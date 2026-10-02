@@ -291,4 +291,18 @@ public sealed partial class FreeformHelperViewModelTests
             vm.NotchTargetCoverageCapHelpText);
     }
 
+    [Theory]
+    [InlineData(true, "Target guard: cap CurrentGain target coverage at 128%.")]
+    [InlineData(false, "Target guard: OFF; target coverage can exceed EMS diagnostic cap.")]
+    public void TargetCoverageGuardSummary_KeepsWorkflowAndSettingsWording(bool enabled, string expected)
+    {
+        var vm = new FreeformHelperViewModel { EnableTargetCoverageGuard = enabled, TargetCoverageCapPercent = 128m };
+        var settings = new SettingsWindowViewModel(vm) { EnableTargetCoverageGuard = enabled, TargetCoverageCapPercent = 128m };
+
+        Assert.Equal(expected, vm.NotchTargetCoverageGuardSummary);
+        Assert.Equal(expected, settings.NotchTargetCoverageGuardSummary);
+        Assert.Equal(
+            "Checklist: Simulation audit, EMS cap, selected rows, and C/runtime parity before FW handoff.",
+            vm.NotchExportHandoffChecklistText);
+    }
 }

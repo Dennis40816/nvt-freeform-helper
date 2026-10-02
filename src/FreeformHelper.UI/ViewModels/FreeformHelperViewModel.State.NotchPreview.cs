@@ -140,9 +140,10 @@ public sealed partial class FreeformHelperViewModel
         ? $"Boundary cap {BoundaryVirtualAreaCapPercent:0.#}%"
         : "Boundary cap OFF";
 
-    public string NotchTargetCoverageGuardSummary => EnableTargetCoverageGuard
-        ? $"Target guard: cap CurrentGain target coverage at {TargetCoverageCapPercent:0.#}%."
-        : "Target guard: OFF; target coverage can exceed EMS diagnostic cap.";
+    public string NotchTargetCoverageGuardSummary =>
+        SimulationSafetyTextProjector.BuildNotchTargetCoverageGuardSummary(
+            EnableTargetCoverageGuard,
+            TargetCoverageCapPercent);
 
     public string NotchTargetCoverageGuardShortText => EnableTargetCoverageGuard
         ? $"Target guard {TargetCoverageCapPercent:0.#}%"
@@ -186,9 +187,8 @@ public sealed partial class FreeformHelperViewModel
             : "Review window selection";
 
     public string NotchExportHandoffChecklistText =>
-        !string.IsNullOrWhiteSpace(SelectedNotchExportFileTypeOption.Display)
-            ? "Checklist: Simulation audit, EMS cap, selected rows, and C/runtime parity before FW handoff."
-            : "Checklist unavailable until an export type is selected.";
+        SimulationSafetyTextProjector.BuildNotchExportHandoffChecklistText(
+            !string.IsNullOrWhiteSpace(SelectedNotchExportFileTypeOption.Display));
 
     /// <summary>
     /// Gets a value indicating whether To Regular ratio labels should render on canvas.

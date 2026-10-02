@@ -391,9 +391,10 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
         ? $"Boundary cap {BoundaryVirtualAreaCapPercent:0.#}%"
         : "Boundary cap OFF";
 
-    public string NotchTargetCoverageGuardSummary => EnableTargetCoverageGuard
-        ? $"Target guard: cap CurrentGain target coverage at {TargetCoverageCapPercent:0.#}%."
-        : "Target guard: OFF; target coverage can exceed EMS diagnostic cap.";
+    public string NotchTargetCoverageGuardSummary =>
+        SimulationSafetyTextProjector.BuildNotchTargetCoverageGuardSummary(
+            EnableTargetCoverageGuard,
+            TargetCoverageCapPercent);
 
     public string NotchTargetCoverageGuardShortText => EnableTargetCoverageGuard
         ? $"Target guard {TargetCoverageCapPercent:0.#}%"

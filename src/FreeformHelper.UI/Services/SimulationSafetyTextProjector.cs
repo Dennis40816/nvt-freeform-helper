@@ -27,6 +27,16 @@ public static class SimulationSafetyTextProjector
                $"compare with EMS cap {emsCapText}.";
     }
 
+    internal static string BuildNotchTargetCoverageGuardSummary(bool enabled, decimal targetCoverageCapPercent) =>
+        enabled
+            ? $"Target guard: cap CurrentGain target coverage at {targetCoverageCapPercent:0.#}%."
+            : "Target guard: OFF; target coverage can exceed EMS diagnostic cap.";
+
+    internal static string BuildNotchExportHandoffChecklistText(bool hasExportType) =>
+        hasExportType
+            ? "Checklist: Simulation audit, EMS cap, selected rows, and C/runtime parity before FW handoff."
+            : "Checklist unavailable until an export type is selected.";
+
     internal static string BuildNotchExportSafetyPolicySummary(string capText) =>
         $"Export safety: run Simulation audit before FW handoff; any After > {capText} needs explicit review.";
 

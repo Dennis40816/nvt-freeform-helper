@@ -451,6 +451,10 @@
     - TDD／mutation：新增 public VM 初始狀態與 null-audit overview cap 一致性及 exact `480`／`EMS cap 480` characterization；暫將 shared fallback 改為 `481d` 後 focused test `1/1` RED（預期 `480`、實得 `481`），還原後 leaf／guard `2/2` GREEN。沒有發現先存 reader 顯示分歧，沒有修正或新增使用者文字。
     - Size／gates：production `0` 新增／刪除檔、`0 physical / 0 nonblank` 淨變動（單行替換）；UI build `0 warning / 0 error`，test-project build `0 error / 7` 個既存 `CA1875` warning。指定四類 tests `31/31`、notch-core `190/190`、notch-golden `6/6` PASS；V21／V22 C golden 未更新，golden 測試通過。`lint.ps1 -UseNoAppHost` 在 sandbox 的 `dotnet format` restore 階段因 `Restore operation failed` 中止，未達 analyzer gate；R13.104 parent及其他既定範圍保持 open。
 
+  - [x] **R13.104a-12 將 target guard 與 handoff checklist 文字交由共用 projector**：主 VM、Settings 的 guard summary 共讀 `SimulationSafetyTextProjector.BuildNotchTargetCoverageGuardSummary`；Step 5 checklist 由同一 owner 投影。既有啟用／停用、選擇狀態與字串不變；selection clear、rebuild、fit／zoom、undo、通知及 export eligibility 均不變。
+    - TDD／mutation：先以 public VM／Settings 鎖定 guard 開／關 exact 文字及已選 export type 的 checklist；原實作 `2/2` GREEN。將新 owner 的 `CurrentGain` 暫改為 `CurrentGainX` 後 focused test `1` 失敗、`1` 通過，還原後指定測試組 `34/34` GREEN。
+    - Size／gates：production `0` 新增／刪除檔，`+11 physical / +9 nonblank`；UI build `0 warning / 0 error`，test-project build `0 error / 7` 個既存 `CA1875` warning。指定四類加 leaf／guard `34/34`、notch-core `190/190`、notch-golden `6/6` PASS；golden 檔未更新。sandbox 依任務規則略過 lint／process listing；R13.104 parent 保持 open。
+
 ### 1.3.2 Matching 與 Domain state
 
 - [ ] **R13.201 正式化 Pad overlap、DXF audit、Canvas hit-test 三個 bounded contexts**；在 overlap evidence API 定案後移除 `PadMatcher`／`PadMatchService` 目前僅為相容而保留、實際未讀取的 `MatchingSettings` 參數
