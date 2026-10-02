@@ -175,6 +175,20 @@ public sealed partial class FreeformHelperViewModelTests
     }
 
     [Fact]
+    public void SimulationSafetyOverview_InitialCapUsesSharedDefaultProjection()
+    {
+        var vm = new FreeformHelperViewModel();
+        var defaultProjection = SimulationSafetyOverviewProjector.Project(
+            audit: null,
+            isStale: false,
+            buildFailureText: null);
+
+        Assert.Equal("480", defaultProjection.EmsCapText);
+        Assert.Equal(defaultProjection.EmsCapText, vm.SimulationSafetyOverviewEmsCapText);
+        Assert.Equal("EMS cap 480", vm.NotchEmsSafetyShortText);
+    }
+
+    [Fact]
     public void SimulationSafetyGuidance_UsesCurrentOverviewCapAndKeepsDefaultSettingsText()
     {
         var vm = new FreeformHelperViewModel();
