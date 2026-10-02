@@ -78,6 +78,12 @@ public static class SimulationSafetyTextProjector
     public static string FormatCountBadge(int count) =>
         count > 99 ? "99+" : Math.Max(0, count).ToString(CultureInfo.InvariantCulture);
 
+    public static string BuildWorkspaceEmsCapText(double afterCap) =>
+        $"EMS cap: After <= {FormatValue(afterCap)}";
+
+    public static string BuildHighRiskStatusText(bool isViolation) =>
+        isViolation ? BuildReplayStatusText(true, true, false) : "Near cap";
+
     public static string BuildWorkspaceSummaryText(SimulationSafetyAuditResult audit)
     {
         if (!audit.HasCells)

@@ -459,6 +459,10 @@
     - TDD／mutation：先補 clean audit 時 block message 的空標題／空內容 characterization，原實作通過；既有 blocked fixture 精確鎖定按鈕、標題與完整本文。暫將新 owner 標題 `safety` 改為 `safetX`，blocked fixture `1/1` RED，還原後指定測試組 `81/81` GREEN。
     - Size／gates：production `0` 新增／刪除檔，`+8 physical / +5 nonblank`；UI build `0 warning / 0 error`，test-project build `0 error / 7` 個既存 `CA1875` warning。指定四類加 export／guard `81/81`、notch-core `190/190`、notch-golden `6/6` PASS；golden 檔未更新。sandbox 依任務規則略過 lint／process listing；R13.104 parent 保持 open。
 
+  - [x] **R13.104a-14 將 Simulation workspace cap 與風險標籤交由共用 projector**：workspace 以 audit cap 呼叫 `SimulationSafetyTextProjector.BuildWorkspaceEmsCapText`，high-risk row 將已計算的 violation fact 交給 `BuildHighRiskStatusText`；後者共用既有 EMS risk priority 文字。移除靜態 guard 中已消除的 ViewModel 例外；audit predicate、row selection、通知、rebuild 與 UI layout 均不變。
+    - TDD／mutation：先以 public workspace fixture 鎖定 `EMS cap: After <= 480`、violation `EMS risk`，再改 global value 鎖定 safe `Near cap`；原實作 `1/1` GREEN。暫將新 owner `Near cap` 改為 `Near caX`，同一測試 `1/1` RED，還原後跑指定 gates。
+    - Size／gates：production `0` 新增／刪除檔，`+6 physical / +4 nonblank`；UI build `0 warning / 0 error`，test-project build `0 error / 7` 個既存 `CA1875` warning。指定四類加 workspace／guard `64/64`、notch-core `190/190`、notch-golden `6/6` PASS；golden 檔未更新。`255` 候選未納入本 leaf：C exporter metadata 的 target cap clamp、legacy projector 的 combine ratio ceiling、UI error formatter 的解析／提示是不同語意；本輪無法以單一 owner 收斂而不跨入 C output，留在 R13.104 parent。sandbox 依任務規則略過 lint／process listing。
+
 ### 1.3.2 Matching 與 Domain state
 
 - [ ] **R13.201 正式化 Pad overlap、DXF audit、Canvas hit-test 三個 bounded contexts**；在 overlap evidence API 定案後移除 `PadMatcher`／`PadMatchService` 目前僅為相容而保留、實際未讀取的 `MatchingSettings` 參數
