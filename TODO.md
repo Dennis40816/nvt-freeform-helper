@@ -455,6 +455,10 @@
     - TDD／mutation：先以 public VM／Settings 鎖定 guard 開／關 exact 文字及已選 export type 的 checklist；原實作 `2/2` GREEN。將新 owner 的 `CurrentGain` 暫改為 `CurrentGainX` 後 focused test `1` 失敗、`1` 通過，還原後指定測試組 `34/34` GREEN。
     - Size／gates：production `0` 新增／刪除檔，`+11 physical / +9 nonblank`；UI build `0 warning / 0 error`，test-project build `0 error / 7` 個既存 `CA1875` warning。指定四類加 leaf／guard `34/34`、notch-core `190/190`、notch-golden `6/6` PASS；golden 檔未更新。sandbox 依任務規則略過 lint／process listing；R13.104 parent 保持 open。
 
+  - [x] **R13.104a-13 將 export safety 按鈕與阻擋對話框文字交由共用 projector**：`NotchExportSelectionViewModel` 只傳遞阻擋狀態及既有正常按鈕文字；`SimulationSafetyTextProjector` 擁有 blocked 按鈕、對話框標題與 summary／high-risk 組裝。移除靜態 guard 中已消除的 ViewModel 例外；既有字串、export eligibility、通知與選列行為不變。
+    - TDD／mutation：先補 clean audit 時 block message 的空標題／空內容 characterization，原實作通過；既有 blocked fixture 精確鎖定按鈕、標題與完整本文。暫將新 owner 標題 `safety` 改為 `safetX`，blocked fixture `1/1` RED，還原後指定測試組 `81/81` GREEN。
+    - Size／gates：production `0` 新增／刪除檔，`+8 physical / +5 nonblank`；UI build `0 warning / 0 error`，test-project build `0 error / 7` 個既存 `CA1875` warning。指定四類加 export／guard `81/81`、notch-core `190/190`、notch-golden `6/6` PASS；golden 檔未更新。sandbox 依任務規則略過 lint／process listing；R13.104 parent 保持 open。
+
 ### 1.3.2 Matching 與 Domain state
 
 - [ ] **R13.201 正式化 Pad overlap、DXF audit、Canvas hit-test 三個 bounded contexts**；在 overlap evidence API 定案後移除 `PadMatcher`／`PadMatchService` 目前僅為相容而保留、實際未讀取的 `MatchingSettings` 參數

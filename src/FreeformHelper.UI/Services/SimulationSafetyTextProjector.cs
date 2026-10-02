@@ -5,6 +5,8 @@ namespace FreeformHelper.UI.Services;
 
 public static class SimulationSafetyTextProjector
 {
+    public const string ExportBlockTitle = "Export blocked by EMS safety";
+
     public static string FormatValue(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 
     internal static string FormatEmsAfterCap(SimulationSafetyAuditResult? audit) =>
@@ -176,6 +178,13 @@ public static class SimulationSafetyTextProjector
             ? $"{summary} {BuildPhysicalAuditSummaryText(audit)}"
             : summary;
     }
+
+    public static string BuildExportButtonText(bool isBlocked, string readyText) =>
+        isBlocked ? "Export blocked (EMS risk)" : readyText;
+
+    public static string BuildExportBlockMessage(SimulationSafetyAuditResult audit) =>
+        BuildExportSummaryText(audit) + Environment.NewLine + Environment.NewLine +
+        BuildExportHighRiskText(audit);
 
     public static string BuildExportHighRiskText(SimulationSafetyAuditResult? audit)
     {

@@ -245,9 +245,9 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public int CadMissingRowCount => _summarySnapshot.CadMissingRowCount;
     public string DistributionText => _summarySnapshot.DistributionText;
     public string SubtitleText => _subtitleText;
-    public string ExportButtonText => IsExportBlockedBySimulationSafety
-        ? "Export blocked (EMS risk)"
-        : _summarySnapshot.ExportButtonText;
+    public string ExportButtonText => SimulationSafetyTextProjector.BuildExportButtonText(
+        IsExportBlockedBySimulationSafety,
+        _summarySnapshot.ExportButtonText);
     public bool CanConfirmExport => HasSelection;
     public string SelectedRowHeaderText => SelectedRow?.PreviewHeaderText ?? "No row selected.";
     public string SelectedRowContextText => SelectedRow?.CurrentRowContextText ?? "-";
@@ -331,9 +331,8 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     {
         if (_simulationSafetyAudit is { HasViolations: true } audit)
         {
-            title = "Export blocked by EMS safety";
-            message = SimulationSafetyTextProjector.BuildExportSummaryText(audit) + Environment.NewLine + Environment.NewLine +
-                      SimulationSafetyTextProjector.BuildExportHighRiskText(audit);
+            title = SimulationSafetyTextProjector.ExportBlockTitle;
+            message = SimulationSafetyTextProjector.BuildExportBlockMessage(audit);
             return true;
         }
 

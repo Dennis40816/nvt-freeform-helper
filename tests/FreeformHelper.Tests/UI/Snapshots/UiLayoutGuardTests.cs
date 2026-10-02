@@ -14,7 +14,6 @@ public sealed class UiLayoutGuardTests
         var allowedExistingRiskLines = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["Views/DevView.axaml"] = "<SelectableTextBlock Text=\"EMS OK\"/>",
-            ["ViewModels/NotchExportSelectionViewModel.cs"] = "? \"Export blocked (EMS risk)\"",
             ["ViewModels/SimulationWorkspaceViewModel.Validation.cs"] = "isViolation ? \"EMS risk\" : \"Near cap\",",
         };
         var literal = new Regex(
