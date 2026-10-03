@@ -360,7 +360,6 @@ public sealed partial class NotchTableGenerator
                 areaMode: context.TargetAllocationAreaMode);
         }
         var hasToFullInfluenceOnAnchorIc = allocation.Targets
-            .Where(target => target.IcIndex == anchor.IcIndex)
             .Any(target => target.ToFullAppliedRegularCount > 0);
         var targetCoverageProjection = allocation.TargetCoverageProjection;
         var legs = BuildV22DiffLegs(
@@ -381,12 +380,7 @@ public sealed partial class NotchTableGenerator
         var combinedPercent = Math.Clamp(rawCombinedPercent, 0, 255);
 
         var anchorSourceArea = allocation.Targets
-            .Where(target => target.IsAnchorDiff)
-            .Where(target => target.IcIndex == anchor.IcIndex)
-            .Where(target => target.DiffIndex == sourceDiffIndex)
-            .Select(target => target.EffectiveArea)
-            .DefaultIfEmpty(compensation.OverlapAreaTotal)
-            .Max();
+            .SingleOrDefault(target => target.IsAnchorDiff)?.EffectiveArea ?? compensation.OverlapAreaTotal;
         var isAnchorMatchedCad = anchor.MatchedCadPadId.HasValue && anchor.MatchedCadPadId.Value == cadPad.Id;
         var crossIcText = profile.IcIndices.Count > 1
             ? $" XIC={string.Join("/", profile.IcIndices.Select(ic => ic + 1))}"
@@ -402,7 +396,7 @@ public sealed partial class NotchTableGenerator
             projectionError,
             combinedPercent,
             commentPrefix,
-            Math.Max(0.0, anchorSourceArea),
+            anchorSourceArea,
             isAnchorMatchedCad,
             hasToFullInfluenceOnAnchorIc,
             legs);
