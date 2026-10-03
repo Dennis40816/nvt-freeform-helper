@@ -14,7 +14,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task ShowSimulationCommand_ActivatesSimulationPlaceholderPage_WhenWorkspaceCannotBeBuilt()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
 
         await shell.ShowSimulationCommand.ExecuteAsync(null);
 
@@ -27,7 +27,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task ShowSimulationCommand_ShowsSimulationHostBeforeDelayedBuildCompletes()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -52,7 +52,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task ShowSimulationAsync_BindsWorkspaceIntoSimulationPage()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var sourceRevision = shell.FreeformHelper.SimulationWorkspaceSourceRevision;
         var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
         var workspaceViewModel = new SimulationWorkspaceViewModel(
@@ -75,7 +75,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public void SimulationSafetyOverview_WhenWorkspaceHasNoCells_UsesNotRunAvailabilityStatus()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var grid = TestGeometryFactory.CreateLinearRegularGrid(Array.Empty<int>());
         var workspaceViewModel = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
@@ -102,7 +102,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task SimulationActiveWithoutWorkspace_PrewarmsArtifactsAfterWorkspaceSourceChanges()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
 
         await shell.ShowSimulationCommand.ExecuteAsync(null);
 
@@ -127,7 +127,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task WorkspaceSourceChanges_PrewarmsSimulationArtifactsWhenWorkspaceNotCreated()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
 
         Assert.True(shell.IsWorkspaceActive);
         Assert.True(shell.Simulation.HasNoWorkspace);
@@ -152,7 +152,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task WorkspaceSourceChanges_RebuildsStaleSimulationWorkspace_WhenWorkspaceIsPristine()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
         var initialWorkspace = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
@@ -190,7 +190,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task WorkspaceSourceChanges_BurstOnlyPrewarmsOnce()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
         shell.Simulation.CurrentWorkspace = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),

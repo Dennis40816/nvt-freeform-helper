@@ -82,7 +82,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
         string projectPath,
         string exportDirectory)
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var vm = shell.FreeformHelper;
         var exportPath = Path.Combine(exportDirectory, $"run-{run.ToString("00", System.Globalization.CultureInfo.InvariantCulture)}.c");
 

@@ -1,3 +1,6 @@
+using System.Collections.Specialized;
+using FreeformHelper.UI.Logging;
+
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class ShellViewModel
@@ -196,6 +199,17 @@ public sealed partial class ShellViewModel
 
     public void Dispose()
     {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _isDisposed = true;
+        if (AppLogStore.Instance.Entries is INotifyCollectionChanged notify)
+        {
+            notify.CollectionChanged -= OnLogEntriesChanged;
+        }
+
         DetachSimulationSafetyOverviewSync();
         FreeformHelper.WorkspaceDerivedSourceChanged -= OnFreeformHelperWorkspaceSourceChanged;
         if (CoordinatePlanner.CurrentWorkspace is not null)

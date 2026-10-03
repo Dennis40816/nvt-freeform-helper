@@ -4,6 +4,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
+using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -129,7 +130,7 @@ public sealed class HeadlessSessionGuardTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var window = new MainWindow();
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         shell.FreeformHelper.HasUnsavedChanges = true;
         window.SetShellViewModel(shell);
         var closed = false;
@@ -137,14 +138,28 @@ public sealed class HeadlessSessionGuardTests
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
+        var store = AppLogStore.Instance;
+        store.MarkUiReady();
+        store.Add(new AppLogEntry(DateTimeOffset.UtcNow, "INFO", "test", "before window closes"));
+        Dispatcher.UIThread.RunJobs();
+        Assert.Contains("before window closes", shell.ConsoleText);
+
         // Unsaved changes make the window cancel the close and ask first.
         window.Close();
         Dispatcher.UIThread.RunJobs();
         Assert.False(closed);
+        var textBeforeClose = shell.ConsoleText;
+        store.Add(new AppLogEntry(DateTimeOffset.UtcNow, "INFO", "test", "after cancelled close"));
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotEqual(textBeforeClose, shell.ConsoleText);
 
         HeadlessSessionGuardAttribute.CloseOpenWindowsAndRunQueuedWork();
 
         Assert.True(closed);
+        var textAfterClose = shell.ConsoleText;
+        store.Add(new AppLogEntry(DateTimeOffset.UtcNow, "INFO", "test", "after window closes"));
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(textAfterClose, shell.ConsoleText);
     }
 
     [AvaloniaFact]

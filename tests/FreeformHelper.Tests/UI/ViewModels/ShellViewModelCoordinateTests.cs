@@ -14,7 +14,7 @@ public sealed class ShellViewModelCoordinateTests
     [Fact]
     public async Task ShowCoordinateAsync_BindsWorkspaceIntoCoordinatePage()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var sourceRevision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
         var workspaceViewModel = new CoordinatePlannerWorkspaceViewModel(
             new CoordinatePlannerWorkspaceUseCase(),
@@ -40,7 +40,7 @@ public sealed class ShellViewModelCoordinateTests
     [Fact]
     public async Task ShowCoordinateAsync_PropagatesCoordinatePreferencesToFreeformSnapshot()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var sourceRevision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
         var workspaceViewModel = new CoordinatePlannerWorkspaceViewModel(
             new CoordinatePlannerWorkspaceUseCase(),

@@ -32,6 +32,7 @@ public sealed partial class MainWindow : Window
     public void SetShellViewModel(ViewModels.ShellViewModel shellViewModel)
     {
         DataContext = shellViewModel;
+        Closed += (_, _) => shellViewModel.Dispose();
     }
 
     public void ShowTopToast(string message, NotificationType type = NotificationType.Information)
