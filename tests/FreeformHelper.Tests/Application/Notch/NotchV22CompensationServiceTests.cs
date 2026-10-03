@@ -1,4 +1,5 @@
 using FreeformHelper.Application.Services;
+using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
@@ -8,6 +9,57 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchV22CompensationServiceTests
 {
+    [Theory]
+    [InlineData(NotchCompensationModel.CurrentGain)]
+    [InlineData(NotchCompensationModel.ConservativeNoGain)]
+    [InlineData(NotchCompensationModel.Disabled)]
+    public void A1Fact5_CadAllocation_Q7ZeroKeepsRawOwnerOverlapButEmitsNoCandidate(NotchCompensationModel model)
+    {
+        var grid = CreateGrid(Grid10, Grid10);
+        var cad = CreateCadRect(0, 0, 2570, 10);
+        var regular = grid.Pads[0];
+        regular.Freeform = FreeformType.XWay;
+        regular.MatchedCadPadId = cad.Id;
+        var settings = new ProjectSettings
+        {
+            Notch = new NotchSettings
+            {
+                ComputationMode = NotchComputationMode.CadAllocation,
+                CompensationModel = model,
+                ThresholdQ7 = 0,
+                ThresholdPercentV22 = 0,
+                EnableTargetCoverageGuard = false,
+                EnabledVersions = [NotchAlgorithmVersion.V22],
+            },
+        };
+        var switches = settings.Notch.ResolveStep3Switches();
+        var ownerContext = NotchV22CompensationService.CreateContext(
+            cad, grid, switches.EnableToRegular, switches.EnableToFull);
+        var rawAllocations = (IReadOnlyList<NotchAllocation>)ownerContext.GetType()
+            .GetProperty("Allocations", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .GetValue(ownerContext)!;
+        var raw = Assert.Single(rawAllocations);
+        Assert.Equal(1.0 / 257.0, raw.Ratio, 12);
+        Assert.Equal(0, raw.Q7);
+        var owner = NotchV22CompensationService.Compute(ownerContext);
+        Assert.Equal(100, owner.OverlapAreaTotal);
+        Assert.Equal(1, owner.OverlapRegularCount);
+        Assert.Equal(100, Assert.Single(owner.RegularDebugInfos).SourceArea);
+        var resolved = new NotchV22ResolvedResultService().Build(
+            cad, owner, 0.001, 0, regular.DiffIndex, NotchV22TargetAllocationPolicy.ResolveAreaMode(model));
+        Assert.Equal(100, Assert.Single(resolved.TargetAllocation.Targets).RatioPercentRounded);
+
+        var readerAllocations = NotchAllocationService.BuildAllocations(cad, grid);
+        Assert.Empty(readerAllocations);
+        var readerCompensation = NotchV22CompensationService.Compute(
+            cad, grid, switches.EnableToRegular, switches.EnableToFull, precomputedAllocations: readerAllocations);
+        Assert.Equal(0, readerCompensation.OverlapAreaTotal);
+        Assert.Empty(readerCompensation.RegularDebugInfos);
+        var generated = new NotchTableGenerator().GenerateCadAllocationResolvedBatch(new CadPadSet([cad]), grid, settings);
+        Assert.Equal(0, generated.Table.GenerationPhaseTimings.CandidateBreakdown?.CandidateCount);
+        Assert.Empty(generated.Table.Rows);
+    }
+
     private static readonly double[] Grid10 = [10.0];
     private static readonly double[] Grid10x2 = [10.0, 10.0];
     private static readonly double[] Grid10x20 = [10.0, 20.0];
