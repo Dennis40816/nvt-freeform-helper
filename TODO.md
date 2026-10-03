@@ -106,6 +106,7 @@
   - 測試先行：新增展開／收合兩個案例，先確認釋放前仍接收 log，重複 `Dispose()` 後文字與行數皆不再變動；舊程式兩個案例皆失敗（展開時文字繼續追加，收合時來源行數由 1 變成 2）。另擴充既有 headless 視窗收尾測試，確認取消關閉仍接收 log、實際關閉後停止接收。
   - 驗證：UI 與測試專案皆以離線參數建置，0 警告、0 錯誤；直接回歸與視窗收尾 4/4 通過；所有建立 shell 的測試類別，加上 `AppLogStoreTests`、console UI、log 格式與連結解析測試，80/80 通過；`verify.ps1 -StructureOnly` 通過。
   - 未驗證：依沙箱限制略過 `lint.ps1` 與真實行程列舉；3635 效能測試的啟用開關保持關閉，其入口雖通過，機密資料的實際流程未執行。未讀取 `example/`，未提交或推送。
+  - 審查補修（S15.018b）：獨立審查發現關閉主視窗時 `Dispose()` 釋放仍在建置中的 workspace gate，導致 `finally` 的 `Release()` 拋出 `ObjectDisposedException` 並使呼叫端記錄錯誤及中斷預熱；改由共用 helper 僅在 shell 已釋放時忽略該例外，透過最小 internal 暫停接縫覆蓋 coordinate 建置、simulation 建置與預熱的回歸測試，修正前三個案例皆因該例外失敗，修正後 3/3 通過且沒有 error log。
 - [x] **S15.016 其他用非 thread-safe 集合收集 `PropertyChanged` 的測試（2026-10-02 修正）**
   - 位置：`FreeformHelperViewModelTests.Basics.GridPitch.cs:72`、`FreeformHelperViewModelTests.Basics.CoreFlags.cs:229`、`:245`、`:266`、`FreeformHelperViewModelTests.NotchExportCache.cs:282`。VM 的背景工作也會觸發 `PropertyChanged`，與 S15.002 已修的 `SettingsWindowDraft_SaveAppliesGeneralSectionFields` 是同一種寫法。
   - 目標：改用 thread-safe 的集合，或抽成共用的收集 helper。
