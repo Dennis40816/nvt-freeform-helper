@@ -168,6 +168,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     public async Task ExecuteAsync_QueryMultiOwner_OverrideReusesOneResolvedResultAndReturnsOverrideEvidence()
     {
         var (shell, cad) = BuildMultiOwnerQueryFixture();
+        using var shellScope = shell;
         var useCase = new RuntimeQueryUseCase(shell);
         var before = await QueryStep3CompensationCacheMetricsAsync(useCase);
 
@@ -211,6 +212,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     public async Task ExecuteAsync_QueryMultiOwner_PreservesVisibilityAndNotReadyErrorsWithoutFallbackCompensation()
     {
         var (shell, cad) = BuildMultiOwnerQueryFixture();
+        using var shellScope = shell;
         var vm = shell.FreeformHelper;
         vm.CadPads.Clear();
         var useCase = new RuntimeQueryUseCase(shell);
@@ -319,7 +321,7 @@ public sealed partial class RuntimeQueryUseCaseTests
 
     private static (ShellViewModel Shell, CadPad TargetCad) BuildMultiOwnerQueryFixture()
     {
-        using var shell = new ShellViewModel();
+        var shell = new ShellViewModel();
         var vm = shell.FreeformHelper;
         var target = CreateCadPad(id: 31, minX: 0, minY: 0, maxX: 5, maxY: 10);
         var minorOwner = CreateCadPad(id: 32, minX: 9.95, minY: 0, maxX: 10, maxY: 10);
