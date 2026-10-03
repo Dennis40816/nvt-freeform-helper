@@ -64,7 +64,9 @@ public sealed class Cad3635LoadBenchmarkTests
     private static async Task<Cad3635LoadBenchmarkSample> RunSampleAsync(int run, bool warmup, string dxfPath)
     {
         var vm = new FreeformHelperViewModel();
-        var useCase = new CadLoadUseCase(new DxfImportService());
+        var importService = GetPrivateField<DxfImportService>(vm, "_dxfImportService");
+        var catalogState = GetPrivateField<LayerCatalogStateService>(vm, "_layerCatalogStateService");
+        var useCase = new CadLoadUseCase(importService);
         var options = InvokePrivate<DxfImportOptions>(vm, "BuildDxfOptions");
 
         var total = Stopwatch.StartNew();
@@ -75,7 +77,8 @@ public sealed class Cad3635LoadBenchmarkTests
         Assert.NotNull(outcome);
 
         var layerCatalog = Stopwatch.StartNew();
-        await InvokePrivateTaskAsync(vm, "TryLoadDxfLayerCatalogFromPathAsync", [dxfPath]);
+        // Open DXF now hands the catalog built during the import to the catalog state (single read).
+        catalogState.SetFromPath(dxfPath, importService.ImportedCatalog);
         layerCatalog.Stop();
 
         var apply = Stopwatch.StartNew();
@@ -138,6 +141,9 @@ public sealed class Cad3635LoadBenchmarkTests
             Math.Round(average, 2),
             sorted[^1]);
     }
+
+    private static TField GetPrivateField<TField>(object instance, string fieldName) =>
+        (TField)instance.GetType().GetField(fieldName, PrivateInstance)!.GetValue(instance)!;
 
     private static TResult InvokePrivate<TResult>(object instance, string methodName, object?[]? args = null)
     {

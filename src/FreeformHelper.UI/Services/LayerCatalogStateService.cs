@@ -56,13 +56,7 @@ public sealed class LayerCatalogStateService
         try
         {
             _catalog = DxfLayerCatalogReader.ReadFromPath(path);
-            _cache = _catalog;
-            _cachePath = path;
-            _cachePathLength = length;
-            _cachePathWriteUtc = writeUtc;
-            _cacheEmbeddedFingerprint = 0;
-            _cacheEmbeddedLength = -1;
-            Logger.Info(CultureInfo.InvariantCulture, "DXF layer catalog loaded from path ({0} layers).", _catalog.Layers.Count);
+            CachePathCatalog(path, length, writeUtc);
         }
         catch (Exception ex)
         {
@@ -73,6 +67,30 @@ public sealed class LayerCatalogStateService
             _cachePathWriteUtc = default;
             Logger.Warn(ex, "Failed to parse DXF layer catalog from path: {0}", path);
         }
+    }
+
+    internal void SetFromPath(string path, DxfLayerCatalog catalog)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            Clear();
+            return;
+        }
+
+        var fileInfo = new FileInfo(path);
+        _catalog = catalog;
+        CachePathCatalog(path, fileInfo.Length, fileInfo.LastWriteTimeUtc);
+    }
+
+    private void CachePathCatalog(string path, long length, DateTime writeUtc)
+    {
+        _cache = _catalog;
+        _cachePath = path;
+        _cachePathLength = length;
+        _cachePathWriteUtc = writeUtc;
+        _cacheEmbeddedFingerprint = 0;
+        _cacheEmbeddedLength = -1;
+        Logger.Info(CultureInfo.InvariantCulture, "DXF layer catalog loaded from path ({0} layers).", _catalog.Layers.Count);
     }
 
     public void TryLoadFromEmbedded(byte[]? data)

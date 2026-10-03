@@ -17,6 +17,8 @@ public sealed class DxfImportService
     // Private instance of the DXF pad importer.
     private readonly DxfPadImporter _importer = new();
 
+    internal DxfLayerCatalog ImportedCatalog { get; private set; } = DxfLayerCatalog.Empty;
+
     /// <summary>
     /// Imports CAD pads from a DXF file specified by its file path.
     /// </summary>
@@ -25,7 +27,9 @@ public sealed class DxfImportService
     /// <returns>A <see cref="CadPadSet"/> containing the imported CAD pads.</returns>
     public CadPadSet ImportFromPath(string path, DxfImportOptions options)
     {
-        return DxfPadImporter.Import(path, options);
+        var pads = DxfPadImporter.Import(path, out var catalog, options);
+        ImportedCatalog = catalog;
+        return pads;
     }
 
     /// <summary>

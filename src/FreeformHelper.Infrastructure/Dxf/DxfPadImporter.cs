@@ -29,6 +29,20 @@ public sealed partial class DxfPadImporter
     }
 
     /// <summary>
+    /// Imports CAD pads and their layer catalog from the same DXF token list.
+    /// </summary>
+    public static CadPadSet Import(string path, out DxfLayerCatalog catalog, DxfImportOptions? options = null)
+    {
+        options ??= new DxfImportOptions();
+
+        using var sr = new StreamReader(path);
+        var tokens = ReadPairs(sr).ToList();
+        var pads = ImportFromTokens(tokens, options);
+        catalog = DxfLayerCatalogReader.ReadFromPairs(tokens);
+        return pads;
+    }
+
+    /// <summary>
     /// Imports CAD pads from a DXF file provided as a stream.
     /// </summary>
     /// <param name="stream">The input stream containing the DXF data.</param>
@@ -52,7 +66,11 @@ public sealed partial class DxfPadImporter
     {
         // DXF files are structured as group code-value pairs. Read them all first.
         var tokens = ReadPairs(reader).ToList();
+        return ImportFromTokens(tokens, options);
+    }
 
+    private static CadPadSet ImportFromTokens(List<(int code, string value)> tokens, DxfImportOptions options)
+    {
         var blocks = ParseBlockDefinitions(tokens);
         var modelPolylines = new List<ParsedPolyline>();
         var modelInserts = new List<ParsedInsert>();
