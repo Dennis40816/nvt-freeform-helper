@@ -265,7 +265,7 @@
     - [x] README 說明 `example/` submodule 與沒有資料時的行為（S15.009b 已加）。
     - [x] `LICENSE`：owner 已決定「保留所有權利」，copyright holder 為 `Dennis Liu`；已新增專有權利聲明，`scripts/verify.ps1` 將其列為必要檔案。
     - [x] 兩個 golden snapshot 已移到 `FreeformHelper-testdata` 的 `golden-snapshots/`（commit `8c84e4d6`），本 repo 透過 `example/golden-snapshots/` 讀取；本次變更刪除舊路徑，提交後的 HEAD 不再包含它們，但本 private repo 歷史仍保留，因此公開 repo 必須由匯出的檔案樹建立。S15.005a 的 deploy key 尚未設置前，CI 會略過這兩個測試。測試程式與文件中同樣有個別 pad 編號、節點數與雜湊這類由面板資料算出的數值，維持不動（owner 已同意名稱可公開）。
-    - [ ] `.gitmodules` 會讓公開 repo 顯示 private 資料 repo 的名稱；外部使用者 `--recurse-submodules` 會失敗（一般 clone 不受影響）。公開 repo 必須由匯出的檔案樹建立，不能 push 現有的任何 ref。
+    - [x] `.gitmodules` 的處理：owner 2026-10-03 決定「保留私有 URL」，公開樹保留 `.gitmodules`（相對 URL `../FreeformHelper-testdata.git`）與 `example` 的 gitlink（`8c84e4d6`）；公開頁面會看得到私有資料 repo 的名稱但沒有內容，外部使用者 `--recurse-submodules` 會失敗（一般 clone 不受影響）。公開 repo 必須由匯出的檔案樹建立（單一初始 commit），不能 push 現有的任何 ref；此公開匯入限制與 S15.009e 一併結案。
   - [ ] **S15.009e 建立公開 repo「NVT Freeform Helper」並把本 repo 標示為 archived**（owner 2026-10-02 決定名稱與處置）
     - 新 repo 由 owner 建立（slug 待定，GitHub 名稱不能有空白）；以單一 commit 匯入，不 push 本 repo 的任何 ref。之後的日常開發在新 repo 進行。
     - 本 repo 在遷移完成後明確標示為 archived（名稱或描述註明，並設為唯讀）。archive 之後不能再 push 或開 PR，所以要先把本 repo 上未完成的 PR 收尾，並確認 `FreeformHelper-testdata` 與新 repo 的 submodule 指標正確。
@@ -365,7 +365,7 @@
     - TDD／mutation：public empty-precompute fixture在修改前把幾何半覆蓋重算為`ToRegular=0.5`而RED，完成後固定ratio／combined／overlap／count為`0`且無debug rows；public raw factory、canonical context與compatibility adapter投影相同normal diagnostics。Focused compensation/generator/Detail 76、notch-core 190、Application 221、ui-core 274、smoke 25、golden 6、Runtime Query/IPC 23與GCC 8 tests通過；callback freeze、V21/V22 ordered rows與Runtime schema不變。
     - Size／gates：相對`659f214`，production total `592 / 99,788 / 89,092 -> 592 / 99,896 / 89,195`、logic-first `387 / 65,541 / 58,141 -> 387 / 65,649 / 58,244`，皆為`0 files / +108 physical / +103 nonblank`；同時直接刪除Stage A/B nullable fallback 45 physical lines，0新service／cache／session／dependency／generic executor，相關最大檔案為497行。兩次fresh isolated deterministic Release皆為`15,362,560 bytes`，相對[#76](https://github.com/Dennis40816/FreeformHelper/issues/76)的`15,360,512`為`+2,048`；Application `715,264 / B55657DD…3C7218`、UI `14,546,432 / E0A4F051…113A7C`，Domain／Infrastructure bytes/hash不變。Hidden UI/IPC正反順序維持V21 `692 / 130979 / 8961B815…E57488`、V22 `548 / 84023 / 5208068B…57BB47`，golden／export state／budget PASS；selection total／Inspector／preview p95為`43/23/19`與`29/15/16 ms`，UI build與lint/analyzer為0 warning／0 error。R13.101仍因R13.101c-2 final-output/cache split保持open；R13.102／R13.103與Legacy convergence亦未由本slice宣稱完成。
 - [ ] **R13.102 建立與 V21/V22 output request 無關的 compensation/Stage1-3/allocation/audit/trace 單一 resolved result**
-  - 盤點證據（2026-10，INV2）：`docs/reviews/r13-slice-inventories-2026-10.md` 第 1 節列出 generator、Inspector、PadInfo、RuntimeQuery、simulation／overlay 讀者及下一個零行為 leaf；本 parent 保持未完成，純 `LegacyRegularAnchor` 議題等待 owner decision。
+  - 盤點證據（2026-10，INV2）：`docs/reviews/r13-slice-inventories-2026-10.md` 第 1 節列出 generator、Inspector、PadInfo、RuntimeQuery、simulation／overlay 讀者及下一個零行為 leaf；本 parent 保持未完成，純 `LegacyRegularAnchor` 部分依 owner 2026-10-03 決定：V21 與 Legacy 維持原樣，不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標（見本檔 Owner 決定）。
   - [ ] **R13.102a 同一次 selection/revision 的 preview、inspector、export 共用同一 resolved snapshot/task**，不得同步 preview 算一次、deferred inspector 再算一次。
     - [x] **R13.102a-1 讓同一 selection/revision 的 Step 3 preview 與 deferred CAD Inspector 共用同一 resolved snapshot**（[#16](https://github.com/Dennis40816/FreeformHelper/issues/16)）：preview 改由既有 revisioned per-CAD owner 取得 `NotchV22ResolvedResult`；200 ms deferred warm path 只投影同一 immutable instance，不再重算 compensation、evict cache 或以等價新 instance 取代。Cold miss 仍在 background 建立、驗證、保存並投影一次，既有 debounce、pending state、cancellation、selection/revision stale rejection 與 UI-thread apply 契約不變。
       - TDD：public ViewModel workflow 鎖 warm identity、cold stable identity、CAD A→B／clear-selection stale rejection、output-only profile/file-type/version reuse、pending 中 strict-overlap invalidation，以及 strict-override／partial-cache 不污染 current key。將 preview 暫退回 uncached construction、讓 deferred path忽略 prewarmed result，或強制 warm path重算 compensation時，identity／build-count tests各自恢復 RED。
@@ -605,7 +605,7 @@
   - 基準：先使用 gated `Cad3635LoadBenchmarkTests` 量測 3635 `import / layerCatalog / apply / rebuild`，並用 gated `Cad3635EndToEndBenchmarkTests` 量測 `Load project / Step1 / Step2 / Step5` 的 compute + render flush，再逐步重構。
   - 驗收：3635 direct DXF load 與 E2E benchmark 顯示改善比例；3635 V21/V22 export drift 維持一致；一般測試不因 benchmark 變慢。
 
-- [ ] **S14.012 Source-line length coverage model note（研究 / 不進 UI 重構 commit）**
+- [x] **S14.012 Source-line length coverage model note（研究 / 不進 UI 重構 commit；2026-10-03 完成，文件隨 PR 103 合併）**
   - 目標：記錄「polygon 面積相同但 source/data line 覆蓋長度不同時，實際感應量可能不同」的物理模型假設，避免未來 allocation 討論只剩 area ratio。
   - 範圍：新增或更新 `docs/reference/source-line-coverage-model.md`；盤點 `src/FreeformHelper.Application/Services/PadMatcher.cs`、`src/FreeformHelper.Application/Services/NotchV22TargetAllocationService.cs`、`src/FreeformHelper.Application/Services/NotchV22CompensationService*.cs` 目前 area-based assumption。
   - 驗證：
