@@ -1,0 +1,1148 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
+  <!-- Slightly denser typography -->
+  <Style Selector="TextBlock, SelectableTextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}"/>
+  </Style>
+
+  <Style Selector="Button SelectableTextBlock, ToggleButton SelectableTextBlock, CheckBox SelectableTextBlock, MenuItem SelectableTextBlock, ComboBox SelectableTextBlock, ComboBoxItem SelectableTextBlock">
+    <Setter Property="IsHitTestVisible" Value="False"/>
+    <Setter Property="Focusable" Value="False"/>
+  </Style>
+
+  <Style Selector="Border.validationCountPill">
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.validationCountText, TextBlock.validationCountText">
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+  </Style>
+
+  <Style Selector="Button.validationTraceRow">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Top"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+  </Style>
+
+  <Style Selector="Button.validationTraceRow:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+  </Style>
+
+  <Style Selector="Button.validationTraceRow:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag">
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.direct">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.incoming">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSuccess}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.outgoing">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.validationRowKindText, TextBlock.validationRowKindText">
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.direct SelectableTextBlock.validationRowKindText, Border.validationRowKindTag.direct TextBlock.validationRowKindText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.incoming SelectableTextBlock.validationRowKindText, Border.validationRowKindTag.incoming TextBlock.validationRowKindText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.outgoing SelectableTextBlock.validationRowKindText, Border.validationRowKindTag.outgoing TextBlock.validationRowKindText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.legacy">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.legacy SelectableTextBlock.validationRowKindText, Border.validationRowKindTag.legacy TextBlock.validationRowKindText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.nocad">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.nocad SelectableTextBlock.validationRowKindText, Border.validationRowKindTag.nocad TextBlock.validationRowKindText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="Button.verificationSummaryChip">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderNotchExportBadge}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Button.verificationSummaryChip:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Border.validationRowKindTag.workspaceContextBadge">
+    <Setter Property="BorderThickness" Value="{StaticResource BorderNotchExportBadge}"/>
+  </Style>
+
+  <Style Selector="Button.verificationSummaryChip.active">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceSelected}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Button.verificationSummaryChip.direct, Button.verificationSummaryChip.transfer">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Button.verificationSummaryChip.incoming">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSuccess}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
+  </Style>
+
+  <Style Selector="Button.verificationSummaryChip.outgoing">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushWarning}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="Button.verificationSummaryChip.nocad">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="Button.verificationSummaryChip.legacy">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="Grid.workspacePresetButtonContent">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space6}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspacePresetButtonLabel, TextBlock.workspacePresetButtonLabel">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+  </Style>
+
+  <Style Selector="StackPanel.infoTierRow">
+    <Setter Property="Orientation" Value="Horizontal"/>
+    <Setter Property="Spacing" Value="{StaticResource Space8}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="Grid.infoTierRow">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space8}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="Border.infoTierDot">
+    <Setter Property="Width" Value="{StaticResource InspectorTierDotSize}"/>
+    <Setter Property="Height" Value="{StaticResource InspectorTierDotSize}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Border.infoTierDot.summary">
+    <Setter Property="Background" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Border.infoTierDot.detail">
+    <Setter Property="Background" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="Border.infoTierDot.warning">
+    <Setter Property="Background" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="Border.infoTierDot.trace">
+    <Setter Property="Background" Value="{DynamicResource BrushSuccess}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.padInspectorLineValue, TextBlock.padInspectorLineValue">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.padInspectorLineLabel, TextBlock.padInspectorLineLabel">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.padInspectorLineLabel.padInspectorLineLabelKey, TextBlock.padInspectorLineLabel.padInspectorLineLabelKey">
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.padInspectorLineLabel.padInspectorLineLabelWarning, TextBlock.padInspectorLineLabel.padInspectorLineLabelWarning">
+    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.padInspectorLineValue.padInspectorLineValueKey, TextBlock.padInspectorLineValue.padInspectorLineValueKey">
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.padInspectorLineValue.padInspectorLineValueWarning, TextBlock.padInspectorLineValue.padInspectorLineValueWarning">
+    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.padInspectorFreeformSlashX, TextBlock.padInspectorFreeformSlashX">
+    <Setter Property="Foreground" Value="{DynamicResource BrushNotchX}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.padInspectorFreeformSlashY, TextBlock.padInspectorFreeformSlashY">
+    <Setter Property="Foreground" Value="{DynamicResource BrushNotchY}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Border.workspaceTopLayerBox">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_8}"/>
+  </Style>
+
+  <Style Selector="Border.workspaceFirstPeekBar">
+    <Setter Property="Padding" Value="{StaticResource Inset12_10}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderBottomThin}"/>
+  </Style>
+
+  <Style Selector="Border.workspaceSecondPeekBar">
+    <Setter Property="Padding" Value="{StaticResource Inset12_10}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderBottomThin}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceFirstPeekTitle, TextBlock.workspaceFirstPeekTitle">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeLg}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceFirstPeekSubtitle, TextBlock.workspaceFirstPeekSubtitle">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceSecondPeekStatus, TextBlock.workspaceSecondPeekStatus">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextAlignment" Value="Right"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="StackPanel.workspaceHeaderSettingBlock">
+    <Setter Property="Spacing" Value="{StaticResource Space4}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceMainTitle, TextBlock.workspaceMainTitle">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSectionTitle}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceHeaderMeta, TextBlock.workspaceHeaderMeta">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceToolbarLabel, TextBlock.workspaceToolbarLabel">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.chipStatusText, TextBlock.chipStatusText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceFilterResultText, TextBlock.workspaceFilterResultText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+  </Style>
+
+  <Style Selector="Border.workspaceSectionCard">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceSectionTitle, TextBlock.workspaceSectionTitle">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Grid.workspaceSectionHeader">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space8}"/>
+    <Setter Property="RowSpacing" Value="{StaticResource Space2}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceSectionSummary, TextBlock.workspaceSectionSummary">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="2"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceSectionMeta, TextBlock.workspaceSectionMeta">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceSectionMeta.compact, TextBlock.workspaceSectionMeta.compact">
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="2"/>
+  </Style>
+
+  <Style Selector="Border.workspaceDetailStrip">
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_6}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Border.workspaceDetailStrip.flat">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderTopThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusNone}"/>
+  </Style>
+
+  <Style Selector="Border.workspaceFileRow">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_6}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Grid.workspaceFileRowContent">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space8}"/>
+  </Style>
+
+  <Style Selector="controls|FontIcon.workspaceFileRowIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeMd}"/>
+    <Setter Property="VerticalAlignment" Value="Top"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceFileRowTitle, TextBlock.workspaceFileRowTitle">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceFileRowMeta, TextBlock.workspaceFileRowMeta">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="ToggleButton.workspaceFoldHeader">
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_6}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="ToggleButton.workspaceFoldHeader:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.workspaceFoldHeader:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.workspaceFoldHeader:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceSelected}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.workspaceFoldHeader controls|FontIcon">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"/>
+    <Setter Property="FontSize" Value="{StaticResource IconSizeSm}"/>
+    <Setter Property="FontWeight" Value="Black"/>
+  </Style>
+
+  <Style Selector="Grid.workspaceFoldHeaderContent">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space8}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Border.workspaceFoldCornerBadge">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Width" Value="{StaticResource WorkspaceFoldCornerBadgeSize}"/>
+    <Setter Property="Height" Value="{StaticResource WorkspaceFoldCornerBadgeSize}"/>
+    <Setter Property="HorizontalAlignment" Value="Right"/>
+    <Setter Property="VerticalAlignment" Value="Top"/>
+    <Setter Property="Margin" Value="{StaticResource InsetWorkspaceFoldCornerBadgeOffset}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Border.workspaceFoldCornerBadge.danger">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceFoldCornerBadgeText, TextBlock.workspaceFoldCornerBadgeText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextAlignment" Value="Center"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+  </Style>
+
+  <Style Selector="Border.workspaceFoldCornerBadge.danger SelectableTextBlock.workspaceFoldCornerBadgeText, Border.workspaceFoldCornerBadge.danger TextBlock.workspaceFoldCornerBadgeText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="Border.workspaceFoldBody">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderTopThin}"/>
+    <Setter Property="Padding" Value="{StaticResource InsetTop8}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.workspaceToggleChip">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_4}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="ToggleButton.workspaceToggleChip:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.workspaceToggleChip:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushAccentSoft}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.workspaceToggleChip:checked:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushAccentSoft}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Button.workspaceSubtleAction">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Button.workspaceSubtleAction:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Button.workspaceSubtleAction:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Button.workspaceSearchClearButton">
+    <Setter Property="Width" Value="{StaticResource ConsoleActionHeight}"/>
+    <Setter Property="Height" Value="{StaticResource ConsoleActionHeight}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ConsoleActionHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset4}"/>
+    <Setter Property="Margin" Value="{StaticResource InsetRight6}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.workspaceSearchClearButton:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.workspaceSearchClearButton:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Border.workspaceGroupToolbarItem">
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceGroupTitle, TextBlock.workspaceGroupTitle">
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceGroupSummary, TextBlock.workspaceGroupSummary">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+  </Style>
+
+  <Style Selector="Button.workspaceGroupActionButton">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.workspaceTextAction">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset6_2}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Button.workspaceTextAction:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.workspaceTextAction:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.workspaceInfoButton">
+    <Setter Property="Width" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Height" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="MinWidth" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Button.workspaceInfoButton:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ListBox.workspaceDataList ListBoxItem">
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Margin" Value="{StaticResource InsetBottom4}"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+  </Style>
+
+  <Style Selector="ListBox.workspaceDataList ListBoxItem:selected">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="0"/>
+  </Style>
+
+  <Style Selector="ListBox.workspaceDataList ListBoxItem:selected:pointerover">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="0"/>
+  </Style>
+
+  <Style Selector="ListBox.workspaceFilterOptions ListBoxItem">
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Margin" Value="0"/>
+    <Setter Property="MinHeight" Value="{StaticResource FormControlCompactHeight}"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+  </Style>
+
+  <Style Selector="CheckBox.workspaceFilterOptionCheck">
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="Height" Value="{StaticResource FormControlCompactHeight}"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Margin" Value="0"/>
+  </Style>
+
+  <Style Selector="Button.verificationTableRow, Button.workspaceDataRow">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_6}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Button.verificationTableRow:pointerover, Button.workspaceDataRow:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+  </Style>
+
+  <Style Selector="Button.verificationTableRow.verificationTableRowActive, Button.workspaceDataRow.workspaceDataRowActive">
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushAccentSoft}"/>
+  </Style>
+
+  <Style Selector="Button.verificationTableRow.verificationTableRowActive:pointerover, Button.workspaceDataRow.workspaceDataRowActive:pointerover">
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushAccentSoft}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.verificationTableCellText, TextBlock.verificationTableCellText, SelectableTextBlock.workspaceDataCellText, TextBlock.workspaceDataCellText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.verificationTableCellText.strong, TextBlock.verificationTableCellText.strong, SelectableTextBlock.workspaceDataCellText.strong, TextBlock.workspaceDataCellText.strong">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Border.workspaceTableHeader">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_6}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceTableHeaderText, TextBlock.workspaceTableHeaderText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+  </Style>
+
+  <Style Selector="Button.workspaceTableHeaderButton">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset6_2}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+  </Style>
+
+  <Style Selector="Button.workspaceTableHeaderButton:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Button.workspaceTableHeaderButton.active">
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Border.workspaceInspectorHost">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Border.workspaceInspectorContextStrip">
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_6}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Border.workspaceInspectorSection">
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceInspectorSectionTitle, TextBlock.workspaceInspectorSectionTitle">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceInspectorValue, TextBlock.workspaceInspectorValue">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceInspectorContextText, TextBlock.workspaceInspectorContextText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="Border.verificationStepRailNode">
+    <Setter Property="Width" Value="{StaticResource VerificationStepRailNodeSize}"/>
+    <Setter Property="Height" Value="{StaticResource VerificationStepRailNodeSize}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Top"/>
+  </Style>
+
+  <Style Selector="Border.verificationStepRailNode.active">
+    <Setter Property="Background" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Border.verificationStepRailNode.pass">
+    <Setter Property="Background" Value="{DynamicResource BrushSuccess}"/>
+  </Style>
+
+  <Style Selector="Border.verificationStepRailNode.warning">
+    <Setter Property="Background" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="Border.verificationStepRailNode.blocked">
+    <Setter Property="Background" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="Border.verificationStepRailConnector">
+    <Setter Property="Width" Value="{StaticResource VerificationStepRailLineWidth}"/>
+    <Setter Property="Margin" Value="{StaticResource InsetTop4}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="Border.workspaceCodeBlock">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_6}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspaceCodeText, TextBlock.workspaceCodeText">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamilyCode}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="Border.workspaceLinkItem">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+    <Setter Property="Margin" Value="{StaticResource InsetBottom6}"/>
+  </Style>
+
+  <Style Selector="Border.notchExportRestoreHint">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_6}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.notchExportRestoreHintText, TextBlock.notchExportRestoreHintText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.notchExportRestoreHintAction">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_6}"/>
+  </Style>
+
+  <Style Selector="Button">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_6}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+    <Setter Property="ToolTip.ShowOnDisabled" Value="True"/>
+  </Style>
+
+  <Style Selector="ToggleButton">
+    <Setter Property="ClipToBounds" Value="True"/>
+    <Setter Property="ToolTip.ShowOnDisabled" Value="True"/>
+  </Style>
+
+  <Style Selector="Button:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button:disabled:pointerover, Button:disabled:pressed">
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonDisabledForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton:disabled:pointerover, ToggleButton:disabled:pressed">
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonDisabledForeground}"/>
+  </Style>
+
+  <Style Selector="StackPanel.panelForm">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="StackPanel.panelForm Button">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="controls|BalancedWrapPanel.badgeGroup">
+    <Setter Property="ItemSpacing" Value="{StaticResource Space6}"/>
+    <Setter Property="LineSpacing" Value="{StaticResource Space6}"/>
+    <Setter Property="BalanceLastRow" Value="True"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="Grid.panelActionRow">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="Button.dxfEditSummaryChip">
+    <Setter Property="MinWidth" Value="{StaticResource DxfEditSummaryBadgeMinWidth}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="controls|FontIcon.dxfEditBadgeIcon">
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeMd}"/>
+    <Setter Property="FontWeight" Value="Black"/>
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditSummaryBadgeText, TextBlock.dxfEditSummaryBadgeText">
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditSectionLabel, TextBlock.dxfEditSectionLabel">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditSelectionSummary, TextBlock.dxfEditSelectionSummary">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="Border.dxfEditActionGroup">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditActionGroupLabel, TextBlock.dxfEditActionGroupLabel">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Grid.dxfEditActionGroupRow">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space6}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.dxfLayerBulkToggleButton">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_4}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderInput}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="HorizontalAlignment" Value="Right"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+    <Setter Property="FocusAdorner" Value="{x:Null}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.dxfLayerBulkToggleButton:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.dxfLayerBulkToggleButton:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.dxfLayerBulkToggleButton:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionSelectedBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderControl}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.dxfLayerBulkToggleButton:checked:pointerover, ToggleButton.dxfLayerBulkToggleButton:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionSelectedBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.dxfLayerBulkToggleButton:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="Grid.dxfLayerBulkToggleContent">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space6}"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Border.dxfLayerBulkMixedIndicator">
+    <Setter Property="Width" Value="{StaticResource Space12}"/>
+    <Setter Property="Height" Value="{StaticResource Space2}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfLayerBulkToggleLabel, TextBlock.dxfLayerBulkToggleLabel">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Grid.dxfEditAlignedFieldRow">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space6}"/>
+  </Style>
+
+  <Style Selector="Border.dxfEditFieldActionSpacer">
+    <Setter Property="Width" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+  </Style>
+
+  <Style Selector="StackPanel.dxfEditMiniActionContent">
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="controls|FontIcon.dxfEditMiniActionIcon">
+    <Setter Property="FontSize" Value="{StaticResource IconSizeSm}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditMiniActionLabel, TextBlock.dxfEditMiniActionLabel">
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+  </Style>
+
+  <Style Selector="Button.iconTextButton, ToggleButton.iconTextButton">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Height" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+  </Style>
+
+  <Style Selector="Button.simulationActionButton, ToggleButton.simulationActionButton, Button.workspaceActionButton, ToggleButton.workspaceActionButton">
+    <Setter Property="Height" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_4}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.workspaceActionButton, ToggleButton.actionTextButton.workspaceActionButton">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="Grid.iconTextButtonContent">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space6}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="controls|FontIcon.iconTextButtonLeadingIcon">
+    <Setter Property="Width" Value="{StaticResource IconSizeSm}"/>
+    <Setter Property="Height" Value="{StaticResource IconSizeSm}"/>
+    <Setter Property="HorizontalAlignment" Value="Left"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="FontSize" Value="{StaticResource IconSizeSm}"/>
+    <Setter Property="FontWeight" Value="Black"/>
+  </Style>
+
+  <Style Selector="Border.iconTextButtonTrailingSpacer">
+    <Setter Property="Width" Value="{StaticResource IconSizeSm}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="IsHitTestVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.iconTextButtonLabel, TextBlock.iconTextButtonLabel">
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="MaxLines" Value="1"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+  </Style>
+
+  <Style Selector="Border.dxfEditAdvancedContent">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderTopThin}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset12}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusBottomMd}"/>
+  </Style>
+
+  <Style Selector="Button.dxfEditCompactIconAction, ToggleButton.dxfEditCompactIconAction">
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditFieldLabel, TextBlock.dxfEditFieldLabel">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="Button.danger">
+    <Setter Property="Background" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.danger:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="Button.danger:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+</Styles>

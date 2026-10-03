@@ -1,0 +1,113 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        x:Class="FreeformHelper.UI.Views.CascadeIcSettingsWindow"
+        Width="{StaticResource CascadeIcSettingsDialogWidth}"
+        Height="{StaticResource CascadeIcSettingsDialogHeight}"
+        MinWidth="{StaticResource CascadeIcSettingsDialogMinWidth}"
+        MinHeight="{StaticResource CascadeIcSettingsDialogMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushSettingsWindowBackground}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Cascade IC details">
+  <Border Classes="settingsWindowChrome">
+    <Grid RowDefinitions="Auto,Auto,*,Auto"
+          RowSpacing="{StaticResource Space12}">
+      <StackPanel Grid.Row="0"
+                  Spacing="{StaticResource Space4}">
+        <SelectableTextBlock Classes="settingsSectionTitle"
+                             Text="Cascade IC details"/>
+        <SelectableTextBlock Classes="settingsSectionMeta"
+                             Text="Adjust the IC count and per-IC channel allocation for the generated regular grid."/>
+      </StackPanel>
+
+      <Border Grid.Row="1"
+              Classes="settingsFieldTile">
+        <Grid ColumnDefinitions="*,Auto"
+              ColumnSpacing="{StaticResource Space12}">
+          <SelectableTextBlock Grid.Column="0"
+                               Classes="settingsSectionMeta"
+                               VerticalAlignment="Center"
+                               Text="{Binding CascadeLayoutSummary}"
+                               TextWrapping="Wrap"/>
+          <StackPanel Grid.Column="1"
+                      Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="Cascade"
+                                        Tip="Adjust IC count. The per-IC rows below update immediately."/>
+            <controls:NumberScrubber Minimum="1"
+                                     Maximum="{StaticResource NumericInputMaximum}"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     Value="{Binding CascadeNum, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border Grid.Row="2"
+              Classes="settingsSectionBlock">
+        <Grid RowDefinitions="Auto,*"
+              RowSpacing="{StaticResource Space8}">
+          <Grid Grid.Row="0"
+                ColumnDefinitions="Auto,*,*"
+                ColumnSpacing="{StaticResource Space10}">
+            <SelectableTextBlock Classes="settingsSectionMeta"
+                                 Text="IC"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="settingsSectionMeta"
+                                 Text="X channels"/>
+            <SelectableTextBlock Grid.Column="2"
+                                 Classes="settingsSectionMeta"
+                                 Text="Y channels"/>
+          </Grid>
+
+          <ScrollViewer Grid.Row="1"
+                        Classes="scrollV2"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Classes="settingsPage">
+              <ItemsControl ItemsSource="{Binding CascadeIcSettings}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border Classes="settingsFieldTile"
+                            Margin="{StaticResource InsetBottom6}">
+                      <Grid ColumnDefinitions="Auto,*,*"
+                            ColumnSpacing="{StaticResource Space10}">
+                        <SelectableTextBlock VerticalAlignment="Center"
+                                             Classes="settingsPassiveValue"
+                                             Text="{Binding IcLabel}"/>
+                        <controls:NumberScrubber Grid.Column="1"
+                                                 Minimum="1"
+                                                 Maximum="{StaticResource NumericInputMaximum}"
+                                                 SmallChange="1"
+                                                 FormatString="0"
+                                                 Value="{Binding XChannels, Mode=TwoWay}"/>
+                        <controls:NumberScrubber Grid.Column="2"
+                                                 Minimum="1"
+                                                 Maximum="{StaticResource NumericInputMaximum}"
+                                                 SmallChange="1"
+                                                 FormatString="0"
+                                                 Value="{Binding YChannels, Mode=TwoWay}"/>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="3"
+            ColumnDefinitions="*,Auto"
+            ColumnSpacing="{StaticResource Space8}">
+        <SelectableTextBlock Grid.Column="0"
+                             Classes="settingsSectionMeta"
+                             VerticalAlignment="Center"
+                             Text="Draft changes apply with Save Settings."/>
+        <Button Grid.Column="1"
+                Content="Done"
+                Click="DoneButton_Click"/>
+      </Grid>
+    </Grid>
+  </Border>
+</Window>

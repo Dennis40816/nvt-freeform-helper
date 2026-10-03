@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             x:Class="FreeformHelper.UI.Controls.NumberScrubber">
+  <Border x:Name="RootBorder" Classes="numberScrubber">
+    <Grid ColumnDefinitions="*,Auto">
+      <TextBox x:Name="InputBox"
+               Classes="numberScrubberInput"
+               Grid.Column="0"
+               BorderThickness="0"
+               Background="Transparent"
+               HorizontalContentAlignment="Left"
+               VerticalContentAlignment="Center"/>
+      <Border x:Name="ScrubArea"
+              Grid.Column="1"
+              Classes="numberScrubberSpin"
+              ToolTip.Tip="Drag or Alt + mouse wheel to adjust"/>
+    </Grid>
+  </Border>
+</UserControl>

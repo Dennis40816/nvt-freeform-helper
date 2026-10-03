@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
+             xmlns:views="clr-namespace:FreeformHelper.UI.Views.RightWorkflowSections"
+             mc:Ignorable="d"
+             x:Class="FreeformHelper.UI.Views.RightWorkflowPanel">
+  <UserControl.Resources>
+    <converters:BooleanGlyphConverter x:Key="NotchLayerStateGlyph"
+                                      TrueGlyph="{x:Static icons:IconGlyphs.Visibility}"
+                                      FalseGlyph="{x:Static icons:IconGlyphs.VisibilityOff}"/>
+    <DataTemplate x:Key="NotchValidationRowTemplate">
+      <Button Classes="validationTraceRow"
+              Command="{Binding DataContext.FocusNotchValidationItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              CommandParameter="{Binding}"
+              Margin="{StaticResource InsetBottom6}"
+              ToolTip.Tip="Focus this validation row on canvas.">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,8,Auto,*,Auto">
+            <Border Classes="validationRowKindTag"
+                    Classes.direct="{Binding IsDirect}"
+                    Classes.incoming="{Binding IsIncoming}"
+                    Classes.outgoing="{Binding IsOutgoing}">
+              <SelectableTextBlock Classes="validationRowKindText"
+                                   Text="{Binding KindText}"/>
+            </Border>
+            <SelectableTextBlock Grid.Column="2" Classes="stepNote" Text="{Binding RowText}"/>
+            <SelectableTextBlock Grid.Column="4" Classes="stepNote" Text="{Binding VersionText}"/>
+            <SelectableTextBlock Grid.Column="6" Classes="stepNote" Text="{Binding IcText}"/>
+            <SelectableTextBlock Grid.Column="8"
+                                 Classes="stepNote"
+                                 Text="{Binding NoteText}"
+                                 TextTrimming="CharacterEllipsis"
+                                 MaxWidth="{StaticResource ValidationTraceNoteMaxWidth}"/>
+          </Grid>
+          <Grid ColumnDefinitions="1*,1*,Auto,Auto">
+            <StackPanel Spacing="{StaticResource Space1}">
+              <SelectableTextBlock Classes="stepNote" Text="Source diff"/>
+              <SelectableTextBlock Text="{Binding SourceText}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="{StaticResource InsetLeft8}" Spacing="{StaticResource Space1}">
+              <SelectableTextBlock Classes="stepNote" Text="Target diff"/>
+              <SelectableTextBlock Text="{Binding TargetText}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Margin="{StaticResource InsetLeft8}" Spacing="{StaticResource Space1}">
+              <SelectableTextBlock Classes="stepNote" Text="Ratio"/>
+              <SelectableTextBlock Text="{Binding RatioText}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="3" Margin="{StaticResource InsetLeft8}" Spacing="{StaticResource Space1}">
+              <SelectableTextBlock Classes="stepNote" Text="Area"/>
+              <SelectableTextBlock Text="{Binding AreaText}"/>
+            </StackPanel>
+          </Grid>
+          <StackPanel Spacing="{StaticResource Space1}">
+            <SelectableTextBlock Classes="stepNote" Text="Values"/>
+            <SelectableTextBlock Text="{Binding ValuesText}" TextWrapping="Wrap"/>
+          </StackPanel>
+          <StackPanel Spacing="{StaticResource Space1}">
+            <SelectableTextBlock Classes="stepNote" Text="Comment"/>
+            <SelectableTextBlock Text="{Binding CommentText}" TextWrapping="Wrap"/>
+          </StackPanel>
+        </StackPanel>
+      </Button>
+    </DataTemplate>
+  </UserControl.Resources>
+  <StackPanel Spacing="{StaticResource Space10}" Classes="panelForm">
+    <views:RightWorkflowInspectorView/>
+    <views:RightWorkflowSettingsTabView OpenSettingsRequested="OnStepOpenSettingsRequested"/>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,131 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        x:Class="FreeformHelper.UI.Views.DxfLayerImageExportWindow"
+        Width="{StaticResource LayerImageExportWidth}"
+        Height="{StaticResource LayerImageExportHeight}"
+        MinWidth="{StaticResource LayerImageExportMinWidth}"
+        MinHeight="{StaticResource LayerImageExportMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Export DXF layer image">
+  <Border Padding="{StaticResource Inset14}">
+    <Grid RowDefinitions="*,Auto">
+      <ScrollViewer Grid.Row="0"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled"
+                    Padding="{StaticResource InsetRight10Bottom12}">
+        <StackPanel Classes="panelForm"
+                    Spacing="{StaticResource Space12}">
+          <SelectableTextBlock Text="Export DXF layer image"
+                               FontWeight="SemiBold"/>
+          <SelectableTextBlock Text="Layer X/Y pixels define inner geometry resolution. Final output adds both-side padding (X + 2*paddingX, Y + 2*paddingY)."
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               TextWrapping="Wrap"/>
+
+          <StackPanel Classes="panelFormField">
+            <SelectableTextBlock Text="DXF layer"/>
+            <ComboBox ItemsSource="{Binding LayerOptions}"
+                      SelectedItem="{Binding SelectedLayer, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <SelectableTextBlock Text="{Binding Display}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <Grid ColumnDefinitions="1*,1*">
+            <StackPanel Classes="panelFormField left"
+                        Grid.Column="0">
+              <SelectableTextBlock Text="X pixels"/>
+              <controls:NumberScrubber Minimum="2"
+                                       Maximum="100000"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       Value="{Binding WidthPixels, Mode=TwoWay}"/>
+            </StackPanel>
+            <StackPanel Classes="panelFormField right"
+                        Grid.Column="1">
+              <SelectableTextBlock Text="Y pixels"/>
+              <controls:NumberScrubber Minimum="2"
+                                       Maximum="100000"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       Value="{Binding HeightPixels, Mode=TwoWay}"/>
+            </StackPanel>
+          </Grid>
+
+          <StackPanel Classes="panelFormField">
+            <SelectableTextBlock Text="Line width (px)"/>
+            <controls:NumberScrubber Minimum="0.1"
+                                     Maximum="100"
+                                     SmallChange="0.1"
+                                     FormatString="0.##"
+                                     SnapToStep="False"
+                                     Value="{Binding LineWidthPixels, Mode=TwoWay}"/>
+          </StackPanel>
+
+          <Grid ColumnDefinitions="1*,1*">
+            <StackPanel Classes="panelFormField left"
+                        Grid.Column="0">
+              <SelectableTextBlock Text="Padding X (px)"/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="100000"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       Value="{Binding PaddingXPixels, Mode=TwoWay}"/>
+            </StackPanel>
+            <StackPanel Classes="panelFormField right"
+                        Grid.Column="1">
+              <SelectableTextBlock Text="Padding Y (px)"/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="100000"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       Value="{Binding PaddingYPixels, Mode=TwoWay}"/>
+            </StackPanel>
+          </Grid>
+
+          <SelectableTextBlock Classes="stepNote"
+                               Text="{Binding OutputResolutionText}"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               TextWrapping="Wrap"/>
+
+          <StackPanel Classes="panelFormField">
+            <SelectableTextBlock Text="Format"/>
+            <ComboBox ItemsSource="{Binding FormatOptions}"
+                      SelectedItem="{Binding SelectedFormat, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <SelectableTextBlock Text="{Binding Display}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <StackPanel Orientation="Horizontal"
+                      Spacing="{StaticResource Space8}">
+            <ToggleSwitch IsChecked="{Binding UseDarkTheme, Mode=TwoWay}"
+                          OnContent="Dark"
+                          OffContent="Light"/>
+            <SelectableTextBlock VerticalAlignment="Center"
+                                 Text="Dark: deep gray background + white outline"/>
+          </StackPanel>
+        </StackPanel>
+      </ScrollViewer>
+
+      <StackPanel Grid.Row="1"
+                  Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  Spacing="{StaticResource Space8}"
+                  Margin="{StaticResource InsetTop10}">
+        <Button Content="Cancel"
+                Click="CancelButton_Click"/>
+        <Button Content="Export"
+                Click="ExportButton_Click"/>
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

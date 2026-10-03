@@ -1,0 +1,73 @@
+{
+  "generatedAtUtc": "2026-06-05 10:14:32 UTC",
+  "sourceSolution": "FreeformHelper.sln",
+  "projects": [
+    {
+      "id": "P1",
+      "name": "FreeformHelper.Application",
+      "path": "src\\FreeformHelper.Application\\FreeformHelper.Application.csproj"
+    },
+    {
+      "id": "P2",
+      "name": "FreeformHelper.Domain",
+      "path": "src\\FreeformHelper.Domain\\FreeformHelper.Domain.csproj"
+    },
+    {
+      "id": "P3",
+      "name": "FreeformHelper.Infrastructure",
+      "path": "src\\FreeformHelper.Infrastructure\\FreeformHelper.Infrastructure.csproj"
+    },
+    {
+      "id": "P5",
+      "name": "FreeformHelper.Tests",
+      "path": "tests\\FreeformHelper.Tests\\FreeformHelper.Tests.csproj"
+    },
+    {
+      "id": "P4",
+      "name": "FreeformHelper.UI",
+      "path": "src\\FreeformHelper.UI\\FreeformHelper.UI.csproj"
+    }
+  ],
+  "edges": [
+    {
+      "from": "FreeformHelper.Application",
+      "to": "FreeformHelper.Domain"
+    },
+    {
+      "from": "FreeformHelper.Infrastructure",
+      "to": "FreeformHelper.Application"
+    },
+    {
+      "from": "FreeformHelper.Infrastructure",
+      "to": "FreeformHelper.Domain"
+    },
+    {
+      "from": "FreeformHelper.Tests",
+      "to": "FreeformHelper.Application"
+    },
+    {
+      "from": "FreeformHelper.Tests",
+      "to": "FreeformHelper.Domain"
+    },
+    {
+      "from": "FreeformHelper.Tests",
+      "to": "FreeformHelper.Infrastructure"
+    },
+    {
+      "from": "FreeformHelper.Tests",
+      "to": "FreeformHelper.UI"
+    },
+    {
+      "from": "FreeformHelper.UI",
+      "to": "FreeformHelper.Application"
+    },
+    {
+      "from": "FreeformHelper.UI",
+      "to": "FreeformHelper.Domain"
+    },
+    {
+      "from": "FreeformHelper.UI",
+      "to": "FreeformHelper.Infrastructure"
+    }
+  ]
+}

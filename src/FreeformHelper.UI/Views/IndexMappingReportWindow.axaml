@@ -1,0 +1,135 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+        xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
+        x:Class="FreeformHelper.UI.Views.IndexMappingReportWindow"
+        Width="{StaticResource IndexMappingReportWidth}"
+        Height="{StaticResource IndexMappingReportHeight}"
+        MinWidth="{StaticResource IndexMappingReportMinWidth}"
+        MinHeight="{StaticResource IndexMappingReportMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Verification Workspace">
+  <controls:ReviewWorkspaceShell Title="Verification Workspace"
+                                 Subtitle="{Binding HeaderSubtitle}">
+    <controls:ReviewWorkspaceShell.HeaderRight>
+      <StackPanel HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Spacing="{StaticResource Space2}">
+        <SelectableTextBlock Classes="workspaceHeaderMeta"
+                             Text="{Binding ActiveVerificationStepText, StringFormat='Active step: {0}'}"/>
+        <SelectableTextBlock Text="{Binding OverallStatusText, StringFormat='Status: {0}'}"
+                             Foreground="{DynamicResource BrushTextMuted}"
+                             TextAlignment="Right"/>
+        <SelectableTextBlock Text="{Binding OpenIssueCount, StringFormat='Open issues: {0}'}"
+                             Foreground="{DynamicResource BrushTextMuted}"
+                             TextAlignment="Right"/>
+        <SelectableTextBlock Text="{Binding TableRevisionText}"
+                             Foreground="{DynamicResource BrushTextMuted}"
+                             TextAlignment="Right"/>
+      </StackPanel>
+    </controls:ReviewWorkspaceShell.HeaderRight>
+
+    <controls:ReviewWorkspaceShell.SummaryContent>
+      <WrapPanel Orientation="Horizontal">
+        <Button Classes="verificationSummaryChip direct"
+                Classes.active="{Binding IsFilterAllActive}"
+                Margin="{StaticResource InsetRight6Bottom6}"
+                Content="{Binding TotalDecisionCount, StringFormat='All {0}'}"
+                Command="{Binding SetDecisionFilterModeCommand}"
+                CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.All}"/>
+        <Button Classes="verificationSummaryChip incoming"
+                Classes.active="{Binding IsFilterChangedByMaskActive}"
+                Margin="{StaticResource InsetRight6Bottom6}"
+                Content="{Binding ChangedByMaskDecisionCount, StringFormat='Changed {0}'}"
+                Command="{Binding SetDecisionFilterModeCommand}"
+                CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.ChangedByMask}"/>
+        <Button Classes="verificationSummaryChip outgoing"
+                Classes.active="{Binding IsFilterRemovedByMaskActive}"
+                Margin="{StaticResource InsetRight6Bottom6}"
+                Content="{Binding RemovedByMaskDecisionCount, StringFormat='Removed {0}'}"
+                Command="{Binding SetDecisionFilterModeCommand}"
+                CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.RemovedByMask}"/>
+        <Button Classes="verificationSummaryChip legacy"
+                Classes.active="{Binding IsFilterAmbiguousActive}"
+                Margin="{StaticResource InsetRight6Bottom6}"
+                Content="{Binding AmbiguousDecisionCount, StringFormat='Ambiguous {0}'}"
+                Command="{Binding SetDecisionFilterModeCommand}"
+                CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.Ambiguous}"/>
+        <Button Classes="verificationSummaryChip transfer"
+                Classes.active="{Binding IsFilterDuplicateDiffActive}"
+                Margin="{StaticResource InsetRight6Bottom6}"
+                Content="{Binding DuplicateDiffDecisionCount, StringFormat='Duplicate {0}'}"
+                Command="{Binding SetDecisionFilterModeCommand}"
+                CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.DuplicateDiff}"/>
+        <Button Classes="verificationSummaryChip transfer"
+                Classes.active="{Binding IsFilterLowConfidenceActive}"
+                Margin="{StaticResource InsetRight6Bottom6}"
+                Content="{Binding LowConfidenceDecisionCount, StringFormat='Low confidence {0}'}"
+                Command="{Binding SetDecisionFilterModeCommand}"
+                CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.LowConfidence}"/>
+        <Button Classes="verificationSummaryChip nocad"
+                Classes.active="{Binding IsFilterUnmappedActive}"
+                Margin="{StaticResource InsetRight6Bottom6}"
+                Content="{Binding UnmappedDecisionCount, StringFormat='Unmapped {0}'}"
+                Command="{Binding SetDecisionFilterModeCommand}"
+                CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.Unmapped}"/>
+        <Button Classes="verificationSummaryChip legacy"
+                Classes.active="{Binding IsFilterCountMismatchActive}"
+                Margin="{StaticResource InsetRight6Bottom6}"
+                Content="{Binding CountMismatchDecisionCount, StringFormat='Mismatch {0}'}"
+                Command="{Binding SetDecisionFilterModeCommand}"
+                CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.CountMismatch}"/>
+      </WrapPanel>
+    </controls:ReviewWorkspaceShell.SummaryContent>
+
+    <controls:ReviewWorkspaceShell.ToolbarContent>
+      <Grid ColumnDefinitions="Auto,Auto,*"
+            ColumnSpacing="{StaticResource Space8}">
+        <TextBox Width="{StaticResource NotchExportSearchWidth}"
+                 Watermark="{Binding SearchWatermarkText}"
+                 Text="{Binding SearchKeyword, Mode=TwoWay}"
+                 TextWrapping="NoWrap"/>
+        <Button Grid.Column="1"
+                Classes="workspaceTextAction"
+                Content="Clear"
+                Command="{Binding ClearSearchKeywordCommand}"
+                IsVisible="{Binding HasSearchKeyword}"/>
+        <WrapPanel Grid.Column="2"
+                   Orientation="Horizontal"
+                   HorizontalAlignment="Right">
+          <Border Classes="chipStatus"
+                  Margin="{StaticResource InsetRight6Bottom6}">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding TotalDecisionCount, StringFormat='Rows {0}'}"/>
+          </Border>
+          <Border Classes="chipStatus"
+                  Margin="{StaticResource InsetRight6Bottom6}">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding OpenIssueCount, StringFormat='Open issues {0}'}"/>
+          </Border>
+          <Border Classes="chipStatus"
+                  Margin="{StaticResource InsetRight6Bottom6}">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding SelectedFilterLabel, StringFormat='Mode {0}'}"/>
+          </Border>
+        </WrapPanel>
+      </Grid>
+    </controls:ReviewWorkspaceShell.ToolbarContent>
+    <controls:ReviewWorkspaceShell.LeftContent>
+      <sections:IndexMappingReportLeftPaneView/>
+    </controls:ReviewWorkspaceShell.LeftContent>
+    <controls:ReviewWorkspaceShell.RightContent>
+      <sections:IndexMappingReportRightPaneView/>
+    </controls:ReviewWorkspaceShell.RightContent>
+
+    <controls:ReviewWorkspaceShell.FooterContent>
+      <SelectableTextBlock Foreground="{DynamicResource BrushTextMuted}"
+                           Text="{Binding MaskAuditSummary}"
+                           TextWrapping="WrapWithOverflow"
+                           IsVisible="{Binding HasMaskAudit}"/>
+    </controls:ReviewWorkspaceShell.FooterContent>
+  </controls:ReviewWorkspaceShell>
+</Window>

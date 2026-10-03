@@ -1,0 +1,297 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
+  <!-- ScrollBars (modern: no line buttons, fixed thickness) -->
+  <Style Selector="ScrollViewer">
+    <Setter Property="AllowAutoHide" Value="False"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.viewportBoundScroll">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="Padding" Value="0"/>
+  </Style>
+
+  <Style Selector="Border.viewportBoundContent">
+    <Setter Property="Width" Value="{Binding $parent[ScrollViewer].Viewport.Width}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar[Orientation=Vertical]">
+    <Setter Property="Width" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource ScrollBarThickness}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar[Orientation=Vertical]:pointerover">
+    <Setter Property="Width" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource ScrollBarThickness}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar[Orientation=Horizontal]">
+    <Setter Property="Height" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="MaxHeight" Value="{StaticResource ScrollBarThickness}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar[Orientation=Horizontal]:pointerover">
+    <Setter Property="Height" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarThickness}"/>
+    <Setter Property="MaxHeight" Value="{StaticResource ScrollBarThickness}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+    <Setter Property="Margin" Value="0"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar /template/ RepeatButton#PART_LineUpButton">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar /template/ RepeatButton#PART_LineDownButton">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar /template/ RepeatButton#PART_LineLeftButton">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar /template/ RepeatButton#PART_LineRightButton">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar Thumb:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollThumb}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar Thumb:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollThumb}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar Thumb">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollThumb}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Margin" Value="{StaticResource ScrollBarThumbMargin}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar[Orientation=Vertical] Thumb">
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarThumbMinLength}"/>
+  </Style>
+
+  <Style Selector="primitives|ScrollBar[Orientation=Horizontal] Thumb">
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarThumbMinLength}"/>
+  </Style>
+
+  <!-- ScrollBars v2 (opt-in via ScrollViewer.scrollV2) -->
+  <Style Selector="ScrollViewer.scrollV2">
+    <Setter Property="AllowAutoHide" Value="False"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar[Orientation=Vertical]">
+    <Setter Property="Width" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="Margin" Value="{StaticResource ScrollBarV2Margin}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar[Orientation=Vertical]:pointerover">
+    <Setter Property="Width" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource ScrollBarV2Thickness}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar[Orientation=Vertical]:pressed">
+    <Setter Property="Width" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource ScrollBarV2Thickness}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar[Orientation=Horizontal]">
+    <Setter Property="Height" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MaxHeight" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="Margin" Value="{StaticResource ScrollBarV2Margin}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar[Orientation=Horizontal]:pointerover">
+    <Setter Property="Height" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MaxHeight" Value="{StaticResource ScrollBarV2Thickness}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar[Orientation=Horizontal]:pressed">
+    <Setter Property="Height" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarV2Thickness}"/>
+    <Setter Property="MaxHeight" Value="{StaticResource ScrollBarV2Thickness}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar Thumb:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollThumb}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar Thumb:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollThumb}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar Thumb">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollThumb}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Margin" Value="{StaticResource ScrollBarV2ThumbMargin}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar[Orientation=Vertical] Thumb">
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarV2ThumbMinLength}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollV2 /template/ primitives|ScrollBar[Orientation=Horizontal] Thumb">
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarV2ThumbMinLength}"/>
+  </Style>
+
+  <!-- ScrollBars dev-candidate (preview only via ScrollViewer.scrollDevCandidate) -->
+  <Style Selector="ScrollViewer.scrollDevCandidate">
+    <Setter Property="AllowAutoHide" Value="False"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar[Orientation=Vertical]">
+    <Setter Property="Width" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="Margin" Value="{StaticResource ScrollBarDevCandidateMargin}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar[Orientation=Vertical]:pointerover">
+    <Setter Property="Width" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar[Orientation=Vertical]:pressed">
+    <Setter Property="Width" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar[Orientation=Horizontal]">
+    <Setter Property="Height" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MaxHeight" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="Margin" Value="{StaticResource ScrollBarDevCandidateMargin}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar[Orientation=Horizontal]:pointerover">
+    <Setter Property="Height" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MaxHeight" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar[Orientation=Horizontal]:pressed">
+    <Setter Property="Height" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+    <Setter Property="MaxHeight" Value="{StaticResource ScrollBarDevCandidateThickness}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollTrack}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar /template/ RepeatButton#PART_LineUpButton">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar /template/ RepeatButton#PART_LineDownButton">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar /template/ RepeatButton#PART_LineLeftButton">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar /template/ RepeatButton#PART_LineRightButton">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar Thumb:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollThumb}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar Thumb:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollThumb}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar Thumb">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollThumb}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Margin" Value="{StaticResource ScrollBarDevCandidateThumbMargin}"/>
+  </Style>
+
+  <!-- Workspace data list scrollbar (left/main region only) -->
+  <Style Selector="ListBox.workspaceDataList /template/ ScrollViewer /template/ primitives|ScrollBar">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Track}"/>
+  </Style>
+
+  <Style Selector="ListBox.workspaceDataList /template/ ScrollViewer /template/ primitives|ScrollBar:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Track}"/>
+  </Style>
+
+  <Style Selector="ListBox.workspaceDataList /template/ ScrollViewer /template/ primitives|ScrollBar:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Track}"/>
+  </Style>
+
+  <Style Selector="ListBox.workspaceDataList /template/ ScrollViewer /template/ primitives|ScrollBar Thumb">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Thumb}"/>
+  </Style>
+
+  <Style Selector="ListBox.workspaceDataList /template/ ScrollViewer /template/ primitives|ScrollBar Thumb:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Thumb}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.workspaceGroupStripScroll /template/ primitives|ScrollBar[Orientation=Horizontal]">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Track}"/>
+    <Setter Property="Margin" Value="{StaticResource InsetTop4}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.workspaceGroupStripScroll /template/ primitives|ScrollBar[Orientation=Horizontal] Thumb">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Thumb}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.workspaceGroupStripScroll /template/ primitives|ScrollBar[Orientation=Horizontal] Thumb:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Thumb}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar[Orientation=Vertical] Thumb">
+    <Setter Property="MinHeight" Value="{StaticResource ScrollBarDevCandidateThumbMinLength}"/>
+  </Style>
+
+  <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar[Orientation=Horizontal] Thumb">
+    <Setter Property="MinWidth" Value="{StaticResource ScrollBarDevCandidateThumbMinLength}"/>
+  </Style>
+
+</Styles>

@@ -1,0 +1,215 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:views="clr-namespace:FreeformHelper.UI.Views"
+             mc:Ignorable="d"
+             xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
+             x:Class="FreeformHelper.UI.Views.SimulationWorkspaceView"
+             Background="{DynamicResource BrushBgApp}"
+             Foreground="{DynamicResource BrushTextPrimary}">
+  <Grid RowDefinitions="Auto,*"
+        MinHeight="0"
+        MinWidth="0">
+    <Border Grid.Row="0"
+            Classes="workspaceFirstPeekBar">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space12}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Text="Simulation"
+                               Classes="workspaceFirstPeekTitle"/>
+          <SelectableTextBlock Text="Regular-grid surface simulation."
+                               Classes="workspaceFirstPeekSubtitle"/>
+        </StackPanel>
+
+        <WrapPanel Grid.Column="1"
+                   Orientation="Horizontal"
+                   VerticalAlignment="Center">
+          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+            <SelectableTextBlock Classes="chipStatusText" Text="{Binding SessionSummaryText}"/>
+          </Border>
+          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+            <SelectableTextBlock Classes="chipStatusText" Text="{Binding SourceModeSummaryText}"/>
+          </Border>
+          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+            <SelectableTextBlock Classes="chipStatusText" Text="{Binding SimulationSafetyStatusText}"/>
+          </Border>
+        </WrapPanel>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1"
+          MinHeight="0"
+          MinWidth="0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="{StaticResource PanelLeftWidthGrid}"/>
+        <ColumnDefinition Width="{StaticResource SplitterThicknessGrid}"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="{StaticResource SplitterThicknessGrid}"/>
+        <ColumnDefinition Width="{StaticResource PanelRightWidthGrid}"/>
+      </Grid.ColumnDefinitions>
+
+      <sections:SimulationWorkspaceControlsPaneView Grid.Column="0"/>
+      <GridSplitter Grid.Column="1"
+                    Width="{StaticResource SplitterThickness}"
+                    Background="{DynamicResource BrushBorder}"
+                    HorizontalAlignment="Stretch"
+                    ShowsPreview="True"/>
+
+      <Border Grid.Column="2"
+              Background="{DynamicResource BrushCanvasBackground}"
+              MinHeight="0"
+              MinWidth="0"
+              ClipToBounds="True">
+        <Grid MinHeight="0"
+              MinWidth="0"
+              ClipToBounds="True">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="{StaticResource SplitterRowHeight}"/>
+            <RowDefinition Height="{StaticResource ConsolePanelRowHeight}"/>
+          </Grid.RowDefinitions>
+          <Border Grid.Row="0"
+                  Classes="workspaceSecondPeekBar">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space12}">
+              <WrapPanel Orientation="Horizontal"
+                         VerticalAlignment="Center">
+                <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                  <SelectableTextBlock Classes="chipStatusText" Text="{Binding VersionSummaryText}"/>
+                </Border>
+                <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                  <SelectableTextBlock Classes="chipStatusText" Text="{Binding ViewModeSummaryText}"/>
+                </Border>
+                <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                  <SelectableTextBlock Classes="chipStatusText" Text="{Binding ColorModeSummaryText}"/>
+                </Border>
+                <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                  <SelectableTextBlock Classes="chipStatusText" Text="{Binding AreaSummaryText}"/>
+                </Border>
+                <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                  <SelectableTextBlock Classes="chipStatusText" Text="{Binding FrameSummaryText}"/>
+                </Border>
+              </WrapPanel>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="workspaceSecondPeekStatus"
+                                   Text="{Binding CanvasStatusSummaryText}"
+                                   MaxWidth="{StaticResource WorkspaceHeaderStatusMaxWidth}"/>
+            </Grid>
+          </Border>
+
+          <Grid Grid.Row="1"
+                 MinHeight="0"
+                 MinWidth="0"
+                 ClipToBounds="True">
+            <controls:PadCanvas x:Name="SimulationPadCanvas"
+                                CadPads="{Binding CadPads}"
+                                RegularPads="{Binding RegularPads}"
+                                ShowCad="{Binding ShowCad}"
+                                ShowRegular="{Binding ShowRegular}"
+                                HighlightUnmatched="{Binding HighlightUnmatched}"
+                                HighlightFreeform="{Binding HighlightFreeform}"
+                                SimulationRegularOverlayItems="{Binding SimulationOverlayItems}"
+                                ShowSimulationRegularOverlay="True"
+                                SimulationRegularOverlayColorMode="{Binding SelectedCanvasColorMode}"
+                                SimulationRegularOverlayViewMode="{Binding SelectedCanvasViewMode}"
+                                SimulationRegularOverlayThresholdValue="{Binding ColorThresholdValue}"
+                                ShowSimulationCopperPillar="{Binding IsCopperSource}"
+                                SimulationCopperCenterX="{Binding CopperCenterX}"
+                                SimulationCopperCenterY="{Binding CopperCenterY}"
+                                SimulationCopperDiameter="{Binding CopperDiameter}"
+                                SelectionChanged="SimulationPadCanvas_SelectionChanged"
+                                PointerPressed="SimulationPadCanvas_PointerPressed"
+                                PointerMoved="SimulationPadCanvas_PointerMoved"
+                                PointerExited="SimulationPadCanvas_PointerExited"
+                                KeyDown="SimulationPadCanvas_KeyDown"
+                                RegularPadActivated="SimulationPadCanvas_RegularPadActivated"
+                                Focusable="True"/>
+            <Canvas x:Name="SimulationInlineEditorOverlay"
+                    ClipToBounds="True"
+                    IsVisible="False">
+              <Border x:Name="SimulationInlineEditorCard"
+                      Classes="padInfoPanel"
+                      IsVisible="False"
+                      MaxWidth="{StaticResource ViewMenuPopupMaxWidth}">
+                <StackPanel Spacing="{StaticResource Space8}">
+                  <StackPanel Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoTitle"
+                                         Text="{Binding SelectedRegularHeaderText}"/>
+                    <SelectableTextBlock Classes="padInfoSubtle"
+                                         Text="Simulation manual override"/>
+                  </StackPanel>
+                  <controls:NumberScrubber x:Name="SimulationInlineEditorValueInput"
+                                           Minimum="{StaticResource NumericInputMinimum}"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding SelectedManualValue, Mode=TwoWay}"/>
+                  <StackPanel Orientation="Horizontal"
+                              Spacing="{StaticResource Space8}">
+                    <Button Classes="actionNeutral actionTextButton simulationActionButton"
+                            Command="{Binding ApplySelectedOverrideCommand}">
+                      <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                        <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                        <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Apply override"/>
+                        <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                      </Grid>
+                    </Button>
+                    <Button Classes="actionNeutral actionTextButton simulationActionButton"
+                            Command="{Binding ClearSelectedOverrideCommand}"
+                            IsEnabled="{Binding HasSelectedOverride}">
+                      <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                        <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+                        <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Use global"/>
+                        <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                      </Grid>
+                    </Button>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+            </Canvas>
+            <Button Classes="actionIconButton viewportOverlayAction"
+                    Command="{Binding FitCanvasCommand}"
+                    ToolTip.Tip="Fit AA canvas"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="{StaticResource InsetTop12Right16}">
+              <controls:FontIcon Classes="symbols"
+                                 Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+            </Button>
+            <SelectableTextBlock Text="{Binding CanvasHintText}"
+                                 IsVisible="{Binding HasCanvasHint}"
+                                 Foreground="{DynamicResource BrushTextMuted}"
+                                 TextWrapping="Wrap"
+                                 TextAlignment="Center"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 MaxWidth="{StaticResource IndexMappingReportMinWidth}"
+                                 Margin="{StaticResource Inset24}"
+                                 IsHitTestVisible="False"/>
+          </Grid>
+
+          <GridSplitter Grid.Row="2"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource BrushBorder}"
+                        ResizeDirection="Rows"
+                        ShowsPreview="True"/>
+
+          <views:ConsolePanel Grid.Row="3"
+                              UseShellHostedBehavior="True"
+                              DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        </Grid>
+      </Border>
+
+      <GridSplitter Grid.Column="3"
+                    Width="{StaticResource SplitterThickness}"
+                    Background="{DynamicResource BrushBorder}"
+                    HorizontalAlignment="Stretch"
+                    ShowsPreview="True"/>
+
+      <sections:SimulationWorkspaceDetailsPaneView Grid.Column="4"/>
+    </Grid>
+  </Grid>
+</UserControl>

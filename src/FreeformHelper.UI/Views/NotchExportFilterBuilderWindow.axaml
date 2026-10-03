@@ -1,0 +1,102 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FreeformHelper.UI.Views.NotchExportFilterBuilderWindow"
+        Width="{StaticResource NotchExportFilterHelperWidth}"
+        Height="{StaticResource NotchExportFilterHelperHeight}"
+        MinWidth="{StaticResource NotchExportFilterHelperMinWidth}"
+        MinHeight="{StaticResource NotchExportFilterHelperMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Filter helper">
+  <Border Padding="{StaticResource Inset14}">
+    <Grid RowDefinitions="Auto,Auto,*,Auto"
+          RowSpacing="{StaticResource Space10}">
+      <StackPanel Spacing="{StaticResource Space4}">
+        <SelectableTextBlock Text="Build filter query"
+                             FontWeight="SemiBold"
+                             FontSize="{StaticResource FontSizeSectionTitle}"/>
+        <SelectableTextBlock Classes="stepNote"
+                             Text="Examples: ic=1 diff=20 status=warning a=20 cad=3777. Plain text still does fuzzy search."
+                             TextWrapping="WrapWithOverflow"/>
+      </StackPanel>
+
+      <Grid Grid.Row="1"
+            ColumnDefinitions="*,*"
+            ColumnSpacing="{StaticResource Space8}"
+            RowDefinitions="Auto,Auto,Auto,Auto"
+            RowSpacing="{StaticResource Space8}">
+        <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{StaticResource Space2}">
+          <SelectableTextBlock Classes="stepNote" Text="IC"/>
+          <TextBox x:Name="IcTextBox"
+                   Watermark="e.g. 1"
+                   TextChanged="FilterInput_TextChanged"/>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource Space2}">
+          <SelectableTextBlock Classes="stepNote" Text="Diff"/>
+          <TextBox x:Name="DiffTextBox"
+                   Watermark="e.g. 20"
+                   TextChanged="FilterInput_TextChanged"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource Space2}">
+          <SelectableTextBlock Classes="stepNote" Text="REG"/>
+          <TextBox x:Name="RegTextBox"
+                   Watermark="e.g. 4820"
+                   TextChanged="FilterInput_TextChanged"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource Space2}">
+          <SelectableTextBlock Classes="stepNote" Text="CAD"/>
+          <TextBox x:Name="CadTextBox"
+                   Watermark="e.g. 3777 / none"
+                   TextChanged="FilterInput_TextChanged"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
+          <SelectableTextBlock Classes="stepNote" Text="Anchor (A)"/>
+          <TextBox x:Name="AnchorTextBox"
+                   Watermark="e.g. 20"
+                   TextChanged="FilterInput_TextChanged"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
+          <SelectableTextBlock Classes="stepNote" Text="Status"/>
+          <ComboBox x:Name="StatusComboBox"
+                    SelectedIndex="0"
+                    SelectionChanged="FilterInput_SelectionChanged">
+            <ComboBoxItem Content="Any"/>
+            <ComboBoxItem Content="Linked"/>
+            <ComboBoxItem Content="Warning"/>
+            <ComboBoxItem Content="No CAD"/>
+            <ComboBoxItem Content="Legacy"/>
+          </ComboBox>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}">
+          <SelectableTextBlock Classes="stepNote" Text="Fuzzy text (optional)"/>
+          <TextBox x:Name="FuzzyTextBox"
+                   Watermark="e.g. CAD 3777 / transfer"
+                   TextChanged="FilterInput_TextChanged"/>
+        </StackPanel>
+      </Grid>
+
+      <StackPanel Grid.Row="2"
+                  Spacing="{StaticResource Space4}">
+        <SelectableTextBlock Classes="stepNote" Text="Generated query"/>
+        <TextBox x:Name="PreviewTextBox"
+                 IsReadOnly="True"
+                 TextWrapping="WrapWithOverflow"/>
+      </StackPanel>
+
+      <Grid Grid.Row="3"
+            ColumnDefinitions="*,Auto,Auto,Auto"
+            ColumnSpacing="{StaticResource Space8}">
+        <Button Grid.Column="1"
+                Content="Clear"
+                Click="ClearButton_Click"/>
+        <Button Grid.Column="2"
+                Content="Cancel"
+                Click="CancelButton_Click"/>
+        <Button Grid.Column="3"
+                Content="Apply"
+                Click="ApplyButton_Click"/>
+      </Grid>
+    </Grid>
+  </Border>
+</Window>

@@ -1,0 +1,973 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Base">
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Dark">
+      <!-- Colors -->
+      <Color x:Key="ColorBgApp">#0B0B0B</Color>
+      <Color x:Key="ColorBgSurface">#0F131A</Color>
+      <Color x:Key="ColorBgSurfaceInset">#0C1118</Color>
+      <Color x:Key="ColorBgSurfaceSelected">#121A24</Color>
+      <Color x:Key="ColorBgPanel">#111823</Color>
+      <Color x:Key="ColorBgElevated">#161C26</Color>
+      <Color x:Key="ColorBgInteractiveHover">#131B26</Color>
+      <Color x:Key="ColorBgInteractivePressed">#172132</Color>
+      <Color x:Key="ColorBorder">#1E2530</Color>
+      <Color x:Key="ColorBorderMuted">#2A3340</Color>
+      <Color x:Key="ColorBorderStrong">#3A475A</Color>
+      <Color x:Key="ColorScrollTrack">#DDDDE0</Color>
+      <Color x:Key="ColorScrollThumb">#6F737A</Color>
+      <Color x:Key="ColorScrollV2Track">#1A2535</Color>
+      <Color x:Key="ColorScrollV2Thumb">#D8DFEB</Color>
+      <Color x:Key="ColorTextPrimary">#E8EDF4</Color>
+      <Color x:Key="ColorTextMuted">#9BA9C0</Color>
+      <Color x:Key="ColorTextSubtle">#C8D0DB</Color>
+      <Color x:Key="ColorWhite">#FFFFFF</Color>
+      <Color x:Key="ColorBlack">#000000</Color>
+      <Color x:Key="ColorAccent">#4DA3FF</Color>
+      <Color x:Key="ColorAccentSoft">#244DA3FF</Color>
+      <Color x:Key="ColorConsoleSearchHighlightBg">#6B5B2A</Color>
+      <Color x:Key="ColorConsoleSearchHighlightFg">#FFFFFF</Color>
+      <Color x:Key="ColorDanger">#FF6B6B</Color>
+      <Color x:Key="ColorSuccess">#4FD1A5</Color>
+      <Color x:Key="ColorWarning">#FFB86B</Color>
+      <Color x:Key="ColorSimulationScaleLow">#236CFF</Color>
+      <Color x:Key="ColorSimulationScaleZero">#32FF6A</Color>
+      <Color x:Key="ColorSimulationScaleMid">#FFD230</Color>
+      <Color x:Key="ColorSimulationScaleWarm">#FF8A1F</Color>
+      <Color x:Key="ColorSimulationScaleHigh">#FF4028</Color>
+      <Color x:Key="ColorSimulationScaleNeutral">#6B7280</Color>
+      <Color x:Key="ColorSimulationCopperHalo">#3858F8FF</Color>
+      <Color x:Key="ColorSimulationCopperRim">#B8A6FFFF</Color>
+      <Color x:Key="ColorSimulationCopperFill">#1627F5FF</Color>
+      <Color x:Key="ColorSimulationCopperCenter">#FFFFFFFF</Color>
+      <Color x:Key="ColorCoordinatePlannerGuide">#5DE2A5</Color>
+      <Color x:Key="ColorCoordinatePlannerPoint">#FFD166</Color>
+      <Color x:Key="ColorCoordinatePlannerBist">#FF7A2B</Color>
+      <Color x:Key="ColorCoordinatePlannerArray">#8B7BFF</Color>
+      <Color x:Key="ColorCoordinatePlannerLabelBackground">#CC0F131A</Color>
+      <Color x:Key="ColorCoordinatePlannerLabelForeground">#E8EDF4</Color>
+      <Color x:Key="ColorButtonNeutralBackground">#F4F7FC</Color>
+      <Color x:Key="ColorButtonNeutralHover">#FFFFFF</Color>
+      <Color x:Key="ColorButtonNeutralPressed">#E8EDF5</Color>
+      <Color x:Key="ColorButtonNeutralBorder">#D0D8E5</Color>
+      <Color x:Key="ColorButtonNeutralForeground">#1E2430</Color>
+      <Color x:Key="ColorButtonDisabledForeground">#4A5568</Color>
+      <Color x:Key="ColorTooltipBackground">#FFFFFF</Color>
+      <Color x:Key="ColorTooltipBorder">#D0D8E5</Color>
+      <Color x:Key="ColorTooltipForeground">#000000</Color>
+      <Color x:Key="ColorActionNeutralBackground">#121A24</Color>
+      <Color x:Key="ColorActionNeutralHover">#1A2535</Color>
+      <Color x:Key="ColorActionNeutralPressed">#223049</Color>
+      <Color x:Key="ColorActionNeutralBorder">#2A3340</Color>
+      <Color x:Key="ColorActionNeutralForeground">#E8EDF4</Color>
+      <Color x:Key="ColorActionPrimaryBackground">#DDEBFF</Color>
+      <Color x:Key="ColorActionPrimaryHover">#F4F7FC</Color>
+      <Color x:Key="ColorActionPrimaryPressed">#BFD9FF</Color>
+      <Color x:Key="ColorActionPrimaryBorder">#7FB8FF</Color>
+      <Color x:Key="ColorActionPrimaryForeground">#07111F</Color>
+      <Color x:Key="ColorActionDangerBackground">#161C26</Color>
+      <Color x:Key="ColorActionDangerHover">#221B20</Color>
+      <Color x:Key="ColorActionDangerPressed">#2D2026</Color>
+      <Color x:Key="ColorActionDangerBorder">#5A3740</Color>
+      <Color x:Key="ColorActionDangerForeground">#FF8A8A</Color>
+      <Color x:Key="ColorActionDangerOnNeutralForeground">#B42323</Color>
+      <Color x:Key="ColorActionGhostBackground">#00000000</Color>
+      <Color x:Key="ColorActionGhostHover">#1A2535</Color>
+      <Color x:Key="ColorActionGhostPressed">#223049</Color>
+      <Color x:Key="ColorActionGhostBorder">#00000000</Color>
+      <Color x:Key="ColorActionGhostForeground">#C8D0DB</Color>
+      <Color x:Key="ColorActionSelectedBackground">#1E3A5F</Color>
+      <Color x:Key="ColorActionSelectedBorder">#7FB8FF</Color>
+      <Color x:Key="ColorActionSelectedForeground">#F4F7FC</Color>
+      <Color x:Key="ColorActionFocusBackground">#1A2535</Color>
+      <Color x:Key="ColorActionFocusBorder">#7FB8FF</Color>
+      <Color x:Key="ColorActionFocusForeground">#FFFFFF</Color>
+      <Color x:Key="ColorActionTextHoverBackground">#2A2F38</Color>
+      <Color x:Key="ColorActionTextPressedBackground">#323A46</Color>
+      <Color x:Key="ColorActionTextHoverBorder">#2A2F38</Color>
+      <Color x:Key="ColorActionTextHoverForeground">#FFFFFF</Color>
+      <Color x:Key="ColorActionViewportBackground">#F4F7FC</Color>
+      <Color x:Key="ColorActionViewportHover">#FFFFFF</Color>
+      <Color x:Key="ColorActionViewportPressed">#E8EDF5</Color>
+      <Color x:Key="ColorActionViewportBorder">#D0D8E5</Color>
+      <Color x:Key="ColorActionViewportForeground">#4A5568</Color>
+      <Color x:Key="ColorActionViewportCheckedBackground">#006EDB</Color>
+      <Color x:Key="ColorActionViewportCheckedForeground">#FFFFFF</Color>
+      <Color x:Key="ColorActionConsoleBackground">#00000000</Color>
+      <Color x:Key="ColorActionConsoleForeground">#E8EDF4</Color>
+      <Color x:Key="ColorActionConsoleCheckedBackground">#121A24</Color>
+      <Color x:Key="ColorActionChipBackground">#121A24</Color>
+      <Color x:Key="ColorActionChipHover">#1A2535</Color>
+      <Color x:Key="ColorActionChipPressed">#223049</Color>
+      <Color x:Key="ColorActionChipBorder">#2A3340</Color>
+      <Color x:Key="ColorActionChipForeground">#E8EDF4</Color>
+      <Color x:Key="ColorStatusChipBackground">#161C26</Color>
+      <Color x:Key="ColorStatusChipBorder">#3A475A</Color>
+      <Color x:Key="ColorStatusChipForeground">#C8D0DB</Color>
+      <Color x:Key="ColorActionInverseBackground">#FFFFFF</Color>
+      <Color x:Key="ColorActionInversePressedBackground">#E8EDF5</Color>
+      <Color x:Key="ColorActionInverseForeground">#000000</Color>
+      <Color x:Key="ColorOverlayScrim">#A0000000</Color>
+      <Color x:Key="ColorPanelBlockCollapsedBackground">#2E4B6A</Color>
+      <Color x:Key="ColorPanelBlockCollapsedHover">#36577B</Color>
+      <Color x:Key="ColorPanelBlockCollapsedPressed">#3E648D</Color>
+      <Color x:Key="ColorPanelBlockExpandedBackground">#1C6BC2</Color>
+      <Color x:Key="ColorPanelBlockExpandedHover">#2B7DD8</Color>
+      <Color x:Key="ColorPanelBlockExpandedPressed">#1759A1</Color>
+      <Color x:Key="ColorSettingsWindowBackground">#070B12</Color>
+      <Color x:Key="ColorSettingsHeroBackground">#0D1726</Color>
+      <Color x:Key="ColorSettingsNavBackground">#0A111C</Color>
+      <Color x:Key="ColorSettingsContentBackground">#0B111B</Color>
+      <Color x:Key="ColorSettingsSectionBackground">#101A29</Color>
+      <Color x:Key="ColorSettingsTileBackground">#0C1421</Color>
+      <Color x:Key="ColorSettingsTileHover">#111D2E</Color>
+      <Color x:Key="ColorSettingsBorder">#24344C</Color>
+      <Color x:Key="ColorSettingsInputBackground">#08101B</Color>
+      <Color x:Key="ColorSettingsInputHover">#0D1828</Color>
+      <Color x:Key="ColorSettingsInputBorder">#31435D</Color>
+      <Color x:Key="ColorSettingsNoteText">#8898AD</Color>
+
+      <!-- Pad info popover -->
+      <Color x:Key="ColorPadInfoPanelBackground">#B20F131A</Color>
+      <Color x:Key="ColorPadInfoPanelBorder">#263040</Color>
+      <Color x:Key="ColorPadInfoConfirmBackground">#182538</Color>
+      <!-- BoxShadow format: offsetX offsetY blur spread color, separated by commas -->
+      <media:BoxShadows x:Key="ShadowPadInfoConfirm">0 0 0 1 #2B4A73, 0 0 16 0 #0E1A2B</media:BoxShadows>
+
+      <!-- Canvas colors -->
+      <Color x:Key="ColorCanvasBackground">#0A0A0A</Color>
+      <Color x:Key="ColorCanvasAxisLabel">#D2DCF0</Color>
+      <Color x:Key="ColorCanvasIcBlockFill">#1F4DA3FF</Color>
+      <Color x:Key="ColorCanvasIcBlockStroke">#A04DA3FF</Color>
+      <Color x:Key="ColorCanvasSelection">#50A0FF</Color>
+      <Color x:Key="ColorCanvasSelectionFill">#1250A0FF</Color>
+      <Color x:Key="ColorCanvasRegularSelected">#FFC878</Color>
+      <Color x:Key="ColorCanvasRegularFreeform">#FFB450</Color>
+      <Color x:Key="ColorCanvasRegularFreeformHatchPrimary">#E45858</Color>
+      <Color x:Key="ColorCanvasRegularFreeformHatchSecondary">#5CD08B</Color>
+      <Color x:Key="ColorCanvasRegularUnmatched">#FF5A5A</Color>
+      <Color x:Key="ColorCanvasCadSelected">#78C8FF</Color>
+      <Color x:Key="ColorCanvasCadFillDefault">#23C8C8C8</Color>
+      <Color x:Key="ColorCanvasCadFillSelected">#5A78C8FF</Color>
+      <Color x:Key="ColorCanvasCadOverlapFill">#35FFB86B</Color>
+      <Color x:Key="ColorCanvasCadLine">#78C8FF</Color>
+      <Color x:Key="ColorCanvasCadOverlapStroke">#FFB86B</Color>
+      <Color x:Key="ColorCanvasDiffIdxOverride">#FFD166</Color>
+      <Color x:Key="ColorCanvasDiffIdxAnchor">#5DE2A5</Color>
+      <Color x:Key="ColorCanvasRegularLine">#F45C5C</Color>
+      <Color x:Key="ColorCanvasMatchRatioLabel">#ECF3FF</Color>
+      <Color x:Key="ColorCanvasMatchRatioBackground">#B8212B3A</Color>
+      <Color x:Key="ColorCanvasMatchRatioBorder">#8AB6FF</Color>
+      <Color x:Key="ColorCanvasNotchRatioLabel">#FFF2DE</Color>
+      <Color x:Key="ColorCanvasNotchRatioBackground">#B82A1E12</Color>
+      <Color x:Key="ColorCanvasNotchRatioBorder">#FFB86B</Color>
+      <Color x:Key="ColorNotchCadStroke">#78C8FF</Color>
+      <Color x:Key="ColorNotchCadFill">#2A78C8FF</Color>
+      <Color x:Key="ColorNotchRegularStroke">#C8D0DB</Color>
+      <Color x:Key="ColorNotchToFullOutline">#FF9F43</Color>
+      <Color x:Key="ColorNotchToFullFill">#4DFF9F43</Color>
+      <Color x:Key="ColorNotchToFullSeedOutline">#5DE2A5</Color>
+      <Color x:Key="ColorNotchToFullSeedFill">#305DE2A5</Color>
+      <Color x:Key="ColorNotchToFullCandidateOutline">#FFD166</Color>
+      <Color x:Key="ColorNotchToFullCandidateFill">#33FFD166</Color>
+      <Color x:Key="ColorNotchX">#4FD1A5</Color>
+      <Color x:Key="ColorNotchY">#4DA3FF</Color>
+      <Color x:Key="ColorNotchXY">#FF6B6B</Color>
+
+      <!-- CAD area bucket palette (bright, high contrast) -->
+      <Color x:Key="ColorCadAreaBucket1">#00BCD4</Color>
+      <Color x:Key="ColorCadAreaBucket2">#2196F3</Color>
+      <Color x:Key="ColorCadAreaBucket3">#3F51B5</Color>
+      <Color x:Key="ColorCadAreaBucket4">#9C27B0</Color>
+      <Color x:Key="ColorCadAreaBucket5">#E91E63</Color>
+      <Color x:Key="ColorCadAreaBucket6">#F44336</Color>
+      <Color x:Key="ColorCadAreaBucket7">#FF5722</Color>
+      <Color x:Key="ColorCadAreaBucket8">#FF9800</Color>
+      <Color x:Key="ColorCadAreaBucket9">#FFC107</Color>
+      <Color x:Key="ColorCadAreaBucket10">#4CAF50</Color>
+      <Color x:Key="ColorCadAreaBucket11">#8BC34A</Color>
+      <Color x:Key="ColorCadAreaBucket12">#009688</Color>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Light">
+      <!-- Colors (light theme placeholders) -->
+      <Color x:Key="ColorBgApp">#F5F7FA</Color>
+      <Color x:Key="ColorBgSurface">#FFFFFF</Color>
+      <Color x:Key="ColorBgSurfaceInset">#F5F7FA</Color>
+      <Color x:Key="ColorBgSurfaceSelected">#F2F4F8</Color>
+      <Color x:Key="ColorBgPanel">#F2F4F8</Color>
+      <Color x:Key="ColorBgElevated">#FFFFFF</Color>
+      <Color x:Key="ColorBgInteractiveHover">#F2F4F8</Color>
+      <Color x:Key="ColorBgInteractivePressed">#E6EAF2</Color>
+      <Color x:Key="ColorBorder">#D8DEE6</Color>
+      <Color x:Key="ColorBorderMuted">#B8C1CC</Color>
+      <Color x:Key="ColorBorderStrong">#B8C1CC</Color>
+      <Color x:Key="ColorScrollTrack">#D7D7DA</Color>
+      <Color x:Key="ColorScrollThumb">#7A7D84</Color>
+      <Color x:Key="ColorScrollV2Track">#CBD3DE</Color>
+      <Color x:Key="ColorScrollV2Thumb">#5F6876</Color>
+      <Color x:Key="ColorTextPrimary">#1E2430</Color>
+      <Color x:Key="ColorTextMuted">#5A6678</Color>
+      <Color x:Key="ColorTextSubtle">#3E4A5A</Color>
+      <Color x:Key="ColorWhite">#FFFFFF</Color>
+      <Color x:Key="ColorBlack">#000000</Color>
+      <Color x:Key="ColorAccent">#2B6CB0</Color>
+      <Color x:Key="ColorAccentSoft">#1F2B6CB0</Color>
+      <Color x:Key="ColorConsoleSearchHighlightBg">#DCE6FF</Color>
+      <Color x:Key="ColorConsoleSearchHighlightFg">#1E2430</Color>
+      <Color x:Key="ColorDanger">#D64545</Color>
+      <Color x:Key="ColorSuccess">#2F855A</Color>
+      <Color x:Key="ColorWarning">#C77D1A</Color>
+      <Color x:Key="ColorSimulationScaleLow">#1E63E4</Color>
+      <Color x:Key="ColorSimulationScaleZero">#159F45</Color>
+      <Color x:Key="ColorSimulationScaleMid">#D99512</Color>
+      <Color x:Key="ColorSimulationScaleWarm">#C96B12</Color>
+      <Color x:Key="ColorSimulationScaleHigh">#D12C1D</Color>
+      <Color x:Key="ColorSimulationScaleNeutral">#7B8798</Color>
+      <Color x:Key="ColorSimulationCopperHalo">#333A83D8</Color>
+      <Color x:Key="ColorSimulationCopperRim">#D03A83D8</Color>
+      <Color x:Key="ColorSimulationCopperFill">#141E88E5</Color>
+      <Color x:Key="ColorSimulationCopperCenter">#FFFFFFFF</Color>
+      <Color x:Key="ColorCoordinatePlannerGuide">#159F45</Color>
+      <Color x:Key="ColorCoordinatePlannerPoint">#C77D1A</Color>
+      <Color x:Key="ColorCoordinatePlannerBist">#D35400</Color>
+      <Color x:Key="ColorCoordinatePlannerArray">#6A5AE0</Color>
+      <Color x:Key="ColorCoordinatePlannerLabelBackground">#EFFFFFFF</Color>
+      <Color x:Key="ColorCoordinatePlannerLabelForeground">#1E2430</Color>
+      <Color x:Key="ColorButtonNeutralBackground">#FFFFFF</Color>
+      <Color x:Key="ColorButtonNeutralHover">#F8FAFC</Color>
+      <Color x:Key="ColorButtonNeutralPressed">#EEF2F7</Color>
+      <Color x:Key="ColorButtonNeutralBorder">#CBD5E1</Color>
+      <Color x:Key="ColorButtonNeutralForeground">#1E2430</Color>
+      <Color x:Key="ColorButtonDisabledForeground">#4A5568</Color>
+      <Color x:Key="ColorTooltipBackground">#FFFFFF</Color>
+      <Color x:Key="ColorTooltipBorder">#CBD5E1</Color>
+      <Color x:Key="ColorTooltipForeground">#000000</Color>
+      <Color x:Key="ColorActionNeutralBackground">#FFFFFF</Color>
+      <Color x:Key="ColorActionNeutralHover">#F8FAFC</Color>
+      <Color x:Key="ColorActionNeutralPressed">#EEF2F7</Color>
+      <Color x:Key="ColorActionNeutralBorder">#CBD5E1</Color>
+      <Color x:Key="ColorActionNeutralForeground">#000000</Color>
+      <Color x:Key="ColorActionPrimaryBackground">#FFFFFF</Color>
+      <Color x:Key="ColorActionPrimaryHover">#F8FAFC</Color>
+      <Color x:Key="ColorActionPrimaryPressed">#EEF2F7</Color>
+      <Color x:Key="ColorActionPrimaryBorder">#CBD5E1</Color>
+      <Color x:Key="ColorActionPrimaryForeground">#000000</Color>
+      <Color x:Key="ColorActionDangerBackground">#FFFFFF</Color>
+      <Color x:Key="ColorActionDangerHover">#F8FAFC</Color>
+      <Color x:Key="ColorActionDangerPressed">#EEF2F7</Color>
+      <Color x:Key="ColorActionDangerBorder">#CBD5E1</Color>
+      <Color x:Key="ColorActionDangerForeground">#B42323</Color>
+      <Color x:Key="ColorActionDangerOnNeutralForeground">#B42323</Color>
+      <Color x:Key="ColorActionGhostBackground">#00000000</Color>
+      <Color x:Key="ColorActionGhostHover">#F2F4F8</Color>
+      <Color x:Key="ColorActionGhostPressed">#E6EAF2</Color>
+      <Color x:Key="ColorActionGhostBorder">#00000000</Color>
+      <Color x:Key="ColorActionGhostForeground">#3E4A5A</Color>
+      <Color x:Key="ColorActionSelectedBackground">#EEF2F7</Color>
+      <Color x:Key="ColorActionSelectedBorder">#1E2430</Color>
+      <Color x:Key="ColorActionSelectedForeground">#000000</Color>
+      <Color x:Key="ColorActionFocusBackground">#FFFFFF</Color>
+      <Color x:Key="ColorActionFocusBorder">#1E2430</Color>
+      <Color x:Key="ColorActionFocusForeground">#000000</Color>
+      <Color x:Key="ColorActionTextHoverBackground">#F2F4F8</Color>
+      <Color x:Key="ColorActionTextPressedBackground">#E6EAF2</Color>
+      <Color x:Key="ColorActionTextHoverBorder">#F2F4F8</Color>
+      <Color x:Key="ColorActionTextHoverForeground">#1E2430</Color>
+      <Color x:Key="ColorActionViewportBackground">#F4F7FC</Color>
+      <Color x:Key="ColorActionViewportHover">#FFFFFF</Color>
+      <Color x:Key="ColorActionViewportPressed">#E8EDF5</Color>
+      <Color x:Key="ColorActionViewportBorder">#D0D8E5</Color>
+      <Color x:Key="ColorActionViewportForeground">#4A5568</Color>
+      <Color x:Key="ColorActionViewportCheckedBackground">#006EDB</Color>
+      <Color x:Key="ColorActionViewportCheckedForeground">#FFFFFF</Color>
+      <Color x:Key="ColorActionConsoleBackground">#00000000</Color>
+      <Color x:Key="ColorActionConsoleForeground">#1E2430</Color>
+      <Color x:Key="ColorActionConsoleCheckedBackground">#F2F4F8</Color>
+      <Color x:Key="ColorActionChipBackground">#FFFFFF</Color>
+      <Color x:Key="ColorActionChipHover">#F8FAFC</Color>
+      <Color x:Key="ColorActionChipPressed">#EEF2F7</Color>
+      <Color x:Key="ColorActionChipBorder">#B8C1CC</Color>
+      <Color x:Key="ColorActionChipForeground">#000000</Color>
+      <Color x:Key="ColorStatusChipBackground">#F8FAFD</Color>
+      <Color x:Key="ColorStatusChipBorder">#CBD5E1</Color>
+      <Color x:Key="ColorStatusChipForeground">#3E4A5A</Color>
+      <Color x:Key="ColorActionInverseBackground">#1E2430</Color>
+      <Color x:Key="ColorActionInversePressedBackground">#2F3A4A</Color>
+      <Color x:Key="ColorActionInverseForeground">#FFFFFF</Color>
+      <Color x:Key="ColorOverlayScrim">#7AFFFFFF</Color>
+      <Color x:Key="ColorPanelBlockCollapsedBackground">#E7EEF8</Color>
+      <Color x:Key="ColorPanelBlockCollapsedHover">#DDE7F6</Color>
+      <Color x:Key="ColorPanelBlockCollapsedPressed">#D2DFF1</Color>
+      <Color x:Key="ColorPanelBlockExpandedBackground">#2B6CB0</Color>
+      <Color x:Key="ColorPanelBlockExpandedHover">#347CC6</Color>
+      <Color x:Key="ColorPanelBlockExpandedPressed">#255E9A</Color>
+      <Color x:Key="ColorSettingsWindowBackground">#EEF3F8</Color>
+      <Color x:Key="ColorSettingsHeroBackground">#FFFFFF</Color>
+      <Color x:Key="ColorSettingsNavBackground">#F8FAFD</Color>
+      <Color x:Key="ColorSettingsContentBackground">#F3F7FB</Color>
+      <Color x:Key="ColorSettingsSectionBackground">#FFFFFF</Color>
+      <Color x:Key="ColorSettingsTileBackground">#F8FAFD</Color>
+      <Color x:Key="ColorSettingsTileHover">#EEF4FB</Color>
+      <Color x:Key="ColorSettingsBorder">#CBD8E6</Color>
+      <Color x:Key="ColorSettingsInputBackground">#FFFFFF</Color>
+      <Color x:Key="ColorSettingsInputHover">#F8FAFD</Color>
+      <Color x:Key="ColorSettingsInputBorder">#B8C7D8</Color>
+      <Color x:Key="ColorSettingsNoteText">#637083</Color>
+
+      <!-- Pad info popover -->
+      <Color x:Key="ColorPadInfoPanelBackground">#E6FFFFFF</Color>
+      <Color x:Key="ColorPadInfoPanelBorder">#D8DEE6</Color>
+      <Color x:Key="ColorPadInfoConfirmBackground">#FFFFFF</Color>
+      <!-- BoxShadow format: offsetX offsetY blur spread color, separated by commas -->
+      <media:BoxShadows x:Key="ShadowPadInfoConfirm">0 0 0 1 #B8C1CC, 0 0 16 0 #00000020</media:BoxShadows>
+
+      <!-- Canvas colors (light theme placeholders) -->
+      <Color x:Key="ColorCanvasBackground">#FFFFFF</Color>
+      <Color x:Key="ColorCanvasAxisLabel">#1E2430</Color>
+      <Color x:Key="ColorCanvasIcBlockFill">#142B6CB0</Color>
+      <Color x:Key="ColorCanvasIcBlockStroke">#8A2B6CB0</Color>
+      <Color x:Key="ColorCanvasSelection">#2B6CB0</Color>
+      <Color x:Key="ColorCanvasSelectionFill">#122B6CB0</Color>
+      <Color x:Key="ColorCanvasRegularSelected">#C77D1A</Color>
+      <Color x:Key="ColorCanvasRegularFreeform">#DD6B20</Color>
+      <Color x:Key="ColorCanvasRegularFreeformHatchPrimary">#C43B3B</Color>
+      <Color x:Key="ColorCanvasRegularFreeformHatchSecondary">#2F855A</Color>
+      <Color x:Key="ColorCanvasRegularUnmatched">#D64545</Color>
+      <Color x:Key="ColorCanvasCadSelected">#2B6CB0</Color>
+      <Color x:Key="ColorCanvasCadFillDefault">#23CCCCCC</Color>
+      <Color x:Key="ColorCanvasCadFillSelected">#5A2B6CB0</Color>
+      <Color x:Key="ColorCanvasCadOverlapFill">#30C77D1A</Color>
+      <Color x:Key="ColorCanvasCadLine">#2B6CB0</Color>
+      <Color x:Key="ColorCanvasCadOverlapStroke">#C77D1A</Color>
+      <Color x:Key="ColorCanvasDiffIdxOverride">#C77D1A</Color>
+      <Color x:Key="ColorCanvasDiffIdxAnchor">#2F855A</Color>
+      <Color x:Key="ColorCanvasRegularLine">#D64545</Color>
+      <Color x:Key="ColorCanvasMatchRatioLabel">#1E2430</Color>
+      <Color x:Key="ColorCanvasMatchRatioBackground">#E8FFFFFF</Color>
+      <Color x:Key="ColorCanvasMatchRatioBorder">#8A2B6CB0</Color>
+      <Color x:Key="ColorCanvasNotchRatioLabel">#3E2A16</Color>
+      <Color x:Key="ColorCanvasNotchRatioBackground">#F4FFF5E8</Color>
+      <Color x:Key="ColorCanvasNotchRatioBorder">#C77D1A</Color>
+      <Color x:Key="ColorNotchCadStroke">#2B6CB0</Color>
+      <Color x:Key="ColorNotchCadFill">#2A2B6CB0</Color>
+      <Color x:Key="ColorNotchRegularStroke">#3E4A5A</Color>
+      <Color x:Key="ColorNotchToFullOutline">#C77D1A</Color>
+      <Color x:Key="ColorNotchToFullFill">#3DC77D1A</Color>
+      <Color x:Key="ColorNotchToFullSeedOutline">#2F855A</Color>
+      <Color x:Key="ColorNotchToFullSeedFill">#2D2F855A</Color>
+      <Color x:Key="ColorNotchToFullCandidateOutline">#C77D1A</Color>
+      <Color x:Key="ColorNotchToFullCandidateFill">#33C77D1A</Color>
+      <Color x:Key="ColorNotchX">#2F855A</Color>
+      <Color x:Key="ColorNotchY">#2B6CB0</Color>
+      <Color x:Key="ColorNotchXY">#D64545</Color>
+
+      <!-- CAD area bucket palette (bright, high contrast) -->
+      <Color x:Key="ColorCadAreaBucket1">#00ACC1</Color>
+      <Color x:Key="ColorCadAreaBucket2">#1E88E5</Color>
+      <Color x:Key="ColorCadAreaBucket3">#3949AB</Color>
+      <Color x:Key="ColorCadAreaBucket4">#8E24AA</Color>
+      <Color x:Key="ColorCadAreaBucket5">#D81B60</Color>
+      <Color x:Key="ColorCadAreaBucket6">#E53935</Color>
+      <Color x:Key="ColorCadAreaBucket7">#F4511E</Color>
+      <Color x:Key="ColorCadAreaBucket8">#FB8C00</Color>
+      <Color x:Key="ColorCadAreaBucket9">#FFB300</Color>
+      <Color x:Key="ColorCadAreaBucket10">#43A047</Color>
+      <Color x:Key="ColorCadAreaBucket11">#7CB342</Color>
+      <Color x:Key="ColorCadAreaBucket12">#00897B</Color>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <!-- Brushes -->
+  <SolidColorBrush x:Key="BrushBgApp" Color="{DynamicResource ColorBgApp}"/>
+  <SolidColorBrush x:Key="BrushBgSurface" Color="{DynamicResource ColorBgSurface}"/>
+  <SolidColorBrush x:Key="BrushBgSurfaceInset" Color="{DynamicResource ColorBgSurfaceInset}"/>
+  <SolidColorBrush x:Key="BrushBgSurfaceSelected" Color="{DynamicResource ColorBgSurfaceSelected}"/>
+  <SolidColorBrush x:Key="BrushBgPanel" Color="{DynamicResource ColorBgPanel}"/>
+  <SolidColorBrush x:Key="BrushBgElevated" Color="{DynamicResource ColorBgElevated}"/>
+  <SolidColorBrush x:Key="BrushBgInteractiveHover" Color="{DynamicResource ColorBgInteractiveHover}"/>
+  <SolidColorBrush x:Key="BrushBgInteractivePressed" Color="{DynamicResource ColorBgInteractivePressed}"/>
+  <SolidColorBrush x:Key="BrushWhite" Color="{DynamicResource ColorWhite}"/>
+  <SolidColorBrush x:Key="BrushBlack" Color="{DynamicResource ColorBlack}"/>
+  <SolidColorBrush x:Key="BrushBorder" Color="{DynamicResource ColorBorder}"/>
+  <SolidColorBrush x:Key="BrushBorderMuted" Color="{DynamicResource ColorBorderMuted}"/>
+  <SolidColorBrush x:Key="BrushBorderStrong" Color="{DynamicResource ColorBorderStrong}"/>
+  <SolidColorBrush x:Key="BrushScrollTrack" Color="{DynamicResource ColorScrollTrack}"/>
+  <SolidColorBrush x:Key="BrushScrollThumb" Color="{DynamicResource ColorScrollThumb}"/>
+  <SolidColorBrush x:Key="BrushScrollV2Track" Color="{DynamicResource ColorScrollV2Track}"/>
+  <SolidColorBrush x:Key="BrushScrollV2Thumb" Color="{DynamicResource ColorScrollV2Thumb}"/>
+  <SolidColorBrush x:Key="BrushTextPrimary" Color="{DynamicResource ColorTextPrimary}"/>
+  <SolidColorBrush x:Key="BrushTextMuted" Color="{DynamicResource ColorTextMuted}"/>
+  <SolidColorBrush x:Key="BrushTextSubtle" Color="{DynamicResource ColorTextSubtle}"/>
+  <SolidColorBrush x:Key="BrushIcon" Color="{DynamicResource ColorTextSubtle}"/>
+  <SolidColorBrush x:Key="BrushAccent" Color="{DynamicResource ColorAccent}"/>
+  <SolidColorBrush x:Key="BrushAccentSoft" Color="{DynamicResource ColorAccentSoft}"/>
+  <SolidColorBrush x:Key="BrushConsoleLink" Color="{DynamicResource ColorAccent}"/>
+  <SolidColorBrush x:Key="BrushConsoleSearchHighlightBg" Color="{DynamicResource ColorConsoleSearchHighlightBg}"/>
+  <SolidColorBrush x:Key="BrushConsoleSearchHighlightFg" Color="{DynamicResource ColorConsoleSearchHighlightFg}"/>
+  <SolidColorBrush x:Key="BrushDanger" Color="{DynamicResource ColorDanger}"/>
+  <SolidColorBrush x:Key="BrushSuccess" Color="{DynamicResource ColorSuccess}"/>
+  <SolidColorBrush x:Key="BrushWarning" Color="{DynamicResource ColorWarning}"/>
+  <SolidColorBrush x:Key="BrushSimulationScaleLow" Color="{DynamicResource ColorSimulationScaleLow}"/>
+  <SolidColorBrush x:Key="BrushSimulationScaleZero" Color="{DynamicResource ColorSimulationScaleZero}"/>
+  <SolidColorBrush x:Key="BrushSimulationScaleMid" Color="{DynamicResource ColorSimulationScaleMid}"/>
+  <SolidColorBrush x:Key="BrushSimulationScaleWarm" Color="{DynamicResource ColorSimulationScaleWarm}"/>
+  <SolidColorBrush x:Key="BrushSimulationScaleNeutral" Color="{DynamicResource ColorSimulationScaleNeutral}"/>
+  <SolidColorBrush x:Key="BrushSimulationScaleHigh" Color="{DynamicResource ColorSimulationScaleHigh}"/>
+  <SolidColorBrush x:Key="BrushSimulationCopperHalo" Color="{DynamicResource ColorSimulationCopperHalo}"/>
+  <SolidColorBrush x:Key="BrushSimulationCopperRim" Color="{DynamicResource ColorSimulationCopperRim}"/>
+  <SolidColorBrush x:Key="BrushSimulationCopperFill" Color="{DynamicResource ColorSimulationCopperFill}"/>
+  <SolidColorBrush x:Key="BrushSimulationCopperCenter" Color="{DynamicResource ColorSimulationCopperCenter}"/>
+  <SolidColorBrush x:Key="BrushCoordinatePlannerGuide" Color="{DynamicResource ColorCoordinatePlannerGuide}"/>
+  <SolidColorBrush x:Key="BrushCoordinatePlannerPoint" Color="{DynamicResource ColorCoordinatePlannerPoint}"/>
+  <SolidColorBrush x:Key="BrushCoordinatePlannerBist" Color="{DynamicResource ColorCoordinatePlannerBist}"/>
+  <SolidColorBrush x:Key="BrushCoordinatePlannerArray" Color="{DynamicResource ColorCoordinatePlannerArray}"/>
+  <SolidColorBrush x:Key="BrushCoordinatePlannerLabelBackground" Color="{DynamicResource ColorCoordinatePlannerLabelBackground}"/>
+  <SolidColorBrush x:Key="BrushCoordinatePlannerLabelForeground" Color="{DynamicResource ColorCoordinatePlannerLabelForeground}"/>
+  <LinearGradientBrush x:Key="BrushSimulationScaleSequential"
+                       StartPoint="0,0.5"
+                       EndPoint="1,0.5">
+    <GradientStop Offset="0"
+                  Color="{DynamicResource ColorSimulationScaleZero}"/>
+    <GradientStop Offset="0.58"
+                  Color="{DynamicResource ColorSimulationScaleMid}"/>
+    <GradientStop Offset="0.82"
+                  Color="{DynamicResource ColorSimulationScaleWarm}"/>
+    <GradientStop Offset="1"
+                  Color="{DynamicResource ColorSimulationScaleHigh}"/>
+  </LinearGradientBrush>
+  <LinearGradientBrush x:Key="BrushSimulationScaleDiverging"
+                       StartPoint="0,0.5"
+                       EndPoint="1,0.5">
+    <GradientStop Offset="0"
+                  Color="{DynamicResource ColorSimulationScaleLow}"/>
+    <GradientStop Offset="0.5"
+                  Color="{DynamicResource ColorSimulationScaleZero}"/>
+    <GradientStop Offset="0.78"
+                  Color="{DynamicResource ColorSimulationScaleMid}"/>
+    <GradientStop Offset="0.9"
+                  Color="{DynamicResource ColorSimulationScaleWarm}"/>
+    <GradientStop Offset="1"
+                  Color="{DynamicResource ColorSimulationScaleHigh}"/>
+  </LinearGradientBrush>
+  <SolidColorBrush x:Key="BrushButtonNeutralBackground" Color="{DynamicResource ColorButtonNeutralBackground}"/>
+  <SolidColorBrush x:Key="BrushButtonNeutralHover" Color="{DynamicResource ColorButtonNeutralHover}"/>
+  <SolidColorBrush x:Key="BrushButtonNeutralPressed" Color="{DynamicResource ColorButtonNeutralPressed}"/>
+  <SolidColorBrush x:Key="BrushButtonNeutralBorder" Color="{DynamicResource ColorButtonNeutralBorder}"/>
+  <SolidColorBrush x:Key="BrushButtonNeutralForeground" Color="{DynamicResource ColorButtonNeutralForeground}"/>
+  <SolidColorBrush x:Key="BrushButtonDisabledForeground" Color="{DynamicResource ColorButtonDisabledForeground}"/>
+  <SolidColorBrush x:Key="BrushTooltipBackground" Color="{DynamicResource ColorTooltipBackground}"/>
+  <SolidColorBrush x:Key="BrushTooltipBorder" Color="{DynamicResource ColorTooltipBorder}"/>
+  <SolidColorBrush x:Key="BrushTooltipForeground" Color="{DynamicResource ColorTooltipForeground}"/>
+  <SolidColorBrush x:Key="BrushActionNeutralBackground" Color="{DynamicResource ColorActionNeutralBackground}"/>
+  <SolidColorBrush x:Key="BrushActionNeutralHover" Color="{DynamicResource ColorActionNeutralHover}"/>
+  <SolidColorBrush x:Key="BrushActionNeutralPressed" Color="{DynamicResource ColorActionNeutralPressed}"/>
+  <SolidColorBrush x:Key="BrushActionNeutralBorder" Color="{DynamicResource ColorActionNeutralBorder}"/>
+  <SolidColorBrush x:Key="BrushActionNeutralForeground" Color="{DynamicResource ColorActionNeutralForeground}"/>
+  <SolidColorBrush x:Key="BrushActionPrimaryBackground" Color="{DynamicResource ColorActionPrimaryBackground}"/>
+  <SolidColorBrush x:Key="BrushActionPrimaryHover" Color="{DynamicResource ColorActionPrimaryHover}"/>
+  <SolidColorBrush x:Key="BrushActionPrimaryPressed" Color="{DynamicResource ColorActionPrimaryPressed}"/>
+  <SolidColorBrush x:Key="BrushActionPrimaryBorder" Color="{DynamicResource ColorActionPrimaryBorder}"/>
+  <SolidColorBrush x:Key="BrushActionPrimaryForeground" Color="{DynamicResource ColorActionPrimaryForeground}"/>
+  <SolidColorBrush x:Key="BrushActionDangerBackground" Color="{DynamicResource ColorActionDangerBackground}"/>
+  <SolidColorBrush x:Key="BrushActionDangerHover" Color="{DynamicResource ColorActionDangerHover}"/>
+  <SolidColorBrush x:Key="BrushActionDangerPressed" Color="{DynamicResource ColorActionDangerPressed}"/>
+  <SolidColorBrush x:Key="BrushActionDangerBorder" Color="{DynamicResource ColorActionDangerBorder}"/>
+  <SolidColorBrush x:Key="BrushActionDangerForeground" Color="{DynamicResource ColorActionDangerForeground}"/>
+  <SolidColorBrush x:Key="BrushActionDangerOnNeutralForeground" Color="{DynamicResource ColorActionDangerOnNeutralForeground}"/>
+  <SolidColorBrush x:Key="BrushActionGhostBackground" Color="{DynamicResource ColorActionGhostBackground}"/>
+  <SolidColorBrush x:Key="BrushActionGhostHover" Color="{DynamicResource ColorActionGhostHover}"/>
+  <SolidColorBrush x:Key="BrushActionGhostPressed" Color="{DynamicResource ColorActionGhostPressed}"/>
+  <SolidColorBrush x:Key="BrushActionGhostBorder" Color="{DynamicResource ColorActionGhostBorder}"/>
+  <SolidColorBrush x:Key="BrushActionGhostForeground" Color="{DynamicResource ColorActionGhostForeground}"/>
+  <SolidColorBrush x:Key="BrushActionSelectedBackground" Color="{DynamicResource ColorActionSelectedBackground}"/>
+  <SolidColorBrush x:Key="BrushActionSelectedBorder" Color="{DynamicResource ColorActionSelectedBorder}"/>
+  <SolidColorBrush x:Key="BrushActionSelectedForeground" Color="{DynamicResource ColorActionSelectedForeground}"/>
+  <SolidColorBrush x:Key="BrushActionFocusBackground" Color="{DynamicResource ColorActionFocusBackground}"/>
+  <SolidColorBrush x:Key="BrushActionFocusBorder" Color="{DynamicResource ColorActionFocusBorder}"/>
+  <SolidColorBrush x:Key="BrushActionFocusForeground" Color="{DynamicResource ColorActionFocusForeground}"/>
+  <SolidColorBrush x:Key="BrushActionTextHoverBackground" Color="{DynamicResource ColorActionTextHoverBackground}"/>
+  <SolidColorBrush x:Key="BrushActionTextPressedBackground" Color="{DynamicResource ColorActionTextPressedBackground}"/>
+  <SolidColorBrush x:Key="BrushActionTextHoverBorder" Color="{DynamicResource ColorActionTextHoverBorder}"/>
+  <SolidColorBrush x:Key="BrushActionTextHoverForeground" Color="{DynamicResource ColorActionTextHoverForeground}"/>
+  <SolidColorBrush x:Key="BrushActionViewportBackground" Color="{DynamicResource ColorActionViewportBackground}"/>
+  <SolidColorBrush x:Key="BrushActionViewportHover" Color="{DynamicResource ColorActionViewportHover}"/>
+  <SolidColorBrush x:Key="BrushActionViewportPressed" Color="{DynamicResource ColorActionViewportPressed}"/>
+  <SolidColorBrush x:Key="BrushActionViewportBorder" Color="{DynamicResource ColorActionViewportBorder}"/>
+  <SolidColorBrush x:Key="BrushActionViewportForeground" Color="{DynamicResource ColorActionViewportForeground}"/>
+  <SolidColorBrush x:Key="BrushActionViewportCheckedBackground" Color="{DynamicResource ColorActionViewportCheckedBackground}"/>
+  <SolidColorBrush x:Key="BrushActionViewportCheckedForeground" Color="{DynamicResource ColorActionViewportCheckedForeground}"/>
+  <SolidColorBrush x:Key="BrushActionConsoleBackground" Color="{DynamicResource ColorActionConsoleBackground}"/>
+  <SolidColorBrush x:Key="BrushActionConsoleForeground" Color="{DynamicResource ColorActionConsoleForeground}"/>
+  <SolidColorBrush x:Key="BrushActionConsoleCheckedBackground" Color="{DynamicResource ColorActionConsoleCheckedBackground}"/>
+  <SolidColorBrush x:Key="BrushActionChipBackground" Color="{DynamicResource ColorActionChipBackground}"/>
+  <SolidColorBrush x:Key="BrushActionChipHover" Color="{DynamicResource ColorActionChipHover}"/>
+  <SolidColorBrush x:Key="BrushActionChipPressed" Color="{DynamicResource ColorActionChipPressed}"/>
+  <SolidColorBrush x:Key="BrushActionChipBorder" Color="{DynamicResource ColorActionChipBorder}"/>
+  <SolidColorBrush x:Key="BrushActionChipForeground" Color="{DynamicResource ColorActionChipForeground}"/>
+  <SolidColorBrush x:Key="BrushStatusChipBackground" Color="{DynamicResource ColorStatusChipBackground}"/>
+  <SolidColorBrush x:Key="BrushStatusChipBorder" Color="{DynamicResource ColorStatusChipBorder}"/>
+  <SolidColorBrush x:Key="BrushStatusChipForeground" Color="{DynamicResource ColorStatusChipForeground}"/>
+  <SolidColorBrush x:Key="BrushActionInverseBackground" Color="{DynamicResource ColorActionInverseBackground}"/>
+  <SolidColorBrush x:Key="BrushActionInversePressedBackground" Color="{DynamicResource ColorActionInversePressedBackground}"/>
+  <SolidColorBrush x:Key="BrushActionInverseForeground" Color="{DynamicResource ColorActionInverseForeground}"/>
+  <SolidColorBrush x:Key="BrushOverlayScrim" Color="{DynamicResource ColorOverlayScrim}"/>
+  <SolidColorBrush x:Key="BrushPanelBlockCollapsedBackground" Color="{DynamicResource ColorPanelBlockCollapsedBackground}"/>
+  <SolidColorBrush x:Key="BrushPanelBlockCollapsedHover" Color="{DynamicResource ColorPanelBlockCollapsedHover}"/>
+  <SolidColorBrush x:Key="BrushPanelBlockCollapsedPressed" Color="{DynamicResource ColorPanelBlockCollapsedPressed}"/>
+  <SolidColorBrush x:Key="BrushPanelBlockExpandedBackground" Color="{DynamicResource ColorPanelBlockExpandedBackground}"/>
+  <SolidColorBrush x:Key="BrushPanelBlockExpandedHover" Color="{DynamicResource ColorPanelBlockExpandedHover}"/>
+  <SolidColorBrush x:Key="BrushPanelBlockExpandedPressed" Color="{DynamicResource ColorPanelBlockExpandedPressed}"/>
+  <SolidColorBrush x:Key="BrushSettingsWindowBackground" Color="{DynamicResource ColorSettingsWindowBackground}"/>
+  <SolidColorBrush x:Key="BrushSettingsHeroBackground" Color="{DynamicResource ColorSettingsHeroBackground}"/>
+  <SolidColorBrush x:Key="BrushSettingsNavBackground" Color="{DynamicResource ColorSettingsNavBackground}"/>
+  <SolidColorBrush x:Key="BrushSettingsContentBackground" Color="{DynamicResource ColorSettingsContentBackground}"/>
+  <SolidColorBrush x:Key="BrushSettingsSectionBackground" Color="{DynamicResource ColorSettingsSectionBackground}"/>
+  <SolidColorBrush x:Key="BrushSettingsTileBackground" Color="{DynamicResource ColorSettingsTileBackground}"/>
+  <SolidColorBrush x:Key="BrushSettingsTileHover" Color="{DynamicResource ColorSettingsTileHover}"/>
+  <SolidColorBrush x:Key="BrushSettingsBorder" Color="{DynamicResource ColorSettingsBorder}"/>
+  <SolidColorBrush x:Key="BrushSettingsInputBackground" Color="{DynamicResource ColorSettingsInputBackground}"/>
+  <SolidColorBrush x:Key="BrushSettingsInputHover" Color="{DynamicResource ColorSettingsInputHover}"/>
+  <SolidColorBrush x:Key="BrushSettingsInputBorder" Color="{DynamicResource ColorSettingsInputBorder}"/>
+  <SolidColorBrush x:Key="BrushSettingsNoteText" Color="{DynamicResource ColorSettingsNoteText}"/>
+  <SolidColorBrush x:Key="BrushTransparent" Color="Transparent"/>
+
+  <SolidColorBrush x:Key="BrushPadInfoPanelBackground" Color="{DynamicResource ColorPadInfoPanelBackground}"/>
+  <SolidColorBrush x:Key="BrushPadInfoPanelBorder" Color="{DynamicResource ColorPadInfoPanelBorder}"/>
+  <SolidColorBrush x:Key="BrushPadInfoConfirmBackground" Color="{DynamicResource ColorPadInfoConfirmBackground}"/>
+
+  <SolidColorBrush x:Key="BrushCanvasBackground" Color="{DynamicResource ColorCanvasBackground}"/>
+  <SolidColorBrush x:Key="BrushCanvasAxisLabel" Color="{DynamicResource ColorCanvasAxisLabel}"/>
+  <SolidColorBrush x:Key="BrushCanvasIcBlockFill" Color="{DynamicResource ColorCanvasIcBlockFill}"/>
+  <SolidColorBrush x:Key="BrushCanvasIcBlockStroke" Color="{DynamicResource ColorCanvasIcBlockStroke}"/>
+  <SolidColorBrush x:Key="BrushCanvasSelection" Color="{DynamicResource ColorCanvasSelection}"/>
+  <SolidColorBrush x:Key="BrushCanvasSelectionFill" Color="{DynamicResource ColorCanvasSelectionFill}"/>
+  <SolidColorBrush x:Key="BrushCanvasRegularSelected" Color="{DynamicResource ColorCanvasRegularSelected}"/>
+  <SolidColorBrush x:Key="BrushCanvasRegularFreeform" Color="{DynamicResource ColorCanvasRegularFreeform}"/>
+  <SolidColorBrush x:Key="BrushCanvasRegularUnmatched" Color="{DynamicResource ColorCanvasRegularUnmatched}"/>
+  <SolidColorBrush x:Key="BrushCanvasCadSelected" Color="{DynamicResource ColorCanvasCadSelected}"/>
+  <SolidColorBrush x:Key="BrushCanvasCadFillDefault" Color="{DynamicResource ColorCanvasCadFillDefault}"/>
+  <SolidColorBrush x:Key="BrushCanvasCadFillSelected" Color="{DynamicResource ColorCanvasCadFillSelected}"/>
+  <SolidColorBrush x:Key="BrushNotchCadStroke" Color="{DynamicResource ColorNotchCadStroke}"/>
+  <SolidColorBrush x:Key="BrushNotchCadFill" Color="{DynamicResource ColorNotchCadFill}"/>
+  <SolidColorBrush x:Key="BrushNotchRegularStroke" Color="{DynamicResource ColorNotchRegularStroke}"/>
+  <SolidColorBrush x:Key="BrushNotchToFullOutline" Color="{DynamicResource ColorNotchToFullOutline}"/>
+  <SolidColorBrush x:Key="BrushNotchToFullFill" Color="{DynamicResource ColorNotchToFullFill}"/>
+  <SolidColorBrush x:Key="BrushNotchToFullSeedOutline" Color="{DynamicResource ColorNotchToFullSeedOutline}"/>
+  <SolidColorBrush x:Key="BrushNotchToFullSeedFill" Color="{DynamicResource ColorNotchToFullSeedFill}"/>
+  <SolidColorBrush x:Key="BrushNotchToFullCandidateOutline" Color="{DynamicResource ColorNotchToFullCandidateOutline}"/>
+  <SolidColorBrush x:Key="BrushNotchToFullCandidateFill" Color="{DynamicResource ColorNotchToFullCandidateFill}"/>
+  <SolidColorBrush x:Key="BrushNotchX" Color="{DynamicResource ColorNotchX}"/>
+  <SolidColorBrush x:Key="BrushNotchY" Color="{DynamicResource ColorNotchY}"/>
+  <SolidColorBrush x:Key="BrushNotchXY" Color="{DynamicResource ColorNotchXY}"/>
+
+  <!-- Spacing -->
+  <x:Double x:Key="Space0">0</x:Double>
+  <x:Double x:Key="Space2">2</x:Double>
+  <x:Double x:Key="Space1">1</x:Double>
+  <x:Double x:Key="Space4">4</x:Double>
+  <x:Double x:Key="Space6">6</x:Double>
+  <x:Double x:Key="Space8">8</x:Double>
+  <x:Double x:Key="Space10">10</x:Double>
+  <x:Double x:Key="Space12">12</x:Double>
+  <x:Double x:Key="Space14">14</x:Double>
+  <x:Double x:Key="Space16">16</x:Double>
+  <x:Double x:Key="Space18">18</x:Double>
+  <x:Double x:Key="Space20">20</x:Double>
+  <x:Double x:Key="Space24">24</x:Double>
+
+  <!-- Insets -->
+  <Thickness x:Key="Inset1">1</Thickness>
+  <Thickness x:Key="InsetNone">0</Thickness>
+  <Thickness x:Key="Inset4">4</Thickness>
+  <Thickness x:Key="Inset6">6</Thickness>
+  <Thickness x:Key="Inset8">8</Thickness>
+  <Thickness x:Key="Inset10">10</Thickness>
+  <Thickness x:Key="Inset14">14</Thickness>
+  <Thickness x:Key="Inset12">12</Thickness>
+  <Thickness x:Key="Inset16">16</Thickness>
+  <Thickness x:Key="Inset20">20</Thickness>
+  <Thickness x:Key="Inset24">24</Thickness>
+  <Thickness x:Key="Inset10_4">10,4</Thickness>
+  <Thickness x:Key="Inset10_6">10,6</Thickness>
+  <Thickness x:Key="Inset10_8">10,8</Thickness>
+  <Thickness x:Key="Inset12_8">12,8</Thickness>
+  <Thickness x:Key="Inset12_10">12,10</Thickness>
+  <Thickness x:Key="Inset14_6">14,6</Thickness>
+  <Thickness x:Key="Inset14_8">14,8</Thickness>
+  <Thickness x:Key="Inset8_4">8,4</Thickness>
+  <Thickness x:Key="Inset8_6">8,6</Thickness>
+  <Thickness x:Key="Inset6_4">6,4</Thickness>
+  <Thickness x:Key="Inset6_2">6,2</Thickness>
+  <Thickness x:Key="Inset10_8_10_12">10,8,10,12</Thickness>
+  <Thickness x:Key="Inset10_10">10,10</Thickness>
+  <Thickness x:Key="InsetRight10">0,0,10,0</Thickness>
+  <Thickness x:Key="InsetRight12">0,0,12,0</Thickness>
+  <Thickness x:Key="InsetRight12Bottom12">0,0,12,12</Thickness>
+  <Thickness x:Key="InsetRight12Bottom16">0,0,12,16</Thickness>
+  <Thickness x:Key="InsetRight12Bottom20">0,0,12,20</Thickness>
+  <Thickness x:Key="InsetRight10Bottom12">0,0,10,12</Thickness>
+  <Thickness x:Key="InsetRight12Bottom6">0,0,12,6</Thickness>
+  <Thickness x:Key="InsetRight6">0,0,6,0</Thickness>
+  <Thickness x:Key="InsetRight6Bottom2">0,0,6,2</Thickness>
+  <Thickness x:Key="InsetRight6Bottom6">0,0,6,6</Thickness>
+  <Thickness x:Key="InsetRight8">0,0,8,0</Thickness>
+  <Thickness x:Key="InsetRight8Bottom8">0,0,8,8</Thickness>
+  <Thickness x:Key="InsetRight8Bottom6">0,0,8,6</Thickness>
+  <Thickness x:Key="InsetRight8Bottom4">0,0,8,4</Thickness>
+  <Thickness x:Key="InsetBottom2">0,0,0,2</Thickness>
+  <Thickness x:Key="InsetBottom4">0,0,0,4</Thickness>
+  <Thickness x:Key="InsetBottom6">0,0,0,6</Thickness>
+  <Thickness x:Key="InsetBottom12">0,0,0,12</Thickness>
+  <Thickness x:Key="InsetBottom20">0,0,0,20</Thickness>
+  <Thickness x:Key="InsetTop4Bottom10">0,4,0,10</Thickness>
+  <Thickness x:Key="InsetTop2Bottom8">0,2,0,8</Thickness>
+  <Thickness x:Key="InsetTop2">0,2,0,0</Thickness>
+  <Thickness x:Key="InsetTop4">0,4,0,0</Thickness>
+  <Thickness x:Key="InsetTop8">0,8,0,0</Thickness>
+  <Thickness x:Key="InsetTop10">0,10,0,0</Thickness>
+  <Thickness x:Key="InsetTop14">0,14,0,0</Thickness>
+  <Thickness x:Key="InsetLeft10">10,0,0,0</Thickness>
+  <Thickness x:Key="InsetLeft6">6,0,0,0</Thickness>
+  <Thickness x:Key="InsetLeft4">4,0,0,0</Thickness>
+  <Thickness x:Key="InsetLeft6Bottom6">6,0,0,6</Thickness>
+  <Thickness x:Key="InsetLeft8">8,0,0,0</Thickness>
+  <Thickness x:Key="InsetLeft14">14,0,0,0</Thickness>
+  <Thickness x:Key="InsetLeft18">18,0,0,0</Thickness>
+  <Thickness x:Key="InsetFormColumnLeft">0,0,6,0</Thickness>
+  <Thickness x:Key="InsetFormColumnRight">6,0,0,0</Thickness>
+  <Thickness x:Key="InsetTop12Right16">0,12,16,0</Thickness>
+  <Thickness x:Key="InsetLeft10Top16">10,16,0,0</Thickness>
+  <Thickness x:Key="InsetWorkspaceFoldCornerBadgeOffset">0,-12,-12,0</Thickness>
+
+  <!-- Borders -->
+  <Thickness x:Key="BorderThin">1</Thickness>
+  <Thickness x:Key="BorderNone">0</Thickness>
+  <Thickness x:Key="BorderNotchExportBadge">2</Thickness>
+  <Thickness x:Key="BorderControl">1.5</Thickness>
+  <Thickness x:Key="BorderInput">2</Thickness>
+  <Thickness x:Key="BorderIconCircle">1.5</Thickness>
+  <Thickness x:Key="BorderNotchExportActiveRow">2,1,1,1</Thickness>
+  <Thickness x:Key="BorderBottomThin">0,0,0,1</Thickness>
+  <Thickness x:Key="BorderTopThin">0,1,0,0</Thickness>
+  <Thickness x:Key="BorderLeftThin">0,0,1,0</Thickness>
+  <Thickness x:Key="BorderRightThin">1,0,0,0</Thickness>
+  <Thickness x:Key="BorderTabThickness">1,1,1,0</Thickness>
+
+  <!-- Radii -->
+  <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+  <CornerRadius x:Key="RadiusNone">0</CornerRadius>
+  <CornerRadius x:Key="RadiusXs">8</CornerRadius>
+  <CornerRadius x:Key="RadiusMd">10</CornerRadius>
+  <CornerRadius x:Key="RadiusLg">12</CornerRadius>
+  <CornerRadius x:Key="RadiusTopMd">10,10,0,0</CornerRadius>
+  <CornerRadius x:Key="RadiusTopLg">12,12,0,0</CornerRadius>
+  <CornerRadius x:Key="RadiusBottomMd">0,0,10,10</CornerRadius>
+  <CornerRadius x:Key="RadiusRightMd">0,10,10,0</CornerRadius>
+  <CornerRadius x:Key="RadiusPillLeft">999,0,0,999</CornerRadius>
+  <CornerRadius x:Key="RadiusPillRight">0,999,999,0</CornerRadius>
+  <CornerRadius x:Key="RadiusPill">999</CornerRadius>
+
+  <!-- Typography -->
+  <FontFamily x:Key="FontFamilyUi">Segoe UI Variable Text</FontFamily>
+  <FontFamily x:Key="FontFamilyCode">Consolas, Cascadia Mono, Segoe UI Variable Text</FontFamily>
+  <x:Double x:Key="FontSizeSm">11</x:Double>
+  <x:Double x:Key="FontSizeBase">12</x:Double>
+  <x:Double x:Key="FontSizeMd">13</x:Double>
+  <x:Double x:Key="FontSizeLg">15</x:Double>
+  <x:Double x:Key="FontSizeXl">20</x:Double>
+  <x:Double x:Key="FontSizeTitle">22</x:Double>
+  <x:Double x:Key="FontSizeSectionTitle">16</x:Double>
+  <x:Double x:Key="FontSizePanelBlockTitle">14</x:Double>
+  <x:Double x:Key="FontSizeMin">2</x:Double>
+  <x:Double x:Key="FontSizeMax">16</x:Double>
+
+  <!-- Icons -->
+  <x:Double x:Key="IconSizeXs">10</x:Double>
+  <x:Double x:Key="IconSizeSm">12</x:Double>
+  <x:Double x:Key="IconSizeMd">16</x:Double>
+  <x:Double x:Key="IconSizeLg">20</x:Double>
+  <x:Double x:Key="IconSizeXl">24</x:Double>
+  <x:Double x:Key="IconStroke">1.6</x:Double>
+  <x:Double x:Key="IconStrokeThin">1.4</x:Double>
+
+  <!-- Opacity -->
+  <x:Double x:Key="OpacityHigh">0.9</x:Double>
+  <x:Double x:Key="OpacityMuted">0.72</x:Double>
+  <x:Double x:Key="OpacitySubtle">0.56</x:Double>
+  <x:Double x:Key="OpacityCanvasQuickToolbarIdle">0.3</x:Double>
+
+  <!-- Layout sizes -->
+  <x:Double x:Key="PanelLeftWidth">280</x:Double>
+  <x:Double x:Key="PanelRightWidth">360</x:Double>
+  <x:Double x:Key="PanelLeftMinWidth">180</x:Double>
+  <x:Double x:Key="PanelRightMinWidth">220</x:Double>
+  <x:Double x:Key="SplitterThickness">5</x:Double>
+  <x:Double x:Key="SplitterRowThickness">6</x:Double>
+  <x:Double x:Key="ConsoleActionWidth">28</x:Double>
+  <x:Double x:Key="ConsoleActionHeight">24</x:Double>
+  <x:Double x:Key="ConsoleSearchWidth">200</x:Double>
+  <x:Double x:Key="ConsoleSearchHeight">26</x:Double>
+  <x:Double x:Key="PanelToggleHeight">26</x:Double>
+  <x:Double x:Key="FormControlHeight">30</x:Double>
+  <x:Double x:Key="FormControlCompactHeight">24</x:Double>
+  <x:Double x:Key="PanelFormFieldSpacing">4</x:Double>
+  <x:Double x:Key="SpinButtonWidth">6</x:Double>
+  <x:Double x:Key="ScrollBarThickness">2.5</x:Double>
+  <Thickness x:Key="ScrollBarThumbMargin">0</Thickness>
+  <x:Double x:Key="ScrollBarThumbMinLength">36</x:Double>
+  <x:Double x:Key="ScrollBarV2Thickness">2.5</x:Double>
+  <Thickness x:Key="ScrollBarV2Margin">0</Thickness>
+  <Thickness x:Key="ScrollBarV2ThumbMargin">0</Thickness>
+  <x:Double x:Key="ScrollBarV2ThumbMinLength">36</x:Double>
+  <x:Double x:Key="ScrollBarDevCandidateThickness">2.5</x:Double>
+  <Thickness x:Key="ScrollBarDevCandidateMargin">0</Thickness>
+  <Thickness x:Key="ScrollBarDevCandidateThumbMargin">0</Thickness>
+  <x:Double x:Key="ScrollBarDevCandidateThumbMinLength">36</x:Double>
+  <x:Double x:Key="IconButtonSize">30</x:Double>
+  <x:Double x:Key="DxfEditSummaryBadgeMinWidth">54</x:Double>
+  <x:Double x:Key="WorkspaceFoldCornerBadgeSize">24</x:Double>
+  <x:Double x:Key="PanelBlockChevronHostSize">20</x:Double>
+  <x:Double x:Key="ManualSizingInputWidth">110</x:Double>
+  <x:Double x:Key="PadInfoAnchorSize">6</x:Double>
+  <x:Double x:Key="PadInfoAnchorClampMargin">8</x:Double>
+  <x:Double x:Key="PadInfoGap">20</x:Double>
+  <x:Double x:Key="PadInfoMinLineLength">20</x:Double>
+  <x:Double x:Key="PadInfoLineInset">12</x:Double>
+  <x:Double x:Key="PadInfoAnchorPanelMargin">6</x:Double>
+  <x:Double x:Key="PadInfoContentMaxHeight">560</x:Double>
+  <x:Double x:Key="ButtonMinWidthSm">70</x:Double>
+    <x:Double x:Key="CadLoadCanvasOverlaySpinnerSize">64</x:Double>
+    <x:Double x:Key="CadLoadSpinnerWindowSize">88</x:Double>
+    <x:Double x:Key="CadLoadCanvasOverlaySpinnerStrokeThickness">4</x:Double>
+    <x:Double x:Key="LoadingSpinnerDesignSize">36</x:Double>
+  <x:Decimal x:Key="NumericInputMinimum">-1000000</x:Decimal>
+  <x:Decimal x:Key="NumericInputMaximum">1000000</x:Decimal>
+  <x:Double x:Key="ConsoleCollapsedMinHeight">32</x:Double>
+  <x:Double x:Key="ConsoleFontMin">8</x:Double>
+  <x:Double x:Key="ConsoleFontMax">32</x:Double>
+  <x:Double x:Key="DialogWidth">360</x:Double>
+  <x:Double x:Key="DialogHeight">170</x:Double>
+  <x:Double x:Key="CadPadDialogHeight">320</x:Double>
+  <x:Double x:Key="RegularPadDialogWidth">320</x:Double>
+  <x:Double x:Key="RegularPadDialogHeight">240</x:Double>
+  <x:Double x:Key="CascadeIcSettingsDialogWidth">520</x:Double>
+  <x:Double x:Key="CascadeIcSettingsDialogHeight">460</x:Double>
+  <x:Double x:Key="CascadeIcSettingsDialogMinWidth">460</x:Double>
+  <x:Double x:Key="CascadeIcSettingsDialogMinHeight">360</x:Double>
+  <x:Double x:Key="LayerListMaxHeight">240</x:Double>
+  <x:Double x:Key="LayerDropdownMaxHeight">320</x:Double>
+  <x:Double x:Key="RegularLayerSelectorWidth">220</x:Double>
+  <x:Double x:Key="NotchDetailWidth">520</x:Double>
+  <x:Double x:Key="NotchDetailHeight">520</x:Double>
+  <x:Double x:Key="NotchDetailMinWidth">420</x:Double>
+  <x:Double x:Key="NotchDetailMinHeight">360</x:Double>
+  <x:Double x:Key="CoordinateArtifactDetailWidth">520</x:Double>
+  <x:Double x:Key="CoordinateArtifactDetailHeight">420</x:Double>
+  <x:Double x:Key="CoordinateArtifactDetailMinWidth">420</x:Double>
+  <x:Double x:Key="CoordinateArtifactDetailMinHeight">320</x:Double>
+  <x:Double x:Key="NotchPreviewHeight">220</x:Double>
+  <x:Double x:Key="NotchPreviewAutoPlayIntervalInputWidth">110</x:Double>
+  <x:Double x:Key="NotchDetailListMaxHeight">220</x:Double>
+  <x:Double x:Key="NotchExportSelectionWidth">1100</x:Double>
+  <x:Double x:Key="NotchExportSelectionHeight">760</x:Double>
+  <x:Double x:Key="NotchExportSelectionMinWidth">900</x:Double>
+  <x:Double x:Key="NotchExportSelectionMinHeight">560</x:Double>
+  <x:Double x:Key="NotchExportSelectionOpacity">0.9</x:Double>
+  <x:Double x:Key="NotchExportSelectionListMaxHeight">580</x:Double>
+  <x:Double x:Key="NotchExportSelectionWorkspaceListMaxHeight">150</x:Double>
+  <x:Double x:Key="NotchExportSelectionPreviewMinWidth">320</x:Double>
+  <x:Double x:Key="NotchExportFilterHelperWidth">560</x:Double>
+  <x:Double x:Key="NotchExportFilterHelperHeight">420</x:Double>
+  <x:Double x:Key="NotchExportFilterHelperMinWidth">520</x:Double>
+  <x:Double x:Key="NotchExportFilterHelperMinHeight">360</x:Double>
+  <x:Double x:Key="NotchExportColumnFilterWidth">340</x:Double>
+  <x:Double x:Key="NotchExportColumnFilterHeight">430</x:Double>
+  <x:Double x:Key="NotchExportColumnFilterMinWidth">320</x:Double>
+  <x:Double x:Key="NotchExportColumnFilterMinHeight">320</x:Double>
+  <x:Double x:Key="NotchExportPrimaryButtonMinWidth">160</x:Double>
+  <x:Double x:Key="NotchExportTopDropdownWidth">180</x:Double>
+  <x:Double x:Key="NotchApplySimulationFrameDropdownWidth">260</x:Double>
+  <x:Double x:Key="NotchApplySimulationModeDropdownWidth">180</x:Double>
+  <x:Double x:Key="NotchApplySimulationAreaDropdownWidth">180</x:Double>
+  <x:Double x:Key="NotchApplySimulationThresholdWidth">120</x:Double>
+  <x:Double x:Key="NotchApplySimulationFrameRailMinWidth">220</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaMinHeight">420</x:Double>
+  <x:Double x:Key="NotchApplySimulationRegularListMinHeight">220</x:Double>
+  <x:Double x:Key="NotchApplySimulationHistogramMinHeight">156</x:Double>
+  <x:Double x:Key="NotchApplySimulationHeatmapMinHeight">180</x:Double>
+  <x:Double x:Key="NotchApplySimulationHotspotListMaxHeight">220</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaPadding">10</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaCellGap">1</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaGridStrokeThickness">1</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaSelectedStrokeThickness">2</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaMinOpacity">0.24</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaMaxOpacity">0.88</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaValueFontMin">8</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaValueFontMax">15</x:Double>
+  <x:Double x:Key="NotchApplySimulationCopperHaloStrokeThickness">5</x:Double>
+  <x:Double x:Key="NotchApplySimulationCopperRimStrokeThickness">2</x:Double>
+  <x:Double x:Key="NotchApplySimulationCopperCrossStrokeThickness">1.5</x:Double>
+  <x:Double x:Key="NotchApplySimulationCopperCrossHalfLength">13</x:Double>
+  <x:Double x:Key="NotchApplySimulationCopperCenterRadius">3.5</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaBadgeFontSize">9</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaBadgePaddingX">4</x:Double>
+  <x:Double x:Key="NotchApplySimulationAaBadgePaddingY">2</x:Double>
+  <x:Double x:Key="NotchApplySimulationHeatmapPadding">10</x:Double>
+  <x:Double x:Key="NotchApplySimulationHeatmapCellGap">1</x:Double>
+  <x:Double x:Key="NotchApplySimulationHeatmapGridStrokeThickness">1</x:Double>
+  <x:Double x:Key="NotchApplySimulationHeatmapSelectedStrokeThickness">2</x:Double>
+  <x:Double x:Key="NotchApplySimulationHeatmapMinOpacity">0.12</x:Double>
+  <x:Double x:Key="NotchApplySimulationHeatmapMaxOpacity">0.92</x:Double>
+  <x:Double x:Key="CoordinatePlannerGuideStrokeThickness">2</x:Double>
+  <x:Double x:Key="CoordinatePlannerBistStrokeThickness">2</x:Double>
+  <x:Double x:Key="CoordinatePlannerPointStrokeThickness">2</x:Double>
+  <x:Double x:Key="CoordinatePlannerLabelFontSize">12</x:Double>
+  <x:Double x:Key="CoordinatePlannerLabelOffset">10</x:Double>
+  <x:Double x:Key="CoordinatePlannerPointMinRadiusScreen">5</x:Double>
+  <x:Double x:Key="CoordinatePlannerArrayPointMinRadiusScreen">3</x:Double>
+  <x:Double x:Key="CoordinatePlannerFocusStrokeThickness">3</x:Double>
+  <x:Double x:Key="CoordinatePlannerMutedOverlayOpacity">0.34</x:Double>
+  <x:Double x:Key="CoordinatePlannerFocusOverlayOpacity">0.96</x:Double>
+  <x:Double x:Key="CoordinatePlannerRegularLineOpacity">0.32</x:Double>
+  <x:Double x:Key="CoordinatePlannerRegularFillOpacity">0.12</x:Double>
+  <x:Double x:Key="CoordinateOverlayModeComboWidth">132</x:Double>
+  <x:Double x:Key="NotchExportSearchWidth">300</x:Double>
+  <x:Double x:Key="NotchExportSortDropdownWidth">160</x:Double>
+  <x:Double x:Key="NotchExportMiniPreviewMinHeight">84</x:Double>
+  <x:Double x:Key="DxfEditChangeListWidth">980</x:Double>
+  <x:Double x:Key="DxfEditChangeListHeight">680</x:Double>
+  <x:Double x:Key="DxfEditChangeListMinWidth">760</x:Double>
+  <x:Double x:Key="DxfEditChangeListMinHeight">500</x:Double>
+  <GridLength x:Key="NotchExportTableColCheckWidth">34</GridLength>
+  <GridLength x:Key="NotchExportTableColRowWidth">72</GridLength>
+  <GridLength x:Key="NotchExportTableColIcWidth">58</GridLength>
+  <GridLength x:Key="NotchExportTableColDiffWidth">62</GridLength>
+  <GridLength x:Key="NotchExportTableColMatchWidth">66</GridLength>
+  <GridLength x:Key="NotchExportTableColStatusWidth">126</GridLength>
+  <GridLength x:Key="NotchExportMainLeftColumnWidth">2.2*</GridLength>
+  <GridLength x:Key="NotchExportMainRightColumnWidth">*</GridLength>
+  <x:Double x:Key="InspectorTierDotSize">8</x:Double>
+  <x:Double x:Key="VerificationStepRailNodeSize">10</x:Double>
+  <x:Double x:Key="VerificationStepRailLineWidth">2</x:Double>
+  <x:Double x:Key="ValidationTraceNoteMaxWidth">260</x:Double>
+  <x:Double x:Key="IndexMappingReportWidth">1080</x:Double>
+  <x:Double x:Key="IndexMappingReportHeight">760</x:Double>
+  <x:Double x:Key="IndexMappingReportMinWidth">900</x:Double>
+  <x:Double x:Key="IndexMappingReportMinHeight">560</x:Double>
+  <x:Double x:Key="IndexMappingReportListMaxHeight">580</x:Double>
+  <x:Double x:Key="SettingsWindowWidth">1040</x:Double>
+  <x:Double x:Key="SettingsWindowHeight">700</x:Double>
+  <x:Double x:Key="SettingsWindowMinWidth">860</x:Double>
+  <x:Double x:Key="SettingsWindowMinHeight">560</x:Double>
+  <x:Double x:Key="SettingsContentMaxWidth">1200</x:Double>
+  <x:Double x:Key="LayerImageExportWidth">500</x:Double>
+  <x:Double x:Key="LayerImageExportHeight">520</x:Double>
+  <x:Double x:Key="LayerImageExportMinWidth">420</x:Double>
+  <x:Double x:Key="LayerImageExportMinHeight">320</x:Double>
+  <x:Double x:Key="ViewMenuPopupMaxHeight">520</x:Double>
+  <x:Double x:Key="ViewMenuPopupMinWidth">200</x:Double>
+  <x:Double x:Key="ViewMenuPopupWidth">264</x:Double>
+  <x:Double x:Key="ViewMenuPopupMaxWidth">320</x:Double>
+  <x:Double x:Key="ViewMenuValueWidth">44</x:Double>
+  <x:Double x:Key="ViewMenuSwitchMinWidth">44</x:Double>
+  <x:Double x:Key="ViewMenuButtonMinHeight">30</x:Double>
+  <x:Double x:Key="WorkspaceHeaderActionMinHeight">24</x:Double>
+  <x:Double x:Key="WorkspaceHeaderStatusMaxWidth">820</x:Double>
+  <x:Double x:Key="WorkspaceHeaderInspectorChipRowMaxWidth">980</x:Double>
+  <x:Double x:Key="WorkspaceHeaderInspectorPrimaryChipMaxWidth">300</x:Double>
+  <x:Double x:Key="WorkspaceHeaderInspectorSecondaryChipMaxWidth">220</x:Double>
+  <x:Double x:Key="WorkspaceHeaderInspectorMatchChipMaxWidth">220</x:Double>
+  <x:Double x:Key="WorkspaceHeaderInspectorCompensationChipMaxWidth">260</x:Double>
+  <x:Double x:Key="WorkspaceSummaryChipMaxWidth">240</x:Double>
+  <x:Double x:Key="ConfirmDialogDangerIconSize">24</x:Double>
+  <x:Double x:Key="ConfirmDialogDangerContentSpacing">8</x:Double>
+  <x:Double x:Key="ConfirmDialogActionMinHeight">36</x:Double>
+  <x:Double x:Key="ConfirmDialogActionHeight">40</x:Double>
+  <x:Double x:Key="ViewMenuCloseDelayMs">110</x:Double>
+  <x:Double x:Key="MainMenuCloseDelayMs">140</x:Double>
+
+  <!-- Grid lengths -->
+  <GridLength x:Key="PanelLeftWidthGrid">280</GridLength>
+  <GridLength x:Key="PanelRightWidthGrid">360</GridLength>
+  <GridLength x:Key="CoordinatePanelRightWidthGrid">460</GridLength>
+  <GridLength x:Key="CoordinateArtifactLabelColumnGrid">1.15*</GridLength>
+  <GridLength x:Key="CoordinateArtifactPixelColumnGrid">1.25*</GridLength>
+  <GridLength x:Key="CoordinateArtifactMachineColumnGrid">1.4*</GridLength>
+  <GridLength x:Key="CoordinateArtifactSafeColumnGrid">1.4*</GridLength>
+  <GridLength x:Key="SettingsNavRailWidthGrid">216</GridLength>
+  <GridLength x:Key="SplitterThicknessGrid">5</GridLength>
+  <GridLength x:Key="SplitterRowHeight">6</GridLength>
+
+  <!-- Canvas tuning -->
+  <x:Double x:Key="CanvasCadLineWidth">0.2</x:Double>
+  <x:Double x:Key="CanvasRegularLineWidth">0.2</x:Double>
+  <x:Double x:Key="CanvasRegularFillAlpha">18</x:Double>
+  <x:Double x:Key="CanvasRegularSelectedFillAlpha">60</x:Double>
+  <x:Double x:Key="CanvasRegularFreeformFillAlpha">35</x:Double>
+  <x:Double x:Key="CanvasRegularStrokeAlpha">210</x:Double>
+  <x:Double x:Key="CanvasCadStrokeAlpha">200</x:Double>
+  <x:Double x:Key="CanvasHighlightStrokeAlpha">255</x:Double>
+  <x:Double x:Key="CanvasCadSelectedStrokeWidthAdd">0.8</x:Double>
+  <x:Double x:Key="CanvasCadOverlapStrokeWidthAdd">1.2</x:Double>
+  <x:Double x:Key="CanvasDiffIdxOverrideStrokeWidthAdd">1.2</x:Double>
+  <x:Double x:Key="CanvasDiffIdxAnchorStrokeWidthAdd">1.8</x:Double>
+  <x:Double x:Key="CanvasCadAreaFillAlpha">50</x:Double>
+  <x:Double x:Key="CanvasSelectionStrokeThickness">1.5</x:Double>
+  <x:Double x:Key="CanvasLowDetailZoomThreshold">0.3</x:Double>
+  <x:Double x:Key="CanvasTransientLowDetailDurationMs">120</x:Double>
+  <x:Double x:Key="CanvasLowDetailRegularDecimationMaxStep">4</x:Double>
+  <x:Double x:Key="CanvasLowDetailCadMaxVisibleUnselected">2500</x:Double>
+  <x:Double x:Key="CanvasLowDetailCadMinScreenSize">0.9</x:Double>
+  <x:Double x:Key="CanvasAxisLabelTopMargin">10</x:Double>
+  <x:Double x:Key="CanvasAxisLabelSideMargin">9</x:Double>
+  <x:Double x:Key="CanvasAxisLabelMinGap">10</x:Double>
+  <x:Double x:Key="CanvasAxisLabelBaseFontSize">15</x:Double>
+  <x:Double x:Key="CanvasAxisLabelMinFontSize">9</x:Double>
+  <x:Double x:Key="CanvasAxisLabelMaxFontSize">20</x:Double>
+  <x:Double x:Key="CanvasRegularFreeformHatchSpacing">8</x:Double>
+  <x:Double x:Key="CanvasRegularFreeformHatchWidth">1.2</x:Double>
+  <x:Double x:Key="CanvasMatchRatioFontSize">11</x:Double>
+  <x:Double x:Key="CanvasMatchRatioPaddingX">6</x:Double>
+  <x:Double x:Key="CanvasMatchRatioPaddingY">3</x:Double>
+  <x:Double x:Key="CanvasMatchRatioOffsetY">4</x:Double>
+  <x:Double x:Key="CanvasMatchRatioCornerRadius">6</x:Double>
+  <x:Double x:Key="CanvasMatchRatioBorderThickness">1</x:Double>
+  <x:Double x:Key="CanvasMatchRatioLabelMinGap">2</x:Double>
+  <x:Double x:Key="CanvasMatchRatioLabelMaxSearchRings">8</x:Double>
+  <x:Double x:Key="CanvasNotchToFullSeedStrokeWidthAdd">0</x:Double>
+  <x:Double x:Key="CanvasNotchToFullCandidateStrokeWidthAdd">0</x:Double>
+  <x:Double x:Key="CanvasNotchToFullFinalStrokeWidthAdd">0</x:Double>
+  <x:Double x:Key="CanvasNotchToFullSeedFillOpacity">1</x:Double>
+  <x:Double x:Key="CanvasNotchToFullCandidateFillOpacity">1</x:Double>
+  <x:Double x:Key="CanvasNotchToFullFinalFillOpacity">1</x:Double>
+  <x:Double x:Key="CanvasNotchRatioFontSize">13</x:Double>
+  <x:Double x:Key="CanvasNotchRatioPaddingX">6</x:Double>
+  <x:Double x:Key="CanvasNotchRatioPaddingY">3</x:Double>
+  <x:Double x:Key="CanvasNotchRatioOffsetY">4</x:Double>
+  <x:Double x:Key="CanvasNotchRatioCornerRadius">6</x:Double>
+  <x:Double x:Key="CanvasNotchRatioBorderThickness">1</x:Double>
+  <x:Double x:Key="CanvasNotchRatioLabelMinGap">2</x:Double>
+  <x:Double x:Key="CanvasNotchRatioLabelMaxSearchRings">8</x:Double>
+  <x:Double x:Key="CanvasIcBlockPadding">8</x:Double>
+  <x:Double x:Key="CanvasIcBlockHeightExtra">14</x:Double>
+  <x:Double x:Key="CanvasIcBlockMinHeight">24</x:Double>
+  <x:Double x:Key="CanvasIcBlockLabelInset">6</x:Double>
+  <x:Double x:Key="NotchPreviewPadding">12</x:Double>
+  <x:Double x:Key="NotchPreviewStrokeWidth">1</x:Double>
+  <x:Double x:Key="NotchPreviewHatchSpacing">10</x:Double>
+  <x:Double x:Key="NotchPreviewHatchWidth">1</x:Double>
+  <x:Double x:Key="NotchPreviewFillAlpha">40</x:Double>
+  <x:Double x:Key="NotchPreviewToFullStrokeWidth">1.4</x:Double>
+
+  <!-- Console layout -->
+  <x:Double x:Key="ConsolePanelMinHeight">120</x:Double>
+  <Thickness x:Key="ConsolePanelPadding">12,8</Thickness>
+  <GridLength x:Key="ConsolePanelRowHeight">180</GridLength>
+
+  <!-- Component preview sizes -->
+  <x:Double x:Key="DevSwatchHeight">40</x:Double>
+  <x:Double x:Key="DevScrollPreviewHeight">260</x:Double>
+  <x:Double x:Key="HowToFigureHeight">220</x:Double>
+</ResourceDictionary>

@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        x:Class="FreeformHelper.UI.Views.ConfirmDialog"
+        Width="{StaticResource DialogWidth}"
+        Height="{StaticResource DialogHeight}"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushBgSurface}">
+  <Border Padding="{StaticResource Inset16}">
+    <Grid RowDefinitions="Auto,*,Auto">
+      <SelectableTextBlock x:Name="TitleText"
+                 Grid.Row="0"
+                 FontSize="{StaticResource FontSizeLg}"
+                 FontWeight="SemiBold"
+                 Foreground="{DynamicResource BrushTextPrimary}"/>
+      <SelectableTextBlock x:Name="MessageText"
+                 Grid.Row="1"
+                 Margin="{StaticResource InsetTop8}"
+                 TextWrapping="Wrap"
+                 Foreground="{DynamicResource BrushTextSubtle}"/>
+      <StackPanel Grid.Row="2"
+                  Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  Spacing="{StaticResource Space8}"
+                  Margin="{StaticResource InsetTop14}">
+        <Button x:Name="CancelButton"
+                Classes="confirmDialogActionButton confirmDialogDangerButton"
+                Click="CancelButton_Click"
+                ToolTip.Tip="Cancel and keep external DXF reference.">
+          <StackPanel Classes="confirmDialogDangerContent"
+                      Orientation="Horizontal"
+                      Spacing="{StaticResource ConfirmDialogDangerContentSpacing}"
+                      VerticalAlignment="Center">
+            <controls:FontIcon x:Name="CancelIcon"
+                               Classes="symbols iconLg confirmDialogDangerIcon"
+                               Glyph="{x:Static icons:IconGlyphs.Close}"
+                               IsVisible="False"/>
+            <SelectableTextBlock x:Name="CancelButtonText"
+                                 Classes="confirmDialogDangerText"/>
+          </StackPanel>
+        </Button>
+        <Button x:Name="ConfirmButton"
+                Classes="confirmDialogActionButton"
+                Click="ConfirmButton_Click"
+                ToolTip.Tip="Embed DXF into the project file.">
+          <SelectableTextBlock x:Name="ConfirmButtonText"/>
+        </Button>
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

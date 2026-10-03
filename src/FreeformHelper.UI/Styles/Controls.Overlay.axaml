@@ -1,0 +1,55 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
+  <Style Selector="Button.confirmDialogDangerButton">
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.confirmDialogActionButton">
+    <Setter Property="MinHeight" Value="{StaticResource ConfirmDialogActionMinHeight}"/>
+    <Setter Property="Height" Value="{StaticResource ConfirmDialogActionHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset14_8}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.confirmDialogDangerButton StackPanel.confirmDialogDangerContent">
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Spacing" Value="{StaticResource ConfirmDialogDangerContentSpacing}"/>
+  </Style>
+
+  <Style Selector="Button.confirmDialogDangerButton SelectableTextBlock.confirmDialogDangerText">
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.danger controls|FontIcon.confirmDialogDangerIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushWhite}"/>
+    <Setter Property="FontSize" Value="{StaticResource ConfirmDialogDangerIconSize}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="ToolTip">
+    <Setter Property="Background" Value="{DynamicResource BrushTooltipBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTooltipBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTooltipForeground}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+  </Style>
+
+  <Style Selector="ToolTip TextBlock, ToolTip SelectableTextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTooltipForeground}"/>
+  </Style>
+
+  <Style Selector="ToolTip /template/ ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTooltipForeground}"/>
+  </Style>
+
+</Styles>

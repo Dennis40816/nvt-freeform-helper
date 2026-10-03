@@ -1,0 +1,37 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Base">
+  <Styles.Resources>
+    <FontFamily x:Key="FontSymbolsOutlined">avares://FreeformHelper.UI/Assets/Fonts/MaterialSymbolsOutlined.ttf#Material Symbols Outlined</FontFamily>
+  </Styles.Resources>
+
+  <!-- Default icon style (Material Symbols Outlined) -->
+  <Style Selector="controls|FontIcon.symbols">
+    <Setter Property="FontFamily" Value="{StaticResource FontSymbolsOutlined}"/>
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeMd}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushIcon}"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="FontFeatures">
+      <Setter.Value>
+        <media:FontFeatureCollection>
+          <media:FontFeature Tag="liga" Value="1"/>
+          <media:FontFeature Tag="clig" Value="1"/>
+        </media:FontFeatureCollection>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="controls|FontIcon.symbols.iconSm">
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeSm}"/>
+  </Style>
+
+  <Style Selector="controls|FontIcon.symbols.iconXs">
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeXs}"/>
+  </Style>
+
+  <Style Selector="controls|FontIcon.symbols.iconLg">
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeLg}"/>
+  </Style>
+</Styles>

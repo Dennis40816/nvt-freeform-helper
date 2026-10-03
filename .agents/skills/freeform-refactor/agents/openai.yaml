@@ -1,0 +1,7 @@
+interface:
+  display_name: "Freeform Refactor"
+  short_description: "Refactor workflow and behavior consistency"
+  default_prompt: "Use $freeform-refactor to refactor this change through a single behavior entry and verify side effects and tests."
+
+policy:
+  allow_implicit_invocation: true

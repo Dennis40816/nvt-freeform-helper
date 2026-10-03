@@ -1,0 +1,75 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+        xmlns:views="clr-namespace:FreeformHelper.UI.Views"
+        mc:Ignorable="d"
+        x:Class="FreeformHelper.UI.MainWindow"
+        Title="FreeformHelper Modern"
+        Icon="/Assets/AppIcon/freeform-helper.ico"
+        WindowState="Maximized"
+        Background="{DynamicResource BrushBgApp}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        FontSize="{Binding FreeformHelper.GlobalFontBaseSize, FallbackValue=12}"
+        WindowStartupLocation="CenterScreen">
+  <Window.DataTemplates>
+    <DataTemplate DataType="{x:Type vm:FreeformHelperViewModel}">
+      <views:FreeformHelperView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:HowToUseViewModel}">
+      <views:HowToUseView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:DevViewModel}">
+      <views:DevView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SimulationHostViewModel}">
+      <views:SimulationHostView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:CoordinatePlannerHostViewModel}">
+      <views:CoordinatePlannerHostView/>
+    </DataTemplate>
+  </Window.DataTemplates>
+
+  <Grid>
+    <Grid x:Name="ShellRoot"
+          RowDefinitions="Auto,*">
+      <!-- Shell header -->
+      <Border Grid.Row="0"
+              Background="{DynamicResource BrushBgSurface}"
+              BorderBrush="{DynamicResource BrushBorder}"
+              BorderThickness="{StaticResource BorderBottomThin}"
+              Padding="{StaticResource Inset10_6}">
+        <Border Classes="shellTabStrip"
+                HorizontalAlignment="Left">
+          <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space4}">
+            <ToggleButton Classes="shellTab"
+                          Content="Freeform Helper"
+                          IsChecked="{Binding IsWorkspaceActive, Mode=TwoWay}"
+                          Command="{Binding ShowWorkspaceCommand}"/>
+            <ToggleButton Classes="shellTab"
+                          Content="Simulation"
+                          IsChecked="{Binding IsSimulationActive, Mode=TwoWay}"
+                          Command="{Binding ShowSimulationCommand}"/>
+            <ToggleButton Classes="shellTab"
+                          Content="Coordinate"
+                          IsChecked="{Binding IsCoordinateActive, Mode=TwoWay}"
+                          Command="{Binding ShowCoordinateCommand}"/>
+            <ToggleButton Classes="shellTab"
+                          Content="How To Use"
+                          IsChecked="{Binding IsHowToUseActive, Mode=TwoWay}"
+                          Command="{Binding ShowHowToUseCommand}"/>
+            <ToggleButton Classes="shellTab"
+                          Content="Dev"
+                          IsChecked="{Binding IsDevActive, Mode=TwoWay}"
+                          Command="{Binding ShowDevCommand}"/>
+          </StackPanel>
+        </Border>
+      </Border>
+
+      <!-- Current view -->
+      <ContentControl Grid.Row="1"
+                      Content="{Binding CurrentViewModel}"/>
+    </Grid>
+  </Grid>
+</Window>

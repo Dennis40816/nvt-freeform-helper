@@ -1,0 +1,800 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls">
+  <!-- Action primitives: mechanical layout only. Semantic role classes own state colors. -->
+  <Style Selector="Button.actionButton, ToggleButton.actionButton, Button.actionTextButton, ToggleButton.actionTextButton">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_6}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderNone}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+    <Setter Property="FocusAdorner" Value="{x:Null}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton, ToggleButton.actionIconButton">
+    <Setter Property="Width" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="MinWidth" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="Height" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="MinHeight" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="Padding" Value="{StaticResource InsetNone}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderNone}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+    <Setter Property="FocusAdorner" Value="{x:Null}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton.actionNeutral, Button.actionIconButton.actionPrimary, Button.actionIconButton.actionDanger, Button.actionIconButton.actionGhost, Button.actionIconButton.viewportOverlayAction, Button.actionIconButton.panelChromeToggle, Button.actionIconButton.consoleHeaderAction">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="ToggleButton.actionIconButton.actionNeutral, ToggleButton.actionIconButton.actionPrimary, ToggleButton.actionIconButton.actionDanger, ToggleButton.actionIconButton.actionGhost, ToggleButton.actionIconButton.viewportOverlayAction, ToggleButton.actionIconButton.panelChromeToggle, ToggleButton.actionIconButton.consoleHeaderAction">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="Button.actionChip, ToggleButton.actionChip">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderControl}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+    <Setter Property="FocusAdorner" Value="{x:Null}"/>
+  </Style>
+
+  <Style Selector="Button.actionButton, Button.actionTextButton, Button.actionChip">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="ToggleButton.actionButton, ToggleButton.actionTextButton, ToggleButton.actionChip">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="Button.actionTextButton TextBlock, Button.actionTextButton SelectableTextBlock, ToggleButton.actionTextButton TextBlock, ToggleButton.actionTextButton SelectableTextBlock, Button.actionChip TextBlock, Button.actionChip SelectableTextBlock, ToggleButton.actionChip TextBlock, ToggleButton.actionChip SelectableTextBlock">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionTextButton TextBlock, ToggleButton.actionTextButton SelectableTextBlock, ToggleButton.actionChip TextBlock, ToggleButton.actionChip SelectableTextBlock">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton controls|FontIcon, Button.actionTextButton controls|FontIcon, Button.actionChip controls|FontIcon">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeMd}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionIconButton controls|FontIcon, ToggleButton.actionTextButton controls|FontIcon, ToggleButton.actionChip controls|FontIcon">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"/>
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeMd}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <!-- Neutral action role. -->
+  <Style Selector="Button.actionNeutral, ToggleButton.actionNeutral">
+    <Setter Property="Background" Value="{DynamicResource BrushActionNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionNeutral:pointerover, ToggleButton.actionNeutral:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionNeutralHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionNeutral:focusvisible, ToggleButton.actionNeutral:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionNeutral:pressed, ToggleButton.actionNeutral:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionNeutralPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionNeutral:disabled, ToggleButton.actionNeutral:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushActionNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionNeutral:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionSelectedBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionNeutral:checked:pointerover, ToggleButton.actionNeutral:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionSelectedBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.actionNeutral, ToggleButton.actionTextButton.actionNeutral">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.actionNeutral:pointerover, ToggleButton.actionTextButton.actionNeutral:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.actionNeutral:pressed, ToggleButton.actionTextButton.actionNeutral:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionTextButton.actionNeutral:checked, ToggleButton.actionTextButton.actionNeutral:checked:pointerover, ToggleButton.actionTextButton.actionNeutral:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionSelectedBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <!-- Primary action role. -->
+  <Style Selector="Button.actionPrimary, ToggleButton.actionPrimary">
+    <Setter Property="Background" Value="{DynamicResource BrushActionPrimaryBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionPrimaryBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionPrimaryForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionPrimary:pointerover, ToggleButton.actionPrimary:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionPrimaryHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionPrimaryBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionPrimaryForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionPrimary:focusvisible, ToggleButton.actionPrimary:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionPrimary:pressed, ToggleButton.actionPrimary:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionPrimaryPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionPrimaryBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionPrimaryForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionPrimary:disabled, ToggleButton.actionPrimary:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushActionNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionPrimary:checked, ToggleButton.actionPrimary:checked:pointerover, ToggleButton.actionPrimary:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionPrimaryBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.actionPrimary:pointerover, ToggleButton.actionTextButton.actionPrimary:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionTextHoverBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionTextHoverBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionTextHoverForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.actionPrimary:pressed, ToggleButton.actionTextButton.actionPrimary:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionTextPressedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionTextHoverBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionTextHoverForeground}"/>
+  </Style>
+
+  <!-- Danger action role. -->
+  <Style Selector="Button.actionDanger, ToggleButton.actionDanger">
+    <Setter Property="Background" Value="{DynamicResource BrushActionDangerBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionDangerBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionDanger:pointerover, ToggleButton.actionDanger:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionDangerHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionDangerBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionDanger:focusvisible, ToggleButton.actionDanger:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionDanger:pressed, ToggleButton.actionDanger:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionDangerPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionDangerBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionDanger:disabled, ToggleButton.actionDanger:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushActionDangerBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionDangerBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionDanger:checked, ToggleButton.actionDanger:checked:pointerover, ToggleButton.actionDanger:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionDangerPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionDangerBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.actionDanger:pointerover, ToggleButton.actionTextButton.actionDanger:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionTextHoverBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionTextHoverBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.actionDanger:pressed, ToggleButton.actionTextButton.actionDanger:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionTextPressedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionTextHoverBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
+  </Style>
+
+  <!-- Ghost action role. -->
+  <Style Selector="Button.actionGhost, ToggleButton.actionGhost">
+    <Setter Property="Background" Value="{DynamicResource BrushActionGhostBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionGhostBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionGhostForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionGhost:pointerover, ToggleButton.actionGhost:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionGhostHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionGhostHover}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionGhost:focusvisible, ToggleButton.actionGhost:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionGhost:pressed, ToggleButton.actionGhost:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionGhostPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionGhostPressed}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionGhost:disabled, ToggleButton.actionGhost:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushActionGhostBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionGhostBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionGhost:checked, ToggleButton.actionGhost:checked:pointerover, ToggleButton.actionGhost:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionSelectedBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.actionGhost:pointerover, ToggleButton.actionTextButton.actionGhost:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionTextHoverBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionTextHoverBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionTextHoverForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionTextButton.actionGhost:pressed, ToggleButton.actionTextButton.actionGhost:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionTextPressedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionTextHoverBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionTextHoverForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dangerTextButton">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerOnNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dangerTextButton:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerOnNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dangerTextButton:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerOnNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dangerTextButton:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonDisabledForeground}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="Button.dangerTextButton:disabled:pointerover, Button.dangerTextButton:disabled:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonDisabledForeground}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <!-- Icon action roles mirror console toolbar affordance: quiet glyph, bright surface on hover. -->
+  <Style Selector="Button.actionIconButton.actionNeutral, Button.actionIconButton.actionPrimary, Button.actionIconButton.actionDanger, Button.actionIconButton.actionGhost, ToggleButton.actionIconButton.actionNeutral, ToggleButton.actionIconButton.actionPrimary, ToggleButton.actionIconButton.actionDanger, ToggleButton.actionIconButton.actionGhost">
+    <Setter Property="Background" Value="{DynamicResource BrushActionConsoleBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionConsoleForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton.actionNeutral:pointerover, Button.actionIconButton.actionPrimary:pointerover, Button.actionIconButton.actionGhost:pointerover, ToggleButton.actionIconButton.actionNeutral:pointerover, ToggleButton.actionIconButton.actionPrimary:pointerover, ToggleButton.actionIconButton.actionGhost:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton.actionDanger:pointerover, ToggleButton.actionIconButton.actionDanger:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton.actionNeutral:focusvisible, Button.actionIconButton.actionPrimary:focusvisible, Button.actionIconButton.actionGhost:focusvisible, ToggleButton.actionIconButton.actionNeutral:focusvisible, ToggleButton.actionIconButton.actionPrimary:focusvisible, ToggleButton.actionIconButton.actionGhost:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton.actionDanger:focusvisible, ToggleButton.actionIconButton.actionDanger:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton.actionNeutral:pressed, Button.actionIconButton.actionPrimary:pressed, Button.actionIconButton.actionGhost:pressed, ToggleButton.actionIconButton.actionNeutral:pressed, ToggleButton.actionIconButton.actionPrimary:pressed, ToggleButton.actionIconButton.actionGhost:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInversePressedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton.actionDanger:pressed, ToggleButton.actionIconButton.actionDanger:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInversePressedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.actionIconButton.actionNeutral:disabled, Button.actionIconButton.actionPrimary:disabled, Button.actionIconButton.actionDanger:disabled, Button.actionIconButton.actionGhost:disabled, ToggleButton.actionIconButton.actionNeutral:disabled, ToggleButton.actionIconButton.actionPrimary:disabled, ToggleButton.actionIconButton.actionDanger:disabled, ToggleButton.actionIconButton.actionGhost:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushActionConsoleBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionIconButton.actionNeutral:checked, ToggleButton.actionIconButton.actionPrimary:checked, ToggleButton.actionIconButton.actionDanger:checked, ToggleButton.actionIconButton.actionGhost:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushActionConsoleCheckedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionConsoleForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionIconButton.actionNeutral:checked:pointerover, ToggleButton.actionIconButton.actionPrimary:checked:pointerover, ToggleButton.actionIconButton.actionGhost:checked:pointerover, ToggleButton.actionIconButton.actionNeutral:checked:pressed, ToggleButton.actionIconButton.actionPrimary:checked:pressed, ToggleButton.actionIconButton.actionGhost:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.actionIconButton.actionDanger:checked:pointerover, ToggleButton.actionIconButton.actionDanger:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <!-- Canvas viewport overlay role. -->
+  <Style Selector="Button.viewportOverlayAction, ToggleButton.viewportOverlayAction">
+    <Setter Property="Background" Value="{DynamicResource BrushActionViewportBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionViewportBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderNone}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionViewportForeground}"/>
+    <Setter Property="Opacity" Value="{StaticResource OpacityMuted}"/>
+  </Style>
+
+  <Style Selector="Button.viewportOverlayAction:pointerover, ToggleButton.viewportOverlayAction:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionViewportHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionViewportBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionViewportForeground}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="Button.viewportOverlayAction:focusvisible, ToggleButton.viewportOverlayAction:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionViewportHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionViewportForeground}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="Button.viewportOverlayAction:pressed, ToggleButton.viewportOverlayAction:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionViewportPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionViewportBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionViewportForeground}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="Button.viewportOverlayAction:pointerover controls|FontIcon, ToggleButton.viewportOverlayAction:pointerover controls|FontIcon, Button.viewportOverlayAction:pressed controls|FontIcon, ToggleButton.viewportOverlayAction:pressed controls|FontIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionViewportForeground}"/>
+  </Style>
+
+  <Style Selector="Button.viewportOverlayAction:disabled, ToggleButton.viewportOverlayAction:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushActionViewportBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionViewportBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionViewportForeground}"/>
+    <Setter Property="Opacity" Value="{StaticResource OpacityMuted}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.viewportOverlayAction:checked, ToggleButton.viewportOverlayAction:checked:pointerover, ToggleButton.viewportOverlayAction:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionViewportCheckedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionViewportCheckedBackground}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionViewportCheckedForeground}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="ToggleButton.viewportOverlayAction:checked controls|FontIcon, ToggleButton.viewportOverlayAction:checked:pointerover controls|FontIcon, ToggleButton.viewportOverlayAction:checked:pressed controls|FontIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionViewportCheckedForeground}"/>
+  </Style>
+
+  <!-- Side-pane chrome role. -->
+  <Style Selector="Button.panelChromeToggle, ToggleButton.panelChromeToggle">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.panelChromeToggle:pointerover, ToggleButton.panelChromeToggle:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.panelChromeToggle:focusvisible, ToggleButton.panelChromeToggle:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
+  </Style>
+
+  <Style Selector="Button.panelChromeToggle:pressed, ToggleButton.panelChromeToggle:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.panelChromeToggle controls|FontIcon, ToggleButton.panelChromeToggle controls|FontIcon">
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeXl}"/>
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.panelChromeToggle controls|FontIcon">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.panelChromeToggle:checked, ToggleButton.panelChromeToggle:checked:pointerover, ToggleButton.panelChromeToggle:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionSelectedBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <!-- Console header role. -->
+  <Style Selector="Button.consoleHeaderAction, ToggleButton.consoleHeaderAction">
+    <Setter Property="Width" Value="{StaticResource ConsoleActionWidth}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ConsoleActionWidth}"/>
+    <Setter Property="Height" Value="{StaticResource ConsoleActionHeight}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ConsoleActionHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource InsetNone}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderNone}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushActionConsoleBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionConsoleForeground}"/>
+  </Style>
+
+  <Style Selector="Button.consoleHeaderAction:pointerover, ToggleButton.consoleHeaderAction:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.consoleHeaderAction:focusvisible, ToggleButton.consoleHeaderAction:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.consoleHeaderAction:pressed, ToggleButton.consoleHeaderAction:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInversePressedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.consoleHeaderAction:disabled, ToggleButton.consoleHeaderAction:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushActionConsoleBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionConsoleForeground}"/>
+    <Setter Property="Opacity" Value="{StaticResource OpacitySubtle}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.consoleHeaderAction:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushActionConsoleCheckedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionConsoleForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.consoleHeaderAction:checked:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.consoleHeaderAction:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInversePressedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.consoleHeaderAction controls|FontIcon, ToggleButton.consoleHeaderAction controls|FontIcon">
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeLg}"/>
+  </Style>
+
+  <!-- Interactive chip role. -->
+  <Style Selector="Button.chipAction, ToggleButton.chipAction">
+    <Setter Property="Background" Value="{DynamicResource BrushActionChipBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionChipBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionChipForeground}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction:pointerover, ToggleButton.chipAction:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionChipHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionChipBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionChipForeground}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction:focusvisible, ToggleButton.chipAction:focusvisible">
+    <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction:pressed, ToggleButton.chipAction:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionChipPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionChipBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionChipForeground}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction:disabled, ToggleButton.chipAction:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushActionChipBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionChipBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionChipForeground}"/>
+    <Setter Property="Opacity" Value="{StaticResource OpacitySubtle}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.active, ToggleButton.chipAction.active">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionSelectedBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.direct, Button.chipAction.transfer, Button.chipAction.linked, ToggleButton.chipAction.direct, ToggleButton.chipAction.transfer, ToggleButton.chipAction.linked">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.hidden, Button.chipAction.geometry, ToggleButton.chipAction.hidden, ToggleButton.chipAction.geometry">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.combined, ToggleButton.chipAction.combined">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSuccess}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.duplicate, ToggleButton.chipAction.duplicate">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushWarning}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.layer, ToggleButton.chipAction.layer">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.incoming, ToggleButton.chipAction.incoming">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSuccess}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.outgoing, ToggleButton.chipAction.outgoing">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushWarning}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.nocad, ToggleButton.chipAction.nocad">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="Button.chipAction.legacy, ToggleButton.chipAction.legacy">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.chipAction:checked, ToggleButton.chipAction:checked:pointerover, ToggleButton.chipAction:checked:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionSelectedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionSelectedBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionSelectedForeground}"/>
+  </Style>
+
+  <!-- Passive status chip role. -->
+  <Style Selector="Border.chipStatus">
+    <Setter Property="Background" Value="{DynamicResource BrushStatusChipBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushStatusChipBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderControl}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource WorkspaceSummaryChipMaxWidth}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Border.chipStatus.warning">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="Border.chipStatus.danger">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="Border.chipStatus.success">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSuccess}"/>
+  </Style>
+
+  <Style Selector="Border.chipStatus TextBlock, Border.chipStatus SelectableTextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource BrushStatusChipForeground}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+  </Style>
+
+  <Style Selector="Border.chipStatus.warning TextBlock, Border.chipStatus.warning SelectableTextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="Border.chipStatus.danger TextBlock, Border.chipStatus.danger SelectableTextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
+  </Style>
+
+  <Style Selector="Border.chipStatus.success TextBlock, Border.chipStatus.success SelectableTextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
+  </Style>
+
+  <!-- DXF edit mini actions keep default button rest state, then invert on hover for the dark left pane. -->
+  <Style Selector="Button.dxfEditMiniAction">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dxfEditMiniAction:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionTextHoverBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionTextHoverBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionTextHoverForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dxfEditMiniAction:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionTextPressedBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionTextHoverBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionTextHoverForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dxfEditMiniAction:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonDisabledForeground}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+  <Style Selector="Button.dangerTextButton.dxfEditMiniAction">
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerOnNeutralForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dangerTextButton.dxfEditMiniAction:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionDangerHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionDangerBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dangerTextButton.dxfEditMiniAction:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushActionDangerPressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionDangerBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
+  </Style>
+
+  <Style Selector="Button.dxfEditMiniAction:disabled:pointerover, Button.dxfEditMiniAction:disabled:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushButtonNeutralBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushButtonDisabledForeground}"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+</Styles>

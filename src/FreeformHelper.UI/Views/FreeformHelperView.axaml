@@ -1,0 +1,281 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             xmlns:views="clr-namespace:FreeformHelper.UI.Views"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             mc:Ignorable="d"
+             x:Class="FreeformHelper.UI.Views.FreeformHelperView"
+             PointerPressed="OnRootPointerPressed"
+             Background="{DynamicResource BrushBgApp}"
+             Foreground="{DynamicResource BrushTextPrimary}">
+  <Design.DataContext>
+    <vm:FreeformHelperViewModel/>
+  </Design.DataContext>
+
+  <Grid x:Name="LayoutGrid" RowDefinitions="Auto,Auto,*">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="{StaticResource PanelLeftWidthGrid}"/>
+      <ColumnDefinition Width="{StaticResource SplitterThicknessGrid}"/>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="{StaticResource SplitterThicknessGrid}"/>
+      <ColumnDefinition Width="{StaticResource PanelRightWidthGrid}"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- Menu bar -->
+    <Border Grid.Row="0"
+            Grid.ColumnSpan="5"
+            Padding="{StaticResource Inset8_6}"
+            Background="{DynamicResource BrushBgSurface}"
+            BorderThickness="{StaticResource BorderBottomThin}"
+            BorderBrush="{DynamicResource BrushBorder}">
+      <Menu x:Name="MainMenu"
+            HorizontalAlignment="Left">
+        <MenuItem Header="File">
+          <MenuItem Header="Open DXF" Command="{Binding OpenDxfCommand}"/>
+          <MenuItem Header="Save Project" Command="{Binding SaveProjectCommand}"/>
+          <MenuItem Header="Load Project" Command="{Binding LoadProjectCommand}"/>
+        </MenuItem>
+        <MenuItem Header="Export">
+          <MenuItem Header="Export Notch" Command="{Binding ExportNotchCommand}"/>
+          <MenuItem Header="Export DXF (Visible Layers)" Command="{Binding ExportDxfVisibleCommand}"/>
+          <MenuItem Header="Export DXF (All Layers)" Command="{Binding ExportDxfAllCommand}"/>
+          <MenuItem Header="Export DXF Layer Image" Command="{Binding ExportDxfLayerImageCommand}"/>
+        </MenuItem>
+        <MenuItem Header="Settings">
+          <MenuItem Header="Open Settings"
+                    Click="OpenSettingsWindow_Click"/>
+        </MenuItem>
+      </Menu>
+    </Border>
+
+    <!-- Workspace header -->
+    <controls:WorkspaceHeader Grid.Row="1"
+                              Grid.ColumnSpan="5"
+                              Items="{Binding WorkspaceHeaderItems}"
+                              StatusText="{Binding StatusText}"
+                              ClearSelectionCommand="{Binding ClearSelectionCommand}"/>
+
+    <Border x:Name="NotchExportRestoreHintBorder"
+            Grid.Row="1"
+            Grid.ColumnSpan="5"
+            Classes="notchExportRestoreHint"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center"
+            Margin="{StaticResource InsetRight12}"
+            IsVisible="False">
+      <StackPanel Orientation="Horizontal"
+                  Spacing="{StaticResource Space8}">
+        <SelectableTextBlock Classes="notchExportRestoreHintText"
+                             Text="Notch export panel hidden"/>
+        <Button Classes="notchExportRestoreHintAction"
+                Content="Restore (Ctrl+Shift+E)"
+                Click="RestoreNotchExportSelectionWindow_Click"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Left: DXF controls -->
+    <Border x:Name="LeftPanel"
+            Grid.Row="2"
+            Grid.Column="0"
+            Classes="workspaceSidePane left">
+      <Grid RowDefinitions="Auto,*">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="{StaticResource InsetBottom12}">
+          <SelectableTextBlock Text="DXF Settings" FontWeight="SemiBold"/>
+          <Button Grid.Column="1"
+                  Classes="actionIconButton panelChromeToggle"
+                  ToolTip.Tip="Hide left panel"
+                  Click="HideLeftPanel_Click">
+            <controls:FontIcon Classes="symbols"
+                               Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+          </Button>
+        </Grid>
+        <ScrollViewer x:Name="LeftSettingsScroll"
+                      Grid.Row="1"
+                      Classes="scrollDevCandidate viewportBoundScroll"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+          <Border Classes="viewportBoundContent"
+                  Padding="{StaticResource InsetRight12Bottom20}">
+            <views:LeftDxfPanel LayerTogglePointerPressed="OnLayerTogglePointerPressed"/>
+          </Border>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+
+    <GridSplitter Grid.Row="2"
+                  Grid.Column="1"
+                  Width="{StaticResource SplitterThickness}"
+                  Background="{DynamicResource BrushBorder}"
+                  HorizontalAlignment="Stretch"
+                  ShowsPreview="True"/>
+
+    <!-- Center: canvas -->
+    <Border Grid.Row="2" Grid.Column="2" Background="{DynamicResource BrushCanvasBackground}">
+      <Grid x:Name="CanvasGrid">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="{StaticResource SplitterRowHeight}"/>
+          <RowDefinition Height="{StaticResource ConsolePanelRowHeight}"
+                         MinHeight="{StaticResource ConsolePanelMinHeight}"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+          <controls:PadCanvas x:Name="PadCanvas"
+                              CadPads="{Binding CadPads}"
+                              RegularPads="{Binding RegularPads}"
+                              ShowCad="{Binding ShowCad}"
+                              ShowRegular="{Binding ShowRegular}"
+                              HighlightUnmatched="{Binding HighlightUnmatched}"
+                              HighlightFreeform="{Binding HighlightFreeform}"
+                              ColorCadByArea="{Binding ColorCadByArea}"
+                              AreaBucketTolerance="{Binding AreaBucketTolerance}"
+                              MaxAreaBuckets="{Binding MaxAreaBuckets}"
+                              MatchThreshold="{Binding MatchThreshold}"
+                              CadLineWidth="{Binding CadLineWidth}"
+                              CadLineColor="{Binding CadLineColor}"
+                              CadFillOpacity="{Binding CadFillOpacity}"
+                              CadLineOpacity="{Binding CadLineOpacity}"
+                              HighlightedCadPadIds="{Binding DxfOverlapHighlightedCadIds}"
+                              DiffIndexOverrideCadPadIds="{Binding CadOutputFwDiffIndexOverrideCadIds}"
+                              DiffIndexAnchorCadPadIds="{Binding CadOutputFwDiffIndexAnchorCadIdsForCanvas}"
+                              ShowDiffIndexOverlay="{Binding ShowDiffIndexOverlay}"
+                              NotchCanvasPreviewItems="{Binding NotchCanvasPreviewItems}"
+                              ShowNotchCanvasPreview="{Binding IsNotchCanvasPreviewVisible}"
+                              ShowNotchToRegularLabels="{Binding IsNotchToRegularPreviewVisible}"
+                              ShowNotchToFullSeedOverlay="{Binding IsNotchToFullSeedPreviewVisible}"
+                              ShowNotchToFullCandidateOverlay="{Binding IsNotchToFullCandidatePreviewVisible}"
+                              ShowNotchToFullFinalOverlay="{Binding IsNotchToFullFinalPreviewVisible}"
+                              NotchPreviewStage="{Binding NotchPreviewVisualizationStep}"
+                              PadMatchLinks="{Binding MatchLinksForCanvas}"
+                              RegularLineWidth="{Binding RegularLineWidth}"
+                              HighlightStrokeWidthAdjust="{Binding HighlightStrokeWidthAdjust}"
+                              RegularLineColor="{Binding RegularLineColor}"
+                              RegularFillOpacity="{Binding RegularFillOpacity}"
+                              RegularLineOpacity="{Binding RegularLineOpacity}"
+                              RegularSelectedColor="{Binding RegularSelectedColor}"
+                              RegularSelectedFillOpacity="{Binding RegularSelectedFillOpacity}"
+                              Focusable="True"/>
+          <SelectableTextBlock Text="{Binding CanvasHintText}"
+                               IsVisible="{Binding HasCanvasHint}"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               MaxWidth="{StaticResource IndexMappingReportMinWidth}"
+                               Margin="{StaticResource Inset24}"
+                               IsHitTestVisible="False"/>
+          <views:CanvasOverlayControls x:Name="CanvasOverlayControls"
+                                       ShowLeftPanelRequested="ShowLeftPanel_Click"
+                                       ShowRightPanelRequested="ShowRightPanel_Click"/>
+        </Grid>
+
+        <GridSplitter Grid.Row="1"
+                      HorizontalAlignment="Stretch"
+                      Background="{DynamicResource BrushBorder}"
+                      ResizeDirection="Rows"
+                      ShowsPreview="True"/>
+
+        <!-- Bottom: app console (center column only) -->
+        <views:ConsolePanel x:Name="ConsolePanelHost"
+                            Grid.Row="2"
+                            DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                            ConsolePointerPressed="OnConsolePointerPressed"
+                            ConsoleEditorPointerReleased="OnConsoleEditorPointerReleased"
+                            CopyAllRequested="OnConsoleCopyAll"
+                            JumpToBottomRequested="OnConsoleJumpToBottom"
+                            FontIncreaseRequested="OnConsoleFontIncrease"
+                            FontDecreaseRequested="OnConsoleFontDecrease"/>
+      </Grid>
+    </Border>
+
+    <GridSplitter Grid.Row="2"
+                  Grid.Column="3"
+                  Width="{StaticResource SplitterThickness}"
+                  Background="{DynamicResource BrushBorder}"
+                  HorizontalAlignment="Stretch"
+                  ShowsPreview="True"/>
+
+    <!-- Right: settings/inspector -->
+    <Border x:Name="RightPanel"
+            Grid.Row="2"
+            Grid.Column="4"
+            Classes="workspaceSidePane right">
+      <Grid RowDefinitions="Auto,*">
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*,Auto"
+              ColumnSpacing="{StaticResource Space8}"
+              Margin="{StaticResource InsetBottom6}">
+          <Border Classes="rightPanelTabHost"
+                  VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal"
+                        Spacing="{StaticResource Space4}">
+              <ToggleButton Classes="rightPanelBrowserTab"
+                            IsChecked="{Binding IsRightPanelSettingsTab, Mode=TwoWay}">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="{StaticResource Space6}">
+                  <controls:FontIcon Classes="symbols iconSm rightPanelBrowserTabIcon"
+                                     Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+                  <TextBlock Classes="rightPanelBrowserTabTitle"
+                             Text="Settings"/>
+                </StackPanel>
+              </ToggleButton>
+              <ToggleButton Classes="rightPanelBrowserTab"
+                            IsChecked="{Binding IsRightPanelInspectorTab, Mode=TwoWay}">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="{StaticResource Space6}">
+                  <controls:FontIcon Classes="symbols iconSm rightPanelBrowserTabIcon"
+                                     Glyph="{x:Static icons:IconGlyphs.Search}"/>
+                  <TextBlock Classes="rightPanelBrowserTabTitle"
+                             Text="Inspector"/>
+                </StackPanel>
+              </ToggleButton>
+            </StackPanel>
+          </Border>
+          <Button Grid.Column="1"
+                  VerticalAlignment="Center"
+                  Classes="actionIconButton panelChromeToggle"
+                  ToolTip.Tip="Hide right panel"
+                  Click="HideRightPanel_Click">
+            <controls:FontIcon Classes="symbols"
+                               Glyph="{x:Static icons:IconGlyphs.ChevronRight}"/>
+          </Button>
+        </Grid>
+
+        <ScrollViewer x:Name="RightSettingsScroll"
+                      Grid.Row="1"
+                      Classes="scrollDevCandidate viewportBoundScroll"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+          <Border Classes="viewportBoundContent"
+                  Padding="{StaticResource InsetRight12Bottom20}">
+            <views:RightWorkflowPanel OpenSettingsRequested="OnRightPanelOpenSettingsRequested"/>
+          </Border>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+
+    <!-- Global Overlays (Ensure they are not obscured by side panels) -->
+    <Canvas x:Name="PadInfoOverlay"
+            Grid.Row="0" Grid.RowSpan="3"
+            Grid.Column="0" Grid.ColumnSpan="5"
+            Panel.ZIndex="100"
+            IsVisible="False"
+            IsHitTestVisible="True">
+      <views:PadInfoPopover x:Name="PadInfoPopover"/>
+      <Path x:Name="PadInfoLink"
+            Stroke="{DynamicResource BrushTextPrimary}"
+            StrokeThickness="{StaticResource Space1}"
+            IsHitTestVisible="False"/>
+      <Ellipse x:Name="PadInfoAnchor"
+               Width="{StaticResource PadInfoAnchorSize}"
+               Height="{StaticResource PadInfoAnchorSize}"
+               Fill="{DynamicResource BrushTextPrimary}"
+               IsHitTestVisible="False"/>
+    </Canvas>
+
+  </Grid>
+</UserControl>

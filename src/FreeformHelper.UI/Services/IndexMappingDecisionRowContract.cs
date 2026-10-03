@@ -1,0 +1,38 @@
+using FreeformHelper.UI.ViewModels;
+
+namespace FreeformHelper.UI.Services;
+
+internal sealed record IndexMappingDecisionRowContract(
+    bool IsAggregateRow,
+    IndexMappingDecisionFilterMode FilterMode,
+    int SortPriority,
+    string CategoryText,
+    string Title,
+    string Subtitle,
+    string CurrentDisplay,
+    string RawDisplay,
+    string SuggestedDisplay,
+    string StatusDisplay,
+    string ReasonText,
+    string ActionHint,
+    string RawDetailText,
+    string MaskedDetailText,
+    string SuggestedDetailText,
+    string CoverageText,
+    string OffsetSupportText,
+    IReadOnlyList<string> CandidateLines,
+    int? CadPadId,
+    int? LocateRegularPadIndex,
+    int? ApplyRegularPadIndex,
+    int? ApplyDiffIndex,
+    int? PassiveCompensationDiffIndex,
+    int? IcIndex,
+    int? RowIndex,
+    int? SegmentIndex,
+    int SegmentMemberCount,
+    double? DecisionConfidence,
+    string DecisionModeText,
+    string DecisionReasonCodeText,
+    string DecisionSourceText,
+    IndexMappingReportIssueViewModel? Issue,
+    int? OverrideRegularPadIndex);

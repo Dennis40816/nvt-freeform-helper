@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep5View">
+    <controls:HidePanelBlock x:Name="Step5Block"
+                             Title="Step 5 · Notch export"
+                             IsExpanded="{Binding IsStep5Expanded, Mode=TwoWay}">
+      <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <SelectableTextBlock Grid.Column="0"
+                               Classes="stepNote"
+                               Text="{Binding NotchExportSummary}"/>
+          <Button Grid.Column="1"
+                  Tag="Step5NotchExport"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Click="OpenSettingsButton_Click"
+                  ToolTip.Tip="Open Settings at Step 5 section.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+          </Button>
+          <Button Grid.Column="2"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Command="{Binding ClearStep5ResultCommand}"
+                  ToolTip.Tip="Clear Step 5 export result and Step 6 validation result.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Delete}"/>
+          </Button>
+        </Grid>
+        <Border Classes="workflowStepSubsection">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <SelectableTextBlock Text="Handoff checklist"
+                                 FontWeight="SemiBold"/>
+            <Border Classes="workflowStepStatusStrip">
+              <StackPanel Spacing="{StaticResource Space6}">
+                <Border Classes="workflowStepMetricTile">
+                  <StackPanel Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                         Text="Export file"/>
+                    <SelectableTextBlock Classes="workflowStepMetricText compact"
+                                         Text="{Binding NotchExportHandoffFileText}"
+                                         ToolTip.Tip="{Binding NotchExportHandoffFileText}"/>
+                    <SelectableTextBlock Classes="workflowStepMetricText compact"
+                                         Text="{Binding NotchExportHandoffVersionText}"
+                                         ToolTip.Tip="{Binding NotchExportHandoffVersionText}"/>
+                  </StackPanel>
+                </Border>
+                <Border Classes="workflowStepMetricTile">
+                  <StackPanel Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                         Text="Profile"/>
+                    <SelectableTextBlock Classes="workflowStepMetricText compact"
+                                         Text="{Binding NotchExportHandoffProfileText}"
+                                         ToolTip.Tip="{Binding NotchExportHandoffProfileText}"/>
+                  </StackPanel>
+                </Border>
+                <Border Classes="workflowStepMetricTile">
+                  <StackPanel Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                         Text="Export policy"/>
+                    <SelectableTextBlock Classes="workflowStepMetricText compact"
+                                         Text="{Binding NotchExportSafetyPolicySummary}"
+                                         ToolTip.Tip="{Binding NotchExportSafetyPolicySummary}"/>
+                  </StackPanel>
+                </Border>
+                <Border Classes="workflowStepMetricTile">
+                  <StackPanel Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                         Text="EMS handoff"/>
+                    <SelectableTextBlock Classes="workflowStepMetricText compact"
+                                         Text="{Binding NotchEmsSafetyPolicySummary}"
+                                         ToolTip.Tip="{Binding NotchEmsSafetyPolicySummary}"/>
+                  </StackPanel>
+                </Border>
+                <SelectableTextBlock Classes="stepNote"
+                                     Text="{Binding NotchExportHandoffChecklistText}"
+                                     ToolTip.Tip="{Binding NotchExportHandoffChecklistText}"
+                                     TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+        <Button Content="Export"
+                Command="{Binding ExportNotchCommand}"
+                HorizontalAlignment="Stretch"
+                ToolTip.Tip="Step 5: export notch table using current version/threshold settings."/>
+        <ProgressBar Minimum="0"
+                     Maximum="1"
+                     Value="{Binding NotchExportProgress}"
+                     IsVisible="{Binding ShouldShowNotchExportProgress}"
+                     Height="{StaticResource Space6}"/>
+        <SelectableTextBlock Classes="stepNote"
+                             IsVisible="{Binding ShouldShowNotchExportProgress}"
+                             Text="{Binding NotchExportProgressText}"/>
+      </StackPanel>
+    </controls:HidePanelBlock>
+</UserControl>
+

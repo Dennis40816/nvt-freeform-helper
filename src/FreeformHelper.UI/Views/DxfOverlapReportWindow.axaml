@@ -1,0 +1,56 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FreeformHelper.UI.Views.DxfOverlapReportWindow"
+        Width="{StaticResource IndexMappingReportWidth}"
+        Height="{StaticResource IndexMappingReportHeight}"
+        MinWidth="{StaticResource IndexMappingReportMinWidth}"
+        MinHeight="{StaticResource IndexMappingReportMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="DXF overlaps report">
+  <Border Padding="{StaticResource Inset14}">
+    <StackPanel Spacing="{StaticResource Space12}">
+      <SelectableTextBlock Text="DXF overlaps report"
+                 FontWeight="SemiBold"/>
+
+      <SelectableTextBlock Text="{Binding Summary}"
+                           Foreground="{DynamicResource BrushTextMuted}"
+                           TextWrapping="Wrap"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <SelectableTextBlock Text="{Binding IssueTitle}"
+                   FontWeight="SemiBold"
+                   VerticalAlignment="Center"/>
+        <Button Grid.Column="1"
+                Content="Copy all"
+                Click="CopyAll_Click"
+                ToolTip.Tip="Copy overlap report text."
+                Margin="{StaticResource InsetLeft8}"/>
+      </Grid>
+
+      <Border Background="{DynamicResource BrushBgPanel}"
+              BorderBrush="{DynamicResource BrushBorder}"
+              BorderThickness="{StaticResource BorderThin}"
+              CornerRadius="{StaticResource RadiusSm}"
+              Padding="{StaticResource Inset8}">
+        <Grid RowDefinitions="Auto,*"
+              MinHeight="{StaticResource IndexMappingReportListMaxHeight}">
+          <SelectableTextBlock Grid.Row="0"
+                     Text="No issues."
+                     Foreground="{DynamicResource BrushTextMuted}"
+                     IsVisible="{Binding HasNoIssues}"/>
+          <TextBox Grid.Row="1"
+                   x:Name="ReportTextBox"
+                   IsVisible="{Binding HasIssues}"
+                   IsReadOnly="True"
+                   AcceptsReturn="True"
+                   TextWrapping="Wrap"
+                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                   Text="{Binding ReportText}"/>
+        </Grid>
+      </Border>
+    </StackPanel>
+  </Border>
+</Window>

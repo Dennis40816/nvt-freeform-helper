@@ -1,0 +1,214 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls">
+  <Style Selector="Border.settingsWindowChrome">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsWindowBackground}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset16}"/>
+  </Style>
+
+  <Style Selector="Border.settingsHero">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsHeroBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSettingsBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusLg}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset16}"/>
+  </Style>
+
+  <Style Selector="Border.settingsNavRail">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsNavBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSettingsBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusLg}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.settingsNavItem">
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset12_8}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+  </Style>
+
+  <Style Selector="ToggleButton.settingsNavItem:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsTileHover}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.settingsNavItem:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceSelected}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSettingsBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Border.settingsContentShell">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsContentBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSettingsBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusLg}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset14}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage">
+    <Setter Property="Spacing" Value="{StaticResource Space14}"/>
+  </Style>
+
+  <Style Selector="Border.settingsSectionBlock">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsSectionBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSettingsBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusLg}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset14}"/>
+  </Style>
+
+  <Style Selector="Border.settingsFieldTile">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsTileBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset12}"/>
+  </Style>
+
+  <Style Selector="Border.settingsFieldTile:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsTileHover}"/>
+  </Style>
+
+  <Style Selector="controls|SettingsInfoLabel">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.settingsInfoLabelText, TextBlock.settingsInfoLabelText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Border.settingsFooter">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsWindowBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSettingsBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderTopThin}"/>
+    <Setter Property="Padding" Value="{StaticResource InsetTop10}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.settingsEyebrow, TextBlock.settingsEyebrow">
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.settingsSectionTitle, TextBlock.settingsSectionTitle">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeLg}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.settingsSectionMeta, TextBlock.settingsSectionMeta">
+    <Setter Property="Foreground" Value="{DynamicResource BrushSettingsNoteText}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.settingsPassiveValue, TextBlock.settingsPassiveValue">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeLg}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage TextBox, StackPanel.settingsPage ComboBox, StackPanel.settingsPage NumericUpDown, StackPanel.settingsPage controls|NumberScrubber">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="Height" Value="{StaticResource FormControlHeight}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage TextBox, StackPanel.settingsPage ComboBox, StackPanel.settingsPage NumericUpDown">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsInputBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSettingsInputBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderInput}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage TextBox:pointerover, StackPanel.settingsPage ComboBox:pointerover, StackPanel.settingsPage NumericUpDown:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsInputHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage TextBox:focus, StackPanel.settingsPage ComboBox:focus, StackPanel.settingsPage ComboBox:dropdownopen, StackPanel.settingsPage NumericUpDown:focus-within">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsInputHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage TextBox:disabled, StackPanel.settingsPage ComboBox:disabled, StackPanel.settingsPage NumericUpDown:disabled">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsTileBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage Border.numberScrubber">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsInputBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSettingsInputBorder}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage Border.numberScrubber:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsInputHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage Border.numberScrubber.focused">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsInputHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage TextBox.numberScrubberInput">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+    <Setter Property="FocusAdorner" Value="{x:Null}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage TextBox.numberScrubberInput:pointerover, StackPanel.settingsPage TextBox.numberScrubberInput:focus">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="FocusAdorner" Value="{x:Null}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage controls|NumberScrubber:disabled Border.numberScrubber">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsTileBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage controls|NumberScrubber:disabled TextBox.numberScrubberInput">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage Border.numberScrubberSpin">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsInputBorder}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushSettingsInputBorder}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage controls|NumberScrubber:disabled Border.numberScrubberSpin">
+    <Setter Property="Background" Value="{DynamicResource BrushSettingsTileBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage StackPanel.panelFormField SelectableTextBlock, StackPanel.settingsPage StackPanel.panelFormField TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="StackPanel.settingsPage StackPanel.panelFormField SelectableTextBlock.stepNote, StackPanel.settingsPage StackPanel.panelFormField TextBlock.stepNote, StackPanel.settingsPage SelectableTextBlock.stepNote, StackPanel.settingsPage TextBlock.stepNote">
+    <Setter Property="Foreground" Value="{DynamicResource BrushSettingsNoteText}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+    <Setter Property="FontWeight" Value="Normal"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+</Styles>

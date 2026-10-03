@@ -1,0 +1,594 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+        xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
+        x:Class="FreeformHelper.UI.Views.NotchExportSelectionWindow"
+        Width="{StaticResource NotchExportSelectionWidth}"
+        Height="{StaticResource NotchExportSelectionHeight}"
+        MinWidth="{StaticResource NotchExportSelectionMinWidth}"
+        MinHeight="{StaticResource NotchExportSelectionMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        Opacity="{StaticResource NotchExportSelectionOpacity}"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Export Notch Rows">
+  <controls:ReviewWorkspaceShell Title="Export Notch Rows"
+                                 Subtitle="{Binding SubtitleText}">
+    <controls:ReviewWorkspaceShell.HeaderRight>
+      <Grid ColumnDefinitions="Auto,Auto"
+            ColumnSpacing="{StaticResource Space12}"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top">
+          <StackPanel Grid.Column="0"
+                      Classes="workspaceHeaderSettingBlock"
+                      IsVisible="{Binding HasVersionOptions}">
+            <SelectableTextBlock Classes="workspaceHeaderMeta"
+                                 Text="Notch version"
+                                 ToolTip.Tip="Limits visible/exported rows to this scope. When confirming export, single-version choice is also kept for next project save."/>
+            <ComboBox ItemsSource="{Binding VersionOptions}"
+                      Width="{StaticResource NotchExportTopDropdownWidth}"
+                      IsEnabled="{Binding CanSelectVersion}"
+                      SelectedItem="{Binding SelectedVersionOption, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <SelectableTextBlock Text="{Binding Display}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <StackPanel Grid.Column="1"
+                      Classes="workspaceHeaderSettingBlock"
+                      IsVisible="{Binding HasExportTypeOptions}">
+            <SelectableTextBlock Classes="workspaceHeaderMeta"
+                                 Text="Export format"
+                                 ToolTip.Tip="Select output file format for this export run."/>
+            <ComboBox ItemsSource="{Binding ExportTypeOptions}"
+                      Width="{StaticResource NotchExportTopDropdownWidth}"
+                      IsEnabled="{Binding CanSelectExportType}"
+                      SelectedItem="{Binding SelectedExportTypeOption, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <SelectableTextBlock Text="{Binding Display}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+      </Grid>
+    </controls:ReviewWorkspaceShell.HeaderRight>
+
+    <controls:ReviewWorkspaceShell.SummaryContent>
+      <WrapPanel Orientation="Horizontal">
+          <Button Classes="actionChip chipAction direct"
+                  Classes.active="{Binding IsSelectedOnlyActive}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding SelectedCount, StringFormat='Selected {0}'}"
+                  Command="{Binding ToggleSelectedOnlyCommand}"
+                  ToolTip.Tip="Toggle selected-only view filter."/>
+          <Button Classes="actionChip chipAction transfer"
+                  Classes.active="{Binding IsFilterTransferOnly}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding TransferRowCount, StringFormat='Transfer {0}'}"
+                  Command="{Binding SetViewFilterModeCommand}"
+                  CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.TransferOnly}"
+                  ToolTip.Tip="Show transfer rows only. Click again to clear."/>
+          <Button Classes="actionChip chipAction incoming"
+                  Classes.active="{Binding IsFilterLinkedOnly}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding CadLinkedRowCount, StringFormat='Linked {0}'}"
+                  Command="{Binding SetViewFilterModeCommand}"
+                  CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.LinkedOnly}"
+                  ToolTip.Tip="Show linked rows only. Click again to clear."/>
+          <Button Classes="actionChip chipAction outgoing"
+                  Classes.active="{Binding IsFilterWarningOnly}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding WarningRowCount, StringFormat='Warning {0}'}"
+                  Command="{Binding SetViewFilterModeCommand}"
+                  CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.WarningOnly}"
+                  ToolTip.Tip="Show warning rows only. Click again to clear."/>
+          <Button Classes="actionChip chipAction nocad"
+                  Classes.active="{Binding IsFilterNoCadOnly}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding CadMissingRowCount, StringFormat='No CAD {0}'}"
+                  Command="{Binding SetViewFilterModeCommand}"
+                  CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.NoCadOnly}"
+                  ToolTip.Tip="Show rows without CAD mapping only. Click again to clear."/>
+          <Button Classes="actionChip chipAction legacy"
+                  Classes.active="{Binding IsFilterLegacyOnly}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding LegacyRowCount, StringFormat='Legacy {0}'}"
+                  Command="{Binding SetViewFilterModeCommand}"
+                  CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.LegacyOnly}"
+                  ToolTip.Tip="Show legacy rows only. Click again to clear."/>
+          <Border Classes="validationRowKindTag direct workspaceContextBadge"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  IsVisible="{Binding HasToFullCoveragePass}">
+            <SelectableTextBlock Classes="validationRowKindText"
+                                 Text="{Binding ToFullCoverageBadgeText}"/>
+          </Border>
+          <Border Classes="validationRowKindTag outgoing workspaceContextBadge"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  IsVisible="{Binding HasToFullCoverageWarning}">
+            <SelectableTextBlock Classes="validationRowKindText"
+                                 Text="{Binding ToFullCoverageBadgeText}"/>
+          </Border>
+          <Border Classes="chipStatus"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  IsVisible="{Binding HasNoToFullCoverageExpectations}">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding ToFullCoverageBadgeText}"/>
+          </Border>
+          <Border Classes="validationRowKindTag direct workspaceContextBadge"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  IsVisible="{Binding IsSimulationSafetyClean}"
+                  ToolTip.Tip="{Binding SimulationSafetyExportSummaryText}">
+            <SelectableTextBlock Classes="validationRowKindText"
+                                 Text="{Binding SimulationSafetyExportBadgeText}"/>
+          </Border>
+          <Border Classes="chipStatus warning"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  IsVisible="{Binding HasSimulationPhysicalAuditWarning}"
+                  ToolTip.Tip="{Binding SimulationSafetyExportSummaryText}">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding SimulationSafetyExportBadgeText}"/>
+          </Border>
+          <Border Classes="validationRowKindTag outgoing workspaceContextBadge"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  IsVisible="{Binding IsExportBlockedBySimulationSafety}"
+                  ToolTip.Tip="{Binding SimulationSafetyExportSummaryText}">
+            <SelectableTextBlock Classes="validationRowKindText"
+                                 Text="{Binding SimulationSafetyExportBadgeText}"/>
+          </Border>
+          <Border Classes="chipStatus"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  IsVisible="{Binding HasNoSimulationSafetyAudit}"
+                  ToolTip.Tip="{Binding SimulationSafetyExportSummaryText}">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding SimulationSafetyExportBadgeText}"/>
+          </Border>
+      </WrapPanel>
+    </controls:ReviewWorkspaceShell.SummaryContent>
+
+    <controls:ReviewWorkspaceShell.ToolbarContent>
+      <Grid RowDefinitions="Auto,Auto"
+            ColumnDefinitions="Auto,Auto,*,Auto"
+            ColumnSpacing="{StaticResource Space8}"
+            RowSpacing="{StaticResource Space6}">
+          <Grid Grid.Row="0"
+                Grid.Column="0"
+                Width="{StaticResource NotchExportSearchWidth}"
+                HorizontalAlignment="Left">
+            <TextBox Watermark="{Binding SearchWatermarkText}"
+                     Text="{Binding SearchKeyword, Mode=TwoWay}"
+                     TextWrapping="NoWrap"/>
+            <Button Classes="workspaceSearchClearButton"
+                    IsVisible="{Binding HasResettableViewFilters}"
+                    Command="{Binding ClearSearchKeywordCommand}"
+                    ToolTip.Tip="Reset filters (view all)"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+              <controls:FontIcon Classes="symbols iconSm"
+                                 Glyph="{x:Static icons:IconGlyphs.Close}"/>
+            </Button>
+          </Grid>
+          <Button Grid.Row="0"
+                  Grid.Column="1"
+                  Classes="workspaceInfoButton"
+                  Click="ShowFilterBuilderButton_Click"
+                  ToolTip.Tip="Filter helper">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.FilterAlt}"/>
+          </Button>
+          <Grid Grid.Row="0"
+                Grid.Column="3"
+                ColumnDefinitions="Auto,Auto"
+                ColumnSpacing="{StaticResource Space6}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center">
+            <SelectableTextBlock Grid.Column="0"
+                                 Classes="workspaceToolbarLabel"
+                                 VerticalAlignment="Center"
+                                 Text="Sort:"/>
+            <ComboBox Grid.Column="1"
+                      Width="{StaticResource NotchExportSortDropdownWidth}"
+                      VerticalAlignment="Center"
+                      ItemsSource="{Binding SortModeOptions}"
+                      IsEnabled="{Binding CanSelectSortMode}"
+                      SelectedItem="{Binding SelectedSortModeOption, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <SelectableTextBlock Text="{Binding Display}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </Grid>
+          <Grid Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                ColumnDefinitions="*,Auto"
+                ColumnSpacing="{StaticResource Space8}">
+            <WrapPanel Grid.Column="0"
+                       Orientation="Horizontal">
+              <Border Classes="chipStatus"
+                      IsVisible="{Binding HasSearchFilterChip}">
+                <SelectableTextBlock Classes="chipStatusText"
+                                     Text="{Binding SearchFilterChipText}"/>
+              </Border>
+              <Border Classes="chipStatus"
+                      IsVisible="{Binding HasModeFilterChip}">
+                <SelectableTextBlock Classes="chipStatusText"
+                                     Text="{Binding ModeFilterChipText}"/>
+              </Border>
+              <Border Classes="chipStatus"
+                      IsVisible="{Binding HasSelectionFilterChip}">
+                <SelectableTextBlock Classes="chipStatusText"
+                                     Text="{Binding SelectionFilterChipText}"/>
+              </Border>
+              <Border Classes="chipStatus"
+                      IsVisible="{Binding HasHeaderFilterChip}">
+                <SelectableTextBlock Classes="chipStatusText"
+                                     Text="{Binding HeaderFilterChipText}"/>
+              </Border>
+              <Border Classes="chipStatus"
+                      IsVisible="{Binding HasNoActiveFilterChips}">
+                <SelectableTextBlock Classes="chipStatusText"
+                                     Text="Search: All"/>
+              </Border>
+            </WrapPanel>
+
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="workspaceFilterResultText"
+                                 VerticalAlignment="Center"
+                                 Text="{Binding VisibleRowsSummaryText}"/>
+          </Grid>
+      </Grid>
+    </controls:ReviewWorkspaceShell.ToolbarContent>
+
+    <controls:ReviewWorkspaceShell.LeftContent>
+      <sections:NotchExportSelectionRowsPaneView/>
+    </controls:ReviewWorkspaceShell.LeftContent>
+
+    <controls:ReviewWorkspaceShell.RightContent>
+      <Border Classes="workspaceInspectorHost"
+              MinWidth="{StaticResource NotchExportSelectionPreviewMinWidth}">
+            <ScrollViewer Classes="scrollV2"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+              <StackPanel Spacing="{StaticResource Space8}">
+                <SelectableTextBlock Text="Inspector"
+                                     FontWeight="SemiBold"
+                                     ToolTip.Tip="Current row details and workspace-linked preview."/>
+
+                <StackPanel Spacing="{StaticResource Space6}"
+                            IsVisible="{Binding HasSelectedRow}">
+                  <Border Classes="workspaceInspectorContextStrip">
+                    <WrapPanel Orientation="Horizontal">
+                      <Border Classes="validationRowKindTag direct workspaceContextBadge"
+                              Margin="{StaticResource InsetRight6Bottom6}">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="{Binding SelectedRowContextText}"/>
+                      </Border>
+                      <Border Classes="validationRowKindTag legacy workspaceContextBadge"
+                              Margin="{StaticResource InsetRight6Bottom6}">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="{Binding SelectedRowPositionText}"/>
+                      </Border>
+                      <Border Classes="validationRowKindTag incoming workspaceContextBadge"
+                              Margin="{StaticResource InsetRight6Bottom6}"
+                              IsVisible="{Binding SelectedRow.IsStatusLinked}">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="Linked"/>
+                      </Border>
+                      <Border Classes="validationRowKindTag outgoing workspaceContextBadge"
+                              Margin="{StaticResource InsetRight6Bottom6}"
+                              IsVisible="{Binding SelectedRow.IsStatusWarning}">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="Warning"/>
+                      </Border>
+                      <Border Classes="validationRowKindTag nocad workspaceContextBadge"
+                              Margin="{StaticResource InsetRight6Bottom6}"
+                              IsVisible="{Binding SelectedRow.IsStatusNoCad}">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="No CAD"/>
+                      </Border>
+                      <Border Classes="validationRowKindTag legacy workspaceContextBadge"
+                              Margin="{StaticResource InsetRight6Bottom6}"
+                              IsVisible="{Binding SelectedRow.IsStatusLegacy}">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="Legacy"/>
+                      </Border>
+                    </WrapPanel>
+                  </Border>
+
+                  <Border Classes="workspaceInspectorSection">
+                    <StackPanel Spacing="{StaticResource Space6}">
+                      <Grid ColumnDefinitions="*,Auto"
+                            ColumnSpacing="{StaticResource Space8}">
+                        <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
+                                             Text="Payload"
+                                             ToolTip.Tip="Raw export payload for current row."/>
+                        <Button Grid.Column="1"
+                                Classes="workspaceInfoButton"
+                                Click="CopyPayloadButton_Click"
+                                ToolTip.Tip="Copy payload">
+                          <controls:FontIcon Classes="symbols iconSm"
+                                             Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                        </Button>
+                      </Grid>
+                      <Border Classes="workspaceCodeBlock">
+                        <SelectableTextBlock Classes="workspaceCodeText"
+                                             Text="{Binding SelectedRowCodePreviewText}"
+                                             TextWrapping="WrapWithOverflow"/>
+                      </Border>
+                      <Grid ColumnDefinitions="*,*"
+                            ColumnSpacing="{StaticResource Space8}">
+                        <StackPanel Spacing="{StaticResource Space2}">
+                          <SelectableTextBlock Classes="stepNote" Text="Anchor"/>
+                          <SelectableTextBlock Classes="workspaceInspectorValue"
+                                               Text="{Binding SelectedRowPayloadAnchorText}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1"
+                                    Spacing="{StaticResource Space2}">
+                          <SelectableTextBlock Classes="stepNote" Text="Combine"/>
+                          <SelectableTextBlock Classes="workspaceInspectorValue"
+                                               Text="{Binding SelectedRowPayloadCombineText}"/>
+                        </StackPanel>
+                      </Grid>
+                      <Grid ColumnDefinitions="*,*"
+                            ColumnSpacing="{StaticResource Space8}">
+                        <StackPanel Spacing="{StaticResource Space2}">
+                          <SelectableTextBlock Classes="stepNote" Text="Target 1"/>
+                          <SelectableTextBlock Classes="workspaceInspectorValue"
+                                               Text="{Binding SelectedRowPayloadTarget1Text}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1"
+                                    Spacing="{StaticResource Space2}">
+                          <SelectableTextBlock Classes="stepNote" Text="Target 2"/>
+                          <SelectableTextBlock Classes="workspaceInspectorValue"
+                                               Text="{Binding SelectedRowPayloadTarget2Text}"/>
+                        </StackPanel>
+                      </Grid>
+                    </StackPanel>
+                  </Border>
+
+                  <Border Classes="workspaceInspectorSection">
+                    <StackPanel Spacing="{StaticResource Space4}">
+                      <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
+                                           Text="Mapping"
+                                           ToolTip.Tip="REG -> CAD link and mapping status."/>
+                      <SelectableTextBlock Classes="workspaceInspectorValue"
+                                           Text="{Binding SelectedRowPadRelationText}"
+                                           TextWrapping="WrapWithOverflow"/>
+                      <SelectableTextBlock Classes="stepNote"
+                                           Text="{Binding SelectedRowMappingStatusText}"
+                                           TextWrapping="WrapWithOverflow"/>
+                    </StackPanel>
+                  </Border>
+
+                  <Border Classes="workspaceInspectorSection">
+                    <StackPanel Spacing="{StaticResource Space6}">
+                      <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
+                                           Text="Analysis"
+                                           ToolTip.Tip="Short outcome and ratio summary."/>
+                      <Grid ColumnDefinitions="*,*"
+                            ColumnSpacing="{StaticResource Space8}">
+                        <StackPanel Spacing="{StaticResource Space2}">
+                          <SelectableTextBlock Classes="stepNote" Text="Effect"/>
+                          <SelectableTextBlock Classes="workspaceInspectorValue"
+                                               Text="{Binding SelectedRowOutcomeText}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1"
+                                    Spacing="{StaticResource Space2}">
+                          <SelectableTextBlock Classes="stepNote" Text="Target ratio sum"/>
+                          <SelectableTextBlock Classes="workspaceInspectorValue"
+                                               Text="{Binding SelectedRowAnalysisRatioSumText}"/>
+                        </StackPanel>
+                      </Grid>
+                      <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="stepNote" Text="Combine delta"/>
+                        <SelectableTextBlock Classes="workspaceInspectorValue"
+                                             Text="{Binding SelectedRowAnalysisDeltaText}"/>
+                      </StackPanel>
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+
+                <SelectableTextBlock Classes="stepNote"
+                                     IsVisible="{Binding HasNoSelectedRow}"
+                                     Text="Select one row on the left to inspect payload and mapping."
+                                     Foreground="{DynamicResource BrushTextMuted}"/>
+
+                <Border Classes="workspaceInspectorSection">
+                  <StackPanel Spacing="{StaticResource Space4}">
+                    <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
+                                         Text="Simulation safety"
+                                         ToolTip.Tip="Step 5 reads the current Simulation safety audit before export."/>
+                    <SelectableTextBlock Classes="workspaceInspectorValue"
+                                         Text="{Binding SimulationSafetyExportSummaryText}"
+                                         TextWrapping="WrapWithOverflow"/>
+                    <Border Classes="workspaceTopLayerBox"
+                            IsVisible="{Binding HasSimulationSafetyAudit}">
+                      <SelectableTextBlock Text="{Binding SimulationSafetyExportHighRiskText}"
+                                           TextWrapping="WrapWithOverflow"/>
+                    </Border>
+                  </StackPanel>
+                </Border>
+
+                <Border Classes="workspaceInspectorSection">
+                  <StackPanel Spacing="{StaticResource Space4}">
+                    <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
+                                         Text="To Full coverage"
+                                         ToolTip.Tip="Checks whether ToFull-affected target diffs are covered by emitted canonical rows."/>
+                    <SelectableTextBlock Classes="workspaceInspectorValue"
+                                         Text="{Binding ToFullCoverageSummaryText}"
+                                         TextWrapping="WrapWithOverflow"/>
+                    <SelectableTextBlock Classes="workspaceSectionMeta"
+                                         Text="{Binding ToFullCoverageDetailText}"
+                                         TextWrapping="WrapWithOverflow"/>
+                    <SelectableTextBlock Classes="stepNote"
+                                         IsVisible="{Binding HasToFullCoverageMissingList}"
+                                         Text="Missing targets"
+                                         Foreground="{DynamicResource BrushWarning}"/>
+                    <Border Classes="workspaceTopLayerBox"
+                            IsVisible="{Binding HasToFullCoverageMissingList}">
+                      <SelectableTextBlock Text="{Binding ToFullCoverageMissingListText}"
+                                           TextWrapping="WrapWithOverflow"/>
+                    </Border>
+                  </StackPanel>
+                </Border>
+
+                <Border Classes="workspaceInspectorSection">
+                  <StackPanel Spacing="{StaticResource Space6}">
+                    <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
+                                         Text="AA preview / workspace locate"
+                                         ToolTip.Tip="Locate selected/export rows by current workspace pad selection."/>
+                    <SelectableTextBlock Classes="stepNote"
+                                         Text="{Binding WorkspaceSelectionSummaryText}"
+                                         Foreground="{DynamicResource BrushTextMuted}"
+                                         TextWrapping="WrapWithOverflow"/>
+                    <Grid ColumnDefinitions="Auto,*"
+                          ColumnSpacing="{StaticResource Space8}"
+                          IsVisible="{Binding CanHidePanelForInspect}">
+                      <Button Content="Hide panel (inspect AA)"
+                              Command="{Binding HidePanelForInspectCommand}"/>
+                      <SelectableTextBlock Grid.Column="1"
+                                           Classes="stepNote"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding RestoreShortcutHintText}"
+                                           Foreground="{DynamicResource BrushTextMuted}"
+                                           TextWrapping="WrapWithOverflow"/>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="{StaticResource Space8}"
+                                IsVisible="{Binding HasWorkspaceLinkedRows}">
+                      <SelectableTextBlock Classes="stepNote"
+                                           VerticalAlignment="Center"
+                                           Text="Linked rows:"/>
+                      <Button Classes="workspaceTextAction"
+                              Content="Select linked rows"
+                              Command="{Binding EnableWorkspaceLinkedRowsCommand}"/>
+                      <Button Classes="workspaceTextAction"
+                              Content="Clear linked rows"
+                              Command="{Binding DisableWorkspaceLinkedRowsCommand}"/>
+                    </StackPanel>
+                    <SelectableTextBlock Classes="stepNote"
+                                         IsVisible="{Binding HasWorkspaceLinkedRows}"
+                                         Text="Checkbox = single-row selection; linked-row actions are bulk operations."
+                                         Foreground="{DynamicResource BrushTextMuted}"
+                                         TextWrapping="WrapWithOverflow"/>
+                    <SelectableTextBlock Classes="stepNote"
+                                         IsVisible="{Binding HasNoWorkspaceLinkedRows}"
+                                         Text="Keep this window open, then click CAD / REG pads in workspace to locate linked rows."
+                                         Foreground="{DynamicResource BrushTextMuted}"
+                                         TextWrapping="WrapWithOverflow"/>
+                    <Border Classes="workspaceTopLayerBox"
+                            IsVisible="{Binding HasWorkspaceLinkedRows}"
+                            Padding="{StaticResource Inset6}">
+                      <ScrollViewer MaxHeight="{StaticResource NotchExportSelectionWorkspaceListMaxHeight}"
+                                    Classes="scrollV2"
+                                    ScrollViewer.AllowAutoHide="False"
+                                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding WorkspaceLinkedRows}">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <Border Classes="workspaceLinkItem">
+                                <Grid ColumnDefinitions="Auto,*,Auto"
+                                      ColumnSpacing="{StaticResource Space8}">
+                                  <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                            VerticalAlignment="Center"/>
+                                  <StackPanel Grid.Column="1"
+                                              Spacing="{StaticResource Space2}">
+                                    <SelectableTextBlock Text="{Binding WorkspaceLinkText}"
+                                                         FontWeight="SemiBold"
+                                                         TextWrapping="WrapWithOverflow"/>
+                                    <SelectableTextBlock Classes="stepNote"
+                                                         Text="{Binding WorkspaceLinkDetailText}"
+                                                         Foreground="{DynamicResource BrushTextMuted}"
+                                                         TextWrapping="WrapWithOverflow"/>
+                                  </StackPanel>
+                                  <Button Grid.Column="2"
+                                          Content="Preview"
+                                          Classes="workspaceGroupActionButton"
+                                          Command="{Binding DataContext.SelectPreviewRowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                          CommandParameter="{Binding}"/>
+                                </Grid>
+                              </Border>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </ScrollViewer>
+                    </Border>
+                  </StackPanel>
+                </Border>
+
+                <Expander IsVisible="{Binding HasSelectedRow}"
+                          IsExpanded="{Binding ShowSelectedRowDetailSection, Mode=TwoWay}">
+                  <Expander.Header>
+                    <SelectableTextBlock Classes="stepNote"
+                                         Text="Low-frequency detail"
+                                         ToolTip.Tip="Expanded debug detail for payload columns and comments."/>
+                  </Expander.Header>
+                  <Border Classes="workspaceInspectorSection"
+                          Margin="{StaticResource InsetTop8}">
+                    <StackPanel Spacing="{StaticResource Space6}">
+                      <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="stepNote"
+                                             Text="Payload details"/>
+                        <SelectableTextBlock Text="{Binding SelectedRowPayloadText}"
+                                             TextWrapping="WrapWithOverflow"/>
+                      </StackPanel>
+
+                      <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="stepNote"
+                                             Text="Column breakdown"/>
+                        <SelectableTextBlock Text="{Binding SelectedRowColumnBreakdownText}"
+                                             TextWrapping="WrapWithOverflow"/>
+                      </StackPanel>
+
+                      <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="stepNote"
+                                             Text="Flags"/>
+                        <SelectableTextBlock Text="{Binding SelectedRowFlagsText}"
+                                             TextWrapping="WrapWithOverflow"/>
+                      </StackPanel>
+
+                      <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="stepNote"
+                                             Text="Values / Comment"/>
+                        <SelectableTextBlock Text="{Binding SelectedRowCommentText}"
+                                             TextWrapping="WrapWithOverflow"
+                                             Foreground="{DynamicResource BrushTextMuted}"/>
+                      </StackPanel>
+                    </StackPanel>
+                  </Border>
+                </Expander>
+              </StackPanel>
+            </ScrollViewer>
+      </Border>
+    </controls:ReviewWorkspaceShell.RightContent>
+
+    <controls:ReviewWorkspaceShell.FooterContent>
+      <Border BorderBrush="{DynamicResource BrushBorder}"
+              BorderThickness="{StaticResource BorderTopThin}"
+              Padding="{StaticResource InsetTop8}">
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              ColumnSpacing="{StaticResource Space8}">
+          <SelectableTextBlock VerticalAlignment="Center"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               Text="{Binding SummaryText}"/>
+          <Button Grid.Column="1"
+                  Content="Cancel"
+                  Click="CancelButton_Click"/>
+          <Button Grid.Column="2"
+                  Classes="actionTextButton actionPrimary"
+                  Content="{Binding ExportButtonText}"
+                  IsEnabled="{Binding HasSelection}"
+                  Click="ExportButton_Click"/>
+        </Grid>
+      </Border>
+    </controls:ReviewWorkspaceShell.FooterContent>
+  </controls:ReviewWorkspaceShell>
+</Window>

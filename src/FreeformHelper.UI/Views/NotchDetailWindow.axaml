@@ -1,0 +1,99 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        x:Class="FreeformHelper.UI.Views.NotchDetailWindow"
+        Width="{StaticResource NotchDetailWidth}"
+        Height="{StaticResource NotchDetailHeight}"
+        MinWidth="{StaticResource NotchDetailMinWidth}"
+        MinHeight="{StaticResource NotchDetailMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Notch detail">
+  <Border Padding="{StaticResource Inset14}">
+    <StackPanel Spacing="{StaticResource Space12}">
+      <StackPanel Spacing="{StaticResource Space4}">
+        <SelectableTextBlock Text="{Binding CadTitle}"
+                   FontWeight="SemiBold"/>
+        <SelectableTextBlock Text="{Binding CadLayer}"
+                   Foreground="{DynamicResource BrushTextMuted}"/>
+      </StackPanel>
+      <StackPanel Spacing="{StaticResource Space4}">
+        <SelectableTextBlock Text="{Binding FreeformLabel}"
+                  />
+        <SelectableTextBlock Text="{Binding ToRegularRatioText}"
+                   Foreground="{DynamicResource BrushTextMuted}"/>
+        <SelectableTextBlock Text="{Binding ToFullRatioText}"
+                   Foreground="{DynamicResource BrushTextMuted}"/>
+        <SelectableTextBlock Text="{Binding CombinedRatioText}"
+                   Foreground="{DynamicResource BrushTextMuted}"/>
+        <SelectableTextBlock Text="{Binding ThresholdSummary}"
+                   Foreground="{DynamicResource BrushTextMuted}"/>
+        <SelectableTextBlock Text="Below TH (skip notch output)"
+                   Foreground="{DynamicResource BrushWarning}"
+                   IsVisible="{Binding IsBelowThreshold}"/>
+      </StackPanel>
+
+      <Border Background="{DynamicResource BrushBgPanel}"
+              BorderBrush="{DynamicResource BrushBorder}"
+              BorderThickness="{StaticResource BorderThin}"
+              CornerRadius="{StaticResource RadiusSm}"
+              Padding="{StaticResource Inset8}">
+        <controls:NotchPreviewCanvas CadPad="{Binding CadPad}"
+                                     RegularPads="{Binding PreviewRegularPads}"
+                                     ToFullPolygons="{Binding ToFullPolygons}"
+                                     FreeformType="{Binding FreeformType}"
+                                     Height="{StaticResource NotchPreviewHeight}"/>
+      </Border>
+
+      <SelectableTextBlock Text="Allocations (Q7)"
+                 FontWeight="SemiBold"/>
+
+      <Border Background="{DynamicResource BrushBgPanel}"
+              BorderBrush="{DynamicResource BrushBorder}"
+              BorderThickness="{StaticResource BorderThin}"
+              CornerRadius="{StaticResource RadiusSm}"
+              Padding="{StaticResource Inset8}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      MaxHeight="{StaticResource NotchDetailListMaxHeight}">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <Grid ColumnDefinitions="*,*,Auto,Auto">
+              <SelectableTextBlock Text="Regular id"
+                         Foreground="{DynamicResource BrushTextMuted}"/>
+              <SelectableTextBlock Grid.Column="1"
+                         Text="Coord"
+                         Foreground="{DynamicResource BrushTextMuted}"/>
+              <SelectableTextBlock Grid.Column="2"
+                         Text="Q7"
+                         Foreground="{DynamicResource BrushTextMuted}"
+                         Margin="{StaticResource InsetLeft6}"/>
+              <SelectableTextBlock Grid.Column="3"
+                         Text="Ratio"
+                         Foreground="{DynamicResource BrushTextMuted}"
+                         Margin="{StaticResource InsetLeft6}"/>
+            </Grid>
+
+            <ItemsControl ItemsSource="{Binding Allocations}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,*,Auto,Auto">
+                    <SelectableTextBlock Text="{Binding RegularLabel}"/>
+                    <SelectableTextBlock Grid.Column="1" Text="{Binding GridLabel}"/>
+                    <SelectableTextBlock Grid.Column="2"
+                               Text="{Binding Q7Text}"
+                               Margin="{StaticResource InsetLeft6}"/>
+                    <SelectableTextBlock Grid.Column="3"
+                               Text="{Binding RatioText}"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               Margin="{StaticResource InsetLeft6}"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </StackPanel>
+  </Border>
+</Window>

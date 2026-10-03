@@ -1,0 +1,324 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:padInfo="clr-namespace:FreeformHelper.UI.Views.PadInfoSections"
+             x:Class="FreeformHelper.UI.Views.PadInfoSections.CadPadInfoContentView">
+          <ScrollViewer x:Name="CadPadInfoScroll"
+                        Classes="scrollV2"
+                        MaxHeight="{StaticResource PadInfoContentMaxHeight}"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled"
+                        HorizontalContentAlignment="Stretch"
+                        Padding="0">
+            <Border Padding="{StaticResource InsetRight12Bottom12}">
+              <StackPanel Spacing="{StaticResource Space10}">
+                <Grid Classes="padInfoHeaderRow" ColumnDefinitions="Auto,*,Auto">
+                  <Path Grid.Column="0"
+                        Width="{DynamicResource IconSizeMd}"
+                        Height="{DynamicResource IconSizeMd}"
+                        Fill="{DynamicResource BrushCanvasCadSelected}"
+                        Data="M2 12 L12 2 L22 12 L12 22 Z"/>
+                  <StackPanel Grid.Column="1" Classes="padInfoHeaderText">
+                    <SelectableTextBlock Classes="padInfoTitle" Text="{Binding Title}"/>
+                    <SelectableTextBlock Classes="padInfoSubtle" Text="{Binding Subtitle}"/>
+                  </StackPanel>
+                  <Button Grid.Column="2"
+                          Classes="padInfoHeaderActionButton"
+                          IsVisible="{Binding HasLocateMatchAction}"
+                          Command="{Binding LocateMatchCommand}"
+                          ToolTip.Tip="Focus the best match when available; otherwise highlight related regular pads.">
+                    <controls:FontIcon Classes="symbols iconSm"
+                                       Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                  </Button>
+                </Grid>
+
+                <SelectableTextBlock Classes="padInfoBodyText"
+                                     Text="{Binding IdentityText}"
+                                     TextWrapping="Wrap"/>
+
+                <Grid ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto,Auto"
+                      ColumnSpacing="{StaticResource Space12}"
+                      RowSpacing="{StaticResource Space8}">
+                  <StackPanel Grid.Column="0" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Geometry seed"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue key"
+                                         Text="{Binding GeometrySeedValueText}">
+                      <ToolTip.Tip>
+                        <SelectableTextBlock Text="{Binding MatchDetailsText}" TextWrapping="Wrap"/>
+                      </ToolTip.Tip>
+                    </SelectableTextBlock>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="To Full"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue key" Text="{Binding ToFullValueText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="To Regular"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding ToRegularValueText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Combined"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue key" Text="{Binding CombinedValueText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Confidence"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding MatchConfidenceText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Source"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue"
+                                         Text="{Binding CadOutputFwDiffAssignmentModeText}"/>
+                  </StackPanel>
+                </Grid>
+
+                <StackPanel Spacing="{StaticResource Space2}"
+                            IsVisible="{Binding HasToFullReason}">
+                  <Grid ColumnDefinitions="Auto,Auto,*"
+                        ColumnSpacing="{StaticResource Space6}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Reason"/>
+                    <Button Grid.Column="1"
+                            Classes="padInfoInfoButton"
+                            IsVisible="{Binding HasToFullReason}"
+                            ToolTip.Tip="{Binding ToFullReasonFullText}">
+                      <controls:FontIcon Classes="symbols iconSm"
+                                         Glyph="{x:Static icons:IconGlyphs.Info}"/>
+                    </Button>
+                  </Grid>
+                  <SelectableTextBlock Classes="padInfoBodyText"
+                                       Text="{Binding ToFullReasonShortText}"
+                                       TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <controls:PadInfoSectionFrame Title="Relation">
+                <Border Classes="padInfoSectionBlock">
+                  <StackPanel Spacing="{StaticResource Space10}">
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto"
+                          ColumnSpacing="{StaticResource Space12}"
+                          RowSpacing="{StaticResource Space8}">
+                      <StackPanel Grid.Column="0" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Seed match"/>
+                        <SelectableTextBlock Classes="padInfoKeyValue key"
+                                             Text="{Binding GeometrySeedValueText}"
+                                             TextWrapping="Wrap">
+                          <ToolTip.Tip>
+                            <SelectableTextBlock Text="{Binding MatchDetailsText}" TextWrapping="Wrap"/>
+                          </ToolTip.Tip>
+                        </SelectableTextBlock>
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Rows"/>
+                        <SelectableTextBlock Classes="padInfoKeyValue"
+                                             Text="{Binding NotchRowCompactText}"
+                                             TextWrapping="Wrap"/>
+                      </StackPanel>
+                      <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Targets"/>
+                        <SelectableTextBlock Classes="padInfoBodyText"
+                                             Text="{Binding TargetAllocationCompactText}"
+                                             TextWrapping="Wrap"/>
+                      </StackPanel>
+                      <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Stage3"/>
+                        <SelectableTextBlock Classes="padInfoBodyText"
+                                             Text="{Binding Stage3AreaCompactText}"
+                                             TextWrapping="Wrap"/>
+                      </StackPanel>
+                    </Grid>
+
+                    <StackPanel Spacing="{StaticResource Space4}"
+                                IsVisible="{Binding HasOwnerSummary}">
+                      <SelectableTextBlock Classes="padInfoKeyLabel" Text="Owner summary"/>
+                      <SelectableTextBlock Classes="padInfoMetaText"
+                                           Text="{Binding OwnerSummaryCompactText}"
+                                           TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="{StaticResource Space4}"
+                                IsVisible="{Binding HasTargetAllocationItems}">
+                      <SelectableTextBlock Classes="padInfoKeyLabel" Text="Area allocation"/>
+                      <padInfo:PadInfoRelationCardListView Cards="{Binding TargetAllocationItems}"/>
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+                </controls:PadInfoSectionFrame>
+
+                <controls:PadInfoSectionFrame Title="Geometry / Debug">
+                <Button Classes="padInfoSectionToggle debugCard"
+                        Command="{Binding ToggleLowFrequencyDetailSectionCommand}"
+                        ToolTip.Tip="Show or hide geometry, diagnostics, and rule trace details.">
+                  <Grid ColumnDefinitions="*,Auto"
+                        ColumnSpacing="{StaticResource Space8}">
+                    <SelectableTextBlock Grid.Column="0"
+                                         Classes="padInfoMetaText"
+                                         Text="{Binding DebugStatusText}"
+                                         TextWrapping="Wrap"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Classes="padInfoKeyValue key"
+                                         Text="{Binding GeometryDetailsToggleText}"
+                                         VerticalAlignment="Center"/>
+                  </Grid>
+                </Button>
+                </controls:PadInfoSectionFrame>
+
+                <StackPanel Spacing="{StaticResource Space8}"
+                            IsVisible="{Binding ShowLowFrequencyDetailSection}">
+                  <Border Classes="padInfoInsetCard"
+                          IsVisible="{Binding ShowGeometryDetails}">
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto,Auto"
+                          ColumnSpacing="{StaticResource Space8}"
+                          RowSpacing="{StaticResource Space8}">
+                      <Border Grid.Column="0" Classes="padInfoMetricCard">
+                        <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Area"/>
+                        <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding AreaText}"/>
+                        </StackPanel>
+                      </Border>
+                      <Border Grid.Column="1" Classes="padInfoMetricCard">
+                        <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Vertices"/>
+                        <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding VertexText}"/>
+                        </StackPanel>
+                      </Border>
+                      <Border Grid.Row="1" Grid.Column="0" Classes="padInfoMetricCard">
+                        <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Centroid"/>
+                        <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding CentroidText}"/>
+                        </StackPanel>
+                      </Border>
+                      <Border Grid.Row="1" Grid.Column="1" Classes="padInfoMetricCard">
+                        <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="CAD id"/>
+                        <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding CadIdText}"/>
+                        </StackPanel>
+                      </Border>
+                      <Border Grid.Row="2" Grid.Column="0" Classes="padInfoMetricCard">
+                        <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Layer"/>
+                        <SelectableTextBlock Classes="padInfoBodyText"
+                                             Text="{Binding LayerText}"
+                                             TextWrapping="Wrap"/>
+                        </StackPanel>
+                      </Border>
+                      <Border Grid.Row="2" Grid.Column="1" Classes="padInfoMetricCard">
+                        <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Name"/>
+                        <SelectableTextBlock Classes="padInfoBodyText"
+                                             Text="{Binding NameText}"
+                                             TextWrapping="Wrap"/>
+                        </StackPanel>
+                      </Border>
+                    </Grid>
+                  </Border>
+                  <Border Classes="padInfoInsetCard"
+                          IsVisible="{Binding ShowNotchDiagnostics}">
+                    <StackPanel Spacing="{StaticResource Space6}">
+                      <SelectableTextBlock Classes="padInfoKeyLabel" Text="To Full rule trace"/>
+                      <SelectableTextBlock Classes="padInfoMetaText"
+                                           Text="{Binding ToFullDiagnosticsText}"
+                                           TextWrapping="Wrap"/>
+                    </StackPanel>
+                  </Border>
+                  <Border Classes="padInfoInsetCard"
+                          IsVisible="{Binding ShowRuleTrace}">
+                    <StackPanel Spacing="{StaticResource Space6}">
+                      <SelectableTextBlock Classes="padInfoKeyLabel" Text="Inspector rule trace"/>
+                      <ScrollViewer Classes="scrollV2"
+                                    MaxHeight="{StaticResource NotchDetailListMaxHeight}"
+                                    VerticalScrollBarVisibility="Auto"
+                                    HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding RuleTraceLines}">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <SelectableTextBlock Classes="padInfoMetaText"
+                                                   Text="{Binding}"
+                                                   TextWrapping="Wrap"/>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </ScrollViewer>
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+
+                <controls:PadInfoSectionFrame Title="Overrides">
+                <Border Classes="padInfoSectionBlock">
+                  <StackPanel Spacing="{StaticResource Space10}">
+                    <StackPanel Classes="panelFormField"
+                                IsVisible="{Binding HasCadOutputFwDiffOverrideEditor}">
+                      <SelectableTextBlock Classes="padInfoKeyLabel" Text="CAD Output FW Diff"/>
+                      <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                            ColumnSpacing="{StaticResource Space6}">
+                        <controls:NumberScrubber Grid.Column="0"
+                                                 Minimum="0"
+                                                 Maximum="1000000"
+                                                 SmallChange="1"
+                                                 FormatString="0"
+                                                 Value="{Binding CadOutputFwDiffOverride, Mode=TwoWay}"
+                                                 ToolTip.Tip="Manual CAD Output FW Diff for this CAD pad (supports jump/offset)."/>
+                        <Button Grid.Column="1"
+                                Classes="padInfoOverrideIconButton"
+                                Command="{Binding ApplyCadOutputFwDiffOverrideCommand}"
+                                ToolTip.Tip="Apply this FW output override.">
+                          <controls:FontIcon Classes="symbols iconSm"
+                                             Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                        </Button>
+                        <Button Grid.Column="2"
+                                Classes="padInfoOverrideIconButton"
+                                IsEnabled="{Binding CanClearCadOutputFwDiffOverride}"
+                                Command="{Binding ClearCadOutputFwDiffOverrideCommand}"
+                                ToolTip.Tip="Clear the FW output override.">
+                          <controls:FontIcon Classes="symbols iconSm"
+                                             Glyph="{x:Static icons:IconGlyphs.Close}"/>
+                        </Button>
+                        <Button Grid.Column="3"
+                                Classes="padInfoOverrideIconButton"
+                                IsVisible="{Binding HasDxfIndexAnchorEditor}"
+                                Command="{Binding SetDxfIndexAnchorCommand}"
+                                ToolTip.Tip="Use this CAD pad as the per-IC CAD Output FW Diff start anchor.">
+                          <controls:FontIcon Classes="symbols iconSm"
+                                             Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                        </Button>
+                        <Button Grid.Column="4"
+                                Classes="padInfoOverrideIconButton"
+                                IsVisible="{Binding HasDxfIndexAnchorEditor}"
+                                IsEnabled="{Binding CanClearDxfIndexAnchor}"
+                                Command="{Binding ClearDxfIndexAnchorCommand}"
+                                ToolTip.Tip="Clear the per-IC CAD Output FW Diff start anchor.">
+                          <controls:FontIcon Classes="symbols iconSm"
+                                             Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                        </Button>
+                      </Grid>
+                    </StackPanel>
+
+                    <SelectableTextBlock Classes="padInfoMetaText"
+                                         Text="{Binding CadOutputFwDiffAssignmentModeText}"
+                                         IsVisible="{Binding HasDxfIndexAnchorEditor}"
+                                         TextWrapping="Wrap"/>
+                    <Grid ColumnDefinitions="Auto,*"
+                          ColumnSpacing="{StaticResource Space8}"
+                          IsVisible="{Binding HasSelectAreaBucketCommand}">
+                      <Button Grid.Column="0"
+                              Classes="padInfoHeaderActionButton"
+                              IsVisible="{Binding HasCadOutputFwDiffOverrideEditor}"
+                              Command="{Binding SelectAreaBucketCommand}"
+                              ToolTip.Tip="Select the current CAD area bucket.">
+                        <controls:FontIcon Classes="symbols iconSm"
+                                           Glyph="{x:Static icons:IconGlyphs.Layers}"/>
+                      </Button>
+                      <SelectableTextBlock Grid.Column="1"
+                                           Classes="padInfoMetaText"
+                                           Text="Area bucket action is available for single CAD selection."
+                                           VerticalAlignment="Center"
+                                           TextWrapping="Wrap"/>
+                    </Grid>
+                  </StackPanel>
+                </Border>
+                </controls:PadInfoSectionFrame>
+              </StackPanel>
+            </Border>
+          </ScrollViewer>
+</UserControl>

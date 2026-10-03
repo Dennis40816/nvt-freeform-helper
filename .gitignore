@@ -1,0 +1,119 @@
+ref
+
+############################
+# OS / Editor
+############################
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+############################
+# Visual Studio / MSBuild
+############################
+.vs/
+[Bb]in/
+[Oo]bj/
+# Avalonia (some render backends/samples may generate obj-XXX)
+obj-*/
+bin-*/
+
+[Ll]og/
+*.tlog
+*.pdb
+*.cache
+*.ilk
+*.aps
+*.ncb
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+[Dd]ebug*/
+[Rr]elease*/
+x64/
+x86/
+[Aa]rm/
+[Aa]rm64/
+bld/
+[Bb]uild/
+[Bb]uilds/
+artifacts/
+publish/
+PublishProfiles/
+*.publishsettings
+
+# Allow versioned repo scripts under scripts/build
+!/scripts/build/
+!/scripts/build/*.ps1
+
+############################
+# Avalonia (optional / only if you see them appear)
+############################
+_Avalonia.cs
+obj-Direct2D1/
+
+############################
+# NuGet
+############################
+packages/
+!NuGet.config
+
+############################
+# Tests
+############################
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.testsettings
+
+############################
+# JetBrains Rider
+############################
+# NOTE:
+# If you use Rider and want to keep .idea with its own internal .gitignore,
+# consider NOT ignoring .idea here. See discussion in Avalonia templates repo. :contentReference[oaicite:1]{index=1}
+.idea/
+*.sln.iml
+riderModule.iml
+*.DotSettings.user
+_ReSharper*/
+
+############################
+# Logs / misc
+############################
+*.log
+*.svclog
+*.orig
+*.rej
+*.dwl
+*.dwl2
+
+############################
+# Node / Python (if present)
+############################
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+__pycache__/
+*.pyc
+
+############################
+# Repository-local .NET install (scripts/ci/install-dotnet.ps1)
+############################
+.dotnet/

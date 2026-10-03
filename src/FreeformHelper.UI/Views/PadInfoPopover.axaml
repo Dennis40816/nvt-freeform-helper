@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             xmlns:views="clr-namespace:FreeformHelper.UI.Views.PadInfoSections"
+             x:Class="FreeformHelper.UI.Views.PadInfoPopover">
+  <Border Classes="padInfoPanel" PointerPressed="OnPopoverPointerPressed">
+    <Grid RowDefinitions="*,Auto">
+      <ContentControl Grid.Row="0" Content="{Binding}">
+        <ContentControl.DataTemplates>
+          <DataTemplate DataType="{x:Type vm:CadPadInfoViewModel}">
+            <views:CadPadInfoContentView/>
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type vm:RegularPadInfoViewModel}">
+            <views:RegularPadInfoContentView/>
+          </DataTemplate>
+        </ContentControl.DataTemplates>
+      </ContentControl>
+
+      <Border Grid.Row="1"
+              Classes="padInfoConfirm"
+              IsVisible="{Binding IsCloseConfirmVisible, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              HorizontalAlignment="Left">
+        <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+          <SelectableTextBlock Classes="padInfoSubtle"
+                               Text="Unsaved changes. Apply or discard."
+                               VerticalAlignment="Center"/>
+
+          <StackPanel Grid.Column="1"
+                      Orientation="Horizontal"
+                      Spacing="{StaticResource Space8}"
+                      Margin="{StaticResource InsetLeft10}"
+                      HorizontalAlignment="Right">
+            <Button Content="Apply"
+                    ToolTip.Tip="Apply changes and close."
+                    Click="ApplyAndClose_Click"/>
+            <Button Content="Discard"
+                    ToolTip.Tip="Discard changes and close."
+                    Click="DiscardAndClose_Click"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</UserControl>

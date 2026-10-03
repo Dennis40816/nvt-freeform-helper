@@ -1,0 +1,868 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             mc:Ignorable="d"
+             x:Class="FreeformHelper.UI.Views.DevView"
+             Background="{DynamicResource BrushBgApp}"
+             Foreground="{DynamicResource BrushTextPrimary}">
+  <Design.DataContext>
+    <vm:DevViewModel/>
+  </Design.DataContext>
+
+  <ScrollViewer x:Name="DevRootScroll"
+                Classes="scrollV2 viewportBoundScroll"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+    <Border x:Name="DebugRoot"
+            Classes="viewportBoundContent"
+            Padding="{DynamicResource Inset24}">
+      <StackPanel Spacing="{DynamicResource Space16}">
+        <SelectableTextBlock x:Name="DevLoadedText"
+                             Text="Dev page (minimal mode)."
+                             FontSize="{DynamicResource FontSizeXl}"
+                             FontWeight="SemiBold"/>
+        <SelectableTextBlock Text="Prototype sections have been trimmed. This page now keeps only lightweight runtime/theme probes."
+                             TextWrapping="Wrap"
+                             Foreground="{DynamicResource BrushTextMuted}"/>
+        <Border Background="{DynamicResource BrushBgPanel}"
+                BorderBrush="{DynamicResource BrushBorderStrong}"
+                BorderThickness="{StaticResource BorderThin}"
+                CornerRadius="{DynamicResource RadiusMd}"
+                Padding="{DynamicResource Inset16}">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <SelectableTextBlock Text="CAD load spinner preview"
+                                 FontSize="{DynamicResource FontSizeLg}"
+                                 FontWeight="SemiBold"/>
+            <SelectableTextBlock Text="Same LoadingSpinner control used by the CAD load host window."
+                                 TextWrapping="Wrap"
+                                 Foreground="{DynamicResource BrushTextMuted}"/>
+            <Button x:Name="DevTriggerSpinnerButton"
+                    HorizontalAlignment="Left"
+                    Content="Show loading spinner (1.5s)"
+                    Click="OnDevTriggerSpinnerClick"/>
+            <Border Background="{DynamicResource BrushBgElevated}"
+                    BorderBrush="{DynamicResource BrushBorderMuted}"
+                    BorderThickness="{StaticResource BorderThin}"
+                    CornerRadius="{DynamicResource RadiusMd}"
+                    Height="{StaticResource DevScrollPreviewHeight}">
+              <Grid>
+                <Border Background="{DynamicResource BrushBgSurfaceInset}"
+                        CornerRadius="{DynamicResource RadiusSm}"
+                        Margin="{DynamicResource Inset12}">
+                  <Grid>
+                    <SelectableTextBlock HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Foreground="{DynamicResource BrushTextMuted}"
+                                         Text="Preview area"/>
+                  </Grid>
+                </Border>
+                <Border x:Name="DevLoadingPreviewOverlay"
+                        IsVisible="False"
+                        Background="{DynamicResource BrushOverlayScrim}"
+                        CornerRadius="{DynamicResource RadiusMd}">
+                  <controls:LoadingSpinner HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           IsAnimationActive="True"/>
+                </Border>
+              </Grid>
+            </Border>
+          </StackPanel>
+        </Border>
+        <Border Classes="workspaceSectionCard">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <SelectableTextBlock Text="Sidebar control states"
+                                 FontSize="{DynamicResource FontSizeLg}"
+                                 FontWeight="SemiBold"/>
+            <Border Classes="workspaceSectionCard">
+              <StackPanel Spacing="{DynamicResource Space8}">
+                <Grid Classes="workspaceSectionHeader"
+                      RowDefinitions="Auto,Auto">
+                  <SelectableTextBlock Classes="workspaceSectionTitle"
+                                       Text="Input"/>
+                  <SelectableTextBlock Grid.Row="1"
+                                       Classes="workspaceSectionSummary"
+                                       Text="Manual uniform source; visible regulars share one scenario snapshot."/>
+                </Grid>
+                <Border Classes="workspaceDetailStrip">
+                  <SelectableTextBlock Classes="workspaceSectionMeta"
+                                       Text="Regular/FW memory frame input projected onto AA grid."/>
+                </Border>
+                <Grid ClipToBounds="False">
+                  <ToggleButton Classes="workspaceFoldHeader">
+                    <Grid Classes="workspaceFoldHeaderContent"
+                          ColumnDefinitions="Auto,*">
+                      <controls:FontIcon Grid.Column="0"
+                                         Classes="symbols"
+                                         Glyph="{x:Static icons:IconGlyphs.ExpandMore}"/>
+                      <SelectableTextBlock Grid.Column="1"
+                                           Classes="workspaceSectionTitle"
+                                           Text="EMS safety"/>
+                    </Grid>
+                  </ToggleButton>
+                  <Border Classes="workspaceFoldCornerBadge">
+                    <SelectableTextBlock Classes="workspaceFoldCornerBadgeText"
+                                         Text="0"/>
+                  </Border>
+                </Grid>
+                <Grid ColumnDefinitions="*,*"
+                      ColumnSpacing="{DynamicResource Space8}">
+                  <Button Classes="actionPrimary actionTextButton workspaceActionButton">
+                    <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                      <controls:FontIcon Grid.Column="0"
+                                         Classes="symbols iconTextButtonLeadingIcon"
+                                         Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                      <SelectableTextBlock Grid.Column="1"
+                                           Classes="iconTextButtonLabel"
+                                           Text="Import"/>
+                      <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                    </Grid>
+                  </Button>
+                  <Button Grid.Column="1"
+                          Classes="actionDanger actionTextButton workspaceActionButton">
+                    <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                      <controls:FontIcon Grid.Column="0"
+                                         Classes="symbols iconTextButtonLeadingIcon"
+                                         Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                      <SelectableTextBlock Grid.Column="1"
+                                           Classes="iconTextButtonLabel"
+                                           Text="Clear"/>
+                      <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                    </Grid>
+                  </Button>
+                </Grid>
+                <StackPanel Spacing="{DynamicResource Space6}">
+                  <Border Classes="workspaceFileRow">
+                    <Grid Classes="workspaceFileRowContent"
+                          ColumnDefinitions="Auto,*">
+                      <controls:FontIcon Grid.Column="0"
+                                         Classes="symbols workspaceFileRowIcon"
+                                         Glyph="{x:Static icons:IconGlyphs.DataObject}"/>
+                      <StackPanel Grid.Column="1" Spacing="{DynamicResource Space2}">
+                        <SelectableTextBlock Classes="workspaceFileRowTitle"
+                                             Text="regular_frame_001.csv"/>
+                        <SelectableTextBlock Classes="workspaceFileRowMeta"
+                                             Text="128 frames, compatible regular grid"/>
+                        <SelectableTextBlock Classes="workspaceFileRowMeta"
+                                             Text="Shape 42 x 36, channel order preserved"/>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                  <Border Classes="workspaceFileRow">
+                    <Grid Classes="workspaceFileRowContent"
+                          ColumnDefinitions="Auto,*">
+                      <controls:FontIcon Grid.Column="0"
+                                         Classes="symbols workspaceFileRowIcon"
+                                         Glyph="{x:Static icons:IconGlyphs.DataObject}"/>
+                      <StackPanel Grid.Column="1" Spacing="{DynamicResource Space2}">
+                        <SelectableTextBlock Classes="workspaceFileRowTitle"
+                                             Text="regular_frame_delta_review_long_filename.csv"/>
+                        <SelectableTextBlock Classes="workspaceFileRowMeta"
+                                             Text="Inspector summary wraps while the filename trims safely."/>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Classes="workspaceDetailStrip"
+                    HorizontalAlignment="Left"
+                    MaxWidth="{StaticResource PanelLeftWidth}">
+              <StackPanel Spacing="{DynamicResource Space8}">
+                <Grid ColumnDefinitions="*,Auto"
+                      ColumnSpacing="{DynamicResource Space8}">
+                  <Grid Classes="workspaceSectionHeader"
+                        RowDefinitions="Auto,Auto">
+                    <SelectableTextBlock Classes="workspaceSectionTitle"
+                                         Text="DXF operation controls"/>
+                    <SelectableTextBlock Grid.Row="1"
+                                         Classes="workspaceSectionSummary"
+                                         Text="Free-form edit actions using action role hierarchy."/>
+                  </Grid>
+                  <Button Grid.Column="1"
+                          Classes="actionDanger actionIconButton dxfEditHeaderAction"
+                          ToolTip.Tip="Reset all DXF edits.">
+                    <controls:FontIcon Classes="symbols iconSm"
+                                       Glyph="{x:Static icons:IconGlyphs.RestartAlt}"/>
+                  </Button>
+                </Grid>
+                <StackPanel Spacing="{DynamicResource Space6}">
+                  <SelectableTextBlock Classes="dxfEditSectionLabel"
+                                       Text="Quick actions"/>
+                  <Border Classes="dxfEditActionGroup">
+                    <StackPanel Spacing="{DynamicResource Space6}">
+                      <SelectableTextBlock Classes="dxfEditActionGroupLabel"
+                                           Text="Hide / restore"/>
+                      <Button Classes="dangerTextButton dxfEditMiniAction"
+                              ToolTip.Tip="Hide selected CAD pads.">
+                        <StackPanel Classes="dxfEditMiniActionContent"
+                                    Orientation="Horizontal"
+                                    Spacing="{DynamicResource Space4}">
+                          <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                             Glyph="{x:Static icons:IconGlyphs.VisibilityOff}"/>
+                          <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                               Text="Hide selected"/>
+                        </StackPanel>
+                      </Button>
+                      <Grid Classes="dxfEditActionGroupRow"
+                            ColumnDefinitions="*,*">
+                        <Button Grid.Column="0"
+                                Classes="dxfEditMiniAction"
+                                ToolTip.Tip="Restore last hidden CAD batch.">
+                          <StackPanel Classes="dxfEditMiniActionContent"
+                                      Orientation="Horizontal"
+                                      Spacing="{DynamicResource Space4}">
+                            <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                               Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+                            <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                                 Text="Undo hide"/>
+                          </StackPanel>
+                        </Button>
+                        <Button Grid.Column="1"
+                                Classes="dxfEditMiniAction"
+                                ToolTip.Tip="Restore all manually hidden CAD pads.">
+                          <StackPanel Classes="dxfEditMiniActionContent"
+                                      Orientation="Horizontal"
+                                      Spacing="{DynamicResource Space4}">
+                            <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                               Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                            <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                                 Text="Show all"/>
+                          </StackPanel>
+                        </Button>
+                      </Grid>
+                    </StackPanel>
+                  </Border>
+                  <Border Classes="dxfEditActionGroup">
+                    <StackPanel Spacing="{DynamicResource Space6}">
+                      <SelectableTextBlock Classes="dxfEditActionGroupLabel"
+                                           Text="Combine / split"/>
+                      <Button Classes="dxfEditMiniAction"
+                              IsEnabled="False"
+                              ToolTip.Tip="Combine selected CAD pads using geometry union.">
+                        <StackPanel Classes="dxfEditMiniActionContent"
+                                    Orientation="Horizontal"
+                                    Spacing="{DynamicResource Space4}">
+                          <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                             Glyph="{x:Static icons:IconGlyphs.Merge}"/>
+                          <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                               Text="Combine"/>
+                        </StackPanel>
+                      </Button>
+                      <Button Classes="dxfEditMiniAction"
+                              IsEnabled="False"
+                              ToolTip.Tip="Split selected combined CAD groups back into their source pads.">
+                        <StackPanel Classes="dxfEditMiniActionContent"
+                                    Orientation="Horizontal"
+                                    Spacing="{DynamicResource Space4}">
+                          <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                             Glyph="{x:Static icons:IconGlyphs.CallSplit}"/>
+                          <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                               Text="Split selected"/>
+                        </StackPanel>
+                      </Button>
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+                <Border Classes="workspaceDetailStrip flat">
+                  <StackPanel Spacing="{DynamicResource Space6}">
+                    <SelectableTextBlock Classes="dxfEditSectionLabel"
+                                         Text="Layer bulk toggle"/>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="{DynamicResource Space6}">
+                      <ToggleButton Classes="dxfLayerBulkToggleButton"
+                                    IsChecked="True"
+                                    ToolTip.Tip="All layers are visible.">
+                        <Grid Classes="dxfLayerBulkToggleContent"
+                              ColumnDefinitions="Auto,*">
+                          <Border Classes="dxfLayerBulkMixedIndicator"
+                                  IsVisible="False"/>
+                          <SelectableTextBlock Grid.Column="1"
+                                               Classes="dxfLayerBulkToggleLabel"
+                                               Text="All on"/>
+                        </Grid>
+                      </ToggleButton>
+                      <ToggleButton Classes="dxfLayerBulkToggleButton"
+                                    ToolTip.Tip="Every layer is hidden.">
+                        <Grid Classes="dxfLayerBulkToggleContent"
+                              ColumnDefinitions="Auto,*">
+                          <Border Classes="dxfLayerBulkMixedIndicator"
+                                  IsVisible="False"/>
+                          <SelectableTextBlock Grid.Column="1"
+                                               Classes="dxfLayerBulkToggleLabel"
+                                               Text="All off"/>
+                        </Grid>
+                      </ToggleButton>
+                      <ToggleButton Classes="dxfLayerBulkToggleButton"
+                                    ToolTip.Tip="Some layers are hidden.">
+                        <Grid Classes="dxfLayerBulkToggleContent"
+                              ColumnDefinitions="Auto,*">
+                          <Border Classes="dxfLayerBulkMixedIndicator"/>
+                          <SelectableTextBlock Grid.Column="1"
+                                               Classes="dxfLayerBulkToggleLabel"
+                                               Text="All off"/>
+                        </Grid>
+                      </ToggleButton>
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+                <StackPanel Spacing="{DynamicResource Space6}">
+                  <SelectableTextBlock Classes="dxfEditSectionLabel"
+                                       Text="Advanced edit"/>
+                  <ToggleButton Classes="workspaceFoldHeader"
+                                IsChecked="True">
+                    <Grid Classes="workspaceFoldHeaderContent"
+                          ColumnDefinitions="Auto,*,Auto">
+                      <controls:FontIcon Grid.Column="0"
+                                         Classes="symbols iconSm"
+                                         Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+                      <SelectableTextBlock Grid.Column="1"
+                                           Text="Advanced edit"
+                                           FontWeight="SemiBold"/>
+                      <controls:FontIcon Grid.Column="2"
+                                         Classes="symbols iconSm"
+                                         Glyph="{x:Static icons:IconGlyphs.ExpandLess}"/>
+                    </Grid>
+                  </ToggleButton>
+                </StackPanel>
+                <Border Classes="workspaceDetailStrip flat">
+                  <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+                        ColumnSpacing="{DynamicResource Space6}">
+                    <SelectableTextBlock Grid.Column="0"
+                                         VerticalAlignment="Center"
+                                         Classes="dxfEditFieldLabel"
+                                         Text="Advanced compact actions"/>
+                    <Button Grid.Column="1"
+                            Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
+                            ToolTip.Tip="Rotate selected CAD pads.">
+                      <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
+                                         Glyph="{x:Static icons:IconGlyphs.RotateRight}"/>
+                    </Button>
+                    <Button Grid.Column="2"
+                            Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
+                            ToolTip.Tip="Move selected CAD pads to layer.">
+                      <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
+                                         Glyph="{x:Static icons:IconGlyphs.DriveFileMove}"/>
+                    </Button>
+                    <Button Grid.Column="3"
+                            Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
+                            ToolTip.Tip="Create layer and move selected CAD pads.">
+                      <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
+                                         Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                    </Button>
+                  </Grid>
+                </Border>
+              </StackPanel>
+            </Border>
+            <Border Classes="workspaceFirstPeekBar">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+                <StackPanel Spacing="{DynamicResource Space4}">
+                  <SelectableTextBlock Classes="workspaceFirstPeekTitle"
+                                       Text="Simulation"/>
+                  <SelectableTextBlock Classes="workspaceFirstPeekSubtitle"
+                                       Text="Regular-grid surface simulation."/>
+                </StackPanel>
+                <WrapPanel Grid.Column="1"
+                           Orientation="Horizontal"
+                           VerticalAlignment="Center">
+                  <Border Classes="chipStatus"
+                          Margin="{DynamicResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText"
+                                         Text="Session ready"/>
+                  </Border>
+                  <Border Classes="chipStatus"
+                          Margin="{DynamicResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText"
+                                         Text="Manual source"/>
+                  </Border>
+                  <Border Classes="chipStatus warning"
+                          Margin="{DynamicResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText"
+                                         Text="Safety warning"/>
+                  </Border>
+                </WrapPanel>
+              </Grid>
+            </Border>
+            <Border Classes="workspaceSecondPeekBar">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+                <WrapPanel Orientation="Horizontal"
+                           VerticalAlignment="Center">
+                  <Border Classes="chipStatus"
+                          Margin="{DynamicResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText"
+                                         Text="v1.1"/>
+                  </Border>
+                  <Border Classes="chipStatus"
+                          Margin="{DynamicResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText"
+                                         Text="Heatmap"/>
+                  </Border>
+                  <Border Classes="chipStatus"
+                          Margin="{DynamicResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText"
+                                         Text="AA area"/>
+                  </Border>
+                </WrapPanel>
+                <SelectableTextBlock Grid.Column="1"
+                                     Classes="workspaceSecondPeekStatus"
+                                     Text="Canvas projected from current workspace"/>
+              </Grid>
+            </Border>
+            <WrapPanel Orientation="Horizontal">
+              <Button Classes="actionIconButton viewportOverlayAction"
+                      Margin="{DynamicResource InsetRight8Bottom6}"
+                      ToolTip.Tip="Icon button">
+                <controls:FontIcon Classes="symbols"
+                                   Glyph="{x:Static icons:IconGlyphs.Search}"/>
+              </Button>
+              <ToggleButton Classes="actionIconButton viewportOverlayAction"
+                            Margin="{DynamicResource InsetRight8Bottom6}"
+                            IsChecked="True"
+                            ToolTip.Tip="Selected icon button">
+                <controls:FontIcon Classes="symbols"
+                                   Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+              </ToggleButton>
+              <Button Classes="workspaceActionButton"
+                      Width="{StaticResource NotchExportPrimaryButtonMinWidth}"
+                      Margin="{DynamicResource InsetRight8Bottom6}"
+                      ToolTip.Tip="Icon + text action">
+                <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                  <controls:FontIcon Grid.Column="0"
+                                     Classes="symbols iconTextButtonLeadingIcon"
+                                     Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                  <SelectableTextBlock Grid.Column="1"
+                                       Classes="iconTextButtonLabel"
+                                       Text="Copy result"/>
+                  <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                </Grid>
+              </Button>
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal">
+              <Button Classes="actionChip chipAction"
+                      Margin="{DynamicResource InsetRight6Bottom6}">
+                <Grid Classes="workspacePresetButtonContent" ColumnDefinitions="Auto,*">
+                  <controls:FontIcon Grid.Column="0"
+                                     Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                  <SelectableTextBlock Grid.Column="1"
+                                       Classes="workspacePresetButtonLabel"
+                                       Text="Uniform 400"/>
+                </Grid>
+              </Button>
+              <Button Classes="actionChip chipAction"
+                      Margin="{DynamicResource InsetRight6Bottom6}">
+                <Grid Classes="workspacePresetButtonContent" ColumnDefinitions="Auto,*">
+                  <controls:FontIcon Grid.Column="0"
+                                     Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                  <SelectableTextBlock Grid.Column="1"
+                                       Classes="workspacePresetButtonLabel"
+                                       Text="Zero"/>
+                </Grid>
+              </Button>
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal">
+              <Border Classes="chipStatus"
+                      Margin="{DynamicResource InsetRight6Bottom6}">
+                <SelectableTextBlock Classes="chipStatusText"
+                                     Text="Primary summary"/>
+              </Border>
+              <Border Classes="chipStatus warning"
+                      Margin="{DynamicResource InsetRight6Bottom6}">
+                <SelectableTextBlock Classes="chipStatusText"
+                                     Text="Warning status"/>
+              </Border>
+              <Border Classes="chipStatus danger"
+                      Margin="{DynamicResource InsetRight6Bottom6}">
+                <SelectableTextBlock Classes="chipStatusText"
+                                     Text="Long AA source summary with active layer and coordinate reference details"/>
+              </Border>
+            </WrapPanel>
+            <Border Classes="workspaceInspectorContextStrip">
+              <SelectableTextBlock Classes="workspaceInspectorContextText"
+                                   Text="Selected REG (R128, C064), AA center 25.000 mm x 18.750 mm, source layer L2 copper, export-ready coordinate status."/>
+            </Border>
+          </StackPanel>
+        </Border>
+        <Border Classes="workspaceSectionCard">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <SelectableTextBlock Text="Action role laboratory"
+                                 FontSize="{DynamicResource FontSizeLg}"
+                                 FontWeight="SemiBold"/>
+            <WrapPanel Orientation="Horizontal">
+              <Button Classes="actionTextButton actionNeutral"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <SelectableTextBlock Text="Neutral"/>
+              </Button>
+              <ToggleButton Classes="actionTextButton actionNeutral"
+                            IsChecked="True"
+                            Margin="{DynamicResource InsetRight8Bottom6}">
+                <SelectableTextBlock Text="Neutral selected"/>
+              </ToggleButton>
+              <Button Classes="actionTextButton actionNeutral"
+                      IsEnabled="False"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <SelectableTextBlock Text="Neutral disabled"/>
+              </Button>
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal">
+              <Button Classes="actionTextButton actionPrimary"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="{DynamicResource Space6}">
+                  <controls:FontIcon Grid.Column="0"
+                                     Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.PlayArrow}"/>
+                  <SelectableTextBlock Grid.Column="1"
+                                       Text="Primary"/>
+                </Grid>
+              </Button>
+              <Button Classes="actionTextButton actionDanger"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="{DynamicResource Space6}">
+                  <controls:FontIcon Grid.Column="0"
+                                     Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                  <SelectableTextBlock Grid.Column="1"
+                                       Text="Danger"/>
+                </Grid>
+              </Button>
+              <Button Classes="actionIconButton actionGhost"
+                      Margin="{DynamicResource InsetRight8Bottom6}"
+                      ToolTip.Tip="Ghost icon action">
+                <controls:FontIcon Classes="symbols"
+                                   Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+              </Button>
+              <ToggleButton Classes="actionIconButton actionGhost"
+                            IsChecked="True"
+                            Margin="{DynamicResource InsetRight8Bottom6}"
+                            ToolTip.Tip="Checked ghost icon action">
+                <controls:FontIcon Classes="symbols"
+                                   Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+              </ToggleButton>
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal">
+              <Button Classes="actionIconButton viewportOverlayAction"
+                      Margin="{DynamicResource InsetRight8Bottom6}"
+                      ToolTip.Tip="Viewport search action">
+                <controls:FontIcon Classes="symbols"
+                                   Glyph="{x:Static icons:IconGlyphs.Search}"/>
+              </Button>
+              <ToggleButton Classes="actionIconButton viewportOverlayAction"
+                            IsChecked="True"
+                            Margin="{DynamicResource InsetRight8Bottom6}"
+                            ToolTip.Tip="Checked viewport visibility action">
+                <controls:FontIcon Classes="symbols"
+                                   Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+              </ToggleButton>
+              <Button Classes="actionIconButton panelChromeToggle"
+                      Margin="{DynamicResource InsetRight8Bottom6}"
+                      ToolTip.Tip="Panel chrome toggle action">
+                <controls:FontIcon Classes="symbols"
+                                   Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+              </Button>
+              <Border Background="{DynamicResource BrushBgSurface}"
+                      BorderBrush="{DynamicResource BrushBorder}"
+                      BorderThickness="{StaticResource BorderThin}"
+                      CornerRadius="{DynamicResource RadiusPill}"
+                      Padding="{DynamicResource Inset8_4}"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <StackPanel Orientation="Horizontal">
+                  <Button Classes="actionIconButton consoleHeaderAction"
+                          Margin="{DynamicResource InsetRight6}"
+                          ToolTip.Tip="Console copy action">
+                    <controls:FontIcon Classes="symbols"
+                                       Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                  </Button>
+                  <ToggleButton Classes="actionIconButton consoleHeaderAction"
+                                IsChecked="True"
+                                ToolTip.Tip="Checked console toggle action">
+                    <controls:FontIcon Classes="symbols"
+                                       Glyph="{x:Static icons:IconGlyphs.ContentPasteOff}"/>
+                  </ToggleButton>
+                </StackPanel>
+              </Border>
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal">
+              <Button Classes="actionChip chipAction"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <SelectableTextBlock Text="Uniform 400"/>
+              </Button>
+              <ToggleButton Classes="actionChip chipAction"
+                            IsChecked="True"
+                            Margin="{DynamicResource InsetRight8Bottom6}">
+                <SelectableTextBlock Text="Zero"/>
+              </ToggleButton>
+              <Button Classes="actionChip chipAction"
+                      IsEnabled="False"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <SelectableTextBlock Text="Disabled preset"/>
+              </Button>
+              <Border Classes="chipStatus success"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <SelectableTextBlock Text="EMS OK"/>
+              </Border>
+              <Border Classes="chipStatus warning"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <SelectableTextBlock Text="Violations 0"/>
+              </Border>
+              <Border Classes="chipStatus danger"
+                      Margin="{DynamicResource InsetRight8Bottom6}">
+                <SelectableTextBlock Text="Max After 486"/>
+              </Border>
+            </WrapPanel>
+            <StackPanel Spacing="{DynamicResource Space6}">
+              <SelectableTextBlock Text="Neutral matrix"
+                                   FontWeight="SemiBold"/>
+              <WrapPanel Orientation="Horizontal">
+                <Button Classes="actionTextButton actionNeutral"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Button"/>
+                </Button>
+                <ToggleButton Classes="actionTextButton actionNeutral"
+                              IsChecked="True"
+                              Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Checked"/>
+                </ToggleButton>
+                <Button Classes="actionIconButton actionNeutral"
+                        Margin="{DynamicResource InsetRight8Bottom6}"
+                        ToolTip.Tip="Neutral icon action">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                </Button>
+                <Button Classes="actionTextButton actionNeutral"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <Grid ColumnDefinitions="Auto,*"
+                        ColumnSpacing="{DynamicResource Space6}">
+                    <controls:FontIcon Grid.Column="0"
+                                       Classes="symbols"
+                                       Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Text="Icon + text"/>
+                  </Grid>
+                </Button>
+                <Button Classes="actionTextButton actionNeutral"
+                        IsEnabled="False"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Disabled"/>
+                </Button>
+              </WrapPanel>
+            </StackPanel>
+            <StackPanel Spacing="{DynamicResource Space6}">
+              <SelectableTextBlock Text="Primary matrix"
+                                   FontWeight="SemiBold"/>
+              <WrapPanel Orientation="Horizontal">
+                <Button Classes="actionTextButton actionPrimary"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Button"/>
+                </Button>
+                <ToggleButton Classes="actionTextButton actionPrimary"
+                              IsChecked="True"
+                              Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Checked"/>
+                </ToggleButton>
+                <Button Classes="actionIconButton actionPrimary"
+                        Margin="{DynamicResource InsetRight8Bottom6}"
+                        ToolTip.Tip="Primary icon action">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.PlayArrow}"/>
+                </Button>
+                <Button Classes="actionTextButton actionPrimary"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <Grid ColumnDefinitions="Auto,*"
+                        ColumnSpacing="{DynamicResource Space6}">
+                    <controls:FontIcon Grid.Column="0"
+                                       Classes="symbols"
+                                       Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Text="Icon + text"/>
+                  </Grid>
+                </Button>
+                <Button Classes="actionTextButton actionPrimary"
+                        IsEnabled="False"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Disabled"/>
+                </Button>
+              </WrapPanel>
+            </StackPanel>
+            <StackPanel Spacing="{DynamicResource Space6}">
+              <SelectableTextBlock Text="Danger matrix"
+                                   FontWeight="SemiBold"/>
+              <WrapPanel Orientation="Horizontal">
+                <Button Classes="actionTextButton actionDanger"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Button"/>
+                </Button>
+                <ToggleButton Classes="actionTextButton actionDanger"
+                              IsChecked="True"
+                              Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Checked"/>
+                </ToggleButton>
+                <Button Classes="actionIconButton actionDanger"
+                        Margin="{DynamicResource InsetRight8Bottom6}"
+                        ToolTip.Tip="Danger icon action">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                </Button>
+                <Button Classes="actionTextButton actionDanger"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <Grid ColumnDefinitions="Auto,*"
+                        ColumnSpacing="{DynamicResource Space6}">
+                    <controls:FontIcon Grid.Column="0"
+                                       Classes="symbols"
+                                       Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Text="Icon + text"/>
+                  </Grid>
+                </Button>
+                <Button Classes="actionTextButton actionDanger"
+                        IsEnabled="False"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Disabled"/>
+                </Button>
+              </WrapPanel>
+            </StackPanel>
+            <StackPanel Spacing="{DynamicResource Space6}">
+              <SelectableTextBlock Text="Ghost matrix"
+                                   FontWeight="SemiBold"/>
+              <WrapPanel Orientation="Horizontal">
+                <Button Classes="actionTextButton actionGhost"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Button"/>
+                </Button>
+                <ToggleButton Classes="actionTextButton actionGhost"
+                              IsChecked="True"
+                              Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Checked"/>
+                </ToggleButton>
+                <Button Classes="actionIconButton actionGhost"
+                        Margin="{DynamicResource InsetRight8Bottom6}"
+                        ToolTip.Tip="Ghost icon action">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                </Button>
+                <Button Classes="actionTextButton actionGhost"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <Grid ColumnDefinitions="Auto,*"
+                        ColumnSpacing="{DynamicResource Space6}">
+                    <controls:FontIcon Grid.Column="0"
+                                       Classes="symbols"
+                                       Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Text="Icon + text"/>
+                  </Grid>
+                </Button>
+                <Button Classes="actionTextButton actionGhost"
+                        IsEnabled="False"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Disabled"/>
+                </Button>
+              </WrapPanel>
+            </StackPanel>
+            <StackPanel Spacing="{DynamicResource Space6}">
+              <SelectableTextBlock Text="Viewport matrix"
+                                   FontWeight="SemiBold"/>
+              <WrapPanel Orientation="Horizontal">
+                <Button Classes="actionIconButton viewportOverlayAction"
+                        Margin="{DynamicResource InsetRight8Bottom6}"
+                        ToolTip.Tip="Fit viewport">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                </Button>
+                <ToggleButton Classes="actionIconButton viewportOverlayAction"
+                              IsChecked="True"
+                              Margin="{DynamicResource InsetRight8Bottom6}"
+                              ToolTip.Tip="Toggle viewport visibility">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                </ToggleButton>
+                <Button Classes="actionIconButton viewportOverlayAction"
+                        IsEnabled="False"
+                        Margin="{DynamicResource InsetRight8Bottom6}"
+                        ToolTip.Tip="Disabled viewport search">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.Search}"/>
+                </Button>
+              </WrapPanel>
+            </StackPanel>
+            <StackPanel Spacing="{DynamicResource Space6}">
+              <SelectableTextBlock Text="Console matrix"
+                                   FontWeight="SemiBold"/>
+              <Border Background="{DynamicResource BrushBgSurface}"
+                      BorderBrush="{DynamicResource BrushBorder}"
+                      BorderThickness="{StaticResource BorderThin}"
+                      CornerRadius="{DynamicResource RadiusPill}"
+                      Padding="{DynamicResource Inset8_4}">
+                <WrapPanel Orientation="Horizontal">
+                  <Button Classes="actionIconButton consoleHeaderAction"
+                          Margin="{DynamicResource InsetRight6Bottom6}"
+                          ToolTip.Tip="Copy console text">
+                    <controls:FontIcon Classes="symbols"
+                                       Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                  </Button>
+                  <ToggleButton Classes="actionIconButton consoleHeaderAction"
+                                IsChecked="True"
+                                Margin="{DynamicResource InsetRight6Bottom6}"
+                                ToolTip.Tip="Toggle console filter">
+                    <controls:FontIcon Classes="symbols"
+                                       Glyph="{x:Static icons:IconGlyphs.ContentPasteOff}"/>
+                  </ToggleButton>
+                  <Button Classes="actionIconButton consoleHeaderAction"
+                          IsEnabled="False"
+                          Margin="{DynamicResource InsetRight6Bottom6}"
+                          ToolTip.Tip="Disabled console delete">
+                    <controls:FontIcon Classes="symbols"
+                                       Glyph="{x:Static icons:IconGlyphs.Delete}"/>
+                  </Button>
+                </WrapPanel>
+              </Border>
+            </StackPanel>
+            <StackPanel Spacing="{DynamicResource Space6}">
+              <SelectableTextBlock Text="Chip matrix"
+                                   FontWeight="SemiBold"/>
+              <WrapPanel Orientation="Horizontal">
+                <Button Classes="actionChip chipAction"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Preset"/>
+                </Button>
+                <ToggleButton Classes="actionChip chipAction"
+                              IsChecked="True"
+                              Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Checked"/>
+                </ToggleButton>
+                <Button Classes="actionChip chipAction"
+                        IsEnabled="False"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Disabled"/>
+                </Button>
+                <Border Classes="chipStatus"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Status"/>
+                </Border>
+                <Border Classes="chipStatus success"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Success"/>
+                </Border>
+                <Border Classes="chipStatus warning"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Warning"/>
+                </Border>
+                <Border Classes="chipStatus danger"
+                        Margin="{DynamicResource InsetRight8Bottom6}">
+                  <SelectableTextBlock Text="Danger"/>
+                </Border>
+              </WrapPanel>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <SelectableTextBlock x:Name="DevProbeText"
+                             TextWrapping="Wrap"
+                             Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}}"/>
+      </StackPanel>
+    </Border>
+  </ScrollViewer>
+</UserControl>

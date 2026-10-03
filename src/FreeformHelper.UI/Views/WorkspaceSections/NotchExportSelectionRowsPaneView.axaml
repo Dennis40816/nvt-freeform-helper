@@ -1,0 +1,189 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.NotchExportSelectionRowsPaneView">
+      <Grid RowDefinitions="Auto,Auto,*"
+            RowSpacing="{StaticResource Space6}">
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space8}">
+              <ScrollViewer Grid.Column="0"
+                            Classes="scrollV2 workspaceGroupStripScroll"
+                            AllowAutoHide="False"
+                            VerticalScrollBarVisibility="Disabled"
+                            HorizontalScrollBarVisibility="Auto"
+                            IsVisible="{Binding HasRows}">
+                <ItemsControl ItemsSource="{Binding IcGroups}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space8}"/>
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Border Classes="workspaceGroupToolbarItem">
+                        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto"
+                              ColumnSpacing="{StaticResource Space8}">
+                          <SelectableTextBlock Grid.Column="0"
+                                               Classes="workspaceGroupTitle"
+                                               Text="{Binding HeaderText}"/>
+                          <SelectableTextBlock Grid.Column="1"
+                                               Classes="workspaceGroupSummary"
+                                               Text="{Binding SummaryText}"/>
+                          <Button Grid.Column="2"
+                                  Classes="workspaceTextAction"
+                                  Content="All"
+                                  Command="{Binding SelectAllGroupCommand}"/>
+                          <Button Grid.Column="3"
+                                  Classes="workspaceTextAction"
+                                  Content="None"
+                                  Command="{Binding SelectNoneGroupCommand}"/>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+
+              <Button Grid.Column="1"
+                      Classes="workspaceSubtleAction"
+                      Content="Apply shown as selection"
+                      Command="{Binding UseShownOnlyCommand}"
+                      ToolTip.Tip="Replace selected rows with currently shown rows."
+                      VerticalAlignment="Center"/>
+            </Grid>
+
+            <Border Grid.Row="1"
+                    Classes="workspaceTableHeader">
+              <Grid ColumnSpacing="{StaticResource Space8}">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="{StaticResource NotchExportTableColCheckWidth}"/>
+                  <ColumnDefinition Width="{StaticResource NotchExportTableColRowWidth}"/>
+                  <ColumnDefinition Width="{StaticResource NotchExportTableColIcWidth}"/>
+                  <ColumnDefinition Width="{StaticResource NotchExportTableColDiffWidth}"/>
+                  <ColumnDefinition Width="{StaticResource NotchExportTableColMatchWidth}"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="{StaticResource NotchExportTableColStatusWidth}"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0"
+                          IsChecked="{Binding AreAllVisibleRowsSelected, Mode=TwoWay}"
+                          IsEnabled="{Binding HasRows}"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Opacity="{StaticResource OpacityHigh}"/>
+                <Button Grid.Column="1"
+                        Classes="workspaceTableHeaderButton"
+                        Classes.active="{Binding IsRowColumnFilterActive}"
+                        Content="#"
+                        Tag="row"
+                        Click="OpenHeaderFilterButton_Click"
+                        ToolTip.Tip="Filter # values (Excel-style)."/>
+                <Button Grid.Column="2"
+                        Classes="workspaceTableHeaderButton"
+                        Classes.active="{Binding IsIcColumnFilterActive}"
+                        Content="IC"
+                        Tag="ic"
+                        Click="OpenHeaderFilterButton_Click"
+                        ToolTip.Tip="Filter IC values (Excel-style)."/>
+                <Button Grid.Column="3"
+                        Classes="workspaceTableHeaderButton"
+                        Classes.active="{Binding IsDiffColumnFilterActive}"
+                        Content="Diff"
+                        Tag="diff"
+                        Click="OpenHeaderFilterButton_Click"
+                        ToolTip.Tip="Filter Diff values (Excel-style)."/>
+                <Button Grid.Column="4"
+                        Classes="workspaceTableHeaderButton"
+                        Classes.active="{Binding IsMatchColumnFilterActive}"
+                        Content="Combine"
+                        Tag="match"
+                        Click="OpenHeaderFilterButton_Click"
+                        ToolTip.Tip="Filter Combine values (Excel-style)."/>
+                <Button Grid.Column="5"
+                        Classes="workspaceTableHeaderButton"
+                        Classes.active="{Binding IsMappingColumnFilterActive}"
+                        Content="REG -> CAD"
+                        Tag="map"
+                        Click="OpenHeaderFilterButton_Click"
+                        ToolTip.Tip="Filter REG -> CAD values (Excel-style)."/>
+                <Button Grid.Column="6"
+                        Classes="workspaceTableHeaderButton"
+                        Classes.active="{Binding IsStatusColumnFilterActive}"
+                        Content="Status"
+                        Tag="status"
+                        Click="OpenHeaderFilterButton_Click"
+                        ToolTip.Tip="Filter Status values (Excel-style)."/>
+              </Grid>
+            </Border>
+
+            <ListBox Grid.Row="2"
+                     Classes="scrollV2 workspaceDataList"
+                     BorderThickness="0"
+                     Background="Transparent"
+                     MaxHeight="{StaticResource NotchExportSelectionListMaxHeight}"
+                     ItemsSource="{Binding Rows}"
+                     SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                     ScrollViewer.AllowAutoHide="False"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+              <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+              </ListBox.ItemsPanel>
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Button Classes="workspaceDataRow"
+                          Classes.workspaceDataRowActive="{Binding IsPreviewSelected}"
+                          Command="{Binding DataContext.SelectPreviewRowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                          CommandParameter="{Binding}">
+                    <Grid ColumnSpacing="{StaticResource Space8}">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource NotchExportTableColCheckWidth}"/>
+                        <ColumnDefinition Width="{StaticResource NotchExportTableColRowWidth}"/>
+                        <ColumnDefinition Width="{StaticResource NotchExportTableColIcWidth}"/>
+                        <ColumnDefinition Width="{StaticResource NotchExportTableColDiffWidth}"/>
+                        <ColumnDefinition Width="{StaticResource NotchExportTableColMatchWidth}"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="{StaticResource NotchExportTableColStatusWidth}"/>
+                      </Grid.ColumnDefinitions>
+                      <CheckBox Grid.Column="0"
+                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+                      <SelectableTextBlock Grid.Column="1"
+                                           Classes="workspaceDataCellText strong"
+                                           Text="{Binding RowNumberText}"/>
+                      <SelectableTextBlock Grid.Column="2"
+                                           Classes="workspaceDataCellText"
+                                           Text="{Binding IcText}"/>
+                      <SelectableTextBlock Grid.Column="3"
+                                           Classes="workspaceDataCellText"
+                                           Text="{Binding DiffText}"/>
+                      <SelectableTextBlock Grid.Column="4"
+                                           Classes="workspaceDataCellText"
+                                           Text="{Binding MatchSummaryText}"/>
+                      <SelectableTextBlock Grid.Column="5"
+                                           Classes="workspaceDataCellText"
+                                           Text="{Binding MappingText}"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip.Tip="{Binding MappingText}"/>
+                      <Border Grid.Column="6"
+                              Classes="validationRowKindTag workspaceContextBadge"
+                              Classes.incoming="{Binding IsStatusLinked}"
+                              Classes.outgoing="{Binding IsStatusWarning}"
+                              Classes.nocad="{Binding IsStatusNoCad}"
+                              Classes.legacy="{Binding IsStatusLegacy}"
+                              HorizontalAlignment="Left">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="{Binding StatusText}"/>
+                      </Border>
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+      </Grid>
+</UserControl>

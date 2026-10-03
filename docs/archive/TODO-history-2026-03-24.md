@@ -1,0 +1,971 @@
+# TODO（Active Backlog）
+
+> 歷史封存：
+> - `docs/archive/TODO-history-2026-03-05.md`
+> - `docs/archive/TODO-S6-closed-2026-03-06.md`
+>
+> 最新已收斂批次：請見最近的 milestone commit。
+
+## 工作規則（非任務）
+- 每個任務完成時：`build + 對應 tests + lint`。
+- 每個里程碑：`commit + push`。
+- 功能實作或範圍變更時，立即同步更新本檔。
+
+## Beta 1.0 必做（本次）
+- 目前無未完成 blocker。
+- 本次進度已進入驗收 / case 掃描 / 必要 bug fix 階段；若驗收再發現 release blocker，新增到本區。
+
+## Beta 1.1 預計完成
+- [x] S11.72 同步文件與 TODO：`SeeRegular.csv` regular mask 已改為 Step 1 顯式匯入，不再自動載入
+  - 觀察依據：
+    - 目前程式契約已改為：`Step 1 · Geometry match` 手動 `Import SeeRegular.csv` + `Use SeeRegular mask` toggle。
+    - 但 `TODO.md` 與 stale-check 文件仍殘留「Load Project 後會自動載入 SeeRegular.csv」的舊敘述，容易誤導第一版驗證。
+  - 目標：
+    - 更新 `TODO.md`、`docs/reference/behavior-inventory.md`、必要的 workflow 說明，使 regular mask 契約明確為：
+      - session-only
+      - Step 1 顯式匯入
+      - Step 4 / Simulation 共用同一份 mask state
+    - 清楚寫出：切換 project / DXF 後會清掉既有 mask 選擇，不自動回補同資料夾 `SeeRegular.csv`。
+  - 驗證：
+    - 文件與實作行為一致
+    - `LoadProject_DoesNotAutoLoadRegularSignalMask_AndManualImportCanToggleBestMatch` 持續通過
+- [x] S11.73 重整 Step 4 diagnostics / Analyze mapping 介面，改成 decision-first、可驗證優先的資訊架構
+  - 觀察依據：
+    - 目前 `Analyze mapping` 同時塞入 `issue list`、`raw best`、`masked best`、`CSV-confirmed candidates`、`suggested diff idx`、`current assigned diff idx`、`override` 等多層概念，但缺乏主次順序。
+    - `IndexMappingReportWindow` 現在是長清單 + 多段文字，沒有明確回答使用者最常問的三件事：
+      - 哪些 CAD 需要先看
+      - 為什麼它被判成這個 diff
+      - mask / CSV 是否真的改變了結果
+    - `Step 4` 右側摘要與報表也存在名詞重複：`Diagnostics`、`Regular mask`、`Analyze mapping`、`CSV-confirmed best match`，但沒有單一 decision summary。
+  - 目標：
+    - 將 diagnostics 收斂成 `decision-first`：先顯示 `Changed / Removed / Ambiguous / Unmapped` 等高價值問題，再進入細節。
+    - 建立單一共享 report section model，避免 issue list 與 mask audit 各講各的。
+    - 強化與 AA/canvas 的互動：從報表到畫布 focus 的主路徑更明確，並降低文字噪音。
+  - 驗證：
+    - `Analyze mapping` 的主視圖能在不展開長文字的情況下，快速看出 top problems
+    - `Step 4` 摘要與 `IndexMappingReportWindow` 對同一 CAD 的結論一致
+    - UI smoke / ViewModel tests 補齊新的 summary 與 filter 契約
+- [ ] S11.63 建立 `TM 8.1` notch v2.1 / v2.2 驗收矩陣與可疑案例盤點
+  - 觀察依據：
+    - `TM 8.1` 已作為 `golden baseline` 專案之一，但目前 baseline 只鎖 row count / 版本分布 / sample rows，尚未形成可直接驗收的「案例矩陣」。
+    - 使用者目前進入 `v2.1 / v2.2` 最後微調階段，需要一份以真實專案為基底的合理性盤點：哪些 row 合理、哪些 no-op / warning / shared-regular case 仍需人工確認。
+  - 目標：
+    - 以 `TM 8.1` 產出固定驗收矩陣：`v2.1` / `v2.2` row 分布、no-op 比例、warning 類型、shared-regular / duplicate / freeform tail-link 案例。
+    - 將已知重點案例（如 `CAD113 / CAD364 / CAD402 / CAD490 / CAD491`）整理成固定驗收清單，讓之後 notch 微調有明確回歸基準。
+  - 驗證：
+    - `golden baseline` 仍通過
+    - 補充 `TM 8.1` 專案等級的 notch 驗收文件/測試，不只驗 sample row，還能驗代表性 case 契約
+- [x] S11.64 新增「notch apply 前後 diff 分布模擬頁」與 CSV 匯入資料流
+  - 觀察依據：
+    - 使用者需要在套用 notch table 前後，比較 regular pad 的 diff 分布變化量，而目前 repo 缺少一個可直接導入實測資料（多張 CSV）並模擬 apply 前後差異的頁面。
+    - `nds_helper` 已有可參考的 frame CSV 匯入邏輯：
+      - `<nds_helper repo>\\test\\data\\test.csv`
+      - `<nds_helper repo>\\nds_helper\\lib\\frame_extractor\\parser.py`
+      - `<nds_helper repo>\\nds_helper\\lib\\frame_extractor\\utils.py`
+  - 目標：
+    - 新增一個 review/simulation 頁面，能導入一或多張 CSV frame 資料，建立「apply notch table 前 / 後」的 diff 分布比較。
+    - 頁面至少提供：
+      - frame/CSV 匯入與資料摘要
+      - regular pad 對應矩陣預覽
+      - before/after diff histogram
+      - per-regular delta heatmap / hotspot
+      - 指定 notch row / version 套用模擬
+    - 解析流程需共用單一路徑 importer，不在 UI/ViewModel 重寫另一套 CSV parser。
+  - 驗證：
+    - 可成功載入 `test.csv` 格式的 frame data
+    - 可同時匯入多檔 CSV 並產生統一 frame dataset
+    - apply/not apply 的 diff 分布與 per-regular delta 能重現並導出
+  - 目前進度：
+    - 已完成第一個里程碑：`Application` 層單一路徑 `DiffFrameCsvImporter` / `DiffFrameGridProjectionService`
+    - 已支援：
+      - 單檔 / 多檔 CSV frame 匯入
+      - `timestamp / Frame index / Break point index / DiffData` metadata 解析
+      - inline marker payload
+      - frame 矩陣一致性驗證
+      - 與 `RegularGrid` 的尺寸相容檢查與投影 diagnostics
+    - 已完成第二個里程碑：`Application` 層單一路徑 `NotchApplySimulationService`
+    - 已支援：
+      - `v2.2` anchor diff -> target diff 的 before/after/delta 模擬
+      - continuation row 合併回單一 anchor action
+      - `single frame / mean frame` 聚合
+      - per-regular / per-diff result model 與 action trace
+    - 已完成第三個里程碑：最小 `review/simulation` 頁面
+    - 已支援：
+      - modeless `Notch apply simulation` 視窗
+      - 多檔 CSV 匯入與檔案摘要
+      - `v2.2` version / `single frame` / `mean frame` 切換
+      - changed-cell list + inspector + action trace
+      - row click / focus 回 AA 區
+      - 與 export/DXF review 一致的 floating-window-aware focus 避讓
+    - 已完成現代互動第一輪：
+      - 三層 header / summary / toolbar 結構
+      - live search
+      - sort mode 切換
+      - keyboard shortcuts（`Ctrl+O` / `F` / `Esc`）
+      - toolbar / chips / list row 視覺與 export review 對齊
+    - 已完成第四個里程碑：凍結 `v2.1` apply 契約 + 視覺分析層
+    - 已支援：
+      - `v2.1 legacy approximation` apply 契約
+      - `v2.2 diff-centric apply` 契約
+      - before / after / delta histogram
+      - per-regular delta heatmap
+      - hotspot list 與 row/cell 同步 focus
+      - changed-cell / hotspot / AA focus 共用單一路徑
+    - 已完成第五個里程碑：`AA-first` simulation 工作頁
+    - 已支援：
+      - `Simulation` 與 `Dev` 同層級的 shell 頁面承載，不再走獨立浮動視窗
+      - 以 workspace 既有 `RegularGrid` 作為唯一 AA 投影來源，不再建立第二份 regular pad 集合
+      - `Before / After / Delta / Changed only` 視圖切換
+      - `AUTO / TH` 著色模式切換，顏色規則由單一路徑 projection 決定
+      - 每顆 regular pad 直接在 AA 區顯示 diff 數值與 `Diff idx` badge
+      - `Area` 篩選（workspace / per-IC）與 frame slider / play-pause 動畫播放
+      - AA 點選、右側 inspector、hotspot、histogram 共用同一份 simulation snapshot
+- [ ] S11.52 建立 repo 級別封裝契約：類外部狀態變更必須走類 API / service API
+  - 觀察依據：
+    - 近期雖已在 `PadCanvas` selection、export projection、spinner lifecycle 等處逐步收斂單一路徑，但 repo 仍存在「類外 caller 直接組裝 side effects / 直接操作內部狀態」的歷史痕跡。
+    - 這類寫法會讓相同行為在多個 caller 端平行演化，後續容易再出現 selection / loading / status / DXF edit 之類的分支漂移。
+  - 目標：
+    - 建立明確契約：非類內修改不得直接碰內部狀態集合、不得在 caller 端平行拼裝 side effects，必須走公開 API、dedicated service 或 use case。
+    - 先以 hotspot 掃描 + 漸進式收斂為主，不一次大改全 repo；優先處理 user-visible workflow 與 shared state model。
+    - 將「多入口但單一路徑」與「不可接受的多路徑重算/多路徑變更」寫入規範與掃描清單。
+  - 驗證：
+    - `repo scan` 明確列出仍存在的 direct state mutation hotspots 與對應收斂路線
+    - 每個收斂里程碑：`dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - 對應 regression tests + `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [ ] S11.59 新增 CAD display index（左上到右下排序）但不變更內部 CadPadId 契約
+  - 觀察依據：
+    - 使用者希望 CAD 編號更貼近畫面閱讀順序，但目前 `CadPadId` 是 project state / overrides / query / selection 的穩定鍵，不能直接改成視覺排序號。
+  - 目標：
+    - 保留 `CadPadId` 作為系統穩定鍵
+    - 另外建立 `CAD display index`，依左上到右下排序，僅用於 UI 顯示與人工檢視
+  - 驗證：
+    - save/load / export / runtime query / overrides 仍以 `CadPadId` 為唯一鍵
+    - UI 可額外顯示 display index，但不改動既有 id 契約
+- [ ] S11.29 拆分 `NotchExportSelectionViewModel` 剩餘 orchestration，降低單檔風險
+  - 觀察依據：
+    - `src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs` 仍是 650+ 行 hotspot
+    - filter/projection 已收斂單一路徑，但 VM 仍同時承擔 command wiring、preview retention、workspace link、toolbar state
+  - 目標：
+    - 將非 UI-state 的 orchestration 再抽成 service / helper，保留 shared projection path 不變
+- [ ] S11.30 依設定分頁拆分 `FreeformHelperViewModel.Settings.PropertyCallbacks`
+  - 觀察依據：
+    - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.cs` 仍是 500+ 行 hotspot
+    - settings side effects 已收斂到 single apply/orchestration path，但 partial callback 檔仍過大，不利維護
+  - 目標：
+    - 依 `General / Step1 / Step2 / Step3 / Step4 / Step5` 拆成多個 partial files，不改動現有 orchestration 契約
+- [ ] S11.31 依 edit 類型拆分 `FreeformHelperViewModel.DxfEditing.Edits`
+  - 觀察依據：
+    - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Edits.cs` 仍是 470+ 行 hotspot
+    - hidden / combine / reset 契約已修正，但 edit command flow 仍集中在單檔
+  - 目標：
+    - 保持 single-entry command 契約不變，將 hidden/combine/reset 依工作流拆分為較小 partial / service
+- [x] S11.74 拆分 `SimulationWorkspaceViewModel`，將 projection / playback / override editor / legend state 分離
+  - 觀察依據：
+    - `src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.cs` 目前已超過 1100 行。
+    - 它同時承擔：
+      - CSV/manual source workflow
+      - simulation snapshot 投影
+      - legend / color scale 文案
+      - frame playback
+      - selected-regular inspector
+      - manual override editor
+    - 這塊最近仍在持續加功能；若不先拆，之後再加輸入模型、動畫、CSV-confirmed surface 很容易互相踩壞。
+  - 目標：
+    - 保留 `SimulationWorkspaceUseCase -> snapshot` 單一路徑不變。
+    - 將 UI 端至少拆成：
+      - overlay/legend projection
+      - playback state
+      - selected-regular editor
+      - source import orchestration
+    - 避免 `OnPropertyChanged` 與 `RefreshSnapshot()` 擴散成更多隱性耦合。
+- [x] S11.75 拆分 `IndexMappingReportViewModel`，將 decision projection / filter state / review actions 分離
+  - 觀察依據：
+    - `src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.cs` 目前約 900 行。
+    - 雖然 diagnostics UI 已改成 decision-first，但 ViewModel 仍同時處理：
+      - issue/mask audit 合併
+      - decision row 投影
+      - filter/search
+      - inspector selected state
+      - locate / apply / clear actions
+    - 後續若再加 `CSV-confirmed best match`、manual propagation preview，很容易再次長成第二套 decision 邏輯。
+  - 目標：
+    - 保持 `DxfRegularMappingUseCase.Analyze(...)` 作為唯一資料入口。
+    - 將 ViewModel 拆成：
+      - decision row projector
+      - filter/search state
+      - review action coordinator
+    - 確保 diagnostics 之後擴充時不會再回到多段列表、各算各的狀態機。
+- [ ] S11.66 設計 Simulation 圓柱 / 自由滑動輸入模型
+  - 觀察依據：
+    - 使用者後續希望在 Simulation 中加入更自由的滑動/滾動輸入模型，接近圓柱式連續手勢，而不是只靠離散 frame 或單點輸入。
+  - 目標：
+    - 先定義輸入模型、資料契約與 UI 行為，再評估如何與既有 regular-grid / CSV / playback path 收斂為單一路徑。
+  - 驗證：
+    - 先以設計規格與 interaction prototype 為主，待 Beta 1.1 再實作。
+- [ ] S11.68 新增 CSV-confirmed best match 第一層確認路徑
+  - 觀察依據：
+    - 使用者已明確要求 Step4 預設先回到 `best match`，後續再用 CSV 做第一層確認。
+    - 目前 repo 缺少一條可閱讀、可驗證的 `CSV -> connected/active regular surface -> best match confirmation` 單一路徑。
+  - 目標：
+    - 保持 `CAD visible diff idx` 目前以 `best match` 為預設來源。
+    - 第一階段先導入 `SeeRegular.csv -> regular active mask`，把所有 frame 都是 `0` 的 regular 排除出 Step4 / Simulation 的 primary surface。
+    - `regular mask` 的掛點固定在：`grid + Step1 raw candidates` 之後、`Step4 visible diff assignment / Simulation active surface` 之前；不直接改動 notch / Step1 幾何本體，避免把 physical output mask 和幾何候選混成同一條真值。
+    - 第二階段再將這份 active mask 往上提升成 `CSV-confirmed best match` 的單一路徑接口：先用實驗資料確認 active/connected regular surface，再疊到 best match 上縮小候選。
+    - 輸出必須可讀：能看出每顆 CAD 的 `best match / csv-confirmed surface / 最終建議 diff idx`。
+  - 驗證：
+    - `SeeRegular.csv` active mask 載入後，Step4 / Simulation 必須共用同一份 active regular surface。
+    - 待使用者提供更進一步的 per-CAD CSV 範例後，再新增對應 use case / report / regression tests。
+    - 輸出報表至少能排序查看：`CAD id / best-match regular / csv-active candidates / confidence / final suggestion`。
+- [ ] S11.69 設計 Step4 手動 propagation layer（手動改一顆，其它同列/同段可跟著調整）
+  - 觀察依據：
+    - 使用者明確指出過去 row 方案存在的主要價值，不是當真值路徑，而是手動修改一個後，希望同列或同段其它 CAD 也能跟著改。
+    - 目前 Step4 真值已回到 pure best match，不能再把 sequence optimization 混回真值來源。
+  - 目標：
+    - 維持 `best match / CSV-confirmed best match` 作為 primary truth。
+    - 另外新增一層 explicit manual propagation policy：使用者編修一顆 CAD 的 diff idx 後，系統可以預覽並批次套用到同列/同段的候選 CAD。
+    - propagation 必須是可預覽、可取消、可只套局部，不得隱性覆蓋 primary truth。
+  - 驗證：
+    - 後續實作時補 dedicated use case / preview UI / regression tests。
+    - 報表需能清楚區分：`truth seed`、`manual override`、`propagated override`。
+
+## 本次已完成（Beta 1.0）
+- [x] S11.70 導入 `SeeRegular.csv` regular mask，先限制 Step4 / Simulation active surface
+  - 觀察依據：
+    - 真實面板 CSV `example/BOE36.35/SeeRegular.csv`、`example/TM 8.1/SeeRegular.csv` 已可被 simulation CSV parser 解析。
+    - 使用者明確要求：若某顆 regular 在所有 frame 都是 `0`，代表它沒有實際輸出，不應先拿來做 primary 分配。
+  - 目標：
+    - 新增 `RegularSignalMaskService`，將 `SeeRegular.csv` 投影到目前 regular grid，建立 `active regular mask`。
+    - Step4 pure best match 與 Simulation active surface 共用這份 mask；所有 frame 都為 `0` 的 regular 不再進 primary surface。
+    - 維持 notch 演算法本體不受這一版 mask 影響，先把 scope 限在 Step4 / Simulation。
+  - 驗證：
+    - `TM 8.1`、`BOE36.35` 的 `SeeRegular.csv` 都能載入與 current regular grid 尺寸相容。
+    - `Step 1` 可顯式匯入 `SeeRegular.csv`，並透過 `Use SeeRegular mask` toggle 控制是否啟用。
+    - `Step4` 與 `Simulation` 共用同一份 active regular surface。
+- [x] S11.67 調查並收斂 `TM 8.1 / CAD384 / REG583` 的 Step4 visible diff idx 壓縮問題
+  - 觀察依據：
+    - `CAD 384` 原本被 `IC-row sequence` 壓成 `dxfIndex=39`，但其最佳 match regular 為 `REG583 / diff43`。
+  - 目標：
+    - 使用者已明確要求 Step4 預設回到 pure best match，row sequence 不再當真值來源。
+  - 驗證：
+    - `CAD 384` 回到最佳 match `REG583 / diff43`。
+    - Step4 使用者可見模式已移除 `IC-row sequence priority`。
+- [x] S11.71 Step4 regular mask / CSV-confirmed best match UI 與驗證報表
+  - 觀察依據：
+    - `regular mask` 與後續 `CSV-confirmed best match` 若只有底層服務，使用者很難確認「哪些 regular 被 mask 掉、哪顆 CAD 因此改配到哪顆 regular」。
+    - 使用者已明確要求驗證手段要好閱讀、能快速看出 mapping 變化，而不是只看黑盒最終 diff idx。
+  - 目標：
+    - 在 `Step4` 提供清楚的 `Regular mask` 狀態摘要與可視化入口。
+    - 既有 `Analyze mapping` 報表加入 `raw best match` / `masked best match` / `是否因 mask 改變`，直接投影同一份 seed 與 mask 結果。
+  - 驗證：
+    - 同一份 `RegularSignalMaskService` / `CadBestMatchSeedService` 結果投影到 Step4 summary 與報表，不得重算第二套。
+    - `TM 8.1` 與 `BOE36.35` 的實檔回歸測試通過。
+- [x] S11.65 將 Simulation 收斂為與 Dev 同層級的 shell 頁面
+  - 觀察依據：
+    - `Simulation` 先前仍以 modeless `Window` 存在，雖然入口已提升為 top-level menu，但承載層與使用者要求的「Dev 同層級新頁面」不一致。
+    - 浮動視窗路徑也讓 simulation 的 page lifecycle、focus-aware window 列舉、delegate wiring 形成另一條 UI path。
+  - 目標：
+    - 將 `Simulation` 改成 `ShellViewModel` 直接管理的內容頁，與 `Freeform Helper / How To Use / Dev` 同級。
+    - 保留 `FreeformHelperViewModel.ShowNotchApplySimulationReviewAsync()` 作為唯一的 simulation 生成入口，只把 UI 承載從 `Window` 改為 shell page。
+    - 移除舊的 simulation floating-window path，避免 focus-aware / picker wiring 再維持兩套。
+  - 驗證：
+    - shell header 可直接切到 `Simulation`
+    - workspace menu `Simulation > Open Simulation` 仍走原本單一路徑產生 review view model，並切到 shell page
+    - simulation `Close` 會回到 workspace
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~ShellViewModelSimulationTests|FullyQualifiedName~HeadlessUiSmokeTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+- [x] S11.62 收斂 Step 2 freeform inherit gate：CAD 端判型保留，regular 端僅 major link 繼承
+  - 觀察依據：
+    - `TM 8.1 / CAD 313` 對次要 regular 的尾巴僅約 `0.001569%`，不應因極小尾巴出現 freeform。
+    - `TM 8.1 / REG 387` 在移除 override 後仍被標為 `XWay`，根因是目前 `FreeformDetector` 先用 CAD spread 判型，再把結果無條件寫回所有 involved regular link。
+    - 這會讓像 `CAD 453 -> REG 387` 這種 `0.0014267%` 的極小 tail link 也把 regular 染成 freeform，與使用者直覺不符。
+  - 目標：
+    - 保留 CAD 端 `XWay / YWay / XYWay` spread 判型公式不變。
+    - regular 端新增 inherit gate：僅當 `max(CadCoverage, RegularCoverage) >= FreeformAxisThreshold` 時，該 regular 才繼承 CAD 的 freeform 類型。
+    - 讓 freeform 類型來源仍是 CAD，但套用到 regular 時會過濾掉極小 tail/noise link。
+  - 驗證：
+    - `TM 8.1 / CAD 313` 的微小尾巴不應造成 freeform。
+    - `TM 8.1 / REG 387` 在移除 override 後應回到 `None`。
+    - `CAD 453` 的主 regular（如 `REG388/389`）仍保留 `XWay`。
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~FreeformDetectorTests|FullyQualifiedName~BuildRegularPadInspectorSnapshot_TM81_REG387|FullyQualifiedName~NotchGoldenBaselineTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+  - 完成：
+    - `FreeformDetector` 保留 CAD 端 spread 判型不變，但 regular 套用時新增 inherit gate：僅 `max(CadCoverage, RegularCoverage) >= FreeformAxisThreshold` 的 link 會繼承 freeform 類型。
+    - `edge specialization` 仍維持原本弱 boundary spill 行為，不套用這個 major-link gate。
+    - `TM 8.1 / REG387` 在移除 override 後改回 `None`；`REG388/389` 仍維持 `XWay`（來源為既有 override）。
+    - 同步更新 `TM 8.1` notch golden baseline：`rowCount 656 / V21 432 / V22 224 / transfer 618 / warning 38`。
+
+- [x] S11.55 收斂 v2.2 To Full「無擴展可能的 CAD 不應進入 To Full」契約
+  - 觀察依據：
+    - `TM 8.1 / CAD 113` 目前會出現 `To Full: 100.0% (Enabled)`，但該 CAD pad 四周已被相鄰 CAD 邊界封住，沒有實際擴展可能。
+    - 現行 `strict owner + 40x40 reachability` 對極薄 foreign overlap 過於寬鬆，可能把「已被相鄰 CAD 填滿/封住」的 case 誤判為 `EXPAND_CLEAR_PATH`。
+  - 目標：
+    - 在 `NotchV22CompensationService` 單一路徑中加入 exact occupied-area gate：
+      - 若該 CAD 所涉 regular 已被 target + neighboring CAD 的精確 overlap 幾何封住，則 `To Full = Disable`
+      - 不再因 raster/strict threshold 漏掉薄 blocker 而誤擴張
+    - 同步收斂顯示契約：單顆 CAD `IsToFullEnabled = false` 時，不產生 `Step1/2/3` preview item。
+  - 驗證：
+    - `TM 8.1 / CAD 113` 應改為 `To Full disabled`
+    - synthetic service test 覆蓋「target + thin foreign overlap 填滿 regular => no expansion」
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~NotchV22CompensationServiceTests|FullyQualifiedName~Step3Tm81|FullyQualifiedName~Step3Preview_" `
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+  - 完成：
+    - `NotchV22CompensationService` 改為先計算 target + neighboring CAD 在 regular 內的 exact occupied union area；若 exact free area 未超過 strict threshold，則視為無有效擴展，不再進入 To Full。
+    - `hasReachableExpansion` 增加 exact free-area 上界約束，避免 raster reachability 因極薄 foreign overlap 遺失而把整顆 regular 誤判成 `EXPAND_CLEAR_PATH`。
+    - `TM 8.1 / CAD 113` 現在改為 `To Full disabled`；對應 `Stage1/2/3` overlay 為空。
+    - Step3 preview 顯示契約同步收斂：若選中 CAD `IsToFullEnabled = false`，不產生 preview item，AA 區不再顯示任何 `Step1/2/3` 視覺。
+
+- [x] S11.47 收斂 `NotchExportSelectionViewModel` 的 filter / selection scope 分支
+  - 觀察依據：
+    - `src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs`
+    - `src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.Selection.cs`
+    - 目前 `search / selected-only / row mode / header filter / select all / select none / use shown only` 雖然共用 projection builder，但 UI state、chip state、summary text、selection scope action 仍由多組 property/command 分散維護。
+  - 目標：
+    - 收斂成單一 `filter + selection scope` state model，toolbar/chips/summary/footer 全由同一投影產生。
+    - 移除 `UseShownOnly / SelectedOnly / header filter summary` 之間的分支式互相修補。
+  - 完成：
+    - `NotchExportSelectionProjectionBuilder` 現在除了 `VisibleRows / IcGroups / WorkspaceLinkedRows` 外，也會同時輸出 filter view state。
+    - export 頁面的 `summary / chips / active-filter text / visible-row footer / header filter active state` 改為讀同一份 projection snapshot，不再由 ViewModel 各自重組字串與布林。
+    - property callbacks 保留原本行為，但改為只觸發 `RebuildVisibleRows()` 與必要的 display-label 通知，減少 filter state 的平行推導。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~NotchExportSelectionViewModelTests|FullyQualifiedName~NotchExportSelectionProjectionBuilderTests|FullyQualifiedName~NotchExportSelectionWindowSmokeTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+- [x] S11.48 收斂 `PadCanvas` selection mutation 為單一 commit path
+  - 觀察依據：
+    - `src/FreeformHelper.UI/Controls/PadCanvas.Input.Selection.cs`
+    - `src/FreeformHelper.UI/Controls/PadCanvas.SelectionEngine.cs`
+    - `_selectedCadIds/_selectedRegIdx` 目前在 click / double-click / axis-label / range-select / box-select / engine path 多處直接修改，`InvalidateVisual()` 與 `RaiseSelectionChanged()` 也散落在多個方法。
+  - 目標：
+    - 所有 selection 結果統一走單一 commit API，selection engine 不再直接寫 owner selection collections。
+    - 明確分離：`compute hit/range result` 與 `apply selection side effects`。
+  - 完成：
+    - `SelectionEngine` 現在只計算選取結果，透過 `PadCanvas` 單一路徑提交 selection mutation。
+    - click / axis-label / programmatic set / select-all / clear 與 box/range selection 共用同一組 selection commit helper，既有 notify / invalidate 時機維持不變。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~PadCanvasHitTestTests|FullyQualifiedName~PadCanvasCacheInvalidationTests|FullyQualifiedName~PadCanvasViewRefreshTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+- [x] S11.49 收斂 `CadLoadSpinnerProcessHost` 為明確 requested-state state machine
+  - 觀察依據：
+    - `src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs`
+    - 現有 `Warmup / Show / Hide / immediate-send / queued-sync / retry / minimum-visible` 共存，內部靠 `_isVisibleRequested / _latestShowRequest / _warmupTask / _lastShowSentUtc` 多個欄位組合判斷。
+  - 目標：
+    - 以單一 requested-state / effective-state 同步流程收斂 spinner host lifecycle。
+    - 減少 `Show()` 內 immediate path 與 background sync path 的雙分支。
+  - 完成：
+    - `CadLoadSpinnerProcessHost` 內部改為明確的 `requested visibility` / `effective visibility` state，替代原本只有 `_isVisibleRequested` 的隱性流程。
+    - `Show / Hide / Dispose / state-sync` 現在都透過同一組 visibility state 收斂，hide IPC 也會同步更新 effective state。
+    - 新增 host visibility snapshot 測試，鎖住預設值與 `Dispose()` 後的 hidden/hidden 契約；既有 loading coordinator / smoke path 維持通過。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~CadLoadSpinnerProcessHostTests|FullyQualifiedName~HeadlessUiSmokeTests.FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility|FullyQualifiedName~LoadingScopeCoordinatorTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+- [x] S11.50 收斂 `v2.1 / v2.2` notch 軸向與 border case 推導的共用 path
+  - 觀察依據：
+    - `src/FreeformHelper.Application/Services/NotchAlgorithms/V21NotchAlgorithm.cs`
+    - `src/FreeformHelper.Application/Services/NotchAlgorithms/V22NotchAlgorithm.cs`
+    - `src/FreeformHelper.Application/Services/NotchAlgorithms/NotchAlgorithmHelpers.cs`
+    - 目前雖已共用部分 helper，但 `X/Y 軸向鄰居 / border 判定 / overlap case 對應` 仍由 `v2.1`、`v2.2` 各自用分支邏輯展開，容易在後續微調時產生平行行為。
+  - 目標：
+    - 抽出 shared axis-context / border-case model，讓 `v2.1 / v2.2` 只在必要輸出欄位差異處分叉。
+    - 維持輸出行為不變，先以重構與 regression guard 為主。
+  - 完成：
+    - 新增 `NotchAxisGeometryContext` / `NotchAxisNeighborContext`，把 `axis / cell edge / border / overlap case / neighbor lookup` 抽成共享推導。
+    - `V21NotchAlgorithm` 改為吃共享 axis geometry + neighbor context；Y 軸 legacy 欄位映射維持原語意，只把共享幾何與鄰居查詢往上拉。
+    - `V22NotchAlgorithm` 改為吃同一份共享 axis geometry + neighbor context；`v2.1 / v2.2` 目前只保留必要的 payload 欄位語意分叉，不再各自重算 border/overlap/neighbor length。
+    - 補回歸測試：
+      - `V21` Y-way legacy neighbor orientation
+      - `V22` Y-way compatibility neighbor orientation
+      - `CadAllocation + connected safe fill` 下 active-regular filter 的新契約同步更新
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~NotchTableGeneratorTests|FullyQualifiedName~NotchGoldenBaselineTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+- [x] S11.51 收斂 `StatusText` 更新為 operation/status reporter path
+  - 觀察依據：
+    - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Status.cs`
+    - `rg "SetStatus\\(" src/FreeformHelper.UI/ViewModels` 目前有 `143` 個直接呼叫點。
+    - 同一類 workflow（DXF edit、mapping、notch、selection、load/save）仍各自直接拼 status 文案與覆蓋時機，容易出現訊息互搶與語意不一致。
+  - 目標：
+    - 將高頻 operation 的 status 更新集中到 shared reporter / operation scope。
+    - 區分 sticky success / transient progress / error，減少直接字串覆寫。
+  - 完成：
+    - 新增 `UiOperationStatusReporter`，提供 shared scope API：`ReportProgress / ReportSuccess / ReportBlocked / ReportError / ReportStatus`。
+    - `FreeformHelperViewModel.Status` 現在只保留薄封裝，實際文字更新改由 shared reporter 負責。
+    - 高頻 workflow 已收斂到 reporter path：
+      - `Match`
+      - `Load Project`
+      - `Save Project`
+      - `Export Notch`（stage progress / blocked / success）
+    - 保持既有 `StatusText` 文字契約不變，只收斂 entry path；其餘低頻 call site 暫時保留，避免一次大改 143 個路徑。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~SaveProjectAsync_WhenDialogHandlerMissing_ReturnsFalse|FullyQualifiedName~SaveProjectAsync_WhenSucceeded_ClearsUnsavedState|FullyQualifiedName~SaveProjectAsync_WhenIoError_ReturnsFalseAndKeepsUnsavedState|FullyQualifiedName~LoadProjectCommand_WhenDialogHandlerMissing_SetsStatus|FullyQualifiedName~MatchCommand_WhenPrerequisitesMissing_SetsStep1Status|FullyQualifiedName~ExportNotchCsvCommand_WhenPrerequisitesMissing_SetsStatus|FullyQualifiedName~ExportNotchLegacyCommand_WhenPrerequisitesMissing_SetsStatus|FullyQualifiedName~ExecuteAsync_QueryStatus_IncludesCadLoadSpinnerDebugTelemetry"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+- [x] S11.53 Step3 notch preview 支援多選 CAD 同時顯示 To Full 結果
+  - 觀察依據：
+    - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.cs`
+    - 目前 `RefreshNotchCanvasPreview()` 雖然最後餵給畫布的是 `ObservableCollection<NotchCanvasPreviewItem>`，但入口只會取 primary selected CAD，導致多選時 AA 區無法同時看到多顆 CAD 的 `To Full` 結果。
+  - 目標：
+    - 多選 `CAD > 1` 時，Step3 preview 仍走同一條 `Get/BuildCadV22ResolvedResult` 路徑，但一次投影所有選中 CAD 的 preview items，不在畫布層額外重算。
+  - 完成：
+    - `RefreshNotchCanvasPreview()` 改為從 selection 一次建立所有選中 CAD 的 `NotchCanvasPreviewItem`，多選時可在 AA 區同時看到各自的 `Stage1/2/3` To Full overlay。
+    - 保留既有 deferred refresh 行為，避免 box-select 拖曳期間同步重算；只是 deferred 結束後不再只顯示 primary CAD。
+    - 狀態列訊息改為區分單選與多選：多選時回報總 CAD 數與 `To Full ON/OFF` 混合狀態。
+    - 補測試鎖住 `2 CAD selected => 2 preview items` 與 command path 的 status text。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~Step3Preview_WhenMultipleCadSelected_ShowsAllSelectedCadToFullResults|FullyQualifiedName~Step3Preview_|FullyQualifiedName~MatchCommand_WhenPrerequisitesMissing_SetsStep1Status"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+- [x] S11.54 收斂多選 notch preview 的顯示契約：只保留 stage overlay，並讓 Step1/2 也有淡色 area tint
+  - 觀察依據：
+    - 多選 `CAD > 1` 後，AA 區同時顯示 stage preview 時，會和 freeform regular 橘色邊框/斜線、coverage/notch label 疊在一起，視覺上過於雜亂。
+    - `Step1/2` 原本只有 outline，和 `Step3` 的淡色 fill 語言不一致。
+  - 目標：
+    - 多選 notch preview 時，只保留 `Stage1 / Stage2 / Stage3` overlay 主體，不再額外疊加 secondary labels。
+    - notch preview 顯示期間，freeform regular 改回正常邊框，避免和 `Stage3` 橘色 outline 打架。
+    - `Step1/2` 改為和 `Step3` 一樣具備淡色 area tint，但仍保留各自 stage outline。
+  - 完成：
+    - `PadCanvas` 新增 aggregate notch preview visual policy，當 preview CAD `> 1` 且 stage overlay 顯示時，會關掉 match/notch ratio labels，只保留 stage overlays。
+    - notch preview active 時，regular freeform styling 退回 base regular styling，不再使用 freeform 橘色邊框/斜線。
+    - `Stage1 seed` / `Stage2 candidate` 改為 `outline + subtle fill`，使用既有 notch token 色系，不新增 ad-hoc color。
+    - 補測試鎖住：
+      - preview active => base regular styling
+      - aggregate preview => simplify secondary visuals
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --no-build --nologo /p:UseAppHost=false --filter "FullyQualifiedName~PadCanvasCacheInvalidationTests|FullyQualifiedName~Step3Preview_WhenMultipleCadSelected_ShowsAllSelectedCadToFullResults"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+## Deferred（Non-blocking）
+- [x] S11.57 調查並收斂 `TM 8.1 / CAD402 / CAD403 / REG624` owner 重疊根因
+  - 觀察依據：
+    - runtime query 顯示 `REG624` 目前同時被 `CAD402`、`CAD403` matched，兩者對 `REG624` 都是 `15.1%` coverage。
+    - `CAD402` 與 `CAD403` 目前查到相同 `bounds / area / matched regulars`，看起來像 duplicate geometry，因此 `REG624`、`REG588` 都落入 multi-owner / no-expansion 路徑。
+    - 使用者預期 `REG624` 應只有 `CAD402`，表示目前資料/匯入/編輯後狀態至少有一條路徑和預期不一致。
+  - 目標：
+    - 確認 duplicate 幾何是來自 `TM8.1.json` 內嵌資料、`Load Project` 還原流程，還是 DXF edit/session state 汙染。
+    - 若屬於 workflow/state 問題，需收斂為單一路徑並補 regression test，避免 owner / To Full 在真實案型上被 duplicate geometry 汙染。
+  - 驗證：
+    - `runtime query` 對 `CAD402 / CAD403 / REG624 / REG588` 的幾何與 match 結果可重現
+    - 補真實案型或 synthetic test 鎖住 duplicate-owner case
+  - 完成：
+    - 確認 root cause 不在 `IncludeBlockPolylines` 或 project replay；`TM 8.1` raw DXF 在 `includeBlocks=false` 就已存在 7 組 same-layer exact duplicate，其中包含 `CAD402 / CAD403`。
+    - 新增 `CadPadExactDuplicateSanitizer`，於 `CadLoadUseCase` 單一路徑對 raw imported `CadPadSet` 做 same-layer exact duplicate sanitize：
+      - 保留 canonical（最小 id）pad
+      - 排除其餘 exact duplicate pad
+      - 不重排其他 pad id，維持 project id 契約
+    - `CAD load` 現在會在 status/log 記錄 filtered duplicate summary；`TM 8.1 / CAD403` 這類 duplicate pad 不再進入 match / To Full / inspector 工作集。
+
+
+- [x] S11.58 將 duplicate CAD pad 從「載入時直接排除工作集」改為「auto-hidden duplicate」契約
+  - 觀察依據：
+    - 目前 `CadLoadUseCase` 對 same-layer exact duplicate 的處理是保留 canonical、其餘 duplicate 不進入 active `CadPadSet`。
+    - 使用者希望 duplicate 不要直接被砍掉，而是以 hidden 方式保留，之後可由 UI 檢視與人工決定是否恢復。
+    - 但若直接把 duplicate 混進現有 `_hiddenCadPadIds` / `DeletedCadPadCount` / `RestoreAllHiddenCadPads`，會把「manual hide」與「auto-hidden duplicate」的語意混在一起，破壞現有 DXF edit undo/reset/badge 契約。
+  - 目標：
+    - 新增獨立的 `auto-hidden duplicate` 類型，對 matching / notch / export / grid rebuild 等工作流等同 hidden，不污染演算法。
+    - manual hidden 與 duplicate hidden 分離：
+      - `RestoreAllHiddenCadPads` 只處理 manual hidden
+      - duplicate hidden 不得污染 `DeletedCadPadCount`、manual hidden badge、undo/reset 契約
+    - project save/load 走 raw CAD 載入後重新偵測 duplicate，不再依賴「直接排除工作集」。
+  - 完成：
+    - `CadLoadUseCase` 不再用 sanitize 後的 filtered `CadPadSet` 當 active CAD；raw imported CAD 會完整保留進 `_cad`。
+    - 新增獨立 `auto-hidden duplicate` state，並透過 `IsCadPadEffectivelyHidden / BuildEffectiveHiddenCadPadIds` 收斂 hidden 判定。
+    - `FilterCadPadsByLayer / BuildActiveCadPadSet / notch compensation inputs / DXF export / grid rebuild / bounds regular-source hint` 現在都走同一份 effective hidden 契約，不再把 duplicate 混進工作集。
+    - manual hidden / duplicate hidden 已分離：
+      - `DeletedCadPadCount` 只統計 manual/combine hidden
+      - `RestoreAllHiddenCadPads` 不會還原 duplicate hidden
+      - `ResetAllDxfEdits` 不會把 duplicate auto-hidden 洗掉
+    - CAD load status 改為回報 `active/raw` pad count 與 auto-hidden duplicate 數量。
+  - 驗證：
+    - `TM 8.1 / CAD402 / CAD403 / REG624` 在 duplicate auto-hidden 模式下仍不得污染 owner / To Full
+    - `ApplyCadLoadOutcomeAsync_PreservesRawDuplicatePads_ButAutoHidesThemFromWorkingSet`
+    - `ResetAllDxfEditsCommand_PreservesAutoHiddenDuplicatePads`
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~CadLoadUseCaseTests|FullyQualifiedName~ApplyCadLoadOutcomeAsync_PreservesRawDuplicatePads_ButAutoHidesThemFromWorkingSet|FullyQualifiedName~ResetAllDxfEditsCommand_PreservesAutoHiddenDuplicatePads|FullyQualifiedName~ApplyCadLoadOutcomeAsync_ClearsStaleCombinedMetadataBeforeApplyingHiddenRows|FullyQualifiedName~SaveThenLoadProject_RestoresDxfCombinedAndMovedEdits"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+- [x] S11.60 增加 duplicate CAD review / restore 契約與 UI
+  - 觀察依據：
+    - `S11.58` 已把 duplicate 改成 `auto-hidden duplicate`，演算法工作集正確，但使用者目前仍缺少一個明確的 review / restore 入口。
+    - 目前左側 `DXF edits > Summary` 只有 `Hidden / Combined / Moved` 三種 badge；若直接把 duplicate 混進 `Hidden`，會讓 manual hide 與 system duplicate 的語意混淆。
+  - 目標：
+    - 提供 duplicate group 檢視、canonical/duplicate 對照、restore/exclude action。
+    - duplicate hidden 與 manual hidden 在 UI 上可辨識，不共用同一 badge / restore 文案。
+    - 與 `Hide` 區塊的搭配契約：
+      - `Hidden` badge 明確代表 **manual hidden**（包含 combine source hidden 維持既有 change-list 語意），不包含 duplicate auto-hidden。
+      - 新增獨立 `Duplicate` badge，顯示 auto-hidden duplicate 數量，點擊後開啟 duplicate review modal。
+      - `Restore all hidden` 只恢復 manual hidden；不恢復 duplicate。
+      - quick action 的 `Hide / Restore / Reset` 不直接作用於 duplicate；duplicate 的 restore/exclude 只在 duplicate review modal 中處理。
+      - 若使用者從 duplicate review 恢復某顆 duplicate，需同時明確提示：
+        - 將重新進入 active CAD working set
+        - 可能影響 match / To Full / export 結果
+    - duplicate review modal 初版契約：
+      - 以 duplicate group 為單位顯示：`Canonical CAD -> Duplicate CAD(s)`
+      - 顯示 layer / bounds / area / geometry signature 摘要
+      - row action：
+        - `Focus canonical`
+        - `Focus duplicate`
+        - `Restore duplicate`
+        - `Hide again`
+      - footer 支援：
+        - `Restore selected duplicates`
+        - `Re-hide selected duplicates`
+        - `Accept auto-hide`
+    - 顯示策略：
+      - `Summary` 區 badge 順序調整為：`Hidden / Duplicate / Combined / Moved`
+      - tooltip 文案分開：
+        - `Hidden`: manual hidden
+        - `Duplicate`: auto-hidden exact duplicates
+      - `DxfEditSelectionSummary` 不把 duplicate 算進 selected/hidden 統計，避免與 manual hide 混淆
+  - 完成：
+    - 左側 `DXF edits > Summary` 新增獨立 `Duplicate` badge；`Hidden` 仍只代表 manual hidden。
+    - 既有 `DxfEditChangeListWindow` 擴充為 `Hidden / Duplicate / Combined / Moved` 四種 scope，duplicate row 可在 canonical/duplicate 間切換 focus，並支援 `Restore / Hide again`。
+    - duplicate restore/re-hide 走獨立 API，不污染 `RestoreAllHiddenCadPads`、`ResetAllDxfEdits`、manual hidden undo 契約。
+    - project save/load 新增 `VisibleDuplicateCadPadIds`，讓使用者手動 restore 的 duplicate 可 round-trip 還原。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -c Debug /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --no-build --nologo /p:UseAppHost=false --filter "FullyQualifiedName~DxfEditChangeListApply_OnDuplicateRow_TogglesDuplicateVisibility|FullyQualifiedName~ApplyCadLoadOutcomeAsync_PreservesRawDuplicatePads_ButAutoHidesThemFromWorkingSet|FullyQualifiedName~ResetAllDxfEditsCommand_PreservesAutoHiddenDuplicatePads|FullyQualifiedName~SaveThenLoadProject_RestoresVisibleDuplicateCadPads|FullyQualifiedName~SaveThenLoadProject_RestoresDxfCombinedAndMovedEdits"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+- [x] S11.61 收斂 `DXF edit details` 為可批次操作的 modeless review 視窗
+  - 觀察依據：
+    - 目前 `DXF edit details` 只能逐列操作，無法對同 scope row 做 `select all visible -> bulk action`。
+    - row action icon 沒有跟 duplicate restore/re-hide 狀態同步切換。
+    - 視窗目前不是 export 同款 review layout，focus 也不會避開自身遮擋的 AA 區。
+    - `ShowDialog(owner)` 會阻斷主畫布互動，導致視窗開著時 AA 區無法維持 export 那種 modeless 工作流。
+  - 目標：
+    - 改成 modeless review window，對齊 export 的 `summary/header/list/inspector` 視覺與 scrollbar 契約。
+    - 目前 tab scope 內支援 `select all visible` 與批次操作：
+      - `Hidden` -> `Restore selected`
+      - `Combined` -> `Clear selected groups`
+      - `Moved` -> `Restore selected layers`
+      - `Duplicate` -> `Restore selected` / `Hide selected`
+    - row icon 與 inspector action 必須跟資料狀態同步，不再固定單一 glyph。
+    - focus 行為收斂為可共用的 floating-review aware viewport 計算，與 export 一致地將目標放在 AA 可視區。
+  - 完成：
+    - `DxfEditChangeListViewModel` 新增 visible-row selection state、`AreAllVisibleRowsSelected`、bulk action commands 與 duplicate 專用批次 restore/re-hide。
+    - `DxfEditChangeListEntry` 改為 observable row model，row action glyph 由 shared change-list builder 根據當前狀態決定。
+    - `DxfEditChangeListWindow` 改為 export-style review layout：header chips、bulk toolbar、table checkbox、shared dark scrollbar、inspector host。
+    - `ShowDxfEditChangeListWindowAsync` 改為 modeless owned window；既有視窗若已存在則直接 refresh + activate，不再開多個 dialog。
+    - `FreeformHelperView.Canvas` 的 focus 避讓邏輯改為泛化 `floating review aware`，供 export / DXF edit details 共用。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -c Debug /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --no-build --nologo /p:UseAppHost=false --filter "FullyQualifiedName~DxfEditChangeListViewModelTests|FullyQualifiedName~DxfEditChangeListApply_OnDuplicateRow_TogglesDuplicateVisibility|FullyQualifiedName~ResetAllDxfEditsCommand_PreservesAutoHiddenDuplicatePads|FullyQualifiedName~SaveThenLoadProject_RestoresVisibleDuplicateCadPads|FullyQualifiedName~DxfEditChangeListApply_OnCombinedRow_ClearsWholeCombineGroup"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+
+## 已完成（最新）
+- [x] S11.56 收斂 compensate/notch preview 下的 freeform 視覺契約
+  - 完成內容：
+    - notch stage preview active 時，`XWay / YWay / XYWay` freeform regular 仍保留斜線 hatch，不再整個消失。
+    - 同時取消 freeform 的橘色 accent border/fill，改回 base regular 邊框，避免與 `Stage3` 橘色 outline 打架。
+    - 補 `PadCanvas` 測試鎖住兩個契約：
+      - stage overlay 顯示時仍會畫 freeform hatch
+      - stage overlay 顯示時要 suppress freeform accent border
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~PadCanvasCacheInvalidationTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.46 收斂 Step1 / notch preview 的 CAD 顯示單一路徑
+  - 完成內容：
+    - `PadCanvas` 新增 notch preview-aware 的 CAD render policy：當 `Step1/2/3` overlay 顯示時，preview CAD 不再沿用 `ColorCadByArea` fill，避免畫面看起來像是 `Step1` 把整塊灌滿。
+    - `PadCanvas` low-detail 模式下，只要 CAD 牽涉 notch preview / selection / highlight / diff override / anchor，就改走精確 polygon，不再退化成 `pad.Bounds` 矩形。
+    - 補回歸測試，鎖住：
+      - `notch preview + low-detail` 仍需精確幾何
+      - `notch preview + stage overlay visible` 需 suppress CAD fill
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~PadCanvasCacheInvalidationTests|FullyQualifiedName~NotchV22ResolvedResultServiceTests|FullyQualifiedName~FreeformHelperViewModelTests.Step3AndOverlap"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.44 收斂 v2.2 To Full 為單一路徑的 `connected safe fill` 規則
+  - 完成內容：
+    - `NotchV22CompensationService` Step3 已不再依賴 `boundary-only` gate，改為單一路徑的 per-regular `connected safe fill`：從 source overlap 出發，只在 `regular - foreign owner area` 內做連通安全擴展。
+    - shared regular 不再一律整顆禁止；若存在 target-only connected free region，會產生 `EXPAND_SHARED_REACHABLE`。sole-owner 且無 foreign blocker 的 regular 則可直接 owner-complete，產生 `EXPAND_CLEAR_PATH`。
+    - 新增 TM 8.1 真實專案回歸測試：
+      - `CAD 364`：`REG291` 需在非 boundary 情況下補滿 Stage2/Stage3。
+      - `CAD 490 / CAD 491`：shared regular(`REG643`) 可安全部分擴展，但 Stage3 不得互相重疊。
+    - `NotchPreviewCanvas` 舊 detail preview path 一併改為 outline + hatch，不再把 regular preview 畫成實心 fill，避免與主畫布 stage contract 脫節。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~Step3Tm81|FullyQualifiedName~NotchV22ResolvedResultServiceTests|FullyQualifiedName~NotchV22CompensationServiceTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.45 修正 Step3 preview stage contract 回歸（Stage1/2 不再錯畫成 fill）
+  - 完成內容：
+    - `NotchV22CompensationResult` / `NotchV22ResolvedResultService` 補回明確的 `candidate polygons`，不再拿 `reachable fill` 充當 Stage 2。
+    - `Stage 1` seed 改為只要屬於 preview candidate 就收進 stage model，不再錯綁 `IsToFullApplied`，避免被 rule 擋掉的 source overlap 從 preview 消失。
+    - `PadCanvas` Stage 1 / Stage 2 改為 outline-only，不再用 fill 畫整塊 candidate/seed area。
+    - `RuntimeQuery / Notch detail / AA canvas` 仍共用同一份 resolved stage model，沒有再分叉推導。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~NotchV22ResolvedResultServiceTests|FullyQualifiedName~FreeformHelperViewModelTests.Step3Preview|FullyQualifiedName~NotchV22CompensationServiceTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.43 建立 Notch golden baseline（`3635` + `TM 8.1`）
+  - 完成內容：
+    - 新增 `tests/FreeformHelper.Tests/Application/Notch/NotchGoldenBaselineTests.cs`，以實際 `Load Project` 後的 `cad + grid + project settings` 生成 NotchTable，避免 golden 只驗證手刻測資。
+    - 新增 `tests/FreeformHelper.Tests/Snapshots/notch-golden-baseline.json`，鎖定兩組真實專案：
+      - `example/BOE36.35/project_3635.json`
+      - `example/TM 8.1/TM8.1.json`
+    - baseline 固定以下契約：
+      - row count
+      - 版本分布（`V21` / `V22`）
+      - IC 分布
+      - export 視角分布（`transfer / warning / noCad / legacy / linked`）
+      - 代表性 sample rows（首列、首個 `V22 MAIN`、首個 `V22 no-op`、首個 `V21 adjusted`、尾列）
+    - 後續若調整 `v2.1 / v2.2`，只要真實案型輸出變動就會立即在測試中浮現。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~NotchGoldenBaselineTests|FullyQualifiedName~NotchTableGeneratorTests|FullyQualifiedName~NotchTableExporterTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.42 Notch 版本命名統一：`V30` 收斂為 `V22`，並補齊流程文件
+  - 完成內容：
+    - `NotchAlgorithmVersion` 改為 `V21 / V22 / V31`，全專案與測試同步移除 `V30` 命名。
+    - `V30NotchAlgorithm` 更名為 `V22NotchAlgorithm`，`NotchTableGenerator` 預設策略與版本分流同步更新。
+    - 設定/匯出/UI 綁定同步改為 `EnableV22` 與 `NotchAlgorithmVersion.V22`，避免同一版本存在雙命名。
+    - 新增 `docs/core/notch-v21-v22-flow.md`：先定義流程圖生成規則，再輸出目前 Notch 實際流程圖（總覽、CadAllocation、Legacy、Export）。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~NotchTableGeneratorTests|FullyQualifiedName~NotchTableExporterTests|FullyQualifiedName~NotchExportSelectionViewModelTests|FullyQualifiedName~ProjectStoreTests|FullyQualifiedName~NotchValidationUseCaseTests|FullyQualifiedName~NotchValidationTraceServiceTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.41 新增可由 CMD 驗證的 CAD load spinner telemetry（不依賴肉眼）
+  - 完成內容：
+    - 新增 `CadLoadSpinnerDebugState`，收斂 loading telemetry：VM overlay show/hide、View host show/hide、Host IPC show/hide 成功/失敗、show retry、事件序列。
+    - `query status` 新增 `cadLoadSpinner` payload，支援命令列直接檢查每次 load 是否真正走到 show/hide。
+    - `FreeformHelperViewModel.CadLoadOverlay`、`FreeformHelperView.CadLoadSpinner`、`CadLoadSpinnerProcessHost` 全部接入同一 telemetry。
+    - 新增測試 `ExecuteAsync_QueryStatus_IncludesCadLoadSpinnerDebugTelemetry`。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~ExecuteAsync_QueryStatus_IncludesCadLoadSpinnerDebugTelemetry|FullyQualifiedName~FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility|FullyQualifiedName~CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates" /p:UseAppHost=false`
+    - 3635 連續 `query load-project` 後執行 `query status`，可看到 `cadLoadSpinner.events` 與各計數一致成對成長。
+- [x] S11.40 修正 CAD load spinner 在 async 載入期間偶發不顯示（show IPC 暫失敗未重試）
+  - 完成內容：
+    - `CadLoadSpinnerProcessHost` 新增 `ShowRetryDelay(30ms)`，當 `show` IPC 暫時送失敗且 loading scope 仍為可見狀態時，會持續重試直到成功或 scope 結束。
+    - 避免管道短暫忙碌時 `show` 訊號遺失，造成「流程仍在載入，但 spinner 沒出現」。
+    - 以 3635 實測連續三次 `load-project`（約 `0.85s~1.49s`）皆成功完成，且 log 未再出現 spinner state sync 例外。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility|FullyQualifiedName~CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates" /p:UseAppHost=false`
+    - `dotnet <build/bin/.../FreeformHelper.UI.dll> query load-project --path example/BOE36.35/project_3635.json`（連續 3 次）
+- [x] S11.39 修正 CAD load spinner 只出現一次 / 閃一下即消失的 show-hide 競態
+  - 完成內容：
+    - `CadLoadSpinnerProcessHost.SyncRequestedVisibilityStateAsync()` 改為以最新 `_isVisibleRequested` 為準，送出 `hide` 前會再次確認狀態，避免舊的 hide 任務晚到覆蓋新的 show。
+    - `FreeformHelperView.CadLoadSpinner` 改為在 UI thread 直接同步 spinner host（跨 thread 才 dispatch），不再只排到 render queue，避免長操作前 show 訊號被延後。
+    - 補 smoke regression：`FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility` 新增第二輪 show/hide 斷言，確保 loading scope 可重複觸發。
+    - 以 `project_3635.json` 連續三次 `query load-project` 實測（總耗時約 0.77~1.45s），流程皆成功，且同一 app 僅維持 1 個 spinner process。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility|FullyQualifiedName~CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates" /p:UseAppHost=false`
+    - `dotnet <build/bin/.../FreeformHelper.UI.dll> query load-project --path example/BOE36.35/project_3635.json`（連續 3 次）
+- [x] S11.38 提升 loading spinner 幀率並保持轉速一致
+  - 完成內容：
+    - `LoadingSpinner` 更新頻率由 `33ms` 提升到 `16ms`（約 60fps）。
+    - 改成依實際經過時間計算 dash offset，避免只提高幀率導致旋轉速度失真。
+    - 保留既有視覺語意，但在 Dev/loading overlay 觀感更順暢。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~HeadlessUiSmokeTests.CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates|FullyQualifiedName~LoadingScopeCoordinatorTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.37 修正 Dev/loading overlay 下 spinner 偶發靜止（父層顯示切換）
+  - 完成內容：
+    - `LoadingSpinner` 動畫狀態判斷改為 `Attached + IsAnimationActive`，不再依賴有效可視狀態，避免父層由隱藏切換為可見時 timer 停住。
+    - `OnTick` 不再因暫時不可視而停表，避免 Dev 預覽按鈕與其他 overlay 在顯示切換後只看到靜止圈圈。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~HeadlessUiSmokeTests.CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates|FullyQualifiedName~LoadingScopeCoordinatorTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.36 修正 CAD load overlay context 回歸，並在 Dev 增加可重複觸發的 loading 驗證按鈕
+  - 完成內容：
+    - `LoadingScopeCoordinator` 移除 `ConfigureAwait(false)`，保持 `RunWithCadLoadCanvasOverlayAsync(...)` 在 UI context 執行，避免 `Load Project` 後續 UI 還原（含 DXF regular layer）被切到背景 thread。
+    - Dev 頁面新增 `Show loading spinner (1.5s)` 按鈕，每次點擊都會觸發一次獨立 preview overlay（Dev 內部，不走 shared spinner host），避免被主流程 hide/show 狀態覆蓋而只閃幾個 frame。
+    - Dev loading preview 使用 sequence gate，連續點擊會以最新一次為準，不引入新的可處置欄位與 analyzer warning。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~LoadingScopeCoordinatorTests|FullyQualifiedName~SaveThenLoadProject_RestoresLayerSelectionsAndDxfDependentOptions_AfterAsyncCadLoadApply|FullyQualifiedName~HeadlessUiSmokeTests.FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility|FullyQualifiedName~HeadlessUiSmokeTests.CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.35 收斂 CAD load loading lifecycle：非阻塞 show + 可重用 scope 協調器
+  - 完成內容：
+    - 新增 `LoadingScopeCoordinator`，把 loading 顯示流程 API 化為單一路徑（show -> 首幀讓位 -> action -> 最短可視時長 -> hide），可供其他 loading 場景重用。
+    - `RunWithCadLoadCanvasOverlayAsync(...)` 改用 `LoadingScopeCoordinator`，明確化顯示與關閉時機，不再靠呼叫端各自管理延遲/關閉順序。
+    - `CadLoadSpinnerProcessHost.Show(...)` 改為非阻塞狀態同步：不再在 UI thread 同步等待 helper process ready，改為背景 warmup + 背景送出最新 show/hide request。
+    - 同步更新 `behavior-inventory.md`，修正舊的 inline overlay 描述為目前獨立 spinner process 契約。
+    - 補測試：`LoadingScopeCoordinatorTests`（顯示順序 + minimum-visible-duration）。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~LoadingScopeCoordinatorTests|FullyQualifiedName~FreeformHelperViewModelTests.Basics.LoadOverlay|FullyQualifiedName~HeadlessUiSmokeTests.FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility|FullyQualifiedName~HeadlessUiSmokeTests.CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.34 將獨立 CAD load spinner host 改為真正 `Hide()/Show()`，移除透明殘留框
+  - 完成內容：
+    - spinner helper process 啟動完成後即自我 `Hide()`，不再維持一個 `Opacity=0` 但仍可被 compositor 留下框線的透明 top-level。
+    - `show` IPC request 會在置中後重新 `Show()`，`hide` IPC request 則改為真正 `Hide()`，避免載入結束後殘留圓角框/陰影。
+    - `show` 後再次套用視窗呈現契約，確保 `click-through / no-activate / no-frame` 樣式在重新顯示後仍成立。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.33 收斂獨立 CAD load spinner 視窗的無框與 click-through 契約
+  - 完成內容：
+    - `CadLoadSpinnerWindow` 在 Windows 上套用原生 `WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_LAYERED`，並移除 caption/border/frame style，確保視窗預設完全不可見、只顯示 spinner 本體，且不攔截底下主視窗的點擊。
+    - 保持 spinner 仍為 centered transparent top-level；不修改 spinner 本體動畫與載入流程，只修正 host window 的顯示與輸入契約。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.32 修正獨立 CAD load spinner 視窗層級，避免被主視窗覆蓋
+  - 完成內容：
+    - `CadLoadSpinnerWindow` 改為 `Topmost=True`，並在 `show` IPC request 套用時再次明確進入 topmost layer，避免跨 process spinner 視窗因沒有 owner 關係而被主視窗蓋住。
+    - 保持 `ShowActivated=False` 與透明背景，只提升 z-order，不改變 spinner 本體或載入流程。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.28 將 CAD load spinner host 提前到 app startup 預熱，避免首次 Show 冷啟延遲
+  - 完成內容：
+    - 新增 `CadLoadSpinnerHostService`，收斂 CAD load spinner host 為 app 級共享實例，不再由 `FreeformHelperView` 每次 attach/detach 自行擁有 process lifetime。
+    - `App.OnFrameworkInitializationCompleted()` 在 main window 建立後即背景預熱 spinner helper process，讓首次 `Load DXF / Load Project` 不再把 process cold-start 時間算進 loading 顯示熱路徑。
+    - `FreeformHelperView` 改為預設取得 shared host，detach 時只會 hide，不會提早銷毀 app 級 spinner helper。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~CadLoadSpinnerProcessHostTests|FullyQualifiedName~HeadlessUiSmokeTests.FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility|FullyQualifiedName~HeadlessUiSmokeTests.CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates"`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.26 將 CAD load spinner 收斂為獨立 host process
+  - 完成內容：
+    - 新增 `CadLoadSpinnerProcessHost`，載入期間由主程式啟動同一支 executable 的 `--cad-load-spinner` 模式，不再讓 loading spinner 與主畫面共用同一個 Avalonia dispatcher。
+    - 新增 `CadLoadSpinnerStartupContext` / `CadLoadSpinnerCommandLine`，專責解析 spinner host 啟動參數（parent pid + owner bounds），避免主程式 bootstrap 與 spinner 視窗各自推導一套啟動契約。
+    - `App` / `Program` 新增 spinner mode 分流；spinner process 只建立 `CadLoadSpinnerWindow`，不載入 `MainWindow` / `ShellViewModel` / runtime query host。
+    - `CadLoadSpinnerWindow` 改為透明 top-level，透過 parent-process monitor 自行關閉；`FreeformHelperView` 改以 `ICadLoadSpinnerHost` 顯示/隱藏 spinner host。
+    - 補測試：
+      - `CadLoadSpinnerProcessHostTests`
+      - `HeadlessUiSmokeTests.FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility`
+      - `HeadlessUiSmokeTests.CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates`
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~HeadlessUiSmokeTests|FullyQualifiedName~CadLoadSpinnerProcessHostTests"`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.25 將 Load Project replay（Step1 / Step2）拆成 background compute + UI-commit
+  - 完成內容：
+    - `FreeformDetector` 拆成 `DetectAssignments(...)` + `ApplyAssignments(...)`，讓 Step2 auto-detect 的重計算與 UI commit 分離；`AutoTagFreeforms(...)` 改為走同一條 shared path。
+    - `FreeformTaggingUseCase` 收斂為無狀態 orchestration helper，提供 `BuildAutoDetectAssignments(...)` / `ApplyAutoDetectAssignments(...)` 單一路徑，避免 `Load Project replay` 與一般 Step2 workflow 各自再推導一次 freeform 結果。
+    - `RestoreStep2FreeformAfterProjectLoadAsync()` 改成先背景計算 assignments，再回 UI thread 統一 commit 到 grid / preview / workflow state；`Load Project` 的 replay timing 也移回 CAD load overlay scope 內，避免 overlay 提前消失。
+    - 補回歸測試：
+      - `FreeformDetectorTests.DetectAssignments_MatchesAutoTagFreeformsResult`
+      - `SaveThenLoadProject_ReplaysStep2FreeformAfterAsyncProjectLoad`
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --no-build --nologo --filter "FullyQualifiedName~FreeformDetectorTests|FullyQualifiedName~SaveThenLoadProject_ReplaysStep2FreeformAfterAsyncProjectLoad"`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.27 收斂 CAD load spinner host，移除 top-level 邊框殘留並加可視性 smoke guard
+  - 完成內容：
+    - `CadLoadSpinnerWindow` 內嵌專用 `Window` template，只保留透明 content host，不再沿用預設 window visual tree，避免在 Windows 上留下方框樣板殘影。
+    - `LoadingSpinner` 調整尺寸 token，讓 spinner 本體在透明 top-level 上更容易辨識。
+    - `HeadlessUiSmokeTests` 新增 spinner 可視像素檢查，避免之後又出現「角度有動但實際看不到 spinner」的回歸。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~HeadlessUiSmokeTests.FreeformHelperView_CadLoadOverlay_BecomesVisible_AndSpinnerAnimates"`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.24 將 CAD load 的 layer toggle / layer option 建立拆成 background-precompute + UI-apply
+  - 完成內容：
+    - 新增 `CadLayerUiSnapshotBuilder`，把 layer name discovery、snapshot layer selection 套用、bound layer option truncation、regular source option、DXF edit target layer 預設收斂成單一 snapshot path。
+    - `ApplyCadLoadOutcomeAsync(...)` 改為先背景建立 `CadLayerUiSnapshot`，再回 UI thread 一次性套用；`Open DXF` 與 `Load Project` 共用這條 async entry。
+    - 同步 `UpdateLayerToggles(...)` 也改讀 shared snapshot builder，移除 repo 內第二套 layer-option 推導路徑。
+    - 補回歸測試：
+      - `CadLayerUiSnapshotBuilderTests`
+      - `FreeformHelperViewModelTests.CommandsAndUndo.ApplyCadLoadOutcomeAsync_ClearsStaleCombinedMetadataBeforeApplyingHiddenRows`
+      - `SaveThenLoadProject_RestoresLayerSelectionsAndDxfDependentOptions_AfterAsyncCadLoadApply`
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --no-build --nologo --filter "FullyQualifiedName~CadLayerUiSnapshotBuilderTests"`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.23 將 CAD load loading 顯示改為透明 top-level spinner window，並把 layer catalog 讀取搬到背景
+  - 完成內容：
+    - `FreeformHelperView` 移除 inline overlay，改為根據 `IsCadLoadCanvasOverlayVisible` 顯示 `CadLoadSpinnerWindow`。
+    - 新增 `CadLoadSpinnerWindow`，透明背景、無系統裝飾、只顯示 centered `LoadingSpinner`。
+    - `HeadlessUiSmokeTests` 改成驗證 top-level spinner window 會建立、顯示、旋轉、關閉。
+    - `CadLoadWorkflowService` 與 `LoadProject` 的 layer catalog 讀取改走 background `Task.Run(...)`，減少 UI thread 在載入期間的同步 IO。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~HeadlessUiSmokeTests.FreeformHelperView_CadLoadOverlay_BecomesVisible_AndSpinnerAnimates"`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --no-build --nologo --filter "FullyQualifiedName~HeadlessUiSmokeTests|FullyQualifiedName~PadCanvasCacheInvalidationTests|FullyQualifiedName~PadCanvasHitTestTests|FullyQualifiedName~FreeformHelperViewModelTests|FullyQualifiedName~IndexMappingReportViewModelTests|FullyQualifiedName~IndexMappingSettingsTests|FullyQualifiedName~NotchExportSelectionViewModelTests|FullyQualifiedName~PadInfoViewModelTests|FullyQualifiedName~WorkspaceInteractionStateTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.22 補 CAD load overlay visual guard 與可視性確認
+  - 完成內容：
+    - 確認看不到 loading 動畫的主因，是 `LoadingSpinner` 使用 `36px` design arc，但 overlay host token 只有 `28px`，導致 spinner 被縮得太小、視覺存在感不足；同時缺少 UI-level animation guard，所以先前只有 ViewModel flag 測試，沒有真的鎖住「看得到且會轉」。
+    - `LoadingSpinner` 改為用 `Viewbox` 承接 design-size arc，避免 host size 與設計尺寸不一致時發生 clipping / 弱化；overlay spinner token 同步調整為 `40px`、stroke `3`。
+    - `FreeformHelperView` 內新增具名 `CadLoadCanvasOverlay` / `CadLoadCanvasSpinner`，正式收斂為 inline centered spinner；舊的 `CadLoadIndicatorWindow` 與 `FreeformHelperView.CadLoadIndicator.cs` 一併移除。
+    - `HeadlessUiSmokeTests` 補 UI-level guard，直接驗證 overlay 顯示、spinner 旋轉角度有變化、scope 結束後 angle 回到 `0`。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~HeadlessUiSmokeTests|FullyQualifiedName~FreeformHelperViewModelTests.Basics.LoadOverlay"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.18 同步文件：DXF edit modal 與 CAD load overlay 契約
+  - 完成內容：
+    - `behavior-inventory.md` 補上 `DxfEditChangeListWindow` 的 badge modal 契約，以及 `Open DXF / Load Project` 共用 `RunWithCadLoadCanvasOverlayAsync(...)` + inline spinner overlay 的 single-path 說明。
+    - `settings-entry-matrix.md` 補上 `DxfEditChangeListWindow` 的具體入口說明，並新增 `CAD load overlay workflow` 的非設定型 workflow row，避免 stale-doc check 漏掉這條固定契約。
+    - 文件同步後，repo scan 的 stale-doc / stale-behavior check 可以覆蓋目前 DXF edit modal 與 CAD load overlay 的最新實作。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~HeadlessUiSmokeTests|FullyQualifiedName~FreeformHelperViewModelTests.Basics.LoadOverlay"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.17 穩定 repo scan / build / lint gate
+  - 完成內容：
+    - `repo_scan.ps1` 改為 `git ls-files` 優先、`Get-ChildItem` fallback，不再依賴 `rg --files`；也會自動排除 dirty worktree 中已刪除但仍被 git 追蹤的檔案。
+    - repo scan 新增 stable build/lint gate summary，會建立 `build/logs`、執行 UI build 與 `lint -AllFiles -UseNoAppHost`，並把 `code` / `environment` 失敗類型分開寫進報告，不再因工具依賴或 log 目錄問題直接中止。
+    - `lint.ps1` 新增 `-NoThrow` / `-ResultOutputPath`，讓其他 gate 腳本可以讀取 machine-readable result，同時保留原本 direct failure 行為。
+    - 產出新的 dated scan report：`docs/guides/repo-refactor-scan-2026-03-10.md`。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `pwsh .agents/skills/repo-optimizer-loop/scripts/repo_scan.ps1 -RepoRoot . -OutFile docs/guides/repo-refactor-scan-2026-03-10.md`
+    - `./scripts/tests/lint.ps1 -AllFiles -UseNoAppHost`
+- [x] S11.16 拆分 Export Notch Rows filter/projection flow
+  - 完成內容：
+    - 新增 `NotchExportSelectionProjectionBuilder`，把 visible rows / IC groups / workspace-linked rows / column-filter option values 收斂到同一條 projection pipeline。
+    - `NotchExportSelectionViewModel` 改由 shared filter state + projection snapshot 驅動 `RebuildVisibleRows()`；移除內部重複的 row filter/search/column filter path 與 workspace row index cache，讓 preview retention 與 workspace selection 都只套用 projection 結果。
+    - 補回歸測試：
+      - `NotchExportSelectionProjectionBuilderTests` 直接鎖住 projection snapshot 與 target-field excluded column-filter scope。
+      - `NotchExportSelectionViewModelTests` 補 column filter dialog integration guard，確認 dialog options 跟主列表共用同一份有效範圍。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~NotchExportSelectionViewModelTests|FullyQualifiedName~NotchExportSelectionProjectionBuilderTests|FullyQualifiedName~NotchExportSelectionWindowSmokeTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.15 將 settings 變更收斂到單一 apply/orchestration path
+  - 完成內容：
+    - 新增 `SettingsApplyPlanBuilder` 與 `FreeformHelperViewModel.Settings.Orchestration`，以 canonical property names 收斂 settings side effects / UI notification / settings-window persistence decision。
+    - `Settings.PropertyCallbacks` 與 `Settings.NotchPreview` 的 direct-edit path 改走 shared orchestration，並補上 scan order / alignment / regular source / match mode / diff-index auto mode 的 sync guard，避免 option/raw enum 互設時重複觸發。
+    - `ApplySettingsWindowDraft` 改為先收集 changed property set，再用同一套 orchestration 套用；一併修正 settings window save 沒有同步 `SelectedScanOrder` / `RegularSourceMode` / `DxfIndexAutoMode` raw state，以及 diff-index anchor 沒有 commit 到 project state 的問題。
+    - 補回歸測試，鎖住 general section raw-state sync、step4 anchor commit、以及 `MatchThreshold` 在 settings window save 下與 direct edit 同樣維持 no-fit rebuild 契約。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~FreeformHelperViewModelTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.14 重命名並拆分 DXF reset command 契約
+  - 完成內容：
+    - `RestoreAllDeletedCadPadsCommand` 正名為 `ResetAllDxfEditsCommand`，明確代表「hidden + combined + layer moves 全重置」；`LeftDxfPanel` header reset button 與 confirm dialog 改綁這條 full-reset path。
+    - 新增 `RestoreAllHiddenCadPadsCommand`，只恢復 manual hidden pads，不會清除 combine group 或 layer-move edits；單筆 hidden restore、restore-last、restore-all-hidden 改共用同一條 hidden-restore side-effect helper。
+    - `LeftDxfPanel` quick actions 新增 hidden-only restore 按鈕，說明文字同步區分 manual hide restore、selected combine clear、header full reset。
+    - 補回歸測試，鎖住 hidden-only restore 與 full reset 的不同契約。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~FreeformHelperViewModelTests"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.21 將 CAD load indicator 收斂為 circle-only overlay 並移除方框視窗
+  - 完成內容：
+    - 移除 `CadLoadIndicatorWindow`，改為 `FreeformHelperView` 最上層透明 overlay，只顯示 centered `LoadingSpinner`。
+    - 保留現有 `LoadingSpinner` 旋轉邏輯，只收斂顯示容器，避免透明 top-level window 在 Windows 上顯示成方框。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.10 建立 unique-path regression guard
+  - 完成內容：
+    - `RuntimeQueryUseCaseTests` 新增跨 reader regression guard，直接比對同一 CAD 輸入下的 `GetCadV22ResolvedResult`、`GetCadV22StageOverlays`、`GetCadV22TargetAllocationSummary`、`BuildCadPadInspectorSnapshot`、`query notch`、`query notch-stage`、`query pad`，鎖住 single-result path。
+    - 一併修正 `RuntimeQueryUseCaseTests` 對 runtime query JSON payload 的命名契約斷言，改為實際使用的 `camelCase` 欄位。
+    - `.agents/skills/repo-optimizer-loop/references/optimization-checklist.md` 新增 scan checklist：shared result 必須區分 acceptable single-path / unacceptable re-derivation，且要檢查是否已有跨 reader regression guard。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~RuntimeQueryUseCaseTests|FullyQualifiedName~NotchV22ResolvedResultServiceTests|FullyQualifiedName~FreeformHelperViewModelTests.PadInspectorCache"`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.20 將 CAD load loading 顯示改為浮動透明 spinner window
+  - 完成內容：
+    - 移除 AA 區內嵌 overlay，改由 `FreeformHelperView` 根據 `IsCadLoadCanvasOverlayVisible` 顯示透明浮動 window。
+    - 新增 `CadLoadIndicatorWindow`，內容只保留 centered `LoadingSpinner`，不再顯示 scrim、卡片或文字。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.19 簡化 CAD load spinner 並避免 grid rebuild 卡住動畫
+  - 完成內容：
+    - `LoadingSpinner` 改為單一輕量圓弧，不再顯示重的 overlay card / title / track ring。
+    - `Open DXF / Load Project` 期間，當 `IsCadLoadCanvasOverlayVisible` 為 `true` 時，`RebuildGridAsync()` 會先在 UI thread 建立 snapshot，再把 `GridRebuildOrchestrator.Build(...)` 放到背景執行，避免 spinner 因同步 grid build 停住。
+    - `YieldCadLoadCanvasOverlayFrameAsync()` 改用 `DispatcherPriority.Render`，確保 overlay 先完成一幀再進入重工作。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.13 Load DXF / Load Project 時在 AA 區顯示 loading overlay
+  - 完成內容：
+    - 新增 `IsCadLoadCanvasOverlayVisible` 與 `RunWithCadLoadCanvasOverlayAsync(...)`，讓 `Open DXF` 與 `Load Project` 共用同一條 overlay scope。
+    - `Open DXF` / `Load Project` 的 DXF import / reload 改為在 overlay scope 內執行，DXF import 走 `Task.Run(...)`，避免 UI thread 被同步 import 完全卡死而看不到動畫。
+    - 中央 AA 區新增 `LoadingSpinner` control 與半透明 overlay card，使用 token 控尺寸/opacity，不混用其他 busy state。
+    - 補回歸測試，鎖住 overlay scope 的顯示/巢狀 scope 契約。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter FullyQualifiedName~FreeformHelperViewModelTests`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.12 修正 Notch Step3 final polygon union 遺失外框的幾何路徑
+  - 完成內容：
+    - `CadPadUnionService` 在 union 前先統一所有實心 polygon 的方向，避免 DXF 原始頂點順序被 Clipper 誤解為不同填充語意。
+    - 修正 `CAD4818` 類型案例：`Stage3 final polygons` 不再裂成右半矩形與左下碎片，回到單一完整外框。
+    - 補回歸測試：
+      - `CadPadUnionServiceTests` 使用實專案的 `CAD4818` 頂點順序
+      - `NotchV22FinalOutlineServiceTests`
+      - `FreeformHelperViewModelTests.Basics.Step3RealProject`
+    - 額外用 runtime query 驗證 `query notch-stage --cad-id 4818` 已回傳單一 final polygon。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~CadPadUnionServiceTests|FullyQualifiedName~NotchV22FinalOutlineServiceTests|FullyQualifiedName~GetCadV22StageOverlays_CAD4818_ReturnsFinalOutlineCoveringFullReg384"`
+    - `./scripts/tests/run-tests.ps1 -Group application -UseNoAppHost`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.11 收斂 Step3 staged preview 語意與畫面顯示
+  - 完成內容：
+    - `NotchOverlayVisibilityPolicy` 改為 stage-exclusive 規則：
+      - `Stage 1` 只顯示 `Seed`
+      - `Stage 2` 只顯示 `Candidate`
+      - `Stage 3` 只顯示 `Final`
+    - `FreeformHelperViewModelTests.Basics.Step3AndOverlap` 更新 stage state 斷言，避免再把「累積顯示」當成既有契約。
+    - `NotchOverlayVisibilityPolicyTests` 的 matrix 改為 `== stage` 規則，鎖住互斥顯示契約。
+    - 文件同步：
+      - `docs/core/notch-2.2-spec.md`
+      - `docs/reference/notch-overlay-h5-design.md`
+      - `docs/reference/behavior-inventory.md`
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.9 收斂 Notch 2.2 顯示投影 path（PadInspector / PadInfo / Notch detail / RuntimeQuery）
+  - 完成內容：
+    - 新增 `src/FreeformHelper.UI/Services/NotchDisplayProjector.cs`，統一產生：
+      - `ToRegular/ToFull/Combined` ratio text / compact value text
+      - `To Full reason`（short/full）
+      - `Stage3 area`
+      - `Target allocation summary / lines`
+      - `Owner summary`
+      - `formatted diagnostics`
+    - `PadInspector` 改讀 shared projector，不再自行 parse `diagnostics` 組 `Reason / Combined`。
+    - `CadPadInfoViewModel` 改讀 shared projector，不再在 `Construction / Formatting / NotchDiagnostics` 三處重組 display text。
+    - `NotchDetailUseCase / NotchDetailViewModel` 的 ratio 文案改讀 shared projector。
+    - `RuntimeQuery query pad / query notch` 新增 `display` payload，與 UI 共用同一組 display projection。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --no-build --filter "FullyQualifiedName~NotchDisplayProjectorTests|FullyQualifiedName~PadInfoViewModelTests|FullyQualifiedName~RuntimeQueryUseCaseTests"`
+    - `./scripts/tests/run-tests.ps1 -Group application -UseNoAppHost`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+- [x] S11.8 收斂 Notch 2.2 最終結果到唯一 path，修正 CAD4826 類型案例
+  - 完成內容：
+    - `NotchV22CompensationResult` 新增 `IsToFullEnabled` / `Stage3Area`，作為單一數值真相。
+    - `ToFullRatio` / `CombinedRatio` / `Stage3Area` 改為以 applied regular 的 `ReachableArea - OverlapArea` 統一計算，不再從 UI 或 allocation 二次推導。
+    - 新增 `NotchV22ResolvedResultService`，統一產出 `Stage1/Stage2/Stage3` overlay 與 `TargetAllocationSummary`。
+    - `PadInspector`、`Notch preview`、`RuntimeQuery` 改讀同一份 resolved result。
+  - 驗證：
+    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
+    - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --no-build --filter "FullyQualifiedName~NotchV22ResolvedResultServiceTests|FullyQualifiedName~NotchV22CompensationServiceTests|FullyQualifiedName~FreeformHelperViewModelTests.PadInspectorCache"`
+    - `./scripts/tests/run-tests.ps1 -Group application -UseNoAppHost`
+    - `./scripts/tests/run-tests.ps1 -Group ui-core -UseNoAppHost`
+    - `./scripts/tests/lint.ps1 -UseNoAppHost`
+

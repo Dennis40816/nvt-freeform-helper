@@ -1,0 +1,337 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.RightWorkflowSections.RightWorkflowInspectorView">
+    <controls:HidePanelBlock Title="Inspector snapshot"
+                             IsVisible="{Binding IsRightPanelInspectorTab}"
+                             IsExpanded="True"
+                             IsCollapsible="False">
+      <StackPanel Spacing="{StaticResource Space8}"
+                  HorizontalAlignment="Stretch">
+        <SelectableTextBlock Classes="stepNote"
+                             IsVisible="{Binding HasNoPadInspectorSummary}"
+                             Text="Select a CAD or regular pad to inspect. This panel uses the same snapshot source as Popover and CLI."/>
+
+        <Border Classes="workspaceSectionCard">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <Grid Classes="workspaceSectionHeader"
+                  RowDefinitions="Auto,Auto">
+              <SelectableTextBlock Classes="workspaceSectionTitle"
+                                   Text="Quick focus"/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Classes="workspaceSectionSummary"
+                                   Text="Focus by CAD, REG, or DIFF id."/>
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space8}">
+              <TextBox Text="{Binding QuickFocusQueryText, Mode=TwoWay}"
+                       Watermark="diff 72 / cad 4809 / reg 4616"
+                       ToolTip.Tip="Focus by typed target. Examples: diff 72, ic1 diff72, cad 4809, reg 4616. Plain number auto-resolves CAD, REG, then diff."/>
+              <Button Grid.Column="1"
+                      Classes="actionPrimary actionTextButton"
+                      Content="Focus"
+                      Command="{Binding QuickFocusCommand}"
+                      ToolTip.Tip="Select and zoom the matching CAD output pad, regular pad, or FW diff."/>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="workspaceSectionCard"
+                IsVisible="{Binding HasPadInspectorSummary}">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <Grid Classes="infoTierRow"
+                  ColumnDefinitions="Auto,*">
+              <Border Classes="infoTierDot summary"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Text="{Binding PadInspectorPrimaryText}"
+                                   FontWeight="SemiBold"
+                                   ToolTip.Tip="{Binding PadInspectorPrimaryText}"
+                                   TextWrapping="Wrap"/>
+            </Grid>
+            <Grid Classes="infoTierRow"
+                  ColumnDefinitions="Auto,*">
+              <Border Classes="infoTierDot detail"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Text="{Binding PadInspectorSecondaryText}"
+                                   Foreground="{DynamicResource BrushTextMuted}"
+                                   ToolTip.Tip="{Binding PadInspectorSecondaryText}"
+                                   TextWrapping="Wrap"/>
+            </Grid>
+            <Grid Classes="infoTierRow"
+                  ColumnDefinitions="Auto,*">
+              <Border Classes="infoTierDot detail"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Text="{Binding PadInspectorMatchText}"
+                                   Foreground="{DynamicResource BrushTextMuted}"
+                                   ToolTip.Tip="{Binding PadInspectorMatchText}"
+                                   TextWrapping="Wrap"/>
+            </Grid>
+            <Grid Classes="infoTierRow"
+                  ColumnDefinitions="Auto,*">
+              <Border Classes="infoTierDot warning"/>
+              <StackPanel Grid.Column="1"
+                          Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Text="Notch / Freeform"
+                                     FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding PadInspectorCompensationLines}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid ColumnDefinitions="Auto,*"
+                            ColumnSpacing="{StaticResource Space6}"
+                            Margin="{StaticResource InsetBottom4}">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="{StaticResource Space2}"
+                                    IsVisible="{Binding HasFreeformDirectionMarker}">
+                          <SelectableTextBlock Text="/"
+                                               Classes="padInspectorFreeformSlashX"
+                                               IsVisible="{Binding ShowFreeformXSlash}"/>
+                          <SelectableTextBlock Text="\"
+                                               Classes="padInspectorFreeformSlashY"
+                                               IsVisible="{Binding ShowFreeformYSlash}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1"
+                                    Spacing="{StaticResource Space2}">
+                          <SelectableTextBlock Text="{Binding Label}"
+                                               FontWeight="SemiBold"
+                                               Classes="padInspectorLineLabel"
+                                               Classes.padInspectorLineLabelKey="{Binding IsToneKey}"
+                                               Classes.padInspectorLineLabelWarning="{Binding IsToneWarning}"
+                                               IsVisible="{Binding HasLabel}"/>
+                          <SelectableTextBlock Text="{Binding Value}"
+                                               FontWeight="{Binding ValueFontWeight}"
+                                               Classes="padInspectorLineValue"
+                                               Classes.padInspectorLineValueKey="{Binding IsToneKey}"
+                                               Classes.padInspectorLineValueWarning="{Binding IsToneWarning}"
+                                               TextWrapping="Wrap"/>
+                        </StackPanel>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Grid>
+            <Grid Classes="infoTierRow"
+                  ColumnDefinitions="Auto,*"
+                  IsVisible="{Binding IsPadInspectorDeferredRefreshPending}">
+              <Border Classes="infoTierDot trace"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="stepNote"
+                                   Text="Notch 2.2 details are computing in background..."
+                                   TextWrapping="Wrap"/>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Height="{StaticResource Space1}"
+                Background="{DynamicResource BrushBorder}"
+                IsVisible="{Binding HasPadInspectorSummary}"/>
+
+        <Border Background="{DynamicResource BrushBgSurfaceInset}"
+                BorderBrush="{DynamicResource BrushBorder}"
+                BorderThickness="{StaticResource BorderThin}"
+                CornerRadius="{StaticResource RadiusSm}"
+                Padding="{StaticResource Inset8}"
+                IsVisible="{Binding HasPadInspectorSummary}">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <Grid Classes="infoTierRow"
+                  ColumnDefinitions="Auto,*">
+              <Border Classes="infoTierDot detail"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Text="Snapshot details"
+                                   FontWeight="SemiBold"/>
+            </Grid>
+            <ContentControl Content="{Binding CurrentPadInspectorSnapshot}">
+              <ContentControl.DataTemplates>
+                <DataTemplate DataType="{x:Type vm:PadInspectorSnapshot}">
+                  <Grid ColumnDefinitions="Auto,8,*"
+                        RowDefinitions="Auto,Auto,Auto,Auto"
+                        RowSpacing="{StaticResource Space4}"
+                        IsVisible="{Binding HasCad}">
+                    <SelectableTextBlock Text="Diff source"/>
+                    <SelectableTextBlock Grid.Column="2"
+                                         Text="{Binding Cad.CadOutputFwDiffAssignmentModeText}"
+                                         TextWrapping="Wrap"/>
+                    <SelectableTextBlock Grid.Row="1" Text="Diff idx"/>
+                    <SelectableTextBlock Grid.Row="1"
+                                         Grid.Column="2"
+                                         Text="{Binding Cad.DxfIndexDisplayText}"
+                                         TextWrapping="Wrap"/>
+                    <SelectableTextBlock Grid.Row="2" Text="Match confidence"/>
+                    <SelectableTextBlock Grid.Row="2"
+                                         Grid.Column="2"
+                                         Text="{Binding Cad.MatchConfidence, StringFormat={}{0:P1}}"
+                                         TextWrapping="Wrap"/>
+                    <SelectableTextBlock Grid.Row="3" Text="Match"/>
+                    <SelectableTextBlock Grid.Row="3"
+                                         Grid.Column="2"
+                                         Text="{Binding Cad.MatchText}"
+                                         TextWrapping="Wrap"/>
+                  </Grid>
+                </DataTemplate>
+              </ContentControl.DataTemplates>
+            </ContentControl>
+            <ContentControl Content="{Binding CurrentPadInspectorSnapshot}">
+              <ContentControl.DataTemplates>
+                <DataTemplate DataType="{x:Type vm:PadInspectorSnapshot}">
+                  <Grid ColumnDefinitions="Auto,8,*"
+                        RowDefinitions="Auto,Auto,Auto,Auto"
+                        RowSpacing="{StaticResource Space4}"
+                        IsVisible="{Binding HasRegular}">
+                    <SelectableTextBlock Text="Diff source"/>
+                    <SelectableTextBlock Grid.Column="2"
+                                         Text="{Binding Regular.DiffSource}"
+                                         TextWrapping="Wrap"/>
+                    <SelectableTextBlock Grid.Row="1" Text="Diff idx"/>
+                    <SelectableTextBlock Grid.Row="1"
+                                         Grid.Column="2"
+                                         Text="{Binding Regular.DiffIndex}"
+                                         TextWrapping="Wrap"/>
+                    <SelectableTextBlock Grid.Row="2" Text="Match confidence"/>
+                    <SelectableTextBlock Grid.Row="2"
+                                         Grid.Column="2"
+                                         Text="{Binding Regular.MatchConfidence, StringFormat={}{0:P1}}"
+                                         TextWrapping="Wrap"/>
+                    <SelectableTextBlock Grid.Row="3" Text="Match"/>
+                    <SelectableTextBlock Grid.Row="3"
+                                         Grid.Column="2"
+                                         Text="{Binding Regular.MatchText}"
+                                         TextWrapping="Wrap"/>
+                  </Grid>
+                </DataTemplate>
+              </ContentControl.DataTemplates>
+            </ContentControl>
+          </StackPanel>
+        </Border>
+
+        <Border Height="{StaticResource Space1}"
+                Background="{DynamicResource BrushBorder}"
+                IsVisible="{Binding HasPadInspectorRuleTrace}"/>
+
+        <Border Background="{DynamicResource BrushBgSurfaceInset}"
+                BorderBrush="{DynamicResource BrushBorder}"
+                BorderThickness="{StaticResource BorderThin}"
+                CornerRadius="{StaticResource RadiusSm}"
+                Padding="{StaticResource Inset8}"
+                IsVisible="{Binding HasPadInspectorRuleTrace}">
+          <StackPanel Spacing="{StaticResource Space4}">
+            <Grid Classes="infoTierRow"
+                  ColumnDefinitions="Auto,*">
+              <Border Classes="infoTierDot trace"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Text="{Binding PadInspectorRuleTraceLines.Count, StringFormat='Rule trace (x{0})'}"
+                                   FontWeight="SemiBold"/>
+            </Grid>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="Shows rule-by-rule reasoning for the current pad."
+                                 Foreground="{DynamicResource BrushTextMuted}"
+                                 TextWrapping="Wrap"/>
+            <ItemsControl ItemsSource="{Binding PadInspectorRuleTraceSections}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Background="{DynamicResource BrushBgPanel}"
+                          BorderBrush="{DynamicResource BrushBorder}"
+                          BorderThickness="{StaticResource BorderThin}"
+                          CornerRadius="{StaticResource RadiusXs}"
+                          Margin="{StaticResource InsetBottom6}"
+                          Padding="{StaticResource Inset6}">
+                    <StackPanel Spacing="{StaticResource Space4}">
+                      <StackPanel Spacing="{StaticResource Space4}"
+                                  IsVisible="{Binding IsNonRawSection}">
+                        <SelectableTextBlock Text="{Binding Title}"
+                                             FontWeight="SemiBold"/>
+                        <ItemsControl ItemsSource="{Binding Lines}">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <Grid ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="{StaticResource Space6}"
+                                    Margin="{StaticResource InsetBottom4}">
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="{StaticResource Space2}"
+                                            IsVisible="{Binding HasFreeformDirectionMarker}">
+                                  <SelectableTextBlock Text="/"
+                                                       Classes="padInspectorFreeformSlashX"
+                                                       IsVisible="{Binding ShowFreeformXSlash}"/>
+                                  <SelectableTextBlock Text="\"
+                                                       Classes="padInspectorFreeformSlashY"
+                                                       IsVisible="{Binding ShowFreeformYSlash}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1"
+                                            Spacing="{StaticResource Space2}">
+                                  <SelectableTextBlock Text="{Binding Label}"
+                                                       FontWeight="SemiBold"
+                                                       Classes="padInspectorLineLabel"
+                                                       Classes.padInspectorLineLabelKey="{Binding IsToneKey}"
+                                                       Classes.padInspectorLineLabelWarning="{Binding IsToneWarning}"
+                                                       IsVisible="{Binding HasLabel}"/>
+                                  <SelectableTextBlock Text="{Binding Value}"
+                                                       FontWeight="{Binding ValueFontWeight}"
+                                                       Classes="padInspectorLineValue"
+                                                       Classes.padInspectorLineValueKey="{Binding IsToneKey}"
+                                                       Classes.padInspectorLineValueWarning="{Binding IsToneWarning}"
+                                                       TextWrapping="Wrap"/>
+                                </StackPanel>
+                              </Grid>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </StackPanel>
+                      <StackPanel Spacing="{StaticResource Space4}"
+                                  IsVisible="{Binding IsRawSection}">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="{StaticResource Space6}">
+                          <SelectableTextBlock Text="{Binding Title}"
+                                               FontWeight="SemiBold"/>
+                          <ToggleButton Grid.Column="1"
+                                        IsChecked="{Binding DataContext.IsPadInspectorRawTraceExpanded, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
+                            <SelectableTextBlock Text="{Binding Lines.Count, StringFormat='Raw x{0}'}"/>
+                          </ToggleButton>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding Lines}"
+                                      IsVisible="{Binding DataContext.IsPadInspectorRawTraceExpanded, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <Grid ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="{StaticResource Space6}"
+                                    Margin="{StaticResource InsetTop4}">
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="{StaticResource Space2}"
+                                            IsVisible="{Binding HasFreeformDirectionMarker}">
+                                  <SelectableTextBlock Text="/"
+                                                       Classes="padInspectorFreeformSlashX"
+                                                       IsVisible="{Binding ShowFreeformXSlash}"/>
+                                  <SelectableTextBlock Text="\"
+                                                       Classes="padInspectorFreeformSlashY"
+                                                       IsVisible="{Binding ShowFreeformYSlash}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1"
+                                            Spacing="{StaticResource Space2}">
+                                  <SelectableTextBlock Text="{Binding Label}"
+                                                       FontWeight="SemiBold"
+                                                       Classes="padInspectorLineLabel"
+                                                       Classes.padInspectorLineLabelKey="{Binding IsToneKey}"
+                                                       Classes.padInspectorLineLabelWarning="{Binding IsToneWarning}"
+                                                       IsVisible="{Binding HasLabel}"/>
+                                  <SelectableTextBlock Text="{Binding Value}"
+                                                       FontWeight="{Binding ValueFontWeight}"
+                                                       Classes="padInspectorLineValue"
+                                                       Classes.padInspectorLineValueKey="{Binding IsToneKey}"
+                                                       Classes.padInspectorLineValueWarning="{Binding IsToneWarning}"
+                                                       TextWrapping="Wrap"/>
+                                </StackPanel>
+                              </Grid>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </StackPanel>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </controls:HidePanelBlock>
+</UserControl>

@@ -1,0 +1,328 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        x:Class="FreeformHelper.UI.Views.DxfEditChangeListWindow"
+        Width="{StaticResource DxfEditChangeListWidth}"
+        Height="{StaticResource DxfEditChangeListHeight}"
+        MinWidth="{StaticResource DxfEditChangeListMinWidth}"
+        MinHeight="{StaticResource DxfEditChangeListMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="DXF Edit Details">
+  <controls:ReviewWorkspaceShell Title="{Binding TitleText}"
+                                 Subtitle="{Binding SubtitleText}">
+    <controls:ReviewWorkspaceShell.HeaderRight>
+      <Button Classes="actionIconButton actionGhost dxfEditHeaderAction"
+              Command="{Binding RefreshCommand}"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Top"
+              ToolTip.Tip="Refresh rows">
+        <controls:FontIcon Classes="symbols iconSm"
+                           Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+      </Button>
+    </controls:ReviewWorkspaceShell.HeaderRight>
+
+    <controls:ReviewWorkspaceShell.SummaryContent>
+      <Grid ColumnDefinitions="*,Auto"
+            ColumnSpacing="{StaticResource Space12}">
+        <WrapPanel Orientation="Horizontal">
+          <Button Classes="actionChip chipAction direct"
+                  Classes.active="{Binding IsHiddenKindSelected}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding HiddenCount, StringFormat='Hidden {0}'}"
+                  Command="{Binding SetHiddenKindCommand}"/>
+          <Button Classes="actionChip chipAction linked"
+                  Classes.active="{Binding IsDuplicateKindSelected}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding DuplicateCount, StringFormat='Duplicate {0}'}"
+                  Command="{Binding SetDuplicateKindCommand}"/>
+          <Button Classes="actionChip chipAction incoming"
+                  Classes.active="{Binding IsCombinedKindSelected}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding CombinedCount, StringFormat='Combined {0}'}"
+                  Command="{Binding SetCombinedKindCommand}"/>
+          <Button Classes="actionChip chipAction legacy"
+                  Classes.active="{Binding IsMovedKindSelected}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding MovedCount, StringFormat='Moved {0}'}"
+                  Command="{Binding SetMovedKindCommand}"/>
+          <Button Classes="actionChip chipAction direct"
+                  Classes.active="{Binding IsRotatedKindSelected}"
+                  Margin="{StaticResource InsetRight6Bottom6}"
+                  Content="{Binding RotatedCount, StringFormat='Rotated {0}'}"
+                  Command="{Binding SetRotatedKindCommand}"/>
+        </WrapPanel>
+
+        <SelectableTextBlock Grid.Column="1"
+                             VerticalAlignment="Center"
+                             Classes="workspaceFilterResultText"
+                             Text="{Binding VisibleRowsSummaryText}"/>
+      </Grid>
+    </controls:ReviewWorkspaceShell.SummaryContent>
+
+    <controls:ReviewWorkspaceShell.ToolbarContent>
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto"
+            ColumnSpacing="{StaticResource Space8}">
+        <SelectableTextBlock VerticalAlignment="Center"
+                             Classes="workspaceFilterResultText"
+                             Text="{Binding SelectedVisibleRowsSummaryText}"/>
+        <SelectableTextBlock Grid.Column="1"
+                             VerticalAlignment="Center"
+                             Foreground="{DynamicResource BrushTextMuted}"
+                             Text="Bulk action follows current tab scope."
+                             TextWrapping="WrapWithOverflow"/>
+        <Button Grid.Column="2"
+                Classes="workspaceSubtleAction iconTextButton"
+                Command="{Binding ApplySelectedEntriesCommand}"
+                IsEnabled="{Binding CanApplySelectedEntries}"
+                IsVisible="{Binding IsSingleActionBulkMode}">
+          <Grid Classes="iconTextButtonContent"
+                ColumnDefinitions="Auto,*,Auto">
+            <controls:FontIcon Grid.Column="0"
+                               Classes="symbols iconTextButtonLeadingIcon"
+                               Glyph="{Binding BulkActionGlyph}"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="iconTextButtonLabel"
+                                 Text="{Binding BulkActionText}"/>
+            <Border Grid.Column="2"
+                    Classes="iconTextButtonTrailingSpacer"/>
+          </Grid>
+        </Button>
+        <Button Grid.Column="3"
+                Classes="workspaceTextAction iconTextButton"
+                Command="{Binding RestoreSelectedDuplicateEntriesCommand}"
+                IsEnabled="{Binding CanRestoreSelectedDuplicateEntries}"
+                IsVisible="{Binding IsDuplicateBulkMode}">
+          <Grid Classes="iconTextButtonContent"
+                ColumnDefinitions="Auto,*,Auto">
+            <controls:FontIcon Grid.Column="0"
+                               Classes="symbols iconTextButtonLeadingIcon"
+                               Glyph="{Binding RestoreSelectedDuplicateGlyph}"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="iconTextButtonLabel"
+                                 Text="Restore selected"/>
+            <Border Grid.Column="2"
+                    Classes="iconTextButtonTrailingSpacer"/>
+          </Grid>
+        </Button>
+        <Button Grid.Column="4"
+                Classes="workspaceTextAction iconTextButton"
+                Command="{Binding RehideSelectedDuplicateEntriesCommand}"
+                IsEnabled="{Binding CanRehideSelectedDuplicateEntries}"
+                IsVisible="{Binding IsDuplicateBulkMode}">
+          <Grid Classes="iconTextButtonContent"
+                ColumnDefinitions="Auto,*,Auto">
+            <controls:FontIcon Grid.Column="0"
+                               Classes="symbols iconTextButtonLeadingIcon"
+                               Glyph="{Binding RehideSelectedDuplicateGlyph}"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="iconTextButtonLabel"
+                                 Text="Hide selected"/>
+            <Border Grid.Column="2"
+                    Classes="iconTextButtonTrailingSpacer"/>
+          </Grid>
+        </Button>
+      </Grid>
+    </controls:ReviewWorkspaceShell.ToolbarContent>
+
+    <controls:ReviewWorkspaceShell.LeftContent>
+      <Grid RowDefinitions="Auto,*"
+            RowSpacing="{StaticResource Space6}">
+        <Border Grid.Row="0"
+                Classes="workspaceTableHeader">
+          <Grid ColumnSpacing="{StaticResource Space8}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="{StaticResource NotchExportTableColCheckWidth}"/>
+              <ColumnDefinition Width="2*"/>
+              <ColumnDefinition Width="1.2*"/>
+              <ColumnDefinition Width="2.9*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox Grid.Column="0"
+                      IsChecked="{Binding AreAllVisibleRowsSelected, Mode=TwoWay}"
+                      IsEnabled="{Binding HasRows}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Opacity="{StaticResource OpacityHigh}"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="workspaceTableHeaderText"
+                                 Text="CAD"
+                                 VerticalAlignment="Center"/>
+            <SelectableTextBlock Grid.Column="2"
+                                 Classes="workspaceTableHeaderText"
+                                 Text="Layer"
+                                 VerticalAlignment="Center"/>
+            <SelectableTextBlock Grid.Column="3"
+                                 Classes="workspaceTableHeaderText"
+                                 Text="Detail"
+                                 VerticalAlignment="Center"/>
+            <SelectableTextBlock Grid.Column="4"
+                                 Classes="workspaceTableHeaderText"
+                                 Text="Action"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Center"/>
+          </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+          <SelectableTextBlock Text="No DXF edit rows in this scope."
+                               IsVisible="{Binding HasNoRows}"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               Margin="{StaticResource Inset8}"/>
+          <ListBox ItemsSource="{Binding Rows}"
+                   x:Name="RowsListBox"
+                   Classes="scrollV2 workspaceDataList"
+                   SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
+                   IsVisible="{Binding HasRows}"
+                   Background="Transparent"
+                   BorderThickness="0"
+                   ScrollViewer.AllowAutoHide="False"
+                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemsPanel>
+              <ItemsPanelTemplate>
+                <VirtualizingStackPanel/>
+              </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Button Classes="workspaceDataRow"
+                        Classes.workspaceDataRowActive="{Binding IsInspectorSelected}"
+                        Command="{Binding DataContext.SelectEntryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding}">
+                  <Grid ColumnSpacing="{StaticResource Space8}">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="{StaticResource NotchExportTableColCheckWidth}"/>
+                      <ColumnDefinition Width="2*"/>
+                      <ColumnDefinition Width="1.2*"/>
+                      <ColumnDefinition Width="2.9*"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Grid.Column="0"
+                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Opacity="{StaticResource OpacityHigh}"/>
+                    <StackPanel Grid.Column="1"
+                                Spacing="{StaticResource Space2}">
+                      <SelectableTextBlock Classes="workspaceDataCellText strong"
+                                           Text="{Binding RowTitleText}"/>
+                      <SelectableTextBlock Classes="workspaceDataCellText"
+                                           Text="{Binding KindDisplayText}"/>
+                    </StackPanel>
+                    <SelectableTextBlock Grid.Column="2"
+                                         Classes="workspaceDataCellText"
+                                         Text="{Binding CurrentLayerText}"
+                                         VerticalAlignment="Center"/>
+                    <SelectableTextBlock Grid.Column="3"
+                                         Classes="workspaceDataCellText"
+                                         Text="{Binding ListDetailText}"
+                                         VerticalAlignment="Center"
+                                         TextWrapping="NoWrap"/>
+                    <SelectableTextBlock Grid.Column="4"
+                                         Classes="workspaceDataCellText"
+                                         Text="{Binding ActionLabel}"
+                                         VerticalAlignment="Center"
+                                         HorizontalAlignment="Center"/>
+                  </Grid>
+                </Button>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Grid>
+    </controls:ReviewWorkspaceShell.LeftContent>
+
+    <controls:ReviewWorkspaceShell.RightContent>
+      <Border Classes="workspaceInspectorHost">
+        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto"
+              RowSpacing="{StaticResource Space10}">
+          <SelectableTextBlock Grid.Row="0"
+                               Text="Inspector"
+                               FontWeight="SemiBold"/>
+          <Border Grid.Row="1"
+                  Classes="chipStatus">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding SelectedRowHeaderText}"/>
+          </Border>
+          <SelectableTextBlock Grid.Row="2"
+                               Text="{Binding SelectedRowStatusText}"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               TextWrapping="Wrap"/>
+          <Border Grid.Row="3"
+                  Classes="workspaceInspectorSection">
+            <StackPanel Spacing="{StaticResource Space8}">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
+                                     Text="Detail"/>
+                <SelectableTextBlock Classes="workspaceInspectorValue"
+                                     Text="{Binding SelectedRowDetailText}"/>
+              </StackPanel>
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
+                                     Text="Quick action"/>
+                <SelectableTextBlock Classes="workspaceInspectorValue"
+                                     Text="{Binding SelectedRowActionText}"
+                                     Foreground="{DynamicResource BrushTextMuted}"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Grid Grid.Row="4"
+                ColumnDefinitions="Auto,Auto,*"
+                ColumnSpacing="{StaticResource Space8}">
+            <Button Grid.Column="0"
+                    Classes="workspaceSubtleAction iconTextButton"
+                    Command="{Binding FocusSelectedEntryCommand}"
+                    IsEnabled="{Binding CanFocusSelectedEntry}">
+              <Grid Classes="iconTextButtonContent"
+                    ColumnDefinitions="Auto,*,Auto">
+                <controls:FontIcon Grid.Column="0"
+                                   Classes="symbols iconTextButtonLeadingIcon"
+                                   Glyph="{x:Static icons:IconGlyphs.Search}"/>
+                <SelectableTextBlock Grid.Column="1"
+                                     Classes="iconTextButtonLabel"
+                                     Text="Focus"/>
+                <Border Grid.Column="2"
+                        Classes="iconTextButtonTrailingSpacer"/>
+              </Grid>
+            </Button>
+            <Button Grid.Column="1"
+                    Classes="actionTextButton actionPrimary"
+                    Command="{Binding ApplySelectedEntryCommand}"
+                    IsEnabled="{Binding CanApplySelectedEntry}">
+              <Grid Classes="iconTextButtonContent"
+                    ColumnDefinitions="Auto,*,Auto">
+                <controls:FontIcon Grid.Column="0"
+                                   Classes="symbols iconTextButtonLeadingIcon"
+                                   Glyph="{Binding SelectedEntry.ActionGlyph}"/>
+                <SelectableTextBlock Grid.Column="1"
+                                     Classes="iconTextButtonLabel"
+                                     Text="{Binding SelectedRowActionLabelText}"/>
+                <Border Grid.Column="2"
+                        Classes="iconTextButtonTrailingSpacer"/>
+              </Grid>
+            </Button>
+          </Grid>
+        </Grid>
+      </Border>
+    </controls:ReviewWorkspaceShell.RightContent>
+
+    <controls:ReviewWorkspaceShell.FooterContent>
+      <Grid ColumnDefinitions="*,Auto"
+            ColumnSpacing="{StaticResource Space12}">
+        <SelectableTextBlock Grid.Column="0"
+                             VerticalAlignment="Center"
+                             Foreground="{DynamicResource BrushTextMuted}"
+                             Text="{Binding SummaryText}"/>
+        <Button Grid.Column="1"
+                Classes="actionNeutral actionTextButton"
+                Command="{Binding CloseCommand}">
+          <SelectableTextBlock Text="Close"/>
+        </Button>
+      </Grid>
+    </controls:ReviewWorkspaceShell.FooterContent>
+  </controls:ReviewWorkspaceShell>
+</Window>

@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        x:Class="FreeformHelper.UI.Views.WarningDialog"
+        Width="{StaticResource DialogWidth}"
+        Height="{StaticResource DialogHeight}"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushBgSurface}">
+  <Border Padding="{StaticResource Inset16}">
+    <Grid RowDefinitions="Auto,*,Auto">
+      <StackPanel Grid.Row="0"
+                  Orientation="Horizontal"
+                  Spacing="{StaticResource Space8}">
+        <controls:FontIcon Classes="symbols"
+                           Glyph="{x:Static icons:IconGlyphs.Warning}"
+                           Foreground="{DynamicResource BrushWarning}"
+                           FontSize="{DynamicResource IconSizeLg}"/>
+        <SelectableTextBlock x:Name="TitleText"
+                             VerticalAlignment="Center"
+                             FontSize="{StaticResource FontSizeLg}"
+                             FontWeight="SemiBold"
+                             Foreground="{DynamicResource BrushTextPrimary}"/>
+      </StackPanel>
+      <SelectableTextBlock x:Name="MessageText"
+                           Grid.Row="1"
+                           Margin="{StaticResource InsetTop8}"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource BrushTextSubtle}"/>
+      <StackPanel Grid.Row="2"
+                  Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  Margin="{StaticResource InsetTop14}">
+        <Button x:Name="OkButton"
+                Click="OkButton_Click"
+                Content="OK"/>
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

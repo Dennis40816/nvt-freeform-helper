@@ -1,0 +1,172 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsStep5SectionView">
+  <StackPanel Classes="settingsPage">
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space12}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="Safety before FW handoff"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="{Binding NotchExportSafetyPolicySummary}"/>
+        </StackPanel>
+        <Border Classes="settingsFieldTile">
+          <SelectableTextBlock Classes="stepNote"
+                               Text="{Binding NotchEmsSafetyPolicySummary}"
+                               TextWrapping="Wrap"/>
+        </Border>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space12}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="Export target"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="Notch versions, output type, and C profile."/>
+        </StackPanel>
+        <Grid ColumnDefinitions="1*,1*"
+              RowDefinitions="Auto,Auto"
+              ColumnSpacing="{StaticResource Space12}"
+              RowSpacing="{StaticResource Space12}">
+          <Border Grid.Row="0"
+                  Grid.Column="0"
+                  Classes="settingsFieldTile">
+            <StackPanel Spacing="{StaticResource Space10}">
+              <controls:SettingsInfoLabel Text="Export versions"
+                                          Tip="Choose which notch table versions are emitted during export."/>
+              <Grid ColumnDefinitions="1*,Auto"
+                    ColumnSpacing="{StaticResource Space10}">
+                <SelectableTextBlock Grid.Column="0"
+                                     Text="v2.1"/>
+                <ToggleSwitch Grid.Column="1"
+                              IsChecked="{Binding EnableV21, Mode=TwoWay}"
+                              OnContent=""
+                              OffContent=""
+                              MinWidth="{StaticResource ViewMenuSwitchMinWidth}"/>
+              </Grid>
+              <Grid ColumnDefinitions="1*,Auto"
+                    ColumnSpacing="{StaticResource Space10}">
+                <SelectableTextBlock Grid.Column="0"
+                                     Text="v2.2"/>
+                <ToggleSwitch Grid.Column="1"
+                              IsChecked="{Binding EnableV22, Mode=TwoWay}"
+                              OnContent=""
+                              OffContent=""
+                              MinWidth="{StaticResource ViewMenuSwitchMinWidth}"/>
+              </Grid>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="0"
+                  Grid.Column="1"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Export type" Tip="Choose the generated file type, such as C source or CSV diagnostics."/>
+              <ComboBox ItemsSource="{Binding NotchExportFileTypeOptions}"
+                        SelectedItem="{Binding SelectedNotchExportFileTypeOption, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <SelectableTextBlock Text="{Binding Display}"/>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="1"
+                  Grid.Column="0"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="C export profile" Tip="Select the C output profile expected by the downstream FW integration."/>
+              <ComboBox ItemsSource="{Binding NotchExportProfileOptions}"
+                        SelectedItem="{Binding SelectedNotchExportProfileOption, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <SelectableTextBlock Text="{Binding Display}"/>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="1"
+                  Grid.Column="1"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Null value" Tip="Placeholder value used for empty entries in exported notch payloads."/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="65535"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       Value="{Binding NullValue, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space12}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="Gate thresholds"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="Gate thresholds for v2.1 and v2.2 export."/>
+        </StackPanel>
+        <Grid ColumnDefinitions="1*,1*"
+              RowDefinitions="Auto,Auto"
+              ColumnSpacing="{StaticResource Space12}"
+              RowSpacing="{StaticResource Space12}">
+          <Border Grid.Row="0"
+                  Grid.Column="0"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Notch gate TH v2.1 (Q7/128)" Tip="v2.1 gate threshold stored in Q7 units where 128 means 100 percent."/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="128"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       IsEnabled="{Binding EnableV21}"
+                                       Value="{Binding NotchThresholdQ7, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="0"
+                  Grid.Column="1"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Notch gate TH v2.2 (%)" Tip="v2.2 gate threshold expressed directly as percent."/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="100"
+                                       SmallChange="0.1"
+                                       FormatString="0.##"
+                                       SnapToStep="False"
+                                       IsEnabled="{Binding EnableV22}"
+                                       Value="{Binding NotchThresholdPercent, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="1"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="2"
+                  Classes="settingsFieldTile">
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space10}">
+              <StackPanel Grid.Column="0"
+                          Classes="panelFormField">
+                <controls:SettingsInfoLabel Text="Link TH (v2.1 Q7 &lt;-&gt; v2.2 %)" Tip="Keep v2.1 Q7 and v2.2 percent thresholds synchronized while editing."/>
+                <SelectableTextBlock Classes="stepNote"
+                                     Text="Keep v2.1 and v2.2 thresholds synchronized."
+                                     TextWrapping="Wrap"/>
+              </StackPanel>
+              <ToggleSwitch Grid.Column="1"
+                            IsChecked="{Binding LinkNotchThresholds, Mode=TwoWay}"
+                            OnContent=""
+                            OffContent=""
+                            MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                            VerticalAlignment="Center"/>
+            </Grid>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

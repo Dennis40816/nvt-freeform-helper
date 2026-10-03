@@ -1,0 +1,104 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+        x:Class="FreeformHelper.UI.Views.NotchExportColumnFilterWindow"
+        x:DataType="viewModels:NotchExportColumnFilterDialogViewModel"
+        Width="{StaticResource NotchExportColumnFilterWidth}"
+        Height="{StaticResource NotchExportColumnFilterHeight}"
+        MinWidth="{StaticResource NotchExportColumnFilterMinWidth}"
+        MinHeight="{StaticResource NotchExportColumnFilterMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Column filter">
+  <Border Padding="{StaticResource Inset14}">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto"
+          RowSpacing="{StaticResource Space4}">
+      <StackPanel Spacing="{StaticResource Space2}">
+        <SelectableTextBlock Text="{Binding TitleText}"
+                             FontWeight="SemiBold"
+                             FontSize="{StaticResource FontSizeSectionTitle}"/>
+        <SelectableTextBlock Classes="stepNote"
+                             Text="{Binding SummaryText}"/>
+      </StackPanel>
+
+      <Grid Grid.Row="1"
+            ColumnDefinitions="*,Auto,Auto"
+            ColumnSpacing="{StaticResource Space8}">
+        <Button Grid.Column="1"
+                Content="Select all"
+                Click="SelectAllButton_Click"/>
+        <Button Grid.Column="2"
+                Content="Clear"
+                Click="ClearButton_Click"/>
+      </Grid>
+
+      <Border Grid.Row="2"
+              Classes="workspaceTopLayerBox"
+              IsVisible="{Binding SupportsRangeInput}">
+        <StackPanel Spacing="{StaticResource Space6}">
+          <CheckBox IsChecked="{Binding UseRangeFilter, Mode=TwoWay}"
+                    Content="Use numeric range"/>
+          <Grid ColumnDefinitions="Auto,*,Auto,*"
+                ColumnSpacing="{StaticResource Space6}"
+                IsVisible="{Binding UseRangeFilter}">
+            <SelectableTextBlock VerticalAlignment="Center"
+                                 Classes="stepNote"
+                                 Text="From"/>
+            <TextBox Grid.Column="1"
+                     Text="{Binding RangeFromText, Mode=TwoWay}"
+                     Watermark="min"/>
+            <SelectableTextBlock Grid.Column="2"
+                                 VerticalAlignment="Center"
+                                 Classes="stepNote"
+                                 Text="To"/>
+            <TextBox Grid.Column="3"
+                     Text="{Binding RangeToText, Mode=TwoWay}"
+                     Watermark="max"/>
+          </Grid>
+          <SelectableTextBlock Classes="stepNote"
+                               IsVisible="{Binding IsRangeSuggested}"
+                               Text="Large value set detected: range mode is recommended."/>
+        </StackPanel>
+      </Border>
+
+      <ListBox Grid.Row="3"
+               Classes="scrollV2 workspaceFilterOptions"
+               BorderThickness="{StaticResource BorderThin}"
+               BorderBrush="{DynamicResource BrushBorder}"
+               Background="{DynamicResource BrushBgPanel}"
+               ItemsSource="{Binding Options}"
+               IsVisible="{Binding CanShowValueList}"
+               ScrollViewer.AllowAutoHide="False"
+               ScrollViewer.VerticalScrollBarVisibility="Auto"
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <VirtualizingStackPanel/>
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="viewModels:NotchExportColumnFilterOptionViewModel">
+            <CheckBox Classes="workspaceFilterOptionCheck"
+                      IsChecked="{Binding IsSelected, Mode=TwoWay}">
+              <SelectableTextBlock Text="{Binding Display}"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"/>
+            </CheckBox>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <Grid Grid.Row="4"
+            ColumnDefinitions="*,Auto,Auto"
+            ColumnSpacing="{StaticResource Space8}">
+        <Button Grid.Column="1"
+                Content="Cancel"
+                Click="CancelButton_Click"/>
+        <Button Grid.Column="2"
+                Content="Apply"
+                Click="ApplyButton_Click"/>
+      </Grid>
+    </Grid>
+  </Border>
+</Window>

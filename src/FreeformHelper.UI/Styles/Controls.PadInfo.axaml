@@ -1,0 +1,332 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
+  <!-- Pad info popover -->
+  <Style Selector="Border.padInfoPanel">
+    <Setter Property="Background" Value="{DynamicResource BrushPadInfoPanelBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushPadInfoPanelBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusLg}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset12}"/>
+    <Setter Property="MaxWidth" Value="{StaticResource PanelRightWidth}"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoTitle, SelectableTextBlock.padInfoTitle">
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoSubtle, SelectableTextBlock.padInfoSubtle">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="StackPanel.padInfoHeaderRow">
+    <Setter Property="Orientation" Value="Horizontal"/>
+    <Setter Property="Spacing" Value="{StaticResource Space10}"/>
+    <Setter Property="Margin" Value="{StaticResource InsetBottom6}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Grid.padInfoHeaderRow">
+    <Setter Property="Margin" Value="{StaticResource InsetBottom6}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="StackPanel.padInfoHeaderText">
+    <Setter Property="Spacing" Value="{StaticResource Space2}"/>
+    <Setter Property="Margin" Value="{StaticResource InsetLeft14}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoHeaderMeta, SelectableTextBlock.padInfoHeaderMeta">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Border.padInfoInsetCard">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+  </Style>
+
+  <Style Selector="controls|PadInfoSectionFrame">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:PadInfoSectionFrame">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <Grid ColumnDefinitions="*,Auto,*"
+                  ColumnSpacing="{StaticResource Space8}">
+              <Border Classes="padInfoDividerLine"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="padInfoSectionDividerText"
+                                   Text="{TemplateBinding Title}"/>
+              <Border Grid.Column="2"
+                      Classes="padInfoDividerLine"/>
+            </Grid>
+
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              HorizontalAlignment="Stretch"/>
+          </StackPanel>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="Border.padInfoSectionBlock">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_8}"/>
+  </Style>
+
+  <Style Selector="Border.padInfoAllocationCard">
+    <Setter Property="Background" Value="{DynamicResource BrushWhite}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushWhite}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_8}"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoAllocationTitle, SelectableTextBlock.padInfoAllocationTitle">
+    <Setter Property="Foreground" Value="{DynamicResource BrushBlack}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoAllocationRole, SelectableTextBlock.padInfoAllocationRole">
+    <Setter Property="Foreground" Value="{DynamicResource BrushBlack}"/>
+    <Setter Property="Opacity" Value="{DynamicResource OpacityMuted}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoAllocationMeta, SelectableTextBlock.padInfoAllocationMeta">
+    <Setter Property="Foreground" Value="{DynamicResource BrushBlack}"/>
+    <Setter Property="Opacity" Value="{DynamicResource OpacityMuted}"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoAllocationRatio, SelectableTextBlock.padInfoAllocationRatio">
+    <Setter Property="Foreground" Value="{DynamicResource BrushBlack}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoAllocationLabel, SelectableTextBlock.padInfoAllocationLabel">
+    <Setter Property="Foreground" Value="{DynamicResource BrushBlack}"/>
+    <Setter Property="Opacity" Value="{DynamicResource OpacitySubtle}"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoAllocationArea, SelectableTextBlock.padInfoAllocationArea">
+    <Setter Property="Foreground" Value="{DynamicResource BrushBlack}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+  </Style>
+
+  <Style Selector="Button.padInfoAllocationButton">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="Button.padInfoAllocationButton:pointerover Border.padInfoAllocationCard">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Border.padInfoMetricCard">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+  </Style>
+
+  <Style Selector="Border.padInfoDividerLine">
+    <Setter Property="Height" Value="{StaticResource Space1}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushWhite}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoSectionDividerText, SelectableTextBlock.padInfoSectionDividerText">
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushPadInfoPanelBackground}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoSectionToggle">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.padInfoSectionToggle:pointerover TextBlock.padInfoSectionDividerText, Button.padInfoSectionToggle:pointerover SelectableTextBlock.padInfoSectionDividerText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoSectionToggle.debugCard">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_8}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoSectionToggle.debugCard:pointerover">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoKeyLabel, SelectableTextBlock.padInfoKeyLabel">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="VerticalAlignment" Value="Top"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoKeyValue, SelectableTextBlock.padInfoKeyValue">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+    <Setter Property="VerticalAlignment" Value="Top"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoKeyValue.key, SelectableTextBlock.padInfoKeyValue.key">
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoKeyValue.warning, SelectableTextBlock.padInfoKeyValue.warning">
+    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoBodyText, SelectableTextBlock.padInfoBodyText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="TextBlock.padInfoMetaText, SelectableTextBlock.padInfoMetaText">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="Button.padInfoInfoButton">
+    <Setter Property="Width" Value="{DynamicResource IconSizeLg}"/>
+    <Setter Property="Height" Value="{DynamicResource IconSizeLg}"/>
+    <Setter Property="MinWidth" Value="0"/>
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoInfoButton:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoInfoButton controls|FontIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoInfoButton:pointerover controls|FontIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoHeaderActionButton">
+    <Setter Property="Width" Value="{DynamicResource IconSizeXl}"/>
+    <Setter Property="Height" Value="{DynamicResource IconSizeXl}"/>
+    <Setter Property="MinWidth" Value="0"/>
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="HorizontalAlignment" Value="Right"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.padInfoHeaderActionButton:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoHeaderActionButton:pointerover controls|FontIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoOverrideIconButton">
+    <Setter Property="Width" Value="{DynamicResource IconSizeXl}"/>
+    <Setter Property="Height" Value="{DynamicResource IconSizeXl}"/>
+    <Setter Property="MinWidth" Value="0"/>
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoOverrideIconButton:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushActionInverseBackground}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoOverrideIconButton:pointerover controls|FontIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
+  </Style>
+
+  <Style Selector="Button.padInfoActionButton">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Button.padInfoActionButton TextBlock, Button.padInfoActionButton SelectableTextBlock">
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+    <Setter Property="TextAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.padInfoActionButton.compact">
+    <Setter Property="Margin" Value="{StaticResource InsetRight8Bottom6}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_6}"/>
+    <Setter Property="HorizontalAlignment" Value="Left"/>
+  </Style>
+
+  <Style Selector="Border.padInfoConfirm">
+    <Setter Property="Background" Value="{DynamicResource BrushPadInfoConfirmBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_8}"/>
+    <Setter Property="Margin" Value="{StaticResource InsetTop10}"/>
+    <Setter Property="BoxShadow" Value="{DynamicResource ShadowPadInfoConfirm}"/>
+  </Style>
+
+</Styles>

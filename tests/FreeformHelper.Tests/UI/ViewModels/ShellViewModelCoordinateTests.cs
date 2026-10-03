@@ -1,0 +1,81 @@
+using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels;
+using Xunit;
+
+namespace FreeformHelper.Tests;
+
+public sealed class ShellViewModelCoordinateTests
+{
+    private static readonly string[] LayerL1 = ["L1"];
+    private static readonly string[] AaAndL1Layers = ["AA.drawing", "L1"];
+
+    [Fact]
+    public async Task ShowCoordinateAsync_BindsWorkspaceIntoCoordinatePage()
+    {
+        var shell = new ShellViewModel();
+        var sourceRevision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
+        var workspaceViewModel = new CoordinatePlannerWorkspaceViewModel(
+            new CoordinatePlannerWorkspaceUseCase(),
+            new CoordinatePlannerWorkspaceSession(
+                BuildGrid(),
+                BuildCadPads(),
+                LayerL1,
+                sourceRevision,
+                DefaultMachineWidth: 2d,
+                DefaultMachineHeight: 1d,
+                DefaultPixelWidth: 2,
+                DefaultPixelHeight: 1));
+
+        await shell.ShowCoordinateAsync(workspaceViewModel);
+
+        Assert.True(shell.IsCoordinateActive);
+        Assert.False(shell.IsWorkspaceActive);
+        Assert.Same(shell.CoordinatePlanner, shell.CurrentViewModel);
+        Assert.Same(workspaceViewModel, shell.CoordinatePlanner.CurrentWorkspace);
+        Assert.False(shell.CoordinatePlanner.IsWorkspaceStale);
+    }
+
+    [Fact]
+    public async Task ShowCoordinateAsync_PropagatesCoordinatePreferencesToFreeformSnapshot()
+    {
+        var shell = new ShellViewModel();
+        var sourceRevision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
+        var workspaceViewModel = new CoordinatePlannerWorkspaceViewModel(
+            new CoordinatePlannerWorkspaceUseCase(),
+            new CoordinatePlannerWorkspaceSession(
+                BuildGrid(),
+                BuildCadPads(),
+                AaAndL1Layers,
+                sourceRevision,
+                DefaultMachineWidth: 2d,
+                DefaultMachineHeight: 1d,
+                DefaultPixelWidth: 2,
+                DefaultPixelHeight: 1,
+                PreferredActiveAreaOutlineLayerName: "AA.drawing"));
+
+        await shell.ShowCoordinateAsync(workspaceViewModel);
+
+        workspaceViewModel.PixelWidth = 123;
+        workspaceViewModel.PixelHeight = 456;
+        var preferredBoundsOption = workspaceViewModel.AaBoundsOptions.First(static option =>
+            option.Mode == CoordinatePlannerWorkspaceViewModel.CoordinatePlannerBoundsMode.LayerBounds &&
+            string.Equals(option.LayerName, "AA.drawing", StringComparison.OrdinalIgnoreCase));
+        workspaceViewModel.SelectedAaBoundsOption = preferredBoundsOption;
+
+        Assert.Equal(123m, shell.FreeformHelper.CoordinatePixelWidth);
+        Assert.Equal(456m, shell.FreeformHelper.CoordinatePixelHeight);
+        Assert.Equal("AA.drawing", shell.FreeformHelper.CoordinatePreferredAaOutlineLayerName);
+    }
+
+    private static RegularGrid BuildGrid()
+    {
+        return TestGeometryFactory.CreateRegularGrid(1, 2);
+    }
+
+    private static CadPad[] BuildCadPads()
+    {
+        return [TestGeometryFactory.CreateCadPad(1, "L1", 0.1d, 0.1d, 0.9d, 0.9d)];
+    }
+}

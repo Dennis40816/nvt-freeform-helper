@@ -1,0 +1,110 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             mc:Ignorable="d"
+             x:Class="FreeformHelper.UI.Views.CanvasOverlayControls">
+  <Grid>
+    <Grid x:Name="CanvasTopButtons"
+          ColumnDefinitions="Auto,Auto"
+          HorizontalAlignment="Right"
+          VerticalAlignment="Top"
+          Margin="{StaticResource InsetTop12Right16}"
+          Opacity="{StaticResource OpacityHigh}"
+          Panel.ZIndex="5">
+      <Button Grid.Column="0"
+              Classes="actionIconButton viewportOverlayAction"
+              ToolTip.Tip="Fit to content"
+              Command="{Binding FitCommand}">
+        <controls:FontIcon Classes="symbols"
+                           Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+      </Button>
+      <Button Grid.Column="1"
+              x:Name="ShowRightPanelButton"
+              Classes="actionIconButton viewportOverlayAction"
+              Margin="{StaticResource InsetLeft8}"
+              ToolTip.Tip="Show right panel"
+              Click="ShowRightPanelButton_Click"
+              IsVisible="False">
+        <controls:FontIcon Classes="symbols"
+                           Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+      </Button>
+    </Grid>
+
+    <StackPanel x:Name="CanvasLeftOverlay"
+                Orientation="Horizontal"
+                Spacing="{StaticResource Space8}"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="{StaticResource InsetLeft10Top16}"
+                Panel.ZIndex="5">
+      <Button x:Name="ShowLeftPanelButton"
+              Classes="actionIconButton viewportOverlayAction"
+              ToolTip.Tip="Show left panel"
+              Click="ShowLeftPanelButton_Click"
+              HorizontalAlignment="Left"
+              IsVisible="False">
+        <controls:FontIcon Classes="symbols"
+                           Glyph="{x:Static icons:IconGlyphs.ChevronRight}"/>
+      </Button>
+      <Border Classes="canvasQuickToolbar">
+        <StackPanel Orientation="Horizontal"
+                    Spacing="{StaticResource Space12}"
+                    VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
+            <SelectableTextBlock Text="CAD layer" VerticalAlignment="Center"/>
+            <ToggleSwitch IsChecked="{Binding ShowCad, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"
+                          ToolTip.Tip="Show or hide CAD pads on canvas."/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
+            <SelectableTextBlock Text="Regular grid" VerticalAlignment="Center"/>
+            <ToggleSwitch IsChecked="{Binding ShowRegular, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"
+                          ToolTip.Tip="Show or hide regular grid on canvas."/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
+            <SelectableTextBlock Text="Color by area" VerticalAlignment="Center"/>
+            <ToggleSwitch IsChecked="{Binding ColorCadByArea, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"
+                          ToolTip.Tip="Color CAD pads by area buckets."/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
+            <SelectableTextBlock Text="To Regular" VerticalAlignment="Center"/>
+            <ToggleSwitch IsChecked="{Binding ShowNotchToRegularLabels, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"
+                          ToolTip.Tip="Display switch affects AA overlay only. Compute switch affects ratio/result."/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
+            <SelectableTextBlock Text="To Full" VerticalAlignment="Center"/>
+            <ToggleSwitch IsChecked="{Binding ShowNotchCanvasPreview, Mode=TwoWay}"
+                          IsEnabled="{Binding CanShowToFullPreviewToggle}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"
+                          ToolTip.Tip="Display switch affects AA overlay only. Compute switch affects ratio/result."/>
+          </StackPanel>
+          <SelectableTextBlock Classes="canvasQuickHint"
+                               VerticalAlignment="Center"
+                               Text="Alt = Regular priority"
+                               ToolTip.Tip="Selection mode hint: hold Alt to prioritize regular pads while selecting."/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Grid>
+</UserControl>

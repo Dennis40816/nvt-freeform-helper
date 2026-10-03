@@ -1,0 +1,19 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FreeformHelper.UI.App"
+             RequestedThemeVariant="Dark">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://FreeformHelper.UI/Styles/Tokens.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+  <Application.Styles>
+    <FluentTheme />
+    <!-- Keep AvaloniaEdit theme app-level. TextEditor terminal render regressed when this was lazy-loaded from workspace code. -->
+    <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml"/>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/Icons.axaml"/>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.axaml"/>
+  </Application.Styles>
+</Application>

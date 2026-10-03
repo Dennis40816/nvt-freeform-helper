@@ -1,0 +1,527 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerWorkspaceControlsPaneView">
+  <Border Grid.Column="0"
+          Classes="workspaceSidePane left">
+    <ScrollViewer Classes="scrollDevCandidate viewportBoundScroll"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+      <Border Classes="viewportBoundContent"
+              Padding="{StaticResource InsetRight12Bottom20}">
+        <StackPanel Classes="panelForm"
+                    Spacing="{StaticResource Space12}">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <SelectableTextBlock Text="Coordinate setup" FontWeight="SemiBold"/>
+            <SelectableTextBlock Text="Pick references first; edit calibration only when the default mapping is wrong."
+                                 Foreground="{DynamicResource BrushTextMuted}"
+                                 TextWrapping="Wrap"/>
+          </StackPanel>
+
+          <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource Space8}">
+            <Button Classes="actionPrimary actionIconButton"
+                    Command="{Binding SyncFromWorkspaceCommand}"
+                    ToolTip.Tip="Sync coordinate setup from current workspace.">
+              <controls:FontIcon Classes="symbols"
+                                 Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+            </Button>
+            <Button Grid.Column="1"
+                    Classes="actionGhost actionIconButton"
+                    Command="{Binding ExportPreviewPngCommand}"
+                    ToolTip.Tip="Export coordinate preview PNG.">
+              <controls:FontIcon Classes="symbols"
+                                 Glyph="{x:Static icons:IconGlyphs.ArrowDownward}"/>
+            </Button>
+          </Grid>
+
+          <Border Classes="workspaceSectionCard">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                  RowSpacing="{StaticResource Space8}">
+              <Grid Grid.Row="0" Classes="workspaceSectionHeader" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+                <Border Classes="chipStatus">
+                  <SelectableTextBlock Classes="chipStatusText" Text="1"/>
+                </Border>
+                <SelectableTextBlock Grid.Column="1" Classes="workspaceSectionTitle" Text="Reference"/>
+                <SelectableTextBlock Grid.Row="1"
+                                     Grid.ColumnSpan="2"
+                                     Classes="workspaceSectionSummary"
+                                     Text="{Binding ActiveAreaSourceSummaryText}"/>
+              </Grid>
+              <StackPanel Grid.Row="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                <SelectableTextBlock Text="Preview layer" FontWeight="SemiBold"/>
+                <ComboBox ItemsSource="{Binding LayerOptions}"
+                          SelectedItem="{Binding SelectedLayerOption, Mode=TwoWay}">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <SelectableTextBlock Text="{Binding Display}"/>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </StackPanel>
+              <StackPanel Grid.Row="2" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                <SelectableTextBlock Text="AA outline" FontWeight="SemiBold"/>
+                <ComboBox ItemsSource="{Binding AaBoundsOptions}"
+                          SelectedItem="{Binding SelectedAaBoundsOption, Mode=TwoWay}">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <SelectableTextBlock Text="{Binding Display}"/>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </StackPanel>
+              <Border Grid.Row="3" Classes="workspaceDetailStrip">
+                <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding LayerSummaryText}" TextWrapping="Wrap"/>
+              </Border>
+            </Grid>
+          </Border>
+
+          <Border Classes="workspaceSectionCard">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                  RowSpacing="{StaticResource Space8}">
+              <Grid Grid.Row="0" Classes="workspaceSectionHeader" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+                <Border Classes="chipStatus">
+                  <SelectableTextBlock Classes="chipStatusText" Text="2"/>
+                </Border>
+                <SelectableTextBlock Grid.Column="1" Classes="workspaceSectionTitle" Text="Calibration"/>
+                <SelectableTextBlock Grid.Row="1"
+                                     Grid.ColumnSpan="2"
+                                     Classes="workspaceSectionSummary"
+                                     Text="{Binding MachineSummaryText}"/>
+              </Grid>
+              <ToggleButton Grid.Row="2"
+                            Classes="actionNeutral actionTextButton simulationActionButton"
+                            IsChecked="{Binding ShowCalibrationDetails, Mode=TwoWay}">
+                <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                  <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                  <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Edit calibration"/>
+                  <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                </Grid>
+              </ToggleButton>
+              <Grid Grid.Row="3"
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="{StaticResource Space8}"
+                    IsVisible="{Binding ShowCalibrationDetails}">
+                <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="Origin X" FontWeight="SemiBold"/>
+                  <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding MachineOriginX, Mode=TwoWay}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="Origin Y" FontWeight="SemiBold"/>
+                  <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding MachineOriginY, Mode=TwoWay}"/>
+                </StackPanel>
+              </Grid>
+              <Grid Grid.Row="4"
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="{StaticResource Space8}"
+                    IsVisible="{Binding ShowCalibrationDetails}">
+                <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="AA width (mm)" FontWeight="SemiBold"/>
+                  <controls:NumberScrubber Minimum="0.001"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding MachineWidth, Mode=TwoWay}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="AA height (mm)" FontWeight="SemiBold"/>
+                  <controls:NumberScrubber Minimum="0.001"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding MachineHeight, Mode=TwoWay}"/>
+                </StackPanel>
+              </Grid>
+              <Grid Grid.Row="5"
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="{StaticResource Space8}"
+                    IsVisible="{Binding ShowCalibrationDetails}">
+                <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="Pixel X" FontWeight="SemiBold"/>
+                  <controls:NumberScrubber Minimum="1"
+                                           Maximum="100000"
+                                           SmallChange="1"
+                                           FormatString="0"
+                                           Value="{Binding PixelWidth, Mode=TwoWay}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="Pixel Y" FontWeight="SemiBold"/>
+                  <controls:NumberScrubber Minimum="1"
+                                           Maximum="100000"
+                                           SmallChange="1"
+                                           FormatString="0"
+                                           Value="{Binding PixelHeight, Mode=TwoWay}"/>
+                </StackPanel>
+              </Grid>
+              <StackPanel Grid.Row="6"
+                          Classes="panelFormField"
+                          Spacing="{StaticResource Space6}"
+                          IsVisible="{Binding ShowCalibrationDetails}">
+                <SelectableTextBlock Text="Copper pillar dia (mm)" FontWeight="SemiBold"/>
+                <controls:NumberScrubber Minimum="0"
+                                         Maximum="{StaticResource NumericInputMaximum}"
+                                         SmallChange="0.01"
+                                         FormatString="0.###"
+                                         SnapToStep="False"
+                                         Value="{Binding CopperPillarDiameter, Mode=TwoWay}"/>
+                <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SafeCoordinatePolicyText}" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Grid>
+          </Border>
+
+          <Border Classes="workspaceSectionCard">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                  RowSpacing="{StaticResource Space8}">
+              <Grid Grid.Row="0" Classes="workspaceSectionHeader" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+                <Border Classes="chipStatus">
+                  <SelectableTextBlock Classes="chipStatusText" Text="3"/>
+                </Border>
+                <SelectableTextBlock Grid.Column="1" Classes="workspaceSectionTitle" Text="Artifacts"/>
+                <SelectableTextBlock Grid.Row="1"
+                                     Grid.ColumnSpan="2"
+                                     Classes="workspaceSectionSummary"
+                                     Text="{Binding GuideSourceSummaryText}"/>
+              </Grid>
+              <StackPanel Grid.Row="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                <SelectableTextBlock Text="Guide reference" FontWeight="SemiBold"/>
+                <ComboBox ItemsSource="{Binding GuideBasisOptions}"
+                          SelectedItem="{Binding SelectedGuideBasisOption, Mode=TwoWay}">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <SelectableTextBlock Text="{Binding Display}"/>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </StackPanel>
+              <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">
+                <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="Horizontal guides" FontWeight="SemiBold"/>
+                  <ComboBox ItemsSource="{Binding GuideGenerationOptions}"
+                            SelectedItem="{Binding SelectedHorizontalGuideGenerationOption, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <SelectableTextBlock Text="{Binding Display}"/>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <SelectableTextBlock Classes="workspaceSectionMeta"
+                                       Text="Count"
+                                       IsVisible="{Binding IsHorizontalGuideCountMode}"/>
+                  <controls:NumberScrubber Minimum="0"
+                                           Maximum="100"
+                                           SmallChange="1"
+                                           FormatString="0"
+                                           IsVisible="{Binding IsHorizontalGuideCountMode}"
+                                           Value="{Binding HorizontalGuideCount, Mode=TwoWay}"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta"
+                                       Text="Pitch (mm)"
+                                       IsVisible="{Binding IsHorizontalGuidePitchMode}"/>
+                  <controls:NumberScrubber Minimum="0"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           IsVisible="{Binding IsHorizontalGuidePitchMode}"
+                                           Value="{Binding HorizontalGuidePitch, Mode=TwoWay}"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta"
+                                       Text="Positions (mm)"
+                                       IsVisible="{Binding IsHorizontalGuideExplicitMode}"/>
+                  <TextBox Text="{Binding HorizontalGuidePositionListText, Mode=TwoWay}"
+                           Watermark="0, 25, 50"
+                           IsVisible="{Binding IsHorizontalGuideExplicitMode}"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta" Text="Inset (mm)"/>
+                  <controls:NumberScrubber Minimum="0"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding HorizontalGuideInset, Mode=TwoWay}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="Vertical guides" FontWeight="SemiBold"/>
+                  <ComboBox ItemsSource="{Binding GuideGenerationOptions}"
+                            SelectedItem="{Binding SelectedVerticalGuideGenerationOption, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <SelectableTextBlock Text="{Binding Display}"/>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <SelectableTextBlock Classes="workspaceSectionMeta"
+                                       Text="Count"
+                                       IsVisible="{Binding IsVerticalGuideCountMode}"/>
+                  <controls:NumberScrubber Minimum="0"
+                                           Maximum="100"
+                                           SmallChange="1"
+                                           FormatString="0"
+                                           IsVisible="{Binding IsVerticalGuideCountMode}"
+                                           Value="{Binding VerticalGuideCount, Mode=TwoWay}"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta"
+                                       Text="Pitch (mm)"
+                                       IsVisible="{Binding IsVerticalGuidePitchMode}"/>
+                  <controls:NumberScrubber Minimum="0"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           IsVisible="{Binding IsVerticalGuidePitchMode}"
+                                           Value="{Binding VerticalGuidePitch, Mode=TwoWay}"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta"
+                                       Text="Positions (mm)"
+                                       IsVisible="{Binding IsVerticalGuideExplicitMode}"/>
+                  <TextBox Text="{Binding VerticalGuidePositionListText, Mode=TwoWay}"
+                           Watermark="0, 25, 50"
+                           IsVisible="{Binding IsVerticalGuideExplicitMode}"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta" Text="Inset (mm)"/>
+                  <controls:NumberScrubber Minimum="0"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding VerticalGuideInset, Mode=TwoWay}"/>
+                </StackPanel>
+              </Grid>
+              <ToggleButton Grid.Row="4"
+                            Classes="actionNeutral actionTextButton simulationActionButton"
+                            IsChecked="{Binding ShowBistRectangle, Mode=TwoWay}">
+                <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                  <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                  <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="BIST center rect"/>
+                  <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                </Grid>
+              </ToggleButton>
+              <SelectableTextBlock Grid.Row="5"
+                                   Classes="workspaceSectionMeta"
+                                   Text="{Binding BistRectangleSummaryText}"
+                                   TextWrapping="Wrap"/>
+            </Grid>
+          </Border>
+
+          <Border Classes="workspaceSectionCard">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                  RowSpacing="{StaticResource Space8}">
+              <Grid Grid.Row="0" Classes="workspaceSectionHeader" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+                <Border Classes="chipStatus">
+                  <SelectableTextBlock Classes="chipStatusText" Text="4"/>
+                </Border>
+                <SelectableTextBlock Grid.Column="1" Classes="workspaceSectionTitle" Text="4-point array"/>
+                <SelectableTextBlock Grid.Row="1"
+                                     Grid.ColumnSpan="2"
+                                     Classes="workspaceSectionSummary"
+                                     Text="{Binding CustomArraySummaryText}"/>
+              </Grid>
+              <ToggleButton Grid.Row="1"
+                            Classes="actionNeutral actionTextButton simulationActionButton"
+                            IsChecked="{Binding ShowCustomArray, Mode=TwoWay}">
+                <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                  <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                  <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Show array"/>
+                  <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                </Grid>
+              </ToggleButton>
+              <Button Grid.Row="2"
+                      Classes="actionNeutral actionTextButton simulationActionButton"
+                      Command="{Binding UseActiveAreaSafeCornersCommand}">
+                <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                  <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+                  <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Use safe AA corners"/>
+                  <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                </Grid>
+              </Button>
+              <Grid Grid.Row="4" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}" IsVisible="{Binding ShowCustomArray}">
+                <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="Array columns" FontWeight="SemiBold"/>
+                  <controls:NumberScrubber Minimum="0"
+                                           Maximum="100"
+                                           SmallChange="1"
+                                           FormatString="0"
+                                           Value="{Binding CustomArrayColumnCount, Mode=TwoWay}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="Array rows" FontWeight="SemiBold"/>
+                  <controls:NumberScrubber Minimum="0"
+                                           Maximum="100"
+                                           SmallChange="1"
+                                           FormatString="0"
+                                           Value="{Binding CustomArrayRowCount, Mode=TwoWay}"/>
+                </StackPanel>
+              </Grid>
+              <Grid Grid.Row="5"
+                    RowDefinitions="Auto,Auto"
+                    RowSpacing="{StaticResource Space8}"
+                    IsVisible="{Binding ShowCustomArray}">
+                <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
+                  <SelectableTextBlock Text="Selected handle" FontWeight="SemiBold"/>
+                  <ComboBox ItemsSource="{Binding CustomArrayCornerOptions}"
+                            SelectedItem="{Binding SelectedCustomArrayCornerOption, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <SelectableTextBlock Text="{Binding Display}"/>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                </StackPanel>
+                <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">
+                  <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
+                    <SelectableTextBlock Text="X (mm)" FontWeight="SemiBold"/>
+                    <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                             Maximum="{StaticResource NumericInputMaximum}"
+                                             SmallChange="0.1"
+                                             FormatString="0.###"
+                                             SnapToStep="False"
+                                             Value="{Binding SelectedCustomArrayCornerMachineX, Mode=TwoWay}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                    <SelectableTextBlock Text="Y (mm)" FontWeight="SemiBold"/>
+                    <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                             Maximum="{StaticResource NumericInputMaximum}"
+                                             SmallChange="0.1"
+                                             FormatString="0.###"
+                                             SnapToStep="False"
+                                             Value="{Binding SelectedCustomArrayCornerMachineY, Mode=TwoWay}"/>
+                  </StackPanel>
+                </Grid>
+              </Grid>
+              <SelectableTextBlock Grid.Row="6"
+                                   Classes="workspaceSectionMeta"
+                                   Text="{Binding SelectedCustomArrayCornerSummaryText}"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding ShowCustomArray}"/>
+            </Grid>
+          </Border>
+
+          <Border Classes="workspaceSectionCard">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                  RowSpacing="{StaticResource Space8}">
+              <Grid Grid.Row="0" Classes="workspaceSectionHeader" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+                <Border Classes="chipStatus">
+                  <SelectableTextBlock Classes="chipStatusText" Text="5"/>
+                </Border>
+                <SelectableTextBlock Grid.Column="1" Classes="workspaceSectionTitle" Text="Custom point / path"/>
+                <SelectableTextBlock Grid.Row="1"
+                                     Grid.ColumnSpan="2"
+                                     Classes="workspaceSectionSummary"
+                                     Text="{Binding CustomArtifactSummaryText}"/>
+              </Grid>
+              <StackPanel Grid.Row="2" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                <SelectableTextBlock Text="Point" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding CustomPointLabelText, Mode=TwoWay}"
+                         Watermark="Point label"/>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">
+                  <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding CustomPointMachineX, Mode=TwoWay}"/>
+                  <controls:NumberScrubber Grid.Column="1"
+                                           Minimum="{StaticResource NumericInputMinimum}"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding CustomPointMachineY, Mode=TwoWay}"/>
+                </Grid>
+                <Button Classes="actionPrimary actionTextButton simulationActionButton"
+                        Command="{Binding AddCustomPointCommand}">
+                  <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                    <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                    <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Add point"/>
+                    <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                  </Grid>
+                </Button>
+              </StackPanel>
+              <StackPanel Grid.Row="3" Classes="panelFormField" Spacing="{StaticResource Space6}">
+                <SelectableTextBlock Text="Path" FontWeight="SemiBold"/>
+                <TextBox Text="{Binding CustomPathLabelText, Mode=TwoWay}"
+                         Watermark="Path label"/>
+                <Grid RowDefinitions="Auto,Auto,Auto"
+                      RowSpacing="{StaticResource Space6}">
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">
+                    <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                             Maximum="{StaticResource NumericInputMaximum}"
+                                             SmallChange="0.1"
+                                             FormatString="0.###"
+                                             SnapToStep="False"
+                                             Value="{Binding CustomPathStartMachineX, Mode=TwoWay}"/>
+                    <controls:NumberScrubber Grid.Column="1"
+                                             Minimum="{StaticResource NumericInputMinimum}"
+                                             Maximum="{StaticResource NumericInputMaximum}"
+                                             SmallChange="0.1"
+                                             FormatString="0.###"
+                                             SnapToStep="False"
+                                             Value="{Binding CustomPathStartMachineY, Mode=TwoWay}"/>
+                  </Grid>
+                  <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">
+                    <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                             Maximum="{StaticResource NumericInputMaximum}"
+                                             SmallChange="0.1"
+                                             FormatString="0.###"
+                                             SnapToStep="False"
+                                             Value="{Binding CustomPathEndMachineX, Mode=TwoWay}"/>
+                    <controls:NumberScrubber Grid.Column="1"
+                                             Minimum="{StaticResource NumericInputMinimum}"
+                                             Maximum="{StaticResource NumericInputMaximum}"
+                                             SmallChange="0.1"
+                                             FormatString="0.###"
+                                             SnapToStep="False"
+                                             Value="{Binding CustomPathEndMachineY, Mode=TwoWay}"/>
+                  </Grid>
+                  <controls:NumberScrubber Grid.Row="2"
+                                           Minimum="2"
+                                           Maximum="500"
+                                           SmallChange="1"
+                                           FormatString="0"
+                                           Value="{Binding CustomPathStepCount, Mode=TwoWay}"/>
+                </Grid>
+                <Button Classes="actionPrimary actionTextButton simulationActionButton"
+                        Command="{Binding AddCustomPathCommand}">
+                  <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                    <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                    <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Add path"/>
+                    <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                  </Grid>
+                </Button>
+              </StackPanel>
+              <ItemsControl Grid.Row="4"
+                            ItemsSource="{Binding CustomRecipeRows}"
+                            IsVisible="{Binding HasCustomArtifacts}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Spacing="{StaticResource Space2}">
+                      <SelectableTextBlock Classes="workspaceDataCellText strong" Text="{Binding Label}"/>
+                      <SelectableTextBlock Classes="workspaceDataCellText" Text="{Binding DetailText}" TextWrapping="Wrap"/>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <Button Grid.Row="5"
+                      Classes="actionDanger actionTextButton simulationActionButton"
+                      Command="{Binding ClearCustomArtifactsCommand}"
+                      IsVisible="{Binding HasCustomArtifacts}">
+                <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                  <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+                  <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Clear custom"/>
+                  <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                </Grid>
+              </Button>
+            </Grid>
+          </Border>
+        </StackPanel>
+      </Border>
+    </ScrollViewer>
+  </Border>
+</UserControl>

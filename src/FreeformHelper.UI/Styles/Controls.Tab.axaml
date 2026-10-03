@@ -1,0 +1,205 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
+  <!-- Shell top navigation (capsule) -->
+  <Style Selector="Border.shellTabStrip">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset4}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.shellTab">
+    <Setter Property="MinHeight" Value="{StaticResource WorkspaceHeaderActionMinHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_6}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.shellTab:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.shellTab:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceSelected}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.shellTab.settingsWindowNavTab">
+    <Setter Property="MinWidth" Value="{StaticResource ButtonMinWidthSm}"/>
+  </Style>
+
+  <Style Selector="Border.rightPanelTabStrip">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset4}"/>
+  </Style>
+
+  <Style Selector="Border.rightPanelTabHost">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset4}"/>
+  </Style>
+
+  <!-- Legacy selector kept for UI guard contract compatibility. -->
+  <Style Selector="ToggleButton.rightPanelTab">
+    <Setter Property="MinHeight" Value="{StaticResource WorkspaceHeaderActionMinHeight}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ButtonMinWidthSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_6}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="ToggleButton.rightPanelTab:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.rightPanelTab:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceSelected}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.rightPanelBrowserTab">
+    <Setter Property="MinHeight" Value="{StaticResource WorkspaceHeaderActionMinHeight}"/>
+    <Setter Property="MinWidth" Value="{StaticResource ButtonMinWidthSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_6}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="ToggleButton.rightPanelBrowserTab:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.rightPanelBrowserTab:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceSelected}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.rightPanelBrowserTab:checked:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceSelected}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="TextBlock.rightPanelBrowserTabTitle">
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="controls|FontIcon.rightPanelBrowserTabIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.rightPanelBrowserTab:pointerover controls|FontIcon.rightPanelBrowserTabIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.rightPanelBrowserTab:checked controls|FontIcon.rightPanelBrowserTabIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <!-- Compact icon-only buttons (used for panel collapse/expand affordances) -->
+  <Style Selector="Button.icon, ToggleButton.icon">
+    <Setter Property="Width" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="MinWidth" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="Height" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="MinHeight" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderIconCircle}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.icon:pointerover, ToggleButton.icon:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="Button.icon:pressed, ToggleButton.icon:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.icon:checked">
+    <Setter Property="Background" Value="{DynamicResource BrushAccentSoft}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <Style Selector="Button.icon controls|FontIcon, ToggleButton.icon controls|FontIcon">
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeMd}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+  </Style>
+
+  <Style Selector="Button.icon:pointerover controls|FontIcon, ToggleButton.icon:pointerover controls|FontIcon, Button.icon:pressed controls|FontIcon, ToggleButton.icon:pressed controls|FontIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.icon:checked controls|FontIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+  </Style>
+
+  <!-- More subtle icon button for embedding inside headers/blocks -->
+  <Style Selector="Button.icon.ghost, ToggleButton.icon.ghost">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderIconCircle}"/>
+  </Style>
+
+  <Style Selector="Button.icon.ghost:pointerover, ToggleButton.icon.ghost:pointerover">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+  </Style>
+
+  <Style Selector="Button.icon.ghost:pressed, ToggleButton.icon.ghost:pressed">
+    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+  </Style>
+
+  <Style Selector="Button.icon.ghost controls|FontIcon, ToggleButton.icon.ghost controls|FontIcon">
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeMd}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+  </Style>
+
+  <Style Selector="Button.icon.ghost:pointerover controls|FontIcon, ToggleButton.icon.ghost:pointerover controls|FontIcon, Button.icon.ghost:pressed controls|FontIcon, ToggleButton.icon.ghost:pressed controls|FontIcon">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+
+
+</Styles>

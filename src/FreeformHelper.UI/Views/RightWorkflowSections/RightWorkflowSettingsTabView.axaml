@@ -1,0 +1,385 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:stepViews="clr-namespace:FreeformHelper.UI.Views.WorkflowSteps"
+             x:Class="FreeformHelper.UI.Views.RightWorkflowSections.RightWorkflowSettingsTabView">
+    <StackPanel Spacing="{StaticResource Space10}"
+                IsVisible="{Binding IsRightPanelSettingsTab}">
+    <controls:HidePanelBlock Title="Overview" IsExpanded="False">
+      <StackPanel Classes="workflowOverviewRail" HorizontalAlignment="Stretch">
+        <Border Classes="workflowOverviewSection"
+                ToolTip.Tip="Project geometry and regular-grid readiness summary. Edit values in Settings > General.">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <Grid Classes="workflowOverviewHeader" ColumnDefinitions="*,Auto">
+              <SelectableTextBlock Classes="workflowOverviewTitle" Text="Project / grid"/>
+              <Button Grid.Column="1"
+                      Tag="General"
+                      Classes="actionIconButton actionGhost workflowOverviewAction"
+                      Click="OpenSettingsButton_Click"
+                      ToolTip.Tip="Open Settings > General.">
+                <controls:FontIcon Classes="symbols iconSm"
+                                   Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+              </Button>
+            </Grid>
+            <Grid Classes="workflowOverviewInfoGrid"
+                  RowDefinitions="Auto,Auto,Auto"
+                  ColumnDefinitions="Auto,*,Auto,*">
+              <SelectableTextBlock Classes="workflowOverviewLabel" Text="CAD"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding CadPads.Count}"
+                                   ToolTip.Tip="Loaded CAD pad count after DXF import and current DXF edits."/>
+              <SelectableTextBlock Grid.Column="2"
+                                   Classes="workflowOverviewLabel"
+                                   Text="REG"/>
+              <SelectableTextBlock Grid.Column="3"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding RegularPads.Count}"
+                                   ToolTip.Tip="Generated regular-grid pad count."/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Classes="workflowOverviewLabel"
+                                   Text="IC"/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding CascadeNum}"
+                                   ToolTip.Tip="Cascade IC count from Settings > General."/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Grid.Column="2"
+                                   Classes="workflowOverviewLabel"
+                                   Text="X"/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Grid.Column="3"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding XChannels}"
+                                   ToolTip.Tip="X-channel count per IC from Settings > General."/>
+              <SelectableTextBlock Grid.Row="2"
+                                   Classes="workflowOverviewLabel"
+                                   Text="Y"/>
+              <SelectableTextBlock Grid.Row="2"
+                                   Grid.Column="1"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding YChannels}"
+                                   ToolTip.Tip="Y-channel count per IC from Settings > General."/>
+            </Grid>
+            <StackPanel Classes="workflowOverviewMetaBlock">
+              <SelectableTextBlock Classes="workflowOverviewMeta"
+                                   Text="{Binding PitchSizeXSummary}"
+                                   TextWrapping="Wrap"
+                                   ToolTip.Tip="{Binding PitchSizeXSummary}"/>
+              <SelectableTextBlock Classes="workflowOverviewMeta"
+                                   Text="{Binding PitchSizeYSummary}"
+                                   TextWrapping="Wrap"
+                                   ToolTip.Tip="{Binding PitchSizeYSummary}"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="workflowOverviewSection"
+                ToolTip.Tip="Current notch allocation semantics. Detailed controls live in Settings > Step 3.">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <Grid Classes="workflowOverviewHeader" ColumnDefinitions="*,Auto">
+              <SelectableTextBlock Classes="workflowOverviewTitle" Text="Notch model"/>
+              <Button Grid.Column="1"
+                      Tag="Step3NotchCompensation"
+                      Classes="actionIconButton actionGhost workflowOverviewAction"
+                      Click="OpenSettingsButton_Click"
+                      ToolTip.Tip="Open Settings > Step 3.">
+                <controls:FontIcon Classes="symbols iconSm"
+                                   Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+              </Button>
+            </Grid>
+            <Grid Classes="workflowOverviewInfoGrid"
+                  RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="Auto,*">
+              <SelectableTextBlock Classes="workflowOverviewLabel" Text="Model"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding SelectedNotchCompensationModelOption.Display}"
+                                   ToolTip.Tip="{Binding NotchEffectiveModelSummary}"/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Classes="workflowOverviewLabel"
+                                   Text="Alloc"/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding NotchAllocationModelShortText}"
+                                   ToolTip.Tip="{Binding NotchAllocationModelSummary}"/>
+            </Grid>
+            <WrapPanel Orientation="Horizontal">
+              <Border Classes="workflowOverviewBadge">
+                <SelectableTextBlock Classes="workflowOverviewBadgeText"
+                                     Text="{Binding NotchToRegularStateText}"
+                                     ToolTip.Tip="{Binding NotchToRegularShortText}"/>
+              </Border>
+              <Border Classes="workflowOverviewBadge">
+                <SelectableTextBlock Classes="workflowOverviewBadgeText"
+                                     Text="{Binding NotchToFullStateText}"
+                                     ToolTip.Tip="{Binding NotchToFullShortText}"/>
+              </Border>
+              <Border Classes="workflowOverviewBadge">
+                <SelectableTextBlock Classes="workflowOverviewBadgeText"
+                                     Text="{Binding NotchBoundaryVirtualAreaCapShortText}"
+                                     ToolTip.Tip="{Binding NotchBoundaryVirtualAreaCapSummary}"/>
+              </Border>
+              <Border Classes="workflowOverviewBadge">
+                <SelectableTextBlock Classes="workflowOverviewBadgeText"
+                                     Text="{Binding NotchTargetCoverageGuardShortText}"
+                                     ToolTip.Tip="{Binding NotchTargetCoverageGuardSummary}"/>
+              </Border>
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="workflowOverviewSection"
+                Classes.warning="{Binding HasSimulationSafetyOverviewAttention}"
+                Classes.danger="{Binding HasSimulationSafetyOverviewRisk}"
+                ToolTip.Tip="Simulation safety is projected from the current Simulation workspace. Refresh Simulation after geometry or notch changes.">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <Grid Classes="workflowOverviewHeader" ColumnDefinitions="*,Auto">
+              <SelectableTextBlock Classes="workflowOverviewTitle" Text="Simulation safety"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="workflowOverviewStatus"
+                                   Classes.warning="{Binding HasSimulationSafetyOverviewAttention}"
+                                   Classes.danger="{Binding HasSimulationSafetyOverviewRisk}"
+                                   Text="{Binding SimulationSafetyOverviewStatusText}"
+                                   ToolTip.Tip="{Binding SimulationSafetyOverviewSummaryText}"/>
+            </Grid>
+            <Grid Classes="workflowOverviewInfoGrid"
+                  RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="Auto,*,Auto,*">
+              <SelectableTextBlock Classes="workflowOverviewLabel" Text="Cap"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding SimulationSafetyOverviewEmsCapText}"
+                                   ToolTip.Tip="EMS safety cap used by the current Simulation audit."/>
+              <SelectableTextBlock Grid.Column="2"
+                                   Classes="workflowOverviewLabel"
+                                   Text="Max"/>
+              <SelectableTextBlock Grid.Column="3"
+                                   Classes="workflowOverviewValue"
+                                   Classes.warning="{Binding HasSimulationSafetyOverviewAttention}"
+                                   Classes.danger="{Binding HasSimulationSafetyOverviewRisk}"
+                                   Text="{Binding SimulationSafetyOverviewMaxAfterText}"
+                                   ToolTip.Tip="Maximum After value observed in the current Simulation audit."/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Classes="workflowOverviewLabel"
+                                   Text="Risk"/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   Classes="workflowOverviewValue"
+                                   Classes.warning="{Binding HasSimulationSafetyOverviewAttention}"
+                                   Classes.danger="{Binding HasSimulationSafetyOverviewRisk}"
+                                   Text="{Binding SimulationSafetyOverviewViolationCountText}"
+                                   ToolTip.Tip="Number of regular pads exceeding the EMS safety cap."/>
+            </Grid>
+            <StackPanel Classes="workflowOverviewMetaBlock">
+              <SelectableTextBlock Classes="workflowOverviewMeta"
+                                   Text="{Binding SimulationSafetyOverviewSummaryText}"
+                                   TextWrapping="Wrap"
+                                   ToolTip.Tip="{Binding SimulationSafetyOverviewSummaryText}"/>
+              <SelectableTextBlock Classes="workflowOverviewMeta"
+                                   Text="{Binding SimulationSafetyOverviewHighRiskDiffsText}"
+                                   TextWrapping="Wrap"
+                                   ToolTip.Tip="{Binding SimulationSafetyOverviewHighRiskDiffsText}"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="workflowOverviewSection last"
+                ToolTip.Tip="{Binding NotchExportSafetyPolicySummary}">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <Grid Classes="workflowOverviewHeader" ColumnDefinitions="*,Auto">
+              <SelectableTextBlock Classes="workflowOverviewTitle" Text="Export handoff"/>
+              <Button Grid.Column="1"
+                      Tag="Step5NotchExport"
+                      Classes="actionIconButton actionGhost workflowOverviewAction"
+                      Click="OpenSettingsButton_Click"
+                      ToolTip.Tip="Open Settings > Step 5.">
+                <controls:FontIcon Classes="symbols iconSm"
+                                   Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+              </Button>
+            </Grid>
+            <Grid Classes="workflowOverviewInfoGrid"
+                  RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="Auto,*">
+              <SelectableTextBlock Classes="workflowOverviewLabel" Text="File"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding SelectedNotchExportFileTypeOption.Display}"
+                                   ToolTip.Tip="Step 5 export file type."/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Classes="workflowOverviewLabel"
+                                   Text="Profile"/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   Classes="workflowOverviewValue"
+                                   Text="{Binding SelectedNotchExportProfileOption.Display}"
+                                   ToolTip.Tip="Step 5 export profile."/>
+            </Grid>
+            <StackPanel Classes="workflowOverviewMetaBlock">
+              <SelectableTextBlock Classes="workflowOverviewMeta"
+                                   Text="{Binding NotchExportSummary}"
+                                   TextWrapping="Wrap"
+                                   ToolTip.Tip="{Binding NotchExportSummary}"/>
+              <SelectableTextBlock Classes="workflowOverviewMeta"
+                                   Text="{Binding NotchExportSafetyPolicySummary}"
+                                   TextWrapping="Wrap"
+                                   ToolTip.Tip="{Binding NotchExportSafetyPolicySummary}"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </controls:HidePanelBlock>
+
+    <stepViews:RightWorkflowStep1View OpenSettingsRequested="OnStepOpenSettingsRequested"/>
+
+    <stepViews:RightWorkflowStep2View x:Name="Step2Block"
+                                      OpenSettingsRequested="OnStepOpenSettingsRequested"/>
+
+    <stepViews:RightWorkflowStep3View x:Name="Step3Block"
+                                      OpenSettingsRequested="OnStepOpenSettingsRequested"/>
+
+    <stepViews:RightWorkflowStep4View x:Name="Step4Block"
+                                      OpenSettingsRequested="OnStepOpenSettingsRequested"/>
+
+    <stepViews:RightWorkflowStep5View x:Name="Step5Block"
+                                      OpenSettingsRequested="OnStepOpenSettingsRequested"/>
+
+
+    <controls:HidePanelBlock x:Name="Step6Block"
+                             Title="Step 6 - Validation Quick Trace"
+                             IsExpanded="{Binding IsStep6Expanded, Mode=TwoWay}">
+      <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="*,Auto">
+          <SelectableTextBlock Grid.Column="0"
+                               Classes="stepNote"
+                               Text="{Binding NotchValidationSummaryText}"/>
+          <Button Grid.Column="1"
+                  Classes="actionIconButton actionGhost"
+                  Margin="{StaticResource InsetLeft10}"
+                  Command="{Binding ClearNotchValidationCommand}"
+                  ToolTip.Tip="Clear validation trace.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Delete}"/>
+          </Button>
+        </Grid>
+        <Grid ColumnDefinitions="1*,Auto,Auto">
+          <controls:NumberScrubber Grid.Column="0"
+                                   Minimum="0"
+                                   Maximum="2000000000"
+                                   SmallChange="1"
+                                   FormatString="0"
+                                   Value="{Binding NotchValidationRegularPadId, Mode=TwoWay}"
+                                   ToolTip.Tip="Target REG id to inspect row/flow trace."/>
+          <Button Grid.Column="1"
+                  Margin="{StaticResource InsetLeft6}"
+                  Content="Use Selected REG"
+                  Command="{Binding UseSelectedRegularForNotchValidationCommand}"
+                  ToolTip.Tip="Copy currently selected REG id and run validation."/>
+          <Button Grid.Column="2"
+                  Margin="{StaticResource InsetLeft6}"
+                  Content="Analyze"
+                  Command="{Binding AnalyzeNotchValidationCommand}"
+                  ToolTip.Tip="Analyze direct rows and incoming/outgoing allocations for this REG."/>
+        </Grid>
+        <Grid ColumnDefinitions="Auto,6,Auto,6,Auto"
+              IsVisible="{Binding HasNotchValidationItems}">
+          <Border Classes="validationRowKindTag direct">
+            <SelectableTextBlock Classes="validationRowKindText"
+                                 Text="{Binding NotchValidationDirectCount, StringFormat='DIRECT {0}'}"/>
+          </Border>
+          <Border Grid.Column="2"
+                  Classes="validationRowKindTag incoming">
+            <SelectableTextBlock Classes="validationRowKindText"
+                                 Text="{Binding NotchValidationIncomingCount, StringFormat='IN {0}'}"/>
+          </Border>
+          <Border Grid.Column="4"
+                  Classes="validationRowKindTag outgoing">
+            <SelectableTextBlock Classes="validationRowKindText"
+                                 Text="{Binding NotchValidationOutgoingCount, StringFormat='OUT {0}'}"/>
+          </Border>
+        </Grid>
+        <SelectableTextBlock Classes="stepNote"
+                             IsVisible="{Binding HasNotchValidationItems}"
+                             Text="Click one row to focus source/target pads on AA canvas."/>
+        <StackPanel Spacing="{StaticResource Space6}"
+                    IsVisible="{Binding HasNotchValidationItems}">
+          <controls:HidePanelBlock Title="DIRECT details"
+                                   IsExpanded="False"
+                                   IsCollapsible="True">
+            <controls:HidePanelBlock.HeaderRight>
+              <Border Classes="validationCountPill">
+                <SelectableTextBlock Classes="validationCountText"
+                                     Text="{Binding NotchValidationDirectCount, StringFormat='x{0}'}"/>
+              </Border>
+            </controls:HidePanelBlock.HeaderRight>
+            <StackPanel Spacing="{StaticResource Space6}">
+              <SelectableTextBlock Classes="stepNote"
+                                   IsVisible="{Binding IsNotchValidationDirectEmpty}"
+                                   Text="No DIRECT rows for current REG."/>
+              <ScrollViewer Classes="scrollV2"
+                            VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Disabled"
+                            MaxHeight="{StaticResource NotchDetailListMaxHeight}"
+                            IsVisible="{Binding HasNotchValidationDirectItems}">
+                <ItemsControl ItemsSource="{Binding NotchValidationDirectItems}"
+                              ItemTemplate="{StaticResource NotchValidationRowTemplate}"/>
+              </ScrollViewer>
+            </StackPanel>
+          </controls:HidePanelBlock>
+          <controls:HidePanelBlock Title="IN details"
+                                   IsExpanded="False"
+                                   IsCollapsible="True">
+            <controls:HidePanelBlock.HeaderRight>
+              <Border Classes="validationCountPill">
+                <SelectableTextBlock Classes="validationCountText"
+                                     Text="{Binding NotchValidationIncomingCount, StringFormat='x{0}'}"/>
+              </Border>
+            </controls:HidePanelBlock.HeaderRight>
+            <StackPanel Spacing="{StaticResource Space6}">
+              <SelectableTextBlock Classes="stepNote"
+                                   IsVisible="{Binding IsNotchValidationIncomingEmpty}"
+                                   Text="No IN rows for current REG."/>
+              <ScrollViewer Classes="scrollV2"
+                            VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Disabled"
+                            MaxHeight="{StaticResource NotchDetailListMaxHeight}"
+                            IsVisible="{Binding HasNotchValidationIncomingItems}">
+                <ItemsControl ItemsSource="{Binding NotchValidationIncomingItems}"
+                              ItemTemplate="{StaticResource NotchValidationRowTemplate}"/>
+              </ScrollViewer>
+            </StackPanel>
+          </controls:HidePanelBlock>
+          <controls:HidePanelBlock Title="OUT details"
+                                   IsExpanded="False"
+                                   IsCollapsible="True">
+            <controls:HidePanelBlock.HeaderRight>
+              <Border Classes="validationCountPill">
+                <SelectableTextBlock Classes="validationCountText"
+                                     Text="{Binding NotchValidationOutgoingCount, StringFormat='x{0}'}"/>
+              </Border>
+            </controls:HidePanelBlock.HeaderRight>
+            <StackPanel Spacing="{StaticResource Space6}">
+              <SelectableTextBlock Classes="stepNote"
+                                   IsVisible="{Binding IsNotchValidationOutgoingEmpty}"
+                                   Text="No OUT rows for current REG."/>
+              <ScrollViewer Classes="scrollV2"
+                            VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Disabled"
+                            MaxHeight="{StaticResource NotchDetailListMaxHeight}"
+                            IsVisible="{Binding HasNotchValidationOutgoingItems}">
+                <ItemsControl ItemsSource="{Binding NotchValidationOutgoingItems}"
+                              ItemTemplate="{StaticResource NotchValidationRowTemplate}"/>
+              </ScrollViewer>
+            </StackPanel>
+          </controls:HidePanelBlock>
+        </StackPanel>
+        <SelectableTextBlock Classes="stepNote"
+                             IsVisible="{Binding IsNotchValidationItemsEmpty}"
+                             Text="No rows yet. Run Analyze for current REG."/>
+      </StackPanel>
+    </controls:HidePanelBlock>
+    </StackPanel>
+</UserControl>

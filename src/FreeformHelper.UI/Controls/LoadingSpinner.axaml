@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FreeformHelper.UI.Controls.LoadingSpinner"
+             Width="{StaticResource CadLoadCanvasOverlaySpinnerSize}"
+             Height="{StaticResource CadLoadCanvasOverlaySpinnerSize}"
+             IsHitTestVisible="False">
+  <Viewbox Stretch="Uniform"
+           StretchDirection="Both">
+    <Grid Width="{StaticResource LoadingSpinnerDesignSize}"
+          Height="{StaticResource LoadingSpinnerDesignSize}">
+      <Ellipse x:Name="SpinnerTrack"
+               Width="30"
+               Height="30"
+               Stroke="{DynamicResource BrushTextMuted}"
+               StrokeThickness="{StaticResource CadLoadCanvasOverlaySpinnerStrokeThickness}"/>
+      <Ellipse x:Name="SpinnerFlow"
+               Width="30"
+               Height="30"
+               Stroke="{DynamicResource BrushAccent}"
+               StrokeThickness="{StaticResource CadLoadCanvasOverlaySpinnerStrokeThickness}"
+               StrokeLineCap="Round"
+               StrokeDashArray="5,18"/>
+    </Grid>
+  </Viewbox>
+</UserControl>

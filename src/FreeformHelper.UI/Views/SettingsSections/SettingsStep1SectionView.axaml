@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsStep1SectionView">
+  <StackPanel Classes="settingsPage">
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space12}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="Geometry match"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="Diagnostics threshold only; overlap links stay unchanged."/>
+        </StackPanel>
+        <Border Classes="settingsFieldTile">
+          <StackPanel Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="Unmatched TH (overlap / regular area)"
+                                        Tip="Diagnostics threshold for unmatched regular pads; it does not rewrite Step 1 links."/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="1"
+                                     SmallChange="0.0001"
+                                     FormatString="0.####"
+                                     SnapToStep="False"
+                                     Value="{Binding MatchThreshold, Mode=TwoWay}"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

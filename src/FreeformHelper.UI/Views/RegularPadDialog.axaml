@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FreeformHelper.UI.Views.RegularPadDialog"
+        Width="{StaticResource RegularPadDialogWidth}"
+        Height="{StaticResource RegularPadDialogHeight}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Regular Pad">
+  <StackPanel Margin="{StaticResource Inset14}" Spacing="{StaticResource Space10}">
+    <SelectableTextBlock Text="{Binding Title}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"/>
+    <SelectableTextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
+
+    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space10}">
+      <StackPanel>
+        <SelectableTextBlock Text="Row"/>
+        <SelectableTextBlock Text="{Binding DisplayRow}"/>
+      </StackPanel>
+      <StackPanel>
+        <SelectableTextBlock Text="Col"/>
+        <SelectableTextBlock Text="{Binding Col}"/>
+      </StackPanel>
+      <StackPanel>
+        <SelectableTextBlock Text="Index"/>
+        <SelectableTextBlock Text="{Binding Index}"/>
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel>
+      <SelectableTextBlock Text="AA size (mm)"/>
+      <Grid ColumnDefinitions="1*,1*">
+        <StackPanel Grid.Column="0">
+          <SelectableTextBlock Text="Width"/>
+          <TextBox Text="{Binding WidthText, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+          <SelectableTextBlock Text="Height"/>
+          <TextBox Text="{Binding HeightText, Mode=TwoWay}"/>
+        </StackPanel>
+      </Grid>
+      <SelectableTextBlock Text="{Binding AreaText}" FontSize="{StaticResource FontSizeBase}" Foreground="{DynamicResource BrushTextMuted}"/>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource Space10}">
+      <Button Content="Cancel" Command="{Binding CancelCommand}"/>
+      <Button Content="Save" Command="{Binding SaveCommand}"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

@@ -1,0 +1,138 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep4View">
+    <controls:HidePanelBlock x:Name="Step4Block"
+                             Title="Step 4 · Index diagnostics"
+                             IsExpanded="{Binding IsStep4Expanded, Mode=TwoWay}">
+      <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <SelectableTextBlock Grid.Column="0"
+                               Classes="stepNote"
+                               Text="Index numbering, duplicate diffs, and visibility mask."/>
+          <Button Grid.Column="1"
+                  Tag="Step4IndexDiagnostics"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Click="OpenSettingsButton_Click"
+                  ToolTip.Tip="Open Settings at Step 4 section.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+          </Button>
+          <Button Grid.Column="2"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Command="{Binding ClearStep4ResultCommand}"
+                  ToolTip.Tip="Clear Step 4 result and downstream Step 5/6 results.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Delete}"/>
+          </Button>
+        </Grid>
+        <Border Classes="workflowStepStatusStrip">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <Border Classes="workflowStepMetricTile">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                     Text="CAD Output FW Diff assignment"/>
+                <SelectableTextBlock Classes="workflowStepMetricText compact"
+                                     Text="{Binding CadOutputFwDiffAssignmentSummary}"
+                                     ToolTip.Tip="{Binding CadOutputFwDiffAssignmentSummary}"/>
+              </StackPanel>
+            </Border>
+            <Border Classes="workflowStepMetricTile">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                     Text="Duplicate diff status"/>
+                <SelectableTextBlock Classes="workflowStepMetricText compact"
+                                     Text="{Binding Step4DuplicateDiffSummary}"
+                                     ToolTip.Tip="{Binding Step4DuplicateDiffSummary}"/>
+              </StackPanel>
+            </Border>
+            <Border Classes="workflowStepMetricTile">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                     Text="Regular Visibility Mask"/>
+                <SelectableTextBlock Classes="workflowStepMetricText compact"
+                                     Text="{Binding RegularVisibilityMaskSummary}"
+                                     ToolTip.Tip="{Binding RegularVisibilityMaskSummary}"/>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+        <Border Classes="workflowStepSubsection"
+                IsVisible="{Binding HasStep4DuplicateDiffGroups}">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <SelectableTextBlock Text="Duplicate CAD Output FW Diff groups"
+                                 FontWeight="SemiBold"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="These groups currently share one IC+diff key. Select a group, then shift or override the CAD Output FW Diff."/>
+            <ItemsControl ItemsSource="{Binding Step4DuplicateDiffGroups}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Classes="workspaceDataRowCard">
+                    <Grid ColumnDefinitions="*,Auto"
+                          ColumnSpacing="{StaticResource Space8}">
+                      <StackPanel Spacing="{StaticResource Space4}">
+                        <SelectableTextBlock Text="{Binding TitleText}"
+                                             FontWeight="SemiBold"/>
+                        <SelectableTextBlock Classes="stepNote"
+                                             Text="{Binding CadSummaryText}"
+                                             TextWrapping="Wrap"/>
+                        <SelectableTextBlock Classes="stepNote"
+                                             Text="{Binding SuggestionText}"
+                                             TextWrapping="Wrap"/>
+                      </StackPanel>
+                      <Button Grid.Column="1"
+                              Content="Select"
+                              Command="{Binding DataContext.SelectStep4DuplicateDiffGroupCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"/>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <Border Classes="workflowStepSubsection">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <SelectableTextBlock Text="Offset selected CAD Output FW Diff"
+                                 FontWeight="SemiBold"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding Step4DiffShiftSelectionSummary}"/>
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space8}">
+              <controls:NumberScrubber Grid.Column="0"
+                                       Minimum="-1000000"
+                                       Maximum="1000000"
+                                       SmallChange="1"
+                                       LargeChange="10"
+                                       FormatString="0"
+                                       Value="{Binding CadOutputFwDiffIndexShiftDelta, Mode=TwoWay}"
+                                       ToolTip.Tip="Apply one shared diff offset to all selected CAD output pads."/>
+              <Button Grid.Column="1"
+                      Command="{Binding OffsetSelectedCadOutputFwDiffIndicesCommand}"
+                      IsEnabled="{Binding CanOffsetSelectedCadOutputFwDiffIndices}"
+                      Content="Shift"
+                      ToolTip.Tip="Offset selected CAD Output FW Diff together. Empty gaps are allowed, but they will not become table anchors."/>
+            </Grid>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="Gap diffs stay empty. They can remain target-only and will not become anchor rows."/>
+          </StackPanel>
+        </Border>
+        <Button Content="Analyze mapping"
+                Command="{Binding AnalyzeIndexMappingCommand}"
+                HorizontalAlignment="Stretch"
+                ToolTip.Tip="Step 4: analyze CAD↔Regular index mapping and open report window."/>
+        <ProgressBar Minimum="0"
+                     Maximum="1"
+                     Value="{Binding IndexMappingProgress}"
+                     IsVisible="{Binding IsAnalyzingIndexMapping}"
+                     Height="{StaticResource Space6}"/>
+        <SelectableTextBlock Classes="stepNote" Text="{Binding DxfRegularMappingSummary}"/>
+        <SelectableTextBlock Classes="stepNote"
+                             Text="Detailed issues open in a separate report window (copy supported)."/>
+      </StackPanel>
+    </controls:HidePanelBlock>
+</UserControl>
+

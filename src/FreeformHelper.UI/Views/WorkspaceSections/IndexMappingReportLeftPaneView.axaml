@@ -1,0 +1,160 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.IndexMappingReportLeftPaneView">
+      <Grid RowDefinitions="Auto,*,Auto"
+            RowSpacing="{StaticResource Space6}">
+        <Border Grid.Row="0"
+                Classes="workspaceTableHeader">
+          <Grid ColumnDefinitions="0.55*,0.75*,0.95*,0.95*,1.8*,1.1*"
+                ColumnSpacing="{StaticResource Space8}">
+            <SelectableTextBlock Classes="workspaceTableHeaderText"
+                                 Text="IC"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="workspaceTableHeaderText"
+                                 Text="Diff"/>
+            <SelectableTextBlock Grid.Column="2"
+                                 Classes="workspaceTableHeaderText"
+                                 Text="CAD"/>
+            <SelectableTextBlock Grid.Column="3"
+                                 Classes="workspaceTableHeaderText"
+                                 Text="REG"/>
+            <SelectableTextBlock Grid.Column="4"
+                                 Classes="workspaceTableHeaderText"
+                                 Text="Reason"/>
+            <SelectableTextBlock Grid.Column="5"
+                                 Classes="workspaceTableHeaderText"
+                                 Text="Status"/>
+          </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+          <SelectableTextBlock Text="No CAD/REG entity rows under current filter."
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               IsVisible="{Binding HasNoDecisionRows}"/>
+          <ListBox Classes="scrollV2 workspaceDataList"
+                   ItemsSource="{Binding DecisionRows}"
+                   SelectedItem="{Binding SelectedDecision, Mode=TwoWay}"
+                   IsVisible="{Binding HasDecisionRows}"
+                   Background="Transparent"
+                   BorderThickness="0"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                   ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox.ItemsPanel>
+              <ItemsPanelTemplate>
+                <VirtualizingStackPanel/>
+              </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Button Classes="workspaceDataRow"
+                        Classes.workspaceDataRowActive="{Binding IsInspectorSelected}"
+                        Command="{Binding DataContext.SelectDecisionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding}">
+                  <Grid RowDefinitions="Auto,Auto"
+                        RowSpacing="{StaticResource Space6}">
+                    <Grid ColumnDefinitions="0.55*,0.75*,0.95*,0.95*,1.8*,1.1*"
+                          ColumnSpacing="{StaticResource Space8}">
+                      <SelectableTextBlock Classes="workspaceDataCellText"
+                                           Text="{Binding IcDisplayText}"/>
+                      <SelectableTextBlock Grid.Column="1"
+                                           Classes="workspaceDataCellText"
+                                           Text="{Binding CurrentDisplay}"/>
+                      <SelectableTextBlock Grid.Column="2"
+                                           Classes="workspaceDataCellText strong"
+                                           Text="{Binding CadDisplayText}"/>
+                      <SelectableTextBlock Grid.Column="3"
+                                           Classes="workspaceDataCellText"
+                                           Text="{Binding RegularDisplayText}"/>
+                      <Border Grid.Column="4"
+                              Classes="validationRowKindTag workspaceContextBadge"
+                              Classes.direct="{Binding IsReasonTagDirect}"
+                              Classes.incoming="{Binding IsReasonTagIncoming}"
+                              Classes.outgoing="{Binding IsReasonTagOutgoing}"
+                              Classes.nocad="{Binding IsReasonTagNoCad}"
+                              Classes.legacy="{Binding IsReasonTagLegacy}"
+                              HorizontalAlignment="Left"
+                              MaxWidth="260">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="{Binding DecisionReasonCodeText}"
+                                             TextTrimming="CharacterEllipsis"
+                                             MaxLines="1"/>
+                      </Border>
+                      <SelectableTextBlock Grid.Column="5"
+                                           Classes="workspaceDataCellText"
+                                           Text="{Binding StatusDisplay}"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxLines="1"/>
+                    </Grid>
+
+                    <WrapPanel Grid.Row="1"
+                               Orientation="Horizontal">
+                      <Border Classes="validationRowKindTag legacy workspaceContextBadge"
+                              Margin="{StaticResource InsetRight6Bottom6}"
+                              HorizontalAlignment="Left"
+                              MaxWidth="220">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="{Binding DecisionSourceText}"
+                                             TextTrimming="CharacterEllipsis"
+                                             MaxLines="1"/>
+                      </Border>
+                      <Border Classes="validationRowKindTag direct workspaceContextBadge"
+                              Margin="{StaticResource InsetRight6Bottom6}"
+                              HorizontalAlignment="Left">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="{Binding ConfidenceDisplayText, StringFormat='conf {0}'}"/>
+                      </Border>
+                      <Border Classes="validationRowKindTag direct workspaceContextBadge"
+                              Margin="{StaticResource InsetRight6Bottom6}"
+                              HorizontalAlignment="Left">
+                        <SelectableTextBlock Classes="validationRowKindText"
+                                             Text="{Binding StepTagText}"/>
+                      </Border>
+                      <SelectableTextBlock Classes="workspaceDataCellText"
+                                           Text="{Binding DiffRepairPreviewText}"
+                                           Foreground="{DynamicResource BrushTextMuted}"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxLines="1"/>
+                    </WrapPanel>
+                  </Grid>
+                </Button>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+
+        <Expander Grid.Row="2"
+                  Header="{Binding AggregateDecisionTitle}"
+                  IsVisible="{Binding HasAggregateDecisionRows}">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <SelectableTextBlock Classes="workspaceSectionMeta"
+                                 Text="{Binding AggregateDecisionSummaryText}"
+                                 TextWrapping="WrapWithOverflow"/>
+            <ItemsControl ItemsSource="{Binding AggregateDecisionRows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Button Classes="workspaceDataRow"
+                          Command="{Binding DataContext.SelectDecisionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                          CommandParameter="{Binding}">
+                    <Grid ColumnDefinitions="1.4*,1*,*"
+                          ColumnSpacing="{StaticResource Space8}">
+                      <SelectableTextBlock Classes="workspaceDataCellText strong"
+                                           Text="{Binding Title}"/>
+                      <SelectableTextBlock Grid.Column="1"
+                                           Classes="workspaceDataCellText"
+                                           Text="{Binding DecisionReasonCodeText}"/>
+                      <SelectableTextBlock Grid.Column="2"
+                                           Classes="workspaceDataCellText"
+                                           Text="{Binding ActionHint}"
+                                           Foreground="{DynamicResource BrushTextMuted}"/>
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Expander>
+      </Grid>
+</UserControl>

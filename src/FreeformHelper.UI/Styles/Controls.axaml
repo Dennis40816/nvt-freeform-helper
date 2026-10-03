@@ -1,0 +1,16 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
+  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Core.axaml"/>
+  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Overlay.axaml"/>
+  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Tab.axaml"/>
+  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Form.axaml"/>
+  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Panel.axaml"/>
+  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Scroll.axaml"/>
+  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Settings.axaml"/>
+  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.PadInfo.axaml"/>
+  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Action.axaml"/>
+</Styles>

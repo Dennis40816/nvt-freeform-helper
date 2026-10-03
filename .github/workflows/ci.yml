@@ -1,0 +1,148 @@
+name: ci
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main, '[0-9]+.[0-9]+.x']
+
+permissions:
+  contents: read
+
+# A new push to a pull request supersedes the running check. Pushes to main and the trunk get one group
+# per commit, so none is cancelled or replaced while pending and every merged commit keeps a real result.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Lanes and shards are named here; scripts/verify.ps1 decides what each one contains.
+# Required checks: "policy / structure" and "dotnet / build-test". The aggregator currently does not
+# count a failing viewmodel shard (see dotnet-test below).
+jobs:
+  structure:
+    name: policy / structure
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out text files with CRLF
+        run: git config --global core.autocrlf true
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify structure
+        shell: pwsh
+        run: ./scripts/verify.ps1 -StructureOnly -AllowMissingExampleData
+
+  dotnet-build:
+    name: dotnet / build
+    if: github.event_name == 'push' || github.event.pull_request.draft == false
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out text files with CRLF
+        run: git config --global core.autocrlf true
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install pinned .NET SDK and runtime
+        shell: pwsh
+        run: ./scripts/ci/install-dotnet.ps1
+      - name: Format, analyzers and build
+        shell: pwsh
+        run: ./scripts/verify.ps1 -CiLane build -AllowMissingExampleData
+
+  dotnet-test:
+    name: dotnet / test (${{ matrix.shard }})
+    if: github.event_name == 'push' || github.event.pull_request.draft == false
+    runs-on: windows-latest
+    timeout-minutes: 30
+    # The viewmodel shard (FreeformHelperViewModelTests only) is reported but does not block merging
+    # yet: those tests time out or stall on runners with few cores (TODO.md S15.002). Owner decision of
+    # 2026-10-02; remove this line when that item is closed, so the shard is required again. Every other
+    # shard, including the remaining UI classes in 'ui', blocks.
+    continue-on-error: ${{ matrix.shard == 'viewmodel' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [core, ui, viewmodel, snapshots]
+    env:
+      # The golden tests need the private example data. Forks and repositories without the deploy key
+      # run without it and report those tests as skipped. Set the repository variable
+      # TESTDATA_REQUIRED to 'true' once the key exists, so a lost key fails instead of skipping.
+      HAS_TESTDATA_KEY: ${{ secrets.TESTDATA_DEPLOY_KEY != '' }}
+      TESTDATA_REQUIRED: ${{ vars.TESTDATA_REQUIRED }}
+    steps:
+      - name: Check out text files with CRLF
+        run: git config --global core.autocrlf true
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Resolve the pinned example data commit
+        id: example
+        if: env.HAS_TESTDATA_KEY == 'true'
+        shell: pwsh
+        run: |
+          $sha = git rev-parse HEAD:example
+          if ($LASTEXITCODE -ne 0) { throw "Cannot resolve the example submodule commit." }
+          "sha=$sha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - name: Checkout private example data
+        if: env.HAS_TESTDATA_KEY == 'true'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: ${{ github.repository_owner }}/FreeformHelper-testdata
+          ref: ${{ steps.example.outputs.sha }}
+          ssh-key: ${{ secrets.TESTDATA_DEPLOY_KEY }}
+          path: example
+          persist-credentials: false
+      - name: Install pinned .NET SDK and runtime
+        shell: pwsh
+        run: ./scripts/ci/install-dotnet.ps1
+      - name: Run test shard
+        shell: pwsh
+        # Below the job limit, so an overrun is a step failure (which continue-on-error covers for the
+        # viewmodel shard) and the results are still uploaded, instead of a cancelled job.
+        timeout-minutes: 25
+        run: |
+          if ($env:HAS_TESTDATA_KEY -eq 'true') {
+            ./scripts/verify.ps1 -CiLane test -Shard ${{ matrix.shard }}
+          } elseif ($env:TESTDATA_REQUIRED -eq 'true') {
+            throw "TESTDATA_REQUIRED is set but the TESTDATA_DEPLOY_KEY secret is not available to this run."
+          } else {
+            Write-Host "::warning title=Example data::Golden and example-data tests are skipped (no TESTDATA_DEPLOY_KEY)."
+            ./scripts/verify.ps1 -CiLane test -Shard ${{ matrix.shard }} -AllowMissingExampleData
+          }
+      - name: Upload test results
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dotnet-test-${{ matrix.shard }}-results-attempt-${{ github.run_attempt }}
+          path: tests/FreeformHelper.Tests/TestResults/
+          if-no-files-found: ignore
+          retention-days: 3
+
+  dotnet:
+    name: dotnet / build-test
+    needs: [dotnet-build, dotnet-test]
+    # Always runs, also on drafts: a skipped required check counts as passing, so this job must report a
+    # failure whenever the build or the tests did not run to success.
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require the build and every test shard to succeed
+        shell: pwsh
+        env:
+          BUILD_RESULT: ${{ needs.dotnet-build.result }}
+          TEST_RESULT: ${{ needs.dotnet-test.result }}
+        run: |
+          if ($env:BUILD_RESULT -cne 'success') { throw "dotnet / build did not succeed: $env:BUILD_RESULT (skipped means the pull request is a draft)" }
+          if ($env:TEST_RESULT -cne 'success') { throw "dotnet / test did not succeed: $env:TEST_RESULT (skipped means the pull request is a draft)" }

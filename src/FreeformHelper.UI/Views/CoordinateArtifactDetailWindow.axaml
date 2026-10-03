@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FreeformHelper.UI.Views.CoordinateArtifactDetailWindow"
+        Width="{StaticResource CoordinateArtifactDetailWidth}"
+        Height="{StaticResource CoordinateArtifactDetailHeight}"
+        MinWidth="{StaticResource CoordinateArtifactDetailMinWidth}"
+        MinHeight="{StaticResource CoordinateArtifactDetailMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Coordinate detail">
+  <Border Padding="{StaticResource Inset14}">
+    <Grid RowDefinitions="Auto,*,Auto"
+          RowSpacing="{StaticResource Space12}">
+      <StackPanel Grid.Row="0" Spacing="{StaticResource Space4}">
+        <SelectableTextBlock Text="{Binding Label}"
+                             FontSize="{DynamicResource FontSizeLg}"
+                             FontWeight="SemiBold"/>
+        <SelectableTextBlock Text="{Binding KindRecipeText}"
+                             Foreground="{DynamicResource BrushTextMuted}"/>
+      </StackPanel>
+
+      <ScrollViewer Grid.Row="1"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="{StaticResource Space10}">
+          <Border Classes="workspaceInspectorSection">
+            <StackPanel Spacing="{StaticResource Space8}">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Pixel"/>
+                <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding PixelText}"/>
+              </StackPanel>
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Machine"/>
+                <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding MachineText}"/>
+              </StackPanel>
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Safe machine"/>
+                <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding SafeMachineText}"/>
+              </StackPanel>
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="World"/>
+                <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding WorldText}"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <Border Classes="workspaceInspectorSection">
+            <StackPanel Spacing="{StaticResource Space8}">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Source"/>
+                <SelectableTextBlock Classes="workspaceInspectorValue"
+                                     Text="{Binding SourceText}"
+                                     TextWrapping="Wrap"/>
+              </StackPanel>
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Source bounds"/>
+                <SelectableTextBlock Classes="workspaceInspectorValue"
+                                     Text="{Binding SourceBoundsText}"
+                                     TextWrapping="Wrap"/>
+              </StackPanel>
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Detail"/>
+                <SelectableTextBlock Classes="workspaceInspectorValue"
+                                     Text="{Binding DetailText}"
+                                     TextWrapping="Wrap"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+
+      <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+        <SelectableTextBlock Text="The canvas keeps this row focused after the dialog closes."
+                             Foreground="{DynamicResource BrushTextMuted}"
+                             TextWrapping="Wrap"
+                             VerticalAlignment="Center"/>
+        <Button Grid.Column="1"
+                Classes="actionNeutral actionTextButton"
+                Click="CloseButton_Click">
+          <SelectableTextBlock Text="Close"/>
+        </Button>
+      </Grid>
+    </Grid>
+  </Border>
+</Window>

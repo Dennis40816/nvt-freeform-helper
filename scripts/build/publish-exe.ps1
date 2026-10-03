@@ -1,0 +1,46 @@
+param(
+    [ValidateSet("single-file", "folder")]
+    [string]$Profile = "single-file",
+    [string]$Runtime = "win-x64",
+    [string]$Configuration = "Release",
+    [string]$OutputRoot = "build/publish"
+)
+
+$ErrorActionPreference = "Stop"
+
+$project = "src/FreeformHelper.UI/FreeformHelper.UI.csproj"
+$profileOut = Join-Path $OutputRoot "$Runtime/$Profile"
+
+$publishArgs = @(
+    "publish", $project,
+    "-c", $Configuration,
+    "-r", $Runtime,
+    "--self-contained", "true",
+    "-p:PublishTrimmed=false",
+    "-o", $profileOut
+)
+
+if ($Profile -eq "single-file") {
+    $publishArgs += "-p:PublishSingleFile=true"
+    $publishArgs += "-p:IncludeNativeLibrariesForSelfExtract=true"
+} else {
+    $publishArgs += "-p:PublishSingleFile=false"
+}
+
+Write-Host "Publishing FreeformHelper.UI..."
+Write-Host "  Profile : $Profile"
+Write-Host "  Runtime : $Runtime"
+Write-Host "  Output  : $profileOut"
+
+& dotnet @publishArgs
+
+if ($LASTEXITCODE -ne 0) {
+    throw "dotnet publish failed with exit code $LASTEXITCODE."
+}
+
+$exePath = Join-Path $profileOut "FreeformHelper.UI.exe"
+if (Test-Path $exePath) {
+    Write-Host "Done: $exePath"
+} else {
+    Write-Warning "Publish completed but EXE not found at expected path: $exePath"
+}

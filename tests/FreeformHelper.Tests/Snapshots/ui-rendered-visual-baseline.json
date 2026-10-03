@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "surfaces": {
+    "MainWindow.ConsoleExpanded": {
+      "width": 1280,
+      "height": 900,
+      "hash": "c000400044f080188018e01fc01fc01f000f000e000f000c001f1fcc1fee000c",
+      "maxDistance": 36
+    },
+    "SettingsWindow.Default": {
+      "width": 960,
+      "height": 760,
+      "hash": "4000ff020000fffc078004cc000046d804cc06fc07f006de000e07000f000017",
+      "maxDistance": 24
+    },
+    "HowToUseView.Default": {
+      "width": 1000,
+      "height": 700,
+      "hash": "e003c000f800c000ff80c000f800f800f800f000ff80fc00f000fe00fe00f800",
+      "maxDistance": 24
+    }
+  }
+}

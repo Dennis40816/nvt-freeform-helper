@@ -1,0 +1,7 @@
+{
+  "selectionSampleCountMin": 1,
+  "selectionTotalP95Ms": 600,
+  "selectionInspectorP95Ms": 400,
+  "exportCsvElapsedMs": 45000,
+  "exportCv22ElapsedMs": 45000
+}

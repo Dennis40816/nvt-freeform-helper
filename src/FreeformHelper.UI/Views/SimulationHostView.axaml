@@ -1,0 +1,169 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:FreeformHelper.UI.Views"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             mc:Ignorable="d"
+             x:Class="FreeformHelper.UI.Views.SimulationHostView"
+             Background="{DynamicResource BrushBgApp}"
+             Foreground="{DynamicResource BrushTextPrimary}">
+  <Design.DataContext>
+    <vm:SimulationHostViewModel/>
+  </Design.DataContext>
+
+  <Grid RowDefinitions="Auto,*"
+        MinHeight="0"
+        MinWidth="0">
+    <Border Grid.Row="0"
+            IsVisible="{Binding IsWorkspaceStale}"
+            Margin="{StaticResource Inset24_24_24_0}"
+            Background="{DynamicResource BrushBgPanel}"
+            BorderBrush="{DynamicResource BrushWarning}"
+            BorderThickness="{StaticResource BorderThin}"
+            CornerRadius="{StaticResource RadiusMd}"
+            Padding="{StaticResource Inset12}">
+      <Grid ColumnDefinitions="*,Auto"
+            ColumnSpacing="{StaticResource Space12}">
+        <SelectableTextBlock Grid.Column="0"
+                             Text="{Binding StaleWorkspaceBannerText}"
+                             VerticalAlignment="Center"
+                             Foreground="{DynamicResource BrushWarning}"
+                             TextWrapping="Wrap"/>
+        <Button Grid.Column="1"
+                Classes="actionNeutral actionTextButton"
+                Command="{Binding OpenSimulationCommand}"
+                IsEnabled="{Binding CanOpenSimulation}">
+          <Grid Classes="iconTextButtonContent"
+                ColumnDefinitions="Auto,*,Auto">
+            <controls:FontIcon Grid.Column="0"
+                               Classes="symbols iconTextButtonLeadingIcon"
+                               Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="iconTextButtonLabel"
+                                 Text="Refresh"/>
+            <Border Grid.Column="2"
+                    Classes="iconTextButtonTrailingSpacer"/>
+          </Grid>
+        </Button>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1"
+          MinHeight="0"
+          MinWidth="0">
+      <Border IsVisible="{Binding HasNoWorkspace}"
+              Padding="{StaticResource Inset24}">
+        <Border Background="{DynamicResource BrushBgPanel}"
+                BorderBrush="{DynamicResource BrushBorder}"
+                BorderThickness="{StaticResource BorderThin}"
+                CornerRadius="{StaticResource RadiusMd}"
+                Padding="{StaticResource Inset20}">
+          <StackPanel Spacing="{StaticResource Space12}"
+                      MaxWidth="{StaticResource IndexMappingReportMinWidth}">
+            <SelectableTextBlock Text="{Binding PlaceholderTitle}"
+                                 FontSize="{DynamicResource FontSizeXl}"
+                                 FontWeight="SemiBold"/>
+            <SelectableTextBlock Text="{Binding PlaceholderSubtitle}"
+                                 Foreground="{DynamicResource BrushTextMuted}"
+                                 TextWrapping="Wrap"/>
+            <Border IsVisible="{Binding HasBuildFailure}"
+                    Background="{DynamicResource BrushBgSurfaceInset}"
+                    BorderBrush="{DynamicResource BrushWarning}"
+                    BorderThickness="{StaticResource BorderThin}"
+                    CornerRadius="{StaticResource RadiusSm}"
+                    Padding="{StaticResource Inset12}">
+              <SelectableTextBlock Text="{Binding BuildFailureText}"
+                                   Foreground="{DynamicResource BrushWarning}"
+                                   TextWrapping="Wrap"/>
+            </Border>
+            <Button Classes="actionNeutral actionTextButton"
+                    Command="{Binding OpenSimulationCommand}"
+                    IsEnabled="{Binding CanOpenSimulation}">
+              <Grid Classes="iconTextButtonContent"
+                    ColumnDefinitions="Auto,*,Auto">
+                <controls:FontIcon Grid.Column="0"
+                                   Classes="symbols iconTextButtonLeadingIcon"
+                                   Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                <SelectableTextBlock Grid.Column="1"
+                                     Classes="iconTextButtonLabel"
+                                     Text="Build from current workspace"/>
+                <Border Grid.Column="2"
+                        Classes="iconTextButtonTrailingSpacer"/>
+              </Grid>
+            </Button>
+          </StackPanel>
+        </Border>
+      </Border>
+
+      <views:SimulationWorkspaceView IsVisible="{Binding HasWorkspace}"
+                                     MinHeight="0"
+                                     MinWidth="0"
+                                     DataContext="{Binding CurrentWorkspace}"/>
+
+      <Border IsVisible="{Binding HasWorkspaceFailureOverlay}"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              MaxWidth="{StaticResource IndexMappingReportMinWidth}"
+              Margin="{StaticResource Inset24}"
+              Padding="{StaticResource Inset12}"
+              Background="{DynamicResource BrushBgSurfaceInset}"
+              BorderBrush="{DynamicResource BrushWarning}"
+              BorderThickness="{StaticResource BorderThin}"
+              CornerRadius="{StaticResource RadiusMd}">
+        <StackPanel Spacing="{StaticResource Space8}">
+          <SelectableTextBlock Text="Simulation blocked"
+                               FontWeight="SemiBold"/>
+          <SelectableTextBlock Text="{Binding BuildFailureText}"
+                               Foreground="{DynamicResource BrushWarning}"
+                               TextWrapping="Wrap"/>
+          <Button Classes="actionNeutral actionTextButton"
+                  Command="{Binding OpenSimulationCommand}"
+                  IsEnabled="{Binding CanOpenSimulation}">
+            <Grid Classes="iconTextButtonContent"
+                  ColumnDefinitions="Auto,*,Auto">
+              <controls:FontIcon Grid.Column="0"
+                                 Classes="symbols iconTextButtonLeadingIcon"
+                                 Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="iconTextButtonLabel"
+                                   Text="Retry build"/>
+              <Border Grid.Column="2"
+                      Classes="iconTextButtonTrailingSpacer"/>
+            </Grid>
+          </Button>
+        </StackPanel>
+      </Border>
+
+      <Border IsVisible="{Binding HasBuildProgressOverlay}"
+              Background="{DynamicResource BrushOverlayScrim}">
+        <Border HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                MaxWidth="{StaticResource IndexMappingReportMinWidth}"
+                Margin="{StaticResource Inset24}"
+                Padding="{StaticResource Inset20}"
+                Background="{DynamicResource BrushBgElevated}"
+                BorderBrush="{DynamicResource BrushBorderStrong}"
+                BorderThickness="{StaticResource BorderThin}"
+                CornerRadius="{StaticResource RadiusMd}">
+          <StackPanel Spacing="{StaticResource Space12}">
+            <controls:LoadingSpinner HorizontalAlignment="Center"/>
+            <SelectableTextBlock Text="Building simulation workspace"
+                                 HorizontalAlignment="Center"
+                                 FontSize="{DynamicResource FontSizeXl}"
+                                 FontWeight="SemiBold"
+                                 TextAlignment="Center"/>
+            <SelectableTextBlock Text="{Binding BuildProgressText}"
+                                 IsVisible="{Binding HasBuildProgressText}"
+                                 HorizontalAlignment="Center"
+                                 Foreground="{DynamicResource BrushTextMuted}"
+                                 TextAlignment="Center"
+                                 TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

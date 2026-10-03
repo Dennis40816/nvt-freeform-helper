@@ -1,0 +1,176 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsStep4SectionView">
+  <StackPanel Classes="settingsPage">
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space12}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="Mapping score weights"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="Geometry score weights for mapping diagnostics."/>
+        </StackPanel>
+        <Grid ColumnDefinitions="1*,1*"
+              RowDefinitions="Auto,Auto,Auto"
+              ColumnSpacing="{StaticResource Space12}"
+              RowSpacing="{StaticResource Space12}">
+          <Border Grid.Row="0"
+                  Grid.Column="0"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Weight IoU" Tip="Mapping score weight for geometric overlap quality between CAD and regular pads."/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="10"
+                                       SmallChange="0.05"
+                                       FormatString="0.##"
+                                       SnapToStep="False"
+                                       Value="{Binding MappingWeightIou, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="0"
+                  Grid.Column="1"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Weight distance" Tip="Mapping score weight for CAD/regular centroid distance."/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="10"
+                                       SmallChange="0.05"
+                                       FormatString="0.##"
+                                       SnapToStep="False"
+                                       Value="{Binding MappingWeightCentroidDistance, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="1"
+                  Grid.Column="0"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Weight area" Tip="Mapping score weight for CAD/regular area similarity."/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="10"
+                                       SmallChange="0.05"
+                                       FormatString="0.##"
+                                       SnapToStep="False"
+                                       Value="{Binding MappingWeightAreaRatio, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="1"
+                  Grid.Column="1"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Candidate number" Tip="How many geometry candidates are retained for Step 4 mapping diagnostics."/>
+              <controls:NumberScrubber Minimum="1"
+                                       Maximum="400"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       Value="{Binding MappingCandidateNumber, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="2"
+                  Grid.Column="0"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Low confidence threshold" Tip="Mappings below this confidence are flagged for review."/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="1"
+                                       SmallChange="0.01"
+                                       FormatString="0.##"
+                                       SnapToStep="False"
+                                       Value="{Binding MappingLowConfidenceThreshold, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="2"
+                  Grid.Column="1"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="Ambiguous margin (best - 2nd)" Tip="If best score minus second score is below this margin, mapping is flagged ambiguous."/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="1"
+                                       SmallChange="0.01"
+                                       FormatString="0.##"
+                                       SnapToStep="False"
+                                       Value="{Binding MappingAmbiguousMargin, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space12}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="CAD Output FW Diff diagnostics"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="CAD output FW diff numbering and visibility."/>
+        </StackPanel>
+        <Grid ColumnDefinitions="1*,1*"
+              RowDefinitions="Auto,Auto"
+              ColumnSpacing="{StaticResource Space12}"
+              RowSpacing="{StaticResource Space12}">
+          <Border Grid.Row="0"
+                  Grid.Column="0"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="CAD Output FW Diff strategy" Tip="Strategy used to assign CAD Output FW Diff indices from geometry seed and overrides."/>
+              <ComboBox ItemsSource="{Binding CadOutputFwDiffAutoModeOptions}"
+                        SelectedItem="{Binding SelectedCadOutputFwDiffAutoModeOption, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <SelectableTextBlock Text="{Binding Display}"
+                                         ToolTip.Tip="{Binding Description}"/>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="{Binding SelectedCadOutputFwDiffAutoModeOption.Description}"
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="0"
+                  Grid.Column="1"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <controls:SettingsInfoLabel Text="CAD Output FW Diff start" Tip="Starting index for automatic CAD Output FW Diff numbering."/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="1000000"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       Value="{Binding CadOutputFwDiffIndexStart, Mode=TwoWay}"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="1"
+                  Grid.Column="0"
+                  Classes="settingsFieldTile">
+            <StackPanel Classes="panelFormField">
+              <SelectableTextBlock Text="Future validation path"/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="Reserved for CSV-confirmed geometry seed."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="1"
+                  Grid.Column="1"
+                  Classes="settingsFieldTile">
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space10}">
+              <StackPanel Grid.Column="0"
+                          Classes="panelFormField">
+                <controls:SettingsInfoLabel Text="Show CAD Output FW Diff markers" Tip="Display CAD output diff markers on canvas; mapping data is unchanged."/>
+                <SelectableTextBlock Classes="stepNote"
+                                     Text="Display only; mapping result unchanged."
+                                     TextWrapping="Wrap"/>
+              </StackPanel>
+              <ToggleSwitch Grid.Column="1"
+                            IsChecked="{Binding ShowDiffIndexOverlay, Mode=TwoWay}"
+                            OnContent=""
+                            OffContent=""
+                            MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                            VerticalAlignment="Center"/>
+            </Grid>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,304 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:padInfo="clr-namespace:FreeformHelper.UI.Views.PadInfoSections"
+             x:Class="FreeformHelper.UI.Views.PadInfoSections.RegularPadInfoContentView">
+          <ScrollViewer x:Name="RegularPadInfoScroll"
+                        Classes="scrollV2"
+                        MaxHeight="{StaticResource PadInfoContentMaxHeight}"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled"
+                        HorizontalContentAlignment="Stretch"
+                        Padding="0">
+            <Border Padding="{StaticResource InsetRight12Bottom12}">
+              <StackPanel Spacing="{StaticResource Space10}">
+                <Grid Classes="padInfoHeaderRow" ColumnDefinitions="Auto,*,Auto,Auto">
+                  <Path Grid.Column="0"
+                        Width="{DynamicResource IconSizeMd}"
+                        Height="{DynamicResource IconSizeMd}"
+                        Fill="{DynamicResource BrushCanvasRegularSelected}"
+                        Data="M3 3 H21 V21 H3 Z"/>
+                  <StackPanel Grid.Column="1" Classes="padInfoHeaderText">
+                    <SelectableTextBlock Classes="padInfoTitle" Text="{Binding Title}"/>
+                    <SelectableTextBlock Classes="padInfoSubtle" Text="{Binding Subtitle}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Column="2"
+                              Spacing="{StaticResource Space2}"
+                              IsVisible="{Binding IsSingle}"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center">
+                    <SelectableTextBlock Classes="padInfoHeaderMeta"
+                                         Text="{Binding HeaderAxisXText}"
+                                         HorizontalAlignment="Right"/>
+                    <SelectableTextBlock Classes="padInfoHeaderMeta"
+                                         Text="{Binding HeaderAxisYText}"
+                                         HorizontalAlignment="Right"/>
+                  </StackPanel>
+                  <Button Grid.Column="3"
+                          Classes="padInfoHeaderActionButton"
+                          IsVisible="{Binding HasLocateMatchAction}"
+                          Command="{Binding LocateMatchCommand}"
+                          ToolTip.Tip="Focus the best match when available; otherwise highlight related CAD pads.">
+                    <controls:FontIcon Classes="symbols iconSm"
+                                       Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                  </Button>
+                </Grid>
+
+                <SelectableTextBlock Classes="padInfoBodyText"
+                                     Text="{Binding IdentityText}"
+                                     TextWrapping="Wrap"/>
+
+                <Grid ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto,Auto,Auto"
+                      ColumnSpacing="{StaticResource Space12}"
+                      RowSpacing="{StaticResource Space8}">
+                  <StackPanel Grid.Column="0" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Match"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue key"
+                                         Text="{Binding MatchText}">
+                      <ToolTip.Tip>
+                        <SelectableTextBlock Text="{Binding MatchDetailsText}" TextWrapping="Wrap"/>
+                      </ToolTip.Tip>
+                    </SelectableTextBlock>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Freeform"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding FreeformText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Diff idx"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding DiffIndexText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Diff source"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding DiffSourceText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="IC"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding IcText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Confidence"/>
+                    <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding MatchConfidenceText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Notch rows"/>
+                    <SelectableTextBlock Classes="padInfoBodyText"
+                                         Text="{Binding NotchRowsSummaryText}"
+                                         TextWrapping="Wrap"/>
+                  </StackPanel>
+                </Grid>
+
+                <StackPanel Spacing="{StaticResource Space2}"
+                            IsVisible="{Binding IsSingle}">
+                  <SelectableTextBlock Classes="padInfoKeyLabel" Text="Owner summary"/>
+                  <SelectableTextBlock Classes="padInfoBodyText"
+                                       Text="{Binding OwnerSummaryText}"
+                                       TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <controls:PadInfoSectionFrame Title="Relation">
+                <Border Classes="padInfoSectionBlock">
+                  <StackPanel Spacing="{StaticResource Space10}">
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="{StaticResource Space12}"
+                          RowSpacing="{StaticResource Space8}">
+                      <StackPanel Grid.Column="0" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Location"/>
+                        <SelectableTextBlock Classes="padInfoBodyText"
+                                             Text="{Binding RowColText}"
+                                             TextWrapping="Wrap"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Owners"/>
+                        <SelectableTextBlock Classes="padInfoBodyText"
+                                             Text="{Binding OwnerSummaryText}"
+                                             TextWrapping="Wrap"/>
+                      </StackPanel>
+                    </Grid>
+
+                    <StackPanel Spacing="{StaticResource Space6}"
+                                IsVisible="{Binding HasMatchAreaCards}">
+                      <SelectableTextBlock Classes="padInfoKeyLabel" Text="CAD overlap areas"/>
+                      <padInfo:PadInfoRelationCardListView Cards="{Binding MatchAreaCards}"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="{StaticResource Space6}"
+                                IsVisible="{Binding HasNotchRowFlowCards}">
+                      <SelectableTextBlock Classes="padInfoKeyLabel" Text="Notch row flow"/>
+                      <padInfo:PadInfoRelationCardListView Cards="{Binding NotchRowFlowCards}"/>
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="{StaticResource Space12}"
+                          IsVisible="{Binding IsMulti}">
+                      <StackPanel Grid.Column="0" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Rows"/>
+                        <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding RowRangeText}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Cols"/>
+                        <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding ColRangeText}"/>
+                      </StackPanel>
+                    </Grid>
+                  </StackPanel>
+                </Border>
+                </controls:PadInfoSectionFrame>
+
+                <controls:PadInfoSectionFrame Title="Geometry / Debug">
+                <Button Classes="padInfoSectionToggle debugCard"
+                        Command="{Binding ToggleGeometryDetailsCommand}"
+                        ToolTip.Tip="Show or hide geometry and rule trace details.">
+                  <Grid ColumnDefinitions="*,Auto"
+                        ColumnSpacing="{StaticResource Space8}">
+                    <SelectableTextBlock Grid.Column="0"
+                                         Classes="padInfoMetaText"
+                                         Text="geometry + trace"
+                                         TextWrapping="Wrap"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Classes="padInfoKeyValue key"
+                                         Text="{Binding GeometryDetailsToggleText}"
+                                         VerticalAlignment="Center"/>
+                  </Grid>
+                </Button>
+                </controls:PadInfoSectionFrame>
+
+                <StackPanel Spacing="{StaticResource Space8}"
+                            IsVisible="{Binding ShowGeometryDetails}">
+                  <Border Classes="padInfoInsetCard"
+                          IsVisible="{Binding ShowGeometryDetails}">
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto,Auto,Auto"
+                          ColumnSpacing="{StaticResource Space12}"
+                          RowSpacing="{StaticResource Space8}">
+                      <StackPanel Grid.Column="0" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Area"/>
+                        <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding AreaText}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Centroid"/>
+                        <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding CentroidText}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Bounds"/>
+                        <SelectableTextBlock Classes="padInfoBodyText"
+                                             Text="{Binding BoundsText}"
+                                             TextWrapping="Wrap"/>
+                      </StackPanel>
+                      <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Regular id"/>
+                        <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding RegularPadIdText}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="padInfoKeyLabel" Text="Match / freeform"/>
+                        <SelectableTextBlock Classes="padInfoBodyText"
+                                             Text="{Binding MatchFreeformText}"
+                                             TextWrapping="Wrap"/>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                  <Border Classes="padInfoInsetCard"
+                          IsVisible="{Binding HasRuleTrace}">
+                    <ItemsControl ItemsSource="{Binding RuleTraceLines}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <SelectableTextBlock Classes="padInfoMetaText"
+                                               Text="{Binding}"
+                                               TextWrapping="Wrap"/>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </Border>
+                </StackPanel>
+
+                <controls:PadInfoSectionFrame Title="Edit tools">
+                <Border Classes="padInfoSectionBlock">
+                <Grid ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto,Auto"
+                      ColumnSpacing="{StaticResource Space12}"
+                      RowSpacing="{StaticResource Space10}">
+                  <StackPanel Grid.Column="0"
+                              Classes="panelFormField left"
+                              Spacing="{StaticResource Space4}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Pad width (mm)"/>
+                    <controls:NumberScrubber Minimum="0"
+                                             Maximum="1000000"
+                                             SmallChange="0.0001"
+                                             FormatString="0.####"
+                                             SnapToStep="False"
+                                             HorizontalAlignment="Stretch"
+                                             Value="{Binding PadWidth, Mode=TwoWay}"
+                                             ToolTip.Tip="Overrides pad width for selected rows/cols."/>
+                    <SelectableTextBlock Classes="padInfoMetaText"
+                                         Text="Mixed values. Enter to override selection."
+                                         IsVisible="{Binding IsPadWidthMixed}"
+                                         TextWrapping="Wrap"/>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1"
+                              Classes="panelFormField right"
+                              Spacing="{StaticResource Space4}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Pad height (mm)"/>
+                    <controls:NumberScrubber Minimum="0"
+                                             Maximum="1000000"
+                                             SmallChange="0.0001"
+                                             FormatString="0.####"
+                                             SnapToStep="False"
+                                             HorizontalAlignment="Stretch"
+                                             Value="{Binding PadHeight, Mode=TwoWay}"
+                                             ToolTip.Tip="Overrides pad height for the selected rows/cols."/>
+                    <SelectableTextBlock Classes="padInfoMetaText"
+                                         Text="Mixed values. Enter to override selection."
+                                         IsVisible="{Binding IsPadHeightMixed}"
+                                         TextWrapping="Wrap"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="1"
+                              Grid.ColumnSpan="2"
+                              Spacing="{StaticResource Space4}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Freeform"/>
+                    <Grid Classes="panelActionRow" ColumnDefinitions="*,*,*,*">
+                      <Button Grid.Column="0"
+                              Classes="actionNeutral actionTextButton padInfoActionButton"
+                              Content="None"
+                              Command="{Binding SetFreeformNoneCommand}"
+                              ToolTip.Tip="Mark selection as none."/>
+                      <Button Grid.Column="1"
+                              Classes="actionNeutral actionTextButton trailing padInfoActionButton"
+                              Content="X"
+                              Command="{Binding SetFreeformXCommand}"
+                              ToolTip.Tip="Mark selection as X-way."/>
+                      <Button Grid.Column="2"
+                              Classes="actionNeutral actionTextButton trailing padInfoActionButton"
+                              Content="Y"
+                              Command="{Binding SetFreeformYCommand}"
+                              ToolTip.Tip="Mark selection as Y-way."/>
+                      <Button Grid.Column="3"
+                              Classes="actionNeutral actionTextButton trailing padInfoActionButton"
+                              Content="XY"
+                              Command="{Binding SetFreeformXYCommand}"
+                              ToolTip.Tip="Mark selection as XY-way."/>
+                    </Grid>
+                  </StackPanel>
+                  <StackPanel Grid.Row="2"
+                              Grid.ColumnSpan="2"
+                              Spacing="{StaticResource Space4}">
+                    <SelectableTextBlock Classes="padInfoKeyLabel" Text="Unsaved changes"/>
+                    <Grid Classes="panelActionRow" ColumnDefinitions="*,*">
+                      <Button Grid.Column="0"
+                              Classes="actionNeutral actionTextButton padInfoActionButton"
+                              Content="Apply changes"
+                              IsEnabled="{Binding HasPendingChanges}"
+                              Command="{Binding ApplyChangesCommand}"/>
+                      <Button Grid.Column="1"
+                              Classes="actionNeutral actionTextButton trailing padInfoActionButton"
+                              Content="Reset size"
+                              Command="{Binding ResetPadSizeCommand}"/>
+                    </Grid>
+                  </StackPanel>
+                </Grid>
+                </Border>
+                </controls:PadInfoSectionFrame>
+              </StackPanel>
+            </Border>
+          </ScrollViewer>
+</UserControl>

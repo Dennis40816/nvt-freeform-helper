@@ -1,0 +1,421 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspaceDetailsPaneView">
+      <UserControl.Resources>
+        <converters:BooleanGlyphConverter x:Key="WorkspaceFoldGlyph"
+                                          FalseGlyph="{x:Static icons:IconGlyphs.ExpandMore}"
+                                          TrueGlyph="{x:Static icons:IconGlyphs.ExpandLess}"/>
+      </UserControl.Resources>
+      <Border Grid.Column="4"
+              Classes="workspaceSidePane right">
+        <ScrollViewer Classes="scrollDevCandidate viewportBoundScroll"
+                      MinHeight="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+          <Border Classes="viewportBoundContent"
+                  Padding="{StaticResource InsetRight12Bottom20}">
+            <StackPanel Classes="panelForm"
+                        Spacing="{StaticResource Space14}">
+              <Border Classes="workspaceSectionCard">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space12}" RowSpacing="{StaticResource Space8}">
+                  <SelectableTextBlock Grid.Row="0" Grid.ColumnSpan="2" Classes="workspaceSectionTitle" Text="Selected regular values"/>
+                  <SelectableTextBlock Grid.Row="1" Grid.ColumnSpan="2" Classes="workspaceSectionMeta" Text="{Binding SelectedRegularHeaderText}"/>
+                  <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Text="Before" FontWeight="SemiBold"/>
+                    <SelectableTextBlock Text="{Binding SelectedBeforeText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Text="After" FontWeight="SemiBold"/>
+                    <SelectableTextBlock Text="{Binding SelectedAfterText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="3" Grid.Column="0" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Text="Delta" FontWeight="SemiBold"/>
+                    <SelectableTextBlock Text="{Binding SelectedDeltaText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="3" Grid.Column="1" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Text="% change" FontWeight="SemiBold"/>
+                    <SelectableTextBlock Text="{Binding SelectedPercentChangeText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}"
+                              IsVisible="{Binding ShowSimulationDiagnostics}">
+                    <SelectableTextBlock Text="EMS status" FontWeight="SemiBold"/>
+                    <SelectableTextBlock Text="{Binding SelectedEmsStatusText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}"
+                              IsVisible="{Binding ShowSimulationDiagnostics}">
+                    <SelectableTextBlock Text="Net flow" FontWeight="SemiBold"/>
+                    <Border Classes="chipStatus"
+                            HorizontalAlignment="Left">
+                      <SelectableTextBlock Classes="chipStatusText"
+                                           Text="{Binding SelectedNetFlowText}"/>
+                    </Border>
+                    <SelectableTextBlock Classes="workspaceSectionMeta"
+                                         Text="{Binding SelectedFlowLegSummaryText}"
+                                         TextWrapping="Wrap"/>
+                    <ItemsControl ItemsSource="{Binding SelectedFlowLegs}"
+                                  IsVisible="{Binding HasSelectedFlowLegs}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Border Classes="chipStatus"
+                                  Margin="{StaticResource InsetBottom6}">
+                            <Grid ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="{StaticResource Space8}">
+                              <StackPanel Grid.Column="0"
+                                          Spacing="{StaticResource Space2}">
+                                <SelectableTextBlock Classes="chipStatusText"
+                                                     Text="{Binding RoleText}"/>
+                                <SelectableTextBlock Text="{Binding SummaryText}"
+                                                     FontWeight="SemiBold"
+                                                     TextWrapping="Wrap"/>
+                                <SelectableTextBlock Classes="workspaceSectionMeta"
+                                                     Text="{Binding DetailText}"
+                                                     TextWrapping="Wrap"/>
+                                <SelectableTextBlock Classes="workspaceSectionMeta"
+                                                     Text="{Binding SourceRowsText}"
+                                                     TextWrapping="Wrap"/>
+                              </StackPanel>
+                              <SelectableTextBlock Grid.Column="1"
+                                                   Text="{Binding DeltaText}"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Top"/>
+                            </Grid>
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                  <Border Grid.Row="6"
+                          Grid.ColumnSpan="2"
+                          Classes="workspaceDetailStrip flat"
+                          ToolTip.Tip="{Binding CanvasStatusSummaryText}">
+                    <StackPanel Spacing="{StaticResource Space2}">
+                      <SelectableTextBlock Classes="chipStatusText" Text="Input source"/>
+                      <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SelectedSourceText}"/>
+                      <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SelectedRegularLocationText}"/>
+                      <SelectableTextBlock Classes="workspaceSectionMeta compact" Text="{Binding CanvasStatusSummaryText}"/>
+                    </StackPanel>
+                  </Border>
+                </Grid>
+              </Border>
+
+              <Grid IsVisible="{Binding ShowSimulationDiagnostics}"
+                    ClipToBounds="False">
+                <Border Classes="workspaceSectionCard">
+                  <StackPanel Spacing="{StaticResource Space8}">
+                    <ToggleButton Classes="workspaceFoldHeader"
+                                  IsChecked="{Binding IsSimulationSafetyExpanded, Mode=TwoWay}"
+                                  ToolTip.Tip="{Binding SimulationSafetySummaryText}">
+                      <Grid Classes="workspaceFoldHeaderContent"
+                            ColumnDefinitions="Auto,*">
+                        <controls:FontIcon Grid.Column="0"
+                                           Classes="symbols"
+                                           Glyph="{Binding IsChecked,
+                                           RelativeSource={RelativeSource AncestorType=ToggleButton},
+                                           Converter={StaticResource WorkspaceFoldGlyph}}"/>
+                        <SelectableTextBlock Grid.Column="1"
+                                             Classes="workspaceSectionTitle"
+                                             Text="EMS safety"/>
+                      </Grid>
+                    </ToggleButton>
+                    <Border Classes="workspaceFoldBody"
+                            IsVisible="{Binding IsSimulationSafetyExpanded}">
+                      <StackPanel Spacing="{StaticResource Space8}">
+                        <WrapPanel Orientation="Horizontal">
+                          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                            <SelectableTextBlock Classes="chipStatusText" Text="{Binding SimulationEmsCapText}"/>
+                          </Border>
+                          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                            <SelectableTextBlock Classes="chipStatusText" Text="{Binding SimulationMaxAfterText}"/>
+                          </Border>
+                          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                            <SelectableTextBlock Classes="chipStatusText" Text="{Binding SimulationSafetyViolationCountText}"/>
+                          </Border>
+                          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                            <SelectableTextBlock Classes="chipStatusText" Text="{Binding SimulationSafetyStatusText}"/>
+                          </Border>
+                        </WrapPanel>
+                        <SelectableTextBlock Classes="workspaceSectionMeta compact"
+                                             Text="{Binding SimulationSafetySummaryText}"
+                                             ToolTip.Tip="{Binding SimulationSafetySummaryText}"
+                                             TextWrapping="Wrap"/>
+                        <Border Classes="workspaceDetailStrip flat"
+                                ToolTip.Tip="{Binding SimulationPhysicalAuditSummaryText}">
+                          <StackPanel Spacing="{StaticResource Space2}">
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="{StaticResource Space8}">
+                              <SelectableTextBlock Classes="workspaceSectionMeta"
+                                                   Text="Flow"/>
+                              <SelectableTextBlock Grid.Column="1"
+                                                   Classes="chipStatusText"
+                                                   Text="{Binding SimulationNetFlowResidualCountText}"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="{StaticResource Space8}">
+                              <SelectableTextBlock Classes="workspaceSectionMeta"
+                                                   Text="Coverage"/>
+                              <SelectableTextBlock Grid.Column="1"
+                                                   Classes="chipStatusText"
+                                                   Text="{Binding SimulationTargetCoverageRiskCountText}"/>
+                            </Grid>
+                            <SelectableTextBlock Classes="workspaceSectionMeta compact"
+                                                 Text="{Binding SimulationPhysicalAuditSummaryText}"
+                                                 TextWrapping="Wrap"/>
+                          </StackPanel>
+                        </Border>
+                        <StackPanel Spacing="{StaticResource Space4}"
+                                    IsVisible="{Binding HasSimulationHighRiskDiffs}">
+                          <SelectableTextBlock Text="Top high-risk diffs"
+                                               FontWeight="SemiBold"
+                                               ToolTip.Tip="Highest After values sorted against the EMS cap."/>
+                          <ItemsControl ItemsSource="{Binding SimulationHighRiskDiffs}">
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate>
+                                <Button Classes="actionChip chipAction"
+                                        Margin="{StaticResource InsetBottom6}"
+                                        Command="{Binding DataContext.SelectSimulationRiskDiffCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch"
+                                        ToolTip.Tip="Focus this regular pad on the Simulation canvas.">
+                                  <Grid ColumnDefinitions="Auto,*,Auto"
+                                        ColumnSpacing="{StaticResource Space8}">
+                                    <SelectableTextBlock Grid.Column="0"
+                                                         Text="{Binding Rank}"
+                                                         FontWeight="SemiBold"
+                                                         VerticalAlignment="Top"/>
+                                    <StackPanel Grid.Column="1"
+                                                Spacing="{StaticResource Space2}">
+                                      <SelectableTextBlock Text="{Binding LocationText}"
+                                                           FontWeight="SemiBold"
+                                                           TextWrapping="Wrap"/>
+                                      <SelectableTextBlock Classes="workspaceSectionMeta"
+                                                           Text="{Binding StatusText}"
+                                                           TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2"
+                                                Spacing="{StaticResource Space2}"
+                                                HorizontalAlignment="Right">
+                                      <SelectableTextBlock Text="{Binding AfterText}"
+                                                           FontWeight="SemiBold"
+                                                           TextAlignment="Right"/>
+                                      <SelectableTextBlock Classes="workspaceSectionMeta"
+                                                           Text="{Binding MarginText}"
+                                                           TextAlignment="Right"/>
+                                      <SelectableTextBlock Classes="workspaceSectionMeta"
+                                                           Text="{Binding DeltaText}"
+                                                           TextAlignment="Right"/>
+                                    </StackPanel>
+                                  </Grid>
+                                </Button>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                        </StackPanel>
+                        <SelectableTextBlock Text="{Binding SimulationSafetyViolationListText}"
+                                             FontWeight="SemiBold"
+                                             TextWrapping="Wrap"
+                                             IsVisible="{Binding HasSimulationSafetyViolations}"/>
+                      </StackPanel>
+                    </Border>
+                  </StackPanel>
+                </Border>
+                <Border Classes="workspaceFoldCornerBadge"
+                        Classes.danger="{Binding HasSimulationSafetyViolations}"
+                        ToolTip.Tip="{Binding SimulationSafetySummaryText}">
+                  <SelectableTextBlock Classes="workspaceFoldCornerBadgeText"
+                                       Text="{Binding SimulationSafetyViolationBadgeText}"/>
+                </Border>
+              </Grid>
+
+              <Border Classes="workspaceSectionCard"
+                      IsVisible="{Binding IsCopperSource}">
+                <Grid RowDefinitions="Auto,Auto,Auto,*"
+                      RowSpacing="{StaticResource Space8}">
+                  <StackPanel Grid.Row="0" Spacing="{StaticResource Space4}">
+                    <SelectableTextBlock Classes="workspaceSectionTitle" Text="Copper path replay"/>
+                    <SelectableTextBlock Classes="workspaceSectionMeta"
+                                         Text="{Binding CopperPathReplaySummaryText}"
+                                         TextWrapping="Wrap"/>
+                  </StackPanel>
+                  <Grid Grid.Row="1"
+                        ColumnDefinitions="Auto,Auto,Auto,*"
+                        ColumnSpacing="{StaticResource Space6}">
+                    <Button Classes="actionGhost actionIconButton"
+                            Command="{Binding CopyCopperPathReplayCommand}"
+                            IsEnabled="{Binding HasCopperPathReplay}"
+                            ToolTip.Tip="Copy copper path replay.">
+                      <controls:FontIcon Classes="symbols"
+                                         Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                    </Button>
+                    <Button Grid.Column="1"
+                            Classes="actionGhost actionIconButton"
+                            Command="{Binding ExportCopperPathReplayCsvCommand}"
+                            IsEnabled="{Binding HasCopperPathReplay}"
+                            ToolTip.Tip="Export copper path replay as CSV.">
+                      <controls:FontIcon Classes="symbols"
+                                         Glyph="{x:Static icons:IconGlyphs.ArrowDownward}"/>
+                    </Button>
+                    <Button Grid.Column="2"
+                            Classes="actionGhost actionIconButton"
+                            Command="{Binding ExportCopperPathReplayJsonCommand}"
+                            IsEnabled="{Binding HasCopperPathReplay}"
+                            ToolTip.Tip="Export copper path replay as JSON.">
+                      <controls:FontIcon Classes="symbols"
+                                         Glyph="{x:Static icons:IconGlyphs.DataObject}"/>
+                    </Button>
+                  </Grid>
+                  <Border Grid.Row="2" Classes="workspaceTableHeader">
+                    <Grid ColumnDefinitions="Auto,*,*,*"
+                          ColumnSpacing="{StaticResource Space8}">
+                      <SelectableTextBlock Grid.Column="0" Classes="workspaceTableHeaderText" Text="Step"/>
+                      <SelectableTextBlock Grid.Column="1" Classes="workspaceTableHeaderText" Text="Center"/>
+                      <SelectableTextBlock Grid.Column="2" Classes="workspaceTableHeaderText" Text="Max"/>
+                      <SelectableTextBlock Grid.Column="3" Classes="workspaceTableHeaderText" Text="Audit"/>
+                    </Grid>
+                  </Border>
+                  <ListBox Grid.Row="3"
+                           ItemsSource="{Binding CopperPathReplayRows}"
+                           SelectedItem="{Binding SelectedCopperPathReplayRow, Mode=TwoWay}"
+                           Classes="scrollV2 workspaceDataList"
+                           Background="Transparent"
+                           BorderThickness="0"
+                           ScrollViewer.AllowAutoHide="False"
+                           ScrollViewer.VerticalScrollBarVisibility="Auto"
+                           ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <VirtualizingStackPanel/>
+                      </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                      <DataTemplate>
+                        <Button Classes="workspaceDataRow"
+                                Command="{Binding DataContext.SelectCopperPathReplayRowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}">
+                          <Grid ColumnDefinitions="Auto,*,*,*"
+                                ColumnSpacing="{StaticResource Space8}">
+                            <SelectableTextBlock Grid.Column="0"
+                                                 Classes="workspaceDataCellText strong"
+                                                 Text="{Binding StepText}"/>
+                            <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
+                              <SelectableTextBlock Classes="workspaceDataCellText strong"
+                                                   Text="{Binding CenterText}"/>
+                              <SelectableTextBlock Classes="workspaceDataCellText"
+                                                   Text="{Binding StatusText}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="{StaticResource Space2}">
+                              <SelectableTextBlock Classes="workspaceDataCellText strong"
+                                                   Text="{Binding MaxAfterText}"/>
+                              <SelectableTextBlock Classes="workspaceDataCellText"
+                                                   Text="{Binding WorstText}"/>
+                            </StackPanel>
+                            <SelectableTextBlock Grid.Column="3"
+                                                 Classes="workspaceDataCellText"
+                                                 Text="{Binding AuditText}"
+                                                 TextWrapping="Wrap"/>
+                          </Grid>
+                        </Button>
+                      </DataTemplate>
+                    </ListBox.ItemTemplate>
+                  </ListBox>
+                </Grid>
+              </Border>
+
+              <Border Classes="workspaceSectionCard"
+                      IsVisible="{Binding ShowSimulationDiagnostics}">
+                <StackPanel Spacing="{StaticResource Space8}">
+                  <SelectableTextBlock Classes="workspaceSectionTitle" Text="Delta validation"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta"
+                                       Text="{Binding DiffViolationSummaryText}"
+                                       TextWrapping="Wrap"/>
+                  <SelectableTextBlock Text="{Binding DiffViolationPadListText}"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       IsVisible="{Binding HasDiffViolationPads}"/>
+                </StackPanel>
+              </Border>
+
+              <Border Classes="workspaceSectionCard">
+                <StackPanel Spacing="{StaticResource Space8}">
+                  <SelectableTextBlock Classes="workspaceSectionTitle" Text="Color scale"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding ColorLegendMeaningText}" TextWrapping="Wrap"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding ColorLegendTitleText}"/>
+                  <Border Height="{StaticResource Space12}"
+                          CornerRadius="{StaticResource RadiusXs}"
+                          ClipToBounds="True"
+                          IsVisible="{Binding ShowLegendCenterLabel}">
+                    <Grid ColumnDefinitions="1.25*,1.1*,1.1*,1.05*,1*"
+                          ColumnSpacing="1"
+                          Background="{DynamicResource BrushBgSurfaceInset}">
+                      <Border Grid.Column="0" Background="{DynamicResource BrushSimulationScaleLow}"/>
+                      <Border Grid.Column="1" Background="{DynamicResource BrushSimulationScaleZero}"/>
+                      <Border Grid.Column="2" Background="{DynamicResource BrushSimulationScaleMid}"/>
+                      <Border Grid.Column="3" Background="{DynamicResource BrushSimulationScaleWarm}"/>
+                      <Border Grid.Column="4" Background="{DynamicResource BrushSimulationScaleHigh}"/>
+                    </Grid>
+                  </Border>
+                  <Border Height="{StaticResource Space12}"
+                          CornerRadius="{StaticResource RadiusXs}"
+                          ClipToBounds="True"
+                          IsVisible="{Binding ShowSequentialLegend}">
+                    <Grid ColumnDefinitions="1.4*,1.2*,1.1*,1*"
+                          ColumnSpacing="1"
+                          Background="{DynamicResource BrushBgSurfaceInset}">
+                      <Border Grid.Column="0" Background="{DynamicResource BrushSimulationScaleZero}"/>
+                      <Border Grid.Column="1" Background="{DynamicResource BrushSimulationScaleMid}"/>
+                      <Border Grid.Column="2" Background="{DynamicResource BrushSimulationScaleWarm}"/>
+                      <Border Grid.Column="3" Background="{DynamicResource BrushSimulationScaleHigh}"/>
+                    </Grid>
+                  </Border>
+                  <Grid ColumnDefinitions="Auto,*,Auto"
+                        IsVisible="{Binding ShowLegendCenterLabel}">
+                    <SelectableTextBlock Grid.Column="0" Classes="workspaceSectionMeta" Text="{Binding ColorLegendStartText}"/>
+                    <SelectableTextBlock Grid.Column="1" Classes="workspaceSectionMeta" Text="{Binding ColorLegendCenterText}" HorizontalAlignment="Center"/>
+                    <SelectableTextBlock Grid.Column="2" Classes="workspaceSectionMeta" Text="{Binding ColorLegendEndText}" HorizontalAlignment="Right"/>
+                  </Grid>
+                  <Grid ColumnDefinitions="Auto,*"
+                        IsVisible="{Binding ShowSequentialLegend}">
+                    <SelectableTextBlock Grid.Column="0" Classes="workspaceSectionMeta" Text="{Binding ColorLegendStartText}"/>
+                    <SelectableTextBlock Grid.Column="1" Classes="workspaceSectionMeta" Text="{Binding ColorLegendEndText}" HorizontalAlignment="Right"/>
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <Border Classes="workspaceSectionCard"
+                      IsVisible="{Binding ShowSimulationDiagnostics}">
+                <StackPanel Spacing="{StaticResource Space8}">
+                  <SelectableTextBlock Classes="workspaceSectionTitle" Text="Notch impact"/>
+                  <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SelectedImpactSummaryText}" TextWrapping="Wrap"/>
+                  <ItemsControl ItemsSource="{Binding SelectedImpactItems}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Border Classes="chipStatus"
+                                Margin="{StaticResource InsetBottom6}">
+                          <Grid ColumnDefinitions="*,Auto"
+                                ColumnSpacing="{StaticResource Space8}">
+                            <StackPanel Grid.Column="0" Spacing="{StaticResource Space2}">
+                              <SelectableTextBlock Classes="chipStatusText" Text="{Binding RoleText}"/>
+                              <SelectableTextBlock Text="{Binding SummaryText}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                              <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding DetailText}" TextWrapping="Wrap"/>
+                              <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SourceRowsText}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <SelectableTextBlock Grid.Column="1"
+                                                 Text="{Binding DeltaText}"
+                                                 FontWeight="SemiBold"
+                                                 VerticalAlignment="Top"/>
+                          </Grid>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
+        </ScrollViewer>
+      </Border>
+</UserControl>

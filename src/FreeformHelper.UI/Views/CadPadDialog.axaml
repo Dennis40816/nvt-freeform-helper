@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FreeformHelper.UI.Views.CadPadDialog"
+        Width="{StaticResource DialogWidth}"
+        Height="{StaticResource CadPadDialogHeight}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Background="{DynamicResource BrushBgSurface}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="CAD Pad">
+  <StackPanel Margin="{StaticResource Inset14}" Spacing="{StaticResource Space10}">
+    <SelectableTextBlock Text="{Binding Title}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"/>
+    <SelectableTextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
+
+    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space12}">
+      <StackPanel>
+        <SelectableTextBlock Text="Id"/>
+        <SelectableTextBlock Text="{Binding Id}"/>
+      </StackPanel>
+      <StackPanel>
+        <SelectableTextBlock Text="Layer"/>
+        <SelectableTextBlock Text="{Binding Layer}"/>
+      </StackPanel>
+      <StackPanel>
+        <SelectableTextBlock Text="Name"/>
+        <SelectableTextBlock Text="{Binding Name}"/>
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel>
+      <SelectableTextBlock Text="Area"/>
+      <SelectableTextBlock Text="{Binding AreaText}"/>
+    </StackPanel>
+
+    <StackPanel>
+      <SelectableTextBlock Text="Centroid (X, Y)"/>
+      <SelectableTextBlock Text="{Binding CentroidText}"/>
+    </StackPanel>
+
+    <StackPanel>
+      <SelectableTextBlock Text="Custom value (editable)"/>
+      <TextBox Text="{Binding CustomValueText, Mode=TwoWay}"/>
+      <SelectableTextBlock Text="Use this for per-CAD notes or metrics. Saved into the project file."
+                 FontSize="{StaticResource FontSizeSm}"
+                 Foreground="{DynamicResource BrushTextMuted}"
+                 TextWrapping="Wrap"/>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource Space10}">
+      <Button Content="Cancel" Command="{Binding CancelCommand}"/>
+      <Button Content="Save" Command="{Binding SaveCommand}"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

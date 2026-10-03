@@ -1,0 +1,293 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
+             x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep3View">
+    <UserControl.Resources>
+      <converters:BooleanGlyphConverter x:Key="NotchLayerStateGlyph"
+                                        TrueGlyph="{x:Static icons:IconGlyphs.Visibility}"
+                                        FalseGlyph="{x:Static icons:IconGlyphs.VisibilityOff}"/>
+    </UserControl.Resources>
+    <controls:HidePanelBlock x:Name="Step3Block"
+                             Title="Step 3 · Notch 2.2 compensation"
+                             IsExpanded="{Binding IsStep3Expanded, Mode=TwoWay}">
+      <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <SelectableTextBlock Grid.Column="0"
+                               Classes="stepNote"
+                               Text="{Binding NotchEffectiveModelSummary}"/>
+          <Button Grid.Column="1"
+                  Tag="Step3NotchCompensation"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Click="OpenSettingsButton_Click"
+                  ToolTip.Tip="Open Settings at Step 3 section.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+          </Button>
+          <Button Grid.Column="2"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Command="{Binding ClearStep3ResultCommand}"
+                  ToolTip.Tip="Clear Step 3 result and all downstream results.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Delete}"/>
+          </Button>
+        </Grid>
+        <Border Classes="workflowStepSubsection">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <SelectableTextBlock Text="Review before export"
+                                 FontWeight="SemiBold"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding NotchAllocationModelShortText}"
+                                 TextWrapping="Wrap"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="These Step 3 guards affect Simulation and Step 5 C export. Review them before FW handoff."
+                                 TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+        <Border Classes="workflowStepSubsection">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <SelectableTextBlock Text="Export-critical guards"
+                                 FontWeight="SemiBold"/>
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space8}">
+              <StackPanel Grid.Column="0"
+                          Classes="panelFormField">
+                <SelectableTextBlock Text="Target coverage guard"/>
+                <SelectableTextBlock Classes="stepNote"
+                                     Text="{Binding NotchTargetCoverageGuardSummary}"
+                                     TextWrapping="Wrap"/>
+              </StackPanel>
+              <ToggleSwitch Grid.Column="1"
+                            IsChecked="{Binding EnableTargetCoverageGuard, Mode=TwoWay}"
+                            OnContent=""
+                            OffContent=""
+                            MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                            VerticalAlignment="Center"/>
+            </Grid>
+            <StackPanel Classes="panelFormField">
+              <SelectableTextBlock Text="Target cap (%)"/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="255"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       IsEnabled="{Binding EnableTargetCoverageGuard}"
+                                       Value="{Binding TargetCoverageCapPercent, Mode=TwoWay}"
+                                       ToolTip.Tip="{Binding NotchTargetCoverageCapHelpText}"/>
+            </StackPanel>
+            <Separator Margin="{StaticResource InsetTop2Bottom8}"/>
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space8}">
+              <StackPanel Grid.Column="0"
+                          Classes="panelFormField">
+                <SelectableTextBlock Text="Boundary virtual-area cap"/>
+                <SelectableTextBlock Classes="stepNote"
+                                     Text="{Binding NotchBoundaryVirtualAreaCapSummary}"
+                                     TextWrapping="Wrap"/>
+              </StackPanel>
+              <ToggleSwitch Grid.Column="1"
+                            IsChecked="{Binding EnableBoundaryVirtualAreaCap, Mode=TwoWay}"
+                            OnContent=""
+                            OffContent=""
+                            MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                            VerticalAlignment="Center"/>
+            </Grid>
+            <StackPanel Classes="panelFormField">
+              <SelectableTextBlock Text="Virtual cap (%)"/>
+              <controls:NumberScrubber Minimum="0"
+                                       Maximum="1000"
+                                       SmallChange="10"
+                                       FormatString="0.#"
+                                       IsEnabled="{Binding EnableBoundaryVirtualAreaCap}"
+                                       Value="{Binding BoundaryVirtualAreaCapPercent, Mode=TwoWay}"
+                                       ToolTip.Tip="Maximum virtual To Full area relative to original overlap area."/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <ToggleButton Classes="workspaceToggleChip"
+                      HorizontalAlignment="Left"
+                      Content="{Binding Step3ToFullDetailsToggleText}"
+                      IsChecked="{Binding IsStep3ToFullDetailsExpanded, Mode=TwoWay}"
+                      ToolTip.Tip="Show or hide detailed To Full / To Regular notes."/>
+        <Border Classes="workflowStepSubsection"
+                IsVisible="{Binding IsStep3ToFullDetailsExpanded}">
+          <StackPanel Spacing="{StaticResource Space4}">
+            <SelectableTextBlock Text="ToFull / allocation details"
+                                 FontWeight="SemiBold"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding NotchAllocationModelSummary}"
+                                 TextWrapping="Wrap"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding NotchToRegularSemanticSummary}"
+                                 TextWrapping="Wrap"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding NotchToFullSemanticSummary}"
+                                 TextWrapping="Wrap"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding ToFullStrictOverlapPercent, StringFormat='Current strict overlap: {0:0.###}%'}"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding NotchToFullRuleEngineSummary}"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="Debug step: use stage arrows for fast To Full layer preview; display toggles are in the canvas toolbar and Settings > Step 3."/>
+          </StackPanel>
+        </Border>
+        <Border Classes="workflowStepSubsection">
+          <StackPanel Spacing="{StaticResource Space8}">
+            <SelectableTextBlock Text="To Full layer stage (AA canvas)"
+                                 FontWeight="SemiBold"/>
+            <Grid ColumnDefinitions="Auto,*,Auto"
+                  ColumnSpacing="{StaticResource Space8}">
+              <Button Grid.Column="0"
+                      Classes="actionIconButton actionGhost workflowStepAction"
+                      IsEnabled="{Binding CanControlNotchPreviewStage}"
+                      Command="{Binding PreviousNotchPreviewStageCommand}"
+                      ToolTip.Tip="Previous stage">
+                <controls:FontIcon Classes="symbols iconSm"
+                                   Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+              </Button>
+              <Border Grid.Column="1"
+                      Padding="{StaticResource Inset8_4}"
+                      Background="{DynamicResource BrushBgSurface}"
+                      BorderBrush="{DynamicResource BrushBorder}"
+                      BorderThickness="{StaticResource BorderThin}"
+                      CornerRadius="{StaticResource RadiusSm}">
+                <SelectableTextBlock HorizontalAlignment="Center"
+                                     Text="{Binding NotchPreviewVisualizationStep, StringFormat='Stage {0:0}'}"/>
+              </Border>
+              <Button Grid.Column="2"
+                      Classes="actionIconButton actionGhost workflowStepAction"
+                      IsEnabled="{Binding CanControlNotchPreviewStage}"
+                      Command="{Binding NextNotchPreviewStageCommand}"
+                      ToolTip.Tip="Next stage">
+                <controls:FontIcon Classes="symbols iconSm"
+                                   Glyph="{x:Static icons:IconGlyphs.ChevronRight}"/>
+              </Button>
+            </Grid>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding NotchPreviewStageSummary}"/>
+
+            <Separator Margin="{StaticResource InsetTop2Bottom8}"/>
+
+            <SelectableTextBlock Text="Auto play"
+                                 FontWeight="SemiBold"/>
+            <Border Classes="workflowStepInsetPanel">
+              <Grid RowDefinitions="Auto,Auto"
+                    ColumnDefinitions="Auto,*,Auto"
+                    ColumnSpacing="{StaticResource Space8}"
+                    RowSpacing="{StaticResource Space4}">
+                  <CheckBox Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Content="Auto"
+                            IsEnabled="{Binding CanControlNotchPreviewStage}"
+                            IsChecked="{Binding NotchPreviewAutoPlayEnabled, Mode=TwoWay}"/>
+                  <controls:NumberScrubber Grid.Column="1"
+                                           HorizontalAlignment="Stretch"
+                                           MaxWidth="{StaticResource NotchPreviewAutoPlayIntervalInputWidth}"
+                                           Minimum="200"
+                                           Maximum="5000"
+                                           SmallChange="100"
+                                           FormatString="0"
+                                           IsEnabled="{Binding CanControlNotchPreviewStage}"
+                                           Value="{Binding NotchPreviewAutoPlayIntervalMs, Mode=TwoWay}"
+                                           ToolTip.Tip="Auto play interval in ms"/>
+                  <SelectableTextBlock Grid.Column="2"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource BrushTextMuted}"
+                                       Text="ms"/>
+                <SelectableTextBlock Grid.Row="1"
+                                     Grid.ColumnSpan="3"
+                                     Classes="stepNote"
+                                     Text="{Binding NotchPreviewAutoPlaySummary}"
+                                     TextWrapping="Wrap"/>
+              </Grid>
+            </Border>
+          </StackPanel>
+        </Border>
+        <Border Classes="workflowStepSubsection">
+          <StackPanel Spacing="{StaticResource Space4}">
+            <SelectableTextBlock Text="Layer legend" FontWeight="SemiBold"/>
+            <Grid Classes="workflowLegendRow"
+                  ColumnDefinitions="Auto,*,Auto">
+              <Border Width="{StaticResource Space12}"
+                      Height="{StaticResource Space12}"
+                      BorderBrush="{DynamicResource BrushNotchToFullSeedOutline}"
+                      BorderThickness="{StaticResource BorderThin}"
+                      CornerRadius="{StaticResource RadiusSm}"
+                      Background="{DynamicResource BrushNotchToFullSeedFill}"
+                      VerticalAlignment="Center"/>
+              <StackPanel Grid.Column="1"
+                          Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workflowLegendTitle"
+                                     Text="1 · Seed"/>
+                <SelectableTextBlock Classes="workflowLegendMeta"
+                                     Text="CAD polygon overlap source"
+                                     ToolTip.Tip="CAD polygon overlap source"/>
+              </StackPanel>
+              <controls:FontIcon Grid.Column="2"
+                                 Classes="symbols iconSm"
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource BrushTextMuted}"
+                                 Glyph="{Binding IsNotchToFullSeedPreviewVisible, Converter={StaticResource NotchLayerStateGlyph}}"
+                                 ToolTip.Tip="{Binding NotchPreviewSeedLayerStateText}"/>
+              <SelectableTextBlock Grid.Column="2"
+                                   IsVisible="False"
+                                   Text="{Binding NotchPreviewSeedLayerStateText}"/>
+            </Grid>
+            <Grid Classes="workflowLegendRow"
+                  ColumnDefinitions="Auto,*,Auto">
+              <Border Width="{StaticResource Space12}"
+                      Height="{StaticResource Space12}"
+                      BorderBrush="{DynamicResource BrushNotchToFullCandidateOutline}"
+                      BorderThickness="{StaticResource BorderThin}"
+                      CornerRadius="{StaticResource RadiusSm}"
+                      Background="{DynamicResource BrushNotchToFullCandidateFill}"
+                      VerticalAlignment="Center"/>
+              <StackPanel Grid.Column="1"
+                          Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workflowLegendTitle"
+                                     Text="2 · Candidate"/>
+                <SelectableTextBlock Classes="workflowLegendMeta"
+                                     Text="Boundary regulars"
+                                     ToolTip.Tip="Boundary regulars"/>
+              </StackPanel>
+              <controls:FontIcon Grid.Column="2"
+                                 Classes="symbols iconSm"
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource BrushTextMuted}"
+                                 Glyph="{Binding IsNotchToFullCandidatePreviewVisible, Converter={StaticResource NotchLayerStateGlyph}}"
+                                 ToolTip.Tip="{Binding NotchPreviewCandidateLayerStateText}"/>
+            </Grid>
+            <Grid Classes="workflowLegendRow"
+                  ColumnDefinitions="Auto,*,Auto">
+              <Border Width="{StaticResource Space12}"
+                      Height="{StaticResource Space12}"
+                      BorderBrush="{DynamicResource BrushNotchToFullOutline}"
+                      BorderThickness="{StaticResource BorderThin}"
+                      CornerRadius="{StaticResource RadiusSm}"
+                      Background="{DynamicResource BrushNotchToFullFill}"
+                      VerticalAlignment="Center"/>
+              <StackPanel Grid.Column="1"
+                          Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workflowLegendTitle"
+                                     Text="3 · Final"/>
+                <SelectableTextBlock Classes="workflowLegendMeta"
+                                     Text="To Full expansion result"
+                                     ToolTip.Tip="To Full expansion result"/>
+              </StackPanel>
+              <controls:FontIcon Grid.Column="2"
+                                 Classes="symbols iconSm"
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource BrushTextMuted}"
+                                 Glyph="{Binding IsNotchToFullFinalPreviewVisible, Converter={StaticResource NotchLayerStateGlyph}}"
+                                 ToolTip.Tip="{Binding NotchPreviewFinalLayerStateText}"/>
+            </Grid>
+          </StackPanel>
+        </Border>
+        <SelectableTextBlock Classes="stepNote"
+                             Text="AA preview follows current CAD selection. Stage 1 shows polygon-overlap seed, Stage 2 shows boundary candidates, Stage 3 shows final To Full. Use clear icon to hide preview."/>
+      </StackPanel>
+    </controls:HidePanelBlock>
+</UserControl>
+

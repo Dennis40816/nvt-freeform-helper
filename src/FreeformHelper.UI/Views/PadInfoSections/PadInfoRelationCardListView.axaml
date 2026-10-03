@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FreeformHelper.UI.Views.PadInfoSections.PadInfoRelationCardListView"
+             x:Name="Root">
+  <ItemsControl ItemsSource="{Binding Cards, ElementName=Root}">
+    <ItemsControl.ItemsPanel>
+      <ItemsPanelTemplate>
+        <StackPanel Spacing="{StaticResource Space8}"/>
+      </ItemsPanelTemplate>
+    </ItemsControl.ItemsPanel>
+    <ItemsControl.ItemTemplate>
+      <DataTemplate>
+        <Button Classes="padInfoAllocationButton"
+                Command="{Binding HighlightCommand}"
+                IsEnabled="{Binding HasHighlightCommand}"
+                ToolTip.Tip="{Binding RawText}">
+          <Border Classes="padInfoAllocationCard">
+            <Grid RowDefinitions="Auto,Auto,Auto"
+                  RowSpacing="{StaticResource Space6}">
+              <Grid ColumnDefinitions="*,Auto"
+                    ColumnSpacing="{StaticResource Space8}">
+                <SelectableTextBlock Grid.Column="0"
+                                     Classes="padInfoAllocationTitle"
+                                     Text="{Binding TitleText}"/>
+                <SelectableTextBlock Grid.Column="1"
+                                     Classes="padInfoAllocationRole"
+                                     Text="{Binding RoleText}"/>
+              </Grid>
+              <Grid Grid.Row="1"
+                    ColumnDefinitions="*,Auto"
+                    ColumnSpacing="{StaticResource Space8}">
+                <SelectableTextBlock Grid.Column="0"
+                                     Classes="padInfoAllocationMeta"
+                                     Text="{Binding MetaText}"/>
+                <SelectableTextBlock Grid.Column="1"
+                                     Classes="padInfoAllocationRatio"
+                                     Text="{Binding RatioText}"/>
+              </Grid>
+              <StackPanel Grid.Row="2"
+                          Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="padInfoAllocationLabel" Text="Area / flow"/>
+                <SelectableTextBlock Classes="padInfoAllocationArea"
+                                     Text="{Binding AreaText}"/>
+              </StackPanel>
+            </Grid>
+          </Border>
+        </Button>
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</UserControl>

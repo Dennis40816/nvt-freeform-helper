@@ -1,0 +1,506 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspaceControlsPaneView">
+      <Border Grid.Column="0"
+              Classes="workspaceSidePane left">
+        <ScrollViewer Classes="scrollDevCandidate viewportBoundScroll"
+                      MinHeight="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+          <Border Classes="viewportBoundContent"
+                  Padding="{StaticResource InsetRight12Bottom20}">
+            <StackPanel Classes="panelForm"
+                        Spacing="{StaticResource Space14}">
+              <StackPanel Spacing="{StaticResource Space6}">
+                <SelectableTextBlock Text="Simulation controls" FontWeight="SemiBold"/>
+                <SelectableTextBlock Text="Inputs, view mode, and playback share one simulation snapshot."
+                                     Foreground="{DynamicResource BrushTextMuted}"
+                                     TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <Border Classes="workspaceSectionCard">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*" RowSpacing="{StaticResource Space8}">
+                  <Grid Grid.Row="0"
+                        Classes="workspaceSectionHeader"
+                        RowDefinitions="Auto,Auto">
+                    <SelectableTextBlock Classes="workspaceSectionTitle" Text="Input"/>
+                    <SelectableTextBlock Grid.Row="1"
+                                         Classes="workspaceSectionSummary"
+                                         Text="{Binding InputPrimarySummaryText}"/>
+                  </Grid>
+                  <ComboBox Grid.Row="1"
+                            ItemsSource="{Binding SourceOptions}"
+                            SelectedItem="{Binding SelectedInputSourceOption, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <SelectableTextBlock Text="{Binding Display}"/>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <Border Grid.Row="2"
+                          Classes="workspaceDetailStrip"
+                          ToolTip.Tip="{Binding InputContractDetailText}">
+                    <StackPanel Spacing="{StaticResource Space2}">
+                      <SelectableTextBlock Classes="chipStatusText"
+                                           Text="{Binding InputContractTitleText}"/>
+                      <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding InputSecondarySummaryText}"/>
+                    </StackPanel>
+                  </Border>
+                  <StackPanel Grid.Row="3"
+                              Classes="panelFormField"
+                              Spacing="{StaticResource Space6}"
+                              IsVisible="{Binding IsManualSource}">
+                    <SelectableTextBlock Text="Global value" FontWeight="SemiBold"/>
+                    <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                             Maximum="{StaticResource NumericInputMaximum}"
+                                             SmallChange="0.1"
+                                             FormatString="0.###"
+                                             SnapToStep="False"
+                                             Value="{Binding GlobalValue, Mode=TwoWay}"/>
+                    <StackPanel Spacing="{StaticResource Space4}">
+                      <SelectableTextBlock Text="Uniform presets" FontWeight="SemiBold"/>
+                      <WrapPanel Orientation="Horizontal">
+                        <Button Classes="actionChip chipAction"
+                                Margin="{StaticResource InsetRight6Bottom6}"
+                                Command="{Binding ApplyManualPresetCommand}"
+                                CommandParameter="400">
+                          <Grid Classes="workspacePresetButtonContent"
+                                ColumnDefinitions="Auto,*">
+                            <controls:FontIcon Grid.Column="0"
+                                               Classes="symbols"
+                                               Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                            <SelectableTextBlock Grid.Column="1"
+                                                 Classes="workspacePresetButtonLabel"
+                                                 Text="Uniform 400"/>
+                          </Grid>
+                        </Button>
+                        <Button Classes="actionChip chipAction"
+                                Margin="{StaticResource InsetRight6Bottom6}"
+                                Command="{Binding ApplyManualPresetCommand}"
+                                CommandParameter="360">
+                          <Grid Classes="workspacePresetButtonContent"
+                                ColumnDefinitions="Auto,*">
+                            <controls:FontIcon Grid.Column="0"
+                                               Classes="symbols"
+                                               Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                            <SelectableTextBlock Grid.Column="1"
+                                                 Classes="workspacePresetButtonLabel"
+                                                 Text="Uniform 360"/>
+                          </Grid>
+                        </Button>
+                        <Button Classes="actionChip chipAction"
+                                Margin="{StaticResource InsetRight6Bottom6}"
+                                Command="{Binding ApplyManualPresetCommand}"
+                                CommandParameter="0">
+                          <Grid Classes="workspacePresetButtonContent"
+                                ColumnDefinitions="Auto,*">
+                            <controls:FontIcon Grid.Column="0"
+                                               Classes="symbols"
+                                               Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                            <SelectableTextBlock Grid.Column="1"
+                                                 Classes="workspacePresetButtonLabel"
+                                                 Text="Zero"/>
+                          </Grid>
+                        </Button>
+                      </WrapPanel>
+                    </StackPanel>
+                    <StackPanel Spacing="{StaticResource Space8}">
+                      <Button Classes="actionPrimary actionTextButton simulationActionButton"
+                              Command="{Binding RandomizeVisibleValuesCommand}"
+                              IsEnabled="{Binding CanRandomizeVisibleValues}">
+                        <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                          <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Shuffle}"/>
+                          <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Random"/>
+                          <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                        </Grid>
+                      </Button>
+                      <Button Classes="actionDanger actionTextButton simulationActionButton"
+                              Command="{Binding ClearAllManualOverridesCommand}"
+                              IsEnabled="{Binding HasManualOverrides}">
+                        <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                          <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+                          <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Clear all"/>
+                          <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                        </Grid>
+                      </Button>
+                    </StackPanel>
+                  </StackPanel>
+                  <StackPanel Grid.Row="4" Spacing="{StaticResource Space6}" IsVisible="{Binding IsCsvSource}">
+                    <Border Classes="workspaceDetailStrip"
+                            ToolTip.Tip="{Binding CsvProjectionContractText}">
+                      <StackPanel Spacing="{StaticResource Space2}">
+                        <SelectableTextBlock Classes="chipStatusText" Text="CSV projection"/>
+                        <SelectableTextBlock Classes="workspaceSectionMeta"
+                                             Text="{Binding CsvProjectionContractText}"
+                                             TextWrapping="Wrap"/>
+                        <SelectableTextBlock Classes="workspaceSectionMeta"
+                                             Text="{Binding CsvInspectorSummaryText}"
+                                             IsVisible="{Binding HasCsvInspectorData}"
+                                             TextWrapping="Wrap"/>
+                        <SelectableTextBlock Classes="workspaceSectionMeta"
+                                             Text="{Binding CsvInspectorShapeSummaryText}"
+                                             IsVisible="{Binding HasCsvInspectorData}"
+                                             TextWrapping="Wrap"/>
+                      </StackPanel>
+                    </Border>
+                    <StackPanel Spacing="{StaticResource Space8}">
+                      <Button Classes="actionPrimary actionTextButton simulationActionButton"
+                              Command="{Binding ImportCsvCommand}"
+                              IsEnabled="{Binding CanImportCsv}">
+                        <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                          <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                          <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Import CSV"/>
+                          <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                        </Grid>
+                      </Button>
+                      <Button Classes="actionDanger actionTextButton simulationActionButton"
+                              Command="{Binding ClearCsvCommand}"
+                              IsEnabled="{Binding HasCsvFiles}">
+                        <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                          <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                          <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Clear CSV"/>
+                          <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                        </Grid>
+                      </Button>
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding CsvFiles}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Border Classes="workspaceFileRow" Margin="{StaticResource InsetBottom6}">
+                            <Grid Classes="workspaceFileRowContent" ColumnDefinitions="Auto,*">
+                              <controls:FontIcon Grid.Column="0"
+                                                 Classes="symbols workspaceFileRowIcon"
+                                                 Glyph="{x:Static icons:IconGlyphs.DataObject}"/>
+                              <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
+                                <SelectableTextBlock Classes="workspaceFileRowTitle" Text="{Binding FileName}"/>
+                                <SelectableTextBlock Classes="workspaceFileRowMeta" Text="{Binding SummaryText}"/>
+                                <SelectableTextBlock Classes="workspaceFileRowMeta"
+                                                     Text="{Binding ShapeText}"
+                                                     TextWrapping="Wrap"/>
+                              </StackPanel>
+                            </Grid>
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                  <StackPanel Grid.Row="5"
+                              Classes="panelFormField"
+                              Spacing="{StaticResource Space6}"
+                              IsVisible="{Binding IsCopperSource}">
+                    <SelectableTextBlock Text="Copper pillar" FontWeight="SemiBold"/>
+                    <Border Classes="workspaceDetailStrip"
+                            ToolTip.Tip="{Binding CopperInstructionText}">
+                      <SelectableTextBlock Classes="workspaceSectionMeta"
+                                           Text="{Binding CopperProjectionModelText}"
+                                           TextWrapping="Wrap"/>
+                    </Border>
+                    <StackPanel Classes="panelFormField">
+                      <SelectableTextBlock Text="Contact model"/>
+                      <ComboBox ItemsSource="{Binding CopperContactModelOptions}"
+                                SelectedItem="{Binding SelectedCopperContactModelOption, Mode=TwoWay}"
+                                ToolTip.Tip="{Binding CopperContactModelSummaryText}">
+                        <ComboBox.ItemTemplate>
+                          <DataTemplate>
+                            <SelectableTextBlock Text="{Binding Display}"/>
+                          </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                      </ComboBox>
+                    </StackPanel>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">
+                      <StackPanel Grid.Column="0" Classes="panelFormField">
+                        <SelectableTextBlock Text="Center X"/>
+                        <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                 Maximum="{StaticResource NumericInputMaximum}"
+                                                 SmallChange="0.1"
+                                                 FormatString="0.###"
+                                                 SnapToStep="False"
+                                                 ToolTip.Tip="Copper center X in regular-grid world coordinates."
+                                                 Value="{Binding CopperCenterX, Mode=TwoWay}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Classes="panelFormField">
+                        <SelectableTextBlock Text="Center Y"/>
+                        <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                 Maximum="{StaticResource NumericInputMaximum}"
+                                                 SmallChange="0.1"
+                                                 FormatString="0.###"
+                                                 SnapToStep="False"
+                                                 ToolTip.Tip="Copper center Y in regular-grid world coordinates."
+                                                 Value="{Binding CopperCenterY, Mode=TwoWay}"/>
+                      </StackPanel>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">
+                      <StackPanel Grid.Column="0" Classes="panelFormField">
+                        <SelectableTextBlock Text="Diameter"/>
+                        <controls:NumberScrubber Minimum="0"
+                                                 Maximum="{StaticResource NumericInputMaximum}"
+                                                 SmallChange="0.1"
+                                                 FormatString="0.###"
+                                                 SnapToStep="False"
+                                                 ToolTip.Tip="Copper pillar diameter in the same unit as the regular grid, usually mm."
+                                                 Value="{Binding CopperDiameter, Mode=TwoWay}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Classes="panelFormField">
+                        <SelectableTextBlock Text="Full-pad signal"/>
+                        <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                 Maximum="{StaticResource NumericInputMaximum}"
+                                                 SmallChange="1"
+                                                 FormatString="0.###"
+                                                 SnapToStep="False"
+                                                 ToolTip.Tip="{Binding CopperContactModelSummaryText}"
+                                                 Value="{Binding CopperPeakValue, Mode=TwoWay}"/>
+                      </StackPanel>
+                    </Grid>
+                    <StackPanel Classes="panelFormField">
+                      <SelectableTextBlock Text="Baseline"/>
+                      <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                               Maximum="{StaticResource NumericInputMaximum}"
+                                               SmallChange="1"
+                                               FormatString="0.###"
+                                               SnapToStep="False"
+                                               ToolTip.Tip="Base diff added to every regular before copper overlap is applied."
+                                               Value="{Binding CopperBaselineValue, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <Border Classes="workspaceDetailStrip">
+                      <StackPanel Spacing="{StaticResource Space8}">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="{StaticResource Space8}">
+                          <StackPanel Grid.Column="0"
+                                      Spacing="{StaticResource Space2}">
+                            <SelectableTextBlock Text="Path replay"
+                                                 FontWeight="SemiBold"/>
+                            <SelectableTextBlock Classes="workspaceSectionMeta"
+                                                 Text="{Binding CopperPathReplayArtifactSummaryText}"
+                                                 TextWrapping="Wrap"/>
+                          </StackPanel>
+                          <Button Grid.Column="1"
+                                  Classes="actionPrimary actionIconButton"
+                                  Command="{Binding ReplayCopperPathCommand}"
+                                  ToolTip.Tip="Run copper path replay">
+                            <controls:FontIcon Classes="symbols"
+                                               Glyph="{x:Static icons:IconGlyphs.PlayArrow}"/>
+                          </Button>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="{StaticResource Space8}">
+                          <StackPanel Grid.Column="0"
+                                      Classes="panelFormField">
+                            <SelectableTextBlock Text="Start X"/>
+                            <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                     Maximum="{StaticResource NumericInputMaximum}"
+                                                     SmallChange="0.1"
+                                                     FormatString="0.###"
+                                                     SnapToStep="False"
+                                                     Value="{Binding CopperPathStartX, Mode=TwoWay}"/>
+                          </StackPanel>
+                          <StackPanel Grid.Column="1"
+                                      Classes="panelFormField">
+                            <SelectableTextBlock Text="Start Y"/>
+                            <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                     Maximum="{StaticResource NumericInputMaximum}"
+                                                     SmallChange="0.1"
+                                                     FormatString="0.###"
+                                                     SnapToStep="False"
+                                                     Value="{Binding CopperPathStartY, Mode=TwoWay}"/>
+                          </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="{StaticResource Space8}">
+                          <StackPanel Grid.Column="0"
+                                      Classes="panelFormField">
+                            <SelectableTextBlock Text="End X"/>
+                            <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                     Maximum="{StaticResource NumericInputMaximum}"
+                                                     SmallChange="0.1"
+                                                     FormatString="0.###"
+                                                     SnapToStep="False"
+                                                     Value="{Binding CopperPathEndX, Mode=TwoWay}"/>
+                          </StackPanel>
+                          <StackPanel Grid.Column="1"
+                                      Classes="panelFormField">
+                            <SelectableTextBlock Text="End Y"/>
+                            <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                     Maximum="{StaticResource NumericInputMaximum}"
+                                                     SmallChange="0.1"
+                                                     FormatString="0.###"
+                                                     SnapToStep="False"
+                                                     Value="{Binding CopperPathEndY, Mode=TwoWay}"/>
+                          </StackPanel>
+                        </Grid>
+                        <StackPanel Classes="panelFormField">
+                          <SelectableTextBlock Text="Steps"/>
+                          <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                   Maximum="{StaticResource NumericInputMaximum}"
+                                                   SmallChange="1"
+                                                   FormatString="0"
+                                                   Value="{Binding CopperPathStepCount, Mode=TwoWay}"/>
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,*,*"
+                              ColumnSpacing="{StaticResource Space6}">
+                          <Button Classes="actionNeutral actionTextButton simulationActionButton"
+                                  Command="{Binding UseCurrentCopperAsPathStartCommand}">
+                            <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                              <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                              <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Start"/>
+                              <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                            </Grid>
+                          </Button>
+                          <Button Grid.Column="1"
+                                  Classes="actionNeutral actionTextButton simulationActionButton"
+                                  Command="{Binding UseCurrentCopperAsPathEndCommand}">
+                            <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                              <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                              <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="End"/>
+                              <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                            </Grid>
+                          </Button>
+                          <Button Grid.Column="2"
+                                  Classes="actionPrimary actionTextButton simulationActionButton"
+                                  Command="{Binding ReplayCopperPathCommand}">
+                            <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                              <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.PlayArrow}"/>
+                              <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Run"/>
+                              <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                            </Grid>
+                          </Button>
+                        </Grid>
+                      </StackPanel>
+                    </Border>
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <Border Classes="workspaceSectionCard">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*" RowSpacing="{StaticResource Space8}">
+                  <Grid Grid.Row="0"
+                        Classes="workspaceSectionHeader"
+                        RowDefinitions="Auto,Auto">
+                    <SelectableTextBlock Classes="workspaceSectionTitle" Text="View"/>
+                    <SelectableTextBlock Grid.Row="1"
+                                         Classes="workspaceSectionSummary"
+                                         Text="Version, value mode, color mode, and AA scope."
+                                         ToolTip.Tip="Keyboard: B Before, A After, D Delta, C Changed, V toggles Before/After."/>
+                  </Grid>
+                  <ComboBox Grid.Row="2" ItemsSource="{Binding VersionOptions}" SelectedItem="{Binding SelectedVersionOption, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <SelectableTextBlock Text="{Binding Display}"/>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <ComboBox Grid.Row="3" ItemsSource="{Binding CanvasViewOptions}" SelectedItem="{Binding SelectedCanvasViewOption, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <SelectableTextBlock Text="{Binding Display}"/>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <ComboBox Grid.Row="4" ItemsSource="{Binding CanvasColorOptions}" SelectedItem="{Binding SelectedCanvasColorOption, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <SelectableTextBlock Text="{Binding Display}"/>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <ComboBox Grid.Row="5" ItemsSource="{Binding AreaOptions}" SelectedItem="{Binding SelectedAreaOption, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <SelectableTextBlock Text="{Binding Display}"/>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <controls:NumberScrubber Grid.Row="6"
+                                           IsVisible="{Binding IsThresholdMode}"
+                                           Minimum="0"
+                                           Maximum="{StaticResource NumericInputMaximum}"
+                                           SmallChange="0.1"
+                                           FormatString="0.###"
+                                           SnapToStep="False"
+                                           Value="{Binding ColorThresholdValue, Mode=TwoWay}"/>
+                </Grid>
+              </Border>
+
+              <Border Classes="workspaceSectionCard" IsVisible="{Binding IsCsvSource}">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*" RowSpacing="{StaticResource Space8}">
+                  <Grid Grid.Row="0"
+                        Classes="workspaceSectionHeader"
+                        RowDefinitions="Auto,Auto">
+                    <SelectableTextBlock Classes="workspaceSectionTitle" Text="Playback"/>
+                    <SelectableTextBlock Grid.Row="1"
+                                         Classes="workspaceSectionSummary"
+                                         Text="Play imported CSV frames on the same AA grid."
+                                         ToolTip.Tip="Playback only changes the projected numbers; it does not recompute the workspace grid."/>
+                  </Grid>
+                  <SelectableTextBlock Grid.Row="2"
+                                       Classes="workspaceSectionMeta"
+                                       Text="{Binding SelectedFrameDisplayText}"/>
+                  <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="{StaticResource Space8}">
+                    <Button Grid.Column="0"
+                            Classes="actionGhost actionIconButton"
+                            Command="{Binding PreviousFrameCommand}"
+                            IsEnabled="{Binding CanStepFrames}"
+                            ToolTip.Tip="Previous frame">
+                      <controls:FontIcon Classes="symbols"
+                                         Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+                    </Button>
+                    <Button Grid.Column="1" Classes="actionNeutral actionTextButton simulationActionButton"
+                          Command="{Binding TogglePlaybackCommand}"
+                          IsEnabled="{Binding CanPlayFrames}">
+                      <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                        <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{Binding PlaybackButtonGlyph}"/>
+                        <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="{Binding PlaybackButtonText}"/>
+                        <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                      </Grid>
+                    </Button>
+                    <Button Grid.Column="2"
+                            Classes="actionGhost actionIconButton"
+                            Command="{Binding NextFrameCommand}"
+                            IsEnabled="{Binding CanStepFrames}"
+                            ToolTip.Tip="Next frame">
+                      <controls:FontIcon Classes="symbols"
+                                         Glyph="{x:Static icons:IconGlyphs.ChevronRight}"/>
+                    </Button>
+                    <ToggleButton Grid.Column="3"
+                                  Classes="actionNeutral actionTextButton simulationActionButton"
+                                  IsChecked="{Binding IsPlaybackLoopEnabled, Mode=TwoWay}">
+                      <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                        <controls:FontIcon Grid.Column="0"
+                                           Classes="symbols iconTextButtonLeadingIcon"
+                                           Glyph="{x:Static icons:IconGlyphs.Repeat}"/>
+                        <SelectableTextBlock Grid.Column="1"
+                                             Classes="iconTextButtonLabel"
+                                             Text="{Binding PlaybackLoopText}"/>
+                        <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+                      </Grid>
+                    </ToggleButton>
+                  </Grid>
+                  <Slider Grid.Row="4"
+                          Minimum="0"
+                          Maximum="{Binding SelectedFrameSliderMaximum}"
+                          TickFrequency="1"
+                          IsSnapToTickEnabled="True"
+                          Value="{Binding SelectedFrameSliderIndex, Mode=TwoWay}"
+                          IsEnabled="{Binding HasCsvData}"/>
+                  <Grid Grid.Row="5" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource Space8}">
+                    <SelectableTextBlock Grid.Column="0" Text="FPS" VerticalAlignment="Center"/>
+                    <controls:NumberScrubber Grid.Column="1"
+                                             Minimum="1"
+                                             Maximum="60"
+                                             SmallChange="1"
+                                             FormatString="0"
+                                             Value="{Binding PlaybackFramesPerSecond, Mode=TwoWay}"/>
+                  </Grid>
+                  <SelectableTextBlock Grid.Row="6"
+                                       Classes="workspaceSectionMeta"
+                                       Text="{Binding FrameSummaryText}"/>
+                </Grid>
+              </Border>
+            </StackPanel>
+          </Border>
+        </ScrollViewer>
+      </Border>
+
+</UserControl>

@@ -1,0 +1,138 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sections="clr-namespace:FreeformHelper.UI.Views.SettingsSections"
+        x:Class="FreeformHelper.UI.Views.SettingsWindow"
+        Width="{StaticResource SettingsWindowWidth}"
+        Height="{StaticResource SettingsWindowHeight}"
+        MinWidth="{StaticResource SettingsWindowMinWidth}"
+        MinHeight="{StaticResource SettingsWindowMinHeight}"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushSettingsWindowBackground}"
+        Foreground="{DynamicResource BrushTextPrimary}"
+        Title="Settings">
+  <Border Classes="settingsWindowChrome">
+    <Grid RowDefinitions="Auto,*,Auto">
+      <Border Grid.Row="0"
+              Classes="settingsHero"
+              Margin="{StaticResource InsetBottom12}">
+        <Grid ColumnDefinitions="*,Auto"
+              ColumnSpacing="{StaticResource Space16}">
+          <StackPanel Grid.Column="0"
+                      Spacing="{StaticResource Space4}">
+            <SelectableTextBlock Classes="settingsEyebrow"
+                                 Text="Freeform Helper"/>
+            <SelectableTextBlock Text="{Binding SettingsSelectedSectionTitle}"
+                                 Classes="workspaceMainTitle"/>
+            <SelectableTextBlock Text="{Binding SettingsSelectedSectionDescription}"
+                                 Classes="settingsSectionMeta"/>
+          </StackPanel>
+          <WrapPanel Grid.Column="1"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Top">
+            <Border Classes="chipStatus">
+              <SelectableTextBlock Classes="chipStatusText"
+                                   Text="{Binding SettingsSelectedSectionTitle}"/>
+            </Border>
+          </WrapPanel>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="1"
+            ColumnSpacing="{StaticResource Space14}">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="{StaticResource SettingsNavRailWidthGrid}"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0"
+                Classes="settingsNavRail">
+          <ScrollViewer VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="{StaticResource Space6}">
+              <SelectableTextBlock Classes="settingsSectionMeta"
+                                   Text="Navigation"/>
+              <ToggleButton x:Name="GeneralNavButton"
+                            Classes="settingsNavItem"
+                            Content="General"
+                            IsChecked="{Binding IsGeneralSectionSelected, Mode=TwoWay}"/>
+              <ToggleButton x:Name="Step1NavButton"
+                            Classes="settingsNavItem"
+                            Content="Step 1 · Geometry"
+                            IsChecked="{Binding IsStep1SectionSelected, Mode=TwoWay}"/>
+              <ToggleButton x:Name="Step2NavButton"
+                            Classes="settingsNavItem"
+                            Content="Step 2 · Freeform"
+                            IsChecked="{Binding IsStep2SectionSelected, Mode=TwoWay}"/>
+              <ToggleButton x:Name="Step3NavButton"
+                            Classes="settingsNavItem"
+                            Content="Step 3 · Notch"
+                            IsChecked="{Binding IsStep3SectionSelected, Mode=TwoWay}"/>
+              <ToggleButton x:Name="Step4NavButton"
+                            Classes="settingsNavItem"
+                            Content="Step 4 · Index"
+                            IsChecked="{Binding IsStep4SectionSelected, Mode=TwoWay}"/>
+              <ToggleButton x:Name="Step5NavButton"
+                            Classes="settingsNavItem"
+                            Content="Step 5 · Export"
+                            IsChecked="{Binding IsStep5SectionSelected, Mode=TwoWay}"/>
+            </StackPanel>
+          </ScrollViewer>
+        </Border>
+
+        <Border Grid.Column="1"
+                Classes="settingsContentShell">
+          <ScrollViewer x:Name="SettingsWindowScroll"
+                        Classes="viewportBoundScroll"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled">
+            <Border Classes="viewportBoundContent"
+                    Padding="{StaticResource InsetRight10Bottom12}">
+              <StackPanel Classes="panelForm settingsPage"
+                          HorizontalAlignment="Stretch">
+                <sections:SettingsGeneralSectionView x:Name="GeneralSection"
+                                                     IsVisible="{Binding IsGeneralSectionSelected}"/>
+
+                <sections:SettingsStep1SectionView x:Name="Step1Section"
+                                                   IsVisible="{Binding IsStep1SectionSelected}"/>
+
+                <sections:SettingsStep2SectionView x:Name="Step2Section"
+                                                   IsVisible="{Binding IsStep2SectionSelected}"/>
+
+                <sections:SettingsStep3SectionView x:Name="Step3Section"
+                                                   IsVisible="{Binding IsStep3SectionSelected}"/>
+
+                <sections:SettingsStep4SectionView x:Name="Step4Section"
+                                                   IsVisible="{Binding IsStep4SectionSelected}"/>
+
+                <sections:SettingsStep5SectionView x:Name="Step5Section"
+                                                   IsVisible="{Binding IsStep5SectionSelected}"/>
+              </StackPanel>
+            </Border>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+
+      <Border Grid.Row="2"
+              Classes="settingsFooter">
+        <Grid ColumnDefinitions="*,Auto"
+              ColumnSpacing="{StaticResource Space12}">
+          <SelectableTextBlock Grid.Column="0"
+                               Classes="settingsSectionMeta"
+                               VerticalAlignment="Center"
+                               Text="Changes apply only after Save Settings."/>
+          <StackPanel Grid.Column="1"
+                      Orientation="Horizontal"
+                      HorizontalAlignment="Right"
+                      Spacing="{StaticResource Space8}">
+            <Button Classes="dangerTextButton"
+                    Content="Reset all settings"
+                    Click="ResetAllSettingsButton_Click"/>
+            <Button Content="Cancel"
+                    Command="{Binding CancelCommand}"/>
+            <Button Content="Save Settings"
+                    Command="{Binding SaveCommand}"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</Window>

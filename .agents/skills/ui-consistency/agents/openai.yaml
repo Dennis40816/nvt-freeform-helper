@@ -1,0 +1,7 @@
+interface:
+  display_name: "UI Consistency"
+  short_description: "Keep FreeformHelper UI layout and tokens consistent"
+  default_prompt: "Use $ui-consistency to adjust this UI change with token-first styles and spacing/layout contracts."
+
+policy:
+  allow_implicit_invocation: true

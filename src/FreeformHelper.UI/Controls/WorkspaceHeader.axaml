@@ -1,0 +1,533 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             x:Class="FreeformHelper.UI.Controls.WorkspaceHeader"
+             x:Name="Root">
+  <UserControl.Styles>
+    <Style Selector="TextBlock.workspaceHeaderStatus, SelectableTextBlock.workspaceHeaderStatus">
+      <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+      <Setter Property="TextWrapping" Value="NoWrap"/>
+      <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+
+    <Style Selector="TextBlock.workspaceHeaderSelection, SelectableTextBlock.workspaceHeaderSelection">
+      <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+      <Setter Property="TextWrapping" Value="NoWrap"/>
+      <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+
+    <Style Selector="Border.workspaceHeaderInspector">
+      <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+      <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+    </Style>
+
+    <Style Selector="TextBlock.workspaceHeaderInspectorPrimary, SelectableTextBlock.workspaceHeaderInspectorPrimary">
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="TextWrapping" Value="NoWrap"/>
+      <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+
+    <Style Selector="TextBlock.workspaceHeaderInspectorSecondary, SelectableTextBlock.workspaceHeaderInspectorSecondary">
+      <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+      <Setter Property="TextWrapping" Value="NoWrap"/>
+      <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+
+    <Style Selector="Border.workspaceHeaderInspectorCompact">
+      <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+      <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+    </Style>
+
+    <Style Selector="ToggleButton.workspaceHeaderInspectorCard">
+      <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="MinHeight" Value="0"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    </Style>
+
+    <Style Selector="Border.workspaceHeaderInspectorChip">
+      <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusXs}"/>
+      <Setter Property="Padding" Value="{StaticResource Inset6_2}"/>
+    </Style>
+
+    <Style Selector="StackPanel.workspaceHeaderInspectorChipRow">
+      <Setter Property="MaxWidth" Value="{StaticResource WorkspaceHeaderInspectorChipRowMaxWidth}"/>
+      <Setter Property="ClipToBounds" Value="True"/>
+    </Style>
+
+    <Style Selector="Border.workspaceHeaderInspectorChipPrimary">
+      <Setter Property="MaxWidth" Value="{StaticResource WorkspaceHeaderInspectorPrimaryChipMaxWidth}"/>
+    </Style>
+
+    <Style Selector="Border.workspaceHeaderInspectorChipSecondary">
+      <Setter Property="MaxWidth" Value="{StaticResource WorkspaceHeaderInspectorSecondaryChipMaxWidth}"/>
+    </Style>
+
+    <Style Selector="Border.workspaceHeaderInspectorChipMatch">
+      <Setter Property="MaxWidth" Value="{StaticResource WorkspaceHeaderInspectorMatchChipMaxWidth}"/>
+    </Style>
+
+    <Style Selector="Border.workspaceHeaderInspectorChipCompensation">
+      <Setter Property="MaxWidth" Value="{StaticResource WorkspaceHeaderInspectorCompensationChipMaxWidth}"/>
+    </Style>
+
+    <Style Selector="TextBlock.workspaceHeaderInspectorChipText, SelectableTextBlock.workspaceHeaderInspectorChipText">
+      <Setter Property="TextWrapping" Value="NoWrap"/>
+      <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+
+    <Style Selector="Button.workspaceHeaderAction, ToggleButton.workspaceHeaderAction">
+      <Setter Property="Padding" Value="{StaticResource Inset10_4}"/>
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusXs}"/>
+      <Setter Property="MinHeight" Value="{StaticResource WorkspaceHeaderActionMinHeight}"/>
+    </Style>
+
+    <Style Selector="TextBox.workspaceHeaderInput">
+      <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+      <Setter Property="Height" Value="{StaticResource FormControlHeight}"/>
+      <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+      <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource BorderInput}"/>
+    </Style>
+
+    <Style Selector="TextBox.workspaceHeaderInput:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+    </Style>
+
+    <Style Selector="ToggleButton.viewMenuButton">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+      <Setter Property="Padding" Value="{StaticResource Inset10_6}"/>
+      <Setter Property="MinHeight" Value="{StaticResource ViewMenuButtonMinHeight}"/>
+      <Setter Property="VerticalAlignment" Value="Stretch"/>
+    </Style>
+
+    <Style Selector="ToggleButton.viewMenuButton:checked">
+      <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceSelected}"/>
+    </Style>
+
+
+    <Style Selector="Border.viewMenuPopup">
+      <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+      <Setter Property="Padding" Value="{StaticResource Inset12}"/>
+      <Setter Property="MinWidth" Value="{StaticResource ViewMenuPopupMinWidth}"/>
+      <Setter Property="Width" Value="{StaticResource ViewMenuPopupWidth}"/>
+      <Setter Property="MaxWidth" Value="{StaticResource ViewMenuPopupMaxWidth}"/>
+    </Style>
+
+    <Style Selector="TextBlock.viewMenuTitle, SelectableTextBlock.viewMenuTitle">
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="TextBlock.viewMenuLabel, SelectableTextBlock.viewMenuLabel">
+      <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <Style Selector="TextBlock.viewMenuHint, SelectableTextBlock.viewMenuHint">
+      <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <Style Selector="TextBlock.viewMenuSectionTitle, SelectableTextBlock.viewMenuSectionTitle">
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="Border.viewMenuSection">
+      <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+      <Setter Property="Padding" Value="{StaticResource Inset10_8}"/>
+    </Style>
+
+    <Style Selector="TextBlock.viewMenuValue, SelectableTextBlock.viewMenuValue">
+      <Setter Property="MinWidth" Value="{StaticResource ViewMenuValueWidth}"/>
+      <Setter Property="TextAlignment" Value="Right"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="{StaticResource InsetRight8}"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="TextWrapping" Value="NoWrap"/>
+      <Setter Property="TextTrimming" Value="None"/>
+    </Style>
+
+    <Style Selector="ToggleSwitch.viewMenuSwitch">
+      <Setter Property="MinWidth" Value="{StaticResource ViewMenuSwitchMinWidth}"/>
+    </Style>
+
+    <Style Selector="Slider.viewOpacitySlider">
+      <Setter Property="Minimum" Value="0"/>
+      <Setter Property="Maximum" Value="1"/>
+      <Setter Property="TickFrequency" Value="0.01"/>
+      <Setter Property="Margin" Value="{StaticResource InsetTop4}"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    </Style>
+
+    <Style Selector="Slider.viewOpacitySlider /template/ Thumb">
+      <Setter Property="Background" Value="{DynamicResource BrushWhite}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushWhite}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Border Background="{DynamicResource BrushBgSurface}"
+          BorderBrush="{DynamicResource BrushBorder}"
+          BorderThickness="{StaticResource BorderBottomThin}"
+          Padding="{StaticResource Inset14_8}">
+    <Grid ColumnDefinitions="Auto,*"
+          RowDefinitions="Auto">
+      <ToggleButton x:Name="ViewMenuButton"
+                    Classes="viewMenuButton"
+                    ToolTip.Tip="Display options"
+                    PointerPressed="ViewMenuButton_PointerPressed"
+                    PointerEntered="ViewMenuButton_PointerEntered"
+                    PointerExited="ViewMenuButton_PointerExited"
+                    Checked="ViewMenuButton_Checked"
+                    Unchecked="ViewMenuButton_Unchecked"
+                    Margin="{StaticResource InsetRight12}"
+                    VerticalAlignment="Stretch">
+        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}">
+          <controls:FontIcon Classes="symbols"
+                             Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+          <SelectableTextBlock Text="Display" VerticalAlignment="Center"/>
+        </StackPanel>
+      </ToggleButton>
+
+      <Border Grid.Column="1"
+              Background="{DynamicResource BrushBgSurfaceInset}"
+              BorderBrush="{DynamicResource BrushBorder}"
+              BorderThickness="{StaticResource BorderThin}"
+              CornerRadius="{StaticResource RadiusMd}"
+              Padding="{StaticResource Inset12_10}"
+              VerticalAlignment="Stretch">
+        <Grid ColumnDefinitions="Auto,*">
+          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="{StaticResource Space12}" VerticalAlignment="Center">
+            <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
+              <SelectableTextBlock Text="Rows"/>
+              <TextBox Classes="workspaceHeaderInput"
+                       Width="{StaticResource ManualSizingInputWidth}"
+                       Watermark="e.g. 0-3,6"
+                       Text="{Binding ManualRowsRange, Mode=TwoWay}"
+                       ToolTip.Tip="Rows range (0 = top). Accepts 5 / 5-7 / 5,7."/>
+            </StackPanel>
+
+            <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
+              <SelectableTextBlock Text="Cols"/>
+              <TextBox Classes="workspaceHeaderInput"
+                       Width="{StaticResource ManualSizingInputWidth}"
+                       Watermark="e.g. 2-6"
+                       Text="{Binding ManualColsRange, Mode=TwoWay}"
+                       ToolTip.Tip="Column range. Accepts 5 / 5-7 / 5,7."/>
+            </StackPanel>
+
+            <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
+              <SelectableTextBlock Text="Width (mm)"/>
+              <TextBox Classes="workspaceHeaderInput"
+                       Width="{StaticResource ManualSizingInputWidth}"
+                       IsReadOnly="True"
+                       Focusable="False"
+                       Text="{Binding PendingColumnWidthDisplay}"
+                       ToolTip.Tip="Target pad width for the manual range (mm)."/>
+            </StackPanel>
+
+            <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
+              <SelectableTextBlock Text="Height (mm)"/>
+              <TextBox Classes="workspaceHeaderInput"
+                       Width="{StaticResource ManualSizingInputWidth}"
+                       IsReadOnly="True"
+                       Focusable="False"
+                       Text="{Binding PendingRowHeightDisplay}"
+                       ToolTip.Tip="Target pad height for the manual range (mm)."/>
+            </StackPanel>
+
+          </StackPanel>
+
+          <Grid Grid.Column="1"
+                ColumnDefinitions="*,Auto">
+            <Border Grid.Column="0"
+                    Background="{DynamicResource BrushBgSurface}"
+                    BorderBrush="{DynamicResource BrushBorder}"
+                    BorderThickness="{StaticResource BorderThin}"
+                    CornerRadius="{StaticResource RadiusSm}"
+                    Padding="{StaticResource Inset8_4}"
+                    MaxWidth="{StaticResource WorkspaceHeaderStatusMaxWidth}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workspaceHeaderStatus"
+                                     Text="{Binding StatusDisplayText}"
+                                     IsVisible="{Binding HasStatusDisplay}"
+                                     ToolTip.Tip="{Binding StatusDisplayText}"/>
+                <StackPanel Orientation="Horizontal"
+                            Spacing="{StaticResource Space8}">
+                  <SelectableTextBlock Classes="workspaceHeaderSelection"
+                                       Text="{Binding CadSelectionText}"/>
+                  <SelectableTextBlock Classes="workspaceHeaderSelection"
+                                       Text="{Binding RegularSelectionText}"/>
+                </StackPanel>
+                <SelectableTextBlock Text="{Binding ManualRangeError}"
+                                     Foreground="{DynamicResource BrushDanger}"
+                                    
+                                     IsVisible="{Binding HasManualRangeError}"/>
+              </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Classes="workspaceHeaderInspectorCompact"
+                    IsVisible="{Binding HasPadInspectorSummary}"
+                    Margin="{StaticResource InsetLeft10}"
+                    HorizontalAlignment="Stretch">
+              <StackPanel Spacing="{StaticResource Space4}">
+                <Grid ColumnDefinitions="*">
+                  <StackPanel Grid.Column="0"
+                              Classes="workspaceHeaderInspectorChipRow"
+                              Orientation="Horizontal"
+                              Spacing="{StaticResource Space8}"
+                              VerticalAlignment="Center">
+                    <Border Classes="workspaceHeaderInspectorChip workspaceHeaderInspectorChipPrimary">
+                      <SelectableTextBlock Classes="workspaceHeaderInspectorPrimary"
+                                           Text="{Binding PadInspectorCompactHeaderText}"
+                                           ToolTip.Tip="{Binding PadInspectorCompactHeaderText}"/>
+                    </Border>
+                  </StackPanel>
+                </Grid>
+              </StackPanel>
+            </Border>
+          </Grid>
+        </Grid>
+      </Border>
+
+      <Popup x:Name="ViewMenuPopup"
+             PlacementTarget="{Binding ElementName=ViewMenuButton}"
+             Placement="BottomEdgeAlignedLeft"
+             Topmost="False"
+             PlacementConstraintAdjustment="FlipX,FlipY,SlideX,SlideY"
+             DataContext="{Binding DataContext, ElementName=Root}">
+        <Border x:Name="ViewMenuPopupRoot"
+                Classes="viewMenuPopup"
+                PointerEntered="ViewMenuPopup_PointerEntered"
+                PointerExited="ViewMenuPopup_PointerExited">
+           <ScrollViewer x:Name="ViewMenuScroll"
+                         Classes="viewportBoundScroll"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Disabled"
+                         MaxHeight="{StaticResource ViewMenuPopupMaxHeight}">
+            <Border Classes="viewportBoundContent"
+                    Padding="{StaticResource InsetRight12Bottom20}">
+              <StackPanel Spacing="{StaticResource Space16}"
+                          HorizontalAlignment="Stretch">
+                <SelectableTextBlock Classes="viewMenuTitle" Text="Display options"/>
+                <SelectableTextBlock Classes="viewMenuHint"
+                                     Text="Quick toggles stay on top. Advanced appearance tuning is folded below to reduce clutter."/>
+
+                <Border Classes="viewMenuSection">
+                  <StackPanel Spacing="{StaticResource Space8}">
+                    <SelectableTextBlock Classes="viewMenuSectionTitle" Text="Quick toggles"/>
+                    <ItemsControl ItemsSource="{Binding Items, ElementName=Root}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <StackPanel Spacing="{StaticResource Space10}"/>
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Grid ColumnDefinitions="*,Auto">
+                            <SelectableTextBlock Classes="viewMenuLabel"
+                                                 Text="{Binding Label}"
+                                                 VerticalAlignment="Center"/>
+                            <ToggleSwitch Grid.Column="1"
+                                          Classes="viewMenuSwitch"
+                                          IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                          ToolTip.Tip="{Binding Label}"
+                                          OnContent=""
+                                          OffContent=""
+                                          VerticalAlignment="Center"/>
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </Border>
+
+                <Border Classes="viewMenuSection">
+                  <StackPanel Spacing="{StaticResource Space8}">
+                    <SelectableTextBlock Classes="viewMenuSectionTitle" Text="Line width"/>
+                    <SelectableTextBlock Classes="viewMenuHint"
+                                         Text="Tune widths first; keep defaults for most color/opacity values unless diagnostics require it."/>
+                    <SelectableTextBlock Classes="viewMenuLabel" Text="CAD line width"/>
+                    <controls:NumberScrubber Minimum="0.1"
+                                             Maximum="5"
+                                             SmallChange="0.05"
+                                             FormatString="0.0#"
+                                             Value="{Binding CadLineWidth, Mode=TwoWay}"
+                                             ToolTip.Tip="CAD stroke width (mm)."/>
+                    <SelectableTextBlock Classes="viewMenuLabel" Text="Regular outline width"/>
+                    <controls:NumberScrubber Minimum="0.1"
+                                             Maximum="5"
+                                             SmallChange="0.05"
+                                             FormatString="0.0#"
+                                             Value="{Binding RegularLineWidth, Mode=TwoWay}"
+                                             ToolTip.Tip="Regular pad outline width (mm)."/>
+                    <SelectableTextBlock Classes="viewMenuLabel" Text="Highlight line width adjust"/>
+                    <controls:NumberScrubber Minimum="-2"
+                                             Maximum="4"
+                                             SmallChange="0.1"
+                                             FormatString="0.0#"
+                                             Value="{Binding HighlightStrokeWidthAdjust, Mode=TwoWay}"
+                                             ToolTip.Tip="Adjust thickness for selected/highlight/to-full/override outlines. Negative = thinner."/>
+                    <SelectableTextBlock Classes="viewMenuHint"
+                                         Text="Default -1 keeps highlight overlays thinner than normal outlines."/>
+                  </StackPanel>
+                </Border>
+
+                <controls:HidePanelBlock Title="Colors and opacity (advanced)"
+                                         IsExpanded="False">
+                  <Border Classes="viewMenuSection">
+                    <StackPanel Spacing="{StaticResource Space8}">
+                      <SelectableTextBlock Classes="viewMenuHint"
+                                           Text="Low-frequency appearance tuning for CAD/Regular rendering."/>
+                      <SelectableTextBlock Classes="viewMenuLabel" Text="CAD line color (#RRGGBB)"/>
+                      <TextBox Text="{Binding CadLineColorHex, Mode=TwoWay}"
+                               ToolTip.Tip="CAD stroke color as hex (#RRGGBB)."/>
+                      <Grid ColumnDefinitions="4*,8,1*" RowDefinitions="Auto,Auto">
+                        <SelectableTextBlock Grid.ColumnSpan="3"
+                                             Classes="viewMenuLabel"
+                                             Text="CAD fill opacity"
+                                             ToolTip.Tip="Transparency for CAD fill rendering."/>
+                        <Slider Grid.Row="1"
+                                Grid.Column="0"
+                                Classes="viewOpacitySlider"
+                                Value="{Binding CadFillOpacity, Mode=TwoWay}"/>
+                        <SelectableTextBlock Grid.Row="1"
+                                             Grid.Column="2"
+                                             Classes="viewMenuLabel viewMenuValue"
+                                             Text="{Binding CadFillOpacity, StringFormat={}{0:P0}}"
+                                             VerticalAlignment="Center"/>
+                      </Grid>
+                      <Grid ColumnDefinitions="4*,8,1*" RowDefinitions="Auto,Auto">
+                        <SelectableTextBlock Grid.ColumnSpan="3"
+                                             Classes="viewMenuLabel"
+                                             Text="CAD line opacity"
+                                             ToolTip.Tip="Transparency for CAD stroke rendering."/>
+                        <Slider Grid.Row="1"
+                                Grid.Column="0"
+                                Classes="viewOpacitySlider"
+                                Value="{Binding CadLineOpacity, Mode=TwoWay}"/>
+                        <SelectableTextBlock Grid.Row="1"
+                                             Grid.Column="2"
+                                             Classes="viewMenuLabel viewMenuValue"
+                                             Text="{Binding CadLineOpacity, StringFormat={}{0:P0}}"
+                                             VerticalAlignment="Center"/>
+                      </Grid>
+                      <SelectableTextBlock Classes="viewMenuLabel" Text="Regular outline color (#RRGGBB)"/>
+                      <TextBox Text="{Binding RegularLineColorHex, Mode=TwoWay}"
+                               ToolTip.Tip="Regular outline color as hex (#RRGGBB)."/>
+                      <SelectableTextBlock Classes="viewMenuLabel" Text="Regular selection color (#RRGGBB)"/>
+                      <TextBox Text="{Binding RegularSelectedColorHex, Mode=TwoWay}"
+                               ToolTip.Tip="Selection color for regular pads (#RRGGBB)."/>
+                      <Grid ColumnDefinitions="4*,8,1*" RowDefinitions="Auto,Auto">
+                        <SelectableTextBlock Grid.ColumnSpan="3"
+                                             Classes="viewMenuLabel"
+                                             Text="Regular fill opacity"
+                                             ToolTip.Tip="Transparency for regular pad fill rendering."/>
+                        <Slider Grid.Row="1"
+                                Grid.Column="0"
+                                Classes="viewOpacitySlider"
+                                Value="{Binding RegularFillOpacity, Mode=TwoWay}"/>
+                        <SelectableTextBlock Grid.Row="1"
+                                             Grid.Column="2"
+                                             Classes="viewMenuLabel viewMenuValue"
+                                             Text="{Binding RegularFillOpacity, StringFormat={}{0:P0}}"
+                                             VerticalAlignment="Center"/>
+                      </Grid>
+                      <Grid ColumnDefinitions="4*,8,1*" RowDefinitions="Auto,Auto">
+                        <SelectableTextBlock Grid.ColumnSpan="3"
+                                             Classes="viewMenuLabel"
+                                             Text="Regular line opacity"
+                                             ToolTip.Tip="Transparency for regular pad stroke rendering."/>
+                        <Slider Grid.Row="1"
+                                Grid.Column="0"
+                                Classes="viewOpacitySlider"
+                                Value="{Binding RegularLineOpacity, Mode=TwoWay}"/>
+                        <SelectableTextBlock Grid.Row="1"
+                                             Grid.Column="2"
+                                             Classes="viewMenuLabel viewMenuValue"
+                                             Text="{Binding RegularLineOpacity, StringFormat={}{0:P0}}"
+                                             VerticalAlignment="Center"/>
+                      </Grid>
+                      <Grid ColumnDefinitions="4*,8,1*" RowDefinitions="Auto,Auto">
+                        <SelectableTextBlock Grid.ColumnSpan="3"
+                                             Classes="viewMenuLabel"
+                                             Text="Regular selection fill opacity"
+                                             ToolTip.Tip="Transparency for selected regular pad fill."/>
+                        <Slider Grid.Row="1"
+                                Grid.Column="0"
+                                Classes="viewOpacitySlider"
+                                Value="{Binding RegularSelectedFillOpacity, Mode=TwoWay}"/>
+                        <SelectableTextBlock Grid.Row="1"
+                                             Grid.Column="2"
+                                             Classes="viewMenuLabel viewMenuValue"
+                                             Text="{Binding RegularSelectedFillOpacity, StringFormat={}{0:P0}}"
+                                             VerticalAlignment="Center"/>
+                      </Grid>
+                    </StackPanel>
+                  </Border>
+                </controls:HidePanelBlock>
+
+                <controls:HidePanelBlock Title="CAD area buckets (advanced)"
+                                         IsExpanded="False">
+                  <Border Classes="viewMenuSection">
+                    <StackPanel Spacing="{StaticResource Space8}">
+                      <SelectableTextBlock Classes="viewMenuHint"
+                                           Text="Enable &quot;Color CAD by area&quot; in Quick toggles, then tune tolerance and bucket count."/>
+                      <StackPanel Spacing="{StaticResource Space6}" IsEnabled="{Binding ColorCadByArea}">
+                        <SelectableTextBlock Classes="viewMenuLabel" Text="Area bucket tolerance (relative)"/>
+                        <controls:NumberScrubber Minimum="0"
+                                                 Maximum="0.1"
+                                                 SmallChange="0.0001"
+                                                 FormatString="0.####"
+                                                 SnapToStep="False"
+                                                 Value="{Binding AreaBucketTolerance, Mode=TwoWay}"
+                                                 ToolTip.Tip="Relative area tolerance to group CAD pads."/>
+                        <SelectableTextBlock Classes="viewMenuLabel" Text="Max area buckets"/>
+                        <controls:NumberScrubber Minimum="1"
+                                                 Maximum="1024"
+                                                 SmallChange="1"
+                                                 FormatString="0"
+                                                 Value="{Binding MaxAreaBuckets, Mode=TwoWay}"
+                                                 ToolTip.Tip="Maximum number of color buckets."/>
+                        <SelectableTextBlock Classes="viewMenuHint"
+                                             Text="Tolerance groups similar areas (0 = exact)."/>
+                      </StackPanel>
+                    </StackPanel>
+                  </Border>
+                </controls:HidePanelBlock>
+              </StackPanel>
+            </Border>
+          </ScrollViewer>
+        </Border>
+      </Popup>
+    </Grid>
+  </Border>
+</UserControl>
+

@@ -1,0 +1,26 @@
+# Normalize text files and keep Windows-friendly CRLF to match .editorconfig.
+* text=auto
+
+*.cs text eol=crlf
+*.axaml text eol=crlf
+*.xaml text eol=crlf
+*.csproj text eol=crlf
+*.props text eol=crlf
+*.targets text eol=crlf
+*.sln text eol=crlf
+*.ps1 text eol=crlf
+*.json text eol=crlf
+*.md text eol=crlf
+*.txt text eol=crlf
+
+# Binary assets should never be line-normalized.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.7z binary
+*.dll binary
+*.exe binary

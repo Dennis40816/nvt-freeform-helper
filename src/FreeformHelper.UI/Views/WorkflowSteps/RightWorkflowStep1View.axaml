@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep1View">
+    <controls:HidePanelBlock x:Name="Step1Block"
+                             Title="Step 1 · Geometry match"
+                             IsExpanded="{Binding IsStep1Expanded, Mode=TwoWay}">
+      <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <SelectableTextBlock Grid.Column="0"
+                               Classes="stepNote"
+                               Text="Run overlap first, then tune unmatched TH for diagnostics visibility only."/>
+          <Button Grid.Column="1"
+                  Tag="Step1GeometryMatch"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Click="OpenSettingsButton_Click"
+                  ToolTip.Tip="Open Settings at Step 1 section.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+          </Button>
+          <Button Grid.Column="2"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Command="{Binding ClearStep1ResultCommand}"
+                  ToolTip.Tip="Clear Step 1 result and all downstream results.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Delete}"/>
+          </Button>
+        </Grid>
+        <Button Content="Match overlaps"
+                Command="{Binding MatchCommand}"
+                HorizontalAlignment="Stretch"
+                ToolTip.Tip="Step 1: build CAD↔Regular overlap links."/>
+        <ProgressBar Minimum="0"
+                     Maximum="1"
+                     Value="{Binding MatchProgress}"
+                     IsVisible="{Binding IsMatchingPads}"
+                     Height="{StaticResource Space6}"/>
+        <Border Classes="workflowStepStatusStrip">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <Border Classes="workflowStepMetricTile">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                     Text="Unmatched diagnostics threshold"/>
+                <SelectableTextBlock Classes="workflowStepMetricText"
+                                     Text="{Binding MatchThreshold, StringFormat='{}{0:0.####} · diagnostics only; does not change links'}"/>
+              </StackPanel>
+            </Border>
+            <Border Classes="workflowStepMetricTile">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                     Text="Regular Visibility Mask"/>
+                <SelectableTextBlock Classes="workflowStepMetricText"
+                                     Text="{Binding RegularVisibilityMaskSummary}"/>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+        <StackPanel Classes="panelFormField">
+          <Grid ColumnDefinitions="*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <SelectableTextBlock Grid.Column="0"
+                                 Text="Use Regular Visibility Mask"
+                                 VerticalAlignment="Center"/>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding IsRegularVisibilityMaskEnabled, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"
+                          ToolTip.Tip="Constrain Step 4 geometry seed and Simulation to active regular pads from imported SeeRegular.csv."/>
+          </Grid>
+          <Grid ColumnDefinitions="*,*"
+                ColumnSpacing="{StaticResource Space10}">
+            <Button Grid.Column="0"
+                    Content="Import mask"
+                    Command="{Binding ImportRegularVisibilityMaskCommand}"
+                    HorizontalAlignment="Stretch"
+                    ToolTip.Tip="Import Regular Visibility Mask (SeeRegular.csv) and build the regular active mask used by Step 4 and Simulation."/>
+            <Button Grid.Column="1"
+                    Content="Clear mask"
+                    Command="{Binding ClearRegularVisibilityMaskCommand}"
+                    HorizontalAlignment="Stretch"
+                    ToolTip.Tip="Remove the imported regular visibility mask and return to pure geometry seed."/>
+          </Grid>
+        </StackPanel>
+      </StackPanel>
+    </controls:HidePanelBlock>
+</UserControl>
+

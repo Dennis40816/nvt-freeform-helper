@@ -1,0 +1,347 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsStep3SectionView">
+  <StackPanel Classes="panelForm settingsPage">
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space8}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="Current compensation model"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="Single source of truth for Step 3 behavior."/>
+        </StackPanel>
+        <StackPanel Classes="panelFormField">
+          <controls:SettingsInfoLabel Text="Compensation model" Tip="Select the Step 3 compensation model that drives To Regular and To Full behavior."/>
+          <ComboBox ItemsSource="{Binding NotchCompensationModelOptions}"
+                    SelectedItem="{Binding SelectedNotchCompensationModelOption, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate>
+                <SelectableTextBlock Text="{Binding Display}"/>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <SelectableTextBlock Classes="stepNote"
+                               Text="{Binding NotchCompensationModelSummary}"
+                               TextWrapping="Wrap"/>
+        </StackPanel>
+        <WrapPanel>
+          <Border Classes="chipStatus">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding NotchEffectiveModelSummary}"/>
+          </Border>
+          <Border Classes="chipStatus">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding NotchEmsSafetyShortText}"/>
+          </Border>
+        </WrapPanel>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space8}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="Signal semantics"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="Area ratio stays primary; To Full only gates boundary support."/>
+        </StackPanel>
+        <WrapPanel>
+          <Border Classes="chipStatus">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding NotchAllocationModelShortText}"/>
+          </Border>
+          <Border Classes="chipStatus">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding NotchToRegularShortText}"/>
+          </Border>
+          <Border Classes="chipStatus">
+            <SelectableTextBlock Classes="chipStatusText"
+                                 Text="{Binding NotchToFullShortText}"/>
+          </Border>
+        </WrapPanel>
+        <Grid ColumnDefinitions="1*,1*"
+              ColumnSpacing="{StaticResource Space10}">
+          <StackPanel Grid.Column="0"
+                      Classes="panelFormField left">
+            <SelectableTextBlock Text="To Regular meaning"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="Restore area signal before redistribution."
+                                 TextWrapping="Wrap"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1"
+                      Classes="panelFormField right">
+            <SelectableTextBlock Text="To Full meaning"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="Allow boundary targets; cap impossible expansion."
+                                 TextWrapping="Wrap"/>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space8}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="Advanced allocation gates"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="Compute gates and diagnostic trace controls."/>
+        </StackPanel>
+        <Grid ColumnDefinitions="1*,1*"
+              ColumnSpacing="{StaticResource Space10}">
+          <Grid Grid.Column="0"
+                ColumnDefinitions="1*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <StackPanel Grid.Column="0"
+                        Classes="panelFormField left">
+              <controls:SettingsInfoLabel Text="To Regular EN (derived)" Tip="Derived from the selected compensation model; restores area-proportional signal before redistribution."/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="From selected model."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsEnabled="False"
+                          IsChecked="{Binding EnableToRegular, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+          <Grid Grid.Column="1"
+                ColumnDefinitions="1*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <StackPanel Grid.Column="0"
+                        Classes="panelFormField right">
+              <controls:SettingsInfoLabel Text="To Full EN (derived)" Tip="Derived from the selected compensation model; enables boundary support/cap logic."/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="From selected model."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsEnabled="False"
+                          IsChecked="{Binding EnableToFull, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+        </Grid>
+        <StackPanel Classes="panelFormField">
+          <controls:SettingsInfoLabel Text="Multi-owner strict overlap (%)" Tip="Minimum regular-area overlap ratio required before a CAD can own or block a boundary target."/>
+          <controls:NumberScrubber Minimum="0"
+                                   Maximum="100"
+                                   SmallChange="0.1"
+                                   FormatString="0.###"
+                                   SnapToStep="False"
+                                   Value="{Binding ToFullStrictOverlapPercent, Mode=TwoWay}"/>
+          <SelectableTextBlock Classes="stepNote"
+                               Text="Higher rejects ambiguous boundary targets sooner."
+                               TextWrapping="Wrap"/>
+        </StackPanel>
+        <Grid ColumnDefinitions="1*,1*"
+              ColumnSpacing="{StaticResource Space10}">
+          <Grid Grid.Column="0"
+                ColumnDefinitions="1*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <StackPanel Grid.Column="0"
+                        Classes="panelFormField left">
+              <controls:SettingsInfoLabel Text="Use boundary area cap" Tip="Cap To Full virtual expansion before it contributes to Stage3 gain/allocation. This is the beta0.9 edge EMS guard."/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="Limits outside support area against the inside overlap."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableBoundaryVirtualAreaCap, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+          <StackPanel Grid.Column="1"
+                      Classes="panelFormField right">
+            <controls:SettingsInfoLabel Text="Virtual cap (%)" Tip="Maximum virtual To Full area relative to original overlap area. 100% means outside virtual area cannot exceed inside overlap area."/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="1000"
+                                     SmallChange="10"
+                                     FormatString="0.#"
+                                     IsEnabled="{Binding EnableBoundaryVirtualAreaCap}"
+                                     Value="{Binding BoundaryVirtualAreaCapPercent, Mode=TwoWay}"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding NotchBoundaryVirtualAreaCapShortText}"
+                                 TextWrapping="Wrap"/>
+          </StackPanel>
+        </Grid>
+        <Grid ColumnDefinitions="1*,1*"
+              ColumnSpacing="{StaticResource Space10}">
+          <Grid Grid.Column="0"
+                ColumnDefinitions="1*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <StackPanel Grid.Column="0"
+                        Classes="panelFormField left">
+              <controls:SettingsInfoLabel Text="Use target coverage guard" Tip="After CurrentGain rows are selected, cap each target FW diff's total coverage to avoid uniform-field EMS overflow."/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="Prevents multiple sources from stacking too much signal on one diff."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableTargetCoverageGuard, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+          <StackPanel Grid.Column="1"
+                      Classes="panelFormField right">
+            <controls:SettingsInfoLabel Text="Target cap (%)" Tip="{Binding NotchTargetCoverageCapHelpText}"/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="255"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     IsEnabled="{Binding EnableTargetCoverageGuard}"
+                                     Value="{Binding TargetCoverageCapPercent, Mode=TwoWay}"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="{Binding NotchTargetCoverageGuardShortText}"
+                                 TextWrapping="Wrap"/>
+          </StackPanel>
+        </Grid>
+        <Grid ColumnDefinitions="1*,1*"
+              ColumnSpacing="{StaticResource Space10}">
+          <Grid Grid.Column="0"
+                ColumnDefinitions="1*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <StackPanel Grid.Column="0"
+                        Classes="panelFormField left">
+              <controls:SettingsInfoLabel Text="Use To Full rule engine" Tip="ON uses the newer centralized To Full boundary gate engine; OFF falls back to the legacy inline gate path."/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="Controls the To Full boundary-gate implementation path."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableToFullRuleEngine, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+          <Grid Grid.Column="1"
+                ColumnDefinitions="1*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <StackPanel Grid.Column="0"
+                        Classes="panelFormField right">
+              <controls:SettingsInfoLabel Text="Keep To Full trace" Tip="Store per-regular To Full rule decisions for diagnostics and runtime query payloads."/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="Adds diagnostics only; notch output is unchanged."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsEnabled="{Binding EnableToFullRuleEngine}"
+                          IsChecked="{Binding EnableToFullRuleTrace, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+        </Grid>
+        <SelectableTextBlock Classes="stepNote"
+                             Text="{Binding ToFullRuleEngineSummary}"/>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="settingsSectionBlock">
+      <StackPanel Spacing="{StaticResource Space8}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Classes="settingsSectionTitle"
+                               Text="AA preview display"/>
+          <SelectableTextBlock Classes="settingsSectionMeta"
+                               Text="Display-only diagnostics; generated notch rows are unchanged."/>
+        </StackPanel>
+        <Grid ColumnDefinitions="1*,1*"
+              ColumnSpacing="{StaticResource Space10}">
+          <Grid Grid.Column="0"
+                ColumnDefinitions="1*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <StackPanel Grid.Column="0"
+                        Classes="panelFormField left">
+              <controls:SettingsInfoLabel Text="Stage auto play" Tip="Loop the Step 3 preview layers automatically in the AA canvas."/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="Loop Step 3 preview layers."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding NotchPreviewAutoPlayEnabled, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+          <StackPanel Grid.Column="1"
+                      Classes="panelFormField right">
+            <controls:SettingsInfoLabel Text="Interval (ms)" Tip="Delay between Step 3 preview layers during auto play."/>
+            <controls:NumberScrubber Minimum="200"
+                                     Maximum="5000"
+                                     SmallChange="100"
+                                     FormatString="0"
+                                     Value="{Binding NotchPreviewAutoPlayIntervalMs, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
+        <Grid ColumnDefinitions="1*,1*"
+              ColumnSpacing="{StaticResource Space10}">
+          <Grid Grid.Column="0"
+                ColumnDefinitions="1*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <StackPanel Grid.Column="0"
+                        Classes="panelFormField left">
+              <controls:SettingsInfoLabel Text="Show To Regular labels" Tip="Display To Regular ratio labels on the Step 3 preview canvas only."/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="Show To Regular ratios."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding ShowNotchToRegularLabels, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+          <Grid Grid.Column="1"
+                ColumnDefinitions="1*,Auto"
+                ColumnSpacing="{StaticResource Space10}">
+            <StackPanel Grid.Column="0"
+                        Classes="panelFormField right">
+              <controls:SettingsInfoLabel Text="Show To Full overlay" Tip="Display To Full support stages on the Step 3 preview canvas only."/>
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="Show To Full support stages."
+                                   TextWrapping="Wrap"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding ShowNotchCanvasPreview, Mode=TwoWay}"
+                          OnContent=""
+                          OffContent=""
+                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+        </Grid>
+        <Grid ColumnDefinitions="1*,1*"
+              ColumnSpacing="{StaticResource Space10}">
+          <StackPanel Grid.Column="0"
+                      Classes="panelFormField left">
+            <controls:SettingsInfoLabel Text="To Full layer stage" Tip="Choose the To Full preview layer: seed, candidate, or final support result."/>
+            <controls:NumberScrubber Minimum="1"
+                                     Maximum="3"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     Value="{Binding NotchPreviewVisualizationStep, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1"
+                      Classes="panelFormField right">
+            <SelectableTextBlock Text="Display contract"/>
+            <SelectableTextBlock Classes="stepNote"
+                                 Text="Preview switches do not change computation."
+                                 TextWrapping="Wrap"/>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

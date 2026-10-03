@@ -1,0 +1,167 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             mc:Ignorable="d"
+             xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
+             x:Class="FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView"
+             Background="{DynamicResource BrushBgApp}"
+             Foreground="{DynamicResource BrushTextPrimary}">
+  <Grid RowDefinitions="Auto,*">
+    <Border Grid.Row="0"
+            Classes="workspaceFirstPeekBar">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space12}">
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Text="Coordinate"
+                               Classes="workspaceFirstPeekTitle"/>
+          <SelectableTextBlock Text="Coordinate artifact planner."
+                               Classes="workspaceFirstPeekSubtitle"/>
+        </StackPanel>
+
+        <WrapPanel Grid.Column="1"
+                   Orientation="Horizontal"
+                   VerticalAlignment="Center">
+          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+            <SelectableTextBlock Classes="chipStatusText" Text="{Binding WorkspaceSummaryText}"/>
+          </Border>
+          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+            <SelectableTextBlock Classes="chipStatusText" Text="{Binding ActiveAreaSourceSummaryText}"/>
+          </Border>
+          <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+            <SelectableTextBlock Classes="chipStatusText" Text="{Binding ArtifactSummaryText}"/>
+          </Border>
+        </WrapPanel>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="{StaticResource PanelLeftWidthGrid}"/>
+        <ColumnDefinition Width="{StaticResource SplitterThicknessGrid}"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="{StaticResource SplitterThicknessGrid}"/>
+        <ColumnDefinition Width="{StaticResource CoordinatePanelRightWidthGrid}"/>
+      </Grid.ColumnDefinitions>
+
+      <sections:CoordinatePlannerWorkspaceControlsPaneView Grid.Column="0"/>
+      <GridSplitter Grid.Column="1"
+                    Width="{StaticResource SplitterThickness}"
+                    Background="{DynamicResource BrushBorder}"
+                    HorizontalAlignment="Stretch"
+                    ShowsPreview="True"/>
+
+      <Border Grid.Column="2"
+              Background="{DynamicResource BrushCanvasBackground}"
+              ClipToBounds="True">
+        <Grid x:Name="CoordinatePreviewHost"
+              RowDefinitions="Auto,*"
+              ClipToBounds="True">
+          <Border Grid.Row="0"
+                  Classes="workspaceSecondPeekBar">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space12}">
+              <StackPanel Spacing="{StaticResource Space4}">
+                <SelectableTextBlock Text="{Binding MachineSummaryText}"
+                                     FontWeight="SemiBold"
+                                     TextWrapping="Wrap"/>
+                <WrapPanel Orientation="Horizontal"
+                           VerticalAlignment="Center">
+                  <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText" Text="{Binding GuideSummaryText}"/>
+                  </Border>
+                  <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText" Text="{Binding PixelSummaryText}"/>
+                  </Border>
+                  <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText" Text="{Binding CopperSummaryText}"/>
+                  </Border>
+                  <Border Classes="chipStatus" Margin="{StaticResource InsetRight6Bottom6}">
+                    <SelectableTextBlock Classes="chipStatusText" Text="{Binding LayerSummaryText}"/>
+                  </Border>
+                </WrapPanel>
+              </StackPanel>
+              <SelectableTextBlock Grid.Column="1"
+                                   Classes="workspaceSecondPeekStatus"
+                                   Text="{Binding StatusText}"
+                                   MaxWidth="{StaticResource WorkspaceHeaderStatusMaxWidth}"/>
+            </Grid>
+          </Border>
+
+          <Grid Grid.Row="1" ClipToBounds="True">
+            <controls:PadCanvas x:Name="CoordinatePadCanvas"
+                                CadPads="{Binding CadPadsForCanvas}"
+                                RegularPads="{Binding RegularPads}"
+                                FitBoundsOverride="{Binding PreviewBounds}"
+                                ShowCad="{Binding ShowCad}"
+                                ShowRegular="{Binding ShowRegular}"
+                                ShowAxisLabels="{Binding ShowRegularAxisLabels}"
+                                HighlightUnmatched="{Binding HighlightUnmatched}"
+                                HighlightFreeform="{Binding HighlightFreeform}"
+                                RegularLineOpacity="{StaticResource CoordinatePlannerRegularLineOpacity}"
+                                RegularFillOpacity="{StaticResource CoordinatePlannerRegularFillOpacity}"
+                                Focusable="True"/>
+            <Canvas x:Name="CoordinateOverlayCanvas"
+                    ClipToBounds="True"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    IsHitTestVisible="True"/>
+            <Canvas x:Name="CoordinateOverlayLabelCanvas"
+                    ClipToBounds="True"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    IsHitTestVisible="False"/>
+            <Border Classes="canvasQuickToolbar coordinateOverlayToolbar"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="{StaticResource Inset12}">
+              <Grid ColumnDefinitions="Auto,Auto,Auto,Auto"
+                    ColumnSpacing="{StaticResource Space6}">
+                <Button Classes="actionIconButton viewportOverlayAction"
+                        ToolTip.Tip="Fit AA canvas"
+                        Command="{Binding FitCanvasCommand}">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                </Button>
+                <ToggleButton Grid.Column="1"
+                              Classes="actionIconButton viewportOverlayAction"
+                              ToolTip.Tip="Toggle regular grid"
+                              IsChecked="{Binding ShowRegular, Mode=TwoWay}">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.Layers}"/>
+                </ToggleButton>
+                <ToggleButton Grid.Column="2"
+                              Classes="actionIconButton viewportOverlayAction"
+                              ToolTip.Tip="Toggle regular row and column labels"
+                              IsChecked="{Binding ShowRegularAxisLabels, Mode=TwoWay}">
+                  <controls:FontIcon Classes="symbols"
+                                     Glyph="{x:Static icons:IconGlyphs.Straighten}"/>
+                </ToggleButton>
+                <ComboBox Grid.Column="3"
+                          Width="{StaticResource CoordinateOverlayModeComboWidth}"
+                          ToolTip.Tip="Overlay density"
+                          ItemsSource="{Binding OverlayModeOptions}"
+                          SelectedItem="{Binding SelectedOverlayModeOption, Mode=TwoWay}">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <SelectableTextBlock Text="{Binding Display}"/>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </Grid>
+            </Border>
+          </Grid>
+        </Grid>
+      </Border>
+
+      <GridSplitter Grid.Column="3"
+                    Width="{StaticResource SplitterThickness}"
+                    Background="{DynamicResource BrushBorder}"
+                    HorizontalAlignment="Stretch"
+                    ShowsPreview="True"/>
+
+      <sections:CoordinatePlannerWorkspaceDetailsPaneView Grid.Column="4"/>
+    </Grid>
+  </Grid>
+</UserControl>

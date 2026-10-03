@@ -1,0 +1,111 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep2View">
+    <controls:HidePanelBlock x:Name="Step2Block"
+                             Title="Step 2 · Freeform tagging"
+                             IsExpanded="{Binding IsStep2Expanded, Mode=TwoWay}">
+      <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <SelectableTextBlock Grid.Column="0"
+                               Classes="stepNote"
+                               Text="Step 2 labels regular pads (None/XWay/YWay/XYWay) without changing Step 1 links."/>
+          <Button Grid.Column="1"
+                  Tag="Step2FreeformTagging"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Click="OpenSettingsButton_Click"
+                  ToolTip.Tip="Open Settings at Step 2 section.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+          </Button>
+          <Button Grid.Column="2"
+                  Classes="actionIconButton actionGhost workflowStepAction"
+                  Margin="{StaticResource InsetLeft10}"
+                  Command="{Binding ClearStep2ResultCommand}"
+                  ToolTip.Tip="Clear Step 2 result and all downstream results.">
+            <controls:FontIcon Classes="symbols iconSm"
+                               Glyph="{x:Static icons:IconGlyphs.Delete}"/>
+          </Button>
+        </Grid>
+        <Border Classes="workflowStepStatusStrip">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <Border Classes="workflowStepMetricTile">
+              <StackPanel Spacing="{StaticResource Space2}">
+                <SelectableTextBlock Classes="workflowStepMetricLabel"
+                                     Text="Freeform threshold"/>
+                <SelectableTextBlock Classes="workflowStepMetricText"
+                                     Text="{Binding FreeformAxisThreshold, StringFormat='{}{0:0.##} · settings control XY / edge spill / load auto-run'}"/>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+        <Button Content="Detect freeform"
+                Command="{Binding AutoDetectFreeformsCommand}"
+                HorizontalAlignment="Stretch"
+                ToolTip.Tip="Step 2: auto-label freeform type from overlap distribution."/>
+        <Border Classes="workflowStepSubsection"
+                IsVisible="{Binding HasFreeformAutoDetectRows}">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <SelectableTextBlock Text="{Binding FreeformAutoDetectSummary}"
+                                
+                                 Foreground="{DynamicResource BrushTextMuted}"
+                                 TextWrapping="Wrap"/>
+            <Grid ColumnDefinitions="2*,Auto,Auto">
+              <SelectableTextBlock Grid.Column="0"
+                                   Text="Type"
+                                   FontWeight="SemiBold"/>
+              <SelectableTextBlock Grid.Column="1"
+                                   Text="Count"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Right"/>
+              <SelectableTextBlock Grid.Column="2"
+                                   Text="Ratio"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Right"
+                                   Margin="{StaticResource InsetLeft10}"/>
+            </Grid>
+            <ItemsControl ItemsSource="{Binding FreeformAutoDetectRows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="2*,Auto,Auto">
+                    <SelectableTextBlock Grid.Column="0" Text="{Binding Type}"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Text="{Binding CountText}"
+                                         HorizontalAlignment="Right"/>
+                    <SelectableTextBlock Grid.Column="2"
+                                         Text="{Binding RatioText}"
+                                         HorizontalAlignment="Right"
+                                         Margin="{StaticResource InsetLeft10}"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <SelectableTextBlock Text="Manual override (selected regular pads)"/>
+        <Grid Classes="panelActionRow"
+              ColumnDefinitions="*,*,*,*"
+              ColumnSpacing="{StaticResource Space6}">
+          <Button Grid.Column="0"
+                  Content="None"
+                  Command="{Binding SetFreeformNoneCommand}"
+                  ToolTip.Tip="Mark selection as none."/>
+          <Button Grid.Column="1"
+                  Content="X"
+                  Command="{Binding SetFreeformXCommand}"
+                  ToolTip.Tip="Mark selection as X-way."/>
+          <Button Grid.Column="2"
+                  Content="Y"
+                  Command="{Binding SetFreeformYCommand}"
+                  ToolTip.Tip="Mark selection as Y-way."/>
+          <Button Grid.Column="3"
+                  Content="XY"
+                  Command="{Binding SetFreeformXYCommand}"
+                  ToolTip.Tip="Mark selection as XY-way."/>
+        </Grid>
+      </StackPanel>
+    </controls:HidePanelBlock>
+</UserControl>
+
