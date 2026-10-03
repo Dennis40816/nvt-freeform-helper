@@ -134,7 +134,10 @@ public sealed record NotchV22TargetCoverageProjection(
     IReadOnlyList<NotchV22TargetAllocation> EmittedTargets,
     int? RawCombinedPercent,
     double DisplayCombinedRatio,
-    bool HasCombinedOverflowRisk);
+    bool HasCombinedOverflowRisk)
+{
+    public bool HasEmittedTargetMembership { get; init; } = true;
+}
 
 public sealed record NotchV22TargetAllocation(
     int IcIndex,
@@ -173,7 +176,10 @@ public static class NotchV22TargetAllocationPolicy
         ArgumentNullException.ThrowIfNull(targets);
         if (!anchorIcIndex.HasValue || !sourceDiffIndex.HasValue)
         {
-            return ProjectCompatibilityDisplay(targets, [], fallbackCombinedRatio);
+            return ProjectCompatibilityDisplay(targets, [], fallbackCombinedRatio) with
+            {
+                HasEmittedTargetMembership = false,
+            };
         }
 
         var anchorIc = anchorIcIndex.Value;

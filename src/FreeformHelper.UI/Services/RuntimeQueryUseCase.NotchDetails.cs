@@ -63,7 +63,8 @@ internal sealed partial class RuntimeQueryUseCase
         var display = NotchDisplayProjector.Build(
             compensation,
             allocation,
-            cacheEntry.DiagnosticsText);
+            cacheEntry.DiagnosticsText,
+            cad.Notch?.ComputationMode ?? helper.CurrentNotchComputationMode);
         var returnedTargets = allocation.Targets
             .Take(targetLimit)
             .Select(target => new

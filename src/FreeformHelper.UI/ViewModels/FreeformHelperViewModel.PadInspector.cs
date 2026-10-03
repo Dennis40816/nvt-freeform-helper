@@ -1,4 +1,5 @@
 using FreeformHelper.Application.Services;
+using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 
@@ -9,6 +10,8 @@ public sealed partial class FreeformHelperViewModel
     private const int MaxInspectorMatchDetailLines = 8;
     private static readonly char[] ToFullDiagnosticsLineSeparators = ['\r', '\n'];
     private static readonly char[] ToFullDiagnosticsOwnerSeparators = ['|', ';'];
+
+    internal NotchComputationMode CurrentNotchComputationMode => _projectFile.Settings.Notch.ComputationMode;
 
     public PadInspectorSnapshot? BuildCadPadInspectorSnapshot(
         int cadPadId,
@@ -123,7 +126,8 @@ public sealed partial class FreeformHelperViewModel
                     ? precomputedDiagnostics ?? BuildToFullDiagnosticsText(resolvedCompensation)
                     : null)
             {
-                TargetCoverageProjection = resolved.TargetAllocation.TargetCoverageProjection
+                TargetCoverageProjection = resolved.TargetAllocation.TargetCoverageProjection,
+                ComputationMode = CurrentNotchComputationMode
             };
         }
         else if (!includeExpensiveNotchDetails && _grid is not null)
