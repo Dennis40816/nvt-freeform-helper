@@ -91,12 +91,12 @@ public sealed class PadInfoViewModelTests
         const double cadArea = 4570.0;
         const double cadHeight = 5.4;
         const double emittedArea = 18.09;
-        const double roundedZeroArea = 0.04;
+        const double roundedZeroArea = 18.0; // Q7-positive CAD allocation with rounded-zero regular coverage.
         const double strictOverlapRatio = 0.00398;
         var anchorMaxX = (cadArea - emittedArea - roundedZeroArea) / cadHeight;
         var emittedMaxX = anchorMaxX + (emittedArea / cadHeight);
         var cadMaxX = emittedMaxX + (roundedZeroArea / cadHeight);
-        var gridMaxX = emittedMaxX + 0.9;
+        var gridMaxX = emittedMaxX + 400.0;
         var cad = TestGeometryFactory.CreateCadPad(274, "AA", 0, 0, cadMaxX, cadHeight);
         var anchor = TestGeometryFactory.CreateRegularPad(
             0, 0, 4808, 0, 0, anchorMaxX, 10, diffIndex: 83);
@@ -119,6 +119,8 @@ public sealed class PadInfoViewModelTests
             yEdges: [0, 10],
             pads: regulars);
         var activeRegularPadIds = regulars.Select(static regular => regular.RegularPadId).ToHashSet();
+        Assert.Equal(1, Assert.Single(NotchAllocationService.BuildAllocations(cad, grid),
+            allocation => allocation.Pad.DiffIndex == roundedZero.DiffIndex).Q7);
         var compensation = NotchV22CompensationService.Compute(
             cad,
             grid,
@@ -195,7 +197,7 @@ public sealed class PadInfoViewModelTests
             ["IC1/diff83", "IC1/diff84", "IC1/diff85"],
             vm.TargetAllocationItems.Select(static item => item.DiffText));
         Assert.Equal(
-            ["4551.87 mm²", "18.09 mm²", "0.04 mm²"],
+            ["4533.91 mm²", "18.09 mm²", "18 mm²"],
             vm.TargetAllocationItems.Select(static item => item.AreaText));
         Assert.Equal(
             [4808, 4809, 4810],

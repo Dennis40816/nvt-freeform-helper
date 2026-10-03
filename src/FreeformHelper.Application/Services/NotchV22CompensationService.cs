@@ -33,7 +33,7 @@ public sealed partial class NotchV22CompensationService
     {
         ArgumentNullException.ThrowIfNull(cad);
         ArgumentNullException.ThrowIfNull(grid);
-        var allocations = BuildCompensationAllocations(cad, grid);
+        var allocations = NotchAllocationService.BuildAllocations(cad, grid);
         var strictOverlapRatio = NormalizeStrictOverlapRatio(strictOverlapRatioOverride);
         return new NotchV22CompensationContext(
             cad,
@@ -81,7 +81,7 @@ public sealed partial class NotchV22CompensationService
         ArgumentNullException.ThrowIfNull(cad);
         ArgumentNullException.ThrowIfNull(grid);
         var strictOverlapRatio = NormalizeStrictOverlapRatio(strictOverlapRatioOverride);
-        var allocations = precomputedAllocations ?? BuildCompensationAllocations(cad, grid);
+        var allocations = precomputedAllocations ?? NotchAllocationService.BuildAllocations(cad, grid);
         IReadOnlyList<CadPad> boundaryCadPool = sharedBoundaryQueryContext is null
             ? BuildAllCadPads(cad, allCadPads)
             : Array.Empty<CadPad>();

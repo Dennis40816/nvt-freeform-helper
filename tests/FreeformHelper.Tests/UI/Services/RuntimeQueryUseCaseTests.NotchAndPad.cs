@@ -15,12 +15,12 @@ public sealed partial class RuntimeQueryUseCaseTests
         const double cadArea = 4570.0;
         const double cadHeight = 5.4;
         const double emittedArea = 18.09;
-        const double roundedZeroArea = 0.04;
+        const double roundedZeroArea = 18.0; // Q7-positive CAD allocation with rounded-zero regular coverage.
         var anchorMaxX = (cadArea - (2 * emittedArea) - roundedZeroArea) / cadHeight;
         var emittedMaxX = anchorMaxX + (emittedArea / cadHeight);
         var secondEmittedMaxX = emittedMaxX + (emittedArea / cadHeight);
         var cadMaxX = secondEmittedMaxX + (roundedZeroArea / cadHeight);
-        var gridMaxX = secondEmittedMaxX + 2.0;
+        var gridMaxX = secondEmittedMaxX + 800.0;
         var shell = new ShellViewModel();
         var helper = shell.FreeformHelper;
         var cad = CreateCadPad(274, 0, 0, cadMaxX, cadHeight);
@@ -43,17 +43,21 @@ public sealed partial class RuntimeQueryUseCaseTests
         helper.EnableToRegular = true;
         helper.EnableToFull = true;
         helper.ToFullStrictOverlapPercent = 0.1m;
+        helper.EnableBoundaryVirtualAreaCap = true;
         SetPrivateField(helper, "_cad", new CadPadSet([cad]));
-        SetPrivateField(helper, "_grid", new RegularGrid(
+        var grid = new RegularGrid(
             rows: 1,
             cols: 4,
             xEdges: [0, anchorMaxX, emittedMaxX, secondEmittedMaxX, gridMaxX],
             yEdges: [0, 10],
-            pads: regulars));
+            pads: regulars);
+        SetPrivateField(helper, "_grid", grid);
         GetPrivateDictionary<int, int>(helper, "_cadOutputFwDiffIndexByCadId")[cad.Id] = 83;
         GetPrivateDictionary<int, int>(helper, "_cadIcIndexByCadId")[cad.Id] = 0;
         SetPrivateField(helper, "_isWorkflowDataSnapshotCacheValid", false);
 
+        Assert.Equal(1, Assert.Single(NotchAllocationService.BuildAllocations(cad, grid),
+            allocation => allocation.Pad.DiffIndex == 86).Q7);
         var resolved = Assert.IsType<NotchV22ResolvedResult>(helper.GetCadV22ResolvedResult(cad.Id));
         var snapshot = Assert.IsType<PadInspectorSnapshot>(helper.BuildCadPadInspectorSnapshot(cad.Id));
         var inspector = Assert.IsType<PadInspectorNotchSnapshot>(snapshot.Cad?.Notch);

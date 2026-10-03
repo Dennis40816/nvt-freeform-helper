@@ -13,7 +13,7 @@ public sealed class NotchV22CompensationServiceTests
     [InlineData(NotchCompensationModel.CurrentGain)]
     [InlineData(NotchCompensationModel.ConservativeNoGain)]
     [InlineData(NotchCompensationModel.Disabled)]
-    public void A1Fact5_CadAllocation_Q7ZeroKeepsRawOwnerOverlapButEmitsNoCandidate(NotchCompensationModel model)
+    public void A1Fact5_CadAllocation_Q7ZeroOwnerAndReaderAgreeAndEmitNoCandidate(NotchCompensationModel model)
     {
         var grid = CreateGrid(Grid10, Grid10);
         var cad = CreateCadRect(0, 0, 2570, 10);
@@ -35,26 +35,28 @@ public sealed class NotchV22CompensationServiceTests
         var switches = settings.Notch.ResolveStep3Switches();
         var ownerContext = NotchV22CompensationService.CreateContext(
             cad, grid, switches.EnableToRegular, switches.EnableToFull);
-        var rawAllocations = (IReadOnlyList<NotchAllocation>)ownerContext.GetType()
+        var ownerAllocations = (IReadOnlyList<NotchAllocation>)ownerContext.GetType()
             .GetProperty("Allocations", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
             .GetValue(ownerContext)!;
-        var raw = Assert.Single(rawAllocations);
-        Assert.Equal(1.0 / 257.0, raw.Ratio, 12);
-        Assert.Equal(0, raw.Q7);
+        Assert.Empty(ownerAllocations);
         var owner = NotchV22CompensationService.Compute(ownerContext);
-        Assert.Equal(100, owner.OverlapAreaTotal);
-        Assert.Equal(1, owner.OverlapRegularCount);
-        Assert.Equal(100, Assert.Single(owner.RegularDebugInfos).SourceArea);
+        Assert.Equal(0, owner.OverlapAreaTotal);
+        Assert.Equal(0, owner.OverlapRegularCount);
+        Assert.Empty(owner.RegularDebugInfos);
         var resolved = new NotchV22ResolvedResultService().Build(
             cad, owner, 0.001, 0, regular.DiffIndex, NotchV22TargetAllocationPolicy.ResolveAreaMode(model));
-        Assert.Equal(100, Assert.Single(resolved.TargetAllocation.Targets).RatioPercentRounded);
+        Assert.Empty(resolved.TargetAllocation.Targets);
 
         var readerAllocations = NotchAllocationService.BuildAllocations(cad, grid);
         Assert.Empty(readerAllocations);
         var readerCompensation = NotchV22CompensationService.Compute(
             cad, grid, switches.EnableToRegular, switches.EnableToFull, precomputedAllocations: readerAllocations);
         Assert.Equal(0, readerCompensation.OverlapAreaTotal);
+        Assert.Equal(0, readerCompensation.OverlapRegularCount);
         Assert.Empty(readerCompensation.RegularDebugInfos);
+        var readerResolved = new NotchV22ResolvedResultService().Build(
+            cad, readerCompensation, 0.001, 0, regular.DiffIndex, NotchV22TargetAllocationPolicy.ResolveAreaMode(model));
+        Assert.Empty(readerResolved.TargetAllocation.Targets);
         var generated = new NotchTableGenerator().GenerateCadAllocationResolvedBatch(new CadPadSet([cad]), grid, settings);
         Assert.Equal(0, generated.Table.GenerationPhaseTimings.CandidateBreakdown?.CandidateCount);
         Assert.Empty(generated.Table.Rows);
@@ -65,8 +67,11 @@ public sealed class NotchV22CompensationServiceTests
     private static readonly double[] Grid10x20 = [10.0, 20.0];
     private static readonly double[] Grid10x3 = [10.0, 10.0, 10.0];
 
-    [Fact]
-    public void BuildAllocations_UsesAwayFromZeroAtV21ThresholdHalfStep()
+    [Theory]
+    [InlineData(NotchCompensationModel.CurrentGain)]
+    [InlineData(NotchCompensationModel.ConservativeNoGain)]
+    [InlineData(NotchCompensationModel.Disabled)]
+    public void BuildAllocations_UsesAwayFromZeroAtV21ThresholdHalfStep(NotchCompensationModel model)
     {
         var grid = TestInfrastructure.TestGeometryFactory.CreateRegularGrid(rows: 1, cols: 1);
         var cad = TestInfrastructure.TestGeometryFactory.CreateCadPad(800, "AA", 0, 0, 256, 1);
@@ -75,6 +80,21 @@ public sealed class NotchV22CompensationServiceTests
 
         Assert.Equal(1.0 / 256.0, allocation.Ratio, 12);
         Assert.Equal(1, allocation.Q7);
+
+        var switches = new NotchSettings { CompensationModel = model }.ResolveStep3Switches();
+        var owner = NotchV22CompensationService.Compute(NotchV22CompensationService.CreateContext(
+            cad, grid, switches.EnableToRegular, switches.EnableToFull));
+        var reader = NotchV22CompensationService.Compute(
+            cad, grid, switches.EnableToRegular, switches.EnableToFull, precomputedAllocations: [allocation]);
+        foreach (var compensation in new[] { owner, reader })
+        {
+            Assert.Equal(1, compensation.OverlapAreaTotal);
+            Assert.Equal(1, compensation.OverlapRegularCount);
+            Assert.Equal(1, Assert.Single(compensation.RegularDebugInfos).SourceArea);
+            var resolved = new NotchV22ResolvedResultService().Build(
+                cad, compensation, 0.001, 0, grid.Pads[0].DiffIndex, NotchV22TargetAllocationPolicy.ResolveAreaMode(model));
+            Assert.Equal(100, Assert.Single(resolved.TargetAllocation.Targets).RatioPercentRounded);
+        }
     }
 
     [Fact]
