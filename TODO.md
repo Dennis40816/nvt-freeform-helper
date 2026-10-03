@@ -87,6 +87,13 @@
   - 修正：展開時的 `ConsoleText` 通知與 collection change 共用同一個排程；刷新執行時讀最新文字，沿用原有渲染、連結解析與 auto-follow 路徑。`ShellViewModel` 的文字語意與去重未更動。
   - 量測：headless console 展開後連續加入 200 筆 log，修改前完整 link parse **202 次**，修改後 **1 次**；新測試在修改前因 `202` 超出 `1..2` 而失敗，修改後通過。測試同時核對最終 editor 文字、離開底部時維持捲動位置、在底部時繼續跟隨，以及字級與篩選顯示。
 
+- [x] **S15.020 console 自動跟隨測試先於排版與捲動完成斷言（S15.013 後續，2026-10-03 修正）**
+  - 現象：GitHub runner 曾有一次 `TerminalStartupPathTests.ConsoleExpanded_LogBurst_ParsesLatestTextOnce` 在加入 `while following latest line` 後，底部距離 `ExtentHeight - VerticalOffset - ViewportHeight <= 1` 的斷言失敗；本機通過。
+  - 可能原因（候選，未重現）：`tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs:312` 的 `FlushUiQueueAsync` 只等待 Background、Loaded、Render、Background 的空 callback，不保證後續排版與捲動完成。`src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleHost.cs:35` 將展開時的文字通知交給共用 refresh，`src/FreeformHelper.UI/Views/FreeformHelperView.Console.Events.cs:72` 排到 Background；refresh 在 `:174` 先讀取跟隨狀態再更新文字與捲動，而 `src/FreeformHelper.UI/Views/FreeformHelperView.Console.Rendering.cs:217` 的文字更新亦使排版失效，因此一次 flush 不是捲動完成的條件。
+  - 變更：僅修改該測試，沿用 `FlushUiQueueAsync`，每輪 flush 完成後以 `Stopwatch` 檢查 5 秒重試期限（flush 本身沒有 timeout，dispatcher 停滯時不會因此退出）；新增 log 前等待已捲到底，新增後等待最新文字出現且底部距離仍 <= 1。條件達成即結束，不加固定 sleep；保留解析次數、捲動距離與篩選斷言，不變更 production，也不新增共用 helper。
+  - 驗證：沙箱內測試專案離線 build 2 次，均為 0 warnings／0 errors；`TerminalStartupPathTests` 修改前 8/8、修改後連續 6 輪共 48/48 通過，0 failed／0 skipped。`verify.ps1 -StructureOnly` 與 `git diff --check` 通過，兩個修改檔均為 CRLF；沙箱不支援 lint，未執行。
+  - 未能驗證：runner 失敗只觀察到一次，未在受控環境重現該次排程，也未取得當時的排版／捲動 trace；本機通過不能證明 runner 後續永不再失敗。
+
 - [ ] **S15.017 console link 解析仍每次重掃整份文字（production 效能，待量測）**
   - `ConsoleLinkParser.Parse` 對完整文字執行六個 regex，並對候選路徑查詢檔案系統；S15.013 只減少呼叫次數，單次成本仍隨 console 長度成長。
   - 待辦：先量測長 console 的單次解析成本，再評估增量解析新增行；須維持舊行 offset、截斷、篩選與可點擊連結的等價性。
