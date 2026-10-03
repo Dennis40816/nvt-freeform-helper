@@ -90,6 +90,8 @@
 - [ ] **S15.017 console link 解析仍每次重掃整份文字（production 效能，待量測）**
   - `ConsoleLinkParser.Parse` 對完整文字執行六個 regex，並對候選路徑查詢檔案系統；S15.013 只減少呼叫次數，單次成本仍隨 console 長度成長。
   - 待辦：先量測長 console 的單次解析成本，再評估增量解析新增行；須維持舊行 offset、截斷、篩選與可點擊連結的等價性。
+  - 量測（2026-10-03，由佇列的 codex 執行；已量測，未實作）：以合成 console（含 URL 與本機暫存檔案路徑，並核對 target、offset、長度、line/column）呼叫 `ConsoleLinkParser.Parse`，暖機後各量 5 次取中位數：27,600 字元／200 個 link 約 49 ms；276,000 字元／2,000 個 link 約 539 ms；2,760,000 字元／20,000 個 link 約 28.2 秒。成本隨輸入超線性成長（文字與 link 數同時放大 10 倍，時間約放大 11 倍、再放大 52 倍），但這個負載同時增加文字與 link，尚未隔離是文字長度還是 link／檔案查詢造成的。`ShellViewModel` 另有 `ConsoleRenderTailSourceLineLimit = 4000` 的渲染尾端上限；是否限制了送進 parser 的長度尚未核對，所以還不能說實際使用會碰到大尺寸。
+  - 量測測試碼未保留在 repo：單一量測類別執行約 2.5 分鐘，不適合放進測試套件。下一步：先核對實際送進 parser 的長度（尾端 4000 行），在那個大小量單次成本；若仍明顯，再評估增量解析。
 
 - [x] **S15.015 多個 thread 同時改寫 log 的 UI 集合，弄壞 `ShellViewModel` 的 console 緩衝（2026-10-02 修正）**
   - 現象：限制核心數的整套測試中，dispatcher 上的工作偶爾丟出 `ArgumentOutOfRangeException: Index was out of range ... (Parameter 'chunkLength')`。9 輪中有 3 輪出現；其中 2 輪發生在測試結束之後（被 S15.002 根因八的防護攔下），1 輪發生在測試進行中，讓 `FreeformHelperViewModel_OutsideUiDispatcher_KeepsCanvasColorDefaults` 失敗並連帶弄壞 session（另外 2 個測試快速失敗）。
