@@ -6,6 +6,8 @@
 
 交付依序為三個 PR，疊加於 `origin/1.3.x = 2c1c0c84`：PR-A 在另一分支，以 `NotchDisplayProjector` 讓 Disabled-target 顯示與 generator 一致（owner 決定「make the screen agree with the generator」），只改顯示數字；PR-B 為本樹截至 `2e3cbd08` 的 R13.104 safety-text centralization、R13.102 resolved readers（含 PadInfo `resolvedDisplayInput`）、A1 facts 刻畫與 duplicate removal，output zero-diff；PR-C 為 `4d54b35d` 的 R13.102a-5，診斷與 warm export 共用 Q7-positive allocation 集合，包含第 6 節揭露的 firmware corner case，須 owner 明確核准。文中的 commit SHA 是私有主幹上的識別；公開 repo 以補丁重建這些 commit，SHA 不同、內容相同，對照時以 commit 標題為準。
 
+更新（2026-10-04）：本文撰寫時，PR-C 的 firmware corner case 尚待 owner 明確核准，C 類退出條件仍是提案。之後 owner 已在 GitHub 核准 PR-C（公開 repo 的 pull request #3，head `9810edf9`）並在聊天明確核准該 corner case（經 Commander 轉述；PR-C 已合併），且決定以 A1、A2 收口、C1–C6 不擋結案。下文各處「仍須 owner 明確核准」「尚待確認」均為撰寫時的狀態，條件已滿足。
+
 ## 1. 已完成的 R13.*
 
 | 已完成項目 | 已記錄的成果與依據 |
