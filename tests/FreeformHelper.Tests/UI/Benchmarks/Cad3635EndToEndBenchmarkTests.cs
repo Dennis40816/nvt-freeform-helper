@@ -35,6 +35,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
         var iterations = GetPositiveInt(IterationsEnv, 3);
         var warmupIterations = GetNonNegativeInt(WarmupEnv, 1);
         var projectPath = Path.Combine(TestPaths.RepoRoot, "example", "BOE36.35", "project_3635.json");
+        using var fixture = ExampleProjectFixture.Create(projectPath);
         var outputPath = ResolveOutputPath(Environment.GetEnvironmentVariable(OutputEnv));
         var exportDirectory = Path.Combine(TestPaths.RepoRoot, "build", "perf", "3635-e2e-export");
         Directory.CreateDirectory(exportDirectory);
@@ -53,7 +54,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
                 samples.Add(await RunSampleAsync(
                     run + 1,
                     run < warmupIterations,
-                    projectPath,
+                    fixture.ProjectPath,
                     exportDirectory));
             }
 
