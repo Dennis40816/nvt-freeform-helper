@@ -1,6 +1,8 @@
 # Issue tracker: GitHub
 
-FreeformHelper 的規格與可執行 tickets 以 GitHub Issues 為唯一 tracker，repository 為 `Dennis40816/FreeformHelper`。
+FreeformHelper 的規格與可執行 tickets 以 GitHub Issues 為唯一 tracker，repository 為 `Dennis40816/nvt-freeform-helper`。
+
+舊 issue 與舊 PR 不搬移；私有 `Dennis40816/FreeformHelper` 完成封存後，它們仍保留在原 repo。`TODO.md` 與文件中指向 `Dennis40816/FreeformHelper` 的舊 issue 連結不改寫。
 
 ## Conventions
 
