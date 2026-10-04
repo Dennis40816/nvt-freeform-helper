@@ -18,28 +18,6 @@ public sealed partial class NotchV22CompensationService
         return allCad;
     }
 
-    private static List<NotchAllocation> BuildCompensationAllocations(CadPad cad, RegularGrid grid)
-    {
-        var allocations = new List<NotchAllocation>();
-        var cadArea = Math.Max(cad.Area, AreaEpsilon);
-        foreach (var regularPad in RegularGridCandidateQuery.QueryByBounds(grid, cad.Bounds))
-        {
-            var overlapArea = Polygon2.IntersectionAreaWithRect(cad.Polygon, regularPad.Bounds);
-            if (overlapArea <= AreaEpsilon)
-            {
-                continue;
-            }
-
-            var ratio = overlapArea / cadArea;
-            allocations.Add(new NotchAllocation(
-                regularPad,
-                ratio,
-                NotchThresholdQ7Contract.EncodeFraction(ratio)));
-        }
-
-        return allocations;
-    }
-
     private static StageAOverlapResult RunStageACollectOverlaps(
         CadPad cad,
         IReadOnlyList<NotchAllocation> allocations)
