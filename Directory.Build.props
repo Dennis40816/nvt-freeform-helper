@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)VERSION').Trim())</Version>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <BaseOutputPath Condition="'$(ArtifactsPath)' == ''">$(MSBuildThisFileDirectory)build\bin\$(MSBuildProjectName)\</BaseOutputPath>
     <BaseIntermediateOutputPath Condition="'$(ArtifactsPath)' == ''">$(MSBuildThisFileDirectory)build\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
