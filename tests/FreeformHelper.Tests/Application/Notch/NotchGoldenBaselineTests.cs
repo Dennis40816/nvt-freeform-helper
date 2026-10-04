@@ -57,10 +57,11 @@ public sealed class NotchGoldenBaselineTests
         var projectPath = Path.Combine(
             TestPaths.RepoRoot,
             projectRelativePath.Replace('/', Path.DirectorySeparatorChar));
+        using var fixture = ExampleProjectFixture.Create(projectPath);
 
         var vm = new FreeformHelperViewModel
         {
-            PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
+            PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath),
         };
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
