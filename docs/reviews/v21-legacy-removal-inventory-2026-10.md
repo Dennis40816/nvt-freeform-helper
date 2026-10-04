@@ -2,7 +2,7 @@
 
 ## 目的、範圍與證據界線
 
-本文件供 owner 後續決定「V21／Legacy 完全移除」的範圍與版本。Owner 已確認「2.1」指 Notch V21；目標版本未訂，本文件不提出版本、日期或執行授權。依 `TODO.md` 與 `docs/guides/refactor-roadmap-1.3.x.md` 的 2026-10-03 決定，現階段保留 V21／Legacy 原行為與 zero-diff gates，不再投入額外 legacy 收斂／等價性工作。
+本文件供 owner 後續決定「V21／Legacy 完全移除」的範圍與版本。Owner 已確認「2.1」指 Notch V21；owner 決定（2026-10-04，經 Commander 轉述）完全移除排在 1.3.x 之後，範圍之後再定，之前不做隱性轉換；目標版本未訂，本文件不提出版本、日期或執行授權。依 `TODO.md` 與 `docs/guides/refactor-roadmap-1.3.x.md` 的 2026-10-03 決定，現階段保留 V21／Legacy 原行為與 zero-diff gates，不再投入額外 legacy 收斂／等價性工作。
 
 盤點基準為分支 `feature/queue/v21-legacy-removal-inventory`、commit `7477b07d3969ad6ad15960d0d1ac8b60ef37a9bc`。先讀 `AGENTS.md`、依賴圖及 domain/reference 文件；現有五個專案的 `ProjectReference` 與依賴圖一致，無須重建。沒有 `.codegraph/`，使用限定於 `src/`、`tests/`、`scripts/`、`docs/` 與根目錄文件的搜尋。
 

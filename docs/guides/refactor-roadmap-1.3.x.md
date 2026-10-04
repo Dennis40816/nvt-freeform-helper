@@ -35,8 +35,8 @@
 - `LegacyRegularAnchor`（重新匯出已交付 project）：答覆「不確定，先保留」；據此：`R13.101c-2` 與 `R13.102` 中僅涉及 legacy 的部分暫緩；既有 zero-diff gates 繼續保護它。
 - 後續答覆（2026-10-03；問題為 `R13.101c-2`／`R13.103` 是否繼續，保留經等價性測試的 Legacy 相容 adapter，或維持暫緩）：owner 原話「先保留吧 但後續目標會是完全移除2.1」。
 - 確認（owner 2026-10-03 在畫面回覆「V21」）：「2.1」指 V2.1，即 V21（本庫 roadmap／TODO 使用「final V2.1 projector」），不是 release 版本 2.1。
-- 後續答覆取代先前對 `R13.101c-2`／`R13.103` 及 `R13.102` 純 legacy 部分的「暫緩」後果：V21 與 Legacy 維持原樣，由既有 zero-diff gates 保護；不再投入額外收斂／等價性工作；完全移除是後續目標，版本未訂。本次只記錄，不變更任務狀態。
-- 1.3.1 退出稽核 B1／B2：已接受例外（owner 決定 2026-10-03），不執行；A1、A2 仍待完成，C 類是否不列入表格退出仍是提案，尚待 owner 確認。
+- 後續答覆取代先前對 `R13.101c-2`／`R13.103` 及 `R13.102` 純 legacy 部分的「暫緩」後果：V21 與 Legacy 維持原樣，由既有 zero-diff gates 保護；不再投入額外收斂／等價性工作；完全移除是後續目標，版本未訂。owner 決定（2026-10-04，經 Commander 轉述）排在 1.3.x 之後，範圍之後再定，之前不做隱性轉換。本次只記錄，不變更任務狀態。
+- 1.3.1 退出稽核 B1／B2：已接受例外（owner 決定 2026-10-03），不執行；A1、A2 仍待完成，owner 已於 2026-10-04 決定（經 Commander 轉述）以 A1、A2 收口，C1–C6 不擋結案；此提案已被取代。
 - Step4 mapping 與 Step6 validation diagnostics：答覆「移到未編號的診斷區」；據此：Owner 確認 `R13.305a` 已寫明的方向。
 - 視覺重設計：答覆「先不改視覺」；據此：1.x 只重整結構，不採用新的視覺語言或重設 token set；結構變更所迫使的範圍以外，任何會改變畫面的變更都需另取得 owner 決定。
 
@@ -323,7 +323,7 @@ flowchart LR
 - 相對 `87cf59a` production 淨減 `-1 physical / -1 nonblank`；兩次 deterministic Release總量皆為 `15,314,944 bytes`，僅 UI hash因本 slice改為 `B1AC7878…1881`、其 bytes仍為 `14,523,392`。Targeted 10、notch-core 130、ui-core 237、golden 6、GCC exporter/parity 15、RuntimeQuery 13 tests與 hidden UI/IPC正反 gate皆通過，V21/V22 golden、export state與budget不變。
 - `R13.101c-2` 仍未完成：R13.102a-2a 已從 normal `CadAllocation` resolved-batch settings fingerprint 移除 enabled versions、threshold、`NullValue` 與 target guard/cap，matching export可重用同一 candidate batch再投影當下 request；R13.101c-2a [#64](https://github.com/Dennis40816/FreeformHelper/issues/64) 再把live UI guard/cap settings固定為final-projection-only，保留Step3 revision、per-CAD sparse identity與export batch，只失效Step5 projected table／validation並通知Simulation；R13.102a-2b-1 [#66](https://github.com/Dennis40816/FreeformHelper/issues/66) 已在既有generation boundary以cache epoch、final-projection revision與source revision拒絕in-flight stale completion，R13.102a-2b-2 [#68](https://github.com/Dennis40816/FreeformHelper/issues/68)／[#76](https://github.com/Dennis40816/FreeformHelper/issues/76) 再完成並行full task與目前單一selected sparse result的bounded bridge。此parent仍未完成：其餘result shape／consumer尚未證明repository-wide共用，`LegacyRegularAnchor`仍保留request-specific table identity，repository-wide final-output cache／projector boundary亦待R13.103完成。
 - owner 2026-10-03：`LegacyRegularAnchor` 是否仍需重新匯出已交付 project 尚未確定，暫時保留；`R13.101c-2` 暫緩，既有 zero-diff gates 繼續保護它。
-- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
+- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；owner 決定（2026-10-04，經 Commander 轉述）排在 1.3.x 之後，範圍之後再定，之前不做隱性轉換；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
 - R13.101c-2a以public direct UI與Settings Save fixtures鎖guard/cap-only不重算Step3、retained batch命中與fresh projection byte-exact；三種behavior mutation與public enum ABI contract各自RED。final-projection invalidation由settings plan的具名internal flag承載，public policy surface／enum values不變。相對`74301a3` production／logic-first皆為`0 files / +22 physical / +19 nonblank`，0新dependency/service/cache/session；兩次fresh isolated Release完全一致，總DLL增加`512 bytes`且只變更UI。Focused 5、notch-core 182、Application 218、ui-core 264、smoke 25、UI build、lint/analyzer與hidden UI/IPC正反gate皆通過；signed C維持V21 `692 / 130979 / 8961B815…E57488`、V22 `548 / 84023 / 5208068B…57BB47`，selection p95為`27/15/15`與`28/16/15 ms`，Standards／Spec／simplification findings均已修正；不宣稱效能提升。
 - `R13.101d-1` 已由 [#20](https://github.com/Dennis40816/FreeformHelper/issues/20) 完成 normal `CadAllocation` 的 computation-input freeze：private `CadAllocationGenerationContext` 統一持有 profiles／allocations、per-IC CAD pools、boundary query/index evidence、owned active-regular／CAD-output snapshots、grid/CAD references、strict ratio與已解析的 compensation／switch／rule／boundary／allocation policy。三個 candidate helpers 只接收此 context，不再接收或重讀 mutable `ProjectSettings`／`NotchSettings`；Enabled outputs、threshold、`NullValue`、target guard/cap 仍只屬獨立 final projection request。這不是 R13.102 resolved batch/task，也沒有改動 `LegacyRegularAnchor` compatibility dispatch。
 - Freeze boundary 精確保留既有 callback 時序：BuildProfiles 完成後才擁有化 caller set/map並建立pool／strict／boundary prerequisites；phase-2 initial progress callback返回後才一次凍結其餘 computation policy與projection request。Public同步progress seam鎖phase-2 `ProcessedCount=0/1`、cap-50 V2.1/V2.2 exact rows、enabled-output／`NullValue` snapshot與caller collection ownership；reflection architecture guard則鎖三個candidate helpers不再依賴settings types。
@@ -366,7 +366,7 @@ flowchart LR
 ### R13.103 Export projection 與 formatter 分離
 
 - owner 2026-10-03：V21 firmware C output 尚未確定，暫時保留；本項 final projection／formatter 分離（含 legacy convergence）暫緩，不得開始移除或變更 V21 output 與舊 project 對它的讀取路徑。
-- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
+- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；owner 決定（2026-10-04，經 Commander 轉述）排在 1.3.x 之後，範圍之後再定，之前不做隱性轉換；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
 - `NotchFirmwareCExporter` 已位於 Application 層；本項不是「搬到 Application」。
 - 把 version-specific final Firmware node projection（V21 destination-oriented、V22 source-oriented）、version threshold、null／continuation／ordering rule 收斂為唯一允許的版本分岔邊界與可測試 result model。
 - exporter 最終只負責 C text formatting 與 fixed contract emission。
