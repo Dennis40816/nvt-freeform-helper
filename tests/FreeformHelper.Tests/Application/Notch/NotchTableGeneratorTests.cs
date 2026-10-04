@@ -745,6 +745,95 @@ public sealed class NotchTableGeneratorTests
         }
     }
 
+    [Theory]
+    [InlineData(NotchAlgorithmVersion.V21)]
+    [InlineData(NotchAlgorithmVersion.V22)]
+    public void A1Fact5_CadAllocation_Q7ZeroAndPositiveAllocationsExportIdenticallyWarmAndCold(
+        NotchAlgorithmVersion version)
+    {
+        var cad = CreateCadWithBounds(0, 0, 2570, 10);
+        var anchor = new RegularPad(0, 1, 1, CreateCadWithBounds(10, 0, 2570, 10).Pads[0].Polygon)
+        {
+            IcIndex = 0,
+            DiffIndex = 1,
+            Freeform = FreeformType.XWay,
+            MatchedCadPadId = cad.Pads[0].Id,
+            MatchScore = 1.0,
+        };
+        var xEdges = new[] { 0.0, 10.0, 2570.0 };
+        var yEdges = new[] { 0.0, 10.0 };
+        var grid = new RegularGrid(1, 2, xEdges, yEdges, new[] { CreateGrid().Pads[0], anchor });
+        var settings = new ProjectSettings
+        {
+            Notch = new NotchSettings
+            {
+                ComputationMode = NotchComputationMode.CadAllocation,
+                CompensationModel = NotchCompensationModel.ConservativeNoGain,
+                MultiOwnerStrictOverlapPercent = 0.1,
+                ThresholdQ7 = 0,
+                ThresholdPercentV22 = 0,
+                EnabledVersions = new HashSet<NotchAlgorithmVersion> { version },
+            },
+        };
+        const double strictOverlapRatio = 0.001;
+        var target = cad.Pads[0];
+        var context = NotchV22CompensationService.CreateContext(
+            target, grid, enableToRegular: true, enableToFull: true,
+            allCadPads: cad.Pads, strictOverlapRatioOverride: strictOverlapRatio,
+            enableToFullRuleEngine: settings.Notch.EnableToFullRuleEngine,
+            enableToFullRuleTrace: settings.Notch.EnableToFullRuleTrace,
+            enableBoundaryVirtualAreaCap: settings.Notch.EnableBoundaryVirtualAreaCap,
+            boundaryVirtualAreaCapRatio: settings.Notch.BoundaryVirtualAreaCapRatio);
+        var warmResolved = new NotchV22ResolvedResultService().Build(
+            target,
+            NotchV22CompensationService.Compute(context),
+            strictOverlapRatio,
+            anchorIcIndex: anchor.IcIndex,
+            anchorDiffIndex: anchor.DiffIndex,
+            allocationAreaMode: NotchV22TargetAllocationAreaMode.TargetRegularSourceCoverage,
+            identity: NotchV22ResolvedResultService.CreateIdentity(
+                target, grid, cad.Pads, activeRegularPadIds: null,
+                compensationModel: settings.Notch.CompensationModel,
+                enableToRegular: true, enableToFull: true,
+                enableToFullRuleEngine: settings.Notch.EnableToFullRuleEngine,
+                enableToFullRuleTrace: settings.Notch.EnableToFullRuleTrace,
+                enableBoundaryVirtualAreaCap: settings.Notch.EnableBoundaryVirtualAreaCap,
+                boundaryVirtualAreaCapRatio: settings.Notch.BoundaryVirtualAreaCapRatio,
+                strictOverlapRatio: strictOverlapRatio,
+                anchorIcIndex: anchor.IcIndex,
+                anchorDiffIndex: anchor.DiffIndex,
+                allocationAreaMode: NotchV22TargetAllocationAreaMode.TargetRegularSourceCoverage));
+        var outputDiffs = new Dictionary<int, int> { [target.Id] = anchor.DiffIndex };
+        var warmBatch = new NotchTableGenerator().ResolveCadAllocationBatch(
+            cad, grid, settings,
+            cadOutputFwDiffIndexByCadId: outputDiffs,
+            selectedSparseResultRequest: new NotchTableGenerator.CadAllocationSparseResultRequest(
+                target.Id, anchor.IcIndex, anchor.DiffIndex, warmResolved));
+
+        Assert.Same(warmResolved, warmBatch.SelectedSparseResult!.ResolvedResult);
+        var warm = NotchTableGenerator.ProjectCadAllocationResolvedBatch(warmBatch, settings);
+        var cold = new NotchTableGenerator().Generate(
+            cad, grid, settings, cadOutputFwDiffIndexByCadId: outputDiffs);
+
+        Assert.Equal(cold.Rows.Select(BuildRowSnapshot), warm.Rows.Select(BuildRowSnapshot));
+        Assert.Equal(100, warmResolved.TargetAllocation.TargetCoverageProjection.RawCombinedPercent);
+    }
+
+    [Fact]
+    public void A1Fact5_CadAllocation_Q7ZeroPartialOverlapDoesNotExpandStage3()
+    {
+        var cad = CreateCadWithBounds(5, 0, 2575, 10);
+        var context = NotchV22CompensationService.CreateContext(
+            cad.Pads[0], CreateGrid(), enableToRegular: true, enableToFull: true,
+            allCadPads: cad.Pads, strictOverlapRatioOverride: 0.001,
+            enableBoundaryVirtualAreaCap: true, boundaryVirtualAreaCapRatio: 1.0);
+
+        var compensation = NotchV22CompensationService.Compute(context);
+
+        Assert.Equal(25700.0, compensation.Stage3Area, 6);
+        Assert.False(compensation.IsToFullEnabled);
+    }
+
     [Fact]
     public void ResolveCadAllocationBatchWithSelectedResult_ReusesOneWarmSparseResult()
     {
