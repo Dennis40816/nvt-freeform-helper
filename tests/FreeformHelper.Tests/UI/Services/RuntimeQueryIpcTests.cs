@@ -22,9 +22,10 @@ public sealed class RuntimeQueryIpcTests
     public async Task StopAsync_WhenHostStarted_CompletesWithinTimeout()
     {
         await RuntimeQueryIpcHost.StopAsync();
+        using var shell = new ShellViewModel();
         try
         {
-            RuntimeQueryIpcHost.Start(new ShellViewModel());
+            RuntimeQueryIpcHost.Start(shell);
 
             var stopTask = RuntimeQueryIpcHost.StopAsync();
             var completed = await Task.WhenAny(stopTask, Task.Delay(1500));
@@ -42,6 +43,7 @@ public sealed class RuntimeQueryIpcTests
     public async Task StopAsync_WhenClientConnectedWithoutRequest_CompletesWithinTimeout()
     {
         await RuntimeQueryIpcHost.StopAsync();
+        using var shell = new ShellViewModel();
         await using var client = new NamedPipeClientStream(
             ".",
             RuntimeQueryProtocol.PipeName,
@@ -50,7 +52,7 @@ public sealed class RuntimeQueryIpcTests
 
         try
         {
-            RuntimeQueryIpcHost.Start(new ShellViewModel());
+            RuntimeQueryIpcHost.Start(shell);
             await client.ConnectAsync(1500);
 
             var stopTask = RuntimeQueryIpcHost.StopAsync();
@@ -97,7 +99,7 @@ public sealed class RuntimeQueryIpcTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         await RuntimeQueryIpcHost.StopAsync();
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var projectFile = new ProjectFile();
         projectFile.Settings.Notch.NullValue = ushort.MaxValue + 1;
         var projectFileField = typeof(FreeformHelperViewModel)

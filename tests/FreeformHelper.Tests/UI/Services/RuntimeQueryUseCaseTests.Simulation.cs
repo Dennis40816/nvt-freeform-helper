@@ -14,7 +14,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QuerySimulation_WhenAfterIsWithinEmsTolerance_ReportsWorkspaceAndRegularAsSafe()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var workspace = BuildSingleCellEmsToleranceBoundaryWorkspace();
         shell.Simulation.CurrentWorkspace = workspace;
 
@@ -74,7 +74,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QuerySimulation_ReturnsWorkspaceAndRegularSnapshot()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var session = BuildSimulationSession();
         shell.Simulation.CurrentWorkspace = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
@@ -121,7 +121,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QuerySimulation_WhenWorkspaceMissing_AutoBuildsWorkspace()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var session = BuildSimulationSession();
         var buildRequested = false;
         shell.Simulation.RequestBuildWorkspaceAsync = () =>
@@ -155,7 +155,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public void ShellViewModel_ExposesCurrentSimulationSafetyAuditForExportPipeline()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         shell.Simulation.CurrentWorkspace = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
             BuildSimulationSession())
@@ -173,7 +173,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_NotchReadersShareSingleResolvedPathAcrossOverlayAllocationQueryAndInspector()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var vm = shell.FreeformHelper;
         var cad = CreateCadPad(id: 40, minX: 0, minY: 0, maxX: 15, maxY: 5);
         var blocker = CreateCadPad(id: 41, minX: 12, minY: 0, maxX: 20, maxY: 5);

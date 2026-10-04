@@ -294,7 +294,7 @@ public sealed class HeadlessUiSmokeTests
     public void MainWindow_WithExpandedConsole_Can_Layout_Headless()
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        var shell = new ShellViewModel
+        using var shell = new ShellViewModel
         {
             IsConsoleExpanded = true,
         };
@@ -314,7 +314,7 @@ public sealed class HeadlessUiSmokeTests
     public async Task MainWindow_WithExpandedConsole_RendersVisibleConsoleText()
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        var shell = new ShellViewModel
+        using var shell = new ShellViewModel
         {
             IsConsoleExpanded = true,
         };
@@ -355,7 +355,7 @@ public sealed class HeadlessUiSmokeTests
     public async Task MainWindow_WithSimulationWorkspace_RendersVisibleConsoleText()
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        var shell = new ShellViewModel
+        using var shell = new ShellViewModel
         {
             IsConsoleExpanded = true,
         };

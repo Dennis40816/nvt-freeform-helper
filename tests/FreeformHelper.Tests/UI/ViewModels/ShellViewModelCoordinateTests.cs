@@ -2,19 +2,62 @@ using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 using Xunit;
 
 namespace FreeformHelper.Tests;
 
+[Collection("HeadlessUiSerial")]
 public sealed class ShellViewModelCoordinateTests
 {
     private static readonly string[] LayerL1 = ["L1"];
     private static readonly string[] AaAndL1Layers = ["AA.drawing", "L1"];
 
+    [Theory]
+    [InlineData("coordinate")]
+    [InlineData("simulation")]
+    [InlineData("simulation-prewarm")]
+    public async Task WorkspaceBuild_WhenShellDisposedWhileInFlight_CompletesWithoutExceptionOrErrorLog(string buildKind)
+    {
+        var previousConfiguration = LogManager.Configuration;
+        using var errors = new MemoryTarget { Layout = "${message} ${exception:format=ToString}" };
+        var configuration = new LoggingConfiguration();
+        configuration.AddRule(LogLevel.Error, LogLevel.Fatal, errors);
+        LogManager.Configuration = configuration;
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        try
+        {
+            using var shell = new ShellViewModel { WorkspaceBuildPauseForTests = release.Task };
+            var buildTask = buildKind switch
+            {
+                "coordinate" => shell.CoordinatePlanner.PrewarmWorkspaceAsync(),
+                "simulation" => shell.Simulation.EnsureWorkspaceAsync(),
+                "simulation-prewarm" => shell.Simulation.PrewarmWorkspaceAsync(),
+                _ => throw new ArgumentOutOfRangeException(nameof(buildKind)),
+            };
+            Assert.False(buildTask.IsCompleted);
+
+            shell.Dispose();
+            shell.Dispose();
+            release.SetResult();
+            var exception = await Record.ExceptionAsync(() => buildTask);
+
+            Assert.Null(exception);
+            Assert.Empty(errors.Logs);
+        }
+        finally
+        {
+            release.TrySetResult();
+            LogManager.Configuration = previousConfiguration;
+        }
+    }
+
     [Fact]
     public async Task ShowCoordinateAsync_BindsWorkspaceIntoCoordinatePage()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var sourceRevision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
         var workspaceViewModel = new CoordinatePlannerWorkspaceViewModel(
             new CoordinatePlannerWorkspaceUseCase(),
@@ -40,7 +83,7 @@ public sealed class ShellViewModelCoordinateTests
     [Fact]
     public async Task ShowCoordinateAsync_PropagatesCoordinatePreferencesToFreeformSnapshot()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var sourceRevision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
         var workspaceViewModel = new CoordinatePlannerWorkspaceViewModel(
             new CoordinatePlannerWorkspaceUseCase(),

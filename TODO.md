@@ -110,9 +110,14 @@
 - [ ] **S15.017 防止 log 訂閱以外的路徑跨 thread 改寫 `ShellViewModel` console 狀態**
   - 現象：測試可能在非 UI thread 切換 `IsConsoleExpanded`；S15.015 的 lock 只保護 log 訂閱路徑。
   - 驗收：盤點 console 狀態的寫入入口，讓寫入收斂到同一執行緒或同步機制，並以跨 thread 測試驗證。
-- [ ] **S15.018 解除測試結束後的 `ShellViewModel` 對全域 log 的訂閱**
-  - 現象：測試留下的 `ShellViewModel` 不會取消訂閱 `AppLogStore.Instance`，訂閱者數量隨測試累積。
-  - 驗收：在明確的生命週期終點取消訂閱，並以測試確認結束後不再收到 log 通知。
+- [x] **S15.018 解除測試結束後的 `ShellViewModel` 對全域 log 的訂閱（2026-10-03 修正）**
+  - 證據（修正前）：`src/FreeformHelper.UI/ViewModels/ShellViewModel.cs:192-194` 訂閱全域 log；`ShellViewModel.Workspaces.cs:197-206` 的既有 `Dispose()` 只解除 workspace 訂閱與釋放 semaphore，沒有解除 log 訂閱。App 在 `src/FreeformHelper.UI/App.axaml.cs:75` 建立 shell，交給 `MainWindow.axaml.cs:32-35`；app 與測試原本都沒有呼叫 shell 的 `Dispose()`。
+  - 測試建立點（修正前，以下皆在 `tests/FreeformHelper.Tests/`）：`UI/ViewModels/ShellViewModelConsoleTests.cs:22`、`ShellViewModelCoordinateTests.cs:17`、`ShellViewModelSimulationTests.cs:17`；`UI/Services/RuntimeQueryUseCaseTests.cs:21` 與三個測試分檔、`RuntimeQueryIpcTests.cs:27`；`UI/Smoke/HeadlessUiSmokeTests.cs:297`、`TerminalStartupPathTests.cs:34`；`UI/Snapshots/UiRenderedVisualSnapshotTests.cs:106`；`UI/Benchmarks/Cad3635EndToEndBenchmarkTests.cs:85`；`UI/TestHost/HeadlessSessionGuardTests.cs:132`。
+  - 變更：沿用既有 `Dispose()`，加入可重複呼叫的保護與對稱、可處理空值的 log 退訂；`MainWindow.SetShellViewModel` 在視窗實際 `Closed` 時釋放傳入的 shell，即使測試收尾先清空 `DataContext` 仍有效。測試的區域 shell 改用 `using`，helper 回傳的 shell 由呼叫端釋放，snapshot factory 的 shell 由視窗關閉釋放。未更動 `AppLogStore`、S15.015 的通知鎖、S15.017 或 S15.002。
+  - 測試先行：新增展開／收合兩個案例，先確認釋放前仍接收 log，重複 `Dispose()` 後文字與行數皆不再變動；舊程式兩個案例皆失敗（展開時文字繼續追加，收合時來源行數由 1 變成 2）。另擴充既有 headless 視窗收尾測試，確認取消關閉仍接收 log、實際關閉後停止接收。
+  - 驗證：UI 與測試專案皆以離線參數建置，0 警告、0 錯誤；直接回歸與視窗收尾 4/4 通過；所有建立 shell 的測試類別，加上 `AppLogStoreTests`、console UI、log 格式與連結解析測試，80/80 通過；`verify.ps1 -StructureOnly` 通過。
+  - 未驗證：依沙箱限制略過 `lint.ps1` 與真實行程列舉；3635 效能測試的啟用開關保持關閉，其入口雖通過，機密資料的實際流程未執行。未讀取 `example/`，未提交或推送。
+  - 審查補修（S15.018b）：獨立審查發現關閉主視窗時 `Dispose()` 釋放仍在建置中的 workspace gate，導致 `finally` 的 `Release()` 拋出 `ObjectDisposedException` 並使呼叫端記錄錯誤及中斷預熱；改由共用 helper 僅在 shell 已釋放時忽略該例外，透過最小 internal 暫停接縫覆蓋 coordinate 建置、simulation 建置與預熱的回歸測試，修正前三個案例皆因該例外失敗，修正後 3/3 通過且沒有 error log。
 - [x] **S15.016 其他用非 thread-safe 集合收集 `PropertyChanged` 的測試（2026-10-02 修正）**
   - 位置：`FreeformHelperViewModelTests.Basics.GridPitch.cs:72`、`FreeformHelperViewModelTests.Basics.CoreFlags.cs:229`、`:245`、`:266`、`FreeformHelperViewModelTests.NotchExportCache.cs:282`。VM 的背景工作也會觸發 `PropertyChanged`，與 S15.002 已修的 `SettingsWindowDraft_SaveAppliesGeneralSectionFields` 是同一種寫法。
   - 目標：改用 thread-safe 的集合，或抽成共用的收集 helper。

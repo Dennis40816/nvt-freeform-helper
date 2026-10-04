@@ -1,7 +1,12 @@
+using System.Collections.Specialized;
+using FreeformHelper.UI.Logging;
+
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class ShellViewModel
 {
+    internal Task? WorkspaceBuildPauseForTests { get; set; }
+
     private async Task BuildSimulationWorkspaceAsync()
     {
         var viewModel = await BuildOrBindSimulationWorkspaceAsync(silent: false, overwriteExistingWorkspace: true);
@@ -18,6 +23,7 @@ public sealed partial class ShellViewModel
         await _simulationWorkspaceBuildGate.WaitAsync();
         try
         {
+            await (WorkspaceBuildPauseForTests ?? Task.CompletedTask);
             var hasWorkspace = Simulation.CurrentWorkspace is not null;
             var overwriteExistingWorkspace = hasWorkspace &&
                                              Simulation.IsWorkspaceStale &&
@@ -36,7 +42,7 @@ public sealed partial class ShellViewModel
         }
         finally
         {
-            _simulationWorkspaceBuildGate.Release();
+            ReleaseWorkspaceBuildGate(_simulationWorkspaceBuildGate);
         }
     }
 
@@ -61,11 +67,12 @@ public sealed partial class ShellViewModel
         await _simulationWorkspaceBuildGate.WaitAsync();
         try
         {
+            await (WorkspaceBuildPauseForTests ?? Task.CompletedTask);
             return await BuildOrBindSimulationWorkspaceCoreAsync(silent, overwriteExistingWorkspace);
         }
         finally
         {
-            _simulationWorkspaceBuildGate.Release();
+            ReleaseWorkspaceBuildGate(_simulationWorkspaceBuildGate);
         }
     }
 
@@ -102,6 +109,7 @@ public sealed partial class ShellViewModel
         await _coordinatePlannerWorkspaceBuildGate.WaitAsync();
         try
         {
+            await (WorkspaceBuildPauseForTests ?? Task.CompletedTask);
             if (!overwriteExistingWorkspace && CoordinatePlanner.CurrentWorkspace is not null)
             {
                 return CoordinatePlanner.CurrentWorkspace;
@@ -127,7 +135,19 @@ public sealed partial class ShellViewModel
         }
         finally
         {
-            _coordinatePlannerWorkspaceBuildGate.Release();
+            ReleaseWorkspaceBuildGate(_coordinatePlannerWorkspaceBuildGate);
+        }
+    }
+
+    private void ReleaseWorkspaceBuildGate(SemaphoreSlim gate)
+    {
+        try
+        {
+            gate.Release();
+        }
+        catch (ObjectDisposedException) when (_isDisposed)
+        {
+            // Closing the shell may dispose the gate while its build is still running.
         }
     }
 
@@ -196,6 +216,17 @@ public sealed partial class ShellViewModel
 
     public void Dispose()
     {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _isDisposed = true;
+        if (AppLogStore.Instance.Entries is INotifyCollectionChanged notify)
+        {
+            notify.CollectionChanged -= OnLogEntriesChanged;
+        }
+
         DetachSimulationSafetyOverviewSync();
         FreeformHelper.WorkspaceDerivedSourceChanged -= OnFreeformHelperWorkspaceSourceChanged;
         if (CoordinatePlanner.CurrentWorkspace is not null)

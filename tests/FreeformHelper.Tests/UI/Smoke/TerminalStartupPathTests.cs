@@ -32,7 +32,7 @@ public sealed class TerminalStartupPathTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         AppLogStore.Instance.Clear();
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var window = new MainWindow();
         window.SetShellViewModel(shell);
         window.Width = 1280;
@@ -145,7 +145,7 @@ public sealed class TerminalStartupPathTests
                     $"startup line {i}"));
             }
 
-            var shell = new ShellViewModel();
+            using var shell = new ShellViewModel();
             var window = new MainWindow();
             window.SetShellViewModel(shell);
             window.Width = 1280;
@@ -195,7 +195,7 @@ public sealed class TerminalStartupPathTests
                     $"render line {i}"));
             }
 
-            var shell = new ShellViewModel();
+            using var shell = new ShellViewModel();
             var window = new MainWindow();
             window.SetShellViewModel(shell);
             window.Width = 1280;
@@ -247,7 +247,7 @@ public sealed class TerminalStartupPathTests
                 "terminal-test",
                 "foreground check"));
 
-            var shell = new ShellViewModel();
+            using var shell = new ShellViewModel();
             var window = new MainWindow();
             window.SetShellViewModel(shell);
             window.Width = 1280;
@@ -305,7 +305,7 @@ public sealed class TerminalStartupPathTests
     [Fact]
     public void ShellViewModel_DefaultsConsoleExpanded()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         Assert.True(shell.IsConsoleExpanded);
     }
 

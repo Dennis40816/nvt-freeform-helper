@@ -20,6 +20,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     private const int ConsoleRenderTailSourceLineLimit = 4000;
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly StringBuilder _consoleTextBuffer = new();
+    private bool _isDisposed;
 
     // --- Sub-Viewmodels ---
     public FreeformHelperViewModel FreeformHelper { get; }

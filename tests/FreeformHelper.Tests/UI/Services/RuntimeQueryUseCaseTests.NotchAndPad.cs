@@ -131,7 +131,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QuerySelectCad_ReturnsSelectionTimings()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var vm = shell.FreeformHelper;
         vm.CadPads.Add(CreateCadPad(id: 101, minX: 0, minY: 0, maxX: 10, maxY: 10));
         var useCase = new RuntimeQueryUseCase(shell);
@@ -162,7 +162,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryNotchValidation_UsesTypedPayloadWhenAvailable()
     {
-        var shell = BuildShellWithNotchValidationTable(BuildTypedValidationTable());
+        using var shell = BuildShellWithNotchValidationTable(BuildTypedValidationTable());
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
@@ -192,7 +192,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryNotchValidation_RejectsInvalidFirmwareNullSentinel()
     {
-        var shell = BuildShellWithNotchValidationTable(BuildTypedValidationTable());
+        using var shell = BuildShellWithNotchValidationTable(BuildTypedValidationTable());
         var projectFile = new ProjectFile();
         projectFile.Settings.Notch.NullValue = ushort.MaxValue + 1;
         SetPrivateField(shell.FreeformHelper, "_projectFile", projectFile);
@@ -213,7 +213,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryNotchValidation_FallsBackToLegacyValuesPayload()
     {
-        var shell = BuildShellWithNotchValidationTable(BuildLegacyValidationTable());
+        using var shell = BuildShellWithNotchValidationTable(BuildLegacyValidationTable());
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
@@ -238,7 +238,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryNotchValidation_ProducesStableRowPayloadShape()
     {
-        var shell = BuildShellWithNotchValidationTable(BuildTypedValidationTable());
+        using var shell = BuildShellWithNotchValidationTable(BuildTypedValidationTable());
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
@@ -286,6 +286,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     public async Task ExecuteAsync_QueryMultiOwner_OverrideReusesOneResolvedResultAndReturnsOverrideEvidence()
     {
         var (shell, cad) = BuildMultiOwnerQueryFixture();
+        using var shellScope = shell;
         var useCase = new RuntimeQueryUseCase(shell);
         var before = await QueryStep3CompensationCacheMetricsAsync(useCase);
 
@@ -329,6 +330,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     public async Task ExecuteAsync_QueryMultiOwner_PreservesVisibilityAndNotReadyErrorsWithoutFallbackCompensation()
     {
         var (shell, cad) = BuildMultiOwnerQueryFixture();
+        using var shellScope = shell;
         var vm = shell.FreeformHelper;
         vm.CadPads.Clear();
         var useCase = new RuntimeQueryUseCase(shell);
@@ -357,7 +359,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryPad_IncludesSharedNotchDisplayProjection()
     {
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var vm = shell.FreeformHelper;
         var cad = CreateCadPad(id: 21, minX: 0, minY: 3, maxX: 3, maxY: 7);
         var blocker = CreateCadPad(id: 22, minX: 5, minY: 0, maxX: 10, maxY: 10);
