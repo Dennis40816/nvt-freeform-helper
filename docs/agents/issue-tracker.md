@@ -2,7 +2,7 @@
 
 FreeformHelper 的規格與可執行 tickets 以 GitHub Issues 為唯一 tracker，repository 為 `Dennis40816/nvt-freeform-helper`。
 
-舊 issue 與舊 PR 不搬移；私有 `Dennis40816/FreeformHelper` 完成封存後，它們仍保留在原 repo。`TODO.md` 與文件中指向 `Dennis40816/FreeformHelper` 的舊 issue 連結不改寫。
+owner 決定（2026-10-04；經 Commander 轉述）：只搬移經機密審查後可公開的舊 issue 至公開 repo，並改寫 `TODO.md` 與文件中對應連結；其餘舊 issue 在私有 `Dennis40816/FreeformHelper` 完成封存後仍保留在原 repo。這取代先前「舊 issue 不搬移、不改寫」的決定。舊 PR 仍不搬移、不改寫連結，封存後留在原私有 repo。App 沒有 issues 權限，建立 issue 需 owner 操作或另行授權。
 
 ## Conventions
 
