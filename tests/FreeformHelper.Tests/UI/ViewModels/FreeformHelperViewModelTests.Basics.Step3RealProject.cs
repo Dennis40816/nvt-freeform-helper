@@ -11,7 +11,8 @@ public sealed partial class FreeformHelperViewModelTests
     {
         var vm = new FreeformHelperViewModel();
         var projectPath = Path.Combine(TestPaths.RepoRoot, "example", "BOE36.35", "project_3635.json");
-        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
+        using var fixture = ExampleProjectFixture.Create(projectPath);
+        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
 
