@@ -270,7 +270,7 @@
   - [x] **S15.009b 建立 private 資料 repo 並改為 submodule**：`Dennis40816/FreeformHelper-testdata`（private）的 `main` = `c49c645e`：`git subtree split --prefix=example` 的 32 個 commits（tree 與 `d6ceb2a:example` 相同）加上一個複製本 repo `.gitattributes` 與 README 的 commit。本 repo 以 submodule 掛回同一個 `example/` 路徑，URL 用相對路徑 `../FreeformHelper-testdata.git`，SSH 與 HTTPS remote 都能解析；測試、腳本與文件的路徑都不必改。
     - 驗證：轉換前後 `example/` 的 18 個檔案 SHA-256 完全相同。
   - [x] **S15.009c gate 預設要求資料存在且在釘住的 commit**：`scripts/tests/assert-example-data.ps1` 檢查 `example/` 已抓取、HEAD 等於本 repo index 釘住的 commit、沒有未提交變更。`run-tests.ps1` 每次實際跑測試前都會呼叫它（`-ValidateOnly` 不跑測試所以不呼叫），資料存在時設定 `FREEFORMHELPER_REQUIRE_EXAMPLE_DATA=1`、以 `-AllowMissingExampleData` 執行且資料不存在時清掉該變數；`run-refactor-gate.ps1`、`run-pre-push-gate.ps1`、`verify.ps1` 另在 lint／build 之前先檢查一次，所以資料有問題時會在最前面以一個明確訊息失敗。沒有資料權限時各腳本都接受 `-AllowMissingExampleData`；即使加了它，資料存在時仍會完整檢查，`example/` 有檔案但不是 git checkout 時一律報錯。`run-pre-push-gate.ps1` 另以 `-ForPush` 檢查指標已 commit、資料 commit 已在資料 repo 的 `origin`（檢查前會先 `fetch --prune`，所以遠端被倒退或刪除的分支都會被發現；無法 fetch 時直接失敗），加 `-SkipTests` 時也照樣檢查。`run-3635-regression-baseline.ps1` 直接讀 `example/` 的檔案，資料不在本來就會失敗，未更動。
-  - 注意：本 repo 的 git 歷史仍包含 `example/` 的全部內容，所以本 repo 必須維持 private；公開只能走 S15.009e 的新 repo。新建的 worktree 不會自動有 submodule 內容，需先 `git submodule update --init example`。
+  - 注意：私有 `FreeformHelper` 的 git 歷史仍包含 `example/` 的全部內容，因此當時須維持 private，公開另走 S15.009e 的新 repo；公開 repo 已於 2026-10-04 由私有 `1.3.x`（`2c1c0c84`）的檔案樹匯入，詳見 S15.009e。新建的 worktree 不會自動有 submodule 內容，需先 `git submodule update --init example`。
   - [ ] **S15.009d 公開前清理**
     - [x] 移除本機絕對路徑：`README.md`（3 處）、`docs/guides/info-refactor-acceptance-2026-02-23.md`、`docs/guides/perf-baseline-padcanvas-2026-03-06.md`、`docs/archive/TODO-history-2026-03-24.md`（3 處，雙反斜線寫法，第一次稽核漏掉）。`scripts/verify.ps1 -StructureOnly` 之後會擋下新的本機路徑。
     - [x] README 說明 `example/` submodule 與沒有資料時的行為（S15.009b 已加）。
@@ -278,9 +278,12 @@
     - [x] 兩個 golden snapshot 已移到 `FreeformHelper-testdata` 的 `golden-snapshots/`（commit `8c84e4d6`），本 repo 透過 `example/golden-snapshots/` 讀取；本次變更刪除舊路徑，提交後的 HEAD 不再包含它們，但本 private repo 歷史仍保留，因此公開 repo 必須由匯出的檔案樹建立。S15.005a 的 deploy key 尚未設置前，CI 會略過這兩個測試。測試程式與文件中同樣有個別 pad 編號、節點數與雜湊這類由面板資料算出的數值，維持不動（owner 已同意名稱可公開）。
     - [x] `.gitmodules` 的處理：owner 2026-10-03 決定「保留私有 URL」，公開樹保留 `.gitmodules`（相對 URL `../FreeformHelper-testdata.git`）與 `example` 的 gitlink（`8c84e4d6`）；公開頁面會看得到私有資料 repo 的名稱但沒有內容，外部使用者 `--recurse-submodules` 會失敗（一般 clone 不受影響）。公開 repo 必須由匯出的檔案樹建立（單一初始 commit），不能 push 現有的任何 ref；此公開匯入限制與 S15.009e 一併結案。
   - [ ] **S15.009e 建立公開 repo「NVT Freeform Helper」並把本 repo 標示為 archived**（owner 2026-10-02 決定名稱與處置）
-    - 新 repo 由 owner 建立（slug 待定，GitHub 名稱不能有空白）；以單一 commit 匯入，不 push 本 repo 的任何 ref。之後的日常開發在新 repo 進行。
-    - 本 repo 在遷移完成後明確標示為 archived（名稱或描述註明，並設為唯讀）。archive 之後不能再 push 或開 PR，所以要先把本 repo 上未完成的 PR 收尾，並確認 `FreeformHelper-testdata` 與新 repo 的 submodule 指標正確。
-    - 待決定：GitHub issues（`TODO.md` 與文件中連到本 repo 的 issue 連結，公開後外部無法開啟）要搬到新 repo、改寫連結，還是保留原狀。搬移 issue 會公開其內容，需先檢查有無機密。
+    - [x] 建立與匯入公開 repo：`Dennis40816/nvt-freeform-helper` 已於 2026-10-04 建立並以私有 `1.3.x`（`2c1c0c84`）的檔案樹匯入，歷史只有單一初始 commit；預設分支為 `1.3.x`，`main` 指向同一個 commit，公開 CI 對兩者均通過。`example/` 仍是 submodule（gitlink `8c84e4d6`），指向私有 `FreeformHelper-testdata`。
+    - [x] 日常開發移轉（owner，2026-10-04）：自 2026-10-04 起，新工作（分支、PR、新 issue）只在公開 repo 進行，PR 目標為 `1.3.x`；私有 `FreeformHelper` 的 `1.3.x` 凍結在 `2c1c0c84`，不再合併新內容。程式碼開發已移至公開 repo，只有 `FreeformHelper-testdata` 留在私有。
+    - [x] 舊 issue 與 PR 的處置已決定：不搬移、不改寫 `TODO.md` 與文件中指向 `Dennis40816/FreeformHelper` 的舊 issue 與 PR 連結；封存後仍保留在原私有 repo。
+    - [ ] `TESTDATA_DEPLOY_KEY` 與 testdata deploy key：仍待完成 S15.005a 的私有資料 repo 唯讀 deploy key 與公開 repo 的 CI secret 設定。
+    - [ ] rulesets：公開 repo 的 rulesets 尚待設定。
+    - [ ] 封存私有 `FreeformHelper`：公開 CI（含使用 `TESTDATA_DEPLOY_KEY` 的資料測試）通過、私有 PR 全部關閉後，由 owner 設為唯讀封存（Archived）；目前尚未封存。
 
 ## 1.3.x Refactor Program（Active）
 
