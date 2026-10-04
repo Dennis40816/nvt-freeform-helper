@@ -9,8 +9,8 @@ function Get-PathRule {
     param([string]$Text, [string]$UserProfilePath, [string]$UserName)
 
     $patterns = [ordered]@{
-        'drive-root' = '(?i)(?<![\w])[a-z]:[\\/]'
-        'unc' = '(?<![:/\\\w])(?:\\{2,}|//)(?:[\w.-]+|\?)[\\/]+[^\s/\\"'']+'
+        'drive-root' = '(?i)(?<![\w/])[a-z]:[\\/]'
+        'unc' = '(?<![:/\\\w])(?:\\{2}(?:[\w.-]+|\?)\\(?!\\)|\\{4}(?:[\w.-]+|\?)\\{2}(?!\\)|//(?:[\w.-]+|\?)/+)[^\s/\\"'']+'
         'msys-drive' = '(?i)(?<![\w/\\.-])/[a-z]/'
         'wsl-drive' = '(?i)(?<![\w/\\.-])/mnt/[a-z]/'
         'users-root' = '(?i)(?<![\w/\\.-])/[U]sers/'
@@ -140,10 +140,51 @@ function Write-Finding {
     Write-Host (ConvertTo-Json -Compress -InputObject ([ordered]@{ file = $File; location = $Location; rule = $Rule }))
 }
 
+function Test-LinkedPath {
+    param([string]$Path, [string]$Root)
+    try {
+        if ($Path.StartsWith('\\') -or $Path.StartsWith('//')) { return $true }
+        $rootPath = [IO.Path]::TrimEndingDirectorySeparator([IO.Path]::GetFullPath($Root))
+        $fullPath = [IO.Path]::GetFullPath($Path)
+        $comparison = if ($IsWindows) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
+        $seen = [System.Collections.Generic.HashSet[string]]::new(
+            $(if ($IsWindows) { [StringComparer]::OrdinalIgnoreCase } else { [StringComparer]::Ordinal }))
+        while ($true) {
+            if ($fullPath.StartsWith('\\') -or $fullPath.StartsWith('//') -or
+                (!$fullPath.Equals($rootPath, $comparison) -and
+                 !$fullPath.StartsWith($rootPath + [IO.Path]::DirectorySeparatorChar, $comparison))) { return $true }
+            # Walk from the root: probing a descendant first could already traverse a UNC link.
+            $parts = $fullPath.Substring($rootPath.Length).Split([IO.Path]::DirectorySeparatorChar, [StringSplitOptions]::RemoveEmptyEntries)
+            $current = $rootPath
+            $redirected = $false
+            for ($index = 0; $index -le $parts.Length; $index++) {
+                if ($index) { $current = [IO.Path]::Combine($current, $parts[$index - 1]) }
+                try { $item = Get-Item -LiteralPath $current -Force -ErrorAction Stop }
+                catch [System.Management.Automation.ItemNotFoundException] { return $false }
+                if (!($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) { continue }
+                $target = [string]$item.Target
+                if (!$seen.Add($current) -or [string]::IsNullOrEmpty($target) -or
+                    $target.StartsWith('\\') -or $target.StartsWith('//')) { return $true }
+                # Read only the immediate target metadata; never resolve through an unchecked link.
+                $fullPath = [IO.Path]::GetFullPath($target, [IO.Path]::GetDirectoryName($current))
+                for ($tail = $index; $tail -lt $parts.Length; $tail++) {
+                    $fullPath = [IO.Path]::Combine($fullPath, $parts[$tail])
+                }
+                $redirected = $true
+                break
+            }
+            if (!$redirected) { return $false }
+        }
+    }
+    catch { return $true }
+}
+
 if ($SelfTest) {
     # Synthetic inputs only: this branch precedes all config, Git, and repository reads.
     $drive = 'Q' + ':\work\mask.csv'
     $unc = ('\' * 2) + 'host\share\mask.csv'
+    $extendedDrive = ('\' * 2) + '?\' + $drive
+    $extendedUnc = ('\' * 2) + '?\UNC\host\share\mask.csv'
     $UserProfilePath = '/var/profiles/guard-user'
     $samples = @(
         @{ text = $drive; rule = 'drive-root' }
@@ -168,6 +209,23 @@ if ($SelfTest) {
         @{ text = 'assets/c/mask.csv'; rule = '' }
         @{ text = 'https://host/share'; rule = '' }
         @{ text = 'avares://App/Assets/x'; rule = '' }
+        @{ text = 'https://host/C:/mask.csv'; rule = '' }
+        @{ text = 'ftp://host/D:/mask.csv'; rule = '' }
+        @{ text = 'file:///Q:/mask.csv'; rule = '' }
+        @{ text = 'avares://App/C:/Assets/x'; rule = '' }
+        @{ text = '"https://host/C:/mask.csv"'; json = $true; rule = '' }
+        @{ text = 'https://host/C:/mask.csv ' + $drive; rule = 'drive-root' }
+        @{ text = 'var escapes = "\\n\\t";'; rule = '' }
+        @{ text = '[\\r\\n]'; rule = '' }
+        @{ text = 'var pattern = "\\w\\s";' + "`n" + 'var other = "\\r\\n";'; rule = '' }
+        @{ text = '"\\n\\t"' + "`n" + $unc; rule = 'unc' }
+        @{ text = $extendedDrive; rule = 'drive-root' }
+        @{ text = $extendedDrive; rule = 'unc' }
+        @{ text = '"' + $extendedDrive.Replace('\', '\\') + '"'; rule = 'unc' }
+        @{ text = $extendedUnc; rule = 'unc' }
+        @{ text = '"' + $extendedUnc.Replace('\', '\\') + '"'; rule = 'unc' }
+        @{ text = '"' + $extendedDrive.Replace('\', '\\') + '"'; json = $true; rule = 'drive-root' }
+        @{ text = '"' + $extendedUnc.Replace('\', '\\') + '"'; json = $true; rule = 'unc' }
         @{ text = '\\{2,}|//)[^\s/\\]'; rule = '' }
         @{ text = '/homework/x'; rule = '' }
         @{ text = '/UsersBackup/x'; rule = '' }
@@ -225,6 +283,50 @@ if ($SelfTest) {
     $privateKey = @(Get-ContentFinding ('{"' + $drive.Replace('\', '\\') + '":"relative.csv"}') $true '' '')[0]
     $checks++
     if ($privateKey.location -cne '$.*') { $failures++ }
+    # Mock metadata only; assert the exact reads so external targets are never probed.
+    $linkResult = & {
+        $fixtureRoot = [IO.Path]::GetFullPath('path-guard-self-test')
+        $outside = $fixtureRoot + '-outside'
+        $linkSamples = @(
+            @{ path = 'tests/sample.json'; links = @{}; linked = $false; reads = @('', 'tests', 'tests/sample.json') }
+            @{ path = 'tests/sample.json'; links = @{ tests = $unc }; linked = $true; reads = @('', 'tests') }
+            @{ path = 'tests/sample.json'; links = @{ tests = $outside }; linked = $true; reads = @('', 'tests') }
+            @{ path = 'tests/data/sample.json'; links = @{ 'tests/data' = $unc }; linked = $true; reads = @('', 'tests', 'tests/data') }
+            @{ path = '.github/path-guard.json'; links = @{ '.github' = $unc }; linked = $true; reads = @('', '.github') }
+            @{ path = '.github/path-guard.json'; links = @{ '.github' = $outside }; linked = $true; reads = @('', '.github') }
+            @{ path = 'example'; links = @{ example = $unc }; linked = $true; reads = @('', 'example') }
+            @{ path = 'example'; links = @{ example = $outside }; linked = $true; reads = @('', 'example') }
+            @{ path = 'tests/sample.json'; links = @{ 'tests/sample.json' = $unc }; linked = $true; reads = @('', 'tests', 'tests/sample.json') }
+            @{ path = 'tests/sample.json'; links = @{ tests = '../path-guard-self-test-outside' }; linked = $true; reads = @('', 'tests') }
+            @{ path = 'tests/sample.json'; links = @{ tests = 'fixtures' }; linked = $false; reads = @('', 'tests', '', 'fixtures', 'fixtures/sample.json') }
+            @{ path = 'tests/sample.json'; links = @{ tests = 'fixtures/data'; fixtures = $unc }; linked = $true; reads = @('', 'tests', '', 'fixtures') }
+            @{ path = 'tests/sample.json'; links = @{ tests = 'tests' }; linked = $true; reads = @('', 'tests', '', 'tests') }
+            @{ path = 'tests/sample.json'; links = @{ tests = '' }; linked = $true; reads = @('', 'tests') }
+            @{ path = 'tests/sample.json'; links = @{ '' = $outside }; linked = $true; reads = @('') }
+        )
+        function Get-Item {
+            param([string]$LiteralPath, [switch]$Force, [string]$ErrorAction)
+            $relative = [IO.Path]::GetRelativePath($fixtureRoot, $LiteralPath).Replace('\', '/')
+            if ($relative -eq '.') { $relative = '' }
+            $index = $reads.Count
+            $reads.Add($relative)
+            if ($index -ge $sample.reads.Count -or $relative -cne $sample.reads[$index]) { throw 'Unexpected metadata read' }
+            [pscustomobject]@{
+                Attributes = if ($sample.links.ContainsKey($relative)) { [IO.FileAttributes]::ReparsePoint } else { [IO.FileAttributes]::Normal }
+                Target = $sample.links[$relative]
+            }
+        }
+        $failed = 0
+        foreach ($sample in $linkSamples) {
+            $reads = [System.Collections.Generic.List[string]]::new()
+            $actual = Test-LinkedPath ([IO.Path]::Combine($fixtureRoot, $sample.path)) $fixtureRoot
+            if ($actual -ne $sample.linked -or $reads.Count -ne $sample.reads.Count -or
+                ($reads -join '|') -cne ($sample.reads -join '|')) { $failed++ }
+        }
+        @{ checks = $linkSamples.Count; failures = $failed }
+    }
+    $checks += $linkResult.checks
+    $failures += $linkResult.failures
     Write-Host "Path guard self-test: $($checks - $failures)/$checks passed."
     if ($failures) { exit 1 }
     exit 0
@@ -233,7 +335,12 @@ if ($SelfTest) {
 $root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $configFile = '.github/path-guard.json'
 try {
-    $config = Get-Content -LiteralPath (Join-Path $root $configFile) -Raw | ConvertFrom-Json -AsHashtable
+    $configPath = Join-Path $root $configFile
+    if (Test-LinkedPath $configPath $root) {
+        Write-Finding $configFile '$' 'skipped: linked'
+        exit 1
+    }
+    $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json -AsHashtable
     if ($config -isnot [System.Collections.IDictionary] -or $config['exceptions'] -isnot [array]) { throw 'Invalid config' }
     $exceptions = @($config.exceptions)
     foreach ($exception in $exceptions) {
@@ -247,12 +354,16 @@ catch {
 
 $repositories = @(@{ root = $root; prefix = '' })
 $example = Join-Path $root 'example'
-if (Test-Path -LiteralPath (Join-Path $example '.git')) {
+$count = 0
+if (Test-LinkedPath $example $root) {
+    Write-Finding 'example/' 'line:1' 'skipped: linked'
+    $count++
+}
+elseif (Test-Path -LiteralPath (Join-Path $example '.git')) {
     $repositories += @{ root = $example; prefix = 'example/' }
 }
 else { Write-Host 'Path guard: example submodule unavailable; coverage excludes example/.' }
 
-$count = 0
 $scanned = 0
 foreach ($repository in $repositories) {
     try {
@@ -269,8 +380,11 @@ foreach ($repository in $repositories) {
         if (!(Test-ScanFile $file)) { continue }
         try {
             $fullPath = Join-Path $repository.root $relative
-            # Do not follow tracked symbolic links into machine-local or untracked data.
-            if ((Get-Item -LiteralPath $fullPath -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Linked file' }
+            if (Test-LinkedPath $fullPath $root) {
+                Write-Finding $file 'line:1' 'skipped: linked'
+                $count++
+                continue
+            }
             # ReadAllText decodes UTF BOMs before the binary check, including UTF-16 text goldens.
             $text = [IO.File]::ReadAllText($fullPath)
             if ($text.Contains([char]0) -and [IO.Path]::GetExtension($file) -ine '.json') { continue }
