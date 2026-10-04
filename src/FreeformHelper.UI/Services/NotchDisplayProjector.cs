@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using FreeformHelper.Application.Services;
+using FreeformHelper.Application.Settings;
 using FreeformHelper.UI.ViewModels;
 
 namespace FreeformHelper.UI.Services;
@@ -35,13 +36,15 @@ internal static partial class NotchDisplayProjector
                     area.EffectiveArea)).ToList(),
                 target.RegularPadIds)).ToList(),
             notch.Diagnostics,
-            notch.TargetCoverageProjection);
+            notch.TargetCoverageProjection,
+            notch.ComputationMode);
     }
 
     public static NotchDisplayProjection Build(
         NotchV22CompensationResult compensation,
         NotchV22TargetAllocationSummary? allocation = null,
-        string? diagnostics = null)
+        string? diagnostics = null,
+        NotchComputationMode computationMode = NotchComputationMode.CadAllocation)
     {
         ArgumentNullException.ThrowIfNull(compensation);
         return Build(
@@ -65,7 +68,8 @@ internal static partial class NotchDisplayProjector
                     area.EffectiveArea)).ToList(),
                 target.RegularPadIds)).ToList(),
             diagnostics,
-            allocation?.TargetCoverageProjection);
+            allocation?.TargetCoverageProjection,
+            computationMode);
     }
 
     public static NotchDisplayProjection Build(
@@ -76,7 +80,8 @@ internal static partial class NotchDisplayProjector
         double? stage3Area,
         IReadOnlyList<NotchDisplayTargetInput>? targets,
         string? diagnostics,
-        NotchV22TargetCoverageProjection? targetCoverageProjection = null)
+        NotchV22TargetCoverageProjection? targetCoverageProjection = null,
+        NotchComputationMode computationMode = NotchComputationMode.CadAllocation)
     {
         var targetItems = targets ?? Array.Empty<NotchDisplayTargetInput>();
         var parsedEntries = ParseDiagnosticEntries(diagnostics);
@@ -97,8 +102,12 @@ internal static partial class NotchDisplayProjector
             effectiveTargetCoverageProjection.DisplayCombinedRatio,
             effectiveTargetCoverageProjection.HasCombinedOverflowRisk);
         IReadOnlySet<(int IcIndex, int DiffIndex)>? emittedTargetKeys =
-            effectiveTargetCoverageProjection.RawCombinedPercent.HasValue
+            (computationMode == NotchComputationMode.CadAllocation
+                ? targetCoverageProjection?.HasEmittedTargetMembership == true
+                : effectiveTargetCoverageProjection.RawCombinedPercent.HasValue)
                 ? effectiveTargetCoverageProjection.EmittedTargets
+                    .Where(target => effectiveTargetCoverageProjection.RawCombinedPercent.HasValue ||
+                                     target.PassesStrictThreshold)
                     .Select(static target => (target.IcIndex, target.DiffIndex))
                     .ToHashSet()
                 : null;

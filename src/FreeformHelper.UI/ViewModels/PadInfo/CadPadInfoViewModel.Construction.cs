@@ -43,7 +43,8 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
         Func<int, string?>? getCadV22CompensationDiagnostics = null,
         Func<int, NotchV22TargetAllocationSummary?>? getCadV22TargetAllocationSummary = null,
         CadOutputFwDiffAutoMode cadOutputFwDiffAutoMode = CadOutputFwDiffAutoMode.BestMatchDirect,
-        PadInspectorSnapshot? inspectorSnapshot = null)
+        PadInspectorSnapshot? inspectorSnapshot = null,
+        NotchComputationMode notchComputationMode = NotchComputationMode.CadAllocation)
     {
         _cadOutputFwDiffAutoMode = cadOutputFwDiffAutoMode;
         _getDxfIndex = getDxfIndex;
@@ -228,7 +229,8 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
                                 area.EffectiveArea)).ToList(),
                             target.RegularPadIds)).ToList(),
                         diagnostics,
-                        allocation?.TargetCoverageProjection);
+                        allocation?.TargetCoverageProjection,
+                        notchComputationMode);
                     toRegularRatioText = notchDisplay.ToRegularRatioText;
                     toFullRatioText = notchDisplay.ToFullRatioText;
                     combinedRatioText = notchDisplay.CombinedRatioText;

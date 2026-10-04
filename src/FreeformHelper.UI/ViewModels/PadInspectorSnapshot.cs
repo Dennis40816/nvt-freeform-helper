@@ -1,4 +1,5 @@
 using FreeformHelper.Application.Services;
+using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 
@@ -20,6 +21,7 @@ public sealed record PadInspectorNotchSnapshot(
     string? Diagnostics)
 {
     internal NotchV22TargetCoverageProjection? TargetCoverageProjection { get; init; }
+    internal NotchComputationMode ComputationMode { get; init; } = NotchComputationMode.CadAllocation;
 }
 
 public sealed record PadInspectorNotchTargetSnapshot(

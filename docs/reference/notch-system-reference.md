@@ -1,6 +1,6 @@
 # Notch System Reference
 
-> 最後更新：2026-08-10
+> 最後更新：2026-10-03
 > 狀態：目前 Notch pipeline / Simulation / Export 的唯一 canonical reference
 
 本文件的目的不是取代所有歷史文件，而是把「現在系統到底怎麼運作」集中到一個位置。後續若流程、命名、C export contract 有變動，應先更新本檔，再回頭調整 deep-dive 或 legacy example。
@@ -202,8 +202,10 @@ Owner：R13.101e已讓normal generator／UI compensation以完整、output-versi
   - `Disabled`：`100`
 - target group 先 `Math.Round(ratio * 100)`；絕對值超過 100 時拆為 `<=100` chunks。Final legs 只包含 anchor IC、非 source/anchor diff、`RatioPercentRounded != 0`，且通過 strict threshold 或具有 ToFull applied coverage 的 emitted groups；不是所有 overlap targets 都必然進 C。
 - `CombinePercent` 是 retained anchor group 加上實際 emitted 的正向 target legs，採 per-group rounding 後相加；不得用 CAD-level `CombinedRatio` 取代。
-- `NotchV22TargetCoverageProjection` 是上述emitted target list、pre-guard raw combined percent與`>255%` risk的Application owner；generator與revisioned resolved result共讀它。Normal anchored display的effective count、compact target line與card role只消費`EmittedTargets`的`(IcIndex, DiffIndex)` membership；Inspector、Pad Info、Notch Detail與Runtime Query不得再sum targets或自行重建`strict || ToFull`門檻。
-- 若缺少anchor/source，或不是target-regular coverage mode，projection的`RawCombinedPercent`為null；為保留public compatibility，display ratio仍由同一Application policy沿用既有all-target positive sum（無targets時回退CAD-level combined diagnostic），target summary／line／role則維持既有strict-only顯示。全部target diagnostics、ordering與strict／ToFull evidence仍保留。
+- `NotchV22TargetCoverageProjection` 是上述 emitted target list、pre-guard raw combined percent 與 `>255%` risk 的 Application owner；generator 與 revisioned resolved result 共讀它。Normal `CadAllocation` 且 anchor/source 齊全時，target-regular coverage display 的 effective count、compact target line 與 card role 只消費 `EmittedTargets` 的 `(IcIndex, DiffIndex)` membership；Inspector、Pad Info、Notch Detail 與 Runtime Query 不得再 sum targets 或自行重建 `strict || ToFull` 門檻。
+- Owner 於 2026-10-03 決定一般 `CadAllocation`、anchor/source 齊全且 coverage 為 `Disabled` 時，畫面跟 generator 一致：即使 `RawCombinedPercent=null`，target summary／line／role 仍使用 emitted membership，並保留既有 strict gate 篩選。通過 strict gate 但四捨五入為 `0%` 的 target 不算 effective，role 為 `Below gate`，effective 明細不列出；完整 target diagnostics 與 `0%` 顯示仍保留。此新規則僅適用於一般 `CadAllocation`，不適用於 `LegacyRegularAnchor`。
+- `LegacyRegularAnchor` 保留 `c8456b76` 前的顯示：只有 `RawCombinedPercent` 有值時使用 emitted membership，否則沿用 `strict && !anchor`。同一個 anchor/source 齊全、`Disabled`、strict gate 通過且四捨五入為 `0%` 的案例仍顯示 `Targets: 1 effective / 2 total`／`Target`／`0%`，並保留 `IC1/diff1  A 0.45 mm²  R 0%` 有效明細；V21 與 Legacy 計算／輸出均維持原樣。SDISPLAY-3 的 `Build_LegacyRegularAnchor_DisabledRoundedZeroTargetPreservesPreviousDisplay` 經 Legacy project 的 Inspector snapshot 驗證此契約；修正前為 `0 pass / 1 fail`（Expected=`Targets: 1 effective / 2 total`、Actual=`Targets: 0 effective / 2 total`），修正及重建後以相同 filter 重跑為 `1 pass / 0 fail / 0 skipped`，完成 RED → GREEN。輸出保存於 ignored `build/sdisplay3-red-test.txt` 與 `build/sdisplay3-green-test.txt`。
+- 缺少 anchor 或 source 時，projection 的 `HasEmittedTargetMembership=false`；空 `EmittedTargets` 表示尚無 emission context，不能當成已計算的零個 effective target。target summary／line／role 保留原有 `strict && !anchor` fallback，strict-passing 的 `100%` target 仍顯示 `1 effective`／`Target`／`100%` 及有效明細。缺少 anchor/source 或非 target-regular coverage mode 時，`RawCombinedPercent` 仍為 null，display ratio 仍由同一 Application policy 沿用既有 all-target positive sum（無 targets 時回退 CAD-level combined diagnostic）。全部 target diagnostics、ordering 與 strict／ToFull evidence 不變。
 - beta0.9 起 `Current (Gain)` 另有兩個可開關 guard：
   - `Boundary virtual-area cap`：ToFull 虛擬外延面積進入 Stage3 gain/allocation 前，先限制為 `inside overlap × cap ratio`。
   - `Target coverage guard`：canonical rows 選定後，統計每個 target FW diff 的 retained/incoming coverage；超過 cap（預設 `120%`）時按比例縮小該 target 的 retained/leg 百分比，避免 uniform 400 超過 EMS 480。

@@ -101,7 +101,8 @@ public sealed partial class FreeformHelperView
             vm.GetCadV22CompensationDiagnostics,
             id => vm.GetCadV22TargetAllocationSummary(id),
             vm.CadOutputFwDiffAutoMode,
-            snapshot);
+            snapshot,
+            vm.CurrentNotchComputationMode);
         TryOpenPadInfo(vm, info, selectedPads.Select(p => p.Bounds)); // Open the popover.
         return Task.CompletedTask;
     }

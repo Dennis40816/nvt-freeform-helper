@@ -162,7 +162,8 @@ public sealed class NotchDetailUseCase
             : "TH=0 (disabled)";
         var display = NotchDisplayProjector.Build(
             compensation,
-            resolved.TargetAllocation);
+            resolved.TargetAllocation,
+            computationMode: settings.Notch.ComputationMode);
 
         return new NotchDetailViewModel(
             cadPad,
