@@ -2,7 +2,15 @@
 
 `Directory.Build.props` 在未設定 `ArtifactsPath` 時，將各專案的 `bin` 與 `obj` 放在**目前 checkout** 的 `build/`。Git worktree 通常各有自己的工作目錄與 `build/`；工具只選取腳本所在 checkout 的 `build/` 子目錄，若選取目錄內有已登錄的其他 worktree，會拒絕刪除。設定 `ArtifactsPath` 的隔離量測工作另依其腳本設定輸出位置。
 
-repo 外 test area 的位置、`TEMP`／`TMP`／`TMPDIR` 指向方式與清理規則仍待 S15.005a 決定；本指南目前只涵蓋各 checkout 的 `build/`，不把 test area 視為可由本清理工具刪除的目標。
+repo 外 test area 依下節的 S15.005a 決定管理，不列入本指南的 build 清理工具目標。
+
+## Repo 外測試暫存區（S15.005a）
+
+Owner 於 2026-10-04 決定預設位置為 `D:\FreeformHelper-TestArea`。`scripts/tests/run-tests.ps1` 執行 `dotnet test` 期間，會建立 `<測試暫存區>\temp`，並設定 `TEMP`／`TMP`／`TMPDIR` 指向此目錄；呼叫端 shell 與其他工具的環境不受影響，`FREEFORMHELPER_APP_GENERAL_SETTINGS_PATH` 隔離與 `-ValidateOnly` 行為維持原樣。
+
+可用環境變數 `FREEFORMHELPER_TEST_AREA` 覆寫測試暫存區根目錄；三個暫存變數仍指向其 `temp` 子目錄。未覆寫且預設的 `D:` 磁碟機不存在時，腳本會輸出一行說明，保留原有暫存環境並沿用系統暫存區。
+
+測試產物保留 7 天，採手動清理：只刪除已結束工作且保留滿 7 天的產物；清理前確認對應測試工作及其子程序已結束。仍在執行或無法確認歸屬的產物保留，需留存的診斷證據先另存；不以整個 `temp` 目錄的時間判定可刪除。
 
 ## `build/` 的內容與保留規則
 
