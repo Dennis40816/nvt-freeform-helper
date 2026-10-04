@@ -96,7 +96,7 @@
 - [ ] **S15.017 console link 解析仍每次重掃整份文字（production 效能，分支試作不合併、暫緩）**
   - `ConsoleLinkParser.Parse` 對完整文字執行六個 regex，並對候選路徑查詢檔案系統；S15.013 只減少呼叫次數，單次成本仍隨 console 長度成長。
   - 暫緩：增量解析不排進 1.3.x；後續研發須維持舊行 offset、截斷、去重、篩選與可點擊連結的等價性。
-  - owner 決定（2026-10-04；經 Commander 轉述）：已在分支 `feature/queue/s15-017-incremental-console-links` 試作並經唯讀審查（無行為差異），決定不合併（依下一條 owner 的方向：console 系統之後再研發；「不合併」是 Commander 對 owner 回答的解讀，不是 owner 原話），本項維持未勾選並暫緩。console 以最後 4000 筆為尾窗，窗口開始滑動後新增文字不再是舊文字的追加，快速路徑會退回完整解析，對 console 已滿的長行最壞情況（約 5.18 秒的合成樣本）沒有幫助；production 約 180 行、測試約 500 行不成比例。
+  - Commander 判斷（2026-10-04）：已在分支 `feature/queue/s15-017-incremental-console-links` 試作並經唯讀審查，判斷不合併（依下一條 owner 的方向：console 系統之後再研發；「不合併」是 Commander 對 owner 回答的解讀，不是 owner 原話），本項維持未勾選並暫緩。console 以最後 4000 筆為尾窗，窗口開始滑動後新增文字不再是舊文字的追加，快速路徑會退回完整解析，對 console 已滿的長行最壞情況（約 5.18 秒的合成樣本）沒有幫助；production 約 180 行、測試約 500 行不成比例。
   - owner 決定（2026-10-04；經 Commander 轉述）併入後續 console 研發方向；原話：「在之後用 fable 5.5 or codex astra or bel 去進行 console 系統的研發 優先在 free form helper 上試運行 之後推送到 nvt core 作為公版的 console 系統，其他的 repo 模組也漸漸像 console 系統一樣，抽象成可共用的結構後，統整到 NVT Core」。時程是「之後」，不排進 1.3.x；Fable 目前暫停（2026-10-06 評估後再定）。
   - 先前量測（2026-10-03，由佇列的 codex 執行；未實作）：以合成 console（含 URL 與本機暫存檔案路徑，並核對 target、offset、長度、line/column）呼叫 `ConsoleLinkParser.Parse`，暖機後各量 5 次取中位數：27,600 字元／200 個 link 約 49 ms；276,000 字元／2,000 個 link 約 539 ms；2,760,000 字元／20,000 個 link 約 28.2 秒。成本隨輸入超線性成長（文字與 link 數同時放大 10 倍，時間約放大 11 倍、再放大 52 倍），但這個負載同時增加文字與 link，尚未隔離是文字長度還是 link／檔案查詢造成的。該次量測類別約 2.5 分鐘，測試碼未保留。
   - 實際輸入上限核對（2026-10-03）：`src/FreeformHelper.UI/ViewModels/ShellViewModel.cs:20` 定義 4000；`ShellViewModel.Console.cs:84` 的追加容量與 `:114` 的 `GetTail(4000)` 都按 **log entry 數**計算，`:120`／`:124` 將格式化文字完整組成 `ConsoleText`，`:209`～`:218` 僅在 entry 間加入換行。**應用程式未設定固定的字元數或實際文字行數上限**：`src/FreeformHelper.UI/Logging/AppLogFormatter.cs:30`～`:37` 原樣串接 `entry.Message`，不截斷長訊息或內嵌換行；若 4000 筆都是單行且每筆訊息長 M，Windows 預設尾端可達 `4000 × (M + 78) + 3999 × 2` 個 UTF-16 字元／4000 行，M 並無程式設定的上限。去重開啟時 `ShellViewModel.Console.cs:133` 改取整個 `MaxEntries`，配合 `src/FreeformHelper.UI/Logging/AppLogStore.cs:15`／`:50` 的 10,000，互不相同的單行 entry 可達 10,000 行；兩種模式有內嵌換行時都可超過其 entry 數。
@@ -282,7 +282,7 @@
   - 現象：主 checkout 的 `build/` 約 37 GB（2026-10-02）；`Directory.Build.props:4-5` 把所有 bin／obj 放在 repo 內的 `build/`，沒有任何清理或保留政策；每個 worktree 各有一份。
   - 目標：定義本工作樹的 build 輸出、worktree 與 evidence 的位置及清理規則；repo 外 test area 隨 S15.005a 決定。
   - 完成：`docs/guides/build-output-and-disk-space.md` 定義本工作樹各類輸出與證據保留規則；`scripts/dev/clean-build-output.ps1` 預設 dry run，只列出本工作樹 `build/bin/`、`build/obj/` 與容量，`-Apply` 才刪除，`-IncludeEvidence` 才納入證據與交付產物。拒絕 reparse point、含 `.git` 項目或其他已登錄 worktree 根目錄的選取目錄。`-Apply` 採刻意嚴格的規則：機器上有任何指定的 .NET 建置／測試／UI 程序，或無法讀取程序清單時，一律拒絕刪除並列出阻擋程序名稱與 ID；無關的 .NET 程序也可能阻擋。請關閉建置、測試、UI 與 IDE 工作階段，執行 `dotnet build-server shutdown` 後重試，因為建置伺服器在 build 結束後仍可能留在背景。已移除程序歸屬判斷與其測試，僅保留三個名稱清單案例；`test-ui-process-in-repo.ps1` 還原為任務開始時的 `origin/1.3.x` 內容。未對真實資料執行 `-Apply`，主 checkout 的 37 GB 未清理；owner 待腳本進入主 checkout 後，可在該目錄先 dry run，再以 `-Apply` 清理預設項目。
-  - [ ] **隨 S15.005a 決定 repo 外 test area**：明定位置、`TEMP`／`TMP`／`TMPDIR` 指向方式、保留期限與清理規則；目前尚未定義，不計入上述完成範圍。
+  - [ ] **隨 S15.005a 決定 repo 外 test area**：位置、`TEMP`／`TMP`／`TMPDIR` 環境變數行為、保留期限與清理規則已由 owner 決定（2026-10-04，見 S15.005a），實作待辦，不計入上述完成範圍。
 
 - [x] **S15.007 移除 Application 專案未使用的 `CommunityToolkit.Mvvm` 參照**
   - 現象：`src/FreeformHelper.Application/FreeformHelper.Application.csproj:15` 參照該套件，但 `src/FreeformHelper.Application` 內沒有任何檔案使用（`git grep "CommunityToolkit" -- src/FreeformHelper.Application/*.cs` 為 0）。
