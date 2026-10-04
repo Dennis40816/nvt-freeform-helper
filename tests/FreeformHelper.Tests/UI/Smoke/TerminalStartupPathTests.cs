@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -78,13 +79,28 @@ public sealed class TerminalStartupPathTests
             Assert.Equal(0, editor.VerticalOffset);
 
             editor.ScrollToEnd();
-            await FlushUiQueueAsync();
+            var scrollWait = Stopwatch.StartNew();
+            do
+            {
+                await FlushUiQueueAsync();
+            }
+            while (editor.ExtentHeight - editor.VerticalOffset - editor.ViewportHeight > 1 &&
+                   scrollWait.Elapsed < TimeSpan.FromSeconds(5));
+            Assert.True(editor.ExtentHeight - editor.VerticalOffset - editor.ViewportHeight <= 1);
+
             AppLogStore.Instance.Add(new AppLogEntry(
                 DateTimeOffset.UtcNow,
                 "INFO",
                 "terminal-test",
                 "while following latest line"));
-            await FlushUiQueueAsync();
+            scrollWait.Restart();
+            do
+            {
+                await FlushUiQueueAsync();
+            }
+            while ((!editor.Text.Contains("while following latest line", StringComparison.Ordinal) ||
+                    editor.ExtentHeight - editor.VerticalOffset - editor.ViewportHeight > 1) &&
+                   scrollWait.Elapsed < TimeSpan.FromSeconds(5));
             Assert.True(editor.ExtentHeight - editor.VerticalOffset - editor.ViewportHeight <= 1);
             Assert.Contains("while following latest line", editor.Text, StringComparison.Ordinal);
 
