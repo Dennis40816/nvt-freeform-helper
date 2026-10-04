@@ -1355,8 +1355,7 @@ public sealed class NotchTableGeneratorTests
             EnableAutoDetectXy = false
         };
 
-        var matcher = new PadMatcher();
-        var matchResult = PadMatcher.Match(cad, grid, matchSettings);
+        var matchResult = PadMatcher.Match(cad, grid);
         FreeformDetector.AutoTagFreeforms(cad, grid, matchSettings, matchResult);
 
         var settings = new ProjectSettings
@@ -1440,8 +1439,7 @@ public sealed class NotchTableGeneratorTests
             EnableAutoDetectXy = false
         };
 
-        var matcher = new PadMatcher();
-        var matchResult = PadMatcher.Match(cad, grid, matchSettings);
+        var matchResult = PadMatcher.Match(cad, grid);
         FreeformDetector.AutoTagFreeforms(cad, grid, matchSettings, matchResult);
 
         var settings = new ProjectSettings
@@ -1480,8 +1478,7 @@ public sealed class NotchTableGeneratorTests
             EnableAutoDetectXy = false
         };
 
-        var matcher = new PadMatcher();
-        var matchResult = PadMatcher.Match(cad, grid, matchSettings);
+        var matchResult = PadMatcher.Match(cad, grid);
         FreeformDetector.AutoTagFreeforms(cad, grid, matchSettings, matchResult);
 
         var legacySettings = new ProjectSettings

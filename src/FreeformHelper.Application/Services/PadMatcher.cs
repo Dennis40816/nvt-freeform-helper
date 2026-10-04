@@ -1,4 +1,3 @@
-using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 
@@ -17,17 +16,14 @@ public sealed class PadMatcher
     private const double OverlapAreaFloorRegularRatio = 0.00001;
 
     /// <summary>
-    /// Builds the current CAD-to-regular overlap evidence.
+    /// Builds many-to-many CAD-to-regular overlap evidence and projects each regular pad's
+    /// best link to <see cref="RegularPad.MatchedCadPadId"/> and <see cref="RegularPad.MatchScore"/>.
     /// </summary>
     /// <param name="cad">The set of CAD pads.</param>
     /// <param name="grid">The regular grid to match.</param>
-    /// <param name="settings">
-    /// Compatibility parameter retained until the overlap-evidence API is formalized; currently ignored.
-    /// </param>
-    public static PadMatchResult Match(CadPadSet cad, RegularGrid grid, MatchingSettings settings, Action<double>? reportProgress = null)
+    public static PadMatchResult Match(CadPadSet cad, RegularGrid grid, Action<double>? reportProgress = null)
     {
         ReportProgress(reportProgress, 0.0);
-        _ = settings;
         return MatchOverlap(cad, grid, reportProgress);
     }
 

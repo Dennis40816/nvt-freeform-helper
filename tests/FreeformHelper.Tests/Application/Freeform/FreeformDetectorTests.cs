@@ -13,7 +13,7 @@ public sealed class FreeformDetectorTests
     {
         var grid = BuildGrid(rows: 1, cols: 3, width: 3, height: 1);
         var cad = BuildCadPadSet(id: 1001, minX: 0.0, minY: 0.0, maxX: 3.0, maxY: 1.0);
-        var matchResult = PadMatcher.Match(cad, grid, new MatchingSettings());
+        var matchResult = PadMatcher.Match(cad, grid);
 
         FreeformDetector.AutoTagFreeforms(
             cad,
@@ -29,7 +29,7 @@ public sealed class FreeformDetectorTests
     {
         var grid = BuildGrid(rows: 3, cols: 1, width: 1, height: 3);
         var cad = BuildCadPadSet(id: 2001, minX: 0.0, minY: 0.0, maxX: 1.0, maxY: 3.0);
-        var matchResult = PadMatcher.Match(cad, grid, new MatchingSettings());
+        var matchResult = PadMatcher.Match(cad, grid);
 
         FreeformDetector.AutoTagFreeforms(
             cad,
@@ -45,7 +45,7 @@ public sealed class FreeformDetectorTests
     {
         var grid = BuildGrid(rows: 1, cols: 2, width: 2, height: 1);
         var cad = BuildCadPadSet(id: 3001, minX: 0.0, minY: 0.0, maxX: 1.1, maxY: 1.0);
-        var matchResult = PadMatcher.Match(cad, grid, new MatchingSettings());
+        var matchResult = PadMatcher.Match(cad, grid);
 
         FreeformDetector.AutoTagFreeforms(
             cad,
@@ -61,7 +61,7 @@ public sealed class FreeformDetectorTests
     {
         var grid = BuildGrid(rows: 2, cols: 2, width: 2, height: 2);
         var cad = BuildCadPadSet(id: 4001, minX: 0.0, minY: 0.0, maxX: 2.0, maxY: 2.0);
-        var matchResult = PadMatcher.Match(cad, grid, new MatchingSettings());
+        var matchResult = PadMatcher.Match(cad, grid);
 
         FreeformDetector.AutoTagFreeforms(
             cad,
@@ -86,7 +86,7 @@ public sealed class FreeformDetectorTests
             FreeformAxisThreshold = 0.4,
             EnableAutoDetectXy = true,
         };
-        var matchResult = PadMatcher.Match(cad, grid, new MatchingSettings());
+        var matchResult = PadMatcher.Match(cad, grid);
 
         var assignments = FreeformDetector.DetectAssignments(cad, grid, settings, matchResult);
 
@@ -103,7 +103,7 @@ public sealed class FreeformDetectorTests
     {
         var grid = BuildGrid(rows: 1, cols: 3, width: 3, height: 1);
         var cad = BuildCadPadSet(id: 5001, minX: 0.9, minY: 0.0, maxX: 1.3, maxY: 1.0);
-        var matchResult = PadMatcher.Match(cad, grid, new MatchingSettings());
+        var matchResult = PadMatcher.Match(cad, grid);
 
         FreeformDetector.AutoTagFreeforms(
             cad,
@@ -123,7 +123,7 @@ public sealed class FreeformDetectorTests
     {
         var grid = BuildGrid(rows: 1, cols: 3, width: 3, height: 1);
         var cad = BuildCadPadSet(id: 5002, minX: 0.9, minY: 0.0, maxX: 1.3, maxY: 1.0);
-        var matchResult = PadMatcher.Match(cad, grid, new MatchingSettings());
+        var matchResult = PadMatcher.Match(cad, grid);
 
         FreeformDetector.AutoTagFreeforms(
             cad,
