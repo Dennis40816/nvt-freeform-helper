@@ -13,7 +13,8 @@ public sealed partial class FreeformHelperViewModelTests
         var vm = new FreeformHelperViewModel();
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
-        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
+        using var fixture = ExampleProjectFixture.Create(projectPath);
+        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
 
@@ -51,13 +52,14 @@ public sealed partial class FreeformHelperViewModelTests
         var vm = new FreeformHelperViewModel();
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
+        using var fixture = ExampleProjectFixture.Create(projectPath);
         var csvPath = Path.Combine(repoRoot, "example", "BOE36.35", "SeeRegular.csv");
         var savePath = Path.Combine(Path.GetTempPath(), $"freeform-helper-mask-{Guid.NewGuid():N}.json");
         var missingDxfPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-missing-{Guid.NewGuid():N}.dxf");
 
         try
         {
-            vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
+            vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
             vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(csvPath);
             await vm.LoadProjectCommand.ExecuteAsync(null);
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
@@ -118,6 +120,7 @@ public sealed partial class FreeformHelperViewModelTests
         var vm = new FreeformHelperViewModel();
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
+        using var fixture = ExampleProjectFixture.Create(projectPath);
         var csvPath = Path.Combine(repoRoot, "example", "BOE36.35", "SeeRegular.csv");
         var savePath = Path.Combine(Path.GetTempPath(), $"freeform-helper-mask-embed-{Guid.NewGuid():N}.json");
         var missingDxfPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-missing-{Guid.NewGuid():N}.dxf");
@@ -125,7 +128,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         try
         {
-            vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
+            vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
             vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(csvPath);
             await vm.LoadProjectCommand.ExecuteAsync(null);
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
@@ -210,7 +213,8 @@ public sealed partial class FreeformHelperViewModelTests
         var vm = new FreeformHelperViewModel();
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
-        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
+        using var fixture = ExampleProjectFixture.Create(projectPath);
+        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
 
@@ -230,8 +234,9 @@ public sealed partial class FreeformHelperViewModelTests
         var vm = new FreeformHelperViewModel();
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
+        using var fixture = ExampleProjectFixture.Create(projectPath);
         var csvPath = Path.Combine(repoRoot, "example", "BOE36.35", "SeeRegular.csv");
-        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
+        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
         vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(csvPath);
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
@@ -270,8 +275,9 @@ public sealed partial class FreeformHelperViewModelTests
         var vm = new FreeformHelperViewModel();
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
+        using var fixture = ExampleProjectFixture.Create(projectPath);
         var csvPath = Path.Combine(repoRoot, "example", "BOE36.35", "SeeRegular.csv");
-        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
+        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
         vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(csvPath);
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
@@ -292,7 +298,8 @@ public sealed partial class FreeformHelperViewModelTests
         var vm = new FreeformHelperViewModel();
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
-        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
+        using var fixture = ExampleProjectFixture.Create(projectPath);
+        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
 
@@ -315,7 +322,8 @@ public sealed partial class FreeformHelperViewModelTests
         var vm = new FreeformHelperViewModel();
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
-        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
+        using var fixture = ExampleProjectFixture.Create(projectPath);
+        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
 
