@@ -2,7 +2,7 @@
 
 FreeformHelper 的規格與可執行 tickets 以 GitHub Issues 為唯一 tracker，repository 為 `Dennis40816/nvt-freeform-helper`。
 
-owner 決定（2026-10-04；經 Commander 轉述）：只搬移經機密審查後可公開的舊 issue 至公開 repo，並改寫 `TODO.md` 與文件中對應連結；其餘舊 issue 在私有 `Dennis40816/FreeformHelper` 完成封存後仍保留在原 repo。這取代先前「舊 issue 不搬移、不改寫」的決定。舊 PR 仍不搬移、不改寫連結，封存後留在原私有 repo。App 沒有 issues 權限，建立 issue 需 owner 操作或另行授權。
+owner 決定（2026-10-04；經 Commander 轉述）：只搬移經機密審查後可公開的舊 issue 至公開 repo，並改寫 `TODO.md` 與文件中對應連結；其餘舊 issue 在私有 `Dennis40816/FreeformHelper` 完成封存後仍保留在原 repo。這取代先前「舊 issue 不搬移、不改寫」的決定。舊 PR 仍不搬移、不改寫連結，封存後留在原私有 repo。As of 2026-10-05, no issues have been migrated; migration waits for the Commander session to confirm that the bot has Issues read/write permission.
 
 ## Conventions
 
@@ -12,6 +12,7 @@ owner 決定（2026-10-04；經 Commander 轉述）：只搬移經機密審查�
 - 優先使用 GitHub native sub-issues 與 issue dependencies；issue body 同時保留 `Part of #N`／`Blocked by: #N` 供人類直接閱讀。若 repository 不支援 native relationships，body 關係就是 fallback contract。
 - Commit title 保持單一邏輯範圍，commit body 使用 `Refs #N`；完成 ticket 的 PR 才使用 `Closes #N`。
 - Pull request body 應列出涵蓋的 issues、行為／契約影響、驗證命令與 golden evidence。
+- From 2026-10-04, new PR titles and bodies default to English; already-open PRs are not rewritten. If `AGENTS.md` or `CONTRIBUTING.md` says otherwise, ask the owner in chat before changing either file.
 
 ## Pull requests as a triage surface
 
