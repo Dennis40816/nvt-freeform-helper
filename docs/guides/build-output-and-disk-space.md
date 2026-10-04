@@ -2,7 +2,7 @@
 
 `Directory.Build.props` 在未設定 `ArtifactsPath` 時，將各專案的 `bin` 與 `obj` 放在**目前 checkout** 的 `build/`。Git worktree 通常各有自己的工作目錄與 `build/`；工具只選取腳本所在 checkout 的 `build/` 子目錄，若選取目錄內有已登錄的其他 worktree，會拒絕刪除。設定 `ArtifactsPath` 的隔離量測工作另依其腳本設定輸出位置。
 
-repo 外 test area 的位置、`TEMP`／`TMP`／`TMPDIR` 環境變數行為、保留期限與清理規則已由 owner 決定（2026-10-04，見 S15.005a），實作待辦；本指南目前只涵蓋各 checkout 的 `build/`，不把 test area 視為可由本清理工具刪除的目標。
+The external test area decided by the owner on 2026-10-04 (S15.005a) is implemented in PR #14 and awaits integration: `scripts/tests/run-tests.ps1` defaults to `D:\FreeformHelper-TestArea`, accepts the `FREEFORMHELPER_TEST_AREA` override, and sets `TEMP` / `TMP` / `TMPDIR` only for tests, with seven-day retention and manual cleanup. This is not yet available on trunk; see [handoff section 7](../reviews/r13-131-milestone-handoff-2026-10.md#7-handoff-for-2026-10-06) for the dated PR status. The build cleanup tool still targets only the `build/` directory of each checkout and does not delete the test area.
 
 ## `build/` 的內容與保留規則
 

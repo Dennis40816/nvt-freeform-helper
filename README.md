@@ -119,7 +119,7 @@ git submodule update --init example
 - 直接執行 `dotnet test` 時是略過；透過 repo 腳本（`run-tests.ps1`、`run-refactor-gate.ps1`、`run-pre-push-gate.ps1`、`verify.ps1` 的 test lane、`build.ps1`）執行時預設要求資料存在，沒有權限時加 `-AllowMissingExampleData`。即使加了這個參數，只要資料存在就仍會檢查。
 - 修改資料要在 `example/` 內 commit 並 push 到資料 repo，再回到本 repo commit 新的 submodule 指標。gate 會檢查 `example/` 是否正好在本 repo 釘住的 commit 且沒有未提交的變更。
 - 兩份 Notch golden snapshot 位於 `example/golden-snapshots/`。設定 `FREEFORMHELPER_UPDATE_NOTCH_BASELINE=1` 或 `FREEFORMHELPER_UPDATE_TM81_NOTCH_MATRIX=1` 會直接更新資料 repo checkout 中的對應檔案；維護者須先在 `FreeformHelper-testdata` commit 並 push，再更新本 repo 的 submodule 指標，否則 `assert-example-data.ps1` 會拒絕未提交的 `example/` 變更。
-- 要切到 `example/` 還是一般資料夾的舊分支（例如 `main`、`master` 目前的狀態）之前，先執行 `git submodule deinit -f example`，否則 git 會因為資料夾內已有檔案而中止切換。
+- Before switching to a historical branch that predates the `example/` submodule and still stores it as an ordinary directory, run `git submodule deinit -f example` to avoid Git refusing the switch because files already exist in that directory.
 
 ## 7. 主要路徑
 
