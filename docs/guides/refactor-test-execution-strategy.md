@@ -50,6 +50,9 @@
 - 全量 `dotnet test`：僅在跨層改動很大或 release 前做。
 
 ## 執行原則
+
+Run `pwsh -NoProfile -File ./scripts/tests/path-guard.ps1` to check tracked test code, JSON/CSV, project/settings files and text goldens, including an initialized private `example/` submodule (missing example coverage is reported); `-SelfTest` runs only synthetic samples. JSON strings are decoded before checking local path forms, the expanded `USERPROFILE`, and whole username path segments. Findings report only file, line or JSON path, and rule, never values; exit codes are 1 for findings or invalid configuration and 0 otherwise. The default `.github/path-guard.json` has an empty `exceptions` array; each exception requires an exact repository-relative `file`, `rule`, `reason`, `owner`, ISO `expiry` date (inclusive, UTC), and a `field` JSON path (for example, `$['mask']`) or `fingerprint` (SHA-256 of the UTF-8 decoded JSON string or text line without its newline); when both are supplied, both must match. This is a report-only prototype with no CI or `verify.ps1` integration.
+
 - 優先序列執行（不要同時開多個 `dotnet test`）。
 - 任何 group 失敗就停下來修，不要先跑完全部再回頭。
 - commit 前至少保證最小集（application/ui-core/smoke）全綠。
