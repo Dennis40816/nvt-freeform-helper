@@ -8,6 +8,7 @@ using Xunit;
 
 namespace FreeformHelper.Tests;
 
+// Pins CURRENT behavior: seed and hover projections have distinct selection rules.
 [Collection("HeadlessUiSerial")]
 public sealed class PadBestMatchProjectionCharacterizationTests
 {
@@ -26,6 +27,24 @@ public sealed class PadBestMatchProjectionCharacterizationTests
 
         Assert.Equal(new CadBestMatchSeed(11, 0, 1011, 0.9d, 0.2d), BuildSeed(regularPads, links));
         Assert.Same(regularPads[2], ResolveBestRegularByCad(canvas, 101));
+    }
+
+    [AvaloniaTheory]
+    [InlineData(0.8d - 0.9e-12, 9d, 22)] // Within 1e-12, larger area wins despite lower coverage.
+    [InlineData(0.8d - 1.1e-12, 9d, 11)] // Outside 1e-12, larger area cannot beat higher coverage.
+    [InlineData(0.8d + 0.5e-12, 7d, 22)] // Strictly higher coverage wins even with smaller area.
+    public void CadHover_NearEqualCoverageUsesCurrentToleranceAndStrictGreaterRule(
+        double laterCadCoverage, double laterOverlapArea, int expectedRegularPadId)
+    {
+        var regularPads = new[] { CreateRegular(11), CreateRegular(22) };
+        var links = new[]
+        {
+            new PadMatchLink(101, 11, 8d, RegularCoverage: 0.8d, CadCoverage: 0.8d),
+            new PadMatchLink(101, 22, laterOverlapArea, RegularCoverage: 0.8d, CadCoverage: laterCadCoverage),
+        };
+        var canvas = new PadCanvas { RegularPads = regularPads, PadMatchLinks = links };
+
+        Assert.Same(regularPads.Single(pad => pad.RegularPadId == expectedRegularPadId), ResolveBestRegularByCad(canvas, 101));
     }
 
     [AvaloniaFact]
@@ -60,10 +79,8 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         Assert.Equal(
             new CadBestMatchSeed(22, 0, 1022, 0.8d, 0.8d),
             BuildSeed(regularPads, links, activeRegularPadIds: new HashSet<int> { 22 }));
-        Assert.Same(regularPads[0], ResolveBestRegularByCad(canvas, 101));
 
         Assert.Equal(CadBestMatchSeed.Empty, BuildSeed(regularPads, links, activeRegularPadIds: new HashSet<int>()));
-        Assert.Same(regularPads[0], ResolveBestRegularByCad(canvas, 101));
     }
 
     [AvaloniaFact]
@@ -98,7 +115,6 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         Assert.Equal(
             new CadBestMatchSeed(11, 1, 1011, 0.9d, 0.9d),
             BuildSeed(regularPads, links, cadIcIndexByCadId: new Dictionary<int, int>()));
-        Assert.Same(regularPads[0], ResolveBestRegularByCad(canvas, 101));
     }
 
     [AvaloniaFact]
@@ -113,6 +129,23 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         var canvas = new PadCanvas { RegularPads = new[] { CreateRegular(11) }, PadMatchLinks = links };
 
         Assert.Equal(101, ResolveBestCadIdByRegular(canvas, 11));
+    }
+
+    [AvaloniaTheory]
+    [InlineData(0.8d - 0.9e-12, 9d, 101)] // Within 1e-12, larger area wins despite lower coverage.
+    [InlineData(0.8d - 1.1e-12, 9d, 301)] // Outside 1e-12, larger area cannot beat higher coverage.
+    [InlineData(0.8d + 0.5e-12, 7d, 101)] // Strictly higher coverage wins even with smaller area.
+    public void ReverseHover_NearEqualCoverageUsesCurrentToleranceAndStrictGreaterRule(
+        double laterRegularCoverage, double laterOverlapArea, int expectedCadPadId)
+    {
+        var links = new[]
+        {
+            new PadMatchLink(301, 11, 8d, RegularCoverage: 0.8d, CadCoverage: 0.8d),
+            new PadMatchLink(101, 11, laterOverlapArea, RegularCoverage: laterRegularCoverage, CadCoverage: 0.8d),
+        };
+        var canvas = new PadCanvas { RegularPads = new[] { CreateRegular(11) }, PadMatchLinks = links };
+
+        Assert.Equal(expectedCadPadId, ResolveBestCadIdByRegular(canvas, 11));
     }
 
     [AvaloniaFact]
