@@ -4,13 +4,18 @@ namespace FreeformHelper.Infrastructure.Dxf;
 
 public sealed partial class DxfPadImporter
 {
+    private static long _tokenizationCount;
+
+    internal static long TokenizationCount => Interlocked.Read(ref _tokenizationCount);
+
     /// <summary>
     /// Reads DXF group code-value pairs from a <see cref="TextReader"/>.
     /// </summary>
     /// <param name="reader">The <see cref="TextReader"/> providing DXF content.</param>
     /// <returns>An enumerable of (int code, string value) tuples.</returns>
-    private static IEnumerable<(int code, string value)> ReadPairs(TextReader reader)
+    internal static IEnumerable<(int code, string value)> ReadPairs(TextReader reader)
     {
+        Interlocked.Increment(ref _tokenizationCount);
         while (true)
         {
             var codeLine = reader.ReadLine();

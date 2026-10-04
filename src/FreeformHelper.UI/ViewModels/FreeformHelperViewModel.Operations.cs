@@ -279,7 +279,11 @@ public sealed partial class FreeformHelperViewModel
             Path = path,
             BuildDxfOptions = BuildDxfOptions,
             SetStatus = SetStatus,
-            LoadLayerCatalogFromPathAsync = TryLoadDxfLayerCatalogFromPathAsync,
+            LoadLayerCatalogFromPathAsync = selectedPath =>
+            {
+                _layerCatalogStateService.SetFromPath(selectedPath, _dxfImportService.ImportedCatalog);
+                return Task.CompletedTask;
+            },
             ResetHiddenCadPads = ResetHiddenCadPads,
             ApplyCadLoadOutcomeAsync = outcome => ApplyCadLoadOutcomeAsync(outcome, null),
             SetProjectLastDxfPath = selectedPath => _projectFile.LastDxfPath = selectedPath,

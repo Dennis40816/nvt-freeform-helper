@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace FreeformHelper.Infrastructure.Dxf;
 
 /// <summary>
@@ -27,7 +25,11 @@ public sealed class DxfLayerCatalogReader
 
     private static DxfLayerCatalog ReadFromReader(TextReader reader)
     {
-        var pairs = ReadPairs(reader).ToList();
+        return ReadFromPairs(DxfPadImporter.ReadPairs(reader).ToList());
+    }
+
+    internal static DxfLayerCatalog ReadFromPairs(IReadOnlyList<(int code, string value)> pairs)
+    {
         var layers = new Dictionary<string, LayerAccumulator>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var name in ReadLayerDefinitions(pairs))
@@ -231,31 +233,6 @@ public sealed class DxfLayerCatalogReader
         }
 
         return result;
-    }
-
-    private static IEnumerable<(int code, string value)> ReadPairs(TextReader reader)
-    {
-        while (true)
-        {
-            var codeLine = reader.ReadLine();
-            if (codeLine is null)
-            {
-                yield break;
-            }
-
-            var valueLine = reader.ReadLine();
-            if (valueLine is null)
-            {
-                yield break;
-            }
-
-            if (!int.TryParse(codeLine.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var code))
-            {
-                continue;
-            }
-
-            yield return (code, valueLine.Trim());
-        }
     }
 
     private sealed class LayerAccumulator
