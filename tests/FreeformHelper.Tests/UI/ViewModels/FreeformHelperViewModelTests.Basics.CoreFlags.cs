@@ -175,6 +175,20 @@ public sealed partial class FreeformHelperViewModelTests
     }
 
     [Fact]
+    public void SimulationSafetyOverview_InitialCapUsesSharedDefaultProjection()
+    {
+        var vm = new FreeformHelperViewModel();
+        var defaultProjection = SimulationSafetyOverviewProjector.Project(
+            audit: null,
+            isStale: false,
+            buildFailureText: null);
+
+        Assert.Equal("480", defaultProjection.EmsCapText);
+        Assert.Equal(defaultProjection.EmsCapText, vm.SimulationSafetyOverviewEmsCapText);
+        Assert.Equal("EMS cap 480", vm.NotchEmsSafetyShortText);
+    }
+
+    [Fact]
     public void SimulationSafetyGuidance_UsesCurrentOverviewCapAndKeepsDefaultSettingsText()
     {
         var vm = new FreeformHelperViewModel();
@@ -277,4 +291,18 @@ public sealed partial class FreeformHelperViewModelTests
             vm.NotchTargetCoverageCapHelpText);
     }
 
+    [Theory]
+    [InlineData(true, "Target guard: cap CurrentGain target coverage at 128%.")]
+    [InlineData(false, "Target guard: OFF; target coverage can exceed EMS diagnostic cap.")]
+    public void TargetCoverageGuardSummary_KeepsWorkflowAndSettingsWording(bool enabled, string expected)
+    {
+        var vm = new FreeformHelperViewModel { EnableTargetCoverageGuard = enabled, TargetCoverageCapPercent = 128m };
+        var settings = new SettingsWindowViewModel(vm) { EnableTargetCoverageGuard = enabled, TargetCoverageCapPercent = 128m };
+
+        Assert.Equal(expected, vm.NotchTargetCoverageGuardSummary);
+        Assert.Equal(expected, settings.NotchTargetCoverageGuardSummary);
+        Assert.Equal(
+            "Checklist: Simulation audit, EMS cap, selected rows, and C/runtime parity before FW handoff.",
+            vm.NotchExportHandoffChecklistText);
+    }
 }

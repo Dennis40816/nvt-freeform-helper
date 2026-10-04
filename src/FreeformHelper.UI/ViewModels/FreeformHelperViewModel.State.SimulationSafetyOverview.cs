@@ -19,7 +19,7 @@ public sealed partial class FreeformHelperViewModel
     private string _simulationSafetyOverviewStatusText = "Simulation not run";
 
     [ObservableProperty]
-    private string _simulationSafetyOverviewEmsCapText = "480";
+    private string _simulationSafetyOverviewEmsCapText = SimulationSafetyTextProjector.DefaultEmsAfterCapText;
 
     [ObservableProperty]
     private string _simulationSafetyOverviewMaxAfterText = "Max After -";

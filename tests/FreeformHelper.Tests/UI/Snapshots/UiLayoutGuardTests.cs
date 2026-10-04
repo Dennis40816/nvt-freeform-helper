@@ -8,6 +8,44 @@ namespace FreeformHelper.Tests;
 public sealed class UiLayoutGuardTests
 {
     [Fact]
+    public void ViewsAndViewModels_DoNotIntroduceLiteralEmsCapOrRiskWording()
+    {
+        var uiRoot = Path.Combine(TestPaths.RepoRoot, "src", "FreeformHelper.UI");
+        var allowedExistingRiskLines = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Views/DevView.axaml"] = "<SelectableTextBlock Text=\"EMS OK\"/>",
+        };
+        var literal = new Regex(
+            @"\b480\b|\bEMS\s+(?:after\s+)?cap\s*[:=]?\s*\d+|\bAfter\s*(?:<=|>=|>|<)\s*\d+|EMS risk|EMS OK|audit warning|Near cap|overflow risk >255%",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        var offenders = new List<string>();
+        var observedExistingRiskLines = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var directory in new[] { "Views", "ViewModels" })
+        {
+            var root = Path.Combine(uiRoot, directory);
+            foreach (var file in Directory.EnumerateFiles(root, "*.*", SearchOption.AllDirectories)
+                         .Where(static path => path.EndsWith(".cs", StringComparison.OrdinalIgnoreCase) ||
+                                               path.EndsWith(".axaml", StringComparison.OrdinalIgnoreCase)))
+            {
+                var relativePath = Path.GetRelativePath(uiRoot, file).Replace('\\', '/');
+                var lines = File.ReadAllLines(file);
+                for (var lineNumber = 0; lineNumber < lines.Length; lineNumber++)
+                {
+                    var line = lines[lineNumber].Trim();
+                    if (literal.IsMatch(line) &&
+                        (!allowedExistingRiskLines.TryGetValue(relativePath, out var allowedLine) ||
+                         line != allowedLine || !observedExistingRiskLines.Add(relativePath)))
+                    {
+                        offenders.Add($"{relativePath}:{lineNumber + 1}");
+                    }
+                }
+            }
+        }
+
+        Assert.True(offenders.Count == 0, "EMS cap and risk text belong to shared projectors. Offenders: " + string.Join(", ", offenders));
+    }
+
+    [Fact]
     public void Xaml_DoesNotBindScrollContentToBoundsWidth()
     {
         var repoRoot = TestPaths.RepoRoot;

@@ -1,3 +1,4 @@
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
@@ -8,6 +9,123 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class RuntimeQueryUseCaseTests
 {
+    [Fact]
+    public async Task ExecuteAsync_NotchPadAndInspector_SameResolvedDisplayWithRoundedZeroTarget()
+    {
+        const double cadArea = 4570.0;
+        const double cadHeight = 5.4;
+        const double emittedArea = 18.09;
+        const double roundedZeroArea = 0.04;
+        var anchorMaxX = (cadArea - (2 * emittedArea) - roundedZeroArea) / cadHeight;
+        var emittedMaxX = anchorMaxX + (emittedArea / cadHeight);
+        var secondEmittedMaxX = emittedMaxX + (emittedArea / cadHeight);
+        var cadMaxX = secondEmittedMaxX + (roundedZeroArea / cadHeight);
+        var gridMaxX = secondEmittedMaxX + 2.0;
+        var shell = new ShellViewModel();
+        var helper = shell.FreeformHelper;
+        var cad = CreateCadPad(274, 0, 0, cadMaxX, cadHeight);
+        var regulars = new[]
+        {
+            CreateRegularPad(4808, 0, 0, 0, 0, anchorMaxX, 10, 0, 83),
+            CreateRegularPad(4809, 0, 1, anchorMaxX, 0, emittedMaxX, 10, 0, 84),
+            CreateRegularPad(4810, 0, 2, emittedMaxX, 0, secondEmittedMaxX, 10, 0, 85),
+            CreateRegularPad(4811, 0, 3, secondEmittedMaxX, 0, gridMaxX, 10, 0, 86),
+        };
+        foreach (var regular in regulars)
+        {
+            regular.Freeform = FreeformType.XWay;
+            regular.MatchedCadPadId = cad.Id;
+            regular.MatchScore = 1.0;
+            helper.RegularPads.Add(regular);
+        }
+
+        helper.CadPads.Add(cad);
+        helper.EnableToRegular = true;
+        helper.EnableToFull = true;
+        helper.ToFullStrictOverlapPercent = 0.1m;
+        SetPrivateField(helper, "_cad", new CadPadSet([cad]));
+        SetPrivateField(helper, "_grid", new RegularGrid(
+            rows: 1,
+            cols: 4,
+            xEdges: [0, anchorMaxX, emittedMaxX, secondEmittedMaxX, gridMaxX],
+            yEdges: [0, 10],
+            pads: regulars));
+        GetPrivateDictionary<int, int>(helper, "_cadOutputFwDiffIndexByCadId")[cad.Id] = 83;
+        GetPrivateDictionary<int, int>(helper, "_cadIcIndexByCadId")[cad.Id] = 0;
+        SetPrivateField(helper, "_isWorkflowDataSnapshotCacheValid", false);
+
+        var resolved = Assert.IsType<NotchV22ResolvedResult>(helper.GetCadV22ResolvedResult(cad.Id));
+        var snapshot = Assert.IsType<PadInspectorSnapshot>(helper.BuildCadPadInspectorSnapshot(cad.Id));
+        var inspector = Assert.IsType<PadInspectorNotchSnapshot>(snapshot.Cad?.Notch);
+        var padInfo = new CadPadInfoViewModel(
+            pads: [cad],
+            getDxfIndex: _ => 83,
+            getCadOutputFwDiffOverride: null,
+            isDxfIndexAnchor: null,
+            getCustomValue: _ => 0,
+            applyCustomValue: null,
+            setCadOutputFwDiffOverride: null,
+            clearCadOutputFwDiffOverride: null,
+            setDxfIndexAnchor: null,
+            clearDxfIndexAnchor: null,
+            inspectorSnapshot: snapshot);
+        var useCase = new RuntimeQueryUseCase(shell);
+        var args = new Dictionary<string, string> { ["cad-id"] = cad.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) };
+        var notchResponse = await useCase.ExecuteAsync(new RuntimeQueryRequest(RuntimeQueryProtocol.Version, "notch", args));
+        var padResponse = await useCase.ExecuteAsync(new RuntimeQueryRequest(RuntimeQueryProtocol.Version, "pad", args));
+        Assert.True(notchResponse.Ok, notchResponse.Error?.Message);
+        Assert.True(padResponse.Ok, padResponse.Error?.Message);
+        var notch = SerializeToRootElement(notchResponse.Data);
+        var pad = SerializeToRootElement(padResponse.Data).GetProperty("snapshot").GetProperty("cad").GetProperty("notch");
+        var notchAllocation = notch.GetProperty("stage3Allocation");
+        var notchDisplay = notch.GetProperty("ratios").GetProperty("display");
+        var padDisplay = pad.GetProperty("display");
+        var expected = NotchDisplayProjector.Build(inspector);
+
+        Assert.Same(resolved, helper.GetCadV22ResolvedResult(cad.Id));
+        Assert.Same(resolved.TargetAllocation.TargetCoverageProjection, inspector.TargetCoverageProjection);
+        Assert.Equal($"r{helper.GetNotchStep3Revision()}:cad{cad.Id}", notch.GetProperty("cache").GetProperty("cacheKey").GetString());
+        Assert.Equal(resolved.Compensation.Stage3Area, inspector.Stage3Area);
+        Assert.Equal(inspector.Stage3Area, notch.GetProperty("ratios").GetProperty("stage3Area").GetDouble());
+        Assert.Equal(inspector.Stage3Area, pad.GetProperty("stage3Area").GetDouble());
+        Assert.Equal(resolved.TargetAllocation.Stage3Area, notchAllocation.GetProperty("stage3Area").GetDouble());
+        Assert.True(resolved.Compensation.IsToFullEnabled);
+        Assert.Equal(resolved.Compensation.IsToFullEnabled, inspector.IsToFullEnabled);
+        Assert.Equal(inspector.IsToFullEnabled, notch.GetProperty("summary").GetProperty("isToFullEnabled").GetBoolean());
+        Assert.Equal(inspector.IsToFullEnabled, pad.GetProperty("isToFullEnabled").GetBoolean());
+        Assert.Equal(expected.Stage3AreaText, padInfo.Stage3AreaText);
+        Assert.Equal(expected.Stage3AreaText, notchDisplay.GetProperty("stage3AreaText").GetString());
+        Assert.Equal(expected.Stage3AreaText, padDisplay.GetProperty("stage3AreaText").GetString());
+        Assert.Equal(expected.ToFullRatioText, padInfo.ToFullRatioText);
+        Assert.Equal(expected.ToFullRatioText, notchDisplay.GetProperty("toFullRatioText").GetString());
+        Assert.Equal(expected.ToFullRatioText, padDisplay.GetProperty("toFullRatioText").GetString());
+
+        var coverage = resolved.TargetAllocation.TargetCoverageProjection;
+        Assert.Equal([84, 85], coverage.EmittedTargets.Select(static target => target.DiffIndex));
+        Assert.Equal(0, Assert.Single(inspector.Targets, target => target.DiffIndex == 86).RatioPercentRounded);
+        Assert.Equal(
+            resolved.TargetAllocation.Targets.Select(static target => target.DiffIndex),
+            inspector.Targets.Select(static target => target.DiffIndex));
+        Assert.Equal(
+            inspector.Targets.Select(static target => target.DiffIndex),
+            notchAllocation.GetProperty("targets").EnumerateArray().Select(static target => target.GetProperty("diffIndex").GetInt32()));
+        Assert.Equal(
+            inspector.Targets.Select(static target => target.DiffIndex),
+            pad.GetProperty("targets").EnumerateArray().Select(static target => target.GetProperty("diffIndex").GetInt32()));
+        Assert.Equal(expected.TargetAllocationSummaryText, padInfo.TargetAllocationSummaryText);
+        Assert.Equal(expected.TargetAllocationSummaryText, notchAllocation.GetProperty("display").GetProperty("targetAllocationSummaryText").GetString());
+        Assert.Equal(expected.TargetAllocationSummaryText, padDisplay.GetProperty("targetAllocationSummaryText").GetString());
+        Assert.Equal(expected.TargetAllocationLines, padInfo.TargetAllocationLines);
+        Assert.Equal(
+            expected.TargetAllocationLines,
+            notchAllocation.GetProperty("display").GetProperty("targetAllocationLines").EnumerateArray().Select(static line => line.GetString()));
+        Assert.Equal(coverage.DisplayCombinedRatio, inspector.TargetCoverageProjection?.DisplayCombinedRatio);
+        Assert.Equal(expected.CombinedRatioText, padInfo.CombinedRatioText);
+        Assert.Equal(expected.CombinedRatioText, notchDisplay.GetProperty("combinedRatioText").GetString());
+        Assert.Equal(expected.CombinedRatioText, padDisplay.GetProperty("combinedRatioText").GetString());
+        Assert.Equal(["IC1/diff83", "IC1/diff84", "IC1/diff85", "IC1/diff86"], padInfo.TargetAllocationItems.Select(static item => item.DiffText));
+        Assert.Equal("Below gate", padInfo.TargetAllocationItems[3].RoleText);
+    }
 
 
     [Fact]

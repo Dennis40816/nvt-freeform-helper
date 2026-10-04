@@ -51,7 +51,7 @@ public sealed partial class SimulationWorkspaceViewModel
         $"Coverage {SimulationTargetCoverageRiskCount.ToString(CultureInfo.InvariantCulture)}";
     public string SimulationSafetyStatusText =>
         SimulationSafetyTextProjector.BuildStatusText(_simulationSafetyAudit);
-    public string SimulationEmsCapText => $"EMS cap: After <= {FormatSafetyValue(SimulationEmsAfterCap)}";
+    public string SimulationEmsCapText => SimulationSafetyTextProjector.BuildWorkspaceEmsCapText(SimulationEmsAfterCap);
     public string SimulationMaxAfterText => _simulationSafetyAudit.HasCells
         ? $"Max After {FormatSafetyValue(_simulationSafetyAudit.MaxAfterValue)}"
         : "Max After -";
@@ -195,7 +195,7 @@ public sealed partial class SimulationWorkspaceViewModel
                 $"After {FormatSafetyValue(item.AfterValue)}",
                 $"Δ {FormatSignedSafetyValue(item.DeltaValue)}",
                 SimulationSafetyTextProjector.FormatRiskMarginText(item, _simulationSafetyAudit.AfterCap),
-                isViolation ? "EMS risk" : "Near cap",
+                SimulationSafetyTextProjector.BuildHighRiskStatusText(isViolation),
                 isViolation));
         }
     }

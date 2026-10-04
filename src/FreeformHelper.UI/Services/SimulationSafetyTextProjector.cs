@@ -5,6 +5,8 @@ namespace FreeformHelper.UI.Services;
 
 public static class SimulationSafetyTextProjector
 {
+    public const string ExportBlockTitle = "Export blocked by EMS safety";
+
     public static string FormatValue(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 
     internal static string FormatEmsAfterCap(SimulationSafetyAuditResult? audit) =>
@@ -26,6 +28,16 @@ public static class SimulationSafetyTextProjector
         return $"At uniform 400, target cap {targetCapText}% maps to After {mappedAfterText}; " +
                $"compare with EMS cap {emsCapText}.";
     }
+
+    internal static string BuildNotchTargetCoverageGuardSummary(bool enabled, decimal targetCoverageCapPercent) =>
+        enabled
+            ? $"Target guard: cap CurrentGain target coverage at {targetCoverageCapPercent:0.#}%."
+            : "Target guard: OFF; target coverage can exceed EMS diagnostic cap.";
+
+    internal static string BuildNotchExportHandoffChecklistText(bool hasExportType) =>
+        hasExportType
+            ? "Checklist: Simulation audit, EMS cap, selected rows, and C/runtime parity before FW handoff."
+            : "Checklist unavailable until an export type is selected.";
 
     internal static string BuildNotchExportSafetyPolicySummary(string capText) =>
         $"Export safety: run Simulation audit before FW handoff; any After > {capText} needs explicit review.";
@@ -65,6 +77,12 @@ public static class SimulationSafetyTextProjector
 
     public static string FormatCountBadge(int count) =>
         count > 99 ? "99+" : Math.Max(0, count).ToString(CultureInfo.InvariantCulture);
+
+    public static string BuildWorkspaceEmsCapText(double afterCap) =>
+        $"EMS cap: After <= {FormatValue(afterCap)}";
+
+    public static string BuildHighRiskStatusText(bool isViolation) =>
+        isViolation ? BuildReplayStatusText(true, true, false) : "Near cap";
 
     public static string BuildWorkspaceSummaryText(SimulationSafetyAuditResult audit)
     {
@@ -166,6 +184,13 @@ public static class SimulationSafetyTextProjector
             ? $"{summary} {BuildPhysicalAuditSummaryText(audit)}"
             : summary;
     }
+
+    public static string BuildExportButtonText(bool isBlocked, string readyText) =>
+        isBlocked ? "Export blocked (EMS risk)" : readyText;
+
+    public static string BuildExportBlockMessage(SimulationSafetyAuditResult audit) =>
+        BuildExportSummaryText(audit) + Environment.NewLine + Environment.NewLine +
+        BuildExportHighRiskText(audit);
 
     public static string BuildExportHighRiskText(SimulationSafetyAuditResult? audit)
     {

@@ -151,11 +151,11 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
                 HasFocusMatchAction = snapshotCad.MatchedRegularPadIds.Count > 0 && _focusCadMatches is not null;
                 HasHighlightMatchAction = snapshotCad.MatchedRegularPadIds.Count > 0 && _highlightCadMatches is not null;
 
-                if (snapshotCad.Notch is not null)
+                if (snapshotCad.Notch is { } resolvedDisplayInput)
                 {
                     hasNotchCompensationPreview = true;
                     notchRowSummaryText = snapshotCad.NotchRowSummary;
-                    var notchDisplay = NotchDisplayProjector.Build(snapshotCad.Notch);
+                    var notchDisplay = NotchDisplayProjector.Build(resolvedDisplayInput);
                     toRegularRatioText = notchDisplay.ToRegularRatioText;
                     toFullRatioText = notchDisplay.ToFullRatioText;
                     combinedRatioText = notchDisplay.CombinedRatioText;

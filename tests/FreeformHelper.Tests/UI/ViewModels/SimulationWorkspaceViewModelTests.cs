@@ -535,10 +535,14 @@ public sealed class SimulationWorkspaceViewModelTests
 
         Assert.True(viewModel.HasSimulationSafetyViolations);
         Assert.Equal("EMS risk", viewModel.SimulationSafetyStatusText);
+        Assert.Equal("EMS cap: After <= 480", viewModel.SimulationEmsCapText);
         Assert.Contains("EMS risk", viewModel.SimulationSafetySummaryText, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Max After", viewModel.SimulationMaxAfterText, StringComparison.Ordinal);
         Assert.Contains("Physical audit", viewModel.SimulationPhysicalAuditSummaryText, StringComparison.Ordinal);
         Assert.NotEmpty(viewModel.SimulationHighRiskDiffs);
+        Assert.Contains(viewModel.SimulationHighRiskDiffs, item => item.IsViolation && item.StatusText == "EMS risk");
+        viewModel.GlobalValue = 450d;
+        Assert.Contains(viewModel.SimulationHighRiskDiffs, item => !item.IsViolation && item.StatusText == "Near cap");
     }
 
     [Theory]

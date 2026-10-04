@@ -355,7 +355,9 @@ public sealed partial class NotchExportSelectionViewModelTests
         Assert.True(vm.IsSimulationSafetyClean);
         Assert.False(vm.HasSimulationPhysicalAuditWarning);
         Assert.False(vm.IsExportBlockedBySimulationSafety);
-        Assert.False(vm.TryGetExportBlockMessage(out _, out _));
+        Assert.False(vm.TryGetExportBlockMessage(out var title, out var message));
+        Assert.Equal(string.Empty, title);
+        Assert.Equal(string.Empty, message);
         Assert.Equal("EMS OK · Max After 452", vm.SimulationSafetyExportBadgeText);
         Assert.Equal("Safe for EMS cap 480: Max After 452 at REG 1.", vm.SimulationSafetyExportSummaryText);
     }
