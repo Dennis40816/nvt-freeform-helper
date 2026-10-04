@@ -37,6 +37,7 @@ public sealed class Notch3635GenerationBenchmarkTests
         }
 
         var projectPath = Path.Combine(TestPaths.RepoRoot, "example", "BOE36.35", "project_3635.json");
+        using var fixture = ExampleProjectFixture.Create(projectPath);
         var samples = new List<Notch3635BenchmarkSample>(warmupIterations + iterations);
         for (var run = 0; run < warmupIterations + iterations; run++)
         {
@@ -46,7 +47,7 @@ public sealed class Notch3635GenerationBenchmarkTests
 
             var vm = new FreeformHelperViewModel
             {
-                PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
+                PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath),
             };
             await vm.LoadProjectCommand.ExecuteAsync(null);
 
