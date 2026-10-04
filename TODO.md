@@ -93,10 +93,14 @@
   - 變更：僅修改該測試，沿用 `FlushUiQueueAsync`，每輪 flush 完成後以 `Stopwatch` 檢查 5 秒重試期限（flush 本身沒有 timeout，dispatcher 停滯時不會因此退出）；新增 log 前等待已捲到底，新增後等待最新文字出現且底部距離仍 <= 1。條件達成即結束，不加固定 sleep；保留解析次數、捲動距離與篩選斷言，不變更 production，也不新增共用 helper。
   - 驗證：沙箱內測試專案離線 build 2 次，均為 0 warnings／0 errors；`TerminalStartupPathTests` 修改前 8/8、修改後連續 6 輪共 48/48 通過，0 failed／0 skipped。`verify.ps1 -StructureOnly` 與 `git diff --check` 通過，兩個修改檔均為 CRLF；沙箱不支援 lint，未執行。
   - 未能驗證：runner 失敗只觀察到一次，未在受控環境重現該次排程，也未取得當時的排版／捲動 trace；本機通過不能證明 runner 後續永不再失敗。
-
-- [ ] **S15.017 console link 解析仍每次重掃整份文字（production 效能，待量測）**
+- [ ] **S15.017 console link 解析仍每次重掃整份文字（production 效能，已量測、未實作）**
   - `ConsoleLinkParser.Parse` 對完整文字執行六個 regex，並對候選路徑查詢檔案系統；S15.013 只減少呼叫次數，單次成本仍隨 console 長度成長。
-  - 待辦：先量測長 console 的單次解析成本，再評估增量解析新增行；須維持舊行 offset、截斷、篩選與可點擊連結的等價性。
+  - 待辦：評估增量解析新增行；須維持舊行 offset、截斷、去重、篩選與可點擊連結的等價性。
+  - 先前量測（2026-10-03，由佇列的 codex 執行；未實作）：以合成 console（含 URL 與本機暫存檔案路徑，並核對 target、offset、長度、line/column）呼叫 `ConsoleLinkParser.Parse`，暖機後各量 5 次取中位數：27,600 字元／200 個 link 約 49 ms；276,000 字元／2,000 個 link 約 539 ms；2,760,000 字元／20,000 個 link 約 28.2 秒。成本隨輸入超線性成長（文字與 link 數同時放大 10 倍，時間約放大 11 倍、再放大 52 倍），但這個負載同時增加文字與 link，尚未隔離是文字長度還是 link／檔案查詢造成的。該次量測類別約 2.5 分鐘，測試碼未保留。
+  - 實際輸入上限核對（2026-10-03）：`src/FreeformHelper.UI/ViewModels/ShellViewModel.cs:20` 定義 4000；`ShellViewModel.Console.cs:84` 的追加容量與 `:114` 的 `GetTail(4000)` 都按 **log entry 數**計算，`:120`／`:124` 將格式化文字完整組成 `ConsoleText`，`:209`～`:218` 僅在 entry 間加入換行。**應用程式未設定固定的字元數或實際文字行數上限**：`src/FreeformHelper.UI/Logging/AppLogFormatter.cs:30`～`:37` 原樣串接 `entry.Message`，不截斷長訊息或內嵌換行；若 4000 筆都是單行且每筆訊息長 M，Windows 預設尾端可達 `4000 × (M + 78) + 3999 × 2` 個 UTF-16 字元／4000 行，M 並無程式設定的上限。去重開啟時 `ShellViewModel.Console.cs:133` 改取整個 `MaxEntries`，配合 `src/FreeformHelper.UI/Logging/AppLogStore.cs:15`／`:50` 的 10,000，互不相同的單行 entry 可達 10,000 行；兩種模式有內嵌換行時都可超過其 entry 數。
+  - 傳入 parser 的證據：`src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleHost.cs:112`～`:120` 將 `ConsoleText` 交給 `ApplyConsoleRender`；同目錄 `FreeformHelperView.Console.Rendering.cs:226`～`:237` 在未篩選時保留原文，`:240`～`:265` 的篩選只減少行，`:217` 寫入完整 editor 文字；`FreeformHelperView.Console.Events.cs:182`～`:184` 的 TextChanged 呼叫 `RefreshConsoleLinks`，後者於 `FreeformHelperView.Console.Rendering.cs:14`／`:21` 將完整 editor 文字送進 `Parse`，沒有額外長度裁切。Fallback 的 `GetTail(4000)`（`FreeformHelperView.axaml.cs:18`；`FreeformHelperView.Console.Rendering.cs:139`／`:148`）亦不限制字元，且每筆 `AppendLine` 使 4000 筆單行 entry 另有一個尾端空行（共 4001 行）。
+  - 尾端長行量測（2026-10-03；.NET 8.0.31／x64／Debug／Windows）：暫時測試加入 4001 筆 entry，由實際 `ShellViewModel.ConsoleText` 取得最後 4000 筆，核對 **4000 行 × 每行 1024 字元（含 78 字元格式前綴）＋3999 組 CRLF＝4,103,998 個 UTF-16 字元**，沒有尾端換行。每行含一個 URL 與一個既存本機暫存檔案路徑 `(12,34)`，餘文重複 `detail ` 補滿；共 8000 個 link，逐一核對 target、offset、長度、line/column。完整大小暖機 1 次後，各計時一次 `Parse`，5 次為 **7739.781／5232.459／5031.071／5176.339／4839.911 ms；中位數 5176.339 ms（約 5.18 秒）**。計時不含文字建立、ViewModel／editor 渲染或結果驗證；這是應用路徑可達的合成長行壓力樣本，並非固定最大值或一般 log 分佈。暫時測試與樣本檔案已刪除，未保留報告檔案。
+  - 建議：**是，值得後續評估增量解析**。即使預設只保留 4000 筆，長行仍能讓一次完整解析耗時約 5.18 秒；上述 View 刷新路徑同步呼叫 parser，S15.013 合併通知無法消除這個單次停頓。新增行時重掃既有文字的成本明顯，但此量測未證明增量方案的加速幅度，也未隔離 regex、link 重疊檢查與檔案查詢成本；本次只補證據與建議，不實作效能修正，保留此項待辦。
 
 - [x] **S15.015 多個 thread 同時改寫 log 的 UI 集合，弄壞 `ShellViewModel` 的 console 緩衝（2026-10-02 修正）**
   - 現象：限制核心數的整套測試中，dispatcher 上的工作偶爾丟出 `ArgumentOutOfRangeException: Index was out of range ... (Parameter 'chunkLength')`。9 輪中有 3 輪出現；其中 2 輪發生在測試結束之後（被 S15.002 根因八的防護攔下），1 輪發生在測試進行中，讓 `FreeformHelperViewModel_OutsideUiDispatcher_KeepsCanvasColorDefaults` 失敗並連帶弄壞 session（另外 2 個測試快速失敗）。
@@ -272,7 +276,7 @@
     - [x] README 說明 `example/` submodule 與沒有資料時的行為（S15.009b 已加）。
     - [x] `LICENSE`：owner 已決定「保留所有權利」，copyright holder 為 `Dennis Liu`；已新增專有權利聲明，`scripts/verify.ps1` 將其列為必要檔案。
     - [x] 兩個 golden snapshot 已移到 `FreeformHelper-testdata` 的 `golden-snapshots/`（commit `8c84e4d6`），本 repo 透過 `example/golden-snapshots/` 讀取；本次變更刪除舊路徑，提交後的 HEAD 不再包含它們，但本 private repo 歷史仍保留，因此公開 repo 必須由匯出的檔案樹建立。S15.005a 的 deploy key 尚未設置前，CI 會略過這兩個測試。測試程式與文件中同樣有個別 pad 編號、節點數與雜湊這類由面板資料算出的數值，維持不動（owner 已同意名稱可公開）。
-    - [ ] `.gitmodules` 會讓公開 repo 顯示 private 資料 repo 的名稱；外部使用者 `--recurse-submodules` 會失敗（一般 clone 不受影響）。公開 repo 必須由匯出的檔案樹建立，不能 push 現有的任何 ref。
+    - [x] `.gitmodules` 的處理：owner 2026-10-03 決定「保留私有 URL」，公開樹保留 `.gitmodules`（相對 URL `../FreeformHelper-testdata.git`）與 `example` 的 gitlink（`8c84e4d6`）；公開頁面會看得到私有資料 repo 的名稱但沒有內容，外部使用者 `--recurse-submodules` 會失敗（一般 clone 不受影響）。公開 repo 必須由匯出的檔案樹建立（單一初始 commit），不能 push 現有的任何 ref；此公開匯入限制與 S15.009e 一併結案。
   - [ ] **S15.009e 建立公開 repo「NVT Freeform Helper」並把本 repo 標示為 archived**（owner 2026-10-02 決定名稱與處置）
     - 新 repo 由 owner 建立（slug 待定，GitHub 名稱不能有空白）；以單一 commit 匯入，不 push 本 repo 的任何 ref。之後的日常開發在新 repo 進行。
     - 本 repo 在遷移完成後明確標示為 archived（名稱或描述註明，並設為唯讀）。archive 之後不能再 push 或開 PR，所以要先把本 repo 上未完成的 PR 收尾，並確認 `FreeformHelper-testdata` 與新 repo 的 submodule 指標正確。
@@ -372,7 +376,7 @@
     - TDD／mutation：public empty-precompute fixture在修改前把幾何半覆蓋重算為`ToRegular=0.5`而RED，完成後固定ratio／combined／overlap／count為`0`且無debug rows；public raw factory、canonical context與compatibility adapter投影相同normal diagnostics。Focused compensation/generator/Detail 76、notch-core 190、Application 221、ui-core 274、smoke 25、golden 6、Runtime Query/IPC 23與GCC 8 tests通過；callback freeze、V21/V22 ordered rows與Runtime schema不變。
     - Size／gates：相對`659f214`，production total `592 / 99,788 / 89,092 -> 592 / 99,896 / 89,195`、logic-first `387 / 65,541 / 58,141 -> 387 / 65,649 / 58,244`，皆為`0 files / +108 physical / +103 nonblank`；同時直接刪除Stage A/B nullable fallback 45 physical lines，0新service／cache／session／dependency／generic executor，相關最大檔案為497行。兩次fresh isolated deterministic Release皆為`15,362,560 bytes`，相對[#76](https://github.com/Dennis40816/FreeformHelper/issues/76)的`15,360,512`為`+2,048`；Application `715,264 / B55657DD…3C7218`、UI `14,546,432 / E0A4F051…113A7C`，Domain／Infrastructure bytes/hash不變。Hidden UI/IPC正反順序維持V21 `692 / 130979 / 8961B815…E57488`、V22 `548 / 84023 / 5208068B…57BB47`，golden／export state／budget PASS；selection total／Inspector／preview p95為`43/23/19`與`29/15/16 ms`，UI build與lint/analyzer為0 warning／0 error。R13.101仍因R13.101c-2 final-output/cache split保持open；R13.102／R13.103與Legacy convergence亦未由本slice宣稱完成。
 - [ ] **R13.102 建立與 V21/V22 output request 無關的 compensation/Stage1-3/allocation/audit/trace 單一 resolved result**
-  - 盤點證據（2026-10，INV2）：`docs/reviews/r13-slice-inventories-2026-10.md` 第 1 節列出 generator、Inspector、PadInfo、RuntimeQuery、simulation／overlay 讀者及下一個零行為 leaf；本 parent 保持未完成，純 `LegacyRegularAnchor` 議題等待 owner decision。
+  - 盤點證據（2026-10，INV2）：`docs/reviews/r13-slice-inventories-2026-10.md` 第 1 節列出 generator、Inspector、PadInfo、RuntimeQuery、simulation／overlay 讀者及下一個零行為 leaf；本 parent 保持未完成，純 `LegacyRegularAnchor` 部分依 owner 2026-10-03 決定：V21 與 Legacy 維持原樣，不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標（見本檔 Owner 決定）。
   - [ ] **R13.102a 同一次 selection/revision 的 preview、inspector、export 共用同一 resolved snapshot/task**，不得同步 preview 算一次、deferred inspector 再算一次。
     - [x] **R13.102a-1 讓同一 selection/revision 的 Step 3 preview 與 deferred CAD Inspector 共用同一 resolved snapshot**（[#16](https://github.com/Dennis40816/FreeformHelper/issues/16)）：preview 改由既有 revisioned per-CAD owner 取得 `NotchV22ResolvedResult`；200 ms deferred warm path 只投影同一 immutable instance，不再重算 compensation、evict cache 或以等價新 instance 取代。Cold miss 仍在 background 建立、驗證、保存並投影一次，既有 debounce、pending state、cancellation、selection/revision stale rejection 與 UI-thread apply 契約不變。
       - TDD：public ViewModel workflow 鎖 warm identity、cold stable identity、CAD A→B／clear-selection stale rejection、output-only profile/file-type/version reuse、pending 中 strict-overlap invalidation，以及 strict-override／partial-cache 不污染 current key。將 preview 暫退回 uncached construction、讓 deferred path忽略 prewarmed result，或強制 warm path重算 compensation時，identity／build-count tests各自恢復 RED。
@@ -612,7 +616,7 @@
   - 基準：先使用 gated `Cad3635LoadBenchmarkTests` 量測 3635 `import / layerCatalog / apply / rebuild`，並用 gated `Cad3635EndToEndBenchmarkTests` 量測 `Load project / Step1 / Step2 / Step5` 的 compute + render flush，再逐步重構。
   - 驗收：3635 direct DXF load 與 E2E benchmark 顯示改善比例；3635 V21/V22 export drift 維持一致；一般測試不因 benchmark 變慢。
 
-- [ ] **S14.012 Source-line length coverage model note（研究 / 不進 UI 重構 commit）**
+- [x] **S14.012 Source-line length coverage model note（研究 / 不進 UI 重構 commit；2026-10-03 完成，文件隨 PR 103 合併）**
   - 目標：記錄「polygon 面積相同但 source/data line 覆蓋長度不同時，實際感應量可能不同」的物理模型假設，避免未來 allocation 討論只剩 area ratio。
   - 範圍：新增或更新 `docs/reference/source-line-coverage-model.md`；盤點 `src/FreeformHelper.Application/Services/PadMatcher.cs`、`src/FreeformHelper.Application/Services/NotchV22TargetAllocationService.cs`、`src/FreeformHelper.Application/Services/NotchV22CompensationService*.cs` 目前 area-based assumption。
   - 驗證：
