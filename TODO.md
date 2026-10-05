@@ -73,29 +73,34 @@
   - Document-translation delivery: the first batch (35 documents under docs/core, docs/governance, docs/guides, docs/performance, docs/reference and docs/reviews) merged in PR #30 (c91c4815). Remaining Chinese documents follow in later low-priority batches.
   - Mask product questions: PR #22 (8817eb5f) merged tests-only characterization of the missing saved mask path and importing a mask while enabled. The owner must decide the behavior for each case; no behavior change is authorized by characterization.
   - README language split and the normative-document corrections merged in PR #29 (d1274d58). The owner confirmed the AGENTS.md and CONTRIBUTING.md changes in chat on 2026-10-05 around 16:2x, selecting 「確認，三處都可以 (Recommended)」 ("Confirmed; all three changes are fine (Recommended)"): the branch model, the chat-confirmation flow, and moving the S15.005c/S15.005d status sentence to TODO.md.
-  - Bot issue permissions: the owner reports that the App's Issues permission is Read and write, but the shared NFC token tool requests a fixed permission subset without issues, so the bot can create issues and labels but cannot add labels, comment on or close issues. The owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch to the shared tool, used only by NFH. The switch is available since 2026-10-05. A test on issue #37 confirmed that the bot can label, comment on and close issues.
+  - Bot issue permissions: the owner reports that the App's Issues permission is Read and write, but the shared NFC token tool requests a fixed permission subset without issues, so the bot could create issues and labels but could not add labels, comment on or close issues. The owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch to the shared tool, used only by NFH. The switch is available since 2026-10-05. A test on issue #37 confirmed that the bot can label, comment on and close issues.
   - 1.3.2 exit: the owner selected 「用已交付範圍結束」 ("End with the delivered scope").
     - R13.201, R13.202, R13.205 and R13.206 close as delivered.
     - R13.203 and R13.204 close with their delivered parts.
     - Their remaining work moves to R13.406, which starts after 2026-10-18: the other typed-ID chains and the RegularPad writer transitions.
     - 1.3.2 ends on 2026-10-06, and the Avalonia 12 upgrade starts on 2026-10-07.
     - VERSION: the owner selected 「改成 1.3.2」 ("Change it to 1.3.2"). PR #38 (922ba49c) merged the change. Tags and the release workflow stay with S15.005e.
-  - R13.205: the owner chose to close the parent. TM8.1 gate evidence: the integrator's local run of the notch-golden group on trunk e01e07a3, with the example data, passed 6 of 6 (C export drift 4, baseline 1, TM8.1 matrix 1) with 0 skipped.
+  - R13.205: the owner chose to close the parent. TM8.1 gate evidence: the notch-golden group passed 6 of 6 with 0 skipped.
+    - The integrator ran it locally on trunk e01e07a3 with the example data.
+    - The group has C export drift 4, baseline 1 and TM8.1 matrix 1.
   - NVT Core: the owner said 「這樣速度偏慢，我是要下下周前完成所有 NVT Core 內容」 ("This is too slow. I want all NVT Core content finished before the week after next").
     - The deadline is 2026-10-18. Core comes first.
     - Until then, non-Core NFH work is limited to 1.3.2 and urgent fixes.
     - NFH officially adopts NVT Core from 1.3.3: first the non-UI library on net8, then the UI modules after the Avalonia 12 upgrade.
     - NFH contributes these modules to Core:
-      - cards, dialogs and input controls, ported to Avalonia 12;
-      - the console with AppLogEntry and AppLogFormatter, tried in NFH first;
-      - CoalescedRefresh and UndoService, in the non-UI library;
-      - the UI-thread helper, in the Avalonia 12 library;
+      - cards, dialogs and input controls, ported to Avalonia 12
+      - the console with AppLogEntry and AppLogFormatter, tried in NFH first
+      - CoalescedRefresh and UndoService, in the non-UI library
+      - the UI-thread helper, in the Avalonia 12 library
       - the Runtime Query transport, in the non-UI library. Its commands stay in NFH.
     - Core code is all rights reserved with the owner as copyright holder, and this also applies to code moved from NFH.
+    - Update 2026-10-06: Core uses a proprietary license. It explicitly allows integration, shipping with the tools and execution by users.
+    - Consumption (2026-10-06): NFH consumes Core as versioned .nupkg files from a local feed in this repository. Core has its own SemVer. NFH uses only the non-UI library until the Avalonia 12 upgrade.
     - Governance checks run report-only now and become required after 1.3.2.
   - Feature classification: the owner said 「我相信完成後，開發功能前都必須先問是屬於 Core 的功能還是專案專屬功能」 ("I believe that once this is done, before developing a feature we must first ask whether it is a Core feature or a project-specific feature").
     - After the Core import, each new feature first gets a classification proposal with reasons for the owner to decide.
     - Plain firmware product logic counts as project-specific and is only recorded.
+    - On 2026-10-06 the owner said 「後續 NFH 也可以慢慢將值得共用的 UI 丟上去了」 ("NFH may now gradually move shareable UI up to Core"). Each candidate goes to the owner with reasons.
 
 - [x] **S15.001 處理 4 個穩定失敗的 `SimulationWorkspaceViewModelTests`**
   - 失敗：`CopperSource_WhenMoved_RegeneratesBeforeFrameThroughSharedSimulationPath`（預期 `400`、實際 `399`）、`CopperContactModel_WhenFingerSelected_UsesLowerFullPadSignal`（`360`／`359`）、`DiffViolationSummary_WhenNoMismatch_ShowsCleanState`（`EMS OK`／`audit warning`）、`DiffViolationSummary_WhenDuplicateDiffDeltaMismatches_ListsViolatingPads`（`Assert.True`）。
@@ -612,7 +617,7 @@
   - Owner decision (2026-10-05): CadBest and hover retain their own rules and share only parts proven identical; the exact-tie decision (no ID tie-break) is recorded once in the decisions section at the top of this file. The 3635 measurement found 4838 CADs, 582 touching at least two regulars, 6 selecting different regulars, and 0 exact ties.
   - [x] CadBest and hover best-match characterization merged in PR #23 (fd6e74ef), tests only.
   - [x] Allocation-anchor and freeform-classification characterization merged in PR #25 (792b4f79), tests only.
-  - Remaining scope: share only parts proven identical; characterization delivery does not close the parent.
+  - Rule for later work: share only parts proven identical.
 - [x] **R13.203 依 API boundary 漸進導入 typed IDs 與 legacy adapters**
   - The owner closed it on 2026-10-05 with the delivered scope. See the owner decisions above.
   - [x] Typed CadPadId/RegularPadId for the DXF manual override chain merged in PR #28 (e5bbe658) with owner approval.
@@ -628,7 +633,7 @@
   - [x] Audit-phase characterization merged in PR #17 (c0c4e39b), tests only.
   - [x] Explicit seed and segment stages merged in PR #31 (d756745b) with owner approval, behavior unchanged.
   - [x] Explicit local-repair and passive-compensation inputs and results merged in PR #34 (c6d94d3e) with owner approval, behavior unchanged.
-  - TM8.1 gate evidence: the integrator's local run of the notch-golden group on trunk e01e07a3, with the example data, passed 6 of 6 (C export drift 4, baseline 1, TM8.1 matrix 1) with 0 skipped.
+  - TM8.1 gate evidence: the notch-golden group passed 6 of 6 with 0 skipped. The owner decisions above give the run details.
 - [x] **R13.206 將 CoordinatePlanner machine/normalized/pixel/world/safe projection 收斂為參數化 transform builder**
   - The owner closed it on 2026-10-05 with the delivered scope. See the owner decisions above.
   - [x] The single CoordinatePlanner transform merged in PR #18 (269a3528). No implementation work remains in the described slice.
@@ -654,17 +659,27 @@
 
 - [ ] **R13.306 Upgrade to Avalonia 12 and net10 before adopting the NVT Core UI library**
   - Owner decision (2026-10-05): assess now and upgrade right after 1.3.2. The upgrade starts on 2026-10-07.
-  - The assessment covers AvaloniaEdit, fonts, headless tests, net8 to net10 and package compatibility.
+  - The assessment covers five areas:
+    - AvaloniaEdit
+    - fonts
+    - headless tests
+    - net8 to net10
+    - package compatibility
   - Assessment facts (2026-10-06):
     - NuGet has Avalonia.AvaloniaEdit 12.0.0 for Avalonia 12, with net8.0 and net10.0 targets.
     - Avalonia.Headless.XUnit 12.0.5 depends on xUnit v3. The tests move from xUnit 2.9.2 to xUnit v3 in the same upgrade.
     - global.json already pins SDK 10.0.301, so only the target framework changes.
   - Owner decisions for the upgrade (2026-10-06):
-    - Fonts: the owner said 「我覺得可以討論出一個 font set 就只能用裡面的，font set 定位要清晰，例如 title 固定用哪種」 ("We can agree on one font set and use only its fonts. Each role must be clear, for example one fixed font for titles"). NVT Core drafts the font set from NFC's fonts, and the owner decides. NFH aligns with it afterwards. This upgrade sets no font policy of its own.
+    - Fonts: the owner said 「我覺得可以討論出一個 font set 就只能用裡面的，font set 定位要清晰，例如 title 固定用哪種」 ("We can agree on one font set and use only its fonts. Each role must be clear, for example one fixed font for titles"). NVT Core drafted the set from NFC's fonts, and the owner decided it on 2026-10-06.
+      - Allowed fonts: Inter, Cascadia Mono, Noto Sans TC and Material Symbols Outlined.
+      - Sizes: caption 11, body 13, heading 16 and title 24.
+      - All fonts are embedded with pinned versions.
+      - NFH's current Segoe UI Variable Text and Consolas are outside the set. NFH moves to the set when it adopts the Core styles. This upgrade sets no font policy of its own.
     - UI snapshots: the owner said 「NFC 要求保持一致，其他沒有要求」 ("NFC must stay identical. The others have no requirement"). NFH UI snapshots may change without owner approval. The pull request attaches before-and-after images as a record. Non-UI outputs, such as files and data, must stay identical.
     - Package locks: the owner said 「repo 共同鎖定」 ("Lock all repositories together"). NFH enables package lock files, and CI restores in locked mode. Shared package versions follow the list that NVT Core pins.
   - Earlier inventories: `docs/reviews/avalonia12-prep-packages-build-2026-10.md`, `docs/reviews/avalonia12-prep-code-surface-2026-10.md`, `docs/reviews/avalonia12-prep-xaml-styles-2026-10.md`.
 - [ ] **R13.307 Adopt NVT Core in NFH**
+  - NFH consumes Core as versioned .nupkg files from a local feed in this repository.
   - Adopt the non-UI library (net8) first. It does not wait for R13.306.
   - Adopt the UI modules after R13.306.
   - Each switch-over keeps the existing NFH tests passing. Non-UI output stays identical, and UI snapshots follow the R13.306 snapshot rule.
