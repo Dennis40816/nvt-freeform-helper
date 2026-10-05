@@ -206,17 +206,19 @@ Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a P
   - After the Core import, each new feature first gets a classification proposal with reasons, and the owner decides. Plain firmware product logic is project-specific and is only recorded.
 - **2026-10-06 — Avalonia 12 upgrade and Core use:** TODO.md R13.306 and the owner decisions record the owner's words.
   - Fonts follow the Core font set: Inter, Cascadia Mono, Noto Sans TC and Material Symbols Outlined.
+  - Font sizes are caption 11, body 13, heading 16 and title 24. All fonts are embedded with pinned versions.
+  - NFH's current Segoe UI Variable Text and Consolas are outside the set. NFH moves to the set when it adopts Core.
   - NFH UI snapshots may change without owner approval. The pull request attaches before-and-after images.
   - Non-UI outputs must stay identical.
   - All repositories use package lock files, and CI restores in locked mode.
-  - Core uses a proprietary license. It explicitly allows integration, shipping with the tools and execution by users.
-  - NFH consumes Core as versioned .nupkg files from a local feed. NFH uses only the non-UI library until the Avalonia 12 upgrade.
-  - NFH may gradually propose shareable UI for Core, each item with reasons for the owner.
+  - The all-rights-reserved wording becomes a proprietary license. The license explicitly allows integration, shipping with the tools and execution by users.
+  - NFH consumes Core as versioned .nupkg files from a local feed. Core has its own SemVer. NFH uses only the non-UI library until the Avalonia 12 upgrade.
+  - NFH may gradually move shareable UI to Core. Each candidate goes to the owner with reasons.
 
 **Owner actions — consult TODO.md for status before acting.**
 
 - Archive the private repository read-only: [FreeformHelper settings](https://github.com/Dennis40816/FreeformHelper/settings), with prerequisites tracked by S15.009e.
-- Import the shared CI ruleset when NVT Core provides it. 1.3.2 has ended, so its checks may now become required: [repository rulesets](https://github.com/Dennis40816/nvt-freeform-helper/settings/rules). Status: [S15.005c/S15.005d](../../TODO.md).
+- Import the shared CI ruleset when NVT Core provides it. The checks become required after 1.3.2: [repository rulesets](https://github.com/Dennis40816/nvt-freeform-helper/settings/rules). Status: [S15.005c/S15.005d](../../TODO.md).
 - Decide the exception and calibration policy of the merged report-only path check and when it starts to block; later NVT Core introduction: [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21), [S15.005c](../../TODO.md).
 - Decide how a missing saved mask path should behave and how importing a mask while enabled should affect assignment refresh: [#22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22), [TODO.md Mask product questions](../../TODO.md).
 

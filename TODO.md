@@ -82,7 +82,7 @@
     - VERSION: the owner selected 「改成 1.3.2」 ("Change it to 1.3.2"). PR #38 (922ba49c) merged the change. Tags and the release workflow stay with S15.005e.
   - R13.205: the owner chose to close the parent. TM8.1 gate evidence: the notch-golden group passed 6 of 6 with 0 skipped.
     - The integrator ran it locally on trunk e01e07a3 with the example data.
-    - The group has C export drift 4, baseline 1 and TM8.1 matrix 1.
+    - The 6 tests are C export drift 4, baseline 1 and TM8.1 matrix 1.
   - NVT Core: the owner said 「這樣速度偏慢，我是要下下周前完成所有 NVT Core 內容」 ("This is too slow. I want all NVT Core content finished before the week after next").
     - The deadline is 2026-10-18. Core comes first.
     - Until then, non-Core NFH work is limited to 1.3.2 and urgent fixes.
@@ -92,9 +92,9 @@
       - the console with AppLogEntry and AppLogFormatter, tried in NFH first
       - CoalescedRefresh and UndoService, in the non-UI library
       - the UI-thread helper, in the Avalonia 12 library
-      - the Runtime Query transport, in the non-UI library. Its commands stay in NFH.
+      - the Runtime Query transport, in the non-UI library, with its commands kept in NFH
     - Core code is all rights reserved with the owner as copyright holder, and this also applies to code moved from NFH.
-    - Update 2026-10-06: Core uses a proprietary license. It explicitly allows integration, shipping with the tools and execution by users.
+    - License (2026-10-06): the all-rights-reserved wording above becomes a proprietary license. The license explicitly allows integration, shipping with the tools and execution by users.
     - Consumption (2026-10-06): NFH consumes Core as versioned .nupkg files from a local feed in this repository. Core has its own SemVer. NFH uses only the non-UI library until the Avalonia 12 upgrade.
     - Governance checks run report-only now and become required after 1.3.2.
   - Feature classification: the owner said 「我相信完成後，開發功能前都必須先問是屬於 Core 的功能還是專案專屬功能」 ("I believe that once this is done, before developing a feature we must first ask whether it is a Core feature or a project-specific feature").
@@ -674,7 +674,7 @@
       - Allowed fonts: Inter, Cascadia Mono, Noto Sans TC and Material Symbols Outlined.
       - Sizes: caption 11, body 13, heading 16 and title 24.
       - All fonts are embedded with pinned versions.
-      - NFH's current Segoe UI Variable Text and Consolas are outside the set. NFH moves to the set when it adopts the Core styles. This upgrade sets no font policy of its own.
+      - NFH's current Segoe UI Variable Text and Consolas are outside the set. NFH moves to the set when it adopts Core. This upgrade sets no font policy of its own.
     - UI snapshots: the owner said 「NFC 要求保持一致，其他沒有要求」 ("NFC must stay identical. The others have no requirement"). NFH UI snapshots may change without owner approval. The pull request attaches before-and-after images as a record. Non-UI outputs, such as files and data, must stay identical.
     - Package locks: the owner said 「repo 共同鎖定」 ("Lock all repositories together"). NFH enables package lock files, and CI restores in locked mode. Shared package versions follow the list that NVT Core pins.
   - Earlier inventories: `docs/reviews/avalonia12-prep-packages-build-2026-10.md`, `docs/reviews/avalonia12-prep-code-surface-2026-10.md`, `docs/reviews/avalonia12-prep-xaml-styles-2026-10.md`.
