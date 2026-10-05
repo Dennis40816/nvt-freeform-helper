@@ -48,7 +48,7 @@
   - 只剩 owner-only `S15.*` 項目時，`R13.*` 可開始執行；不必等待 owner 專屬設定與發佈操作完成。
   - `LICENSE` 的 copyright holder 為 `Dennis Liu`；原「保留所有權利」決定不變。
   - `2.0.0 = 開始共用核心架構（owner 暫定目標，2026-10-02）`。
-  - Current scheduling (2026-10-05): Avalonia 11 to 12 is outside 1.3.x. This supersedes the earlier placement before 1.3.5; no upgrade is scheduled in this release train.
+  - Current scheduling (2026-10-05, later decision): the Avalonia 12 upgrade is R13.306, right after 1.3.2 and before NFH adopts the NVT Core UI library in 1.3.3. This supersedes the earlier decision to keep it outside 1.3.x.
 
 - **Owner 決定（2026-10-03；回覆 `docs/reviews/ui-feature-inventory-2026-10.md` 的產品問題）**
   - V21 firmware C output：答覆「不確定，先保留」；據此：`R13.103` 的 final projection／formatter 分離（含 legacy convergence）暫緩；不得開始移除或變更 V21 output，以及舊 project 對它的讀取路徑。
@@ -73,7 +73,34 @@
   - Document-translation delivery: the first batch (35 documents under docs/core, docs/governance, docs/guides, docs/performance, docs/reference and docs/reviews) merged in PR #30 (c91c4815). Remaining Chinese documents follow in later low-priority batches.
   - Mask product questions: PR #22 (8817eb5f) merged tests-only characterization of the missing saved mask path and importing a mask while enabled. The owner must decide the behavior for each case; no behavior change is authorized by characterization.
   - README language split and the normative-document corrections merged in PR #29 (d1274d58). The owner confirmed the AGENTS.md and CONTRIBUTING.md changes in chat on 2026-10-05 around 16:2x, selecting 「確認，三處都可以 (Recommended)」 ("Confirmed; all three changes are fine (Recommended)"): the branch model, the chat-confirmation flow, and moving the S15.005c/S15.005d status sentence to TODO.md.
-  - Bot issue permissions: the owner reports that the App's Issues permission is Read and write, but the shared NFC token tool requests a fixed permission subset without issues, so the bot can create issues and labels but cannot add labels, comment on or close issues. The owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch to the shared tool, used only by NFH (not yet available).
+  - Bot issue permissions: the owner reports that the App's Issues permission is Read and write, but the shared NFC token tool requests a fixed permission subset without issues, so the bot could create issues and labels but could not add labels, comment on or close issues. The owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch to the shared tool, used only by NFH. The switch is available since 2026-10-05. A test on issue #37 confirmed that the bot can label, comment on and close issues.
+  - 1.3.2 exit: the owner selected 「用已交付範圍結束」 ("End with the delivered scope").
+    - R13.201, R13.202, R13.205 and R13.206 close as delivered.
+    - R13.203 and R13.204 close with their delivered parts.
+    - Their remaining work moves to R13.406, which starts after 2026-10-18: the other typed-ID chains and the RegularPad writer transitions.
+    - 1.3.2 ends on 2026-10-06, and the Avalonia 12 upgrade starts on 2026-10-07.
+    - VERSION: the owner selected 「改成 1.3.2」 ("Change it to 1.3.2"). PR #38 (922ba49c) merged the change. Tags and the release workflow stay with S15.005e.
+  - R13.205: the owner chose to close the parent. TM8.1 gate evidence: the notch-golden group passed 6 of 6 with 0 skipped.
+    - The integrator ran it locally on trunk e01e07a3 with the example data.
+    - The 6 tests are C export drift 4, baseline 1 and TM8.1 matrix 1.
+  - NVT Core: the owner said 「這樣速度偏慢，我是要下下周前完成所有 NVT Core 內容」 ("This is too slow. I want all NVT Core content finished before the week after next").
+    - The deadline is 2026-10-18. Core comes first.
+    - Until then, non-Core NFH work is limited to 1.3.2 and urgent fixes.
+    - NFH officially adopts NVT Core from 1.3.3: first the non-UI library on net8, then the UI modules after the Avalonia 12 upgrade.
+    - NFH contributes these modules to Core:
+      - cards, dialogs and input controls, ported to Avalonia 12
+      - the console with AppLogEntry and AppLogFormatter, tried in NFH first
+      - CoalescedRefresh and UndoService, in the non-UI library
+      - the UI-thread helper, in the Avalonia 12 library
+      - the Runtime Query transport, in the non-UI library, with its commands kept in NFH
+    - Core code is all rights reserved with the owner as copyright holder, and this also applies to code moved from NFH.
+    - License (2026-10-06): the all-rights-reserved wording above becomes a proprietary license. The license explicitly allows integration, shipping with the tools and execution by users.
+    - Consumption (2026-10-06): NFH consumes Core as versioned .nupkg files from a local feed in this repository. Core has its own SemVer. NFH uses only the non-UI library until the Avalonia 12 upgrade.
+    - Governance checks run report-only now and become required after 1.3.2.
+  - Feature classification: the owner said 「我相信完成後，開發功能前都必須先問是屬於 Core 的功能還是專案專屬功能」 ("I believe that once this is done, before developing a feature we must first ask whether it is a Core feature or a project-specific feature").
+    - After the Core import, each new feature first gets a classification proposal with reasons for the owner to decide.
+    - Plain firmware product logic counts as project-specific and is only recorded.
+    - On 2026-10-06 the owner said 「後續 NFH 也可以慢慢將值得共用的 UI 丟上去了」 ("NFH may now gradually move shareable UI up to Core"). Each candidate goes to the owner with reasons.
 
 - [x] **S15.001 處理 4 個穩定失敗的 `SimulationWorkspaceViewModelTests`**
   - 失敗：`CopperSource_WhenMoved_RegeneratesBeforeFrameThroughSharedSimulationPath`（預期 `400`、實際 `399`）、`CopperContactModel_WhenFingerSelected_UsesLowerFullPadSignal`（`360`／`359`）、`DiffViolationSummary_WhenNoMismatch_ShowsCleanState`（`EMS OK`／`audit warning`）、`DiffViolationSummary_WhenDuplicateDiffDeltaMismatches_ListsViolatingPads`（`Assert.True`）。
@@ -580,33 +607,40 @@
 
 ### 1.3.2 Matching 與 Domain state
 
-- [ ] **R13.201 正式化 Pad overlap、DXF audit、Canvas hit-test 三個 bounded contexts**；在 overlap evidence API 定案後移除 `PadMatcher`／`PadMatchService` 目前僅為相容而保留、實際未讀取的 `MatchingSettings` 參數
+- [x] **R13.201 正式化 Pad overlap、DXF audit、Canvas hit-test 三個 bounded contexts**；在 overlap evidence API 定案後移除 `PadMatcher`／`PadMatchService` 目前僅為相容而保留、實際未讀取的 `MatchingSettings` 參數
+  - The owner closed it on 2026-10-05 with the delivered scope. See the owner decisions above.
   - Inventory: [INV2, section 2](docs/reviews/r13-slice-inventories-2026-10.md) records the three contexts and tests.
-  - [x] R13.201 overlap evidence API and removal of the unused MatchingSettings parameter merged in PR #15 (53366ee1). No implementation work remains in the described slice; the parent stays unticked for the owner.
+  - [x] R13.201 overlap evidence API and removal of the unused MatchingSettings parameter merged in PR #15 (53366ee1). No implementation work remains in the described slice.
   - [x] Matching bounded-context contract guards merged in PR #32 (5caa07ea), tests only.
-- [ ] **R13.202 Preserve the CadBest / hover status quo; share only parts proven identical**
+- [x] **R13.202 Preserve the CadBest / hover status quo; share only parts proven identical**
+  - The owner closed it on 2026-10-05 with the delivered scope. See the owner decisions above.
   - Owner decision (2026-10-05): CadBest and hover retain their own rules and share only parts proven identical; the exact-tie decision (no ID tie-break) is recorded once in the decisions section at the top of this file. The 3635 measurement found 4838 CADs, 582 touching at least two regulars, 6 selecting different regulars, and 0 exact ties.
   - [x] CadBest and hover best-match characterization merged in PR #23 (fd6e74ef), tests only.
   - [x] Allocation-anchor and freeform-classification characterization merged in PR #25 (792b4f79), tests only.
-  - Remaining scope: share only parts proven identical; characterization delivery does not close the parent.
-- [ ] **R13.203 依 API boundary 漸進導入 typed IDs 與 legacy adapters**
+  - Rule for later work: share only parts proven identical.
+- [x] **R13.203 依 API boundary 漸進導入 typed IDs 與 legacy adapters**
+  - The owner closed it on 2026-10-05 with the delivered scope. See the owner decisions above.
   - [x] Typed CadPadId/RegularPadId for the DXF manual override chain merged in PR #28 (e5bbe658) with owner approval.
   - [x] Typed IcIndex/DiffIndex behind the mapping adapters merged in PR #35 (fd078295) with owner approval, behavior unchanged.
-  - Remaining scope: all four roadmap types (CadPadId, RegularPadId, IcIndex, DiffIndex) now exist; other API chains still use the integer adapters and are converted one chain at a time per the roadmap. The parent stays open.
-- [ ] **R13.204 封裝 `RegularPad` writers 為等價的狀態轉移 API**
+  - Remaining work moves to R13.406.
+- [x] **R13.204 封裝 `RegularPad` writers 為等價的狀態轉移 API**
+  - The owner closed it on 2026-10-05 with the delivered scope. See the owner decisions above.
   - Inventory: INV2 section 3 records field writers, readers, and side effects.
-  - [x] RegularPad.AssignMapping merged in PR #16 (b41ebe04). This leaf covers matched-pair assignment; the broader writer-transition parent stays open.
-- [ ] **R13.205 將 DxfRegularMaskAudit segment/local-repair/passive-compensation 改為顯式 pipeline**
+  - [x] RegularPad.AssignMapping merged in PR #16 (b41ebe04). This leaf covers matched-pair assignment.
+  - Remaining work moves to R13.406.
+- [x] **R13.205 將 DxfRegularMaskAudit segment/local-repair/passive-compensation 改為顯式 pipeline**
+  - The owner closed it on 2026-10-05 with the delivered scope. See the owner decisions above.
   - [x] Audit-phase characterization merged in PR #17 (c0c4e39b), tests only.
   - [x] Explicit seed and segment stages merged in PR #31 (d756745b) with owner approval, behavior unchanged.
   - [x] Explicit local-repair and passive-compensation inputs and results merged in PR #34 (c6d94d3e) with owner approval, behavior unchanged.
-  - Remaining scope: the external TM8.1 acceptance gate; the parent stays open.
-- [ ] **R13.206 將 CoordinatePlanner machine/normalized/pixel/world/safe projection 收斂為參數化 transform builder**
-  - [x] The single CoordinatePlanner transform merged in PR #18 (269a3528). No implementation work remains in the described slice; the parent stays unticked for the owner.
+  - TM8.1 gate evidence: the notch-golden group passed 6 of 6 with 0 skipped. The owner decisions above give the run details.
+- [x] **R13.206 將 CoordinatePlanner machine/normalized/pixel/world/safe projection 收斂為參數化 transform builder**
+  - The owner closed it on 2026-10-05 with the delivered scope. See the owner decisions above.
+  - [x] The single CoordinatePlanner transform merged in PR #18 (269a3528). No implementation work remains in the described slice.
 
 ### 1.3.3 Settings 與 Presentation orchestration
 
-- Dependency: R13.301–R13.305 wait for the owner's 1.3.2 exit. R13.303 opacity 0.9 and R13.305b's last-enabled-version rule are already decided; those decisions do not start implementation.
+- Dependency: the owner ended 1.3.2 with the delivered scope. R13.306 and R13.307 come first. R13.301–R13.305 resume after 2026-10-18, because non-Core work pauses until then.
 
 - [ ] **R13.301 建立 Settings draft snapshot/map 與逐欄 Apply/Discard/roundtrip tests**
   - 盤點證據（2026-10，INV2）：同文件第 4 節列 draft/live 複製欄位與待補逐欄測試；狀態未完成。
@@ -623,6 +657,34 @@
     - owner 2026-10-03：確認 Step4 mapping 與 Step6 validation diagnostics 移出編號流程，放到未編號的 Diagnostics 區域。
   - [ ] **R13.305b Remove inoperable or non-routine derived toggles and placeholders from normal Settings**; apply the owner's 2026-10-04 rule, 「禁止關掉最後一個版本」 ("Do not allow the last version to be disabled"): neither V21 nor V22 can be disabled when it is the last enabled version. Implement the guard in both directions in 1.3.3, after the 1.3.2 exit.
 
+- [ ] **R13.306 Upgrade to Avalonia 12 and net10 before adopting the NVT Core UI library**
+  - Owner decision (2026-10-05): assess now and upgrade right after 1.3.2. The upgrade starts on 2026-10-07.
+  - The assessment covers five areas:
+    - AvaloniaEdit
+    - fonts
+    - headless tests
+    - net8 to net10
+    - package compatibility
+  - Assessment facts (2026-10-06):
+    - NuGet has Avalonia.AvaloniaEdit 12.0.0 for Avalonia 12, with net8.0 and net10.0 targets.
+    - Avalonia.Headless.XUnit 12.0.5 depends on xUnit v3. The tests move from xUnit 2.9.2 to xUnit v3 in the same upgrade.
+    - global.json already pins SDK 10.0.301, so only the target framework changes.
+  - Owner decisions for the upgrade (2026-10-06):
+    - Fonts: the owner said 「我覺得可以討論出一個 font set 就只能用裡面的，font set 定位要清晰，例如 title 固定用哪種」 ("We can agree on one font set and use only its fonts. Each role must be clear, for example one fixed font for titles"). NVT Core drafted the set from NFC's fonts, and the owner decided it on 2026-10-06.
+      - Allowed fonts: Inter, Cascadia Mono, Noto Sans TC and Material Symbols Outlined.
+      - Sizes: caption 11, body 13, heading 16 and title 24.
+      - All fonts are embedded with pinned versions.
+      - NFH's current Segoe UI Variable Text and Consolas are outside the set. NFH moves to the set when it adopts Core. This upgrade sets no font policy of its own.
+    - UI snapshots: the owner said 「NFC 要求保持一致，其他沒有要求」 ("NFC must stay identical. The others have no requirement"). NFH UI snapshots may change without owner approval. The pull request attaches before-and-after images as a record. Non-UI outputs, such as files and data, must stay identical.
+    - Package locks: the owner said 「repo 共同鎖定」 ("Lock all repositories together"). NFH enables package lock files, and CI restores in locked mode. Shared package versions follow the list that NVT Core pins.
+  - Earlier inventories: `docs/reviews/avalonia12-prep-packages-build-2026-10.md`, `docs/reviews/avalonia12-prep-code-surface-2026-10.md`, `docs/reviews/avalonia12-prep-xaml-styles-2026-10.md`.
+- [ ] **R13.307 Adopt NVT Core in NFH**
+  - NFH consumes Core as versioned .nupkg files from a local feed in this repository.
+  - Adopt the non-UI library (net8) first. It does not wait for R13.306.
+  - Adopt the UI modules after R13.306.
+  - Each switch-over keeps the existing NFH tests passing. Non-UI output stays identical, and UI snapshots follow the R13.306 snapshot rule.
+  - A module is done only when NFH uses the Core version and deletes its own copy.
+
 ### 1.3.4 Workspace ViewModel 拆解
 
 - Dependency: R13.401–R13.405 wait for the owner's 1.3.3 exit.
@@ -634,9 +696,17 @@
 - [ ] **R13.404 遷移 `NotchWorkspaceViewModel` orchestration**
 - [ ] **R13.405 收斂 `ProjectSessionViewModel` facade、Save/Load/IPC 與跨 workspace tests**
 
+- [ ] **R13.406 Follow-up after 2026-10-18: remaining typed-ID chains (from R13.203) and RegularPad writer transitions (from R13.204)**
+  - Convert one API chain at a time and keep the integer adapters, per the roadmap's R13.203 rules. Persistence, export, CSV, CLI and IPC shapes stay numeric and unchanged.
+  - Planning found these single-source-of-truth risks. Verify each one before changing anything:
+    - [ ] (i) Best-match identity is derived twice: `src/FreeformHelper.Application/Services/CadBestMatchSeedService.cs` picks the first eligible link, while `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.cs` reconstructs its candidates.
+    - [ ] (ii) Duplicate (IC, diff) ownership is grouped independently in `src/FreeformHelper.Application/Services/CadOutputFwDiffIndexDuplicateReviewService.cs`, `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.cs` and `src/FreeformHelper.Application/Services/CadOutputFwDiffIndexShiftService.cs`. Review and audit skip a missing IC, but shift defaults it to IC 0.
+    - [ ] (iii) Matched-identity lookups in `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Locate.cs` read the overlap maps, then fall back to `MatchedCadPadId`.
+    - [ ] (iv) Anchor identity: the CSV exporter writes the row `DiffIndex` (`src/FreeformHelper.Application/Export/NotchTableExporter.cs`), while V22 firmware projection reads `AnchorDiffIndex` (`src/FreeformHelper.Application/Services/NotchV22FirmwareProjector.cs`).
+
 ### 1.3.5 UI 結構與 token 收斂（no visual change）
 
-- Dependency: R13.501–R13.507 wait for the owner's 1.3.4 exit; Avalonia 12 and full V21/Legacy removal are outside 1.3.x.
+- Dependency: R13.501–R13.507 wait for the owner's 1.3.4 exit. Full V21/Legacy removal is outside 1.3.x. The Avalonia 12 upgrade is R13.306.
 
 - [ ] **R13.501 拆分 Controls.Core responsibilities，限域導入 BasedOn/template 去重並鎖住 selector precedence**
 - [ ] **R13.502 拆分 DevView preview sections 並完整保留 action role laboratory**
