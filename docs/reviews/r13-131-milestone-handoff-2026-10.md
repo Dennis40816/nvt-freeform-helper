@@ -125,7 +125,7 @@ PR-C `4d54b35d`：golden／baseline／snapshot data 亦未更新，無更新者�
 - **Compensation diagnostics 的 debug-entry 順序改變。** allocation 改依 Ratio descending 排序，原 raw builder 的 row／column 順序不再保留；review 例 debug order 為 `[col0,col1]→[col1,col0]`。未證明 firmware tie-break 迴歸，也未新增此排序案例測試。（`TODO.md:R13.102a-5`）
 - **PR-A 在另一分支、以獨立 PR 交付。** Disabled-target display 修正只改顯示數字；第 4 節的 PR-B／PR-C revision 證據不是 PR-A 的驗證紀錄，交付順序仍為 PR-A → PR-B → PR-C。
 - **Mask product questions.** The owner must decide how a missing saved mask path should behave and how importing a mask while enabled should affect assignment refresh. Use [PR #22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22) for characterization evidence and [TODO.md](../../TODO.md) for the decision status; characterization does not authorize a behavior change.
-- **1.3.2 sequence.** Consult [TODO.md R13.201–R13.206](../../TODO.md) for delivery, review, and remaining work. Keep 1.3.3 behind the owner's 1.3.2 exit; section 7 provides IDs and links.
+- **1.3.2 sequence.** Consult [TODO.md R13.201–R13.206](../../TODO.md) for delivery, review, and remaining work. On 2026-10-05 the owner decided to end 1.3.2 with the delivered scope. TODO.md R13.306 and R13.307 come first in 1.3.3. Section 7 provides IDs and links.
 
 ## 7. Handoff for 2026-10-06
 
@@ -185,7 +185,7 @@ Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a P
 - **2026-10-04 — PR language; 2026-10-05 — document language:** new PR titles and bodies default to English; already-open PRs are not rewritten, and conflicting AGENTS.md/CONTRIBUTING.md wording must first be raised with the owner. The owner said 「後續文件，除了 README 預設要有中文版本，其他都預設用英文，除非我指定新增中文版本」 ("Future documents default to English, except that README should have a Chinese version by default, unless I request an additional Chinese version"). Existing Chinese documents are translated in low-priority Codex batches, preserving Chinese owner quotes with English translations; only English is maintained afterwards, except the bilingual README. The owner selected 「可以 (Recommended)」 ("Allowed (Recommended)") for [README.md](../../README.md) in English and [README.zh-TW.md](../../README.zh-TW.md) in Traditional Chinese.
 - **2026-10-04 — Old private issues; 2026-10-05 decision:** move only publishable issues. On 2026-10-05 the owner chose 「同意，只搬 #1 改寫版 (Recommended)」 ("Agreed, move only the rewritten issue 1"): the old parent spec was rewritten and created as public [#27](https://github.com/Dennis40816/nvt-freeform-helper/issues/27) (old 1 -> new 27); the other 42 open issues are delivered child tickets and are not migrated. Old PRs are not migrated and their links are not rewritten. The owner also kept the 1.3.1 parent unticked.
 - **2026-10-04 — R13.303:** implement simulation opacity fallback 0.9 in 1.3.3 and update snapshots for this visual change.
-- **2026-10-04 — V21/Legacy removal:** removal is outside 1.3.x; the specific version and scope are decided later, with no implicit conversion beforehand. Avalonia 12 is also outside 1.3.x.
+- **2026-10-04 — V21/Legacy removal:** removal is outside 1.3.x; the specific version and scope are decided later, with no implicit conversion beforehand. On 2026-10-05 the owner scheduled Avalonia 12 as R13.306.
 - **2026-10-04 — R13.305b:** the owner said 「禁止關掉最後一個版本」 ("Do not allow the last version to be disabled"). Neither V21 nor V22 may be switched off when it is the last enabled version; implement the guard in 1.3.3 after the 1.3.2 exit.
 - **2026-10-05 — R13.202:** preserve distinct CadBest and hover rules and share only parts proven identical. For exactly equal scores, the owner selected 「維持現狀 (Recommended)」 ("Keep the status quo (Recommended)"): add no ID tie-break to PadMatcher sorting or R13.202 selection. Any later change is a separate behavior-change item; the ID tie-break question is resolved.
 - **2026-10-05 — Approval after trunk integration:** the owner selected 「可以，但手動解衝突要重批 (Recommended)」 ("Allowed, but manual conflict resolution requires approval again (Recommended)"). After owner approval, a new commit that only merges trunk cleanly needs no new approval if tests pass; any manual conflict resolution requires owner approval again.
@@ -194,11 +194,26 @@ Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a P
 - **2026-10-05 — Shared CI pilot:** the owner selected 「改由 NFH 試點，1.3.2 結束後開始 (Recommended)」 ("Use NFH as the pilot, starting after 1.3.2 completion (Recommended)"). NFH replaces NFU as NVT Core's shared CI pilot after the 1.3.2 exit. CI path-check evaluation is tracked under S15.005c for later NVT Core introduction.
 - **2026-10-05 — Models and usage:** models return to the default; Codex usage remains economical after its reset.
 - **2026-10-04 22:07 — Ruleset:** the owner created Protect 1.3.x and main, requiring policy / structure and dotnet / build-test, with strict mode off and admin bypass.
+- **2026-10-05 — 1.3.2 exit, NVT Core and Avalonia 12:** [TODO.md](../../TODO.md) is the status source.
+  - The owner closed R13.201–R13.206 with the delivered scope. 1.3.2 ends on 2026-10-06.
+  - The remaining R13.203 and R13.204 work moves to R13.406, after 2026-10-18.
+  - PR #38 set VERSION to 1.3.2. Tags and the release workflow remain under S15.005e.
+  - The Avalonia 12 upgrade starts on 2026-10-07 as R13.306.
+  - All NVT Core content is due by 2026-10-18. Until then Core comes first, and non-Core NFH work is limited to 1.3.2 and urgent fixes.
+  - NFH adopts Core from 1.3.3 as R13.307. The non-UI library on net8 comes first. The UI modules follow the Avalonia 12 upgrade.
+  - Core code is all rights reserved, with the owner as copyright holder. This includes code moved from NFH.
+  - Governance checks run report-only now and become required after 1.3.2.
+  - After the Core import, each new feature first gets a classification proposal with reasons, and the owner decides. Plain firmware product logic is project-specific and is only recorded.
+- **2026-10-06 — Avalonia 12 upgrade rules:** TODO.md R13.306 records the owner's words.
+  - Fonts follow a Core font set. NVT Core drafts it and the owner decides.
+  - NFH UI snapshots may change without owner approval. The pull request attaches before-and-after images.
+  - Non-UI outputs must stay identical.
+  - All repositories use package lock files, and CI restores in locked mode.
 
 **Owner actions — consult TODO.md for status before acting.**
 
 - Archive the private repository read-only: [FreeformHelper settings](https://github.com/Dennis40816/FreeformHelper/settings), with prerequisites tracked by S15.009e.
-- Coordinate the shared CI pilot after the owner's 1.3.2 exit: [S15.005c/S15.005d](../../TODO.md), then NVT Core contacts the NFH session.
+- Import the shared CI ruleset when NVT Core provides it: [repository rulesets](https://github.com/Dennis40816/nvt-freeform-helper/settings/rules). Until then the checks run report-only. Status: [S15.005c/S15.005d](../../TODO.md).
 - Decide the exception and calibration policy of the merged report-only path check and when it starts to block; later NVT Core introduction: [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21), [S15.005c](../../TODO.md).
 - Decide how a missing saved mask path should behave and how importing a mask while enabled should affect assignment refresh: [#22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22), [TODO.md Mask product questions](../../TODO.md).
 
@@ -210,6 +225,6 @@ Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a P
 - R13.205: audit-phase characterization in PR #17, seed and segment stages in PR #31, and the local-repair/passive-compensation stage in PR #34 (`r13205-repair-passive`).
 - S15.005c: path-check evaluation; the report-only prototype is PR #21.
 
-**Release gates.** Consult [TODO.md R13.201–R13.206](../../TODO.md) for 1.3.2 work. R13.202 shares only parts proven identical; R13.203 covers its typed-ID boundary; R13.205 covers the production pipeline. The owner's 1.3.2 exit precedes 1.3.3 implementation and the shared CI pilot. R13.303 opacity 0.9 with updated snapshots and R13.305b's last-version guard retain their 1.3.3 gates. No parent, milestone, or exit checkbox is closed by this handoff.
+**Release gates.** Consult [TODO.md R13.201–R13.206](../../TODO.md) for 1.3.2 work. R13.202 shares only parts proven identical; R13.203 covers its typed-ID boundary; R13.205 covers the production pipeline. On 2026-10-05 the owner decided to end 1.3.2 with the delivered scope. TODO.md R13.306 and R13.307 come first in 1.3.3. R13.303 opacity 0.9 with updated snapshots and R13.305b's last-version guard retain their 1.3.3 gates. No parent, milestone, or exit checkbox is closed by this handoff.
 
 **Open product questions.** The missing saved mask path and importing a mask while enabled require owner behavior decisions; consult [PR #22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22) for characterization and [TODO.md](../../TODO.md) for status. PadMatcher sorting and R13.202 have no open ID tie-break question: exact ties preserve the current behavior under the 2026-10-05 decision.
