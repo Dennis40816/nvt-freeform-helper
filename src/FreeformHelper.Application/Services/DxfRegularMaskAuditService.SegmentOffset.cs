@@ -6,22 +6,21 @@ public static partial class DxfRegularMaskAuditService
 {
     private const double SegmentOffsetDominanceThreshold = 0.60;
 
-    private static void ApplySegmentOffsetSignals(
-        Dictionary<int, CadOutputFwDiffAssignmentDecision> decisions,
-        IReadOnlyList<CadPad> orderedCadPads,
-        IReadOnlyDictionary<int, RegularPad> regularPadById,
-        IReadOnlyDictionary<int, int> cadIcIndexByCadId)
+    private static SegmentAnalysisResult ApplySegmentOffsetSignals(
+        AuditInvocationContext context,
+        SeedConstructionResult seedResult)
     {
+        var decisions = seedResult.Decisions;
         if (decisions.Count == 0)
         {
-            return;
+            return new SegmentAnalysisResult(decisions);
         }
 
         var segmentRows = BuildSegmentRows(
             decisions,
-            orderedCadPads,
-            regularPadById,
-            cadIcIndexByCadId);
+            context.OrderedCadPads,
+            context.RegularPadById,
+            context.CadIcIndexByCadId);
         foreach (var rowGroup in segmentRows
                      .GroupBy(static sample => (sample.IcIndex, sample.RowIndex))
                      .OrderBy(static group => group.Key.IcIndex)
@@ -56,6 +55,8 @@ public static partial class DxfRegularMaskAuditService
                 segmentIndex++;
             }
         }
+
+        return new SegmentAnalysisResult(decisions);
     }
 
     private static void ApplySegmentMetadata(
