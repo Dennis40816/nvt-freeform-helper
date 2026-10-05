@@ -1,11 +1,36 @@
+using System.Reflection;
 using System.Text.Json.Nodes;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.ViewModels;
 using Xunit;
 
 namespace FreeformHelper.Tests;
 
 public sealed class ExampleProjectFixtureTests
 {
+    [ExampleDataFact]
+    public async Task LoadProject_3635_RequiresLoadedAndEnabledRegularVisibilityMask()
+    {
+        var projectPath = Path.Combine(TestPaths.RepoRoot, "example", "BOE36.35", "project_3635.json");
+        using var fixture = ExampleProjectFixture.Create(projectPath);
+        var vm = new FreeformHelperViewModel
+        {
+            PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath),
+        };
+
+        await vm.LoadProjectCommand.ExecuteAsync(null);
+
+        var maskField = typeof(FreeformHelperViewModel).GetField(
+            "_regularVisibilityMaskResult",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(maskField);
+        var mask = Assert.IsType<RegularVisibilityMaskResult>(maskField!.GetValue(vm));
+        Assert.Equal(RegularVisibilityMaskStatus.Loaded, mask.Status);
+        Assert.True(mask.ActiveRegularCount > 0);
+        Assert.True(vm.IsRegularVisibilityMaskEnabled);
+    }
+
     [Theory]
     [InlineData(true, true)]
     [InlineData(false, true)]
