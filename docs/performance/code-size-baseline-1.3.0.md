@@ -1,14 +1,14 @@
 # FreeformHelper 1.3.0 Code-size Baseline
 
-- 簽核日期：2026-08-08
-- 量測入口：`scripts/perf/measure-code-size.ps1`
-- 契約檢查：`scripts/tests/check-code-size-baseline.ps1`
-- 1.3.x signed-start commit：`3032121156dec2329e38e971327d55c7887db99f`
-- 首個獨立 cutdown before commit：`207e29d5115c3d3318ee3249ed3af197f2d18180`
+- Approval date: 2026-08-08
+- Measurement entry point: `scripts/perf/measure-code-size.ps1`
+- Contract check: `scripts/tests/check-code-size-baseline.ps1`
+- 1.3.x signed-start commit: `3032121156dec2329e38e971327d55c7887db99f`
+- First independent cutdown before commit: `207e29d5115c3d3318ee3249ed3af197f2d18180`
 
-## 1. 量測契約
+## 1. Measurement Contract
 
-Production source 是 primary metric，只計 git tracked 且符合下列互斥群組的檔案：
+Production source is the primary metric, counting only git tracked files that match the following mutually exclusive groups:
 
 - `src/FreeformHelper.Domain/**/*.cs`
 - `src/FreeformHelper.Application/**/*.cs`
@@ -16,27 +16,27 @@ Production source 是 primary metric，只計 git tracked 且符合下列互斥�
 - `src/FreeformHelper.UI/**/*.cs`
 - `src/FreeformHelper.UI/**/*.axaml`
 
-`UI ViewModels` 與 `UI Services` 是 UI C# 的 subsets；計算 logic-first 時加入，但不會再加進 production total 一次。tests、docs、scripts、Assets、Goldens、Generated、bin、obj、build 與 generated suffix (`*.g.cs`、`*.g.i.cs`、`*.generated.cs` 等) 均排除。工具會先跑 line/path classifier self-test，再量測真實 tracked tree。
+`UI ViewModels` and `UI Services` are subsets of UI C#; they are included when calculating logic-first but are not added to the production total a second time. tests, docs, scripts, Assets, Goldens, Generated, bin, obj, build, and generated suffixes (`*.g.cs`, `*.g.i.cs`, `*.generated.cs`, etc.) are all excluded. The tool runs the line/path classifier self-test before measuring the actual tracked tree.
 
-行數定義：
+Line count definitions:
 
-- physical：CRLF、LF、lone CR 都是分隔符；EOF newline 不額外產生 sentinel line。
-- empty eligible file：檔案數仍為 1，physical/nonblank 都是 0。
-- nonblank：對每個 physical line 套用 `String.IsNullOrWhiteSpace`，結果為 false 才計數。
+- physical: CRLF, LF, and lone CR are all delimiters; an EOF newline does not produce an extra sentinel line.
+- empty eligible file: the file count is still 1, and physical/nonblank are both 0.
+- nonblank: apply `String.IsNullOrWhiteSpace` to each physical line and count it only if the result is false.
 
-Source metric 可讀取 tracked working tree，並同時記錄 base commit/source-tree OID 與 `productionSourceDirty`；簽核數字一律來自 immutable commit archive。Release metric 只接受 clean tracked build inputs，且只是 secondary metric。
+The source metric can read the tracked working tree while recording the base commit/source-tree OID and `productionSourceDirty`; approved numbers always come from an immutable commit archive. The Release metric accepts only clean tracked build inputs and is only a secondary metric.
 
-## 2. 三個不可混用的 anchor
+## 2. Three Anchors That Must Not Be Mixed
 
 | Anchor | Total files | Physical | Nonblank | Logic files | Logic physical | Logic nonblank |
 |---|---:|---:|---:|---:|---:|---:|
-| GitHub #4 建票前 signed-worktree observation | 586 | 98,946 | 88,311 | 381 | 64,705 | 57,366 |
+| signed-worktree observation before GitHub #4 was created | 586 | 98,946 | 88,311 | 381 | 64,705 | 57,366 |
 | 1.3.x signed-start `3032121` | 586 | 98,950 | 88,315 | 381 | 64,709 | 57,370 |
 | R13.006b independent before `207e29d` | 589 | 98,617 | 88,021 | 384 | 64,377 | 57,077 |
 
-原始 observation 沒有 immutable tree OID，因此不能作往後自動 gate。`3032121` 是完成 R13.002 production 3635 gate 後的第一個 immutable anchor；相對 observation，total 與 logic-first 都是 `+0 files / +4 physical / +4 nonblank`。Roadmap 的 `165f076` 仍是規劃文件基準，不是 code-size signed start。
+The original observation has no immutable tree OID and therefore cannot serve as a future automated gate. `3032121` is the first immutable anchor after completion of the R13.002 production 3635 gate; relative to the observation, both total and logic-first are `+0 files / +4 physical / +4 nonblank`. The roadmap's `165f076` remains the planning document baseline, not the code-size signed start.
 
-`207e29d` 的 `src` tree 是 `c5048b4ecfd0c8a89a8a4719a48afbf11b980f68`。它位於 R13.004 完成後，所以 R13.006b 必須以此作獨立 before；若改用 `3032121`，會把 #6 已完成的刪減重複算入 #7。
+The `src` tree of `207e29d` is `c5048b4ecfd0c8a89a8a4719a48afbf11b980f68`. It follows completion of R13.004, so R13.006b must use it as the independent before; using `3032121` instead would count the reductions already completed in #6 again in #7.
 
 ## 3. Source breakdown
 
@@ -52,11 +52,11 @@ Source metric 可讀取 tracked working tree，並同時記錄 base commit/sourc
 | UI Services subset | 94 / 12,810 / 11,378 | 94 / 12,796 / 11,369 | 0 / -14 / -9 |
 | **Logic-first** | **381 / 64,709 / 57,370** | **384 / 64,377 / 57,077** | **+3 / -332 / -293** |
 
-Total 的 `3032121 -> 207e29d` 可完整對帳：R13.003 為 `+320 physical / +288 nonblank`，R13.004 為 `-653 / -582`，合計即 `-333 / -294`。R13.006a 本身不得修改 `src`，完成 commit 的 source-tree OID 必須仍等於 `207e29d`。
+The total `3032121 -> 207e29d` reconciles fully: R13.003 is `+320 physical / +288 nonblank`, R13.004 is `-653 / -582`, and the sum is `-333 / -294`. R13.006a itself must not modify `src`; the source-tree OID of its completion commit must still equal that of `207e29d`.
 
-### R13.006b 首個獨立 cutdown
+### R13.006b First Independent cutdown
 
-R13.006b 只刪除 `BuildHeatmap` 對已 materialize 且按 row／col 排序之 `cells` list 的第二次相同排序，不重算 R13.004。公開 characterization 使用亂序 pad input，鎖定 `Result.Cells` 與 `Heatmap.Cells` 的 row／col 順序；完成 source-tree OID 為 `b35b9a50cb646be14db5c15cdd5533ab64d73867`。
+R13.006b only removes the second identical sort by `BuildHeatmap` on the `cells` list that has already been materialized and sorted by row/col, without counting R13.004 again. Public characterization uses pad input in shuffled order to lock down the row/col order of `Result.Cells` and `Heatmap.Cells`; the completed source-tree OID is `b35b9a50cb646be14db5c15cdd5533ab64d73867`.
 
 | Scope | Before `207e29d` files / physical / nonblank | R13.006b files / physical / nonblank | Delta |
 |---|---:|---:|---:|
@@ -66,7 +66,7 @@ R13.006b 只刪除 `BuildHeatmap` 對已 materialize 且按 row／col 排序之 
 
 ## 4. Secondary Release artifacts
 
-量測 profile：同一 clean checkout、同一 SDK/OS/RID/TFM，對兩個全新且彼此隔離的 `ArtifactsPath` 執行 Release build。每個 root 都獨立承載 bin/obj；可共用 immutable global NuGet cache。四個 primary DLL 的 bytes 與 SHA-256 必須兩次完全一致。
+Measurement profile: the same clean checkout and the same SDK/OS/RID/TFM, with Release builds in two new, isolated `ArtifactsPath` locations. Each root independently holds bin/obj; an immutable global NuGet cache may be shared. The bytes and SHA-256 of the four primary DLLs must be exactly identical across both builds.
 
 | Artifact | Bytes | SHA-256 |
 |---|---:|---|
@@ -76,7 +76,7 @@ R13.006b 只刪除 `BuildHeatmap` 對已 materialize 且按 row／col 排序之 
 | `FreeformHelper.UI.dll` | 14,523,392 | `3A0CBCAC6E054A9AB762A8EC9C7C3EBF5872C2B459DC470E1C9D60838FC072B6` |
 | **Total** | **15,315,456** | — |
 
-R13.006b clean candidate 的兩次 isolated build 同樣 exact repeatable。四個 artifact 的 bytes 皆未改變，總量 delta 為 0；這是 PE alignment 下的誠實結果，不取代上節 production source 的 `-2 / -2` primary evidence。只有包含刪除實作的 Application DLL hash 更新：
+The two isolated builds of the R13.006b clean candidate are also exactly repeatable. The bytes of all four artifacts are unchanged, with a total delta of 0; this is an honest result under PE alignment and does not replace the `-2 / -2` primary evidence for production source in the preceding section. Only the hash of the Application DLL containing the removed implementation changes:
 
 | Artifact | R13.006a bytes / SHA-256 | R13.006b bytes / SHA-256 | Byte delta |
 |---|---|---|---:|
@@ -86,24 +86,24 @@ R13.006b clean candidate 的兩次 isolated build 同樣 exact repeatable。四�
 | `FreeformHelper.UI.dll` | 14,523,392 / `3A0CBCAC…FC072B6` | 14,523,392 / `3A0CBCAC…FC072B6` | 0 |
 | **Total** | **15,315,456** | **15,315,456** | **0** |
 
-這是明確的 no-PDB measurement profile：`Release`、`net8.0`、`UseAppHost=false`、`ContinuousIntegrationBuild=true`、`Deterministic=true`、`IncludeSourceRevisionInInformationalVersion=false`、`DebugType=None`、`DebugSymbols=false`，並把各自 artifact root 與 repo root PathMap 到固定虛擬路徑。Source revision metadata 被排除，避免只改 docs/commit SHA 就改變 structural size hash；不可把這個 total 與預設 portable-PDB Release 大小混比。
+This is an explicit no-PDB measurement profile: `Release`, `net8.0`, `UseAppHost=false`, `ContinuousIntegrationBuild=true`, `Deterministic=true`, `IncludeSourceRevisionInInformationalVersion=false`, `DebugType=None`, `DebugSymbols=false`, with each artifact root and the repo root mapped through PathMap to fixed virtual paths. Source revision metadata is excluded so that changing only docs/commit SHA does not change the structural size hash; this total must not be compared with the default portable-PDB Release size.
 
-簽核環境：.NET SDK `10.0.302`、MSBuild `18.6.11.33009`、Microsoft Windows `10.0.26200`、OS/process `X64`、RID `win-x64`。Repo 沒有 `global.json` 或 `packages.lock.json`，因此此 hash 只宣稱在已記錄的 checkout 與相同 toolchain/environment 下可重現，不是跨 SDK/OS 的 binary reproducibility 保證。
+Approval environment: .NET SDK `10.0.302`, MSBuild `18.6.11.33009`, Microsoft Windows `10.0.26200`, OS/process `X64`, RID `win-x64`. The repo has no `global.json` or `packages.lock.json`, so this hash claims reproducibility only with the recorded checkout and the same toolchain/environment, not a guarantee of binary reproducibility across SDKs/OSes.
 
-## 5. 重跑方式
+## 5. How to Rerun
 
-只檢查 source contract（可用於未提交 slice）：
+Check only the source contract (usable for an uncommitted slice):
 
 ```powershell
 ./scripts/tests/check-code-size-baseline.ps1
 ./scripts/perf/measure-code-size.ps1 -SkipReleaseBuild
 ```
 
-產生 authoritative source + Release manifest（tracked build inputs 必須 clean；入口會先執行 workspace preparation）：
+Generate the authoritative source + Release manifest (tracked build inputs must be clean; the entry point first runs workspace preparation):
 
 ```powershell
 ./scripts/perf/measure-code-size.ps1 `
   -OutJsonPath build/code-size/code-size-baseline.json
 ```
 
-JSON 與 assembly outputs 位於 ignored `build/code-size/`，不提交動態 machine output。Review evidence 應引用 command、commit/source-tree OID、summary values 與 manifest path。
+JSON and assembly outputs are in the ignored `build/code-size/`; do not commit dynamic machine output. Review evidence should cite the command, commit/source-tree OID, summary values, and manifest path.

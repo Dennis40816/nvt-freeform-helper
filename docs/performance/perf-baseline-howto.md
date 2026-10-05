@@ -1,71 +1,71 @@
-# 非 Notch 效能 Baseline 使用方式
+# Non-Notch Performance Baseline Usage
 
-## 目的
+## Purpose
 
-建立一套可重複執行、可比對的效能基線，先聚焦在：
-- 主要操作耗時（`finished in N ms`）
-- log 噪音指標（`Selection updated`、`Grid built`、`ViewModel initialized`）
-- 例外與警告數量（`ERROR`/`WARN`）
+Establish a repeatable, comparable performance baseline, initially focusing on:
+- Duration of major operations (`finished in N ms`)
+- Log noise metrics (`Selection updated`, `Grid built`, `ViewModel initialized`)
+- Exception and warning counts (`ERROR`/`WARN`)
 
-本文件處理 runtime latency/log。Production source LOC 與 secondary Release DLL size 是另一套 structural metric，請見 `docs/performance/code-size-baseline-1.3.0.md`；兩者不可互相替代或混用門檻。
+This document covers runtime latency/logs. Production source LOC and secondary Release DLL size are a separate set of structural metrics; see `docs/performance/code-size-baseline-1.3.0.md`. Neither can replace the other, and their thresholds must not be mixed.
 
 ---
 
-## 一次 baseline 的建議流程
+## Recommended Workflow for a Baseline Run
 
-1. 啟動工具並執行固定操作腳本（你常用的流程）  
-   例：載入 DXF -> 重建 grid -> run overlap/match -> 匯出。
-2. 關閉工具（確保 log flush 完成）。
-3. 執行 baseline 腳本：
+1. Start the tool and execute a fixed operation script (your usual workflow)  
+   Example: load DXF -> rebuild grid -> run overlap/match -> export.
+2. Close the tool (ensure log flushing has completed).
+3. Run the baseline script:
 
 ```powershell
 ./scripts/perf/collect-perf-baseline.ps1
 ```
 
-4. 查看輸出檔：
+4. Inspect the output file:
    - `build/perf/non-notch-perf-baseline-latest.md`
 
 ---
 
-## 啟動/載入效能（Phase 1）
+## Startup/Load Performance (Phase 1)
 
-新增腳本：`scripts/perf/measure-startup-load.ps1`
+New script: `scripts/perf/measure-startup-load.ps1`
 
-用途：
-- 自動啟動 app，量測「Runtime query 可用」時間
-- 可選擇執行 `load-project`
-- 產出 markdown/json 供基線比對
+Purpose:
+- Automatically start the app and measure the time until "Runtime query is available"
+- Optionally execute `load-project`
+- Produce markdown/json for baseline comparison
 
-範例：
+Example:
 
 ```powershell
 ./scripts/perf/measure-startup-load.ps1 `
   -ProjectPath example/BOE36.35/project_3635.json
 ```
 
-輸出：
+Output:
 - `build/perf/startup-load-latest.md`
 - `build/perf/startup-load-latest.json`
 
-補充：
-- 預設 `PERF STARTUP` / `PERF LOAD_PROJECT` marker 記錄在 `Debug` level。
-- `measure-startup-load.ps1` 會暫時設置 `FREEFORM_PERF_MARKERS_INFO=1`，確保量測 run 可在 `Info` level 也保留 marker。
-- 若要手動量測非腳本啟動流程，可自行設定 `FREEFORM_PERF_MARKERS_INFO=1` 後啟動 app。
-- 若已啟用「初始 grid 背景排程」，`Startup` 區塊的 `hasGrid` 可能是 `False`（屬預期）。
-- 這時請搭配 `PERF STARTUP stage=workspace.initial-grid-built` 觀察首個 grid 完成時間。
+Additional notes:
+- By default, `PERF STARTUP` / `PERF LOAD_PROJECT` markers are logged at the `Debug` level.
+- `measure-startup-load.ps1` temporarily sets `FREEFORM_PERF_MARKERS_INFO=1` to ensure the measurement run also retains markers at the `Info` level.
+- To manually measure startup without the script, set `FREEFORM_PERF_MARKERS_INFO=1` yourself before starting the app.
+- If "initial grid background scheduling" is enabled, `hasGrid` in the `Startup` section may be `False` (expected).
+- In that case, also use `PERF STARTUP stage=workspace.initial-grid-built` to observe when the first grid finishes.
 
 ---
 
-## 冷啟動/暖啟動批次基線
+## Cold/Warm Startup Batch Baseline
 
-新增腳本：`scripts/perf/measure-startup-load-batch.ps1`
+New script: `scripts/perf/measure-startup-load-batch.ps1`
 
-用途：
-- 重複執行 `measure-startup-load.ps1`，一次產生多次量測
-- 自動彙整 cold（run1）與 warm（run2+）統計（avg/p50/p95/min/max）
-- 保留每次 run 的原始 markdown/json，方便回溯
+Purpose:
+- Run `measure-startup-load.ps1` repeatedly to produce multiple measurements in one batch
+- Automatically aggregate cold (run1) and warm (run2+) statistics (avg/p50/p95/min/max)
+- Retain the raw markdown/json for each run for traceability
 
-範例：
+Example:
 
 ```powershell
 ./scripts/perf/measure-startup-load-batch.ps1 `
@@ -74,12 +74,12 @@
   -SkipBuild
 ```
 
-輸出：
+Output:
 - `build/perf/startup-load-batch-latest.md`
 - `build/perf/startup-load-batch-latest.json`
 - `build/perf/runs/startup-load-run-*.md/json`
 
-可選回歸比較：
+Optional regression comparison:
 
 ```powershell
 ./scripts/perf/measure-startup-load-batch.ps1 `
@@ -91,25 +91,25 @@
   -SkipBuild
 ```
 
-- `CompareJsonPath`：前一版 batch JSON 路徑
-- `RegressionThresholdPercent`：退化門檻（百分比，預設 15）
-- `FailOnRegression`：若偵測到退化則腳本回傳失敗（可接 CI）
+- `CompareJsonPath`: path to the previous batch JSON
+- `RegressionThresholdPercent`: regression threshold (percentage, default 15)
+- `FailOnRegression`: return script failure if a regression is detected (can be integrated into CI)
 
 ---
 
-## 3635 固定回歸基線（Step1~Step5 + exact export + Runtime Query）
+## 3635 Fixed Regression Baseline (Step1~Step5 + exact export + Runtime Query)
 
-新增腳本：`scripts/perf/run-3635-regression-baseline.ps1`
+New script: `scripts/perf/run-3635-regression-baseline.ps1`
 
-用途：
-- 固定跑 `project_3635.json` 的重構回歸流程（load + Step1~Step4 + Step5 export）
-- 自動輸出 CSV / C v2.1 / C v2.2 匯出檔
-- 預設將真實 UI/IPC 產生的 V21/V22 C，把 CRLF/LF/lone CR 統一為 LF 並容許最多一個 optional EOF newline 後，以 ordinal exact compare 對照 checked-in golden
-- 同步產生 runtime query 基線（`status/selection/notch/notch-validation`）
-- 以 runtime `selection.timings` 為主輸出 selection / inspector latency 統計，必要時 fallback 解析 `Selection updated` log
-- 讀取 `docs/performance/regression-baseline-3635.budget.json`，輸出固定 budget gate 結果
+Purpose:
+- Run a fixed refactoring regression workflow for `project_3635.json` (load + Step1~Step4 + Step5 export)
+- Automatically produce CSV / C v2.1 / C v2.2 export files
+- By default, compare V21/V22 C produced by the actual UI/IPC against the checked-in golden using ordinal exact compare after normalizing CRLF/LF/lone CR to LF and allowing at most one optional EOF newline
+- Also produce a runtime query baseline (`status/selection/notch/notch-validation`)
+- Use runtime `selection.timings` as the primary source for selection / inspector latency statistics, falling back to parsing the `Selection updated` log when necessary
+- Read `docs/performance/regression-baseline-3635.budget.json` and output fixed budget gate results
 
-範例：
+Example:
 
 ```powershell
 ./scripts/perf/run-3635-regression-baseline.ps1 `
@@ -124,17 +124,17 @@
   -SkipBuild
 ```
 
-Golden gate 預設使用：
+The golden gate uses these by default:
 
 - `example/BOE36.35/notch_export_v21_current.c`
 - `example/BOE36.35/notch_export_v22_current.c`
 - `example/BOE36.35/notch_export_golden_manifest.json`（executable hash/bytes/nodes/input lock）
 
-Exact gate 強制使用 `-LaunchIsolatedUi`：腳本以暫時的 `FREEFORMHELPER_APP_GENERAL_SETTINGS_PATH` 啟動 hidden UI，避免個人 import/view 設定改變 CAD 數量或輸出，結束時只停止自己啟動且路徑已驗證的 process。Mismatch 會保留 actual C，並在錯誤訊息列出 actual/golden path 與第一個差異；腳本不會更新 golden。`-SkipGoldenCheck` 僅供非 gate 的自訂效能實驗。
+The exact gate requires `-LaunchIsolatedUi`: the script launches a hidden UI with a temporary `FREEFORMHELPER_APP_GENERAL_SETTINGS_PATH` to prevent personal import/view settings from changing the CAD count or output. On completion, it stops only the process it launched whose path has been verified. A mismatch preserves the actual C and lists the actual/golden paths and the first difference in the error message; the script does not update the golden. `-SkipGoldenCheck` is only for custom performance experiments outside the gate.
 
-`-SkipBuild` 需要既有 apphost executable；若剛執行過 `-UseNoAppHost` 測試／lint，請移除 `-SkipBuild`，讓腳本以 `UseAppHost=true` 重建後再啟動 isolated UI。
+`-SkipBuild` requires an existing apphost executable; if you just ran tests/lint with `-UseNoAppHost`, remove `-SkipBuild` so the script rebuilds with `UseAppHost=true` before launching the isolated UI.
 
-輸出（預設）：
+Output (default):
 - `build/perf/3635-regression-latest/regression-baseline-summary.md`
 - `build/perf/3635-regression-latest/regression-baseline-summary.json`
 - `build/perf/3635-regression-latest/notch_table.csv`
@@ -145,22 +145,22 @@ Exact gate 強制使用 `-LaunchIsolatedUi`：腳本以暫時的 `FREEFORMHELPER
 - `build/perf/3635-regression-latest/runtime-*.json`
 - `build/perf/3635-regression-latest/selection-latency.json`
 
-詳細驗收與輸出說明請見：
+For detailed acceptance criteria and output descriptions, see:
 - `docs/performance/regression-baseline-3635.md`
 
 ---
 
-## 啟動同步熱點盤點（Marker 分解）
+## Startup Synchronous Hotspot Inventory (Marker Breakdown)
 
-新增腳本：`scripts/perf/analyze-startup-markers.ps1`
+New script: `scripts/perf/analyze-startup-markers.ps1`
 
-用途：
-- 從 `PERF STARTUP` log 自動找出「最新 app run」（排除 query 子流程）
-- 產生 stage timeline（elapsed/delta）
-- 列出 top delta stages，快速定位同步熱點
-- 注意：若不是透過 `measure-startup-load.ps1` 啟動，且目前 log level 非 Debug、也未設 `FREEFORM_PERF_MARKERS_INFO=1`，腳本可能找不到最新 run marker。
+Purpose:
+- Automatically find the "latest app run" in the `PERF STARTUP` log (excluding query subprocesses)
+- Produce a stage timeline (elapsed/delta)
+- List top delta stages to quickly locate synchronous hotspots
+- Note: if the app was not launched through `measure-startup-load.ps1`, the current log level is not Debug, and `FREEFORM_PERF_MARKERS_INFO=1` is not set, the script may not find markers for the latest run.
 
-範例：
+Example:
 
 ```powershell
 ./scripts/perf/analyze-startup-markers.ps1 `
@@ -168,7 +168,7 @@ Exact gate 強制使用 `-LaunchIsolatedUi`：腳本以暫時的 `FREEFORMHELPER
   -OutPath build/perf/startup-markers-latest.md
 ```
 
-可直接啟用預算檢查（`workspace.initial-grid-built <= 1000ms`）：
+Budget checking can be enabled directly (`workspace.initial-grid-built <= 1000ms`):
 
 ```powershell
 ./scripts/perf/analyze-startup-markers.ps1 `
@@ -178,7 +178,7 @@ Exact gate 強制使用 `-LaunchIsolatedUi`：腳本以暫時的 `FREEFORMHELPER
   -FailOnBudgetViolation
 ```
 
-或用測試 gate 包裝腳本：
+Or use the test gate wrapper script:
 
 ```powershell
 ./scripts/tests/check-startup-budget.ps1 -SkipBuild -InitialGridBudgetMs 1000
@@ -186,7 +186,7 @@ Exact gate 強制使用 `-LaunchIsolatedUi`：腳本以暫時的 `FREEFORMHELPER
 
 ---
 
-## 腳本參數
+## Script Parameters
 
 ```powershell
 ./scripts/perf/collect-perf-baseline.ps1 `
@@ -198,52 +198,52 @@ Exact gate 強制使用 `-LaunchIsolatedUi`：腳本以暫時的 `FREEFORMHELPER
   -TopOperations 30
 ```
 
-- `LogPath`：來源 log 檔
-- `OutPath`：輸出 markdown 路徑
-- `OutJsonPath`：輸出 JSON 路徑（供後續比對/自動化）
-- `CompareJsonPath`：要比較的舊 baseline JSON（可選）
-- `RegressionThresholdPercent`：退化門檻（超過才列入 regression 表）
-- `TopOperations`：依 `p95` 排序後，輸出前 N 個操作
+- `LogPath`: source log file
+- `OutPath`: output markdown path
+- `OutJsonPath`: output JSON path (for subsequent comparison/automation)
+- `CompareJsonPath`: old baseline JSON to compare against (optional)
+- `RegressionThresholdPercent`: regression threshold (only values exceeding it are listed in the regression table)
+- `TopOperations`: output the top N operations after sorting by `p95`
 
 ---
 
-## 新增可觀測欄位
+## New Observable Fields
 
-`collect-perf-baseline.ps1` 現在也會整理：
-- `PERF STARTUP` markers（程式啟動階段）
-- `PERF LOAD_PROJECT SUMMARY` markers（載入專案分段耗時）
+`collect-perf-baseline.ps1` now also summarizes:
+- `PERF STARTUP` markers (application startup stages)
+- `PERF LOAD_PROJECT SUMMARY` markers (elapsed time for project loading segments)
 
-可在 markdown 中看到兩個新區塊：
+Two new sections appear in the markdown:
 - `Startup Markers`
 - `Load Project Markers`
 
 ---
 
-## 快速比對建議
+## Quick Comparison Recommendations
 
-1. 先備份上一版 JSON：
+1. Back up the previous JSON first:
 
 ```powershell
 Copy-Item build/perf/non-notch-perf-baseline-latest.json build/perf/non-notch-perf-baseline-prev.json -Force
 ```
 
-2. 跑完新流程後再重跑基線（帶 `-CompareJsonPath`）。
-3. 直接看 markdown 的 `Regression Check` 區塊。
+2. After completing the new workflow, rerun the baseline (with `-CompareJsonPath`).
+3. Read the `Regression Check` section in the markdown directly.
 
 ---
 
-## 讀表重點
+## How to Read the Tables
 
-- 優先看 `p95`：比平均值更能反映卡頓體感。
-- `Count` 太少時，先不要下結論。
-- `ERROR`/`WARN` 若上升，先排除功能異常，再談效能。
-- `Selection updated` 異常偏高，通常代表互動過度觸發或 log 噪音。
+- Look at `p95` first: it reflects perceived stuttering better than the average.
+- Avoid drawing conclusions when `Count` is too small.
+- If `ERROR`/`WARN` increases, rule out functional problems before discussing performance.
+- An unusually high `Selection updated` count usually indicates excessive interaction triggers or log noise.
 
 ---
 
-## 版本比對建議
+## Version Comparison Recommendations
 
-- 每次做 perf/refactor 前後都跑一次。
-- 以 `build/perf/` 產出比較檔，必要時再挑選重點貼到 PR/issue。
-- 若 `p95` 退化超過 20%，應先停下來做 root cause 分析。
+- Run once before and after each perf/refactor change.
+- Produce comparison files under `build/perf/`, then select key points to paste into a PR/issue if needed.
+- If `p95` regresses by more than 20%, stop and perform root cause analysis first.
 

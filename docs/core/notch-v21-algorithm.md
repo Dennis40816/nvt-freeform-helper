@@ -1,28 +1,28 @@
-# Notch V21 演算法細節
-最後更新：2026-03-23
+# Notch V21 Algorithm Details
+Last updated: 2026-03-23
 
-本文件描述目前 repo 內 `V21` 的實作契約。這裡講的是「現在程式怎麼算」，不是歷史外部答案檔。
+This document describes the current implementation contract for `V21` in the repo. It explains "how the code calculates now", not historical external answer files.
 
-主要實作：
+Main implementations:
 - `src/FreeformHelper.Application/Services/NotchAlgorithms/V21NotchAlgorithm.cs`
 - `src/FreeformHelper.Application/Services/NotchAlgorithms/NotchAlgorithmHelpers.cs`
 
-## 1. 適用條件
+## 1. Applicability
 
-`V21` 只處理：
+`V21` only handles:
 - `reg.Freeform != None`
 
-也就是：
+That is:
 - `XWay`
 - `YWay`
-- `XYWay` 仍會通過 `CanHandle`，但 legacy v2.1 軸向 helper 會將非 `YWay` 視為 X 軸
+- `XYWay` still passes `CanHandle`, but the legacy v2.1 axis helper treats any non-`YWay` type as the X axis
 
-判斷入口：
+Decision entry point:
 - `V21NotchAlgorithm.CanHandle(...)`
 
-## 2. 輸出格式
+## 2. Output Format
 
-`V21` 輸出是 9 欄 legacy row：
+`V21` outputs a legacy row with 9 columns:
 
 1. `IDX`
 2. `REGULAR_PERCENT`
@@ -34,129 +34,129 @@
 8. `SECOND_TYPE`
 9. `SECOND_RATIO_Q7`
 
-## 3. 前三欄怎麼算
+## 3. How the First Three Columns Are Calculated
 
 ### 3.1 `IDX`
-- 直接取 `reg.DiffIndex`
+- Take `reg.DiffIndex` directly
 
 ### 3.2 `REGULAR_PERCENT`
 - `cad.Area / reg.Area * 100`
-- 四捨五入到整數
+- Round to the nearest integer
 
 ### 3.3 `REGU_TO_FULL_PERCENT`
 - `cad.Bounds.Width * cad.Bounds.Height / reg.Area * 100`
-- 四捨五入到整數
+- Round to the nearest integer
 
-注意：
-- 這兩欄是兩個不同觀點的幾何比例。
-- 不會在 `V21` row 生成時彼此相乘。
+Notes:
+- These two columns are geometric ratios from two different perspectives.
+- They are not multiplied together when generating a `V21` row.
 
-## 4. 軸向判定
+## 4. Axis Determination
 
-`V21` 先把 freeform 類型收斂成軸：
+`V21` first reduces the freeform type to an axis:
 - `XWay -> X`
 - `YWay -> Y`
-- `XYWay -> X`（legacy fallback；正式 Step5 主線仍以 v2.2 canonical flow 為準）
+- `XYWay -> X` (legacy fallback; the formal Step5 main path still follows the v2.2 canonical flow)
 
-輔助入口：
+Helper entry point:
 - `NotchAlgorithmHelpers.ResolveAxisKind(...)`
 
-## 5. 鄰居與幾何上下文
+## 5. Neighbors and Geometry Context
 
-### 5.1 X 軸
-- 左鄰居：`(row, col - 1)`
-- 右鄰居：`(row, col + 1)`
+### 5.1 X Axis
+- Left neighbor: `(row, col - 1)`
+- Right neighbor: `(row, col + 1)`
 
-### 5.2 Y 軸
-- 上鄰居：`(row + 1, col)`
-- 下鄰居：`(row - 1, col)`
+### 5.2 Y Axis
+- Upper neighbor: `(row + 1, col)`
+- Lower neighbor: `(row - 1, col)`
 
-這裡用的是內部 grid row 契約，不是 UI 顯示的 top-down row label。
+This uses the internal grid row contract, not the top-down row labels shown in the UI.
 
-建立入口：
+Creation entry points:
 - `CreateAxisGeometryContext(...)`
 - `CreateAxisNeighborContext(...)`
 
-## 6. `type` 定義
+## 6. `type` Definitions
 
-`V21` 的 leg type 只有三種：
+`V21` has only three leg types:
 
 - `0 = none`
 - `1 = add`
 - `2 = sub`
 
-白話：
-- `add`：把量加到鄰居 diff
-- `sub`：代表在自己這顆 diff 內扣回去
+In plain terms:
+- `add`: add the amount to the neighbor diff
+- `sub`: subtract the amount back within the current diff
 
-## 7. `Q7` ratio 是什麼
+## 7. What the `Q7` Ratio Means
 
-`V21` 的第 6 / 9 欄是 firmware `UINT8` Q7 magnitude：
+`V21` columns 6 / 9 are firmware `UINT8` Q7 magnitudes:
 
 - `1.0 = 128`
 - `0.5 = 64`
 - `0.0 = 0`
-- 合法 payload 範圍是 `0..255`；`255` 約為 `199%`
-- 正負不放在 magnitude，而只由 `NHC_TYPE_ADD / NHC_TYPE_SUB` 承載
+- The valid payload range is `0..255`; `255` is approximately `199%`
+- The sign is not stored in the magnitude; it is carried only by `NHC_TYPE_ADD / NHC_TYPE_SUB`
 
-也就是：
+That is:
 
 ```text
 ratioQ7 = roundAwayFromZero(fraction * 128)
 ```
 
-legacy geometry row 可以暫存大於 `255` 的未飽和值以維持歷史 row/CSV 語意；唯一 final firmware projector 會在 ABI 邊界飽和到 `0..255`。Firmware apply 直接執行 `(INT16 source * magnitudeQ7) >> 7`，不可先轉成整數 percent 或 double 再套用。
+A legacy geometry row can temporarily hold unsaturated values above `255` to preserve historical row/CSV semantics; the single final firmware projector saturates them to `0..255` at the ABI boundary. Firmware apply directly executes `(INT16 source * magnitudeQ7) >> 7`; it must not convert to integer percent or double before applying.
 
-fraction 的來源是：
-- 幾何延伸長度 / 目前 cell 長度
-- 或幾何延伸長度 / 鄰居 cell 長度
+The fraction comes from:
+- Geometric extension length / current cell length
+- Or geometric extension length / neighbor cell length
 
-對應入口：
+Corresponding entry points:
 - legacy row：`NotchV21Q7Codec.EncodeLegacyRowFractionRaw(...)`
 - final payload／display／apply：`NotchV21Q7Codec`
 
-`ThresholdQ7` 是另一份 `0..128` admission contract，由 `NotchThresholdQ7Contract` 管理；它不是 leg payload，不能與 `0..255` 的 magnitude 上限合併。
+`ThresholdQ7` is a separate `0..128` admission contract managed by `NotchThresholdQ7Contract`; it is not a leg payload and must not be combined with the `0..255` magnitude limit.
 
-## 8. `add` / `sub` 怎麼決定
+## 8. How `add` / `sub` Are Determined
 
-對 X / Y 軸都一樣：
+The same rules apply to both the X / Y axes:
 
-1. 先算 leading / trailing 的幾何 delta
-2. 判斷 CAD 是否真的往那一側跨出 cell
-3. 若跨出：
+1. First calculate the leading / trailing geometric deltas
+2. Determine whether the CAD actually extends beyond the cell on that side
+3. If it extends beyond:
 - `type = add`
 - `diff = neighbor diff`
-4. 若沒跨出但有回縮：
+4. If it does not extend beyond but retracts:
 - `type = sub`
 - `diff = current reg diff`
 
-實作入口：
+Implementation entry points:
 - `geometryContext.ExpandsLeading(...)`
 - `geometryContext.ExpandsTrailing(...)`
 - `geometryContext.GetLeadingDelta(...)`
 - `geometryContext.GetTrailingDelta(...)`
 
-## 9. `V21` 真正表達的是什麼
+## 9. What `V21` Actually Expresses
 
-`V21` 這列可以白話成：
+A `V21` row can be described in plain terms as:
 
-- 這顆 CAD 在自己的 regular 內大概占多少
-- 若看 bounding box，會到多少
-- 在第一個方向，對哪個 diff 有 `add/sub`
-- 在第二個方向，對哪個 diff 有 `add/sub`
-- 每個方向的量有多大（用 `Q7`）
+- Roughly how much of its own regular this CAD occupies
+- How much it would occupy based on the bounding box
+- Which diff has `add/sub` in the first direction
+- Which diff has `add/sub` in the second direction
+- How large the amount is in each direction (using `Q7`)
 
-它是幾何導出的 legacy row，不是 firmware 真值表。
+It is a geometrically derived legacy row, not a firmware truth table.
 
-## 10. 修改時要守的契約
+## 10. Contracts to Preserve When Making Changes
 
-1. `Q7` 是目前唯一 V21 leg ratio 契約
-- 不要再把 UI 可調的 `LenScale` 帶回使用者層。
-- V22 leg 維持 `INT8 -100..100` signed percent，不走 V21 Q7 codec。
+1. `Q7` is currently the only V21 leg ratio contract
+- Do not bring the UI-adjustable `LenScale` back to the user-facing layer.
+- V22 legs remain `INT8 -100..100` signed percent and do not use the V21 Q7 codec.
 
-2. `V21` 的 `[1]/[2]` 是幾何比例
-- 不應該被 UI / exporter / simulation 再重解成別的單位。
+2. `V21` `[1]/[2]` are geometric ratios
+- They should not be reinterpreted as other units by UI / exporter / simulation.
 
-3. `V21` 的 `type / diff / ratio` 必須一起看
-- 不可只看 ratio 而忽略 `add/sub` 語意。
-- exporter 與 simulation 必須消費同一份 `NotchV21FirmwareProjector` final node；formatter 不再重做 clamp 或 projection。
+3. `V21` `type / diff / ratio` must be considered together
+- Do not look only at the ratio and ignore `add/sub` semantics.
+- The exporter and simulation must consume the same `NotchV21FirmwareProjector` final node; the formatter no longer repeats clamping or projection.

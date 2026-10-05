@@ -1,116 +1,116 @@
-# V21／Legacy 完全移除：持久化相容性規劃
+# Complete V21／Legacy Removal: Persistence Compatibility Plan
 
-本文件只盤點 TODO「V21／Legacy 完全移除」的持久化影響與政策選項。Owner 已確認「2.1」指 V21，且目前仍決定保留 V21 與 `LegacyRegularAnchor`；本文件不授權移除、不提出產品或檔案格式新版本，也不安排移除順序或日期。
+This document only inventories the persistence impact and policy options for the TODO item "Complete V21／Legacy Removal". The owner has confirmed that 「2.1」 means V21 and still chooses to retain V21 and `LegacyRegularAnchor`; this document does not authorize removal, propose a new product or file format version, or schedule the order or date of removal.
 
-依據為目前分支 `feature/queue/v21-removal-persistence-plan` 的程式與測試宣告、[依賴圖](../generated/project-dependency-graph.md)、[Notch 契約](../reference/notch-system-reference.md)、[設定入口矩陣](../guides/settings-entry-matrix.md)及 [1.3.x roadmap 的 owner 決定](../guides/refactor-roadmap-1.3.x.md)。以下為現況與尚未採納的建議；未讀取私有範例資料，也未檢查或變更 golden、baseline。
+The basis is the code and test declarations on the current branch `feature/queue/v21-removal-persistence-plan`, the [dependency graph](../generated/project-dependency-graph.md), the [Notch contract](../reference/notch-system-reference.md), the [settings entry matrix](../guides/settings-entry-matrix.md), and the [owner decisions in the 1.3.x roadmap](../guides/refactor-roadmap-1.3.x.md). The following describes the current state and recommendations that have not been adopted; no private example data was read, and no golden or baseline was inspected or changed.
 
-## 1. 檔案格式與 enum 契約
+## 1. File Format and Enum Contracts
 
-| 載體／值 | 檔案：symbol | 可確認的格式與現況 |
+| Carrier／value | File: symbol | Confirmed format and current state |
 |---|---|---|
-| 專案 JSON | `src/FreeformHelper.Infrastructure/Project/ProjectSchema.cs:ProjectSchema.CurrentVersion`；`ProjectFile.cs:ProjectFile.SchemaVersion`；`JsonProjectStore.cs:JsonProjectStore.Options` | 現行 `schemaVersion` 是字串 `"2"`；JSON 欄位使用 camelCase，enum 使用數值，沒有 string-enum converter。下節專案欄位均可由格式 `"2"` 承載。 |
-| App 白名單 JSON | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:AppGeneralSettingsDocument.CurrentSchemaVersion/Save` | 現行 `SchemaVersion` 是整數 `2`；欄位保留 PascalCase。只有 `View`、`Import`、`Behavior`，沒有 `Settings.Notch` 或 `UiSnapshot.Notch`。 |
-| 舊 app JSON | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:LegacyAppGeneralSettingsDocument/TryLoad/LooksLikeWhitelistShape` | `AppGeneralSettingsStoreTests.TryLoad_LegacyDocument_MapsToWhitelistAndDefaultsBehavior` 明列整數 `SchemaVersion = 1` 的舊形狀。讀取器依頂層 `View`／`Import`／`Behavior` 是否存在選形狀，不以版本號分派；舊形狀只轉入 `UiSnapshot.View` 與 `UiSnapshot.Import`。 |
-| V21 | `src/FreeformHelper.Domain/Notch/NotchAlgorithmVersion.cs:NotchAlgorithmVersion.V21` | 數值 `21`；專案 `settings.notch.enabledVersions` 可包含此值。 |
-| V22 | 同檔：`NotchAlgorithmVersion.V22` | 數值 **`30`**，不是 `22`；移除 V21 不代表可重編這個持久化數值。 |
-| Legacy 模式 | `src/FreeformHelper.Application/Settings/NotchComputationMode.cs:NotchComputationMode.LegacyRegularAnchor` | 數值 `0`；專案 `settings.notch.computationMode = 0` 是明確舊模式選擇。 |
-| CAD 模式 | 同檔：`NotchComputationMode.CadAllocation` | 數值 `1`；`NotchSettings.ComputationMode` 的初始化預設也是此值，欄位缺漏不等於 Legacy 的 `0`。 |
-| V21 C 匯出選項 | `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Models.cs:FreeformHelperViewModel.NotchExportFileType.Cv21` | enum 隱含數值 `1`（`Csv = 0`、`Cv22 = 2`）；專案／app 實際寫入字串 `"Cv21"`，而非此 enum 的數值。 |
+| Project JSON | `src/FreeformHelper.Infrastructure/Project/ProjectSchema.cs:ProjectSchema.CurrentVersion`; `ProjectFile.cs:ProjectFile.SchemaVersion`; `JsonProjectStore.cs:JsonProjectStore.Options` | The current `schemaVersion` is the string `"2"`; JSON fields use camelCase, and enums use numeric values, with no string-enum converter. All project fields in the next section can be carried by format `"2"`. |
+| App whitelist JSON | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:AppGeneralSettingsDocument.CurrentSchemaVersion/Save` | The current `SchemaVersion` is the integer `2`; fields retain PascalCase. It contains only `View`, `Import`, and `Behavior`, with no `Settings.Notch` or `UiSnapshot.Notch`. |
+| Old app JSON | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:LegacyAppGeneralSettingsDocument/TryLoad/LooksLikeWhitelistShape` | `AppGeneralSettingsStoreTests.TryLoad_LegacyDocument_MapsToWhitelistAndDefaultsBehavior` explicitly lists the old shape with integer `SchemaVersion = 1`. The reader selects the shape based on the presence of top-level `View`／`Import`／`Behavior`, not the version number; the old shape maps only `UiSnapshot.View` and `UiSnapshot.Import`. |
+| V21 | `src/FreeformHelper.Domain/Notch/NotchAlgorithmVersion.cs:NotchAlgorithmVersion.V21` | Numeric value `21`; project `settings.notch.enabledVersions` can contain this value. |
+| V22 | Same file: `NotchAlgorithmVersion.V22` | Numeric value **`30`**, not `22`; removing V21 does not permit renumbering this persisted value. |
+| Legacy mode | `src/FreeformHelper.Application/Settings/NotchComputationMode.cs:NotchComputationMode.LegacyRegularAnchor` | Numeric value `0`; project `settings.notch.computationMode = 0` is an explicit selection of the old mode. |
+| CAD mode | Same file: `NotchComputationMode.CadAllocation` | Numeric value `1`; this is also the initialization default for `NotchSettings.ComputationMode`, so a missing field is not equivalent to Legacy `0`. |
+| V21 C export option | `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Models.cs:FreeformHelperViewModel.NotchExportFileType.Cv21` | Implicit enum value `1` (`Csv = 0`, `Cv22 = 2`); the project／app actually writes the string `"Cv21"`, not this enum's numeric value. |
 
-格式 `"2"` 的版本與欄位已有程式／測試佐證；本次資料不足以認定每個欄位最初加入哪一個歷史格式。`ProjectFileMigrator.MigrateInPlace` 只補空白版本與空集合等資料，不依 `"1"`／`"2"` 分派，也沒有 V21／Legacy 遷移；非空的其他版本標記目前沒有相應拒絕檢查。因此舊檔處置須檢查內容，不能只看版本號。未標版或其他版本標記的檔案可能由同一 reader 接受，不因此被認定具備已驗證的歷史格式契約。
+The version and fields of format `"2"` are supported by code／test evidence; the available data is insufficient to determine the historical format in which each field first appeared. `ProjectFileMigrator.MigrateInPlace` only fills in data such as blank versions and null collections; it does not dispatch by `"1"`／`"2"` or migrate V21／Legacy. Other nonblank version markers currently have no corresponding rejection check. Old files must therefore be handled by inspecting their content, not just their version number. Files with no version or other version markers may be accepted by the same reader; this does not establish a verified historical format contract for them.
 
-## 2. 選擇入口與持久化欄位完整盤點
+## 2. Complete Inventory of Selection Entry Points and Persisted Fields
 
-### 2.1 直接選擇 V21／Legacy 的設定與入口
+### 2.1 Settings and Entry Points That Directly Select V21／Legacy
 
-| 設定／入口 | 檔案：symbol | 持久化結果／格式 |
+| Setting／entry point | File: symbol | Persisted result／format |
 |---|---|---|
-| 演算法集合與預設／正規化 | `src/FreeformHelper.Application/Settings/NotchSettings.cs:NotchSettings.EnabledVersions/ReplaceEnabledVersions/DefaultEnabledVersions/NormalizeEnabledVersions` | 專案 `"2"`：`settings.notch.enabledVersions`，例如 `[21]`、`[21,30]`。預設同時含 V21／V22；缺漏、null、空清單或全為不支援值會回到兩版預設。目前 `[30,31]` 只留下 `30`。 |
-| 計算模式 | 同檔：`NotchSettings.ComputationMode`；`src/FreeformHelper.Application/Settings/ProjectSettings.cs:ProjectSettings.ValidateOrThrow` | 專案 `"2"`：`settings.notch.computationMode`；`0` 選 Legacy，`1` 選 CAD。驗證要求 enum 有定義。V21／V22 與計算模式是獨立維度；只用 V22 的檔案仍可能選 Legacy。 |
-| Live V21 開關 | `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:FreeformHelperViewModel.EnableV21/EnableV22`；`FreeformHelperViewModel.Settings.Sync.cs:LoadSettingsToUi/ApplyUiToSettings` | 投影／寫回上述版本集合；沒有獨立的 `enableV21` JSON 欄位，也沒有 app 演算法開關欄位。 |
-| Settings draft V21 開關 | `src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:SettingsWindowViewModel.EnableV21/EnableV22`；`FreeformHelperViewModel.SettingsWindow.cs:ApplySettingsWindowDraft`；`src/FreeformHelper.UI/Views/SettingsSections/SettingsStep5SectionView.axaml:EnableV21 binding` | Draft Save 套用到 live 開關，再由專案 `"2"` 的版本集合保存；Cancel 不形成另一份持久化設定。 |
-| C v2.1 檔案類型與固定版本 | `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:FreeformHelperViewModel constructor`；`FreeformHelperViewModel.Models.cs:NotchExportFileTypeOption.PinnedVersion`；`NotchExportFileTypeMetadata.cs:TryGetPinnedVersion` | `Cv21` 選項的 `PinnedVersion = V21`；檔案類型偏好存為下一表的字串，`PinnedVersion` 本身沒有 JSON 欄位。檔案類型能要求 V21 匯出，不能只清版本集合而留下此選項。 |
-| Export Notch Rows 的版本／類型選擇 | `src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:SelectedVersionOption/SelectedExportTypeOption/BuildVersionOptions`；`FreeformHelperViewModel.Persistence.NotchExport.Helpers.cs:ApplyNotchExportVersionSelection/ApplyNotchExportTypeSelection` | 視窗可選 V21，C 類型會固定版本；套用後回到 live 開關與檔案類型偏好，於專案儲存時保存。沒有另一個專案版本欄位；`All versions` 保留原專案集合。 |
+| Algorithm set and defaults／normalization | `src/FreeformHelper.Application/Settings/NotchSettings.cs:NotchSettings.EnabledVersions/ReplaceEnabledVersions/DefaultEnabledVersions/NormalizeEnabledVersions` | Project `"2"`: `settings.notch.enabledVersions`, for example `[21]` or `[21,30]`. The default includes both V21／V22; a missing field, null, an empty list, or a list containing only unsupported values falls back to the two-version default. Currently, `[30,31]` retains only `30`. |
+| Computation mode | Same file: `NotchSettings.ComputationMode`; `src/FreeformHelper.Application/Settings/ProjectSettings.cs:ProjectSettings.ValidateOrThrow` | Project `"2"`: `settings.notch.computationMode`; `0` selects Legacy, and `1` selects CAD. Validation requires a defined enum value. V21／V22 and computation mode are independent dimensions; a V22-only file may still select Legacy. |
+| Live V21 toggle | `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:FreeformHelperViewModel.EnableV21/EnableV22`; `FreeformHelperViewModel.Settings.Sync.cs:LoadSettingsToUi/ApplyUiToSettings` | Projects／writes back the version set above; there is no separate `enableV21` JSON field or app algorithm toggle field. |
+| Settings draft V21 toggle | `src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:SettingsWindowViewModel.EnableV21/EnableV22`; `FreeformHelperViewModel.SettingsWindow.cs:ApplySettingsWindowDraft`; `src/FreeformHelper.UI/Views/SettingsSections/SettingsStep5SectionView.axaml:EnableV21 binding` | Draft Save applies to the live toggles, which are then persisted through the version set in project `"2"`; Cancel does not create another set of persisted settings. |
+| C v2.1 file type and pinned version | `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:FreeformHelperViewModel constructor`; `FreeformHelperViewModel.Models.cs:NotchExportFileTypeOption.PinnedVersion`; `NotchExportFileTypeMetadata.cs:TryGetPinnedVersion` | The `Cv21` option has `PinnedVersion = V21`; the file type preference is stored as the string in the next table, while `PinnedVersion` itself has no JSON field. The file type can request a V21 export, so clearing only the version set while retaining this option is insufficient. |
+| Version／type selection in Export Notch Rows | `src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:SelectedVersionOption/SelectedExportTypeOption/BuildVersionOptions`; `FreeformHelperViewModel.Persistence.NotchExport.Helpers.cs:ApplyNotchExportVersionSelection/ApplyNotchExportTypeSelection` | The window can select V21, and C types pin the version; applying the selection updates the live toggles and file type preference, which are persisted when the project is saved. There is no other project version field; `All versions` retains the original project set. |
 
-Legacy 模式由專案設定載入並保留，沒有對應的 normal operator 模式切換 editor；`ApplyUiToSettings` 不把它改回 CAD 預設。現有 `LoadThenSaveProject_PreservesLegacyNotchComputationAndVersionFields` 明確保護「Legacy + V22」的往返。其他名稱含 Legacy 的 matching／To Full 設定不等於 `LegacyRegularAnchor`，不列入本移除規劃。
+Legacy mode is loaded and retained from project settings, with no corresponding mode-switch editor for normal operators; `ApplyUiToSettings` does not reset it to the CAD default. The existing `LoadThenSaveProject_PreservesLegacyNotchComputationAndVersionFields` explicitly protects a "Legacy + V22" roundtrip. Other matching／To Full settings whose names contain Legacy are not equivalent to `LegacyRegularAnchor` and are excluded from this removal plan.
 
-### 2.2 專案 JSON 欄位
+### 2.2 Project JSON Fields
 
-以下 symbol 未重複完整前綴時，`ProjectUiSnapshot.cs` 位於 `src/FreeformHelper.Infrastructure/Project/`，`NotchSettings.cs` 位於 `src/FreeformHelper.Application/Settings/`。
+Where the full prefix is not repeated for the symbols below, `ProjectUiSnapshot.cs` is in `src/FreeformHelper.Infrastructure/Project/`, and `NotchSettings.cs` is in `src/FreeformHelper.Application/Settings/`.
 
-| JSON 路徑 | 檔案：symbol | 格式／用途與舊值 |
+| JSON path | File: symbol | Format／purpose and old values |
 |---|---|---|
-| `settings.notch.enabledVersions` | `NotchSettings.cs:NotchSettings.EnabledVersions` | 專案 `"2"`；數值 `21` 是 V21，`30` 是 V22；唯一 authoritative 演算法集合。 |
-| `settings.notch.computationMode` | `NotchSettings.cs:NotchSettings.ComputationMode` | 專案 `"2"`；`0` 是 Legacy，獨立於版本集合。 |
-| `uiSnapshot.notch.enabledVersions` | `ProjectUiSnapshot.cs:UiNotchSnapshot.EnabledVersions` | 專案 `"2"` 可承載舊字串清單，例如 `["V21","V22"]`。標記 `LegacyUiSnapshotField`；目前 `BuildUiSnapshot` 不寫它，載入 UI 不用它恢復版本。但直接 `JsonProjectStore.Save` 可再次寫出非 null 的清單，不能宣稱所有 save 都已排除此欄位。 |
-| `uiSnapshot.view.notchExportFileType` | `ProjectUiSnapshot.cs:UiViewSnapshot.NotchExportFileType` | 專案 `"2"`；`"Cv21"` 選 C v2.1，預設 `"Csv"`。`FreeformHelperViewModel.UiSnapshot.cs:BuildUiSnapshot` 寫入；`FreeformHelperViewModel.Operations.cs:ApplyViewSnapshot` 解析並選現有 option。 |
-| `settings.notch.thresholdQ7`、`settings.notch.linkVersionThresholds` | `NotchSettings.cs:NotchSettings.ThresholdQ7/LinkVersionThresholds` | 專案 `"2"`；不選版本，卻保存 V21 Q7 門檻與跨版連動（預設 true）。連動時 V22 也使用 `ThresholdQ7 * 100 / 128`。 |
-| `settings.notch.thresholdPercentV22` | `NotchSettings.cs:NotchSettings.ThresholdPercentV22` | 專案 `"2"`；非連動才採用這個獨立 V22 門檻。單純保留此欄位不足以保留連動專案的結果。 |
-| `settings.notch.lenScale` | `NotchSettings.cs:NotchSettings.LenScale` | 專案 `"2"`；LegacyRegularAnchor 的 V22 legacy 9-column 長度倍率（`V22LegacyRowStrategy.cs:51`、`:76`–`:77`），預設 `10`；V21 與 CadAllocation 不使用；不是 V21／Legacy selector。 |
-| `uiSnapshot.notch.thresholdQ7`、`uiSnapshot.notch.linkThresholds`、`uiSnapshot.notch.thresholdPercentV22`、`uiSnapshot.notch.lenScale` | `ProjectUiSnapshot.cs:UiNotchSnapshot.ThresholdQ7/LinkThresholds/ThresholdPercentV22/LenScale` | 專案 `"2"`；目前 snapshot 仍寫入這些副本，但載入設定以 `Settings.Notch` 為準，不以副本重新推導門檻或版本。 |
+| `settings.notch.enabledVersions` | `NotchSettings.cs:NotchSettings.EnabledVersions` | Project `"2"`; numeric `21` is V21, and `30` is V22; the sole authoritative algorithm set. |
+| `settings.notch.computationMode` | `NotchSettings.cs:NotchSettings.ComputationMode` | Project `"2"`; `0` is Legacy, independent of the version set. |
+| `uiSnapshot.notch.enabledVersions` | `ProjectUiSnapshot.cs:UiNotchSnapshot.EnabledVersions` | Project `"2"` can carry old string lists, for example `["V21","V22"]`. Marked `LegacyUiSnapshotField`; currently, `BuildUiSnapshot` does not write it, and UI loading does not use it to restore versions. However, a direct `JsonProjectStore.Save` can write a non-null list again, so not every save can be said to exclude this field. |
+| `uiSnapshot.view.notchExportFileType` | `ProjectUiSnapshot.cs:UiViewSnapshot.NotchExportFileType` | Project `"2"`; `"Cv21"` selects C v2.1, with default `"Csv"`. Written by `FreeformHelperViewModel.UiSnapshot.cs:BuildUiSnapshot`; `FreeformHelperViewModel.Operations.cs:ApplyViewSnapshot` parses it and selects an existing option. |
+| `settings.notch.thresholdQ7`, `settings.notch.linkVersionThresholds` | `NotchSettings.cs:NotchSettings.ThresholdQ7/LinkVersionThresholds` | Project `"2"`; does not select a version, but persists the V21 Q7 threshold and cross-version linking (default true). When linked, V22 also uses `ThresholdQ7 * 100 / 128`. |
+| `settings.notch.thresholdPercentV22` | `NotchSettings.cs:NotchSettings.ThresholdPercentV22` | Project `"2"`; this independent V22 threshold applies only when unlinked. Retaining this field alone is insufficient to preserve the results of linked projects. |
+| `settings.notch.lenScale` | `NotchSettings.cs:NotchSettings.LenScale` | Project `"2"`; the V22 legacy 9-column length scale for LegacyRegularAnchor (`V22LegacyRowStrategy.cs:51`, `:76`–`:77`), default `10`; unused by V21 and CadAllocation; not a V21／Legacy selector. |
+| `uiSnapshot.notch.thresholdQ7`, `uiSnapshot.notch.linkThresholds`, `uiSnapshot.notch.thresholdPercentV22`, `uiSnapshot.notch.lenScale` | `ProjectUiSnapshot.cs:UiNotchSnapshot.ThresholdQ7/LinkThresholds/ThresholdPercentV22/LenScale` | Project `"2"`; the snapshot currently still writes these copies, but settings loading uses `Settings.Notch` as authoritative and does not rederive thresholds or versions from the copies. |
 
-最後四列是移除時不能漏掉的伴隨欄位，不是額外的演算法開關。`NullValue`、`ExportProfile` 與補償設定為共用參數，不因 V21 移除便成為可忽略資料。專案保存輸入與設定，沒有保存已產生的 Notch table 或 C bytes；runtime row 的 `Version` 也不是另一個專案欄位。
+The last four rows are companion fields that must not be overlooked during removal, not additional algorithm toggles. `NullValue`, `ExportProfile`, and compensation settings are shared parameters and do not become ignorable data when V21 is removed. Projects persist inputs and settings, not generated Notch tables or C bytes; the runtime row's `Version` is not another project field either.
 
-### 2.3 App settings 欄位與舊形狀
+### 2.3 App Settings Fields and Old Shape
 
-| JSON 路徑 | 檔案：symbol | 格式／現況 |
+| JSON path | File: symbol | Format／current state |
 |---|---|---|
-| `View.NotchExportFileType` | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:AppGeneralSettingsDocument.View` → `src/FreeformHelper.Infrastructure/Project/ProjectUiSnapshot.cs:UiViewSnapshot.NotchExportFileType` | App `2`；可保存 `"Cv21"`。`FreeformHelperViewModel.AppSettings.cs:CloneViewSnapshot/PersistAppGeneralSettingsNow` 複製並保存，啟動時還原。 |
-| `UiSnapshot.View.NotchExportFileType` | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:LegacyAppGeneralSettingsDocument.UiSnapshot/TryLoad` → 同一 `UiViewSnapshot.NotchExportFileType` | 舊 app `1` 形狀；轉到現行 `View`，所以 `"Cv21"` 不會自動消失。 |
-| `UiSnapshot.Notch.EnabledVersions` | 同檔：`LegacyAppGeneralSettingsDocument.UiSnapshot/TryLoad` → `ProjectUiSnapshot.cs:UiNotchSnapshot.EnabledVersions` | 舊 app `1` 形狀可承載 V21 字串；反序列化後不轉入白名單，不選演算法。 |
-| `UiSnapshot.Notch.ThresholdQ7/LinkThresholds/ThresholdPercentV22/LenScale` | 同一舊 document → `ProjectUiSnapshot.cs:UiNotchSnapshot` 對應 properties | 舊 app `1` 形狀的伴隨副本；同樣不轉入白名單。不存在 `UiNotchSnapshot.ComputationMode`。 |
-| `Settings.Notch.EnabledVersions/ComputationMode` 及伴隨設定 | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:LegacyAppGeneralSettingsDocument/TryLoad` | 舊 app `1` 的整份 `Settings` 形狀可夾帶數值 V21／Legacy；現行相容 DTO **沒有 `Settings` property**，這些資料是未知欄位，直接略過，並非目前仍有效的 app 設定。舊 fixture 證明頂層 `Settings` 形狀，不證明每個 Notch 欄位的歷史寫入起點。 |
-| `Behavior.ApplyVisualPreferencesOnProjectLoad` | 同檔：`AppGeneralBehaviorSettings.ApplyVisualPreferencesOnProjectLoad`；`FreeformHelperViewModel.AppSettings.cs:TryApplyAppGeneralVisualPreferencesAfterProjectLoad` | App `2`；不是 selector，但為 true 時 app `View` 在專案載入後覆蓋專案 view，包含 C 類型偏好。 |
+| `View.NotchExportFileType` | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:AppGeneralSettingsDocument.View` → `src/FreeformHelper.Infrastructure/Project/ProjectUiSnapshot.cs:UiViewSnapshot.NotchExportFileType` | App `2`; can persist `"Cv21"`. `FreeformHelperViewModel.AppSettings.cs:CloneViewSnapshot/PersistAppGeneralSettingsNow` copies and saves it, and it is restored at startup. |
+| `UiSnapshot.View.NotchExportFileType` | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:LegacyAppGeneralSettingsDocument.UiSnapshot/TryLoad` → the same `UiViewSnapshot.NotchExportFileType` | Old app `1` shape; maps to the current `View`, so `"Cv21"` does not disappear automatically. |
+| `UiSnapshot.Notch.EnabledVersions` | Same file: `LegacyAppGeneralSettingsDocument.UiSnapshot/TryLoad` → `ProjectUiSnapshot.cs:UiNotchSnapshot.EnabledVersions` | The old app `1` shape can carry V21 strings; after deserialization, they are not mapped into the whitelist and do not select an algorithm. |
+| `UiSnapshot.Notch.ThresholdQ7/LinkThresholds/ThresholdPercentV22/LenScale` | The same old document → corresponding properties of `ProjectUiSnapshot.cs:UiNotchSnapshot` | Companion copies in the old app `1` shape; likewise not mapped into the whitelist. `UiNotchSnapshot.ComputationMode` does not exist. |
+| `Settings.Notch.EnabledVersions/ComputationMode` and companion settings | `src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:LegacyAppGeneralSettingsDocument/TryLoad` | In old app `1`, the full `Settings` shape can carry numeric V21／Legacy values; the current compatibility DTO **has no `Settings` property**, so these are unknown fields that are skipped directly, not currently effective app settings. The old fixture proves the top-level `Settings` shape, not the historical point at which each Notch field was first written. |
+| `Behavior.ApplyVisualPreferencesOnProjectLoad` | Same file: `AppGeneralBehaviorSettings.ApplyVisualPreferencesOnProjectLoad`; `FreeformHelperViewModel.AppSettings.cs:TryApplyAppGeneralVisualPreferencesAfterProjectLoad` | App `2`; not a selector, but when true, app `View` overrides the project view after project loading, including the C type preference. |
 
-未標版舊 app 也按形狀讀取；不能用 `SchemaVersion` 推定哪些舊欄位被套用。現行白名單不存在 app `EnableV21`、`NotchAlgorithmVersion` 或 `ComputationMode` 欄位。舊 app 的算法／模式欄位不應升格為新的 project source-of-truth。
+Unversioned old app files are also read by shape; `SchemaVersion` cannot establish which old fields are applied. The current whitelist has no app `EnableV21`, `NotchAlgorithmVersion`, or `ComputationMode` field. Old app algorithm／mode fields should not be promoted to a new project source-of-truth.
 
-## 3. 移除後的讀取政策選項與建議
+## 3. Post-removal Read Policy Options and Recommendations
 
-此節只回答「若 owner 另行同意完全移除」的相容性選擇，不改目前載入行為。V21 → V22 與 Legacy → CAD 是兩項不同的行為變更；兩者均不能宣稱等價或 byte-exact。
+This section only addresses compatibility choices "if the owner separately agrees to complete removal"; it does not change current loading behavior. V21 → V22 and Legacy → CAD are two different behavioral changes; neither can be claimed to be equivalent or byte-exact.
 
-### 3.1 三種選項的使用者後果
+### 3.1 User Consequences of the Three Options
 
-| 載入策略 | 舊專案的後果 | 舊 app settings 的後果 |
+| Loading strategy | Consequences for old projects | Consequences for old app settings |
 |---|---|---|
-| 遷移到 V22／CadAllocation | `21` 改為 `30`、Legacy `0` 改為 CAD `1`；專案可以開啟，但 row、補償、匯出 ABI／C bytes 可能改變，儲存後會失去原選擇。門檻也須按既有有效值處理。須明示「已轉換，不能重現原 V21／Legacy 輸出」，不能只顯示一般載入成功。 | `Cv21` 偏好可改為 `Cv22`；使用者下一次會看到 C v2.2 選項，並須知道其 firmware 契約不同。舊算法／模式欄位目前已忽略，無須再把它們移成有效 app 算法預設。 |
-| 清楚拒絕 | 原檔保留；使用者須以仍支援 V21／Legacy 的舊版開啟，不能在移除版重匯相同 C。訊息須指出路徑／欄位／舊值與原因，避免只報 enum invalid。 | 若整份拒絕，使用者也會失去其他視覺與 import 偏好。現行 `TryLoad` 只記錄 warning 並回 null，不等於已提供清楚的使用者訊息。 |
-| 繼續讀取並忽略 | 適用已無效的 UI 副本。若忽略真正的版本集合／模式，改用 V22／CAD 預設，實質上是未告知的轉換；舊檔看似成功開啟，卻無法重現輸出。 | 適合已被白名單排除的舊算法／模式／Notch 副本；保留其他偏好。若 `Cv21` 解析失敗只保留目前選項，使用者可能得到 CSV 或前一個偏好，結果受 session 狀態影響。 |
+| Migrate to V22／CadAllocation | Change `21` to `30` and Legacy `0` to CAD `1`; the project can open, but rows, compensation, export ABI／C bytes may change, and saving loses the original selections. Thresholds must also be handled according to their existing effective values. Explicitly state "Converted; the original V21／Legacy output cannot be reproduced", instead of showing only a normal loading success message. | The `Cv21` preference can change to `Cv22`; the user will next see the C v2.2 option and must know that its firmware contract differs. Old algorithm／mode fields are already ignored, so they need not be migrated into effective app algorithm defaults. |
+| Reject clearly | Preserve the original file; the user must open it with an older version that still supports V21／Legacy and cannot re-export the same C in the removal version. The message must identify the path／field／old value and reason, rather than reporting only an invalid enum. | Rejecting the entire file would also lose the user's other visual and import preferences. The current `TryLoad` only logs a warning and returns null, which is not equivalent to providing a clear user message. |
+| Continue reading and ignore | Suitable for obsolete UI copies. Ignoring the actual version set／mode and substituting V22／CAD defaults is effectively an unannounced conversion; the old file appears to open successfully, but its output cannot be reproduced. | Suitable for old algorithm／mode／Notch copies already excluded by the whitelist; retain other preferences. If a failed `Cv21` parse only retains the current option, the user may get CSV or the previous preference, making the result depend on session state. |
 
-### 3.2 逐欄建議
+### 3.2 Per-field Recommendations
 
-| 舊資料情況 | 建議 | 使用者可見結果 |
+| Old data condition | Recommendation | User-visible result |
 |---|---|---|
-| `settings.notch.enabledVersions` 含 `21`，包括 `[21,30]` | **清楚拒絕**，不自行刪掉 `21` 或自動轉版。 | 知道此專案需要 V21，相同 C 須用保留相容性的舊版重匯；原檔不被改寫。即使 `[21,30]` 含 V22，也不能假定 owner 同意放棄 V21 交付。 |
-| `settings.notch.computationMode = 0`，即使只含 `[30]` | **清楚拒絕**。 | 知道此專案需要 Legacy；只把 V21 清掉仍不足以安全開啟。 |
-| 舊檔缺漏／null／空／全不支援的 `enabledVersions`，或整個 `Settings.Notch` 缺漏 | **清楚拒絕這項歧義**，不把舊預設 V21＋V22 默默當成 V22。 | 明示舊檔依賴含 V21 的歷史預設，現有資料無法證明原輸出版本；以舊版確認後再決定是否接受轉換。 |
-| 明列 `[30]`，模式為 `1` 或缺漏 | **保留 V22／CadAllocation**；缺漏模式沿用目前初始化的 CAD 語意。 | 不因舊格式標記或多餘 UI V21 字串而誤拒絕已使用 V22／CAD 的專案。 |
-| `uiSnapshot.notch.enabledVersions`、舊 app 的 `UiSnapshot.Notch` 與未知 `Settings.Notch` | **繼續讀取並忽略**；專案只以 authoritative settings 判斷，不從副本推導算法。 | 不會因過時字串切回 V21／Legacy，也不丟掉其他可用資料。這不代表可忽略專案 `settings.notch`。 |
-| 專案 `uiSnapshot.view.notchExportFileType = "Cv21"` 或 app `View`／舊 `UiSnapshot.View` 中同值 | 在其餘資料可讀的前提下，**明示遷移成 `Cv22` 偏好**，不自動匯出。 | 顯示「原 C v2.1 偏好已改為 C v2.2；不能重現原 C，請確認 firmware 支援」。App 偏好本身不應阻止開啟可用的 V22／CAD 專案，也不能解除對真正 V21／Legacy settings 的拒絕。 |
-| V22／CAD 專案的 Q7／連動欄位 | 若完全移除這些有效欄位，**遷移有效 V22 門檻**；非連動保留 `ThresholdPercentV22`，連動採用既有 `ThresholdQ7 * 100.0 / 128.0`，不要改採 snapshot 副本。 | V22 有效門檻維持原值；不再顯示跨版連動。不得把 UI 顯示用的兩位小數當成演算法精度。 |
-| `LenScale` 與 Notch UI 的 Q7／連動副本 | **保留相容讀取並忽略不再使用的副本**；不因其存在選 V21。 | 載入已採 V22／CAD 的專案不因過時顯示欄位失敗。此建議不刪共用 `NullValue`、profile 或補償值。 |
+| `settings.notch.enabledVersions` contains `21`, including `[21,30]` | **Reject clearly**; do not remove `21` unilaterally or convert versions automatically. | The user knows that this project requires V21 and that re-exporting the same C requires an older version that retains compatibility; the original file is not rewritten. Even if `[21,30]` contains V22, the owner cannot be assumed to have agreed to abandon V21 delivery. |
+| `settings.notch.computationMode = 0`, even with only `[30]` | **Reject clearly**. | The user knows that this project requires Legacy; clearing V21 alone is still insufficient for safe opening. |
+| An old file has missing／null／empty／entirely unsupported `enabledVersions`, or the whole `Settings.Notch` is missing | **Clearly reject this ambiguity**; do not silently treat the old V21＋V22 default as V22. | Explicitly state that the old file depends on a historical default containing V21 and that the available data cannot establish the original output version; verify with an older version before deciding whether to accept conversion. |
+| Explicit `[30]`, with mode `1` or missing | **Retain V22／CadAllocation**; a missing mode keeps the current CAD initialization semantics. | An old format marker or redundant UI V21 strings do not cause incorrect rejection of a project already using V22／CAD. |
+| `uiSnapshot.notch.enabledVersions`, old app `UiSnapshot.Notch`, and unknown `Settings.Notch` | **Continue reading and ignore**; assess the project only by authoritative settings, without deriving algorithms from copies. | Outdated strings do not switch it back to V21／Legacy, and other usable data is not discarded. This does not mean project `settings.notch` can be ignored. |
+| Project `uiSnapshot.view.notchExportFileType = "Cv21"` or the same value in app `View`／old `UiSnapshot.View` | If the remaining data is readable, **explicitly migrate to the `Cv22` preference**, without automatically exporting. | Display "The original C v2.1 preference has changed to C v2.2; the original C cannot be reproduced. Please confirm firmware support." The app preference itself should neither prevent opening a usable V22／CAD project nor override rejection of actual V21／Legacy settings. |
+| V22／CAD projects: Q7／linking fields | If these effective fields are completely removed, **migrate the effective V22 threshold**; retain `ThresholdPercentV22` when unlinked and use the existing `ThresholdQ7 * 100.0 / 128.0` when linked, without switching to snapshot copies. | The effective V22 threshold retains its original value; cross-version linking is no longer displayed. The two decimal places used for UI display must not be treated as algorithm precision. |
+| `LenScale` and Q7／linking copies in the Notch UI | **Retain compatible reading and ignore copies no longer used**; their presence does not select V21. | A project already using V22／CAD does not fail to load because of obsolete display fields. This recommendation does not delete shared `NullValue`, profile, or compensation values. |
 
-拒絕訊息建議表達：「此專案的 `settings.notch.enabledVersions` 含 V21（21）／`settings.notch.computationMode` 為 LegacyRegularAnchor（0）。此版本無法重現原輸出，未載入或改寫原檔；請用仍支援該模式的舊版開啟。」這是擬議內容，不是本次 UI 文字變更。
+The proposed rejection message is: "This project's `settings.notch.enabledVersions` contains V21 (21)／`settings.notch.computationMode` is LegacyRegularAnchor (0). This version cannot reproduce the original output; the original file was neither loaded nor rewritten. Please open it with an older version that still supports that mode." This is proposed content, not a UI text change in this task.
 
-政策落點應使用既有 `JsonProjectStore.Load` → `ProjectFileMigrator.MigrateInPlace` → `ProjectSettings.ValidateOrThrow` 與 `AppGeneralSettingsStore.TryLoad` 的機制，不設另一套持久化層。現行數值 enum 刪成員後不保證反序列化立刻拒絕：版本集合會先經 `NormalizeEnabledVersions`，可能把 `21` 丟掉再套預設；模式 `0` 則可能在 enum validation 才失敗。因此若採拒絕，必須仍能辨識原始舊值，不能讓正規化先抹去證據。既有 `LoadProjectFromPathAsync` 的錯誤結果／status 可承接清楚訊息；不在 UI 另做一份遷移判斷。
+The policy should use the existing `JsonProjectStore.Load` → `ProjectFileMigrator.MigrateInPlace` → `ProjectSettings.ValidateOrThrow` and `AppGeneralSettingsStore.TryLoad` mechanisms, without creating another persistence layer. Removing members from the current numeric enums does not guarantee immediate rejection during deserialization: the version set first passes through `NormalizeEnabledVersions`, which may drop `21` and then apply defaults; mode `0` may fail only during enum validation. Therefore, rejection must still be able to identify the original old values, without letting normalization erase the evidence first. The existing error result／status in `LoadProjectFromPathAsync` can carry a clear message; do not duplicate migration decisions in the UI.
 
-載入不應自行儲存原檔。專案成功載入後的 app 設定 deferred mode，以及下一次成功 Save Project 才 flush 的規則仍適用；拒絕、取消或儲存失敗不可提早寫入 app 偏好。只有頂層 `ProjectFile.ExtensionData` 保留未知欄位，不能據此保證移除後的巢狀 Notch 欄位仍能 lossless roundtrip。讀取相容欄位不等於保留舊計算路徑。
+Loading should not automatically save the original file. The rules for app settings entering deferred mode after a successful project load and flushing only on the next successful Save Project still apply; rejection, cancellation, or save failure must not write app preferences early. Only top-level `ProjectFile.ExtensionData` preserves unknown fields, which does not guarantee lossless roundtrips for nested Notch fields after removal. Reading compatibility fields does not mean retaining the old computation path.
 
-## 4. 測試名稱盤點
+## 4. Test Name Inventory
 
-以下只列名稱；本次不修改測試、fixture 或預期值。
+Only names are listed below; this task does not modify tests, fixtures, or expected values.
 
-### 4.1 現有期待必須調整
+### 4.1 Existing Expectations That Must Change
 
 - `ProjectFileMigrationTests.Load_MigratesNullCollections`
 - `FreeformHelperViewModelTests.LoadThenSaveProject_PreservesLegacyNotchComputationAndVersionFields`
 - `FreeformHelperViewModelTests.SaveThenLoadProject_PersistsStep5NotchVersionSelection`
 
-### 4.2 相容欄位是否保留會影響的現有 roundtrip／契約測試
+### 4.2 Existing Roundtrip／Contract Tests Affected by Whether Compatibility Fields Are Retained
 
 - `ProjectStoreTests.SaveAndLoad_RoundTripsMatchingAndIndexMappingSettings`
 - `UiSnapshotPersistenceContractTests.SectionContract_MatchesAllSnapshotSettableProperties`
 
-### 4.3 應擴充覆蓋的現有 load／save／roundtrip 測試
+### 4.3 Existing Load／Save／Roundtrip Tests Whose Coverage Should Be Extended
 
 - `ProjectFileMigrationTests.Load_DropsUnsupportedLegacyNotchVersions`
 - `ProjectFileMigrationTests.LoadAndSave_PreservesUnknownRootProperties`
@@ -127,7 +127,7 @@ Legacy 模式由專案設定載入並保留，沒有對應的 normal operator �
 - `FreeformHelperViewModelTests.SaveProjectAsync_WhenUserCancels_KeepsUnsavedState`
 - `FreeformHelperViewModelTests.SaveProjectAsync_WhenIoError_ReturnsFalseAndKeepsUnsavedState`
 
-### 4.4 採上述建議時需要的新案例
+### 4.4 New Cases Needed If the Recommendations Above Are Adopted
 
 - `ProjectFileMigrationTests.Load_V21Only_RejectsWithCompatibilityMessage`
 - `ProjectFileMigrationTests.Load_V21AndV22_RejectsWithoutDroppingV21Evidence`
@@ -150,20 +150,20 @@ Legacy 模式由專案設定載入並保留，沒有對應的 normal operator �
 - `FreeformHelperViewModelTests.LoadRejectedProject_DoesNotWriteProjectOrAppSettings`
 - `FreeformHelperViewModelTests.LoadConvertedPreferences_CancelledOrFailedSave_DoesNotFlushAppSettings`
 
-### 4.5 若另採允許算法／模式轉換，才需要的替代案例
+### 4.5 Alternative Cases Needed Only If Algorithm／Mode Conversion Is Allowed Instead
 
 - `ProjectFileMigrationTests.Load_V21Selection_MigratesToV22AndReportsChangedOutputContract`
 - `ProjectFileMigrationTests.Load_LegacyRegularAnchor_MigratesToCadAllocationAndReportsChangedComputation`
 - `ProjectStoreTests.SaveThenLoad_MigratedNotchSettings_PreservesConvertedValues`
 - `FreeformHelperViewModelTests.LoadMigratedProject_ShowsNonReproducibilityNoticeAndMarksUnsaved`
 
-## 5. 風險與待決事項
+## 5. Risks and Open Decisions
 
-- **已交付 C 的可重現性**：保存的 project 可能曾以 V21 匯出 C，但 JSON 沒有 C artifact、export history 或 byte-exact 證明。當前 `Cv22` 偏好也不能證明過去未交付 V21。V21 Q7 與 V22 signed-percent firmware 契約不同；改版或換計算模式不能維持同一 C。若交付必須可重現，完全移除版本不能承擔這項重匯能力，仍需可用的舊版與原輸入／設定／既有交付檔。
-- **只保留 V22 仍可能改結果**：Legacy 與版本集合獨立；連動 Q7 門檻也仍影響 V22。只刪 V21 enum／UI 開關會漏掉兩種不同風險。Application 使用完整換算值，UI 顯示兩位小數；誤用顯示值可在門檻邊界改變 row。
-- **資料損失與回讀**：移除 enum／property 可能導致 silent fallback、generic error 或下次 save 丟欄位。現在 schema 採 append-only，未知根層資料可保留，巢狀欄位沒有同等保障。必須明確決定哪些舊欄位只讀、哪些不再寫，以及新儲存檔能否再由舊版使用；本文件不指定新 schema。
-- **跨專案偏好污染**：app `View` overlay 可能把專案 Cv22 選擇覆蓋成舊 Cv21。若移除後只靠 parse failure 留目前值，結果受啟動／載入順序影響。app 轉換與 project 拒絕都必須遵守既有 deferred-write 契約與測試設定隔離。
-- **相容讀取被誤認為相容計算**：保留舊字串／欄位讀取可以避免 JSON 失敗，卻不代表仍可 V21 export 或 Legacy simulation。訊息與 roundtrip 期待必須說明這項能力差異；現行 zero-diff 保護仍有效，不能因本規劃更新 baseline。
-- **尚待 owner 決定**：是否接受交付專案在移除版無法重匯；是否採本文件的拒絕策略，或明示接受 V22／CAD 的非等價轉換；是否接受 app／UI Cv21 偏好轉 Cv22，以及相容欄位的讀寫保留政策。這些尚未採納的選擇不改變「目前先保留」決策。
+- **Reproducibility of delivered C**: A saved project may have exported C with V21, but its JSON contains no C artifact, export history, or byte-exact evidence. The current `Cv22` preference also cannot prove that V21 was never delivered. V21 Q7 and V22 signed-percent firmware contracts differ; changing the version or computation mode cannot preserve the same C. If deliveries must be reproducible, a version with complete removal cannot provide that re-export capability; a usable older version and the original inputs／settings／existing delivered files are still required.
+- **Retaining only V22 may still change results**: Legacy is independent of the version set; linked Q7 thresholds also still affect V22. Removing only the V21 enum／UI toggle misses two different risks. Application uses the full converted value, while the UI displays two decimal places; mistakenly using the displayed value may change rows at threshold boundaries.
+- **Data loss and readback**: Removing enum members／properties may cause silent fallback, generic errors, or fields lost on the next save. The current schema is append-only, and unknown root-level data can be retained, but nested fields have no equivalent guarantee. The policy must explicitly decide which old fields are read-only, which are no longer written, and whether newly saved files can still be used by older versions; this document does not specify a new schema.
+- **Cross-project preference contamination**: The app `View` overlay may replace a project's Cv22 selection with an old Cv21 preference. If removal relies only on parse failure to retain the current value, the result depends on startup／loading order. Both app conversion and project rejection must follow the existing deferred-write contract and test settings isolation.
+- **Compatible reading mistaken for compatible computation**: Retaining the ability to read old strings／fields may avoid JSON failures, but does not mean V21 export or Legacy simulation remains available. Messages and roundtrip expectations must explain this capability difference; current zero-diff protection remains effective, and this plan does not permit baseline updates.
+- **Pending owner decisions**: Whether to accept that delivered projects cannot be re-exported in the removal version; whether to adopt this document's rejection strategy or explicitly accept a non-equivalent V22／CAD conversion; whether to accept converting app／UI Cv21 preferences to Cv22, and the read／write retention policy for compatibility fields. These choices have not been adopted and do not change the 「目前先保留」 (retain for now) decision.
 
-本次交付僅為這份持久化規劃文件；不變更 production code、測試、TODO、roadmap、golden 或 baseline，不建立轉換工具／配置選項，也不提出移除實作安排。
+This delivery is limited to this persistence plan; it does not change production code, tests, TODO, roadmap, golden, or baseline, create conversion tools／configuration options, or propose removal implementation arrangements.

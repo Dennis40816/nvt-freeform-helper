@@ -1,92 +1,92 @@
-# Refactor 測試計畫（Phase 1~2 基線）
-最後更新：2026-02-10
+# Refactor Test Plan (Phase 1~2 Baseline)
+Last updated: 2026-02-10
 
-## 1. 目的
-- 在進入最終 overlap / notch 重構前，先鎖定現有可接受行為，避免功能在重構期間回歸。
-- 建立「功能對應測試」矩陣：每個使用者可見功能至少有一個可重複驗證入口（unit / integration / VM / UI guard）。
+## 1. Purpose
+- Lock down the existing acceptable behavior before the final overlap / notch refactoring to prevent functional regressions during refactoring.
+- Establish a "feature-to-test" matrix: every user-visible feature must have at least one repeatable verification entry point (unit / integration / VM / UI guard).
 
-## 2. 測試分層與執行順序
-1. **Domain / Application Unit**（最快、先跑）  
+## 2. Test Layers and Execution Order
+1. **Domain / Application Unit** (fastest, run first)  
    `tests/FreeformHelper.Tests/Application/**/*Tests.cs`
-2. **ViewModel 行為測試**（命令與狀態轉移）  
+2. **ViewModel behavior tests** (commands and state transitions)  
    `tests/FreeformHelper.Tests/UI/ViewModels/*Tests.cs`
-3. **UI Guard 測試**（XAML layout/token 失誤防呆）  
+3. **UI Guard tests** (guards against XAML layout/token mistakes)  
    `tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs`
-4. **整體 build gate**  
+4. **Overall build gate**  
    `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`
 
-Gate 規則（重構期間）：
-- PR / 每日整合至少要通過 1~4 全部。
-- 新增功能若無測試，不可替換既有流程（只能 behind flag）。
+Gate rules (during refactoring):
+- PR / daily integration must pass all of 1~4 at a minimum.
+- A new feature without tests must not replace the existing workflow (it may only be behind flag).
 
-## 3. 功能覆蓋矩陣
+## 3. Feature Coverage Matrix
 
-### A. DXF 匯入/篩選/編輯
-- A01 匯入 closed polylines 過濾正確。
-- A02 layer toggle 後 CAD output pads 正確，且 hidden pads 不回流。
-- A03 DXF hide / restore last / restore all 可逆且不破壞索引。
-- A04 Export DXF（visible/all）輸出 pad 數與目前狀態一致。
+### A. DXF Import/Filtering/Editing
+- A01 Importing closed polylines filters correctly.
+- A02 CAD output pads are correct after a layer toggle, and hidden pads do not flow back in.
+- A03 DXF hide / restore last / restore all are reversible and do not damage indexes.
+- A04 The pad count from Export DXF (visible/all) matches the current state.
 
-### B. Grid 建構與索引
-- B01 Panel AA 對位建 grid（row/col/count）正確。
-- B02 DXF bounds 對位在無 DXF 時 fallback 到 Panel AA，且有明確 status。
-- B03 指定 bound layer（隱藏仍可用）時 bounds 正確。
-- B04 Scan order 變更後 regular diff idx 重新排序正確。
-- B05 移除 legacy 上限後（高 X / 高 IC）仍可建 grid。
+### B. Grid Construction and Indexing
+- B01 Grid construction aligned to Panel AA is correct (row/col/count).
+- B02 DXF bounds alignment falls back to Panel AA when no DXF is available, with an explicit status.
+- B03 Bounds are correct when a bound layer is specified (still usable when hidden).
+- B04 After a Scan order change, regular diff idx is reordered correctly.
+- B05 Grid construction still works after removing legacy limits (high X / high IC).
 
 ### C. CAD↔Regular overlap / mapping
-- C01 overlap match 可回報 progress（0→1）且不中斷 UI。
-- C02 一個 CAD 橫跨多個 regular 時，雙向 link 完整（CadToRegular + RegularToCad）。
-- C03 unmatched threshold 只影響標示；direct/draft 修改只重畫，不重建 grid 或改變 links。
-- C04 index diagnostics 能產生 count mismatch / low confidence / ambiguous 類別。
-- C05 mapping override 的 apply/clear 可持久化且 load 後一致。
+- C01 overlap match reports progress (0→1) without interrupting the UI.
+- C02 When a CAD spans multiple regulars, bidirectional links are complete (CadToRegular + RegularToCad).
+- C03 unmatched threshold affects only marking; direct/draft changes only redraw, without rebuilding the grid or changing links.
+- C04 index diagnostics can produce count mismatch / low confidence / ambiguous categories.
+- C05 mapping override apply/clear can be persisted and remains consistent after load.
 
-### D. Freeform 偵測與手動覆寫
-- D01 auto-detect（X dominant）標為 XWay。
-- D02 auto-detect（Y dominant）標為 YWay。
-- D03 dominant spread 低於 TH 時維持 None。
-- D04 開啟 `EnableAutoDetectXy` 後可判定 XYWay；關閉時不得自動產生 XYWay。
-- D05 手動覆寫（None/X/Y/XY）只影響 selection 並可 undo。
+### D. Freeform Detection and Manual Overrides
+- D01 auto-detect (X dominant) marks XWay.
+- D02 auto-detect (Y dominant) marks YWay.
+- D03 When dominant spread is below TH, it remains None.
+- D04 Enabling `EnableAutoDetectXy` allows XYWay classification; when disabled, XYWay must not be produced automatically.
+- D05 Manual overrides (None/X/Y/XY) affect only the selection and can be undone.
 
-### E. Notch 與輸出
-- E01 v2.1 輸出格式穩定（fixture 比對）。
-- E02 legacy 輸出仍可用（相容測試不可刪）。
-- E03 notch TH gate 低於門檻者不輸出。
-- E04 mode 切換（legacy/new）在相同輸入下可比較結果，不得 crash。
+### E. Notch and Output
+- E01 v2.1 output format is stable (fixture comparison).
+- E02 legacy output remains usable (compatibility tests must not be deleted).
+- E03 The notch TH gate excludes output below the threshold.
+- E04 Switching mode (legacy/new) allows result comparison with the same input and must not crash.
 
 ### F. Save/Load / Migration
-- F01 Project save/load 後 grid/match/freeform/overrides 可回復。
-- F02 embed DXF roundtrip 正確（無原始 dxf path 時仍可載入）。
-- F03 migration append-only：舊版欄位保留、未知欄位不丟失。
-- F04 設定視窗提交（Save）與取消（Cancel）行為一致，不應即時污染主狀態。
+- F01 grid/match/freeform/overrides can be restored after Project save/load.
+- F02 embed DXF roundtrip is correct (loading remains possible without the original dxf path).
+- F03 migration is append-only: old fields are retained and unknown fields are not lost.
+- F04 Settings window submit (Save) and cancel (Cancel) behavior is consistent and should not immediately contaminate the main state.
 
-### F-Plus. Save Project 專項（重構前先守住）
-- F05 Save project：使用者取消路徑選擇時，不寫檔、不改 `HasUnsavedChanges`、不污染 `_lastSavedPath`。
-- F06 Save project：dialog handler 未綁定時，回傳失敗且 status 明確（避免靜默失敗）。
-- F07 Save project：IO/序列化異常時，status 與 log 可追蹤，且既有記憶體狀態不可被半套覆蓋。
-- F08 Save project：成功後 `HasUnsavedChanges=false`，後續再次修改任一 persisted setting 需重新變回 dirty。
-- F09 Save project：embed DXF 的 yes/no 分支都需驗證（含警告訊息與輸出檔內容一致）。
-- F10 Save -> Load roundtrip：hidden CAD / mapping overrides / UI snapshot / notch 設定值保持一致。
+### F-Plus. Save Project Focus (Protect Before Refactoring)
+- F05 Save project: when the user cancels path selection, no file is written, `HasUnsavedChanges` is unchanged, and `_lastSavedPath` is not contaminated.
+- F06 Save project: when the dialog handler is not bound, return failure with an explicit status (to avoid silent failure).
+- F07 Save project: on IO/serialization exceptions, status and log provide traceability, and existing in-memory state must not be partially overwritten.
+- F08 Save project: after success, `HasUnsavedChanges=false`; modifying any persisted setting again must make it dirty again.
+- F09 Save project: both yes/no branches of embed DXF require verification (including consistency between warning messages and output file contents).
+- F10 Save -> Load roundtrip: hidden CAD / mapping overrides / UI snapshot / notch settings remain consistent.
 
-目前自動化基線（已存在）：
-- `ProjectPersistenceUseCaseTests`：save/load、embed/no-embed、UI snapshot roundtrip。
-- `ProjectStoreTests`：project json 存取與欄位 roundtrip。
-- `FreeformHelperViewModelTests`：`SaveProjectAsync_WhenDialogHandlerMissing_ReturnsFalse`。
+Current automated baseline (already exists):
+- `ProjectPersistenceUseCaseTests`: save/load, embed/no-embed, UI snapshot roundtrip.
+- `ProjectStoreTests`: project json access and field roundtrip.
+- `FreeformHelperViewModelTests`: `SaveProjectAsync_WhenDialogHandlerMissing_ReturnsFalse`.
 
-### G. UI/UX Guard（不測美術，測結構）
-- G01 Scroll content 不可綁 `Bounds.Width`（避免裁切/重疊）。
-- G02 關鍵容器必須採 viewport-bounded width pattern。
-- G03 重要按鈕/輸入控件需使用 token（禁止硬編顏色/尺寸）。
-- G04 分析區 Step 1~4 文案與操作順序保持一致。
-- G05 視覺快照最小基線：關鍵 UI 檔案 hash 必須與 baseline 一致（intentional UI 變更需同步更新 baseline）。
-- G06 視覺快照進階基線：headless 實際渲染後做 aHash + Hamming 容差比對（可捕捉排版/配色實際變化）。
+### G. UI/UX Guard (Test Structure, Not Artwork)
+- G01 Scroll content must not bind `Bounds.Width` (to avoid clipping/overlap).
+- G02 Key containers must use the viewport-bounded width pattern.
+- G03 Important buttons/input controls must use tokens (hard-coded colors/sizes are prohibited).
+- G04 Analysis section Step 1~4 wording and operation order remain consistent.
+- G05 Minimum visual snapshot baseline: key UI file hashes must match the baseline (intentional UI changes require a corresponding baseline update).
+- G06 Advanced visual snapshot baseline: compare actual headless rendering using aHash + Hamming tolerance (to capture actual layout/color changes).
 
-## 4. 近期新增測試重點（本輪重構起手）
-- P0：C02, C04, D01~D04, F01, F03（先守住 mapping/freeform/save-load 核心）
-- P1：A03, C05, E01, E04（確保重構可逐步替換）
-- P2：G 系列（持續加 guard，避免 UI 回歸）
+## 4. Near-Term Test Priorities (Starting This Refactoring Round)
+- P0: C02, C04, D01~D04, F01, F03 (protect the mapping/freeform/save-load core first)
+- P1: A03, C05, E01, E04 (ensure incremental replacement during refactoring)
+- P2: G series (keep adding guards to prevent UI regressions)
 
-## 5. 執行腳本
+## 5. Execution Scripts
 ```powershell
 dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj
 dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj
@@ -96,8 +96,8 @@ dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj
 ./scripts/tests/update-ui-baseline.ps1 -Mode Apply
 ```
 
-## 6. 完成定義（DoD）
-- 測試矩陣中 P0 全部有自動化測試。
-- 新流程（overlap-allocation notch）可在 flag 下與 legacy 結果並列比較。
-- 無新增 hard-coded style；UI guard 測試通過。
+## 6. Definition of Done (DoD)
+- All P0 items in the test matrix have automated tests.
+- The new workflow (overlap-allocation notch) can be compared side by side with legacy results under a flag.
+- No new hard-coded style; UI guard tests pass.
 
