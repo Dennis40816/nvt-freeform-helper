@@ -18,7 +18,7 @@ Update (2026-10-04): the owner approved the PR-C firmware corner case in public 
 | R13.102a-1（含 PadInfo follow-up）、R13.102b-1、R13.102b-2 | preview／deferred Inspector 共用 revisioned resolved snapshot，Detail 與 override-aware Runtime Query 投影同一 owner；PadInfo follow-up 擷取單一 `resolvedDisplayInput`。（`TODO.md:R13.102a-1`、`R13.102b-1`、`R13.102b-2`；稽核「最新證據已排除的舊剩餘項」） |
 | R13.102a-2a、R13.102a-2b-1 | normal export/generator 重用 output-request-neutral candidate batch；generation completion 依 epoch／final-projection revision／Simulation source identity 拒收過期結果。（`TODO.md:R13.102a-2a`、`R13.102a-2b-1`） |
 | R13.102a-2b-2a、R13.102a-2b-2b | 並行 Export／Simulation 共用 full batch-resolution task；目前單一 selected sparse result 接入 batch session，移除 VM 平行 compensation dictionary，收口 2b-2 的 bounded bridge。（`TODO.md:R13.102a-2b-2a`、`R13.102a-2b-2b`） |
-| R13.102a-3b（Facts 2～6 刻畫；PR-B） | Facts 2／3 證明 reader 重複推導；Fact 5 鎖定修正前 raw owner 與 Q7-positive reader 分歧；Facts 4／6 為保留的 ABI 投影。新增刻畫 `18/18` 通過，entry 與 parent 仍未勾選。（`TODO.md:R13.102a-3b`） |
+| R13.102a-3b (Facts 2–6; PR-B) | Characterization evidence for anchor IC filtering, source area, Q7-positive admission, and retained ABI projections; see [TODO.md R13.102a-3b/4/5](../../TODO.md) for delivery and owner closeout. |
 | R13.102a-4（PR-B） | normal reader 的 Fact 2／3 改讀 owner 的 ToFull count、唯一 anchor target area／既有 Stage D fallback，刪除重複 IC 篩選、Max 與非負 clamp。（`TODO.md:R13.102a-4`；`src/FreeformHelper.Application/Services/NotchTableGenerator.Generation.V22.cs:BuildV22CadCandidate`） |
 | R13.102a-5（PR-C） | 移除 raw allocation builder，compensation diagnostics／warm export 與 generator 共用既有 Q7-positive allocation 集合；單一 Q7=0 診斷改變，混合 allocation 檢視後匯出的 V21／V22 rows 與 FW apply simulation 亦改變，warm 現在等於 cold。Cold generator and golden-input outputs are unchanged. The owner approved the firmware corner case on 2026-10-04 in public PR #3 at `9810edf9` and in chat.（`TODO.md:R13.102a-5`） |
 | R13.103a、R13.103b-1、R13.103c-1、R13.103c-2 | 鎖定 final ABI characterization；threshold admission 移至 final row projection；V22 export／simulation 共用 Firmware projector；NullValue 共用 `0..65535` validation owner。（`TODO.md:R13.103a`、`R13.103b-1`、`R13.103c-1`、`R13.103c-2`） |
@@ -117,111 +117,97 @@ PR-C `4d54b35d`：golden／baseline／snapshot data 亦未更新，無更新者�
 ## 6. 剩餘風險、owner 例外及下一版第一個 slice
 
 - **A1 Fact 5 is implemented in PR-C; the owner approved the firmware corner case on 2026-10-04 in public PR #3 at `9810edf9` and in chat.** owner 於 2026-10-03 裁定「診斷跟 generator 一致，Q7=0 不顯示」，R13.102a-5 共用 Q7-positive allocation 集合。單一 `10×10` regular 完全位於 `2570×10` CAD，raw ratio=`1/257`、Q7=`0`：三模型 allocation `1→0`、overlap `100→0`、overlapped regular area `100→0`、regular/debug count `1→0`、resolved target `1 筆 100%→空集合`；CurrentGain／ConservativeNoGain 的 ToRegular／Combined `100%→0%`，Disabled 仍為 `100%`；三模型 ToFull 仍為 `100% (disabled)`、Stage3 area 仍為 `25700`，generator 維持 `0 candidates／0 V22 rows`。但 CAD 同時含 Q7=0／Q7-positive allocation，且先檢視 CAD 再匯出時，warm resolved result 的 V21／V22 firmware rows 與 FW apply simulation 確實改變，warm 現在等於 cold；不能宣稱 firmware C 輸出一概不變。review 例為 CAD `(0,0)–(2570,10)`、1×2 grid `xEdges=[0,10,2570]`、`yEdges=[0,10]`、IC0，diff0 overlap=`100`／Q7=`0`、diff1 overlap=`25600`／Q7=`128`；diff1=`XWay`、`MatchedCadPadId`=CAD、`MatchScore=1`、CAD output diff=`1`。ConservativeNoGain、strict overlap=`0.001`、threshold=`0` 時，CombinePercent=`200→100`；V21 移除 destination diff0／ref diff1 的 `ADD Q7=128` term，V22 Release row 成為 no-op 而不再輸出，FW apply simulation 隨同 rows 改變。兩版 warm/cold 完整 row snapshot 測試在舊 builder 下失敗、修正後通過；此 synthetic case 未另跑 C formatter 或實際 UI 匯出。另 partial-overlap 例 CAD `(5,0)–(2575,10)`、regular `(0,0)–(10,10)`、overlap=`50`／Q7=`0`，strict=`0.001`、ToFull 開啟、boundary virtual-area cap 啟用且 ratio=`1`，Stage3Area=`25750→25700`、`IsToFullEnabled=true→false`；stage polygons、Notch canvas preview／`notch-stage` counts 亦會改變，R label 可能改變；此例 core test 鎖 area／flag，未另操作 canvas／R label 或查詢 `notch-stage`。Historical approval requirement: PR-C 必須獨立交付並取得 owner 對 firmware corner case 的明確核准；既有診斷裁定不代表 firmware 變更已獲核准。（`TODO.md:R13.102a-3b` Fact 5、`R13.102a-5`） Update (2026-10-04): the owner approved this firmware corner case in public PR #3 at head `9810edf9` and in chat, as relayed by the Commander session.
-- **A1 normal 同源證據仍須收口。** Fact 2／3 已由 R13.102a-4 去重，Facts 4／6 保留 ABI 投影；其餘必要 consumer 的證據仍依各 parent exit criteria 稽核，不能因 bounded selected sparse/full bridge 完成就宣稱 repository-wide 收斂。（`TODO.md:R13.102a-3b`、`R13.102a-4`、`R13.101c-2`、`R13.102a-2`；稽核 A1）
+- **A1 normal single-owner evidence.** Fact 2/3 deduplication, the Fact 5 Q7-positive correction, and retained Fact 4/6 ABI projections are recorded in [TODO.md R13.102a-3b/4/5](../../TODO.md). The owner selected A1/A2 as the closeout scope; use [TODO.md R13.101/R13.102](../../TODO.md) for status. The bounded sparse/full bridge does not claim repository-wide convergence.
 - **A2 的最終 revision 驗證證據已補入第 4／5 節。** PR-B/PR-C passed full lint, the refactor gate, UI snapshots, and forward/reverse Runtime CLI baselines at the recorded revisions. The owner approved PR-C's warm firmware corner case on 2026-10-04; existing golden-input zero diff does not prove zero diff for every input, and parent checkboxes and milestone exit remain the owner's decision.（稽核 A2、「1.3.1 最小收口清單與 Milestone handoff」；`TODO.md:R13.102a-5`） 更新（2026-10-04）：PR-C 的 firmware corner case 已取得 owner 核准，見上一條。
 - **B1/B2 remain accepted exceptions (2026-10-03); the 2026-10-04 owner decision places V21/Legacy removal after 1.3.x, with the specific version and scope decided later and no implicit conversion beforehand.** B1 豁免 Legacy request-specific table identity／cache 或 generator 併入 normal batch/task；B2 豁免 V21／Legacy 額外 projector／formatter 收斂、broader adapter 與新增 typed/legacy 等價性投資。V21／Legacy 保留既有行為與 zero-diff gates，normal V22 projector 不回退；例外不能連帶關閉 A1。Historical timing note: 後續完全移除 V21 的版本與範圍尚未訂定。（稽核 B1、B2、「最新 owner 答覆如何影響分類」；`TODO.md:R13.101c-2`、`R13.102a-2`、`R13.103`、`R13.103c-1`）
 - **Owner decision (2026-10-04): 1.3.1 closes with A1/A2; C1–C6 do not block exit, and B1/B2 remain accepted exceptions.** Historical proposal: C 類不列入表格退出仍是提案，尚待 owner 確認，不是已接受豁免。 C1 為額外 repository-wide final-output cache；C2 為無 Inspector snapshot 的 PadInfo public callbacks／partial-input fallback；C3 為 exporter metadata target-cap `255` clamp；C4 為 V22 short-row payload `255` ceiling；C5 為 UI error formatter 的 `255` 解析／提示；C6 為 DevView 固定 `EMS OK` 展示樣本與 static guard 白名單。若 normal flow 確有同結果重算，仍歸 A1；三種 `255` 不因字面相同而合併 policy。（稽核 C1～C6、「1.3.1 最小收口清單與 Milestone handoff」；`TODO.md:R13.101c-2`、`R13.102a-1`、`R13.103c-1`、`R13.104a-14`） 更新（2026-10-04）：owner 已決定以 A1、A2 收口，C1–C6 不擋結案；此提案已被取代（經 Commander 轉述）。
 - **Static guard 的範圍較 EMS-cap 規則廣。** `UiLayoutGuardTests.ViewsAndViewModels_DoNotIntroduceLiteralEmsCapOrRiskWording` 使用無條件的 `\b480\b` pattern；Views／ViewModels 中無關的 literal `480` 也會被標記。本里程碑新增整個 guard（`R13.104` 的第一個 commit），並在後兩個 commit 各縮減一條白名單例外；未收窄無條件的 `480` pattern。
 - **Compensation diagnostics 的 debug-entry 順序改變。** allocation 改依 Ratio descending 排序，原 raw builder 的 row／column 順序不再保留；review 例 debug order 為 `[col0,col1]→[col1,col0]`。未證明 firmware tie-break 迴歸，也未新增此排序案例測試。（`TODO.md:R13.102a-5`）
 - **PR-A 在另一分支、以獨立 PR 交付。** Disabled-target display 修正只改顯示數字；第 4 節的 PR-B／PR-C revision 證據不是 PR-A 的驗證紀錄，交付順序仍為 PR-A → PR-B → PR-C。
-- **Mask loading remains a product question.** A missing saved mask path leaves `enabled=true` with no mask, so simulation uses the full grid; a project-relative fallback is undecided. It is an unverified hypothesis that importing a mask CSV while already enabled returns early without refreshing the assignment.
-- **Current next step (2026-10-05): the R13.202 characterization leaf is queued; R13.203 is no longer blocked by R13.201 but is not queued yet. Keep 1.3.3 behind the 1.3.2 exit; section 7 records the current sequence.** Historical next-slice plan: R13.201 (1.3.2). 依現有順序，正式化 Pad overlap、DXF audit、Canvas hit-test 三個 bounded contexts；overlap evidence API 定案後再移除 `PadMatcher`／`PadMatchService` 未讀取的 `MatchingSettings` 相容參數。這是下一版既有首項，不代表本交接已授權跳過 1.3.1 的未決退出條件。（`TODO.md:R13.201`；`TODO.md:R13.101`～`R13.104`；稽核「1.3.1 最小收口清單與 Milestone handoff」）
+- **Mask product questions.** The owner must decide how a missing saved mask path should behave and how importing a mask while enabled should affect assignment refresh. Use [PR #22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22) for characterization evidence and [TODO.md](../../TODO.md) for the decision status; characterization does not authorize a behavior change.
+- **1.3.2 sequence.** Consult [TODO.md R13.201–R13.206](../../TODO.md) for delivery, review, and remaining work. Keep 1.3.3 behind the owner's 1.3.2 exit; section 7 provides IDs and links.
 
 ## 7. Handoff for 2026-10-06
 
-**Programme state (2026-10-05 02:20, local time UTC+8).** Main development is in the public [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper) repository, with `1.3.x` as default branch and trunk at `269a3528`. Its initial single-commit export came from private `FreeformHelper` `1.3.x` at `2c1c0c84`; public `main` remains at that export. Private `FreeformHelper` `1.3.x` is frozen at `2c1c0c84`, has no open PRs (two closed as superseded), and is not archived yet. Only `FreeformHelper-testdata` remains private for ongoing development through the `example/` submodule. The `codex-queue/nfh` queue uses the public clone; the owner's 2026-10-05 night-shift work is listed below. A done brief does not close a parent or milestone. 1.3.1 closes with A1/A2 evidence under the owner's exit decision, and 1.3.3 waits for the 1.3.2 exit.
+Last verified: 2026-10-05 15:09 (+08:00), trunk 1.3.x at 792b4f79, local full test run with the example data: 1157 passed, 0 failed, 0 skipped.
 
-**Public PR snapshot — 2026-10-05 02:20 (UTC+8).** #14 is the only open public PR and targets `1.3.x`. PR, approval, and CI status must be re-checked before acting. Merge commits for #1–#11 are recorded from local trunk history; later state follows the verified snapshot.
+This line records verification supplied by the Commander session, not a test run performed by this documentation batch. Re-check the table, current PR head, approvals, and required checks before acting.
 
-| PR | Recorded state / merge commit | Delivered scope or remaining action |
+**Status source and repository context.** [TODO.md](../../TODO.md) is the single status table until Issues replace it after the issue migration. This handoff references IDs and purposes; consult the corresponding TODO.md rows for execution status. The integrator verifies merge results and writes the table back once per batch. Main development uses the public [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper) repository. The default branch is `1.3.x` (trunk); `main` currently equals the initial import commit and will hold released versions only. Work uses `feature/<version>/<topic>` branches targeting `1.3.x`. The original public import came from private `FreeformHelper` `1.3.x` at `2c1c0c84`; private archive and issue-migration actions are tracked by S15.009e.
+
+**Pull request references — IDs, links, and purposes.**
+
+| PR | TODO.md reference | Purpose |
 | --- | --- | --- |
-| [#1](https://github.com/Dennis40816/nvt-freeform-helper/pull/1) | Merged earlier; `b6c2562`. | PR-A: Disabled-target display agrees with the generator. |
-| [#2](https://github.com/Dennis40816/nvt-freeform-helper/pull/2) | Merged earlier; `91f2054`. | PR-B: R13.102 A1 deduplication and R13.104 safety-text centralization, with the recorded zero-diff scope. |
-| [#3](https://github.com/Dennis40816/nvt-freeform-helper/pull/3) | Merged earlier; `f1c15c3`. | PR-C: Q7-positive diagnostics and warm export, including the firmware corner case approved on 2026-10-04 at head `9810edf9` and in chat; section 6 retains its scope and verification limits. |
-| [#4](https://github.com/Dennis40816/nvt-freeform-helper/pull/4) | Merged earlier; `41e10d0`. | R13.131 milestone handoff. |
-| [#5](https://github.com/Dennis40816/nvt-freeform-helper/pull/5) | Merged earlier; `75f14cb`. | S14.011 single-pass DXF opening. |
-| [#6](https://github.com/Dennis40816/nvt-freeform-helper/pull/6) | Merged earlier; `26187c1`. | S15.018 shell log unsubscription. |
-| [#7](https://github.com/Dennis40816/nvt-freeform-helper/pull/7) | Merged earlier; `44d1259`. | Console writer inventory; this does not integrate the S15.017 incremental-parser prototype. |
-| [#8](https://github.com/Dennis40816/nvt-freeform-helper/pull/8) | Merged earlier; `070caa2`. | S15.020 terminal auto-follow test wait. |
-| [#9](https://github.com/Dennis40816/nvt-freeform-helper/pull/9) | Merged earlier; `d8aad96`. | 2026-10-03 documentation batch. |
-| [#10](https://github.com/Dennis40816/nvt-freeform-helper/pull/10) | Merged earlier; `be3a793`. | Public-repository transfer documentation. |
-| [#11](https://github.com/Dennis40816/nvt-freeform-helper/pull/11) | Merged earlier; `6aaacf5`. | 2026-10-04 owner-decision record. |
-| [#12](https://github.com/Dennis40816/nvt-freeform-helper/pull/12) | Merged 2026-10-05; `c119295b`. | Dependabot: weekly NuGet and GitHub Actions updates, limit 5. |
-| [#13](https://github.com/Dennis40816/nvt-freeform-helper/pull/13) | Merged 2026-10-05; `cbd430af`. | Root `VERSION=1.3.0`, read by `Directory.Build.props`, with a structure check in `scripts/verify.ps1`. |
-| [#14](https://github.com/Dennis40816/nvt-freeform-helper/pull/14) | Open; CI green (7/7). | `scripts/tests/run-tests.ps1` uses a repository-external test area: default `D:\FreeformHelper-TestArea`, `FREEFORMHELPER_TEST_AREA` override, seven-day retention, and manual cleanup, documented in `docs/guides/build-output-and-disk-space.md`. The owner must review it again after the documentation conflict resolution; it touches `scripts/`, so owner approval is required before merge. |
-| [#15](https://github.com/Dennis40816/nvt-freeform-helper/pull/15) | Merged 2026-10-05; `53366ee1`. | R13.201 overlap evidence API without the unused `MatchingSettings` parameter. |
-| [#16](https://github.com/Dennis40816/nvt-freeform-helper/pull/16) | Merged 2026-10-05; `b41ebe04`. | R13.204 single `RegularPad.AssignMapping` assignment. |
-| [#17](https://github.com/Dennis40816/nvt-freeform-helper/pull/17) | Merged 2026-10-05; `c0c4e39b`. | R13.205 audit-phase characterization tests only; the full pipeline refactor remains pending. |
-| [#18](https://github.com/Dennis40816/nvt-freeform-helper/pull/18) | Merged 2026-10-05; `269a3528`. | R13.206 one private coordinate transform. |
-| [#19](https://github.com/Dennis40816/nvt-freeform-helper/pull/19) | Merged 2026-10-05; `e48fa2aa`. | Tests-only `ExampleProjectFixture` repair: every example-project test uses a temporary copy, including the golden baseline test that builds its path from manifest data. Historically, #14, #15, #16, #17 and #18 failed the same seven example-data tests: two core C export drift cases (V21 and V22) and five viewmodel regular-visibility-mask tests, because the runner could not load the developer machine's saved mask path. Repository CI checks out each pull request head, so each branch needed the fix merged into it; #19 resolved those failures for all five pull requests. |
+| [#1](https://github.com/Dennis40816/nvt-freeform-helper/pull/1) | [R13.102](../../TODO.md) | PR-A: align Disabled-target display with the generator. |
+| [#2](https://github.com/Dennis40816/nvt-freeform-helper/pull/2) | [R13.102a-3b/4; R13.104](../../TODO.md) | PR-B: characterize and deduplicate normal readers; centralize safety text. |
+| [#3](https://github.com/Dennis40816/nvt-freeform-helper/pull/3) | [R13.102a-5](../../TODO.md) | PR-C: use Q7-positive allocations in diagnostics and warm export; see section 6 for the firmware scope. |
+| [#4](https://github.com/Dennis40816/nvt-freeform-helper/pull/4) | [R13.101–R13.104](../../TODO.md) | R13.131 milestone handoff. |
+| [#5](https://github.com/Dennis40816/nvt-freeform-helper/pull/5) | [S14.011](../../TODO.md) | Single-pass DXF opening. |
+| [#6](https://github.com/Dennis40816/nvt-freeform-helper/pull/6) | [S15.018](../../TODO.md) | Shell log unsubscription. |
+| [#7](https://github.com/Dennis40816/nvt-freeform-helper/pull/7) | [S15.017](../../TODO.md) | Console writer inventory. |
+| [#8](https://github.com/Dennis40816/nvt-freeform-helper/pull/8) | [S15.020](../../TODO.md) | Terminal auto-follow test waits. |
+| [#9](https://github.com/Dennis40816/nvt-freeform-helper/pull/9) | [S15.005b](../../TODO.md) | 2026-10-03 documentation batch. |
+| [#10](https://github.com/Dennis40816/nvt-freeform-helper/pull/10) | [S15.009e](../../TODO.md) | Public-repository transfer documentation. |
+| [#11](https://github.com/Dennis40816/nvt-freeform-helper/pull/11) | [Owner decisions](../../TODO.md) | 2026-10-04 owner-decision record. |
+| [#12](https://github.com/Dennis40816/nvt-freeform-helper/pull/12) | [S15.005a](../../TODO.md) | Dependabot: weekly NuGet and GitHub Actions updates, limit 5. |
+| [#13](https://github.com/Dennis40816/nvt-freeform-helper/pull/13) | [S15.005a](../../TODO.md) | VERSION 1.3.0 and its structure check. |
+| [#14](https://github.com/Dennis40816/nvt-freeform-helper/pull/14) | [S15.005a; S15.006 external test area](../../TODO.md) | Repository-external test area with seven-day retention and manual cleanup. |
+| [#15](https://github.com/Dennis40816/nvt-freeform-helper/pull/15) | [R13.201](../../TODO.md) | Overlap evidence API without the unused MatchingSettings parameter. |
+| [#16](https://github.com/Dennis40816/nvt-freeform-helper/pull/16) | [R13.204](../../TODO.md) | RegularPad.AssignMapping for matched-pair assignment. |
+| [#17](https://github.com/Dennis40816/nvt-freeform-helper/pull/17) | [R13.205](../../TODO.md) | Audit-phase characterization tests. |
+| [#18](https://github.com/Dennis40816/nvt-freeform-helper/pull/18) | [R13.206](../../TODO.md) | One private coordinate transform. |
+| [#19](https://github.com/Dennis40816/nvt-freeform-helper/pull/19) | [S15.005a; R13.002](../../TODO.md) | ExampleProjectFixture temporary project copies with a local saved-mask path. |
+| [#20](https://github.com/Dennis40816/nvt-freeform-helper/pull/20) | [S15.005a](../../TODO.md) | Dependabot actions/checkout 7.0.1. |
+| [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21) | [S15.005c](../../TODO.md) | Report-only scripts/tests/path-guard.ps1 prototype. |
+| [#22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22) | [Mask product questions](../../TODO.md) | Characterize a missing saved mask path and importing a mask while enabled. |
+| [#23](https://github.com/Dennis40816/nvt-freeform-helper/pull/23) | [R13.202](../../TODO.md) | Characterize CadBest and hover best-match rules. |
+| [#24](https://github.com/Dennis40816/nvt-freeform-helper/pull/24) | [Owner decisions](../../TODO.md) | Documentation state synchronization. |
+| [#25](https://github.com/Dennis40816/nvt-freeform-helper/pull/25) | [R13.202](../../TODO.md) | Characterize allocation-anchor and freeform-classification selection. |
 
-Owner GitHub approvals are on record for #15, #16, and #18 at 2026-10-04 23:18, and #12, #13, and #14 at 2026-10-05 00:13 (UTC+8). The own diffs of #15, #16, and #18 at merge time were byte-identical to their approved diffs; only trunk was merged into those branches. #14 changed after approval: merging trunk required one documentation conflict resolution that kept the test-area section of the build-output guide and dropped the sentence saying implementation was pending. The owner should look at that current diff again before merge.
-
-**Merge and next-step order.** The CI repair and the delivered 1.3.2 slices are already on trunk. The remaining merge action is owner review of the changed #14, followed by re-checking its current approval and required checks before integration. Continue the queued characterization work and choose the remaining 1.3.2 leaves; R13.203 is unblocked but not queued. Keep the 1.3.2 exit ahead of 1.3.3 implementation and the shared CI pilot.
-
-Repository CI checks out the PR head, not the merge ref. A trunk fix reaches an open PR only when trunk is merged into its branch; closing and reopening the PR does not bring in that fix.
-
-The resolved CI defect came from the developer-machine absolute mask path in `example/BOE36.35/project_3635.json`, under `uiSnapshot.import.regularSignalMaskSourcePath`. Failure to load the saved mask caused seven example-data failures, including 323/324, `NHC_TYPE_SUB` versus `ADD`, and grid 4992. #19 moved every example-project test onto a temporary copy with a local mask path through `ExampleProjectFixture`, including the manifest-derived golden baseline call site. It changed tests only, with no `src` or golden change. The signed golden manifest hashes the original project JSON, which must not be edited without re-signing. Public CI uses the `policy / structure` and `dotnet / build-test` lanes; it is green, including the data tests with `TESTDATA_DEPLOY_KEY`. The full local trunk run at `269a3528`, with example data, recorded **1119 passed, 0 failed, 0 skipped**; this is supplied verification evidence, not a test run performed by this documentation update.
+Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a PR when trunk is merged into its branch; closing and reopening the PR does not bring in the fix. PR #19 documents the tests-only CI fixture repair. The signed golden manifest hashes the original project JSON; editing that data requires re-signing.
 
 **Owner decisions and dates.**
 
-- **2026-10-04 — Transfer:** main development and new work move to the public repository; the queue uses the public clone and new work is public-only from this date. Private `1.3.x` stays frozen at `2c1c0c84`; the owner archives private `FreeformHelper` read-only after public CI, including the deploy key, is green and private PRs are closed.
-- **2026-10-04 — 1.3.1:** close with A1/A2; C1–C6 do not block, and B1/B2 remain accepted exceptions (accepted on 2026-10-03). The R13.131 parent and milestone checkbox remain the owner's decision. PR-C's firmware corner case was approved in public PR #3 at `9810edf9` and in chat; its warm-output scope and verification limits remain in section 6.
-- **2026-10-04 — S15.017:** incremental console links are not merged. Console system work comes later, first with a new model in FreeformHelper, then pushed to NVT Core as the shared console; other modules are abstracted into NVT Core over time.
-- **2026-10-04 — VERSION, test area, and Dependabot:** keep the name and version `1.3.0`; use `D:\FreeformHelper-TestArea` by default, overridable with `FREEFORMHELPER_TEST_AREA`, with `TEMP`/`TMP`/`TMPDIR` set only for tests, seven-day retention, and manual cleanup. Dependabot follows the NVT Core template: weekly NuGet and GitHub Actions updates, limit 5. These S15.005a implementations are in #12–#14.
-- **2026-10-04 — Agent and contributor documents:** changes to `AGENTS.md` or `CONTRIBUTING.md` require the owner's confirmation in chat before editing; no GitHub review is required for those changes.
-- **2026-10-04 — PR language; 2026-10-05 — document language:** new PR titles and bodies default to English from 2026-10-04; already-open PRs are not rewritten, and conflicting `AGENTS.md`/`CONTRIBUTING.md` wording must be raised with the owner first. On 2026-10-05 the owner said: 「後續文件，除了 README 預設要有中文版本，其他都預設用英文，除非我指定新增中文版本」. Existing Chinese documents will be translated later in low-priority codex batches, preserving owner quotes in Chinese (an English translation may accompany them); only the English version is maintained afterwards. README gets English and Chinese versions, with file names decided later.
-- **2026-10-04 — Old private issues:** move only publishable issues and rewrite their links after bot Issues read/write permission is active. Nothing has migrated; wait for the Commander session's permission notice. Old PRs are not migrated and their links are not rewritten.
-- **2026-10-04 — R13.303:** implement simulation opacity fallback `0.9` in 1.3.3 and update snapshots for this approved visual change.
-- **2026-10-04 — V21/Legacy removal:** removal is after 1.3.x; the specific version and scope are decided later, with no implicit conversion beforehand.
-- **2026-10-04 — R13.305b:** owner 「禁止關掉最後一個版本」. Neither V21 nor V22 may be switched off when it is the last enabled version; implement the guard in 1.3.3 after the 1.3.2 exit.
-- **2026-10-05 — R13.202:** keep the status quo: CadBest and hover retain their own rules, share only parts proven identical, and preserve what users see. The 3635 measurement found 4838 CADs, 582 touching at least two regulars, 6 selecting a different regular between the rules, and 0 exact ties. R13.203 is no longer blocked by R13.201 but is not queued yet.
-- **2026-10-05 — Shared CI pilot:** owner selected 「改由 NFH 試點，1.3.2 結束後開始 (Recommended)」. NFH replaces NFU as the NVT Core shared CI pilot after 1.3.2 completion; the mask-path fix is complete, and pilot implementation waits for that exit. The Commander session has codex evaluating a CI path check to reject machine-local paths in test data for later introduction in NVT Core.
-- **2026-10-04 22:07 — Ruleset:** the owner created `Protect 1.3.x and main`, requiring `policy / structure` and `dotnet / build-test`, with strict mode off and admin bypass.
+- **2026-10-04 — Transfer:** main development and new work move to the public repository; the queue uses the public clone and new work is public-only from this date. Private `1.3.x` stays frozen at `2c1c0c84`; the owner archives private FreeformHelper read-only after public CI, including the deploy key, is green and private PRs are closed.
+- **2026-10-04 — 1.3.1:** close with A1/A2; C1–C6 do not block, and B1/B2 remain accepted exceptions from 2026-10-03. Parent and milestone checkboxes remain the owner's decision. The owner approved PR-C's firmware corner case in public PR #3 at `9810edf9` and in chat; section 6 preserves its warm-output scope and verification limits.
+- **2026-10-04 — S15.017:** incremental console links are not merged. Console-system work comes later, first in FreeformHelper, then in NVT Core as the shared console; other modules are abstracted into NVT Core over time. The 2026-10-05 model decision returns model selection to the default.
+- **2026-10-04 — VERSION, test area, and Dependabot:** keep the name and version 1.3.0; use `D:\FreeformHelper-TestArea` by default, overridable with FREEFORMHELPER_TEST_AREA, with TEMP/TMP/TMPDIR set only for tests, seven-day retention, and manual cleanup. Dependabot follows the NVT Core template: weekly NuGet and GitHub Actions updates, limit 5. Reference: S15.005a.
+- **2026-10-04 — Agent and contributor documents:** the owner said 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). Changes to AGENTS.md or CONTRIBUTING.md require prior owner confirmation in chat; a GitHub review is not required for this confirmation. On 2026-10-05 the owner selected 「同意，改好開 PR 給我看 (Recommended)」 ("Agreed; make the corrections and open a PR for me to inspect (Recommended)") for exactly the current branch model and this confirmation flow.
+- **2026-10-04 — PR language; 2026-10-05 — document language:** new PR titles and bodies default to English; already-open PRs are not rewritten, and conflicting AGENTS.md/CONTRIBUTING.md wording must first be raised with the owner. The owner said 「後續文件，除了 README 預設要有中文版本，其他都預設用英文，除非我指定新增中文版本」 ("Future documents default to English, except that README should have a Chinese version by default, unless I request an additional Chinese version"). Existing Chinese documents are translated in low-priority Codex batches, preserving Chinese owner quotes with English translations; only English is maintained afterwards, except the bilingual README. The owner selected 「可以 (Recommended)」 ("Allowed (Recommended)") for [README.md](../../README.md) in English and [README.zh-TW.md](../../README.zh-TW.md) in Traditional Chinese.
+- **2026-10-04 — Old private issues; 2026-10-05 decision:** move only publishable issues. On 2026-10-05 the owner chose 「同意，只搬 #1 改寫版 (Recommended)」 ("Agreed, move only the rewritten issue 1"): the old parent spec was rewritten and created as public [#27](https://github.com/Dennis40816/nvt-freeform-helper/issues/27) (old 1 -> new 27); the other 42 open issues are delivered child tickets and are not migrated. Old PRs are not migrated and their links are not rewritten. The owner also kept the 1.3.1 parent unticked.
+- **2026-10-04 — R13.303:** implement simulation opacity fallback 0.9 in 1.3.3 and update snapshots for this visual change.
+- **2026-10-04 — V21/Legacy removal:** removal is outside 1.3.x; the specific version and scope are decided later, with no implicit conversion beforehand. Avalonia 12 is also outside 1.3.x.
+- **2026-10-04 — R13.305b:** the owner said 「禁止關掉最後一個版本」 ("Do not allow the last version to be disabled"). Neither V21 nor V22 may be switched off when it is the last enabled version; implement the guard in 1.3.3 after the 1.3.2 exit.
+- **2026-10-05 — R13.202:** preserve distinct CadBest and hover rules and share only parts proven identical. For exactly equal scores, the owner selected 「維持現狀 (Recommended)」 ("Keep the status quo (Recommended)"): add no ID tie-break to PadMatcher sorting or R13.202 selection. Any later change is a separate behavior-change item; the ID tie-break question is resolved.
+- **2026-10-05 — Approval after trunk integration:** the owner selected 「可以，但手動解衝突要重批 (Recommended)」 ("Allowed, but manual conflict resolution requires approval again (Recommended)"). After owner approval, a new commit that only merges trunk cleanly needs no new approval if tests pass; any manual conflict resolution requires owner approval again.
+- **2026-10-05 — Integration batches:** the owner selected 「不設上限」 ("No limit") for batches awaiting review.
+- **2026-10-05 — Status table:** the owner said 「可以先用各自的，但路徑未來要統一」 ("Each project may use its own table for now, but the path will be unified later"). TODO.md is NFH's single status table until Issues replace it after migration. Roadmap, handoff, and WIP files reference IDs without restating execution status; the integrator verifies merge results and writes the table back once per batch.
+- **2026-10-05 — Shared CI pilot:** the owner selected 「改由 NFH 試點，1.3.2 結束後開始 (Recommended)」 ("Use NFH as the pilot, starting after 1.3.2 completion (Recommended)"). NFH replaces NFU as NVT Core's shared CI pilot after the 1.3.2 exit. CI path-check evaluation is tracked under S15.005c for later NVT Core introduction.
+- **2026-10-05 — Models and usage:** models return to the default; Codex usage remains economical after its reset.
+- **2026-10-04 22:07 — Ruleset:** the owner created Protect 1.3.x and main, requiring policy / structure and dotnet / build-test, with strict mode off and admin bypass.
 
-**Waiting items and who unblocks them.**
+**Owner actions — consult TODO.md for status before acting.**
 
-- **#14:** the owner looks again at the current diff after the documentation conflict resolution; the earlier approval predates that change.
-- **Issue migration:** wait for the Commander session's notice that the bot has Issues read/write permission before moving any old issue.
-- **Private repository archive:** both prerequisites are satisfied: public CI including deploy-key-backed data tests is green, and no private PR is open. The owner archives the private repository at [FreeformHelper settings](https://github.com/Dennis40816/FreeformHelper/settings); the archive step is still pending.
-- **Shared CI pilot:** NVT Core contacts the NFH session after the 1.3.2 exit. NFH Avalonia 12 preparation remains planned, with no work now.
-- **CI path check:** the evaluation and prototype are queued or running; the prototype is not wired into CI and needs owner approval because it touches `scripts/`. Later NVT Core introduction remains pending.
-- **Document translation and README:** translation batches for existing Chinese documents are queued or running at low priority under the language decision above; README still needs English and Chinese versions, with file names undecided.
-- `CONTRIBUTING.md` still needs the owner-confirmed sync of its default-branch model and the chat-confirmation rule at line 37.
+- Review [#14](https://github.com/Dennis40816/nvt-freeform-helper/pull/14) again after its conflict with trunk is resolved; its scripts change requires owner approval.
+- Approve the workflow change in [#20](https://github.com/Dennis40816/nvt-freeform-helper/pull/20) and the scripts prototype in [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21).
+- Review and approve the typed CadPadId/RegularPadId DXF manual-override chain: [R13.203](../../TODO.md), in the NFH queue.
+- Change the bot's Issues permission to Read and write (decided on 2026-10-05, not yet in effect; today the bot can create issues and labels but cannot add labels, comment or close): [App installation settings](https://github.com/settings/installations/165315921). Issue migration status: [S15.009e](../../TODO.md).
+- Archive the private repository read-only: [FreeformHelper settings](https://github.com/Dennis40816/FreeformHelper/settings), with prerequisites tracked by S15.009e.
+- Coordinate the shared CI pilot after the owner's 1.3.2 exit: [S15.005c/S15.005d](../../TODO.md), then NVT Core contacts the NFH session.
+- Evaluate the CI path check and later NVT Core introduction: [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21), [S15.005c](../../TODO.md).
+- Handle translation of existing Chinese documents: the five NFH queue briefs below, under [TODO.md Owner decisions](../../TODO.md).
+- Decide how a missing saved mask path should behave and how importing a mask while enabled should affect assignment refresh: [#22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22), [TODO.md Mask product questions](../../TODO.md).
 
-**Owner night shift — 2026-10-05, queued or running; no decision needed to continue this work.** The work list includes the CI path-guard prototype (a script, an exception config, and a required-mask load assertion; not wired into CI), tests-only characterization of a missing saved mask path and importing a mask while it is already enabled, console ring-tail test isolation (S15.002), the read-only 1.3.3 design inventory, pre-reviews of #12/#13/#14, and batches translating existing Chinese documents to English. Use the table above for current PR state; queued reviews do not imply that those PRs remain open. The prototype's owner-approval gate remains in force.
+**Queue references.** These names identify work, not execution status; consult TODO.md.
 
-Done queue briefs in the dated snapshot:
+- R13.203: typed IDs for the DXF manual-override chain.
+- S15.002: `s15-002-console-ring-tail-isolation`.
+- Document translation: `translate-core-notch-specs`, `translate-guides-reference-misc`, `translate-reference-notch-behavior`, `translate-reviews-avalonia-ui`, and `translate-reviews-v21-removal`.
+- R13.202: best-match, allocation-anchor, and freeform-classification characterization in PR #23/#25.
+- R13.205: audit-phase characterization in PR #17 and the production pipeline scope.
+- S15.005c: path-check evaluation and PR #21.
 
-- `r13-201-overlap-api`
-- `r13-204-mapping-transition`
-- `r13-205-audit-phase-characterization`
-- `r13-206-coordinate-transform`
-- `s15-005a-version-file`
-- `s15-005a-dependabot`
-- `s15-005a-test-area`
-- `simplify-test-area-launch`
-- `transfer-docs-public-repo`
-- `record-owner-decisions-2026-10-04`
-- `ci-example-mask-path`
-- `ci-mask-baseline-loader`
-- `docs-state-sync-2026-10-05`
+**Release gates.** Consult [TODO.md R13.201–R13.206](../../TODO.md) for 1.3.2 work. R13.202 shares only parts proven identical; R13.203 covers its typed-ID boundary; R13.205 covers the production pipeline. The owner's 1.3.2 exit precedes 1.3.3 implementation and the shared CI pilot. R13.303 opacity 0.9 with updated snapshots and R13.305b's last-version guard retain their 1.3.3 gates. No parent, milestone, or exit checkbox is closed by this handoff.
 
-Queue briefs queued or running on the night of 2026-10-05:
-
-- `path-guard-prototype`
-- `path-guard-fix-p2`
-- `characterize-mask-missing-and-import`
-- `mask-char-compile-fix`
-- `r13-202-best-match-characterization`
-- `r13202-char-fix`
-- `s15-002-console-ring-tail-isolation`: the S15.002 branch was kept without a pull request because it touches `src` and the console system will be redone.
-- `translate-core-notch-specs`
-- `translate-guides-reference-misc`
-- `translate-reference-notch-behavior`
-- `translate-reviews-avalonia-ui`
-- `translate-reviews-v21-removal`
-
-**Remaining 1.3.2 leaves and 1.3.3 gates.** R13.202 retains the status quo or a reduced scope limited to proven-identical parts; a characterization leaf pinning both current CadBest and hover selection rules is queued. R13.203 is no longer blocked by R13.201 and is not queued yet. The full R13.205 pipeline remains pending beyond #17's characterization tests. Select remaining 1.3.2 leaves without reopening delivered slices; the 1.3.2 exit remains the owner's decision. R13.305b's last-version guard and R13.303's opacity `0.9` change with updated snapshots belong to 1.3.3 after that exit; the read-only design inventory does not authorize implementation. No parent, S15.005a, S15.009e, S15.017, or milestone exit is closed by this handoff.
-
-**Open product questions — not decided.** A missing saved mask path leaves `enabled=true` with no mask, so simulation uses the full grid; a project-relative fallback would be a product change and has not been decided. It is an unverified hypothesis that importing a mask CSV while the mask is already enabled returns early without refreshing the assignment; the queued characterization tests do not settle a behavior change. PadMatcher sorting has no final ID tie-break; the zero exact ties in the 3635 measurement do not settle that question.
+**Open product questions.** The missing saved mask path and importing a mask while enabled require owner behavior decisions; consult [PR #22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22) for characterization and [TODO.md](../../TODO.md) for status. PadMatcher sorting and R13.202 have no open ID tie-break question: exact ties preserve the current behavior under the 2026-10-05 decision.

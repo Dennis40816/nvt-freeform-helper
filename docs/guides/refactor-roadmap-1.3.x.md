@@ -430,7 +430,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 ### R13.201 定義 matching bounded contexts
 
-- The overlap evidence API is implemented in PR #15.
+- Execution status and delivery evidence: [TODO.md R13.201](../../TODO.md).
 
 保留三種不同契約：
 
@@ -444,13 +444,13 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 ### R13.202 Preserve distinct best-match rules
 
 - Owner decision (2026-10-05): keep the status quo. `CadBestMatchSeedService` and PadCanvas hover retain their own rules; share only parts proven identical, with no user-visible change. R13.202 may close as status quo or a reduced scope.
-- The 3635 measurement covers 4,838 CADs: 582 touch two or more regulars, the two rules select different regulars for 6 CADs, and there are 0 exact ties. `PadMatcher` sorting still lacks a final ID tie-break, as recorded in [INV2, section 2](../reviews/r13-slice-inventories-2026-10.md); this is an open follow-up, not authorization to change ordering.
+- The 3635 measurement covers 4,838 CADs: 582 touch two or more regulars, the two rules select different regulars for 6 CADs, and there are 0 exact ties. The owner selected 「維持現狀 (Recommended)」 ("Keep the status quo (Recommended)") on 2026-10-05: when scores are exactly equal, add no ID tie-break to PadMatcher sorting or R13.202 selection. Preserve current behavior; any later change is a separate behavior-change item. The ID tie-break question is resolved. See [INV2, section 2](../reviews/r13-slice-inventories-2026-10.md) for the rule inventory and [TODO.md R13.202](../../TODO.md) for execution status and characterization PRs.
 - DXF audit 可共享 overlap evidence，但保留自己的 score、one-to-one allocation 與 override policy。
 - `SelectCadAllocationAnchor` 與 `GetFreeformType` 先以相同輸入建立 parity/差異案例；前者是 allocation anchor、後者是 classification，不能只因都挑最高分就直接合併。若證明共用同一 ordering/evidence，抽出共享 anchor projection，兩個 consumer 仍各自決定結果語意。
 
 ### R13.203 Typed ID 漸進導入
 
-- R13.201 no longer blocks R13.203; typed ID work is not queued yet.
+- The typed-ID boundary work and review are tracked by [TODO.md R13.203](../../TODO.md); R13.201 is its API dependency.
 
 - 依 boundary 分批導入 `CadPadId`、`RegularPadId`、`IcIndex`、`DiffIndex`。
 - 每次只轉換一條 API chain，保留 adapter，不做全 repo 一次改寫。
@@ -458,7 +458,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 ### R13.204 RegularPad 狀態轉移 API
 
-- `RegularPad.AssignMapping` is implemented in PR #16.
+- Matched-pair assignment and the broader writer-transition scope are tracked separately by [TODO.md R13.204](../../TODO.md).
 
 - 盤點 `IcIndex`、`DiffIndex`、`MatchedCadPadId`、`MatchScore`、`Freeform` 的 writer。
 - 以明確 assign/replace/apply API 集中不變量與 invalidation。
@@ -466,7 +466,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 ### R13.205 DxfRegularMaskAudit 顯式 pipeline
 
-- Audit-phase characterization tests are in PR #17. This tests-only slice does not complete the explicit pipeline refactor below.
+- Audit-phase characterization and the production pipeline scope below are tracked separately by [TODO.md R13.205](../../TODO.md).
 
 - 把 segment offset、local repair、passive compensation 的先後依賴改成顯式 context/step result。
 - 保留原本不同 decision source 與 reason code。
@@ -474,7 +474,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 ### R13.206 CoordinatePlanner transform builder
 
-- The single CoordinatePlanner transform is implemented in PR #18.
+- Transform delivery evidence and execution status: [TODO.md R13.206](../../TODO.md).
 
 - 將 point/line/rectangle 重複的 machine、normalized、pixel、world、safe coordinate projection 收斂為單一參數化 transform/builder。
 - builder 只統一座標換算，不混入 guide、BIST、custom array/path 的 feature policy。
@@ -482,7 +482,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 完成條件：所有 planner artifact 使用同一轉換契約；既有 key、排序、raw/safe 座標與輸出 snapshot 零差異。
 
-Exit criteria: preserve the distinct CadBest and hover rules and all user-visible results; share only evidence or calculations proven identical. The R13.202 characterization leaf is queued; R13.203 is not queued, and the R13.205 pipeline refactor remains pending. The 1.3.2 exit remains the owner's decision.
+Exit criteria: preserve the distinct CadBest and hover rules and all user-visible results; share only evidence or calculations proven identical. Consult [TODO.md R13.201–R13.206](../../TODO.md) for execution status. The 1.3.2 exit remains the owner's decision.
 
 ---
 
@@ -680,7 +680,7 @@ $actual
 | S1-05 | DxfRegularMaskAudit 顯式順序 | 採納 | R13.205；獨立 bounded context，不與 Notch context 實作綁成同一 slice |
 | S1-06 | simulation color mapper | 採納 | R13.303；共用數值映射，render/resource ownership 留在各 View |
 | S1-07 | Console dual-mode 收斂 | 採納 | R13.304；共同 use case + 等價 action contract |
-| S2-01 | typed IDs | 採納 | R13.203 introduces IDs incrementally by boundary; R13.201 no longer blocks it, but it is not queued yet |
+| S2-01 | typed IDs | Adopted | R13.203 introduces IDs incrementally by boundary; see [TODO.md R13.203](../../TODO.md) for execution status |
 | S2-02 | `RegularPad` transition API | 採納 | R13.204；首輪只封裝既有語意，不偷加 lifecycle 拒絕規則 |
 | S2-03 | CoordinatePlanner builder | 採納 | 新增 R13.206；Application snapshot equivalence + G2/G3 |
 | S2-04 | PadCanvas engines 真正注入 | 採納（限縮） | 新增 R13.506；窄 seam/state-result dependency，不引入全域 container |
@@ -768,7 +768,9 @@ Merge 前額外執行：
 
 ## 13. 進度與變更控制
 
-- 本文件描述穩定的版本順序與 gate；實際 `[ ]`/`[x]` 狀態只在 `TODO.md` 維護。
+- This roadmap defines version order, scope, and gates. Under the owner's 2026-10-05 decision, 「可以先用各自的，但路徑未來要統一」 ("Each project may use its own table for now, but the path will be unified later"), TODO.md is NFH's single status table until Issues replace it after migration. Roadmap, handoff, and WIP documents reference IDs without restating execution status; the integrator verifies merges and writes the table back once per batch.
+- Approval after trunk integration (owner, 2026-10-05): 「可以，但手動解衝突要重批 (Recommended)」 ("Allowed, but manual conflict resolution requires approval again (Recommended)"). After owner approval, a new commit that only merges trunk cleanly needs no new approval if tests pass; any manual conflict resolution requires owner approval again.
+- Integration batches awaiting review have no limit (owner, 2026-10-05: 「不設上限」 ("No limit")).
 - 版本不得跳過前一版本退出條件；可在同版本內調整 slice 順序，但必須記錄依賴理由。
 - 新發現的重構項目先寫入 TODO，再判斷歸屬版本，不直接擴大當前 slice。
 - 若同一 blocking condition 連續出現，先縮小 slice 或補 guard，不以更新 golden、放寬 lint、warning suppression 繞過。

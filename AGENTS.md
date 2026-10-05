@@ -60,6 +60,9 @@
 
 ## 分支與審查邊界
 
+- The default branch is `1.3.x` (trunk). `main` currently equals the initial import commit and will hold released versions only. Work uses `feature/<version>/<topic>` branches targeting `1.3.x`.
+- Changes to `AGENTS.md` or `CONTRIBUTING.md` require owner confirmation in chat before editing. The owner said on 2026-10-04: 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). A GitHub review is not required for this confirmation; the owner-approval rules for high-risk PRs in `CONTRIBUTING.md`, including `src/**`, `scripts/**`, and `.github/**`, continue to apply.
+
 - Commit 範圍須小而明確，每個 commit 含 title 與 body；不把無關修正放在同一 commit，優先逐一提交。
 - 分支、版本與發佈治理見 `docs/governance/branch-version-and-release-governance.md`；PR 與合併規則、貢獻者執行順序見 `CONTRIBUTING.md`。
 

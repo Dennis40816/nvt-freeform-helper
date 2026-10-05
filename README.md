@@ -1,61 +1,63 @@
+English | [繁體中文](README.zh-TW.md)
+
 # FreeformHelper
 
-授權與使用限制請見 [LICENSE](LICENSE)。
+See [LICENSE](LICENSE) for licensing and usage restrictions.
 
-自 2026-10-04 起，新工作（分支、PR、新 issue）在公開 repo [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper) 進行，PR 目標為 `1.3.x`。
+Since 2026-10-04, new work (branches, PRs, and new issues) takes place in the public repository [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper), with PRs targeting `1.3.x`.
 
-FreeformHelper 是 DXF 分析工具，主流程是：
-`DXF 匯入 -> Regular Grid 建立 -> CAD/Regular 對應 -> Freeform/Notch 輸出`
+FreeformHelper is a DXF analysis tool with this main workflow:
+`DXF import -> Regular Grid creation -> CAD/Regular mapping -> Freeform/Notch output`
 
-## 0. 先看這裡（90 秒）
+## 0. Start here (90 seconds)
 
-- 要直接啟動 UI：看「1) 傻瓜模式：直接跑起來」
-- 要打包給別人用（免安裝 .NET）：看「2) 傻瓜模式：單檔 EXE」
-- 是的，README 內有「build 單檔 exe」流程，而且是可整段複製貼上。
+- To launch the UI directly, see "1) Quick start: run the app".
+- To package it for others without requiring a .NET installation, see "2) Quick start: single-file EXE".
+- The README includes a complete, copy-and-paste procedure for building a single-file EXE.
 
-## 1. 傻瓜模式：直接跑起來（整段複製貼上）
+## 1. Quick start: run the app (copy and paste the entire block)
 
-> 條件：Windows + PowerShell + .NET SDK 10.0.3xx（版本由 `global.json` 鎖定）+ .NET 8 runtime（專案 target 為 `net8.0`）
+> Requirements: Windows + PowerShell + .NET SDK 10.0.3xx (pinned by `global.json`) + .NET 8 runtime (the projects target `net8.0`).
 
 ```powershell
-# 1) 到 repo 根目錄（請改成你的路徑）
+# 1) Go to the repository root (replace the placeholder with your path)
 Set-Location <FreeformHelper repo 路徑>
 
-# 2) 還原 + 建置
+# 2) Restore and build
 dotnet restore
 dotnet build FreeformHelper.sln
 
-# 3) 啟動 UI
+# 3) Launch the UI
 dotnet run --project src/FreeformHelper.UI/FreeformHelper.UI.csproj
 ```
 
-## 2. 傻瓜模式：打包「單檔 EXE」（整段複製貼上）
+## 2. Quick start: package a single-file EXE (copy and paste the entire block)
 
-> 這是免安裝版本（self-contained），最適合交付測試。
+> This self-contained package requires no installation and is best suited for handing over for testing.
 
 ```powershell
-# 1) 到 repo 根目錄（請改成你的路徑）
+# 1) Go to the repository root (replace the placeholder with your path)
 Set-Location <FreeformHelper repo 路徑>
 
-# 2) 打包單檔 EXE（預設 win-x64、Release）
+# 2) Package a single-file EXE (win-x64 and Release by default)
 ./scripts/build/publish-exe-single-file.ps1
 
-# 3) 檢查產物
+# 3) Check the output
 Get-Item .\build\publish\win-x64\single-file\FreeformHelper.UI.exe
 
-# 4) 直接執行
+# 4) Run it directly
 .\build\publish\win-x64\single-file\FreeformHelper.UI.exe
 ```
 
-常用變體（ARM64）：
+Common variant (ARM64):
 
 ```powershell
 ./scripts/build/publish-exe-single-file.ps1 -Runtime win-arm64
 ```
 
-## 3. 傻瓜模式：打包「資料夾版 EXE」（整段複製貼上）
+## 3. Quick start: package a folder-based EXE (copy and paste the entire block)
 
-> 啟動通常更穩、除錯較容易（但檔案較多）。
+> Startup is usually more reliable and debugging is easier, at the cost of more files.
 
 ```powershell
 Set-Location <FreeformHelper repo 路徑>
@@ -64,97 +66,97 @@ Get-Item .\build\publish\win-x64\folder\FreeformHelper.UI.exe
 .\build\publish\win-x64\folder\FreeformHelper.UI.exe
 ```
 
-## 4. 第一次使用建議流程（UI）
+## 4. Recommended workflow for first use (UI)
 
 1. `File -> Open DXF`
-2. 左側確認 layer 可見性與 overlap 檢查
-3. 右側調整 Grid / Scan order / Alignment
-4. 執行 `Match`，查看 mapping 摘要與報告
-5. 視需要標記 freeform，最後匯出 Notch / DXF
-6. `Save Project` 存成 JSON，後續可 `Load Project`
+2. Check layer visibility and overlap on the left.
+3. Adjust Grid / Scan order / Alignment on the right.
+4. Run `Match` and inspect the mapping summary and report.
+5. Mark freeform pads as needed, then export Notch / DXF.
+6. Use `Save Project` to save JSON for a later `Load Project`.
 
-## 5. Runtime CLI（進階，可跳過）
+## 5. Runtime CLI (advanced; optional)
 
-UI 啟動後，可在另一個 terminal 查詢執行中狀態。
+After launching the UI, query its runtime state from another terminal.
 
 ```powershell
-# 列出命令
+# List commands
 dotnet run --project src/FreeformHelper.UI/FreeformHelper.UI.csproj -- query help
 
-# 狀態
+# Query status
 dotnet run --project src/FreeformHelper.UI/FreeformHelper.UI.csproj -- query status
 
-# 載入 project
+# Load a project
 dotnet run --project src/FreeformHelper.UI/FreeformHelper.UI.csproj -- query load-project --path example/BOE36.35/project_3635.json
 
-# 跑 Step1~3
+# Run Steps 1–3
 dotnet run --project src/FreeformHelper.UI/FreeformHelper.UI.csproj -- query run-step --step 1 --timeout-ms 120000
 dotnet run --project src/FreeformHelper.UI/FreeformHelper.UI.csproj -- query run-step --step 2 --timeout-ms 120000
 dotnet run --project src/FreeformHelper.UI/FreeformHelper.UI.csproj -- query run-step --step 3
 ```
 
-完整 CLI 請看：`docs/reference/runtime-cli-plan.md`
+For the complete CLI reference, see `docs/reference/runtime-cli-plan.md`.
 
-## 6. 常見問題
+## 6. Frequently asked questions
 
 - `MSB3027` / `file is being used by another process`
-  - 先關閉正在執行的 `FreeformHelper.UI.exe` 再 build/publish。
+  - Close the running `FreeformHelper.UI.exe` before building or publishing.
 - `INSTANCE_NOT_RUNNING`
-  - 代表目前沒有執行中的 UI instance（先開 UI）。
-- 匯出 Notch 失敗
-  - 先確認 DXF 已載入、grid 已建立、match 已執行。
-- 問到 `To Regular` 演算法時
-  - 先看 `docs/reference/notch-system-reference.md`。beta0.9 起，`ToRegularRatio = Σ(overlapArea / targetRegularArea)` 是 CAD-level 診斷值；Gain / No Gain 的 v2.2 row payload 改用 per-target regular coverage，不再把整顆 CAD 的 `R` 當 source-wide gain 乘到每個 target share。
+  - No UI instance is running; launch the UI first.
+- Notch export fails
+  - Confirm that a DXF is loaded, the grid is created, and matching has run.
+- Questions about the `To Regular` algorithm
+  - Read `docs/reference/notch-system-reference.md` first. Since beta0.9, `ToRegularRatio = Σ(overlapArea / targetRegularArea)` is a CAD-level diagnostic value. The Gain / No Gain v2.2 row payload uses per-target regular coverage rather than applying the whole CAD's `R` as a source-wide gain to every target share.
 
-## 6.1 範例資料（private submodule）
+## 6.1 Example data (private submodule)
 
-`example/` 是 git submodule，指向 private repo `FreeformHelper-testdata`（客戶面板 CAD、IC mapping，以及由它們產生的 project JSON 與韌體 C 匯出）。沒有該 repo 權限也能 build 與執行 UI。
+`example/` is a Git submodule pointing to the private repository `FreeformHelper-testdata` (customer-panel CAD, IC mapping, and the project JSON and firmware C exports generated from them). You can build and run the UI without access to that repository.
 
 ```powershell
-# 有權限：clone 後或新建 worktree 後抓資料
+# With access: fetch the data after cloning or creating a worktree
 git submodule update --init example
 ```
 
-- 沒有資料時，讀取 `example/` 的測試會標示為略過（Skipped），不會失敗。
-- 直接執行 `dotnet test` 時是略過；透過 repo 腳本（`run-tests.ps1`、`run-refactor-gate.ps1`、`run-pre-push-gate.ps1`、`verify.ps1` 的 test lane、`build.ps1`）執行時預設要求資料存在，沒有權限時加 `-AllowMissingExampleData`。即使加了這個參數，只要資料存在就仍會檢查。
-- 修改資料要在 `example/` 內 commit 並 push 到資料 repo，再回到本 repo commit 新的 submodule 指標。gate 會檢查 `example/` 是否正好在本 repo 釘住的 commit 且沒有未提交的變更。
-- 兩份 Notch golden snapshot 位於 `example/golden-snapshots/`。設定 `FREEFORMHELPER_UPDATE_NOTCH_BASELINE=1` 或 `FREEFORMHELPER_UPDATE_TM81_NOTCH_MATRIX=1` 會直接更新資料 repo checkout 中的對應檔案；維護者須先在 `FreeformHelper-testdata` commit 並 push，再更新本 repo 的 submodule 指標，否則 `assert-example-data.ps1` 會拒絕未提交的 `example/` 變更。
+- When the data is absent, tests that read `example/` are marked Skipped rather than failing.
+- Direct `dotnet test` skips those tests. Repository scripts (`run-tests.ps1`, `run-refactor-gate.ps1`, `run-pre-push-gate.ps1`, the test lane of `verify.ps1`, and `build.ps1`) require the data by default; add `-AllowMissingExampleData` when you do not have access. Even with that option, data is still checked whenever it is present.
+- Commit data changes inside `example/` and push them to the data repository, then return to this repository and commit the new submodule pointer. The gate checks that `example/` is exactly at the pinned commit and has no uncommitted changes.
+- The two Notch golden snapshots are in `example/golden-snapshots/`. Setting `FREEFORMHELPER_UPDATE_NOTCH_BASELINE=1` or `FREEFORMHELPER_UPDATE_TM81_NOTCH_MATRIX=1` directly updates the corresponding file in the data-repository checkout. Maintainers must commit and push in `FreeformHelper-testdata` before updating this repository's submodule pointer; otherwise, `assert-example-data.ps1` rejects uncommitted `example/` changes.
 - Before switching to a historical branch that predates the `example/` submodule and still stores it as an ordinary directory, run `git submodule deinit -f example` to avoid Git refusing the switch because files already exist in that directory.
 
-## 7. 主要路徑
+## 7. Main paths
 
-- 專案檔：`*.json`（預設 `freeform_helper_project.json`）
-- logs：`logs/app.log`
-- 建置與產物：`build/`
+- Project files: `*.json` (default: `freeform_helper_project.json`)
+- Logs: `logs/app.log`
+- Build files and outputs: `build/`
 
-## 8. 專案結構
+## 8. Project structure
 
-- `src/FreeformHelper.Domain`：幾何與 pad domain model
-- `src/FreeformHelper.Application`：grid/match/notch 演算法與設定模型
-- `src/FreeformHelper.Infrastructure`：DXF 匯入、project JSON store、migration
-- `src/FreeformHelper.UI`：Avalonia UI（View/ViewModel/Controls/Styles）
-- `tests/FreeformHelper.Tests`：單元測試與 headless UI 測試
-- `docs/`：規格與行為盤點文件
+- `src/FreeformHelper.Domain`: geometry and pad domain models
+- `src/FreeformHelper.Application`: grid/match/notch algorithms and settings models
+- `src/FreeformHelper.Infrastructure`: DXF import, project JSON store, and migration
+- `src/FreeformHelper.UI`: Avalonia UI (View/ViewModel/Controls/Styles)
+- `tests/FreeformHelper.Tests`: unit tests and headless UI tests
+- `docs/`: specifications and behavior inventories
 
-## 9. 延伸文件
+## 9. Further documentation
 
-- 文件導覽：`docs/README.md`
-- Notch canonical reference：`docs/reference/notch-system-reference.md`
-- 主演算法文件：`docs/core/freeform-helper-algorithms.md`
-- Notch V21：`docs/core/notch-v21-algorithm.md`
-- Notch V22：`docs/core/notch-v22-algorithm.md`
-- Notch 流程圖：`docs/core/notch-v21-v22-flow.md`
-- 目前 C export example：`example/BOE36.35/notch_export_v21_current.c` / `example/BOE36.35/notch_export_v22_current.c`
-- 使用手冊：`docs/guides/app-user-manual.md`
-- 開發待辦：`TODO.md`
-- 腳本總覽：`scripts/README.md`
+- Documentation index: `docs/README.md`
+- Notch canonical reference: `docs/reference/notch-system-reference.md`
+- Main algorithm document: `docs/core/freeform-helper-algorithms.md`
+- Notch V21: `docs/core/notch-v21-algorithm.md`
+- Notch V22: `docs/core/notch-v22-algorithm.md`
+- Notch flowchart: `docs/core/notch-v21-v22-flow.md`
+- Current C export examples: `example/BOE36.35/notch_export_v21_current.c` / `example/BOE36.35/notch_export_v22_current.c`
+- User manual: `docs/guides/app-user-manual.md`
+- Development backlog: `TODO.md`
+- Script overview: `scripts/README.md`
 
-## 10. 重構 Gate（開發者）
+## 10. Refactor gate (developers)
 
 ```powershell
-# 固定 gate（lint + build + 全部測試分組：notch-core/application/infrastructure/ui-core/ui-snapshots/uncategorized）
+# Standard gate (lint + build + all test groups: notch-core/application/infrastructure/ui-core/ui-snapshots/uncategorized)
 ./scripts/tests/run-refactor-gate.ps1 -UseNoAppHost
 
-# 沒有 example/ 資料權限時
+# Without access to example/ data
 ./scripts/tests/run-refactor-gate.ps1 -UseNoAppHost -AllowMissingExampleData
 ```
