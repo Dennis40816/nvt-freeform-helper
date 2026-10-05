@@ -1,68 +1,68 @@
-# Notch V22 演算法細節
+# Notch V22 Algorithm Details
 
 > Canonical reference：[`docs/reference/notch-system-reference.md`](../reference/notch-system-reference.md)
-> 本檔保留 v2.2 演算法 deep-dive；流程真值與 export 契約以 canonical reference 為準。
+> This file retains the v2.2 algorithm deep-dive; the canonical reference governs flow truth and export contracts.
 
-最後更新：2026-08-08
+Last updated: 2026-08-08
 
-`V22` 在 repo 裡有兩條關聯但不同層級的實作：
+`V22` has two related implementations at different levels in the repo:
 
-1. 主線：
+1. Main path:
 - `NotchV22CompensationService`
 - `NotchV22TargetAllocationService`
 - `NotchTableGenerator.Generation.V22`
-- 這是 Step3 / Step5 真正的 `v2.2` 主路徑
+- This is the actual `v2.2` main path for Step3 / Step5
 
-2. 相容：
+2. Compatibility:
 - `V22LegacyRowStrategy`
-- 這是 legacy 9 欄相容 row，不是 Step5 主輸出
+- This is a legacy 9-column compatibility row, not the Step5 main output
 
-本文件先講主線，再講 legacy 相容支線。
+This document covers the main path first, then the legacy compatibility branch.
 
-## 1. 主線入口
+## 1. Main Path Entry Points
 
 - `src/FreeformHelper.Application/Services/NotchV22CompensationService.cs`
 - `src/FreeformHelper.Application/Services/NotchV22TargetAllocationService.cs`
 - `src/FreeformHelper.Application/Services/NotchTableGenerator.Generation.V22.cs`
 - `src/FreeformHelper.Domain/Notch/NotchV22Node.cs`
 
-## 2. 主線的三個核心比例
+## 2. Three Core Ratios in the Main Path
 
 ### 2.1 `ToRegular`
-- 來源：CAD 與所有 overlapped regular 的面積關係
-- 比率：`sum(overlapArea / regularArea)`
-- 注意：這是診斷用的 CAD-level 面積覆蓋總量，不應再被視為 source-wide gain 乘到所有 target share。
-- 實際 v2.2 row 使用 per-target regular coverage：
+- Source: the area relationship between the CAD and all overlapped regulars
+- Ratio: `sum(overlapArea / regularArea)`
+- Note: this is a diagnostic CAD-level total area coverage and should no longer be treated as a source-wide gain multiplied into all target shares.
+- Actual v2.2 rows use per-target regular coverage:
   - No Gain：`overlapAreaOnTarget / targetRegularArea`
   - Gain：`stage3EffectiveAreaOnTarget / targetRegularArea`
 
 ### 2.2 `ToFull`
-- 來源：Stage3 補償後最終面積 / CAD 原始面積
-- 必須先通過 rule gate，才會真的展開
+- Source: final area after Stage3 compensation / original CAD area
+- Expansion occurs only after passing the rule gate
 
 ### 2.3 `Combine`
-- beta0.9 後的主線公式：
+- Main path formula after beta0.9:
 
 ```text
 CombinePercent = retainedCoveragePercent + Σ(targetLegCoveragePercent)
 ```
 
-- `Current (Gain)`：coverage 來自 `stage3EffectiveAreaOnTarget / targetRegularArea`
-- `Conservative (No Gain)`：coverage 來自 `overlapAreaOnTarget / targetRegularArea`
-- `R` / `F` 仍保留在 diagnostics/comment 中，但不再先合成 source-wide gain 後二次分配。
+- `Current (Gain)`: coverage comes from `stage3EffectiveAreaOnTarget / targetRegularArea`
+- `Conservative (No Gain)`: coverage comes from `overlapAreaOnTarget / targetRegularArea`
+- `R` / `F` remain in diagnostics/comment, but are no longer combined into a source-wide gain and then redistributed.
 
-例子：3635 的 `CAD4818` 覆蓋 `REG384/FW1472` 約 `98.6%`，覆蓋 `REG385/FW1473` 約 `58.8%`，因此 diagnostic `R≈157.4%`。v2.2 row 不會把 `R` 乘回 target share；No Gain row 應輸出 `diff1472 leg≈99%`、`diff1473 retained≈59%`、`C≈158%`。目前 `example/BOE36.35/notch_export_v22_current.c` 對應 row 為 `{ 1473, 158, 1472, 99, ... }`，`NODE KEEP=59% MOVE=99%`。
+Example: in 3635, `CAD4818` covers `REG384/FW1472` by approximately `98.6%` and `REG385/FW1473` by approximately `58.8%`, giving diagnostic `R≈157.4%`. The v2.2 row does not multiply `R` back into target shares; the No Gain row should output `diff1472 leg≈99%`, `diff1473 retained≈59%`, and `C≈158%`. The corresponding row in the current `example/BOE36.35/notch_export_v22_current.c` is `{ 1473, 158, 1472, 99, ... }`, with `NODE KEEP=59% MOVE=99%`.
 
-## 3. `ToFull` 的 gate
+## 3. `ToFull` Gates
 
-每顆 overlapped regular 都會被評估：
+Each overlapped regular is evaluated for:
 - boundary candidate？
-- source area 足夠？
+- Sufficient source area?
 - multi-owner？
 - blocker？
 - really has expansion？
 
-常見 gate code：
+Common gate codes:
 - `GATE_TOFULL_DISABLED`
 - `GATE_NOT_BOUNDARY`
 - `GATE_SOURCE_EMPTY`
@@ -70,44 +70,44 @@ CombinePercent = retainedCoveragePercent + Σ(targetLegCoveragePercent)
 - `NO_EXPANSION_NEEDED`
 - `EXPAND_CLEAR_PATH`
 
-規則引擎：
+Rule engine:
 - `src/FreeformHelper.Application/Services/NotchToFullRuleEngine.cs`
 
 ## 4. Stage1 / Stage2 / Stage3
 
 ### 4.1 Stage1
 - seed overlap
-- CAD 真正與 regular 重疊的區域
+- The area where the CAD actually overlaps the regular
 
 ### 4.2 Stage2
 - candidate regular boundary
-- 可考慮擴張的 regular 候選
+- A candidate regular for possible expansion
 
 ### 4.3 Stage3
 - final to-full result
-- 真正套用後的 union / outline
+- The union / outline after actual application
 
-UI、RuntimeQuery、Inspector 都必須讀同一份 resolved result，不得自己再推。
+UI, RuntimeQuery, and Inspector must all read the same resolved result and must not derive it independently.
 
 ## 5. Target allocation
 
-`V22` 主輸出不是只看 anchor 自己，還會算 target legs。
+The `V22` main output considers not only the anchor itself but also calculates target legs.
 
-target allocation 規則：
-- 以 `(IC, Diff)` 分桶
-- 排除 anchor diff
-- 過 strict threshold
-- 形成 `target diff + ratio`
-- `Current (Gain)`：target leg 直接使用 Stage3 target coverage，不再使用 `CombinePercent * share`。
-- `Conservative (No Gain)`：target leg 直接使用 source-overlap target coverage，ToFull 只作 support/cap/allowance。
-- 若單一 target coverage 超過 `100%`，必要時拆成多個 <=100% chunk。
+Target allocation rules:
+- Bucket by `(IC, Diff)`
+- Exclude the anchor diff
+- Pass the strict threshold
+- Form `target diff + ratio`
+- `Current (Gain)`: target legs directly use Stage3 target coverage, no longer `CombinePercent * share`.
+- `Conservative (No Gain)`: target legs directly use source-overlap target coverage; ToFull serves only as support/cap/allowance.
+- If a single target coverage exceeds `100%`, split it into multiple <=100% chunks when necessary.
 
-主服務：
+Main service:
 - `src/FreeformHelper.Application/Services/NotchV22TargetAllocationService.cs`
 
-## 6. `NotchV22Node` 7 欄
+## 6. `NotchV22Node` 7 Columns
 
-主輸出 payload：
+Main output payload:
 
 1. `AnchorDiffIndex`
 2. `CombinePercent`
@@ -119,41 +119,41 @@ target allocation 規則：
 
 ### 6.1 continuation row
 
-若一個 anchor 有超過兩個 target legs：
-- 第一列保留真實 `CombinePercent`
-- 續列固定 `CombinePercent = 100`
-- `Flags` 打 continuation bit
+If an anchor has more than two target legs:
+- The first row retains the actual `CombinePercent`
+- Continuation rows use a fixed `CombinePercent = 100`
+- Set the continuation bit in `Flags`
 
-## 7. `V22LegacyRowStrategy` 相容支線
+## 7. `V22LegacyRowStrategy` Compatibility Branch
 
-檔案：
+File:
 - `src/FreeformHelper.Application/Services/NotchAlgorithms/V22LegacyRowStrategy.cs`
 
-這支的用途是：
-- 提供 legacy 9 欄相容表示
-- 不是 Step5 主匯出 payload
+Its purpose is to:
+- Provide a legacy 9-column compatibility representation
+- It is not the Step5 main export payload
 
-一般 production flow 中，公開 `Generate` 只有 `LegacyRegularAnchor` 會呼叫它的 `Build`，所以正常 row
-使用 legacy 9 欄幾何估算；`CadAllocation` canonical 路徑直接走共同 compensation／allocation pipeline。
-但 `Generate` 在 mode dispatch 後會同步呼叫 caller 提供的 `IProgress.Report`，callback 可修改同一份
-mutable settings，讓 `Build` 重新讀到 CadAllocation。R13.004f 因此保留 compensation branch、comment
-與 `allCadPads`，不把「正常流程不用」誤判成 public API 下的不可達。
+In the normal production flow, in public `Generate`, only `LegacyRegularAnchor` calls its `Build`, so normal rows
+use the legacy 9-column geometry estimate; the `CadAllocation` canonical path directly uses the shared compensation/allocation pipeline.
+However, after mode dispatch, `Generate` synchronously calls the caller-supplied `IProgress.Report`; the callback can modify the same
+mutable settings, allowing `Build` to read CadAllocation again. R13.004f therefore retains the compensation branch, comment,
+and `allCadPads`, rather than mistaking "unused in the normal flow" for unreachable under the public API.
 
-此 strategy 的 `CanHandle` 仍被 CadAllocation eligibility 查詢共用，但 eligibility 不會呼叫 `Build`；
-這個跨模式 seam 與 generation input immutability 留給 R13.101～R13.103 收斂，不應被誤認為 canonical
+This strategy's `CanHandle` is still shared by CadAllocation eligibility queries, but eligibility does not call `Build`;
+this cross-mode seam and generation input immutability are left for R13.101～R13.103 to converge and should not be mistaken for canonical
 V2.2 ownership。
 
-## 8. 修改時要守的契約
+## 8. Contracts to Preserve When Making Changes
 
-1. `Combine` 一律從 per-target regular coverage sum 得出
-- UI / export / simulation 不能各算各的。
-- `ToRegular * ToFull` 只保留為 CAD-level 診斷概念，不可再反推成 row payload。
+1. `Combine` always comes from the per-target regular coverage sum
+- UI / export / simulation must not calculate it independently.
+- `ToRegular * ToFull` remains only a CAD-level diagnostic concept and must not be used to derive the row payload.
 
-2. Stage overlay 只是顯示投影
-- 不得反向成為 business truth。
+2. Stage overlays are only display projections
+- They must not feed back as business truth.
 
-3. `NotchV22Node` 是 Step5 主輸出單一來源
-- legacy 9 欄只作相容，不是主路徑。
+3. `NotchV22Node` is the single source of the Step5 main output
+- The legacy 9-column format is only for compatibility, not the main path.
 
-更細的 Stage / UI 契約：
+More detailed Stage / UI contracts:
 - `docs/core/notch-2.2-spec.md`

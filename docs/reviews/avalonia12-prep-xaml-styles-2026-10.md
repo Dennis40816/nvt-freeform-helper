@@ -1,20 +1,20 @@
-# Avalonia 12 升級準備：XAML、樣式與視覺基線盤點（2026-10）
+# Avalonia 12 upgrade preparation: XAML, styles, and visual baseline inventory (2026-10)
 
-## 狀態與計數範圍
+## Status and counting scope
 
-本文件僅盤點升級接觸面，**沒有執行 Avalonia 11 → 12 升級**。[TODO.md](../../TODO.md) 的版本決策將升級排在 **1.3.5 之前**，目前不執行；[Directory.Packages.props](../../Directory.Packages.props) 中 Avalonia、Desktop、Fluent、Inter、Headless 與 Headless.XUnit 仍為 **11.3.12**。AvaloniaEdit 是另行定版的 11.4.1，不應混稱為核心版本。
+This document only inventories upgrade touchpoints; **no Avalonia 11 → 12 upgrade has been performed**. The version decision in [TODO.md](../../TODO.md) schedules the upgrade **before 1.3.5**; it is not being performed now. Avalonia, Desktop, Fluent, Inter, Headless, and Headless.XUnit in [Directory.Packages.props](../../Directory.Packages.props) remain at **11.3.12**. AvaloniaEdit is separately pinned to 11.4.1 and should not be conflated with the core version.
 
-盤點基準為 `7477b07d`，限於 `src/FreeformHelper.UI/**/*.axaml`、相關測試及其公開基線。依賴關係已對照 [project-dependency-graph.md](../generated/project-dependency-graph.md) 與目前 ProjectReference，沒有需要重建的差異。未讀取私有 example 資料。沙箱無網路，未取得 Avalonia 12 官方遷移指南；以下風險是依本庫的耦合程度排序，**不是 Avalonia 12 已確認的 breaking changes**。涉及新版行為的判斷一律為「**待對照官方遷移指南確認（to check against the official migration guide）**」。
+The inventory baseline is `7477b07d`, limited to `src/FreeformHelper.UI/**/*.axaml`, related tests, and their public baselines. Dependencies have been checked against [project-dependency-graph.md](../generated/project-dependency-graph.md) and the current ProjectReference entries, with no differences requiring regeneration. No private example data was read. The sandbox has no network access, so the official Avalonia 12 migration guide was not obtained; the risks below are ranked by coupling in this repository, **not confirmed Avalonia 12 breaking changes**. All judgments involving new-version behavior are marked “**pending confirmation against the official migration guide (to check against the official migration guide)**”.
 
-計數以 XML 元素及屬性值為準，排除註解：共 **69 份 AXAML**（根目錄 2、Styles 12、Controls 4、Views 51），**607 個 `<Style Selector>`**、**0 個 `<ControlTheme>`**、**8 個 `<ControlTemplate>`**、**70 個 `<DataTemplate>`**。逗號分隔的 selector 算同一個 Style；一個 selector 同時包含多種控制項或語法時，各分類會重複計入，不能相加當總數。資源／binding 數字是 markup extension 的出現次數，不是不同 key／path 的數量。
+Counts are based on XML elements and attribute values, excluding comments: **69 AXAML files** in total (root 2, Styles 12, Controls 4, Views 51), **607 `<Style Selector>` elements**, **0 `<ControlTheme>` elements**, **8 `<ControlTemplate>` elements**, and **70 `<DataTemplate>` elements**. Comma-separated selectors count as one Style; when a selector contains multiple control types or syntax forms, it is counted in each category, so categories cannot be added to obtain the total. Resource/binding counts are occurrences of markup extensions, not counts of distinct keys/paths.
 
-## 樣式系統與 selector 接觸面
+## Style system and selector touchpoints
 
-[App.axaml](../../src/FreeformHelper.UI/App.axaml) 預設 Dark；Application.Resources 合併 Tokens，Application.Styles 依序載入 FluentTheme、AvaloniaEdit Fluent 主題、Icons、Controls。[Controls.axaml](../../src/FreeformHelper.UI/Styles/Controls.axaml) 再依 **Core → Overlay → Tab → Form → Panel → Scroll → Settings → PadInfo → Action** 載入 9 份檔案。順序及 selector 優先權是既有外觀契約；升級時須核對主題與覆寫的生效順序。
+[App.axaml](../../src/FreeformHelper.UI/App.axaml) defaults to Dark; Application.Resources merges Tokens, and Application.Styles loads FluentTheme, the AvaloniaEdit Fluent theme, Icons, and Controls in that order. [Controls.axaml](../../src/FreeformHelper.UI/Styles/Controls.axaml) then loads 9 files in the order **Core → Overlay → Tab → Form → Panel → Scroll → Settings → PadInfo → Action**. The order and selector precedence are existing appearance contracts; the effective order of themes and overrides must be checked during the upgrade.
 
-Styles 目錄共 **577 個 selector、7 個 ControlTemplate**；以下列出全部 12 份檔案。`/template/` 欄計含此語法的 selector 數，單一 selector 可跨兩層 template。
+The Styles directory has **577 selectors and 7 ControlTemplate elements**; all 12 files are listed below. The `/template/` column counts selectors containing this syntax; a single selector can cross two template levels.
 
-| 檔案（Styles/） | Selector | ControlTemplate | `:pointerover` | `/template/` | DynamicResource | StaticResource |
+| File (Styles/) | Selector | ControlTemplate | `:pointerover` | `/template/` | DynamicResource | StaticResource |
 |---|---:|---:|---:|---:|---:|---:|
 | [Controls.axaml](../../src/FreeformHelper.UI/Styles/Controls.axaml) | 0 | 0 | 0 | 0 | 0 | 0 |
 | [Controls.Core.axaml](../../src/FreeformHelper.UI/Styles/Controls.Core.axaml) | 179 | 0 | 19 | 0 | 239 | 162 |
@@ -28,122 +28,122 @@ Styles 目錄共 **577 個 selector、7 個 ControlTemplate**；以下列出全�
 | [Controls.Action.axaml](../../src/FreeformHelper.UI/Styles/Controls.Action.axaml) | 118 | 4 | 32 | 0 | 286 | 34 |
 | [Icons.axaml](../../src/FreeformHelper.UI/Styles/Icons.axaml) | 4 | 0 | 0 | 0 | 5 | 1 |
 | [Tokens.axaml](../../src/FreeformHelper.UI/Styles/Tokens.axaml) | 0 | 0 | 0 | 0 | 161 | 0 |
-| **合計** | **577** | **7** | **93** | **46** | **999** | **475** |
+| **Total** | **577** | **7** | **93** | **46** | **999** | **475** |
 
-Styles 以外另有 **30 個 selector**：[WorkspaceHeader.axaml](../../src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml) 的 UserControl.Styles 有 29 個，[CadLoadSpinnerWindow.axaml](../../src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml) 的 Window.Styles 有 1 個。這是局部樣式範圍，不等同於 Style 內嵌套 Style。
+There are another **30 selectors** outside Styles: 29 in UserControl.Styles in [WorkspaceHeader.axaml](../../src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml), and 1 in Window.Styles in [CadLoadSpinnerWindow.axaml](../../src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml). These are local style scopes, which are not equivalent to Styles nested inside a Style.
 
-| 語法／結構 | 全部 AXAML 數量 | 具體參照與升級核對點 |
+| Syntax/structure | Count across all AXAML | Specific references and upgrade checks |
 |---|---:|---|
-| `:pointerover` | 93 個 selector | Action 的語意角色與 Core 的一般按鈕；核對 hover／disabled 的生效優先權。 |
-| 其他 pseudo-class | `:pressed` 59、`:checked` 37、`:disabled` 20、`:focus` 19、`:selected` 2 | [Controls.Tab.axaml](../../src/FreeformHelper.UI/Styles/Controls.Tab.axaml) 的 `ToggleButton.shellTab:pointerover`、`:checked`，以及 Action 的組合狀態；分類有交集。 |
-| `/template/` | 47 個 selector | Scroll 42、Form 3、Overlay 1、WorkspaceHeader 1；最直接依賴內建範本樹。 |
-| `^`、`>` | 各 0 個 selector | 目前未用 nesting anchor 或直接子節點組合符；只計 Selector 屬性，沒有把 XML 的 `>` 算入。 |
-| 巢狀 Style／ControlTheme 內 Style | 0 | 目前是平坦 Style；若新版遷移要求改成 nesting，既有字串 guards 的解析假設也須核對。 |
-| 類別、逗號聯集、後代與屬性條件 | 已使用 | `Button.actionButton, ToggleButton.actionButton`、`ToolTip TextBlock`、`primitives|ScrollBar[Orientation=Vertical]`；含命名空間型別與 `#PART_*` 名稱。 |
+| `:pointerover` | 93 selectors | Action semantic roles and Core general buttons; check hover/disabled precedence. |
+| Other pseudo-classes | `:pressed` 59, `:checked` 37, `:disabled` 20, `:focus` 19, `:selected` 2 | `ToggleButton.shellTab:pointerover` and `:checked` in [Controls.Tab.axaml](../../src/FreeformHelper.UI/Styles/Controls.Tab.axaml), and combined states in Action; the categories overlap. |
+| `/template/` | 47 selectors | Scroll 42, Form 3, Overlay 1, WorkspaceHeader 1; the most direct dependency on built-in template trees. |
+| `^`, `>` | 0 selectors each | No nesting anchors or direct-child combinators are currently used; only Selector attributes are counted, excluding XML `>` characters. |
+| Nested Styles/Styles inside ControlTheme | 0 | Styles are currently flat; if migration to the new version requires nesting, the parsing assumptions of existing string guards must also be checked. |
+| Classes, comma unions, descendants, and attribute conditions | In use | `Button.actionButton, ToggleButton.actionButton`, `ToolTip TextBlock`, `primitives|ScrollBar[Orientation=Vertical]`; includes namespaced types and `#PART_*` names. |
 
-**最高優先核對**：[Controls.Scroll.axaml:63](../../src/FreeformHelper.UI/Styles/Controls.Scroll.axaml#L63) 起隱藏四個 `PART_LineUpButton`／`Down`／`Left`／`Right`；全檔共 **8 個含 `#PART_*` 的 selector**，另一組位於 scrollDevCandidate。該檔也使用 `ScrollViewer /template/ ScrollBar /template/ RepeatButton` 與 `ListBox /template/ ScrollViewer /template/ ScrollBar` 的兩層穿透。Form 的 [ComboBox Popup 與 ContentPresenter](../../src/FreeformHelper.UI/Styles/Controls.Form.axaml#L138)、Overlay 的 [ToolTip ContentPresenter](../../src/FreeformHelper.UI/Styles/Controls.Overlay.axaml#L51)，以及 WorkspaceHeader 的 Thumb 範本穿透也依賴上游結構。這些名稱、樹形及 selector 規則皆待對照官方遷移指南確認。
+**Highest-priority check**: starting at [Controls.Scroll.axaml:63](../../src/FreeformHelper.UI/Styles/Controls.Scroll.axaml#L63), the four `PART_LineUpButton`/`Down`/`Left`/`Right` buttons are hidden; the file has **8 selectors containing `#PART_*`** in total, with the other set in scrollDevCandidate. The file also uses two-level traversal through `ScrollViewer /template/ ScrollBar /template/ RepeatButton` and `ListBox /template/ ScrollViewer /template/ ScrollBar`. The [ComboBox Popup and ContentPresenter](../../src/FreeformHelper.UI/Styles/Controls.Form.axaml#L138) in Form, the [ToolTip ContentPresenter](../../src/FreeformHelper.UI/Styles/Controls.Overlay.axaml#L51) in Overlay, and the Thumb template traversal in WorkspaceHeader also depend on upstream structure. These names, tree structures, and selector rules all await confirmation against the official migration guide.
 
-## 內建控制項：完整範本替換與局部樣式覆寫
+## Built-in controls: full template replacements and local style overrides
 
-本庫 **沒有 ControlTheme、沒有其 BasedOn 繼承鏈**。目前的替換方式是 `Style → Setter Property="Template" → ControlTemplate`，不可將所有 Style 都當作完整範本替換。下表的 selector 數是全 69 份 AXAML 中含控制項型別名稱的 Style 數（含後代目標）。
+This repository has **no ControlTheme and no BasedOn inheritance chain for it**. The current replacement mechanism is `Style → Setter Property="Template" → ControlTemplate`; not every Style should be treated as a full template replacement. The selector counts below are the counts of Styles containing the control type name across all 69 AXAML files (including descendant targets).
 
-| 內建控制項 | Selector 數 | 完整範本替換數 | 現況與優先程度 |
+| Built-in control | Selector count | Full template replacement count | Current state and priority |
 |---|---:|---:|---|
-| Button | 173 | 2 | **高**：[Action:32、81](../../src/FreeformHelper.UI/Styles/Controls.Action.axaml#L32) 為 icon action 與一般 action／text／chip 提供 Border + ContentPresenter；另有大量狀態覆寫。 |
-| ToggleButton | 161 | 2 | **高**：[Action:51、100](../../src/FreeformHelper.UI/Styles/Controls.Action.axaml#L51) 同類替換；核對 checked／disabled 與 TemplateBinding 保持一致。 |
-| Window | 1 | 1 | **高**：[CadLoadSpinnerWindow:20](../../src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml#L20) 以 Panel + `PART_ContentPresenter` 替換無邊框透明視窗範本。 |
-| TextBox | 21 | 0 | **中**：Form／Settings／Panel／WorkspaceHeader 覆寫字型、尺寸、focus、numberScrubber 與 consoleSearch；沿用內建範本。 |
-| ComboBox | 16 | 0 | **高**：Form 的 regularLayerSelector 穿透 Popup／ContentPresenter，Popup 寬度綁 `$parent[ComboBox].Bounds.Width`；不是替換整個範本。 |
-| ToolTip | 3 | 0 | **高**：Overlay 覆寫本體、文字後代與 template 內 ContentPresenter；必須搭配 tooltip-open smoke。 |
-| ScrollViewer | 42 | 0 | **高**：Scroll 的 template／捲軸覆寫與 Viewport.Width binding；不是自製 ScrollViewer 範本。 |
-| ScrollBar／Thumb／RepeatButton | 54／20／9 | 各 0 | **高**：ScrollBar 型別含 `primitives|` 前綴；Thumb 另見 WorkspaceHeader、RepeatButton 另見 Form 的 NumericUpDown。 |
-| Expander | 0 | 0 | **中**：仍有 3 個實例，位於 [NotchExportSelectionWindow:527](../../src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml#L527)、[IndexMappingReportLeftPaneView:128](../../src/FreeformHelper.UI/Views/WorkspaceSections/IndexMappingReportLeftPaneView.axaml#L128)、[IndexMappingReportRightPaneView:212](../../src/FreeformHelper.UI/Views/WorkspaceSections/IndexMappingReportRightPaneView.axaml#L212)，沿用內建主題。 |
-| TabControl／TabItem | 0／1 | 各 0 | **低**：兩者 AXAML 實例皆 0；Form:209 的 TabItem 只有字型規則。Controls.Tab 實際主要樣式化 ToggleButton 導覽，不是 TabControl 範本。 |
-| DataGrid | 0 | 0 | **低**：AXAML 實例 0；此 XAML 盤點未發現其覆寫，不推論其他 C# 使用情形。 |
-| ListBox／ListBoxItem | 9／4 | 各 0 | **中至高**：Core 的列表與 item 狀態；Scroll 穿透 workspaceDataList 的捲動範本。 |
-| NumericUpDown／ToggleSwitch／CheckBox／MenuItem | 12／3／3／2 | 各 0 | **中**：Form／Settings 等局部覆寫；NumericUpDown 的內建 RepeatButton 穿透優先核對。 |
+| Button | 173 | 2 | **High**: [Action:32, 81](../../src/FreeformHelper.UI/Styles/Controls.Action.axaml#L32) provides Border + ContentPresenter for icon actions and general action/text/chip controls; there are also many state overrides. |
+| ToggleButton | 161 | 2 | **High**: [Action:51, 100](../../src/FreeformHelper.UI/Styles/Controls.Action.axaml#L51) uses the same type of replacement; check that checked/disabled states and TemplateBinding remain consistent. |
+| Window | 1 | 1 | **High**: [CadLoadSpinnerWindow:20](../../src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml#L20) replaces the borderless transparent window template with Panel + `PART_ContentPresenter`. |
+| TextBox | 21 | 0 | **Medium**: Form/Settings/Panel/WorkspaceHeader override fonts, sizes, focus, numberScrubber, and consoleSearch; they retain the built-in template. |
+| ComboBox | 16 | 0 | **High**: regularLayerSelector in Form traverses Popup/ContentPresenter, with Popup width bound to `$parent[ComboBox].Bounds.Width`; it does not replace the entire template. |
+| ToolTip | 3 | 0 | **High**: Overlay overrides the control itself, text descendants, and ContentPresenter inside the template; tooltip-open smoke must accompany it. |
+| ScrollViewer | 42 | 0 | **High**: template/scrollbar overrides and Viewport.Width binding in Scroll; this is not a custom ScrollViewer template. |
+| ScrollBar/Thumb/RepeatButton | 54/20/9 | 0 each | **High**: the ScrollBar type includes the `primitives|` prefix; Thumb also appears in WorkspaceHeader, and RepeatButton also appears in NumericUpDown in Form. |
+| Expander | 0 | 0 | **Medium**: 3 instances remain, in [NotchExportSelectionWindow:527](../../src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml#L527), [IndexMappingReportLeftPaneView:128](../../src/FreeformHelper.UI/Views/WorkspaceSections/IndexMappingReportLeftPaneView.axaml#L128), and [IndexMappingReportRightPaneView:212](../../src/FreeformHelper.UI/Views/WorkspaceSections/IndexMappingReportRightPaneView.axaml#L212), using the built-in theme. |
+| TabControl/TabItem | 0/1 | 0 each | **Low**: both have 0 AXAML instances; TabItem in Form:209 has only a font rule. Controls.Tab mainly styles ToggleButton navigation, not TabControl templates. |
+| DataGrid | 0 | 0 | **Low**: 0 AXAML instances; this XAML inventory found no overrides and makes no inference about other C# usage. |
+| ListBox/ListBoxItem | 9/4 | 0 each | **Medium to high**: list and item states in Core; Scroll traverses the scrolling template of workspaceDataList. |
+| NumericUpDown/ToggleSwitch/CheckBox/MenuItem | 12/3/3/2 | 0 each | **Medium**: local overrides in Form/Settings and elsewhere; prioritize checking traversal into NumericUpDown's built-in RepeatButton. |
 
-因此，**內建控制項完整替換合計 5 個**（Button 2、ToggleButton 2、Window 1）。另 **3 個**是本庫自訂控制項範本：[Controls.Panel:12](../../src/FreeformHelper.UI/Styles/Controls.Panel.axaml#L12) 的 HidePanelBlock、[Controls.Panel:55](../../src/FreeformHelper.UI/Styles/Controls.Panel.axaml#L55) 的 ReviewWorkspaceShell、[Controls.PadInfo:61](../../src/FreeformHelper.UI/Styles/Controls.PadInfo.axaml#L61) 的 PadInfoSectionFrame。它們依賴 TemplateBinding／TemplatedParent 等 XAML 行為，應列為中優先核對，但不是覆寫內建 Expander。全庫共有 **52 次 TemplateBinding**（Styles 51、spinner view 1）。以上新版相容性均待對照官方遷移指南確認。
+Thus, there are **5 full template replacements for built-in controls** (Button 2, ToggleButton 2, Window 1). Another **3** are templates for this repository's custom controls: HidePanelBlock in [Controls.Panel:12](../../src/FreeformHelper.UI/Styles/Controls.Panel.axaml#L12), ReviewWorkspaceShell in [Controls.Panel:55](../../src/FreeformHelper.UI/Styles/Controls.Panel.axaml#L55), and PadInfoSectionFrame in [Controls.PadInfo:61](../../src/FreeformHelper.UI/Styles/Controls.PadInfo.axaml#L61). They depend on XAML behavior such as TemplateBinding/TemplatedParent and should be medium-priority checks, but they do not override the built-in Expander. The repository has **52 TemplateBinding occurrences** in total (Styles 51, spinner view 1). All compatibility with the new version described above awaits confirmation against the official migration guide.
 
-## Binding 與資源慣例
+## Binding and resource conventions
 
-### Compiled bindings 與 x:DataType
+### Compiled bindings and x:DataType
 
-[UI.csproj](../../src/FreeformHelper.UI/FreeformHelper.UI.csproj) 與 [Directory.Build.props](../../Directory.Build.props) 未設定 `AvaloniaUseCompiledBindingsByDefault`；本機已還原 11.3.12 套件的 `buildTransitive/Avalonia.props:9` 預設為 false，`dotnet msbuild ... -getProperty:AvaloniaUseCompiledBindingsByDefault` 的實際評估也是 **false**。
+[UI.csproj](../../src/FreeformHelper.UI/FreeformHelper.UI.csproj) and [Directory.Build.props](../../Directory.Build.props) do not set `AvaloniaUseCompiledBindingsByDefault`; `buildTransitive/Avalonia.props:9` in the locally restored 11.3.12 package defaults to false, and the actual evaluation from `dotnet msbuild ... -getProperty:AvaloniaUseCompiledBindingsByDefault` is also **false**.
 
-- AXAML 內 **0 個 `x:CompileBindings`**、**0 次 `{CompiledBinding ...}`**、**0 次 `{ReflectionBinding ...}`**；一般 `{Binding ...}` 共 **1,526 次**（根目錄 12、Controls 41、Styles 17、Views 1,456）。這不是已全面使用 compiled bindings 的專案。
-- **2 個 `x:DataType`，集中在 1 份檔案**：[NotchExportColumnFilterWindow:5](../../src/FreeformHelper.UI/Views/NotchExportColumnFilterWindow.axaml#L5) 的視窗型別，以及 [同檔:81](../../src/FreeformHelper.UI/Views/NotchExportColumnFilterWindow.axaml#L81) 的 Option DataTemplate。宣告資料型別不等同於已啟用 compiled binding。
-- 全部 70 個 DataTemplate 中另有 **9 個普通 `DataType="{x:Type ...}"`**：MainWindow 5、PadInfoPopover 2、RightWorkflowInspectorView 2；它們是模板型別匹配，不能混算為 `x:DataType`。
-- **中優先核對**：一般 Binding 的 `$parent[...]`、RelativeSource／TemplatedParent、DataTemplate 資料範圍與預設編譯設定。是否需要改動，待對照官方遷移指南確認；本次不補型別、不切換 binding 模式。
+- AXAML contains **0 `x:CompileBindings` attributes**, **0 `{CompiledBinding ...}` occurrences**, and **0 `{ReflectionBinding ...}` occurrences**; ordinary `{Binding ...}` occurs **1,526 times** (root 12, Controls 41, Styles 17, Views 1,456). This project does not already use compiled bindings throughout.
+- **2 `x:DataType` attributes, concentrated in 1 file**: the window type at [NotchExportColumnFilterWindow:5](../../src/FreeformHelper.UI/Views/NotchExportColumnFilterWindow.axaml#L5), and the Option DataTemplate at [the same file:81](../../src/FreeformHelper.UI/Views/NotchExportColumnFilterWindow.axaml#L81). Declaring a data type does not mean compiled binding is enabled.
+- Across all 70 DataTemplate elements, there are also **9 ordinary `DataType="{x:Type ...}"` attributes**: MainWindow 5, PadInfoPopover 2, RightWorkflowInspectorView 2; these match template types and must not be counted as `x:DataType`.
+- **Medium-priority check**: `$parent[...]` in ordinary Binding, RelativeSource/TemplatedParent, DataTemplate data scope, and default compilation settings. Whether changes are needed awaits confirmation against the official migration guide; this task adds no types and does not switch binding modes.
 
-### Tokens、DynamicResource 與 StaticResource
+### Tokens, DynamicResource, and StaticResource
 
-[Tokens.axaml](../../src/FreeformHelper.UI/Styles/Tokens.axaml) 有 **Dark／Light 2 個 ThemeDictionary**，每個含 **176 個 Color + 1 個 BoxShadows**。共用層有 **540 個資源定義**：153 SolidColorBrush、2 LinearGradientBrush、270 Double、80 Thickness、12 CornerRadius、2 FontFamily、2 Decimal、19 GridLength。排除 Dark／Light 字典容器自身的 key 後，合計 **894 個定義、717 個不同 key**；兩個 theme 的相同 key 分別計定義。
+[Tokens.axaml](../../src/FreeformHelper.UI/Styles/Tokens.axaml) has **2 ThemeDictionary elements, Dark/Light**, each containing **176 Color + 1 BoxShadows**. The shared layer has **540 resource definitions**: 153 SolidColorBrush, 2 LinearGradientBrush, 270 Double, 80 Thickness, 12 CornerRadius, 2 FontFamily, 2 Decimal, and 19 GridLength. Excluding the keys of the Dark/Light dictionary containers themselves, there are **894 definitions and 717 distinct keys** in total; identical keys in the two themes count as separate definitions.
 
-| 範圍 | DynamicResource | StaticResource |
+| Scope | DynamicResource | StaticResource |
 |---|---:|---:|
 | App／MainWindow | 4 | 3 |
 | Controls | 32 | 83 |
-| Styles（含 Tokens） | 999 | 475 |
-| Views（含子目錄） | 343 | 1,118 |
-| **合計** | **1,378** | **1,679** |
+| Styles (including Tokens) | 999 | 475 |
+| Views (including subdirectories) | 343 | 1,118 |
+| **Total** | **1,378** | **1,679** |
 
-既有模式多以 DynamicResource 取得可切換主題的 brush／color，以 StaticResource 取得固定 spacing、厚度、圓角、字型與尺寸；並非所有 DynamicResource 都是顏色，例如 Action 的 IconSizeMd。Tokens 內 **161 次 DynamicResource** 接到顏色或其他主題資源。依 [AGENTS.md](../../AGENTS.md) 與 [ui-density-token-rules.md](../guides/ui-density-token-rules.md)，Views／Controls 不新增 inline 顏色或尺寸，新 UI resource 使用 token 與 DynamicResource 支援 theme。
+Existing patterns mostly use DynamicResource for brushes/colors that support theme switching, and StaticResource for fixed spacing, thickness, corner radii, fonts, and sizes; not every DynamicResource is a color, as illustrated by IconSizeMd in Action. The **161 DynamicResource occurrences** in Tokens refer to colors or other theme resources. Under [AGENTS.md](../../AGENTS.md) and [ui-density-token-rules.md](../guides/ui-density-token-rules.md), Views/Controls must not add inline colors or sizes, and new UI resources use tokens and DynamicResource for theme support.
 
-**中優先核對**：合併字典順序、ThemeDictionary 的查找／切換、DynamicResource 傳遞至 template 內容，以及 StaticResource 的解析時點。不要為升級預先把兩種寫法全面互換；新版是否改變上述機制，待對照官方遷移指南確認。
+**Medium-priority check**: merged dictionary order, ThemeDictionary lookup/switching, DynamicResource propagation into template content, and StaticResource resolution timing. Do not preemptively swap the two forms throughout the repository for the upgrade; whether the new version changes these mechanisms awaits confirmation against the official migration guide.
 
-## 靜態 guards 與視覺基線的涵蓋範圍
+## Coverage of static guards and visual baselines
 
-### 解析 XAML 的 guards
+### Guards that parse XAML
 
-[UiLayoutGuardTests.cs](../../tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs) 有 **16 個 Fact**，涵蓋 viewport bounded width、動態文字換行／省略、共用 action 與字型、tooltip／對比、input border、popover、inline color、快捷鍵及 canvas token。這些測試讀取來源文字；不是完整 Avalonia XAML 編譯器或渲染驗證。
+[UiLayoutGuardTests.cs](../../tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs) has **16 Facts**, covering viewport bounded width, dynamic text wrapping/ellipsis, shared actions and fonts, tooltips/contrast, input borders, popovers, inline colors, keyboard shortcuts, and canvas tokens. These tests read source text; they are not a full Avalonia XAML compiler or rendering verification.
 
-最直接的樣式 guard 是 [HoverAffordances_KeepContrastTooltipsAndInputBorderScope:467](../../tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs#L467)：它呼叫 [AssertNoStyleSetterCollisions:918](../../tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs#L918)，逐一掃 Styles 頂層 AXAML，檢查同一 Style 重複 Setter、Foreground 與附加 Foreground 衝突、disabled 狀態及 Dark／Light 對比（4.5）。另有 ComboBox Popup 契約（:549）、StylesOutsideTokens_DoNotUseInlineHexColors（:683）等。
+The most direct style guard is [HoverAffordances_KeepContrastTooltipsAndInputBorderScope:467](../../tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs#L467): it calls [AssertNoStyleSetterCollisions:918](../../tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs#L918), scans top-level AXAML files in Styles, and checks duplicate Setters within a Style, conflicts between Foreground and attached Foreground, disabled states, and Dark/Light contrast (4.5). Other checks include the ComboBox Popup contract (:549) and StylesOutsideTokens_DoNotUseInlineHexColors (:683).
 
-[ExtractStyleBlocks:1053](../../tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs#L1053) 用 Regex 擷取平坦的 `<Style Selector="...">...</Style>`；Setter、DynamicResource、Dark／Light 色碼及 brush mapping 也以 Regex／字串解析。**若未來改成 ControlTheme、Style nesting 或不同屬性順序／序列化形式，guards 可能需同步調整解析**，不能把格式造成的失敗直接當成新版 UI 缺陷，也不能以放寬斷言掩蓋行為差異。
+[ExtractStyleBlocks:1053](../../tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs#L1053) uses Regex to extract flat `<Style Selector="...">...</Style>` blocks; Setters, DynamicResource, Dark/Light color codes, and brush mappings are also parsed with Regex/strings. **If the styles later move to ControlTheme, Style nesting, or a different attribute order/serialization format, guard parsing may need to be updated as well**. Formatting-related failures must not be treated directly as new-version UI defects, and assertions must not be relaxed to conceal behavioral differences.
 
-[check-xaml-action-roles.ps1](../../scripts/tests/check-xaml-action-roles.ps1) 則透過 XmlReader／**XDocument** 載入並保留行號（:37 起），掃 Views／Controls（目前 55 份 AXAML）的 action classes，並解析 Controls.Action 的 Style 直接子 Setter。它有 **3 個明列 style contracts**（XAR101 icon 尺寸／裁切、XAR102 chip hover、XAR103 chip pressed，:368 起）；會檢查 selector 字串片段與指定 Setter，不解析完整 selector 語意或 runtime precedence。
+[check-xaml-action-roles.ps1](../../scripts/tests/check-xaml-action-roles.ps1) loads files through XmlReader/**XDocument** and preserves line numbers (from :37), scans action classes in Views/Controls (currently 55 AXAML files), and parses Setters that are direct children of Styles in Controls.Action. It has **3 explicit style contracts** (XAR101 icon size/clipping, XAR102 chip hover, XAR103 chip pressed, from :368); it checks selector string fragments and specific Setters, without parsing full selector semantics or runtime precedence.
 
-**高優先核對**：parser 假設與 runtime-only style。Tooltip 既有雙重驗證為上述 static guard，加上 [HeadlessUiSmokeTests:69、103](../../tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs#L69) 的開啟及字串 tooltip 前景 smoke；該類共 **10 個 AvaloniaFact**，另含 cap tooltip、spinner 與 console 渲染。新版相容性待對照官方遷移指南確認。
+**High-priority check**: parser assumptions and runtime-only styles. Existing dual verification for tooltips consists of the static guard above plus the tooltip-open and string-tooltip foreground smoke tests in [HeadlessUiSmokeTests:69, 103](../../tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs#L69); the class has **10 AvaloniaFacts** in total, also covering cap tooltips, the spinner, and console rendering. New-version compatibility awaits confirmation against the official migration guide.
 
-### 兩種 visual snapshot
+### Two types of visual snapshots
 
-| 測試與基線 | 數量／方法 | 升級時的限制 |
+| Tests and baselines | Count/method | Limitations during the upgrade |
 |---|---|---|
-| [UiVisualSnapshotTests](../../tests/FreeformHelper.Tests/UI/Snapshots/UiVisualSnapshotTests.cs)；[ui-visual-minimal-baseline.json](../../tests/FreeformHelper.Tests/Snapshots/ui-visual-minimal-baseline.json) | **1 個 Fact、9 個來源檔**；只將 CRLF 轉 LF，計 SHA-256，精確比對。 | 是來源文字快照，不是圖片；套件升級即使改變渲染，來源未改也可能通過。 |
-| [UiRenderedVisualSnapshotTests](../../tests/FreeformHelper.Tests/UI/Snapshots/UiRenderedVisualSnapshotTests.cs)；[ui-rendered-visual-baseline.json](../../tests/FreeformHelper.Tests/Snapshots/ui-rendered-visual-baseline.json) | **1 個 AvaloniaFact、3 個 surface**；headless + Skia 擷取 BGRA，縮成 16×16 平均亮度 hash（256 bits），依 Hamming distance 門檻比對。 | 非逐像素零差異檢查；hash 可能漏掉局部字型／顏色差異，通過也須人工確認重點畫面。 |
+| [UiVisualSnapshotTests](../../tests/FreeformHelper.Tests/UI/Snapshots/UiVisualSnapshotTests.cs); [ui-visual-minimal-baseline.json](../../tests/FreeformHelper.Tests/Snapshots/ui-visual-minimal-baseline.json) | **1 Fact, 9 source files**; only converts CRLF to LF, computes SHA-256, and compares exactly. | These are source text snapshots, not images; even if a package upgrade changes rendering, the test may pass if the source is unchanged. |
+| [UiRenderedVisualSnapshotTests](../../tests/FreeformHelper.Tests/UI/Snapshots/UiRenderedVisualSnapshotTests.cs); [ui-rendered-visual-baseline.json](../../tests/FreeformHelper.Tests/Snapshots/ui-rendered-visual-baseline.json) | **1 AvaloniaFact, 3 surfaces**; captures BGRA using headless + Skia, reduces it to a 16×16 average-luminance hash (256 bits), and compares against Hamming distance thresholds. | This is not a pixel-by-pixel zero-difference check; the hash may miss local font/color differences, so key screens still require manual confirmation even when the test passes. |
 
-來源基線的 9 個檔案：`Controls/WorkspaceHeader.axaml`、`Styles/Controls.axaml`、`Views/CanvasOverlayControls.axaml`、`ConsolePanel.axaml`、`FreeformHelperView.axaml`、`LeftDxfPanel.axaml`、`PadInfoPopover.axaml`、`RightWorkflowPanel.axaml`、`SettingsWindow.axaml`（皆以 `src/FreeformHelper.UI/` 為根）。**Tokens 與 Controls 的 9 份分檔沒有直接列入來源 hash 基線**；Controls.axaml 只 hash include 清單，沒有遞迴 hash include 內容。
+The source baseline contains 9 files: `Controls/WorkspaceHeader.axaml`, `Styles/Controls.axaml`, `Views/CanvasOverlayControls.axaml`, `ConsolePanel.axaml`, `FreeformHelperView.axaml`, `LeftDxfPanel.axaml`, `PadInfoPopover.axaml`, `RightWorkflowPanel.axaml`, and `SettingsWindow.axaml` (all relative to `src/FreeformHelper.UI/`). **Tokens and the 9 split Controls files are not directly included in the source hash baseline**; Controls.axaml hashes only the include list, without recursively hashing included content.
 
-| Rendered surface key | 固定尺寸 | 最大 Hamming distance |
+| Rendered surface key | Fixed size | Maximum Hamming distance |
 |---|---:|---:|
 | MainWindow.ConsoleExpanded | 1280×900 | 36 |
 | SettingsWindow.Default | 960×760 | 24 |
 | HowToUseView.Default | 1000×700 | 24 |
 
-兩份 JSON 都是 version `1.0`，**沒有 checked-in PNG 基線**。Rendered test 也不保存 actual／diff 圖片；失敗訊息列 surface、expected／actual hash 與 distance。DevView、tooltip-open、ComboBox popup、Expander 展開及所有 action 狀態不在這 3 個 surface 的明列覆蓋清單中，須由 guards／smoke／人工預覽補足。
+Both JSON files are version `1.0`, with **no checked-in PNG baselines**. The rendered test also does not save actual/diff images; failure messages list the surface, expected/actual hashes, and distance. DevView, tooltip-open, ComboBox popup, expanded Expander, and all action states are not in the explicit coverage list of these 3 surfaces and must be covered by guards/smoke/manual previews.
 
-### 渲染差異如何審查
+### How to review rendering differences
 
-1. 保留原基線，在相同 OS、字型來源、theme、尺寸與測試模式下，先跑 11.3.12 的對照，再跑未來升級分支的 class-filtered guards、snapshots 與相關 smoke。透過 [UiBaselineUpdateMode.cs](../../tests/FreeformHelper.Tests/UI/Snapshots/UiBaselineUpdateMode.cs) 的 `FH_UI_BASELINE_MODE=dry-run` 可檢查而不寫基線；未設定時也是 Check。
-2. 依失敗 surface／hash／distance 找到差異，人工擷取同條件前後畫面並比較字型、裁切、間距、狀態顏色與 template 內容。現有測試不產生圖片 diff，不能聲稱已有自動圖片審查流程。補看 [DevView](../../src/FreeformHelper.UI/Views/DevView.axaml) 的 Action role laboratory，依 [ui-action-role-visual-qa.md](../guides/ui-action-role-visual-qa.md) 檢查 checked／disabled／hover、console toolbar、viewport actions 與 passive badges，並開啟 popup／tooltip／Expander。
-3. 將差異分為範本／selector 未命中、resource／theme、字型環境或經確認的新版渲染差異，附來源與前後證據；Avalonia 12 原因待對照官方遷移指南確認。依 [1.3.x roadmap](../guides/refactor-roadmap-1.3.x.md) 的 no-visual-change 與 owner 視覺決策，修正非預期差異；必要外觀變更先取得相應決定，不用更新 expected 取得綠燈。
-4. 只有明確接受的 UI 差異才另案使用既有 [update-ui-baseline.ps1](../../scripts/tests/update-ui-baseline.ps1) 的 Apply／`FH_UI_BASELINE_MODE=apply`，檢視兩份 JSON 的差異並重跑驗證。Apply 並非審查，rendered Apply 在超出門檻時會更新所有 surface hash；本次完全不執行 Apply。該腳本首輪測試可能觸發 build／restore，不能直接套用於本次禁止 restore 的沙箱。
+1. Preserve the original baselines. Under the same OS, font sources, theme, dimensions, and test mode, first run the 11.3.12 comparison, then run class-filtered guards, snapshots, and related smoke tests on the future upgrade branch. `FH_UI_BASELINE_MODE=dry-run` in [UiBaselineUpdateMode.cs](../../tests/FreeformHelper.Tests/UI/Snapshots/UiBaselineUpdateMode.cs) allows checking without writing baselines; the unset default is also Check.
+2. Locate differences using the failed surface/hash/distance, manually capture before/after screens under the same conditions, and compare fonts, clipping, spacing, state colors, and template content. Existing tests do not produce image diffs, so an automated image review process cannot be claimed. Also preview the Action role laboratory in [DevView](../../src/FreeformHelper.UI/Views/DevView.axaml), check checked/disabled/hover states, the console toolbar, viewport actions, and passive badges according to [ui-action-role-visual-qa.md](../guides/ui-action-role-visual-qa.md), and open popups/tooltips/Expanders.
+3. Classify differences as template/selector mismatches, resource/theme issues, font environment differences, or confirmed new-version rendering differences, with sources and before/after evidence; Avalonia 12 causes await confirmation against the official migration guide. Fix unexpected differences under the no-visual-change requirement and owner visual decisions in the [1.3.x roadmap](../guides/refactor-roadmap-1.3.x.md); obtain the corresponding decision first for necessary appearance changes, rather than updating expected values to make tests pass.
+4. Only explicitly accepted UI differences may use Apply/`FH_UI_BASELINE_MODE=apply` in the existing [update-ui-baseline.ps1](../../scripts/tests/update-ui-baseline.ps1) in a separate task; review the differences in both JSON files and rerun validation. Apply is not a review; rendered Apply updates all surface hashes when the threshold is exceeded. This task does not run Apply at all. The script's first test run may trigger build/restore, so it cannot be used directly in this sandbox, where restore is prohibited.
 
-## 字型與最可能需要調整的部分
+## Fonts and the areas most likely to need changes
 
-[Tokens:673–674](../../src/FreeformHelper.UI/Styles/Tokens.axaml#L673) 定義 **2 個 FontFamily token**：`FontFamilyUi = Segoe UI Variable Text`，`FontFamilyCode = Consolas, Cascadia Mono, Segoe UI Variable Text`。Form 等樣式通常 StaticResource 取 Ui 字型；[Controls.Core:826](../../src/FreeformHelper.UI/Styles/Controls.Core.axaml#L826) 使用 FontFamilyCode，而 [ConsolePanel:138](../../src/FreeformHelper.UI/Views/ConsolePanel.axaml#L138) 的 editor 直接寫同一候選字型清單，並非引用 token。不能只看 token 名稱就認定實際渲染採 Windows Segoe。
+[Tokens:673–674](../../src/FreeformHelper.UI/Styles/Tokens.axaml#L673) defines **2 FontFamily tokens**: `FontFamilyUi = Segoe UI Variable Text` and `FontFamilyCode = Consolas, Cascadia Mono, Segoe UI Variable Text`. Styles such as Form usually retrieve the Ui font through StaticResource; [Controls.Core:826](../../src/FreeformHelper.UI/Styles/Controls.Core.axaml#L826) uses FontFamilyCode, while the editor in [ConsolePanel:138](../../src/FreeformHelper.UI/Views/ConsolePanel.axaml#L138) specifies the same candidate font list directly instead of referencing the token. Token names alone do not establish that actual rendering uses Windows Segoe.
 
-目前 production 字型來源由 [Program.cs:74–77](../../src/FreeformHelper.UI/Program.cs#L74) 與 [AppFontBootstrapper.cs](../../src/FreeformHelper.UI/Services/AppFontBootstrapper.cs) 提供：system font source 指向 **`avares://Avalonia.Fonts.Inter/Assets`**，註冊 **1 個 InterFontCollection**，並 WithInterFont；default family 為 Inter，另有 **2 個 mapping** 將 Segoe UI Variable Text／Segoe UI 導到 Inter。Code token 的 Consolas／Cascadia Mono 候選與 CJK glyph fallback 仍需以實際環境驗證，不假定全部字形來自 Inter。
+Production font sources currently come from [Program.cs:74–77](../../src/FreeformHelper.UI/Program.cs#L74) and [AppFontBootstrapper.cs](../../src/FreeformHelper.UI/Services/AppFontBootstrapper.cs): the system font source points to **`avares://Avalonia.Fonts.Inter/Assets`**, **1 InterFontCollection** is registered, and WithInterFont is used; the default family is Inter, with **2 additional mappings** from Segoe UI Variable Text/Segoe UI to Inter. The Consolas/Cascadia Mono candidates in the Code token and CJK glyph fallback still require validation in the actual environment; not all glyphs are assumed to come from Inter.
 
-[AvaloniaTestApp.cs:14–27](../../tests/FreeformHelper.Tests/UI/TestHost/AvaloniaTestApp.cs#L14) 的 headless host 使用 Skia、`UseHeadlessDrawing=false`、相同 FontManagerOptions，並在 **`fonts:SystemFonts`** 註冊指向同一 Inter Assets 的 **1 個 EmbeddedFontCollection**，再 WithInterFont。production 與 headless 的註冊方式不同；本文件只標記字型來源與基線關係，不展開 C# API 遷移。字型 collection／system source、fallback、glyph metrics 與新版渲染行為皆待對照官方遷移指南確認。
+The headless host in [AvaloniaTestApp.cs:14–27](../../tests/FreeformHelper.Tests/UI/TestHost/AvaloniaTestApp.cs#L14) uses Skia, `UseHeadlessDrawing=false`, and the same FontManagerOptions, registers **1 EmbeddedFontCollection** pointing to the same Inter Assets under **`fonts:SystemFonts`**, and then uses WithInterFont. Production and headless registration differ; this document only identifies font sources and their relationship to the baselines, without expanding into C# API migration. Font collections/system sources, fallback, glyph metrics, and new-version rendering behavior all await confirmation against the official migration guide.
 
-| 優先核對 | 可能需要改動的部位 | 判斷依據／驗證 |
+| Check priority | Areas that may need changes | Basis/validation |
 |---|---|---|
-| **最高** | Scroll 的 `/template/`、`PART_*`；ComboBox Popup、ToolTip ContentPresenter、WorkspaceHeader 的 Slider Thumb | 依賴上游範本形狀與名稱；先核對遷移指南及實際新版範本，再跑 static guard、popup／tooltip smoke 與 Dev 預覽。 |
-| **高** | 5 個內建控制項完整替換範本、action 狀態／載入順序 | 直接覆寫內建視覺與狀態呈現；核對 TemplateBinding、checked／disabled／focus 與透明 spinner。 |
-| **高** | Regex style guards、rendered 基線與字型 host | parser 只支援既有平坦寫法；渲染與字型變化可能影響 hash，不能自動接受或提高門檻。 |
-| **中** | 3 個自訂控制項範本、Binding／x:DataType、theme resource 查找、Expander | 沿用 XAML／resource／內建 theme 行為；只在指南或實際測試證明需要時修改。 |
-| **低** | 未使用的 `^`／`>`／ControlTheme、TabControl／DataGrid XAML 覆寫 | 目前計數為 0，沒有既有語法／範本要遷移；不為假設中的未來需求新增機制。 |
+| **Highest** | Scroll `/template/` and `PART_*`; ComboBox Popup, ToolTip ContentPresenter, and WorkspaceHeader Slider Thumb | Depends on upstream template structure and names; first check the migration guide and actual new-version templates, then run static guards, popup/tooltip smoke tests, and Dev previews. |
+| **High** | 5 full replacement templates for built-in controls, action states/load order | Directly overrides built-in visuals and state presentation; check TemplateBinding, checked/disabled/focus, and the transparent spinner. |
+| **High** | Regex style guards, rendered baselines, and font hosts | The parser supports only the existing flat form; rendering and font changes may affect hashes and must not be automatically accepted or accommodated by raising thresholds. |
+| **Medium** | 3 custom control templates, Binding/x:DataType, theme resource lookup, Expander | Uses existing XAML/resource/built-in theme behavior; change only when the guide or actual tests prove it necessary. |
+| **Low** | Unused `^`/`>`/ControlTheme, TabControl/DataGrid XAML overrides | Current counts are 0, with no existing syntax/templates to migrate; do not add mechanisms for hypothetical future needs. |
 
-以上是待核對清單，**不構成已確認的 Avalonia 12 修改需求**。此次只新增本文件；沒有修改程式、XAML、套件、build 設定、基線、TODO 或 roadmap，也沒有執行官方指南查核或視覺升級。
+The above is a checklist awaiting verification, **not confirmed Avalonia 12 change requirements**. This task only adds this document; it does not modify code, XAML, packages, build settings, baselines, TODO, or the roadmap, and does not perform an official-guide review or visual upgrade.

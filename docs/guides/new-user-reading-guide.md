@@ -1,84 +1,84 @@
-# 新手中文閱讀指南
+# Beginner Chinese Reading Guide
 
-最後更新：2026-05-23
+Last updated: 2026-05-23
 
-這份文件回答兩個問題：
+This document answers two questions:
 
-1. 第一次接手 FreeformHelper 要先看哪些文件。
-2. 哪些文件是中文主體或已有中文版本，可以放心列入新手路線。
+1. Which documents to read first when taking over FreeformHelper for the first time.
+2. Which documents are primarily in Chinese or already have a Chinese version and can safely be included in the beginner reading path.
 
-## 最短路線
+## Shortest Path
 
-如果你只是第一次使用 app 或驗證一個 panel，先看這三份就夠：
+If you are simply using the app or validating a panel for the first time, these three documents are enough to start:
 
-| 順序 | 文件 | 適合對象 | 讀完應該知道 |
+| Order | Document | Audience | What you should know after reading |
 | --- | --- | --- | --- |
-| 1 | `docs/guides/app-user-manual.md` | 第一次操作 app 的使用者 | UI 頁面、Step1~Step5、Simulation / Export 基本流程。 |
-| 2 | `docs/guides/settings-parameter-guide.md` | 需要調參數的人 | Settings 每個參數在做什麼、怎麼調、cascade per-IC X/Y 怎麼用。 |
-| 3 | `docs/diagrams/notch-simulation/zh-TW/README.md` | 需要看懂 Notch / Simulation 流程的人 | Notch table 與 Simulation 是兩條責任線，並知道要點進哪張圖。 |
+| 1 | `docs/guides/app-user-manual.md` | Users operating the app for the first time | UI pages, Step1~Step5, and the basic Simulation / Export workflow. |
+| 2 | `docs/guides/settings-parameter-guide.md` | People who need to tune parameters | What each Settings parameter does, how to adjust it, and how to use cascade per-IC X/Y. |
+| 3 | `docs/diagrams/notch-simulation/zh-TW/README.md` | People who need to understand the Notch / Simulation workflow | Notch table and Simulation are two separate lines of responsibility, and which diagram to open. |
 
-這三份都是中文主體；第三份是 diagram library 的 `zh-TW` 版本。
+All three are primarily in Chinese; the third is the `zh-TW` version of the diagram library.
 
-## 演算法 Mermaid 連結
+## Algorithm Mermaid Links
 
-目前演算法 Mermaid 已整理在 repo 內的 Mermaid 文件中；新手優先看中文圖庫，不需要先看英文版。
+The algorithm Mermaid diagrams are currently organized in Mermaid documents within the repo; beginners should start with the Chinese diagram library and do not need to read the English version first.
 
-| 用途 | Mermaid 文件 | 說明 |
+| Purpose | Mermaid document | Description |
 | --- | --- | --- |
-| Notch / Simulation overview | `docs/diagrams/notch-simulation/zh-TW/README.md` | 目前圖庫入口，區分 Notch table 與 Simulation 兩條責任線。 |
-| Notch table 模組地圖 | `docs/diagrams/notch-simulation/zh-TW/notch-table.md` | row identity、candidate、compensation、output projection 的分層圖。 |
-| Identity contract | `docs/diagrams/notch-simulation/zh-TW/notch-table-identity.md` | Regular / CAD / SeeRegular 如何收斂成同一份 snapshot。 |
-| Candidate assembly | `docs/diagrams/notch-simulation/zh-TW/notch-table-candidate.md` | CadAllocation candidate bucket 的建立流程。 |
-| Compensation + target | `docs/diagrams/notch-simulation/zh-TW/notch-table-compensation.md` | ToRegular / ToFull / Stage3 / target allocation 的責任邊界。 |
-| Output projection | `docs/diagrams/notch-simulation/zh-TW/notch-table-output.md` | v2.2 canonical、v2.1 compatibility、CAD output grid 與 handoff。 |
-| Simulation 模組地圖 | `docs/diagrams/notch-simulation/zh-TW/simulation.md` | Simulation source、apply、audit、UI/export/replay 分層。 |
-| Overall flow | `docs/core/notch-overall-flow-mermaid.md` | 維護者用總覽圖；若與 canonical reference 不一致，以 `notch-system-reference.md` 為準。 |
+| Notch / Simulation overview | `docs/diagrams/notch-simulation/zh-TW/README.md` | Current diagram library entry point, distinguishing the two lines of responsibility for Notch table and Simulation. |
+| Notch table module map | `docs/diagrams/notch-simulation/zh-TW/notch-table.md` | Layer diagram for row identity, candidate, compensation, and output projection. |
+| Identity contract | `docs/diagrams/notch-simulation/zh-TW/notch-table-identity.md` | How Regular / CAD / SeeRegular converge into a single snapshot. |
+| Candidate assembly | `docs/diagrams/notch-simulation/zh-TW/notch-table-candidate.md` | The process for building CadAllocation candidate buckets. |
+| Compensation + target | `docs/diagrams/notch-simulation/zh-TW/notch-table-compensation.md` | Responsibility boundaries for ToRegular / ToFull / Stage3 / target allocation. |
+| Output projection | `docs/diagrams/notch-simulation/zh-TW/notch-table-output.md` | v2.2 canonical, v2.1 compatibility, CAD output grid, and handoff. |
+| Simulation module map | `docs/diagrams/notch-simulation/zh-TW/simulation.md` | Simulation source, apply, audit, and UI/export/replay layers. |
+| Overall flow | `docs/core/notch-overall-flow-mermaid.md` | Overview diagram for maintainers; if it differs from the canonical reference, `notch-system-reference.md` takes precedence. |
 
-## 依角色閱讀
+## Reading by Role
 
-| 角色 | 建議文件 | 備註 |
+| Role | Recommended documents | Notes |
 | --- | --- | --- |
-| 一般使用者 / 驗證者 | `app-user-manual.md` -> `settings-parameter-guide.md` -> `zh-TW` diagram README | 不需要先看 algorithm deep-dive。 |
-| 第一次調 Settings | `settings-parameter-guide.md` -> `settings-entry-matrix.md` | 前者給操作與調參建議；後者給設定入口與 single source contract。 |
-| 第一次接手維護 workflow | `workflow-pipeline.md` -> `settings-entry-matrix.md` -> `refactor-playbook.md` | 先懂 Step 依賴與 invalidation，再看重構規則。 |
-| 第一次 debug Notch / Export | `notch-system-reference.md` -> `freeform-helper-algorithms.md` -> `notch-v21-v22-flow.md` | `notch-system-reference.md` 是現行真值；其他是 deep-dive。 |
-| 第一次看 Simulation | `docs/diagrams/notch-simulation/zh-TW/README.md` -> `notch-system-reference.md` 的 Simulation 章節 | 先看圖，再回 canonical reference 對照。 |
-| 第一次準備改程式 | `refactor-playbook.md` -> `workflow-pipeline.md` -> `behavior-inventory.md` | 這條路線偏維護者，不是操作手冊。 |
+| General user / validator | `app-user-manual.md` -> `settings-parameter-guide.md` -> `zh-TW` diagram README | No need to read the algorithm deep-dive first. |
+| Adjusting Settings for the first time | `settings-parameter-guide.md` -> `settings-entry-matrix.md` | The former gives operating and tuning guidance; the latter gives settings entry points and the single source contract. |
+| Taking over workflow maintenance for the first time | `workflow-pipeline.md` -> `settings-entry-matrix.md` -> `refactor-playbook.md` | Understand Step dependencies and invalidation first, then read the refactoring rules. |
+| Debugging Notch / Export for the first time | `notch-system-reference.md` -> `freeform-helper-algorithms.md` -> `notch-v21-v22-flow.md` | `notch-system-reference.md` is the current source of truth; the others are deep-dives. |
+| Looking at Simulation for the first time | `docs/diagrams/notch-simulation/zh-TW/README.md` -> the Simulation section of `notch-system-reference.md` | Look at the diagrams first, then compare them with the canonical reference. |
+| Preparing to change code for the first time | `refactor-playbook.md` -> `workflow-pipeline.md` -> `behavior-inventory.md` | This path is for maintainers rather than an operating manual. |
 
-## 中文版本狀態
+## Chinese Version Status
 
-新手路線只應列入中文主體或已有中文版本的文件。現行可列入新手路線的中文文件如下：
+The beginner reading path should include only documents that are primarily in Chinese or already have a Chinese version. The following Chinese documents can currently be included in the beginner reading path:
 
-| 文件 | 中文狀態 | 用途 |
+| Document | Chinese status | Purpose |
 | --- | --- | --- |
-| `docs/guides/new-user-reading-guide.md` | 中文主體 | 新手入口與閱讀路線。 |
-| `docs/guides/app-user-manual.md` | 中文主體 | App 操作手冊。 |
-| `docs/guides/settings-parameter-guide.md` | 中文主體 | Settings 參數說明與調適建議。 |
-| `docs/diagrams/notch-simulation/zh-TW/README.md` | 中文版本 | Notch / Simulation 圖庫入口。 |
-| `docs/core/notch-overall-flow-mermaid.md` | 中文說明 + Mermaid | 維護者用 algorithm overview。 |
-| `docs/reference/notch-system-reference.md` | 中文主體 | Notch pipeline / Simulation / Export canonical reference。 |
-| `docs/core/freeform-helper-algorithms.md` | 中文主體 | Step1~Step5 演算法 deep-dive。 |
-| `docs/core/notch-v21-v22-flow.md` | 中文主體 | Step5 / v2.1 / v2.2 export flow deep-dive。 |
-| `docs/core/workflow-pipeline.md` | 中文主體 | Step 依賴與 invalidation 規則。 |
-| `docs/guides/settings-entry-matrix.md` | 中文主體 | Settings 入口與 single source matrix。 |
-| `docs/guides/refactor-playbook.md` | 中文主體 | 維護與重構流程。 |
-| `docs/reference/behavior-inventory.md` | 中文主體 | 現行行為與入口盤點，適合維護者對照。 |
+| `docs/guides/new-user-reading-guide.md` | Primarily Chinese | Beginner entry point and reading paths. |
+| `docs/guides/app-user-manual.md` | Primarily Chinese | App user manual. |
+| `docs/guides/settings-parameter-guide.md` | Primarily Chinese | Settings parameter descriptions and tuning guidance. |
+| `docs/diagrams/notch-simulation/zh-TW/README.md` | Chinese version | Notch / Simulation diagram library entry point. |
+| `docs/core/notch-overall-flow-mermaid.md` | Chinese explanations + Mermaid | Algorithm overview for maintainers. |
+| `docs/reference/notch-system-reference.md` | Primarily Chinese | Notch pipeline / Simulation / Export canonical reference. |
+| `docs/core/freeform-helper-algorithms.md` | Primarily Chinese | Step1~Step5 algorithm deep-dive. |
+| `docs/core/notch-v21-v22-flow.md` | Primarily Chinese | Step5 / v2.1 / v2.2 export flow deep-dive. |
+| `docs/core/workflow-pipeline.md` | Primarily Chinese | Step dependencies and invalidation rules. |
+| `docs/guides/settings-entry-matrix.md` | Primarily Chinese | Settings entry points and single source matrix. |
+| `docs/guides/refactor-playbook.md` | Primarily Chinese | Maintenance and refactoring workflow. |
+| `docs/reference/behavior-inventory.md` | Primarily Chinese | Inventory of current behavior and entry points for maintainer reference. |
 
-若未來要把某份英文文件加入「新手必讀」，必須先補中文版本或將該文件改為中文主體。
+Before adding an English document to the "required reading for beginners" in the future, a Chinese version must first be provided or the document must be changed to be primarily in Chinese.
 
-## 先不要看的文件
+## Documents to Skip for Now
 
-以下文件不是新手入口，除非你正在追特定歷史或工程問題：
+The following documents are not beginner entry points unless you are investigating a specific historical or engineering issue:
 
-- `docs/archive/`：歷史保留，不代表目前主線；舊 repo scan 報告集中在 `docs/archive/repo-refactor-scans/`。
-- `docs/guides/repo-refactor-scan-2026-06-26.md`：最新 repo 掃描紀錄，適合追技術債，不適合入門。
-- `docs/generated/`：工具生成，不手動維護。
-- `docs/diagrams/notch-simulation/en/`：英文圖庫；新手優先看 `zh-TW`。
-- `docs/guides/settings-overview-redesign-plan-*.md`、`post-1.0-*`：設計提案或後續計畫，不是操作流程。
+- `docs/archive/`: Historical records that do not represent the current mainline; old repo scan reports are collected in `docs/archive/repo-refactor-scans/`.
+- `docs/guides/repo-refactor-scan-2026-06-26.md`: The latest repo scan record, useful for tracking technical debt but unsuitable as an introduction.
+- `docs/generated/`: Tool-generated and not maintained manually.
+- `docs/diagrams/notch-simulation/en/`: English diagram library; beginners should start with `zh-TW`.
+- `docs/guides/settings-overview-redesign-plan-*.md`, `post-1.0-*`: Design proposals or future plans, not operating procedures.
 
-## 維護規則
+## Maintenance Rules
 
-- `docs/README.md` 只做入口索引，不放長篇內容。
-- 新手文件要優先放在 `docs/guides/`，並在本檔與 `docs/README.md` 登記。
-- 同一主題若同時有中文與英文，README 的新手入口只連中文。
-- 歷史文件要留在 `docs/archive/` 或明確標示非現行主線。
+- `docs/README.md` is an entry index only and does not contain long-form content.
+- Beginner documents should preferably be placed in `docs/guides/` and registered in this file and `docs/README.md`.
+- If a topic has both Chinese and English versions, the beginner entry in README links only to the Chinese version.
+- Historical documents must remain in `docs/archive/` or be clearly marked as outside the current mainline.

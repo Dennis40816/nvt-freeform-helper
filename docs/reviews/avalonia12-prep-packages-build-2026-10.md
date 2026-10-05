@@ -1,20 +1,20 @@
-# Avalonia 12 升級準備：套件與建置盤點（2026-10）
+# Avalonia 12 upgrade preparation: package and build inventory (2026-10)
 
-## 範圍與證據
+## Scope and evidence
 
-本文件只做升級前準備。依 `TODO.md` 的 owner 決定，Avalonia 11 → 12 排在 `1.3.5` 之前，目前不執行升級。現行 Avalonia 主套件版本為 **11.3.12**；沒有選定任何 12.x 版本，也沒有修改套件、程式、XAML、TODO 或 roadmap。
+This document only covers preparation for the upgrade. According to the owner decision in `TODO.md`, Avalonia 11 → 12 is scheduled before `1.3.5`; the upgrade is not being performed now. The current main Avalonia package version is **11.3.12**; no 12.x version has been selected, and no packages, code, XAML, TODO or roadmap have been changed.
 
-盤點基準：2026-10-03，commit `7477b07d`，分支 `feature/queue/avalonia12-prep-packages-build`。已先讀取 `AGENTS.md`、`docs/generated/project-dependency-graph.md`、`docs/agents/domain.md` 與 1.3.x roadmap；依賴圖的五個專案與目前 solution／ProjectReference 一致。
+Inventory baseline: 2026-10-03, commit `7477b07d`, branch `feature/queue/avalonia12-prep-packages-build`. `AGENTS.md`, `docs/generated/project-dependency-graph.md`, `docs/agents/domain.md` and the 1.3.x roadmap were read first; the five projects in the dependency graph match the current solution／ProjectReference relationships.
 
-來源為 [中央套件版本](../../Directory.Packages.props)、[共用建置設定](../../Directory.Build.props)、下列五個 csproj、[SDK 設定](../../global.json)、[CI workflow](../../.github/workflows/ci.yml) 與現有驗證腳本。傳遞相依版本另由已還原的 `build/obj/FreeformHelper.UI/project.assets.json`、`build/obj/FreeformHelper.Tests/project.assets.json` 的 `net8.0` target 核對；這兩份是本機產物，不是鎖檔。本次未連網、未執行 restore、未讀取私有測試資料。
+Sources are the [central package versions](../../Directory.Packages.props), [shared build settings](../../Directory.Build.props), the five csproj files below, [SDK settings](../../global.json), [CI workflow](../../.github/workflows/ci.yml) and existing verification scripts. Transitive dependency versions were also checked against the `net8.0` target in the restored `build/obj/FreeformHelper.UI/project.assets.json` and `build/obj/FreeformHelper.Tests/project.assets.json`; these two files are local artifacts, not lock files. This work did not access the network, run restore or read private test data.
 
-無網路環境無法核實 Avalonia 12 的變更。本文每個涉及 12 的相容性、最低版本或建置要求的待查項，均標示 **to check against the official migration guide**；現行 11 的本機證據不能當成 12 的相容保證。
+Avalonia 12 changes cannot be verified without network access. Every open item in this document concerning 12 compatibility, minimum versions or build requirements is marked **to check against the official migration guide**; local evidence for the current 11 version cannot be treated as a compatibility guarantee for 12.
 
-## 中央版本與直接引用
+## Central versions and direct references
 
-`Directory.Build.props` 設定 `ManagePackageVersionsCentrally=true`。所有 csproj 的 PackageReference 都未填寫 `Version` 或 `VersionOverride`，版本來自 `Directory.Packages.props`。
+`Directory.Build.props` sets `ManagePackageVersionsCentrally=true`. No PackageReference in any csproj specifies `Version` or `VersionOverride`; versions come from `Directory.Packages.props`.
 
-| 套件 | 中央版本 | 直接引用專案 |
+| Package | Central version | Directly referencing project |
 | --- | --- | --- |
 | `Avalonia` | `11.3.12` | UI |
 | `Avalonia.Desktop` | `11.3.12` | UI |
@@ -24,122 +24,122 @@
 | `Avalonia.Headless` | `11.3.12` | Tests |
 | `Avalonia.Headless.XUnit` | `11.3.12` | Tests |
 
-UI 為 [FreeformHelper.UI.csproj](../../src/FreeformHelper.UI/FreeformHelper.UI.csproj)，Tests 為 [FreeformHelper.Tests.csproj](../../tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj)。Tests 引用 UI，會繼承 UI 的桌面、theme、font、editor 與 renderer 相依。
+UI is [FreeformHelper.UI.csproj](../../src/FreeformHelper.UI/FreeformHelper.UI.csproj), and Tests is [FreeformHelper.Tests.csproj](../../tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj). Tests references UI and inherits its desktop, theme, font, editor and renderer dependencies.
 
-其餘三個專案為 [Domain](../../src/FreeformHelper.Domain/FreeformHelper.Domain.csproj)、[Application](../../src/FreeformHelper.Application/FreeformHelper.Application.csproj)、[Infrastructure](../../src/FreeformHelper.Infrastructure/FreeformHelper.Infrastructure.csproj)，沒有直接引用 Avalonia。Application 唯一直接套件是 `Clipper2 2.0.0`；Infrastructure 引用 Application／Domain，沒有自己的套件引用。
+The other three projects are [Domain](../../src/FreeformHelper.Domain/FreeformHelper.Domain.csproj), [Application](../../src/FreeformHelper.Application/FreeformHelper.Application.csproj) and [Infrastructure](../../src/FreeformHelper.Infrastructure/FreeformHelper.Infrastructure.csproj), with no direct Avalonia references. Application's only direct package is `Clipper2 2.0.0`; Infrastructure references Application／Domain and has no package references of its own.
 
-| 須共同檢查的直接相依 | 中央版本／引用 | 升級時的核對點 |
+| Direct dependency to check together | Central version／reference | Items to check during the upgrade |
 | --- | --- | --- |
-| `CommunityToolkit.Mvvm` | `8.3.2`／UI | 現有 MVVM source generator 與新工具鏈的相容性：to check against the official migration guide。沒有證據要求跟著 Avalonia 改成相同版本。 |
-| `System.Reactive` | `6.0.0`／UI | 新 Avalonia 套件圖是否仍接受目前版本：to check against the official migration guide。 |
-| `Microsoft.NET.Test.Sdk` | `17.11.1`／Tests | 新 Headless 測試工具鏈所需版本：to check against the official migration guide。 |
-| `xunit` | `2.9.2`／Tests | `Avalonia.Headless.XUnit` 的測試框架相容性：to check against the official migration guide。 |
-| `xunit.runner.visualstudio` | `3.0.0`／Tests | test discovery 與 runner 相容性：to check against the official migration guide。 |
+| `CommunityToolkit.Mvvm` | `8.3.2`／UI | Compatibility of the existing MVVM source generator with the new toolchain: to check against the official migration guide. There is no evidence that it needs to change to the same version as Avalonia. |
+| `System.Reactive` | `6.0.0`／UI | Whether the new Avalonia package graph still accepts the current version: to check against the official migration guide. |
+| `Microsoft.NET.Test.Sdk` | `17.11.1`／Tests | Version required by the new Headless test toolchain: to check against the official migration guide. |
+| `xunit` | `2.9.2`／Tests | Test framework compatibility of `Avalonia.Headless.XUnit`: to check against the official migration guide. |
+| `xunit.runner.visualstudio` | `3.0.0`／Tests | test discovery and runner compatibility: to check against the official migration guide. |
 
-UI 另直接引用 `NLog 5.3.4`、`NLog.Extensions.Logging 5.3.4`；目前相依圖沒有證據要求它們隨 Avalonia 升版。
+UI also directly references `NLog 5.3.4` and `NLog.Extensions.Logging 5.3.4`; the current dependency graph provides no evidence that they need to be upgraded along with Avalonia.
 
-主套件、Desktop、Fluent、Inter、Headless、Headless.XUnit 的目前版本一致。未來應一起檢查這組引用與還原結果，避免 production 與 headless 使用不相容的 Avalonia 組件；12 的套件組合與版本對齊規則：to check against the official migration guide。`Avalonia.AvaloniaEdit` 有自己的版本序列，目前還原圖只宣告 Avalonia 最低相依 `11.0.0`；這不證明它支援 12，應核對相容發行版：to check against the official migration guide。
+The main package, Desktop, Fluent, Inter, Headless and Headless.XUnit currently share the same version. These references and restore results should be checked together in the future to avoid incompatible Avalonia assemblies in production and headless; package combinations and version alignment rules for 12: to check against the official migration guide. `Avalonia.AvaloniaEdit` has its own version sequence, and the current restore graph only declares a minimum Avalonia dependency of `11.0.0`; this does not prove support for 12. A compatible release should be checked: to check against the official migration guide.
 
-## 傳遞相依、renderer、原生庫與未引用套件
+## Transitive dependencies, renderer, native libraries and unreferenced packages
 
-以下版本來自既有 restore assets；UI 與 Tests 均帶入這些相依。它們沒有中央 PackageVersion 或直接 PackageReference，不應只為盤點而新增 pin。
+The following versions come from existing restore assets; both UI and Tests bring in these dependencies. They have no central PackageVersion or direct PackageReference, and pins should not be added solely for this inventory.
 
-| 套件 | 已解析版本 | 現行來源／用途 |
+| Package | Resolved version | Current source／purpose |
 | --- | --- | --- |
-| `Avalonia.Skia` | `11.3.12` | Desktop、X11 帶入的 renderer |
-| `Avalonia.Native` | `11.3.12` | Desktop 帶入 |
-| `Avalonia.Win32` | `11.3.12` | Desktop 帶入 |
-| `Avalonia.X11` | `11.3.12` | Desktop 帶入 |
-| `Avalonia.FreeDesktop` | `11.3.12` | X11 帶入 |
-| `Avalonia.Remote.Protocol` | `11.3.12` | Avalonia 主套件帶入 |
-| `Avalonia.BuildServices` | `11.3.2` | Avalonia 主套件帶入的建置服務 |
-| `Avalonia.Angle.Windows.Natives` | `2.1.25547.20250602` | Win32 帶入 |
-| `SkiaSharp` | `2.88.9` | Avalonia.Skia 帶入 |
-| `SkiaSharp.NativeAssets.Linux` | `2.88.9` | Avalonia.Skia 帶入 |
-| `SkiaSharp.NativeAssets.WebAssembly` | `2.88.9` | Avalonia.Skia 帶入 |
-| `SkiaSharp.NativeAssets.Win32` | `2.88.9` | SkiaSharp 帶入 |
-| `SkiaSharp.NativeAssets.macOS` | `2.88.9` | SkiaSharp 帶入 |
-| `HarfBuzzSharp` | `8.3.1.1` | Avalonia.Skia 帶入的文字渲染相依 |
-| `HarfBuzzSharp.NativeAssets.Linux` | `8.3.1.1` | Avalonia.Skia 帶入 |
-| `HarfBuzzSharp.NativeAssets.WebAssembly` | `8.3.1.1` | Avalonia.Skia 帶入 |
-| `HarfBuzzSharp.NativeAssets.Win32` | `8.3.1.1` | HarfBuzzSharp 帶入 |
-| `HarfBuzzSharp.NativeAssets.macOS` | `8.3.1.1` | HarfBuzzSharp 帶入 |
-| `MicroCom.Runtime` | `0.11.0` | Avalonia 主套件帶入 |
-| `Tmds.DBus.Protocol` | `0.21.2` | Avalonia.FreeDesktop 帶入 |
-| `System.IO.Pipelines` | `8.0.0` | Tmds.DBus.Protocol 帶入 |
+| `Avalonia.Skia` | `11.3.12` | Renderer brought in by Desktop and X11 |
+| `Avalonia.Native` | `11.3.12` | Brought in by Desktop |
+| `Avalonia.Win32` | `11.3.12` | Brought in by Desktop |
+| `Avalonia.X11` | `11.3.12` | Brought in by Desktop |
+| `Avalonia.FreeDesktop` | `11.3.12` | Brought in by X11 |
+| `Avalonia.Remote.Protocol` | `11.3.12` | Brought in by the main Avalonia package |
+| `Avalonia.BuildServices` | `11.3.2` | Build services brought in by the main Avalonia package |
+| `Avalonia.Angle.Windows.Natives` | `2.1.25547.20250602` | Brought in by Win32 |
+| `SkiaSharp` | `2.88.9` | Brought in by Avalonia.Skia |
+| `SkiaSharp.NativeAssets.Linux` | `2.88.9` | Brought in by Avalonia.Skia |
+| `SkiaSharp.NativeAssets.WebAssembly` | `2.88.9` | Brought in by Avalonia.Skia |
+| `SkiaSharp.NativeAssets.Win32` | `2.88.9` | Brought in by SkiaSharp |
+| `SkiaSharp.NativeAssets.macOS` | `2.88.9` | Brought in by SkiaSharp |
+| `HarfBuzzSharp` | `8.3.1.1` | Text rendering dependency brought in by Avalonia.Skia |
+| `HarfBuzzSharp.NativeAssets.Linux` | `8.3.1.1` | Brought in by Avalonia.Skia |
+| `HarfBuzzSharp.NativeAssets.WebAssembly` | `8.3.1.1` | Brought in by Avalonia.Skia |
+| `HarfBuzzSharp.NativeAssets.Win32` | `8.3.1.1` | Brought in by HarfBuzzSharp |
+| `HarfBuzzSharp.NativeAssets.macOS` | `8.3.1.1` | Brought in by HarfBuzzSharp |
+| `MicroCom.Runtime` | `0.11.0` | Brought in by the main Avalonia package |
+| `Tmds.DBus.Protocol` | `0.21.2` | Brought in by Avalonia.FreeDesktop |
+| `System.IO.Pipelines` | `8.0.0` | Brought in by Tmds.DBus.Protocol |
 
-`Avalonia.BuildServices`、ANGLE、SkiaSharp、HarfBuzzSharp 與其他配套有各自的版本序列。12 所要求的 managed／native 套件配對、平台支援與相依版本：to check against the official migration guide。升版時重新審查整張還原圖與 native assets，不能由目前的 `11.3.12` 推算它們的目標版本。
+`Avalonia.BuildServices`, ANGLE, SkiaSharp, HarfBuzzSharp and other supporting packages have their own version sequences. The managed／native package pairings, platform support and dependency versions required by 12: to check against the official migration guide. Review the entire restore graph and native assets again during the upgrade; their target versions cannot be inferred from the current `11.3.12`.
 
-`Avalonia.Diagnostics` 沒有中央宣告、csproj 引用或上述 assets 項目，因此沒有可列的現行版本；是否需要加入、替換或調整 Debug 建置的 diagnostics 配套：to check against the official migration guide。目前 theme／font 套件只有 Fluent／Fonts.Inter；沒有 `Avalonia.Themes.Simple` 或其他 Avalonia 字型套件。
+`Avalonia.Diagnostics` has no central declaration, csproj reference or entry in the assets above, so there is no current version to list; whether diagnostics support for Debug builds needs to be added, replaced or adjusted: to check against the official migration guide. The current theme／font packages are only Fluent／Fonts.Inter; there is no `Avalonia.Themes.Simple` or other Avalonia font package.
 
-## 鎖檔、restore 與 CI
+## Lock files, restore and CI
 
-目前 **0 份受追蹤的 `packages.lock.json`**；根目錄與五個 csproj 所在目錄也沒有此檔。`Directory.Build.props`、`Directory.Packages.props`、csproj、workflow 與建置／測試腳本沒有啟用 `RestorePackagesWithLockFile`、`RestoreLockedMode` 或 `--locked-mode`。中央版本管理固定的是直接引用版本，不等同鎖住完整傳遞相依。
+There are currently **0 tracked `packages.lock.json` files**; none exists in the root directory or the directories containing the five csproj files either. `Directory.Build.props`, `Directory.Packages.props`, csproj files, workflows and build／test scripts do not enable `RestorePackagesWithLockFile`, `RestoreLockedMode` or `--locked-mode`. Central package management pins direct reference versions; it does not lock all transitive dependencies.
 
-`build/obj/<專案名>/project.assets.json` 與產生的 `*.nuget.g.props`／`*.nuget.g.targets` 是還原產物，不能當成 `packages.lock.json`。`scripts/perf/measure-code-size.ps1` 會收集受追蹤的 `*packages.lock.json` 作證據；這個收集動作不會建立鎖檔或啟用 locked mode。
+`build/obj/<專案名>/project.assets.json` and the generated `*.nuget.g.props`／`*.nuget.g.targets` are restore artifacts and cannot be treated as `packages.lock.json`. `scripts/perf/measure-code-size.ps1` collects tracked `*packages.lock.json` files as evidence; this collection does not create lock files or enable locked mode.
 
-`.github/workflows` 目前只有 `ci.yml`，沒有直接點名 Avalonia、Headless、Fonts.Inter、Diagnostics 或 SkiaSharp 的 step，也沒有專用套件 cache／lock restore step。實際依賴在以下入口：
+`.github/workflows` currently contains only `ci.yml`, with no step that explicitly names Avalonia, Headless, Fonts.Inter, Diagnostics or SkiaSharp, and no dedicated package cache／lock restore step. The actual dependencies are in the following entry points:
 
-| CI job／step | 執行入口 | 與升級有關的現況 |
+| CI job／step | Execution entry point | Current state relevant to the upgrade |
 | --- | --- | --- |
-| `policy / structure`／`Verify structure` | `verify.ps1 -StructureOnly -AllowMissingExampleData` | 檢查 SDK pin、action pins、shard 一致性與結構；不是 restore 或套件相容性驗證。 |
-| `dotnet / build`、各 test shard／`Install pinned .NET SDK and runtime` | `scripts/ci/install-dotnet.ps1` | 從 global.json 取得 SDK，從 Tests csproj 取得 runtime channel。 |
-| `dotnet / build`／`Format, analyzers and build` | `verify.ps1 -CiLane build -AllowMissingExampleData` | 委派 `lint.ps1 -AllFiles -UseNoAppHost -WarningsAsErrors`；format／build 沒有禁止 restore，也沒有 locked mode。 |
-| `dotnet / test (...)`／`Run test shard` | `verify.ps1 -CiLane test -Shard ...` | `run-tests.ps1` 呼叫 dotnet test，沒有 `--no-restore` 或 `--no-build`，會經過還原與建置。 |
-| `dotnet / build-test`／`Require the build and every test shard to succeed` | 彙總 build／test 結果 | 本身不還原套件；目前 viewmodel shard 的 `continue-on-error` 是既有暫時例外，不能把彙總通過說成所有 shard 全過。 |
+| `policy / structure`／`Verify structure` | `verify.ps1 -StructureOnly -AllowMissingExampleData` | Checks SDK pin, action pins, shard consistency and structure; does not verify restore or package compatibility. |
+| `dotnet / build`, each test shard／`Install pinned .NET SDK and runtime` | `scripts/ci/install-dotnet.ps1` | Gets the SDK from global.json and the runtime channel from the Tests csproj. |
+| `dotnet / build`／`Format, analyzers and build` | `verify.ps1 -CiLane build -AllowMissingExampleData` | Delegates to `lint.ps1 -AllFiles -UseNoAppHost -WarningsAsErrors`; format／build does not prohibit restore and has no locked mode. |
+| `dotnet / test (...)`／`Run test shard` | `verify.ps1 -CiLane test -Shard ...` | `run-tests.ps1` calls dotnet test without `--no-restore` or `--no-build`, so it goes through restore and build. |
+| `dotnet / build-test`／`Require the build and every test shard to succeed` | Aggregates build／test results | Does not restore packages itself; the current viewmodel shard's `continue-on-error` is an existing temporary exception, so a passing aggregate cannot be described as all shards passing. |
 
-test matrix 是 `core, ui, viewmodel, snapshots`；`verify.ps1` 將 snapshots 對應至 `ui-snapshots`，包含 `UiLayoutGuardTests`、`UiRenderedVisualSnapshotTests`、`UiSnapshotPersistenceContractTests`、`UiVisualSnapshotTests`。`HeadlessUiSmokeTests` 在 `ui-stable`，由 ui shard 執行。
+The test matrix is `core, ui, viewmodel, snapshots`; `verify.ps1` maps snapshots to `ui-snapshots`, which includes `UiLayoutGuardTests`, `UiRenderedVisualSnapshotTests`, `UiSnapshotPersistenceContractTests` and `UiVisualSnapshotTests`. `HeadlessUiSmokeTests` is in `ui-stable` and runs in the ui shard.
 
-未來升級若採用鎖檔，先以非 locked 的 restore 更新／建立各專案 `packages.lock.json`，審查版本、依賴與 content hash 差異，再以 locked mode 重跑確認重現性。**目前沒有既有鎖檔可更新，也沒有既有 locked CI 可直接沿用**；是否納入鎖檔與 CI locked restore，應由實際升級工作決定，本次不新增此機制。12 是否要求額外 NuGet feed 或 restore 設定：to check against the official migration guide。
+If a future upgrade adopts lock files, first update／create each project's `packages.lock.json` with a non-locked restore, review version, dependency and content hash differences, then rerun in locked mode to confirm reproducibility. **There are currently no existing lock files to update and no existing locked CI to reuse directly**; whether to include lock files and CI locked restore should be decided by the actual upgrade work. This work does not add that mechanism. Whether 12 requires additional NuGet feeds or restore settings: to check against the official migration guide.
 
-## Target framework、SDK 與建置條件
+## Target framework, SDK and build conditions
 
-| 項目 | 現況與受影響位置 | 升級待查 |
+| Item | Current state and affected locations | Upgrade items to check |
 | --- | --- | --- |
-| Target framework | Domain、Application、Infrastructure、UI、Tests 五個 csproj 全是 `net8.0`，沒有 multi-target。 | 12 的最低 TFM／runtime 是否迫使變更，以及專案引用相容性：to check against the official migration guide。 |
-| SDK | `global.json`：`10.0.301`、`rollForward=latestPatch`、`allowPrerelease=false`。本機 `dotnet --version` 為 `10.0.303`，是允許的 patch roll-forward。SDK 與 `net8.0` 是不同設定。 | 12 的最低 SDK／MSBuild 是否符合此範圍：to check against the official migration guide。 |
-| CI 安裝 | `install-dotnet.ps1` 安裝 global.json 指定版本的 SDK，並依 Tests 的 `net8.0` 安裝 `8.0` runtime channel；不是在 workflow 寫死 SDK／TFM。 | 若需調整 TFM，核對所有專案與此推導邏輯；12 的 runtime 要求：to check against the official migration guide。 |
-| C#／輸出 | UI、Domain、Application、Infrastructure 為 `LangVersion=latest`；Tests 未明訂。UI 為 `WinExe`，帶 application manifest／icon。 | 新 SDK 對 analyzer／generator 的影響與 12 的平台建置條件：to check against the official migration guide。 |
-| 輸出位置 | `BaseOutputPath=build/bin/<專案名>/`、`BaseIntermediateOutputPath=build/obj/<專案名>/`，條件為 `ArtifactsPath` 未設定；`DefaultItemExcludes` 排除 build。 | 12 的 MSBuild targets 與產物位置假設：to check against the official migration guide。 |
-| 發佈 | `scripts/build/publish-exe.ps1` 預設 `win-x64`、Release、self-contained、`PublishTrimmed=false`；single-file 另開 `IncludeNativeLibrariesForSelfExtract=true`。 | 新 renderer／native assets 的發佈與載入要求：to check against the official migration guide；一般 build 通過不能代替發佈驗證。 |
+| Target framework | All five csproj files for Domain, Application, Infrastructure, UI and Tests use `net8.0`, with no multi-targeting. | Whether the minimum TFM／runtime for 12 requires changes, and project reference compatibility: to check against the official migration guide. |
+| SDK | `global.json`: `10.0.301`, `rollForward=latestPatch`, `allowPrerelease=false`. Local `dotnet --version` is `10.0.303`, an allowed patch roll-forward. SDK and `net8.0` are separate settings. | Whether the minimum SDK／MSBuild for 12 fits this range: to check against the official migration guide. |
+| CI installation | `install-dotnet.ps1` installs the SDK version specified in global.json and installs the `8.0` runtime channel based on Tests' `net8.0`; SDK／TFM are not hardcoded in the workflow. | If the TFM needs adjustment, check all projects and this derivation logic; runtime requirements for 12: to check against the official migration guide. |
+| C#／output | UI, Domain, Application and Infrastructure use `LangVersion=latest`; Tests does not specify it. UI is `WinExe`, with an application manifest／icon. | Effects of the new SDK on analyzers／generators and platform build conditions for 12: to check against the official migration guide. |
+| Output locations | `BaseOutputPath=build/bin/<專案名>/`, `BaseIntermediateOutputPath=build/obj/<專案名>/`, conditional on `ArtifactsPath` being unset; `DefaultItemExcludes` excludes build. | MSBuild targets and artifact location assumptions for 12: to check against the official migration guide. |
+| Publishing | `scripts/build/publish-exe.ps1` defaults to `win-x64`, Release, self-contained and `PublishTrimmed=false`; single-file also enables `IncludeNativeLibrariesForSelfExtract=true`. | Publishing and loading requirements for the new renderer／native assets: to check against the official migration guide; a passing regular build cannot replace publishing verification. |
 
-`verify.ps1 -StructureOnly` 只檢查 SDK version 為穩定的三段數字，不能證明該 SDK 或 TFM 適用 Avalonia 12。
+`verify.ps1 -StructureOnly` only checks that the SDK version is a stable three-part number; it cannot prove that the SDK or TFM is suitable for Avalonia 12.
 
-## Avalonia analyzers 與 MSBuild 整合
+## Avalonia analyzers and MSBuild integration
 
-UI csproj 明訂 `<AvaloniaResource Include="Assets\**" />`，另以 `None` 複製 NLog.config。沒有明訂 compiled-binding、XAML compilation 或 name-generator 的 Avalonia 屬性，也沒有自訂 Avalonia build task／analyzer 套件引用。
+The UI csproj explicitly specifies `<AvaloniaResource Include="Assets\**" />` and copies NLog.config via `None`. It does not explicitly specify Avalonia properties for compiled binding, XAML compilation or name generation, and has no custom Avalonia build task／analyzer package references.
 
-既有 `Avalonia 11.3.12` 套件內含 `Avalonia.Analyzers.dll`、`Avalonia.Generators.dll`、`Avalonia.Build.Tasks.dll`，以及 `build/`、`buildTransitive/` 的 props／targets；它們隨主套件帶入，不是三個獨立的中央版本。12 的 analyzer、generator、task 與 props／targets 契約：to check against the official migration guide。
+The existing `Avalonia 11.3.12` package contains `Avalonia.Analyzers.dll`, `Avalonia.Generators.dll`, `Avalonia.Build.Tasks.dll`, and props／targets in `build/` and `buildTransitive/`; they come with the main package, not three independent central versions. Analyzer, generator, task and props／targets contracts for 12: to check against the official migration guide.
 
-| 目前 11.3.12 套件所提供的設定／流程 | 本機可核實的值 | 升級待查 |
+| Settings／processes provided by the current 11.3.12 package | Locally verifiable values | Upgrade items to check |
 | --- | --- | --- |
-| `EnableAvaloniaXamlCompilation` | 未覆寫時 `true` | 12 的支援與預設：to check against the official migration guide。 |
-| `AvaloniaUseCompiledBindingsByDefault`、`AvaloniaXamlIlVerifyIl` | 未覆寫時均為 `false` | 12 的支援與預設：to check against the official migration guide。本文不盤點個別 XAML／binding。 |
-| `AvaloniaNameGeneratorIsEnabled`、`AvaloniaNameGeneratorBehavior`、`AvaloniaNameGeneratorDefaultFieldModifier` | `true`、`InitializeComponent`、`internal` | 12 的 generator 設定契約：to check against the official migration guide。 |
-| `AvaloniaNameGeneratorAttachDevTools` | 套件預設 `true`；不代表本庫有引用 Diagnostics | 12 的 diagnostics／generator 整合：to check against the official migration guide。 |
-| resource／XAML targets | `GenerateAvaloniaResources`、`CompileAvaloniaXaml`；套件預設收集 axaml／paml，參與編譯及 up-to-date inputs | 12 的資源編譯與增量建置要求：to check against the official migration guide。 |
-| `Avalonia.BuildServices` | `11.3.2`，帶入 `AvaloniaStats` target；本次命令設定 `AVALONIA_TELEMETRY_OPTOUT=1` | 12 的建置服務與 opt-out 支援：to check against the official migration guide。 |
+| `EnableAvaloniaXamlCompilation` | `true` when not overridden | Support and defaults in 12: to check against the official migration guide. |
+| `AvaloniaUseCompiledBindingsByDefault`, `AvaloniaXamlIlVerifyIl` | Both `false` when not overridden | Support and defaults in 12: to check against the official migration guide. This document does not inventory individual XAML／bindings. |
+| `AvaloniaNameGeneratorIsEnabled`, `AvaloniaNameGeneratorBehavior`, `AvaloniaNameGeneratorDefaultFieldModifier` | `true`, `InitializeComponent`, `internal` | Generator settings contract for 12: to check against the official migration guide. |
+| `AvaloniaNameGeneratorAttachDevTools` | Package default is `true`; this does not mean the repo references Diagnostics | Diagnostics／generator integration in 12: to check against the official migration guide. |
+| resource／XAML targets | `GenerateAvaloniaResources`, `CompileAvaloniaXaml`; the package collects axaml／paml by default, participating in compilation and up-to-date inputs | Resource compilation and incremental build requirements for 12: to check against the official migration guide. |
+| `Avalonia.BuildServices` | `11.3.2`, bringing in the `AvaloniaStats` target; commands in this work set `AVALONIA_TELEMETRY_OPTOUT=1` | Build services and opt-out support in 12: to check against the official migration guide. |
 
-共用 .NET analyzer 政策是 `EnableNETAnalyzers=true`、`AnalysisLevel=latest-recommended`、`EnforceCodeStyleInBuild=true`、`GenerateDocumentationFile=true`，既有 `NoWarn` 只追加 `1572;1573;1591`。`.editorconfig` 沒有 Avalonia／AVLN 專用 severity 設定。不得為升級新增 warning suppression 或降低 lint 標準。
+The shared .NET analyzer policy is `EnableNETAnalyzers=true`, `AnalysisLevel=latest-recommended`, `EnforceCodeStyleInBuild=true` and `GenerateDocumentationFile=true`; the existing `NoWarn` only appends `1572;1573;1591`. `.editorconfig` has no Avalonia／AVLN-specific severity settings. The upgrade must not add warning suppressions or lower lint standards.
 
-CI build lane 的 lint 會以 `dotnet format --severity warn` 驗證，既有 formatter 排除 IDE0059／IDE0060；analyzer build 使用 `-warnaserror --no-incremental`。新套件或 SDK 產生的診斷要在原 gate 下處理；12 的診斷變更：to check against the official migration guide。Tests 另解析 `xunit.analyzers 1.16.0`，須連同 runner／Headless 相容性重驗。
+The CI build lane's lint verifies with `dotnet format --severity warn`; the existing formatter excludes IDE0059／IDE0060, and the analyzer build uses `-warnaserror --no-incremental`. Diagnostics from new packages or SDKs must be handled under the existing gate; diagnostic changes in 12: to check against the official migration guide. Tests also resolves `xunit.analyzers 1.16.0`, which must be reverified together with runner／Headless compatibility.
 
-## 實際升版後必須重跑的順序
+## Required rerun sequence after the actual upgrade
 
-下列是未來經授權升版的執行清單，**不是本次已執行的命令**。所有 12 的套件目標版本、相依配對與工具鏈要求，先完成上述官方指南待查項。
+The following is an execution checklist for a future authorized upgrade, **not commands executed in this work**. First complete the official guide checks above for all 12 target package versions, dependency pairings and toolchain requirements.
 
-1. **Restore 與 lock 差異。** 在可連網且具備所需 feed 的環境重新還原 solution，核對 UI／Tests 的完整相依圖，包含 SkiaSharp／HarfBuzzSharp native assets、AvaloniaEdit 與 test runner。若升級採用鎖檔，以 `dotnet restore FreeformHelper.sln --use-lock-file --force-evaluate` 建立／更新鎖檔；審查後再 `dotnet restore FreeformHelper.sln --locked-mode`，驗證 lock 與宣告一致。未採鎖檔時仍須重新 restore，但應明列無 locked-mode 保證。本次沒有執行這些命令。
-2. **準備工作區並 build。** 依 AGENTS 執行 `scripts/dev/prepare-ui-workspace.ps1`；重建 UI 與 Tests，避免使用舊 Avalonia 編譯產物。可用 `dotnet build <專案> --no-restore -p:UseAppHost=false -p:UseSharedCompilation=false --nologo -m:1 -nr:false`；UI 與 Tests 路徑見上文。另依現有發佈腳本檢查 win-x64 folder／single-file 的原生庫載入。
-3. **完整 repo gate。** 在具備授權私有資料與完整工具鏈的環境執行 `pwsh -NoProfile -File ./scripts/verify.ps1 -All`，涵蓋 structure、全檔 lint／analyzer build、core／ui／viewmodel／snapshots 四個 shards。此入口可能隱含 restore，不適合本次禁止 restore 的 sandbox。確認 viewmodel 的實際結果，不能只看 CI aggregator。
-4. **UI guards 與快照。** 至少確認 `HeadlessUiSmokeTests`、`UiLayoutGuardTests`、`UiSnapshotPersistenceContractTests`、`UiVisualSnapshotTests`、`UiRenderedVisualSnapshotTests`，並在 Dev page／真實 UI 核對目前的外觀契約。12 的 headless／renderer／字型行為：to check against the official migration guide。
-5. **Baseline 先比較再決定。** 以既有 `scripts/tests/update-ui-baseline.ps1 -Mode DryRun` 比較；此腳本第一個 test 會 build 並可能 restore，應在外部完整環境執行。`FH_UI_BASELINE_MODE` 未設定時是 Check，`dry-run` 不寫入，只有 `apply` 會寫入。升版可能造成的差異須留存與人工核對，不能自動覆蓋 expected 或放寬距離門檻來讓 gate 通過；只有經確認的必要視覺差異才在獨立變更中採用 `-Mode Apply`，之後恢復 Check 並重跑 gate。
+1. **Restore and lock differences.** Restore the solution again in an environment with network access and the required feeds, and check the complete UI／Tests dependency graphs, including SkiaSharp／HarfBuzzSharp native assets, AvaloniaEdit and the test runner. If the upgrade adopts lock files, create／update them with `dotnet restore FreeformHelper.sln --use-lock-file --force-evaluate`; after review, run `dotnet restore FreeformHelper.sln --locked-mode` to verify that the locks match the declarations. Restore is still required without lock files, but the lack of a locked-mode guarantee should be stated explicitly. These commands were not executed in this work.
+2. **Prepare the workspace and build.** Run `scripts/dev/prepare-ui-workspace.ps1` according to AGENTS; rebuild UI and Tests to avoid using old Avalonia build artifacts. The command `dotnet build <專案> --no-restore -p:UseAppHost=false -p:UseSharedCompilation=false --nologo -m:1 -nr:false` can be used; see above for UI and Tests paths. Also check native library loading for win-x64 folder／single-file publishing using the existing publishing script.
+3. **Full repo gate.** Run `pwsh -NoProfile -File ./scripts/verify.ps1 -All` in an environment with authorized private data and the complete toolchain, covering structure, all-file lint／analyzer build and the four core／ui／viewmodel／snapshots shards. This entry point may implicitly restore, so it is unsuitable for this sandbox where restore is prohibited. Confirm the actual viewmodel results rather than relying only on the CI aggregator.
+4. **UI guards and snapshots.** At minimum, confirm `HeadlessUiSmokeTests`, `UiLayoutGuardTests`, `UiSnapshotPersistenceContractTests`, `UiVisualSnapshotTests` and `UiRenderedVisualSnapshotTests`, and check the current appearance contract on the Dev page／real UI. Headless／renderer／font behavior in 12: to check against the official migration guide.
+5. **Compare baselines before deciding.** Compare with the existing `scripts/tests/update-ui-baseline.ps1 -Mode DryRun`; this script's first test builds and may restore, so it should run in the external full environment. When `FH_UI_BASELINE_MODE` is unset, the mode is Check; `dry-run` does not write, and only `apply` writes. Possible differences from the upgrade must be retained and manually checked; expected values must not be overwritten automatically, and distance thresholds must not be relaxed to pass the gate. Only confirmed necessary visual differences may use `-Mode Apply` in a separate change, after which Check must be restored and the gate rerun.
 
-兩份 baseline 是 `tests/FreeformHelper.Tests/Snapshots/ui-visual-minimal-baseline.json`（來源檔正規化 SHA-256）與 `tests/FreeformHelper.Tests/Snapshots/ui-rendered-visual-baseline.json`（headless 渲染的 average hash／Hamming distance）。只改套件時前者可能不變，仍須重跑；後者須重驗 renderer／字型結果。升級不得默認取得 baseline 更新授權。
+The two baselines are `tests/FreeformHelper.Tests/Snapshots/ui-visual-minimal-baseline.json` (normalized source-file SHA-256) and `tests/FreeformHelper.Tests/Snapshots/ui-rendered-visual-baseline.json` (headless-rendered average hash／Hamming distance). The former may remain unchanged when only packages change, but must still be rerun; the latter requires reverifying renderer／font results. The upgrade does not implicitly authorize baseline updates.
 
-## 尚待確認
+## Open items
 
-- 12 的正式套件清單、對齊規則、AvaloniaEdit 相容版本及 Diagnostics 要求：to check against the official migration guide。
-- SkiaSharp、HarfBuzzSharp、ANGLE、BuildServices 與平台配套的目標版本：to check against the official migration guide。
-- 最低 SDK／TFM／runtime、analyzer／generator、MSBuild、restore 與 publish 要求：to check against the official migration guide。
-- Headless.XUnit／runner 組合與可接受的快照差異：to check against the official migration guide；外觀差異另依現有人工確認規則處理。
-- 實際升級是否納入 `packages.lock.json` 與 CI locked restore：目前未實作，留給升級工作決定。本文件不建立新的設定或驗證機制。
+- Official package list, alignment rules, compatible AvaloniaEdit version and Diagnostics requirements for 12: to check against the official migration guide.
+- Target versions for SkiaSharp, HarfBuzzSharp, ANGLE, BuildServices and platform support packages: to check against the official migration guide.
+- Minimum SDK／TFM／runtime, analyzer／generator, MSBuild, restore and publish requirements: to check against the official migration guide.
+- Headless.XUnit／runner combinations and acceptable snapshot differences: to check against the official migration guide; appearance differences are also subject to the existing manual confirmation rules.
+- Whether the actual upgrade includes `packages.lock.json` and CI locked restore: currently unimplemented and left for the upgrade work to decide. This document does not create new settings or verification mechanisms.

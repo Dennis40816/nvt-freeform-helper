@@ -1,120 +1,120 @@
-# Runtime CLI / IPC（Phase A++）
-最後更新：2026-08-10
+# Runtime CLI / IPC (Phase A++)
+Last updated: 2026-08-10
 
-## 目標
-- 讓「正在執行中的 FreeformHelper UI」可被外部命令查詢與常用流程操作。
-- 提供 AI / 自動化可重現的 debug 介面，不依賴手動點 UI。
+## Goals
+- Allow external commands to query the "running FreeformHelper UI" and perform common workflow operations.
+- Provide a reproducible debug interface for AI / automation without relying on manual UI clicks.
 
-## 已實作命令（Phase A++）
+## Implemented commands (Phase A++)
 - `freeformhelper.exe query help`
-  - 回傳：所有支援命令、參數與範例。
+  - Returns: all supported commands, arguments, and examples.
 - `freeformhelper.exe query status`
-  - 回傳：CAD/Regular 數量、選取數、workflow snapshot、Notch preview 狀態。
-  - 新增：`cache`（Step3 compensation cache + runtime notch query cache + Step5 export generation cache 的 revision / hit-miss / hit-rate）。
+  - Returns: CAD/Regular counts, selection counts, workflow snapshot, and Notch preview state.
+  - Added: `cache` (revision / hit-miss / hit-rate for the Step3 compensation cache + runtime notch query cache + Step5 export generation cache).
 - `freeformhelper.exe query selection`
-  - 回傳：selected CAD ids、selected regular indices、selected regular ids。
-  - 新增：`timings`（summary / inspector / notchPreview / total，來自最新一次 selection pipeline）。
+  - Returns: selected CAD ids, selected regular indices, and selected regular ids.
+  - Added: `timings` (summary / inspector / notchPreview / total, from the latest selection pipeline).
 - `freeformhelper.exe query terminal [--tail N]`
-  - 回傳：console log level、總行數、最後 N 行（預設 120）。
+  - Returns: console log level, total line count, and the last N lines (default 120).
 - `freeformhelper.exe query terminal-links [--tail N] [--limit M]`
-  - 回傳：terminal 解析出的可點擊 links（line number / offset / length / target / isUrl）。
-  - 用途：不進 UI 也可驗證 link parser 是否命中正確範圍。
+  - Returns: clickable links parsed from the terminal (line number / offset / length / target / isUrl).
+  - Purpose: verify whether the link parser matches the correct ranges without entering the UI.
 - `freeformhelper.exe query pad --cad-id <id>`
-  - 回傳：指定 CAD pad 幾何、diff/ic、match regular、Notch 2.2 比例。
-  - 新增：`snapshot`（與 Pad Inspector 同源）與 `ruleTrace`。
+  - Returns: geometry, diff/ic, matched regular, and Notch 2.2 ratios for the specified CAD pad.
+  - Added: `snapshot` (from the same source as Pad Inspector) and `ruleTrace`.
 - `freeformhelper.exe query pad --regular-id <id>`
-  - 回傳：指定 Regular pad 幾何、diff/ic/freeform、match CAD。
-  - 新增：`snapshot`（與 Pad Inspector 同源）與 `ruleTrace`。
+  - Returns: geometry, diff/ic/freeform, and matched CAD for the specified Regular pad.
+  - Added: `snapshot` (from the same source as Pad Inspector) and `ruleTrace`.
 - `freeformhelper.exe query notch --cad-id <id> [--limit N] [--target-limit T] [--polygon-limit M]`
-  - 回傳：Notch 2.2 比例、每個 regular 的 To Full debug 拆解（overlap/source/blocker/reachable）、
-    seed/final polygon bounds（可限量）。
-  - 新增：`stage3Allocation`（`cadArea/stage3Area` 與各 target diff 的 `area/ratio` 對照表）。
-  - 新增：revision-based cache（key=`step3Revision + cadId`），同 revision 重複查詢不重算 compensation。
+  - Returns: Notch 2.2 ratios, a To Full debug breakdown for each regular (overlap/source/blocker/reachable),
+    and seed/final polygon bounds (with an optional limit).
+  - Added: `stage3Allocation` (a comparison table of `cadArea/stage3Area` and `area/ratio` for each target diff).
+  - Added: revision-based cache (key=`step3Revision + cadId`); repeated queries at the same revision do not recompute compensation.
 - `freeformhelper.exe query multi-owner --cad-id <id> [--limit N] [--overlap-percent P]`
-  - 回傳：`GATE_MULTI_OWNER` 與 `owner>1` regular 清單、每格 owner CAD ids。
-  - `--overlap-percent` 可覆寫嚴格 overlap 門檻（只影響本次 query，方便比較 0.1% vs 1%）。
+  - Returns: `GATE_MULTI_OWNER`, a list of `owner>1` regulars, and owner CAD ids for each cell.
+  - `--overlap-percent` can override the strict overlap threshold (affects only this query, making it easier to compare 0.1% vs 1%).
 - `freeformhelper.exe query notch-stage --cad-id <id> [--polygon-limit M]`
-  - 回傳：Notch 2.2 Stage overlay（stage1 seed / stage2 candidate / stage3 final）多邊形資料，
-    可直接對照 AA 畫面分階段檢查。
+  - Returns: polygon data for the Notch 2.2 Stage overlay (stage1 seed / stage2 candidate / stage3 final),
+    allowing stage-by-stage checks directly against the AA view.
 - `freeformhelper.exe query notch-validation --regular-id <id>`
-  - 回傳：Step 5 Validation 的 regular-centric rows（direct / incoming / outgoing）。
-  - 每列 row 內容走 typed-first（`NotchTableRow.V22Node`），若缺少 typed payload 會 fallback 解碼 `Values[]`。
-  - 與 Step5 UI 共用同一個 trace mapper（`NotchValidationTraceService`），避免 UI/CLI 規則分叉。
+  - Returns: regular-centric rows from Step 5 Validation (direct / incoming / outgoing).
+  - Each row uses typed-first content (`NotchTableRow.V22Node`), falling back to decoding `Values[]` if the typed payload is missing.
+  - Shares the same trace mapper (`NotchValidationTraceService`) with the Step5 UI to avoid diverging UI/CLI rules.
 - `freeformhelper.exe query load-project --path <project.json>`
-  - 在已啟動 UI instance 載入專案（含 timing 回傳）。
-  - timing 新增 `stepReplay`，可看到 load 後 Step1/Step2 自動重播是否發生與耗時。
+  - Loads a project in the running UI instance (including timing in the response).
+  - Timing adds `stepReplay` to show whether automatic Step1/Step2 replay occurred after loading and how long it took.
 - `freeformhelper.exe query run-step --step <1|2|3|4>`
-  - 觸發 Step1 Match / Step2 Freeform detect / Step3 Notch preview refresh / Step4 Index diagnostics。
-  - 實作改為走 VM 單一 step 執行入口（與 UI 按鈕同源），避免 CLI/UI 行為分歧。
+  - Triggers Step1 Match / Step2 Freeform detect / Step3 Notch preview refresh / Step4 Index diagnostics.
+  - The implementation now uses the VM's single step execution entry point (shared with the UI buttons) to avoid diverging CLI/UI behavior.
 - `freeformhelper.exe query clear-step --step <1|2|3|4|5>`
-  - 清除指定步驟結果（會連動清除 downstream）。
-  - 實作改為走 VM 單一 step 清除入口（與 UI clear icon 同源）。
-- `freeformhelper.exe query select-cad --cad-id <id>` 或 `--cad-ids a,b,c`
-  - 程式化選取 CAD pad（更新畫面 selection/inspector 上下文）。
+  - Clears the specified step's results (also clears downstream results).
+  - The implementation now uses the VM's single step clearing entry point (shared with the UI clear icons).
+- `freeformhelper.exe query select-cad --cad-id <id>` or `--cad-ids a,b,c`
+  - Programmatically selects CAD pads (updates the view's selection/inspector context).
 - `freeformhelper.exe query select-regular --regular-id <id>` / `--regular-ids ...`
-  - 程式化選取 Regular pad（亦支援 `--regular-index` / `--regular-indices`）。
+  - Programmatically selects Regular pads (also supports `--regular-index` / `--regular-indices`).
 - `freeformhelper.exe query clear-selection`
-  - 清除目前選取。
+  - Clears the current selection.
 - `freeformhelper.exe query set-tofull --enable <true|false>`
-  - 切換 Notch 2.2 To Full 開關（與 UI 設定同源）。
+  - Toggles the Notch 2.2 To Full switch (shared with the UI setting).
 - `freeformhelper.exe query export-notch --format <csv|c-v21|c-v22> --path <outputPath>`
-  - `csv` 表示 CSV review artifact，不是 FW direct-import contract；`.c` 才是 FW 直接導入格式。
-  - 非互動執行 Step 5 匯出（直接輸出檔案，不經 save dialog / row selection 視窗）。
-  - 內部仍走既有 Step 5 生成流程與 cache，若前置未滿足會回錯誤。
-  - 新增：`elapsedMs`（UI 內部實際匯出耗時）。
+  - `csv` means a CSV review artifact, not an FW direct-import contract; `.c` is the format for direct FW import.
+  - Runs Step 5 export non-interactively (writes the file directly, without a save dialog / row selection window).
+  - Internally still uses the existing Step 5 generation workflow and cache, and returns an error if prerequisites are not met.
+  - Added: `elapsedMs` (the actual export duration inside the UI).
 - `freeformhelper.exe query simulation [--regular-id <id>]`
-  - 回傳目前 `Simulation` 工作頁的 workspace 狀態。
-  - 若指定 `--regular-id`，額外回傳該 regular pad 的 `before/after/delta`、active-surface 狀態與 notch impact 摘要。
-  - `workspace.safety.hasSimulationSafetyViolations`、`simulationSafetyViolationCount`，以及指定 `--regular-id` 時的 `regular.isEmsSafetyRisk`，皆由同一 current `SimulationSafetyAuditResult` 與 Application EMS after-cap predicate（`afterValue > afterCap + 1e-9`）投影；同一 snapshot 必須一致。欄位名稱、payload schema 與命令參數不變。
+  - Returns the workspace state of the current `Simulation` workspace page.
+  - If `--regular-id` is specified, also returns the regular pad's `before/after/delta`, active-surface state, and notch impact summary.
+  - `workspace.safety.hasSimulationSafetyViolations`, `simulationSafetyViolationCount`, and `regular.isEmsSafetyRisk` when `--regular-id` is specified are all projected from the same current `SimulationSafetyAuditResult` and Application EMS after-cap predicate (`afterValue > afterCap + 1e-9`); they must be consistent within the same snapshot. Field names, payload schema, and command arguments remain unchanged.
 
-## 命令列參數
-- 通用參數：
-  - `--timeout-ms <ms>`：IPC 連線 timeout（預設 1500，範圍 1~120000）。
-  - `--json-pretty` / `--json-compact`：輸出格式（預設 pretty）。
-- `query terminal`：
-  - `--tail <N>`：回傳最後 N 行（範圍 1~5000）。
-- `query terminal-links`：
-  - `--tail <N>`：掃描最後 N 行（範圍 1~5000）。
-  - `--limit <M>`：最多回傳 M 個 link（範圍 1~2000，預設 200）。
-- `query pad`：
-  - 二選一：`--cad-id <id>` 或 `--regular-id <id>`。
-- `query notch`：
-  - `--cad-id <id>`：必填。
-  - `--limit <N>`：回傳 regular debug 筆數（預設 200，範圍 1~5000）。
-  - `--target-limit <T>`：回傳 stage3 target diff 筆數（預設 120，範圍 1~5000）。
-  - `--polygon-limit <M>`：回傳 seed/final polygon bounds 筆數（預設 64，範圍 1~2000）。
-- `query multi-owner`：
-  - `--cad-id <id>`：必填。
-  - `--limit <N>`：回傳 regular 筆數（預設 200，範圍 1~5000）。
-  - `--overlap-percent <P>`：可選，範圍 0~100，覆寫 strict owner overlap 門檻（%）。
-- `query notch-stage`：
-  - `--cad-id <id>`：必填。
-  - `--polygon-limit <M>`：回傳每階段 polygon 筆數上限（預設 64，範圍 1~2000）。
-- `query notch-validation`：
-  - `--regular-id <id>`：必填。
-- `query load-project`：
-  - `--path <project.json>`：必填。
-- `query run-step` / `query clear-step`：
-  - `--step <N>`：必填。
-- `query select-cad`：
-  - `--cad-id <id>` 或 `--cad-ids <a,b,c>`。
-- `query select-regular`：
-  - `--regular-id <id>` / `--regular-ids <a,b,c>` / `--regular-index <idx>` / `--regular-indices <a,b,c>`。
-- `query set-tofull`：
-  - `--enable true|false|1|0|on|off`。
-- `query export-notch`：
-  - `--format csv|c-v21|c-v22`：匯出格式（必填）；`csv` = CSV review artifact，`c-v21/c-v22` = FW C contract。
-  - `--path <outputPath>`：輸出檔案路徑（必填，支援相對/絕對路徑）。
-- `query simulation`：
-  - `--regular-id <id>`：可選，查詢目前 Simulation workspace 的指定 regular pad。
+## Command-line arguments
+- Common arguments:
+  - `--timeout-ms <ms>`: IPC connection timeout (default 1500, range 1~120000).
+  - `--json-pretty` / `--json-compact`: output format (default pretty).
+- `query terminal`:
+  - `--tail <N>`: returns the last N lines (range 1~5000).
+- `query terminal-links`:
+  - `--tail <N>`: scans the last N lines (range 1~5000).
+  - `--limit <M>`: returns at most M links (range 1~2000, default 200).
+- `query pad`:
+  - Choose one: `--cad-id <id>` or `--regular-id <id>`.
+- `query notch`:
+  - `--cad-id <id>`: required.
+  - `--limit <N>`: number of regular debug entries to return (default 200, range 1~5000).
+  - `--target-limit <T>`: number of stage3 target diff entries to return (default 120, range 1~5000).
+  - `--polygon-limit <M>`: number of seed/final polygon bounds entries to return (default 64, range 1~2000).
+- `query multi-owner`:
+  - `--cad-id <id>`: required.
+  - `--limit <N>`: number of regular entries to return (default 200, range 1~5000).
+  - `--overlap-percent <P>`: optional, range 0~100, overrides the strict owner overlap threshold (%).
+- `query notch-stage`:
+  - `--cad-id <id>`: required.
+  - `--polygon-limit <M>`: maximum number of polygons to return per stage (default 64, range 1~2000).
+- `query notch-validation`:
+  - `--regular-id <id>`: required.
+- `query load-project`:
+  - `--path <project.json>`: required.
+- `query run-step` / `query clear-step`:
+  - `--step <N>`: required.
+- `query select-cad`:
+  - `--cad-id <id>` or `--cad-ids <a,b,c>`.
+- `query select-regular`:
+  - `--regular-id <id>` / `--regular-ids <a,b,c>` / `--regular-index <idx>` / `--regular-indices <a,b,c>`.
+- `query set-tofull`:
+  - `--enable true|false|1|0|on|off`.
+- `query export-notch`:
+  - `--format csv|c-v21|c-v22`: export format (required); `csv` = CSV review artifact, `c-v21/c-v22` = FW C contract.
+  - `--path <outputPath>`: output file path (required, supports relative/absolute paths).
+- `query simulation`:
+  - `--regular-id <id>`: optional, queries the specified regular pad in the current Simulation workspace.
 
-## AI 快速操作建議（實務）
-1. 先確認 UI instance 在執行中（否則會回 `INSTANCE_NOT_RUNNING`）。
-2. 常見完整流程（建議腳本）：
+## AI quick-operation recommendations (practical)
+1. First confirm that the UI instance is running (otherwise `INSTANCE_NOT_RUNNING` is returned).
+2. Common complete workflow (recommended script):
    - `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/runtime/runtime-quick.ps1 -Project <project.json> -CadId <id>`
-   - 腳本會依序做：`load-project` → wait-ready → `run-step 1/2/3(/4)`（step3 前自動選取 CAD）→ `query notch-stage` → `query notch` → `query status`。
-   - 內建 transient retry（`STEP_NOT_READY` / `NOT_READY` / `IPC_*`），可降低 load/step 時序衝突。
-3. 手動命令最小組合（不走腳本）：
+   - The script runs these in order: `load-project` → wait-ready → `run-step 1/2/3(/4)` (automatically selects CAD before step3) → `query notch-stage` → `query notch` → `query status`.
+   - Built-in transient retry (`STEP_NOT_READY` / `NOT_READY` / `IPC_*`) can reduce load/step timing conflicts.
+3. Minimal manual command set (without the script):
    - `freeformhelper.exe query load-project --path <project.json>`
    - `freeformhelper.exe query run-step --step 1`
    - `freeformhelper.exe query run-step --step 2`
@@ -130,56 +130,56 @@
    - `freeformhelper.exe query export-notch --format c-v21 --path build/perf/notch_v2.1.c`
    - `freeformhelper.exe query export-notch --format c-v22 --path build/perf/notch_v2.2.c`
    - `freeformhelper.exe query multi-owner --cad-id <id> --overlap-percent 1.0`
-4. 常見陷阱：
-   - `run-step --step 3` 需要先有 selected CAD，否則回 `STEP_NOT_READY`。
-   - `run-step --step 4` 需要 Step1 結果；尚未 Match 會回 `STEP_NOT_READY`。
-   - 請優先比對 `query notch-stage` 的 stage1/2/3 polygon，再看 `query notch` 的 per-regular 規則診斷。
+4. Common pitfalls:
+   - `run-step --step 3` requires a selected CAD first; otherwise it returns `STEP_NOT_READY`.
+   - `run-step --step 4` requires Step1 results; if Match has not run, it returns `STEP_NOT_READY`.
+   - Compare the stage1/2/3 polygons from `query notch-stage` first, then inspect the per-regular rule diagnostics from `query notch`.
 
 ## 3635 V21/V22 exact export gate
 
-- 前置：先關閉既有 `FreeformHelper.UI` instance；exact gate 自行啟動 hidden UI，並以暫時 app-general-settings path 隔離個人 DXF import/view preference。
-- 入口：`./scripts/perf/run-3635-regression-baseline.ps1 -LaunchIsolatedUi`；只有 apphost executable 已存在時才加 `-SkipBuild`。
-- lifecycle：`load-project` 後依序呼叫 `run-step 1~4`，驗證正式 workflow entry points 仍可重建完整輸出 state。
-- production single entry：UI Step5 直接進 `ExportNotchCommand`；Runtime Query 經 `RuntimeQueryUseCase -> ExportNotchCommand`，之後兩者共用 generation/export/write path。CLI 不直接呼叫 Application exporter，也不建立第二套 production workflow entry。
-- `c-v21`／`c-v22` 只 pin 最後的 selection/export target，不建立第二套 generation algorithm。CLI adapter 不會為指定 format 覆寫 VM 的 enabled versions 或 export profile；但共同 Step5 command 仍依既有契約把 live UI state 同步至 in-memory project settings，可能標記 `HasUnsavedChanges`。因此下述四欄 invariant 不能延伸解讀成整份 `ProjectSettings`、status 或 cache metrics 均不變。
-- 結果：產生 `notch_v2.1.c` / `notch_v2.2.c`，比較分成兩層：
-  1. diagnostic compare：把 CRLF、LF、lone CR 統一為 LF，每側最多移除一個 terminal LF，再做 ordinal compare；不 trim space/tab/comment，也不忽略 row ordering，失敗時回報 first-diff line/column/code point。
-  2. hard byte gate：actual raw bytes、SHA-256 與 node macro 必須命中 signed manifest；所以最終 gate 不容許 encoding、newline 或任何 byte 漂移。
-- executable provenance 的唯一 machine-readable owner 是 `example/BOE36.35/notch_export_golden_manifest.json`；它鎖住 project、mask、兩份 checked-in C、node/bytes/SHA 與 actual output。人工簽核、完整數值與環境見 `docs/performance/regression-baseline-3635.md`。
-- 失敗：actual C 保留在 `OutDir`；錯誤訊息列出第一個差異的 line/column、expected/actual code point 與 actual/golden path。Gate 不會覆蓋 checked-in golden。
-- lifecycle：啟動前拒絕任何既有 `FreeformHelper.UI`／`dotnet ... FreeformHelper.UI` process，啟動後以 `status.processId` 驗證 IPC server 正是 managed PID；結束時只停止 gate 自己啟動且 executable path 已驗證的 UI process。
-- state invariant：`status.notchExportState` 鎖住 `EnableV21`、`EnableV22`、file type、profile；連續 export 前後四者必須完全相同。
-- side effects：query 會建立 output directory、寫入或覆寫指定 output file、更新 export status/progress/summary，並 lookup/store generation cache；file type 與 selection delegates 是 transient adapter，必須在 `finally` 還原。
-- `-SkipGoldenCheck` 只供非 gate 的自訂效能實驗；VM、IPC 或 exporter slice 不得使用此參數作驗收。
-- version state/invalidation slice 必須再以 `-ReverseCExportOrder` 驗證 V22→V21；預設 V21→V22 與反向順序都要 exact。
+- Prerequisite: close existing `FreeformHelper.UI` instances first; the exact gate launches its own hidden UI and isolates personal DXF import/view preferences with a temporary app-general-settings path.
+- Entry point: `./scripts/perf/run-3635-regression-baseline.ps1 -LaunchIsolatedUi`; add `-SkipBuild` only when the apphost executable already exists.
+- lifecycle: after `load-project`, calls `run-step 1~4` in order to verify that the production workflow entry points can still rebuild the complete output state.
+- production single entry: UI Step5 goes directly to `ExportNotchCommand`; Runtime Query goes through `RuntimeQueryUseCase -> ExportNotchCommand`, after which both share the generation/export/write path. The CLI does not directly call the Application exporter or establish a second production workflow entry.
+- `c-v21`/`c-v22` only pin the final selection/export target and do not establish a second generation algorithm. The CLI adapter does not override the VM's enabled versions or export profile for the specified format; however, the shared Step5 command still synchronizes live UI state to in-memory project settings under the existing contract and may mark `HasUnsavedChanges`. Therefore, the four-field invariant below must not be interpreted as meaning that the entire `ProjectSettings`, status, or cache metrics remain unchanged.
+- Results: generates `notch_v2.1.c` / `notch_v2.2.c`, with two comparison layers:
+  1. diagnostic compare: normalizes CRLF, LF, and lone CR to LF, removes at most one terminal LF from each side, then performs an ordinal compare; does not trim spaces/tabs/comments or ignore row ordering, and reports the first-diff line/column/code point on failure.
+  2. hard byte gate: actual raw bytes, SHA-256, and node macro must match the signed manifest; the final gate therefore permits no encoding, newline, or any other byte drift.
+- The sole machine-readable owner of executable provenance is `example/BOE36.35/notch_export_golden_manifest.json`; it pins the project, mask, both checked-in C files, node/bytes/SHA, and actual output. See `docs/performance/regression-baseline-3635.md` for human sign-off, full values, and environment.
+- Failure: actual C files remain in `OutDir`; the error message lists the first differing line/column, expected/actual code points, and actual/golden paths. The gate does not overwrite checked-in golden.
+- lifecycle: rejects any existing `FreeformHelper.UI`/`dotnet ... FreeformHelper.UI` process before launch, then verifies through `status.processId` that the IPC server is the managed PID; on completion, stops only the UI process that the gate itself launched and whose executable path has been verified.
+- state invariant: `status.notchExportState` pins `EnableV21`, `EnableV22`, file type, and profile; all four must be identical before and after consecutive exports.
+- side effects: the query creates the output directory, writes or overwrites the specified output file, updates export status/progress/summary, and looks up/stores the generation cache; file type and selection delegates are transient adapters and must be restored in `finally`.
+- `-SkipGoldenCheck` is only for custom performance experiments outside the gate; VM, IPC, or exporter slices must not use this parameter for acceptance.
+- Version state/invalidation slices must also verify V22→V21 with `-ReverseCExportOrder`; both the default V21→V22 and reverse order must be exact.
 
-## IPC 協定（v1）
-- Transport：Windows Named Pipe（`freeformhelper.runtime.v1`）。
-- Request（單行 JSON）：
+## IPC protocol (v1)
+- Transport: Windows Named Pipe (`freeformhelper.runtime.v1`).
+- Request (single-line JSON):
   - `{ "version":"1", "command":"status", "args":{...} }`
-- Response（單行 JSON）：
-  - 成功：`{ "ok": true, "data": { ... } }`
-  - 失敗：`{ "ok": false, "error": { "code":"...", "message":"..." } }`
+- Response (single-line JSON):
+  - Success: `{ "ok": true, "data": { ... } }`
+  - Failure: `{ "ok": false, "error": { "code":"...", "message":"..." } }`
 
-## 錯誤碼（目前）
-- `INSTANCE_NOT_RUNNING`：沒有執行中的 UI instance 可回應。
-- `INVALID_ARGUMENTS`：命令列參數格式錯誤。
-- `UNKNOWN_COMMAND`：不支援的 query command。
-- `PAD_NOT_FOUND`：指定 pad 在目前可視資料中不存在。
-- `NOT_READY`：請先完成必要前置（例如 grid 尚未建立）。
-- `STEP_NOT_READY`：指定步驟執行後仍不滿足可用狀態（通常是前置條件不足）。
-- `STEP_EXECUTION_FAILED`：步驟執行期間例外。
-- `IPC_IO_ERROR` / `IPC_ERROR`：IPC 傳輸或執行錯誤。
-- UI-side command執行若拋出未處理例外，Named Pipe server必須回單行`IPC_ERROR` failure envelope並保留原message；不能以斷線／`EMPTY_RESPONSE`取代協定回應。Lifecycle cancellation仍直接結束server，不轉成錯誤回應。
-- `IPC_TIMEOUT`：已連上執行中的 UI instance，但 query 在 `--timeout-ms` 上限內未完成。
-- `IPC_REQUEST_TIMEOUT`：client 連上 IPC server 後沒有送出完整 request，server 已主動中止該連線。
+## Error codes (current)
+- `INSTANCE_NOT_RUNNING`: no running UI instance is available to respond.
+- `INVALID_ARGUMENTS`: invalid command-line argument format.
+- `UNKNOWN_COMMAND`: unsupported query command.
+- `PAD_NOT_FOUND`: the specified pad does not exist in the currently visible data.
+- `NOT_READY`: complete the required prerequisites first (for example, the grid has not yet been built).
+- `STEP_NOT_READY`: the specified step still does not satisfy the available state after execution (usually due to missing prerequisites).
+- `STEP_EXECUTION_FAILED`: exception during step execution.
+- `IPC_IO_ERROR` / `IPC_ERROR`: IPC transport or execution error.
+- If UI-side command execution throws an unhandled exception, the Named Pipe server must return a single-line `IPC_ERROR` failure envelope and retain the original message; disconnection/`EMPTY_RESPONSE` must not replace the protocol response. Lifecycle cancellation still terminates the server directly and is not converted to an error response.
+- `IPC_TIMEOUT`: connected to a running UI instance, but the query did not complete within the `--timeout-ms` limit.
+- `IPC_REQUEST_TIMEOUT`: the client connected to the IPC server without sending a complete request, and the server terminated the connection.
 
-## 架構
-- `Program`：判斷是否 `query` 模式，query 走 IPC client，否則啟動 UI。
-- `RuntimeQueryIpcServer`：UI process 內 Named Pipe server。
-- `RuntimeQueryUseCase`：將 query 映射為 ViewModel snapshot / 常用 workflow action。
-- `FreeformHelperViewModel.GetWorkflowStateSnapshot()`：提供 workflow gate 狀態給 CLI。
-- `R13.102b-2` 後，`query multi-owner` 先確認CAD仍在visible collection，再只取得一份由current setting或`--overlap-percent` override決定的current-revision `NotchV22ResolvedResult`；輕量Inspector snapshot只供既有CAD response metadata，所有multi-owner evidence均投影`resolved.Compensation.RegularDebugInfos`。CLI arguments、payload schema、ordering、limit/truncation與error codes不變。
-- `R13.102a-2b-2` 後，normal `CadAllocation` generation cache保存compact output-request-neutral candidate batch；同一 `ExportNotchCommand` 的matching request以當下enabled versions、threshold、`NullValue`與target coverage guard/cap做final projection，再由當下profile／file type serialization。UI與Runtime export仍共用同一command／write path；batch request可攜帶目前單一選取CAD的resolved result，warm時reuse exact instance，cold時至多回傳一份並在currentness驗證後promotion回既有per-CAD owner。batch不保存其餘candidate的完整polygons/debug evidence；`LegacyRegularAnchor`仍維持request-specific table cache。R13.101e另讓normal generator／UI compensation都只執行完整`NotchV22CompensationContext`，舊multi-parameter API僅為compatibility adapter；Runtime command、payload schema與final-output identity不變。R13.101c-2／R13.102／R13.102a-2／R13.103依各自exit criteria保持open。
-- IPC schema未變：`status.cache.exportGenerationCache.entryRowCount`在batch-backed `CadAllocation` entry上表示最新一次projected table row count，而非candidate count或batch大小；因此零列projection可同時呈現`hasEntry=true`與`entryRowCount=0`。Warm cache hit只執行／回報phase 4，不捏造phase 1～3工作。
+## Architecture
+- `Program`: determines whether this is `query` mode; queries use the IPC client, otherwise the UI starts.
+- `RuntimeQueryIpcServer`: Named Pipe server inside the UI process.
+- `RuntimeQueryUseCase`: maps queries to ViewModel snapshots / common workflow actions.
+- `FreeformHelperViewModel.GetWorkflowStateSnapshot()`: provides workflow gate state to the CLI.
+- After `R13.102b-2`, `query multi-owner` first confirms that the CAD is still in the visible collection, then obtains only one current-revision `NotchV22ResolvedResult` determined by the current setting or `--overlap-percent` override; the lightweight Inspector snapshot only supplies existing CAD response metadata, and all multi-owner evidence is projected from `resolved.Compensation.RegularDebugInfos`. CLI arguments, payload schema, ordering, limit/truncation, and error codes remain unchanged.
+- After `R13.102a-2b-2`, the normal `CadAllocation` generation cache stores a compact output-request-neutral candidate batch; a matching request in the same `ExportNotchCommand` performs final projection using the current enabled versions, threshold, `NullValue`, and target coverage guard/cap, then serializes using the current profile/file type. UI and Runtime export still share the same command/write path; a batch request can carry the resolved result for the currently selected single CAD, reusing the exact instance when warm, or returning at most one when cold and promoting it to the existing per-CAD owner after currentness validation. The batch does not retain complete polygons/debug evidence for the other candidates; `LegacyRegularAnchor` retains its request-specific table cache. R13.101e also makes both the normal generator/UI compensation execute only the complete `NotchV22CompensationContext`, with the old multi-parameter API serving only as a compatibility adapter; Runtime commands, payload schema, and final-output identity remain unchanged. R13.101c-2/R13.102/R13.102a-2/R13.103 remain open under their respective exit criteria.
+- The IPC schema is unchanged: `status.cache.exportGenerationCache.entryRowCount` on a batch-backed `CadAllocation` entry represents the latest projected table row count, not the candidate count or batch size; a zero-row projection can therefore show both `hasEntry=true` and `entryRowCount=0`. A warm cache hit only executes/reports phase 4 and does not fabricate phase 1～3 work.
 
