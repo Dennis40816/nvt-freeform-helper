@@ -90,77 +90,23 @@ public static partial class DxfRegularMaskAuditService
         ArgumentNullException.ThrowIfNull(regularPadById);
         ArgumentNullException.ThrowIfNull(cadIcIndexByCadId);
 
-        var mode = activeRegularPadIds is null
-            ? CadOutputFwDiffAssignmentMode.GeometryOnly
-            : CadOutputFwDiffAssignmentMode.CsvConstrained;
-        var duplicateDiffKeys = BuildDuplicateDiffKeySet(
+        var context = new AuditInvocationContext(
             orderedCadPads,
+            cadToRegular,
+            regularPadById,
+            cadIcIndexByCadId,
+            activeRegularPadIds,
             currentAssignedDiffByCadId,
-            cadIcIndexByCadId);
-        var decisions = new Dictionary<int, CadOutputFwDiffAssignmentDecision>(orderedCadPads.Count);
-
-        for (var index = 0; index < orderedCadPads.Count; index++)
-        {
-            var cadPad = orderedCadPads[index];
-            var candidateSet = BuildCandidateSet(
-                cadPad.Id,
-                cadToRegular,
-                regularPadById,
-                cadIcIndexByCadId,
-                activeRegularPadIds);
-            var currentPrimaryDiff = ResolveCurrentPrimaryDiff(currentAssignedDiffByCadId, cadPad.Id);
-            var decisionSource = manualOverrideDiffByCadId is not null &&
-                                 manualOverrideDiffByCadId.ContainsKey(cadPad.Id)
-                ? CadOutputFwDiffAssignmentDecisionSource.ManualOverride
-                : CadOutputFwDiffAssignmentDecisionSource.Seed;
-            var hasDuplicateConflict = currentPrimaryDiff.HasValue &&
-                                       cadIcIndexByCadId.TryGetValue(cadPad.Id, out var cadIcIndex) &&
-                                       duplicateDiffKeys.Contains((cadIcIndex, currentPrimaryDiff.Value));
-            var reasonCode = ResolveReasonCode(
-                mode,
-                candidateSet.RawSeed,
-                candidateSet.MaskedSeed,
-                currentPrimaryDiff,
-                hasDuplicateConflict,
-                candidateSet.GeometryCandidates,
-                candidateSet.CsvConfirmedCandidates);
-            var repairSuggestionDiff = ResolveRepairSuggestionDiff(
-                mode,
-                currentPrimaryDiff,
-                candidateSet.GeometryCandidates,
-                candidateSet.CsvConfirmedCandidates);
-            var confidence = mode == CadOutputFwDiffAssignmentMode.CsvConstrained
-                ? ComputeConfidence(candidateSet.CsvConfirmedCandidates)
-                : ComputeConfidence(candidateSet.GeometryCandidates);
-
-            decisions[cadPad.Id] = new CadOutputFwDiffAssignmentDecision(
-                CadPadId: cadPad.Id,
-                OrderedCadIndex: index,
-                Mode: mode,
-                RawSeed: candidateSet.RawSeed,
-                MaskedSeed: candidateSet.MaskedSeed,
-                GeometryCandidates: candidateSet.GeometryCandidates,
-                CsvConfirmedCandidates: candidateSet.CsvConfirmedCandidates,
-                CurrentPrimaryDiffIndex: currentPrimaryDiff,
-                PassiveCompensationDiffIndex: null,
-                RepairSuggestionDiffIndex: repairSuggestionDiff,
-                ReasonCode: reasonCode,
-                DecisionSource: decisionSource,
-                Confidence: confidence);
-        }
-
-        ApplySegmentOffsetSignals(
-            decisions,
-            orderedCadPads,
-            regularPadById,
-            cadIcIndexByCadId);
+            manualOverrideDiffByCadId);
+        var seedResult = BuildSeedDecisions(context);
+        var segmentResult = ApplySegmentOffsetSignals(context, seedResult);
         ApplyLocalRepairAndPassiveCompensationSignals(
-            decisions,
-            orderedCadPads,
-            regularPadById,
-            cadIcIndexByCadId);
+            segmentResult.Decisions,
+            context.OrderedCadPads,
+            context.RegularPadById,
+            context.CadIcIndexByCadId);
 
-        return decisions;
+        return segmentResult.Decisions;
     }
 
     private static CandidateSet BuildCandidateSet(
