@@ -46,6 +46,7 @@ $requiredFiles = @(
     "LICENSE",
     "README.md",
     "TODO.md",
+    "VERSION",
     "global.json"
 )
 
@@ -77,6 +78,24 @@ function Add-StructureFailures {
     foreach ($file in $requiredFiles) {
         if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $file) -PathType Leaf)) {
             $failures.Add("Required file is missing: $file")
+        }
+    }
+
+    $versionPath = Join-Path $repoRoot "VERSION"
+    if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
+        $versionText = [System.IO.File]::ReadAllText($versionPath)
+        if ($versionText -notmatch '\A(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\r\n\z') {
+            $failures.Add("VERSION must contain one MAJOR.MINOR.PATCH line ending in CRLF, without leading zeros.")
+        }
+    }
+
+    $buildPropsPath = Join-Path $repoRoot "Directory.Build.props"
+    if (Test-Path -LiteralPath $buildPropsPath -PathType Leaf) {
+        [xml]$buildProps = Get-Content -LiteralPath $buildPropsPath -Raw
+        $versionNodes = @($buildProps.SelectNodes("/Project/PropertyGroup/Version"))
+        $versionReadExpression = '$([System.IO.File]::ReadAllText(''$(MSBuildThisFileDirectory)VERSION'').Trim())'
+        if ($versionNodes.Count -ne 1 -or $versionNodes[0].InnerText -cne $versionReadExpression) {
+            $failures.Add("Directory.Build.props must set Version by reading the root VERSION file with the expected MSBuild property function.")
         }
     }
 
@@ -143,7 +162,7 @@ function Add-StructureFailures {
 }
 
 function Invoke-StructureLane {
-    Write-Lane "structure: required files, submodule link, private paths, SDK pin, action pins"
+    Write-Lane "structure: required files, project version, submodule link, private paths, SDK pin, action pins"
     $failures = New-Object System.Collections.Generic.List[string]
     & $privatePathCheckScript
     & $temporaryEnvironmentCheckScript

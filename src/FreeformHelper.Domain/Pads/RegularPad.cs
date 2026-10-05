@@ -68,6 +68,15 @@ public sealed class RegularPad
     }
 
     /// <summary>
+    /// Assigns the IC index and per-IC FW diff index for this pad.
+    /// </summary>
+    public void AssignMapping(int icIndex, int diffIndex)
+    {
+        IcIndex = icIndex;
+        DiffIndex = diffIndex;
+    }
+
+    /// <summary>
     /// Gets or sets the ID of the <see cref="CadPad"/> that this regular pad was matched to.
     /// Null if no matching CAD pad was found.
     /// </summary>

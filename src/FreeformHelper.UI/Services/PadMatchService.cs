@@ -16,16 +16,13 @@ namespace FreeformHelper.UI.Services;
 public sealed class PadMatchService
 {
     /// <summary>
-    /// Builds the current CAD-to-regular overlap evidence.
+    /// Builds many-to-many CAD-to-regular overlap evidence and updates each regular pad's best match.
     /// </summary>
     /// <param name="cad">The set of CAD pads.</param>
     /// <param name="grid">The regular grid whose pads will be matched.</param>
-    /// <param name="settings">
-    /// Compatibility parameter retained by the Application matcher API; currently ignored.
-    /// </param>
-    public PadMatchResult Match(CadPadSet cad, RegularGrid grid, MatchingSettings settings, Action<double>? reportProgress = null)
+    public PadMatchResult Match(CadPadSet cad, RegularGrid grid, Action<double>? reportProgress = null)
     {
-        return PadMatcher.Match(cad, grid, settings, reportProgress);
+        return PadMatcher.Match(cad, grid, reportProgress);
     }
 
     /// <summary>

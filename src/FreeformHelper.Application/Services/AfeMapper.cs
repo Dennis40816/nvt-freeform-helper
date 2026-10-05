@@ -49,8 +49,7 @@ public sealed class DiffIndexMapper
             var scanRow = ApplyRowDirection(pad.Row, rows, settings.ScanOrder);
             var scanColLocal = ApplyColDirection(localX, icCols, settings.ScanOrder);
 
-            pad.IcIndex = ic;
-            pad.DiffIndex = scanRow * icCols + scanColLocal;
+            pad.AssignMapping(ic, scanRow * icCols + scanColLocal);
         }
     }
 

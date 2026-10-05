@@ -8,6 +8,229 @@ namespace FreeformHelper.Tests;
 public sealed class CoordinatePlannerComputationServiceTests
 {
     [Fact]
+    public void BuildSnapshot_WithAllArtifactKinds_PreservesCompleteSnapshot()
+    {
+        var request = BuildGuideModeRequest(CoordinateGuideGenerationMode.Count, CoordinateGuideGenerationMode.Count) with
+        {
+            MachineOriginX = 100d,
+            MachineOriginY = -20d,
+            MachineWidth = 80d,
+            MachineHeight = 40d,
+            PixelWidth = 800,
+            PixelHeight = 200,
+            HorizontalGuideCount = 2,
+            VerticalGuideCount = 1,
+            CopperPillarDiameter = 10d,
+            ShowBistRectangle = true,
+            ShowCustomArray = true,
+            CustomArrayColumnCount = 3,
+            CustomArrayRowCount = 2,
+            CustomArrayTopLeftMachineX = 90d,
+            CustomArrayTopLeftMachineY = -30d,
+            CustomArrayTopRightMachineX = 154d,
+            CustomArrayTopRightMachineY = 18d,
+            CustomArrayBottomRightMachineX = 154d,
+            CustomArrayBottomRightMachineY = 58d,
+            CustomArrayBottomLeftMachineX = 90d,
+            CustomArrayBottomLeftMachineY = 10d,
+            CustomPoints =
+            [
+                new CoordinateCustomPointRequest(" ", "Ignored", 0d, 0d),
+                new CoordinateCustomPointRequest("probe", "Probe A", 95d, 25d),
+                new CoordinateCustomPointRequest("fallback", " ", 140d, 0d),
+            ],
+            CustomPaths =
+            [
+                new CoordinateCustomPathRequest(" ", "Ignored", 0d, 0d, 0d, 0d, 3),
+                new CoordinateCustomPathRequest("sweep", "Edge sweep", 90d, -30d, 190d, 30d, 3),
+                new CoordinateCustomPathRequest("single", " ", 140d, -30d, 140d, 30d, 1),
+                new CoordinateCustomPathRequest("empty", "No steps", 120d, -10d, 160d, 10d, -1),
+            ],
+        };
+
+        var snapshot = CoordinatePlannerComputationService.BuildSnapshot(
+            new Rect2(10d, 20d, 90d, 60d), new Rect2(-8d, -4d, 8d, 4d), request);
+
+        // Captured from the original service with round-trip coordinates and artifact order.
+        const string expected = """
+            AA=10,20,90,60|radius=5|worldRadius=5,5
+            P|aa-tl|AA TL|AaCorner|world=10,60|safeWorld=15,55|pixel=0,0|machine=100,-20|safeMachine=105,-15
+            P|aa-tr|AA TR|AaCorner|world=90,60|safeWorld=85,55|pixel=800,0|machine=180,-20|safeMachine=175,-15
+            P|aa-br|AA BR|AaCorner|world=90,20|safeWorld=85,25|pixel=800,200|machine=180,20|safeMachine=175,15
+            P|aa-bl|AA BL|AaCorner|world=10,20|safeWorld=15,25|pixel=0,200|machine=100,20|safeMachine=105,15
+            P|bist-tl|BIST TL|BistCorner|world=30,50|safeWorld=30,50|pixel=200,50|machine=120,-10|safeMachine=120,-10
+            P|bist-tr|BIST TR|BistCorner|world=70,50|safeWorld=70,50|pixel=600,50|machine=160,-10|safeMachine=160,-10
+            P|bist-br|BIST BR|BistCorner|world=70,30|safeWorld=70,30|pixel=600,150|machine=160,10|safeMachine=160,10
+            P|bist-bl|BIST BL|BistCorner|world=30,30|safeWorld=30,30|pixel=200,150|machine=120,10|safeMachine=120,10
+            P|array-tl|Array TL|CustomArrayCorner|world=10,60|safeWorld=15,55|pixel=-100,-50|machine=90,-30|safeMachine=105,-15
+            P|array-tr|Array TR|CustomArrayCorner|world=64,22|safeWorld=60,25|pixel=540,190|machine=154,18|safeMachine=150,15
+            P|array-br|Array BR|CustomArrayCorner|world=64,20|safeWorld=60,25|pixel=540,390|machine=154,58|safeMachine=150,15
+            P|array-bl|Array BL|CustomArrayCorner|world=10,30|safeWorld=15,32|pixel=-100,150|machine=90,10|safeMachine=105,8
+            P|array-dot-r1-c1|P1-1|CustomArrayDot|world=10,60|safeWorld=15,55|pixel=-100,-50|machine=90,-30|safeMachine=105,-15
+            P|array-dot-r1-c2|P1-2|CustomArrayDot|world=32,46|safeWorld=32,41|pixel=220.00000000000003,70|machine=122,-6|safeMachine=122,-1
+            P|array-dot-r1-c3|P1-3|CustomArrayDot|world=64,22|safeWorld=60,25|pixel=540,190|machine=154,18|safeMachine=150,15
+            P|array-dot-r2-c1|P2-1|CustomArrayDot|world=10,30|safeWorld=15,32|pixel=-100,150|machine=90,10|safeMachine=105,8
+            P|array-dot-r2-c2|P2-2|CustomArrayDot|world=32,20|safeWorld=32,25|pixel=220.00000000000003,270|machine=122,34|safeMachine=122,15
+            P|array-dot-r2-c3|P2-3|CustomArrayDot|world=64,20|safeWorld=60,25|pixel=540,390|machine=154,58|safeMachine=150,15
+            P|custom-point-probe|Probe A|CustomPoint|world=10,20|safeWorld=15,25|pixel=-50,225|machine=95,25|safeMachine=105,15
+            P|custom-point-fallback|Custom point|CustomPoint|world=50,40|safeWorld=50,40|pixel=400,100|machine=140,0|safeMachine=140,0
+            P|custom-path-sweep-step-1|Edge sweep P1|CustomPathStep|world=10,60|safeWorld=15,55|pixel=-100,-50|machine=90,-30|safeMachine=105,-15
+            P|custom-path-sweep-step-2|Edge sweep P2|CustomPathStep|world=50,40|safeWorld=50,40|pixel=400,100|machine=140,0|safeMachine=140,0
+            P|custom-path-sweep-step-3|Edge sweep P3|CustomPathStep|world=90,20|safeWorld=85,25|pixel=900,250|machine=190,30|safeMachine=175,15
+            P|custom-path-single-step-1|Custom path P1|CustomPathStep|world=50,40|safeWorld=50,40|pixel=400,100|machine=140,0|safeMachine=140,0
+            L|h-1|H1|HorizontalGuide|world=-8,4,8,4|safeWorld=-7,3,7,3|pixel=0,0,800,0|machine=100,-20,180,-20|safeMachine=105,-15,175,-15
+            L|h-2|H2|HorizontalGuide|world=-8,-4,8,-4|safeWorld=-7,-3,7,-3|pixel=0,200,800,200|machine=100,20,180,20|safeMachine=105,15,175,15
+            L|v-1|V1|VerticalGuide|world=-8,4,-8,-4|safeWorld=-7,3,-7,-3|pixel=0,0,0,200|machine=100,-20,100,20|safeMachine=105,-15,105,15
+            L|array-top|Array top|CustomArrayEdge|world=10,60,64,22|safeWorld=15,55,60,25|pixel=-100,-50,540,190|machine=90,-30,154,18|safeMachine=105,-15,150,15
+            L|array-right|Array right|CustomArrayEdge|world=64,22,64,20|safeWorld=60,25,60,25|pixel=540,190,540,390|machine=154,18,154,58|safeMachine=150,15,150,15
+            L|array-bottom|Array bottom|CustomArrayEdge|world=10,30,64,20|safeWorld=15,32,60,25|pixel=-100,150,540,390|machine=90,10,154,58|safeMachine=105,8,150,15
+            L|array-left|Array left|CustomArrayEdge|world=10,60,10,30|safeWorld=15,55,15,32|pixel=-100,-50,-100,150|machine=90,-30,90,10|safeMachine=105,-15,105,8
+            L|custom-path-sweep|Edge sweep|CustomPath|world=10,60,90,20|safeWorld=15,55,85,25|pixel=-100,-50,900,250|machine=90,-30,190,30|safeMachine=105,-15,175,15
+            L|custom-path-single|Custom path|CustomPath|world=50,60,50,20|safeWorld=50,55,50,25|pixel=400,-50,400,250|machine=140,-30,140,30|safeMachine=140,-15,140,15
+            L|custom-path-empty|No steps|CustomPath|world=30,50,70,30|safeWorld=30,50,70,30|pixel=200,50,600,150|machine=120,-10,160,10|safeMachine=120,-10,160,10
+            R|bist-center|BIST center blank rect|BistCenter|world=30,30,70,50|safeWorld=35,35,65,45|pixel=200,50,600,150|machine=120,-10,160,10|safeMachine=125,-5,155,5
+            """;
+        AssertSnapshot(expected, snapshot);
+    }
+
+    [Theory]
+    [InlineData(60d)]
+    [InlineData(120d)]
+    public void BuildSnapshot_WhenSafeRectangleCollapses_PreservesCompleteSnapshot(double diameter)
+    {
+        var request = BuildGuideModeRequest(CoordinateGuideGenerationMode.Count, CoordinateGuideGenerationMode.Count) with
+        {
+            MachineOriginX = -10d,
+            MachineOriginY = 30d,
+            MachineWidth = 80d,
+            MachineHeight = 40d,
+            PixelWidth = 800,
+            PixelHeight = 200,
+            HorizontalGuideCount = 1,
+            VerticalGuideCount = 1,
+            CopperPillarDiameter = diameter,
+            ShowBistRectangle = true,
+        };
+
+        var snapshot = CoordinatePlannerComputationService.BuildSnapshot(new Rect2(10d, 20d, 90d, 60d), request);
+
+        // The rectangle collapses before the point clamp does when diameter is 60.
+        var expected = diameter == 60d
+            ? """
+            AA=10,20,90,60|radius=30|worldRadius=30,30
+            P|aa-tl|AA TL|AaCorner|world=10,60|safeWorld=40,40|pixel=0,0|machine=-10,30|safeMachine=20,50
+            P|aa-tr|AA TR|AaCorner|world=90,60|safeWorld=60,40|pixel=800,0|machine=70,30|safeMachine=40,50
+            P|aa-br|AA BR|AaCorner|world=90,20|safeWorld=60,40|pixel=800,200|machine=70,70|safeMachine=40,50
+            P|aa-bl|AA BL|AaCorner|world=10,20|safeWorld=40,40|pixel=0,200|machine=-10,70|safeMachine=20,50
+            P|bist-tl|BIST TL|BistCorner|world=30,50|safeWorld=40,40|pixel=200,50|machine=10,40|safeMachine=20,50
+            P|bist-tr|BIST TR|BistCorner|world=70,50|safeWorld=60,40|pixel=600,50|machine=50,40|safeMachine=40,50
+            P|bist-br|BIST BR|BistCorner|world=70,30|safeWorld=60,40|pixel=600,150|machine=50,60|safeMachine=40,50
+            P|bist-bl|BIST BL|BistCorner|world=30,30|safeWorld=40,40|pixel=200,150|machine=10,60|safeMachine=20,50
+            L|h-1|H1|HorizontalGuide|world=10,60,90,60|safeWorld=40,40,60,40|pixel=0,0,800,0|machine=-10,30,70,30|safeMachine=20,50,40,50
+            L|v-1|V1|VerticalGuide|world=10,60,10,20|safeWorld=40,40,40,40|pixel=0,0,0,200|machine=-10,30,-10,70|safeMachine=20,50,20,50
+            R|bist-center|BIST center blank rect|BistCenter|world=30,30,70,50|safeWorld=50,40,50,40|pixel=200,50,600,150|machine=10,40,50,60|safeMachine=30,50,30,50
+            """
+            : """
+            AA=10,20,90,60|radius=60|worldRadius=60,60
+            P|aa-tl|AA TL|AaCorner|world=10,60|safeWorld=50,40|pixel=0,0|machine=-10,30|safeMachine=30,50
+            P|aa-tr|AA TR|AaCorner|world=90,60|safeWorld=50,40|pixel=800,0|machine=70,30|safeMachine=30,50
+            P|aa-br|AA BR|AaCorner|world=90,20|safeWorld=50,40|pixel=800,200|machine=70,70|safeMachine=30,50
+            P|aa-bl|AA BL|AaCorner|world=10,20|safeWorld=50,40|pixel=0,200|machine=-10,70|safeMachine=30,50
+            P|bist-tl|BIST TL|BistCorner|world=30,50|safeWorld=50,40|pixel=200,50|machine=10,40|safeMachine=30,50
+            P|bist-tr|BIST TR|BistCorner|world=70,50|safeWorld=50,40|pixel=600,50|machine=50,40|safeMachine=30,50
+            P|bist-br|BIST BR|BistCorner|world=70,30|safeWorld=50,40|pixel=600,150|machine=50,60|safeMachine=30,50
+            P|bist-bl|BIST BL|BistCorner|world=30,30|safeWorld=50,40|pixel=200,150|machine=10,60|safeMachine=30,50
+            L|h-1|H1|HorizontalGuide|world=10,60,90,60|safeWorld=50,40,50,40|pixel=0,0,800,0|machine=-10,30,70,30|safeMachine=30,50,30,50
+            L|v-1|V1|VerticalGuide|world=10,60,10,20|safeWorld=50,40,50,40|pixel=0,0,0,200|machine=-10,30,-10,70|safeMachine=30,50,30,50
+            R|bist-center|BIST center blank rect|BistCenter|world=30,30,70,50|safeWorld=50,40,50,40|pixel=200,50,600,150|machine=10,40,50,60|safeMachine=30,50,30,50
+            """;
+        AssertSnapshot(expected, snapshot);
+    }
+
+    [Fact]
+    public void BuildSnapshot_WithZeroAndNegativeMachineSpans_PreservesCompleteSnapshot()
+    {
+        var request = BuildGuideModeRequest(CoordinateGuideGenerationMode.Count, CoordinateGuideGenerationMode.Count) with
+        {
+            MachineOriginX = 10d,
+            MachineOriginY = 20d,
+            MachineWidth = 0d,
+            MachineHeight = -8d,
+            PixelWidth = 0,
+            PixelHeight = -4,
+            HorizontalGuideCount = 2,
+            VerticalGuideCount = 1,
+            CopperPillarDiameter = 6d,
+            ShowBistRectangle = true,
+            CustomPoints = [new CoordinateCustomPointRequest("probe", "Probe A", 12d, 30d)],
+            CustomPaths = [new CoordinateCustomPathRequest("single", "Single step", 8d, 10d, 20d, 40d, 1)],
+        };
+
+        var snapshot = CoordinatePlannerComputationService.BuildSnapshot(new Rect2(10d, 20d, 90d, 60d), request);
+
+        // Captured from the original service with round-trip coordinates and artifact order.
+        const string expected = """
+            AA=10,20,90,60|radius=3|worldRadius=240000000000,120000000000
+            P|aa-tl|AA TL|AaCorner|world=10,60|safeWorld=10,60|pixel=0,0|machine=10,20|safeMachine=10,16
+            P|aa-tr|AA TR|AaCorner|world=90,60|safeWorld=10,60|pixel=1,0|machine=10,20|safeMachine=10,16
+            P|aa-br|AA BR|AaCorner|world=90,20|safeWorld=10,60|pixel=1,1|machine=10,12|safeMachine=10,16
+            P|aa-bl|AA BL|AaCorner|world=10,20|safeWorld=10,60|pixel=0,1|machine=10,12|safeMachine=10,16
+            P|bist-tl|BIST TL|BistCorner|world=30,50|safeWorld=10,60|pixel=0.25,0.25|machine=10,18|safeMachine=10,16
+            P|bist-tr|BIST TR|BistCorner|world=70,50|safeWorld=10,60|pixel=0.75,0.25|machine=10,18|safeMachine=10,16
+            P|bist-br|BIST BR|BistCorner|world=70,30|safeWorld=10,60|pixel=0.75,0.75|machine=10,14|safeMachine=10,16
+            P|bist-bl|BIST BL|BistCorner|world=30,30|safeWorld=10,60|pixel=0.25,0.75|machine=10,14|safeMachine=10,16
+            P|custom-point-probe|Probe A|CustomPoint|world=10,60|safeWorld=10,60|pixel=0,0|machine=12,30|safeMachine=10,16
+            P|custom-path-single-step-1|Single step P1|CustomPathStep|world=10,60|safeWorld=10,60|pixel=0,0|machine=14,25|safeMachine=10,16
+            L|h-1|H1|HorizontalGuide|world=10,60,90,60|safeWorld=10,60,10,60|pixel=0,0,1,0|machine=10,20,10,20|safeMachine=10,16,10,16
+            L|h-2|H2|HorizontalGuide|world=10,20,90,20|safeWorld=10,60,10,60|pixel=0,1,1,1|machine=10,12,10,12|safeMachine=10,16,10,16
+            L|v-1|V1|VerticalGuide|world=10,60,10,20|safeWorld=10,60,10,60|pixel=0,0,0,1|machine=10,20,10,12|safeMachine=10,16,10,16
+            L|custom-path-single|Single step|CustomPath|world=10,60,10,60|safeWorld=10,60,10,60|pixel=0,0,0,0|machine=8,10,20,40|safeMachine=10,16,10,16
+            R|bist-center|BIST center blank rect|BistCenter|world=30,30,70,50|safeWorld=10,60,10,60|pixel=0.25,0.25,0.75,0.75|machine=10,18,10,14|safeMachine=10,16,10,16
+            """;
+        AssertSnapshot(expected, snapshot);
+    }
+
+    [Fact]
+    public void BuildSnapshot_AtMachineSpanThreshold_PreservesCompleteSnapshot()
+    {
+        var request = BuildGuideModeRequest(CoordinateGuideGenerationMode.Count, CoordinateGuideGenerationMode.Count) with
+        {
+            MachineWidth = 1e-9,
+            MachineHeight = 1.000000001e-9,
+            PixelWidth = -2,
+            PixelHeight = 0,
+            HorizontalGuideCount = 2,
+            VerticalGuideCount = 1,
+            ShowBistRectangle = true,
+            CustomPoints = [new CoordinateCustomPointRequest("probe", "Probe A", 2e-9, -1e-9)],
+            CustomPaths = [new CoordinateCustomPathRequest("single", "Single step", -1e-9, 2e-9, 2e-9, -1e-9, 1)],
+        };
+
+        var snapshot = CoordinatePlannerComputationService.BuildSnapshot(new Rect2(10d, 20d, 90d, 60d), request);
+
+        // Captured from the original service with round-trip coordinates and artifact order.
+        const string expected = """
+            AA=10,20,90,60|radius=0|worldRadius=0,0
+            P|aa-tl|AA TL|AaCorner|world=10,60|safeWorld=10,60|pixel=0,0|machine=0,0|safeMachine=0,0
+            P|aa-tr|AA TR|AaCorner|world=90,60|safeWorld=10,60|pixel=1,0|machine=1E-09,0|safeMachine=1E-09,0
+            P|aa-br|AA BR|AaCorner|world=90,20|safeWorld=10,20|pixel=1,1|machine=1E-09,1.000000001E-09|safeMachine=1E-09,1.000000001E-09
+            P|aa-bl|AA BL|AaCorner|world=10,20|safeWorld=10,20|pixel=0,1|machine=0,1.000000001E-09|safeMachine=0,1.000000001E-09
+            P|bist-tl|BIST TL|BistCorner|world=30,50|safeWorld=10,50|pixel=0.25,0.25|machine=2.5E-10,2.5000000025E-10|safeMachine=2.5E-10,2.5000000025E-10
+            P|bist-tr|BIST TR|BistCorner|world=70,50|safeWorld=10,50|pixel=0.75,0.25|machine=7.500000000000001E-10,2.5000000025E-10|safeMachine=7.500000000000001E-10,2.5000000025E-10
+            P|bist-br|BIST BR|BistCorner|world=70,30|safeWorld=10,30|pixel=0.75,0.75|machine=7.500000000000001E-10,7.5000000075E-10|safeMachine=7.500000000000001E-10,7.5000000075E-10
+            P|bist-bl|BIST BL|BistCorner|world=30,30|safeWorld=10,30|pixel=0.25,0.75|machine=2.5E-10,7.5000000075E-10|safeMachine=2.5E-10,7.5000000075E-10
+            P|custom-point-probe|Probe A|CustomPoint|world=10,60|safeWorld=10,60|pixel=0,-0.999999999|machine=2E-09,-1E-09|safeMachine=1E-09,0
+            P|custom-path-single-step-1|Single step P1|CustomPathStep|world=10,40.00000002|safeWorld=10,40.00000002|pixel=0,0.4999999994999999|machine=5.000000000000001E-10,4.999999999999999E-10|safeMachine=5.000000000000001E-10,4.999999999999999E-10
+            L|h-1|H1|HorizontalGuide|world=10,60,90,60|safeWorld=10,60,10,60|pixel=0,0,1,0|machine=0,0,1E-09,0|safeMachine=0,0,1E-09,0
+            L|h-2|H2|HorizontalGuide|world=10,20,90,20|safeWorld=10,20,10,20|pixel=0,1,1,1|machine=0,1.000000001E-09,1E-09,1.000000001E-09|safeMachine=0,1.000000001E-09,1E-09,1.000000001E-09
+            L|v-1|V1|VerticalGuide|world=10,60,10,20|safeWorld=10,60,10,20|pixel=0,0,0,1|machine=0,0,0,1.000000001E-09|safeMachine=0,0,0,1.000000001E-09
+            L|custom-path-single|Single step|CustomPath|world=10,20,10,60|safeWorld=10,20,10,60|pixel=0,1.999999998,0,-0.999999999|machine=-1E-09,2E-09,2E-09,-1E-09|safeMachine=0,1.000000001E-09,1E-09,0
+            R|bist-center|BIST center blank rect|BistCenter|world=30,30,70,50|safeWorld=10,30,10,50|pixel=0.25,0.25,0.75,0.75|machine=2.5E-10,2.5000000025E-10,7.500000000000001E-10,7.5000000075E-10|safeMachine=2.5E-10,2.5000000025E-10,7.500000000000001E-10,7.5000000075E-10
+            """;
+        AssertSnapshot(expected, snapshot);
+    }
+
+    [Fact]
     public void BuildSnapshot_ComputesAaCornersGuidesAndBistRectWithCopperSafeCoordinates()
     {
         var grid = BuildGrid(rows: 2, cols: 2, cellWidth: 10d, cellHeight: 5d);
@@ -283,6 +506,23 @@ public sealed class CoordinatePlannerComputationServiceTests
         Assert.Equal(3, pathSteps.Length);
         Assert.Equal("custom-path-1-step-2", pathSteps[1].Key);
         Assert.Equal(50d, pathSteps[1].MachineX, 6);
+    }
+
+    private static void AssertSnapshot(string expected, CoordinatePlannerSnapshot snapshot)
+    {
+        var rows = new List<string>
+        {
+            FormattableString.Invariant($"AA={snapshot.ActiveAreaBounds.MinX:R},{snapshot.ActiveAreaBounds.MinY:R},{snapshot.ActiveAreaBounds.MaxX:R},{snapshot.ActiveAreaBounds.MaxY:R}|radius={snapshot.CopperPillarRadiusMachine:R}|worldRadius={snapshot.WorldPillarRadiusX:R},{snapshot.WorldPillarRadiusY:R}"),
+        };
+        rows.AddRange(snapshot.Points.Select(static point => FormattableString.Invariant(
+            $"P|{point.Key}|{point.Label}|{point.Kind}|world={point.World.X:R},{point.World.Y:R}|safeWorld={point.SafeWorld.X:R},{point.SafeWorld.Y:R}|pixel={point.PixelX:R},{point.PixelY:R}|machine={point.MachineX:R},{point.MachineY:R}|safeMachine={point.SafeMachineX:R},{point.SafeMachineY:R}")));
+        rows.AddRange(snapshot.Lines.Select(static line => FormattableString.Invariant(
+            $"L|{line.Key}|{line.Label}|{line.Kind}|world={line.StartWorld.X:R},{line.StartWorld.Y:R},{line.EndWorld.X:R},{line.EndWorld.Y:R}|safeWorld={line.SafeStartWorld.X:R},{line.SafeStartWorld.Y:R},{line.SafeEndWorld.X:R},{line.SafeEndWorld.Y:R}|pixel={line.StartPixelX:R},{line.StartPixelY:R},{line.EndPixelX:R},{line.EndPixelY:R}|machine={line.StartMachineX:R},{line.StartMachineY:R},{line.EndMachineX:R},{line.EndMachineY:R}|safeMachine={line.SafeStartMachineX:R},{line.SafeStartMachineY:R},{line.SafeEndMachineX:R},{line.SafeEndMachineY:R}")));
+        rows.AddRange(snapshot.Rectangles.Select(static rectangle => FormattableString.Invariant(
+            $"R|{rectangle.Key}|{rectangle.Label}|{rectangle.Kind}|world={rectangle.WorldBounds.MinX:R},{rectangle.WorldBounds.MinY:R},{rectangle.WorldBounds.MaxX:R},{rectangle.WorldBounds.MaxY:R}|safeWorld={rectangle.SafeWorldBounds.MinX:R},{rectangle.SafeWorldBounds.MinY:R},{rectangle.SafeWorldBounds.MaxX:R},{rectangle.SafeWorldBounds.MaxY:R}|pixel={rectangle.PixelLeft:R},{rectangle.PixelTop:R},{rectangle.PixelRight:R},{rectangle.PixelBottom:R}|machine={rectangle.MachineLeft:R},{rectangle.MachineTop:R},{rectangle.MachineRight:R},{rectangle.MachineBottom:R}|safeMachine={rectangle.SafeMachineLeft:R},{rectangle.SafeMachineTop:R},{rectangle.SafeMachineRight:R},{rectangle.SafeMachineBottom:R}")));
+
+        var actual = string.Join('\n', rows);
+        Assert.Equal(expected.Replace("\r\n", "\n", StringComparison.Ordinal), actual);
     }
 
     private static RegularGrid BuildGrid(int rows, int cols, double cellWidth, double cellHeight)

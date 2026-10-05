@@ -13,16 +13,9 @@ public sealed class PadMatcherTests
     {
         var (cad, grid) = BuildPerfectOverlapCase();
         var progress = new List<double>();
-        var matcher = new PadMatcher();
-
         var result = PadMatcher.Match(
             cad,
             grid,
-            new MatchingSettings
-            {
-                Mode = MatchMode.LegacyOverlap,
-                MatchThreshold = 0.35,
-            },
             reportProgress: value => progress.Add(value));
 
         Assert.NotNull(result);
@@ -57,12 +50,7 @@ public sealed class PadMatcherTests
             }));
         var cad = new CadPadSet(new[] { spanningCad });
 
-        var matcher = new PadMatcher();
-
-        var result = PadMatcher.Match(cad, grid, new MatchingSettings
-        {
-            Mode = MatchMode.LegacyOverlap,
-        });
+        var result = PadMatcher.Match(cad, grid);
 
         Assert.True(result.CadToRegular.TryGetValue(spanningCad.Id, out var relatedRegulars));
         Assert.Equal(2, relatedRegulars.Count);
@@ -85,46 +73,23 @@ public sealed class PadMatcherTests
     }
 
     [Fact]
-    public void Match_Overlap_IsInvariantToDiagnosticAndRetiredCompatibilitySettings()
+    public void Match_Overlap_KeepsPartialCoverageAndLeavesNonOverlappingPadUnmatched()
     {
-        var (lowThresholdCad, lowThresholdGrid) = BuildCompatibilitySettingsCase();
-        var (highThresholdCad, highThresholdGrid) = BuildCompatibilitySettingsCase();
+        var (cad, grid) = BuildPartialCoverageCase();
+        var result = PadMatcher.Match(cad, grid);
 
-        var lowThresholdResult = PadMatcher.Match(
-            lowThresholdCad,
-            lowThresholdGrid,
-            new MatchingSettings
-            {
-                Mode = MatchMode.RegularToCad,
-                MatchThreshold = 0.5,
-                EnableCentroidFallback = false,
-                NearestK = 1,
-            });
-        var highThresholdResult = PadMatcher.Match(
-            highThresholdCad,
-            highThresholdGrid,
-            new MatchingSettings
-            {
-                Mode = MatchMode.LegacyOverlap,
-                MatchThreshold = 0.75,
-                EnableCentroidFallback = true,
-                NearestK = 128,
-            });
-
-        Assert.All(lowThresholdResult.Links, static link => Assert.InRange(link.RegularCoverage, 0.500001, 0.749999));
-        Assert.Equal(4, lowThresholdResult.Links.Count);
+        Assert.All(result.Links, static link => Assert.InRange(link.RegularCoverage, 0.500001, 0.749999));
+        Assert.Equal(4, result.Links.Count);
         Assert.DoesNotContain(
-            lowThresholdResult.Links,
-            link => link.RegularPadId == lowThresholdGrid.Pads[2].RegularPadId);
-        Assert.Null(lowThresholdGrid.Pads[2].MatchedCadPadId);
-        Assert.Equal(lowThresholdResult.Links, highThresholdResult.Links);
-        Assert.Equal(lowThresholdResult.Telemetry, highThresholdResult.Telemetry);
-        Assert.Equal(
-            lowThresholdGrid.Pads.Select(static pad => (pad.RegularPadId, pad.MatchedCadPadId, pad.MatchScore)),
-            highThresholdGrid.Pads.Select(static pad => (pad.RegularPadId, pad.MatchedCadPadId, pad.MatchScore)));
+            result.Links,
+            link => link.RegularPadId == grid.Pads[2].RegularPadId);
+        Assert.Equal(201, grid.Pads[0].MatchedCadPadId);
+        Assert.Equal(202, grid.Pads[1].MatchedCadPadId);
+        Assert.Null(grid.Pads[2].MatchedCadPadId);
+        Assert.Equal(0, grid.Pads[2].MatchScore);
     }
 
-    private static (CadPadSet cad, RegularGrid grid) BuildCompatibilitySettingsCase()
+    private static (CadPadSet cad, RegularGrid grid) BuildPartialCoverageCase()
     {
         var grid = new RegularGridBuilder().BuildFromSettings(new GridSettings
         {

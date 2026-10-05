@@ -61,7 +61,6 @@ public sealed partial class FreeformHelperViewModel
         var result = await Task.Run(() => _padMatchService.Match(
             cad,
             grid,
-            _projectFile.Settings.Matching,
             reportProgress));
 
         SetLatestPadMatchResult(result);

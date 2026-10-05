@@ -328,26 +328,26 @@ public static class CoordinatePlannerComputationService
         const double topNorm = 0.25d;
         const double bottomNorm = 0.75d;
 
-        var machineLeft = request.MachineOriginX + (request.MachineWidth * leftNorm);
-        var machineRight = request.MachineOriginX + (request.MachineWidth * rightNorm);
-        var machineTop = request.MachineOriginY + (request.MachineHeight * topNorm);
-        var machineBottom = request.MachineOriginY + (request.MachineHeight * bottomNorm);
-        var safeMachineRect = ClampMachineRect(machineLeft, machineTop, machineRight, machineBottom, request);
+        var topLeft = Transform(aaBounds, request, pixelWidth, pixelHeight, leftNorm, topNorm, fromMachine: false);
+        var bottomRight = Transform(aaBounds, request, pixelWidth, pixelHeight, rightNorm, bottomNorm, fromMachine: false);
+        var safeMachineRect = ClampMachineRect(topLeft.Machine.X, topLeft.Machine.Y, bottomRight.Machine.X, bottomRight.Machine.Y, request);
+        var safeTopLeft = Transform(aaBounds, request, pixelWidth, pixelHeight, safeMachineRect.left, safeMachineRect.top, fromMachine: true);
+        var safeBottomRight = Transform(aaBounds, request, pixelWidth, pixelHeight, safeMachineRect.right, safeMachineRect.bottom, fromMachine: true);
 
         var rect = new CoordinatePlannerRectangle(
             Key: "bist-center",
             Label: "BIST center blank rect",
             Kind: CoordinatePlannerRectangleKind.BistCenter,
-            WorldBounds: BuildWorldRect(aaBounds, leftNorm, topNorm, rightNorm, bottomNorm),
-            SafeWorldBounds: BuildWorldRectFromMachine(aaBounds, request, safeMachineRect.left, safeMachineRect.top, safeMachineRect.right, safeMachineRect.bottom),
-            PixelLeft: pixelWidth * leftNorm,
-            PixelTop: pixelHeight * topNorm,
-            PixelRight: pixelWidth * rightNorm,
-            PixelBottom: pixelHeight * bottomNorm,
-            MachineLeft: machineLeft,
-            MachineTop: machineTop,
-            MachineRight: machineRight,
-            MachineBottom: machineBottom,
+            WorldBounds: BuildWorldRect(topLeft.World, bottomRight.World),
+            SafeWorldBounds: BuildWorldRect(safeTopLeft.World, safeBottomRight.World),
+            PixelLeft: topLeft.PixelX,
+            PixelTop: topLeft.PixelY,
+            PixelRight: bottomRight.PixelX,
+            PixelBottom: bottomRight.PixelY,
+            MachineLeft: topLeft.Machine.X,
+            MachineTop: topLeft.Machine.Y,
+            MachineRight: bottomRight.Machine.X,
+            MachineBottom: bottomRight.Machine.Y,
             SafeMachineLeft: safeMachineRect.left,
             SafeMachineTop: safeMachineRect.top,
             SafeMachineRight: safeMachineRect.right,
@@ -517,22 +517,21 @@ public static class CoordinatePlannerComputationService
         double normX,
         double normY)
     {
-        var world = BuildWorldPoint(aaBounds, normX, normY);
-        var machineX = request.MachineOriginX + (request.MachineWidth * normX);
-        var machineY = request.MachineOriginY + (request.MachineHeight * normY);
-        var (safeMachineX, safeMachineY) = ClampMachinePoint(machineX, machineY, request);
+        var raw = Transform(aaBounds, request, pixelWidth, pixelHeight, normX, normY, fromMachine: false);
+        var safeMachine = ClampMachinePoint(raw.Machine, request);
+        var safe = Transform(aaBounds, request, pixelWidth, pixelHeight, safeMachine.X, safeMachine.Y, fromMachine: true);
         return new CoordinatePlannerPoint(
             Key: key,
             Label: label,
             Kind: kind,
-            World: world,
-            SafeWorld: BuildWorldPointFromMachine(aaBounds, request, safeMachineX, safeMachineY),
-            PixelX: pixelWidth * normX,
-            PixelY: pixelHeight * normY,
-            MachineX: machineX,
-            MachineY: machineY,
-            SafeMachineX: safeMachineX,
-            SafeMachineY: safeMachineY);
+            World: raw.World,
+            SafeWorld: safe.World,
+            PixelX: raw.PixelX,
+            PixelY: raw.PixelY,
+            MachineX: raw.Machine.X,
+            MachineY: raw.Machine.Y,
+            SafeMachineX: safe.Machine.X,
+            SafeMachineY: safe.Machine.Y);
     }
 
     private static CoordinatePlannerPoint BuildPointFromMachine(
@@ -546,18 +545,20 @@ public static class CoordinatePlannerComputationService
         MachinePoint machinePoint,
         MachinePoint safeMachinePoint)
     {
+        var raw = Transform(aaBounds, request, pixelWidth, pixelHeight, machinePoint.X, machinePoint.Y, fromMachine: true);
+        var safe = Transform(aaBounds, request, pixelWidth, pixelHeight, safeMachinePoint.X, safeMachinePoint.Y, fromMachine: true);
         return new CoordinatePlannerPoint(
             Key: key,
             Label: label,
             Kind: kind,
-            World: BuildWorldPointFromMachine(aaBounds, request, machinePoint.X, machinePoint.Y),
-            SafeWorld: BuildWorldPointFromMachine(aaBounds, request, safeMachinePoint.X, safeMachinePoint.Y),
-            PixelX: BuildPixelX(request, pixelWidth, machinePoint.X),
-            PixelY: BuildPixelY(request, pixelHeight, machinePoint.Y),
-            MachineX: machinePoint.X,
-            MachineY: machinePoint.Y,
-            SafeMachineX: safeMachinePoint.X,
-            SafeMachineY: safeMachinePoint.Y);
+            World: raw.World,
+            SafeWorld: safe.World,
+            PixelX: raw.PixelX,
+            PixelY: raw.PixelY,
+            MachineX: raw.Machine.X,
+            MachineY: raw.Machine.Y,
+            SafeMachineX: safe.Machine.X,
+            SafeMachineY: safe.Machine.Y);
     }
 
     private static CoordinatePlannerLine BuildLine(
@@ -573,33 +574,33 @@ public static class CoordinatePlannerComputationService
         double endNormX,
         double endNormY)
     {
-        var startMachineX = request.MachineOriginX + (request.MachineWidth * startNormX);
-        var startMachineY = request.MachineOriginY + (request.MachineHeight * startNormY);
-        var endMachineX = request.MachineOriginX + (request.MachineWidth * endNormX);
-        var endMachineY = request.MachineOriginY + (request.MachineHeight * endNormY);
-        var (safeStartMachineX, safeStartMachineY) = ClampMachinePoint(startMachineX, startMachineY, request);
-        var (safeEndMachineX, safeEndMachineY) = ClampMachinePoint(endMachineX, endMachineY, request);
+        var start = Transform(aaBounds, request, pixelWidth, pixelHeight, startNormX, startNormY, fromMachine: false);
+        var end = Transform(aaBounds, request, pixelWidth, pixelHeight, endNormX, endNormY, fromMachine: false);
+        var safeStartMachine = ClampMachinePoint(start.Machine, request);
+        var safeEndMachine = ClampMachinePoint(end.Machine, request);
+        var safeStart = Transform(aaBounds, request, pixelWidth, pixelHeight, safeStartMachine.X, safeStartMachine.Y, fromMachine: true);
+        var safeEnd = Transform(aaBounds, request, pixelWidth, pixelHeight, safeEndMachine.X, safeEndMachine.Y, fromMachine: true);
 
         return new CoordinatePlannerLine(
             Key: key,
             Label: label,
             Kind: kind,
-            StartWorld: BuildWorldPoint(aaBounds, startNormX, startNormY),
-            EndWorld: BuildWorldPoint(aaBounds, endNormX, endNormY),
-            SafeStartWorld: BuildWorldPointFromMachine(aaBounds, request, safeStartMachineX, safeStartMachineY),
-            SafeEndWorld: BuildWorldPointFromMachine(aaBounds, request, safeEndMachineX, safeEndMachineY),
-            StartPixelX: pixelWidth * startNormX,
-            StartPixelY: pixelHeight * startNormY,
-            EndPixelX: pixelWidth * endNormX,
-            EndPixelY: pixelHeight * endNormY,
-            StartMachineX: startMachineX,
-            StartMachineY: startMachineY,
-            EndMachineX: endMachineX,
-            EndMachineY: endMachineY,
-            SafeStartMachineX: safeStartMachineX,
-            SafeStartMachineY: safeStartMachineY,
-            SafeEndMachineX: safeEndMachineX,
-            SafeEndMachineY: safeEndMachineY);
+            StartWorld: start.World,
+            EndWorld: end.World,
+            SafeStartWorld: safeStart.World,
+            SafeEndWorld: safeEnd.World,
+            StartPixelX: start.PixelX,
+            StartPixelY: start.PixelY,
+            EndPixelX: end.PixelX,
+            EndPixelY: end.PixelY,
+            StartMachineX: start.Machine.X,
+            StartMachineY: start.Machine.Y,
+            EndMachineX: end.Machine.X,
+            EndMachineY: end.Machine.Y,
+            SafeStartMachineX: safeStart.Machine.X,
+            SafeStartMachineY: safeStart.Machine.Y,
+            SafeEndMachineX: safeEnd.Machine.X,
+            SafeEndMachineY: safeEnd.Machine.Y);
     }
 
     private static CoordinatePlannerLine BuildLineFromMachine(
@@ -615,87 +616,69 @@ public static class CoordinatePlannerComputationService
         MachinePoint safeStartMachinePoint,
         MachinePoint safeEndMachinePoint)
     {
+        var start = Transform(aaBounds, request, pixelWidth, pixelHeight, startMachinePoint.X, startMachinePoint.Y, fromMachine: true);
+        var end = Transform(aaBounds, request, pixelWidth, pixelHeight, endMachinePoint.X, endMachinePoint.Y, fromMachine: true);
+        var safeStart = Transform(aaBounds, request, pixelWidth, pixelHeight, safeStartMachinePoint.X, safeStartMachinePoint.Y, fromMachine: true);
+        var safeEnd = Transform(aaBounds, request, pixelWidth, pixelHeight, safeEndMachinePoint.X, safeEndMachinePoint.Y, fromMachine: true);
         return new CoordinatePlannerLine(
             Key: key,
             Label: label,
             Kind: kind,
-            StartWorld: BuildWorldPointFromMachine(aaBounds, request, startMachinePoint.X, startMachinePoint.Y),
-            EndWorld: BuildWorldPointFromMachine(aaBounds, request, endMachinePoint.X, endMachinePoint.Y),
-            SafeStartWorld: BuildWorldPointFromMachine(aaBounds, request, safeStartMachinePoint.X, safeStartMachinePoint.Y),
-            SafeEndWorld: BuildWorldPointFromMachine(aaBounds, request, safeEndMachinePoint.X, safeEndMachinePoint.Y),
-            StartPixelX: BuildPixelX(request, pixelWidth, startMachinePoint.X),
-            StartPixelY: BuildPixelY(request, pixelHeight, startMachinePoint.Y),
-            EndPixelX: BuildPixelX(request, pixelWidth, endMachinePoint.X),
-            EndPixelY: BuildPixelY(request, pixelHeight, endMachinePoint.Y),
-            StartMachineX: startMachinePoint.X,
-            StartMachineY: startMachinePoint.Y,
-            EndMachineX: endMachinePoint.X,
-            EndMachineY: endMachinePoint.Y,
-            SafeStartMachineX: safeStartMachinePoint.X,
-            SafeStartMachineY: safeStartMachinePoint.Y,
-            SafeEndMachineX: safeEndMachinePoint.X,
-            SafeEndMachineY: safeEndMachinePoint.Y);
+            StartWorld: start.World,
+            EndWorld: end.World,
+            SafeStartWorld: safeStart.World,
+            SafeEndWorld: safeEnd.World,
+            StartPixelX: start.PixelX,
+            StartPixelY: start.PixelY,
+            EndPixelX: end.PixelX,
+            EndPixelY: end.PixelY,
+            StartMachineX: start.Machine.X,
+            StartMachineY: start.Machine.Y,
+            EndMachineX: end.Machine.X,
+            EndMachineY: end.Machine.Y,
+            SafeStartMachineX: safeStart.Machine.X,
+            SafeStartMachineY: safeStart.Machine.Y,
+            SafeEndMachineX: safeEnd.Machine.X,
+            SafeEndMachineY: safeEnd.Machine.Y);
     }
 
-    private static Point2 BuildWorldPoint(Rect2 aaBounds, double normX, double normY)
-    {
-        return new Point2(
-            aaBounds.MinX + (aaBounds.Width * normX),
-            aaBounds.MaxY - (aaBounds.Height * normY));
-    }
-
-    private static Point2 BuildWorldPointFromMachine(
+    private static (Point2 World, double PixelX, double PixelY, MachinePoint Machine) Transform(
         Rect2 aaBounds,
         CoordinatePlannerRequest request,
-        double machineX,
-        double machineY)
+        int pixelWidth,
+        int pixelHeight,
+        double x,
+        double y,
+        bool fromMachine)
     {
-        var normalizedX = request.MachineWidth <= 1e-9
-            ? 0d
-            : Math.Clamp((machineX - request.MachineOriginX) / request.MachineWidth, 0d, 1d);
-        var normalizedY = request.MachineHeight <= 1e-9
-            ? 0d
-            : Math.Clamp((machineY - request.MachineOriginY) / request.MachineHeight, 0d, 1d);
-        return BuildWorldPoint(aaBounds, normalizedX, normalizedY);
+        var normX = x;
+        var normY = y;
+        var machine = new MachinePoint(x, y);
+        if (fromMachine)
+        {
+            normX = request.MachineWidth <= 1e-9 ? 0d : (x - request.MachineOriginX) / request.MachineWidth;
+            normY = request.MachineHeight <= 1e-9 ? 0d : (y - request.MachineOriginY) / request.MachineHeight;
+        }
+        else
+        {
+            machine = new MachinePoint(
+                request.MachineOriginX + (request.MachineWidth * normX),
+                request.MachineOriginY + (request.MachineHeight * normY));
+        }
+
+        // Machine inputs clamp only world coordinates. Normalized inputs retain their raw projection,
+        // including on degenerate machine spans, rather than round-tripping through machine space.
+        var worldNormX = fromMachine ? Math.Clamp(normX, 0d, 1d) : normX;
+        var worldNormY = fromMachine ? Math.Clamp(normY, 0d, 1d) : normY;
+        return (
+            new Point2(aaBounds.MinX + (aaBounds.Width * worldNormX), aaBounds.MaxY - (aaBounds.Height * worldNormY)),
+            pixelWidth * normX,
+            pixelHeight * normY,
+            machine);
     }
 
-    private static double BuildPixelX(CoordinatePlannerRequest request, int pixelWidth, double machineX)
+    private static Rect2 BuildWorldRect(Point2 topLeft, Point2 bottomRight)
     {
-        var normalizedX = request.MachineWidth <= 1e-9
-            ? 0d
-            : (machineX - request.MachineOriginX) / request.MachineWidth;
-        return pixelWidth * normalizedX;
-    }
-
-    private static double BuildPixelY(CoordinatePlannerRequest request, int pixelHeight, double machineY)
-    {
-        var normalizedY = request.MachineHeight <= 1e-9
-            ? 0d
-            : (machineY - request.MachineOriginY) / request.MachineHeight;
-        return pixelHeight * normalizedY;
-    }
-
-    private static Rect2 BuildWorldRect(Rect2 aaBounds, double leftNorm, double topNorm, double rightNorm, double bottomNorm)
-    {
-        var topLeft = BuildWorldPoint(aaBounds, leftNorm, topNorm);
-        var bottomRight = BuildWorldPoint(aaBounds, rightNorm, bottomNorm);
-        return new Rect2(
-            Math.Min(topLeft.X, bottomRight.X),
-            Math.Min(bottomRight.Y, topLeft.Y),
-            Math.Max(topLeft.X, bottomRight.X),
-            Math.Max(bottomRight.Y, topLeft.Y));
-    }
-
-    private static Rect2 BuildWorldRectFromMachine(
-        Rect2 aaBounds,
-        CoordinatePlannerRequest request,
-        double left,
-        double top,
-        double right,
-        double bottom)
-    {
-        var topLeft = BuildWorldPointFromMachine(aaBounds, request, left, top);
-        var bottomRight = BuildWorldPointFromMachine(aaBounds, request, right, bottom);
         return new Rect2(
             Math.Min(topLeft.X, bottomRight.X),
             Math.Min(bottomRight.Y, topLeft.Y),
