@@ -8,7 +8,7 @@ Status: Documentation for the 1.3.x branch and existing gates; release automatio
 
 ## Maintain a Single Version Identity
 
-The initial `VERSION` value and fixed test area outside the repo in `TODO.md S15.005a` are still pending. This repository cannot currently claim that the template mappings among `VERSION`, tag, package, manifest, and Catalog are in effect; the formal policy for version identity and release artifacts must be decided as part of `S15.005e`.
+For the `VERSION` value and the repository-external test area, see `TODO.md` S15.005a. This repository cannot currently claim that the template mappings among `VERSION`, tag, package, manifest, and Catalog are in effect; the formal policy for version identity and release artifacts must be decided as part of `S15.005e`.
 
 ## Branch Authority and Work Direction
 

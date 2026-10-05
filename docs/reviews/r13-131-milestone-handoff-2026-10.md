@@ -165,7 +165,7 @@ This line records the integrating session's local full run after the merges list
 | [#24](https://github.com/Dennis40816/nvt-freeform-helper/pull/24) | [Owner decisions](../../TODO.md) | Documentation state synchronization. |
 | [#25](https://github.com/Dennis40816/nvt-freeform-helper/pull/25) | [R13.202](../../TODO.md) | Characterize allocation-anchor and freeform-classification selection. |
 | [#28](https://github.com/Dennis40816/nvt-freeform-helper/pull/28) | [R13.203](../../TODO.md) | Typed CadPadId/RegularPadId for the DXF manual override chain. |
-| [#29](https://github.com/Dennis40816/nvt-freeform-helper/pull/29) | [Owner decisions; S15.009e](../../TODO.md) | Status refresh, 2026-10-05 decisions, README in two languages, two normative-document corrections. |
+| [#29](https://github.com/Dennis40816/nvt-freeform-helper/pull/29) | [Owner decisions; S15.009e](../../TODO.md) | Status refresh, 2026-10-05 decisions, README in two languages, AGENTS.md/CONTRIBUTING.md corrections. |
 | [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30) | [Owner decisions](../../TODO.md) | First translation batch: 35 documents to English. |
 | [#31](https://github.com/Dennis40816/nvt-freeform-helper/pull/31) | [R13.205](../../TODO.md) | Explicit seed and segment stages of the DXF regular mask audit. |
 | [#32](https://github.com/Dennis40816/nvt-freeform-helper/pull/32) | [R13.201](../../TODO.md) | Contract guards for the three matching bounded contexts. |
@@ -194,11 +194,9 @@ Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a P
 
 **Owner actions — consult TODO.md for status before acting.**
 
-- Bot issue permissions: the owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch to the shared NFC token tool, used only by NFH (the owner approves that NFC pull request). Until then the bot cannot add labels, comment on or close issues. Issue migration status: [S15.009e](../../TODO.md).
 - Archive the private repository read-only: [FreeformHelper settings](https://github.com/Dennis40816/FreeformHelper/settings), with prerequisites tracked by S15.009e.
 - Coordinate the shared CI pilot after the owner's 1.3.2 exit: [S15.005c/S15.005d](../../TODO.md), then NVT Core contacts the NFH session.
 - Decide the exception and calibration policy of the merged report-only path check and when it starts to block; later NVT Core introduction: [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21), [S15.005c](../../TODO.md).
-- Translation of the remaining Chinese documents continues in low-priority batches after the first batch in [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30); no owner action is needed unless a normative document is affected.
 - Decide how a missing saved mask path should behave and how importing a mask while enabled should affect assignment refresh: [#22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22), [TODO.md Mask product questions](../../TODO.md).
 
 **Queue references.** These names identify work, not execution status; consult TODO.md.
