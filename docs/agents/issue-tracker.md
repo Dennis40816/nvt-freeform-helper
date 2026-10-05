@@ -2,7 +2,7 @@
 
 FreeformHelper 的規格與可執行 tickets 以 GitHub Issues 為唯一 tracker，repository 為 `Dennis40816/nvt-freeform-helper`。
 
-owner 決定（2026-10-04；經 Commander 轉述）：只搬移經機密審查後可公開的舊 issue 至公開 repo，並改寫 `TODO.md` 與文件中對應連結；其餘舊 issue 在私有 `Dennis40816/FreeformHelper` 完成封存後仍保留在原 repo。這取代先前「舊 issue 不搬移、不改寫」的決定。舊 PR 仍不搬移、不改寫連結，封存後留在原私有 repo。As of 2026-10-05, only the parent spec was migrated (old issue 1 -> public issue 27); the 42 other open old issues are delivered child tickets and stay in the private repository. The bot can create issues and labels but cannot add labels, comment or close issues; the owner decided on 2026-10-05 to change its Issues permission to Read and write (not yet in effect).
+owner 決定（2026-10-04；經 Commander 轉述）：只搬移經機密審查後可公開的舊 issue 至公開 repo，並改寫 `TODO.md` 與文件中對應連結；其餘舊 issue 在私有 `Dennis40816/FreeformHelper` 完成封存後仍保留在原 repo。這取代先前「舊 issue 不搬移、不改寫」的決定。舊 PR 仍不搬移、不改寫連結，封存後留在原私有 repo。As of 2026-10-05, only the parent spec was migrated (old issue 1 -> public issue 27); the 42 other open old issues are delivered child tickets and stay in the private repository. The bot can create issues and labels but cannot add labels, comment or close issues, because the shared NFC token tool requests a permission subset without issues; the owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch used only by NFH (not yet available).
 
 ## Conventions
 

@@ -129,9 +129,9 @@ PR-C `4d54b35d`：golden／baseline／snapshot data 亦未更新，無更新者�
 
 ## 7. Handoff for 2026-10-06
 
-Last verified: 2026-10-05 15:09 (+08:00), trunk 1.3.x at 792b4f79, local full test run with the example data: 1157 passed, 0 failed, 0 skipped.
+Last verified: 2026-10-05 17:27 (+08:00), trunk 1.3.x at d756745b, local full test run with the example data: 1198 passed, 0 failed, 0 skipped.
 
-This line records verification supplied by the Commander session, not a test run performed by this documentation batch. Re-check the table, current PR head, approvals, and required checks before acting.
+This line records the integrating session's local full run after the merges listed below. Re-check the table, current PR head, approvals, and required checks before acting.
 
 **Status source and repository context.** [TODO.md](../../TODO.md) is the single status table until Issues replace it after the issue migration. This handoff references IDs and purposes; consult the corresponding TODO.md rows for execution status. The integrator verifies merge results and writes the table back once per batch. Main development uses the public [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper) repository. The default branch is `1.3.x` (trunk); `main` currently equals the initial import commit and will hold released versions only. Work uses `feature/<version>/<topic>` branches targeting `1.3.x`. The original public import came from private `FreeformHelper` `1.3.x` at `2c1c0c84`; private archive and issue-migration actions are tracked by S15.009e.
 
@@ -164,6 +164,11 @@ This line records verification supplied by the Commander session, not a test run
 | [#23](https://github.com/Dennis40816/nvt-freeform-helper/pull/23) | [R13.202](../../TODO.md) | Characterize CadBest and hover best-match rules. |
 | [#24](https://github.com/Dennis40816/nvt-freeform-helper/pull/24) | [Owner decisions](../../TODO.md) | Documentation state synchronization. |
 | [#25](https://github.com/Dennis40816/nvt-freeform-helper/pull/25) | [R13.202](../../TODO.md) | Characterize allocation-anchor and freeform-classification selection. |
+| [#28](https://github.com/Dennis40816/nvt-freeform-helper/pull/28) | [R13.203](../../TODO.md) | Typed CadPadId/RegularPadId for the DXF manual override chain. |
+| [#29](https://github.com/Dennis40816/nvt-freeform-helper/pull/29) | [Owner decisions; S15.009e](../../TODO.md) | Status refresh, 2026-10-05 decisions, README in two languages, two normative-document corrections. |
+| [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30) | [Owner decisions](../../TODO.md) | First translation batch: 35 documents to English. |
+| [#31](https://github.com/Dennis40816/nvt-freeform-helper/pull/31) | [R13.205](../../TODO.md) | Explicit seed and segment stages of the DXF regular mask audit. |
+| [#32](https://github.com/Dennis40816/nvt-freeform-helper/pull/32) | [R13.201](../../TODO.md) | Contract guards for the three matching bounded contexts. |
 
 Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a PR when trunk is merged into its branch; closing and reopening the PR does not bring in the fix. PR #19 documents the tests-only CI fixture repair. The signed golden manifest hashes the original project JSON; editing that data requires re-signing.
 
@@ -189,24 +194,19 @@ Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a P
 
 **Owner actions — consult TODO.md for status before acting.**
 
-- Review [#14](https://github.com/Dennis40816/nvt-freeform-helper/pull/14) again after its conflict with trunk is resolved; its scripts change requires owner approval.
-- Approve the workflow change in [#20](https://github.com/Dennis40816/nvt-freeform-helper/pull/20) and the scripts prototype in [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21).
-- Review and approve the typed CadPadId/RegularPadId DXF manual-override chain: [R13.203](../../TODO.md), in the NFH queue.
-- Change the bot's Issues permission to Read and write (decided on 2026-10-05, not yet in effect; today the bot can create issues and labels but cannot add labels, comment or close): [App installation settings](https://github.com/settings/installations/165315921). Issue migration status: [S15.009e](../../TODO.md).
+- Bot issue permissions: the owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch to the shared NFC token tool, used only by NFH (the owner approves that NFC pull request). Until then the bot cannot add labels, comment on or close issues. Issue migration status: [S15.009e](../../TODO.md).
 - Archive the private repository read-only: [FreeformHelper settings](https://github.com/Dennis40816/FreeformHelper/settings), with prerequisites tracked by S15.009e.
 - Coordinate the shared CI pilot after the owner's 1.3.2 exit: [S15.005c/S15.005d](../../TODO.md), then NVT Core contacts the NFH session.
-- Evaluate the CI path check and later NVT Core introduction: [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21), [S15.005c](../../TODO.md).
-- Handle translation of existing Chinese documents: the five NFH queue briefs below, under [TODO.md Owner decisions](../../TODO.md).
+- Decide the exception and calibration policy of the merged report-only path check and when it starts to block; later NVT Core introduction: [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21), [S15.005c](../../TODO.md).
+- Translation of the remaining Chinese documents continues in low-priority batches after the first batch in [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30); no owner action is needed unless a normative document is affected.
 - Decide how a missing saved mask path should behave and how importing a mask while enabled should affect assignment refresh: [#22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22), [TODO.md Mask product questions](../../TODO.md).
 
 **Queue references.** These names identify work, not execution status; consult TODO.md.
 
-- R13.203: typed IDs for the DXF manual-override chain.
 - S15.002: `s15-002-console-ring-tail-isolation`.
-- Document translation: `translate-core-notch-specs`, `translate-guides-reference-misc`, `translate-reference-notch-behavior`, `translate-reviews-avalonia-ui`, and `translate-reviews-v21-removal`.
 - R13.202: best-match, allocation-anchor, and freeform-classification characterization in PR #23/#25.
-- R13.205: audit-phase characterization in PR #17 and the production pipeline scope.
-- S15.005c: path-check evaluation and PR #21.
+- R13.205: audit-phase characterization in PR #17, seed and segment stages in PR #31, and the local-repair/passive-compensation stage (`r13205-repair-passive`).
+- S15.005c: path-check evaluation; the report-only prototype is PR #21.
 
 **Release gates.** Consult [TODO.md R13.201–R13.206](../../TODO.md) for 1.3.2 work. R13.202 shares only parts proven identical; R13.203 covers its typed-ID boundary; R13.205 covers the production pipeline. The owner's 1.3.2 exit precedes 1.3.3 implementation and the shared CI pilot. R13.303 opacity 0.9 with updated snapshots and R13.305b's last-version guard retain their 1.3.3 gates. No parent, milestone, or exit checkbox is closed by this handoff.
 

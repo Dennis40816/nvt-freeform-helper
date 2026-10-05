@@ -69,10 +69,11 @@
   - Documents default to English; the owner selected 「可以 (Recommended)」 ("Allowed (Recommended)") for README.md in English and README.zh-TW.md in Traditional Chinese.
   - Normative-document corrections: the owner selected 「同意，改好開 PR 給我看 (Recommended)」 ("Agreed; make the corrections and open a PR for me to inspect (Recommended)"). Correct only the branch model and prior chat-confirmation flow in AGENTS.md and CONTRIBUTING.md; other rules remain unchanged.
   - Shared CI pilot: NFH replaces NFU after the 1.3.2 exit. Models return to the default; Codex usage remains economical after its reset.
-  - Verified state (2026-10-05, +08:00): trunk 1.3.x is 792b4f79. Public PRs #1–#11 and #12, #13, #15–#19, #22–#25 are merged; #14, #20, and #21 are open. PR #24 documentation state synchronization merged at 8d22f75d. The supplied local full run with example data recorded 1157 passed, 0 failed, and 0 skipped; this documentation batch did not run it.
-  - Document-translation delivery: five Chinese-to-English batches are delivered on queue branches and await one combined documentation PR. Their queue brief names are listed in handoff section 7; this batch does not merge them.
+  - Verified state (2026-10-05 17:27, +08:00): trunk 1.3.x is d756745b. Public PRs #1–#25 and #28–#32 are merged and none is open (#26 and #27 are issues). The integrator's local full run with example data on d756745b recorded 1198 passed, 0 failed, and 0 skipped.
+  - Document-translation delivery: the first batch (35 documents under docs/core, docs/governance, docs/guides, docs/performance, docs/reference and docs/reviews) merged in PR #30 (c91c4815). Remaining Chinese documents, such as TODO.md, the roadmap and the milestone handoff, follow in later low-priority batches.
   - Mask product questions: PR #22 (8817eb5f) merged tests-only characterization of the missing saved mask path and importing a mask while enabled. The owner must decide the behavior for each case; no behavior change is authorized by characterization.
-  - README language split and the two normative-document corrections are prepared in this documentation batch; review and integration remain separate steps.
+  - README language split and the normative-document corrections merged in PR #29 (d1274d58). The owner confirmed the AGENTS.md and CONTRIBUTING.md changes in chat on 2026-10-05 (16:2x), selecting 「確認，三處都可以 (Recommended)」 ("Confirmed; all three changes are fine (Recommended)"): the branch model, the chat-confirmation flow, and moving the S15.005c/S15.005d status sentence to TODO.md.
+  - Bot issue permissions: the owner reports that the App's Issues permission is Read and write, but the shared NFC token tool requests a fixed permission subset without issues, so the bot can create issues and labels but cannot add labels, comment on or close issues. The owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch to the shared tool, used only by NFH; until it is available, label and close actions are recorded in pull request descriptions and commit messages.
 
 - [x] **S15.001 處理 4 個穩定失敗的 `SimulationWorkspaceViewModelTests`**
   - 失敗：`CopperSource_WhenMoved_RegeneratesBeforeFrameThroughSharedSimulationPath`（預期 `400`、實際 `399`）、`CopperContactModel_WhenFingerSelected_UsesLowerFullPadSignal`（`360`／`359`）、`DiffViolationSummary_WhenNoMismatch_ShowsCleanState`（`EMS OK`／`audit warning`）、`DiffViolationSummary_WhenDuplicateDiffDeltaMismatches_ListsViolatingPads`（`Assert.True`）。
@@ -256,7 +257,7 @@
     - 根因六的偵測（`HeadlessDispatcherSetup`）與根因八「收尾期間由 dispatcher 狀態辨識」的事件路徑只用暫時的探針或量測驗證。
     - 已補自測：`scripts/tests/check-private-path-patterns.ps1` 驗證 `verify.ps1` 的私有路徑規則，包括應命中與不應命中的樣本；由 structure lane 執行。
     - 已補自測：`scripts/tests/check-temporary-environment.ps1` 驗證 `assert-example-data.ps1` 使用的環境變數暫存與還原，包括原先不存在的變數；由 structure lane 執行。
-    - S15 系列的 commit 與 PR 以 `Refs: TODO.md S15.xxx` 連結而不是 `Refs #N`：the GitHub App in use can create issues and labels but cannot add labels, comment or close issues (verified 2026-10-05; the owner decided on 2026-10-05 to change its Issues permission to Read and write, not yet in effect), so these commits keep `Refs: TODO.md S15.xxx` (`docs/agents/issue-tracker.md` requires the exception to be listed here).
+    - S15 系列的 commit 與 PR 以 `Refs: TODO.md S15.xxx` 連結而不是 `Refs #N`：the GitHub App in use can create issues and labels but cannot add labels, comment or close issues (verified 2026-10-05; the shared NFC token tool requests a permission subset without issues; the owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch used only by NFH, not yet available), so these commits keep `Refs: TODO.md S15.xxx` (`docs/agents/issue-tracker.md` requires the exception to be listed here).
   - 驗收：完整測試在 4 核心與 2 核心條件下各連續 3 次無逾時、無停住；不得以單純放大 timeout 當作唯一修法而不說明等待條件。完成後移除 `ci.yml` 中 `dotnet-test` 的 `continue-on-error`。
 
 - [x] **S15.003 讓測試分組完整覆蓋所有測試類別**
@@ -283,18 +284,18 @@
     - See [handoff section 7](docs/reviews/r13-131-milestone-handoff-2026-10.md#7-handoff-for-2026-10-06) for the dated CI defect and repair history.
     - [x] 第二輪審查（PR #81，accept-with-changes，P1 一個）後補正：aggregator `dotnet / build-test` 改成 `if: always()`，草稿 PR 上會明確失敗而不是被 skip（skip 的 required check 會被當成通過）；沒有 `TESTDATA_DEPLOY_KEY` 時輸出 warning，repo 變數 `TESTDATA_REQUIRED=true` 時直接失敗；push 到 `main`／trunk 的 run 不再被後續 push 取消；`assert-example-data.ps1` 加 `-AllowMissing`（資料存在就一律檢查）與 `-ForPush`（指標已 commit、資料 commit 已在資料 repo 的 remote）；`build.ps1` 的測試改走 `run-tests.ps1`；`update-ui-baseline.ps1` 的 repo root 少算一層已修正；`verify.ps1` 的本機路徑檢查補上正斜線、`/home`、`/Users`、Git Bash 路徑並掃描所有非二進位檔；`-warnaserror` 加 `--no-incremental`；`smoke` 清單不再影響 `uncategorized`；installer 下載加重試。
     - [x] Private testdata access: the read-only deploy key and public CI secret TESTDATA_DEPLOY_KEY are installed; example-data tests run in public CI. Without the key, CI uses -AllowMissingExampleData and golden tests are skipped.
-    - The public repository exists; the remaining S15.005a implementation is the external test area in PR #14, on feature/1.3.x/test-area. It needs the owner's review again after its conflict with trunk is resolved.
+    - [x] External test area merged in PR #14 (b9a9f832) after the owner approved the conflict-resolved head again.
     - [x] VERSION 1.3.0 merged in PR #13 (cbd430af), read by Directory.Build.props, with the structure check in scripts/verify.ps1.
     - [x] Dependabot configuration merged in PR #12 (c119295b): weekly NuGet and GitHub Actions updates, limit 5.
-    - [ ] Dependabot actions/checkout 7.0.1: PR #20 is open and requires owner approval because it touches a workflow.
+    - [x] Dependabot actions/checkout 7.0.1 merged in PR #20 (9859e903) with owner approval.
     - [x] CI test fixture fix merged in PR #19 (e48fa2aa): temporary project copies use a local saved-mask path, including the manifest-derived golden baseline call site; tests only, with no src or golden change.
-    - S15.005a remains unticked; VERSION and Dependabot delivery do not close the external-test-area review.
+    - Every listed S15.005a component is delivered; the parent stays unticked for the owner.
     - Public PR links and purposes are in handoff section 7; execution status is maintained here.
     - owner 決定（2026-10-04；經 Commander 轉述）：`VERSION` 初始值為 `1.3.0`；名稱維持 NVT Freeform Helper，不改 assembly 或 namespace。repo 外測試暫存區使用 `D:\FreeformHelper-TestArea`，`TEMP`／`TMP`／`TMPDIR` 只影響測試子程序，保留 7 天，只清理已結束工作的產物。dependabot 採 NVT Core 的公版，不自行選頻率。
   - [x] **S15.005b 文件**：已依公版章序重整 `AGENTS.md`，新增 `CONTRIBUTING.md`、兩份 `docs/governance/` 流程／分支文件，以及 `docs/handoff/` 協定與空白 bug ledger。
   - [ ] **S15.005c Review infrastructure**: authority policy (R0–R3), checks, CODEOWNERS limited to R3 paths, PR and issue templates, and review records wait for the shared CI plan and the 1.3.2 exit.
     - Shared CI pilot (owner decision, 2026-10-05): NFH replaces NFU after the 1.3.2 exit; the mask-path fix is delivered in PR #19. NVT Core will contact the NFH session.
-    - [ ] CI path-check evaluation: report-only prototype PR #21 (scripts/tests/path-guard.ps1) is open, is not wired into CI, and requires owner approval because it touches scripts; later NVT Core introduction remains pending.
+    - [ ] CI path-check evaluation: the report-only prototype merged in PR #21 (edcf3967): `scripts/tests/path-guard.ps1`, `.github/path-guard.json` and a required-mask load assertion. It is not wired into CI. Open owner questions: the exception and calibration policy for existing findings and when the scanner starts to block; later NVT Core introduction remains pending.
   - [ ] **S15.005d Owner-only settings**: the public default branch is `1.3.x` (trunk); `main` remains at the initial import. The template project's GitHub App remains the chosen merge bot. The owner created `Protect 1.3.x and main` on 2026-10-04 at 22:07, requiring `policy / structure` and `dotnet / build-test`, with strict mode off and admin bypass. The `release` environment remains undecided. Changes to `AGENTS.md` / `CONTRIBUTING.md` require the owner's prior chat confirmation (2026-10-04 decision), without a GitHub review.
     - Shared CI pilot (owner decision, 2026-10-05): NFH replaces NFU after the 1.3.2 exit; the mask-path fix is delivered in PR #19. NVT Core will contact the NFH session.
     - Owner decision (2026-10-04, relayed by the Commander session): 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). Changes to AGENTS.md or CONTRIBUTING.md require prior owner confirmation in chat; a GitHub review is not required for that confirmation.
@@ -305,7 +306,7 @@
   - 現象：主 checkout 的 `build/` 約 37 GB（2026-10-02）；`Directory.Build.props:4-5` 把所有 bin／obj 放在 repo 內的 `build/`，沒有任何清理或保留政策；每個 worktree 各有一份。
   - 目標：定義本工作樹的 build 輸出、worktree 與 evidence 的位置及清理規則；repo 外 test area 隨 S15.005a 決定。
   - 完成：`docs/guides/build-output-and-disk-space.md` 定義本工作樹各類輸出與證據保留規則；`scripts/dev/clean-build-output.ps1` 預設 dry run，只列出本工作樹 `build/bin/`、`build/obj/` 與容量，`-Apply` 才刪除，`-IncludeEvidence` 才納入證據與交付產物。拒絕 reparse point、含 `.git` 項目或其他已登錄 worktree 根目錄的選取目錄。`-Apply` 採刻意嚴格的規則：機器上有任何指定的 .NET 建置／測試／UI 程序，或無法讀取程序清單時，一律拒絕刪除並列出阻擋程序名稱與 ID；無關的 .NET 程序也可能阻擋。請關閉建置、測試、UI 與 IDE 工作階段，執行 `dotnet build-server shutdown` 後重試，因為建置伺服器在 build 結束後仍可能留在背景。已移除程序歸屬判斷與其測試，僅保留三個名稱清單案例；`test-ui-process-in-repo.ps1` 還原為任務開始時的 `origin/1.3.x` 內容。未對真實資料執行 `-Apply`，主 checkout 的 37 GB 未清理；owner 待腳本進入主 checkout 後，可在該目錄先 dry run，再以 `-Apply` 清理預設項目。
-  - [ ] **External test area under S15.005a**: delivered on the open [PR #14](https://github.com/Dennis40816/nvt-freeform-helper/pull/14) branch, outside the completed S15.006 scope; it needs the owner's review again after its conflict with trunk is resolved. The default is `D:\FreeformHelper-TestArea`, overridden by `FREEFORMHELPER_TEST_AREA`; `TEMP` / `TMP` / `TMPDIR` apply only to test subprocesses, with 7-day retention and manual cleanup of completed jobs.
+  - [x] **External test area under S15.005a**: merged in [PR #14](https://github.com/Dennis40816/nvt-freeform-helper/pull/14) (b9a9f832), outside the completed S15.006 scope. The default is `D:\FreeformHelper-TestArea`, overridden by `FREEFORMHELPER_TEST_AREA`; `TEMP` / `TMP` / `TMPDIR` apply only to test subprocesses, with 7-day retention and manual cleanup of completed jobs.
 
 - [x] **S15.007 移除 Application 專案未使用的 `CommunityToolkit.Mvvm` 參照**
   - 現象：`src/FreeformHelper.Application/FreeformHelper.Application.csproj:15` 參照該套件，但 `src/FreeformHelper.Application` 內沒有任何檔案使用（`git grep "CommunityToolkit" -- src/FreeformHelper.Application/*.cs` 為 0）。
@@ -332,7 +333,7 @@
     - [x] 建立與匯入公開 repo：`Dennis40816/nvt-freeform-helper` 已於 2026-10-04 建立並以私有 `1.3.x`（`2c1c0c84`）的檔案樹匯入，歷史只有單一初始 commit；預設分支為 `1.3.x`，`main` 指向同一個 commit，公開 CI 對兩者均通過。`example/` 仍是 submodule（gitlink `8c84e4d6`），指向私有 `FreeformHelper-testdata`。
     - [x] 日常開發移轉（owner，2026-10-04）：自 2026-10-04 起，新工作（分支、PR、新 issue）只在公開 repo 進行，PR 目標為 `1.3.x`；私有 `FreeformHelper` 的 `1.3.x` 凍結在 `2c1c0c84`，不再合併新內容。程式碼開發已移至公開 repo，只有 `FreeformHelper-testdata` 留在私有。
     - [x] 舊 issue 的處置：owner 決定（2026-10-04；經 Commander 轉述）只搬移經機密審查後可公開的 issue，並改寫 `TODO.md` 與文件中對應連結；其餘留在封存的私有 `Dennis40816/FreeformHelper`。這取代先前「舊 issue 不搬移、不改寫」的決定；舊 PR 仍不搬移、不改寫連結，封存後留在原私有 repo。
-    - [ ] Issue migration: the old open issues were exported and triaged on 2026-10-05 (1 to rewrite and move, 42 delivered child tickets not to move). Owner decision 2026-10-05: move only the parent spec. The old issue 1 was rewritten and created as public [#27](https://github.com/Dennis40816/nvt-freeform-helper/issues/27) (old 1 -> new 27; labels `ready-for-human` and `enhancement` were added by the owner). The other 42 issues are not migrated; their links below stay as history, and old PRs and their links stay in the private repository. Remaining: rewrite the parent-spec links and the final status once the owner decides the sub-item is complete; the bot can create issues and labels but cannot add labels, comment or close (the owner decided on 2026-10-05 to change its Issues permission to Read and write, not yet in effect).
+    - [ ] Issue migration: the old open issues were exported and triaged on 2026-10-05 (1 to rewrite and move, 42 delivered child tickets not to move). Owner decision 2026-10-05: move only the parent spec. The old issue 1 was rewritten and created as public [#27](https://github.com/Dennis40816/nvt-freeform-helper/issues/27) (old 1 -> new 27; labels `ready-for-human` and `enhancement` were added by the owner). The other 42 issues are not migrated; their links below stay as history, and old PRs and their links stay in the private repository. Remaining: rewrite the parent-spec links and the final status once the owner decides the sub-item is complete; the bot can create issues and labels but cannot add labels, comment or close because the shared NFC token tool requests no issues permission (the owner decided on 2026-10-05 to add an opt-in `-IncludeIssuesWrite` switch used only by NFH; not yet available). The owner added the labels of #27.
     - [x] TESTDATA_DEPLOY_KEY and the read-only testdata deploy key are installed; public CI runs example-data tests.
     - [x] The owner created Protect 1.3.x and main on 2026-10-04 at 22:07: required checks are policy / structure and dotnet / build-test, strict mode is off, and admin bypass is enabled.
     - [ ] Archive private FreeformHelper: private 1.3.x is frozen at 2c1c0c84. Public CI including deploy-key-backed data tests is green and no private PR is open, so both prerequisites are satisfied; the owner archive step remains pending at [repository settings](https://github.com/Dennis40816/FreeformHelper/settings).
@@ -582,19 +583,22 @@
 - [ ] **R13.201 正式化 Pad overlap、DXF audit、Canvas hit-test 三個 bounded contexts**；在 overlap evidence API 定案後移除 `PadMatcher`／`PadMatchService` 目前僅為相容而保留、實際未讀取的 `MatchingSettings` 參數
   - Inventory: [INV2, section 2](docs/reviews/r13-slice-inventories-2026-10.md) records the three contexts and tests.
   - [x] R13.201 overlap evidence API and removal of the unused MatchingSettings parameter merged in PR #15 (53366ee1). No implementation work remains in the described slice; the parent stays unticked for the owner.
+  - [x] Matching bounded-context contract guards merged in PR #32 (5caa07ea), tests only: one shared input checks many-to-many overlap evidence, one-to-one DXF suggestions and overrides, and geometry-only Canvas hit testing.
 - [ ] **R13.202 Preserve the CadBest / hover status quo; share only parts proven identical**
   - Owner decision (2026-10-05): CadBest and hover retain their own rules and share only parts proven identical; the exact-tie decision (no ID tie-break) is recorded once in the decisions section at the top of this file. The 3635 measurement found 4838 CADs, 582 touching at least two regulars, 6 selecting different regulars, and 0 exact ties.
   - [x] CadBest and hover best-match characterization merged in PR #23 (fd6e74ef), tests only.
   - [x] Allocation-anchor and freeform-classification characterization merged in PR #25 (792b4f79), tests only.
   - Remaining scope: share only parts proven identical; characterization delivery does not close the parent.
 - [ ] **R13.203 依 API boundary 漸進導入 typed IDs 與 legacy adapters**
-  - Delivery: typed CadPadId/RegularPadId for the DXF manual override chain is on a queue branch, not merged. It touches src and needs owner approval. The first review requested changes; they were made and a second review is running. R13.201 no longer blocks it.
+  - [x] Typed CadPadId/RegularPadId for the DXF manual override chain merged in PR #28 (e5bbe658) with owner approval; the int entry stays a thin adapter over one implementation.
+  - Remaining scope: further API chains (for example runtime selection and IC/diff mapping) are not delivered; the parent stays open.
 - [ ] **R13.204 封裝 `RegularPad` writers 為等價的狀態轉移 API**
   - Inventory: INV2 section 3 records field writers, readers, and side effects.
   - [x] RegularPad.AssignMapping merged in PR #16 (b41ebe04). This leaf covers matched-pair assignment; the broader writer-transition parent stays open.
 - [ ] **R13.205 將 DxfRegularMaskAudit segment/local-repair/passive-compensation 改為顯式 pipeline**
   - [x] Audit-phase characterization merged in PR #17 (c0c4e39b), tests only.
-  - Remaining scope: the production segment/local-repair/passive-compensation pipeline follows characterization; the parent stays open.
+  - [x] Explicit seed and segment stages merged in PR #31 (d756745b) with owner approval, behavior unchanged.
+  - Remaining scope: the local-repair/passive-compensation stage and the external TM8.1 acceptance gate; the parent stays open.
 - [ ] **R13.206 將 CoordinatePlanner machine/normalized/pixel/world/safe projection 收斂為參數化 transform builder**
   - [x] The single CoordinatePlanner transform merged in PR #18 (269a3528). No implementation work remains in the described slice; the parent stays unticked for the owner.
 
