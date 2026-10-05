@@ -69,7 +69,7 @@
   - Documents default to English; the owner selected 「可以 (Recommended)」 ("Allowed (Recommended)") for README.md in English and README.zh-TW.md in Traditional Chinese.
   - Normative-document corrections: the owner selected 「同意，改好開 PR 給我看 (Recommended)」 ("Agreed; make the corrections and open a PR for me to inspect (Recommended)"). Correct only the branch model and prior chat-confirmation flow in AGENTS.md and CONTRIBUTING.md; other rules remain unchanged. The owner later also confirmed a third change; see the PR #29 entry below.
   - Shared CI pilot: NFH replaces NFU after the 1.3.2 exit. Models return to the default; Codex usage remains economical after its reset.
-  - Verified state (2026-10-05 19:44, +08:00): trunk 1.3.x is fd078295. Public PRs #1–#25 and #28–#35 are merged (#26 and #27 are issues). The integrator's local full run with example data on the tree of fd078295 recorded 1230 passed, 0 failed, and 0 skipped.
+  - Verified state (2026-10-05, +08:00): trunk 1.3.x is fd078295 (PR #35 merged at 19:49). Public PRs #1–#25 and #28–#35 are merged (#26 and #27 are issues). The integrator's local full run with example data finished at 19:44 on the tree that fd078295 has (the PR #35 head over trunk) and recorded 1230 passed, 0 failed, and 0 skipped.
   - Document-translation delivery: the first batch (35 documents under docs/core, docs/governance, docs/guides, docs/performance, docs/reference and docs/reviews) merged in PR #30 (c91c4815). Remaining Chinese documents follow in later low-priority batches.
   - Mask product questions: PR #22 (8817eb5f) merged tests-only characterization of the missing saved mask path and importing a mask while enabled. The owner must decide the behavior for each case; no behavior change is authorized by characterization.
   - README language split and the normative-document corrections merged in PR #29 (d1274d58). The owner confirmed the AGENTS.md and CONTRIBUTING.md changes in chat on 2026-10-05 around 16:2x, selecting 「確認，三處都可以 (Recommended)」 ("Confirmed; all three changes are fine (Recommended)"): the branch model, the chat-confirmation flow, and moving the S15.005c/S15.005d status sentence to TODO.md.
@@ -592,7 +592,7 @@
 - [ ] **R13.203 依 API boundary 漸進導入 typed IDs 與 legacy adapters**
   - [x] Typed CadPadId/RegularPadId for the DXF manual override chain merged in PR #28 (e5bbe658) with owner approval.
   - [x] Typed IcIndex/DiffIndex behind the mapping adapters merged in PR #35 (fd078295) with owner approval, behavior unchanged.
-  - Remaining scope: the other API boundaries named in the roadmap are not delivered; the parent stays open.
+  - Remaining scope: all four roadmap types (CadPadId, RegularPadId, IcIndex, DiffIndex) now exist; other API chains still use the integer adapters and are converted one chain at a time per the roadmap. The parent stays open.
 - [ ] **R13.204 封裝 `RegularPad` writers 為等價的狀態轉移 API**
   - Inventory: INV2 section 3 records field writers, readers, and side effects.
   - [x] RegularPad.AssignMapping merged in PR #16 (b41ebe04). This leaf covers matched-pair assignment; the broader writer-transition parent stays open.

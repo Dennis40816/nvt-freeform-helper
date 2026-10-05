@@ -129,9 +129,9 @@ PR-C `4d54b35d`：golden／baseline／snapshot data 亦未更新，無更新者�
 
 ## 7. Handoff for 2026-10-06
 
-Last verified: 2026-10-05 19:44 (+08:00), trunk 1.3.x at fd078295, local full test run with the example data: 1230 passed, 0 failed, 0 skipped.
+Last verified: 2026-10-05 19:44 (+08:00), local full test run with the example data on the tree of trunk 1.3.x fd078295 (PR #35 merged at 19:49): 1230 passed, 0 failed, 0 skipped.
 
-This line records the integrating session's local full run after the merges listed below. Re-check the table, current PR head, approvals, and required checks before acting.
+This line records the integrating session's local full run on the tree of the merges listed below. Re-check the table, current PR head, approvals, and required checks before acting.
 
 **Status source and repository context.** [TODO.md](../../TODO.md) is the single status table until Issues replace it after the issue migration. This handoff references IDs and purposes; consult the corresponding TODO.md rows for execution status. The integrator verifies merge results and writes the table back once per batch. Main development uses the public [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper) repository. The default branch is `1.3.x` (trunk); `main` currently equals the initial import commit and will hold released versions only. Work uses `feature/<version>/<topic>` branches targeting `1.3.x`. The original public import came from private `FreeformHelper` `1.3.x` at `2c1c0c84`; private archive and issue-migration actions are tracked by S15.009e.
 
