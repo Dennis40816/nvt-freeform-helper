@@ -192,13 +192,35 @@ $requireExampleDataEnv = "FREEFORMHELPER_REQUIRE_EXAMPLE_DATA"
 $previousRequireExampleData = [Environment]::GetEnvironmentVariable($requireExampleDataEnv)
 $exampleDataPresent = & (Join-Path $PSScriptRoot "assert-example-data.ps1") -AllowMissing:$AllowMissingExampleData
 
+$testArea = $env:FREEFORMHELPER_TEST_AREA
+if ([string]::IsNullOrWhiteSpace($testArea)) {
+    if (Test-Path -LiteralPath "D:\" -PathType Container) {
+        $testArea = "D:\FreeformHelper-TestArea"
+    } else {
+        Write-Host "Test area drive D: is unavailable; keeping the system temporary environment."
+    }
+}
+
+$previousTemp = [Environment]::GetEnvironmentVariable("TEMP")
+$previousTmp = [Environment]::GetEnvironmentVariable("TMP")
+$previousTmpDir = [Environment]::GetEnvironmentVariable("TMPDIR")
+
 try {
-    [Environment]::SetEnvironmentVariable($requireExampleDataEnv, $(if ($exampleDataPresent) { "1" } else { $null }))
+    if (-not [string]::IsNullOrWhiteSpace($testArea)) {
+        $testTempPath = (New-Item -ItemType Directory -Path (Join-Path $testArea "temp") -Force).FullName
+        [Environment]::SetEnvironmentVariable("TEMP", $testTempPath)
+        [Environment]::SetEnvironmentVariable("TMP", $testTempPath)
+        [Environment]::SetEnvironmentVariable("TMPDIR", $testTempPath)
+    }
+    [Environment]::SetEnvironmentVariable($requireExampleDataEnv, $(if ($exampleDataPresent) { "1" } else { [NullString]::Value }))
     dotnet @args
     $testExitCode = $LASTEXITCODE
 }
 finally {
-    [Environment]::SetEnvironmentVariable($requireExampleDataEnv, $previousRequireExampleData)
+    [Environment]::SetEnvironmentVariable($requireExampleDataEnv, ($previousRequireExampleData ?? [NullString]::Value))
+    [Environment]::SetEnvironmentVariable("TEMP", ($previousTemp ?? [NullString]::Value))
+    [Environment]::SetEnvironmentVariable("TMP", ($previousTmp ?? [NullString]::Value))
+    [Environment]::SetEnvironmentVariable("TMPDIR", ($previousTmpDir ?? [NullString]::Value))
 }
 
 # A failing native command does not stop the script by itself, so callers would report the stage as done.
