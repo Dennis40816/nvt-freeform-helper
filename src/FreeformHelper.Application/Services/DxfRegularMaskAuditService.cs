@@ -100,13 +100,7 @@ public static partial class DxfRegularMaskAuditService
             manualOverrideDiffByCadId);
         var seedResult = BuildSeedDecisions(context);
         var segmentResult = ApplySegmentOffsetSignals(context, seedResult);
-        ApplyLocalRepairAndPassiveCompensationSignals(
-            segmentResult.Decisions,
-            context.OrderedCadPads,
-            context.RegularPadById,
-            context.CadIcIndexByCadId);
-
-        return segmentResult.Decisions;
+        return ApplyLocalRepairAndPassiveCompensationSignals(context, segmentResult);
     }
 
     private static CandidateSet BuildCandidateSet(

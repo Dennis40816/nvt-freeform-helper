@@ -68,7 +68,7 @@ public static partial class DxfRegularMaskAuditService
         return new SeedConstructionResult(decisions);
     }
 
-    // Keep caller-owned inputs live and pass the same invocation-owned decisions through both stages.
+    // Keep caller-owned inputs live and pass the same invocation-owned decisions through all stages.
     private sealed record AuditInvocationContext(
         IReadOnlyList<CadPad> OrderedCadPads,
         IReadOnlyDictionary<int, IReadOnlyList<PadMatchLink>> CadToRegular,
@@ -81,4 +81,21 @@ public static partial class DxfRegularMaskAuditService
     private readonly record struct SeedConstructionResult(Dictionary<int, CadOutputFwDiffAssignmentDecision> Decisions);
 
     private readonly record struct SegmentAnalysisResult(Dictionary<int, CadOutputFwDiffAssignmentDecision> Decisions);
+
+    private readonly record struct LocalRepairEvidence(
+        CadOutputFwDiffAssignmentDecision OriginalDecision,
+        IReadOnlyList<DxfRegularMaskAuditCandidate> PreferredCandidates,
+        int? ReferenceDiff,
+        int? PreviousDiff,
+        int? NextDiff,
+        IReadOnlyDictionary<int, Dictionary<int, int>> PrimaryCountsByIc,
+        int IcIndex);
+
+    private readonly record struct LocalRepairResult(int? SuggestedDiff, double? Confidence);
+
+    private readonly record struct PassiveCompensationInput(
+        CadOutputFwDiffAssignmentDecision OriginalDecision,
+        int? ReferenceDiff);
+
+    private readonly record struct PassiveCompensationResult(int? DiffIndex);
 }

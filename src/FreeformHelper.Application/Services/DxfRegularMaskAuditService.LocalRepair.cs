@@ -1,5 +1,3 @@
-using FreeformHelper.Domain.Pads;
-
 namespace FreeformHelper.Application.Services;
 
 public static partial class DxfRegularMaskAuditService
@@ -12,28 +10,27 @@ public static partial class DxfRegularMaskAuditService
     private const double LocalRepairOrderPenalty = 0.15;
     private const double LocalRepairGapPenalty = 0.05;
 
-    private static void ApplyLocalRepairAndPassiveCompensationSignals(
-        Dictionary<int, CadOutputFwDiffAssignmentDecision> decisions,
-        IReadOnlyList<CadPad> orderedCadPads,
-        IReadOnlyDictionary<int, RegularPad> regularPadById,
-        IReadOnlyDictionary<int, int> cadIcIndexByCadId)
+    private static Dictionary<int, CadOutputFwDiffAssignmentDecision> ApplyLocalRepairAndPassiveCompensationSignals(
+        AuditInvocationContext context,
+        SegmentAnalysisResult segmentResult)
     {
+        var decisions = segmentResult.Decisions;
         if (decisions.Count == 0)
         {
-            return;
+            return decisions;
         }
 
         var segmentRows = BuildSegmentRows(
             decisions,
-            orderedCadPads,
-            regularPadById,
-            cadIcIndexByCadId);
+            context.OrderedCadPads,
+            context.RegularPadById,
+            context.CadIcIndexByCadId);
         if (segmentRows.Count == 0)
         {
-            return;
+            return decisions;
         }
 
-        var primaryCountsByIc = BuildPrimaryDiffCountsByIc(decisions, cadIcIndexByCadId);
+        var primaryCountsByIc = BuildPrimaryDiffCountsByIc(decisions, context.CadIcIndexByCadId);
         foreach (var rowGroup in segmentRows
                      .GroupBy(static sample => (sample.IcIndex, sample.RowIndex))
                      .OrderBy(static group => group.Key.IcIndex)
@@ -56,7 +53,7 @@ public static partial class DxfRegularMaskAuditService
                 var referenceDiff = decision.CurrentPrimaryDiffIndex ?? seedDiff;
                 var prevDiff = ResolveNeighborCurrentDiff(decisions, orderedSamples, index - 1);
                 var nextDiff = ResolveNeighborCurrentDiff(decisions, orderedSamples, index + 1);
-                var (localRepairSuggestion, localRepairConfidence) = ResolveLocalRepairSuggestion(
+                var repairEvidence = new LocalRepairEvidence(
                     decision,
                     preferredCandidates,
                     referenceDiff,
@@ -64,9 +61,11 @@ public static partial class DxfRegularMaskAuditService
                     nextDiff,
                     primaryCountsByIc,
                     sample.IcIndex);
-                var passiveCompensationDiff = ResolvePassiveCompensationDiff(
-                    decision,
-                    referenceDiff);
+                var localRepairResult = ResolveLocalRepairSuggestion(repairEvidence);
+                // Passive compensation reads the segment-enriched decision before any repair is projected.
+                var passiveCompensationResult = ResolvePassiveCompensationDiff(new PassiveCompensationInput(
+                    repairEvidence.OriginalDecision,
+                    repairEvidence.ReferenceDiff));
                 var rowMismatchShiftSuggestion = hasRowMaskMismatch
                     ? ResolveRowMismatchShiftSuggestion(
                         decision,
@@ -76,16 +75,16 @@ public static partial class DxfRegularMaskAuditService
                         primaryCountsByIc,
                         sample.IcIndex)
                     : null;
-                var effectiveRepairSuggestion = localRepairSuggestion;
-                var effectiveConfidence = localRepairConfidence ?? decision.Confidence;
+                var effectiveRepairSuggestion = localRepairResult.SuggestedDiff;
+                var effectiveConfidence = localRepairResult.Confidence ?? decision.Confidence;
                 if (rowMismatchShiftSuggestion.HasValue)
                 {
                     effectiveRepairSuggestion = rowMismatchShiftSuggestion;
                     effectiveConfidence = Math.Max(effectiveConfidence ?? 0d, LocalRepairAutoApplyMinConfidence);
                 }
                 else if (effectiveRepairSuggestion.HasValue &&
-                         localRepairConfidence.HasValue &&
-                         localRepairConfidence.Value < LocalRepairAutoApplyMinConfidence)
+                         localRepairResult.Confidence.HasValue &&
+                         localRepairResult.Confidence.Value < LocalRepairAutoApplyMinConfidence)
                 {
                     effectiveRepairSuggestion = decision.RepairSuggestionDiffIndex;
                 }
@@ -93,11 +92,13 @@ public static partial class DxfRegularMaskAuditService
                 decisions[sample.CadPadId] = decision with
                 {
                     RepairSuggestionDiffIndex = effectiveRepairSuggestion ?? decision.RepairSuggestionDiffIndex,
-                    PassiveCompensationDiffIndex = passiveCompensationDiff,
+                    PassiveCompensationDiffIndex = passiveCompensationResult.DiffIndex,
                     Confidence = effectiveConfidence,
                 };
             }
         }
+
+        return decisions;
     }
 
     private static bool HasCsvRowMaskMismatch(
@@ -224,18 +225,18 @@ public static partial class DxfRegularMaskAuditService
             .FirstOrDefault();
     }
 
-    private static (int? SuggestedDiff, double? Confidence) ResolveLocalRepairSuggestion(
-        CadOutputFwDiffAssignmentDecision decision,
-        IReadOnlyList<DxfRegularMaskAuditCandidate> preferredCandidates,
-        int? referenceDiff,
-        int? prevDiff,
-        int? nextDiff,
-        IReadOnlyDictionary<int, Dictionary<int, int>> primaryCountsByIc,
-        int icIndex)
+    private static LocalRepairResult ResolveLocalRepairSuggestion(LocalRepairEvidence evidence)
     {
+        var decision = evidence.OriginalDecision;
+        var preferredCandidates = evidence.PreferredCandidates;
+        var referenceDiff = evidence.ReferenceDiff;
+        var prevDiff = evidence.PreviousDiff;
+        var nextDiff = evidence.NextDiff;
+        var primaryCountsByIc = evidence.PrimaryCountsByIc;
+        var icIndex = evidence.IcIndex;
         if (preferredCandidates.Count == 0)
         {
-            return (null, null);
+            return new LocalRepairResult(null, null);
         }
 
         IReadOnlyList<DxfRegularMaskAuditCandidate> scopedCandidates = preferredCandidates;
@@ -275,10 +276,10 @@ public static partial class DxfRegularMaskAuditService
         if (decision.CurrentPrimaryDiffIndex.HasValue &&
             decision.CurrentPrimaryDiffIndex.Value == bestCandidate.Candidate.DiffIndex)
         {
-            return (null, confidence);
+            return new LocalRepairResult(null, confidence);
         }
 
-        return (bestCandidate.Candidate.DiffIndex, confidence);
+        return new LocalRepairResult(bestCandidate.Candidate.DiffIndex, confidence);
     }
 
     private static double ComputeLocalRepairCost(
@@ -356,15 +357,15 @@ public static partial class DxfRegularMaskAuditService
         return Math.Max(0, owners - selfOwner);
     }
 
-    private static int? ResolvePassiveCompensationDiff(
-        CadOutputFwDiffAssignmentDecision decision,
-        int? referenceDiff)
+    private static PassiveCompensationResult ResolvePassiveCompensationDiff(PassiveCompensationInput input)
     {
+        var decision = input.OriginalDecision;
+        var referenceDiff = input.ReferenceDiff;
         if (decision.Mode != CadOutputFwDiffAssignmentMode.CsvConstrained ||
             decision.CsvConfirmedCandidates.Count > 0 ||
             !decision.RawSeed.HasMatch)
         {
-            return null;
+            return new PassiveCompensationResult(null);
         }
 
         var overlapGeometryCandidates = decision.GeometryCandidates
@@ -372,7 +373,7 @@ public static partial class DxfRegularMaskAuditService
             .ToList();
         if (overlapGeometryCandidates.Count == 0)
         {
-            return null;
+            return new PassiveCompensationResult(null);
         }
 
         if (decision.DetectedOffset.HasValue)
@@ -386,7 +387,7 @@ public static partial class DxfRegularMaskAuditService
                 .FirstOrDefault();
             if (expectedMatch is not null)
             {
-                return expectedMatch.DiffIndex;
+                return new PassiveCompensationResult(expectedMatch.DiffIndex);
             }
         }
 
@@ -402,12 +403,12 @@ public static partial class DxfRegularMaskAuditService
             }
         }
 
-        return scopedCandidates
+        return new PassiveCompensationResult(scopedCandidates
             .OrderByDescending(static candidate => candidate.RegularCoverage)
             .ThenByDescending(static candidate => candidate.CadCoverage)
             .ThenBy(static candidate => candidate.DiffIndex)
             .First()
-            .DiffIndex;
+            .DiffIndex);
     }
 
     private static Dictionary<int, Dictionary<int, int>> BuildPrimaryDiffCountsByIc(
