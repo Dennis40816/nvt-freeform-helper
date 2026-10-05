@@ -129,9 +129,9 @@ PR-C `4d54b35d`：golden／baseline／snapshot data 亦未更新，無更新者�
 
 ## 7. Handoff for 2026-10-06
 
-Last verified: 2026-10-05 17:27 (+08:00), trunk 1.3.x at d756745b, local full test run with the example data: 1198 passed, 0 failed, 0 skipped.
+Last verified: 2026-10-05 19:44 (+08:00), local full test run with the example data on the tree of trunk 1.3.x fd078295 (PR #35 merged at 19:49): 1230 passed, 0 failed, 0 skipped.
 
-This line records the integrating session's local full run after the merges listed below. Re-check the table, current PR head, approvals, and required checks before acting.
+This line records the integrating session's local full run on the tree of the merges listed below. Re-check the table, current PR head, approvals, and required checks before acting.
 
 **Status source and repository context.** [TODO.md](../../TODO.md) is the single status table until Issues replace it after the issue migration. This handoff references IDs and purposes; consult the corresponding TODO.md rows for execution status. The integrator verifies merge results and writes the table back once per batch. Main development uses the public [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper) repository. The default branch is `1.3.x` (trunk); `main` currently equals the initial import commit and will hold released versions only. Work uses `feature/<version>/<topic>` branches targeting `1.3.x`. The original public import came from private `FreeformHelper` `1.3.x` at `2c1c0c84`; private archive and issue-migration actions are tracked by S15.009e.
 
@@ -169,6 +169,9 @@ This line records the integrating session's local full run after the merges list
 | [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30) | [Owner decisions](../../TODO.md) | First translation batch: 35 documents to English. |
 | [#31](https://github.com/Dennis40816/nvt-freeform-helper/pull/31) | [R13.205](../../TODO.md) | Explicit seed and segment stages of the DXF regular mask audit. |
 | [#32](https://github.com/Dennis40816/nvt-freeform-helper/pull/32) | [R13.201](../../TODO.md) | Contract guards for the three matching bounded contexts. |
+| [#33](https://github.com/Dennis40816/nvt-freeform-helper/pull/33) | [Owner decisions](../../TODO.md) | Status-table write-back of the 2026-10-05 merges. |
+| [#34](https://github.com/Dennis40816/nvt-freeform-helper/pull/34) | [R13.205](../../TODO.md) | Explicit local-repair and passive-compensation inputs and results. |
+| [#35](https://github.com/Dennis40816/nvt-freeform-helper/pull/35) | [R13.203](../../TODO.md) | Typed IcIndex/DiffIndex behind the mapping adapters. |
 
 Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a PR when trunk is merged into its branch; closing and reopening the PR does not bring in the fix. PR #19 documents the tests-only CI fixture repair. The signed golden manifest hashes the original project JSON; editing that data requires re-signing.
 
@@ -203,7 +206,8 @@ Repository CI checks out the PR head, not the merge ref. A trunk fix reaches a P
 
 - S15.002: `s15-002-console-ring-tail-isolation`.
 - R13.202: best-match, allocation-anchor, and freeform-classification characterization in PR #23/#25.
-- R13.205: audit-phase characterization in PR #17, seed and segment stages in PR #31, and the local-repair/passive-compensation stage (`r13205-repair-passive`).
+- R13.203: DXF manual override chain in PR #28 and the mapping chain in PR #35 (`r13203-mapping-ids`).
+- R13.205: audit-phase characterization in PR #17, seed and segment stages in PR #31, and the local-repair/passive-compensation stage in PR #34 (`r13205-repair-passive`).
 - S15.005c: path-check evaluation; the report-only prototype is PR #21.
 
 **Release gates.** Consult [TODO.md R13.201–R13.206](../../TODO.md) for 1.3.2 work. R13.202 shares only parts proven identical; R13.203 covers its typed-ID boundary; R13.205 covers the production pipeline. The owner's 1.3.2 exit precedes 1.3.3 implementation and the shared CI pilot. R13.303 opacity 0.9 with updated snapshots and R13.305b's last-version guard retain their 1.3.3 gates. No parent, milestone, or exit checkbox is closed by this handoff.

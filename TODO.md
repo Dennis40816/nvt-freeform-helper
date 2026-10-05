@@ -69,7 +69,7 @@
   - Documents default to English; the owner selected 「可以 (Recommended)」 ("Allowed (Recommended)") for README.md in English and README.zh-TW.md in Traditional Chinese.
   - Normative-document corrections: the owner selected 「同意，改好開 PR 給我看 (Recommended)」 ("Agreed; make the corrections and open a PR for me to inspect (Recommended)"). Correct only the branch model and prior chat-confirmation flow in AGENTS.md and CONTRIBUTING.md; other rules remain unchanged. The owner later also confirmed a third change; see the PR #29 entry below.
   - Shared CI pilot: NFH replaces NFU after the 1.3.2 exit. Models return to the default; Codex usage remains economical after its reset.
-  - Verified state (2026-10-05 17:27, +08:00): trunk 1.3.x is d756745b. Public PRs #1–#25 and #28–#32 are merged and none is open (#26 and #27 are issues). The integrator's local full run with example data on d756745b recorded 1198 passed, 0 failed, and 0 skipped.
+  - Verified state (2026-10-05, +08:00): trunk 1.3.x is fd078295 (PR #35 merged at 19:49). Public PRs #1–#25 and #28–#35 are merged (#26 and #27 are issues). The integrator's local full run with example data finished at 19:44 on the tree that fd078295 has (the PR #35 head over trunk) and recorded 1230 passed, 0 failed, and 0 skipped.
   - Document-translation delivery: the first batch (35 documents under docs/core, docs/governance, docs/guides, docs/performance, docs/reference and docs/reviews) merged in PR #30 (c91c4815). Remaining Chinese documents follow in later low-priority batches.
   - Mask product questions: PR #22 (8817eb5f) merged tests-only characterization of the missing saved mask path and importing a mask while enabled. The owner must decide the behavior for each case; no behavior change is authorized by characterization.
   - README language split and the normative-document corrections merged in PR #29 (d1274d58). The owner confirmed the AGENTS.md and CONTRIBUTING.md changes in chat on 2026-10-05 around 16:2x, selecting 「確認，三處都可以 (Recommended)」 ("Confirmed; all three changes are fine (Recommended)"): the branch model, the chat-confirmation flow, and moving the S15.005c/S15.005d status sentence to TODO.md.
@@ -591,14 +591,16 @@
   - Remaining scope: share only parts proven identical; characterization delivery does not close the parent.
 - [ ] **R13.203 依 API boundary 漸進導入 typed IDs 與 legacy adapters**
   - [x] Typed CadPadId/RegularPadId for the DXF manual override chain merged in PR #28 (e5bbe658) with owner approval.
-  - Remaining scope: the other API boundaries named in the roadmap are not delivered; the parent stays open.
+  - [x] Typed IcIndex/DiffIndex behind the mapping adapters merged in PR #35 (fd078295) with owner approval, behavior unchanged.
+  - Remaining scope: all four roadmap types (CadPadId, RegularPadId, IcIndex, DiffIndex) now exist; other API chains still use the integer adapters and are converted one chain at a time per the roadmap. The parent stays open.
 - [ ] **R13.204 封裝 `RegularPad` writers 為等價的狀態轉移 API**
   - Inventory: INV2 section 3 records field writers, readers, and side effects.
   - [x] RegularPad.AssignMapping merged in PR #16 (b41ebe04). This leaf covers matched-pair assignment; the broader writer-transition parent stays open.
 - [ ] **R13.205 將 DxfRegularMaskAudit segment/local-repair/passive-compensation 改為顯式 pipeline**
   - [x] Audit-phase characterization merged in PR #17 (c0c4e39b), tests only.
   - [x] Explicit seed and segment stages merged in PR #31 (d756745b) with owner approval, behavior unchanged.
-  - Remaining scope: the local-repair/passive-compensation stage and the external TM8.1 acceptance gate; the parent stays open.
+  - [x] Explicit local-repair and passive-compensation inputs and results merged in PR #34 (c6d94d3e) with owner approval, behavior unchanged.
+  - Remaining scope: the external TM8.1 acceptance gate; the parent stays open.
 - [ ] **R13.206 將 CoordinatePlanner machine/normalized/pixel/world/safe projection 收斂為參數化 transform builder**
   - [x] The single CoordinatePlanner transform merged in PR #18 (269a3528). No implementation work remains in the described slice; the parent stays unticked for the owner.
 
