@@ -8,6 +8,9 @@ namespace FreeformHelper.Domain.Pads;
 /// </summary>
 public sealed class RegularPad
 {
+    private IcIndex _icIndex;
+    private DiffIndex _diffIndex;
+
     /// <summary>
     /// Gets the zero-based row index of this pad within the grid.
     /// </summary>
@@ -49,13 +52,21 @@ public sealed class RegularPad
     /// Gets or sets the zero-based index of the IC (Integrated Circuit) this pad is mapped to.
     /// This is determined by the AFE mapping logic.
     /// </summary>
-    public int IcIndex { get; set; }
+    public int IcIndex
+    {
+        get => _icIndex.Value;
+        set => AssignMapping(new IcIndex(value), _diffIndex);
+    }
     /// <summary>
     /// Gets or sets the contiguous FW diff index for this regular pad across the whole grid (no overlap).
     /// This is a per-IC, 0-based index that follows the configured scan order.
     /// Combine <see cref="IcIndex"/> + <see cref="RegularFwDiffIndex"/> for stable channel identity.
     /// </summary>
-    public int DiffIndex { get; set; }
+    public int DiffIndex
+    {
+        get => _diffIndex.Value;
+        set => AssignMapping(_icIndex, new DiffIndex(value));
+    }
 
     /// <summary>
     /// Gets or sets the FW memory diff index represented by this regular pad.
@@ -72,8 +83,16 @@ public sealed class RegularPad
     /// </summary>
     public void AssignMapping(int icIndex, int diffIndex)
     {
-        IcIndex = icIndex;
-        DiffIndex = diffIndex;
+        AssignMapping(new IcIndex(icIndex), new DiffIndex(diffIndex));
+    }
+
+    /// <summary>
+    /// Assigns the typed IC index and per-IC FW diff index for this pad.
+    /// </summary>
+    public void AssignMapping(IcIndex icIndex, DiffIndex diffIndex)
+    {
+        _icIndex = icIndex;
+        _diffIndex = diffIndex;
     }
 
     /// <summary>
