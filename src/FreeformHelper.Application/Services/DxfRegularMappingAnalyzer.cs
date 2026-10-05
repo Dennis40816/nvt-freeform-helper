@@ -17,6 +17,34 @@ public sealed partial class DxfRegularMappingAnalyzer
         IReadOnlyDictionary<int, int>? expectedDiffIndexByCadId = null,
         Action<double>? reportProgress = null)
     {
+        // Defer conversion until overrides are applied, after candidate progress callbacks.
+        return AnalyzeCore(cad, grid, settings,
+            manualOverrides is null ? null : new LegacyManualOverrides(manualOverrides),
+            expectedDiffIndexByCadId, reportProgress);
+    }
+
+    /// <summary>
+    /// Analyzes with typed override identities. A distinct name preserves legacy null-literal calls.
+    /// </summary>
+    public static DxfRegularMappingResult AnalyzeWithTypedOverrides(
+        CadPadSet cad,
+        RegularGrid grid,
+        IndexMappingSettings settings,
+        IReadOnlyDictionary<CadPadId, RegularPadId>? manualOverrides,
+        IReadOnlyDictionary<int, int>? expectedDiffIndexByCadId = null,
+        Action<double>? reportProgress = null)
+    {
+        return AnalyzeCore(cad, grid, settings, manualOverrides, expectedDiffIndexByCadId, reportProgress);
+    }
+
+    private static DxfRegularMappingResult AnalyzeCore(
+        CadPadSet cad,
+        RegularGrid grid,
+        IndexMappingSettings settings,
+        IReadOnlyCollection<KeyValuePair<CadPadId, RegularPadId>>? manualOverrides,
+        IReadOnlyDictionary<int, int>? expectedDiffIndexByCadId,
+        Action<double>? reportProgress)
+    {
         ReportProgress(reportProgress, 0.0);
         settings ??= new IndexMappingSettings();
         settings.ValidateOrThrow();

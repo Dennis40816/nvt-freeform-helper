@@ -1,3 +1,4 @@
+using System.Collections;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -42,10 +43,26 @@ public sealed partial class DxfRegularMappingAnalyzer
         }
     }
 
+    private sealed class LegacyManualOverrides(IReadOnlyDictionary<int, int> source)
+        : IReadOnlyCollection<KeyValuePair<CadPadId, RegularPadId>>
+    {
+        public int Count => source.Count;
+
+        public IEnumerator<KeyValuePair<CadPadId, RegularPadId>> GetEnumerator()
+        {
+            foreach (var entry in source)
+            {
+                yield return new KeyValuePair<CadPadId, RegularPadId>(new CadPadId(entry.Key), new RegularPadId(entry.Value));
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
     private static class ManualOverrideApplier
     {
         public static void Apply(
-            IReadOnlyDictionary<int, int>? manualOverrides,
+            IReadOnlyCollection<KeyValuePair<CadPadId, RegularPadId>>? manualOverrides,
             IReadOnlyList<CadPad> cadPads,
             IReadOnlyList<RegularPad> regPads,
             IndexMappingSettings settings,
@@ -58,16 +75,16 @@ public sealed partial class DxfRegularMappingAnalyzer
                 return;
             }
 
-            var cadById = new Dictionary<int, int>(cadPads.Count);
+            var cadById = new Dictionary<CadPadId, int>(cadPads.Count);
             for (var i = 0; i < cadPads.Count; i++)
             {
-                cadById[cadPads[i].Id] = i;
+                cadById[new CadPadId(cadPads[i].Id)] = i;
             }
 
-            var regularByIndex = new Dictionary<int, int>(regPads.Count);
+            var regularById = new Dictionary<RegularPadId, int>(regPads.Count);
             for (var i = 0; i < regPads.Count; i++)
             {
-                regularByIndex[regPads[i].RegularPadId] = i;
+                regularById[new RegularPadId(regPads[i].RegularPadId)] = i;
             }
 
             foreach (var entry in manualOverrides.OrderBy(k => k.Key))
@@ -77,7 +94,7 @@ public sealed partial class DxfRegularMappingAnalyzer
                     continue;
                 }
 
-                if (!regularByIndex.TryGetValue(entry.Value, out var regularListIndex))
+                if (!regularById.TryGetValue(entry.Value, out var regularListIndex))
                 {
                     continue;
                 }
