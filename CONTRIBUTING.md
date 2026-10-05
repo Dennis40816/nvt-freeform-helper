@@ -4,8 +4,8 @@
 
 ## 分支模型
 
-- `main` 是預設分支，只保存已發佈版本；`1.3.x` 是目前的 minor-line trunk。
-- 獨立工作使用 `feature/<version>/<topic>`，例如 `feature/1.3.x/<topic>`；功能 PR 以對應 trunk 為目標，不直接進入 `main`。
+- The default branch is `1.3.x` (trunk). `main` currently equals the initial import commit and will hold released versions only.
+- Work uses `feature/<version>/<topic>` branches, such as `feature/1.3.x/<topic>`, targeting `1.3.x`.
 - 1.3.x 的版本順序、slice 依賴與退出條件以 `docs/guides/refactor-roadmap-1.3.x.md` 及 `TODO.md` 為準。發佈 workflow 尚屬 `S15.005e`，不得把範本的發佈程序視為本庫已實作的 gate。
 
 ## 變更、commit 與 PR
@@ -34,6 +34,8 @@
 
 PR 只要觸及以下任一高風險範圍，整個 PR 就需要 owner 在 GitHub 核准：production code `src/**`、CI workflow `.github/**`、決定 gate 內容的 `scripts/**`、`.editorconfig`、`Directory.Build.props`、`Directory.Packages.props`、`global.json`、發佈相關檔案，以及 agent 權限設定。高風險 PR 仍建議取得本專案的獨立審查。其餘文件與測試變更，在本專案派出的獨立審查結論為 `accept`、未留 P0／P1、且 required checks 綠燈後由 bot 合併。範本專案的 session 不替本專案審查。
 
-此處的 bot 是本庫已用於 PR 操作、沿用範本專案的 GitHub App。`AGENTS.md` 與 `CONTRIBUTING.md` 本身是否屬於「agent 權限設定」尚未決定；釐清前，修改這兩個檔案的 PR 送 owner 核准。
+The bot is the repository's existing GitHub App, inherited from the template project. Changes to `AGENTS.md` or `CONTRIBUTING.md` require owner confirmation in chat before editing. The owner said on 2026-10-04: 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). A GitHub review is not required for this confirmation; the GitHub owner-approval rules for `src/**`, `scripts/**`, `.github/**`, and the other high-risk paths above continue to apply.
 
-合併前再次確認 PR 的目前 head、適用的獨立審查與 owner 核准，以及 required checks。使用 `gh pr merge <n> --merge --match-head-commit <head>`，以當下確認的 head 作為合併邊界。`S15.005c` 的 authority policy／review record 與 `S15.005d` 的 ruleset 尚未完成，不把未實作的自動檢查寫成現行 gate。
+合併前再次確認 PR 的目前 head、適用的獨立審查與 owner 核准，以及 required checks。使用 `gh pr merge <n> --merge --match-head-commit <head>`，以當下確認的 head 作為合併邊界。
+
+Execution status for the S15.005c authority policy/review record and the S15.005d ruleset is maintained in TODO.md; do not describe unimplemented automatic checks as current gates.
