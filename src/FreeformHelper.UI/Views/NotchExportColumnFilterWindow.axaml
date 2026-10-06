@@ -47,14 +47,14 @@
                                  Text="From"/>
             <TextBox Grid.Column="1"
                      Text="{Binding RangeFromText, Mode=TwoWay}"
-                     Watermark="min"/>
+                     PlaceholderText="min"/>
             <SelectableTextBlock Grid.Column="2"
                                  VerticalAlignment="Center"
                                  Classes="stepNote"
                                  Text="To"/>
             <TextBox Grid.Column="3"
                      Text="{Binding RangeToText, Mode=TwoWay}"
-                     Watermark="max"/>
+                     PlaceholderText="max"/>
           </Grid>
           <SelectableTextBlock Classes="stepNote"
                                IsVisible="{Binding IsRangeSuggested}"

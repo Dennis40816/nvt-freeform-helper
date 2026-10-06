@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using AvaloniaEdit;
@@ -320,7 +321,7 @@ public sealed partial class FreeformHelperView
         }
     }
 
-    private void OnConsoleFocusGained(object? sender, GotFocusEventArgs e)
+    private void OnConsoleFocusGained(object? sender, FocusChangedEventArgs e)
     {
         SetConsoleFocus(true);
     }

@@ -202,8 +202,7 @@
                     PointerPressed="ViewMenuButton_PointerPressed"
                     PointerEntered="ViewMenuButton_PointerEntered"
                     PointerExited="ViewMenuButton_PointerExited"
-                    Checked="ViewMenuButton_Checked"
-                    Unchecked="ViewMenuButton_Unchecked"
+                    IsCheckedChanged="ViewMenuButton_IsCheckedChanged"
                     Margin="{StaticResource InsetRight12}"
                     VerticalAlignment="Stretch">
         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}">
@@ -226,7 +225,7 @@
               <SelectableTextBlock Text="Rows"/>
               <TextBox Classes="workspaceHeaderInput"
                        Width="{StaticResource ManualSizingInputWidth}"
-                       Watermark="e.g. 0-3,6"
+                       PlaceholderText="e.g. 0-3,6"
                        Text="{Binding ManualRowsRange, Mode=TwoWay}"
                        ToolTip.Tip="Rows range (0 = top). Accepts 5 / 5-7 / 5,7."/>
             </StackPanel>
@@ -235,7 +234,7 @@
               <SelectableTextBlock Text="Cols"/>
               <TextBox Classes="workspaceHeaderInput"
                        Width="{StaticResource ManualSizingInputWidth}"
-                       Watermark="e.g. 2-6"
+                       PlaceholderText="e.g. 2-6"
                        Text="{Binding ManualColsRange, Mode=TwoWay}"
                        ToolTip.Tip="Column range. Accepts 5 / 5-7 / 5,7."/>
             </StackPanel>

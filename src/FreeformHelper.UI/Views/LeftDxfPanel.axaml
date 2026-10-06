@@ -368,7 +368,7 @@
                       ColumnSpacing="{StaticResource Space6}">
                   <TextBox Grid.Column="0"
                            Text="{Binding DxfEditNewLayerName, Mode=TwoWay}"
-                           Watermark="New DXF layer"/>
+                           PlaceholderText="New DXF layer"/>
                   <Button Grid.Column="1"
                           Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                           Command="{Binding CreateLayerAndMoveSelectedCadPadsCommand}"

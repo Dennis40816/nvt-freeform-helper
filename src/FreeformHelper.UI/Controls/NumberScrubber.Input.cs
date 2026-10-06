@@ -46,7 +46,7 @@ public sealed partial class NumberScrubber
         }
     }
 
-    private void OnInputFocus(object? sender, GotFocusEventArgs e)
+    private void OnInputFocus(object? sender, FocusChangedEventArgs e)
     {
         _isEditing = true;
         if (IsMixed && _inputBox is not null)
