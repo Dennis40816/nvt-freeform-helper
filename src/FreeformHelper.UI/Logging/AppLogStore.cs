@@ -25,12 +25,13 @@ public sealed class AppLogStore
     // The main collection of log entries that the UI binds to.
     private readonly ObservableCollection<AppLogEntry> _entries = new();
     // A concurrent queue to temporarily store log entries before the UI is ready to process them.
-    private readonly ConcurrentQueue<AppLogEntry> _pending = new();
+    private readonly ConcurrentQueue<(AppLogEntry Entry, long Generation)> _pending = new();
     // A thread-safe ring buffer snapshot used by runtime query and diagnostics.
     private readonly List<AppLogEntry> _ringEntries;
     private readonly int _maxEntries;
     // A flag indicating whether the UI thread has completed its initialization and is ready to process log entries.
     private bool _uiReady;
+    private long _generation;
 
     /// <summary>
     /// Gets the singleton instance of the <see cref="AppLogStore"/>.
@@ -104,11 +105,11 @@ public sealed class AppLogStore
     /// <param name="entry">The log entry to add.</param>
     public void Add(AppLogEntry entry)
     {
-        AddToRing(entry);
+        var generation = AddToRing(entry);
 
         if (!_uiReady)
         {
-            _pending.Enqueue(entry); // Enqueue if UI is not ready.
+            _pending.Enqueue((entry, generation)); // Enqueue if UI is not ready.
             TrimPendingQueueToMax();
             return;
         }
@@ -116,11 +117,11 @@ public sealed class AppLogStore
         // Ensure that additions to the ObservableCollection happen on the UI thread.
         if (_hasUiThreadAccess())
         {
-            AppendEntryToUiCollection(entry);
+            AppendEntryToUiCollection(entry, generation);
         }
         else
         {
-            _postToUiThread(() => AppendEntryToUiCollection(entry));
+            _postToUiThread(() => AppendEntryToUiCollection(entry, generation));
         }
     }
 
@@ -131,42 +132,46 @@ public sealed class AppLogStore
     /// </summary>
     public void Clear()
     {
-        lock (_sync)
+        lock (_uiCollectionGate)
         {
-            _ringEntries.Clear();
-        }
-
-        if (!_uiReady)
-        {
-            // If UI is not ready, just clear the pending queue.
-            while (_pending.TryDequeue(out _))
+            lock (_sync)
             {
+                _generation++;
+                _ringEntries.Clear();
+                while (_pending.TryDequeue(out _))
+                {
+                }
             }
-            return;
-        }
 
-        // Ensure that clearing the ObservableCollection happens on the UI thread.
-        if (_hasUiThreadAccess())
-        {
-            ClearUiCollection();
-        }
-        else
-        {
-            _postToUiThread(ClearUiCollection);
+            if (!_uiReady)
+            {
+                return;
+            }
+
+            // Ensure that clearing the ObservableCollection happens on the UI thread.
+            if (_hasUiThreadAccess())
+            {
+                ClearUiCollection();
+            }
+            else
+            {
+                _postToUiThread(ClearUiCollection);
+            }
         }
     }
 
     public IReadOnlyList<AppLogEntry> GetTail(int tailCount)
     {
-        var effectiveTail = Math.Max(0, tailCount);
-        if (effectiveTail == 0)
-        {
-            return Array.Empty<AppLogEntry>();
-        }
+        return GetTail(tailCount, out _);
+    }
 
+    internal IReadOnlyList<AppLogEntry> GetTail(int tailCount, out int totalCount)
+    {
+        var effectiveTail = Math.Max(0, tailCount);
         lock (_sync)
         {
-            if (_ringEntries.Count == 0)
+            totalCount = _ringEntries.Count;
+            if (effectiveTail == 0 || totalCount == 0)
             {
                 return Array.Empty<AppLogEntry>();
             }
@@ -201,17 +206,18 @@ public sealed class AppLogStore
         {
             while (_pending.TryDequeue(out var entry))
             {
-                AppendEntryToUiCollection(entry);
+                AppendEntryToUiCollection(entry.Entry, entry.Generation);
             }
         }
     }
 
-    private void AddToRing(AppLogEntry entry)
+    private long AddToRing(AppLogEntry entry)
     {
         lock (_sync)
         {
             _ringEntries.Add(entry);
             TrimRingEntriesToMax();
+            return _generation;
         }
     }
 
@@ -226,10 +232,18 @@ public sealed class AppLogStore
         _ringEntries.RemoveRange(0, overflow);
     }
 
-    private void AppendEntryToUiCollection(AppLogEntry entry)
+    private void AppendEntryToUiCollection(AppLogEntry entry, long generation)
     {
         lock (_uiCollectionGate)
         {
+            lock (_sync)
+            {
+                if (generation != _generation)
+                {
+                    return;
+                }
+            }
+
             _entries.Add(entry);
             TrimUiEntriesToMax();
         }

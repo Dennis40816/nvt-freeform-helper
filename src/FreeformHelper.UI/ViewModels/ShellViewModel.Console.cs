@@ -6,6 +6,9 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class ShellViewModel
 {
+    // Tests can schedule a background Add at the snapshot boundary without relying on timing.
+    internal Action? ConsoleSnapshotReadForTests { get; set; }
+
     private void OnLogEntriesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (!IsConsoleExpanded)
@@ -32,6 +35,13 @@ public sealed partial class ShellViewModel
 
         if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems is not null)
         {
+            // The ring snapshot may already include this notification. Replace until the UI collection catches up.
+            if (e.NewStartingIndex < ConsoleSourceLineCount)
+            {
+                RebuildConsoleText();
+                return;
+            }
+
             AppendConsoleLines(e.NewItems.Cast<AppLogEntry>()); // Append new log entries.
             return;
         }
@@ -110,8 +120,9 @@ public sealed partial class ShellViewModel
     {
         _consoleTextBuffer.Clear();
         var renderedCount = 0;
-        var totalSourceCount = AppLogStore.Instance.GetTotalCount();
-        var tailEntries = AppLogStore.Instance.GetTail(ConsoleRenderTailSourceLineLimit);
+        ConsoleSnapshotReadForTests?.Invoke();
+        var tailLimit = IsConsoleDedupEnabled ? AppLogStore.Instance.MaxEntries : ConsoleRenderTailSourceLineLimit;
+        var tailEntries = AppLogStore.Instance.GetTail(tailLimit, out var totalSourceCount);
 
         if (!IsConsoleDedupEnabled)
         {
@@ -130,7 +141,7 @@ public sealed partial class ShellViewModel
 
         string? pendingLine = null;
         var pendingCount = 0;
-        foreach (var entry in AppLogStore.Instance.GetTail(AppLogStore.Instance.MaxEntries))
+        foreach (var entry in tailEntries)
         {
             var line = AppLogFormatter.FormatLine(entry);
 

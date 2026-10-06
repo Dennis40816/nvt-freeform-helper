@@ -19,6 +19,30 @@
 - 2026-07-20 起由 `docs/guides/refactor-roadmap-1.3.x.md` 統一排序；舊 S14 UI candidates 已映射到 `R13.005` / `R13.501`～`R13.505`，不再作為第二套執行佇列。
 - 2026-10-02 起，`S15.*`（基準修復與公版對齊）排在所有未完成 `R13.*` 之前：owner 指定順序為「確認現狀 → 收進 `master` → 套用 NFC 公版 → 才改架構／UI／演算法」；但依下方 2026-10-02 owner 決定，只剩 owner-only `S15.*` 項目時，`R13.*` 可開始執行。
 
+- [ ] **2026-10-06 console review（基準 `6fe3c269`）：NFH 僅修 01、02，其餘移至 Core 1.0.0**
+  - [x] 01 ring 快照與後續 Add 通知重複追加：Shell 在通知追上快照前採替換更新；啟動／展開回歸測試。
+  - [x] 02 Clear 後已排隊的 Add 使舊 log 重現：Clear 遞增世代並清空 pending；已排隊 Add／pending flush × UI／背景 Clear 回歸測試。
+  - 下列 03–21 均為待完成：fixed by the Core console redesign for Core 1.0.0。
+  - [ ] 03 UI-ready 切換漏通知競態。
+  - [ ] 04 Shell 逐筆複製／重建全文。
+  - [ ] 05 收合後仍重掃隱藏 editor。
+  - [ ] 06 完整 link parse 與檔案查詢同步跑在 UI（含 S15.017）。
+  - [ ] 07 entry 上限未形成記憶體上限。
+  - [ ] 08 全文替換重設選取與 caret。
+  - [ ] 09 捲動缺少 entry 閱讀錨點。
+  - [ ] 10 收合再展開強制回到最新。
+  - [ ] 11 水平位置保留呼叫無效。
+  - [ ] 12 連結命中座標缺少 ScrollOffset。
+  - [ ] 13 搜尋與 hover 未使 visual lines 快取失效。
+  - [ ] 14 相對路徑邊界與 Unicode 支援不足。
+  - [ ] 15 URL 裁掉合法尾端符號。
+  - [ ] 16 檔名解析同步遞迴掃 repo 且可能選錯同名檔。
+  - [ ] 17 line／column 未傳入開啟動作。
+  - [ ] 18 console 存在兩套行為實作。
+  - [ ] 19 Lines 計數不是實際顯示行數。
+  - [ ] 20 收合期間 Copy all 使用過期 ConsoleText。
+  - [ ] 21 檔案連結缺少鍵盤入口，圖示操作缺少可及性名稱。
+
 ## 工作規則（非任務）
 - 每個任務完成時：`build + 對應 tests + lint`。
 - 每個里程碑：`commit + push`。
@@ -140,7 +164,8 @@
   - 變更：僅修改該測試，沿用 `FlushUiQueueAsync`，每輪 flush 完成後以 `Stopwatch` 檢查 5 秒重試期限（flush 本身沒有 timeout，dispatcher 停滯時不會因此退出）；新增 log 前等待已捲到底，新增後等待最新文字出現且底部距離仍 <= 1。條件達成即結束，不加固定 sleep；保留解析次數、捲動距離與篩選斷言，不變更 production，也不新增共用 helper。
   - 驗證：沙箱內測試專案離線 build 2 次，均為 0 warnings／0 errors；`TerminalStartupPathTests` 修改前 8/8、修改後連續 6 輪共 48/48 通過，0 failed／0 skipped。`verify.ps1 -StructureOnly` 與 `git diff --check` 通過，兩個修改檔均為 CRLF；沙箱不支援 lint，未執行。
   - 未能驗證：runner 失敗只觀察到一次，未在受控環境重現該次排程，也未取得當時的排版／捲動 trace；本機通過不能證明 runner 後續永不再失敗。
-- [ ] **S15.017 console link 解析仍每次重掃整份文字（production 效能，分支試作不合併、暫緩）**
+- [ ] **S15.017 console link 解析仍每次重掃整份文字（已移至 Core 1.0.0 console redesign）**
+  - owner 決定（2026-10-06）：移至 Core console redesign for Core 1.0.0，對應本次 console review 06；NFH 本次僅修 01、02。以下保留先前調查與暫緩紀錄。
   - `ConsoleLinkParser.Parse` 對完整文字執行六個 regex，並對候選路徑查詢檔案系統；S15.013 只減少呼叫次數，單次成本仍隨 console 長度成長。
   - 暫緩：增量解析不排進 1.3.x；後續研發須維持舊行 offset、截斷、去重、篩選與可點擊連結的等價性。
   - Commander 判斷（2026-10-04）：已在分支 `feature/queue/s15-017-incremental-console-links` 試作並經唯讀審查，判斷不合併（依下一條 owner 的方向：console 系統之後再研發；「不合併」是 Commander 對 owner 回答的解讀，不是 owner 原話），本項維持未勾選並暫緩。console 以最後 4000 筆為尾窗，窗口開始滑動後新增文字不再是舊文字的追加，快速路徑會退回完整解析，對 console 已滿的長行最壞情況（約 5.18 秒的合成樣本）沒有幫助；production 約 180 行、測試約 500 行不成比例。
