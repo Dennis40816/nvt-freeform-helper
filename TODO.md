@@ -706,6 +706,10 @@
   - [ ] Found 2026-10-06: `src/FreeformHelper.UI/Styles/Controls.Scroll.axaml` has selectors that match nothing on Avalonia 12: `PART_LineLeftButton`, `PART_LineRightButton`, `ScrollBar:pressed`, and `ScrollViewer.scrollV2` on ListBoxes. Remove them when the scroll styles move to Core.
   - [ ] Test on Avalonia 12.1.1 whether an exception in test setup stops the headless loop, and record the result in Core `docs/core/modules/Testing.md`. NFC reports that it does on Avalonia 12.0.5. NFH measured the opposite on Avalonia 11.3.12.
   - [ ] `src/FreeformHelper.UI/Assets/Fonts/MaterialIcons-Regular.ttf` (357 KB) has no reference, but the `Assets\**` resource rule still ships it. Remove it when the icons move to Core.
+  - Runtime Query moves to Core in two NFH steps (NVT Core proposal, 2026-10-06):
+    - [ ] Q0: add characterization tests for the command line, routing, request checks, argument parsing and the `help` output. Tests only. They must pass at 847cc453 and later against the Core version.
+    - [ ] Q7: after Core 0.2.0 (target 2026-10-14), switch to the Core Runtime Query layers. The full test list and outcomes stay equal to 847cc453.
+  - [ ] Found 2026-10-06 by NVT Core: `scripts/runtime/runtime-quick.ps1` takes the repository root one level too high (`..` instead of `..\..`). It never finds the built exe. It falls back to `dotnet run` with a relative project path, which works only from the repository root. The problem dates from the first public import.
 
 ### 1.3.4 Workspace ViewModel 拆解
 
