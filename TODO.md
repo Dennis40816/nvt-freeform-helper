@@ -690,8 +690,10 @@
     - Merged into 1.3.x on 2026-10-06 through #41 (merge commit 847cc453).
     - Still open: the manual desktop checks of the console editor, rendering, dialogs and input from the assessment.
   - [ ] Follow-up (found 2026-10-06; not part of the upgrade): four main-window tests ask the shared CAD load spinner host to show, and the host starts a short-lived copy of the test executable. The Avalonia 11 baseline does the same with testhost. Give these tests a fake host, or extend the test switch to the show path.
-- [ ] **R13.307 Adopt NVT Core in NFH**
-  - NFH consumes Core as versioned .nupkg files from a local feed in this repository.
+- [ ] **R13.307 Adopt NVT Core in NFH** ([#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
+  - NFH downloads the versioned Core .nupkg files from Core Releases before every restore. `core-packages.json` pins each file's SHA-256, and the files are not committed (owner decision, 2026-10-06).
+  - [x] Step 1 (2026-10-06): NFH references Nvt.Core.Avalonia 0.1.0, downloaded by `scripts/build/fetch-core-packages.ps1`, and all UI-thread checks use the Core `UiThread`. NFH's own copy is deleted. The full test list and outcomes match 847cc453.
+  - [ ] Before the first NFH release with Core, ship the Core license as `licenses/Nvt.Core/LICENSE`, per the Core release rules.
   - Adopt the non-UI library (net8) first. It does not wait for R13.306.
   - Adopt the UI modules after R13.306.
   - Each switch-over keeps the existing NFH tests passing. Non-UI output stays identical, and UI snapshots follow the R13.306 snapshot rule.
