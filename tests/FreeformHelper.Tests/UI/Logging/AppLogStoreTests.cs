@@ -9,6 +9,53 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class AppLogStoreTests
 {
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(false, false)]
+    public void Clear_WhenNotificationsAreQueued_DiscardsPreClearEntries(bool readyBeforeAdd, bool clearOnUiThread)
+    {
+        var callbacks = new Queue<Action>();
+        var hasUiThreadAccess = false;
+        var store = new AppLogStore(3, () => hasUiThreadAccess, callbacks.Enqueue);
+        if (readyBeforeAdd)
+        {
+            store.MarkUiReady();
+            callbacks.Dequeue()();
+        }
+
+        store.Add(CreateEntry("before clear"));
+        if (!readyBeforeAdd)
+        {
+            store.MarkUiReady();
+        }
+
+        Assert.Empty(store.Entries);
+        var displayedMessages = new List<string>();
+        ((INotifyCollectionChanged)store.Entries).CollectionChanged += (_, change) =>
+        {
+            if (change.NewItems is not null)
+            {
+                displayedMessages.AddRange(change.NewItems.Cast<AppLogEntry>().Select(entry => entry.Message));
+            }
+        };
+
+        hasUiThreadAccess = clearOnUiThread;
+        store.Clear();
+        Assert.Empty(store.GetTail(3));
+        hasUiThreadAccess = false;
+        store.Add(CreateEntry("after clear"));
+        while (callbacks.TryDequeue(out var callback))
+        {
+            callback();
+        }
+
+        Assert.Equal("after clear", Assert.Single(displayedMessages));
+        Assert.Equal("after clear", Assert.Single(store.Entries).Message);
+        Assert.Equal("after clear", Assert.Single(store.GetTail(3)).Message);
+    }
+
     [Fact]
     public async Task AddAndClear_AfterUiReadyWithoutApplication_DoNotCreateDispatcher()
     {

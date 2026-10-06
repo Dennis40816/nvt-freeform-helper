@@ -305,8 +305,9 @@ Notes:
 - ShowWorkspaceCommand / ShowHowToUseCommand / ShowDevCommand
   - Switches CurrentViewModel and page visibility
 - ClearConsoleCommand
-  - [Status] (clears AppLogStore)
+  - [Status] (clears AppLogStore, including pending entries; queued Add callbacks from before Clear cannot restore old entries)
   - The terminal is expanded by default at startup; the full console text is built from the ring buffer tail without depending on UI collection flush.
+  - After a startup/expansion ring snapshot, Add notifications replace the snapshot until the UI collection catches up; each stored entry appears once, including distinct entries with identical content.
 
 ### Pad Info ViewModels (src/FreeformHelper.UI/ViewModels/PadInfoViewModels.cs)
 - CadPadInfoViewModel.ApplyChangesCommand → SetCadPadCustomValues
