@@ -696,10 +696,15 @@
   - Adopt the UI modules after R13.306.
   - Each switch-over keeps the existing NFH tests passing. Non-UI output stays identical, and UI snapshots follow the R13.306 snapshot rule.
   - A module is done only when NFH uses the Core version and deletes its own copy.
-  - The four post-R13.306 items were compared with Core `1e49373` and NFC `085f71cf` on 2026-10-06. NVT Core sets their order. The suggested order is: the Core UI-thread helper first, then UiResourceResolver, the headless session guard, the button roles and the scroll styles.
-  - [ ] Found 2026-10-06: the 10 keyboard focus selectors in `src/FreeformHelper.UI/Styles/Controls.Action.axaml` use `:focusvisible`. Avalonia defines only `:focus-visible`, so NFH buttons show no keyboard focus. `UiLayoutGuardTests` checks the same spelling. The bug predates R13.306. Fix it when the button roles move to Core.
+  - The four post-R13.306 items were compared with Core `1e49373` and NFC `085f71cf` on 2026-10-06. NVT Core set the order the same day:
+    1. NFH uses the Core UI-thread helper, from the first Core release.
+    2. UiResourceResolver.
+    3. The scroll styles, based on NFC's set plus NFH's viewport-bound rule.
+    4. The button roles, after Core's font role keys are merged.
+    - The headless session guard stays in NFH for now, because Core ships no test helpers. NVT Core asks the owner whether Core should ship them.
+  - [ ] Found 2026-10-06: the 10 keyboard focus selectors in `src/FreeformHelper.UI/Styles/Controls.Action.axaml` use `:focusvisible`. Avalonia defines only `:focus-visible`, so NFH buttons show no keyboard focus. `UiLayoutGuardTests` checks the same spelling. The bug predates R13.306. Fix it in NFH.
   - [ ] Found 2026-10-06: `src/FreeformHelper.UI/Styles/Controls.Scroll.axaml` has selectors that match nothing on Avalonia 12: `PART_LineLeftButton`, `PART_LineRightButton`, `ScrollBar:pressed`, and `ScrollViewer.scrollV2` on ListBoxes. Remove them when the scroll styles move to Core.
-  - [ ] Before the headless session guard moves to Core, test on Avalonia 12.1.1 whether an exception in test setup stops the headless loop. NFC reports that it does on Avalonia 12.0.5. NFH measured the opposite on Avalonia 11.3.12.
+  - [ ] Test on Avalonia 12.1.1 whether an exception in test setup stops the headless loop, and record the result in Core `docs/core/modules/Testing.md`. NFC reports that it does on Avalonia 12.0.5. NFH measured the opposite on Avalonia 11.3.12.
   - [ ] `src/FreeformHelper.UI/Assets/Fonts/MaterialIcons-Regular.ttf` (357 KB) has no reference, but the `Assets\**` resource rule still ships it. Remove it when the icons move to Core.
 
 ### 1.3.4 Workspace ViewModel 拆解
