@@ -117,3 +117,8 @@ __pycache__/
 # Repository-local .NET install (scripts/ci/install-dotnet.ps1)
 ############################
 .dotnet/
+
+############################
+# NVT Core packages, downloaded before restore (scripts/build/fetch-core-packages.ps1)
+############################
+artifacts/core-packages/

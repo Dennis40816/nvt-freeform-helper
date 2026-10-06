@@ -9,8 +9,8 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaEdit;
-using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.Views;
 

@@ -2,7 +2,7 @@ using System.Reflection;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Threading;
 using Xunit;
 
 namespace FreeformHelper.Tests;

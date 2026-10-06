@@ -17,13 +17,15 @@ FreeformHelper 是 DXF 分析工具，主流程是：
 
 ## 1. 傻瓜模式：直接跑起來（整段複製貼上）
 
-> 條件：Windows + PowerShell + .NET SDK 10.0.3xx（版本由 `global.json` 鎖定）。專案 target 為 `net10.0`。
+> 條件：Windows + PowerShell + Python 3.10 以上 + .NET SDK 10.0.3xx（版本由 `global.json` 鎖定）。專案 target 為 `net10.0`。
 
 ```powershell
 # 1) 到 repo 根目錄（請改成你的路徑）
 Set-Location <FreeformHelper repo 路徑>
 
-# 2) 還原 + 建置
+# 2) 下載 NVT Core 套件（需要 Python 3.10 以上），再還原 + 建置。
+#    core-packages.json 改變後，用 IDE 建置或 dotnet run 之前要再下載一次。
+./scripts/build/fetch-core-packages.ps1
 dotnet restore
 dotnet build FreeformHelper.sln
 

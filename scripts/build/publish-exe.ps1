@@ -11,6 +11,8 @@ $ErrorActionPreference = "Stop"
 $project = "src/FreeformHelper.UI/FreeformHelper.UI.csproj"
 $profileOut = Join-Path $OutputRoot "$Runtime/$Profile"
 
+& (Join-Path $PSScriptRoot "fetch-core-packages.ps1")
+
 # Restore on its own, without the publish properties: a single-file or single-runtime restore does not match
 # the lock files, which fails a locked restore and rewrites the lock files otherwise. Directory.Build.props
 # lists the runtimes this restore covers.

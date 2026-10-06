@@ -6,6 +6,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+& (Join-Path $PSScriptRoot "fetch-core-packages.ps1")
+
 dotnet build FreeformHelper.sln
 if ($LASTEXITCODE -ne 0) {
     throw "dotnet build failed with exit code $LASTEXITCODE."

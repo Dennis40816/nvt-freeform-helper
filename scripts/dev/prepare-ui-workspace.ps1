@@ -186,6 +186,11 @@ try {
     $result.normalizeLineEndings.status = "ok"
   }
 
+  # The build and test cycle that follows restores; download and verify the NVT Core packages first.
+  if (-not $DryRun) {
+    & (Join-Path $repoRoot "scripts/build/fetch-core-packages.ps1")
+  }
+
   $result.overallStatus = "ok"
   Write-Host "[prepare-ui-workspace] done"
 }

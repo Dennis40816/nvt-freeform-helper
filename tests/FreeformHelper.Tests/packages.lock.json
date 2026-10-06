@@ -287,6 +287,11 @@
         "resolved": "13.0.3",
         "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
+      "Nvt.Core": {
+        "type": "Transitive",
+        "resolved": "0.1.0",
+        "contentHash": "zwlxw7iHNVCjAtix9Wi1Ok1nEZk6fJtAkQFVI7BYQycKS2Xk5ZLo3X4mXU/SPdetJcHQQSPoEGNiYtVgoc+5yA=="
+      },
       "SkiaSharp": {
         "type": "Transitive",
         "resolved": "3.119.4",
@@ -419,6 +424,7 @@
           "FreeformHelper.Infrastructure": "[1.3.2, )",
           "NLog": "[5.3.4, )",
           "NLog.Extensions.Logging": "[5.3.4, )",
+          "Nvt.Core.Avalonia": "[0.1.0, 0.1.0]",
           "System.Reactive": "[6.0.0, )"
         }
       },
@@ -501,6 +507,16 @@
           "Microsoft.Extensions.Configuration.Abstractions": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
           "NLog": "5.2.4"
+        }
+      },
+      "Nvt.Core.Avalonia": {
+        "type": "CentralTransitive",
+        "requested": "[0.1.0, 0.1.0]",
+        "resolved": "0.1.0",
+        "contentHash": "ROlhfUouNXaNLu2/eoDMMiF72piqRVQY03J8I8MLHcegsL71O77cpxxVGaXzvJFXO233efUG4YNo57Ecn6qUxw==",
+        "dependencies": {
+          "Avalonia": "12.1.1",
+          "Nvt.Core": "0.1.0"
         }
       },
       "System.Reactive": {

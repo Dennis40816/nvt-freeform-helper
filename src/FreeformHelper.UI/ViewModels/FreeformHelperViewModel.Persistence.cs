@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 

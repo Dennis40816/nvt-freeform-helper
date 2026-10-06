@@ -3,6 +3,7 @@ using System.Globalization;
 using Avalonia.Threading;
 using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 

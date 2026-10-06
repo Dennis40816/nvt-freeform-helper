@@ -77,6 +77,16 @@
           "NLog": "5.2.4"
         }
       },
+      "Nvt.Core.Avalonia": {
+        "type": "Direct",
+        "requested": "[0.1.0, 0.1.0]",
+        "resolved": "0.1.0",
+        "contentHash": "ROlhfUouNXaNLu2/eoDMMiF72piqRVQY03J8I8MLHcegsL71O77cpxxVGaXzvJFXO233efUG4YNo57Ecn6qUxw==",
+        "dependencies": {
+          "Avalonia": "12.1.1",
+          "Nvt.Core": "0.1.0"
+        }
+      },
       "System.Reactive": {
         "type": "Direct",
         "requested": "[6.0.0, )",
@@ -252,6 +262,11 @@
         "type": "Transitive",
         "resolved": "6.0.0",
         "contentHash": "9+PnzmQFfEFNR9J2aDTfJGGupShHjOuGw4VUv+JB044biSHrnmCIMD+mJHmb2H7YryrfBEXDurxQ47gJZdCKNQ=="
+      },
+      "Nvt.Core": {
+        "type": "Transitive",
+        "resolved": "0.1.0",
+        "contentHash": "zwlxw7iHNVCjAtix9Wi1Ok1nEZk6fJtAkQFVI7BYQycKS2Xk5ZLo3X4mXU/SPdetJcHQQSPoEGNiYtVgoc+5yA=="
       },
       "SkiaSharp": {
         "type": "Transitive",

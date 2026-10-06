@@ -1,5 +1,5 @@
 using Avalonia.Threading;
-using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.Tests;
 

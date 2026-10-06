@@ -26,6 +26,7 @@ $privatePathCheckScript = Join-Path $repoRoot "scripts/tests/check-private-path-
 $temporaryEnvironmentCheckScript = Join-Path $repoRoot "scripts/tests/check-temporary-environment.ps1"
 . (Join-Path $repoRoot "scripts/tests/private-path-patterns.ps1")
 $buildOutputSelectionScript = Join-Path $repoRoot "scripts/tests/check-build-output-selection.ps1"
+$fetchCorePackagesScript = Join-Path $repoRoot "scripts/build/fetch-core-packages.ps1"
 
 # Every test class belongs to at least one group here; 'uncategorized' catches the classes no list names.
 $shardGroups = [ordered]@{
@@ -234,6 +235,12 @@ try {
     # accident, so check the data before the slow lanes.
     if ($lanes -contains "test") {
         $null = & $assertExampleDataScript -AllowMissing:$AllowMissingExampleData
+    }
+
+    # The build and test lanes restore; the NVT Core packages must be downloaded and verified first.
+    if (($lanes -contains "build") -or ($lanes -contains "test")) {
+        Write-Lane "NVT Core packages"
+        & $fetchCorePackagesScript
     }
 
     foreach ($lane in $lanes) {

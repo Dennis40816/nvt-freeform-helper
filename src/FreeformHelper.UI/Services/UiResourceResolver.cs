@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Styling;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.Services;
 

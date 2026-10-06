@@ -22,6 +22,7 @@
     <PackageReference Include="Avalonia.AvaloniaEdit" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Nvt.Core.Avalonia" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="NLog" />
     <PackageReference Include="NLog.Extensions.Logging" />

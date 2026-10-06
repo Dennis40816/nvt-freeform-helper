@@ -2,8 +2,8 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using FreeformHelper.UI.Services;
 using NLog;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.Views;
 

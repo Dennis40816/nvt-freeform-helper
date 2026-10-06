@@ -1,4 +1,4 @@
-using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Threading;
 using Xunit;
 
 namespace FreeformHelper.Tests;
