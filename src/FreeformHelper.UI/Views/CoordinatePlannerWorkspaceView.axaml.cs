@@ -232,7 +232,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         var bitmap = new RenderTargetBitmap(pixelSize);
         bitmap.Render(previewHost);
         await using var stream = File.Open(file.Path.LocalPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        bitmap.Save(stream);
+        bitmap.Save(stream, PngBitmapEncoderOptions.Default);
         bitmap.Dispose();
         return true;
     }
