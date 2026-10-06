@@ -932,7 +932,7 @@ public sealed class UiLayoutGuardTests
             var isInteractiveControlState =
                 (selector.Contains("Button", StringComparison.Ordinal) || selector.Contains("ToggleButton", StringComparison.Ordinal)) &&
                 (selector.Contains(":pointerover", StringComparison.Ordinal) ||
-                 selector.Contains(":focusvisible", StringComparison.Ordinal) ||
+                 selector.Contains(":focus-visible", StringComparison.Ordinal) ||
                  selector.Contains(":pressed", StringComparison.Ordinal)) &&
                 !selector.Contains(" Border.", StringComparison.Ordinal) &&
                 !selector.Contains(" controls|", StringComparison.Ordinal) &&
@@ -1079,7 +1079,7 @@ public sealed class UiLayoutGuardTests
     {
         return (selector.Contains("Button", StringComparison.Ordinal) || selector.Contains("ToggleButton", StringComparison.Ordinal)) &&
             (selector.Contains(":pointerover", StringComparison.Ordinal) ||
-             selector.Contains(":focusvisible", StringComparison.Ordinal) ||
+             selector.Contains(":focus-visible", StringComparison.Ordinal) ||
              selector.Contains(":pressed", StringComparison.Ordinal) ||
              selector.Contains(":checked", StringComparison.Ordinal)) &&
             !selector.Contains(" Border.", StringComparison.Ordinal) &&

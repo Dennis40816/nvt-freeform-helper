@@ -702,7 +702,8 @@
     3. The scroll styles, based on NFC's set plus NFH's viewport-bound rule.
     4. The button roles, after Core's font role keys are merged.
     - The headless session guard stays in NFH for now, because Core ships no test helpers. NVT Core asks the owner whether Core should ship them.
-  - [ ] Found 2026-10-06: the 10 keyboard focus selectors in `src/FreeformHelper.UI/Styles/Controls.Action.axaml` use `:focusvisible`. Avalonia defines only `:focus-visible`, so NFH buttons show no keyboard focus. `UiLayoutGuardTests` checks the same spelling. The bug predates R13.306. Fix it in NFH.
+  - [x] Found 2026-10-06: the 10 keyboard focus selectors in `src/FreeformHelper.UI/Styles/Controls.Action.axaml` use `:focusvisible`. Avalonia defines only `:focus-visible`, so NFH buttons show no keyboard focus. `UiLayoutGuardTests` checks the same spelling. The bug predates R13.306. Fixed on 2026-10-06: 9 of the 10 roles now show their focus style.
+  - [ ] Found 2026-10-06: the neutral text button still shows no keyboard focus. The later `actionTextButton.actionNeutral` style (Controls.Action.axaml, line 187) sets the background again and has no focus state. Settle it when the button roles move to Core.
   - [ ] Found 2026-10-06: `src/FreeformHelper.UI/Styles/Controls.Scroll.axaml` has selectors that match nothing on Avalonia 12: `PART_LineLeftButton`, `PART_LineRightButton`, `ScrollBar:pressed`, and `ScrollViewer.scrollV2` on ListBoxes. Remove them when the scroll styles move to Core.
   - [ ] Test on Avalonia 12.1.1 whether an exception in test setup stops the headless loop, and record the result in Core `docs/core/modules/Testing.md`. NFC reports that it does on Avalonia 12.0.5. NFH measured the opposite on Avalonia 11.3.12.
   - [ ] `src/FreeformHelper.UI/Assets/Fonts/MaterialIcons-Regular.ttf` (357 KB) has no reference, but the `Assets\**` resource rule still ships it. Remove it when the icons move to Core.

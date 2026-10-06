@@ -153,7 +153,7 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushActionNeutralForeground}"/>
   </Style>
 
-  <Style Selector="Button.actionNeutral:focusvisible, ToggleButton.actionNeutral:focusvisible">
+  <Style Selector="Button.actionNeutral:focus-visible, ToggleButton.actionNeutral:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
@@ -221,7 +221,7 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushActionPrimaryForeground}"/>
   </Style>
 
-  <Style Selector="Button.actionPrimary:focusvisible, ToggleButton.actionPrimary:focusvisible">
+  <Style Selector="Button.actionPrimary:focus-visible, ToggleButton.actionPrimary:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
@@ -271,7 +271,7 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
   </Style>
 
-  <Style Selector="Button.actionDanger:focusvisible, ToggleButton.actionDanger:focusvisible">
+  <Style Selector="Button.actionDanger:focus-visible, ToggleButton.actionDanger:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionDangerForeground}"/>
@@ -321,7 +321,7 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
   </Style>
 
-  <Style Selector="Button.actionGhost:focusvisible, ToggleButton.actionGhost:focusvisible">
+  <Style Selector="Button.actionGhost:focus-visible, ToggleButton.actionGhost:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
@@ -409,13 +409,13 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
   </Style>
 
-  <Style Selector="Button.actionIconButton.actionNeutral:focusvisible, Button.actionIconButton.actionPrimary:focusvisible, Button.actionIconButton.actionGhost:focusvisible, ToggleButton.actionIconButton.actionNeutral:focusvisible, ToggleButton.actionIconButton.actionPrimary:focusvisible, ToggleButton.actionIconButton.actionGhost:focusvisible">
+  <Style Selector="Button.actionIconButton.actionNeutral:focus-visible, Button.actionIconButton.actionPrimary:focus-visible, Button.actionIconButton.actionGhost:focus-visible, ToggleButton.actionIconButton.actionNeutral:focus-visible, ToggleButton.actionIconButton.actionPrimary:focus-visible, ToggleButton.actionIconButton.actionGhost:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
   </Style>
 
-  <Style Selector="Button.actionIconButton.actionDanger:focusvisible, ToggleButton.actionIconButton.actionDanger:focusvisible">
+  <Style Selector="Button.actionIconButton.actionDanger:focus-visible, ToggleButton.actionIconButton.actionDanger:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
@@ -474,7 +474,7 @@
     <Setter Property="Opacity" Value="1"/>
   </Style>
 
-  <Style Selector="Button.viewportOverlayAction:focusvisible, ToggleButton.viewportOverlayAction:focusvisible">
+  <Style Selector="Button.viewportOverlayAction:focus-visible, ToggleButton.viewportOverlayAction:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionViewportHover}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionViewportForeground}"/>
@@ -523,7 +523,7 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
   </Style>
 
-  <Style Selector="Button.panelChromeToggle:focusvisible, ToggleButton.panelChromeToggle:focusvisible">
+  <Style Selector="Button.panelChromeToggle:focus-visible, ToggleButton.panelChromeToggle:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
@@ -570,7 +570,7 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
   </Style>
 
-  <Style Selector="Button.consoleHeaderAction:focusvisible, ToggleButton.consoleHeaderAction:focusvisible">
+  <Style Selector="Button.consoleHeaderAction:focus-visible, ToggleButton.consoleHeaderAction:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionInverseBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionInverseForeground}"/>
@@ -624,7 +624,7 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushActionChipForeground}"/>
   </Style>
 
-  <Style Selector="Button.chipAction:focusvisible, ToggleButton.chipAction:focusvisible">
+  <Style Selector="Button.chipAction:focus-visible, ToggleButton.chipAction:focus-visible">
     <Setter Property="Background" Value="{DynamicResource BrushActionFocusBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushActionFocusBorder}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushActionFocusForeground}"/>
