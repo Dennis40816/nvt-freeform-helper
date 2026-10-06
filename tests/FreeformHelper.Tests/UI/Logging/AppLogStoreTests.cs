@@ -24,7 +24,7 @@ public sealed class AppLogStoreTests
             store.Add(CreateEntry("before"));
             store.Clear();
             store.Add(CreateEntry("after"));
-        });
+        }, TestContext.Current.CancellationToken);
 
         Assert.Same(before, dispatcherField.GetValue(null));
         Assert.Equal("after", Assert.Single(store.Entries).Message);

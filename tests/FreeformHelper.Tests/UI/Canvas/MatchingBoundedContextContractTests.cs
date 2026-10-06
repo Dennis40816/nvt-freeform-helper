@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using FreeformHelper.Application.Services;
@@ -162,6 +163,9 @@ public sealed class MatchingBoundedContextContractTests
     private static PadCanvas CreateCanvas(IReadOnlyList<CadPad> cadPads, IReadOnlyList<RegularPad> regularPads)
     {
         var canvas = new PadCanvas { CadPads = cadPads, RegularPads = regularPads, Width = 200, Height = 120 };
+        // Avalonia 12 resolves pointer positions through a TopLevel.
+        var window = new Window { Content = canvas, Width = 200, Height = 120 };
+        window.Show();
         canvas.Measure(new Size(200, 120));
         canvas.Arrange(new Rect(0, 0, 200, 120));
         return canvas;
@@ -185,7 +189,9 @@ public sealed class MatchingBoundedContextContractTests
         try
         {
             using var pointer = new Pointer(1, PointerType.Mouse, isPrimary: true);
-            canvas.RaiseEvent(new PointerPressedEventArgs(canvas, pointer, canvas, screen, 0,
+            var root = TopLevel.GetTopLevel(canvas)!;
+            var rootPosition = canvas.TranslatePoint(screen, root)!.Value;
+            canvas.RaiseEvent(new PointerPressedEventArgs(canvas, pointer, root, rootPosition, 0,
                 new PointerPointProperties(RawInputModifiers.RightMouseButton, PointerUpdateKind.RightButtonPressed),
                 KeyModifiers.None, clickCount: 1));
             return hit;

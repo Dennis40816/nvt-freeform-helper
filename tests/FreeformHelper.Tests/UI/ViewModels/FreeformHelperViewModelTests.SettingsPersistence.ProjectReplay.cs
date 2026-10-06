@@ -316,7 +316,7 @@ public sealed partial class FreeformHelperViewModelTests
             var saveResult = await vm.SaveProjectAsync();
             Assert.True(saveResult);
 
-            using var doc = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(path));
+            using var doc = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(path, TestContext.Current.CancellationToken));
             var settingsVersions = doc.RootElement
                 .GetProperty("settings")
                 .GetProperty("notch")
@@ -495,7 +495,7 @@ public sealed partial class FreeformHelperViewModelTests
             vm.ConfirmEmbedDxfAsync = () => Task.FromResult(false);
             Assert.True(await vm.SaveProjectAsync());
 
-            using (var doc = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(projectPath)))
+            using (var doc = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(projectPath, TestContext.Current.CancellationToken)))
             {
                 var visibleDuplicates = doc.RootElement
                     .GetProperty("visibleDuplicateCadPadIds")

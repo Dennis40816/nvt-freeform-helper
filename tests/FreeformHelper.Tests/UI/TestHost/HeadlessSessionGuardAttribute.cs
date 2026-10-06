@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
-using Xunit.Sdk;
+using Xunit.v3;
 
 [assembly: FreeformHelper.Tests.HeadlessSessionGuard]
 
@@ -42,7 +42,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
 
     internal static string? CurrentHeadlessTest { get; private set; }
 
-    public override void Before(MethodInfo methodUnderTest)
+    public override void Before(MethodInfo methodUnderTest, IXunitTest test)
     {
         ArgumentNullException.ThrowIfNull(methodUnderTest);
         if (!IsHeadlessTest(methodUnderTest))
@@ -61,7 +61,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
         }
     }
 
-    public override void After(MethodInfo methodUnderTest)
+    public override void After(MethodInfo methodUnderTest, IXunitTest test)
     {
         ArgumentNullException.ThrowIfNull(methodUnderTest);
         if (!IsHeadlessTest(methodUnderTest))
@@ -69,8 +69,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
             return;
         }
 
-        var test = DescribeTest(methodUnderTest);
-        s_previousHeadlessTest = test;
+        s_previousHeadlessTest = DescribeTest(methodUnderTest);
         CurrentHeadlessTest = null;
         if (!Dispatcher.UIThread.CheckAccess())
         {

@@ -28,7 +28,7 @@ public sealed class RuntimeQueryIpcTests
             RuntimeQueryIpcHost.Start(shell);
 
             var stopTask = RuntimeQueryIpcHost.StopAsync();
-            var completed = await Task.WhenAny(stopTask, Task.Delay(1500));
+            var completed = await Task.WhenAny(stopTask, Task.Delay(1500, TestContext.Current.CancellationToken));
 
             Assert.Same(stopTask, completed);
             await stopTask;
@@ -53,10 +53,10 @@ public sealed class RuntimeQueryIpcTests
         try
         {
             RuntimeQueryIpcHost.Start(shell);
-            await client.ConnectAsync(1500);
+            await client.ConnectAsync(1500, TestContext.Current.CancellationToken);
 
             var stopTask = RuntimeQueryIpcHost.StopAsync();
-            var completed = await Task.WhenAny(stopTask, Task.Delay(1500));
+            var completed = await Task.WhenAny(stopTask, Task.Delay(1500, TestContext.Current.CancellationToken));
 
             Assert.Same(stopTask, completed);
             await stopTask;
@@ -84,14 +84,14 @@ public sealed class RuntimeQueryIpcTests
             using var reader = new StreamReader(server, leaveOpen: true);
             _ = await reader.ReadLineAsync();
             await Task.Delay(500);
-        });
+        }, TestContext.Current.CancellationToken);
         var request = new RuntimeQueryRequest(RuntimeQueryProtocol.Version, "status", Args: null);
 
         var response = RuntimeQueryCommandLine.SendRequest(request, timeoutMs: 100);
 
         Assert.False(response.Ok);
         Assert.Equal("IPC_TIMEOUT", response.Error?.Code);
-        await serverTask.WaitAsync(TimeSpan.FromSeconds(3));
+        await serverTask.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
     }
 
     [AvaloniaFact]

@@ -71,7 +71,7 @@ public sealed class Notch3635GenerationBenchmarkTests
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
         var json = JsonSerializer.Serialize(result, JsonOptions);
-        await File.WriteAllTextAsync(outputPath, json);
+        await File.WriteAllTextAsync(outputPath, json, TestContext.Current.CancellationToken);
     }
 
     private static Notch3635BenchmarkSample BuildSample(

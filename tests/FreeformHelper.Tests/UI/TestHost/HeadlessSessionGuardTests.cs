@@ -7,6 +7,7 @@ using FreeformHelper.UI;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
+using Xunit.v3;
 
 namespace FreeformHelper.Tests;
 
@@ -30,7 +31,7 @@ public sealed class HeadlessSessionGuardTests
         window.Show();
         var thisTest = typeof(HeadlessSessionGuardTests).GetMethod(nameof(After_ClosesTheWindowsOfAHeadlessTest))!;
 
-        new HeadlessSessionGuardAttribute().After(thisTest);
+        new HeadlessSessionGuardAttribute().After(thisTest, (IXunitTest)TestContext.Current.Test!);
 
         Assert.True(closed);
     }
@@ -39,7 +40,7 @@ public sealed class HeadlessSessionGuardTests
     public void After_MarksTheTestAsEnded_SoLaterWorkThatThrowsDoesNotEscape()
     {
         var thisTest = typeof(HeadlessSessionGuardTests).GetMethod(nameof(After_MarksTheTestAsEnded_SoLaterWorkThatThrowsDoesNotEscape))!;
-        new HeadlessSessionGuardAttribute().After(thisTest);
+        new HeadlessSessionGuardAttribute().After(thisTest, (IXunitTest)TestContext.Current.Test!);
         Dispatcher.UIThread.Post(static () => throw new InvalidOperationException("work after the hook"));
 
         Dispatcher.UIThread.RunJobs();
@@ -55,11 +56,10 @@ public sealed class HeadlessSessionGuardTests
         var thisTest = typeof(HeadlessSessionGuardTests).GetMethod(nameof(Before_RejectsAContextThatAHeadlessTestAlreadyRanWith))!;
         var guard = new HeadlessSessionGuardAttribute();
 
-        // The test body runs with a context of its own (xunit wraps the session's), so the first call
-        // sees it for the first time and the second call sees it again.
-        guard.Before(thisTest);
+        // xUnit v3 runs the hook and test body with the same session context. The automatic
+        // Before call has already recorded it, so another call must reject it.
 
-        Assert.Throws<InvalidOperationException>(() => guard.Before(thisTest));
+        Assert.Throws<InvalidOperationException>(() => guard.Before(thisTest, (IXunitTest)TestContext.Current.Test!));
     }
 
     [AvaloniaFact]
@@ -101,7 +101,7 @@ public sealed class HeadlessSessionGuardTests
         window.Show();
         var plainTest = typeof(HeadlessSessionGuardTests).GetMethod(nameof(ThrowIfContextWasUsedBefore_FailsTheSecondTestThatSeesTheSameContext))!;
 
-        new HeadlessSessionGuardAttribute().After(plainTest);
+        new HeadlessSessionGuardAttribute().After(plainTest, (IXunitTest)TestContext.Current.Test!);
 
         Assert.False(closed);
     }

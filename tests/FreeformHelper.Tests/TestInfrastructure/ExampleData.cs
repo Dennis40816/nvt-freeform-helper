@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Xunit;
 
 namespace FreeformHelper.Tests.TestInfrastructure;
@@ -35,7 +36,8 @@ internal static class ExampleData
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class ExampleDataFactAttribute : FactAttribute
 {
-    public ExampleDataFactAttribute()
+    public ExampleDataFactAttribute([CallerFilePath] string? sourceFilePath = null, [CallerLineNumber] int sourceLineNumber = -1)
+        : base(sourceFilePath, sourceLineNumber)
     {
         Skip = ExampleData.SkipReason;
     }
@@ -45,7 +47,8 @@ public sealed class ExampleDataFactAttribute : FactAttribute
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class ExampleDataTheoryAttribute : TheoryAttribute
 {
-    public ExampleDataTheoryAttribute()
+    public ExampleDataTheoryAttribute([CallerFilePath] string? sourceFilePath = null, [CallerLineNumber] int sourceLineNumber = -1)
+        : base(sourceFilePath, sourceLineNumber)
     {
         Skip = ExampleData.SkipReason;
     }
