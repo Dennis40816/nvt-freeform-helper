@@ -27,7 +27,7 @@
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space8}">
               <TextBox Text="{Binding QuickFocusQueryText, Mode=TwoWay}"
-                       Watermark="diff 72 / cad 4809 / reg 4616"
+                       PlaceholderText="diff 72 / cad 4809 / reg 4616"
                        ToolTip.Tip="Focus by typed target. Examples: diff 72, ic1 diff72, cad 4809, reg 4616. Plain number auto-resolves CAD, REG, then diff."/>
               <Button Grid.Column="1"
                       Classes="actionPrimary actionTextButton"

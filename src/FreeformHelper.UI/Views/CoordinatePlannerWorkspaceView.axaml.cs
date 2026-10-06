@@ -6,6 +6,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -231,7 +232,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         var bitmap = new RenderTargetBitmap(pixelSize);
         bitmap.Render(previewHost);
         await using var stream = File.Open(file.Path.LocalPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        bitmap.Save(stream);
+        bitmap.Save(stream, PngBitmapEncoderOptions.Default);
         bitmap.Dispose();
         return true;
     }

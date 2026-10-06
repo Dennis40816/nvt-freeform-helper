@@ -1,6 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<!-- xUnit v3 test projects must build an app host. The scripts' -UseNoAppHost passes UseAppHost=false to every
+     project so that a running FreeformHelper.UI.exe is never overwritten; this project keeps its own value. -->
+<Project Sdk="Microsoft.NET.Sdk" TreatAsLocalProperty="UseAppHost">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <UseAppHost>true</UseAppHost>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -17,7 +21,7 @@
     <PackageReference Include="Avalonia.Headless" />
     <PackageReference Include="Avalonia.Headless.XUnit" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
 </Project>

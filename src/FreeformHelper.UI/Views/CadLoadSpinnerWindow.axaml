@@ -5,14 +5,13 @@
         Width="{StaticResource CadLoadSpinnerWindowSize}"
         Height="{StaticResource CadLoadSpinnerWindowSize}"
         Background="Transparent"
-        SystemDecorations="None"
+        WindowDecorations="None"
         CanResize="False"
         ShowInTaskbar="False"
         ShowActivated="False"
         Topmost="True"
         WindowStartupLocation="Manual"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
         TransparencyLevelHint="Transparent">
   <Window.Styles>
     <Style Selector="Window">

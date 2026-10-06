@@ -678,6 +678,12 @@
     - UI snapshots: the owner said 「NFC 要求保持一致，其他沒有要求」 ("NFC must stay identical. The others have no requirement"). NFH UI snapshots may change without owner approval. The pull request attaches before-and-after images as a record. Non-UI outputs, such as files and data, must stay identical.
     - Package locks: the owner said 「repo 共同鎖定」 ("Lock all repositories together"). NFH enables package lock files, and CI restores in locked mode. Shared package versions follow the list that NVT Core pins.
   - Earlier inventories: `docs/reviews/avalonia12-prep-packages-build-2026-10.md`, `docs/reviews/avalonia12-prep-code-surface-2026-10.md`, `docs/reviews/avalonia12-prep-xaml-styles-2026-10.md`.
+  - Progress (2026-10-06, issue #40, branch `feature/1.3.x/a12-upgrade`):
+    - Avalonia is 12.1.1, the version NVT Core moved to on 2026-10-06. AvaloniaEdit stays at 12.0.0, its latest release, which requires Avalonia 12.0.0 or later.
+    - The branch also moves to net10 and xUnit v3, adds lock files and a locked restore in CI, and covers the win-x64 and win-arm64 publish runtimes.
+    - The full suite with the example data passed 1230 tests. The test names and count match the Avalonia 11 baseline at 4df72911.
+    - Still open: the manual desktop checks of the console editor, rendering, dialogs and input from the assessment.
+  - [ ] Follow-up (found 2026-10-06; not part of the upgrade): four main-window tests ask the shared CAD load spinner host to show, and the host starts a short-lived copy of the test executable. The Avalonia 11 baseline does the same with testhost. Give these tests a fake host, or extend the test switch to the show path.
 - [ ] **R13.307 Adopt NVT Core in NFH**
   - NFH consumes Core as versioned .nupkg files from a local feed in this repository.
   - Adopt the non-UI library (net8) first. It does not wait for R13.306.

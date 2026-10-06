@@ -89,7 +89,7 @@
       <Grid ColumnDefinitions="Auto,Auto,*"
             ColumnSpacing="{StaticResource Space8}">
         <TextBox Width="{StaticResource NotchExportSearchWidth}"
-                 Watermark="{Binding SearchWatermarkText}"
+                 PlaceholderText="{Binding SearchWatermarkText}"
                  Text="{Binding SearchKeyword, Mode=TwoWay}"
                  TextWrapping="NoWrap"/>
         <Button Grid.Column="1"

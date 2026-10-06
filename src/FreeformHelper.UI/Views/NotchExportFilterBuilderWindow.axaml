@@ -29,31 +29,31 @@
         <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="IC"/>
           <TextBox x:Name="IcTextBox"
-                   Watermark="e.g. 1"
+                   PlaceholderText="e.g. 1"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="Diff"/>
           <TextBox x:Name="DiffTextBox"
-                   Watermark="e.g. 20"
+                   PlaceholderText="e.g. 20"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="REG"/>
           <TextBox x:Name="RegTextBox"
-                   Watermark="e.g. 4820"
+                   PlaceholderText="e.g. 4820"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="CAD"/>
           <TextBox x:Name="CadTextBox"
-                   Watermark="e.g. 3777 / none"
+                   PlaceholderText="e.g. 3777 / none"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="Anchor (A)"/>
           <TextBox x:Name="AnchorTextBox"
-                   Watermark="e.g. 20"
+                   PlaceholderText="e.g. 20"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
@@ -71,7 +71,7 @@
         <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="Fuzzy text (optional)"/>
           <TextBox x:Name="FuzzyTextBox"
-                   Watermark="e.g. CAD 3777 / transfer"
+                   PlaceholderText="e.g. CAD 3777 / transfer"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
       </Grid>

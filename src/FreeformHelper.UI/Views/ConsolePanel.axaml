@@ -87,7 +87,7 @@
                  Width="{StaticResource ConsoleSearchWidth}"
                  Height="{StaticResource ConsoleSearchHeight}"
                  Text="{Binding ConsoleSearchText, Mode=TwoWay}"
-                 Watermark="Search logs..."
+                 PlaceholderText="Search logs..."
                  ToolTip.Tip="Search keyword in terminal output"/>
         <ToggleButton Classes="actionIconButton consoleHeaderAction"
                       IsChecked="{Binding IsConsoleFilterEnabled, Mode=TwoWay}"

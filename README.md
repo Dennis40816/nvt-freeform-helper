@@ -17,7 +17,7 @@ FreeformHelper is a DXF analysis tool with this main workflow:
 
 ## 1. Quick start: run the app (copy and paste the entire block)
 
-> Requirements: Windows + PowerShell + .NET SDK 10.0.3xx (pinned by `global.json`) + .NET 8 runtime (the projects target `net8.0`).
+> Requirements: Windows + PowerShell + .NET SDK 10.0.3xx (pinned by `global.json`). The projects target `net10.0`.
 
 ```powershell
 # 1) Go to the repository root (replace the placeholder with your path)

@@ -104,7 +104,7 @@ public sealed partial class FreeformHelperViewModelTests
         {
             await vm.ExportDxfVisibleCommand.ExecuteAsync(null);
 
-            var text = await File.ReadAllTextAsync(outputPath);
+            var text = await File.ReadAllTextAsync(outputPath, TestContext.Current.CancellationToken);
             var polylineCount = text
                 .Split("LWPOLYLINE", StringSplitOptions.None)
                 .Length - 1;

@@ -1,12 +1,12 @@
 {
   "version": "1.0",
   "files": {
-    "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml": "0ac8a42c2009c8340867b768c9f236a2152eaeaa30bb630e5a99141f245669e3",
+    "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml": "83bbfda260e9f8c68393976bd02f4ed23bd9613f80fa3e8f6e5ea346c186c576",
     "src/FreeformHelper.UI/Styles/Controls.axaml": "10309807aa99ccff0bb2a61932d067e0a0447d36043fd1dc40d591af1172e325",
     "src/FreeformHelper.UI/Views/CanvasOverlayControls.axaml": "0f07abae660731f6e8f8c4a950e41a6ff48fe80dfce5e89b6d3a5749bf4c86f2",
-    "src/FreeformHelper.UI/Views/ConsolePanel.axaml": "0d57d87e2533bbccde252559beca3bf2f4c84f0495988b9735324e52adb133d7",
+    "src/FreeformHelper.UI/Views/ConsolePanel.axaml": "71db2f6d75fedd6dd2a8a4dada636baaa628f159813d1e972b3e75dbe842ab76",
     "src/FreeformHelper.UI/Views/FreeformHelperView.axaml": "09d2ccf246eb9159192db052f9039fa6fe48cc58fb6a3db05e757ed3c63ea4d4",
-    "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml": "8abcc8a0cea93bce26d94c838e50b61e65f50ae1fd625bf9485d7ece694eea2d",
+    "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml": "b15f1dbf50e9dbf683f09de691b70c5e89042e890a479b63d36eb897f5f2da00",
     "src/FreeformHelper.UI/Views/PadInfoPopover.axaml": "b2a6efd85af62304b19efb84b49eefacdf3c4c6399f7af5c82f0f7b61091debe",
     "src/FreeformHelper.UI/Views/RightWorkflowPanel.axaml": "27f8c70950caea38341088a08a7cf43a3239ca4db0508f4990de12f614032eaa",
     "src/FreeformHelper.UI/Views/SettingsWindow.axaml": "903e9217179bf31640fc35165b51b48aae7887e4006f09288ac2092bbccd10e3"

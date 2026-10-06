@@ -2,7 +2,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 using FreeformHelper.UI.ViewModels;
 
 namespace FreeformHelper.UI.Views;
@@ -61,7 +60,7 @@ public sealed partial class SettingsWindow : Window
             return;
         }
 
-        var owner = this.GetVisualRoot() as Window ?? this;
+        var owner = TopLevel.GetTopLevel(this) as Window ?? this;
         var dialog = new ConfirmDialog(
             "Reset all settings",
             "Reset all settings to defaults? This also overwrites app-level general settings for next startup.",

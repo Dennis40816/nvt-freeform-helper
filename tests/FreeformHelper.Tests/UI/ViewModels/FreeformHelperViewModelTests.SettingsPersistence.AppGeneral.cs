@@ -171,7 +171,7 @@ public sealed partial class FreeformHelperViewModelTests
             vm.GlobalFontSizePercent = baselineFont >= 130
                 ? 118m
                 : (decimal)baselineFont + 8m;
-            await Task.Delay(700);
+            await Task.Delay(700, TestContext.Current.CancellationToken);
 
             var deferredDoc = appStore.TryLoad();
             Assert.NotNull(deferredDoc);

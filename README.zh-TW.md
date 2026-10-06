@@ -17,7 +17,7 @@ FreeformHelper 是 DXF 分析工具，主流程是：
 
 ## 1. 傻瓜模式：直接跑起來（整段複製貼上）
 
-> 條件：Windows + PowerShell + .NET SDK 10.0.3xx（版本由 `global.json` 鎖定）+ .NET 8 runtime（專案 target 為 `net8.0`）
+> 條件：Windows + PowerShell + .NET SDK 10.0.3xx（版本由 `global.json` 鎖定）。專案 target 為 `net10.0`。
 
 ```powershell
 # 1) 到 repo 根目錄（請改成你的路徑）

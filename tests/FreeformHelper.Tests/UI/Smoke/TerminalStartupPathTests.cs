@@ -13,7 +13,6 @@ using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FreeformHelper.Tests;
 

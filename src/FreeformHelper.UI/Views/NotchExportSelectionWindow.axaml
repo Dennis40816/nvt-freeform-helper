@@ -160,7 +160,7 @@
                 Grid.Column="0"
                 Width="{StaticResource NotchExportSearchWidth}"
                 HorizontalAlignment="Left">
-            <TextBox Watermark="{Binding SearchWatermarkText}"
+            <TextBox PlaceholderText="{Binding SearchWatermarkText}"
                      Text="{Binding SearchKeyword, Mode=TwoWay}"
                      TextWrapping="NoWrap"/>
             <Button Classes="workspaceSearchClearButton"

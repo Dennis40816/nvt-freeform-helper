@@ -240,7 +240,7 @@
                                        Text="Positions (mm)"
                                        IsVisible="{Binding IsHorizontalGuideExplicitMode}"/>
                   <TextBox Text="{Binding HorizontalGuidePositionListText, Mode=TwoWay}"
-                           Watermark="0, 25, 50"
+                           PlaceholderText="0, 25, 50"
                            IsVisible="{Binding IsHorizontalGuideExplicitMode}"/>
                   <SelectableTextBlock Classes="workspaceSectionMeta" Text="Inset (mm)"/>
                   <controls:NumberScrubber Minimum="0"
@@ -283,7 +283,7 @@
                                        Text="Positions (mm)"
                                        IsVisible="{Binding IsVerticalGuideExplicitMode}"/>
                   <TextBox Text="{Binding VerticalGuidePositionListText, Mode=TwoWay}"
-                           Watermark="0, 25, 50"
+                           PlaceholderText="0, 25, 50"
                            IsVisible="{Binding IsVerticalGuideExplicitMode}"/>
                   <SelectableTextBlock Classes="workspaceSectionMeta" Text="Inset (mm)"/>
                   <controls:NumberScrubber Minimum="0"
@@ -419,7 +419,7 @@
               <StackPanel Grid.Row="2" Classes="panelFormField" Spacing="{StaticResource Space6}">
                 <SelectableTextBlock Text="Point" FontWeight="SemiBold"/>
                 <TextBox Text="{Binding CustomPointLabelText, Mode=TwoWay}"
-                         Watermark="Point label"/>
+                         PlaceholderText="Point label"/>
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">
                   <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
                                            Maximum="{StaticResource NumericInputMaximum}"
@@ -447,7 +447,7 @@
               <StackPanel Grid.Row="3" Classes="panelFormField" Spacing="{StaticResource Space6}">
                 <SelectableTextBlock Text="Path" FontWeight="SemiBold"/>
                 <TextBox Text="{Binding CustomPathLabelText, Mode=TwoWay}"
-                         Watermark="Path label"/>
+                         PlaceholderText="Path label"/>
                 <Grid RowDefinitions="Auto,Auto,Auto"
                       RowSpacing="{StaticResource Space6}">
                   <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">

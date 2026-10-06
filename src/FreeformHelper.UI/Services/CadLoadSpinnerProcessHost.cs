@@ -24,6 +24,8 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         Visible,
     }
 
+    // Test runners set this switch: under xUnit v3 the test executable is not named testhost.
+    internal const string DisableProcessLaunchSwitch = "FreeformHelper.DisableCadLoadSpinnerProcess";
     private const int ConnectTimeoutMs = 250;
     private const int WarmupTimeoutMs = 3000;
     private static readonly TimeSpan ShowRetryDelay = TimeSpan.FromMilliseconds(30);
@@ -58,7 +60,8 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         lock (_sync)
         {
             ThrowIfDisposed();
-            if (!CanLaunchSpinnerProcessForPath(Environment.ProcessPath))
+            if ((AppContext.TryGetSwitch(DisableProcessLaunchSwitch, out var launchDisabled) && launchDisabled) ||
+                !CanLaunchSpinnerProcessForPath(Environment.ProcessPath))
             {
                 return;
             }

@@ -213,7 +213,7 @@ public sealed class ShellViewModelSimulationTests
         shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
 
         await WaitForConditionAsync(() => Volatile.Read(ref prewarmCount) > 0);
-        await Task.Delay(120);
+        await Task.Delay(120, TestContext.Current.CancellationToken);
 
         Assert.Equal(1, Volatile.Read(ref prewarmCount));
     }

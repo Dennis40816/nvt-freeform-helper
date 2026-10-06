@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -186,20 +187,17 @@ public partial class WorkspaceHeader : UserControl
     }
 
     /// <summary>
-    /// Event handler for when the view menu button is checked (i.e., pinned).
+    /// Event handler for when the view menu button is checked (pinned) or unchecked (unpinned).
+    /// An indeterminate state leaves the pin unchanged, as the separate checked and unchecked events did.
     /// </summary>
-    private void ViewMenuButton_Checked(object? sender, RoutedEventArgs e)
+    private void ViewMenuButton_IsCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        _viewPinned = true;
-        UpdateViewPopupState(); // Update popup visibility.
-    }
+        if (sender is not ToggleButton { IsChecked: bool isChecked })
+        {
+            return;
+        }
 
-    /// <summary>
-    /// Event handler for when the view menu button is unchecked (i.e., unpinned).
-    /// </summary>
-    private void ViewMenuButton_Unchecked(object? sender, RoutedEventArgs e)
-    {
-        _viewPinned = false;
+        _viewPinned = isChecked;
         UpdateViewPopupState(); // Update popup visibility.
     }
 

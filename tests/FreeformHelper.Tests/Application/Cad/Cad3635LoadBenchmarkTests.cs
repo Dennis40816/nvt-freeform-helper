@@ -58,7 +58,7 @@ public sealed class Cad3635LoadBenchmarkTests
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
         var json = JsonSerializer.Serialize(result, JsonOptions);
-        await File.WriteAllTextAsync(outputPath, json);
+        await File.WriteAllTextAsync(outputPath, json, TestContext.Current.CancellationToken);
     }
 
     private static async Task<Cad3635LoadBenchmarkSample> RunSampleAsync(int run, bool warmup, string dxfPath)
