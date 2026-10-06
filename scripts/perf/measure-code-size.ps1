@@ -446,7 +446,7 @@ function Get-ReleaseArtifactResult {
     authoritative = (-not $BuildInputsDirty) -and $allReproducible
     reproducible = $true
     configuration = "Release"
-    targetFramework = "net8.0"
+    targetFramework = "net10.0"
     debugPolicy = "No PDB: DebugType=None and DebugSymbols=false."
     isolationPolicy = "Each build uses a new ArtifactsPath containing its own bin and obj trees; the immutable global NuGet package cache may be shared."
     reproducibilityPolicy = "Exact bytes and SHA-256 for the four primary project DLLs under the recorded checkout, SDK, OS, architecture, RID, TFM, and flags."

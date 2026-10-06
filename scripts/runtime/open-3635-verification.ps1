@@ -12,7 +12,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 $uiProject = Join-Path $repoRoot "src/FreeformHelper.UI/FreeformHelper.UI.csproj"
-$uiExe = Join-Path $repoRoot "build/bin/FreeformHelper.UI/Debug/net8.0/FreeformHelper.UI.exe"
+$uiExe = Join-Path $repoRoot "build/bin/FreeformHelper.UI/Debug/net10.0/FreeformHelper.UI.exe"
 
 function Convert-QueryResponse {
     param(

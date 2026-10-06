@@ -28,7 +28,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 $uiProject = "src/FreeformHelper.UI/FreeformHelper.UI.csproj"
-$uiExe = Join-Path $repoRoot "build/bin/FreeformHelper.UI/Debug/net8.0/FreeformHelper.UI.exe"
+$uiExe = Join-Path $repoRoot "build/bin/FreeformHelper.UI/Debug/net10.0/FreeformHelper.UI.exe"
 $runtimeCmd = if (Test-Path -LiteralPath $uiExe) { $uiExe } else { "dotnet" }
 $runtimePrefix = if (Test-Path -LiteralPath $uiExe) { @() } else { @("run", "--project", $uiProject, "--") }
 $managedUiProcess = $null

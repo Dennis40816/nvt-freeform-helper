@@ -1,7 +1,7 @@
 param(
     [string]$ProjectPath = "",
     [string]$UiProject = "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-    [string]$ExePath = "build/bin/FreeformHelper.UI/Debug/net8.0/FreeformHelper.UI.exe",
+    [string]$ExePath = "build/bin/FreeformHelper.UI/Debug/net10.0/FreeformHelper.UI.exe",
     [int]$StartupTimeoutMs = 60000,
     [int]$LoadTimeoutMs = 120000,
     [int]$PollIntervalMs = 400,
