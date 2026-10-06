@@ -709,7 +709,7 @@
   - Runtime Query moves to Core in two NFH steps (NVT Core proposal, 2026-10-06):
     - [ ] Q0: add characterization tests for the command line, routing, request checks, argument parsing and the `help` output. Tests only. They must pass at 847cc453 and later against the Core version.
     - [ ] Q7: after Core 0.2.0 (target 2026-10-14), switch to the Core Runtime Query layers. The full test list and outcomes stay equal to 847cc453.
-  - [ ] Found 2026-10-06 by NVT Core: `scripts/runtime/runtime-quick.ps1` takes the repository root one level too high (`..` instead of `..\..`). It never finds the built exe. It falls back to `dotnet run` with a relative project path, which works only from the repository root. The problem dates from the first public import.
+  - [x] Found 2026-10-06 by NVT Core: `scripts/runtime/runtime-quick.ps1` takes the repository root one level too high (`..` instead of `..\..`). It never finds the built exe. It falls back to `dotnet run` with a relative project path, which works only from the repository root. The problem dates from the first public import. Fixed on 2026-10-06: the script goes up two folders and builds the project path from the repository root.
 
 ### 1.3.4 Workspace ViewModel 拆解
 
