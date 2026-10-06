@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using FreeformHelper.UI.ViewModels;
 using NLog;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.Services;
 

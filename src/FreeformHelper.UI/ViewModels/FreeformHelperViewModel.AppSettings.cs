@@ -2,6 +2,7 @@ using System.Globalization;
 using Avalonia.Threading;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 

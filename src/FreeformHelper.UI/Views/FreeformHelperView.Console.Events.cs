@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using AvaloniaEdit;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.Views;
 

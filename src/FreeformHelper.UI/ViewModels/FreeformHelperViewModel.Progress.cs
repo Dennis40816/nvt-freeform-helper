@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
-using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 

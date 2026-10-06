@@ -17,13 +17,15 @@ FreeformHelper is a DXF analysis tool with this main workflow:
 
 ## 1. Quick start: run the app (copy and paste the entire block)
 
-> Requirements: Windows + PowerShell + .NET SDK 10.0.3xx (pinned by `global.json`). The projects target `net10.0`.
+> Requirements: Windows + PowerShell + Python 3.10 or later + .NET SDK 10.0.3xx (pinned by `global.json`). The projects target `net10.0`.
 
 ```powershell
 # 1) Go to the repository root (replace the placeholder with your path)
 Set-Location <FreeformHelper repo 路徑>
 
-# 2) Restore and build
+# 2) Download the NVT Core packages (needs Python 3.10+), then restore and build.
+#    Run the download again before an IDE build or dotnet run whenever core-packages.json changes.
+./scripts/build/fetch-core-packages.ps1
 dotnet restore
 dotnet build FreeformHelper.sln
 
