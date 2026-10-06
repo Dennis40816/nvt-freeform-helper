@@ -101,6 +101,11 @@
     - After the Core import, each new feature first gets a classification proposal with reasons for the owner to decide.
     - Plain firmware product logic counts as project-specific and is only recorded.
     - On 2026-10-06 the owner said 「後續 NFH 也可以慢慢將值得共用的 UI 丟上去了」 ("NFH may now gradually move shareable UI up to Core"). Each candidate goes to the owner with reasons.
+    - Owner decisions on the shareable UI candidates (2026-10-06, relayed by Commander, all as recommended):
+      - LoadingScopeCoordinator moves to the non-UI Core library now, with an injectable clock (pull request Dennis40816/nvt_fw_core#44).
+      - After R13.306, four items move to the Core UI library: UiResourceResolver, the action-role button styles, the scroll styles and the headless session guard. Each one is first compared with the Core and NFC versions.
+      - After R13.306, the Material Symbols font icons become the shared Core icon system.
+      - Nine other candidates go on the Core candidate list until a second tool needs them.
 
 - [x] **S15.001 處理 4 個穩定失敗的 `SimulationWorkspaceViewModelTests`**
   - 失敗：`CopperSource_WhenMoved_RegeneratesBeforeFrameThroughSharedSimulationPath`（預期 `400`、實際 `399`）、`CopperContactModel_WhenFingerSelected_UsesLowerFullPadSignal`（`360`／`359`）、`DiffViolationSummary_WhenNoMismatch_ShowsCleanState`（`EMS OK`／`audit warning`）、`DiffViolationSummary_WhenDuplicateDiffDeltaMismatches_ListsViolatingPads`（`Assert.True`）。
@@ -682,6 +687,7 @@
     - Avalonia is 12.1.1, the version NVT Core moved to on 2026-10-06. AvaloniaEdit stays at 12.0.0, its latest release, which requires Avalonia 12.0.0 or later.
     - The branch also moves to net10 and xUnit v3, adds lock files and a locked restore in CI, and covers the win-x64 and win-arm64 publish runtimes.
     - The full suite with the example data passed 1230 tests. The test names and count match the Avalonia 11 baseline at 4df72911.
+    - Merged into 1.3.x on 2026-10-06 through #41 (merge commit 847cc453).
     - Still open: the manual desktop checks of the console editor, rendering, dialogs and input from the assessment.
   - [ ] Follow-up (found 2026-10-06; not part of the upgrade): four main-window tests ask the shared CAD load spinner host to show, and the host starts a short-lived copy of the test executable. The Avalonia 11 baseline does the same with testhost. Give these tests a fake host, or extend the test switch to the show path.
 - [ ] **R13.307 Adopt NVT Core in NFH**
@@ -690,6 +696,11 @@
   - Adopt the UI modules after R13.306.
   - Each switch-over keeps the existing NFH tests passing. Non-UI output stays identical, and UI snapshots follow the R13.306 snapshot rule.
   - A module is done only when NFH uses the Core version and deletes its own copy.
+  - The four post-R13.306 items were compared with Core `1e49373` and NFC `085f71cf` on 2026-10-06. NVT Core sets their order. The suggested order is: the Core UI-thread helper first, then UiResourceResolver, the headless session guard, the button roles and the scroll styles.
+  - [ ] Found 2026-10-06: the 10 keyboard focus selectors in `src/FreeformHelper.UI/Styles/Controls.Action.axaml` use `:focusvisible`. Avalonia defines only `:focus-visible`, so NFH buttons show no keyboard focus. `UiLayoutGuardTests` checks the same spelling. The bug predates R13.306. Fix it when the button roles move to Core.
+  - [ ] Found 2026-10-06: `src/FreeformHelper.UI/Styles/Controls.Scroll.axaml` has selectors that match nothing on Avalonia 12: `PART_LineLeftButton`, `PART_LineRightButton`, `ScrollBar:pressed`, and `ScrollViewer.scrollV2` on ListBoxes. Remove them when the scroll styles move to Core.
+  - [ ] Before the headless session guard moves to Core, test on Avalonia 12.1.1 whether an exception in test setup stops the headless loop. NFC reports that it does on Avalonia 12.0.5. NFH measured the opposite on Avalonia 11.3.12.
+  - [ ] `src/FreeformHelper.UI/Assets/Fonts/MaterialIcons-Regular.ttf` (357 KB) has no reference, but the `Assets\**` resource rule still ships it. Remove it when the icons move to Core.
 
 ### 1.3.4 Workspace ViewModel 拆解
 
