@@ -265,7 +265,7 @@ public sealed partial class FreeformHelperViewModel
         ImportRegularVisibilityMaskCommand = new AsyncRelayCommand(ImportRegularVisibilityMaskAsync);
         ClearRegularVisibilityMaskCommand = new RelayCommand(ClearRegularVisibilityMask);
         AutoDetectFreeformsCommand = new AsyncRelayCommand(AutoDetectFreeformsAsync);
-        SaveProjectCommand = new AsyncRelayCommand(async () => await SaveProjectAsync()); // Wrap with async lambda.
+        SaveProjectCommand = new AsyncRelayCommand(SaveProjectAsync);
         LoadProjectCommand = new AsyncRelayCommand(LoadProjectAsync);
         ExportNotchCommand = new AsyncRelayCommand(ExportNotchAsync);
         ExportDxfVisibleCommand = new AsyncRelayCommand(ExportVisibleDxfAsync);

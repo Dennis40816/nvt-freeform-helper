@@ -43,7 +43,6 @@ public sealed partial class FreeformHelperView : UserControl
     private Border? _notchExportRestoreHint;
     private bool _isViewAttached;
     private bool _isCadLoadSpinnerHostVisible;
-    private bool _isSaveProjectShortcutRunning;
     private bool _isPadInfoLayoutUpdateQueued;
     private FreeformHelperViewModel? _observedViewModel;
     private ICadLoadSpinnerHost? _cadLoadSpinnerHost;

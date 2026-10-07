@@ -107,31 +107,26 @@ public sealed partial class FreeformHelperView
 
     private async Task SaveProjectFromShortcutAsync(FreeformHelperViewModel viewModel)
     {
-        if (_isSaveProjectShortcutRunning)
+        var command = viewModel.SaveProjectCommand;
+        if (!command.CanExecute(null) || command.IsRunning)
         {
             return;
         }
 
-        _isSaveProjectShortcutRunning = true;
-        try
+        var saveTask = command.ExecuteAsync(null);
+        await saveTask;
+        var ok = saveTask is Task<bool> { Result: true };
+        var message = string.IsNullOrWhiteSpace(viewModel.StatusText)
+            ? ok ? "Project saved." : "Save project failed."
+            : viewModel.StatusText;
+        var type = ok
+            ? Avalonia.Controls.Notifications.NotificationType.Success
+            : message.Contains("cancel", StringComparison.OrdinalIgnoreCase)
+                ? Avalonia.Controls.Notifications.NotificationType.Information
+                : Avalonia.Controls.Notifications.NotificationType.Warning;
+        if (TopLevel.GetTopLevel(this) is MainWindow window)
         {
-            var ok = await viewModel.SaveProjectAsync();
-            var message = string.IsNullOrWhiteSpace(viewModel.StatusText)
-                ? ok ? "Project saved." : "Save project failed."
-                : viewModel.StatusText;
-            var type = ok
-                ? Avalonia.Controls.Notifications.NotificationType.Success
-                : message.Contains("cancel", StringComparison.OrdinalIgnoreCase)
-                    ? Avalonia.Controls.Notifications.NotificationType.Information
-                    : Avalonia.Controls.Notifications.NotificationType.Warning;
-            if (TopLevel.GetTopLevel(this) is MainWindow window)
-            {
-                window.ShowTopToast(message, type);
-            }
-        }
-        finally
-        {
-            _isSaveProjectShortcutRunning = false;
+            window.ShowTopToast(message, type);
         }
     }
 
