@@ -63,7 +63,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     # The viewmodel shard (FreeformHelperViewModelTests only) is reported but does not block merging
-    # yet: those tests time out or stall on runners with few cores (ROADMAP.md S15.002). Owner decision of
+    # yet: those tests time out or stall on runners with few cores (TODO.md S15.002). Owner decision of
     # 2026-10-02; remove this line when that item is closed, so the shard is required again. Every other
     # shard, including the remaining UI classes in 'ui', blocks.
     continue-on-error: ${{ matrix.shard == 'viewmodel' }}
