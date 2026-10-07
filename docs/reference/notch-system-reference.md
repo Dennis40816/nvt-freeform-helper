@@ -136,7 +136,7 @@ Simulation currently has two other fixed contracts:
   - The notch table still shares `GenerateCurrentNotchTableAsync(...)`
   - If the fingerprint has not changed, directly reuses the cache / prewarm artifact without recomputing a second simulation-specific algorithm
 
-### 4.4 1.3.x shared execution contract: target and current debt
+### 4.4 1.0.x shared execution contract: target and current debt
 
 Hard target:
 
@@ -150,7 +150,7 @@ project/filter
 
 - The output version must not enter matching, compensation, allocation, or candidate/evidence construction before final projection; version-specific threshold admission may only reside in the final row projector. The version-neutral resolved audit and upstream cache key must not carry the output version either.
 - V2.1-only, V2.2-only, and both for the same workflow revision must read the same canonical fingerprint/result; the first and only version branch may occur only in the final Firmware data projector/formatter.
-- `V21_before == V21_after` and `V22_before == V22_after` are hard gates already in effect for 1.3.x; the final-only architecture is the exit target for R13.101～R13.103, and the two must not be conflated as completed.
+- `V21_before == V21_after` and `V22_before == V22_after` are hard gates already in effect for 1.0.x; the final-only architecture is the exit target for R13.101～R13.103, and the two must not be conflated as completed.
 
 After `R13.102a-2a` / `R13.102a-2b-2` / `R13.102b-2`, the current state still has three explicit boundaries:
 
@@ -236,8 +236,8 @@ The C file currently produced by `NotchTableExporter.ExportAsCInitializer(...)` 
 
 ### 7.1 C File Guarantees
 
-- 1.3.x frozen Lucid 3635 Release baseline: V2.1 has 692 nodes / 130,979 bytes / SHA-256 `8961B8155B0571B193C7C87D8EEA75077B4EF8822828506C4661B50BA2E57488`; V2.2 has 548 nodes / 84,023 bytes / SHA-256 `5208068BBD8D82FC0A628693EF6035B31288EC674A25724C0C962CD58757BB47`. See `docs/performance/regression-baseline-3635.md` for complete input provenance.
-- 1.3.x permits only `V21_before == V21_after` and `V22_before == V22_after`; neither Q7 correctness nor simulation parity is an exception for updating the C golden.
+- 1.0.x frozen Lucid 3635 Release baseline: V2.1 has 692 nodes / 130,979 bytes / SHA-256 `8961B8155B0571B193C7C87D8EEA75077B4EF8822828506C4661B50BA2E57488`; V2.2 has 548 nodes / 84,023 bytes / SHA-256 `5208068BBD8D82FC0A628693EF6035B31288EC674A25724C0C962CD58757BB47`. See `docs/performance/regression-baseline-3635.md` for complete input provenance.
+- 1.0.x permits only `V21_before == V21_after` and `V22_before == V22_after`; neither Q7 correctness nor simulation parity is an exception for updating the C golden.
 - Revalidation must run V21→V22 with `run-3635-regression-baseline.ps1 -LaunchIsolatedUi -EnforceBudget` and V22→V21 with `-ReverseCExportOrder`; Windows/.NET/MSBuild/GCC, script hash, complete layers/filter/settings, and artifact paths are maintained centrally in `docs/performance/regression-baseline-3635.md` to avoid creating a second calibration owner in this file.
 - The output file begins with `#include "notch.h"` and is wrapped in `#if (USER_SWITCH_NOTCH_COMPENSATION == FUNC_ENABLE)`.
 - It does not directly `#include <stdint.h>`; the output file assumes the FW platform already provides `UINT8`, `UINT16`, `INT8`, and `INT16`.
@@ -419,7 +419,7 @@ After R13.103c-2, the executable Firmware domain of `NullValue` is fixed at `0..
 
 The input domain for V21/V22 simulation is FW INT16: finite fractional values truncate toward zero, values beyond the INT16 range saturate, and NaN/Infinity quantize to 0. `Cells.BeforeValue`, Actions, and safety audit all use this quantized baseline to avoid misrepresenting input quantization as notch compensation. V21 CadAllocation additionally provides source-oriented Actions; V21 LegacyRegularAnchor rows are destination-oriented, so they provide only exact Cells/EMS, without producing source-flow Actions in the wrong direction.
 
-If a parity gap is found in 1.3.x, only simulation/decoder/compatibility adapter adjustments that do not change C bytes are allowed; a correctness change requiring encoder, row ordering, or C emission changes must be filed as a separate post-1.3.x product issue.
+If a parity gap is found in 1.0.x, only simulation/decoder/compatibility adapter adjustments that do not change C bytes are allowed; a correctness change requiring encoder, row ordering, or C emission changes must be filed as a separate post-g7 product issue.
 
 ### 7.4.3 C export generation metadata
 
@@ -689,7 +689,7 @@ Additional notes:
 - `v2.1` is already a compatibility payload in the current system and should no longer carry new primary semantic design.
 - `v2.2` has clearly more suitable expressive capabilities for freeform / boundary / SeeRegular / per-diff redistribution.
 
-### 10.5 Post-1.3.x Algorithm Research Directions (Outside the Zero-Diff Refactor)
+### 10.5 Post-1.0.x Algorithm Research Directions (Outside the Zero-Diff Refactor)
 
 1. `ToRegular` should be retained
    - It matches the physical assumption of "first restoring the area differences flattened by NF".

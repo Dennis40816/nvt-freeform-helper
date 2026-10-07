@@ -1,10 +1,10 @@
 # Branch, Version, and Release Governance
 
-Status: Documentation for the 1.3.x branch and existing gates; release automation remains part of `ROADMAP.md S15.005e`.
+Status: Documentation for the 1.0.x branch and existing gates; release automation remains part of `ROADMAP.md S15.005e`. The version rules are in `ROADMAP.md`, section "Version rules".
 
 ## Choose Versions by Product Impact
 
-`ROADMAP.md` holds the version order, target versions and progress on three lines: fixes, product features and Core integration. `docs/reference/refactor-contract-1.3.x.md` defines the gates and exit criteria for 1.3.0～1.3.5. Do not skip the exit criteria of the preceding version; correctness work that requires output changes must not be mixed into zero-difference refactor/UI commits. NVT Core adoption starts in 1.3.3 (owner decision, 2026-10-05); this replaces the provisional 2026-10-02 goal that 2.0.0 starts the shared core architecture.
+`ROADMAP.md` holds the version order, target versions and progress on three lines: fixes, product features and Core integration. `docs/reference/refactor-contract.md` defines the gates and exit criteria for the handoff groups g1～g7. Do not skip the exit criteria of the preceding group; correctness work that requires output changes must not be mixed into zero-difference refactor/UI commits. NVT Core adoption starts in g4 (owner decision, 2026-10-05); this replaces the provisional 2026-10-02 goal that 2.0.0 starts the shared core architecture.
 
 ## Maintain a Single Version Identity
 
@@ -12,8 +12,8 @@ For the `VERSION` value and the repository-external test area, see `ROADMAP.md` 
 
 ## Branch Authority and Work Direction
 
-- `main` is the default branch and stores only released versions; the current minor-line trunk is `1.3.x`. Independent work uses `feature/<version>/<topic>`, with the corresponding trunk as the PR target; do not merge features directly into `main`.
-- Work on 1.3.x first addresses the `S15.*` baseline fixes and alignment with the public template, then proceeds to unfinished `R13.*`; the owner has decided that `R13` can begin when only owner-only `S15` items remain.
+- `1.0.x` is the default branch and the trunk. Its name follows the next customer release, `1.0.0`. `main` will hold customer releases only. Independent work uses `feature/<version>/<topic>`, with the corresponding trunk as the PR target; do not merge features directly into `main`.
+- Work on 1.0.x first addresses the `S15.*` baseline fixes and alignment with the public template, then proceeds to unfinished `R13.*`; the owner has decided that `R13` can begin when only owner-only `S15` items remain.
 - This repository has not yet completed the execution contract for release branches, tags, and release workflows; until `S15.005e` is complete, assess work completion using the current CI and roadmap gates, without citing the template release commands.
 
 ## Include Work in Versions and PRs

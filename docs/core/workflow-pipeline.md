@@ -25,7 +25,7 @@ Last updated: 2026-08-08
 - Expand Step5 after Step4 succeeds.
 - Step4 remains optional diagnostics; Step3 is not merely a debug step and cannot simply be skipped in the main flow.
 
-This describes current 1.3.0 production behavior, not the final operator-flow contract. `WorkflowStepGateService` already allows Step5 to be independent of Step4, so the R13.305 target is to expand Step5 directly after Step3 succeeds; Step4 mapping diagnostics and Step6 validation move to an unnumbered Diagnostics/Inspector entry. That UI move must wait until the R13.301/R13.302 draft/typed invalidation owner is stable; this documentation calibration must not pretend it has already been implemented.
+This describes current g1 production behavior, not the final operator-flow contract. `WorkflowStepGateService` already allows Step5 to be independent of Step4, so the R13.305 target is to expand Step5 directly after Step3 succeeds; Step4 mapping diagnostics and Step6 validation move to an unnumbered Diagnostics/Inspector entry. That UI move must wait until the R13.301/R13.302 draft/typed invalidation owner is stable; this documentation calibration must not pretend it has already been implemented.
 
 ## Rule Three: Single Entry for Step Execution/Clearing
 - The VM provides unified entries:

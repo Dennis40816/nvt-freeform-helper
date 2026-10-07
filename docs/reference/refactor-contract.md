@@ -1,9 +1,9 @@
-# FreeformHelper 1.3.x refactor contract
+# FreeformHelper refactor contract
 
-- Scope: `1.3.0`～`1.3.5`.
-- This document keeps the rules that every 1.3.x refactor slice must follow: the zero-difference policy, the Firmware C and Q7 contract, the gates G0～G6, the golden update rules, the targeted suites, and the specs of the open slices.
+- Scope: the handoff groups `g1`～`g7` before `1.0.0`. They were named `1.3.0`～`1.3.5` before 2026-10-07; older commits and reviews use the old names.
+- This document keeps the rules that every 1.0.x refactor slice must follow: the zero-difference policy, the Firmware C and Q7 contract, the gates G0～G6, the golden update rules, the targeted suites, and the specs of the open slices.
 - Status, target versions and order live in `ROADMAP.md`. This document does not track progress.
-- It was split out of `docs/guides/refactor-roadmap-1.3.x.md` on 2026-10-07. The finished 1.3.0 slice specs, the 2026-07-20 gate-gap history (old 1.2), the release-train table (old 4) and the reviewer traceability tables (old 11.1～11.3) were removed; git history keeps them.
+- It was split out of `docs/guides/refactor-roadmap-1.3.x.md` on 2026-10-07. The finished g1 slice specs, the 2026-07-20 gate-gap history (old 1.2), the release-train table (old 4) and the reviewer traceability tables (old 11.1～11.3) were removed; git history keeps them.
 - The Notch algorithm specification remains `docs/reference/notch-system-reference.md`.
 - Planning base: `codex/code-size-cutdown`, commit `165f076`. Code-size signed reference: R13.002 commit `3032121`; see `docs/performance/code-size-baseline-1.3.0.md`.
 - GitHub parent spec: [#27](https://github.com/Dennis40816/nvt-freeform-helper/issues/27).
@@ -13,15 +13,15 @@
 
 ## 0. 執行結論
 
-1. 1.3.x 以「先建立可信 gate，再移動核心資料路徑，最後拆 UI」為固定順序。
-2. 所有 1.3.x 重構（包含 `R13.003`）都必須保持：
+1. 1.0.x 以「先建立可信 gate，再移動核心資料路徑，最後拆 UI」為固定順序。
+2. 所有 1.0.x 重構（包含 `R13.003`）都必須保持：
    - BOE 3635 V21/V22 Firmware C export byte-exact。
    - TM8.1 acceptance matrix 與 Notch golden snapshot 完全一致。
    - 不得新增 Runtime Query、UI、inspector、simulation 或 export 的 second-pass derivation；目前已存在的多路推導必須由 R13.102/104 明列並逐步移除，不能因本條而假裝已完成。
-   - Existing UI appearance, action roles, spacing and DevView previews remain unchanged except for the owner-approved R13.303 opacity fallback of 0.9 in 1.3.3, which requires updated snapshots.
+   - Existing UI appearance, action roles, spacing and DevView previews remain unchanged except for the owner-approved R13.303 opacity fallback of 0.9 in g5, which requires updated snapshots.
    - `V21_before == V21_after` 且 `V22_before == V22_after`；不是要求 V21 與 V22 兩份檔案彼此相同。
-   - R13.101～R13.103 的 architecture exit target 是：V21/V22 共用 version-neutral input、matching evidence、allocation、compensation、audit 與 resolved result，只能在最後的 version-specific data projection／formatting 邊界分岔。1.3.0 current generator 尚有 early threshold/cache/legacy dispatch debt，詳見 R13.005 canonical docs。
-   - 若 Q7 correctness 需要改變任何 C byte，該工作退出 1.3.x zero-diff refactor，另立產品行為變更 issue，不得更新本計畫的 golden。
+   - R13.101～R13.103 的 architecture exit target 是：V21/V22 共用 version-neutral input、matching evidence、allocation、compensation、audit 與 resolved result，只能在最後的 version-specific data projection／formatting 邊界分岔。g1 current generator 尚有 early threshold/cache/legacy dispatch debt，詳見 R13.005 canonical docs。
+   - 若 Q7 correctness 需要改變任何 C byte，該工作退出 1.0.x zero-diff refactor，另立產品行為變更 issue，不得更新本計畫的 golden。
 3. 每次只執行一個 `R13.*` slice；每個 slice 必須單獨 build、targeted test、lint、commit、push。
 4. 不把不同 bounded context 為了「去重」硬合併：多對多 Pad overlap、DXF 一對一 audit、Canvas hit-test 是不同結果；只共享真正相同的幾何證據或 tie-break policy。
 5. 不批次刪除單一使用 token，也不移除 DevView。只合併語意相同的 token；DevView 是 UI contract 的正式預覽與 guard surface。
@@ -34,8 +34,8 @@
 - `LegacyRegularAnchor`（重新匯出已交付 project）：答覆「不確定，先保留」；據此：`R13.101c-2` 與 `R13.102` 中僅涉及 legacy 的部分暫緩；既有 zero-diff gates 繼續保護它。
 - 後續答覆（2026-10-03；問題為 `R13.101c-2`／`R13.103` 是否繼續，保留經等價性測試的 Legacy 相容 adapter，或維持暫緩）：owner 原話「先保留吧 但後續目標會是完全移除2.1」。
 - 確認（owner 2026-10-03 在畫面回覆「V21」）：「2.1」指 V2.1，即 V21（本庫 roadmap／TODO 使用「final V2.1 projector」），不是 release 版本 2.1。
-- 後續答覆取代先前對 `R13.101c-2`／`R13.103` 及 `R13.102` 純 legacy 部分的「暫緩」後果：V21 與 Legacy 維持原樣，由既有 zero-diff gates 保護；不再投入額外收斂／等價性工作；完全移除是後續目標，版本未訂。owner 決定（2026-10-04，經 Commander 轉述）排在 1.3.x 之後，範圍之後再定，之前不做隱性轉換。本次只記錄，不變更任務狀態。
-- The 1.3.1 exit audit keeps B1/B2 as accepted exceptions (owner decision, 2026-10-03). The owner decided on 2026-10-04, relayed by the Commander session, that 1.3.1 closes with A1/A2 and C1–C6 do not block closure. Parent and milestone exits remain the owner's decision.
+- 後續答覆取代先前對 `R13.101c-2`／`R13.103` 及 `R13.102` 純 legacy 部分的「暫緩」後果：V21 與 Legacy 維持原樣，由既有 zero-diff gates 保護；不再投入額外收斂／等價性工作；完全移除是後續目標，版本未訂。owner 決定（2026-10-04，經 Commander 轉述）排在 g7 之後，範圍之後再定，之前不做隱性轉換。本次只記錄，不變更任務狀態。
+- The g2 exit audit keeps B1/B2 as accepted exceptions (owner decision, 2026-10-03). The owner decided on 2026-10-04, relayed by the Commander session, that g2 closes with A1/A2 and C1–C6 do not block closure. Parent and milestone exits remain the owner's decision.
 - Step4 mapping 與 Step6 validation diagnostics：答覆「移到未編號的診斷區」；據此：Owner 確認 `R13.305a` 已寫明的方向。
 - 視覺重設計：答覆「先不改視覺」；據此：1.x 只重整結構，不採用新的視覺語言或重設 token set；結構變更所迫使的範圍以外，任何會改變畫面的變更都需另取得 owner 決定。
 
@@ -73,7 +73,7 @@ R13.002 在 2026-07-28 進一步證明，這個數字只能代表原有 test sea
 - CLI 的 `--format` 只暫時切換 export file type 並於 export 後恢復；不修改 `EnableV21`／`EnableV22`，連續 V21/V22 export 不互相污染 project version state。
 - gate 只停止自己啟動且 executable path 已驗證的 UI process，並隔離 app-general-settings。
 
-project 保存的 layer selections 繼續作為 production Step1/Step5 輸入；checked-in C golden 依第 3.1 節做已簽核的 provenance correction。完成 `R13.002` 後，後續 1.3.x slice 不得再更新這兩份 C golden。
+project 保存的 layer selections 繼續作為 production Step1/Step5 輸入；checked-in C golden 依第 3.1 節做已簽核的 provenance correction。完成 `R13.002` 後，後續 1.0.x slice 不得再更新這兩份 C golden。
 
 ---
 
@@ -90,7 +90,7 @@ V21 Firmware C 仍使用 Q7：
 - Firmware apply 直接使用 INT16 integer path：`(source * magnitudeQ7) >> 7`，不得先轉成 percent/double 再近似。
 - V21 threshold 使用獨立的 `ThresholdQ7` contract，合法範圍為 `0..128`；它不是 `0..255` payload magnitude。
 
-因此 Q7 是 V21 Firmware C 的公開相容契約，1.3.x 不得把它默默改成 percent。
+因此 Q7 是 V21 Firmware C 的公開相容契約，1.0.x 不得把它默默改成 percent。
 
 ### 2.2 V22 Firmware C
 
@@ -105,7 +105,7 @@ V22 Firmware C 不使用 Q7：
 
 V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容既有 `NotchTableRow.Values` 9 欄 reader，`ProjectV22RowsToV21Rows` 仍會把 V22 percent 轉成 Q7 放入 legacy slot。
 
-這是內部相容投影，不是 V22 Firmware C 格式。1.3.x 必須分清：
+這是內部相容投影，不是 V22 Firmware C 格式。1.0.x 必須分清：
 
 - V21 Firmware Q7 codec。
 - V22 canonical percent model。
@@ -126,7 +126,7 @@ V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容�
 
 ---
 
-## 3. 1.3.x 驗收層級
+## 3. 1.0.x 驗收層級
 
 | Gate | 目的 | 執行時機 |
 |---|---|---|
@@ -134,15 +134,15 @@ V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容�
 | G1 Targeted | 鎖住本 slice 的直接契約 | 每個 slice |
 | G2 Notch Core | generator/export/simulation/projection/CLI contract（R13.004b 完成時 118 cases） | 任何 Application/Domain/Settings/RuntimeQuery/VM Notch slice |
 | G3 Golden | 3635 V21/V22 byte-exact + 3635/TM8.1 snapshot + TM8.1 matrix | 任何可能影響資料路徑的 slice |
-| G4 Runtime CLI | 真實 UI/IPC 的 V21/V22 export 等於 checked-in golden | 1.3.0 建立後；VM/RuntimeQuery/export slice 必跑 |
+| G4 Runtime CLI | 真實 UI/IPC 的 V21/V22 export 等於 checked-in golden | g1 建立後；VM/RuntimeQuery/export slice 必跑 |
 | G5 UI | DevView + UiLayoutGuard + headless smoke；必要時 rendered snapshot dry-run | View/Style/Control slice |
-| G6 Merge | full lint + refactor gate + UI snapshots | 合併 1.3.x milestone 前 |
+| G6 Merge | full lint + refactor gate + UI snapshots | 合併 1.0.x milestone 前 |
 
 ### 3.1 Golden 更新規則
 
 1. 重構預設不允許 golden 變更。
 2. 測試失敗時先保存 actual diff，不得用 actual 覆蓋 expected 來取得綠燈。
-3. 1.3.x 只允許 `R13.002` 這一次已簽核、且已證明舊 golden 來自非 production test seam 的 provenance correction；後續 correctness fix 若改 C，必須退出本 zero-diff refactor 計畫。
+3. 1.0.x 只允許 `R13.002` 這一次已簽核、且已證明舊 golden 來自非 production test seam 的 provenance correction；後續 correctness fix 若改 C，必須退出本 zero-diff refactor 計畫。
 4. Provenance correction 必須先證明兩個獨立 production-equivalent seams 產生相同輸出，且 production behavior 本身沒有為了符合 actual 而改動。
 5. 更新必須記錄：版本、slice、project、CAD/diff/欄位、輸入 selection/filter、舊值、新值、理由、人工簽核與驗證命令。
 6. 更新後再完整跑 G2、G3、G4，證明沒有未宣告差異。
@@ -155,15 +155,15 @@ V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容�
 
 | 版本 | G2/G3 之外的必要測試 |
 |---|---|
-| 1.3.1 | `NotchDisplayProjectorTests`、`NotchValidationUseCaseTests`、`NotchValidationTraceServiceTests`、`SimulationSafetyOverviewProjectorTests`、`SimulationSafetyAuditServiceTests`、`PadInfoViewModelTests` |
-| 1.3.2 | `PadMatcherTests`、`DxfRegularMappingAnalyzerTests`、`DxfRegularMaskAuditServiceTests`、`FreeformDetectorTests`、`CoordinatePlannerComputationServiceTests`、`PadCanvasHitTestTests` |
-| 1.3.3 | 新增的 `SettingsDraftContractTests`、既有 Settings persistence cases、`SimulationWorkspaceUseCaseTests`、`SimulationWorkspaceViewModelTests`、`SimulationColorScaleResolverTests`、`ShellViewModelConsoleTests` |
-| 1.3.4 | `FreeformHelperViewModelTests`、`WorkflowPipelineServiceTests`、`RuntimeQueryIpcTests`、`HeadlessUiSmokeTests` |
-| 1.3.5 | `UiLayoutGuardTests`、`UiRenderedVisualSnapshotTests`、`UiVisualSnapshotTests`、`HeadlessUiSmokeTests`、`CadAreaBucketServiceTests`、`PadCanvasHitTestTests`、`PadCanvasCacheInvalidationTests`、`check-xaml-action-roles.ps1` |
+| g2 | `NotchDisplayProjectorTests`、`NotchValidationUseCaseTests`、`NotchValidationTraceServiceTests`、`SimulationSafetyOverviewProjectorTests`、`SimulationSafetyAuditServiceTests`、`PadInfoViewModelTests` |
+| g3 | `PadMatcherTests`、`DxfRegularMappingAnalyzerTests`、`DxfRegularMaskAuditServiceTests`、`FreeformDetectorTests`、`CoordinatePlannerComputationServiceTests`、`PadCanvasHitTestTests` |
+| g5 | 新增的 `SettingsDraftContractTests`、既有 Settings persistence cases、`SimulationWorkspaceUseCaseTests`、`SimulationWorkspaceViewModelTests`、`SimulationColorScaleResolverTests`、`ShellViewModelConsoleTests` |
+| g6 | `FreeformHelperViewModelTests`、`WorkflowPipelineServiceTests`、`RuntimeQueryIpcTests`、`HeadlessUiSmokeTests` |
+| g7 | `UiLayoutGuardTests`、`UiRenderedVisualSnapshotTests`、`UiVisualSnapshotTests`、`HeadlessUiSmokeTests`、`CadAreaBucketServiceTests`、`PadCanvasHitTestTests`、`PadCanvasCacheInvalidationTests`、`check-xaml-action-roles.ps1` |
 
 ---
 
-## 6. 1.3.1 — Notch single-result pipeline
+## 6. g2 — Notch single-result pipeline
 
 ### R13.101 顯式 NotchGenerationContext
 
@@ -178,9 +178,9 @@ V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容�
 - `R13.101c` exit target：version-neutral result fingerprint 不包含 `ExportProfile`／`EnabledVersions`；final projector/formatter cache 仍可攜帶 output contract，舊 persistence roundtrip 不變。
 - `R13.101c-1` 已由 [#14](https://github.com/Dennis40816/FreeformHelper/issues/14) 完成：只從現行 generated-table settings fingerprint 移除 `ExportProfile`；cached table 仍由當下 requested profile serialization，不新增 formatter cache、key abstraction或公開 API。Public headless export seam 鎖 Release→Debug／Debug→Release 都只做一次 miss/store 後命中同一 table，warm/fresh requested-profile raw C exact，而 profile metadata與 Debug-only FW mask仍依當下 profile輸出；mutation 加回 profile時兩案均 RED。V21/V22切換與 V21 Q7 threshold改動仍 miss。
 - 相對 `87cf59a` production 淨減 `-1 physical / -1 nonblank`；兩次 deterministic Release總量皆為 `15,314,944 bytes`，僅 UI hash因本 slice改為 `B1AC7878…1881`、其 bytes仍為 `14,523,392`。Targeted 10、notch-core 130、ui-core 237、golden 6、GCC exporter/parity 15、RuntimeQuery 13 tests與 hidden UI/IPC正反 gate皆通過，V21/V22 golden、export state與budget不變。
-- Historical `R13.101c-2` implementation evidence: R13.102a-2a 已從 normal `CadAllocation` resolved-batch settings fingerprint 移除 enabled versions、threshold、`NullValue` 與 target guard/cap，matching export可重用同一 candidate batch再投影當下 request；R13.101c-2a [#64](https://github.com/Dennis40816/FreeformHelper/issues/64) 再把live UI guard/cap settings固定為final-projection-only，保留Step3 revision、per-CAD sparse identity與export batch，只失效Step5 projected table／validation並通知Simulation；R13.102a-2b-1 [#66](https://github.com/Dennis40816/FreeformHelper/issues/66) 已在既有generation boundary以cache epoch、final-projection revision與source revision拒絕in-flight stale completion，R13.102a-2b-2 [#68](https://github.com/Dennis40816/FreeformHelper/issues/68)／[#76](https://github.com/Dennis40816/FreeformHelper/issues/76) 再完成並行full task與目前單一selected sparse result的bounded bridge。Current exit scope follows the owner decisions of 2026-10-03/04: normal A1/A2 closure requires evidence; Legacy request-specific table identity and additional V21/Legacy projector convergence remain accepted B1/B2 exceptions. The repository-wide final-output cache is C1; C1–C6 do not block 1.3.1. Parent and milestone exits remain the owner's decision.
+- Historical `R13.101c-2` implementation evidence: R13.102a-2a 已從 normal `CadAllocation` resolved-batch settings fingerprint 移除 enabled versions、threshold、`NullValue` 與 target guard/cap，matching export可重用同一 candidate batch再投影當下 request；R13.101c-2a [#64](https://github.com/Dennis40816/FreeformHelper/issues/64) 再把live UI guard/cap settings固定為final-projection-only，保留Step3 revision、per-CAD sparse identity與export batch，只失效Step5 projected table／validation並通知Simulation；R13.102a-2b-1 [#66](https://github.com/Dennis40816/FreeformHelper/issues/66) 已在既有generation boundary以cache epoch、final-projection revision與source revision拒絕in-flight stale completion，R13.102a-2b-2 [#68](https://github.com/Dennis40816/FreeformHelper/issues/68)／[#76](https://github.com/Dennis40816/FreeformHelper/issues/76) 再完成並行full task與目前單一selected sparse result的bounded bridge。Current exit scope follows the owner decisions of 2026-10-03/04: normal A1/A2 closure requires evidence; Legacy request-specific table identity and additional V21/Legacy projector convergence remain accepted B1/B2 exceptions. The repository-wide final-output cache is C1; C1–C6 do not block g2. Parent and milestone exits remain the owner's decision.
 - owner 2026-10-03：`LegacyRegularAnchor` 是否仍需重新匯出已交付 project 尚未確定，暫時保留；`R13.101c-2` 暫緩，既有 zero-diff gates 繼續保護它。
-- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；owner 決定（2026-10-04，經 Commander 轉述）排在 1.3.x 之後，範圍之後再定，之前不做隱性轉換；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
+- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；owner 決定（2026-10-04，經 Commander 轉述）排在 g7 之後，範圍之後再定，之前不做隱性轉換；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
 - R13.101c-2a以public direct UI與Settings Save fixtures鎖guard/cap-only不重算Step3、retained batch命中與fresh projection byte-exact；三種behavior mutation與public enum ABI contract各自RED。final-projection invalidation由settings plan的具名internal flag承載，public policy surface／enum values不變。相對`74301a3` production／logic-first皆為`0 files / +22 physical / +19 nonblank`，0新dependency/service/cache/session；兩次fresh isolated Release完全一致，總DLL增加`512 bytes`且只變更UI。Focused 5、notch-core 182、Application 218、ui-core 264、smoke 25、UI build、lint/analyzer與hidden UI/IPC正反gate皆通過；signed C維持V21 `692 / 130979 / 8961B815…E57488`、V22 `548 / 84023 / 5208068B…57BB47`，selection p95為`27/15/15`與`28/16/15 ms`，Standards／Spec／simplification findings均已修正；不宣稱效能提升。
 - `R13.101d-1` 已由 [#20](https://github.com/Dennis40816/FreeformHelper/issues/20) 完成 normal `CadAllocation` 的 computation-input freeze：private `CadAllocationGenerationContext` 統一持有 profiles／allocations、per-IC CAD pools、boundary query/index evidence、owned active-regular／CAD-output snapshots、grid/CAD references、strict ratio與已解析的 compensation／switch／rule／boundary／allocation policy。三個 candidate helpers 只接收此 context，不再接收或重讀 mutable `ProjectSettings`／`NotchSettings`；Enabled outputs、threshold、`NullValue`、target guard/cap 仍只屬獨立 final projection request。這不是 R13.102 resolved batch/task，也沒有改動 `LegacyRegularAnchor` compatibility dispatch。
 - Freeze boundary 精確保留既有 callback 時序：BuildProfiles 完成後才擁有化 caller set/map並建立pool／strict／boundary prerequisites；phase-2 initial progress callback返回後才一次凍結其餘 computation policy與projection request。Public同步progress seam鎖phase-2 `ProcessedCount=0/1`、cap-50 V2.1/V2.2 exact rows、enabled-output／`NullValue` snapshot與caller collection ownership；reflection architecture guard則鎖三個candidate helpers不再依賴settings types。
@@ -225,7 +225,7 @@ V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容�
 ### R13.103 Export projection 與 formatter 分離
 
 - owner 2026-10-03：V21 firmware C output 尚未確定，暫時保留；本項 final projection／formatter 分離（含 legacy convergence）暫緩，不得開始移除或變更 V21 output 與舊 project 對它的讀取路徑。
-- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；owner 決定（2026-10-04，經 Commander 轉述）排在 1.3.x 之後，範圍之後再定，之前不做隱性轉換；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
+- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；owner 決定（2026-10-04，經 Commander 轉述）排在 g7 之後，範圍之後再定，之前不做隱性轉換；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
 - `NotchFirmwareCExporter` 已位於 Application 層；本項不是「搬到 Application」。
 - 把 version-specific final Firmware node projection（V21 destination-oriented、V22 source-oriented）、version threshold、null／continuation／ordering rule 收斂為唯一允許的版本分岔邊界與可測試 result model。
 - exporter 最終只負責 C text formatting 與 fixed contract emission。
@@ -247,7 +247,7 @@ V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容�
 - 完成證據：相對`36d7bb8` production／logic-first皆為`0 files / -3 physical / -4 nonblank`；兩次fresh isolated deterministic Release完全一致，總DLL `15,330,816 -> 15,332,864 bytes`（`+2,048`），只有Application由`697,856 / 699FF83D…744649`變為`699,904 / 33FB9E60…FA6170`。Legacy targeted 6、generator 44、Application 212、notch-core 179、ui-core 258、smoke 24、UI snapshots 21、golden 2、exporter／GCC 30與Runtime Query 18 tests pass；UI build與lint/analyzer為0 warning／0 error。Hidden UI／IPC正反順序的signed C、golden、export state與budget不變，selection total／Inspector／preview p95為`38/23/14`與`27/15/15 ms`，evidence SHA-256為`57685C9D…395309F`與`82BF6DF4…FD47D5`；不宣稱效能提升。
 - `R13.103d-2` 由 [#60](https://github.com/Dennis40816/FreeformHelper/issues/60) 刪除固定兩版本卻沒有注入consumer的Legacy strategy registry：generation與eligibility共用明確V21／V22 switch，兩個stateless compatibility algorithm改為static owner；`INotchAlgorithmStrategy`、dictionary、test-only injection constructor與missing-strategy假分支一併移除。Owned request、threshold、9-int rows、comments、ordering與progress維持exact。
 - Public XWay／YWay／XYWay matrix鎖反向configured set仍canonical輸出V21→V22、eligibility／row count／anchor一致；放寬V22 admission與交換兩版builder兩個mutation都會RED。相對`f244c47` production／logic-first皆為`0 files / -61 physical / -53 nonblank`；兩次fresh isolated deterministic Release完全一致，總DLL `15,329,792 -> 15,329,280 bytes`（`-512`），只有Application由`696,832 / 06F8CF03…C5C0A4E`變為`696,320 / 9899BC42…B952EBF`，其餘三個DLL bytes/SHA不變。Application 218、notch-core 182、notch-golden 6、ui-core 258、smoke 24、Runtime Query／exporter／GCC 48 tests及UI build／lint皆通過。Hidden正反signed C、golden、export state與budget不變，selection total／Inspector／preview p95為`29/16/15`與`32/19/14 ms`，evidence SHA-256為`F1F09E5A…B79A89`與`0581FE62…F1D12`。
-- Historical status after R13.103a/R13.103b-1/R13.103c-1/R13.103c-2/R13.103d-1/R13.103d-2 left the R13.103 parent open. Under the owner decisions of 2026-10-03/04, Legacy request-specific table/cache and compatibility convergence are accepted B1/B2 exceptions, not remaining 1.3.1 blockers; normal A1/A2 evidence and owner-controlled parent/milestone exits still apply.
+- Historical status after R13.103a/R13.103b-1/R13.103c-1/R13.103c-2/R13.103d-1/R13.103d-2 left the R13.103 parent open. Under the owner decisions of 2026-10-03/04, Legacy request-specific table/cache and compatibility convergence are accepted B1/B2 exceptions, not remaining g2 blockers; normal A1/A2 evidence and owner-controlled parent/milestone exits still apply.
 - `LegacyRegularAnchor` 的固定V21／V22 compatibility dispatch不得成為 normal flow 的第二條實際路徑。
 
 ### R13.104 Notch display/safety projection 收斂
@@ -277,13 +277,13 @@ V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容�
 - 相對`e1b0b9c` production／logic-first皆為`0 files / +21 physical / +16 nonblank`；兩次fresh isolated Release完全一致，總 DLL `15,330,304 -> 15,330,816 bytes`（`+512`），只有UI更新為`14,532,096 / 67C40172…D7AF33`。Focused 32、Application 208、notch-core 175、ui-core 258、UI snapshots 21、smoke 24、golden 6、Runtime Query 18、GCC 8、hidden UI/IPC正反gate、UI build與lint全數通過；signed V21/V22 C exact。Selection total／Inspector／preview p95為`37/23/16`與`34/17/19 ms`，evidence SHA-256為`97152F5A…41A1EA`與`DD69E750…7DA0EB`；不宣稱效能提升。
 - `R13.104a-10` 已由 [#62](https://github.com/Dennis40816/FreeformHelper/issues/62) 完成target-cap help provenance的窄收斂：`SimulationSafetyTextProjector.BuildNotchTargetCoverageCapHelpText`格式化current target cap、uniform `400`對應After與比較用EMS cap。Active Step 3供應current overview cap，Settings保留documented default cap；兩個既有tooltip共讀同一template，沒有新增control／layout／style／token或改target guard／EMS computation。
 - Public headless Step 3 tooltip與VM／Settings fixtures鎖target cap `128%`時active exact `After 512 / EMS cap 512`、Settings exact `After 512 / EMS cap 480`；static XAML、default active cap與dependent-notification三個mutations皆RED後restore。相對`32f4469` production／logic-first皆為`0 files / +23 physical / +20 nonblank`；兩次fresh isolated Release完全一致，總DLL `15,329,280 -> 15,329,792 bytes`（`+512`），只有UI更新為`14,532,608 / 44805041…29B52`。Focused 19、ui-core 260、smoke 25、notch-core 182、golden 6、Runtime Query／exporter／GCC 48、hidden UI/IPC正反gate、UI build與lint全數通過，signed V21/V22 C exact。Selection total／Inspector／preview p95為`40/20/19`與`39/23/21 ms`，evidence SHA-256為`D4BE8E99…A08D95D`與`36915EDF…2A3EE3`；不宣稱效能提升。
-- Remaining hard-coded cap and Simulation/replay/display text convergence stays recorded as follow-up scope. The owner decision of 2026-10-04 closes 1.3.1 with normal A1/A2 evidence; C1–C6 do not block closure, and B1/B2 remain accepted exceptions. The earlier Legacy-convergence blocker is historical; parent and milestone exits remain the owner's decision.
+- Remaining hard-coded cap and Simulation/replay/display text convergence stays recorded as follow-up scope. The owner decision of 2026-10-04 closes g2 with normal A1/A2 evidence; C1–C6 do not block closure, and B1/B2 remain accepted exceptions. The earlier Legacy-convergence blocker is historical; parent and milestone exits remain the owner's decision.
 
 Exit criteria: close normal A1/A2 with the single-owner result and final-projection evidence plus G2/G3/G4 validation. B1/B2 remain accepted exceptions and C1–C6 are nonblocking under the owner's 2026-10-04 decision; parent and milestone exits remain the owner's decision.
 
 ---
 
-## 7. 1.3.2 — Matching 與 Domain state
+## 7. g3 — Matching 與 Domain state
 
 ### R13.201 定義 matching bounded contexts
 
@@ -296,7 +296,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 3. `PadCanvas` selection/hit-test：純 UI 幾何互動。
 
 不得把三者合併成一個巨大 `PadMatchingService`。
-`R13.004c-2` 只移除失效設定的 live UI owner；`PadMatcher`／`PadMatchService` 的 `MatchingSettings` compatibility parameter 留到本項在 overlap evidence API 邊界一併移除，不在 1.3.0 偷改 public seam。
+`R13.004c-2` 只移除失效設定的 live UI owner；`PadMatcher`／`PadMatchService` 的 `MatchingSettings` compatibility parameter 留到本項在 overlap evidence API 邊界一併移除，不在 g1 偷改 public seam。
 
 ### R13.202 Preserve distinct best-match rules
 
@@ -339,11 +339,11 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 完成條件：所有 planner artifact 使用同一轉換契約；既有 key、排序、raw/safe 座標與輸出 snapshot 零差異。
 
-Exit criteria: preserve the distinct CadBest and hover rules and all user-visible results; share only evidence or calculations proven identical. Consult the R13.201–R13.206 entries of the former `TODO.md` (git history) for execution status. The 1.3.2 exit remains the owner's decision.
+Exit criteria: preserve the distinct CadBest and hover rules and all user-visible results; share only evidence or calculations proven identical. Consult the R13.201–R13.206 entries of the former `TODO.md` (git history) for execution status. The g3 exit remains the owner's decision.
 
 ---
 
-## 8. 1.3.3 — Settings 與 Presentation orchestration
+## 8. g5 — Settings 與 Presentation orchestration
 
 ### R13.301 Settings draft 完整性
 
@@ -364,7 +364,7 @@ Exit criteria: preserve the distinct CadBest and hover rules and all user-visibl
 
 - 共用 simulation intensity/color scale，只搬真正相同的數值映射。
 - `NotchApplySimulationAaView` 的 auto-scale/color-mode 保持 presentation policy；共用既有 `SimulationColorScaleResolver`，除非出現非視覺 consumer，否則不搬成 Domain/Application 業務結果。
-- Owner decision (2026-10-04): use 0.9 for the AaView/HeatmapView opacity fallback in 1.3.3 after the 1.3.2 exit. This approved visual change requires updated snapshots; do not expand it into a global table of defaults.
+- Owner decision (2026-10-04): use 0.9 for the AaView/HeatmapView opacity fallback in g5 after the g3 exit. This approved visual change requires updated snapshots; do not expand it into a global table of defaults.
 - 共用 4 處重複 `GetBrush(Color)` cache primitive，但不得吸收 View-specific resource lookup 或 cache lifetime。
 - 移除 code-behind magic fallback 時，先補 token 與 runtime guard test；若範圍超出已知 color/opacity views，另立後續 slice，不擴大 R13.303。
 
@@ -383,7 +383,7 @@ Exit criteria: preserve the distinct CadBest and hover rules and all user-visibl
 - display-only、derived、automatic policy 與 compatibility fields 必須標出唯一 owner，不能因從 UI 隱藏而建立另一套 hidden mutable state。
 - Layer category batch action 移出 draft settings，改由 DXF workspace 的即時操作 owner 承接，確保 Cancel 不會留下未回滾 mutation。
 - numbered normal flow 固定為 Step3 直達 Step5；Step4 mapping 與 Step6 validation 保留在未編號 Diagnostics/Inspector，不要求正常使用者手動執行。
-- Remove non-operable derived toggles and placeholders. For R13.305b, the owner decided on 2026-10-04: 「禁止關掉最後一個版本」. Neither V21 nor V22 may be switched off when it is the last enabled version. Implement this bidirectional guard in 1.3.3 after the 1.3.2 exit.
+- Remove non-operable derived toggles and placeholders. For R13.305b, the owner decided on 2026-10-04: 「禁止關掉最後一個版本」. Neither V21 nor V22 may be switched off when it is the last enabled version. Implement this bidirectional guard in g5 after the g3 exit.
 
 完成條件：非人工參數不再干擾 normal flow；必要 workflow action、舊 project roundtrip、3635 V21/V22 C 與主 UI 操作體驗不變。
 
@@ -391,7 +391,7 @@ Exit criteria: preserve the distinct CadBest and hover rules and all user-visibl
 
 ---
 
-## 9. 1.3.4 — Workspace ViewModel 拆解
+## 9. g6 — Workspace ViewModel 拆解
 
 ### R13.401 建立 root shell 邊界
 
@@ -412,7 +412,7 @@ Exit criteria: preserve the distinct CadBest and hover rules and all user-visibl
 ### R13.404 NotchWorkspaceViewModel
 
 - 搬 Notch generation/preview/validation/export selection UI state。
-- 只讀 1.3.1 的 resolved result model。
+- 只讀 g2 的 resolved result model。
 
 ### R13.405 ProjectSessionViewModel facade 收斂
 
@@ -423,7 +423,7 @@ Exit criteria: preserve the distinct CadBest and hover rules and all user-visibl
 
 ---
 
-## 10. 1.3.5 — UI 結構與 token 收斂
+## 10. g7 — UI 結構與 token 收斂
 
 ### R13.501 Styles responsibility split
 
@@ -476,7 +476,7 @@ Exit criteria: preserve the distinct CadBest and hover rules and all user-visibl
 
 ## 11. 明確不執行或需改寫的舊提案
 
-| 舊提案 | 1.3.x 處置 |
+| 舊提案 | 1.0.x 處置 |
 |---|---|
 | Golden baseline 目前壞掉 | 已否證；2026-07-20 為 103/103 綠燈 |
 | 封裝 `BalancedWrapPanel` public list | 不執行；為 private nested helper 的 false positive |
@@ -534,7 +534,7 @@ Merge 前額外執行：
 
 ### Milestone handoff
 
-每個 1.3.x milestone 完成時記錄：
+每個 1.0.x milestone 完成時記錄：
 
 1. 完成的 `R13.*`。
 2. single-entry / single-result 變化。

@@ -4,7 +4,7 @@ English | [繁體中文](README.zh-TW.md)
 
 See [LICENSE](LICENSE) for licensing and usage restrictions.
 
-Since 2026-10-04, new work (branches, PRs, and new issues) takes place in the public repository [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper), with PRs targeting `1.3.x`.
+Since 2026-10-04, new work (branches, PRs, and new issues) takes place in the public repository [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper), with PRs targeting `1.0.x`.
 
 FreeformHelper is a DXF analysis tool with this main workflow:
 `DXF import -> Regular Grid creation -> CAD/Regular mapping -> Freeform/Notch output`

@@ -1,7 +1,7 @@
 # Behavior inventory
 Last updated: 2026-08-10
 
-Current document baseline: FreeformHelper 1.3.0 current-state audit, production evidence commit `ef08945`. Historical stale-checks preserve decision context; the R13.005 calibration sections represent the current owner/result/reader state.
+Current document baseline: FreeformHelper g1 current-state audit, production evidence commit `ef08945`. Historical stale-checks preserve decision context; the R13.005 calibration sections represent the current owner/result/reader state.
 
 ## S10.10 stale-check（2026-03-08）
 - DXF edit behavior has been extended to the full project state:
@@ -253,7 +253,7 @@ Notes:
   - Export content is based on the currently visible and checked rows; the default behavior reduces reading noise while retaining an entry to the complete view.
 
 ### UI structure and consistency
-- The 1.3.0 current settings area still presents numbered Step1~5 and Step6 validation; Step4/6 are diagnostics but have not yet been moved out of the normal-flow surface (R13.305a debt).
+- The g1 current settings area still presents numbered Step1~5 and Step6 validation; Step4/6 are diagnostics but have not yet been moved out of the normal-flow surface (R13.305a debt).
 - The right-side Panel is now split into `Settings / Inspector` tabs; Inspector and Step settings no longer share the same scrolling content.
 - `RightWorkflowPanel > General Settings` retains editable shortcut fields (Grid/AA/source/alignment) and shares a single source with `SettingsWindow`.
 - The `WorkspaceHeader` Display popup retains frequent real-time visual items; `SettingsWindow` should handle only necessary operator-facing settings, without aiming to make the entire persistence schema editable.
@@ -490,7 +490,7 @@ Notes:
 
 The seven UseCases listed in the original draft are not currently "all complete"; the accurate status is 6 partially implemented and 1 not implemented. `SelectionCoordinator` and status/undo are additional coordination components and are not counted among these seven UseCases.
 
-| UseCase | 1.3.0 status | Converged responsibilities | Responsibilities / owners not yet converged |
+| UseCase | g1 status | Converged responsibilities | Responsibilities / owners not yet converged |
 | --- | --- | --- | --- |
 | `GridRebuildUseCase` | Partial | All rebuild requests go through `TriggerGridRebuildAsync -> RequestAsync -> RebuildGridAsync` and coalesce pending requests | `preserveSelection/reason` is not yet a typed request; selection clear, fit, and status are still owned by the VM low-level rebuild (R13.302/R13.403) |
 | `ManualSizingUseCase` | Partial | range parse, validation, and action plan | Mutation is performed by VM/`PadEditUseCase`; mixed state, Undo, rebuild, and fit have not formed a single result/side-effect owner (R13.402) |
