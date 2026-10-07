@@ -42,4 +42,4 @@ Primary reference: `docs/guides/refactor-playbook.md`.
 ## Deliverable checklist
 - No new inline colors or sizes in Views/Controls.
 - Any behavior change routed through a single entry.
-- `TODO.md` status synced (unfinished on top, completed at bottom).
+- `ROADMAP.md` status synced: update the item's status and PR link; delete completed items once their release ships.

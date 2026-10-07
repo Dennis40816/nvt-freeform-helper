@@ -25,7 +25,7 @@
 ./scripts/tests/run-refactor-gate.ps1
 ```
 
-預設流程（2026-10-02 起固定跑全部測試分組，見 `TODO.md` S15.003）：
+預設流程（2026-10-02 起固定跑全部測試分組，見 `ROADMAP.md` S15.003）：
 1. 檢查 `example/` 資料（已抓取、在釘住的 commit、沒有未提交變更）
 2. `lint`
 3. `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`

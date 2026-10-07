@@ -176,7 +176,7 @@ refactor(beta0.5-S11.xxx): <slice summary>
 - Scope:
   - `docs/core/notch-overall-flow-mermaid.md` (rebuild and align with the current state).
   - `docs/core/notch-v21-v22-flow.md` (synchronize flow/semantics).
-  - `TODO.md` (synchronize slice completion status).
+  - `ROADMAP.md` (synchronize slice completion status).
 - Key changes:
   - Synchronize `notch-overall-flow-mermaid` with `S11.134` stage orchestration:
     - `BuildCadAllocationGenerationContext -> BuildCanonicalCandidatesByDiff -> BuildCanonicalRows -> AppendCanonicalExports`。

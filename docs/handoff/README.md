@@ -1,6 +1,6 @@
 # Agent 交接協定
 
-本目錄保存跨 session 或多人工作的即時交接狀態：誰負責什麼、在哪個 branch／head、已完成哪些驗證與還有什麼 gate。產品行為以 `docs/reference/` 契約及現行 roadmap 為準；可執行待辦與狀態由 `TODO.md` 維護，不在交接紀錄複製第二份 backlog。
+本目錄保存跨 session 或多人工作的即時交接狀態：誰負責什麼、在哪個 branch／head、已完成哪些驗證與還有什麼 gate。產品行為以 `docs/reference/` 契約及現行 roadmap 為準；可執行待辦與狀態由 `ROADMAP.md` 維護，不在交接紀錄複製第二份 backlog。
 
 ## 檔案與責任
 

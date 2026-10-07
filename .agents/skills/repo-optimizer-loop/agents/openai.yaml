@@ -1,7 +1,7 @@
 interface:
   display_name: "Repo Optimizer Loop"
-  short_description: "Scan repo, refresh TODO, execute optimization loop"
-  default_prompt: "Use $repo-optimizer-loop to scan this repository, refresh TODO.md into executable steps, then implement and validate each step until no actionable items remain."
+  short_description: "Scan repo, refresh ROADMAP, execute optimization loop"
+  default_prompt: "Use $repo-optimizer-loop to scan this repository, refresh ROADMAP.md into executable steps, then implement and validate each step until no actionable items remain."
 
 policy:
   allow_implicit_invocation: true

@@ -150,7 +150,7 @@ git submodule update --init example
 - Notch 流程圖：`docs/core/notch-v21-v22-flow.md`
 - 目前 C export example：`example/BOE36.35/notch_export_v21_current.c` / `example/BOE36.35/notch_export_v22_current.c`
 - 使用手冊：`docs/guides/app-user-manual.md`
-- 開發待辦：`TODO.md`
+- 開發待辦：`ROADMAP.md`
 - 腳本總覽：`scripts/README.md`
 
 ## 10. 重構 Gate（開發者）

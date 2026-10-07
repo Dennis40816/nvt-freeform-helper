@@ -96,7 +96,7 @@ Keep existing token names, fill gaps, and use no inline color values:
 - Documentation:
   - `docs/core/notch-2.2-spec.md` (overlay section)
   - `docs/reference/behavior-inventory.md` (Step3 display switch side-effect)
-  - Synchronize progress in `TODO.md`
+  - Synchronize progress in `ROADMAP.md`
 
 ## 10. Acceptance criteria
 1. Users can explicitly control `To Regular` and `To Full` display independently.

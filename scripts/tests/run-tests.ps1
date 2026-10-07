@@ -84,7 +84,7 @@ $infrastructureClasses = @(
     "LoggingConfigurationTests"
 )
 
-# FreeformHelperViewModelTests is unstable on machines with few cores (TODO.md S15.002), so CI runs it
+# FreeformHelperViewModelTests is unstable on machines with few cores (ROADMAP.md S15.002), so CI runs it
 # as its own non-blocking shard. 'ui-core' stays the union of both lists for the local gate.
 $uiViewModelClasses = @(
     "FreeformHelperViewModelTests"

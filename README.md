@@ -150,7 +150,7 @@ git submodule update --init example
 - Notch flowchart: `docs/core/notch-v21-v22-flow.md`
 - Current C export examples: `example/BOE36.35/notch_export_v21_current.c` / `example/BOE36.35/notch_export_v22_current.c`
 - User manual: `docs/guides/app-user-manual.md`
-- Development backlog: `TODO.md`
+- Development backlog: `ROADMAP.md`
 - Script overview: `scripts/README.md`
 
 ## 10. Refactor gate (developers)
