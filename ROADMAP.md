@@ -120,6 +120,10 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (target 
 - [ ] **GOV-REQ Make the report-only governance checks required** · Target: after 1.3.2 · Status: Waiting for owner (1.3.2 has ended) · PR: -
 - [ ] **S15.009e Issue migration: rewrite the parent-spec links and final status** · Target: - · Status: Waiting for owner · PR: -
 - [ ] **S15.009e Archive the private FreeformHelper repository** · Target: - · Status: Waiting for owner; both preconditions are met · PR: -
+- [ ] **S15.009f Move the test data into `Dennis40816/nvt-private-assets` under `nfh/`, then archive `FreeformHelper-testdata`** · Target: - · Status: Not started; after C-CONSOLE and C-THEME2 · PR: -
+  - A submodule links a whole repository, so decide first how `example/` reads the `nfh/` folder.
+  - Update the CI deploy key `TESTDATA_DEPLOY_KEY` and the data checks in `scripts/tests/assert-example-data.ps1`.
+  - Never copy the data into this repository, a PR, an issue or a log.
 - [ ] **DOC-TR Translate the remaining Chinese documents** · Target: - · Status: Not started (low priority) · PR: [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30) (first batch)
 
 ## 3. Core integration
