@@ -58,8 +58,8 @@ Order rules:
 
 ### 2.1 Waiting for the owner
 
-- [ ] **Close the 1.3.1 parents R13.101, R13.102 and R13.103** · Target: 1.3.1 · Status: Waiting for owner · PR: -
-  - All their work is delivered. V21 and `LegacyRegularAnchor` stay as they are. The parent spec is [#27](https://github.com/Dennis40816/nvt-freeform-helper/issues/27).
+The owner closed these parents on 2026-10-07 because their work is delivered: R13.101, R13.102 and R13.103 (parent spec [#27](https://github.com/Dennis40816/nvt-freeform-helper/issues/27)), S15.005 with S15.005a, and S15.009 with S15.009d. V21 and `LegacyRegularAnchor` stay as they are.
+
 - [ ] **R13.104 Converge the Notch display and EMS safety predicate and text** · Target: 1.3.1 · Status: Waiting for owner · PR: -
   - R13.104a-1 to a-14 are done. Decide whether the remaining follow-up scope is open work: the `255` cap spread over Step 3 XAML, settings sync, generator, exporter and formatter, and separate Simulation, replay and Dev texts.
 - [ ] **P-MASK Behavior for a missing saved mask path and for importing a mask while enabled** · Target: - · Status: Waiting for owner · PR: [#22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22) (characterization tests only)
@@ -72,7 +72,7 @@ Order rules:
 - [ ] **R13.302 One apply plan and side-effect owner for all settings entries; typed Step 2/4/5 invalidation** · Target: 1.3.3 · Status: Not started · PR: -
 - [ ] **R13.303 Converge the simulation color and opacity scale, brush cache and token fallback** · Target: 1.3.3 · Status: Not started · PR: -
   - The owner approved the 0.9 opacity fallback on 2026-10-04. It changes appearance and needs snapshot updates.
-- [ ] **R13.304 Structured console dedup; one action path for both hosted modes** · Target: 1.3.3 · Status: Probably superseded by C-CONSOLE (line 3) · PR: -
+- [x] **R13.304 Structured console dedup; one action path for both hosted modes** · Target: 1.3.3 · Status: Closed: superseded by C-CONSOLE (owner decision, 2026-10-07) · PR: -
 - [ ] **R13.305 Move non-routine parameters out of normal Settings; Step 3 goes straight to Step 5; diagnostics area** · Target: 1.3.3 · Status: Not started · PR: -
   - The owner confirmed on 2026-10-03 that Step 4 mapping and Step 6 validation diagnostics move to an unnumbered diagnostics area.
 
@@ -111,7 +111,6 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (target 
 - [ ] **S15.002 Remove the full-suite timeouts in `FreeformHelperViewModelTests`, then make the `viewmodel` CI shard required again** · Target: - · Status: Blocked: needs a new failure trace for root cause six (headless dispatcher race) · PR: -
   - Root causes 1 to 5, 7 and 8 are fixed. The earlier analysis predates Avalonia 12.1.1 and xUnit v3.
 - [ ] **R13.306-F1 Give the four main-window tests a fake CAD load spinner host** · Target: - · Status: Not started · PR: -
-- [ ] **S15.005 Apply the NFC template (parent) and S15.005a foundation** · Target: - · Status: Waiting for owner (close; all parts delivered) · PR: [#12](https://github.com/Dennis40816/nvt-freeform-helper/pull/12), [#13](https://github.com/Dennis40816/nvt-freeform-helper/pull/13), [#14](https://github.com/Dennis40816/nvt-freeform-helper/pull/14), [#19](https://github.com/Dennis40816/nvt-freeform-helper/pull/19), [#20](https://github.com/Dennis40816/nvt-freeform-helper/pull/20)
 - [ ] **S15.005c Review infrastructure: R0–R3 authority policy, CODEOWNERS, PR and issue templates, review records** · Target: - · Status: Blocked: waits for the shared CI pilot · PR: -
   - The report-only path guard merged in [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21) but is not wired into CI. Waiting for owner: the exception and calibration policy, and when it starts to block.
 - [ ] **S15.005d Owner-only settings: the `release` environment** · Target: - · Status: Waiting for owner · PR: -
@@ -119,7 +118,6 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (target 
   - The first public release tag also starts the fix line (section 1).
 - [ ] **SHARED-CI Shared CI pilot: NFH replaces NFU** · Target: - · Status: Not started; NVT Core will contact NFH · PR: -
 - [ ] **GOV-REQ Make the report-only governance checks required** · Target: after 1.3.2 · Status: Waiting for owner (1.3.2 has ended) · PR: -
-- [ ] **S15.009 Separate the confidential test data (parent) and S15.009d pre-publication cleanup** · Target: - · Status: Waiting for owner (close; no work left) · PR: -
 - [ ] **S15.009e Issue migration: rewrite the parent-spec links and final status** · Target: - · Status: Waiting for owner · PR: -
 - [ ] **S15.009e Archive the private FreeformHelper repository** · Target: - · Status: Waiting for owner; both preconditions are met · PR: -
 - [ ] **DOC-TR Translate the remaining Chinese documents** · Target: - · Status: Not started (low priority) · PR: [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30) (first batch)
@@ -142,7 +140,7 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
   - Map tool-specific button classes to the nearest Core role. Open a Core issue when none fits.
   - This replaces the former steps M3 (scroll styles) and M4 (button roles). It also removes the scroll selectors that match nothing on Avalonia 12 and fixes the neutral text button focus.
 - [ ] **C-CONSOLE Adopt the redesigned Core Console and delete NFH's console** · Target: 1.3.3 (Core 1.0.0) · Status: Not started; Core implements it first · PR: [Core #82](https://github.com/Dennis40816/nvt_fw_core/pull/82) (approved design)
-  - NFH fixed console review items 01 and 02 in [#49](https://github.com/Dennis40816/nvt-freeform-helper/pull/49). The Core redesign covers items 03 to 21 and S15.017.
+  - NFH fixed console review items 01 and 02 in [#49](https://github.com/Dennis40816/nvt-freeform-helper/pull/49). The Core redesign covers items 03 to 21, S15.017 and R13.304.
 - [ ] **R13.307-ICON Material Symbols becomes the shared Core icon system; delete the unused `MaterialIcons-Regular.ttf`** · Target: 1.3.3 · Status: Not started · PR: -
 - [ ] **R13.307-FONT Adopt the Core font set** · Target: 1.3.3 · Status: Not started · PR: -
 - [ ] **R13.307-LIC Ship the Core license as `licenses/Nvt.Core/LICENSE`** · Target: first NFH release with Core · Status: Not started · PR: -
