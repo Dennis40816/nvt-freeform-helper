@@ -2,7 +2,7 @@
 
 ## 任務使命與依據
 
-本規則適用於本庫所有重構與 UI 變更。FreeformHelper 是單一 context repository；探索程式碼前，依 `docs/agents/domain.md` 讀取依賴圖、適用的 reference contract 與目前的 1.3.x roadmap。任務開始時必須先查 `docs/generated/project-dependency-graph.md`；缺失或過期時以 `scripts/build/generate-dependency-graph.ps1` 重建，再做深入檔案搜尋。
+本規則適用於本庫所有重構與 UI 變更。FreeformHelper 是單一 context repository；探索程式碼前，依 `docs/agents/domain.md` 讀取依賴圖、適用的 reference contract 與目前的 1.0.x roadmap。任務開始時必須先查 `docs/generated/project-dependency-graph.md`；缺失或過期時以 `scripts/build/generate-dependency-graph.ps1` 重建，再做深入檔案搜尋。
 
 規格與可執行工作以 GitHub Issues 追蹤；commit 與 PR 必須連結相關 issue，依 `docs/agents/issue-tracker.md` 辦理。生命週期標籤使用 `needs-triage`、`needs-info`、`ready-for-agent`、`ready-for-human`、`wontfix`，詳見 `docs/agents/triage-labels.md`。
 
@@ -23,7 +23,7 @@
 - 每次 UI build、test 或 lint 循環前，先執行一次 `./scripts/dev/prepare-ui-workspace.ps1`。它會停止過期的 `FreeformHelper.UI`、spinner 與 dotnet UI 行程，並將修改的文字檔正規化為 CRLF；不要反覆用臨時 PowerShell 命令執行同樣的工作區整理。1.2 UI 階段曾因行程鎖定失去至少兩輪 build/test，且多次耗費時間修復行尾。
 - 腳本修改或批次重寫後、build/lint 前，執行 `./scripts/dev/prepare-ui-workspace.ps1 -SkipStopApp`，將觸及的文字檔恢復為 CRLF，不依賴之後的格式化補救。所有 tracked 文字檔均須遵守 `.editorconfig` 與 `.gitattributes` 的 CRLF 規範。
 - 若工具回報檔案被 `FreeformHelper.UI` 鎖定，執行一次 `./scripts/dev/prepare-ui-workspace.ps1 -SkipNormalizeLineEndings` 後再重試；不要直接重跑同一 build/test 命令。
-- 每次 commit 前執行 `./scripts/tests/lint.ps1 -UseNoAppHost`；合併至 trunk（`1.3.x`）或 `main` 前執行 `./scripts/tests/lint.ps1 -AllFiles -UseNoAppHost`（原規則稱合併至 `master` 前）。
+- 每次 commit 前執行 `./scripts/tests/lint.ps1 -UseNoAppHost`；合併至 trunk（`1.0.x`）或 `main` 前執行 `./scripts/tests/lint.ps1 -AllFiles -UseNoAppHost`（原規則稱合併至 `master` 前）。
 - Repo verifier 的 structure、build、test 與 all lanes 由 `./scripts/verify.ps1` 執行；選擇與實際工作相符的 lane，詳見 `CONTRIBUTING.md`。
 - `example/` 是私有 git submodule。新 clone 或 worktree 須在任何 gate 前執行 `git submodule update --init example`。缺少它時，example-data 測試可能略過，`run-refactor-gate.ps1` 會失敗；不得將其內容帶入本 repo、PR、issue 或 log。切換到 submodule 設立前的分支，先執行 `git submodule deinit -f example`。
 
@@ -56,11 +56,11 @@
 ## 風險與驗證關卡
 
 - Runtime-only style 風險在 commit 前必須有 guard test；tooltip style 變更同時需要 `UiLayoutGuardTests` 的 static style guard 與 headless tooltip-open smoke test。
-- 資料路徑、golden 與 1.3.x gate 的細節依 `docs/reference/refactor-contract-1.3.x.md`。
+- 資料路徑、golden 與 1.0.x gate 的細節依 `docs/reference/refactor-contract.md`。
 
 ## 分支與審查邊界
 
-- The default branch is `1.3.x` (trunk). `main` currently equals the initial import commit and will hold released versions only. Work uses `feature/<version>/<topic>` branches targeting `1.3.x`.
+- The default branch is `1.0.x` (trunk). `main` currently equals the initial import commit and will hold released versions only. Work uses `feature/<version>/<topic>` branches targeting `1.0.x`.
 - Changes to `AGENTS.md` or `CONTRIBUTING.md` require owner confirmation in chat before editing. The owner said on 2026-10-04: 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). A GitHub review is not required for this confirmation; the owner-approval rules for high-risk PRs in `CONTRIBUTING.md`, including `src/**`, `scripts/**`, and `.github/**`, continue to apply.
 
 - Commit 範圍須小而明確，每個 commit 含 title 與 body；不把無關修正放在同一 commit，優先逐一提交。

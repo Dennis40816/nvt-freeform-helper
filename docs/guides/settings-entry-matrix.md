@@ -1,7 +1,7 @@
 # Settings Entry Matrix (M11 Phase 1~3)
 Last updated: 2026-08-08
 
-Current documentation baseline: FreeformHelper 1.3.0 current-state audit, production evidence commit `ef08945`. This document deliberately separates "editors that currently exist" from the "1.3.x normal-flow contract" to avoid mistaking the full persistence schema for a list of normal-flow UI fields.
+Current documentation baseline: FreeformHelper g1 current-state audit, production evidence commit `ef08945`. This document deliberately separates "editors that currently exist" from the "1.0.x normal-flow contract" to avoid mistaking the full persistence schema for a list of normal-flow UI fields.
 
 ## S11.18 stale-check (2026-03-10)
 1. The `DXF edits > Hidden / Combined / Moved` summary badge on the left specifically opens `DxfEditChangeListWindow`, a modal view entry point for DXF edit project state, not a settings fork.
@@ -58,7 +58,7 @@ Current documentation baseline: FreeformHelper 1.3.0 current-state audit, produc
 1. After `Load Project`, app-level general settings enter deferred mode without immediately overwriting user app settings.
 2. App-level general settings flush only after the next successful `Save Project`.
 3. `Ctrl+S` triggers `SaveProjectAsync()` and displays the result in a top toast in `MainWindow`.
-4. The current M11 state still places most fields in `SettingsWindow`; the 1.3.x normative target keeps only normal operator decisions, excluding advanced/diagnostic and internal/compatibility fields from the numbered flow while preserving lossless project roundtrip.
+4. The current M11 state still places most fields in `SettingsWindow`; the 1.0.x normative target keeps only normal operator decisions, excluding advanced/diagnostic and internal/compatibility fields from the numbered flow while preserving lossless project roundtrip.
 5. The validation workflow is consistently named Step6 (`Step 6 - Validation Quick Trace`), replacing the old Step5 wording.
 
 ## Single Source (current state)
@@ -67,7 +67,7 @@ Current documentation baseline: FreeformHelper 1.3.0 current-state audit, produc
 3. `RightWorkflowPanel` deep-link path: `OpenSettingsRequested` -> `FreeformHelperView.OpenSettingsWindowCore(section)` -> `SettingsWindow.NavigateToSection(section)`.
 4. `Display popup` path: `src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml` binds directly to VM properties.
 
-## 1.3.x normal-flow classification (normative)
+## 1.0.x normal-flow classification (normative)
 
 | Classification | Allowed in numbered flow | Examples | Persistence rules |
 | --- | --- | --- | --- |
@@ -75,7 +75,7 @@ Current documentation baseline: FreeformHelper 1.3.0 current-state audit, produc
 | Advanced/diagnostic | No; only in unnumbered Diagnostics/dedicated workspaces | Coordinate calibration, Step4 mapping analyze/report, trace/score tuning | Editable or read-only as determined by the diagnostic surface; schema/default/consumer retained |
 | Internal/compatibility | No editor | legacy aliases, internal limits, retired matching fields | Lossless or explicitly defined canonicalized roundtrip; hiding UI does not delete fields |
 
-Firm decision: `CoordinatePixelWidth/Height`, `MappingWeight*`, and candidate/confidence/ambiguous thresholds are all outside the normal operator flow. The 1.3.0 production UI has not completed all moves; the table below accurately lists legacy editors as the "current state". R13.305 only removes/separates entry points, without changing defaults, consumers, or the persistence schema.
+Firm decision: `CoordinatePixelWidth/Height`, `MappingWeight*`, and candidate/confidence/ambiguous thresholds are all outside the normal operator flow. The g1 production UI has not completed all moves; the table below accurately lists legacy editors as the "current state". R13.305 only removes/separates entry points, without changing defaults, consumers, or the persistence schema.
 
 ## Settings entry matrix (current-state inventory)
 | Settings group | Main properties (single source) | Display popup | SettingsWindow | Right panel / diagnostic workspace | Notes |
@@ -108,7 +108,7 @@ Firm decision: `CoordinatePixelWidth/Height`, `MappingWeight*`, and candidate/co
 
 ## Current flow and target flow
 
-- The 1.3.0 current UI still presents `Step1 -> Step2 -> Step3 -> Step4 -> Step5`, and Step6 validation also appears in a numbered settings tab; this is registered presentation debt, not an indication that Step4/6 is an export prerequisite.
+- The g1 current UI still presents `Step1 -> Step2 -> Step3 -> Step4 -> Step5`, and Step6 validation also appears in a numbered settings tab; this is registered presentation debt, not an indication that Step4/6 is an export prerequisite.
 - The R13.305 target is `Step1 -> Step2 -> Step3 -> Step5`; Step4 mapping diagnostics and Step6 validation move to unnumbered Diagnostics/Inspector, where they can still be run manually and reports can be read.
 - Before moving entry points, R13.301/R13.302 must establish draft apply, dirty-field handling, and typed invalidation to avoid changing settings side effects while hiding editors.
 

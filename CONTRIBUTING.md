@@ -4,14 +4,14 @@
 
 ## 分支模型
 
-- The default branch is `1.3.x` (trunk). `main` currently equals the initial import commit and will hold released versions only.
-- Work uses `feature/<version>/<topic>` branches, such as `feature/1.3.x/<topic>`, targeting `1.3.x`.
-- 1.3.x 的版本順序、目標版本與狀態以 `ROADMAP.md` 為準；slice 規格、gate 與退出條件以 `docs/reference/refactor-contract-1.3.x.md` 為準。發佈 workflow 尚屬 `S15.005e`，不得把範本的發佈程序視為本庫已實作的 gate。
+- The default branch is `1.0.x` (trunk). `main` currently equals the initial import commit and will hold released versions only.
+- Work uses `feature/<version>/<topic>` branches, such as `feature/1.0.x/<topic>`, targeting `1.0.x`.
+- 1.0.x 的版本順序、目標版本與狀態以 `ROADMAP.md` 為準；slice 規格、gate 與退出條件以 `docs/reference/refactor-contract.md` 為準。發佈 workflow 尚屬 `S15.005e`，不得把範本的發佈程序視為本庫已實作的 gate。
 
 ## 變更、commit 與 PR
 
 1. 從 `ROADMAP.md` 或現有 issue 確定一個可驗收的範圍；功能或範圍變更時立即同步 `ROADMAP.md`。先依 `AGENTS.md` 讀取依賴圖及適用契約。
-2. 一次完成一個邏輯 slice；程式與 UI 變更依 `docs/guides/refactor-playbook.md` 與 1.3.x roadmap 的 gate 驗證。
+2. 一次完成一個邏輯 slice；程式與 UI 變更依 `docs/guides/refactor-playbook.md` 與 1.0.x roadmap 的 gate 驗證。
 3. 每個 commit 保持單一邏輯範圍，使用 title 與說明原因、結果及驗證的 body。依 `docs/agents/issue-tracker.md` 使用 `Refs #N`；`S15.*` 的既有例外使用獨立一行 `Refs: ROADMAP.md S15.xxx`，直到可建立對應 issue。
 4. PR 說明列出關聯 issue／TODO ID、行為或契約影響、實際驗證命令與結果及必要的 golden 證據。
 
@@ -26,7 +26,7 @@
 | `./scripts/verify.ps1 -CiLane test -Shard core` | Core test shard；`ui`、`viewmodel`、`snapshots` 可取代 `core`。 |
 | `./scripts/verify.ps1 -All` | Structure、build 與所有 test shards。 |
 
-每個工作里程碑仍依 `AGENTS.md` 執行 UI build；每次 commit 前跑 `./scripts/tests/lint.ps1 -UseNoAppHost`，合併至 trunk（`1.3.x`）或 `main` 前跑 `./scripts/tests/lint.ps1 -AllFiles -UseNoAppHost`（原規則稱合併至 `master` 前）。1.3.x 的 G0～G6 與 targeted suites 見 `docs/reference/refactor-contract-1.3.x.md`。現行 CI 的 required checks 是 `policy / structure` 與 `dotnet / build-test`；`viewmodel` shard 依 `ROADMAP.md S15.002` 的暫時決定報告但不阻擋合併，關閉該項後恢復必過。
+每個工作里程碑仍依 `AGENTS.md` 執行 UI build；每次 commit 前跑 `./scripts/tests/lint.ps1 -UseNoAppHost`，合併至 trunk（`1.0.x`）或 `main` 前跑 `./scripts/tests/lint.ps1 -AllFiles -UseNoAppHost`（原規則稱合併至 `master` 前）。1.0.x 的 G0～G6 與 targeted suites 見 `docs/reference/refactor-contract.md`。現行 CI 的 required checks 是 `policy / structure` 與 `dotnet / build-test`；`viewmodel` shard 依 `ROADMAP.md S15.002` 的暫時決定報告但不阻擋合併，關閉該項後恢復必過。
 
 `example/` 是私有 git submodule。新 clone 或 worktree 須在任何 gate 前執行 `git submodule update --init example`。缺少它時，example-data 測試可能略過，`run-refactor-gate.ps1` 會失敗；不得將其內容帶入本 repo、PR、issue 或 log。切換到 submodule 設立前的分支，先執行 `git submodule deinit -f example`。
 

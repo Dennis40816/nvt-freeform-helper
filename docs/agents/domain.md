@@ -7,7 +7,7 @@ FreeformHelper 採 single-context repository layout；`src/` 內的 Domain、App
 依序讀取：
 
 1. `docs/generated/project-dependency-graph.md`
-2. `ROADMAP.md` 與 `docs/reference/refactor-contract-1.3.x.md`
+2. `ROADMAP.md` 與 `docs/reference/refactor-contract.md`
 3. 任務直接相關的 `docs/reference/` contract
 4. 涉及 workflow／UI 時再讀 `docs/guides/refactor-playbook.md`
 
