@@ -50,10 +50,10 @@
    - Step5 flow、bucket、continuation 與 export path 的唯一 deep-dive。
 5. `docs/diagrams/notch-simulation/zh-TW/README.md`
    - Notch table 計算與 Simulation 驗證的中文 Mermaid 圖庫入口。
-6. `TODO.md`
-   - 目前待辦、優先順序、里程碑追蹤。
-7. `docs/guides/refactor-roadmap-1.3.x.md`
-   - 1.3.0～1.3.5 重構 release train、Firmware Q7 契約、golden/runtime gate 與逐 slice 完成條件。
+6. `ROADMAP.md`
+   - 唯一的進度表：修正線、產品功能、整合 Core 三條線，每項附目標版本、狀態與 PR 連結。
+7. `docs/reference/refactor-contract-1.3.x.md`
+   - 1.3.x 重構契約：zero-diff 政策、Firmware Q7 契約、gate G0～G6、golden 更新規則與未完成 slice 的規格。
 8. `docs/guides/post-1.0-tool-workbench-redesign-plan-2026-04-30.md`
    - 1.0 後 Tool Workbench 重做規格：Simulation 完整性與 Coordinate artifact 產生工具。
 9. `docs/guides/refactor-playbook.md`

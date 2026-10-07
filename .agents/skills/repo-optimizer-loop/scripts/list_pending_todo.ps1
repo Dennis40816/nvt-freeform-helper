@@ -1,5 +1,5 @@
 param(
-    [string]$TodoPath = "TODO.md",
+    [string]$TodoPath = "ROADMAP.md",
     [switch]$AsJson
 )
 
@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 if (-not (Test-Path $TodoPath)) {
-    throw "TODO file not found: $TodoPath"
+    throw "Roadmap file not found: $TodoPath"
 }
 
 $lines = Get-Content $TodoPath
@@ -44,11 +44,11 @@ if ($AsJson) {
 }
 
 if ($pending.Count -eq 0) {
-    Write-Output "No unchecked TODO items found."
+    Write-Output "No unchecked roadmap items found."
     exit 0
 }
 
-Write-Output "Pending TODO items: $($pending.Count)"
+Write-Output "Pending roadmap items: $($pending.Count)"
 foreach ($item in $pending) {
-    Write-Output ("{0}. [{1}] {2} (TODO.md:{3})" -f $item.Index, $item.Section, $item.Title, $item.Line)
+    Write-Output ("{0}. [{1}] {2} (ROADMAP.md:{3})" -f $item.Index, $item.Section, $item.Title, $item.Line)
 }

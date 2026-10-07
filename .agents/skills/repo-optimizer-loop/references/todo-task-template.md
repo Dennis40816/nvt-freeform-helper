@@ -1,15 +1,15 @@
-# TODO Task Template
+# Roadmap Task Template
 
-Use this template for each unchecked task:
+Use this template for each unchecked task in `ROADMAP.md`. Put it under the line it belongs to: fix line, product features, or Core integration.
 
 ```markdown
-- [ ] **<ID> <Title>**
-  - 目標：<single outcome>
-  - 範圍：`<file/path/a>`、`<file/path/b>`
-  - 驗證：
+- [ ] **<ID> <Title>** · Target: <version> · Status: <Not started | In progress | Blocked: reason | Waiting for owner> · PR: <link or ->
+  - Goal: <single outcome>
+  - Scope: `<file/path/a>`, `<file/path/b>`
+  - Verification:
     - `<build/test command 1>`
     - `<build/test command 2>`
-  - 完成定義：<observable condition>
+  - Done when: <observable condition>
 ```
 
 ## Splitting rule

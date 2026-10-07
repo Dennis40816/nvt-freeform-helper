@@ -1,14 +1,13 @@
-# FreeformHelper 1.3.x 重構總路線圖
+# FreeformHelper 1.3.x refactor contract
 
-- 建立日期：2026-07-20
-- 規劃基準：`codex/code-size-cutdown`，commit `165f076`
-- Code-size signed reference：R13.002 完成 commit `3032121`；詳見 `docs/performance/code-size-baseline-1.3.0.md`
-- 適用版本：`1.3.0`～`1.3.5`
-- 執行入口：`TODO.md` 的 `R13.*` work items
-- 性質：1.3.x 重構執行順序、風險與驗收 gate；Notch 演算法真實規格仍以 `docs/reference/notch-system-reference.md` 為準
-- Reviewer 來源：`master-refactor-roadmap-2026-07-20.md`，SHA-256 `52e28dd079a90e90d9404218f9daa5e4bd64faf6875b461b4a3d6bb75e7970ba`
-- 追溯狀態：41/41 個統合建議、實際 12/12 個分類爭議、6/6 個排序判斷均有唯一處置；詳見第 11.1～11.3 節
-- GitHub parent spec：[#1](https://github.com/Dennis40816/FreeformHelper/issues/1)
+- Scope: `1.3.0`～`1.3.5`.
+- This document keeps the rules that every 1.3.x refactor slice must follow: the zero-difference policy, the Firmware C and Q7 contract, the gates G0～G6, the golden update rules, the targeted suites, and the specs of the open slices.
+- Status, target versions and order live in `ROADMAP.md`. This document does not track progress.
+- It was split out of `docs/guides/refactor-roadmap-1.3.x.md` on 2026-10-07. The finished 1.3.0 slice specs, the 2026-07-20 gate-gap history (old 1.2), the release-train table (old 4) and the reviewer traceability tables (old 11.1～11.3) were removed; git history keeps them.
+- The Notch algorithm specification remains `docs/reference/notch-system-reference.md`.
+- Planning base: `codex/code-size-cutdown`, commit `165f076`. Code-size signed reference: R13.002 commit `3032121`; see `docs/performance/code-size-baseline-1.3.0.md`.
+- GitHub parent spec: [#27](https://github.com/Dennis40816/nvt-freeform-helper/issues/27).
+
 
 ---
 
@@ -64,25 +63,6 @@ R13.002 在 2026-07-28 進一步證明，這個數字只能代表原有 test sea
 - production V22 為 548 nodes / 84,023 bytes / `5208068BBD8D82FC0A628693EF6035B31288EC674A25724C0C962CD58757BB47`。
 
 2026-08-08 人員已確認 `example/BOE36.35/project_3635.json` 與 project 保存的 production layer/filter state 是 Lucid 3635 authoritative input，並同意以上述兩個 production hashes 做一次性 provenance correction。這是 refactor 前的 baseline 修復，不是後續更新 golden 的授權。
-
-### 1.2 規劃基準的 gate 缺口（R13.001 已於 2026-07-20 關閉）
-
-R13.001 實作前，`scripts/tests/run-refactor-gate.ps1` 只會執行 `application`、`ui-core`、`smoke`，且 `scripts/tests/run-tests.ps1` 的分類清單未完整包含：
-
-- `NotchExampleCExportDriftTests`
-- `NotchGoldenBaselineTests`
-- `Tm81NotchAcceptanceMatrixTests`
-- `NotchApplySimulationServiceTests`
-- `NotchApplySimulationReviewUseCaseTests`
-- `NotchV22TargetAllocationServiceTests`
-- `NotchV22ResolvedResultServiceTests`
-- `NotchV22FinalOutlineServiceTests`
-- `NotchDiffIdentityPipelineTests`
-- `NotchCadOutputFwDiffProjectionServiceTests`
-- `NotchSettingsTests`
-- `RuntimeQueryUseCaseTests`
-
-其中 `NotchTableGeneratorTests`、`NotchTableExporterTests`、`NotchV22CompensationServiceTests` 原已在 application group。R13.001 已新增明確的 `notch-core` 與 `notch-golden` group：前者重現 103-case 核心集合，後者由預設 refactor gate 執行，避免再靠人工維護長 filter。完成狀態與驗證數字以 `TODO.md` 為準。
 
 ### 1.3 R13.002 cross-path 調查結果
 
@@ -169,27 +149,9 @@ V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容�
 
 ---
 
-## 4. Release train 與依賴
+---
 
-```mermaid
-flowchart LR
-    A[1.3.0<br/>可信 gate 與數值契約] --> B[1.3.1<br/>Notch single-result pipeline]
-    B --> C[1.3.2<br/>Matching / Domain state]
-    C --> D[1.3.3<br/>Settings / Presentation orchestration]
-    D --> E[1.3.4<br/>Workspace ViewModel 拆解]
-    E --> F[1.3.5<br/>UI 結構與 token 收斂]
-```
-
-| 版本 | 主要成果 | 輸出政策 | 退出條件 |
-|---|---|---|---|
-| 1.3.0 | 可重現的 core/golden/runtime gate；Q7 契約；code-size baseline；GitHub traceability | 完成一次性 provenance correction 後零差異 | G2/G3/G4 可由單一入口重跑，且每個後續 slice 可追到 issue/commit/PR |
-| 1.3.1 | Notch context/result/export 單一路徑 | 零差異 | UI/export/inspector/runtime 讀同一 model |
-| 1.3.2 | Matching projection 與 domain mutation 收斂 | 零差異 | Preserve distinct matching rules; share only evidence or calculations proven identical |
-| 1.3.3 | Settings draft 與 presentation orchestration 收斂 | Zero data differences; the owner-approved R13.303 opacity fallback of 0.9 changes appearance | Apply/Discard/roundtrip and display projection have dedicated tests; update R13.303 snapshots |
-| 1.3.4 | Root VM 變薄、workspace child VM 可獨立測試 | 零差異 | command/side-effect/IPC contract 不變 |
-| 1.3.5 | no-visual-change UI 結構整理 | 零資料差異、零未宣告視覺差異 | DevView/UI guards/rendered dry-run 全綠 |
-
-### 4.1 各版本加跑的 targeted suites
+## 4. Targeted suites per version
 
 | 版本 | G2/G3 之外的必要測試 |
 |---|---|
@@ -198,111 +160,6 @@ flowchart LR
 | 1.3.3 | 新增的 `SettingsDraftContractTests`、既有 Settings persistence cases、`SimulationWorkspaceUseCaseTests`、`SimulationWorkspaceViewModelTests`、`SimulationColorScaleResolverTests`、`ShellViewModelConsoleTests` |
 | 1.3.4 | `FreeformHelperViewModelTests`、`WorkflowPipelineServiceTests`、`RuntimeQueryIpcTests`、`HeadlessUiSmokeTests` |
 | 1.3.5 | `UiLayoutGuardTests`、`UiRenderedVisualSnapshotTests`、`UiVisualSnapshotTests`、`HeadlessUiSmokeTests`、`CadAreaBucketServiceTests`、`PadCanvasHitTestTests`、`PadCanvasCacheInvalidationTests`、`check-xaml-action-roles.ps1` |
-
----
-
-## 5. 1.3.0 — 可信 gate 與數值契約
-
-### R13.001 建立 Notch gate groups
-
-- 在 `run-tests.ps1` 新增 `notch-core`、`notch-golden`。
-- `run-refactor-gate.ps1` 預設執行 `notch-golden`；任何核心路徑 milestone 執行 `notch-core`。
-- 同步 `tests/README.md`、`scripts/README.md`。
-- 不把 opt-in performance benchmark 放進一般 gate。
-
-完成條件：短命令可重現目前的 `103 passed`，且 golden 三類測試不再漏跑。
-
-### R13.002 Runtime CLI exact export gate
-
-- GitHub：[#3](https://github.com/Dennis40816/FreeformHelper/issues/3)
-
-- 擴充 3635 regression script，產生 `c-v21` 與 `c-v22`。
-- 只把 CRLF/LF/lone CR 統一為 LF，並容許最多一個 optional EOF newline；其他內容 ordinal exact compare checked-in C files。
-- 失敗輸出清楚的 actual path 與第一個 diff，不自動覆蓋 golden。
-- 預設 V21→V22 與 `-ReverseCExportOrder` 的 V22→V21 都必須 exact；`--format` 不得修改 project version/profile state。
-- VM/IPC/export 相關 slice 將此 gate 升為必跑。
-
-完成條件：真實 UI instance 的兩個 C export 都與經簽核、具 production provenance 的 checked-in golden 相同。
-
-### R13.003 統一 V21 Q7 codec
-
-- GitHub：[#5](https://github.com/Dennis40816/FreeformHelper/issues/5)
-
-- payload magnitude 固定為 `UINT8 0..255`，`128=100%`，sign 只由 ADD/SUB type 承載；display percent 為 `0..199%`。
-- 建立單一 V21 codec，統一 AwayFromZero encode、ABI saturation、display decode 與 raw-Q7 integer apply。
-- threshold Q7 另以 `0..128` contract 管理，不與 payload max 合併。
-- Firmware exporter、C# simulation、CadAllocation projection 與 LegacyRegularAnchor compatibility 使用同一 final node contract，但不得改變已簽核的 V21 C bytes。
-- boundary table tests 鎖定 0、1、127、128、129、255 × ADD/SUB；另鎖 self-target、continuation、INT16 baseline、legacy ABI saturation 與兩種 computation mode 的 GCC exact parity。
-- 保留 V22 canonical signed percent，不把 Q7 帶入 V22 Firmware C。
-
-完成條件：C# simulation 與 GCC V21 runtime parity，且 3635 V21/V22 C byte-exact；需要改 C 的 correctness work 已退出本計畫。
-
-### R13.004 死碼與失效設定清理
-
-- GitHub：[#6](https://github.com/Dennis40816/FreeformHelper/issues/6)
-
-- `R13.004d` 已刪除 `TryAssignRowSequence` 與零 caller 的專用 catalog／anchor／private list scaffolding：tracked-repo inventory 確認無 reflection、serializer、XAML 或 script consumer；all-auto-mode public seam 以合法 direct output 對比舊 DP 會產生的 `0/1/2/3` row projection，並完成 G2/G3/G4。公開參數與 result telemetry shape 保留相容。
-- `R13.004b` 已刪除 `BuildScaledStage3Legs`：exhaustive policy test 鎖定全部 compensation enum，CurrentGain public generator seam 另鎖完整 node，G2/G3/G4 證明零差異。
-- `CadAllocation` 的 `AppendLegacyCompatibleRows` 對目前僅有的 V21/V22 enum 皆直接跳過，是每次生成都空跑的 profile traversal；以 public progress seam 鎖定只有四個實際 phase 後刪除，`LegacyRegularAnchor` 相容入口不受影響。
-- `R13.004c-1` 已確認 `PadMatcher` 忽略 `MatchThreshold`，而 PadCanvas 只用它顯示 unmatched diagnostics；direct/draft 修改改為 visual-only refresh，並刪除零 consumer 的 auto-tune command/helper，project/schema/XAML roundtrip 不變。
-- `R13.004c-2` 已移除同樣被忽略的 `Mode`／centroid fallback／`NearestK` live VM plumbing；ProjectSettings 與 UiSnapshot 的 retired values 經獨立 load→save seam 原值保存，新專案歷史預設與 live `MatchThreshold` projection 亦保持不變。production 淨減 `157 physical / 141 nonblank`，G2/G3/G4/G5 皆通過。
-- `R13.004e` 將誤導 canonical ownership 的 internal `V22NotchAlgorithm` 更名為 `V22LegacyRowStrategy`；rename 前已掃描 `nameof`、`GetType().Name`、reflection、serializer discriminator、XAML、script、test 與文件字串 consumer，唯一 test reflection 已改走 public generator seam，不保留 alias。
-- `R13.004f` 稽核後保留 `V22LegacyRowStrategy.Build` 的 CadAllocation compensation branch：一般 production flow 不會進入，但公開 `Generate` 在 mode dispatch 後會同步回報 caller 提供的 `IProgress`，callback 可修改同一份 mutable settings，使 `Build` 重新讀到 CadAllocation。這是 public API 下可觀察的 reachability，不能以「正常流程不用」冒充死碼。Legacy triangle fixture 以 public `Generate` exact 鎖住 9-column geometry row，VM load→save→load 鎖住 `LegacyRegularAnchor + V22-only` persistence；G2/G3/G4 exact。R13.103d-1 其後另行簽核 callback request-freeze 契約，才移除 hybrid branch、comment 與 `allCadPads` 傳遞；本段保留當時 audit 的歷史結論。
-
-完成條件：已達成。已列入本項且可證明的 dead caller／stale setting live owner 均已移除；無法證明不可達的 f branch 有明確保留理由，project load/save 相容。R13.004 累計 production 淨減 `653 physical / 582 nonblank`。
-
-### R13.005 刷新行為與入口文件
-
-- GitHub：[#8](https://github.com/Dennis40816/FreeformHelper/issues/8)
-
-- `behavior-inventory.md` 將舊「7 個建議」校準為 6 partial + 1 unimplemented，並建立 per-CAD resolved與generated table兩個source-of-truth scope、由table派生的simulation review projection，以及 UI/Inspector/PadInfo/Simulation/Validation/RuntimeQuery/export reader matrix；所有 second-pass debt都有 R13.101～104 owner。
-- `runtime-cli-plan.md` 鎖定唯一 production export call chain、transient adapter/side effects，以及 diagnostic normalized compare + raw bytes/SHA/node hard gate兩層規則。
-- `settings-entry-matrix.md` 分開 current editor與 normative normal flow：Coordinate pixel dimensions、Step4 scoring明定 normal-flow=No，但保留 diagnostic/compatibility consumer、project/app-view precedence與 canonicalized roundtrip。
-- `notch-2.2-spec.md` 改為 per-target regular coverage：Conservative source coverage、Current applied Stage3 coverage、per-group rounding/chunking，以及7-field node；CAD-level CombinedRatio不再冒充payload。
-- `notch-system-reference.md` 與 3635 baseline記錄 project/mask/output hashes、lock commit/tree、forward/reverse commands、環境、date、named human approval與approval scope；raw `_cad`歷史 seam只准一次性 correction。
-- Current architecture debt明列為 early threshold/version cache leak、generator另算 resolved result、LegacyRegularAnchor strategy/re-entrant mutable settings dispatch；final-only branching仍由 R13.101～103完成。
-- 最新 profile只支持 end-to-end export：`NotchFirmwareCExporter`保留為structural/measured-path candidate，未證明CPU dominant；3635不呼叫`CoordinatePlannerComputationService`，故移出3635 runtime-hotspot claim、保留R13.206獨立量測。
-- Reviewer trace只對 signed master主張41/41、12/12、6/6；不虛構缺失的44 raw proposals重算證據。
-
-完成狀態：已達成。Canonical docs可從每個entry/reader追到current owner與future owner，current/target/debt不混寫；reviewer verifier實跑 `41/12/6`。Targeted 29、notch-core 119、notch-golden 6 tests pass；R13.005 forward/reverse hidden UI/IPC gate的V21/V22 raw signed hashes、golden、export-state invariant與budget全 PASS；UI build與lint/analyzer 0 warning／0 error。Production source、UI、public contract與checked-in golden均無 diff；GitHub #8與PR evidence在本slice commit後同步。
-
-### R13.006 可量測的 code-size cutdown
-
-- GitHub：baseline [#4](https://github.com/Dennis40816/FreeformHelper/issues/4)，首個獨立 cutdown [#7](https://github.com/Dennis40816/FreeformHelper/issues/7)
-
-- `R13.006a` 已建立可重跑 baseline：signed start `3032121` 為 total `586 / 98,950 / 88,315`、logic-first `381 / 64,709 / 57,370`；相較 #4 建票前 observation，兩個 scope 都是 `+0 files / +4 physical / +4 nonblank`。R13.004 後的 `207e29d` 為 total `589 / 98,617 / 88,021`、logic-first `384 / 64,377 / 57,077`。
-- R13.006a 的 source gate 會鎖 line/path semantics、五個互斥主群組、ViewModels/Services subsets、signed commit/tree 與 delta arithmetic；secondary Release metric 使用兩個 fresh isolated bin/obj roots，四個 primary DLL bytes/SHA-256 必須 exact。
-- 建立 production source LOC、主要 assembly size 與重複／死碼候選的 before/after baseline；不以 minify、generated output 或移除測試製造數字。
-- `R13.004` 只處理 reviewer 已點名的 dead code／失效 settings；`R13.006` 不重複計數這些刪除，而是對剩餘 production code 做獨立、可證明的 cutdown。
-- `R13.006b` 固定以 post-R13.004 commit `207e29d`／`src` tree `c5048b4ecfd0c8a89a8a4719a48afbf11b980f68` 為 before，不能改用 `3032121` 重算 #6 的刪減。
-- 優先刪除已證明不可達的 private path、重複 projection／formatter，以及可直接使用標準函式或既有 shared policy 的自訂包裝。
-- `R13.006b` 已以 simulation heatmap 的重複排序完成 #7：`Simulate` 先建立唯一 row／col ordered `cells` list，`BuildHeatmap` 只做 projection，不再重跑相同 `OrderBy/ThenBy`。亂序 grid 公開 seam 同時鎖 `Cells`／`Heatmap.Cells` 的 row／col 順序。
-- Source 從固定 before `207e29d` 淨減 `0 files / -2 physical / -2 nonblank`：total 為 `589 / 98,615 / 88,019`、Application `95 / 17,473 / 15,515`、logic-first `384 / 64,375 / 57,075`；完成 source tree 為 `b35b9a50cb646be14db5c15cdd5533ab64d73867`。
-- Clean no-PDB Release 兩次 isolated build 均可重現；四個 DLL byte size 合計仍為 `15,315,456`（PE alignment，delta 0），Application DLL hash 更新為 `B7B07B17…62A9B`。Source LOC 是本 cutdown 的 primary reduction evidence。
-- `BuildHeatmap` 只有一個 private caller；被刪 LINQ operations 沒有 reflection／name-string、serialization、XAML、script 或 config seam。Public model、UI、Lucid 3635 V21/V22 C、TM8.1 與匯出 state 保持不變，G0/G2/G3/G4 均通過。
-- `R13.006c` 已由 [#56](https://github.com/Dennis40816/FreeformHelper/issues/56) 刪除只供兩個`TryGetValue` call-site使用的手刻`EmptyOverrideMap`與aliases；with-grid direct assignment及grid-null fallback改為直接optional-map check。Public兩路fixture固定null、real與duplicate overrides的assignment／counter契約；null-guard與duplicate-tracking mutations各自RED。Public API、ordering、auto policy與result shape不變。
-- 完成證據：相對`31c74df` production／logic-first皆為`0 files / -17 physical / -16 nonblank`；兩次fresh isolated deterministic Release完全一致，總DLL `15,332,864 -> 15,332,352 bytes`（`-512`），只有Application由`699,904 / 33FB9E60…FA6170`降為`699,392 / 53541491…5AE784`。Focused 6、Application 214、ui-core 258、smoke 24、golden 6、Runtime Query 18、UI build與lint/analyzer皆通過。Hidden UI／IPC正反順序的signed C、golden、export state與budget不變，selection total／Inspector／preview p95為`35/15/16`與`36/17/19 ms`，evidence SHA-256為`B8B71BB0…3EC0B6`與`C3AF05BB…39452B`；不宣稱效能提升。
-- `R13.006d` 已由 [#58](https://github.com/Dennis40816/FreeformHelper/issues/58) 完成direct grouping窄刪減：`BuildRowGroups`在首次見到row時保存`FirstOrder`並直接持有ordered pads，刪除per-pad `CadRowItem`；row groups只在owner內排序一次，override／auto兩路不再重複`OrderBy`。Public 2×2 reverse-row／reverse-ID fixture鎖first-seen row、within-row pad、duplicate winner、fallback assignments與counters；numeric-row及CAD-ID sorting mutations均RED。
-- 完成證據：相對`594917f` production／logic-first皆為`0 files / -3 physical / -2 nonblank`；兩次fresh isolated deterministic Release完全一致，總DLL `15,332,352 -> 15,329,792 bytes`（`-2,560`），只有Application由`699,392 / 53541491…5AE784`降為`696,832 / 06F8CF03…C0A4E`。Focused 7、Application 215、ui-core 258、smoke 24、golden 6、Runtime Query 18、UI build與lint/analyzer皆通過。Hidden UI／IPC正反順序的signed C、golden、export state與budget不變，selection total／Inspector／preview p95為`29/15/16`與`33/16/18 ms`，evidence SHA-256為`B2F01E68…582EDA`與`C9DAA555…CF9CF`；不宣稱效能提升，所有R13.101+ parent仍保持open。
-- 每個刪除項先列 caller／reflection／serialization／XAML binding inventory；無法證明安全時保留並記錄原因。
-- 不為縮短檔案新增泛化 abstraction、dependency、warning suppression 或難以閱讀的壓縮寫法。
-- production behavior、公開契約、UI 與未簽核 golden 保持不變；每個 slice 依風險執行 G2/G3/G4。
-
-完成條件：before/after evidence 可重跑，production code size 有實際淨減少，且所有刪除均有 gate 證據。
-
-### R13.007 GitHub spec-to-tickets traceability
-
-- GitHub：parent spec [#1](https://github.com/Dennis40816/FreeformHelper/issues/1)，tracker [#2](https://github.com/Dennis40816/FreeformHelper/issues/2)
-
-- 本項是 cross-cutting governance，不改 production behavior，可在 R13.002 收斂前先完成 setup 與 ticket publication。
-- Pocock engineering skills已由 `655284c`加入，並由`9c79c15`同步至upstream post-v1.2.3 snapshot／commit `84fdeffd12f2ee307994d1eb6feb48173b6e0502`（較v1.2.3 tag commit超前2筆）；`docs/agents/skill-sources.md`記錄MIT license與update review。
-- `to-spec`產生的parent [#1](https://github.com/Dennis40816/FreeformHelper/issues/1)具problem/solution/testing/out-of-scope決策與`ready-for-agent` lifecycle。
-- `to-tickets`產生的1.3.0 frontier為#2～#8；各票具parent、scope/out-of-scope、acceptance、test plan與blocker，並已掛為#1 native sub-issues。
-- Native blocked-by graph已建立：#5←#3、#6←#3、#7←#3/#4/#6、#8←#2/#3/#5/#6/#7；issue body文字仍保留供reviewer直接閱讀。
-- `docs/agents/triage-labels.md`固定`needs-triage`、`needs-info`、`ready-for-agent`、`ready-for-human`、`wontfix`五個互斥lifecycle角色，live repository labels已核對存在。
-- 每個實作 commit 與 PR 回鏈對應 issue；被 reviewer 建議但不導入的項目保留明確理由。
-
-完成狀態：已達成。Repo設定文件、pinned skill provenance、labels、parent spec、approved child tickets、native dependency graph與draft PR #9均可由GitHub追溯，且R13.007沒有`src`diff。除明列的歷史例外外，`3032121`及其後各完成slice使用正規`Refs #N`；`6817c6d`／`c230309`把換行誤寫為literal `\n`，`655284c`則早於tickets建立，三者保留為bootstrap/history例外，由PR與roadmap補足連結，不改寫已推送history。PR #9的base為`1.2`而非repository default branch；`Closes #N`仍作completion intent，但merge後須由default-branch integration PR或人工依dependency順序驗證關票，不能假設GitHub已自動close。
 
 ---
 
@@ -430,7 +287,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 ### R13.201 定義 matching bounded contexts
 
-- Execution status and delivery evidence: [TODO.md R13.201](../../TODO.md).
+- Execution status and delivery evidence: the R13.201 entries of the former `TODO.md` (git history).
 
 保留三種不同契約：
 
@@ -444,13 +301,13 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 ### R13.202 Preserve distinct best-match rules
 
 - Owner decision (2026-10-05): keep the status quo. `CadBestMatchSeedService` and PadCanvas hover retain their own rules; share only parts proven identical, with no user-visible change. R13.202 may close as status quo or a reduced scope.
-- The 3635 measurement covers 4,838 CADs: 582 touch two or more regulars, the two rules select different regulars for 6 CADs, and there are 0 exact ties. The owner selected 「維持現狀 (Recommended)」 ("Keep the status quo (Recommended)") on 2026-10-05: when scores are exactly equal, add no ID tie-break to PadMatcher sorting or R13.202 selection. Preserve current behavior; any later change is a separate behavior-change item. The ID tie-break question is resolved. See [INV2, section 2](../reviews/r13-slice-inventories-2026-10.md) for the rule inventory and [TODO.md R13.202](../../TODO.md) for execution status and characterization PRs.
+- The 3635 measurement covers 4,838 CADs: 582 touch two or more regulars, the two rules select different regulars for 6 CADs, and there are 0 exact ties. The owner selected 「維持現狀 (Recommended)」 ("Keep the status quo (Recommended)") on 2026-10-05: when scores are exactly equal, add no ID tie-break to PadMatcher sorting or R13.202 selection. Preserve current behavior; any later change is a separate behavior-change item. The ID tie-break question is resolved. See [INV2, section 2](../reviews/r13-slice-inventories-2026-10.md) for the rule inventory and the R13.202 entries of the former `TODO.md` (git history) for execution status and characterization PRs.
 - DXF audit 可共享 overlap evidence，但保留自己的 score、one-to-one allocation 與 override policy。
 - `SelectCadAllocationAnchor` 與 `GetFreeformType` 先以相同輸入建立 parity/差異案例；前者是 allocation anchor、後者是 classification，不能只因都挑最高分就直接合併。若證明共用同一 ordering/evidence，抽出共享 anchor projection，兩個 consumer 仍各自決定結果語意。
 
 ### R13.203 Typed ID 漸進導入
 
-- The typed-ID boundary work and review are tracked by [TODO.md R13.203](../../TODO.md); R13.201 is its API dependency.
+- The typed-ID boundary work and review are tracked by the R13.203 entries of the former `TODO.md` (git history); R13.201 is its API dependency.
 
 - 依 boundary 分批導入 `CadPadId`、`RegularPadId`、`IcIndex`、`DiffIndex`。
 - 每次只轉換一條 API chain，保留 adapter，不做全 repo 一次改寫。
@@ -458,7 +315,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 ### R13.204 RegularPad 狀態轉移 API
 
-- Matched-pair assignment and the broader writer-transition scope are tracked separately by [TODO.md R13.204](../../TODO.md).
+- Matched-pair assignment and the broader writer-transition scope are tracked separately by the R13.204 entries of the former `TODO.md` (git history).
 
 - 盤點 `IcIndex`、`DiffIndex`、`MatchedCadPadId`、`MatchScore`、`Freeform` 的 writer。
 - 以明確 assign/replace/apply API 集中不變量與 invalidation。
@@ -466,7 +323,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 ### R13.205 DxfRegularMaskAudit 顯式 pipeline
 
-- Audit-phase characterization and the production pipeline scope below are tracked separately by [TODO.md R13.205](../../TODO.md).
+- Audit-phase characterization and the production pipeline scope below are tracked separately by the R13.205 entries of the former `TODO.md` (git history).
 
 - 把 segment offset、local repair、passive compensation 的先後依賴改成顯式 context/step result。
 - 保留原本不同 decision source 與 reason code。
@@ -474,7 +331,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 ### R13.206 CoordinatePlanner transform builder
 
-- Transform delivery evidence and execution status: [TODO.md R13.206](../../TODO.md).
+- Transform delivery evidence and execution status: the R13.206 entries of the former `TODO.md` (git history).
 
 - 將 point/line/rectangle 重複的 machine、normalized、pixel、world、safe coordinate projection 收斂為單一參數化 transform/builder。
 - builder 只統一座標換算，不混入 guide、BIST、custom array/path 的 feature policy。
@@ -482,7 +339,7 @@ Exit criteria: close normal A1/A2 with the single-owner result and final-project
 
 完成條件：所有 planner artifact 使用同一轉換契約；既有 key、排序、raw/safe 座標與輸出 snapshot 零差異。
 
-Exit criteria: preserve the distinct CadBest and hover rules and all user-visible results; share only evidence or calculations proven identical. Consult [TODO.md R13.201–R13.206](../../TODO.md) for execution status. The 1.3.2 exit remains the owner's decision.
+Exit criteria: preserve the distinct CadBest and hover rules and all user-visible results; share only evidence or calculations proven identical. Consult the R13.201–R13.206 entries of the former `TODO.md` (git history) for execution status. The 1.3.2 exit remains the owner's decision.
 
 ---
 
@@ -632,113 +489,12 @@ Exit criteria: preserve the distinct CadBest and hover rules and all user-visibl
 | Settings draft 只靠 golden 驗證 | 不接受；R13.301 加專屬 Apply/Discard/roundtrip tests |
 | 一次性拆完整 root ViewModel | 不接受；R13.401～R13.405 逐 workspace 遷移 |
 
-### 11.1 Reviewer 41 項建議追溯矩陣
-
-狀態定義：`採納`＝按原意執行；`已完成`＝已採納且已有 slice evidence（納入 30 項採納總數）；`改寫`＝保留問題但修正不合理解法/邊界；`已關閉`＝目前已有可重現證據，不再建立工作；`不執行`＝已證明前提不成立。合計為 30 項採納、8 項改寫、2 項已關閉、1 項不執行。
-
-R13.005 只對 signed master SHA-256 `52e28dd079a90e90d9404218f9daa5e4bd64faf6875b461b4a3d6bb75e7970ba` 主張完整追溯；缺失的 upstream 44 raw proposals 沒有被虛構為可獨立重算。以下 verifier 在 2026-08-08 回傳 `41 / 12 / 6`：
-
-```powershell
-$text = Get-Content -Raw docs/guides/refactor-roadmap-1.3.x.md
-$reviewerCount = [regex]::Matches($text, '(?m)^\| S[0-3]-\d{2} \|').Count
-$section = [regex]::Match(
-    $text,
-    '(?s)### 11\.2 Reviewer 分類爭議與排序判斷(?<body>.*?)### 11\.3').Groups['body'].Value
-$disputeCount = [regex]::Matches($section, '(?m)^\| (?!分類爭議|---).+ \|\r?$').Count
-$orderingCount = [regex]::Matches($section, '(?m)^[1-6]\. ').Count
-$actual = "$reviewerCount/$disputeCount/$orderingCount"
-if ($actual -ne '41/12/6') { throw "Reviewer trace drift: $actual" }
-$actual
-```
-
-| Reviewer ID | 建議摘要 | 處置 | 唯一 owner / 理由 |
-|---|---|---|---|
-| S0-01 | Q7 magnitude／type-sign／clamp 收斂 | 採納（零 C 差異） | R13.003；統一 contract，但需要改 C 的 correctness work 退出 1.3.x refactor |
-| S0-02 | 刪 `TryAssignRowSequence` | 已完成 | R13.004d；caller／reflection／serializer／XAML inventory + all-auto-mode direct-output seam，production 淨減 245 physical / 218 nonblank，G2/G3/G4 exact |
-| S0-03 | 刪 `BuildScaledStage3Legs` | 已完成 | R13.004b；exhaustive policy + CurrentGain full-node seam，production 淨減 80 physical / 71 nonblank，G2/G3/G4 exact |
-| S0-04 | 移除失效 match settings | 已完成 | R13.004c-1 將 `MatchThreshold` 收斂為 visual-only diagnostics並刪除 dead auto-tune；c-2 移除 Mode/fallback/K live owner，同時保留兩套 schema value 的獨立 roundtrip |
-| S0-05 | `V22NotchAlgorithm` 更名 | 已完成 | R13.004e；完整 consumer inventory 後更名為 `V22LegacyRowStrategy`，測試改鎖 public generator，不保留 internal alias |
-| S0-06 | EMS policy/wording 收斂 | 採納 | R13.104；共享 predicate/result + 單一文字 projector |
-| S0-07 | EMS 硬編碼 guard | 採納 | R13.104；static/runtime guard 均不得出現第二套 cap |
-| S0-08 | 移除 display `>255` 重算 | 採納 | R13.104；display 只格式化 resolved result |
-| S0-09 | 更新 Notch 2.2 per-target 公式 | 已完成 | R13.005；明列 `notch-2.2-spec.md` 的 effective-area、eligibility、per-group rounding/chunking 與 7-field node |
-| S0-10 | 更新 7 個 UseCase 狀態 | 已完成 | R13.005；`behavior-inventory.md` 校準為 6 partial + 1 unimplemented，另列 current side-effect owner |
-| S0-11 | 修 5 個 CRLF 檔 | 已關閉 | 2026-07-20 `git ls-files --eol` 無 `w/lf`/`w/mixed`；後續由 G0/prepare script 持續保護 |
-| S0-12 | 封裝 `BalancedWrapPanel` public list | 不執行 | R13.505 記錄 false positive；命中 private nested `Row.Children`，非 control 對外 mutable state |
-| S0-13 | reference 校準重驗機制 | 已完成 | R13.005；輸入/hash/lock commit+tree/script/命令/環境/輸出/簽核scope完整留存，正反hidden UI/IPC gate重驗 |
-| S0-14 | performance hotspot 文件 | 已完成 | R13.005；最新profile只支持end-to-end export，exporter降級為structural/measured-path candidate，CoordinatePlanner因3635未執行改由R13.206量測 |
-| S0-15 | 共用 4 個 brush caches | 採納 | R13.303；只抽 cache primitive，不混 resource ownership/lifetime |
-| S0-16 | opacity fallback + 禁 magic fallback | 採納（限縮） | R13.303 uses the owner-approved 0.9 fallback in 1.3.3 after the 1.3.2 exit, with updated snapshots; wider scope needs a separate slice |
-| S0-17 | WorkspaceHeader popup token | 採納 | R13.504；取代 code-behind 的 `260`/`200`/`30` layout literals |
-| S0-18 | LoadingSpinner token | 已關閉 | `LoadingSpinnerDesignSize` 已被 style 使用，不重做 |
-| S0-19 | Console raw-field dedup | 採納 | R13.304；結構化 identity，不比較 formatted line |
-| S0-20 | DevView 移出或 dev-only | 改寫 | R13.502；保留正式 source/preview guard。是否隱藏 production navigation 是產品發佈政策，沒有該需求時不以搬檔破壞 UI contract |
-| S1-01 | 顯式 NotchGenerationContext | 採納 | R13.101 |
-| S1-02 | 四套 matching 合成單一 service/model | 改寫 | R13.201/R13.202 preserve distinct CadBest/hover and bounded-context rules; share only parts proven identical, with no user-visible change (owner decision, 2026-10-05) |
-| S1-03 | 合併 anchor 選擇 | 改寫 | R13.202 keeps the status quo or a reduced scope; share `SelectCadAllocationAnchor`/`GetFreeformType` evidence only where proven identical, preserving each consumer's semantics |
-| S1-04 | exporter 業務邏輯搬 Application | 改寫 | R13.103；exporter 已在 Application，實際工作是 projection/result 與 formatter 分離 |
-| S1-05 | DxfRegularMaskAudit 顯式順序 | 採納 | R13.205；獨立 bounded context，不與 Notch context 實作綁成同一 slice |
-| S1-06 | simulation color mapper | 採納 | R13.303；共用數值映射，render/resource ownership 留在各 View |
-| S1-07 | Console dual-mode 收斂 | 採納 | R13.304；共同 use case + 等價 action contract |
-| S2-01 | typed IDs | Adopted | R13.203 introduces IDs incrementally by boundary; see [TODO.md R13.203](../../TODO.md) for execution status |
-| S2-02 | `RegularPad` transition API | 採納 | R13.204；首輪只封裝既有語意，不偷加 lifecycle 拒絕規則 |
-| S2-03 | CoordinatePlanner builder | 採納 | 新增 R13.206；Application snapshot equivalence + G2/G3 |
-| S2-04 | PadCanvas engines 真正注入 | 採納（限縮） | 新增 R13.506；窄 seam/state-result dependency，不引入全域 container |
-| S2-05 | area buckets 搬 Application 評估 | 改寫為明確收斂 | 新增 R13.507；Application `CadAreaBucketService` 已存在，PadCanvas 不再另算同一 membership |
-| S2-06 | freeform hatch 幾何搬移評估 | 改寫為保留 UI | R13.507；目前只有 Avalonia clipping/zoom/drawing consumer，搬 Application 沒有 domain value |
-| S2-07 | AaView auto-scale/color-mode 搬移評估 | 改寫為 presentation policy | R13.303；共用 resolver，但無非視覺 consumer 時不升格 Domain/Application 結果 |
-| S2-08 | `BasedOn`/template 去重 | 採納（加 guard） | R13.501；只合併語意/結構相同者並鎖 selector precedence |
-| S2-09 | `notchExport*` naming 收斂 | 採納 | R13.504；先 grep behavior consumer，banner-first、bulk-second |
-| S2-10 | 清 74 single-use/6 duplicate tokens | 改寫 | R13.504；合併同義/重複 alias，不以使用次數刪有語意或 canvas-tuning token |
-| S2-11 | 共用 card/tile layout skeleton | 採納（條件式） | R13.503；結構、density、spacing owner、interaction 全同才抽取 |
-| S2-12 | NumberScrubber 初始化契約 | 採納 | R13.505；Settings UI regression，若影響 binding/apply 再升 G3 |
-| S3-01 | root VM bounded-context 拆分 | 採納 | R13.401～R13.405；逐 workspace 遷移，G2～G5 |
-| S3-02 | Settings draft 批次 apply/discard | 採納 | R13.301/R13.302；專屬逐欄測試 + G2/G3，不能只靠 golden |
-
-### 11.2 Reviewer 分類爭議與排序判斷
-
-Reviewer 章節標題寫「11 項分類爭議」，但實際表格有 12 列；本 roadmap 以實際 12 列為準，沒有忽略 EMS 那一列。
-
-| 分類爭議 | 1.3.x 決定 |
-|---|---|
-| `BuildScaledStage3Legs` 證明與既有漂移耦合 | 已關閉；R13.004b 以 exhaustive policy + public full-node seam 與 G2/G3/G4 證明不可達且零漂移 |
-| `TryAssignRowSequence` 證據過弱 | 已關閉；R13.004d 以完整 consumer inventory、會區分舊 DP 的 all-auto-mode public output seam 與 G2/G3/G4 證明不可達且零漂移 |
-| match settings 缺精確 consumer 證據 | 已關閉；R13.004c 以 PadMatcher invariance、XAML/RuntimeQuery/reflection inventory、兩套 persistence seam 與 G2/G3/G4/G5 證明分類 |
-| V22 類別更名可能影響 reflection/serialization | 已關閉；R13.004e 確認 production reflection／serialization／XAML／script consumer 為 0，唯一 test type-name reflection 已改為 public generator seam |
-| CoordinatePlanner 屬 Application、可能影響輸出 | 接受質疑；R13.206 保留 snapshot equivalence + G2/G3 |
-| CRLF 五檔路徑不明 | 以目前 repo scan 關閉舊問題；未來若碰 embedded output/template，仍按資料路徑跑 G2/G3 |
-| root VM 理論 UI-only 但 IPC 風險高 | 接受 Gate override；R13.401～405 必跑 G3/G4/G5 |
-| Settings draft 可能靜默改輸入 | 接受 Gate override，但修正「只能信 golden」：逐欄 contract tests 是主證據，G2/G3 是下游保險 |
-| PadCanvas area bucket 搬移後可能有新 consumer | 接受重評條件；R13.507 inventory consumers，且 selection/顯色共用 membership |
-| naming 可能被 code-behind class 判斷消費 | 接受；R13.504 前置 grep `Classes.Contains`/selector consumers |
-| NumberScrubber 可能間接影響設定 | 接受；R13.505 跑 Settings UI regression，binding/apply 有變則加 G3 |
-| EMS 來源項目數對不上 | 不虛構第二個 reviewer ID；單一 normalized item 完整對到 R13.104 的 policy/text/guard 三部分 |
-
-6 個排序判斷的決定如下：
-
-1. Naming banner 與 bulk alias 保留在 R13.504 同一語意 slice，實作順序固定 banner-first、bulk-second，不為快速勝利建立另一套 release gate。
-2. Opacity 漂移與已知 code-behind fallback 留在 R13.303；禁止擴張為全域 fallback registry，若 inventory 超出已知 views 則先新增後續 TODO。
-3. 接受 typed IDs 排在 matching contract 穩定後，避免同一 API chain 轉型兩次。
-4. `DxfRegularMaskAuditService` 保留獨立 R13.205；它與 Notch context 只共享設計模式，不共享 bounded context 或 commit。
-5. 接受重新推導的 1.3.0～1.3.5 release train，不把來源文件的 Stage 編號當依賴本身。
-6. 接受 root VM/Settings draft 的 Gate override；root VM 用 G3/G4/G5，Settings draft 用逐欄 contract tests + G2/G3。
-
-### 11.3 Reviewer 立即行動清單處置
-
-| Reviewer immediate action | 處置 |
-|---|---|
-| 先跑 V21/V22 drift test | R13.001 建立 group；R13.002 再修正 test seam，已重現 production V21/V22 drift |
-| 追查 V22 漂移來源 commit | 已先完成更高價值的 input-path trace：來源是舊 test 使用 raw `_cad`、production 使用 saved layer selections；只有 production contract 判定需要歷史責任時才做 commit archaeology |
-| 判定 regression 或行為變更並 reconcile golden | 已定位為 test/golden provenance；2026-08-08 已簽核 production layer/filter contract，依第 3.1 節做一次性 correction |
-| 三個 golden 類別加入 test group | R13.001 已完成；並擴充為 `notch-core`/`notch-golden`，不只塞進既有 application list |
-| 複核分類/排序 | 本節已完成 12/12 + 6/6 決策 |
-| baseline 綠後才做其他項目 | 採納；release train 固定 R13.001/R13.002 gate-first |
 
 ---
 
 ## 12. 每個 slice 的固定執行模板
 
-1. 讀取本 roadmap、`TODO.md` 與 dependency graph。
+1. 讀取本 contract、`ROADMAP.md` 與 dependency graph。
 2. Inventory：列出 entry、reader、writer、side effects。
 3. 寫或更新 targeted regression test。
 4. 實作單一 `R13.*` slice。
@@ -752,7 +508,7 @@ Reviewer 章節標題寫「11 項分類爭議」，但實際表格有 12 列；�
    ```
 
 6. 依風險加跑 G2/G3/G4/G5。
-7. 更新 TODO 與必要 canonical docs。
+7. 更新 `ROADMAP.md` 與必要 canonical docs。
 8. 一個 slice 一個 commit，commit body 記錄 single entry、single result、side effects、驗證結果。
 9. push 分支後才開始下一個 slice。
 
@@ -768,11 +524,11 @@ Merge 前額外執行：
 
 ## 13. 進度與變更控制
 
-- This roadmap defines version order, scope, and gates. Under the owner's 2026-10-05 decision, 「可以先用各自的，但路徑未來要統一」 ("Each project may use its own table for now, but the path will be unified later"), TODO.md is NFH's single status table until Issues replace it after migration. Roadmap, handoff, and WIP documents reference IDs without restating execution status; the integrator verifies merges and writes the table back once per batch.
+- This contract defines scope and gates. `ROADMAP.md` is NFH's single status table: it holds version order, target versions and status. Handoff and WIP documents reference IDs without restating execution status; the integrator verifies merges and writes `ROADMAP.md` back once per batch.
 - Approval after trunk integration (owner, 2026-10-05): 「可以，但手動解衝突要重批 (Recommended)」 ("Allowed, but manual conflict resolution requires approval again (Recommended)"). After owner approval, a new commit that only merges trunk cleanly needs no new approval if tests pass; any manual conflict resolution requires owner approval again.
 - Integration batches awaiting review have no limit (owner, 2026-10-05: 「不設上限」 ("No limit")).
 - 版本不得跳過前一版本退出條件；可在同版本內調整 slice 順序，但必須記錄依賴理由。
-- 新發現的重構項目先寫入 TODO，再判斷歸屬版本，不直接擴大當前 slice。
+- 新發現的重構項目先寫入 `ROADMAP.md`，再判斷歸屬版本，不直接擴大當前 slice。
 - 若同一 blocking condition 連續出現，先縮小 slice 或補 guard，不以更新 golden、放寬 lint、warning suppression 繞過。
 - 任何計算輸出變更都視為 correctness change，不得夾在純 refactor/UI commit。
 

@@ -46,7 +46,7 @@ $requiredFiles = @(
     "FreeformHelper.sln",
     "LICENSE",
     "README.md",
-    "TODO.md",
+    "ROADMAP.md",
     "VERSION",
     "global.json"
 )

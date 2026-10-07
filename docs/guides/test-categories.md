@@ -22,7 +22,7 @@ This repo now provides a grouped test runner for faster local feedback:
 7. `ui-core`
    - UI behavior tests (canvas, viewmodels, smoke). The union of `ui-stable` and `ui-viewmodel`.
    - `ui-stable`: every `ui-core` class except `FreeformHelperViewModelTests`.
-   - `ui-viewmodel`: `FreeformHelperViewModelTests` only. CI runs it as its own shard, which does not block merging while `TODO.md` S15.002 is open.
+   - `ui-viewmodel`: `FreeformHelperViewModelTests` only. CI runs it as its own shard, which does not block merging while `ROADMAP.md` S15.002 is open.
 8. `ui-snapshots`
    - Snapshot and layout guard tests.
 9. `smoke`
@@ -44,13 +44,13 @@ This repo now provides a grouped test runner for faster local feedback:
 
 ## Headless UI tests
 - Tests marked `[AvaloniaFact]` or `[AvaloniaTheory]` share one headless session, which builds a new application and dispatcher for every test.
-- A window still open when such a test ends breaks the session for the tests after it (`TODO.md` S15.002, root cause five). `HeadlessSessionGuardAttribute` (assembly level, `tests/FreeformHelper.Tests/UI/TestHost`) therefore closes the windows a test left open and runs the queued dispatcher work after every headless test; a window that refuses to close fails that test.
+- A window still open when such a test ends breaks the session for the tests after it (`ROADMAP.md` S15.002, root cause five). `HeadlessSessionGuardAttribute` (assembly level, `tests/FreeformHelper.Tests/UI/TestHost`) therefore closes the windows a test left open and runs the queued dispatcher work after every headless test; a window that refuses to close fails that test.
 - The guard only sees windows that were shown. A test that builds a window and only measures it must call `HeadlessSessionGuardAttribute.CloseAtTestEnd(window)` right after creating it.
 - When the session does break, every later headless test of that run fails at its start with "The headless session still has the synchronization context of an earlier test". Only the first of those failures matters; its message names the headless test that finished just before.
 - Work that throws on a test's dispatcher after the test has ended, or while the session tears the application down, does not fail anything: the guard writes it to the error stream with the prefix `[HeadlessSessionGuard]`. Search the test output for that prefix when looking for work that outlives its test.
 - `HeadlessSessionGuardTests.After_MarksTheTestAsEnded_SoLaterWorkThatThrowsDoesNotEscape` 與 `HeadlessSessionGuardTests.LeftoverWork_ThatThrowsAfterTheTestEnded_DoesNotEscapeTheDispatcher` 會刻意觸發防護；這兩個測試每次都會印出 `[HeadlessSessionGuard]` 前綴。
 - `MainWindow.Close()` is cancelled while the project has no saved path, because the window asks about unsaved work. A test that needs the window closed before it ends must clear the `DataContext` first.
-- A headless test that fails with "Another thread created Dispatcher.UIThread while the headless application was being set up" hit a known race with background work of an earlier test (`TODO.md` S15.002, root cause six). `HeadlessDispatcherSetup` reports it; it is not fixed yet, and a rerun is expected to pass.
+- A headless test that fails with "Another thread created Dispatcher.UIThread while the headless application was being set up" hit a known race with background work of an earlier test (`ROADMAP.md` S15.002, root cause six). `HeadlessDispatcherSetup` reports it; it is not fixed yet, and a rerun is expected to pass.
 
 ## Notes
 - Grouping is class-name based and intended for fast iteration.

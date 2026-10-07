@@ -1,14 +1,14 @@
 # Branch, Version, and Release Governance
 
-Status: Documentation for the 1.3.x branch and existing gates; release automation remains part of `TODO.md S15.005e`.
+Status: Documentation for the 1.3.x branch and existing gates; release automation remains part of `ROADMAP.md S15.005e`.
 
 ## Choose Versions by Product Impact
 
-`docs/guides/refactor-roadmap-1.3.x.md` defines the outcomes, sequence, and exit criteria for 1.3.0～1.3.5, and `TODO.md` tracks progress. Do not skip the exit criteria of the preceding version; correctness work that requires output changes must not be mixed into zero-difference refactor/UI commits. `2.0.0 = 開始共用核心架構` (2.0.0 = start sharing the core architecture) is the owner's provisional goal from 2026-10-02, not yet a finalized version contract.
+`ROADMAP.md` holds the version order, target versions and progress on three lines: fixes, product features and Core integration. `docs/reference/refactor-contract-1.3.x.md` defines the gates and exit criteria for 1.3.0～1.3.5. Do not skip the exit criteria of the preceding version; correctness work that requires output changes must not be mixed into zero-difference refactor/UI commits. NVT Core adoption starts in 1.3.3 (owner decision, 2026-10-05); this replaces the provisional 2026-10-02 goal that 2.0.0 starts the shared core architecture.
 
 ## Maintain a Single Version Identity
 
-For the `VERSION` value and the repository-external test area, see `TODO.md` S15.005a. This repository cannot currently claim that the template mappings among `VERSION`, tag, package, manifest, and Catalog are in effect; the formal policy for version identity and release artifacts must be decided as part of `S15.005e`.
+For the `VERSION` value and the repository-external test area, see `ROADMAP.md` S15.005a. This repository cannot currently claim that the template mappings among `VERSION`, tag, package, manifest, and Catalog are in effect; the formal policy for version identity and release artifacts must be decided as part of `S15.005e`.
 
 ## Branch Authority and Work Direction
 
@@ -26,4 +26,4 @@ This repository's release workflow, rehearsal, recovery steps, and release notes
 
 ## Post-Release PR and Branch Cleanup
 
-This repository has not yet decided the authorization and steps for bulk PR closure, remote branch deletion, and release merge-back; also see `TODO.md S15.005d` and `S15.005e`.
+This repository has not yet decided the authorization and steps for bulk PR closure, remote branch deletion, and release merge-back; also see `ROADMAP.md S15.005d` and `S15.005e`.

@@ -4,8 +4,8 @@ Status: The current development workflow for this repository. Use the root `AGEN
 
 ## Before Starting (Preflight)
 
-1. Check the current branch and working tree. Read `docs/generated/project-dependency-graph.md`, then follow `docs/agents/domain.md` to read `TODO.md`, the active roadmap, and applicable reference contracts.
-2. Confirm the outcome, affected layers, side effects, acceptance criteria, targeted test, and human/golden gates for one TODO slice/issue. See `TODO.md S15.002` for the `S15.*` issue-link exception.
+1. Check the current branch and working tree. Read `docs/generated/project-dependency-graph.md`, then follow `docs/agents/domain.md` to read `ROADMAP.md`, `docs/reference/refactor-contract-1.3.x.md`, and applicable reference contracts.
+2. Confirm the outcome, affected layers, side effects, acceptance criteria, targeted test, and human/golden gates for one roadmap slice/issue. See `ROADMAP.md S15.002` for the `S15.*` issue-link exception.
 3. Run `./scripts/dev/prepare-ui-workspace.ps1` before UI build/test/lint; initialize the private `example/` submodule in a new worktree before running gates. Do not copy its contents into records or public files.
 
 ## Work Admission (Admission)
@@ -21,9 +21,9 @@ PRs must record the associated issue/TODO ID, outcome and scope, behavior/contra
 | Documentation and governance structure | Check the diff, links, and CRLF; run `./scripts/verify.ps1 -StructureOnly`. |
 | UI/styles | Dev page preview, token checks, `UiLayoutGuardTests`, and applicable headless smoke; tooltips require both a static style guard and tooltip-open smoke. |
 | 1.3.x code slice | UI build, targeted tests, and lint, selected according to roadmap G2～G5 risks. |
-| Merging a 1.3.x milestone | All-file lint, refactor gate, and UI snapshots (roadmap G6). |
+| Merging a 1.3.x milestone | All-file lint, refactor gate, and UI snapshots (refactor contract G6). |
 
-The current repo verifier lanes in `./scripts/verify.ps1` are `-StructureOnly`, `-CiLane build`, `-CiLane test -Shard core|ui|viewmodel|snapshots`, and `-All`. The `viewmodel` shard temporarily does not block CI merges; restore it according to the closure criteria in `TODO.md S15.002`. Skips caused by a missing `example/` are not evidence that the private-data gate passed.
+The current repo verifier lanes in `./scripts/verify.ps1` are `-StructureOnly`, `-CiLane build`, `-CiLane test -Shard core|ui|viewmodel|snapshots`, and `-All`. The `viewmodel` shard temporarily does not block CI merges; restore it according to the closure criteria in `ROADMAP.md S15.002`. Skips caused by a missing `example/` are not evidence that the private-data gate passed.
 
 ## Review and checkpoint
 

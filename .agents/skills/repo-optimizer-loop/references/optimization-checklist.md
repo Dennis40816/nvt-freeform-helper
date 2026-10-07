@@ -12,7 +12,7 @@
 - shared result models surfaced in overlay/query/inspector/export must have a regression guard that compares each reader against the same resolved model
 - direct state mutation hotspots (public mutable collection properties, external side-effect assembly) with convergence route
 - missing side-effect centralization
-- TODO/doc drift versus implemented behavior
+- roadmap/doc drift versus implemented behavior
 
 3. UI clarity
 - overflow/clipping issues
@@ -34,6 +34,6 @@
 ## Mandatory outputs per scan
 - one dated report in `docs/guides/`
 - report must include a dedicated `Direct state mutation hotspots` section
-- refreshed TODO with executable unchecked tasks
-- explicit "done definition" for each new TODO item
+- refreshed ROADMAP.md with executable unchecked tasks
+- explicit "done definition" for each new roadmap item
 - PR must reference `docs/guides/refactor-pr-checklist.md` and mark S11.52 direct mutation gate status

@@ -56,7 +56,7 @@
 ## 風險與驗證關卡
 
 - Runtime-only style 風險在 commit 前必須有 guard test；tooltip style 變更同時需要 `UiLayoutGuardTests` 的 static style guard 與 headless tooltip-open smoke test。
-- 資料路徑、golden 與 1.3.x gate 的細節依 `docs/guides/refactor-roadmap-1.3.x.md`。
+- 資料路徑、golden 與 1.3.x gate 的細節依 `docs/reference/refactor-contract-1.3.x.md`。
 
 ## 分支與審查邊界
 
@@ -71,4 +71,4 @@
 - 符合觸發條件時，必須遵循本庫自動探索的 `.agents/skills/freeform-refactor/SKILL.md`、`.agents/skills/ui-consistency/SKILL.md` 與 `.agents/skills/repo-optimizer-loop/SKILL.md` 的流程。
 - 全庫重構掃描至少包含檔案大小／行數熱點、analyzer 警告摘要，以及 `docs/reference/behavior-inventory.md`、`docs/guides/settings-entry-matrix.md` 的過期文件／行為檢查。
 - 全庫掃描須明確稽核「同一 feature／result 的多條推導路徑」，分開記錄可接受的多入口單一路徑與不可接受的多路徑再推導。
-- 新發現的最佳化／重構項目，立即以清楚的 `[ ]`／`[x]` 狀態寫入 `TODO.md`。
+- 新發現的最佳化／重構項目，立即寫入 `ROADMAP.md` 對應的線(修正線、產品功能、整合 Core),附目標版本、狀態與 PR 或 issue 連結。

@@ -8,7 +8,7 @@ This document provides a refactoring process that can be followed directly, so d
 - Reproducible verification (fixed build/test/baseline process)
 
 ## Entry points and prerequisite documents
-1. `TODO.md`
+1. `ROADMAP.md`
 2. `docs/README.md`
 3. `docs/core/workflow-pipeline.md`
 4. `docs/core/notch-validation-flow.md` (when changing Step6 validation/Notch rows)
@@ -46,7 +46,7 @@ This document provides a refactoring process that can be followed directly, so d
 6. **Verification**
    - Build + targeted tests.
 7. **Synchronize documentation**
-   - Update `TODO.md` status and the necessary spec/README entry points.
+   - Update `ROADMAP.md` status and the necessary spec/README entry points.
 8. **Commit**
    - `type(scope): subject` + a clear body (what changed and why).
 
@@ -68,7 +68,7 @@ This document provides a refactoring process that can be followed directly, so d
    - export recalculates independently
    - inspector/pad info reconstructs it again from partial data
 3. If second-pass derivation exists:
-   - First record it in `TODO.md`
+   - First record it in `ROADMAP.md`
    - Then define a single source-of-truth model
    - Finally add regression tests to lock in consistency across readers.
 
