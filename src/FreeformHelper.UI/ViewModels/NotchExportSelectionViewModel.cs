@@ -9,6 +9,8 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class NotchExportSelectionViewModel : ObservableObject
 {
+    public ProjectEditingCommands Editing { get; } = new();
+
     private readonly Dictionary<int, NotchExportIcGroupViewModel> _groupByIcIndex = new();
     private readonly Dictionary<NotchExportColumnFilterField, HashSet<string>> _columnFilters = new();
     private readonly List<NotchExportRowItemViewModel> _allRows = new();
@@ -131,18 +133,18 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
 
         IcGroups = new ReadOnlyObservableCollection<NotchExportIcGroupViewModel>(_icGroups);
 
-        SelectAllCommand = new RelayCommand(SelectAll);
-        SelectNoneCommand = new RelayCommand(SelectNone);
-        UseShownOnlyCommand = new RelayCommand(UseShownOnly);
-        SetViewFilterModeCommand = new RelayCommand<NotchExportRowDisplayMode>(SetViewFilterMode);
-        ToggleSelectedOnlyCommand = new RelayCommand(() => ShowSelectedOnly = !ShowSelectedOnly);
-        ApplyColumnFilterCommand = new RelayCommand<string?>(ApplyColumnFilter);
-        ClearSearchKeywordCommand = new RelayCommand(ClearSearchKeyword);
-        SelectPreviewRowCommand = new RelayCommand<NotchExportRowItemViewModel?>(SelectPreviewRow);
-        ToggleSelectedRowDetailCommand = new RelayCommand(() => ShowSelectedRowDetailSection = !ShowSelectedRowDetailSection);
-        EnableWorkspaceLinkedRowsCommand = new RelayCommand(() => SetWorkspaceLinkedRowsSelected(true));
-        DisableWorkspaceLinkedRowsCommand = new RelayCommand(() => SetWorkspaceLinkedRowsSelected(false));
-        _hidePanelForInspectCommand = new RelayCommand(RequestHidePanelForInspect, () => CanHidePanelForInspect);
+        SelectAllCommand = Editing.Create(SelectAll);
+        SelectNoneCommand = Editing.Create(SelectNone);
+        UseShownOnlyCommand = Editing.Create(UseShownOnly);
+        SetViewFilterModeCommand = Editing.Create<NotchExportRowDisplayMode>(SetViewFilterMode);
+        ToggleSelectedOnlyCommand = Editing.Create(() => ShowSelectedOnly = !ShowSelectedOnly);
+        ApplyColumnFilterCommand = Editing.Create<string?>(ApplyColumnFilter);
+        ClearSearchKeywordCommand = Editing.Create(ClearSearchKeyword);
+        SelectPreviewRowCommand = Editing.Create<NotchExportRowItemViewModel?>(SelectPreviewRow);
+        ToggleSelectedRowDetailCommand = Editing.Create(() => ShowSelectedRowDetailSection = !ShowSelectedRowDetailSection);
+        EnableWorkspaceLinkedRowsCommand = Editing.Create(() => SetWorkspaceLinkedRowsSelected(true));
+        DisableWorkspaceLinkedRowsCommand = Editing.Create(() => SetWorkspaceLinkedRowsSelected(false));
+        _hidePanelForInspectCommand = Editing.Create(RequestHidePanelForInspect, () => CanHidePanelForInspect);
         HidePanelForInspectCommand = _hidePanelForInspectCommand;
 
         RebuildVisibleRows();

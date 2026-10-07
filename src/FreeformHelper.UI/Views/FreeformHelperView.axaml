@@ -9,6 +9,7 @@
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.FreeformHelperView"
+             IsEnabled="{Binding IsProjectEditingEnabled}"
              PointerPressed="OnRootPointerPressed"
              Background="{DynamicResource BrushBgApp}"
              Foreground="{DynamicResource BrushTextPrimary}">

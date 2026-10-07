@@ -154,7 +154,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
 
         InitializeCascadeIcSettings(owner);
         RefreshLayerCategoryRows();
-        SaveCommand = new RelayCommand(OnSave);
+        SaveCommand = new RelayCommand(OnSave, () => _owner.IsProjectEditingEnabled);
         CancelCommand = new RelayCommand(OnCancel);
     }
 

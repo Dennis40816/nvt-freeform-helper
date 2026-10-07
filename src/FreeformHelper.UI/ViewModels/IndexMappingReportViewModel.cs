@@ -8,6 +8,8 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class IndexMappingReportViewModel : ObservableObject
 {
+    public ProjectEditingCommands Editing { get; } = new();
+
     private const int MaxConcurrentTraceJobs = 2;
     private const int TraceSchemaVersion = 1;
     private readonly Func<int?, int?, bool>? _locateTarget;
@@ -51,18 +53,18 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
         ChangedByMaskDecisionCount = _workspaceSnapshot.Metrics.ChangedByMaskDecisionCount;
         RemovedByMaskDecisionCount = _workspaceSnapshot.Metrics.RemovedByMaskDecisionCount;
 
-        PreviousIssueCommand = new RelayCommand(() => MoveDecision(-1));
-        NextIssueCommand = new RelayCommand(() => MoveDecision(1));
-        LocateSelectedIssueCommand = new RelayCommand(LocateSelectedDecision);
-        ApplyOverrideCommand = new RelayCommand(ApplyOverrideForSelectedDecision);
-        ApplyDiffOverrideCommand = new RelayCommand(ApplyDiffOverrideForSelectedDecision);
-        ApplySegmentDiffOverridesCommand = new RelayCommand(ApplySegmentDiffOverridesForSelectedDecision);
-        ApplyCadOutputFwDiffOverridesCommand = new RelayCommand(ApplyCadOutputFwDiffOverrides);
-        ClearOverrideCommand = new RelayCommand(ClearOverrideForSelectedDecision);
-        ClearSearchKeywordCommand = new RelayCommand(() => SearchKeyword = string.Empty);
-        SetDecisionFilterModeCommand = new RelayCommand<IndexMappingDecisionFilterMode>(SetDecisionFilterMode);
-        SelectDecisionCommand = new RelayCommand<IndexMappingDecisionRowViewModel?>(SelectDecision);
-        SelectVerificationStepCommand = new RelayCommand<IndexMappingVerificationStep>(SelectVerificationStep);
+        PreviousIssueCommand = Editing.Create(() => MoveDecision(-1));
+        NextIssueCommand = Editing.Create(() => MoveDecision(1));
+        LocateSelectedIssueCommand = Editing.Create(LocateSelectedDecision);
+        ApplyOverrideCommand = Editing.Create(ApplyOverrideForSelectedDecision);
+        ApplyDiffOverrideCommand = Editing.Create(ApplyDiffOverrideForSelectedDecision);
+        ApplySegmentDiffOverridesCommand = Editing.Create(ApplySegmentDiffOverridesForSelectedDecision);
+        ApplyCadOutputFwDiffOverridesCommand = Editing.Create(ApplyCadOutputFwDiffOverrides);
+        ClearOverrideCommand = Editing.Create(ClearOverrideForSelectedDecision);
+        ClearSearchKeywordCommand = Editing.Create(() => SearchKeyword = string.Empty);
+        SetDecisionFilterModeCommand = Editing.Create<IndexMappingDecisionFilterMode>(SetDecisionFilterMode);
+        SelectDecisionCommand = Editing.Create<IndexMappingDecisionRowViewModel?>(SelectDecision);
+        SelectVerificationStepCommand = Editing.Create<IndexMappingVerificationStep>(SelectVerificationStep);
 
         RebuildWorkspaceView();
         RefreshVerificationSteps();

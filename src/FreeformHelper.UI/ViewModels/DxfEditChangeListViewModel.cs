@@ -3,6 +3,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.UI.Icons;
+using FreeformHelper.UI.Services;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -80,24 +81,26 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
         _focusEntry = focusEntry;
         _applyEntry = applyEntry;
         Rows = new ReadOnlyObservableCollection<DxfEditChangeListEntry>(_rows);
-        SetHiddenKindCommand = new RelayCommand(() => SelectedKind = DxfEditChangeKind.Hidden);
-        SetDuplicateKindCommand = new RelayCommand(() => SelectedKind = DxfEditChangeKind.Duplicate);
-        SetCombinedKindCommand = new RelayCommand(() => SelectedKind = DxfEditChangeKind.Combined);
-        SetMovedKindCommand = new RelayCommand(() => SelectedKind = DxfEditChangeKind.Moved);
-        SetRotatedKindCommand = new RelayCommand(() => SelectedKind = DxfEditChangeKind.Rotated);
-        RefreshCommand = new RelayCommand(RefreshEntries);
-        ApplySelectedEntriesCommand = new RelayCommand(ApplySelectedEntries, () => CanApplySelectedEntries);
-        RestoreSelectedDuplicateEntriesCommand = new RelayCommand(RestoreSelectedDuplicateEntries, () => CanRestoreSelectedDuplicateEntries);
-        RehideSelectedDuplicateEntriesCommand = new RelayCommand(RehideSelectedDuplicateEntries, () => CanRehideSelectedDuplicateEntries);
-        FocusSelectedEntryCommand = new RelayCommand(FocusSelectedEntry, () => SelectedEntry?.CanFocus == true);
-        ApplySelectedEntryCommand = new RelayCommand(ApplySelectedEntry, () => SelectedEntry?.CanApply == true);
-        SelectEntryCommand = new RelayCommand<DxfEditChangeListEntry?>(SelectEntry);
-        FocusEntryCommand = new RelayCommand<DxfEditChangeListEntry?>(FocusEntry);
-        ApplyEntryCommand = new RelayCommand<DxfEditChangeListEntry?>(ApplyEntry);
+        SetHiddenKindCommand = Editing.Create(() => SelectedKind = DxfEditChangeKind.Hidden);
+        SetDuplicateKindCommand = Editing.Create(() => SelectedKind = DxfEditChangeKind.Duplicate);
+        SetCombinedKindCommand = Editing.Create(() => SelectedKind = DxfEditChangeKind.Combined);
+        SetMovedKindCommand = Editing.Create(() => SelectedKind = DxfEditChangeKind.Moved);
+        SetRotatedKindCommand = Editing.Create(() => SelectedKind = DxfEditChangeKind.Rotated);
+        RefreshCommand = Editing.Create(RefreshEntries);
+        ApplySelectedEntriesCommand = Editing.Create(ApplySelectedEntries, () => CanApplySelectedEntries);
+        RestoreSelectedDuplicateEntriesCommand = Editing.Create(RestoreSelectedDuplicateEntries, () => CanRestoreSelectedDuplicateEntries);
+        RehideSelectedDuplicateEntriesCommand = Editing.Create(RehideSelectedDuplicateEntries, () => CanRehideSelectedDuplicateEntries);
+        FocusSelectedEntryCommand = Editing.Create(FocusSelectedEntry, () => SelectedEntry?.CanFocus == true);
+        ApplySelectedEntryCommand = Editing.Create(ApplySelectedEntry, () => SelectedEntry?.CanApply == true);
+        SelectEntryCommand = Editing.Create<DxfEditChangeListEntry?>(SelectEntry);
+        FocusEntryCommand = Editing.Create<DxfEditChangeListEntry?>(FocusEntry);
+        ApplyEntryCommand = Editing.Create<DxfEditChangeListEntry?>(ApplyEntry, entry => entry?.CanApply == true);
         CloseCommand = new RelayCommand(() => CloseRequested?.Invoke(this, EventArgs.Empty));
         SelectedKind = initialKind;
         RefreshEntries();
     }
+
+    public ProjectEditingCommands Editing { get; } = new();
 
     public event EventHandler? CloseRequested;
 

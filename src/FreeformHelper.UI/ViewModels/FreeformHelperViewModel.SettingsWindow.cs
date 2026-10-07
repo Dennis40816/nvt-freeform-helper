@@ -15,6 +15,7 @@ public sealed partial class FreeformHelperViewModel
     internal void ApplySettingsWindowDraft(SettingsWindowViewModel draft)
     {
         ArgumentNullException.ThrowIfNull(draft);
+        if (!IsProjectEditingEnabled) return;
 
         var resolvedScanOrder = ScanOrderOptions.FirstOrDefault(o => o.Value == draft.SelectedScanOrderOption.Value);
         if (string.IsNullOrWhiteSpace(resolvedScanOrder.Display))

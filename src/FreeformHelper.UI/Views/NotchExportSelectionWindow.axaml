@@ -10,6 +10,7 @@
         MinWidth="{StaticResource NotchExportSelectionMinWidth}"
         MinHeight="{StaticResource NotchExportSelectionMinHeight}"
         WindowStartupLocation="CenterOwner"
+        IsEnabled="{Binding Editing.IsProjectEditingEnabled}"
         Opacity="{StaticResource NotchExportSelectionOpacity}"
         Background="{DynamicResource BrushBgSurface}"
         Foreground="{DynamicResource BrushTextPrimary}"

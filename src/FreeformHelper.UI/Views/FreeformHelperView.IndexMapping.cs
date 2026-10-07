@@ -7,6 +7,7 @@ public sealed partial class FreeformHelperView
 {
     private Task ShowIndexMappingReportWindowAsync(IndexMappingReportViewModel viewModel)
     {
+        viewModel.Editing.AttachProject(DataContext as FreeformHelperViewModel);
         var owner = TopLevel.GetTopLevel(this) as Window;
         if (_indexMappingReportWindow is not null && _indexMappingReportWindow.IsVisible)
         {

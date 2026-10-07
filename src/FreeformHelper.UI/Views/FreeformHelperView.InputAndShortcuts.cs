@@ -15,6 +15,11 @@ public sealed partial class FreeformHelperView
 {
     private void OnTopLevelKeyDown(object? sender, KeyEventArgs e)
     {
+        if (DataContext is FreeformHelperViewModel { IsProjectEditingEnabled: false })
+        {
+            return;
+        }
+
         if (e.Handled)
         {
             return;

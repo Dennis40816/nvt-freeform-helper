@@ -7,6 +7,7 @@ public sealed partial class FreeformHelperView
 {
     private Task ShowDxfEditChangeListWindowAsync(DxfEditChangeListViewModel viewModel)
     {
+        viewModel.Editing.AttachProject(DataContext as FreeformHelperViewModel);
         var owner = TopLevel.GetTopLevel(this) as Window;
         if (_dxfEditChangeListWindow is not null && _dxfEditChangeListWindow.IsVisible)
         {
