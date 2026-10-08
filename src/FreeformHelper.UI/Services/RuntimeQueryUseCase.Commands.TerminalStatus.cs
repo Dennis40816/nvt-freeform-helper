@@ -1,4 +1,5 @@
 using FreeformHelper.UI.Logging;
+using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 

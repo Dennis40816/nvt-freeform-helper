@@ -1,4 +1,5 @@
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 
@@ -151,7 +152,7 @@ internal sealed partial class RuntimeQueryUseCase
 
     private RuntimeQueryResponseEnvelope QuerySelectCad(IReadOnlyDictionary<string, string>? args)
     {
-        var selectedIds = RuntimeQueryArgumentParser.ParseCadSelectionArgs(args, out var error);
+        var selectedIds = RuntimeQuerySelectionParser.ParseCadSelectionArgs(args, out var error);
         if (error is not null)
         {
             return error;
@@ -185,7 +186,7 @@ internal sealed partial class RuntimeQueryUseCase
     {
         var helper = _shellViewModel.FreeformHelper;
         var regularById = helper.RegularPads.ToDictionary(static pad => pad.RegularPadId, static pad => pad.Index);
-        var regularIndices = RuntimeQueryArgumentParser.ParseRegularSelectionArgs(
+        var regularIndices = RuntimeQuerySelectionParser.ParseRegularSelectionArgs(
             args,
             regularById,
             out var error,

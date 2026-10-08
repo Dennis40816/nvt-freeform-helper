@@ -1,5 +1,6 @@
 using FreeformHelper.Application.Services;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 
@@ -74,21 +75,7 @@ internal sealed partial class RuntimeQueryUseCase
 
     public async Task<RuntimeQueryResponseEnvelope> ExecuteAsync(RuntimeQueryRequest? request)
     {
-        if (request is null)
-        {
-            return RuntimeQueryResponseEnvelope.Failure(
-                code: "INVALID_REQUEST",
-                message: "Request is null.");
-        }
-
-        if (!string.Equals(request.Version, RuntimeQueryProtocol.Version, StringComparison.Ordinal))
-        {
-            return RuntimeQueryResponseEnvelope.Failure(
-                code: "UNSUPPORTED_VERSION",
-                message: $"Unsupported request version '{request.Version}'. Expected '{RuntimeQueryProtocol.Version}'.");
-        }
-
-        return await _commandRouter.RouteAsync(request.Command, request.Args);
+        return await _commandRouter.ExecuteAsync(request, RuntimeQueryProtocol.Version);
     }
 
     private static RuntimeQueryResponseEnvelope QueryHelp()
