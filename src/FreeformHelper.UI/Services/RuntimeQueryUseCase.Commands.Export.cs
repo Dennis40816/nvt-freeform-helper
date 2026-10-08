@@ -1,5 +1,6 @@
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 

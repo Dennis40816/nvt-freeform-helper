@@ -154,7 +154,8 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
 - [x] **R13.307-Q0 Runtime Query characterization tests before the Core move** · Target: g4 · Status: Done · PR: [#47](https://github.com/Dennis40816/nvt-freeform-helper/pull/47)
 - [x] **C-THEME1 Theme step 1: pin Core 0.2.0 with no visual change** · Target: g4 · Status: Done · PR: [#50](https://github.com/Dennis40816/nvt-freeform-helper/pull/50)
 - [ ] **R13.306 Upgrade to Avalonia 12 and net10** · Target: g4 · Status: In progress: only the manual desktop checks remain (console editor, rendering, dialogs, input) · PR: [#41](https://github.com/Dennis40816/nvt-freeform-helper/pull/41)
-- [ ] **R13.307-Q7 Switch to the Core Runtime Query layers; the test list and outcomes stay equal to 847cc453** · Target: g4 · Status: Not started (unblocked by Core 0.2.0) · PR: -
+- [ ] **R13.307-Q7 Switch to the Core Runtime Query layers; the test list and outcomes stay equal to 847cc453** · Target: g4 · Status: In progress · PR: -
+  - Same-user pipe access with network logons denied, bounded in-flight shutdown, and pipe-creation failure diagnostic timing are owner-approved behavior changes (owner decision, 2026-10-07: 「接受 Core 的行為 (Recommended)」); every other behavior is unchanged.
 - [ ] **R13.307-M2 Use the Core UiResourceResolver and delete NFH's copy** · Target: g4 · Status: Not started · PR: -
   - All NFH callers must share one dispatcher registration. See the Core Theme module notes.
 - [ ] **C-THEME2 Theme step 2: one look PR with the Core tokens, button roles and scroll styles** · Target: g4 · Status: Not started; waits for the NFC and NFU look PRs and for the Console button roles · PR: -
