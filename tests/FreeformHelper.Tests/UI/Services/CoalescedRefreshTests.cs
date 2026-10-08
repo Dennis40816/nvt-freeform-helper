@@ -1,4 +1,4 @@
-using FreeformHelper.UI.Services;
+using Nvt.Core.Lifecycle;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -71,5 +71,6 @@ public sealed class CoalescedRefreshTests
         refresh.Request();
 
         Assert.Equal(2, scheduled.Count);
+        LifecycleCharacterization.AssertRefreshSequence();
     }
 }

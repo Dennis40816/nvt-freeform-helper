@@ -12,6 +12,7 @@ using FreeformHelper.UI.Interaction;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
 using NLog;
+using Nvt.Core.Lifecycle;
 
 namespace FreeformHelper.UI.ViewModels;
 

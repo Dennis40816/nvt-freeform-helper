@@ -66,6 +66,7 @@ public sealed partial class FreeformHelperViewModelTests
         vm.UndoCommand.Execute(null);
 
         Assert.Equal(original, vm.ShowCad);
+        LifecycleCharacterization.AssertUndoSequence();
     }
 
 
