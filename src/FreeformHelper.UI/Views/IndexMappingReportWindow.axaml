@@ -9,6 +9,7 @@
         MinWidth="{StaticResource IndexMappingReportMinWidth}"
         MinHeight="{StaticResource IndexMappingReportMinHeight}"
         WindowStartupLocation="CenterOwner"
+        IsEnabled="{Binding Editing.IsProjectEditingEnabled}"
         Background="{DynamicResource BrushBgSurface}"
         Foreground="{DynamicResource BrushTextPrimary}"
         Title="Verification Workspace">

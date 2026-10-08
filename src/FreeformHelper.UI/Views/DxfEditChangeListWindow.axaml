@@ -8,6 +8,7 @@
         MinWidth="{StaticResource DxfEditChangeListMinWidth}"
         MinHeight="{StaticResource DxfEditChangeListMinHeight}"
         WindowStartupLocation="CenterOwner"
+        IsEnabled="{Binding Editing.IsProjectEditingEnabled}"
         ShowInTaskbar="False"
         Background="{DynamicResource BrushBgSurface}"
         Foreground="{DynamicResource BrushTextPrimary}"

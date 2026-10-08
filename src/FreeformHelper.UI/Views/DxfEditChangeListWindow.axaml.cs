@@ -41,7 +41,7 @@ public sealed partial class DxfEditChangeListWindow : Window
     {
         base.OnKeyDown(e);
 
-        if (e.Handled || _currentViewModel is null)
+        if (e.Handled || _currentViewModel is null || !_currentViewModel.Editing.IsProjectEditingEnabled)
         {
             return;
         }

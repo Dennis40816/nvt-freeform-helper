@@ -37,7 +37,7 @@ public sealed partial class NotchExportSelectionViewModel
 
     private void NotifyPreviewRowChanged(NotchExportRowItemViewModel row)
     {
-        if (_suppressPreviewCallback)
+        if (_suppressPreviewCallback || !Editing.IsProjectEditingEnabled)
         {
             return;
         }

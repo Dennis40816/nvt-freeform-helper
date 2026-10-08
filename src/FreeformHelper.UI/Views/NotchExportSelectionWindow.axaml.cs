@@ -117,7 +117,7 @@ public sealed partial class NotchExportSelectionWindow : Window
 
     private void RequestClose(bool confirmed)
     {
-        if (_completionRaised)
+        if (_completionRaised || (confirmed && DataContext is NotchExportSelectionViewModel { Editing.IsProjectEditingEnabled: false }))
         {
             return;
         }

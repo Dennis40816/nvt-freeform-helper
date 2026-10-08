@@ -31,6 +31,7 @@ public sealed partial class FreeformHelperViewModel
             BuildDxfEditChangeEntries,
             FocusDxfEditChangeEntry,
             ApplyDxfEditChangeEntry);
+        viewModel.Editing.AttachProject(this);
         await OpenDxfEditChangeListAsync(viewModel);
     }
 

@@ -163,7 +163,7 @@ public sealed partial class PadCanvas
             _isSpacePanning = false;
             _lastPanRedrawTicks = 0;
             RequestViewRefresh();
-            e.Pointer.Capture(null);
+            ReleaseGestureCapture(e.Pointer);
             e.Handled = true;
             return;
         }
@@ -179,12 +179,12 @@ public sealed partial class PadCanvas
             ApplyBoxSelection(rect, additive, regularOnly); // Apply selection based on the box.
 
             _isBoxSelecting = false; // Reset box selection state.
+            _isLeftPointerDown = false; // Reset left pointer down flag before releasing capture.
             _lastBoxSelectionRedrawTicks = 0;
-            e.Pointer.Capture(null); // Release pointer capture.
+            ReleaseGestureCapture(e.Pointer);
             RequestVisualRefresh();
             RaiseSelectionChanged(); // Notify listeners of selection change.
             e.Handled = true;
-            _isLeftPointerDown = false; // Reset left pointer down flag.
             RefreshHoverDebugHitFromCurrentPointer(modifiers);
             return;
         }
@@ -239,9 +239,9 @@ public sealed partial class PadCanvas
                 }
             }
 
-            e.Pointer.Capture(null);
-            e.Handled = true;
             _isLeftPointerDown = false;
+            ReleaseGestureCapture(e.Pointer);
+            e.Handled = true;
             RefreshHoverDebugHitFromCurrentPointer(modifiers);
         }
     }

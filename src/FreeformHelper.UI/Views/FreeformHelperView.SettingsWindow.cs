@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Interactivity;
 using FreeformHelper.UI.ViewModels;
 
@@ -40,6 +41,10 @@ public sealed partial class FreeformHelperView
         {
             DataContext = viewModel.CreateSettingsWindowViewModel()
         };
+        _settingsWindow.Bind(IsEnabledProperty, new Binding(nameof(FreeformHelperViewModel.IsProjectEditingEnabled))
+        {
+            Source = viewModel,
+        });
         _settingsWindow.Closed += (_, _) => _settingsWindow = null;
 
         if (owner is not null)

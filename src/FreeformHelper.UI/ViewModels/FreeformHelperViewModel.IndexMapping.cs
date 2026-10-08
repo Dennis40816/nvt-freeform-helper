@@ -74,14 +74,16 @@ public sealed partial class FreeformHelperViewModel
                     (res.Report.TotalIssueCount > 0 ||
                      (res.Report.MaskAuditRows?.Count ?? 0) > 0))
                 {
-                    await OpenIndexMappingReportAsync(new IndexMappingReportViewModel(
+                    var reportViewModel = new IndexMappingReportViewModel(
                         DxfRegularMappingSummary,
                         res.Report,
                         LocateMappingTargetFromReport,
                         ApplyMappingOverrideFromReport,
                         ApplyCadOutputFwDiffOverrideFromReport,
                         ClearMappingOverrideFromReport,
-                        GetMappingOverrideRegularIndex));
+                        GetMappingOverrideRegularIndex);
+                    reportViewModel.Editing.AttachProject(this);
+                    await OpenIndexMappingReportAsync(reportViewModel);
                 }
 
                 if (res.Report.HasIssues)

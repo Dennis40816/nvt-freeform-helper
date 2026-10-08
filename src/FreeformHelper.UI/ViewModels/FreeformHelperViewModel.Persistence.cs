@@ -212,6 +212,7 @@ public sealed partial class FreeformHelperViewModel
                 NotchExportFileTypeOptions,
                 SelectedNotchExportFileTypeOption)
             : new NotchExportSelectionViewModel(table, PreviewNotchExportRowSelection);
+        selectionViewModel.Editing.AttachProject(this);
         selectionViewModel.AttachSimulationSafetyAudit(safetyAudit);
         var selectedTable = await OpenNotchExportSelectionAsync(selectionViewModel);
         if (selectedTable is null)

@@ -20,6 +20,8 @@ public sealed partial class FreeformHelperViewModel
     /// <returns>True if the project was saved successfully, false otherwise.</returns>
     public async Task<bool> SaveProjectAsync()
     {
+        if (!IsProjectEditingEnabled) return false;
+
         var status = CreateStatusScope("SaveProject");
         if (PickSaveProjectPathAsync is null)
         {
@@ -78,23 +80,31 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     private async Task LoadProjectAsync()
     {
-        var status = CreateStatusScope("LoadProject");
-        if (PickLoadProjectPathAsync is null)
+        _ = await RunProjectLoadAsync(async () =>
         {
-            status.ReportBlocked("Load project: dialog handler not wired.");
-            return;
-        }
+            var status = CreateStatusScope("LoadProject");
+            if (PickLoadProjectPathAsync is null)
+            {
+                status.ReportBlocked("Load project: dialog handler not wired.");
+                return ProjectLoadCommandResult.Failed("LOAD_FAILED", "Load project: dialog handler not wired.");
+            }
 
-        var path = await PickLoadProjectPathAsync();
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return;
-        }
+            var path = await PickLoadProjectPathAsync();
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return ProjectLoadCommandResult.Failed("CANCELLED", "Load cancelled.");
+            }
 
-        _ = await LoadProjectFromPathAsync(path);
+            return await LoadProjectFromPathCoreAsync(path);
+        });
     }
 
-    internal async Task<ProjectLoadCommandResult> LoadProjectFromPathAsync(string path)
+    internal Task<ProjectLoadCommandResult> LoadProjectFromPathAsync(string path)
+    {
+        return RunProjectLoadAsync(() => LoadProjectFromPathCoreAsync(path));
+    }
+
+    private async Task<ProjectLoadCommandResult> LoadProjectFromPathCoreAsync(string path)
     {
         var status = CreateStatusScope("LoadProject");
         if (string.IsNullOrWhiteSpace(path))
