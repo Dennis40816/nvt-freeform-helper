@@ -9,6 +9,7 @@ using FreeformHelper.Domain.Geometry;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Avalonia.Theme;
 
 namespace FreeformHelper.UI.Views;
 
