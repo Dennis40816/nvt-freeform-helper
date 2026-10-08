@@ -14,7 +14,7 @@ Rendered snapshot: R1 = `MainWindow.ConsoleExpanded`, R2 = `SettingsWindow.Defau
 | `src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml:SimulationWorkspaceView` | Simulation Open; controls, AA canvas, details, override, console; `SimulationWorkspaceViewModel` | None |
 | `src/FreeformHelper.UI/Views/CoordinatePlannerHostView.axaml:CoordinatePlannerHostView` | Coordinate tab; Open/Refresh, status; `CoordinatePlannerHostViewModel`, see `src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs:BuildCoordinatePlannerWorkspaceAsync` for creation | None |
 | `src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml:CoordinatePlannerWorkspaceView` | Coordinate Open; layer/AA/guide/array, canvas, artifact; `CoordinatePlannerWorkspaceViewModel` | None |
-| `src/FreeformHelper.UI/Views/HowToUseView.axaml:HowToUseView` | How To Use tab; instructions, language switch; `HowToUseViewModel` (`src/FreeformHelper.UI/MainWindow.axaml:Window.DataTemplates`) | R3 |
+| `src/FreeformHelper.UI/Views/HowToUseView.axaml:HowToUseView` | How To Use tab; English-only instructions; `HowToUseViewModel` (`src/FreeformHelper.UI/MainWindow.axaml:Window.DataTemplates`) | R3 |
 | `src/FreeformHelper.UI/Views/DevView.axaml:DevView` | Dev tab; spinner preview, sidebar/theme/runtime probes; `DevViewModel` (`src/FreeformHelper.UI/ViewModels/ShellViewModel.cs:ShowDevCommand`) | None |
 
 | Main workspace panel/file | Entry point, main controls, backing VM | Rendered snapshot |

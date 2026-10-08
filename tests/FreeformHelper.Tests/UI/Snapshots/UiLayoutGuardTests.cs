@@ -763,7 +763,6 @@ public sealed class UiLayoutGuardTests
         Assert.False(keyRPattern.IsMatch(freeformShortcutCode), "Global shortcut handler should not bind Key.R.");
         Assert.False(keyRPattern.IsMatch(canvasInputCode), "Canvas shortcut handler should not bind Key.R.");
         Assert.DoesNotContain("Reset view", howToUseXaml, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("R：", howToUseXaml);
         Assert.DoesNotContain("R:", howToUseXaml);
     }
 
