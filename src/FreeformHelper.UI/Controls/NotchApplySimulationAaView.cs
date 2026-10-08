@@ -3,8 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
-using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Avalonia.Theme;
 
 namespace FreeformHelper.UI.Controls;
 

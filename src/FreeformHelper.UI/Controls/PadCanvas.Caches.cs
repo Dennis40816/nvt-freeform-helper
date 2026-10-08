@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Media;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
-using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Theme;
 
 namespace FreeformHelper.UI.Controls;
 
