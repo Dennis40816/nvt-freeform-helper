@@ -1,6 +1,6 @@
 # Notch v2.1 / v2.2 Flow Definitions and Flowcharts (Current As-Is)
 
-> Canonical reference：[`docs/reference/notch-system-reference.md`](../reference/notch-system-reference.md)
+> Canonical reference: [`docs/reference/notch-system-reference.md`](../reference/notch-system-reference.md)
 > This file retains detailed flowcharts and entrypoint breakdowns; if it differs from the canonical reference, the canonical reference takes precedence.
 
 > Last updated: 2026-08-08
@@ -52,7 +52,7 @@ Each decision node must clearly answer:
 - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs`
   - `RebuildVisibleDxfIndexMap(...)`
 
-### 2.2 Overview Flowchart (EN Flow + Chinese Side Notes)
+### 2.2 Overview Flowchart (Flow + Side Notes)
 ```mermaid
 flowchart LR
     A["Build RegularGrid Key<br/>(IC, DiffIndex baseline)"] --> B["Run Step1 Geometry Match<br/>(CAD to Regular candidates)"]
@@ -76,19 +76,19 @@ flowchart LR
     K --> L["Build Dual Grid Views + Final NotchTable<br/>(shared by Step5 / Simulation / export)"]
     L --> M["Export via NotchTableExporter<br/>(CSV / C v2.1 / C v2.2)"]
 
-    A_CN["中文：建立 RegularGrid 基準鍵，固定 (IC,DiffIndex)"]:::note
-    B_CN["中文：Step1 建立 CAD->Regular 候選配對"]:::note
-    B1_CN["中文：matching 結果同時定義目前的 active regular set"]:::note
-    C0_CN["中文：SeeRegular 是額外 mask，不是 Step1 active set 本身"]:::note
-    C_CN["中文：Step4 指派 CAD Output FW Diff，override 優先"]:::note
-    D_CN["中文：凍結 workflow snapshot；同時保存 CAD output 與 Regular Visibility Mask (SeeRegular.csv)"]:::note
-    E_CN["中文：進入 Step5 產表入口"]:::note
-    F_CN["中文：若未啟用任何版本則直接回傳空表"]:::note
-    G_CN["中文：依設定分流到 CadAllocation 或 Legacy"]:::note
-    J_CN["中文：CadAllocation rows 在生成時就固定 source=CAD Output FW Diff"]:::note
-    K_CN["中文：projection 只修正 anchor 與顯示用 CAD output grid，不再改 target"]:::note
-    L_CN["中文：產出最終表與 dual-grid view，供下游共用"]:::note
-    M_CN["中文：以同一份 payload 匯出 CSV / C v2.1 / C v2.2"]:::note
+    A_CN["Build the RegularGrid baseline key and fix (IC, DiffIndex)"]:::note
+    B_CN["Step1 builds CAD->Regular candidate matches"]:::note
+    B1_CN["The matching result also defines the current active regular set"]:::note
+    C0_CN["SeeRegular is an extra mask, not the Step1 active set itself"]:::note
+    C_CN["Step4 assigns CAD Output FW Diff; override takes priority"]:::note
+    D_CN["Freeze workflow snapshot; save both CAD output and Regular Visibility Mask (SeeRegular.csv)"]:::note
+    E_CN["Enter the Step5 table generation entry"]:::note
+    F_CN["If no version is enabled, return an empty table directly"]:::note
+    G_CN["Branch to CadAllocation or Legacy based on settings"]:::note
+    J_CN["CadAllocation rows fix source=CAD Output FW Diff at generation time"]:::note
+    K_CN["Projection only corrects the anchor and the display CAD output grid; it no longer changes target"]:::note
+    L_CN["Produce the final table and dual-grid view for shared downstream use"]:::note
+    M_CN["Export CSV / C v2.1 / C v2.2 from the same payload"]:::note
 
     A -.-> A_CN
     B -.-> B_CN
@@ -117,10 +117,10 @@ flowchart LR
 - `Best-Match FW Diff Idx` (geometry seed):
   - Derived from the best-match / raw anchor regular, typically the regular `DiffIndex` selected by `SelectCadAllocationAnchor(...)`.
   - This is a seed for geometry and trace, not the final output address.
-- Notch row source diff（Step5）：
+- Notch row source diff (Step5):
   - `CadAllocation` mode prioritizes `CAD Output FW Diff Idx` as the row source.
   - It falls back to the raw anchor diff only when no CAD output mapping is available (compatibility path).
-- Target diff（v2.2 legs）：
+- Target diff (v2.2 legs):
   - Always comes from Stage3 allocation's geometric aggregation of regular `(IC, Diff)`.
   - The target diff retains its `Regular FW Diff` identity and no longer undergoes Step4/CAD output projection.
 
@@ -136,7 +136,7 @@ flowchart LR
 - `src/FreeformHelper.Application/Services/NotchTableGenerator.Memo.cs`
 - `src/FreeformHelper.Application/Services/NotchV22TargetAllocationService.cs`
 
-### 3.2 Flowchart (EN Flow + Chinese Side Notes)
+### 3.2 Flowchart (Flow + Side Notes)
 ```mermaid
 flowchart LR
     A["Enter CadAllocation Mode<br/>(GenerateCadAllocationCompatible)"] --> B["BuildCadAllocationGenerationContext"]
@@ -178,13 +178,13 @@ flowchart LR
     O --> Q["Return NotchTable<br/>(source/target identity fixed)"]
     P --> Q
 
-    A_CN["中文：主入口只做 orchestration，不直接混算"]:::note
-    B_CN["中文：先建 context，顯式帶出 stage 共用資料"]:::note
-    E_CN["中文：若 V21/V22 都未啟用，canonical bucket 直接為空"]:::note
-    G_CN["中文：candidate 建構仍是 per-profile，但平行執行"]:::note
-    I_CN["中文：canonical rows 單一路徑來自 v2.2 diff-centric"]:::note
-    J_CN["中文：最後再決定要輸出 v2.2 與/或投影 v2.1"]:::note
-    Q_CN["中文：CadAllocation 回傳的 table 已經固定 source/target 身份；後續只做 anchor 對齊與 display grid"]:::note
+    A_CN["The main entry only orchestrates and does not mix calculations directly"]:::note
+    B_CN["Build the context first, explicitly passing stage-shared data"]:::note
+    E_CN["If neither V21 nor V22 is enabled, the canonical bucket is empty directly"]:::note
+    G_CN["Candidate building is still per-profile, but runs in parallel"]:::note
+    I_CN["Canonical rows come from a single path: v2.2 diff-centric"]:::note
+    J_CN["Finally decide whether to output v2.2 and/or project v2.1"]:::note
+    Q_CN["CadAllocation's returned table already fixes source/target identity; later steps only do anchor alignment and display grid"]:::note
 
     A -.-> A_CN
     B -.-> B_CN
@@ -214,8 +214,8 @@ flowchart LR
   - First run `NotchV22CompensationService.Compute(...)` to obtain ToRegular/ToFull.
   - Retain `ToRegular%` / `ToFull%` as diagnostics/comments.
   - Since beta0.9, `CombinePercent` for `Current (Gain)` / `Conservative (No Gain)` has been determined by the sum of per-target regular coverage, capped at 255:
-    - `Current (Gain)`：`Σ(stage3EffectiveAreaOnTarget / targetRegularArea)`。
-    - `Conservative (No Gain)`：`Σ(overlapAreaOnTarget / targetRegularArea)`。
+    - `Current (Gain)`: `Σ(stage3EffectiveAreaOnTarget / targetRegularArea)`.
+    - `Conservative (No Gain)`: `Σ(overlapAreaOnTarget / targetRegularArea)`.
   - This avoids multiplying each target share by the whole CAD's `R` as a source-wide gain.
   - `Boundary virtual-area cap` is part of the middle Step3 compensation stage: it limits the effective virtual area extended by the ToFull boundary without changing Step1/Step4 mapping.
   - Source diff prioritizes `CAD Output FW Diff Idx`; target legs are built only from geometric aggregation of regular `(IC,Diff)`.
@@ -295,7 +295,7 @@ flowchart LR
    - `global=400` should be a diagnostic input, not an objective function of "the closer to 400, the more correct".
    - Target allocation still needs an `area-preserving + EMS-guarded` audit: preserve area ratios, check net-flow residuals, and treat `After > 480` as a safety risk.
 10. Version and mode recommendations
-   - canonical truth：`v2.2 + without gain`
+   - canonical truth: `v2.2 + without gain`
    - `without gain`: `C = ToRegular`; ToFull retains only support / cap / allowance and does not amplify the source combine
    - `v2.1`: compatibility projection only
    - `with gain`: changed to Stage3 effective allocation, but retained for calibration/research and unsuitable as the default main path
@@ -308,7 +308,7 @@ flowchart LR
 - `src/FreeformHelper.Application/Services/NotchTableGenerator.Generation.cs`
   - `GenerateLegacyRegularAnchor(...)`
 
-### 4.2 Flowchart (EN Flow + Chinese Side Notes)
+### 4.2 Flowchart (Flow + Side Notes)
 ```mermaid
 flowchart LR
     A["Enter LegacyRegularAnchor Mode"] --> B["Enumerate Freeform Regular Pads"]
@@ -326,16 +326,16 @@ flowchart LR
     F --> C
     C --> J["Return NotchTable"]
 
-    A_CN["中文：進入 Legacy 相容路徑"]:::note
-    B_CN["中文：掃描所有 freeform regular"]:::note
-    C_CN["中文：逐顆 regular 迭代"]:::note
-    D_CN["中文：沒有 matched CAD 就略過"]:::note
-    E_CN["中文：計算 matched CAD 的最大分配比"]:::note
-    F_CN["中文：依啟用版本逐一嘗試"]:::note
-    G_CN["中文：先過版本門檻再繼續"]:::note
-    H_CN["中文：策略可處理才輸出 row"]:::note
-    I_CN["中文：由版本策略實際建 row"]:::note
-    J_CN["中文：回傳 Legacy 路徑結果"]:::note
+    A_CN["Enter the Legacy compatibility path"]:::note
+    B_CN["Scan all freeform regular pads"]:::note
+    C_CN["Iterate regular pads one by one"]:::note
+    D_CN["Skip if there is no matched CAD"]:::note
+    E_CN["Compute the maximum allocation ratio of the matched CAD"]:::note
+    F_CN["Try each enabled version in turn"]:::note
+    G_CN["Pass the version threshold before continuing"]:::note
+    H_CN["Output a row only if the strategy can handle it"]:::note
+    I_CN["Build the row using the version strategy"]:::note
+    J_CN["Return the Legacy path result"]:::note
 
     A -.-> A_CN
     B -.-> B_CN
@@ -369,7 +369,7 @@ flowchart LR
 - Key behavior:
   - In public `Generate`, only `LegacyRegularAnchor` calls this strategy's `Build`; the main `CadAllocation` path does not go through it.
   - After mode dispatch, `Generate` synchronously reports to the caller-provided `IProgress`; its callback can modify the same mutable settings, causing `Build` to read CadAllocation again. Therefore, R13.004f retains the compensation branch, comment, and `allCadPads`, without mistaking absence from the normal flow for unreachability through the public API.
-  - `CanHandle` is still shared by CadAllocation eligibility queries, but eligibility does not call `Build`; consolidation of this cross-mode seam is left to R13.101～R13.103.
+  - `CanHandle` is still shared by CadAllocation eligibility queries, but eligibility does not call `Build`; consolidation of this cross-mode seam is left to R13.101 to R13.103.
 
 ---
 
@@ -379,12 +379,12 @@ flowchart LR
 Type: `src/FreeformHelper.Domain/Notch/NotchV22Node.cs`
 
 1. `AnchorDiffIndex`
-2. `CombinePercent`（0..255）
+2. `CombinePercent` (0..255)
 3. `TargetDiffIndex1` (NullValue when there is no target)
-4. `TargetRatioPercent1`（-100..100）
+4. `TargetRatioPercent1` (-100..100)
 5. `TargetDiffIndex2` (NullValue when there is no target)
-6. `TargetRatioPercent2`（-100..100）
-7. `Flags`（continuation bit）
+6. `TargetRatioPercent2` (-100..100)
+7. `Flags` (continuation bit)
 
 ### 6.2 Continuation Row Rules
 - First row: retain the actual combine.
@@ -441,7 +441,7 @@ A practical rule to remember:
 ### 7.1 Key Implementation Locations
 - `src/FreeformHelper.Application/Export/NotchTableExporter.cs`
 
-### 7.2 Flowchart (EN Flow + Chinese Side Notes)
+### 7.2 Flowchart (Flow + Side Notes)
 ```mermaid
 flowchart LR
     A["Input NotchTable"] --> B{"Export kind?"}
@@ -451,13 +451,13 @@ flowchart LR
     E --> F["Emit per-IC dispatch table"]
     F --> G["Finish func_notch.c-style output"]
 
-    A_CN["中文：輸入最終 NotchTable"]:::note
-    B_CN["中文：依輸出格式走不同分支"]:::note
-    C_CN["中文：CSV 路徑為排序後展開欄位"]:::note
-    D_CN["中文：C 輸出先依 IC 分段"]:::note
-    E_CN["中文：只輸出被選中的版本，維持 codebase v2.0.0 C 檔骨架"]:::note
-    F_CN["中文：每顆 IC 有自己的 castNHC_TABLE_ICx，再用 dispatch table 選擇"]:::note
-    G_CN["中文：完成可直接導入的 func_notch.c-style C 檔內容"]:::note
+    A_CN["Input the final NotchTable"]:::note
+    B_CN["Branch by output format"]:::note
+    C_CN["The CSV path emits the columns expanded after sorting"]:::note
+    D_CN["C output is first split by IC"]:::note
+    E_CN["Output only the selected version; keep the codebase v2.0.0 C file skeleton"]:::note
+    F_CN["Each IC has its own castNHC_TABLE_ICx; a dispatch table then selects it"]:::note
+    G_CN["Finish the content of a func_notch.c-style C file that can be imported directly"]:::note
 
     A -.-> A_CN
     B -.-> B_CN
@@ -472,13 +472,13 @@ flowchart LR
 
 ### 7.3 Output Contracts
 - CSV review: fixed review fields + `payload_01..payload_09`; intended for trace / diff review, not as the FW direct-import contract.
-- `C v2.1`：
+- `C v2.1`:
   - Output in the codebase v2.0.0 `func_notch.c` style.
   - Retain legacy `ST_PRI_NHC_TABLE_NODE_INFO` fields; leg ratio is a `UINT8 0..255` Q7 magnitude (`128=100%`), with the sign carried only by `NHC_TYPE_ADD/SUB`.
   - `ThresholdQ7` is a separate `0..128` admission gate; the two must not share the same upper limit.
   - On the CadAllocation canonical path, `NotchV21FirmwareProjector` projects the source-oriented v2.1 payload into destination-oriented rows that the legacy FW function can apply correctly; both the C formatter and C# simulation consume the same final node.
   - Firmware apply uses raw integer `(INT16 source * magnitudeQ7) >> 7`; simulation and GCC runtime must match exactly at every point, without approximation from decoding percent first.
-- `C v2.2`：
+- `C v2.2`:
   - Likewise, output in the codebase v2.0.0 `func_notch.c` style.
   - Do not use a unified root / accessor; the external entry remains `FUNC_NHC_DiffCompensation(void)`, with `FUNC_NHC_DiffCompensationByIc(UINT8 u8Ic)` for multiple ICs.
   - Change the table payload to source-oriented v2.2 nodes; legs retain `INT8 -100..100` signed percent and do not use the V21 Q7 codec. The algorithm applies source backup + legs within `FUNC_NHC_DiffCompensationOneTable(...)`.

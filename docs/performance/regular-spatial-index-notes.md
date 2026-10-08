@@ -1,36 +1,36 @@
 # Regular Spatial Index Notes
 
-## 結論（先看）
-- 目前 `PadMatcher` 並非暴力全配對；對於 **規則格點** 已使用「隱含空間索引」：
-  - 先用 `XEdges/YEdges` 二分搜尋定位 CAD bbox 對應 row/col 範圍。
-  - 只在候選 cell 範圍內做 polygon-rect overlap 計算。
-- 對 `RegularGrid` 場景，這個策略通常比額外 R-tree 更直接，且維護成本更低。
+## Conclusion (read first)
+- The current `PadMatcher` is not a brute-force all-pairs match. For **regular grids**, it already uses an "implicit spatial index":
+  - First, it uses binary search on `XEdges/YEdges` to locate the row/col range that corresponds to the CAD bbox.
+  - It computes polygon-rect overlap only within the candidate cell range.
+- For the `RegularGrid` scenario, this approach is usually more direct than an extra R-tree, and its maintenance cost is lower.
 
-## 現況實作
-- 檔案：`src/FreeformHelper.Application/Services/PadMatcher.cs`
-- 主要流程：
-  1. `GetCandidateRange()` 用 bbox + 邊界陣列找 row/col 區間。
-  2. 僅遍歷候選區間內的 regular pads。
-  3. 先做 bbox 相交快篩，再算 `IntersectionAreaWithRect`。
-  4. 低於 overlap floor（絕對值與相對值）直接忽略。
+## Current Implementation
+- File: `src/FreeformHelper.Application/Services/PadMatcher.cs`
+- Main flow:
+  1. `GetCandidateRange()` uses the bbox and boundary arrays to find the row/col interval.
+  2. Only regular pads within the candidate interval are traversed.
+  3. A bbox intersection pre-filter runs first, then `IntersectionAreaWithRect` is computed.
+  4. Overlaps below the overlap floor (absolute and relative values) are ignored directly.
 
-## 複雜度觀點
-- 理論上每顆 CAD 不是 `O(totalRegular)`，而是 `O(logR + logC + candidateCells)`。
-- 在規則網格中，`candidateCells` 近似 CAD bbox 覆蓋的格數，通常遠小於全域 regular 數量。
+## Complexity View
+- In theory, each CAD is not `O(totalRegular)`, but `O(logR + logC + candidateCells)`.
+- In a regular grid, `candidateCells` roughly approximates the number of cells covered by the CAD bbox, which is usually far smaller than the global regular count.
 
-## 什麼情況才需要升級到 R-tree / Spatial Hash
-- regular 不再是規則格點（例如大比例使用 irregular regular source）。
-- 候選區間普遍過大（單 CAD 經常覆蓋大量 cell）導致 `candidateCells` 成本失控。
-- 需要跨多種幾何集合共享同一套索引（不只 regular grid）。
+## When Upgrading to R-tree / Spatial Hash Is Needed
+- Regulars are no longer a regular grid (for example, a large proportion of irregular regular sources are used).
+- Candidate intervals are generally too large (a single CAD often covers many cells), so `candidateCells` cost gets out of control.
+- The same index must be shared across multiple geometry sets (not only the regular grid).
 
-## 建議下一步（低風險）
-1. [x] 先加 telemetry（每次 Match 的平均候選 cell、p95 候選 cell、intersection 次數）。
-   - `PadMatchResult.Telemetry`：`candidate/bounds/polygon` 次數 + `avg/p95`。
-   - Step1 log：`PERF PADMATCH: ...`。
-   - 報表腳本：`scripts/perf/extract-padmatch-telemetry.ps1`（由 `build/logs/app.log` 產生 `build/perf/padmatch-telemetry-latest.md`）。
-2. [x] 以真實專案（如 36.35）量測瓶頸是否在 candidate 掃描。
-   - 決策腳本：`scripts/perf/evaluate-padmatch-telemetry.ps1`（輸出 `build/perf/padmatch-decision-latest.md`）。
-   - 預設門檻：`avgCandidate/CAD <= 120`、`p95Candidate/CAD <= 400`、`polygonIntersections <= 2,000,000`。
-3. [x] 只有在 telemetry 顯示 candidate 成本過高時，再導入 R-tree/Spatial hash。
-   - 目前決策：預設維持 `XEdges/YEdges + candidate-range`，避免引入額外索引維護成本。
-   - 若決策腳本觸發門檻，才進入 R-tree/Spatial hash POC。
+## Suggested Next Steps (Low Risk)
+1. [x] First add telemetry (average candidate cells per Match, p95 candidate cells, number of intersection calls).
+   - `PadMatchResult.Telemetry`: `candidate/bounds/polygon` counts + `avg/p95`.
+   - Step1 log: `PERF PADMATCH: ...`.
+   - Report script: `scripts/perf/extract-padmatch-telemetry.ps1` (generates `build/perf/padmatch-telemetry-latest.md` from `build/logs/app.log`).
+2. [x] Measure with a real project (such as 36.35) whether the bottleneck is in candidate scanning.
+   - Decision script: `scripts/perf/evaluate-padmatch-telemetry.ps1` (outputs `build/perf/padmatch-decision-latest.md`).
+   - Default thresholds: `avgCandidate/CAD <= 120`, `p95Candidate/CAD <= 400`, `polygonIntersections <= 2,000,000`.
+3. [x] Only introduce R-tree/Spatial hash when telemetry shows candidate cost is too high.
+   - Current decision: by default keep `XEdges/YEdges + candidate-range` to avoid the extra index maintenance cost.
+   - Only enter the R-tree/Spatial hash POC if the decision script triggers the thresholds.

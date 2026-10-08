@@ -1,50 +1,50 @@
-# Agent 交接協定
+# Agent Handoff Protocol
 
-本目錄保存跨 session 或多人工作的即時交接狀態：誰負責什麼、在哪個 branch／head、已完成哪些驗證與還有什麼 gate。產品行為以 `docs/reference/` 契約及現行 roadmap 為準；可執行待辦與狀態由 `ROADMAP.md` 維護，不在交接紀錄複製第二份 backlog。
+This directory stores live handoff state for work across sessions or multiple people: who owns what, on which branch and head, which verifications are done, and which gates remain. Product behavior follows the contracts in `docs/reference/` and the current roadmap. Executable to-dos and status are maintained in `ROADMAP.md`; the handoff records do not copy a second backlog.
 
-## 檔案與責任
+## Files and responsibilities
 
-- `<version>.md`：版本協調板，記錄 base、工作流、負責者、待決事項與跨分支阻塞。
-- `<version>/<workstream-id>.md`：單一工作流的交接紀錄，由該工作流負責者維護。
-- `bugs/ledger.md`：目前為空的 bug ledger 索引。發現 bug 時新增 `bugs/BUG-<yyyymmdd>-<slug>.md`，再在 ledger 加入該 ID 與連結；每個 bug 一檔，避免並行寫入衝突。
+- `<version>.md`: version coordination board. Records the base, workstreams, owners, pending decisions, and cross-branch blockers.
+- `<version>/<workstream-id>.md`: handoff record for a single workstream. Maintained by that workstream's owner.
+- `bugs/ledger.md`: bug ledger index, currently empty. When a bug is found, add `bugs/BUG-<yyyymmdd>-<slug>.md`, then add that ID and link to the ledger. Use one file per bug to avoid parallel write conflicts.
 
-## 交接紀錄必備內容
+## Required content of a handoff record
 
-每份工作流紀錄先寫明以下資訊，讓接手者不需依賴聊天紀錄猜測狀態：
+Each workstream record first states the following, so the next person does not have to guess the status from chat history:
 
-1. **成果與非目標**：可觀察的完成條件、明確不處理的範圍。
-2. **Branch、worktree 與基準**：base commit、目前 head、目標分支；使用相對工作區標識，不記錄私人機器絕對路徑。
-3. **先讀材料**：適用的 `AGENTS.md`、reference contract、roadmap、TODO／issue，以及先前驗證證據。
-4. **執行資訊**：已知的 runtime／model 設定、工作分配原因；未知時如實標示未知。
-5. **驗收與待決事項**：預期檢查、證據位置與需要 owner 決定的事項。
+1. **Outcomes and non-goals**: observable completion criteria and the scope that is explicitly not handled.
+2. **Branch, worktree, and baseline**: base commit, current head, target branch. Use relative workspace identifiers, not absolute paths from private machines.
+3. **Materials to read first**: applicable `AGENTS.md`, reference contracts, roadmap, TODOs/issues, and earlier verification evidence.
+4. **Execution information**: known runtime/model settings, and the reason for the work assignment. If unknown, state that it is unknown.
+5. **Acceptance and pending decisions**: expected checks, evidence locations, and items that need a decision from the owner.
 
-## Checkpoint 格式
+## Checkpoint format
 
-每次交接在紀錄末尾追加 checkpoint，至少列出：日期／摘要；狀態（planned、local、verified、integrated、published）；commit 與 head；實際命令、結果及其對應 SHA；已修改與未追蹤檔案；審查發現；尚未完成的 gate、阻塞及答覆者；下一個具體動作。未 commit 的修改不能僅靠其他 branch 的 Git 歷史讀到，應在紀錄中明說。
+Each handoff appends a checkpoint at the end of the record, listing at least: date and summary; status (planned, local, verified, integrated, published); commit and head; actual commands, results, and their corresponding SHAs; modified and untracked files; review findings; unfinished gates, blockers, and who can answer them; and the next concrete action. Uncommitted changes cannot be read only from the Git history of another branch, so the record must state them explicitly.
 
-檢視其他 branch 已提交的交接紀錄可使用 `git show <branch>:docs/handoff/<version>/<workstream-id>.md`。交接紀錄僅報告實際驗證的狀態；`verified` 不等於已整合或已發佈。
+To view a handoff record committed on another branch, use `git show <branch>:docs/handoff/<version>/<workstream-id>.md`. Handoff records report only the state that was actually verified. `verified` does not mean integrated or published.
 
 ## Bug ledger
 
-發現與既有契約、測試或文件相矛盾的行為，或 gate 因錯誤原因失敗時，以一個 bug ID 建立一份檔案；未確認的線索標為 `suspected`。
+When you find behavior that contradicts an existing contract, test, or document, or when a gate fails for a wrong reason, create one file under a bug ID. Mark unconfirmed leads as `suspected`.
 
-公開交接與 bug 紀錄僅保留可分享的 ID、hash 和路徑參照，不寫入私有 `example/` 內容、憑證或個人工作站路徑。
+Public handoff and bug records keep only shareable IDs, hashes, and path references. Do not write private `example/` content, credentials, or personal workstation paths into them.
 
-## 範本導入的建議流程（尚未經 owner 確認）
+## Suggested flow for adopting the template (not yet confirmed by the owner)
 
-- 交接時可記錄可執行的 edit、local commit、push、PR、GitHub write 等動作、可寫範圍與需要的人員／golden gate；交接紀錄本身不擴大授權，範圍外修改的處理方式仍待確認。
-- Bug 檔案可採以下欄位格式：
+- During a handoff, record executable actions such as edits, local commits, pushes, PRs, and GitHub writes, the writable scope, and the required people and golden gates. The handoff record itself does not expand authorization; how to handle changes outside the scope is still to be confirmed.
+- Bug files may use this field format:
 
 ```text
-# BUG-<yyyymmdd>-<slug>: <標題>
+# BUG-<yyyymmdd>-<slug>: <title>
 Status: suspected | open | fixing | fixed | wontfix | duplicate
 Severity: P0 | P1 | P2 | P3
-Found: <日期、工作、branch@sha>
-Where: <路徑與行號或命令>
-Observed: <實際行為>
-Expected: <依據契約及預期行為>
-Evidence: <可重現命令與結果或程式碼位置>
-Owner: unassigned | <負責者與 branch>
-Resolution: <修復 SHA、驗證或不修理由>
+Found: <date, task, branch@sha>
+Where: <path and line number, or command>
+Observed: <actual behavior>
+Expected: <expected behavior and the contract it is based on>
+Evidence: <reproducible command and result, or code location>
+Owner: unassigned | <owner and branch>
+Resolution: <fix SHA, verification, or reason for not fixing>
 ```
 

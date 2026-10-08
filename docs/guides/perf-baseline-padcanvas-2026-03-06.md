@@ -1,30 +1,30 @@
-# PadCanvas Selection/Draw Perf Baseline（2026-03-06）
+# PadCanvas Selection/Draw Perf Baseline (2026-03-06)
 
-## 目的
-- 為 `PadCanvas` 新增的觀測欄位建立第一版基線，後續優化可直接比較前後差異。
-- 指標來源：
-  - `Selection updated` 既有 timing（summary / inspector / notchPreview / total）
-  - 新增 `canvasSelect(...)` / `draw(...)` 快照欄位
+## Purpose
+- Create the first baseline for the new observation fields in `PadCanvas`. Later optimizations can be compared directly against it.
+- Metric sources:
+  - Existing `Selection updated` timings (summary / inspector / notchPreview / total)
+  - New `canvasSelect(...)` / `draw(...)` snapshot fields
 
-## 採樣資料與前置
-- 專案：`example/BOE36.35/project_3635.json`
-- 版本：`master`（含 `PadCanvas.Perf.cs` 埋點）
-- 採樣前置：
-  - App log level 需為 `Debug`（否則不會輸出 `Selection updated` debug line）
-  - 啟動 app instance 後，以 runtime query 載入 3635 並做多次 `select-cad/clear-selection`
+## Sample Data and Prerequisites
+- Project: `example/BOE36.35/project_3635.json`
+- Version: `master` (includes `PadCanvas.Perf.cs` instrumentation)
+- Sampling prerequisites:
+  - App log level must be `Debug` (otherwise the `Selection updated` debug line is not output)
+  - Start an app instance, then load 3635 via runtime query and run multiple `select-cad/clear-selection` calls
 
-## 採樣命令（實際使用）
+## Sampling Commands (as actually used)
 ```powershell
-# 啟動 app（使用含 Debug log level 的 app settings）
+# Start the app (using app settings with the Debug log level)
 Start-Process -FilePath "build/bin/FreeformHelper.UI/Debug/net8.0/FreeformHelper.UI.exe" `
   -WorkingDirectory (Resolve-Path ".") `
   -Environment @{ FREEFORMHELPER_APP_GENERAL_SETTINGS_PATH = "$env:TEMP\freeform-app-general-a1bed0c3941b4fce9238efd6520a8fb4.json" }
 
-# 載入 3635
+# Load 3635
 & "build/bin/FreeformHelper.UI/Debug/net8.0/FreeformHelper.UI.exe" query load-project `
   --path "example/BOE36.35/project_3635.json" --json-compact --timeout-ms 120000
 
-# 取樣（多次選取）
+# Sample (multiple selections)
 $ids = @(4767,3777,2089,274,291)
 foreach ($id in $ids) {
   & "build/bin/FreeformHelper.UI/Debug/net8.0/FreeformHelper.UI.exe" query clear-selection --json-compact --timeout-ms 60000 | Out-Null
@@ -33,17 +33,17 @@ foreach ($id in $ids) {
 & "build/bin/FreeformHelper.UI/Debug/net8.0/FreeformHelper.UI.exe" query clear-selection --json-compact --timeout-ms 60000 | Out-Null
 ```
 
-## 指標擷取規則
-- log line pattern（單行）：
+## Metric Extraction Rules
+- Log line pattern (single line):
   - `Selection updated: ... | canvasSelect(rev=...,ms=...,cadCand=...,regCand=...,...) draw(rev=...,ms=...,cadCand=...,regCand=...,visCad=...,visReg=...,stepCad=...,stepReg=...)`
-- 本次擷取欄位：
-  - `inspector ms`、`total ms`
-  - `draw.ms`、`draw.cadCand`、`draw.regCand`、`draw.stepCad`、`draw.stepReg`
-  - `canvasSelect.revision`（確認是否走到選取埋點）
+- Fields captured in this run:
+  - `inspector ms`, `total ms`
+  - `draw.ms`, `draw.cadCand`, `draw.regCand`, `draw.stepCad`, `draw.stepReg`
+  - `canvasSelect.revision` (to confirm the selection instrumentation was reached)
 
-## 基線結果（本次）
-- 來源：`build/logs/app.log`（2026-03-06 22:44 local）
-- 樣本數：`10`
+## Baseline Results (this run)
+- Source: `build/logs/app.log` (2026-03-06 22:44 local)
+- Sample count: `10`
 
 | Metric | Value |
 |---|---:|
@@ -55,14 +55,14 @@ foreach ($id in $ids) {
 | draw decimation step (cad / regular) | 1 / 1 |
 | canvasSelect revision max | 0 |
 
-## 解讀與限制
-- `draw` 指標已可穩定觀測（候選數與 draw 耗時可比較）。
-- 本次樣本 `canvasSelect revision = 0`：
-  - 原因：runtime `select-cad` 屬程式化單點選取，不是框選/命中測試路徑。
-  - 後續若要建立「框選起手延遲」基線，需加一輪手動框選或專用自動化輸入腳本。
+## Interpretation and Limitations
+- The `draw` metrics can now be observed consistently (candidate counts and draw time are comparable).
+- In this sample, `canvasSelect revision = 0`:
+  - Reason: runtime `select-cad` is a programmatic single-point selection, not the box-select or hit-test path.
+  - To build a baseline for "box-select start latency", run one round of manual box selection or use a dedicated automated input script.
 
-## 後續比較建議
-- 每次調整 `PadCanvas.SelectionEngine` 或 `PadCanvas.VisibleDrawListBuilder` 後，至少重跑一次上述流程。
-- 比較門檻建議：
-  - `draw p95` 不可高於基線 +20%
-  - `inspector p95`、`total p95` 不可高於現有 3635 budget
+## Recommendations for Future Comparison
+- After each change to `PadCanvas.SelectionEngine` or `PadCanvas.VisibleDrawListBuilder`, rerun the above process at least once.
+- Suggested comparison thresholds:
+  - `draw p95` must not exceed baseline by more than +20%
+  - `inspector p95` and `total p95` must not exceed the existing 3635 budget

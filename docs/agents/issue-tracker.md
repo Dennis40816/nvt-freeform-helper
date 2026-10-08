@@ -1,29 +1,29 @@
 # Issue tracker: GitHub
 
-FreeformHelper 的規格與可執行 tickets 以 GitHub Issues 為唯一 tracker，repository 為 `Dennis40816/nvt-freeform-helper`。
+FreeformHelper's specifications and executable tickets use GitHub Issues as the only tracker. The repository is `Dennis40816/nvt-freeform-helper`.
 
-owner 決定（2026-10-04；經 Commander 轉述）：只搬移經機密審查後可公開的舊 issue 至公開 repo，並改寫 `TODO.md` 與文件中對應連結；其餘舊 issue 在私有 `Dennis40816/FreeformHelper` 完成封存後仍保留在原 repo。這取代先前「舊 issue 不搬移、不改寫」的決定。舊 PR 仍不搬移、不改寫連結，封存後留在原私有 repo。As of 2026-10-05, only the parent spec was migrated (old issue 1 -> public issue 27); the 42 other open old issues are delivered child tickets and stay in the private repository. The bot's current issue permissions are described in `TODO.md` ("Bot issue permissions" under the 2026-10-05 owner decisions).
+Owner decision (2026-10-04; relayed by Commander): Only old issues that pass confidentiality review and are safe to make public will be migrated to the public repo. `TODO.md` and the matching links in the documents will be rewritten. The other old issues stay in the original private repo `Dennis40816/FreeformHelper` after it is archived. This replaces the earlier decision that old issues are not migrated and not rewritten. Old PRs are still not migrated and their links are not rewritten; they stay in the original private repo after archiving. As of 2026-10-05, only the parent spec was migrated (old issue 1 -> public issue 27); the 42 other open old issues are delivered child tickets and stay in the private repository. The bot's current issue permissions are described in `TODO.md` ("Bot issue permissions" under the 2026-10-05 owner decisions).
 
 ## Conventions
 
-- 規格 issue：由 `to-spec` 發布，完成最高層級 test seam 決策後加上 `ready-for-agent`。
-- 實作 ticket：由 `to-tickets` 拆分；每張 ticket 必須列出 scope、out of scope、acceptance criteria、test plan 與 blocker。
-- 建立或修改 issue 前先搜尋相同 `R13.*` 或標題，避免重複。
-- 優先使用 GitHub native sub-issues 與 issue dependencies；issue body 同時保留 `Part of #N`／`Blocked by: #N` 供人類直接閱讀。若 repository 不支援 native relationships，body 關係就是 fallback contract。
-- Commit title 保持單一邏輯範圍，commit body 使用 `Refs #N`；完成 ticket 的 PR 才使用 `Closes #N`。
-- Pull request body 應列出涵蓋的 issues、行為／契約影響、驗證命令與 golden evidence。
-- From 2026-10-04, new PR titles and bodies default to English; already-open PRs are not rewritten. If `AGENTS.md` or `CONTRIBUTING.md` says otherwise, ask the owner in chat before changing either file.
+- Specification issue: published by `to-spec`. After the highest-level test seam decision is complete, add `ready-for-agent`.
+- Implementation ticket: split by `to-tickets`. Each ticket must list scope, out of scope, acceptance criteria, test plan, and blocker.
+- Before creating or changing an issue, search for the same `R13.*` or title to avoid duplicates.
+- Prefer GitHub native sub-issues and issue dependencies. Keep `Part of #N` / `Blocked by: #N` in the issue body too, so people can read them directly. If the repository does not support native relationships, the body relationships are the fallback contract.
+- Keep the commit title to one logical scope. Use `Refs #N` in the commit body. Only a PR that completes a ticket uses `Closes #N`.
+- The pull request body should list the covered issues, behavior or contract impact, verification commands, and golden evidence.
+- From 2026-10-04, new PR titles and bodies default to English. Already-open PRs are not rewritten. If `AGENTS.md` or `CONTRIBUTING.md` says otherwise, ask the owner in chat before changing either file.
 
 ## Pull requests as a triage surface
 
-PR 不作為新需求入口；新需求先建 issue，再由 branch／commit／PR 回鏈。
+PRs are not an entry point for new requirements. New requirements start as issues, and branches, commits, and PRs link back to them.
 
-## Completion 與歷史例外
+## Completion and historical exceptions
 
-- Native sub-issue／dependency links 是機器可查的關係；issue body 的 `Part of`／`Blocked by` 同時保留，供 reviewer 不開額外 UI 也能讀懂。
-- `Closes #N` 表示完成意圖，但 GitHub 只有在 PR 進入 default branch 的整合流程中才可依平台規則自動關票。若 PR 先合入 release branch，必須在 default-branch integration PR 或 merge 後人工依 dependency 順序驗證 issue state。
-- Ticket 建立前的 bootstrap commit，或已推送但 commit body 格式不完整的歷史 commit，不以 rewrite/force-push 修正；在 roadmap、PR 與 issue evidence明列例外。新 commit 一律使用獨立一行 `Refs #N`。
+- Native sub-issue and dependency links are machine-readable relationships. The `Part of` and `Blocked by` lines in the issue body are kept too, so reviewers can read them without opening extra UI.
+- `Closes #N` shows completion intent. GitHub only closes issues automatically under its platform rules when a PR enters the default branch integration flow. If a PR merges into a release branch first, a default-branch integration PR or merge must be used, or issue state must be checked by hand in dependency order.
+- Bootstrap commits made before a ticket exists, and historical commits already pushed with incomplete commit body format, are not fixed by rewrite or force-push. List these exceptions in the roadmap, PRs, and issue evidence. New commits always use a separate single line `Refs #N`.
 
 ## Tooling
 
-優先使用已連線的 GitHub connector 讀寫 issue／PR metadata；connector 未涵蓋的 labels、native dependencies、current-branch discovery 或 Actions logs 才使用 `gh`。
+Prefer the connected GitHub connector to read and write issue and PR metadata. Use `gh` only for labels, native dependencies, current-branch discovery, or Actions logs that the connector does not cover.

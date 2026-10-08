@@ -1,69 +1,69 @@
-# Repo Refactor Scan（2026-02-26）
+# Repo Refactor Scan (2026-02-26)
 
-## 掃描範圍
-- 分支：`refactor-code-reduction-pass1`
-- 掃描檔案：`src/`、`tests/`、`docs/`（排除 `bin/obj/build`）
-- 檔案數（tracked）：`408`
+## Scan Scope
+- Branch: `refactor-code-reduction-pass1`
+- Scanned files: `src/`, `tests/`, `docs/` (excluding `bin/obj/build`)
+- Tracked files: `408`
 
-## 量化結果（本輪）
-1. 行數熱點（前 10）
-   - `src/FreeformHelper.UI/Services/RuntimeQueryUseCase.cs`：1493
-   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs`：1483
-   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs`：1373
-   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs`：1352
-   - `src/FreeformHelper.UI/Controls/PadCanvas.Rendering.cs`：1083
-   - `src/FreeformHelper.Application/Services/NotchV22CompensationService.cs`：1040
-   - `src/FreeformHelper.UI/Views/FreeformHelperView.axaml.cs`：944
-   - `src/FreeformHelper.UI/Views/FreeformHelperView.Console.cs`：914
-   - `src/FreeformHelper.UI/Services/ManualSizingService.cs`：899
-   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.cs`：868
-2. Lint/analyzer（`./scripts/tests/lint.ps1 -AllFiles`）
-   - 總 warning：`74`
-   - `CA1822`：72（大量 stateless service / helper 可轉 static）
-   - `CA1865`：2（`StartsWith(string)` 單字元用法）
-3. 同步/關閉路徑風險
-   - `src/FreeformHelper.UI/Services/RuntimeQueryIpc.cs` 仍有 `_runLoopTask?.Wait(...)`，存在關閉時阻塞風險。
-4. 文件同步問題
-   - `docs/reference/behavior-inventory.md` 尚有已失效敘述（例如 `ShowHomeCommand`）。
+## Quantified Results (This Round)
+1. Line count hotspots (top 10)
+   - `src/FreeformHelper.UI/Services/RuntimeQueryUseCase.cs`: 1493
+   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs`: 1483
+   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs`: 1373
+   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs`: 1352
+   - `src/FreeformHelper.UI/Controls/PadCanvas.Rendering.cs`: 1083
+   - `src/FreeformHelper.Application/Services/NotchV22CompensationService.cs`: 1040
+   - `src/FreeformHelper.UI/Views/FreeformHelperView.axaml.cs`: 944
+   - `src/FreeformHelper.UI/Views/FreeformHelperView.Console.cs`: 914
+   - `src/FreeformHelper.UI/Services/ManualSizingService.cs`: 899
+   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.cs`: 868
+2. Lint/analyzer (`./scripts/tests/lint.ps1 -AllFiles`)
+   - Total warnings: `74`
+   - `CA1822`: 72 (many stateless services / helpers can become static)
+   - `CA1865`: 2 (single-character `StartsWith(string)` usage)
+3. Sync/shutdown path risk
+   - `src/FreeformHelper.UI/Services/RuntimeQueryIpc.cs` still calls `_runLoopTask?.Wait(...)`. This risks blocking on shutdown.
+4. Documentation sync issues
+   - `docs/reference/behavior-inventory.md` still has outdated descriptions (for example, `ShowHomeCommand`).
 
-## 重構機會（按優先順序）
+## Refactor Opportunities (by Priority)
 
-### P0（先做）
-1. **Selection/Inspector 低延遲化第二輪**
-   - 目標：降低框選起手延遲（先更新 selection summary，inspector 走背景批次，並在 drag 期間禁重工作業）。
-   - 入口：`src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.cs`
-2. **IPC 關閉流程去阻塞**
-   - 目標：把 `_runLoopTask?.Wait(...)` 改為 async stop（含 timeout/cancel），避免 UI close 卡住。
-   - 入口：`src/FreeformHelper.UI/Services/RuntimeQueryIpc.cs`
-3. **Analyzer 清債（先清 CA1822/CA1865）**
-   - 目標：把 stateless 成員標示為 `static`，修正單字元 `StartsWith`，降低噪音 warning。
-   - 入口：`src/FreeformHelper.UI/Services/*.cs`、`src/FreeformHelper.Application/**/*.cs`
+### P0 (Do First)
+1. **Selection/Inspector low-latency, second round**
+   - Goal: reduce the delay when starting a marquee selection. Update the selection summary first, run inspector work in background batches, and block heavy work during drag.
+   - Entry point: `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.cs`
+2. **Remove blocking from the IPC shutdown flow**
+   - Goal: replace `_runLoopTask?.Wait(...)` with an async stop (with timeout/cancel) to keep the UI from hanging on close.
+   - Entry point: `src/FreeformHelper.UI/Services/RuntimeQueryIpc.cs`
+3. **Analyzer debt cleanup (clear CA1822/CA1865 first)**
+   - Goal: mark stateless members as `static`, fix single-character `StartsWith` usage, and reduce warning noise.
+   - Entry points: `src/FreeformHelper.UI/Services/*.cs`, `src/FreeformHelper.Application/**/*.cs`
 
-### P1（流程/品質）
-1. **Lint gate 擴大到 solution 層**
-   - 目前 lint 僅 build `FreeformHelper.UI.csproj`；建議新增「全解決方案 analyzer gate」模式，避免跨專案品質債累積。
-   - 入口：`scripts/tests/lint.ps1`、`scripts/tests/run-refactor-gate.ps1`
-2. **測試命名規則策略化**
-   - `CA1707`（底線命名）在 tests 比例高；決策需二選一：
-     - A. 逐步改名
-     - B. 僅在 tests 專案調整規則（保留可讀性）
+### P1 (Process/Quality)
+1. **Extend the lint gate to the solution level**
+   - Lint currently builds only `FreeformHelper.UI.csproj`. Add a full-solution analyzer gate mode so cross-project quality debt does not build up.
+   - Entry points: `scripts/tests/lint.ps1`, `scripts/tests/run-refactor-gate.ps1`
+2. **Make the test naming rule a policy**
+   - `CA1707` (underscore naming) is common in tests. Choose one of two options:
+     - A. Rename gradually
+     - B. Adjust the rule only in the tests project (keep readability)
 
-### P2（架構可維護性）
-1. **超大檔案再拆分**
-   - `RuntimeQueryUseCase`、`FreeformHelperViewModel.Settings/State/Operations`、`PadCanvas.Rendering` 仍超大。
-   - 建議按 command domain / setting domain / render layer 再分模組，持續保持 single-entry。
-2. **Notch/Inspector 重算策略文件化**
-   - 補齊「何時快取命中、何時強制重算、何時只更新 overlay」決策表（供 UI/CLI 共用）。
+### P2 (Architecture Maintainability)
+1. **Split very large files further**
+   - `RuntimeQueryUseCase`, `FreeformHelperViewModel.Settings/State/Operations`, and `PadCanvas.Rendering` are still very large.
+   - Split them into modules by command domain / setting domain / render layer, and keep the single entry point.
+2. **Document the Notch/Inspector recalculation policy**
+   - Complete a decision table covering when to hit the cache, when to force a recalculation, and when to update only the overlay. It should be shared by UI and CLI.
 
-### UI 顯示（持續優化）
-1. **文字溢出守門**
-   - 新增 layout guard：關鍵資訊欄（Settings、Inspector、Notch export rows）必須換行且不超出容器。
-2. **重點層級 token 化**
-   - 把「結果/原因/次要資訊」顏色與字重收斂為 token，避免區塊視覺規則漂移。
+### UI Display (Ongoing Optimization)
+1. **Text overflow guard**
+   - Add a layout guard: key information columns (Settings, Inspector, Notch export rows) must wrap and must not overflow their container.
+2. **Tokenize the emphasis levels**
+   - Consolidate the colors and font weights for "result / cause / secondary info" into tokens, so block visual rules do not drift.
 
-## 驗證與門檻
-- Build：`dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`
-- Lint：`./scripts/tests/lint.ps1`（必要時 `-AllFiles`）
-- 回歸：`scripts/tests/run-tests.ps1 -Group application`
-- 回歸：`scripts/tests/run-tests.ps1 -Group ui-core`
-- 回歸：`scripts/tests/run-tests.ps1 -Group smoke`
+## Verification and Thresholds
+- Build: `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`
+- Lint: `./scripts/tests/lint.ps1` (use `-AllFiles` if needed)
+- Regression: `scripts/tests/run-tests.ps1 -Group application`
+- Regression: `scripts/tests/run-tests.ps1 -Group ui-core`
+- Regression: `scripts/tests/run-tests.ps1 -Group smoke`

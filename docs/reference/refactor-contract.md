@@ -1,9 +1,9 @@
 # FreeformHelper refactor contract
 
-- Scope: the handoff groups `g1`～`g7` before `1.0.0`. They were named `1.3.0`～`1.3.5` before 2026-10-07; older commits and reviews use the old names.
-- This document keeps the rules that every 1.0.x refactor slice must follow: the zero-difference policy, the Firmware C and Q7 contract, the gates G0～G6, the golden update rules, the targeted suites, and the specs of the open slices.
+- Scope: the handoff groups `g1` to `g7` before `1.0.0`. They were named `1.3.0` to `1.3.5` before 2026-10-07; older commits and reviews use the old names.
+- This document keeps the rules that every 1.0.x refactor slice must follow: the zero-difference policy, the Firmware C and Q7 contract, the gates G0 to G6, the golden update rules, the targeted suites, and the specs of the open slices.
 - Status, target versions and order live in `ROADMAP.md`. This document does not track progress.
-- It was split out of `docs/guides/refactor-roadmap-1.3.x.md` on 2026-10-07. The finished g1 slice specs, the 2026-07-20 gate-gap history (old 1.2), the release-train table (old 4) and the reviewer traceability tables (old 11.1～11.3) were removed; git history keeps them.
+- It was split out of `docs/guides/refactor-roadmap-1.3.x.md` on 2026-10-07. The finished g1 slice specs, the 2026-07-20 gate-gap history (old 1.2), the release-train table (old 4) and the reviewer traceability tables (old 11.1 to 11.3) were removed; git history keeps them.
 - The Notch algorithm specification remains `docs/reference/notch-system-reference.md`.
 - Planning base: `codex/code-size-cutdown`, commit `165f076`. Code-size signed reference: R13.002 commit `3032121`; see `docs/performance/code-size-baseline-1.3.0.md`.
 - GitHub parent spec: [#27](https://github.com/Dennis40816/nvt-freeform-helper/issues/27).
@@ -11,41 +11,41 @@
 
 ---
 
-## 0. 執行結論
+## 0. Executive conclusions
 
-1. 1.0.x 以「先建立可信 gate，再移動核心資料路徑，最後拆 UI」為固定順序。
-2. 所有 1.0.x 重構（包含 `R13.003`）都必須保持：
-   - BOE 3635 V21/V22 Firmware C export byte-exact。
-   - TM8.1 acceptance matrix 與 Notch golden snapshot 完全一致。
-   - 不得新增 Runtime Query、UI、inspector、simulation 或 export 的 second-pass derivation；目前已存在的多路推導必須由 R13.102/104 明列並逐步移除，不能因本條而假裝已完成。
-   - Existing UI appearance, action roles, spacing and DevView previews remain unchanged except for the owner-approved R13.303 opacity fallback of 0.9 in g5, which requires updated snapshots.
-   - `V21_before == V21_after` 且 `V22_before == V22_after`；不是要求 V21 與 V22 兩份檔案彼此相同。
-   - R13.101～R13.103 的 architecture exit target 是：V21/V22 共用 version-neutral input、matching evidence、allocation、compensation、audit 與 resolved result，只能在最後的 version-specific data projection／formatting 邊界分岔。g1 current generator 尚有 early threshold/cache/legacy dispatch debt，詳見 R13.005 canonical docs。
-   - 若 Q7 correctness 需要改變任何 C byte，該工作退出 1.0.x zero-diff refactor，另立產品行為變更 issue，不得更新本計畫的 golden。
-3. 每次只執行一個 `R13.*` slice；每個 slice 必須單獨 build、targeted test、lint、commit、push。
-4. 不把不同 bounded context 為了「去重」硬合併：多對多 Pad overlap、DXF 一對一 audit、Canvas hit-test 是不同結果；只共享真正相同的幾何證據或 tie-break policy。
-5. 不批次刪除單一使用 token，也不移除 DevView。只合併語意相同的 token；DevView 是 UI contract 的正式預覽與 guard surface。
-6. Reviewer 建議不能只靠 release 主題推定為「已涵蓋」；每一項必須對到一個 `R13.*`、已完成證據、明確不執行理由，或有退出條件的 discovery gate。
-7. `R13.007` 是跨版本 traceability governance，可先建立 tracker/labels/spec，且不與 production slice 混在同一 commit；production code 仍一次只執行一個依賴 frontier 上的 `R13.*`。執行 tracker 為 [#2](https://github.com/Dennis40816/FreeformHelper/issues/2)。
+1. 1.0.x uses a fixed order: first build a trustworthy gate, then move the core data path, and finally split the UI.
+2. Every 1.0.x refactor (including `R13.003`) must keep the following:
+   - BOE 3635 V21/V22 Firmware C export is byte-exact.
+   - The TM8.1 acceptance matrix and the Notch golden snapshot match exactly.
+   - No new second-pass derivation may be added to Runtime Query, UI, inspector, simulation or export. Existing multi-path derivations must be listed and removed step by step under R13.102/104. This clause does not mean they are already done.
+   - Existing UI appearance, action roles, spacing and DevView previews remain unchanged, except for the owner-approved R13.303 opacity fallback of 0.9 in g5, which requires updated snapshots.
+   - `V21_before == V21_after` and `V22_before == V22_after`. It does not require the V21 and V22 files to be identical to each other.
+   - The architecture exit target for R13.101 to R13.103 is: V21 and V22 share version-neutral input, matching evidence, allocation, compensation, audit and resolved result. They may only diverge at the final version-specific data projection/formatting boundary. The current g1 generator still has early threshold, cache and legacy dispatch debt; see the R13.005 canonical docs.
+   - If a Q7 correctness fix requires changing any C byte, that work leaves the 1.0.x zero-diff refactor. It must be handled by a separate product-behavior change issue, and the golden for this plan must not be updated.
+3. Run only one `R13.*` slice at a time. Each slice must be built, targeted-tested, linted, committed and pushed separately.
+4. Do not force-merge different bounded contexts just to remove duplication. Many-to-many Pad overlap, DXF one-to-one audit and Canvas hit-test produce different results. Share only truly identical geometry evidence or tie-break policy.
+5. Do not delete single-use tokens in batches, and do not remove DevView. Merge only tokens with identical meaning. DevView is the formal preview and guard surface of the UI contract.
+6. Reviewer suggestions may not be treated as "covered" based only on the release theme. Each item must map to an `R13.*`, to completed evidence, to an explicit reason for not executing, or to a discovery gate with an exit condition.
+7. `R13.007` is cross-version traceability governance. A tracker, labels and spec may be created first, and it must not be mixed into the same commit as a production slice. Production code still runs only one `R13.*` at a time, on the dependency frontier. The execution tracker is [#2](https://github.com/Dennis40816/FreeformHelper/issues/2).
 
-**Owner 決定（2026-10-03；回覆 `docs/reviews/ui-feature-inventory-2026-10.md` 的產品問題）**
+**Owner decisions (2026-10-03; reply to the product questions in `docs/reviews/ui-feature-inventory-2026-10.md`)**
 
-- V21 firmware C output：答覆「不確定，先保留」；據此：`R13.103` 的 final projection／formatter 分離（含 legacy convergence）暫緩；不得開始移除或變更 V21 output，以及舊 project 對它的讀取路徑。
-- `LegacyRegularAnchor`（重新匯出已交付 project）：答覆「不確定，先保留」；據此：`R13.101c-2` 與 `R13.102` 中僅涉及 legacy 的部分暫緩；既有 zero-diff gates 繼續保護它。
-- 後續答覆（2026-10-03；問題為 `R13.101c-2`／`R13.103` 是否繼續，保留經等價性測試的 Legacy 相容 adapter，或維持暫緩）：owner 原話「先保留吧 但後續目標會是完全移除2.1」。
-- 確認（owner 2026-10-03 在畫面回覆「V21」）：「2.1」指 V2.1，即 V21（本庫 roadmap／TODO 使用「final V2.1 projector」），不是 release 版本 2.1。
-- 後續答覆取代先前對 `R13.101c-2`／`R13.103` 及 `R13.102` 純 legacy 部分的「暫緩」後果：V21 與 Legacy 維持原樣，由既有 zero-diff gates 保護；不再投入額外收斂／等價性工作；完全移除是後續目標，版本未訂。owner 決定（2026-10-04，經 Commander 轉述）排在 g7 之後，範圍之後再定，之前不做隱性轉換。本次只記錄，不變更任務狀態。
+- V21 firmware C output: the reply was "not sure, keep it for now". Accordingly, the final projection/formatter separation of `R13.103` (including legacy convergence) is postponed. Do not start removing or changing V21 output, or the read path for old projects that depend on it.
+- `LegacyRegularAnchor` (re-export of already delivered projects): the reply was "not sure, keep it for now". Accordingly, `R13.101c-2` and the legacy-only parts of `R13.102` are postponed. The existing zero-diff gates continue to protect it.
+- Follow-up reply (2026-10-03; the question was whether `R13.101c-2`/`R13.103` continue by keeping equivalence-tested Legacy compatibility adapters, or stay postponed): the owner's words were "keep it for now, but the later target will be complete removal of 2.1".
+- Confirmation (the owner replied "V21" on screen on 2026-10-03): "2.1" refers to V2.1, i.e. V21 (this repository's roadmap/TODO uses "final V2.1 projector"), not release version 2.1.
+- The follow-up reply above replaces the earlier "postponed" consequence for `R13.101c-2`/`R13.103` and for the pure legacy part of `R13.102`. V21 and Legacy stay as they are, protected by the existing zero-diff gates. No extra convergence or equivalence work is invested. Complete removal is a later goal with no version assigned. On 2026-10-04, the owner (relayed by the Commander) placed it after g7. Its scope will be decided later. No implicit conversion happens before then. This entry only records the decision and does not change task status.
 - The g2 exit audit keeps B1/B2 as accepted exceptions (owner decision, 2026-10-03). The owner decided on 2026-10-04, relayed by the Commander session, that g2 closes with A1/A2 and C1–C6 do not block closure. Parent and milestone exits remain the owner's decision.
-- Step4 mapping 與 Step6 validation diagnostics：答覆「移到未編號的診斷區」；據此：Owner 確認 `R13.305a` 已寫明的方向。
-- 視覺重設計：答覆「先不改視覺」；據此：1.x 只重整結構，不採用新的視覺語言或重設 token set；結構變更所迫使的範圍以外，任何會改變畫面的變更都需另取得 owner 決定。
+- Step4 mapping and Step6 validation diagnostics: the reply was "move to the unnumbered diagnostics area". Accordingly, the owner confirmed the direction already written in `R13.305a`.
+- Visual redesign: the reply was "do not change visuals for now". Accordingly, 1.x only reorganizes structure. It does not adopt a new visual language or reset the token set. Beyond the scope forced by structural changes, any change that alters the screen needs a separate owner decision.
 
 ---
 
-## 1. 目前基準與已驗證事實
+## 1. Current baseline and verified facts
 
-### 1.1 2026-07-20 測試基準
+### 1.1 Test baseline of 2026-07-20
 
-規劃前已執行擴充 Notch/Firmware 核心集合：
+Before planning, the extended Notch/Firmware core set was run:
 
 ```powershell
 dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj `
@@ -53,99 +53,99 @@ dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj `
   --filter "FullyQualifiedName~NotchExampleCExportDriftTests|FullyQualifiedName~NotchGoldenBaselineTests|FullyQualifiedName~Tm81NotchAcceptanceMatrixTests|FullyQualifiedName~NotchTableExporterTests|FullyQualifiedName~NotchTableGeneratorTests|FullyQualifiedName~NotchV22CompensationServiceTests|FullyQualifiedName~NotchV22TargetAllocationServiceTests|FullyQualifiedName~NotchV22ResolvedResultServiceTests|FullyQualifiedName~NotchV22FinalOutlineServiceTests|FullyQualifiedName~NotchDiffIdentityPipelineTests|FullyQualifiedName~NotchCadOutputFwDiffProjectionServiceTests|FullyQualifiedName~NotchApplySimulationServiceTests|FullyQualifiedName~NotchApplySimulationReviewUseCaseTests|FullyQualifiedName~NotchSettingsTests|FullyQualifiedName~RuntimeQueryUseCaseTests"
 ```
 
-結果：`103 passed / 0 failed / 0 skipped`。
+Result: `103 passed / 0 failed / 0 skipped`.
 
-R13.002 在 2026-07-28 進一步證明，這個數字只能代表原有 test seams 全綠，不能單獨證明 checked-in C golden 等於 production export：
+On 2026-07-28, R13.002 further showed that this number only proves that the existing test seams are all green. It cannot alone prove that the checked-in C golden equals production export:
 
-- 舊 `NotchExampleCExportDriftTests` 直接取 raw `_cad`（9,843 pads），略過 production `BuildFilteredCadPadSet` 與 project 保存的 layer selections。
-- 真實 UI/IPC、修正後的 production-equivalent test 都使用 4,838 個 selected-layer pads，且兩條路徑輸出的 SHA-256 完全相同。
-- production V21 為 692 nodes / 130,979 bytes / `8961B8155B0571B193C7C87D8EEA75077B4EF8822828506C4661B50BA2E57488`。
-- production V22 為 548 nodes / 84,023 bytes / `5208068BBD8D82FC0A628693EF6035B31288EC674A25724C0C962CD58757BB47`。
+- The old `NotchExampleCExportDriftTests` took raw `_cad` directly (9,843 pads). It skipped the production `BuildFilteredCadPadSet` and the layer selections saved by the project.
+- The real UI/IPC path and the corrected production-equivalent test both use 4,838 selected-layer pads. The SHA-256 of both paths' output is identical.
+- Production V21: 692 nodes / 130,979 bytes / `8961B8155B0571B193C7C87D8EEA75077B4EF8822828506C4661B50BA2E57488`.
+- Production V22: 548 nodes / 84,023 bytes / `5208068BBD8D82FC0A628693EF6035B31288EC674A25724C0C962CD58757BB47`.
 
-2026-08-08 人員已確認 `example/BOE36.35/project_3635.json` 與 project 保存的 production layer/filter state 是 Lucid 3635 authoritative input，並同意以上述兩個 production hashes 做一次性 provenance correction。這是 refactor 前的 baseline 修復，不是後續更新 golden 的授權。
+On 2026-08-08, the team confirmed that `example/BOE36.35/project_3635.json` and the production layer/filter state saved by the project are the authoritative Lucid 3635 input. They agreed to make a one-time provenance correction using the two production hashes above. This is a baseline repair before the refactor. It is not authorization for later golden updates.
 
-### 1.3 R13.002 cross-path 調查結果
+### 1.3 R13.002 cross-path investigation results
 
-`scripts/perf/run-3635-regression-baseline.ps1` 的 R13.002 版本已能透過 isolated hidden UI/IPC 產生 `c-v21` 與 `c-v22`，並以 normalized ordinal compare 執行 exact gate。現有證據可證明：
+The R13.002 version of `scripts/perf/run-3635-regression-baseline.ps1` can already produce `c-v21` and `c-v22` through an isolated hidden UI/IPC path. It runs the exact gate with a normalized ordinal compare. The current evidence shows:
 
-- Runtime Query 仍委派既有 ViewModel Step 5 export command，沒有第二條 C row 生成路徑。
-- 真實 UI/IPC 與修正後的 production-equivalent Application test 對 V21/V22 各自 byte-identical。
-- CLI 的 `--format` 只暫時切換 export file type 並於 export 後恢復；不修改 `EnableV21`／`EnableV22`，連續 V21/V22 export 不互相污染 project version state。
-- gate 只停止自己啟動且 executable path 已驗證的 UI process，並隔離 app-general-settings。
+- Runtime Query still delegates to the existing ViewModel Step 5 export command. There is no second C row generation path.
+- The real UI/IPC path and the corrected production-equivalent Application test are each byte-identical for V21 and V22.
+- The CLI `--format` only switches the export file type temporarily and restores it after export. It does not modify `EnableV21` or `EnableV22`. Consecutive V21/V22 exports do not contaminate each other's project version state.
+- The gate only stops the UI process it started itself and whose executable path was verified. It isolates app-general-settings.
 
-project 保存的 layer selections 繼續作為 production Step1/Step5 輸入；checked-in C golden 依第 3.1 節做已簽核的 provenance correction。完成 `R13.002` 後，後續 1.0.x slice 不得再更新這兩份 C golden。
+Project-saved layer selections remain the production Step1/Step5 input. The checked-in C golden follows the signed provenance correction in section 3.1. After `R13.002` is complete, later 1.0.x slices must not update these two C golden files.
 
 ---
 
-## 2. Firmware C 與 Q7 契約
+## 2. Firmware C and Q7 contract
 
 ### 2.1 V21 Firmware C
 
-V21 Firmware C 仍使用 Q7：
+V21 Firmware C still uses Q7:
 
-- `NHC_1ST_RATIO` / `NHC_2ND_RATIO` 為 `UINT8`。
-- magnitude 合法範圍為 `0..255`；數值表示 `ratio * 128`，100% 等於 128，255 約為 199%。
-- 正負號只由 `NHC_TYPE_ADD` / `NHC_TYPE_SUB` 承載；Q7 byte 本身不是 signed value。
-- percent/fraction encode 使用 `MidpointRounding.AwayFromZero`，進入 Firmware payload 時飽和到 `UINT8`。
-- Firmware apply 直接使用 INT16 integer path：`(source * magnitudeQ7) >> 7`，不得先轉成 percent/double 再近似。
-- V21 threshold 使用獨立的 `ThresholdQ7` contract，合法範圍為 `0..128`；它不是 `0..255` payload magnitude。
+- `NHC_1ST_RATIO` / `NHC_2ND_RATIO` are `UINT8`.
+- The legal magnitude range is `0..255`. The value represents `ratio * 128`, so 100% equals 128, and 255 is about 199%.
+- The sign is carried only by `NHC_TYPE_ADD` / `NHC_TYPE_SUB`. The Q7 byte itself is not a signed value.
+- Percent/fraction encoding uses `MidpointRounding.AwayFromZero`. When entering the Firmware payload, it saturates to `UINT8`.
+- Firmware apply uses the INT16 integer path directly: `(source * magnitudeQ7) >> 7`. It must not first convert to percent/double and approximate.
+- The V21 threshold uses an independent `ThresholdQ7` contract with a legal range of `0..128`. It is not the `0..255` payload magnitude.
 
-因此 Q7 是 V21 Firmware C 的公開相容契約，1.0.x 不得把它默默改成 percent。
+Therefore Q7 is the public compatibility contract of V21 Firmware C. 1.0.x must not silently change it to percent.
 
 ### 2.2 V22 Firmware C
 
-V22 Firmware C 不使用 Q7：
+V22 Firmware C does not use Q7:
 
-- `NHC_COMBINE` 為 `UINT8` percent。
-- `NHC_1ST_RATIO` / `NHC_2ND_RATIO` 為 `INT8` signed percent。
-- Firmware apply 使用 `INT16` carrier：percent scaling 為 `(INT16)((source * percent) / 100)`，整數除法向零截斷，writeback 維持 firmware modular narrowing。
-- V22 threshold 原生為 percent；若開啟 `LinkVersionThresholds`，UI/Application 可從 V21 Q7 threshold 換算，但 Q7 不會被寫進 V22 Firmware C node。
+- `NHC_COMBINE` is a `UINT8` percent.
+- `NHC_1ST_RATIO` / `NHC_2ND_RATIO` are `INT8` signed percent.
+- Firmware apply uses an `INT16` carrier. Percent scaling is `(INT16)((source * percent) / 100)`. Integer division truncates toward zero. Writeback keeps firmware modular narrowing.
+- The V22 threshold is natively a percent. If `LinkVersionThresholds` is enabled, UI/Application may convert from the V21 Q7 threshold. Q7 is never written into a V22 Firmware C node.
 
-### 2.3 V22 內部仍有 legacy Q7 projection
+### 2.3 V22 internally still has a legacy Q7 projection
 
-V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容既有 `NotchTableRow.Values` 9 欄 reader，`ProjectV22RowsToV21Rows` 仍會把 V22 percent 轉成 Q7 放入 legacy slot。
+The V22 canonical row uses the signed percent of `NotchV22Node`. However, to stay compatible with the existing 9-column `NotchTableRow.Values` reader, `ProjectV22RowsToV21Rows` still converts the V22 percent into Q7 and places it in the legacy slot.
 
-這是內部相容投影，不是 V22 Firmware C 格式。1.0.x 必須分清：
+This is an internal compatibility projection. It is not the V22 Firmware C format. 1.0.x must distinguish:
 
-- V21 Firmware Q7 codec。
-- V22 canonical percent model。
-- V22 → legacy row Q7 compatibility projection。
+- The V21 Firmware Q7 codec.
+- The V22 canonical percent model.
+- The V22-to-legacy-row Q7 compatibility projection.
 
-不得再由 exporter、simulation、validation 各自實作不同的 clamp/rounding。
+The exporter, simulation and validation must not each implement different clamp/rounding logic.
 
-### 2.4 R13.003 收斂結果
+### 2.4 Result of R13.003 convergence
 
-- `NotchV21Q7Codec` 是 V21 payload encode/decode/scale 的唯一數值契約。
-- `NotchThresholdQ7Contract` 獨立負責 `0..128` threshold/allocation rounding，不讓 output-version codec 滲入 shared upstream geometry。
-- `NotchV21FirmwareProjector` 一次完成 CadAllocation source row 或 LegacyRegularAnchor row 到 final ABI node 的投影；C formatter 只序列化 final node。
-- `NotchV21FirmwareEvaluator` 消費同一 final node，依 FW 的 MUL → snapshot Q7 offsets → writeback 三階段與 INT16 narrowing 執行。
-- C# simulation 的 V21 baseline 明確量化到 INT16（有限小數向零截斷、超界飽和、非有限值為 0）；Cells/Actions/audit 都讀同一 firmware baseline，不把量化誤報成 compensation delta。
-- CadAllocation 提供 source-oriented Actions；LegacyRegularAnchor 只提供 exact Cells/EMS，不偽造方向相反的 source-flow Actions。
+- `NotchV21Q7Codec` is the only numeric contract for V21 payload encode/decode/scale.
+- `NotchThresholdQ7Contract` independently handles `0..128` threshold/allocation rounding. It does not let the output-version codec leak into shared upstream geometry.
+- `NotchV21FirmwareProjector` completes, in one step, the projection from a CadAllocation source row or a LegacyRegularAnchor row to the final ABI node. The C formatter only serializes the final node.
+- `NotchV21FirmwareEvaluator` consumes the same final node and executes the three stages: MUL, snapshot Q7 offsets, and writeback with INT16 narrowing.
+- The V21 baseline of C# simulation is explicitly quantized to INT16 (finite decimals truncate toward zero, out-of-range values saturate, non-finite values become 0). Cells, Actions and audit all read the same firmware baseline, so quantization is not misreported as a compensation delta.
+- CadAllocation provides source-oriented Actions. LegacyRegularAnchor only provides exact Cells/EMS and does not fabricate source-flow Actions in the opposite direction.
 
-完整 byte boundary、CadAllocation、LegacyRegularAnchor 與 GCC exact parity 都由測試鎖定；V21/V22 Lucid 3635 C golden 未更新。
+The full byte boundary, CadAllocation, LegacyRegularAnchor and GCC exact parity are locked by tests. The V21/V22 Lucid 3635 C golden was not updated.
 
 ---
 
-## 3. 1.0.x 驗收層級
+## 3. 1.0.x acceptance levels
 
-| Gate | 目的 | 執行時機 |
+| Gate | Purpose | When to run |
 |---|---|---|
-| G0 Build/Lint | 保證編譯、analyzer、格式與 CRLF | 每個 slice |
-| G1 Targeted | 鎖住本 slice 的直接契約 | 每個 slice |
-| G2 Notch Core | generator/export/simulation/projection/CLI contract（R13.004b 完成時 118 cases） | 任何 Application/Domain/Settings/RuntimeQuery/VM Notch slice |
-| G3 Golden | 3635 V21/V22 byte-exact + 3635/TM8.1 snapshot + TM8.1 matrix | 任何可能影響資料路徑的 slice |
-| G4 Runtime CLI | 真實 UI/IPC 的 V21/V22 export 等於 checked-in golden | g1 建立後；VM/RuntimeQuery/export slice 必跑 |
-| G5 UI | DevView + UiLayoutGuard + headless smoke；必要時 rendered snapshot dry-run | View/Style/Control slice |
-| G6 Merge | full lint + refactor gate + UI snapshots | 合併 1.0.x milestone 前 |
+| G0 Build/Lint | Ensure compilation, analyzers, formatting and CRLF | Every slice |
+| G1 Targeted | Lock the direct contract of this slice | Every slice |
+| G2 Notch Core | Generator/export/simulation/projection/CLI contract (118 cases when R13.004b completed) | Any Application/Domain/Settings/RuntimeQuery/VM Notch slice |
+| G3 Golden | 3635 V21/V22 byte-exact + 3635/TM8.1 snapshot + TM8.1 matrix | Any slice that may affect the data path |
+| G4 Runtime CLI | The V21/V22 export from real UI/IPC equals the checked-in golden | Required after g1 is built; required for VM/RuntimeQuery/export slices |
+| G5 UI | DevView + UiLayoutGuard + headless smoke; rendered snapshot dry-run when needed | View/Style/Control slices |
+| G6 Merge | Full lint + refactor gate + UI snapshots | Before merging the 1.0.x milestone |
 
-### 3.1 Golden 更新規則
+### 3.1 Golden update rules
 
-1. 重構預設不允許 golden 變更。
-2. 測試失敗時先保存 actual diff，不得用 actual 覆蓋 expected 來取得綠燈。
-3. 1.0.x 只允許 `R13.002` 這一次已簽核、且已證明舊 golden 來自非 production test seam 的 provenance correction；後續 correctness fix 若改 C，必須退出本 zero-diff refactor 計畫。
-4. Provenance correction 必須先證明兩個獨立 production-equivalent seams 產生相同輸出，且 production behavior 本身沒有為了符合 actual 而改動。
-5. 更新必須記錄：版本、slice、project、CAD/diff/欄位、輸入 selection/filter、舊值、新值、理由、人工簽核與驗證命令。
-6. 更新後再完整跑 G2、G3、G4，證明沒有未宣告差異。
+1. By default, refactoring does not allow golden changes.
+2. When a test fails, save the actual diff first. Never overwrite expected with actual to get a green build.
+3. 1.0.x allows only one signed provenance correction, which is `R13.002`. It must prove that the old golden came from a non-production test seam. Any later correctness fix that changes C must leave this zero-diff refactor plan.
+4. A provenance correction must first prove that two independent production-equivalent seams produce the same output. The production behavior itself must not be changed to match the actual output.
+5. An update must record: version, slice, project, CAD/diff/fields, input selection/filter, old value, new value, reason, human sign-off and verification commands.
+6. After updating, run G2, G3 and G4 in full to prove there is no undeclared difference.
 
 ---
 
@@ -153,352 +153,352 @@ V22 canonical row 使用 `NotchV22Node` 的 signed percent。不過為了相容�
 
 ## 4. Targeted suites per version
 
-| 版本 | G2/G3 之外的必要測試 |
+| Version | Required tests beyond G2/G3 |
 |---|---|
-| g2 | `NotchDisplayProjectorTests`、`NotchValidationUseCaseTests`、`NotchValidationTraceServiceTests`、`SimulationSafetyOverviewProjectorTests`、`SimulationSafetyAuditServiceTests`、`PadInfoViewModelTests` |
-| g3 | `PadMatcherTests`、`DxfRegularMappingAnalyzerTests`、`DxfRegularMaskAuditServiceTests`、`FreeformDetectorTests`、`CoordinatePlannerComputationServiceTests`、`PadCanvasHitTestTests` |
-| g5 | 新增的 `SettingsDraftContractTests`、既有 Settings persistence cases、`SimulationWorkspaceUseCaseTests`、`SimulationWorkspaceViewModelTests`、`SimulationColorScaleResolverTests`、`ShellViewModelConsoleTests` |
-| g6 | `FreeformHelperViewModelTests`、`WorkflowPipelineServiceTests`、`RuntimeQueryIpcTests`、`HeadlessUiSmokeTests` |
-| g7 | `UiLayoutGuardTests`、`UiRenderedVisualSnapshotTests`、`UiVisualSnapshotTests`、`HeadlessUiSmokeTests`、`CadAreaBucketServiceTests`、`PadCanvasHitTestTests`、`PadCanvasCacheInvalidationTests`、`check-xaml-action-roles.ps1` |
+| g2 | `NotchDisplayProjectorTests`, `NotchValidationUseCaseTests`, `NotchValidationTraceServiceTests`, `SimulationSafetyOverviewProjectorTests`, `SimulationSafetyAuditServiceTests`, `PadInfoViewModelTests` |
+| g3 | `PadMatcherTests`, `DxfRegularMappingAnalyzerTests`, `DxfRegularMaskAuditServiceTests`, `FreeformDetectorTests`, `CoordinatePlannerComputationServiceTests`, `PadCanvasHitTestTests` |
+| g5 | New `SettingsDraftContractTests`, existing Settings persistence cases, `SimulationWorkspaceUseCaseTests`, `SimulationWorkspaceViewModelTests`, `SimulationColorScaleResolverTests`, `ShellViewModelConsoleTests` |
+| g6 | `FreeformHelperViewModelTests`, `WorkflowPipelineServiceTests`, `RuntimeQueryIpcTests`, `HeadlessUiSmokeTests` |
+| g7 | `UiLayoutGuardTests`, `UiRenderedVisualSnapshotTests`, `UiVisualSnapshotTests`, `HeadlessUiSmokeTests`, `CadAreaBucketServiceTests`, `PadCanvasHitTestTests`, `PadCanvasCacheInvalidationTests`, `check-xaml-action-roles.ps1` |
 
 ---
 
 ## 6. g2 — Notch single-result pipeline
 
-### R13.101 顯式 NotchGenerationContext
+### R13.101 Explicit NotchGenerationContext
 
-- 取代 `NotchV22CompensationService.Compute` 的選填 precomputed 參數組合。
-- context 必須攜帶一致的 allocations、boundary indices、active regular mask、strict ratio 與 boundary query context。
-- 禁止呼叫端只傳部分 cache 造成隱性 stage 順序。
-- shared computation context 不得攜帶 `EnabledVersions` 或以 V21/V22 選擇 threshold／strategy；版本只屬於最後 projection request。
-- `R13.101a` 已由 [#10](https://github.com/Dennis40816/FreeformHelper/issues/10) 完成：`BuildV22CadCandidate` 對每個 CAD/IC candidate 重複複製／掃描同一 pool 的成本已移除。generator 內部 per-IC pool 是 owned、固定大小 snapshot；shared boundary context 存在時為 authoritative pool，redundant fallback 不被讀取；context 缺席時仍依 CAD identity 保留 null／empty／same-ID normalization 與 missing-current append。Public context factory 的 caller-ownership 契約不在本 slice 改寫。
-- Public seam 以 throw-on-read fallback 鎖 shared path zero-read，並以 missing-current／same-ID mutation 鎖 fallback 非空洞；既有 generator deterministic test 鎖平行 candidate generation 的 ordered rows。Lucid 3635 的 `9,831` candidates 不變；p50 canonical candidate build `207 -> 128 ms`、compensation `1,596 -> 798 ms`，wall `3,568 -> 3,593 ms`（`+0.7%`），所以 evidence 只主張 deterministic duplicate-work removal。Production 淨減 `-2 physical / -2 nonblank`；targeted 51、notch-core 122、golden 6、GCC exporter/parity 15 tests 與 hidden UI/IPC 正反 gate皆通過，UI build／lint 0 warning／0 error。完整 `NotchGenerationContext`、memo key 與 cache split 仍分別由 R13.101 parent／101b／101c 負責。
-- `R13.101b` 已由 [#12](https://github.com/Dennis40816/FreeformHelper/issues/12) 完成：allocation memo 仍以 CAD ID 分區並保留 grid-reference invalidation／8,192-entry capacity，但 entry 改持有 immutable `Polygon2`。相同 instance 直接 O(1) 命中；同 ID 換 polygon instance 才透過既有 `CadPadGeometrySignature` owner 比較 invariant round-trip exact coordinates。Public 6-decimal／AwayFromZero signature 保留給 DXF duplicate/audit tolerance，未新增平行 signature class、cache framework、version/output state或公開 API。
-- Public `Generate` seam 以同 area/bounds、同 rounded signature、但 inner X 為 `5.0000004`／`4.9999996` 的 concave polygons 鎖住左右 overlap與 DIFF anchor翻轉；A→B、B→A 皆 exact 等於 fresh generator並鎖 V21/V22 ordered rows。把 memo mutation 回 public 6-decimal signature會由 DIFF20退化為DIFF10 RED；cyclic-start／reversed-winding、固定 rounded literal與既有 DXF consumers亦有 guard。相對 `4a05fc9` production 淨增 `+8 physical / +5 nonblank`；兩次 fresh isolated deterministic Release 完全一致，總 DLL `15,315,456 -> 15,314,944 bytes`（`-512`），Application `691,200 / 2679A0FE…C093A -> 690,688 / 3B2BA783…F2FA`，其餘 Domain `39,936 / 0EAD9AC9…66D5`、Infrastructure `60,928 / CAFA1813…6F29`、UI `14,523,392 / 3A0CBCAC…72B6` 均 unchanged。Lucid 3635 candidates仍為 `9,831`，p50 wall `5,914 -> 4,726 ms`、generation `5,861 -> 4,695 ms`、BuildProfiles `5,672 -> 4,530 ms`，只作 no-regression evidence。Targeted 36、notch-core 124、golden 6、GCC exporter/parity 15、RuntimeQuery 13 tests與 hidden UI/IPC 正反 gate皆通過，兩份 C golden/state/budget不變。完整 `NotchGenerationContext` 與 cache split仍由 R13.101 parent／101c負責。
-- `R13.101c` exit target：version-neutral result fingerprint 不包含 `ExportProfile`／`EnabledVersions`；final projector/formatter cache 仍可攜帶 output contract，舊 persistence roundtrip 不變。
-- `R13.101c-1` 已由 [#14](https://github.com/Dennis40816/FreeformHelper/issues/14) 完成：只從現行 generated-table settings fingerprint 移除 `ExportProfile`；cached table 仍由當下 requested profile serialization，不新增 formatter cache、key abstraction或公開 API。Public headless export seam 鎖 Release→Debug／Debug→Release 都只做一次 miss/store 後命中同一 table，warm/fresh requested-profile raw C exact，而 profile metadata與 Debug-only FW mask仍依當下 profile輸出；mutation 加回 profile時兩案均 RED。V21/V22切換與 V21 Q7 threshold改動仍 miss。
-- 相對 `87cf59a` production 淨減 `-1 physical / -1 nonblank`；兩次 deterministic Release總量皆為 `15,314,944 bytes`，僅 UI hash因本 slice改為 `B1AC7878…1881`、其 bytes仍為 `14,523,392`。Targeted 10、notch-core 130、ui-core 237、golden 6、GCC exporter/parity 15、RuntimeQuery 13 tests與 hidden UI/IPC正反 gate皆通過，V21/V22 golden、export state與budget不變。
-- Historical `R13.101c-2` implementation evidence: R13.102a-2a 已從 normal `CadAllocation` resolved-batch settings fingerprint 移除 enabled versions、threshold、`NullValue` 與 target guard/cap，matching export可重用同一 candidate batch再投影當下 request；R13.101c-2a [#64](https://github.com/Dennis40816/FreeformHelper/issues/64) 再把live UI guard/cap settings固定為final-projection-only，保留Step3 revision、per-CAD sparse identity與export batch，只失效Step5 projected table／validation並通知Simulation；R13.102a-2b-1 [#66](https://github.com/Dennis40816/FreeformHelper/issues/66) 已在既有generation boundary以cache epoch、final-projection revision與source revision拒絕in-flight stale completion，R13.102a-2b-2 [#68](https://github.com/Dennis40816/FreeformHelper/issues/68)／[#76](https://github.com/Dennis40816/FreeformHelper/issues/76) 再完成並行full task與目前單一selected sparse result的bounded bridge。Current exit scope follows the owner decisions of 2026-10-03/04: normal A1/A2 closure requires evidence; Legacy request-specific table identity and additional V21/Legacy projector convergence remain accepted B1/B2 exceptions. The repository-wide final-output cache is C1; C1–C6 do not block g2. Parent and milestone exits remain the owner's decision.
-- owner 2026-10-03：`LegacyRegularAnchor` 是否仍需重新匯出已交付 project 尚未確定，暫時保留；`R13.101c-2` 暫緩，既有 zero-diff gates 繼續保護它。
-- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；owner 決定（2026-10-04，經 Commander 轉述）排在 g7 之後，範圍之後再定，之前不做隱性轉換；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
-- R13.101c-2a以public direct UI與Settings Save fixtures鎖guard/cap-only不重算Step3、retained batch命中與fresh projection byte-exact；三種behavior mutation與public enum ABI contract各自RED。final-projection invalidation由settings plan的具名internal flag承載，public policy surface／enum values不變。相對`74301a3` production／logic-first皆為`0 files / +22 physical / +19 nonblank`，0新dependency/service/cache/session；兩次fresh isolated Release完全一致，總DLL增加`512 bytes`且只變更UI。Focused 5、notch-core 182、Application 218、ui-core 264、smoke 25、UI build、lint/analyzer與hidden UI/IPC正反gate皆通過；signed C維持V21 `692 / 130979 / 8961B815…E57488`、V22 `548 / 84023 / 5208068B…57BB47`，selection p95為`27/15/15`與`28/16/15 ms`，Standards／Spec／simplification findings均已修正；不宣稱效能提升。
-- `R13.101d-1` 已由 [#20](https://github.com/Dennis40816/FreeformHelper/issues/20) 完成 normal `CadAllocation` 的 computation-input freeze：private `CadAllocationGenerationContext` 統一持有 profiles／allocations、per-IC CAD pools、boundary query/index evidence、owned active-regular／CAD-output snapshots、grid/CAD references、strict ratio與已解析的 compensation／switch／rule／boundary／allocation policy。三個 candidate helpers 只接收此 context，不再接收或重讀 mutable `ProjectSettings`／`NotchSettings`；Enabled outputs、threshold、`NullValue`、target guard/cap 仍只屬獨立 final projection request。這不是 R13.102 resolved batch/task，也沒有改動 `LegacyRegularAnchor` compatibility dispatch。
-- Freeze boundary 精確保留既有 callback 時序：BuildProfiles 完成後才擁有化 caller set/map並建立pool／strict／boundary prerequisites；phase-2 initial progress callback返回後才一次凍結其餘 computation policy與projection request。Public同步progress seam鎖phase-2 `ProcessedCount=0/1`、cap-50 V2.1/V2.2 exact rows、enabled-output／`NullValue` snapshot與caller collection ownership；reflection architecture guard則鎖三個candidate helpers不再依賴settings types。
-- 相對 `0e03662`，R13.101d-1 的必要 context boundary 為 production `+12 physical / +10 nonblank`。Carrier 使用 private sealed class + readonly fields，沒有 positional record 的未使用 equality／deconstruct／`ToString`；兩次 fresh isolated deterministic Release完全一致，總 DLL `15,312,384 -> 15,312,896 bytes`（`+512`），只有Application `688,640 / CC0C1F71…8E86 -> 689,152 / 28F3BBF2…4E8F`，其餘三個DLL bytes/hash不變。Lucid 3635 candidates固定`9,831`，同環境p50 wall `3,819 -> 3,971 ms`、generation `3,798 -> 3,942 ms`、candidate `121 -> 131 ms`、compensation `906 -> 960 ms`，只作no-regression observation。Targeted 77、notch-core 140、golden 6、GCC exporter/parity 15、RuntimeQuery 13、ui-core 243 tests與hidden UI/IPC正反gate皆通過，兩份signed C、export state與budget不變；UI build／lint與雙軸review為0 finding。完整`NotchGenerationContext`、version-neutral resolved batch、cache split與typed final projectors仍由R13.101 parent／R13.102／R13.103負責。
-- `R13.101d-2` 已由 [#26](https://github.com/Dennis40816/FreeformHelper/issues/26) 統一 single-CAD UI 與 generator 的 per-IC CAD pool admission：`NotchAllocationService` 的 membership query 與 `BuildAllocations` 共用 Q7-positive predicate，先檢查 IC 再做 intersection，首個命中即可返回；UI 不再只按每顆 CAD 的 primary IC 組 pool。既有 empty-pool all-visible fallback 與 selected-target inclusion fallback 保留。
-- Public two-IC fixture A `[0,5]`、B `[5,15]` 明列 intentional correction：舊 UI `ToRegular / ToFull / Combined = 0.5 / 2 / 1`，generator 為 `0.5 / 1 / 0.5`；完成後 selection preview path、deferred Inspector、Notch Detail 與 generator 皆為 `0.5 / 1 / 0.5`，並共用 owners、blocker、reason／trace、target allocation 及 resolved identity。Pool cache 另由 count-only 改為 canonical ordered CAD IDs（含 count）的 fingerprint，same-count B→C member swap 會失效；firmware API／schema、UI 視覺與 signed C 未改。
-- 相對 `e18a4f3`，production 淨增 `+62 physical / +57 nonblank`；兩次 fresh isolated deterministic Release 完全一致，總 DLL `15,313,408 -> 15,314,432 bytes`（`+1,024`），Application bytes 不變但 hash 更新，UI 增加 `1,024 bytes`，Domain／Infrastructure bytes/hash 不變。Fresh current-source benchmark 的 candidate count 仍為 `9,831`；forward／reverse selection `total / notchPreview / Inspector` p95 由 `11 / 3 / 8`、`5 / 3 / 1 ms` 增為 `38 / 22 / 20`、`45 / 24 / 23 ms`，這是 correctness 成本，不宣稱加速，official total `600 ms`／Inspector `400 ms` budget 仍 PASS。Focused 71、notch-core 143、ui-core 247、notch-golden 6、GCC exporter/runtime 16、RuntimeQuery 13 tests，以及 hidden UI/IPC 正反 gate、UI build、lint/analyzer 均通過。At this historical checkpoint, the R13.101/101c-2 context/cache split, R13.102/102a-2 batch/task and R13.103 projector/formatter targets remained open. Current closure follows A1/A2 and the accepted B1/B2 exceptions above.
+- Replace the optional precomputed-parameter combination of `NotchV22CompensationService.Compute`.
+- The context must carry consistent allocations, boundary indices, active regular mask, strict ratio and boundary query context.
+- Callers must not pass only some caches, which would create implicit stage ordering.
+- The shared computation context must not carry `EnabledVersions`, and must not select threshold or strategy by V21/V22. The version belongs only to the final projection request.
+- `R13.101a` was completed by [#10](https://github.com/Dennis40816/FreeformHelper/issues/10). The cost of `BuildV22CadCandidate` repeatedly copying or scanning the same pool for each CAD/IC candidate has been removed. The per-IC pool inside the generator is an owned, fixed-size snapshot. When the shared boundary context exists, it is the authoritative pool, and the redundant fallback is not read. When the context is absent, null/empty/same-ID normalization and missing-current append are still kept by CAD identity. The caller-ownership contract of the public context factory is not rewritten in this slice. The full `NotchGenerationContext`, memo key and cache split remain the responsibility of the R13.101 parent, 101b and 101c.
+- A public seam uses a throw-on-read fallback to lock zero reads on the shared path. Missing-current and same-ID mutations lock that the fallback is not empty. The existing generator deterministic test locks the ordered rows of parallel candidate generation. For Lucid 3635, the `9,831` candidates are unchanged. The p50 canonical candidate build went `207 -> 128 ms`, and compensation `1,596 -> 798 ms`. Wall time went `3,568 -> 3,593 ms` (`+0.7%`), so the evidence only claims deterministic duplicate-work removal. Production net change is `-2 physical / -2 nonblank`. Targeted 51, notch-core 122, golden 6, GCC exporter/parity 15 tests, and the positive and negative hidden UI/IPC gates all pass. UI build passes with 0 warnings and 0 errors from lint.
+- `R13.101b` was completed by [#12](https://github.com/Dennis40816/FreeformHelper/issues/12). The allocation memo still partitions by CAD ID and keeps grid-reference invalidation and the 8,192-entry capacity. However, each entry now holds an immutable `Polygon2`. The same instance hits directly in O(1). When the same ID has a different polygon instance, the comparison goes through the existing `CadPadGeometrySignature` owner, which verifies the invariant round trip with exact coordinates. The public 6-decimal/AwayFromZero signature is kept for DXF duplicate/audit tolerance. No parallel signature class, cache framework, version/output state or public API was added.
+- The public `Generate` seam uses concave polygons with the same area and bounds and the same rounded signature, but with inner X values `5.0000004` and `4.9999996`. This locks the flip of left/right overlap and the DIFF anchor. A to B and B to A both equal a fresh generator exactly, and both lock the V21/V22 ordered rows. If the memo mutation is returned to the public 6-decimal signature, the result regresses from DIFF20 to DIFF10 and turns RED. Cyclic-start and reversed-winding cases, fixed rounded literals and existing DXF consumers also have guards. Compared with production at `4a05fc9`, the net change is `+8 physical / +5 nonblank`. Two fresh isolated deterministic Release builds are fully identical. The total DLL goes `15,315,456 -> 15,314,944 bytes` (`-512`). Application goes `691,200 / 2679A0FE…C093A -> 690,688 / 3B2BA783…F2FA`. Domain `39,936 / 0EAD9AC9…66D5`, Infrastructure `60,928 / CAFA1813…6F29`, and UI `14,523,392 / 3A0CBCAC…72B6` are unchanged. Lucid 3635 candidates remain `9,831`. The p50 wall time goes `5,914 -> 4,726 ms`, generation `5,861 -> 4,695 ms`, and BuildProfiles `5,672 -> 4,530 ms`. These are only no-regression evidence. Targeted 36, notch-core 124, golden 6, GCC exporter/parity 15, RuntimeQuery 13 tests, and the positive and negative hidden UI/IPC gates all pass. Both C golden files, state and budget are unchanged. The full `NotchGenerationContext` and cache split remain the responsibility of R13.101 parent and 101c.
+- `R13.101c` exit target: the version-neutral result fingerprint does not include `ExportProfile` or `EnabledVersions`. The final projector/formatter cache may still carry the output contract. The old persistence roundtrip does not change.
+- `R13.101c-1` was completed by [#14](https://github.com/Dennis40816/FreeformHelper/issues/14). It removes `ExportProfile` only from the current generated-table settings fingerprint. The cached table is still serialized with the currently requested profile. No formatter cache, key abstraction or public API was added. The public headless export seam locks that switching Release to Debug and Debug to Release each performs only one miss/store, then hits the same table. Warm and fresh requested-profile raw C are exact, while profile metadata and the Debug-only FW mask are still output according to the current profile. Adding the profile back in a mutation turns both cases RED. Switching V21/V22 and changing the V21 Q7 threshold still miss.
+- Compared with production at `87cf59a`, the net change is `-1 physical / -1 nonblank`. Two deterministic Release builds total `15,314,944 bytes`. Only the UI hash changes, to `B1AC7878…1881`, while its bytes remain `14,523,392`. Targeted 10, notch-core 130, ui-core 237, golden 6, GCC exporter/parity 15, RuntimeQuery 13 tests and the positive and negative hidden UI/IPC gates all pass. V21/V22 golden, export state and budget are unchanged.
+- Historical `R13.101c-2` implementation evidence: R13.102a-2a removed enabled versions, threshold, `NullValue` and target guard/cap from the normal `CadAllocation` resolved-batch settings fingerprint. A matching export can reuse the same candidate batch and re-project the current request. R13.101c-2a [#64](https://github.com/Dennis40816/FreeformHelper/issues/64) then made the live UI guard/cap settings final-projection-only. It keeps the Step3 revision, per-CAD sparse identity and export batch. It only invalidates Step5 projected table and validation, and notifies Simulation. R13.102a-2b-1 [#66](https://github.com/Dennis40816/FreeformHelper/issues/66) rejects in-flight stale completions at the existing generation boundary, using the cache epoch, final-projection revision and source revision. R13.102a-2b-2 [#68](https://github.com/Dennis40816/FreeformHelper/issues/68) and [#76](https://github.com/Dennis40816/FreeformHelper/issues/76) then completed the parallel full task and a bounded bridge to the currently selected single sparse result. The current exit scope follows the owner decisions of 2026-10-03/04: normal A1/A2 closure requires evidence. Legacy request-specific table identity and further V21/Legacy projector convergence remain accepted B1/B2 exceptions. The repository-wide final-output cache is C1. C1 to C6 do not block g2. Parent and milestone exits remain the owner's decision.
+- Owner, 2026-10-03: whether `LegacyRegularAnchor` still needs re-export of already delivered projects has not been decided. It is kept for now. `R13.101c-2` is postponed, and the existing zero-diff gates continue to protect it.
+- A later owner reply (2026-10-03) replaces the "postponed" consequence above. V21 and Legacy stay as they are, protected by the existing zero-diff gates. No extra convergence or equivalence work is invested. Complete removal is a later goal with no version assigned. On 2026-10-04, the owner (relayed by the Commander) placed it after g7. Its scope will be decided later, and no implicit conversion happens before then. For the original wording and the owner's confirmation that "2.1" means V21, see the owner decisions in section 0.
+- R13.101c-2a uses public direct UI and Settings Save fixtures to lock that a guard/cap-only change does not recompute Step3. Retained batch hits and fresh projection are byte-exact. Three behavior mutations and a public enum ABI contract each turn RED. Final-projection invalidation is carried by a named internal flag in the settings plan. The public policy surface and enum values are unchanged. Compared with `74301a3`, both production and logic-first are `0 files / +22 physical / +19 nonblank`, with 0 new dependency, service, cache or session. Two fresh isolated Release builds are fully identical. The total DLL increases by `512 bytes`, and only UI changes. Focused 5, notch-core 182, Application 218, ui-core 264, smoke 25, the UI build, lint/analyzer and the positive and negative hidden UI/IPC gates all pass. The signed C remains V21 `692 / 130979 / 8961B815…E57488` and V22 `548 / 84023 / 5208068B…57BB47`. Selection p95 is `27/15/15` and `28/16/15 ms`. Standards, spec and simplification findings were all fixed. No performance improvement is claimed.
+- `R13.101d-1` was completed by [#20](https://github.com/Dennis40816/FreeformHelper/issues/20). It freezes the computation input of the normal `CadAllocation`. A private `CadAllocationGenerationContext` owns, in one place, profiles/allocations, per-IC CAD pools, boundary query/index evidence, owned active-regular and CAD-output snapshots, grid/CAD references, strict ratio, and the resolved compensation, switch, rule, boundary and allocation policy. The three candidate helpers receive only this context. They no longer receive or reread the mutable `ProjectSettings` or `NotchSettings`. Enabled outputs, threshold, `NullValue` and target guard/cap still belong only to the separate final projection request. This is not the R13.102 resolved batch/task, and it does not change the `LegacyRegularAnchor` compatibility dispatch.
+- The freeze boundary exactly preserves the existing callback timing. The caller's set and map are owned only after BuildProfiles completes. The pool, strict and boundary prerequisites are created then. The remaining computation policy and projection request are frozen once, after the phase-2 initial progress callback returns. A public synchronous progress seam locks phase-2 `ProcessedCount=0/1`, the cap-50 V2.1/V2.2 exact rows, the snapshot of enabled outputs and `NullValue`, and caller collection ownership. A reflection architecture guard locks that the three candidate helpers no longer depend on settings types.
+- Compared with `0e03662`, the necessary context boundary of R13.101d-1 is `+12 physical / +10 nonblank` in production. The carrier is a private sealed class with readonly fields. It does not use a positional record, so it has no unused equality, deconstruction or `ToString`. Two fresh isolated deterministic Release builds are fully identical. The total DLL goes `15,312,384 -> 15,312,896 bytes` (`+512`). Only Application changes, `688,640 / CC0C1F71…8E86 -> 689,152 / 28F3BBF2…4E8F`. The other three DLLs keep their bytes and hashes. For Lucid 3635, candidates are fixed at `9,831`. On the same environment, p50 wall goes `3,819 -> 3,971 ms`, generation `3,798 -> 3,942 ms`, candidate `121 -> 131 ms`, and compensation `906 -> 960 ms`. These are only no-regression observations. Targeted 77, notch-core 140, golden 6, GCC exporter/parity 15, RuntimeQuery 13, ui-core 243 tests, and the hidden UI/IPC positive and negative gates all pass. Both signed C files, export state and budget are unchanged. The UI build and lint, plus the two-axis review, report 0 findings. The full `NotchGenerationContext`, version-neutral resolved batch, cache split and typed final projectors remain the responsibility of the R13.101 parent, R13.102 and R13.103.
+- `R13.101d-2` was completed by [#26](https://github.com/Dennis40816/FreeformHelper/issues/26). It unifies the per-IC CAD pool admission of single-CAD UI and the generator. The membership query of `NotchAllocationService` and `BuildAllocations` share a Q7-positive predicate. They check the IC first and then do the intersection, returning at the first hit. The UI no longer groups pools only by each CAD's primary IC. The existing empty-pool all-visible fallback and the selected-target inclusion fallback are kept.
+- The public two-IC fixture A `[0,5]` and B `[5,15]` records an intentional correction. The old UI gave `ToRegular / ToFull / Combined = 0.5 / 2 / 1`. The generator gives `0.5 / 1 / 0.5`. After completion, the selection preview path, deferred Inspector, Notch Detail and the generator all give `0.5 / 1 / 0.5`. They share the owners, blocker, reason/trace, target allocation and resolved identity. The pool cache also changes from count-only to a fingerprint of canonical ordered CAD IDs (including count), so a same-count B-to-C member swap invalidates it. The firmware API/schema, UI visuals and signed C are unchanged.
+- Compared with `e18a4f3`, the production net change is `+62 physical / +57 nonblank`. Two fresh isolated deterministic Release builds are fully identical. The total DLL goes `15,313,408 -> 15,314,432 bytes` (`+1,024`). Application bytes are unchanged but the hash is updated. UI increases by `1,024 bytes`. Domain and Infrastructure bytes and hashes are unchanged. The candidate count in the fresh current-source benchmark is still `9,831`. Forward and reverse selection `total / notchPreview / Inspector` p95 goes from `11 / 3 / 8` and `5 / 3 / 1 ms` to `38 / 22 / 20` and `45 / 24 / 23 ms`. This is a correctness cost, not a speedup. The official `600 ms` total and `400 ms` Inspector budgets still PASS. Focused 71, notch-core 143, ui-core 247, notch-golden 6, GCC exporter/runtime 16, RuntimeQuery 13 tests, the hidden UI/IPC positive and negative gates, the UI build and lint/analyzer all pass. At this historical checkpoint, the R13.101/101c-2 context/cache split, the R13.102/102a-2 batch/task and the R13.103 projector/formatter targets were still open. The current closure follows A1/A2 and the accepted B1/B2 exceptions above.
 
-- `R13.101e` 已由 [#78](https://github.com/Dennis40816/FreeformHelper/issues/78) 完成選填precomputed組合的canonical收斂：normal generator與UI先建立一份`NotchV22CompensationContext`，一次攜帶allocation evidence、boundary indices、active mask、strict/query context與全部computation policy，再由唯一`Compute(context)`執行。舊public multi-parameter `Compute`維持source compatibility，但只負責補齊完整context；明確空allocations不再被當成missing而回退geometry。Stage A/B不再含nullable evidence或隱性stage-order fallback，context不含`EnabledVersions`、threshold、`NullValue`或target guard/cap。
-- Public TDD先以半覆蓋CAD + explicit empty allocations鎖住舊`ToRegular=0.5` RED，完成後ratio／combined／overlap／count均為`0`且無debug rows；raw factory、canonical context與compatibility adapter另鎖相同normal diagnostics。相對`659f214` production／logic-first皆為`0 files / +108 physical / +103 nonblank`，同時刪除Stage A/B fallback 45 physical lines；0新service／cache／session／dependency／generic executor，最大相關檔案497行。兩次deterministic Release均為`15,362,560 bytes`，較基線`+2,048`。Focused 76、notch-core 190、Application 221、ui-core 274、smoke 25、golden 6、Runtime Query/IPC 23、GCC 8與hidden正反gate皆通過；signed C、export state、budget、Runtime schema與callback/ordered-row contract不變。This historical checkpoint predates the owner's 2026-10-03/04 exit decisions; current A1/A2 obligations and accepted B1/B2 exceptions are listed above.
+- `R13.101e` was completed by [#78](https://github.com/Dennis40816/FreeformHelper/issues/78). It converges the optional precomputed combination to a canonical form. The normal generator and the UI first build one `NotchV22CompensationContext`. It carries, in one object, the allocation evidence, boundary indices, active mask, strict/query context and all computation policy. Then the single `Compute(context)` runs. The old public multi-parameter `Compute` keeps source compatibility, but it only fills in a complete context. An explicitly empty allocations set is no longer treated as missing, so it no longer falls back to geometry. Stage A and B no longer contain nullable evidence or implicit stage-order fallbacks. The context does not contain `EnabledVersions`, threshold, `NullValue` or target guard/cap.
+- Public TDD first locks, with a half-covered CAD plus explicit empty allocations, the old `ToRegular=0.5` RED. After completion, ratio, combined, overlap and count are all `0`, with no debug rows. A raw factory, the canonical context and a compatibility adapter separately lock the same normal diagnostics. Compared with `659f214`, production and logic-first are both `0 files / +108 physical / +103 nonblank`. The Stage A/B fallback removes 45 physical lines. It adds 0 new service, cache, session, dependency or generic executor. The largest related file has 497 lines. Two deterministic Release builds are both `15,362,560 bytes`, which is `+2,048` over the baseline. Focused 76, notch-core 190, Application 221, ui-core 274, smoke 25, golden 6, Runtime Query/IPC 23, GCC 8 and the hidden positive and negative gates all pass. The signed C, export state, budget, Runtime schema and callback/ordered-row contract are unchanged. This historical checkpoint predates the owner's 2026-10-03/04 exit decisions. The current A1/A2 obligations and accepted B1/B2 exceptions are listed above.
 
-### R13.102 統一 Notch resolved result
+### R13.102 Unified Notch resolved result
 
-- 建立一個 source-of-truth result，包含 compensation、Stage1/2/3、target allocation、coverage audit 與 reason/trace。
-- generator、inspector、PadInfo、RuntimeQuery、simulation、overlay 只讀取或投影此 result。
-- 不允許 reader 從 partial data 重算 Stage3Area、ToFull enabled 或 target legs。
-- 同一份 input 在 V21-only、V22-only、V21+V22 三種 output request 下，shared resolved result 必須相同；output request 不得改變 candidate evidence。
-- 同一 selection 與 workflow revision 的 synchronous preview、deferred inspector、export 必須等待／投影同一 resolved task/snapshot，不能重算 compensation。
-- `R13.102a-1` 已由 [#16](https://github.com/Dennis40816/FreeformHelper/issues/16) 完成：同一 single-CAD selection/revision 的 Step 3 preview 與 200 ms deferred CAD Inspector 共用既有 revisioned per-CAD `NotchV22ResolvedResult` identity。Warm deferred path只投影既有 immutable result；cold miss才 background 建立並保存一次。Output-only profile/file-type/version不改 Step 3 revision或 result identity，真實 computation input變更仍 invalidation，既有 stale/cancellation/pending/UI-thread規則不變。
-- 相對 `f600dfe`，production 淨減 `-16 physical / -11 nonblank`；兩次 deterministic Release總量皆為 `15,314,432 bytes`，相較上一片減少 `512 bytes`，只有 UI DLL由 `14,523,392 / B1AC7878…1881` 變為 `14,522,880 / B3B399D9…400F`，其餘三個 DLL bytes/hash不變。Targeted 6、notch-core 130、ui-core 243、golden 6、GCC exporter/parity 15、RuntimeQuery 13 tests與 hidden UI/IPC正反 gate皆通過，兩份 C golden、export state與budget不變。
-- `R13.102b-1` 已由 [#22](https://github.com/Dennis40816/FreeformHelper/issues/22) 收斂下一個 UI reader：`ShowNotchDetailCommand` 先由既有 full-key owner取得目前 selection/revision 的 `NotchV22ResolvedResult`，Detail只投影該 instance，不再另跑 compensation／resolved build。Warm、cold、output-only reuse、真實 Step3 invalidation與完整 detail欄位皆由 public headless workflow鎖定；public `NotchDetailUseCase.Build` signature與 compatibility行為保留。
-- 跨 IC correction 明列為 intended：舊 compatibility `Build` 的 `anchorIcIndex:null` 會把所有 IC targets加總；normal command現在與 preview／Inspector一致，使用 workflow anchor-IC allocation。最小真實 fixture鎖住 unanchored `Combined ratio: 200.00 %` 與 authoritative `100.00 %`，而底層 compensation ratio不變；不以另一輪 unanchored allocation重算保留 Detail-only second derivation。Deferred Inspector cold completion亦在覆寫前以完整 key重查，避免晚到背景工作移除 Detail剛建立的 current identity。
-- 相對 `2973229`，production淨增 `+16 physical / +14 nonblank`，只包含 compatibility-preserving projection seam與 deferred cold race guard。兩次 fresh isolated deterministic Release皆為 `15,313,408 bytes`，相較基線增加 `512 bytes`，只有 UI DLL由 `14,522,880 / B3B399D9…5400F` 變為 `14,523,392 / 984487EE…BE67`，其餘三個 DLL bytes/hash不變。Focused 4、ui-core 246、notch-core 140、golden 6、GCC exporter/parity 15、RuntimeQuery 13 tests、UI build與lint/analyzer皆通過；Lucid 3635 hidden UI/IPC正反順序皆為 V21 `692 / 130979 / 8961B815…E57488`、V22 `548 / 84023 / 5208068B…57BB47`，golden、export state、budget PASS，selection p95皆為 `6 ms`。Standards、Spec與 simplification review無 blocker。
-- `R13.102b-2` 已由 [#36](https://github.com/Dennis40816/FreeformHelper/issues/36) 收斂 Runtime Query `multi-owner` reader：visible CAD guard之後只取得一份依current setting或`--overlap-percent` override解析的current-revision `NotchV22ResolvedResult`；輕量Inspector snapshot只供既有CAD response metadata，rows、summary counts與rule trace全部投影`resolved.Compensation.RegularDebugInfos`。Cold override由兩次compensation misses收斂為一次，相同CAD/revision/override重查不增加miss；payload schema、ordering、limit/truncation、threshold metadata與errors不變。
-- 本slice只完成R13.102b-2；它沒有建立UI/export共用的revisioned task/session，也沒有改export candidate batch、`LegacyRegularAnchor`或`NotchDisplayProjector` combined-overflow derivation。R13.102、R13.102a-2、R13.101c-2、R13.103與R13.104保持open。
-- 完成證據：相對`f866e6a` production／logic-first皆為`+14 physical / +12 nonblank`；兩次fresh isolated deterministic Release完全一致，總DLL `15,322,624 -> 15,323,136 bytes`（`+512`），只有UI由`14,528,512 / 9B017D15…09DBC`變為`14,529,024 / 20280245…86A7`。Focused 2、RuntimeQueryUseCase 18、RuntimeQueryIpc 5、notch-core 170、ui-core 250、notch-golden 6、GCC 8、UI build、lint/analyzer與Standards／Spec／simplification reviews皆通過。Hidden UI/IPC正反順序的signed C、golden、export state與budget不變，selection total p95為`47 / 96 ms`；evidence SHA-256為`359F4F0B…B75F4`與`854254B0…D2D5B`，不宣稱效能提升。
-- `R13.102a-2a` 已由 [#28](https://github.com/Dennis40816/FreeformHelper/issues/28) 完成 export/generator-only 的窄 slice：normal `CadAllocation` cold path建立一次Application-owned opaque compact candidate batch與首次final projection；matching warm request重用同一batch，以當下版本、threshold、`NullValue`及target coverage guard/cap重投影。零列首次projection仍保存batch；`LegacyRegularAnchor`維持request-specific `NotchTable` cache。
-- Warm batch projection不重播profiles／candidate／merge工作，只回報當次phase 4；Runtime Query schema不變，`exportGenerationCache.entryRowCount`代表最新projected table rows，不代表candidate count或batch大小。
-- Mutation 證據分別加回 version/threshold key、移除強相容性 guard、拒存零列 batch、在 hit 重跑 candidates、或回傳首次 final table，均由 focused characterization RED；combined-request admission沿用 R13.103b-1 已鎖的 V22-controlled shared set。
-- 完成證據：相對`1deb591` production／logic-first皆為`+405 physical / +377 nonblank`。兩次fresh isolated deterministic Release完全一致，總DLL `15,314,432 -> 15,322,112 bytes`（`+7,680`）；Application `689,152 / 3FE87F11…CCBB5 -> 693,248 / 141A8972…730A`、UI `14,524,416 / AF1EC4E4…9D67 -> 14,528,000 / B00AAB25…E2D0`，Domain／Infrastructure bytes/hash不變。Current-source Lucid 3635三次cold皆為`9,831` candidates／`1,148` rows；cold p50 `1,328.20 ms`，同batch warm projection p50／p95 `0.5884 / 1.0393 ms`，估計retained `331,509 bytes/batch`；ignored evidence SHA-256為`56198980…A031205`，僅作單機no-regression／capacity evidence。Focused 54、notch-core 146、ui-core 250、golden 6、GCC 16、RuntimeQuery 13與hidden UI/IPC正反順序PASS；signed C仍為V21 `692 / 130979 / 8961B815…E57488`、V22 `548 / 84023 / 5208068B…57BB47`。
-- `R13.102a-2b-1` 已由 [#66](https://github.com/Dennis40816/FreeformHelper/issues/66) 收斂既有generation completion boundary：request入口固定cache generation epoch、Step5 final-projection revision與Simulation source revision；只有三者仍current的completion可commit projected row count、last generated table、progress／flow及caller continuation，accepted Simulation session保存該次captured source revision。
-- `CadAllocation` final-only guard/cap invalidation會拒絕舊completion的table／session／progress發布，但保留已解析batch並把projected row count維持為`0`，下一個current request可直接命中batch重投影；完整Step5 invalidation即使cache為空也推進generation epoch，舊request不得補存batch或table。Export與Simulation共用reference-counted busy scope，重疊操作完成其中一項時不會提早解除另一項busy；`LegacyRegularAnchor`的compatibility行為不變。
-- 本 slice 不完成R13.102／R13.102a-2：R13.102a-2b-2仍須讓single-CAD UI sparse result與full export batch共用同一次revisioned task/session；R13.101c-2、R13.102與R13.103 parent亦保持open。
-- `R13.102a-2b-2` 依code-size與lifetime風險分兩個consumer-backed leaf：`R13.102a-2b-2a` [#68](https://github.com/Dennis40816/FreeformHelper/issues/68) 先讓並行Export／Simulation在同一output-neutral identity與generation epoch下共用一個full batch-resolution task，並明確拆開phases 1～3 resolution與每位caller自己的phase 4 projection；下一個leaf才把single-CAD sparse resolved result接入同一session。2b-2a不得新增generic executor、第二個cache service、per-candidate task或eager full preview，也不得宣稱完成2b-2 parent。
-- `R13.102a-2b-2a` 已完成：cold owner成功後只在epoch／entry仍current時store一次，joiner共讀同一task但各自以入口凍結的final request投影；final-only invalidation保留task／batch並拒絕舊projection，full invalidation detach舊task且禁止補存，faulted entry移除供retry。completed cache、in-flight join與projection都保留完整computation-settings equality防止32-bit fingerprint collision；舊UI service facade由同一路徑薄委派以維持source compatibility。
-- 完成證據：相對`03faae6` production／logic-first皆為`0 files / +182 physical / +169 nonblank`，ViewModel淨減`-2 / -4`，無新production file／service／dependency。兩次fresh isolated deterministic Release完全一致，總DLL `15,332,864 -> 15,342,080 bytes`（`+9,216`）；Application `696,320 / 9899BC42…B952EBF -> 697,856 / EA953FCE…33E3B4`、UI `14,535,680 / 258E5AB4…723CE6 -> 14,543,360 / EDB83455…4D0D4B`，Domain／Infrastructure不變。Facade 1、notch-core 187、Application 218、ui-core 274、smoke 25、notch-golden 6、Runtime Query 23、GCC 8 tests與UI build／lint全綠；hidden UI/IPC正反signed C、golden、state、budget皆PASS，selection p95為`31/17/15`與`29/15/15 ms`，evidence SHA-256為`5B5C5272…D5DB4E`與`C3EC88C3…D2961`。generator現為`974 / 899`、cache service為`634 / 575` physical／nonblank；下一個leaf採extract/delete-first，2b-2與所有parents保持open。
-- `R13.102a-2b-2b` [#76](https://github.com/Dennis40816/FreeformHelper/issues/76) 已完成並收口2b-2：single-CAD UI的compensation／resolved雙cache已收斂為一份resolved owner，cold/warm full batch至多攜帶並重用目前單一選取CAD的一份resolved result。identity鎖CAD ID、anchor IC/diff、exact CAD、immutable grid state與CAD pool signatures、active mask及全部computation settings；final-only request不進identity，同一mutable grid reference改變亦不能誤用舊result。
-- 2b-2b沒有保留所有candidate的polygons/debug evidence，也未新增per-CAD task registry、第二個cache/session service、generic executor或dependency。generator carrier抽離後主檔由`974`降為`841`行，ViewModel淨減`109 / 100` physical／nonblank；相對`7b06722` production為`+2 files / +127 physical / +118 nonblank`，小於duplicate cache path直接淨刪的`128` physical lines。兩次fresh isolated deterministic Release一致，總DLL `15,342,080 -> 15,360,512 bytes`（`+18,432`）。Focused 8、notch-core 189、Application 220、ui-core 274、smoke 25、golden 6、Runtime Query/IPC 23、GCC 8、hidden UI/IPC正反、build/lint與三軸review均PASS；signed C仍為V21 `692 / 130979 / 8961B815…E57488`、V22 `548 / 84023 / 5208068B…57BB47`。R13.101／101c-2／102／102a／102a-2／103與Legacy convergence仍依各自exit條件保持open。
+- Build one source-of-truth result. It contains compensation, Stage1/2/3, target allocation, coverage audit and reason/trace.
+- The generator, inspector, PadInfo, RuntimeQuery, simulation and overlay only read or project this result.
+- Readers must not recompute Stage3Area, ToFull enabled or target legs from partial data.
+- For the same input, under V21-only, V22-only and V21+V22 output requests, the shared resolved result must be identical. The output request must not change candidate evidence.
+- Synchronous preview, deferred inspector and export for the same selection and workflow revision must wait for, or project from, the same resolved task/snapshot. They must not recompute compensation.
+- `R13.102a-1` was completed by [#16](https://github.com/Dennis40816/FreeformHelper/issues/16). The Step 3 preview and the 200 ms deferred CAD Inspector for the same single-CAD selection/revision share the existing revisioned per-CAD `NotchV22ResolvedResult` identity. The warm deferred path only projects the existing immutable result. A cold miss is built once in the background and then stored. Output-only changes to profile, file type or version do not change the Step 3 revision or result identity. Real computation-input changes still invalidate. The existing stale, cancellation, pending and UI-thread rules are unchanged.
+- Compared with `f600dfe`, production net change is `-16 physical / -11 nonblank`. Two deterministic Release builds both total `15,314,432 bytes`, which is `512 bytes` less than the previous slice. Only the UI DLL changes, from `14,523,392 / B1AC7878…1881` to `14,522,880 / B3B399D9…400F`. The other three DLL bytes and hashes are unchanged. Targeted 6, notch-core 130, ui-core 243, golden 6, GCC exporter/parity 15, RuntimeQuery 13 tests and the hidden UI/IPC positive and negative gates all pass. Both C golden files, export state and budget are unchanged.
+- `R13.102b-1` was completed by [#22](https://github.com/Dennis40816/FreeformHelper/issues/22). It converges the next UI reader. `ShowNotchDetailCommand` first gets the `NotchV22ResolvedResult` of the current selection/revision through the existing full-key owner. Detail only projects that instance and no longer runs compensation or resolved build again. Warm, cold, output-only reuse, real Step3 invalidation and full detail fields are locked by a public headless workflow. The public `NotchDetailUseCase.Build` signature and compatibility behavior are preserved.
+- The cross-IC correction is recorded as intended. In the old compatibility `Build`, `anchorIcIndex:null` added up all IC targets. The normal command now matches the preview and Inspector, using the workflow anchor-IC allocation. The smallest real fixture locks the unanchored `Combined ratio: 200.00 %` and the authoritative `100.00 %`. The underlying compensation ratio is unchanged. The change does not use another unanchored allocation recomputation to keep a Detail-only second derivation. The deferred Inspector cold completion also re-queries the full key before overwriting. This prevents a late background job from removing the current identity that Detail just built.
+- Compared with `2973229`, production net change is `+16 physical / +14 nonblank`. It contains only the compatibility-preserving projection seam and the deferred cold race guard. Two fresh isolated deterministic Release builds are both `15,313,408 bytes`, which is `512 bytes` more than the baseline. Only the UI DLL changes, from `14,522,880 / B3B399D9…5400F` to `14,523,392 / 984487EE…BE67`. The other three DLL bytes and hashes are unchanged. Focused 4, ui-core 246, notch-core 140, golden 6, GCC exporter/parity 15, RuntimeQuery 13 tests, the UI build and lint/analyzer all pass. For Lucid 3635, the hidden UI/IPC positive and negative order both give V21 `692 / 130979 / 8961B815…E57488` and V22 `548 / 84023 / 5208068B…57BB47`. Golden, export state and budget all PASS. Selection p95 is `6 ms` in each case. The Standards, Spec and simplification reviews have no blocker.
+- `R13.102b-2` was completed by [#36](https://github.com/Dennis40816/FreeformHelper/issues/36). It converges the Runtime Query `multi-owner` reader. After the visible CAD guard, it obtains only one current-revision `NotchV22ResolvedResult`, resolved from the current setting or the `--overlap-percent` override. The lightweight Inspector snapshot is used only for the existing CAD response metadata. Rows, summary counts and rule trace are all projected from `resolved.Compensation.RegularDebugInfos`. A cold override reduces from two compensation misses to one. A re-query with the same CAD/revision/override does not add a miss. The payload schema, ordering, limit/truncation, threshold metadata and errors are unchanged.
+- This slice only completes R13.102b-2. It does not build a revisioned task/session shared by UI and export. It also does not change the export candidate batch, `LegacyRegularAnchor` or the combined-overflow derivation of `NotchDisplayProjector`. R13.102, R13.102a-2, R13.101c-2, R13.103 and R13.104 remain open.
+- Completion evidence: compared with `f866e6a`, production and logic-first are both `+14 physical / +12 nonblank`. Two fresh isolated deterministic Release builds are fully identical. The total DLL goes `15,322,624 -> 15,323,136 bytes` (`+512`). Only UI changes, from `14,528,512 / 9B017D15…09DBC` to `14,529,024 / 20280245…86A7`. Focused 2, RuntimeQueryUseCase 18, RuntimeQueryIpc 5, notch-core 170, ui-core 250, notch-golden 6, GCC 8, the UI build, lint/analyzer and the Standards, Spec and simplification reviews all pass. The signed C, golden, export state and budget of the hidden UI/IPC positive and negative order are unchanged. Selection total p95 is `47 / 96 ms`. The evidence SHA-256 values are `359F4F0B…B75F4` and `854254B0…D2D5B`. No performance improvement is claimed.
+- `R13.102a-2a` was completed by [#28](https://github.com/Dennis40816/FreeformHelper/issues/28) as a narrow, export/generator-only slice. The normal `CadAllocation` cold path builds one Application-owned opaque compact candidate batch and the first final projection. A matching warm request reuses the same batch and re-projects it with the current version, threshold, `NullValue` and target coverage guard/cap. A first projection with zero rows still stores the batch. `LegacyRegularAnchor` keeps its request-specific `NotchTable` cache.
+- Warm batch projection does not replay the profiles, candidate or merge work. It reports only phase 4 of the current run. The Runtime Query schema is unchanged. `exportGenerationCache.entryRowCount` is the row count of the latest projected table. It is not the candidate count or the batch size.
+- Mutation evidence: each of these changes fails a focused characterization RED test: adding the version/threshold key back, removing the strong compatibility guard, refusing to store a zero-row batch, rerunning the candidates on a hit, or returning the first final table. Combined-request admission keeps the V22-controlled shared set that R13.103b-1 already locked.
+- Completion evidence: compared with `1deb591`, production and logic-first are both `+405 physical / +377 nonblank`. Two fresh isolated deterministic Release builds are fully identical. The total DLL is `15,314,432 -> 15,322,112 bytes` (`+7,680`). Application is `689,152 / 3FE87F11…CCBB5 -> 693,248 / 141A8972…730A`, and UI is `14,524,416 / AF1EC4E4…9D67 -> 14,528,000 / B00AAB25…E2D0`. The bytes and hashes of Domain and Infrastructure are unchanged. In current-source Lucid 3635, all three cold runs give `9,831` candidates and `1,148` rows. The cold p50 is `1,328.20 ms`. The warm projection p50 / p95 on the same batch is `0.5884 / 1.0393 ms`. The estimated retained size is `331,509 bytes/batch`. The ignored evidence SHA-256 is `56198980…A031205`. It serves only as single-machine no-regression and capacity evidence. Focused 54, notch-core 146, ui-core 250, golden 6, GCC 16, RuntimeQuery 13 and the hidden UI/IPC positive and negative order all PASS. The signed C is still V21 `692 / 130979 / 8961B815…E57488` and V22 `548 / 84023 / 5208068B…57BB47`.
+- `R13.102a-2b-1` was completed by [#66](https://github.com/Dennis40816/FreeformHelper/issues/66). It converges the existing generation completion boundary. The request entry fixes the cache generation epoch, the Step5 final-projection revision and the Simulation source revision. Only a completion for which all three are still current may commit the projected row count, the last generated table, progress/flow and the caller continuation. The accepted Simulation session stores the source revision captured for that run.
+- A final-only guard/cap invalidation on `CadAllocation` rejects the table, session and progress publication of an old completion. It keeps the resolved batch and keeps the projected row count at `0`, so the next current request can hit the batch and re-project it. A full Step5 invalidation advances the generation epoch even if the cache is empty, so an old request cannot store a batch or table afterwards. Export and Simulation share a reference-counted busy scope. When one of two overlapping operations finishes, the busy state of the other is not released early. The compatibility behavior of `LegacyRegularAnchor` is unchanged.
+- This slice does not complete R13.102 or R13.102a-2. R13.102a-2b-2 must still make the single-CAD UI sparse result and the full export batch share one revisioned task/session. The parents R13.101c-2, R13.102 and R13.103 also remain open.
+- `R13.102a-2b-2` is split into two consumer-backed leaves, according to code-size and lifetime risk. `R13.102a-2b-2a` [#68](https://github.com/Dennis40816/FreeformHelper/issues/68) first makes concurrent Export and Simulation share one full batch-resolution task under the same output-neutral identity and generation epoch. It explicitly separates the resolution of phases 1 to 3 from the phase 4 projection of each caller. The next leaf connects the single-CAD sparse resolved result to the same session. 2b-2a must not add a generic executor, a second cache service, a per-candidate task or an eager full preview. It must not claim to complete the 2b-2 parent.
+- `R13.102a-2b-2a` is complete. After the cold owner succeeds, it stores once, and only if the epoch and entry are still current. Joiners read the same task, but each projects with the final request frozen at its own entry. A final-only invalidation keeps the task and batch and rejects old projections. A full invalidation detaches the old task and forbids storing afterwards. A faulted entry is removed so that it can be retried. The completed cache, the in-flight join and the projection all keep the full computation-settings equality, to prevent a 32-bit fingerprint collision. The old UI service facade delegates thinly to the same path, to keep source compatibility.
+- Completion evidence: compared with `03faae6`, production and logic-first are both `0 files / +182 physical / +169 nonblank`, and the ViewModel net reduction is `-2 / -4`. There is no new production file, service or dependency. Two fresh isolated deterministic Release builds are fully identical. The total DLL is `15,332,864 -> 15,342,080 bytes` (`+9,216`). Application is `696,320 / 9899BC42…B952EBF -> 697,856 / EA953FCE…33E3B4`, and UI is `14,535,680 / 258E5AB4…723CE6 -> 14,543,360 / EDB83455…4D0D4B`. Domain and Infrastructure are unchanged. Facade 1, notch-core 187, Application 218, ui-core 274, smoke 25, notch-golden 6, Runtime Query 23 and GCC 8 tests and the UI build and lint are all green. The hidden UI/IPC positive and negative order give signed C, golden, state and budget all PASS. The selection p95 is `31/17/15` and `29/15/15 ms`, and the evidence SHA-256 values are `5B5C5272…D5DB4E` and `C3EC88C3…D2961`. The generator is now `974 / 899` and the cache service is `634 / 575` physical / nonblank. The next leaf takes an extract/delete-first approach. 2b-2 and all parents remain open.
+- `R13.102a-2b-2b` [#76](https://github.com/Dennis40816/FreeformHelper/issues/76) is complete and closes 2b-2. The two caches of the single-CAD UI, compensation and resolved, are converged into one resolved owner. A cold or warm full batch carries and reuses at most one resolved result of the currently selected single CAD. The identity locks the CAD ID, the anchor IC/diff, the exact CAD, the immutable grid state and CAD pool signatures, the active mask, and all computation settings. A final-only request is not part of the identity. A change of the same mutable grid reference also cannot reuse an old result by mistake.
+- 2b-2b does not keep the polygons and debug evidence of all candidates. It also adds no per-CAD task registry, no second cache/session service, no generic executor and no dependency. After the generator carrier is extracted, the main file drops from `974` to `841` lines, and the ViewModel net reduction is `109 / 100` physical / nonblank. Compared with `7b06722`, production is `+2 files / +127 physical / +118 nonblank`. This is less than the `128` physical lines that deleting the duplicate cache path directly would save. Two fresh isolated deterministic Release builds are identical. The total DLL is `15,342,080 -> 15,360,512 bytes` (`+18,432`). Focused 8, notch-core 189, Application 220, ui-core 274, smoke 25, golden 6, Runtime Query/IPC 23, GCC 8, the hidden UI/IPC positive and negative order, build and lint, and the three-axis review all PASS. The signed C is still V21 `692 / 130979 / 8961B815…E57488` and V22 `548 / 84023 / 5208068B…57BB47`. R13.101 / 101c-2 / 102 / 102a / 102a-2 / 103 and Legacy convergence remain open under their own exit conditions.
 
 - Owner-approved firmware corner case (2026-10-04): the owner approved public PR #3 at head `9810edf9` and the corner case in chat. With mixed Q7-zero/Q7-positive allocations after CAD inspection, warm V21/V22 firmware rows and FW apply simulation now match cold results; cold generator and golden-input outputs remain unchanged. Synthetic warm/cold full-row snapshots cover this case, but it was not separately verified through the C formatter or actual UI export. See [milestone handoff section 6](../reviews/r13-131-milestone-handoff-2026-10.md) for the exact scope and remaining presentation/interaction validation limits.
 
-### R13.103 Export projection 與 formatter 分離
+### R13.103 Export projection and formatter separation
 
-- owner 2026-10-03：V21 firmware C output 尚未確定，暫時保留；本項 final projection／formatter 分離（含 legacy convergence）暫緩，不得開始移除或變更 V21 output 與舊 project 對它的讀取路徑。
-- owner 後續答覆（2026-10-03）取代上述「暫緩」後果：V21／Legacy 維持原樣，既有 zero-diff gates 繼續保護；不再投入額外收斂／等價性工作，完全移除為版本未訂的後續目標；owner 決定（2026-10-04，經 Commander 轉述）排在 g7 之後，範圍之後再定，之前不做隱性轉換；原話與 owner 確認「2.1」指 V21 見第 0 節 Owner 決定。
-- `NotchFirmwareCExporter` 已位於 Application 層；本項不是「搬到 Application」。
-- 把 version-specific final Firmware node projection（V21 destination-oriented、V22 source-oriented）、version threshold、null／continuation／ordering rule 收斂為唯一允許的版本分岔邊界與可測試 result model。
-- exporter 最終只負責 C text formatting 與 fixed contract emission。
-- typed vs legacy projection 必須有等價性測試。
-- `R13.103a` 已由 [#24](https://github.com/Dennis40816/FreeformHelper/issues/24) 完成 final V2.1 projector／evaluator characterization。Public exporter fixture將三個同destination terms依source identity穩定排序並拆成兩個ABI nodes，鎖exact C lines、node count與generated `INT16` carrier；C# evaluator及GCC `15.1.0` runtime對三個`32767 × Q7 128` terms的final destination都為`32765`。另一個public simulation fixture鎖missing destination／source／anchor三種exact diagnostics及順序。
-- Mutation evidence分別把projector步進改為3、把evaluator改成saturating clamp、抑制missing-source diagnostic，三案都會由新增characterization RED；restore後targeted exporter／simulation 27、notch-core 142、notch-golden 6 tests pass。此slice無production source差異；兩次fresh isolated deterministic Release維持`15,313,408 bytes`與四個own-output DLL bytes/SHA。Lucid 3635 hidden UI/IPC正反順序的V21 `692 / 130979 / 8961B815…E57488`、V22 `548 / 84023 / 5208068B…57BB47`仍exact，golden、export state與budget PASS；UI build／lint無warning。
-- 移除 canonical candidate build 依 `exportsV22` 提早選 threshold 的行為；先建立version-neutral superset/evidence，再於final row projection建立一個compatibility admitted view。V21-only沿用Q7 predicate；只要request含V22（含both），就沿用V22 effective-percent predicate控制同一shared set，V21再由該集合做compatibility projection。把both改成兩版各自獨立filter會改既有非golden輸出，必須另立behavior-change ticket，不能混入zero-diff refactor。
-- `R13.103b-1` 由 [#18](https://github.com/Dennis40816/FreeformHelper/issues/18) 實作此窄邊界：compatibility request在BuildProfiles與CAD pool／strict／boundary prerequisites完成、phase-2 initial progress callback返回後、平行candidate compute開始前凍結；candidate build／merge不再接收enabled version或version-selected threshold。Final admission後的同一dictionary依序供primary selection、target coverage guard、rows、coverage audit、V22 append與V21 projection使用。
-- Candidate phase現在刻意量測完整superset：`CandidateCount`、candidate timings與merge-phase `GeneratedRowCount`是candidate／bucket telemetry，可能大於final rows；phase 4仍回報實際output row count。Payload overflow evidence亦先隨candidate保存，只對admitted candidate以原exception type/message驗證，避免threshold-rejected資料新增例外。這些是建立output-neutral evidence的明列telemetry邊界，不代表R13.102 batch/result已完成。
-- R13.103b-1完成證據：相對`7490477` production淨減`-8 physical / -10 nonblank`；兩次fresh isolated deterministic Release均為`15,312,384 bytes`，較base減少`2,048 bytes`，只有Application DLL由`690,688 / 3B2BA783…F2FA`變為`688,640 / CC0C1F71…8E86`。Lucid 3635 candidates固定`9,831`，p50 wall `4,726 -> 3,819 ms`、generation `4,695 -> 3,798 ms`，只作no-regression observation。Targeted 30、notch-core 132、golden 6、GCC 15、ui-core 243 tests，以及hidden UI/IPC正反順序、UI build、lint與雙軸review全數通過；V21/V22 signed C、export state與budget不變。
-- `R13.103c-1` 由 [#32](https://github.com/Dennis40816/FreeformHelper/issues/32) 收斂 final V22 projector：`NotchV22FirmwareProjector` 一次正規化 typed、`Values.Length >= 7` 與 short-row compatibility payload，同一 projected row 同時形成 input-order `SourceRows` 與既有 C-order `NodesByIc`。Exporter 只格式化 projection，Release no-op 仍在排序／emission boundary 依既有順序移除；simulation 逐 node 以 FW `INT16` semantics 執行，再由已計算 evaluation 聚合 Actions／diagnostics，不再自行 decode 或從 merged continuation legs 重算 physics。
-- Intentional correction：MAIN `C=120`、legs `60/20` 加 CONT leg `10` 的 V22 simulation source 由 `30` 修正為與 frozen C 相同的 `40`，完整結果 `[40,60,20,10]`；同 fixture 的 frozen V21 ABI 仍為 `[30,60,20,10]`。source `1`、target `50%` 亦由浮點 `0.5` 修正為 FW integer `0`。Typed／untyped clamp、short-row exact fallback／overflow、Release no-op、invalid IC、INT16 baseline與 public GCC parity皆有 characterization；C node／ordering／bytes及 signed golden 不變。
-- 完成證據：相對 `f0d16c8` production／logic-first皆為 `+1 file / +19 physical / +20 nonblank`。兩次 fresh isolated deterministic Release完全一致，總 DLL維持 `15,322,624 bytes`；Application bytes仍為 `693,248`、SHA由 `D88E9F7F…E0CBD`變為 `45431F85…1068EF`。Focused 35、notch-core 156、notch-golden 6、GCC 8、Runtime Query 15、ui-core 250 tests，UI build與lint皆通過；兩個production mutation均由public parity fixture RED。Hidden UI/IPC正反順序的V21/V22 signed C、golden、export state與budget全數不變，selection total p95為 `41 / 47 ms`；不宣稱效能提升。
-- `R13.103c-2` 由 [#34](https://github.com/Dennis40816/FreeformHelper/issues/34) 完成 null-sentinel domain contract：`NotchSettings.ValidateNullValueOrThrow` 以 `0..UINT16.MaxValue` 為唯一 Application validation owner，並由 `ProjectSettings.ValidateOrThrow`、V21 final projector與V22 final projector共用；Step 5／Runtime Query notch validation亦先走同一settings validation entry。VM／direct UseCase在report建立前fail-fast，Named Pipe最外層則以既有`IPC_ERROR` failure envelope傳回原message，避免例外斷線退化成`EMPTY_RESPONSE`。會實際投影 Firmware nodes 的 public exporter／simulation 對越界值在 formatter／evaluator 前拋出相同 exact exception；不 silent clamp、migrate或改 persistence schema／UI range，empty C table與unsupported simulation fast path不變。
-- Public `65536`／target `65535` fixture 修改前固定 C／GCC `[50,0]` 與 simulation `[50,50]` 的 invalid-input drift；修正後兩入口一致 fail-fast。Runtime Query `notch-validation` 亦由silent clamp修正為direct exception與actual IPC `IPC_ERROR` exact message；public pipe fixture先固定舊`EMPTY_RESPONSE`再GREEN。單次C export在讀取caller-owned collections前snapshot sentinel；active-set enumeration同步把`65534`改為`65535`時，舊live-read實作的V21／V22 fixtures均RED，修正後macro／projector／formatter仍共用`65534`。`0／65535` settings boundary，以及 sentinel `65534` 時的 V22 target／V21 Legacy ref diff `65535` legal boundary均有C／GCC parity characterization。V21 custom-adjacent sentinel 的舊 `NHC_DIFF_NONE` literal刻意修正為numeric `65535`；default-sentinel V21／V22 C bytes與 signed golden exact，沒有更新 golden。
-- 完成證據：相對 `493d5d6` production／logic-first皆為 `+0 files / +16 physical / +16 nonblank`；兩次 fresh isolated deterministic Release完全一致，總 DLL維持 `15,322,624 bytes`，Application `693,248 bytes` SHA由 `45431F85…1068EF`變為 `827EF8A0…1EE5D8`，UI `14,528,512 bytes` SHA由 `D0BABA97…3431B`變為 `9B017D15…09DBC`。Focused 13、notch-core 168、notch-golden 6、GCC 8、RuntimeQueryUseCase 16、RuntimeQueryIpc 5、ui-core 250 tests，UI build與lint皆通過；projector/settings/silent-clamp、IPC `EMPTY_RESPONSE`與export live-read mutations均由public fixture RED。Hidden UI/IPC正反順序的V21/V22 signed C、golden、export state與budget全數不變；forward／reverse selection total p95 `53 / 40 ms`的evidence為`build/perf/r13103c2-forward-snapshot-final/regression-baseline-summary.json`（SHA-256 `31B3D8F4…AF85D`）與`build/perf/r13103c2-reverse-snapshot-final/regression-baseline-summary.json`（SHA-256 `ED200E05…5FB15`）。不宣稱效能提升。
-- `R13.103d-1` 由 [#54](https://github.com/Dennis40816/FreeformHelper/issues/54) 收斂 Legacy request一致性：`LegacyNotchGenerationRequest`在首次progress callback前擁有化enabled版本並凍結effective V22／V21 thresholds、`NullValue`與`LenScale`；legacy threshold admission及V21／V22 strategies只讀此request。Callback仍同步執行且caller settings立即可見，但只影響下一次generation；V22 strategy原本因re-entrant live mode可達的CadAllocation compensation branch與`allCadPads`參數因此移除。
-- Public triangle RED固定callback把entry Legacy mode改成CadAllocation時，舊row的ToFull由`100`變成hybrid `200`；完成後仍是exact Legacy 9-int row。1x2與caller-set fixtures另鎖mid-run linked／unlinked threshold、`NullValue`、`LenScale`、enabled-version mutation不影響未建rows，progress tuple與V21→V22 order不變，下一次呼叫才採新值。live-set與live-threshold mutations及原始live-mode RED均有實跑／restore。
-- 完成證據：相對`36d7bb8` production／logic-first皆為`0 files / -3 physical / -4 nonblank`；兩次fresh isolated deterministic Release完全一致，總DLL `15,330,816 -> 15,332,864 bytes`（`+2,048`），只有Application由`697,856 / 699FF83D…744649`變為`699,904 / 33FB9E60…FA6170`。Legacy targeted 6、generator 44、Application 212、notch-core 179、ui-core 258、smoke 24、UI snapshots 21、golden 2、exporter／GCC 30與Runtime Query 18 tests pass；UI build與lint/analyzer為0 warning／0 error。Hidden UI／IPC正反順序的signed C、golden、export state與budget不變，selection total／Inspector／preview p95為`38/23/14`與`27/15/15 ms`，evidence SHA-256為`57685C9D…395309F`與`82BF6DF4…FD47D5`；不宣稱效能提升。
-- `R13.103d-2` 由 [#60](https://github.com/Dennis40816/FreeformHelper/issues/60) 刪除固定兩版本卻沒有注入consumer的Legacy strategy registry：generation與eligibility共用明確V21／V22 switch，兩個stateless compatibility algorithm改為static owner；`INotchAlgorithmStrategy`、dictionary、test-only injection constructor與missing-strategy假分支一併移除。Owned request、threshold、9-int rows、comments、ordering與progress維持exact。
-- Public XWay／YWay／XYWay matrix鎖反向configured set仍canonical輸出V21→V22、eligibility／row count／anchor一致；放寬V22 admission與交換兩版builder兩個mutation都會RED。相對`f244c47` production／logic-first皆為`0 files / -61 physical / -53 nonblank`；兩次fresh isolated deterministic Release完全一致，總DLL `15,329,792 -> 15,329,280 bytes`（`-512`），只有Application由`696,832 / 06F8CF03…C5C0A4E`變為`696,320 / 9899BC42…B952EBF`，其餘三個DLL bytes/SHA不變。Application 218、notch-core 182、notch-golden 6、ui-core 258、smoke 24、Runtime Query／exporter／GCC 48 tests及UI build／lint皆通過。Hidden正反signed C、golden、export state與budget不變，selection total／Inspector／preview p95為`29/16/15`與`32/19/14 ms`，evidence SHA-256為`F1F09E5A…B79A89`與`0581FE62…F1D12`。
-- Historical status after R13.103a/R13.103b-1/R13.103c-1/R13.103c-2/R13.103d-1/R13.103d-2 left the R13.103 parent open. Under the owner decisions of 2026-10-03/04, Legacy request-specific table/cache and compatibility convergence are accepted B1/B2 exceptions, not remaining g2 blockers; normal A1/A2 evidence and owner-controlled parent/milestone exits still apply.
-- `LegacyRegularAnchor` 的固定V21／V22 compatibility dispatch不得成為 normal flow 的第二條實際路徑。
+- owner 2026-10-03: The V21 firmware C output is not yet decided, so it is kept for now. The final projection/formatter separation for this item, including legacy convergence, is postponed. Do not start removing or changing the V21 output, or the old project read paths that depend on it.
+- Later owner reply (2026-10-03), which replaces the postponement above: V21/Legacy stay as they are, and the existing zero-diff gates continue to protect them. No further convergence or equivalence work is planned. Full removal is a future goal with no assigned version. On 2026-10-04, the owner decided (relayed by Commander) to schedule this after g7. The scope will be decided later. No implicit conversion happens before then. The owner's original words, and the owner's confirmation that "2.1" refers to V21, are in the Owner decision in section 0.
+- `NotchFirmwareCExporter` is already in the Application layer. This item is not "move it to Application."
+- Converge the version-specific final Firmware node projection (V21 destination-oriented, V22 source-oriented), the version threshold, and the null, continuation, and ordering rules into the only allowed version-branching boundary and a testable result model.
+- The exporter should only handle C text formatting and fixed contract emission.
+- Typed and legacy projections must have equivalence tests.
+- `R13.103a` was completed by [#24](https://github.com/Dennis40816/FreeformHelper/issues/24). It added final V2.1 projector/evaluator characterization. The public exporter fixture sorts three terms with the same destination in a stable order by source identity, then splits them into two ABI nodes. It locks the exact C lines, the node count, and the generated `INT16` carrier. The C# evaluator and the GCC `15.1.0` runtime both give a final destination of `32765` for three `32767 × Q7 128` terms. A separate public simulation fixture locks the exact diagnostics, and their order, for missing destination, missing source, and missing anchor.
+- Mutation evidence: changing the projector step to 3, changing the evaluator to a saturating clamp, and suppressing the missing-source diagnostic. Each of these three cases turns RED in the new characterization. After restoring the code, the targeted exporter/simulation tests pass (27), along with notch-core (142) and notch-golden (6). This slice has no production source difference. Two fresh isolated deterministic Release builds both stayed at `15,313,408 bytes`, and the bytes and SHA of the four own-output DLLs matched. The Lucid 3635 hidden UI/IPC forward and reverse results remain exact: V21 `692 / 130979 / 8961B815…E57488` and V22 `548 / 84023 / 5208068B…57BB47`. Golden, export state, and budget all PASS. The UI build and lint have no warnings.
+- Remove the behavior where canonical candidate build chooses the threshold early based on `exportsV22`. First build a version-neutral superset and evidence. Then create one compatibility admitted view in the final row projection. V21-only uses the Q7 predicate. Whenever the request includes V22 (including both), use the V22 effective-percent predicate to control the same shared set, and then project V21 from that set. Changing "both" to two independent per-version filters would change existing non-golden output. That needs a separate behavior-change ticket and cannot be mixed into the zero-diff refactor.
+- `R13.103b-1` ([#18](https://github.com/Dennis40816/FreeformHelper/issues/18)) implements this narrow boundary. The compatibility request is frozen after BuildProfiles and the CAD pool, strict, and boundary prerequisites are complete. It is frozen after the phase-2 initial progress callback returns and before parallel candidate compute starts. Candidate build and merge no longer receive the enabled version or the version-selected threshold. After final admission, the same dictionary is used in order for primary selection, the target coverage guard, rows, the coverage audit, V22 append, and V21 projection.
+- The candidate phase now intentionally measures the full superset. `CandidateCount`, candidate timings, and the merge-phase `GeneratedRowCount` are candidate and bucket telemetry, so they can be larger than the final rows. Phase 4 still reports the actual output row count. Payload overflow evidence is also saved with the candidate first. It is checked only for admitted candidates, using the original exception type and message. This means threshold-rejected data does not add new exceptions. These are explicitly listed telemetry boundaries for building output-neutral evidence. They do not mean R13.102 batch/result is complete.
+- R13.103b-1 completion evidence: Compared with `7490477`, production has a net reduction of `-8 physical / -10 nonblank`. Two fresh isolated deterministic Release builds both produced `15,312,384 bytes`, which is `2,048 bytes` less than the base. Only the Application DLL changed, from `690,688 / 3B2BA783…F2FA` to `688,640 / CC0C1F71…8E86`. Lucid 3635 candidates are fixed at `9,831`. p50 wall time went `4,726 -> 3,819 ms`, and generation `4,695 -> 3,798 ms`. This is recorded only as a no-regression observation. Targeted 30, notch-core 132, golden 6, GCC 15, and ui-core 243 tests pass. The hidden UI/IPC forward and reverse order checks, UI build, lint, and dual-axis review also pass. The V21/V22 signed C, export state, and budget are unchanged.
+- `R13.103c-1` ([#32](https://github.com/Dennis40816/FreeformHelper/issues/32)) converges the final V22 projector. `NotchV22FirmwareProjector` normalizes, in one pass, the typed payload, `Values.Length >= 7`, and the short-row compatibility payload. The same projected row forms both the input-order `SourceRows` and the existing C-order `NodesByIc`. The exporter only formats the projection. The Release no-op is still removed at the sorting and emission boundary, in the existing order. Simulation runs each node under FW `INT16` semantics. It then aggregates Actions and diagnostics from the computed evaluation. It no longer decodes on its own, and it no longer recalculates physics from merged continuation legs.
+- Intentional correction: For the MAIN `C=120` fixture with legs `60/20` and a CONT leg `10`, the V22 simulation source is changed from `30` to `40`, matching the frozen C. The full result is `[40,60,20,10]`. For the same fixture, the frozen V21 ABI remains `[30,60,20,10]`. Source `1` and target `50%` are also corrected from the floating value `0.5` to the FW integer `0`. Typed and untyped clamp, short-row exact fallback and overflow, the Release no-op, invalid IC, the INT16 baseline, and public GCC parity all have characterization. C nodes, ordering, bytes, and signed golden are unchanged.
+- Completion evidence: Compared with `f0d16c8`, production and logic-first are both `+1 file / +19 physical / +20 nonblank`. The two fresh isolated deterministic Release builds were identical. The total DLL stays at `15,322,624 bytes`. Application bytes remain `693,248`, but the SHA changes from `D88E9F7F…E0CBD` to `45431F85…1068EF`. Focused 35, notch-core 156, notch-golden 6, GCC 8, Runtime Query 15, and ui-core 250 tests pass, and the UI build and lint pass. Both production mutations turn RED in the public parity fixture. The hidden UI/IPC forward and reverse V21/V22 signed C, golden, export state, and budget are all unchanged. Selection total p95 is `41 / 47 ms`. No performance improvement is claimed.
+- `R13.103c-2` ([#34](https://github.com/Dennis40816/FreeformHelper/issues/34)) completes the null-sentinel domain contract. `NotchSettings.ValidateNullValueOrThrow` uses `0..UINT16.MaxValue` as the only Application validation owner. `ProjectSettings.ValidateOrThrow`, the V21 final projector, and the V22 final projector all share it. Step 5 and Runtime Query notch validation also go through the same settings validation entry first. The VM and direct UseCase fail fast before the report is built. The outermost Named Pipe layer returns the original message in the existing `IPC_ERROR` failure envelope. This prevents an exception from dropping the connection and turning into `EMPTY_RESPONSE`. Public exporter and simulation paths that actually project Firmware nodes throw the same exact exception for out-of-range values, before the formatter or evaluator runs. They do not silently clamp, migrate, or change the persistence schema or UI range. The empty C table and the unsupported simulation fast path are unchanged.
+- Public `65536` and target `65535` fixture: Before the change, the C and GCC output for `[50,0]` and the simulation output for `[50,50]` showed invalid-input drift. After the fix, both entry points fail fast consistently. Runtime Query `notch-validation` changed from silent clamping to a direct exception and the exact `IPC_ERROR` message over IPC. The public pipe fixture first locked the old `EMPTY_RESPONSE` and then turned GREEN. A single C export snapshots the sentinel before it reads the caller-owned collections. When active-set enumeration is also changed from `65534` to `65535`, the old live-read implementation makes both the V21 and V22 fixtures RED. After the fix, the macro, projector, and formatter all still share `65534`. The `0／65535` settings boundary, and the legal boundary where the V22 target and V21 Legacy reference diff are `65535` with sentinel `65534`, all have C and GCC parity characterization. The old `NHC_DIFF_NONE` literal for the V21 custom-adjacent sentinel is intentionally changed to the numeric `65535`. The default-sentinel V21/V22 C bytes match signed golden exactly. Golden was not updated.
+- Completion evidence: Compared with `493d5d6`, production and logic-first are both `+0 files / +16 physical / +16 nonblank`. The two fresh isolated deterministic Release builds were identical. The total DLL stays at `15,322,624 bytes`. Application stays at `693,248 bytes`, but its SHA changes from `45431F85…1068EF` to `827EF8A0…1EE5D8`. UI goes from `14,528,512 bytes` with SHA `D0BABA97…3431B` to `9B017D15…09DBC`. Focused 13, notch-core 168, notch-golden 6, GCC 8, RuntimeQueryUseCase 16, RuntimeQueryIpc 5, and ui-core 250 tests pass. The UI build and lint pass. The projector, settings, silent-clamp, IPC `EMPTY_RESPONSE`, and export live-read mutations are each caught RED by a public fixture. The hidden UI/IPC forward and reverse V21/V22 signed C, golden, export state, and budget are all unchanged. Forward and reverse selection total p95 is `53 / 40 ms`. The evidence is at `build/perf/r13103c2-forward-snapshot-final/regression-baseline-summary.json` (SHA-256 `31B3D8F4…AF85D`) and `build/perf/r13103c2-reverse-snapshot-final/regression-baseline-summary.json` (SHA-256 `ED200E05…5FB15`). No performance improvement is claimed.
+- `R13.103d-1` ([#54](https://github.com/Dennis40816/FreeformHelper/issues/54)) converges Legacy request consistency. `LegacyNotchGenerationRequest` owns a copy of the enabled versions before the first progress callback. It freezes the effective V22 and V21 thresholds, `NullValue`, and `LenScale`. The legacy threshold admission and the V21 and V22 strategies read only this request. The callback still runs synchronously, and the caller's settings are visible immediately. However, a change only affects the next generation. The V22 strategy's CadAllocation compensation branch, which was reachable through re-entrant live mode, and its `allCadPads` parameter are removed.
+- A public triangle RED test locks this behavior. When the callback changes the entry Legacy mode to CadAllocation, the old row's ToFull value changes from `100` to the hybrid value `200`. After the fix, the result is still the exact Legacy 9-int row. The 1x2 and caller-set fixtures further lock that a mid-run change to the linked or unlinked threshold, `NullValue`, `LenScale`, or the enabled versions does not affect rows that have not been built yet. The progress tuple and the V21 to V22 order stay the same. The new values are used only on the next call. The live-set and live-threshold mutations, and the original live-mode RED, were all run and then restored.
+- Completion evidence: Compared with `36d7bb8`, production and logic-first are both `0 files / -3 physical / -4 nonblank`. The two fresh isolated deterministic Release builds were identical. The total DLL goes `15,330,816 -> 15,332,864 bytes` (`+2,048`). Only Application changes, from `697,856 / 699FF83D…744649` to `699,904 / 33FB9E60…FA6170`. Legacy targeted 6, generator 44, Application 212, notch-core 179, ui-core 258, smoke 24, UI snapshots 21, golden 2, exporter and GCC 30, and Runtime Query 18 tests all pass. The UI build and lint/analyzer have 0 warnings and 0 errors. The hidden UI/IPC forward and reverse signed C, golden, export state, and budget are unchanged. Selection total, Inspector, and preview p95 are `38/23/14` and `27/15/15 ms`. The evidence SHA-256 values are `57685C9D…395309F` and `82BF6DF4…FD47D5`. No performance improvement is claimed.
+- `R13.103d-2` ([#60](https://github.com/Dennis40816/FreeformHelper/issues/60)) removes a fixed two-version Legacy strategy registry that had no injected consumer. Generation and eligibility now share an explicit V21/V22 switch. The two stateless compatibility algorithms become static owners. `INotchAlgorithmStrategy`, the dictionary, the test-only injection constructor, and the missing-strategy fake branch are all removed. Owned requests, thresholds, 9-int rows, comments, ordering, and progress stay exact.
+- The public XWay, YWay, and XYWay matrix locks that a reversed configured set still outputs V21 then V22 in canonical order. Eligibility, row count, and anchor stay consistent. Two mutations, one that loosens V22 admission and one that swaps the two version builders, both turn RED. Compared with `f244c47`, production and logic-first are both `0 files / -61 physical / -53 nonblank`. The two fresh isolated deterministic Release builds were identical. The total DLL goes `15,329,792 -> 15,329,280 bytes` (`-512`). Only Application changes, from `696,832 / 06F8CF03…C5C0A4E` to `696,320 / 9899BC42…B952EBF`. The other three DLLs keep the same bytes and SHA. Application 218, notch-core 182, notch-golden 6, ui-core 258, smoke 24, Runtime Query, exporter, and GCC 48 tests, and the UI build and lint pass. The hidden forward and reverse signed C, golden, export state, and budget are unchanged. Selection total, Inspector, and preview p95 are `29/16/15` and `32/19/14 ms`. The evidence SHA-256 values are `F1F09E5A…B79A89` and `0581FE62…F1D12`.
+- Historical status after R13.103a, R13.103b-1, R13.103c-1, R13.103c-2, R13.103d-1, and R13.103d-2 left the R13.103 parent open. Under the owner decisions of 2026-10-03/04, Legacy request-specific table/cache and compatibility convergence are accepted B1/B2 exceptions. They are not remaining g2 blockers. Normal A1/A2 evidence and owner-controlled parent and milestone exits still apply.
+- The fixed V21/V22 compatibility dispatch in `LegacyRegularAnchor` must not become a second actual path in the normal flow.
 
-### R13.104 Notch display/safety projection 收斂
+### R13.104 Notch display and safety projection convergence
 
-- `NotchDisplayProjector` 只格式化 resolved result。
-- 移除 `NotchDisplayProjector` 重複的 `>255.0` 門檻推導；overflow/EMS risk predicate 在共享 policy/result 只計算一次。
-- `SimulationSafetyOverviewProjector` 與 workspace 不各自拼相同結論字串。
-- 新增 EMS safety constant/predicate guard，防止 View/ViewModel 再出現硬編碼 cap 或 risk wording。
-- `R13.104a-1` 已由 [#30](https://github.com/Dennis40816/FreeformHelper/issues/30) 完成 EMS after-cap decision 的窄收斂：既有 `DefaultEmsAfterCap = 480` 不變；`SimulationSafetyAuditService.IsEmsAfterCapViolation` 以 `afterValue > afterCap + 1e-9` 為唯一判斷，供 audit violation、net-flow／target-coverage EMS classification、Runtime Query regular snapshot、cell EMS status 及 workspace／overview high-risk projection 共用。`cap` 與 `cap + 0.5e-9` 安全，`cap + 2e-9` 為 violation。
-- Public headless Simulation／Runtime Query workflow 與兩個 raw-`>` mutation 已鎖住一致性。相對 `0c46d69` production 為 `+21 physical / +20 nonblank`；兩次 fresh isolated Release 均為 `15,322,624 bytes`，四個 DLL 各自 bytes/SHA exact。Affected 59、ui-core 250、notch-core 148、golden 6、GCC 6、Runtime Query 15 tests，以及 hidden UI/IPC 正反 gate、UI build 與 lint 全數通過；既有 V21/V22 signed C exact。
-- `R13.104a-2` 已由 [#38](https://github.com/Dennis40816/FreeformHelper/issues/38) 完成 combined-overflow decision 的窄收斂：`NotchV22TargetAllocationPolicy` 產生同時供 generator與revisioned resolved readers使用的`NotchV22TargetCoverageProjection`，normal anchored target-coverage只計 anchor max-once與實際emitted（strict或ToFull）groups的逐group rounded percent；`NotchDisplayProjector`只格式化supplied ratio／risk。Unanchored public compatibility與非target-coverage modes仍由Application owner保留舊all-target display fallback；below-gate diagnostics、global target-coverage guard與raw CAD-level `CombinedRatio`不變。
-- Public headless safe／true-overflow、ToFull bypass、rounding與`255/256` fixtures及三個production mutations已鎖住一致性。相對`f98c2e3` production／logic-first皆為`+73 physical / +67 nonblank`；兩次fresh isolated Release均為`15,326,720 bytes`且四DLL bytes/SHA exact。Focused 16、notch-core 175、ui-core 252、golden 6、Runtime Query 18、GCC 8、hidden UI/IPC正反gate、UI build與lint全數通過；signed V21/V22 C exact。
-- `R13.104a-3` 已由 [#40](https://github.com/Dennis40816/FreeformHelper/issues/40) 完成target display membership的窄收斂：normal anchored target coverage只以supplied `EmittedTargets`的`(IcIndex, DiffIndex)` membership投影effective count、compact lines與card role；rounded-zero及其他non-emitted diagnostics仍完整顯示為`Below gate`。`RawCombinedPercent == null` compatibility保留既有strict-only顯示。
-- Public Pad Info／compatibility fixtures與strict-only、UI `strict || ToFull` mutations已鎖住一致性；paired order-race test最初`3/3` RED，await既有grid-rebuild idle後`3/3` GREEN，僅穩定test harness，production未變。相對`0fe6416d` production／logic-first皆為`+22 physical / +21 nonblank`；兩次fresh isolated Release完全一致，總 DLL `15,326,720 -> 15,327,744 bytes`（`+1,024`），只有 UI `14,529,536 / D18E2F57…33467 -> 14,530,560 / 5BCB3018…AE304F`，其餘三 DLL bytes／SHA不變。Focused public reader 41、notch-core 175、ui-core 253、golden 6、Runtime Query 18、GCC 8（GCC `15.1.0`）、hidden UI/IPC正反gate、UI build與lint全數通過；signed V21/V22 C exact。Selection total／Inspector／preview p95為`31/16/16`與`33/18/15 ms`，evidence SHA-256為`DA135200…707C14`與`C33465AB…FA1034`。
-- `R13.104a-4` 已由 [#42](https://github.com/Dennis40816/FreeformHelper/issues/42) 完成Simulation audit base status的窄收斂：`SimulationSafetyTextProjector.BuildStatusText`以supplied audit投影`null/no cells -> Simulation not run`、`cells + violations -> EMS risk`、`cells + safe -> EMS OK`，供workspace status與overview共讀；stale suffix與build-failure unavailable仍留在overview boundary。Public headless empty-regular-grid fixture與兩個binary／ignore-HasCells mutations已鎖住availability一致性，normal operator workspace builder對missing workflow inputs的拒絕契約不變。
-- 相對`ef408f6` production／logic-first皆為`+11 physical / +9 nonblank`；兩次fresh isolated Release完全一致，總 DLL維持`15,327,744 bytes`，前三DLL bytes／SHA不變，UI bytes維持`14,530,560`而SHA更新為`2A133931…AD043A`。Focused 7、notch-core 175、Application 208、ui-core 253、smoke 24、golden 6、Runtime Query 18、GCC 8（GCC `15.1.0`）、hidden UI/IPC正反gate、UI build與lint全數通過；signed V21/V22 C exact。Selection total／Inspector／preview p95為`35/21/17`與`58/26/32 ms`，evidence SHA-256為`17B745E4…F04EC41C`與`A2E1D970…DACA098`。
-- `R13.104a-5` 已由 [#44](https://github.com/Dennis40816/FreeformHelper/issues/44) 完成Copper replay status priority的窄收斂：既有step positional constructor不變，support state與global-flow residual以non-positional、`[JsonIgnore]` facts沿原result path保存；step physical risk涵蓋global-flow、net-flow與target-coverage，result再投影any-unsupported／any-EMS／any-physical facts。`SimulationSafetyTextProjector.BuildReplayStatusText`固定`unsupported > EMS risk > audit warning > EMS OK`，供step status與VM aggregate summary共讀；artifact row複製JSON-ignored global-flow fact，使既有structured risk與status一致而不新增CSV／JSON／clipboard field，EMS count suffix亦不變。
-- Public headless two-point replay fixture固定step 0 `Max After 200`的global-flow-only `audit warning`、step 1 `Max After 399`及aggregate由錯誤`EMS OK`修正為exact `audit warning`；shared priority、structured facts、artifact schema guard與三個production mutations已鎖住一致性。相對`bdab625` production／logic-first皆為`0 files / +32 physical / +26 nonblank`；兩次fresh isolated Release完全一致，總 DLL `15,327,744 -> 15,329,792 bytes`（`+2,048`），四DLL bytes／SHA reproducible。Focused 17、Application 208、notch-core 175、ui-core 253、smoke 24、golden 6、Runtime Query 18、GCC 8、hidden UI/IPC正反gate、UI build與lint全數通過；signed V21/V22 C exact。Selection total／Inspector／preview p95為`44/18/21`與`40/18/26 ms`，evidence SHA-256為`619E0484…89875B`與`0A4DD778…85C48`；不宣稱效能提升或normal operator UI coverage。
-- `R13.104a-6` 已由 [#46](https://github.com/Dennis40816/FreeformHelper/issues/46) 完成no-cell EMS cap provenance的窄收斂：`SimulationSafetyTextProjector.FormatEmsAfterCap`以supplied audit的`AfterCap`為準，只有null audit回退`DefaultEmsAfterCap = 480`；overview no-cells cap與export no-cells handoff prompt共讀此projection。Public empty audit `512`／null `480` theories與overview constant、export literal、null-zero三個mutations已鎖住一致性，availability status、schema、predicate與layout不變。
-- 相對`dd559a0` production／logic-first皆為`0 files / +6 physical / +5 nonblank`；兩次fresh isolated Release完全一致，總 DLL維持`15,329,792 bytes`，前三DLL bytes／SHA不變，UI維持`14,531,072 bytes`而SHA更新為`CD7779FD…34E37`。Focused 12、notch-core 175、ui-core 253、smoke 24、golden 6、Runtime Query 18、GCC 8、hidden UI/IPC正反gate、UI build與lint全數通過；signed V21/V22 C exact。Selection total／Inspector／preview p95為`40/19/20`與`34/18/16 ms`，evidence SHA-256為`F874E56C…CE447A`與`4CD7EBB7…5EA40`。
-- `R13.104a-7` 已由 [#48](https://github.com/Dennis40816/FreeformHelper/issues/48) 完成physical-audit status的窄收斂：`SimulationSafetyTextProjector.BuildStatusText`對有cells的audit共用`EMS risk > audit warning > EMS OK` priority，physical risk涵蓋既有global-flow／net-flow／target-coverage facts；null／no-cells仍為`Simulation not run`。Workspace與overview共讀此base status，overview `HasRisk`仍只表示EMS danger，`NeedsAttention`納入physical risk與stale，並在非stale summary附加既有physical evidence。Public global-flow-only fixture及EMS priority、status／attention／summary三個production mutations已鎖住一致性；export-selection warning chip、predicate、counts、schema與layout未改。
-- 相對`e1c92d0` production／logic-first皆為`0 files / +6 physical / +6 nonblank`；兩次fresh isolated Release完全一致，總 DLL維持`15,329,792 bytes`，前三DLL bytes／SHA不變，UI維持`14,531,072 bytes`而SHA更新為`08878462…F95AB`。Focused 14、Application 208、notch-core 175、ui-core 253、smoke 24、golden 6、Runtime Query 18、GCC 8、hidden UI/IPC正反gate、UI build與lint全數通過；signed V21/V22 C exact。Selection total／Inspector／preview p95為`27/15/14`與`31/18/15 ms`，evidence SHA-256為`3BFF980B…04D199`與`577A9BB1…0A229`；不宣稱效能提升。
-- `R13.104a-8` 已由 [#50](https://github.com/Dennis40816/FreeformHelper/issues/50) 完成Notch export review physical-warning reader的窄收斂：badge共讀`BuildStatusText` priority，physical-only summary復用`BuildPhysicalAuditSummaryText`；physical-only audit不再標成clean，但仍不阻擋export。新增VM visibility fact只驅動既有`chipStatus warning` presentation，沒有新增style／token；clean、EMS block與availability wording保持exact。
-- Public `Before=400`／`After=450`／global residual`+50` fixture、clean／EMS-priority／availability compatibility、static XAML guard與三個production mutations已鎖住一致性。相對`cb73c8c` production為`+17 physical / +16 nonblank`、logic-first為`+10 / +9`；兩次fresh isolated Release完全一致，總 DLL `15,329,792 -> 15,330,304 bytes`（`+512`），只有UI bytes／SHA更新，final UI為`14,531,584 / 956A3FA5…06AFC9`。Focused 65、Application 208、notch-core 175、ui-core 256、UI snapshots 20、smoke 24、golden 6、Runtime Query 18、GCC 8、hidden UI/IPC正反gate、UI build與lint全數通過；signed V21/V22 C exact。Selection total／Inspector／preview p95為`40/25/17`與`35/20/16 ms`，evidence SHA-256為`981C85CA…4B32D8`與`979B4E22…DD664F`；不宣稱效能提升。
-- `R13.104a-9` 已由 [#52](https://github.com/Dennis40816/FreeformHelper/issues/52) 完成active Notch safety guidance的窄收斂：`SimulationSafetyTextProjector`擁有short／Simulation policy／export handoff三個templates；主VM供應current overview cap並通知dependent properties，Settings仍以同一owner使用default `480`。Step 5 overview tooltip共讀既有dynamic guidance property，無新增layout／style／token。
-- Public one-cell `AfterCap=512` fixture、default/null `480` compatibility、三個dependent notifications、active-tooltip source guard與三個mutations已鎖住同一screen不再同時呈現兩個EMS policies。此slice沒有改default cap、predicate、audit、target-coverage calibration、Runtime Query、persistence或firmware contract。
-- 相對`e1b0b9c` production／logic-first皆為`0 files / +21 physical / +16 nonblank`；兩次fresh isolated Release完全一致，總 DLL `15,330,304 -> 15,330,816 bytes`（`+512`），只有UI更新為`14,532,096 / 67C40172…D7AF33`。Focused 32、Application 208、notch-core 175、ui-core 258、UI snapshots 21、smoke 24、golden 6、Runtime Query 18、GCC 8、hidden UI/IPC正反gate、UI build與lint全數通過；signed V21/V22 C exact。Selection total／Inspector／preview p95為`37/23/16`與`34/17/19 ms`，evidence SHA-256為`97152F5A…41A1EA`與`DD69E750…7DA0EB`；不宣稱效能提升。
-- `R13.104a-10` 已由 [#62](https://github.com/Dennis40816/FreeformHelper/issues/62) 完成target-cap help provenance的窄收斂：`SimulationSafetyTextProjector.BuildNotchTargetCoverageCapHelpText`格式化current target cap、uniform `400`對應After與比較用EMS cap。Active Step 3供應current overview cap，Settings保留documented default cap；兩個既有tooltip共讀同一template，沒有新增control／layout／style／token或改target guard／EMS computation。
-- Public headless Step 3 tooltip與VM／Settings fixtures鎖target cap `128%`時active exact `After 512 / EMS cap 512`、Settings exact `After 512 / EMS cap 480`；static XAML、default active cap與dependent-notification三個mutations皆RED後restore。相對`32f4469` production／logic-first皆為`0 files / +23 physical / +20 nonblank`；兩次fresh isolated Release完全一致，總DLL `15,329,280 -> 15,329,792 bytes`（`+512`），只有UI更新為`14,532,608 / 44805041…29B52`。Focused 19、ui-core 260、smoke 25、notch-core 182、golden 6、Runtime Query／exporter／GCC 48、hidden UI/IPC正反gate、UI build與lint全數通過，signed V21/V22 C exact。Selection total／Inspector／preview p95為`40/20/19`與`39/23/21 ms`，evidence SHA-256為`D4BE8E99…A08D95D`與`36915EDF…2A3EE3`；不宣稱效能提升。
+- `NotchDisplayProjector` only formats the resolved result.
+- Remove the duplicated `>255.0` threshold derivation from `NotchDisplayProjector`. The overflow and EMS risk predicates are computed only once, in the shared policy and result.
+- `SimulationSafetyOverviewProjector` and the workspace must not each build the same conclusion string.
+- Add an EMS safety constant and predicate guard. This prevents View or ViewModel code from reintroducing a hard-coded cap or risk wording.
+- `R13.104a-1` was completed by [#30](https://github.com/Dennis40816/FreeformHelper/issues/30). It narrowly converges the EMS after-cap decision. The existing `DefaultEmsAfterCap = 480` is unchanged. `SimulationSafetyAuditService.IsEmsAfterCapViolation` uses `afterValue > afterCap + 1e-9` as the only check. It is shared by audit violations, net-flow and target-coverage EMS classification, the Runtime Query regular snapshot, cell EMS status, and the workspace and overview high-risk projection. `cap` and `cap + 0.5e-9` are safe. `cap + 2e-9` is a violation.
+- Public headless Simulation and Runtime Query workflows, plus two raw `>` mutations, lock in consistency. Compared with `0c46d69`, production is `+21 physical / +20 nonblank`. Two fresh isolated Release builds were both `15,322,624 bytes`, and the bytes and SHA of each of the four DLLs match exactly. Affected 59, ui-core 250, notch-core 148, golden 6, GCC 6, and Runtime Query 15 tests pass. The hidden UI/IPC forward and reverse gate, UI build, and lint all pass. The existing V21/V22 signed C matches exactly.
+- `R13.104a-2` was completed by [#38](https://github.com/Dennis40816/FreeformHelper/issues/38). It narrowly converges the combined-overflow decision. `NotchV22TargetAllocationPolicy` produces `NotchV22TargetCoverageProjection`, which is used by both the generator and the revisioned resolved readers. For normal anchored target coverage, it counts only the anchor (max once) and the per-group rounded percent of the groups actually emitted (strict or ToFull). `NotchDisplayProjector` only formats the supplied ratio and risk. Unanchored public compatibility and non-target-coverage modes still use the Application owner's old all-target display fallback. Below-gate diagnostics, the global target-coverage guard, and the raw CAD-level `CombinedRatio` are unchanged.
+- Public headless safe and true-overflow cases, the ToFull bypass, rounding, and `255/256` fixtures, plus three production mutations, lock in consistency. Compared with `f98c2e3`, production and logic-first are both `+73 physical / +67 nonblank`. Two fresh isolated Release builds were both `15,326,720 bytes`, and the bytes and SHA of all four DLLs match. Focused 16, notch-core 175, ui-core 252, golden 6, Runtime Query 18, and GCC 8 tests pass. The hidden UI/IPC forward and reverse gate, UI build, and lint all pass. The signed V21/V22 C matches exactly.
+- `R13.104a-3` was completed by [#40](https://github.com/Dennis40816/FreeformHelper/issues/40). It narrowly converges target display membership. For normal anchored target coverage, the effective count, compact lines, and card role are projected only from the membership of `(IcIndex, DiffIndex)` in the supplied `EmittedTargets`. Rounded-zero values and other non-emitted diagnostics are still fully displayed as `Below gate`. The existing strict-only display is kept for `RawCombinedPercent == null` compatibility.
+- Public Pad Info and compatibility fixtures, plus strict-only and UI `strict || ToFull` mutations, lock in consistency. A paired order-race test was first `3/3` RED. After it awaited the existing grid-rebuild idle, it became `3/3` GREEN. Only the test harness was stabilized. Production did not change. Compared with `0fe6416d`, production and logic-first are both `+22 physical / +21 nonblank`. The two fresh isolated Release builds were identical. The total DLL goes `15,326,720 -> 15,327,744 bytes` (`+1,024`). Only UI changes, `14,529,536 / D18E2F57…33467 -> 14,530,560 / 5BCB3018…AE304F`. The other three DLLs keep the same bytes and SHA. Focused public reader 41, notch-core 175, ui-core 253, golden 6, Runtime Query 18, and GCC 8 tests (GCC `15.1.0`) pass. The hidden UI/IPC forward and reverse gate, UI build, and lint all pass. The signed V21/V22 C matches exactly. Selection total, Inspector, and preview p95 are `31/16/16` and `33/18/15 ms`. The evidence SHA-256 values are `DA135200…707C14` and `C33465AB…FA1034`.
+- `R13.104a-4` was completed by [#42](https://github.com/Dennis40816/FreeformHelper/issues/42). It narrowly converges the base status of the Simulation audit. `SimulationSafetyTextProjector.BuildStatusText` projects `null/no cells -> Simulation not run`, `cells + violations -> EMS risk` and `cells + safe -> EMS OK` from the supplied audit. The workspace status and overview both read this. The stale suffix and build-failure unavailable state stay at the overview boundary. A public headless empty-regular-grid fixture and two mutations (binary, and ignoring HasCells) lock in availability consistency. The normal operator workspace builder's rejection contract for missing workflow inputs is unchanged.
+- Compared with `ef408f6`, production and logic-first are both `+11 physical / +9 nonblank`. The two fresh isolated Release builds were identical. The total DLL stays at `15,327,744 bytes`, and the first three DLLs keep their bytes and SHA. UI bytes stay at `14,530,560`, but the SHA is updated to `2A133931…AD043A`. Focused 7, notch-core 175, Application 208, ui-core 253, smoke 24, golden 6, Runtime Query 18, and GCC 8 tests (GCC `15.1.0`) pass. The hidden UI/IPC forward and reverse gate, UI build, and lint all pass. The signed V21/V22 C matches exactly. Selection total, Inspector, and preview p95 are `35/21/17` and `58/26/32 ms`. The evidence SHA-256 values are `17B745E4…F04EC41C` and `A2E1D970…DACA098`.
+- `R13.104a-5` was completed by [#44](https://github.com/Dennis40816/FreeformHelper/issues/44). It narrowly converges the priority of Copper replay status. The existing positional constructor for the step is unchanged. Support state and the global-flow residual are stored as non-positional facts marked `[JsonIgnore]`, along the original result path. The step physical risk covers global-flow, net-flow, and target-coverage. The result then projects the any-unsupported, any-EMS, and any-physical facts. `SimulationSafetyTextProjector.BuildReplayStatusText` fixes the priority as `unsupported > EMS risk > audit warning > EMS OK`. The step status and the VM aggregate summary both read it. The artifact row copies the JSON-ignored global-flow fact. This keeps the existing structured risk consistent with the status, without adding any CSV, JSON, or clipboard field. The EMS count suffix is also unchanged.
+- A public headless two-point replay fixture fixes the following: step 0 `Max After 200` with a global-flow-only `audit warning`, step 1 `Max After 399`, and the aggregate. The aggregate is corrected from a wrong `EMS OK` to the exact `audit warning`. The shared priority, structured facts, an artifact schema guard, and three production mutations lock in consistency. Compared with `bdab625`, production and logic-first are both `0 files / +32 physical / +26 nonblank`. The two fresh isolated Release builds were identical. The total DLL goes `15,327,744 -> 15,329,792 bytes` (`+2,048`). The bytes and SHA of the four DLLs are reproducible. Focused 17, Application 208, notch-core 175, ui-core 253, smoke 24, golden 6, Runtime Query 18, and GCC 8 tests pass. The hidden UI/IPC forward and reverse gate, UI build, and lint all pass. The signed V21/V22 C matches exactly. Selection total, Inspector, and preview p95 are `44/18/21` and `40/18/26 ms`. The evidence SHA-256 values are `619E0484…89875B` and `0A4DD778…85C48`. No performance improvement or normal operator UI coverage is claimed.
+- `R13.104a-6` was completed by [#46](https://github.com/Dennis40816/FreeformHelper/issues/46). It narrowly converges the provenance of the EMS cap when there are no cells. `SimulationSafetyTextProjector.FormatEmsAfterCap` uses the `AfterCap` from the supplied audit. Only a null audit falls back to `DefaultEmsAfterCap = 480`. The overview's no-cells cap and the export no-cells handoff prompt both read this projection. Public empty audit theories with `512` and null with `480`, plus three mutations (the overview constant, the export literal, and null-zero), lock in consistency. The availability status, schema, predicate, and layout are unchanged.
+- Compared with `dd559a0`, production and logic-first are both `0 files / +6 physical / +5 nonblank`. The two fresh isolated Release builds were identical. The total DLL stays at `15,329,792 bytes`, and the first three DLLs keep their bytes and SHA. UI stays at `14,531,072 bytes`, but the SHA is updated to `CD7779FD…34E37`. Focused 12, notch-core 175, ui-core 253, smoke 24, golden 6, Runtime Query 18, and GCC 8 tests, plus the hidden UI/IPC forward and reverse gate, UI build, and lint, all pass. The signed V21/V22 C matches exactly. Selection total, Inspector, and preview p95 are `40/19/20` and `34/18/16 ms`. The evidence SHA-256 values are `F874E56C…CE447A` and `4CD7EBB7…5EA40`.
+- `R13.104a-7` was completed by [#48](https://github.com/Dennis40816/FreeformHelper/issues/48). It narrowly converges the status of physical audits. For an audit that has cells, `SimulationSafetyTextProjector.BuildStatusText` uses one shared priority: `EMS risk > audit warning > EMS OK`. Physical risk covers the existing global-flow, net-flow, and target-coverage facts. Null or no-cells still shows `Simulation not run`. The workspace and overview both read this base status. The overview `HasRisk` still means only EMS danger. `NeedsAttention` includes physical risk and stale, and for a non-stale summary it appends the existing physical evidence. A public global-flow-only fixture, plus the EMS priority and three status, attention, and summary mutations, lock in consistency. The export-selection warning chip, its predicate, its counts, the schema, and the layout are unchanged.
+- Compared with `e1c92d0`, production and logic-first are both `0 files / +6 physical / +6 nonblank`. The two fresh isolated Release builds were identical. The total DLL stays at `15,329,792 bytes`, and the first three DLLs keep their bytes and SHA. UI stays at `14,531,072 bytes`, but the SHA is updated to `08878462…F95AB`. Focused 14, Application 208, notch-core 175, ui-core 253, smoke 24, golden 6, Runtime Query 18, and GCC 8 tests, plus the hidden UI/IPC forward and reverse gate, UI build, and lint, all pass. The signed V21/V22 C matches exactly. Selection total, Inspector, and preview p95 are `27/15/14` and `31/18/15 ms`. The evidence SHA-256 values are `3BFF980B…04D199` and `577A9BB1…0A229`. No performance improvement is claimed.
+- `R13.104a-8` was completed by [#50](https://github.com/Dennis40816/FreeformHelper/issues/50). It narrowly converges the Notch export review reader for physical warnings. The badge reads the shared `BuildStatusText` priority. The physical-only summary reuses `BuildPhysicalAuditSummaryText`. A physical-only audit is no longer labeled clean, but it still does not block export. A new VM visibility fact only drives the existing `chipStatus warning` presentation. No new style or token is added. The clean, EMS block, and availability wording stay exact.
+- A public fixture with `Before=400`, `After=450`, and a global residual of `+50`, the clean, EMS-priority, and availability compatibility checks, a static XAML guard, and three production mutations lock in consistency. Compared with `cb73c8c`, production is `+17 physical / +16 nonblank`, and logic-first is `+10 / +9`. The two fresh isolated Release builds were identical. The total DLL goes `15,329,792 -> 15,330,304 bytes` (`+512`). Only the UI bytes and SHA are updated. The final UI is `14,531,584 / 956A3FA5…06AFC9`. Focused 65, Application 208, notch-core 175, ui-core 256, UI snapshots 20, smoke 24, golden 6, Runtime Query 18, and GCC 8 tests, plus the hidden UI/IPC forward and reverse gate, UI build, and lint, all pass. The signed V21/V22 C matches exactly. Selection total, Inspector, and preview p95 are `40/25/17` and `35/20/16 ms`. The evidence SHA-256 values are `981C85CA…4B32D8` and `979B4E22…DD664F`. No performance improvement is claimed.
+- `R13.104a-9` was completed by [#52](https://github.com/Dennis40816/FreeformHelper/issues/52). It narrowly converges the active Notch safety guidance. `SimulationSafetyTextProjector` owns three templates: short, Simulation policy, and export handoff. The main VM supplies the current overview cap and notifies the dependent properties. Settings uses the same owner, with the default `480`. The Step 5 overview tooltip reads the existing dynamic guidance property. No new layout, style, or token is added.
+- A public one-cell fixture with `AfterCap=512`, default and null `480` compatibility, three dependent notifications, an active-tooltip source guard, and three mutations lock in the fix. The same screen no longer shows two EMS policies at once. This slice does not change the default cap, the predicate, the audit, the target-coverage calibration, Runtime Query, persistence, or the firmware contract.
+- Compared with `e1b0b9c`, production and logic-first are both `0 files / +21 physical / +16 nonblank`. The two fresh isolated Release builds were identical. The total DLL goes `15,330,304 -> 15,330,816 bytes` (`+512`). Only UI changes, to `14,532,096 / 67C40172…D7AF33`. Focused 32, Application 208, notch-core 175, ui-core 258, UI snapshots 21, smoke 24, golden 6, Runtime Query 18, and GCC 8 tests, plus the hidden UI/IPC forward and reverse gate, UI build, and lint, all pass. The signed V21/V22 C matches exactly. Selection total, Inspector, and preview p95 are `37/23/16` and `34/17/19 ms`. The evidence SHA-256 values are `97152F5A…41A1EA` and `DD69E750…7DA0EB`. No performance improvement is claimed.
+- `R13.104a-10` was completed by [#62](https://github.com/Dennis40816/FreeformHelper/issues/62). It narrowly converges the provenance of the target-cap help text. `SimulationSafetyTextProjector.BuildNotchTargetCoverageCapHelpText` formats the current target cap, the uniform `400` mapped to After, and the EMS cap used for comparison. Active Step 3 supplies the current overview cap. Settings keeps the documented default cap. The two existing tooltips read the same template. No new control, layout, style, or token is added, and the target guard and EMS computation are not changed.
+- Public headless Step 3 tooltip, VM, and Settings fixtures lock in the following. With a target cap of `128%`, the active view shows exactly `After 512 / EMS cap 512`, and Settings shows exactly `After 512 / EMS cap 480`. Static XAML, the default active cap, and the dependent-notification three mutations all turn RED, and then are restored. Compared with `32f4469`, production and logic-first are both `0 files / +23 physical / +20 nonblank`. The two fresh isolated Release builds were identical. The total DLL goes `15,329,280 -> 15,329,792 bytes` (`+512`). Only UI changes, to `14,532,608 / 44805041…29B52`. Focused 19, ui-core 260, smoke 25, notch-core 182, golden 6, Runtime Query, exporter, and GCC 48, the hidden UI/IPC forward and reverse gate, UI build, and lint all pass. The signed V21/V22 C matches exactly. Selection total, Inspector, and preview p95 are `40/20/19` and `39/23/21 ms`. The evidence SHA-256 values are `D4BE8E99…A08D95D` and `36915EDF…2A3EE3`. No performance improvement is claimed.
 - Remaining hard-coded cap and Simulation/replay/display text convergence stays recorded as follow-up scope. The owner decision of 2026-10-04 closes g2 with normal A1/A2 evidence; C1–C6 do not block closure, and B1/B2 remain accepted exceptions. The earlier Legacy-convergence blocker is historical; parent and milestone exits remain the owner's decision.
 
 Exit criteria: close normal A1/A2 with the single-owner result and final-projection evidence plus G2/G3/G4 validation. B1/B2 remain accepted exceptions and C1–C6 are nonblocking under the owner's 2026-10-04 decision; parent and milestone exits remain the owner's decision.
 
 ---
 
-## 7. g3 — Matching 與 Domain state
+## 7. g3 — Matching and Domain state
 
-### R13.201 定義 matching bounded contexts
+### R13.201 Define matching bounded contexts
 
 - Execution status and delivery evidence: the R13.201 entries of the former `TODO.md` (git history).
 
-保留三種不同契約：
+Keep three distinct contracts:
 
-1. `PadMatcher`：CAD↔Regular 多對多 overlap evidence。
-2. `DxfRegularMappingAnalyzer`：設定化、可人工 override 的一對一 audit/suggestion。
-3. `PadCanvas` selection/hit-test：純 UI 幾何互動。
+1. `PadMatcher`: many-to-many overlap evidence between CAD and Regular.
+2. `DxfRegularMappingAnalyzer`: configurable one-to-one audit/suggestion that a person can override.
+3. `PadCanvas` selection/hit-test: pure UI geometry interaction.
 
-不得把三者合併成一個巨大 `PadMatchingService`。
-`R13.004c-2` 只移除失效設定的 live UI owner；`PadMatcher`／`PadMatchService` 的 `MatchingSettings` compatibility parameter 留到本項在 overlap evidence API 邊界一併移除，不在 g1 偷改 public seam。
+Do not merge the three into one large `PadMatchingService`.
+`R13.004c-2` only removes the live UI owner of the obsolete setting. The `MatchingSettings` compatibility parameter of `PadMatcher`/`PadMatchService` stays until this item removes it together with the overlap evidence API boundary. It is not changed in g1, to avoid silently altering the public seam.
 
 ### R13.202 Preserve distinct best-match rules
 
 - Owner decision (2026-10-05): keep the status quo. `CadBestMatchSeedService` and PadCanvas hover retain their own rules; share only parts proven identical, with no user-visible change. R13.202 may close as status quo or a reduced scope.
 - The 3635 measurement covers 4,838 CADs: 582 touch two or more regulars, the two rules select different regulars for 6 CADs, and there are 0 exact ties. The owner selected 「維持現狀 (Recommended)」 ("Keep the status quo (Recommended)") on 2026-10-05: when scores are exactly equal, add no ID tie-break to PadMatcher sorting or R13.202 selection. Preserve current behavior; any later change is a separate behavior-change item. The ID tie-break question is resolved. See [INV2, section 2](../reviews/r13-slice-inventories-2026-10.md) for the rule inventory and the R13.202 entries of the former `TODO.md` (git history) for execution status and characterization PRs.
-- DXF audit 可共享 overlap evidence，但保留自己的 score、one-to-one allocation 與 override policy。
-- `SelectCadAllocationAnchor` 與 `GetFreeformType` 先以相同輸入建立 parity/差異案例；前者是 allocation anchor、後者是 classification，不能只因都挑最高分就直接合併。若證明共用同一 ordering/evidence，抽出共享 anchor projection，兩個 consumer 仍各自決定結果語意。
+- DXF audit may share overlap evidence, but keeps its own score, one-to-one allocation, and override policy.
+- `SelectCadAllocationAnchor` and `GetFreeformType` first build parity and difference cases from the same inputs. The former is the allocation anchor, and the latter is classification. They cannot be merged just because both pick the highest score. If they are proven to share the same ordering and evidence, extract a shared anchor projection. Both consumers still decide their own result semantics.
 
-### R13.203 Typed ID 漸進導入
+### R13.203 Typed ID incremental introduction
 
 - The typed-ID boundary work and review are tracked by the R13.203 entries of the former `TODO.md` (git history); R13.201 is its API dependency.
 
-- 依 boundary 分批導入 `CadPadId`、`RegularPadId`、`IcIndex`、`DiffIndex`。
-- 每次只轉換一條 API chain，保留 adapter，不做全 repo 一次改寫。
-- 相等性、排序、JSON/CSV/CLI parsing 必須有 legacy equivalence tests。
+- Introduce `CadPadId`, `RegularPadId`, `IcIndex`, and `DiffIndex` in batches, one boundary at a time.
+- Convert one API chain at a time and keep adapters. Do not rewrite the whole repo at once.
+- Equality, ordering, and JSON/CSV/CLI parsing must have legacy equivalence tests.
 
-### R13.204 RegularPad 狀態轉移 API
+### R13.204 RegularPad state transition API
 
 - Matched-pair assignment and the broader writer-transition scope are tracked separately by the R13.204 entries of the former `TODO.md` (git history).
 
-- 盤點 `IcIndex`、`DiffIndex`、`MatchedCadPadId`、`MatchScore`、`Freeform` 的 writer。
-- 以明確 assign/replace/apply API 集中不變量與 invalidation。
-- 第一階段只封裝既有語意，不新增拒絕規則；新 lifecycle rule 另立 correctness slice。
+- Inventory the writers of `IcIndex`, `DiffIndex`, `MatchedCadPadId`, `MatchScore`, and `Freeform`.
+- Centralize invariants and invalidation behind explicit assign/replace/apply APIs.
+- The first phase only encapsulates existing semantics and adds no new rejection rules. New lifecycle rules go into a separate correctness slice.
 
-### R13.205 DxfRegularMaskAudit 顯式 pipeline
+### R13.205 Explicit DxfRegularMaskAudit pipeline
 
 - Audit-phase characterization and the production pipeline scope below are tracked separately by the R13.205 entries of the former `TODO.md` (git history).
 
-- 把 segment offset、local repair、passive compensation 的先後依賴改成顯式 context/step result。
-- 保留原本不同 decision source 與 reason code。
-- TM8.1 matrix 是必跑 gate。
+- Make the ordering dependencies between segment offset, local repair, and passive compensation explicit through context and step results.
+- Keep the existing distinct decision sources and reason codes.
+- The TM8.1 matrix is a mandatory gate.
 
 ### R13.206 CoordinatePlanner transform builder
 
 - Transform delivery evidence and execution status: the R13.206 entries of the former `TODO.md` (git history).
 
-- 將 point/line/rectangle 重複的 machine、normalized、pixel、world、safe coordinate projection 收斂為單一參數化 transform/builder。
-- builder 只統一座標換算，不混入 guide、BIST、custom array/path 的 feature policy。
-- 以現有 `CoordinatePlannerComputationServiceTests` 加入前後 snapshot equivalence，並把 G2/G3 當 Application-layer 低成本保險。
+- Consolidate the repeated machine, normalized, pixel, world, and safe coordinate projections for point, line, and rectangle into a single parameterized transform/builder.
+- The builder only unifies coordinate conversion. It does not mix in guide, BIST, or custom array/path feature policy.
+- Add before/after snapshot equivalence using the existing `CoordinatePlannerComputationServiceTests`, and treat G2/G3 as low-cost Application-layer insurance.
 
-完成條件：所有 planner artifact 使用同一轉換契約；既有 key、排序、raw/safe 座標與輸出 snapshot 零差異。
+Completion criteria: all planner artifacts use the same transform contract. Existing keys, ordering, raw/safe coordinates, and output snapshots show zero difference.
 
 Exit criteria: preserve the distinct CadBest and hover rules and all user-visible results; share only evidence or calculations proven identical. Consult the R13.201–R13.206 entries of the former `TODO.md` (git history) for execution status. The g3 exit remains the owner's decision.
 
 ---
 
-## 8. g5 — Settings 與 Presentation orchestration
+## 8. g5 — Settings and Presentation orchestration
 
-### R13.301 Settings draft 完整性
+### R13.301 Settings draft completeness
 
-- 用顯式 draft snapshot/binding map 取代約 50 個欄位的手動 diff/copy 漂移。
-- draft 必須記 original + dirty-field change set；非 modal Settings 開啟後，Canvas/Header 的 live change 不得被未編輯欄位的舊 snapshot 覆寫。
-- 專屬測試必須逐欄驗證：Open、Apply、Discard、Reopen、project roundtrip、app-general deferred write。
-- 3635 golden 只能當下游保險，不能替代 SettingsWindow 操作測試。
+- Replace the manual diff/copy drift across roughly 50 fields with an explicit draft snapshot/binding map.
+- The draft must record the original plus a dirty-field change set. After a non-modal Settings window opens, live changes from Canvas or Header must not be overwritten by stale snapshots of unedited fields.
+- Dedicated tests must verify each field individually for: Open, Apply, Discard, Reopen, project roundtrip, and app-general deferred write.
+- The 3635 golden tests can serve only as downstream insurance. They cannot replace SettingsWindow operation tests.
 
-### R13.302 Settings side-effect 單一路徑
+### R13.302 Single path for Settings side effects
 
-- 所有入口收斂到既有 settings apply policy/orchestration。
-- 明確鎖住 selection clear、rebuild、downstream invalidation、focus/step、undo、status、fit/zoom。
-- WorkspaceHeader、SettingsWindow、RightWorkflowPanel 可多入口，但必須同一 apply plan。
-- workflow readiness/completion 必須來自 revisioned execution result state，而不是 row count、preview item 或 summary string；合法零結果仍是 Completed，輸入改變後明確成為 Stale。
-- Step2、Step4 diagnostic 與 Step5 export presentation 都要有 typed invalidation；Apply 後不得把舊結果繼續標示為 current。
+- All entry points converge on the existing settings apply policy/orchestration.
+- Explicitly lock down selection clear, rebuild, downstream invalidation, focus/step, undo, status, and fit/zoom.
+- WorkspaceHeader, SettingsWindow, and RightWorkflowPanel may have multiple entry points, but they must share the same apply plan.
+- Workflow readiness and completion must come from a revisioned execution result state, not from row count, preview item, or summary string. A legitimate zero-result outcome is still Completed. After an input change, the state must become explicitly Stale.
+- Step2, Step4 diagnostics, and Step5 export presentation must each have typed invalidation. After Apply, old results must not continue to be marked as current.
 
-### R13.303 Simulation color/brush policy
+### R13.303 Simulation color and brush policy
 
-- 共用 simulation intensity/color scale，只搬真正相同的數值映射。
-- `NotchApplySimulationAaView` 的 auto-scale/color-mode 保持 presentation policy；共用既有 `SimulationColorScaleResolver`，除非出現非視覺 consumer，否則不搬成 Domain/Application 業務結果。
-- Owner decision (2026-10-04): use 0.9 for the AaView/HeatmapView opacity fallback in g5 after the g3 exit. This approved visual change requires updated snapshots; do not expand it into a global table of defaults.
-- 共用 4 處重複 `GetBrush(Color)` cache primitive，但不得吸收 View-specific resource lookup 或 cache lifetime。
-- 移除 code-behind magic fallback 時，先補 token 與 runtime guard test；若範圍超出已知 color/opacity views，另立後續 slice，不擴大 R13.303。
+- Share the simulation intensity/color scale, but only move numeric mappings that are truly identical.
+- `NotchApplySimulationAaView` auto-scale and color mode remain presentation policy. Share the existing `SimulationColorScaleResolver`. Do not move them into Domain or Application business results unless a non-visual consumer appears.
+- Owner decision (2026-10-04): in g5, after the g3 exit, use 0.9 as the opacity fallback for AaView and HeatmapView. This approved visual change requires updated snapshots. Do not expand it into a global table of defaults.
+- Share the 4 duplicated `GetBrush(Color)` cache primitives. Do not absorb View-specific resource lookup or cache lifetime.
+- When removing code-behind magic fallbacks, first add tokens and runtime guard tests. If the scope goes beyond the known color/opacity views, open a follow-up slice rather than expanding R13.303.
 
-### R13.304 Console 行為收斂
+### R13.304 Console behavior consolidation
 
-- dedup 比對結構化 log identity，不比對含時間戳的 formatted line。
-- 合併 shell-hosted 與 event-hosted 模式的共同 use case；View 只轉送 action。
-- 保留 copy、jump、font、filter、auto-follow 契約。
+- Deduplication compares structured log identity, not formatted lines that contain timestamps.
+- Merge the use cases shared by shell-hosted and event-hosted modes. The View only forwards actions.
+- Preserve the contracts for copy, jump, font, filter, and auto-follow.
 
 ### R13.305 Normal-flow settings surface reduction
 
-- owner 2026-10-03：確認 `R13.305a` 的方向，Step4 mapping 與 Step6 validation diagnostics 移出編號流程，放到未編號的 Diagnostics 區域。
-- Settings／workflow 只顯示正常操作中需要使用者決定的參數；不是人工日常調整的欄位不得排入 Step flow。
-- Coordinate pixel X/Y 與 Step4 mapping weights、candidate count、confidence／ambiguous thresholds 退出 normal Settings／workflow；若仍需支援校準，只能放 Dev／diagnostic surface。
-- `ProjectSettings + ProjectUiSnapshot`、defaults 與舊 project JSON roundtrip 完整保留；第一階段只調整入口與可見性，不刪 persistence schema。
-- display-only、derived、automatic policy 與 compatibility fields 必須標出唯一 owner，不能因從 UI 隱藏而建立另一套 hidden mutable state。
-- Layer category batch action 移出 draft settings，改由 DXF workspace 的即時操作 owner 承接，確保 Cancel 不會留下未回滾 mutation。
-- numbered normal flow 固定為 Step3 直達 Step5；Step4 mapping 與 Step6 validation 保留在未編號 Diagnostics/Inspector，不要求正常使用者手動執行。
-- Remove non-operable derived toggles and placeholders. For R13.305b, the owner decided on 2026-10-04: 「禁止關掉最後一個版本」. Neither V21 nor V22 may be switched off when it is the last enabled version. Implement this bidirectional guard in g5 after the g3 exit.
+- Owner, 2026-10-03: confirmed the direction of `R13.305a`. Step4 mapping and Step6 validation diagnostics move out of the numbered flow into an unnumbered Diagnostics area.
+- Settings and workflow show only parameters that users must decide during normal operation. Fields that are not routine manual adjustments must not be placed in the Step flow.
+- Coordinate pixel X/Y, Step4 mapping weights, candidate count, and confidence/ambiguous thresholds leave the normal Settings and workflow. If calibration support is still needed, it may only live on a Dev or diagnostic surface.
+- `ProjectSettings + ProjectUiSnapshot`, defaults, and old project JSON roundtrip are fully preserved. The first phase only adjusts entry points and visibility. It does not delete the persistence schema.
+- Display-only, derived, automatic-policy, and compatibility fields must each have a single owner. Hiding them from the UI must not create a second hidden mutable state.
+- Move the Layer category batch action out of draft settings. The DXF workspace's immediate-operation owner takes it over, so Cancel cannot leave an unrolled-back mutation.
+- The numbered normal flow is fixed as Step3 directly to Step5. Step4 mapping and Step6 validation remain in the unnumbered Diagnostics/Inspector, and normal users are not required to run them manually.
+- Remove non-operable derived toggles and placeholders. For R13.305b, the owner decided on 2026-10-04: "Do not turn off the last remaining version." Neither V21 nor V22 may be switched off when it is the last enabled version. Implement this bidirectional guard in g5, after the g3 exit.
 
-完成條件：非人工參數不再干擾 normal flow；必要 workflow action、舊 project roundtrip、3635 V21/V22 C 與主 UI 操作體驗不變。
+Completion criteria: non-manual parameters no longer interfere with the normal flow. Required workflow actions, old project roundtrip, 3635 V21/V22 C, and the main UI operating experience remain unchanged.
 
-退出條件：設定與 presentation side effects 都有單一 owner，專屬測試可獨立驗證。
+Exit criteria: Settings and presentation side effects each have a single owner, and dedicated tests can verify them independently.
 
 ---
 
-## 9. g6 — Workspace ViewModel 拆解
+## 9. g6 — Workspace ViewModel decomposition
 
-### R13.401 建立 root shell 邊界
+### R13.401 Establish the root shell boundary
 
-- `FreeformHelperViewModel` 保留 project session、workspace navigation、command compatibility facade。
-- 先建立 child VM contract，不先搬 state。
-- 列出所有 command、property callback、View event、RuntimeQuery reader 與 side effects。
+- `FreeformHelperViewModel` retains project session, workspace navigation, and the command compatibility facade.
+- Establish the child VM contracts first. Do not move state yet.
+- List all commands, property callbacks, View events, RuntimeQuery readers, and side effects.
 
 ### R13.402 DxfWorkspaceViewModel
 
-- 搬 DXF load/edit/layer/indexing orchestration。
-- project session 透過明確 result/event 更新，不直接 mutation root 私有欄位。
+- Move DXF load, edit, layer, and indexing orchestration.
+- Project session updates go through explicit result/event flows. They must not directly mutate private root fields.
 
 ### R13.403 MatchingWorkspaceViewModel
 
-- 搬 Step1/Step2 UI state 與 command binding。
-- 計算仍委派 Application/UI use case，不在 child VM 重寫 matching。
+- Move Step1 and Step2 UI state and command binding.
+- Computation remains delegated to the Application/UI use cases. Do not rewrite matching inside the child VM.
 
 ### R13.404 NotchWorkspaceViewModel
 
-- 搬 Notch generation/preview/validation/export selection UI state。
-- 只讀 g2 的 resolved result model。
+- Move Notch generation, preview, validation, and export selection UI state.
+- Read only the resolved result model from g2.
 
-### R13.405 ProjectSessionViewModel facade 收斂
+### R13.405 ProjectSessionViewModel facade consolidation
 
-- Save/Load、Ctrl+S、RuntimeQuery、project settings persistence 維持現有 public contract。
-- 移除已遷移的 root state，補跨 workspace integration tests。
+- Save/Load, Ctrl+S, RuntimeQuery, and project settings persistence keep their existing public contracts.
+- Remove migrated root state and add cross-workspace integration tests.
 
-退出條件：root VM 顯著變薄；UI、IPC、快捷鍵與 project roundtrip 行為不變；G2～G5 全綠。
+Exit criteria: the root VM is noticeably thinner. UI, IPC, keyboard shortcuts, and project roundtrip behavior are unchanged. G2 through G5 are all green.
 
 ---
 
-## 10. g7 — UI 結構與 token 收斂
+## 10. g7 — UI structure and token consolidation
 
 ### R13.501 Styles responsibility split
 
-- 拆分 `Controls.Core.axaml` 的 workspace/DXF/validation responsibilities。
-- 保持 include 與 selector precedence；禁止因檔案搬移改變 hover/disabled/checked。
-- 只對語意相同的 action role 導入 `BasedOn`，並逐一合併經結構比對確定等價的重複 `ControlTemplate`；不建立跨角色的深繼承鏈。
-- 使用 DevView 與 UI guard 驗證。
+- Split the workspace, DXF, and validation responsibilities of `Controls.Core.axaml`.
+- Keep include and selector precedence. Do not change hover, disabled, or checked behavior because of file moves.
+- Introduce `BasedOn` only for action roles with identical semantics. Merge duplicate `ControlTemplate`s only after structural comparison confirms equivalence one by one. Do not create cross-role inheritance chains.
+- Verify using DevView and UI guards.
 
 ### R13.502 DevView preview extraction
 
-- 將大型 preview 區塊拆成 section controls。
-- 保留 action role laboratory、token probe、disabled/checked/icon/chip/status matrix。
-- DevView 不移出正式 source tree，也不刪除。
+- Split the large preview area into section controls.
+- Keep the action role laboratory and the token probe, plus the disabled/checked/icon/chip/status matrix.
+- DevView is not moved out of the official source tree and is not deleted.
 
 ### R13.503 Shared workbench shell
 
-- 只抽取 Simulation/Coordinate 真正相同的 layout shell。
-- 盤點 section card、overview card、settings tile 重複骨架；只有結構、density、spacing owner 與互動契約均相同時才抽共用 Control/style，否則保留 role-specific view。
-- 遵守 single spacing owner、`panelFormField` 與 two-column token contract。
-- 不把不同 workflow action 塞進通用 control。
+- Extract only the layout shell that is truly identical between Simulation and Coordinate.
+- Inventory the repeated skeletons of section cards, overview cards, and settings tiles. Extract a shared Control/style only when structure, density, spacing owner, and interaction contract are all identical. Otherwise keep role-specific views.
+- Follow the single spacing owner, `panelFormField`, and the two-column token contract.
+- Do not force different workflow actions into a generic control.
 
-### R13.504 Token 與命名清理
+### R13.504 Token and naming cleanup
 
-- 只合併同義 token 或錯誤 legacy alias。
-- 單一使用但有清楚語意的 token保留。
-- `WorkspaceHeader` popup minimum/inset 邊界（目前 `260`/`200`/`30`）改由 theme-aware token/resource 提供，code-behind 不保留 layout magic literals。
-- `notchExport*`/`workspace*` rename 前掃描 `Classes.Contains` 與 code-behind selector consumer；先處理孤立 banner，再處理 `Controls.Core` bulk alias，但維持同一語意 slice 與 selector precedence。
+- Merge only synonymous tokens or incorrect legacy aliases.
+- Keep single-use tokens that have a clear meaning.
+- The `WorkspaceHeader` popup minimum and inset boundaries (currently `260`/`200`/`30`) are provided by theme-aware tokens or resources. Code-behind must not keep layout magic literals.
+- Before renaming `notchExport*` or `workspace*`, scan for `Classes.Contains` and code-behind selector consumers. Handle the orphaned banner first, then the `Controls.Core` bulk aliases, while keeping them in the same semantic slice and preserving selector precedence.
 
 ### R13.505 Control initialization contracts
 
-- `NumberScrubber` 初始化順序改成顯式契約並補 Settings UI regression。
-- `BalancedWrapPanel` 不列入 public mutable state 修正：掃描命中的是 private nested `Row.Children`，不是外部可取得的 control state。
+- Change the `NumberScrubber` initialization order into an explicit contract, and add a Settings UI regression test.
+- Exclude `BalancedWrapPanel` from the public mutable state fix. The scan hit is the private nested `Row.Children`, not externally accessible control state.
 
 ### R13.506 PadCanvas engine seams
 
-- 將 `PadCanvasSelectionEngine` 與 `PadCanvasVisibleDrawListBuilder` 對整個 owner 的隱式依賴改為窄介面/顯式 state-and-result seam，讓 hit-test、viewport query、decimation 與 selection side effects 可獨立測試。
-- 不把 Avalonia pointer、zoom/pan 或 draw-list cache 搬到 Application；此項是 UI 可測試性與依賴方向修正，不是新增全域 DI container registration。
+- Replace the implicit dependencies that `PadCanvasSelectionEngine` and `PadCanvasVisibleDrawListBuilder` have on their entire owner with narrow interfaces or explicit state-and-result seams. This makes hit-test, viewport query, decimation, and selection side effects independently testable.
+- Do not move Avalonia pointer handling, zoom/pan, or draw-list caching into Application. This item is a UI testability and dependency-direction fix, not the addition of a global DI container registration.
 
 ### R13.507 PadCanvas view-only geometry ownership audit
 
-- area-bucket membership 不是純畫筆細節：目前 `PadCanvas.Caches` 另算 buckets，而 `CadAreaBucketService` 已供 selection 使用。改由共享 service/result 投影顏色，消除 selection 與顯色的第二套 derivation。
-- freeform hatch 的 `Rect` clipping、screen-to-world spacing 與 Avalonia `DrawingContext` 屬於 renderer，明確保留在 UI；只有出現非 Avalonia consumer 或相同幾何結果第二個 reader 時才抽 pure geometry helper。
-- R13.303 負責 AaView color/auto-scale；本項不重複搬移。
+- Area-bucket membership is not a pure brush detail. Currently `PadCanvas.Caches` computes buckets separately, while `CadAreaBucketService` is already used for selection. Project colors from a shared service/result instead, eliminating the second derivation between selection and coloring.
+- Freeform hatch `Rect` clipping, screen-to-world spacing, and Avalonia `DrawingContext` belong to the renderer and explicitly stay in the UI. Extract a pure geometry helper only when a non-Avalonia consumer appears, or when the same geometry result gets a second reader.
+- R13.303 owns AaView color and auto-scale. This item does not move them again.
 
-完成條件：同一 tolerance 下 area-bucket selection 與顯色讀同一 membership；hatch ownership 決策有測試/文件證據，沒有為 layer purity 做投機式搬移。
+Completion criteria: under the same tolerance, area-bucket selection and coloring read the same membership. The hatch ownership decision has test or document evidence, and no speculative move is made for layer purity.
 
-退出條件：no-visual-change 證據完整；DevView、UiLayoutGuard、headless smoke、rendered snapshot dry-run、lint 全綠。
+Exit criteria: no-visual-change evidence is complete. DevView, UiLayoutGuard, headless smoke, rendered snapshot dry-run, and lint are all green.
 
 ---
 
-## 11. 明確不執行或需改寫的舊提案
+## 11. Old proposals that will not be executed or must be rewritten
 
-| 舊提案 | 1.0.x 處置 |
+| Old proposal | Disposition for 1.0.x |
 |---|---|
-| Golden baseline 目前壞掉 | 已否證；2026-07-20 為 103/103 綠燈 |
-| 封裝 `BalancedWrapPanel` public list | 不執行；為 private nested helper 的 false positive |
-| `LoadingSpinner` 改用 `LoadingSpinnerDesignSize` | 已完成，不再列工作 |
-| 修正 5 個 CRLF 檔 | 當前 `git ls-files --eol` 無 `w/lf`/`w/mixed`，不列工作 |
-| 合併所有 matcher/audit/hover | R13.201/R13.202 preserve distinct rules; share only parts proven identical under the 2026-10-05 owner decision |
-| exporter 搬到 Application | 已在 Application；改為 R13.103 projection/format split |
-| 刪除大量 single-consumer token | 不執行；只做語意 alias/consolidation |
-| 移除或移出 DevView | 不執行；改為 R13.502 保留 preview contract |
-| Settings draft 只靠 golden 驗證 | 不接受；R13.301 加專屬 Apply/Discard/roundtrip tests |
-| 一次性拆完整 root ViewModel | 不接受；R13.401～R13.405 逐 workspace 遷移 |
+| Golden baseline is currently broken | Disproven. As of 2026-07-20, 103/103 green |
+| Encapsulate the `BalancedWrapPanel` public list | Not executed. False positive for a private nested helper |
+| Switch `LoadingSpinner` to `LoadingSpinnerDesignSize` | Completed. No longer listed as work |
+| Fix 5 CRLF files | Current `git ls-files --eol` shows no `w/lf` or `w/mixed`. Not listed as work |
+| Merge all matcher/audit/hover logic | R13.201/R13.202 preserve distinct rules. Share only parts proven identical under the 2026-10-05 owner decision |
+| Move exporter to Application | Already in Application. Replaced by the R13.103 projection/format split |
+| Delete a large number of single-consumer tokens | Not executed. Only semantic aliases and consolidation are done |
+| Remove or move out DevView | Not executed. Replaced by R13.502 preserving the preview contract |
+| Verify Settings draft only through golden tests | Not accepted. R13.301 adds dedicated Apply/Discard/roundtrip tests |
+| Split the entire root ViewModel in one pass | Not accepted. R13.401–R13.405 migrate one workspace at a time |
 
 
 ---
 
-## 12. 每個 slice 的固定執行模板
+## 12. Fixed execution template for each slice
 
-1. 讀取本 contract、`ROADMAP.md` 與 dependency graph。
-2. Inventory：列出 entry、reader、writer、side effects。
-3. 寫或更新 targeted regression test。
-4. 實作單一 `R13.*` slice。
-5. 執行：
+1. Read this contract, `ROADMAP.md`, and the dependency graph.
+2. Inventory: list entries, readers, writers, and side effects.
+3. Write or update targeted regression tests.
+4. Implement a single `R13.*` slice.
+5. Run:
 
    ```powershell
    ./scripts/dev/prepare-ui-workspace.ps1
@@ -507,12 +507,12 @@ Exit criteria: preserve the distinct CadBest and hover rules and all user-visibl
    ./scripts/tests/lint.ps1 -UseNoAppHost
    ```
 
-6. 依風險加跑 G2/G3/G4/G5。
-7. 更新 `ROADMAP.md` 與必要 canonical docs。
-8. 一個 slice 一個 commit，commit body 記錄 single entry、single result、side effects、驗證結果。
-9. push 分支後才開始下一個 slice。
+6. Depending on risk, also run G2, G3, G4, or G5.
+7. Update `ROADMAP.md` and any necessary canonical docs.
+8. One slice per commit. The commit body records the single entry, single result, side effects, and verification results.
+9. Push the branch before starting the next slice.
 
-Merge 前額外執行：
+Additional commands to run before merge:
 
 ```powershell
 ./scripts/dev/prepare-ui-workspace.ps1
@@ -522,23 +522,23 @@ Merge 前額外執行：
 
 ---
 
-## 13. 進度與變更控制
+## 13. Progress and change control
 
-- This contract defines scope and gates. `ROADMAP.md` is NFH's single status table: it holds version order, target versions and status. Handoff and WIP documents reference IDs without restating execution status; the integrator verifies merges and writes `ROADMAP.md` back once per batch.
-- Approval after trunk integration (owner, 2026-10-05): 「可以，但手動解衝突要重批 (Recommended)」 ("Allowed, but manual conflict resolution requires approval again (Recommended)"). After owner approval, a new commit that only merges trunk cleanly needs no new approval if tests pass; any manual conflict resolution requires owner approval again.
+- This contract defines scope and gates. `ROADMAP.md` is NFH's single status table. It holds version order, target versions, and status. Handoff and WIP documents reference IDs without restating execution status. The integrator verifies merges and writes `ROADMAP.md` back once per batch.
+- Approval after trunk integration (owner, 2026-10-05): 「可以，但手動解衝突要重批 (Recommended)」 ("Allowed, but manual conflict resolution requires approval again (Recommended)"). After owner approval, a new commit that only merges trunk cleanly needs no new approval if tests pass. Any manual conflict resolution requires owner approval again.
 - Integration batches awaiting review have no limit (owner, 2026-10-05: 「不設上限」 ("No limit")).
-- 版本不得跳過前一版本退出條件；可在同版本內調整 slice 順序，但必須記錄依賴理由。
-- 新發現的重構項目先寫入 `ROADMAP.md`，再判斷歸屬版本，不直接擴大當前 slice。
-- 若同一 blocking condition 連續出現，先縮小 slice 或補 guard，不以更新 golden、放寬 lint、warning suppression 繞過。
-- 任何計算輸出變更都視為 correctness change，不得夾在純 refactor/UI commit。
+- A version may not skip the exit criteria of the previous version. Slice order may be adjusted within the same version, but the dependency rationale must be recorded.
+- Newly discovered refactoring items are written into `ROADMAP.md` first, then assigned to a version. They do not directly expand the current slice.
+- If the same blocking condition recurs consecutively, narrow the slice or add a guard first. Do not bypass it by updating golden files, relaxing lint, or suppressing warnings.
+- Any change to computed output is a correctness change and must not be mixed into a pure refactor or UI commit.
 
 ### Milestone handoff
 
-每個 1.0.x milestone 完成時記錄：
+When each 1.0.x milestone is completed, record:
 
-1. 完成的 `R13.*`。
-2. single-entry / single-result 變化。
-3. side effects 是否變化。
-4. G0～G6 實際執行結果。
-5. golden 是否更新；若是，附簽核記錄。
-6. 尚未完成的風險與下一版第一個 slice。
+1. The completed `R13.*` items.
+2. Changes to single-entry and single-result.
+3. Whether side effects changed.
+4. The actual results of G0 through G6.
+5. Whether golden files were updated. If so, attach the sign-off record.
+6. Remaining risks and the first slice of the next version.
