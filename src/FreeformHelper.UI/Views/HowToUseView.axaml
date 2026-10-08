@@ -8,31 +8,15 @@
   <ScrollViewer>
     <Border Padding="{StaticResource Inset20}">
       <StackPanel Spacing="{StaticResource Space16}">
-        <Grid ColumnDefinitions="*,Auto">
-          <StackPanel Spacing="{StaticResource Space4}">
-            <SelectableTextBlock Text="How To Use"
-                       FontSize="{StaticResource FontSizeTitle}"
-                       FontWeight="SemiBold"
-                       IsVisible="{Binding IsEnglish}"/>
-            <SelectableTextBlock Text="使用說明"
-                       FontSize="{StaticResource FontSizeTitle}"
-                       FontWeight="SemiBold"
-                       IsVisible="{Binding IsChinese}"/>
-            <SelectableTextBlock TextWrapping="Wrap"
-                       Text="Workflow, controls, and settings reference."
-                       IsVisible="{Binding IsEnglish}"/>
-            <SelectableTextBlock TextWrapping="Wrap"
-                       Text="工作流程、操作方式與設定說明。"
-                       IsVisible="{Binding IsChinese}"/>
-          </StackPanel>
-          <ToggleSwitch Grid.Column="1"
-                        IsChecked="{Binding IsChinese, Mode=TwoWay}"
-                        OffContent="EN"
-                        OnContent="中文"
-                        VerticalAlignment="Top"/>
-        </Grid>
+        <StackPanel Spacing="{StaticResource Space4}">
+          <SelectableTextBlock Text="How To Use"
+                     FontSize="{StaticResource FontSizeTitle}"
+                     FontWeight="SemiBold"/>
+          <SelectableTextBlock TextWrapping="Wrap"
+                     Text="Workflow, controls, and settings reference."/>
+        </StackPanel>
 
-        <StackPanel Spacing="{StaticResource Space12}" IsVisible="{Binding IsEnglish}">
+        <StackPanel Spacing="{StaticResource Space12}">
           <SelectableTextBlock Text="Quick Start" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
           <StackPanel Spacing="{StaticResource Space6}">
             <SelectableTextBlock TextWrapping="Wrap" Text="1) Open DXF → 2) Review grid settings → 3) Match → 4) Tag freeforms → 5) Export."/>
@@ -156,133 +140,6 @@
           <SelectableTextBlock Text="Build &amp; Tests" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
           <StackPanel Spacing="{StaticResource Space6}">
             <SelectableTextBlock TextWrapping="Wrap" Text="- Run scripts/build.ps1 to build and execute unit tests."/>
-          </StackPanel>
-        </StackPanel>
-
-        <StackPanel Spacing="{StaticResource Space12}" IsVisible="{Binding IsChinese}">
-          <SelectableTextBlock Text="快速開始" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="1) 開啟 DXF → 2) 檢查 Grid 設定 → 3) Match → 4) 標註 Freeform → 5) 匯出。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="即使未載入 DXF，也會依 AA 大小與通道數產生 Regular pad。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="頁面導覽" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 上方分頁：Freeform Helper、How To Use、Dev。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Fit 圖示：Pad 區右上角。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="Menu Bar" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- File：Open DXF、Save Project、Load Project。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Match：執行 pad 匹配。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Export：輸出 Notch CSV review 或 C v2.1/v2.2。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="Workspace Header（Display）" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Display：CAD layer、Regular grid、Highlight unmatched/freeform、Color by area。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- CAD 顯示：線寬與線色。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Area buckets：僅影響 CAD 的面積分色。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 狀態與選取摘要會自動更新。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="DXF 設定（左側面板）" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Only closed polylines：只匯入封閉多段線。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 圖層勾選：載入後可顯示/隱藏圖層。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Check DXF overlaps：按需掃描重複與重疊。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="畫布操作" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 中鍵拖曳：平移（建議）。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Space + 左鍵拖曳：平移（筆電備用）。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 滾輪縮放；Ctrl + 滾輪加速。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Shift + 方向鍵：微調平移。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- F：Fit。Ctrl + A：全選可見 pads。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- F / Ctrl + A 在非文字編輯狀態下可全域觸發。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="選取與 Pad 資訊" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 左鍵點擊：選取 pad。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Ctrl/Shift + 點擊：加選/取消。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Alt + 點擊：CAD/regular 重疊時優先選 regular。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 拖拉框選；Ctrl/Shift 可加選。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 雙擊：開啟該 pad 的資訊視窗。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 右鍵：開啟資訊（若已選取則不變更選取）。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 點空白：清除選取。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="手動調整（Header Bar）" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Rows/Cols：輸入範圍，如 5、5-7、5,7。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Width/Height：設定選取 Regular pad 的目標尺寸。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Use Selection：將目前選取的範圍帶入輸入框。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- '*' 代表混合值。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="右側：General Settings" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- IC layout：Cascade 數量與每顆 IC 的 X/Y。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Grid settings：Padding、Scan order 與 Sizing scope（Local/Global）。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Panel AA size (mm)：用來計算 pitch。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Alignment mode：AA 或 DXF bounds 對位。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="右側：Analysis" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 配對方式：使用 CAD↔Regular overlap 關聯；一顆 CAD 可對應多顆 regular。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Unmatched threshold：只用交集面積比例標示可疑 pad；調整時不會改變 links。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Freeform tagging：指定 X/Y/XY/None。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Notch export：版本與 legacy 參數。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="Notch 名詞與門檻" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- BBoxArea：CAD pad 外接矩形面積，公式為 width × height（用在 V2.1 的 REGU_TO_FULL）。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Freeform TH（Matching 的 Freeform axis threshold）：控制 auto-detect 的 XWay / YWay / None 判定。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Notch TH（Notch threshold Q7）：allocation 後若最大分配比例 &lt; TH，該 CAD 不輸出 notch row。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 有效邊界：To Full 只能從「CAD 實際 overlap 且連通到邊界 seed（外圈或鄰居 inactive）」的 regular 啟動。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Multi-owner gate：同一顆 regular 若有超過 1 個 CAD owner（超過 strict overlap TH），該 regular 不可作為 To Full 目標。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Active regular visibility mask：判定鄰居是否 inactive 時，使用當前 active regular 集合（match scope），不是整張 grid。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Allocation cutoff：預留給 FW 友善的筆數最小化策略（目前版本尚未啟用）。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Export notch 會先跳出 row 選擇視窗，可逐列決定是否輸出。"/>
-          </StackPanel>
-
-          <Image Source="avares://FreeformHelper.UI/Assets/HowTo/notch-flow.png"
-                 Height="{StaticResource HowToFigureHeight}"
-                 Stretch="Uniform"
-                 HorizontalAlignment="Left"/>
-          <Image Source="avares://FreeformHelper.UI/Assets/HowTo/threshold-scope.png"
-                 Height="{StaticResource HowToFigureHeight}"
-                 Stretch="Uniform"
-                 HorizontalAlignment="Left"/>
-          <Image Source="avares://FreeformHelper.UI/Assets/HowTo/bbox-area.png"
-                 Height="{StaticResource HowToFigureHeight}"
-                 Stretch="Uniform"
-                 HorizontalAlignment="Left"/>
-
-          <SelectableTextBlock Text="數值輸入" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 輸入後按 Enter 或點空白提交。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 上下箭頭可微調。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 右側區域可拖曳快速調整。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Alt + 滾輪調整數值。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="Console 與 Undo" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 底部 Console 會即時顯示 log 並自動捲動。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Clear 可清除顯示。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Ctrl + Z 可復原設定與 pad 修改（非文字編輯時全域可用）。"/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Delete 可隱藏已選 CAD pads（非文字編輯時全域可用）。"/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="建置與測試" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- 執行 scripts/build.ps1 會建置並跑單元測試。"/>
           </StackPanel>
         </StackPanel>
       </StackPanel>
