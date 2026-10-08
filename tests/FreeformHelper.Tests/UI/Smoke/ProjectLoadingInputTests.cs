@@ -7,9 +7,9 @@ using Avalonia.Input;
 using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Infrastructure.Project;
-using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
+using Nvt.Core.Progress;
 using Xunit;
 
 namespace FreeformHelper.Tests;
