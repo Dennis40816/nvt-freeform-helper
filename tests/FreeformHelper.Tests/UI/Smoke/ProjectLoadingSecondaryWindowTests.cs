@@ -7,9 +7,9 @@ using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
-using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
+using Nvt.Core.Lifecycle;
 using Xunit;
 
 namespace FreeformHelper.Tests;

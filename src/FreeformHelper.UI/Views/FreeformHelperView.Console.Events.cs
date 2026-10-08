@@ -4,8 +4,8 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using AvaloniaEdit;
 using FreeformHelper.UI.Logging;
-using FreeformHelper.UI.Services;
 using Nvt.Core.Avalonia.Threading;
+using Nvt.Core.Lifecycle;
 
 namespace FreeformHelper.UI.Views;
 
