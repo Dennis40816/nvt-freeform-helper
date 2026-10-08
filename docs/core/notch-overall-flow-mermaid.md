@@ -1,9 +1,9 @@
 # Notch / Simulation Overall Flow (Mermaid)
 
-> Canonical reference：[`docs/reference/notch-system-reference.md`](../reference/notch-system-reference.md)
-> 本檔只保留總覽圖與名詞提醒；若與 canonical reference 不一致，以 canonical reference 為準。
+> Canonical reference: [`docs/reference/notch-system-reference.md`](../reference/notch-system-reference.md)
+> This file only keeps the overview diagrams and term reminders. If it conflicts with the canonical reference, the canonical reference takes precedence.
 
-> 最後更新：2026-04-30
+> Last updated: 2026-04-30
 
 ## 1. Workflow Identity Flow
 
@@ -45,12 +45,12 @@ flowchart TD
     C -- "No" --> F["Boundary seed = false"]
 ```
 
-重點：
+Key points:
 
-- `active set` 目前來自 `PadMatchResult.RegularToCad.Keys`
-- 不是 `Regular Visibility Mask (SeeRegular.csv)`
-- `Regular Visibility Mask (SeeRegular.csv)` 是另一層額外限制，用在 Step4 / Simulation
-- beta0.9 boundary / coverage guard 是 Step3 中段補償，不是 SeeRegular；它在 V22 candidate 產生後、canonical rows 輸出前限制 ToFull 虛擬面積與 target coverage。
+- The `active set` currently comes from `PadMatchResult.RegularToCad.Keys`.
+- It is not the `Regular Visibility Mask (SeeRegular.csv)`.
+- The `Regular Visibility Mask (SeeRegular.csv)` is a separate additional constraint, used in Step4 / Simulation.
+- The beta0.9 boundary / coverage guard is a mid-stage compensation in Step3, not SeeRegular. It limits ToFull virtual area and target coverage after V22 candidates are generated and before canonical rows are output.
 
 ## 3. Simulation Open / Warm Path
 
@@ -68,11 +68,11 @@ flowchart LR
     F --> I
 ```
 
-重點：
+Key points:
 
-- Simulation 不使用第二套數學路徑
-- 仍然共用 Step5 table generation
-- 優化重點是 `prewarm + cache reuse + candidate hot-path reduction`
+- Simulation does not use a second math path.
+- It still shares Step5 table generation.
+- The optimization focus is `prewarm + cache reuse + candidate hot-path reduction`.
 
 ## 4. Simulation Audit Gate
 
@@ -92,26 +92,26 @@ flowchart LR
     H --> I["Export gate / inspector / path replay"]
 ```
 
-重點：
+Key points:
 
-- audit 入口吃同一份 `Cells + Actions`，不讓 UI / export / inspector 各自從局部資料重推。
-- `After > 480` 是 EMS hard-risk gate。
-- target coverage cap 預設 `120%`，用來抓小 overlap 被放大成不合理 target ratio 的情況。
-- `global 400` 只作診斷輸入；偏差需歸類為 `GeometryExpected`、`NetFlowSuspicious` 或 `EmsRisk`。
-- Copper path replay 每個 point 都走 `BuildCopperDataset -> BuildSnapshot -> Analyze(result)`，並記錄 Max After / EMS violations / worst diff。
+- The audit entry takes the same `Cells + Actions` data. UI, export, and inspector do not each re-derive results from partial data.
+- `After > 480` is the EMS hard-risk gate.
+- The target coverage cap defaults to `120%`. It catches cases where a small overlap is amplified into an unreasonable target ratio.
+- `global 400` is only a diagnostic input. Deviations must be classified as `GeometryExpected`, `NetFlowSuspicious`, or `EmsRisk`.
+- Copper path replay runs every point through `BuildCopperDataset -> BuildSnapshot -> Analyze(result)`, and records Max After, EMS violations, and the worst diff.
 
 ## 5. Physical Intent Notes
 
 - `ToRegular`
-  - 目的是 Undo NF 對面積差異的部分壓平，讓感應量先回到較接近面積正比的狀態。
+  - Its purpose is to partly flatten the area difference caused by Undo NF, so the sensed quantity first returns to a state closer to proportional to area.
 - `ToFull`
-  - 目的是支援 boundary / 推邊，不應自動等同於「擴展後 full area 直接成為主要分配權重」。
+  - Its purpose is to support boundary / edge push. It should not automatically mean that the expanded full area becomes the main allocation weight directly.
 - `Boundary virtual-area cap`
-  - 目的是限制 ToFull 長出去的虛擬面積，避免很小的邊界 overlap 取得過大的 expansion 權重。
+  - Its purpose is to limit the virtual area that ToFull extends, so that a very small boundary overlap does not get an excessively large expansion weight.
 - `Target coverage guard`
-  - 目的是限制同一 FW diff 最終 retained + incoming coverage，作為 Current(Gain) 的 EMS safety guard。
-- canonical truth
-  - 應以 `v2.2 canonical` 為主；`v2.1` 只作 compatibility payload。
-- default compensation mode
-  - 若目標是維持 `global 400` 下的 uniform-field 合理性，預設應優先採 `without gain`。
-  - `without gain` 仍套用 `ToRegular` 面積還原；它只關閉 `ToFull` 對 source combine 的放大。
+  - Its purpose is to limit the final retained + incoming coverage of the same FW diff, as an EMS safety guard for Current(Gain).
+- Canonical truth
+  - The `v2.2 canonical` should be the main reference. `v2.1` is only a compatibility payload.
+- Default compensation mode
+  - If the goal is to keep uniform-field reasonableness under `global 400`, `without gain` should be the default.
+  - `without gain` still applies the `ToRegular` area restoration. It only turns off the amplification of source combine by `ToFull`.

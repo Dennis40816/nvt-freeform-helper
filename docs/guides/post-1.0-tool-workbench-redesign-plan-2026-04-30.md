@@ -1,20 +1,20 @@
 # Post-1.0 Tool Workbench Redesign Plan
 
-最後更新：2026-04-30  
-狀態：Draft v1，可進入分階段實作
+Last updated: 2026-04-30  
+Status: Draft v1, ready for phased implementation
 
-## 1. 目標
+## 1. Goals
 
-1. 讓 Simulation 從「可檢查數值」升級成完整驗證平台。
-2. 讓 Coordinate 工具從「欄位式計算器」重做成可直接產生、檢查、匯出座標 artifact 的工具。
-3. 把 Simulation 與 Coordinate 視為 post-1.0 的 Tool workbench，而不是附屬頁面。
-4. 維持既有 single-path 原則：UI 不重新推導數值，所有結果由 UseCase/service snapshot 投影。
+1. Upgrade Simulation from a value inspection tool into a complete validation platform.
+2. Rework the Coordinate tool from a field-based calculator into a tool that directly generates, checks, and exports coordinate artifacts.
+3. Treat Simulation and Coordinate as post-1.0 Tool workbenches, not secondary pages.
+4. Keep the existing single-path principle: the UI does not re-derive values; all results are projected from UseCase/service snapshots.
 
-## 2. 現有功能盤點
+## 2. Current Feature Inventory
 
 ### 2.1 Simulation
 
-| 區塊 | 現有能力 | 主要入口 |
+| Area | Current capabilities | Main entry points |
 | --- | --- | --- |
 | Workspace lifecycle | open / prewarm / stale source revision / auto build from runtime query | `SimulationHostViewModel`, `FreeformHelperViewModel.Simulation.cs` |
 | Session input | current `RegularGrid`, Step5 `NotchTable`, active regular surface, CAD output FW diff map | `SimulationWorkspaceSession` |
@@ -30,7 +30,7 @@
 
 ### 2.2 Coordinate
 
-| 區塊 | 現有能力 | 主要入口 |
+| Area | Current capabilities | Main entry points |
 | --- | --- | --- |
 | Workspace lifecycle | open / prewarm / stale source revision | `CoordinatePlannerHostViewModel` |
 | Session input | current `RegularGrid`, visible CAD pads/layers, default active area size, pixel size, preferred AA outline layer | `CoordinatePlannerWorkspaceSession` |
@@ -46,7 +46,7 @@
 | Preview export | PNG preview export hook | `CoordinatePlannerWorkspaceViewModel.ExportPreviewPngAsync()` |
 | Preference sync | pixel size and preferred AA outline layer persisted back to main workspace | `ApplyCoordinatePlannerPreferences(...)` |
 
-## 3. 主要痛點
+## 3. Main Pain Points
 
 ### 3.1 Simulation
 
@@ -91,7 +91,7 @@ flowchart LR
 
     subgraph SIM["Simulation"]
         direction TB
-        S1["Prepare scenario<br/>Manual / CSV / Copper / Path"]:::input
+        S1["Prepare scenario<br/>Manual / CSV / Copper / Path Sweep"]:::input
         S2["Run snapshot<br/>BuildSnapshot -> Simulate -> Analyze"]:::compute
         S3["Audit dashboard<br/>EMS / net-flow / geometry"]:::gate
         S4["Evidence table<br/>diff flow + replay steps"]:::artifact
@@ -213,13 +213,13 @@ flowchart LR
 
 ### 7.4 3635 Coordinate Screen Assessment
 
-2026-04-30 使用 `example/BOE36.35/project_3635.json` 實際截圖檢查 Coordinate 頁，確認目前最大問題不是演算法，而是資訊架構：
+On 2026-04-30, I checked the Coordinate page with real screenshots using `example/BOE36.35/project_3635.json`, and confirmed that the main current problem is not the algorithm but the information architecture:
 
-1. 左側把 reference、machine calibration、pixel/copper、guides、BIST、4-point array 全部攤在同一張長表單內，使用者必須先理解每個 raw field 的角色。
-2. 4-point array 未啟用時仍顯示 8 個 corner 欄位，讓主要流程看起來像進階設定牆。
-3. 右側 AA / BIST / guide / array 結果各自用 row cards 呈現，raw / safe / pixel 的語意沒有先建立讀表順序。
-4. Header 與 preview rail 重複顯示 source / layer / machine / pixel 摘要，首屏訊息密度太高。
-5. 3635 的 AA 比例非常扁長，canvas 本身還能判讀；真正卡住的是左右兩側的操作與 artifact 閱讀順序。
+1. The left side puts reference, machine calibration, pixel/copper, guides, BIST, and 4-point array all in one long form, so users must first understand the role of every raw field.
+2. When the 4-point array is disabled, it still shows 8 corner fields, which makes the main flow look like a wall of advanced settings.
+3. On the right, AA / BIST / guide / array results are each shown as row cards, and the meaning of raw / safe / pixel has no established reading order first.
+4. The header and preview rail both repeat source / layer / machine / pixel summaries, so the first screen is too dense.
+5. The 3635 AA ratio is very flat and long, and the canvas itself is still readable; what actually gets stuck is the operations on the left and right and the artifact reading order.
 
 Immediate UI cleanup scope:
 

@@ -142,7 +142,7 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (target 
   - A submodule links a whole repository, so decide first how `example/` reads the `nfh/` folder.
   - Update the CI deploy key `TESTDATA_DEPLOY_KEY` and the data checks in `scripts/tests/assert-example-data.ps1`.
   - Never copy the data into this repository, a PR, an issue or a log.
-- [ ] **DOC-TR Translate the remaining Chinese documents** · Target: - · Status: Not started (low priority) · PR: [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30) (first batch)
+- [x] **DOC-TR Translate the remaining Chinese documents** · Target: - · Status: Done (the screen `HowToUseView.axaml` is tracked separately) · PR: [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30) (first batch), [#57](https://github.com/Dennis40816/nvt-freeform-helper/pull/57)
 
 ## 3. Core integration
 

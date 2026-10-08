@@ -1,41 +1,41 @@
-# 貢獻指南
+# Contributing Guide
 
-本指南彙整本庫現行的分支、提交、驗證與合併規則。實作細節依 [開發執行流程](docs/governance/development-workflow.md)，版本與分支邊界依 [分支、版本與發佈治理](docs/governance/branch-version-and-release-governance.md)。
+This guide summarizes the current branch, commit, verification, and merge rules for this repository. For implementation details, see [Development Workflow](docs/governance/development-workflow.md). For version and branch boundaries, see [Branch, Version, and Release Governance](docs/governance/branch-version-and-release-governance.md).
 
-## 分支模型
+## Branch Model
 
 - The default branch is `1.0.x` (trunk). `main` currently equals the initial import commit and will hold released versions only.
 - Work uses `feature/<version>/<topic>` branches, such as `feature/1.0.x/<topic>`, targeting `1.0.x`.
-- 1.0.x 的版本順序、目標版本與狀態以 `ROADMAP.md` 為準；slice 規格、gate 與退出條件以 `docs/reference/refactor-contract.md` 為準。發佈 workflow 尚屬 `S15.005e`，不得把範本的發佈程序視為本庫已實作的 gate。
+- The version order, target versions, and status for 1.0.x are defined in `ROADMAP.md`. Slice specifications, gates, and exit criteria are defined in `docs/reference/refactor-contract.md`. The release workflow is still part of `S15.005e`. Do not treat the template's release procedure as a gate already implemented in this repository.
 
-## 變更、commit 與 PR
+## Changes, Commits, and PRs
 
-1. 從 `ROADMAP.md` 或現有 issue 確定一個可驗收的範圍；功能或範圍變更時立即同步 `ROADMAP.md`。先依 `AGENTS.md` 讀取依賴圖及適用契約。
-2. 一次完成一個邏輯 slice；程式與 UI 變更依 `docs/guides/refactor-playbook.md` 與 1.0.x roadmap 的 gate 驗證。
-3. 每個 commit 保持單一邏輯範圍，使用 title 與說明原因、結果及驗證的 body。依 `docs/agents/issue-tracker.md` 使用 `Refs #N`；`S15.*` 的既有例外使用獨立一行 `Refs: ROADMAP.md S15.xxx`，直到可建立對應 issue。
-4. PR 說明列出關聯 issue／TODO ID、行為或契約影響、實際驗證命令與結果及必要的 golden 證據。
+1. Define a verifiable scope from `ROADMAP.md` or an existing issue. When scope or features change, update `ROADMAP.md` immediately. Before starting, read the dependency graph and applicable contracts as described in `AGENTS.md`.
+2. Complete one logical slice at a time. Verify program and UI changes against `docs/guides/refactor-playbook.md` and the gates in the 1.0.x roadmap.
+3. Keep each commit within a single logical scope. Use a title and a body that explains the reason, the result, and the verification. Use `Refs #N` as described in `docs/agents/issue-tracker.md`. For existing `S15.*` exceptions, use a separate line `Refs: ROADMAP.md S15.xxx` until a corresponding issue can be created.
+4. The PR description lists related issue or TODO IDs, behavior or contract impact, the verification commands actually run and their results, and any required golden evidence.
 
-## 驗證入口
+## Verification Entry Point
 
-`./scripts/verify.ps1` 是 structure、build 與 test 的單一入口；實際 lane 與 shard 內容由腳本決定，CI workflow 只命名它們。
+`./scripts/verify.ps1` is the single entry point for structure, build, and test. The actual contents of lanes and shards are determined by the script. The CI workflow only names them.
 
-| 命令 | 用途 |
+| Command | Purpose |
 | --- | --- |
-| `./scripts/verify.ps1 -StructureOnly` | 必要檔案、submodule link、私有路徑、SDK pin、action pin、測試分組、CRLF、XAML action role。 |
-| `./scripts/verify.ps1 -CiLane build` | 全檔 lint、analyzer 與 UI build，warning 視為 error。 |
-| `./scripts/verify.ps1 -CiLane test -Shard core` | Core test shard；`ui`、`viewmodel`、`snapshots` 可取代 `core`。 |
-| `./scripts/verify.ps1 -All` | Structure、build 與所有 test shards。 |
+| `./scripts/verify.ps1 -StructureOnly` | Required files, submodule links, private paths, SDK pin, action pin, test grouping, CRLF, XAML action role. |
+| `./scripts/verify.ps1 -CiLane build` | Full-file lint, analyzers, and UI build, with warnings treated as errors. |
+| `./scripts/verify.ps1 -CiLane test -Shard core` | Core test shard. `ui`, `viewmodel`, and `snapshots` can replace `core`. |
+| `./scripts/verify.ps1 -All` | Structure, build, and all test shards. |
 
-每個工作里程碑仍依 `AGENTS.md` 執行 UI build；每次 commit 前跑 `./scripts/tests/lint.ps1 -UseNoAppHost`，合併至 trunk（`1.0.x`）或 `main` 前跑 `./scripts/tests/lint.ps1 -AllFiles -UseNoAppHost`（原規則稱合併至 `master` 前）。1.0.x 的 G0～G6 與 targeted suites 見 `docs/reference/refactor-contract.md`。現行 CI 的 required checks 是 `policy / structure` 與 `dotnet / build-test`；`viewmodel` shard 依 `ROADMAP.md S15.002` 的暫時決定報告但不阻擋合併，關閉該項後恢復必過。
+Each work milestone still runs the UI build as required by `AGENTS.md`. Run `./scripts/tests/lint.ps1 -UseNoAppHost` before each commit. Run `./scripts/tests/lint.ps1 -AllFiles -UseNoAppHost` before merging into trunk (`1.0.x`) or `main` (the original rule referred to merging into `master`). The 1.0.x G0 to G6 gates and targeted suites are in `docs/reference/refactor-contract.md`. The current required CI checks are `policy / structure` and `dotnet / build-test`. The `viewmodel` shard is reported but does not block merges, as a temporary decision under `ROADMAP.md S15.002`. Once that item is closed, it becomes required again.
 
-`example/` 是私有 git submodule。新 clone 或 worktree 須在任何 gate 前執行 `git submodule update --init example`。缺少它時，example-data 測試可能略過，`run-refactor-gate.ps1` 會失敗；不得將其內容帶入本 repo、PR、issue 或 log。切換到 submodule 設立前的分支，先執行 `git submodule deinit -f example`。
+`example/` is a private git submodule. A new clone or worktree must run `git submodule update --init example` before any gate. Without it, example-data tests may be skipped, and `run-refactor-gate.ps1` will fail. Do not bring its contents into this repo, a PR, an issue, or a log. To switch to a branch from before the submodule was set up, first run `git submodule deinit -f example`.
 
-## 合併邊界（Owner 決定，2026-10-02）
+## Merge Boundaries (Owner Decision, 2026-10-02)
 
-PR 只要觸及以下任一高風險範圍，整個 PR 就需要 owner 在 GitHub 核准：production code `src/**`、CI workflow `.github/**`、決定 gate 內容的 `scripts/**`、`.editorconfig`、`Directory.Build.props`、`Directory.Packages.props`、`global.json`、發佈相關檔案，以及 agent 權限設定。高風險 PR 仍建議取得本專案的獨立審查。其餘文件與測試變更，在本專案派出的獨立審查結論為 `accept`、未留 P0／P1、且 required checks 綠燈後由 bot 合併。範本專案的 session 不替本專案審查。
+If a PR touches any of the following high-risk areas, the whole PR requires owner approval on GitHub: production code `src/**`, CI workflows `.github/**`, `scripts/**` that determine gate content, `.editorconfig`, `Directory.Build.props`, `Directory.Packages.props`, `global.json`, release-related files, and agent permission settings. High-risk PRs are still recommended to get independent review from this project. For other documentation and test changes, the bot merges once the independent review dispatched by this project concludes `accept`, leaves no P0 or P1 issues, and the required checks are green. Sessions in the template project do not review on behalf of this project.
 
-The bot is the repository's existing GitHub App, inherited from the template project. Changes to `AGENTS.md` or `CONTRIBUTING.md` require owner confirmation in chat before editing. The owner said on 2026-10-04: 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). A GitHub review is not required for this confirmation; the GitHub owner-approval rules for `src/**`, `scripts/**`, `.github/**`, and the other high-risk paths above continue to apply.
+The bot is the repository's existing GitHub App, inherited from the template project. Changes to `AGENTS.md` or `CONTRIBUTING.md` require owner confirmation in chat before editing. The owner said on 2026-10-04: 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). A GitHub review is not required for this confirmation. The GitHub owner-approval rules for `src/**`, `scripts/**`, `.github/**`, and the other high-risk paths above continue to apply.
 
-合併前再次確認 PR 的目前 head、適用的獨立審查與 owner 核准，以及 required checks。使用 `gh pr merge <n> --merge --match-head-commit <head>`，以當下確認的 head 作為合併邊界。
+Before merging, reconfirm the PR's current head, the applicable independent review and owner approval, and the required checks. Use `gh pr merge <n> --merge --match-head-commit <head>`, treating the head confirmed at that moment as the merge boundary.
 
-Execution status for the S15.005c authority policy/review record and the S15.005d ruleset is maintained in ROADMAP.md; do not describe unimplemented automatic checks as current gates.
+The execution status for the S15.005c authority policy/review record and the S15.005d ruleset is maintained in ROADMAP.md. Do not describe unimplemented automatic checks as current gates.

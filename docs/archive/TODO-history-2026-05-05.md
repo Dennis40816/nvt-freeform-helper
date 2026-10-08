@@ -4,573 +4,573 @@ Source: `TODO.md` completed top-level items before the 2026-05-05 active-backlog
 
 This archive intentionally contains completed `[x]` tasks only. Active `[ ]` tasks remain in `TODO.md`.
 
-## Post 1.0（Tool Workbench：Simulation / Coordinate）
+## Post 1.0 (Tool Workbench: Simulation / Coordinate)
 
-- [x] S12.001 Tool 面能力盤點與重做設計規格
-  - 目標：
-    - 基於 1.0 後續開發，統整目前 Simulation 與 Coordinate 的現有能力、痛點、重做方向與分階段切片。
-    - 明確把 Simulation 定位為完整驗證平台，把 Coordinate 定位為可產生 / 檢查 / 匯出座標 artifact 的工具。
-  - 完成：
-    - 新增 `docs/guides/post-1.0-tool-workbench-redesign-plan-2026-04-30.md`。
-    - 盤點 Simulation：Manual / CSV / Copper / replay / audit / inspector / runtime-export bridge。
-    - 盤點 Coordinate：active area source、machine/pixel mapping、AA corners、guides、BIST、4-point array、safe coordinates、PNG preview。
-    - 定義 post-1.0 target IA、Simulation scenario model、Coordinate recipe/artifact model、實作切片與驗收條件。
-  - 驗證：
+- [x] S12.001 Tool-surface capability inventory and redesign design spec
+  - Goal:
+    - Based on post-1.0 development, consolidate the current Simulation and Coordinate capabilities, pain points, redesign direction, and phased slices.
+    - Clearly position Simulation as a complete validation platform, and Coordinate as a tool that generates, inspects, and exports coordinate artifacts.
+  - Completed:
+    - Added `docs/guides/post-1.0-tool-workbench-redesign-plan-2026-04-30.md`.
+    - Inventory of Simulation: Manual / CSV / Copper / replay / audit / inspector / runtime-export bridge.
+    - Inventory of Coordinate: active area source, machine/pixel mapping, AA corners, guides, BIST, 4-point array, safe coordinates, PNG preview.
+    - Defined post-1.0 target IA, Simulation scenario model, Coordinate recipe/artifact model, implementation slices, and acceptance criteria.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
 
-- [x] S12.003 Copper mode audit 完整化
-  - 目標：
-    - Copper mode 不再隱藏 EMS / net-flow / geometry diagnostics。
-    - Copper 與 Manual / CSV 一樣輸出正式 `SimulationSafetyAuditResult`，UI/export/replay 共用。
-  - 完成：
-    - Copper source 進入同一個 `SimulationSafetyAuditResult` 顯示路徑，右側 EMS safety card 會顯示 EMS cap、max after、violation、net-flow residual、target coverage risk 與 physical audit summary。
-    - `ShowSimulationDiagnostics` 不再因 Copper source 被關閉，selected diff evidence 與 replay artifact 可共用同一 audit snapshot。
-  - 驗收：
-    - Copper source 下可顯示 EMS cap、max after、high-risk diff、net-flow residual、target coverage risk。
+- [x] S12.003 Complete the Copper mode audit
+  - Goal:
+    - Copper mode no longer hides EMS / net-flow / geometry diagnostics.
+    - Copper outputs a formal `SimulationSafetyAuditResult` like Manual / CSV, shared by UI/export/replay.
+  - Completed:
+    - Copper source enters the same `SimulationSafetyAuditResult` display path. The right-side EMS safety card shows EMS cap, max after, violations, net-flow residual, target coverage risk, and physical audit summary.
+    - `ShowSimulationDiagnostics` is no longer turned off for Copper source. Selected diff evidence and replay artifact share the same audit snapshot.
+  - Acceptance:
+    - With Copper source, EMS cap, max after, high-risk diff, net-flow residual, and target coverage risk can be displayed.
 
 - [x] S12.004 Copper / Coordinate path replay UI artifact
-  - 目標：
-    - 將目前 test/VM 可呼叫的 `ReplayCopperPath(...)` 做成正式 UI 流程。
-    - 支援 start/end/step 設定、replay table、focus worst step、export evidence。
-  - 完成：
-    - Copper controls pane 新增 start/end/step、capture start/end 與 replay command。
-    - 右側新增 Copper path replay table，row selection 會 focus 該 step 的 copper center。
-    - 新增 Application 層 `CopperPillarPathReplayArtifactService`，CSV / JSON / clipboard table 均由同一份 `CopperPillarPathReplayArtifactSnapshot` 輸出。
-  - 驗收：
-    - 使用者不需手動滑鼠掃邊緣，即可產生 notch/edge 區 path sweep report。
+  - Goal:
+    - Turn the current test/VM-callable `ReplayCopperPath(...)` into a formal UI flow.
+    - Support start/end/step settings, replay table, focus worst step, and export evidence.
+  - Completed:
+    - Copper controls pane adds start/end/step, capture start/end, and a replay command.
+    - Right side adds a Copper path replay table. Row selection focuses the copper center of that step.
+    - Added Application-layer `CopperPillarPathReplayArtifactService`. CSV / JSON / clipboard table are all output from the same `CopperPillarPathReplayArtifactSnapshot`.
+  - Acceptance:
+    - Users can generate a notch/edge path sweep report without manually sweeping the mouse over edges.
 
-- [x] S12.005 Coordinate recipe / artifact snapshot 收斂
-  - 目標：
-    - 新增 `CoordinateRecipe` 與 `CoordinateArtifactSnapshot`，把 AA corners / Guides / BIST / 4-point array / custom points / path 統一成 artifact rows。
-    - 既有 `CoordinatePlannerComputationService` 仍為計算來源。
-  - 完成：
-    - `CoordinateArtifactSnapshot` 已作為 table / modal / export 的唯一 artifact row model。
-    - `CoordinatePlannerRequest` 支援 custom point / custom path recipes，計算服務會產生 `CustomPoint`、`CustomPath`、`CustomPathStep`。
-    - Coordinate 左側可新增 point/path recipe；右側 artifact table 立即顯示並可匯出。
-  - 驗收：
-    - 目前右側顯示的所有座標列都能從同一 artifact snapshot 投影。
+- [x] S12.005 Converge Coordinate recipe / artifact snapshot
+  - Goal:
+    - Add `CoordinateRecipe` and `CoordinateArtifactSnapshot`, unifying AA corners / Guides / BIST / 4-point array / custom points / path into artifact rows.
+    - The existing `CoordinatePlannerComputationService` remains the computation source.
+  - Completed:
+    - `CoordinateArtifactSnapshot` is now the only artifact row model for table / modal / export.
+    - `CoordinatePlannerRequest` supports custom point / custom path recipes. The computation service generates `CustomPoint`, `CustomPath`, and `CustomPathStep`.
+    - Coordinate left side can add point/path recipes; the right-side artifact table shows them immediately and can export them.
+  - Acceptance:
+    - All coordinate rows currently shown on the right can be projected from the same artifact snapshot.
 
 - [x] S12.006 Coordinate export / copy artifact
-  - 目標：
-    - 增加穩定座標輸出：CSV review、JSON artifact、clipboard table。
-    - 欄位至少包含 label、kind、recipe、pixel、machine、safe machine、world、unit、source bounds。
-  - 完成：
-    - 右側 Coordinate table 提供 Copy selected、Copy all、CSV、JSON。
-    - CSV / JSON / clipboard 均由 Application 層 `CoordinateArtifactSnapshot` 生成，不由 ViewModel 重新推導座標。
-  - 驗收：
-    - AA corners、BIST、guide、4-point array dot rows 均可匯出且排序穩定。
+  - Goal:
+    - Add stable coordinate output: CSV review, JSON artifact, clipboard table.
+    - Fields include at least label, kind, recipe, pixel, machine, safe machine, world, unit, and source bounds.
+  - Completed:
+    - The right-side Coordinate table provides Copy selected, Copy all, CSV, and JSON.
+    - CSV / JSON / clipboard are all generated from the Application-layer `CoordinateArtifactSnapshot`, not re-derived by the ViewModel.
+  - Acceptance:
+    - AA corners, BIST, guide, and 4-point array dot rows can all be exported with stable ordering.
 
-- [x] S12.007 Coordinate UX 重做：recipe selector + canvas handles + artifact table
-  - 目標：
-    - 左側從 raw field wall 改為 Reference setup + Recipe selector。
-    - 4-point array 支援 canvas handle / selected handle inspector，避免手動輸入 8 個 corner 欄位。
-  - 完成：
-    - 左側已收斂為 Reference / Calibration / Artifacts / 4-point array / Custom point-path 的 task sections。
-    - 4-point array 啟用後只顯示 selected-handle inspector；TL/TR/BR/BL 由單一 X/Y inspector 編輯，不再常駐攤開 8 個 raw 欄位。
-    - Canvas overlay 的 4-point array corner 可直接選取/拖曳；ViewModel 以 `MoveCustomArrayCornerToWorldPoint(...)` 單一路徑更新 corner，artifact table/focus row 由 snapshot 重新投影。
-    - Artifact table / modal / Copy / CSV / JSON 已由 `CoordinateArtifactSnapshot` 統一輸出。
-  - 驗收：
-    - 使用者可用 canvas 選點或拖曳方式建立 coordinate recipe，再直接看 artifact table。
-  - 驗證：
+- [x] S12.007 Coordinate UX redesign: recipe selector + canvas handles + artifact table
+  - Goal:
+    - Change the left side from raw field wall to Reference setup + Recipe selector.
+    - 4-point array supports canvas handles / selected handle inspector, avoiding manual entry of 8 corner fields.
+  - Completed:
+    - The left side is consolidated into task sections: Reference / Calibration / Artifacts / 4-point array / Custom point-path.
+    - When 4-point array is enabled, only the selected-handle inspector is shown. TL/TR/BR/BL are edited through a single X/Y inspector, instead of permanently exposing 8 raw fields.
+    - 4-point array corners in the canvas overlay can be selected and dragged directly. The ViewModel updates corners through the single path `MoveCustomArrayCornerToWorldPoint(...)`, and artifact table/focus row are re-projected from the snapshot.
+    - Artifact table / modal / Copy / CSV / JSON are unified through `CoordinateArtifactSnapshot`.
+  - Acceptance:
+    - Users can build a coordinate recipe by selecting points or dragging on the canvas, then directly view the artifact table.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false -v normal`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "CoordinatePlannerWorkspaceViewModelTests|CoordinatePlannerWorkspaceUseCaseTests|CoordinatePlannerComputationServiceTests|CoordinateArtifactServiceTests|WorkspaceViewsSmokeTests" /p:UseAppHost=false -v normal`
 
 - [x] S12.020 Sidebar content hierarchy pass
-  - 目標：
-    - Freeform / Simulation / Coordinate 側欄統一資訊分層：section header 顯示 title + 一行摘要，詳細 contract / diagnostics / trace 收斂到次層。
-    - 明確區分 primary / secondary / danger actions，降低按鈕掃描成本。
-    - 降低常駐說明文字與框線密度，維持簡約且可掃描。
-  - 完成：
-    - 新增共用 `workspaceSectionHeader`、`workspaceSectionSummary`、`workspaceDetailStrip`、`workspacePrimaryAction`、`workspaceDangerAction`。
-    - Simulation 左側將 input contract、CSV inspector、Copper projection / replay 收斂為 detail strip；Import / Run / Random 為 primary，Clear 類為 danger。
-    - Coordinate 左側各 section 以 title + summary 固定第一掃描層，新增 point/path 為 primary，Clear custom 為 danger。
-    - Freeform 左側 Import / DXF check 改成同樣 section pattern；右側 quick focus 改成同樣 section header + primary focus action。
-    - Dev page 補上 section header、detail strip、primary/danger action tier 預覽。
-  - 驗收：
-    - Dev page 可預覽側欄 section header、action tier、detail strip。
-    - Simulation / Coordinate 左側不再把 contract / inspector 細節常駐塞在 first-read 區。
-    - Freeform 左右側欄的 quick focus / DXF check / workflow overview 使用同一分層樣式。
-  - 驗證：
+  - Goal:
+    - Unify information layering in the Freeform / Simulation / Coordinate sidebars: section headers show title + one-line summary, while detailed contract / diagnostics / trace move to a secondary layer.
+    - Clearly distinguish primary / secondary / danger actions to reduce button scanning cost.
+    - Reduce resident explanatory text and border density, keeping the UI minimal and scannable.
+  - Completed:
+    - Added shared `workspaceSectionHeader`, `workspaceSectionSummary`, `workspaceDetailStrip`, `workspacePrimaryAction`, and `workspaceDangerAction`.
+    - Simulation left side consolidates input contract, CSV inspector, and Copper projection / replay into detail strips. Import / Run / Random are primary, and Clear-type actions are danger.
+    - Coordinate left side uses title + summary per section as the first scan layer. Add point/path is primary, and Clear custom is danger.
+    - Freeform left side Import / DXF check uses the same section pattern. Right-side quick focus uses the same section header + primary focus action.
+    - Dev page adds section header, detail strip, and primary/danger action tier previews.
+  - Acceptance:
+    - Dev page can preview sidebar section headers, action tiers, and detail strips.
+    - Simulation / Coordinate left sides no longer keep contract / inspector details resident in the first-read area.
+    - Freeform left and right sidebar quick focus / DXF check / workflow overview use the same layering style.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
 
 - [x] S12.021 Sidebar affordance and density cleanup
-  - 根因：
-    - 可點 preset、靜態 badge、primary action 共用近似 pill/card 外觀，互動語意不清。
-    - 側欄 primary action 使用大面積 accent fill，與一般 sidebar button hover / icon contrast 規則不一致。
-    - 部分 compact button 缺少共用 clipping / no-wrap 契約，窄欄位時文字可能超出外框。
-    - Workflow diagnostics 與 Simulation detail 把第二層輸出常駐攤開，導致 first peek / second peek 分層不明顯。
-  - 目標：
-    - 建立 sidebar button clipping 與 icon foreground 繼承規則。
-    - 將 clickable preset 從 static badge 視覺中拆出，並降低 badge 疊放噪音。
-    - 壓縮 Auto play、Layer legend、Index diagnostics、Step 5 handoff 與 Simulation right pane 的常駐閱讀量。
-  - 驗收：
-    - Overlap check / Run / Import 等 workspace primary action 不再使用突兀藍底，hover / pressed icon 對比一致。
-    - Uniform presets 明確看得出可點；static badge 不再與 preset button 混淆。
-    - Step 3 legend、Step 4 diagnostics、Step 5 handoff 在窄側欄不破框且可保留完整 tooltip。
-  - 完成：
-    - 新增 `workspacePresetButton`，將 clickable preset 與 static summary chip 拆開。
-    - Workspace primary action 改為 quiet primary：accent border + selected/hover surface，icon foreground 跟隨高對比文字色。
-    - Button / panel action / pad info / dev inspector compact actions 加上 clipping 與 no-wrap/ellipsis 契約。
-    - Step 3 Auto play / Layer legend 改為固定欄位 row；Step 4/5 diagnostic metric 改為 compact row + tooltip。
-    - Simulation right pane 將 source / physical audit 從常駐 badge wall 收斂到 detail strip。
-  - 驗證：
+  - Root cause:
+    - Clickable presets, static badges, and primary actions share near-identical pill/card appearance, so interaction meaning is unclear.
+    - Sidebar primary actions use large accent fills, which is inconsistent with the general sidebar button hover / icon contrast rules.
+    - Some compact buttons lack the shared clipping / no-wrap contract, so text may overflow the border when the column is narrow.
+    - Workflow diagnostics and Simulation details keep second-layer output permanently expanded, making the first peek / second peek layering unclear.
+  - Goal:
+    - Establish button clipping and icon foreground inheritance rules for the sidebar.
+    - Separate clickable presets from static badge visuals, and reduce badge stacking noise.
+    - Reduce the resident reading load of Auto play, Layer legend, Index diagnostics, Step 5 handoff, and the Simulation right pane.
+  - Acceptance:
+    - Overlap check / Run / Import and other workspace primary actions no longer use a jarring blue fill, and hover / pressed icon contrast is consistent.
+    - Uniform presets clearly look clickable; static badges are no longer confused with preset buttons.
+    - Step 3 legend, Step 4 diagnostics, and Step 5 handoff do not break the frame in a narrow sidebar, and full tooltips are preserved.
+  - Completed:
+    - Added `workspacePresetButton`, separating clickable presets from static summary chips.
+    - Workspace primary actions changed to quiet primary: accent border + selected/hover surface. Icon foreground follows the high-contrast text color.
+    - Button / panel action / pad info / dev inspector compact actions now have clipping and no-wrap/ellipsis contracts.
+    - Step 3 Auto play / Layer legend changed to fixed-column rows. Step 4/5 diagnostic metrics changed to compact rows with tooltips.
+    - Simulation right pane moved source / physical audit from resident badge walls into detail strips.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
 
 - [x] S12.022 Sidebar neutral contrast pass
-  - 根因：
-    - Default neutral block / badge 使用的 surface 與 sidepane 背景階差太小，導致沒有 warning/danger 色時邊界不明顯。
-    - Workflow overview section 只有底線分隔，無完整 block 邊界；多個 badge 疊在同色背景上時掃描成本偏高。
-  - 完成：
-    - Workflow overview section 改為完整 neutral block：surface background + strong border + spacing。
-    - Default workflow / workspace badges 改用 elevated background + strong border，文字改為 primary contrast。
-    - Workflow inset/status strip 與 workspace section/detail strip 提高 neutral border 階差。
-  - 驗收：
-    - Notch model 的 default badges 在未選中、無 warning/danger 的狀態下仍能看出 pill 邊界。
-    - Section block 與側欄背景有明確分界，但不使用 warning/danger/accent 色誤導語意。
+  - Root cause:
+    - The surface used by default neutral blocks / badges has too little contrast with the sidepane background, so boundaries are unclear when there is no warning/danger color.
+    - Workflow overview sections only had bottom-line separators and no full block boundary. When many badges stack on the same background, scanning cost is high.
+  - Completed:
+    - Workflow overview sections changed to full neutral blocks: surface background + strong border + spacing.
+    - Default workflow / workspace badges use elevated background + strong border, with primary contrast text.
+    - Workflow inset/status strips and workspace section/detail strips have increased neutral border contrast.
+  - Acceptance:
+    - Notch model default badges, in unselected states without warning/danger, still show pill boundaries.
+    - Section blocks have clear separation from the sidebar background, without using warning/danger/accent colors that mislead meaning.
 
 - [x] S12.023 Sidebar fold and interaction role pass
-  - 根因：
-    - EMS safety 是 second-level diagnostic，但右側預設展開所有 chips、physical audit 與 high-risk 列表，first peek 被診斷輸出淹沒。
-    - Console toolbar 同時使用 `consoleHeaderAction` 與通用 `icon` class，hover 時 icon foreground 被一般 icon selector 蓋過，沒有跟白底黑字一起反轉。
-    - White/Black hover 被分散寫在多個 control style，缺少共用 interaction role。
-  - 完成：
-    - EMS safety 改為預設收合的 `workspaceFoldHeader`，header 僅顯示 status 與 `Unsafe N`。
-    - 新增 `workspaceFoldHeader` / `workspaceFoldBody` 共用樣式，Dev page 補 fold header preview。
-    - 新增 `BrushActionInverseBackground` / `BrushActionInversePressedBackground` / `BrushActionInverseForeground` interaction role。
-    - Console header / console action / pad-info inverse hover 改用 interaction role，並加 console icon-specific hover override，避免被通用 icon style 蓋掉。
-  - 驗收：
-    - Simulation right pane 預設不顯示 EMS high-risk list；需要時才展開。
-    - Console toolbar hover 呈現 inverse state，icon 與文字都跟背景保持高對比。
-    - 新增/調整 control hover 不直接使用裸 `BrushWhite` / `BrushBlack` 作為互動語意。
+  - Root cause:
+    - EMS safety is a second-level diagnostic, but the right side expands all chips, physical audit, and high-risk lists by default, so the first peek is overwhelmed by diagnostic output.
+    - Console toolbar uses both `consoleHeaderAction` and the general `icon` class. On hover, the icon foreground is overridden by the general icon selector and does not invert together with the white background / black text.
+    - White/Black hover is scattered across multiple control styles with no shared interaction role.
+  - Completed:
+    - EMS safety changed to a collapsed-by-default `workspaceFoldHeader`. The header shows only status and `Unsafe N`.
+    - Added shared `workspaceFoldHeader` / `workspaceFoldBody` styles, and added a fold header preview to the Dev page.
+    - Added `BrushActionInverseBackground` / `BrushActionInversePressedBackground` / `BrushActionInverseForeground` interaction roles.
+    - Console header / console action / pad-info inverse hover now use interaction roles, with console icon-specific hover overrides to prevent the general icon style from overriding them.
+  - Acceptance:
+    - Simulation right pane does not show the EMS high-risk list by default; it expands only when needed.
+    - Console toolbar hover shows the inverse state, and icon and text both keep high contrast against the background.
+    - Newly added or adjusted control hovers no longer use bare `BrushWhite` / `BrushBlack` as interaction semantics.
 
 - [x] S12.024 UI action role unification pass
-  - 掃描根因：
-    - Console toolbar button 同時套 `consoleHeaderAction` 與通用 `icon`，導致 checked/hover selector 競爭，Dedup 這類 toggle 沒有穩定套用 inverse hover。
-    - Console collapse toggle 使用自訂 template 且 corner radius 固定為 `RadiusSm`，所以 hover 後看起來像方形，不符合 icon action 規則。
-    - DXF Overlap check 被標成 `workspacePrimaryAction`，但語意只是一般 check command，造成普通 button 與 primary button 混淆。
-    - Simulation Fit AA 使用 `panelToggle`，Coordinate Fit AA 使用 `coordinateOverlayAction`，同一種 canvas overlay action 分成兩套樣式。
-    - `panelToggle` 同時代表側欄 chrome 開關與畫布浮層按鈕，角色命名太寬，導致新畫布控件容易漏套一致樣式。
-  - 架構：
-    - `consoleHeaderAction` 是 terminal toolbar 專用 action，不能再混用通用 `icon`。
-    - `viewportOverlayAction` 是 canvas overlay icon/toggle 專用 role，Simulation / Coordinate Fit AA 共用。
-    - `panelChromeToggle` 是側欄 chrome 開關專用 role；舊 `panelToggle` 只保留為相容 alias。
-    - `panelAction` 是側欄普通動作；`workspacePrimaryAction` 只保留給真正高優先級流程動作。
-    - `BrushActionInverse*` 是 inverse hover/pressed 唯一入口，避免裸 White/Black 在控件間分散。
-  - 完成：
-    - Console action buttons 移除通用 `icon` class；checked hover / pressed 補 inverse foreground。
-    - Console collapse toggle 改用 `RadiusPill` template binding。
-    - DXF Overlap check 降回 neutral `panelAction iconTextButton workspaceActionButton`。
-    - Simulation / Coordinate viewport overlay Fit/toggle 改套 `viewportOverlayAction`，Dev page 補預覽。
-    - Freeform canvas overlay controls 改套 `viewportOverlayAction`；側欄 hide controls 改套 `panelChromeToggle`。
-  - 驗收：
-    - Dedup hover、console toggle hover、Simulation Fit AA、Coordinate Fit AA、DXF Overlap check 都走對應 action role。
+  - Scan root cause:
+    - Console toolbar buttons applied both `consoleHeaderAction` and the general `icon` class, causing checked/hover selector competition. Toggles like Dedup did not reliably apply the inverse hover.
+    - The console collapse toggle used a custom template with a fixed `RadiusSm` corner radius, so after hover it looked square, inconsistent with the icon action rules.
+    - DXF Overlap check was marked as `workspacePrimaryAction`, but its meaning is only a general check command, which made ordinary buttons and primary buttons look the same.
+    - Simulation Fit AA used `panelToggle`, while Coordinate Fit AA used `coordinateOverlayAction`, so the same canvas overlay action had two styles.
+    - `panelToggle` represented both sidebar chrome toggles and canvas overlay buttons. The role name was too broad, so new canvas controls easily missed the consistent style.
+  - Architecture:
+    - `consoleHeaderAction` is a terminal-toolbar-only action and must no longer be mixed with the general `icon`.
+    - `viewportOverlayAction` is the canvas overlay icon/toggle-specific role, shared by Simulation / Coordinate Fit AA.
+    - `panelChromeToggle` is the sidebar chrome toggle-specific role. The old `panelToggle` is kept only as a compatibility alias.
+    - `panelAction` is an ordinary sidebar action; `workspacePrimaryAction` is reserved only for truly high-priority workflow actions.
+    - `BrushActionInverse*` is the single entry point for inverse hover/pressed, avoiding bare White/Black scattered across controls.
+  - Completed:
+    - Console action buttons removed the general `icon` class. Checked hover / pressed now add inverse foreground.
+    - Console collapse toggle now uses the `RadiusPill` template binding.
+    - DXF Overlap check is downgraded back to neutral `panelAction iconTextButton workspaceActionButton`.
+    - Simulation / Coordinate viewport overlay Fit/toggle now use `viewportOverlayAction`, with previews added to the Dev page.
+    - Freeform canvas overlay controls use `viewportOverlayAction`. Sidebar hide controls use `panelChromeToggle`.
+  - Acceptance:
+    - Dedup hover, console toggle hover, Simulation Fit AA, Coordinate Fit AA, and DXF Overlap check all use their corresponding action roles.
 
-- [x] S12.009 Coordinate 3635 首屏 IA cleanup
-  - 目標：
-    - 使用 `example/BOE36.35/project_3635.json` 截圖確認 Coordinate 實際混亂來源。
-    - 不改演算法，先降低現有 tool 首屏混亂度。
-  - 完成：
-    - 左側改為 `Reference / Calibration / Artifacts / 4-point array` 四段式流程。
-    - 4-point array 未啟用時隱藏 8 個 corner raw 欄位。
-    - 右側新增 `ResultGroups` 投影，AA / BIST / Guides / Array 由同一 artifact group model 呈現。
-    - 文件補充 3635 Coordinate screen assessment。
-  - 後續：
-    - CSV/JSON/clipboard export 已於 S12.006 收斂；canvas handles 與 selected-handle inspector 已於 S12.007 / S12.016 收斂。
+- [x] S12.009 Coordinate 3635 first-screen IA cleanup
+  - Goal:
+    - Use the `example/BOE36.35/project_3635.json` screenshot to confirm the actual sources of confusion in Coordinate.
+    - Do not change the algorithm; first reduce the first-screen confusion of the existing tool.
+  - Completed:
+    - The left side changes to a four-section flow: `Reference / Calibration / Artifacts / 4-point array`.
+    - When 4-point array is not enabled, the 8 raw corner fields are hidden.
+    - The right side adds a `ResultGroups` projection. AA / BIST / Guides / Array are presented by the same artifact group model.
+    - The document adds a Coordinate screen assessment for 3635.
+  - Follow-up:
+    - CSV/JSON/clipboard export was converged in S12.006. Canvas handles and the selected-handle inspector were converged in S12.007 / S12.016.
 
 - [x] S12.010 Coordinate artifact table / modal / focus overlay cleanup
-  - 目標：
-    - 回應 3635 Coordinate 第二輪檢視：右側座標集中成單一可排序表格，避免多個 row card 疊出資訊牆。
-    - 表格列點擊後才開啟座標 detail modal，並同步 focus canvas artifact，讓右側保持可掃描。
-    - 中間 AA canvas 的快捷工具列改為 compact horizontal toolbar，overlay density 明確分成 `Focus / Essentials / All`。
-  - 完成：
-    - `CoordinatePlannerWorkspaceViewModel` 新增 `ArtifactRows`、排序命令、選取列、detail request event、overlay mode option。
-    - `CoordinatePlannerWorkspaceDetailsPaneView` 改為單一 coordinate table，欄位為 Artifact / Pixel / Machine / Safe。
-    - 新增 `CoordinateArtifactDetailWindow`，將完整 pixel / machine / safe / source / detail 移出右側常駐區。
-    - Canvas overlay 預設顯示 essentials；Focus mode 以選取 artifact 為彩色，其餘 overlay 灰階弱化。
-  - 後續：
-    - Recipe / export / canvas handle 已於 S12.005-S12.007 與 S12.016 收斂。
-  - 驗證：
+  - Goal:
+    - Respond to the second review of 3635 Coordinate: concentrate right-side coordinates into a single sortable table, avoiding a wall of stacked row cards.
+    - After a table row is clicked, open the coordinate detail modal, and sync focus to the canvas artifact so the right side stays scannable.
+    - Change the AA canvas quick toolbar in the middle to a compact horizontal toolbar, with overlay density clearly split into `Focus / Essentials / All`.
+  - Completed:
+    - `CoordinatePlannerWorkspaceViewModel` adds `ArtifactRows`, sort commands, selected row, detail request event, and overlay mode options.
+    - `CoordinatePlannerWorkspaceDetailsPaneView` is changed to a single coordinate table with columns Artifact / Pixel / Machine / Safe.
+    - Added `CoordinateArtifactDetailWindow`, moving full pixel / machine / safe / source / detail out of the permanent right-side area.
+    - Canvas overlay defaults to essentials. Focus mode colors the selected artifact, and other overlays are weakened to grayscale.
+  - Follow-up:
+    - Recipe / export / canvas handle were converged in S12.005-S12.007 and S12.016.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "CoordinatePlannerWorkspaceViewModelTests|WorkspaceViewsSmokeTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-    - 3635 visual check：`example/BOE36.35/project_3635.json` Coordinate table、row detail modal、Essentials overlay。
+    - 3635 visual check: `example/BOE36.35/project_3635.json` Coordinate table, row detail modal, Essentials overlay.
 
 - [x] S12.011 Coordinate first-peek simplification / guide reference mode
-  - 目標：
-    - Coordinate 預設把 Regular 當成低透明度背景，不顯示 row/column/IC 軸標籤，不套用 freeform / unmatched 視覺強調，降低首屏理解成本。
-    - Horizontal / Vertical guide 支援 `AA outline` 與 `Regular grid` 兩種參考基準，讓使用者可選擇用 CAD 外框內接矩形或 Regular table 生成。
-    - 將 calibration raw fields 預設收起，避免一進頁面就看到整面欄位牆。
-  - 完成：
-    - `PadCanvas` 新增 `ShowAxisLabels`，Coordinate canvas 預設關閉並提供 toolbar icon toggle；Regular layer 在 Coordinate 以 token 化低透明度呈現。
-    - 右上 canvas toolbar 的 fit/focus 與 toggle 使用同一個 compact style；unchecked 白底按鈕改為黑色 icon stroke，checked toggle 維持 accent fill。
-    - Horizontal guide 改用 green token，避免與 CAD / AA outline 的藍色過於接近。
-    - `CoordinatePlannerWorkspaceUseCase` 新增 guide basis，`CoordinatePlannerComputationService` 可用不同 `activeAreaBounds` / `guideBounds` 建 snapshot。
-    - Coordinate 左側新增 guide reference selector；calibration 改成按需展開。
-    - 文件補充 curved-surface 三軸座標為後續 recipe，不併入本切片。
-  - 驗證：
+  - Goal:
+    - By default, Coordinate treats Regular as a low-opacity background, does not show row/column/IC axis labels, and does not apply freeform / unmatched visual emphasis, reducing first-screen comprehension cost.
+    - Horizontal / Vertical guide supports two reference bases, `AA outline` and `Regular grid`, letting users choose whether to generate from the CAD outline inscribed rectangle or the Regular table.
+    - Collapse calibration raw fields by default, so the full field wall is not visible as soon as the page opens.
+  - Completed:
+    - `PadCanvas` adds `ShowAxisLabels`. Coordinate canvas turns it off by default and provides a toolbar icon toggle. Regular layer is presented at low opacity with tokens in Coordinate.
+    - The fit/focus and toggle in the upper-right canvas toolbar use the same compact style. Unchecked white-background buttons now use black icon strokes, and checked toggles keep the accent fill.
+    - Horizontal guide uses the green token, avoiding excessive similarity with the blue of CAD / AA outline.
+    - `CoordinatePlannerWorkspaceUseCase` adds guide basis. `CoordinatePlannerComputationService` can build snapshots with different `activeAreaBounds` / `guideBounds`.
+    - Coordinate left side adds a guide reference selector. Calibration is expanded on demand.
+    - The document notes that curved-surface three-axis coordinates are a later recipe and are not included in this slice.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "CoordinatePlannerWorkspaceViewModelTests|CoordinatePlannerWorkspaceUseCaseTests|CoordinatePlannerComputationServiceTests|PadCanvasViewRefreshTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
 
 - [x] S12.012 Coordinate artifact snapshot / copy-export tactical slice
-  - 目標：
-    - 將 Coordinate table rows 正式化為 Application 層 `CoordinateArtifactSnapshot`，避免 UI 重新組裝 pixel / machine / safe / world 座標。
-    - 在右側集中座標表格加入低干擾 Copy / CSV / JSON action，支援 1.0 後 tool handoff 與後續 Simulation path replay 串接。
-  - 完成：
-    - 新增 `CoordinateArtifactService`，同一份 artifact rows 投影供 UI table、detail modal、CSV、JSON、clipboard 使用。
-    - CSV / JSON 匯出包含 stable label/kind/recipe/geometry、pixel/machine/safe/world numeric columns、unit、source bounds、source/detail。
-    - Copy 預設複製目前選取 row；未選取時複製目前排序後的全部 table rows。
-    - Detail modal 補上 world coordinate 與 source bounds。
-  - 驗證：
+  - Goal:
+    - Formalize Coordinate table rows as the Application-layer `CoordinateArtifactSnapshot`, preventing the UI from reassembling pixel / machine / safe / world coordinates.
+    - Add low-interference Copy / CSV / JSON actions to the right-side centralized coordinate table, supporting post-1.0 tool handoff and later Simulation path replay linkage.
+  - Completed:
+    - Added `CoordinateArtifactService`. The same artifact rows are projected for the UI table, detail modal, CSV, JSON, and clipboard.
+    - CSV / JSON exports include stable label/kind/recipe/geometry, pixel/machine/safe/world numeric columns, unit, source bounds, and source/detail.
+    - Copy defaults to copying the currently selected row. When nothing is selected, it copies all currently sorted table rows.
+    - Detail modal adds world coordinate and source bounds.
+  - Verification:
     - `CoordinateArtifactServiceTests`
     - `CoordinatePlannerWorkspaceViewModelTests`
 
 - [x] S12.013 Coordinate guide generation mode expansion
-  - 目標：
-    - H/V guide 不只支援 count，也支援 pitch / spacing、explicit position list、edge inset。
-    - Copy selected / Copy all 在 UI 上明確分開，避免「有選取時 copy selected、未選取時 copy all」造成理解落差。
-  - 完成：
-    - `CoordinatePlannerRequest` 新增 `CoordinateGuideGenerationMode`、pitch、inset、explicit position list。
-    - `CoordinatePlannerComputationService` 以同一計算路徑產生 count / pitch / explicit guide lines。
-    - Coordinate 左側 Artifacts 區分別設定 horizontal / vertical guide generation mode；右側 table action 分為 Copy row / Copy all / CSV / JSON。
-  - 驗證：
+  - Goal:
+    - H/V guide supports not only count, but also pitch / spacing, explicit position list, and edge inset.
+    - Copy selected / Copy all are clearly separated in the UI, avoiding the comprehension gap of "copy selected when something is selected, otherwise copy all."
+  - Completed:
+    - `CoordinatePlannerRequest` adds `CoordinateGuideGenerationMode`, pitch, inset, and explicit position list.
+    - `CoordinatePlannerComputationService` generates count / pitch / explicit guide lines through the same computation path.
+    - Coordinate left-side Artifacts section sets horizontal / vertical guide generation modes separately. Right-side table actions are split into Copy row / Copy all / CSV / JSON.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "CoordinatePlannerComputationServiceTests|CoordinatePlannerWorkspaceViewModelTests|CoordinatePlannerWorkspaceUseCaseTests|CoordinateArtifactServiceTests|WorkspaceViewsSmokeTests"`
 
 - [x] S12.014 Coordinate custom point/path recipe + surface transform model
-  - 目標：
-    - 讓使用者能用左側 tool 建立自訂點與 path，並讓它們進入同一 artifact table/export path。
-    - 曲面三軸座標先做 spec + data model，不先綁 UI。
-  - 完成：
-    - 新增 `CoordinateCustomPointRequest` / `CoordinateCustomPathRequest`，custom recipe 仍由 `CoordinatePlannerComputationService` 計算。
-    - Artifact snapshot 會輸出 custom point、custom path line、path step rows。
-    - 新增 `CoordinateSurfaceProfile` / `CoordinateSurfacePoint` / `CoordinateSurfaceTransformService`，定義 `ArcLength` 與 `Projection` 兩種 cylindrical mapping。
-    - 補充 `docs/reference/coordinate-surface-transform.md`。
-  - 驗證：
+  - Goal:
+    - Let users create custom points and paths with the left-side tool, and have them enter the same artifact table/export path.
+    - For curved-surface three-axis coordinates, do the spec and data model first, without binding UI yet.
+  - Completed:
+    - Added `CoordinateCustomPointRequest` / `CoordinateCustomPathRequest`. Custom recipes are still computed by `CoordinatePlannerComputationService`.
+    - The artifact snapshot outputs custom point, custom path line, and path step rows.
+    - Added `CoordinateSurfaceProfile` / `CoordinateSurfacePoint` / `CoordinateSurfaceTransformService`, defining `ArcLength` and `Projection` cylindrical mappings.
+    - Added `docs/reference/coordinate-surface-transform.md`.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "CoordinatePlannerComputationServiceTests|CoordinatePlannerWorkspaceViewModelTests|CoordinateArtifactServiceTests|CoordinateSurfaceTransformServiceTests|WorkspaceViewsSmokeTests"`
 
 
-## Beta 0.9（AutoCAD 驗證前待追）
+## Beta 0.9 (To Follow Up Before AutoCAD Verification)
 
-- [x] S11.172 CurrentGain 邊界 EMS 超標原因收斂與策略決策
-  - 觀察：
-    - 3635 uniform 400 + CurrentGain + Regular Visibility Mask 下，左右邊界仍有少數 pad 超過 EMS cap 480，max 約 500。
-    - 目前診斷顯示不是 FW diff / CAD output diff 混用，而是邊界連鎖 net-flow：高 `ToRegular` source 自身保留高比例，同時又承接相鄰 source 的 incoming leg，局部 coverage 會超過 120%。
-  - 變更：
-    - 新增 `Boundary virtual-area cap`：ToFull 虛擬外延面積進入 Stage3 gain/allocation 前，先限制為 inside overlap 的指定倍率。
-    - 新增 `Target coverage guard`：CurrentGain canonical rows 選定後，統計每個 target FW diff 的 retained/incoming coverage；超過 cap（預設 120%）時，按比例縮小該 target 的 retained/leg 百分比，避免 uniform 400 超過 EMS 480。
-    - Settings > Step 3 已加入兩個可開關補償項，C export metadata 同步記錄產生策略。
-  - 驗證：
-    - 3635 uniform 400 + CurrentGain + Regular Visibility Mask：未開 target guard 時 max=500 / violations=8；開 target guard 120% 後 max=476 / violations=0。
-    - `Boundary virtual-area cap` 單獨開啟仍 max=500，確認邊緣 EMS 主因是 target coverage stacking，不是單純 ToFull 虛擬面積。
+- [x] S11.172 Converge the cause of CurrentGain boundary EMS overruns and decide the policy
+  - Observation:
+    - Under 3635 uniform 400 + CurrentGain + Regular Visibility Mask, a few pads on the left and right boundaries still exceed the EMS cap of 480, with max around 500.
+    - Current diagnostics show this is not FW diff / CAD output diff mixing, but boundary chained net-flow: high-`ToRegular` source keeps a high proportion itself, while also receiving incoming legs from adjacent sources, so local coverage exceeds 120%.
+  - Changes:
+    - Added `Boundary virtual-area cap`: before ToFull virtual outer-extension area enters Stage3 gain/allocation, it is limited to a specified multiple of the inside overlap.
+    - Added `Target coverage guard`: after CurrentGain canonical rows are selected, retained/incoming coverage is counted for each target FW diff. If it exceeds the cap (default 120%), the retained/leg percentages for that target are scaled down proportionally, so uniform 400 does not exceed EMS 480.
+    - Settings > Step 3 adds two toggleable compensation items, and C export metadata records the generation strategy.
+  - Verification:
+    - 3635 uniform 400 + CurrentGain + Regular Visibility Mask: without target guard, max=500 / violations=8; with target guard at 120%, max=476 / violations=0.
+    - With only `Boundary virtual-area cap` enabled, max is still 500, confirming that the main edge EMS cause is target coverage stacking, not simply ToFull virtual area.
 
-## Beta 0.10（Simulation 驗證平台）
+## Beta 0.10 (Simulation Verification Platform)
 
-- [x] S11.174 Simulation 輸入契約顯示與 Manual uniform preset
-  - 目標：
-    - 明確區分 Manual / CSV 是 regular/FW memory frame input，Copper 是 CAD physical overlap input。
-    - Manual 模式提供常用 uniform preset，快速切換 400 / 360 / 0 驗證。
-  - 驗證：
-    - VM 測試鎖定輸入契約文案與 Manual preset 會清除 override 並重建 simulation。
+- [x] S11.174 Simulation input contract display and Manual uniform preset
+  - Goal:
+    - Clearly distinguish that Manual / CSV are regular/FW memory frame input, while Copper is CAD physical overlap input.
+    - Manual mode provides common uniform presets for quickly switching among 400 / 360 / 0 validation.
+  - Verification:
+    - VM tests lock the input-contract wording and confirm that the Manual preset clears override and rebuilds the simulation.
 
 - [x] S11.175 CSV orientation / shape inspector
-  - 目標：
-    - 顯示 Xch/Ych、row origin、top-row 映射、compatible frame count，避免 CSV 上下顛倒或 IC 區域誤判。
-    - 匯入後提供 Before preview summary，讓使用者先確認 CSV 是 FW/tool rectangular diff frame，不是 CAD physical overlap。
-  - 變更：
-    - Simulation Input 的 CSV 模式新增 shape inspector，顯示 declared Xch/Ych、detected frame shape、row-origin mapping、compatible frame count 與 selected-frame Before range/avg。
-    - 每個 CSV file chip 顯示 compatible count 與 shape summary。
+  - Goal:
+    - Show Xch/Ych, row origin, top-row mapping, and compatible frame count, to avoid CSV being flipped vertically or IC regions being misjudged.
+    - After import, provide a Before preview summary, letting users first confirm that the CSV is FW/tool rectangular diff frame input, not CAD physical overlap.
+  - Changes:
+    - The Simulation Input CSV mode adds a shape inspector showing declared Xch/Ych, detected frame shape, row-origin mapping, compatible frame count, and selected-frame Before range/avg.
+    - Each CSV file chip shows compatible count and shape summary.
 
 - [x] S11.176 Copper sweep / path replay
-  - 目標：
-    - 讓銅柱沿指定路徑自動掃描，記錄每一點的 Max After / EMS violations / worst diff。
-    - 用於驗證邊緣與 notch 區，不依賴手動滑鼠觀察。
-  - 完成：
-    - 新增 `SimulationWorkspaceUseCase.ReplayCopperPath(...)`，每個 path step 皆走 `BuildCopperDataset -> BuildSnapshot -> SimulationSafetyAuditService.Analyze(...)` shared path。
-    - `CopperPillarPathReplayResult` 記錄 step center、Max After、EMS violation count、worst REG/IC/FW Diff、net-flow residual count 與 target coverage risk count。
-    - `SimulationWorkspaceViewModel.ReplayCopperPath(...)` 提供 UI/測試可呼叫入口與 replay summary。
-  - 驗證：
+  - Goal:
+    - Let the copper pillar automatically scan along a specified path, recording Max After / EMS violations / worst diff at each point.
+    - Used to validate edge and notch regions without relying on manual mouse observation.
+  - Completed:
+    - Added `SimulationWorkspaceUseCase.ReplayCopperPath(...)`. Every path step goes through the shared `BuildCopperDataset -> BuildSnapshot -> SimulationSafetyAuditService.Analyze(...)` path.
+    - `CopperPillarPathReplayResult` records step center, Max After, EMS violation count, worst REG/IC/FW Diff, net-flow residual count, and target coverage risk count.
+    - `SimulationWorkspaceViewModel.ReplayCopperPath(...)` provides an entry point callable by UI/tests, along with a replay summary.
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "SimulationSafetyAuditServiceTests|SimulationWorkspaceViewModelTests|FreeformHelperViewModelTests"`
 
 - [x] S11.177 C# simulation vs exported C runtime parity test
-  - 目標：
-    - 用相同 Before frame 驗證 C# simulation 與 exported C output 的 After 完全一致。
-    - 作為 beta0.10 export handoff gate。
-  - 完成：
+  - Goal:
+    - Use the same Before frame to verify that the C# simulation and exported C output produce exactly identical After results.
+    - Serve as the beta0.10 export handoff gate.
+  - Completed:
     - `NotchTableExporterTests.ExportAsCInitializer_GccRuntimeMatchesCSharpSimulationForV22_WhenGccIsAvailable`
     - `NotchTableExporterTests.ExportAsCInitializer_GccRuntimeMatchesCSharpSimulationForV21_WhenGccIsAvailable`
-    - 已確認 exporter 產出的 C code 可透過 gcc runtime harness 與 C# `NotchApplySimulationService` 逐點比對。
-  - 驗證：
+    - Confirmed that C code produced by the exporter can be compared point-by-point with C# `NotchApplySimulationService` through a gcc runtime harness.
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~NotchTableExporterTests|FullyQualifiedName~NotchV22CompensationServiceTests|FullyQualifiedName~NotchTableGeneratorTests" /p:UseAppHost=false`
 
 
-## Release 1.0 gate（2026-04-30 掃描）
+## Release 1.0 gate (2026-04-30 Scan)
 
-- [x] S11.178 TODO pending detector 格式漂移修正
-  - 觀察依據：
-    - `pwsh .agents/skills/repo-optimizer-loop/scripts/list_pending_todo.ps1 -TodoPath TODO.md` 目前回報 `No unchecked TODO items found.`。
-    - 但 `Select-String -Path TODO.md -Pattern '^\s*- \[ \]'` 可找到多個未勾項，因為 helper 只匹配 `- [ ] **...**` 格式，與目前 `- [ ] S11.xxx ...` 格式不一致。
-  - 範圍：
+- [x] S11.178 Fix TODO pending detector format drift
+  - Basis for observation:
+    - `pwsh .agents/skills/repo-optimizer-loop/scripts/list_pending_todo.ps1 -TodoPath TODO.md` currently reports `No unchecked TODO items found.`
+    - However, `Select-String -Path TODO.md -Pattern '^\s*- \[ \]'` can find multiple unchecked items, because the helper only matches `- [ ] **...**` format, which is inconsistent with the current `- [ ] S11.xxx ...` format.
+  - Scope:
     - `.agents/skills/repo-optimizer-loop/scripts/list_pending_todo.ps1`
-    - `TODO.md` 未勾任務格式契約。
-  - 驗收：
-    - `pwsh .agents/skills/repo-optimizer-loop/scripts/list_pending_todo.ps1 -TodoPath TODO.md` 能列出目前未勾 S11 任務，或明確改名/文件化為只支援 bold task。
-    - helper 結果需與 manual unchecked search 對齊，不再誤導 release gate。
-  - Done condition：
-    - tag 前 checklist 不會因 TODO helper 漂移而漏掉中高風險未完成項。
-  - 完成：
-    - `list_pending_todo.ps1` 已支援 `- [ ] **bold**` 與 `- [ ] plain` 兩種 task title 格式。
-    - helper 結果已與 `Select-String -Path TODO.md -Pattern '^\s*- \[ \]'` 的 unchecked count 對齊。
-  - 驗證：
+    - The unchecked task format contract in `TODO.md`.
+  - Acceptance:
+    - `pwsh .agents/skills/repo-optimizer-loop/scripts/list_pending_todo.ps1 -TodoPath TODO.md` can list the currently unchecked S11 tasks, or is explicitly renamed/documented as supporting only bold tasks.
+    - Helper results must align with the manual unchecked search and no longer mislead the release gate.
+  - Done condition:
+    - The pre-tag checklist will not miss medium- or high-risk incomplete items due to TODO helper drift.
+  - Completed:
+    - `list_pending_todo.ps1` now supports both `- [ ] **bold**` and `- [ ] plain` task title formats.
+    - Helper results have been aligned with the unchecked count from `Select-String -Path TODO.md -Pattern '^\s*- \[ \]'`.
+  - Verification:
     - `pwsh .agents/skills/repo-optimizer-loop/scripts/list_pending_todo.ps1 -TodoPath TODO.md`
 
 
-## Beta 0.5（Notch 單一路徑重構補充）
+## Beta 0.5 (Notch Single-Path Refactor Supplement)
 
-- [x] S11.121 v2.1/v2.2 改為同一演算法來源（v2.2 canonical），v2.1 僅保留輸出格式投影
-  - 變更：
-    - `CadAllocation` 生成路徑改為先產生 v2.2 canonical rows，再投影出 v2.1 rows。
-    - 取消 `CadAllocation` 下 v2.1 直接走 legacy strategy 的雙路徑來源，避免結果漂移。
-  - 驗證：
-    - 新增 simulation 等價測試，鎖定同 canonical payload 下 v2.1/v2.2 輸出一致。
+- [x] S11.121 Make v2.1/v2.2 use the same algorithm source (v2.2 canonical); v2.1 keeps only the output format projection
+  - Changes:
+    - The `CadAllocation` generation path now first produces v2.2 canonical rows, then projects them into v2.1 rows.
+    - Removed the dual path where v2.1 under `CadAllocation` went directly through the legacy strategy, avoiding result drift.
+  - Verification:
+    - Added simulation equivalence tests locking that v2.1/v2.2 outputs are identical under the same canonical payload.
 
-- [x] S11.122 C 匯出改為 N 顆 IC 動態陣列索引格式（可用 `icIdx` 直接 access）
-  - 變更：
-    - 匯出新增 `PRI_NHC_IC_COUNT` 與 `ST_PRI_NHC_TABLE_IC_RANGE(offset,count)`。
-    - v2.1/v2.2 均改為「扁平節點池 + 每顆 IC range」結構，支援中間 IC 無資料時 `count=0`。
-  - 驗證：
-    - 新增 sparse IC 測試（例如只存在 IC0/IC2），確認最終仍輸出 N 顆 IC range。
+- [x] S11.122 Change C export to an N-IC dynamic array index format (`icIdx` can be used to access directly)
+  - Changes:
+    - Export adds `PRI_NHC_IC_COUNT` and `ST_PRI_NHC_TABLE_IC_RANGE(offset,count)`.
+    - v2.1/v2.2 both move to a structure of "flat node pool + per-IC range," supporting `count=0` when an intermediate IC has no data.
+  - Verification:
+    - Added sparse IC tests (for example, only IC0/IC2 present), confirming that the final output still includes N IC ranges.
 
-- [x] S11.123 CadAllocation canonical 產生改為 per-IC anchor，並納入 `ToFull ∪ Freeform` 輸出門檻
-  - 變更：
-    - `NotchTableGenerator` 由每個 CAD 僅產一個 anchor，調整為依 `IcIndices` 逐 IC 建立 candidate。
-    - anchor fallback 放寬為：`matched+freeform -> matched -> freeform -> any`，避免非 freeform 場景直接被排除。
-    - v2.2 leg 過濾條件改為 `PassesStrictThreshold || ToFullAppliedRegularCount > 0`，確保 ToFull 影響區可進表。
-    - 非 freeform anchor 僅在該 IC 有 ToFull 影響時才允許輸出，避免無效噪音列。
-  - 驗證：
-    - 補測試：跨 IC CAD 需輸出每顆 IC 的 row。
-    - 補測試：非 freeform anchor 在 ToFull 生效時仍可輸出。
+- [x] S11.123 Make CadAllocation canonical generation use a per-IC anchor, and include the `ToFull ∪ Freeform` output threshold
+  - Changes:
+    - `NotchTableGenerator` changed from producing one anchor per CAD to creating candidates per IC through `IcIndices`.
+    - Anchor fallback is relaxed to: `matched+freeform -> matched -> freeform -> any`, avoiding direct exclusion of non-freeform scenarios.
+    - The v2.2 leg filter condition changed to `PassesStrictThreshold || ToFullAppliedRegularCount > 0`, ensuring ToFull-affected regions can enter the table.
+    - Non-freeform anchors are allowed to output only when that IC is affected by ToFull, avoiding invalid noise rows.
+  - Verification:
+    - Added test: cross-IC CAD must output a row for each IC.
+    - Added test: non-freeform anchors can still output when ToFull is applied.
 
-- [x] S11.124 加入「ToFull coverage 自動檢查」報告（`T ⊆ emittedDiffs`）
-  - 目標：
-    - 在生成流程或驗證流程提供缺漏清單，明確列出 ToFull 影響 diff 是否未被 Step5 rows 覆蓋。
-  - 驗證：
-    - `notch-golden-baseline.json` 與 `tm81-notch-acceptance-matrix.json` 已收錄 current workflow 下的 `toFullCoverage` report。
-    - 目前 `3635` / `TM8.1` snapshot 都顯示 `hasExpectations=false`，表示現行案例沒有 ToFull target-diff coverage 需求。
-    - `NotchTableGeneratorTests.BuildToFullCoverageAudit_ReportsMissingTargetDiffsAcrossIcBuckets_WhenCanonicalRowsDoNotCoverAllToFullLegs` 補足跨 diff / 跨 IC 的正向 synthetic case。
+- [x] S11.124 Add a "ToFull coverage automatic check" report (`T ⊆ emittedDiffs`)
+  - Goal:
+    - Provide a missing-items list in the generation or validation flow, explicitly showing whether ToFull-affected diffs are not covered by Step5 rows.
+  - Verification:
+    - `notch-golden-baseline.json` and `tm81-notch-acceptance-matrix.json` now contain the `toFullCoverage` report under the current workflow.
+    - The current `3635` / `TM8.1` snapshots both show `hasExpectations=false`, meaning the current cases have no ToFull target-diff coverage requirement.
+    - `NotchTableGeneratorTests.BuildToFullCoverageAudit_ReportsMissingTargetDiffsAcrossIcBuckets_WhenCanonicalRowsDoNotCoverAllToFullLegs` adds a positive synthetic case across diffs / across ICs.
 
-- [x] S11.125 Workflow 主路徑調整：Step2 完成後直接導向 Step5（Step3/4 保留 debug）
-  - 變更：
-    - `WorkflowPipelineService.TryGetNextStepOnSuccess`：`Step2 -> Step5`。
-    - 移除 Step3 視圖中的手動「Recompute focused CAD (Step 3)」按鈕。
-  - 驗證：
-    - `WorkflowPipelineServiceTests` 更新 next-step 契約並通過。
+- [x] S11.125 Workflow main path adjustment: after Step2 completes, go directly to Step5 (Step3/4 are kept for debug)
+  - Changes:
+    - `WorkflowPipelineService.TryGetNextStepOnSuccess`: `Step2 -> Step5`.
+    - Removed the manual "Recompute focused CAD (Step 3)" button from the Step3 view.
+  - Verification:
+    - `WorkflowPipelineServiceTests` updated the next-step contract and passes.
 
-- [x] S11.126 Simulation prewarm 降噪：未建立 workspace 前不做背景重算
-  - 變更：
-    - `SimulationHostViewModel.PrewarmWorkspaceAsync` 新增 guard：`CurrentWorkspace is null` 時直接 return。
-    - 避免 project load / source revision 期間出現未進入 Simulation 也先跑 20+ 秒重算。
-  - 驗證：
-    - `SimulationHostViewModelTests` 新增 `WorkspaceIsMissing_DoesNotInvokeRequest`。
-    - `ShellViewModelSimulationTests` 更新為「無 workspace 不自動 prewarm」。
+- [x] S11.126 Reduce Simulation prewarm noise: no background recomputation before a workspace is built
+  - Changes:
+    - `SimulationHostViewModel.PrewarmWorkspaceAsync` adds a guard: when `CurrentWorkspace is null`, it returns directly.
+    - Avoids 20+ seconds of background recomputation during project load / source revision before entering Simulation.
+  - Verification:
+    - `SimulationHostViewModelTests` adds `WorkspaceIsMissing_DoesNotInvokeRequest`.
+    - `ShellViewModelSimulationTests` is updated to "no automatic prewarm without a workspace."
 
-- [x] S11.127 Simulation source-change debounce：多次連續 revision 只重建最後一次
-  - 觀察：
-    - 在已開啟 Simulation 且 source 快速連續變動（如載入後套 mask/repair）時，仍可能連續觸發多次重建。
-  - 目標：
-    - 引入短暫 debounce 或 coalescing，確保短時間 burst 事件只執行最後一次重建。
-  - 驗證：
-    - 以 3635 重放載入流程，確認重建次數下降且最終 row 與現況一致。
-  - 完成：
-    - `ShellViewModel` 加入 source-change drain/coalescing；事件 burst 只保留最後一次 prewarm。
-    - 補測試：`WorkspaceSourceChanges_BurstOnlyPrewarmsOnce`。
+- [x] S11.127 Simulation source-change debounce: rebuild only the last of several consecutive revisions
+  - Observation:
+    - When Simulation is already open and the source changes rapidly and continuously (for example, applying mask/repair after loading), repeated rebuilds may still be triggered several times.
+  - Goal:
+    - Introduce a short debounce or coalescing, ensuring that a burst of events in a short period runs only the last rebuild.
+  - Verification:
+    - Replay the 3635 load flow, confirm that the rebuild count drops and the final rows match the current state.
+  - Completed:
+    - `ShellViewModel` adds source-change drain/coalescing; a burst of events keeps only the last prewarm.
+    - Added test: `WorkspaceSourceChanges_BurstOnlyPrewarmsOnce`.
 
-- [x] S11.128 Load Project 期間延後來源通知：完成後只發一次 revision
-  - 變更：
-    - `ApplyLoadedProjectStateAsync` 以 batch scope 包住整段載入/重建/replay，避免中途連續通知觸發背景重算。
-  - 驗證：
-    - 3635 重放時，project load 階段不再出現多次來源變更連鎖 prewarm。
+- [x] S11.128 Defer source notifications during Load Project: send only one revision after completion
+  - Changes:
+    - `ApplyLoadedProjectStateAsync` wraps the entire load/rebuild/replay section in a batch scope, preventing mid-load notifications from triggering background recomputation.
+  - Verification:
+    - During 3635 replay, the project load phase no longer shows multiple chained prewarms from source changes.
 
-- [x] S11.129 Notch canonical 候選建構 per-CAD 平行化（輸出保持一致）
-  - 變更：
-    - `GenerateCadAllocationCompatible` 將 v2.2 canonical 候選建構拆成平行階段，再以 deterministic 合併回主流程。
-    - `CadAllocationProfile` 攜帶預先計算 allocations，避免平行階段讀寫共享 memo。
-  - 驗證：
-    - `NotchTableGenerator` 既有測試持續通過，輸出 row 不變、生成時間下降。
+- [x] S11.129 Parallelize Notch canonical candidate building per CAD (the output stays the same)
+  - Changes:
+    - `GenerateCadAllocationCompatible` splits v2.2 canonical candidate construction into a parallel stage, then merges back deterministically into the main flow.
+    - `CadAllocationProfile` carries precomputed allocations, preventing the parallel stage from reading and writing a shared memo.
+  - Verification:
+    - Existing `NotchTableGenerator` tests continue to pass, output rows are unchanged, and generation time decreases.
 
-- [x] S11.130 Simulation active surface 改為遵循 SeeRegular mask（manual Global Value 不再覆蓋 inactive diff）
-  - 變更：
-    - `CreateSimulationWorkspaceSessionAsync` 改為優先使用 `WorkflowDataSnapshot.ActiveRegularSignalMaskPadIds` 建立 `ActiveRegularPadIds`。
-    - 只有在未載入或未啟用 mask 時，才 fallback 成 full regular set。
-  - 驗證：
-    - `CreateSimulationWorkspaceSessionAsync_BuildsSimulationWorkspaceFor3635`（無 mask：仍 full set）。
-    - `CreateSimulationWorkspaceSessionAsync_WhenRegularMaskEnabled_UsesMaskLimitedActiveSet`（有 mask：active set 小於 full set）。
+- [x] S11.130 Make the Simulation active surface follow the SeeRegular mask (manual Global Value no longer overrides inactive diff)
+  - Changes:
+    - `CreateSimulationWorkspaceSessionAsync` now prioritizes `WorkflowDataSnapshot.ActiveRegularSignalMaskPadIds` to build `ActiveRegularPadIds`.
+    - Only when unloaded or when no mask is enabled does it fall back to the full regular set.
+  - Verification:
+    - `CreateSimulationWorkspaceSessionAsync_BuildsSimulationWorkspaceFor3635` (no mask: still full set).
+    - `CreateSimulationWorkspaceSessionAsync_WhenRegularMaskEnabled_UsesMaskLimitedActiveSet` (with mask: active set smaller than full set).
 
 
-## Beta 0.5（Notch 流程重構切片，從此處開始）
+## Beta 0.5 (Notch Flow Refactor Slices, Starts Here)
 
-- [x] S11.131 建立重構起點 marker 與切片記錄檔
-  - 重構起點 marker：
+- [x] S11.131 Create refactor start marker and slice record file
+  - Refactor start marker:
     - `BETA05-NOTCH-REFACTOR-START-2026-04-19`
-  - 記錄檔：
+  - Record file:
     - `docs/core/notch-beta05-refactor-slices.md`
-  - 後續 commit 要求：
-    - commit body 必須包含：
+  - Commit requirements:
+    - The commit body must include:
       - `Refactor-Start: BETA05-NOTCH-REFACTOR-START-2026-04-19`
       - `Refactor-Slice: S11.xxx`
       - `Refactor-Record: docs/core/notch-beta05-refactor-slices.md`
       - `Change-Items: ...`
 
-- [x] S11.132 收斂 Workflow Snapshot（單次建構 + 多處共用）
-  - 目標：
-    - `BuildWorkflowDataSnapshot()` 改為 revision-aware cache，避免同一輪操作重複 `ToFrozenDictionary()`。
-    - 明確定義 snapshot invalidation 來源（match/override/mask/layer filter/grid rebuild）。
-  - 目前進度（2026-04-19）：
-    - 已導入 `WorkflowDataSnapshot` 快取（valid/invalid state）。
-    - 已收斂失效入口：
-      - Step1 match 結果更新。
-      - Step4 visible index / assignment decisions 重建。
-      - SeeRegular mask 載入與 enabled 切換。
-      - Load Project 替換 `_projectFile`。
-    - 已移除舊的「直接 field 賦值」路徑（改由 `SetLatestPadMatchResult` / `SetLatestVisibleIndexAssignmentDecisions` 統一入口）。
-  - 完成（2026-04-30）：
-    - `BuildWorkflowDataSnapshot()` 改為 revision-aware cache；cache hit 不重建 frozen dictionaries。
-    - `InvalidateWorkflowDataSnapshot()` 會推進 revision，確保 match / layer / visibility / project-load 入口清 cache 後下一次建構可追蹤。
-    - 新增 `WorkflowDataSnapshotRevision` / `WorkflowDataSnapshotBuildCount` internal diagnostics 與快取重用測試。
-  - 驗證：
+- [x] S11.132 Consolidate Workflow Snapshot (build once, share in many places)
+  - Goal:
+    - Change `BuildWorkflowDataSnapshot()` to a revision-aware cache, so the same operation does not repeat `ToFrozenDictionary()`.
+    - Define the snapshot invalidation sources clearly (match/override/mask/layer filter/grid rebuild).
+  - Current progress (2026-04-19):
+    - Introduced a `WorkflowDataSnapshot` cache (valid/invalid state).
+    - Consolidated invalidation entry points:
+      - Step1 match result update.
+      - Step4 visible index / assignment decisions rebuild.
+      - SeeRegular mask load and enabled toggle.
+      - Load Project replaces `_projectFile`.
+    - Removed the old direct field assignment path. Updates now go through `SetLatestPadMatchResult` / `SetLatestVisibleIndexAssignmentDecisions`.
+  - Completed (2026-04-30):
+    - `BuildWorkflowDataSnapshot()` is now revision-aware cached. A cache hit does not rebuild frozen dictionaries.
+    - `InvalidateWorkflowDataSnapshot()` advances the revision, so after match / layer / visibility / project-load entry points clear the cache, the next build can be tracked.
+    - Added internal diagnostics `WorkflowDataSnapshotRevision` / `WorkflowDataSnapshotBuildCount` and cache reuse tests.
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "SimulationSafetyAuditServiceTests|SimulationWorkspaceViewModelTests|FreeformHelperViewModelTests"`
-    - 3635 project 載入 + Step2/Step5/Simulation，snapshot build 次數顯著下降。
+    - 3635 project load + Step2/Step5/Simulation. Snapshot build count drops significantly.
 
-- [x] S11.133 建立 Diff Identity Pipeline（Raw/Visible/Projected 單一契約）
-  - 目標：
-    - 將 `raw diff -> visible diff -> notch row anchor/target` 的投影規則收斂到單一 pipeline model。
-    - 將衝突策略（同 raw diff 對應多 visible diff）明確化並可追蹤。
-  - 驗證：
-    - `NotchCurrentVisibleDiffProjectionService` 與 simulation 消費同一 identity 契約，避免雙重判斷。
-  - 完成：
-    - 新增 `NotchDiffIdentityPipeline`，集中：
-      - `raw -> visible` 映射、衝突 key 收斂與 target diff 投影。
-      - simulation active diff baseline（duplicate diff key 的 primary/suppressed 決策）。
-    - `NotchCurrentVisibleDiffProjectionService` 改為消費 pipeline 契約，並在結果回傳 `ConflictedRawDiffKeyCount`。
-    - `NotchApplySimulationService` 改為透過 pipeline 取得 diff baseline，保留既有 duplicate diagnostics 語意。
-    - 補測試：`NotchDiffIdentityPipelineTests`，並擴充 projection 測試覆蓋 conflicted raw diff count。
+- [x] S11.133 Build Diff Identity Pipeline (single Raw/Visible/Projected contract)
+  - Goal:
+    - Consolidate the projection rules of `raw diff -> visible diff -> notch row anchor/target` into one pipeline model.
+    - Make the conflict strategy (multiple visible diffs for the same raw diff) explicit and traceable.
+  - Verification:
+    - `NotchCurrentVisibleDiffProjectionService` and simulation use the same identity contract, avoiding double judgment.
+  - Completed:
+    - Added `NotchDiffIdentityPipeline`, which centralizes:
+      - `raw -> visible` mapping, conflict key consolidation, and target diff projection.
+      - Simulation active diff baseline (primary/suppressed decision for duplicate diff keys).
+    - `NotchCurrentVisibleDiffProjectionService` now consumes the pipeline contract and returns `ConflictedRawDiffKeyCount` in the result.
+    - `NotchApplySimulationService` gets the diff baseline through the pipeline, keeping the existing duplicate diagnostics semantics.
+    - Added tests: `NotchDiffIdentityPipelineTests`, and extended projection tests to cover the conflicted raw diff count.
 
-- [x] S11.134 Notch 生成流程 orchestration 重構（不改數學結果）
-  - 目標：
-    - `GenerateCadAllocationCompatible` 的流程拆成可測試 stage（candidate build / select / serialize / export projection）。
-    - 保留演算法輸出不變，只重構流程責任邊界與 trace。
-  - 驗證：
-    - 既有 `NotchTableGenerator` 測試全通過，並新增 stage-level regression 測試。
-  - 完成：
-    - `GenerateCadAllocationCompatible` 拆分為明確 orchestration stage：
-      - context build（含 candidate build 先決資料）。
-      - legacy-compatible rows append（非 v2.1/v2.2 strategy）。
-      - canonical row build（v2.2 diff-centric）。
-      - compatibility export append（v2.2 直出 / v2.1 投影）。
-    - 新增 `CadAllocationGenerationContext`，將 stage 間共享資料顯式化，降低主流程方法複雜度。
-    - `ProjectV22RowsToV21Rows` 參數型別改為 `IReadOnlyList<NotchTableRow>`，移除不必要 list 複製。
+- [x] S11.134 Refactor Notch generation flow orchestration (math results unchanged)
+  - Goal:
+    - Split the flow of `GenerateCadAllocationCompatible` into testable stages (candidate build / select / serialize / export projection).
+    - Keep algorithm output unchanged. Only refactor the flow responsibility boundaries and trace.
+  - Verification:
+    - Existing `NotchTableGenerator` tests all pass, and stage-level regression tests are added.
+  - Completed:
+    - Split `GenerateCadAllocationCompatible` into explicit orchestration stages:
+      - Context build (including the required input data for candidate build).
+      - Legacy-compatible rows append (non v2.1/v2.2 strategy).
+      - Canonical row build (v2.2 diff-centric).
+      - Compatibility export append (v2.2 direct output / v2.1 projection).
+    - Added `CadAllocationGenerationContext` to make data shared between stages explicit and reduce the complexity of the main flow method.
+    - Changed the parameter type of `ProjectV22RowsToV21Rows` to `IReadOnlyList<NotchTableRow>`, removing an unnecessary list copy.
 
-- [x] S11.135 Simulation 契約收斂（重複 diff 抑制與來源說明）
-  - 目標：
-    - Simulation 不再自行補規則，改消費上游已收斂 identity + row contract。
-    - 將目前 `Duplicate active diff key detected` 的 fallback 行為改為可配置/可診斷契約。
-  - 驗證：
-    - IC/diff 重複情境在 UI 可追蹤來源與採用策略，before/after 行為一致可解釋。
-  - 完成：
-    - `NotchApplySimulationResult` 新增 `DiffIdentityContract`，包含：
+- [x] S11.135 Consolidate Simulation contract (duplicate diff suppression and source description)
+  - Goal:
+    - Simulation no longer adds its own rules. It consumes the upstream consolidated identity and row contract.
+    - Change the current `Duplicate active diff key detected` fallback behavior into a configurable or diagnosable contract.
+  - Verification:
+    - In IC/diff duplicate scenarios, the UI can trace the source and adopted strategy. Before/after behavior is consistent and explainable.
+  - Completed:
+    - `NotchApplySimulationResult` adds `DiffIdentityContract`, which includes:
       - duplicate diff resolution strategy
-      - duplicate diff resolution 清單（IC/diff、primary regular、suppressed regulars）。
-    - `NotchApplySimulationService` 將 baseline duplicate 決策轉為結構化契約輸出，同步保留既有 diagnostics 文案。
-    - `SimulationWorkspaceViewModel` 新增 duplicate diff 契約摘要屬性（count/strategy/summary/sample）。
-    - `runtime query simulation` 回傳加入 `workspace.diffIdentity`，可由外部檢索 duplicate 策略與樣本。
-    - 補測試：
-      - `NotchApplySimulationServiceTests` 驗證 duplicate resolution 契約內容。
-      - `RuntimeQueryUseCaseTests` 驗證 simulation payload 含 `diffIdentity` 欄位。
+      - duplicate diff resolution list (IC/diff, primary regular, suppressed regulars).
+    - `NotchApplySimulationService` converts baseline duplicate decisions into a structured contract output, and keeps the existing diagnostics text.
+    - `SimulationWorkspaceViewModel` adds duplicate diff contract summary properties (count/strategy/summary/sample).
+    - The `runtime query simulation` response adds `workspace.diffIdentity`, so external callers can query the duplicate strategy and samples.
+    - Added tests:
+      - `NotchApplySimulationServiceTests` verifies the duplicate resolution contract content.
+      - `RuntimeQueryUseCaseTests` verifies the simulation payload contains the `diffIdentity` field.
 
-- [x] S11.136 文件與流程圖一致化（實作同步）
-  - 目標：
-    - 更新 `docs/core/notch-overall-flow-mermaid.md` 與相關 spec，避免與目前實作漂移。
-    - 明確標記「哪些是 canonical 流程、哪些是 compatibility path」。
-  - 驗證：
-    - 文件可直接對應程式入口與 stage，不再出現 target/anchor 投影語意矛盾。
-  - 完成：
-    - 重建並更新 `docs/core/notch-overall-flow-mermaid.md`，補上：
-      - `S11.134` staged orchestration（`BuildCadAllocationGenerationContext -> BuildCanonicalCandidatesByDiff -> BuildCanonicalRows -> AppendCanonicalExports`）。
-      - projection 真實語意（anchor 一定投影；target 僅在 raw key 唯一映射時投影，conflict key 保留 raw）。
-      - `S11.135` simulation `diffIdentity` 契約輸出鏈路。
-    - 更新 `docs/core/notch-v21-v22-flow.md`：
-      - 修正 target diff projection 規則與 conflict fallback。
-      - 將 CadAllocation 詳細流程改為 stage orchestration 版本。
-      - 補充 Simulation 共用契約與 runtime query `workspace.diffIdentity` 欄位。
+- [x] S11.136 Align documents and flow diagrams with implementation (implementation sync)
+  - Goal:
+    - Update `docs/core/notch-overall-flow-mermaid.md` and related specs, so they do not drift from the current implementation.
+    - Clearly mark which parts are the canonical flow and which are compatibility paths.
+  - Verification:
+    - Documents can map directly to code entry points and stages. No more contradictory target/anchor projection semantics.
+  - Completed:
+    - Rebuilt and updated `docs/core/notch-overall-flow-mermaid.md`, adding:
+      - `S11.134` staged orchestration (`BuildCadAllocationGenerationContext -> BuildCanonicalCandidatesByDiff -> BuildCanonicalRows -> AppendCanonicalExports`).
+      - Actual projection semantics (anchor is always projected; target is projected only when the raw key maps uniquely; conflict keys keep the raw value).
+      - `S11.135` simulation `diffIdentity` contract output chain.
+    - Updated `docs/core/notch-v21-v22-flow.md`:
+      - Corrected the target diff projection rule and conflict fallback.
+      - Changed the CadAllocation detailed flow to the stage orchestration version.
+      - Added the shared Simulation contract and the runtime query `workspace.diffIdentity` field.
 
-- [x] S11.137 Simulation duplicate diff baseline 改為 merge-sum（避免感應量遺失）
-  - 變更：
-    - `NotchDiffIdentityPipeline.BuildActiveDiffBaseline(...)` 由 `keep-first` 改為同 `(IC,Diff)` active regular pad 值加總。
-    - `NotchApplySimulationService` duplicate diagnostics 改為 `merged REG ... by sum`。
-    - `SimulationWorkspaceViewModel` / runtime query strategy 字串改為 `merge-sum-active-regular-pads`。
-  - 驗證：
-    - `NotchDiffIdentityPipelineTests`、`NotchApplySimulationServiceTests`、`RuntimeQueryUseCaseTests(QuerySimulation_ReturnsWorkspaceAndRegularSnapshot)`。
+- [x] S11.137 Change Simulation duplicate diff baseline to merge-sum (avoid losing induction values)
+  - Changes:
+    - `NotchDiffIdentityPipeline.BuildActiveDiffBaseline(...)` changes from `keep-first` to summing the values of active regular pads with the same `(IC,Diff)`.
+    - `NotchApplySimulationService` duplicate diagnostics change to `merged REG ... by sum`.
+    - `SimulationWorkspaceViewModel` / runtime query strategy string changes to `merge-sum-active-regular-pads`.
+  - Verification:
+    - `NotchDiffIdentityPipelineTests`, `NotchApplySimulationServiceTests`, `RuntimeQueryUseCaseTests(QuerySimulation_ReturnsWorkspaceAndRegularSnapshot)`.
 
-- [x] S11.138 Settings 區塊 toggle 版型統一（減少勾選項目視覺負擔）
-  - 變更：
-    - `SettingsGeneralSectionView`、`SettingsStep2SectionView`、`SettingsStep3SectionView`、`SettingsStep4SectionView`、`SettingsStep5SectionView` 主要布林選項改為一致的 `ToggleSwitch` row pattern（label + step note + switch）。
-    - 保留原有綁定與功能行為，不調整設定語意，只優化呈現一致性。
-  - 驗證：
+- [x] S11.138 Unify toggle layout in Settings sections (reduce visual load of checkbox items)
+  - Changes:
+    - `SettingsGeneralSectionView`, `SettingsStep2SectionView`, `SettingsStep3SectionView`, `SettingsStep4SectionView`, and `SettingsStep5SectionView` boolean options now use a consistent `ToggleSwitch` row pattern (label + step note + switch).
+    - Keep the existing bindings and functional behavior. Do not change setting semantics. Only improve presentation consistency.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
 
 
-## Beta 0.3（已完成）
+## Beta 0.3 (Completed)
 
-- [x] S11.66 設計 Simulation 圓柱 / 自由滑動輸入模型
-  - 觀察依據：
-    - 使用者希望 Simulation 支援更自由的滑動 / 滾動輸入模型，而非只靠離散 frame。
-  - 目標：
-    - 先定義輸入模型、資料契約與 UI 行為，再評估如何與既有 regular-grid / CSV / playback path 收斂單一路徑。
-  - 驗證：
-    - 先以設計規格與 interaction prototype 為主，再評估正式實作時機。
-  - 完成：
-    - 新增 `docs/core/simulation-cylindrical-input-model-spec.md`，定義 `ContinuousCylinder` 輸入模型、插值/環繞契約與 snapshot 單一路徑約束。
-    - 明確列出 prototype 範圍與 non-goals，避免與 notch 核心演算法耦合。
+- [x] S11.66 Design Simulation cylindrical / free-slide input model
+  - Basis for observation:
+    - Users want Simulation to support a freer slide / scroll input model, not only discrete frames.
+  - Goal:
+    - Define the input model, data contract, and UI behavior first. Then evaluate how to consolidate with the existing regular-grid / CSV / playback path into a single path.
+  - Verification:
+    - Focus on the design spec and interaction prototype first. Evaluate the timing of formal implementation later.
+  - Completed:
+    - Added `docs/core/simulation-cylindrical-input-model-spec.md`, defining the `ContinuousCylinder` input model, interpolation/wrap-around contract, and snapshot single-path constraint.
+    - Clearly listed the prototype scope and non-goals, to avoid coupling with the notch core algorithm.
 
 
-- [x] S11.87 建立 Verification Workbench（Header / Summary chips / Verification table / Review panel / Step rail / Detail cards）
-  - 觀察依據：
-    - 目前 Step3/4/5/6 驗證資訊分散在多個 surface，使用者需要切換多個區塊才能拼出完整結論。
-    - 現有畫面仍偏 Step4 diagnostics report，而不是單一 verification workflow。
-    - 左表目前混有 aggregate diagnostics row 與 item row，欄位命名也偏 `Current / Raw / Suggested / Status` 報表語法，未完整反映欄位契約與下游影響。
-    - 右側目前缺少明確「目前在哪一步、每步要驗證什麼、下一步是什麼」的流程可視化。
-    - 主畫面仍有長描述與 debug-style counters，資訊層級不夠乾淨。
-  - Non-goals（避免 scope 漂移）：
-    - 本項不改演算法真值、不重寫 notch 公式、不更動 `best match / mask / repair` 判斷定義。
-    - 本項不新增第二套 focus / locate / export 邏輯，只收斂 UI 承載與投影契約。
-  - 目標：
-    - 將現有 diagnostics / report / export / trace / simulation review 收斂成同一個 `Verification Workbench`。
-    - 保留現有深色配色、狀態色語義與工程工具感，不做品牌層級換皮。
-    - 建立單一 row identity：`IC + Diff + Row + CAD/REG`，供 Step4 / Step5 / Step6 / Simulation 共用。
-    - 建立單一 projector / projection contract，UI 不得自行重算第二套資料。
-    - 主畫面固定採三段式結構：
+- [x] S11.87 Build Verification Workbench (Header / Summary chips / Verification table / Review panel / Step rail / Detail cards)
+  - Basis for observation:
+    - Step3/4/5/6 verification information is currently spread across several surfaces. Users must switch between multiple areas to assemble a full conclusion.
+    - The current screen still looks like a Step4 diagnostics report, not a single verification workflow.
+    - The left table mixes aggregate diagnostics rows with item rows. Column names use report-style `Current / Raw / Suggested / Status`, which does not fully reflect the field contract and downstream impact.
+    - The right side lacks a clear flow view of "which step we are on, what each step verifies, and what comes next."
+    - The main screen still has long descriptions and debug-style counters, so the information hierarchy is not clean enough.
+  - Non-goals (avoid scope drift):
+    - This item does not change algorithm truth, rewrite the notch formulas, or change the definitions of `best match / mask / repair` decisions.
+    - This item does not add a second focus / locate / export logic. It only consolidates the UI carrier and projection contract.
+  - Goal:
+    - Consolidate the existing diagnostics / report / export / trace / simulation review into one `Verification Workbench`.
+    - Keep the current dark palette, status color semantics, and engineering tool feel. Do not re-skin at the brand level.
+    - Establish a single row identity: `IC + Diff + Row + CAD/REG`, shared by Step4 / Step5 / Step6 / Simulation.
+    - Establish a single projector / projection contract. The UI must not recalculate a second set of data.
+    - The main screen uses a fixed three-part structure:
       - `Header`
       - `Summary chips + Filter/Search`
       - `Left verification table + Right review panel`
-    - Header 至少顯示：
+    - The Header shows at least:
       - `current mode`
       - `overall status`
       - `open issues count`
       - `last table revision`
       - `active step`
-    - 將目前 counters 長字串移出主視覺，改為可展開 audit counters / info icon。
-    - Summary chips 固定順序：
+    - Move the long counter strings out of the main view. Make them available through expandable audit counters / an info icon.
+    - Summary chips use a fixed order:
       - `All / Changed / Removed / Ambiguous / Duplicate / Low confidence / Unmapped / Mismatch`
-    - 左側改為真正的 `Verification table`：
-      - 支援 `group row` 與 `item row`
-      - group row 用於 `Count mismatch / duplicate group / segment repair group / trace group` 等聚合問題
-      - item row 用於具體 row identity
-      - 預設欄位控制在 <= 8 欄，避免主表過重
-      - 建議預設欄位：
+    - The left side becomes a true `Verification table`:
+      - Supports `group row` and `item row`.
+      - Group rows are used for aggregated issues such as `Count mismatch / duplicate group / segment repair group / trace group`.
+      - Item rows are used for specific row identities.
+      - Default columns are kept to <= 8 to avoid an overloaded main table.
+      - Suggested default columns:
         - `Key`
         - `Reason`
         - `Mode`
@@ -579,32 +579,32 @@ This archive intentionally contains completed `[x]` tasks only. Active `[ ]` tas
         - `Source`
         - `Confidence`
         - `Step status`
-      - 大資料契約：
-        - row 數 > 5k 時必須維持 virtualization（含 group + item 混合模式）。
-        - filter / sort 不得觸發全量重建可視元素。
-    - 右側 review panel 固定分段：
-      - `Verification summary（sticky）`
+      - Large data contract:
+        - When rows > 5k, virtualization must be maintained (including mixed group + item mode).
+        - Filter / sort must not trigger a full rebuild of visible elements.
+    - The right review panel has fixed sections:
+      - `Verification summary (sticky)`
       - `Step rail`
       - `Step detail card`
       - `Action area`
-    - Step rail 固定順序：
+    - Step rail uses a fixed order:
       - `Step3 -> Step4 -> Step5 -> Step6 -> Simulation`
-      - 每個節點都必須顯示：
+      - Each node must show:
         - `status`
         - `what to verify`
         - `key checks`
         - `open action`
-      - 點節點後：
-        - 左表套用對應 filter
-        - 右側 detail 切到該 step
-        - 不得觸發平行重算
-    - 建立 step-specific detail cards，但採相同結構語法：
+      - After clicking a node:
+        - The left table applies the matching filter.
+        - The right detail switches to that step.
+        - No parallel recalculation may be triggered.
+    - Build step-specific detail cards using the same structure syntax:
       - `Title row`
       - `Badges row`
       - `Field grid`
       - `Before/After/Preview`
       - `Step-specific actions`
-    - Step4 detail 至少顯示：
+    - Step4 detail shows at least:
       - `mode`
       - `reasonCode`
       - `decisionSource`
@@ -616,7 +616,7 @@ This archive intentionally contains completed `[x]` tasks only. Active `[ ]` tas
       - `confidence`
       - `detectedOffset`
       - `offsetSupportRatio`
-    - Step5 detail 至少顯示：
+    - Step5 detail shows at least:
       - `rowNumber`
       - `version`
       - `icIndex`
@@ -626,37 +626,37 @@ This archive intentionally contains completed `[x]` tasks only. Active `[ ]` tas
       - `payload summary`
       - `status`
       - `isSelected`
-    - Step6 detail 至少顯示：
+    - Step6 detail shows at least:
       - `validationRegularPadId`
       - `DIRECT / IN / OUT`
       - `trace counts`
-    - Simulation detail 至少顯示：
+    - Simulation detail shows at least:
       - `Before / After / Delta / Changed only`
       - `color mode`
       - `color scale min/max`
       - `selected regular impact list`
       - `linked notch rows`
       - `visible scope`
-    - action 區要明確區分：
+    - The action area must clearly separate:
       - `row actions`
       - `batch actions`
-      - group row 被選中時不得顯示單筆 repair 類 action
-    - 所有 focus / locate / open action 都必須走既有 path，不得新增第二套 focus 演算法。
-    - 既有功能不可退化，至少包含：
-      - Step4 duplicate group `Select` 仍可 focus 到 AA。
-      - `Analyze mapping` report 內 locate/apply/clear/segment/visible repair action 全保留。
-      - Step6 row click 仍可 focus source/target pads。
-      - Export 視窗 `Hide panel (inspect AA)` + `Ctrl+Shift+E` restore 保留。
-      - Simulation canvas 點選 regular 後 inspector/notch impact 仍同步更新。
-  - 實作指示：
-    - 先補 projector / row contract，再改 view；不要在 UI 層 ad-hoc 拼資料。
-    - 新增或整理：
+      - When a group row is selected, single-item repair actions must not be shown.
+    - All focus / locate / open actions must use the existing path. No second focus algorithm may be added.
+    - Existing functions must not regress. At minimum, keep:
+      - Step4 duplicate group `Select` can still focus to AA.
+      - All locate/apply/clear/segment/visible repair actions in the `Analyze mapping` report are retained.
+      - Step6 row click can still focus source/target pads.
+      - Export window `Hide panel (inspect AA)` and `Ctrl+Shift+E` restore are retained.
+      - After selecting a regular on the Simulation canvas, the inspector and notch impact still update.
+  - Implementation instructions:
+    - Add or adjust the projector / row contract first, then change the view. Do not assemble data ad hoc in the UI layer.
+    - Add or organize:
       - `VerificationRowProjector`
       - `VerificationGroupProjector`
       - `VerificationSummaryProjector`
       - `VerificationStepStatusProjector`
-    - 將現有 diagnostics list 中的 `Count mismatch` 這類聚合問題抽成 group row，不要再與 item row 同型。
-    - Search / filter 至少支援：
+    - Extract aggregate issues such as `Count mismatch` from the diagnostics list into group rows. Do not keep them the same type as item rows.
+    - Search / filter supports at least:
       - CAD
       - REG
       - diff
@@ -664,43 +664,43 @@ This archive intentionally contains completed `[x]` tasks only. Active `[ ]` tas
       - row
       - reason
       - source
-    - 保留現有 palette，只做 semantic token 收斂；不得局部長出另一套 UI。
-  - 驗證：
-    - 可在單一 workbench 中回答：
-      - 目前值是什麼
-      - 為什麼是這個值
-      - 改了會影響哪裡
-    - 主畫面不再顯示大段文字描述（>2 行說明移到 info icon / detail）。
-    - Step rail 與 verification table 使用同一 row identity。
-    - `Count mismatch` 等 aggregate row 與 item row 清楚分離。
-    - 既有 focus/locate/override/export-hide/restore 路徑回歸通過。
-    - 效能門檻（以本機 baseline + CI smoke 為準）：
-      - 首屏主表（不含 trace 展開）`p95 < 300ms`
-      - filter / chip 切換 `p95 < 150ms`
-      - row 切換後主欄位更新 `p95 < 80ms`
+    - Keep the existing palette. Only consolidate semantic tokens. Do not grow another UI style locally.
+  - Verification:
+    - In a single workbench, the user can answer:
+      - What is the current value?
+      - Why is it this value?
+      - What will be affected if it changes?
+    - The main screen no longer shows large blocks of text (descriptions longer than 2 lines move to an info icon / detail).
+    - Step rail and the verification table use the same row identity.
+    - Aggregate rows such as `Count mismatch` are clearly separated from item rows.
+    - Regression of existing focus/locate/override/export-hide/restore paths passes.
+    - Performance gates (based on local baseline + CI smoke):
+      - First-screen main table (excluding trace expansion) `p95 < 300ms`
+      - Filter / chip switch `p95 < 150ms`
+      - Main field update after row switch `p95 < 80ms`
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~IndexMappingReportViewModelTests|FullyQualifiedName~NotchExportSelectionViewModelTests|FullyQualifiedName~HeadlessUiSmokeTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成：
-    - `IndexMappingReportWindow` 重構為 `Header + Summary chips + Left table + Right review panel` 三段式，右側加入 `Verification summary` 與 `Step rail`（Step3/4/5/6/Simulation）。
-    - `IndexMappingReportViewModel` 新增 active-step 狀態、step 節點投影與 step->filter 綁定，保留既有 locate/apply/clear/segment/visible action path。
-    - 補回歸測試：`VerificationStepRail_SelectStep5_BindsToCountMismatchFilter`。
+  - Completed:
+    - `IndexMappingReportWindow` was refactored into a three-part structure: `Header + Summary chips + Left table + Right review panel`. The right side adds `Verification summary` and `Step rail` (Step3/4/5/6/Simulation).
+    - `IndexMappingReportViewModel` adds active-step state, step node projection, and step-to-filter binding. The existing locate/apply/clear/segment/visible action paths are retained.
+    - Added regression test: `VerificationStepRail_SelectStep5_BindsToCountMismatchFilter`.
 
 
-- [x] S11.88 建立 Algorithm Trace / Explainability detail，並採延遲計算與背景補齊
-  - 觀察依據：
-    - 使用者希望所有用到的演算法都能被追蹤，包含：
-      - 判斷條件
-      - 原因
-      - 參與值
-      - 中間結果
-      - 最終採用哪條分支
-    - 這些資訊不適合出現在首頁 table，否則主表會過重、首屏變慢、資訊密度也會失控。
-    - 主表應優先快速生成；演算法追蹤應放在 detail 區，並允許延後計算。
-  - 目標：
-    - 在各 step detail card 內新增統一的 `Algorithm trace / Explainability` 區塊，不顯示於首頁 table。
-    - 演算法追蹤至少要能覆蓋 decision / repair / grouping / trace / simulation projection 中所有 user-visible 關鍵判斷。
-    - 每份 trace 至少包含：
+- [x] S11.88 Build Algorithm Trace / Explainability detail, with lazy calculation and background fill
+  - Basis for observation:
+    - Users want every algorithm in use to be traceable, including:
+      - decision conditions
+      - reasons
+      - participating values
+      - intermediate results
+      - which branch was finally chosen
+    - This information is not suitable for the home table. Otherwise the main table becomes overloaded, the first screen slows down, and information density gets out of control.
+    - The main table should be generated quickly first. Algorithm trace should live in the detail area and may be calculated later.
+  - Goal:
+    - Add a unified `Algorithm trace / Explainability` section inside each step detail card. Do not show it in the home table.
+    - Algorithm trace must cover all user-visible key decisions across decision / repair / grouping / trace / simulation projection.
+    - Each trace contains at least:
       - `algorithm / rule name`
       - `rule id / reason code`
       - `input snapshot summary`
@@ -713,665 +713,665 @@ This archive intentionally contains completed `[x]` tasks only. Active `[ ]` tas
       - `source revision / snapshot identity`
       - `traceSchemaVersion`
       - `generatedAt`
-    - 演算法追蹤只放在 detail：
+    - Algorithm trace appears only in the detail:
       - `Step4 detail`
       - `Step5 detail`
       - `Step6 detail`
       - `Simulation detail`
-      - group row detail 若有聚合判斷，也可顯示 group-level trace
-    - 首次開啟 workbench 時：
-      - 主表只算 summary / status / key columns
-      - 不同步計算所有 detail traces
-    - trace 計算採雙層策略：
-      - `on-demand priority`：使用者點到某筆 detail 時優先計算該 row / 該 step trace
-      - `background fill`：UI idle 或低優先時，再慢慢補 visible / nearby rows 的 trace cache
-    - trace 必須可快取，cache key 至少包含：
+      - Group row detail can also show group-level trace if there is an aggregate decision.
+    - When the workbench is first opened:
+      - The main table only calculates summary / status / key columns.
+      - It does not synchronously calculate all detail traces.
+    - Trace calculation uses a two-layer strategy:
+      - `on-demand priority`: when the user clicks a detail, calculate that row's / step's trace first.
+      - `background fill`: when the UI is idle or low priority, slowly fill the trace cache for visible / nearby rows.
+    - Trace must be cacheable. The cache key includes at least:
       - `row identity`
       - `active step`
       - `mode`
       - `table revision / snapshot revision`
-      - 必要時加上 `selected filter scope`
-    - 若 revision 改變，舊 trace 必須標記 stale，不可默默沿用。
-    - detail UI 要能顯示 trace 狀態：
+      - `selected filter scope` when needed
+    - If the revision changes, old traces must be marked stale. They must not be silently reused.
+    - The detail UI must show trace state:
       - `not requested`
       - `loading`
       - `ready`
       - `stale`
       - `failed`
-    - 使用者點到 detail 時，若 trace 尚未完成：
-      - 先顯示主欄位與 summary
-      - trace 區顯示 loading / queued
-      - 完成後局部更新 detail，不重新整頁刷新
-    - 不得因 trace 計算拖慢主表生成、filter 切換、row navigation。
-    - 併發與取消策略：
-      - `maxConcurrentTraceJobs=2`（可設定）
-      - selection 或 step 改變時取消舊低優先工作
-      - 同 key 任務去重，避免重複排隊
-    - 若使用者快速上下切 row，應優先保證：
-      - summary/detail 主欄位即時更新
-      - trace 慢一點無妨
-    - 若 trace 生成失敗，detail 要顯示明確錯誤，不可 silent fail。
-  - 實作指示：
-    - 建立獨立 explainability model，例如：
+    - When the user clicks a detail and its trace is not finished:
+      - Show the main fields and summary first.
+      - The trace section shows loading / queued.
+      - After completion, update the detail locally. Do not refresh the whole page.
+    - Trace must not slow down main table generation, filter switching, or row navigation.
+    - Concurrency and cancellation strategy:
+      - `maxConcurrentTraceJobs=2` (configurable)
+      - When selection or step changes, cancel old low-priority work.
+      - Deduplicate jobs with the same key to avoid repeated queuing.
+    - If the user quickly moves up and down between rows, prioritize:
+      - Summary/detail main fields update immediately.
+      - Trace can be a little slower.
+    - If trace generation fails, the detail must show a clear error. It must not fail silently.
+  - Implementation instructions:
+    - Build an independent explainability model, for example:
       - `AlgorithmTraceSummary`
       - `AlgorithmTraceStep`
       - `AlgorithmPredicateResult`
       - `AlgorithmValueSnapshot`
-    - 建立 trace provider / builder，但仍必須讀既有 single-path truth，不可為了 trace 再重跑另一套演算法。
-    - 若某演算法目前沒有完整 explainability 資料，先補最小可用版本：
+    - Build a trace provider / builder. It must still read the existing single-path truth. Do not run another algorithm just for trace.
+    - If an algorithm does not yet have complete explainability data, first add a minimum usable version:
       - rule name
       - input values
       - reason code
       - final output
-      - missing fields 明確標示 `not instrumented yet`
-    - detail card 內將 trace 視為可折疊區塊：
-      - 預設收起
-      - 使用者點開才觸發優先計算
-      - 已點開的 row 可維持 cache
-    - 背景補算需可取消；row selection 改變時，舊的低優先 trace job 不應阻塞新選取項目。
-    - 補充測試：
-      - lazy trace 不阻塞表格首屏
-      - 點選 row 後 trace 會優先生成
-      - revision 改變後 cache 失效
-      - stale / loading / ready / failed 狀態正確
-  - 驗證：
-    - 主表首屏生成速度不因 trace detail 而明顯惡化。
-    - 任一被選中的 row，都可以在 detail 中追到演算法判斷條件、原因與值。
-    - trace 不出現在首頁主表，只出現在 detail。
-    - on-demand 與 background fill 都能運作，且 row 切換時優先順序正確。
-    - build / tests / lint 全過。
-  - 完成：
-    - 新增 `IndexMappingAlgorithmTraceProjector` 與 trace view model model，trace 僅投影到右側 detail。
-    - trace 流程採 `on-demand + cache + background prefetch`，並提供 `not requested/loading/ready/stale/failed` 狀態。
-    - cache key 綁定 `row identity + table revision`，revision 變更即失效。
-    - 補回歸測試：`AlgorithmTrace_ExpandsAndLoadsForSelectedDecisionAsync`。
+      - Missing fields are explicitly marked `not instrumented yet`.
+    - Treat trace as a collapsible section inside the detail card:
+      - Collapsed by default.
+      - Expanding it triggers priority calculation.
+      - An expanded row can keep its cache.
+    - Background fill must be cancelable. When row selection changes, old low-priority trace jobs must not block the new selected item.
+    - Add tests:
+      - Lazy trace does not block the first table screen.
+      - After selecting a row, its trace is generated first.
+      - After a revision change, the cache is invalidated.
+      - stale / loading / ready / failed states are correct.
+  - Verification:
+    - First-screen generation speed of the main table is not noticeably worse because of trace detail.
+    - For any selected row, the decision conditions, reasons, and values can be traced in the detail.
+    - Trace does not appear in the home main table. It appears only in the detail.
+    - On-demand and background fill both work. Priority is correct when switching rows.
+    - Build / tests / lint all pass.
+  - Completed:
+    - Added `IndexMappingAlgorithmTraceProjector` and the trace view model. Trace is projected only to the right-side detail.
+    - Trace flow uses `on-demand + cache + background prefetch`, and provides `not requested/loading/ready/stale/failed` states.
+    - The cache key is bound to `row identity + table revision`. A revision change invalidates it immediately.
+    - Added regression test: `AlgorithmTrace_ExpandsAndLoadsForSelectedDecisionAsync`.
 
 
-- [x] S11.59 新增 CAD display index（左上到右下排序）但不變更內部 `CadPadId` 契約
-  - 觀察依據：
-    - 使用者希望 CAD 編號更貼近畫面閱讀順序，但 `CadPadId` 仍須維持穩定鍵。
-  - 目標：
-    - 保留 `CadPadId` 作為系統鍵。
-    - 另建 `CAD display index`（左上到右下），僅供 UI 顯示與人工檢視。
-    - 排序規則固定為 `Y asc -> X asc`，若座標同值則以 `CadPadId asc` 作為 tie-break（確保穩定性）。
-  - 驗證：
-    - save/load/export/runtime query/overrides 仍以 `CadPadId` 為唯一鍵。
-    - 同一資料集在重建/重載後 `display index` 穩定不漂移。
-  - 完成：
-    - 在 `RebuildVisibleDxfIndexMap(...)` 新增 `display index` 建構（固定 `Y asc -> X asc`，1-based）。
-    - 對外新增 `TryGetCadDisplayIndex(...)`，僅作 UI 顯示用途，不影響 `CadPadId`/save/load/export/runtime query 鍵契約。
-    - Pad inspector 標題改為優先顯示 `CAD #display (id X)`。
+- [x] S11.59 Add CAD display index (top-left to bottom-right order), without changing the internal `CadPadId` contract
+  - Basis for observation:
+    - Users want CAD numbers to follow the screen reading order more closely, but `CadPadId` must remain a stable key.
+  - Goal:
+    - Keep `CadPadId` as the system key.
+    - Build a separate `CAD display index` (top-left to bottom-right), used only for UI display and manual review.
+    - The sorting rule is fixed as `Y asc -> X asc`. If coordinates are equal, use `CadPadId asc` as the tie-break to ensure stability.
+  - Verification:
+    - Save/load/export/runtime query/overrides still use `CadPadId` as the only key.
+    - For the same dataset, `display index` does not drift after rebuilding or reloading.
+  - Completed:
+    - Added `display index` construction in `RebuildVisibleDxfIndexMap(...)` (fixed `Y asc -> X asc`, 1-based).
+    - Added `TryGetCadDisplayIndex(...)` externally. It is for UI display only and does not affect the `CadPadId`/save/load/export/runtime query key contract.
+    - The Pad inspector title now prefers showing `CAD #display (id X)`.
 
 
-## Beta 0.4 結構收斂 / 維護性提升
+## Beta 0.4 Structure Consolidation / Maintainability Improvement
 
-- [x] S11.52 建立 repo 級別封裝契約：類外部狀態變更必須走類 API / service API
-  - 觀察依據：
-    - repo 仍存在「類外 caller 直接組裝 side effects / 直接操作內部狀態」的歷史痕跡，易造成 workflow 分支漂移。
-  - 目標：
-    - 建立明確契約：非類內修改不得直接碰內部狀態集合，必須走公開 API / dedicated service / use case。
-    - 先做 hotspot 掃描與漸進收斂，優先 user-visible workflow 與 shared state。
-    - 明確區分「多入口但單一路徑」與「不可接受的多路徑重算 / 多路徑變更」。
-  - 驗證：
-    - `repo scan` 列出 direct state mutation hotspots 與收斂路線。
-    - 每個里程碑執行 build / regression tests / lint。
-  - 子里程碑：
-    - [x] 里程碑 A：掃描與第一批封裝收斂
-      - `.agents/skills/repo-optimizer-loop/scripts/repo_scan.ps1` 新增 `Direct state mutation hotspots` 掃描段落，會輸出 category + snippet + convergence route。
-      - 先收斂三個 user-visible workflow VM 的集合封裝：`NotchExportSelectionViewModel`、`SimulationWorkspaceViewModel`、`DxfEditChangeListViewModel` 改為「私有可變 backing collection + 對外 read-only facade」。
-      - 補對應 regression tests，鎖住對外集合不可直接 mutation 的契約。
-    - [x] 里程碑 B：workflow 熱點收斂
-      - 針對 Step3/4/5/Simulation 的 state mutation hotspot 再做一輪 service/use-case 收斂。
-      - 補 `acceptable multi-entry / unacceptable multi-path` 清單與修正追蹤。
-      - 目前進度：
-        - 已收斂 `ProjectFile` 與 `ProjectUiSnapshot` 的可變集合 alias 風險（改為 clone-on-set），避免 caller 持有外部集合後直接回寫持久化模型內部狀態。
-        - 已新增 `ProjectModelCollectionIsolationTests`，鎖住 `ProjectFile`/`UiGridSnapshot`/`UiViewSnapshot`/`UiNotchSnapshot` 的集合隔離契約。
-        - 已收斂 `GridSettings` sizing collections（`ColumnWidths/RowHeights/RowWidthOverrides/...`）為 clone-on-set + `ReplaceSizingCollections(...)` API，並將 `ManualSizingService` 還原/ensure 路徑改走單一 API。
-        - 已補 `ManualSizingServiceTests.ReplaceSizingCollections_ClonesInputCollections`，防止 sizing list alias 回歸。
-        - `NotchApplySimulationService` / `NotchV22` context / `NotchSettings` / `GridSettings` 已補 dedicated replace API 或 read-only facade，Step3/4/5/Simulation 的主要 state mutation hotspot 已收斂到 service/settings API。
-        - `acceptable multi-entry / unacceptable multi-path` 清單已寫入 `docs/guides/refactor-playbook.md`，並納入 scan/checklist 追蹤。
-    - [x] 里程碑 C：守護機制
-      - 補 repo scan 報告模板與 PR checklist，將 direct mutation hotspot 固定納入 gate。
-      - 補至少一組 regression guard，防止相同 hotspot 回歸。
-      - 完成：
-        - 新增 `docs/guides/repo-refactor-scan-template.md`，固定要求輸出 `Direct state mutation hotspots` 區段。
-        - 新增 `docs/guides/refactor-pr-checklist.md`，將 S11.52 gate 納入 PR 必填清單。
-        - 更新 `docs/guides/refactor-playbook.md` 與 `.agents/skills/repo-optimizer-loop/references/optimization-checklist.md`，讓掃描與交付流程預設包含 direct mutation gate。
-        - regression guard 已補：`ProjectModelCollectionIsolationTests`、`ManualSizingServiceTests.ReplaceSizingCollections_ClonesInputCollections`。
+- [x] S11.52 Establish repo-level encapsulation contract: state changes from outside a class must go through the class API / service API
+  - Basis for observation:
+    - The repo still has historical traces of "external callers directly assemble side effects / directly operate internal state." This easily causes workflow branches to drift.
+  - Goal:
+    - Establish a clear contract: changes from outside a class must not directly touch internal state collections. They must go through public APIs, dedicated services, or use cases.
+    - First do hotspot scanning and gradual consolidation. Prioritize user-visible workflows and shared state.
+    - Clearly distinguish "multiple entries but single path" from "unacceptable multi-path recalculation / multi-path mutation."
+  - Verification:
+    - `repo scan` lists direct state mutation hotspots and the consolidation route.
+    - Each milestone runs build / regression tests / lint.
+  - Sub-milestones:
+    - [x] Milestone A: Scanning and first batch of encapsulation consolidation
+      - `.agents/skills/repo-optimizer-loop/scripts/repo_scan.ps1` adds a `Direct state mutation hotspots` scan section. It outputs category + snippet + convergence route.
+      - First consolidate collection encapsulation in three user-visible workflow VMs: `NotchExportSelectionViewModel`, `SimulationWorkspaceViewModel`, and `DxfEditChangeListViewModel`. They become "private mutable backing collection + public read-only facade."
+      - Add matching regression tests to lock the contract that external collections cannot be mutated directly.
+    - [x] Milestone B: Workflow hotspot consolidation
+      - For the state mutation hotspots in Step3/4/5/Simulation, run another round of service/use-case consolidation.
+      - Add an `acceptable multi-entry / unacceptable multi-path` list and track fixes.
+      - Current progress:
+        - Reduced the risk of mutable collection aliasing in `ProjectFile` and `ProjectUiSnapshot` (changed to clone-on-set). This prevents callers from holding external collections and writing back into the persisted model's internal state.
+        - Added `ProjectModelCollectionIsolationTests` to lock the collection isolation contract of `ProjectFile`/`UiGridSnapshot`/`UiViewSnapshot`/`UiNotchSnapshot`.
+        - Consolidated `GridSettings` sizing collections (`ColumnWidths/RowHeights/RowWidthOverrides/...`) into clone-on-set + a `ReplaceSizingCollections(...)` API. `ManualSizingService` restore/ensure paths now go through this single API.
+        - Added `ManualSizingServiceTests.ReplaceSizingCollections_ClonesInputCollections` to prevent sizing list alias regression.
+        - `NotchApplySimulationService` / `NotchV22` context / `NotchSettings` / `GridSettings` now have dedicated replace APIs or read-only facades. The main state mutation hotspots in Step3/4/5/Simulation are consolidated into service/settings APIs.
+        - The `acceptable multi-entry / unacceptable multi-path` list is written in `docs/guides/refactor-playbook.md` and included in scan/checklist tracking.
+    - [x] Milestone C: Guardrail mechanisms
+      - Add a repo scan report template and PR checklist. Fix the direct mutation hotspot as a gate.
+      - Add at least one regression guard set to prevent the same hotspot from regressing.
+      - Completed:
+        - Added `docs/guides/repo-refactor-scan-template.md`. It requires the `Direct state mutation hotspots` section.
+        - Added `docs/guides/refactor-pr-checklist.md`. It puts the S11.52 gate into the required PR checklist.
+        - Updated `docs/guides/refactor-playbook.md` and `.agents/skills/repo-optimizer-loop/references/optimization-checklist.md`, so scanning and delivery flow include the direct mutation gate by default.
+        - Regression guards added: `ProjectModelCollectionIsolationTests`, `ManualSizingServiceTests.ReplaceSizingCollections_ClonesInputCollections`.
 
 
-- [x] S11.29 拆分 `NotchExportSelectionViewModel` 剩餘 orchestration，降低單檔風險
-  - 觀察依據：
-    - `src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs` 仍是 650+ 行 hotspot。
-  - 目標：
-    - 將非 UI-state orchestration 抽成 service / helper，保留 shared projection path 不變。
-  - 目前進度：
-    - 里程碑 A（已完成）：row selection orchestration 已抽離至 `NotchExportSelectionRowSelectionService`，`SelectAll/SelectNone/UseShownOnly/group/workspace-linked` 不再由 VM 直接維護迴圈 mutation。
-    - 已補 `NotchExportSelectionRowSelectionServiceTests`，鎖住 selection scope 契約，避免回到 VM 端分散 mutation。
-    - 里程碑 B（已完成）：workspace-linked row 的刷新與首選選取決策已抽離至 `NotchExportSelectionWorkspaceLinkService`，VM 僅保留 apply/notify。
-    - 已補 `NotchExportSelectionWorkspaceLinkServiceTests`，鎖住 linked rows 與 preferred selection 契約。
-    - 里程碑 C（已完成）：quick-filter hint orchestration（`row/ic/diff/match/map` token toggle + `status` cycle）已抽離至 `NotchExportSelectionQuickFilterService`，`ApplyColumnFilter` 不再在 VM 內維護字串切詞與狀態循環分支。
-    - 已補 `NotchExportSelectionQuickFilterServiceTests`，鎖住 token toggle、複合 query 移除、status cycle、unknown target no-op 契約。
-    - 里程碑 D（已完成）：column-filter field parsing / title / selection-apply 規則已抽離至 `NotchExportSelectionColumnFilterService`，`Filters.cs` 不再維護欄位 key switch 與 filter dictionary mutation 分支。
-    - 已補 `NotchExportSelectionColumnFilterServiceTests`，鎖住 `selected-all -> clear`、`empty-selected -> explicit empty filter`、field parse、dialog title 契約。
-    - 里程碑 E（已完成）：selected-row 決策 orchestration（projection 後首選 row + selection toggle 下的 auto-select 判斷）已抽離至 `NotchExportSelectionSelectedRowService`，`Selection.cs` 不再直接維護 fallback/visible 判斷分支。
-    - 已補 `NotchExportSelectionSelectedRowServiceTests`，鎖住 workspace-linked 優先、保留既有選中列、fallback 首列、auto-select 條件契約。
-    - 里程碑 F（已完成）：summary/count projection 已抽離至 `NotchExportSelectionSummaryProjector`，`ViewModel` 不再於多個 getter 重複 LINQ 計算 scoped counts 與摘要文案。
-    - 已補 `NotchExportSelectionSummaryProjectorTests`，鎖住 scoped counts、summary/export text 與無選取狀態契約。
-  - 完成：
-    - `S11.29` 既定 orchestration 熱點已拆分為 dedicated services：
+- [x] S11.29 Split remaining orchestration in `NotchExportSelectionViewModel` to reduce single-file risk
+  - Basis for observation:
+    - `src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs` is still a hotspot with more than 650 lines.
+  - Goal:
+    - Extract non-UI-state orchestration into services / helpers. Keep the shared projection path unchanged.
+  - Current progress:
+    - Milestone A (completed): Row selection orchestration is extracted to `NotchExportSelectionRowSelectionService`. `SelectAll/SelectNone/UseShownOnly/group/workspace-linked` no longer use loops in the VM to mutate directly.
+    - Added `NotchExportSelectionRowSelectionServiceTests` to lock the selection scope contract and prevent a return to scattered VM-side mutation.
+    - Milestone B (completed): Refresh and preferred selection decisions for workspace-linked rows are extracted to `NotchExportSelectionWorkspaceLinkService`. The VM only keeps apply/notify.
+    - Added `NotchExportSelectionWorkspaceLinkServiceTests` to lock the linked rows and preferred selection contract.
+    - Milestone C (completed): Quick-filter hint orchestration (`row/ic/diff/match/map` token toggle + `status` cycle) is extracted to `NotchExportSelectionQuickFilterService`. `ApplyColumnFilter` no longer maintains string tokenization and status cycle branches inside the VM.
+    - Added `NotchExportSelectionQuickFilterServiceTests` to lock token toggle, composite query removal, status cycle, and unknown target no-op contracts.
+    - Milestone D (completed): Column-filter field parsing / title / selection-apply rules are extracted to `NotchExportSelectionColumnFilterService`. `Filters.cs` no longer maintains field key switch and filter dictionary mutation branches.
+    - Added `NotchExportSelectionColumnFilterServiceTests` to lock `selected-all -> clear`, `empty-selected -> explicit empty filter`, field parsing, and dialog title contracts.
+    - Milestone E (completed): Selected-row decision orchestration (preferred row after projection + auto-select decision under selection toggle) is extracted to `NotchExportSelectionSelectedRowService`. `Selection.cs` no longer directly maintains fallback/visible decision branches.
+    - Added `NotchExportSelectionSelectedRowServiceTests` to lock workspace-linked priority, keeping the existing selected row, first-row fallback, and auto-select condition contracts.
+    - Milestone F (completed): Summary/count projection is extracted to `NotchExportSelectionSummaryProjector`. The `ViewModel` no longer repeats LINQ calculations for scoped counts and summary text in multiple getters.
+    - Added `NotchExportSelectionSummaryProjectorTests` to lock scoped counts, summary/export text, and no-selection state contracts.
+  - Completed:
+    - The orchestration hotspots defined in `S11.29` are split into dedicated services:
       - `NotchExportSelectionRowSelectionService`
       - `NotchExportSelectionWorkspaceLinkService`
       - `NotchExportSelectionQuickFilterService`
       - `NotchExportSelectionColumnFilterService`
       - `NotchExportSelectionSelectedRowService`
       - `NotchExportSelectionSummaryProjector`
-    - `NotchExportSelectionViewModel` 保留 UI state / command binding，非 UI-state 決策已下放 service/helper，且維持 shared projection path 不變。
-  - 驗證：
+    - `NotchExportSelectionViewModel` keeps UI state and command binding. Non-UI-state decisions are moved to services/helpers, and the shared projection path remains unchanged.
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~NotchExportSelection"`
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
 
 
-- [x] S11.30 依設定分頁拆分 `FreeformHelperViewModel.Settings.PropertyCallbacks`
-  - 觀察依據：
-    - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.cs` 仍是 500+ 行 hotspot。
-  - 目標：
-    - 依 `General / Step1 / Step2 / Step3 / Step4 / Step5` 拆成多個 partial files，不改動現有 orchestration 契約。
-  - 完成：
-    - property callbacks 已按分頁拆成：
+- [x] S11.30 Split `FreeformHelperViewModel.Settings.PropertyCallbacks` by settings tab
+  - Basis for observation:
+    - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.cs` is still a hotspot with more than 500 lines.
+  - Goal:
+    - Split into multiple partial files by `General / Step1 / Step2 / Step3 / Step4 / Step5` without changing the existing orchestration contract.
+  - Completed:
+    - Property callbacks are split by tab into:
       - `FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs`
       - `FreeformHelperViewModel.Settings.PropertyCallbacks.Step1.cs`
       - `FreeformHelperViewModel.Settings.PropertyCallbacks.Step2.cs`
       - `FreeformHelperViewModel.Settings.PropertyCallbacks.Step3.cs`
       - `FreeformHelperViewModel.Settings.PropertyCallbacks.Step4.cs`
       - `FreeformHelperViewModel.Settings.PropertyCallbacks.Step5.cs`
-    - `Settings.Orchestration` 單一路徑契約維持不變，未回退到 callback 內平行重算。
-  - 驗證：
+    - The `Settings.Orchestration` single-path contract is unchanged. It did not fall back to parallel recalculation inside callbacks.
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~FreeformHelperViewModelTests|FullyQualifiedName~HeadlessUiSmokeTests"`
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
 
 
-- [x] S11.31 依 edit 類型拆分 `FreeformHelperViewModel.DxfEditing.Edits`
-  - 觀察依據：
-    - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Edits.cs` 仍是 470+ 行 hotspot。
-  - 目標：
-    - 保持 single-entry command 契約不變，將 hidden / combine / reset 依工作流拆分為較小 partial / service。
-  - 完成：
-    - edits 已按工作流拆分：
+- [x] S11.31 Split `FreeformHelperViewModel.DxfEditing.Edits` by edit type
+  - Basis for observation:
+    - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Edits.cs` is still a hotspot with more than 470 lines.
+  - Goal:
+    - Keep the single-entry command contract unchanged. Split hidden / combine / reset by workflow into smaller partials / services.
+  - Completed:
+    - Edits are split by workflow into:
       - `FreeformHelperViewModel.DxfEditing.Edits.Hidden.cs`
       - `FreeformHelperViewModel.DxfEditing.Edits.Combine.cs`
       - `FreeformHelperViewModel.DxfEditing.Edits.Reset.cs`
-    - hidden/combine/reset command flow 仍透過既有 single-entry path，未新增第二套行為入口。
-  - 驗證：
+    - The hidden/combine/reset command flows still go through the existing single-entry path. No second behavior entry was added.
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~FreeformHelperViewModelTests|FullyQualifiedName~DxfEditChangeListViewModelTests|FullyQualifiedName~HeadlessUiSmokeTests"`
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
 
 
-- [x] S11.80 建立 UI consistency audit + shared workspace primitives
-  - 觀察依據：
-    - `CoordinatePlannerWorkspaceView.axaml` 已直接重用 `notchExportFilterChip` 等 feature-specific style class。
-    - `SimulationWorkspaceView` / `CoordinatePlannerWorkspaceView` / `NotchExportSelectionWindow` 其實已有共用 section / card / chip / button pattern，但語意仍綁在歷史功能名稱。
-  - 目標：
-    - 先做 UI audit，再建立中性 primitives：`sectionCard`、`sectionTitle`、`summaryChip`、`toolbarActionButton` 等。
-    - 收斂主要 workspace 的頁面骨架與 interaction hierarchy。
-    - 與 `S11.87 / S11.88` 對齊，但不重複承擔 row identity / explainability / lazy trace contract；本項聚焦共用 primitives、樣式與 workspace 骨架。
-  - 驗證：
-    - Coordinate / Simulation / NotchExport / Verification Workbench 的共用樣式不再依賴歷史 feature 名稱。
-    - 補必要 snapshot baseline，避免後續 UI 回退。
-  - 完成：
-    - `Controls.Core/Controls.Scroll/Controls.Panel` 新增中性 workspace primitives selector alias，包含：
+- [x] S11.80 Build UI consistency audit + shared workspace primitives
+  - Basis for observation:
+    - `CoordinatePlannerWorkspaceView.axaml` already reuses feature-specific style classes such as `notchExportFilterChip`.
+    - `SimulationWorkspaceView` / `CoordinatePlannerWorkspaceView` / `NotchExportSelectionWindow` already share section / card / chip / button patterns, but the semantics are still tied to historical feature names.
+  - Goal:
+    - Do the UI audit first. Then build neutral primitives: `sectionCard`, `sectionTitle`, `summaryChip`, `toolbarActionButton`, and similar.
+    - Consolidate the page skeleton and interaction hierarchy of the main workspaces.
+    - Align with `S11.87 / S11.88`, but do not repeat the row identity / explainability / lazy trace contract. This item focuses on shared primitives, styles, and the workspace skeleton.
+  - Verification:
+    - Shared styles for Coordinate / Simulation / NotchExport / Verification Workbench no longer depend on historical feature names.
+    - Add necessary snapshot baselines to prevent future UI regression.
+  - Completed:
+    - `Controls.Core/Controls.Scroll/Controls.Panel` adds neutral workspace primitive selector aliases, including:
       - `workspaceSummaryChipButton / workspaceTopLayerBox / workspaceHeaderSettingBlock / workspaceToolbarLabel`
       - `workspaceDataList / workspaceDataRow / workspaceDataRowActive / workspaceDataCellText`
       - `workspaceTableHeader / workspaceTableHeaderText / workspaceTableHeaderButton`
       - `workspaceInfoButton / workspaceSearchClearButton / workspaceGroupStripScroll / workspaceLinkItem`
       - `workspaceFilterOptions / workspaceFilterOptionCheck / workspaceContextBadge`
-    - 主要 workspace view 已改用中性 class：
+    - Main workspace views now use the neutral classes:
       - `src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml`
       - `src/FreeformHelper.UI/Views/NotchExportColumnFilterWindow.axaml`
       - `src/FreeformHelper.UI/Views/IndexMappingReportWindow.axaml`
       - `src/FreeformHelper.UI/Views/WorkflowSteps/RightWorkflowStep4View.axaml`
-      - `src/FreeformHelper.UI/Styles/Controls.Panel.axaml`（`ReviewWorkspaceShell` header/summary/toolbar shell classes）
-    - 保留舊 `notchExport*` selector 兼容層，避免一次性移除造成歷史頁面回歸；新頁面不再需要依賴舊命名。
-    - 以 `rg` 檢查目標範圍（Coordinate / Simulation / NotchExport / Verification）已無 `notchExport*` 直綁 class。
-  - 驗證（本次）：
+      - `src/FreeformHelper.UI/Styles/Controls.Panel.axaml` (`ReviewWorkspaceShell` header/summary/toolbar shell classes)
+    - The old `notchExport*` selector compatibility layer is kept to avoid one-time removal causing regression in historical pages. New pages no longer need the old naming.
+    - Checked the target scope (Coordinate / Simulation / NotchExport / Verification) with `rg`. There are no remaining direct `notchExport*` class bindings.
+  - Verification (this round):
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~IndexMappingReportViewModelTests|FullyQualifiedName~NotchExportSelectionViewModelTests|FullyQualifiedName~IndexMappingReportWindowSmokeTests|FullyQualifiedName~NotchExportSelectionWindowSmokeTests|FullyQualifiedName~HeadlessUiSmokeTests.FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
 
 
-## Beta 0.5（進行中）
+## Beta 0.5 (in progress)
 
-- [x] S11.89 拆分 `DxfRegularMaskAuditService` LocalRepair/PassiveCompensation 區段
-  - 目標：
-    - 將 `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.cs` 的 LocalRepair/PassiveCompensation helper 區段拆到獨立 partial，降低單檔熱點與維護風險，維持單一路徑行為不變。
-  - 範圍：
+- [x] S11.89 Split the LocalRepair/PassiveCompensation section of `DxfRegularMaskAuditService`
+  - Goal:
+    - Move the LocalRepair/PassiveCompensation helper section of `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.cs` into a separate partial. This reduces the single-file hotspot and maintenance risk, and keeps single-path behavior unchanged.
+  - Scope:
     - `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.cs`
-    - `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.LocalRepair.cs`（new）
+    - `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.LocalRepair.cs` (new)
     - `.agents/skills/repo-optimizer-loop/scripts/repo_scan.ps1`
     - `docs/guides/repo-refactor-scan-2026-04-18.md`
-    - `tests/FreeformHelper.Tests/Application/Dxf/DxfRegularMaskAuditServiceTests.cs`（必要時）
-  - 驗證：
+    - `tests/FreeformHelper.Tests/Application/Dxf/DxfRegularMaskAuditServiceTests.cs` (if needed)
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~DxfRegularMaskAuditServiceTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - LocalRepair/PassiveCompensation 方法與常數移出主檔，既有 `DxfRegularMaskAuditServiceTests` 全通過且行為無回歸。
-  - 完成：
-    - `DxfRegularMaskAuditService` 改為 partial，LocalRepair/PassiveCompensation 相關方法與常數已拆到 `DxfRegularMaskAuditService.LocalRepair.cs`。
-    - `repo_scan.ps1` 修正空集合時 `.Count` 例外（改為陣列包裝），恢復 TODO 掃描自動化流程。
-    - 新增 scan 報告 `docs/guides/repo-refactor-scan-2026-04-18.md`，確認本輪 direct state mutation hotspots 為 0。
+  - Definition of done:
+    - LocalRepair/PassiveCompensation methods and constants are moved out of the main file. All existing `DxfRegularMaskAuditServiceTests` pass, with no behavior regression.
+  - Completed:
+    - `DxfRegularMaskAuditService` is now a partial class. LocalRepair/PassiveCompensation methods and constants are moved to `DxfRegularMaskAuditService.LocalRepair.cs`.
+    - `repo_scan.ps1` fixes the `.Count` exception on empty collections (wrapped in an array). The TODO scan automation flow is restored.
+    - Added scan report `docs/guides/repo-refactor-scan-2026-04-18.md`. It confirms this round has 0 direct state mutation hotspots.
 
 
-- [x] S11.90 拆分 `DxfRegularMaskAuditService` SegmentOffset 區段
-  - 目標：
-    - 將 `segment offset` 相關方法與常數抽到獨立 partial，進一步降低 `DxfRegularMaskAuditService.cs` 熱點大小並維持單一路徑行為不變。
-  - 範圍：
+- [x] S11.90 Split the SegmentOffset section of `DxfRegularMaskAuditService`
+  - Goal:
+    - Move the `segment offset` methods and constants into a separate partial. This further reduces the size of the `DxfRegularMaskAuditService.cs` hotspot and keeps single-path behavior unchanged.
+  - Scope:
     - `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.cs`
-    - `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.SegmentOffset.cs`（new）
-    - `tests/FreeformHelper.Tests/Application/Dxf/DxfRegularMaskAuditServiceTests.cs`（必要時）
-  - 驗證：
+    - `src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.SegmentOffset.cs` (new)
+    - `tests/FreeformHelper.Tests/Application/Dxf/DxfRegularMaskAuditServiceTests.cs` (if needed)
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~DxfRegularMaskAuditServiceTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - segment offset 相關方法由主檔拆出且 `DxfRegularMaskAuditServiceTests` 無回歸。
-  - 完成：
-    - `ApplySegmentOffsetSignals` 與其 helper（含 `ResolveSeedDiffForOffset`、`ShouldPromoteToSegmentOffsetReason`）已移到 `DxfRegularMaskAuditService.SegmentOffset.cs`。
-    - `SegmentOffsetDominanceThreshold` 與 `SegmentRowSample/SegmentOffsetSample` 型別一起收斂到 SegmentOffset partial，主檔不再混放 segment 掃描細節。
-    - 目標驗證命令已全數通過（build + `DxfRegularMaskAuditServiceTests` + lint）。
+  - Definition of done:
+    - Segment offset methods are moved out of the main file, and `DxfRegularMaskAuditServiceTests` shows no regression.
+  - Completed:
+    - `ApplySegmentOffsetSignals` and its helpers (including `ResolveSeedDiffForOffset` and `ShouldPromoteToSegmentOffsetReason`) are moved to `DxfRegularMaskAuditService.SegmentOffset.cs`.
+    - `SegmentOffsetDominanceThreshold` and the `SegmentRowSample/SegmentOffsetSample` types are consolidated into the SegmentOffset partial. The main file no longer mixes in segment scanning details.
+    - All target verification commands passed (build, `DxfRegularMaskAuditServiceTests`, lint).
 
 
-## Beta 0.6（輸出契約收尾）
+## Beta 0.6 (output contract finalization)
 
-- [x] S11.139 Step5 export 改為 `CSV / C v2.1 / C v2.2` 三種真實輸出，移除 legacy txt 路徑
-  - 目標：
-    - 讓 beta0.6 停在「輸出正確、可直接貼用」的狀態，不再混入舊 `txt` 契約。
-  - 範圍：
+- [x] S11.139 Step5 export changed to real `CSV / C v2.1 / C v2.2` outputs; remove legacy txt path
+  - Goal:
+    - Get beta0.6 to a state where output is correct and can be pasted directly. Stop mixing in the old `txt` contract.
+  - Scope:
     - `src/FreeformHelper.UI/ViewModels/*Notch*`
     - `src/FreeformHelper.UI/Services/RuntimeQueryUseCase*.cs`
     - `src/FreeformHelper.UI/Views/FreeformHelperView.axaml`
     - `src/FreeformHelper.Application/Export/NotchTableExporter.cs`
     - `scripts/perf/run-3635-regression-baseline.ps1`
     - `example/BOE36.35/*`
-    - 相關 docs / tests / example project snapshot
-  - 驗證：
+    - Related docs / tests / example project snapshot
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~NotchTableExporterTests|FullyQualifiedName~ProjectStoreTests|FullyQualifiedName~RuntimeQueryUseCaseTests|FullyQualifiedName~NotchExportSelectionViewModelTests|FullyQualifiedName~FreeformHelperViewModelTests.CommandsAndUndo|FullyQualifiedName~FreeformHelperViewModelTests.SettingsPersistence.ProjectSaveLoad" --no-restore -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
     - `gcc -std=c11 -Wall -Wextra -Werror -c example/BOE36.35/notch_export_v21_current.c`
     - `gcc -std=c11 -Wall -Wextra -Werror -c example/BOE36.35/notch_export_v22_current.c`
-  - 完成定義：
-    - UI / runtime query / example / perf script 中不再有 `txt` notch export 路徑。
-    - `example/BOE36.35` 只保留 split `.c` example。
+  - Definition of done:
+    - No `txt` notch export path remains in the UI, runtime query, example, or perf scripts.
+    - `example/BOE36.35` keeps only the split `.c` examples.
 
 
-## Beta 0.7（安全縮減與架構整理）
+## Beta 0.7 (safe reduction and architecture cleanup)
 
-- [x] S11.140 Notch 文件縮減：只保留 canonical + 必要 deep-dive
-  - 觀察依據：
-    - `docs/reference/notch-system-reference.md` 已是 canonical reference。
-    - `docs/core/notch-v21-v22-flow.md`、`docs/core/notch-v22-algorithm.md`、`docs/core/notch-2.2-spec.md`、`docs/code/notch_v21.md` 等文件仍分散入口。
-    - `docs/README.md` 先前未以 canonical reference 為第一入口。
-  - 範圍：
+- [x] S11.140 Notch docs reduction: keep only canonical + required deep-dives
+  - Basis for observation:
+    - `docs/reference/notch-system-reference.md` is already the canonical reference.
+    - `docs/core/notch-v21-v22-flow.md`, `docs/core/notch-v22-algorithm.md`, `docs/core/notch-2.2-spec.md`, `docs/code/notch_v21.md`, and other docs still have scattered entry points.
+    - `docs/README.md` did not previously list the canonical reference as the first entry point.
+  - Scope:
     - `docs/reference/notch-system-reference.md`
     - `docs/core/notch-*.md`
     - `example/BOE36.35/notch_export_v21_current.c`
     - `example/BOE36.35/notch_export_v22_current.c`
     - `docs/README.md`
     - `docs/guides/app-user-manual.md`
-  - 驗證：
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - fully-subsumed 文件已刪除或移入 archive。
-    - 主入口只剩 canonical reference + 明確標註用途的 deep-dive。
+  - Definition of done:
+    - Fully subsumed docs are deleted or moved to archive.
+    - The main entry points are only the canonical reference and clearly labeled deep-dives.
 
 
-- [x] S11.141 測試熱點拆分與 dead test 清理（不改 assertion 行為）
-  - 觀察依據：
-    - `FreeformHelperViewModelTests.CommandsAndUndo.cs`、`RuntimeQueryUseCaseTests.cs`、`NotchExportSelectionViewModelTests.cs`、`IndexMappingReportViewModelTests.cs`、`ProjectSaveLoad` 測試檔都已超過一般維護舒適區。
-  - 範圍：
+- [x] S11.141 Test hotspot split and dead test cleanup (no assertion behavior changes)
+  - Basis for observation:
+    - `FreeformHelperViewModelTests.CommandsAndUndo.cs`, `RuntimeQueryUseCaseTests.cs`, `NotchExportSelectionViewModelTests.cs`, `IndexMappingReportViewModelTests.cs`, and the `ProjectSaveLoad` test files have all grown beyond a comfortable maintenance size.
+  - Scope:
     - `tests/FreeformHelper.Tests/UI/ViewModels/*.cs`
     - `tests/FreeformHelper.Tests/UI/Services/RuntimeQueryUseCaseTests.cs`
-    - 共用 helper / test infrastructure
-  - 驗證：
+    - Shared helpers / test infrastructure
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~RuntimeQueryUseCaseTests|FullyQualifiedName~NotchExportSelectionViewModelTests|FullyQualifiedName~IndexMappingReportViewModelTests|FullyQualifiedName~FreeformHelperViewModelTests" --no-restore -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - 被刪除的測試僅限 dead path。
-    - 保留測試的 assertion 與覆蓋語義不變，只改結構與命名。
+  - Definition of done:
+    - Deleted tests cover only dead paths.
+    - Retained tests keep the same assertions and coverage semantics. Only structure and naming change.
 
 
-- [x] S11.142 ViewModel 熱點拆分：`IndexMappingReportViewModel` / `ShellViewModel` / `CoordinatePlannerWorkspaceViewModel`
-  - 觀察依據：
-    - `IndexMappingReportViewModel.cs` 934 行。
-    - `ShellViewModel.cs` 702 行。
-    - `CoordinatePlannerWorkspaceViewModel.cs` 665 行。
-  - 範圍：
+- [x] S11.142 ViewModel hotspot split: `IndexMappingReportViewModel` / `ShellViewModel` / `CoordinatePlannerWorkspaceViewModel`
+  - Basis for observation:
+    - `IndexMappingReportViewModel.cs` has 934 lines.
+    - `ShellViewModel.cs` has 702 lines.
+    - `CoordinatePlannerWorkspaceViewModel.cs` has 665 lines.
+  - Scope:
     - `src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel*.cs`
     - `src/FreeformHelper.UI/ViewModels/ShellViewModel*.cs`
     - `src/FreeformHelper.UI/ViewModels/CoordinatePlannerWorkspaceViewModel*.cs`
-  - 驗證：
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
-    - 依 touched area 跑 targeted UI/ViewModel tests
+    - Run targeted UI/ViewModel tests for the touched areas
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - 切分依責任邊界，不新增第二套 workflow 或 re-derive path。
-  - 完成：
-    - `IndexMappingReportViewModel` 拆為 `Selection / Verification / AlgorithmTrace` partial，主檔只保留 state、ctor 與投影屬性。
-    - `ShellViewModel` 拆為 `Console / Navigation / Workspaces` partial，workspace source-change drain 與畫面切換責任切開。
-    - `CoordinatePlannerWorkspaceViewModel` 拆為 `Operations / PropertyCallbacks` partial，主檔保留設定 state 與 summary projection。
-    - 同步修正兩個既有契約漂移：
-      - `SimulationHostViewModel.PrewarmWorkspaceAsync()` 在 `CurrentWorkspace is null` 時直接 return。
-      - `ShellViewModel` source-change drain 在 prewarm 完成後以最新 pending version 更新 processed version，真正 coalesce burst 事件。
+  - Definition of done:
+    - The split follows responsibility boundaries. It does not add a second workflow or a re-derive path.
+  - Completed:
+    - `IndexMappingReportViewModel` is split into `Selection / Verification / AlgorithmTrace` partials. The main file keeps only state, the constructor, and projection properties.
+    - `ShellViewModel` is split into `Console / Navigation / Workspaces` partials. Workspace source-change drain and screen switching responsibilities are separated.
+    - `CoordinatePlannerWorkspaceViewModel` is split into `Operations / PropertyCallbacks` partials. The main file keeps settings state and summary projection.
+    - Also fixed two existing contract drifts:
+      - `SimulationHostViewModel.PrewarmWorkspaceAsync()` returns directly when `CurrentWorkspace is null`.
+      - `ShellViewModel` source-change drain updates the processed version to the latest pending version after prewarm completes, so bursts are truly coalesced.
 
 
-- [x] S11.143 大型 XAML 視圖拆分成可重用 section/control
-  - 觀察依據：
-    - `NotchExportSelectionWindow.axaml`、`CoordinatePlannerWorkspaceView.axaml`、`IndexMappingReportWindow.axaml`、`SimulationWorkspaceView.axaml` 都已超過 550 行。
-  - 範圍：
-    - 上述 XAML 與對應 code-behind / controls / styles
-  - 驗證：
+- [x] S11.143 Split large XAML views into reusable sections/controls
+  - Basis for observation:
+    - `NotchExportSelectionWindow.axaml`, `CoordinatePlannerWorkspaceView.axaml`, `IndexMappingReportWindow.axaml`, and `SimulationWorkspaceView.axaml` each exceed 550 lines.
+  - Scope:
+    - The XAML files above and their corresponding code-behind / controls / styles
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
-    - 相關 smoke / viewmodel tests
+    - Related smoke / ViewModel tests
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - 切出 section 後，binding 與 command 行為不變。
-    - 新增控制項仍遵守 token / theme-ready 規則。
-  - 完成：
-    - `NotchExportSelectionWindow`：左側 rows pane 抽成 `NotchExportSelectionRowsPaneView`。
-    - `IndexMappingReportWindow`：左右 pane 抽成 `IndexMappingReportLeftPaneView` / `IndexMappingReportRightPaneView`。
-    - `CoordinatePlannerWorkspaceView`：左右側邊欄抽成 `CoordinatePlannerWorkspaceControlsPaneView` / `CoordinatePlannerWorkspaceDetailsPaneView`。
-    - `SimulationWorkspaceView`：左右側邊欄抽成 `SimulationWorkspaceControlsPaneView` / `SimulationWorkspaceDetailsPaneView`。
-    - 新增 `WorkspaceViewsSmokeTests`，補 `CoordinatePlannerWorkspaceView` 與 `SimulationWorkspaceView` headless layout guard。
+  - Definition of done:
+    - After extracting sections, binding and command behavior is unchanged.
+    - New controls still follow the token / theme-ready rules.
+  - Completed:
+    - `NotchExportSelectionWindow`: the left rows pane is extracted to `NotchExportSelectionRowsPaneView`.
+    - `IndexMappingReportWindow`: the left and right panes are extracted to `IndexMappingReportLeftPaneView` / `IndexMappingReportRightPaneView`.
+    - `CoordinatePlannerWorkspaceView`: the left and right sidebars are extracted to `CoordinatePlannerWorkspaceControlsPaneView` / `CoordinatePlannerWorkspaceDetailsPaneView`.
+    - `SimulationWorkspaceView`: the left and right sidebars are extracted to `SimulationWorkspaceControlsPaneView` / `SimulationWorkspaceDetailsPaneView`.
+    - Added `WorkspaceViewsSmokeTests` to add headless layout guards for `CoordinatePlannerWorkspaceView` and `SimulationWorkspaceView`.
 
 
-- [x] S11.144 Compatibility quarantine audit：先證明，再決定是否移除 `V31`
-  - 觀察依據：
-    - `NotchSettings` 明寫 `v3.1 is kept for compatibility`。
-    - `V31` 仍存在於 domain/application/tests/docs/example。
-    - UI 端已隱藏但仍保留欄位與同步邏輯。
-  - 範圍：
+- [x] S11.144 Compatibility quarantine audit: prove first, then decide whether to remove `V31`
+  - Basis for observation:
+    - `NotchSettings` explicitly says `v3.1 is kept for compatibility`.
+    - `V31` still exists in domain, application, tests, docs, and example.
+    - The UI hides it, but the field and sync logic are still kept.
+  - Scope:
     - `src/FreeformHelper.Application/Settings/NotchSettings.cs`
     - `src/FreeformHelper.Application/Services/NotchAlgorithms/V31NotchAlgorithm.cs`
     - `src/FreeformHelper.UI/ViewModels/*V31*`
     - `docs/core/notch-v31-algorithm.md`
-    - `example/boe_30.25.json`（S11.149 已移除）
-    - 相關 tests
-  - 驗證：
+    - `example/boe_30.25.json` (removed in S11.149)
+    - Related tests
+  - Verification:
     - `rg -n "\\bV31\\b|v3\\.1|EnableV31|NotchAlgorithmVersion\\.V31" src tests docs example`
-    - 後續依審核結果補 build/tests/lint
-  - 完成定義：
-    - 先產出 dependency proof。
-    - 若仍有真實依賴，轉成 compatibility quarantine；若無依賴，再安排刪除切片。
-  - 完成：
-    - 證據：`V31` 仍會被 `NotchTableGenerator` 註冊並在 `CadAllocation` 模式附加 legacy row，但 UI 已隱藏，simulation 對 `V31` 回傳 unsupported，C exporter 也只輸出 `v2.1/v2.2` section。
-    - 結論：`V31` 是半支援 compatibility leak，不符合目前 FW contract，直接移除 runtime / UI / docs 路徑。
-    - 舊 project 相容：`NotchSettings` 會清掉 unsupported legacy numeric version（例如 31）；若清空則 fallback 到預設 `v2.1/v2.2`。
-    - `example/boe_30.25.json` 已在 S11.149 移除，避免大型 legacy fixture 繼續留在 active example。
+    - Follow up with build/tests/lint based on the audit result
+  - Definition of done:
+    - Produce a dependency proof first.
+    - If real dependencies remain, turn them into a compatibility quarantine. If there are none, schedule a deletion slice.
+  - Completed:
+    - Evidence: `V31` is still registered by `NotchTableGenerator`, and in `CadAllocation` mode it appends a legacy row. However, the UI hides it, simulation returns unsupported for `V31`, and the C exporter outputs only the `v2.1/v2.2` sections.
+    - Conclusion: `V31` is a half-supported compatibility leak. It does not match the current FW contract, so its runtime, UI, and docs paths are removed directly.
+    - Old project compatibility: `NotchSettings` clears unsupported legacy numeric versions (for example, 31). If the list becomes empty, it falls back to the default `v2.1/v2.2`.
+    - `example/boe_30.25.json` was removed in S11.149 to keep a large legacy fixture from staying in the active example set.
 
 
-- [x] S11.145 CSV export contract cleanup：整理用途、欄位與排序，切開 review artifact 與 FW contract 心智模型
-  - 觀察依據：
-    - CSV 目前定位偏向 trace / diff review，但 UI 與文件對其用途說明不足。
-    - 使用者反映輸出資料閱讀順序與欄位語義偏亂，容易和 `.c` FW contract 混淆。
-  - 範圍：
+- [x] S11.145 CSV export contract cleanup: clarify purpose, fields, and ordering; separate the review artifact from the FW contract mental model
+  - Basis for observation:
+    - The CSV is currently positioned toward trace / diff review, but the UI and docs do not explain its purpose well.
+    - Users report that the output reading order and field semantics are confusing, which makes it easy to mix up with the `.c` FW contract.
+  - Scope:
     - `src/FreeformHelper.Application/Export/NotchTableExporter.cs`
     - `src/FreeformHelper.UI/ViewModels/*NotchExport*`
     - `docs/reference/notch-system-reference.md`
     - `docs/guides/app-user-manual.md`
-    - 相關 export tests / example
-  - 驗證：
+    - Related export tests / example
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~NotchTableExporterTests|FullyQualifiedName~NotchExportSelectionViewModelTests" --no-restore -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - 文件明確說明 CSV 的使用對象與非目標。
-    - 欄位順序、欄位名稱與排序規則固定化。
-    - 不再與 `.c` exporter 的 direct-import contract 混用。
-  - 完成：
-    - CSV 在 UI/status/docs 中定位為 `CSV review`，只作 trace / diff review artifact。
-    - CSV header 固定為 `row_number/version/version_code/ic_index/ic_number/fw_diff_idx/regular_pad_id/cad_pad_id/payload_width/payload_01..payload_09/comment`。
-    - CSV 排序固定為 `IC -> FW Diff -> Version -> REG -> CAD`。
-    - `.c` export 仍是唯一 FW direct-import contract。
+  - Definition of done:
+    - Docs clearly state the CSV's audience and non-goals.
+    - Field order, field names, and sort rules are fixed.
+    - It is no longer mixed with the `.c` exporter's direct-import contract.
+  - Completed:
+    - In the UI, status, and docs, CSV is positioned as `CSV review`, meant only as a trace / diff review artifact.
+    - The CSV header is fixed as `row_number/version/version_code/ic_index/ic_number/fw_diff_idx/regular_pad_id/cad_pad_id/payload_width/payload_01..payload_09/comment`.
+    - CSV sort order is fixed as `IC -> FW Diff -> Version -> REG -> CAD`.
+    - `.c` export is still the only FW direct-import contract.
 
 
-- [x] S11.146 Legacy workspace UI class 收斂：非 Notch export 視圖不再沿用 `notchExport*` class
-  - 觀察依據：
-    - `DxfEditChangeListWindow` 是 DXF edit review surface，但仍沿用大量 `notchExport*` style class，降低後續 UI token / selector 可讀性。
-    - `Controls.Core.axaml` 已提供對應 `workspace*` class alias，可先替換使用端，不改樣式行為。
-  - 範圍：
+- [x] S11.146 Legacy workspace UI class convergence: non-Notch export views no longer reuse `notchExport*` classes
+  - Basis for observation:
+    - `DxfEditChangeListWindow` is a DXF edit review surface, but it still uses many `notchExport*` style classes. This makes later UI token and selector maintenance harder to read.
+    - `Controls.Core.axaml` already provides the matching `workspace*` class aliases, so the consuming side can be switched first without changing style behavior.
+  - Scope:
     - `src/FreeformHelper.UI/Views/DxfEditChangeListWindow.axaml`
-    - 必要時補 style selector alias 或文件說明
-  - 驗證：
+    - Add style selector aliases or docs as needed
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~DxfEditChangeList|FullyQualifiedName~WorkspaceViewsSmokeTests" --no-restore -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - DXF edit review view 使用 `workspace*` class，不再借用 `notchExport*` semantic class。
-    - Notch export 專屬 view 可保留 `notchExport*`，避免無意義大規模 rename。
-  - 完成：
-    - `DxfEditChangeListWindow` 的 summary chip、table、list row、inspector 與 action button class 全部改用既有 `workspace*` alias。
-    - 保留既有 style selector alias 與 layout token，不改顏色、尺寸、binding 或 command 行為。
+  - Definition of done:
+    - The DXF edit review view uses `workspace*` classes and no longer borrows `notchExport*` semantic classes.
+    - Notch export-specific views may keep `notchExport*`, to avoid a pointless large-scale rename.
+  - Completed:
+    - All summary chip, table, list row, inspector, and action button classes in `DxfEditChangeListWindow` now use the existing `workspace*` aliases.
+    - Existing style selector aliases and layout tokens are kept. Colors, sizes, binding, and command behavior are unchanged.
 
 
-- [x] S11.147 Project UiSnapshot notch schema 收斂：`EnabledVersions` 不再由 UI snapshot 寫入目前版本設定
-  - 觀察依據：
-    - Notch enabled versions 的實際來源已是 `Project.Settings.Notch.EnabledVersions`。
-    - `UiNotchSnapshot.EnabledVersions` 只剩舊 UI snapshot 相容欄位，若繼續由 `BuildUiSnapshot()` 寫入會形成第二個版本來源。
-  - 範圍：
+- [x] S11.147 Project UiSnapshot notch schema convergence: `EnabledVersions` is no longer written to the current version settings by the UI snapshot
+  - Basis for observation:
+    - The actual source of notch enabled versions is already `Project.Settings.Notch.EnabledVersions`.
+    - `UiNotchSnapshot.EnabledVersions` is now only a legacy UI snapshot compatibility field. If `BuildUiSnapshot()` keeps writing it, it creates a second version source.
+  - Scope:
     - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.UiSnapshot.cs`
     - `src/FreeformHelper.Infrastructure/Project/ProjectUiSnapshot.cs`
     - `src/FreeformHelper.Infrastructure/Project/UiSnapshotPersistenceContract.cs`
-    - 相關 project persistence tests / docs
-  - 驗證：
+    - Related project persistence tests / docs
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~ProjectStoreTests|FullyQualifiedName~ProjectFileMigrationTests|FullyQualifiedName~UiSnapshotPersistenceContractTests|FullyQualifiedName~FreeformHelperViewModelTests.SettingsPersistence.ProjectSaveLoad" --no-restore -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - 目前 UI snapshot 不再輸出 `Notch.EnabledVersions`。
-    - 舊 project 仍可反序列化 legacy 欄位，但不再作為目前設定來源。
-  - 完成：
-    - `BuildUiSnapshot()` 不再寫入 `UiNotchSnapshot.EnabledVersions`。
-    - `UiNotchSnapshot.EnabledVersions` 改為 legacy-only nullable 欄位，只有舊 JSON 帶值時才保留；空值不輸出。
-    - `UiSnapshotPersistenceContract` 排除 legacy 欄位，並在 settings entry matrix 明確標示 Step5 version source 只來自 `Project.Settings.Notch.EnabledVersions`。
+  - Definition of done:
+    - The current UI snapshot no longer outputs `Notch.EnabledVersions`.
+    - Old projects can still deserialize the legacy field, but it is no longer used as the current settings source.
+  - Completed:
+    - `BuildUiSnapshot()` no longer writes `UiNotchSnapshot.EnabledVersions`.
+    - `UiNotchSnapshot.EnabledVersions` is now a legacy-only nullable field. It is kept only when old JSON contains a value. Null values are not output.
+    - `UiSnapshotPersistenceContract` excludes the legacy field. The settings entry matrix explicitly states that the Step5 version source comes only from `Project.Settings.Notch.EnabledVersions`.
 
 
-- [x] S11.148 Test analyzer warning cleanup：移除已知測試 warning，不靠 suppression
-  - 觀察依據：
-    - beta0.7 已拆分測試熱點，但測試專案仍有 analyzer warning，會增加後續 refactor noise。
-  - 範圍：
+- [x] S11.148 Test analyzer warning cleanup: remove known test warnings without relying on suppression
+  - Basis for observation:
+    - Beta0.7 has split the test hotspots, but the test project still has analyzer warnings. These add noise to future refactors.
+  - Scope:
     - `tests/FreeformHelper.Tests/**/*.cs`
-  - 驗證：
+  - Verification:
     - `dotnet build tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --no-restore -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - 測試專案 build 不再出現本次盤點可立即修正的 analyzer warning。
-    - 不新增 warning suppression。
-  - 完成：
-    - 修正 `CA1861` 常數 array 直接傳入與 `CA1859` helper 回傳型別 warning，未新增 suppression。
-    - `dotnet build tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -p:UseAppHost=false` 目前 0 warning / 0 error。
-    - 完整 `dotnet test` 仍暴露既有 full-suite baseline drift：UI visual baseline、TM81/notch golden baseline、3635 regular-mask/simulation count；本 slice 未變更那些 baseline 或演算法。
+  - Definition of done:
+    - The test project build no longer shows analyzer warnings that this inventory can fix immediately.
+    - No new warning suppressions are added.
+  - Completed:
+    - Fixed `CA1861` (constant array passed directly) and `CA1859` (helper return type) warnings. No suppressions added.
+    - `dotnet build tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -p:UseAppHost=false` currently shows 0 warnings / 0 errors.
+    - A full `dotnet test` still exposes existing full-suite baseline drift: UI visual baseline, TM81/notch golden baseline, and 3635 regular-mask/simulation counts. This slice did not change those baselines or the algorithms.
 
 
-- [x] S11.149 Example directory reduction：移除未被測試/文件/腳本使用的大型 legacy fixture
-  - 觀察依據：
-    - `example/boe_30.25.json` 是 V31 回收前留下的大型 legacy fixture；目前主要範例與回歸已集中在 `BOE36.35` 與 `TM 8.1`。
-  - 範圍：
+- [x] S11.149 Example directory reduction: remove large legacy fixtures not used by tests, docs, or scripts
+  - Basis for observation:
+    - `example/boe_30.25.json` is a large legacy fixture left over from before the V31 retirement. Current main examples and regression runs are concentrated on `BOE36.35` and `TM 8.1`.
+  - Scope:
     - `example/*`
-    - 相關 docs / tests / README reference
-  - 驗證：
+    - Related docs / tests / README references
+  - Verification:
     - `rg -n "boe_30\\.25|example/BOE36\\.35|example/TM 8\\.1" src tests docs scripts README.md TODO.md`
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - 未使用的大型 legacy fixture 已移除。
-    - 保留仍被 golden tests / runtime scripts / docs 使用的 example fixture。
-  - 完成：
-    - 刪除 `example/boe_30.25.json`（約 6.2MB），引用盤點確認只剩 TODO/舊掃描文件提及，無 src/tests/scripts 依賴。
-    - 保留 `BOE36.35` 與 `TM 8.1`，因為仍被 golden tests、runtime scripts、manual/docs 使用。
+  - Definition of done:
+    - Unused large legacy fixtures are removed.
+    - Example fixtures still used by golden tests, runtime scripts, or docs are kept.
+  - Completed:
+    - Deleted `example/boe_30.25.json` (about 6.2MB). Reference inventory confirmed it is mentioned only in TODO and old scan docs, with no dependencies in src, tests, or scripts.
+    - Kept `BOE36.35` and `TM 8.1`, because golden tests, runtime scripts, and the manual/docs still use them.
 
 
-- [x] S11.150 Runtime query / UI export wording convergence：`csv` 明確標示為 `CSV review`
-  - 觀察依據：
-    - UI 已多處使用 `CSV review`，但 runtime query help / error message 與部分 metadata 仍顯示 `CSV`，容易和 FW direct-import contract 混淆。
-  - 範圍：
+- [x] S11.150 Runtime query / UI export wording convergence: explicitly label `csv` as `CSV review`
+  - Basis for observation:
+    - The UI already uses `CSV review` in many places, but runtime query help / error messages and some metadata still show `CSV`. This easily gets mixed up with the FW direct-import contract.
+  - Scope:
     - `src/FreeformHelper.UI/Services/RuntimeQueryUseCase*.cs`
     - `src/FreeformHelper.UI/ViewModels/NotchExportFileTypeMetadata.cs`
     - `docs/reference/runtime-cli-plan.md`
-    - 相關 runtime/export tests
-  - 驗證：
+    - Related runtime/export tests
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~RuntimeQueryUseCaseTests|FullyQualifiedName~NotchExportSelectionViewModelTests" --no-restore -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - CLI 仍接受 `--format csv`，但所有說明與 export kind label 都以 `CSV review` 呈現。
-  - 完成：
-    - `NotchExportFileTypeMetadata.GetExportKindLabel(Csv)` 改為 `CSV review`。
-    - Runtime query help / error message / export response 補上 `CSV review` 語意，保留 `--format csv` 作為 CLI token。
-    - `docs/reference/runtime-cli-plan.md` 明確註明 `csv` 是 review artifact，`.c` 才是 FW direct-import contract。
+  - Definition of done:
+    - The CLI still accepts `--format csv`, but all help text and export kind labels show `CSV review`.
+  - Completed:
+    - `NotchExportFileTypeMetadata.GetExportKindLabel(Csv)` now returns `CSV review`.
+    - Runtime query help, error messages, and export responses now carry the `CSV review` meaning. `--format csv` is kept as the CLI token.
+    - `docs/reference/runtime-cli-plan.md` explicitly states that `csv` is a review artifact and `.c` is the FW direct-import contract.
 
 
-- [x] S11.151 ViewModel remaining hotspot scan：盤點剩餘大型 partial 並形成 beta0.8 前可執行拆分候選
-  - 觀察依據：
-    - beta0.7 已拆掉幾個大型 ViewModel，但 `FreeformHelperViewModel.*` 仍有多個超過維護舒適區的 partial。
-  - 範圍：
+- [x] S11.151 ViewModel remaining hotspot scan: inventory the remaining large partials and form executable split candidates before beta0.8
+  - Basis for observation:
+    - Beta0.7 has already removed several large ViewModels, but several `FreeformHelperViewModel.*` partials still exceed a comfortable maintenance size.
+  - Scope:
     - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel*.cs`
     - `docs/guides/*hotspot*`
-  - 驗證：
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成定義：
-    - 產出剩餘 hotspot 的行數、責任、可拆分方式與風險排序。
-    - 本 slice 僅做盤點/命名收斂建議，不改使用者行為。
-  - 完成：
-    - 產出 `docs/guides/viewmodel-hotspot-scan-2026-04-23-beta07.md`。
-    - 將剩餘 ViewModel hotspot 排成 beta0.8 可執行候選：Project orchestration、Layer filtering、Pad inspector snapshot、Notch export request/cache、Core constructor slimming。
+  - Definition of done:
+    - Produce line counts, responsibilities, split approaches, and a risk ranking for the remaining hotspots.
+    - This slice only does inventory and naming convergence suggestions. It does not change user behavior.
+  - Completed:
+    - Produced `docs/guides/viewmodel-hotspot-scan-2026-04-23-beta07.md`.
+    - Ranked the remaining ViewModel hotspots into beta0.8 executable candidates: Project orchestration, Layer filtering, Pad inspector snapshot, Notch export request/cache, and Core constructor slimming.
 
 
-- [x] S11.152 感應量分配合理性驗證框架：建立 EMS guard / net-flow / geometry audit
-  - 觀察依據：
-    - 目前 `Simulation + global 400` 能快速暴露局部 `After` 過低或過高，但 `After` 是否接近 400 不是物理正確性的充分條件。
-    - 分配合理性應先遵守幾何面積比例；`global 400` 只能作為診斷輸入，用來暴露局部淨流量失衡或不合理累積。
-    - `After > 480` 可能觸發 EMS 保護機制，先列為 hard risk / fail 條件。
-  - 目標：
-    - 建立一套可自動化的合理性驗證，至少包含：
-      - global conservation（總量守恆）
-      - EMS safety cap audit（預設 `After <= 480`）
-      - uniform-field diagnostic（整面 400 只作診斷，不作「越接近 400 越正確」的優化目標）
-      - per-diff net-flow residual（`inflow - outflow`）
-      - geometry cap audit（小 overlap 不得直接膨脹成不合理 target ratio）
-  - 驗證：
-    - `3635` 與 `TM8.1` 各輸出一份 audit report / snapshot，可直接指出高風險 diff、是否超過 EMS cap、以及原因分類。
-  - 完成：
-    - `SimulationSafetyAuditService.Analyze(NotchApplySimulationResult)` 已正式化 EMS guard、global action-flow residual、per-diff net-flow residual 與 target coverage geometry cap audit。
-    - Simulation VM 改為持有正式 audit snapshot，UI/export 取得同一份 `SimulationSafetyAuditResult`，避免各自重推 partial result。
-    - classification 目前分為 `GeometryExpected`、`NetFlowSuspicious`、`EmsRisk`，並保留 high-risk diff / max-after / cap margin。
-  - 驗證：
-    - `SimulationSafetyAuditServiceTests` 覆蓋 EMS clean/risk、balanced physical audit、net-flow residual、target coverage risk。
+- [x] S11.152 Sensing-amount allocation plausibility verification framework: build EMS guard / net-flow / geometry audit
+  - Basis for observation:
+    - Today `Simulation + global 400` can quickly expose a local `After` that is too low or too high. But an `After` close to 400 is not a sufficient condition for physical correctness.
+    - Allocation plausibility must first follow the geometric area ratio. `global 400` is only a diagnostic input, used to expose local net-flow imbalance or unreasonable accumulation.
+    - `After > 480` may trigger the EMS protection mechanism, so it is first listed as a hard risk / fail condition.
+  - Goal:
+    - Build an automated plausibility verification that includes at least:
+      - global conservation (the total amount is conserved)
+      - EMS safety cap audit (default `After <= 480`)
+      - uniform-field diagnostic (a whole-surface 400 is only a diagnostic, not an optimization target of "the closer to 400, the more correct")
+      - per-diff net-flow residual (`inflow - outflow`)
+      - geometry cap audit (a small overlap must not inflate directly into an unreasonable target ratio)
+  - Verification:
+    - `3635` and `TM8.1` each output one audit report / snapshot. The report can point directly to the high-risk diffs, whether they exceed the EMS cap, and the cause classification.
+  - Completed:
+    - `SimulationSafetyAuditService.Analyze(NotchApplySimulationResult)` has formalized the EMS guard, the global action-flow residual, the per-diff net-flow residual and the target coverage geometry cap audit.
+    - The Simulation VM now holds a formal audit snapshot. UI and export get the same `SimulationSafetyAuditResult`, so they do not each re-derive from a partial result.
+    - The classification is now `GeometryExpected`, `NetFlowSuspicious` and `EmsRisk`. It also keeps the high-risk diff, max-after and cap margin.
+  - Verification:
+    - `SimulationSafetyAuditServiceTests` cover EMS clean/risk, balanced physical audit, net-flow residual and target coverage risk.
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "SimulationSafetyAuditServiceTests|SimulationWorkspaceViewModelTests|FreeformHelperViewModelTests"`
 
 
-- [x] S11.154 Stage3 / target allocation 安全校正：探索 area-preserving + EMS-guarded 模型
-  - 觀察依據：
-    - 現行 no-gain 模式雖滿足 source-side conservation，但未保證 target-side 不會局部累積。
-    - 單純把 `After` 拉近 400 可能違反幾何面積比例原則，因此不能把「接近 400」當作主要最佳化目標。
-    - `global=400` 場景若出現 `100+` 級別偏差，需要先判斷是合理的邊界/面積比例結果，還是不合理的局部 net-flow imbalance。
-    - `After > 480` 先視為 EMS safety violation，必須在 UI / Simulation / export 前提示。
-  - 目標：
-    - 評估更合理的 target allocation 模型，候選至少比較：
+- [x] S11.154 Stage3 / target allocation safety correction: explore an area-preserving + EMS-guarded model
+  - Basis for observation:
+    - The current no-gain mode satisfies source-side conservation, but it does not guarantee that the target side has no local accumulation.
+    - Simply pulling `After` close to 400 may violate the geometric area ratio principle, so "close to 400" must not be the main optimization target.
+    - If a `global=400` scenario shows a deviation at the `100+` level, first decide whether it is a reasonable boundary / area-ratio result or an unreasonable local net-flow imbalance.
+    - `After > 480` is first treated as an EMS safety violation, and it must be flagged before UI / Simulation / export.
+  - Goal:
+    - Evaluate a more reasonable target allocation model. The candidates compare at least:
       - exact-overlap-only
-      - ToFull 只作 support mask / cap，不直接當 full weight
-      - area-constrained balanced transport（在保留 source/target 面積比例前提下限制不合理累積）
-      - EMS-guarded cap / warning（不以接近 400 為目標，但禁止或警告 `After > 480`）
-    - 明確定義 allowable deviation（interior / boundary 可分級），並把偏差原因分成 geometry-expected / net-flow-suspicious / EMS-risk。
-  - 驗證：
-    - `global=400` 下 `3635` 不得出現 `After > 480`。
-    - 高偏差 diff 必須能在 Step5 / Simulation audit 中追到 source legs、target legs、面積比例與 net-flow residual。
-  - 完成：
-    - `Target coverage guard` 仍作為 first-line EMS safety policy；正式 audit 會再檢查同一 `(IC, FW Diff)` retained + incoming coverage 是否超過預設 `120%` cap。
-    - `After > 480` 維持 EMS hard-risk gate；Simulation/export 使用同一份 audit 判斷，不以「接近 400」作最佳化目標。
-    - 高偏差 diff 可由 Simulation selected diff 的 source/target legs、net-flow residual 與 target coverage risk 一起定位原因。
-  - 驗證：
+      - ToFull is only a support mask / cap and is not used directly as a full weight
+      - area-constrained balanced transport (limit unreasonable accumulation while the source/target area ratio is preserved)
+      - EMS-guarded cap / warning (the target is not to get close to 400, but `After > 480` is forbidden or warned)
+    - Define the allowable deviation explicitly (interior / boundary can be graded), and divide the deviation causes into geometry-expected / net-flow-suspicious / EMS-risk.
+  - Verification:
+    - Under `global=400`, `3635` must not show `After > 480`.
+    - A high-deviation diff must be traceable in the Step5 / Simulation audit to its source legs, target legs, area ratio and net-flow residual.
+  - Completed:
+    - The `Target coverage guard` remains the first-line EMS safety policy. The formal audit also checks whether the retained + incoming coverage of the same `(IC, FW Diff)` exceeds the default `120%` cap.
+    - `After > 480` stays the EMS hard-risk gate. Simulation and export use the same audit for this judgment, and "close to 400" is not an optimization target.
+    - The cause of a high-deviation diff can be located together from the source/target legs of the Simulation selected diff, the net-flow residual and the target coverage risk.
+  - Verification:
     - `SimulationSafetyAuditServiceTests.AnalyzeResult_WhenTargetCoverageExceedsCap_ReportsCoverageRisk`
     - `SimulationWorkspaceViewModelTests.SimulationSafetySummary_WhenAfterExceedsEmsCap_ReportsRisk`
 
 
-## Beta 0.10（UI 驗證平台與資訊呈現收斂）
+## Beta 0.10 (UI verification platform and information presentation convergence)
 
-- [x] S11.157 Inspector quick focus：輸入 Diff / CAD / Regular 後直接 highlight/focus
-  - 範圍：
+- [x] S11.157 Inspector quick focus: after entering Diff / CAD / Regular, highlight and focus directly
+  - Scope:
     - `src/FreeformHelper.UI/Views/RightWorkflowSections/RightWorkflowInspectorView.axaml`
     - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Locate.cs`
     - `src/FreeformHelper.UI/Services/QuickFocusQueryParser.cs`
-  - 完成：
-    - 支援 `diff 72`、`ic1 diff72`、`cad 4809`、`reg 4616`。
-    - 純數字依序嘗試 CAD / REG / FW diff。
-    - 所有結果都走既有 locate selection path，不新增第二套 focus 行為。
+  - Completed:
+    - Supports `diff 72`, `ic1 diff72`, `cad 4809`, and `reg 4616`.
+    - Pure numbers are tried in order as CAD, then REG, then FW diff.
+    - All results go through the existing locate selection path. No second focus behavior is added.
 
-- [x] S11.158 Pad Info relation cards phase 1：Regular relation 改成 area/flow 卡片
-  - 範圍：
+- [x] S11.158 Pad Info relation cards phase 1: change Regular relation to area/flow cards
+  - Scope:
     - `src/FreeformHelper.UI/ViewModels/PadInfo/*`
     - `src/FreeformHelper.UI/Views/PadInfoSections/*`
-  - 完成：
-    - Regular 右鍵 Relation 區改為 `CAD overlap areas` 卡片，直接顯示 overlap area、REG/CAD coverage、CAD Output FW diff。
-    - Notch row links 改成全寬 flow card，可點擊 highlight，不再藏在窄小文字 link。
-    - CAD / Regular Relation 開始共用同一組 allocation-card 視覺語言。
-  - 驗證：
+  - Completed:
+    - The Regular right-click Relation section is changed to `CAD overlap areas` cards. It directly shows overlap area, REG/CAD coverage, and CAD Output FW diff.
+    - Notch row links are changed to full-width flow cards that can be clicked to highlight. They are no longer hidden in narrow small text links.
+    - CAD and Regular Relation begin sharing the same allocation-card visual language.
+  - Verification:
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
 
-- [x] S11.159 Pad Info relation cards phase 2：抽出 CAD/Regular 共用框架控件
-  - 目標：
-    - CAD / Regular 右鍵面板 header、relation、debug、edit tools 使用一致 section/control contract。
-    - Relation 內每個面積卡片可點選 highlight 指定 CAD / Regular overlap owner。
-    - Debug 區保留但預設收起，改成結構化卡片，不回到長文字堆疊。
-  - 完成：
-    - 新增 `PadInfoRelationCardListView`，CAD area allocation、Regular CAD overlap、Regular notch row flow 共用同一個全寬 card template。
-    - `PadInfoTargetAllocationViewModel` 與 Regular relation cards 對齊 `Title/Role/Meta/Ratio/Area/Raw/HighlightCommand` 投影欄位。
-    - Regular notch row flow 改為 card 投影，保留 click highlight 行為。
-  - 驗證：
+- [x] S11.159 Pad Info relation cards phase 2: extract shared CAD/Regular framework controls
+  - Goal:
+    - The CAD / Regular right-click panel header, relation, debug, and edit tools use one consistent section/control contract.
+    - Each area card in Relation can be selected to highlight the specified CAD / Regular overlap owner.
+    - The Debug section is kept but collapsed by default, and it uses structured cards instead of returning to long stacked text.
+  - Completed:
+    - Added `PadInfoRelationCardListView`. CAD area allocation, Regular CAD overlap, and Regular notch row flow share the same full-width card template.
+    - `PadInfoTargetAllocationViewModel` and Regular relation cards align with the `Title/Role/Meta/Ratio/Area/Raw/HighlightCommand` projection fields.
+    - Regular notch row flow is changed to card projection, and click-highlight behavior is kept.
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj --filter "FullyQualifiedName~PadInfoViewModelTests" /p:UseAppHost=false`
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
 
-- [x] S11.160 Simulation verification platform：Max After / EMS / risk diff / net-flow inspector
-  - 目標：
-    - Simulation 顯示 Max After、EMS violation count、top risk diffs。
-    - 點選 diff 可看到 source legs、target legs、net-flow residual。
-    - 熱圖補 legend、EMS cap line、Before/After/Delta 模式。
-  - 驗證：
-    - 3635 / TM8.1 simulation snapshot 能直接指出 high-risk diff 與原因分類。
+- [x] S11.160 Simulation verification platform: Max After / EMS / risk diff / net-flow inspector
+  - Goal:
+    - Simulation shows Max After, EMS violation count, and top risk diffs.
+    - Selecting a diff shows its source legs, target legs, and net-flow residual.
+    - The heatmap adds a legend, EMS cap line, and Before/After/Delta modes.
+  - Verification:
+    - 3635 / TM8.1 simulation snapshots can directly identify high-risk diffs and their cause classification.
 
-- [x] S11.161 Right workflow density cleanup：Step 1~6 主流程一致化
-  - 目標：
-    - 每個 step 只保留 status、next action、primary action。
-    - Advanced / debug / trace 預設收起。
-    - 各 step 使用同一套 compact/narrow panel density 規則。
-  - 驗證：
-    - `RightWorkflow*View` build + smoke。
+- [x] S11.161 Right workflow density cleanup: make the Step 1~6 main flow consistent
+  - Goal:
+    - Each step keeps only status, next action, and primary action.
+    - Advanced / debug / trace are collapsed by default.
+    - Each step uses the same compact/narrow panel density rules.
+  - Verification:
+    - `RightWorkflow*View` build + smoke.
 
-- [x] S11.162 Settings high-frequency first：常用設定固定置頂，低頻進 Advanced
-  - 目標：
-    - General 第一屏固定 Cascade / X / Y / AA size / scan order / regular source。
-    - disabled input、hover help、validation error 狀態一致化。
-    - 低頻與 debug 設定收進 Advanced。
-  - 驗證：
-    - SettingsWindow layout smoke + `dotnet build`。
+- [x] S11.162 Settings high-frequency first: pin common settings at the top, and move low-frequency settings into Advanced
+  - Goal:
+    - General's first screen fixes Cascade / X / Y / AA size / scan order / regular source.
+    - Disabled input, hover help, and validation error states are made consistent.
+    - Low-frequency and debug settings move into Advanced.
+  - Verification:
+    - SettingsWindow layout smoke + `dotnet build`.
 
-- [x] S11.163 Step5 handoff checklist：版本/profile/safety/runtime parity 一眼可讀
-  - 目標：
-    - Step5 明確顯示匯出版本、profile、Simulation safety、C export example、runtime parity。
-    - 不安全時 block 或要求 override reason，不只顯示 warning。
-  - 驗證：
-    - Notch export ViewModel tests + runtime query export tests。
+- [x] S11.163 Step5 handoff checklist: version/profile/safety/runtime parity readable at a glance
+  - Goal:
+    - Step5 clearly shows the export version, profile, Simulation safety, C export example, and runtime parity.
+    - When unsafe, block or require an override reason. Do not show only a warning.
+  - Verification:
+    - Notch export ViewModel tests + runtime query export tests.
 
-- [x] S11.164 UI density/token rules：normal / compact / narrow panel 三種密度規則
-  - 目標：
-    - badge、button、card padding、section title、scrollbar、disabled state 全部對齊 token。
-    - 新增/更新設計規則文件，避免每個 view 自行調 spacing。
-  - 驗證：
-    - `rg` 檢查新增 inline color/size。
+- [x] S11.164 UI density/token rules: three density rules for normal / compact / narrow panels
+  - Goal:
+    - Badge, button, card padding, section title, scrollbar, and disabled state all align with tokens.
+    - Add or update a design rules document so each view does not tune its own spacing.
+  - Verification:
+    - `rg` check for newly added inline color/size.
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj -p:UseAppHost=false`

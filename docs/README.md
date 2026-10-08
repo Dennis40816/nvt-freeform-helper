@@ -1,69 +1,69 @@
-# Docs 導覽
-最後更新：2026-07-20
+# Docs Guide
+Last updated: 2026-07-20
 
-## 新手中文入口
+## New User Chinese Entry
 
-第一次接手或第一次操作 app，先看這份：
+If you are new to this project or new to operating the app, read this first:
 
 1. `docs/guides/new-user-reading-guide.md`
-   - 新手中文閱讀路線、角色分流、哪些文件先不要看。
+   - Chinese reading route for new users, role split, and which documents to skip for now.
 
-最短操作路線：
+Shortest operating route:
 
 1. `docs/guides/app-user-manual.md`
-   - UI 頁面、Step1~Step5、Simulation / Export 基本流程。
+   - UI pages, Step1~Step5, and the basic Simulation / Export flow.
 2. `docs/guides/settings-parameter-guide.md`
-   - Settings 全參數功能、調適建議與 cascade per-IC X/Y 操作。
+   - All Settings parameters, tuning advice, and cascade per-IC X/Y operations.
 3. `docs/diagrams/notch-simulation/zh-TW/README.md`
-   - Notch table 與 Simulation 的中文流程圖入口。
+   - Entry for the Chinese flow diagrams for Notch table and Simulation.
 
-這個區塊只列中文主體或已有中文版本的文件；若新手必讀文件只有英文，先補中文版本再加入。
+This section lists only documents that have a Chinese main text or an existing Chinese version. If a must-read document for new users exists only in English, add a Chinese version first before adding it here.
 
-## 文件結構
+## Document Structure
 
 - `docs/core/`
-  - 核心規格、演算法 deep-dive、workflow pipeline。
+  - Core specifications, algorithm deep-dives, and workflow pipeline.
 - `docs/diagrams/`
-  - Mermaid 流程圖；新手優先看 `zh-TW`。
+  - Mermaid flow diagrams; new users should start with `zh-TW`.
 - `docs/guides/`
-  - 使用手冊、設定指南、重構手冊、測試分類與閱讀指南。
+  - User manuals, settings guides, refactoring manuals, test categories, and reading guides.
 - `docs/performance/`
-  - 效能基線、量測與優化筆記。
+  - Performance baselines, measurements, and optimization notes.
 - `docs/reference/`
-  - canonical reference、外部契約、CLI 設計與行為盤點。
+  - Canonical reference, external contracts, CLI design, and behavior inventory.
 - `docs/generated/`
-  - 工具生成文件，不手動維護。
+  - Tool-generated documents; not maintained by hand.
 - `docs/archive/`
-  - 已退出主線但保留追溯價值的歷史文件。
+  - Historical documents that have left the main line but are kept for traceability.
 
-## 維護者深入路線
+## Maintainer Deep-Dive Route
 
-這組是接手維護或 debug 時的閱讀順序，不是第一次使用 app 的最短路線。
+This group is the reading order for taking over maintenance or debugging. It is not the shortest route for first-time app use.
 
 1. `docs/reference/notch-system-reference.md`
-   - Notch pipeline / diff identity / simulation / export contract 的唯一 canonical reference。
+   - The only canonical reference for the Notch pipeline, diff identity, simulation, and export contract.
 2. `docs/core/freeform-helper-algorithms.md`
-   - Freeform Helper 主流程與 Step1~Step5 演算法全解，含對應程式入口。
+   - Full guide to the Freeform Helper main flow and Step1~Step5 algorithms, including the matching code entry points.
 3. `docs/guides/app-user-manual.md`
-   - 給一般使用者/驗證者的完整操作手冊，從載入專案到 Simulation / Export / Diagnostics。
+   - Complete operating manual for general users and verifiers, from loading a project to Simulation / Export / Diagnostics.
 4. `docs/core/notch-v21-v22-flow.md`
-   - Step5 flow、bucket、continuation 與 export path 的唯一 deep-dive。
+   - The only deep-dive for the Step5 flow, buckets, continuation, and export path.
 5. `docs/diagrams/notch-simulation/zh-TW/README.md`
-   - Notch table 計算與 Simulation 驗證的中文 Mermaid 圖庫入口。
+   - Entry to the Chinese Mermaid diagram library for Notch table calculation and Simulation validation.
 6. `ROADMAP.md`
-   - 唯一的進度表：修正線、產品功能、整合 Core 三條線，每項附目標版本、狀態與 PR 連結。
+   - The only progress table: fix line, product features, and Core integration line, each item with target version, status, and PR link.
 7. `docs/reference/refactor-contract.md`
-   - 1.0.x 重構契約：zero-diff 政策、Firmware Q7 契約、gate G0～G6、golden 更新規則與未完成 slice 的規格。
+   - 1.0.x refactor contract: zero-diff policy, Firmware Q7 contract, gates G0 to G6, golden update rules, and specifications for unfinished slices.
 8. `docs/guides/post-1.0-tool-workbench-redesign-plan-2026-04-30.md`
-   - 1.0 後 Tool Workbench 重做規格：Simulation 完整性與 Coordinate artifact 產生工具。
+   - Post-1.0 Tool Workbench redesign specification: Simulation completeness and the Coordinate artifact generation tool.
 9. `docs/guides/refactor-playbook.md`
-   - 重構與交接標準流程（分支、驗證、提交）。
+   - Standard workflow for refactoring and handover (branches, verification, commits).
 10. `docs/guides/settings-parameter-guide.md`
-   - SettingsWindow 全參數功能、調適建議與 cascade per-IC X/Y 操作說明。
+   - SettingsWindow full parameter guide, tuning advice, and cascade per-IC X/Y operation instructions.
 11. `docs/core/workflow-pipeline.md`
-   - Step 依賴關係與 invalidation 規則。
+   - Step dependencies and invalidation rules.
 
-## 常用補充文件
+## Common Supplementary Documents
 
 - `docs/core/notch-v21-algorithm.md`
 - `docs/core/notch-v22-algorithm.md`
@@ -81,24 +81,24 @@
 - `example/BOE36.35/notch_export_v21_current.c`
 - `example/BOE36.35/notch_export_v22_current.c`
 
-## 先不要從這裡開始
+## Do Not Start Here
 
-- `docs/archive/`：歷史保留，不代表目前主線；舊 repo scan 報告集中在 `docs/archive/repo-refactor-scans/`。
-- `docs/guides/repo-refactor-scan-2026-06-26.md`：最新掃描紀錄，適合追技術債，不適合入門。
-- `docs/generated/`：工具生成，不手動維護。
-- `docs/diagrams/notch-simulation/en/`：英文圖庫；新手優先看 `zh-TW`。
-- `docs/guides/*redesign-plan*.md`、`docs/guides/post-1.0-*`：設計提案或後續計畫，不是操作手冊。
+- `docs/archive/`: Kept for history; does not represent the current main line. Old repo scan reports are collected in `docs/archive/repo-refactor-scans/`.
+- `docs/guides/repo-refactor-scan-2026-06-26.md`: The latest scan record; suitable for tracking technical debt, not for onboarding.
+- `docs/generated/`: Tool-generated; not maintained by hand.
+- `docs/diagrams/notch-simulation/en/`: English diagram library; new users should start with `zh-TW`.
+- `docs/guides/*redesign-plan*.md`, `docs/guides/post-1.0-*`: Design proposals or later plans, not operating manuals.
 
-## 已清理與收斂
-- 已刪除不再適用文件：`docs/non-notch-refactor-batches.md`
-- 已刪除已被 canonical/deep-dive 完整覆蓋的文件：
+## Cleanup and Consolidation
+- Deleted documents that no longer apply: `docs/non-notch-refactor-batches.md`
+- Deleted documents that are fully covered by the canonical/deep-dive documents:
   - `docs/core/notch-algorithm-overview.md`
   - `docs/core/freeform-notch-spec.md`
   - `docs/code/notch_v21.md`
-- 原本平鋪在 `docs/` 根目錄的規格文件，已依用途分流到 `core/guides/performance/reference/archive`
+- Specification documents that were originally flat in the `docs/` root have been sorted by purpose into `core/guides/performance/reference/archive`.
 
-## 維護原則
-- 只保留「仍在現行流程中會被直接引用」的文件在 `core/` 或 `guides/`。
-- 可由工具或程式重新產生的內容，不長期存放於 `docs/`。
-- 舊版提案若仍需追溯，一律移入 `docs/archive/`，避免主線閱讀干擾。
+## Maintenance Principles
+- Only keep documents in `core/` or `guides/` that are still directly referenced in the current workflow.
+- Content that can be regenerated by tools or programs should not be stored long-term in `docs/`.
+- Old proposals that still need traceability must be moved to `docs/archive/` to avoid disturbing the main-line reading.
 

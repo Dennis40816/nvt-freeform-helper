@@ -18,7 +18,7 @@ For the `VERSION` value and the repository-external test area, see `ROADMAP.md` 
 
 ## Include Work in Versions and PRs
 
-Each PR describes the outcome, associated issue/TODO, affected workflow/contract, and verification. Review and merge requirements follow the ["Merge boundaries" in the contribution guide](../../CONTRIBUTING.md#合併邊界owner-決定2026-10-02).
+Each PR describes the outcome, associated issue/TODO, affected workflow/contract, and verification. Review and merge requirements follow the ["Merge boundaries" in the contribution guide](../../CONTRIBUTING.md#merge-boundaries-owner-decision-2026-10-02).
 
 ## Release Recovery and release notes
 

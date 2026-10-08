@@ -27,7 +27,7 @@ The current repo verifier lanes in `./scripts/verify.ps1` are `-StructureOnly`, 
 
 ## Review and checkpoint
 
-For each logical slice, first complete the directly relevant tests, build, and lint, inspect the diff to be committed, then record the outcome in a commit with a single scope. Push the branch at each milestone; merge requirements follow the ["Merge boundaries" in the contribution guide](../../CONTRIBUTING.md#合併邊界owner-決定2026-10-02). Gates that have not passed are not treated as passed.
+For each logical slice, first complete the directly relevant tests, build, and lint, inspect the diff to be committed, then record the outcome in a commit with a single scope. Push the branch at each milestone; merge requirements follow the ["Merge boundaries" in the contribution guide](../../CONTRIBUTING.md#merge-boundaries-owner-decision-2026-10-02). Gates that have not passed are not treated as passed.
 
 ## Specification Consistency and Retries
 

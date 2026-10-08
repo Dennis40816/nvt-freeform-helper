@@ -1,6 +1,6 @@
 # Repo Refactor Scan Template
 
-> 用途：每次執行 repo scan 時，統一輸出格式，確保 S11.52 要求的 direct state mutation gate 不會漏掉。
+> Purpose: Each time a repo scan runs, use one output format so the direct state mutation gate required by S11.52 does not miss anything.
 
 ## Metadata
 - Generated:
@@ -17,14 +17,14 @@
 
 ## Line Count Hotspots
 - top files by line count:
-- 風險摘要：
-- 本輪是否處理：
+- Risk summary:
+- Handled this round:
 
 ## Unique Path Audit
 - acceptable multi-entry / single-path:
 - unacceptable multi-path re-derivation:
-- 本輪收斂項目：
-- 尚未收斂項目：
+- Converged this round:
+- Not yet converged:
 
 ## Direct State Mutation Hotspots
 - hotspot count:
@@ -55,10 +55,10 @@
 - log:
 
 ## TODO Sync
-- 新增 TODO:
-- 更新 TODO:
-- 已完成項目封存:
+- New TODO:
+- Updated TODO:
+- Archived completed items:
 
 ## PR Checklist Link
-- 使用 checklist: `docs/guides/refactor-pr-checklist.md`
-- direct mutation hotspot 已逐項對應 convergence route：`Yes/No`
+- Checklist in use: `docs/guides/refactor-pr-checklist.md`
+- Each direct mutation hotspot mapped to a convergence route: `Yes/No`

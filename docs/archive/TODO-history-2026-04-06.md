@@ -1,315 +1,315 @@
-# TODO 完成項目封存（2026-04-06）
+# TODO Completed Items Archive (2026-04-06)
 
-> 來源：`TODO.md`
-> 說明：此檔保留從 active TODO 移出的完成項目（`[x]`）。
+> Source: `TODO.md`
+> Note: This file keeps completed items (`[x]`) moved out of the active TODO.
 
-## Beta 0.2 必做（本次）
+## Beta 0.2 Required (This Round)
 
-- [x] S11.77 修正 Coordinate 頁面 AA 區 preview / overlay 越界與左側偏移問題
-  - 觀察依據：
-    - `CoordinatePlannerWorkspaceUseCase.BuildSnapshot(...)` 會以 `session.Grid.Bounds` 或 selected AA layer bounds 建立 `snapshot.ActiveAreaBounds`。
-    - `PadCanvas.GetWorldBounds()` 目前主要仍依 `CadPads + RegularPads` 做 fit；Coordinate overlay 與 PadCanvas fit 不是同一份 bounds 契約。
-    - `CoordinatePlannerWorkspaceView.axaml` 的 `CoordinateOverlayCanvas` / `CoordinateOverlayLabelCanvas` 與中心宿主尚未完整以同一份 viewport + clipping 契約約束；`CoordinatePlannerWorkspaceView.axaml.cs` 直接以 `Canvas.SetLeft/Top(...)` 放置 overlay 元件。
-    - 結果是：當 `snapshot.ActiveAreaBounds` 與 PadCanvas 實際 fit bounds 不一致時，AA 區 overlay 可能跑出中心畫布，甚至出現在 Left Panel 左側。
-  - 目標：
-    - 讓 Coordinate overlay、label、AA rectangle、corner marker 與 PadCanvas 使用同一份 world-to-screen / viewport 契約。
-    - overlay 元件不得顯示於 center workspace host 之外。
-    - 不在這項任務內重寫 Coordinate 幾何演算法，只修正顯示與 bounds 契約。
-  - 依賴：
-    - 此項為 `Beta 0.2` viewport 問題的 hotfix 先行項；`S11.78` 必須以這項收斂後的契約為基礎。
-  - 實作細項：
-    - A. 補齊 `CoordinatePreviewHost`、中心 `Grid` / `Border`、`CoordinateOverlayCanvas`、`CoordinateOverlayLabelCanvas` 的 `ClipToBounds` 與宿主尺寸對齊。
-    - B. 為 `PadCanvas` 增加可選 `FitBoundsOverride` / `ViewportBoundsOverride`，讓 Coordinate 可明確使用 `snapshot.ActiveAreaBounds` 做 fit。
-    - C. 收斂 `CoordinatePlannerWorkspaceView.axaml.cs` 的 overlay 位置計算，保證與 PadCanvas 相同 viewport transform，不再各自推一套 bounds。
-    - D. 對 `SelectedAaBoundsOption` / fallback regular bounds 補明確 diagnostics，至少可看出目前使用的是 `regular grid bounds` 還是 `selected layer bounds`。
-  - 驗證：
-    - 切換不同 AA layer、fit canvas、rebuild workspace 後，AA overlay / labels 均維持在中心畫布內。
-    - 不再出現 AA 區顯示在 Left Panel 左側。
-    - 補 `CoordinatePlannerWorkspaceUseCaseTests`、`CoordinatePlannerWorkspaceViewModelTests`、必要 UI smoke / snapshot test。
+- [x] S11.77 Fix AA area preview / overlay out-of-bounds and left-side offset on the Coordinate page
+  - Observation basis:
+    - `CoordinatePlannerWorkspaceUseCase.BuildSnapshot(...)` builds `snapshot.ActiveAreaBounds` from `session.Grid.Bounds` or the selected AA layer bounds.
+    - `PadCanvas.GetWorldBounds()` still fits mainly based on `CadPads + RegularPads`. The Coordinate overlay and PadCanvas fit do not share the same bounds contract.
+    - `CoordinatePlannerWorkspaceView.axaml`'s `CoordinateOverlayCanvas` / `CoordinateOverlayLabelCanvas` and the center host are not yet fully constrained by the same viewport + clipping contract. `CoordinatePlannerWorkspaceView.axaml.cs` places overlay elements directly with `Canvas.SetLeft/Top(...)`.
+    - Result: when `snapshot.ActiveAreaBounds` and the actual PadCanvas fit bounds differ, the AA area overlay can run outside the center canvas, and even appear on the left side of the Left Panel.
+  - Goal:
+    - Make the Coordinate overlay, labels, AA rectangle, corner markers, and PadCanvas use the same world-to-screen / viewport contract.
+    - Overlay elements must not appear outside the center workspace host.
+    - Do not rewrite the Coordinate geometry algorithm in this task. Only fix the display and bounds contract.
+  - Dependency:
+    - This item is the hotfix to run first for the `Beta 0.2` viewport issue. `S11.78` must be based on the contract this item establishes.
+  - Implementation details:
+    - A. Make `ClipToBounds` and host size alignment consistent for `CoordinatePreviewHost`, the center `Grid` / `Border`, `CoordinateOverlayCanvas`, and `CoordinateOverlayLabelCanvas`.
+    - B. Add an optional `FitBoundsOverride` / `ViewportBoundsOverride` to `PadCanvas`, so Coordinate can explicitly fit using `snapshot.ActiveAreaBounds`.
+    - C. Consolidate the overlay position calculation in `CoordinatePlannerWorkspaceView.axaml.cs`, ensuring it uses the same viewport transform as PadCanvas instead of each deriving its own bounds.
+    - D. Add explicit diagnostics for `SelectedAaBoundsOption` / fallback regular bounds, at minimum showing whether `regular grid bounds` or `selected layer bounds` is in use.
+  - Verification:
+    - After switching different AA layers, fitting the canvas, or rebuilding the workspace, the AA overlay / labels stay inside the center canvas.
+    - The AA area no longer appears on the left side of the Left Panel.
+    - Add `CoordinatePlannerWorkspaceUseCaseTests`, `CoordinatePlannerWorkspaceViewModelTests`, and necessary UI smoke / snapshot tests.
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~CoordinatePlannerWorkspaceUseCaseTests|FullyQualifiedName~CoordinatePlannerWorkspaceViewModelTests|FullyQualifiedName~ShellViewModelCoordinateTests|FullyQualifiedName~HeadlessUiSmokeTests|FullyQualifiedName~PadCanvasViewRefreshTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成：
-    - `CoordinatePreviewHost` / preview center grid / `CoordinateOverlayCanvas` / `CoordinateOverlayLabelCanvas` 全部收斂 `ClipToBounds`，overlay 不再越界到 Left Panel。
-    - `PadCanvas` 新增 `FitBoundsOverride`，Coordinate 頁面改由 `Snapshot.ActiveAreaBounds` 做 fit bounds single path。
-    - `CoordinatePlannerWorkspaceView.axaml.cs` overlay world-to-screen 轉換改讀 `PadCanvas.GetViewFrameSnapshot().WorldToScreen`，不再平行推導另一套 transform。
-    - `CoordinatePlannerWorkspaceUseCase` 補 active-area source diagnostics：可區分 `selected layer has no CAD pads` 與 `selected layer not found` 的 regular-grid fallback。
-    - 補測試：
-      - `CoordinatePlannerWorkspaceUseCaseTests`（layer fallback diagnostics）
-      - `CoordinatePlannerWorkspaceViewModelTests`（preferred layer 無 CAD pads 時的 summary fallback）
-      - `PadCanvasViewRefreshTests`（`FitBoundsOverride` 生效）
+  - Completed:
+    - `CoordinatePreviewHost` / preview center grid / `CoordinateOverlayCanvas` / `CoordinateOverlayLabelCanvas` all converge on `ClipToBounds`. Overlay no longer extends into the Left Panel.
+    - `PadCanvas` adds `FitBoundsOverride`. The Coordinate page now uses `Snapshot.ActiveAreaBounds` as the single path for fit bounds.
+    - The overlay world-to-screen conversion in `CoordinatePlannerWorkspaceView.axaml.cs` now reads `PadCanvas.GetViewFrameSnapshot().WorldToScreen` instead of deriving a parallel transform.
+    - `CoordinatePlannerWorkspaceUseCase` adds active-area source diagnostics: it distinguishes `selected layer has no CAD pads` from the regular-grid fallback for `selected layer not found`.
+    - Tests added:
+      - `CoordinatePlannerWorkspaceUseCaseTests` (layer fallback diagnostics)
+      - `CoordinatePlannerWorkspaceViewModelTests` (summary fallback when the preferred layer has no CAD pads)
+      - `PadCanvasViewRefreshTests` (`FitBoundsOverride` takes effect)
 
 
-- [x] S11.78 建立 shared canvas viewport policy（AA / zoom / fit / pan / overlay transform / clipping）
-  - 觀察依據：
-    - `PadCanvas` 已是共用控制項，但 Coordinate 與 Simulation 目前仍各自處理 `FitCanvasRequested -> FindCanvas().FitToContent()`、`ViewChanged`、overlay 重排、inline editor 跟隨 viewport 等重複邏輯。
-    - 目前 AA 區越界問題本質上也暴露了：viewport source、overlay host、clipping policy 沒被收斂成共用契約。
-  - 目標：
-    - 把真正應共用的行為抽成 shared policy / adapter，而不是每個 workspace 自己 patch。
-    - 共用範圍限定為：`fit / zoom / pan lifecycle`、`overlay transform`、`view-changed callback`、`clipping`、`viewport bounds override`。
-    - 不把 Coordinate-specific 幾何（AA corners / safe corners / BIST / custom array）與 Simulation-specific 幾何硬綁成共用邏輯。
-  - 依賴：
-    - 先完成 `S11.77`（視覺越界 hotfix 與 fit/bounds 契約對齊），再抽象化 shared adapter，避免邊修 bug 邊大重構。
-  - 實作細項：
-    - A. 盤點 Coordinate / Simulation / Freeform 目前對 PadCanvas 的 wiring，列出可抽共用的 lifecycle 與 callback。
-    - B. 引入 `CanvasViewportAdapter`（名稱可調整），統一處理：initial fit、explicit fit request、view changed、overlay relayout、clip policy。
-    - C. 讓 Coordinate / Simulation 先共用同一組 viewport adapter；Freeform 若已有特殊需求則先保留但對齊介面。
-    - D. `PadCanvas` 補必要 API：取得目前 viewport transform、接受外部 fit bounds、發送穩定的 view changed 事件。
-  - 驗證：
-    - Coordinate / Simulation 不再各自維護不同 fit lifecycle。
-    - overlay / label / inline editor 的跟隨邏輯可以從共用 adapter 觀察與驗證。
-    - 後續新增 workspace 時，不需再重複 patch `FitCanvasRequested + relayout + clip`。
+- [x] S11.78 Establish a shared canvas viewport policy (AA / zoom / fit / pan / overlay transform / clipping)
+  - Observation basis:
+    - `PadCanvas` is already a shared control, but Coordinate and Simulation still each handle duplicated logic: `FitCanvasRequested -> FindCanvas().FitToContent()`, `ViewChanged`, overlay relayout, and inline editor following the viewport.
+    - The current AA out-of-bounds issue essentially exposes that the viewport source, overlay host, and clipping policy have not been converged into a shared contract.
+  - Goal:
+    - Extract behavior that should truly be shared into a shared policy / adapter, rather than having each workspace patch it separately.
+    - Shared scope is limited to: `fit / zoom / pan lifecycle`, `overlay transform`, `view-changed callback`, `clipping`, and `viewport bounds override`.
+    - Do not hard-bind Coordinate-specific geometry (AA corners / safe corners / BIST / custom array) or Simulation-specific geometry into shared logic.
+  - Dependency:
+    - Complete `S11.77` first (visual out-of-bounds hotfix and fit/bounds contract alignment), then abstract the shared adapter, to avoid a large refactor while still fixing bugs.
+  - Implementation details:
+    - A. Inventory the current wiring of Coordinate / Simulation / Freeform to PadCanvas, and list the lifecycle and callbacks that can be shared.
+    - B. Introduce `CanvasViewportAdapter` (name adjustable) to unify: initial fit, explicit fit request, view changed, overlay relayout, and clip policy.
+    - C. Have Coordinate and Simulation first share the same viewport adapter. If Freeform already has special needs, keep them for now but align the interface.
+    - D. Add the necessary APIs to `PadCanvas`: get the current viewport transform, accept external fit bounds, and emit a stable view-changed event.
+  - Verification:
+    - Coordinate and Simulation no longer each maintain different fit lifecycles.
+    - Overlay / label / inline editor following logic can be observed and verified through the shared adapter.
+    - When adding a new workspace in the future, there is no need to repeat patching `FitCanvasRequested + relayout + clip`.
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~PadCanvas|FullyQualifiedName~CoordinatePlannerWorkspace|FullyQualifiedName~SimulationWorkspace|FullyQualifiedName~HeadlessUiSmokeTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成：
-    - 新增 `CanvasViewportAdapter`，收斂 shared viewport contract：initial fit、`FitCanvasRequested` wiring、`ViewChanged` callback、world-to-screen transform、clip policy、fit bounds override。
-    - `CoordinatePlannerWorkspaceView.axaml.cs` 改為透過 adapter 管理 fit/request/view-change 與 overlay transform，不再自行維護平行 lifecycle。
-    - `SimulationWorkspaceView.axaml.cs` 改為透過 adapter 管理 fit/request/view-change；inline editor 跟隨 viewport 也改讀同一份 transform。
-    - `SimulationWorkspaceView.axaml` 補齊 center host / working grid / inline overlay 的 `ClipToBounds`。
-    - 新增 `CanvasViewportAdapterTests`，覆蓋 attach+fit 流程、overlay transform 契約、clip policy 契約。
+  - Completed:
+    - Added `CanvasViewportAdapter`, consolidating the shared viewport contract: initial fit, `FitCanvasRequested` wiring, `ViewChanged` callback, world-to-screen transform, clip policy, and fit bounds override.
+    - `CoordinatePlannerWorkspaceView.axaml.cs` now manages fit/request/view-change and overlay transform through the adapter, no longer maintaining its own parallel lifecycle.
+    - `SimulationWorkspaceView.axaml.cs` now manages fit/request/view-change through the adapter. The inline editor following the viewport also reads the same transform.
+    - `SimulationWorkspaceView.axaml` adds `ClipToBounds` to the center host / working grid / inline overlay.
+    - Added `CanvasViewportAdapterTests`, covering the attach+fit flow, the overlay transform contract, and the clip policy contract.
 
 
-- [x] S11.79 建立 active-area source 單一路徑契約（Coordinate / Simulation / preferences 共用 truth 層）
-  - 觀察依據：
-    - `SelectedAaBoundsOption`、`Snapshot.ActiveAreaBounds`、safe corners、summary text、workspace preferences 目前語意接近，但尚未完全落成單一路徑。
-    - 若 Coordinate preview、safe corners、summary、後續 Simulation area projection 各自重算，仍會持續出現 UI 看一套、輸出又另一套的漂移。
-  - 目標：
-    - 建立 `ActiveAreaResolver`（名稱可調整），統一輸出：
+- [x] S11.79 Establish a single-path contract for active-area source (shared truth layer for Coordinate / Simulation / preferences)
+  - Observation basis:
+    - `SelectedAaBoundsOption`, `Snapshot.ActiveAreaBounds`, safe corners, summary text, and workspace preferences are currently semantically close, but not yet fully unified into a single path.
+    - If the Coordinate preview, safe corners, summary, and future Simulation area projection each recalculate independently, drift will keep occurring where the UI shows one thing and the output shows another.
+  - Goal:
+    - Establish `ActiveAreaResolver` (name adjustable) to uniformly output:
       - active area source kind
       - bounds
       - safe corners
       - summary text / diagnostics reason
-    - 讓 Coordinate preview、safe corners、summary、workspace preferences、未來 Simulation selected area projection 都從同一份 truth 讀取。
-  - 依賴：
-    - 需接在 `S11.78` 之後，統一先有 shared viewport policy，再收斂 active-area truth/source。
-  - 實作細項：
-    - A. 明確定義 active area source priority：selected layer bounds -> valid fallback -> regular grid bounds。
-    - B. 將 `CoordinatePlannerWorkspaceUseCase`、`CoordinatePlannerWorkspaceViewModel`、必要 shell state 改為依賴該 resolver。
-    - C. 清查所有 AA / safe corner / summary / custom array sync 的更新路徑，禁止各自重算。
-  - 驗證：
+    - Make the Coordinate preview, safe corners, summary, workspace preferences, and future Simulation selected area projection all read from the same truth.
+  - Dependency:
+    - Must be placed after `S11.78`, so the shared viewport policy exists first, and then the active-area truth/source is converged.
+  - Implementation details:
+    - A. Explicitly define the active area source priority: selected layer bounds -> valid fallback -> regular grid bounds.
+    - B. Change `CoordinatePlannerWorkspaceUseCase`, `CoordinatePlannerWorkspaceViewModel`, and necessary shell state to depend on this resolver.
+    - C. Audit all update paths for AA / safe corner / summary / custom array sync, and prohibit each from recalculating on its own.
+  - Verification:
     - `CoordinatePlannerWorkspaceUseCaseTests`
     - `CoordinatePlannerWorkspaceViewModelTests`
     - `ShellViewModelCoordinateTests`
-    - 切 layer / rebuild workspace / sync custom array 後，畫布顯示、summary、safe corners 皆一致。
+    - After switching layers / rebuilding the workspace / syncing the custom array, the canvas display, summary, and safe corners are all consistent.
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~CoordinatePlannerWorkspaceUseCaseTests|FullyQualifiedName~CoordinatePlannerWorkspaceViewModelTests|FullyQualifiedName~ShellViewModelCoordinateTests|FullyQualifiedName~SimulationWorkspace"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成：
-    - 新增 `CoordinatePlannerActiveAreaResolver`，統一 active area source priority 與 diagnostics：`layer bounds`、`fallback no CAD pads`、`fallback layer missing`、`regular grid`。
-    - `CoordinatePlannerWorkspaceUseCase.BuildSnapshot(...)` 改為只讀 resolver 結果，不再在 use case 內平行重算 active area bounds/source text。
-    - `CoordinatePlannerWorkspaceViewModel` 的 initial AA layer selection、snapshot rebuild、workspace preference 輸出改走同一套 resolver + selected-layer path。
-    - `FreeformHelperViewModel.CoordinatePlanner` 的 preferred AA layer 邏輯改委派給同一 resolver，與 Coordinate page 預設選層契約一致。
-    - 補測試：
+  - Completed:
+    - Added `CoordinatePlannerActiveAreaResolver`, unifying the active area source priority and diagnostics: `layer bounds`, `fallback no CAD pads`, `fallback layer missing`, `regular grid`.
+    - `CoordinatePlannerWorkspaceUseCase.BuildSnapshot(...)` now only reads the resolver result, and no longer recalculates active area bounds/source text in parallel inside the use case.
+    - `CoordinatePlannerWorkspaceViewModel` initial AA layer selection, snapshot rebuild, and workspace preference output now all go through the same resolver + selected-layer path.
+    - `FreeformHelperViewModel.CoordinatePlanner`'s preferred AA layer logic now delegates to the same resolver, aligning with the Coordinate page default layer selection contract.
+    - Tests added:
       - `CoordinatePlannerActiveAreaResolverTests`
-      - `CoordinatePlannerWorkspaceUseCaseTests`（source kind / requested vs resolved layer）
-      - 既有 `CoordinatePlannerWorkspaceViewModelTests`、`ShellViewModelCoordinateTests` 回歸持續通過。
+      - `CoordinatePlannerWorkspaceUseCaseTests` (source kind / requested vs resolved layer)
+      - Existing `CoordinatePlannerWorkspaceViewModelTests` and `ShellViewModelCoordinateTests` regressions continue to pass.
 
 
-- [x] S11.76A Diff idx 候選集 / guardrail / 可觀測契約（Seed + Optional SeeRegular）
-  - 目標：
-    - 拆出 assignment 的共享輸入模型，讓 Step4 / Simulation / runtime query 都讀同一份 candidate/decision truth。
-    - 明確分離 `reasonCode` 與 `decisionSource`，避免「原因」與「來源」混成同一欄。
-    - `SeeRegular.csv` 保持 optional；未提供時仍可在 geometry-only mode 完整運作。
-  - 規則：
-    - `best match` 是 seed/prior，不是 final truth。
-    - CSV 模式下，inactive regular 不可作為 `PrimaryAssignedDiff` 的主動來源。
-    - geometry-only mode 下，不得使用 inactive/no-output 專屬規則。
-  - 共享欄位契約：
-    - `reasonCode`：`inactive-blocked`、`duplicate-conflict`、`segment-offset-suspected`、`gap-compensation-candidate`、`geometry-only-suggestion`、`needs-review`。
-    - `decisionSource`：`seed`、`auto-repaired`、`manual-override`、`propagated-override`。
-    - `mode`：`geometry-only` / `csv-constrained`。
-    - `primaryAssignedDiff`、`passiveCompensationDiff`（可空，僅在 CSV gap 補償時可能有值）。
-  - 報表欄位：
-    - `CAD id`、`row/segment`、`raw best diff`、`masked best diff`、`csv-confirmed candidates`、`geometry candidates`、`current primary diff`、`passive compensation diff`、`repair suggestion`、`reasonCode`、`decisionSource`、`confidence`、`mode`。
-  - 驗證：
-    - CSV 模式下，inactive regular 不可直接進入 `PrimaryAssignedDiff`。
-    - Step4 / Simulation / runtime query 共用同一份 candidate / decision result，不得各自重算。
+- [x] S11.76A Diff idx candidate set / guardrail / observability contract (Seed + Optional SeeRegular)
+  - Goal:
+    - Split out a shared input model for assignment, so Step4 / Simulation / runtime query all read the same candidate/decision truth.
+    - Explicitly separate `reasonCode` from `decisionSource`, so "why" and "where from" are not mixed into the same field.
+    - `SeeRegular.csv` remains optional. When not provided, it must still work fully in geometry-only mode.
+  - Rules:
+    - `best match` is a seed/prior, not the final truth.
+    - In CSV mode, inactive regular must not serve as an active source for `PrimaryAssignedDiff`.
+    - In geometry-only mode, inactive/no-output-specific rules must not be used.
+  - Shared field contract:
+    - `reasonCode`: `inactive-blocked`, `duplicate-conflict`, `segment-offset-suspected`, `gap-compensation-candidate`, `geometry-only-suggestion`, `needs-review`.
+    - `decisionSource`: `seed`, `auto-repaired`, `manual-override`, `propagated-override`.
+    - `mode`: `geometry-only` / `csv-constrained`.
+    - `primaryAssignedDiff`, `passiveCompensationDiff` (nullable; may only have a value during CSV gap compensation).
+  - Report fields:
+    - `CAD id`, `row/segment`, `raw best diff`, `masked best diff`, `csv-confirmed candidates`, `geometry candidates`, `current primary diff`, `passive compensation diff`, `repair suggestion`, `reasonCode`, `decisionSource`, `confidence`, `mode`.
+  - Verification:
+    - In CSV mode, inactive regular cannot directly enter `PrimaryAssignedDiff`.
+    - Step4 / Simulation / runtime query share the same candidate / decision result and must not each recalculate.
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~DxfVisibleIndexAssignment|FullyQualifiedName~IndexMappingReport|FullyQualifiedName~SimulationWorkspace|FullyQualifiedName~RuntimeQueryUseCaseTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成：
-    - `DxfRegularMaskAuditService` 新增共享 decision model（`mode / reasonCode / decisionSource / primaryAssignedDiff / passiveCompensationDiff / repairSuggestion / confidence`），並支援 precomputed decision path。
-    - `DxfRegularMappingUseCase.Analyze(...)` 與 Step4 入口改為可注入同一份 assignment decisions，不再平行重算。
-    - `FreeformHelperViewModel` 新增 visible index assignment decision snapshot 與 summary snapshot，供 Step4 / Simulation / runtime query 共用。
-    - `SimulationWorkspaceSession`、`query simulation`、`query status` 新增 `visibleIndexDecision` summary payload，對齊同一份 decision truth。
-    - `IndexMappingMaskAuditRowViewModel` / `IndexMappingDecisionRowViewModel` 補 decision-first 欄位投影，直接顯示 `reasonCode`、`decisionSource`、`primary/passive/suggestion`。
-    - 補測試：
-      - `DxfRegularMaskAuditServiceTests`（CSV constrained inactive blocked、geometry-only suggestion）
-      - `RuntimeQueryUseCaseTests`（visibleIndexDecision payload、stage3 target truncation 契約）
+  - Completed:
+    - `DxfRegularMaskAuditService` adds a shared decision model (`mode / reasonCode / decisionSource / primaryAssignedDiff / passiveCompensationDiff / repairSuggestion / confidence`), and supports a precomputed decision path.
+    - `DxfRegularMappingUseCase.Analyze(...)` and the Step4 entry point can now inject the same assignment decisions, instead of recalculating in parallel.
+    - `FreeformHelperViewModel` adds a visible index assignment decision snapshot and summary snapshot, shared by Step4 / Simulation / runtime query.
+    - `SimulationWorkspaceSession`, `query simulation`, and `query status` add a `visibleIndexDecision` summary payload, aligned to the same decision truth.
+    - `IndexMappingMaskAuditRowViewModel` / `IndexMappingDecisionRowViewModel` add decision-first field projection, directly displaying `reasonCode`, `decisionSource`, and `primary/passive/suggestion`.
+    - Tests added:
+      - `DxfRegularMaskAuditServiceTests` (CSV constrained inactive blocked, geometry-only suggestion)
+      - `RuntimeQueryUseCaseTests` (visibleIndexDecision payload, stage3 target truncation contract)
 
 
-- [x] S11.76B Row/Segment 共同 offset 偵測（非 row-sequence 全域重排）
-  - 目標：
-    - 針對 `IC -> row -> segment` 做共同偏移偵測，優先解「整段一起 +1/-1/+2」問題。
-    - 明確把 manual override 視為固定 anchor：除非使用者 clear override，否則不被 auto-repair 覆蓋。
-  - 規則：
-    - 只在問題 segment 內偵測與評分，不做全域 row-sequence 重排。
-    - 段落偵測採 dominant offset，建議門檻：`OffsetDominanceRatio >= 0.60` 才能標記 `segment-offset-suspected`。
-  - 產出：
-    - `detectedOffset`、`offsetSupportCount`、`offsetSupportRatio`、`segmentConfidence`。
-    - 供 Phase C 做 local repair 搜尋，不直接改寫 final assignment。
-  - 驗證：
-    - 可對同 `IC/row` segment 偵測 dominant offset，並在達門檻時標記 `segment-offset-suspected`。
-    - manual override row 僅作為 anchor，不提升為 `segment-offset-suspected`。
+- [x] S11.76B Row/Segment shared offset detection (not global row-sequence reordering)
+  - Goal:
+    - Perform shared offset detection on `IC -> row -> segment`, prioritizing the problem of "the whole segment shifts together by +1/-1/+2".
+    - Explicitly treat manual override as a fixed anchor: unless the user clears the override, it is not overwritten by auto-repair.
+  - Rules:
+    - Detect and score only within the problematic segment. Do not perform global row-sequence reordering.
+    - Segment detection uses dominant offset. Recommended threshold: `OffsetDominanceRatio >= 0.60` before marking `segment-offset-suspected`.
+  - Outputs:
+    - `detectedOffset`, `offsetSupportCount`, `offsetSupportRatio`, `segmentConfidence`.
+    - Used by Phase C for local repair search. Does not directly rewrite the final assignment.
+  - Verification:
+    - Can detect the dominant offset for the same `IC/row` segment, and mark `segment-offset-suspected` when the threshold is met.
+    - A manual override row serves only as an anchor and is not promoted to `segment-offset-suspected`.
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~DxfRegularMaskAuditServiceTests|FullyQualifiedName~DxfVisibleIndexAssignment|FullyQualifiedName~IndexMapping|FullyQualifiedName~RuntimeQueryUseCaseTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成：
-    - `DxfRegularMaskAuditService` 新增 `ApplySegmentOffsetSignals(...)`，以 `IC -> row -> segment` 做 dominant offset 偵測，門檻固定為：
+  - Completed:
+    - `DxfRegularMaskAuditService` adds `ApplySegmentOffsetSignals(...)`, performing dominant offset detection over `IC -> row -> segment`, with fixed thresholds:
       - `supportCount >= 2`
       - `supportRatio >= 0.60`
       - `dominantOffset != 0`
-    - decision/audit row 新增 `detectedOffset`、`offsetSupportCount`、`offsetSupportRatio`、`segmentConfidence`。
-    - 當 row 為 manual override anchor 時，不將 reason 升級為 `segment-offset-suspected`，維持 override 優先級。
-    - `IndexMappingMaskAuditRowViewModel` 新增上述欄位與 `SegmentOffsetText` 投影，供 report/diagnostics 直接顯示。
-    - 補測試：
+    - Decision/audit rows add `detectedOffset`, `offsetSupportCount`, `offsetSupportRatio`, and `segmentConfidence`.
+    - When a row is a manual override anchor, its reason is not upgraded to `segment-offset-suspected`, preserving override priority.
+    - `IndexMappingMaskAuditRowViewModel` adds the above fields and a `SegmentOffsetText` projection, for direct display in reports/diagnostics.
+    - Tests added:
       - `BuildAuditRows_DominantSegmentOffset_PromotesReasonToSegmentOffsetSuspected`
       - `BuildAuditRows_SegmentOffsetDetection_DoesNotPromoteManualOverrideAnchor`
 
 
-- [x] S11.76C Local repair + passive compensation（含 inactive/no-output 理論澄清）
-  - 目標：
-    - 在 segment 內做最小成本修復，解 duplicate / inactive block / 跳號。
-    - 澄清 no-output 與幾何覆蓋的關係：`SeeRegular=0` 代表量測輸出為 0，不代表 CAD 與該 regular 幾何 overlap 必然為 0。
-  - inactive/no-output 理論與契約：
-    - 若 regular 在 `SeeRegular.csv` 為 no-output，但其幾何上有 CAD overlap，允許其承接 `passiveCompensationDiff` 以修補 row continuity。
-    - `passiveCompensationDiff` 不等於 active primary source；該 regular 仍不得主動捐出 diff 給其他 regular。
-    - 若 regular 完全無 CAD overlap，禁止憑空補 diff。
-  - 成本函數：
-    - `best match` 分數損失
-    - `|newDiff-oldDiff|` 位移成本
-    - duplicate 懲罰
-    - inactive 作為 primary candidate 的高懲罰（CSV 模式）
-    - row order 違反懲罰
-    - gap/jump 平滑懲罰
-  - auto-apply 門檻（先固定，後續可參數化）：
+- [x] S11.76C Local repair + passive compensation (including inactive/no-output theory clarification)
+  - Goal:
+    - Perform minimum-cost repair within a segment to resolve duplicates, inactive blocks, and skipped numbers.
+    - Clarify the relationship between no-output and geometric coverage: `SeeRegular=0` means the measured output is 0, not that the geometric overlap between the CAD and that regular is necessarily 0.
+  - Inactive/no-output theory and contract:
+    - If a regular is no-output in `SeeRegular.csv` but has geometric CAD overlap, it may receive `passiveCompensationDiff` to repair row continuity.
+    - `passiveCompensationDiff` is not equivalent to an active primary source. That regular still must not actively donate diff to other regulars.
+    - If a regular has no CAD overlap at all, filling diff out of nothing is prohibited.
+  - Cost function:
+    - `best match` score loss
+    - `|newDiff-oldDiff|` displacement cost
+    - duplicate penalty
+    - high penalty for inactive as a primary candidate (CSV mode)
+    - row order violation penalty
+    - gap/jump smoothing penalty
+  - Auto-apply threshold (fixed first, parameterizable later):
     - `AutoApplyMinConfidence = 0.80`
-    - 低於門檻僅輸出 preview，標記 `needs-review`，不得硬套。
-  - 驗證：
-    - CSV 模式下，只允許「有 CAD overlap 的 no-output/inactive regular」接收 `passiveCompensationDiff`。
-    - geometry-only mode 下，僅可做 heuristic gap suggestion，不得宣稱 inactive compensation。
+    - Below the threshold, only output a preview, marked `needs-review`, and must not be forcibly applied.
+  - Verification:
+    - In CSV mode, only no-output/inactive regulars that have CAD overlap may receive `passiveCompensationDiff`.
+    - In geometry-only mode, only heuristic gap suggestions are allowed, and inactive compensation must not be claimed.
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~DxfRegularMaskAuditServiceTests|FullyQualifiedName~DxfVisibleIndexAssignment|FullyQualifiedName~IndexMapping|FullyQualifiedName~SimulationWorkspace|FullyQualifiedName~RuntimeQueryUseCaseTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成：
-    - `DxfRegularMaskAuditService` 新增 `ApplyLocalRepairAndPassiveCompensationSignals(...)`，在既有 segment 訊號後套用 local repair 與被動補償訊號。
-    - local repair 契約：
-      - 只在 local diff window（`±3`）內優先搜尋候選；若視窗內無候選才 fallback 全候選。
-      - 成本函數納入 `match loss`、`move cost`、`duplicate penalty`、`row order penalty`、`gap penalty`。
-      - 固定門檻 `AutoApplyMinConfidence=0.80`：低於門檻不提升 repair suggestion（保留 preview/needs-review 語意，不硬套 primary）。
-    - passive compensation 契約：
-      - 僅 `csv-constrained` 且無 active candidate 時啟用。
-      - 僅允許 `geometryCandidates` 具有實際 overlap（`RegularCoverage>0` 或 `CadCoverage>0`）時輸出 `passiveCompensationDiff`。
-      - `geometry-only` 一律不輸出 `passiveCompensationDiff`。
-      - 若已偵測 segment offset，優先以 `rawSeed + detectedOffset` 在 local window 內尋找被動補償 diff。
-    - 補測試：
+  - Completed:
+    - `DxfRegularMaskAuditService` adds `ApplyLocalRepairAndPassiveCompensationSignals(...)`, applying local repair and passive compensation signals after the existing segment signals.
+    - Local repair contract:
+      - Search candidates preferentially only within the local diff window (`±3`); fall back to all candidates only if the window has none.
+      - Cost function includes `match loss`, `move cost`, `duplicate penalty`, `row order penalty`, and `gap penalty`.
+      - Fixed threshold `AutoApplyMinConfidence=0.80`: below the threshold, the repair suggestion is not promoted (preserving preview/needs-review semantics, not forcibly applying primary).
+    - Passive compensation contract:
+      - Enabled only when `csv-constrained` and there is no active candidate.
+      - `passiveCompensationDiff` is output only when `geometryCandidates` have actual overlap (`RegularCoverage>0` or `CadCoverage>0`).
+      - `geometry-only` never outputs `passiveCompensationDiff`.
+      - If a segment offset has been detected, first search for passive compensation diff in the local window using `rawSeed + detectedOffset`.
+    - Tests added:
       - `BuildAuditRows_CsvConstrained_InactiveBestWithOverlap_CanReceivePassiveCompensationDiff`
       - `BuildAuditRows_CsvConstrained_InactiveWithoutOverlap_DoesNotSetPassiveCompensationDiff`
       - `BuildAuditRows_CsvConstrained_LocalRepairPrefersCandidateWithinDiffWindow`
 
 
-- [x] S11.76D Preview/Apply + propagation 協作 + Notch v2.1/v2.2 串接
-  - 目標：
-    - 提供 row/segment 級 preview/apply/partial-apply，降低逐顆人工修正成本。
-    - 與手動 propagation 協作：清楚區分 `seed`、`auto-repaired`、`manual-override`、`propagated-override`。
-    - 將修復後 diff assignment 明確回寫到最終 Notch pipeline（`v2.1` / `v2.2`）使用的同一份來源。
-  - UI/報表輸出：
-    - `IC`、`row`、`segment`、`detectedOffset`、`before/after`、`影響 CAD 數`、`passive compensation 發生與否`、`reasonCode`、`decisionSource`、`confidence`、`mode`。
-  - 驗證：
-    - preview/apply 可取消、可局部套用、可回歸比對。
-    - Notch `v2.1/v2.2` 匯出結果確實使用已修復 assignment，不再讀舊分配快取。
+- [x] S11.76D Preview/Apply + propagation coordination + Notch v2.1/v2.2 integration
+  - Goal:
+    - Provide row/segment-level preview/apply/partial-apply to reduce the manual cost of correcting each pad individually.
+    - Coordinate clearly with manual propagation: clearly distinguish `seed`, `auto-repaired`, `manual-override`, and `propagated-override`.
+    - Explicitly write the repaired diff assignment back to the same source used by the final Notch pipeline (`v2.1` / `v2.2`).
+  - UI/report outputs:
+    - `IC`, `row`, `segment`, `detectedOffset`, `before/after`, `affected CAD count`, `whether passive compensation occurred`, `reasonCode`, `decisionSource`, `confidence`, `mode`.
+  - Verification:
+    - Preview/apply can be cancelled, partially applied, and regression-compared.
+    - Notch `v2.1/v2.2` export results actually use the repaired assignment and no longer read the old assignment cache.
     - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj /p:UseAppHost=false`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~DxfRegularMaskAuditServiceTests|FullyQualifiedName~IndexMappingReportViewModelTests|FullyQualifiedName~IndexMappingReportWindowSmokeTests|FullyQualifiedName~FreeformHelperViewModelTests.RegularSignalMask"`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~NotchTableGeneratorTests|FullyQualifiedName~NotchGoldenBaselineTests|FullyQualifiedName~DxfVisibleIndexAssignment|FullyQualifiedName~RuntimeQueryUseCaseTests|FullyQualifiedName~IndexMappingReportViewModelTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成：
-    - `DxfRegularMaskAuditService` 補齊 segment metadata（`IcIndex/RowIndex/SegmentIndex/SegmentMemberCount`）並投影到 audit rows，作為 segment-scope preview/apply 的單一路徑來源。
-    - `IndexMappingDecisionRowViewModel` / `IndexMappingMaskAuditRowViewModel` 補上 segment scope、decision contract、passive compensation 相關欄位與顯示文案，報表可直接辨識 `seed / repair / passive-compensation`。
-    - `IndexMappingReportViewModel` 新增 `ApplySegmentDiffOverridesCommand`、`ApplyVisibleDiffOverridesCommand`，支援 segment 級與 visible rows 級 partial apply；保留既有單筆 apply。
-    - `IndexMappingReportWindow` 新增 segment/contract/repair preview 顯示與 `Apply visible repairs`、`Apply segment repairs` 入口，維持 decision-first 檢視流。
-    - `FreeformHelperViewModel.IndexMapping` 的 apply action 仍統一走 `SetDxfVisibleIndexOverride(...)`，修復後 assignment 直接成為 Notch `v2.1/v2.2` 後續使用來源。
-    - 新增/更新測試：
+  - Completed:
+    - `DxfRegularMaskAuditService` adds complete segment metadata (`IcIndex/RowIndex/SegmentIndex/SegmentMemberCount`) and projects it to audit rows, serving as the single-path source for segment-scope preview/apply.
+    - `IndexMappingDecisionRowViewModel` / `IndexMappingMaskAuditRowViewModel` add segment scope, decision contract, and passive-compensation-related fields and display text, so reports can directly identify `seed / repair / passive-compensation`.
+    - `IndexMappingReportViewModel` adds `ApplySegmentDiffOverridesCommand` and `ApplyVisibleDiffOverridesCommand`, supporting segment-level and visible-rows-level partial apply. The existing single-row apply is retained.
+    - `IndexMappingReportWindow` adds segment/contract/repair preview display and `Apply visible repairs` and `Apply segment repairs` entry points, keeping the decision-first review flow.
+    - The apply action in `FreeformHelperViewModel.IndexMapping` still uniformly goes through `SetDxfVisibleIndexOverride(...)`, so repaired assignments directly become the source used by Notch `v2.1/v2.2` downstream.
+    - Added/updated tests:
       - `BuildAuditRows_AssignsIcRowSegmentMetadata_ForSegmentRows`
       - `ApplySegmentDiffOverridesCommand_AppliesRowsInSelectedSegment`
       - `ApplyVisibleDiffOverridesCommand_AppliesOnlyVisibleRows`
 
 
-- [x] S11.63 建立 `TM 8.1` notch v2.1 / v2.2 驗收矩陣與可疑案例盤點
-  - 觀察依據：
-    - `TM 8.1` 已作為 `golden baseline` 專案之一，但目前 baseline 只鎖 row count / 版本分布 / sample rows，尚未形成可直接驗收的案例矩陣。
-    - 尤其在 `S11.76` 導入新的 diff assignment / segment repair 後，需要一份真實專案等級的固定驗收面板。
-  - 目標：
-    - 以 `TM 8.1` 產出固定驗收矩陣：`v2.1` / `v2.2` row 分布、no-op 比例、warning 類型、shared-regular / duplicate / freeform tail-link / diff repair case。
-    - 將已知重點案例（如 `CAD113 / CAD364 / CAD402 / CAD490 / CAD491`）整理成固定驗收清單，讓 notch 與 diff assignment 微調都有明確回歸基準。
-  - 驗證：
-    - `golden baseline` 仍通過。
-    - 新增 `TM 8.1` 專案級驗收文件 / 測試，可直接觀察 `S11.76` 新策略是否造成 row/segment 行為回歸。
+- [x] S11.63 Establish the `TM 8.1` notch v2.1 / v2.2 acceptance matrix and inventory of suspicious cases
+  - Observation basis:
+    - `TM 8.1` is already one of the `golden baseline` projects, but the baseline currently only locks row count / version distribution / sample rows, and has not yet formed a case matrix that can be directly accepted.
+    - Especially after `S11.76` introduces the new diff assignment / segment repair, a fixed project-level acceptance panel based on a real project is needed.
+  - Goal:
+    - Use `TM 8.1` to produce a fixed acceptance matrix: `v2.1` / `v2.2` row distribution, no-op ratio, warning types, shared-regular / duplicate / freeform tail-link / diff repair cases.
+    - Organize known key cases (such as `CAD113 / CAD364 / CAD402 / CAD490 / CAD491`) into a fixed acceptance checklist, so both notch and diff assignment tuning have a clear regression baseline.
+  - Verification:
+    - `golden baseline` still passes.
+    - Add a `TM 8.1` project-level acceptance document / test, so you can directly observe whether the new `S11.76` strategy causes row/segment behavior regressions.
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~Tm81NotchAcceptanceMatrixTests|FullyQualifiedName~NotchGoldenBaselineTests|FullyQualifiedName~NotchTableGeneratorTests"`
-  - 完成：
-    - 新增 `TM 8.1` 專案級驗收快照測試：`tests/FreeformHelper.Tests/Application/Notch/Tm81NotchAcceptanceMatrixTests.cs`。
-    - 新增固定矩陣快照：`tests/FreeformHelper.Tests/Snapshots/tm81-notch-acceptance-matrix.json`，鎖定：
-      - `v2.1/v2.2` row 分布
-      - `V22 no-op` 比例與 warning 分布
-      - `SeeRegular mask` 啟用後的 diff repair 摘要（repair/passive/segment-offset/reason-mode 分布）
-      - 重點案例契約（`CAD113 / CAD364 / CAD402 / CAD490 / CAD491 / REG387-389`）
-    - 新增驗收文件：`docs/reference/tm81-notch-acceptance-matrix.md`，同步整理固定回歸命令與可疑案例盤點。
-    - 本輪盤點結果保留在矩陣快照與文件，供後續 notch / diff assignment 微調直接對照回歸。
+  - Completed:
+    - Added the `TM 8.1` project-level acceptance snapshot test: `tests/FreeformHelper.Tests/Application/Notch/Tm81NotchAcceptanceMatrixTests.cs`.
+    - Added the fixed matrix snapshot: `tests/FreeformHelper.Tests/Snapshots/tm81-notch-acceptance-matrix.json`, locking:
+      - `v2.1/v2.2` row distribution
+      - `V22 no-op` ratio and warning distribution
+      - Diff repair summary after `SeeRegular mask` is enabled (repair/passive/segment-offset/reason-mode distribution)
+      - Key case contracts (`CAD113 / CAD364 / CAD402 / CAD490 / CAD491 / REG387-389`)
+    - Added the acceptance document: `docs/reference/tm81-notch-acceptance-matrix.md`, also organizing the fixed regression commands and the inventory of suspicious cases.
+    - The results of this round's inventory are retained in the matrix snapshot and the document, for direct comparison in future notch / diff assignment tuning regressions.
 
 
-- [x] S11.77 收斂 `TM 8.1` 盤點揭露的 Stage3 / simulation fixture 回歸（`CAD364 / CAD490 / CAD491`）
-  - 觀察依據：
-    - `dotnet test ... --filter "FullyQualifiedName~TM81"` 目前可重現失敗：
+- [x] S11.77 Converge the Stage3 / simulation fixture regressions revealed by the `TM 8.1` inventory (`CAD364 / CAD490 / CAD491`)
+  - Observation basis:
+    - `dotnet test ... --filter "FullyQualifiedName~TM81"` currently reproducibly fails:
       - `GetCadV22StageOverlays_TM81_CAD364_CoversWholeSoleOwnerInteriorRegular`
       - `GetCadV22StageOverlays_TM81_CAD490_And_CAD491_UseSharedSafeFillWithoutStage3Overlap`
       - `Tm81SingleFingerFixture_KeepsDiffMismatchedStep1PadsAtZero`
       - `Tm81SingleFingerFixture_AllowsAfterValueForInactiveTargetDiffPads`
-    - `tm81-notch-acceptance-matrix` 顯示：
-      - `CAD364 / REG291` 的 `stage3Coverage` 與 `reg291Area` 有微小落差。
-      - `CAD490/491` `stage3OverlapArea` 非 0（目前約 `4.078e-4`）。
-  - 目標：
-    - 收斂 Stage3 覆蓋/重疊契約，避免共享 regular case 的實際幾何重疊與 coverage 漂移。
-    - 釐清 `TM 8.1` single-finger fixture 在目前 diff assignment / mask path 下的 null row 根因，補單一路徑修正。
-  - 驗證：
+    - `tm81-notch-acceptance-matrix` shows:
+      - `CAD364 / REG291` `stage3Coverage` and `reg291Area` have a slight discrepancy.
+      - `CAD490/491` `stage3OverlapArea` is not 0 (currently about `4.078e-4`).
+  - Goal:
+    - Converge the Stage3 coverage/overlap contract, avoiding actual geometric overlap and coverage drift in shared-regular cases.
+    - Clarify the root cause of the null row in the `TM 8.1` single-finger fixture under the current diff assignment / mask path, and add a single-path fix.
+  - Verification:
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~GetCadV22StageOverlays_TM81|FullyQualifiedName~Tm81SingleFingerFixture"`
     - `dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj -c Debug --nologo /p:UseAppHost=false --filter "FullyQualifiedName~Tm81NotchAcceptanceMatrixTests|FullyQualifiedName~NotchGoldenBaselineTests"`
     - `./scripts/tests/lint.ps1 -UseNoAppHost`
-  - 完成：
-    - `CreateSimulationWorkspaceSessionAsync(...)` 不再因 Step4 duplicate diff 直接 blocked 回傳 `null`；改為 warning 並繼續建立 session，修正 `TM 8.1` single-finger fixture 的 null-row 根因。
-    - `TM81 Stage3` 契約改為容差收斂：
-      - `CAD364 / REG291` 的 Stage3 覆蓋改採 `1e-5` 容差，避免 union/clipper 微小數值誤差造成假失敗。
-      - `CAD490/491` 的 Stage3 overlap 判定加入 `1e-4` 接觸容差，避免共享邊界的浮點接觸被誤判為重疊。
-    - `tm81-notch-acceptance-matrix` 併入同一容差判定並更新 snapshot（`stage3OverlapArea` 由 `4.078e-4` 收斂為 `0`）。
+  - Completed:
+    - `CreateSimulationWorkspaceSessionAsync(...)` no longer returns `null` directly when Step4 duplicate diff causes a block. Instead it warns and continues to create the session, fixing the null-row root cause in the `TM 8.1` single-finger fixture.
+    - The `TM81 Stage3` contract was changed to tolerance-based convergence:
+      - The Stage3 coverage for `CAD364 / REG291` uses a `1e-5` tolerance, avoiding false failures caused by tiny numerical errors from union/clipper.
+      - The Stage3 overlap determination for `CAD490/491` adds a `1e-4` contact tolerance, avoiding floating-point contact on shared boundaries being misjudged as overlap.
+    - `tm81-notch-acceptance-matrix` incorporates the same tolerance determination and the snapshot is updated (`stage3OverlapArea` converged from `4.078e-4` to `0`).
 
 
-## Beta 0.3 待辦
+## Beta 0.3 Pending
 
-- [x] S11.85 建立 pre-push gate（build + targeted tests + lint）並固定依賴圖先行
-  - 目標：
-    - 提供單一腳本，固定執行 `build + dependency graph + targeted tests + lint`。
-    - 里程碑模式需自動加跑 `lint -AllFiles`，避免 merge 前漏跑全量 lint。
-  - 完成：
-    - 新增 `scripts/tests/run-pre-push-gate.ps1`。
-    - `build` 階段改走 `scripts/build/build.ps1 -NoTest`（同時生成 dependency graph）。
-    - `tests` 預設跑 `smoke`，可透過 `-TestGroups` 擴充。
-    - `lint` 預設跑變更範圍；`-Milestone` 會追加 `lint -AllFiles`。
-    - 輸出 summary：`build/test-gate/pre-push-gate-summary.json`。
-  - 驗證：
+- [x] S11.85 Establish the pre-push gate (build + targeted tests + lint) and fix the dependency graph first
+  - Goal:
+    - Provide a single script that fixedly runs `build + dependency graph + targeted tests + lint`.
+    - Milestone mode must automatically also run `lint -AllFiles`, to avoid missing the full lint before merge.
+  - Completed:
+    - Added `scripts/tests/run-pre-push-gate.ps1`.
+    - The `build` stage now uses `scripts/build/build.ps1 -NoTest` (which also generates the dependency graph).
+    - `tests` defaults to running `smoke`, and can be extended via `-TestGroups`.
+    - `lint` defaults to running on the changed scope; `-Milestone` additionally runs `lint -AllFiles`.
+    - Outputs a summary: `build/test-gate/pre-push-gate-summary.json`.
+  - Verification:
     - `./scripts/tests/run-pre-push-gate.ps1 -UseNoAppHost`
     - `./scripts/tests/run-pre-push-gate.ps1 -UseNoAppHost -Milestone`
 
 
-- [x] S11.86 建立 notch 驗證資訊架構 + 欄位契約 spec（Step3/4/5/6 + Simulation + Export）
-  - 目標：
-    - 先在不改演算法的前提下，定義單一驗證資訊架構（table + 右側 review panel）與欄位契約。
-    - 每個欄位必須明確標示：`來源（single source）/ 是否可編輯 / 哪個 action 會改到它 / 下游影響`。
-  - 完成：
-    - 新增規格文件：`docs/core/notch-verification-ia-field-contract-spec.md`。
-    - 已定義：
-      - L0~L4 truth 層（mask/assignment/notch table/validation trace/simulation projection）
-      - Step4/Step5/Step6/Simulation 共用欄位契約
-      - Action -> 欄位影響矩陣
-      - UI 減噪規範（主畫面不放長段落，改用 info icon）
-      - 後續 Phase A~D 實作切分
-  - 驗證：
-    - 本項為 spec/documentation slice，先以文件契約作為後續 UI implementation 依據（不涉及程式執行路徑變更）。
+- [x] S11.86 Establish the notch verification information architecture + field contract spec (Step3/4/5/6 + Simulation + Export)
+  - Goal:
+    - Without changing algorithms, first define a single verification information architecture (table + right-side review panel) and field contract.
+    - Each field must explicitly state: `source (single source) / whether editable / which action modifies it / downstream impact`.
+  - Completed:
+    - Added spec document: `docs/core/notch-verification-ia-field-contract-spec.md`.
+    - Defined:
+      - L0~L4 truth layers (mask/assignment/notch table/validation trace/simulation projection)
+      - Shared field contract for Step4/Step5/Step6/Simulation
+      - Action -> field impact matrix
+      - UI noise-reduction guidelines (no long paragraphs on the main screen; use info icons instead)
+      - Phase A~D implementation split for follow-up work
+  - Verification:
+    - This item is a spec/documentation slice. It uses the document contract as the basis for later UI implementation (does not involve program execution path changes).

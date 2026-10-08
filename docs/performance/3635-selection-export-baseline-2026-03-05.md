@@ -1,18 +1,18 @@
-# 3635 Selection / Export Historical Baseline（2026-03-05）
+# 3635 Selection / Export Historical Baseline (2026-03-05)
 
-> 狀態：歷史快照，已由 `docs/performance/regression-baseline-3635.md` 的 2026-08-08 signed/isolated measurement 取代；本文件不得再稱為 latest 或用來更新 golden。
+> Status: historical snapshot. The 2026-08-08 signed/isolated measurement in `docs/performance/regression-baseline-3635.md` replaces it. Do not call this file the latest baseline, and do not use it to update golden.
 
-## 目的
-- 固定量測 3635 專案在「selection latency」與「Step5 匯出耗時」。
-- 保存 2026-03-04 舊 non-isolated command 與數值，供歷史趨勢查閱；新的可重現模板與 exact gate 只看 current baseline 文件。
+## Purpose
+- Measure two things on the 3635 project with fixed fields: selection latency and Step5 export time.
+- Keep the old 2026-03-04 non-isolated command and its values, so readers can look up the historical trend. The reproducible template and the exact gate are only in the current baseline document.
 
-## 測試資料與前置
-- 專案：`example/BOE36.35/project_3635.json`
-- 目標 CAD：`4767`
-- 目標 Regular（notch-validation）：`4792`
-- 歷史前置：先啟動 FreeformHelper UI（IPC query 連到既有 instance）。這不符合目前 managed PID/app-settings isolation gate，禁止作 1.3.x acceptance。
+## Test Data and Prerequisites
+- Project: `example/BOE36.35/project_3635.json`
+- Target CAD: `4767`
+- Target Regular (notch-validation): `4792`
+- Historical prerequisite: start the FreeformHelper UI first (the IPC query connects to the existing instance). This setup does not meet the current managed PID/app-settings isolation gate. It is forbidden as 1.3.x acceptance.
 
-## 重現命令
+## Reproduction Command
 ```powershell
 ./scripts/perf/run-3635-regression-baseline.ps1 `
   -ProjectPath example/BOE36.35/project_3635.json `
@@ -24,21 +24,21 @@
   -SkipBuild
 ```
 
-## 量測欄位（固定）
-- Selection：
+## Measured Fields (Fixed)
+- Selection:
   - `sampleCount`
   - `totalMs.{min,p50,p95,max,avg}`
   - `inspectorMs.{min,p50,p95,max,avg}`
   - `notchPreviewMs.{min,p50,p95,max,avg}`
-- Export：
+- Export:
   - `runtime-export-csv.json:data.elapsedMs`
   - `runtime-export-c-v22.json:data.elapsedMs`
-  - 輸出檔 size（csv/c-v22）
+  - Output file size (csv/c-v22)
 
-## 歷史量測（來源：`build/perf/3635-regression-verify`，2026-03-04 16:47 UTC）
+## Historical Measurement (Source: `build/perf/3635-regression-verify`, 2026-03-04 16:47 UTC)
 
 ### Selection latency
-| 指標 | 值 |
+| Metric | Value |
 |---|---:|
 | sampleCount | 2 |
 | totalMs p50 / p95 | 2 / 6 |
@@ -46,24 +46,24 @@
 | notchPreviewMs p50 / p95 | 2 / 6 |
 
 ### Step5 export
-| 指標 | 值 |
+| Metric | Value |
 |---|---:|
 | CSV elapsedMs | 9682 |
 | C v2.2 elapsedMs | 80 |
 | CSV size | 44897 bytes |
 | C v2.2 size | 65820 bytes |
 
-### Budget gate（同次量測）
-- 來源：`docs/performance/regression-baseline-3635.budget.json`
-- 結果：`pass = true`
+### Budget gate (same measurement)
+- Source: `docs/performance/regression-baseline-3635.budget.json`
+- Result: `pass = true`
 
-## 產物路徑
+## Artifact Paths
 - `build/perf/3635-regression-verify/regression-baseline-summary.md`
 - `build/perf/3635-regression-verify/selection-latency.json`
 - `build/perf/3635-regression-verify/runtime-export-csv.json`
 - `build/perf/3635-regression-verify/runtime-export-c-v22.json`
 
-## 後續規則
-1. 不覆寫本歷史快照，也不以其舊 output size/hash 作 golden。
-2. 新量測使用 `run-3635-regression-baseline.ps1 -LaunchIsolatedUi -EnforceBudget`，並在 current baseline 文件記錄 forward/reverse command、環境與 signed hashes。
-3. 若 current baseline 的 `totalMs p95` 或 `CSV elapsedMs` 相對最近一次可比環境退化超過 20%，在 TODO 新增 perf 調查項；不可直接拿本文件的 non-isolated 數字作同環境比較。
+## Follow-up Rules
+1. Do not overwrite this historical snapshot. Do not use its old output size or hash as golden.
+2. Run new measurements with `run-3635-regression-baseline.ps1 -LaunchIsolatedUi -EnforceBudget`. Record the forward/reverse command, the environment, and the signed hashes in the current baseline document.
+3. If the current baseline's `totalMs p95` or `CSV elapsedMs` is more than 20% worse than the latest comparable environment, add a perf investigation item to TODO. Do not use this document's non-isolated numbers as a same-environment comparison.
