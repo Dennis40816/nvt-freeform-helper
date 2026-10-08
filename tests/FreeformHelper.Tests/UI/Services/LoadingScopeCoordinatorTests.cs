@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using FreeformHelper.UI.Services;
+using Nvt.Core.Progress;
 using Xunit;
 
 namespace FreeformHelper.Tests;

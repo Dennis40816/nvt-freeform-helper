@@ -1,6 +1,7 @@
 using Avalonia.Threading;
 using FreeformHelper.UI.Services;
 using Nvt.Core.Avalonia.Threading;
+using Nvt.Core.Progress;
 
 namespace FreeformHelper.UI.ViewModels;
 

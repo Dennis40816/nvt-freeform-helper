@@ -1,4 +1,5 @@
 using FreeformHelper.UI.Services;
+using Nvt.Core.Progress;
 
 namespace FreeformHelper.UI.ViewModels;
 
