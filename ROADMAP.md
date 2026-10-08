@@ -167,7 +167,7 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
 - [ ] **R13.307-ICON Material Symbols becomes the shared Core icon system; delete the unused `MaterialIcons-Regular.ttf`** · Target: g4 · Status: Not started · PR: -
 - [ ] **R13.307-FONT Adopt the Core font set** · Target: g4 · Status: Not started · PR: -
 - [ ] **R13.307-LIC Ship the Core license as `licenses/Nvt.Core/LICENSE`** · Target: first NFH release with Core · Status: Not started · PR: -
-- [x] **C-LSC Use LoadingScopeCoordinator from the Core non-UI library** · Target: g4 · Status: Done; Core side in [Core #44](https://github.com/Dennis40816/nvt_fw_core/pull/44) · PR: -
+- [x] **C-LSC Use LoadingScopeCoordinator from the Core non-UI library** · Target: g4 · Status: Done; Core side in [Core #44](https://github.com/Dennis40816/nvt_fw_core/pull/44) · PR: [#61](https://github.com/Dennis40816/nvt-freeform-helper/pull/61)
 - [x] **C-NONUI Move CoalescedRefresh and UndoService to the Core non-UI library** · Target: g4 · Status: Done · PR: [#60](https://github.com/Dennis40816/nvt-freeform-helper/pull/60)
 - [ ] **C-CTRL Move cards, dialogs and input controls to Core** · Target: g4 · Status: Not started · PR: -
 - [ ] **R13.307-GUARD Should Core ship test helpers such as the headless session guard?** · Target: - · Status: Waiting for owner · PR: -
