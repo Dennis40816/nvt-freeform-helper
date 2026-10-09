@@ -1,6 +1,6 @@
 # Branch, Version, and Release Governance
 
-Status: Documentation for the 1.0.x branch and existing gates; release automation remains part of `ROADMAP.md S15.005e`. The version rules are in `ROADMAP.md`, section "Version rules".
+Status: Documentation for the `main` trunk, the 1.0.x version line and existing gates; release automation remains part of `ROADMAP.md S15.005e`. The version rules are in `ROADMAP.md`, section "Version rules".
 
 ## Choose Versions by Product Impact
 
@@ -12,7 +12,9 @@ For the `VERSION` value and the repository-external test area, see `ROADMAP.md` 
 
 ## Branch Authority and Work Direction
 
-- `1.0.x` is the default branch and the trunk. Its name follows the next customer release, `1.0.0`. `main` will hold customer releases only. Independent work uses `feature/<version>/<topic>`, with the corresponding trunk as the PR target; do not merge features directly into `main`.
+- `main` is the default branch and the trunk. The version line `1.0.x` names the next customer release, `1.0.0`, and is not a branch. A release branch `X.Y.x` is cut from `main` only when a customer release ships. It freezes the content and takes fixes only.
+- Independent work uses `<type>/<scope>/<topic>` branches with `main` as the PR target. The type is one of `feature`, `fix`, `refactor`, `docs`, `test`, `build`, `ci` or `chore`. The scope is a component name and never a version number.
+- Do not keep `backup/` or `codex/` branches; use tags. Delete branches only from a list the owner approved.
 - Work on 1.0.x first addresses the `S15.*` baseline fixes and alignment with the public template, then proceeds to unfinished `R13.*`; the owner has decided that `R13` can begin when only owner-only `S15` items remain.
 - This repository has not yet completed the execution contract for release branches, tags, and release workflows; until `S15.005e` is complete, assess work completion using the current CI and roadmap gates, without citing the template release commands.
 

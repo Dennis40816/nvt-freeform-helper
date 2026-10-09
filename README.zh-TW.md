@@ -4,7 +4,7 @@
 
 授權與使用限制請見 [LICENSE](LICENSE)。
 
-自 2026-10-04 起，新工作（分支、PR、新 issue）在公開 repo [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper) 進行，PR 目標為 `1.0.x`。
+自 2026-10-04 起，新工作（分支、PR、新 issue）在公開 repo [Dennis40816/nvt-freeform-helper](https://github.com/Dennis40816/nvt-freeform-helper) 進行，PR 目標為 `main`。
 
 FreeformHelper 是 DXF 分析工具，主流程是：
 `DXF 匯入 -> Regular Grid 建立 -> CAD/Regular 對應 -> Freeform/Notch 輸出`

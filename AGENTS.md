@@ -23,7 +23,7 @@ For multi-person work or handoff across sessions, see `docs/handoff/README.md` f
 - Before each UI build, test, or lint cycle, run `./scripts/dev/prepare-ui-workspace.ps1` once. It stops stale `FreeformHelper.UI`, spinner, and dotnet UI processes, and normalizes modified text files to CRLF. Do not repeatedly use ad hoc PowerShell commands to do the same workspace cleanup. During the 1.2 UI phase, process locks cost at least two build/test rounds, and fixing line endings cost time several times.
 - After script edits or batch rewrites, and before build or lint, run `./scripts/dev/prepare-ui-workspace.ps1 -SkipStopApp`. This restores touched text files to CRLF, so you do not depend on formatting fixes later. All tracked text files must follow the CRLF rules in `.editorconfig` and `.gitattributes`.
 - If a tool reports that a file is locked by `FreeformHelper.UI`, run `./scripts/dev/prepare-ui-workspace.ps1 -SkipNormalizeLineEndings` once, then retry. Do not rerun the same build or test command directly.
-- Before each commit, run `./scripts/tests/lint.ps1 -UseNoAppHost`. Before merging into trunk (`1.0.x`) or `main`, run `./scripts/tests/lint.ps1 -AllFiles -UseNoAppHost`. (The original rule said `master` before merging.)
+- Before each commit, run `./scripts/tests/lint.ps1 -UseNoAppHost`. Before merging into `main`, run `./scripts/tests/lint.ps1 -AllFiles -UseNoAppHost`. (The original rule said `master` before merging.)
 - The repo verifier runs its structure, build, test, and all lanes through `./scripts/verify.ps1`. Choose the lane that matches the actual work. See `CONTRIBUTING.md` for details.
 - `example/` is a private git submodule. For a new clone or worktree, run `git submodule update --init example` before any gate. If it is missing, example-data tests may be skipped, and `run-refactor-gate.ps1` will fail. Do not bring its contents into this repo, PRs, issues, or logs. When switching to a branch from before the submodule was set up, run `git submodule deinit -f example` first.
 
@@ -60,7 +60,7 @@ The following four runtime mechanisms must not be changed without an explicit ta
 
 ## Branch and Review Boundaries
 
-- The default branch is `1.0.x` (trunk). `main` currently equals the initial import commit and will hold released versions only. Work uses `feature/<version>/<topic>` branches targeting `1.0.x`.
+- The default branch and the trunk is `main`. Work uses `<type>/<scope>/<topic>` branches targeting `main`. The type is one of `feature`, `fix`, `refactor`, `docs`, `test`, `build`, `ci` or `chore`. The scope is a component name, such as `console` or `notch`, and never a version number. The topic is a short kebab-case name. A release branch `X.Y.x` is cut from `main` only when a customer release ships. Do not keep `backup/` or `codex/` branches; use tags. Delete branches only from a list the owner approved.
 - Changes to `AGENTS.md` or `CONTRIBUTING.md` require owner confirmation in chat before editing. The owner said on 2026-10-04: 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). A GitHub review is not required for this confirmation. The owner-approval rules for high-risk PRs in `CONTRIBUTING.md`, including `src/**`, `scripts/**`, and `.github/**`, still apply.
 
 - Keep each commit small and clear. Each commit must have a title and a body. Do not put unrelated fixes in the same commit. Prefer committing them one at a time.

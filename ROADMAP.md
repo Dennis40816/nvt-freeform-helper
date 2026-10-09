@@ -25,7 +25,7 @@ Links of the form `Dennis40816/FreeformHelper/issues/N` point to the archived pr
 
 | Item | Value |
 |---|---|
-| Development line | `1.0.x` (`VERSION` = 1.0.0) |
+| Development line | Version line `1.0.x` (`VERSION` = 1.0.0). The branch is `main` |
 | Next customer release | `1.0.0`, after handoff group g4 (owner decision, 2026-10-07) |
 | Latest customer release in this repository | None yet |
 | Latest release overall | `1.2`, tagged only in the archived private repository. It was never shipped to customers |
@@ -36,15 +36,15 @@ These rules follow the owner decisions of 2026-10-07.
 
 - **Customer releases**: only a version shipped to customers gets a release tag and a GitHub Release. The number is set at release time. Customer version numbers are continuous.
 - **Minor and patch**: raise the minor version only for a large set of features. Otherwise raise the patch version.
-- **Release branch**: to ship a customer release, cut a branch with the same name from the trunk. It freezes the content and takes fixes only. The trunk keeps moving.
-- **Internal names follow the next customer release**: the trunk name, `VERSION` and handoff names match the next customer release. No internal number may be larger than the next customer release. The next customer release is `1.0.0`, so the trunk is `1.0.x`.
-- **Handoff groups and internal tags**: work is grouped in handoff order. When a whole group has merged into the trunk, the GitHub App creates one internal tag `dev/1.0.x/g<n>-<name>`. Internal tags get no Release.
+- **Release branch**: to ship a customer release, cut a branch named after the version line, for example `1.0.x`, from `main`. It freezes the content and takes fixes only. `main` keeps moving.
+- **Internal names follow the next customer release**: `VERSION` and handoff names match the next customer release. No internal number may be larger than the next customer release. The next customer release is `1.0.0`, so the version line is `1.0.x`. The trunk is always `main`; the version line is not a branch name.
+- **Handoff groups and internal tags**: work is grouped in handoff order. When a whole group has merged into the trunk, the GitHub App creates one internal tag `dev/<line>/g<n>-<name>`, for example `dev/1.0.x/g<n>-<name>`. `<line>` is the version line of the next customer release, not a branch name. Internal tags get no Release.
 - **Skipped versions**: a customer who skips versions must still be able to update. Settings and user data migrate from every customer release directly. The release notes list the accumulated changes.
 
 ## 1. Fix line
 
 - A hotfix branch starts from the latest customer release tag.
-- The fix ships as a patch release and then merges back into the release branch or `1.0.x`.
+- The fix ships as a patch release and then merges back into the release branch or `main`.
 - This repository has no customer release yet. The fix line starts with `1.0.0`. Until then, ask the owner before you start a hotfix.
 
 Open hotfixes: none.
