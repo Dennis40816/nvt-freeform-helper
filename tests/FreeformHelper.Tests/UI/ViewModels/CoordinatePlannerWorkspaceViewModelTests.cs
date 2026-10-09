@@ -241,7 +241,7 @@ public sealed class CoordinatePlannerWorkspaceViewModelTests
     }
 
     [Fact]
-    public void ShowArtifactDetailCommand_SelectsRowAndRequestsDialog()
+    public async Task ShowArtifactDetailCommand_SelectsRowAndRequestsDialog()
     {
         var viewModel = new CoordinatePlannerWorkspaceViewModel(
             new CoordinatePlannerWorkspaceUseCase(),
@@ -255,13 +255,48 @@ public sealed class CoordinatePlannerWorkspaceViewModelTests
                 DefaultPixelWidth: 1000,
                 DefaultPixelHeight: 500));
         CoordinateArtifactRow? requestedRow = null;
-        viewModel.ArtifactDetailRequested += row => requestedRow = row;
+        viewModel.RequestArtifactDetailAsync = row =>
+        {
+            requestedRow = row;
+            return Task.CompletedTask;
+        };
         var row = viewModel.ArtifactRows[0];
 
-        viewModel.ShowArtifactDetailCommand.Execute(row);
+        await viewModel.ShowArtifactDetailCommand.ExecuteAsync(row);
 
         Assert.Same(row, viewModel.SelectedArtifactRow);
         Assert.Same(row, requestedRow);
+    }
+
+    [Fact]
+    public async Task ShowArtifactDetailCommand_CallbackFails_ReportsFailureAndReleasesCommand()
+    {
+        var probe = new FreeformHelper.Tests.TestInfrastructure.UiEventProbe();
+        var failure = new InvalidOperationException("artifact dialog unavailable");
+        var viewModel = new CoordinatePlannerWorkspaceViewModel(
+            new CoordinatePlannerWorkspaceUseCase(),
+            new CoordinatePlannerWorkspaceSession(
+                BuildGrid(),
+                Array.Empty<CadPad>(),
+                Array.Empty<string>(),
+                SourceRevision: 0,
+                DefaultMachineWidth: 100d,
+                DefaultMachineHeight: 50d,
+                DefaultPixelWidth: 1000,
+                DefaultPixelHeight: 500))
+        {
+            UiEvents = probe.Runner,
+            RequestArtifactDetailAsync = _ => Task.FromException(failure),
+        };
+        var row = viewModel.ArtifactRows[0];
+
+        await viewModel.ShowArtifactDetailCommand.ExecuteAsync(row);
+
+        var report = Assert.Single(probe.Reports);
+        Assert.Equal("CoordinatePlanner.ArtifactDetail", report.Operation);
+        Assert.Same(failure, report.Exception);
+        Assert.Same(row, viewModel.SelectedArtifactRow);
+        Assert.False(viewModel.ShowArtifactDetailCommand.IsRunning);
     }
 
     [Fact]

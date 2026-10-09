@@ -304,6 +304,9 @@
           "FreeformHelper.Domain": "[1.0.0, )"
         }
       },
+      "freeformhelper.coresource": {
+        "type": "Project"
+      },
       "freeformhelper.domain": {
         "type": "Project"
       },

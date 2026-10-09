@@ -11,11 +11,14 @@ using Avalonia.VisualTree;
 using AvaloniaEdit;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Avalonia.Threading;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.Views;
 
 public partial class ConsolePanel : UserControl
 {
+    private UiEventRunner? _uiEvents => _shellViewModel?.UiEvents ?? (DataContext as ShellViewModel)?.UiEvents ?? (DataContext as FreeformHelperViewModel)?.UiEvents;
+
     public static readonly StyledProperty<bool> UseShellHostedBehaviorProperty =
         AvaloniaProperty.Register<ConsolePanel, bool>(nameof(UseShellHostedBehavior));
 
@@ -248,7 +251,12 @@ public partial class ConsolePanel : UserControl
         _consoleEditor.ScrollToEnd();
     }
 
-    private async void OnConsolePointerPressedInternal(object? sender, PointerPressedEventArgs e)
+    private void OnConsolePointerPressedInternal(object? sender, PointerPressedEventArgs e)
+    {
+        _uiEvents?.Run("Console.PointerPressed", _ => HandleConsolePointerPressedAsync(sender, e), CancellationToken.None);
+    }
+
+    private async Task HandleConsolePointerPressedAsync(object? sender, PointerPressedEventArgs e)
     {
         if (UseShellHostedBehavior)
         {
@@ -285,7 +293,12 @@ public partial class ConsolePanel : UserControl
         ConsoleEditorPointerReleased?.Invoke(sender, e);
     }
 
-    private async void OnConsoleCopyAllInternal(object? sender, RoutedEventArgs e)
+    private void OnConsoleCopyAllInternal(object? sender, RoutedEventArgs e)
+    {
+        _uiEvents?.Run("Console.CopyAll", _ => CopyConsoleAsync(sender, e), CancellationToken.None);
+    }
+
+    private async Task CopyConsoleAsync(object? sender, RoutedEventArgs e)
     {
         if (UseShellHostedBehavior)
         {

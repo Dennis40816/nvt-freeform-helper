@@ -97,7 +97,7 @@ public sealed partial class ShellViewModel
             Simulation.ReportBuildProgress("Opening simulation workspace...");
         }
 
-        var viewModel = new SimulationWorkspaceViewModel(_simulationWorkspaceUseCase, session);
+        var viewModel = new SimulationWorkspaceViewModel(_simulationWorkspaceUseCase, session) { UiEvents = UiEvents };
         Simulation.UpdateSourceRevision(FreeformHelper.SimulationWorkspaceSourceRevision);
         Simulation.SetBuildFailure(string.Empty);
         Simulation.CurrentWorkspace = viewModel;
@@ -121,7 +121,7 @@ public sealed partial class ShellViewModel
                 return null;
             }
 
-            var viewModel = new CoordinatePlannerWorkspaceViewModel(_coordinatePlannerWorkspaceUseCase, session);
+            var viewModel = new CoordinatePlannerWorkspaceViewModel(_coordinatePlannerWorkspaceUseCase, session) { UiEvents = UiEvents };
             if (CoordinatePlanner.CurrentWorkspace is not null)
             {
                 CoordinatePlanner.CurrentWorkspace.WorkspacePreferencesChanged -= OnCoordinateWorkspacePreferencesChanged;

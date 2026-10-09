@@ -8,7 +8,7 @@ public sealed partial class FreeformHelperView
     private Task ShowDxfOverlapReportWindowAsync(DxfOverlapReportViewModel viewModel)
     {
         var owner = TopLevel.GetTopLevel(this) as Window;
-        var window = new DxfOverlapReportWindow
+        var window = new DxfOverlapReportWindow(new DxfOverlapReportSeams(((FreeformHelperViewModel)DataContext!).UiEvents))
         {
             DataContext = viewModel
         };

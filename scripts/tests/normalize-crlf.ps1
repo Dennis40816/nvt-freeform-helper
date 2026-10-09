@@ -125,6 +125,12 @@ Push-Location $repoRoot
 try {
   $candidates = Get-CandidatePaths -UseAllFiles:$AllFiles
   foreach ($relativePath in $candidates) {
+    # Preserve the canonical Core source and its pinned manifest byte for byte.
+    if ($relativePath -ceq "src/FreeformHelper.CoreSource/UiEventRunner.cs" -or
+        $relativePath -ceq "src/FreeformHelper.CoreSource/manifest.json") {
+      continue
+    }
+
     $fullPath = Join-Path $repoRoot $relativePath
     if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
       $normalizeResult.skippedMissingFiles++
