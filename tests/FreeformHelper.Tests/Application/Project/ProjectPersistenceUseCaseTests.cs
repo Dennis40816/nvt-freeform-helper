@@ -1,6 +1,7 @@
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using Xunit;
 
@@ -425,6 +426,45 @@ public sealed class ProjectPersistenceUseCaseTests
             {
                 File.Delete(projectPath);
             }
+        }
+    }
+
+    [Fact]
+    public async Task SaveAsync_PublisherFailure_AwaitsPublicationAndPropagatesFailure()
+    {
+        var directory = TestFiles.CreateTempDirectory();
+        try
+        {
+            var path = Path.Combine(directory.FullName, "project.json");
+            var publication = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var store = new JsonProjectStore
+            {
+                Publisher = (_, _, _) => publication.Task,
+            };
+            var useCase = new ProjectPersistenceUseCase(store, new PadOverrideService());
+
+            var saving = useCase.SaveAsync(new ProjectSaveRequest(
+                Project: new ProjectFile(),
+                Grid: null,
+                CadPadCustomValues: new Dictionary<int, double>(),
+                PickSaveProjectPathAsync: () => Task.FromResult<string?>(path),
+                ConfirmEmbedDxfAsync: null,
+                BuildUiSnapshot: () => new ProjectUiSnapshot(),
+                ApplyUiToSettings: _ => { },
+                HasCadLoaded: false));
+
+            var completedBeforePublication = saving.IsCompleted;
+            var failure = new IOException("Publication failed.");
+            publication.SetException(failure);
+
+            var actual = await Assert.ThrowsAsync<IOException>(() => saving);
+            Assert.Same(failure, actual);
+            Assert.False(completedBeforePublication);
+            Assert.Empty(Directory.GetFileSystemEntries(directory.FullName));
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
         }
     }
 

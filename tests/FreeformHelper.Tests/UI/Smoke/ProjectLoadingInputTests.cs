@@ -87,7 +87,7 @@ public sealed class ProjectLoadingInputTests
         var saveCount = 0;
         try
         {
-            JsonProjectStore.Save(path, new ProjectFile());
+            await new JsonProjectStore().SaveAsync(path, new ProjectFile(), CancellationToken.None);
             window.Show();
             var editor = view.GetVisualDescendants().OfType<CheckBox>()
                 .Single(c => Equals(c.Content, "Only closed polylines"));

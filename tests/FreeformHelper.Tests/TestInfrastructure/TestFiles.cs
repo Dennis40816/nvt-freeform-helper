@@ -2,6 +2,11 @@ namespace FreeformHelper.Tests.TestInfrastructure;
 
 internal static class TestFiles
 {
+    public static DirectoryInfo CreateTempDirectory()
+    {
+        return Directory.CreateTempSubdirectory("freeform-helper-test-");
+    }
+
     public static string WriteTempCsv(string content)
     {
         var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.csv");

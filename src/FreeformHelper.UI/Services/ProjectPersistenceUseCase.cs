@@ -57,7 +57,7 @@ public sealed class ProjectPersistenceUseCase
             }
         }
 
-        JsonProjectStore.Save(path, request.Project);
+        await _store.SaveAsync(path, request.Project, CancellationToken.None);
         return ProjectSaveResult.Saved(path, embedWarning);
     }
 
