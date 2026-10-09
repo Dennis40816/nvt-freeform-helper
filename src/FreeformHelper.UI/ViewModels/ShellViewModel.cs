@@ -22,6 +22,8 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly StringBuilder _consoleTextBuffer = new();
     private bool _isDisposed;
+    // Navigation selection is owned by the shell's UI-thread command entry point.
+    private ShellPage _selectedPage = ShellPage.Workspace;
 
     // --- Sub-Viewmodels ---
     public FreeformHelperViewModel FreeformHelper { get; }
@@ -42,37 +44,33 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     public CoordinatePlannerHostViewModel CoordinatePlanner => _coordinatePlanner ??= new CoordinatePlannerHostViewModel();
 
     /// <summary>
-    /// Gets or sets the currently active ViewModel, which is displayed in the main content area.
+    /// Gets the selected page's ViewModel for the main content area.
     /// </summary>
-    [ObservableProperty]
-    private object _currentViewModel = null!;
+    public object CurrentViewModel => GetPageViewModel(_selectedPage);
+
+    internal ShellPage SelectedPage => _selectedPage;
 
     // --- Navigation State Flags ---
     /// <summary>
-    /// Gets or sets a value indicating whether the main Workspace view is currently active.
+    /// Gets a value indicating whether the main Workspace view is currently active.
     /// </summary>
-    [ObservableProperty]
-    private bool _isWorkspaceActive;
+    public bool IsWorkspaceActive => _selectedPage == ShellPage.Workspace;
     /// <summary>
-    /// Gets or sets a value indicating whether the How To Use view is currently active.
+    /// Gets a value indicating whether the How To Use view is currently active.
     /// </summary>
-    [ObservableProperty]
-    private bool _isHowToUseActive;
+    public bool IsHowToUseActive => _selectedPage == ShellPage.HowToUse;
     /// <summary>
-    /// Gets or sets a value indicating whether the Dev view is currently active.
+    /// Gets a value indicating whether the Dev view is currently active.
     /// </summary>
-    [ObservableProperty]
-    private bool _isDevActive;
+    public bool IsDevActive => _selectedPage == ShellPage.Dev;
     /// <summary>
-    /// Gets or sets a value indicating whether the Simulation view is currently active.
+    /// Gets a value indicating whether the Simulation view is currently active.
     /// </summary>
-    [ObservableProperty]
-    private bool _isSimulationActive;
+    public bool IsSimulationActive => _selectedPage == ShellPage.Simulation;
     /// <summary>
-    /// Gets or sets a value indicating whether the Coordinate page is currently active.
+    /// Gets a value indicating whether the Coordinate page is currently active.
     /// </summary>
-    [ObservableProperty]
-    private bool _isCoordinateActive;
+    public bool IsCoordinateActive => _selectedPage == ShellPage.Coordinate;
 
     // --- Console/Log Display ---
     /// <summary>
