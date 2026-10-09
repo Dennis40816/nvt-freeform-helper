@@ -12,13 +12,15 @@ public sealed class DebtBaselineTests
     // tokens. Comments/literals are excluded; inactive #if source is included. Source paths
     // and diagnostics use ordinal ordering. This inventory counts storage, not independent
     // domain facts; extraction into another owner is outside this particular FHVM metric.
+    internal const string AsyncVoidPattern = @"\basync\s+void\b";
+
     internal static Dictionary<string, string[]> Measure(ArchitectureSource[] sources, string repoRoot)
     {
         var result = new Dictionary<string, string[]>(StringComparer.Ordinal);
         void Count(string key, string pattern) => result.Add(key, sources.SelectMany(source => source.Find(pattern)).ToArray());
 
-        // Method/local-function declarations with the adjacent modifiers async void.
-        Count("asyncVoid", @"\basync\s+void\s+\w+\s*\(");
+        // Declarations with the adjacent modifiers async void, including generic methods.
+        Count("asyncVoid", AsyncVoidPattern);
         // Attribute applications, including qualified names and the Attribute suffix.
         Count("suppressMessage", @"\[\s*(?:(?:global::)?System\.Diagnostics\.CodeAnalysis\.)?SuppressMessage(?:Attribute)?\s*\(");
         // Each disable directive counts once, irrespective of how many IDs it contains.
@@ -126,6 +128,23 @@ public sealed class DebtBaselineTests
         }
 
         Assert.True(errors.Count == 0, string.Join(Environment.NewLine, errors));
+    }
+
+    [Fact]
+    public void AsyncVoidMetric_CountsPlainAndGenericDeclarations()
+    {
+        var source = new ArchitectureSource("fixture.cs", """
+            class Handlers
+            {
+                // async void FakeInComment() { }
+                private string _text = "async void FakeInString() { }";
+                async void Plain() { }
+                private static async void Generic<T>(T value) { }
+                internal async void Constrained<TFirst, TSecond>() where TFirst : class { }
+                async Task NotCounted() { await Task.Yield(); }
+            }
+            """);
+        Assert.Equal(3, source.Find(AsyncVoidPattern).Length);
     }
 
     [Fact]
