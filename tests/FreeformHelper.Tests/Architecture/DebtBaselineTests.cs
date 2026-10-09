@@ -148,6 +148,24 @@ public sealed class DebtBaselineTests
     }
 
     [Fact]
+    public void FieldInventory_FindsEveryDeclaratorAfterComparisonsAndGenerics()
+    {
+        var source = new ArchitectureSource("fixture.cs", """
+            class FreeformHelperViewModel
+            {
+                private bool _suppressA = true, _suppressB;
+                private bool _suppressC = 1 < 2, _suppressD;
+                private bool _suppressE = 3 > 2, _suppressF;
+                private object _mapA = new Dictionary<int, int>(), _mapB;
+                private object _nested = new Dictionary<int, List<int>>(), _after;
+            }
+            """);
+        Assert.Equal(
+            ["_suppressA", "_suppressB", "_suppressC", "_suppressD", "_suppressE", "_suppressF", "_mapA", "_mapB", "_nested", "_after"],
+            source.Fields("FreeformHelperViewModel").Select(static field => field.Name));
+    }
+
+    [Fact]
     public void SourceInventory_ExcludesLiteralsNestedTypesAndGeneratedDuplicates()
     {
         var source = new ArchitectureSource("fixture.cs", """

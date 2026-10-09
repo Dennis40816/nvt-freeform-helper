@@ -172,24 +172,37 @@ internal sealed record ArchitectureSource(string Path, string Text)
             yield return (name.Value, match.Groups["type"].Value.Trim(), modifiers, name.Index);
             // Additional declarators after top-level commas; ignore commas in type arguments,
             // calls, collection/object initializers and lambdas in the field initializer.
-            int depth = 0;
+            // A "<" opens a generic argument list only when it touches the preceding identifier;
+            // a spaced "<" or ">" is a comparison and must not hide the next declarator.
+            var open = new Stack<char>();
             for (int i = name.Index + name.Length; i < Code.Length; i++)
             {
                 char c = Code[i];
-                if (c == ';' && depth == 0)
+                if (c == ';' && open.Count == 0)
                 {
                     break;
                 }
 
-                if (c is '(' or '[' or '{' or '<')
+                if (c is '(' or '[' or '{')
                 {
-                    depth++;
+                    open.Push(c);
                 }
-                else if (c is ')' or ']' or '}' || (c == '>' && depth > 0 && Code[i - 1] != '='))
+                else if (c == '<' && i > 0 && (char.IsLetterOrDigit(Code[i - 1]) || Code[i - 1] == '_'))
                 {
-                    depth--;
+                    open.Push('<');
                 }
-                else if (c == ',' && depth == 0)
+                else if (c is ')' or ']' or '}')
+                {
+                    if (open.Count > 0)
+                    {
+                        open.Pop();
+                    }
+                }
+                else if (c == '>' && open.Count > 0 && open.Peek() == '<' && Code[i - 1] != '=')
+                {
+                    open.Pop();
+                }
+                else if (c == ',' && open.Count == 0)
                 {
                     var next = Pattern(@"\G\s*(?<name>@?\w+)\s*(?=[;,]|=(?!>))").Match(Code, i + 1);
                     if (next.Success)
