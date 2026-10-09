@@ -30,9 +30,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, 0m, 1000m);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            BoundaryVirtualAreaCapPercent = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                BoundaryVirtualAreaCapPercent = clamped;
+            }
             return;
         }
 
@@ -61,9 +62,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, 0m, 255m);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            TargetCoverageCapPercent = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                TargetCoverageCapPercent = clamped;
+            }
             return;
         }
 

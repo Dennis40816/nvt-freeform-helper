@@ -4,13 +4,13 @@
     "asyncVoidLambdas": 2,
     "suppressMessage": 13,
     "pragmaWarningDisable": 0,
-    "suppressUndoAssignments": 64,
+    "suppressUndoAssignments": 0,
     "fileWriteAllText": 5,
     "processStart": 4,
     "directClockReads": 17,
     "bareCatch": 12,
     "catchException": 29,
-    "suppressFlagFields": 21,
+    "suppressFlagFields": 20,
     "freeformViewModelStateMembers": 373,
     "shellNavigationBooleans": 5,
     "noWarnIds": 3
@@ -49,21 +49,7 @@
       "src/FreeformHelper.UI/Services/ProjectPersistenceUseCase.cs:12"
     ],
     "pragmaWarningDisable": [],
-    "suppressUndoAssignments": [
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:36", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:38", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:60", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:62",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs:136", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs:205",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Locate.cs:12", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Locate.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Locate.cs:27", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Locate.cs:29",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Summary.cs:36", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Summary.cs:39", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Summary.cs:52", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Summary.cs:55",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:38", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:47", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:98", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:100", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:133", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:135", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:162", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:164", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:209", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:211", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:284", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.NotchPreview.cs:286",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.Orchestration.cs:93", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.Orchestration.cs:95",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:48", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:50", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:64", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:66", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:79", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:81", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:90", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:92", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:102", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs:104",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step1.cs:231", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step1.cs:233", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step1.cs:247", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step1.cs:249", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step1.cs:263", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step1.cs:265",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step3.cs:33", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step3.cs:35", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step3.cs:64", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step3.cs:66",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step4.cs:12", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step4.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step4.cs:67", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step4.cs:69",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs:83", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs:85", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs:92", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs:94", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs:115", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs:124", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs:154", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs:157",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:330", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:332",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Undo.cs:71", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Undo.cs:73"
-    ],
+    "suppressUndoAssignments": [],
     "fileWriteAllText": [
       "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:99",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:158",
@@ -120,7 +106,6 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.RegularVisibilityMask.cs:17",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:265", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:266",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:262",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Undo.cs:11",
       "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:61",
       "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:12", "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:13",
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:17"

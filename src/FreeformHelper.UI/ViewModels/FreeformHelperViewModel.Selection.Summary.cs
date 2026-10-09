@@ -33,10 +33,11 @@ public sealed partial class FreeformHelperViewModel
         }
 
         _suppressManualSizingApply = true;
-        _suppressUndo = true;
-        ManualRowsRange = rows;
-        ManualColsRange = cols;
-        _suppressUndo = false;
+        using (_undoSuppression.Enter())
+        {
+            ManualRowsRange = rows;
+            ManualColsRange = cols;
+        }
         _suppressManualSizingApply = false;
         UpdateManualRangeStatus();
     }
@@ -49,10 +50,11 @@ public sealed partial class FreeformHelperViewModel
         }
 
         _suppressManualSizingApply = true;
-        _suppressUndo = true;
-        PendingColumnWidth = width;
-        PendingRowHeight = height;
-        _suppressUndo = false;
+        using (_undoSuppression.Enter())
+        {
+            PendingColumnWidth = width;
+            PendingRowHeight = height;
+        }
         _suppressManualSizingApply = false;
         ClearPendingMixedFlags();
     }

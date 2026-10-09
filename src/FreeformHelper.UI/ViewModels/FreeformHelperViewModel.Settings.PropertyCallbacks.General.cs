@@ -45,9 +45,10 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnCadLineColorChanged(Color value)
     {
-        _suppressUndo = true; // Suppress undo for programmatic change.
-        CadLineColorHex = ToRgbHex(value); // Update hex string.
-        _suppressUndo = false;
+        using (_undoSuppression.Enter())
+        {
+            CadLineColorHex = ToRgbHex(value); // Update hex string.
+        }
     }
 
     partial void OnRegularLineColorHexChanged(string value)
@@ -61,9 +62,10 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnRegularLineColorChanged(Color value)
     {
-        _suppressUndo = true; // Suppress undo for programmatic change.
-        RegularLineColorHex = ToRgbHex(value); // Update hex string.
-        _suppressUndo = false;
+        using (_undoSuppression.Enter())
+        {
+            RegularLineColorHex = ToRgbHex(value); // Update hex string.
+        }
     }
 
     partial void OnRegularSelectedColorHexChanged(string value)
@@ -76,9 +78,10 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnRegularSelectedColorChanged(Color value)
     {
-        _suppressUndo = true;
-        RegularSelectedColorHex = ToRgbHex(value);
-        _suppressUndo = false;
+        using (_undoSuppression.Enter())
+        {
+            RegularSelectedColorHex = ToRgbHex(value);
+        }
     }
 
     partial void OnRegularSelectedFillOpacityChanged(decimal value)
@@ -87,9 +90,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, 0.0m, 1.0m);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            RegularSelectedFillOpacity = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                RegularSelectedFillOpacity = clamped;
+            }
         }
     }
 
@@ -99,9 +103,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, -2.0m, 4.0m);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            HighlightStrokeWidthAdjust = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                HighlightStrokeWidthAdjust = clamped;
+            }
         }
     }
 

@@ -33,9 +33,10 @@ public sealed partial class FreeformHelperViewModel
 
         var current = Math.Clamp((int)Math.Round((double)NotchPreviewVisualizationStep), 1, 3);
         var next = current >= 3 ? 1 : current + 1;
-        _suppressUndo = true;
-        NotchPreviewVisualizationStep = next;
-        _suppressUndo = false;
+        using (_undoSuppression.Enter())
+        {
+            NotchPreviewVisualizationStep = next;
+        }
     }
 
     private void ShiftNotchPreviewStage(int delta)
@@ -57,9 +58,10 @@ public sealed partial class FreeformHelperViewModel
             next -= 3;
         }
 
-        _suppressUndo = true;
-        NotchPreviewVisualizationStep = next;
-        _suppressUndo = false;
+        using (_undoSuppression.Enter())
+        {
+            NotchPreviewVisualizationStep = next;
+        }
     }
 
     private void StopNotchPreviewAutoPlayLoop()

@@ -7,8 +7,8 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 public sealed partial class FreeformHelperViewModel
 {
-    // A flag to temporarily suppress recording undo entries (e.g., during an undo operation itself).
-    private bool _suppressUndo;
+    // One suppression owner for programmatic changes and undo actions.
+    private readonly UndoSuppression _undoSuppression = new();
 
     /// <summary>
     /// Gets a value indicating whether there are any actions currently available to be undone.
@@ -22,8 +22,8 @@ public sealed partial class FreeformHelperViewModel
     /// <param name="description">A description of the change, used for UI feedback.</param>
     private void PushUndo(Action undo, string description)
     {
-        // Suppress undo recording if the flag is set or settings are currently loading.
-        if (_suppressUndo || _isLoadingSettings)
+        // Suppress undo recording during programmatic changes or settings loading.
+        if (_undoSuppression.IsActive || _isLoadingSettings)
         {
             return;
         }
@@ -44,8 +44,8 @@ public sealed partial class FreeformHelperViewModel
     /// <param name="description">A description of the change.</param>
     private void TrackUndo<T>(T oldValue, T newValue, Action<T> assign, string description)
     {
-        // Suppress undo recording if the flag is set or settings are currently loading.
-        if (_suppressUndo || _isLoadingSettings)
+        // Suppress undo recording during programmatic changes or settings loading.
+        if (_undoSuppression.IsActive || _isLoadingSettings)
         {
             return;
         }
@@ -68,9 +68,10 @@ public sealed partial class FreeformHelperViewModel
         {
             return; // Nothing to undo.
         }
-        _suppressUndo = true; // Temporarily suppress undo recording while executing the undo action.
-        entry.Undo(); // Execute the undo action.
-        _suppressUndo = false; // Re-enable undo recording.
+        using (_undoSuppression.Enter())
+        {
+            entry.Undo(); // Execute the undo action.
+        }
 
         SetStatus($"Undo: {entry.Description}"); // Update status text with undo information.
         UndoCommand?.NotifyCanExecuteChanged(); // Notify UI that undo command's CanExecute state might have changed.

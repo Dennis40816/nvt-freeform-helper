@@ -133,76 +133,77 @@ public sealed partial class FreeformHelperViewModel
 
         var wasLoading = _isLoadingSettings;
         _isLoadingSettings = true;
-        _suppressUndo = true;
-
-        ShowCad = snapshot.ShowCad;
-        ShowRegular = snapshot.ShowRegular;
-        HighlightUnmatched = snapshot.HighlightUnmatched;
-        HighlightFreeform = snapshot.HighlightFreeform;
-        ColorCadByArea = snapshot.ColorCadByArea;
-
-        CadLineWidth = (decimal)snapshot.CadLineWidth;
-        CadFillOpacity = (decimal)Math.Clamp(snapshot.CadFillOpacity, 0.0, 1.0);
-        CadLineOpacity = snapshot.CadLineOpacity <= 0
-            ? 1.0m
-            : (decimal)Math.Clamp(snapshot.CadLineOpacity, 0.0, 1.0);
-        if (!string.IsNullOrWhiteSpace(snapshot.CadLineColor))
+        using (_undoSuppression.Enter())
         {
-            CadLineColorHex = snapshot.CadLineColor;
-        }
 
-        RegularLineWidth = (decimal)snapshot.RegularLineWidth;
-        HighlightStrokeWidthAdjust = (decimal)Math.Clamp(snapshot.HighlightStrokeWidthAdjust, -2.0, 4.0);
-        RegularFillOpacity = (decimal)Math.Clamp(snapshot.RegularFillOpacity, 0.0, 1.0);
-        RegularLineOpacity = snapshot.RegularLineOpacity <= 0
-            ? 1.0m
-            : (decimal)Math.Clamp(snapshot.RegularLineOpacity, 0.0, 1.0);
-        if (!string.IsNullOrWhiteSpace(snapshot.RegularLineColor))
-        {
-            RegularLineColorHex = snapshot.RegularLineColor;
-        }
+            ShowCad = snapshot.ShowCad;
+            ShowRegular = snapshot.ShowRegular;
+            HighlightUnmatched = snapshot.HighlightUnmatched;
+            HighlightFreeform = snapshot.HighlightFreeform;
+            ColorCadByArea = snapshot.ColorCadByArea;
 
-        if (!string.IsNullOrWhiteSpace(snapshot.RegularSelectedColor))
-        {
-            RegularSelectedColorHex = snapshot.RegularSelectedColor;
-        }
-        if (snapshot.RegularSelectedFillOpacity > 0)
-        {
-            RegularSelectedFillOpacity = (decimal)Math.Clamp(snapshot.RegularSelectedFillOpacity, 0.0, 1.0);
-        }
-
-        AreaBucketTolerance = (decimal)snapshot.AreaBucketTolerance;
-        MaxAreaBuckets = snapshot.MaxAreaBuckets;
-        ShowDiffIndexOverlay = snapshot.ShowDiffIndexOverlay;
-        ShowNotchCanvasPreview = snapshot.ShowNotchCanvasPreview;
-        ShowNotchToRegularLabels = snapshot.ShowNotchToRegularLabels;
-        GlobalFontSizePercent = (decimal)Math.Clamp(snapshot.GlobalFontSizePercent, 80.0, 140.0);
-        NotchPreviewVisualizationStep = (decimal)Math.Clamp(snapshot.NotchPreviewVisualizationStep, 1.0, 3.0);
-        NotchPreviewAutoPlayIntervalMs = (decimal)Math.Clamp(snapshot.NotchPreviewAutoPlayIntervalMs, 200.0, 5000.0);
-        NotchPreviewAutoPlayEnabled = snapshot.NotchPreviewAutoPlayEnabled;
-        if (NotchExportFileTypeMetadata.TryParseStoredValue(snapshot.NotchExportFileType, out var exportFileType))
-        {
-            var exportOption = NotchExportFileTypeOptions.FirstOrDefault(o => o.Value == exportFileType);
-            if (!string.IsNullOrWhiteSpace(exportOption.Display))
+            CadLineWidth = (decimal)snapshot.CadLineWidth;
+            CadFillOpacity = (decimal)Math.Clamp(snapshot.CadFillOpacity, 0.0, 1.0);
+            CadLineOpacity = snapshot.CadLineOpacity <= 0
+                ? 1.0m
+                : (decimal)Math.Clamp(snapshot.CadLineOpacity, 0.0, 1.0);
+            if (!string.IsNullOrWhiteSpace(snapshot.CadLineColor))
             {
-                SelectedNotchExportFileTypeOption = exportOption;
+                CadLineColorHex = snapshot.CadLineColor;
             }
+
+            RegularLineWidth = (decimal)snapshot.RegularLineWidth;
+            HighlightStrokeWidthAdjust = (decimal)Math.Clamp(snapshot.HighlightStrokeWidthAdjust, -2.0, 4.0);
+            RegularFillOpacity = (decimal)Math.Clamp(snapshot.RegularFillOpacity, 0.0, 1.0);
+            RegularLineOpacity = snapshot.RegularLineOpacity <= 0
+                ? 1.0m
+                : (decimal)Math.Clamp(snapshot.RegularLineOpacity, 0.0, 1.0);
+            if (!string.IsNullOrWhiteSpace(snapshot.RegularLineColor))
+            {
+                RegularLineColorHex = snapshot.RegularLineColor;
+            }
+
+            if (!string.IsNullOrWhiteSpace(snapshot.RegularSelectedColor))
+            {
+                RegularSelectedColorHex = snapshot.RegularSelectedColor;
+            }
+            if (snapshot.RegularSelectedFillOpacity > 0)
+            {
+                RegularSelectedFillOpacity = (decimal)Math.Clamp(snapshot.RegularSelectedFillOpacity, 0.0, 1.0);
+            }
+
+            AreaBucketTolerance = (decimal)snapshot.AreaBucketTolerance;
+            MaxAreaBuckets = snapshot.MaxAreaBuckets;
+            ShowDiffIndexOverlay = snapshot.ShowDiffIndexOverlay;
+            ShowNotchCanvasPreview = snapshot.ShowNotchCanvasPreview;
+            ShowNotchToRegularLabels = snapshot.ShowNotchToRegularLabels;
+            GlobalFontSizePercent = (decimal)Math.Clamp(snapshot.GlobalFontSizePercent, 80.0, 140.0);
+            NotchPreviewVisualizationStep = (decimal)Math.Clamp(snapshot.NotchPreviewVisualizationStep, 1.0, 3.0);
+            NotchPreviewAutoPlayIntervalMs = (decimal)Math.Clamp(snapshot.NotchPreviewAutoPlayIntervalMs, 200.0, 5000.0);
+            NotchPreviewAutoPlayEnabled = snapshot.NotchPreviewAutoPlayEnabled;
+            if (NotchExportFileTypeMetadata.TryParseStoredValue(snapshot.NotchExportFileType, out var exportFileType))
+            {
+                var exportOption = NotchExportFileTypeOptions.FirstOrDefault(o => o.Value == exportFileType);
+                if (!string.IsNullOrWhiteSpace(exportOption.Display))
+                {
+                    SelectedNotchExportFileTypeOption = exportOption;
+                }
+            }
+
+            ApplyDxfLayerImageExportSnapshot(snapshot);
+            CoordinatePixelWidth = (decimal)Math.Max(
+                1.0,
+                snapshot.CoordinatePixelWidth > 0.0
+                    ? snapshot.CoordinatePixelWidth
+                    : (double)XChannels);
+            CoordinatePixelHeight = (decimal)Math.Max(
+                1.0,
+                snapshot.CoordinatePixelHeight > 0.0
+                    ? snapshot.CoordinatePixelHeight
+                    : (double)YChannels);
+            CoordinatePreferredAaOutlineLayerName = snapshot.CoordinatePreferredAaOutlineLayerName?.Trim() ?? string.Empty;
+
         }
-
-        ApplyDxfLayerImageExportSnapshot(snapshot);
-        CoordinatePixelWidth = (decimal)Math.Max(
-            1.0,
-            snapshot.CoordinatePixelWidth > 0.0
-                ? snapshot.CoordinatePixelWidth
-                : (double)XChannels);
-        CoordinatePixelHeight = (decimal)Math.Max(
-            1.0,
-            snapshot.CoordinatePixelHeight > 0.0
-                ? snapshot.CoordinatePixelHeight
-                : (double)YChannels);
-        CoordinatePreferredAaOutlineLayerName = snapshot.CoordinatePreferredAaOutlineLayerName?.Trim() ?? string.Empty;
-
-        _suppressUndo = false;
         _isLoadingSettings = wasLoading;
     }
 
