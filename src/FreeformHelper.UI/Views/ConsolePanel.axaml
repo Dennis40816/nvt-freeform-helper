@@ -135,7 +135,7 @@
         <avaloniaEdit:TextEditor x:Name="ConsoleEditor"
                                  Classes="consoleEditor"
                                  FontSize="{Binding ConsoleFontSize}"
-                                 FontFamily="Consolas, Cascadia Mono, Segoe UI Variable Text"
+                                 FontFamily="{StaticResource FontFamilyCode}"
                                  Foreground="{DynamicResource BrushTextPrimary}"
                                  IsReadOnly="True"
                                  ShowLineNumbers="False"

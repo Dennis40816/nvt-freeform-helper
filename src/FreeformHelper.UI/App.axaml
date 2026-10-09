@@ -5,6 +5,7 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Nvt.Core.Fonts/FontRoles.axaml"/>
         <ResourceInclude Source="avares://FreeformHelper.UI/Styles/Tokens.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>

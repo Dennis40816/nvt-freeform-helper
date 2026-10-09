@@ -3,7 +3,7 @@
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
         xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Base">
   <Styles.Resources>
-    <FontFamily x:Key="FontSymbolsOutlined">avares://FreeformHelper.UI/Assets/Fonts/MaterialSymbolsOutlined.ttf#Material Symbols Outlined</FontFamily>
+    <StaticResource x:Key="FontSymbolsOutlined" ResourceKey="Nvt.Font.Icon.Family"/>
   </Styles.Resources>
 
   <!-- Default icon style (Material Symbols Outlined) -->

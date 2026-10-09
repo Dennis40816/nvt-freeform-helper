@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Headless;
-using Avalonia.Media.Fonts;
 using FreeformHelper.UI;
 using FreeformHelper.UI.Services;
 
@@ -18,12 +17,7 @@ public static class AvaloniaTestApp
             {
                 UseHeadlessDrawing = false,
             })
-            .With(AppFontBootstrapper.CreateFontManagerOptions())
-            .ConfigureFonts(static fontManager => fontManager.AddFontCollection(
-                new EmbeddedFontCollection(
-                    new Uri("fonts:SystemFonts"),
-                    AppFontBootstrapper.InterSystemFontSourceUri)))
-            .WithInterFont()
+            .WithAppFonts()
             .AfterPlatformServicesSetup(static _ => HeadlessDispatcherSetup.EnsureRunLoopDispatcher())
             .AfterSetup(static builder =>
             {

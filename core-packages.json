@@ -11,6 +11,11 @@
       "release": "core-v0.2.0",
       "asset": "Nvt.Core.Avalonia.0.2.0.nupkg",
       "sha256": "7ed0eec30edecba9cf6b2b78604829678a7838316703bd9e1f3f25f539e327a1"
+    },
+    {
+      "release": "core-fonts-v0.1.0",
+      "asset": "Nvt.Core.Fonts.0.1.0.nupkg",
+      "sha256": "c726f0ce001ab9e16233e2247711b7b93a29e9d1439a6bd1c61ca2fdd0686e4c"
     }
   ]
 }

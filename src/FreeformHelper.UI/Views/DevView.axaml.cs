@@ -54,15 +54,6 @@ public partial class DevView : UserControl
         Logger.Info(CultureInfo.InvariantCulture, "DevView resource probe: {0} found={1} type={2}", key, found, value?.GetType().Name ?? "null");
     }
 
-    private static void LogFontProbe()
-    {
-        var fontFamily = new FontFamily(
-            "avares://FreeformHelper.UI/Assets/Fonts/MaterialSymbolsOutlined.ttf#Material Symbols Outlined");
-        var typeface = new Typeface(fontFamily);
-        var loaded = FontManager.Current.TryGetGlyphTypeface(typeface, out _);
-        Logger.Info(CultureInfo.InvariantCulture, "DevView font probe: Material Symbols loaded={0}", loaded);
-    }
-
     private string BuildProbeText()
     {
         var brushBgFound = this.TryFindResource("BrushBgApp", out var brushBg);

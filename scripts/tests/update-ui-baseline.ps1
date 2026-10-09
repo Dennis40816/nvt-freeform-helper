@@ -3,7 +3,10 @@ param(
     [string]$Mode = "DryRun",
 
     [ValidateSet("Debug", "Release")]
-    [string]$Configuration = "Debug"
+    [string]$Configuration = "Debug",
+
+    # Use existing test binaries without building or restoring packages.
+    [switch]$NoBuild
 )
 
 $ErrorActionPreference = "Stop"
@@ -26,7 +29,7 @@ try {
     for ($i = 0; $i -lt $filters.Count; $i++) {
         $filter = $filters[$i]
         $args = @("test", $testProject, "-c", $Configuration, "--nologo", "--filter", $filter)
-        if ($i -gt 0) {
+        if ($NoBuild -or $i -gt 0) {
             $args += "--no-build"
         }
 
