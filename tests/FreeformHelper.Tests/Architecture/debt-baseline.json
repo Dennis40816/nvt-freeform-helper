@@ -4,9 +4,9 @@
     "suppressMessage": 13,
     "pragmaWarningDisable": 0,
     "suppressUndoAssignments": 64,
-    "fileWriteAllText": 6,
+    "fileWriteAllText": 5,
     "processStart": 4,
-    "directClockReads": 18,
+    "directClockReads": 17,
     "bareCatch": 12,
     "catchException": 29,
     "suppressFlagFields": 21,
@@ -61,7 +61,6 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Undo.cs:71", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Undo.cs:73"
     ],
     "fileWriteAllText": [
-      "src/FreeformHelper.Infrastructure/Project/JsonProjectStore.cs:50",
       "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:99",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:158",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs:114",
@@ -73,7 +72,6 @@
       "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:155", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:173", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:191"
     ],
     "directClockReads": [
-      "src/FreeformHelper.Infrastructure/Project/JsonProjectStore.cs:45",
       "src/FreeformHelper.Infrastructure/Project/ProjectFile.cs:24",
       "src/FreeformHelper.UI/Controls/PadCanvas.Input.PointerMove.cs:27", "src/FreeformHelper.UI/Controls/PadCanvas.Input.PointerMove.cs:55",
       "src/FreeformHelper.UI/Controls/PadCanvas.RenderFrame.cs:18",
