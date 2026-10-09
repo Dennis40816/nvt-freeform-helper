@@ -1,4 +1,6 @@
+using System.Text;
 using System.Text.Json;
+using Nvt.Core.IO;
 
 namespace FreeformHelper.Infrastructure.Project;
 
@@ -16,6 +18,15 @@ public sealed class JsonProjectStore
         WriteIndented = true, // Makes the JSON output human-readable with indentation
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Converts C# PascalCase properties to camelCase in JSON
     };
+
+    private readonly TimeProvider _timeProvider;
+
+    public JsonProjectStore(TimeProvider? timeProvider = null)
+    {
+        _timeProvider = timeProvider ?? TimeProvider.System;
+    }
+
+    internal Func<string, ReadOnlyMemory<byte>, CancellationToken, Task> Publisher { get; set; } = AtomicOutput.WriteBytesAsync;
 
     /// <summary>
     /// Loads a <see cref="ProjectFile"/> from the specified JSON file path.
@@ -40,13 +51,20 @@ public sealed class JsonProjectStore
     /// </summary>
     /// <param name="path">The full path where the project JSON file will be saved.</param>
     /// <param name="file">The <see cref="ProjectFile"/> object to save.</param>
-    public static void Save(string path, ProjectFile file)
+    /// <param name="cancellationToken">The token used to cancel publication.</param>
+    /// <returns>A task that completes after the project file is atomically published.</returns>
+    public Task SaveAsync(string path, ProjectFile file, CancellationToken cancellationToken)
     {
-        file.SavedAt = DateTimeOffset.UtcNow; // Update the 'SavedAt' timestamp to the current UTC time
+        file.SavedAt = _timeProvider.GetUtcNow(); // Update the 'SavedAt' timestamp from the injected clock
         ProjectFileMigrator.MigrateInPlace(file);
         file.Settings.ValidateOrThrow(); // Validate the settings before saving
 
         var json = JsonSerializer.Serialize(file, Options); // Serialize the ProjectFile object to JSON
-        File.WriteAllText(path, json); // Write the JSON content to the file
+        return PublishAsync(path, Encoding.UTF8.GetBytes(json), cancellationToken);
+    }
+
+    private Task PublishAsync(string path, ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken)
+    {
+        return Publisher(path, bytes, cancellationToken);
     }
 }

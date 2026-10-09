@@ -21,7 +21,7 @@ public sealed class MaskCurrentBehaviorTests
         {
             var missingMaskPath = Path.Combine(directory.FullName, "missing.csv");
             var projectPath = Path.Combine(directory.FullName, "project.json");
-            JsonProjectStore.Save(projectPath, new ProjectFile
+            await new JsonProjectStore().SaveAsync(projectPath, new ProjectFile
             {
                 EmbeddedDxfName = "synthetic.dxf",
                 EmbeddedDxf = Encoding.UTF8.GetBytes("""
@@ -80,7 +80,7 @@ public sealed class MaskCurrentBehaviorTests
                         UseRegularVisibilityMask = true,
                     },
                 },
-            });
+            }, CancellationToken.None);
             Assert.False(File.Exists(missingMaskPath));
             Assert.Null(JsonProjectStore.Load(projectPath).EmbeddedRegularVisibilityMask);
 

@@ -34,7 +34,7 @@ public sealed partial class FreeformHelperViewModelTests
         var outputPath = Path.Combine(Path.GetTempPath(), $"notch-legacy-cache-{Guid.NewGuid():N}.c");
         try
         {
-            JsonProjectStore.Save(projectPath, new ProjectFile
+            await new JsonProjectStore().SaveAsync(projectPath, new ProjectFile
             {
                 Settings = new ProjectSettings
                 {
@@ -47,7 +47,7 @@ public sealed partial class FreeformHelperViewModelTests
                         LinkVersionThresholds = false,
                     },
                 },
-            });
+            }, CancellationToken.None);
 
             var vm = await CreateNotchExportCacheViewModelAsync(dxfPath, projectPath);
             var metrics = new List<NotchExportGenerationCacheMetricsSnapshot>();

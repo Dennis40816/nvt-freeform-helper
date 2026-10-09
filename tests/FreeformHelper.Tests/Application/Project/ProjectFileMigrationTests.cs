@@ -193,7 +193,7 @@ public sealed class ProjectFileMigrationTests
     }
 
     [Fact]
-    public void LoadAndSave_PreservesUnknownRootProperties()
+    public async Task LoadAndSave_PreservesUnknownRootProperties()
     {
         var input = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}_in.json");
         var output = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}_out.json");
@@ -211,7 +211,7 @@ public sealed class ProjectFileMigrationTests
 
             var store = new JsonProjectStore();
             var loaded = JsonProjectStore.Load(input);
-            JsonProjectStore.Save(output, loaded);
+            await store.SaveAsync(output, loaded, CancellationToken.None);
 
             var outJson = File.ReadAllText(output);
             Assert.Contains("\"legacyFoo\"", outJson);
@@ -230,7 +230,7 @@ public sealed class ProjectFileMigrationTests
     }
 
     [Fact]
-    public void SaveAndLoad_PreservesDxfRegularMappingOverrides()
+    public async Task SaveAndLoad_PreservesDxfRegularMappingOverrides()
     {
         var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
         try
@@ -243,8 +243,8 @@ public sealed class ProjectFileMigrationTests
                     [202] = 18,
                 }
             };
-            _ = new JsonProjectStore();
-            JsonProjectStore.Save(path, file);
+            var store = new JsonProjectStore();
+            await store.SaveAsync(path, file, CancellationToken.None);
             var loaded = JsonProjectStore.Load(path);
 
             Assert.Equal(2, loaded.DxfRegularMappingOverrides.Count);
@@ -261,7 +261,7 @@ public sealed class ProjectFileMigrationTests
     }
 
     [Fact]
-    public void SaveAndLoad_PreservesCadOutputFwDiffIndexOverrides()
+    public async Task SaveAndLoad_PreservesCadOutputFwDiffIndexOverrides()
     {
         var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
         try
@@ -274,8 +274,8 @@ public sealed class ProjectFileMigrationTests
                     [202] = 25,
                 }
             };
-            _ = new JsonProjectStore();
-            JsonProjectStore.Save(path, file);
+            var store = new JsonProjectStore();
+            await store.SaveAsync(path, file, CancellationToken.None);
             var loaded = JsonProjectStore.Load(path);
 
             Assert.Equal(2, loaded.CadOutputFwDiffIndexOverrides.Count);
@@ -292,7 +292,7 @@ public sealed class ProjectFileMigrationTests
     }
 
     [Fact]
-    public void SaveAndLoad_PreservesDxfCadGeometryOverrides()
+    public async Task SaveAndLoad_PreservesDxfCadGeometryOverrides()
     {
         var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
         try
@@ -313,8 +313,8 @@ public sealed class ProjectFileMigrationTests
                     },
                 },
             };
-            _ = new JsonProjectStore();
-            JsonProjectStore.Save(path, file);
+            var store = new JsonProjectStore();
+            await store.SaveAsync(path, file, CancellationToken.None);
             var loaded = JsonProjectStore.Load(path);
 
             Assert.Single(loaded.DxfCadGeometryOverrides);
@@ -332,7 +332,7 @@ public sealed class ProjectFileMigrationTests
     }
 
     [Fact]
-    public void SaveAndLoad_PreservesCadOutputFwDiffIndexAnchorCadPadId()
+    public async Task SaveAndLoad_PreservesCadOutputFwDiffIndexAnchorCadPadId()
     {
         var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
         try
@@ -341,8 +341,8 @@ public sealed class ProjectFileMigrationTests
             {
                 CadOutputFwDiffIndexAnchorCadPadId = 314159
             };
-            _ = new JsonProjectStore();
-            JsonProjectStore.Save(path, file);
+            var store = new JsonProjectStore();
+            await store.SaveAsync(path, file, CancellationToken.None);
             var loaded = JsonProjectStore.Load(path);
 
             Assert.Equal(314159, loaded.CadOutputFwDiffIndexAnchorCadPadId);
@@ -357,7 +357,7 @@ public sealed class ProjectFileMigrationTests
     }
 
     [Fact]
-    public void SaveAndLoad_PreservesCadOutputFwDiffIndexAnchorCadPadByIc()
+    public async Task SaveAndLoad_PreservesCadOutputFwDiffIndexAnchorCadPadByIc()
     {
         var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
         try
@@ -370,8 +370,8 @@ public sealed class ProjectFileMigrationTests
                     [1] = 202,
                 }
             };
-            _ = new JsonProjectStore();
-            JsonProjectStore.Save(path, file);
+            var store = new JsonProjectStore();
+            await store.SaveAsync(path, file, CancellationToken.None);
             var loaded = JsonProjectStore.Load(path);
 
             Assert.Equal(2, loaded.CadOutputFwDiffIndexAnchorCadPadByIc.Count);
