@@ -82,11 +82,11 @@ public sealed class OpenDxfSinglePassTests
             var expectedOpenCatalog = DxfLayerCatalogReader.ReadFromPath(path);
             var expectedEmbeddedPads = DxfPadImporter.Import(embeddedPath, options);
             var expectedEmbeddedCatalog = DxfLayerCatalogReader.ReadFromPath(embeddedPath);
-            JsonProjectStore.Save(projectPath, new ProjectFile
+            await new JsonProjectStore().SaveAsync(projectPath, new ProjectFile
             {
                 EmbeddedDxf = File.ReadAllBytes(embeddedPath),
                 EmbeddedDxfName = Path.GetFileName(embeddedPath),
-            });
+            }, CancellationToken.None);
             var vm = new FreeformHelperViewModel
             {
                 PickOpenDxfPathAsync = () => Task.FromResult<string?>(path),
