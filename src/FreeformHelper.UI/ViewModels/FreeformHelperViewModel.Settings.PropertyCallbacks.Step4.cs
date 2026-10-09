@@ -9,9 +9,10 @@ public sealed partial class FreeformHelperViewModel
         if (_isLoadingSettings) return;
         if (value < 0 || value > 1_000_000)
         {
-            _suppressUndo = true;
-            CadOutputFwDiffIndexStart = Math.Clamp(value, 0, 1_000_000);
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                CadOutputFwDiffIndexStart = Math.Clamp(value, 0, 1_000_000);
+            }
             return;
         }
 
@@ -64,9 +65,10 @@ public sealed partial class FreeformHelperViewModel
         if (_isLoadingSettings || _suppressDxfIndexAnchorChange) return;
         if (value < -1 || value > 2_000_000_000)
         {
-            _suppressUndo = true;
-            CadOutputFwDiffIndexAnchorCadId = Math.Clamp(value, -1, 2_000_000_000);
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                CadOutputFwDiffIndexAnchorCadId = Math.Clamp(value, -1, 2_000_000_000);
+            }
             return;
         }
 

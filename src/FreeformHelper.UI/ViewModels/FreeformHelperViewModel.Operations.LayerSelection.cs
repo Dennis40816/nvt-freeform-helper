@@ -109,7 +109,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void QueueLayerSelectionUndoSnapshot()
     {
-        if (_suppressLayerToggleChange || _suppressUndo || _isLoadingSettings || LayerToggles.Count == 0)
+        if (_suppressLayerToggleChange || _undoSuppression.IsActive || _isLoadingSettings || LayerToggles.Count == 0)
         {
             return;
         }

@@ -33,18 +33,18 @@ public sealed partial class FreeformHelperViewModel
             _ => (currentGainEnableToRegular ?? true, currentGainEnableToFull ?? true),
         };
         var wasLoading = _isLoadingSettings;
-        var wasSuppressUndo = _suppressUndo;
         _isLoadingSettings = true;
-        _suppressUndo = true;
-        try
+        using (_undoSuppression.Enter())
         {
-            EnableToRegular = enableToRegular;
-            EnableToFull = enableToFull;
-        }
-        finally
-        {
-            _isLoadingSettings = wasLoading;
-            _suppressUndo = wasSuppressUndo;
+            try
+            {
+                EnableToRegular = enableToRegular;
+                EnableToFull = enableToFull;
+            }
+            finally
+            {
+                _isLoadingSettings = wasLoading;
+            }
         }
 
         OnPropertyChanged(nameof(CanShowToFullPreviewToggle));
@@ -95,9 +95,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, 0m, 100m);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            ToFullStrictOverlapPercent = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                ToFullStrictOverlapPercent = clamped;
+            }
             return;
         }
 
@@ -130,9 +131,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, 0m, 128m);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            NotchThresholdQ7 = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                NotchThresholdQ7 = clamped;
+            }
             return;
         }
 
@@ -159,9 +161,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, 0m, 100m);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            NotchThresholdPercent = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                NotchThresholdPercent = clamped;
+            }
             return;
         }
 
@@ -206,9 +209,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, 1m, 3m);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            NotchPreviewVisualizationStep = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                NotchPreviewVisualizationStep = clamped;
+            }
             return;
         }
 
@@ -281,9 +285,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, NotchPreviewAutoPlayIntervalMinMs, NotchPreviewAutoPlayIntervalMaxMs);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            NotchPreviewAutoPlayIntervalMs = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                NotchPreviewAutoPlayIntervalMs = clamped;
+            }
             return;
         }
 

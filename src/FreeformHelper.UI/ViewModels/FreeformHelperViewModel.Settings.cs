@@ -80,18 +80,20 @@ public sealed partial class FreeformHelperViewModel
         if (XChannels != totalX)
         {
             _suppressCascadeRebuild = true;
-            _suppressUndo = true; // Suppress undo for this programmatic change.
-            XChannels = totalX;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                XChannels = totalX;
+            }
             _suppressCascadeRebuild = false;
         }
 
         if (YChannels != maxY)
         {
             _suppressCascadeRebuild = true;
-            _suppressUndo = true;
-            YChannels = maxY;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                YChannels = maxY;
+            }
             _suppressCascadeRebuild = false;
         }
 
@@ -112,16 +114,17 @@ public sealed partial class FreeformHelperViewModel
         // Track the change as an undoable action.
         TrackUndo(e.OldValue, e.NewValue, value =>
         {
-            _suppressUndo = true;
-            if (e.PropertyName == nameof(CascadeIcSetting.XChannels))
+            using (_undoSuppression.Enter())
             {
-                setting.XChannels = value;
+                if (e.PropertyName == nameof(CascadeIcSetting.XChannels))
+                {
+                    setting.XChannels = value;
+                }
+                else if (e.PropertyName == nameof(CascadeIcSetting.YChannels))
+                {
+                    setting.YChannels = value;
+                }
             }
-            else if (e.PropertyName == nameof(CascadeIcSetting.YChannels))
-            {
-                setting.YChannels = value;
-            }
-            _suppressUndo = false;
         }, $"IC {setting.IcIndex} {e.PropertyName}");
     }
 
@@ -151,10 +154,11 @@ public sealed partial class FreeformHelperViewModel
         if (XChannels != totalX || YChannels != maxY)
         {
             _suppressCascadeRebuild = true;
-            _suppressUndo = true;
-            XChannels = totalX;
-            YChannels = maxY;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                XChannels = totalX;
+                YChannels = maxY;
+            }
             _suppressCascadeRebuild = false;
         }
     }

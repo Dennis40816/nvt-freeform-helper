@@ -90,9 +90,10 @@ public sealed partial class FreeformHelperViewModel
             _suppressDxfIndexAnchorChange = true;
             try
             {
-                _suppressUndo = true;
-                CadOutputFwDiffIndexAnchorCadId = -1;
-                _suppressUndo = false;
+                using (_undoSuppression.Enter())
+                {
+                    CadOutputFwDiffIndexAnchorCadId = -1;
+                }
             }
             finally
             {

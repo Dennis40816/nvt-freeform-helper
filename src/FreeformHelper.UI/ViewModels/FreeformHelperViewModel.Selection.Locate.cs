@@ -9,9 +9,10 @@ public sealed partial class FreeformHelperViewModel
     private void LocateCadByQuickInput()
     {
         var cadPadId = NormalizeQuickLocateInput(QuickLocateCadPadId);
-        _suppressUndo = true;
-        QuickLocateCadPadId = cadPadId;
-        _suppressUndo = false;
+        using (_undoSuppression.Enter())
+        {
+            QuickLocateCadPadId = cadPadId;
+        }
 
         TryLocateSelection(
             new[] { cadPadId },
@@ -24,9 +25,10 @@ public sealed partial class FreeformHelperViewModel
     private void LocateRegularByQuickInput()
     {
         var regularIndex = NormalizeQuickLocateInput(QuickLocateRegularPadIndex);
-        _suppressUndo = true;
-        QuickLocateRegularPadIndex = regularIndex;
-        _suppressUndo = false;
+        using (_undoSuppression.Enter())
+        {
+            QuickLocateRegularPadIndex = regularIndex;
+        }
 
         var regularPad = RegularPads.FirstOrDefault(pad => pad.Index == regularIndex);
         if (regularPad is null)

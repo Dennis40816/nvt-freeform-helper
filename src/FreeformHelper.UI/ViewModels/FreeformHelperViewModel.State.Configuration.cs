@@ -327,9 +327,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Clamp(value, GlobalFontSizePercentMin, GlobalFontSizePercentMax);
         if (clamped != value)
         {
-            _suppressUndo = true;
-            GlobalFontSizePercent = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                GlobalFontSizePercent = clamped;
+            }
             return;
         }
 

@@ -228,9 +228,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Max(1m, Math.Round(value, MidpointRounding.AwayFromZero));
         if (clamped != value)
         {
-            _suppressUndo = true;
-            CoordinatePixelWidth = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                CoordinatePixelWidth = clamped;
+            }
         }
     }
 
@@ -244,9 +245,10 @@ public sealed partial class FreeformHelperViewModel
         var clamped = Math.Max(1m, Math.Round(value, MidpointRounding.AwayFromZero));
         if (clamped != value)
         {
-            _suppressUndo = true;
-            CoordinatePixelHeight = clamped;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                CoordinatePixelHeight = clamped;
+            }
         }
     }
 
@@ -260,9 +262,10 @@ public sealed partial class FreeformHelperViewModel
         var normalized = value?.Trim() ?? string.Empty;
         if (!string.Equals(value, normalized, StringComparison.Ordinal))
         {
-            _suppressUndo = true;
-            CoordinatePreferredAaOutlineLayerName = normalized;
-            _suppressUndo = false;
+            using (_undoSuppression.Enter())
+            {
+                CoordinatePreferredAaOutlineLayerName = normalized;
+            }
         }
     }
 
