@@ -1,4 +1,4 @@
-<Styles xmlns="https://github.com/avaloniaui"
+<Styles x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls">
   <!-- Action primitives: mechanical layout only. Semantic role classes own state colors. -->
