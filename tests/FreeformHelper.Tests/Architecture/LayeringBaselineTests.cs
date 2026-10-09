@@ -64,6 +64,34 @@ public sealed class LayeringBaselineTests
     }
 
     [Fact]
+    public void NamespaceScan_DetectsNamespacesWrittenRelativeToTheEnclosingNamespace()
+    {
+        var control = new ArchitectureSource("fixture.cs", """
+            namespace FreeformHelper.UI.Controls;
+
+            public sealed class SampleControl
+            {
+                public ViewModels.NotchApplySimulationCanvasViewMode Mode { get; set; }
+            }
+            """);
+        Assert.True(control.References("FreeformHelper.UI.ViewModels"));
+        Assert.False(control.References("FreeformHelper.UI.Services"));
+
+        var viewModel = new ArchitectureSource("fixture.cs", """
+            namespace FreeformHelper.UI.ViewModels;
+
+            public sealed class SampleViewModel
+            {
+                private readonly Services.GridBuildService _grid = new();
+                private int viewModels;
+                public int Count => viewModels.GetHashCode();
+            }
+            """);
+        Assert.True(viewModel.References("FreeformHelper.UI.Services"));
+        Assert.False(viewModel.References("FreeformHelper.UI.Controls"));
+    }
+
+    [Fact]
     public void FileRatchet_RejectsBothReplacementOffendersAndStaleCleanupEntries()
     {
         var errors = ArchitectureBaseline.CompareFiles("fixture", ["old.cs"], ["new.cs"]);

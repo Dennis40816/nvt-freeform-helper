@@ -172,6 +172,7 @@
     ],
     "controlsViewModels": [
       "src/FreeformHelper.UI/Controls/NotchApplySimulationAaView.cs", "src/FreeformHelper.UI/Controls/PadCanvas.Properties.cs",
+      "src/FreeformHelper.UI/Controls/PadCanvas.Rendering.Simulation.cs",
       "src/FreeformHelper.UI/Controls/PadCanvas.State.cs", "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml.cs"
     ],
     "viewModelsControls": [
@@ -200,14 +201,16 @@
       "src/FreeformHelper.UI/ViewModels/DxfEditChangeListViewModel.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CadLoad.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CadLoadOverlay.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Commands.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CoordinatePlanner.cs",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfIndexing.Duplicates.cs",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfIndexing.Duplicates.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.GridRebuild.Background.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ManualSizing.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ModalLoading.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.Compensation.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchValidation.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerSelection.Options.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Overrides.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Overrides.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadEdits.cs",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorSummary.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Preconditions.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Locate.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Summary.cs",

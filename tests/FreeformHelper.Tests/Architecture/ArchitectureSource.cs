@@ -237,7 +237,19 @@ internal sealed record ArchitectureSource(string Path, string Text)
 
     // Both using directives (including aliases/static imports) and qualified names count.
     // The boundary excludes Nvt.Core.Avalonia from the Avalonia framework rule.
-    public bool References(string ns) => Pattern(@"(?<![\w.])(?:global::)?" + Regex.Escape(ns) + @"\b").IsMatch(Code);
+    // Inside the FreeformHelper.UI assembly a namespace can also be written relative to the enclosing
+    // namespace, for example "ViewModels.ShellViewModel" in FreeformHelper.UI.Controls; that counts too.
+    public bool References(string ns)
+    {
+        if (Pattern(@"(?<![\w.])(?:global::)?" + Regex.Escape(ns) + @"\b").IsMatch(Code))
+        {
+            return true;
+        }
+
+        const string uiPrefix = "FreeformHelper.UI.";
+        return ns.StartsWith(uiPrefix, StringComparison.Ordinal) &&
+               Pattern(@"(?<![\w.])" + Regex.Escape(ns[uiPrefix.Length..]) + @"\s*\.\s*[A-Z]").IsMatch(Code);
+    }
 
     public bool CallsPlatformIo()
     {
