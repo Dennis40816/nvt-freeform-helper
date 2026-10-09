@@ -13,6 +13,7 @@ public sealed class DebtBaselineTests
     // and diagnostics use ordinal ordering. This inventory counts storage, not independent
     // domain facts; extraction into another owner is outside this particular FHVM metric.
     internal const string AsyncVoidPattern = @"\basync\s+void\b";
+    internal const string AsyncVoidLambdaPattern = @"[+\-]=\s*async\b";
 
     internal static Dictionary<string, string[]> Measure(ArchitectureSource[] sources, string repoRoot)
     {
@@ -21,6 +22,9 @@ public sealed class DebtBaselineTests
 
         // Declarations with the adjacent modifiers async void, including generic methods.
         Count("asyncVoid", AsyncVoidPattern);
+        // Async lambdas subscribed to an event with += or -= are async void handlers too.
+        // Async lambdas passed as arguments or assigned to Func<Task> are not counted.
+        Count("asyncVoidLambdas", AsyncVoidLambdaPattern);
         // Attribute applications, including qualified names and the Attribute suffix.
         Count("suppressMessage", @"\[\s*(?:(?:global::)?System\.Diagnostics\.CodeAnalysis\.)?SuppressMessage(?:Attribute)?\s*\(");
         // Each disable directive counts once, irrespective of how many IDs it contains.
@@ -146,6 +150,45 @@ public sealed class DebtBaselineTests
             """);
         Assert.Equal(3, source.Find(AsyncVoidPattern).Length);
     }
+
+    [Fact]
+
+    public void AsyncVoidLambdaMetric_CountsEventSubscriptionsOnly()
+
+    {
+
+        var source = new ArchitectureSource("fixture.cs", """
+
+            class Wiring
+
+            {
+
+                void Wire(Canvas canvas, Func<Task> run)
+
+                {
+
+                    // canvas.Opened += async (_, e) => { };
+
+                    canvas.Opened += async (_, e) => { await Task.Yield(); };
+
+                    canvas.Closed -= async (_, e) => { await Task.Yield(); };
+
+                    canvas.Moved +=  async delegate { await Task.Yield(); };
+
+                    run = async () => await Task.Yield();
+
+                    Schedule(async () => await Task.Yield());
+
+                }
+
+            }
+
+            """);
+
+        Assert.Equal(3, source.Find(AsyncVoidLambdaPattern).Length);
+
+    }
+
 
     [Fact]
     public void FieldInventory_FindsEveryDeclaratorAfterComparisonsAndGenerics()

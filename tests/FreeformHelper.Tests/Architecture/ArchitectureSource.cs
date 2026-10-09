@@ -262,9 +262,14 @@ internal sealed record ArchitectureSource(string Path, string Text)
 
         // File/Directory/Process are also available via ordinary/implicit namespace imports.
         // Static imports of these types are conservatively treated as an IO dependency.
+        // A Process held as a field, local, parameter or generic argument counts too, because its
+        // instance calls (_process.Start()) do not name the type.
         return Pattern(@"(?<![\w.])(?:(?:global::)?System\.(?:IO|Diagnostics)\.)?" +
                        @"(?:File|Directory|Process)\s*\.\s*\w+\s*\(|" +
                        @"\bnew\s+(?:(?:global::)?System\.Diagnostics\.)?Process\s*[({]|" +
+                       @"(?<![\w.])(?:global::)?System\.Diagnostics\.Process\b|" +
+                       @"(?<![\w.])Process\??\s+@?\w+\s*(?:[;=,)]|=>)|" +
+                       @"[<,]\s*Process\s*[>,]|" +
                        @"\busing\s+static\s+(?:global::)?System\.(?:IO\.(?:File|Directory)|Diagnostics\.Process)\s*;")
             .IsMatch(code);
     }

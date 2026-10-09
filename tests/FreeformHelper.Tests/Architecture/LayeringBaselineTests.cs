@@ -48,6 +48,13 @@ public sealed class LayeringBaselineTests
     [InlineData("using P = System.Diagnostics.Process; class C { void M() { P.Start(path); } }", true)]
     [InlineData("using static System.IO.File; class C { void M() { ReadAllText(path); } }", true)]
     [InlineData("class C { void M() { File.ReadAllBytes(path); } }", true)]
+    [InlineData("using System.Diagnostics; class C { private readonly Process _process = new(); bool M() => _process.Start(); }", true)]
+    [InlineData("class C { private Process? _process; }", true)]
+    [InlineData("class C { void M(Process process) { } }", true)]
+    [InlineData("class C { System.Diagnostics.Process process; }", true)]
+    [InlineData("class C { System.Collections.Generic.List<Process> items; }", true)]
+    [InlineData("class C { void Process(int value) { } void M() { Process(1); } }", false)]
+    [InlineData("class Process { }", false)]
     [InlineData("// File.ReadAllText(path);\nclass C { string s = \"System.IO.File.ReadAllText(path)\"; }", false)]
     public void PlatformIoScan_RecognizesImportsAndQualifiedCalls(string text, bool expected)
     {

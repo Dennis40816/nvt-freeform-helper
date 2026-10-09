@@ -1,6 +1,7 @@
 {
   "metrics": {
     "asyncVoid": 16,
+    "asyncVoidLambdas": 2,
     "suppressMessage": 13,
     "pragmaWarningDisable": 0,
     "suppressUndoAssignments": 64,
@@ -28,6 +29,9 @@
       "src/FreeformHelper.UI/Views/SettingsWindow.axaml.cs:51",
       "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs:129",
       "src/FreeformHelper.UI/Views/WorkspaceSections/NotchExportSelectionRowsPaneView.axaml.cs:14"
+    ],
+    "asyncVoidLambdas": [
+      "src/FreeformHelper.UI/Views/FreeformHelperView.Canvas.cs:47", "src/FreeformHelper.UI/Views/FreeformHelperView.Canvas.cs:55"
     ],
     "suppressMessage": [
       "src/FreeformHelper.Application/Services/CadAreaBucketService.cs:9",
