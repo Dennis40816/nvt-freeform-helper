@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Nvt.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FreeformHelper.Application\FreeformHelper.Application.csproj" />
     <ProjectReference Include="..\FreeformHelper.Domain\FreeformHelper.Domain.csproj" />
   </ItemGroup>

@@ -48,6 +48,13 @@ public sealed class LayeringBaselineTests
     [InlineData("using P = System.Diagnostics.Process; class C { void M() { P.Start(path); } }", true)]
     [InlineData("using static System.IO.File; class C { void M() { ReadAllText(path); } }", true)]
     [InlineData("class C { void M() { File.ReadAllBytes(path); } }", true)]
+    [InlineData("using System.Diagnostics; class C { private readonly Process _process = new(); bool M() => _process.Start(); }", true)]
+    [InlineData("class C { private Process? _process; }", true)]
+    [InlineData("class C { void M(Process process) { } }", true)]
+    [InlineData("class C { System.Diagnostics.Process process; }", true)]
+    [InlineData("class C { System.Collections.Generic.List<Process> items; }", true)]
+    [InlineData("class C { void Process(int value) { } void M() { Process(1); } }", false)]
+    [InlineData("class Process { }", false)]
     [InlineData("// File.ReadAllText(path);\nclass C { string s = \"System.IO.File.ReadAllText(path)\"; }", false)]
     public void PlatformIoScan_RecognizesImportsAndQualifiedCalls(string text, bool expected)
     {
@@ -61,6 +68,34 @@ public sealed class LayeringBaselineTests
         Assert.True(new ArchitectureSource("fixture.cs", "using A = global::Avalonia.Media;").References("Avalonia"));
         Assert.True(new ArchitectureSource("fixture.cs", "global::FreeformHelper.UI.ViewModels.ShellViewModel vm;")
             .References("FreeformHelper.UI.ViewModels"));
+    }
+
+    [Fact]
+    public void NamespaceScan_DetectsNamespacesWrittenRelativeToTheEnclosingNamespace()
+    {
+        var control = new ArchitectureSource("fixture.cs", """
+            namespace FreeformHelper.UI.Controls;
+
+            public sealed class SampleControl
+            {
+                public ViewModels.NotchApplySimulationCanvasViewMode Mode { get; set; }
+            }
+            """);
+        Assert.True(control.References("FreeformHelper.UI.ViewModels"));
+        Assert.False(control.References("FreeformHelper.UI.Services"));
+
+        var viewModel = new ArchitectureSource("fixture.cs", """
+            namespace FreeformHelper.UI.ViewModels;
+
+            public sealed class SampleViewModel
+            {
+                private readonly Services.GridBuildService _grid = new();
+                private int viewModels;
+                public int Count => viewModels.GetHashCode();
+            }
+            """);
+        Assert.True(viewModel.References("FreeformHelper.UI.Services"));
+        Assert.False(viewModel.References("FreeformHelper.UI.Controls"));
     }
 
     [Fact]

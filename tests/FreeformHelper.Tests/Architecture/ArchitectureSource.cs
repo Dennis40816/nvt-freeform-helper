@@ -172,24 +172,37 @@ internal sealed record ArchitectureSource(string Path, string Text)
             yield return (name.Value, match.Groups["type"].Value.Trim(), modifiers, name.Index);
             // Additional declarators after top-level commas; ignore commas in type arguments,
             // calls, collection/object initializers and lambdas in the field initializer.
-            int depth = 0;
+            // A "<" opens a generic argument list only when it touches the preceding identifier;
+            // a spaced "<" or ">" is a comparison and must not hide the next declarator.
+            var open = new Stack<char>();
             for (int i = name.Index + name.Length; i < Code.Length; i++)
             {
                 char c = Code[i];
-                if (c == ';' && depth == 0)
+                if (c == ';' && open.Count == 0)
                 {
                     break;
                 }
 
-                if (c is '(' or '[' or '{' or '<')
+                if (c is '(' or '[' or '{')
                 {
-                    depth++;
+                    open.Push(c);
                 }
-                else if (c is ')' or ']' or '}' || (c == '>' && depth > 0 && Code[i - 1] != '='))
+                else if (c == '<' && i > 0 && (char.IsLetterOrDigit(Code[i - 1]) || Code[i - 1] == '_'))
                 {
-                    depth--;
+                    open.Push('<');
                 }
-                else if (c == ',' && depth == 0)
+                else if (c is ')' or ']' or '}')
+                {
+                    if (open.Count > 0)
+                    {
+                        open.Pop();
+                    }
+                }
+                else if (c == '>' && open.Count > 0 && open.Peek() == '<' && Code[i - 1] != '=')
+                {
+                    open.Pop();
+                }
+                else if (c == ',' && open.Count == 0)
                 {
                     var next = Pattern(@"\G\s*(?<name>@?\w+)\s*(?=[;,]|=(?!>))").Match(Code, i + 1);
                     if (next.Success)
@@ -224,7 +237,19 @@ internal sealed record ArchitectureSource(string Path, string Text)
 
     // Both using directives (including aliases/static imports) and qualified names count.
     // The boundary excludes Nvt.Core.Avalonia from the Avalonia framework rule.
-    public bool References(string ns) => Pattern(@"(?<![\w.])(?:global::)?" + Regex.Escape(ns) + @"\b").IsMatch(Code);
+    // Inside the FreeformHelper.UI assembly a namespace can also be written relative to the enclosing
+    // namespace, for example "ViewModels.ShellViewModel" in FreeformHelper.UI.Controls; that counts too.
+    public bool References(string ns)
+    {
+        if (Pattern(@"(?<![\w.])(?:global::)?" + Regex.Escape(ns) + @"\b").IsMatch(Code))
+        {
+            return true;
+        }
+
+        const string uiPrefix = "FreeformHelper.UI.";
+        return ns.StartsWith(uiPrefix, StringComparison.Ordinal) &&
+               Pattern(@"(?<![\w.])" + Regex.Escape(ns[uiPrefix.Length..]) + @"\s*\.\s*[A-Z]").IsMatch(Code);
+    }
 
     public bool CallsPlatformIo()
     {
@@ -237,9 +262,14 @@ internal sealed record ArchitectureSource(string Path, string Text)
 
         // File/Directory/Process are also available via ordinary/implicit namespace imports.
         // Static imports of these types are conservatively treated as an IO dependency.
+        // A Process held as a field, local, parameter or generic argument counts too, because its
+        // instance calls (_process.Start()) do not name the type.
         return Pattern(@"(?<![\w.])(?:(?:global::)?System\.(?:IO|Diagnostics)\.)?" +
                        @"(?:File|Directory|Process)\s*\.\s*\w+\s*\(|" +
                        @"\bnew\s+(?:(?:global::)?System\.Diagnostics\.)?Process\s*[({]|" +
+                       @"(?<![\w.])(?:global::)?System\.Diagnostics\.Process\b|" +
+                       @"(?<![\w.])Process\??\s+@?\w+\s*(?:[;=,)]|=>)|" +
+                       @"[<,]\s*Process\s*[>,]|" +
                        @"\busing\s+static\s+(?:global::)?System\.(?:IO\.(?:File|Directory)|Diagnostics\.Process)\s*;")
             .IsMatch(code);
     }

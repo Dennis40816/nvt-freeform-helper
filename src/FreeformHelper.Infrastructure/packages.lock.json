@@ -2,11 +2,17 @@
   "version": 2,
   "dependencies": {
     "net10.0": {
+      "Nvt.Core": {
+        "type": "Direct",
+        "requested": "[0.2.0, 0.2.0]",
+        "resolved": "0.2.0",
+        "contentHash": "k/mY/z0n19QLga/dln2mLWsRjAFvGUGfcjrhM2WmBCztOsiET6jpKn28lmVykgfEEy7DUd+YFLDRDifsWj7vqg=="
+      },
       "freeformhelper.application": {
         "type": "Project",
         "dependencies": {
           "Clipper2": "[2.0.0, )",
-          "FreeformHelper.Domain": "[1.3.2, )"
+          "FreeformHelper.Domain": "[1.0.0, )"
         }
       },
       "freeformhelper.domain": {

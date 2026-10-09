@@ -21,7 +21,7 @@ public sealed partial class FreeformHelperViewModelTests
         var savedPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-notch-saved-{Guid.NewGuid():N}.json");
         try
         {
-            JsonProjectStore.Save(sourcePath, new ProjectFile
+            await new JsonProjectStore().SaveAsync(sourcePath, new ProjectFile
             {
                 Settings = new ProjectSettings
                 {
@@ -31,7 +31,7 @@ public sealed partial class FreeformHelperViewModelTests
                         EnabledVersions = new HashSet<NotchAlgorithmVersion> { NotchAlgorithmVersion.V22 },
                     },
                 },
-            });
+            }, CancellationToken.None);
 
             var vm = new FreeformHelperViewModel
             {
@@ -63,7 +63,7 @@ public sealed partial class FreeformHelperViewModelTests
         var savedPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-matching-saved-{Guid.NewGuid():N}.json");
         try
         {
-            JsonProjectStore.Save(sourcePath, new ProjectFile
+            await new JsonProjectStore().SaveAsync(sourcePath, new ProjectFile
             {
                 Settings = new ProjectSettings
                 {
@@ -85,7 +85,7 @@ public sealed partial class FreeformHelperViewModelTests
                         NearestK = -41,
                     },
                 },
-            });
+            }, CancellationToken.None);
 
             var vm = new FreeformHelperViewModel
             {

@@ -9,7 +9,7 @@ public sealed class ProjectStoreTests
     private static readonly string[] ExpectedEnabledVersions = ["V21", "V22"];
 
     [Fact]
-    public void SaveAndLoad_RoundTripsSettings()
+    public async Task SaveAndLoad_RoundTripsSettings()
     {
         var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
         try
@@ -31,7 +31,7 @@ public sealed class ProjectStoreTests
                 }
             };
 
-            JsonProjectStore.Save(path, file);
+            await store.SaveAsync(path, file, CancellationToken.None);
             var loaded = JsonProjectStore.Load(path);
 
             Assert.Equal(40, loaded.Settings.Grid.XChannels);
@@ -51,7 +51,7 @@ public sealed class ProjectStoreTests
     }
 
     [Fact]
-    public void SaveAndLoad_RoundTripsMatchingAndIndexMappingSettings()
+    public async Task SaveAndLoad_RoundTripsMatchingAndIndexMappingSettings()
     {
         var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
         try
@@ -137,7 +137,7 @@ public sealed class ProjectStoreTests
                 },
             };
 
-            JsonProjectStore.Save(path, file);
+            await store.SaveAsync(path, file, CancellationToken.None);
             var loaded = JsonProjectStore.Load(path);
 
             Assert.Equal(new byte[] { 5, 4, 3, 2, 1 }, loaded.EmbeddedRegularVisibilityMask);
