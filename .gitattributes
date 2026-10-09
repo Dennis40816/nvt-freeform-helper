@@ -25,5 +25,3 @@
 *.dll binary
 *.exe binary
 
-# Verbatim upstream license text (Inter v3.19, SIL OFL 1.1). The test pins its sha256.
-src/FreeformHelper.UI/licenses/Inter/LICENSE text eol=lf
