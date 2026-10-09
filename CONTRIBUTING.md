@@ -40,3 +40,7 @@ The bot is the repository's existing GitHub App, inherited from the template pro
 Before merging, reconfirm the PR's current head, the applicable independent review and owner approval, and the required checks. Use `gh pr merge <n> --merge --match-head-commit <head>`, treating the head confirmed at that moment as the merge boundary.
 
 The execution status for the S15.005c authority policy/review record and the S15.005d ruleset is maintained in ROADMAP.md. Do not describe unimplemented automatic checks as current gates.
+
+## C# conventions
+
+Follow the [C# conventions](https://github.com/Dennis40816/nvt_fw_core/blob/main/docs/core/conventions.md); the ratchet tests in `tests/FreeformHelper.Tests/Architecture` require cleanup changes to lower the matching count and update its offender list in `debt-baseline.json`.

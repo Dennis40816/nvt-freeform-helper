@@ -72,3 +72,7 @@ The following four runtime mechanisms must not be changed without an explicit ta
 - A full-repository refactor scan must include at least: file size and line count hotspots, a summary of analyzer warnings, and checks for stale documentation or behavior in `docs/reference/behavior-inventory.md` and `docs/guides/settings-entry-matrix.md`.
 - A full-repository scan must explicitly audit "multiple derivation paths for the same feature or result." Record separately the acceptable multi-entry single-path cases and the unacceptable multi-path re-derivations.
 - Immediately write newly found optimization or refactor items into the matching track in `ROADMAP.md` (fix track, product features, or Core integration). Include the target version, status, and PR or issue link.
+
+## C# conventions
+
+New code follows the [C# conventions](https://github.com/Dennis40816/nvt_fw_core/blob/main/docs/core/conventions.md). The ratchet tests in `tests/FreeformHelper.Tests/Architecture` fail when a counted metric gets worse or its baseline is not lowered after a cleanup.
