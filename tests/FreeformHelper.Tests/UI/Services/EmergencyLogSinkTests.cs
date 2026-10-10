@@ -38,6 +38,50 @@ public sealed class EmergencyLogSinkTests
         }
     }
 
+    [Fact]
+    public void Report_InternalLoggerOff_WritesOperationAndExceptionToStandardError()
+    {
+        var oldError = Console.Error;
+        var oldLevel = InternalLogger.LogLevel;
+        using var writer = new StringWriter();
+        try
+        {
+            Console.SetError(writer);
+            InternalLogger.LogLevel = LogLevel.Off;
+
+            EmergencyLogSink.Report("DxfOverlap.CopyAll", new InvalidOperationException("clipboard unavailable"));
+
+            Assert.Equal("UI event DxfOverlap.CopyAll failed: System.InvalidOperationException: clipboard unavailable" +
+                writer.NewLine, writer.ToString());
+        }
+        finally
+        {
+            Console.SetError(oldError);
+            InternalLogger.LogLevel = oldLevel;
+        }
+    }
+
+    [Fact]
+    public void Report_StandardErrorWriterThrows_DoesNotThrow()
+    {
+        var oldError = Console.Error;
+        using var writer = new FailingEmergencyWriter();
+        try
+        {
+            Console.SetError(TextWriter.Synchronized(writer));
+
+            var exception = Record.Exception(() => EmergencyLogSink.Report(
+                "DxfOverlap.CopyAll", new InvalidOperationException("clipboard unavailable")));
+
+            Assert.Null(exception);
+            Assert.Equal(1, writer.Attempts);
+        }
+        finally
+        {
+            Console.SetError(oldError);
+        }
+    }
+
     private sealed class FailingEmergencyWriter : TextWriter
     {
         public override Encoding Encoding => Encoding.UTF8;

@@ -28,3 +28,10 @@
 # Verbatim copy of a Core source file. Its bytes must match the sha256 in manifest.json.
 src/FreeformHelper.CoreSource/UiEventRunner.cs text eol=lf
 src/FreeformHelper.CoreSource/manifest.json text eol=lf
+
+# Preserve the pinned health bundle and its portable enrollment artifacts.
+eng/core-health/** text eol=lf
+eng/core-health.lock.json text eol=lf
+eng/code-health/baseline.json text eol=lf
+# The managed block must equal the canonical LF bytes.
+.editorconfig text eol=lf

@@ -94,15 +94,15 @@ public sealed class ShellViewModelNavigationTests
 
     internal static Task ShowPageAsync(ShellViewModel shell, ShellPage page) => page switch
     {
-        ShellPage.Workspace => Execute(shell.ShowWorkspaceCommand),
-        ShellPage.HowToUse => Execute(shell.ShowHowToUseCommand),
-        ShellPage.Dev => Execute(shell.ShowDevCommand),
+        ShellPage.Workspace => ExecuteAsync(shell.ShowWorkspaceCommand),
+        ShellPage.HowToUse => ExecuteAsync(shell.ShowHowToUseCommand),
+        ShellPage.Dev => ExecuteAsync(shell.ShowDevCommand),
         ShellPage.Simulation => shell.ShowSimulationCommand.ExecuteAsync(null),
         ShellPage.Coordinate => shell.ShowCoordinateCommand.ExecuteAsync(null),
         _ => throw new ArgumentOutOfRangeException(nameof(page)),
     };
 
-    private static Task Execute(System.Windows.Input.ICommand command)
+    private static Task ExecuteAsync(System.Windows.Input.ICommand command)
     {
         command.Execute(null);
         return Task.CompletedTask;
