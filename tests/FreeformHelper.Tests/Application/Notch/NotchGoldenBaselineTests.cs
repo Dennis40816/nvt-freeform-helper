@@ -49,7 +49,7 @@ public sealed class NotchGoldenBaselineTests
             File.WriteAllText(actualDumpPath, actualJson);
         }
 
-        Assert.Equal(expectedJson, actualJson);
+        GoldenAssert.TextEqual(expectedJson, actualJson, "notch golden baseline");
     }
 
     private static async Task<NotchGoldenProjectBaseline> BuildActualBaselineAsync(string projectRelativePath)
@@ -175,7 +175,7 @@ public sealed class NotchGoldenBaselineTests
     private static NotchGoldenBaselineDocument LoadBaseline()
     {
         var baselinePath = GetBaselinePath();
-        Assert.True(File.Exists(baselinePath), $"Baseline file not found: {baselinePath}");
+        Assert.True(File.Exists(baselinePath), "The golden baseline file is missing.");
 
         using var stream = File.OpenRead(baselinePath);
         var baseline = JsonSerializer.Deserialize<NotchGoldenBaselineDocument>(stream, BaselineJsonOptions);
