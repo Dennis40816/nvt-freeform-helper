@@ -40,7 +40,8 @@ jobs:
     name: dotnet / build
     if: github.event_name == 'push' || github.event.pull_request.draft == false
     runs-on: windows-latest
-    timeout-minutes: 20
+    # The health check does its own non-incremental Release build after the build lane.
+    timeout-minutes: 35
     steps:
       - name: Check out text files with CRLF
         run: git config --global core.autocrlf true
@@ -56,6 +57,29 @@ jobs:
       - name: Format, analyzers and build
         shell: pwsh
         run: ./scripts/verify.ps1 -CiLane build -AllowMissingExampleData
+      # The baseline and the test-debt ledger were enrolled with English tool output. A pull request is also
+      # compared with its base commit, so the ledgers cannot grow and the checker files cannot drift.
+      - name: Verify enrolled C# code health
+        shell: pwsh
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          DOTNET_CLI_UI_LANGUAGE: en
+          VSLANG: '1033'
+          PreferredUILang: en-US
+          MSBUILDDISABLENODEREUSE: '1'
+          UseSharedCompilation: 'false'
+          DOTNET_CLI_USE_MSBUILD_SERVER: '0'
+        run: |
+          if ($env:EVENT_NAME -eq 'pull_request') {
+            if ([string]::IsNullOrWhiteSpace($env:PR_BASE_SHA)) {
+              throw 'Pull-request code-health verification requires a base SHA.'
+            }
+            pwsh -NoProfile -File eng/core-health/repo-health.ps1 -Mode Verify -Repo nfh -Root . -Solution FreeformHelper.sln -BaseRef $env:PR_BASE_SHA
+          } else {
+            pwsh -NoProfile -File eng/core-health/repo-health.ps1 -Mode Verify -Repo nfh -Root . -Solution FreeformHelper.sln
+          }
+          exit $LASTEXITCODE
 
   dotnet-test:
     name: dotnet / test (${{ matrix.shard }})
