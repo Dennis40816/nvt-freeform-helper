@@ -2,11 +2,14 @@ using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.Views;
 
 public sealed partial class NotchExportSelectionWindow : Window
 {
+    private UiEventRunner? _uiEvents => (DataContext as NotchExportSelectionViewModel)?.UiEvents;
+
     private bool _completionRaised;
 
     public NotchExportSelectionWindow()
@@ -21,7 +24,12 @@ public sealed partial class NotchExportSelectionWindow : Window
         RequestClose(false);
     }
 
-    private async void ExportButton_Click(object? sender, RoutedEventArgs e)
+    private void ExportButton_Click(object? sender, RoutedEventArgs e)
+    {
+        _uiEvents?.Run("NotchExport.Export", _ => ConfirmExportAsync(), CancellationToken.None);
+    }
+
+    private async Task ConfirmExportAsync()
     {
         if (DataContext is NotchExportSelectionViewModel viewModel &&
             viewModel.TryGetExportBlockMessage(out var title, out var message))
@@ -34,7 +42,12 @@ public sealed partial class NotchExportSelectionWindow : Window
         RequestClose(true);
     }
 
-    private async void CopyPayloadButton_Click(object? sender, RoutedEventArgs e)
+    private void CopyPayloadButton_Click(object? sender, RoutedEventArgs e)
+    {
+        _uiEvents?.Run("NotchExport.CopyPayload", _ => CopyPayloadAsync(), CancellationToken.None);
+    }
+
+    private async Task CopyPayloadAsync()
     {
         if (DataContext is not NotchExportSelectionViewModel viewModel)
         {
@@ -56,7 +69,12 @@ public sealed partial class NotchExportSelectionWindow : Window
         await clipboard.SetTextAsync(text);
     }
 
-    private async void ShowFilterBuilderButton_Click(object? sender, RoutedEventArgs e)
+    private void ShowFilterBuilderButton_Click(object? sender, RoutedEventArgs e)
+    {
+        _uiEvents?.Run("NotchExport.FilterBuilder", _ => ShowFilterBuilderAsync(), CancellationToken.None);
+    }
+
+    private async Task ShowFilterBuilderAsync()
     {
         if (DataContext is not NotchExportSelectionViewModel viewModel)
         {
@@ -74,14 +92,19 @@ public sealed partial class NotchExportSelectionWindow : Window
         viewModel.SearchKeyword = helper.GeneratedQuery;
     }
 
-    private async void OpenHeaderFilterButton_Click(object? sender, RoutedEventArgs e)
+    private void OpenHeaderFilterButton_Click(object? sender, RoutedEventArgs e)
+    {
+        var key = (sender as Control)?.Tag?.ToString();
+        _uiEvents?.Run("NotchExport.HeaderFilter", _ => OpenHeaderFilterAsync(key), CancellationToken.None);
+    }
+
+    private async Task OpenHeaderFilterAsync(string? key)
     {
         if (DataContext is not NotchExportSelectionViewModel viewModel)
         {
             return;
         }
 
-        var key = (sender as Control)?.Tag?.ToString();
         if (!viewModel.TryBuildColumnFilterDialog(key, out var dialogViewModel) || dialogViewModel is null)
         {
             return;

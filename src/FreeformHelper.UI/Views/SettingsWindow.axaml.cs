@@ -3,11 +3,14 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.Views;
 
 public sealed partial class SettingsWindow : Window
 {
+    private UiEventRunner? _uiEvents => _viewModel?.UiEvents;
+
     private SettingsWindowViewModel? _viewModel;
 
     public SettingsWindow()
@@ -48,9 +51,9 @@ public sealed partial class SettingsWindow : Window
         Close();
     }
 
-    private async void ResetAllSettingsButton_Click(object? sender, RoutedEventArgs e)
+    private void ResetAllSettingsButton_Click(object? sender, RoutedEventArgs e)
     {
-        await ResetAllSettingsAsync();
+        _uiEvents?.Run("Settings.ResetAll", _ => ResetAllSettingsAsync(), CancellationToken.None);
     }
 
     private async Task ResetAllSettingsAsync()

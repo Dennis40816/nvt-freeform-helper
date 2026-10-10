@@ -81,7 +81,7 @@ public sealed partial class FreeformHelperView
 
         if (e.Key == Key.S && e.KeyModifiers == KeyModifiers.Control)
         {
-            _ = SaveProjectFromShortcutAsync(viewModel);
+            _uiEvents?.Run("Workspace.SaveShortcut", _ => SaveProjectFromShortcutAsync(viewModel), CancellationToken.None);
             return true;
         }
 
@@ -112,15 +112,13 @@ public sealed partial class FreeformHelperView
 
     private async Task SaveProjectFromShortcutAsync(FreeformHelperViewModel viewModel)
     {
-        var command = viewModel.SaveProjectCommand;
-        if (!command.CanExecute(null) || command.IsRunning)
+        var save = viewModel.TryStartSaveProjectCommand();
+        if (save is null)
         {
             return;
         }
 
-        var saveTask = command.ExecuteAsync(null);
-        await saveTask;
-        var ok = saveTask is Task<bool> { Result: true };
+        var ok = await save;
         var message = string.IsNullOrWhiteSpace(viewModel.StatusText)
             ? ok ? "Project saved." : "Save project failed."
             : viewModel.StatusText;
@@ -340,7 +338,12 @@ public sealed partial class FreeformHelperView
         EnableConsoleAutoFollowAndScrollToEnd();
     }
 
-    private async void OnConsoleCopyAll(object? sender, RoutedEventArgs e)
+    private void OnConsoleCopyAll(object? sender, RoutedEventArgs e)
+    {
+        _uiEvents?.Run("Workspace.CopyConsole", _ => CopyConsoleAsync(), CancellationToken.None);
+    }
+
+    private async Task CopyConsoleAsync()
     {
         EnsureShellViewModel();
         var text = _shellViewModel?.ConsoleText ?? string.Empty;

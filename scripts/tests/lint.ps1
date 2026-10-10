@@ -194,6 +194,8 @@ try {
 
   Write-Host "[lint] dotnet format ($(if ($Fix) { 'apply' } else { 'verify' }))"
   $formatArgs = @("format", $solutionPath, "--verbosity", "minimal", "--severity", "warn")
+  # This canonical source is verified by hash and must never be reformatted.
+  $formatArgs += @("--exclude", "src/FreeformHelper.CoreSource/UiEventRunner.cs")
   #
   # Keep format gate focused on code-style/formatting drift.
   # A few existing analyzer diagnostics have no deterministic auto-fix in dotnet format.

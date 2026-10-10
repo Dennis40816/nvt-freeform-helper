@@ -1,24 +1,32 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.Views.WorkspaceSections;
 
 public partial class NotchExportSelectionRowsPaneView : UserControl
 {
+    private UiEventRunner? _uiEvents => (DataContext as NotchExportSelectionViewModel)?.UiEvents;
+
     public NotchExportSelectionRowsPaneView()
     {
         InitializeComponent();
     }
 
-    private async void OpenHeaderFilterButton_Click(object? sender, RoutedEventArgs e)
+    private void OpenHeaderFilterButton_Click(object? sender, RoutedEventArgs e)
+    {
+        var key = (sender as Control)?.Tag?.ToString();
+        _uiEvents?.Run("NotchExport.RowsHeaderFilter", _ => OpenHeaderFilterAsync(key), CancellationToken.None);
+    }
+
+    private async Task OpenHeaderFilterAsync(string? key)
     {
         if (DataContext is not NotchExportSelectionViewModel viewModel)
         {
             return;
         }
 
-        var key = (sender as Control)?.Tag?.ToString();
         if (!viewModel.TryBuildColumnFilterDialog(key, out var dialogViewModel) || dialogViewModel is null)
         {
             return;

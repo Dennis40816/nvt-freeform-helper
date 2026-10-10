@@ -25,3 +25,6 @@
 *.dll binary
 *.exe binary
 
+# Verbatim copy of a Core source file. Its bytes must match the sha256 in manifest.json.
+src/FreeformHelper.CoreSource/UiEventRunner.cs text eol=lf
+src/FreeformHelper.CoreSource/manifest.json text eol=lf

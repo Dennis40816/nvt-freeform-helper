@@ -11,6 +11,7 @@ public sealed partial class FreeformHelperView
     private async Task<NotchTable?> ShowNotchExportSelectionWindowAsync(NotchExportSelectionViewModel viewModel)
     {
         viewModel.Editing.AttachProject(DataContext as FreeformHelperViewModel);
+        viewModel.UiEvents = _uiEvents;
         var owner = TopLevel.GetTopLevel(this) as Window;
         if (owner is null)
         {

@@ -338,15 +338,18 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
         OnPropertyChanged(nameof(GuideSourceSummaryText));
     }
 
-    private void ShowArtifactDetail(CoordinateArtifactRow? row)
+    private Task ShowArtifactDetailAsync(CoordinateArtifactRow? row)
     {
         if (row is null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         SelectedArtifactRow = row;
-        ArtifactDetailRequested?.Invoke(row);
+        var request = RequestArtifactDetailAsync;
+        if (request is null) return Task.CompletedTask;
+        return UiEvents?.RunAsync("CoordinatePlanner.ArtifactDetail", _ => request(row), CancellationToken.None)
+            ?? request(row);
     }
 
     private void SortArtifactRows(string? key)

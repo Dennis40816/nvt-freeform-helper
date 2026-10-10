@@ -4,11 +4,14 @@ using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.UI.Services;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class NotchExportSelectionViewModel : ObservableObject
 {
+    internal UiEventRunner? UiEvents { get; set; }
+
     public ProjectEditingCommands Editing { get; } = new();
 
     private readonly Dictionary<int, NotchExportIcGroupViewModel> _groupByIcIndex = new();
