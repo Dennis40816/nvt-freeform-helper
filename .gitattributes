@@ -33,5 +33,6 @@ src/FreeformHelper.CoreSource/manifest.json text eol=lf
 eng/core-health/** text eol=lf
 eng/core-health.lock.json text eol=lf
 eng/code-health/baseline.json text eol=lf
+eng/code-health/test-debt.json text eol=lf
 # The managed block must equal the canonical LF bytes.
 .editorconfig text eol=lf

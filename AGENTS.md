@@ -12,6 +12,7 @@ Specifications and executable work are tracked in GitHub Issues. Commits and PRs
 - Use low-usage execution: handle one TODO slice at a time. Do not scan the whole repository or run the full test suite unless a milestone or failure investigation requires it.
 - Do not suppress warnings with `SuppressMessage`, `#pragma warning disable`, editorconfig severity downgrades, or equivalent methods, unless the user explicitly asks for it.
 - Do not relax existing lint standards. Do not merge while lint failures remain.
+- New C# code and tests follow the Core rules in [conventions.md](https://github.com/Dennis40816/nvt_fw_core/blob/main/docs/core/conventions.md) and [testing.md](https://github.com/Dennis40816/nvt_fw_core/blob/main/docs/core/testing.md). Existing code is the baseline and may only go down.
 
 ## Delegation and Handoff
 
