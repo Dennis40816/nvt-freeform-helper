@@ -3,12 +3,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.UI.Services;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class SettingsWindowViewModel : ObservableObject
 {
     private readonly FreeformHelperViewModel _owner;
+    internal UiEventRunner UiEvents => _owner.UiEvents;
     private bool _suppressNotchThresholdSync;
     private bool _suppressCompensationModelSync;
     private readonly bool _showInternalLegacyNotchFields;

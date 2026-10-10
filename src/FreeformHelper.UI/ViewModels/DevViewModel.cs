@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -8,6 +9,8 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 public sealed partial class DevViewModel : ObservableObject
 {
+    internal UiEventRunner? UiEvents { get; init; }
+
     public sealed record IconScaleProbe(string Label, double Scale);
     public sealed record StickyBlockPrototypeItem(string Title, string Summary, IReadOnlyList<string> DetailLines);
 

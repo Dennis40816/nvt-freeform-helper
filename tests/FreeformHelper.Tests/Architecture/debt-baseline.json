@@ -1,7 +1,7 @@
 {
   "metrics": {
-    "asyncVoid": 16,
-    "asyncVoidLambdas": 2,
+    "asyncVoid": 0,
+    "asyncVoidLambdas": 0,
     "suppressMessage": 13,
     "pragmaWarningDisable": 0,
     "suppressUndoAssignments": 0,
@@ -16,23 +16,8 @@
     "noWarnIds": 3
   },
   "metricOffenders": {
-    "asyncVoid": [
-      "src/FreeformHelper.UI/MainWindow.axaml.cs:58",
-      "src/FreeformHelper.UI/Views/ConsolePanel.axaml.cs:251", "src/FreeformHelper.UI/Views/ConsolePanel.axaml.cs:288",
-      "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs:143",
-      "src/FreeformHelper.UI/Views/DevView.axaml.cs:33",
-      "src/FreeformHelper.UI/Views/DxfOverlapReportWindow.axaml.cs:15",
-      "src/FreeformHelper.UI/Views/FreeformHelperView.InputAndShortcuts.cs:343",
-      "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml.cs:22",
-      "src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml.cs:24", "src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml.cs:37", "src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml.cs:59", "src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml.cs:77",
-      "src/FreeformHelper.UI/Views/SettingsSections/SettingsGeneralSectionView.axaml.cs:13",
-      "src/FreeformHelper.UI/Views/SettingsWindow.axaml.cs:51",
-      "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs:129",
-      "src/FreeformHelper.UI/Views/WorkspaceSections/NotchExportSelectionRowsPaneView.axaml.cs:14"
-    ],
-    "asyncVoidLambdas": [
-      "src/FreeformHelper.UI/Views/FreeformHelperView.Canvas.cs:47", "src/FreeformHelper.UI/Views/FreeformHelperView.Canvas.cs:55"
-    ],
+    "asyncVoid": [],
+    "asyncVoidLambdas": [],
     "suppressMessage": [
       "src/FreeformHelper.Application/Services/CadAreaBucketService.cs:9",
       "src/FreeformHelper.Application/Services/CadOutputFwDiffIndexAssignmentService.cs:9",

@@ -44,20 +44,24 @@ public sealed partial class FreeformHelperView
         canvas.ViewChanged += (_, _) => QueuePadInfoLayoutUpdate();
 
         // Handle context menu requests for CAD pads.
-        canvas.CadPadContextRequested += async (_, e) =>
-        {
-            if (HandleDirtyPadInfo()) return; // Block if pad info is dirty.
-            if (DataContext is not FreeformHelperViewModel vm) return;
-            await ShowCadPadInfoAsync(vm, e.Pad);
-        };
+        canvas.CadPadContextRequested += OnCadPadContextRequested;
 
         // Handle context menu requests for Regular pads.
-        canvas.RegularPadContextRequested += async (_, e) =>
-        {
-            if (HandleDirtyPadInfo()) return; // Block if pad info is dirty.
-            if (DataContext is not FreeformHelperViewModel vm) return;
-            await ShowRegularPadInfoAsync(vm, e.Pad);
-        };
+        canvas.RegularPadContextRequested += OnRegularPadContextRequested;
+    }
+
+    private void OnCadPadContextRequested(object? sender, PadCanvas.CadPadContextRequestedEventArgs e)
+    {
+        if (HandleDirtyPadInfo() || DataContext is not FreeformHelperViewModel vm) return;
+        var pad = e.Pad;
+        _uiEvents?.Run("Workspace.CadPadContext", _ => ShowCadPadInfoAsync(vm, pad), CancellationToken.None);
+    }
+
+    private void OnRegularPadContextRequested(object? sender, PadCanvas.RegularPadContextRequestedEventArgs e)
+    {
+        if (HandleDirtyPadInfo() || DataContext is not FreeformHelperViewModel vm) return;
+        var pad = e.Pad;
+        _uiEvents?.Run("Workspace.RegularPadContext", _ => ShowRegularPadInfoAsync(vm, pad), CancellationToken.None);
     }
 
     /// <summary>

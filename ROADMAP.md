@@ -178,6 +178,10 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
   - Record the result in the Core Testing module docs.
 - Parked: nine more shareable UI candidates stay on the Core candidate list until a second tool needs them.
 
+### UI event failure observation
+
+- [x] H12b — Target 1.0.0; Done. Observe all UI event operations through the canonical Core UiEventRunner, share the save command guard with close handling, and lower both async-void ratchets to zero. [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
+
 ## Owner decisions still in force
 
 Decisions about one item are recorded with that item. These apply across the roadmap.

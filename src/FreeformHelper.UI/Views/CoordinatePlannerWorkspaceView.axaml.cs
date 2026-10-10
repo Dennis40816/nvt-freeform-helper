@@ -58,7 +58,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             }
 
             _attachedViewModel.PropertyChanged -= OnViewModelPropertyChanged;
-            _attachedViewModel.ArtifactDetailRequested -= OnArtifactDetailRequested;
+            _attachedViewModel.RequestArtifactDetailAsync = null;
             _attachedViewModel.RequestExportPreviewPngAsync = null;
             _attachedViewModel.RequestSetClipboardTextAsync = null;
             _attachedViewModel.RequestSaveTextFileAsync = null;
@@ -77,7 +77,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         }
 
         _attachedViewModel.PropertyChanged += OnViewModelPropertyChanged;
-        _attachedViewModel.ArtifactDetailRequested += OnArtifactDetailRequested;
+        _attachedViewModel.RequestArtifactDetailAsync = ShowArtifactDetailAsync;
         _attachedViewModel.RequestExportPreviewPngAsync = ExportPreviewPngAsync;
         _attachedViewModel.RequestSetClipboardTextAsync = SetClipboardTextAsync;
         _attachedViewModel.RequestSaveTextFileAsync = SaveTextFileAsync;
@@ -140,7 +140,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         }
     }
 
-    private async void OnArtifactDetailRequested(CoordinateArtifactRow row)
+    private async Task ShowArtifactDetailAsync(CoordinateArtifactRow row)
     {
         var dialog = new CoordinateArtifactDetailWindow
         {

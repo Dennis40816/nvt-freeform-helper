@@ -13,6 +13,17 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 public sealed partial class FreeformHelperViewModel
 {
+    internal Task<bool>? TryStartSaveProjectCommand()
+    {
+        if (SaveProjectCommand.IsRunning || !SaveProjectCommand.CanExecute(null))
+        {
+            return null;
+        }
+
+        // The save command preserves the Task<bool> returned by SaveProjectAsync.
+        return (Task<bool>)SaveProjectCommand.ExecuteAsync(null);
+    }
+
     /// <summary>
     /// Asynchronously saves the current project state to a file.
     /// This includes current settings, pad overrides, UI snapshot, and optionally embeds DXF data.

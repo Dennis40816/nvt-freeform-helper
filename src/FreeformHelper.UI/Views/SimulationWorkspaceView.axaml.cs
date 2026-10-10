@@ -10,11 +10,14 @@ using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Avalonia.Theme;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.Views;
 
 public sealed partial class SimulationWorkspaceView : UserControl
 {
+    private UiEventRunner? _uiEvents => (DataContext as SimulationWorkspaceViewModel)?.UiEvents;
+
     private static readonly string[] CsvFilePatterns = ["*.csv"];
     private static readonly string[] AllFilesPatterns = ["*"];
     private PadCanvas? _canvas;
@@ -126,7 +129,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
         CloseHoverToolTip(FindCanvas());
     }
 
-    private async void SimulationPadCanvas_RegularPadActivated(object? sender, PadCanvas.RegularPadContextRequestedEventArgs e)
+    private void SimulationPadCanvas_RegularPadActivated(object? sender, PadCanvas.RegularPadContextRequestedEventArgs e)
     {
         if (DataContext is not SimulationWorkspaceViewModel viewModel)
         {
@@ -141,7 +144,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
         }
 
         OpenInlineEditor();
-        await FocusInlineEditorAsync();
+        _uiEvents?.Run("Simulation.ActivateRegularPad", _ => FocusInlineEditorAsync(), CancellationToken.None);
     }
 
     private void SimulationPadCanvas_PointerPressed(object? sender, PointerPressedEventArgs e)

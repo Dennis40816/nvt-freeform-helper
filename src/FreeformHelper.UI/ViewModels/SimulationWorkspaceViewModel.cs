@@ -9,6 +9,7 @@ using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.Services;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -71,6 +72,8 @@ internal readonly record struct SimulationCadOutputFwDiffAssignmentDecisionSumma
 
 public sealed partial class SimulationWorkspaceViewModel : ObservableObject
 {
+    internal UiEventRunner? UiEvents { get; init; }
+
     public sealed record SimulationTextExportRequest(
         string Title,
         string SuggestedFileName,

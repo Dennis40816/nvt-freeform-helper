@@ -8,6 +8,7 @@ using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
 using NLog;
 using Nvt.Core.Avalonia.Threading;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -27,6 +28,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
 
     // --- Sub-Viewmodels ---
     public FreeformHelperViewModel FreeformHelper { get; }
+    internal UiEventRunner UiEvents => FreeformHelper.UiEvents;
     private HowToUseViewModel? _howToUse;
     private DevViewModel? _dev;
     private SimulationHostViewModel? _simulation;
@@ -39,7 +41,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     private int _processedWorkspaceSourceChangeVersion;
     private int _workspaceSourceChangeDrainRunning;
     public HowToUseViewModel HowToUse => _howToUse ??= new HowToUseViewModel();
-    public DevViewModel Dev => _dev ??= new DevViewModel();
+    public DevViewModel Dev => _dev ??= new DevViewModel { UiEvents = UiEvents };
     public SimulationHostViewModel Simulation => _simulation ??= new SimulationHostViewModel();
     public CoordinatePlannerHostViewModel CoordinatePlanner => _coordinatePlanner ??= new CoordinatePlannerHostViewModel();
 
@@ -165,10 +167,15 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     /// Initializes a new instance of the <see cref="ShellViewModel"/> class.
     /// </summary>
     public ShellViewModel()
+        : this(null)
+    {
+    }
+
+    internal ShellViewModel(FreeformHelperViewModel? freeformHelper)
     {
         StartupPerfTracker.Mark("shell.vm-ctor-start");
         StartupPerfTracker.Mark("shell.freeform-vm-create-start");
-        FreeformHelper = new FreeformHelperViewModel();
+        FreeformHelper = freeformHelper ?? new FreeformHelperViewModel();
         StartupPerfTracker.Mark("shell.freeform-vm-created");
 
         ShowWorkspaceCommand = new RelayCommand(ShowWorkspace);
