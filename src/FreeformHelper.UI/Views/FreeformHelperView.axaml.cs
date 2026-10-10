@@ -5,6 +5,7 @@ using AvaloniaEdit;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.Views;
 
@@ -15,6 +16,8 @@ namespace FreeformHelper.UI.Views;
 /// </summary>
 public sealed partial class FreeformHelperView : UserControl
 {
+    private UiEventRunner? _uiEvents => (DataContext as FreeformHelperViewModel)?.UiEvents;
+
     private const int ConsoleFallbackTailLines = 4000;
 
     // References to key UI controls, initialized after InitializeComponent.

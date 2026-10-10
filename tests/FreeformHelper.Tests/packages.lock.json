@@ -395,6 +395,9 @@
           "FreeformHelper.Domain": "[1.0.0, )"
         }
       },
+      "freeformhelper.coresource": {
+        "type": "Project"
+      },
       "freeformhelper.domain": {
         "type": "Project"
       },
@@ -416,6 +419,7 @@
           "Avalonia.Themes.Fluent": "[12.1.1, )",
           "CommunityToolkit.Mvvm": "[8.3.2, )",
           "FreeformHelper.Application": "[1.0.0, )",
+          "FreeformHelper.CoreSource": "[1.0.0, )",
           "FreeformHelper.Domain": "[1.0.0, )",
           "FreeformHelper.Infrastructure": "[1.0.0, )",
           "NLog": "[5.3.4, )",

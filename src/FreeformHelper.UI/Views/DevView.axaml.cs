@@ -4,11 +4,14 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using NLog;
 using Nvt.Core.Avalonia.Threading;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.Views;
 
 public partial class DevView : UserControl
 {
+    private UiEventRunner? _uiEvents => (DataContext as FreeformHelper.UI.ViewModels.DevViewModel)?.UiEvents;
+
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private int _previewSpinnerSequence;
 
@@ -30,7 +33,7 @@ public partial class DevView : UserControl
         Logger.Info(CultureInfo.InvariantCulture, "{0}", probeText.Replace(Environment.NewLine, " | "));
     }
 
-    private async void OnDevTriggerSpinnerClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void OnDevTriggerSpinnerClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DevLoadingPreviewOverlay is null)
         {
@@ -39,6 +42,11 @@ public partial class DevView : UserControl
 
         var currentSequence = System.Threading.Interlocked.Increment(ref _previewSpinnerSequence);
         DevLoadingPreviewOverlay.IsVisible = true;
+        _uiEvents?.Run("Dev.PreviewSpinner", _ => HidePreviewSpinnerAsync(currentSequence), CancellationToken.None);
+    }
+
+    private async Task HidePreviewSpinnerAsync(int currentSequence)
+    {
         await Task.Delay(TimeSpan.FromMilliseconds(1500));
         if (currentSequence != System.Threading.Volatile.Read(ref _previewSpinnerSequence))
         {

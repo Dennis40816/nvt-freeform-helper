@@ -13,6 +13,7 @@ using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
 using NLog;
 using Nvt.Core.Lifecycle;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -24,6 +25,7 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 public sealed partial class FreeformHelperViewModel : ObservableObject
 {
+    internal UiEventRunner UiEvents { get; }
     // Logger instance for recording events and debugging information.
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -169,10 +171,16 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     /// Sets up default values, initializes UI options, and configures commands.
     /// </summary>
     public FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore = null)
+        : this(appGeneralSettingsStore, null)
+    {
+    }
+
+    internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
         _showInternalLegacyNotchFields = false;
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
         _statusReporter = new UiOperationStatusReporter(message => StatusText = message);
+        UiEvents = uiEvents ?? new UiEventRunner(new UiEventFailureReporter(_statusReporter).Report, EmergencyLogSink.Report);
         _appGeneralSettingsStore = appGeneralSettingsStore ?? new AppGeneralSettingsStore();
         InitializeAppGeneralSettingsPersistence();
         // Populate dropdown options for ScanOrder.

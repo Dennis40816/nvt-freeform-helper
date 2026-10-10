@@ -6,11 +6,14 @@ using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
+using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObject
 {
+    internal UiEventRunner? UiEvents { get; init; }
+
     public enum CoordinatePlannerCadLayerMode
     {
         None,
@@ -120,7 +123,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public event EventHandler? FitCanvasRequested;
     public event Action<CoordinatePlannerWorkspacePreferences>? WorkspacePreferencesChanged;
-    public event Action<CoordinateArtifactRow>? ArtifactDetailRequested;
+    public Func<CoordinateArtifactRow, Task>? RequestArtifactDetailAsync { get; set; }
 
     public CoordinatePlannerWorkspaceViewModel(
         CoordinatePlannerWorkspaceUseCase useCase,
@@ -223,7 +226,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
         AddCustomPathCommand = new RelayCommand(AddCustomPath);
         ClearCustomArtifactsCommand = new RelayCommand(ClearCustomArtifacts, () => HasCustomArtifacts);
         SortArtifactRowsCommand = new RelayCommand<string?>(SortArtifactRows);
-        ShowArtifactDetailCommand = new RelayCommand<CoordinateArtifactRow?>(ShowArtifactDetail);
+        ShowArtifactDetailCommand = new AsyncRelayCommand<CoordinateArtifactRow?>(ShowArtifactDetailAsync);
 
         UpdateCadPadsForCanvas();
         RebuildSnapshot();
@@ -297,7 +300,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public IRelayCommand<string?> SortArtifactRowsCommand { get; }
 
-    public IRelayCommand<CoordinateArtifactRow?> ShowArtifactDetailCommand { get; }
+    public IAsyncRelayCommand<CoordinateArtifactRow?> ShowArtifactDetailCommand { get; }
 
     public Func<Task<bool>>? RequestExportPreviewPngAsync { get; set; }
 
