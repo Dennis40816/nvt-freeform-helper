@@ -149,7 +149,7 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (target 
 
 ## 3. Core integration
 
-- [ ] **H09 Adopt the pinned Core C# health bundle and enroll NFH** · Target: 1.0.0 · Status: Baseline enrolled; host Verify awaits the first commit; CI follow-up pending · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
+- [ ] **H09 Adopt the pinned Core C# health bundle and enroll NFH** · Target: 1.0.0 · Status: Baseline enrolled and verified on the host in LF and CRLF checkouts; the CI step that runs Verify with the merge base follows after this change is on main · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
 
 NFH adopts NVT Core from g4: the non-UI library first, then the UI modules after R13.306. A Core module is done only when NFH uses the Core version and deletes its own copy. Each switch keeps the NFH tests passing and the non-UI output identical. Parent: R13.307, issue [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43).
 
