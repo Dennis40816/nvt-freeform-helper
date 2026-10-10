@@ -200,6 +200,16 @@ try {
   # Keep format gate focused on code-style/formatting drift.
   # A few existing analyzer diagnostics have no deterministic auto-fix in dotnet format.
   $formatExcludedDiagnostics = @("IDE0059", "IDE0060")
+  # The repository health check ratchets the debt in these IDs (eng/code-health/baseline.json).
+  # The format gate must not demand that the whole recorded debt is rewritten at once.
+  $healthPropsPath = Join-Path $repoRoot "eng/code-health/projects.props"
+  if (Test-Path -LiteralPath $healthPropsPath) {
+    $healthProps = [xml](Get-Content -LiteralPath $healthPropsPath -Raw)
+    $healthIds = @($healthProps.SelectNodes("//HealthBaselineWarningIds") |
+        ForEach-Object { $_.InnerText -split ";" } |
+        Where-Object { $_ -match "^[A-Z]+[0-9]+$" })
+    $formatExcludedDiagnostics = @($formatExcludedDiagnostics + $healthIds | Sort-Object -Unique)
+  }
   if ($formatExcludedDiagnostics.Count -gt 0) {
     $formatArgs += "--exclude-diagnostics"
     $formatArgs += $formatExcludedDiagnostics
