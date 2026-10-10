@@ -53,22 +53,78 @@ public sealed class ShellViewModelSimulationTests
     public async Task ShowSimulationAsync_BindsWorkspaceIntoSimulationPage()
     {
         using var shell = new ShellViewModel();
-        var sourceRevision = shell.FreeformHelper.SimulationWorkspaceSourceRevision;
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
-        var workspaceViewModel = new SimulationWorkspaceViewModel(
-            new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
-            new SimulationWorkspaceSession(
-                grid,
-                BuildTable(),
-                NullDiffValue,
-                SourceRevision: sourceRevision,
-                ActiveRegularPadIds: grid.Pads.Select(static pad => pad.RegularPadId).ToHashSet()));
+        var workspaceViewModel = CreateWorkspace(shell.FreeformHelper.SimulationWorkspaceSourceRevision);
 
         await shell.ShowSimulationAsync(workspaceViewModel);
 
         Assert.True(shell.IsSimulationActive);
         Assert.Same(shell.Simulation, shell.CurrentViewModel);
         Assert.Same(workspaceViewModel, shell.Simulation.CurrentWorkspace);
+        Assert.False(shell.Simulation.IsWorkspaceStale);
+    }
+
+    [Fact]
+    public async Task ShowSimulationCommand_HealthyWorkspace_BuildsOnlyOnFirstSelection()
+    {
+        using var shell = new ShellViewModel();
+        var workspace = CreateWorkspace(shell.FreeformHelper.SimulationWorkspaceSourceRevision);
+        var buildCount = 0;
+        shell.Simulation.RequestBuildWorkspaceAsync = () =>
+        {
+            buildCount++;
+            shell.Simulation.CurrentWorkspace = workspace;
+            return Task.CompletedTask;
+        };
+        Assert.Null(shell.Simulation.CurrentWorkspace);
+        Assert.Equal(0, buildCount);
+
+        await shell.ShowSimulationCommand.ExecuteAsync(null);
+        await shell.ShowSimulationCommand.ExecuteAsync(null);
+        shell.ShowWorkspaceCommand.Execute(null);
+        await shell.ShowSimulationCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, buildCount);
+        Assert.Same(workspace, shell.Simulation.CurrentWorkspace);
+    }
+
+    [Fact]
+    public async Task ShowSimulationCommand_RepeatedSelectionWithoutWorkspace_RetriesBuild()
+    {
+        using var shell = new ShellViewModel();
+        var buildCount = 0;
+        shell.Simulation.RequestBuildWorkspaceAsync = () =>
+        {
+            buildCount++;
+            return Task.CompletedTask;
+        };
+        await shell.ShowSimulationCommand.ExecuteAsync(null);
+
+        await shell.ShowSimulationCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, buildCount);
+        Assert.True(shell.Simulation.HasNoWorkspace);
+    }
+
+    [Fact]
+    public async Task ShowSimulationCommand_RepeatedSelectionWithStaleWorkspace_RebuildsWorkspace()
+    {
+        using var shell = new ShellViewModel();
+        var revision = shell.FreeformHelper.SimulationWorkspaceSourceRevision;
+        await shell.ShowSimulationAsync(CreateWorkspace(revision));
+        var refreshedWorkspace = CreateWorkspace(revision + 1);
+        shell.Simulation.UpdateSourceRevision(revision + 1);
+        var buildCount = 0;
+        shell.Simulation.RequestBuildWorkspaceAsync = () =>
+        {
+            buildCount++;
+            shell.Simulation.CurrentWorkspace = refreshedWorkspace;
+            return Task.CompletedTask;
+        };
+
+        await shell.ShowSimulationCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, buildCount);
+        Assert.Same(refreshedWorkspace, shell.Simulation.CurrentWorkspace);
         Assert.False(shell.Simulation.IsWorkspaceStale);
     }
 
@@ -230,6 +286,19 @@ public sealed class ShellViewModelSimulationTests
 
             await Task.Delay(20);
         }
+    }
+
+    private static SimulationWorkspaceViewModel CreateWorkspace(int sourceRevision)
+    {
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+        return new SimulationWorkspaceViewModel(
+            new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
+            new SimulationWorkspaceSession(
+                grid,
+                BuildTable(),
+                NullDiffValue,
+                SourceRevision: sourceRevision,
+                ActiveRegularPadIds: grid.Pads.Select(static pad => pad.RegularPadId).ToHashSet()));
     }
 
     private static NotchTable BuildTable()

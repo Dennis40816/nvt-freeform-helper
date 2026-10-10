@@ -58,18 +58,7 @@ public sealed class ShellViewModelCoordinateTests
     public async Task ShowCoordinateAsync_BindsWorkspaceIntoCoordinatePage()
     {
         using var shell = new ShellViewModel();
-        var sourceRevision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
-        var workspaceViewModel = new CoordinatePlannerWorkspaceViewModel(
-            new CoordinatePlannerWorkspaceUseCase(),
-            new CoordinatePlannerWorkspaceSession(
-                BuildGrid(),
-                BuildCadPads(),
-                LayerL1,
-                sourceRevision,
-                DefaultMachineWidth: 2d,
-                DefaultMachineHeight: 1d,
-                DefaultPixelWidth: 2,
-                DefaultPixelHeight: 1));
+        var workspaceViewModel = CreateWorkspace(shell.FreeformHelper.WorkspaceDerivedSourceRevision);
 
         await shell.ShowCoordinateAsync(workspaceViewModel);
 
@@ -77,6 +66,98 @@ public sealed class ShellViewModelCoordinateTests
         Assert.False(shell.IsWorkspaceActive);
         Assert.Same(shell.CoordinatePlanner, shell.CurrentViewModel);
         Assert.Same(workspaceViewModel, shell.CoordinatePlanner.CurrentWorkspace);
+        Assert.False(shell.CoordinatePlanner.IsWorkspaceStale);
+    }
+
+    [Fact]
+    public async Task ShowCoordinateCommand_HealthyWorkspace_BuildsOnlyOnFirstSelection()
+    {
+        using var shell = new ShellViewModel();
+        var workspace = CreateWorkspace(shell.FreeformHelper.WorkspaceDerivedSourceRevision);
+        var buildCount = 0;
+        shell.CoordinatePlanner.RequestBuildWorkspaceAsync = () =>
+        {
+            buildCount++;
+            shell.CoordinatePlanner.CurrentWorkspace = workspace;
+            return Task.CompletedTask;
+        };
+        Assert.Null(shell.CoordinatePlanner.CurrentWorkspace);
+        Assert.Equal(0, buildCount);
+
+        await shell.ShowCoordinateCommand.ExecuteAsync(null);
+        await shell.ShowCoordinateCommand.ExecuteAsync(null);
+        shell.ShowWorkspaceCommand.Execute(null);
+        await shell.ShowCoordinateCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, buildCount);
+        Assert.Same(workspace, shell.CoordinatePlanner.CurrentWorkspace);
+    }
+
+    [Fact]
+    public async Task ShowCoordinateCommand_DelayedBuild_KeepsPreviousPageUntilCompletion()
+    {
+        using var shell = new ShellViewModel();
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        shell.CoordinatePlanner.RequestBuildWorkspaceAsync = async () =>
+        {
+            entered.SetResult();
+            await release.Task;
+        };
+
+        var showTask = shell.ShowCoordinateCommand.ExecuteAsync(null);
+        try
+        {
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+            Assert.True(shell.IsWorkspaceActive);
+            Assert.False(shell.IsCoordinateActive);
+            Assert.Same(shell.FreeformHelper, shell.CurrentViewModel);
+        }
+        finally
+        {
+            release.TrySetResult();
+            await showTask;
+        }
+    }
+
+    [Fact]
+    public async Task ShowCoordinateCommand_RepeatedSelectionWithoutWorkspace_RetriesBuild()
+    {
+        using var shell = new ShellViewModel();
+        var buildCount = 0;
+        shell.CoordinatePlanner.RequestBuildWorkspaceAsync = () =>
+        {
+            buildCount++;
+            return Task.CompletedTask;
+        };
+        await shell.ShowCoordinateCommand.ExecuteAsync(null);
+
+        await shell.ShowCoordinateCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, buildCount);
+        Assert.True(shell.CoordinatePlanner.HasNoWorkspace);
+    }
+
+    [Fact]
+    public async Task ShowCoordinateCommand_RepeatedSelectionWithStaleWorkspace_RebuildsWorkspace()
+    {
+        using var shell = new ShellViewModel();
+        var revision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
+        await shell.ShowCoordinateAsync(CreateWorkspace(revision));
+        var refreshedWorkspace = CreateWorkspace(revision + 1);
+        shell.CoordinatePlanner.UpdateSourceRevision(revision + 1);
+        var buildCount = 0;
+        shell.CoordinatePlanner.RequestBuildWorkspaceAsync = () =>
+        {
+            buildCount++;
+            shell.CoordinatePlanner.CurrentWorkspace = refreshedWorkspace;
+            return Task.CompletedTask;
+        };
+
+        await shell.ShowCoordinateCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, buildCount);
+        Assert.Same(refreshedWorkspace, shell.CoordinatePlanner.CurrentWorkspace);
         Assert.False(shell.CoordinatePlanner.IsWorkspaceStale);
     }
 
@@ -111,6 +192,18 @@ public sealed class ShellViewModelCoordinateTests
         Assert.Equal(456m, shell.FreeformHelper.CoordinatePixelHeight);
         Assert.Equal("AA.drawing", shell.FreeformHelper.CoordinatePreferredAaOutlineLayerName);
     }
+
+    private static CoordinatePlannerWorkspaceViewModel CreateWorkspace(int sourceRevision) => new(
+        new CoordinatePlannerWorkspaceUseCase(),
+        new CoordinatePlannerWorkspaceSession(
+            BuildGrid(),
+            BuildCadPads(),
+            LayerL1,
+            sourceRevision,
+            DefaultMachineWidth: 2d,
+            DefaultMachineHeight: 1d,
+            DefaultPixelWidth: 2,
+            DefaultPixelHeight: 1));
 
     private static RegularGrid BuildGrid()
     {

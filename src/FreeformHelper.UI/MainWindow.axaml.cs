@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
+using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 
@@ -34,6 +36,7 @@ public sealed partial class MainWindow : Window
             MaxItems = 3
         };
         StartupPerfTracker.Mark("workspace.startup-overlay-hidden", "disabled");
+        AddHandler(Button.ClickEvent, OnShellTabClick);
         Closing += OnClosing; // Subscribes to the window's Closing event to handle unsaved changes.
     }
 
@@ -41,6 +44,16 @@ public sealed partial class MainWindow : Window
     {
         DataContext = shellViewModel;
         Closed += (_, _) => shellViewModel.Dispose();
+    }
+
+    private void OnShellTabClick(object? sender, RoutedEventArgs e)
+    {
+        if (e.Source is ToggleButton { Tag: ViewModels.ShellPage page } button &&
+            button.Classes.Contains("shellTab") && DataContext is ViewModels.ShellViewModel shell)
+        {
+            // ToggleButton toggles before Click; restore the projection while retaining its binding.
+            button.SetCurrentValue(ToggleButton.IsCheckedProperty, shell.SelectedPage == page);
+        }
     }
 
     public void ShowTopToast(string message, NotificationType type = NotificationType.Information)

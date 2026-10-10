@@ -115,6 +115,9 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
 
 ### 2.4 State refactor after Core 1.0.0
 
+- [ ] **H2 One shell navigation selection with computed binding projections** · Target: 1.0.0 (g4 health tasks) · Status: In progress (implementation and repeated-tab click fix verified locally; review pending) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
+  - The authorized H2 slice precedes the larger state batches below; it preserves workspace build, source refresh and prewarm ordering.
+
 The owner scheduled these five batches after the NVT Core 1.0.0 release (target 2026-10-15). Each batch is one PR, and each starts with tests that pin the current behavior.
 
 - [ ] **ST1 Compute derived values instead of storing them in `FreeformHelperViewModel`** · Target: after Core 1.0.0 · Status: Not started · PR: -

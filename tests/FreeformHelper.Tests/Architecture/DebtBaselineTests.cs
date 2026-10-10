@@ -59,30 +59,7 @@ public sealed class DebtBaselineTests
                     .IsMatch(source.Code[..field.Offset]))
             .Select(field => source.Location(field.Offset))).ToArray());
 
-        // These five public bool properties may be explicit or generated from attributed
-        // fields. Never count both. Missing/duplicate names fail the metric definition so
-        // an unrecognized source shape cannot silently produce a lower inventory.
-        string[] navigationNames = ["IsWorkspaceActive", "IsHowToUseActive", "IsDevActive", "IsSimulationActive", "IsCoordinateActive"];
-        var shell = sources.Where(static source => source.Path.StartsWith("src/FreeformHelper.UI/ViewModels/", StringComparison.Ordinal));
-        var navigation = new List<string>();
-        foreach (string name in navigationNames)
-        {
-            var entries = shell.SelectMany(source =>
-                source.Fields("ShellViewModel").Where(field => field.Type == "bool" &&
-                    field.Name == "_" + char.ToLowerInvariant(name[0]) + name[1..] &&
-                    ArchitectureSource.Pattern(@"\[\s*ObservableProperty\s*\]\s*private\s+bool\s+$")
-                        .IsMatch(source.Code[..field.Offset]))
-                    .Select(field => source.Location(field.Offset))
-                    .Concat(source.Find(@"\bpublic\s+bool\s+" + Regex.Escape(name) + @"\s*(?=\{|=>)", "ShellViewModel"))).ToArray();
-            if (entries.Length != 1)
-            {
-                throw new InvalidOperationException($"shellNavigationBooleans definition: expected one bool property {name}, found {entries.Length}.");
-            }
-
-            navigation.Add(entries[0]);
-        }
-
-        result.Add("shellNavigationBooleans", navigation.Order(StringComparer.Ordinal).ToArray());
+        result.Add("shellNavigationBooleans", MeasureShellNavigationBooleans(sources));
 
         // One occurrence per literal NoWarn ID per XML element in root Directory.Build.props
         // and all repository csproj files (excluding bin/obj/build). Repeated IDs count again.
@@ -107,6 +84,91 @@ public sealed class DebtBaselineTests
         result.Add("noWarnIds", noWarn.ToArray());
         return result;
     }
+
+    internal static string[] MeasureShellNavigationBooleans(ArchitectureSource[] sources)
+    {
+        // Keep all five binding names, including generated declarations, unique and present.
+        // Getters have no storage unless they directly read a bool field or use an auto-accessor.
+        // Unrecognized property bodies are conservatively counted.
+        // This remains a lexical inventory; it does not follow getter method calls semantically.
+        string[] navigationNames = ["IsWorkspaceActive", "IsHowToUseActive", "IsDevActive", "IsSimulationActive", "IsCoordinateActive"];
+        var shell = sources.Where(static source => source.Path.StartsWith("src/FreeformHelper.UI/ViewModels/", StringComparison.Ordinal)).ToArray();
+        var booleanFields = shell.SelectMany(static source => source.Fields("ShellViewModel", instanceOnly: false))
+            .Where(static field => field.Type == "bool").Select(static field => field.Name).ToArray();
+        var navigation = new List<string>();
+        foreach (string name in navigationNames)
+        {
+            string declaration = @"\bpublic\s+bool\s+" + Regex.Escape(name) + @"\s*";
+            var entries = shell.SelectMany(source =>
+                source.Fields("ShellViewModel").Where(field => field.Type == "bool" &&
+                    field.Name == "_" + char.ToLowerInvariant(name[0]) + name[1..] &&
+                    ArchitectureSource.Pattern(@"\[\s*ObservableProperty\s*\]\s*private\s+bool\s+$")
+                        .IsMatch(source.Code[..field.Offset]))
+                    .Select(field => source.Location(field.Offset))
+                    .Concat(source.Find(declaration + @"(?=\{|=>)", "ShellViewModel"))).ToArray();
+            if (entries.Length != 1)
+            {
+                throw new InvalidOperationException($"shellNavigationBooleans definition: expected one bool property {name}, found {entries.Length}.");
+            }
+
+            string propertyPattern = declaration + @"(?<body>=>[^;{}]*;|\{(?:[^{}]|\{(?<depth>)|\}(?<-depth>))*(?(depth)(?!))\})";
+            var bodies = shell.SelectMany(source => ArchitectureSource.Pattern(propertyPattern).Matches(source.Code)
+                .Where(match => entries.Contains(source.Location(match.Index), StringComparer.Ordinal))
+                .Select(static match => match.Groups["body"].Value)).ToArray();
+            bool hasAutoAccessor = bodies.Any(body => ArchitectureSource.Pattern(@"\b(?:get|set|init)\s*;").IsMatch(body));
+            bool readsBooleanField = booleanFields.Any(field => bodies.Any(body =>
+                ArchitectureSource.Pattern(@"\b" + Regex.Escape(field) + @"\b").IsMatch(body)));
+            if (bodies.Length != 1 || hasAutoAccessor || readsBooleanField)
+            {
+                navigation.Add(entries[0]);
+            }
+        }
+
+        return navigation.Order(StringComparer.Ordinal).ToArray();
+    }
+
+    [Theory]
+    [InlineData("public bool IsWorkspaceActive => _page == ShellPage.Workspace;", 0)]
+    [InlineData("public bool IsWorkspaceActive { get { return _page == ShellPage.Workspace; } }", 0)]
+    [InlineData("public bool IsWorkspaceActive { get; set; }", 1)]
+    [InlineData("public bool IsWorkspaceActive { get; } = true;", 1)]
+    [InlineData("[ObservableProperty] private bool _isWorkspaceActive;", 1)]
+    [InlineData("private bool _workspace;\npublic bool IsWorkspaceActive => _workspace;", 1)]
+    [InlineData("private bool _workspace;\npublic bool IsWorkspaceActive { get => _workspace; set => _workspace = value; }", 1)]
+    public void ShellNavigationMetric_DeclarationShape_CountsStoredBooleans(string workspaceMembers, int expectedCount)
+    {
+        var source = CreateNavigationMetricFixture(workspaceMembers);
+
+        var measured = MeasureShellNavigationBooleans([source]);
+
+        Assert.Equal(expectedCount, measured.Length);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("public bool IsWorkspaceActive => true;\npublic bool IsWorkspaceActive => false;")]
+    public void ShellNavigationMetric_MissingOrDuplicateBindingName_RejectsDefinition(string workspaceMembers)
+    {
+        var source = CreateNavigationMetricFixture(workspaceMembers);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => MeasureShellNavigationBooleans([source]));
+
+        Assert.Contains("expected one bool property IsWorkspaceActive", exception.Message, StringComparison.Ordinal);
+    }
+
+    private static ArchitectureSource CreateNavigationMetricFixture(string workspaceMembers) => new(
+        "src/FreeformHelper.UI/ViewModels/fixture.cs",
+        $$"""
+        class ShellViewModel
+        {
+            private ShellPage _page;
+            {{workspaceMembers}}
+            public bool IsHowToUseActive => _page == ShellPage.HowToUse;
+            public bool IsDevActive => _page == ShellPage.Dev;
+            public bool IsSimulationActive => _page == ShellPage.Simulation;
+            public bool IsCoordinateActive => _page == ShellPage.Coordinate;
+        }
+        """);
 
     [Fact]
     public void CountedDebt_MatchesBaselineAndRequiresRatchetAfterCleanup()

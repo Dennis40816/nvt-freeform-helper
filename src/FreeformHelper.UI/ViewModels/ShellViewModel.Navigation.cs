@@ -2,97 +2,109 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class ShellViewModel
 {
-    private void ShowWorkspace()
-    {
-        CurrentViewModel = FreeformHelper;
-        IsWorkspaceActive = true;
-        IsHowToUseActive = false;
-        IsDevActive = false;
-        IsSimulationActive = false;
-        IsCoordinateActive = false;
-    }
+    private void ShowWorkspace() => _ = SelectPageAsync(ShellPage.Workspace);
 
-    /// <summary>
-    /// Activates the How To Use view and deactivates other views.
-    /// </summary>
-    private void ShowHowToUse()
-    {
-        CurrentViewModel = HowToUse;
-        IsHowToUseActive = true;
-        IsWorkspaceActive = false;
-        IsDevActive = false;
-        IsSimulationActive = false;
-        IsCoordinateActive = false;
-    }
+    private void ShowHowToUse() => _ = SelectPageAsync(ShellPage.HowToUse);
 
-    /// <summary>
-    /// Activates the Dev view and deactivates other views.
-    /// </summary>
-    private void ShowDev()
-    {
-        CurrentViewModel = Dev;
-        IsDevActive = true;
-        IsWorkspaceActive = false;
-        IsHowToUseActive = false;
-        IsSimulationActive = false;
-        IsCoordinateActive = false;
-    }
+    private void ShowDev() => _ = SelectPageAsync(ShellPage.Dev);
 
-    private void ShowSimulation()
-    {
-        CurrentViewModel = Simulation;
-        IsSimulationActive = true;
-        IsWorkspaceActive = false;
-        IsHowToUseActive = false;
-        IsDevActive = false;
-        IsCoordinateActive = false;
-    }
-
-    private async Task ShowSimulationAsync()
-    {
-        ShowSimulation();
-        await Simulation.EnsureWorkspaceAsync();
-    }
+    private Task ShowSimulationAsync() => SelectPageAsync(ShellPage.Simulation);
 
     public Task ShowSimulationAsync(SimulationWorkspaceViewModel viewModel)
     {
         ArgumentNullException.ThrowIfNull(viewModel);
-        Simulation.UpdateSourceRevision(FreeformHelper.SimulationWorkspaceSourceRevision);
-        Simulation.CurrentWorkspace = viewModel;
-        ShowSimulation();
-        return Task.CompletedTask;
+        return SelectPageAsync(ShellPage.Simulation, simulationWorkspace: viewModel);
     }
 
-    private void ShowCoordinatePlanner()
-    {
-        CurrentViewModel = CoordinatePlanner;
-        IsCoordinateActive = true;
-        IsWorkspaceActive = false;
-        IsHowToUseActive = false;
-        IsDevActive = false;
-        IsSimulationActive = false;
-    }
-
-    private async Task ShowCoordinateAsync()
-    {
-        await CoordinatePlanner.EnsureWorkspaceAsync();
-        ShowCoordinatePlanner();
-    }
+    private Task ShowCoordinateAsync() => SelectPageAsync(ShellPage.Coordinate);
 
     public Task ShowCoordinateAsync(CoordinatePlannerWorkspaceViewModel viewModel)
     {
         ArgumentNullException.ThrowIfNull(viewModel);
-        if (CoordinatePlanner.CurrentWorkspace is not null)
-        {
-            CoordinatePlanner.CurrentWorkspace.WorkspacePreferencesChanged -= OnCoordinateWorkspacePreferencesChanged;
-        }
-
-        viewModel.WorkspacePreferencesChanged += OnCoordinateWorkspacePreferencesChanged;
-        CoordinatePlanner.UpdateSourceRevision(FreeformHelper.WorkspaceDerivedSourceRevision);
-        CoordinatePlanner.CurrentWorkspace = viewModel;
-        OnCoordinateWorkspacePreferencesChanged(viewModel.BuildWorkspacePreferences());
-        ShowCoordinatePlanner();
-        return Task.CompletedTask;
+        return SelectPageAsync(ShellPage.Coordinate, coordinateWorkspace: viewModel);
     }
 
+    private Task SelectPageAsync(
+        ShellPage page,
+        SimulationWorkspaceViewModel? simulationWorkspace = null,
+        CoordinatePlannerWorkspaceViewModel? coordinateWorkspace = null)
+    {
+        // Coordinate keeps the previous page visible until its workspace attempt completes.
+        if (page == ShellPage.Coordinate && coordinateWorkspace is null)
+        {
+            return EnsureCoordinateAndSelectAsync();
+        }
+
+        if (simulationWorkspace is not null)
+        {
+            Simulation.UpdateSourceRevision(FreeformHelper.SimulationWorkspaceSourceRevision);
+            Simulation.CurrentWorkspace = simulationWorkspace;
+        }
+
+        if (coordinateWorkspace is not null)
+        {
+            if (CoordinatePlanner.CurrentWorkspace is not null)
+            {
+                CoordinatePlanner.CurrentWorkspace.WorkspacePreferencesChanged -= OnCoordinateWorkspacePreferencesChanged;
+            }
+
+            coordinateWorkspace.WorkspacePreferencesChanged += OnCoordinateWorkspacePreferencesChanged;
+            CoordinatePlanner.UpdateSourceRevision(FreeformHelper.WorkspaceDerivedSourceRevision);
+            CoordinatePlanner.CurrentWorkspace = coordinateWorkspace;
+            OnCoordinateWorkspacePreferencesChanged(coordinateWorkspace.BuildWorkspacePreferences());
+        }
+
+        ApplySelection();
+        // Simulation displays its host before building, even when no workspace can be built.
+        return page == ShellPage.Simulation && simulationWorkspace is null
+            ? Simulation.EnsureWorkspaceAsync()
+            : Task.CompletedTask;
+
+        async Task EnsureCoordinateAndSelectAsync()
+        {
+            await CoordinatePlanner.EnsureWorkspaceAsync();
+            ApplySelection();
+        }
+
+        void ApplySelection()
+        {
+            if (_selectedPage == page)
+            {
+                return;
+            }
+
+            // Preserve lazy page construction before publishing the selected page.
+            _ = GetPageViewModel(page);
+            var previousPage = _selectedPage;
+            var activeProperty = GetActivePropertyName(page);
+            var previousActiveProperty = GetActivePropertyName(previousPage);
+            OnPropertyChanging(nameof(CurrentViewModel));
+            OnPropertyChanging(activeProperty);
+            OnPropertyChanging(previousActiveProperty);
+            _selectedPage = page;
+            OnPropertyChanged(nameof(CurrentViewModel));
+            OnPropertyChanged(activeProperty);
+            OnPropertyChanged(previousActiveProperty);
+        }
+    }
+
+    private object GetPageViewModel(ShellPage page) => page switch
+    {
+        ShellPage.Workspace => FreeformHelper,
+        ShellPage.HowToUse => HowToUse,
+        ShellPage.Dev => Dev,
+        ShellPage.Simulation => Simulation,
+        ShellPage.Coordinate => CoordinatePlanner,
+        _ => throw new ArgumentOutOfRangeException(nameof(page)),
+    };
+
+    private static string GetActivePropertyName(ShellPage page) => page switch
+    {
+        ShellPage.Workspace => nameof(IsWorkspaceActive),
+        ShellPage.HowToUse => nameof(IsHowToUseActive),
+        ShellPage.Dev => nameof(IsDevActive),
+        ShellPage.Simulation => nameof(IsSimulationActive),
+        ShellPage.Coordinate => nameof(IsCoordinateActive),
+        _ => throw new ArgumentOutOfRangeException(nameof(page)),
+    };
 }

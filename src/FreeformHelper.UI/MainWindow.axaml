@@ -45,23 +45,28 @@
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space4}">
             <ToggleButton Classes="shellTab"
                           Content="Freeform Helper"
-                          IsChecked="{Binding IsWorkspaceActive, Mode=TwoWay}"
+                          Tag="{x:Static vm:ShellPage.Workspace}"
+                          IsChecked="{Binding IsWorkspaceActive, Mode=OneWay}"
                           Command="{Binding ShowWorkspaceCommand}"/>
             <ToggleButton Classes="shellTab"
                           Content="Simulation"
-                          IsChecked="{Binding IsSimulationActive, Mode=TwoWay}"
+                          Tag="{x:Static vm:ShellPage.Simulation}"
+                          IsChecked="{Binding IsSimulationActive, Mode=OneWay}"
                           Command="{Binding ShowSimulationCommand}"/>
             <ToggleButton Classes="shellTab"
                           Content="Coordinate"
-                          IsChecked="{Binding IsCoordinateActive, Mode=TwoWay}"
+                          Tag="{x:Static vm:ShellPage.Coordinate}"
+                          IsChecked="{Binding IsCoordinateActive, Mode=OneWay}"
                           Command="{Binding ShowCoordinateCommand}"/>
             <ToggleButton Classes="shellTab"
                           Content="How To Use"
-                          IsChecked="{Binding IsHowToUseActive, Mode=TwoWay}"
+                          Tag="{x:Static vm:ShellPage.HowToUse}"
+                          IsChecked="{Binding IsHowToUseActive, Mode=OneWay}"
                           Command="{Binding ShowHowToUseCommand}"/>
             <ToggleButton Classes="shellTab"
                           Content="Dev"
-                          IsChecked="{Binding IsDevActive, Mode=TwoWay}"
+                          Tag="{x:Static vm:ShellPage.Dev}"
+                          IsChecked="{Binding IsDevActive, Mode=OneWay}"
                           Command="{Binding ShowDevCommand}"/>
           </StackPanel>
         </Border>

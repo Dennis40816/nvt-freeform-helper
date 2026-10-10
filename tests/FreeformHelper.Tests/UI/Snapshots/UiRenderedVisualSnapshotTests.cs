@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
@@ -21,6 +22,51 @@ public sealed class UiRenderedVisualSnapshotTests
     {
         WriteIndented = true
     };
+
+    [AvaloniaTheory]
+    [InlineData("Light", ShellPage.Workspace)]
+    [InlineData("Light", ShellPage.HowToUse)]
+    [InlineData("Light", ShellPage.Dev)]
+    [InlineData("Light", ShellPage.Simulation)]
+    [InlineData("Light", ShellPage.Coordinate)]
+    [InlineData("Dark", ShellPage.Workspace)]
+    [InlineData("Dark", ShellPage.HowToUse)]
+    [InlineData("Dark", ShellPage.Dev)]
+    [InlineData("Dark", ShellPage.Simulation)]
+    [InlineData("Dark", ShellPage.Coordinate)]
+    public async Task MainWindowNavigation_PageRoundTrip_PreservesRenderedWorkspace(string theme, ShellPage page)
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var app = Assert.IsType<App>(Avalonia.Application.Current);
+        var previousTheme = app.RequestedThemeVariant;
+        using var shell = new ShellViewModel { IsConsoleExpanded = false };
+        shell.Simulation.RequestBuildWorkspaceAsync = null;
+        shell.CoordinatePlanner.RequestBuildWorkspaceAsync = null;
+        var window = new MainWindow { Width = 1440, Height = 900 };
+        window.SetShellViewModel(shell);
+        try
+        {
+            app.RequestedThemeVariant = theme == "Light" ? ThemeVariant.Light : ThemeVariant.Dark;
+            window.Show();
+            await FlushUiQueueAsync();
+            var before = CaptureRenderedBuffer(window);
+
+            await ShellViewModelNavigationTests.ShowPageAsync(shell, page);
+            await FlushUiQueueAsync();
+            shell.ShowWorkspaceCommand.Execute(null);
+            await FlushUiQueueAsync();
+            var after = CaptureRenderedBuffer(window);
+
+            Assert.Equal(
+                ComputeAverageHashHex(before.Buffer, before.Width, before.Height, before.Stride, 16),
+                ComputeAverageHashHex(after.Buffer, after.Width, after.Height, after.Stride, 16));
+        }
+        finally
+        {
+            window.Close();
+            app.RequestedThemeVariant = previousTheme;
+        }
+    }
 
     [AvaloniaFact]
     public async Task RenderedUiSurfaces_MatchAdvancedVisualBaseline()
@@ -142,16 +188,7 @@ public sealed class UiRenderedVisualSnapshotTests
         {
             host.Show();
             await FlushUiQueueAsync();
-            using var frame = host.CaptureRenderedFrame();
-            Assert.NotNull(frame);
-
-            using var locked = frame.Lock();
-            var rowBytes = locked.RowBytes;
-            var frameWidth = locked.Size.Width;
-            var frameHeight = locked.Size.Height;
-            var bytes = new byte[rowBytes * frameHeight];
-            Marshal.Copy(locked.Address, bytes, 0, bytes.Length);
-            return new RenderedBuffer(bytes, frameWidth, frameHeight, rowBytes);
+            return CaptureRenderedBuffer(host);
         }
         finally
         {
@@ -161,6 +198,20 @@ public sealed class UiRenderedVisualSnapshotTests
                 host.Content = null;
             }
         }
+    }
+
+    private static RenderedBuffer CaptureRenderedBuffer(Window host)
+    {
+        using var frame = host.CaptureRenderedFrame();
+        Assert.NotNull(frame);
+
+        using var locked = frame.Lock();
+        var rowBytes = locked.RowBytes;
+        var frameWidth = locked.Size.Width;
+        var frameHeight = locked.Size.Height;
+        var bytes = new byte[rowBytes * frameHeight];
+        Marshal.Copy(locked.Address, bytes, 0, bytes.Length);
+        return new RenderedBuffer(bytes, frameWidth, frameHeight, rowBytes);
     }
 
     private static async Task FlushUiQueueAsync()

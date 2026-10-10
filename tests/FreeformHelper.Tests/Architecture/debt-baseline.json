@@ -12,7 +12,7 @@
     "catchException": 29,
     "suppressFlagFields": 20,
     "freeformViewModelStateMembers": 373,
-    "shellNavigationBooleans": 5,
+    "shellNavigationBooleans": 0,
     "noWarnIds": 3
   },
   "metricOffenders": {
@@ -124,9 +124,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Undo.cs:11",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkflowSteps.cs:10"
     ],
-    "shellNavigationBooleans": [
-      "src/FreeformHelper.UI/ViewModels/ShellViewModel.cs:55", "src/FreeformHelper.UI/ViewModels/ShellViewModel.cs:60", "src/FreeformHelper.UI/ViewModels/ShellViewModel.cs:65", "src/FreeformHelper.UI/ViewModels/ShellViewModel.cs:70", "src/FreeformHelper.UI/ViewModels/ShellViewModel.cs:75"
-    ],
+    "shellNavigationBooleans": [],
     "noWarnIds": [
       "Directory.Build.props:12 (1572)", "Directory.Build.props:12 (1573)", "Directory.Build.props:12 (1591)"
     ]
