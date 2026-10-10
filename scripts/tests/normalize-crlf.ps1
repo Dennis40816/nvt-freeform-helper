@@ -129,7 +129,7 @@ try {
     if ($relativePath -ceq "src/FreeformHelper.CoreSource/UiEventRunner.cs" -or
         $relativePath -ceq "src/FreeformHelper.CoreSource/manifest.json" -or
         $relativePath.StartsWith("eng/core-health/", [System.StringComparison]::Ordinal) -or
-        $relativePath -cin @(".editorconfig", "eng/core-health.lock.json", "eng/code-health/baseline.json")) {
+        $relativePath -cin @(".editorconfig", "eng/core-health.lock.json", "eng/code-health/baseline.json", "eng/code-health/test-debt.json")) {
       continue
     }
 
