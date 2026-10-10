@@ -60,6 +60,18 @@
         "resolved": "8.3.2",
         "contentHash": "m8EolE1A0Updj68WTsZSGI6VWb6mUqHPh7QFo0kt7+JPhYMNXRS1ch8TS/oITAdcxTLrwMOp3ku1KjeG1/Zdpg=="
       },
+      "Microsoft.CodeAnalysis.BannedApiAnalyzers": {
+        "type": "Direct",
+        "requested": "[3.3.4, )",
+        "resolved": "3.3.4",
+        "contentHash": "0k2Jwpc8eq0hjOtX6TxRkHm9clkJ2PAQ3heEHgqIJZcsfdFosC/iyz18nsgTVDDWpID80rC7aiYK7ripx+Qndg=="
+      },
+      "Microsoft.VisualStudio.Threading.Analyzers": {
+        "type": "Direct",
+        "requested": "[17.14.15, )",
+        "resolved": "17.14.15",
+        "contentHash": "mXQPJsbuUD2ydq4/ffd8h8tSOFCXec+2xJOVNCvXjuMOq/+5EKHq3D2m2MC2+nUaXeFMSt66VS/J4HdKBixgcw=="
+      },
       "NLog": {
         "type": "Direct",
         "requested": "[5.3.4, )",

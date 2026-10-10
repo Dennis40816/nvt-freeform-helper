@@ -1,0 +1,35 @@
+<Project>
+  <!-- Every C# project has an explicit layer; CoreSource is an infrastructure adapter. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Domain'">
+    <HealthLayer>domain</HealthLayer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Application'">
+    <HealthLayer>application</HealthLayer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Infrastructure' Or '$(MSBuildProjectName)' == 'FreeformHelper.CoreSource'">
+    <HealthLayer>infrastructure</HealthLayer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.UI'">
+    <HealthLayer>presentation</HealthLayer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Tests'">
+    <HealthLayer>tests</HealthLayer>
+  </PropertyGroup>
+  <!-- BEGIN GENERATED HEALTH WARNING IDS -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Application'">
+    <HealthBaselineWarningIds>CA1031;CA1307;IDE0051;IDE0052;IDE1006;RS0030</HealthBaselineWarningIds>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.CoreSource'">
+    <HealthBaselineWarningIds>CA1031;IDE0005;IDE1006</HealthBaselineWarningIds>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Infrastructure'">
+    <HealthBaselineWarningIds>IDE1006;RS0030</HealthBaselineWarningIds>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Tests'">
+    <HealthBaselineWarningIds>CA1031;CA1307;CA2000;EnableGenerateDocumentationFile;IDE0052;IDE0330;IDE1006;RS0030;VSTHRD002;VSTHRD003;VSTHRD103</HealthBaselineWarningIds>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.UI'">
+    <HealthBaselineWarningIds>CA1031;CA1307;CA2000;CA5392;IDE0051;IDE0052;IDE0330;IDE1006;RS0030;VSTHRD002;VSTHRD003;VSTHRD200</HealthBaselineWarningIds>
+  </PropertyGroup>
+  <!-- END GENERATED HEALTH WARNING IDS -->
+</Project>
