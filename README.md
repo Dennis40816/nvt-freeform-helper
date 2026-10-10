@@ -68,6 +68,10 @@ Get-Item .\build\publish\win-x64\folder\FreeformHelper.UI.exe
 .\build\publish\win-x64\folder\FreeformHelper.UI.exe
 ```
 
+### Third-party fonts and licenses
+
+NFH uses Inter for UI text, Cascadia Mono for code, Noto Sans TC for Chinese fallback, and Material Symbols Outlined for icons through `Nvt.Core.Fonts` 0.1.0. Inter, Cascadia Mono, and Noto Sans TC use SIL Open Font License 1.1; Material Symbols uses Apache 2.0. The restored package supplies the Core license at `licenses/Nvt.Core/LICENSE` and its font licenses and Material Symbols `NOTICE` under `licenses/` in build and publish output. Distribute the complete output folder, including `licenses/`, for both the folder and single-file profiles. NFH keeps its existing font size tokens; Core size roles are a later theme step. The pinned packages do not supply a standalone Inter OFL license file; a Core packaging follow-up must provide it before customer distribution.
+
 ## 4. Recommended workflow for first use (UI)
 
 1. `File -> Open DXF`

@@ -670,8 +670,8 @@
   <CornerRadius x:Key="RadiusPill">999</CornerRadius>
 
   <!-- Typography -->
-  <FontFamily x:Key="FontFamilyUi">Segoe UI Variable Text</FontFamily>
-  <FontFamily x:Key="FontFamilyCode">Consolas, Cascadia Mono, Segoe UI Variable Text</FontFamily>
+  <StaticResource x:Key="FontFamilyUi" ResourceKey="Nvt.Font.Body.Family"/>
+  <StaticResource x:Key="FontFamilyCode" ResourceKey="Nvt.Font.Mono.Family"/>
   <x:Double x:Key="FontSizeSm">11</x:Double>
   <x:Double x:Key="FontSizeBase">12</x:Double>
   <x:Double x:Key="FontSizeMd">13</x:Double>

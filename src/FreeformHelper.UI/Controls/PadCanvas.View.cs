@@ -14,7 +14,8 @@ namespace FreeformHelper.UI.Controls;
 public sealed partial class PadCanvas
 {
     // Typeface for rendering axis labels.
-    private static readonly Typeface AxisLabelTypeface = new("Segoe UI Variable Text", FontStyle.Normal, FontWeight.SemiBold);
+    private static Typeface AxisLabelTypeface => new(
+        (FontFamily)Avalonia.Application.Current!.Resources["FontFamilyUi"]!, FontStyle.Normal, FontWeight.SemiBold);
 
     // Flags for managing delayed FitToContent calls.
     private bool _pendingFitToContent;

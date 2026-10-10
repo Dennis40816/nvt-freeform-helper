@@ -1,23 +1,12 @@
-using Avalonia.Media;
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
+using Avalonia;
+using Nvt.Core.Fonts;
 
 namespace FreeformHelper.UI.Services;
 
+/// <summary>Shares the Core font bootstrap between the desktop app and the headless test host.</summary>
 internal static class AppFontBootstrapper
 {
-    private const string DefaultFontFamily = "Inter";
-    public static readonly Uri InterSystemFontSourceUri = new("avares://Avalonia.Fonts.Inter/Assets");
-
-    public static FontManagerOptions CreateFontManagerOptions()
-    {
-        var interFamily = new FontFamily(DefaultFontFamily);
-        return new FontManagerOptions
-        {
-            DefaultFamilyName = DefaultFontFamily,
-            FontFamilyMappings = new Dictionary<string, FontFamily>(StringComparer.OrdinalIgnoreCase)
-            {
-                ["Segoe UI Variable Text"] = interFamily,
-                ["Segoe UI"] = interFamily,
-            },
-        };
-    }
+    public static AppBuilder WithAppFonts(this AppBuilder builder) => builder.WithNvtCoreFonts();
 }

@@ -87,6 +87,16 @@
           "Nvt.Core": "0.2.0"
         }
       },
+      "Nvt.Core.Fonts": {
+        "type": "Direct",
+        "requested": "[0.1.0, 0.1.0]",
+        "resolved": "0.1.0",
+        "contentHash": "AYzmJCQ6T1eLVU5hI1sqlsgT74J14C5YAmXMtZy1MRERLUpBKGQhk1+RtYhizecU+4gSH/Qax3O7/k+vFGPngA==",
+        "dependencies": {
+          "Avalonia": "12.1.1",
+          "Avalonia.Fonts.Inter": "12.1.1"
+        }
+      },
       "System.Reactive": {
         "type": "Direct",
         "requested": "[6.0.0, )",

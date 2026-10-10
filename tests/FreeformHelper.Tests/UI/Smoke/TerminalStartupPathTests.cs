@@ -293,12 +293,17 @@ public sealed class TerminalStartupPathTests
     }
 
     [AvaloniaFact]
-    public void HeadlessApp_ResolvesUiFontAliasesWithoutSystemFontFallback()
+    public void HeadlessApp_ResolvesEmbeddedFontTokensWithoutSystemFontFallback()
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        Assert.True(FontManager.Current.TryGetGlyphTypeface(new Typeface("Inter"), out _));
-        Assert.True(FontManager.Current.TryGetGlyphTypeface(new Typeface("Segoe UI Variable Text"), out _));
-        Assert.True(FontManager.Current.TryGetGlyphTypeface(new Typeface("Segoe UI"), out _));
+        foreach (var key in new[] { "FontFamilyUi", "FontFamilyCode" })
+        {
+            Assert.True(Avalonia.Application.Current!.Resources.TryGetResource(key, null, out var resource));
+            var family = Assert.IsType<FontFamily>(resource);
+            Assert.True(FontManager.Current.TryGetGlyphTypeface(new Typeface(family), out var typeface));
+            Assert.True(typeface.PlatformTypeface.TryGetStream(out var stream));
+            stream.Dispose();
+        }
     }
 
     [Fact]

@@ -167,9 +167,10 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
   - This replaces the former steps M3 (scroll styles) and M4 (button roles). It also removes the scroll selectors that match nothing on Avalonia 12 and fixes the neutral text button focus.
 - [ ] **C-CONSOLE Adopt the redesigned Core Console and delete NFH's console** · Target: g4 (Core 1.0.0) · Status: Not started; Core implements it first · PR: [Core #82](https://github.com/Dennis40816/nvt_fw_core/pull/82) (approved design)
   - NFH fixed console review items 01 and 02 in [#49](https://github.com/Dennis40816/nvt-freeform-helper/pull/49). The Core redesign covers items 03 to 21, S15.017 and R13.304.
-- [ ] **R13.307-ICON Material Symbols becomes the shared Core icon system; delete the unused `MaterialIcons-Regular.ttf`** · Target: g4 · Status: Not started · PR: -
-- [ ] **R13.307-FONT Adopt the Core font set** · Target: g4 · Status: Not started · PR: -
-- [ ] **R13.307-LIC Ship the Core license as `licenses/Nvt.Core/LICENSE`** · Target: first NFH release with Core · Status: Not started · PR: -
+- [ ] **R13.307-ICON Material Symbols becomes the shared Core icon system; delete the unused `MaterialIcons-Regular.ttf`** · Target: g4 · Status: In progress: Core font file adoption done; `NvtIcons` migration waits for the Core.Avalonia upgrade · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
+- [x] **R13.307-FONT Adopt the Core font set** · Target: g4 · Status: Done · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
+- [x] **R13.307-LIC Ship the Core license as `licenses/Nvt.Core/LICENSE` and the font licenses (including the Inter OFL text) under `licenses/`** · Target: first NFH release with Core · Status: Done · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
+  - The pinned Fonts 0.1.0 package supplies the Core license, three font license files and Material Symbols NOTICE. It omits a standalone Inter OFL license; the Core packaging follow-up must supply it before customer distribution.
 - [x] **C-LSC Use LoadingScopeCoordinator from the Core non-UI library** · Target: g4 · Status: Done; Core side in [Core #44](https://github.com/Dennis40816/nvt_fw_core/pull/44) · PR: [#61](https://github.com/Dennis40816/nvt-freeform-helper/pull/61)
 - [x] **C-NONUI Move CoalescedRefresh and UndoService to the Core non-UI library** · Target: g4 · Status: Done · PR: [#60](https://github.com/Dennis40816/nvt-freeform-helper/pull/60)
 - [ ] **C-CTRL Move cards, dialogs and input controls to Core** · Target: g4 · Status: Not started · PR: -

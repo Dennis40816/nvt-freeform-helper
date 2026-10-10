@@ -1,6 +1,5 @@
 using System.Globalization;
 using Avalonia;
-using Avalonia.Fonts.Inter;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
 using NLog;
@@ -72,10 +71,7 @@ internal sealed class Program
     {
         var builder = AppBuilder.Configure<App>() // Start configuration for the 'App' class.
             .UsePlatformDetect() // Automatically detect and configure for the current platform.
-            .WithSystemFontSource(AppFontBootstrapper.InterSystemFontSourceUri)
-            .With(AppFontBootstrapper.CreateFontManagerOptions())
-            .ConfigureFonts(static fontManager => fontManager.AddFontCollection(new InterFontCollection()))
-            .WithInterFont() // Configure Inter as the default font.
+            .WithAppFonts() // Use the embedded Core font fallback.
             .AfterPlatformServicesSetup(static _ => UiThread.RegisterRunningDispatcher(
                 Avalonia.Threading.Dispatcher.UIThread));
 
