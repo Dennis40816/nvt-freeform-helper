@@ -21,6 +21,9 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
 {
     private const int ConsoleRenderTailSourceLineLimit = 4000;
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    // Log notifications can arrive from another thread while this view model rebuilds the text. One lock
+    // guards the buffer and the text and counts that the notification handler decides from.
+    private readonly Lock _consoleTextGate = new();
     private readonly StringBuilder _consoleTextBuffer = new();
     private bool _isDisposed;
     // Navigation selection is owned by the shell's UI-thread command entry point.

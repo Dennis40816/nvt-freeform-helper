@@ -9,7 +9,16 @@ public sealed partial class ShellViewModel
     // Tests can schedule a background Add at the snapshot boundary without relying on timing.
     internal Action? ConsoleSnapshotReadForTests { get; set; }
 
-    private void OnLogEntriesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    internal void OnLogEntriesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        // The handler decides from the text and the counts, so the decision and the change are one section.
+        lock (_consoleTextGate)
+        {
+            HandleLogEntriesChanged(e);
+        }
+    }
+
+    private void HandleLogEntriesChanged(NotifyCollectionChangedEventArgs e)
     {
         if (!IsConsoleExpanded)
         {
@@ -75,6 +84,7 @@ public sealed partial class ShellViewModel
 
     /// <summary>
     /// Appends a collection of <see cref="AppLogEntry"/> objects to the <see cref="ConsoleText"/>.
+    /// The caller holds the console text gate.
     /// </summary>
     /// <param name="entries">The log entries to append.</param>
     private void AppendConsoleLines(IEnumerable<AppLogEntry> entries)
@@ -118,67 +128,72 @@ public sealed partial class ShellViewModel
     /// </summary>
     private void RebuildConsoleText()
     {
-        _consoleTextBuffer.Clear();
-        var renderedCount = 0;
-        ConsoleSnapshotReadForTests?.Invoke();
-        var tailLimit = IsConsoleDedupEnabled ? AppLogStore.Instance.MaxEntries : ConsoleRenderTailSourceLineLimit;
-        var tailEntries = AppLogStore.Instance.GetTail(tailLimit, out var totalSourceCount);
-
-        if (!IsConsoleDedupEnabled)
+        lock (_consoleTextGate)
         {
-            foreach (var entry in tailEntries)
+            var renderedCount = 0;
+            _consoleTextBuffer.Clear();
+            ConsoleSnapshotReadForTests?.Invoke();
+            var tailLimit = IsConsoleDedupEnabled ? AppLogStore.Instance.MaxEntries : ConsoleRenderTailSourceLineLimit;
+            var tailEntries = AppLogStore.Instance.GetTail(tailLimit, out var totalSourceCount);
+
+            if (!IsConsoleDedupEnabled)
             {
-                AppendConsoleLine(_consoleTextBuffer, AppLogFormatter.FormatLine(entry));
-                renderedCount++;
+                foreach (var entry in tailEntries)
+                {
+                    AppendConsoleLine(_consoleTextBuffer, AppLogFormatter.FormatLine(entry));
+                    renderedCount++;
+                }
+            }
+            else
+            {
+                string? pendingLine = null;
+                var pendingCount = 0;
+                foreach (var entry in tailEntries)
+                {
+                    var line = AppLogFormatter.FormatLine(entry);
+
+                    if (string.Equals(line, pendingLine, StringComparison.Ordinal))
+                    {
+                        pendingCount++;
+                        continue;
+                    }
+
+                    if (!string.IsNullOrEmpty(pendingLine))
+                    {
+                        AppendCollapsedLine(_consoleTextBuffer, pendingLine, pendingCount);
+                        renderedCount++;
+                    }
+
+                    pendingLine = line;
+                    pendingCount = 1;
+                }
+
+                if (!string.IsNullOrEmpty(pendingLine))
+                {
+                    AppendCollapsedLine(_consoleTextBuffer, pendingLine, pendingCount);
+                    renderedCount++;
+                }
             }
 
+            // The notification handler decides from these counts, so they change together with the text.
             ConsoleText = _consoleTextBuffer.ToString();
             ConsoleRenderedLineCount = renderedCount;
             ConsoleSourceLineCount = totalSourceCount;
-            OnPropertyChanged(nameof(ConsoleSummaryText));
-            return;
         }
 
-        string? pendingLine = null;
-        var pendingCount = 0;
-        foreach (var entry in tailEntries)
-        {
-            var line = AppLogFormatter.FormatLine(entry);
-
-            if (string.Equals(line, pendingLine, StringComparison.Ordinal))
-            {
-                pendingCount++;
-                continue;
-            }
-
-            if (!string.IsNullOrEmpty(pendingLine))
-            {
-                AppendCollapsedLine(_consoleTextBuffer, pendingLine, pendingCount);
-                renderedCount++;
-            }
-
-            pendingLine = line;
-            pendingCount = 1;
-        }
-
-        if (!string.IsNullOrEmpty(pendingLine))
-        {
-            AppendCollapsedLine(_consoleTextBuffer, pendingLine, pendingCount);
-            renderedCount++;
-        }
-
-        ConsoleText = _consoleTextBuffer.ToString();
-        ConsoleRenderedLineCount = renderedCount;
-        ConsoleSourceLineCount = totalSourceCount;
         OnPropertyChanged(nameof(ConsoleSummaryText));
     }
 
     private void RefreshConsoleSummaryCounts()
     {
-        ConsoleSourceLineCount = AppLogStore.Instance.GetTotalCount();
-        ConsoleRenderedLineCount = IsConsoleDedupEnabled
-            ? ConsoleSourceLineCount
-            : Math.Min(ConsoleSourceLineCount, ConsoleRenderTailSourceLineLimit);
+        lock (_consoleTextGate)
+        {
+            ConsoleSourceLineCount = AppLogStore.Instance.GetTotalCount();
+            ConsoleRenderedLineCount = IsConsoleDedupEnabled
+                ? ConsoleSourceLineCount
+                : Math.Min(ConsoleSourceLineCount, ConsoleRenderTailSourceLineLimit);
+        }
+
         OnPropertyChanged(nameof(ConsoleSummaryText));
     }
 
