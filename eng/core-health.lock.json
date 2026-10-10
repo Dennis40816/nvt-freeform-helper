@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "coreCommit": "865bd6deb4f00ac38943b819dada7154796de216",
+  "coreCommit": "a8f92b1a95a7667800adde807bff54c35ff763ef",
   "files": {
     "Directory.Build.props": "26a1dce105b061cc7b243f9edccb8b786d82f7e73e1ff5dda4f311976b7a8f2e",
     ".editorconfig": "3845322a721254c76e9d4d851f64012726b0cee871b3eb01bbad823948f957c4",
