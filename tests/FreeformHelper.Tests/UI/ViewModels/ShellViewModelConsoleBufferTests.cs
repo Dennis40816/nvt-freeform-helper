@@ -1,11 +1,11 @@
 using System.Collections.Specialized;
 using Avalonia.Headless.XUnit;
-using Avalonia.Threading;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.ViewModels;
 using NLog;
 using NLog.Config;
+using Nvt.Core.Avalonia.Threading;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -15,6 +15,8 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class ShellViewModelConsoleBufferTests
 {
+    private static readonly DateTimeOffset _entryTime = new(2026, 10, 10, 0, 0, 0, TimeSpan.Zero);
+
     [AvaloniaFact]
     public void ConsoleText_WhenNotificationArrivesOnAnotherThreadDuringRebuild_ShowsEachEntryOnce()
     {
@@ -27,12 +29,12 @@ public sealed class ShellViewModelConsoleBufferTests
             LogManager.Configuration = new LoggingConfiguration();
             store.MarkUiReady();
             store.Clear();
-            Dispatcher.UIThread.RunJobs();
-            var initial = new AppLogEntry(DateTimeOffset.UtcNow, "INFO", "test", "before rebuild");
+            RunPendingUiJobs();
+            var initial = new AppLogEntry(_entryTime, "INFO", "test", "before rebuild");
             var added = initial with { Message = "during rebuild" };
             store.Add(initial);
             shell = new ShellViewModel { IsConsoleExpanded = false };
-            Dispatcher.UIThread.RunJobs();
+            RunPendingUiJobs();
             var notifier = new Thread(() => shell.OnLogEntriesChanged(
                 store.Entries,
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, added, 1)));
@@ -63,8 +65,15 @@ public sealed class ShellViewModelConsoleBufferTests
         {
             shell?.Dispose();
             store.Clear();
-            Dispatcher.UIThread.RunJobs();
+            RunPendingUiJobs();
             LogManager.Configuration = previousConfiguration;
         }
+    }
+
+    // The store posts to the registered UI dispatcher. Run what it posted, through the Core seam.
+    private static void RunPendingUiJobs()
+    {
+        UiThread.TryGetRunningDispatcher(out var dispatcher);
+        dispatcher?.RunJobs();
     }
 }
