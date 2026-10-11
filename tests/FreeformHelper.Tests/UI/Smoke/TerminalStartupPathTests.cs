@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -27,96 +26,105 @@ public sealed class TerminalStartupPathTests
     }
 
     [AvaloniaFact]
-    public async Task ConsoleExpanded_LogBurst_ParsesLatestTextOnce()
+    public void ConsoleExpanded_LogBurst_ParsesLatestTextOnce()
     {
-        HeadlessAppBootstrap.EnsureInitialized();
-        AppLogStore.Instance.Clear();
-        using var shell = new ShellViewModel();
-        var window = new MainWindow();
-        window.SetShellViewModel(shell);
-        window.Width = 1280;
-        window.Height = 900;
+        using var console = new ConsoleFixture();
+        var parsesBeforeBurst = console.View.ConsoleLinkParseCount;
 
-        try
-        {
-            window.Show();
-            await FlushUiQueueAsync();
+        console.AddBurst();
+        console.Drain();
 
-            var view = window.GetVisualDescendants().OfType<FreeformHelperView>().Single();
-            var editor = window.GetVisualDescendants().OfType<TextEditor>()
-                .Single(control => string.Equals(control.Name, "ConsoleEditor", StringComparison.Ordinal));
-            Assert.True(shell.IsConsoleExpanded);
-            var parsesBeforeBurst = view.ConsoleLinkParseCount;
+        var burstParseCount = console.View.ConsoleLinkParseCount - parsesBeforeBurst;
+        _output.WriteLine($"200 log entries: {burstParseCount} full link parses");
+        Assert.InRange(burstParseCount, 1, 2);
+    }
 
-            for (var i = 0; i < 200; i++)
-            {
-                AppLogStore.Instance.Add(new AppLogEntry(
-                    DateTimeOffset.UtcNow,
-                    "INFO",
-                    "terminal-test",
-                    $"burst line {i:D3}"));
-            }
+    [AvaloniaFact]
+    public void ConsoleExpanded_LogBurst_ShowsLatestShellText()
+    {
+        using var console = new ConsoleFixture();
 
-            await FlushUiQueueAsync();
+        console.AddBurst();
+        console.Drain();
 
-            var burstParseCount = view.ConsoleLinkParseCount - parsesBeforeBurst;
-            _output.WriteLine($"200 log entries: {burstParseCount} full link parses");
-            Assert.InRange(burstParseCount, 1, 2);
-            Assert.Equal(shell.ConsoleText, editor.Text);
-            Assert.Contains("burst line 199", editor.Text, StringComparison.Ordinal);
+        Assert.True(console.Shell.IsConsoleExpanded);
+        Assert.Equal(console.Shell.ConsoleText, console.Editor.Text);
+        Assert.Contains("burst line 199", console.Editor.Text, StringComparison.Ordinal);
+    }
 
-            Assert.True(editor.ExtentHeight > editor.ViewportHeight);
-            editor.ScrollToHome();
-            await FlushUiQueueAsync();
-            Assert.True(editor.VerticalOffset < editor.ExtentHeight - editor.ViewportHeight - 1);
-            AppLogStore.Instance.Add(new AppLogEntry(
-                DateTimeOffset.UtcNow,
-                "INFO",
-                "terminal-test",
-                "while reading older lines"));
-            await FlushUiQueueAsync();
-            Assert.Equal(0, editor.VerticalOffset);
+    [AvaloniaFact]
+    public void ConsoleExpanded_ReadingOlderLines_NewLineKeepsOffset()
+    {
+        using var console = CreateConsoleWithBurst();
+        console.Editor.ScrollToHome();
+        console.Drain();
 
-            editor.ScrollToEnd();
-            var scrollWait = Stopwatch.StartNew();
-            do
-            {
-                await FlushUiQueueAsync();
-            }
-            while (editor.ExtentHeight - editor.VerticalOffset - editor.ViewportHeight > 1 &&
-                   scrollWait.Elapsed < TimeSpan.FromSeconds(5));
-            Assert.True(editor.ExtentHeight - editor.VerticalOffset - editor.ViewportHeight <= 1);
+        console.AddLine("while reading older lines");
+        console.Drain();
 
-            AppLogStore.Instance.Add(new AppLogEntry(
-                DateTimeOffset.UtcNow,
-                "INFO",
-                "terminal-test",
-                "while following latest line"));
-            scrollWait.Restart();
-            do
-            {
-                await FlushUiQueueAsync();
-            }
-            while ((!editor.Text.Contains("while following latest line", StringComparison.Ordinal) ||
-                    editor.ExtentHeight - editor.VerticalOffset - editor.ViewportHeight > 1) &&
-                   scrollWait.Elapsed < TimeSpan.FromSeconds(5));
-            Assert.True(editor.ExtentHeight - editor.VerticalOffset - editor.ViewportHeight <= 1);
-            Assert.Contains("while following latest line", editor.Text, StringComparison.Ordinal);
+        Assert.True(console.Editor.ExtentHeight > console.Editor.ViewportHeight);
+        Assert.Equal(0, console.Editor.VerticalOffset);
+        Assert.Contains("while reading older lines", console.Editor.Text, StringComparison.Ordinal);
+    }
 
-            shell.ConsoleFontSize = 18;
-            Assert.Equal(18, editor.FontSize);
-            shell.ConsoleSearchText = "while following latest line";
-            shell.IsConsoleFilterEnabled = true;
-            Assert.Contains("while following latest line", editor.Text, StringComparison.Ordinal);
-            Assert.DoesNotContain("burst line 199", editor.Text, StringComparison.Ordinal);
-            shell.IsConsoleFilterEnabled = false;
-            Assert.Equal(shell.ConsoleText, editor.Text);
-        }
-        finally
-        {
-            window.Close();
-            AppLogStore.Instance.Clear();
-        }
+    [AvaloniaFact]
+    public void ConsoleExpanded_FollowingLatestLine_NewLineScrollsToEnd()
+    {
+        using var console = CreateConsoleWithBurst();
+        console.Editor.ScrollToHome();
+        console.Drain();
+        console.Editor.ScrollToEnd();
+        console.Drain();
+
+        console.AddLine("while following latest line");
+        console.Drain();
+
+        Assert.True(console.Editor.ExtentHeight > console.Editor.ViewportHeight);
+        Assert.True(console.Editor.ExtentHeight - console.Editor.VerticalOffset - console.Editor.ViewportHeight <= 1);
+        Assert.Contains("while following latest line", console.Editor.Text, StringComparison.Ordinal);
+    }
+
+    [AvaloniaFact]
+    public void ConsoleExpanded_FontSizeChange_UpdatesEditor()
+    {
+        using var console = new ConsoleFixture();
+
+        console.Shell.ConsoleFontSize = 18;
+        console.Drain();
+
+        Assert.Equal(18, console.Editor.FontSize);
+    }
+
+    [AvaloniaFact]
+    public void ConsoleExpanded_FilterEnabled_ShowsOnlyMatchingLines()
+    {
+        using var console = CreateConsoleWithBurst();
+        console.AddLine("while following latest line");
+        console.Drain();
+        console.Shell.ConsoleSearchText = "while following latest line";
+
+        console.Shell.IsConsoleFilterEnabled = true;
+        console.Drain();
+
+        Assert.Contains("while following latest line", console.Editor.Text, StringComparison.Ordinal);
+        Assert.DoesNotContain("burst line 199", console.Editor.Text, StringComparison.Ordinal);
+    }
+
+    [AvaloniaFact]
+    public void ConsoleExpanded_FilterDisabled_RestoresShellText()
+    {
+        using var console = CreateConsoleWithBurst();
+        console.AddLine("while following latest line");
+        console.Drain();
+        console.Shell.ConsoleSearchText = "while following latest line";
+        console.Shell.IsConsoleFilterEnabled = true;
+        console.Drain();
+
+        console.Shell.IsConsoleFilterEnabled = false;
+        console.Drain();
+
+        Assert.Equal(console.Shell.ConsoleText, console.Editor.Text);
+        Assert.Contains("burst line 199", console.Editor.Text, StringComparison.Ordinal);
     }
 
     [AvaloniaFact]
@@ -311,6 +319,64 @@ public sealed class TerminalStartupPathTests
     {
         using var shell = new ShellViewModel();
         Assert.True(shell.IsConsoleExpanded);
+    }
+
+    private static ConsoleFixture CreateConsoleWithBurst()
+    {
+        var console = new ConsoleFixture();
+        console.AddBurst();
+        console.Drain();
+        return console;
+    }
+
+    private sealed class ConsoleFixture : IDisposable
+    {
+        private readonly MainWindow _window;
+
+        public ShellViewModel Shell { get; }
+        public FreeformHelperView View { get; }
+        public TextEditor Editor { get; }
+
+        public ConsoleFixture()
+        {
+            HeadlessAppBootstrap.EnsureInitialized();
+            AppLogStore.Instance.Clear();
+            Shell = new ShellViewModel();
+            _window = new MainWindow { Width = 1280, Height = 900 };
+            _window.SetShellViewModel(Shell);
+            _window.Show();
+            Drain();
+            View = _window.GetVisualDescendants().OfType<FreeformHelperView>().Single();
+            Editor = _window.GetVisualDescendants().OfType<TextEditor>()
+                .Single(control => string.Equals(control.Name, "ConsoleEditor", StringComparison.Ordinal));
+        }
+
+        public void AddBurst()
+        {
+            for (var i = 0; i < 200; i++)
+            {
+                AddLine($"burst line {i:D3}");
+            }
+        }
+
+        public void AddLine(string text)
+        {
+            _window.Dispatcher.VerifyAccess();
+            AppLogStore.Instance.Add(new AppLogEntry(
+                new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                "INFO",
+                "terminal-test",
+                text));
+        }
+
+        public void Drain() => HeadlessUiPump.Drain(_window);
+
+        public void Dispose()
+        {
+            _window.Close();
+            Shell.Dispose();
+            AppLogStore.Instance.Clear();
+        }
     }
 
     private static async Task FlushUiQueueAsync()

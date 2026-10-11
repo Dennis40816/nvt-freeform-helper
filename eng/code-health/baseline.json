@@ -2031,20 +2031,6 @@
       "symbol": "FreeformHelper.Tests.ProjectLoadingSecondaryWindowTests.LoadPickerAwait_BlocksOpenDxfChangeListWithoutChangingHiddenUndoOrDirtyState(DxfEditChangeKind)"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 92
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs"
-      ],
-      "contentHash": "150a8a9342af55fb2e2b603e8d88868d24be37b78a3b71c4ead8bd75a707253b",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.TerminalStartupPathTests.ConsoleExpanded_LogBurst_ParsesLatestTextOnce()"
-    },
-    {
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
@@ -17049,83 +17035,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
-      "syntaxHash": "d025329786feb24d701311431a7b5f4a140e1c6cde38abb020e283b32355446b",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.ConsoleExpanded_LogBurst_ParsesLatestTextOnce()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
-      "syntaxHash": "df058412fdb3aa0d4a3106bdb64d715ebc5eb1d8715a0ea79655f26854081c48",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.ConsoleExpanded_LogBurst_ParsesLatestTextOnce()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
-      "syntaxHash": "fa6f3978d41f702944ed48b10b9738aa89b9142130cd225c6afeefb1e17058bb",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.ConsoleExpanded_LogBurst_ParsesLatestTextOnce()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
-      "syntaxHash": "366af6cc8927d9f846ead2e85fef5205a9a700b692ac511bbbea0c255091bc6c",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.ConsoleExpanded_LogBurst_ParsesLatestTextOnce()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "T:System.Diagnostics.Stopwatch"
-    },
-    {
-      "syntaxHash": "551e0ad7ae04ea2d40faa8806cbdd022d6ae31c3ad7e693adaaca8af8c960c93",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.ConsoleExpanded_LogBurst_ParsesLatestTextOnce()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "T:System.Diagnostics.Stopwatch"
-    },
-    {
-      "syntaxHash": "6ea2c64839fc2765aa62135e2414a24d63a7c38b7cdb35739ab632f595dea123",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.ConsoleExpanded_LogBurst_ParsesLatestTextOnce()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "T:System.Diagnostics.Stopwatch"
-    },
-    {
-      "syntaxHash": "c727e2cdc91d728e1cc7f7c7e889c3adc0e0fe935a57a0430d04754b1bfd0699",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.ConsoleExpanded_LogBurst_ParsesLatestTextOnce()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "T:System.Diagnostics.Stopwatch"
     },
     {
       "syntaxHash": "66c996656279b6402ed9e412f52cab528fcdfffe035d958700917a2c1c5413c0",
