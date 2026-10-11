@@ -71,6 +71,20 @@ public sealed class GoldenAssertTests
     }
 
     [Fact]
+    public void TextEqual_WhenTextsDiffer_FailureMessageIsExactlyTheSafeSummary()
+    {
+        var failure = Assert.ThrowsAny<XunitException>(
+            () => GoldenAssert.TextEqual("ALPHA-7731", "BRAVO-4419", "text"));
+
+        Assert.Equal(
+            "Golden text differs: text. " +
+            "Expected 10 characters, 1 lines, SHA-256 05B1F6E8D19D47047F767583C337BB6AC982CCEAF0C30E186E9487383D723072. " +
+            "Actual 10 characters, 1 lines, SHA-256 87902D941C33C5D61E4A1213570977024AEE3A1D770D11949632BF146444F225. " +
+            "First difference at line 1, column 1.",
+            failure.Message);
+    }
+
+    [Fact]
     public void TextEqual_WhenOneTextIsEmpty_NamesTheFirstPosition()
     {
         var failure = Assert.ThrowsAny<XunitException>(
@@ -131,6 +145,15 @@ public sealed class GoldenAssertTests
     }
 
     [Fact]
+    public void SingleMatch_WhenItMatchesNothing_FailureMessageIsExactlyTheSafeSummary()
+    {
+        var failure = Assert.ThrowsAny<XunitException>(
+            () => GoldenAssert.SingleMatch(_secretTexts, static value => value.Length == 1, "texts"));
+
+        Assert.Equal("Golden collection does not hold exactly one match: texts. Items 2, matches 0.", failure.Message);
+    }
+
+    [Fact]
     public void TextContains_WhenTheFragmentIsPresent_DoesNotFail()
     {
         GoldenAssert.TextContains("one two three", "two", "text");
@@ -143,5 +166,17 @@ public sealed class GoldenAssertTests
             () => GoldenAssert.TextContains(ExpectedSecret, ActualSecret, "text"));
 
         Assert.DoesNotContain("PRIVATE", failure.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TextContains_WhenTheFragmentIsMissing_FailureMessageIsExactlyTheSafeSummary()
+    {
+        var failure = Assert.ThrowsAny<XunitException>(
+            () => GoldenAssert.TextContains("one two three", "ZZZ-FRAGMENT", "text"));
+
+        Assert.Equal(
+            "Golden text lacks an expected fragment: text. " +
+            "Text 13 characters, 1 lines, SHA-256 6899EE404683A14E8C2A03149860DF25D67D34D9CD4DAE7350CBE91E4B3976BE.",
+            failure.Message);
     }
 }

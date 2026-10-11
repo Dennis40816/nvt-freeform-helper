@@ -9,8 +9,9 @@ namespace FreeformHelper.Tests.TestInfrastructure;
 /// <summary>
 /// Compares text that comes from the private example data. A failure names the label, the size, the hash and the
 /// position of the first difference. It never prints the text itself: the log of a public CI run is public.
-/// A fragment that is missing has no first difference, so <see cref="TextContains"/> names the label, the size and
-/// the hash of both texts.
+/// A fragment that is missing has no first difference, so <see cref="TextContains"/> names the label and the size
+/// and the hash of the text. It does not name the fragment, its size or its hash: a short fragment with one number in
+/// it can be recovered from a hash.
 /// </summary>
 internal static class GoldenAssert
 {
@@ -39,7 +40,7 @@ internal static class GoldenAssert
         }
 
         Assert.Fail(
-            $"Golden text lacks an expected fragment: {label}. Fragment {Summarize(fragment)}. Text {Summarize(text)}.");
+            $"Golden text lacks an expected fragment: {label}. Text {Summarize(text)}.");
     }
 
     /// <summary>
