@@ -35,6 +35,11 @@ jobs:
       - name: Verify structure
         shell: pwsh
         run: ./scripts/verify.ps1 -StructureOnly -AllowMissingExampleData
+      - name: Check the test shard policy scripts
+        shell: pwsh
+        # A child process in the harness leaves $LASTEXITCODE at 1 on purpose (negative cases), and the
+        # step wrapper exits with that value. A separate process reports only the harness result.
+        run: pwsh -NoProfile -File ./scripts/tests/check-test-shard-policy.ps1
 
   dotnet-build:
     name: dotnet / build
@@ -96,11 +101,11 @@ jobs:
       matrix:
         shard: [core, ui, viewmodel, snapshots]
     env:
-      # The golden tests need the private example data. Forks and repositories without the deploy key
-      # run without it and report those tests as skipped. Set the repository variable
-      # TESTDATA_REQUIRED to 'true' once the key exists, so a lost key fails instead of skipping.
+      # The golden tests need the private example data. A run that has no deploy key fails here, so a
+      # lost key cannot turn into skipped tests. Fork and dependabot pull requests are the only runs
+      # that go without the key: they are reported as unverified and cannot merge.
       HAS_TESTDATA_KEY: ${{ secrets.TESTDATA_DEPLOY_KEY != '' }}
-      TESTDATA_REQUIRED: ${{ vars.TESTDATA_REQUIRED }}
+      UNVERIFIED: ${{ github.event_name == 'pull_request' && (github.event.pull_request.head.repo.full_name != github.repository || github.event.pull_request.user.login == 'dependabot[bot]') }}
     steps:
       - name: Check out text files with CRLF
         run: git config --global core.autocrlf true
@@ -136,20 +141,19 @@ jobs:
         # viewmodel shard) and the results are still uploaded, instead of a cancelled job.
         timeout-minutes: 25
         run: |
-          if ($env:HAS_TESTDATA_KEY -eq 'true') {
-            ./scripts/verify.ps1 -CiLane test -Shard ${{ matrix.shard }}
-          } elseif ($env:TESTDATA_REQUIRED -eq 'true') {
-            throw "TESTDATA_REQUIRED is set but the TESTDATA_DEPLOY_KEY secret is not available to this run."
-          } else {
-            Write-Host "::warning title=Example data::Golden and example-data tests are skipped (no TESTDATA_DEPLOY_KEY)."
-            ./scripts/verify.ps1 -CiLane test -Shard ${{ matrix.shard }} -AllowMissingExampleData
+          $unverified = $env:UNVERIFIED -eq 'true'
+          if (-not $unverified -and $env:HAS_TESTDATA_KEY -ne 'true') {
+            throw 'The TESTDATA_DEPLOY_KEY secret is not available to this run.'
           }
-      - name: Upload test results
+          ./scripts/verify.ps1 -CiLane test -Shard ${{ matrix.shard }} -EnforceFloors -Unverified:$unverified -SummaryPath 'build/ci-test-summaries/${{ matrix.shard }}/shard-summary.json'
+      - name: Upload the shard summary
+        # The summary holds only counts, test class names and test method names. Never upload TRX files,
+        # TestResults/, example/ or the build/ folder: a failed golden test can carry private text.
         if: failure() || cancelled()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: dotnet-test-${{ matrix.shard }}-results-attempt-${{ github.run_attempt }}
-          path: tests/FreeformHelper.Tests/TestResults/
+          name: dotnet-test-${{ matrix.shard }}-summary-attempt-${{ github.run_attempt }}
+          path: build/ci-test-summaries/${{ matrix.shard }}/shard-summary.json
           if-no-files-found: ignore
           retention-days: 3
 
