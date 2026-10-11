@@ -23,13 +23,14 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var undoSnapshot = CaptureCadEditUndoSnapshot();
+        var previous = new CadEditNotificationSnapshot(this);
         foreach (var id in selected)
         {
             _hiddenCadPadIds.Add(id);
         }
 
         _hiddenCadUndoStack.Push(selected);
-        SyncHiddenCadIdsToProject();
+        SyncHiddenCadIdsToProject(previous);
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
         FilterCadPadsByLayer();
@@ -212,6 +213,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var undoSnapshot = CaptureCadEditUndoSnapshot();
+        var previous = new CadEditNotificationSnapshot(this);
         foreach (var id in restorableIds)
         {
             _hiddenCadPadIds.Remove(id);
@@ -222,7 +224,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         _cachedFilteredCadForBuild = null;
-        SyncHiddenCadIdsToProject();
+        SyncHiddenCadIdsToProject(previous);
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
         FilterCadPadsByLayer();

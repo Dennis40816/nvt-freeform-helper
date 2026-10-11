@@ -5,7 +5,33 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private void ClearDxfEditRuntimeState(bool resetBaseline)
+    // UI-thread owned, operation-local notification history; never retained on the ViewModel.
+    // Advance each source only at its Sync point, including multi-source edits and DXF reloads.
+    private sealed class CadEditNotificationSnapshot(FreeformHelperViewModel owner)
+    {
+        public int Deleted { get; set; } = owner.DeletedCadPadCount;
+        public int Duplicate { get; set; } = owner.DuplicateCadPadCount;
+        public int Combined { get; set; } = owner.CombinedCadPadCount;
+        public int Relayered { get; set; } = owner.RelayeredCadPadCount;
+        public int Rotated { get; set; } = owner.RotatedCadPadCount;
+        public bool HasAny => HasDxfEditChanges(Deleted > 0, Combined > 0, Relayered > 0, Rotated > 0);
+    }
+
+    private static bool HasDxfEditChanges(bool deleted, bool combined, bool relayered, bool rotated) =>
+        deleted || combined || relayered || rotated;
+
+    private void NotifyCadEditProjectionChange<T>(string propertyName, T previous, T current)
+    {
+        if (EqualityComparer<T>.Default.Equals(previous, current))
+        {
+            return;
+        }
+
+        OnPropertyChanging(propertyName);
+        OnPropertyChanged(propertyName);
+    }
+
+    private void ClearDxfEditRuntimeState(bool resetBaseline, CadEditNotificationSnapshot previous)
     {
         _hiddenCadPadIds.Clear();
         _hiddenCadUndoStack.Clear();
@@ -18,27 +44,33 @@ public sealed partial class FreeformHelperViewModel
         _nextCombinedCadPadId = 1_500_000_000;
         if (resetBaseline)
         {
-            ResetDxfEditBaseline(_cad);
+            ResetDxfEditBaselineCore(_cad, previous);
         }
     }
 
     private void ResetDxfEditBaseline(CadPadSet? cad)
     {
+        ResetDxfEditBaselineCore(cad, new CadEditNotificationSnapshot(this));
+    }
+
+    private void ResetDxfEditBaselineCore(CadPadSet? cad, CadEditNotificationSnapshot previous)
+    {
         _dxfEditBaselineCad = cad is null
             ? null
             : new CadPadSet(cad.Pads.ToList());
-        SyncRelayeredCadState();
-        SyncRotatedCadState();
+        SyncRelayeredCadState(previous);
+        SyncRotatedCadState(previous);
     }
 
-    private void SetHiddenCadPads(IEnumerable<int> hiddenIds)
+    private void SetHiddenCadPads(IEnumerable<int> hiddenIds, CadEditNotificationSnapshot? previous = null)
     {
+        previous ??= new CadEditNotificationSnapshot(this);
         _hiddenCadPadIds.Clear();
 
         if (_cad is null)
         {
-            SyncHiddenCadIdsToProject();
-            SyncCombinedCadState();
+            SyncHiddenCadIdsToProject(previous);
+            SyncCombinedCadState(previous);
             return;
         }
 
@@ -51,56 +83,67 @@ public sealed partial class FreeformHelperViewModel
             }
         }
 
-        SyncHiddenCadIdsToProject();
-        SyncCombinedCadState();
+        SyncHiddenCadIdsToProject(previous);
+        SyncCombinedCadState(previous);
         Logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads set from project. Hidden total={0}.", _hiddenCadPadIds.Count);
     }
 
-    private void ResetHiddenCadPads()
+    private void ResetHiddenCadPads(CadEditNotificationSnapshot previous)
     {
-        ClearDxfEditRuntimeState(resetBaseline: true);
+        ClearDxfEditRuntimeState(resetBaseline: true, previous);
         ClearAutoHiddenDuplicateCadPadState();
-        SyncHiddenCadIdsToProject();
-        SyncCombinedCadState();
+        SyncHiddenCadIdsToProject(previous);
+        SyncCombinedCadState(previous);
         Logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads reset.");
     }
 
-    private void SyncHiddenCadIdsToProject()
+    private void SyncHiddenCadIdsToProject(CadEditNotificationSnapshot? previous = null)
     {
+        previous ??= new CadEditNotificationSnapshot(this);
+        var hadEdits = previous.HasAny;
         _projectFile.HiddenCadPadIds = _hiddenCadPadIds.ToHashSet();
-        DeletedCadPadCount = _hiddenCadPadIds.Count;
-        HasDeletedCadPads = DeletedCadPadCount > 0;
+        NotifyCadEditProjectionChange(nameof(DeletedCadPadCount), previous.Deleted, DeletedCadPadCount);
+        NotifyCadEditProjectionChange(nameof(HasDeletedCadPads), previous.Deleted > 0, HasDeletedCadPads);
+        previous.Deleted = DeletedCadPadCount;
         OnPropertyChanged(nameof(HiddenDxfEditBadgeTooltip));
         OnPropertyChanged(nameof(HasManualHiddenCadPads));
-        SyncCadEditAggregateState();
+        SyncCadEditAggregateState(hadEdits, previous.HasAny);
     }
 
-    private void SyncCombinedCadState()
+    private void SyncCombinedCadState(CadEditNotificationSnapshot? previous = null)
     {
-        CombinedCadPadCount = _combinedCadPadIds.Count;
-        HasCombinedCadPads = CombinedCadPadCount > 0;
+        previous ??= new CadEditNotificationSnapshot(this);
+        var hadEdits = previous.HasAny;
+        NotifyCadEditProjectionChange(nameof(CombinedCadPadCount), previous.Combined, CombinedCadPadCount);
+        NotifyCadEditProjectionChange(nameof(HasCombinedCadPads), previous.Combined > 0, HasCombinedCadPads);
+        previous.Combined = CombinedCadPadCount;
         OnPropertyChanged(nameof(CombinedDxfEditBadgeTooltip));
         OnPropertyChanged(nameof(HasManualHiddenCadPads));
         OnPropertyChanged(nameof(HasSelectedCombinedCadPadsForDxfEdit));
-        SyncCadEditAggregateState();
+        SyncCadEditAggregateState(hadEdits, previous.HasAny);
     }
 
-    private void SyncDuplicateCadState()
+    private void SyncDuplicateCadState(CadEditNotificationSnapshot? previous = null)
     {
-        DuplicateCadPadCount = _duplicateCadPadIdToCanonicalId.Count;
-        HasDuplicateCadPads = DuplicateCadPadCount > 0;
+        previous ??= new CadEditNotificationSnapshot(this);
+        NotifyCadEditProjectionChange(nameof(DuplicateCadPadCount), previous.Duplicate, DuplicateCadPadCount);
+        NotifyCadEditProjectionChange(nameof(HasDuplicateCadPads), previous.Duplicate > 0, HasDuplicateCadPads);
+        previous.Duplicate = DuplicateCadPadCount;
         _projectFile.VisibleDuplicateCadPadIds = GetRestoredDuplicateCadPadIds();
         OnPropertyChanged(nameof(HasDetectedDuplicateCadPads));
         OnPropertyChanged(nameof(DuplicateDxfEditBadgeTooltip));
     }
 
-    private void SyncRelayeredCadState()
+    private void SyncRelayeredCadState(CadEditNotificationSnapshot? previous = null)
     {
+        previous ??= new CadEditNotificationSnapshot(this);
+        var hadEdits = previous.HasAny;
         if (_dxfEditBaselineCad is null || _cad is null)
         {
             RelayeredCadPadCount = 0;
-            HasRelayeredCadPads = false;
-            SyncCadEditAggregateState();
+            NotifyCadEditProjectionChange(nameof(HasRelayeredCadPads), previous.Relayered > 0, HasRelayeredCadPads);
+            previous.Relayered = RelayeredCadPadCount;
+            SyncCadEditAggregateState(hadEdits, previous.HasAny);
             return;
         }
 
@@ -112,18 +155,22 @@ public sealed partial class FreeformHelperViewModel
             !string.Equals(baselineLayer, pad.Layer, StringComparison.OrdinalIgnoreCase));
 
         RelayeredCadPadCount = relayeredCount;
-        HasRelayeredCadPads = relayeredCount > 0;
+        NotifyCadEditProjectionChange(nameof(HasRelayeredCadPads), previous.Relayered > 0, HasRelayeredCadPads);
+        previous.Relayered = RelayeredCadPadCount;
         OnPropertyChanged(nameof(MovedDxfEditBadgeTooltip));
-        SyncCadEditAggregateState();
+        SyncCadEditAggregateState(hadEdits, previous.HasAny);
     }
 
-    private void SyncRotatedCadState()
+    private void SyncRotatedCadState(CadEditNotificationSnapshot? previous = null)
     {
+        previous ??= new CadEditNotificationSnapshot(this);
+        var hadEdits = previous.HasAny;
         if (_dxfEditBaselineCad is null || _cad is null)
         {
             RotatedCadPadCount = 0;
-            HasRotatedCadPads = false;
-            SyncCadEditAggregateState();
+            NotifyCadEditProjectionChange(nameof(HasRotatedCadPads), previous.Rotated > 0, HasRotatedCadPads);
+            previous.Rotated = RotatedCadPadCount;
+            SyncCadEditAggregateState(hadEdits, previous.HasAny);
             return;
         }
 
@@ -135,13 +182,14 @@ public sealed partial class FreeformHelperViewModel
             !ArePolygonVerticesEquivalent(baselinePad.Polygon, pad.Polygon));
 
         RotatedCadPadCount = rotatedCount;
-        HasRotatedCadPads = rotatedCount > 0;
+        NotifyCadEditProjectionChange(nameof(HasRotatedCadPads), previous.Rotated > 0, HasRotatedCadPads);
+        previous.Rotated = RotatedCadPadCount;
         OnPropertyChanged(nameof(RotatedDxfEditBadgeTooltip));
-        SyncCadEditAggregateState();
+        SyncCadEditAggregateState(hadEdits, previous.HasAny);
     }
 
-    private void SyncCadEditAggregateState()
+    private void SyncCadEditAggregateState(bool previous, bool current)
     {
-        HasAnyCadEdits = HasDeletedCadPads || HasCombinedCadPads || HasRelayeredCadPads || HasRotatedCadPads;
+        NotifyCadEditProjectionChange(nameof(HasAnyCadEdits), previous, current);
     }
 }

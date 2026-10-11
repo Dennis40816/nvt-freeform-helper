@@ -36,6 +36,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var undoSnapshot = CaptureCadEditUndoSnapshot();
+        var previous = new CadEditNotificationSnapshot(this);
         var unionResult = Application.Services.CadPadUnionService.Union(sourcePads.Select(p => p.Polygon));
         if (unionResult.OuterPolygons.Count == 0)
         {
@@ -63,7 +64,6 @@ public sealed partial class FreeformHelperViewModel
         _combinedCadGroups[groupId] = new CombinedCadGroupState(
             sourcePadIds,
             combinedPads.Select(static pad => pad.Id).ToList());
-
         _cad = new CadPadSet(cad.Pads.Concat(combinedPads).ToList());
         foreach (var sourceId in sourcePadIds)
         {
@@ -72,9 +72,9 @@ public sealed partial class FreeformHelperViewModel
             _combinedCadGroupIdBySourceCadId[sourceId] = groupId;
         }
 
-        SyncRelayeredCadState();
-        SyncCombinedCadState();
-        SyncHiddenCadIdsToProject();
+        SyncRelayeredCadState(previous);
+        SyncCombinedCadState(previous);
+        SyncHiddenCadIdsToProject(previous);
         _cachedFilteredCadForBuild = null;
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
@@ -146,6 +146,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var undoSnapshot = CaptureCadEditUndoSnapshot();
+        var previous = new CadEditNotificationSnapshot(this);
         var outputIds = new HashSet<int>();
         var sourceIds = new HashSet<int>();
         foreach (var groupId in validGroupIds)
@@ -173,7 +174,6 @@ public sealed partial class FreeformHelperViewModel
             _combinedCadGroupIdByOutputCadId.Remove(outputId);
             _hiddenCadPadIds.Remove(outputId);
         }
-
         var restoredSources = 0;
         foreach (var sourceId in sourceIds)
         {
@@ -197,10 +197,10 @@ public sealed partial class FreeformHelperViewModel
         }
 
         _cachedFilteredCadForBuild = null;
-        SyncRelayeredCadState();
-        SyncRotatedCadState();
-        SyncCombinedCadState();
-        SyncHiddenCadIdsToProject();
+        SyncRelayeredCadState(previous);
+        SyncRotatedCadState(previous);
+        SyncCombinedCadState(previous);
+        SyncHiddenCadIdsToProject(previous);
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
         FilterCadPadsByLayer();
