@@ -15,7 +15,7 @@
 
 1. 1.0.x uses a fixed order: first build a trustworthy gate, then move the core data path, and finally split the UI.
 2. Every 1.0.x refactor (including `R13.003`) must keep the following:
-   - BOE 3635 V21/V22 Firmware C export is byte-exact.
+   - The example panel's V21/V22 Firmware C export is byte-exact.
    - The TM8.1 acceptance matrix and the Notch golden snapshot match exactly.
    - No new second-pass derivation may be added to Runtime Query, UI, inspector, simulation or export. Existing multi-path derivations must be listed and removed step by step under R13.102/104. This clause does not mean they are already done.
    - Existing UI appearance, action roles, spacing and DevView previews remain unchanged, except for the owner-approved R13.303 opacity fallback of 0.9 in g5, which requires updated snapshots.
