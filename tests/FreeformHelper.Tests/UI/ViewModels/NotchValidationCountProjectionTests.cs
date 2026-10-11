@@ -180,6 +180,56 @@ public sealed class NotchValidationCountProjectionTests
         }
     }
 
+    [AvaloniaFact]
+    public async Task AnalyzeNotchValidationCommand_MissingRegWithEmptyGroups_RaisesNoCountChanges()
+    {
+        var path = CreateTempDxfFile(("signal", 0, 0, 15, 10), ("signal", 5, 0, 20, 10),
+            ("signal", 0, 0, 14, 10));
+        var outputPath = Path.ChangeExtension(path, ".c");
+        try
+        {
+            var vm = await CreateNotchExportCacheViewModelAsync(path);
+            await ExportNotchProfileAsync(vm, NotchExportProfile.Release, outputPath);
+            vm.NotchValidationRegularPadId = int.MaxValue;
+            var changes = ObserveNotchValidationChanges(vm);
+
+            vm.AnalyzeNotchValidationCommand.Execute(null);
+
+            AssertCounts(vm, 0, 0, 0);
+            AssertGroupChanges(changes);
+            Assert.Contains("not found", vm.NotchValidationSummaryText, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+            File.Delete(outputPath);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task ClearStep5ResultCommand_EmptyGroups_RaisesNoCountChanges()
+    {
+        var path = CreateTempDxfFile(("signal", 0, 0, 15, 10), ("signal", 5, 0, 20, 10),
+            ("signal", 0, 0, 14, 10));
+        var outputPath = Path.ChangeExtension(path, ".c");
+        try
+        {
+            var vm = await CreateNotchExportCacheViewModelAsync(path);
+            await ExportNotchProfileAsync(vm, NotchExportProfile.Release, outputPath);
+            var changes = ObserveNotchValidationChanges(vm);
+
+            vm.ClearStep5ResultCommand.Execute(null);
+
+            AssertCounts(vm, 0, 0, 0);
+            AssertGroupChanges(changes);
+        }
+        finally
+        {
+            File.Delete(path);
+            File.Delete(outputPath);
+        }
+    }
+
     [Fact]
     public async Task ClearNotchValidationCommand_EmptyGroups_RaisesNoCountChanges()
     {
