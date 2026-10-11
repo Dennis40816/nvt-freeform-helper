@@ -88,7 +88,7 @@ public sealed class NotchExampleCExportDriftTests
             File.WriteAllText(driftPath, actualExport);
         }
 
-        Assert.Equal(expected, actual);
+        GoldenAssert.TextEqual(expected, actual, $"exported C text {version.ToDisplayLabel()}");
     }
 
     private static string NormalizeText(string text)
@@ -110,10 +110,10 @@ public sealed class NotchExampleCExportDriftTests
 
         var expectedNodes = contract.GetProperty("nodes").GetInt32();
         var text = NormalizeText(File.ReadAllText(path));
-        Assert.Contains(
-            $"#define USER_NHC_NODE_NUM        ({expectedNodes}u)",
+        GoldenAssert.TextContains(
             text,
-            StringComparison.Ordinal);
+            $"#define USER_NHC_NODE_NUM        ({expectedNodes}u)",
+            "signed output node count");
     }
 
     private static void AssertSignedFile(string path, string? expectedSha256)

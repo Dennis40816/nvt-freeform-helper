@@ -38,7 +38,7 @@ public sealed class Tm81NotchAcceptanceMatrixTests
             return;
         }
 
-        Assert.True(File.Exists(snapshotPath), $"Snapshot file not found: {snapshotPath}");
+        Assert.True(File.Exists(snapshotPath), "The acceptance matrix snapshot file is missing.");
         var expected = JsonSerializer.Deserialize<Tm81NotchAcceptanceMatrixDocument>(
             File.ReadAllText(snapshotPath),
             MatrixJsonOptions);
@@ -54,7 +54,7 @@ public sealed class Tm81NotchAcceptanceMatrixTests
             File.WriteAllText(actualDumpPath, actualJson);
         }
 
-        Assert.Equal(expectedJson, actualJson);
+        GoldenAssert.TextEqual(expectedJson, actualJson, "TM8.1 acceptance matrix");
     }
 
     private static async Task<Tm81NotchAcceptanceMatrixDocument> BuildActualMatrixAsync()
@@ -178,20 +178,20 @@ public sealed class Tm81NotchAcceptanceMatrixTests
         var cad113Overlay = vm.GetCadV22StageOverlays(113);
         Assert.NotNull(cad113Compensation);
         Assert.NotNull(cad113Overlay);
-        var cad113MainInfo = Assert.Single(cad113Compensation!.RegularDebugInfos, static info => info.RegularIndex == 445);
+        var cad113MainInfo = GoldenAssert.SingleMatch(cad113Compensation!.RegularDebugInfos, static info => info.RegularIndex == 445, "CAD 113 regular debug info 445");
 
         var cad364Compensation = vm.GetCadV22CompensationResult(364);
         var cad364Overlay = vm.GetCadV22StageOverlays(364);
         Assert.NotNull(cad364Compensation);
         Assert.NotNull(cad364Overlay);
-        var reg291 = Assert.Single(vm.RegularPads, static pad => pad.Index == 291);
-        var cad364Reg291Info = Assert.Single(cad364Compensation!.RegularDebugInfos, static info => info.RegularIndex == 291);
+        var reg291 = GoldenAssert.SingleMatch(vm.RegularPads, static pad => pad.Index == 291, "regular pad 291");
+        var cad364Reg291Info = GoldenAssert.SingleMatch(cad364Compensation!.RegularDebugInfos, static info => info.RegularIndex == 291, "CAD 364 regular debug info 291");
         var cad364Stage2Coverage = ComputeRectCoverage(cad364Overlay!.Value.Stage2Candidate, reg291.Bounds);
         var cad364Stage3Coverage = ComputeRectCoverage(cad364Overlay.Value.Stage3Final, reg291.Bounds);
 
         var cad402Compensation = vm.GetCadV22CompensationResult(402);
         Assert.NotNull(cad402Compensation);
-        var reg624Info = Assert.Single(cad402Compensation!.RegularDebugInfos, static info => info.RegularIndex == 624);
+        var reg624Info = GoldenAssert.SingleMatch(cad402Compensation!.RegularDebugInfos, static info => info.RegularIndex == 624, "CAD 402 regular debug info 624");
 
         var cad490Compensation = vm.GetCadV22CompensationResult(490);
         var cad491Compensation = vm.GetCadV22CompensationResult(491);
@@ -201,8 +201,8 @@ public sealed class Tm81NotchAcceptanceMatrixTests
         Assert.NotNull(cad491Compensation);
         Assert.NotNull(cad490Overlay);
         Assert.NotNull(cad491Overlay);
-        var cad490SharedInfo = Assert.Single(cad490Compensation!.RegularDebugInfos, static info => info.RegularIndex == 643);
-        var cad491SharedInfo = Assert.Single(cad491Compensation!.RegularDebugInfos, static info => info.RegularIndex == 643);
+        var cad490SharedInfo = GoldenAssert.SingleMatch(cad490Compensation!.RegularDebugInfos, static info => info.RegularIndex == 643, "CAD 490 regular debug info 643");
+        var cad491SharedInfo = GoldenAssert.SingleMatch(cad491Compensation!.RegularDebugInfos, static info => info.RegularIndex == 643, "CAD 491 regular debug info 643");
         var stage3Overlap = ComputeRectangleIntersectionArea(cad490Overlay!.Value.Stage3Final, cad491Overlay!.Value.Stage3Final);
 
         var reg387Snapshot = vm.BuildRegularPadInspectorSnapshot(387);
