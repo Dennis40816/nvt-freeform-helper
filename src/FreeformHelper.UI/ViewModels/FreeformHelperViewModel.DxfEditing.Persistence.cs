@@ -131,32 +131,33 @@ public sealed partial class FreeformHelperViewModel
     private void ApplyCapturedDxfEditProjectState(PersistedDxfEditProjectState state)
     {
         ArgumentNullException.ThrowIfNull(state);
+        var previous = new CadEditNotificationSnapshot(this);
 
         if (_cad is null)
         {
-            ClearDxfEditRuntimeState(resetBaseline: false);
+            ClearDxfEditRuntimeState(resetBaseline: false, previous);
             ClearAutoHiddenDuplicateCadPadState();
-            SyncRelayeredCadState();
-            SyncRotatedCadState();
-            SyncHiddenCadIdsToProject();
-            SyncCombinedCadState();
-            SyncDuplicateCadState();
+            SyncRelayeredCadState(previous);
+            SyncRotatedCadState(previous);
+            SyncHiddenCadIdsToProject(previous);
+            SyncCombinedCadState(previous);
+            SyncDuplicateCadState(previous);
             return;
         }
 
         var layerSelectionSnapshot = CaptureLayerSelectionSnapshot();
         PreserveDxfDependentLayerSelections();
-        ClearDxfEditRuntimeState(resetBaseline: false);
+        ClearDxfEditRuntimeState(resetBaseline: false, previous);
         ApplyPersistedCadLayerOverrides(state.CadLayerOverrides);
         ApplyPersistedCadGeometryOverrides(state.CadGeometryOverrides);
         var combinedSourceCadIds = ReplayPersistedCombinedCadGroups(state.CombinedCadGroups);
-        SetHiddenCadPads(state.HiddenCadPadIds.Concat(combinedSourceCadIds));
+        SetHiddenCadPads(state.HiddenCadPadIds.Concat(combinedSourceCadIds), previous);
         ApplyPersistedVisibleDuplicateCadPads(state.VisibleDuplicateCadPadIds);
         _hiddenCadUndoStack.Clear();
         _cachedFilteredCadForBuild = null;
-        SyncRelayeredCadState();
-        SyncRotatedCadState();
-        SyncCombinedCadState();
+        SyncRelayeredCadState(previous);
+        SyncRotatedCadState(previous);
+        SyncCombinedCadState(previous);
         UpdateLayerToggles(_cad);
         RestoreLayerSelectionAfterCadLayerEdit(layerSelectionSnapshot, ensureVisibleLayerName: string.Empty);
     }

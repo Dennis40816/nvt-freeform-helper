@@ -8,17 +8,21 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private async Task ApplyCadLoadOutcomeAsync(CadLoadOutcome outcome, UiViewSnapshot? snapshot)
+    private Task ApplyCadLoadOutcomeAsync(CadLoadOutcome outcome, UiViewSnapshot? snapshot) =>
+        ApplyCadLoadOutcomeCoreAsync(outcome, snapshot, new CadEditNotificationSnapshot(this));
+
+    private async Task ApplyCadLoadOutcomeCoreAsync(CadLoadOutcome outcome, UiViewSnapshot? snapshot, CadEditNotificationSnapshot? previous)
     {
+        previous ??= new CadEditNotificationSnapshot(this);
         _cad = outcome.Cad;
         ResetRegularVisibilityMaskSelection(clearProjectEmbeddedMask: !_isLoadingSettings);
         ClearAutoHiddenDuplicateCadPadState();
-        ClearDxfEditRuntimeState(resetBaseline: false);
+        ClearDxfEditRuntimeState(resetBaseline: false, previous);
         SetAutoHiddenDuplicateCadPads(outcome.DuplicateSanitization);
-        ResetDxfEditBaseline(outcome.Cad);
-        SyncHiddenCadIdsToProject();
-        SyncCombinedCadState();
-        SyncDuplicateCadState();
+        ResetDxfEditBaselineCore(outcome.Cad, previous);
+        SyncHiddenCadIdsToProject(previous);
+        SyncCombinedCadState(previous);
+        SyncDuplicateCadState(previous);
         _cachedFilteredCadForBuild = null;
 
         var layerUiSnapshot = await Task.Run(() => BuildCadLayerUiSnapshot(outcome.Cad, snapshot?.LayerSelections));

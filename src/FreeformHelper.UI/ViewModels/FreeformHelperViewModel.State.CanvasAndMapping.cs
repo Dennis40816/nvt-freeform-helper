@@ -157,60 +157,44 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     [ObservableProperty] private bool _isModalLoadingSpinnerVisible;
 
-    /// <summary>
-    /// Gets or sets Notch 2.2 preview overlays shown on the main canvas.
-    /// </summary>
-    [ObservableProperty] private int _deletedCadPadCount;
+    /// <summary>Gets the number of hidden CAD pads.</summary>
+    public int DeletedCadPadCount => _hiddenCadPadIds.Count;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether there are hidden CAD pads.
-    /// </summary>
-    [ObservableProperty] private bool _hasDeletedCadPads;
+    /// <summary>Gets whether hidden CAD pads exist.</summary>
+    public bool HasDeletedCadPads => DeletedCadPadCount > 0;
 
-    /// <summary>
-    /// Gets or sets the count of synthetic combined CAD pads.
-    /// </summary>
-    [ObservableProperty] private int _duplicateCadPadCount;
+    /// <summary>Gets the number of detected duplicate CAD pads.</summary>
+    public int DuplicateCadPadCount => _duplicateCadPadIdToCanonicalId.Count;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether auto-hidden duplicate CAD pads exist.
-    /// </summary>
-    [ObservableProperty] private bool _hasDuplicateCadPads;
+    /// <summary>Gets whether detected duplicate CAD pads exist.</summary>
+    public bool HasDuplicateCadPads => DuplicateCadPadCount > 0;
 
-    /// <summary>
-    /// Gets or sets the count of synthetic combined CAD pads.
-    /// </summary>
-    [ObservableProperty] private int _combinedCadPadCount;
+    /// <summary>Gets the number of synthetic combined CAD pads.</summary>
+    public int CombinedCadPadCount => _combinedCadPadIds.Count;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether synthetic combined CAD pads exist.
-    /// </summary>
-    [ObservableProperty] private bool _hasCombinedCadPads;
+    /// <summary>Gets whether synthetic combined CAD pads exist.</summary>
+    public bool HasCombinedCadPads => CombinedCadPadCount > 0;
 
     /// <summary>
     /// Gets or sets the count of CAD pads whose layer differs from the current DXF edit baseline.
     /// </summary>
+    // UI-thread owned; sync measures the O(n) baseline scan so binding reads stay O(1).
     [ObservableProperty] private int _relayeredCadPadCount;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether any CAD pad has been moved to a different layer.
-    /// </summary>
-    [ObservableProperty] private bool _hasRelayeredCadPads;
+    /// <summary>Gets whether any CAD pad has been moved to a different layer.</summary>
+    public bool HasRelayeredCadPads => RelayeredCadPadCount > 0;
 
     /// <summary>
     /// Gets or sets the count of CAD pads whose polygon differs from the current DXF edit baseline.
     /// </summary>
+    // UI-thread owned; sync measures the O(n) baseline scan so binding reads stay O(1).
     [ObservableProperty] private int _rotatedCadPadCount;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether any CAD pad geometry has been rotated from baseline.
-    /// </summary>
-    [ObservableProperty] private bool _hasRotatedCadPads;
+    /// <summary>Gets whether any CAD pad geometry differs from baseline.</summary>
+    public bool HasRotatedCadPads => RotatedCadPadCount > 0;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether any DXF edit (hidden, combined, or relayered) exists.
-    /// </summary>
-    [ObservableProperty] private bool _hasAnyCadEdits;
+    /// <summary>Gets whether hidden, combined, relayered or rotated CAD edits exist.</summary>
+    public bool HasAnyCadEdits => HasDxfEditChanges(HasDeletedCadPads, HasCombinedCadPads, HasRelayeredCadPads, HasRotatedCadPads);
 
     /// <summary>
     /// Gets or sets available DXF layer names for "move selected pads" action.

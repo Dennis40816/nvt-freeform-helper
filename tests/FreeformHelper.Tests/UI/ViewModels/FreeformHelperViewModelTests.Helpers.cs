@@ -85,7 +85,7 @@ public sealed partial class FreeformHelperViewModelTests
         return new CadPad(id, $"CAD{id}", "L1", polygon);
     }
 
-    private static string CreateTempDxfFile(params (string Layer, double MinX, double MinY, double MaxX, double MaxY)[] pads)
+    internal static string CreateTempDxfFile(params (string Layer, double MinX, double MinY, double MaxX, double MaxY)[] pads)
     {
         var path = Path.Combine(Path.GetTempPath(), $"freeformhelper-test-{Guid.NewGuid():N}.dxf");
         var builder = new StringBuilder();
@@ -208,14 +208,14 @@ public sealed partial class FreeformHelperViewModelTests
 
     // DXF edit commands start a grid rebuild they do not await, and its completion clears the selection.
     // Wait for it first, so the selection made here is the one the next command sees.
-    private static async Task SelectCadPadsAsync(FreeformHelperViewModel vm, IReadOnlyList<int> cadPadIds)
+    internal static async Task SelectCadPadsAsync(FreeformHelperViewModel vm, IReadOnlyList<int> cadPadIds)
     {
         await WaitForGridRebuildAsync(vm);
         vm.ApplyCanvasSelection(cadPadIds, Array.Empty<int>());
     }
 
     // A rebuild that never finishes must fail here with its state, not stall the whole run.
-    private static async Task WaitForGridRebuildAsync(FreeformHelperViewModel vm)
+    internal static async Task WaitForGridRebuildAsync(FreeformHelperViewModel vm)
     {
         var rebuild = vm.WaitForGridRebuildIdleAsync();
         try

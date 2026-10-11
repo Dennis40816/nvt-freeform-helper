@@ -275,6 +275,7 @@ public sealed partial class FreeformHelperViewModel
         var path = await PickOpenDxfPathAsync(); // Prompt user to pick a DXF file.
         if (string.IsNullOrWhiteSpace(path)) return; // User cancelled.
 
+        CadEditNotificationSnapshot? previous = null;
         await _cadLoadWorkflowService.OpenDxfAsync(new OpenDxfWorkflowRequest
         {
             Path = path,
@@ -285,8 +286,12 @@ public sealed partial class FreeformHelperViewModel
                 _layerCatalogStateService.SetFromPath(selectedPath, _dxfImportService.ImportedCatalog);
                 return Task.CompletedTask;
             },
-            ResetHiddenCadPads = ResetHiddenCadPads,
-            ApplyCadLoadOutcomeAsync = outcome => ApplyCadLoadOutcomeAsync(outcome, null),
+            ResetHiddenCadPads = () =>
+            {
+                previous = new CadEditNotificationSnapshot(this);
+                ResetHiddenCadPads(previous);
+            },
+            ApplyCadLoadOutcomeAsync = outcome => ApplyCadLoadOutcomeCoreAsync(outcome, null, previous),
             SetProjectLastDxfPath = selectedPath => _projectFile.LastDxfPath = selectedPath,
             ClearLastSavedPath = () => _lastSavedPath = null,
             MarkUnsaved = MarkUnsaved,

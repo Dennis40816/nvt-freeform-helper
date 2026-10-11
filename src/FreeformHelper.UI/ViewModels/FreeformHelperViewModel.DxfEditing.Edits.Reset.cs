@@ -15,6 +15,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var undoSnapshot = CaptureCadEditUndoSnapshot();
+        var previous = new CadEditNotificationSnapshot(this);
         var restored = _hiddenCadPadIds.Count;
         var removedCombined = _combinedCadPadIds.Count;
         var restoredLayerMoves = RelayeredCadPadCount;
@@ -38,11 +39,11 @@ public sealed partial class FreeformHelperViewModel
         _nextCombinedCadGroupId = 1;
         _nextCombinedCadPadId = 1_500_000_000;
         _cachedFilteredCadForBuild = null;
-        SyncRelayeredCadState();
-        SyncRotatedCadState();
-        SyncHiddenCadIdsToProject();
-        SyncCombinedCadState();
-        SyncDuplicateCadState();
+        SyncRelayeredCadState(previous);
+        SyncRotatedCadState(previous);
+        SyncHiddenCadIdsToProject(previous);
+        SyncCombinedCadState(previous);
+        SyncDuplicateCadState(previous);
         if (_cad is not null)
         {
             var layerSelectionSnapshot = CaptureLayerSelectionSnapshot();

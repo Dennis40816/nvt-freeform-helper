@@ -49,8 +49,8 @@ public sealed partial class FreeformHelperViewModel
 
     private void RestoreCadEditUndoSnapshot(CadEditUndoSnapshot snapshot)
     {
+        var previous = new CadEditNotificationSnapshot(this);
         _cad = snapshot.Cad;
-
         _hiddenCadPadIds.Clear();
         foreach (var id in snapshot.HiddenCadIds)
         {
@@ -110,13 +110,13 @@ public sealed partial class FreeformHelperViewModel
         _nextCombinedCadGroupId = snapshot.NextCombinedCadGroupId;
         _nextCombinedCadPadId = snapshot.NextCombinedCadPadId;
         _cachedFilteredCadForBuild = null;
-        SyncRelayeredCadState();
-        SyncRotatedCadState();
+        SyncRelayeredCadState(previous);
+        SyncRotatedCadState(previous);
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
-        SyncCombinedCadState();
-        SyncHiddenCadIdsToProject();
-        SyncDuplicateCadState();
+        SyncCombinedCadState(previous);
+        SyncHiddenCadIdsToProject(previous);
+        SyncDuplicateCadState(previous);
         if (_cad is not null)
         {
             var currentLayers = LayerToggles
