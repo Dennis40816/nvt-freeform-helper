@@ -95,23 +95,38 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private double _consoleFontSize = 14.0;
 
+    // The console text and its two counts are plain fields. The notification handler changes them inside the
+    // console text gate and raises the change notifications after it releases the gate (ShellViewModel.Console.cs).
+    private string _consoleText = string.Empty;
+    private int _consoleRenderedLineCount;
+    private int _consoleSourceLineCount;
+
     /// <summary>
     /// Gets or sets the concatenated text content of all log entries for display in the console.
     /// </summary>
-    [ObservableProperty]
-    private string _consoleText = string.Empty;
+    public string ConsoleText
+    {
+        get => _consoleText;
+        set => SetProperty(ref _consoleText, value);
+    }
 
     /// <summary>
     /// Gets or sets the rendered line count in current console view.
     /// </summary>
-    [ObservableProperty]
-    private int _consoleRenderedLineCount;
+    public int ConsoleRenderedLineCount
+    {
+        get => _consoleRenderedLineCount;
+        set => SetProperty(ref _consoleRenderedLineCount, value);
+    }
 
     /// <summary>
     /// Gets or sets the source line count currently stored in app log entries.
     /// </summary>
-    [ObservableProperty]
-    private int _consoleSourceLineCount;
+    public int ConsoleSourceLineCount
+    {
+        get => _consoleSourceLineCount;
+        set => SetProperty(ref _consoleSourceLineCount, value);
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether duplicated consecutive console lines are collapsed.
@@ -134,11 +149,26 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     /// <summary>
     /// Gets the summary text shown in console header.
     /// </summary>
-    public string ConsoleSummaryText => IsConsoleDedupEnabled
-        ? $"Lines {ConsoleRenderedLineCount} (from {ConsoleSourceLineCount})"
-        : ConsoleRenderedLineCount < ConsoleSourceLineCount
-            ? $"Lines {ConsoleRenderedLineCount} / {ConsoleSourceLineCount}"
-            : $"Lines {ConsoleRenderedLineCount}";
+    public string ConsoleSummaryText
+    {
+        get
+        {
+            // Both counts come from one section, so the header never shows counts of two different rebuilds.
+            int renderedLineCount;
+            int sourceLineCount;
+            lock (_consoleTextGate)
+            {
+                renderedLineCount = _consoleRenderedLineCount;
+                sourceLineCount = _consoleSourceLineCount;
+            }
+
+            return IsConsoleDedupEnabled
+                ? $"Lines {renderedLineCount} (from {sourceLineCount})"
+                : renderedLineCount < sourceLineCount
+                    ? $"Lines {renderedLineCount} / {sourceLineCount}"
+                    : $"Lines {renderedLineCount}";
+        }
+    }
 
     // --- Commands ---
     /// <summary>

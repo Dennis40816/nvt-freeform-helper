@@ -1600,17 +1600,6 @@
     },
     {
       "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelConsoleBufferTests.cs",
-      "rule": "timeWaitsInTests",
-      "removeBy": "2026-10-31",
-      "member": "FreeformHelper.Tests.ShellViewModelConsoleBufferTests.ConsoleText_WhenNotificationArrivesOnAnotherThreadDuringRebuild_ShowsEachEntryOnce()",
-      "owner": "NFH",
-      "symbol": "SpinWait.SpinUntil",
-      "syntaxHash": "c2e13a1a4407b8d22c1ea808c4f20d87b8da977de11291ace278b7e06af72483",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
       "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
       "rule": "timeWaitsInTests",
       "removeBy": "2026-10-31",
