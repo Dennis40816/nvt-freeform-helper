@@ -77,3 +77,11 @@ The following four runtime mechanisms must not be changed without an explicit ta
 ## C# conventions
 
 New code follows the [C# conventions](https://github.com/Dennis40816/nvt_fw_core/blob/main/docs/core/conventions.md). The ratchet tests in `tests/FreeformHelper.Tests/Architecture` fail when a counted metric gets worse or its baseline is not lowered after a cleanup.
+
+## Debt ledger rules
+
+The debt ledgers `eng/code-health/baseline.json` and `eng/code-health/test-debt.json` only go down. The practical rules are in [ledger-operation.md](https://github.com/Dennis40816/nvt_fw_core/blob/main/tools/repo-checks/ledger-operation.md). Three of them matter in every pull request:
+
+1. **Only down.** Do not raise a ledger count or add an entry by hand. Lower a ledger with the script and arguments of rule 3, using `-Mode LowerBaseline`.
+2. **Rename, move and reorder create new fingerprints.** The ledger stores a finding by rule, project, member, symbol and syntax hash. Changing the name or signature of a member that carries debt, moving it to another type, or reordering it inside its type makes the old entry disappear and a new one appear. Verify (rule 3) then fails. Do these only in a change that also removes the finding.
+3. **Run Verify before you open the pull request.** `pwsh -NoProfile -File eng/core-health/repo-health.ps1 -Mode Verify -Repo nfh -Root . -Solution FreeformHelper.sln -BaseRef origin/main`. Run it once on the final change. It takes about 25 minutes. Set `DOTNET_CLI_UI_LANGUAGE=en` and `VSLANG=1033` for English tool output.
