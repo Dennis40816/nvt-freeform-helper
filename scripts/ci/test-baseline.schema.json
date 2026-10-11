@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "test-baseline",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "measuredAtCommit",
+    "shards"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "measuredAtCommit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "shards": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "minTotal",
+          "maxSkipped",
+          "exampleMinTests",
+          "requiredClasses"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "minTotal": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "maxSkipped": {
+            "const": 0
+          },
+          "exampleMinTests": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "requiredClasses": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.]+$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

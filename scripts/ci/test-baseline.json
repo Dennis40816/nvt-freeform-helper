@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "measuredAtCommit": "2680b9747707c3276ebd934245da6ef4bd9f36db",
+  "shards": {
+    "core": {
+      "minTotal": 1413,
+      "maxSkipped": 0,
+      "exampleMinTests": 11,
+      "requiredClasses": [
+        "FreeformHelper.Tests.NotchExampleCExportDriftTests",
+        "FreeformHelper.Tests.NotchGoldenBaselineTests",
+        "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests"
+      ]
+    },
+    "ui": {
+      "minTotal": 113,
+      "maxSkipped": 0,
+      "exampleMinTests": 0,
+      "requiredClasses": []
+    },
+    "viewmodel": {
+      "minTotal": 173,
+      "maxSkipped": 0,
+      "exampleMinTests": 15,
+      "requiredClasses": []
+    },
+    "snapshots": {
+      "minTotal": 33,
+      "maxSkipped": 0,
+      "exampleMinTests": 0,
+      "requiredClasses": []
+    }
+  }
+}

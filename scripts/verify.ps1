@@ -6,7 +6,10 @@ param(
     [ValidateSet("", "core", "ui", "viewmodel", "snapshots")]
     [string]$Shard = "",
     [string]$Configuration = "Debug",
-    [switch]$AllowMissingExampleData
+    [switch]$AllowMissingExampleData,
+    [switch]$EnforceFloors,
+    [string]$SummaryPath = "",
+    [switch]$Unverified
 )
 
 # Single verification entry for local runs and CI. The workflow file names lanes and shards only;
@@ -27,6 +30,7 @@ $temporaryEnvironmentCheckScript = Join-Path $repoRoot "scripts/tests/check-temp
 . (Join-Path $repoRoot "scripts/tests/private-path-patterns.ps1")
 $buildOutputSelectionScript = Join-Path $repoRoot "scripts/tests/check-build-output-selection.ps1"
 $fetchCorePackagesScript = Join-Path $repoRoot "scripts/build/fetch-core-packages.ps1"
+$testShardCheckScript = Join-Path $repoRoot "scripts/ci/check-test-shard.ps1"
 
 # Every test class belongs to at least one group here; 'uncategorized' catches the classes no list names.
 $shardGroups = [ordered]@{
@@ -206,6 +210,63 @@ function Invoke-BuildLane {
 function Invoke-TestShard {
     param([string]$Name)
 
+    if ($EnforceFloors) {
+        try {
+            $resultsRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot "build/ci-test-results"))
+            $resultsDirectory = Join-Path $resultsRoot ("{0}-{1}" -f $Name, [guid]::NewGuid().ToString("N"))
+            $summaryFile = if ([string]::IsNullOrWhiteSpace($SummaryPath)) {
+                Join-Path $repoRoot "build/ci-test-summaries/$Name/shard-summary.json"
+            } else { [System.IO.Path]::GetFullPath($SummaryPath) }
+        } catch {
+            throw ("path-resolution-failed {0}" -f $Name)
+        }
+        if ($summaryFile.Equals($resultsRoot, [System.StringComparison]::OrdinalIgnoreCase) -or
+            $summaryFile.StartsWith($resultsRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Shard summary must be outside private results."
+        }
+        $runFailed = $false
+        try {
+            try {
+                $null = New-Item -ItemType Directory -Path $resultsDirectory -Force
+            } catch {
+                Write-Host ("results-creation-failed {0}" -f $Name)
+                $runFailed = $true
+            }
+            if (-not $runFailed) {
+                foreach ($group in $shardGroups[$Name]) {
+                    try {
+                        & $runTestsScript -Group $group -Configuration $Configuration -UseNoAppHost `
+                            -AllowMissingExampleData:($AllowMissingExampleData -or $Unverified) `
+                            -ResultsDirectory (Join-Path $resultsDirectory $group) *> $null
+                    } catch {
+                        # Continue collecting the remaining groups without printing raw exception records.
+                        $runFailed = $true
+                    }
+                }
+            }
+            & $testShardCheckScript -Shard $Name -ResultsDirectory $resultsDirectory `
+                -ExampleDataPresent $exampleDataPresent -SummaryPath $summaryFile `
+                -TestRunFailed:$runFailed -Unverified:$Unverified
+        } finally {
+            try {
+                # This invocation owns a fresh directory, verified to be inside the private results root.
+                $cleanupPath = [System.IO.Path]::GetFullPath($resultsDirectory)
+                if (-not $cleanupPath.StartsWith($resultsRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+                    throw "Private results cleanup refused."
+                }
+                if (Test-Path -LiteralPath $cleanupPath) {
+                    Remove-Item -LiteralPath $cleanupPath -Recurse -Force
+                }
+                if ((Test-Path -LiteralPath $resultsRoot) -and @(Get-ChildItem -LiteralPath $resultsRoot -Force).Count -eq 0) {
+                    Remove-Item -LiteralPath $resultsRoot
+                }
+            } catch {
+                throw ("results-cleanup-failed {0}" -f $Name)
+            }
+        }
+        return
+    }
+
     foreach ($group in $shardGroups[$Name]) {
         Write-Lane "test shard '$Name': group '$group'"
         & $runTestsScript `
@@ -227,14 +288,26 @@ if ($All) {
     throw "Choose one of -StructureOnly, -All, or -CiLane <structure|build|test>."
 }
 
-$shards = if ([string]::IsNullOrWhiteSpace($Shard)) { @($shardGroups.Keys) } else { @($Shard) }
+$shards = @(if ([string]::IsNullOrWhiteSpace($Shard)) { $shardGroups.Keys } else { $Shard })
+if ($EnforceFloors -and -not [string]::IsNullOrWhiteSpace($SummaryPath) -and $shards.Count -ne 1) {
+    throw "An explicit summary path requires one shard."
+}
 
 Push-Location $repoRoot
 try {
     # Without the private data the golden tests skip; a run that includes tests must not pass that way by
     # accident, so check the data before the slow lanes.
     if ($lanes -contains "test") {
-        $null = & $assertExampleDataScript -AllowMissing:$AllowMissingExampleData
+        if ($EnforceFloors) {
+            try {
+                $exampleDataPresent = & $assertExampleDataScript -AllowMissing:($AllowMissingExampleData -or $Unverified) `
+                    2>$null 3>$null 4>$null 5>$null 6>$null
+            } catch {
+                throw ("example-precheck-failed {0}" -f ($shards -join ' '))
+            }
+        } else {
+            $null = & $assertExampleDataScript -AllowMissing:$AllowMissingExampleData
+        }
     }
 
     # The build and test lanes restore; the NVT Core packages must be downloaded and verified first.
