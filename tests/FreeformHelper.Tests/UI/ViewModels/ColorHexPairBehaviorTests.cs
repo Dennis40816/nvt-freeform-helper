@@ -199,6 +199,25 @@ public sealed class ColorHexPairBehaviorTests
     [InlineData("CadLineColor")]
     [InlineData("RegularLineColor")]
     [InlineData("RegularSelectedColor")]
+    public void UndoCommandEmptyHistoryLeavesPairUnchanged(string colorName)
+    {
+        var vm = new FreeformHelperViewModel();
+        var originalHex = GetHex(vm, colorName);
+        var originalColor = GetColor(vm, colorName);
+        var changes = ObserveChanges(vm);
+
+        vm.UndoCommand.Execute(null);
+
+        AssertPair(vm, colorName, originalHex, originalColor);
+        var pairChanges = changes.Where(IsPairChange).ToArray();
+        Assert.Empty(pairChanges);
+        Assert.False(vm.CanUndo);
+    }
+
+    [AvaloniaTheory]
+    [InlineData("CadLineColor")]
+    [InlineData("RegularLineColor")]
+    [InlineData("RegularSelectedColor")]
     public void UndoCommand_ValidHexEdit_RestoresPreviousTextAndColor(string colorName)
     {
         var vm = new FreeformHelperViewModel();
@@ -319,35 +338,27 @@ public sealed class ColorHexPairBehaviorTests
     [InlineData("RegularSelectedColor")]
     public async Task SaveProjectAsync_ValidHex_RoundTripsNormalizedTextAndColor(string colorName)
     {
-        var path = CreateTempDxfFile(("signal", 0, 0, 10, 20));
-        var projectPath = Path.ChangeExtension(path, ".json");
-        try
+        using var projectFile = new ProjectFileScope();
+        var projectPath = projectFile.ProjectPath;
+        var vm = new FreeformHelperViewModel { PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath) };
+        SetColor(vm, colorName, Color.Parse("#112233"));
+        SetHex(vm, colorName, "#aabbcc");
+        var loaded = new FreeformHelperViewModel
         {
-            var vm = new FreeformHelperViewModel { PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath) };
-            SetColor(vm, colorName, Color.Parse("#112233"));
-            SetHex(vm, colorName, "#aabbcc");
-            var loaded = new FreeformHelperViewModel
-            {
-                ApplyAppVisualPreferencesOnProjectLoad = false,
-                PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
-            };
-            SetColor(loaded, colorName, Color.Parse("#445566"));
-            var changes = ObserveChanges(loaded);
+            ApplyAppVisualPreferencesOnProjectLoad = false,
+            PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
+        };
+        SetColor(loaded, colorName, Color.Parse("#445566"));
+        var changes = ObserveChanges(loaded);
 
-            Assert.True(await vm.SaveProjectAsync());
-            var saved = JsonProjectStore.Load(projectPath);
-            await loaded.LoadProjectCommand.ExecuteAsync(null);
+        Assert.True(await vm.SaveProjectAsync());
+        var saved = JsonProjectStore.Load(projectPath);
+        await loaded.LoadProjectCommand.ExecuteAsync(null);
 
-            Assert.Equal("#AABBCC", GetSnapshotHex(saved.UiSnapshot.View, colorName));
-            AssertPair(loaded, colorName, "#AABBCC", Color.Parse("#AABBCC"));
-            AssertPairChanges(changes, colorName, HexName(colorName));
-            await WaitForGridRebuildAsync(loaded);
-        }
-        finally
-        {
-            File.Delete(path);
-            File.Delete(projectPath);
-        }
+        Assert.Equal("#AABBCC", GetSnapshotHex(saved.UiSnapshot.View, colorName));
+        AssertPair(loaded, colorName, "#AABBCC", Color.Parse("#AABBCC"));
+        AssertPairChanges(changes, colorName, HexName(colorName));
+        await WaitForGridRebuildAsync(loaded);
     }
 
     [AvaloniaTheory]
@@ -363,36 +374,28 @@ public sealed class ColorHexPairBehaviorTests
     public async Task SaveProjectAsync_SameColorSpelling_RoundTripsTypedTextForSameReceivingColor(
         string colorName, string originalHex, string typedHex)
     {
-        var path = CreateTempDxfFile(("signal", 0, 0, 10, 20));
-        var projectPath = Path.ChangeExtension(path, ".json");
-        try
+        using var projectFile = new ProjectFileScope();
+        var projectPath = projectFile.ProjectPath;
+        var vm = new FreeformHelperViewModel { PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath) };
+        var color = Color.Parse(originalHex);
+        SetColor(vm, colorName, color);
+        SetHex(vm, colorName, typedHex);
+        var loaded = new FreeformHelperViewModel
         {
-            var vm = new FreeformHelperViewModel { PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath) };
-            var color = Color.Parse(originalHex);
-            SetColor(vm, colorName, color);
-            SetHex(vm, colorName, typedHex);
-            var loaded = new FreeformHelperViewModel
-            {
-                ApplyAppVisualPreferencesOnProjectLoad = false,
-                PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
-            };
-            SetColor(loaded, colorName, color);
-            var changes = ObserveChanges(loaded);
+            ApplyAppVisualPreferencesOnProjectLoad = false,
+            PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
+        };
+        SetColor(loaded, colorName, color);
+        var changes = ObserveChanges(loaded);
 
-            Assert.True(await vm.SaveProjectAsync());
-            var saved = JsonProjectStore.Load(projectPath);
-            await loaded.LoadProjectCommand.ExecuteAsync(null);
+        Assert.True(await vm.SaveProjectAsync());
+        var saved = JsonProjectStore.Load(projectPath);
+        await loaded.LoadProjectCommand.ExecuteAsync(null);
 
-            Assert.Equal(typedHex, GetSnapshotHex(saved.UiSnapshot.View, colorName));
-            AssertPair(loaded, colorName, typedHex, color);
-            AssertPairChanges(changes, HexName(colorName));
-            await WaitForGridRebuildAsync(loaded);
-        }
-        finally
-        {
-            File.Delete(path);
-            File.Delete(projectPath);
-        }
+        Assert.Equal(typedHex, GetSnapshotHex(saved.UiSnapshot.View, colorName));
+        AssertPair(loaded, colorName, typedHex, color);
+        AssertPairChanges(changes, HexName(colorName));
+        await WaitForGridRebuildAsync(loaded);
     }
 
     [AvaloniaTheory]
@@ -401,36 +404,28 @@ public sealed class ColorHexPairBehaviorTests
     [InlineData("RegularSelectedColor")]
     public async Task SaveProjectAsync_InvalidHex_RoundTripsTextAndKeepsReceivingColor(string colorName)
     {
-        var path = CreateTempDxfFile(("signal", 0, 0, 10, 20));
-        var projectPath = Path.ChangeExtension(path, ".json");
-        try
+        using var projectFile = new ProjectFileScope();
+        var projectPath = projectFile.ProjectPath;
+        var vm = new FreeformHelperViewModel { PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath) };
+        SetColor(vm, colorName, Color.Parse("#112233"));
+        SetHex(vm, colorName, "#GGGGGG");
+        var loaded = new FreeformHelperViewModel
         {
-            var vm = new FreeformHelperViewModel { PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath) };
-            SetColor(vm, colorName, Color.Parse("#112233"));
-            SetHex(vm, colorName, "#GGGGGG");
-            var loaded = new FreeformHelperViewModel
-            {
-                ApplyAppVisualPreferencesOnProjectLoad = false,
-                PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
-            };
-            SetColor(loaded, colorName, Color.Parse("#445566"));
-            var changes = ObserveChanges(loaded);
+            ApplyAppVisualPreferencesOnProjectLoad = false,
+            PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
+        };
+        SetColor(loaded, colorName, Color.Parse("#445566"));
+        var changes = ObserveChanges(loaded);
 
-            Assert.True(await vm.SaveProjectAsync());
-            var saved = JsonProjectStore.Load(projectPath);
-            await loaded.LoadProjectCommand.ExecuteAsync(null);
+        Assert.True(await vm.SaveProjectAsync());
+        var saved = JsonProjectStore.Load(projectPath);
+        await loaded.LoadProjectCommand.ExecuteAsync(null);
 
-            Assert.Equal("#GGGGGG", GetSnapshotHex(saved.UiSnapshot.View, colorName));
-            AssertPair(vm, colorName, "#GGGGGG", Color.Parse("#112233"));
-            AssertPair(loaded, colorName, "#GGGGGG", Color.Parse("#445566"));
-            AssertPairChanges(changes, HexName(colorName));
-            await WaitForGridRebuildAsync(loaded);
-        }
-        finally
-        {
-            File.Delete(path);
-            File.Delete(projectPath);
-        }
+        Assert.Equal("#GGGGGG", GetSnapshotHex(saved.UiSnapshot.View, colorName));
+        AssertPair(vm, colorName, "#GGGGGG", Color.Parse("#112233"));
+        AssertPair(loaded, colorName, "#GGGGGG", Color.Parse("#445566"));
+        AssertPairChanges(changes, HexName(colorName));
+        await WaitForGridRebuildAsync(loaded);
     }
 
     [AvaloniaTheory]
@@ -443,36 +438,28 @@ public sealed class ColorHexPairBehaviorTests
     public async Task SaveProjectAsync_BlankHex_WritesTextButLoadLeavesReceivingPairUntouched(
         string colorName, string typedHex)
     {
-        var path = CreateTempDxfFile(("signal", 0, 0, 10, 20));
-        var projectPath = Path.ChangeExtension(path, ".json");
-        try
+        using var projectFile = new ProjectFileScope();
+        var projectPath = projectFile.ProjectPath;
+        var vm = new FreeformHelperViewModel { PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath) };
+        SetColor(vm, colorName, Color.Parse("#112233"));
+        SetHex(vm, colorName, typedHex);
+        var loaded = new FreeformHelperViewModel
         {
-            var vm = new FreeformHelperViewModel { PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath) };
-            SetColor(vm, colorName, Color.Parse("#112233"));
-            SetHex(vm, colorName, typedHex);
-            var loaded = new FreeformHelperViewModel
-            {
-                ApplyAppVisualPreferencesOnProjectLoad = false,
-                PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
-            };
-            SetColor(loaded, colorName, Color.Parse("#445566"));
-            SetHex(loaded, colorName, "#GGGGGG");
-            var changes = ObserveChanges(loaded);
+            ApplyAppVisualPreferencesOnProjectLoad = false,
+            PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
+        };
+        SetColor(loaded, colorName, Color.Parse("#445566"));
+        SetHex(loaded, colorName, "#GGGGGG");
+        var changes = ObserveChanges(loaded);
 
-            Assert.True(await vm.SaveProjectAsync());
-            var saved = JsonProjectStore.Load(projectPath);
-            await loaded.LoadProjectCommand.ExecuteAsync(null);
+        Assert.True(await vm.SaveProjectAsync());
+        var saved = JsonProjectStore.Load(projectPath);
+        await loaded.LoadProjectCommand.ExecuteAsync(null);
 
-            Assert.Equal(typedHex, GetSnapshotHex(saved.UiSnapshot.View, colorName));
-            AssertPair(loaded, colorName, "#GGGGGG", Color.Parse("#445566"));
-            AssertPairChanges(changes);
-            await WaitForGridRebuildAsync(loaded);
-        }
-        finally
-        {
-            File.Delete(path);
-            File.Delete(projectPath);
-        }
+        Assert.Equal(typedHex, GetSnapshotHex(saved.UiSnapshot.View, colorName));
+        AssertPair(loaded, colorName, "#GGGGGG", Color.Parse("#445566"));
+        AssertPairChanges(changes);
+        await WaitForGridRebuildAsync(loaded);
     }
 
     [AvaloniaTheory]
@@ -485,41 +472,34 @@ public sealed class ColorHexPairBehaviorTests
     public async Task LoadProjectCommand_ColorSnapshot_DoesNotRecordUndoOrMarkPairDirty(
         string colorName, string snapshotHex, string expectedHex, string expectedColor)
     {
-        var path = CreateTempDxfFile(("signal", 0, 0, 10, 20));
-        var projectPath = Path.ChangeExtension(path, ".json");
-        try
+        using var projectFile = new ProjectFileScope();
+        var projectPath = projectFile.ProjectPath;
+        var project = new ProjectFile();
+        SetSnapshotHex(project.UiSnapshot.View, colorName, snapshotHex);
+        await new JsonProjectStore().SaveAsync(projectPath, project, CancellationToken.None);
+        var vm = new FreeformHelperViewModel
         {
-            var project = new ProjectFile();
-            SetSnapshotHex(project.UiSnapshot.View, colorName, snapshotHex);
-            await new JsonProjectStore().SaveAsync(projectPath, project, CancellationToken.None);
-            var vm = new FreeformHelperViewModel
-            {
-                ApplyAppVisualPreferencesOnProjectLoad = false,
-                PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
-            };
-            SetColor(vm, colorName, Color.Parse("#112233"));
-            Assert.False(vm.CanUndo);
-            Assert.False(vm.HasUnsavedChanges);
-            var changes = ObserveChanges(vm);
-            var statesAtPairChanges = new ConcurrentQueue<(bool CanUndo, bool Dirty)>();
-            vm.PropertyChanged += (_, change) => RecordPairState(vm, change.PropertyName, statesAtPairChanges);
+            ApplyAppVisualPreferencesOnProjectLoad = false,
+            PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
+        };
+        SetColor(vm, colorName, Color.Parse("#112233"));
+        Assert.False(vm.CanUndo);
+        Assert.False(vm.HasUnsavedChanges);
+        var changes = ObserveChanges(vm);
+        var statesAtPairChanges = new ConcurrentQueue<(bool CanUndo, bool Dirty)>();
+        vm.PropertyChanged += (_, change) => RecordPairState(vm, change.PropertyName, statesAtPairChanges);
 
-            await vm.LoadProjectCommand.ExecuteAsync(null);
+        await vm.LoadProjectCommand.ExecuteAsync(null);
 
-            AssertPair(vm, colorName, expectedHex, Color.Parse(expectedColor));
-            AssertLoadedPairChanges(changes, colorName, snapshotHex);
-            Assert.NotEmpty(statesAtPairChanges);
-            Assert.All(statesAtPairChanges, state => Assert.Equal((false, false), state));
-            Assert.DoesNotContain(nameof(vm.CanUndo), changes);
-            Assert.False(vm.CanUndo);
-            Assert.False(vm.HasUnsavedChanges);
-            await WaitForGridRebuildAsync(vm);
-        }
-        finally
-        {
-            File.Delete(path);
-            File.Delete(projectPath);
-        }
+        AssertPair(vm, colorName, expectedHex, Color.Parse(expectedColor));
+        AssertLoadedPairChanges(changes, colorName, snapshotHex);
+        Assert.NotEmpty(statesAtPairChanges);
+        Assert.All(statesAtPairChanges, state => Assert.Equal((false, false), state));
+        Assert.DoesNotContain(nameof(vm.CanUndo), changes);
+        Assert.DoesNotContain(nameof(vm.HasUnsavedChanges), changes);
+        Assert.False(vm.CanUndo);
+        Assert.False(vm.HasUnsavedChanges);
+        await WaitForGridRebuildAsync(vm);
     }
 
     [AvaloniaTheory]
@@ -562,6 +542,25 @@ public sealed class ColorHexPairBehaviorTests
         AssertPair(vm, colorName, "#GGGGGG", token);
         Assert.Empty(changes);
         Assert.True(vm.CanUndo);
+    }
+
+    private sealed class ProjectFileScope : IDisposable
+    {
+        private readonly string _dxfPath;
+
+        public ProjectFileScope()
+        {
+            _dxfPath = CreateTempDxfFile(("signal", 0, 0, 10, 20));
+            ProjectPath = Path.ChangeExtension(_dxfPath, ".json");
+        }
+
+        public string ProjectPath { get; }
+
+        public void Dispose()
+        {
+            File.Delete(_dxfPath);
+            File.Delete(ProjectPath);
+        }
     }
 
     private static ConcurrentQueue<string?> ObserveChanges(FreeformHelperViewModel vm)
