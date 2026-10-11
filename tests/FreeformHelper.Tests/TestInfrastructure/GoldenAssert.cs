@@ -9,6 +9,8 @@ namespace FreeformHelper.Tests.TestInfrastructure;
 /// <summary>
 /// Compares text that comes from the private example data. A failure names the label, the size, the hash and the
 /// position of the first difference. It never prints the text itself: the log of a public CI run is public.
+/// A fragment that is missing has no first difference, so <see cref="TextContains"/> names the label, the size and
+/// the hash of both texts.
 /// </summary>
 internal static class GoldenAssert
 {
@@ -38,6 +40,33 @@ internal static class GoldenAssert
 
         Assert.Fail(
             $"Golden text lacks an expected fragment: {label}. Fragment {Summarize(fragment)}. Text {Summarize(text)}.");
+    }
+
+    /// <summary>
+    /// Returns the one item that matches. A failure names the label and the two counts, and never formats an item:
+    /// <c>Assert.Single(collection, predicate)</c> prints the whole collection, and the items carry private values.
+    /// </summary>
+    public static T SingleMatch<T>(IEnumerable<T> items, Func<T, bool> predicate, string label)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(predicate);
+        var total = 0;
+        var matches = new List<T>();
+        foreach (var item in items)
+        {
+            total++;
+            if (predicate(item))
+            {
+                matches.Add(item);
+            }
+        }
+
+        if (matches.Count != 1)
+        {
+            Assert.Fail($"Golden collection does not hold exactly one match: {label}. Items {total}, matches {matches.Count}.");
+        }
+
+        return matches[0];
     }
 
     private static int FirstDifference(string expected, string actual)
