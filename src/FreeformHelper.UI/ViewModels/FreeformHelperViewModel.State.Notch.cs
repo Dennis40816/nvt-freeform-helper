@@ -130,17 +130,17 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     [ObservableProperty] private ObservableCollection<NotchValidationDisplayItem> _notchValidationItems = new();
     /// <summary>
-    /// Gets or sets direct row count for Step 6 validation.
+    /// Gets direct row count for Step 6 validation.
     /// </summary>
-    [ObservableProperty] private int _notchValidationDirectCount;
+    public int NotchValidationDirectCount => NotchValidationDirectItems.Count;
     /// <summary>
-    /// Gets or sets incoming row count for Step 6 validation.
+    /// Gets incoming row count for Step 6 validation.
     /// </summary>
-    [ObservableProperty] private int _notchValidationIncomingCount;
+    public int NotchValidationIncomingCount => NotchValidationIncomingItems.Count;
     /// <summary>
-    /// Gets or sets outgoing row count for Step 6 validation.
+    /// Gets outgoing row count for Step 6 validation.
     /// </summary>
-    [ObservableProperty] private int _notchValidationOutgoingCount;
+    public int NotchValidationOutgoingCount => NotchValidationOutgoingItems.Count;
     /// <summary>
     /// Gets a value indicating whether Step 6 merged validation list contains rows.
     /// </summary>

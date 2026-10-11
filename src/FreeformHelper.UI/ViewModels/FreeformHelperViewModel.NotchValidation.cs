@@ -48,12 +48,10 @@ public sealed partial class FreeformHelperViewModel
         var outgoingItems = trace.OutgoingRows.Select(ToDisplayItem).ToList();
 
         NotchValidationItems = new ObservableCollection<NotchValidationDisplayItem>(mergedItems);
-        NotchValidationDirectItems = new ObservableCollection<NotchValidationDisplayItem>(directItems);
-        NotchValidationIncomingItems = new ObservableCollection<NotchValidationDisplayItem>(incomingItems);
-        NotchValidationOutgoingItems = new ObservableCollection<NotchValidationDisplayItem>(outgoingItems);
-        NotchValidationDirectCount = directItems.Count;
-        NotchValidationIncomingCount = incomingItems.Count;
-        NotchValidationOutgoingCount = outgoingItems.Count;
+        ReplaceNotchValidationGroupItems(
+            new ObservableCollection<NotchValidationDisplayItem>(directItems),
+            new ObservableCollection<NotchValidationDisplayItem>(incomingItems),
+            new ObservableCollection<NotchValidationDisplayItem>(outgoingItems));
 
         NotchValidationSummaryText =
             $"REG {report.RegularPadId} | IC{report.IcIndex + 1}/diff{report.DiffIndex} | rows={mergedItems.Count} (direct={directItems.Count}, in={incomingItems.Count}, out={outgoingItems.Count})";
@@ -137,12 +135,37 @@ public sealed partial class FreeformHelperViewModel
     private void ClearNotchValidationCollections()
     {
         NotchValidationItems = new ObservableCollection<NotchValidationDisplayItem>();
-        NotchValidationDirectItems = new ObservableCollection<NotchValidationDisplayItem>();
-        NotchValidationIncomingItems = new ObservableCollection<NotchValidationDisplayItem>();
-        NotchValidationOutgoingItems = new ObservableCollection<NotchValidationDisplayItem>();
-        NotchValidationDirectCount = 0;
-        NotchValidationIncomingCount = 0;
-        NotchValidationOutgoingCount = 0;
+        ReplaceNotchValidationGroupItems(new(), new(), new());
+    }
+
+    private void ReplaceNotchValidationGroupItems(
+        ObservableCollection<NotchValidationDisplayItem> directItems,
+        ObservableCollection<NotchValidationDisplayItem> incomingItems,
+        ObservableCollection<NotchValidationDisplayItem> outgoingItems)
+    {
+        var previousDirectCount = NotchValidationDirectCount;
+        var previousIncomingCount = NotchValidationIncomingCount;
+        var previousOutgoingCount = NotchValidationOutgoingCount;
+
+        NotchValidationDirectItems = directItems;
+        NotchValidationIncomingItems = incomingItems;
+        NotchValidationOutgoingItems = outgoingItems;
+
+        // Keep count notifications after all collection notifications, in the original setter order.
+        if (previousDirectCount != NotchValidationDirectCount)
+        {
+            OnPropertyChanged(nameof(NotchValidationDirectCount));
+        }
+
+        if (previousIncomingCount != NotchValidationIncomingCount)
+        {
+            OnPropertyChanged(nameof(NotchValidationIncomingCount));
+        }
+
+        if (previousOutgoingCount != NotchValidationOutgoingCount)
+        {
+            OnPropertyChanged(nameof(NotchValidationOutgoingCount));
+        }
     }
 
     private void InvalidateNotchValidationCache()
