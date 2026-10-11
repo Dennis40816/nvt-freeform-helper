@@ -4,7 +4,9 @@ param(
     [string]$Configuration = "Debug",
     [switch]$UseNoAppHost,
     [switch]$ValidateOnly,
-    [switch]$AllowMissingExampleData
+    [switch]$AllowMissingExampleData,
+    # Internal CI result collection. Policy and summaries belong to verify.ps1, which owns shards.
+    [string]$ResultsDirectory = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -182,8 +184,13 @@ if (-not [string]::IsNullOrWhiteSpace($filter)) {
     $args += @("--filter", $filter)
 }
 
-Write-Host "Running test group '$Group' ($Configuration)..."
-Write-Host "Command: dotnet $($args -join ' ')"
+if (-not [string]::IsNullOrWhiteSpace($ResultsDirectory)) {
+    $args += @("-m:4", "-nodeReuse:false", "--logger", "trx;LogFileName=$Group.trx",
+        "--results-directory", $ResultsDirectory)
+} else {
+    Write-Host "Running test group '$Group' ($Configuration)..."
+    Write-Host "Command: dotnet $($args -join ' ')"
+}
 
 # Tests that read the private example data skip when it is absent. A gate must not pass that way, so the
 # data is required unless the caller says it has no access. Data that is present is always checked, so
@@ -213,7 +220,12 @@ try {
         [Environment]::SetEnvironmentVariable("TMPDIR", $testTempPath)
     }
     [Environment]::SetEnvironmentVariable($requireExampleDataEnv, $(if ($exampleDataPresent) { "1" } else { [NullString]::Value }))
-    dotnet @args
+    if (-not [string]::IsNullOrWhiteSpace($ResultsDirectory)) {
+        # Even a console logger can expose theory arguments or assertions. Only the safe summary leaves CI.
+        dotnet @args *> $null
+    } else {
+        dotnet @args
+    }
     $testExitCode = $LASTEXITCODE
 }
 finally {

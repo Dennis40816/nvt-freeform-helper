@@ -41,6 +41,35 @@ Scripts are grouped by purpose to keep any single directory from becoming crowde
   - `lint.ps1`: Lint entry point. By default it checks changed files. `-AllFiles` checks everything. `-AnalyzerScope Solution` runs analyzers across the full solution. It runs CRLF normalization automatically before linting. Use `-SkipNormalizeLineEndings` to turn this off.
   - `update-ui-baseline.ps1`: UI baseline dry run and apply.
 
+## Opt-in golden shard checks
+
+Run `./scripts/tests/check-test-shard-policy.ps1` by hand to exercise the shard policies; the structure lane does not run this harness.
+The workflow change that enables floors adds it as a separate step.
+
+`./scripts/verify.ps1 -CiLane test -Shard core -EnforceFloors -SummaryPath build/ci-test-summaries/core/shard-summary.json`
+collects TRX under `build/ci-test-results/`, checks counts, zero skips, required golden classes,
+example-data execution and unset update-mode variables, writes a counts-and-method-names summary,
+then deletes the private results. Tests keep the existing implicit restore behavior of `dotnet test`;
+`verify.ps1` fetches and verifies Core packages first, so no extra workflow restore step is needed. Without
+`-EnforceFloors` the existing behavior is unchanged. The baseline is `scripts/ci/test-baseline.json`;
+raise a floor with `./scripts/ci/update-test-baseline.ps1 -Shard core -ResultsDirectory <trx-directory>`.
+This script reads results only and never lowers a floor; lowering requires a reviewed hand edit.
+Add `-ExampleDataPresent` to raise the example-data method floor as well.
+Only TRX runs with overall outcome `Completed` are accepted. Other run outcomes set the summary's
+`outcome` to `failed` while preserving the test-row counts. The updater rejects unfinished runs and
+counts below either applicable floor without changing the baseline file.
+
+Event handling belongs to the workflow: fork and dependabot PRs pass `-EnforceFloors -Unverified`
+and run available tests, write `outcome: unverified`, then fail with `unverified, cannot merge`.
+Missing example data disables only the example-data checks. Zero skips and shard floors still apply.
+Baseline schema version 2 stores `exampleMinTests` and `requiredClasses` in each shard. Only the
+current shard's expectations apply when data is present: core has 11 distinct example-data methods
+and the three golden classes; viewmodel has 15 methods and no required classes; ui and snapshots
+have 0 methods and no required classes, so they have no example-data check. Summary schema version 1
+is unchanged; `exampleData.executed` counts distinct methods in this shard, independent of theory rows.
+`build/ci-test-results/` must **never be uploaded**. Upload only the explicit `shard-summary.json`;
+do not upload `TestResults/`, TRX, sequence files, or the containing `build/` directory.
+
 ## Quick Commands
 
 ```powershell
