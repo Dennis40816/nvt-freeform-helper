@@ -64,6 +64,9 @@ jobs:
         run: ./scripts/verify.ps1 -CiLane build -AllowMissingExampleData
       # The baseline and the test-debt ledger were enrolled with English tool output. A pull request is also
       # compared with its base commit, so the ledgers cannot grow and the checker files cannot drift.
+      # A push to main or to the trunk runs without a base commit on purpose: the pull request run and the
+      # ruleset already compared the change with its base, and a push comparison would report the pin
+      # synchronization pull request as drift after it was approved by design (Core issue 197).
       - name: Verify enrolled C# code health
         shell: pwsh
         env:
@@ -85,6 +88,19 @@ jobs:
             pwsh -NoProfile -File eng/core-health/repo-health.ps1 -Mode Verify -Repo nfh -Root . -Solution FreeformHelper.sln
           }
           exit $LASTEXITCODE
+      - name: Upload the code-health evidence
+        # Only the SARIF files and the tool logs of this job. The build job does not check out the private
+        # example data, and the files hold rule ids, paths of this public repository and messages. Never
+        # upload bin/, obj/ or a whole artifacts/ folder.
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dotnet-build-code-health-attempt-${{ github.run_attempt }}
+          path: |
+            artifacts/code-health/*.sarif
+            artifacts/code-health/*.log
+          if-no-files-found: ignore
+          retention-days: 3
 
   dotnet-test:
     name: dotnet / test (${{ matrix.shard }})
@@ -127,7 +143,7 @@ jobs:
         if: env.HAS_TESTDATA_KEY == 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ${{ github.repository_owner }}/FreeformHelper-testdata
+          repository: ${{ github.repository_owner }}/nvt-testdata
           ref: ${{ steps.example.outputs.sha }}
           ssh-key: ${{ secrets.TESTDATA_DEPLOY_KEY }}
           path: example
