@@ -575,6 +575,60 @@ public sealed class DxfEditCountProjectionTests
         }
     }
 
+    [Fact]
+    public async Task ClearCombinedCadPadsCommand_NoCombinedGroup_RaisesNoProjectionChanges()
+    {
+        var path = CreateTempDxfFile(("signal", 0, 0, 10, 20));
+        try
+        {
+            var vm = new FreeformHelperViewModel { PickOpenDxfPathAsync = () => Task.FromResult<string?>(path) };
+            await vm.OpenDxfCommand.ExecuteAsync(null);
+            await SelectCadPadsAsync(vm, [vm.CadPads[0].Id]);
+            var changes = ObserveDxfEditChanges(vm);
+
+            vm.ClearCombinedCadPadsCommand.Execute(null);
+
+            AssertDxfEditCounts(vm, 0, 0, 0, 0, 0, false);
+            AssertProjectionChanges(changes);
+            await WaitForGridRebuildAsync(vm);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public async Task LoadProjectCommand_WithoutDxfAndNoEdits_RaisesNoProjectionChanges()
+    {
+        var path = CreateTempDxfFile(("signal", 0, 0, 10, 20));
+        var projectPath = Path.ChangeExtension(path, ".json");
+        try
+        {
+            await new FreeformHelper.Infrastructure.Project.JsonProjectStore().SaveAsync(projectPath,
+                new FreeformHelper.Infrastructure.Project.ProjectFile(), CancellationToken.None);
+            var vm = new FreeformHelperViewModel
+            {
+                PickOpenDxfPathAsync = () => Task.FromResult<string?>(path),
+                PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
+            };
+            await vm.OpenDxfCommand.ExecuteAsync(null);
+            await WaitForGridRebuildAsync(vm);
+            var changes = ObserveDxfEditChanges(vm);
+
+            await vm.LoadProjectCommand.ExecuteAsync(null);
+
+            AssertDxfEditCounts(vm, 0, 0, 0, 0, 0, false);
+            AssertProjectionChanges(changes);
+            await WaitForGridRebuildAsync(vm);
+        }
+        finally
+        {
+            File.Delete(path);
+            File.Delete(projectPath);
+        }
+    }
+
     private static ConcurrentQueue<string?> ObserveDxfEditChanges(FreeformHelperViewModel vm)
     {
         var changes = new ConcurrentQueue<string?>();

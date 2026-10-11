@@ -368,7 +368,7 @@ public sealed partial class FreeformHelperViewModelTests
         }
     }
 
-    private static async Task<FreeformHelperViewModel> CreateNotchExportCacheViewModelAsync(
+    internal static async Task<FreeformHelperViewModel> CreateNotchExportCacheViewModelAsync(
         string dxfPath,
         string? projectPath = null)
     {
@@ -430,7 +430,7 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Contains(expected, payload, StringComparison.Ordinal);
     }
 
-    private static async Task<string> ExportNotchProfileAsync(
+    internal static async Task<string> ExportNotchProfileAsync(
         FreeformHelperViewModel vm,
         NotchExportProfile profile,
         string outputPath)
