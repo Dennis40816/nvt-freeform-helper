@@ -105,7 +105,9 @@ public sealed class ExampleProjectFixtureTests
             var firstDirectory = Path.GetDirectoryName(first.ProjectPath)!;
             var secondDirectory = Path.GetDirectoryName(second.ProjectPath)!;
 
-            Assert.NotEqual(firstDirectory, secondDirectory);
+            Assert.False(
+                string.Equals(firstDirectory, secondDirectory, StringComparison.Ordinal),
+                "The two working copies share a folder.");
             Assert.Equal(Path.TrimEndingDirectorySeparator(Path.GetTempPath()), Path.GetDirectoryName(firstDirectory));
             Assert.Equal("project.json", Path.GetFileName(first.ProjectPath));
             Assert.True(File.Exists(first.ProjectPath));
