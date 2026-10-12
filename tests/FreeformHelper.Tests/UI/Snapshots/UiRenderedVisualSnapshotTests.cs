@@ -2,11 +2,13 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
 using FreeformHelper.UI.ViewModels;
@@ -56,6 +58,12 @@ public sealed class UiRenderedVisualSnapshotTests
             shell.ShowWorkspaceCommand.Execute(null);
             await FlushUiQueueAsync();
             var after = CaptureRenderedBuffer(window);
+
+            // The console header shows the line count of the process-wide log store, and the navigation under
+            // test and other work in the same process add lines. That text is not workspace content.
+            var console = FindConsoleRegion(window);
+            MaskRegion(before, console);
+            MaskRegion(after, console);
 
             Assert.Equal(
                 ComputeAverageHashHex(before.Buffer, before.Width, before.Height, before.Stride, 16),
@@ -212,6 +220,33 @@ public sealed class UiRenderedVisualSnapshotTests
         var bytes = new byte[rowBytes * frameHeight];
         Marshal.Copy(locked.Address, bytes, 0, bytes.Length);
         return new RenderedBuffer(bytes, frameWidth, frameHeight, rowBytes);
+    }
+
+    private static PixelRect FindConsoleRegion(Window window)
+    {
+        var border = window.GetVisualDescendants()
+            .OfType<Border>()
+            .Single(static candidate => candidate.IsEffectivelyVisible && candidate.Name == "ConsoleBorder");
+        var origin = border.TranslatePoint(default, window);
+        Assert.NotNull(origin);
+        var scale = window.RenderScaling;
+        return new PixelRect(
+            (int)Math.Floor(origin.Value.X * scale),
+            (int)Math.Floor(origin.Value.Y * scale),
+            (int)Math.Ceiling(border.Bounds.Width * scale),
+            (int)Math.Ceiling(border.Bounds.Height * scale));
+    }
+
+    private static void MaskRegion(RenderedBuffer rendered, PixelRect region)
+    {
+        var left = Math.Clamp(region.X, 0, rendered.Width);
+        var right = Math.Clamp(region.X + region.Width, 0, rendered.Width);
+        var top = Math.Clamp(region.Y, 0, rendered.Height);
+        var bottom = Math.Clamp(region.Y + region.Height, 0, rendered.Height);
+        for (var y = top; y < bottom; y++)
+        {
+            Array.Clear(rendered.Buffer, (y * rendered.Stride) + (left * 4), (right - left) * 4);
+        }
     }
 
     private static async Task FlushUiQueueAsync()
