@@ -127,11 +127,19 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets a value indicating whether DXF overlap checking is currently running.
     /// </summary>
-    [ObservableProperty] private bool _isCheckingDxfOverlap;
+    public bool IsCheckingDxfOverlap
+    {
+        get => _dxfOverlapState.Current.IsBusy;
+        set => SetOperationBusy(_dxfOverlapState, value, nameof(IsCheckingDxfOverlap));
+    }
     /// <summary>
     /// Gets or sets the current progress value (0-1) for DXF overlap checking.
     /// </summary>
-    [ObservableProperty] private double _dxfOverlapProgress;
+    public double DxfOverlapProgress
+    {
+        get => _dxfOverlapState.Current.Progress;
+        set => SetOperationProgress(_dxfOverlapState, value, nameof(DxfOverlapProgress));
+    }
     /// <summary>
     /// Gets or sets CAD pad IDs highlighted by overlap checking.
     /// </summary>
@@ -248,19 +256,36 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets a value indicating whether pad matching is currently running.
     /// </summary>
-    [ObservableProperty] private bool _isMatchingPads;
+    public bool IsMatchingPads
+    {
+        get => _matchState.Current.IsBusy;
+        set => SetOperationBusy(_matchState, value, nameof(IsMatchingPads));
+    }
     /// <summary>
     /// Gets or sets the current progress value (0-1) for pad matching.
     /// </summary>
-    [ObservableProperty] private double _matchProgress;
+    public double MatchProgress
+    {
+        get => _matchState.Current.Progress;
+        set => SetOperationProgress(_matchState, value, nameof(MatchProgress));
+    }
     /// <summary>
     /// Gets or sets a value indicating whether index mapping diagnostics are currently running.
     /// </summary>
-    [ObservableProperty] private bool _isAnalyzingIndexMapping;
+    public bool IsAnalyzingIndexMapping
+    {
+        get => _indexMappingState.Current.IsBusy;
+        set => SetOperationBusy(_indexMappingState, value, nameof(IsAnalyzingIndexMapping));
+    }
     /// <summary>
     /// Gets or sets the current progress value (0-1) for index mapping diagnostics.
     /// </summary>
-    [ObservableProperty] private double _indexMappingProgress;
+    public double IndexMappingProgress
+    {
+        get => _indexMappingState.Current.Progress;
+        set => SetOperationProgress(_indexMappingState, value, nameof(IndexMappingProgress));
+    }
+
     /// <summary>
     /// Gets or sets the observable collection of detailed DXF/Regular mapping issues.
     /// </summary>

@@ -23,7 +23,6 @@ public sealed partial class FreeformHelperViewModel
         {
             return;
         }
-
         await RunUiProgressOperationAsync(
             operationName: "DXF/Regular mapping analysis",
             setBusy: busy => IsAnalyzingIndexMapping = busy,
@@ -38,77 +37,78 @@ public sealed partial class FreeformHelperViewModel
                 SetStatus("Running mapping diagnostics...");
                 Logger.Info(CultureInfo.InvariantCulture, "Analyzing DXF/Regular mapping (cadVisible={0}, regular={1}).", cadVisible.Pads.Count, grid.Pads.Count);
             },
-            operationAsync: async reportProgress =>
-            {
-                var workflowSnapshot = BuildWorkflowDataSnapshot();
-                var res = await Task.Run(() => _dxfRegularMappingUseCase.Analyze(
-                    cadVisible,
-                    grid,
-                    _projectFile.Settings,
-                    _projectFile.DxfRegularMappingOverrides,
-                    workflowSnapshot.CadOutputFwDiffIndexByCadId,
-                    workflowSnapshot.CadToRegularByCadId,
-                    workflowSnapshot.CadIcIndexByCadId,
-                    workflowSnapshot.ActiveRegularVisibilityMaskPadIds,
-                    workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId,
-                    reportProgress));
-
-                var issueMessages = res.Report.SampleIssues.Select(i => $"[{i.Kind}] {i.Message}").ToList();
-
-                DxfRegularMappingIssues.Clear();
-                foreach (var message in issueMessages)
-                {
-                    DxfRegularMappingIssues.Add(message);
-                }
-
-                HasDxfRegularMappingIssues = (res.Report.HasIssues && res.Report.SampleIssues.Count > 0) ||
-                                            res.Report.MaskChangedCount > 0 ||
-                                            res.Report.MaskRemovedCount > 0;
-                DxfRegularMappingSummary = res.Report.HasIssues
-                    ? $"Diagnostics warnings: {res.Report.Summary}"
-                    : $"Diagnostics OK: {res.Report.Summary}";
-
-                SetStatus(BuildMappingStatusForWorkspaceHeader(res.Report));
-
-                if (OpenIndexMappingReportAsync is not null &&
-                    (res.Report.TotalIssueCount > 0 ||
-                     (res.Report.MaskAuditRows?.Count ?? 0) > 0))
-                {
-                    var reportViewModel = new IndexMappingReportViewModel(
-                        DxfRegularMappingSummary,
-                        res.Report,
-                        LocateMappingTargetFromReport,
-                        ApplyMappingOverrideFromReport,
-                        ApplyCadOutputFwDiffOverrideFromReport,
-                        ClearMappingOverrideFromReport,
-                        GetMappingOverrideRegularIndex);
-                    reportViewModel.Editing.AttachProject(this);
-                    await OpenIndexMappingReportAsync(reportViewModel);
-                }
-
-                if (res.Report.HasIssues)
-                {
-                    Logger.Warn(CultureInfo.InvariantCulture, "DXF/Regular mapping warnings: {0}", res.Report.Summary);
-                    foreach (var issue in res.Report.SampleIssues.Take(10))
-                    {
-                        Logger.Warn(CultureInfo.InvariantCulture, "Mapping issue: {0}", issue.Message);
-                    }
-                }
-                else
-                {
-                    Logger.Info(CultureInfo.InvariantCulture, "DXF/Regular mapping OK: {0}", res.Report.Summary);
-                }
-
-                OnWorkflowStepCompleted(
-                    WorkflowStepId.Step4IndexDiagnostics,
-                    invalidateDownstream: false,
-                    moveToNextStep: true);
-            },
+            operationAsync: AnalyzeMappingAsync,
             onError: ex =>
             {
                 SetStatusError("Mapping analyze failed", ex);
                 Logger.Error(ex, "Mapping analyze failed.");
             });
+        async Task AnalyzeMappingAsync(Action<double> reportProgress)
+        {
+            var workflowSnapshot = BuildWorkflowDataSnapshot();
+            var res = await Task.Run(() => _dxfRegularMappingUseCase.Analyze(
+                cadVisible,
+                grid,
+                _projectFile.Settings,
+                _projectFile.DxfRegularMappingOverrides,
+                workflowSnapshot.CadOutputFwDiffIndexByCadId,
+                workflowSnapshot.CadToRegularByCadId,
+                workflowSnapshot.CadIcIndexByCadId,
+                workflowSnapshot.ActiveRegularVisibilityMaskPadIds,
+                workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId,
+                reportProgress));
+
+            var issueMessages = res.Report.SampleIssues.Select(i => $"[{i.Kind}] {i.Message}").ToList();
+
+            DxfRegularMappingIssues.Clear();
+            foreach (var message in issueMessages)
+            {
+                DxfRegularMappingIssues.Add(message);
+            }
+
+            HasDxfRegularMappingIssues = (res.Report.HasIssues && res.Report.SampleIssues.Count > 0) ||
+                                        res.Report.MaskChangedCount > 0 ||
+                                        res.Report.MaskRemovedCount > 0;
+            DxfRegularMappingSummary = res.Report.HasIssues
+                ? $"Diagnostics warnings: {res.Report.Summary}"
+                : $"Diagnostics OK: {res.Report.Summary}";
+
+            SetStatus(BuildMappingStatusForWorkspaceHeader(res.Report));
+
+            if (OpenIndexMappingReportAsync is not null &&
+                (res.Report.TotalIssueCount > 0 ||
+                 (res.Report.MaskAuditRows?.Count ?? 0) > 0))
+            {
+                var reportViewModel = new IndexMappingReportViewModel(
+                    DxfRegularMappingSummary,
+                    res.Report,
+                    LocateMappingTargetFromReport,
+                    ApplyMappingOverrideFromReport,
+                    ApplyCadOutputFwDiffOverrideFromReport,
+                    ClearMappingOverrideFromReport,
+                    GetMappingOverrideRegularIndex);
+                reportViewModel.Editing.AttachProject(this);
+                await OpenIndexMappingReportAsync(reportViewModel);
+            }
+
+            if (res.Report.HasIssues)
+            {
+                Logger.Warn(CultureInfo.InvariantCulture, "DXF/Regular mapping warnings: {0}", res.Report.Summary);
+                foreach (var issue in res.Report.SampleIssues.Take(10))
+                {
+                    Logger.Warn(CultureInfo.InvariantCulture, "Mapping issue: {0}", issue.Message);
+                }
+            }
+            else
+            {
+                Logger.Info(CultureInfo.InvariantCulture, "DXF/Regular mapping OK: {0}", res.Report.Summary);
+            }
+
+            OnWorkflowStepCompleted(
+                WorkflowStepId.Step4IndexDiagnostics,
+                invalidateDownstream: false,
+                moveToNextStep: true);
+        }
     }
 
     private bool LocateMappingTargetFromReport(int? cadPadId, int? regularPadIndex)
