@@ -93,7 +93,7 @@ jobs:
         # example data, and the files hold rule ids, paths of this public repository and messages. Never
         # upload bin/, obj/ or a whole artifacts/ folder.
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dotnet-build-code-health-attempt-${{ github.run_attempt }}
           path: |
@@ -166,7 +166,7 @@ jobs:
         # The summary holds only counts, test class names and test method names. Never upload TRX files,
         # TestResults/, example/ or the build/ folder: a failed golden test can carry private text.
         if: failure() || cancelled()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dotnet-test-${{ matrix.shard }}-summary-attempt-${{ github.run_attempt }}
           path: build/ci-test-summaries/${{ matrix.shard }}/shard-summary.json
