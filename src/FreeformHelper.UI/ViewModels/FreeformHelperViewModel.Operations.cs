@@ -279,125 +279,130 @@ public sealed partial class FreeformHelperViewModel
     {
         await RunUiOperationAsync(
             operationName: "Grid rebuild",
-            operationAsync: async () =>
-            {
-                var hadRegularBefore = RegularPads.Count > 0;
-                ApplyUiToSettings(_projectFile.Settings);
-                SetStatus("Building regular grid...");
-                Logger.Info(CultureInfo.InvariantCulture, "Building regular grid.");
-                CanvasHintText = string.Empty;
-                var buildRequest = CreateGridRebuildBuildRequestSnapshot();
-                var buildResult = IsCadLoadCanvasOverlayVisible
-                    ? await Task.Run(() => _gridRebuildOrchestrator.Build(buildRequest))
-                    : _gridRebuildOrchestrator.Build(buildRequest);
-                if (!string.IsNullOrWhiteSpace(buildResult.DxfRegularSourceHint))
-                {
-                    DxfRegularSourceHint = buildResult.DxfRegularSourceHint;
-                }
-
-                if (!buildResult.Success || buildResult.Grid is null)
-                {
-                    SetStatus(buildResult.StatusText);
-                    ShowEmptyGridResult(buildResult.CanvasHint ?? string.Empty);
-                    return;
-                }
-
-                var grid = buildResult.Grid;
-                _grid = grid;
-                BumpNotchExportGridFingerprint();
-                InvalidateNotchCompensationCache();
-                SetLatestPadMatchResult(PadMatchResult.Empty);
-                MatchLinksForCanvas = Array.Empty<PadMatchLink>();
-                OnPropertyChanged(nameof(PitchSizeX));
-                OnPropertyChanged(nameof(PitchSizeY));
-                OnPropertyChanged(nameof(PitchSizeXSummary));
-                OnPropertyChanged(nameof(PitchSizeYSummary));
-
-                RegularPads = new ObservableCollection<RegularPad>(grid.Pads);
-                RefreshRegularVisibilityMask(grid);
-                ResetFreeformAutoDetectStats("Freeform stats: run Step 2 auto-detect.");
-                if (!_isLoadingSettings)
-                {
-                    ResetWorkflowFromStep(WorkflowStepId.Step1Match, showStatus: false);
-                }
-
-                if (CadPads.Count > 0)
-                {
-                    UpdateCadOutputFwDiffIndexing(CadPads.ToList());
-                }
-                RefreshDxfRegularSourceHint();
-                NotifySimulationWorkspaceSourceChanged();
-
-                var shouldClear = !SuppressSelectionClearOnRebuild;
-                SuppressSelectionClearOnRebuild = false;
-                if (shouldClear)
-                {
-                    _selectionCoordinator.ClearSelection(CanvasHost);
-                }
-
-                SetStatus(buildResult.StatusText);
-                Logger.Info(CultureInfo.InvariantCulture, "Grid built. Rows={0}, Cols={1}, Pads={2}.", grid.Rows, grid.Cols, grid.Pads.Count);
-                if (!_startupInitialGridBuiltMarked && _cad is null)
-                {
-                    StartupPerfTracker.Mark("workspace.initial-grid-built", $"pads={grid.Pads.Count}");
-                    _startupInitialGridBuiltMarked = true;
-                }
-
-                CanvasHost?.Invalidate();
-                if (_fitAfterNextGridBuild)
-                {
-                    CanvasHost?.FitToContent();
-                    _fitAfterNextGridBuild = false;
-                }
-                else if (_cad is null && !hadRegularBefore)
-                {
-                    CanvasHost?.FitToContent();
-                }
-
-                UpdateSelectedRangeSummary();
-                return;
-
-                void ShowEmptyGridResult(string hint)
-                {
-                    SetLatestPadMatchResult(PadMatchResult.Empty);
-                    MatchLinksForCanvas = Array.Empty<PadMatchLink>();
-                    _grid = null;
-                    BumpNotchExportGridFingerprint();
-                    InvalidateNotchCompensationCache();
-                    OnPropertyChanged(nameof(PitchSizeX));
-                    OnPropertyChanged(nameof(PitchSizeY));
-                    OnPropertyChanged(nameof(PitchSizeXSummary));
-                    OnPropertyChanged(nameof(PitchSizeYSummary));
-                    RegularPads = new ObservableCollection<RegularPad>();
-                    ApplyRegularVisibilityMaskResult(
-                        string.IsNullOrWhiteSpace(_regularVisibilityMaskSourcePath)
-                            ? RegularVisibilityMaskResult.NotFound()
-                            : RegularVisibilityMaskResult.NotFound(_regularVisibilityMaskSourcePath),
-                        grid: null);
-                    CanvasHintText = hint;
-                    ResetFreeformAutoDetectStats();
-                    if (!_isLoadingSettings)
-                    {
-                        ResetWorkflowFromStep(WorkflowStepId.Step1Match, showStatus: false);
-                    }
-
-                    var shouldClearSelection = !SuppressSelectionClearOnRebuild;
-                    SuppressSelectionClearOnRebuild = false;
-                    if (shouldClearSelection)
-                    {
-                        _selectionCoordinator.ClearSelection(CanvasHost);
-                    }
-
-                    CanvasHost?.Invalidate();
-                    UpdateSelectedRangeSummary();
-                    NotifySimulationWorkspaceSourceChanged();
-                }
-            },
+            operationAsync: RebuildGridCoreAsync,
             onError: ex =>
             {
                 SetStatusError("Rebuild grid failed", ex);
                 Logger.Error(ex, "Rebuild grid failed.");
             });
+    }
+
+    private async Task RebuildGridCoreAsync()
+    {
+        var hadRegularBefore = RegularPads.Count > 0;
+        ApplyUiToSettings(_projectFile.Settings);
+        SetStatus("Building regular grid...");
+        Logger.Info(CultureInfo.InvariantCulture, "Building regular grid.");
+        CanvasHintText = string.Empty;
+        var buildRequest = CreateGridRebuildBuildRequestSnapshot();
+        var buildResult = IsCadLoadCanvasOverlayVisible
+            ? await Task.Run(() => _gridRebuildOrchestrator.Build(buildRequest))
+            : _gridRebuildOrchestrator.Build(buildRequest);
+        if (!string.IsNullOrWhiteSpace(buildResult.DxfRegularSourceHint))
+        {
+            DxfRegularSourceHint = buildResult.DxfRegularSourceHint;
+        }
+
+        if (!buildResult.Success || buildResult.Grid is null)
+        {
+            SetStatus(buildResult.StatusText);
+            ShowEmptyGridResult(buildResult.CanvasHint ?? string.Empty);
+            return;
+        }
+
+        ApplyBuiltGrid(buildResult.Grid, buildResult.StatusText, hadRegularBefore);
+    }
+
+    private void ApplyBuiltGrid(RegularGrid grid, string statusText, bool hadRegularBefore)
+    {
+        _grid = grid;
+        BumpNotchExportGridFingerprint();
+        InvalidateNotchCompensationCache();
+        SetLatestPadMatchResult(PadMatchResult.Empty);
+        MatchLinksForCanvas = Array.Empty<PadMatchLink>();
+        OnPropertyChanged(nameof(PitchSizeX));
+        OnPropertyChanged(nameof(PitchSizeY));
+        OnPropertyChanged(nameof(PitchSizeXSummary));
+        OnPropertyChanged(nameof(PitchSizeYSummary));
+
+        RegularPads = new ObservableCollection<RegularPad>(grid.Pads);
+        RefreshRegularVisibilityMask(grid);
+        ResetFreeformAutoDetectStats("Freeform stats: run Step 2 auto-detect.");
+        if (!_isLoadingSettings)
+        {
+            ResetWorkflowFromStep(WorkflowStepId.Step1Match, showStatus: false);
+        }
+
+        if (CadPads.Count > 0)
+        {
+            UpdateCadOutputFwDiffIndexing(CadPads.ToList());
+        }
+        RefreshDxfRegularSourceHint();
+        NotifySimulationWorkspaceSourceChanged();
+
+        var shouldClear = !SuppressSelectionClearOnRebuild;
+        SuppressSelectionClearOnRebuild = false;
+        if (shouldClear)
+        {
+            _selectionCoordinator.ClearSelection(CanvasHost);
+        }
+
+        SetStatus(statusText);
+        Logger.Info(CultureInfo.InvariantCulture, "Grid built. Rows={0}, Cols={1}, Pads={2}.", grid.Rows, grid.Cols, grid.Pads.Count);
+        if (!_startupInitialGridBuiltMarked && _cad is null)
+        {
+            StartupPerfTracker.Mark("workspace.initial-grid-built", $"pads={grid.Pads.Count}");
+            _startupInitialGridBuiltMarked = true;
+        }
+
+        CanvasHost?.Invalidate();
+        if (_fitAfterNextGridBuild)
+        {
+            CanvasHost?.FitToContent();
+            _fitAfterNextGridBuild = false;
+        }
+        else if (_cad is null && !hadRegularBefore)
+        {
+            CanvasHost?.FitToContent();
+        }
+
+        UpdateSelectedRangeSummary();
+    }
+
+    private void ShowEmptyGridResult(string hint)
+    {
+        SetLatestPadMatchResult(PadMatchResult.Empty);
+        MatchLinksForCanvas = Array.Empty<PadMatchLink>();
+        _grid = null;
+        BumpNotchExportGridFingerprint();
+        InvalidateNotchCompensationCache();
+        OnPropertyChanged(nameof(PitchSizeX));
+        OnPropertyChanged(nameof(PitchSizeY));
+        OnPropertyChanged(nameof(PitchSizeXSummary));
+        OnPropertyChanged(nameof(PitchSizeYSummary));
+        RegularPads = new ObservableCollection<RegularPad>();
+        ApplyRegularVisibilityMaskResult(
+            string.IsNullOrWhiteSpace(_regularVisibilityMaskSourcePath)
+                ? RegularVisibilityMaskResult.NotFound()
+                : RegularVisibilityMaskResult.NotFound(_regularVisibilityMaskSourcePath),
+            grid: null);
+        CanvasHintText = hint;
+        ResetFreeformAutoDetectStats();
+        if (!_isLoadingSettings)
+        {
+            ResetWorkflowFromStep(WorkflowStepId.Step1Match, showStatus: false);
+        }
+
+        var shouldClearSelection = !SuppressSelectionClearOnRebuild;
+        SuppressSelectionClearOnRebuild = false;
+        if (shouldClearSelection)
+        {
+            _selectionCoordinator.ClearSelection(CanvasHost);
+        }
+
+        CanvasHost?.Invalidate();
+        UpdateSelectedRangeSummary();
+        NotifySimulationWorkspaceSourceChanged();
     }
 
     private void ClearPadMatchResult(bool clearRegularAssignments)
