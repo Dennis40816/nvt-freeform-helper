@@ -8,7 +8,9 @@ param(
     [Parameter(Mandatory = $true)][string]$SummaryPath,
     [string]$Commit = "",
     [switch]$TestRunFailed,
-    [switch]$Unverified
+    [switch]$Unverified,
+    # Facts collected by the shard runner; they do not participate in verdicts or summaries.
+    [object[]]$RunDiagnostics = @()
 )
 
 Set-StrictMode -Version Latest
@@ -19,8 +21,9 @@ $invalid = $false
 $counts = [pscustomobject]@{ Completed = $false; Total = 0; Passed = 0; Failed = 0; Skipped = 0; NotExecuted = 0; FailedTests = @(); Results = @() }
 $checks = [ordered]@{ belowFloor = $false; skippedNotZero = $false; requiredClassMissing = $false; updateModeVariableSet = $false }
 $exampleExecuted = 0
+$readDiagnostics = @{}
 try {
-    $counts = Read-TrxResults -ResultsDirectory $ResultsDirectory
+    $counts = Read-TrxResults -ResultsDirectory $ResultsDirectory -ReadDiagnostics $readDiagnostics
     $baselineText = Get-Content -LiteralPath $BaselinePath -Raw
     if (-not (Test-Json -Json $baselineText -SchemaFile (Join-Path $PSScriptRoot "test-baseline.schema.json") -ErrorAction Stop)) {
         throw "Invalid baseline."
@@ -88,5 +91,36 @@ try {
 }
 Write-Host ("[check-test-shard] total {0} passed {1} failed {2} skipped {3} notExecuted {4}" -f
     $counts.Total, $counts.Passed, $counts.Failed, $counts.Skipped, $counts.NotExecuted)
+if ($counts.Total -eq 0 -and $RunDiagnostics.Count -gt 0) {
+    # The existing parse path identifies the failed group; never print an unrecognized directory name.
+    $diagnostic = $RunDiagnostics | Where-Object { $_.Group -ceq $readDiagnostics.FailedGroup } | Select-Object -First 1
+    $unknownDiagnostic = [pscustomobject]@{
+        Group = 'unknown'
+        Phase = 'read-results'
+        ExitCode = $null
+        ExceptionType = $readDiagnostics.ExceptionType
+        TrxFiles = $readDiagnostics.TrxFiles
+        DirectoryPresent = $readDiagnostics.DirectoryPresent -or @($RunDiagnostics | Where-Object DirectoryPresent).Count -gt 0
+    }
+    if ($null -eq $diagnostic -and $readDiagnostics.ExceptionType -ne '' -and $readDiagnostics.TrxFiles -gt 0) {
+        $diagnostic = $unknownDiagnostic
+    }
+    # Without a per-file failure, prefer an observed unfinished phase, then missing TRX.
+    if ($null -eq $diagnostic) {
+        $diagnostic = $RunDiagnostics | Where-Object { $_.Phase -ne 'read-results' } | Select-Object -First 1
+    }
+    if ($null -eq $diagnostic) {
+        $diagnostic = $RunDiagnostics | Where-Object { $_.TrxFiles -eq 0 } | Select-Object -First 1
+    }
+    if ($null -eq $diagnostic) {
+        $diagnostic = if ($readDiagnostics.ExceptionType -ne '') { $unknownDiagnostic } else { $RunDiagnostics[0] }
+    }
+    $exit = if ($null -ne $diagnostic.ExitCode) { [string][int]$diagnostic.ExitCode } else {
+        'exception exception-type={0}' -f $diagnostic.ExceptionType
+    }
+    $directory = if ($diagnostic.DirectoryPresent) { 'present' } else { 'missing' }
+    Write-Host ('[check-test-shard] diagnostic shard={0} group={1} phase={2} exit={3} trx-files={4} results-dir={5}' -f
+        $Shard, $diagnostic.Group, $diagnostic.Phase, $exit, $diagnostic.TrxFiles, $directory)
+}
 if ($Unverified) { throw "unverified, cannot merge" }
 if ($failed) { throw "Shard validation failed." }

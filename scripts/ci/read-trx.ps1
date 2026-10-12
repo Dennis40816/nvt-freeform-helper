@@ -2,7 +2,15 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 function Read-TrxResults {
-    param([Parameter(Mandatory = $true)][string]$ResultsDirectory)
+    param([Parameter(Mandatory = $true)][string]$ResultsDirectory,
+        [System.Collections.IDictionary]$ReadDiagnostics)
+
+    if ($null -ne $ReadDiagnostics) {
+        $ReadDiagnostics['FailedGroup'] = $null
+        $ReadDiagnostics['ExceptionType'] = ''
+        $ReadDiagnostics['TrxFiles'] = 0
+        $ReadDiagnostics['DirectoryPresent'] = $false
+    }
 
     $total = 0
     $passed = 0
@@ -10,10 +18,16 @@ function Read-TrxResults {
     $skipped = 0
     $completed = $true
     $results = [System.Collections.Generic.List[object]]::new()
+    $currentFile = $null
     try {
         $files = @(Get-ChildItem -LiteralPath $ResultsDirectory -Filter *.trx -File -Recurse)
+        if ($null -ne $ReadDiagnostics) {
+            $ReadDiagnostics['TrxFiles'] = $files.Count
+            $ReadDiagnostics['DirectoryPresent'] = $true
+        }
         if ($files.Count -eq 0) { throw "Missing TRX." }
         foreach ($file in $files) {
+            $currentFile = $file
             $settings = [System.Xml.XmlReaderSettings]::new()
             $settings.DtdProcessing = [System.Xml.DtdProcessing]::Prohibit
             $settings.XmlResolver = $null
@@ -83,6 +97,14 @@ function Read-TrxResults {
             $skipped += $fileSkipped
         }
     } catch {
+        if ($null -ne $ReadDiagnostics) {
+            $ReadDiagnostics['ExceptionType'] = $_.Exception.GetType().FullName
+            if ($null -ne $currentFile) {
+                # The runner owns the first directory segment; the checker validates it against known groups.
+                $parts = [System.IO.Path]::GetRelativePath($ResultsDirectory, $currentFile.FullName) -split '[\\/]', 2
+                if ($parts.Count -eq 2) { $ReadDiagnostics['FailedGroup'] = $parts[0] }
+            }
+        }
         # XML and IO errors can include input text or private paths. Expose only a fixed message.
         throw "TRX results missing or invalid."
     }

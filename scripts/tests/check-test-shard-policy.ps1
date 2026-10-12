@@ -55,20 +55,21 @@ function Write-FixtureBaseline {
 }
 
 function Invoke-FixtureCheck {
-    param([bool]$Present = $false, [switch]$Unverified, [switch]$TestRunFailed, [string]$Shard = 'core')
+    param([bool]$Present = $false, [switch]$Unverified, [switch]$TestRunFailed, [string]$Shard = 'core',
+        [object[]]$RunDiagnostics = @(), [string]$ResultsDirectory = (Join-Path $testRoot 'results'))
     $message = ""
     $output = @(
         try {
-            & $checkScript -Shard $Shard -ResultsDirectory (Join-Path $testRoot "results") `
+            & $checkScript -Shard $Shard -ResultsDirectory $ResultsDirectory `
                 -BaselinePath (Join-Path $testRoot "baseline.json") -ExampleDataPresent $Present `
                 -SummaryPath (Join-Path $testRoot "summary.json") -Commit ("a" * 40) `
-                -Unverified:$Unverified -TestRunFailed:$TestRunFailed 6>&1
+                -Unverified:$Unverified -TestRunFailed:$TestRunFailed -RunDiagnostics $RunDiagnostics 6>&1
         } catch { $message = $_.Exception.Message }
     )
     $json = Get-Content -LiteralPath (Join-Path $testRoot "summary.json") -Raw
     Assert-Policy (Test-Json -Json $json -SchemaFile $summarySchema)
     Assert-Policy (($json + ($output -join '') + $message) -notmatch 'CONFIDENTIAL_SENTINEL|StackTrace|ErrorInfo|\(|\)')
-    return @{ Summary = ($json | ConvertFrom-Json); Message = $message }
+    return @{ Summary = ($json | ConvertFrom-Json); Message = $message; Output = $output }
 }
 
 function Assert-FixtureUpdateRejected {
@@ -123,9 +124,19 @@ try {
     Write-FixtureBaseline
     $actual = Invoke-FixtureCheck
     Assert-Policy ($actual.Summary.outcome -ceq 'passed' -and $actual.Summary.total -eq 3 -and -not $actual.Summary.exampleData.present)
+    $normalOutput = '[check-test-shard] total 3 passed 3 failed 0 skipped 0 notExecuted 0'
+    Assert-Policy (($actual.Output -join "`n") -ceq $normalOutput)
+    $fixtureDiagnostics = @([pscustomobject]@{
+        Group = 'notch-core'; Phase = 'read-results'; ExitCode = 0; ExceptionType = ''; TrxFiles = 1; DirectoryPresent = $true
+    })
+    $actual = Invoke-FixtureCheck -RunDiagnostics $fixtureDiagnostics
+    Assert-Policy ($actual.Summary.outcome -ceq 'passed' -and ($actual.Output -join "`n") -ceq $normalOutput)
     Write-FixtureBaseline -Floor 1000000
     $actual = Invoke-FixtureCheck
     Assert-Policy ($actual.Summary.checks.belowFloor -and $actual.Message -ceq 'Shard validation failed.')
+    $actual = Invoke-FixtureCheck -RunDiagnostics $fixtureDiagnostics
+    Assert-Policy ($actual.Summary.checks.belowFloor -and $actual.Message -ceq 'Shard validation failed.' -and
+        ($actual.Output -join "`n") -ceq $normalOutput)
     Write-FixtureBaseline
     $outcomeCases = @(
         @{ Outcome = 'NotExecuted'; RunOutcome = 'Completed'; Skipped = 1; Failed = 0; NotExecuted = 0 },
@@ -282,6 +293,35 @@ try {
     $read = Read-TrxResults -ResultsDirectory $resultsPath
     Assert-Policy (-not $read.Completed -and $read.Total -eq 6 -and $read.Passed -eq 6)
 
+    # A later group's corrupt TRX must never blame the valid first group.
+    $groupResultsPath = Join-Path $testRoot 'group-results'
+    $groupDiagnostics = @('notch-core', 'application') | ForEach-Object {
+        [pscustomobject]@{ Group = $_; Phase = 'read-results'; ExitCode = 0; ExceptionType = ''; TrxFiles = 1; DirectoryPresent = $true }
+    }
+    Write-FixtureTrx -Directory (Join-Path $groupResultsPath 'notch-core') -Tests $samples
+    Write-FixtureTrx -Directory (Join-Path $groupResultsPath 'application') -Tests $samples
+    $corruptTrx = Join-Path $groupResultsPath 'application/fixture.trx'
+    [System.IO.File]::WriteAllText($corruptTrx, 'PRIVATE-MARKER-DO-NOT-PRINT')
+    $actual = Invoke-FixtureCheck -ResultsDirectory $groupResultsPath -RunDiagnostics $groupDiagnostics
+    $diagnostics = @($actual.Output | Where-Object { [string]$_ -like '[[]check-test-shard] diagnostic *' })
+    $expectedDiagnostic = '[check-test-shard] diagnostic shard=core group=application phase=read-results exit=0 trx-files=1 results-dir=present'
+    Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -ceq $expectedDiagnostic)
+    Assert-Policy ($actual.Summary.outcome -ceq 'failed' -and $actual.Summary.total -eq 0 -and $actual.Message -ceq 'Shard validation failed.')
+    Assert-Policy (($actual.Output -join '') -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
+
+    Write-FixtureTrx -Directory (Join-Path $groupResultsPath 'application') -Tests $samples
+    $actual = Invoke-FixtureCheck -ResultsDirectory $groupResultsPath -RunDiagnostics $groupDiagnostics
+    Assert-Policy ($actual.Summary.outcome -ceq 'passed' -and $actual.Summary.total -eq 6 -and $actual.Message -ceq '')
+    Assert-Policy (($actual.Output -join "`n") -ceq '[check-test-shard] total 6 passed 6 failed 0 skipped 0 notExecuted 0')
+
+    # A corrupt file outside the known group directories has no attributable group.
+    [System.IO.File]::WriteAllText((Join-Path $groupResultsPath 'fixture.trx'), 'PRIVATE-MARKER-DO-NOT-PRINT')
+    $actual = Invoke-FixtureCheck -ResultsDirectory $groupResultsPath -RunDiagnostics $groupDiagnostics
+    $diagnostics = @($actual.Output | Where-Object { [string]$_ -like '[[]check-test-shard] diagnostic *' })
+    Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -cmatch '^\[check-test-shard\] diagnostic shard=core group=unknown phase=read-results exit=exception exception-type=[A-Za-z0-9_.]+ trx-files=3 results-dir=present$')
+    Assert-Policy ($actual.Summary.outcome -ceq 'failed' -and $actual.Summary.total -eq 0 -and $actual.Message -ceq 'Shard validation failed.')
+    Assert-Policy (($actual.Output -join '') -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
+
     # Exercise both entries with a console-local dotnet stub: no restore, network or real test data.
     $fakeRepo = Join-Path $testRoot "repo"
     foreach ($directory in @('scripts/ci', 'scripts/tests', 'scripts/build', 'tests/FreeformHelper.Tests')) {
@@ -347,10 +387,80 @@ try {
                     Assert-Policy ($entrySummary.outcome -ceq $case.Outcome -and $entrySummary.total -eq 12)
                     Assert-Policy (($message.Length -gt 0) -eq ($case.Fail -or $case.Unverified))
                     if ($case.Unverified) { Assert-Policy ($message -ceq 'unverified, cannot merge') }
+                    $expectedOutput = @(
+                        '[verify] NVT Core packages',
+                        '[check-test-shard] total 12 passed 12 failed 0 skipped 0 notExecuted 0'
+                    )
+                    if (-not $case.Fail -and -not $case.Unverified) { $expectedOutput += '[verify] OK (test)' }
+                    Assert-Policy (($entryOutput -join "`n") -ceq ($expectedOutput -join "`n"))
                 } else {
                     Assert-Policy (-not (Test-Path -LiteralPath $summaryFile) -and ($message.Length -gt 0) -eq $case.Fail)
                     if ($case.Fail) { Assert-Policy ($message -ceq "Test group 'notch-core' failed with exit code 1.") }
                 }
+            }
+        }
+    }
+    $diagnosticCases = @(
+        @{ Mode = 'exit'; Shard = 'snapshots'; Phase = 'run-tests'; Exit = '1'; Trx = 0; Directory = 'missing' },
+        @{ Mode = 'exception'; Shard = 'snapshots'; Phase = 'run-tests'; Exit = 'exception exception-type=System.InvalidOperationException'; Trx = 0; Directory = 'missing' },
+        @{ Mode = 'missing'; Shard = 'snapshots'; Phase = 'read-results'; Exit = '0'; Trx = 0; Directory = 'missing' },
+        @{ Mode = 'empty'; Shard = 'snapshots'; Phase = 'read-results'; Exit = '0'; Trx = 0; Directory = 'present' },
+        @{ Mode = 'zero'; Shard = 'snapshots'; Phase = 'read-results'; Exit = '0'; Trx = 1; Directory = 'present' },
+        @{ Mode = 'invalid'; Shard = 'snapshots'; Phase = 'read-results'; Exit = '0'; Trx = 1; Directory = 'present' },
+        @{ Mode = 'unreadable'; Shard = 'snapshots'; Phase = 'results-directory'; Exit = '0'; Trx = 0; Directory = 'present' },
+        @{ Mode = 'exit'; Shard = 'core'; Phase = 'run-tests'; Exit = '1'; Trx = 0; Directory = 'missing' },
+        @{ Mode = 'mixed'; Shard = 'core'; Group = 'application'; Phase = 'run-tests'; Exit = '1'; Trx = 0; Directory = 'missing' }
+    )
+    foreach ($case in $diagnosticCases) {
+        Invoke-WithTemporaryEnvironmentVariables -Settings @{ FREEFORMHELPER_TEST_AREA = (Join-Path $testRoot 'test-area') } -Action {
+            & {
+                function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
+                function dotnet {
+                    $index = [Array]::IndexOf($args, '--results-directory')
+                    $directory = $args[$index + 1]
+                    Write-Output 'PRIVATE-MARKER-DO-NOT-PRINT'
+                    Write-Host 'PRIVATE-MARKER-DO-NOT-PRINT'
+                    Write-Warning 'PRIVATE-MARKER-DO-NOT-PRINT'
+                    switch ($case.Mode) {
+                        'exception' { throw [System.InvalidOperationException]::new('PRIVATE-MARKER-DO-NOT-PRINT') }
+                        'empty' { $null = New-Item -ItemType Directory -Path $directory -Force }
+                        'unreadable' { $null = New-Item -ItemType Directory -Path $directory -Force }
+                        'zero' { Write-FixtureTrx -Directory $directory -Tests @() }
+                        'invalid' {
+                            $null = New-Item -ItemType Directory -Path $directory -Force
+                            [System.IO.File]::WriteAllText((Join-Path $directory 'fixture.trx'), 'PRIVATE-MARKER-DO-NOT-PRINT')
+                        }
+                    }
+                    $global:LASTEXITCODE = if ($case.Mode -eq 'exit' -or
+                        ($case.Mode -eq 'mixed' -and (Split-Path -Leaf $directory) -eq 'application')) { 1 } else { 0 }
+                }
+                function Get-ChildItem {
+                    param([string]$LiteralPath, [string]$Filter, [switch]$File, [switch]$Recurse, [switch]$Force)
+                    if ($case.Mode -eq 'unreadable' -and $Filter -eq '*.trx') {
+                        throw [System.UnauthorizedAccessException]::new('PRIVATE-MARKER-DO-NOT-PRINT')
+                    }
+                    Microsoft.PowerShell.Management\Get-ChildItem @PSBoundParameters
+                }
+                $summaryFile = Join-Path $fakeRepo 'summary.json'
+                $message = ''
+                $entryOutput = @(
+                    try {
+                        & (Join-Path $fakeRepo 'scripts/verify.ps1') -CiLane test -Shard $case.Shard -AllowMissingExampleData `
+                            -EnforceFloors -SummaryPath $summaryFile *>&1
+                    } catch { $message = $_.Exception.Message }
+                )
+                $group = if ($case.ContainsKey('Group')) { $case.Group } elseif ($case.Shard -eq 'core') { 'notch-core' } else { 'ui-snapshots' }
+                $expectedDiagnostic = '[check-test-shard] diagnostic shard={0} group={1} phase={2} exit={3} trx-files={4} results-dir={5}' -f
+                    $case.Shard, $group, $case.Phase, $case.Exit, $case.Trx, $case.Directory
+                $diagnostics = @($entryOutput | Where-Object { [string]$_ -like '[[]check-test-shard] diagnostic *' })
+                Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -ceq $expectedDiagnostic)
+                Assert-Policy (($entryOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT|StackTrace|ErrorInfo')
+                Assert-Policy ($message -ceq 'Shard validation failed.')
+                $summaryText = Get-Content -LiteralPath $summaryFile -Raw
+                Assert-Policy (Test-Json -Json $summaryText -SchemaFile $summarySchema)
+                $entrySummary = $summaryText | ConvertFrom-Json
+                Assert-Policy ($entrySummary.outcome -ceq 'failed' -and $entrySummary.total -eq 0)
+                Assert-Policy (-not (Test-Path -LiteralPath (Join-Path $fakeRepo 'build/ci-test-results')))
             }
         }
     }
@@ -367,6 +477,12 @@ function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
 function dotnet {
     $index = [Array]::IndexOf($args, '--results-directory')
     $directory = $args[$index + 1]
+    Write-Output 'PRIVATE-MARKER-DO-NOT-PRINT'
+    if ($Failure -eq 'zero-exception') { throw [System.InvalidOperationException]::new('PRIVATE-MARKER-DO-NOT-PRINT') }
+    if ($Failure -in @('zero-exit', 'zero-unverified')) {
+        $global:LASTEXITCODE = if ($Failure -eq 'zero-exit') { 1 } else { 0 }
+        return
+    }
     $null = New-Item -ItemType Directory -Path $directory -Force
     Copy-Item -LiteralPath $Fixture -Destination (Join-Path $directory 'fixture.trx')
     Write-Output 'CONFIDENTIAL_SENTINEL_FILE.bin'
@@ -395,9 +511,9 @@ if ($Failure -eq 'resolution') {
     [System.IO.File]::WriteAllText($verifyPath, $source.Replace($expression, '$(throw ''CONFIDENTIAL_SENTINEL_FILE.bin'')'))
 }
 & $verifyPath -CiLane test -Shard core -EnforceFloors `
-    -SummaryPath (Join-Path $Repo 'summary.json') -AllowMissingExampleData
+    -SummaryPath (Join-Path $Repo 'summary.json') -AllowMissingExampleData -Unverified:($Failure -eq 'zero-unverified')
 '@)
-    foreach ($failure in @('precheck', 'cleanup', 'creation', 'resolution')) {
+    foreach ($failure in @('precheck', 'cleanup', 'creation', 'resolution', 'zero-exit', 'zero-exception', 'zero-unverified')) {
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot '../verify.ps1') -Destination (Join-Path $fakeRepo 'scripts/verify.ps1')
         $precheckSource = if ($failure -eq 'precheck') {
             @'
@@ -419,8 +535,24 @@ throw 'CONFIDENTIAL_SENTINEL_FILE.bin'
             'cleanup' { 'results-cleanup-failed core' }
             'creation' { 'results-creation-failed core' }
             'resolution' { 'path-resolution-failed core' }
+            'zero-exit' { 'Shard validation failed.' }
+            'zero-exception' { 'Shard validation failed.' }
+            'zero-unverified' { 'unverified, cannot merge' }
         }
-        Assert-Policy (($output -join '') -match $reason -and ($output -join '') -notmatch 'CONFIDENTIAL_SENTINEL_FILE\.bin')
+        Assert-Policy (($output -join '') -match $reason -and ($output -join '') -notmatch 'CONFIDENTIAL_SENTINEL_FILE\.bin|PRIVATE-MARKER-DO-NOT-PRINT')
+        if ($failure -like 'zero-*' -or $failure -eq 'creation') {
+            Assert-Policy ($LASTEXITCODE -eq 1)
+            $exit = switch ($failure) {
+                'creation' { 'exception exception-type=System.Management.Automation.RuntimeException' }
+                'zero-exit' { '1' }
+                'zero-exception' { 'exception exception-type=System.InvalidOperationException' }
+                'zero-unverified' { '0' }
+            }
+            $phase = if ($failure -eq 'creation') { 'results-directory' } elseif ($failure -eq 'zero-unverified') { 'read-results' } else { 'run-tests' }
+            $expectedDiagnostic = '[check-test-shard] diagnostic shard=core group=notch-core phase={0} exit={1} trx-files=0 results-dir=missing' -f $phase, $exit
+            $diagnostics = @($output | Where-Object { [string]$_ -like '[[]check-test-shard] diagnostic *' })
+            Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -ceq $expectedDiagnostic)
+        }
         if ($failure -in @('precheck', 'resolution')) {
             Assert-Policy (-not (Test-Path -LiteralPath $summaryFile))
         } else {
@@ -430,6 +562,11 @@ throw 'CONFIDENTIAL_SENTINEL_FILE.bin'
             if ($failure -eq 'creation') {
                 $summary = $summaryText | ConvertFrom-Json
                 Assert-Policy ($summary.outcome -ceq 'failed' -and $summary.total -eq 0)
+            }
+            if ($failure -like 'zero-*') {
+                $summary = $summaryText | ConvertFrom-Json
+                $expectedOutcome = if ($failure -eq 'zero-unverified') { 'unverified' } else { 'failed' }
+                Assert-Policy ($summary.outcome -ceq $expectedOutcome -and $summary.total -eq 0)
             }
         }
     }
