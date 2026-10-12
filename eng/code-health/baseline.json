@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 356,
+        "stateMembers": 345,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -2626,16 +2626,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._workflowDataSnapshotRevision"
     },
     {
-      "syntaxHash": "a7bfe8ef22248a7cdf0979a79044a686f4448b3aa42c2e69b23b85d8ed8f2eba",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_workflowDataSnapshotCacheRevision",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._workflowDataSnapshotCacheRevision"
-    },
-    {
       "syntaxHash": "8d6e6b306dd49f643f9d89644d5f1ebf78f389cb34d344a63b22eef622537d1d",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_notchCompensationCacheRevision",
       "owner": "NFH",
@@ -2704,36 +2694,6 @@
       "count": 1,
       "rule": "asyncVoid",
       "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "7eb307b08163782efa790e11753adcba0d1f7ed792f4af2e1690370a212f177d",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_notchExportCadFingerprintRevision",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Fingerprint.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._notchExportCadFingerprintRevision"
-    },
-    {
-      "syntaxHash": "ce8b07988155e0ea0cdb3cca423e7ec048f32832a7a6e36957b365de84aca528",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_notchExportGridFingerprintRevision",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Fingerprint.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._notchExportGridFingerprintRevision"
-    },
-    {
-      "syntaxHash": "d6eaa38ae89909e76e8d3cd2fa4572530489d5faa21b8a18516a94cd62241171",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_notchExportIndexFingerprintRevision",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Fingerprint.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._notchExportIndexFingerprintRevision"
     },
     {
       "syntaxHash": "bd7a422b3cdbfbb59daf7efa9c4259328708240f7f6f51390a5dd0c6922bba71",

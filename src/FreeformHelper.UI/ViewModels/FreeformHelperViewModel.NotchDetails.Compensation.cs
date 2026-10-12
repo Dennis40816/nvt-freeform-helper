@@ -14,15 +14,15 @@ public sealed partial class FreeformHelperViewModel
 
     public NotchCompensationCacheMetricsSnapshot GetNotchCompensationCacheMetrics()
     {
-        var hitCount = Interlocked.Read(ref _notchCompensationCacheHitCount);
-        var missCount = Interlocked.Read(ref _notchCompensationCacheMissCount);
-        var invalidationCount = Interlocked.Read(ref _notchCompensationCacheInvalidationCount);
+        var hitCount = _notchCompensationCacheCounters.HitCount;
+        var missCount = _notchCompensationCacheCounters.MissCount;
+        var invalidationCount = _notchCompensationCacheCounters.InvalidationCount;
         var total = hitCount + missCount;
         var hitRate = total > 0 ? (double)hitCount / total : 0.0;
         return new NotchCompensationCacheMetricsSnapshot(
             Revision: _notchCompensationCacheRevision,
             EntryCount: _notchResolvedResultCacheByCadId.Count,
-            LastClearSize: _notchCompensationCacheLastClearSize,
+            LastClearSize: _notchCompensationCacheCounters.LastClearSize,
             HitCount: hitCount,
             MissCount: missCount,
             InvalidationCount: invalidationCount,
@@ -171,7 +171,7 @@ public sealed partial class FreeformHelperViewModel
             cached.AnchorDiffIndex == anchorDiff &&
             cached.TargetAllocationAreaMode == allocationAreaMode)
         {
-            Interlocked.Increment(ref _notchCompensationCacheHitCount);
+            _notchCompensationCacheCounters.RecordHit();
             return cached.Resolved;
         }
 
@@ -180,7 +180,7 @@ public sealed partial class FreeformHelperViewModel
             return null;
         }
 
-        Interlocked.Increment(ref _notchCompensationCacheMissCount);
+        _notchCompensationCacheCounters.RecordMiss();
         var resolutionRequest = new NotchResolvedResultRequest(
             cadPad,
             _grid,

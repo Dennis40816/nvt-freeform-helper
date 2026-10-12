@@ -106,24 +106,23 @@ public sealed partial class FreeformHelperViewModel
         NotchTable table,
         int nullDiffValue)
     {
-        if (_notchValidationBucketCache is not null &&
-            ReferenceEquals(_notchValidationBucketTable, table) &&
-            _notchValidationBucketNullDiffValue == nullDiffValue)
+        if (_notchValidationBucketCache is { } cached &&
+            ReferenceEquals(cached.Table, table) &&
+            cached.NullDiffValue == nullDiffValue)
         {
-            return _notchValidationBucketCache;
+            return cached.Bucket;
         }
 
         var stopwatch = Stopwatch.StartNew();
-        _notchValidationBucketCache = NotchValidationUseCase.BuildBucket(
+        var bucket = NotchValidationUseCase.BuildBucket(
             table,
             nullDiffValue);
-        _notchValidationBucketTable = table;
-        _notchValidationBucketNullDiffValue = nullDiffValue;
+        _notchValidationBucketCache = (bucket, table, nullDiffValue);
         Logger.Info(CultureInfo.InvariantCulture, "Validation bucket rebuilt: tableRows={0}, null={1}, elapsed={2}ms.",
             table.Rows.Count,
             nullDiffValue,
             stopwatch.ElapsedMilliseconds);
-        return _notchValidationBucketCache;
+        return bucket;
     }
 
     private void ClearNotchValidation()
@@ -171,8 +170,6 @@ public sealed partial class FreeformHelperViewModel
     private void InvalidateNotchValidationCache()
     {
         _notchValidationBucketCache = null;
-        _notchValidationBucketTable = null;
-        _notchValidationBucketNullDiffValue = -1;
         ClearNotchValidationCollections();
     }
 
