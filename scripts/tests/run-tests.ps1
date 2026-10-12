@@ -6,10 +6,13 @@ param(
     [switch]$ValidateOnly,
     [switch]$AllowMissingExampleData,
     # Internal CI result collection. Policy and summaries belong to verify.ps1, which owns shards.
-    [string]$ResultsDirectory = ""
+    [string]$ResultsDirectory = "",
+    # Internal CI status channel: native exit code only, never tool output.
+    [System.Collections.IDictionary]$RunStatus
 )
 
 $ErrorActionPreference = "Stop"
+if ($null -ne $RunStatus) { $RunStatus['ExitCode'] = $null }
 
 $project = "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj"
 
@@ -227,6 +230,7 @@ try {
         dotnet @args
     }
     $testExitCode = $LASTEXITCODE
+    if ($null -ne $RunStatus) { $RunStatus['ExitCode'] = [int]$testExitCode }
 }
 finally {
     [Environment]::SetEnvironmentVariable($requireExampleDataEnv, ($previousRequireExampleData ?? [NullString]::Value))

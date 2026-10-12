@@ -225,28 +225,57 @@ function Invoke-TestShard {
             throw "Shard summary must be outside private results."
         }
         $runFailed = $false
+        $directoryExceptionType = ''
+        $runDiagnostics = [System.Collections.Generic.List[object]]::new()
         try {
             try {
                 $null = New-Item -ItemType Directory -Path $resultsDirectory -Force
             } catch {
                 Write-Host ("results-creation-failed {0}" -f $Name)
                 $runFailed = $true
+                $directoryExceptionType = $_.Exception.GetType().FullName
             }
-            if (-not $runFailed) {
-                foreach ($group in $shardGroups[$Name]) {
+            foreach ($group in $shardGroups[$Name]) {
+                $groupDirectory = Join-Path $resultsDirectory $group
+                $runStatus = @{ ExitCode = $null }
+                $phase = 'results-directory'
+                $exceptionType = $directoryExceptionType
+                if ([string]::IsNullOrEmpty($directoryExceptionType)) {
                     try {
+                        $phase = 'run-tests'
                         & $runTestsScript -Group $group -Configuration $Configuration -UseNoAppHost `
                             -AllowMissingExampleData:($AllowMissingExampleData -or $Unverified) `
-                            -ResultsDirectory (Join-Path $resultsDirectory $group) *> $null
+                            -ResultsDirectory $groupDirectory -RunStatus $runStatus *> $null
+                        $phase = 'read-results'
                     } catch {
                         # Continue collecting the remaining groups without printing raw exception records.
                         $runFailed = $true
+                        $exceptionType = $_.Exception.GetType().FullName
                     }
                 }
+                $directoryPresent = $false
+                $trxFiles = 0
+                try {
+                    $directoryPresent = Test-Path -LiteralPath $groupDirectory -PathType Container
+                    if ($directoryPresent) {
+                        $trxFiles = @(Get-ChildItem -LiteralPath $groupDirectory -Filter *.trx -File -Recurse).Count
+                    }
+                } catch {
+                    $phase = 'results-directory'
+                    $exceptionType = $_.Exception.GetType().FullName
+                }
+                $runDiagnostics.Add([pscustomobject]@{
+                    Group = $group
+                    Phase = $phase
+                    ExitCode = $runStatus.ExitCode
+                    ExceptionType = $exceptionType
+                    TrxFiles = $trxFiles
+                    DirectoryPresent = $directoryPresent
+                })
             }
             & $testShardCheckScript -Shard $Name -ResultsDirectory $resultsDirectory `
                 -ExampleDataPresent $exampleDataPresent -SummaryPath $summaryFile `
-                -TestRunFailed:$runFailed -Unverified:$Unverified
+                -TestRunFailed:$runFailed -Unverified:$Unverified -RunDiagnostics $runDiagnostics.ToArray()
         } finally {
             try {
                 # This invocation owns a fresh directory, verified to be inside the private results root.
