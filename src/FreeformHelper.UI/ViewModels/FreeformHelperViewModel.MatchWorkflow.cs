@@ -7,6 +7,34 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
+    // Each operation snapshot is owned and accessed only on the UI thread.
+    private readonly UiOperationProgressState _dxfOverlapState = new();
+    private readonly UiOperationProgressState _matchState = new();
+    private readonly UiOperationProgressState _indexMappingState = new();
+
+    private void SetOperationBusy(UiOperationProgressState state, bool value, string propertyName)
+    {
+        if (state.Current.IsBusy == value)
+        {
+            return;
+        }
+
+        OnPropertyChanging(propertyName);
+        state.SetBusy(value);
+        OnPropertyChanged(propertyName);
+    }
+
+    private void SetOperationProgress(UiOperationProgressState state, double value, string propertyName)
+    {
+        if (EqualityComparer<double>.Default.Equals(state.Current.Progress, value))
+        {
+            return;
+        }
+
+        OnPropertyChanging(propertyName);
+        state.SetProgress(value);
+        OnPropertyChanged(propertyName);
+    }
     /// <summary>
     /// Handles the asynchronous operation of matching regular pads to CAD pads.
     /// </summary>
@@ -21,7 +49,6 @@ public sealed partial class FreeformHelperViewModel
         {
             return;
         }
-
         await RunUiProgressOperationAsync(
             operationName: "Match task",
             setBusy: busy => IsMatchingPads = busy,
@@ -32,22 +59,23 @@ public sealed partial class FreeformHelperViewModel
                 status.ReportProgress("Matching pads...");
                 Logger.Info(CultureInfo.InvariantCulture, "Matching pads.");
             },
-            operationAsync: async reportProgress =>
-            {
-                await ApplyStep1MatchResultAsync(
-                    cad,
-                    grid,
-                    reportProgress,
-                    invalidateDownstream: true,
-                    moveToStep2: true,
-                    completionStatus: "Matching complete.");
-                Logger.Info(CultureInfo.InvariantCulture, "Matching complete.");
-            },
+            operationAsync: MatchPadsAsync,
             onError: ex =>
             {
                 status.ReportError("Match failed", ex);
                 Logger.Error(ex, "Match failed.");
             });
+        async Task MatchPadsAsync(Action<double> reportProgress)
+        {
+            await ApplyStep1MatchResultAsync(
+                cad,
+                grid,
+                reportProgress,
+                invalidateDownstream: true,
+                moveToStep2: true,
+                completionStatus: "Matching complete.");
+            Logger.Info(CultureInfo.InvariantCulture, "Matching complete.");
+        }
     }
 
     private async Task ApplyStep1MatchResultAsync(
