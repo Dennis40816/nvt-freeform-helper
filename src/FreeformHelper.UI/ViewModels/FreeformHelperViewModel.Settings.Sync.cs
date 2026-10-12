@@ -9,166 +9,166 @@ public sealed partial class FreeformHelperViewModel
 {
     private void LoadSettingsToUi(ProjectSettings s)
     {
-        _isLoadingSettings = true; // Set flag to prevent UI updates from marking project dirty.
-        EnsureChannelDefaults(s.Grid); // Ensure channel counts are valid.
-        EnsureActiveAreaDefaults(s.Grid); // Ensure active area dimensions are valid.
-        ManualSizingService.EnsureSizingLists(s.Grid); // Ensure sizing lists are correctly initialized.
-        // --- Grid Settings ---
-        XChannels = s.Grid.XChannels;
-        YChannels = s.Grid.YChannels;
-        CascadeNum = s.Grid.CascadeNum;
-        SelectedScanOrder = s.Grid.ScanOrder;
-        SelectedScanOrderOption = ScanOrderOptions.FirstOrDefault(o => o.Value == s.Grid.ScanOrder);
-        GridAlignmentMode = s.Grid.AlignmentMode;
-        SelectedGridAlignmentOption = GridAlignmentOptions.FirstOrDefault(o => o.Value == s.Grid.AlignmentMode);
-        RegularSourceMode = s.Grid.RegularSourceMode;
-        SelectedRegularSourceModeOption = RegularSourceModeOptions.FirstOrDefault(o => o.Value == s.Grid.RegularSourceMode);
-
-        // Fallback for potentially invalid or uninitialized enum values.
-        if (string.IsNullOrWhiteSpace(SelectedGridAlignmentOption.Display))
+        using (_settingsSuppression.EnterSettingsLoading())
         {
-            var fallback = GridAlignmentOptions.FirstOrDefault(o => o.Value == GridAlignmentMode.FromCadBounds);
-            if (!string.IsNullOrWhiteSpace(fallback.Display))
+            EnsureChannelDefaults(s.Grid); // Ensure channel counts are valid.
+            EnsureActiveAreaDefaults(s.Grid); // Ensure active area dimensions are valid.
+            ManualSizingService.EnsureSizingLists(s.Grid); // Ensure sizing lists are correctly initialized.
+            // --- Grid Settings ---
+            XChannels = s.Grid.XChannels;
+            YChannels = s.Grid.YChannels;
+            CascadeNum = s.Grid.CascadeNum;
+            SelectedScanOrder = s.Grid.ScanOrder;
+            SelectedScanOrderOption = ScanOrderOptions.FirstOrDefault(o => o.Value == s.Grid.ScanOrder);
+            GridAlignmentMode = s.Grid.AlignmentMode;
+            SelectedGridAlignmentOption = GridAlignmentOptions.FirstOrDefault(o => o.Value == s.Grid.AlignmentMode);
+            RegularSourceMode = s.Grid.RegularSourceMode;
+            SelectedRegularSourceModeOption = RegularSourceModeOptions.FirstOrDefault(o => o.Value == s.Grid.RegularSourceMode);
+
+            // Fallback for potentially invalid or uninitialized enum values.
+            if (string.IsNullOrWhiteSpace(SelectedGridAlignmentOption.Display))
             {
-                GridAlignmentMode = fallback.Value;
-                SelectedGridAlignmentOption = fallback;
+                var fallback = GridAlignmentOptions.FirstOrDefault(o => o.Value == GridAlignmentMode.FromCadBounds);
+                if (!string.IsNullOrWhiteSpace(fallback.Display))
+                {
+                    GridAlignmentMode = fallback.Value;
+                    SelectedGridAlignmentOption = fallback;
+                }
             }
-        }
-        if (string.IsNullOrWhiteSpace(SelectedRegularSourceModeOption.Display))
-        {
-            var fallback = RegularSourceModeOptions.FirstOrDefault(o => o.Value == RegularSourceMode.GeneratedGrid);
-            if (!string.IsNullOrWhiteSpace(fallback.Display))
+            if (string.IsNullOrWhiteSpace(SelectedRegularSourceModeOption.Display))
             {
-                RegularSourceMode = fallback.Value;
-                SelectedRegularSourceModeOption = fallback;
+                var fallback = RegularSourceModeOptions.FirstOrDefault(o => o.Value == RegularSourceMode.GeneratedGrid);
+                if (!string.IsNullOrWhiteSpace(fallback.Display))
+                {
+                    RegularSourceMode = fallback.Value;
+                    SelectedRegularSourceModeOption = fallback;
+                }
             }
-        }
-        // Notify UI of changes to dependent properties.
-        OnPropertyChanged(nameof(IsPanelAlignment));
-        OnPropertyChanged(nameof(IsDxfLayerRegularSource));
+            // Notify UI of changes to dependent properties.
+            OnPropertyChanged(nameof(IsPanelAlignment));
+            OnPropertyChanged(nameof(IsDxfLayerRegularSource));
 
-        GridPaddingPercent = (decimal)(s.Grid.BoundsPaddingRatio * 100.0);
-        ActiveAreaWidth = (decimal)s.Grid.ActiveAreaWidth;
-        ActiveAreaHeight = (decimal)s.Grid.ActiveAreaHeight;
-        PanelBiasX = (decimal)s.Grid.PanelBiasX;
-        PanelBiasY = (decimal)s.Grid.PanelBiasY;
-        RecalcBoundsOnLayerFilter = s.Grid.RecalcBoundsOnLayerFilter;
-        _pendingBoundLayerName = s.Grid.BoundLayerName;
-        _pendingRegularSourceLayerName = s.Grid.RegularSourceLayerName;
+            GridPaddingPercent = (decimal)(s.Grid.BoundsPaddingRatio * 100.0);
+            ActiveAreaWidth = (decimal)s.Grid.ActiveAreaWidth;
+            ActiveAreaHeight = (decimal)s.Grid.ActiveAreaHeight;
+            PanelBiasX = (decimal)s.Grid.PanelBiasX;
+            PanelBiasY = (decimal)s.Grid.PanelBiasY;
+            RecalcBoundsOnLayerFilter = s.Grid.RecalcBoundsOnLayerFilter;
+            _pendingBoundLayerName = s.Grid.BoundLayerName;
+            _pendingRegularSourceLayerName = s.Grid.RegularSourceLayerName;
 
-        // --- Matching Settings ---
-        MatchThreshold = (decimal)s.Matching.MatchThreshold;
-        FreeformAxisThreshold = (decimal)s.Matching.FreeformAxisThreshold;
-        EnableAutoDetectXy = s.Matching.EnableAutoDetectXy;
-        EnableFreeformEdgeSpecialization = s.Matching.EnableFreeformEdgeSpecialization;
-        AutoReplayStep2AfterProjectLoad = s.View.AutoReplayStep2AfterProjectLoad;
+            // --- Matching Settings ---
+            MatchThreshold = (decimal)s.Matching.MatchThreshold;
+            FreeformAxisThreshold = (decimal)s.Matching.FreeformAxisThreshold;
+            EnableAutoDetectXy = s.Matching.EnableAutoDetectXy;
+            EnableFreeformEdgeSpecialization = s.Matching.EnableFreeformEdgeSpecialization;
+            AutoReplayStep2AfterProjectLoad = s.View.AutoReplayStep2AfterProjectLoad;
 
-        // --- Index Mapping Settings ---
-        MappingWeightIou = (decimal)s.IndexMapping.WeightIou;
-        MappingWeightCentroidDistance = (decimal)s.IndexMapping.WeightCentroidDistance;
-        MappingWeightAreaRatio = (decimal)s.IndexMapping.WeightAreaRatio;
-        MappingLowConfidenceThreshold = (decimal)s.IndexMapping.LowConfidenceThreshold;
-        MappingAmbiguousMargin = (decimal)s.IndexMapping.AmbiguousMargin;
-        MappingCandidatePaddingCells = s.IndexMapping.CandidatePaddingCells;
-        MappingCandidateNumber = s.IndexMapping.GetEffectiveCandidateNumber();
-        CadOutputFwDiffIndexStart = s.IndexMapping.CadOutputFwDiffStartIndex;
-        CadOutputFwDiffAutoMode = s.IndexMapping.CadOutputFwDiffAutoMode;
-        var dxfModeOption = CadOutputFwDiffAutoModeOptions.FirstOrDefault(option => option.Value == s.IndexMapping.CadOutputFwDiffAutoMode);
-        if (string.IsNullOrWhiteSpace(dxfModeOption.Display))
-        {
-            dxfModeOption = CadOutputFwDiffAutoModeOptions.Count > 0 ? CadOutputFwDiffAutoModeOptions[0] : default;
-        }
-
-        SelectedCadOutputFwDiffAutoModeOption = dxfModeOption;
-        var anchorFallback = _projectFile.CadOutputFwDiffIndexAnchorCadPadId ?? -1;
-        var anchorCadId = anchorFallback;
-        foreach (var value in _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.Values)
-        {
-            anchorCadId = value;
-            break;
-        }
-
-        CadOutputFwDiffIndexAnchorCadId = anchorCadId;
-
-        // --- Notch Settings ---
-        EnableV21 = s.Notch.EnabledVersions.Contains(NotchAlgorithmVersion.V21);
-        EnableV22 = s.Notch.EnabledVersions.Contains(NotchAlgorithmVersion.V22);
-        if (!EnableV21 && !EnableV22)
-        {
-            EnableV21 = true;
-            EnableV22 = true;
-        }
-        OnPropertyChanged(nameof(IsLenScaleVisible));
-        LenScale = s.Notch.LenScale;
-        NullValue = s.Notch.NullValue;
-        using (_settingsSuppression.EnterNotchThresholdSync())
-        {
-            NotchThresholdQ7 = s.Notch.ThresholdQ7;
-            NotchThresholdPercent = (decimal)Math.Clamp(s.Notch.ThresholdPercentV22, 0.0, 100.0);
-            LinkNotchThresholds = s.Notch.LinkVersionThresholds;
-            if (LinkNotchThresholds)
+            // --- Index Mapping Settings ---
+            MappingWeightIou = (decimal)s.IndexMapping.WeightIou;
+            MappingWeightCentroidDistance = (decimal)s.IndexMapping.WeightCentroidDistance;
+            MappingWeightAreaRatio = (decimal)s.IndexMapping.WeightAreaRatio;
+            MappingLowConfidenceThreshold = (decimal)s.IndexMapping.LowConfidenceThreshold;
+            MappingAmbiguousMargin = (decimal)s.IndexMapping.AmbiguousMargin;
+            MappingCandidatePaddingCells = s.IndexMapping.CandidatePaddingCells;
+            MappingCandidateNumber = s.IndexMapping.GetEffectiveCandidateNumber();
+            CadOutputFwDiffIndexStart = s.IndexMapping.CadOutputFwDiffStartIndex;
+            CadOutputFwDiffAutoMode = s.IndexMapping.CadOutputFwDiffAutoMode;
+            var dxfModeOption = CadOutputFwDiffAutoModeOptions.FirstOrDefault(option => option.Value == s.IndexMapping.CadOutputFwDiffAutoMode);
+            if (string.IsNullOrWhiteSpace(dxfModeOption.Display))
             {
-                NotchThresholdPercent = Math.Round(NotchThresholdQ7 * 100m / 128m, 2);
+                dxfModeOption = CadOutputFwDiffAutoModeOptions.Count > 0 ? CadOutputFwDiffAutoModeOptions[0] : default;
             }
+
+            SelectedCadOutputFwDiffAutoModeOption = dxfModeOption;
+            var anchorFallback = _projectFile.CadOutputFwDiffIndexAnchorCadPadId ?? -1;
+            var anchorCadId = anchorFallback;
+            foreach (var value in _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.Values)
+            {
+                anchorCadId = value;
+                break;
+            }
+
+            CadOutputFwDiffIndexAnchorCadId = anchorCadId;
+
+            // --- Notch Settings ---
+            EnableV21 = s.Notch.EnabledVersions.Contains(NotchAlgorithmVersion.V21);
+            EnableV22 = s.Notch.EnabledVersions.Contains(NotchAlgorithmVersion.V22);
+            if (!EnableV21 && !EnableV22)
+            {
+                EnableV21 = true;
+                EnableV22 = true;
+            }
+            OnPropertyChanged(nameof(IsLenScaleVisible));
+            LenScale = s.Notch.LenScale;
+            NullValue = s.Notch.NullValue;
+            using (_settingsSuppression.EnterNotchThresholdSync())
+            {
+                NotchThresholdQ7 = s.Notch.ThresholdQ7;
+                NotchThresholdPercent = (decimal)Math.Clamp(s.Notch.ThresholdPercentV22, 0.0, 100.0);
+                LinkNotchThresholds = s.Notch.LinkVersionThresholds;
+                if (LinkNotchThresholds)
+                {
+                    NotchThresholdPercent = Math.Round(NotchThresholdQ7 * 100m / 128m, 2);
+                }
+            }
+            var compensationModelOption = NotchCompensationModelOptions.FirstOrDefault(
+                option => option.Value == s.Notch.CompensationModel);
+            if (string.IsNullOrWhiteSpace(compensationModelOption.Display))
+            {
+                compensationModelOption = NotchCompensationModelOptions.Count > 0
+                    ? NotchCompensationModelOptions[0]
+                    : default;
+            }
+
+            SelectedNotchCompensationModelOption = compensationModelOption;
+            ApplyNotchCompensationModeToLegacySwitches(
+                SelectedNotchCompensationModelOption.Value,
+                s.Notch.EnableToRegular,
+                s.Notch.EnableToFull);
+            ToFullStrictOverlapPercent = (decimal)s.Notch.MultiOwnerStrictOverlapPercent;
+            EnableToFullRuleEngine = s.Notch.EnableToFullRuleEngine;
+            EnableToFullRuleTrace = s.Notch.EnableToFullRuleTrace;
+            EnableBoundaryVirtualAreaCap = s.Notch.EnableBoundaryVirtualAreaCap;
+            BoundaryVirtualAreaCapPercent = (decimal)(NotchV22CompensationService.NormalizeBoundaryVirtualAreaCapRatio(
+                s.Notch.BoundaryVirtualAreaCapRatio) * 100.0);
+            EnableTargetCoverageGuard = s.Notch.EnableTargetCoverageGuard;
+            TargetCoverageCapPercent = s.Notch.TargetCoverageCapPercent;
+            OnPropertyChanged(nameof(NotchToFullRuleEngineSummary));
+            var notchExportProfileOption = NotchExportProfileOptions.FirstOrDefault(option => option.Value == s.Notch.ExportProfile);
+            if (string.IsNullOrWhiteSpace(notchExportProfileOption.Display))
+            {
+                notchExportProfileOption = NotchExportProfileOptions.Count > 0 ? NotchExportProfileOptions[0] : default;
+            }
+
+            SelectedNotchExportProfileOption = notchExportProfileOption;
+
+            // --- View Settings ---
+            CadFillOpacity = (decimal)Math.Clamp(s.View.CadFillOpacity, 0.0, 1.0);
+            CadLineOpacity = NormalizeLineOpacity(s.View.CadLineOpacity);
+            RegularFillOpacity = (decimal)Math.Clamp(s.View.RegularFillOpacity, 0.0, 1.0);
+            RegularLineOpacity = NormalizeLineOpacity(s.View.RegularLineOpacity);
+            AreaBucketTolerance = (decimal)s.View.AreaBucketTolerance;
+            MaxAreaBuckets = s.View.MaxAreaBuckets;
+            // --- Manual Sizing Scope ---
+            using (_settingsSuppression.EnterScopeSync())
+            {
+                IsWidthRowLocal = s.Grid.WidthScope == WidthAdjustmentScope.RowLocal;
+                IsHeightColumnLocal = s.Grid.HeightScope == HeightAdjustmentScope.ColumnLocal;
+                UseLocalSizing = IsWidthRowLocal && IsHeightColumnLocal; // Sync UseLocalSizing based on individual scopes.
+            }
+
+            // --- Manual Sizing Inputs (reset on load) ---
+            PendingColumnWidth = 0;
+            PendingRowHeight = 0;
+            ManualRowsRange = string.Empty;
+            ManualColsRange = string.Empty;
+            ManualRangeStatus = "No manual range.";
+            ManualRangeError = string.Empty;
+            HasManualRangeError = false;
+
+            RebuildCascadeSettings(); // Rebuild cascade-related UI elements.
         }
-        var compensationModelOption = NotchCompensationModelOptions.FirstOrDefault(
-            option => option.Value == s.Notch.CompensationModel);
-        if (string.IsNullOrWhiteSpace(compensationModelOption.Display))
-        {
-            compensationModelOption = NotchCompensationModelOptions.Count > 0
-                ? NotchCompensationModelOptions[0]
-                : default;
-        }
-
-        SelectedNotchCompensationModelOption = compensationModelOption;
-        ApplyNotchCompensationModeToLegacySwitches(
-            SelectedNotchCompensationModelOption.Value,
-            s.Notch.EnableToRegular,
-            s.Notch.EnableToFull);
-        ToFullStrictOverlapPercent = (decimal)s.Notch.MultiOwnerStrictOverlapPercent;
-        EnableToFullRuleEngine = s.Notch.EnableToFullRuleEngine;
-        EnableToFullRuleTrace = s.Notch.EnableToFullRuleTrace;
-        EnableBoundaryVirtualAreaCap = s.Notch.EnableBoundaryVirtualAreaCap;
-        BoundaryVirtualAreaCapPercent = (decimal)(NotchV22CompensationService.NormalizeBoundaryVirtualAreaCapRatio(
-            s.Notch.BoundaryVirtualAreaCapRatio) * 100.0);
-        EnableTargetCoverageGuard = s.Notch.EnableTargetCoverageGuard;
-        TargetCoverageCapPercent = s.Notch.TargetCoverageCapPercent;
-        OnPropertyChanged(nameof(NotchToFullRuleEngineSummary));
-        var notchExportProfileOption = NotchExportProfileOptions.FirstOrDefault(option => option.Value == s.Notch.ExportProfile);
-        if (string.IsNullOrWhiteSpace(notchExportProfileOption.Display))
-        {
-            notchExportProfileOption = NotchExportProfileOptions.Count > 0 ? NotchExportProfileOptions[0] : default;
-        }
-
-        SelectedNotchExportProfileOption = notchExportProfileOption;
-
-        // --- View Settings ---
-        CadFillOpacity = (decimal)Math.Clamp(s.View.CadFillOpacity, 0.0, 1.0);
-        CadLineOpacity = NormalizeLineOpacity(s.View.CadLineOpacity);
-        RegularFillOpacity = (decimal)Math.Clamp(s.View.RegularFillOpacity, 0.0, 1.0);
-        RegularLineOpacity = NormalizeLineOpacity(s.View.RegularLineOpacity);
-        AreaBucketTolerance = (decimal)s.View.AreaBucketTolerance;
-        MaxAreaBuckets = s.View.MaxAreaBuckets;
-        // --- Manual Sizing Scope ---
-        using (_settingsSuppression.EnterScopeSync())
-        {
-            IsWidthRowLocal = s.Grid.WidthScope == WidthAdjustmentScope.RowLocal;
-            IsHeightColumnLocal = s.Grid.HeightScope == HeightAdjustmentScope.ColumnLocal;
-            UseLocalSizing = IsWidthRowLocal && IsHeightColumnLocal; // Sync UseLocalSizing based on individual scopes.
-        }
-
-        // --- Manual Sizing Inputs (reset on load) ---
-        PendingColumnWidth = 0;
-        PendingRowHeight = 0;
-        ManualRowsRange = string.Empty;
-        ManualColsRange = string.Empty;
-        ManualRangeStatus = "No manual range.";
-        ManualRangeError = string.Empty;
-        HasManualRangeError = false;
-
-        RebuildCascadeSettings(); // Rebuild cascade-related UI elements.
-
-        _isLoadingSettings = false; // Reset loading flag after cascade rebuild (prevents stray rebuild triggers).
         HasUnsavedChanges = false; // Project is clean after loading.
     }
 

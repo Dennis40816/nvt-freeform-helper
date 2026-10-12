@@ -135,15 +135,9 @@ public sealed partial class FreeformHelperViewModel
 
         _appGeneralViewSnapshot = CloneViewSnapshot(document.View);
         _appGeneralImportSnapshot = CloneImportSnapshot(document.Import);
-        var wasLoading = _isLoadingSettings;
-        _isLoadingSettings = true;
-        try
+        using (_settingsSuppression.EnterSettingsLoading())
         {
             ApplyAppVisualPreferencesOnProjectLoad = document.Behavior.ApplyVisualPreferencesOnProjectLoad;
-        }
-        finally
-        {
-            _isLoadingSettings = wasLoading;
         }
         _projectFile.UiSnapshot = new ProjectUiSnapshot
         {

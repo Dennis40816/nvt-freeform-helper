@@ -32,19 +32,11 @@ public sealed partial class FreeformHelperViewModel
             NotchCompensationModel.Disabled => (false, false),
             _ => (currentGainEnableToRegular ?? true, currentGainEnableToFull ?? true),
         };
-        var wasLoading = _isLoadingSettings;
-        _isLoadingSettings = true;
+        using (_settingsSuppression.EnterSettingsLoading())
         using (_undoSuppression.Enter())
         {
-            try
-            {
-                EnableToRegular = enableToRegular;
-                EnableToFull = enableToFull;
-            }
-            finally
-            {
-                _isLoadingSettings = wasLoading;
-            }
+            EnableToRegular = enableToRegular;
+            EnableToFull = enableToFull;
         }
 
         OnPropertyChanged(nameof(CanShowToFullPreviewToggle));

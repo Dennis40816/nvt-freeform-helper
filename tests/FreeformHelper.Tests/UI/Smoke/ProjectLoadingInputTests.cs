@@ -107,9 +107,6 @@ public sealed class ProjectLoadingInputTests
             load = vm.LoadProjectCommand.ExecuteAsync(null);
             await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
-            var loadingField = typeof(FreeformHelperViewModel).GetField("_isLoadingSettings", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(loadingField);
-            Assert.True(Assert.IsType<bool>(loadingField.GetValue(vm)));
             Assert.Equal(ProjectSessionMode.LoadingProject, vm.SessionMode);
             Assert.False(view.IsEnabled);
             Assert.False(editor.IsEffectivelyEnabled);

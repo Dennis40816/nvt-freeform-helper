@@ -24,6 +24,11 @@ public sealed partial class FreeformHelperViewModel
 
     public bool IsProjectEditingEnabled => SessionMode == ProjectSessionMode.Ready;
 
+    // True while settings or a project load apply values. Derived from the counter; there is no second copy.
+    // The old field name is kept on purpose: members that carry analyzer debt (the RebuildGridAsync async lambda
+    // and the FilterCadPadsByLayer try statement) read it, and renaming it would change their ledger fingerprints.
+    private bool _isLoadingSettings => _settingsSuppression.IsSettingsLoadingActive;
+
     private async Task<ProjectLoadCommandResult> RunProjectLoadAsync(Func<Task<ProjectLoadCommandResult>> load)
     {
         if (!IsProjectEditingEnabled)
