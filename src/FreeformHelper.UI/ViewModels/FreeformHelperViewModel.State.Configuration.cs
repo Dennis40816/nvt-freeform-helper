@@ -339,12 +339,12 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(GlobalFontBaseSize));
     }
 
-    partial void OnIsNotchExportingChanged(bool value)
+    private void OnIsNotchExportingChanged(bool _)
     {
         OnPropertyChanged(nameof(ShouldShowNotchExportProgress));
     }
 
-    partial void OnNotchExportProgressChanged(double value)
+    private void OnNotchExportProgressChanged(double _)
     {
         OnPropertyChanged(nameof(ShouldShowNotchExportProgress));
     }
