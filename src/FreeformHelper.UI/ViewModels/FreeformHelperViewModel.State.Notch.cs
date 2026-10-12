@@ -103,11 +103,41 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets a value indicating whether notch export is currently running.
     /// </summary>
-    [ObservableProperty] private bool _isNotchExporting;
+    public bool IsNotchExporting
+    {
+        get => _notchOperationState.Current.IsBusy;
+        set
+        {
+            if (EqualityComparer<bool>.Default.Equals(_notchOperationState.Current.IsBusy, value))
+            {
+                return;
+            }
+
+            OnPropertyChanging(nameof(IsNotchExporting));
+            _notchOperationState.SetBusy(value);
+            OnIsNotchExportingChanged(value);
+            OnPropertyChanged(nameof(IsNotchExporting));
+        }
+    }
     /// <summary>
     /// Gets or sets notch export progress value in range [0,1].
     /// </summary>
-    [ObservableProperty] private double _notchExportProgress;
+    public double NotchExportProgress
+    {
+        get => _notchOperationState.Current.Progress;
+        set
+        {
+            if (EqualityComparer<double>.Default.Equals(_notchOperationState.Current.Progress, value))
+            {
+                return;
+            }
+
+            OnPropertyChanging(nameof(NotchExportProgress));
+            _notchOperationState.SetProgress(value);
+            OnNotchExportProgressChanged(value);
+            OnPropertyChanged(nameof(NotchExportProgress));
+        }
+    }
     /// <summary>
     /// Gets a value indicating whether Step 5 export progress UI should be visible.
     /// Hidden once progress reaches completion even if command cleanup is still finishing.
@@ -116,7 +146,21 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets current notch export progress text.
     /// </summary>
-    [ObservableProperty] private string _notchExportProgressText = "Idle.";
+    public string NotchExportProgressText
+    {
+        get => _notchOperationState.Current.Text;
+        set
+        {
+            if (EqualityComparer<string>.Default.Equals(_notchOperationState.Current.Text, value))
+            {
+                return;
+            }
+
+            OnPropertyChanging(nameof(NotchExportProgressText));
+            _notchOperationState.SetText(value);
+            OnPropertyChanged(nameof(NotchExportProgressText));
+        }
+    }
     /// <summary>
     /// Gets or sets target REG id used by Step 6 validation quick trace.
     /// </summary>

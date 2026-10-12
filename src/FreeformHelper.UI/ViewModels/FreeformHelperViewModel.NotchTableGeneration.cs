@@ -9,7 +9,8 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private int _notchOperationBusyScopeCount;
+    // The notch snapshot is owned and accessed only on the UI thread.
+    private readonly UiNotchOperationState _notchOperationState = new();
 
     private sealed record NotchTableGenerationResult(
         NotchTable Table,
@@ -365,13 +366,12 @@ public sealed partial class FreeformHelperViewModel
 
     private void BeginNotchOperationBusyScope()
     {
-        Interlocked.Increment(ref _notchOperationBusyScopeCount);
-        IsNotchExporting = true;
+        _notchOperationState.BeginBusyScope(value => IsNotchExporting = value);
     }
 
     private void EndNotchOperationBusyScope()
     {
-        IsNotchExporting = Interlocked.Decrement(ref _notchOperationBusyScopeCount) > 0;
+        _notchOperationState.EndBusyScope(value => IsNotchExporting = value);
     }
 
     private bool IsNotchFinalProjectionCurrent(int finalProjectionRevision, int sourceRevision)
