@@ -32,13 +32,14 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _suppressManualSizingApply = true;
-        using (_undoSuppression.Enter())
+        using (_settingsSuppression.EnterManualSizingApply())
         {
-            ManualRowsRange = rows;
-            ManualColsRange = cols;
+            using (_undoSuppression.Enter())
+            {
+                ManualRowsRange = rows;
+                ManualColsRange = cols;
+            }
         }
-        _suppressManualSizingApply = false;
         UpdateManualRangeStatus();
     }
 
@@ -49,13 +50,14 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _suppressManualSizingApply = true;
-        using (_undoSuppression.Enter())
+        using (_settingsSuppression.EnterManualSizingApply())
         {
-            PendingColumnWidth = width;
-            PendingRowHeight = height;
+            using (_undoSuppression.Enter())
+            {
+                PendingColumnWidth = width;
+                PendingRowHeight = height;
+            }
         }
-        _suppressManualSizingApply = false;
         ClearPendingMixedFlags();
     }
 

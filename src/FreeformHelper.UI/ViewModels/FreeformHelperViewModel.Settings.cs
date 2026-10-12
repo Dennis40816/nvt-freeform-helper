@@ -79,22 +79,24 @@ public sealed partial class FreeformHelperViewModel
         // Update global X/Y channels if they differ, suppressing cascade rebuild during this update.
         if (XChannels != totalX)
         {
-            _suppressCascadeRebuild = true;
-            using (_undoSuppression.Enter())
+            using (_settingsSuppression.EnterCascadeRebuild())
             {
-                XChannels = totalX;
+                using (_undoSuppression.Enter())
+                {
+                    XChannels = totalX;
+                }
             }
-            _suppressCascadeRebuild = false;
         }
 
         if (YChannels != maxY)
         {
-            _suppressCascadeRebuild = true;
-            using (_undoSuppression.Enter())
+            using (_settingsSuppression.EnterCascadeRebuild())
             {
-                YChannels = maxY;
+                using (_undoSuppression.Enter())
+                {
+                    YChannels = maxY;
+                }
             }
-            _suppressCascadeRebuild = false;
         }
 
         _ = TriggerGridRebuildAsync(requestFit: true); // Trigger grid rebuild.
@@ -153,13 +155,14 @@ public sealed partial class FreeformHelperViewModel
         // Update global X/Y channels if they differ, suppressing cascade rebuild during this update.
         if (XChannels != totalX || YChannels != maxY)
         {
-            _suppressCascadeRebuild = true;
-            using (_undoSuppression.Enter())
+            using (_settingsSuppression.EnterCascadeRebuild())
             {
-                XChannels = totalX;
-                YChannels = maxY;
+                using (_undoSuppression.Enter())
+                {
+                    XChannels = totalX;
+                    YChannels = maxY;
+                }
             }
-            _suppressCascadeRebuild = false;
         }
     }
 

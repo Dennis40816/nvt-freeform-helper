@@ -37,19 +37,14 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnSelectedScanOrderOptionChanged(ScanOrderOption value)
     {
-        if (_isLoadingSettings || _suppressScanOrderSelectionSync) return;
+        if (_isLoadingSettings || _settingsSuppression.IsScanOrderSelectionSyncActive) return;
 
-        _suppressScanOrderSelectionSync = true;
-        try
+        using (_settingsSuppression.EnterScanOrderSelectionSync())
         {
             if (SelectedScanOrder != value.Value)
             {
                 SelectedScanOrder = value.Value; // Update underlying enum property.
             }
-        }
-        finally
-        {
-            _suppressScanOrderSelectionSync = false;
         }
 
         ApplySettingsOrchestration(nameof(SelectedScanOrder));
@@ -57,10 +52,9 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnSelectedScanOrderChanged(ScanOrder value)
     {
-        if (_isLoadingSettings || _suppressScanOrderSelectionSync) return;
+        if (_isLoadingSettings || _settingsSuppression.IsScanOrderSelectionSyncActive) return;
 
-        _suppressScanOrderSelectionSync = true;
-        try
+        using (_settingsSuppression.EnterScanOrderSelectionSync())
         {
             var match = ScanOrderOptions.FirstOrDefault(o => o.Value == value);
             if (!match.Equals(SelectedScanOrderOption)) // Update display option if it doesn't match.
@@ -68,29 +62,20 @@ public sealed partial class FreeformHelperViewModel
                 SelectedScanOrderOption = match;
             }
         }
-        finally
-        {
-            _suppressScanOrderSelectionSync = false;
-        }
 
         ApplySettingsOrchestration(nameof(SelectedScanOrder));
     }
 
     partial void OnSelectedGridAlignmentOptionChanged(GridAlignmentOption value)
     {
-        if (_isLoadingSettings || _suppressGridAlignmentSelectionSync) return;
+        if (_isLoadingSettings || _settingsSuppression.IsGridAlignmentSelectionSyncActive) return;
 
-        _suppressGridAlignmentSelectionSync = true;
-        try
+        using (_settingsSuppression.EnterGridAlignmentSelectionSync())
         {
             if (GridAlignmentMode != value.Value)
             {
                 GridAlignmentMode = value.Value; // Update underlying enum property.
             }
-        }
-        finally
-        {
-            _suppressGridAlignmentSelectionSync = false;
         }
 
         ApplySettingsOrchestration(nameof(GridAlignmentMode));
@@ -98,10 +83,9 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnRegularSourceModeChanged(RegularSourceMode value)
     {
-        if (_isLoadingSettings || _suppressRegularSourceModeSelectionSync) return;
+        if (_isLoadingSettings || _settingsSuppression.IsRegularSourceModeSelectionSyncActive) return;
 
-        _suppressRegularSourceModeSelectionSync = true;
-        try
+        using (_settingsSuppression.EnterRegularSourceModeSelectionSync())
         {
             var match = RegularSourceModeOptions.FirstOrDefault(o => o.Value == value);
             if (!match.Equals(SelectedRegularSourceModeOption))
@@ -109,29 +93,20 @@ public sealed partial class FreeformHelperViewModel
                 SelectedRegularSourceModeOption = match;
             }
         }
-        finally
-        {
-            _suppressRegularSourceModeSelectionSync = false;
-        }
 
         ApplySettingsOrchestration(nameof(RegularSourceMode));
     }
 
     partial void OnSelectedRegularSourceModeOptionChanged(RegularSourceModeOption value)
     {
-        if (_isLoadingSettings || _suppressRegularSourceModeSelectionSync) return;
+        if (_isLoadingSettings || _settingsSuppression.IsRegularSourceModeSelectionSyncActive) return;
 
-        _suppressRegularSourceModeSelectionSync = true;
-        try
+        using (_settingsSuppression.EnterRegularSourceModeSelectionSync())
         {
             if (RegularSourceMode != value.Value)
             {
                 RegularSourceMode = value.Value;
             }
-        }
-        finally
-        {
-            _suppressRegularSourceModeSelectionSync = false;
         }
 
         ApplySettingsOrchestration(nameof(RegularSourceMode));
@@ -139,10 +114,9 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnGridAlignmentModeChanged(GridAlignmentMode value)
     {
-        if (_isLoadingSettings || _suppressGridAlignmentSelectionSync) return;
+        if (_isLoadingSettings || _settingsSuppression.IsGridAlignmentSelectionSyncActive) return;
 
-        _suppressGridAlignmentSelectionSync = true;
-        try
+        using (_settingsSuppression.EnterGridAlignmentSelectionSync())
         {
             var match = GridAlignmentOptions.FirstOrDefault(o => o.Value == value);
             if (!match.Equals(SelectedGridAlignmentOption)) // Update display option if it doesn't match.
@@ -150,17 +124,13 @@ public sealed partial class FreeformHelperViewModel
                 SelectedGridAlignmentOption = match;
             }
         }
-        finally
-        {
-            _suppressGridAlignmentSelectionSync = false;
-        }
 
         ApplySettingsOrchestration(nameof(GridAlignmentMode));
     }
 
     partial void OnSelectedBoundLayerOptionChanged(BoundLayerOption value)
     {
-        if (_suppressBoundLayerSelectionChange)
+        if (_settingsSuppression.IsBoundLayerSelectionChangeActive)
         {
             return;
         }
@@ -173,7 +143,7 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnSelectedRegularSourceLayerOptionChanged(RegularSourceLayerOption value)
     {
-        if (_suppressRegularSourceLayerSelectionChange)
+        if (_settingsSuppression.IsRegularSourceLayerSelectionChangeActive)
         {
             return;
         }
@@ -191,7 +161,7 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(PitchSizeX)); // Update dependent property.
         OnPropertyChanged(nameof(PitchSizeXSummary)); // Update dependent property.
         if (_isLoadingSettings) return;
-        if (_suppressCascadeRebuild)
+        if (_settingsSuppression.IsCascadeRebuildActive)
         {
             ApplySettingsChangeEffects(
                 SettingsChangeEffects.RefreshDxfRegularSourceHint |
@@ -207,7 +177,7 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(PitchSizeY)); // Update dependent property.
         OnPropertyChanged(nameof(PitchSizeYSummary)); // Update dependent property.
         if (_isLoadingSettings) return;
-        if (_suppressCascadeRebuild)
+        if (_settingsSuppression.IsCascadeRebuildActive)
         {
             ApplySettingsChangeEffects(
                 SettingsChangeEffects.RefreshDxfRegularSourceHint |

@@ -87,17 +87,12 @@ public sealed partial class FreeformHelperViewModel
         var cadId = ClampToInt(CadOutputFwDiffIndexAnchorCadId, 0, 2_000_000_000);
         if (!_cadIcIndexByCadId.TryGetValue(cadId, out var icIndex))
         {
-            _suppressDxfIndexAnchorChange = true;
-            try
+            using (_settingsSuppression.EnterDxfIndexAnchorChange())
             {
                 using (_undoSuppression.Enter())
                 {
                     CadOutputFwDiffIndexAnchorCadId = -1;
                 }
-            }
-            finally
-            {
-                _suppressDxfIndexAnchorChange = false;
             }
 
             SetStatus($"CAD Output FW Diff anchor ignored: CAD {cadId} is not visible.");

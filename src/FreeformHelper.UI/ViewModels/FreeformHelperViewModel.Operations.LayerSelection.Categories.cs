@@ -48,18 +48,19 @@ public sealed partial class FreeformHelperViewModel
 
         var undoSnapshot = CaptureLayerSelectionSnapshot();
         var changed = false;
-        _suppressLayerToggleChange = true;
-        foreach (var toggle in targets)
+        using (_settingsSuppression.EnterLayerToggleChange())
         {
-            if (toggle.IsSelected == isSelected)
+            foreach (var toggle in targets)
             {
-                continue;
-            }
+                if (toggle.IsSelected == isSelected)
+                {
+                    continue;
+                }
 
-            toggle.IsSelected = isSelected;
-            changed = true;
+                toggle.IsSelected = isSelected;
+                changed = true;
+            }
         }
-        _suppressLayerToggleChange = false;
 
         if (!changed)
         {

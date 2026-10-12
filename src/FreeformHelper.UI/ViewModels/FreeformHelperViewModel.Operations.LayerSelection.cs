@@ -92,15 +92,16 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _suppressLayerToggleChange = true;
-        foreach (var toggle in LayerToggles)
+        using (_settingsSuppression.EnterLayerToggleChange())
         {
-            if (snapshot.TryGetValue(toggle.Name, out var isSelected))
+            foreach (var toggle in LayerToggles)
             {
-                toggle.IsSelected = isSelected;
+                if (snapshot.TryGetValue(toggle.Name, out var isSelected))
+                {
+                    toggle.IsSelected = isSelected;
+                }
             }
         }
-        _suppressLayerToggleChange = false;
 
         MarkUnsaved();
         FilterCadPadsByLayer();
@@ -109,7 +110,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void QueueLayerSelectionUndoSnapshot()
     {
-        if (_suppressLayerToggleChange || _undoSuppression.IsActive || _isLoadingSettings || LayerToggles.Count == 0)
+        if (_settingsSuppression.IsLayerToggleChangeActive || _undoSuppression.IsActive || _isLoadingSettings || LayerToggles.Count == 0)
         {
             return;
         }
@@ -129,16 +130,17 @@ public sealed partial class FreeformHelperViewModel
 
         var undoSnapshot = CaptureLayerSelectionSnapshot();
         var changed = false;
-        _suppressLayerToggleChange = true;
-        foreach (var t in LayerToggles)
+        using (_settingsSuppression.EnterLayerToggleChange())
         {
-            if (!t.IsSelected)
+            foreach (var t in LayerToggles)
             {
-                t.IsSelected = true;
-                changed = true;
+                if (!t.IsSelected)
+                {
+                    t.IsSelected = true;
+                    changed = true;
+                }
             }
         }
-        _suppressLayerToggleChange = false;
 
         if (changed)
         {
@@ -162,16 +164,17 @@ public sealed partial class FreeformHelperViewModel
 
         var undoSnapshot = CaptureLayerSelectionSnapshot();
         var changed = false;
-        _suppressLayerToggleChange = true;
-        foreach (var t in LayerToggles)
+        using (_settingsSuppression.EnterLayerToggleChange())
         {
-            if (t.IsSelected)
+            foreach (var t in LayerToggles)
             {
-                t.IsSelected = false;
-                changed = true;
+                if (t.IsSelected)
+                {
+                    t.IsSelected = false;
+                    changed = true;
+                }
             }
         }
-        _suppressLayerToggleChange = false;
 
         if (changed)
         {
@@ -199,7 +202,7 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     private void OnLayerToggleChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (_suppressLayerToggleChange)
+        if (_settingsSuppression.IsLayerToggleChangeActive)
         {
             return;
         }
@@ -239,29 +242,30 @@ public sealed partial class FreeformHelperViewModel
 
         var undoSnapshot = CaptureLayerSelectionSnapshot();
         var changed = false;
-        _suppressLayerToggleChange = true;
-        if (soloSelect)
+        using (_settingsSuppression.EnterLayerToggleChange())
         {
-            foreach (var t in LayerToggles)
+            if (soloSelect)
             {
-                var shouldSelect = ReferenceEquals(t, toggle);
-                if (t.IsSelected != shouldSelect)
+                foreach (var t in LayerToggles)
                 {
-                    t.IsSelected = shouldSelect;
+                    var shouldSelect = ReferenceEquals(t, toggle);
+                    if (t.IsSelected != shouldSelect)
+                    {
+                        t.IsSelected = shouldSelect;
+                        changed = true;
+                    }
+                }
+            }
+            else
+            {
+                var next = !toggle.IsSelected;
+                if (toggle.IsSelected != next)
+                {
+                    toggle.IsSelected = next;
                     changed = true;
                 }
             }
         }
-        else
-        {
-            var next = !toggle.IsSelected;
-            if (toggle.IsSelected != next)
-            {
-                toggle.IsSelected = next;
-                changed = true;
-            }
-        }
-        _suppressLayerToggleChange = false;
 
         if (changed)
         {

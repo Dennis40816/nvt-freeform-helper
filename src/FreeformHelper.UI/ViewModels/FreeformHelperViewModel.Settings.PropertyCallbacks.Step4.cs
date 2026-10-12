@@ -21,10 +21,9 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnCadOutputFwDiffAutoModeChanged(CadOutputFwDiffAutoMode value)
     {
-        if (_isLoadingSettings || _suppressCadOutputFwDiffAutoModeSelectionSync) return;
+        if (_isLoadingSettings || _settingsSuppression.IsCadOutputFwDiffAutoModeSelectionSyncActive) return;
 
-        _suppressCadOutputFwDiffAutoModeSelectionSync = true;
-        try
+        using (_settingsSuppression.EnterCadOutputFwDiffAutoModeSelectionSync())
         {
             var match = CadOutputFwDiffAutoModeOptions.FirstOrDefault(option => option.Value == value);
             if (!match.Equals(SelectedCadOutputFwDiffAutoModeOption))
@@ -32,29 +31,20 @@ public sealed partial class FreeformHelperViewModel
                 SelectedCadOutputFwDiffAutoModeOption = match;
             }
         }
-        finally
-        {
-            _suppressCadOutputFwDiffAutoModeSelectionSync = false;
-        }
 
         ApplySettingsOrchestration(nameof(CadOutputFwDiffAutoMode));
     }
 
     partial void OnSelectedCadOutputFwDiffAutoModeOptionChanged(CadOutputFwDiffAutoModeOption value)
     {
-        if (_isLoadingSettings || _suppressCadOutputFwDiffAutoModeSelectionSync) return;
+        if (_isLoadingSettings || _settingsSuppression.IsCadOutputFwDiffAutoModeSelectionSyncActive) return;
 
-        _suppressCadOutputFwDiffAutoModeSelectionSync = true;
-        try
+        using (_settingsSuppression.EnterCadOutputFwDiffAutoModeSelectionSync())
         {
             if (CadOutputFwDiffAutoMode != value.Value)
             {
                 CadOutputFwDiffAutoMode = value.Value;
             }
-        }
-        finally
-        {
-            _suppressCadOutputFwDiffAutoModeSelectionSync = false;
         }
 
         ApplySettingsOrchestration(nameof(CadOutputFwDiffAutoMode));
@@ -62,7 +52,7 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnCadOutputFwDiffIndexAnchorCadIdChanged(decimal value)
     {
-        if (_isLoadingSettings || _suppressDxfIndexAnchorChange) return;
+        if (_isLoadingSettings || _settingsSuppression.IsDxfIndexAnchorChangeActive) return;
         if (value < -1 || value > 2_000_000_000)
         {
             using (_undoSuppression.Enter())

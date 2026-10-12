@@ -38,14 +38,9 @@ public sealed partial class FreeformHelperViewModel
             return false;
         }
 
-        _suppressLayerToggleChange = true;
-        try
+        using (_settingsSuppression.EnterLayerToggleChange())
         {
             target.IsSelected = false;
-        }
-        finally
-        {
-            _suppressLayerToggleChange = false;
         }
 
         if (!_isLoadingSettings)

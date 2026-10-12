@@ -89,17 +89,10 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private CadPadSet? _dxfEditBaselineCad;
     private readonly Dictionary<string, WorkspaceHeaderItem> _workspaceHeaderItemMap = new(); // Maps keys to header items.
     private string? _lastSavedPath; // Stores the path where the project was last saved.
-    private bool _suppressCascadeRebuild; // Flag to temporarily suppress cascading rebuilds.
+    // Independent synchronous suppression counters; UI-thread-only access.
+    private readonly SettingsSuppressionScopes _settingsSuppression = new();
     private bool _isLoadingSettings; // Flag to indicate that settings are currently being loaded.
-    private bool _suppressLayerToggleChange; // Flag to suppress layer toggle change handling during batch updates.
     private Dictionary<string, bool>? _pendingLayerSelectionUndoSnapshot;
-    private bool _suppressBoundLayerSelectionChange;
-    private bool _suppressRegularSourceLayerSelectionChange;
-    private bool _suppressScanOrderSelectionSync;
-    private bool _suppressGridAlignmentSelectionSync;
-    private bool _suppressRegularSourceModeSelectionSync;
-    private bool _suppressCadOutputFwDiffAutoModeSelectionSync;
-    private bool _suppressDxfIndexAnchorChange;
     private string? _pendingBoundLayerName;
     private string? _pendingRegularSourceLayerName;
     private ProjectFile _projectFile = new(); // The core project data model.
@@ -264,17 +257,18 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             initialLogLevel = new LogLevelOption("Info", "Info");
         }
         _selectedLogLevelOption = initialLogLevel;
-        _suppressBoundLayerSelectionChange = true;
-        BoundLayerOptions.Add(new BoundLayerOption(null, "Auto (visible layers)"));
-        SelectedBoundLayerOption = BoundLayerOptions[0];
-        _suppressBoundLayerSelectionChange = false;
-        _suppressRegularSourceLayerSelectionChange = true;
-        RegularSourceLayerOptions.Add(new RegularSourceLayerOption(null, "Select layer"));
-        SelectedRegularSourceLayerOption = RegularSourceLayerOptions[0];
-        _suppressRegularSourceLayerSelectionChange = false;
+        using (_settingsSuppression.EnterBoundLayerSelectionChange())
+        {
+            BoundLayerOptions.Add(new BoundLayerOption(null, "Auto (visible layers)"));
+            SelectedBoundLayerOption = BoundLayerOptions[0];
+        }
+        using (_settingsSuppression.EnterRegularSourceLayerSelectionChange())
+        {
+            RegularSourceLayerOptions.Add(new RegularSourceLayerOption(null, "Select layer"));
+            SelectedRegularSourceLayerOption = RegularSourceLayerOptions[0];
+        }
         _selectedDxfEditRotationScopeOption = DxfEditRotationScopeOptions[0];
         StartupPerfTracker.Mark("workspace.vm-options-initialized");
-
         // Layered settings precedence: Project > App General > Built-in defaults.
         // At startup without a project file loaded, app general overrides default values.
         TryApplyAppGeneralSettingsLayer();
@@ -304,7 +298,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _projectPersistenceUseCase = new ProjectPersistenceUseCase(_projectStore, _padOverrideService);
         _padEditUseCase = new PadEditUseCase(_manualSizingService);
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
-
         Logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
         StartupPerfTracker.Mark("workspace.vm-ctor-complete");
     }
