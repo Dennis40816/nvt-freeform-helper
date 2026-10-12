@@ -11,7 +11,7 @@ public sealed class SettingsSuppressionScopesTests
         "CascadeRebuild", "LayerToggleChange", "BoundLayerSelectionChange", "RegularSourceLayerSelectionChange",
         "ScanOrderSelectionSync", "GridAlignmentSelectionSync", "RegularSourceModeSelectionSync",
         "CadOutputFwDiffAutoModeSelectionSync", "DxfIndexAnchorChange", "ManualSizingApply",
-        "RegularVisibilityMaskStateChange", "ScopeSync", "NotchThresholdSync",
+        "RegularVisibilityMaskStateChange", "ScopeSync", "NotchThresholdSync", "SettingsLoading",
     };
 
     [Theory]
@@ -52,11 +52,27 @@ public sealed class SettingsSuppressionScopesTests
 
     [Theory]
     [MemberData(nameof(Domains))]
+    public void Enter_ExceptionInsideNestedScope_KeepsOuterActiveUntilDisposed(string domain)
+    {
+        var owner = new SettingsSuppressionScopes();
+        var (enter, active) = GetDomain(owner, domain);
+        using (enter())
+        {
+            Assert.Throws<InvalidOperationException>(() => ThrowInsideScope(enter));
+
+            Assert.True(active());
+        }
+
+        Assert.False(active());
+    }
+
+    [Theory]
+    [MemberData(nameof(Domains))]
     public void Enter_IndependentDomain_DoesNotSuppressOtherDomain(string domain)
     {
         var owner = new SettingsSuppressionScopes();
         var (enter, active) = GetDomain(owner, domain);
-        var other = GetDomain(owner, string.Equals(domain, "ScopeSync", StringComparison.Ordinal) ? "NotchThresholdSync" : "ScopeSync");
+        var other = GetDomain(owner, string.Equals(domain, "SettingsLoading", StringComparison.Ordinal) ? "ScopeSync" : "SettingsLoading");
 
         using (enter())
         {
@@ -93,6 +109,7 @@ public sealed class SettingsSuppressionScopesTests
         "ManualSizingApply" => (owner.EnterManualSizingApply, () => owner.IsManualSizingApplyActive),
         "RegularVisibilityMaskStateChange" => (owner.EnterRegularVisibilityMaskStateChange, () => owner.IsRegularVisibilityMaskStateChangeActive),
         "ScopeSync" => (owner.EnterScopeSync, () => owner.IsScopeSyncActive),
+        "SettingsLoading" => (owner.EnterSettingsLoading, () => owner.IsSettingsLoadingActive),
         "NotchThresholdSync" => (owner.EnterNotchThresholdSync, () => owner.IsNotchThresholdSyncActive),
         _ => throw new ArgumentOutOfRangeException(nameof(domain)),
     };

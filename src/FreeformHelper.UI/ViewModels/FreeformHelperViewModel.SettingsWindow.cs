@@ -150,8 +150,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _isLoadingSettings = true;
-        try
+        using (_settingsSuppression.EnterSettingsLoading())
         {
             XChannels = draft.XChannels;
             YChannels = draft.YChannels;
@@ -221,10 +220,6 @@ public sealed partial class FreeformHelperViewModel
             GlobalFontSizePercent = draft.GlobalFontSizePercent;
             HighlightStrokeWidthAdjust = Math.Clamp(draft.HighlightStrokeWidthAdjust, -2m, 4m);
         }
-        finally
-        {
-            _isLoadingSettings = false;
-        }
         if (changedProperties.Contains(nameof(SelectedLogLevelOption)))
         {
             var appliedLevelName = LoggingBootstrapper.ApplyMinimumLevel(resolvedLogLevel.Value);
@@ -233,14 +228,9 @@ public sealed partial class FreeformHelperViewModel
             if (!string.IsNullOrWhiteSpace(normalized.Display) &&
                 !normalized.Equals(SelectedLogLevelOption))
             {
-                _isLoadingSettings = true;
-                try
+                using (_settingsSuppression.EnterSettingsLoading())
                 {
                     SelectedLogLevelOption = normalized;
-                }
-                finally
-                {
-                    _isLoadingSettings = false;
                 }
             }
         }

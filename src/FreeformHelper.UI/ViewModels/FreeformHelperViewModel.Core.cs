@@ -89,9 +89,8 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private CadPadSet? _dxfEditBaselineCad;
     private readonly Dictionary<string, WorkspaceHeaderItem> _workspaceHeaderItemMap = new(); // Maps keys to header items.
     private string? _lastSavedPath; // Stores the path where the project was last saved.
-    // Independent synchronous suppression counters; UI-thread-only access.
+    // Independent nesting-safe suppression counters; UI-thread-only access.
     private readonly SettingsSuppressionScopes _settingsSuppression = new();
-    private bool _isLoadingSettings; // Flag to indicate that settings are currently being loaded.
     private Dictionary<string, bool>? _pendingLayerSelectionUndoSnapshot;
     private string? _pendingBoundLayerName;
     private string? _pendingRegularSourceLayerName;

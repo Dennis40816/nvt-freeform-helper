@@ -97,8 +97,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var wasLoading = _isLoadingSettings;
-        _isLoadingSettings = true;
+        using (_settingsSuppression.EnterSettingsLoading())
         using (_undoSuppression.Enter())
         {
 
@@ -170,7 +169,6 @@ public sealed partial class FreeformHelperViewModel
             CoordinatePreferredAaOutlineLayerName = snapshot.CoordinatePreferredAaOutlineLayerName?.Trim() ?? string.Empty;
 
         }
-        _isLoadingSettings = wasLoading;
     }
 
     private void ApplyImportSnapshot(UiImportSnapshot snapshot, ProjectFile? projectFile = null)
@@ -180,8 +178,8 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var wasLoading = _isLoadingSettings;
-        _isLoadingSettings = true;
+        var allowRuntimeRefresh = !_isLoadingSettings;
+        using var settingsLoading = _settingsSuppression.EnterSettingsLoading();
         ImportOnlyClosedPolylines = snapshot.OnlyClosedPolylines;
         ImportBlockPolylines = snapshot.IncludeBlockPolylines;
         if (!string.IsNullOrWhiteSpace(snapshot.LogLevel))
@@ -203,11 +201,9 @@ public sealed partial class FreeformHelperViewModel
         ApplyRegularVisibilityMaskSnapshot(
             sourcePath: snapshot.RegularVisibilityMaskSourcePath,
             isEnabled: snapshot.UseRegularVisibilityMask,
-            allowRuntimeRefresh: !wasLoading,
+            allowRuntimeRefresh: allowRuntimeRefresh,
             embeddedMask: projectFile?.EmbeddedRegularVisibilityMask,
             embeddedMaskName: projectFile?.EmbeddedRegularVisibilityMaskName);
-
-        _isLoadingSettings = wasLoading;
     }
 
     /// <summary>

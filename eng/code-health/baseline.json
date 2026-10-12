@@ -987,7 +987,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 367,
+        "stateMembers": 366,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -1249,20 +1249,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 82
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs"
-      ],
-      "contentHash": "f1dcff427705e767ce2c8457974799369d439ec35dc998732414ce451ef3feb0",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplyViewSnapshot(UiViewSnapshot)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 124
       },
       "owner": "NFH",
@@ -1361,7 +1347,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 127
+        "methodLines": 121
       },
       "owner": "NFH",
       "locations": [
@@ -1417,7 +1403,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 250
+        "methodLines": 240
       },
       "owner": "NFH",
       "locations": [
@@ -2006,7 +1992,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 112
+        "methodLines": 109
       },
       "owner": "NFH",
       "locations": [
@@ -16397,17 +16383,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "54482742c72a3d9b7db707713e7ed258411ce27a7dd87a5178377e544b2fad3a",
-      "member": "FreeformHelper.Tests.ProjectLoadingInputTests.ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "560e9601ab503844c8233af27153c6f825aa803e12e51be267611f330f46a587",

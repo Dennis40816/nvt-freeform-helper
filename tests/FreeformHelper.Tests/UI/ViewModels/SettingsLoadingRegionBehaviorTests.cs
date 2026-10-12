@@ -96,7 +96,7 @@ public sealed class SettingsLoadingRegionBehaviorTests
     }
 
     [AvaloniaFact]
-    public async Task SaveCommand_NestedDefaultsReset_ClearsOuterLoadingModeBeforeApplyReturns()
+    public async Task SaveCommand_NestedDefaultsReset_KeepsOuterLoadingModeUntilApplyReturns()
     {
         using var files = new LoadingModeTestScope();
         var vm = files.CreateViewModel();
@@ -106,15 +106,41 @@ public sealed class SettingsLoadingRegionBehaviorTests
         {
             vm.CreateSettingsWindowViewModel().ResetAllSettingsToDefaults();
             Assert.False(vm.CanUndo);
+            var percent = vm.NotchThresholdPercent;
+            vm.HasUnsavedChanges = false;
             vm.NotchThresholdQ7 = 64m;
-            Assert.Equal(50m, vm.NotchThresholdPercent);
-            Assert.True(vm.CanUndo); // Looks like a defect: LoadSettingsToUi cleared the outer apply mode.
+            Assert.Equal(percent, vm.NotchThresholdPercent);
+            Assert.False(vm.HasUnsavedChanges);
+            Assert.False(vm.CanUndo);
         });
 
         draft.SaveCommand.Execute(null);
 
         Assert.True(reset.WasInvoked);
         await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
+    }
+
+    [AvaloniaFact]
+    public async Task SaveCommand_NestedDefaultsResetCompleted_RestoresHandlersAndUndoRecording()
+    {
+        using var files = new LoadingModeTestScope();
+        var vm = files.CreateViewModel();
+        var draft = vm.CreateSettingsWindowViewModel();
+        draft.XChannels = 6m;
+        using var reset = OnNextChange(vm, nameof(vm.XChannels), () =>
+            vm.CreateSettingsWindowViewModel().ResetAllSettingsToDefaults());
+        draft.SaveCommand.Execute(null);
+        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
+        Assert.True(await vm.SaveProjectAsync());
+
+        vm.NotchThresholdQ7 = 96m;
+
+        Assert.True(reset.WasInvoked);
+        Assert.Equal(75m, vm.NotchThresholdPercent);
+        Assert.True(vm.HasUnsavedChanges);
+        Assert.True(vm.CanUndo);
+        vm.UndoCommand.Execute(null);
+        Assert.Equal(draft.NotchThresholdQ7, vm.NotchThresholdQ7);
     }
 
     [AvaloniaFact]

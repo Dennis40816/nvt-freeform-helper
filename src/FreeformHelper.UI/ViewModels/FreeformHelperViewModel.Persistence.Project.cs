@@ -237,9 +237,7 @@ public sealed partial class FreeformHelperViewModel
             var rebuildElapsedMs = 0L;
             var replayTiming = ProjectLoadReplayTiming.Empty;
 
-            var wasLoading = _isLoadingSettings;
-            _isLoadingSettings = true;
-            try
+            using (_settingsSuppression.EnterSettingsLoading())
             {
                 _cad = null;
                 ResetDxfEditBaseline(null);
@@ -287,10 +285,6 @@ public sealed partial class FreeformHelperViewModel
 
                     replayTiming = await ReplayWorkflowStepsAfterProjectLoadAsync();
                 });
-            }
-            finally
-            {
-                _isLoadingSettings = wasLoading;
             }
 
             totalSw.Stop();

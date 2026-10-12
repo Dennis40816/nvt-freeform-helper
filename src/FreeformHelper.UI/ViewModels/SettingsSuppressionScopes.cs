@@ -2,7 +2,9 @@
 namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
-/// Owns independent, nesting-safe synchronous suppression domains. UI-thread-only access.
+/// Owns independent, nesting-safe suppression domains. UI-thread-only access.
+/// Settings loading is a nesting counter held across the project load await;
+/// the other domains suppress synchronous regions.
 /// </summary>
 internal sealed class SettingsSuppressionScopes
 {
@@ -19,6 +21,10 @@ internal sealed class SettingsSuppressionScopes
     private readonly UndoSuppression _regularVisibilityMaskStateChange = new();
     private readonly UndoSuppression _scopeSync = new();
     private readonly UndoSuppression _notchThresholdSync = new();
+    private readonly UndoSuppression _settingsLoading = new();
+
+    public bool IsSettingsLoadingActive => _settingsLoading.IsActive;
+    public UndoSuppression.Scope EnterSettingsLoading() => _settingsLoading.Enter();
 
     public bool IsCascadeRebuildActive => _cascadeRebuild.IsActive;
     public UndoSuppression.Scope EnterCascadeRebuild() => _cascadeRebuild.Enter();
