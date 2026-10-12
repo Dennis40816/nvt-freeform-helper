@@ -62,15 +62,35 @@ jobs:
       - name: Format, analyzers and build
         shell: pwsh
         run: ./scripts/verify.ps1 -CiLane build -AllowMissingExampleData
+      # The checker accepts a moved Core pin only against a Core checkout (-CoreRoot): the pin must be a commit of that
+      # checkout and must descend from the pin it replaces. The pinned commit is read from the lock of the checked-out
+      # head and passed as a step output. Core is a public repository and needs its full history. The checker that
+      # runs is the one in that checkout, so the running script is the checker at the pin. From Core commit d2c3971
+      # on, Core keeps it LF with .gitattributes, which wins over the autocrlf setting of this job. The owner
+      # reviews every change to these steps and to the lock, because the checker trusts the checkout they select.
+      - name: Read the Core pin
+        id: pin
+        shell: pwsh
+        run: |
+          $lock = Get-Content -Raw -LiteralPath eng/core-health.lock.json | ConvertFrom-Json
+          if ($lock.coreCommit -cnotmatch '\A[0-9a-f]{40}\z') { throw 'eng/core-health.lock.json: coreCommit is not a 40-character lowercase SHA.' }
+          "commit=$($lock.coreCommit)" >> $env:GITHUB_OUTPUT
+      - name: Check out Core at the pin
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Dennis40816/nvt_fw_core
+          ref: ${{ steps.pin.outputs.commit }}
+          path: .core
+          fetch-depth: 0
+          persist-credentials: false
       # The baseline and the test-debt ledger were enrolled with English tool output. A pull request is also
       # compared with its base commit, so the ledgers cannot grow and the checker files cannot drift.
-      # A push to main or to the trunk runs without a base commit on purpose: the pull request run and the
-      # ruleset already compared the change with its base, and a push comparison would report the pin
-      # synchronization pull request as drift after it was approved by design (Core issue 197).
-      - name: Verify enrolled C# code health
+      # A push compares with the commit that the push replaced. An all-zero value (a new branch) runs without a
+      # base commit.
+      - name: Verify enrolled C# code health (pull request)
+        if: github.event_name == 'pull_request'
         shell: pwsh
         env:
-          EVENT_NAME: ${{ github.event_name }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           DOTNET_CLI_UI_LANGUAGE: en
           VSLANG: '1033'
@@ -79,15 +99,25 @@ jobs:
           UseSharedCompilation: 'false'
           DOTNET_CLI_USE_MSBUILD_SERVER: '0'
         run: |
-          if ($env:EVENT_NAME -eq 'pull_request') {
-            if ([string]::IsNullOrWhiteSpace($env:PR_BASE_SHA)) {
-              throw 'Pull-request code-health verification requires a base SHA.'
-            }
-            pwsh -NoProfile -File eng/core-health/repo-health.ps1 -Mode Verify -Repo nfh -Root . -Solution FreeformHelper.sln -BaseRef $env:PR_BASE_SHA
-          } else {
-            pwsh -NoProfile -File eng/core-health/repo-health.ps1 -Mode Verify -Repo nfh -Root . -Solution FreeformHelper.sln
+          if ([string]::IsNullOrWhiteSpace($env:PR_BASE_SHA)) {
+            throw 'Pull-request code-health verification requires a base SHA.'
           }
-          exit $LASTEXITCODE
+          ./.core/tools/repo-checks/repo-health.ps1 -Mode Verify -Repo nfh -Root . -Solution FreeformHelper.sln -BaseRef $env:PR_BASE_SHA -CoreRoot ./.core
+      - name: Verify enrolled C# code health (push)
+        if: github.event_name == 'push'
+        shell: pwsh
+        env:
+          PUSH_BEFORE: ${{ github.event.before }}
+          DOTNET_CLI_UI_LANGUAGE: en
+          VSLANG: '1033'
+          PreferredUILang: en-US
+          MSBUILDDISABLENODEREUSE: '1'
+          UseSharedCompilation: 'false'
+          DOTNET_CLI_USE_MSBUILD_SERVER: '0'
+        run: |
+          $p = @{ Mode = 'Verify'; Repo = 'nfh'; Root = '.'; Solution = 'FreeformHelper.sln'; CoreRoot = './.core' }
+          if ($env:PUSH_BEFORE -and $env:PUSH_BEFORE -notmatch '^0+$') { $p.BaseRef = $env:PUSH_BEFORE }
+          ./.core/tools/repo-checks/repo-health.ps1 @p
       - name: Upload the code-health evidence
         # Only the SARIF files and the tool logs of this job. The build job does not check out the private
         # example data, and the files hold rule ids, paths of this public repository and messages. Never
