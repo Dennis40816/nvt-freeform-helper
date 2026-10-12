@@ -65,20 +65,22 @@ public sealed partial class FreeformHelperViewModel
         LayerToggles = toggles;
         HasCadLayers = snapshot.HasCadLayers;
 
-        _suppressBoundLayerSelectionChange = true;
-        BoundLayerOptions = new ObservableCollection<BoundLayerOption>(snapshot.BoundLayerOptions);
-        SelectedBoundLayerOption = BoundLayerOptions.FirstOrDefault(option =>
-            string.Equals(option.Name, snapshot.SelectedBoundLayerName, StringComparison.OrdinalIgnoreCase))
-            ?? BoundLayerOptions.First();
-        BoundLayerOptionSummary = snapshot.BoundLayerOptionSummary;
-        _suppressBoundLayerSelectionChange = false;
+        using (_settingsSuppression.EnterBoundLayerSelectionChange())
+        {
+            BoundLayerOptions = new ObservableCollection<BoundLayerOption>(snapshot.BoundLayerOptions);
+            SelectedBoundLayerOption = BoundLayerOptions.FirstOrDefault(option =>
+                string.Equals(option.Name, snapshot.SelectedBoundLayerName, StringComparison.OrdinalIgnoreCase))
+                ?? BoundLayerOptions.First();
+            BoundLayerOptionSummary = snapshot.BoundLayerOptionSummary;
+        }
 
-        _suppressRegularSourceLayerSelectionChange = true;
-        RegularSourceLayerOptions = new ObservableCollection<RegularSourceLayerOption>(snapshot.RegularSourceLayerOptions);
-        SelectedRegularSourceLayerOption = RegularSourceLayerOptions.FirstOrDefault(option =>
-            string.Equals(option.Name, snapshot.SelectedRegularSourceLayerName, StringComparison.OrdinalIgnoreCase))
-            ?? RegularSourceLayerOptions.First();
-        _suppressRegularSourceLayerSelectionChange = false;
+        using (_settingsSuppression.EnterRegularSourceLayerSelectionChange())
+        {
+            RegularSourceLayerOptions = new ObservableCollection<RegularSourceLayerOption>(snapshot.RegularSourceLayerOptions);
+            SelectedRegularSourceLayerOption = RegularSourceLayerOptions.FirstOrDefault(option =>
+                string.Equals(option.Name, snapshot.SelectedRegularSourceLayerName, StringComparison.OrdinalIgnoreCase))
+                ?? RegularSourceLayerOptions.First();
+        }
 
         DxfEditLayerOptions = new ObservableCollection<string>(snapshot.DxfEditLayerOptions);
         DxfEditTargetLayerName = snapshot.SelectedDxfEditTargetLayerName;

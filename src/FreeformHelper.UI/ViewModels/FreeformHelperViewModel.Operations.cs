@@ -87,40 +87,6 @@ public sealed partial class FreeformHelperViewModel
     }
 
     /// <summary>
-    /// Applies the saved layer selections from a <see cref="UiViewSnapshot"/> to the current layer toggles.
-    /// </summary>
-    /// <param name="snapshot">The <see cref="UiViewSnapshot"/> containing saved layer selection states.</param>
-    private void ApplyLayerSelections(UiViewSnapshot snapshot)
-    {
-        if (snapshot is null || snapshot.LayerSelections is null || snapshot.LayerSelections.Count == 0)
-        {
-            return;
-        }
-
-        var changed = false;
-        _suppressLayerToggleChange = true;
-        // Iterate through current layer toggles and set their selection state based on the snapshot.
-        foreach (var t in LayerToggles)
-        {
-            var match = snapshot.LayerSelections.FirstOrDefault(s => string.Equals(s.Name, t.Name, StringComparison.OrdinalIgnoreCase));
-            if (match is not null)
-            {
-                if (t.IsSelected != match.IsSelected)
-                {
-                    t.IsSelected = match.IsSelected;
-                    changed = true;
-                }
-            }
-        }
-        _suppressLayerToggleChange = false;
-
-        if (changed)
-        {
-            FilterCadPadsByLayer(); // Apply the restored layer filters.
-        }
-    }
-
-    /// <summary>
     /// Applies persisted UI view settings from a <see cref="UiViewSnapshot"/>.
     /// </summary>
     /// <param name="snapshot">The snapshot containing view settings.</param>

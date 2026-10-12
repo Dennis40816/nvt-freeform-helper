@@ -262,8 +262,6 @@ public sealed partial class FreeformHelperViewModel
     [ObservableProperty] private ObservableCollection<int> _cadOutputFwDiffIndexAnchorCadIdsForCanvas = new();
 
     // Sizing scopes for manual adjustments.
-    private bool _suppressScopeSync; // Flag to prevent infinite loops during scope changes.
-    private bool _suppressNotchThresholdSync; // Flag to prevent threshold synchronization loops.
 
     /// <summary>
     /// Gets or sets a value indicating whether local sizing (row-local width, column-local height) is enabled.
@@ -286,11 +284,12 @@ public sealed partial class FreeformHelperViewModel
     /// <param name="value">The new value of <see cref="UseLocalSizing"/>.</param>
     partial void OnUseLocalSizingChanged(bool value)
     {
-        if (_suppressScopeSync) return;
-        _suppressScopeSync = true;
-        IsWidthRowLocal = value;
-        IsHeightColumnLocal = value;
-        _suppressScopeSync = false;
+        if (_settingsSuppression.IsScopeSyncActive) return;
+        using (_settingsSuppression.EnterScopeSync())
+        {
+            IsWidthRowLocal = value;
+            IsHeightColumnLocal = value;
+        }
         _ = TriggerGridRebuildAsync(requestFit: false);
     }
 
@@ -301,10 +300,11 @@ public sealed partial class FreeformHelperViewModel
     /// <param name="value">The new value of <see cref="IsWidthRowLocal"/>.</param>
     partial void OnIsWidthRowLocalChanged(bool value)
     {
-        if (_suppressScopeSync) return;
-        _suppressScopeSync = true;
-        UseLocalSizing = value && IsHeightColumnLocal;
-        _suppressScopeSync = false;
+        if (_settingsSuppression.IsScopeSyncActive) return;
+        using (_settingsSuppression.EnterScopeSync())
+        {
+            UseLocalSizing = value && IsHeightColumnLocal;
+        }
         _ = TriggerGridRebuildAsync(requestFit: false);
     }
 
@@ -315,10 +315,11 @@ public sealed partial class FreeformHelperViewModel
     /// <param name="value">The new value of <see cref="IsHeightColumnLocal"/>.</param>
     partial void OnIsHeightColumnLocalChanged(bool value)
     {
-        if (_suppressScopeSync) return;
-        _suppressScopeSync = true;
-        UseLocalSizing = IsWidthRowLocal && value;
-        _suppressScopeSync = false;
+        if (_settingsSuppression.IsScopeSyncActive) return;
+        using (_settingsSuppression.EnterScopeSync())
+        {
+            UseLocalSizing = IsWidthRowLocal && value;
+        }
         _ = TriggerGridRebuildAsync(requestFit: false);
     }
 

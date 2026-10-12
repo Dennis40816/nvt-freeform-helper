@@ -152,9 +152,8 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _suppressLayerToggleChange = true;
         var changed = false;
-        try
+        using (_settingsSuppression.EnterLayerToggleChange())
         {
             foreach (var toggle in LayerToggles)
             {
@@ -174,10 +173,6 @@ public sealed partial class FreeformHelperViewModel
                 toggle.IsSelected = isSelected;
                 changed = true;
             }
-        }
-        finally
-        {
-            _suppressLayerToggleChange = false;
         }
 
         if (changed)

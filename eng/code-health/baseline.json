@@ -987,7 +987,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 380,
+        "stateMembers": 367,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -8836,17 +8836,6 @@
       "removeBy": "2026-10-31",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/ManualSizingService.Distribution.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0051",
-      "symbol": "IDE0051"
-    },
-    {
-      "syntaxHash": "80c99baf1b1593c460b8749bcaa7344808e802ab189c04322900e17e7f70ac1e",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplyLayerSelections(UiViewSnapshot)",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "IDE0051",

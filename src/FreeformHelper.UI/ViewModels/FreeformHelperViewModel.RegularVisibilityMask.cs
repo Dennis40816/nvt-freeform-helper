@@ -14,7 +14,6 @@ public sealed partial class FreeformHelperViewModel
     private string? _regularVisibilityMaskSourcePath;
     private byte[]? _embeddedRegularVisibilityMask;
     private string? _embeddedRegularVisibilityMaskName;
-    private bool _suppressRegularVisibilityMaskStateChange;
 
     private async Task ImportRegularVisibilityMaskAsync()
     {
@@ -218,9 +217,10 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _suppressRegularVisibilityMaskStateChange = true;
-        IsRegularVisibilityMaskEnabled = value;
-        _suppressRegularVisibilityMaskStateChange = false;
+        using (_settingsSuppression.EnterRegularVisibilityMaskStateChange())
+        {
+            IsRegularVisibilityMaskEnabled = value;
+        }
         InvalidateWorkflowDataSnapshot();
 
         RegularVisibilityMaskSummary = BuildRegularVisibilityMaskSummary(_regularVisibilityMaskResult, _grid, IsRegularVisibilityMaskEnabled);
@@ -235,7 +235,7 @@ public sealed partial class FreeformHelperViewModel
     {
         RegularVisibilityMaskSummary = BuildRegularVisibilityMaskSummary(_regularVisibilityMaskResult, _grid, value);
         RefreshStep4DuplicateDiffGroups();
-        if (_suppressRegularVisibilityMaskStateChange)
+        if (_settingsSuppression.IsRegularVisibilityMaskStateChangeActive)
         {
             return;
         }

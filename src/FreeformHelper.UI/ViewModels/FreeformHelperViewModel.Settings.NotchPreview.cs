@@ -138,7 +138,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        if (_suppressNotchThresholdSync)
+        if (_settingsSuppression.IsNotchThresholdSyncActive)
         {
             return;
         }
@@ -150,9 +150,10 @@ public sealed partial class FreeformHelperViewModel
 
         if (LinkNotchThresholds)
         {
-            _suppressNotchThresholdSync = true;
-            NotchThresholdPercent = Math.Round(clamped * 100m / 128m, 2);
-            _suppressNotchThresholdSync = false;
+            using (_settingsSuppression.EnterNotchThresholdSync())
+            {
+                NotchThresholdPercent = Math.Round(clamped * 100m / 128m, 2);
+            }
         }
     }
 
@@ -168,7 +169,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        if (_suppressNotchThresholdSync)
+        if (_settingsSuppression.IsNotchThresholdSyncActive)
         {
             return;
         }
@@ -181,15 +182,16 @@ public sealed partial class FreeformHelperViewModel
         if (LinkNotchThresholds)
         {
             var q7 = Math.Clamp((int)Math.Round(clamped * 128m / 100m, MidpointRounding.AwayFromZero), 0, 128);
-            _suppressNotchThresholdSync = true;
-            NotchThresholdQ7 = q7;
-            _suppressNotchThresholdSync = false;
+            using (_settingsSuppression.EnterNotchThresholdSync())
+            {
+                NotchThresholdQ7 = q7;
+            }
         }
     }
 
     partial void OnLinkNotchThresholdsChanged(bool value)
     {
-        if (_isLoadingSettings || _suppressNotchThresholdSync)
+        if (_isLoadingSettings || _settingsSuppression.IsNotchThresholdSyncActive)
         {
             return;
         }
@@ -199,9 +201,10 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _suppressNotchThresholdSync = true;
-        NotchThresholdPercent = Math.Round(NotchThresholdQ7 * 100m / 128m, 2);
-        _suppressNotchThresholdSync = false;
+        using (_settingsSuppression.EnterNotchThresholdSync())
+        {
+            NotchThresholdPercent = Math.Round(NotchThresholdQ7 * 100m / 128m, 2);
+        }
     }
 
     partial void OnNotchPreviewVisualizationStepChanged(decimal value)

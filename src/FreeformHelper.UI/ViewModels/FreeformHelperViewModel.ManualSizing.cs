@@ -12,7 +12,6 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel
 {
     // Flag to suppress manual sizing application during initial settings loading or other controlled updates.
-    private bool _suppressManualSizingApply;
 
     /// <summary>
     /// Partial method invoked when the <see cref="ManualRowsRange"/> property changes.
@@ -22,7 +21,7 @@ public sealed partial class FreeformHelperViewModel
     partial void OnManualRowsRangeChanged(string value)
     {
         // Suppress updates if settings are loading or manual sizing is temporarily suppressed.
-        if (_isLoadingSettings || _suppressManualSizingApply)
+        if (_isLoadingSettings || _settingsSuppression.IsManualSizingApplyActive)
         {
             return;
         }
@@ -38,7 +37,7 @@ public sealed partial class FreeformHelperViewModel
     partial void OnManualColsRangeChanged(string value)
     {
         // Suppress updates if settings are loading or manual sizing is temporarily suppressed.
-        if (_isLoadingSettings || _suppressManualSizingApply)
+        if (_isLoadingSettings || _settingsSuppression.IsManualSizingApplyActive)
         {
             return;
         }
@@ -54,7 +53,7 @@ public sealed partial class FreeformHelperViewModel
     partial void OnPendingColumnWidthChanged(decimal value)
     {
         // Suppress updates if settings are loading or manual sizing is temporarily suppressed.
-        if (_isLoadingSettings || _suppressManualSizingApply)
+        if (_isLoadingSettings || _settingsSuppression.IsManualSizingApplyActive)
         {
             return;
         }
@@ -70,7 +69,7 @@ public sealed partial class FreeformHelperViewModel
     partial void OnPendingRowHeightChanged(decimal value)
     {
         // Suppress updates if settings are loading or manual sizing is temporarily suppressed.
-        if (_isLoadingSettings || _suppressManualSizingApply)
+        if (_isLoadingSettings || _settingsSuppression.IsManualSizingApplyActive)
         {
             return;
         }

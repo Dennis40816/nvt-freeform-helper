@@ -13,7 +13,6 @@ public sealed partial class FreeformHelperViewModel
         EnsureChannelDefaults(s.Grid); // Ensure channel counts are valid.
         EnsureActiveAreaDefaults(s.Grid); // Ensure active area dimensions are valid.
         ManualSizingService.EnsureSizingLists(s.Grid); // Ensure sizing lists are correctly initialized.
-
         // --- Grid Settings ---
         XChannels = s.Grid.XChannels;
         YChannels = s.Grid.YChannels;
@@ -102,15 +101,16 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(IsLenScaleVisible));
         LenScale = s.Notch.LenScale;
         NullValue = s.Notch.NullValue;
-        _suppressNotchThresholdSync = true;
-        NotchThresholdQ7 = s.Notch.ThresholdQ7;
-        NotchThresholdPercent = (decimal)Math.Clamp(s.Notch.ThresholdPercentV22, 0.0, 100.0);
-        LinkNotchThresholds = s.Notch.LinkVersionThresholds;
-        if (LinkNotchThresholds)
+        using (_settingsSuppression.EnterNotchThresholdSync())
         {
-            NotchThresholdPercent = Math.Round(NotchThresholdQ7 * 100m / 128m, 2);
+            NotchThresholdQ7 = s.Notch.ThresholdQ7;
+            NotchThresholdPercent = (decimal)Math.Clamp(s.Notch.ThresholdPercentV22, 0.0, 100.0);
+            LinkNotchThresholds = s.Notch.LinkVersionThresholds;
+            if (LinkNotchThresholds)
+            {
+                NotchThresholdPercent = Math.Round(NotchThresholdQ7 * 100m / 128m, 2);
+            }
         }
-        _suppressNotchThresholdSync = false;
         var compensationModelOption = NotchCompensationModelOptions.FirstOrDefault(
             option => option.Value == s.Notch.CompensationModel);
         if (string.IsNullOrWhiteSpace(compensationModelOption.Display))
@@ -149,13 +149,13 @@ public sealed partial class FreeformHelperViewModel
         RegularLineOpacity = NormalizeLineOpacity(s.View.RegularLineOpacity);
         AreaBucketTolerance = (decimal)s.View.AreaBucketTolerance;
         MaxAreaBuckets = s.View.MaxAreaBuckets;
-
         // --- Manual Sizing Scope ---
-        _suppressScopeSync = true; // Temporarily suppress scope synchronization.
-        IsWidthRowLocal = s.Grid.WidthScope == WidthAdjustmentScope.RowLocal;
-        IsHeightColumnLocal = s.Grid.HeightScope == HeightAdjustmentScope.ColumnLocal;
-        UseLocalSizing = IsWidthRowLocal && IsHeightColumnLocal; // Sync UseLocalSizing based on individual scopes.
-        _suppressScopeSync = false;
+        using (_settingsSuppression.EnterScopeSync())
+        {
+            IsWidthRowLocal = s.Grid.WidthScope == WidthAdjustmentScope.RowLocal;
+            IsHeightColumnLocal = s.Grid.HeightScope == HeightAdjustmentScope.ColumnLocal;
+            UseLocalSizing = IsWidthRowLocal && IsHeightColumnLocal; // Sync UseLocalSizing based on individual scopes.
+        }
 
         // --- Manual Sizing Inputs (reset on load) ---
         PendingColumnWidth = 0;
