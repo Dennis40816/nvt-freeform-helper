@@ -51,19 +51,9 @@ public sealed partial class FreeformHelperViewModel
         _layerCatalogStateService.Clear();
     }
 
-    private void TryLoadDxfLayerCatalogFromPath(string path)
-    {
-        _layerCatalogStateService.TryLoadFromPath(path);
-    }
-
     private Task TryLoadDxfLayerCatalogFromPathAsync(string path)
     {
         return Task.Run(() => _layerCatalogStateService.TryLoadFromPath(path));
-    }
-
-    private void TryLoadDxfLayerCatalogFromEmbedded(byte[]? data)
-    {
-        _layerCatalogStateService.TryLoadFromEmbedded(data);
     }
 
     private Task TryLoadDxfLayerCatalogFromEmbeddedAsync(byte[]? data)

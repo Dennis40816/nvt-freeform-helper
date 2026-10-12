@@ -8216,26 +8216,6 @@
       "symbol": "IDE0051"
     },
     {
-      "syntaxHash": "889ed16d046bb1ecf54930ec00b4d0d46353a4a5fe17a11cc40b207f7d0a2fd0",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.TryLoadDxfLayerCatalogFromEmbedded(byte[]?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0051",
-      "symbol": "IDE0051"
-    },
-    {
-      "syntaxHash": "3f9d3fc6fe27424a8fc1fd30dabb2f93508703b01542e2240674344f947c3f16",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.TryLoadDxfLayerCatalogFromPath(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0051",
-      "symbol": "IDE0051"
-    },
-    {
       "syntaxHash": "9df6a0dbf8bf6bcb3771f7a448dfb381df1293fdf274ffec5c55134225fa1f52",
       "member": "FreeformHelper.UI.ViewModels.IndexMappingReportViewModel.ApplyIssueFilters()",
       "owner": "NFH",
