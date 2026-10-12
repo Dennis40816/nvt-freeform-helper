@@ -36,7 +36,6 @@ public sealed partial class FreeformHelperViewModel
             Logger.Debug(CultureInfo.InvariantCulture, "DXF overlap check skipped: no CAD output pads.");
             return;
         }
-
         await RunUiProgressOperationAsync(
             operationName: "DXF overlap check",
             setBusy: busy => IsCheckingDxfOverlap = busy,
@@ -47,49 +46,7 @@ public sealed partial class FreeformHelperViewModel
                 SetStatus(DxfOverlapSummary);
                 Logger.Info(CultureInfo.InvariantCulture, "DXF overlap check started (visible pads={0}).", pads.Count);
             },
-            operationAsync: async reportProgress =>
-            {
-                var cad = new CadPadSet(pads);
-                var report = await Task.Run(() =>
-                    Application.Services.DxfOverlapAnalyzer.Analyze(
-                        cad,
-                        maxSamples: 300,
-                        reportProgress: reportProgress));
-
-                DxfOverlapIssues.Clear();
-                foreach (var issue in report.SampleIssues)
-                {
-                    DxfOverlapIssues.Add(issue.BuildMessage());
-                }
-
-                DxfOverlapIssueCount = DxfOverlapIssues.Count;
-                HasDxfOverlapIssues = DxfOverlapIssues.Count > 0;
-
-                var highlightedIds = report.SampleIssues
-                    .SelectMany(issue => new[] { issue.PadAId, issue.PadBId })
-                    .Distinct()
-                    .OrderBy(id => id)
-                    .ToList();
-                _lastDxfOverlapCadIds = highlightedIds;
-                DxfOverlapHighlightedCadIds = new System.Collections.ObjectModel.ObservableCollection<int>(highlightedIds);
-                HasDxfOverlapHighlights = highlightedIds.Count > 0;
-
-                if (!report.HasIssues)
-                {
-                    DxfOverlapSummary = "DXF check: no overlaps detected.";
-                    SetStatus(DxfOverlapSummary);
-                    Logger.Info(CultureInfo.InvariantCulture, "DXF check: no overlaps detected (pads={0}).", report.PadCount);
-                    return;
-                }
-
-                DxfOverlapSummary = $"DXF warnings: {report.Summary}.";
-                SetStatus(DxfOverlapSummary);
-                Logger.Warn(CultureInfo.InvariantCulture, "DXF quality warnings: {0}", report.Summary);
-                foreach (var issue in report.SampleIssues)
-                {
-                    Logger.Warn(CultureInfo.InvariantCulture, "DXF issue: {0}", issue.BuildMessage());
-                }
-            },
+            operationAsync: CheckOverlapAsync,
             onError: ex =>
             {
                 ClearDxfOverlapResult();
@@ -97,6 +54,49 @@ public sealed partial class FreeformHelperViewModel
                 SetStatusError("DXF overlap check failed", ex);
                 Logger.Error(ex, "DXF overlap check failed.");
             });
+        async Task CheckOverlapAsync(Action<double> reportProgress)
+        {
+            var cad = new CadPadSet(pads);
+            var report = await Task.Run(() =>
+                Application.Services.DxfOverlapAnalyzer.Analyze(
+                    cad,
+                    maxSamples: 300,
+                    reportProgress: reportProgress));
+
+            DxfOverlapIssues.Clear();
+            foreach (var issue in report.SampleIssues)
+            {
+                DxfOverlapIssues.Add(issue.BuildMessage());
+            }
+
+            DxfOverlapIssueCount = DxfOverlapIssues.Count;
+            HasDxfOverlapIssues = DxfOverlapIssues.Count > 0;
+
+            var highlightedIds = report.SampleIssues
+                .SelectMany(issue => new[] { issue.PadAId, issue.PadBId })
+                .Distinct()
+                .OrderBy(id => id)
+                .ToList();
+            _lastDxfOverlapCadIds = highlightedIds;
+            DxfOverlapHighlightedCadIds = new System.Collections.ObjectModel.ObservableCollection<int>(highlightedIds);
+            HasDxfOverlapHighlights = highlightedIds.Count > 0;
+
+            if (!report.HasIssues)
+            {
+                DxfOverlapSummary = "DXF check: no overlaps detected.";
+                SetStatus(DxfOverlapSummary);
+                Logger.Info(CultureInfo.InvariantCulture, "DXF check: no overlaps detected (pads={0}).", report.PadCount);
+                return;
+            }
+
+            DxfOverlapSummary = $"DXF warnings: {report.Summary}.";
+            SetStatus(DxfOverlapSummary);
+            Logger.Warn(CultureInfo.InvariantCulture, "DXF quality warnings: {0}", report.Summary);
+            foreach (var issue in report.SampleIssues)
+            {
+                Logger.Warn(CultureInfo.InvariantCulture, "DXF issue: {0}", issue.BuildMessage());
+            }
+        }
     }
 
     private void SelectDxfOverlapPads()

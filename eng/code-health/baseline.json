@@ -987,7 +987,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 366,
+        "stateMembers": 360,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -2699,39 +2699,6 @@
       "count": 1,
       "rule": "generationFields",
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._notchCompensationCacheRevision"
-    },
-    {
-      "syntaxHash": "85cff46ba934e81a045fff4446d89b2dc444a6764a16bf02228cc0132ca9d52d",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.CheckDxfQualityAsync()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "01ba6e61b503ebf53fb7a16c78f60c55e53cedeb4b224cca3d887142e5575e14",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.AnalyzeIndexMappingAsync()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "c557ae82f8125eb4a768325baa49df5dc141ff8e88f97c70b95ca4f2872d93c9",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.MatchAsync()",
-      "removeBy": "2026-10-31",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
     },
     {
       "syntaxHash": "45f03dabb72b6ba4a44f3b30f99748dbab085f1b297269e886041c9c05906bfb",
