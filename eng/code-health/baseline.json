@@ -1250,20 +1250,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 124
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs"
-      ],
-      "contentHash": "2019f02c62ce524f109761b85f0e6d64f9ecf647f0587e2405a049f691b73496",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RebuildGridAsync()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 81
       },
       "owner": "NFH",
@@ -2664,16 +2650,6 @@
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunWithModalLoadingSpinnerAsync`1(Func<Task<TResult>>)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ModalLoading.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "6f7d19de8df7a1e5f55434a4f78e24ac5c3b9efd7bd03e6efeac3d94670ed37f",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RebuildGridAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "asyncVoid",
