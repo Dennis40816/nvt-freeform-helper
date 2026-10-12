@@ -122,3 +122,6 @@ __pycache__/
 # NVT Core packages, downloaded before restore (scripts/build/fetch-core-packages.ps1)
 ############################
 artifacts/core-packages/
+
+# Core checkout used by the code-health check in CI.
+/.core/
