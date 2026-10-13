@@ -109,21 +109,27 @@ public sealed partial class FreeformHelperViewModel
     // --- DXF Quality Check Properties ---
 
     /// <summary>
-    /// Gets or sets a summary message for DXF overlap issues (e.g., "no overlaps detected").
+    /// Gets or sets the latest DXF overlap check result. The view model replaces the whole value.
+    /// The properties below forward to it and raise their change notification when their own
+    /// value changed.
     /// </summary>
-    [ObservableProperty] private string _dxfOverlapSummary = "DXF check: not run.";
+    [ObservableProperty] private DxfOverlapResult _dxfOverlapResult = DxfOverlapResult.CreateNotRun();
     /// <summary>
-    /// Gets or sets the observable collection of detailed DXF overlap issue messages.
+    /// Gets the summary message for DXF overlap issues (e.g., "no overlaps detected").
     /// </summary>
-    [ObservableProperty] private ObservableCollection<string> _dxfOverlapIssues = new();
+    public string DxfOverlapSummary => DxfOverlapResult.Summary;
     /// <summary>
-    /// Gets or sets the number of overlap issues currently loaded in details.
+    /// Gets the observable collection of detailed DXF overlap issue messages.
     /// </summary>
-    [ObservableProperty] private int _dxfOverlapIssueCount;
+    public ObservableCollection<string> DxfOverlapIssues => DxfOverlapResult.Issues;
     /// <summary>
-    /// Gets or sets a value indicating whether any DXF overlap issues were found.
+    /// Gets the number of overlap issues currently loaded in details.
     /// </summary>
-    [ObservableProperty] private bool _hasDxfOverlapIssues;
+    public int DxfOverlapIssueCount => DxfOverlapResult.Issues.Count;
+    /// <summary>
+    /// Gets a value indicating whether any DXF overlap issues were found.
+    /// </summary>
+    public bool HasDxfOverlapIssues => DxfOverlapResult.Issues.Count > 0;
     /// <summary>
     /// Gets or sets a value indicating whether DXF overlap checking is currently running.
     /// </summary>
@@ -141,13 +147,13 @@ public sealed partial class FreeformHelperViewModel
         set => SetOperationProgress(_dxfOverlapState, value, nameof(DxfOverlapProgress));
     }
     /// <summary>
-    /// Gets or sets CAD pad IDs highlighted by overlap checking.
+    /// Gets the CAD pad IDs highlighted by overlap checking.
     /// </summary>
-    [ObservableProperty] private ObservableCollection<int> _dxfOverlapHighlightedCadIds = new();
+    public ObservableCollection<int> DxfOverlapHighlightedCadIds => DxfOverlapResult.HighlightedCadIds;
     /// <summary>
-    /// Gets or sets a value indicating whether highlighted overlap CAD pads exist.
+    /// Gets a value indicating whether highlighted overlap CAD pads exist.
     /// </summary>
-    [ObservableProperty] private bool _hasDxfOverlapHighlights;
+    public bool HasDxfOverlapHighlights => DxfOverlapResult.HighlightedCadIds.Count > 0;
     /// <summary>
     /// Gets or sets the latest CAD?egular overlap links for canvas ratio labels.
     /// </summary>
@@ -242,9 +248,15 @@ public sealed partial class FreeformHelperViewModel
     // --- DXF/Regular Mapping Properties ---
 
     /// <summary>
-    /// Gets or sets a summary message for DXF/Regular mapping analysis.
+    /// Gets or sets the latest DXF/Regular mapping diagnostics result. The view model replaces the
+    /// whole value. The properties that forward to it raise their change notification when their
+    /// own value changed.
     /// </summary>
-    [ObservableProperty] private string _dxfRegularMappingSummary = "Diagnostics: not run.";
+    [ObservableProperty] private DxfRegularMappingResult _dxfRegularMappingResult = DxfRegularMappingResult.CreateNotRun();
+    /// <summary>
+    /// Gets the summary message for DXF/Regular mapping analysis.
+    /// </summary>
+    public string DxfRegularMappingSummary => DxfRegularMappingResult.Summary;
     /// <summary>
     /// Gets or sets a summary message for the externally measured regular visibility mask.
     /// </summary>
@@ -287,13 +299,13 @@ public sealed partial class FreeformHelperViewModel
     }
 
     /// <summary>
-    /// Gets or sets the observable collection of detailed DXF/Regular mapping issues.
+    /// Gets the observable collection of detailed DXF/Regular mapping issues.
     /// </summary>
-    [ObservableProperty] private ObservableCollection<string> _dxfRegularMappingIssues = new();
+    public ObservableCollection<string> DxfRegularMappingIssues => DxfRegularMappingResult.Issues;
     /// <summary>
-    /// Gets or sets a value indicating whether any DXF/Regular mapping issues were found.
+    /// Gets a value indicating whether any DXF/Regular mapping issues were found.
     /// </summary>
-    [ObservableProperty] private bool _hasDxfRegularMappingIssues;
+    public bool HasDxfRegularMappingIssues => DxfRegularMappingResult.HasIssues;
 
     /// <summary>
     /// Gets or sets the console font size (used for in-app log view).

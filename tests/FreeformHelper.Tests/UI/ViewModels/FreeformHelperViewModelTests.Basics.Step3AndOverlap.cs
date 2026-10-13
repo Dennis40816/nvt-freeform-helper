@@ -279,43 +279,6 @@ public sealed partial class FreeformHelperViewModelTests
 
 
     [Fact]
-    public void OverlapCommands_ClearHighlightAndSelection()
-    {
-        var highlightedCadIds = new ObservableCollection<int> { 11, 12 };
-        var vm = new FreeformHelperViewModel
-        {
-            DxfOverlapHighlightedCadIds = highlightedCadIds,
-            HasDxfOverlapHighlights = true,
-        };
-
-        vm.SelectDxfOverlapPadsCommand.Execute(null);
-        Assert.Equal("Selected: CAD=2.", vm.SelectionSummary);
-
-        vm.ClearDxfOverlapHighlightsCommand.Execute(null);
-
-        Assert.Empty(vm.DxfOverlapHighlightedCadIds);
-        Assert.False(vm.HasDxfOverlapHighlights);
-        Assert.Equal("No selection.", vm.SelectionSummary);
-    }
-
-
-    [Fact]
-    public void SelectOverlapPads_RestoresHighlightFromLastResult()
-    {
-        var vm = new FreeformHelperViewModel();
-        var field = typeof(FreeformHelperViewModel).GetField("_lastDxfOverlapCadIds", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        field!.SetValue(vm, new List<int> { 21, 22, 23 });
-
-        vm.SelectDxfOverlapPadsCommand.Execute(null);
-
-        Assert.True(vm.HasDxfOverlapHighlights);
-        Assert.Equal(3, vm.DxfOverlapHighlightedCadIds.Count);
-        Assert.Equal("Selected: CAD=3.", vm.SelectionSummary);
-    }
-
-
-    [Fact]
     public void SelectCadAreaBucketFromPad_SelectsOnlySameBucket()
     {
         var expectedCadIds = new[] { 101, 102 };

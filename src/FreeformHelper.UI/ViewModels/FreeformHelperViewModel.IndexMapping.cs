@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Globalization;
 using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Services;
@@ -13,9 +14,10 @@ public sealed partial class FreeformHelperViewModel
                 "Step 4: import DXF and build grid first.",
                 onCadUnavailable: () =>
                 {
-                    DxfRegularMappingSummary = "Diagnostics: no CAD output pads.";
-                    DxfRegularMappingIssues.Clear();
-                    HasDxfRegularMappingIssues = false;
+                    DxfRegularMappingResult = new DxfRegularMappingResult(
+                        "Diagnostics: no CAD output pads.",
+                        new ObservableCollection<string>(),
+                        HasIssues: false);
                     SetStatus(DxfRegularMappingSummary);
                 },
                 out var cadVisible,
@@ -31,9 +33,10 @@ public sealed partial class FreeformHelperViewModel
             {
                 ApplyUiToSettings(_projectFile.Settings);
                 InvalidateDownstreamFromStep4(showStatus: false);
-                DxfRegularMappingSummary = "Diagnostics: running...";
-                HasDxfRegularMappingIssues = false;
-                DxfRegularMappingIssues.Clear();
+                DxfRegularMappingResult = new DxfRegularMappingResult(
+                    "Diagnostics: running...",
+                    new ObservableCollection<string>(),
+                    HasIssues: false);
                 SetStatus("Running mapping diagnostics...");
                 Logger.Info(CultureInfo.InvariantCulture, "Analyzing DXF/Regular mapping (cadVisible={0}, regular={1}).", cadVisible.Pads.Count, grid.Pads.Count);
             },
@@ -60,18 +63,14 @@ public sealed partial class FreeformHelperViewModel
 
             var issueMessages = res.Report.SampleIssues.Select(i => $"[{i.Kind}] {i.Message}").ToList();
 
-            DxfRegularMappingIssues.Clear();
-            foreach (var message in issueMessages)
-            {
-                DxfRegularMappingIssues.Add(message);
-            }
-
-            HasDxfRegularMappingIssues = (res.Report.HasIssues && res.Report.SampleIssues.Count > 0) ||
-                                        res.Report.MaskChangedCount > 0 ||
-                                        res.Report.MaskRemovedCount > 0;
-            DxfRegularMappingSummary = res.Report.HasIssues
-                ? $"Diagnostics warnings: {res.Report.Summary}"
-                : $"Diagnostics OK: {res.Report.Summary}";
+            DxfRegularMappingResult = new DxfRegularMappingResult(
+                res.Report.HasIssues
+                    ? $"Diagnostics warnings: {res.Report.Summary}"
+                    : $"Diagnostics OK: {res.Report.Summary}",
+                new ObservableCollection<string>(issueMessages),
+                HasIssues: (res.Report.HasIssues && res.Report.SampleIssues.Count > 0) ||
+                           res.Report.MaskChangedCount > 0 ||
+                           res.Report.MaskRemovedCount > 0);
 
             SetStatus(BuildMappingStatusForWorkspaceHeader(res.Report));
 
@@ -215,5 +214,12 @@ public sealed partial class FreeformHelperViewModel
 
         return string.Concat(statusText.AsSpan(0, maxChars - 1), "…");
     }
-}
 
+    partial void OnDxfRegularMappingResultChanged(DxfRegularMappingResult? oldValue, DxfRegularMappingResult newValue)
+    {
+        ArgumentNullException.ThrowIfNull(oldValue);
+        RaiseWhenChanged(oldValue.Summary, newValue.Summary, nameof(DxfRegularMappingSummary));
+        RaiseWhenChanged(oldValue.Issues, newValue.Issues, nameof(DxfRegularMappingIssues));
+        RaiseWhenChanged(oldValue.HasIssues, newValue.HasIssues, nameof(HasDxfRegularMappingIssues));
+    }
+}

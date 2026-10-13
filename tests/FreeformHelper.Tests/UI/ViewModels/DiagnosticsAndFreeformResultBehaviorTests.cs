@@ -1,6 +1,7 @@
 using System.Text;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 using static FreeformHelper.Tests.FreeformHelperViewModelTests;
@@ -131,13 +132,12 @@ public sealed class DiagnosticsAndFreeformResultBehaviorTests
     }
 
     [Fact]
-    public void ClearStep4Result_WithoutAnalysis_RaisesNoDiagnosticsNotification()
+    public void ClearStep4Result_WithoutAnalysis_RaisesNoSummaryOrFlagNotification()
     {
         var vm = new FreeformHelperViewModel();
         var changes = RecordNotifications(
             vm,
             nameof(FreeformHelperViewModel.DxfRegularMappingSummary),
-            nameof(FreeformHelperViewModel.DxfRegularMappingIssues),
             nameof(FreeformHelperViewModel.HasDxfRegularMappingIssues));
 
         vm.ClearStep4ResultCommand.Execute(null);
@@ -159,7 +159,7 @@ public sealed class DiagnosticsAndFreeformResultBehaviorTests
 
         public static async Task<ProjectFixture> LoadAsync()
         {
-            var directory = Directory.CreateTempSubdirectory("freeformhelper-result-records-");
+            var directory = TestFiles.CreateTempDirectory();
             var projectPath = Path.Combine(directory.FullName, "project.json");
             await new JsonProjectStore().SaveAsync(projectPath, new ProjectFile
             {

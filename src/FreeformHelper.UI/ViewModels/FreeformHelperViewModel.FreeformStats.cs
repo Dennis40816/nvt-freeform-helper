@@ -5,11 +5,19 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private void ResetFreeformAutoDetectStats(string summary = "Freeform stats: not run.")
+    private void ResetFreeformAutoDetectStats(string summary = FreeformAutoDetectResult.NotRunSummary)
     {
-        FreeformAutoDetectRows = new ObservableCollection<FreeformAutoDetectStatRow>();
-        HasFreeformAutoDetectRows = false;
-        FreeformAutoDetectSummary = summary;
+        FreeformAutoDetectResult = new FreeformAutoDetectResult(
+            summary,
+            new ObservableCollection<FreeformAutoDetectStatRow>());
+    }
+
+    partial void OnFreeformAutoDetectResultChanged(FreeformAutoDetectResult? oldValue, FreeformAutoDetectResult newValue)
+    {
+        ArgumentNullException.ThrowIfNull(oldValue);
+        RaiseWhenChanged(oldValue.Summary, newValue.Summary, nameof(FreeformAutoDetectSummary));
+        RaiseWhenChanged(oldValue.Rows, newValue.Rows, nameof(FreeformAutoDetectRows));
+        RaiseWhenChanged(oldValue.HasRows, newValue.HasRows, nameof(HasFreeformAutoDetectRows));
     }
 
     private void RefreshFreeformAutoDetectStats(string source)
@@ -29,9 +37,8 @@ public sealed partial class FreeformHelperViewModel
             new("XYWay", stats.XyWayCount, stats.TotalCount),
         };
 
-        FreeformAutoDetectRows = rows;
-        HasFreeformAutoDetectRows = rows.Count > 0;
-        FreeformAutoDetectSummary =
-            $"Freeform stats ({source}): total={stats.TotalCount}, tagged={stats.TaggedCount}, none={stats.NoneCount}.";
+        FreeformAutoDetectResult = new FreeformAutoDetectResult(
+            $"Freeform stats ({source}): total={stats.TotalCount}, tagged={stats.TaggedCount}, none={stats.NoneCount}.",
+            rows);
     }
 }
