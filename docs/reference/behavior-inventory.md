@@ -260,9 +260,10 @@ Notes:
 - Important controls now use tokens (colors, spacing, borders, shadows), with layout guard tests added.
 - ScrollViewer/Scrollbar now use a unified style, reducing inconsistent interaction across pages.
 - The Terminal contract is fixed:
-  - `ConsolePanel` uses the single `AvaloniaEdit TextEditor` path; `TextBox fallback` is no longer allowed.
-  - The AvaloniaEdit theme remains an app-level include and must not be moved back to workspace lazy-load.
-  - The terminal is expanded by default, with the existing initial dimensions `ConsolePanelRowHeight=180` and `ConsolePanelMinHeight=120`.
+  - `ConsolePanel` composes the Core `Nvt.Core.Avalonia.LogConsole` controls (`ConsoleHeader`, `ConsoleToolbar`, `ConsoleListView`, `ConsoleEmptyState`) over one `ConsoleController` that `ShellViewModel.ConsoleSession` owns.
+  - The Core theme tokens (`ThemeTokens.axaml`) and the two console style files stay app-level includes in `App.axaml`.
+  - The terminal is expanded by default, with the initial dimensions `ConsolePanelRowHeight=300` and `ConsolePanelMinHeight=232`.
+  - There is no per-panel font size control and no console font shortcut. The console font follows the Core Body font role.
 
 ## Commands
 
@@ -304,10 +305,10 @@ Notes:
 ### ShellViewModel (src/FreeformHelper.UI/ViewModels/ShellViewModel.cs)
 - ShowWorkspaceCommand / ShowHowToUseCommand / ShowDevCommand
   - Switches CurrentViewModel and page visibility
-- ClearConsoleCommand
-  - [Status] (clears AppLogStore, including pending entries; queued Add callbacks from before Clear cannot restore old entries)
-  - The terminal is expanded by default at startup; the full console text is built from the ring buffer tail without depending on UI collection flush.
-  - After a startup/expansion ring snapshot, Add notifications replace the snapshot until the UI collection catches up; each stored entry appears once, including distinct entries with identical content.
+- ConsoleSession.Controller.ClearCommand (Core `ConsoleController`)
+  - [Status] (clears `AppConsoleLog.Store`; the store's writer drops queued writes from before the clear)
+  - The terminal is expanded by default at startup; the controller captures the store snapshot when it is created and refreshes on every store change.
+  - Each stored entry appears once. With dedupe on, entries with the same source, level and full message merge into one row with a count.
 
 ### Pad Info ViewModels (src/FreeformHelper.UI/ViewModels/PadInfoViewModels.cs)
 - CadPadInfoViewModel.ApplyChangesCommand → SetCadPadCustomValues
@@ -398,7 +399,6 @@ Notes:
   - Ctrl+S → SaveProjectAsync (save result displayed in a top toast) [Status]
   - Delete → DeleteSelectedCadPadsCommand (only when focus is outside text input) [Status]
 - F / Ctrl+A → globally forwarded to Fit / SelectAll (only when focus is outside text input and the source is not the canvas) [View]/[Set selection]
-  - Ctrl +/- (console focus) → ConsoleFontSize changes
   - Global shortcuts are not handled when text input (TextBox/ComboBox/NumberScrubber) has focus
 - OnRootPointerPressed
   - An outside click closes pad info / otherwise focuses the canvas
@@ -409,8 +409,9 @@ Notes:
 - PadInfoPopover wiring
   - ApplyCloseRequested / DiscardCloseRequested → ClosePadInfoViaState
   - CloseConfirmDismissed → re-enable hit testing
-- Console controls（Console.cs）
-  - Log changes → auto-scroll
+- Console controls（ConsolePanel.axaml.cs）
+  - ConsoleListView.ViewStateRequested → ConsoleController.RequestViewState (follow, pause, selection, expansion)
+  - Copy visible / Save log → `ConsoleSession` commands; the panel supplies the clipboard writer and the file picker
 - Panel buttons（Panels.cs）
   - Left/right panel show/hide (layout only)
 - File picker delegates（Pickers.cs）

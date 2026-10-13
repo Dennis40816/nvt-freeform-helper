@@ -5,12 +5,12 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using AvaloniaEdit;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
-using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.ViewModels;
-using FreeformHelper.UI.Views;
+using NLog;
+using NLog.Config;
+using Nvt.Core.Avalonia.LogConsole;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -18,277 +18,127 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class TerminalStartupPathTests
 {
-    private readonly ITestOutputHelper _output;
-
-    public TerminalStartupPathTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
     [AvaloniaFact]
-    public void ConsoleExpanded_LogBurst_ParsesLatestTextOnce()
-    {
-        using var console = new ConsoleFixture();
-        var parsesBeforeBurst = console.View.ConsoleLinkParseCount;
-
-        console.AddBurst();
-        console.Drain();
-
-        var burstParseCount = console.View.ConsoleLinkParseCount - parsesBeforeBurst;
-        _output.WriteLine($"200 log entries: {burstParseCount} full link parses");
-        Assert.InRange(burstParseCount, 1, 2);
-    }
-
-    [AvaloniaFact]
-    public void ConsoleExpanded_LogBurst_ShowsLatestShellText()
+    public async Task ConsoleExpanded_LogBurst_ShowsEveryLineOnce()
     {
         using var console = new ConsoleFixture();
 
-        console.AddBurst();
-        console.Drain();
+        await console.AddBurstAsync();
 
-        Assert.True(console.Shell.IsConsoleExpanded);
-        Assert.Equal(console.Shell.ConsoleText, console.Editor.Text);
-        Assert.Contains("burst line 199", console.Editor.Text, StringComparison.Ordinal);
+        var texts = ConsoleLogTestSupport.RowTexts(console.Controller.Projection, console.SourceId);
+        Assert.Equal(200, texts.Count);
+        Assert.Equal("burst line 199", texts[^1]);
     }
 
     [AvaloniaFact]
-    public void ConsoleExpanded_ReadingOlderLines_NewLineKeepsOffset()
+    public async Task ConsoleExpanded_SearchText_ShowsOnlyMatchingLines()
     {
-        using var console = CreateConsoleWithBurst();
-        console.Editor.ScrollToHome();
-        console.Drain();
+        using var console = new ConsoleFixture();
+        await console.AddBurstAsync();
 
-        console.AddLine("while reading older lines");
-        console.Drain();
+        console.Controller.SetSearchText("burst line 199");
+        await ConsoleLogTestSupport.WaitForProjectionAsync(
+            console.Controller,
+            projection => ConsoleLogTestSupport.RowTexts(projection, console.SourceId).Count == 1);
 
-        Assert.True(console.Editor.ExtentHeight > console.Editor.ViewportHeight);
-        Assert.Equal(0, console.Editor.VerticalOffset);
-        Assert.Contains("while reading older lines", console.Editor.Text, StringComparison.Ordinal);
+        Assert.Equal(["burst line 199"], ConsoleLogTestSupport.RowTexts(console.Controller.Projection, console.SourceId));
     }
 
     [AvaloniaFact]
-    public void ConsoleExpanded_FollowingLatestLine_NewLineScrollsToEnd()
+    public async Task ConsoleExpanded_ResetFilters_RestoresEveryLine()
     {
-        using var console = CreateConsoleWithBurst();
-        console.Editor.ScrollToHome();
-        console.Drain();
-        console.Editor.ScrollToEnd();
-        console.Drain();
+        using var console = new ConsoleFixture();
+        await console.AddBurstAsync();
+        console.Controller.SetSearchText("burst line 199");
+        await ConsoleLogTestSupport.WaitForProjectionAsync(
+            console.Controller,
+            projection => ConsoleLogTestSupport.RowTexts(projection, console.SourceId).Count == 1);
 
-        console.AddLine("while following latest line");
-        console.Drain();
+        console.Controller.ResetFiltersCommand.Execute(null);
+        await ConsoleLogTestSupport.WaitForProjectionAsync(
+            console.Controller,
+            projection => ConsoleLogTestSupport.RowTexts(projection, console.SourceId).Count == 200);
 
-        Assert.True(console.Editor.ExtentHeight > console.Editor.ViewportHeight);
-        Assert.True(console.Editor.ExtentHeight - console.Editor.VerticalOffset - console.Editor.ViewportHeight <= 1);
-        Assert.Contains("while following latest line", console.Editor.Text, StringComparison.Ordinal);
+        Assert.Equal(200, ConsoleLogTestSupport.RowTexts(console.Controller.Projection, console.SourceId).Count);
     }
 
     [AvaloniaFact]
-    public void ConsoleExpanded_FontSizeChange_UpdatesEditor()
+    public void ConsoleExpanded_ListView_IsComposedWithTheShellController()
     {
         using var console = new ConsoleFixture();
 
-        console.Shell.ConsoleFontSize = 18;
-        console.Drain();
-
-        Assert.Equal(18, console.Editor.FontSize);
+        Assert.Same(console.Controller, console.List.Controller);
+        Assert.True(console.List.IsVisible);
     }
 
     [AvaloniaFact]
-    public void ConsoleExpanded_FilterEnabled_ShowsOnlyMatchingLines()
-    {
-        using var console = CreateConsoleWithBurst();
-        console.AddLine("while following latest line");
-        console.Drain();
-        console.Shell.ConsoleSearchText = "while following latest line";
-
-        console.Shell.IsConsoleFilterEnabled = true;
-        console.Drain();
-
-        Assert.Contains("while following latest line", console.Editor.Text, StringComparison.Ordinal);
-        Assert.DoesNotContain("burst line 199", console.Editor.Text, StringComparison.Ordinal);
-    }
-
-    [AvaloniaFact]
-    public void ConsoleExpanded_FilterDisabled_RestoresShellText()
-    {
-        using var console = CreateConsoleWithBurst();
-        console.AddLine("while following latest line");
-        console.Drain();
-        console.Shell.ConsoleSearchText = "while following latest line";
-        console.Shell.IsConsoleFilterEnabled = true;
-        console.Drain();
-
-        console.Shell.IsConsoleFilterEnabled = false;
-        console.Drain();
-
-        Assert.Equal(console.Shell.ConsoleText, console.Editor.Text);
-        Assert.Contains("burst line 199", console.Editor.Text, StringComparison.Ordinal);
-    }
-
-    [AvaloniaFact]
-    public async Task ConsoleStartup_UsesAppLevelAvaloniaEditTheme()
-    {
-        var appAxamlPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src", "FreeformHelper.UI", "App.axaml"));
-        var xaml = await File.ReadAllTextAsync(appAxamlPath);
-
-        Assert.Contains("avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml", xaml, StringComparison.Ordinal);
-    }
-
-    [AvaloniaFact]
-    public async Task ConsoleExpanded_AfterStartupLogs_ShowsTextEditorText()
+    public void ConsoleStartup_LoadsCoreConsoleResources()
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        AppLogStore.Instance.Clear();
-        try
+
+        Assert.True(Avalonia.Application.Current!.Styles.TryGetResource("Nvt.Console.MinimumWidth", null, out var minimumWidth));
+        Assert.IsType<double>(minimumWidth);
+    }
+
+    [AvaloniaFact]
+    public async Task ConsoleExpanded_AfterStartupLogs_ListShowsTheStartupLines()
+    {
+        using var console = new ConsoleFixture();
+
+        for (var i = 0; i < 8; i++)
         {
-            for (var i = 0; i < 8; i++)
-            {
-                AppLogStore.Instance.Add(new AppLogEntry(
-                    DateTimeOffset.UtcNow,
-                    "INFO",
-                    "terminal-test",
-                    $"startup line {i}"));
-            }
-
-            using var shell = new ShellViewModel();
-            var window = new MainWindow();
-            window.SetShellViewModel(shell);
-            window.Width = 1280;
-            window.Height = 900;
-
-            try
-            {
-                window.Show();
-                await FlushUiQueueAsync();
-
-                shell.IsConsoleExpanded = true;
-                await FlushUiQueueAsync();
-
-                var editor = window.GetVisualDescendants()
-                    .OfType<TextEditor>()
-                    .FirstOrDefault(control => string.Equals(control.Name, "ConsoleEditor", StringComparison.Ordinal));
-
-                Assert.Contains("startup line 0", shell.ConsoleText);
-                Assert.NotNull(editor);
-                Assert.True(editor!.IsVisible);
-                Assert.Contains("startup line 0", editor.Text ?? string.Empty);
-            }
-            finally
-            {
-                window.Close();
-            }
+            ConsoleLogTestSupport.Write(console.SourceId, $"startup line {i}");
         }
-        finally
-        {
-            AppLogStore.Instance.Clear();
-        }
+
+        await ConsoleLogTestSupport.WaitForProjectionAsync(
+            console.Controller,
+            projection => ConsoleLogTestSupport.RowTexts(projection, console.SourceId).Count == 8);
+        console.Shell.IsConsoleExpanded = true;
+        await FlushUiQueueAsync();
+
+        Assert.True(console.List.IsVisible);
+        Assert.Equal("startup line 0", ConsoleLogTestSupport.RowTexts(console.Controller.Projection, console.SourceId)[0]);
     }
 
     [AvaloniaFact]
     public async Task ConsoleExpanded_AfterStartupLogs_RendersVisibleGlyphs()
     {
-        HeadlessAppBootstrap.EnsureInitialized();
-        AppLogStore.Instance.Clear();
-        try
+        using var console = new ConsoleFixture();
+        for (var i = 0; i < 24; i++)
         {
-            for (var i = 0; i < 24; i++)
-            {
-                AppLogStore.Instance.Add(new AppLogEntry(
-                    DateTimeOffset.UtcNow,
-                    "INFO",
-                    "terminal-test",
-                    $"render line {i}"));
-            }
-
-            using var shell = new ShellViewModel();
-            var window = new MainWindow();
-            window.SetShellViewModel(shell);
-            window.Width = 1280;
-            window.Height = 900;
-
-            try
-            {
-                window.Show();
-                await FlushUiQueueAsync();
-
-                shell.IsConsoleExpanded = true;
-                await FlushUiQueueAsync();
-
-                using var frame = window.CaptureRenderedFrame();
-                Assert.NotNull(frame);
-
-                using var locked = frame!.Lock();
-                var visiblePixelCount = CountBrightPixelsInConsoleBody(
-                    locked,
-                    locked.RowBytes,
-                    locked.Size.Width,
-                    locked.Size.Height);
-
-                Assert.True(
-                    visiblePixelCount >= 120,
-                    $"Expected visible terminal glyph pixels after startup expansion, but only counted {visiblePixelCount} bright pixels.");
-            }
-            finally
-            {
-                window.Close();
-            }
+            ConsoleLogTestSupport.Write(console.SourceId, $"render line {i}");
         }
-        finally
-        {
-            AppLogStore.Instance.Clear();
-        }
+
+        await ConsoleLogTestSupport.WaitForProjectionAsync(
+            console.Controller,
+            projection => ConsoleLogTestSupport.RowTexts(projection, console.SourceId).Count == 24);
+        console.Shell.IsConsoleExpanded = true;
+        await FlushUiQueueAsync();
+
+        using var frame = console.Window.CaptureRenderedFrame();
+        Assert.NotNull(frame);
+        using var locked = frame!.Lock();
+        var visiblePixelCount = CountBrightPixelsInConsoleBody(
+            locked,
+            locked.RowBytes,
+            locked.Size.Width,
+            locked.Size.Height);
+
+        Assert.True(
+            visiblePixelCount >= 120,
+            $"Expected visible terminal glyph pixels after startup expansion, but only counted {visiblePixelCount} bright pixels.");
     }
 
     [AvaloniaFact]
-    public async Task ConsoleExpanded_AfterStartupLogs_UsesTextEditorOnly()
+    public async Task ConsoleCollapsed_HidesTheListAndKeepsTheHeader()
     {
-        HeadlessAppBootstrap.EnsureInitialized();
-        AppLogStore.Instance.Clear();
-        try
-        {
-            AppLogStore.Instance.Add(new AppLogEntry(
-                DateTimeOffset.UtcNow,
-                "INFO",
-                "terminal-test",
-                "foreground check"));
+        using var console = new ConsoleFixture();
 
-            using var shell = new ShellViewModel();
-            var window = new MainWindow();
-            window.SetShellViewModel(shell);
-            window.Width = 1280;
-            window.Height = 900;
+        console.Shell.IsConsoleExpanded = false;
+        await FlushUiQueueAsync();
 
-            try
-            {
-                window.Show();
-                await FlushUiQueueAsync();
-
-                shell.IsConsoleExpanded = true;
-                await FlushUiQueueAsync();
-
-                var editor = window.GetVisualDescendants()
-                    .OfType<TextEditor>()
-                    .FirstOrDefault(control => string.Equals(control.Name, "ConsoleEditor", StringComparison.Ordinal));
-                Assert.NotNull(editor);
-                Assert.True(editor!.IsVisible);
-                Assert.NotNull(editor.Foreground);
-                Assert.NotNull(editor.TextArea);
-                Assert.NotNull(editor.TextArea!.Foreground);
-                Assert.DoesNotContain(
-                    window.GetVisualDescendants(),
-                    control => string.Equals(control.Name, "ConsoleTextBox", StringComparison.Ordinal));
-            }
-            finally
-            {
-                window.Close();
-            }
-        }
-        finally
-        {
-            AppLogStore.Instance.Clear();
-        }
+        Assert.False(console.List.IsEffectivelyVisible);
+        Assert.NotEmpty(console.Window.GetVisualDescendants().OfType<ConsoleHeader>());
     }
 
     [AvaloniaFact]
@@ -321,61 +171,47 @@ public sealed class TerminalStartupPathTests
         Assert.True(shell.IsConsoleExpanded);
     }
 
-    private static ConsoleFixture CreateConsoleWithBurst()
-    {
-        var console = new ConsoleFixture();
-        console.AddBurst();
-        console.Drain();
-        return console;
-    }
-
     private sealed class ConsoleFixture : IDisposable
     {
-        private readonly MainWindow _window;
+        public string SourceId { get; } = $"terminal-test-{Guid.NewGuid():N}";
+
+        private readonly LoggingConfiguration? _previousConfiguration;
 
         public ShellViewModel Shell { get; }
-        public FreeformHelperView View { get; }
-        public TextEditor Editor { get; }
+        public MainWindow Window { get; }
+        public ConsoleController Controller => Shell.ConsoleSession.Controller;
+        public ConsoleListView List { get; }
 
         public ConsoleFixture()
         {
             HeadlessAppBootstrap.EnsureInitialized();
-            AppLogStore.Instance.Clear();
+            _previousConfiguration = LogManager.Configuration;
+            LogManager.Configuration = new LoggingConfiguration();
             Shell = new ShellViewModel();
-            _window = new MainWindow { Width = 1280, Height = 900 };
-            _window.SetShellViewModel(Shell);
-            _window.Show();
-            Drain();
-            View = _window.GetVisualDescendants().OfType<FreeformHelperView>().Single();
-            Editor = _window.GetVisualDescendants().OfType<TextEditor>()
-                .Single(control => string.Equals(control.Name, "ConsoleEditor", StringComparison.Ordinal));
+            Window = new MainWindow { Width = 1280, Height = 900 };
+            Window.SetShellViewModel(Shell);
+            Window.Show();
+            HeadlessUiPump.Drain(Window);
+            List = Window.GetVisualDescendants().OfType<ConsoleListView>().First();
         }
 
-        public void AddBurst()
+        public async Task AddBurstAsync()
         {
             for (var i = 0; i < 200; i++)
             {
-                AddLine($"burst line {i:D3}");
+                ConsoleLogTestSupport.Write(SourceId, $"burst line {i}");
             }
-        }
 
-        public void AddLine(string text)
-        {
-            _window.Dispatcher.VerifyAccess();
-            AppLogStore.Instance.Add(new AppLogEntry(
-                new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
-                "INFO",
-                "terminal-test",
-                text));
+            await ConsoleLogTestSupport.WaitForProjectionAsync(
+                Controller,
+                projection => ConsoleLogTestSupport.RowTexts(projection, SourceId).Count == 200);
         }
-
-        public void Drain() => HeadlessUiPump.Drain(_window);
 
         public void Dispose()
         {
-            _window.Close();
+            Window.Close();
             Shell.Dispose();
-            AppLogStore.Instance.Clear();
+            LogManager.Configuration = _previousConfiguration;
         }
     }
 

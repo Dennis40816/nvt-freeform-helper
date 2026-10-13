@@ -19,7 +19,6 @@ public sealed partial class FreeformHelperView
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         _isViewAttached = true;
-        ResolveConsoleShellControls();
 
         if (DataContext is FreeformHelperViewModel viewModel)
         {
@@ -35,14 +34,7 @@ public sealed partial class FreeformHelperView
         _shellViewModel = _topLevel?.DataContext as ViewModels.ShellViewModel;
         if (_shellViewModel is not null)
         {
-            _consolePanel ??= this.FindControl<ConsolePanel>("ConsolePanelHost");
-            if (_consolePanel is not null)
-            {
-                _consolePanel.DataContext = _shellViewModel;
-            }
-
             _shellViewModel.PropertyChanged += OnShellPropertyChanged;
-            EnsureConsoleEditorReady();
             SyncConsoleRowHeight(_shellViewModel.IsConsoleExpanded);
         }
 
@@ -74,8 +66,6 @@ public sealed partial class FreeformHelperView
             _initialFitHandler = null;
         }
 
-        DetachConsoleAutoScroll();
-
         if (_shellViewModel is not null)
         {
             _shellViewModel.PropertyChanged -= OnShellPropertyChanged;
@@ -87,8 +77,6 @@ public sealed partial class FreeformHelperView
             _settingsWindow.Close();
             _settingsWindow = null;
         }
-
-        _consolePanel = null;
     }
 
     /// <summary>
@@ -228,23 +216,10 @@ public sealed partial class FreeformHelperView
                 return;
             }
 
-            AttachConsoleAutoScroll();
             CachePadInfoControls();
             StartupPerfTracker.Mark("workspace.startup-ready-signal");
 
             StartupPerfTracker.Mark("workspace.deferred-ui-hooks-attached");
-
-            Dispatcher.UIThread.Post(() =>
-            {
-                if (!_isViewAttached || _shellViewModel is null)
-                {
-                    return;
-                }
-
-                SyncConsoleText(_shellViewModel.ConsoleText);
-                SyncConsoleFontSize(_shellViewModel.ConsoleFontSize);
-                StartupPerfTracker.Mark("workspace.console-initial-sync");
-            }, DispatcherPriority.Background);
         }, DispatcherPriority.Background);
     }
 }

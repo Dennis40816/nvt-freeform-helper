@@ -510,7 +510,6 @@ public sealed class UiLayoutGuardTests
         var coreStyles = File.ReadAllText(Path.Combine(stylesRoot, "Controls.Core.axaml"));
         var overlayStyles = File.ReadAllText(Path.Combine(stylesRoot, "Controls.Overlay.axaml"));
         var formStyles = File.ReadAllText(Path.Combine(stylesRoot, "Controls.Form.axaml"));
-        var panelStyles = File.ReadAllText(Path.Combine(stylesRoot, "Controls.Panel.axaml"));
         var tokens = File.ReadAllText(Path.Combine(stylesRoot, "Tokens.axaml"));
         var allStyles = ReadAllStylesText(repoRoot);
         AssertNoStyleSetterCollisions(stylesRoot);
@@ -571,9 +570,6 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("Style Selector=\"ToggleSwitch\"", formStyles);
         Assert.Contains("Style Selector=\"ToggleSwitch:checked\"", formStyles);
         Assert.Contains("BorderBrush\" Value=\"{DynamicResource BrushBorderStrong}\"", formStyles);
-        Assert.Contains("TextBox.consoleSearch", panelStyles);
-        Assert.Contains("TextBox.consoleSearch:focus", panelStyles);
-        Assert.Contains("BorderThickness\" Value=\"{StaticResource BorderInput}\"", panelStyles);
         Assert.DoesNotContain("BorderInput", actionStyles);
 
         var tooltipOffenders = FindIconActionButtonsWithoutToolTips(repoRoot);

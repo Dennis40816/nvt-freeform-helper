@@ -5,34 +5,21 @@
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
              xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
-             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:logConsole="clr-namespace:Nvt.Core.Avalonia.LogConsole;assembly=Nvt.Core.Avalonia"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.ConsolePanel">
   <UserControl.Resources>
     <converters:BooleanGlyphConverter x:Key="ConsoleToggleGlyph"
                                       FalseGlyph="{x:Static icons:IconGlyphs.ExpandLess}"
                                       TrueGlyph="{x:Static icons:IconGlyphs.ExpandMore}"/>
-    <converters:BooleanGlyphConverter x:Key="ConsoleDedupGlyph"
-                                      FalseGlyph="{x:Static icons:IconGlyphs.ContentPaste}"
-                                      TrueGlyph="{x:Static icons:IconGlyphs.ContentPasteOff}"/>
-    <converters:BooleanGlyphConverter x:Key="ConsoleFilterGlyph"
-                                      FalseGlyph="{x:Static icons:IconGlyphs.FilterAltOff}"
-                                      TrueGlyph="{x:Static icons:IconGlyphs.FilterAlt}"/>
   </UserControl.Resources>
   <Border x:Name="ConsoleBorder"
           Background="{DynamicResource BrushBgSurface}"
           BorderBrush="{DynamicResource BrushBorder}"
           BorderThickness="{StaticResource BorderTopThin}"
-          Padding="{StaticResource ConsolePanelPadding}"
-          Focusable="True"
-          IsTabStop="False"
-          PointerPressed="OnConsolePointerPressedInternal">
+          Padding="{StaticResource ConsolePanelPadding}">
     <Grid RowDefinitions="Auto,*">
-      <Grid Grid.Row="0"
-            ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto"
-            HorizontalAlignment="Stretch"
-            Margin="{StaticResource InsetRight8Bottom4}"
-            VerticalAlignment="Center">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
         <ToggleButton x:Name="ConsoleToggleButton"
                       Classes="actionIconButton panelChromeToggle"
                       IsChecked="{Binding IsConsoleExpanded, Mode=TwoWay}"
@@ -45,111 +32,36 @@
                              RelativeSource={RelativeSource AncestorType=ToggleButton},
                              Converter={StaticResource ConsoleToggleGlyph}}"/>
         </ToggleButton>
-        <Button Classes="actionIconButton consoleHeaderAction"
-                Command="{Binding ClearConsoleCommand}"
-                ToolTip.Tip="Clear console"
-                VerticalAlignment="Center"
-                Grid.Column="1"
-                Margin="{StaticResource InsetRight12}">
-          <controls:FontIcon Classes="consoleHeaderIcon symbols"
-                             Glyph="{x:Static icons:IconGlyphs.Delete}"/>
-        </Button>
-        <Button Classes="actionIconButton consoleHeaderAction"
-                Click="OnConsoleCopyAllInternal"
-                ToolTip.Tip="Copy all console text"
-                VerticalAlignment="Center"
-                Grid.Column="2"
-                Margin="{StaticResource InsetRight12}">
-          <controls:FontIcon Classes="consoleHeaderIcon symbols"
-                             Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
-        </Button>
-        <ToggleButton Classes="actionIconButton consoleHeaderAction"
-                      IsChecked="{Binding IsConsoleDedupEnabled, Mode=TwoWay}"
-                      ToolTip.Tip="Dedup consecutive duplicate log lines"
-                      Margin="{StaticResource InsetRight12}"
-                      Grid.Column="3">
-          <controls:FontIcon Classes="consoleToggleIcon symbols"
-                             Glyph="{Binding IsChecked,
-                             RelativeSource={RelativeSource AncestorType=ToggleButton},
-                             Converter={StaticResource ConsoleDedupGlyph}}"/>
-        </ToggleButton>
-        <Button Classes="actionIconButton consoleHeaderAction"
-                Click="OnConsoleJumpToBottomInternal"
-                ToolTip.Tip="Jump to latest output"
-                VerticalAlignment="Center"
-                Grid.Column="4"
-                Margin="{StaticResource InsetRight12}">
-          <controls:FontIcon Classes="consoleHeaderIcon symbols"
-                             Glyph="{x:Static icons:IconGlyphs.ArrowDownward}"/>
-        </Button>
-        <TextBox Grid.Column="5"
-                 Classes="consoleSearch"
-                 Width="{StaticResource ConsoleSearchWidth}"
-                 Height="{StaticResource ConsoleSearchHeight}"
-                 Text="{Binding ConsoleSearchText, Mode=TwoWay}"
-                 PlaceholderText="Search logs..."
-                 ToolTip.Tip="Search keyword in terminal output"/>
-        <ToggleButton Classes="actionIconButton consoleHeaderAction"
-                      IsChecked="{Binding IsConsoleFilterEnabled, Mode=TwoWay}"
-                      ToolTip.Tip="Filter to matched lines only"
-                      Margin="{StaticResource InsetRight12}"
-                      Grid.Column="6">
-          <controls:FontIcon Classes="consoleToggleIcon symbols"
-                             Glyph="{Binding IsChecked,
-                             RelativeSource={RelativeSource AncestorType=ToggleButton},
-                             Converter={StaticResource ConsoleFilterGlyph}}"/>
-        </ToggleButton>
-        <SelectableTextBlock Grid.Column="7"
-                             Text="{Binding ConsoleSummaryText}"
-                             Foreground="{DynamicResource BrushTextMuted}"
-                             VerticalAlignment="Center"
-                             HorizontalAlignment="Right"
-                             Margin="{StaticResource InsetRight8}"/>
-        <Button Classes="actionIconButton consoleHeaderAction"
-                Click="OnConsoleFontDecreaseInternal"
-                ToolTip.Tip="Font -"
-                VerticalAlignment="Center"
-                Grid.Column="8"
-                Margin="{StaticResource InsetRight6}">
-          <controls:FontIcon Classes="consoleHeaderIcon symbols"
-                             Glyph="{x:Static icons:IconGlyphs.Remove}"/>
-        </Button>
-        <Button Classes="actionIconButton consoleHeaderAction"
-                Click="OnConsoleFontIncreaseInternal"
-                ToolTip.Tip="Font +"
-                VerticalAlignment="Center"
-                Grid.Column="9">
-          <controls:FontIcon Classes="consoleHeaderIcon symbols"
-                             Glyph="{x:Static icons:IconGlyphs.Add}"/>
-        </Button>
+        <logConsole:ConsoleHeader x:Name="ConsoleHeaderControl"
+                                  Grid.Column="1"
+                                  Controller="{Binding ConsoleSession.Controller}"
+                                  CopySelectedCommand="{Binding ConsoleSession.Controller.CopySelectionCommand}"
+                                  CopyVisibleCommand="{Binding ConsoleSession.CopyVisibleCommand}"
+                                  SaveLogCommand="{Binding ConsoleSession.SaveLogCommand}"/>
       </Grid>
 
-      <Border Grid.Row="1"
-              Background="{DynamicResource BrushBgApp}"
-              BorderBrush="{DynamicResource BrushBorder}"
-              BorderThickness="{StaticResource BorderThin}"
-              CornerRadius="{StaticResource RadiusXs}"
-              Margin="{StaticResource InsetTop2}"
-              IsVisible="{Binding IsConsoleExpanded}">
-        <!-- Terminal is intentionally single-renderer: keep TextEditor-only unless product explicitly asks otherwise. -->
-        <avaloniaEdit:TextEditor x:Name="ConsoleEditor"
-                                 Classes="consoleEditor"
-                                 FontSize="{Binding ConsoleFontSize}"
-                                 FontFamily="{StaticResource FontFamilyCode}"
-                                 Foreground="{DynamicResource BrushTextPrimary}"
-                                 IsReadOnly="True"
-                                 ShowLineNumbers="False"
-                                 HorizontalScrollBarVisibility="Auto"
-                                 VerticalScrollBarVisibility="Auto"
-                                 Focusable="True"
-                                 IsTabStop="True"
-                                 PointerReleased="OnConsoleEditorPointerReleasedInternal">
-          <avaloniaEdit:TextEditor.Options>
-            <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
-                                            EnableVirtualSpace="False"/>
-          </avaloniaEdit:TextEditor.Options>
-        </avaloniaEdit:TextEditor>
-      </Border>
+      <Grid Grid.Row="1"
+            RowDefinitions="Auto,*"
+            IsVisible="{Binding IsConsoleExpanded}">
+        <logConsole:ConsoleToolbar Grid.Row="0"
+                                   Controller="{Binding ConsoleSession.Controller}"/>
+        <Border Grid.Row="1"
+                Background="{DynamicResource BrushBgApp}"
+                BorderBrush="{DynamicResource BrushBorder}"
+                BorderThickness="{StaticResource BorderThin}"
+                CornerRadius="{StaticResource RadiusXs}"
+                Margin="{StaticResource InsetTop2}">
+          <Grid>
+            <logConsole:ConsoleListView x:Name="ConsoleList"
+                                        Controller="{Binding ConsoleSession.Controller}"
+                                        Projection="{Binding ConsoleSession.Controller.Projection}"
+                                        ViewState="{Binding ConsoleSession.Controller.ViewState}"
+                                        TimeOptions="{Binding ConsoleSession.Controller.Options}"
+                                        TimeMode="{Binding ConsoleSession.Controller.Filter.TimeMode}"/>
+            <logConsole:ConsoleEmptyState Controller="{Binding ConsoleSession.Controller}"/>
+          </Grid>
+        </Border>
+      </Grid>
     </Grid>
   </Border>
 </UserControl>

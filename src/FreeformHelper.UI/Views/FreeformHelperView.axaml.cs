@@ -1,7 +1,4 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
-using AvaloniaEdit;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
@@ -18,8 +15,6 @@ public sealed partial class FreeformHelperView : UserControl
 {
     private UiEventRunner? _uiEvents => (DataContext as FreeformHelperViewModel)?.UiEvents;
 
-    private const int ConsoleFallbackTailLines = 4000;
-
     // References to key UI controls, initialized after InitializeComponent.
     private PadCanvas? _canvas;
     private Canvas? _padInfoOverlay;
@@ -27,11 +22,6 @@ public sealed partial class FreeformHelperView : UserControl
     private Avalonia.Controls.Shapes.Path? _padInfoLink;
     private Avalonia.Controls.Shapes.Ellipse? _padInfoAnchor;
     private RowDefinition? _consoleRow;
-    private ConsolePanel? _consolePanel;
-    private TextEditor? _consoleEditor;
-    private Border? _consoleBorder;
-    private bool _consoleHasFocus;
-    private IDisposable? _consoleFocusWithinSubscription;
     private ViewModels.ShellViewModel? _shellViewModel;
     private TopLevel? _topLevel;
     private Menu? _mainMenu;
@@ -67,17 +57,8 @@ public sealed partial class FreeformHelperView : UserControl
         _notchExportRestoreHint = this.FindControl<Border>("NotchExportRestoreHintBorder");
 
         _consoleRow = this.FindControl<Grid>("CanvasGrid")?.RowDefinitions.ElementAtOrDefault(2);
-        ResolveConsoleShellControls();
         _mainMenu = this.FindControl<Menu>("MainMenu");
 
-        if (_consoleBorder is not null)
-        {
-            _consoleFocusWithinSubscription = _consoleBorder
-                .GetObservable(InputElement.IsKeyboardFocusWithinProperty)
-                .Subscribe(focused => SetConsoleFocus(focused));
-        }
-
-        UpdateConsoleFocusVisual();
         UpdateNotchExportRestoreHintVisibility();
     }
 }

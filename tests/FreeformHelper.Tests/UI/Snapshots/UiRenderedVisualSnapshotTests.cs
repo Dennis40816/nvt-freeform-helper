@@ -95,6 +95,11 @@ public sealed class UiRenderedVisualSnapshotTests
         var hashMismatches = new List<string>();
         foreach (var item in baseline.Surfaces.OrderBy(static pair => pair.Key, StringComparer.Ordinal))
         {
+            if (item.Key == "MainWindow.ConsoleExpanded")
+            {
+                await SeedConsoleSnapshotLineAsync();
+            }
+
             if (!TryCreateSurface(item.Key, out var control))
             {
                 fatalIssues.Add($"{item.Key}: no control factory defined");
@@ -152,6 +157,12 @@ public sealed class UiRenderedVisualSnapshotTests
             + string.Join('\n', fatalIssues.Concat(hashMismatches)));
     }
 
+    // The console shows the process-wide log store. The snapshot starts from a store with one fixed line.
+    private static async Task SeedConsoleSnapshotLineAsync()
+    {
+        await ConsoleLogTestSupport.SeedAsync("test", "console snapshot line");
+    }
+
     private static bool TryCreateSurface(string key, out Control control)
     {
         switch (key)
@@ -161,9 +172,6 @@ public sealed class UiRenderedVisualSnapshotTests
                 {
                 };
                 shell.IsConsoleExpanded = true;
-                shell.ConsoleText = "08:00:00 | INFO  | test | console snapshot line";
-                shell.ConsoleRenderedLineCount = 1;
-                shell.ConsoleSourceLineCount = 1;
 
                 var window = new MainWindow();
                 window.SetShellViewModel(shell);

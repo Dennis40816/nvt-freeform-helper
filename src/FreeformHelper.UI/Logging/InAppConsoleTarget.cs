@@ -1,10 +1,11 @@
 using NLog;
 using NLog.Targets;
+using CoreLogLevel = Nvt.Core.LogConsole.LogLevel;
 
 namespace FreeformHelper.UI.Logging;
 
 /// <summary>
-/// A custom NLog target that redirects log events to the <see cref="AppLogStore"/>.
+/// A custom NLog target that redirects log events to the <see cref="AppConsoleLog"/> store.
 /// This allows log messages to be displayed directly within the application's UI,
 /// effectively creating an in-app console.
 /// </summary>
@@ -25,14 +26,23 @@ public sealed class InAppConsoleTarget : TargetWithLayout
             message = logEvent.FormattedMessage;
         }
 
-        // Create a new AppLogEntry instance from the log event data.
-        var entry = new AppLogEntry(
-            logEvent.TimeStamp, // Timestamp of the log event.
-            logEvent.Level.Name, // Severity level (e.g., "INFO", "WARN").
-            logEvent.LoggerName ?? "App", // Name of the logger, defaulting to "App" if null.
-            message); // The rendered log message.
+        AppConsoleLog.Write(
+            new DateTimeOffset(logEvent.TimeStamp),
+            MapLevel(logEvent.Level),
+            logEvent.LoggerName,
+            message ?? string.Empty);
+    }
 
-        // Add the created log entry to the singleton AppLogStore.
-        AppLogStore.Instance.Add(entry);
+    private static CoreLogLevel MapLevel(NLog.LogLevel level)
+    {
+        return level.Ordinal switch
+        {
+            <= 0 => CoreLogLevel.Trace,
+            1 => CoreLogLevel.Debug,
+            2 => CoreLogLevel.Info,
+            3 => CoreLogLevel.Warn,
+            4 => CoreLogLevel.Error,
+            _ => CoreLogLevel.Fatal
+        };
     }
 }

@@ -1,9 +1,11 @@
 using System.Globalization;
+using Nvt.Core.LogConsole;
 
 namespace FreeformHelper.UI.Logging;
 
 /// <summary>
-/// Provides a single formatting contract for in-app console log lines.
+/// Provides a single formatting contract for the one-line text of a log event.
+/// The runtime query commands use it.
 /// </summary>
 public static class AppLogFormatter
 {
@@ -11,30 +13,74 @@ public static class AppLogFormatter
     private const int LoggerColumnWidth = 56;
 
     /// <summary>
-    /// Formats one console line using unified fields:
-    /// time, level, logger source, and message.
+    /// Formats one line using unified fields:
+    /// local time, level, logger source, and message.
     /// </summary>
-    public static string FormatLine(AppLogEntry entry)
+    public static string FormatLine(LogEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
 
-        var level = string.IsNullOrWhiteSpace(entry.Level)
+        return FormatLine(
+            entry.Timestamp,
+            entry.Level.ToString(),
+            entry.SourceId,
+            ReadMessage(entry.TextContent));
+    }
+
+    /// <summary>
+    /// Formats one line from its fields. A blank level becomes INFO and a blank logger becomes App.
+    /// </summary>
+    public static string FormatLine(DateTimeOffset timestamp, string? level, string? logger, string message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        var levelText = string.IsNullOrWhiteSpace(level)
             ? "INFO"
-            : entry.Level.ToUpperInvariant();
-        var logger = string.IsNullOrWhiteSpace(entry.Logger)
+            : level.ToUpperInvariant();
+        var loggerText = string.IsNullOrWhiteSpace(logger)
             ? "App"
-            : entry.Logger;
-        var levelColumn = FitColumn(level, LevelColumnWidth);
-        var loggerColumn = FitColumn(logger, LoggerColumnWidth);
+            : logger;
+        var levelColumn = FitColumn(levelText, LevelColumnWidth);
+        var loggerColumn = FitColumn(loggerText, LoggerColumnWidth);
 
         return string.Concat(
-            entry.Timestamp.ToString("HH:mm:ss", CultureInfo.InvariantCulture),
+            timestamp.ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture),
             " | ",
             levelColumn,
             " | ",
             loggerColumn,
             " | ",
-            entry.Message);
+            message);
+    }
+
+    /// <summary>
+    /// Returns the formatted lines of the newest events and the number of events the store keeps.
+    /// </summary>
+    /// <param name="tailCount">The number of newest events to return.</param>
+    /// <param name="totalCount">The number of events the store keeps.</param>
+    public static IReadOnlyList<string> GetTailLines(int tailCount, out int totalCount)
+    {
+        var effectiveTail = Math.Max(0, tailCount);
+        using var snapshot = AppConsoleLog.Store.CaptureSnapshot();
+        totalCount = snapshot.EventCount;
+        if (effectiveTail == 0 || totalCount == 0)
+        {
+            return Array.Empty<string>();
+        }
+
+        var start = Math.Max(0, snapshot.Entries.Length - effectiveTail);
+        var lines = new List<string>(snapshot.Entries.Length - start);
+        for (var index = start; index < snapshot.Entries.Length; index++)
+        {
+            lines.Add(FormatLine(snapshot.Entries[index]));
+        }
+
+        return lines;
+    }
+
+    private static string ReadMessage(ILogTextContent content)
+    {
+        return string.Create(content.Length, content, static (span, value) => value.Read(0, span));
     }
 
     private static string FitColumn(string value, int width)
