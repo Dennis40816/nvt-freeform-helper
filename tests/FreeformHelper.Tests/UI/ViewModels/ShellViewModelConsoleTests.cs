@@ -1,5 +1,4 @@
 using Avalonia.Headless.XUnit;
-using Avalonia.Threading;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using NLog;
@@ -62,7 +61,7 @@ public sealed class ShellViewModelConsoleTests
                 Assert.Contains(snapshot.Entries, entry => entry.SourceId == sourceId && entry.TextContent.Length == "after dispose".Length);
             }
 
-            Dispatcher.UIThread.RunJobs();
+            Avalonia.Application.Current!.Dispatcher.RunJobs();
             Assert.Equal(0, notifications);
         }
         finally

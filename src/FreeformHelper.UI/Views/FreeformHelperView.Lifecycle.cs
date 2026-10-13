@@ -209,7 +209,7 @@ public sealed partial class FreeformHelperView
 
     private void ScheduleDeferredUiHooks()
     {
-        Dispatcher.UIThread.Post(() =>
+        Dispatcher.Post(() =>
         {
             if (!_isViewAttached)
             {

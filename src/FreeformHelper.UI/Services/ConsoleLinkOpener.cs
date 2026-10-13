@@ -15,9 +15,10 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
 {
     private const string PendingReason = "Checking the path...";
     private const string MissingReason = "The path does not exist.";
-    private static readonly TimeSpan MissingRetryAge = TimeSpan.FromSeconds(2);
+    private const string UnsupportedSchemeReason = "Only http and https links can be opened.";
+    private static readonly TimeSpan _missingRetryAge = TimeSpan.FromSeconds(2);
 
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly ConcurrentDictionary<string, (ConsoleTargetResolution Resolution, DateTimeOffset CheckedAt)> _resolved =
         new(StringComparer.Ordinal);
@@ -25,14 +26,14 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
     private readonly Func<string, ConsoleTargetResolution> _resolve;
     private readonly Action<LinkTarget, ConsoleTargetResolution> _open;
     private readonly Action<Action> _schedule;
-    private readonly TimeProvider _time;
+    private readonly Func<DateTimeOffset> _utcNow;
 
     public ConsoleLinkOpener()
         : this(
             ConsoleTargetResolver.Resolve,
             OpenWithShell,
             static work => _ = Task.Run(work),
-            TimeProvider.System)
+            TimeProvider.System.GetUtcNow)
     {
     }
 
@@ -40,12 +41,12 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
         Func<string, ConsoleTargetResolution> resolve,
         Action<LinkTarget, ConsoleTargetResolution> open,
         Action<Action> schedule,
-        TimeProvider time)
+        Func<DateTimeOffset> utcNow)
     {
         _resolve = resolve ?? throw new ArgumentNullException(nameof(resolve));
         _open = open ?? throw new ArgumentNullException(nameof(open));
         _schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
-        _time = time ?? throw new ArgumentNullException(nameof(time));
+        _utcNow = utcNow ?? throw new ArgumentNullException(nameof(utcNow));
     }
 
     /// <inheritdoc />
@@ -55,7 +56,7 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
 
         if (target.Kind == LinkKind.Url)
         {
-            return null;
+            return IsWebUrl(target.Path) ? null : UnsupportedSchemeReason;
         }
 
         if (_resolved.TryGetValue(target.Path, out var known))
@@ -65,7 +66,7 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
                 return null;
             }
 
-            if (_time.GetUtcNow() - known.CheckedAt >= MissingRetryAge)
+            if (_utcNow() - known.CheckedAt >= _missingRetryAge)
             {
                 StartResolve(target.Path);
             }
@@ -84,6 +85,12 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
 
         if (target.Kind == LinkKind.Url)
         {
+            if (!IsWebUrl(target.Path))
+            {
+                _logger.Warn(CultureInfo.InvariantCulture, "Console link open refused (not an http or https link): raw={0}.", target.Path);
+                return;
+            }
+
             _schedule(() => _open(target, default));
             return;
         }
@@ -97,7 +104,7 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
             }
             else
             {
-                Logger.Warn(CultureInfo.InvariantCulture, "Console link open failed (path not found): raw={0}.", target.Path);
+                _logger.Warn(CultureInfo.InvariantCulture, "Console link open failed (path not found): raw={0}.", target.Path);
             }
         });
     }
@@ -125,7 +132,7 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
     private ConsoleTargetResolution Resolve(string path)
     {
         var resolution = _resolve(path);
-        _resolved[path] = (resolution, _time.GetUtcNow());
+        _resolved[path] = (resolution, _utcNow());
         return resolution;
     }
 
@@ -136,11 +143,11 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
             : OpenInExplorer(resolution);
         if (opened)
         {
-            Logger.Debug(CultureInfo.InvariantCulture, "Console link open success: target={0}.", target.Path);
+            _logger.Debug(CultureInfo.InvariantCulture, "Console link open success: target={0}.", target.Path);
         }
         else
         {
-            Logger.Warn(CultureInfo.InvariantCulture, "Console link open failed: target={0}.", target.Path);
+            _logger.Warn(CultureInfo.InvariantCulture, "Console link open failed: target={0}.", target.Path);
         }
     }
 
@@ -148,7 +155,13 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
     {
         var fullPath = resolution.FullPath!;
         var arguments = resolution.IsDirectory ? new[] { fullPath } : new[] { "/select," + fullPath };
-        return SourceFileNavigator.TryStart("explorer.exe", arguments, out _)
-            || SourceFileNavigator.OpenDefault(fullPath).Opened;
+        // Explorer only selects a file or opens a folder. It never runs the file.
+        return SourceFileNavigator.TryStart("explorer.exe", arguments, out _);
+    }
+
+    private static bool IsWebUrl(string text)
+    {
+        return Uri.TryCreate(text, UriKind.Absolute, out var uri)
+            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
     }
 }

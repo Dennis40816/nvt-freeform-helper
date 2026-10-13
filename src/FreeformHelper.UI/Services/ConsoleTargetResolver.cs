@@ -33,6 +33,30 @@ internal static class ConsoleTargetResolver
         }
 
         var target = rawTarget.Trim().Trim('"');
+        if (IsNetworkOrDevicePath(target))
+        {
+            // A probe of a UNC path opens a network connection that sends the user's credentials to the named host.
+            return default;
+        }
+
+        try
+        {
+            return ResolveLocal(target);
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or IOException
+                                              or UnauthorizedAccessException or System.Security.SecurityException)
+        {
+            return default;
+        }
+    }
+
+    private static bool IsNetworkOrDevicePath(string target)
+    {
+        return target.StartsWith(@"\\", StringComparison.Ordinal) || target.StartsWith("//", StringComparison.Ordinal);
+    }
+
+    private static ConsoleTargetResolution ResolveLocal(string target)
+    {
         if (Path.IsPathRooted(target))
         {
             return Probe(Path.GetFullPath(target));
@@ -55,7 +79,7 @@ internal static class ConsoleTargetResolver
     {
         var normalized = target.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
         var found = Probe(Path.GetFullPath(normalized, repoRoot));
-        if (found.Exists || target.Contains('/') || target.Contains('\\'))
+        if (found.Exists || target.Contains('/', StringComparison.Ordinal) || target.Contains('\\', StringComparison.Ordinal))
         {
             return found;
         }
@@ -78,8 +102,7 @@ internal static class ConsoleTargetResolver
 
     private static string? FindRepositoryRoot()
     {
-        var userDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        foreach (var seed in new[] { Environment.CurrentDirectory, AppContext.BaseDirectory, userDirectory })
+        foreach (var seed in new[] { Environment.CurrentDirectory, AppContext.BaseDirectory })
         {
             var root = WalkUpToRepositoryRoot(seed);
             if (root is not null)

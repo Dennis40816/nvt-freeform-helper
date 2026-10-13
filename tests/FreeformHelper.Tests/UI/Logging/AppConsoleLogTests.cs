@@ -13,7 +13,7 @@ public sealed class AppConsoleLogTests
         var loggerName = $"FreeformHelper.UI.Tests.{Guid.NewGuid():N}";
         var message = $"full logger name {Guid.NewGuid():N}";
 
-        AppConsoleLog.Write(DateTimeOffset.UtcNow, LogLevel.Warn, loggerName, message);
+        AppConsoleLog.Write(DateTimeOffset.UnixEpoch, LogLevel.Warn, loggerName, message);
 
         using var snapshot = await ConsoleLogTestSupport.CaptureAsync();
         var entry = Assert.Single(snapshot.Entries, candidate => candidate.SourceId == loggerName);
@@ -29,7 +29,7 @@ public sealed class AppConsoleLogTests
     {
         var message = $"blank logger {Guid.NewGuid():N}";
 
-        AppConsoleLog.Write(DateTimeOffset.UtcNow, LogLevel.Info, loggerName, message);
+        AppConsoleLog.Write(DateTimeOffset.UnixEpoch, LogLevel.Info, loggerName, message);
 
         using var snapshot = await ConsoleLogTestSupport.CaptureAsync();
         var entry = Assert.Single(
@@ -56,6 +56,6 @@ public sealed class AppConsoleLogTests
     public void Write_WithNullMessage_Throws()
     {
         Assert.Throws<ArgumentNullException>(
-            () => AppConsoleLog.Write(DateTimeOffset.UtcNow, LogLevel.Info, "logger", null!));
+            () => AppConsoleLog.Write(DateTimeOffset.UnixEpoch, LogLevel.Info, "logger", null!));
     }
 }

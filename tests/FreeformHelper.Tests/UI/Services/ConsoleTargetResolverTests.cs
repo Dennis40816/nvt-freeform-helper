@@ -62,6 +62,25 @@ public sealed class ConsoleTargetResolverTests
     }
 
     [Theory]
+    [InlineData(@"\\server\share\a.txt")]
+    [InlineData("//server/share/a.txt")]
+    [InlineData(@"\\?\C:\Windows\notepad.exe")]
+    public void Resolve_ForANetworkOrDevicePath_ReturnsNothingWithoutProbing(string text)
+    {
+        Assert.False(ConsoleTargetResolver.Resolve(text).Exists);
+    }
+
+    [Theory]
+    [InlineData("bad|name?.txt")]
+    [InlineData("C:\\dir\\a<b>.txt")]
+    public void Resolve_ForAnIllegalPath_ReturnsNothingInsteadOfThrowing(string text)
+    {
+        var exception = Record.Exception(() => ConsoleTargetResolver.Resolve(text));
+
+        Assert.Null(exception);
+    }
+
+    [Theory]
     [InlineData("")]
     [InlineData("   ")]
     public void Resolve_ForBlankText_ReturnsNothing(string text)

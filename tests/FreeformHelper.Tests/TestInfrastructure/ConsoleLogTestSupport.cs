@@ -13,14 +13,14 @@ namespace FreeformHelper.Tests.TestInfrastructure;
 /// </summary>
 internal static class ConsoleLogTestSupport
 {
-    private static readonly DateTimeOffset FixedTime = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset _fixedTime = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
     // A failure guard for a projection that never arrives. It is not a time that a test waits for.
-    private static readonly TimeSpan ProjectionGuard = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan _projectionGuard = TimeSpan.FromSeconds(30);
 
     public static void Write(string sourceId, string message, LogLevel level = LogLevel.Info)
     {
-        AppConsoleLog.Write(FixedTime, level, sourceId, message);
+        AppConsoleLog.Write(_fixedTime, level, sourceId, message);
     }
 
     public static async Task ClearAsync()
@@ -92,7 +92,7 @@ internal static class ConsoleLogTestSupport
         controller.PropertyChanged += OnChanged;
         try
         {
-            await completion.Task.WaitAsync(ProjectionGuard);
+            await completion.Task.WaitAsync(_projectionGuard);
         }
         finally
         {

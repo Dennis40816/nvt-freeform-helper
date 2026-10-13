@@ -40,7 +40,7 @@ public sealed class ConsoleSessionTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         using var store = new LogStore();
-        store.Add(LogLevel.Info, "session-none", "line", DateTimeOffset.UtcNow);
+        store.Add(LogLevel.Info, "session-none", "line", DateTimeOffset.UnixEpoch);
         using var session = new ConsoleSession(store, new UiEventRunner(static (_, _) => { }, static (_, _) => { }), new ConsoleLinkOpener());
 
         var exception = await Record.ExceptionAsync(() => session.CopyVisibleCommand.ExecuteAsync(null));
@@ -55,7 +55,7 @@ public sealed class ConsoleSessionTests
         using var store = new LogStore();
         store.Add(LogLevel.Warn, "session-save", "saved line", new DateTimeOffset(2026, 10, 13, 1, 2, 3, TimeSpan.Zero));
         using var session = new ConsoleSession(store, new UiEventRunner(static (_, _) => { }, static (_, _) => { }), new ConsoleLinkOpener());
-        var stream = new TrackingStream();
+        using var stream = new TrackingStream();
         session.RequestOpenLogStreamAsync = () => Task.FromResult<Stream?>(stream);
 
         await session.SaveLogCommand.ExecuteAsync(null);

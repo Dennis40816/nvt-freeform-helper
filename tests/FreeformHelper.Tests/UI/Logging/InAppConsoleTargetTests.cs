@@ -20,9 +20,9 @@ public sealed class InAppConsoleTargetTests
     {
         var loggerName = $"target-{nlogLevelName}-{Guid.NewGuid():N}";
         var message = $"target message {Guid.NewGuid():N}";
-        var logger = CreateLogger(loggerName);
+        using var logging = new TargetLogging(NLog.LogLevel.Trace);
 
-        logger.Log(NLog.LogLevel.FromString(nlogLevelName), message);
+        logging.GetLogger(loggerName).Log(NLog.LogLevel.FromString(nlogLevelName), message);
 
         using var snapshot = await ConsoleLogTestSupport.CaptureAsync();
         var entry = Assert.Single(snapshot.Entries, candidate => candidate.SourceId == loggerName);
@@ -34,25 +34,34 @@ public sealed class InAppConsoleTargetTests
     public async Task Write_EventBelowTheRuleMinimum_IsNotStored()
     {
         var loggerName = $"target-filtered-{Guid.NewGuid():N}";
-        var configuration = new LoggingConfiguration();
-        var target = new InAppConsoleTarget { Layout = "${message}" };
-        configuration.AddTarget("console", target);
-        configuration.AddRule(NLog.LogLevel.Warn, NLog.LogLevel.Fatal, target);
-        var factory = new LogFactory { Configuration = configuration };
+        using var logging = new TargetLogging(NLog.LogLevel.Warn);
 
-        factory.GetLogger(loggerName).Info("below minimum");
+        logging.GetLogger(loggerName).Info("below minimum");
 
         using var snapshot = await ConsoleLogTestSupport.CaptureAsync();
         Assert.DoesNotContain(snapshot.Entries, candidate => candidate.SourceId == loggerName);
     }
 
-    private static Logger CreateLogger(string loggerName)
+    private sealed class TargetLogging : IDisposable
     {
-        var configuration = new LoggingConfiguration();
-        var target = new InAppConsoleTarget { Layout = "${message}" };
-        configuration.AddTarget("console", target);
-        configuration.AddRule(NLog.LogLevel.Trace, NLog.LogLevel.Fatal, target);
-        var factory = new LogFactory { Configuration = configuration };
-        return factory.GetLogger(loggerName);
+        private readonly InAppConsoleTarget _target;
+        private readonly LogFactory _factory;
+
+        public TargetLogging(NLog.LogLevel minimumLevel)
+        {
+            _target = new InAppConsoleTarget { Layout = "${message}" };
+            var configuration = new LoggingConfiguration();
+            configuration.AddTarget("console", _target);
+            configuration.AddRule(minimumLevel, NLog.LogLevel.Fatal, _target);
+            _factory = new LogFactory { Configuration = configuration };
+        }
+
+        public Logger GetLogger(string loggerName) => _factory.GetLogger(loggerName);
+
+        public void Dispose()
+        {
+            _factory.Dispose();
+            _target.Dispose();
+        }
     }
 }

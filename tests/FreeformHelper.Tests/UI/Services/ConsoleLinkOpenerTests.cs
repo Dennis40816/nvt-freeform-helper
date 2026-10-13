@@ -70,7 +70,7 @@ public sealed class ConsoleLinkOpenerTests
         fixture.Opener.GetUnavailableReason(target);
         fixture.RunScheduled();
         fixture.Existing.Add("C:/work/late.txt");
-        fixture.Time.Advance(TimeSpan.FromSeconds(3));
+        fixture.Advance(TimeSpan.FromSeconds(3));
 
         var reason = fixture.Opener.GetUnavailableReason(target);
         fixture.RunScheduled();
@@ -118,6 +118,31 @@ public sealed class ConsoleLinkOpenerTests
         Assert.Empty(fixture.Resolved);
     }
 
+    [Theory]
+    [InlineData("file:///C:/Windows/System32/calc.exe")]
+    [InlineData("ms-msdt:/id PCWDiagnostic")]
+    [InlineData("javascript:alert(1)")]
+    [InlineData("not a url")]
+    public void Open_ForAUrlThatIsNotHttpOrHttps_DoesNotOpen(string url)
+    {
+        var fixture = new Fixture();
+
+        fixture.Opener.Open(new LinkTarget(LinkKind.Url, url));
+        fixture.RunScheduled();
+
+        Assert.Empty(fixture.Opened);
+    }
+
+    [Fact]
+    public void GetUnavailableReason_ForAUrlThatIsNotHttpOrHttps_ReturnsTheSchemeReason()
+    {
+        var fixture = new Fixture();
+
+        var reason = fixture.Opener.GetUnavailableReason(new LinkTarget(LinkKind.Url, "file:///C:/a.exe"));
+
+        Assert.Equal("Only http and https links can be opened.", reason);
+    }
+
     [Fact]
     public void Open_WithNullTarget_Throws()
     {
@@ -134,15 +159,20 @@ public sealed class ConsoleLinkOpenerTests
                 Resolve,
                 (target, resolution) => Opened.Add((target, resolution)),
                 Scheduled.Enqueue,
-                Time);
+                () => Now);
         }
 
         public ConsoleLinkOpener Opener { get; }
-        public ManualTimeProvider Time { get; } = new();
+        public DateTimeOffset Now { get; private set; } = DateTimeOffset.UnixEpoch;
         public HashSet<string> Existing { get; } = new(StringComparer.Ordinal);
         public Queue<Action> Scheduled { get; } = new();
         public List<string> Resolved { get; } = [];
         public List<(LinkTarget Target, ConsoleTargetResolution Resolution)> Opened { get; } = [];
+
+        public void Advance(TimeSpan amount)
+        {
+            Now += amount;
+        }
 
         public void RunScheduled()
         {
@@ -157,14 +187,5 @@ public sealed class ConsoleLinkOpenerTests
             Resolved.Add(path);
             return Existing.Contains(path) ? new ConsoleTargetResolution("full:" + path, false) : default;
         }
-    }
-
-    private sealed class ManualTimeProvider : TimeProvider
-    {
-        private DateTimeOffset _now = new(2026, 10, 13, 0, 0, 0, TimeSpan.Zero);
-
-        public override DateTimeOffset GetUtcNow() => _now;
-
-        public void Advance(TimeSpan amount) => _now += amount;
     }
 }

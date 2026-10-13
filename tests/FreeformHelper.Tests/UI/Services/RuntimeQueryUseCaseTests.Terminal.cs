@@ -31,7 +31,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryTerminal_ReportsTotalAndReturnedLineCounts()
     {
-        AppConsoleLogWrite(DateTimeOffset.UtcNow, LogLevel.Info, $"rq-count-{Guid.NewGuid():N}", "count line");
+        AppConsoleLogWrite(DateTimeOffset.UnixEpoch, LogLevel.Info, $"rq-count-{Guid.NewGuid():N}", "count line");
         using var shell = new ShellViewModel();
         var useCase = new RuntimeQueryUseCase(shell);
 
@@ -61,7 +61,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         var logger = $"rq-links-{Guid.NewGuid():N}";
         const string path = "C:/work/export/notch_review.csv";
         const string url = "https://github.com/Dennis40816/nvt-freeform-helper";
-        AppConsoleLogWrite(DateTimeOffset.UtcNow, LogLevel.Info, logger, $"see {path} and {url}");
+        AppConsoleLogWrite(DateTimeOffset.UnixEpoch, LogLevel.Info, logger, $"see {path} and {url}");
         using var shell = new ShellViewModel();
         var useCase = new RuntimeQueryUseCase(shell);
 
@@ -83,7 +83,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     public async Task ExecuteAsync_QueryTerminalLinks_WithLimitOne_ReturnsOneLink()
     {
         var logger = $"rq-limit-{Guid.NewGuid():N}";
-        AppConsoleLogWrite(DateTimeOffset.UtcNow, LogLevel.Info, logger, "open C:/work/a.txt then C:/work/b.txt");
+        AppConsoleLogWrite(DateTimeOffset.UnixEpoch, LogLevel.Info, logger, "open C:/work/a.txt then C:/work/b.txt");
         using var shell = new ShellViewModel();
         var useCase = new RuntimeQueryUseCase(shell);
 
