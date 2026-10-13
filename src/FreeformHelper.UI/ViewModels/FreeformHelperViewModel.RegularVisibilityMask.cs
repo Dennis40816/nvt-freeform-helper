@@ -9,7 +9,6 @@ public sealed partial class FreeformHelperViewModel
     private const string RegularVisibilityMaskNotLoadedSummary =
         "Regular visibility mask: not loaded. Import Regular Visibility Mask (SeeRegular.csv) in Step 1 to constrain Step 4 geometry seed and Simulation.";
 
-    private IReadOnlySet<int>? _loadedRegularVisibilityMaskPadIds;
     private RegularVisibilityMaskResult _regularVisibilityMaskResult = RegularVisibilityMaskResult.NotFound();
     private string? _regularVisibilityMaskSourcePath;
     private byte[]? _embeddedRegularVisibilityMask;
@@ -112,7 +111,7 @@ public sealed partial class FreeformHelperViewModel
     private void ClearRegularVisibilityMask()
     {
         var hadMask = !string.IsNullOrWhiteSpace(_regularVisibilityMaskSourcePath) ||
-                      _loadedRegularVisibilityMaskPadIds is not null ||
+                      _regularVisibilityMaskResult.HasLoadedMask ||
                       IsRegularVisibilityMaskEnabled;
 
         _regularVisibilityMaskSourcePath = null;
@@ -148,9 +147,6 @@ public sealed partial class FreeformHelperViewModel
     private void ApplyRegularVisibilityMaskResult(RegularVisibilityMaskResult result, RegularGrid? grid)
     {
         _regularVisibilityMaskResult = result;
-        _loadedRegularVisibilityMaskPadIds = result.HasLoadedMask
-            ? result.ActiveRegularPadIds
-            : null;
         InvalidateWorkflowDataSnapshot();
         RegularVisibilityMaskSummary = BuildRegularVisibilityMaskSummary(result, grid, IsRegularVisibilityMaskEnabled);
         RefreshStep4DuplicateDiffGroups();
@@ -186,7 +182,9 @@ public sealed partial class FreeformHelperViewModel
 
     private IReadOnlySet<int>? GetActiveRegularVisibilityMaskPadIds()
     {
-        return IsRegularVisibilityMaskEnabled ? _loadedRegularVisibilityMaskPadIds : null;
+        return IsRegularVisibilityMaskEnabled && _regularVisibilityMaskResult.HasLoadedMask
+            ? _regularVisibilityMaskResult.ActiveRegularPadIds
+            : null;
     }
 
     private void RefreshCadOutputFwDiffIndexingForRegularVisibilityMaskChange()

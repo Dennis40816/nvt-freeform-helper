@@ -165,7 +165,6 @@ public sealed partial class FreeformHelperViewModel
             ManualColsRange = string.Empty;
             ManualRangeStatus = "No manual range.";
             ManualRangeError = string.Empty;
-            HasManualRangeError = false;
 
             RebuildCascadeSettings(); // Rebuild cascade-related UI elements.
         }

@@ -299,16 +299,17 @@ public sealed partial class FreeformHelperViewModelTests
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
         using var fixture = ExampleProjectFixture.Create(projectPath);
+        var zeroRow = string.Join(',', Enumerable.Repeat("0", 192));
+        var zeroMaskPath = TestFiles.WriteTempCsv(
+            "Xch:\"192\",Ych:\"26\"\n" +
+            $"timestamp(0:0:0),DiffData,{zeroRow}\n" +
+            string.Join('\n', Enumerable.Repeat(zeroRow, 25)) + "\n");
         vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
+        vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(zeroMaskPath);
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
-
-        var maskField = typeof(FreeformHelperViewModel).GetField(
-            "_loadedRegularVisibilityMaskPadIds",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(maskField);
-        maskField!.SetValue(vm, new HashSet<int>());
-        vm.IsRegularVisibilityMaskEnabled = true;
+        await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
+        Assert.True(vm.IsRegularVisibilityMaskEnabled);
 
         var session = await vm.CreateSimulationWorkspaceSessionAsync();
 

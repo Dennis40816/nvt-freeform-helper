@@ -305,4 +305,178 @@ public sealed partial class FreeformHelperViewModelTests
             "Checklist: Simulation audit, EMS cap, selected rows, and C/runtime parity before FW handoff.",
             vm.NotchExportHandoffChecklistText);
     }
+
+    [Fact]
+    public void StatusText_SetToMessage_ShowsMessageInDisplayText()
+    {
+        var vm = CreateViewModelWithReadyStatus();
+
+        vm.StatusText = "Importing DXF...";
+
+        Assert.Equal("Importing DXF...", vm.StatusDisplayText);
+        Assert.True(vm.HasStatusDisplay);
+    }
+
+    [Fact]
+    public void StatusText_SetToMessage_RaisesDisplayNotificationsBeforeStatusText()
+    {
+        var vm = CreateViewModelWithReadyStatus();
+        var changes = RecordNotifications(vm, nameof(vm.StatusText), nameof(vm.StatusDisplayText), nameof(vm.HasStatusDisplay));
+
+        vm.StatusText = "Importing DXF...";
+
+        Assert.Equal([nameof(vm.StatusDisplayText), nameof(vm.HasStatusDisplay), nameof(vm.StatusText)], changes);
+    }
+
+    [Fact]
+    public void StatusText_SetBackToReady_HidesDisplay()
+    {
+        var vm = CreateViewModelWithReadyStatus();
+        vm.StatusText = "Importing DXF...";
+
+        vm.StatusText = "Ready.";
+
+        Assert.Equal(string.Empty, vm.StatusDisplayText);
+        Assert.False(vm.HasStatusDisplay);
+    }
+
+    [Fact]
+    public void StatusText_SetBackToReady_RaisesDisplayNotificationsBeforeStatusText()
+    {
+        var vm = CreateViewModelWithReadyStatus();
+        vm.StatusText = "Importing DXF...";
+        var changes = RecordNotifications(vm, nameof(vm.StatusText), nameof(vm.StatusDisplayText), nameof(vm.HasStatusDisplay));
+
+        vm.StatusText = "Ready.";
+
+        Assert.Equal([nameof(vm.StatusDisplayText), nameof(vm.HasStatusDisplay), nameof(vm.StatusText)], changes);
+    }
+
+    [Fact]
+    public void StatusText_SetToAnotherMessage_DoesNotRaiseHasStatusDisplay()
+    {
+        var vm = CreateViewModelWithReadyStatus();
+        vm.StatusText = "Importing DXF...";
+        var changes = RecordNotifications(vm, nameof(vm.StatusText), nameof(vm.StatusDisplayText), nameof(vm.HasStatusDisplay));
+
+        vm.StatusText = "Building grid...";
+
+        Assert.Equal([nameof(vm.StatusDisplayText), nameof(vm.StatusText)], changes);
+    }
+
+    [Fact]
+    public void StatusText_SetToReadyInOtherCase_HidesDisplay()
+    {
+        var vm = CreateViewModelWithReadyStatus();
+        vm.StatusText = "Importing DXF...";
+
+        vm.StatusText = "READY";
+
+        Assert.Equal(string.Empty, vm.StatusDisplayText);
+        Assert.False(vm.HasStatusDisplay);
+    }
+
+    [Fact]
+    public void StatusText_SetToWhitespace_KeepsTextAndHidesDisplay()
+    {
+        var vm = CreateViewModelWithReadyStatus();
+
+        vm.StatusText = "   ";
+
+        Assert.Equal("   ", vm.StatusDisplayText);
+        Assert.False(vm.HasStatusDisplay);
+    }
+
+    [Fact]
+    public void StatusText_SetToWhitespaceFromReady_DoesNotRaiseHasStatusDisplay()
+    {
+        var vm = CreateViewModelWithReadyStatus();
+        var changes = RecordNotifications(vm, nameof(vm.StatusText), nameof(vm.StatusDisplayText), nameof(vm.HasStatusDisplay));
+
+        vm.StatusText = "   ";
+
+        Assert.Equal([nameof(vm.StatusDisplayText), nameof(vm.StatusText)], changes);
+    }
+
+    [Fact]
+    public void StatusText_SetToSameValue_RaisesNothing()
+    {
+        var vm = CreateViewModelWithReadyStatus();
+        var changes = RecordNotifications(vm, nameof(vm.StatusText), nameof(vm.StatusDisplayText), nameof(vm.HasStatusDisplay));
+
+        vm.StatusText = "Ready.";
+
+        Assert.Empty(changes);
+    }
+
+    [Fact]
+    public void CanvasHintText_SetToText_ShowsHint()
+    {
+        var vm = CreateViewModelWithEmptyCanvasHint();
+
+        vm.CanvasHintText = "Import a DXF to begin.";
+
+        Assert.True(vm.HasCanvasHint);
+    }
+
+    [Fact]
+    public void CanvasHintText_SetToText_RaisesHasCanvasHintBeforeCanvasHintText()
+    {
+        var vm = CreateViewModelWithEmptyCanvasHint();
+        var changes = RecordNotifications(vm, nameof(vm.CanvasHintText), nameof(vm.HasCanvasHint));
+
+        vm.CanvasHintText = "Import a DXF to begin.";
+
+        Assert.Equal([nameof(vm.HasCanvasHint), nameof(vm.CanvasHintText)], changes);
+    }
+
+    [Fact]
+    public void CanvasHintText_SetToWhitespace_HidesHint()
+    {
+        var vm = CreateViewModelWithEmptyCanvasHint();
+        vm.CanvasHintText = "Import a DXF to begin.";
+
+        vm.CanvasHintText = "  ";
+
+        Assert.False(vm.HasCanvasHint);
+    }
+
+    [Fact]
+    public void CanvasHintText_SetToAnotherText_DoesNotRaiseHasCanvasHint()
+    {
+        var vm = CreateViewModelWithEmptyCanvasHint();
+        vm.CanvasHintText = "Import a DXF to begin.";
+        var changes = RecordNotifications(vm, nameof(vm.CanvasHintText), nameof(vm.HasCanvasHint));
+
+        vm.CanvasHintText = "Build the grid.";
+
+        Assert.Equal([nameof(vm.CanvasHintText)], changes);
+    }
+
+    private static FreeformHelperViewModel CreateViewModelWithReadyStatus()
+    {
+        var vm = new FreeformHelperViewModel();
+        vm.StatusText = "Ready.";
+        return vm;
+    }
+
+    private static FreeformHelperViewModel CreateViewModelWithEmptyCanvasHint()
+    {
+        var vm = new FreeformHelperViewModel();
+        vm.CanvasHintText = string.Empty;
+        return vm;
+    }
+
+    internal static List<string?> RecordNotifications(FreeformHelperViewModel vm, params string[] names)
+    {
+        var changes = new List<string?>();
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (names.Contains(e.PropertyName))
+            {
+                changes.Add(e.PropertyName);
+            }
+        };
+        return changes;
+    }
 }

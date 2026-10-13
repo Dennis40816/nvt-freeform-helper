@@ -35,14 +35,30 @@ public sealed partial class FreeformHelperViewModel
     /// Gets or sets the status message for the manual range input (e.g., "No manual range.", "Invalid input.").
     /// </summary>
     [ObservableProperty] private string _manualRangeStatus = "No manual range.";
+    private string _manualRangeError = string.Empty;
+
     /// <summary>
     /// Gets or sets an error message for invalid manual range input.
     /// </summary>
-    [ObservableProperty] private string _manualRangeError = string.Empty;
+    public string ManualRangeError
+    {
+        get => _manualRangeError;
+        set
+        {
+            var hadError = HasManualRangeError;
+            if (SetProperty(ref _manualRangeError, value) && hadError != HasManualRangeError)
+            {
+                OnPropertyChanged(nameof(HasManualRangeError));
+            }
+        }
+    }
+
     /// <summary>
-    /// Gets or sets a value indicating whether there is an error in the manual range input.
+    /// Gets a value indicating whether there is an error in the manual range input.
+    /// The value follows <see cref="ManualRangeError"/>.
     /// </summary>
-    [ObservableProperty] private bool _hasManualRangeError;
+    public bool HasManualRangeError => !string.IsNullOrEmpty(_manualRangeError);
+
 
     /// <summary>
     /// Gets or sets the display text for pending column width, handling mixed state.
