@@ -608,7 +608,6 @@
   <Thickness x:Key="InsetRight8">0,0,8,0</Thickness>
   <Thickness x:Key="InsetRight8Bottom8">0,0,8,8</Thickness>
   <Thickness x:Key="InsetRight8Bottom6">0,0,8,6</Thickness>
-  <Thickness x:Key="InsetRight8Bottom4">0,0,8,4</Thickness>
   <Thickness x:Key="InsetBottom2">0,0,0,2</Thickness>
   <Thickness x:Key="InsetBottom4">0,0,0,4</Thickness>
   <Thickness x:Key="InsetBottom6">0,0,0,6</Thickness>

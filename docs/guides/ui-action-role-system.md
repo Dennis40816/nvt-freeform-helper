@@ -148,7 +148,7 @@ State implementation requirements:
 | DXF Overlap check / Quick Check | `actionTextButton actionNeutral` |
 | Simulation Fit AA | `actionIconButton viewportOverlayAction` |
 | Coordinate Fit AA | `actionIconButton viewportOverlayAction` |
-| Console Dedup toggle | `actionIconButton consoleHeaderAction` or compact `actionTextButton consoleHeaderAction` |
+| Dev page console header toggle | `actionIconButton consoleHeaderAction` or compact `actionTextButton consoleHeaderAction` |
 | Console collapse toggle | `actionIconButton panelChromeToggle` or dedicated console chrome role if it diverges |
 | Uniform 400 / Uniform 360 / Zero presets | `actionChip chipAction` |
 | EMS OK / Violations 0 / Max After 0 | `chipStatus` |
@@ -163,7 +163,7 @@ These controls are named because they were the regression-prone cases that start
 | Quick Check / Overlap Check | `actionTextButton actionNeutral` | Ordinary review/check commands, not primary workflow actions. |
 | Simulation Fit AA | `actionIconButton viewportOverlayAction` | Canvas overlay icon; must not combine with panel action classes. |
 | Coordinate Fit AA | `actionIconButton viewportOverlayAction` | Same overlay role as Simulation Fit AA. |
-| Console Dedup | `actionIconButton consoleHeaderAction` or compact `actionTextButton consoleHeaderAction` | Header toolbar toggle; checked:hover must stay console-specific. |
+| Dev page console header toggle | `actionIconButton consoleHeaderAction` or compact `actionTextButton consoleHeaderAction` | Header toolbar toggle; checked:hover must stay console-specific. |
 | Uniform/Zero presets | `actionChip chipAction` | Interactive preset selection, distinct from passive status badges. |
 | EMS OK / Violations / Max After badges | `chipStatus` | Passive status; no command or click binding. |
 
@@ -271,7 +271,7 @@ Deliverables:
 Acceptance:
 
 - A token/style change can be reviewed in one Dev page location.
-- Manual QA covers Console Dedup, terminal toolbar hover, Quick Check, Simulation Fit AA, Coordinate Fit AA, presets, and badges.
+- Manual QA covers the Dev page console header toggle, Quick Check, Simulation Fit AA, Coordinate Fit AA, presets, and badges.
 
 ## Definition Of Done
 

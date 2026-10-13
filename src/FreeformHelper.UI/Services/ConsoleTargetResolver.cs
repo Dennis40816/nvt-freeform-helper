@@ -18,6 +18,7 @@ internal readonly record struct ConsoleTargetResolution(string? FullPath, bool I
 internal static class ConsoleTargetResolver
 {
     private const int MaxFileNameMatches = 32;
+    private static readonly char[] _wildcardCharacters = ['*', '?'];
 
     /// <summary>
     /// Resolves a link target. A rooted path is checked as it is.
@@ -93,12 +94,16 @@ internal static class ConsoleTargetResolver
     {
         var normalized = target.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
         var found = Probe(Path.GetFullPath(normalized, repoRoot));
-        if (found.Exists || target.Contains('/', StringComparison.Ordinal) || target.Contains('\\', StringComparison.Ordinal))
+        if (found.Exists
+            || target.Contains('/', StringComparison.Ordinal)
+            || target.Contains('\\', StringComparison.Ordinal)
+            || target.IndexOfAny(_wildcardCharacters) >= 0)
         {
             return found;
         }
 
         var shortest = EnumerateFileNameMatches(repoRoot, target)
+            .Where(IsLocalDrivePath)
             .OrderBy(static path => path.Length)
             .FirstOrDefault();
         return shortest is null ? default : new ConsoleTargetResolution(shortest, false);

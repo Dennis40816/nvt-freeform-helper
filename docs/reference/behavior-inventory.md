@@ -265,6 +265,8 @@ Notes:
   - The terminal is expanded by default, with the initial dimensions `ConsolePanelRowHeight=300` and `ConsolePanelMinHeight=232`.
   - There is no per-panel font size control in this version. Ctrl +/- zoom arrives with a later Core version. The console font follows the Core Body font role.
   - Copy visible, Copy selection and Save log write the time in UTC (the Core export has no time zone option). The list and the RuntimeQuery `terminal` command show local time.
+  - A link opens on Ctrl+click or Ctrl+Enter. A plain click only selects the row. This is the Core 0.9.1 behavior. The old terminal opened a link on a plain click.
+  - The Core scanner treats text as a link when it is an http or https URL or a path with a separator or a location suffix. A bare file name with neither (for example `notch_review.csv`) is not a link. A path with a separator is a link whatever its extension, because the old extension allowlist is gone. The repository-root search for a relative path starts from the current folder and the application folder only.
   - A link opens only when it is an http or https URL, or a file or folder that exists. A file or folder link is selected in Explorer. A network path (a UNC path in any separator form) is never probed.
 
 ## Commands

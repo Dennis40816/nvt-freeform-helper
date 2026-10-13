@@ -73,7 +73,15 @@ public sealed class ConsoleTargetResolverTests
     [InlineData(@"\??\UNC\localhost\C$\Windows")]
     [InlineData(@"\??\C:\Windows\notepad.exe")]
     [InlineData(@"\\.\C:\Windows\notepad.exe")]
-    public void Resolve_ForANetworkOrDevicePath_ReturnsNothingWithoutProbing(string text)
+    public void Resolve_ForANetworkOrDevicePath_ReturnsNothing(string text)
+    {
+        Assert.False(ConsoleTargetResolver.Resolve(text).Exists);
+    }
+
+    [Theory]
+    [InlineData("*.cs")]
+    [InlineData("Free?ormHelper.sln")]
+    public void Resolve_ForABareNameWithAWildcard_ReturnsNothing(string text)
     {
         Assert.False(ConsoleTargetResolver.Resolve(text).Exists);
     }
