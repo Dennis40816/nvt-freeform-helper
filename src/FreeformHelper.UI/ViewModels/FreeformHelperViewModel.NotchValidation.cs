@@ -127,7 +127,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void ClearNotchValidation()
     {
-        NotchValidationSummaryText = "Validation: select REG, then run Analyze.";
+        NotchValidationSummaryText = NotchValidationDisplayState.HintSummaryText;
         ClearNotchValidationCollections();
     }
 

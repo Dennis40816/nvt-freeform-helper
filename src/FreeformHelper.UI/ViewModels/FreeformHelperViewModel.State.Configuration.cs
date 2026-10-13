@@ -354,28 +354,4 @@ public sealed partial class FreeformHelperViewModel
     {
         OnPropertyChanged(nameof(ShouldShowNotchExportProgress));
     }
-
-    partial void OnNotchValidationDirectItemsChanged(ObservableCollection<NotchValidationDisplayItem> value)
-    {
-        OnPropertyChanged(nameof(HasNotchValidationDirectItems));
-        OnPropertyChanged(nameof(IsNotchValidationDirectEmpty));
-    }
-
-    partial void OnNotchValidationItemsChanged(ObservableCollection<NotchValidationDisplayItem> value)
-    {
-        OnPropertyChanged(nameof(HasNotchValidationItems));
-        OnPropertyChanged(nameof(IsNotchValidationItemsEmpty));
-    }
-
-    partial void OnNotchValidationIncomingItemsChanged(ObservableCollection<NotchValidationDisplayItem> value)
-    {
-        OnPropertyChanged(nameof(HasNotchValidationIncomingItems));
-        OnPropertyChanged(nameof(IsNotchValidationIncomingEmpty));
-    }
-
-    partial void OnNotchValidationOutgoingItemsChanged(ObservableCollection<NotchValidationDisplayItem> value)
-    {
-        OnPropertyChanged(nameof(HasNotchValidationOutgoingItems));
-        OnPropertyChanged(nameof(IsNotchValidationOutgoingEmpty));
-    }
 }

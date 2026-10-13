@@ -165,14 +165,49 @@ public sealed partial class FreeformHelperViewModel
     /// Gets or sets target REG id used by Step 6 validation quick trace.
     /// </summary>
     [ObservableProperty] private decimal _notchValidationRegularPadId;
+    // The Step 6 quick trace display is stored once. The summary and the four row collections below
+    // forward to it. Each setter raises the notifications of the stored property it replaced.
+    private NotchValidationDisplayState _notchValidationDisplay = NotchValidationDisplayState.CreateInitial();
+
     /// <summary>
     /// Gets or sets quick trace summary text for Step 6 validation.
     /// </summary>
-    [ObservableProperty] private string _notchValidationSummaryText = "Validation: select REG, then run Analyze.";
+    public string NotchValidationSummaryText
+    {
+        get => _notchValidationDisplay.SummaryText;
+        set
+        {
+            if (EqualityComparer<string>.Default.Equals(_notchValidationDisplay.SummaryText, value))
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchValidationDisplay = _notchValidationDisplay with { SummaryText = value };
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>
     /// Gets or sets merged validation rows for Step 6 quick trace.
     /// </summary>
-    [ObservableProperty] private ObservableCollection<NotchValidationDisplayItem> _notchValidationItems = new();
+    public ObservableCollection<NotchValidationDisplayItem> NotchValidationItems
+    {
+        get => _notchValidationDisplay.Items;
+        set
+        {
+            if (EqualityComparer<ObservableCollection<NotchValidationDisplayItem>>.Default.Equals(_notchValidationDisplay.Items, value))
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchValidationDisplay = _notchValidationDisplay with { Items = value };
+            OnPropertyChanged(nameof(HasNotchValidationItems));
+            OnPropertyChanged(nameof(IsNotchValidationItemsEmpty));
+            OnPropertyChanged();
+        }
+    }
     /// <summary>
     /// Gets direct row count for Step 6 validation.
     /// </summary>
@@ -197,15 +232,65 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets direct row items for Step 6 validation.
     /// </summary>
-    [ObservableProperty] private ObservableCollection<NotchValidationDisplayItem> _notchValidationDirectItems = new();
+    public ObservableCollection<NotchValidationDisplayItem> NotchValidationDirectItems
+    {
+        get => _notchValidationDisplay.DirectItems;
+        set
+        {
+            if (EqualityComparer<ObservableCollection<NotchValidationDisplayItem>>.Default.Equals(_notchValidationDisplay.DirectItems, value))
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchValidationDisplay = _notchValidationDisplay with { DirectItems = value };
+            OnPropertyChanged(nameof(HasNotchValidationDirectItems));
+            OnPropertyChanged(nameof(IsNotchValidationDirectEmpty));
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>
     /// Gets or sets incoming allocation items for Step 6 validation.
     /// </summary>
-    [ObservableProperty] private ObservableCollection<NotchValidationDisplayItem> _notchValidationIncomingItems = new();
+    public ObservableCollection<NotchValidationDisplayItem> NotchValidationIncomingItems
+    {
+        get => _notchValidationDisplay.IncomingItems;
+        set
+        {
+            if (EqualityComparer<ObservableCollection<NotchValidationDisplayItem>>.Default.Equals(_notchValidationDisplay.IncomingItems, value))
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchValidationDisplay = _notchValidationDisplay with { IncomingItems = value };
+            OnPropertyChanged(nameof(HasNotchValidationIncomingItems));
+            OnPropertyChanged(nameof(IsNotchValidationIncomingEmpty));
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>
     /// Gets or sets outgoing allocation items for Step 6 validation.
     /// </summary>
-    [ObservableProperty] private ObservableCollection<NotchValidationDisplayItem> _notchValidationOutgoingItems = new();
+    public ObservableCollection<NotchValidationDisplayItem> NotchValidationOutgoingItems
+    {
+        get => _notchValidationDisplay.OutgoingItems;
+        set
+        {
+            if (EqualityComparer<ObservableCollection<NotchValidationDisplayItem>>.Default.Equals(_notchValidationDisplay.OutgoingItems, value))
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchValidationDisplay = _notchValidationDisplay with { OutgoingItems = value };
+            OnPropertyChanged(nameof(HasNotchValidationOutgoingItems));
+            OnPropertyChanged(nameof(IsNotchValidationOutgoingEmpty));
+            OnPropertyChanged();
+        }
+    }
     /// <summary>
     /// Gets a value indicating whether Step 6 validation has direct rows.
     /// </summary>
