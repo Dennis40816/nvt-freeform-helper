@@ -49,27 +49,27 @@ internal sealed partial class RuntimeQueryUseCase
     public RuntimeQueryUseCase(ShellViewModel shellViewModel)
     {
         _shellViewModel = shellViewModel ?? throw new ArgumentNullException(nameof(shellViewModel));
-        _commandRouter = new RuntimeQueryCommandRouter(new Dictionary<string, Func<IReadOnlyDictionary<string, string>?, Task<RuntimeQueryResponseEnvelope>>>(StringComparer.Ordinal)
+        _commandRouter = new RuntimeQueryCommandRouter(new Dictionary<string, Func<IReadOnlyDictionary<string, string>?, CancellationToken, Task<RuntimeQueryResponseEnvelope>>>(StringComparer.Ordinal)
         {
-            ["help"] = _ => Task.FromResult(QueryHelp()),
-            ["status"] = _ => Task.FromResult(QueryStatus()),
-            ["selection"] = _ => Task.FromResult(QuerySelection()),
-            ["terminal"] = args => Task.FromResult(QueryTerminal(args)),
-            ["terminal-links"] = args => Task.FromResult(QueryTerminalLinks(args)),
-            ["pad"] = args => Task.FromResult(QueryPad(args)),
-            ["notch"] = args => Task.FromResult(QueryNotch(args)),
-            ["multi-owner"] = args => Task.FromResult(QueryMultiOwner(args)),
-            ["notch-stage"] = args => Task.FromResult(QueryNotchStage(args)),
-            ["notch-validation"] = args => Task.FromResult(QueryNotchValidation(args)),
-            ["load-project"] = QueryLoadProjectAsync,
-            ["run-step"] = QueryRunStepAsync,
-            ["clear-step"] = args => Task.FromResult(QueryClearStep(args)),
-            ["select-cad"] = args => Task.FromResult(QuerySelectCad(args)),
-            ["select-regular"] = args => Task.FromResult(QuerySelectRegular(args)),
-            ["clear-selection"] = _ => Task.FromResult(QueryClearSelection()),
-            ["set-tofull"] = args => Task.FromResult(QuerySetToFull(args)),
-            ["simulation"] = QuerySimulationAsync,
-            ["export-notch"] = QueryExportNotchAsync
+            ["help"] = (_, _) => Task.FromResult(QueryHelp()),
+            ["status"] = (_, _) => Task.FromResult(QueryStatus()),
+            ["selection"] = (_, _) => Task.FromResult(QuerySelection()),
+            ["terminal"] = (args, _) => Task.FromResult(QueryTerminal(args)),
+            ["terminal-links"] = (args, _) => Task.FromResult(QueryTerminalLinks(args)),
+            ["pad"] = (args, _) => Task.FromResult(QueryPad(args)),
+            ["notch"] = (args, _) => Task.FromResult(QueryNotch(args)),
+            ["multi-owner"] = (args, _) => Task.FromResult(QueryMultiOwner(args)),
+            ["notch-stage"] = (args, _) => Task.FromResult(QueryNotchStage(args)),
+            ["notch-validation"] = (args, _) => Task.FromResult(QueryNotchValidation(args)),
+            ["load-project"] = (args, _) => QueryLoadProjectAsync(args),
+            ["run-step"] = (args, _) => QueryRunStepAsync(args),
+            ["clear-step"] = (args, _) => Task.FromResult(QueryClearStep(args)),
+            ["select-cad"] = (args, _) => Task.FromResult(QuerySelectCad(args)),
+            ["select-regular"] = (args, _) => Task.FromResult(QuerySelectRegular(args)),
+            ["clear-selection"] = (_, _) => Task.FromResult(QueryClearSelection()),
+            ["set-tofull"] = (args, _) => Task.FromResult(QuerySetToFull(args)),
+            ["simulation"] = (args, _) => QuerySimulationAsync(args),
+            ["export-notch"] = (args, _) => QueryExportNotchAsync(args)
         });
     }
 

@@ -112,9 +112,9 @@ internal static class RuntimeQueryCharacterizationSubject
         string handlerName, Action<IReadOnlyDictionary<string, string>?> handler)
     {
         var router = new RuntimeQueryCommandRouter(
-            new Dictionary<string, Func<IReadOnlyDictionary<string, string>?, Task<RuntimeQueryResponseEnvelope>>>(StringComparer.Ordinal)
+            new Dictionary<string, Func<IReadOnlyDictionary<string, string>?, CancellationToken, Task<RuntimeQueryResponseEnvelope>>>(StringComparer.Ordinal)
             {
-                [handlerName] = received =>
+                [handlerName] = (received, _) =>
                 {
                     handler(received);
                     return Task.FromResult(RuntimeQueryResponseEnvelope.Success(null));
