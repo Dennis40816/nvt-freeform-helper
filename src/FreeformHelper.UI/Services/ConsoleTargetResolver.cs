@@ -56,6 +56,14 @@ internal static class ConsoleTargetResolver
         return path.Length >= 2 && IsSeparator(path[0]) && IsSeparator(path[1]);
     }
 
+    // After GetFullPath only a drive-letter path is probed. An NT or device prefix such as \??\UNC\host\share
+    // or \\.\ can reach the network redirector, so every path that is not a drive-letter path is refused.
+    private static bool IsLocalDrivePath(string fullPath)
+    {
+        return !OperatingSystem.IsWindows()
+            || (fullPath.Length >= 3 && char.IsAsciiLetter(fullPath[0]) && fullPath[1] == ':' && IsSeparator(fullPath[2]));
+    }
+
     private static bool IsSeparator(char value)
     {
         return value == '/' || value == '\\';
@@ -99,7 +107,7 @@ internal static class ConsoleTargetResolver
     private static ConsoleTargetResolution Probe(string fullPath)
     {
         // One choke point for every route: an existence check never reaches a network or device path.
-        if (IsNetworkOrDevicePath(fullPath))
+        if (!IsLocalDrivePath(fullPath))
         {
             return default;
         }

@@ -20,7 +20,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         using var shell = new ShellViewModel();
         var useCase = new RuntimeQueryUseCase(shell);
 
-        var response = await useCase.ExecuteAsync(TerminalRequest("terminal"));
+        var response = await useCase.ExecuteAsync(TerminalRequest("terminal", ("tail", TerminalTailCount.ToString(CultureInfo.InvariantCulture))));
 
         Assert.True(response.Ok, $"{response.Error?.Code}:{response.Error?.Message}");
         var line = Assert.Single(ReadLines(response.Data), candidate => candidate.Contains(logger, StringComparison.Ordinal));
@@ -87,7 +87,10 @@ public sealed partial class RuntimeQueryUseCaseTests
         using var shell = new ShellViewModel();
         var useCase = new RuntimeQueryUseCase(shell);
 
-        var response = await useCase.ExecuteAsync(TerminalRequest("terminal-links", ("limit", "1")));
+        var response = await useCase.ExecuteAsync(TerminalRequest(
+            "terminal-links",
+            ("tail", TerminalTailCount.ToString(CultureInfo.InvariantCulture)),
+            ("limit", "1")));
 
         Assert.True(response.Ok, $"{response.Error?.Code}:{response.Error?.Message}");
         var root = SerializeToRootElement(response.Data);
