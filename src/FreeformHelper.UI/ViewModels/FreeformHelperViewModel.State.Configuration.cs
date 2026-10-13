@@ -186,17 +186,23 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     [ObservableProperty] private bool _applyAppVisualPreferencesOnProjectLoad = true;
     /// <summary>
-    /// Gets or sets the summary text for the latest freeform auto-detect statistics.
+    /// Gets or sets the latest freeform auto-detect statistics. The view model replaces the whole
+    /// value. The properties below forward to it and raise their change notification when their
+    /// own value changed.
     /// </summary>
-    [ObservableProperty] private string _freeformAutoDetectSummary = "Freeform stats: not run.";
+    [ObservableProperty] private FreeformAutoDetectResult _freeformAutoDetectResult = FreeformAutoDetectResult.CreateNotRun();
     /// <summary>
-    /// Gets or sets the rows shown in the freeform auto-detect statistics table.
+    /// Gets the summary text for the latest freeform auto-detect statistics.
     /// </summary>
-    [ObservableProperty] private ObservableCollection<FreeformAutoDetectStatRow> _freeformAutoDetectRows = new();
+    public string FreeformAutoDetectSummary => FreeformAutoDetectResult.Summary;
     /// <summary>
-    /// Gets or sets a value indicating whether freeform auto-detect statistics are available.
+    /// Gets the rows shown in the freeform auto-detect statistics table.
     /// </summary>
-    [ObservableProperty] private bool _hasFreeformAutoDetectRows;
+    public ObservableCollection<FreeformAutoDetectStatRow> FreeformAutoDetectRows => FreeformAutoDetectResult.Rows;
+    /// <summary>
+    /// Gets a value indicating whether freeform auto-detect statistics are available.
+    /// </summary>
+    public bool HasFreeformAutoDetectRows => FreeformAutoDetectResult.HasRows;
     // Index mapping settings
     /// <summary>
     /// Gets or sets the IoU weight used for DXF/Regular mapping scoring.
