@@ -11,67 +11,41 @@ public sealed partial class FreeformHelperViewModel
     private const decimal DxfLayerImageExportMinLineWidth = 0.1m;
     private const decimal DxfLayerImageExportMaxLineWidth = 100m;
 
-    private string _dxfLayerImageExportPreferredLayerName = string.Empty;
-    private int _dxfLayerImageExportWidthPixels = 1024;
-    private int _dxfLayerImageExportHeightPixels = 1024;
-    private decimal _dxfLayerImageExportLineWidthPixels = 1m;
-    private int _dxfLayerImageExportPaddingXPixels = 200;
-    private int _dxfLayerImageExportPaddingYPixels = 200;
-    private DxfLayerImageFormat _dxfLayerImageExportFormat = DxfLayerImageFormat.Png;
-    private bool _dxfLayerImageExportUseDarkTheme;
+    private static readonly DxfLayerImageExportRequest _defaultDxfLayerImageExportPreferences = new(
+        LayerName: string.Empty,
+        WidthPixels: 1024,
+        HeightPixels: 1024,
+        LineWidthPixels: 1m,
+        PaddingXPixels: 200,
+        PaddingYPixels: 200,
+        Format: DxfLayerImageFormat.Png,
+        UseDarkTheme: false);
+
+    // The remembered export request. It always holds clamped values and is replaced as a whole.
+    // The layer name is the preferred layer. It may name a layer that the current DXF does not have.
+    private DxfLayerImageExportRequest _dxfLayerImageExportPreferences = _defaultDxfLayerImageExportPreferences;
 
     internal DxfLayerImageExportRequest BuildDxfLayerImageExportInitialRequest(IReadOnlyList<string> layerNames)
     {
         ArgumentNullException.ThrowIfNull(layerNames);
+        var preferences = _dxfLayerImageExportPreferences;
         var layerName = layerNames.FirstOrDefault(name =>
-            string.Equals(name, _dxfLayerImageExportPreferredLayerName, StringComparison.Ordinal))
+            string.Equals(name, preferences.LayerName, StringComparison.Ordinal))
             ?? (layerNames.Count > 0 ? layerNames[0] : null)
             ?? "0";
 
-        return new DxfLayerImageExportRequest(
-            LayerName: layerName,
-            WidthPixels: ClampDxfLayerImagePixels(_dxfLayerImageExportWidthPixels),
-            HeightPixels: ClampDxfLayerImagePixels(_dxfLayerImageExportHeightPixels),
-            LineWidthPixels: ClampDxfLayerImageLineWidth(_dxfLayerImageExportLineWidthPixels),
-            PaddingXPixels: ClampDxfLayerImagePadding(_dxfLayerImageExportPaddingXPixels),
-            PaddingYPixels: ClampDxfLayerImagePadding(_dxfLayerImageExportPaddingYPixels),
-            Format: _dxfLayerImageExportFormat,
-            UseDarkTheme: _dxfLayerImageExportUseDarkTheme);
+        return NormalizeDxfLayerImageExportRequest(preferences with { LayerName = layerName });
     }
 
     internal void RememberDxfLayerImageExportRequest(DxfLayerImageExportRequest request)
     {
-        var normalizedLayer = request.LayerName ?? string.Empty;
-        var normalizedWidth = ClampDxfLayerImagePixels(request.WidthPixels);
-        var normalizedHeight = ClampDxfLayerImagePixels(request.HeightPixels);
-        var normalizedLineWidth = ClampDxfLayerImageLineWidth(request.LineWidthPixels);
-        var normalizedPaddingX = ClampDxfLayerImagePadding(request.PaddingXPixels);
-        var normalizedPaddingY = ClampDxfLayerImagePadding(request.PaddingYPixels);
-
-        var changed =
-            !string.Equals(_dxfLayerImageExportPreferredLayerName, normalizedLayer, StringComparison.Ordinal) ||
-            _dxfLayerImageExportWidthPixels != normalizedWidth ||
-            _dxfLayerImageExportHeightPixels != normalizedHeight ||
-            _dxfLayerImageExportLineWidthPixels != normalizedLineWidth ||
-            _dxfLayerImageExportPaddingXPixels != normalizedPaddingX ||
-            _dxfLayerImageExportPaddingYPixels != normalizedPaddingY ||
-            _dxfLayerImageExportFormat != request.Format ||
-            _dxfLayerImageExportUseDarkTheme != request.UseDarkTheme;
-
-        _dxfLayerImageExportPreferredLayerName = normalizedLayer;
-        _dxfLayerImageExportWidthPixels = normalizedWidth;
-        _dxfLayerImageExportHeightPixels = normalizedHeight;
-        _dxfLayerImageExportLineWidthPixels = normalizedLineWidth;
-        _dxfLayerImageExportPaddingXPixels = normalizedPaddingX;
-        _dxfLayerImageExportPaddingYPixels = normalizedPaddingY;
-        _dxfLayerImageExportFormat = request.Format;
-        _dxfLayerImageExportUseDarkTheme = request.UseDarkTheme;
-
-        if (!changed)
+        var normalized = NormalizeDxfLayerImageExportRequest(request);
+        if (normalized == _dxfLayerImageExportPreferences)
         {
             return;
         }
 
+        _dxfLayerImageExportPreferences = normalized;
         MarkUnsaved();
         SchedulePersistAppGeneralSettings();
     }
@@ -83,19 +57,34 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _dxfLayerImageExportPreferredLayerName = snapshot.DxfLayerImagePreferredLayer ?? string.Empty;
-        _dxfLayerImageExportWidthPixels = ClampDxfLayerImagePixels((int)Math.Round(snapshot.DxfLayerImageWidthPixels));
-        _dxfLayerImageExportHeightPixels = ClampDxfLayerImagePixels((int)Math.Round(snapshot.DxfLayerImageHeightPixels));
-        _dxfLayerImageExportLineWidthPixels = ClampDxfLayerImageLineWidth((decimal)snapshot.DxfLayerImageLineWidthPixels);
-        _dxfLayerImageExportPaddingXPixels = ClampDxfLayerImagePadding((int)Math.Round(snapshot.DxfLayerImagePaddingXPixels));
-        _dxfLayerImageExportPaddingYPixels = ClampDxfLayerImagePadding((int)Math.Round(snapshot.DxfLayerImagePaddingYPixels));
-        _dxfLayerImageExportUseDarkTheme = snapshot.DxfLayerImageUseDarkTheme;
-        _dxfLayerImageExportFormat = Enum.TryParse<DxfLayerImageFormat>(
+        var format = Enum.TryParse<DxfLayerImageFormat>(
             snapshot.DxfLayerImageFormat,
             ignoreCase: true,
             out var parsedFormat)
             ? parsedFormat
             : DxfLayerImageFormat.Png;
+        _dxfLayerImageExportPreferences = NormalizeDxfLayerImageExportRequest(new DxfLayerImageExportRequest(
+            LayerName: snapshot.DxfLayerImagePreferredLayer ?? string.Empty,
+            WidthPixels: (int)Math.Round(snapshot.DxfLayerImageWidthPixels),
+            HeightPixels: (int)Math.Round(snapshot.DxfLayerImageHeightPixels),
+            LineWidthPixels: (decimal)snapshot.DxfLayerImageLineWidthPixels,
+            PaddingXPixels: (int)Math.Round(snapshot.DxfLayerImagePaddingXPixels),
+            PaddingYPixels: (int)Math.Round(snapshot.DxfLayerImagePaddingYPixels),
+            Format: format,
+            UseDarkTheme: snapshot.DxfLayerImageUseDarkTheme));
+    }
+
+    private static DxfLayerImageExportRequest NormalizeDxfLayerImageExportRequest(DxfLayerImageExportRequest request)
+    {
+        return request with
+        {
+            LayerName = request.LayerName ?? string.Empty,
+            WidthPixels = ClampDxfLayerImagePixels(request.WidthPixels),
+            HeightPixels = ClampDxfLayerImagePixels(request.HeightPixels),
+            LineWidthPixels = ClampDxfLayerImageLineWidth(request.LineWidthPixels),
+            PaddingXPixels = ClampDxfLayerImagePadding(request.PaddingXPixels),
+            PaddingYPixels = ClampDxfLayerImagePadding(request.PaddingYPixels),
+        };
     }
 
     private static int ClampDxfLayerImagePixels(int value)

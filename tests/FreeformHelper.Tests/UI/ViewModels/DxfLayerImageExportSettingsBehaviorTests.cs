@@ -130,6 +130,17 @@ public sealed class DxfLayerImageExportSettingsBehaviorTests
     }
 
     [Fact]
+    public async Task RememberDxfLayerImageExportRequest_NullLayerName_IsTheStoredEmptyLayerAndKeepsTheProjectSaved()
+    {
+        using var project = await ProjectFixture.LoadAsync();
+        var current = project.Vm.BuildDxfLayerImageExportInitialRequest(_layers);
+
+        project.Vm.RememberDxfLayerImageExportRequest(current with { LayerName = null! });
+
+        Assert.False(project.Vm.HasUnsavedChanges);
+    }
+
+    [Fact]
     public async Task RememberDxfLayerImageExportRequest_ValueClampedToTheStoredOne_KeepsTheProjectSaved()
     {
         using var project = await ProjectFixture.LoadAsync();
