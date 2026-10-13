@@ -10,7 +10,7 @@ public sealed partial class FreeformHelperViewModel
 
     public bool HasSelectedCombinedCadPadsForDxfEdit => _selectedCadIds.Any(id => TryResolveCombinedCadGroupId(id, out _));
 
-    public bool HasManualHiddenCadPads => _hiddenCadPadIds.Any(id => !_combinedCadGroupIdBySourceCadId.ContainsKey(id));
+    public bool HasManualHiddenCadPads => _hiddenCadPadIds.Any(id => !_combinedCad.GroupIdBySourceCadId.ContainsKey(id));
 
     public bool HasDetectedDuplicateCadPads => _duplicateCadPadIdToCanonicalId.Count > 0;
 

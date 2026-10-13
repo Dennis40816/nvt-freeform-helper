@@ -49,9 +49,9 @@ public sealed partial class FreeformHelperViewModel
                 continue;
             }
 
-            if (_combinedCadGroupIdBySourceCadId.TryGetValue(cadPadId, out var combineGroupId))
+            if (_combinedCad.GroupIdBySourceCadId.TryGetValue(cadPadId, out var combineGroupId))
             {
-                var sourceCount = _combinedCadGroups.TryGetValue(combineGroupId, out var group)
+                var sourceCount = _combinedCad.Groups.TryGetValue(combineGroupId, out var group)
                     ? group.SourceCadIds.Count
                     : 0;
                 entries.Add(new DxfEditChangeListEntry(
@@ -125,15 +125,15 @@ public sealed partial class FreeformHelperViewModel
                 canApply: true));
         }
 
-        foreach (var combinedCadId in _combinedCadPadIds.OrderBy(static id => id))
+        foreach (var combinedCadId in _combinedCad.OutputCadIds.OrderBy(static id => id))
         {
             if (!currentPadsById.TryGetValue(combinedCadId, out var pad))
             {
                 continue;
             }
 
-            var groupId = _combinedCadGroupIdByOutputCadId.GetValueOrDefault(combinedCadId);
-            var sourceCount = groupId > 0 && _combinedCadGroups.TryGetValue(groupId, out var group)
+            var groupId = _combinedCad.GroupIdByOutputCadId.GetValueOrDefault(combinedCadId);
+            var sourceCount = groupId > 0 && _combinedCad.Groups.TryGetValue(groupId, out var group)
                 ? group.SourceCadIds.Count
                 : 0;
             entries.Add(new DxfEditChangeListEntry(
@@ -222,7 +222,7 @@ public sealed partial class FreeformHelperViewModel
         switch (entry.Kind)
         {
             case DxfEditChangeKind.Hidden:
-                if (_combinedCadGroupIdBySourceCadId.ContainsKey(entry.CadPadId))
+                if (_combinedCad.GroupIdBySourceCadId.ContainsKey(entry.CadPadId))
                 {
                     ClearCombinedCadGroupForPad(entry.CadPadId);
                 }
@@ -344,11 +344,11 @@ public sealed partial class FreeformHelperViewModel
 
     private bool TryResolveCombinedCadGroupId(int cadPadId, out int groupId)
     {
-        if (_combinedCadGroupIdByOutputCadId.TryGetValue(cadPadId, out groupId))
+        if (_combinedCad.GroupIdByOutputCadId.TryGetValue(cadPadId, out groupId))
         {
             return true;
         }
 
-        return _combinedCadGroupIdBySourceCadId.TryGetValue(cadPadId, out groupId);
+        return _combinedCad.GroupIdBySourceCadId.TryGetValue(cadPadId, out groupId);
     }
 }

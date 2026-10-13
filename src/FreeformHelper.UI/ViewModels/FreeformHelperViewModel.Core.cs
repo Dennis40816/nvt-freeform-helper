@@ -79,13 +79,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly HashSet<int> _autoHiddenDuplicateCadPadIds = new();
     private readonly Dictionary<int, int> _duplicateCadPadIdToCanonicalId = new();
     private readonly Stack<List<int>> _hiddenCadUndoStack = new();
-    private readonly HashSet<int> _combinedCadPadIds = new();
-    private readonly HashSet<int> _combinedSourceCadPadIds = new();
-    private readonly Dictionary<int, int> _combinedCadGroupIdByOutputCadId = new();
-    private readonly Dictionary<int, int> _combinedCadGroupIdBySourceCadId = new();
-    private readonly Dictionary<int, CombinedCadGroupState> _combinedCadGroups = new();
-    private int _nextCombinedCadGroupId = 1;
-    private int _nextCombinedCadPadId = 1_500_000_000;
+    private readonly CombinedCadState _combinedCad = new();
     private CadPadSet? _dxfEditBaselineCad;
     private readonly Dictionary<string, WorkspaceHeaderItem> _workspaceHeaderItemMap = new(); // Maps keys to header items.
     private string? _lastSavedPath; // Stores the path where the project was last saved.

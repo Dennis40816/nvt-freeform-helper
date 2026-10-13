@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 345,
+        "stateMembers": 343,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -1124,21 +1124,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 101
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.cs"
-      ],
-      "contentHash": "953808964972befa6eecc7124a1969eb6fa40d735768c5ede857e0a0f33c261c",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RestoreCadEditUndoSnapshot(CadEditUndoSnapshot)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 89
+        "methodLines": 87
       },
       "owner": "NFH",
       "locations": [
@@ -1152,7 +1138,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 97
+        "methodLines": 95
       },
       "owner": "NFH",
       "locations": [
@@ -1180,7 +1166,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 103
+        "methodLines": 101
       },
       "owner": "NFH",
       "locations": [

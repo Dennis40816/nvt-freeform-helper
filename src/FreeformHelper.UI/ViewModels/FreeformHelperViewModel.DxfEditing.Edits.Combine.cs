@@ -47,7 +47,7 @@ public sealed partial class FreeformHelperViewModel
 
         var layer = sourcePads[0].Layer;
         var combinedPads = new List<CadPad>(unionResult.OuterPolygons.Count);
-        var groupId = _nextCombinedCadGroupId++;
+        var groupId = _combinedCad.NextGroupId++;
         foreach (var polygon in unionResult.OuterPolygons)
         {
             var combinedId = AllocateCombinedCadPadId();
@@ -56,20 +56,18 @@ public sealed partial class FreeformHelperViewModel
                 $"COMB_{combinedId}",
                 layer,
                 polygon));
-            _combinedCadPadIds.Add(combinedId);
-            _combinedCadGroupIdByOutputCadId[combinedId] = groupId;
+            _combinedCad.GroupIdByOutputCadId[combinedId] = groupId;
         }
 
         var sourcePadIds = sourcePads.Select(static p => p.Id).Distinct().ToList();
-        _combinedCadGroups[groupId] = new CombinedCadGroupState(
+        _combinedCad.Groups[groupId] = new CombinedCadGroupState(
             sourcePadIds,
             combinedPads.Select(static pad => pad.Id).ToList());
         _cad = new CadPadSet(cad.Pads.Concat(combinedPads).ToList());
         foreach (var sourceId in sourcePadIds)
         {
             _hiddenCadPadIds.Add(sourceId);
-            _combinedSourceCadPadIds.Add(sourceId);
-            _combinedCadGroupIdBySourceCadId[sourceId] = groupId;
+            _combinedCad.GroupIdBySourceCadId[sourceId] = groupId;
         }
 
         SyncRelayeredCadState(previous);
@@ -89,7 +87,7 @@ public sealed partial class FreeformHelperViewModel
             sourcePads.Count,
             combinedPads.Count,
             _hiddenCadPadIds.Count,
-            _combinedCadPadIds.Count,
+            _combinedCad.OutputCadIds.Count,
             unionResult.HolePathCount);
         MarkUnsaved();
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), "DXF combine CAD pads");
@@ -97,7 +95,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void ClearCombinedCadPads()
     {
-        if (_cad is null || _combinedCadPadIds.Count == 0)
+        if (_cad is null || _combinedCad.OutputCadIds.Count == 0)
         {
             SetStatus("DXF combine: no combined pad.");
             Logger.Debug(CultureInfo.InvariantCulture, "DXF combine clear skipped: no combined pads.");
@@ -136,7 +134,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var validGroupIds = groupIds
-            .Where(_combinedCadGroups.ContainsKey)
+            .Where(_combinedCad.Groups.ContainsKey)
             .Distinct()
             .OrderBy(static id => id)
             .ToList();
@@ -151,7 +149,7 @@ public sealed partial class FreeformHelperViewModel
         var sourceIds = new HashSet<int>();
         foreach (var groupId in validGroupIds)
         {
-            if (!_combinedCadGroups.TryGetValue(groupId, out var group))
+            if (!_combinedCad.Groups.TryGetValue(groupId, out var group))
             {
                 continue;
             }
@@ -170,8 +168,7 @@ public sealed partial class FreeformHelperViewModel
         _cad = new CadPadSet(_cad.Pads.Where(pad => !outputIds.Contains(pad.Id)).ToList());
         foreach (var outputId in outputIds)
         {
-            _combinedCadPadIds.Remove(outputId);
-            _combinedCadGroupIdByOutputCadId.Remove(outputId);
+            _combinedCad.GroupIdByOutputCadId.Remove(outputId);
             _hiddenCadPadIds.Remove(outputId);
         }
         var restoredSources = 0;
@@ -182,18 +179,17 @@ public sealed partial class FreeformHelperViewModel
                 restoredSources++;
             }
 
-            _combinedSourceCadPadIds.Remove(sourceId);
-            _combinedCadGroupIdBySourceCadId.Remove(sourceId);
+            _combinedCad.GroupIdBySourceCadId.Remove(sourceId);
         }
 
         foreach (var groupId in validGroupIds)
         {
-            _combinedCadGroups.Remove(groupId);
+            _combinedCad.Groups.Remove(groupId);
         }
 
-        if (_combinedCadGroups.Count == 0)
+        if (_combinedCad.Groups.Count == 0)
         {
-            _nextCombinedCadGroupId = 1;
+            _combinedCad.NextGroupId = 1;
         }
 
         _cachedFilteredCadForBuild = null;
@@ -226,15 +222,15 @@ public sealed partial class FreeformHelperViewModel
     {
         if (_cad is null)
         {
-            return _nextCombinedCadPadId++;
+            return _combinedCad.NextPadId++;
         }
 
         var used = _cad.Pads.Select(p => p.Id).ToHashSet();
-        while (used.Contains(_nextCombinedCadPadId))
+        while (used.Contains(_combinedCad.NextPadId))
         {
-            _nextCombinedCadPadId++;
+            _combinedCad.NextPadId++;
         }
 
-        return _nextCombinedCadPadId++;
+        return _combinedCad.NextPadId++;
     }
 }

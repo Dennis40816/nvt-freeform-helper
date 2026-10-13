@@ -178,7 +178,7 @@ public sealed partial class FreeformHelperViewModel
     public bool HasDuplicateCadPads => DuplicateCadPadCount > 0;
 
     /// <summary>Gets the number of synthetic combined CAD pads.</summary>
-    public int CombinedCadPadCount => _combinedCadPadIds.Count;
+    public int CombinedCadPadCount => _combinedCad.OutputCadIds.Count;
 
     /// <summary>Gets whether synthetic combined CAD pads exist.</summary>
     public bool HasCombinedCadPads => CombinedCadPadCount > 0;

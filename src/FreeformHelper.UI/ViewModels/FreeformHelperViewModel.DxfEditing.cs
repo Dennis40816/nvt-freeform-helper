@@ -8,23 +8,13 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 public sealed partial class FreeformHelperViewModel
 {
-    private sealed record CombinedCadGroupState(
-        List<int> SourceCadIds,
-        List<int> OutputCadIds);
-
     private sealed record CadEditUndoSnapshot(
         CadPadSet? Cad,
         List<int> HiddenCadIds,
         List<int> AutoHiddenDuplicateCadIds,
         List<List<int>> HiddenUndoBatchesTopToBottom,
-        List<int> CombinedCadIds,
-        List<int> CombinedSourceCadIds,
         Dictionary<int, int> DuplicateCadPadIdToCanonicalId,
-        Dictionary<int, int> CombinedGroupIdByOutputCadId,
-        Dictionary<int, int> CombinedGroupIdBySourceCadId,
-        Dictionary<int, CombinedCadGroupState> CombinedGroups,
-        int NextCombinedCadGroupId,
-        int NextCombinedCadPadId);
+        CombinedCadState Combined);
 
     private CadEditUndoSnapshot CaptureCadEditUndoSnapshot()
     {
@@ -33,18 +23,8 @@ public sealed partial class FreeformHelperViewModel
             _hiddenCadPadIds.ToList(),
             _autoHiddenDuplicateCadPadIds.ToList(),
             _hiddenCadUndoStack.Select(batch => batch.ToList()).ToList(),
-            _combinedCadPadIds.ToList(),
-            _combinedSourceCadPadIds.ToList(),
             _duplicateCadPadIdToCanonicalId.ToDictionary(static pair => pair.Key, static pair => pair.Value),
-            _combinedCadGroupIdByOutputCadId.ToDictionary(static pair => pair.Key, static pair => pair.Value),
-            _combinedCadGroupIdBySourceCadId.ToDictionary(static pair => pair.Key, static pair => pair.Value),
-            _combinedCadGroups.ToDictionary(
-                static pair => pair.Key,
-                static pair => new CombinedCadGroupState(
-                    pair.Value.SourceCadIds.ToList(),
-                    pair.Value.OutputCadIds.ToList())),
-            _nextCombinedCadGroupId,
-            _nextCombinedCadPadId);
+            _combinedCad.Clone());
     }
 
     private void RestoreCadEditUndoSnapshot(CadEditUndoSnapshot snapshot)
@@ -69,46 +49,13 @@ public sealed partial class FreeformHelperViewModel
             _hiddenCadUndoStack.Push(snapshot.HiddenUndoBatchesTopToBottom[index].ToList());
         }
 
-        _combinedCadPadIds.Clear();
-        foreach (var id in snapshot.CombinedCadIds)
-        {
-            _combinedCadPadIds.Add(id);
-        }
-
-        _combinedSourceCadPadIds.Clear();
-        foreach (var id in snapshot.CombinedSourceCadIds)
-        {
-            _combinedSourceCadPadIds.Add(id);
-        }
-
         _duplicateCadPadIdToCanonicalId.Clear();
         foreach (var pair in snapshot.DuplicateCadPadIdToCanonicalId)
         {
             _duplicateCadPadIdToCanonicalId[pair.Key] = pair.Value;
         }
 
-        _combinedCadGroupIdByOutputCadId.Clear();
-        foreach (var pair in snapshot.CombinedGroupIdByOutputCadId)
-        {
-            _combinedCadGroupIdByOutputCadId[pair.Key] = pair.Value;
-        }
-
-        _combinedCadGroupIdBySourceCadId.Clear();
-        foreach (var pair in snapshot.CombinedGroupIdBySourceCadId)
-        {
-            _combinedCadGroupIdBySourceCadId[pair.Key] = pair.Value;
-        }
-
-        _combinedCadGroups.Clear();
-        foreach (var pair in snapshot.CombinedGroups)
-        {
-            _combinedCadGroups[pair.Key] = new CombinedCadGroupState(
-                pair.Value.SourceCadIds.ToList(),
-                pair.Value.OutputCadIds.ToList());
-        }
-
-        _nextCombinedCadGroupId = snapshot.NextCombinedCadGroupId;
-        _nextCombinedCadPadId = snapshot.NextCombinedCadPadId;
+        _combinedCad.CopyFrom(snapshot.Combined);
         _cachedFilteredCadForBuild = null;
         SyncRelayeredCadState(previous);
         SyncRotatedCadState(previous);
