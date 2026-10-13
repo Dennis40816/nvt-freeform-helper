@@ -72,13 +72,13 @@ public sealed class SelectionSummaryResultBehaviorTests
     }
 
     [Fact]
-    public void ApplyCanvasSelection_SameSelectionAgain_RaisesNoTextNotification()
+    public void ApplyCanvasSelection_OtherPadsWithTheSameTexts_RaisesNoTextNotification()
     {
         var vm = new FreeformHelperViewModel();
         vm.ApplyCanvasSelection([1, 2], []);
         var changes = RecordNotifications(vm, _textNames);
 
-        vm.ApplyCanvasSelection([1, 2], []);
+        vm.ApplyCanvasSelection([3, 4], []);
 
         Assert.Empty(changes);
     }

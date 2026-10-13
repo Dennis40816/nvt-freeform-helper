@@ -107,6 +107,8 @@ public sealed class PadInspectorDisplayBehaviorTests
         {
             CurrentPadInspectorSnapshot = CreateCadSnapshot(274),
             IsPadInspectorTraceExpanded = true,
+            IsPadInspectorTracePopupOpen = true,
+            IsPadInspectorRawTraceExpanded = true,
         };
 
         vm.CurrentPadInspectorSnapshot = null;
@@ -118,6 +120,8 @@ public sealed class PadInspectorDisplayBehaviorTests
         Assert.Empty(vm.PadInspectorCompensationLines);
         Assert.False(vm.HasPadInspectorRuleTrace);
         Assert.False(vm.IsPadInspectorTraceExpanded);
+        Assert.False(vm.IsPadInspectorTracePopupOpen);
+        Assert.False(vm.IsPadInspectorRawTraceExpanded);
     }
 
     [Fact]
@@ -146,7 +150,7 @@ public sealed class PadInspectorDisplayBehaviorTests
 
         vm.CurrentPadInspectorSnapshot = CreateCadSnapshot(274);
 
-        Assert.Equal(_summaryNames.Order(StringComparer.Ordinal), changes.OfType<string>().Distinct().Order(StringComparer.Ordinal));
+        Assert.Equal(_summaryNames.Order(StringComparer.Ordinal), changes.OfType<string>().Order(StringComparer.Ordinal));
     }
 
     [Fact]
@@ -163,7 +167,7 @@ public sealed class PadInspectorDisplayBehaviorTests
             nameof(FreeformHelperViewModel.PadInspectorRuleTraceLines),
             nameof(FreeformHelperViewModel.PadInspectorRuleTraceSections),
         ];
-        Assert.Equal(expected.Order(StringComparer.Ordinal), changes.OfType<string>().Distinct().Order(StringComparer.Ordinal));
+        Assert.Equal(expected.Order(StringComparer.Ordinal), changes.OfType<string>().Order(StringComparer.Ordinal));
     }
 
     [Fact]
@@ -180,7 +184,7 @@ public sealed class PadInspectorDisplayBehaviorTests
             nameof(FreeformHelperViewModel.PadInspectorRuleTraceLines),
             nameof(FreeformHelperViewModel.PadInspectorRuleTraceSections),
         ];
-        Assert.Equal(expected.Order(StringComparer.Ordinal), changes.OfType<string>().Distinct().Order(StringComparer.Ordinal));
+        Assert.Equal(expected.Order(StringComparer.Ordinal), changes.OfType<string>().Order(StringComparer.Ordinal));
         Assert.False(vm.HasPadInspectorSummary);
     }
 
