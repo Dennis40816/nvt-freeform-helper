@@ -1,12 +1,12 @@
 <Project>
-  <!-- Every C# project has an explicit layer; CoreSource is an infrastructure adapter. -->
+  <!-- Every C# project has an explicit layer. -->
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Domain'">
     <HealthLayer>domain</HealthLayer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Application'">
     <HealthLayer>application</HealthLayer>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Infrastructure' Or '$(MSBuildProjectName)' == 'FreeformHelper.CoreSource'">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Infrastructure'">
     <HealthLayer>infrastructure</HealthLayer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.UI'">
@@ -18,9 +18,6 @@
   <!-- BEGIN GENERATED HEALTH WARNING IDS -->
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Application'">
     <HealthBaselineWarningIds>CA1031;CA1307;IDE0051;IDE0052;IDE1006;RS0030</HealthBaselineWarningIds>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.CoreSource'">
-    <HealthBaselineWarningIds>CA1031;IDE0005;IDE1006</HealthBaselineWarningIds>
   </PropertyGroup>
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Infrastructure'">
     <HealthBaselineWarningIds>IDE1006;RS0030</HealthBaselineWarningIds>

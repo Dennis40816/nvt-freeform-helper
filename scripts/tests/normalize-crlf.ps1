@@ -125,10 +125,8 @@ Push-Location $repoRoot
 try {
   $candidates = Get-CandidatePaths -UseAllFiles:$AllFiles
   foreach ($relativePath in $candidates) {
-    # Preserve canonical Core bytes and LF-stable health artifacts.
-    if ($relativePath -ceq "src/FreeformHelper.CoreSource/UiEventRunner.cs" -or
-        $relativePath -ceq "src/FreeformHelper.CoreSource/manifest.json" -or
-        $relativePath.StartsWith("eng/core-health/", [System.StringComparison]::Ordinal) -or
+    # Preserve LF-stable health artifacts.
+    if ($relativePath.StartsWith("eng/core-health/", [System.StringComparison]::Ordinal) -or
         $relativePath -cin @(".editorconfig", "eng/core-health.lock.json", "eng/code-health/baseline.json", "eng/code-health/test-debt.json")) {
       continue
     }

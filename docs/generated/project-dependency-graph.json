@@ -1,5 +1,5 @@
 {
-  "generatedAtUtc": "2026-10-09 19:49:15 UTC",
+  "generatedAtUtc": "2026-10-13 05:10:22 UTC",
   "sourceSolution": "FreeformHelper.sln",
   "projects": [
     {
@@ -9,26 +9,21 @@
     },
     {
       "id": "P2",
-      "name": "FreeformHelper.CoreSource",
-      "path": "src\\FreeformHelper.CoreSource\\FreeformHelper.CoreSource.csproj"
-    },
-    {
-      "id": "P3",
       "name": "FreeformHelper.Domain",
       "path": "src\\FreeformHelper.Domain\\FreeformHelper.Domain.csproj"
     },
     {
-      "id": "P4",
+      "id": "P3",
       "name": "FreeformHelper.Infrastructure",
       "path": "src\\FreeformHelper.Infrastructure\\FreeformHelper.Infrastructure.csproj"
     },
     {
-      "id": "P6",
+      "id": "P5",
       "name": "FreeformHelper.Tests",
       "path": "tests\\FreeformHelper.Tests\\FreeformHelper.Tests.csproj"
     },
     {
-      "id": "P5",
+      "id": "P4",
       "name": "FreeformHelper.UI",
       "path": "src\\FreeformHelper.UI\\FreeformHelper.UI.csproj"
     }
@@ -65,10 +60,6 @@
     {
       "from": "FreeformHelper.UI",
       "to": "FreeformHelper.Application"
-    },
-    {
-      "from": "FreeformHelper.UI",
-      "to": "FreeformHelper.CoreSource"
     },
     {
       "from": "FreeformHelper.UI",

@@ -8,12 +8,7 @@ namespace FreeformHelper.Tests.Architecture;
 // including inactive preprocessor branches, and never generated bin/obj output.
 internal sealed record ArchitectureSource(string Path, string Text)
 {
-    internal const string VerbatimCoreSourcePath = "src/FreeformHelper.CoreSource/UiEventRunner.cs";
-
     public string Code { get; } = Mask(Text);
-
-    internal static bool IsVerbatimCoreSource(string path) =>
-        string.Equals(path, VerbatimCoreSourcePath, StringComparison.Ordinal);
 
     public static Regex Pattern(string pattern) => new(pattern, RegexOptions.CultureInvariant);
 
@@ -146,9 +141,12 @@ internal sealed record ArchitectureSource(string Path, string Text)
         Directory.EnumerateFiles(System.IO.Path.Combine(repoRoot, folder), "*" + extension, SearchOption.AllDirectories)
             .Select(path => System.IO.Path.GetRelativePath(repoRoot, path).Replace('\\', '/'))
             .Where(static path => !path.Split('/').Any(static part => part is "bin" or "obj" or "build"))
-            .Where(static path => !IsVerbatimCoreSource(path))
             .Order(StringComparer.Ordinal)
-            .Select(path => new ArchitectureSource(path, File.ReadAllText(System.IO.Path.Combine(repoRoot, path))))
+            .Select(path =>
+            {
+                using var reader = File.OpenText(System.IO.Path.Combine(repoRoot, path));
+                return new ArchitectureSource(path, reader.ReadToEnd());
+            })
             .ToArray();
 
     // Each variable declarator is one storage slot. Readonly dependencies/collections count;
