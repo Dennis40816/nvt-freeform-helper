@@ -1,19 +1,48 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.UI.Services;
+using SelectionSummaryModel = FreeformHelper.UI.Services.SelectionSummary;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
+    /// <summary>
+    /// Gets or sets the result of the last selection summary computation.
+    /// The text properties below read from this one result.
+    /// </summary>
+    [ObservableProperty]
+    private SelectionSummaryModel _selectionSummaryResult = SelectionSummaryModel.Initial;
+
+    /// <summary>
+    /// Gets a concise summary of the current selection (e.g., "Selected: CAD=5, Regular=12").
+    /// </summary>
+    public string SelectionSummary => SelectionSummaryResult.SelectionSummaryText;
+
+    /// <summary>
+    /// Gets a descriptive summary of the currently selected regular grid range.
+    /// </summary>
+    public string SelectedGridRangeSummary => SelectionSummaryResult.SelectedGridRangeSummary;
+
+    /// <summary>
+    /// Gets a string indicating the count of selected CAD pads.
+    /// </summary>
+    public string CadSelectionText => SelectionSummaryResult.CadSelectionText;
+
+    /// <summary>
+    /// Gets a string indicating the count of selected regular pads.
+    /// </summary>
+    public string RegularSelectionText => SelectionSummaryResult.RegularSelectionText;
+
+    /// <summary>
+    /// Gets a detailed text description of the current selection, including row/col ranges.
+    /// </summary>
+    public string SelectionDetailText => SelectionSummaryResult.SelectionDetailText;
+
     private void UpdateSelectedRangeSummary()
     {
         var summary = SelectionSummaryUseCase.Compute(_grid, _selectedCadIds, _selectedRegIndices);
 
-        _selectedRegRange = summary.RegularRange;
-        SelectionSummary = summary.SelectionSummaryText;
-        SelectedGridRangeSummary = summary.SelectedGridRangeSummary;
-        CadSelectionText = summary.CadSelectionText;
-        RegularSelectionText = summary.RegularSelectionText;
-        SelectionDetailText = summary.SelectionDetailText;
+        SelectionSummaryResult = summary;
         SetManualRangeInputs(summary.ManualRowsRange, summary.ManualColsRange);
         ManualRangeError = summary.ManualRangeError;
         SetManualSizeInputs(summary.PendingWidth, summary.PendingHeight);
@@ -21,6 +50,16 @@ public sealed partial class FreeformHelperViewModel
         IsPendingRowHeightMixed = summary.HeightMixed;
         SetManualSizeDisplay(summary.PendingWidth, summary.PendingHeight, summary.WidthMixed, summary.HeightMixed);
         OnPropertyChanged(nameof(SelectedRegularRange));
+    }
+
+    partial void OnSelectionSummaryResultChanged(SelectionSummaryModel? oldValue, SelectionSummaryModel newValue)
+    {
+        ArgumentNullException.ThrowIfNull(oldValue);
+        RaiseWhenChanged(oldValue.SelectionSummaryText, newValue.SelectionSummaryText, nameof(SelectionSummary));
+        RaiseWhenChanged(oldValue.SelectedGridRangeSummary, newValue.SelectedGridRangeSummary, nameof(SelectedGridRangeSummary));
+        RaiseWhenChanged(oldValue.CadSelectionText, newValue.CadSelectionText, nameof(CadSelectionText));
+        RaiseWhenChanged(oldValue.RegularSelectionText, newValue.RegularSelectionText, nameof(RegularSelectionText));
+        RaiseWhenChanged(oldValue.SelectionDetailText, newValue.SelectionDetailText, nameof(SelectionDetailText));
     }
 
     private void SetManualRangeInputs(string rows, string cols)

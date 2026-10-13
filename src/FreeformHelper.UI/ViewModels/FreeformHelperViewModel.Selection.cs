@@ -25,8 +25,6 @@ public sealed partial class FreeformHelperViewModel
     private long _lastSelectionNotchPreviewMs;
     private long _lastSelectionTotalMs;
 
-    private (int minR, int maxR, int minC, int maxC)? _selectedRegRange;
-
     /// <summary>
     /// Gets a read-only collection of selected CAD pad IDs.
     /// </summary>
@@ -41,7 +39,7 @@ public sealed partial class FreeformHelperViewModel
     /// Gets the rectangular range (min/max row/column) covered by the selected regular pads.
     /// Null if no regular pads are selected or they do not form a contiguous block.
     /// </summary>
-    public (int minR, int maxR, int minC, int maxC)? SelectedRegularRange => _selectedRegRange;
+    public (int minR, int maxR, int minC, int maxC)? SelectedRegularRange => SelectionSummaryResult.RegularRange;
 
     public SelectionTimingSnapshot GetLastSelectionTimingSnapshot()
     {
