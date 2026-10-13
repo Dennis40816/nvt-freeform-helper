@@ -13,7 +13,33 @@ public sealed record SimulationSafetyOverviewProjection(
     string MaxAfterText,
     string ViolationCountText,
     string SummaryText,
-    string HighRiskDiffsText);
+    string HighRiskDiffsText)
+{
+    /// <summary>
+    /// The summary text while no Simulation audit exists and no build failure is known.
+    /// </summary>
+    public const string NotRunSummaryText = "Run Simulation to audit current notch output before FW handoff.";
+
+    /// <summary>
+    /// The high risk diff text while no diff is listed.
+    /// </summary>
+    public const string NoHighRiskDiffsText = "Top risk diffs: -";
+
+    /// <summary>
+    /// Gets the overview that the view model shows before the first Simulation result.
+    /// </summary>
+    public static SimulationSafetyOverviewProjection Initial { get; } = new(
+        HasAudit: false,
+        IsStale: false,
+        HasRisk: false,
+        NeedsAttention: false,
+        StatusText: "Simulation not run",
+        EmsCapText: SimulationSafetyTextProjector.DefaultEmsAfterCapText,
+        MaxAfterText: "Max After -",
+        ViolationCountText: "-",
+        SummaryText: NotRunSummaryText,
+        HighRiskDiffsText: NoHighRiskDiffsText);
+}
 
 public static class SimulationSafetyOverviewProjector
 {
@@ -64,8 +90,8 @@ public static class SimulationSafetyOverviewProjector
             ViolationCountText: "-",
             SummaryText: hasFailure
                 ? buildFailureText!.Trim()
-                : "Run Simulation to audit current notch output before FW handoff.",
-            HighRiskDiffsText: "Top risk diffs: -");
+                : SimulationSafetyOverviewProjection.NotRunSummaryText,
+            HighRiskDiffsText: SimulationSafetyOverviewProjection.NoHighRiskDiffsText);
     }
 
     private static string BuildSummary(SimulationSafetyAuditResult audit, bool isStale)
@@ -90,7 +116,7 @@ public static class SimulationSafetyOverviewProjector
     {
         if (!audit.HasHighRiskDiffs)
         {
-            return "Top risk diffs: -";
+            return SimulationSafetyOverviewProjection.NoHighRiskDiffsText;
         }
 
         var preview = audit.HighRiskDiffs

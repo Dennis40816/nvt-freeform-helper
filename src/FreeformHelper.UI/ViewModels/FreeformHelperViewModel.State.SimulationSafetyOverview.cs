@@ -6,32 +6,31 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
+    /// <summary>
+    /// Gets or sets the latest Simulation safety overview. The view model replaces the whole
+    /// value. The properties below forward to it and raise their change notification when their
+    /// own value changed.
+    /// </summary>
     [ObservableProperty]
-    private bool _hasSimulationSafetyOverviewAudit;
+    private SimulationSafetyOverviewProjection _simulationSafetyOverview = SimulationSafetyOverviewProjection.Initial;
 
-    [ObservableProperty]
-    private bool _hasSimulationSafetyOverviewRisk;
+    public bool HasSimulationSafetyOverviewAudit => SimulationSafetyOverview.HasAudit;
 
-    [ObservableProperty]
-    private bool _hasSimulationSafetyOverviewAttention;
+    public bool HasSimulationSafetyOverviewRisk => SimulationSafetyOverview.HasRisk;
 
-    [ObservableProperty]
-    private string _simulationSafetyOverviewStatusText = "Simulation not run";
+    public bool HasSimulationSafetyOverviewAttention => SimulationSafetyOverview.NeedsAttention;
 
-    [ObservableProperty]
-    private string _simulationSafetyOverviewEmsCapText = SimulationSafetyTextProjector.DefaultEmsAfterCapText;
+    public string SimulationSafetyOverviewStatusText => SimulationSafetyOverview.StatusText;
 
-    [ObservableProperty]
-    private string _simulationSafetyOverviewMaxAfterText = "Max After -";
+    public string SimulationSafetyOverviewEmsCapText => SimulationSafetyOverview.EmsCapText;
 
-    [ObservableProperty]
-    private string _simulationSafetyOverviewViolationCountText = "-";
+    public string SimulationSafetyOverviewMaxAfterText => SimulationSafetyOverview.MaxAfterText;
 
-    [ObservableProperty]
-    private string _simulationSafetyOverviewSummaryText = "Run Simulation to audit current notch output before FW handoff.";
+    public string SimulationSafetyOverviewViolationCountText => SimulationSafetyOverview.ViolationCountText;
 
-    [ObservableProperty]
-    private string _simulationSafetyOverviewHighRiskDiffsText = "Top risk diffs: -";
+    public string SimulationSafetyOverviewSummaryText => SimulationSafetyOverview.SummaryText;
+
+    public string SimulationSafetyOverviewHighRiskDiffsText => SimulationSafetyOverview.HighRiskDiffsText;
 
     public void ApplySimulationSafetyOverview(
         SimulationSafetyAuditResult? audit,
@@ -43,22 +42,32 @@ public sealed partial class FreeformHelperViewModel
 
     private void ApplySimulationSafetyOverview(SimulationSafetyOverviewProjection projection)
     {
-        HasSimulationSafetyOverviewAudit = projection.HasAudit;
-        HasSimulationSafetyOverviewRisk = projection.HasRisk;
-        HasSimulationSafetyOverviewAttention = projection.NeedsAttention;
-        SimulationSafetyOverviewStatusText = projection.StatusText;
-        SimulationSafetyOverviewEmsCapText = projection.EmsCapText;
-        SimulationSafetyOverviewMaxAfterText = projection.MaxAfterText;
-        SimulationSafetyOverviewViolationCountText = projection.ViolationCountText;
-        SimulationSafetyOverviewSummaryText = projection.SummaryText;
-        SimulationSafetyOverviewHighRiskDiffsText = projection.HighRiskDiffsText;
+        SimulationSafetyOverview = projection;
     }
 
-    partial void OnSimulationSafetyOverviewEmsCapTextChanged(string value)
+    partial void OnSimulationSafetyOverviewChanged(
+        SimulationSafetyOverviewProjection? oldValue,
+        SimulationSafetyOverviewProjection newValue)
     {
-        OnPropertyChanged(nameof(NotchEmsSafetyPolicySummary));
-        OnPropertyChanged(nameof(NotchEmsSafetyShortText));
-        OnPropertyChanged(nameof(NotchTargetCoverageCapHelpText));
-        OnPropertyChanged(nameof(NotchExportSafetyPolicySummary));
+        ArgumentNullException.ThrowIfNull(oldValue);
+        RaiseWhenChanged(oldValue.HasAudit, newValue.HasAudit, nameof(HasSimulationSafetyOverviewAudit));
+        RaiseWhenChanged(oldValue.HasRisk, newValue.HasRisk, nameof(HasSimulationSafetyOverviewRisk));
+        RaiseWhenChanged(oldValue.NeedsAttention, newValue.NeedsAttention, nameof(HasSimulationSafetyOverviewAttention));
+        RaiseWhenChanged(oldValue.StatusText, newValue.StatusText, nameof(SimulationSafetyOverviewStatusText));
+        if (!string.Equals(oldValue.EmsCapText, newValue.EmsCapText, StringComparison.Ordinal))
+        {
+            // The cap guidance texts depend on the cap. They are raised before the cap text, as the
+            // stored property's changed hook did.
+            OnPropertyChanged(nameof(NotchEmsSafetyPolicySummary));
+            OnPropertyChanged(nameof(NotchEmsSafetyShortText));
+            OnPropertyChanged(nameof(NotchTargetCoverageCapHelpText));
+            OnPropertyChanged(nameof(NotchExportSafetyPolicySummary));
+            OnPropertyChanged(nameof(SimulationSafetyOverviewEmsCapText));
+        }
+
+        RaiseWhenChanged(oldValue.MaxAfterText, newValue.MaxAfterText, nameof(SimulationSafetyOverviewMaxAfterText));
+        RaiseWhenChanged(oldValue.ViolationCountText, newValue.ViolationCountText, nameof(SimulationSafetyOverviewViolationCountText));
+        RaiseWhenChanged(oldValue.SummaryText, newValue.SummaryText, nameof(SimulationSafetyOverviewSummaryText));
+        RaiseWhenChanged(oldValue.HighRiskDiffsText, newValue.HighRiskDiffsText, nameof(SimulationSafetyOverviewHighRiskDiffsText));
     }
 }
