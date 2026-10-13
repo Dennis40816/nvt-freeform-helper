@@ -304,17 +304,24 @@ public sealed partial class FreeformHelperViewModelTests
             "Xch:\"192\",Ych:\"26\"\n" +
             $"timestamp(0:0:0),DiffData,{zeroRow}\n" +
             string.Join('\n', Enumerable.Repeat(zeroRow, 25)) + "\n");
-        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
-        vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(zeroMaskPath);
+        try
+        {
+            vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
+            vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(zeroMaskPath);
 
-        await vm.LoadProjectCommand.ExecuteAsync(null);
-        await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
-        Assert.True(vm.IsRegularVisibilityMaskEnabled);
+            await vm.LoadProjectCommand.ExecuteAsync(null);
+            await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
+            Assert.True(vm.IsRegularVisibilityMaskEnabled);
 
-        var session = await vm.CreateSimulationWorkspaceSessionAsync();
+            var session = await vm.CreateSimulationWorkspaceSessionAsync();
 
-        Assert.NotNull(session);
-        Assert.Empty(session!.ActiveRegularPadIds);
+            Assert.NotNull(session);
+            Assert.Empty(session!.ActiveRegularPadIds);
+        }
+        finally
+        {
+            File.Delete(zeroMaskPath);
+        }
     }
 
     [ExampleDataFact]

@@ -59,7 +59,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool HasManualRangeError => !string.IsNullOrEmpty(_manualRangeError);
 
-
     /// <summary>
     /// Gets or sets the display text for pending column width, handling mixed state.
     /// </summary>
