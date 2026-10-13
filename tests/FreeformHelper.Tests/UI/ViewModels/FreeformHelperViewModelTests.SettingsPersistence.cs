@@ -259,13 +259,10 @@ public sealed partial class FreeformHelperViewModelTests
             targetAutoMode = vm.SelectedCadOutputFwDiffAutoModeOption;
         }
 
-        var cadIcIndexField = typeof(FreeformHelperViewModel).GetField("_cadIcIndexByCadId", BindingFlags.Instance | BindingFlags.NonPublic);
         var projectField = typeof(FreeformHelperViewModel).GetField("_projectFile", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadIcIndexField);
         Assert.NotNull(projectField);
 
-        var cadIcIndexByCadId = Assert.IsType<Dictionary<int, int>>(cadIcIndexField!.GetValue(vm));
-        cadIcIndexByCadId[4201] = 1;
+        vm.CadIndexMaps.IcIndexByCadId[4201] = 1;
 
         settings.SelectedCadOutputFwDiffAutoModeOption = targetAutoMode;
         settings.CadOutputFwDiffIndexAnchorCadId = 4201;
