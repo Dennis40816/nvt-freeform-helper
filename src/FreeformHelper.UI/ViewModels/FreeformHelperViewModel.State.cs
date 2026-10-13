@@ -32,10 +32,10 @@ public sealed partial class FreeformHelperViewModel
     private string _canvasHintText = string.Empty;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the in-canvas hint should be visible.
+    /// Gets a value indicating whether the in-canvas hint should be visible.
+    /// The value follows <see cref="CanvasHintText"/>.
     /// </summary>
-    [ObservableProperty]
-    private bool _hasCanvasHint;
+    public bool HasCanvasHint => !string.IsNullOrWhiteSpace(CanvasHintText);
 
     // --- Status and Selection Display Properties ---
 
@@ -47,17 +47,15 @@ public sealed partial class FreeformHelperViewModel
     private string _statusText = "Ready.";
 
     /// <summary>
-    /// Gets or sets the display version of the status text.
+    /// Gets the display version of the status text.
     /// Empty if <see cref="StatusText"/> is "Ready.".
     /// </summary>
-    [ObservableProperty]
-    private string _statusDisplayText = string.Empty;
+    public string StatusDisplayText => BuildStatusDisplayText(StatusText);
 
     /// <summary>
-    /// Gets or sets a value indicating whether there is a status message to display.
+    /// Gets a value indicating whether there is a status message to display.
     /// </summary>
-    [ObservableProperty]
-    private bool _hasStatusDisplay;
+    public bool HasStatusDisplay => HasStatusDisplayFor(StatusText);
 
     /// <summary>
     /// Gets or sets a concise summary of the current selection (e.g., "Selected: CAD=5, Regular=12").
@@ -88,12 +86,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     [ObservableProperty]
     private string _selectionDetailText = string.Empty;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether there is a detailed selection text to display.
-    /// </summary>
-    [ObservableProperty]
-    private bool _hasSelectionDetail;
 
     /// <summary>
     /// Gets or sets quick-locate CAD pad id input used by Inspector panel.
@@ -263,28 +255,45 @@ public sealed partial class FreeformHelperViewModel
 
     /// <summary>
     /// Partial method invoked when <see cref="StatusText"/> property changes.
-    /// It processes the raw status text to update <see cref="StatusDisplayText"/>
-    /// and <see cref="HasStatusDisplay"/> for UI binding.
+    /// It raises the change notifications of <see cref="StatusDisplayText"/>
+    /// and <see cref="HasStatusDisplay"/> for UI binding when their values change.
     /// </summary>
-    /// <param name="value">The new value of <see cref="StatusText"/>.</param>
-    partial void OnStatusTextChanged(string value)
+    /// <param name="oldValue">The previous value of <see cref="StatusText"/>.</param>
+    /// <param name="newValue">The new value of <see cref="StatusText"/>.</param>
+    partial void OnStatusTextChanged(string? oldValue, string newValue)
     {
-        // If the status text indicates "Ready.", clear the display text and hide the status display.
-        if (string.Equals(value, "Ready.", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(value, "Ready", StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(BuildStatusDisplayText(oldValue), BuildStatusDisplayText(newValue), StringComparison.Ordinal))
         {
-            StatusDisplayText = string.Empty;
-            HasStatusDisplay = false;
-            return;
+            OnPropertyChanged(nameof(StatusDisplayText));
         }
 
-        // Otherwise, display the new status text.
-        StatusDisplayText = value;
-        HasStatusDisplay = !string.IsNullOrWhiteSpace(value);
+        if (HasStatusDisplayFor(oldValue) != HasStatusDisplayFor(newValue))
+        {
+            OnPropertyChanged(nameof(HasStatusDisplay));
+        }
     }
 
-    partial void OnCanvasHintTextChanged(string value)
+    partial void OnCanvasHintTextChanged(string? oldValue, string newValue)
     {
-        HasCanvasHint = !string.IsNullOrWhiteSpace(value);
+        if (string.IsNullOrWhiteSpace(oldValue) != string.IsNullOrWhiteSpace(newValue))
+        {
+            OnPropertyChanged(nameof(HasCanvasHint));
+        }
+    }
+
+    private static bool IsReadyStatusText(string? value)
+    {
+        return string.Equals(value, "Ready.", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, "Ready", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string BuildStatusDisplayText(string? value)
+    {
+        return IsReadyStatusText(value) ? string.Empty : value ?? string.Empty;
+    }
+
+    private static bool HasStatusDisplayFor(string? value)
+    {
+        return !IsReadyStatusText(value) && !string.IsNullOrWhiteSpace(value);
     }
 }

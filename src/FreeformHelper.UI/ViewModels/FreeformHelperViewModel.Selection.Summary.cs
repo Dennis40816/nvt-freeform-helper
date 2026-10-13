@@ -14,10 +14,8 @@ public sealed partial class FreeformHelperViewModel
         CadSelectionText = summary.CadSelectionText;
         RegularSelectionText = summary.RegularSelectionText;
         SelectionDetailText = summary.SelectionDetailText;
-        HasSelectionDetail = summary.HasSelectionDetail;
         SetManualRangeInputs(summary.ManualRowsRange, summary.ManualColsRange);
         ManualRangeError = summary.ManualRangeError;
-        HasManualRangeError = summary.HasManualRangeError;
         SetManualSizeInputs(summary.PendingWidth, summary.PendingHeight);
         IsPendingColumnWidthMixed = summary.WidthMixed;
         IsPendingRowHeightMixed = summary.HeightMixed;

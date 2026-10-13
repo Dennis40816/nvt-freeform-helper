@@ -97,7 +97,6 @@ public sealed class MaskCurrentBehaviorTests
             Assert.False(mask.HasLoadedMask);
             Assert.Equal(missingMaskPath, mask.SourcePath);
             Assert.Equal(0, mask.ActiveRegularCount);
-            Assert.Null(GetFieldValue(vm, "_loadedRegularVisibilityMaskPadIds"));
             Assert.Contains("not loaded", vm.RegularVisibilityMaskSummary, StringComparison.Ordinal);
 
             var grid = GetField<RegularGrid>(vm, "_grid");

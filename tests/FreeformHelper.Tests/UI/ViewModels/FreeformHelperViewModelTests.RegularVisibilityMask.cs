@@ -299,21 +299,29 @@ public sealed partial class FreeformHelperViewModelTests
         var repoRoot = TestPaths.RepoRoot;
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
         using var fixture = ExampleProjectFixture.Create(projectPath);
-        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
+        var zeroRow = string.Join(',', Enumerable.Repeat("0", 192));
+        var zeroMaskPath = TestFiles.WriteTempCsv(
+            "Xch:\"192\",Ych:\"26\"\n" +
+            $"timestamp(0:0:0),DiffData,{zeroRow}\n" +
+            string.Join('\n', Enumerable.Repeat(zeroRow, 25)) + "\n");
+        try
+        {
+            vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
+            vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(zeroMaskPath);
 
-        await vm.LoadProjectCommand.ExecuteAsync(null);
+            await vm.LoadProjectCommand.ExecuteAsync(null);
+            await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
+            Assert.True(vm.IsRegularVisibilityMaskEnabled);
 
-        var maskField = typeof(FreeformHelperViewModel).GetField(
-            "_loadedRegularVisibilityMaskPadIds",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(maskField);
-        maskField!.SetValue(vm, new HashSet<int>());
-        vm.IsRegularVisibilityMaskEnabled = true;
+            var session = await vm.CreateSimulationWorkspaceSessionAsync();
 
-        var session = await vm.CreateSimulationWorkspaceSessionAsync();
-
-        Assert.NotNull(session);
-        Assert.Empty(session!.ActiveRegularPadIds);
+            Assert.NotNull(session);
+            Assert.Empty(session!.ActiveRegularPadIds);
+        }
+        finally
+        {
+            File.Delete(zeroMaskPath);
+        }
     }
 
     [ExampleDataFact]

@@ -915,7 +915,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 150
+        "methodLines": 141
       },
       "owner": "NFH",
       "locations": [
@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 343,
+        "stateMembers": 337,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -1334,7 +1334,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 164
+        "methodLines": 163
       },
       "owner": "NFH",
       "locations": [
@@ -2171,7 +2171,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 104
+        "methodLines": 103
       },
       "owner": "NFH",
       "locations": [
@@ -12286,16 +12286,6 @@
       "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.BuildWorkflowDataSnapshot(FreeformHelperViewModel)",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.WorkflowSnapshot.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "d198bf3f4cdc00c8be981a89d6fac1c9bac5a00ee059965f42d75c86624bf0f9",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.CreateSimulationWorkspaceSessionAsync_WhenRegularMaskEnabledButEmpty_KeepsEmptyActiveSet()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.RegularVisibilityMask.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "RS0030",

@@ -84,7 +84,6 @@ public sealed partial class FreeformHelperViewModel
     private void UpdateManualRangeStatus()
     {
         ManualRangeError = string.Empty; // Clear previous errors.
-        HasManualRangeError = false;
 
         // If no grid is built, indicate that.
         if (_grid is null)
@@ -139,7 +138,6 @@ public sealed partial class FreeformHelperViewModel
         if (rowsEmpty && colsEmpty)
         {
             ManualRangeError = string.Empty;
-            HasManualRangeError = false;
             _selectionCoordinator.ClearSelection(CanvasHost);
             return;
         }
@@ -154,12 +152,10 @@ public sealed partial class FreeformHelperViewModel
         if (plan.HasError)
         {
             ManualRangeError = plan.ErrorMessage;
-            HasManualRangeError = true;
             return;
         }
 
         ManualRangeError = string.Empty; // Clear errors if parsing successful.
-        HasManualRangeError = false;
 
         if (plan.Action == ManualSizingAction.SyncSelection)
         {
