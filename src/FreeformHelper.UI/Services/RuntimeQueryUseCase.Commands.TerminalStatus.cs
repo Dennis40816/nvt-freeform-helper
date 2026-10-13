@@ -67,7 +67,7 @@ internal sealed partial class RuntimeQueryUseCase
         return RuntimeQueryResponseEnvelope.Success(RuntimeQueryResponseBuilder.BuildSelectionPayload(helper));
     }
 
-    private static async Task<RuntimeQueryResponseEnvelope> QueryTerminalAsync(IReadOnlyDictionary<string, string>? args)
+    private async Task<RuntimeQueryResponseEnvelope> QueryTerminalAsync(IReadOnlyDictionary<string, string>? args)
     {
         var tail = DefaultTerminalTail;
         if (RuntimeQueryArgumentParser.TryGetIntArg(args, "tail", 1, MaxTerminalTail, out var parsedTail, out var tailError))
@@ -79,7 +79,7 @@ internal sealed partial class RuntimeQueryUseCase
             return tailError;
         }
 
-        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(tail);
+        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(_shellViewModel.ConsoleStore, tail);
 
         return RuntimeQueryResponseEnvelope.Success(new
         {
@@ -90,7 +90,7 @@ internal sealed partial class RuntimeQueryUseCase
         });
     }
 
-    private static async Task<RuntimeQueryResponseEnvelope> QueryTerminalLinksAsync(IReadOnlyDictionary<string, string>? args)
+    private async Task<RuntimeQueryResponseEnvelope> QueryTerminalLinksAsync(IReadOnlyDictionary<string, string>? args)
     {
         var tail = DefaultTerminalTail;
         if (RuntimeQueryArgumentParser.TryGetIntArg(args, "tail", 1, MaxTerminalTail, out var parsedTail, out var tailError))
@@ -112,7 +112,7 @@ internal sealed partial class RuntimeQueryUseCase
             return limitError;
         }
 
-        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(tail);
+        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(_shellViewModel.ConsoleStore, tail);
 
         var startLineNumber = Math.Max(1, totalLines - lines.Count + 1);
         var links = new List<object>();

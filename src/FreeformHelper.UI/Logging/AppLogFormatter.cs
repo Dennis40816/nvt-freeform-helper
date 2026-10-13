@@ -57,11 +57,13 @@ public static class AppLogFormatter
     /// Returns the formatted lines of the newest events and the number of events the store keeps.
     /// The method waits until the store has published every write that was accepted before the call.
     /// </summary>
+    /// <param name="store">The store to read. The application passes the store of its shell.</param>
     /// <param name="tailCount">The number of newest events to return.</param>
-    public static async Task<(IReadOnlyList<string> Lines, int TotalCount)> GetTailLinesAsync(int tailCount)
+    public static async Task<(IReadOnlyList<string> Lines, int TotalCount)> GetTailLinesAsync(LogStore store, int tailCount)
     {
+        ArgumentNullException.ThrowIfNull(store);
         var effectiveTail = Math.Max(0, tailCount);
-        using var snapshot = await AppConsoleLog.Store.CaptureLatestAsync();
+        using var snapshot = await store.CaptureLatestAsync();
         var totalCount = snapshot.EventCount;
         if (effectiveTail == 0 || totalCount == 0)
         {

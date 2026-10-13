@@ -16,8 +16,8 @@ public sealed partial class RuntimeQueryUseCaseTests
     {
         var logger = $"rq-{Guid.NewGuid():N}";
         var timestamp = new DateTimeOffset(2026, 10, 13, 8, 15, 42, TimeSpan.Zero);
-        AppConsoleLogWrite(timestamp, LogLevel.Warn, logger, "Pad 12 moved");
-        using var shell = new ShellViewModel();
+        using var store = await CreateStoreAsync(timestamp, LogLevel.Warn, logger, "Pad 12 moved");
+        using var shell = new ShellViewModel { ConsoleStore = store };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(TerminalRequest("terminal", ("tail", TerminalTailCount.ToString(CultureInfo.InvariantCulture))));
@@ -31,8 +31,8 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryTerminal_ReportsTotalAndReturnedLineCounts()
     {
-        AppConsoleLogWrite(DateTimeOffset.UnixEpoch, LogLevel.Info, $"rq-count-{Guid.NewGuid():N}", "count line");
-        using var shell = new ShellViewModel();
+        using var store = await CreateStoreAsync(DateTimeOffset.UnixEpoch, LogLevel.Info, "rq-count", "count line");
+        using var shell = new ShellViewModel { ConsoleStore = store };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(TerminalRequest("terminal", ("tail", "1")));
@@ -40,7 +40,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         Assert.True(response.Ok, $"{response.Error?.Code}:{response.Error?.Message}");
         var root = SerializeToRootElement(response.Data);
         Assert.Equal(1, root.GetProperty("returnedLines").GetInt32());
-        Assert.True(root.GetProperty("totalLines").GetInt32() >= 1);
+        Assert.Equal(1, root.GetProperty("totalLines").GetInt32());
     }
 
     [Fact]
@@ -61,8 +61,8 @@ public sealed partial class RuntimeQueryUseCaseTests
         var logger = $"rq-links-{Guid.NewGuid():N}";
         const string path = "C:/work/export/notch_review.csv";
         const string url = "https://github.com/Dennis40816/nvt-freeform-helper";
-        AppConsoleLogWrite(DateTimeOffset.UnixEpoch, LogLevel.Info, logger, $"see {path} and {url}");
-        using var shell = new ShellViewModel();
+        using var store = await CreateStoreAsync(DateTimeOffset.UnixEpoch, LogLevel.Info, logger, $"see {path} and {url}");
+        using var shell = new ShellViewModel { ConsoleStore = store };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(TerminalRequest("terminal-links", ("tail", TerminalTailCount.ToString(CultureInfo.InvariantCulture))));
@@ -83,8 +83,8 @@ public sealed partial class RuntimeQueryUseCaseTests
     public async Task ExecuteAsync_QueryTerminalLinks_WithLimitOne_ReturnsOneLink()
     {
         var logger = $"rq-limit-{Guid.NewGuid():N}";
-        AppConsoleLogWrite(DateTimeOffset.UnixEpoch, LogLevel.Info, logger, "open C:/work/a.txt then C:/work/b.txt");
-        using var shell = new ShellViewModel();
+        using var store = await CreateStoreAsync(DateTimeOffset.UnixEpoch, LogLevel.Info, logger, "open C:/work/a.txt then C:/work/b.txt");
+        using var shell = new ShellViewModel { ConsoleStore = store };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(TerminalRequest(
@@ -97,9 +97,13 @@ public sealed partial class RuntimeQueryUseCaseTests
         Assert.Equal(1, root.GetProperty("links").GetArrayLength());
     }
 
-    private static void AppConsoleLogWrite(DateTimeOffset timestamp, LogLevel level, string logger, string message)
+    // Each test reads a store of its own, so parallel tests that write to the process-wide store cannot push the line out of the tail.
+    private static async Task<LogStore> CreateStoreAsync(DateTimeOffset timestamp, LogLevel level, string logger, string message)
     {
-        FreeformHelper.UI.Logging.AppConsoleLog.Write(timestamp, level, logger, message);
+        var store = new LogStore();
+        store.Add(level, logger, message, timestamp);
+        using var snapshot = await store.CaptureLatestAsync();
+        return store;
     }
 
     private static RuntimeQueryRequest TerminalRequest(string command, params (string Name, string Value)[] args)
