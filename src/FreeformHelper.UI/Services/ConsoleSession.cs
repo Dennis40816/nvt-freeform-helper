@@ -39,8 +39,10 @@ public sealed class ConsoleSession : IConsoleClipboard, IDisposable
             LinkOpener = linkOpener,
             Clipboard = this
         };
-        CopyVisibleCommand = new AsyncRelayCommand(CopyVisibleAsync);
-        SaveLogCommand = new AsyncRelayCommand(SaveLogAsync);
+        CopyVisibleCommand = new AsyncRelayCommand(
+            () => _uiEvents.RunAsync("Console.CopyVisible", _ => CopyVisibleAsync()));
+        SaveLogCommand = new AsyncRelayCommand(
+            () => _uiEvents.RunAsync("Console.SaveLog", _ => SaveLogAsync()));
     }
 
     /// <summary>Gets the controller that the console controls bind to.</summary>

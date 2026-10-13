@@ -23,24 +23,21 @@ internal static class ConsoleLogTestSupport
         AppConsoleLog.Write(_fixedTime, level, sourceId, message);
     }
 
-    public static async Task ClearAsync()
-    {
-        AppConsoleLog.Store.Clear();
-        using var snapshot = await AppConsoleLog.Store.CaptureLatestAsync();
-    }
-
     /// <summary>
-    /// Replaces the store content with the given lines and waits until the store has published them.
+    /// Creates a store of its own with the given lines and waits until the store has published them.
+    /// The caller owns the store and disposes it. A window test passes it to the shell, so the test
+    /// never clears the process-wide store that other tests write to.
     /// </summary>
-    public static async Task SeedAsync(string sourceId, params string[] messages)
+    public static async Task<LogStore> CreateSeededStoreAsync(string sourceId, params string[] messages)
     {
-        await ClearAsync();
+        var store = new LogStore();
         foreach (var message in messages)
         {
-            Write(sourceId, message);
+            store.Add(LogLevel.Info, sourceId, message, _fixedTime);
         }
 
-        using var snapshot = await CaptureAsync();
+        using var snapshot = await store.CaptureLatestAsync();
+        return store;
     }
 
     public static async Task<LogSnapshot> CaptureAsync()

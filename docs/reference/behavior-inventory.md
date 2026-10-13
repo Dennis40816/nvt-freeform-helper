@@ -263,7 +263,9 @@ Notes:
   - `ConsolePanel` composes the Core `Nvt.Core.Avalonia.LogConsole` controls (`ConsoleHeader`, `ConsoleToolbar`, `ConsoleListView`, `ConsoleEmptyState`) over one `ConsoleController` that `ShellViewModel.ConsoleSession` owns.
   - The Core theme tokens (`ThemeTokens.axaml`) and the two console style files stay app-level includes in `App.axaml`.
   - The terminal is expanded by default, with the initial dimensions `ConsolePanelRowHeight=300` and `ConsolePanelMinHeight=232`.
-  - There is no per-panel font size control and no console font shortcut. The console font follows the Core Body font role.
+  - There is no per-panel font size control in this version. Ctrl +/- zoom arrives with a later Core version. The console font follows the Core Body font role.
+  - Copy visible, Copy selection and Save log write the time in UTC (the Core export has no time zone option). The list and the RuntimeQuery `terminal` command show local time.
+  - A link opens only when it is an http or https URL, or a file or folder that exists. A file or folder link is selected in Explorer. A network path (a UNC path in any separator form) is never probed.
 
 ## Commands
 
@@ -399,7 +401,7 @@ Notes:
   - Ctrl+S → SaveProjectAsync (save result displayed in a top toast) [Status]
   - Delete → DeleteSelectedCadPadsCommand (only when focus is outside text input) [Status]
 - F / Ctrl+A → globally forwarded to Fit / SelectAll (only when focus is outside text input and the source is not the canvas) [View]/[Set selection]
-  - Global shortcuts are not handled when text input (TextBox/ComboBox/NumberScrubber) has focus
+  - Global shortcuts are not handled when text input (TextBox/ComboBox/NumberScrubber) has focus or when focus is inside the console panel
 - OnRootPointerPressed
   - An outside click closes pad info / otherwise focuses the canvas
 - WireCanvasEvents（Canvas.cs）

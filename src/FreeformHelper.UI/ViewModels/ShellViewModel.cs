@@ -76,9 +76,15 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     private bool _isConsoleExpanded = true;
 
     /// <summary>
+    /// Gets the log store that the console shows. The default is the process-wide store that the NLog target writes to.
+    /// A test supplies a store of its own, so it never has to clear or filter the shared one.
+    /// </summary>
+    public Nvt.Core.LogConsole.LogStore ConsoleStore { get; init; } = AppConsoleLog.Store;
+
+    /// <summary>
     /// Gets the console session that the console panels bind to. The first read creates it and must run on the UI thread.
     /// </summary>
-    public ConsoleSession ConsoleSession => _console ??= new ConsoleSession(AppConsoleLog.Store, UiEvents, new ConsoleLinkOpener());
+    public ConsoleSession ConsoleSession => _console ??= new ConsoleSession(ConsoleStore, UiEvents, new ConsoleLinkOpener());
 
     // --- Commands ---
     /// <summary>

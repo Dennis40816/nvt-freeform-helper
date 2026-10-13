@@ -65,6 +65,10 @@ public sealed class ConsoleTargetResolverTests
     [InlineData(@"\\server\share\a.txt")]
     [InlineData("//server/share/a.txt")]
     [InlineData(@"\\?\C:\Windows\notepad.exe")]
+    [InlineData(@"/\server\share\a.txt")]
+    [InlineData(@"\/server/share/a.txt")]
+    [InlineData(@"/\\server\share")]
+    [InlineData(@"/\localhost\C$\Windows")]
     public void Resolve_ForANetworkOrDevicePath_ReturnsNothingWithoutProbing(string text)
     {
         Assert.False(ConsoleTargetResolver.Resolve(text).Exists);

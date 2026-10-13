@@ -82,6 +82,38 @@ public sealed class ConsoleSessionTests
         Assert.Equal(1, requests);
     }
 
+    [AvaloniaFact]
+    public async Task CopyVisibleCommand_WhenTheClipboardThrows_ReportsTheFailureInsteadOfThrowing()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        using var store = new LogStore();
+        var reported = new List<string>();
+        var uiEvents = new UiEventRunner((name, _) => reported.Add(name), static (_, _) => { });
+        using var session = new ConsoleSession(store, uiEvents, new ConsoleLinkOpener());
+        session.RequestSetClipboardTextAsync = _ => throw new IOException("The clipboard is locked.");
+
+        var exception = await Record.ExceptionAsync(() => session.CopyVisibleCommand.ExecuteAsync(null));
+
+        Assert.Null(exception);
+        Assert.Equal("Console.CopyVisible", Assert.Single(reported));
+    }
+
+    [AvaloniaFact]
+    public async Task SaveLogCommand_WhenThePickerThrows_ReportsTheFailureInsteadOfThrowing()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        using var store = new LogStore();
+        var reported = new List<string>();
+        var uiEvents = new UiEventRunner((name, _) => reported.Add(name), static (_, _) => { });
+        using var session = new ConsoleSession(store, uiEvents, new ConsoleLinkOpener());
+        session.RequestOpenLogStreamAsync = () => throw new IOException("The file is locked.");
+
+        var exception = await Record.ExceptionAsync(() => session.SaveLogCommand.ExecuteAsync(null));
+
+        Assert.Null(exception);
+        Assert.Equal("Console.SaveLog", Assert.Single(reported));
+    }
+
     private sealed class TrackingStream : MemoryStream
     {
         public bool WasDisposed { get; private set; }

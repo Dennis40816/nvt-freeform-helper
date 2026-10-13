@@ -13,6 +13,7 @@ using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
+using Nvt.Core.LogConsole;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -76,6 +77,8 @@ public sealed class UiRenderedVisualSnapshotTests
         }
     }
 
+    private const string ConsoleSurfaceKey = "MainWindow.ConsoleExpanded";
+
     [AvaloniaFact]
     public async Task RenderedUiSurfaces_MatchAdvancedVisualBaseline()
     {
@@ -95,12 +98,8 @@ public sealed class UiRenderedVisualSnapshotTests
         var hashMismatches = new List<string>();
         foreach (var item in baseline.Surfaces.OrderBy(static pair => pair.Key, StringComparer.Ordinal))
         {
-            if (item.Key == "MainWindow.ConsoleExpanded")
-            {
-                await SeedConsoleSnapshotLineAsync();
-            }
-
-            if (!TryCreateSurface(item.Key, out var control))
+            using var consoleSurface = await ConsoleSurface.CreateAsync(item.Key);
+            if (!TryCreateSurface(item.Key, consoleSurface.Shell, out var control))
             {
                 fatalIssues.Add($"{item.Key}: no control factory defined");
                 continue;
@@ -157,24 +156,41 @@ public sealed class UiRenderedVisualSnapshotTests
             + string.Join('\n', fatalIssues.Concat(hashMismatches)));
     }
 
-    // The console shows the process-wide log store. The snapshot starts from a store with one fixed line.
-    private static async Task SeedConsoleSnapshotLineAsync()
+    // The console surface shows a store of its own that holds one fixed line, so the test never touches the shared store.
+    private sealed class ConsoleSurface : IDisposable
     {
-        await ConsoleLogTestSupport.SeedAsync("test", "console snapshot line");
+        private readonly LogStore? _store;
+
+        private ConsoleSurface(LogStore? store)
+        {
+            _store = store;
+            Shell = store is null ? null : new ShellViewModel { ConsoleStore = store, IsConsoleExpanded = true };
+        }
+
+        public ShellViewModel? Shell { get; }
+
+        public static async Task<ConsoleSurface> CreateAsync(string key)
+        {
+            var store = key == ConsoleSurfaceKey
+                ? await ConsoleLogTestSupport.CreateSeededStoreAsync("test", "console snapshot line")
+                : null;
+            return new ConsoleSurface(store);
+        }
+
+        public void Dispose()
+        {
+            Shell?.Dispose();
+            _store?.Dispose();
+        }
     }
 
-    private static bool TryCreateSurface(string key, out Control control)
+    private static bool TryCreateSurface(string key, ShellViewModel? consoleShell, out Control control)
     {
         switch (key)
         {
-            case "MainWindow.ConsoleExpanded":
-                var shell = new ShellViewModel
-                {
-                };
-                shell.IsConsoleExpanded = true;
-
+            case ConsoleSurfaceKey:
                 var window = new MainWindow();
-                window.SetShellViewModel(shell);
+                window.SetShellViewModel(consoleShell!);
                 control = window;
                 return true;
             case "SettingsWindow.Default":

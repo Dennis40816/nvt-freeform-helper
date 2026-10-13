@@ -7,7 +7,6 @@ namespace FreeformHelper.Tests;
 public sealed class ConsoleLinkOpenerTests
 {
     private const string MissingReason = "The path does not exist.";
-    private const string PendingReason = "Checking the path...";
 
     [Fact]
     public void GetUnavailableReason_ForUrl_ReturnsNullWithoutResolving()
@@ -21,7 +20,7 @@ public sealed class ConsoleLinkOpenerTests
     }
 
     [Fact]
-    public void GetUnavailableReason_FirstAskForAPath_ReturnsCheckingAndSchedulesOneResolve()
+    public void GetUnavailableReason_FirstAskForAPath_ReturnsAvailableAndSchedulesOneResolve()
     {
         var fixture = new Fixture();
         var target = new LinkTarget(LinkKind.File, "C:/work/a.txt");
@@ -29,8 +28,8 @@ public sealed class ConsoleLinkOpenerTests
         var first = fixture.Opener.GetUnavailableReason(target);
         var second = fixture.Opener.GetUnavailableReason(target);
 
-        Assert.Equal(PendingReason, first);
-        Assert.Equal(PendingReason, second);
+        Assert.Null(first);
+        Assert.Null(second);
         Assert.Single(fixture.Scheduled);
         Assert.Empty(fixture.Resolved);
     }
@@ -141,6 +140,28 @@ public sealed class ConsoleLinkOpenerTests
         var reason = fixture.Opener.GetUnavailableReason(new LinkTarget(LinkKind.Url, "file:///C:/a.exe"));
 
         Assert.Equal("Only http and https links can be opened.", reason);
+    }
+
+    [Fact]
+    public void BuildExplorerArguments_ForAFileWithSpacesAndAComma_KeepsSelectAndThePathAsSeparateItems()
+    {
+        var resolution = new ConsoleTargetResolution(@"C:\My Folder\a, b.txt", false);
+
+        var arguments = ConsoleLinkOpener.BuildExplorerArguments(resolution);
+
+        Assert.Equal(2, arguments.Length);
+        Assert.Equal("/select,", arguments[0]);
+        Assert.Equal(@"C:\My Folder\a, b.txt", arguments[1]);
+    }
+
+    [Fact]
+    public void BuildExplorerArguments_ForAFolder_PassesOnlyThePath()
+    {
+        var resolution = new ConsoleTargetResolution(@"C:\My Folder", true);
+
+        var arguments = ConsoleLinkOpener.BuildExplorerArguments(resolution);
+
+        Assert.Equal(@"C:\My Folder", Assert.Single(arguments));
     }
 
     [Fact]

@@ -24,7 +24,7 @@ Last updated: 2026-02-12
 - File log and in-app console share the same semantic fields:
   - `time | level | logger/source | message`
 - File target remains full-fidelity with exception stack on new line.
-- In-app console is rendered through `AppLogFormatter` for a single source of truth.
+- The in-app console shows the Core `LogStore` (`AppConsoleLog.Store`) through the Core console controls. `AppLogFormatter` formats the same entries for the RuntimeQuery `terminal` commands.
 
 ## Current Rules (implemented)
 - Default runtime rule: `Info+` to file + in-app console.

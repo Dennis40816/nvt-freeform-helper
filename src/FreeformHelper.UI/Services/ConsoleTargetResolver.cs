@@ -50,9 +50,15 @@ internal static class ConsoleTargetResolver
         }
     }
 
-    private static bool IsNetworkOrDevicePath(string target)
+    // Windows reads "/" and "\" as the same separator, so "/\host\share" is a network path as well.
+    private static bool IsNetworkOrDevicePath(string path)
     {
-        return target.StartsWith(@"\\", StringComparison.Ordinal) || target.StartsWith("//", StringComparison.Ordinal);
+        return path.Length >= 2 && IsSeparator(path[0]) && IsSeparator(path[1]);
+    }
+
+    private static bool IsSeparator(char value)
+    {
+        return value == '/' || value == '\\';
     }
 
     private static ConsoleTargetResolution ResolveLocal(string target)
@@ -92,6 +98,12 @@ internal static class ConsoleTargetResolver
 
     private static ConsoleTargetResolution Probe(string fullPath)
     {
+        // One choke point for every route: an existence check never reaches a network or device path.
+        if (IsNetworkOrDevicePath(fullPath))
+        {
+            return default;
+        }
+
         if (Directory.Exists(fullPath))
         {
             return new ConsoleTargetResolution(fullPath, true);

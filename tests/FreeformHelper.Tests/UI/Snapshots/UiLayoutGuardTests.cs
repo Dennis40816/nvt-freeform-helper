@@ -776,7 +776,7 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("Alt = Regular priority", overlayXaml);
         Assert.Contains("_topLevel.KeyDown += OnTopLevelKeyDown;", freeformLifecycleCode);
         Assert.Contains("_topLevel.KeyDown -= OnTopLevelKeyDown;", freeformLifecycleCode);
-        Assert.Contains("IsTextEntryControlSource(e.Source)", freeformShortcutCode);
+        Assert.Matches(@"IsTextEntryControlSource\(e\.Source\)[\s\S]*private static bool IsTextEntryControlSource[\s\S]*?ConsolePanel[\s\S]*?private static bool IsCanvasInputSource", freeformShortcutCode);
         Assert.Contains("if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.None)", freeformShortcutCode);
         Assert.Contains("if (e.Key == Key.A && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode);
         Assert.Contains("if (e.Key == Key.Z && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode);

@@ -9,13 +9,14 @@ namespace FreeformHelper.UI.Services;
 
 /// <summary>
 /// Gives the console its link capabilities. The console asks on the UI thread, so a path is resolved
-/// on a worker and the answer is cached. The first answer for a path is "checking"; the next hover sees the result.
+/// on a worker and the answer is cached. Until the answer arrives the link counts as available, so a click right after
+/// the first hover still opens it. A path that turns out to be missing is reported on the next ask.
 /// </summary>
 internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
 {
-    private const string PendingReason = "Checking the path...";
     private const string MissingReason = "The path does not exist.";
     private const string UnsupportedSchemeReason = "Only http and https links can be opened.";
+    private const int MaxCachedPaths = 1024;
     private static readonly TimeSpan _missingRetryAge = TimeSpan.FromSeconds(2);
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -75,7 +76,7 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
         }
 
         StartResolve(target.Path);
-        return PendingReason;
+        return null;
     }
 
     /// <inheritdoc />
@@ -132,6 +133,11 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
     private ConsoleTargetResolution Resolve(string path)
     {
         var resolution = _resolve(path);
+        if (_resolved.Count >= MaxCachedPaths)
+        {
+            _resolved.Clear();
+        }
+
         _resolved[path] = (resolution, _utcNow());
         return resolution;
     }
@@ -139,7 +145,7 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
     private static void OpenWithShell(LinkTarget target, ConsoleTargetResolution resolution)
     {
         var opened = target.Kind == LinkKind.Url
-            ? SourceFileNavigator.OpenDefault(target.Path).Opened
+            ? SourceFileNavigator.OpenDefault(new Uri(target.Path, UriKind.Absolute).AbsoluteUri).Opened
             : OpenInExplorer(resolution);
         if (opened)
         {
@@ -151,12 +157,27 @@ internal sealed class ConsoleLinkOpener : IConsoleLinkOpener
         }
     }
 
-    private static bool OpenInExplorer(ConsoleTargetResolution resolution)
+    /// <summary>
+    /// Builds the Explorer arguments for a resolved target. "/select," and the path are separate items,
+    /// so a path with spaces is quoted on its own and Explorer still selects the file.
+    /// </summary>
+    internal static string[] BuildExplorerArguments(ConsoleTargetResolution resolution)
     {
         var fullPath = resolution.FullPath!;
-        var arguments = resolution.IsDirectory ? new[] { fullPath } : new[] { "/select," + fullPath };
+        return resolution.IsDirectory ? [fullPath] : ["/select,", fullPath];
+    }
+
+    private static bool OpenInExplorer(ConsoleTargetResolution resolution)
+    {
         // Explorer only selects a file or opens a folder. It never runs the file.
-        return SourceFileNavigator.TryStart("explorer.exe", arguments, out _);
+        return SourceFileNavigator.TryStart(ResolveExplorerPath(), BuildExplorerArguments(resolution), out _);
+    }
+
+    private static string ResolveExplorerPath()
+    {
+        // The system folder is C:\Windows\System32. Explorer lives one level up, in the Windows folder.
+        var windowsFolder = Path.GetDirectoryName(Environment.SystemDirectory);
+        return string.IsNullOrWhiteSpace(windowsFolder) ? "explorer.exe" : Path.Combine(windowsFolder, "explorer.exe");
     }
 
     private static bool IsWebUrl(string text)

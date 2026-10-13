@@ -296,10 +296,6 @@ public sealed partial class FreeformHelperViewModel
     [ObservableProperty] private bool _hasDxfRegularMappingIssues;
 
     /// <summary>
-    /// Gets or sets the console font size (used for in-app log view).
-    /// </summary>
-    [ObservableProperty] private double _consoleFontSize = 12.0;
-    /// <summary>
     /// Gets or sets whether the console panel is expanded.
     /// </summary>
     [ObservableProperty] private bool _isConsoleExpanded = true;

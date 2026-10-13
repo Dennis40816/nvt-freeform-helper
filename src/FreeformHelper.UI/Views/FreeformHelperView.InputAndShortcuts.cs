@@ -204,16 +204,12 @@ public sealed partial class FreeformHelperView
             return false;
         }
 
-        if (visual is TextBox or ComboBox or NumberScrubber)
-        {
-            return true;
-        }
-
-        if (visual.FindAncestorOfType<TextBox>() is not null) return true;
-        if (visual.FindAncestorOfType<ComboBox>() is not null) return true;
-        if (visual.FindAncestorOfType<NumberScrubber>() is not null) return true;
-
-        return false;
+        // The console list handles its own keys. Delete, F and Ctrl+Z must not reach the canvas from a log row.
+        return visual is TextBox or ComboBox or NumberScrubber or ConsolePanel
+            || visual.FindAncestorOfType<TextBox>() is not null
+            || visual.FindAncestorOfType<ComboBox>() is not null
+            || visual.FindAncestorOfType<NumberScrubber>() is not null
+            || visual.FindAncestorOfType<ConsolePanel>() is not null;
     }
 
     private static bool IsCanvasInputSource(object? source)
