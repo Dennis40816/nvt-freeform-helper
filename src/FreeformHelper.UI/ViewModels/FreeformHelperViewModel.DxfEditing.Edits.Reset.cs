@@ -17,7 +17,7 @@ public sealed partial class FreeformHelperViewModel
         var undoSnapshot = CaptureCadEditUndoSnapshot();
         var previous = new CadEditNotificationSnapshot(this);
         var restored = _hiddenCadPadIds.Count;
-        var removedCombined = _combinedCadPadIds.Count;
+        var removedCombined = _combinedCad.OutputCadIds.Count;
         var restoredLayerMoves = RelayeredCadPadCount;
         var restoredRotations = RotatedCadPadCount;
         if (_dxfEditBaselineCad is not null)
@@ -31,13 +31,7 @@ public sealed partial class FreeformHelperViewModel
 
         _hiddenCadPadIds.Clear();
         _hiddenCadUndoStack.Clear();
-        _combinedCadPadIds.Clear();
-        _combinedSourceCadPadIds.Clear();
-        _combinedCadGroupIdByOutputCadId.Clear();
-        _combinedCadGroupIdBySourceCadId.Clear();
-        _combinedCadGroups.Clear();
-        _nextCombinedCadGroupId = 1;
-        _nextCombinedCadPadId = 1_500_000_000;
+        _combinedCad.Clear();
         _cachedFilteredCadForBuild = null;
         SyncRelayeredCadState(previous);
         SyncRotatedCadState(previous);
@@ -72,18 +66,14 @@ public sealed partial class FreeformHelperViewModel
 
     private int RemoveCombinedPadsFromCadSet()
     {
-        if (_cad is null || _combinedCadPadIds.Count == 0)
+        if (_cad is null || _combinedCad.OutputCadIds.Count == 0)
         {
             return 0;
         }
 
-        var removed = _combinedCadPadIds.Count;
-        _cad = new CadPadSet(_cad.Pads.Where(p => !_combinedCadPadIds.Contains(p.Id)).ToList());
-        _combinedCadPadIds.Clear();
-        _combinedCadGroupIdByOutputCadId.Clear();
-        _combinedCadGroupIdBySourceCadId.Clear();
-        _combinedCadGroups.Clear();
-        _nextCombinedCadGroupId = 1;
+        var removed = _combinedCad.OutputCadIds.Count;
+        _cad = new CadPadSet(_cad.Pads.Where(p => !_combinedCad.OutputCadIds.Contains(p.Id)).ToList());
+        _combinedCad.ClearGroups();
         return removed;
     }
 }

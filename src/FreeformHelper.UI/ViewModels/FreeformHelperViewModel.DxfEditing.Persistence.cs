@@ -91,14 +91,14 @@ public sealed partial class FreeformHelperViewModel
 
     private List<ProjectDxfCombinedCadGroup> CapturePersistedCombinedCadGroups()
     {
-        if (_cad is null || _combinedCadGroups.Count == 0)
+        if (_cad is null || _combinedCad.Groups.Count == 0)
         {
             return new List<ProjectDxfCombinedCadGroup>();
         }
 
         var currentPadsById = _cad.Pads.ToDictionary(static pad => pad.Id);
         var groups = new List<ProjectDxfCombinedCadGroup>();
-        foreach (var pair in _combinedCadGroups.OrderBy(static pair => pair.Key))
+        foreach (var pair in _combinedCad.Groups.OrderBy(static pair => pair.Key))
         {
             var outputPads = pair.Value.OutputCadIds
                 .Select(outputCadId => currentPadsById.TryGetValue(outputCadId, out var pad)
@@ -197,7 +197,7 @@ public sealed partial class FreeformHelperViewModel
         var currentPads = _cad.Pads.ToList();
         var currentPadIds = currentPads.Select(static pad => pad.Id).ToHashSet();
         var maxGroupId = 0;
-        var nextCombinedCadPadId = _nextCombinedCadPadId;
+        var nextCombinedCadPadId = _combinedCad.NextPadId;
 
         foreach (var persistedGroup in combinedGroups.OrderBy(static group => group.GroupId))
         {
@@ -263,29 +263,27 @@ public sealed partial class FreeformHelperViewModel
                 continue;
             }
 
-            var groupId = persistedGroup.GroupId > 0 ? persistedGroup.GroupId : _nextCombinedCadGroupId++;
+            var groupId = persistedGroup.GroupId > 0 ? persistedGroup.GroupId : _combinedCad.NextGroupId++;
             currentPads.AddRange(outputPads);
-            _combinedCadGroups[groupId] = new CombinedCadGroupState(
+            _combinedCad.Groups[groupId] = new CombinedCadGroupState(
                 distinctSourceCadIds,
                 outputPads.Select(static pad => pad.Id).ToList());
             foreach (var outputPad in outputPads)
             {
-                _combinedCadPadIds.Add(outputPad.Id);
-                _combinedCadGroupIdByOutputCadId[outputPad.Id] = groupId;
+                _combinedCad.GroupIdByOutputCadId[outputPad.Id] = groupId;
             }
 
             foreach (var sourceCadId in distinctSourceCadIds)
             {
-                _combinedSourceCadPadIds.Add(sourceCadId);
                 combinedSourceCadIds.Add(sourceCadId);
-                _combinedCadGroupIdBySourceCadId[sourceCadId] = groupId;
+                _combinedCad.GroupIdBySourceCadId[sourceCadId] = groupId;
             }
 
             maxGroupId = Math.Max(maxGroupId, groupId);
         }
 
-        _nextCombinedCadGroupId = Math.Max(_nextCombinedCadGroupId, maxGroupId + 1);
-        _nextCombinedCadPadId = nextCombinedCadPadId;
+        _combinedCad.NextGroupId = Math.Max(_combinedCad.NextGroupId, maxGroupId + 1);
+        _combinedCad.NextPadId = nextCombinedCadPadId;
         _cad = new CadPadSet(currentPads);
         return combinedSourceCadIds;
     }

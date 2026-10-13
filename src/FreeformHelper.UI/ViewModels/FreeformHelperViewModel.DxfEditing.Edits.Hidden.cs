@@ -184,7 +184,7 @@ public sealed partial class FreeformHelperViewModel
     private List<int> GetManualHiddenCadPadIds()
     {
         return _hiddenCadPadIds
-            .Where(id => !_combinedCadGroupIdBySourceCadId.ContainsKey(id))
+            .Where(id => !_combinedCad.GroupIdBySourceCadId.ContainsKey(id))
             .Distinct()
             .OrderBy(static id => id)
             .ToList();
@@ -203,7 +203,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var restorableIds = cadPadIds
-            .Where(id => _hiddenCadPadIds.Contains(id) && !_combinedCadGroupIdBySourceCadId.ContainsKey(id))
+            .Where(id => _hiddenCadPadIds.Contains(id) && !_combinedCad.GroupIdBySourceCadId.ContainsKey(id))
             .Distinct()
             .OrderBy(static id => id)
             .ToList();

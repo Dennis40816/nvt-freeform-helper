@@ -35,13 +35,7 @@ public sealed partial class FreeformHelperViewModel
     {
         _hiddenCadPadIds.Clear();
         _hiddenCadUndoStack.Clear();
-        _combinedCadPadIds.Clear();
-        _combinedSourceCadPadIds.Clear();
-        _combinedCadGroupIdByOutputCadId.Clear();
-        _combinedCadGroupIdBySourceCadId.Clear();
-        _combinedCadGroups.Clear();
-        _nextCombinedCadGroupId = 1;
-        _nextCombinedCadPadId = 1_500_000_000;
+        _combinedCad.Clear();
         if (resetBaseline)
         {
             ResetDxfEditBaselineCore(_cad, previous);
