@@ -58,36 +58,6 @@ public sealed partial class FreeformHelperViewModel
     public bool HasStatusDisplay => HasStatusDisplayFor(StatusText);
 
     /// <summary>
-    /// Gets or sets a concise summary of the current selection (e.g., "Selected: CAD=5, Regular=12").
-    /// </summary>
-    [ObservableProperty]
-    private string _selectionSummary = "No selection.";
-
-    /// <summary>
-    /// Gets or sets a descriptive summary of the currently selected regular grid range.
-    /// </summary>
-    [ObservableProperty]
-    private string _selectedGridRangeSummary = "Select regular pads to edit size.";
-
-    /// <summary>
-    /// Gets or sets a string indicating the count of selected CAD pads.
-    /// </summary>
-    [ObservableProperty]
-    private string _cadSelectionText = "CAD: 0 pads.";
-
-    /// <summary>
-    /// Gets or sets a string indicating the count of selected regular pads.
-    /// </summary>
-    [ObservableProperty]
-    private string _regularSelectionText = "Regular: 0 pads.";
-
-    /// <summary>
-    /// Gets or sets a detailed text description of the current selection, including row/col ranges.
-    /// </summary>
-    [ObservableProperty]
-    private string _selectionDetailText = string.Empty;
-
-    /// <summary>
     /// Gets or sets quick-locate CAD pad id input used by Inspector panel.
     /// </summary>
     [ObservableProperty]
@@ -113,10 +83,16 @@ public sealed partial class FreeformHelperViewModel
     private PadInspectorSnapshot? _currentPadInspectorSnapshot;
 
     /// <summary>
-    /// Gets or sets whether the top-strip pad inspector summary is visible.
+    /// Gets or sets the text and lines that the pad inspector panels show for the current snapshot.
+    /// The properties below read from this one value.
     /// </summary>
     [ObservableProperty]
-    private bool _hasPadInspectorSummary;
+    private PadInspectorDisplay _padInspectorDisplay = PadInspectorDisplay.CreateEmpty();
+
+    /// <summary>
+    /// Gets whether the top-strip pad inspector summary is visible.
+    /// </summary>
+    public bool HasPadInspectorSummary => PadInspectorDisplay.HasSummary;
     public bool HasNoPadInspectorSummary => !HasPadInspectorSummary;
 
     /// <summary>
@@ -154,58 +130,49 @@ public sealed partial class FreeformHelperViewModel
     public string RightPanelActiveTabTitle => IsRightPanelSettingsTab ? "Settings" : "Inspector";
 
     /// <summary>
-    /// Gets or sets top-strip primary text for current inspector snapshot.
+    /// Gets top-strip primary text for current inspector snapshot.
     /// </summary>
-    [ObservableProperty]
-    private string _padInspectorPrimaryText = string.Empty;
+    public string PadInspectorPrimaryText => PadInspectorDisplay.PrimaryText;
 
     /// <summary>
-    /// Gets or sets compact header text (ID + diff idx only) for workspace top strip.
+    /// Gets compact header text (ID + diff idx only) for workspace top strip.
     /// </summary>
-    [ObservableProperty]
-    private string _padInspectorCompactHeaderText = string.Empty;
+    public string PadInspectorCompactHeaderText => PadInspectorDisplay.CompactHeaderText;
 
     /// <summary>
-    /// Gets or sets top-strip secondary text for current inspector snapshot.
+    /// Gets top-strip secondary text for current inspector snapshot.
     /// </summary>
-    [ObservableProperty]
-    private string _padInspectorSecondaryText = string.Empty;
+    public string PadInspectorSecondaryText => PadInspectorDisplay.SecondaryText;
 
     /// <summary>
-    /// Gets or sets top-strip match summary text for current inspector snapshot.
+    /// Gets top-strip match summary text for current inspector snapshot.
     /// </summary>
-    [ObservableProperty]
-    private string _padInspectorMatchText = string.Empty;
+    public string PadInspectorMatchText => PadInspectorDisplay.MatchText;
 
     /// <summary>
-    /// Gets or sets top-strip notch/freeform summary text for current inspector snapshot.
+    /// Gets top-strip notch/freeform summary text for current inspector snapshot.
     /// </summary>
-    [ObservableProperty]
-    private string _padInspectorCompensationText = string.Empty;
+    public string PadInspectorCompensationText => PadInspectorDisplay.CompensationText;
 
     /// <summary>
-    /// Gets or sets segmented notch/freeform summary lines for inspector panel.
+    /// Gets segmented notch/freeform summary lines for inspector panel.
     /// </summary>
-    [ObservableProperty]
-    private ObservableCollection<PadInspectorDisplayLine> _padInspectorCompensationLines = new();
+    public ObservableCollection<PadInspectorDisplayLine> PadInspectorCompensationLines => PadInspectorDisplay.CompensationLines;
 
     /// <summary>
-    /// Gets or sets rule trace lines for current inspector snapshot.
+    /// Gets rule trace lines for current inspector snapshot.
     /// </summary>
-    [ObservableProperty]
-    private ObservableCollection<string> _padInspectorRuleTraceLines = new();
+    public ObservableCollection<string> PadInspectorRuleTraceLines => PadInspectorDisplay.RuleTraceLines;
 
     /// <summary>
-    /// Gets or sets grouped rule trace sections for current inspector snapshot.
+    /// Gets grouped rule trace sections for current inspector snapshot.
     /// </summary>
-    [ObservableProperty]
-    private ObservableCollection<PadInspectorRuleTraceSection> _padInspectorRuleTraceSections = new();
+    public ObservableCollection<PadInspectorRuleTraceSection> PadInspectorRuleTraceSections => PadInspectorDisplay.RuleTraceSections;
 
     /// <summary>
-    /// Gets or sets whether current inspector snapshot has rule trace lines.
+    /// Gets whether current inspector snapshot has rule trace lines.
     /// </summary>
-    [ObservableProperty]
-    private bool _hasPadInspectorRuleTrace;
+    public bool HasPadInspectorRuleTrace => PadInspectorDisplay.HasRuleTrace;
 
     /// <summary>
     /// Gets or sets whether pad inspector trace is expanded in top strip.
@@ -234,11 +201,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     [ObservableProperty]
     private bool _isPadInspectorRawTraceExpanded;
-
-    partial void OnHasPadInspectorSummaryChanged(bool value)
-    {
-        OnPropertyChanged(nameof(HasNoPadInspectorSummary));
-    }
 
     partial void OnIsRightPanelSettingsTabChanged(bool value)
     {

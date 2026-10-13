@@ -254,4 +254,27 @@ public sealed record SelectionSummary(
     decimal PendingWidth,
     decimal PendingHeight,
     bool WidthMixed,
-    bool HeightMixed);
+    bool HeightMixed)
+{
+    /// <summary>
+    /// Gets the summary shown before the first selection update.
+    /// It differs from the computed summary of an empty selection in the grid range text.
+    /// </summary>
+    public static SelectionSummary Initial { get; } = new(
+        0,
+        0,
+        "No selection.",
+        "Select regular pads to edit size.",
+        "CAD: 0 pads.",
+        "Regular: 0 pads.",
+        string.Empty,
+        null,
+        string.Empty,
+        string.Empty,
+        false,
+        string.Empty,
+        0m,
+        0m,
+        false,
+        false);
+}

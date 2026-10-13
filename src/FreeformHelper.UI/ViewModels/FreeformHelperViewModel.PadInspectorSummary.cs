@@ -10,24 +10,55 @@ public sealed partial class FreeformHelperViewModel
 {
     partial void OnCurrentPadInspectorSnapshotChanged(PadInspectorSnapshot? value)
     {
-        if (value is null)
+        var display = value is null ? null : BuildPadInspectorDisplay(value);
+        PadInspectorDisplay = display ?? PadInspectorDisplay.CreateEmpty();
+        if (display is null)
         {
-            HasPadInspectorSummary = false;
-            PadInspectorCompactHeaderText = string.Empty;
-            PadInspectorPrimaryText = string.Empty;
-            PadInspectorSecondaryText = string.Empty;
-            PadInspectorMatchText = string.Empty;
-            PadInspectorCompensationText = string.Empty;
-            PadInspectorCompensationLines = new ObservableCollection<PadInspectorDisplayLine>();
-            PadInspectorRuleTraceLines = new ObservableCollection<string>();
-            PadInspectorRuleTraceSections = new ObservableCollection<PadInspectorRuleTraceSection>();
-            HasPadInspectorRuleTrace = false;
             IsPadInspectorTraceExpanded = false;
-            IsPadInspectorTracePopupOpen = false;
-            IsPadInspectorRawTraceExpanded = false;
-            return;
         }
 
+        IsPadInspectorTracePopupOpen = false;
+        IsPadInspectorRawTraceExpanded = false;
+    }
+
+    partial void OnPadInspectorDisplayChanged(PadInspectorDisplay? oldValue, PadInspectorDisplay newValue)
+    {
+        ArgumentNullException.ThrowIfNull(oldValue);
+        if (oldValue.HasSummary != newValue.HasSummary)
+        {
+            OnPropertyChanged(nameof(HasPadInspectorSummary));
+            OnPropertyChanged(nameof(HasNoPadInspectorSummary));
+        }
+
+        RaiseWhenChanged(oldValue.CompactHeaderText, newValue.CompactHeaderText, nameof(PadInspectorCompactHeaderText));
+        RaiseWhenChanged(oldValue.PrimaryText, newValue.PrimaryText, nameof(PadInspectorPrimaryText));
+        RaiseWhenChanged(oldValue.SecondaryText, newValue.SecondaryText, nameof(PadInspectorSecondaryText));
+        RaiseWhenChanged(oldValue.MatchText, newValue.MatchText, nameof(PadInspectorMatchText));
+        RaiseWhenChanged(oldValue.CompensationText, newValue.CompensationText, nameof(PadInspectorCompensationText));
+        RaiseWhenChanged(oldValue.CompensationLines, newValue.CompensationLines, nameof(PadInspectorCompensationLines));
+        RaiseWhenChanged(oldValue.RuleTraceLines, newValue.RuleTraceLines, nameof(PadInspectorRuleTraceLines));
+        RaiseWhenChanged(oldValue.RuleTraceSections, newValue.RuleTraceSections, nameof(PadInspectorRuleTraceSections));
+        RaiseWhenChanged(oldValue.HasRuleTrace, newValue.HasRuleTrace, nameof(HasPadInspectorRuleTrace));
+    }
+
+    private void RaiseWhenChanged<T>(T oldValue, T newValue, string propertyName)
+    {
+        if (!EqualityComparer<T>.Default.Equals(oldValue, newValue))
+        {
+            OnPropertyChanged(propertyName);
+        }
+    }
+
+    /// <summary>
+    /// Builds the panel text and lines for a snapshot. Returns null when the snapshot has neither
+    /// a CAD nor a regular part, so the caller shows the empty display.
+    /// </summary>
+    private PadInspectorDisplay? BuildPadInspectorDisplay(PadInspectorSnapshot value)
+    {
+        string compactHeaderText;
+        string primaryText;
+        string secondaryText;
+        string matchText;
         if (value.Cad is CadPadInspectorSnapshot cad)
         {
             var icText = cad.IcIndex.HasValue ? $"IC {cad.IcIndex.Value + 1}" : "IC -";
@@ -39,10 +70,10 @@ public sealed partial class FreeformHelperViewModel
             var confidenceText = matchCount == 0
                 ? "-"
                 : cad.MatchConfidence.ToString("P0", CultureInfo.InvariantCulture);
-            PadInspectorCompactHeaderText = $"{cadDisplayText} · Diff {diffText}";
-            PadInspectorPrimaryText = $"{cadDisplayText} · {icText} · Diff idx {diffText}";
-            PadInspectorSecondaryText = $"Diff source: {cad.CadOutputFwDiffAssignmentModeText}";
-            PadInspectorMatchText = $"Match: {matchCount} regular pad(s), confidence {confidenceText}";
+            compactHeaderText = $"{cadDisplayText} · Diff {diffText}";
+            primaryText = $"{cadDisplayText} · {icText} · Diff idx {diffText}";
+            secondaryText = $"Diff source: {cad.CadOutputFwDiffAssignmentModeText}";
+            matchText = $"Match: {matchCount} regular pad(s), confidence {confidenceText}";
         }
         else if (value.Regular is RegularPadInspectorSnapshot regular)
         {
@@ -50,40 +81,32 @@ public sealed partial class FreeformHelperViewModel
             var confidenceText = matchCount == 0
                 ? "-"
                 : regular.MatchConfidence.ToString("P0", CultureInfo.InvariantCulture);
-            PadInspectorCompactHeaderText = $"REG {regular.RegularPadId} · Diff {regular.DiffIndex}";
-            PadInspectorPrimaryText = $"REG {regular.RegularPadId} · IC {regular.IcIndex + 1} · Diff idx {regular.DiffIndex}";
-            PadInspectorSecondaryText = $"Diff source: {regular.DiffSource}";
-            PadInspectorMatchText = $"Match: {matchCount} CAD pad(s), confidence {confidenceText}";
+            compactHeaderText = $"REG {regular.RegularPadId} · Diff {regular.DiffIndex}";
+            primaryText = $"REG {regular.RegularPadId} · IC {regular.IcIndex + 1} · Diff idx {regular.DiffIndex}";
+            secondaryText = $"Diff source: {regular.DiffSource}";
+            matchText = $"Match: {matchCount} CAD pad(s), confidence {confidenceText}";
         }
         else
         {
-            HasPadInspectorSummary = false;
-            PadInspectorCompactHeaderText = string.Empty;
-            PadInspectorPrimaryText = string.Empty;
-            PadInspectorSecondaryText = string.Empty;
-            PadInspectorMatchText = string.Empty;
-            PadInspectorCompensationText = string.Empty;
-            PadInspectorCompensationLines = new ObservableCollection<PadInspectorDisplayLine>();
-            PadInspectorRuleTraceLines = new ObservableCollection<string>();
-            PadInspectorRuleTraceSections = new ObservableCollection<PadInspectorRuleTraceSection>();
-            IsPadInspectorTraceExpanded = false;
-            IsPadInspectorRawTraceExpanded = false;
-            return;
+            return null;
         }
 
-        PadInspectorCompensationLines = BuildCompensationLines(value);
-        PadInspectorCompensationText = string.Join(
-            Environment.NewLine,
-            PadInspectorCompensationLines.Select(static line => line.DisplayText));
-        PadInspectorRuleTraceSections = BuildRuleTraceSections(value.RuleTrace);
-        PadInspectorRuleTraceLines = new ObservableCollection<string>(
-            PadInspectorRuleTraceSections
-                .SelectMany(static section => section.Lines)
-                .Select(static line => line.DisplayText));
-        HasPadInspectorRuleTrace = PadInspectorRuleTraceSections.Any(static section => section.Lines.Count > 0);
-        IsPadInspectorTracePopupOpen = false;
-        IsPadInspectorRawTraceExpanded = false;
-        HasPadInspectorSummary = true;
+        var compensationLines = BuildCompensationLines(value);
+        var ruleTraceSections = BuildRuleTraceSections(value.RuleTrace);
+        return new PadInspectorDisplay(
+            HasSummary: true,
+            CompactHeaderText: compactHeaderText,
+            PrimaryText: primaryText,
+            SecondaryText: secondaryText,
+            MatchText: matchText,
+            CompensationText: string.Join(Environment.NewLine, compensationLines.Select(static line => line.DisplayText)),
+            CompensationLines: compensationLines,
+            RuleTraceLines: new ObservableCollection<string>(
+                ruleTraceSections
+                    .SelectMany(static section => section.Lines)
+                    .Select(static line => line.DisplayText)),
+            RuleTraceSections: ruleTraceSections,
+            HasRuleTrace: ruleTraceSections.Any(static section => section.Lines.Count > 0));
     }
 
     partial void OnIsPadInspectorTraceExpandedChanged(bool value)
