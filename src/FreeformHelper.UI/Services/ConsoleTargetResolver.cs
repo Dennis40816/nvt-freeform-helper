@@ -44,8 +44,23 @@ internal static class ConsoleTargetResolver
         {
             return ResolveLocal(target);
         }
-        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or IOException
-                                              or UnauthorizedAccessException or System.Security.SecurityException)
+        catch (ArgumentException)
+        {
+            return default;
+        }
+        catch (NotSupportedException)
+        {
+            return default;
+        }
+        catch (IOException)
+        {
+            return default;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return default;
+        }
+        catch (System.Security.SecurityException)
         {
             return default;
         }
@@ -169,7 +184,11 @@ internal static class ConsoleTargetResolver
                 .Take(MaxFileNameMatches)
                 .ToArray();
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        catch (IOException)
+        {
+            return Array.Empty<string>();
+        }
+        catch (UnauthorizedAccessException)
         {
             return Array.Empty<string>();
         }
