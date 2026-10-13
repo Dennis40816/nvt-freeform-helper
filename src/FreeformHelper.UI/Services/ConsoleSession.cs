@@ -48,6 +48,13 @@ public sealed class ConsoleSession : IConsoleClipboard, IDisposable
     /// <summary>Gets the controller that the console controls bind to.</summary>
     public ConsoleController Controller { get; }
 
+    /// <summary>
+    /// Gets or sets the zoom factor of the console rows. 1.0 is the normal size.
+    /// Core does not store the value. The panel saves it here when the zoom changes and assigns it to the list
+    /// when it creates the list. The value lasts as long as this session.
+    /// </summary>
+    public double Zoom { get; set; } = 1.0;
+
     /// <summary>Gets the command that copies every visible row to the clipboard.</summary>
     public IAsyncRelayCommand CopyVisibleCommand { get; }
 

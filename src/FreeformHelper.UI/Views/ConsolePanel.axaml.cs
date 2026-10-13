@@ -30,6 +30,7 @@ public partial class ConsolePanel : UserControl
             AttachSession();
         };
         ConsoleList.ViewStateRequested += OnViewStateRequested;
+        ConsoleList.ZoomChanged += OnZoomChanged;
     }
 
     private void AttachSession()
@@ -44,6 +45,7 @@ public partial class ConsolePanel : UserControl
         _logStreamOpener = OpenLogStreamAsync;
         _session.RequestSetClipboardTextAsync = _clipboardWriter;
         _session.RequestOpenLogStreamAsync = _logStreamOpener;
+        ConsoleList.Zoom = _session.Zoom;
     }
 
     private void DetachSession()
@@ -72,6 +74,14 @@ public partial class ConsolePanel : UserControl
     private void OnViewStateRequested(object? sender, ConsoleViewState state)
     {
         (DataContext as ShellViewModel)?.ConsoleSession.Controller.RequestViewState(state);
+    }
+
+    private void OnZoomChanged(object? sender, double zoom)
+    {
+        if (_session is not null)
+        {
+            _session.Zoom = zoom;
+        }
     }
 
     private async Task<bool> SetClipboardTextAsync(string text)
