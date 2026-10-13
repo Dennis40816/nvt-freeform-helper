@@ -111,10 +111,8 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly Dictionary<int, int> _cadIcIndexByCadId = new(); // Maps CAD pad ID -> inferred IC index (grid partition based).
     private IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> _latestCadOutputFwDiffAssignmentDecisionsByCadId =
         new Dictionary<int, CadOutputFwDiffAssignmentDecision>();
-    private WorkflowDataSnapshot _workflowDataSnapshotCache = WorkflowDataSnapshot.Empty;
-    private bool _isWorkflowDataSnapshotCacheValid;
+    private (int Revision, WorkflowDataSnapshot Snapshot)? _workflowDataSnapshotCache;
     private int _workflowDataSnapshotRevision = 1;
-    private int _workflowDataSnapshotCacheRevision;
     private bool _fitAfterNextGridBuild; // Flag to request a canvas fit-to-content after the next grid rebuild.
     private readonly GridRebuildUseCase _gridRebuildUseCase;
     private readonly SelectionSummaryUseCase _selectionSummaryUseCase = new();
@@ -145,15 +143,11 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         double StrictOverlapRatio, int? AnchorIcIndex, int? AnchorDiffIndex,
         NotchV22TargetAllocationAreaMode TargetAllocationAreaMode, NotchV22ResolvedResult Resolved)>
         _notchResolvedResultCacheByCadId = new();
-    private NotchValidationBucket? _notchValidationBucketCache;
-    private NotchTable? _notchValidationBucketTable;
-    private int _notchValidationBucketNullDiffValue = -1;
+    private (NotchValidationBucket Bucket, NotchTable Table, int NullDiffValue)? _notchValidationBucketCache;
     private NotchTable? _lastGeneratedNotchTable;
     private int _notchCompensationCacheRevision;
-    private long _notchCompensationCacheHitCount;
-    private long _notchCompensationCacheMissCount;
-    private long _notchCompensationCacheInvalidationCount;
-    private int _notchCompensationCacheLastClearSize;
+    private readonly NotchCompensationCacheCounters _notchCompensationCacheCounters = new();
+    private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
     private bool _lastNotchPreviewVisibleForPlayback;
     private bool _startupInitialGridBuiltMarked;
     private bool _initialGridBuildRequested;
@@ -381,10 +375,10 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     private WorkflowDataSnapshot BuildWorkflowDataSnapshot()
     {
-        if (_isWorkflowDataSnapshotCacheValid &&
-            _workflowDataSnapshotCacheRevision == _workflowDataSnapshotRevision)
+        if (_workflowDataSnapshotCache is { } cached &&
+            cached.Revision == _workflowDataSnapshotRevision)
         {
-            return _workflowDataSnapshotCache;
+            return cached.Snapshot;
         }
 
         var activeMask = GetActiveRegularVisibilityMaskPadIds()?.ToFrozenSet();
@@ -395,7 +389,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
                 static pair => (IReadOnlyList<PadMatchLink>)pair.Value.ToArray())
             .ToFrozenDictionary();
 
-        _workflowDataSnapshotCache = new WorkflowDataSnapshot(
+        var snapshot = new WorkflowDataSnapshot(
             _cadOutputFwDiffIndexByCadId.ToFrozenDictionary(),
             _latestCadOutputFwDiffAssignmentDecisionsByCadId.ToFrozenDictionary(),
             _cadIcIndexByCadId.ToFrozenDictionary(),
@@ -403,15 +397,13 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             cadToRegular,
             _projectFile.CadOutputFwDiffIndexOverrides.ToFrozenDictionary(),
             activeMask);
-        _workflowDataSnapshotCacheRevision = _workflowDataSnapshotRevision;
-        _isWorkflowDataSnapshotCacheValid = true;
+        _workflowDataSnapshotCache = (_workflowDataSnapshotRevision, snapshot);
         WorkflowDataSnapshotBuildCount++;
-        return _workflowDataSnapshotCache;
+        return snapshot;
     }
 
-    private void InvalidateWorkflowDataSnapshot()
+    internal void InvalidateWorkflowDataSnapshot()
     {
-        _isWorkflowDataSnapshotCacheValid = false;
         _workflowDataSnapshotRevision++;
     }
 
