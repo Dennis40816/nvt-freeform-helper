@@ -142,11 +142,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void SetDxfOverlapEmptyResult(string summary)
     {
-        DxfOverlapResult = new DxfOverlapResult(
-            summary,
-            new ObservableCollection<string>(),
-            new ObservableCollection<int>(),
-            Array.Empty<int>());
+        DxfOverlapResult = DxfOverlapResult.CreateNotRun() with { Summary = summary };
     }
 
     partial void OnDxfOverlapResultChanged(DxfOverlapResult? oldValue, DxfOverlapResult newValue)

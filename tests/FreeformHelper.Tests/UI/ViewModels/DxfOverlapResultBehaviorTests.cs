@@ -108,6 +108,19 @@ public sealed class DxfOverlapResultBehaviorTests
     }
 
     [Fact]
+    public async Task ClearDxfOverlapHighlights_AfterSelect_ClearsTheCanvasSelection()
+    {
+        using var dxf = await DxfFixture.OpenAsync(_overlappingPads);
+        await dxf.Vm.CheckDxfQualityCommand.ExecuteAsync(null);
+        dxf.Vm.SelectDxfOverlapPadsCommand.Execute(null);
+        Assert.Equal("Selected: CAD=2.", dxf.Vm.SelectionSummary);
+
+        dxf.Vm.ClearDxfOverlapHighlightsCommand.Execute(null);
+
+        Assert.Equal("No selection.", dxf.Vm.SelectionSummary);
+    }
+
+    [Fact]
     public async Task SelectDxfOverlapPads_AfterCheck_SelectsBothOverlappingPads()
     {
         using var dxf = await DxfFixture.OpenAsync(_overlappingPads);

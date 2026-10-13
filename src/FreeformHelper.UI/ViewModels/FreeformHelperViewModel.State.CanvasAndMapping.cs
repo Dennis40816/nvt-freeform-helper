@@ -252,11 +252,11 @@ public sealed partial class FreeformHelperViewModel
     /// whole value. The properties that forward to it raise their change notification when their
     /// own value changed.
     /// </summary>
-    [ObservableProperty] private DxfRegularMappingResult _dxfRegularMappingResult = DxfRegularMappingResult.CreateNotRun();
+    [ObservableProperty] private MappingDiagnosticsResult _mappingDiagnosticsResult = MappingDiagnosticsResult.CreateNotRun();
     /// <summary>
     /// Gets the summary message for DXF/Regular mapping analysis.
     /// </summary>
-    public string DxfRegularMappingSummary => DxfRegularMappingResult.Summary;
+    public string DxfRegularMappingSummary => MappingDiagnosticsResult.Summary;
     /// <summary>
     /// Gets or sets a summary message for the externally measured regular visibility mask.
     /// </summary>
@@ -301,11 +301,11 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets the observable collection of detailed DXF/Regular mapping issues.
     /// </summary>
-    public ObservableCollection<string> DxfRegularMappingIssues => DxfRegularMappingResult.Issues;
+    public ObservableCollection<string> DxfRegularMappingIssues => MappingDiagnosticsResult.Issues;
     /// <summary>
     /// Gets a value indicating whether any DXF/Regular mapping issues were found.
     /// </summary>
-    public bool HasDxfRegularMappingIssues => DxfRegularMappingResult.HasIssues;
+    public bool HasDxfRegularMappingIssues => MappingDiagnosticsResult.HasIssues;
 
     /// <summary>
     /// Gets or sets the console font size (used for in-app log view).

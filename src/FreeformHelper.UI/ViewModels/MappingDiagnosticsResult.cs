@@ -12,7 +12,7 @@ namespace FreeformHelper.UI.ViewModels;
 /// Whether the run found issues. A mask change or removal counts as an issue, so this is not
 /// only the length of <paramref name="Issues"/>.
 /// </param>
-public sealed record DxfRegularMappingResult(
+public sealed record MappingDiagnosticsResult(
     string Summary,
     ObservableCollection<string> Issues,
     bool HasIssues)
@@ -25,8 +25,8 @@ public sealed record DxfRegularMappingResult(
     /// <summary>
     /// Creates the result before any run. Each call returns a new issue collection.
     /// </summary>
-    public static DxfRegularMappingResult CreateNotRun()
+    public static MappingDiagnosticsResult CreateNotRun()
     {
-        return new DxfRegularMappingResult(NotRunSummary, new ObservableCollection<string>(), HasIssues: false);
+        return new MappingDiagnosticsResult(NotRunSummary, new ObservableCollection<string>(), HasIssues: false);
     }
 }

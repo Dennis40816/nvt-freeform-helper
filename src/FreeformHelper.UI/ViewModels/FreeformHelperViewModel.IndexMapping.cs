@@ -14,10 +14,10 @@ public sealed partial class FreeformHelperViewModel
                 "Step 4: import DXF and build grid first.",
                 onCadUnavailable: () =>
                 {
-                    DxfRegularMappingResult = new DxfRegularMappingResult(
-                        "Diagnostics: no CAD output pads.",
-                        new ObservableCollection<string>(),
-                        HasIssues: false);
+                    MappingDiagnosticsResult = MappingDiagnosticsResult.CreateNotRun() with
+                    {
+                        Summary = "Diagnostics: no CAD output pads.",
+                    };
                     SetStatus(DxfRegularMappingSummary);
                 },
                 out var cadVisible,
@@ -33,10 +33,10 @@ public sealed partial class FreeformHelperViewModel
             {
                 ApplyUiToSettings(_projectFile.Settings);
                 InvalidateDownstreamFromStep4(showStatus: false);
-                DxfRegularMappingResult = new DxfRegularMappingResult(
-                    "Diagnostics: running...",
-                    new ObservableCollection<string>(),
-                    HasIssues: false);
+                MappingDiagnosticsResult = MappingDiagnosticsResult.CreateNotRun() with
+                {
+                    Summary = "Diagnostics: running...",
+                };
                 SetStatus("Running mapping diagnostics...");
                 Logger.Info(CultureInfo.InvariantCulture, "Analyzing DXF/Regular mapping (cadVisible={0}, regular={1}).", cadVisible.Pads.Count, grid.Pads.Count);
             },
@@ -63,7 +63,7 @@ public sealed partial class FreeformHelperViewModel
 
             var issueMessages = res.Report.SampleIssues.Select(i => $"[{i.Kind}] {i.Message}").ToList();
 
-            DxfRegularMappingResult = new DxfRegularMappingResult(
+            MappingDiagnosticsResult = new MappingDiagnosticsResult(
                 res.Report.HasIssues
                     ? $"Diagnostics warnings: {res.Report.Summary}"
                     : $"Diagnostics OK: {res.Report.Summary}",
@@ -215,7 +215,7 @@ public sealed partial class FreeformHelperViewModel
         return string.Concat(statusText.AsSpan(0, maxChars - 1), "…");
     }
 
-    partial void OnDxfRegularMappingResultChanged(DxfRegularMappingResult? oldValue, DxfRegularMappingResult newValue)
+    partial void OnMappingDiagnosticsResultChanged(MappingDiagnosticsResult? oldValue, MappingDiagnosticsResult newValue)
     {
         ArgumentNullException.ThrowIfNull(oldValue);
         RaiseWhenChanged(oldValue.Summary, newValue.Summary, nameof(DxfRegularMappingSummary));

@@ -5,7 +5,7 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private const string DiagnosticsNotRunSummary = DxfRegularMappingResult.NotRunSummary;
+    private const string DiagnosticsNotRunSummary = MappingDiagnosticsResult.NotRunSummary;
     private const string NotchExportNotRunSummary = "Notch export: not run.";
     private int _notchFinalProjectionRevision;
 
@@ -150,7 +150,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void ClearStep4ResultCore()
     {
-        DxfRegularMappingResult = DxfRegularMappingResult.CreateNotRun();
+        MappingDiagnosticsResult = MappingDiagnosticsResult.CreateNotRun();
         IndexMappingProgress = 0;
     }
 
