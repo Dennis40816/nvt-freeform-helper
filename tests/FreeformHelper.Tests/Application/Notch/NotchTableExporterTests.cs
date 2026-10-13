@@ -565,7 +565,7 @@ public sealed class NotchTableExporterTests
         Assert.Contains("static const ST_PRI_NHC_TABLE_NODE_INFO castNHC_TABLE_IC1[USER_NHC_NODE_NUM_IC1]", text, StringComparison.Ordinal);
         Assert.DoesNotContain("static const ST_PRI_NHC_TABLE_NODE_INFO castNHC_TABLE_IC2", text, StringComparison.Ordinal);
         Assert.Contains("static const ST_PRI_NHC_TABLE_NODE_INFO castNHC_TABLE_IC3[USER_NHC_NODE_NUM_IC3]", text, StringComparison.Ordinal);
-        Assert.Contains("{ ((const ST_PRI_NHC_TABLE_NODE_INFO*)0), USER_NHC_NODE_NUM_IC2 }, // IC2", text, StringComparison.Ordinal);
+        Assert.Contains("{ NULL, USER_NHC_NODE_NUM_IC2 }, // IC2", text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -1420,7 +1420,7 @@ public sealed class NotchTableExporterTests
     private static double[] RunCProgramWithGcc(string source)
     {
         var tempDirectory = Path.Combine(Path.GetTempPath(), "FreeformHelper.NotchExporterRuntimeTests", Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(tempDirectory);
+        NotchGccTestDirectory.Create(tempDirectory);
         var sourcePath = Path.Combine(tempDirectory, "notch_runtime.c");
         var executablePath = Path.Combine(tempDirectory, "notch_runtime.exe");
         File.WriteAllText(sourcePath, source);
@@ -1432,6 +1432,8 @@ public sealed class NotchTableExporterTests
                 "gcc",
                 [
                     "-std=c11",
+                    "-include",
+                    "stddef.h",
                     "-Wall",
                     "-Wextra",
                     "-Werror",
@@ -1495,7 +1497,7 @@ public sealed class NotchTableExporterTests
     private static void AssertCCompilesWithGcc(string source)
     {
         var tempDirectory = Path.Combine(Path.GetTempPath(), "FreeformHelper.NotchExporterTests", Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(tempDirectory);
+        NotchGccTestDirectory.Create(tempDirectory);
         var sourcePath = Path.Combine(tempDirectory, "notch_export.c");
         var objectPath = Path.Combine(tempDirectory, "notch_export.o");
         File.WriteAllText(sourcePath, CreateGccHarnessSource(source));
@@ -1512,14 +1514,11 @@ public sealed class NotchTableExporterTests
                 CreateNoWindow = true,
             },
         };
-        process.StartInfo.ArgumentList.Add("-std=c11");
-        process.StartInfo.ArgumentList.Add("-Wall");
-        process.StartInfo.ArgumentList.Add("-Wextra");
-        process.StartInfo.ArgumentList.Add("-Werror");
-        process.StartInfo.ArgumentList.Add("-c");
-        process.StartInfo.ArgumentList.Add(sourcePath);
-        process.StartInfo.ArgumentList.Add("-o");
-        process.StartInfo.ArgumentList.Add(objectPath);
+        string[] gccFlags = ["-std=c11", "-include", "stddef.h", "-Wall", "-Wextra", "-Werror", "-c", sourcePath, "-o", objectPath];
+        foreach (var flag in gccFlags)
+        {
+            process.StartInfo.ArgumentList.Add(flag);
+        }
 
         try
         {

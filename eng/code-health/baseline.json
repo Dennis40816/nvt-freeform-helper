@@ -15,7 +15,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 824
+        "fileLines": 816
       },
       "owner": "NFH",
       "locations": [
@@ -1727,7 +1727,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 1748
+        "fileLines": 1747
       },
       "owner": "NFH",
       "locations": [
@@ -2936,16 +2936,6 @@
       "count": 1,
       "rule": "asyncVoid",
       "symbol": "async-lambda:Func<Task<bool>>?"
-    },
-    {
-      "syntaxHash": "eabe4a93c657a59ebc98e2f288501dbf7e1415adb50dba392b2d6ca6ea64f5db",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "workspaceDuplicates",
-      "symbol": "FreeformHelper.Tests.NotchTableExporterTests"
     },
     {
       "syntaxHash": "9c4c1d90c447342d5326b441fe63fa734322c098f002f5ba6b9293fb6e71304b",
