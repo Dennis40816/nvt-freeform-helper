@@ -142,10 +142,8 @@ public sealed class NotchDisplayProjectorTests
         vmType.GetField("_cad", fieldFlags)!.SetValue(vm, new CadPadSet([cad]));
         var project = Assert.IsType<ProjectFile>(vmType.GetField("_projectFile", fieldFlags)!.GetValue(vm));
         project.Settings.Notch.ComputationMode = NotchComputationMode.LegacyRegularAnchor;
-        Assert.IsType<Dictionary<int, int>>(vmType.GetField("_cadOutputFwDiffIndexByCadId", fieldFlags)!.GetValue(vm))
-            .Add(cad.Id, 0);
-        Assert.IsType<Dictionary<int, int>>(vmType.GetField("_cadIcIndexByCadId", fieldFlags)!.GetValue(vm))
-            .Add(cad.Id, 0);
+        vm.CadIndexMaps.OutputFwDiffIndexByCadId.Add(cad.Id, 0);
+        vm.CadIndexMaps.IcIndexByCadId.Add(cad.Id, 0);
         vmType.GetMethod("InvalidateWorkflowDataSnapshot", fieldFlags)!.Invoke(vm, null);
 
         var snapshot = Assert.IsType<PadInspectorSnapshot>(vm.BuildCadPadInspectorSnapshot(

@@ -100,11 +100,28 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private RegularGrid? _grid; // The generated regular grid data.
     private PadMatchResult _latestPadMatchResult = PadMatchResult.Empty;
     private CadPadSet? _cachedFilteredCadForBuild; // Cache for layer-filtered CAD pads.
-    private readonly Dictionary<int, int> _cadOutputFwDiffIndexByCadId = new(); // Maps CAD pad ID -> Step 4 CAD output FW diff idx.
-    private readonly Dictionary<int, int> _cadDisplayIndexByCadId = new(); // Maps CAD pad ID -> stable display index (L->R, T->B, 1-based).
-    private readonly Dictionary<int, int> _cadIcIndexByCadId = new(); // Maps CAD pad ID -> inferred IC index (grid partition based).
-    private IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> _latestCadOutputFwDiffAssignmentDecisionsByCadId =
-        new Dictionary<int, CadOutputFwDiffAssignmentDecision>();
+    // The four per-CAD-pad index tables are stored once. The members below keep the old names and
+    // read through it: members that carry analyzer debt read them, and renaming them would change
+    // their ledger fingerprints.
+    private readonly CadIndexMaps _cadIndexMaps = new();
+
+    internal CadIndexMaps CadIndexMaps => _cadIndexMaps;
+
+    // Maps CAD pad ID -> Step 4 CAD output FW diff idx.
+    private Dictionary<int, int> _cadOutputFwDiffIndexByCadId => _cadIndexMaps.OutputFwDiffIndexByCadId;
+
+    // Maps CAD pad ID -> stable display index (L->R, T->B, 1-based).
+    private Dictionary<int, int> _cadDisplayIndexByCadId => _cadIndexMaps.DisplayIndexByCadId;
+
+    // Maps CAD pad ID -> inferred IC index (grid partition based).
+    private Dictionary<int, int> _cadIcIndexByCadId => _cadIndexMaps.IcIndexByCadId;
+
+    private IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> _latestCadOutputFwDiffAssignmentDecisionsByCadId
+    {
+        get => _cadIndexMaps.LatestAssignmentDecisionsByCadId;
+        set => _cadIndexMaps.LatestAssignmentDecisionsByCadId = value;
+    }
+
     private (int Revision, WorkflowDataSnapshot Snapshot)? _workflowDataSnapshotCache;
     private int _workflowDataSnapshotRevision = 1;
     private bool _fitAfterNextGridBuild; // Flag to request a canvas fit-to-content after the next grid rebuild.

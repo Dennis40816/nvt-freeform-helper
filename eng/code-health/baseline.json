@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 294,
+        "stateMembers": 293,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -12768,26 +12768,6 @@
       "symbol": "M:System.IO.Path.GetTempPath"
     },
     {
-      "syntaxHash": "28e261c9dcf6760ab863dbf5ee87ca69fc1f2d40c47429eacb1d273238494afb",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.SetCadOutputFwDiff(FreeformHelperViewModel,int,int,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Helpers.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "9b9272d2125c21c53ff30b306e0f86013acccd535055dc26ef50c19250a79d04",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.SetCadOutputFwDiff(FreeformHelperViewModel,int,int,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Helpers.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "f54cc340df0714381933cc1cad545f8e8c651b50ce546c4862844bdb9af58af5",
       "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.SetPadMatchResults(FreeformHelperViewModel,params (int CadPadId, int RegularPadId)[])",
       "owner": "NFH",
@@ -12819,16 +12799,6 @@
     },
     {
       "syntaxHash": "44cd28a5c4c924341909c289a70ce4e6a2b0150bbc7902a5047d7faf8a2bf4c6",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.SettingsWindowDraft_SaveAppliesStep4SelectionState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.SettingsPersistence.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "44dde8efc042838226f0c437278a8449f313cadc197148a101eb9ede187d90ac",
       "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.SettingsWindowDraft_SaveAppliesStep4SelectionState()",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.SettingsPersistence.cs",
@@ -14896,16 +14866,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "d66155ecbb4dd6654c7d69c46b03772bb2d1cbbe1aa93ed941d3113422034551",
-      "member": "FreeformHelper.Tests.RuntimeQueryUseCaseTests.GetPrivateDictionary`2(object,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "d66155ecbb4dd6654c7d69c46b03772bb2d1cbbe1aa93ed941d3113422034551",

@@ -197,14 +197,6 @@ public sealed partial class RuntimeQueryUseCaseTests
         field!.SetValue(target, value);
     }
 
-    private static Dictionary<TKey, TValue> GetPrivateDictionary<TKey, TValue>(object target, string fieldName)
-        where TKey : notnull
-    {
-        var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return Assert.IsType<Dictionary<TKey, TValue>>(field!.GetValue(target));
-    }
-
     private static void AssertTargetPayloadMatches(JsonElement payload, NotchV22TargetAllocation expected)
     {
         Assert.Equal(expected.IcIndex, payload.GetProperty("icIndex").GetInt32());

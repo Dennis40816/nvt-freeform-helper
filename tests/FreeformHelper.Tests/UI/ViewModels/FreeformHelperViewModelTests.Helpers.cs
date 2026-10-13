@@ -166,15 +166,8 @@ public sealed partial class FreeformHelperViewModelTests
 
     private static void SetCadOutputFwDiff(FreeformHelperViewModel vm, int cadPadId, int diffIndex, int icIndex)
     {
-        var outputDiffField = typeof(FreeformHelperViewModel).GetField("_cadOutputFwDiffIndexByCadId", BindingFlags.Instance | BindingFlags.NonPublic);
-        var icField = typeof(FreeformHelperViewModel).GetField("_cadIcIndexByCadId", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(outputDiffField);
-        Assert.NotNull(icField);
-
-        var outputDiffByCadId = Assert.IsType<Dictionary<int, int>>(outputDiffField!.GetValue(vm));
-        var icByCadId = Assert.IsType<Dictionary<int, int>>(icField!.GetValue(vm));
-        outputDiffByCadId[cadPadId] = diffIndex;
-        icByCadId[cadPadId] = icIndex;
+        vm.CadIndexMaps.OutputFwDiffIndexByCadId[cadPadId] = diffIndex;
+        vm.CadIndexMaps.IcIndexByCadId[cadPadId] = icIndex;
     }
 
     private static FreeformHelperViewModel.NotchValidationDisplayItem CreateValidationDisplayItem(
