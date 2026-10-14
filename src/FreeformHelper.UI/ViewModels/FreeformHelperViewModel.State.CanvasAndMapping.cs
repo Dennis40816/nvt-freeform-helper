@@ -215,41 +215,14 @@ public sealed partial class FreeformHelperViewModel
     [ObservableProperty] private ObservableCollection<LayerToggle> _layerToggles = new();
 
     /// <summary>
-    /// Gets or sets a value indicating whether any CAD layers are available.
-    /// Used to hide the layer section when no DXF is loaded.
-    /// </summary>
-    [ObservableProperty] private bool _hasCadLayers;
-
-    /// <summary>
     /// Gets or sets the available layer options for bounding the grid.
     /// </summary>
     [ObservableProperty] private ObservableCollection<BoundLayerOption> _boundLayerOptions = new();
 
     /// <summary>
-    /// Gets or sets the currently selected layer option for bounding the grid.
-    /// </summary>
-    [ObservableProperty] private BoundLayerOption _selectedBoundLayerOption = new BoundLayerOption(null, "Auto (visible layers)");
-
-    /// <summary>
-    /// Gets or sets the helper text shown under bounds layer selector,
-    /// including truncation hint when available layers exceed dropdown cap.
-    /// </summary>
-    [ObservableProperty] private string _boundLayerOptionSummary = "Hidden bounds layer is still valid.";
-
-    /// <summary>
     /// Gets or sets the available layer options for DXF regular source mode.
     /// </summary>
     [ObservableProperty] private ObservableCollection<RegularSourceLayerOption> _regularSourceLayerOptions = new();
-
-    /// <summary>
-    /// Gets or sets the currently selected layer option for DXF regular source mode.
-    /// </summary>
-    [ObservableProperty] private RegularSourceLayerOption _selectedRegularSourceLayerOption = new RegularSourceLayerOption(null, "Select layer");
-
-    /// <summary>
-    /// Gets or sets helper text for DXF regular-source validation and suggested IC/grid settings.
-    /// </summary>
-    [ObservableProperty] private string _dxfRegularSourceHint = string.Empty;
 
     // --- DXF Quality Check Properties ---
 
