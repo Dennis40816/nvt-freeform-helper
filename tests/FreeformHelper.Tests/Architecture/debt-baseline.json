@@ -11,7 +11,7 @@
     "bareCatch": 12,
     "catchException": 29,
     "suppressFlagFields": 6,
-    "freeformViewModelStateMembers": 114,
+    "freeformViewModelStateMembers": 112,
     "shellNavigationBooleans": 0,
     "noWarnIds": 3
   },
@@ -93,11 +93,9 @@
     ],
     "freeformViewModelStateMembers": [
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:15", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:16", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:17",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CadLoadOverlay.cs:13",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:77", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:80", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:81", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:85", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:93", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:94", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:95", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:96", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:119", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:120", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:150", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:151", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:152", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:153", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:156",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfIndexing.Duplicates.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfLayerImageExportSettings.cs:26",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ModalLoading.cs:11",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:7",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:10", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:11",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:15", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:16", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:17", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:18",
