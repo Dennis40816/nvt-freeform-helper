@@ -35,34 +35,179 @@ public sealed partial class FreeformHelperViewModel
 
     // --- Canvas Toggles (Directly bound to UI for visual state) ---
 
+    // The canvas display switches and the import flags are stored once. The properties below forward to
+    // the record and raise the same notifications and callbacks as the stored properties they replaced.
+    private CanvasDisplayToggles _canvasToggles = CanvasDisplayToggles.Initial;
+
     /// <summary>
     /// Gets or sets a value indicating whether CAD pads should be displayed on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _showCad = true;
+    public bool ShowCad
+    {
+        get => _canvasToggles.ShowCad;
+        set
+        {
+            if (_canvasToggles.ShowCad == value)
+            {
+                return;
+            }
+
+            OnShowCadChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ShowCad = value };
+            OnShowCadChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnShowCadChanging(bool value);
+
+    partial void OnShowCadChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether regular pads should be displayed on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _showRegular = true;
+    public bool ShowRegular
+    {
+        get => _canvasToggles.ShowRegular;
+        set
+        {
+            if (_canvasToggles.ShowRegular == value)
+            {
+                return;
+            }
+
+            OnShowRegularChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ShowRegular = value };
+            OnShowRegularChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnShowRegularChanging(bool value);
+
+    partial void OnShowRegularChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether unmatched pads should be highlighted on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _highlightUnmatched = true;
+    public bool HighlightUnmatched
+    {
+        get => _canvasToggles.HighlightUnmatched;
+        set
+        {
+            if (_canvasToggles.HighlightUnmatched == value)
+            {
+                return;
+            }
+
+            OnHighlightUnmatchedChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { HighlightUnmatched = value };
+            OnHighlightUnmatchedChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnHighlightUnmatchedChanging(bool value);
+
+    partial void OnHighlightUnmatchedChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether freeform pads should be highlighted on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _highlightFreeform = true;
+    public bool HighlightFreeform
+    {
+        get => _canvasToggles.HighlightFreeform;
+        set
+        {
+            if (_canvasToggles.HighlightFreeform == value)
+            {
+                return;
+            }
+
+            OnHighlightFreeformChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { HighlightFreeform = value };
+            OnHighlightFreeformChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnHighlightFreeformChanging(bool value);
+
+    partial void OnHighlightFreeformChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether CAD pads should be colored by area on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _colorCadByArea = false;
+    public bool ColorCadByArea
+    {
+        get => _canvasToggles.ColorCadByArea;
+        set
+        {
+            if (_canvasToggles.ColorCadByArea == value)
+            {
+                return;
+            }
+
+            OnColorCadByAreaChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ColorCadByArea = value };
+            OnColorCadByAreaChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnColorCadByAreaChanging(bool value);
+
+    partial void OnColorCadByAreaChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether only closed polylines should be imported from DXF.
     /// </summary>
-    [ObservableProperty] private bool _importOnlyClosedPolylines = true;
+    public bool ImportOnlyClosedPolylines
+    {
+        get => _canvasToggles.ImportOnlyClosedPolylines;
+        set
+        {
+            if (_canvasToggles.ImportOnlyClosedPolylines == value)
+            {
+                return;
+            }
+
+            OnImportOnlyClosedPolylinesChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ImportOnlyClosedPolylines = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnImportOnlyClosedPolylinesChanging(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether polylines from the DXF BLOCKS section should be imported.
     /// </summary>
-    [ObservableProperty] private bool _importBlockPolylines = true;
+    public bool ImportBlockPolylines
+    {
+        get => _canvasToggles.ImportBlockPolylines;
+        set
+        {
+            if (_canvasToggles.ImportBlockPolylines == value)
+            {
+                return;
+            }
+
+            OnImportBlockPolylinesChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ImportBlockPolylines = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnImportBlockPolylinesChanging(bool value);
+
     /// <summary>
     /// Gets or sets the observable collection of <see cref="LayerToggle"/> objects
     /// used to control the visibility of CAD layers.
