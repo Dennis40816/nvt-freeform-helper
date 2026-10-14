@@ -409,4 +409,111 @@ public sealed partial class FreeformHelperViewModel
     partial void OnSelectedScanOrderChanging(ScanOrder value);
 
     partial void OnSelectedScanOrderChanged(ScanOrder value);
+
+    // The layer source selection is stored once. The properties below forward to the record and raise
+    // the same notifications and callbacks as the stored properties they replaced.
+    private LayerSourceSelection _layerSource = LayerSourceSelection.Initial;
+
+    /// <summary>
+    /// Gets or sets helper text for DXF regular-source validation and suggested IC/grid settings.
+    /// </summary>
+    public string DxfRegularSourceHint
+    {
+        get => _layerSource.DxfRegularSourceHint;
+        set
+        {
+            if (_layerSource.DxfRegularSourceHint == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _layerSource = _layerSource with { DxfRegularSourceHint = value };
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the currently selected layer option for DXF regular source mode.
+    /// </summary>
+    public RegularSourceLayerOption SelectedRegularSourceLayerOption
+    {
+        get => _layerSource.SelectedRegularSourceLayerOption;
+        set
+        {
+            if (_layerSource.SelectedRegularSourceLayerOption == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _layerSource = _layerSource with { SelectedRegularSourceLayerOption = value };
+            OnSelectedRegularSourceLayerOptionChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnSelectedRegularSourceLayerOptionChanged(RegularSourceLayerOption value);
+
+    /// <summary>
+    /// Gets or sets the helper text shown under bounds layer selector,
+    /// including truncation hint when available layers exceed dropdown cap.
+    /// </summary>
+    public string BoundLayerOptionSummary
+    {
+        get => _layerSource.BoundLayerOptionSummary;
+        set
+        {
+            if (_layerSource.BoundLayerOptionSummary == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _layerSource = _layerSource with { BoundLayerOptionSummary = value };
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the currently selected layer option for bounding the grid.
+    /// </summary>
+    public BoundLayerOption SelectedBoundLayerOption
+    {
+        get => _layerSource.SelectedBoundLayerOption;
+        set
+        {
+            if (_layerSource.SelectedBoundLayerOption == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _layerSource = _layerSource with { SelectedBoundLayerOption = value };
+            OnSelectedBoundLayerOptionChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnSelectedBoundLayerOptionChanged(BoundLayerOption value);
+
+    /// <summary>
+    /// Gets or sets a value indicating whether any CAD layers are available.
+    /// Used to hide the layer section when no DXF is loaded.
+    /// </summary>
+    public bool HasCadLayers
+    {
+        get => _layerSource.HasCadLayers;
+        set
+        {
+            if (_layerSource.HasCadLayers == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _layerSource = _layerSource with { HasCadLayers = value };
+            OnPropertyChanged();
+        }
+    }
 }
