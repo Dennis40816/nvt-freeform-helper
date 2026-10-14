@@ -8,28 +8,13 @@ public sealed partial class FreeformHelperViewModel
     private void QueueDeferredSelectionNotchPreviewRefresh()
     {
         CancelDeferredSelectionNotchPreviewRefresh();
-        var cts = new CancellationTokenSource();
-        _selectionNotchPreviewCts = cts;
-        var requestId = Interlocked.Increment(ref _selectionNotchPreviewRequestId);
+        var (requestId, cts) = _selectionNotchPreviewGate.Begin();
         _ = RunDeferredSelectionNotchPreviewRefreshAsync(requestId, cts, cts.Token);
     }
 
     private void CancelDeferredSelectionNotchPreviewRefresh()
     {
-        var cts = Interlocked.Exchange(ref _selectionNotchPreviewCts, null);
-        if (cts is null)
-        {
-            return;
-        }
-
-        try
-        {
-            cts.Cancel();
-        }
-        finally
-        {
-            cts.Dispose();
-        }
+        _selectionNotchPreviewGate.Cancel();
     }
 
     private async Task RunDeferredSelectionNotchPreviewRefreshAsync(
@@ -57,7 +42,7 @@ public sealed partial class FreeformHelperViewModel
                     return;
                 }
 
-                if (requestId != Interlocked.Read(ref _selectionNotchPreviewRequestId))
+                if (requestId != _selectionNotchPreviewGate.LatestRequestId)
                 {
                     return;
                 }
@@ -76,10 +61,7 @@ public sealed partial class FreeformHelperViewModel
         }
         finally
         {
-            if (ReferenceEquals(Interlocked.CompareExchange(ref _selectionNotchPreviewCts, null, cts), cts))
-            {
-                cts.Dispose();
-            }
+            _selectionNotchPreviewGate.Release(cts);
         }
     }
 }

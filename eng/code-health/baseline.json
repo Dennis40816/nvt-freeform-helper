@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 293,
+        "stateMembers": 287,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -2706,16 +2706,6 @@
       "count": 1,
       "rule": "asyncVoid",
       "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "f8201a8a5c237f38abfacf1a58e5dbab14edc4f5c577b2ab821fa2fec336c036",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_selectionNotchPreviewRequestId",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._selectionNotchPreviewRequestId"
     },
     {
       "syntaxHash": "57fe9fc66f63df4fa4fd5e3e802cd23cdacb792903d5e840e97b98b469fd9af9",
