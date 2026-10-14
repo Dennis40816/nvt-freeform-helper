@@ -10,12 +10,14 @@ public sealed partial class FreeformHelperViewModel
 {
     private static readonly TimeSpan AppGeneralSettingsPersistDebounce = TimeSpan.FromMilliseconds(450);
     private readonly AppGeneralSettingsStore _appGeneralSettingsStore;
-    private DispatcherTimer? _appGeneralSettingsPersistTimer;
+    private readonly AppGeneralPersistenceState _appGeneralPersistence = new(); // Holds the debounce timer and the project load deferral of the app general settings persistence.
     private bool _suppressAppGeneralPersistence;
-    private bool _deferAppGeneralPersistenceAfterProjectLoad;
     private bool _hasDeferredAppGeneralPersistenceChanges;
     private UiViewSnapshot _appGeneralViewSnapshot = new();
     private UiImportSnapshot _appGeneralImportSnapshot = new();
+
+    /// <summary>Gets the app general settings persistence holder for tests.</summary>
+    internal AppGeneralPersistenceState AppGeneralPersistenceForTests => _appGeneralPersistence;
 
     private void InitializeAppGeneralSettingsPersistence()
     {
@@ -24,9 +26,9 @@ public sealed partial class FreeformHelperViewModel
 
     private DispatcherTimer? EnsureAppGeneralSettingsPersistTimer()
     {
-        if (_appGeneralSettingsPersistTimer is not null)
+        if (_appGeneralPersistence.PersistTimer is not null)
         {
-            return _appGeneralSettingsPersistTimer;
+            return _appGeneralPersistence.PersistTimer;
         }
 
         if (!UiThread.IsCurrent(out _, out _))
@@ -39,13 +41,13 @@ public sealed partial class FreeformHelperViewModel
             Interval = AppGeneralSettingsPersistDebounce,
         };
         timer.Tick += OnAppGeneralSettingsPersistTimerTick;
-        _appGeneralSettingsPersistTimer = timer;
+        _appGeneralPersistence.PersistTimer = timer;
         return timer;
     }
 
     private void OnAppGeneralSettingsPersistTimerTick(object? sender, EventArgs e)
     {
-        _appGeneralSettingsPersistTimer?.Stop();
+        _appGeneralPersistence.PersistTimer?.Stop();
         PersistAppGeneralSettingsNow();
     }
 
@@ -106,18 +108,18 @@ public sealed partial class FreeformHelperViewModel
 
     private bool ShouldDeferAppGeneralSettingsPersistence()
     {
-        return _deferAppGeneralPersistenceAfterProjectLoad;
+        return _appGeneralPersistence.DeferAfterProjectLoad;
     }
 
     private void MarkProjectLoadedForAppGeneralPersistence()
     {
-        _deferAppGeneralPersistenceAfterProjectLoad = true;
-        _appGeneralSettingsPersistTimer?.Stop();
+        _appGeneralPersistence.DeferAfterProjectLoad = true;
+        _appGeneralPersistence.PersistTimer?.Stop();
     }
 
     private void FlushDeferredAppGeneralSettingsIfNeeded()
     {
-        if (!_deferAppGeneralPersistenceAfterProjectLoad || !_hasDeferredAppGeneralPersistenceChanges)
+        if (!_appGeneralPersistence.DeferAfterProjectLoad || !_hasDeferredAppGeneralPersistenceChanges)
         {
             return;
         }
@@ -219,6 +221,18 @@ public sealed partial class FreeformHelperViewModel
             IncludeBlockPolylines = source.IncludeBlockPolylines,
             LogLevel = source.LogLevel
         };
+    }
+
+    /// <summary>
+    /// Holds the debounce timer and the deferral flag of the app general settings persistence, for the main view model.
+    /// </summary>
+    internal sealed class AppGeneralPersistenceState
+    {
+        /// <summary>Gets or sets the debounce timer that writes the app general settings. It is created on first use on the UI thread.</summary>
+        internal DispatcherTimer? PersistTimer { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether writes wait for the next successful project save after a project load.</summary>
+        internal bool DeferAfterProjectLoad { get; set; }
     }
 }
 

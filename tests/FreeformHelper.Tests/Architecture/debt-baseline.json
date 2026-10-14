@@ -11,7 +11,7 @@
     "bareCatch": 12,
     "catchException": 29,
     "suppressFlagFields": 6,
-    "freeformViewModelStateMembers": 116,
+    "freeformViewModelStateMembers": 114,
     "shellNavigationBooleans": 0,
     "noWarnIds": 3
   },
@@ -72,7 +72,7 @@
       "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:61", "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:126",
       "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.Simulation.cs:22",
       "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.WorkflowSelection.cs:84",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:101",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:103",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:115", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:162",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs:231",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs:231",
@@ -92,7 +92,7 @@
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:17"
     ],
     "freeformViewModelStateMembers": [
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:13", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:15", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:16", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:17", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:18",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:15", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:16", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:17",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CadLoadOverlay.cs:13",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:77", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:80", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:81", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:85", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:93", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:94", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:95", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:96", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:119", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:120", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:150", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:151", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:152", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:153", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:156",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfIndexing.Duplicates.cs:10",
