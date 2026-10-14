@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json.Nodes;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Tests.TestInfrastructure;
@@ -21,11 +20,7 @@ public sealed class ExampleProjectFixtureTests
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
 
-        var maskField = typeof(FreeformHelperViewModel).GetField(
-            "_regularVisibilityMaskResult",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(maskField);
-        var mask = Assert.IsType<RegularVisibilityMaskResult>(maskField!.GetValue(vm));
+        var mask = vm.RegularVisibilityMaskForTests.Mask;
         Assert.Equal(RegularVisibilityMaskStatus.Loaded, mask.Status);
         Assert.True(mask.ActiveRegularCount > 0);
         Assert.True(vm.IsRegularVisibilityMaskEnabled);

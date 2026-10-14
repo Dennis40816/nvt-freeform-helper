@@ -1,4 +1,3 @@
-using System.Reflection;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -96,13 +95,8 @@ public sealed partial class FreeformHelperViewModelTests
             };
             await loadedVm.LoadProjectCommand.ExecuteAsync(null);
 
-            var sourcePathField = typeof(FreeformHelperViewModel).GetField(
-                "_regularVisibilityMaskSourcePath",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(sourcePathField);
-
             Assert.True(loadedVm.IsRegularVisibilityMaskEnabled);
-            Assert.Equal(csvPath, sourcePathField!.GetValue(loadedVm) as string);
+            Assert.Equal(csvPath, loadedVm.RegularVisibilityMaskForTests.SourcePath);
             Assert.Contains("not loaded", loadedVm.RegularVisibilityMaskSummary, StringComparison.OrdinalIgnoreCase);
         }
         finally
