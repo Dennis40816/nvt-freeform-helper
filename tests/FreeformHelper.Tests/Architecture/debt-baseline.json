@@ -11,7 +11,7 @@
     "bareCatch": 12,
     "catchException": 29,
     "suppressFlagFields": 6,
-    "freeformViewModelStateMembers": 130,
+    "freeformViewModelStateMembers": 128,
     "shellNavigationBooleans": 0,
     "noWarnIds": 3
   },
@@ -99,7 +99,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfLayerImageExportSettings.cs:26",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ModalLoading.cs:11",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:7",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:9", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:10", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:11", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:12",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:10", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:11",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:15", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:16", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:17", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:18",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:7", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:8",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.RegularVisibilityMask.cs:12", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.RegularVisibilityMask.cs:13", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.RegularVisibilityMask.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.RegularVisibilityMask.cs:15",
