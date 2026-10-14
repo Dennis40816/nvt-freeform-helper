@@ -10458,16 +10458,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "948db030e1f3a1fd0d290d6d2798ab5f538688c98df831888aad567644db866c",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:DirtySettingNames",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.DirtyTracking.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:Logger",
       "owner": "NFH",
