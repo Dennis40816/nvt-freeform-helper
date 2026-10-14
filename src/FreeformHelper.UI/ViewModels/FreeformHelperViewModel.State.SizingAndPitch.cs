@@ -7,34 +7,167 @@ public sealed partial class FreeformHelperViewModel
 {
     // --- Manual Sizing Input Fields ---
 
+    // The manual sizing inputs are stored once. The properties below forward to the record and raise
+    // the same notifications and callbacks as the stored properties they replaced.
+    private ManualSizingInput _manualSizingInput = ManualSizingInput.Initial;
+
     /// <summary>
     /// Gets or sets the pending width value for manual column/pad sizing.
     /// </summary>
-    [ObservableProperty] private decimal _pendingColumnWidth;
+    public decimal PendingColumnWidth
+    {
+        get => _manualSizingInput.PendingColumnWidth;
+        set
+        {
+            if (_manualSizingInput.PendingColumnWidth == value)
+            {
+                return;
+            }
+
+            OnPendingColumnWidthChanging(value);
+            OnPropertyChanging();
+            _manualSizingInput = _manualSizingInput with { PendingColumnWidth = value };
+            OnPendingColumnWidthChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnPendingColumnWidthChanging(decimal value);
+
+    partial void OnPendingColumnWidthChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the pending height value for manual row/pad sizing.
     /// </summary>
-    [ObservableProperty] private decimal _pendingRowHeight;
+    public decimal PendingRowHeight
+    {
+        get => _manualSizingInput.PendingRowHeight;
+        set
+        {
+            if (_manualSizingInput.PendingRowHeight == value)
+            {
+                return;
+            }
+
+            OnPendingRowHeightChanging(value);
+            OnPropertyChanging();
+            _manualSizingInput = _manualSizingInput with { PendingRowHeight = value };
+            OnPendingRowHeightChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnPendingRowHeightChanging(decimal value);
+
+    partial void OnPendingRowHeightChanged(decimal value);
+
     /// <summary>
     /// Gets or sets a value indicating whether <see cref="PendingColumnWidth"/> represents mixed values in a selection.
     /// </summary>
-    [ObservableProperty] private bool _isPendingColumnWidthMixed;
+    public bool IsPendingColumnWidthMixed
+    {
+        get => _manualSizingInput.IsPendingColumnWidthMixed;
+        set
+        {
+            if (_manualSizingInput.IsPendingColumnWidthMixed == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _manualSizingInput = _manualSizingInput with { IsPendingColumnWidthMixed = value };
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>
     /// Gets or sets a value indicating whether <see cref="PendingRowHeight"/> represents mixed values in a selection.
     /// </summary>
-    [ObservableProperty] private bool _isPendingRowHeightMixed;
+    public bool IsPendingRowHeightMixed
+    {
+        get => _manualSizingInput.IsPendingRowHeightMixed;
+        set
+        {
+            if (_manualSizingInput.IsPendingRowHeightMixed == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _manualSizingInput = _manualSizingInput with { IsPendingRowHeightMixed = value };
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>
     /// Gets or sets the string input for manual row range selection (e.g., "1-3,5").
     /// </summary>
-    [ObservableProperty] private string _manualRowsRange = string.Empty;
+    public string ManualRowsRange
+    {
+        get => _manualSizingInput.ManualRowsRange;
+        set
+        {
+            if (_manualSizingInput.ManualRowsRange == value)
+            {
+                return;
+            }
+
+            OnManualRowsRangeChanging(value);
+            OnPropertyChanging();
+            _manualSizingInput = _manualSizingInput with { ManualRowsRange = value };
+            OnManualRowsRangeChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnManualRowsRangeChanging(string value);
+
+    partial void OnManualRowsRangeChanged(string value);
+
     /// <summary>
     /// Gets or sets the string input for manual column range selection (e.g., "A-C,E").
     /// </summary>
-    [ObservableProperty] private string _manualColsRange = string.Empty;
+    public string ManualColsRange
+    {
+        get => _manualSizingInput.ManualColsRange;
+        set
+        {
+            if (_manualSizingInput.ManualColsRange == value)
+            {
+                return;
+            }
+
+            OnManualColsRangeChanging(value);
+            OnPropertyChanging();
+            _manualSizingInput = _manualSizingInput with { ManualColsRange = value };
+            OnManualColsRangeChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnManualColsRangeChanging(string value);
+
+    partial void OnManualColsRangeChanged(string value);
+
     /// <summary>
     /// Gets or sets the status message for the manual range input (e.g., "No manual range.", "Invalid input.").
     /// </summary>
-    [ObservableProperty] private string _manualRangeStatus = "No manual range.";
+    public string ManualRangeStatus
+    {
+        get => _manualSizingInput.ManualRangeStatus;
+        set
+        {
+            if (_manualSizingInput.ManualRangeStatus == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _manualSizingInput = _manualSizingInput with { ManualRangeStatus = value };
+            OnPropertyChanged();
+        }
+    }
+
     private string _manualRangeError = string.Empty;
 
     /// <summary>
@@ -62,11 +195,40 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets the display text for pending column width, handling mixed state.
     /// </summary>
-    [ObservableProperty] private string _pendingColumnWidthDisplay = "0";
+    public string PendingColumnWidthDisplay
+    {
+        get => _manualSizingInput.PendingColumnWidthDisplay;
+        set
+        {
+            if (_manualSizingInput.PendingColumnWidthDisplay == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _manualSizingInput = _manualSizingInput with { PendingColumnWidthDisplay = value };
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>
     /// Gets or sets the display text for pending row height, handling mixed state.
     /// </summary>
-    [ObservableProperty] private string _pendingRowHeightDisplay = "0";
+    public string PendingRowHeightDisplay
+    {
+        get => _manualSizingInput.PendingRowHeightDisplay;
+        set
+        {
+            if (_manualSizingInput.PendingRowHeightDisplay == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _manualSizingInput = _manualSizingInput with { PendingRowHeightDisplay = value };
+            OnPropertyChanged();
+        }
+    }
 
     // --- Derived Read-Only Properties ---
 
