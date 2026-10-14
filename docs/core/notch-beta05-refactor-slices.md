@@ -103,7 +103,7 @@ refactor(beta0.5-S11.xxx): <slice summary>
     - `SetLatestPadMatchResult(...)`
     - `SetLatestVisibleIndexAssignmentDecisions(...)`
     - `InvalidateWorkflowDataSnapshot()`
-  - Remove the old paths: direct assignments to `_latestPadMatchResult` / `_latestVisibleIndexAssignmentDecisionsByCadId` in multiple places.
+  - Remove the old paths: direct assignments to `_workflowData.LatestPadMatch` / `_latestVisibleIndexAssignmentDecisionsByCadId` in multiple places.
 - Validation:
   - UI project build/lint still need to run because a running `FreeformHelper.UI` process locked files.
 

@@ -67,12 +67,12 @@ public sealed partial class FreeformHelperViewModel
 
     private HashSet<int>? GetActiveRegularPadIdsForNotchComputation()
     {
-        if (_latestPadMatchResult.RegularToCad.Count == 0)
+        if (_workflowData.LatestPadMatch.RegularToCad.Count == 0)
         {
             return null;
         }
 
-        return _latestPadMatchResult.RegularToCad.Keys.ToHashSet();
+        return _workflowData.LatestPadMatch.RegularToCad.Keys.ToHashSet();
     }
 
     private bool TryResolveNotchComputationInputs(

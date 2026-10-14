@@ -92,7 +92,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     private CadPadSet? _cad; // The loaded CAD pad data.
     private RegularGrid? _grid; // The generated regular grid data.
-    private PadMatchResult _latestPadMatchResult = PadMatchResult.Empty;
+    private readonly WorkflowDataState _workflowData = new(); // Holds the latest pad match result and the cached workflow data snapshot built from it.
     private CadPadSet? _cachedFilteredCadForBuild; // Cache for layer-filtered CAD pads.
     // The four per-CAD-pad index tables are stored once. The members below keep the old names and
     // read through it: members that carry analyzer debt read them, and renaming them would change
@@ -116,7 +116,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         set => _cadIndexMaps.LatestAssignmentDecisionsByCadId = value;
     }
 
-    private (int Revision, WorkflowDataSnapshot Snapshot)? _workflowDataSnapshotCache;
     private int _workflowDataSnapshotRevision = 1;
     private readonly GridStartupState _gridStartup = new(); // Holds the one-time startup flags and the fit request of the grid build.
     private readonly GridRebuildUseCase _gridRebuildUseCase;
@@ -373,11 +372,14 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     internal int WorkflowDataSnapshotRevision => _workflowDataSnapshotRevision;
 
+    /// <summary>Gets the pad match and workflow snapshot holder for tests.</summary>
+    internal WorkflowDataState WorkflowDataForTests => _workflowData;
+
     internal int WorkflowDataSnapshotBuildCount { get; private set; }
 
     private WorkflowDataSnapshot BuildWorkflowDataSnapshot()
     {
-        if (_workflowDataSnapshotCache is { } cached &&
+        if (_workflowData.SnapshotCache is { } cached &&
             cached.Revision == _workflowDataSnapshotRevision)
         {
             return cached.Snapshot;
@@ -385,7 +387,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
         var activeMask = GetActiveRegularVisibilityMaskPadIds()?.ToFrozenSet();
 
-        var cadToRegular = _latestPadMatchResult.CadToRegular
+        var cadToRegular = _workflowData.LatestPadMatch.CadToRegular
             .ToDictionary(
                 static pair => pair.Key,
                 static pair => (IReadOnlyList<PadMatchLink>)pair.Value.ToArray())
@@ -399,7 +401,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             cadToRegular,
             _projectFile.CadOutputFwDiffIndexOverrides.ToFrozenDictionary(),
             activeMask);
-        _workflowDataSnapshotCache = (_workflowDataSnapshotRevision, snapshot);
+        _workflowData.SnapshotCache = (_workflowDataSnapshotRevision, snapshot);
         WorkflowDataSnapshotBuildCount++;
         return snapshot;
     }
@@ -411,7 +413,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     private void SetLatestPadMatchResult(PadMatchResult result)
     {
-        _latestPadMatchResult = result;
+        _workflowData.LatestPadMatch = result;
         InvalidateWorkflowDataSnapshot();
     }
 
@@ -429,6 +431,18 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     public bool TryGetCadDisplayIndex(int cadPadId, out int displayIndex)
     {
         return _cadDisplayIndexByCadId.TryGetValue(cadPadId, out displayIndex);
+    }
+
+    /// <summary>
+    /// Holds the latest pad match result and the cached workflow data snapshot with the revision it was built for, for the main view model.
+    /// </summary>
+    internal sealed class WorkflowDataState
+    {
+        /// <summary>Gets or sets the pad match result of the last match run.</summary>
+        internal PadMatchResult LatestPadMatch { get; set; } = PadMatchResult.Empty;
+
+        /// <summary>Gets or sets the last built workflow data snapshot with the revision it was built for.</summary>
+        internal (int Revision, WorkflowDataSnapshot Snapshot)? SnapshotCache { get; set; }
     }
 }
 

@@ -159,9 +159,7 @@ public sealed partial class FreeformHelperViewModelTests
             };
         }
 
-        var field = typeof(FreeformHelperViewModel).GetField("_latestPadMatchResult", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        field!.SetValue(vm, new PadMatchResult(cadToRegular, regularToCad));
+        vm.WorkflowDataForTests.LatestPadMatch = new PadMatchResult(cadToRegular, regularToCad);
     }
 
     private static void SetCadOutputFwDiff(FreeformHelperViewModel vm, int cadPadId, int diffIndex, int icIndex)
