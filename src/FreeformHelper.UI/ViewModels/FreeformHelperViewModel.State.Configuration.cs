@@ -426,7 +426,6 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnPanelBiasYChanged(decimal value);
 
-
     // Matching settings
     /// <summary>
     /// Gets or sets the diagnostic threshold for highlighting low-coverage regular pads.
@@ -629,14 +628,6 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(propertyName);
     }
     /// <summary>
-    /// Gets or sets the starting expected diff idx value for CAD scan-order indexing.
-    /// </summary>
-    [ObservableProperty] private decimal _cadOutputFwDiffIndexStart;
-    /// <summary>
-    /// Gets or sets the CAD auto CAD Output FW Diff assignment mode.
-    /// </summary>
-    [ObservableProperty] private CadOutputFwDiffAutoMode _cadOutputFwDiffAutoMode = CadOutputFwDiffAutoMode.BestMatchDirect;
-    /// <summary>
     /// Gets or sets the selected CAD auto CAD Output FW Diff assignment mode option.
     /// </summary>
     public CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption
@@ -662,19 +653,6 @@ public sealed partial class FreeformHelperViewModel
             OnPropertyChanged(nameof(SelectedCadOutputFwDiffAutoModeOption));
         }
     }
-    /// <summary>
-    /// Gets or sets the CAD id used as diff idx start anchor.
-    /// Use -1 to indicate "first CAD in scan order".
-    /// </summary>
-    [ObservableProperty] private decimal _cadOutputFwDiffIndexAnchorCadId = -1;
-    /// <summary>
-    /// Gets or sets the summary text for current CAD Output FW Diff assignment policy.
-    /// </summary>
-    [ObservableProperty] private string _cadOutputFwDiffAssignmentSummary = "CAD Output FW Diff assignment (per-IC): auto, scan-order based.";
-    /// <summary>
-    /// Gets or sets a value indicating whether to display CAD Output FW Diff overlay hints on canvas.
-    /// </summary>
-    [ObservableProperty] private bool _showDiffIndexOverlay = true;
     /// <summary>
     /// Gets or sets the CAD output ids that currently use manual CAD Output FW Diff override.
     /// </summary>
