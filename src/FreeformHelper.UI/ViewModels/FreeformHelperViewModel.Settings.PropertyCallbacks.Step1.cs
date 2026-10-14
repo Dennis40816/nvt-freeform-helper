@@ -201,4 +201,212 @@ public sealed partial class FreeformHelperViewModel
         if (_isLoadingSettings) return;
         ApplySettingsOrchestration(nameof(GridPaddingPercent));
     }
+
+    // The grid build options are stored once. The properties below forward to the record and raise
+    // the same notifications and callbacks as the stored properties they replaced.
+    private GridBuildOptions _gridBuild = GridBuildOptions.Initial;
+
+    /// <summary>
+    /// Gets or sets the preferred AA outline layer name used by Coordinate.
+    /// </summary>
+    public string CoordinatePreferredAaOutlineLayerName
+    {
+        get => _gridBuild.CoordinatePreferredAaOutlineLayerName;
+        set
+        {
+            if (_gridBuild.CoordinatePreferredAaOutlineLayerName == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _gridBuild = _gridBuild with { CoordinatePreferredAaOutlineLayerName = value };
+            OnCoordinatePreferredAaOutlineLayerNameChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnCoordinatePreferredAaOutlineLayerNameChanged(string value);
+
+    /// <summary>
+    /// Gets or sets the maximum number of area buckets to use for coloring pads.
+    /// </summary>
+    public decimal MaxAreaBuckets
+    {
+        get => _gridBuild.MaxAreaBuckets;
+        set
+        {
+            if (_gridBuild.MaxAreaBuckets == value)
+            {
+                return;
+            }
+
+            OnMaxAreaBucketsChanging(value);
+            OnPropertyChanging();
+            _gridBuild = _gridBuild with { MaxAreaBuckets = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnMaxAreaBucketsChanging(decimal value);
+
+    /// <summary>
+    /// Gets or sets the area bucket tolerance for coloring pads by area.
+    /// </summary>
+    public decimal AreaBucketTolerance
+    {
+        get => _gridBuild.AreaBucketTolerance;
+        set
+        {
+            if (_gridBuild.AreaBucketTolerance == value)
+            {
+                return;
+            }
+
+            OnAreaBucketToleranceChanging(value);
+            OnPropertyChanging();
+            _gridBuild = _gridBuild with { AreaBucketTolerance = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnAreaBucketToleranceChanging(decimal value);
+
+    /// <summary>
+    /// Gets or sets a value indicating whether height adjustment is column-local.
+    /// </summary>
+    public bool IsHeightColumnLocal
+    {
+        get => _gridBuild.IsHeightColumnLocal;
+        set
+        {
+            if (_gridBuild.IsHeightColumnLocal == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _gridBuild = _gridBuild with { IsHeightColumnLocal = value };
+            OnIsHeightColumnLocalChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnIsHeightColumnLocalChanged(bool value);
+
+    /// <summary>
+    /// Gets or sets a value indicating whether width adjustment is row-local.
+    /// </summary>
+    public bool IsWidthRowLocal
+    {
+        get => _gridBuild.IsWidthRowLocal;
+        set
+        {
+            if (_gridBuild.IsWidthRowLocal == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _gridBuild = _gridBuild with { IsWidthRowLocal = value };
+            OnIsWidthRowLocalChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnIsWidthRowLocalChanged(bool value);
+
+    /// <summary>
+    /// Gets or sets a value indicating whether local sizing (row-local width, column-local height) is enabled.
+    /// </summary>
+    public bool UseLocalSizing
+    {
+        get => _gridBuild.UseLocalSizing;
+        set
+        {
+            if (_gridBuild.UseLocalSizing == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _gridBuild = _gridBuild with { UseLocalSizing = value };
+            OnUseLocalSizingChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnUseLocalSizingChanged(bool value);
+
+    /// <summary>
+    /// Gets or sets the currently selected <see cref="RegularSourceMode"/> enumeration value.
+    /// </summary>
+    public RegularSourceMode RegularSourceMode
+    {
+        get => _gridBuild.RegularSourceMode;
+        set
+        {
+            if (_gridBuild.RegularSourceMode == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _gridBuild = _gridBuild with { RegularSourceMode = value };
+            OnRegularSourceModeChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnRegularSourceModeChanged(RegularSourceMode value);
+
+    /// <summary>
+    /// Gets or sets the currently selected <see cref="GridAlignmentMode"/> enumeration value.
+    /// </summary>
+    public GridAlignmentMode GridAlignmentMode
+    {
+        get => _gridBuild.GridAlignmentMode;
+        set
+        {
+            if (_gridBuild.GridAlignmentMode == value)
+            {
+                return;
+            }
+
+            OnGridAlignmentModeChanging(value);
+            OnPropertyChanging();
+            _gridBuild = _gridBuild with { GridAlignmentMode = value };
+            OnGridAlignmentModeChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnGridAlignmentModeChanging(GridAlignmentMode value);
+
+    partial void OnGridAlignmentModeChanged(GridAlignmentMode value);
+
+    /// <summary>
+    /// Gets or sets the currently selected <see cref="ScanOrder"/> enumeration value.
+    /// </summary>
+    public ScanOrder SelectedScanOrder
+    {
+        get => _gridBuild.SelectedScanOrder;
+        set
+        {
+            if (_gridBuild.SelectedScanOrder == value)
+            {
+                return;
+            }
+
+            OnSelectedScanOrderChanging(value);
+            OnPropertyChanging();
+            _gridBuild = _gridBuild with { SelectedScanOrder = value };
+            OnSelectedScanOrderChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnSelectedScanOrderChanging(ScanOrder value);
+
+    partial void OnSelectedScanOrderChanged(ScanOrder value);
 }
