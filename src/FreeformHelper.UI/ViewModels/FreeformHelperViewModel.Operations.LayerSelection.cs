@@ -115,7 +115,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _pendingLayerSelectionUndoSnapshot ??= CaptureLayerSelectionSnapshot();
+        _pendingLayerSelection.UndoSnapshot ??= CaptureLayerSelectionSnapshot();
     }
 
     /// <summary>
@@ -211,18 +211,18 @@ public sealed partial class FreeformHelperViewModel
         {
             if (ApplyRegularSourceLayerAutoHidePolicy())
             {
-                _pendingLayerSelectionUndoSnapshot = null;
+                _pendingLayerSelection.UndoSnapshot = null;
                 return;
             }
 
             MarkUnsaved();
             FilterCadPadsByLayer();
-            if (_pendingLayerSelectionUndoSnapshot is { Count: > 0 } undoSnapshot)
+            if (_pendingLayerSelection.UndoSnapshot is { Count: > 0 } undoSnapshot)
             {
                 PushUndo(() => RestoreLayerSelectionSnapshot(undoSnapshot), "DXF layer selection");
             }
 
-            _pendingLayerSelectionUndoSnapshot = null;
+            _pendingLayerSelection.UndoSnapshot = null;
         }
 
         NotifyCadLayerAggregateStateChanged();

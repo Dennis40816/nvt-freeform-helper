@@ -81,9 +81,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private string? _lastSavedPath; // Stores the path where the project was last saved.
     // Independent nesting-safe suppression counters; UI-thread-only access.
     private readonly SettingsSuppressionScopes _settingsSuppression = new();
-    private Dictionary<string, bool>? _pendingLayerSelectionUndoSnapshot;
-    private string? _pendingBoundLayerName;
-    private string? _pendingRegularSourceLayerName;
+    private readonly PendingLayerSelectionState _pendingLayerSelection = new(); // Holds the layer selection data that waits for the next CAD load or layer toggle.
     private ProjectFile _projectFile = new(); // The core project data model.
 
     /// <summary>

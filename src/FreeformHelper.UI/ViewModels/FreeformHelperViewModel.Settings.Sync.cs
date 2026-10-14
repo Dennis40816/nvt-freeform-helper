@@ -49,8 +49,8 @@ public sealed partial class FreeformHelperViewModel
             PanelBiasX = (decimal)s.Grid.PanelBiasX;
             PanelBiasY = (decimal)s.Grid.PanelBiasY;
             RecalcBoundsOnLayerFilter = s.Grid.RecalcBoundsOnLayerFilter;
-            _pendingBoundLayerName = s.Grid.BoundLayerName;
-            _pendingRegularSourceLayerName = s.Grid.RegularSourceLayerName;
+            _pendingLayerSelection.BoundLayerName = s.Grid.BoundLayerName;
+            _pendingLayerSelection.RegularSourceLayerName = s.Grid.RegularSourceLayerName;
 
             // --- Matching Settings ---
             MatchThreshold = (decimal)s.Matching.MatchThreshold;
