@@ -355,9 +355,7 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Equal(await File.ReadAllBytesAsync(freshPath), await File.ReadAllBytesAsync(cachedPath));
             Assert.NotEqual(warmPayload, cachedPayload);
             Assert.Contains($"//   ExportProfile: {requestedProfile}", cachedPayload, StringComparison.Ordinal);
-            Assert.Equal(
-                requestedProfile == NotchExportProfile.Debug,
-                cachedPayload.Contains("FUNC_NHC_SimulationLoadFwBaseMaskByIc", StringComparison.Ordinal));
+            Assert.DoesNotContain("FwBaseMask", cachedPayload, StringComparison.Ordinal);
         }
         finally
         {

@@ -6,12 +6,12 @@ namespace FreeformHelper.Application.Export;
 public enum NotchExportProfile
 {
     /// <summary>
-    /// Minimal firmware-oriented output. No-op v2.2 rows and simulation-only helpers are pruned.
+    /// Minimal firmware-oriented output. No-op v2.2 rows are pruned.
     /// </summary>
     Release = 0,
 
     /// <summary>
-    /// Full debug output. Keeps no-op rows and FW simulation baseline helpers for traceability.
+    /// Full debug output. Keeps no-op v2.2 rows for traceability.
     /// </summary>
     Debug = 1,
 }

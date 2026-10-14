@@ -60,7 +60,6 @@ public sealed class NotchExampleCExportDriftTests
         var cad = NotchCurrentWorkflowTableTestHelper.GetExportCadPadSet(vm);
         var grid = GetPrivateField<RegularGrid>(vm, "_grid");
         var project = GetPrivateField<ProjectFile>(vm, "_projectFile");
-        var activeRegularPadIds = GetActiveRegularPadIds(vm);
 
         var exportTable = await NotchCurrentWorkflowTableTestHelper.GenerateExportTableAsync(
             vm,
@@ -73,8 +72,7 @@ public sealed class NotchExampleCExportDriftTests
             cad,
             grid,
             project.Settings,
-            project.Settings.Notch.ExportProfile,
-            activeRegularPadIds);
+            project.Settings.Notch.ExportProfile);
 
         var expected = NormalizeText(File.ReadAllText(examplePath));
         var actual = NormalizeText(actualExport);
@@ -137,17 +135,5 @@ public sealed class NotchExampleCExportDriftTests
         var field = typeof(FreeformHelperViewModel).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(field);
         return Assert.IsType<T>(field!.GetValue(vm));
-    }
-
-    private static IReadOnlySet<int>? GetActiveRegularPadIds(FreeformHelperViewModel vm)
-    {
-        var method = typeof(FreeformHelperViewModel).GetMethod(
-            "GetActiveRegularPadIdsForNotchComputation",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        var result = method!.Invoke(vm, null);
-        return result is null
-            ? null
-            : Assert.IsAssignableFrom<IReadOnlySet<int>>(result);
     }
 }
