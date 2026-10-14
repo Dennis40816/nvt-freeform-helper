@@ -242,7 +242,11 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine(CultureInfo.InvariantCulture, $"#define NHC_DIFF_NONE            (0x{Math.Clamp(nullValue, 0, ushort.MaxValue):X4}u)");
         sb.AppendLine("#define NHC_FLAG_NONE            (0u)");
         sb.AppendLine("#define NHC_FLAG_CONTINUATION    (1u << 0)");
-        sb.AppendLine("#define NHC_FLAG_ANCHOR_OVERRIDE (1u << 1)");
+        if (nodesByIc.Any(static nodes => nodes.Any(static node => (node.Flags & NotchV22FirmwareProjector.AnchorOverrideFlag) != 0)))
+        {
+            sb.AppendLine("#define NHC_FLAG_ANCHOR_OVERRIDE (1u << 1)");
+        }
+
         sb.AppendLine();
         for (var icIndex = 0; icIndex < nodesByIc.Count; icIndex++)
         {
@@ -490,8 +494,8 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine("            // MUL");
         sb.AppendLine("            if (pstTable[u16j].NHC_REGU_TO_FULL != 0u)");
         sb.AppendLine("            {");
-        sb.AppendLine("                S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_IDX] =");
-        sb.AppendLine("                    S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_IDX] * pstTable[u16j].NHC_REGU_TO_FULL / 100;");
+        sb.AppendLine("                S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_IDX] = (INT16)(");
+        sb.AppendLine("                    ((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_IDX] * (INT32)pstTable[u16j].NHC_REGU_TO_FULL) / 100);");
         sb.AppendLine("            }");
         sb.AppendLine("            else");
         sb.AppendLine("            {");
@@ -505,11 +509,13 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine("            s16Sum = 0;");
         sb.AppendLine("            if (pstTable[u16j].NHC_1ST_TYPE == NHC_TYPE_ADD)");
         sb.AppendLine("            {");
-        sb.AppendLine("                s16Sum += (S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_1ST_IDX] * pstTable[u16j].NHC_1ST_RATIO) >> 7;");
+        sb.AppendLine("                // MISRA C:2012 Rule 10.1 deviation NHC-DEV-01: Q7 ratio, arithmetic right shift of INT32 is intended.");
+        sb.AppendLine("                s16Sum += (INT16)((((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_1ST_IDX]) * (INT32)pstTable[u16j].NHC_1ST_RATIO) >> 7);");
         sb.AppendLine("            }");
         sb.AppendLine("            else if (pstTable[u16j].NHC_1ST_TYPE == NHC_TYPE_SUB)");
         sb.AppendLine("            {");
-        sb.AppendLine("                s16Sum -= (S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_1ST_IDX] * pstTable[u16j].NHC_1ST_RATIO) >> 7;");
+        sb.AppendLine("                // MISRA C:2012 Rule 10.1 deviation NHC-DEV-01: Q7 ratio, arithmetic right shift of INT32 is intended.");
+        sb.AppendLine("                s16Sum -= (INT16)((((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_1ST_IDX]) * (INT32)pstTable[u16j].NHC_1ST_RATIO) >> 7);");
         sb.AppendLine("            }");
         sb.AppendLine("            else");
         sb.AppendLine("            {");
@@ -518,11 +524,13 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine();
         sb.AppendLine("            if (pstTable[u16j].NHC_2ND_TYPE == NHC_TYPE_ADD)");
         sb.AppendLine("            {");
-        sb.AppendLine("                s16Sum += (S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_2ND_IDX] * pstTable[u16j].NHC_2ND_RATIO) >> 7;");
+        sb.AppendLine("                // MISRA C:2012 Rule 10.1 deviation NHC-DEV-01: Q7 ratio, arithmetic right shift of INT32 is intended.");
+        sb.AppendLine("                s16Sum += (INT16)((((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_2ND_IDX]) * (INT32)pstTable[u16j].NHC_2ND_RATIO) >> 7);");
         sb.AppendLine("            }");
         sb.AppendLine("            else if (pstTable[u16j].NHC_2ND_TYPE == NHC_TYPE_SUB)");
         sb.AppendLine("            {");
-        sb.AppendLine("                s16Sum -= (S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_2ND_IDX] * pstTable[u16j].NHC_2ND_RATIO) >> 7;");
+        sb.AppendLine("                // MISRA C:2012 Rule 10.1 deviation NHC-DEV-01: Q7 ratio, arithmetic right shift of INT32 is intended.");
+        sb.AppendLine("                s16Sum -= (INT16)((((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_2ND_IDX]) * (INT32)pstTable[u16j].NHC_2ND_RATIO) >> 7);");
         sb.AppendLine("            }");
         sb.AppendLine("            else");
         sb.AppendLine("            {");
@@ -550,7 +558,7 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine();
         sb.AppendLine("static INT16 FUNC_NHC_ScalePercent(INT16 s16Value, INT16 s16Percent)");
         sb.AppendLine("{");
-        sb.AppendLine("    return (INT16)((s16Value * s16Percent) / 100);");
+        sb.AppendLine("    return (INT16)(((INT32)s16Value * (INT32)s16Percent) / 100);");
         sb.AppendLine("}");
         sb.AppendLine();
         sb.AppendLine("static void FUNC_NHC_ApplyTarget(INT16 s16Source, UINT16 u16TargetIdx, INT8 s8Ratio)");
@@ -587,7 +595,7 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine("                    s16RetainPct = 0;");
         sb.AppendLine("                }");
         sb.AppendLine();
-        sb.AppendLine("                s16SourceDeltaPct = s16RetainPct - 100;");
+        sb.AppendLine("                s16SourceDeltaPct = (INT16)(s16RetainPct - 100);");
         sb.AppendLine("                S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_IDX] +=");
         sb.AppendLine("                    FUNC_NHC_ScalePercent(s16SourceBk[u16j], s16SourceDeltaPct);");
         sb.AppendLine("            }");
