@@ -372,9 +372,9 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(PitchSizeYSummary));
         RegularPads = new ObservableCollection<RegularPad>();
         ApplyRegularVisibilityMaskResult(
-            string.IsNullOrWhiteSpace(_regularVisibilityMaskSourcePath)
+            string.IsNullOrWhiteSpace(_regularVisibilityMask.SourcePath)
                 ? RegularVisibilityMaskResult.NotFound()
-                : RegularVisibilityMaskResult.NotFound(_regularVisibilityMaskSourcePath),
+                : RegularVisibilityMaskResult.NotFound(_regularVisibilityMask.SourcePath),
             grid: null);
         CanvasHintText = hint;
         ResetFreeformAutoDetectStats();

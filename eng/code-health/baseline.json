@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 203,
+        "stateMembers": 199,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -11538,16 +11538,6 @@
       "symbol": "M:System.IO.Path.GetTempPath"
     },
     {
-      "syntaxHash": "a873c8c79f709f1b3468f2dbeb96b26da8fafcb4a271e5c9c77482242d77ac78",
-      "member": "FreeformHelper.Tests.ExampleProjectFixtureTests.LoadProject_3635_RequiresLoadedAndEnabledRegularVisibilityMask()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "1649e615fb03121d60bbeb220d129c1da32cbcd070c0fc36e470e1470124d5ab",
       "member": "FreeformHelper.Tests.FontAdoptionTests.AssertLicenseCopy(string,string,string,string)",
       "owner": "NFH",
@@ -12686,16 +12676,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "1f827b4248056b63e377ce3f29ff726d4215775911c8c419eee155f3302d5a70",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.SaveThenLoadProject_WithoutEmbeddedDxf_PersistsRegularVisibilityMaskSourcePathAndToggle_WithoutRuntimeReload()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.RegularVisibilityMask.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "2cb2c6b2d7c48e9f82e11c539e8d2272e948d3c58a24d156b463d057373f0d60",

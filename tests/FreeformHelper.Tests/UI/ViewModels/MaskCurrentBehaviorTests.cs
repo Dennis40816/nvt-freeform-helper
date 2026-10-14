@@ -92,7 +92,7 @@ public sealed class MaskCurrentBehaviorTests
             await vm.WaitForGridRebuildIdleAsync();
 
             Assert.True(vm.IsRegularVisibilityMaskEnabled);
-            var mask = GetField<RegularVisibilityMaskResult>(vm, "_regularVisibilityMaskResult");
+            var mask = vm.RegularVisibilityMaskForTests.Mask;
             Assert.Equal(RegularVisibilityMaskStatus.NotFound, mask.Status);
             Assert.False(mask.HasLoadedMask);
             Assert.Equal(missingMaskPath, mask.SourcePath);
@@ -143,7 +143,7 @@ public sealed class MaskCurrentBehaviorTests
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
             Assert.True(vm.IsRegularVisibilityMaskEnabled);
-            var initialMask = GetField<RegularVisibilityMaskResult>(vm, "_regularVisibilityMaskResult");
+            var initialMask = vm.RegularVisibilityMaskForTests.Mask;
             Assert.Equal(RegularVisibilityMaskStatus.Loaded, initialMask.Status);
             Assert.Equal(0, Assert.Single(initialMask.ActiveRegularPadIds));
             Assert.True(vm.TryGetCadOutputFwDiffIndex(pad.Id, out var geometryDiff));
@@ -152,7 +152,7 @@ public sealed class MaskCurrentBehaviorTests
             vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(changedPath);
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
-            var changedMask = GetField<RegularVisibilityMaskResult>(vm, "_regularVisibilityMaskResult");
+            var changedMask = vm.RegularVisibilityMaskForTests.Mask;
             Assert.True(vm.IsRegularVisibilityMaskEnabled);
             Assert.Equal(RegularVisibilityMaskStatus.Loaded, changedMask.Status);
             Assert.Equal(changedPath, changedMask.SourcePath);
