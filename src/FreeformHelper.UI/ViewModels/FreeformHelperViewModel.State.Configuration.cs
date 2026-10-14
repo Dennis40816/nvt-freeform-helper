@@ -75,26 +75,130 @@ public sealed partial class FreeformHelperViewModel
     public double GlobalFontBaseSize => 12.0 * GlobalFontScaleFactor;
 
     // Grid settings
+    // The grid, coordinate, active area, panel offset and match settings are stored once. The properties
+    // below forward to the record and raise the same notifications and callbacks as the stored properties
+    // they replaced.
+    private GridAndMatchSettings _gridAndMatch = GridAndMatchSettings.Initial;
+
     /// <summary>
     /// Gets or sets the number of X channels (columns) in the grid.
     /// </summary>
-    [ObservableProperty] private decimal _xChannels;
+    public decimal XChannels
+    {
+        get => _gridAndMatch.XChannels;
+        set
+        {
+            if (_gridAndMatch.XChannels == value)
+            {
+                return;
+            }
+
+            OnXChannelsChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { XChannels = value };
+            OnXChannelsChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnXChannelsChanging(decimal value);
+
+    partial void OnXChannelsChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the number of Y channels (rows) in the grid.
     /// </summary>
-    [ObservableProperty] private decimal _yChannels;
+    public decimal YChannels
+    {
+        get => _gridAndMatch.YChannels;
+        set
+        {
+            if (_gridAndMatch.YChannels == value)
+            {
+                return;
+            }
+
+            OnYChannelsChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { YChannels = value };
+            OnYChannelsChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnYChannelsChanging(decimal value);
+
+    partial void OnYChannelsChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the number of cascaded ICs.
     /// </summary>
-    [ObservableProperty] private decimal _cascadeNum;
+    public decimal CascadeNum
+    {
+        get => _gridAndMatch.CascadeNum;
+        set
+        {
+            if (_gridAndMatch.CascadeNum == value)
+            {
+                return;
+            }
+
+            OnCascadeNumChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { CascadeNum = value };
+            OnCascadeNumChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnCascadeNumChanging(decimal value);
+
+    partial void OnCascadeNumChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the default coordinate-planner pixel width.
     /// </summary>
-    [ObservableProperty] private decimal _coordinatePixelWidth = 1m;
+    public decimal CoordinatePixelWidth
+    {
+        get => _gridAndMatch.CoordinatePixelWidth;
+        set
+        {
+            if (_gridAndMatch.CoordinatePixelWidth == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { CoordinatePixelWidth = value };
+            OnCoordinatePixelWidthChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnCoordinatePixelWidthChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the default coordinate-planner pixel height.
     /// </summary>
-    [ObservableProperty] private decimal _coordinatePixelHeight = 1m;
+    public decimal CoordinatePixelHeight
+    {
+        get => _gridAndMatch.CoordinatePixelHeight;
+        set
+        {
+            if (_gridAndMatch.CoordinatePixelHeight == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { CoordinatePixelHeight = value };
+            OnCoordinatePixelHeightChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnCoordinatePixelHeightChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the preferred AA outline layer name used by Coordinate.
     /// </summary>
@@ -140,42 +244,222 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets the grid padding percentage.
     /// </summary>
-    [ObservableProperty] private decimal _gridPaddingPercent;
+    public decimal GridPaddingPercent
+    {
+        get => _gridAndMatch.GridPaddingPercent;
+        set
+        {
+            if (_gridAndMatch.GridPaddingPercent == value)
+            {
+                return;
+            }
+
+            OnGridPaddingPercentChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { GridPaddingPercent = value };
+            OnGridPaddingPercentChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnGridPaddingPercentChanging(decimal value);
+
+    partial void OnGridPaddingPercentChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the active area width.
     /// </summary>
-    [ObservableProperty] private decimal _activeAreaWidth = 310m;
+    public decimal ActiveAreaWidth
+    {
+        get => _gridAndMatch.ActiveAreaWidth;
+        set
+        {
+            if (_gridAndMatch.ActiveAreaWidth == value)
+            {
+                return;
+            }
+
+            OnActiveAreaWidthChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { ActiveAreaWidth = value };
+            OnActiveAreaWidthChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnActiveAreaWidthChanging(decimal value);
+
+    partial void OnActiveAreaWidthChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the active area height.
     /// </summary>
-    [ObservableProperty] private decimal _activeAreaHeight = 174m;
+    public decimal ActiveAreaHeight
+    {
+        get => _gridAndMatch.ActiveAreaHeight;
+        set
+        {
+            if (_gridAndMatch.ActiveAreaHeight == value)
+            {
+                return;
+            }
+
+            OnActiveAreaHeightChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { ActiveAreaHeight = value };
+            OnActiveAreaHeightChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnActiveAreaHeightChanging(decimal value);
+
+    partial void OnActiveAreaHeightChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the panel bias X.
     /// </summary>
-    [ObservableProperty] private decimal _panelBiasX;
+    public decimal PanelBiasX
+    {
+        get => _gridAndMatch.PanelBiasX;
+        set
+        {
+            if (_gridAndMatch.PanelBiasX == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { PanelBiasX = value };
+            OnPanelBiasXChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnPanelBiasXChanged(decimal value);
+
     /// <summary>
     /// Gets or sets the panel bias Y.
     /// </summary>
-    [ObservableProperty] private decimal _panelBiasY;
+    public decimal PanelBiasY
+    {
+        get => _gridAndMatch.PanelBiasY;
+        set
+        {
+            if (_gridAndMatch.PanelBiasY == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { PanelBiasY = value };
+            OnPanelBiasYChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnPanelBiasYChanged(decimal value);
+
 
     // Matching settings
     /// <summary>
     /// Gets or sets the diagnostic threshold for highlighting low-coverage regular pads.
     /// </summary>
-    [ObservableProperty] private decimal _matchThreshold;
+    public decimal MatchThreshold
+    {
+        get => _gridAndMatch.MatchThreshold;
+        set
+        {
+            if (_gridAndMatch.MatchThreshold == value)
+            {
+                return;
+            }
+
+            OnMatchThresholdChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { MatchThreshold = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnMatchThresholdChanging(decimal value);
+
     /// <summary>
     /// Gets or sets the directional spread threshold used for freeform auto-detection.
     /// </summary>
-    [ObservableProperty] private decimal _freeformAxisThreshold = 0.55m;
+    public decimal FreeformAxisThreshold
+    {
+        get => _gridAndMatch.FreeformAxisThreshold;
+        set
+        {
+            if (_gridAndMatch.FreeformAxisThreshold == value)
+            {
+                return;
+            }
+
+            OnFreeformAxisThresholdChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { FreeformAxisThreshold = value };
+            OnFreeformAxisThresholdChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnFreeformAxisThresholdChanging(decimal value);
+
+    partial void OnFreeformAxisThresholdChanged(decimal value);
+
     /// <summary>
     /// Gets or sets a value indicating whether auto-detect can classify XYWay.
     /// </summary>
-    [ObservableProperty] private bool _enableAutoDetectXy;
+    public bool EnableAutoDetectXy
+    {
+        get => _gridAndMatch.EnableAutoDetectXy;
+        set
+        {
+            if (_gridAndMatch.EnableAutoDetectXy == value)
+            {
+                return;
+            }
+
+            OnEnableAutoDetectXyChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { EnableAutoDetectXy = value };
+            OnEnableAutoDetectXyChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableAutoDetectXyChanging(bool value);
+
+    partial void OnEnableAutoDetectXyChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether freeform auto-detect should keep one-side
     /// boundary spill as freeform when TH would otherwise suppress it.
     /// </summary>
-    [ObservableProperty] private bool _enableFreeformEdgeSpecialization;
+    public bool EnableFreeformEdgeSpecialization
+    {
+        get => _gridAndMatch.EnableFreeformEdgeSpecialization;
+        set
+        {
+            if (_gridAndMatch.EnableFreeformEdgeSpecialization == value)
+            {
+                return;
+            }
+
+            OnEnableFreeformEdgeSpecializationChanging(value);
+            OnPropertyChanging();
+            _gridAndMatch = _gridAndMatch with { EnableFreeformEdgeSpecialization = value };
+            OnEnableFreeformEdgeSpecializationChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableFreeformEdgeSpecializationChanging(bool value);
+
+    partial void OnEnableFreeformEdgeSpecializationChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether project load should auto-run Step 2
     /// freeform auto-detect after Step 1 is restored.
