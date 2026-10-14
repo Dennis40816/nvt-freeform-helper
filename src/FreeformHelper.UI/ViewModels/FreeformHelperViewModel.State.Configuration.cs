@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Application.Settings;
 
@@ -205,34 +206,78 @@ public sealed partial class FreeformHelperViewModel
     public bool HasFreeformAutoDetectRows => FreeformAutoDetectResult.HasRows;
     // Index mapping settings
     /// <summary>
+    /// Holds the index mapping numbers. The view model replaces the whole value. The properties
+    /// below forward to it and raise their change notification when their own value changed.
+    /// </summary>
+    private IndexMappingTuning _indexMappingTuning = IndexMappingTuning.Initial;
+    /// <summary>
     /// Gets or sets the IoU weight used for DXF/Regular mapping scoring.
     /// </summary>
-    [ObservableProperty] private decimal _mappingWeightIou;
+    public decimal MappingWeightIou
+    {
+        get => _indexMappingTuning.WeightIou;
+        set => SetIndexMappingTuning(_indexMappingTuning with { WeightIou = value });
+    }
     /// <summary>
     /// Gets or sets the centroid distance weight used for DXF/Regular mapping scoring.
     /// </summary>
-    [ObservableProperty] private decimal _mappingWeightCentroidDistance;
+    public decimal MappingWeightCentroidDistance
+    {
+        get => _indexMappingTuning.WeightCentroidDistance;
+        set => SetIndexMappingTuning(_indexMappingTuning with { WeightCentroidDistance = value });
+    }
     /// <summary>
     /// Gets or sets the area ratio weight used for DXF/Regular mapping scoring.
     /// </summary>
-    [ObservableProperty] private decimal _mappingWeightAreaRatio;
+    public decimal MappingWeightAreaRatio
+    {
+        get => _indexMappingTuning.WeightAreaRatio;
+        set => SetIndexMappingTuning(_indexMappingTuning with { WeightAreaRatio = value });
+    }
     /// <summary>
     /// Gets or sets the low-confidence score threshold for mapping suggestions.
     /// </summary>
-    [ObservableProperty] private decimal _mappingLowConfidenceThreshold;
+    public decimal MappingLowConfidenceThreshold
+    {
+        get => _indexMappingTuning.LowConfidenceThreshold;
+        set => SetIndexMappingTuning(_indexMappingTuning with { LowConfidenceThreshold = value });
+    }
     /// <summary>
     /// Gets or sets the ambiguity margin threshold (best - secondBest) for mapping suggestions.
     /// </summary>
-    [ObservableProperty] private decimal _mappingAmbiguousMargin;
+    public decimal MappingAmbiguousMargin
+    {
+        get => _indexMappingTuning.AmbiguousMargin;
+        set => SetIndexMappingTuning(_indexMappingTuning with { AmbiguousMargin = value });
+    }
     /// <summary>
     /// Gets or sets the legacy number of candidate padding cells used for mapping.
     /// Retained for project compatibility; UI uses <see cref="MappingCandidateNumber"/>.
     /// </summary>
-    [ObservableProperty] private decimal _mappingCandidatePaddingCells;
+    public decimal MappingCandidatePaddingCells
+    {
+        get => _indexMappingTuning.CandidatePaddingCells;
+        set => SetIndexMappingTuning(_indexMappingTuning with { CandidatePaddingCells = value });
+    }
     /// <summary>
     /// Gets or sets the number of retained candidates per CAD pad used for mapping.
     /// </summary>
-    [ObservableProperty] private decimal _mappingCandidateNumber = 9m;
+    public decimal MappingCandidateNumber
+    {
+        get => _indexMappingTuning.CandidateNumber;
+        set => SetIndexMappingTuning(_indexMappingTuning with { CandidateNumber = value });
+    }
+    private void SetIndexMappingTuning(IndexMappingTuning next, [CallerMemberName] string? propertyName = null)
+    {
+        if (_indexMappingTuning == next)
+        {
+            return;
+        }
+
+        OnPropertyChanging(propertyName);
+        _indexMappingTuning = next;
+        OnPropertyChanged(propertyName);
+    }
     /// <summary>
     /// Gets or sets the starting expected diff idx value for CAD scan-order indexing.
     /// </summary>
