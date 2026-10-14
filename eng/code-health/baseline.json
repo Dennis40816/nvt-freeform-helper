@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 191,
+        "stateMembers": 189,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -12866,26 +12866,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "6acadaecdc024cc14ec7b1ba78c0773bedffed2dce2d3ff914177ca9c043f5c0",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTokenDefaultsTests.Constructor_OffUiThread_DoesNotCreateDispatcherTimer()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTokenDefaultsTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "6acadaecdc024cc14ec7b1ba78c0773bedffed2dce2d3ff914177ca9c043f5c0",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTokenDefaultsTests.FreeformHelperViewModel_DefaultCanvasColors_ComeFromTokens()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTokenDefaultsTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "c81479aacdeac4e155ffb4a148616edec1099939c2d2e6f02dfce9b430e9db33",
