@@ -135,7 +135,7 @@ public sealed class MaskCurrentBehaviorTests
             await vm.WaitForGridRebuildIdleAsync();
             SetField(vm, "_grid", grid);
             SetField(vm, "_cad", cad);
-            SetField(vm, "_latestPadMatchResult", PadMatcher.Match(cad, grid));
+            vm.WorkflowDataForTests.LatestPadMatch = PadMatcher.Match(cad, grid);
             vm.CadPads = new ObservableCollection<CadPad>([pad]);
             vm.RegularPads = new ObservableCollection<RegularPad>(grid.Pads);
             vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(initialPath);

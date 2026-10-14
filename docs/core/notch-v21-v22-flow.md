@@ -228,7 +228,7 @@ flowchart LR
 
 ### 3.4 Boundary / Active-Set Rules (CadAllocation)
 1. `activeRegularPadIds`
-   - Currently comes from `_latestPadMatchResult.RegularToCad.Keys`
+   - Currently comes from `_workflowData.LatestPadMatch.RegularToCad.Keys`
    - Means "regulars to which CAD has already been allocated"
 2. `Regular Visibility Mask (SeeRegular.csv)`
    - A separate set of additional restrictions

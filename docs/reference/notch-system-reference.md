@@ -81,7 +81,7 @@ A CAD pad is not itself a FW memory node, but several diff identities are derive
 ### 4.1.1 Active Regular Set and SeeRegular Mask
 
 - `Match-scope active regular set`
-  - Source: `_latestPadMatchResult.RegularToCad.Keys`
+  - Source: `_workflowData.LatestPadMatch.RegularToCad.Keys`
   - Meaning: Regular pads already assigned to a CAD pad in the current Step1 / matching result
   - Current uses:
     - v2.2 `ToFull` boundary seed

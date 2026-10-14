@@ -132,7 +132,7 @@ public sealed partial class FreeformHelperViewModel
     {
         var hasCad = _cad is not null && _cad.Pads.Count > 0;
         var hasGrid = _grid is not null && _grid.Pads.Count > 0;
-        var hasStep1 = _latestPadMatchResult.CadToRegular.Count > 0;
+        var hasStep1 = _workflowData.LatestPadMatch.CadToRegular.Count > 0;
         var hasStep2 = _grid is not null && _grid.Pads.Any(pad => pad.Freeform != FreeformType.None);
         var hasStep3 = NotchCanvasPreviewItems.Count > 0;
         var hasStep4 = !string.Equals(DxfRegularMappingSummary, DiagnosticsNotRunSummary, StringComparison.Ordinal);

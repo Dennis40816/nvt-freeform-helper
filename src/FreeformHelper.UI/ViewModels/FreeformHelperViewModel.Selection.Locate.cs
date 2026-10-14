@@ -189,7 +189,7 @@ public sealed partial class FreeformHelperViewModel
 
     public IReadOnlyList<int> GetMatchedRegularPadIds(int cadPadId)
     {
-        if (_latestPadMatchResult.CadToRegular.TryGetValue(cadPadId, out var links) && links.Count > 0)
+        if (_workflowData.LatestPadMatch.CadToRegular.TryGetValue(cadPadId, out var links) && links.Count > 0)
         {
             return links
                 .Select(link => link.RegularPadId)
@@ -206,7 +206,7 @@ public sealed partial class FreeformHelperViewModel
 
     public IReadOnlyList<PadMatchLink> GetMatchedRegularLinks(int cadPadId)
     {
-        if (_latestPadMatchResult.CadToRegular.TryGetValue(cadPadId, out var links) && links.Count > 0)
+        if (_workflowData.LatestPadMatch.CadToRegular.TryGetValue(cadPadId, out var links) && links.Count > 0)
         {
             return links;
         }
@@ -227,7 +227,7 @@ public sealed partial class FreeformHelperViewModel
 
     public IReadOnlyList<int> GetMatchedCadPadIds(int regularPadId)
     {
-        if (_latestPadMatchResult.RegularToCad.TryGetValue(regularPadId, out var links) && links.Count > 0)
+        if (_workflowData.LatestPadMatch.RegularToCad.TryGetValue(regularPadId, out var links) && links.Count > 0)
         {
             return links
                 .Select(link => link.CadPadId)
@@ -246,7 +246,7 @@ public sealed partial class FreeformHelperViewModel
 
     public IReadOnlyList<PadMatchLink> GetMatchedCadLinks(int regularPadId)
     {
-        if (_latestPadMatchResult.RegularToCad.TryGetValue(regularPadId, out var links) && links.Count > 0)
+        if (_workflowData.LatestPadMatch.RegularToCad.TryGetValue(regularPadId, out var links) && links.Count > 0)
         {
             return links;
         }

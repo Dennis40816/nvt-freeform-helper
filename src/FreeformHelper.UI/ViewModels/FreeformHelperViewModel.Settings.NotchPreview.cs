@@ -107,7 +107,7 @@ public sealed partial class FreeformHelperViewModel
         var canRefreshPreview =
             _grid is not null &&
             _selectedCadIds.Count > 0 &&
-            _latestPadMatchResult.CadToRegular.Count > 0;
+            _workflowData.LatestPadMatch.CadToRegular.Count > 0;
 
         if (canRefreshPreview)
         {

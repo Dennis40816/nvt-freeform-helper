@@ -160,7 +160,7 @@ public sealed partial class FreeformHelperViewModel
             return false;
         }
 
-        if (_latestPadMatchResult.CadToRegular.Count == 0)
+        if (_workflowData.LatestPadMatch.CadToRegular.Count == 0)
         {
             return false;
         }
@@ -244,7 +244,7 @@ public sealed partial class FreeformHelperViewModel
             cad,
             grid,
             matchingSettings,
-            _latestPadMatchResult));
+            _workflowData.LatestPadMatch));
     }
 
     private void CommitStep2FreeformResult(

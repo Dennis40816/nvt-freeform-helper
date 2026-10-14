@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 187,
+        "stateMembers": 185,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -12716,16 +12716,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "f54cc340df0714381933cc1cad545f8e8c651b50ce546c4862844bdb9af58af5",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.SetPadMatchResults(FreeformHelperViewModel,params (int CadPadId, int RegularPadId)[])",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Helpers.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "4273dca739e293555a4f05f1fa98701f9e5fbbd07f1a7ca23ddf4f1438969288",
