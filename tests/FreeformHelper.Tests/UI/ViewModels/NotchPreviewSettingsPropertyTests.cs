@@ -52,7 +52,7 @@ public sealed class NotchPreviewSettingsPropertyTests
 
     [Theory]
     [MemberData(nameof(SettingIndexes))]
-    public void Set_NewValue_RaisesChangingBeforeChangedOnceAndKeepsTheOtherValues(int index)
+    public async Task Set_NewValue_RaisesChangingBeforeChangedOnceAndKeepsTheOtherValues(int index)
     {
         var setting = _settings[index];
         var vm = new FreeformHelperViewModel();
@@ -62,6 +62,7 @@ public sealed class NotchPreviewSettingsPropertyTests
         vm.PropertyChanged += (_, args) => raised.Enqueue("changed:" + args.PropertyName);
 
         Write(vm, setting.Name, setting.NewValue);
+        await vm.WaitForGridRebuildIdleAsync();
 
         var sequence = raised.ToList();
         Assert.Equal(1, sequence.Count(entry => entry == "changing:" + setting.Name));
@@ -94,20 +95,21 @@ public sealed class NotchPreviewSettingsPropertyTests
 
     [Theory]
     [MemberData(nameof(SettingIndexes))]
-    public void Set_NewValue_SetsTheUnsavedFlagAsBefore(int index)
+    public async Task Set_NewValue_SetsTheUnsavedFlagAsBefore(int index)
     {
         var setting = _settings[index];
         var vm = new FreeformHelperViewModel();
         Assert.False(vm.HasUnsavedChanges);
 
         Write(vm, setting.Name, setting.NewValue);
+        await vm.WaitForGridRebuildIdleAsync();
 
         Assert.Equal(setting.MarksUnsaved, vm.HasUnsavedChanges);
     }
 
     [Theory]
     [MemberData(nameof(SettingIndexes))]
-    public void Set_NewValue_AddsAnUndoEntryOnlyWhereTheSettingHasUndo(int index)
+    public async Task Set_NewValue_AddsAnUndoEntryOnlyWhereTheSettingHasUndo(int index)
     {
         var setting = _settings[index];
         var vm = new FreeformHelperViewModel();
@@ -115,6 +117,7 @@ public sealed class NotchPreviewSettingsPropertyTests
         Assert.False(vm.CanUndo);
 
         Write(vm, setting.Name, setting.NewValue);
+        await vm.WaitForGridRebuildIdleAsync();
 
         Assert.Equal(setting.HasUndo, vm.CanUndo);
         if (!setting.HasUndo)

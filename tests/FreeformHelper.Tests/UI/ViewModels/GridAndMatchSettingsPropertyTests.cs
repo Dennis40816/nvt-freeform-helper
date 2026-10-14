@@ -70,7 +70,7 @@ public sealed class GridAndMatchSettingsPropertyTests
 
     [Theory]
     [MemberData(nameof(SettingIndexes))]
-    public void Set_NewValue_RaisesChangingBeforeChangedOnceAndKeepsTheOtherValues(int index)
+    public async Task Set_NewValue_RaisesChangingBeforeChangedOnceAndKeepsTheOtherValues(int index)
     {
         var setting = _settings[index];
         var vm = new FreeformHelperViewModel();
@@ -80,6 +80,7 @@ public sealed class GridAndMatchSettingsPropertyTests
         vm.PropertyChanged += (_, args) => raised.Enqueue("changed:" + args.PropertyName);
 
         Write(vm, setting.Name, setting.NewValue);
+        await vm.WaitForGridRebuildIdleAsync();
 
         var sequence = raised.ToList();
         if (_recalculated.Contains(setting.Name))
@@ -125,20 +126,21 @@ public sealed class GridAndMatchSettingsPropertyTests
 
     [Theory]
     [MemberData(nameof(SettingIndexes))]
-    public void Set_NewValue_MarksTheProjectAsChanged(int index)
+    public async Task Set_NewValue_MarksTheProjectAsChanged(int index)
     {
         var setting = _settings[index];
         var vm = new FreeformHelperViewModel();
         Assert.False(vm.HasUnsavedChanges);
 
         Write(vm, setting.Name, setting.NewValue);
+        await vm.WaitForGridRebuildIdleAsync();
 
         Assert.True(vm.HasUnsavedChanges);
     }
 
     [Theory]
     [MemberData(nameof(SettingIndexes))]
-    public void Set_NewValue_AddsAnUndoEntryOnlyWhereTheSettingHasUndo(int index)
+    public async Task Set_NewValue_AddsAnUndoEntryOnlyWhereTheSettingHasUndo(int index)
     {
         var setting = _settings[index];
         var vm = new FreeformHelperViewModel();
@@ -146,6 +148,7 @@ public sealed class GridAndMatchSettingsPropertyTests
         Assert.False(vm.CanUndo);
 
         Write(vm, setting.Name, setting.NewValue);
+        await vm.WaitForGridRebuildIdleAsync();
 
         Assert.Equal(setting.HasUndo, vm.CanUndo);
         if (!setting.HasUndo)
