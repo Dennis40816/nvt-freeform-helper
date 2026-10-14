@@ -18,12 +18,8 @@ public sealed partial class FreeformHelperViewModel
     // HashSets for efficient storage and lookup of selected pad IDs/indices.
     private readonly HashSet<int> _selectedCadIds = new();
     private readonly HashSet<int> _selectedRegIndices = new();
-    private CancellationTokenSource? _selectionNotchPreviewCts;
-    private long _selectionNotchPreviewRequestId;
-    private long _lastSelectionSummaryMs;
-    private long _lastSelectionInspectorMs;
-    private long _lastSelectionNotchPreviewMs;
-    private long _lastSelectionTotalMs;
+    private readonly LatestRequestGate _selectionNotchPreviewGate = new();
+    private readonly SelectionTimingRecorder _selectionTimings = new();
 
     /// <summary>
     /// Gets a read-only collection of selected CAD pad IDs.
@@ -43,11 +39,12 @@ public sealed partial class FreeformHelperViewModel
 
     public SelectionTimingSnapshot GetLastSelectionTimingSnapshot()
     {
+        var last = _selectionTimings.Last;
         return new SelectionTimingSnapshot(
-            SummaryMs: Interlocked.Read(ref _lastSelectionSummaryMs),
-            InspectorMs: Interlocked.Read(ref _lastSelectionInspectorMs),
-            NotchPreviewMs: Interlocked.Read(ref _lastSelectionNotchPreviewMs),
-            TotalMs: Interlocked.Read(ref _lastSelectionTotalMs));
+            SummaryMs: last.SummaryMs,
+            InspectorMs: last.InspectorMs,
+            NotchPreviewMs: last.NotchPreviewMs,
+            TotalMs: last.TotalMs);
     }
 
     /// <summary>
@@ -120,10 +117,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var totalDurationMs = selectionSw.ElapsedMilliseconds;
-        Interlocked.Exchange(ref _lastSelectionSummaryMs, summaryDurationMs);
-        Interlocked.Exchange(ref _lastSelectionInspectorMs, inspectorDurationMs);
-        Interlocked.Exchange(ref _lastSelectionNotchPreviewMs, notchPreviewDurationMs);
-        Interlocked.Exchange(ref _lastSelectionTotalMs, totalDurationMs);
+        _selectionTimings.Record(summaryDurationMs, inspectorDurationMs, notchPreviewDurationMs, totalDurationMs);
         var canvasPerfText = BuildCanvasPerfText();
 
         Logger.Debug(
