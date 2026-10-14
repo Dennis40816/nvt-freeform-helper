@@ -16,21 +16,21 @@ public sealed partial class FreeformHelperViewModel
 
         var undoSnapshot = CaptureCadEditUndoSnapshot();
         var previous = new CadEditNotificationSnapshot(this);
-        var restored = _hiddenCadPadIds.Count;
+        var restored = _cadEdit.HiddenCadPadIds.Count;
         var removedCombined = _combinedCad.OutputCadIds.Count;
         var restoredLayerMoves = RelayeredCadPadCount;
         var restoredRotations = RotatedCadPadCount;
-        if (_dxfEditBaselineCad is not null)
+        if (_cadEdit.BaselineCad is not null)
         {
-            _cad = new CadPadSet(_dxfEditBaselineCad.Pads.ToList());
+            _cad = new CadPadSet(_cadEdit.BaselineCad.Pads.ToList());
         }
         else
         {
             RemoveCombinedPadsFromCadSet();
         }
 
-        _hiddenCadPadIds.Clear();
-        _hiddenCadUndoStack.Clear();
+        _cadEdit.HiddenCadPadIds.Clear();
+        _cadEdit.HiddenUndoStack.Clear();
         _combinedCad.Clear();
         _cachedFilteredCadForBuild = null;
         SyncRelayeredCadState(previous);

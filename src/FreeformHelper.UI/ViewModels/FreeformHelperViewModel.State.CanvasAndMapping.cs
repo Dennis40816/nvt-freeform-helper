@@ -290,13 +290,13 @@ public sealed partial class FreeformHelperViewModel
     [ObservableProperty] private bool _isModalLoadingSpinnerVisible;
 
     /// <summary>Gets the number of hidden CAD pads.</summary>
-    public int DeletedCadPadCount => _hiddenCadPadIds.Count;
+    public int DeletedCadPadCount => _cadEdit.HiddenCadPadIds.Count;
 
     /// <summary>Gets whether hidden CAD pads exist.</summary>
     public bool HasDeletedCadPads => DeletedCadPadCount > 0;
 
     /// <summary>Gets the number of detected duplicate CAD pads.</summary>
-    public int DuplicateCadPadCount => _duplicateCadPadIdToCanonicalId.Count;
+    public int DuplicateCadPadCount => _cadEdit.DuplicateCadPadIdToCanonicalId.Count;
 
     /// <summary>Gets whether detected duplicate CAD pads exist.</summary>
     public bool HasDuplicateCadPads => DuplicateCadPadCount > 0;

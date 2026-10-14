@@ -464,7 +464,7 @@ public sealed partial class FreeformHelperViewModel
             return BuildFilteredCadPadSet();
         }
 
-        if (_autoHiddenDuplicateCadPadIds.Count == 0)
+        if (_cadEdit.AutoHiddenDuplicateCadPadIds.Count == 0)
         {
             return _cad;
         }

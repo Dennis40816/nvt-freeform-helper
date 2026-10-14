@@ -39,9 +39,9 @@ public sealed partial class FreeformHelperViewModel
     {
         var entries = new List<DxfEditChangeListEntry>();
         var currentPadsById = _cad?.Pads.ToDictionary(static pad => pad.Id) ?? new Dictionary<int, CadPad>();
-        var baselinePadsById = _dxfEditBaselineCad?.Pads.ToDictionary(static pad => pad.Id) ?? new Dictionary<int, CadPad>();
+        var baselinePadsById = _cadEdit.BaselineCad?.Pads.ToDictionary(static pad => pad.Id) ?? new Dictionary<int, CadPad>();
 
-        foreach (var cadPadId in _hiddenCadPadIds.OrderBy(static id => id))
+        foreach (var cadPadId in _cadEdit.HiddenCadPadIds.OrderBy(static id => id))
         {
             var pad = currentPadsById.GetValueOrDefault(cadPadId) ?? baselinePadsById.GetValueOrDefault(cadPadId);
             if (pad is null)
@@ -89,16 +89,16 @@ public sealed partial class FreeformHelperViewModel
                 canApply: true));
         }
 
-        foreach (var duplicateCadId in _duplicateCadPadIdToCanonicalId.Keys.OrderBy(static id => id))
+        foreach (var duplicateCadId in _cadEdit.DuplicateCadPadIdToCanonicalId.Keys.OrderBy(static id => id))
         {
             if (!currentPadsById.TryGetValue(duplicateCadId, out var duplicatePad))
             {
                 continue;
             }
 
-            var canonicalCadId = _duplicateCadPadIdToCanonicalId[duplicateCadId];
+            var canonicalCadId = _cadEdit.DuplicateCadPadIdToCanonicalId[duplicateCadId];
             var canonicalPad = currentPadsById.GetValueOrDefault(canonicalCadId) ?? baselinePadsById.GetValueOrDefault(canonicalCadId);
-            var isAutoHidden = _autoHiddenDuplicateCadPadIds.Contains(duplicateCadId);
+            var isAutoHidden = _cadEdit.AutoHiddenDuplicateCadPadIds.Contains(duplicateCadId);
             var currentLayerText = canonicalPad is null
                 ? $"Layer {duplicatePad.Layer}"
                 : $"Layer {duplicatePad.Layer} · Canonical CAD {canonicalCadId}";
@@ -233,7 +233,7 @@ public sealed partial class FreeformHelperViewModel
 
                 break;
             case DxfEditChangeKind.Duplicate:
-                if (_autoHiddenDuplicateCadPadIds.Contains(entry.CadPadId))
+                if (_cadEdit.AutoHiddenDuplicateCadPadIds.Contains(entry.CadPadId))
                 {
                     RestoreDuplicateCadPad(entry.CadPadId);
                 }
@@ -257,7 +257,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void RestoreHiddenCadPad(int cadPadId)
     {
-        if (_cad is null || !_hiddenCadPadIds.Contains(cadPadId))
+        if (_cad is null || !_cadEdit.HiddenCadPadIds.Contains(cadPadId))
         {
             return;
         }
@@ -286,12 +286,12 @@ public sealed partial class FreeformHelperViewModel
 
     private void RestoreMovedCadPadLayer(int cadPadId)
     {
-        if (_cad is null || _dxfEditBaselineCad is null)
+        if (_cad is null || _cadEdit.BaselineCad is null)
         {
             return;
         }
 
-        var baselinePad = _dxfEditBaselineCad.Pads.FirstOrDefault(pad => pad.Id == cadPadId);
+        var baselinePad = _cadEdit.BaselineCad.Pads.FirstOrDefault(pad => pad.Id == cadPadId);
         if (baselinePad is null)
         {
             return;

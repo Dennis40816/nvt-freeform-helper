@@ -7,20 +7,20 @@ public sealed partial class FreeformHelperViewModel
 {
     private bool IsCadPadEffectivelyHidden(int cadPadId)
     {
-        return _hiddenCadPadIds.Contains(cadPadId) || _autoHiddenDuplicateCadPadIds.Contains(cadPadId);
+        return _cadEdit.HiddenCadPadIds.Contains(cadPadId) || _cadEdit.AutoHiddenDuplicateCadPadIds.Contains(cadPadId);
     }
 
     private HashSet<int> BuildEffectiveHiddenCadPadIds()
     {
-        var effectiveHiddenIds = _hiddenCadPadIds.ToHashSet();
-        effectiveHiddenIds.UnionWith(_autoHiddenDuplicateCadPadIds);
+        var effectiveHiddenIds = _cadEdit.HiddenCadPadIds.ToHashSet();
+        effectiveHiddenIds.UnionWith(_cadEdit.AutoHiddenDuplicateCadPadIds);
         return effectiveHiddenIds;
     }
 
     private void ClearAutoHiddenDuplicateCadPadState()
     {
-        _autoHiddenDuplicateCadPadIds.Clear();
-        _duplicateCadPadIdToCanonicalId.Clear();
+        _cadEdit.AutoHiddenDuplicateCadPadIds.Clear();
+        _cadEdit.DuplicateCadPadIdToCanonicalId.Clear();
     }
 
     private void SetAutoHiddenDuplicateCadPads(CadPadExactDuplicateSanitizationResult duplicateSanitization)
@@ -42,33 +42,33 @@ public sealed partial class FreeformHelperViewModel
                 continue;
             }
 
-            _autoHiddenDuplicateCadPadIds.Add(duplicateId);
+            _cadEdit.AutoHiddenDuplicateCadPadIds.Add(duplicateId);
         }
 
         foreach (var pair in duplicateSanitization.DuplicateToCanonicalPadId)
         {
-            if (!_autoHiddenDuplicateCadPadIds.Contains(pair.Key) || !validCadIds.Contains(pair.Value))
+            if (!_cadEdit.AutoHiddenDuplicateCadPadIds.Contains(pair.Key) || !validCadIds.Contains(pair.Value))
             {
                 continue;
             }
 
-            _duplicateCadPadIdToCanonicalId[pair.Key] = pair.Value;
+            _cadEdit.DuplicateCadPadIdToCanonicalId[pair.Key] = pair.Value;
         }
 
-        if (_autoHiddenDuplicateCadPadIds.Count > 0)
+        if (_cadEdit.AutoHiddenDuplicateCadPadIds.Count > 0)
         {
             Logger.Debug(
                 CultureInfo.InvariantCulture,
                 "DXF duplicate pads auto-hidden. total={0}, ids={1}.",
-                _autoHiddenDuplicateCadPadIds.Count,
-                string.Join(", ", _autoHiddenDuplicateCadPadIds.OrderBy(static id => id)));
+                _cadEdit.AutoHiddenDuplicateCadPadIds.Count,
+                string.Join(", ", _cadEdit.AutoHiddenDuplicateCadPadIds.OrderBy(static id => id)));
         }
     }
 
     private HashSet<int> GetRestoredDuplicateCadPadIds()
     {
-        var restored = _duplicateCadPadIdToCanonicalId.Keys.ToHashSet();
-        restored.ExceptWith(_autoHiddenDuplicateCadPadIds);
+        var restored = _cadEdit.DuplicateCadPadIdToCanonicalId.Keys.ToHashSet();
+        restored.ExceptWith(_cadEdit.AutoHiddenDuplicateCadPadIds);
         return restored;
     }
 
@@ -80,7 +80,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var duplicateIds = duplicateCadPadIds
-            .Where(_duplicateCadPadIdToCanonicalId.ContainsKey)
+            .Where(_cadEdit.DuplicateCadPadIdToCanonicalId.ContainsKey)
             .Distinct()
             .ToList();
         if (duplicateIds.Count == 0)
@@ -90,7 +90,7 @@ public sealed partial class FreeformHelperViewModel
 
         foreach (var duplicateId in duplicateIds)
         {
-            _autoHiddenDuplicateCadPadIds.Remove(duplicateId);
+            _cadEdit.AutoHiddenDuplicateCadPadIds.Remove(duplicateId);
         }
 
         SyncDuplicateCadState();

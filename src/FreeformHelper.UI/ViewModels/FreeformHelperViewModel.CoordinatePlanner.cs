@@ -39,7 +39,7 @@ public sealed partial class FreeformHelperViewModel
             .OrderBy(static pad => pad.Id)
             .ToArray();
         var allCadPadsForLayerOptions = (_cad?.Pads ?? activeCad.Pads)
-            .Where(pad => !_autoHiddenDuplicateCadPadIds.Contains(pad.Id))
+            .Where(pad => !_cadEdit.AutoHiddenDuplicateCadPadIds.Contains(pad.Id))
             .ToArray();
         var layerNames = allCadPadsForLayerOptions
             .Select(static pad => pad.Layer)

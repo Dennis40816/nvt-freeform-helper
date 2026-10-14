@@ -79,7 +79,7 @@ public sealed partial class FreeformHelperViewModel
             return new HashSet<int>();
         }
 
-        var baselineCadIds = _dxfEditBaselineCad?.Pads.Select(static pad => pad.Id).ToHashSet() ?? new HashSet<int>();
+        var baselineCadIds = _cadEdit.BaselineCad?.Pads.Select(static pad => pad.Id).ToHashSet() ?? new HashSet<int>();
         if (baselineCadIds.Count == 0)
         {
             return new HashSet<int>();
@@ -131,12 +131,12 @@ public sealed partial class FreeformHelperViewModel
 
     private void RestoreRotatedCadPadGeometry(int cadPadId)
     {
-        if (_cad is null || _dxfEditBaselineCad is null)
+        if (_cad is null || _cadEdit.BaselineCad is null)
         {
             return;
         }
 
-        var baselinePad = _dxfEditBaselineCad.Pads.FirstOrDefault(pad => pad.Id == cadPadId);
+        var baselinePad = _cadEdit.BaselineCad.Pads.FirstOrDefault(pad => pad.Id == cadPadId);
         if (baselinePad is null)
         {
             return;
@@ -191,12 +191,12 @@ public sealed partial class FreeformHelperViewModel
 
     private Dictionary<int, ProjectCadGeometrySnapshot> CapturePersistedCadGeometryOverrides()
     {
-        if (_cad is null || _dxfEditBaselineCad is null)
+        if (_cad is null || _cadEdit.BaselineCad is null)
         {
             return new Dictionary<int, ProjectCadGeometrySnapshot>();
         }
 
-        var baselinePadsByCadId = _dxfEditBaselineCad.Pads
+        var baselinePadsByCadId = _cadEdit.BaselineCad.Pads
             .GroupBy(static pad => pad.Id)
             .ToDictionary(static group => group.Key, static group => group.First());
 

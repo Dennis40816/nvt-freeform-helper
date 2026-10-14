@@ -66,7 +66,7 @@ public sealed partial class FreeformHelperViewModel
         _cad = new CadPadSet(cad.Pads.Concat(combinedPads).ToList());
         foreach (var sourceId in sourcePadIds)
         {
-            _hiddenCadPadIds.Add(sourceId);
+            _cadEdit.HiddenCadPadIds.Add(sourceId);
             _combinedCad.GroupIdBySourceCadId[sourceId] = groupId;
         }
 
@@ -86,7 +86,7 @@ public sealed partial class FreeformHelperViewModel
         Logger.Info(CultureInfo.InvariantCulture, "DXF combine applied. source={0}, outputPads={1}, hiddenTotal={2}, combinedTotal={3}, holes={4}.",
             sourcePads.Count,
             combinedPads.Count,
-            _hiddenCadPadIds.Count,
+            _cadEdit.HiddenCadPadIds.Count,
             _combinedCad.OutputCadIds.Count,
             unionResult.HolePathCount);
         MarkUnsaved();
@@ -169,12 +169,12 @@ public sealed partial class FreeformHelperViewModel
         foreach (var outputId in outputIds)
         {
             _combinedCad.GroupIdByOutputCadId.Remove(outputId);
-            _hiddenCadPadIds.Remove(outputId);
+            _cadEdit.HiddenCadPadIds.Remove(outputId);
         }
         var restoredSources = 0;
         foreach (var sourceId in sourceIds)
         {
-            if (_hiddenCadPadIds.Remove(sourceId))
+            if (_cadEdit.HiddenCadPadIds.Remove(sourceId))
             {
                 restoredSources++;
             }
@@ -213,7 +213,7 @@ public sealed partial class FreeformHelperViewModel
             validGroupIds.Count,
             outputIds.Count,
             restoredSources,
-            _hiddenCadPadIds.Count);
+            _cadEdit.HiddenCadPadIds.Count);
         MarkUnsaved();
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), undoLabel);
     }
