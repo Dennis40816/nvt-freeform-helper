@@ -11,7 +11,7 @@
     "bareCatch": 12,
     "catchException": 29,
     "suppressFlagFields": 6,
-    "freeformViewModelStateMembers": 141,
+    "freeformViewModelStateMembers": 135,
     "shellNavigationBooleans": 0,
     "noWarnIds": 3
   },
@@ -86,7 +86,7 @@
     ],
     "suppressFlagFields": [
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:14",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:216",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:320",
       "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:64",
       "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:14", "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:15",
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:17"
@@ -115,7 +115,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SimulationSafetyOverview.cs:15",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:12", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:171", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:311",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Step4Indexing.cs:10", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Step4Indexing.cs:15", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Step4Indexing.cs:20",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:20", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:26", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:32", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:47", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:64", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:70", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:77", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:83", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:90", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:102", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:108", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:181", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:192", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:203", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:216",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:20", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:26", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:32", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:47", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:62", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:126", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:133", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:145", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:320",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkflowSteps.cs:10"
     ],
     "shellNavigationBooleans": [],
