@@ -11,7 +11,8 @@ public sealed class DebtBaselineTests
     // Counts are occurrences, not lines or unique files. Patterns allow whitespace between
     // tokens. Comments/literals are excluded; inactive #if source is included. Source paths
     // and diagnostics use ordinal ordering. This inventory counts storage, not independent
-    // domain facts; extraction into another owner is outside this particular FHVM metric.
+    // domain facts. For the FHVM state metric, a readonly collaborator reference is not counted:
+    // moving state into a readonly holder object lowers that metric without lowering state.
     internal const string AsyncVoidPattern = @"\basync\s+void\b";
     internal const string AsyncVoidLambdaPattern = @"[+\-]=\s*async\b";
 
@@ -51,13 +52,11 @@ public sealed class DebtBaselineTests
 
         // All private instance field declarators of this class across its partial files,
         // plus non-private ObservableProperty field declarators, each counted only once.
-        // Readonly service references count. Stored public properties do not. Nested types
-        // are excluded; filenames do not determine ownership. See ArchitectureSource.Fields.
-        result.Add("freeformViewModelStateMembers", sources.SelectMany(source => source.Fields("FreeformHelperViewModel")
-            .Where(field => field.Modifiers.Contains("private", StringComparison.Ordinal) ||
-                ArchitectureSource.Pattern(@"\[\s*ObservableProperty(?:Attribute)?\s*\][\s\w\[\](),.]*$")
-                    .IsMatch(source.Code[..field.Offset]))
-            .Select(field => source.Location(field.Offset))).ToArray());
+        // Readonly collaborators (services, use cases, owner objects) do not count: the
+        // reference cannot change, and the state they hold is not a slot of this class.
+        // Readonly mutable collections still count. Stored public properties do not. Nested
+        // types are excluded; filenames do not determine ownership. See ArchitectureSource.Fields.
+        result.Add("freeformViewModelStateMembers", MeasureFreeformViewModelStateMembers(sources));
 
         result.Add("shellNavigationBooleans", MeasureShellNavigationBooleans(sources));
 
@@ -84,6 +83,21 @@ public sealed class DebtBaselineTests
         result.Add("noWarnIds", noWarn.ToArray());
         return result;
     }
+
+    internal static string[] MeasureFreeformViewModelStateMembers(ArchitectureSource[] sources) =>
+        sources.SelectMany(source => source.Fields("FreeformHelperViewModel")
+            .Where(field => !IsReadonlyCollaborator(field.Modifiers, field.Type))
+            .Where(field => field.Modifiers.Contains("private", StringComparison.Ordinal) ||
+                ArchitectureSource.Pattern(@"\[\s*ObservableProperty(?:Attribute)?\s*\][\s\w\[\](),.]*$")
+                    .IsMatch(source.Code[..field.Offset]))
+            .Select(field => source.Location(field.Offset))).ToArray();
+
+    // A readonly field cannot be reassigned, so it holds no state slot of its own unless its
+    // type is a mutable collection or an array, whose contents change after construction.
+    internal static bool IsReadonlyCollaborator(string modifiers, string type) =>
+        ArchitectureSource.Pattern(@"\breadonly\b").IsMatch(modifiers) &&
+        !ArchitectureSource.Pattern(@"\[\s*,*\s*\]|\b(?:I?(?:Dictionary|SortedDictionary|SortedList|SortedSet|HashSet|Set|List|Collection)|LinkedList|Stack|Queue|PriorityQueue|ObservableCollection|BindingList|BlockingCollection|Concurrent\w+)\s*<|\b(?:ArrayList|Hashtable|StringBuilder|BitArray)\b")
+            .IsMatch(type);
 
     internal static string[] MeasureShellNavigationBooleans(ArchitectureSource[] sources)
     {
@@ -125,6 +139,39 @@ public sealed class DebtBaselineTests
         }
 
         return navigation.Order(StringComparer.Ordinal).ToArray();
+    }
+
+    [Theory]
+    [InlineData("private readonly SelectionCoordinator _coordinator;", 0)]
+    [InlineData("private readonly PadMatchService _padMatchService = new();", 0)]
+    [InlineData("private readonly bool _showInternalLegacyNotchFields;", 0)]
+    [InlineData("private PadMatchService _padMatchService = new();", 1)]
+    [InlineData("private readonly HashSet<int> _selectedCadIds = new();", 1)]
+    [InlineData("private readonly Dictionary<int, (int A, bool B)> _cache = new();", 1)]
+    [InlineData("private readonly List<IRelayCommand> _commands = [];", 1)]
+    [InlineData("private readonly int[] _slots = new int[4];", 1)]
+    [InlineData("private readonly ImmutableArray<int> _frozen;", 0)]
+    [InlineData("private readonly IReadOnlyList<int> _view;", 0)]
+    [InlineData("private readonly IList<int> _items = [];", 1)]
+    [InlineData("private readonly ICollection<int> _bag = [];", 1)]
+    [InlineData("private readonly IDictionary<int, string> _map = new Dictionary<int, string>();", 1)]
+    [InlineData("private readonly System.Collections.Generic.List<int>? _ids;", 1)]
+    [InlineData("private readonly StringBuilder _text = new();", 1)]
+    [InlineData("private bool _isBusy;", 1)]
+    [InlineData("[ObservableProperty] private bool _isLoading;", 1)]
+    public void FreeformViewModelStateMembersMetric_ReadonlyCollaborators_AreExcludedButMutableStateCounts(
+        string members, int expectedCount)
+    {
+        var source = new ArchitectureSource("src/FreeformHelper.UI/ViewModels/fixture.cs", $$"""
+            class FreeformHelperViewModel
+            {
+                {{members}}
+            }
+            """);
+
+        var measured = MeasureFreeformViewModelStateMembers([source]);
+
+        Assert.Equal(expectedCount, measured.Length);
     }
 
     [Theory]
