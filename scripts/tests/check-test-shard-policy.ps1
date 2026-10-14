@@ -323,11 +323,17 @@ try {
     Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -ceq $expectedDiagnostic)
     Assert-Policy ($actual.Summary.outcome -ceq 'failed' -and $actual.Summary.total -eq 0 -and $actual.Message -ceq 'Shard validation failed.')
     Assert-Policy (($actual.Output -join '') -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
+    # The group list names the group without results: notch-core has its own total, application reads as 0.
+    Assert-Policy (@($actual.Summary.groups).Count -eq 2 -and $actual.Summary.groups[0].name -ceq 'notch-core' -and
+        $actual.Summary.groups[0].total -eq 3 -and $actual.Summary.groups[1].name -ceq 'application' -and
+        $actual.Summary.groups[1].total -eq 0 -and $actual.Summary.groups[1].trxFileCount -eq 1)
 
     Write-FixtureTrx -Directory (Join-Path $groupResultsPath 'application') -Tests $samples
     $actual = Invoke-FixtureCheck -ResultsDirectory $groupResultsPath -RunDiagnostics $groupDiagnostics
     Assert-Policy ($actual.Summary.outcome -ceq 'passed' -and $actual.Summary.total -eq 6 -and $actual.Message -ceq '')
     Assert-Policy (($actual.Output -join "`n") -ceq '[check-test-shard] total 6 passed 6 failed 0 skipped 0 notExecuted 0')
+    Assert-Policy (@($actual.Summary.groups).Count -eq 2 -and $actual.Summary.groups[0].total -eq 3 -and
+        $actual.Summary.groups[1].total -eq 3)
 
     # A corrupt file outside the known group directories has no attributable group.
     [System.IO.File]::WriteAllText((Join-Path $groupResultsPath 'fixture.trx'), 'PRIVATE-MARKER-DO-NOT-PRINT')

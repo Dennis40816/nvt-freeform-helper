@@ -49,7 +49,8 @@ The workflow change that enables floors adds it as a separate step.
 
 `./scripts/verify.ps1 -CiLane test -Shard core -EnforceFloors -SummaryPath build/ci-test-summaries/core/shard-summary.json`
 collects TRX under `build/ci-test-results/`, checks counts, zero skips, required golden classes,
-example-data execution and unset update-mode variables, writes a counts-and-method-names summary,
+example-data execution and unset update-mode variables, writes a counts-and-method-names summary
+with one `groups` entry per test group (fixed name, exit code, TRX file count and total),
 then deletes the private results. Tests keep the existing implicit restore behavior of `dotnet test`;
 `verify.ps1` fetches and verifies Core packages first, so no extra workflow restore step is needed. Without
 `-EnforceFloors` the existing behavior is unchanged. The baseline is `scripts/ci/test-baseline.json`;
