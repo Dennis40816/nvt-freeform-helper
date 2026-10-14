@@ -11,12 +11,9 @@ namespace FreeformHelper.Tests;
 /// inventory item 8: scan order, grid alignment, regular source mode, CAD output FW diff auto
 /// mode). Each pair is two properties of the view model that copy each other through property
 /// callbacks. A change of either side moves the other side, raises the change notification of
-/// both and, for three of the pairs, marks the project as changed. The regular source mode pair
-/// is not in the list of settings that mark the project as changed, so its tests do not assert
-/// the unsaved flag: the flag after such a change depends on side effects of the grid rebuild
-/// and on the UI thread context of the test. A project load sets both sides from the file. These
-/// tests describe the current behavior. A change that derives the option from the enum must keep
-/// every value here, or say so in its pull request.
+/// both and marks the project as changed. A project load sets both sides from the file and leaves
+/// the project clean. These tests describe the current behavior. A change that derives the option
+/// from the enum must keep every value here, or say so in its pull request.
 /// </summary>
 [Collection("HeadlessUiSerial")]
 public sealed class SettingsOptionMirrorCharacterizationTests
@@ -93,6 +90,7 @@ public sealed class SettingsOptionMirrorCharacterizationTests
         Assert.Equal(target, vm.SelectedRegularSourceModeOption.Value);
         Assert.Equal(1, raised.Count(name => name == nameof(FreeformHelperViewModel.RegularSourceMode)));
         Assert.Equal(1, raised.Count(name => name == nameof(FreeformHelperViewModel.SelectedRegularSourceModeOption)));
+        Assert.True(vm.HasUnsavedChanges);
     }
 
     [Fact]
@@ -107,6 +105,7 @@ public sealed class SettingsOptionMirrorCharacterizationTests
         Assert.Equal(target.Value, vm.RegularSourceMode);
         Assert.Equal(1, raised.Count(name => name == nameof(FreeformHelperViewModel.RegularSourceMode)));
         Assert.Equal(1, raised.Count(name => name == nameof(FreeformHelperViewModel.SelectedRegularSourceModeOption)));
+        Assert.True(vm.HasUnsavedChanges);
     }
 
     [Fact]

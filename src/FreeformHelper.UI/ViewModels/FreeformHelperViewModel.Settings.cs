@@ -204,7 +204,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         // Check if the changed property is one of the persisted settings.
-        if (DirtySettingNames.Value.Contains(e.PropertyName))
+        if (_dirtySettingNames.Value.Contains(e.PropertyName))
         {
             MarkUnsaved(); // Mark the project as unsaved.
             SchedulePersistAppGeneralSettings();

@@ -6,7 +6,7 @@ public sealed partial class FreeformHelperViewModel
     /// A lazy-initialized HashSet containing the names of properties that, when changed,
     /// should mark the project as having unsaved changes.
     /// </summary>
-    private static readonly Lazy<HashSet<string>> DirtySettingNames = new(() => new HashSet<string>(StringComparer.Ordinal)
+    private static readonly Lazy<HashSet<string>> _dirtySettingNames = new(() => new HashSet<string>(StringComparer.Ordinal)
     {
         nameof(ShowCad),
         nameof(ShowRegular),
@@ -23,6 +23,8 @@ public sealed partial class FreeformHelperViewModel
         nameof(SelectedScanOrderOption), // This is a UI-specific proxy for SelectedScanOrder, changes to it impact the underlying setting
         nameof(GridAlignmentMode),
         nameof(SelectedGridAlignmentOption), // UI proxy
+        nameof(RegularSourceMode),
+        nameof(SelectedRegularSourceModeOption), // UI proxy
         nameof(GridPaddingPercent),
         nameof(ActiveAreaWidth),
         nameof(ActiveAreaHeight),
