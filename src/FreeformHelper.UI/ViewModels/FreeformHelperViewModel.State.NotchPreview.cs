@@ -11,29 +11,123 @@ public sealed partial class FreeformHelperViewModel
 {
     [ObservableProperty] private ObservableCollection<NotchCanvasPreviewItem> _notchCanvasPreviewItems = new();
 
+    // The notch preview settings are stored once. The properties below forward to the record and raise
+    // the same notifications and callbacks as the stored properties they replaced.
+    private NotchPreviewSettings _notchPreview = NotchPreviewSettings.Initial;
+
     /// <summary>
     /// Gets or sets a value indicating whether Notch 2.2 canvas preview is active.
     /// </summary>
-    [ObservableProperty] private bool _showNotchCanvasPreview = true;
+    public bool ShowNotchCanvasPreview
+    {
+        get => _notchPreview.ShowNotchCanvasPreview;
+        set
+        {
+            if (_notchPreview.ShowNotchCanvasPreview == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchPreview = _notchPreview with { ShowNotchCanvasPreview = value };
+            OnShowNotchCanvasPreviewChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnShowNotchCanvasPreviewChanged(bool value);
 
     /// <summary>
     /// Gets or sets a value indicating whether To Regular ratio labels should render on AA canvas.
     /// </summary>
-    [ObservableProperty] private bool _showNotchToRegularLabels = true;
+    public bool ShowNotchToRegularLabels
+    {
+        get => _notchPreview.ShowNotchToRegularLabels;
+        set
+        {
+            if (_notchPreview.ShowNotchToRegularLabels == value)
+            {
+                return;
+            }
+
+            OnShowNotchToRegularLabelsChanging(value);
+            OnPropertyChanging();
+            _notchPreview = _notchPreview with { ShowNotchToRegularLabels = value };
+            OnShowNotchToRegularLabelsChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnShowNotchToRegularLabelsChanging(bool value);
+
+    partial void OnShowNotchToRegularLabelsChanged(bool value);
 
     /// <summary>
     /// Gets or sets staged To Full visualization step on AA canvas.
     /// 1 = polygon-overlap seed, 2 = boundary candidate regulars, 3 = final To Full result.
     /// </summary>
-    [ObservableProperty] private decimal _notchPreviewVisualizationStep = 3m;
+    public decimal NotchPreviewVisualizationStep
+    {
+        get => _notchPreview.NotchPreviewVisualizationStep;
+        set
+        {
+            if (_notchPreview.NotchPreviewVisualizationStep == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchPreview = _notchPreview with { NotchPreviewVisualizationStep = value };
+            OnNotchPreviewVisualizationStepChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnNotchPreviewVisualizationStepChanged(decimal value);
+
     /// <summary>
     /// Gets or sets a value indicating whether Step 3 preview stage should auto-play (1->2->3 loop).
     /// </summary>
-    [ObservableProperty] private bool _notchPreviewAutoPlayEnabled = true;
+    public bool NotchPreviewAutoPlayEnabled
+    {
+        get => _notchPreview.NotchPreviewAutoPlayEnabled;
+        set
+        {
+            if (_notchPreview.NotchPreviewAutoPlayEnabled == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchPreview = _notchPreview with { NotchPreviewAutoPlayEnabled = value };
+            OnNotchPreviewAutoPlayEnabledChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnNotchPreviewAutoPlayEnabledChanged(bool value);
+
     /// <summary>
     /// Gets or sets Step 3 preview auto-play interval in milliseconds.
     /// </summary>
-    [ObservableProperty] private decimal _notchPreviewAutoPlayIntervalMs = 700m;
+    public decimal NotchPreviewAutoPlayIntervalMs
+    {
+        get => _notchPreview.NotchPreviewAutoPlayIntervalMs;
+        set
+        {
+            if (_notchPreview.NotchPreviewAutoPlayIntervalMs == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchPreview = _notchPreview with { NotchPreviewAutoPlayIntervalMs = value };
+            OnNotchPreviewAutoPlayIntervalMsChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnNotchPreviewAutoPlayIntervalMsChanged(decimal value);
 
     /// <summary>
     /// Gets a value indicating whether the quick To Full display toggle is available.
