@@ -57,24 +57,67 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool HasStatusDisplay => HasStatusDisplayFor(StatusText);
 
+    // The inspector panel inputs and flags are stored once. The properties below forward to the record and
+    // raise the same notifications and callbacks as the stored properties they replaced.
+    private InspectorPanelState _inspectorPanel = InspectorPanelState.Initial;
+
     /// <summary>
     /// Gets or sets quick-locate CAD pad id input used by Inspector panel.
     /// </summary>
-    [ObservableProperty]
-    private decimal _quickLocateCadPadId;
+    public decimal QuickLocateCadPadId
+    {
+        get => _inspectorPanel.QuickLocateCadPadId;
+        set
+        {
+            if (_inspectorPanel.QuickLocateCadPadId == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _inspectorPanel = _inspectorPanel with { QuickLocateCadPadId = value };
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     /// Gets or sets quick-locate regular pad index input used by Inspector panel.
     /// </summary>
-    [ObservableProperty]
-    private decimal _quickLocateRegularPadIndex;
+    public decimal QuickLocateRegularPadIndex
+    {
+        get => _inspectorPanel.QuickLocateRegularPadIndex;
+        set
+        {
+            if (_inspectorPanel.QuickLocateRegularPadIndex == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _inspectorPanel = _inspectorPanel with { QuickLocateRegularPadIndex = value };
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     /// Gets or sets the unified quick-focus query used by the Inspector panel.
     /// Examples: CAD 4809, REG 4616, DIFF 72, IC1 DIFF72.
     /// </summary>
-    [ObservableProperty]
-    private string _quickFocusQueryText = string.Empty;
+    public string QuickFocusQueryText
+    {
+        get => _inspectorPanel.QuickFocusQueryText;
+        set
+        {
+            if (_inspectorPanel.QuickFocusQueryText == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _inspectorPanel = _inspectorPanel with { QuickFocusQueryText = value };
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     /// Gets or sets the latest pad inspector snapshot used by popover/CLI/right-side details.
@@ -104,8 +147,24 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets whether right panel is currently on Settings tab.
     /// </summary>
-    [ObservableProperty]
-    private bool _isRightPanelSettingsTab = true;
+    public bool IsRightPanelSettingsTab
+    {
+        get => _inspectorPanel.IsRightPanelSettingsTab;
+        set
+        {
+            if (_inspectorPanel.IsRightPanelSettingsTab == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _inspectorPanel = _inspectorPanel with { IsRightPanelSettingsTab = value };
+            OnIsRightPanelSettingsTabChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnIsRightPanelSettingsTabChanged(bool value);
 
     /// <summary>
     /// Gets or sets whether right panel is currently on Inspector tab.
@@ -177,8 +236,24 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets whether pad inspector trace is expanded in top strip.
     /// </summary>
-    [ObservableProperty]
-    private bool _isPadInspectorTraceExpanded;
+    public bool IsPadInspectorTraceExpanded
+    {
+        get => _inspectorPanel.IsPadInspectorTraceExpanded;
+        set
+        {
+            if (_inspectorPanel.IsPadInspectorTraceExpanded == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _inspectorPanel = _inspectorPanel with { IsPadInspectorTraceExpanded = value };
+            OnIsPadInspectorTraceExpandedChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnIsPadInspectorTraceExpandedChanged(bool value);
 
     /// <summary>
     /// Gets the toggle text for pad inspector trace expander.
@@ -188,8 +263,24 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets whether top-strip rule trace popup is open.
     /// </summary>
-    [ObservableProperty]
-    private bool _isPadInspectorTracePopupOpen;
+    public bool IsPadInspectorTracePopupOpen
+    {
+        get => _inspectorPanel.IsPadInspectorTracePopupOpen;
+        set
+        {
+            if (_inspectorPanel.IsPadInspectorTracePopupOpen == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _inspectorPanel = _inspectorPanel with { IsPadInspectorTracePopupOpen = value };
+            OnIsPadInspectorTracePopupOpenChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnIsPadInspectorTracePopupOpenChanged(bool value);
 
     /// <summary>
     /// Gets the toggle text for the top-strip rule trace popup.
@@ -199,8 +290,21 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets whether Debug raw section in inspector rule trace is expanded.
     /// </summary>
-    [ObservableProperty]
-    private bool _isPadInspectorRawTraceExpanded;
+    public bool IsPadInspectorRawTraceExpanded
+    {
+        get => _inspectorPanel.IsPadInspectorRawTraceExpanded;
+        set
+        {
+            if (_inspectorPanel.IsPadInspectorRawTraceExpanded == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _inspectorPanel = _inspectorPanel with { IsPadInspectorRawTraceExpanded = value };
+            OnPropertyChanged();
+        }
+    }
 
     partial void OnIsRightPanelSettingsTabChanged(bool value)
     {
