@@ -336,9 +336,9 @@ Notes:
   - [Rebuild] [View] [Status]
 - OnCadLineOpacityChanged / OnRegularLineOpacityChanged
   - [Rebuild] [Status]
-- OnSelectedScanOrderOptionChanged / OnSelectedScanOrderChanged
+- OnSelectedScanOrderChanged (SelectedScanOrderOption is derived from the value)
   - [Rebuild] [Status]
-- OnSelectedGridAlignmentOptionChanged / OnGridAlignmentModeChanged
+- OnGridAlignmentModeChanged (SelectedGridAlignmentOption is derived from the value)
   - [Rebuild] [View] [Status]
 - OnXChannelsChanged / OnYChannelsChanged / OnCascadeNumChanged / OnGridPaddingPercentChanged
   - [Rebuild] [View] [Status]
