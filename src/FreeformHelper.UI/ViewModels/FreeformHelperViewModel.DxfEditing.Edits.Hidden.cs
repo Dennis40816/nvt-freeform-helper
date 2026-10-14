@@ -26,10 +26,10 @@ public sealed partial class FreeformHelperViewModel
         var previous = new CadEditNotificationSnapshot(this);
         foreach (var id in selected)
         {
-            _hiddenCadPadIds.Add(id);
+            _cadEdit.HiddenCadPadIds.Add(id);
         }
 
-        _hiddenCadUndoStack.Push(selected);
+        _cadEdit.HiddenUndoStack.Push(selected);
         SyncHiddenCadIdsToProject(previous);
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
@@ -40,7 +40,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus($"DXF edit: hid {selected.Count} CAD pad(s).");
-        Logger.Info(CultureInfo.InvariantCulture, "DXF edit hid {0} pad(s). Hidden total={1}.", selected.Count, _hiddenCadPadIds.Count);
+        Logger.Info(CultureInfo.InvariantCulture, "DXF edit hid {0} pad(s). Hidden total={1}.", selected.Count, _cadEdit.HiddenCadPadIds.Count);
         MarkUnsaved();
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), "DXF hide CAD pads");
     }
@@ -53,9 +53,9 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        while (_hiddenCadUndoStack.Count > 0)
+        while (_cadEdit.HiddenUndoStack.Count > 0)
         {
-            var batch = _hiddenCadUndoStack.Pop();
+            var batch = _cadEdit.HiddenUndoStack.Pop();
             var restored = RestoreHiddenCadPadsCore(
                 batch,
                 undoLabel: "DXF restore hidden CAD pads",
@@ -121,7 +121,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var duplicateIds = cadPadIds
-            .Where(_duplicateCadPadIdToCanonicalId.ContainsKey)
+            .Where(_cadEdit.DuplicateCadPadIdToCanonicalId.ContainsKey)
             .Distinct()
             .OrderBy(static id => id)
             .ToList();
@@ -133,7 +133,7 @@ public sealed partial class FreeformHelperViewModel
         var changedIds = new List<int>();
         foreach (var duplicateId in duplicateIds)
         {
-            var isCurrentlyAutoHidden = _autoHiddenDuplicateCadPadIds.Contains(duplicateId);
+            var isCurrentlyAutoHidden = _cadEdit.AutoHiddenDuplicateCadPadIds.Contains(duplicateId);
             if (autoHide == isCurrentlyAutoHidden)
             {
                 continue;
@@ -152,11 +152,11 @@ public sealed partial class FreeformHelperViewModel
         {
             if (autoHide)
             {
-                _autoHiddenDuplicateCadPadIds.Add(duplicateId);
+                _cadEdit.AutoHiddenDuplicateCadPadIds.Add(duplicateId);
             }
             else
             {
-                _autoHiddenDuplicateCadPadIds.Remove(duplicateId);
+                _cadEdit.AutoHiddenDuplicateCadPadIds.Remove(duplicateId);
             }
         }
 
@@ -176,14 +176,14 @@ public sealed partial class FreeformHelperViewModel
             "DXF duplicate visibility updated. autoHide={0}, changed={1}, autoHiddenTotal={2}.",
             autoHide,
             changedIds.Count,
-            _autoHiddenDuplicateCadPadIds.Count);
+            _cadEdit.AutoHiddenDuplicateCadPadIds.Count);
         MarkUnsaved();
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), undoLabel);
     }
 
     private List<int> GetManualHiddenCadPadIds()
     {
-        return _hiddenCadPadIds
+        return _cadEdit.HiddenCadPadIds
             .Where(id => !_combinedCad.GroupIdBySourceCadId.ContainsKey(id))
             .Distinct()
             .OrderBy(static id => id)
@@ -203,7 +203,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var restorableIds = cadPadIds
-            .Where(id => _hiddenCadPadIds.Contains(id) && !_combinedCad.GroupIdBySourceCadId.ContainsKey(id))
+            .Where(id => _cadEdit.HiddenCadPadIds.Contains(id) && !_combinedCad.GroupIdBySourceCadId.ContainsKey(id))
             .Distinct()
             .OrderBy(static id => id)
             .ToList();
@@ -216,7 +216,7 @@ public sealed partial class FreeformHelperViewModel
         var previous = new CadEditNotificationSnapshot(this);
         foreach (var id in restorableIds)
         {
-            _hiddenCadPadIds.Remove(id);
+            _cadEdit.HiddenCadPadIds.Remove(id);
             if (removeFromUndoBatches)
             {
                 RemoveHiddenCadIdFromUndoBatches(id);
@@ -239,7 +239,7 @@ public sealed partial class FreeformHelperViewModel
             "{0}. restored={1}, hiddenTotal={2}.",
             logContext,
             restorableIds.Count,
-            _hiddenCadPadIds.Count);
+            _cadEdit.HiddenCadPadIds.Count);
         MarkUnsaved();
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), undoLabel);
         return restorableIds.Count;

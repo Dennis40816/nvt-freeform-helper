@@ -75,12 +75,8 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     // --- Internal State Management ---
     private readonly Dictionary<int, double> _cadPadCustomValues = new(); // Stores custom user-defined values for CAD pads.
-    private readonly HashSet<int> _hiddenCadPadIds = new();
-    private readonly HashSet<int> _autoHiddenDuplicateCadPadIds = new();
-    private readonly Dictionary<int, int> _duplicateCadPadIdToCanonicalId = new();
-    private readonly Stack<List<int>> _hiddenCadUndoStack = new();
+    private readonly CadEditState _cadEdit = new(); // Holds the hidden, duplicate and baseline data of the CAD edits.
     private readonly CombinedCadState _combinedCad = new();
-    private CadPadSet? _dxfEditBaselineCad;
     private readonly Dictionary<string, WorkspaceHeaderItem> _workspaceHeaderItemMap = new(); // Maps keys to header items.
     private string? _lastSavedPath; // Stores the path where the project was last saved.
     // Independent nesting-safe suppression counters; UI-thread-only access.

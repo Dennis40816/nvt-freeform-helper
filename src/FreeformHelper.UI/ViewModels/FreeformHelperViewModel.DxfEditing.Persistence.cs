@@ -28,7 +28,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var validCadIds = _cad.Pads.Select(static pad => pad.Id).ToHashSet();
-        file.HiddenCadPadIds = _hiddenCadPadIds
+        file.HiddenCadPadIds = _cadEdit.HiddenCadPadIds
             .Where(validCadIds.Contains)
             .ToHashSet();
         file.VisibleDuplicateCadPadIds = GetRestoredDuplicateCadPadIds()
@@ -73,12 +73,12 @@ public sealed partial class FreeformHelperViewModel
 
     private Dictionary<int, string> CapturePersistedCadLayerOverrides()
     {
-        if (_cad is null || _dxfEditBaselineCad is null)
+        if (_cad is null || _cadEdit.BaselineCad is null)
         {
             return new Dictionary<int, string>();
         }
 
-        var baselineLayersByCadId = _dxfEditBaselineCad.Pads
+        var baselineLayersByCadId = _cadEdit.BaselineCad.Pads
             .GroupBy(static pad => pad.Id)
             .ToDictionary(static group => group.Key, static group => group.First().Layer);
 
@@ -153,7 +153,7 @@ public sealed partial class FreeformHelperViewModel
         var combinedSourceCadIds = ReplayPersistedCombinedCadGroups(state.CombinedCadGroups);
         SetHiddenCadPads(state.HiddenCadPadIds.Concat(combinedSourceCadIds), previous);
         ApplyPersistedVisibleDuplicateCadPads(state.VisibleDuplicateCadPadIds);
-        _hiddenCadUndoStack.Clear();
+        _cadEdit.HiddenUndoStack.Clear();
         _cachedFilteredCadForBuild = null;
         SyncRelayeredCadState(previous);
         SyncRotatedCadState(previous);

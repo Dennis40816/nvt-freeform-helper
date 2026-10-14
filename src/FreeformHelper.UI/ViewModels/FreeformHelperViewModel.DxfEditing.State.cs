@@ -33,8 +33,8 @@ public sealed partial class FreeformHelperViewModel
 
     private void ClearDxfEditRuntimeState(bool resetBaseline, CadEditNotificationSnapshot previous)
     {
-        _hiddenCadPadIds.Clear();
-        _hiddenCadUndoStack.Clear();
+        _cadEdit.HiddenCadPadIds.Clear();
+        _cadEdit.HiddenUndoStack.Clear();
         _combinedCad.Clear();
         if (resetBaseline)
         {
@@ -49,7 +49,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void ResetDxfEditBaselineCore(CadPadSet? cad, CadEditNotificationSnapshot previous)
     {
-        _dxfEditBaselineCad = cad is null
+        _cadEdit.BaselineCad = cad is null
             ? null
             : new CadPadSet(cad.Pads.ToList());
         SyncRelayeredCadState(previous);
@@ -59,7 +59,7 @@ public sealed partial class FreeformHelperViewModel
     private void SetHiddenCadPads(IEnumerable<int> hiddenIds, CadEditNotificationSnapshot? previous = null)
     {
         previous ??= new CadEditNotificationSnapshot(this);
-        _hiddenCadPadIds.Clear();
+        _cadEdit.HiddenCadPadIds.Clear();
 
         if (_cad is null)
         {
@@ -73,13 +73,13 @@ public sealed partial class FreeformHelperViewModel
         {
             if (valid.Contains(id))
             {
-                _hiddenCadPadIds.Add(id);
+                _cadEdit.HiddenCadPadIds.Add(id);
             }
         }
 
         SyncHiddenCadIdsToProject(previous);
         SyncCombinedCadState(previous);
-        Logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads set from project. Hidden total={0}.", _hiddenCadPadIds.Count);
+        Logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads set from project. Hidden total={0}.", _cadEdit.HiddenCadPadIds.Count);
     }
 
     private void ResetHiddenCadPads(CadEditNotificationSnapshot previous)
@@ -95,7 +95,7 @@ public sealed partial class FreeformHelperViewModel
     {
         previous ??= new CadEditNotificationSnapshot(this);
         var hadEdits = previous.HasAny;
-        _projectFile.HiddenCadPadIds = _hiddenCadPadIds.ToHashSet();
+        _projectFile.HiddenCadPadIds = _cadEdit.HiddenCadPadIds.ToHashSet();
         NotifyCadEditProjectionChange(nameof(DeletedCadPadCount), previous.Deleted, DeletedCadPadCount);
         NotifyCadEditProjectionChange(nameof(HasDeletedCadPads), previous.Deleted > 0, HasDeletedCadPads);
         previous.Deleted = DeletedCadPadCount;
@@ -132,7 +132,7 @@ public sealed partial class FreeformHelperViewModel
     {
         previous ??= new CadEditNotificationSnapshot(this);
         var hadEdits = previous.HasAny;
-        if (_dxfEditBaselineCad is null || _cad is null)
+        if (_cadEdit.BaselineCad is null || _cad is null)
         {
             RelayeredCadPadCount = 0;
             NotifyCadEditProjectionChange(nameof(HasRelayeredCadPads), previous.Relayered > 0, HasRelayeredCadPads);
@@ -141,7 +141,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var baselineLayersByCadId = _dxfEditBaselineCad.Pads
+        var baselineLayersByCadId = _cadEdit.BaselineCad.Pads
             .GroupBy(static pad => pad.Id)
             .ToDictionary(static group => group.Key, static group => group.First().Layer);
         var relayeredCount = _cad.Pads.Count(pad =>
@@ -159,7 +159,7 @@ public sealed partial class FreeformHelperViewModel
     {
         previous ??= new CadEditNotificationSnapshot(this);
         var hadEdits = previous.HasAny;
-        if (_dxfEditBaselineCad is null || _cad is null)
+        if (_cadEdit.BaselineCad is null || _cad is null)
         {
             RotatedCadPadCount = 0;
             NotifyCadEditProjectionChange(nameof(HasRotatedCadPads), previous.Rotated > 0, HasRotatedCadPads);
@@ -168,7 +168,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var baselinePadsByCadId = _dxfEditBaselineCad.Pads
+        var baselinePadsByCadId = _cadEdit.BaselineCad.Pads
             .GroupBy(static pad => pad.Id)
             .ToDictionary(static group => group.Key, static group => group.First());
         var rotatedCount = _cad.Pads.Count(pad =>

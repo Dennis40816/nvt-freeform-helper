@@ -10,9 +10,9 @@ public sealed partial class FreeformHelperViewModel
 
     public bool HasSelectedCombinedCadPadsForDxfEdit => _selectedCadIds.Any(id => TryResolveCombinedCadGroupId(id, out _));
 
-    public bool HasManualHiddenCadPads => _hiddenCadPadIds.Any(id => !_combinedCad.GroupIdBySourceCadId.ContainsKey(id));
+    public bool HasManualHiddenCadPads => _cadEdit.HiddenCadPadIds.Any(id => !_combinedCad.GroupIdBySourceCadId.ContainsKey(id));
 
-    public bool HasDetectedDuplicateCadPads => _duplicateCadPadIdToCanonicalId.Count > 0;
+    public bool HasDetectedDuplicateCadPads => _cadEdit.DuplicateCadPadIdToCanonicalId.Count > 0;
 
     public bool CanMoveSelectedCadPadsToLayer =>
         _cad is not null &&
@@ -38,7 +38,7 @@ public sealed partial class FreeformHelperViewModel
 
     public string DuplicateDxfEditBadgeTooltip =>
         FormattableString.Invariant(
-            $"Duplicate groups: {DuplicateCadPadCount}. Auto-hidden exact duplicates: {_autoHiddenDuplicateCadPadIds.Count}, restored: {GetRestoredDuplicateCadPadIds().Count}. Click to open duplicate details.");
+            $"Duplicate groups: {DuplicateCadPadCount}. Auto-hidden exact duplicates: {_cadEdit.AutoHiddenDuplicateCadPadIds.Count}, restored: {GetRestoredDuplicateCadPadIds().Count}. Click to open duplicate details.");
 
     public string MovedDxfEditBadgeTooltip =>
         FormattableString.Invariant($"Moved pads: {RelayeredCadPadCount}. Click to open layer-move details.");
