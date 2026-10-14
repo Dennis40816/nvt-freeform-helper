@@ -45,8 +45,8 @@ public sealed partial class FreeformHelperViewModel
 
     private void PreserveDxfDependentLayerSelections()
     {
-        _pendingBoundLayerName = SelectedBoundLayerOption?.Name;
-        _pendingRegularSourceLayerName = SelectedRegularSourceLayerOption?.Name;
+        _pendingLayerSelection.BoundLayerName = SelectedBoundLayerOption?.Name;
+        _pendingLayerSelection.RegularSourceLayerName = SelectedRegularSourceLayerOption?.Name;
     }
 
     private void MoveSelectedCadPadsToLayer()
