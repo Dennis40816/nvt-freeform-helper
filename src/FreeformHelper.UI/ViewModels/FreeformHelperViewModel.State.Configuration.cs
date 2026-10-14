@@ -54,14 +54,6 @@ public sealed partial class FreeformHelperViewModel
 
     // View settings
     /// <summary>
-    /// Gets or sets the area bucket tolerance for coloring pads by area.
-    /// </summary>
-    [ObservableProperty] private decimal _areaBucketTolerance = 0.001m;
-    /// <summary>
-    /// Gets or sets the maximum number of area buckets to use for coloring pads.
-    /// </summary>
-    [ObservableProperty] private decimal _maxAreaBuckets = 32m;
-    /// <summary>
     /// Gets or sets the global UI font size scale in percent.
     /// </summary>
     [ObservableProperty] private decimal _globalFontSizePercent = 120m;
@@ -200,14 +192,6 @@ public sealed partial class FreeformHelperViewModel
     partial void OnCoordinatePixelHeightChanged(decimal value);
 
     /// <summary>
-    /// Gets or sets the preferred AA outline layer name used by Coordinate.
-    /// </summary>
-    [ObservableProperty] private string _coordinatePreferredAaOutlineLayerName = string.Empty;
-    /// <summary>
-    /// Gets or sets the currently selected <see cref="ScanOrder"/> enumeration value.
-    /// </summary>
-    [ObservableProperty] private ScanOrder _selectedScanOrder;
-    /// <summary>
     /// Gets or sets the currently selected <see cref="ScanOrderOption"/> object.
     /// </summary>
     public ScanOrderOption SelectedScanOrderOption
@@ -233,14 +217,6 @@ public sealed partial class FreeformHelperViewModel
             OnPropertyChanged(nameof(SelectedScanOrderOption));
         }
     }
-    /// <summary>
-    /// Gets or sets the currently selected <see cref="GridAlignmentMode"/> enumeration value.
-    /// </summary>
-    [ObservableProperty] private GridAlignmentMode _gridAlignmentMode;
-    /// <summary>
-    /// Gets or sets the currently selected <see cref="RegularSourceMode"/> enumeration value.
-    /// </summary>
-    [ObservableProperty] private RegularSourceMode _regularSourceMode;
     /// <summary>
     /// Gets or sets the currently selected <see cref="GridAlignmentOption"/> object.
     /// </summary>
@@ -663,19 +639,6 @@ public sealed partial class FreeformHelperViewModel
     [ObservableProperty] private ObservableCollection<int> _cadOutputFwDiffIndexAnchorCadIdsForCanvas = new();
 
     // Sizing scopes for manual adjustments.
-
-    /// <summary>
-    /// Gets or sets a value indicating whether local sizing (row-local width, column-local height) is enabled.
-    /// </summary>
-    [ObservableProperty] private bool _useLocalSizing = true;
-    /// <summary>
-    /// Gets or sets a value indicating whether width adjustment is row-local.
-    /// </summary>
-    [ObservableProperty] private bool _isWidthRowLocal = true;
-    /// <summary>
-    /// Gets or sets a value indicating whether height adjustment is column-local.
-    /// </summary>
-    [ObservableProperty] private bool _isHeightColumnLocal = true;
 
     /// <summary>
     /// Partial method invoked when <see cref="UseLocalSizing"/> property changes.
