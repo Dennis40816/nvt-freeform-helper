@@ -131,6 +131,21 @@ try {
     })
     $actual = Invoke-FixtureCheck -RunDiagnostics $fixtureDiagnostics
     Assert-Policy ($actual.Summary.outcome -ceq 'passed' -and ($actual.Output -join "`n") -ceq $normalOutput)
+    # The summary lists each known group with only its name, exit code, TRX file count and total.
+    Assert-Policy (@($actual.Summary.groups).Count -eq 1 -and $actual.Summary.groups[0].name -ceq 'notch-core' -and
+        $actual.Summary.groups[0].exitCode -eq 0 -and $actual.Summary.groups[0].trxFileCount -eq 1)
+    Assert-Policy (@($actual.Summary.groups[0].psobject.Properties.Name) -join ',' -ceq 'name,exitCode,trxFileCount,total')
+    $unknownDiagnostics = @([pscustomobject]@{
+        Group = 'C:private-folder'; Phase = 'read-results'; ExitCode = 0; ExceptionType = ''; TrxFiles = 1; DirectoryPresent = $true
+    })
+    $actual = Invoke-FixtureCheck -RunDiagnostics $unknownDiagnostics
+    Assert-Policy (@($actual.Summary.groups).Count -eq 0)
+    $nullExitDiagnostics = @([pscustomobject]@{
+        Group = 'application'; Phase = 'run-tests'; ExitCode = $null; ExceptionType = 'System.Exception'; TrxFiles = 0; DirectoryPresent = $false
+    })
+    $actual = Invoke-FixtureCheck -RunDiagnostics $nullExitDiagnostics
+    Assert-Policy (@($actual.Summary.groups).Count -eq 1 -and $null -eq $actual.Summary.groups[0].exitCode -and
+        $actual.Summary.groups[0].total -eq 0)
     Write-FixtureBaseline -Floor 1000000
     $actual = Invoke-FixtureCheck
     Assert-Policy ($actual.Summary.checks.belowFloor -and $actual.Message -ceq 'Shard validation failed.')
