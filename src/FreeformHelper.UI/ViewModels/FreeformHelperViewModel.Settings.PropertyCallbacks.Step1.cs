@@ -35,96 +35,42 @@ public sealed partial class FreeformHelperViewModel
         ApplySettingsOrchestration(nameof(PanelBiasY));
     }
 
-    partial void OnSelectedScanOrderOptionChanged(ScanOrderOption value)
-    {
-        if (_isLoadingSettings || _settingsSuppression.IsScanOrderSelectionSyncActive) return;
-
-        using (_settingsSuppression.EnterScanOrderSelectionSync())
-        {
-            if (SelectedScanOrder != value.Value)
-            {
-                SelectedScanOrder = value.Value; // Update underlying enum property.
-            }
-        }
-
-        ApplySettingsOrchestration(nameof(SelectedScanOrder));
-    }
-
     partial void OnSelectedScanOrderChanged(ScanOrder value)
     {
-        if (_isLoadingSettings || _settingsSuppression.IsScanOrderSelectionSyncActive) return;
+        if (_settingsSuppression.IsScanOrderSelectionSyncActive) return;
 
         using (_settingsSuppression.EnterScanOrderSelectionSync())
         {
-            var match = ScanOrderOptions.FirstOrDefault(o => o.Value == value);
-            if (!match.Equals(SelectedScanOrderOption)) // Update display option if it doesn't match.
-            {
-                SelectedScanOrderOption = match;
-            }
+            OnPropertyChanged(nameof(SelectedScanOrderOption));
         }
 
+        if (_isLoadingSettings) return;
         ApplySettingsOrchestration(nameof(SelectedScanOrder));
-    }
-
-    partial void OnSelectedGridAlignmentOptionChanged(GridAlignmentOption value)
-    {
-        if (_isLoadingSettings || _settingsSuppression.IsGridAlignmentSelectionSyncActive) return;
-
-        using (_settingsSuppression.EnterGridAlignmentSelectionSync())
-        {
-            if (GridAlignmentMode != value.Value)
-            {
-                GridAlignmentMode = value.Value; // Update underlying enum property.
-            }
-        }
-
-        ApplySettingsOrchestration(nameof(GridAlignmentMode));
     }
 
     partial void OnRegularSourceModeChanged(RegularSourceMode value)
     {
-        if (_isLoadingSettings || _settingsSuppression.IsRegularSourceModeSelectionSyncActive) return;
+        if (_settingsSuppression.IsRegularSourceModeSelectionSyncActive) return;
 
         using (_settingsSuppression.EnterRegularSourceModeSelectionSync())
         {
-            var match = RegularSourceModeOptions.FirstOrDefault(o => o.Value == value);
-            if (!match.Equals(SelectedRegularSourceModeOption))
-            {
-                SelectedRegularSourceModeOption = match;
-            }
+            OnPropertyChanged(nameof(SelectedRegularSourceModeOption));
         }
 
-        ApplySettingsOrchestration(nameof(RegularSourceMode));
-    }
-
-    partial void OnSelectedRegularSourceModeOptionChanged(RegularSourceModeOption value)
-    {
-        if (_isLoadingSettings || _settingsSuppression.IsRegularSourceModeSelectionSyncActive) return;
-
-        using (_settingsSuppression.EnterRegularSourceModeSelectionSync())
-        {
-            if (RegularSourceMode != value.Value)
-            {
-                RegularSourceMode = value.Value;
-            }
-        }
-
+        if (_isLoadingSettings) return;
         ApplySettingsOrchestration(nameof(RegularSourceMode));
     }
 
     partial void OnGridAlignmentModeChanged(GridAlignmentMode value)
     {
-        if (_isLoadingSettings || _settingsSuppression.IsGridAlignmentSelectionSyncActive) return;
+        if (_settingsSuppression.IsGridAlignmentSelectionSyncActive) return;
 
         using (_settingsSuppression.EnterGridAlignmentSelectionSync())
         {
-            var match = GridAlignmentOptions.FirstOrDefault(o => o.Value == value);
-            if (!match.Equals(SelectedGridAlignmentOption)) // Update display option if it doesn't match.
-            {
-                SelectedGridAlignmentOption = match;
-            }
+            OnPropertyChanged(nameof(SelectedGridAlignmentOption));
         }
 
+        if (_isLoadingSettings) return;
         ApplySettingsOrchestration(nameof(GridAlignmentMode));
     }
 

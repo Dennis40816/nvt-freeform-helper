@@ -210,7 +210,29 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets the currently selected <see cref="ScanOrderOption"/> object.
     /// </summary>
-    [ObservableProperty] private ScanOrderOption _selectedScanOrderOption;
+    public ScanOrderOption SelectedScanOrderOption
+    {
+        get => ScanOrderOptions.FirstOrDefault(option => option.Value == SelectedScanOrder);
+        set
+        {
+            if (_settingsSuppression.IsScanOrderSelectionSyncActive || value.Value == SelectedScanOrder)
+            {
+                return;
+            }
+
+            using (_settingsSuppression.EnterScanOrderSelectionSync())
+            {
+                SelectedScanOrder = value.Value;
+            }
+
+            if (!_isLoadingSettings)
+            {
+                ApplySettingsOrchestration(nameof(SelectedScanOrder));
+            }
+
+            OnPropertyChanged(nameof(SelectedScanOrderOption));
+        }
+    }
     /// <summary>
     /// Gets or sets the currently selected <see cref="GridAlignmentMode"/> enumeration value.
     /// </summary>
@@ -222,11 +244,55 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets the currently selected <see cref="GridAlignmentOption"/> object.
     /// </summary>
-    [ObservableProperty] private GridAlignmentOption _selectedGridAlignmentOption;
+    public GridAlignmentOption SelectedGridAlignmentOption
+    {
+        get => GridAlignmentOptions.FirstOrDefault(option => option.Value == GridAlignmentMode);
+        set
+        {
+            if (_settingsSuppression.IsGridAlignmentSelectionSyncActive || value.Value == GridAlignmentMode)
+            {
+                return;
+            }
+
+            using (_settingsSuppression.EnterGridAlignmentSelectionSync())
+            {
+                GridAlignmentMode = value.Value;
+            }
+
+            if (!_isLoadingSettings)
+            {
+                ApplySettingsOrchestration(nameof(GridAlignmentMode));
+            }
+
+            OnPropertyChanged(nameof(SelectedGridAlignmentOption));
+        }
+    }
     /// <summary>
     /// Gets or sets the currently selected <see cref="RegularSourceModeOption"/> object.
     /// </summary>
-    [ObservableProperty] private RegularSourceModeOption _selectedRegularSourceModeOption;
+    public RegularSourceModeOption SelectedRegularSourceModeOption
+    {
+        get => RegularSourceModeOptions.FirstOrDefault(option => option.Value == RegularSourceMode);
+        set
+        {
+            if (_settingsSuppression.IsRegularSourceModeSelectionSyncActive || value.Value == RegularSourceMode)
+            {
+                return;
+            }
+
+            using (_settingsSuppression.EnterRegularSourceModeSelectionSync())
+            {
+                RegularSourceMode = value.Value;
+            }
+
+            if (!_isLoadingSettings)
+            {
+                ApplySettingsOrchestration(nameof(RegularSourceMode));
+            }
+
+            OnPropertyChanged(nameof(SelectedRegularSourceModeOption));
+        }
+    }
     /// <summary>
     /// Gets or sets the currently selected application log level option.
     /// </summary>
@@ -573,7 +639,29 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets the selected CAD auto CAD Output FW Diff assignment mode option.
     /// </summary>
-    [ObservableProperty] private CadOutputFwDiffAutoModeOption _selectedCadOutputFwDiffAutoModeOption;
+    public CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption
+    {
+        get => CadOutputFwDiffAutoModeOptions.FirstOrDefault(option => option.Value == CadOutputFwDiffAutoMode);
+        set
+        {
+            if (_settingsSuppression.IsCadOutputFwDiffAutoModeSelectionSyncActive || value.Value == CadOutputFwDiffAutoMode)
+            {
+                return;
+            }
+
+            using (_settingsSuppression.EnterCadOutputFwDiffAutoModeSelectionSync())
+            {
+                CadOutputFwDiffAutoMode = value.Value;
+            }
+
+            if (!_isLoadingSettings)
+            {
+                ApplySettingsOrchestration(nameof(CadOutputFwDiffAutoMode));
+            }
+
+            OnPropertyChanged(nameof(SelectedCadOutputFwDiffAutoModeOption));
+        }
+    }
     /// <summary>
     /// Gets or sets the CAD id used as diff idx start anchor.
     /// Use -1 to indicate "first CAD in scan order".

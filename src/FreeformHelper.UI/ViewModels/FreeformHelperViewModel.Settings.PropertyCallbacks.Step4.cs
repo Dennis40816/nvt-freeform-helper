@@ -21,32 +21,14 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnCadOutputFwDiffAutoModeChanged(CadOutputFwDiffAutoMode value)
     {
-        if (_isLoadingSettings || _settingsSuppression.IsCadOutputFwDiffAutoModeSelectionSyncActive) return;
+        if (_settingsSuppression.IsCadOutputFwDiffAutoModeSelectionSyncActive) return;
 
         using (_settingsSuppression.EnterCadOutputFwDiffAutoModeSelectionSync())
         {
-            var match = CadOutputFwDiffAutoModeOptions.FirstOrDefault(option => option.Value == value);
-            if (!match.Equals(SelectedCadOutputFwDiffAutoModeOption))
-            {
-                SelectedCadOutputFwDiffAutoModeOption = match;
-            }
+            OnPropertyChanged(nameof(SelectedCadOutputFwDiffAutoModeOption));
         }
 
-        ApplySettingsOrchestration(nameof(CadOutputFwDiffAutoMode));
-    }
-
-    partial void OnSelectedCadOutputFwDiffAutoModeOptionChanged(CadOutputFwDiffAutoModeOption value)
-    {
-        if (_isLoadingSettings || _settingsSuppression.IsCadOutputFwDiffAutoModeSelectionSyncActive) return;
-
-        using (_settingsSuppression.EnterCadOutputFwDiffAutoModeSelectionSync())
-        {
-            if (CadOutputFwDiffAutoMode != value.Value)
-            {
-                CadOutputFwDiffAutoMode = value.Value;
-            }
-        }
-
+        if (_isLoadingSettings) return;
         ApplySettingsOrchestration(nameof(CadOutputFwDiffAutoMode));
     }
 

@@ -19,11 +19,8 @@ public sealed partial class FreeformHelperViewModel
             YChannels = s.Grid.YChannels;
             CascadeNum = s.Grid.CascadeNum;
             SelectedScanOrder = s.Grid.ScanOrder;
-            SelectedScanOrderOption = ScanOrderOptions.FirstOrDefault(o => o.Value == s.Grid.ScanOrder);
             GridAlignmentMode = s.Grid.AlignmentMode;
-            SelectedGridAlignmentOption = GridAlignmentOptions.FirstOrDefault(o => o.Value == s.Grid.AlignmentMode);
             RegularSourceMode = s.Grid.RegularSourceMode;
-            SelectedRegularSourceModeOption = RegularSourceModeOptions.FirstOrDefault(o => o.Value == s.Grid.RegularSourceMode);
 
             // Fallback for potentially invalid or uninitialized enum values.
             if (string.IsNullOrWhiteSpace(SelectedGridAlignmentOption.Display))
@@ -32,7 +29,6 @@ public sealed partial class FreeformHelperViewModel
                 if (!string.IsNullOrWhiteSpace(fallback.Display))
                 {
                     GridAlignmentMode = fallback.Value;
-                    SelectedGridAlignmentOption = fallback;
                 }
             }
             if (string.IsNullOrWhiteSpace(SelectedRegularSourceModeOption.Display))
@@ -41,7 +37,6 @@ public sealed partial class FreeformHelperViewModel
                 if (!string.IsNullOrWhiteSpace(fallback.Display))
                 {
                     RegularSourceMode = fallback.Value;
-                    SelectedRegularSourceModeOption = fallback;
                 }
             }
             // Notify UI of changes to dependent properties.
@@ -74,13 +69,6 @@ public sealed partial class FreeformHelperViewModel
             MappingCandidateNumber = s.IndexMapping.GetEffectiveCandidateNumber();
             CadOutputFwDiffIndexStart = s.IndexMapping.CadOutputFwDiffStartIndex;
             CadOutputFwDiffAutoMode = s.IndexMapping.CadOutputFwDiffAutoMode;
-            var dxfModeOption = CadOutputFwDiffAutoModeOptions.FirstOrDefault(option => option.Value == s.IndexMapping.CadOutputFwDiffAutoMode);
-            if (string.IsNullOrWhiteSpace(dxfModeOption.Display))
-            {
-                dxfModeOption = CadOutputFwDiffAutoModeOptions.Count > 0 ? CadOutputFwDiffAutoModeOptions[0] : default;
-            }
-
-            SelectedCadOutputFwDiffAutoModeOption = dxfModeOption;
             var anchorFallback = _projectFile.CadOutputFwDiffIndexAnchorCadPadId ?? -1;
             var anchorCadId = anchorFallback;
             foreach (var value in _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.Values)

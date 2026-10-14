@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 239,
+        "stateMembers": 235,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -1096,7 +1096,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 133
+        "methodLines": 132
       },
       "owner": "NFH",
       "locations": [
@@ -1320,7 +1320,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 163
+        "methodLines": 151
       },
       "owner": "NFH",
       "locations": [

@@ -245,7 +245,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
                 "Disabled",
                 "Turn off To Full and To Regular for baseline comparison."),
         };
-        _selectedCadOutputFwDiffAutoModeOption = CadOutputFwDiffAutoModeOptions[0];
         _selectedNotchExportFileTypeOption = NotchExportFileTypeOptions[0];
         _selectedNotchExportProfileOption = NotchExportProfileOptions[0];
         _selectedNotchCompensationModelOption = NotchCompensationModelOptions[0];
