@@ -360,35 +360,138 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     [ObservableProperty] private ObservableCollection<string> _dxfEditLayerOptions = new();
 
+    // The DXF edit panel inputs are stored once. The properties below forward to the record and raise
+    // the same notifications and callbacks as the stored properties they replaced.
+    private DxfEditPanelInput _dxfEditPanel = DxfEditPanelInput.Initial;
+
     /// <summary>
     /// Gets or sets the target DXF layer name used to move selected pads.
     /// </summary>
-    [ObservableProperty] private string _dxfEditTargetLayerName = string.Empty;
+    public string DxfEditTargetLayerName
+    {
+        get => _dxfEditPanel.DxfEditTargetLayerName;
+        set
+        {
+            if (_dxfEditPanel.DxfEditTargetLayerName == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { DxfEditTargetLayerName = value };
+            OnDxfEditTargetLayerNameChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnDxfEditTargetLayerNameChanged(string value);
 
     /// <summary>
     /// Gets or sets the currently selected DXF rotation scope option.
     /// </summary>
-    [ObservableProperty] private DxfEditRotationScopeOption _selectedDxfEditRotationScopeOption;
+    public DxfEditRotationScopeOption SelectedDxfEditRotationScopeOption
+    {
+        get => _dxfEditPanel.SelectedDxfEditRotationScopeOption;
+        set
+        {
+            if (_dxfEditPanel.SelectedDxfEditRotationScopeOption == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { SelectedDxfEditRotationScopeOption = value };
+            OnSelectedDxfEditRotationScopeOptionChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnSelectedDxfEditRotationScopeOptionChanged(DxfEditRotationScopeOption value);
 
     /// <summary>
     /// Gets or sets the target DXF layer name used when rotating by layer scope.
     /// </summary>
-    [ObservableProperty] private string _dxfEditRotationLayerName = string.Empty;
+    public string DxfEditRotationLayerName
+    {
+        get => _dxfEditPanel.DxfEditRotationLayerName;
+        set
+        {
+            if (_dxfEditPanel.DxfEditRotationLayerName == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { DxfEditRotationLayerName = value };
+            OnDxfEditRotationLayerNameChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnDxfEditRotationLayerNameChanged(string value);
 
     /// <summary>
     /// Gets or sets the input text used to create a new DXF layer.
     /// </summary>
-    [ObservableProperty] private string _dxfEditNewLayerName = string.Empty;
+    public string DxfEditNewLayerName
+    {
+        get => _dxfEditPanel.DxfEditNewLayerName;
+        set
+        {
+            if (_dxfEditPanel.DxfEditNewLayerName == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { DxfEditNewLayerName = value };
+            OnDxfEditNewLayerNameChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnDxfEditNewLayerNameChanged(string value);
 
     /// <summary>
     /// Gets or sets the rotation angle for selected CAD pads in DXF edit workflow.
     /// </summary>
-    [ObservableProperty] private decimal _dxfEditRotationDegrees = 90m;
+    public decimal DxfEditRotationDegrees
+    {
+        get => _dxfEditPanel.DxfEditRotationDegrees;
+        set
+        {
+            if (_dxfEditPanel.DxfEditRotationDegrees == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { DxfEditRotationDegrees = value };
+            OnDxfEditRotationDegreesChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnDxfEditRotationDegreesChanged(decimal value);
 
     /// <summary>
     /// Gets or sets a value indicating whether the advanced DXF edit block is expanded.
     /// </summary>
-    [ObservableProperty] private bool _isDxfEditAdvancedPanelExpanded = true;
+    public bool IsDxfEditAdvancedPanelExpanded
+    {
+        get => _dxfEditPanel.IsDxfEditAdvancedPanelExpanded;
+        set
+        {
+            if (_dxfEditPanel.IsDxfEditAdvancedPanelExpanded == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { IsDxfEditAdvancedPanelExpanded = value };
+            OnPropertyChanged();
+        }
+    }
 
     // --- DXF/Regular Mapping Properties ---
 

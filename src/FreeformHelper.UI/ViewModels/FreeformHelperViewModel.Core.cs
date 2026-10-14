@@ -270,7 +270,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             RegularSourceLayerOptions.Add(new RegularSourceLayerOption(null, "Select layer"));
             SelectedRegularSourceLayerOption = RegularSourceLayerOptions[0];
         }
-        _selectedDxfEditRotationScopeOption = DxfEditRotationScopeOptions[0];
+        _dxfEditPanel = _dxfEditPanel with { SelectedDxfEditRotationScopeOption = DxfEditRotationScopeOptions[0] };
         StartupPerfTracker.Mark("workspace.vm-options-initialized");
         // Layered settings precedence: Project > App General > Built-in defaults.
         // At startup without a project file loaded, app general overrides default values.
