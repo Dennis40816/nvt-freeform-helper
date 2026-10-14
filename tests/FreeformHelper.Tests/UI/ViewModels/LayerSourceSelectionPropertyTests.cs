@@ -15,12 +15,13 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class LayerSourceSelectionPropertyTests
 {
+    // MarksUnsaved is the value after the grid rebuild that the change starts has finished.
     private sealed record Setting(string Name, object NewValue, bool HasUndo, bool MarksUnsaved);
 
     private static readonly Setting[] _settings =
     [
         new(nameof(FreeformHelperViewModel.HasCadLayers), true, false, false),
-        new(nameof(FreeformHelperViewModel.SelectedBoundLayerOption), new FreeformHelperViewModel.BoundLayerOption("LAYER_A", "LAYER_A"), false, false),
+        new(nameof(FreeformHelperViewModel.SelectedBoundLayerOption), new FreeformHelperViewModel.BoundLayerOption("LAYER_A", "LAYER_A"), false, true),
         new(nameof(FreeformHelperViewModel.BoundLayerOptionSummary), "changed summary", false, false),
         new(nameof(FreeformHelperViewModel.SelectedRegularSourceLayerOption), new FreeformHelperViewModel.RegularSourceLayerOption("LAYER_B", "LAYER_B"), false, false),
         new(nameof(FreeformHelperViewModel.DxfRegularSourceHint), "changed hint", false, false),
@@ -84,20 +85,23 @@ public sealed class LayerSourceSelectionPropertyTests
 
     [Theory]
     [MemberData(nameof(SettingIndexes))]
-    public void Set_NewValue_SetsTheUnsavedFlagAsBefore(int index)
+    public async Task Set_NewValue_SetsTheUnsavedFlagAsBefore(int index)
     {
         var setting = _settings[index];
         var vm = new FreeformHelperViewModel();
         Assert.False(vm.HasUnsavedChanges);
 
         Write(vm, setting.Name, setting.NewValue);
+        // A new bounds layer starts a grid rebuild in the background. It marks the project unsaved when it finishes,
+        // so the flag is read after the rebuild and not while it races with the assertion.
+        await vm.WaitForGridRebuildIdleAsync();
 
         Assert.Equal(setting.MarksUnsaved, vm.HasUnsavedChanges);
     }
 
     [Theory]
     [MemberData(nameof(SettingIndexes))]
-    public void Set_NewValue_AddsAnUndoEntryOnlyWhereTheSettingHasUndo(int index)
+    public async Task Set_NewValue_AddsAnUndoEntryOnlyWhereTheSettingHasUndo(int index)
     {
         var setting = _settings[index];
         var vm = new FreeformHelperViewModel();
@@ -105,6 +109,7 @@ public sealed class LayerSourceSelectionPropertyTests
         Assert.False(vm.CanUndo);
 
         Write(vm, setting.Name, setting.NewValue);
+        await vm.WaitForGridRebuildIdleAsync();
 
         Assert.Equal(setting.HasUndo, vm.CanUndo);
         if (!setting.HasUndo)
