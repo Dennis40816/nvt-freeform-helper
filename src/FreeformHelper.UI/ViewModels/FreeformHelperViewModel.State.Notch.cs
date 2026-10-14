@@ -8,19 +8,80 @@ public sealed partial class FreeformHelperViewModel
     private readonly bool _showInternalLegacyNotchFields;
 
     // Notch settings
+    // The sixteen notch algorithm settings are stored once. The properties below forward to the
+    // record and raise the same notifications and callbacks as the stored properties they replaced.
+    private NotchAlgorithmSettings _notchAlgorithm = NotchAlgorithmSettings.Initial;
+
     /// <summary>
     /// Gets or sets a value indicating whether Notch Algorithm Version 2.1 is enabled.
     /// </summary>
-    [ObservableProperty] private bool _enableV21;
+    public bool EnableV21
+    {
+        get => _notchAlgorithm.EnableV21;
+        set
+        {
+            if (_notchAlgorithm.EnableV21 == value)
+            {
+                return;
+            }
+
+            OnEnableV21Changing(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { EnableV21 = value };
+            OnEnableV21Changed(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableV21Changing(bool value);
+
+    partial void OnEnableV21Changed(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether Notch 2.2 output path is enabled.
     /// (Internally mapped to enum value 30 for compatibility.)
     /// </summary>
-    [ObservableProperty] private bool _enableV22;
+    public bool EnableV22
+    {
+        get => _notchAlgorithm.EnableV22;
+        set
+        {
+            if (_notchAlgorithm.EnableV22 == value)
+            {
+                return;
+            }
+
+            OnEnableV22Changing(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { EnableV22 = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableV22Changing(bool value);
+
     /// <summary>
     /// Gets or sets the length scale factor for notch calculations.
     /// </summary>
-    [ObservableProperty] private decimal _lenScale;
+    public decimal LenScale
+    {
+        get => _notchAlgorithm.LenScale;
+        set
+        {
+            if (_notchAlgorithm.LenScale == value)
+            {
+                return;
+            }
+
+            OnLenScaleChanging(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { LenScale = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnLenScaleChanging(decimal value);
+
     /// <summary>
     /// Gets a value indicating whether LenScale should be visible in UI.
     /// LenScale is now treated as an internal legacy parameter and stays hidden.
@@ -29,56 +90,308 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets the null value used in notch tables.
     /// </summary>
-    [ObservableProperty] private decimal _nullValue;
+    public decimal NullValue
+    {
+        get => _notchAlgorithm.NullValue;
+        set
+        {
+            if (_notchAlgorithm.NullValue == value)
+            {
+                return;
+            }
+
+            OnNullValueChanging(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { NullValue = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnNullValueChanging(decimal value);
+
     /// <summary>
     /// Gets or sets the v2.1 threshold gate in Q7 (/128).
     /// </summary>
-    [ObservableProperty] private decimal _notchThresholdQ7;
+    public decimal NotchThresholdQ7
+    {
+        get => _notchAlgorithm.NotchThresholdQ7;
+        set
+        {
+            if (_notchAlgorithm.NotchThresholdQ7 == value)
+            {
+                return;
+            }
+
+            OnNotchThresholdQ7Changing(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { NotchThresholdQ7 = value };
+            OnNotchThresholdQ7Changed(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnNotchThresholdQ7Changing(decimal value);
+
+    partial void OnNotchThresholdQ7Changed(decimal value);
+
     /// <summary>
     /// Gets or sets the v2.2 threshold gate in percent.
     /// </summary>
-    [ObservableProperty] private decimal _notchThresholdPercent;
+    public decimal NotchThresholdPercent
+    {
+        get => _notchAlgorithm.NotchThresholdPercent;
+        set
+        {
+            if (_notchAlgorithm.NotchThresholdPercent == value)
+            {
+                return;
+            }
+
+            OnNotchThresholdPercentChanging(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { NotchThresholdPercent = value };
+            OnNotchThresholdPercentChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnNotchThresholdPercentChanging(decimal value);
+
+    partial void OnNotchThresholdPercentChanged(decimal value);
+
     /// <summary>
     /// Gets or sets a value indicating whether v2.2 threshold should be linked to v2.1 threshold.
     /// </summary>
-    [ObservableProperty] private bool _linkNotchThresholds = true;
+    public bool LinkNotchThresholds
+    {
+        get => _notchAlgorithm.LinkNotchThresholds;
+        set
+        {
+            if (_notchAlgorithm.LinkNotchThresholds == value)
+            {
+                return;
+            }
+
+            OnLinkNotchThresholdsChanging(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { LinkNotchThresholds = value };
+            OnLinkNotchThresholdsChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnLinkNotchThresholdsChanging(bool value);
+
+    partial void OnLinkNotchThresholdsChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether Notch 2.2 To Regular compensation is enabled.
     /// </summary>
-    [ObservableProperty] private bool _enableToRegular = true;
+    public bool EnableToRegular
+    {
+        get => _notchAlgorithm.EnableToRegular;
+        set
+        {
+            if (_notchAlgorithm.EnableToRegular == value)
+            {
+                return;
+            }
+
+            OnEnableToRegularChanging(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { EnableToRegular = value };
+            OnEnableToRegularChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableToRegularChanging(bool value);
+
+    partial void OnEnableToRegularChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether Notch 2.2 To Full compensation is enabled.
     /// </summary>
-    [ObservableProperty] private bool _enableToFull = true;
+    public bool EnableToFull
+    {
+        get => _notchAlgorithm.EnableToFull;
+        set
+        {
+            if (_notchAlgorithm.EnableToFull == value)
+            {
+                return;
+            }
+
+            OnEnableToFullChanging(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { EnableToFull = value };
+            OnEnableToFullChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableToFullChanging(bool value);
+
+    partial void OnEnableToFullChanged(bool value);
+
     /// <summary>
     /// Gets or sets strict overlap threshold (%) used by Notch 2.2 multi-owner gating.
     /// Example: 0.1 means overlap must exceed 0.1% of regular area to count as owner.
     /// </summary>
-    [ObservableProperty] private decimal _toFullStrictOverlapPercent = 0.1m;
+    public decimal ToFullStrictOverlapPercent
+    {
+        get => _notchAlgorithm.ToFullStrictOverlapPercent;
+        set
+        {
+            if (_notchAlgorithm.ToFullStrictOverlapPercent == value)
+            {
+                return;
+            }
+
+            OnToFullStrictOverlapPercentChanging(value);
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { ToFullStrictOverlapPercent = value };
+            OnToFullStrictOverlapPercentChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnToFullStrictOverlapPercentChanging(decimal value);
+
+    partial void OnToFullStrictOverlapPercentChanged(decimal value);
+
     /// <summary>
     /// Gets or sets whether Step3 should use split To Full rule engine path.
     /// </summary>
-    [ObservableProperty] private bool _enableToFullRuleEngine = true;
+    public bool EnableToFullRuleEngine
+    {
+        get => _notchAlgorithm.EnableToFullRuleEngine;
+        set
+        {
+            if (_notchAlgorithm.EnableToFullRuleEngine == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { EnableToFullRuleEngine = value };
+            OnEnableToFullRuleEngineChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableToFullRuleEngineChanged(bool value);
+
     /// <summary>
     /// Gets or sets whether Step3 should keep per-regular To Full rule trace entries.
     /// </summary>
-    [ObservableProperty] private bool _enableToFullRuleTrace;
+    public bool EnableToFullRuleTrace
+    {
+        get => _notchAlgorithm.EnableToFullRuleTrace;
+        set
+        {
+            if (_notchAlgorithm.EnableToFullRuleTrace == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { EnableToFullRuleTrace = value };
+            OnEnableToFullRuleTraceChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableToFullRuleTraceChanged(bool value);
+
     /// <summary>
     /// Gets or sets whether Step3 caps virtual To Full area before it contributes to gain/allocation.
     /// </summary>
-    [ObservableProperty] private bool _enableBoundaryVirtualAreaCap = true;
+    public bool EnableBoundaryVirtualAreaCap
+    {
+        get => _notchAlgorithm.EnableBoundaryVirtualAreaCap;
+        set
+        {
+            if (_notchAlgorithm.EnableBoundaryVirtualAreaCap == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { EnableBoundaryVirtualAreaCap = value };
+            OnEnableBoundaryVirtualAreaCapChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableBoundaryVirtualAreaCapChanged(bool value);
+
     /// <summary>
     /// Gets or sets maximum virtual To Full area as a percent of the inside overlap area.
     /// </summary>
-    [ObservableProperty] private decimal _boundaryVirtualAreaCapPercent = 100m;
+    public decimal BoundaryVirtualAreaCapPercent
+    {
+        get => _notchAlgorithm.BoundaryVirtualAreaCapPercent;
+        set
+        {
+            if (_notchAlgorithm.BoundaryVirtualAreaCapPercent == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { BoundaryVirtualAreaCapPercent = value };
+            OnBoundaryVirtualAreaCapPercentChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnBoundaryVirtualAreaCapPercentChanged(decimal value);
+
     /// <summary>
     /// Gets or sets whether Step3 caps target-side coverage after CurrentGain row selection.
     /// </summary>
-    [ObservableProperty] private bool _enableTargetCoverageGuard = true;
+    public bool EnableTargetCoverageGuard
+    {
+        get => _notchAlgorithm.EnableTargetCoverageGuard;
+        set
+        {
+            if (_notchAlgorithm.EnableTargetCoverageGuard == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { EnableTargetCoverageGuard = value };
+            OnEnableTargetCoverageGuardChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnEnableTargetCoverageGuardChanged(bool value);
+
     /// <summary>
     /// Gets or sets the maximum target-side coverage percent for uniform-field safety.
     /// </summary>
-    [ObservableProperty] private decimal _targetCoverageCapPercent = 120m;
+    public decimal TargetCoverageCapPercent
+    {
+        get => _notchAlgorithm.TargetCoverageCapPercent;
+        set
+        {
+            if (_notchAlgorithm.TargetCoverageCapPercent == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _notchAlgorithm = _notchAlgorithm with { TargetCoverageCapPercent = value };
+            OnTargetCoverageCapPercentChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnTargetCoverageCapPercentChanged(decimal value);
+
     /// <summary>
     /// Gets or sets selected Step3 notch compensation model option.
     /// </summary>
