@@ -339,17 +339,17 @@ public sealed partial class FreeformHelperViewModel
 
         SetStatus(statusText);
         Logger.Info(CultureInfo.InvariantCulture, "Grid built. Rows={0}, Cols={1}, Pads={2}.", grid.Rows, grid.Cols, grid.Pads.Count);
-        if (!_startupInitialGridBuiltMarked && _cad is null)
+        if (!_gridStartup.InitialGridBuiltMarked && _cad is null)
         {
             StartupPerfTracker.Mark("workspace.initial-grid-built", $"pads={grid.Pads.Count}");
-            _startupInitialGridBuiltMarked = true;
+            _gridStartup.InitialGridBuiltMarked = true;
         }
 
         CanvasHost?.Invalidate();
-        if (_fitAfterNextGridBuild)
+        if (_gridStartup.FitAfterNextBuild)
         {
             CanvasHost?.FitToContent();
-            _fitAfterNextGridBuild = false;
+            _gridStartup.FitAfterNextBuild = false;
         }
         else if (_cad is null && !hadRegularBefore)
         {

@@ -118,7 +118,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     private (int Revision, WorkflowDataSnapshot Snapshot)? _workflowDataSnapshotCache;
     private int _workflowDataSnapshotRevision = 1;
-    private bool _fitAfterNextGridBuild; // Flag to request a canvas fit-to-content after the next grid rebuild.
+    private readonly GridStartupState _gridStartup = new(); // Holds the one-time startup flags and the fit request of the grid build.
     private readonly GridRebuildUseCase _gridRebuildUseCase;
     private readonly SelectionSummaryUseCase _selectionSummaryUseCase = new();
     private readonly ManualSizingUseCase _manualSizingUseCase;
@@ -154,8 +154,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly NotchCompensationCacheCounters _notchCompensationCacheCounters = new();
     private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
     private bool _lastNotchPreviewVisibleForPlayback;
-    private bool _startupInitialGridBuiltMarked;
-    private bool _initialGridBuildRequested;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperViewModel"/> class.
@@ -301,7 +299,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     private void RequestFitAfterNextRebuild()
     {
-        _fitAfterNextGridBuild = true;
+        _gridStartup.FitAfterNextBuild = true;
     }
 
     /// <summary>
@@ -311,12 +309,12 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     public void EnsureInitialGrid()
     {
         // If CAD data is already loaded or a grid already exists, no initial grid is needed.
-        if (_cad is not null || RegularPads.Count > 0 || _initialGridBuildRequested)
+        if (_cad is not null || RegularPads.Count > 0 || _gridStartup.InitialBuildRequested)
         {
             return;
         }
 
-        _initialGridBuildRequested = true;
+        _gridStartup.InitialBuildRequested = true;
         _ = RequestInitialGridBuildAsync();
     }
 
@@ -340,7 +338,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         }
         finally
         {
-            _initialGridBuildRequested = false;
+            _gridStartup.InitialBuildRequested = false;
         }
     }
 
@@ -364,7 +362,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         {
             // If no data, but potentially will have data after a grid rebuild,
             // schedule a fit after the next rebuild.
-            _fitAfterNextGridBuild = true;
+            _gridStartup.FitAfterNextBuild = true;
         }
     }
 
