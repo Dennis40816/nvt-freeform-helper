@@ -10,7 +10,6 @@ public sealed partial class FreeformHelperViewModel
     private static readonly TimeSpan CadLoadOverlayMinVisibleDuration = TimeSpan.FromMilliseconds(120);
     private readonly LoadingScopeCoordinator _cadLoadOverlayScope =
         new(YieldCadLoadCanvasOverlayFrameAsync, CadLoadOverlayMinVisibleDuration);
-    private int _cadLoadCanvasOverlayScopeCount;
 
     internal async Task RunWithCadLoadCanvasOverlayAsync(Func<Task> action)
     {
@@ -35,18 +34,18 @@ public sealed partial class FreeformHelperViewModel
 
     internal void BeginCadLoadCanvasOverlayScope()
     {
-        _cadLoadCanvasOverlayScopeCount++;
+        _loadingScopes.CadLoadCanvasOverlay++;
         IsCadLoadCanvasOverlayVisible = true;
     }
 
     internal void EndCadLoadCanvasOverlayScope()
     {
-        if (_cadLoadCanvasOverlayScopeCount > 0)
+        if (_loadingScopes.CadLoadCanvasOverlay > 0)
         {
-            _cadLoadCanvasOverlayScopeCount--;
+            _loadingScopes.CadLoadCanvasOverlay--;
         }
 
-        IsCadLoadCanvasOverlayVisible = _cadLoadCanvasOverlayScopeCount > 0;
+        IsCadLoadCanvasOverlayVisible = _loadingScopes.CadLoadCanvasOverlay > 0;
     }
 
     private void SetCadLoadOverlayVisibleAsyncContract(bool isVisible)
