@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Security;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
@@ -115,6 +116,34 @@ public sealed partial class FreeformHelperViewModel
         return RunProjectLoadAsync(() => LoadProjectFromPathCoreAsync(path));
     }
 
+    // Path.GetFullPath documents exactly these four exception types; anything else is not an input problem.
+    private static string? TryGetFullProjectPath(string path, out Exception? error)
+    {
+        error = null;
+        try
+        {
+            return Path.GetFullPath(path.Trim());
+        }
+        catch (ArgumentException ex)
+        {
+            error = ex;
+        }
+        catch (NotSupportedException ex)
+        {
+            error = ex;
+        }
+        catch (PathTooLongException ex)
+        {
+            error = ex;
+        }
+        catch (SecurityException ex)
+        {
+            error = ex;
+        }
+
+        return null;
+    }
+
     private async Task<ProjectLoadCommandResult> LoadProjectFromPathCoreAsync(string path)
     {
         var status = CreateStatusScope("LoadProject");
@@ -125,16 +154,12 @@ public sealed partial class FreeformHelperViewModel
                 message: "Argument '--path' is required.");
         }
 
-        string normalizedPath;
-        try
-        {
-            normalizedPath = Path.GetFullPath(path.Trim());
-        }
-        catch (Exception ex)
+        var normalizedPath = TryGetFullProjectPath(path, out var pathError);
+        if (normalizedPath is null)
         {
             return ProjectLoadCommandResult.Failed(
                 code: "INVALID_ARGUMENTS",
-                message: $"Invalid project path '{path}': {ex.Message}");
+                message: $"Invalid project path '{path}': {pathError!.Message}");
         }
 
         if (!File.Exists(normalizedPath))

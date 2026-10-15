@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Logging;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -6,6 +7,13 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class ShellViewModel
 {
     internal Task? WorkspaceBuildPauseForTests { get; set; }
+
+    internal Task RunWorkspaceSourceChangeDrainForTestsAsync()
+    {
+        Interlocked.Increment(ref _pendingWorkspaceSourceChangeVersion);
+        Volatile.Write(ref _workspaceSourceChangeDrainRunning, 1);
+        return RunWorkspaceSourceChangeDrainAsync();
+    }
 
     private async Task BuildSimulationWorkspaceAsync()
     {
@@ -169,6 +177,9 @@ public sealed partial class ShellViewModel
 
     private async Task RunWorkspaceSourceChangeDrainAsync()
     {
+        // Only a finished pass may start the next one. After out-of-memory the version stays behind, and a
+        // restart would run the same work again at once.
+        var mayRestart = false;
         try
         {
             while (true)
@@ -195,18 +206,22 @@ public sealed partial class ShellViewModel
                     ref _processedWorkspaceSourceChangeVersion,
                     Volatile.Read(ref _pendingWorkspaceSourceChangeVersion));
             }
+
+            mayRestart = true;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Volatile.Write(
                 ref _processedWorkspaceSourceChangeVersion,
                 Volatile.Read(ref _pendingWorkspaceSourceChangeVersion));
             Logger.Error(ex, "Derived workspace prewarm failed after workspace source change.");
+            mayRestart = true;
         }
         finally
         {
             Volatile.Write(ref _workspaceSourceChangeDrainRunning, 0);
-            if (Volatile.Read(ref _processedWorkspaceSourceChangeVersion) <
+            if (mayRestart &&
+                Volatile.Read(ref _processedWorkspaceSourceChangeVersion) <
                 Volatile.Read(ref _pendingWorkspaceSourceChangeVersion))
             {
                 TryRunWorkspaceSourceChangeDrain();
