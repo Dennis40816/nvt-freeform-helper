@@ -17,7 +17,7 @@ public sealed partial class FreeformHelperViewModel
 
     // HashSets for efficient storage and lookup of selected pad IDs/indices.
     private readonly HashSet<int> _selectedCadIds = new();
-    private readonly HashSet<int> _selectedRegIndices = new();
+    private readonly SelectionState _selection = new();
     private readonly LatestRequestGate _selectionNotchPreviewGate = new();
     private readonly SelectionTimingRecorder _selectionTimings = new();
 
@@ -29,7 +29,7 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets a read-only collection of selected regular pad indices.
     /// </summary>
-    public IReadOnlyCollection<int> SelectedRegularPadIndices => _selectedRegIndices;
+    public IReadOnlyCollection<int> SelectedRegularPadIndices => _selection.RegularIndices;
 
     /// <summary>
     /// Gets the rectangular range (min/max row/column) covered by the selected regular pads.
@@ -76,10 +76,10 @@ public sealed partial class FreeformHelperViewModel
             _selectedCadIds.Add(id);
         }
 
-        _selectedRegIndices.Clear();
+        _selection.RegularIndices.Clear();
         foreach (var idx in regularPadIndices)
         {
-            _selectedRegIndices.Add(idx);
+            _selection.RegularIndices.Add(idx);
         }
 
         var summaryStartMs = selectionSw.ElapsedMilliseconds;
@@ -124,7 +124,7 @@ public sealed partial class FreeformHelperViewModel
             CultureInfo.InvariantCulture,
             "Selection updated: CAD={0}, Regular={1}, summary={2}ms, inspector={3}ms, notchPreview={4}ms, total={5}ms. {6} | {7}",
             _selectedCadIds.Count,
-            _selectedRegIndices.Count,
+            _selection.RegularIndices.Count,
             summaryDurationMs,
             inspectorDurationMs,
             notchPreviewDurationMs,
@@ -192,9 +192,9 @@ public sealed partial class FreeformHelperViewModel
         }
 
         CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: true);
-        if (_selectedRegIndices.Count == 1)
+        if (_selection.RegularIndices.Count == 1)
         {
-            var selectedRegularIndex = _selectedRegIndices.First();
+            var selectedRegularIndex = _selection.RegularIndices.First();
             var primaryRegular = RegularPads.FirstOrDefault(pad => pad.Index == selectedRegularIndex);
             if (primaryRegular is not null)
             {
@@ -206,7 +206,7 @@ public sealed partial class FreeformHelperViewModel
                 return;
             }
         }
-        else if (_selectedRegIndices.Count > 1)
+        else if (_selection.RegularIndices.Count > 1)
         {
             CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
             CurrentPadInspectorSnapshot = null;
@@ -215,6 +215,21 @@ public sealed partial class FreeformHelperViewModel
 
         CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
         CurrentPadInspectorSnapshot = null;
+    }
+
+    /// <summary>
+    /// Holds the selected regular pad indices and the flag that keeps the selection through the next grid rebuild, for the main view model.
+    /// </summary>
+    internal sealed class SelectionState
+    {
+        /// <summary>Gets the selected regular pad indices.</summary>
+        internal HashSet<int> RegularIndices { get; } = new();
+
+        /// <summary>
+        /// Gets or sets a value that, when true, suppresses clearing the current selection
+        /// during a grid rebuild operation. Used for undo/redo.
+        /// </summary>
+        internal bool SuppressClearOnRebuild { get; set; }
     }
 }
 

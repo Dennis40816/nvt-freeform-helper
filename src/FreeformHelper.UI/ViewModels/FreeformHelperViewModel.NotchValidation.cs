@@ -209,14 +209,14 @@ public sealed partial class FreeformHelperViewModel
 
     private int? GetPrimarySelectedRegularPadIdForNotchValidation()
     {
-        if (_selectedRegIndices.Count == 0)
+        if (_selection.RegularIndices.Count == 0)
         {
             return null;
         }
 
         foreach (var regularPad in RegularPads)
         {
-            if (_selectedRegIndices.Contains(regularPad.Index))
+            if (_selection.RegularIndices.Contains(regularPad.Index))
             {
                 return regularPad.RegularPadId;
             }

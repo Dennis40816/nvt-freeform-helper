@@ -116,7 +116,7 @@ public sealed partial class FreeformHelperViewModel
             colLabel,
             widthMm?.ToString(CultureInfo.InvariantCulture) ?? "unchanged",
             heightMm?.ToString(CultureInfo.InvariantCulture) ?? "unchanged");
-        SuppressSelectionClearOnRebuild = true; // Suppress clearing selection during the rebuild.
+        _selection.SuppressClearOnRebuild = true; // Suppress clearing selection during the rebuild.
         _ = TriggerGridRebuildAsync(requestFit: true); // Trigger a grid rebuild to reflect new sizing.
         MarkUnsaved(); // Mark the project as unsaved.
     }
@@ -164,7 +164,7 @@ public sealed partial class FreeformHelperViewModel
         var rowLabel = FormatIndexRanges(rows.Select(ToDisplayRow));
         var colLabel = FormatIndexRanges(cols);
         Logger.Info(CultureInfo.InvariantCulture, "Manual sizing reset requested. Rows={0}, Cols={1}.", rowLabel, colLabel);
-        SuppressSelectionClearOnRebuild = true; // Suppress clearing selection during the rebuild.
+        _selection.SuppressClearOnRebuild = true; // Suppress clearing selection during the rebuild.
         _ = TriggerGridRebuildAsync(requestFit: true); // Trigger a grid rebuild to reflect changes.
         MarkUnsaved(); // Mark the project as unsaved.
     }

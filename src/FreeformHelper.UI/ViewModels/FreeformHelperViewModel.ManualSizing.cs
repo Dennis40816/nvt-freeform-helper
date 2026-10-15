@@ -179,7 +179,7 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public void ApplySelectionToManualRange()
     {
-        if (_grid is null || _selectedRegIndices.Count == 0)
+        if (_grid is null || _selection.RegularIndices.Count == 0)
         {
             SetStatus("Manual sizing: select regular pads first.");
             Logger.Debug(CultureInfo.InvariantCulture, "Manual sizing range fill skipped: no regular selection.");
@@ -187,7 +187,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         // Get the actual RegularPad objects from the selected indices.
-        var pads = _selectedRegIndices
+        var pads = _selection.RegularIndices
             .Select(i => _grid.Pads.FirstOrDefault(p => p.Index == i))
             .Where(p => p is not null)
             .Cast<RegularPad>()

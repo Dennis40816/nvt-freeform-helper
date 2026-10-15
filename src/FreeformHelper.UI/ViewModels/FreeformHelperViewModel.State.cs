@@ -313,13 +313,6 @@ public sealed partial class FreeformHelperViewModel
     }
 
     /// <summary>
-    /// Gets or sets a value that, when true, suppresses clearing the current selection
-    /// during a grid rebuild operation. Used for undo/redo.
-    /// </summary>
-    [ObservableProperty]
-    private bool _suppressSelectionClearOnRebuild;
-
-    /// <summary>
     /// Partial method invoked when <see cref="StatusText"/> property changes.
     /// It raises the change notifications of <see cref="StatusDisplayText"/>
     /// and <see cref="HasStatusDisplay"/> for UI binding when their values change.

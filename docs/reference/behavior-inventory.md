@@ -173,7 +173,7 @@ Marker descriptions:
 - [Status] Updates StatusText or console/log display
 
 Notes:
-- RebuildGridAsync clears selection unless SuppressSelectionClearOnRebuild is true.
+- RebuildGridAsync clears selection unless the selection holder flag SuppressClearOnRebuild is true.
 - RebuildGridAsync updates StatusText and may call FitToContent depending on requestFit/initial load.
 
 ## Completed feature baseline (2026-02)
