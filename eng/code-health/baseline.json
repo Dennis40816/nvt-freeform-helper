@@ -1292,7 +1292,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 86
+        "methodLines": 82
       },
       "owner": "NFH",
       "locations": [
@@ -3508,30 +3508,10 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "b1e76d2ace1ea36ffd7dfc327a5dde094a1955d6b6345083f6a47b2c421993e4",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.LoadProjectFromPathCoreAsync(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "0cc35a5766d2aee89151167a90aa6d53afaca12975e51baf38a777f8f5257a66",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ReplayPersistedCombinedCadGroups(List<ProjectDxfCombinedCadGroup>)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "bf996e25a62bc06acdcf9ead19e6e76cb26f368ce7c27fce8df229d6676a0443",
-      "member": "FreeformHelper.UI.ViewModels.ShellViewModel.RunWorkspaceSourceChangeDrainAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "CA1031",
