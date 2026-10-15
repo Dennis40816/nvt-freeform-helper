@@ -207,8 +207,8 @@ public sealed partial class FreeformHelperViewModel
         var status = CreateStatusScope("LoadProject");
         var totalSw = Stopwatch.StartNew();
         Logger.Info(CultureInfo.InvariantCulture, "Loading project: {0}", path);
-        var originalSuppressAppGeneralPersistence = _suppressAppGeneralPersistence;
-        _suppressAppGeneralPersistence = true;
+        var originalSuppressAppGeneralPersistence = _appGeneralPersistence.SuppressPersistence;
+        _appGeneralPersistence.SuppressPersistence = true;
         _projectFile = file;
         InvalidateWorkflowDataSnapshot();
         _lastSavedPath = path;
@@ -320,7 +320,7 @@ public sealed partial class FreeformHelperViewModel
         }
         finally
         {
-            _suppressAppGeneralPersistence = originalSuppressAppGeneralPersistence;
+            _appGeneralPersistence.SuppressPersistence = originalSuppressAppGeneralPersistence;
         }
     }
 

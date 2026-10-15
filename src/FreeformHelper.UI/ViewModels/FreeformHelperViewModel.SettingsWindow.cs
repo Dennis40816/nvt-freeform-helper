@@ -263,7 +263,7 @@ public sealed partial class FreeformHelperViewModel
         _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.Clear();
         _projectFile.CadOutputFwDiffIndexAnchorCadPadId = null;
 
-        _suppressAppGeneralPersistence = true;
+        _appGeneralPersistence.SuppressPersistence = true;
         try
         {
             ApplyAppVisualPreferencesOnProjectLoad = true;
@@ -274,7 +274,7 @@ public sealed partial class FreeformHelperViewModel
         }
         finally
         {
-            _suppressAppGeneralPersistence = false;
+            _appGeneralPersistence.SuppressPersistence = false;
         }
 
         InvalidateNotchCompensationCache();

@@ -259,13 +259,13 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         // Layered settings precedence: Project > App General > Built-in defaults.
         // At startup without a project file loaded, app general overrides default values.
         TryApplyAppGeneralSettingsLayer();
-        _suppressAppGeneralPersistence = true;
+        _appGeneralPersistence.SuppressPersistence = true;
         ApplyCanvasColorDefaultsFromTokens();
         // Load initial settings to UI properties from layered settings snapshot.
         LoadSettingsToUi(_projectFile.Settings);
         ApplyViewSnapshot(_projectFile.UiSnapshot.View);
         ApplyImportSnapshot(_projectFile.UiSnapshot.Import);
-        _suppressAppGeneralPersistence = false;
+        _appGeneralPersistence.SuppressPersistence = false;
         StartupPerfTracker.Mark("workspace.vm-settings-loaded");
         InitializeWorkspaceHeaderItems(); // Set up items for the workspace header menu.
         StartupPerfTracker.Mark("workspace.vm-header-initialized");

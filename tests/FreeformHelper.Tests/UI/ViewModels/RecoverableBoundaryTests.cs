@@ -114,7 +114,7 @@ public sealed class RecoverableBoundaryTests
     public void PersistAppGeneralSettings_WhenSaveFails_KeepsTheViewModelUsable()
     {
         var store = new ScriptedSettingsStore(static () => new IOException("disk full"));
-        var vm = new FreeformHelperViewModel(store);
+        var vm = new FreeformHelperViewModel(store.Store);
         store.SaveCalls = 0;
 
         vm.PersistAppGeneralSettingsNowForTests();
@@ -127,7 +127,7 @@ public sealed class RecoverableBoundaryTests
     public void PersistAppGeneralSettings_WhenSaveRunsOutOfMemory_Propagates()
     {
         var store = new ScriptedSettingsStore(static () => CreateOutOfMemory());
-        var vm = new FreeformHelperViewModel(store);
+        var vm = new FreeformHelperViewModel(store.Store);
         store.SaveCalls = 0;
 
         Assert.Throws<OutOfMemoryException>(vm.PersistAppGeneralSettingsNowForTests);
@@ -139,7 +139,7 @@ public sealed class RecoverableBoundaryTests
     public void PersistAppGeneralSettings_WhenSaveSucceeds_HandsOverTheDocument()
     {
         var store = new ScriptedSettingsStore(static () => null);
-        var vm = new FreeformHelperViewModel(store);
+        var vm = new FreeformHelperViewModel(store.Store);
         store.SaveCalls = 0;
 
         vm.PersistAppGeneralSettingsNowForTests();
@@ -409,18 +409,30 @@ public sealed class RecoverableBoundaryTests
         public PadCanvasVisibleDrawPerfSnapshot GetVisibleDrawPerfSnapshot() => default;
     }
 
-    // Never touches the disk: Load finds no file at the path, and Save only records what it was given.
-    private sealed class ScriptedSettingsStore(Func<Exception?> failure)
-        : AppGeneralSettingsStore(Path.Combine(AppContext.BaseDirectory, "recoverable-boundary-unused.json"))
+    // Never touches the disk: the read finds no file, and the save only records what it was given.
+    private sealed class ScriptedSettingsStore
     {
+        private readonly Func<Exception?> _failure;
+
+        public ScriptedSettingsStore(Func<Exception?> failure)
+        {
+            _failure = failure;
+            Store = new AppGeneralSettingsStore(
+                "recoverable-boundary-unused.json",
+                static _ => null,
+                Save);
+        }
+
+        public AppGeneralSettingsStore Store { get; }
+
         public int SaveCalls { get; set; }
 
         public AppGeneralSettingsDocument? LastSaved { get; private set; }
 
-        public override void Save(AppGeneralSettingsDocument document)
+        private void Save(AppGeneralSettingsDocument document)
         {
             SaveCalls++;
-            var error = failure();
+            var error = _failure();
             if (error is not null)
             {
                 throw error;
