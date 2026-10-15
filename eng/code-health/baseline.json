@@ -3508,26 +3508,6 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "f894e99601a5abd1145baffbe06a76c24789b33a6cf0a96781ef0e204c5f06f3",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ExportDxfAsync(bool)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "9795a00b03b22b3c20b29dd9adb34a5dd56b999c8ad7ae68d6db97ebc244c33e",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ExportDxfLayerImageAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "b1e76d2ace1ea36ffd7dfc327a5dde094a1955d6b6345083f6a47b2c421993e4",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.LoadProjectFromPathCoreAsync(string)",
       "owner": "NFH",
@@ -3542,36 +3522,6 @@
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ReplayPersistedCombinedCadGroups(List<ProjectDxfCombinedCadGroup>)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "4a5e512588ff2f187e9e6057a7f4921be983a922189932771598e99c8bd63436",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunDeferredCadInspectorSnapshotRefreshAsync(long,int,long,CancellationTokenSource,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "f5fc5106dbbadfb41af0b861a05b1776549c2e4301d7d85434e0037dec8794d7",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunNotchPreviewAutoPlayLoopAsync(CancellationTokenSource,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "55cebb9d76be777d99a03d5faf487eb441e7a10b90741a61c30d75cd4cd130d4",
-      "member": "FreeformHelper.UI.ViewModels.IndexMappingReportViewModel.LoadTraceAsync(IndexMappingDecisionRowViewModel,string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "CA1031",

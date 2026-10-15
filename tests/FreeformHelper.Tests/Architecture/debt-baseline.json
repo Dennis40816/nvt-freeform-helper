@@ -37,7 +37,7 @@
     "suppressUndoAssignments": [],
     "fileWriteAllText": [
       "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:135",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:158",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:159",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs:114",
       "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs:195",
       "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs:264"
@@ -55,7 +55,7 @@
       "src/FreeformHelper.UI/Services/CadLoadSpinnerDebugState.cs:158",
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:378", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:548",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:99", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:212",
-      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:62", "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:103"
+      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:68", "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:109"
     ],
     "bareCatch": [
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:443", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:482", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:552", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:630",
@@ -71,15 +71,15 @@
       "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:72", "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:137",
       "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.cs:30",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:102",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:115", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:162",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:116", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:163",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs:231",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs:232",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:121",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:128",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:57",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:266", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:332",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:278", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:344",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs:133",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:67", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:108",
-      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:83",
+      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:89",
       "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs:199"
     ],
     "suppressFlagFields": [
@@ -91,7 +91,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:78", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:81", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:82", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:86", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:94", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:95", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:97", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:120", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:146",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfIndexing.Duplicates.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfLayerImageExportSettings.cs:26",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:7",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:8",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:10", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:11",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:15", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:16", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:17", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:18",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:7", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:8",
