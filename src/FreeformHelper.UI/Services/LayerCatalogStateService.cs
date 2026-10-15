@@ -10,7 +10,8 @@ namespace FreeformHelper.UI.Services;
 public sealed class LayerCatalogStateService
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    private readonly DxfLayerCatalogReader _reader;
+    private readonly Func<string, DxfLayerCatalog> _readFromPath;
+    private readonly Func<Stream, DxfLayerCatalog> _readFromStream;
     private DxfLayerCatalog _catalog = DxfLayerCatalog.Empty;
     private DxfLayerCatalog _cache = DxfLayerCatalog.Empty;
     private string? _cachePath;
@@ -20,8 +21,17 @@ public sealed class LayerCatalogStateService
     private int _cacheEmbeddedLength = -1;
 
     public LayerCatalogStateService(DxfLayerCatalogReader reader)
+        : this(DxfLayerCatalogReader.ReadFromPath, DxfLayerCatalogReader.ReadFromStream)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        ArgumentNullException.ThrowIfNull(reader);
+    }
+
+    internal LayerCatalogStateService(
+        Func<string, DxfLayerCatalog> readFromPath,
+        Func<Stream, DxfLayerCatalog> readFromStream)
+    {
+        _readFromPath = readFromPath ?? throw new ArgumentNullException(nameof(readFromPath));
+        _readFromStream = readFromStream ?? throw new ArgumentNullException(nameof(readFromStream));
     }
 
     public DxfLayerCatalog Catalog => _catalog;
@@ -55,7 +65,7 @@ public sealed class LayerCatalogStateService
 
         try
         {
-            _catalog = DxfLayerCatalogReader.ReadFromPath(path);
+            _catalog = _readFromPath(path);
             CachePathCatalog(path, length, writeUtc);
         }
         catch (Exception ex)
@@ -114,7 +124,7 @@ public sealed class LayerCatalogStateService
         try
         {
             using var ms = new MemoryStream(data);
-            _catalog = DxfLayerCatalogReader.ReadFromStream(ms);
+            _catalog = _readFromStream(ms);
             _cache = _catalog;
             _cacheEmbeddedLength = data.Length;
             _cacheEmbeddedFingerprint = fingerprint;
