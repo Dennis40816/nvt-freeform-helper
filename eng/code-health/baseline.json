@@ -988,7 +988,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 181,
+        "stateMembers": 177,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -3443,26 +3443,6 @@
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
       "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "6e4aae34edf8f0ce29ab63e3c3f74afe9dc0eaec1f19c43fea81036ff52620cf",
-      "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.LooksLikeWhitelistShape(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "5f5e67141bfbf59542f8e523ec142f0726fc9733ea26e30e27c94a66abb97752",
-      "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.TryLoad()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs",
-      "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "CA1031",
       "symbol": "CA1031"
