@@ -135,31 +135,16 @@ public sealed partial class FreeformHelperViewModel
         ArgumentNullException.ThrowIfNull(operationAsync);
         ArgumentNullException.ThrowIfNull(onError);
 
-        async Task<TResult> ExecuteCoreAsync()
+        // The Task overload owns the catch, the finish log and the spinner scope. This overload only carries the value.
+        TResult result = default!;
+
+        async Task CaptureResultAsync()
         {
-            var timer = Stopwatch.StartNew();
-            try
-            {
-                onStart?.Invoke();
-                return await operationAsync();
-            }
-            catch (Exception ex)
-            {
-                return onError(ex);
-            }
-            finally
-            {
-                timer.Stop();
-                Logger.Info(CultureInfo.InvariantCulture, "{0} finished in {1} ms.", operationName, timer.ElapsedMilliseconds);
-            }
+            result = await operationAsync();
         }
 
-        if (showModalSpinner)
-        {
-            return await RunWithModalLoadingSpinnerAsync(ExecuteCoreAsync);
-        }
-
-        return await ExecuteCoreAsync();
+        await RunUiOperationAsync(operationName, CaptureResultAsync, ex => result = onError(ex), onStart, showModalSpinner);
+        return result;
     }
 
     internal Task<TResult> RunUiOperationForTestsAsync<TResult>(

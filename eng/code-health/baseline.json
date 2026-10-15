@@ -3998,16 +3998,6 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "610e600a0e783933dcd432da6d859bfe8a7cb259fc07c2d5406d029e3f5f562e",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunUiOperationAsync`1(string,Func<Task<TResult>>,Func<Exception, TResult>,Action?,bool).local:ExecuteCoreAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "a5e52c18a74379f2568ce574745207fcb85833fb41bf760d9ed60e1e58868949",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunUiProgressOperationAsync(string,Action<bool>,Action<double>,Func<Action<double>, Task>,Action<Exception>,Action?,bool).local:ExecuteCoreAsync()",
       "owner": "NFH",

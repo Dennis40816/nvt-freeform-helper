@@ -9,7 +9,7 @@
     "processStart": 4,
     "directClockReads": 17,
     "bareCatch": 12,
-    "catchException": 29,
+    "catchException": 28,
     "suppressFlagFields": 6,
     "freeformViewModelStateMembers": 106,
     "shellNavigationBooleans": 0,
@@ -80,7 +80,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:55",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:254", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:320",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs:133",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:66", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:107", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:146",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:66", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:107",
       "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:83",
       "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs:199"
     ],
