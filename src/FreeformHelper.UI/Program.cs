@@ -119,17 +119,22 @@ internal sealed class Program
 
     private static void TryApplyStartupLogLevelOverride()
     {
+        ApplyStartupLogLevelOverride(
+            () => new AppGeneralSettingsStore().TryLoad()?.Import?.LogLevel,
+            LoggingBootstrapper.ApplyMinimumLevel);
+    }
+
+    internal static void ApplyStartupLogLevelOverride(Func<string?> readRequestedLevel, Func<string, string> applyLevel)
+    {
         try
         {
-            var store = new AppGeneralSettingsStore();
-            var document = store.TryLoad();
-            var requestedLevel = document?.Import?.LogLevel;
+            var requestedLevel = readRequestedLevel();
             if (string.IsNullOrWhiteSpace(requestedLevel))
             {
                 return;
             }
 
-            var appliedLevel = LoggingBootstrapper.ApplyMinimumLevel(requestedLevel);
+            var appliedLevel = applyLevel(requestedLevel);
             Logger.Info(CultureInfo.InvariantCulture, "Startup log level override applied from app settings: {0}", appliedLevel);
         }
         catch (Exception ex)

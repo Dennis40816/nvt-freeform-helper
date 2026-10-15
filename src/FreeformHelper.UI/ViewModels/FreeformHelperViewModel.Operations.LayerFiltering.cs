@@ -12,6 +12,8 @@ public sealed partial class FreeformHelperViewModel
 {
     private const double CsvLocalRepairAutoApplyMinConfidence = 0.80;
 
+    internal void FilterCadPadsByLayerForTests() => FilterCadPadsByLayer();
+
     private void FilterCadPadsByLayer()
     {
         if (_cad is null)

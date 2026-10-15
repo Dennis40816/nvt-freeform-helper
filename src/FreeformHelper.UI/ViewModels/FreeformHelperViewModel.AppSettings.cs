@@ -19,6 +19,8 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>Gets the app general settings persistence holder for tests.</summary>
     internal AppGeneralPersistenceState AppGeneralPersistenceForTests => _appGeneralPersistence;
 
+    internal void PersistAppGeneralSettingsNowForTests() => PersistAppGeneralSettingsNow();
+
     private void InitializeAppGeneralSettingsPersistence()
     {
         _ = EnsureAppGeneralSettingsPersistTimer();
