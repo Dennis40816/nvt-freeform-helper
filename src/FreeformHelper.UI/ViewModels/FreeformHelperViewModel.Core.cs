@@ -27,6 +27,10 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel : ObservableObject
 {
     internal UiEventRunner UiEvents { get; }
+
+    // Starts the fire-and-forget background loops and refreshes. Tests replace its runner to observe them.
+    internal BackgroundWorkRunnerSlot BackgroundWork { get; } = new();
+
     // Logger instance for recording events and debugging information.
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 

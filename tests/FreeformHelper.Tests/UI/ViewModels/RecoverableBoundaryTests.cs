@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia.Headless.XUnit;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
@@ -244,11 +245,12 @@ public sealed class RecoverableBoundaryTests
                 vm,
                 nameof(vm.CurrentPadInspectorSnapshot),
                 new InvalidOperationException("snapshot rejected"));
-            using var cts = new CancellationTokenSource();
+            var work = new RecordingBackgroundWorkRunner();
+            vm.BackgroundWork.Runner = work;
 
-            var refresh = vm.RunDeferredRegularInspectorSnapshotRefreshForTestsAsync(regularPadId, cts);
+            vm.QueueDeferredRegularInspectorSnapshotRefresh(regularPadId);
             Assert.True(vm.IsPadInspectorDeferredRefreshPending);
-            await refresh;
+            await work.LastStartedAsync(FreeformHelperViewModel.DeferredRegularInspectorRefreshWorkName);
 
             Assert.True(trap.Fired);
             Assert.False(vm.IsPadInspectorDeferredRefreshPending);
@@ -270,14 +272,13 @@ public sealed class RecoverableBoundaryTests
             await SelectRegularPadAndSettleAsync(vm, regularPadId);
             vm.CurrentPadInspectorSnapshot = vm.CurrentPadInspectorSnapshot! with { Kind = "stale" };
             using var trap = FailOnce(vm, nameof(vm.CurrentPadInspectorSnapshot), CreateOutOfMemory());
-            using var cts = new CancellationTokenSource();
+            var work = new RecordingBackgroundWorkRunner();
+            vm.BackgroundWork.Runner = work;
 
-            await Assert.ThrowsAsync<OutOfMemoryException>(async () =>
-            {
-                var refresh = vm.RunDeferredRegularInspectorSnapshotRefreshForTestsAsync(regularPadId, cts);
-                Assert.True(vm.IsPadInspectorDeferredRefreshPending);
-                await refresh;
-            });
+            vm.QueueDeferredRegularInspectorSnapshotRefresh(regularPadId);
+            Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+            await Assert.ThrowsAsync<OutOfMemoryException>(() =>
+                work.LastStartedAsync(FreeformHelperViewModel.DeferredRegularInspectorRefreshWorkName));
 
             Assert.True(trap.Fired);
             Assert.False(vm.IsPadInspectorDeferredRefreshPending);
