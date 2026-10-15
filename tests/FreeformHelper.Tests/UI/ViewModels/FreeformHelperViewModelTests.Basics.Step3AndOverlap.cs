@@ -333,9 +333,9 @@ public sealed partial class FreeformHelperViewModelTests
         try
         {
             var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
-            using var cts = new CancellationTokenSource();
-            var loop = StartAutoPlayLoopBeforePreviewAsync(vm, cts);
+            var work = EnableAutoPlayWithRecorder(vm);
             await ShowCadPreviewAsync(vm);
+            var loop = work.LastStartedAsync(FreeformHelperViewModel.NotchPreviewAutoPlayWorkName);
             using var trap = FailOnStageChange(vm, new InvalidOperationException("stage rejected"));
 
             await loop.WaitAsync(TimeSpan.FromSeconds(10));
@@ -356,9 +356,9 @@ public sealed partial class FreeformHelperViewModelTests
         try
         {
             var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
-            using var cts = new CancellationTokenSource();
-            var loop = StartAutoPlayLoopBeforePreviewAsync(vm, cts);
+            var work = EnableAutoPlayWithRecorder(vm);
             await ShowCadPreviewAsync(vm);
+            var loop = work.LastStartedAsync(FreeformHelperViewModel.NotchPreviewAutoPlayWorkName);
             using var trap = FailOnStageChange(vm, CreateBoundaryOutOfMemory());
 
             await Assert.ThrowsAsync<OutOfMemoryException>(() => loop.WaitAsync(TimeSpan.FromSeconds(10)));
@@ -386,11 +386,12 @@ public sealed partial class FreeformHelperViewModelTests
                 includeMatchDetails: false,
                 includeRuleTrace: false);
             using var trap = FailOnSnapshotChange(vm, new InvalidOperationException("snapshot rejected"));
-            using var cts = new CancellationTokenSource();
+            var work = new RecordingBackgroundWorkRunner();
+            vm.BackgroundWork.Runner = work;
 
-            var refresh = vm.RunDeferredCadInspectorSnapshotRefreshForTestsAsync(cad.Id, cts);
+            vm.QueueDeferredCadInspectorSnapshotRefresh(cad.Id);
             Assert.True(vm.IsPadInspectorDeferredRefreshPending);
-            await refresh;
+            await work.LastStartedAsync(FreeformHelperViewModel.DeferredCadInspectorRefreshWorkName);
 
             Assert.True(trap.Fired);
             Assert.False(vm.IsPadInspectorDeferredRefreshPending);
@@ -417,10 +418,12 @@ public sealed partial class FreeformHelperViewModelTests
                 includeMatchDetails: false,
                 includeRuleTrace: false);
             using var trap = FailOnSnapshotChange(vm, CreateBoundaryOutOfMemory());
-            using var cts = new CancellationTokenSource();
+            var work = new RecordingBackgroundWorkRunner();
+            vm.BackgroundWork.Runner = work;
 
+            vm.QueueDeferredCadInspectorSnapshotRefresh(cad.Id);
             await Assert.ThrowsAsync<OutOfMemoryException>(() =>
-                vm.RunDeferredCadInspectorSnapshotRefreshForTestsAsync(cad.Id, cts));
+                work.LastStartedAsync(FreeformHelperViewModel.DeferredCadInspectorRefreshWorkName));
 
             Assert.True(trap.Fired);
             Assert.False(vm.IsPadInspectorDeferredRefreshPending);
@@ -431,12 +434,14 @@ public sealed partial class FreeformHelperViewModelTests
         }
     }
 
-    // Registers the loop first, so showing the preview later does not start a second, unobservable one.
-    private static Task StartAutoPlayLoopBeforePreviewAsync(FreeformHelperViewModel vm, CancellationTokenSource cts)
+    // Installs the recorder first, so the loop that showing the preview starts can be observed.
+    private static RecordingBackgroundWorkRunner EnableAutoPlayWithRecorder(FreeformHelperViewModel vm)
     {
+        var work = new RecordingBackgroundWorkRunner();
+        vm.BackgroundWork.Runner = work;
         vm.NotchPreviewAutoPlayIntervalMs = 200m;
         vm.NotchPreviewAutoPlayEnabled = true;
-        return vm.RunNotchPreviewAutoPlayLoopForTestsAsync(cts);
+        return work;
     }
 
     private static async Task ShowCadPreviewAsync(FreeformHelperViewModel vm)

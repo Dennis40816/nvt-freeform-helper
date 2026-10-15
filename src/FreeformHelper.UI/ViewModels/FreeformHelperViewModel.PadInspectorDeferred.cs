@@ -9,6 +9,9 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
+    internal const string DeferredCadInspectorRefreshWorkName = "deferred-cad-inspector-refresh";
+    internal const string DeferredRegularInspectorRefreshWorkName = "deferred-regular-inspector-refresh";
+
     private const int PadInspectorDeferredRefreshDelayMs = 200;
     private const int RegularPadInspectorDeferredRefreshDelayMs = 150;
 
@@ -16,30 +19,6 @@ public sealed partial class FreeformHelperViewModel
     private long _padInspectorDeferredRefreshRequestId;
     private CancellationTokenSource? _regularPadInspectorDeferredRefreshCts;
     private long _regularPadInspectorDeferredRefreshRequestId;
-
-    internal Task RunDeferredCadInspectorSnapshotRefreshForTestsAsync(int cadPadId, CancellationTokenSource cts)
-    {
-        _padInspectorDeferredRefreshCts = cts;
-        UpdatePadInspectorDeferredRefreshPendingState();
-        return RunDeferredCadInspectorSnapshotRefreshAsync(
-            Interlocked.Read(ref _padInspectorDeferredRefreshRequestId),
-            cadPadId,
-            Interlocked.Read(ref _padInspectorSelectionRevision),
-            cts,
-            cts.Token);
-    }
-
-    internal Task RunDeferredRegularInspectorSnapshotRefreshForTestsAsync(int regularPadId, CancellationTokenSource cts)
-    {
-        _regularPadInspectorDeferredRefreshCts = cts;
-        UpdatePadInspectorDeferredRefreshPendingState();
-        return RunDeferredRegularInspectorSnapshotRefreshAsync(
-            Interlocked.Read(ref _regularPadInspectorDeferredRefreshRequestId),
-            regularPadId,
-            Interlocked.Read(ref _padInspectorSelectionRevision),
-            cts,
-            cts.Token);
-    }
 
     public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId)
     {
@@ -55,7 +34,9 @@ public sealed partial class FreeformHelperViewModel
         _padInspectorDeferredRefreshCts = cts;
         var requestId = Interlocked.Increment(ref _padInspectorDeferredRefreshRequestId);
         UpdatePadInspectorDeferredRefreshPendingState();
-        _ = RunDeferredCadInspectorSnapshotRefreshAsync(requestId, cadPadId, selectionRevision, cts, cts.Token);
+        BackgroundWork.Run(
+            DeferredCadInspectorRefreshWorkName,
+            () => RunDeferredCadInspectorSnapshotRefreshAsync(requestId, cadPadId, selectionRevision, cts, cts.Token));
     }
 
     public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId)
@@ -72,7 +53,9 @@ public sealed partial class FreeformHelperViewModel
         _regularPadInspectorDeferredRefreshCts = cts;
         var requestId = Interlocked.Increment(ref _regularPadInspectorDeferredRefreshRequestId);
         UpdatePadInspectorDeferredRefreshPendingState();
-        _ = RunDeferredRegularInspectorSnapshotRefreshAsync(requestId, regularPadId, selectionRevision, cts, cts.Token);
+        BackgroundWork.Run(
+            DeferredRegularInspectorRefreshWorkName,
+            () => RunDeferredRegularInspectorSnapshotRefreshAsync(requestId, regularPadId, selectionRevision, cts, cts.Token));
     }
 
     private void CancelDeferredCadInspectorSnapshotRefresh(bool clearPendingState)

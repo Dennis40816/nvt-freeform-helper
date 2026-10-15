@@ -5,13 +5,9 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private CancellationTokenSource? _notchPreviewAutoPlayCts;
+    internal const string NotchPreviewAutoPlayWorkName = "notch-preview-auto-play";
 
-    internal Task RunNotchPreviewAutoPlayLoopForTestsAsync(CancellationTokenSource cts)
-    {
-        _notchPreviewAutoPlayCts = cts;
-        return RunNotchPreviewAutoPlayLoopAsync(cts, cts.Token);
-    }
+    private CancellationTokenSource? _notchPreviewAutoPlayCts;
 
     private void RestartNotchPreviewAutoPlayLoop()
     {
@@ -28,7 +24,7 @@ public sealed partial class FreeformHelperViewModel
 
         var cts = new CancellationTokenSource();
         _notchPreviewAutoPlayCts = cts;
-        _ = RunNotchPreviewAutoPlayLoopAsync(cts, cts.Token);
+        BackgroundWork.Run(NotchPreviewAutoPlayWorkName, () => RunNotchPreviewAutoPlayLoopAsync(cts, cts.Token));
     }
 
     private void AdvanceNotchPreviewStageOnce()
