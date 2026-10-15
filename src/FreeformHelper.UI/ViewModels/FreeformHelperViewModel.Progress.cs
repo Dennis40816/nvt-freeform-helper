@@ -161,5 +161,13 @@ public sealed partial class FreeformHelperViewModel
 
         return await ExecuteCoreAsync();
     }
+
+    internal Task<TResult> RunUiOperationForTestsAsync<TResult>(
+        string operationName,
+        Func<Task<TResult>> operationAsync,
+        Func<Exception, TResult> onError,
+        Action? onStart = null,
+        bool showModalSpinner = true) =>
+        RunUiOperationAsync(operationName, operationAsync, onError, onStart, showModalSpinner);
 }
 
