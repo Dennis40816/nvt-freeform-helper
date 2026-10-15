@@ -2368,16 +2368,6 @@
       "symbol": "FreeformHelper.UI.Logging.AppLogStore._generation"
     },
     {
-      "syntaxHash": "bda48d2ae5e52308644f7b1eb3cb2411a4515d84b0508d28652f090124f37374",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.QueueStateSync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
       "syntaxHash": "a5a4d95679b7d1f771e3b87bf360d33290fd2b84e0b69c0bf30fd18cb8d2e40e",
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SendRequest(CadLoadSpinnerRequest,int,bool)",
       "owner": "NFH",
@@ -2406,26 +2396,6 @@
       "count": 1,
       "rule": "blockingWait",
       "symbol": "GetResult"
-    },
-    {
-      "syntaxHash": "6fe302034a95d0bcb1fda23ec1314a27f6b37d75daddac7151113d445d9254dc",
-      "member": "FreeformHelper.UI.Services.CadLoadWorkflowService.OpenDxfAsync(OpenDxfWorkflowRequest)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadWorkflowService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "d5fec5e7e5c6643aa2bbe3b01617a607a67c84a51a2be22d9f5455e7d3277142",
-      "member": "FreeformHelper.UI.Services.CadLoadWorkflowService.OpenDxfAsync(OpenDxfWorkflowRequest)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadWorkflowService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
     },
     {
       "syntaxHash": "4a102f05d6a9e47ba13a9d958107225ffdfe5d72242c28e21204c403399a6905",
@@ -2508,16 +2478,6 @@
       "symbol": "SuppressMessage:CA1822:Mark members as static"
     },
     {
-      "syntaxHash": "e1901abb6875ee73cb5034d3f9788d4b682e4262d8581cfacae7341a8a7bf441",
-      "member": "FreeformHelper.UI.Services.RuntimeQueryIpcHost.Start(ShellViewModel)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
       "syntaxHash": "b23b9b374ad0b97a4f8fa2d496b338c34a638ea7eb5869d0f49fb295099dccf5",
       "member": "FreeformHelper.UI.Services.RuntimeQueryNotchCacheService.fields:_revision",
       "owner": "NFH",
@@ -2578,16 +2538,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.CoordinatePlannerHostViewModel._sourceRevision"
     },
     {
-      "syntaxHash": "45f03dabb72b6ba4a44f3b30f99748dbab085f1b297269e886041c9c05906bfb",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunWithCadLoadCanvasOverlayAsync`1(Func<Task<TResult>>)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CadLoadOverlay.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
       "syntaxHash": "4723141b35467140f3af75c9ec4e4118c208b50ba4f6a50d2b514f196cb7baa3",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_workflowDataSnapshotRevision",
       "owner": "NFH",
@@ -2606,16 +2556,6 @@
       "count": 1,
       "rule": "generationFields",
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._notchCompensationCacheRevision"
-    },
-    {
-      "syntaxHash": "45f03dabb72b6ba4a44f3b30f99748dbab085f1b297269e886041c9c05906bfb",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunWithModalLoadingSpinnerAsync`1(Func<Task<TResult>>)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ModalLoading.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
     },
     {
       "syntaxHash": "ba4db073403ee10d21828d5e382615ffa425fc702072a7ca5659c2bcb227436c",
@@ -2656,66 +2596,6 @@
       "count": 1,
       "rule": "generationFields",
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._regularPadInspectorDeferredRefreshRequestId"
-    },
-    {
-      "syntaxHash": "92149ac038db2a53bde80006e777c174d1e942aba120280fd69c1120f21058e4",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ExportNotchTableAsync(string,string,string,string,Func<NotchTable, CadPadSet, RegularGrid, string>,bool)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "bd7a422b3cdbfbb59daf7efa9c4259328708240f7f6f51390a5dd0c6922bba71",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.SaveProjectAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "356c609a0b06b07f39653b0483e0bffed699f7d669644755c3448255b4f85c68",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.LoadProjectAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "4b2dcc1664699281181b57be11aca2b2fc2c878decfd008d045e6113e6bf709b",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.LoadProjectFromPathCoreAsync(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "c3bf8120e1559d8ec2fe41337f00ff593f306c916753afa2f5ca30d8d39f486c",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplyLoadedProjectStateAsync(ProjectFile,string,long)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "57fe9fc66f63df4fa4fd5e3e802cd23cdacb792903d5e840e97b98b469fd9af9",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.CreateSimulationWorkspaceSessionAsync(bool,Action<string>?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Simulation.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
     },
     {
       "syntaxHash": "75a0068f69b37adf91fb2acc75c86bd9f8686eb673520f600fd02ea58eecc64b",
@@ -2848,86 +2728,6 @@
       "symbol": "Result"
     },
     {
-      "syntaxHash": "b00c0ba552be885ea3328975493e6455c2cbc610d1c3cc9c3ab075d72ff12666",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ConfigureFilePickers(FreeformHelperViewModel,IStorageProvider)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Pickers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:Func<Task<string?>>?"
-    },
-    {
-      "syntaxHash": "5a4dcaac32c99ed5ec30fa58f68f26efd08daa12559a02669189bae103333ac8",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ConfigureFilePickers(FreeformHelperViewModel,IStorageProvider)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Pickers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:Func<Task<IReadOnlyList<string>>>?"
-    },
-    {
-      "syntaxHash": "25fb9442e3f62d4439ee3555934d901f0a32d9d3d3ded3d9bb8de45f27efec4c",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ConfigureFilePickers(FreeformHelperViewModel,IStorageProvider)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Pickers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:Func<Task<string?>>?"
-    },
-    {
-      "syntaxHash": "56c856c5c770a344fd99bdfcc5be1c7808f3cee4f62a56f0a5ba69ba49cf7d46",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ConfigureFilePickers(FreeformHelperViewModel,IStorageProvider)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Pickers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:Func<Task<string?>>?"
-    },
-    {
-      "syntaxHash": "f16b3846a4ae68eb710a47a852718c8bebd05eed3bb36d9b7447641c6a13f264",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ConfigureFilePickers(FreeformHelperViewModel,IStorageProvider)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Pickers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:Func<Task<string?>>?"
-    },
-    {
-      "syntaxHash": "3a5fb6e5d5fdebb23395c4fbb45d3b84ca2add8fd054a5eddabd815e108ac26c",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ConfigureFilePickers(FreeformHelperViewModel,IStorageProvider)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Pickers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:Func<string, string, Task<string?>>?"
-    },
-    {
-      "syntaxHash": "c5178abbf5551e85e84b977a668f49304922a8184144f127d0a46656ddec3726",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ConfigureFilePickers(FreeformHelperViewModel,IStorageProvider)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Pickers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:Func<string, string, Task<string?>>?"
-    },
-    {
-      "syntaxHash": "903c12c02925546ed2442aaa510f9d308f0b42b00f2e435b5de23f7722d4ce5d",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ConfigureFilePickers(FreeformHelperViewModel,IStorageProvider)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Pickers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:Func<Task<bool>>?"
-    },
-    {
       "syntaxHash": "9c4c1d90c447342d5326b441fe63fa734322c098f002f5ba6b9293fb6e71304b",
       "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.FixedTimeProvider",
       "owner": "NFH",
@@ -2936,16 +2736,6 @@
       "count": 1,
       "rule": "fakeClockDuplicates",
       "symbol": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.FixedTimeProvider"
-    },
-    {
-      "syntaxHash": "347431b679a4fd0cc62c57318fdf39289be73cdf274a84bcd782c6f9c15eee16",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_WriteFailure_PreservesExistingBytesAndRemovesTemporaryFile()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
     },
     {
       "syntaxHash": "65ea0cb72b9ff2a6e47715fa46d02ea89329a25fadc45db5198c1befda20b930",
@@ -2988,26 +2778,6 @@
       "symbol": "Wait"
     },
     {
-      "syntaxHash": "282d2d52aa8b4c21d845d716d349790b5c66040409a8ae099d623f89fe45e8ca",
-      "member": "FreeformHelper.Tests.LoadingScopeCoordinatorTests.RunAsync_ShowsBeforeAction_AndHidesAfterAction()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/LoadingScopeCoordinatorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "0422a856400fd0134bd7c5e8c6f5e6f125269d2079658a81743cde8a84196e4d",
-      "member": "FreeformHelper.Tests.RuntimeQueryCharacterizationSubject.HandleWithReplyAsync(string[],string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryCharacterizationSubject.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
       "syntaxHash": "dd3622d0a7cfee8791b3ce6a8691e957e2abcde8d8ec851b5e332ac95d1d771e",
       "member": "FreeformHelper.Tests.RuntimeQueryCoreBehaviorTests.DisposeAsync_WhenHandlerBlocksSynchronously_ReportsBoundAndReleasesPipe()",
       "owner": "NFH",
@@ -3016,16 +2786,6 @@
       "count": 1,
       "rule": "blockingWait",
       "symbol": "Wait"
-    },
-    {
-      "syntaxHash": "d46396a3ba53628ce90f42df4f2f3fafdbfabccf786939fd05f14c8df45c982c",
-      "member": "FreeformHelper.Tests.RuntimeQueryIpcTests.SendRequest_WhenServerAcceptsButDoesNotRespond_ReturnsTimeout()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryIpcTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
     },
     {
       "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
@@ -3056,26 +2816,6 @@
       "count": 3,
       "rule": "blockingWait",
       "symbol": "Result"
-    },
-    {
-      "syntaxHash": "4f232450a1d1ce4dcfd56f43d5d1ed04f37e48ac7a558caf71dc2481268dfe47",
-      "member": "FreeformHelper.Tests.UiEventRunnerTests.Run_AsynchronousFailure_ReportsOnceWithoutDispatcherException()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "0153ac33fab7b0538dc71de40799a357b115b3b60ba4f4013c8fa1b3af25ab7a",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.YieldCadLoadCanvasOverlayFrame_OffTheUiThread_DoesNotWaitForTheDispatcher()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Basics.LoadOverlay.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
     },
     {
       "syntaxHash": "b25639be4ec9b2e0cbebab31fdfcdaeddefe66df953544e6c089420981b00ab8",
