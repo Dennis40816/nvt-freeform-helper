@@ -14,6 +14,7 @@ using FreeformHelper.UI.Services;
 using NLog;
 using Nvt.Core.Lifecycle;
 using Nvt.Core.Threading;
+using NotchResolvedCacheEntry = (int Revision, ulong CadPoolFingerprint, int ActiveRegularHash, ulong GridFingerprint, bool EnableToRegular, bool EnableToFull, bool EnableToFullRuleEngine, bool EnableToFullRuleTrace, double StrictOverlapRatio, int? AnchorIcIndex, int? AnchorDiffIndex, FreeformHelper.Application.Services.NotchV22TargetAllocationAreaMode TargetAllocationAreaMode, FreeformHelper.Application.Services.NotchV22ResolvedResult Resolved);
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -141,18 +142,10 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly UndoService _undoService = new();
     private readonly UiOperationStatusReporter _statusReporter;
     private readonly NotchApplySimulationReviewUseCase _notchApplySimulationReviewUseCase = new();
-    private readonly Dictionary<int, (
-        int Revision, ulong CadPoolFingerprint, int ActiveRegularHash, ulong GridFingerprint,
-        bool EnableToRegular, bool EnableToFull, bool EnableToFullRuleEngine, bool EnableToFullRuleTrace,
-        double StrictOverlapRatio, int? AnchorIcIndex, int? AnchorDiffIndex,
-        NotchV22TargetAllocationAreaMode TargetAllocationAreaMode, NotchV22ResolvedResult Resolved)>
-        _notchResolvedResultCacheByCadId = new();
-    private (NotchValidationBucket Bucket, NotchTable Table, int NullDiffValue)? _notchValidationBucketCache;
-    private NotchTable? _lastGeneratedNotchTable;
+    private readonly NotchResultCacheState _notchCache = new(); // Holds the notch compensation and validation caches and the last generated notch table.
     private int _notchCompensationCacheRevision;
     private readonly NotchCompensationCacheCounters _notchCompensationCacheCounters = new();
     private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
-    private bool _lastNotchPreviewVisibleForPlayback;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperViewModel"/> class.
@@ -375,6 +368,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     /// <summary>Gets the pad match and workflow snapshot holder for tests.</summary>
     internal WorkflowDataState WorkflowDataForTests => _workflowData;
 
+    /// <summary>Gets the notch result cache holder for tests.</summary>
+    internal NotchResultCacheState NotchCacheForTests => _notchCache;
+
     internal int WorkflowDataSnapshotBuildCount { get; private set; }
 
     private WorkflowDataSnapshot BuildWorkflowDataSnapshot()
@@ -443,6 +439,24 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
         /// <summary>Gets or sets the last built workflow data snapshot with the revision it was built for.</summary>
         internal (int Revision, WorkflowDataSnapshot Snapshot)? SnapshotCache { get; set; }
+    }
+
+    /// <summary>
+    /// Holds the notch compensation result cache, the notch validation bucket cache, the last generated notch table and the last preview visibility seen by playback, for the main view model.
+    /// </summary>
+    internal sealed class NotchResultCacheState
+    {
+        /// <summary>Gets the resolved notch result cache keyed by CAD pad id.</summary>
+        internal Dictionary<int, NotchResolvedCacheEntry> ResolvedResultByCadId { get; } = new();
+
+        /// <summary>Gets or sets the cached validation bucket with the table and null diff value it was built for.</summary>
+        internal (NotchValidationBucket Bucket, NotchTable Table, int NullDiffValue)? ValidationBucket { get; set; }
+
+        /// <summary>Gets or sets the table of the last notch generation.</summary>
+        internal NotchTable? LastGeneratedTable { get; set; }
+
+        /// <summary>Gets or sets the preview visibility that the last playback sync saw.</summary>
+        internal bool LastPreviewVisibleForPlayback { get; set; }
     }
 }
 

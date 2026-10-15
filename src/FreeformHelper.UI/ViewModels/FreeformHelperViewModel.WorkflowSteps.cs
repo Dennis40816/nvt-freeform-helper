@@ -168,7 +168,7 @@ public sealed partial class FreeformHelperViewModel
         Interlocked.Increment(ref _notchFinalProjectionRevision);
         _notchExportGenerationCacheService.InvalidateCadAllocationProjectedRowCount();
         NotchExportSummary = NotchExportNotRunSummary;
-        _lastGeneratedNotchTable = null;
+        _notchCache.LastGeneratedTable = null;
         ClearNotchValidation();
     }
 

@@ -87,14 +87,14 @@ public sealed partial class FreeformHelperViewModel
             return false;
         }
 
-        if (_lastGeneratedNotchTable is null || _lastGeneratedNotchTable.Rows.Count == 0)
+        if (_notchCache.LastGeneratedTable is null || _notchCache.LastGeneratedTable.Rows.Count == 0)
         {
             failureCode = "NOT_READY";
             failureMessage = "Validation: no generated notch table. Run Step 5 Export once first.";
             return false;
         }
 
-        var bucket = EnsureNotchValidationBucket(_lastGeneratedNotchTable, nullDiffValue);
+        var bucket = EnsureNotchValidationBucket(_notchCache.LastGeneratedTable, nullDiffValue);
         report = NotchValidationUseCase.BuildRegularReportFromBucket(
             regularPadId,
             regularPad,
@@ -106,7 +106,7 @@ public sealed partial class FreeformHelperViewModel
         NotchTable table,
         int nullDiffValue)
     {
-        if (_notchValidationBucketCache is { } cached &&
+        if (_notchCache.ValidationBucket is { } cached &&
             ReferenceEquals(cached.Table, table) &&
             cached.NullDiffValue == nullDiffValue)
         {
@@ -117,7 +117,7 @@ public sealed partial class FreeformHelperViewModel
         var bucket = NotchValidationUseCase.BuildBucket(
             table,
             nullDiffValue);
-        _notchValidationBucketCache = (bucket, table, nullDiffValue);
+        _notchCache.ValidationBucket = (bucket, table, nullDiffValue);
         Logger.Info(CultureInfo.InvariantCulture, "Validation bucket rebuilt: tableRows={0}, null={1}, elapsed={2}ms.",
             table.Rows.Count,
             nullDiffValue,
@@ -169,7 +169,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void InvalidateNotchValidationCache()
     {
-        _notchValidationBucketCache = null;
+        _notchCache.ValidationBucket = null;
         ClearNotchValidationCollections();
     }
 

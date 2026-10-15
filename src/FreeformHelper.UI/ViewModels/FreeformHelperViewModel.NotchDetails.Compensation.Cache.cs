@@ -6,9 +6,9 @@ public sealed partial class FreeformHelperViewModel
 {
     private void InvalidateNotchCompensationCache()
     {
-        _notchCompensationCacheCounters.RecordInvalidation(_notchResolvedResultCacheByCadId.Count);
+        _notchCompensationCacheCounters.RecordInvalidation(_notchCache.ResolvedResultByCadId.Count);
         _notchCompensationCacheRevision++;
-        _notchResolvedResultCacheByCadId.Clear();
+        _notchCache.ResolvedResultByCadId.Clear();
         NotifySimulationWorkspaceSourceChanged();
     }
 
