@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia.Threading;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
 using Nvt.Core.Avalonia.Threading;
@@ -102,7 +103,7 @@ public sealed partial class FreeformHelperViewModel
             _hasDeferredAppGeneralPersistenceChanges = false;
             Logger.Debug(CultureInfo.InvariantCulture, "App general settings persisted: {0}", _appGeneralSettingsStore.SettingsPath);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Logger.Warn(ex, "Persist app general settings failed.");
         }

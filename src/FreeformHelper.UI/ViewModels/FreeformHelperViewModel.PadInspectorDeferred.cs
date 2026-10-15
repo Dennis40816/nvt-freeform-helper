@@ -325,7 +325,7 @@ public sealed partial class FreeformHelperViewModel
         {
             // Deferred refresh canceled.
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Logger.Warn(
                 ex,

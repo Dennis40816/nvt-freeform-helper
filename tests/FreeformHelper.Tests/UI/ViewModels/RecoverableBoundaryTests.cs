@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.UI;
 using FreeformHelper.UI.Controls;
@@ -43,6 +44,30 @@ public sealed class RecoverableBoundaryTests
         });
 
         Assert.Equal(0, applyCalls);
+    }
+
+    [Fact]
+    public void StartupLogLevelOverride_WhenReadingTheLevelRunsOutOfMemory_Propagates()
+    {
+        var applyCalls = 0;
+
+        Assert.Throws<OutOfMemoryException>(() => Program.ApplyStartupLogLevelOverride(
+            static () => throw CreateOutOfMemory(),
+            level =>
+            {
+                applyCalls++;
+                return level;
+            }));
+
+        Assert.Equal(0, applyCalls);
+    }
+
+    [Fact]
+    public void StartupLogLevelOverride_WhenApplyingTheLevelRunsOutOfMemory_Propagates()
+    {
+        Assert.Throws<OutOfMemoryException>(() => Program.ApplyStartupLogLevelOverride(
+            static () => "Debug",
+            static _ => throw CreateOutOfMemory()));
     }
 
     [Fact]
@@ -93,6 +118,25 @@ public sealed class RecoverableBoundaryTests
     }
 
     [Fact]
+    public void PersistAppGeneralSettings_WhenSaveRunsOutOfMemory_Propagates()
+    {
+        var directory = Directory.CreateTempSubdirectory("freeformhelper-persist-");
+        try
+        {
+            var store = new ScriptedSettingsStore(
+                Path.Combine(directory.FullName, "app-settings.json"),
+                static () => CreateOutOfMemory());
+            var vm = new FreeformHelperViewModel(store);
+
+            Assert.Throws<OutOfMemoryException>(vm.PersistAppGeneralSettingsNowForTests);
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
     public void PersistAppGeneralSettings_WhenSaveSucceeds_WritesTheDocument()
     {
         var directory = Directory.CreateTempSubdirectory("freeformhelper-persist-");
@@ -128,6 +172,44 @@ public sealed class RecoverableBoundaryTests
             Assert.True(trap.Fired);
             Assert.Contains("Layer filter failed", vm.StatusText, StringComparison.Ordinal);
             Assert.Contains("collection rejected", vm.StatusText, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task LayerFilter_WhenApplyingTheResultRunsOutOfMemory_Propagates()
+    {
+        var path = CreateTempDxfFile(("signal", 0, 0, 15, 10), ("signal", 5, 0, 20, 10), ("signal", 0, 0, 14, 10));
+        try
+        {
+            var vm = await CreateNotchExportCacheViewModelAsync(path);
+            using var trap = FailOnce(vm, nameof(vm.CadPads), CreateOutOfMemory());
+
+            Assert.Throws<OutOfMemoryException>(vm.FilterCadPadsByLayerForTests);
+            Assert.True(trap.Fired);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task AutoDetectFreeforms_WhenCommittingTheResultRunsOutOfMemory_Propagates()
+    {
+        var path = CreateTempDxfFile(("signal", 0, 0, 15, 10), ("signal", 5, 0, 20, 10), ("signal", 0, 0, 14, 10));
+        try
+        {
+            var vm = await CreateNotchExportCacheViewModelAsync(path);
+            var host = new FailingCanvasHost(CreateOutOfMemory());
+            vm.CanvasHost = host;
+
+            await Assert.ThrowsAsync<OutOfMemoryException>(() => vm.AutoDetectFreeformsCommand.ExecuteAsync(null));
+
+            Assert.True(host.Failed);
         }
         finally
         {
@@ -183,6 +265,32 @@ public sealed class RecoverableBoundaryTests
             File.Delete(path);
         }
     }
+
+    [AvaloniaFact]
+    public async Task DeferredRegularInspectorRefresh_WhenApplyingTheSnapshotRunsOutOfMemory_Propagates()
+    {
+        var path = CreateTempDxfFile(("signal", 0, 0, 15, 10), ("signal", 5, 0, 20, 10), ("signal", 0, 0, 14, 10));
+        try
+        {
+            var vm = await CreateNotchExportCacheViewModelAsync(path);
+            var regularPadId = vm.RegularPads[0].RegularPadId;
+            await SelectRegularPadAndSettleAsync(vm, regularPadId);
+            vm.CurrentPadInspectorSnapshot = vm.CurrentPadInspectorSnapshot! with { Kind = "stale" };
+            using var trap = FailOnce(vm, nameof(vm.CurrentPadInspectorSnapshot), CreateOutOfMemory());
+
+            await Assert.ThrowsAsync<OutOfMemoryException>(
+                () => vm.RunDeferredRegularInspectorSnapshotRefreshForTestsAsync(regularPadId, new CancellationTokenSource()));
+
+            Assert.True(trap.Fired);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    private static OutOfMemoryException CreateOutOfMemory() =>
+        (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
 
     private static async Task SelectRegularPadAndSettleAsync(FreeformHelperViewModel vm, int regularPadId)
     {

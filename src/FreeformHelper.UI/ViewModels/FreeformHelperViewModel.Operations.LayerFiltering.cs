@@ -54,7 +54,7 @@ public sealed partial class FreeformHelperViewModel
                 _ = TriggerGridRebuildAsync(requestFit: false);
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Layer filter failed", ex);
             Logger.Error(ex, "Layer filter failed.");
