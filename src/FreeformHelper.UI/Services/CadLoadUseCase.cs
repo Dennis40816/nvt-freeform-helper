@@ -65,7 +65,7 @@ public sealed class CadLoadUseCase
             {
                 return TryLoadFromPath(lastPath, options);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 pathLoadException = ex;
             }

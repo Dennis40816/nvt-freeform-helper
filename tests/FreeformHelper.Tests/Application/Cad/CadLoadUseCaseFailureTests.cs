@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
@@ -93,4 +94,28 @@ public sealed class CadLoadUseCaseFailureTests
     {
         throw new InvalidOperationException("path import failed");
     }
+
+    [Fact]
+    public void TryLoadFromProject_WhenPathImportRunsOutOfMemory_PropagatesWithoutTryingEmbedded()
+    {
+        var memory = CreateOutOfMemory();
+        var embeddedCalls = 0;
+        var useCase = new CadLoadUseCase(
+            (_, _) => throw memory,
+            (_, _) =>
+            {
+                embeddedCalls++;
+                return new DxfImportService().ImportFromStream(new MemoryStream(ValidEmbeddedDxfBytes), new DxfImportOptions());
+            });
+
+        var thrown = Assert.Throws<OutOfMemoryException>(
+            () => useCase.TryLoadFromProject(ExistingPath, ValidEmbeddedDxfBytes, new DxfImportOptions()));
+
+        Assert.Same(memory, thrown);
+        Assert.Equal(0, embeddedCalls);
+    }
+
+    // The runtime reserves this type (CA2201), so the instance is created without running a constructor.
+    private static OutOfMemoryException CreateOutOfMemory() =>
+        (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
 }

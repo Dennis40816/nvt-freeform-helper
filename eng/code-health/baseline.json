@@ -3838,36 +3838,6 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "41432e15da497854e03c2da045f5a60234ecd38720ea1d7e7b92d9087703d87f",
-      "member": "FreeformHelper.UI.Services.CadLoadUseCase.TryLoadFromProject(string?,byte[]?,DxfImportOptions)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "ce917203d2904a029b357a8577afcc9544586038ee5cd5b95f065c79b4ae86e3",
-      "member": "FreeformHelper.UI.Services.LayerCatalogStateService.TryLoadFromEmbedded(byte[]?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "c3331547ad9549a8d733ff9b30c26df2df6e957e4ffbf4438f70817caf209b16",
-      "member": "FreeformHelper.UI.Services.LayerCatalogStateService.TryLoadFromPath(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "fcbad7e3f3ddb25ee16a6716fa1d4dc58b1c708b0fadc9a89b14a63d077a5d96",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.AutoDetectFreeformsAsync()",
       "owner": "NFH",
@@ -7872,16 +7842,6 @@
       "member": "FreeformHelper.UI.Services.GridRebuildOrchestrator.fields:_padOverrideService",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/GridRebuildOrchestrator.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0052",
-      "symbol": "IDE0052"
-    },
-    {
-      "syntaxHash": "1cb0d607be1f1c24a58bfd9e6e1a72e418c5edde12af935f9b5ebeb9acb643ce",
-      "member": "FreeformHelper.UI.Services.LayerCatalogStateService.fields:_reader",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "IDE0052",

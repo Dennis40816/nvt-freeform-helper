@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.UI.Services;
 using Xunit;
@@ -54,4 +55,30 @@ public sealed class LayerCatalogStateServiceFailureTests
     {
         throw new InvalidOperationException("read failed");
     }
+
+    [Fact]
+    public void TryLoadFromPath_WhenReadRunsOutOfMemory_Propagates()
+    {
+        var memory = CreateOutOfMemory();
+        var service = new LayerCatalogStateService(_ => throw memory, ThrowInvalidOperation);
+
+        var thrown = Assert.Throws<OutOfMemoryException>(() => service.TryLoadFromPath(ExistingPath));
+
+        Assert.Same(memory, thrown);
+    }
+
+    [Fact]
+    public void TryLoadFromEmbedded_WhenReadRunsOutOfMemory_Propagates()
+    {
+        var memory = CreateOutOfMemory();
+        var service = new LayerCatalogStateService(ThrowInvalidOperation, _ => throw memory);
+
+        var thrown = Assert.Throws<OutOfMemoryException>(() => service.TryLoadFromEmbedded(SomeBytes));
+
+        Assert.Same(memory, thrown);
+    }
+
+    // The runtime reserves this type (CA2201), so the instance is created without running a constructor.
+    private static OutOfMemoryException CreateOutOfMemory() =>
+        (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
 }

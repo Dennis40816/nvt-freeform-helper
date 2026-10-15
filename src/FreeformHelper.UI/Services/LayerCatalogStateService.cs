@@ -1,4 +1,5 @@
 using System.Globalization;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Infrastructure.Dxf;
 using NLog;
 
@@ -68,7 +69,7 @@ public sealed class LayerCatalogStateService
             _catalog = _readFromPath(path);
             CachePathCatalog(path, length, writeUtc);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Clear();
             _cache = DxfLayerCatalog.Empty;
@@ -133,7 +134,7 @@ public sealed class LayerCatalogStateService
             _cachePathWriteUtc = default;
             Logger.Info(CultureInfo.InvariantCulture, "DXF layer catalog loaded from embedded bytes ({0} layers).", _catalog.Layers.Count);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Clear();
             _cache = DxfLayerCatalog.Empty;
