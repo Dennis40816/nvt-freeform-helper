@@ -1,3 +1,4 @@
+using FreeformHelper.Application.Services;
 using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -5,6 +6,12 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel
 {
     private CancellationTokenSource? _notchPreviewAutoPlayCts;
+
+    internal Task RunNotchPreviewAutoPlayLoopForTestsAsync(CancellationTokenSource cts)
+    {
+        _notchPreviewAutoPlayCts = cts;
+        return RunNotchPreviewAutoPlayLoopAsync(cts, cts.Token);
+    }
 
     private void RestartNotchPreviewAutoPlayLoop()
     {
@@ -118,7 +125,7 @@ public sealed partial class FreeformHelperViewModel
         {
             // Loop canceled.
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Logger.Warn(ex, "Notch preview auto-play loop crashed.");
         }

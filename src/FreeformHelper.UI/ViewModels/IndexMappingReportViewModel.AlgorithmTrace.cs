@@ -1,10 +1,15 @@
 using System.Globalization;
+using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Services;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class IndexMappingReportViewModel
 {
+    internal Action? TraceLoadStartedForTests { get; set; }
+
+    internal Task EnsureAlgorithmTraceForTestsAsync() => EnsureAlgorithmTraceForSelectedDecisionAsync(priorityOnly: false);
+
     private void MarkAlgorithmTraceNotRequested()
     {
         AlgorithmTraceEntries = Array.Empty<IndexMappingAlgorithmTraceEntryViewModel>();
@@ -58,6 +63,7 @@ public sealed partial class IndexMappingReportViewModel
 
         try
         {
+            TraceLoadStartedForTests?.Invoke();
             var trace = await Task.Run(
                 () => IndexMappingAlgorithmTraceProjector.Build(decision, TraceSchemaVersion, DateTime.UtcNow));
             if (requestVersion != _traceRequestVersion)
@@ -80,7 +86,7 @@ public sealed partial class IndexMappingReportViewModel
             AlgorithmTraceStatusText = $"Trace: ready ({trace.Count.ToString(CultureInfo.InvariantCulture)} entries).";
             OnPropertyChanged(nameof(HasAlgorithmTraceEntries));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             AlgorithmTraceState = IndexMappingAlgorithmTraceState.Failed;
             AlgorithmTraceStatusText = $"Trace: failed ({ex.GetType().Name}).";

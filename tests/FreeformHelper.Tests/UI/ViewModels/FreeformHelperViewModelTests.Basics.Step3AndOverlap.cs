@@ -1,6 +1,10 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -321,4 +325,164 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Empty(vm.SelectedCadPadIds);
     }
 
+    [AvaloniaFact]
+    public async Task NotchPreviewAutoPlay_WhenAdvancingTheStageFails_EndsTheLoopWithoutFailure()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var dxfPath = CreateResolvedSnapshotDxfFile();
+        try
+        {
+            var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
+            using var cts = new CancellationTokenSource();
+            var loop = StartAutoPlayLoopBeforePreviewAsync(vm, cts);
+            await ShowCadPreviewAsync(vm);
+            using var trap = FailOnStageChange(vm, new InvalidOperationException("stage rejected"));
+
+            await loop.WaitAsync(TimeSpan.FromSeconds(10));
+
+            Assert.True(trap.Fired);
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task NotchPreviewAutoPlay_WhenAdvancingTheStageRunsOutOfMemory_Propagates()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var dxfPath = CreateResolvedSnapshotDxfFile();
+        try
+        {
+            var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
+            using var cts = new CancellationTokenSource();
+            var loop = StartAutoPlayLoopBeforePreviewAsync(vm, cts);
+            await ShowCadPreviewAsync(vm);
+            using var trap = FailOnStageChange(vm, CreateBoundaryOutOfMemory());
+
+            await Assert.ThrowsAsync<OutOfMemoryException>(() => loop.WaitAsync(TimeSpan.FromSeconds(10)));
+            Assert.True(trap.Fired);
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task DeferredCadInspectorRefresh_WhenApplyingTheSnapshotFails_EndsWithoutFailureAndClearsPending()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var dxfPath = CreateResolvedSnapshotDxfFile();
+        try
+        {
+            var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
+            var cad = Assert.Single(vm.CadPads, static pad => pad.Layer == "signal-a");
+            vm.CurrentPadInspectorSnapshot = vm.BuildCadPadInspectorSnapshot(
+                cad.Id,
+                includeExpensiveNotchDetails: false,
+                includeNotchRowEligibilityDetails: false,
+                includeMatchDetails: false,
+                includeRuleTrace: false);
+            using var trap = FailOnSnapshotChange(vm, new InvalidOperationException("snapshot rejected"));
+            using var cts = new CancellationTokenSource();
+
+            var refresh = vm.RunDeferredCadInspectorSnapshotRefreshForTestsAsync(cad.Id, cts);
+            Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+            await refresh;
+
+            Assert.True(trap.Fired);
+            Assert.False(vm.IsPadInspectorDeferredRefreshPending);
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task DeferredCadInspectorRefresh_WhenApplyingTheSnapshotRunsOutOfMemory_Propagates()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var dxfPath = CreateResolvedSnapshotDxfFile();
+        try
+        {
+            var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
+            var cad = Assert.Single(vm.CadPads, static pad => pad.Layer == "signal-a");
+            vm.CurrentPadInspectorSnapshot = vm.BuildCadPadInspectorSnapshot(
+                cad.Id,
+                includeExpensiveNotchDetails: false,
+                includeNotchRowEligibilityDetails: false,
+                includeMatchDetails: false,
+                includeRuleTrace: false);
+            using var trap = FailOnSnapshotChange(vm, CreateBoundaryOutOfMemory());
+            using var cts = new CancellationTokenSource();
+
+            await Assert.ThrowsAsync<OutOfMemoryException>(() =>
+                vm.RunDeferredCadInspectorSnapshotRefreshForTestsAsync(cad.Id, cts));
+
+            Assert.True(trap.Fired);
+            Assert.False(vm.IsPadInspectorDeferredRefreshPending);
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
+    }
+
+    // Registers the loop first, so showing the preview later does not start a second, unobservable one.
+    private static Task StartAutoPlayLoopBeforePreviewAsync(FreeformHelperViewModel vm, CancellationTokenSource cts)
+    {
+        vm.NotchPreviewAutoPlayIntervalMs = 200m;
+        vm.NotchPreviewAutoPlayEnabled = true;
+        return vm.RunNotchPreviewAutoPlayLoopForTestsAsync(cts);
+    }
+
+    private static async Task ShowCadPreviewAsync(FreeformHelperViewModel vm)
+    {
+        var cad = Assert.Single(vm.CadPads, static pad => pad.Layer == "signal-a");
+        vm.ApplyCanvasSelection([cad.Id], Array.Empty<int>());
+        await WaitForConditionAsync(
+            () => !vm.IsPadInspectorDeferredRefreshPending && vm.IsNotchCanvasPreviewVisible,
+            timeoutMs: 3000);
+    }
+
+    private static OutOfMemoryException CreateBoundaryOutOfMemory() =>
+        (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
+
+    private static OnceThrowingPropertyChange FailOnStageChange(FreeformHelperViewModel vm, Exception failure) =>
+        new(vm, nameof(vm.NotchPreviewVisualizationStep), failure);
+
+    private static OnceThrowingPropertyChange FailOnSnapshotChange(FreeformHelperViewModel vm, Exception failure) =>
+        new(vm, nameof(vm.CurrentPadInspectorSnapshot), failure);
+
+    // Throws the failure from the first change notification of one property, then lets later changes pass.
+    private sealed class OnceThrowingPropertyChange : IDisposable
+    {
+        private readonly FreeformHelperViewModel _vm;
+        private readonly string _propertyName;
+        private readonly Exception _failure;
+        private int _fired;
+
+        public OnceThrowingPropertyChange(FreeformHelperViewModel vm, string propertyName, Exception failure)
+        {
+            _vm = vm;
+            _propertyName = propertyName;
+            _failure = failure;
+            _vm.PropertyChanged += OnPropertyChanged;
+        }
+
+        public bool Fired => Volatile.Read(ref _fired) == 1;
+
+        public void Dispose() => _vm.PropertyChanged -= OnPropertyChanged;
+
+        private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == _propertyName && Interlocked.Exchange(ref _fired, 1) == 0)
+            {
+                throw _failure;
+            }
+        }
+    }
 }

@@ -1,6 +1,8 @@
 using System.Reflection;
+using Avalonia.Headless.XUnit;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -131,5 +133,87 @@ public sealed partial class FreeformHelperViewModelTests
         await vm.ExportNotchCommand.ExecuteAsync(null);
 
         Assert.Equal("Export notch: import DXF and build grid first.", vm.StatusText);
+    }
+
+    [AvaloniaFact]
+    public async Task ExportDxfVisible_WhenTheSaveDialogFails_ReportsTheFailureAndKeepsRunning()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var dxfPath = CreateResolvedSnapshotDxfFile();
+        try
+        {
+            var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
+            vm.PickSaveExportPathAsync = static (_, _) => throw new IOException("disk gone");
+
+            await vm.ExportDxfVisibleCommand.ExecuteAsync(null);
+
+            Assert.Contains("Export DXF failed", vm.StatusText, StringComparison.Ordinal);
+            Assert.Contains("disk gone", vm.StatusText, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task ExportDxfVisible_WhenTheSaveDialogRunsOutOfMemory_Propagates()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var dxfPath = CreateResolvedSnapshotDxfFile();
+        try
+        {
+            var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
+            var failure = CreateBoundaryOutOfMemory();
+            vm.PickSaveExportPathAsync = (_, _) => throw failure;
+
+            await Assert.ThrowsAsync<OutOfMemoryException>(() => vm.ExportDxfVisibleCommand.ExecuteAsync(null));
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task ExportDxfLayerImage_WhenTheRequestDialogFails_ReportsTheFailureAndKeepsRunning()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var dxfPath = CreateResolvedSnapshotDxfFile();
+        try
+        {
+            var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
+            vm.PickSaveExportPathAsync = static (_, _) => Task.FromResult<string?>(null);
+            vm.OpenDxfLayerImageExportAsync = static _ => throw new IOException("dialog gone");
+
+            await vm.ExportDxfLayerImageCommand.ExecuteAsync(null);
+
+            Assert.Contains("Export DXF image failed", vm.StatusText, StringComparison.Ordinal);
+            Assert.Contains("dialog gone", vm.StatusText, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task ExportDxfLayerImage_WhenTheRequestDialogRunsOutOfMemory_Propagates()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var dxfPath = CreateResolvedSnapshotDxfFile();
+        try
+        {
+            var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
+            var failure = CreateBoundaryOutOfMemory();
+            vm.PickSaveExportPathAsync = static (_, _) => Task.FromResult<string?>(null);
+            vm.OpenDxfLayerImageExportAsync = _ => throw failure;
+
+            await Assert.ThrowsAsync<OutOfMemoryException>(() => vm.ExportDxfLayerImageCommand.ExecuteAsync(null));
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
     }
 }
