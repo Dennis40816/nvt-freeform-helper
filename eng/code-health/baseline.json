@@ -15878,26 +15878,6 @@
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
     },
     {
-      "syntaxHash": "690fdca359fe9332cc2f9b0d2f9bf13d9c8aeaee7793cf46ce6c5d9651ee36a7",
-      "member": "FreeformHelper.UI.ViewModels.IndexMappingReportViewModel.LoadTraceAsync(IndexMappingDecisionRowViewModel,string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTime.UtcNow"
-    },
-    {
-      "syntaxHash": "6c38c02737479be30e73ec4e7f05b8b309eafa54bf98dbbbec8b61a3bf267e0c",
-      "member": "FreeformHelper.UI.ViewModels.IndexMappingReportViewModel.PrefetchBackgroundTraceAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTime.UtcNow"
-    },
-    {
       "syntaxHash": "4d14ac912418b225f0de9b528e6733316bb065b19a562da4f272df75a6b244e6",
       "member": "FreeformHelper.UI.ViewModels.ShellViewModel.RunWorkspaceSourceChangeDrainAsync()",
       "owner": "NFH",
