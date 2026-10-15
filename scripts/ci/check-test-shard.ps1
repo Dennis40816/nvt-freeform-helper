@@ -9,7 +9,8 @@ param(
     [string]$Commit = "",
     [switch]$TestRunFailed,
     [switch]$Unverified,
-    # Facts collected by the shard runner; they do not participate in verdicts or summaries.
+    # Facts collected by the shard runner; they do not participate in verdicts. The summary exports only the fixed
+    # group name, exit code, TRX file count and per-group total.
     [object[]]$RunDiagnostics = @()
 )
 
@@ -55,6 +56,25 @@ try {
 $checks.updateModeVariableSet = (Test-Path -LiteralPath "Env:FREEFORMHELPER_UPDATE_NOTCH_BASELINE") -or
     (Test-Path -LiteralPath "Env:FREEFORMHELPER_UPDATE_TM81_NOTCH_MATRIX")
 
+# Per-group facts so a missing group shows in the summary. Only fixed names, integers and null are exported.
+$knownGroups = @("notch-core", "application", "infrastructure", "uncategorized", "ui-stable", "ui-viewmodel", "ui-snapshots")
+$groups = @()
+foreach ($diagnostic in $RunDiagnostics) {
+    if ($knownGroups -cnotcontains [string]$diagnostic.Group) { continue }
+    $groupTotal = 0
+    try {
+        $groupTotal = [int](Read-TrxResults -ResultsDirectory (Join-Path $ResultsDirectory ([string]$diagnostic.Group))).Total
+    } catch {
+        $groupTotal = 0
+    }
+    $groups += [ordered]@{
+        name = [string]$diagnostic.Group
+        exitCode = if ($null -ne $diagnostic.ExitCode) { [int]$diagnostic.ExitCode } else { $null }
+        trxFileCount = [int]$diagnostic.TrxFiles
+        total = $groupTotal
+    }
+}
+
 if ([string]::IsNullOrWhiteSpace($Commit)) {
     $Commit = [string](git -C (Join-Path $PSScriptRoot "../..") rev-parse HEAD 2>$null)
 }
@@ -79,6 +99,7 @@ $summary = [ordered]@{
     failedTests = @($counts.FailedTests)
     exampleData = [ordered]@{ present = $ExampleDataPresent; executed = $exampleExecuted }
     checks = $checks
+    groups = @($groups)
 }
 try {
     $json = $summary | ConvertTo-Json -Depth 6

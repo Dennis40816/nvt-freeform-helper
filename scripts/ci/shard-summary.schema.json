@@ -14,7 +14,8 @@
     "notExecuted",
     "failedTests",
     "exampleData",
-    "checks"
+    "checks",
+    "groups"
   ],
   "additionalProperties": false,
   "properties": {
@@ -100,6 +101,46 @@
         },
         "updateModeVariableSet": {
           "type": "boolean"
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "exitCode",
+          "trxFileCount",
+          "total"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "enum": [
+              "notch-core",
+              "application",
+              "infrastructure",
+              "uncategorized",
+              "ui-stable",
+              "ui-viewmodel",
+              "ui-snapshots"
+            ]
+          },
+          "exitCode": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "trxFileCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       }
     }
