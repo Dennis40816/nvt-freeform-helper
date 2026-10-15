@@ -21,13 +21,13 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        if (_selectedRegIndices.Count == 0)
+        if (_selection.RegularIndices.Count == 0)
         {
             SetStatus("Freeform tagging: select regular pads first.");
             return;
         }
 
-        SetFreeformForPadIndices(_selectedRegIndices, type);
+        SetFreeformForPadIndices(_selection.RegularIndices, type);
     }
 
     internal void SetFreeformForPadIndices(IReadOnlyCollection<int> padIndices, FreeformType type)

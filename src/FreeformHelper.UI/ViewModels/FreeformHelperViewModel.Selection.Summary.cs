@@ -40,7 +40,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void UpdateSelectedRangeSummary()
     {
-        var summary = SelectionSummaryUseCase.Compute(_grid, _selectedCadIds, _selectedRegIndices);
+        var summary = SelectionSummaryUseCase.Compute(_grid, _selectedCadIds, _selection.RegularIndices);
 
         SelectionSummaryResult = summary;
         SetManualRangeInputs(summary.ManualRowsRange, summary.ManualColsRange);

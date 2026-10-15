@@ -330,8 +330,8 @@ public sealed partial class FreeformHelperViewModel
         RefreshDxfRegularSourceHint();
         NotifySimulationWorkspaceSourceChanged();
 
-        var shouldClear = !SuppressSelectionClearOnRebuild;
-        SuppressSelectionClearOnRebuild = false;
+        var shouldClear = !_selection.SuppressClearOnRebuild;
+        _selection.SuppressClearOnRebuild = false;
         if (shouldClear)
         {
             _selectionCoordinator.ClearSelection(CanvasHost);
@@ -383,8 +383,8 @@ public sealed partial class FreeformHelperViewModel
             ResetWorkflowFromStep(WorkflowStepId.Step1Match, showStatus: false);
         }
 
-        var shouldClearSelection = !SuppressSelectionClearOnRebuild;
-        SuppressSelectionClearOnRebuild = false;
+        var shouldClearSelection = !_selection.SuppressClearOnRebuild;
+        _selection.SuppressClearOnRebuild = false;
         if (shouldClearSelection)
         {
             _selectionCoordinator.ClearSelection(CanvasHost);
