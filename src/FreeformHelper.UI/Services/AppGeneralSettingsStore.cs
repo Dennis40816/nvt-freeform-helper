@@ -8,7 +8,7 @@ namespace FreeformHelper.UI.Services;
 /// Persists app-level general settings (cross-project defaults) between app runs.
 /// Layer priority: Project file settings > App general settings > Built-in defaults.
 /// </summary>
-public sealed class AppGeneralSettingsStore
+public class AppGeneralSettingsStore
 {
     public const string SettingsPathOverrideEnvironmentVariable = "FREEFORMHELPER_APP_GENERAL_SETTINGS_PATH";
 
@@ -83,7 +83,7 @@ public sealed class AppGeneralSettingsStore
         }
     }
 
-    public void Save(AppGeneralSettingsDocument document)
+    public virtual void Save(AppGeneralSettingsDocument document)
     {
         ArgumentNullException.ThrowIfNull(document);
 

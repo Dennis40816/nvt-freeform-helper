@@ -1,4 +1,5 @@
 using System.Globalization;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
@@ -228,7 +229,7 @@ public sealed partial class FreeformHelperViewModel
                 setStatusFromSummary: true,
                 reapplyManualOverrides: false);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Auto detect failed", ex);
         }

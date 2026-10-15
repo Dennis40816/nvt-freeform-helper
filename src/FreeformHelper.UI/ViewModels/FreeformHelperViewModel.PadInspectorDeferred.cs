@@ -17,6 +17,18 @@ public sealed partial class FreeformHelperViewModel
     private CancellationTokenSource? _regularPadInspectorDeferredRefreshCts;
     private long _regularPadInspectorDeferredRefreshRequestId;
 
+    internal Task RunDeferredRegularInspectorSnapshotRefreshForTestsAsync(int regularPadId, CancellationTokenSource cts)
+    {
+        _regularPadInspectorDeferredRefreshCts = cts;
+        UpdatePadInspectorDeferredRefreshPendingState();
+        return RunDeferredRegularInspectorSnapshotRefreshAsync(
+            Interlocked.Read(ref _regularPadInspectorDeferredRefreshRequestId),
+            regularPadId,
+            Interlocked.Read(ref _padInspectorSelectionRevision),
+            cts,
+            cts.Token);
+    }
+
     public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId)
     {
         QueueDeferredCadInspectorSnapshotRefresh(
@@ -317,7 +329,7 @@ public sealed partial class FreeformHelperViewModel
         {
             // Deferred refresh canceled.
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Logger.Warn(
                 ex,

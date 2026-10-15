@@ -3448,16 +3448,6 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "e0edeecb04de965ddc44d74c468ed693204dcebfd863b68d8edb6f7c464e3bef",
-      "member": "FreeformHelper.UI.Program.TryApplyStartupLogLevelOverride()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Program.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "6e4aae34edf8f0ce29ab63e3c3f74afe9dc0eaec1f19c43fea81036ff52620cf",
       "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.LooksLikeWhitelistShape(string)",
       "owner": "NFH",
@@ -3538,16 +3528,6 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "fcbad7e3f3ddb25ee16a6716fa1d4dc58b1c708b0fadc9a89b14a63d077a5d96",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.AutoDetectFreeformsAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "f894e99601a5abd1145baffbe06a76c24789b33a6cf0a96781ef0e204c5f06f3",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ExportDxfAsync(bool)",
       "owner": "NFH",
@@ -3568,30 +3548,10 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "45577dbbf024be34b45a7b7c239a3405e54a890652c95e54478ab277c3a07788",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.FilterCadPadsByLayer()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "b1e76d2ace1ea36ffd7dfc327a5dde094a1955d6b6345083f6a47b2c421993e4",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.LoadProjectFromPathCoreAsync(string)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "eab293ddd331e2d3273a5ddac8fd5d9bb3906a7d7f8dbb41724c38424e996409",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.PersistAppGeneralSettingsNow(bool)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "CA1031",
@@ -3610,16 +3570,6 @@
     {
       "syntaxHash": "4a5e512588ff2f187e9e6057a7f4921be983a922189932771598e99c8bd63436",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunDeferredCadInspectorSnapshotRefreshAsync(long,int,long,CancellationTokenSource,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "c2ccdcad12f8a93f6408213ea95a4132549a6be731971f8ae2bfe4289ca22eb2",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunDeferredRegularInspectorSnapshotRefreshAsync(long,int,long,CancellationTokenSource,CancellationToken)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
       "project": "FreeformHelper.UI",
