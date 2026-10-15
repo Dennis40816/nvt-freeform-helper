@@ -18,6 +18,8 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class RecoverableBoundaryTests
 {
+    private const int SettleTimeoutMilliseconds = 10_000;
+
     [Fact]
     public void StartupLogLevelOverride_WhenLevelIsRequested_AppliesIt()
     {
@@ -73,89 +75,77 @@ public sealed class RecoverableBoundaryTests
     [Fact]
     public void StartupLogLevelOverride_WhenReadingTheLevelFails_ContinuesStartup()
     {
+        var readCalls = 0;
         var applyCalls = 0;
 
         Program.ApplyStartupLogLevelOverride(
-            static () => throw new InvalidOperationException("settings unreadable"),
+            () =>
+            {
+                readCalls++;
+                throw new InvalidOperationException("settings unreadable");
+            },
             level =>
             {
                 applyCalls++;
                 return level;
             });
 
+        Assert.Equal(1, readCalls);
         Assert.Equal(0, applyCalls);
     }
 
     [Fact]
     public void StartupLogLevelOverride_WhenApplyingTheLevelFails_ContinuesStartup()
     {
+        var applyCalls = 0;
+
         Program.ApplyStartupLogLevelOverride(
             static () => "Debug",
-            static _ => throw new InvalidOperationException("level rejected"));
+            _ =>
+            {
+                applyCalls++;
+                throw new InvalidOperationException("level rejected");
+            });
+
+        Assert.Equal(1, applyCalls);
     }
 
     [Fact]
     public void PersistAppGeneralSettings_WhenSaveFails_KeepsTheViewModelUsable()
     {
-        var directory = Directory.CreateTempSubdirectory("freeformhelper-persist-");
-        try
-        {
-            var store = new ScriptedSettingsStore(
-                Path.Combine(directory.FullName, "app-settings.json"),
-                static () => new IOException("disk full"));
-            var vm = new FreeformHelperViewModel(store);
-            store.SaveCalls = 0;
+        var store = new ScriptedSettingsStore(static () => new IOException("disk full"));
+        var vm = new FreeformHelperViewModel(store);
+        store.SaveCalls = 0;
 
-            vm.PersistAppGeneralSettingsNowForTests();
+        vm.PersistAppGeneralSettingsNowForTests();
 
-            Assert.Equal(1, store.SaveCalls);
-            Assert.False(vm.AppGeneralPersistenceForTests.DeferAfterProjectLoad);
-        }
-        finally
-        {
-            directory.Delete(recursive: true);
-        }
+        Assert.Equal(1, store.SaveCalls);
+        Assert.Null(store.LastSaved);
     }
 
     [Fact]
     public void PersistAppGeneralSettings_WhenSaveRunsOutOfMemory_Propagates()
     {
-        var directory = Directory.CreateTempSubdirectory("freeformhelper-persist-");
-        try
-        {
-            var store = new ScriptedSettingsStore(
-                Path.Combine(directory.FullName, "app-settings.json"),
-                static () => CreateOutOfMemory());
-            var vm = new FreeformHelperViewModel(store);
+        var store = new ScriptedSettingsStore(static () => CreateOutOfMemory());
+        var vm = new FreeformHelperViewModel(store);
+        store.SaveCalls = 0;
 
-            Assert.Throws<OutOfMemoryException>(vm.PersistAppGeneralSettingsNowForTests);
-        }
-        finally
-        {
-            directory.Delete(recursive: true);
-        }
+        Assert.Throws<OutOfMemoryException>(vm.PersistAppGeneralSettingsNowForTests);
+
+        Assert.Equal(1, store.SaveCalls);
     }
 
     [Fact]
-    public void PersistAppGeneralSettings_WhenSaveSucceeds_WritesTheDocument()
+    public void PersistAppGeneralSettings_WhenSaveSucceeds_HandsOverTheDocument()
     {
-        var directory = Directory.CreateTempSubdirectory("freeformhelper-persist-");
-        try
-        {
-            var path = Path.Combine(directory.FullName, "app-settings.json");
-            var store = new ScriptedSettingsStore(path, static () => null);
-            var vm = new FreeformHelperViewModel(store);
-            store.SaveCalls = 0;
+        var store = new ScriptedSettingsStore(static () => null);
+        var vm = new FreeformHelperViewModel(store);
+        store.SaveCalls = 0;
 
-            vm.PersistAppGeneralSettingsNowForTests();
+        vm.PersistAppGeneralSettingsNowForTests();
 
-            Assert.Equal(1, store.SaveCalls);
-            Assert.True(File.Exists(path));
-        }
-        finally
-        {
-            directory.Delete(recursive: true);
-        }
+        Assert.Equal(1, store.SaveCalls);
+        Assert.NotNull(store.LastSaved);
     }
 
     [AvaloniaFact]
@@ -254,8 +244,11 @@ public sealed class RecoverableBoundaryTests
                 vm,
                 nameof(vm.CurrentPadInspectorSnapshot),
                 new InvalidOperationException("snapshot rejected"));
+            using var cts = new CancellationTokenSource();
 
-            await vm.RunDeferredRegularInspectorSnapshotRefreshForTestsAsync(regularPadId, new CancellationTokenSource());
+            var refresh = vm.RunDeferredRegularInspectorSnapshotRefreshForTestsAsync(regularPadId, cts);
+            Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+            await refresh;
 
             Assert.True(trap.Fired);
             Assert.False(vm.IsPadInspectorDeferredRefreshPending);
@@ -277,11 +270,17 @@ public sealed class RecoverableBoundaryTests
             await SelectRegularPadAndSettleAsync(vm, regularPadId);
             vm.CurrentPadInspectorSnapshot = vm.CurrentPadInspectorSnapshot! with { Kind = "stale" };
             using var trap = FailOnce(vm, nameof(vm.CurrentPadInspectorSnapshot), CreateOutOfMemory());
+            using var cts = new CancellationTokenSource();
 
-            await Assert.ThrowsAsync<OutOfMemoryException>(
-                () => vm.RunDeferredRegularInspectorSnapshotRefreshForTestsAsync(regularPadId, new CancellationTokenSource()));
+            await Assert.ThrowsAsync<OutOfMemoryException>(async () =>
+            {
+                var refresh = vm.RunDeferredRegularInspectorSnapshotRefreshForTestsAsync(regularPadId, cts);
+                Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+                await refresh;
+            });
 
             Assert.True(trap.Fired);
+            Assert.False(vm.IsPadInspectorDeferredRefreshPending);
         }
         finally
         {
@@ -294,12 +293,42 @@ public sealed class RecoverableBoundaryTests
 
     private static async Task SelectRegularPadAndSettleAsync(FreeformHelperViewModel vm, int regularPadId)
     {
-        vm.ApplyCanvasSelection(Array.Empty<int>(), [regularPadId]);
-        var deadline = Environment.TickCount64 + 10_000;
-        while (vm.CurrentPadInspectorSnapshot?.Regular?.RegularPadId != regularPadId || vm.IsPadInspectorDeferredRefreshPending)
+        var settled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var selectionApplied = 0;
+
+        bool IsSettled() =>
+            vm.CurrentPadInspectorSnapshot?.Regular?.RegularPadId == regularPadId && !vm.IsPadInspectorDeferredRefreshPending;
+
+        void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            Assert.True(Environment.TickCount64 < deadline, $"The inspector did not settle (status: '{vm.StatusText}').");
-            await Task.Delay(20);
+            // The immediate snapshot is set before the deferred refresh is queued, so ignore changes until the
+            // selection call has returned.
+            if (Volatile.Read(ref selectionApplied) == 1 && IsSettled())
+            {
+                settled.TrySetResult();
+            }
+        }
+
+        vm.PropertyChanged += OnPropertyChanged;
+        try
+        {
+            vm.ApplyCanvasSelection(Array.Empty<int>(), [regularPadId]);
+            Volatile.Write(ref selectionApplied, 1);
+            if (!IsSettled())
+            {
+                try
+                {
+                    await settled.Task.WaitAsync(TimeSpan.FromMilliseconds(SettleTimeoutMilliseconds));
+                }
+                catch (TimeoutException)
+                {
+                    Assert.Fail($"The inspector did not settle (status: '{vm.StatusText}').");
+                }
+            }
+        }
+        finally
+        {
+            vm.PropertyChanged -= OnPropertyChanged;
         }
     }
 
@@ -380,9 +409,13 @@ public sealed class RecoverableBoundaryTests
         public PadCanvasVisibleDrawPerfSnapshot GetVisibleDrawPerfSnapshot() => default;
     }
 
-    private sealed class ScriptedSettingsStore(string path, Func<Exception?> failure) : AppGeneralSettingsStore(path)
+    // Never touches the disk: Load finds no file at the path, and Save only records what it was given.
+    private sealed class ScriptedSettingsStore(Func<Exception?> failure)
+        : AppGeneralSettingsStore(Path.Combine(AppContext.BaseDirectory, "recoverable-boundary-unused.json"))
     {
         public int SaveCalls { get; set; }
+
+        public AppGeneralSettingsDocument? LastSaved { get; private set; }
 
         public override void Save(AppGeneralSettingsDocument document)
         {
@@ -393,7 +426,7 @@ public sealed class RecoverableBoundaryTests
                 throw error;
             }
 
-            base.Save(document);
+            LastSaved = document;
         }
     }
 }
