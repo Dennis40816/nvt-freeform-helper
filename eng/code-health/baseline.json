@@ -3908,26 +3908,6 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "d7aaa20497af3f8b3ca86e4eb6f372cdafd6cfd6ca740ae1a4fe2fd3f6d36a5b",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunUiOperationAsync(string,Func<Task>,Action<Exception>,Action?,bool).local:ExecuteCoreAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "a5e52c18a74379f2568ce574745207fcb85833fb41bf760d9ed60e1e58868949",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunUiProgressOperationAsync(string,Action<bool>,Action<double>,Func<Action<double>, Task>,Action<Exception>,Action?,bool).local:ExecuteCoreAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "55cebb9d76be777d99a03d5faf487eb441e7a10b90741a61c30d75cd4cd130d4",
       "member": "FreeformHelper.UI.ViewModels.IndexMappingReportViewModel.LoadTraceAsync(IndexMappingDecisionRowViewModel,string)",
       "owner": "NFH",

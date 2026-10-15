@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using FreeformHelper.Application.Services;
 using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -63,7 +64,7 @@ public sealed partial class FreeformHelperViewModel
                 var reportProgress = CreateUiProgressReporter(setProgress);
                 await operationAsync(reportProgress);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 onError(ex);
             }
@@ -104,7 +105,7 @@ public sealed partial class FreeformHelperViewModel
                 onStart?.Invoke();
                 await operationAsync();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 onError(ex);
             }
@@ -146,6 +147,16 @@ public sealed partial class FreeformHelperViewModel
         await RunUiOperationAsync(operationName, CaptureResultAsync, ex => result = onError(ex), onStart, showModalSpinner);
         return result;
     }
+
+    internal Task RunUiProgressOperationForTestsAsync(
+        string operationName,
+        Action<bool> setBusy,
+        Action<double> setProgress,
+        Func<Action<double>, Task> operationAsync,
+        Action<Exception> onError,
+        Action? onStart = null,
+        bool showModalSpinner = true) =>
+        RunUiProgressOperationAsync(operationName, setBusy, setProgress, operationAsync, onError, onStart, showModalSpinner);
 
     internal Task<TResult> RunUiOperationForTestsAsync<TResult>(
         string operationName,
