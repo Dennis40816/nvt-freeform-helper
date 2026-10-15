@@ -9,7 +9,7 @@
     "processStart": 4,
     "directClockReads": 17,
     "bareCatch": 12,
-    "catchException": 27,
+    "catchException": 26,
     "suppressFlagFields": 5,
     "freeformViewModelStateMembers": 104,
     "shellNavigationBooleans": 0,
@@ -64,7 +64,7 @@
       "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:87", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:163", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:181", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:198", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:323"
     ],
     "catchException": [
-      "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs:77", "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs:106",
+      "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs:116",
       "src/FreeformHelper.UI/Program.cs:53", "src/FreeformHelper.UI/Program.cs:135",
       "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:79",
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:225", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:311", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:586",

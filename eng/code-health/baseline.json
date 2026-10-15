@@ -3238,16 +3238,6 @@
       "symbol": "NoWarn:1591"
     },
     {
-      "syntaxHash": "babcd6d0cf0c6c732cbdf22149224aa4dbb4af9a2a9273d689b97b880080f066",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/FreeformHelper.Application.csproj",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:CA1031"
-    },
-    {
       "syntaxHash": "11296c0397a890e23ef507ec0659e1184f2e4bd21bfa743070e05f95234b6dbe",
       "member": "MSBuild",
       "owner": "NFH",
@@ -3666,26 +3656,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "WarningsNotAsErrors:VSTHRD103"
-    },
-    {
-      "syntaxHash": "f479e6d83d2caeb3f36d566cd444d59d98d1424c58d6d437812d156d299587fa",
-      "member": "FreeformHelper.Application.Services.RegularVisibilityMaskService.Load(string?,RegularGrid,DiffFrameGridRowOrigin)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "47c22845d0ee599cf5b854106c0963a2c9ee3e2ad97792c968c36b034bebad57",
-      "member": "FreeformHelper.Application.Services.RegularVisibilityMaskService.LoadEmbedded(byte[]?,string?,RegularGrid,DiffFrameGridRowOrigin)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
     },
     {
       "syntaxHash": "4d5720406773f8680c5d16367834777ee736799101f6bfb9298b1320b5919895",
