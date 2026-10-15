@@ -2768,16 +2768,6 @@
       "symbol": "Wait"
     },
     {
-      "syntaxHash": "145d04d5c5dade8f433b04725125712f12bf804c604f0bd9ae3bbaf704cb213c",
-      "member": "FreeformHelper.Tests.CadLoadSpinnerProcessHostTests.Show_WhileHideSendIsInFlight_RestoresVisibleState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CadLoadSpinnerProcessHostTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Wait"
-    },
-    {
       "syntaxHash": "dd3622d0a7cfee8791b3ce6a8691e957e2abcde8d8ec851b5e332ac95d1d771e",
       "member": "FreeformHelper.Tests.RuntimeQueryCoreBehaviorTests.DisposeAsync_WhenHandlerBlocksSynchronously_ReportsBoundAndReleasesPipe()",
       "owner": "NFH",

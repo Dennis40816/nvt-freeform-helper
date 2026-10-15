@@ -91,13 +91,13 @@ public sealed class CadLoadSpinnerProcessHostTests
     [AvaloniaFact]
     public async Task Show_WhileHideSendIsInFlight_RestoresVisibleState()
     {
-        using var hideSendEntered = new ManualResetEventSlim(false);
+        var hideSendEntered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         using var releaseHideSend = new ManualResetEventSlim(false);
         using var host = new CadLoadSpinnerProcessHost(request =>
         {
             if (request.Command == CadLoadSpinnerIpcProtocol.HideCommand)
             {
-                hideSendEntered.Set();
+                hideSendEntered.TrySetResult();
                 releaseHideSend.Wait();
             }
 
@@ -112,7 +112,7 @@ public sealed class CadLoadSpinnerProcessHostTests
         var stateSync = host.GetLatestStateSyncTask();
         try
         {
-            Assert.True(hideSendEntered.Wait(TimeSpan.FromSeconds(5)));
+            await AwaitWithStateAsync(hideSendEntered.Task, "The hide message was not sent", host, stateSync);
             host.Show(owner);
         }
         finally
@@ -120,10 +120,27 @@ public sealed class CadLoadSpinnerProcessHostTests
             releaseHideSend.Set();
         }
 
-        await stateSync.WaitAsync(TimeSpan.FromSeconds(5));
+        await AwaitWithStateAsync(stateSync, "The state sync did not finish", host, stateSync);
         var snapshot = host.GetVisibilityStateSnapshot();
         Assert.Equal("Visible", snapshot.Requested);
         Assert.Equal("Visible", snapshot.Effective);
+    }
+
+    // Long on purpose: it is only the safety net that turns a real hang into a failure with the state in the message.
+    private static TimeSpan SafetyNetTimeout => TimeSpan.FromSeconds(30);
+
+    private static async Task AwaitWithStateAsync(Task awaited, string what, CadLoadSpinnerProcessHost host, Task stateSync)
+    {
+        try
+        {
+            await awaited.WaitAsync(SafetyNetTimeout);
+        }
+        catch (TimeoutException)
+        {
+            var snapshot = host.GetVisibilityStateSnapshot();
+            Assert.Fail(
+                $"{what} within {SafetyNetTimeout.TotalSeconds:0} s. Requested={snapshot.Requested}, Effective={snapshot.Effective}, state sync status={stateSync.Status}.");
+        }
     }
 
     private static void SetVisibilityState(CadLoadSpinnerProcessHost host, string fieldName, string stateName)
