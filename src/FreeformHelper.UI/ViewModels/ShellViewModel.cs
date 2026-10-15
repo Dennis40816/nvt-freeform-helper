@@ -43,6 +43,12 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     private int _pendingWorkspaceSourceChangeVersion;
     private int _processedWorkspaceSourceChangeVersion;
     private int _workspaceSourceChangeDrainRunning;
+
+    internal const string WorkspaceSourceChangeDrainWorkName = "workspace-source-change-drain";
+
+    // Starts the workspace source change drain. Tests replace its runner to observe the drain and its failure.
+    internal BackgroundWorkRunnerSlot BackgroundWork { get; } = new();
+
     public HowToUseViewModel HowToUse => _howToUse ??= new HowToUseViewModel();
     public DevViewModel Dev => _dev ??= new DevViewModel { UiEvents = UiEvents };
     public SimulationHostViewModel Simulation => _simulation ??= new SimulationHostViewModel();

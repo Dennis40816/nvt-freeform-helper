@@ -8,13 +8,6 @@ public sealed partial class ShellViewModel
 {
     internal Task? WorkspaceBuildPauseForTests { get; set; }
 
-    internal Task RunWorkspaceSourceChangeDrainForTestsAsync()
-    {
-        Interlocked.Increment(ref _pendingWorkspaceSourceChangeVersion);
-        Volatile.Write(ref _workspaceSourceChangeDrainRunning, 1);
-        return RunWorkspaceSourceChangeDrainAsync();
-    }
-
     private async Task BuildSimulationWorkspaceAsync()
     {
         var viewModel = await BuildOrBindSimulationWorkspaceAsync(silent: false, overwriteExistingWorkspace: true);
@@ -172,7 +165,7 @@ public sealed partial class ShellViewModel
             return;
         }
 
-        _ = RunWorkspaceSourceChangeDrainAsync();
+        BackgroundWork.Run(WorkspaceSourceChangeDrainWorkName, RunWorkspaceSourceChangeDrainAsync);
     }
 
     private async Task RunWorkspaceSourceChangeDrainAsync()
