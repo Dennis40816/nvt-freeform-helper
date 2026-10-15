@@ -845,7 +845,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 134
+        "methodLines": 132
       },
       "owner": "NFH",
       "locations": [
@@ -3862,26 +3862,6 @@
       "member": "FreeformHelper.UI.Services.LayerCatalogStateService.TryLoadFromPath(string)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "0804cd6b54996213e032ed1337f28f8a442abb4c59274fe589ae83eceb587767",
-      "member": "FreeformHelper.UI.Services.RuntimeQueryUseCase.QueryRunStepAsync(IReadOnlyDictionary<string, string>?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.WorkflowSelection.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "89e0ecf4b93ce812d2613965ec465c0da08050a02a265951eef9ffd05da39334",
-      "member": "FreeformHelper.UI.Services.RuntimeQueryUseCase.QuerySimulationAsync(IReadOnlyDictionary<string, string>?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.Simulation.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "CA1031",
