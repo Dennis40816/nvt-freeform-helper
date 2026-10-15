@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Infrastructure.Project;
 using NLog;
 
@@ -8,7 +9,7 @@ namespace FreeformHelper.UI.Services;
 /// Persists app-level general settings (cross-project defaults) between app runs.
 /// Layer priority: Project file settings > App general settings > Built-in defaults.
 /// </summary>
-public class AppGeneralSettingsStore
+public sealed class AppGeneralSettingsStore
 {
     public const string SettingsPathOverrideEnvironmentVariable = "FREEFORMHELPER_APP_GENERAL_SETTINGS_PATH";
 
@@ -19,6 +20,8 @@ public class AppGeneralSettingsStore
     };
 
     private readonly string _settingsPath;
+    private readonly Func<string, string?>? _readTextOverride;
+    private readonly Action<AppGeneralSettingsDocument>? _saveOverride;
 
     public AppGeneralSettingsStore(string? settingsPath = null)
     {
@@ -27,65 +30,98 @@ public class AppGeneralSettingsStore
             : settingsPath;
     }
 
+    /// <summary>
+    /// Creates a store whose file read and file write are replaced, so a test can script what they return or throw
+    /// without a disk.
+    /// </summary>
+    /// <param name="settingsPath">The settings path, or null for the default path.</param>
+    /// <param name="readTextOverride">Returns the file text, or null when the file does not exist.</param>
+    /// <param name="saveOverride">Receives the document instead of the file write.</param>
+    internal AppGeneralSettingsStore(
+        string? settingsPath,
+        Func<string, string?>? readTextOverride,
+        Action<AppGeneralSettingsDocument>? saveOverride)
+        : this(settingsPath)
+    {
+        _readTextOverride = readTextOverride;
+        _saveOverride = saveOverride;
+    }
+
     public string SettingsPath => _settingsPath;
 
     public AppGeneralSettingsDocument? TryLoad()
     {
         try
         {
+            if (_readTextOverride is not null)
+            {
+                return ParseDocument(_readTextOverride(_settingsPath));
+            }
+
             if (!File.Exists(_settingsPath))
             {
                 return null;
             }
 
             var json = File.ReadAllText(_settingsPath);
-            if (string.IsNullOrWhiteSpace(json))
-            {
-                return null;
-            }
-
-            AppGeneralSettingsDocument? document;
-            if (LooksLikeWhitelistShape(json))
-            {
-                document = JsonSerializer.Deserialize<AppGeneralSettingsDocument>(json, JsonOptions);
-            }
-            else
-            {
-                var legacy = JsonSerializer.Deserialize<LegacyAppGeneralSettingsDocument>(json, JsonOptions);
-                if (legacy is null)
-                {
-                    return null;
-                }
-
-                document = new AppGeneralSettingsDocument
-                {
-                    SavedAtUtc = legacy.SavedAtUtc,
-                    View = legacy.UiSnapshot?.View ?? new UiViewSnapshot(),
-                    Import = legacy.UiSnapshot?.Import ?? new UiImportSnapshot(),
-                    Behavior = new AppGeneralBehaviorSettings()
-                };
-            }
-
-            if (document is null)
-            {
-                return null;
-            }
-
-            document.View ??= new UiViewSnapshot();
-            document.Import ??= new UiImportSnapshot();
-            document.Behavior ??= new AppGeneralBehaviorSettings();
-            return document;
+            return ParseDocument(json);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Logger.Warn(ex, "Failed to load app general settings from '{0}'.", _settingsPath);
             return null;
         }
     }
 
-    public virtual void Save(AppGeneralSettingsDocument document)
+    private static AppGeneralSettingsDocument? ParseDocument(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return null;
+        }
+
+        AppGeneralSettingsDocument? document;
+        if (LooksLikeWhitelistShape(json))
+        {
+            document = JsonSerializer.Deserialize<AppGeneralSettingsDocument>(json, JsonOptions);
+        }
+        else
+        {
+            var legacy = JsonSerializer.Deserialize<LegacyAppGeneralSettingsDocument>(json, JsonOptions);
+            if (legacy is null)
+            {
+                return null;
+            }
+
+            document = new AppGeneralSettingsDocument
+            {
+                SavedAtUtc = legacy.SavedAtUtc,
+                View = legacy.UiSnapshot?.View ?? new UiViewSnapshot(),
+                Import = legacy.UiSnapshot?.Import ?? new UiImportSnapshot(),
+                Behavior = new AppGeneralBehaviorSettings()
+            };
+        }
+
+        if (document is null)
+        {
+            return null;
+        }
+
+        document.View ??= new UiViewSnapshot();
+        document.Import ??= new UiImportSnapshot();
+        document.Behavior ??= new AppGeneralBehaviorSettings();
+        return document;
+    }
+
+    public void Save(AppGeneralSettingsDocument document)
     {
         ArgumentNullException.ThrowIfNull(document);
+
+        if (_saveOverride is not null)
+        {
+            _saveOverride(document);
+            return;
+        }
 
         var dir = Path.GetDirectoryName(_settingsPath);
         if (!string.IsNullOrWhiteSpace(dir))
@@ -139,7 +175,11 @@ public class AppGeneralSettingsStore
                    doc.RootElement.TryGetProperty("Import", out _) ||
                    doc.RootElement.TryGetProperty("Behavior", out _);
         }
-        catch
+        catch (JsonException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
         {
             return false;
         }
