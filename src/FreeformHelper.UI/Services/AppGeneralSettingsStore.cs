@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Infrastructure.Project;
 using NLog;
 
@@ -65,7 +66,7 @@ public sealed class AppGeneralSettingsStore
             var json = File.ReadAllText(_settingsPath);
             return ParseDocument(json);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Logger.Warn(ex, "Failed to load app general settings from '{0}'.", _settingsPath);
             return null;
@@ -174,7 +175,11 @@ public sealed class AppGeneralSettingsStore
                    doc.RootElement.TryGetProperty("Import", out _) ||
                    doc.RootElement.TryGetProperty("Behavior", out _);
         }
-        catch
+        catch (JsonException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
         {
             return false;
         }

@@ -1,4 +1,5 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
+using System.Runtime.CompilerServices;
 using FreeformHelper.UI.Services;
 using Xunit;
 
@@ -78,6 +79,17 @@ public sealed class AppGeneralSettingsStoreReadBoundaryTests
 
         Assert.Null(store.TryLoad());
     }
+
+    [Fact]
+    public void TryLoad_WhenTheReadRunsOutOfMemory_Propagates()
+    {
+        var store = CreateStore(static _ => throw CreateOutOfMemory());
+
+        Assert.Throws<OutOfMemoryException>(store.TryLoad);
+    }
+
+    private static OutOfMemoryException CreateOutOfMemory() =>
+        (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
 
     private static AppGeneralSettingsStore CreateStore(Func<string, string?> readText) =>
         new(UnusedPath, readText, saveOverride: null);
