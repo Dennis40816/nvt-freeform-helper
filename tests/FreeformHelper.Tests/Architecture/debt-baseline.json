@@ -72,7 +72,7 @@
       "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.cs:30",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:102",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:116", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:163",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs:231",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs:226",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs:232",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:128",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:57",

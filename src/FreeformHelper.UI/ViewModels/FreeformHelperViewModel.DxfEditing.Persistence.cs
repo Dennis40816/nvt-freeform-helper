@@ -123,11 +123,6 @@ public sealed partial class FreeformHelperViewModel
         return groups;
     }
 
-    private void ApplyPersistedDxfEditProjectState(ProjectFile file)
-    {
-        ApplyCapturedDxfEditProjectState(CapturePersistedDxfEditProjectState(file));
-    }
-
     private void ApplyCapturedDxfEditProjectState(PersistedDxfEditProjectState state)
     {
         ArgumentNullException.ThrowIfNull(state);

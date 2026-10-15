@@ -24,12 +24,14 @@ public sealed partial class FreeformHelperViewModelTests
         var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
         var resetBaselineMethod = typeof(FreeformHelperViewModel).GetMethod("ResetDxfEditBaseline", BindingFlags.Instance | BindingFlags.NonPublic);
         var applyCadLoadOutcomeMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyCadLoadOutcomeAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        var applyPersistedDxfEditProjectStateMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyPersistedDxfEditProjectState", BindingFlags.Instance | BindingFlags.NonPublic);
+        var capturePersistedDxfEditProjectStateMethod = typeof(FreeformHelperViewModel).GetMethod("CapturePersistedDxfEditProjectState", BindingFlags.Static | BindingFlags.NonPublic);
+        var applyCapturedDxfEditProjectStateMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyCapturedDxfEditProjectState", BindingFlags.Instance | BindingFlags.NonPublic);
         var buildEntriesMethod = typeof(FreeformHelperViewModel).GetMethod("BuildDxfEditChangeEntries", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(cadField);
         Assert.NotNull(resetBaselineMethod);
         Assert.NotNull(applyCadLoadOutcomeMethod);
-        Assert.NotNull(applyPersistedDxfEditProjectStateMethod);
+        Assert.NotNull(capturePersistedDxfEditProjectStateMethod);
+        Assert.NotNull(applyCapturedDxfEditProjectStateMethod);
         Assert.NotNull(buildEntriesMethod);
 
         cadField!.SetValue(vm, new CadPadSet(source));
@@ -58,8 +60,8 @@ public sealed partial class FreeformHelperViewModelTests
                 null
             }));
         await applyTask;
-        applyPersistedDxfEditProjectStateMethod!.Invoke(
-            vm,
+        var captured = capturePersistedDxfEditProjectStateMethod!.Invoke(
+            null,
             new object?[]
             {
                 new ProjectFile
@@ -67,6 +69,7 @@ public sealed partial class FreeformHelperViewModelTests
                     HiddenCadPadIds = new HashSet<int> { 1 },
                 },
             });
+        applyCapturedDxfEditProjectStateMethod!.Invoke(vm, new[] { captured });
 
         var entries = Assert.IsType<List<DxfEditChangeListEntry>>(buildEntriesMethod.Invoke(vm, null));
         var hiddenEntry = Assert.Single(entries, entry => entry.Kind == DxfEditChangeKind.Hidden);
