@@ -76,16 +76,20 @@ internal sealed partial class RuntimeQueryUseCase
             _ => WorkflowStepId.Step1Match
         };
 
-        WorkflowStepExecutionResult result;
-        try
+        WorkflowStepExecutionResult result = default!;
+
+        async Task RunStepAsync()
         {
             result = await helper.RunWorkflowStepAsync(stepId);
         }
-        catch (Exception ex)
+
+        var stepFailure = await RunCommandOperationAsync(
+            RunStepAsync,
+            "STEP_EXECUTION_FAILED",
+            ex => ex.Message);
+        if (stepFailure is not null)
         {
-            return RuntimeQueryResponseEnvelope.Failure(
-                code: "STEP_EXECUTION_FAILED",
-                message: ex.Message);
+            return stepFailure;
         }
 
         if (!result.IsSupported)

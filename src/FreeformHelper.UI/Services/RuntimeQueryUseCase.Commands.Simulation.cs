@@ -15,15 +15,13 @@ internal sealed partial class RuntimeQueryUseCase
         var workspace = simulation.CurrentWorkspace;
         if (workspace is null)
         {
-            try
+            var buildFailure = await RunCommandOperationAsync(
+                simulation.EnsureWorkspaceAsync,
+                "BUILD_FAILED",
+                ex => $"Simulation workspace build failed: {ex.Message}");
+            if (buildFailure is not null)
             {
-                await simulation.EnsureWorkspaceAsync();
-            }
-            catch (Exception ex)
-            {
-                return RuntimeQueryResponseEnvelope.Failure(
-                    code: "BUILD_FAILED",
-                    message: $"Simulation workspace build failed: {ex.Message}");
+                return buildFailure;
             }
 
             workspace = simulation.CurrentWorkspace;
