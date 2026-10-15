@@ -256,7 +256,7 @@ public sealed partial class FreeformHelperViewModel
     private void SyncNotchPreviewPlaybackAndCanvas(bool forceAdvanceOnActivate)
     {
         var isVisible = IsNotchCanvasPreviewVisible;
-        var becameVisible = isVisible && !_lastNotchPreviewVisibleForPlayback;
+        var becameVisible = isVisible && !_notchCache.LastPreviewVisibleForPlayback;
         if (NotchPreviewAutoPlayEnabled && isVisible)
         {
             if (forceAdvanceOnActivate || becameVisible)
@@ -271,7 +271,7 @@ public sealed partial class FreeformHelperViewModel
             StopNotchPreviewAutoPlayLoop();
         }
 
-        _lastNotchPreviewVisibleForPlayback = isVisible;
+        _notchCache.LastPreviewVisibleForPlayback = isVisible;
         CanvasHost?.Invalidate();
     }
 

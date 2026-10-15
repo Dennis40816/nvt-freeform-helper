@@ -64,7 +64,7 @@ public sealed partial class FreeformHelperViewModel
             out activeRegularPadIds);
         var resolved = includeExpensiveNotchDetails
             ? GetCadV22ResolvedResult(cadPadId)
-            : hasNotchInputs && _notchResolvedResultCacheByCadId.ContainsKey(cadPadId)
+            : hasNotchInputs && _notchCache.ResolvedResultByCadId.ContainsKey(cadPadId)
                 ? GetOrBuildCadV22ResolvedResultCached(
                     notchCad,
                     allCadPads,

@@ -332,7 +332,7 @@ public sealed partial class FreeformHelperViewModel
                 }
             }
 
-            _lastGeneratedNotchTable = effectiveTable;
+            _notchCache.LastGeneratedTable = effectiveTable;
             Logger.Info(
                 CultureInfo.InvariantCulture,
                 "{0} generated {1} row(s).",

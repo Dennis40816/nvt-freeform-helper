@@ -21,7 +21,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         var shell = new ShellViewModel();
         var vm = shell.FreeformHelper;
         SetPrivateField(vm, "_grid", BuildValidationGrid());
-        SetPrivateField(vm, "_lastGeneratedNotchTable", table);
+        vm.NotchCacheForTests.LastGeneratedTable = table;
         return shell;
     }
 
