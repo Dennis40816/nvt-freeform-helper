@@ -10,6 +10,13 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
 {
     public ProjectEditingCommands Editing { get; } = new();
 
+    internal const string TraceWorkName = "index-mapping-trace";
+    internal const string TracePrefetchWorkName = "index-mapping-trace-prefetch";
+
+    // Start the trace loads and build the traces. Tests replace the runner and the builder inside them.
+    internal BackgroundWorkRunnerSlot BackgroundWork { get; } = new();
+    internal IndexMappingTraceBuilderSlot TraceBuilder { get; } = new();
+
     private const int MaxConcurrentTraceJobs = 2;
     private const int TraceSchemaVersion = 1;
     private readonly Func<int?, int?, bool>? _locateTarget;
