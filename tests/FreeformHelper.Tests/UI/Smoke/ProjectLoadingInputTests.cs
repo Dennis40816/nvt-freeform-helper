@@ -66,6 +66,19 @@ public sealed class ProjectLoadingInputTests
     }
 
     [AvaloniaFact]
+    public async Task ProjectLoadFromPath_WhenThePathIsNotValid_ReturnsInvalidArguments()
+    {
+        var vm = new FreeformHelperViewModel();
+
+        var result = await vm.LoadProjectFromPathAsync("project\0.json");
+
+        Assert.False(result.IsLoaded);
+        Assert.Equal("INVALID_ARGUMENTS", result.Code);
+        Assert.Contains("Invalid project path", result.Message, StringComparison.Ordinal);
+        Assert.Equal(ProjectSessionMode.Ready, vm.SessionMode);
+    }
+
+    [AvaloniaFact]
     public async Task ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()
     {
         var path = Path.Combine(Path.GetTempPath(), $"loading-input-{Guid.NewGuid():N}.json");

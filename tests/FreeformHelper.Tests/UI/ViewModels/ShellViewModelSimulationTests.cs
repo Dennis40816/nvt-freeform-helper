@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
@@ -272,6 +273,39 @@ public sealed class ShellViewModelSimulationTests
         await Task.Delay(120, TestContext.Current.CancellationToken);
 
         Assert.Equal(1, Volatile.Read(ref prewarmCount));
+    }
+
+    [Fact]
+    public async Task WorkspaceSourceChangeDrain_WhenThePrewarmFails_EndsWithoutRestarting()
+    {
+        using var shell = new ShellViewModel();
+        var prewarmCount = 0;
+        shell.Simulation.RequestPrewarmWorkspaceAsync = () =>
+        {
+            prewarmCount++;
+            throw new InvalidOperationException("prewarm rejected");
+        };
+
+        await shell.RunWorkspaceSourceChangeDrainForTestsAsync();
+
+        Assert.Equal(1, prewarmCount);
+    }
+
+    [Fact]
+    public async Task WorkspaceSourceChangeDrain_WhenThePrewarmRunsOutOfMemory_PropagatesAndDoesNotRestart()
+    {
+        using var shell = new ShellViewModel();
+        var failure = (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
+        var prewarmCount = 0;
+        shell.Simulation.RequestPrewarmWorkspaceAsync = () =>
+        {
+            prewarmCount++;
+            throw failure;
+        };
+
+        await Assert.ThrowsAsync<OutOfMemoryException>(shell.RunWorkspaceSourceChangeDrainForTestsAsync);
+
+        Assert.Equal(1, prewarmCount);
     }
 
     private static async Task WaitForConditionAsync(Func<bool> predicate, int timeoutMs = 1200)
