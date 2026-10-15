@@ -30,7 +30,11 @@ public sealed class GridRebuildUseCase
             if (!_isRebuildInProgress)
             {
                 _isRebuildInProgress = true;
-                _activeRunTask = RunQueuedRequestsAsync();
+                var runTask = RunQueuedRequestsAsync();
+
+                // A run that already ended (it failed before its first await) has reset the flag, so it is not the active run.
+                _activeRunTask = _isRebuildInProgress ? runTask : Task.CompletedTask;
+                return runTask;
             }
 
             return _activeRunTask;
@@ -47,29 +51,47 @@ public sealed class GridRebuildUseCase
 
     private async Task RunQueuedRequestsAsync()
     {
-        while (true)
+        var drained = false;
+        try
         {
-            bool requestFit;
-            lock (_sync)
+            while (true)
             {
-                if (!_pendingRebuild)
+                bool requestFit;
+                lock (_sync)
+                {
+                    if (!_pendingRebuild)
+                    {
+                        _isRebuildInProgress = false;
+                        _activeRunTask = Task.CompletedTask;
+                        drained = true;
+                        return;
+                    }
+
+                    requestFit = _pendingRequestFit;
+                    _pendingRebuild = false;
+                    _pendingRequestFit = false;
+                }
+
+                if (requestFit)
+                {
+                    _requestFit();
+                }
+
+                await _rebuildAsync();
+            }
+        }
+        finally
+        {
+            if (!drained)
+            {
+                // The fit action or the rebuild threw. Free the use case so that the next request starts a new run
+                // instead of getting this faulted task back. A request that arrived during the failed run stays pending.
+                lock (_sync)
                 {
                     _isRebuildInProgress = false;
                     _activeRunTask = Task.CompletedTask;
-                    return;
                 }
-
-                requestFit = _pendingRequestFit;
-                _pendingRebuild = false;
-                _pendingRequestFit = false;
             }
-
-            if (requestFit)
-            {
-                _requestFit();
-            }
-
-            await _rebuildAsync();
         }
     }
 }
