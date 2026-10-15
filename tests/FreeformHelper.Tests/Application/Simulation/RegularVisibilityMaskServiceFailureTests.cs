@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -64,6 +65,48 @@ public sealed class RegularVisibilityMaskServiceFailureTests
         Assert.Equal(RegularVisibilityMaskStatus.Failed, result.Status);
         Assert.Equal(ExistingNonCsvPath, result.SourcePath);
         Assert.Equal("CSV does not contain any frames.", result.Diagnostic);
+    }
+
+    [Fact]
+    public void ReadAndProject_WhenReadFailsWithExpectedException_ReturnsFailedWithItsMessage()
+    {
+        var result = RegularVisibilityMaskService.ReadAndProject(
+            static () => throw new IOException("disk read failed"),
+            "mask.csv",
+            BuildRectGrid(2, 2),
+            DiffFrameGridRowOrigin.TopRowIsRegularLastRow);
+
+        Assert.Equal(RegularVisibilityMaskStatus.Failed, result.Status);
+        Assert.Equal("mask.csv", result.SourcePath);
+        Assert.Equal("disk read failed", result.Diagnostic);
+    }
+
+    [Fact]
+    public void ReadAndProject_WhenReadFailsWithUnexpectedRecoverableException_ReturnsFailed()
+    {
+        var result = RegularVisibilityMaskService.ReadAndProject(
+            static () => throw new InvalidOperationException("unexpected"),
+            "mask.csv",
+            BuildRectGrid(2, 2),
+            DiffFrameGridRowOrigin.TopRowIsRegularLastRow);
+
+        Assert.Equal(RegularVisibilityMaskStatus.Failed, result.Status);
+        Assert.Equal("unexpected", result.Diagnostic);
+    }
+
+    [Fact]
+    public void ReadAndProject_WhenReadRunsOutOfMemory_Propagates()
+    {
+        // CA2201 forbids creating the type directly, and the message is never read.
+        var outOfMemory = (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
+
+        var thrown = Assert.Throws<OutOfMemoryException>(() => RegularVisibilityMaskService.ReadAndProject(
+            () => throw outOfMemory,
+            "mask.csv",
+            BuildRectGrid(2, 2),
+            DiffFrameGridRowOrigin.TopRowIsRegularLastRow));
+
+        Assert.Same(outOfMemory, thrown);
     }
 
     private static RegularGrid BuildRectGrid(int rows, int cols)
