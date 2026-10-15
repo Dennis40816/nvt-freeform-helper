@@ -147,6 +147,16 @@ public sealed partial class FreeformHelperViewModel
         return result;
     }
 
+    internal Task RunUiProgressOperationForTestsAsync(
+        string operationName,
+        Action<bool> setBusy,
+        Action<double> setProgress,
+        Func<Action<double>, Task> operationAsync,
+        Action<Exception> onError,
+        Action? onStart = null,
+        bool showModalSpinner = true) =>
+        RunUiProgressOperationAsync(operationName, setBusy, setProgress, operationAsync, onError, onStart, showModalSpinner);
+
     internal Task<TResult> RunUiOperationForTestsAsync<TResult>(
         string operationName,
         Func<Task<TResult>> operationAsync,
