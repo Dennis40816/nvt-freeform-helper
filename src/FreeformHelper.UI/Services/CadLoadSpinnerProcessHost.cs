@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Avalonia.Controls;
+using FreeformHelper.Application.Services;
 using NLog;
 
 namespace FreeformHelper.UI.Services;
@@ -222,7 +223,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
             {
                 await SyncRequestedVisibilityStateAsync().ConfigureAwait(false);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 Logger.Warn(ex, "Failed to sync CAD load spinner visibility state.");
             }
@@ -469,6 +470,13 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         throw new TimeoutException("CAD load spinner process did not become ready within timeout.");
     }
 
+    // The spinner is a helper process, so a failed send never ends the user's operation. The three senders below
+    // (SendRequest, SendShowRequestCoreLocked, TrySendRequest) catch the failures that sending can end in:
+    // IOException and TimeoutException (the pipe; TrySendRequestAsync already answers those two itself),
+    // InvalidOperationException (includes ObjectDisposedException; the pipe client is in a bad state),
+    // UnauthorizedAccessException (the pipe belongs to another user), NotSupportedException (JsonSerializer)
+    // and ArgumentException (includes ArgumentOutOfRangeException; the pipe name or the timeout). The send only
+    // writes, so a bad response cannot fail it. Any other exception, out-of-memory included, reaches the caller.
     private void SendRequest(CadLoadSpinnerRequest request, int timeoutMs, bool swallowIoErrors = false)
     {
         try
@@ -479,10 +487,35 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 throw new IOException($"CAD load spinner IPC command '{request.Command}' failed.");
             }
         }
-        catch when (swallowIoErrors)
+        catch (IOException) when (swallowIoErrors)
         {
-            Logger.Debug(CultureInfo.InvariantCulture, "Ignoring CAD load spinner IPC failure for command '{0}'.", request.Command);
+            LogIgnoredIpcFailure(request);
         }
+        catch (TimeoutException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+        catch (InvalidOperationException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+        catch (UnauthorizedAccessException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+        catch (NotSupportedException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+        catch (ArgumentException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+    }
+
+    private static void LogIgnoredIpcFailure(CadLoadSpinnerRequest request)
+    {
+        Logger.Debug(CultureInfo.InvariantCulture, "Ignoring CAD load spinner IPC failure for command '{0}'.", request.Command);
     }
 
     private async Task<bool> TrySendRequestAsync(CadLoadSpinnerRequest request, int timeoutMs)
@@ -549,7 +582,27 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
             _effectiveVisibility = VisibilityState.Visible;
             return true;
         }
-        catch
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (TimeoutException)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
         {
             return false;
         }
@@ -627,7 +680,27 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         {
             return TrySendRequestAsync(request, timeoutMs).GetAwaiter().GetResult();
         }
-        catch
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (TimeoutException)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
         {
             return false;
         }

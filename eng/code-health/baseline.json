@@ -3458,48 +3458,8 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "05d8d1b2b848fba9d4e39aa29d8b58388d6c1a198004e5a41c43bd58e46f0bdb",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.QueueStateSync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "aae8aa7acf675d906b2178b73bb17f04ba13dd127c2503b11ac65f5e26526f6a",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SendRequest(CadLoadSpinnerRequest,int,bool)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "0c256c626aeb9a5297319599dd47223742db72ccacf6edb47029f9787c2a32f8",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SendShowRequestCoreLocked(CadLoadSpinnerRequest)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "93bb268b083e4f9bbbac35564fb794753b8387aa0a02772c8900e5e509491f57",
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SyncRequestedVisibilityStateAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "d3d843b8ca38b84d57e366816c509be8f9e6432142b3864455f6ebbae7e924cd",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.TrySendRequest(CadLoadSpinnerRequest,int)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
       "project": "FreeformHelper.UI",

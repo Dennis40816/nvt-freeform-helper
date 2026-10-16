@@ -8,7 +8,7 @@
     "fileWriteAllText": 5,
     "processStart": 4,
     "directClockReads": 15,
-    "bareCatch": 6,
+    "bareCatch": 3,
     "catchException": 25,
     "suppressFlagFields": 4,
     "freeformViewModelStateMembers": 100,
@@ -43,7 +43,7 @@
       "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs:264"
     ],
     "processStart": [
-      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:435",
+      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:436",
       "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:149", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:179", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:209"
     ],
     "directClockReads": [
@@ -53,18 +53,18 @@
       "src/FreeformHelper.UI/Controls/PadCanvas.ViewRefresh.cs:58", "src/FreeformHelper.UI/Controls/PadCanvas.ViewRefresh.cs:97", "src/FreeformHelper.UI/Controls/PadCanvas.ViewRefresh.cs:110",
       "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:133", "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:194", "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:207",
       "src/FreeformHelper.UI/Services/CadLoadSpinnerDebugState.cs:158",
-      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:378", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:548",
+      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:379", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:581",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:99", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:212"
     ],
     "bareCatch": [
-      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:443", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:482", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:552", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:630",
+      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:444",
       "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:82", "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:195"
     ],
     "catchException": [
       "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs:116",
       "src/FreeformHelper.UI/Program.cs:54", "src/FreeformHelper.UI/Program.cs:141",
       "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:69",
-      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:225", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:311", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:586",
+      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:226", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:312", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:639",
       "src/FreeformHelper.UI/Services/CadLoadUseCase.cs:68", "src/FreeformHelper.UI/Services/CadLoadUseCase.cs:82",
       "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:72", "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:137",
       "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.cs:30",
