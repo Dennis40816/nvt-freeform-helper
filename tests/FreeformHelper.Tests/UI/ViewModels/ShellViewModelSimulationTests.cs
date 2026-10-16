@@ -173,7 +173,7 @@ public sealed class ShellViewModelSimulationTests
             return Task.CompletedTask;
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
 
         await WaitForConditionAsync(() => prewarmCount == 1);
         Assert.Equal(1, prewarmCount);
@@ -196,7 +196,7 @@ public sealed class ShellViewModelSimulationTests
             return Task.CompletedTask;
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
 
         await WaitForConditionAsync(() => prewarmCount == 1);
         Assert.Equal(1, prewarmCount);
@@ -237,7 +237,7 @@ public sealed class ShellViewModelSimulationTests
             return Task.CompletedTask;
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
 
         await WaitForConditionAsync(() => prewarmCount == 1);
         Assert.Equal(1, prewarmCount);
@@ -265,9 +265,9 @@ public sealed class ShellViewModelSimulationTests
             await Task.Delay(80);
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
 
         await WaitForConditionAsync(() => Volatile.Read(ref prewarmCount) > 0);
         await Task.Delay(120, TestContext.Current.CancellationToken);
@@ -288,7 +288,7 @@ public sealed class ShellViewModelSimulationTests
             throw new InvalidOperationException("prewarm rejected");
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
         await work.LastStartedAsync(ShellViewModel.WorkspaceSourceChangeDrainWorkName);
 
         Assert.Equal(1, prewarmCount);
@@ -308,7 +308,7 @@ public sealed class ShellViewModelSimulationTests
             throw failure;
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
         await Assert.ThrowsAsync<OutOfMemoryException>(() =>
             work.LastStartedAsync(ShellViewModel.WorkspaceSourceChangeDrainWorkName));
 
@@ -334,13 +334,13 @@ public sealed class ShellViewModelSimulationTests
             return Task.CompletedTask;
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
         await Assert.ThrowsAsync<OutOfMemoryException>(() =>
             work.LastStartedAsync(ShellViewModel.WorkspaceSourceChangeDrainWorkName));
         Assert.Equal(1, prewarmCount);
         Assert.Equal(1, work.StartedCount(ShellViewModel.WorkspaceSourceChangeDrainWorkName));
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
         await work.LastStartedAsync(ShellViewModel.WorkspaceSourceChangeDrainWorkName);
 
         Assert.Equal(2, work.StartedCount(ShellViewModel.WorkspaceSourceChangeDrainWorkName));
