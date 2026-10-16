@@ -2,6 +2,7 @@ using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
