@@ -1,7 +1,7 @@
-using System.Reflection;
 using FreeformHelper.Domain.Geometry;
-using FreeformHelper.Domain.Pads;
+using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -10,57 +10,55 @@ namespace FreeformHelper.Tests;
 public sealed partial class FreeformHelperViewModelTests
 {
     [Fact]
-    public void ApplyPersistedDxfEditProjectState_SkipsACombinedGroupWhoseOutputPadHasTooFewVertices()
+    public async Task LoadProject_SkipsACombinedGroupWhoseOutputPadHasTooFewVertices()
     {
-        var vm = CreateViewModelWithTwoSourcePads();
+        var combinedCount = await LoadProjectWithCombinedGroupsAsync(vertexCounts: [2]);
 
-        ApplyPersistedCombinedGroups(vm, CreateCombinedGroup(1, outputPadId: 3, vertexCount: 2));
-
-        Assert.Equal(0, vm.CombinedCadPadCount);
-        Assert.False(vm.HasCombinedCadPads);
+        Assert.Equal(0, combinedCount);
     }
 
     [Fact]
-    public void ApplyPersistedDxfEditProjectState_ReplaysTheValidGroupsAroundAnInvalidOne()
+    public async Task LoadProject_ReplaysTheValidGroupsAroundAnInvalidOne()
     {
-        var vm = CreateViewModelWithTwoSourcePads();
+        var combinedCount = await LoadProjectWithCombinedGroupsAsync(vertexCounts: [2, 4]);
 
-        ApplyPersistedCombinedGroups(
-            vm,
-            CreateCombinedGroup(1, outputPadId: 3, vertexCount: 2),
-            CreateCombinedGroup(2, outputPadId: 4, vertexCount: 4));
-
-        Assert.Equal(1, vm.CombinedCadPadCount);
-        Assert.True(vm.HasCombinedCadPads);
+        Assert.Equal(1, combinedCount);
     }
 
-    private static FreeformHelperViewModel CreateViewModelWithTwoSourcePads()
+    private static async Task<int> LoadProjectWithCombinedGroupsAsync(int[] vertexCounts)
     {
-        var vm = new FreeformHelperViewModel();
-        var source = new CadPadSet(new[]
+        var dxfPath = CreateTempDxfFile(("L1", 0, 0, 10, 10), ("L1", 8, 0, 18, 10));
+        var directory = TestFiles.CreateTempDirectory();
+        try
         {
-            CreateRectCad(1, 0, 0, 10, 10),
-            CreateRectCad(2, 8, 0, 18, 10),
-        });
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var resetBaselineMethod = typeof(FreeformHelperViewModel).GetMethod("ResetDxfEditBaseline", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(resetBaselineMethod);
+            var cad = new DxfImportService().ImportFromPath(dxfPath, new DxfImportOptions());
+            var sourceCadIds = cad.Pads.Select(static pad => pad.Id).OrderBy(static id => id).ToList();
+            var maxCadId = sourceCadIds.Max();
+            var project = new ProjectFile { LastDxfPath = dxfPath };
+            for (var index = 0; index < vertexCounts.Length; index++)
+            {
+                project.DxfCombinedCadGroups.Add(CreateCombinedGroup(index + 1, sourceCadIds, maxCadId + 1 + index, vertexCounts[index]));
+            }
 
-        cadField!.SetValue(vm, source);
-        resetBaselineMethod!.Invoke(vm, new object?[] { source });
-        return vm;
+            var projectPath = Path.Combine(directory.FullName, "combined-groups.json");
+            await new JsonProjectStore().SaveAsync(projectPath, project, TestContext.Current.CancellationToken);
+
+            var vm = new FreeformHelperViewModel
+            {
+                PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath),
+            };
+            await vm.LoadProjectCommand.ExecuteAsync(null);
+
+            return vm.CombinedCadPadCount;
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+            directory.Delete(recursive: true);
+        }
     }
 
-    private static void ApplyPersistedCombinedGroups(FreeformHelperViewModel vm, params ProjectDxfCombinedCadGroup[] groups)
-    {
-        var applyMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyPersistedDxfEditProjectState", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(applyMethod);
-
-        applyMethod!.Invoke(vm, new object?[] { new ProjectFile { DxfCombinedCadGroups = [.. groups] } });
-    }
-
-    private static ProjectDxfCombinedCadGroup CreateCombinedGroup(int groupId, int outputPadId, int vertexCount)
+    private static ProjectDxfCombinedCadGroup CreateCombinedGroup(int groupId, List<int> sourceCadIds, int outputPadId, int vertexCount)
     {
         var vertices = new[]
         {
@@ -73,13 +71,13 @@ public sealed partial class FreeformHelperViewModelTests
         return new ProjectDxfCombinedCadGroup
         {
             GroupId = groupId,
-            SourceCadIds = [1, 2],
+            SourceCadIds = sourceCadIds,
             OutputPads =
             [
                 new ProjectCadPadSnapshot
                 {
                     Id = outputPadId,
-                    Name = $"COMBINED{outputPadId}",
+                    Name = $"COMB_{outputPadId}",
                     Layer = "L1",
                     Vertices = [.. vertices.Take(vertexCount)],
                 },
