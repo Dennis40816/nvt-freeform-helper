@@ -75,11 +75,7 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
             return;
         }
 
-        try
-        {
-            _parentProcess = Process.GetProcessById(_options.ParentProcessId);
-        }
-        catch
+        if (!SpinnerParentProcess.TryGet(_options.ParentProcessId, out _parentProcess))
         {
             Close();
             return;

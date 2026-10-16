@@ -1523,7 +1523,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 308
+        "axamlCodeBehindLines": 304
       },
       "owner": "NFH",
       "locations": [
@@ -3448,26 +3448,6 @@
       "symbol": "CA1031"
     },
     {
-      "syntaxHash": "46f67066b0b9f2f7598fd3bb1af001421a61de91f3f73835df043c34c6cf0845",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.CleanupProcess(bool)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "93bb268b083e4f9bbbac35564fb794753b8387aa0a02772c8900e5e509491f57",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SyncRequestedVisibilityStateAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "0cc35a5766d2aee89151167a90aa6d53afaca12975e51baf38a777f8f5257a66",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ReplayPersistedCombinedCadGroups(List<ProjectDxfCombinedCadGroup>)",
       "owner": "NFH",
@@ -3480,16 +3460,6 @@
     {
       "syntaxHash": "ef02d3fbb89c5a19265fb9e306e9f03a9c6f8908265f12771845324c64468be8",
       "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.RunIpcLoopAsync(string,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "15247e11eca60ccc600d52d932368c6056493547a8b6361ea18a12666d77f8a7",
-      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.StartParentMonitor()",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
       "project": "FreeformHelper.UI",
