@@ -77,7 +77,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:55",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:261", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:327",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:67", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:108",
-      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:82", "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs:205"
+      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:82", "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs:203"
     ],
     "suppressFlagFields": [
       "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:64",

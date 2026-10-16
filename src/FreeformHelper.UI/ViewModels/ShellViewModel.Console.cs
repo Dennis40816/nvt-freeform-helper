@@ -6,12 +6,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class ShellViewModel
 {
-    // Tests can schedule a background Add at the snapshot boundary without relying on timing.
-    internal Action? ConsoleSnapshotReadForTests { get; set; }
-
-    // Runs on a notification thread that finds the gate held, right before it waits for the gate.
-    internal Action? ConsoleGateContendedForTests { get; set; }
-
     // What a section of the gate changed. The caller raises these after it releases the gate, because a
     // subscriber can write a log line, and that write can wait for another thread that waits for the gate.
     [Flags]
@@ -29,7 +23,7 @@ public sealed partial class ShellViewModel
         // The handler decides from the text and the counts, so the decision and the change are one section.
         if (!_consoleTextGate.TryEnter())
         {
-            ConsoleGateContendedForTests?.Invoke();
+            _timingProbe.ConsoleGateContended();
             _consoleTextGate.Enter();
         }
 
@@ -160,7 +154,7 @@ public sealed partial class ShellViewModel
     {
         var renderedCount = 0;
         _consoleTextBuffer.Clear();
-        ConsoleSnapshotReadForTests?.Invoke();
+        _timingProbe.ConsoleSnapshotRead();
         var tailLimit = IsConsoleDedupEnabled ? AppLogStore.Instance.MaxEntries : ConsoleRenderTailSourceLineLimit;
         var tailEntries = AppLogStore.Instance.GetTail(tailLimit, out var totalSourceCount);
 
