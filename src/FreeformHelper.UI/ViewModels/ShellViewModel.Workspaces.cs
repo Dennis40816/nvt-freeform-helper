@@ -6,8 +6,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class ShellViewModel
 {
-    internal Task? WorkspaceBuildPauseForTests { get; set; }
-
     private async Task BuildSimulationWorkspaceAsync()
     {
         var viewModel = await BuildOrBindSimulationWorkspaceAsync(silent: false, overwriteExistingWorkspace: true);
@@ -24,7 +22,7 @@ public sealed partial class ShellViewModel
         await _simulationWorkspaceBuildGate.WaitAsync();
         try
         {
-            await (WorkspaceBuildPauseForTests ?? Task.CompletedTask);
+            await _timingProbe.WorkspaceBuildPauseAsync();
             var hasWorkspace = Simulation.CurrentWorkspace is not null;
             var overwriteExistingWorkspace = hasWorkspace &&
                                              Simulation.IsWorkspaceStale &&
@@ -68,7 +66,7 @@ public sealed partial class ShellViewModel
         await _simulationWorkspaceBuildGate.WaitAsync();
         try
         {
-            await (WorkspaceBuildPauseForTests ?? Task.CompletedTask);
+            await _timingProbe.WorkspaceBuildPauseAsync();
             return await BuildOrBindSimulationWorkspaceCoreAsync(silent, overwriteExistingWorkspace);
         }
         finally
@@ -110,7 +108,7 @@ public sealed partial class ShellViewModel
         await _coordinatePlannerWorkspaceBuildGate.WaitAsync();
         try
         {
-            await (WorkspaceBuildPauseForTests ?? Task.CompletedTask);
+            await _timingProbe.WorkspaceBuildPauseAsync();
             if (!overwriteExistingWorkspace && CoordinatePlanner.CurrentWorkspace is not null)
             {
                 return CoordinatePlanner.CurrentWorkspace;

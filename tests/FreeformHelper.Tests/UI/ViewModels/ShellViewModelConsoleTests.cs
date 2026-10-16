@@ -94,14 +94,15 @@ public sealed class ShellViewModelConsoleTests
             var initial = new AppLogEntry(DateTimeOffset.UtcNow, "INFO", "test", "before snapshot read");
             var added = initial with { Message = "during snapshot read" };
             store.Add(initial);
-            shell = new ShellViewModel { IsConsoleExpanded = false };
+            var probe = new RecordingShellTimingProbe();
+            shell = new ShellViewModel(null, probe) { IsConsoleExpanded = false };
             Dispatcher.UIThread.RunJobs();
             panel = new ConsolePanel { UseShellHostedBehavior = true, DataContext = shell };
             var editor = panel.FindControl<TextEditor>("ConsoleEditor");
             Assert.NotNull(editor);
-            shell.ConsoleSnapshotReadForTests = () =>
+            probe.OnConsoleSnapshotRead = () =>
             {
-                shell.ConsoleSnapshotReadForTests = null;
+                probe.OnConsoleSnapshotRead = null;
                 Assert.Equal(1, store.GetTotalCount());
                 var writer = new Thread(() => store.Add(added));
                 writer.Start();

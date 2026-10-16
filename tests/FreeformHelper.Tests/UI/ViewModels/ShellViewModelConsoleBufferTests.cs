@@ -37,16 +37,17 @@ public sealed class ShellViewModelConsoleBufferTests
             var initial = new AppLogEntry(_entryTime, "INFO", "test", "before rebuild");
             var added = initial with { Message = "during rebuild" };
             store.Add(initial);
-            shell = new ShellViewModel { IsConsoleExpanded = false };
+            var probe = new RecordingShellTimingProbe();
+            shell = new ShellViewModel(null, probe) { IsConsoleExpanded = false };
             RunPendingUiJobs();
             using var contended = new ManualResetEventSlim();
             var notifier = new Thread(() => shell.OnLogEntriesChanged(
                 store.Entries,
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, added, 1)));
-            shell.ConsoleGateContendedForTests = contended.Set;
-            shell.ConsoleSnapshotReadForTests = () =>
+            probe.OnConsoleGateContended = contended.Set;
+            probe.OnConsoleSnapshotRead = () =>
             {
-                shell.ConsoleSnapshotReadForTests = null;
+                probe.OnConsoleSnapshotRead = null;
                 // The hook runs inside the gate. The store posts this add to the registered dispatcher, so the
                 // writer does not need the gate. The writer is joined with a bound, so a missing dispatcher
                 // fails the test instead of hanging it.

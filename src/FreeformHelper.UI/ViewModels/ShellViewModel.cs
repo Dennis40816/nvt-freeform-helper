@@ -25,6 +25,8 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     // guards the buffer and the text and counts that the notification handler decides from.
     private readonly Lock _consoleTextGate = new();
     private readonly StringBuilder _consoleTextBuffer = new();
+    // Tests pass their own probe to pause the work or to run code at a moment of a rebuild.
+    private readonly IShellTimingProbe _timingProbe;
     private bool _isDisposed;
     // Navigation selection is owned by the shell's UI-thread command entry point.
     private ShellPage _selectedPage = ShellPage.Workspace;
@@ -211,7 +213,14 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     }
 
     internal ShellViewModel(FreeformHelperViewModel? freeformHelper)
+        : this(freeformHelper, NullShellTimingProbe.Instance)
     {
+    }
+
+    internal ShellViewModel(FreeformHelperViewModel? freeformHelper, IShellTimingProbe timingProbe)
+    {
+        ArgumentNullException.ThrowIfNull(timingProbe);
+        _timingProbe = timingProbe;
         StartupPerfTracker.Mark("shell.vm-ctor-start");
         StartupPerfTracker.Mark("shell.freeform-vm-create-start");
         FreeformHelper = freeformHelper ?? new FreeformHelperViewModel();
