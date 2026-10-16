@@ -228,7 +228,7 @@ public sealed partial class FreeformHelperViewModel
                 {
                     outputPad = outputPadSnapshot.ToCadPad();
                 }
-                catch (Exception ex)
+                catch (ArgumentException ex)
                 {
                     Logger.Warn(
                         ex,

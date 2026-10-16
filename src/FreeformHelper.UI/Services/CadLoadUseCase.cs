@@ -79,7 +79,7 @@ public sealed class CadLoadUseCase
                 return embeddedOutcome;
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             if (pathLoadException is not null)
             {

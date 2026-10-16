@@ -1727,7 +1727,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 1747
+        "fileLines": 1738
       },
       "owner": "NFH",
       "locations": [
@@ -3278,16 +3278,6 @@
       "symbol": "NoWarn:1591"
     },
     {
-      "syntaxHash": "babcd6d0cf0c6c732cbdf22149224aa4dbb4af9a2a9273d689b97b880080f066",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:CA1031"
-    },
-    {
       "syntaxHash": "11296c0397a890e23ef507ec0659e1184f2e4bd21bfa743070e05f95234b6dbe",
       "member": "MSBuild",
       "owner": "NFH",
@@ -3386,76 +3376,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "WarningsNotAsErrors:VSTHRD103"
-    },
-    {
-      "syntaxHash": "4d5720406773f8680c5d16367834777ee736799101f6bfb9298b1320b5919895",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.CloseOpenWindowsAndRunQueuedWork()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "a6a1811a2d6eda0cf396683d5c387bc7771746c89f9197f2cdca0efb8d671e51",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.CloseOpenWindowsAndRunQueuedWork()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "f5dce7ca01792b919e099527b6f22ae8aca779f2ba790a44e0d7cb3837abbbee",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.CloseOpenWindowsAndRunQueuedWork()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "091eda50ca47cdd01ac64dc2a221e0fa8e3ceba5056f4b62c6f382052fb0e391",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.AssertCCompilesWithGcc(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "8b7bce4e0fcd727c2b943d32e2c7a803de9398ca5aa579a6086212dc534a6110",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.IsGccAvailable()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "091eda50ca47cdd01ac64dc2a221e0fa8e3ceba5056f4b62c6f382052fb0e391",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.RunCProgramWithGcc(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "0cc35a5766d2aee89151167a90aa6d53afaca12975e51baf38a777f8f5257a66",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ReplayPersistedCombinedCadGroups(List<ProjectDxfCombinedCadGroup>)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
     },
     {
       "syntaxHash": "ef02d3fbb89c5a19265fb9e306e9f03a9c6f8908265f12771845324c64468be8",
