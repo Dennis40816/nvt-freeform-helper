@@ -3278,16 +3278,6 @@
       "symbol": "NoWarn:1591"
     },
     {
-      "syntaxHash": "babcd6d0cf0c6c732cbdf22149224aa4dbb4af9a2a9273d689b97b880080f066",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:CA1031"
-    },
-    {
       "syntaxHash": "11296c0397a890e23ef507ec0659e1184f2e4bd21bfa743070e05f95234b6dbe",
       "member": "MSBuild",
       "owner": "NFH",
