@@ -181,6 +181,15 @@ jobs:
       - name: Install pinned .NET SDK and runtime
         shell: pwsh
         run: ./scripts/ci/install-dotnet.ps1
+      - name: Require gcc for the generated firmware C tests
+        if: matrix.shard == 'core'
+        shell: pwsh
+        # The Notch firmware C tests compile the generated C with gcc and compare it with the C#
+        # simulation. They pass without a message when gcc is missing, so this step turns a runner
+        # without gcc into a failure instead of tests that silently did not run.
+        run: |
+          gcc --version
+          if ($LASTEXITCODE -ne 0) { throw 'gcc is not available on this runner.' }
       - name: Run test shard
         shell: pwsh
         # Below the job limit, so an overrun is a step failure (which continue-on-error covers for the
