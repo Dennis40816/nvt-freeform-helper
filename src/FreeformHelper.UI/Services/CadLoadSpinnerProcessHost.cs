@@ -309,7 +309,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 {
                     await warmupTask.ConfigureAwait(false);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
                 {
                     Logger.Warn(ex, "CAD load spinner warmup failed.");
                     CleanupProcess(forceKillIfStillRunning: true);
@@ -437,14 +437,18 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
             processToWait = _process;
         }
 
+        var serverReady = false;
         try
         {
             await WaitForServerReadyAsync(WarmupTimeoutMs).ConfigureAwait(false);
+            serverReady = true;
         }
-        catch
+        finally
         {
-            CleanupProcess(forceKillIfStillRunning: true);
-            throw;
+            if (!serverReady)
+            {
+                CleanupProcess(forceKillIfStillRunning: true);
+            }
         }
 
         if (processToWait is not null && processToWait.HasExited)
@@ -636,7 +640,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                     _process.WaitForExit(500);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 Logger.Warn(ex, "Failed to cleanup CAD load spinner process.");
             }
