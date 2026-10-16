@@ -69,7 +69,7 @@
       "src/FreeformHelper.UI/Services/CadLoadUseCase.cs:68", "src/FreeformHelper.UI/Services/CadLoadUseCase.cs:82",
       "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:72", "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:137",
       "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.cs:30",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:102",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:100",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:116", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:163",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs:231",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs:232",

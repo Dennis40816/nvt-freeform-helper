@@ -21,7 +21,7 @@ public sealed class RunUiOperationFailureTests
         var failure = new InvalidOperationException("operation failed");
         Exception? reported = null;
 
-        await vm.RunUiProgressOperationForTestsAsync(
+        await vm.RunUiProgressOperationAsync(
             "Progress failure",
             busy.Add,
             progress.Add,
@@ -45,7 +45,7 @@ public sealed class RunUiOperationFailureTests
         var failure = new InvalidOperationException("start failed");
         Exception? reported = null;
 
-        await vm.RunUiProgressOperationForTestsAsync(
+        await vm.RunUiProgressOperationAsync(
             "Progress start failure",
             busy.Add,
             static _ => { },
@@ -74,7 +74,7 @@ public sealed class RunUiOperationFailureTests
         var errorCalled = false;
         var outOfMemory = CreateOutOfMemory();
 
-        var thrown = await Assert.ThrowsAsync<OutOfMemoryException>(() => vm.RunUiProgressOperationForTestsAsync(
+        var thrown = await Assert.ThrowsAsync<OutOfMemoryException>(() => vm.RunUiProgressOperationAsync(
             "Progress out of memory",
             busy.Add,
             progress.Add,
@@ -99,7 +99,7 @@ public sealed class RunUiOperationFailureTests
         var errorCalled = false;
         var outOfMemory = CreateOutOfMemory();
 
-        var thrown = await Assert.ThrowsAsync<OutOfMemoryException>(() => vm.RunUiProgressOperationForTestsAsync(
+        var thrown = await Assert.ThrowsAsync<OutOfMemoryException>(() => vm.RunUiProgressOperationAsync(
             "Progress start out of memory",
             busy.Add,
             static _ => { },
@@ -127,7 +127,7 @@ public sealed class RunUiOperationFailureTests
         var errorCalled = false;
         var outOfMemory = CreateOutOfMemory();
 
-        var thrown = await Assert.ThrowsAsync<OutOfMemoryException>(() => vm.RunUiOperationForTestsAsync<int>(
+        var thrown = await Assert.ThrowsAsync<OutOfMemoryException>(() => vm.RunUiOperationAsync<int>(
             "Result out of memory",
             () => Task.FromException<int>(outOfMemory),
             _ =>
@@ -155,7 +155,7 @@ public sealed class RunUiOperationFailureTests
         var progress = new List<double>();
         var errorCalled = false;
 
-        await vm.RunUiProgressOperationForTestsAsync(
+        await vm.RunUiProgressOperationAsync(
             "Progress success",
             busy.Add,
             progress.Add,
