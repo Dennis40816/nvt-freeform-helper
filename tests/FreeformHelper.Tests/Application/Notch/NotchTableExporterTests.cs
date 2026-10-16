@@ -1455,18 +1455,7 @@ public sealed class NotchTableExporterTests
         }
         finally
         {
-            try
-            {
-                Directory.Delete(tempDirectory, recursive: true);
-            }
-            catch (IOException)
-            {
-                // Best-effort temp cleanup only.
-            }
-            catch (UnauthorizedAccessException)
-            {
-                // Best-effort temp cleanup only.
-            }
+            TestDirectoryCleanup.DeleteBestEffort(tempDirectory);
         }
     }
 
@@ -1542,18 +1531,7 @@ public sealed class NotchTableExporterTests
         }
         finally
         {
-            try
-            {
-                Directory.Delete(tempDirectory, recursive: true);
-            }
-            catch (IOException)
-            {
-                // Best-effort temp cleanup only.
-            }
-            catch (UnauthorizedAccessException)
-            {
-                // Best-effort temp cleanup only.
-            }
+            TestDirectoryCleanup.DeleteBestEffort(tempDirectory);
         }
     }
 

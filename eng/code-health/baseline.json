@@ -1727,7 +1727,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 1747
+        "fileLines": 1738
       },
       "owner": "NFH",
       "locations": [
