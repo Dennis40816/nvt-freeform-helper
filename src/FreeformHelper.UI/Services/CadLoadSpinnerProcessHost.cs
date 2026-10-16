@@ -37,6 +37,8 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
     private readonly SemaphoreSlim _stateSyncGate = new(1, 1);
     private readonly string _pipeName = CadLoadSpinnerIpcProtocol.BuildPipeName(Environment.ProcessId);
     private readonly Func<CadLoadSpinnerRequest, bool>? _sendRequestOverride;
+    private readonly Func<Task> _startProcess;
+    private readonly Func<bool>? _hasProcessExitedOverride;
     private Process? _process;
     private Task? _warmupTask;
     private Task _stateSyncTask = Task.CompletedTask;
@@ -48,11 +50,25 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
     public CadLoadSpinnerProcessHost()
     {
+        _startProcess = EnsureProcessStartedAsync;
     }
 
     internal CadLoadSpinnerProcessHost(Func<CadLoadSpinnerRequest, bool> sendRequest)
     {
         _sendRequestOverride = sendRequest;
+        _startProcess = EnsureProcessStartedAsync;
+        _warmupTask = Task.CompletedTask;
+    }
+
+    // Lets a test play a spinner process that has exited, and the start of a new one.
+    internal CadLoadSpinnerProcessHost(
+        Func<CadLoadSpinnerRequest, bool> sendRequest,
+        Func<Task> startProcess,
+        Func<bool> hasProcessExited)
+    {
+        _sendRequestOverride = sendRequest;
+        _startProcess = startProcess;
+        _hasProcessExitedOverride = hasProcessExited;
         _warmupTask = Task.CompletedTask;
     }
 
@@ -67,7 +83,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 return;
             }
 
-            _warmupTask ??= Task.Run(EnsureProcessStartedAsync);
+            _warmupTask ??= Task.Run(_startProcess);
         }
     }
 
@@ -211,7 +227,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
     private void EnsureWarmupTaskLocked()
     {
-        _warmupTask ??= Task.Run(EnsureProcessStartedAsync);
+        _warmupTask ??= Task.Run(_startProcess);
     }
 
     private void QueueStateSync()
@@ -252,7 +268,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
                 showRequestedAtStart = _requestedVisibility == VisibilityState.Visible;
                 showRequest = _latestShowRequest;
-                warmupTask = _warmupTask;
+                warmupTask = showRequestedAtStart && ResetExitedProcessLocked() ? null : _warmupTask;
             }
             CadLoadSpinnerDebugState.RecordHostStateSync(showRequestedAtStart);
 
@@ -569,7 +585,40 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
     private bool HasRunningProcessLocked()
     {
+        if (_hasProcessExitedOverride is not null)
+        {
+            return !_hasProcessExitedOverride();
+        }
+
         return _sendRequestOverride is not null || (_process is not null && !_process.HasExited);
+    }
+
+    // The spinner process can end on its own. The warm-up task is already complete then, so without this reset
+    // no new process starts and every Show fails until the program restarts. Clearing the warm-up task makes the
+    // next sync start a new process.
+    private bool ResetExitedProcessLocked()
+    {
+        var exited = _hasProcessExitedOverride is not null
+            ? _hasProcessExitedOverride()
+            : _sendRequestOverride is null && _process is not null && _process.HasExited;
+        if (!exited)
+        {
+            return false;
+        }
+
+        if (_process is not null)
+        {
+            var exitCode = _process.ExitCode;
+            Logger.Warn(
+                CultureInfo.InvariantCulture,
+                "CAD load spinner process exited with code {0} at {1:O}. Starting a new one.",
+                exitCode,
+                _process.ExitTime);
+            CadLoadSpinnerDebugState.RecordHostProcessExit(exitCode);
+        }
+
+        CleanupProcess(forceKillIfStillRunning: false);
+        return true;
     }
 
     private bool SendShowRequestCoreLocked(CadLoadSpinnerRequest request)

@@ -112,6 +112,11 @@ internal static class CadLoadSpinnerDebugState
         AddEvent("host.retry", "show");
     }
 
+    public static void RecordHostProcessExit(int exitCode)
+    {
+        AddEvent("host.process", string.Create(CultureInfo.InvariantCulture, $"exited:code={exitCode}"));
+    }
+
     public static CadLoadSpinnerDebugSnapshot GetSnapshot()
     {
         lock (Sync)
