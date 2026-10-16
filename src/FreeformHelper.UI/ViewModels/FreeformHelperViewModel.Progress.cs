@@ -37,7 +37,7 @@ public sealed partial class FreeformHelperViewModel
         };
     }
 
-    private async Task RunUiProgressOperationAsync(
+    internal async Task RunUiProgressOperationAsync(
         string operationName,
         Action<bool> setBusy,
         Action<double> setProgress,
@@ -86,7 +86,7 @@ public sealed partial class FreeformHelperViewModel
         await ExecuteCoreAsync();
     }
 
-    private async Task RunUiOperationAsync(
+    internal async Task RunUiOperationAsync(
         string operationName,
         Func<Task> operationAsync,
         Action<Exception> onError,
@@ -125,7 +125,7 @@ public sealed partial class FreeformHelperViewModel
         await ExecuteCoreAsync();
     }
 
-    private async Task<TResult> RunUiOperationAsync<TResult>(
+    internal async Task<TResult> RunUiOperationAsync<TResult>(
         string operationName,
         Func<Task<TResult>> operationAsync,
         Func<Exception, TResult> onError,
@@ -147,23 +147,5 @@ public sealed partial class FreeformHelperViewModel
         await RunUiOperationAsync(operationName, CaptureResultAsync, ex => result = onError(ex), onStart, showModalSpinner);
         return result;
     }
-
-    internal Task RunUiProgressOperationForTestsAsync(
-        string operationName,
-        Action<bool> setBusy,
-        Action<double> setProgress,
-        Func<Action<double>, Task> operationAsync,
-        Action<Exception> onError,
-        Action? onStart = null,
-        bool showModalSpinner = true) =>
-        RunUiProgressOperationAsync(operationName, setBusy, setProgress, operationAsync, onError, onStart, showModalSpinner);
-
-    internal Task<TResult> RunUiOperationForTestsAsync<TResult>(
-        string operationName,
-        Func<Task<TResult>> operationAsync,
-        Func<Exception, TResult> onError,
-        Action? onStart = null,
-        bool showModalSpinner = true) =>
-        RunUiOperationAsync(operationName, operationAsync, onError, onStart, showModalSpinner);
 }
 

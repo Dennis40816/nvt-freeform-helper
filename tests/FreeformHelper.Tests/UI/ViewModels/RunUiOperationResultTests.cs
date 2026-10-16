@@ -17,7 +17,7 @@ public sealed class RunUiOperationResultTests
         var vm = new FreeformHelperViewModel();
         var order = new List<string>();
 
-        var result = await vm.RunUiOperationForTestsAsync(
+        var result = await vm.RunUiOperationAsync(
             "Result success",
             () => ReturnAfterYieldAsync(order, 42),
             _ =>
@@ -43,7 +43,7 @@ public sealed class RunUiOperationResultTests
         var failure = new InvalidOperationException("operation failed");
         Exception? reported = null;
 
-        var result = await vm.RunUiOperationForTestsAsync(
+        var result = await vm.RunUiOperationAsync(
             "Result failure",
             () => ThrowAfterYieldAsync(order, failure),
             ex =>
@@ -69,7 +69,7 @@ public sealed class RunUiOperationResultTests
         var failure = new InvalidOperationException("start failed");
         Exception? reported = null;
 
-        var result = await vm.RunUiOperationForTestsAsync(
+        var result = await vm.RunUiOperationAsync(
             "Result start failure",
             () =>
             {
@@ -97,7 +97,7 @@ public sealed class RunUiOperationResultTests
         var vm = new FreeformHelperViewModel();
         var replacement = new ArgumentException("error callback failed");
 
-        var thrown = await Assert.ThrowsAsync<ArgumentException>(() => vm.RunUiOperationForTestsAsync<int>(
+        var thrown = await Assert.ThrowsAsync<ArgumentException>(() => vm.RunUiOperationAsync<int>(
             "Result error callback failure",
             () => Task.FromException<int>(new InvalidOperationException("operation failed")),
             _ => throw replacement,
@@ -114,7 +114,7 @@ public sealed class RunUiOperationResultTests
         var vm = new FreeformHelperViewModel();
         var visibleInside = false;
 
-        var result = await vm.RunUiOperationForTestsAsync(
+        var result = await vm.RunUiOperationAsync(
             "Result spinner",
             () =>
             {

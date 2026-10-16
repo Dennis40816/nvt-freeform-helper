@@ -118,7 +118,7 @@ public sealed class RecoverableBoundaryTests
         var vm = new FreeformHelperViewModel(store.Store);
         store.SaveCalls = 0;
 
-        vm.PersistAppGeneralSettingsNowForTests();
+        vm.PersistAppGeneralSettingsNow();
 
         Assert.Equal(1, store.SaveCalls);
         Assert.Null(store.LastSaved);
@@ -131,7 +131,7 @@ public sealed class RecoverableBoundaryTests
         var vm = new FreeformHelperViewModel(store.Store);
         store.SaveCalls = 0;
 
-        Assert.Throws<OutOfMemoryException>(vm.PersistAppGeneralSettingsNowForTests);
+        Assert.Throws<OutOfMemoryException>(() => vm.PersistAppGeneralSettingsNow());
 
         Assert.Equal(1, store.SaveCalls);
     }
@@ -143,7 +143,7 @@ public sealed class RecoverableBoundaryTests
         var vm = new FreeformHelperViewModel(store.Store);
         store.SaveCalls = 0;
 
-        vm.PersistAppGeneralSettingsNowForTests();
+        vm.PersistAppGeneralSettingsNow();
 
         Assert.Equal(1, store.SaveCalls);
         Assert.NotNull(store.LastSaved);
