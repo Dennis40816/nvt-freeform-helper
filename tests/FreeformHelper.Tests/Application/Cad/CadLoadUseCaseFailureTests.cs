@@ -90,6 +90,20 @@ public sealed class CadLoadUseCaseFailureTests
         Assert.Equal(new Exception[] { pathFailure, embeddedFailure }, thrown.InnerExceptions);
     }
 
+    [Fact]
+    public void TryLoadFromProject_WhenPathImportFailsAndEmbeddedRunsOutOfMemory_PropagatesItUnwrapped()
+    {
+        var memory = CreateOutOfMemory();
+        var useCase = new CadLoadUseCase(
+            (_, _) => throw new InvalidOperationException("path import failed"),
+            (_, _) => throw memory);
+
+        var thrown = Assert.Throws<OutOfMemoryException>(
+            () => useCase.TryLoadFromProject(ExistingPath, ValidEmbeddedDxfBytes, new DxfImportOptions()));
+
+        Assert.Same(memory, thrown);
+    }
+
     private static CadPadSet ThrowInvalidOperation(string path, DxfImportOptions options)
     {
         throw new InvalidOperationException("path import failed");

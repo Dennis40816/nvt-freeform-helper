@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
+using FreeformHelper.Application.Services;
 using Xunit.v3;
 
 [assembly: FreeformHelper.Tests.HeadlessSessionGuard]
@@ -192,7 +193,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
                         // that has not been saved. Without its view model it has nothing to ask about.
                         window.DataContext = null;
                     }
-                    catch (Exception exception)
+                    catch (Exception exception) when (ExceptionPolicy.IsRecoverable(exception))
                     {
                         (failures ??= []).Add(exception);
                     }
@@ -201,7 +202,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
                     {
                         window.Close();
                     }
-                    catch (Exception exception)
+                    catch (Exception exception) when (ExceptionPolicy.IsRecoverable(exception))
                     {
                         (failures ??= []).Add(exception);
                     }
@@ -214,7 +215,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
                 }
             }
         }
-        catch (Exception exception)
+        catch (Exception exception) when (ExceptionPolicy.IsRecoverable(exception))
         {
             (failures ??= []).Add(exception);
         }

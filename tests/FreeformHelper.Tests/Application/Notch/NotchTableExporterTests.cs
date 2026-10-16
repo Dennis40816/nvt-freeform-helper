@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Services;
@@ -1411,7 +1412,11 @@ public sealed class NotchTableExporterTests
             process.WaitForExit(5000);
             return process.ExitCode == 0;
         }
-        catch
+        catch (Win32Exception)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
         {
             return false;
         }
@@ -1454,7 +1459,11 @@ public sealed class NotchTableExporterTests
             {
                 Directory.Delete(tempDirectory, recursive: true);
             }
-            catch
+            catch (IOException)
+            {
+                // Best-effort temp cleanup only.
+            }
+            catch (UnauthorizedAccessException)
             {
                 // Best-effort temp cleanup only.
             }
@@ -1537,7 +1546,11 @@ public sealed class NotchTableExporterTests
             {
                 Directory.Delete(tempDirectory, recursive: true);
             }
-            catch
+            catch (IOException)
+            {
+                // Best-effort temp cleanup only.
+            }
+            catch (UnauthorizedAccessException)
             {
                 // Best-effort temp cleanup only.
             }
