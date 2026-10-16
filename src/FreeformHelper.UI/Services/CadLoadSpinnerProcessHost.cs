@@ -64,12 +64,13 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
     internal CadLoadSpinnerProcessHost(
         Func<CadLoadSpinnerRequest, bool> sendRequest,
         Func<Task> startProcess,
-        Func<bool> hasProcessExited)
+        Func<bool> hasProcessExited,
+        Task? warmupTask = null)
     {
         _sendRequestOverride = sendRequest;
         _startProcess = startProcess;
         _hasProcessExitedOverride = hasProcessExited;
-        _warmupTask = Task.CompletedTask;
+        _warmupTask = warmupTask ?? Task.CompletedTask;
     }
 
     public void Warmup()
@@ -595,13 +596,13 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
     // The spinner process can end on its own. The warm-up task is already complete then, so without this reset
     // no new process starts and every Show fails until the program restarts. Clearing the warm-up task makes the
-    // next sync start a new process.
+    // next sync start a new process. While the warm-up still runs, it owns the process and cleans up when it fails.
     private bool ResetExitedProcessLocked()
     {
         var exited = _hasProcessExitedOverride is not null
             ? _hasProcessExitedOverride()
             : _sendRequestOverride is null && _process is not null && _process.HasExited;
-        if (!exited)
+        if (!exited || _warmupTask is { IsCompleted: false })
         {
             return false;
         }

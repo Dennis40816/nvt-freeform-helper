@@ -50,6 +50,11 @@ public sealed class CadLoadSpinnerProcessHostRestartTests
             return true;
         }
 
+        public void Restore()
+        {
+            Volatile.Write(ref _exited, 0);
+        }
+
         public Task StartAsync()
         {
             Interlocked.Increment(ref _starts);
@@ -75,6 +80,27 @@ public sealed class CadLoadSpinnerProcessHostRestartTests
         Assert.Equal(1, process.Starts);
         Assert.Contains(CadLoadSpinnerIpcProtocol.ShowCommand, process.Commands);
         Assert.Equal("Visible", host.GetVisibilityStateSnapshot().Effective);
+    }
+
+    [AvaloniaFact]
+    public async Task Show_WhileTheWarmupStillRuns_DoesNotStartASecondProcess()
+    {
+        // The spinner process ended during its own start-up. The start task still runs and cleans up by itself.
+        var process = new FakeProcess(exited: true);
+        var warmup = new TaskCompletionSource();
+        using var host = new CadLoadSpinnerProcessHost(process.Send, process.StartAsync, () => process.HasExited, warmup.Task);
+
+        host.Show(new Window());
+        var stateSync = host.GetLatestStateSyncTask();
+        Assert.False(stateSync.IsCompleted);
+
+        Assert.Equal(0, process.Starts);
+        warmup.SetResult();
+        process.Restore();
+        await AwaitStateSyncAsync(stateSync);
+
+        Assert.Equal(0, process.Starts);
+        Assert.Contains(CadLoadSpinnerIpcProtocol.ShowCommand, process.Commands);
     }
 
     [AvaloniaFact]
