@@ -204,7 +204,7 @@ public sealed partial class FreeformHelperViewModel
         return activeRegularPadIds;
     }
 
-    private void NotifySimulationWorkspaceSourceChanged()
+    internal void NotifySimulationWorkspaceSourceChanged()
     {
         if (_simulationSourceChangeBatch.SuspendDepth > 0)
         {
@@ -240,11 +240,6 @@ public sealed partial class FreeformHelperViewModel
     {
         SimulationWorkspaceSourceRevision++;
         SimulationWorkspaceSourceChanged?.Invoke(this, EventArgs.Empty);
-    }
-
-    internal void NotifySimulationWorkspaceSourceChangedForTests()
-    {
-        NotifySimulationWorkspaceSourceChanged();
     }
 
     private sealed class SimulationWorkspaceSourceChangeBatchScope : IDisposable

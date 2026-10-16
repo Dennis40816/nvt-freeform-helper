@@ -74,7 +74,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs:231",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs:232",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:124",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:57",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:55",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:261", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:327",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:67", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:108",
       "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:82", "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs:205"

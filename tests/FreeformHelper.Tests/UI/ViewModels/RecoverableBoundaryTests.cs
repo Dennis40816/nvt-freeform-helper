@@ -158,7 +158,7 @@ public sealed class RecoverableBoundaryTests
             var vm = await CreateNotchExportCacheViewModelAsync(path);
             using var trap = FailOnce(vm, nameof(vm.CadPads), new InvalidOperationException("collection rejected"));
 
-            vm.FilterCadPadsByLayerForTests();
+            vm.FilterCadPadsByLayer();
 
             Assert.True(trap.Fired);
             Assert.Contains("Layer filter failed", vm.StatusText, StringComparison.Ordinal);
@@ -179,7 +179,7 @@ public sealed class RecoverableBoundaryTests
             var vm = await CreateNotchExportCacheViewModelAsync(path);
             using var trap = FailOnce(vm, nameof(vm.CadPads), CreateOutOfMemory());
 
-            Assert.Throws<OutOfMemoryException>(vm.FilterCadPadsByLayerForTests);
+            Assert.Throws<OutOfMemoryException>(vm.FilterCadPadsByLayer);
             Assert.True(trap.Fired);
         }
         finally
