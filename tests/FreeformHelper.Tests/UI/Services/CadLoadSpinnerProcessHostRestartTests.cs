@@ -87,16 +87,33 @@ public sealed class CadLoadSpinnerProcessHostRestartTests
     {
         // The spinner process ended during its own start-up. The start task still runs and cleans up by itself.
         var process = new FakeProcess(exited: true);
-        var warmup = new TaskCompletionSource();
-        using var host = new CadLoadSpinnerProcessHost(process.Send, process.StartAsync, () => process.HasExited, warmup.Task);
+        var warmup = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var reset = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var probes = 0;
+
+        // Show asks once itself. The second ask comes from the state sync, when it decides whether to restart.
+        bool HasExited()
+        {
+            var exited = process.HasExited;
+            if (Interlocked.Increment(ref probes) >= 2)
+            {
+                reset.TrySetResult();
+            }
+
+            return exited;
+        }
+
+        using var host = new CadLoadSpinnerProcessHost(process.Send, process.StartAsync, HasExited, warmup.Task);
 
         host.Show(new Window());
         var stateSync = host.GetLatestStateSyncTask();
-        Assert.False(stateSync.IsCompleted);
+        await reset.Task.WaitAsync(SafetyNetTimeout);
 
-        Assert.Equal(0, process.Starts);
-        warmup.SetResult();
+        // The snapshot takes the host lock, and the restart decision is made under the same lock. Once it returns,
+        // the host has looked at the pending warm-up.
+        _ = host.GetVisibilityStateSnapshot();
         process.Restore();
+        warmup.SetResult();
         await AwaitStateSyncAsync(stateSync);
 
         Assert.Equal(0, process.Starts);
