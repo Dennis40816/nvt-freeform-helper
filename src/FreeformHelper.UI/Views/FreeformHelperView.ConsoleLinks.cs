@@ -1,9 +1,11 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Input;
 using AvaloniaEdit;
 using FreeformHelper.UI.Logging;
+using static FreeformHelper.UI.Services.ConsoleLinkTargetSearch;
 
 namespace FreeformHelper.UI.Views;
 
@@ -79,15 +81,7 @@ public sealed partial class FreeformHelperView
             return null;
         }
 
-        try
-        {
-            var offset = editor.Document.GetOffset(position.Value.Location);
-            return ConsoleLinkParser.FindAtOffset(_consoleLinks, offset);
-        }
-        catch
-        {
-            return null;
-        }
+        return FindLinkAt(_consoleLinks, () => editor.Document.GetOffset(position.Value.Location));
     }
 
     private bool TryOpenConsoleLink(ConsoleLinkSpan link)
@@ -160,7 +154,19 @@ public sealed partial class FreeformHelperView
             });
             return process is not null;
         }
-        catch
+        catch (Win32Exception)
+        {
+            return TryOpenWithShell(path);
+        }
+        catch (InvalidOperationException)
+        {
+            return TryOpenWithShell(path);
+        }
+        catch (PlatformNotSupportedException)
+        {
+            return TryOpenWithShell(path);
+        }
+        catch (ArgumentException)
         {
             return TryOpenWithShell(path);
         }
@@ -178,13 +184,25 @@ public sealed partial class FreeformHelperView
             });
             return process is not null;
         }
-        catch
+        catch (Win32Exception)
+        {
+            return TryOpenWithShell(path);
+        }
+        catch (InvalidOperationException)
+        {
+            return TryOpenWithShell(path);
+        }
+        catch (PlatformNotSupportedException)
+        {
+            return TryOpenWithShell(path);
+        }
+        catch (ArgumentException)
         {
             return TryOpenWithShell(path);
         }
     }
 
-    private static bool TryOpenWithShell(string target)
+    internal static bool TryOpenWithShell(string target)
     {
         try
         {
@@ -195,7 +213,19 @@ public sealed partial class FreeformHelperView
             });
             return process is not null;
         }
-        catch
+        catch (Win32Exception)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+        catch (PlatformNotSupportedException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
         {
             return false;
         }
@@ -288,43 +318,4 @@ public sealed partial class FreeformHelperView
             yield return userDirectory;
         }
     }
-
-    private static string? WalkUpToRepoRoot(string? seed)
-    {
-        if (string.IsNullOrWhiteSpace(seed) || !Directory.Exists(seed))
-        {
-            return null;
-        }
-
-        var directory = new DirectoryInfo(Path.GetFullPath(seed));
-        while (directory is not null)
-        {
-            var hasSln = File.Exists(Path.Combine(directory.FullName, "FreeformHelper.sln"));
-            var hasGit = Directory.Exists(Path.Combine(directory.FullName, ".git"));
-            if (hasSln || hasGit)
-            {
-                return directory.FullName;
-            }
-
-            directory = directory.Parent;
-        }
-
-        return null;
-    }
-
-    private static string[] EnumerateRepoMatches(string repoRoot, string fileName)
-    {
-        try
-        {
-            return Directory.EnumerateFiles(repoRoot, fileName, SearchOption.AllDirectories)
-                .Take(32)
-                .ToArray();
-        }
-        catch
-        {
-            return Array.Empty<string>();
-        }
-    }
-
 }
-
