@@ -1,15 +1,10 @@
 using System.Globalization;
 using FreeformHelper.Application.Services;
-using FreeformHelper.UI.Services;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class IndexMappingReportViewModel
 {
-    internal Action? TraceLoadStartedForTests { get; set; }
-
-    internal Task EnsureAlgorithmTraceForTestsAsync() => EnsureAlgorithmTraceForSelectedDecisionAsync(priorityOnly: false);
-
     private void MarkAlgorithmTraceNotRequested()
     {
         AlgorithmTraceEntries = Array.Empty<IndexMappingAlgorithmTraceEntryViewModel>();
@@ -51,7 +46,7 @@ public sealed partial class IndexMappingReportViewModel
 
         if (priorityOnly)
         {
-            _ = PrefetchBackgroundTraceAsync();
+            BackgroundWork.Run(TracePrefetchWorkName, PrefetchBackgroundTraceAsync);
         }
     }
 
@@ -63,9 +58,7 @@ public sealed partial class IndexMappingReportViewModel
 
         try
         {
-            TraceLoadStartedForTests?.Invoke();
-            var trace = await Task.Run(
-                () => IndexMappingAlgorithmTraceProjector.Build(decision, TraceSchemaVersion, DateTime.UtcNow));
+            var trace = await Task.Run(() => TraceBuilder.Build(decision, TraceSchemaVersion));
             if (requestVersion != _traceRequestVersion)
             {
                 AlgorithmTraceState = IndexMappingAlgorithmTraceState.Stale;
@@ -106,7 +99,7 @@ public sealed partial class IndexMappingReportViewModel
             var key = BuildTraceCacheKey(row);
             if (!_traceCache.ContainsKey(key))
             {
-                var trace = IndexMappingAlgorithmTraceProjector.Build(row, TraceSchemaVersion, DateTime.UtcNow);
+                var trace = TraceBuilder.Build(row, TraceSchemaVersion);
                 _traceCache[key] = trace;
             }
 

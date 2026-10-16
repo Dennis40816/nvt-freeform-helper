@@ -99,7 +99,7 @@ public sealed partial class IndexMappingReportViewModel
 
         if (IsAlgorithmTraceExpanded && SelectedDecision is not null)
         {
-            _ = EnsureAlgorithmTraceForSelectedDecisionAsync(priorityOnly: true);
+            BackgroundWork.Run(TraceWorkName, () => EnsureAlgorithmTraceForSelectedDecisionAsync(priorityOnly: true));
         }
     }
 

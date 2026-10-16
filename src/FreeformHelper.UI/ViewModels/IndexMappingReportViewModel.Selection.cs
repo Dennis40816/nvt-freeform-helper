@@ -50,7 +50,7 @@ public sealed partial class IndexMappingReportViewModel
         MarkAlgorithmTraceNotRequested();
         if (IsAlgorithmTraceExpanded)
         {
-            _ = EnsureAlgorithmTraceForSelectedDecisionAsync(priorityOnly: true);
+            BackgroundWork.Run(TraceWorkName, () => EnsureAlgorithmTraceForSelectedDecisionAsync(priorityOnly: true));
         }
     }
 
@@ -61,7 +61,7 @@ public sealed partial class IndexMappingReportViewModel
             return;
         }
 
-        _ = EnsureAlgorithmTraceForSelectedDecisionAsync(priorityOnly: true);
+        BackgroundWork.Run(TraceWorkName, () => EnsureAlgorithmTraceForSelectedDecisionAsync(priorityOnly: true));
     }
 
     partial void OnActiveVerificationStepChanged(IndexMappingVerificationStep value)

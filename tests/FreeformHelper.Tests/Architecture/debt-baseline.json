@@ -7,7 +7,7 @@
     "suppressUndoAssignments": 0,
     "fileWriteAllText": 5,
     "processStart": 4,
-    "directClockReads": 17,
+    "directClockReads": 15,
     "bareCatch": 11,
     "catchException": 25,
     "suppressFlagFields": 4,
@@ -54,8 +54,7 @@
       "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:133", "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:194", "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:207",
       "src/FreeformHelper.UI/Services/CadLoadSpinnerDebugState.cs:158",
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:378", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:548",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:99", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:212",
-      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:68", "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:109"
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:99", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:212"
     ],
     "bareCatch": [
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:443", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:482", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:552", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:630",
@@ -78,7 +77,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:57",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:261", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:327",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:67", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:108",
-      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:89", "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs:205"
+      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:82", "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs:205"
     ],
     "suppressFlagFields": [
       "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:64",
@@ -175,7 +174,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Simulation.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.NotchPreview.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SimulationSafetyOverview.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Status.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkflowSteps.cs", "src/FreeformHelper.UI/ViewModels/IndexMappingDecisionRowViewModel.cs",
-      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs", "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.Filtering.cs",
+      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.Filtering.cs",
       "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.cs", "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.Filters.cs",
       "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.Selection.cs", "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.Workspace.cs",
       "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs", "src/FreeformHelper.UI/ViewModels/PadInfo/CadPadInfoViewModel.Construction.cs",
