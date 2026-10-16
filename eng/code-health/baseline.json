@@ -1579,7 +1579,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "viewTypeLines": 3553,
+        "viewTypeLines": 3543,
         "stateMembers": 48,
         "partialFiles": 21
       },
@@ -3462,56 +3462,6 @@
       "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.RunIpcLoopAsync(string,CancellationToken)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "0aa0f161230621fe79b216795be3a4e18ad8ee19eb87e8309909979e8920f1cb",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.EnumerateRepoMatches(string,string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "d80fba362a6bc9e3d5652b1ef74f76e4285a9fd3a3f28fa4c720455bc27e4e42",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.FindConsoleLinkAtPoint(TextEditor,Point)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "7a049dc185a781687f51648a7f19486214c69b2090f0145e7fd418604ac8f3d5",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.TryOpenDirectory(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "8928dd5c030d5291bcd7921d281238da52dbfce437d4f18edb6d5f6208366d11",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.TryOpenFileInExplorer(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
-      "syntaxHash": "247d7420016b9fb8b63e565c861ae4eae737853ee09642c18861ff477dc3f500",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.TryOpenWithShell(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "CA1031",
