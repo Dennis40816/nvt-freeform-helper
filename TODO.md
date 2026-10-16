@@ -5,3 +5,8 @@
 # Legacy console follow-up
 
 - [ ] When the Core console list replaces the legacy console panel, delete the text buffer of `ShellViewModel.Console.cs` with its gate (`_consoleTextGate`) and the `OnLogEntriesChanged` hook. Until then the gate keeps log notifications from other threads away from the buffer.
+
+# Test seams that the ledger fingerprints make expensive
+
+- [ ] No deadline. `FreeformHelperView.TryOpenDirectory` and `TryOpenFileInExplorer` (`FreeformHelperView.ConsoleLinks.cs`) have no test. Each starts `explorer.exe`, so a test would open a window. Putting `Process.Start` behind a delegate means moving its statement, and the ledger treats a moved banned-API statement (RS0030) as a new fingerprint, which it refuses. Their named `catch` list is the same as the one of `TryOpenWithShell`, which has tests with real failing inputs. When the ledger tool stops treating a move as a new fingerprint, move the three `Process.Start` calls behind a delegate and test both sites.
+- [ ] No deadline. `AppGeneralPersistenceForTests`, `NotchCacheForTests`, `WorkflowDataForTests` and `RegularVisibilityMaskForTests` (`FreeformHelperViewModel`) expose private state objects to tests. Removing them means rewriting about 12 tests to go through public commands. Renaming them does not lower any ledger number.

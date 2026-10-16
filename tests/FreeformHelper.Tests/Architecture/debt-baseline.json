@@ -8,7 +8,7 @@
     "fileWriteAllText": 5,
     "processStart": 4,
     "directClockReads": 15,
-    "bareCatch": 11,
+    "bareCatch": 6,
     "catchException": 25,
     "suppressFlagFields": 4,
     "freeformViewModelStateMembers": 100,
@@ -44,7 +44,7 @@
     ],
     "processStart": [
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:435",
-      "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:155", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:173", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:191"
+      "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:149", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:179", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:209"
     ],
     "directClockReads": [
       "src/FreeformHelper.Infrastructure/Project/ProjectFile.cs:24",
@@ -58,8 +58,7 @@
     ],
     "bareCatch": [
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:443", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:482", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:552", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:630",
-      "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:82", "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:195",
-      "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:87", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:163", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:181", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:198", "src/FreeformHelper.UI/Views/FreeformHelperView.ConsoleLinks.cs:323"
+      "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:82", "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:195"
     ],
     "catchException": [
       "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs:116",
