@@ -245,7 +245,7 @@ The C file currently produced by `NotchTableExporter.ExportAsCInitializer(...)` 
 - Multiple ICs add only a minimal helper: `FUNC_NHC_DiffCompensationByIc(UINT8 u8Ic)`.
 - `FUNC_NHC_DiffCompensation(void)` calls IC1 by default, preserving the old single-IC calling convention.
 - `castNHC_TABLE` remains a legacy alias pointing to `castNHC_TABLE_IC1`.
-- The Release profile does not output the FW simulation base mask; only the Debug profile additionally outputs `FUNC_NHC_SimulationLoadFwBaseMaskByIc(UINT8 u8Ic, INT16 s16BaseValue)`, allowing FW bring-up to recreate the same active regular baseline as FreeformHelper Simulation.
+- Neither profile outputs the FW simulation base mask. The Debug profile used to output `FUNC_NHC_SimulationLoadFwBaseMaskByIc(...)`; it was removed on 2026-10-17 because the firmware does not use it.
 - It does not output a new root ABI such as `ST_PRI_NHC_TABLE_EXPORT` / `PriNhc_GetExport(...)`.
 - It can be compiled with `gcc -std=c11 -Wall -Wextra -Werror` in a FW environment that provides `notch.h` / platform typedef / `S_2D_DIFFAFTER`.
 
@@ -266,11 +266,6 @@ The C file currently produced by `NotchTableExporter.ExportAsCInitializer(...)` 
   - v2.2 fields change to a source-oriented payload: `NHC_IDX / NHC_COMBINE / NHC_1ST_IDX / NHC_1ST_RATIO / NHC_2ND_IDX / NHC_2ND_RATIO / NHC_FLAGS`.
 - `ST_PRI_NHC_IC_TABLE_INFO`
   - Per-IC table dispatch metadata in codebase v2.0.0 style.
-- `ST_PRI_NHC_FW_BASE_MASK_INFO`
-  - FW simulation-specific mask dispatch metadata, output only by the Debug profile.
-  - `pu16ActiveDiffs` points to the active regular FW diff list for that IC.
-  - `u16ActiveDiffNum` is the active diff count.
-  - `u16DiffSpan` is the diff span for that IC that must first be cleared to 0.
 
 ### 7.4 v2.2 Node Comment Semantics
 
@@ -437,28 +432,9 @@ C export outputs a comment-only metadata region without adding C structures or a
 - Whether v2.1 / v2.2 actually has rows
 - The active diff count and span to clear to 0 for the FW simulation base mask (Debug profile only)
 
-### 7.5 FW simulation base mask
+### 7.5 FW simulation base mask (removed)
 
-The Debug profile of C export additionally outputs a FW simulation base mask so FW can create a baseline consistent with FreeformHelper Simulation without hand-writing another `SeeRegular`-like mask.
-
-The Release profile omits the entire simulation base mask section and does not output the related defines, structs, `cau16NHC_FW_BASE_MASK_ICx[]`, dispatch table, or `FUNC_NHC_SimulationLoadFwBaseMask*` helpers, so the production `.c` file does not carry extra constant data.
-
-- Mask source:
-  - Uses the active regular set if one is available during export.
-  - Otherwise, falls back to all pads in the current regular grid.
-- Mask contents:
-  - One `cau16NHC_FW_BASE_MASK_ICx[]` per IC containing the FW diff indices corresponding to active regulars.
-  - One dispatch entry per IC: `castNHC_FW_BASE_MASK_BY_IC[u8Ic]`.
-- runtime helper：
-  - `FUNC_NHC_SimulationLoadFwBaseMaskByIc(UINT8 u8Ic, INT16 s16BaseValue)`
-    - First sets the entire `0..u16DiffSpan-1` range of that IC to `0`.
-    - Then sets the active FW diffs in the mask to `s16BaseValue`.
-  - `FUNC_NHC_SimulationLoadFwBaseMask(void)`
-    - Legacy single-IC helper; loads IC1 by default with base value `USER_NHC_SIM_BASE_VALUE`, currently defaulting to `400`.
-- Notes:
-  - This is a simulation / bring-up helper and does not change the production compensation flow of `FUNC_NHC_DiffCompensationByIc(...)`.
-  - Production FW compensation does not need this data; switch to the Debug profile for export only when recreating the FreeformHelper Simulation baseline inside FW is needed.
-  - Before a multi-IC FW call, the FW side still needs to switch to the corresponding IC's `S_2D_DIFFAFTER` buffer/context.
+The C export no longer outputs a FW simulation base mask in any profile. Earlier versions of the Debug profile emitted `cau16NHC_FW_BASE_MASK_ICx[]`, the dispatch table `castNHC_FW_BASE_MASK_BY_IC`, `FUNC_NHC_SimulationLoadFwBaseMaskByIc(...)`, `FUNC_NHC_SimulationLoadFwBaseMask(void)` and `USER_NHC_SIM_BASE_VALUE`. The firmware does not use them, so the exporter dropped them and no longer reads the active regular set.
 
 ### 7.6 Public Symbols
 
@@ -468,12 +444,6 @@ The Release profile omits the entire simulation base mask section and does not o
   - Multi-IC dispatch table.
 - `castNHC_TABLE`
   - Legacy single-IC alias, equivalent to `castNHC_TABLE_IC1`.
-- `castNHC_FW_BASE_MASK_BY_IC`
-  - Output only by the Debug profile; the per-IC FW simulation base mask dispatch table.
-- `FUNC_NHC_SimulationLoadFwBaseMaskByIc(UINT8 u8Ic, INT16 s16BaseValue)`
-  - Output only by the Debug profile; the FW simulation baseline loading helper.
-- `FUNC_NHC_SimulationLoadFwBaseMask(void)`
-  - Output only by the Debug profile; the legacy single-IC baseline loading helper.
 - `FUNC_NHC_DiffCompensationByIc(UINT8 u8Ic)`
   - Multi-IC entry point; before calling, the FW side should switch to the corresponding IC's `S_2D_DIFFAFTER` buffer/context.
 - `FUNC_NHC_DiffCompensation(void)`

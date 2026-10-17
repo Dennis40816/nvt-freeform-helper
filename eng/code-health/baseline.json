@@ -12,20 +12,6 @@
   },
   "entities": [
     {
-      "kind": "file",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "fileLines": 602
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Export/NotchFirmwareCExporter.cs"
-      ],
-      "contentHash": "1b0c7a9e6c3b5466ccc2d1bc782131f2ca42a623857055e229deb96c40f36278",
-      "project": "FreeformHelper.Application",
-      "symbol": "file:FreeformHelper.Application.Export.NotchFirmwareCExporter;FreeformHelper.Application.Export.NotchFirmwareCExporter.FwBaseMaskIc"
-    },
-    {
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
