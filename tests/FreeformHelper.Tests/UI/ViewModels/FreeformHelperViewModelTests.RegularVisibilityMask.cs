@@ -216,7 +216,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         Assert.NotNull(session);
         Assert.Contains("ready", vm.LastSimulationWorkspaceAttemptMessage, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("none", vm.Step4DuplicateDiffSummary, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("none", vm.Step4Index.DuplicateDiffSummary, StringComparison.OrdinalIgnoreCase);
         Assert.True(vm.IsRegularVisibilityMaskEnabled);
         Assert.NotEqual(session!.Grid.Pads.Count, session.ActiveRegularPadIds.Count);
         Assert.True(session.ActiveRegularPadIds.Count > 0);

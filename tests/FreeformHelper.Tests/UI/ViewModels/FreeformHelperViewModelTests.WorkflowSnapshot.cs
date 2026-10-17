@@ -65,4 +65,18 @@ public sealed partial class FreeformHelperViewModelTests
             File.Delete(path);
         }
     }
+
+    [Fact]
+    public void Step4Index_ShiftDeltaChange_RaisesTheDerivedStep4ShiftMembersOnTheViewModel()
+    {
+        var vm = new FreeformHelperViewModel();
+        var raised = new List<string?>();
+        vm.PropertyChanged += (_, args) => raised.Add(args.PropertyName);
+
+        vm.Step4Index.ShiftDelta = 3m;
+
+        Assert.Contains(nameof(FreeformHelperViewModel.CanOffsetSelectedCadOutputFwDiffIndices), raised);
+        Assert.Contains(nameof(FreeformHelperViewModel.Step4DiffShiftSelectionSummary), raised);
+        Assert.Same(vm.Step4Index, vm.Step4Index);
+    }
 }
