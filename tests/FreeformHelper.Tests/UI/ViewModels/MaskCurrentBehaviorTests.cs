@@ -91,13 +91,13 @@ public sealed class MaskCurrentBehaviorTests
             await vm.LoadProjectCommand.ExecuteAsync(null);
             await vm.WaitForGridRebuildIdleAsync();
 
-            Assert.True(vm.IsRegularVisibilityMaskEnabled);
+            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
             var mask = vm.RegularVisibilityMaskForTests.Mask;
             Assert.Equal(RegularVisibilityMaskStatus.NotFound, mask.Status);
             Assert.False(mask.HasLoadedMask);
             Assert.Equal(missingMaskPath, mask.SourcePath);
             Assert.Equal(0, mask.ActiveRegularCount);
-            Assert.Contains("not loaded", vm.RegularVisibilityMaskSummary, StringComparison.Ordinal);
+            Assert.Contains("not loaded", vm.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
 
             var grid = GetField<RegularGrid>(vm, "_grid");
             Assert.Equal(1, grid.Rows);
@@ -109,7 +109,7 @@ public sealed class MaskCurrentBehaviorTests
             Assert.Equal(2, session.Grid.Pads.Count);
             Assert.Equal(2, session.ActiveRegularPadIds.Count);
             Assert.True(session.ActiveRegularPadIds.SetEquals(grid.Pads.Select(static pad => pad.RegularPadId)));
-            Assert.True(vm.IsRegularVisibilityMaskEnabled);
+            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
         }
         finally
         {
@@ -142,7 +142,7 @@ public sealed class MaskCurrentBehaviorTests
 
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
-            Assert.True(vm.IsRegularVisibilityMaskEnabled);
+            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
             var initialMask = vm.RegularVisibilityMaskForTests.Mask;
             Assert.Equal(RegularVisibilityMaskStatus.Loaded, initialMask.Status);
             Assert.Equal(0, Assert.Single(initialMask.ActiveRegularPadIds));
@@ -153,7 +153,7 @@ public sealed class MaskCurrentBehaviorTests
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
             var changedMask = vm.RegularVisibilityMaskForTests.Mask;
-            Assert.True(vm.IsRegularVisibilityMaskEnabled);
+            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
             Assert.Equal(RegularVisibilityMaskStatus.Loaded, changedMask.Status);
             Assert.Equal(changedPath, changedMask.SourcePath);
             Assert.Equal(1, changedMask.ActiveRegularCount);
@@ -161,11 +161,11 @@ public sealed class MaskCurrentBehaviorTests
             Assert.True(vm.TryGetCadOutputFwDiffIndex(pad.Id, out var staleDiff));
             Assert.Equal(10, staleDiff);
 
-            vm.IsRegularVisibilityMaskEnabled = false;
+            vm.RegularVisibilityMaskUi.IsEnabled = false;
             Assert.True(vm.TryGetCadOutputFwDiffIndex(pad.Id, out var disabledDiff));
             Assert.Equal(10, disabledDiff);
 
-            vm.IsRegularVisibilityMaskEnabled = true;
+            vm.RegularVisibilityMaskUi.IsEnabled = true;
             Assert.True(vm.TryGetCadOutputFwDiffIndex(pad.Id, out var refreshedDiff));
             Assert.Equal(20, refreshedDiff);
         }

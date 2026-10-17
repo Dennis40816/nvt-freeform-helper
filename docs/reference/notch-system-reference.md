@@ -88,7 +88,7 @@ A CAD pad is not itself a FW memory node, but several diff identities are derive
     - Active/inactive neighbor decisions for notch compensation
 
 - `Regular Visibility Mask (SeeRegular.csv)`
-  - Source: `SeeRegular.csv` loads successfully, and `UseRegularVisibilityMask` / `IsRegularVisibilityMaskEnabled` is enabled
+  - Source: `SeeRegular.csv` loads successfully, and `UseRegularVisibilityMask` / `RegularVisibilityMaskUi.IsEnabled` is enabled
   - Meaning: An additional set that restricts active regulars
   - Current uses:
     - Step4 geometry seed / visible assignment

@@ -974,7 +974,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 175,
+        "stateMembers": 174,
         "partialFiles": 94
       },
       "owner": "NFH",

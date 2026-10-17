@@ -51,7 +51,7 @@ Current document baseline: FreeformHelper g1 current-state audit, production evi
   - After `Open DXF` succeeds, it clears the previously manually selected mask path and loaded result.
   - `Step 4` reads the current workflow snapshot mask directly; Notch generation consumes the CAD Output FW Diff assignment after the mask has been applied.
   - `Simulation` also uses the jointly generated notch table and intersects regular grid IDs with the active mask to form the active surface; it cannot currently be described as "Simulation only reads the table".
-- `RegularVisibilityMaskSummary` contract:
+- `RegularVisibilityMaskUi.Summary` contract:
   - `not loaded`: not yet manually imported
   - `loaded but disabled`: imported, but the toggle is off
   - `enabled`: imported and currently constraining `Step 4 / Simulation`

@@ -109,7 +109,7 @@ public sealed partial class FreeformHelperViewModel
                 IncludeBlockPolylines = ImportBlockPolylines,
                 LogLevel = SelectedLogLevelOption.Value,
                 RegularVisibilityMaskSourcePath = _regularVisibilityMask.SourcePath,
-                UseRegularVisibilityMask = IsRegularVisibilityMaskEnabled
+                UseRegularVisibilityMask = RegularVisibilityMaskUi.IsEnabled
             }
         };
 

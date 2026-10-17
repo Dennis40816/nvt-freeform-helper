@@ -23,7 +23,7 @@ public sealed class ExampleProjectFixtureTests
         var mask = vm.RegularVisibilityMaskForTests.Mask;
         Assert.Equal(RegularVisibilityMaskStatus.Loaded, mask.Status);
         Assert.True(mask.ActiveRegularCount > 0);
-        Assert.True(vm.IsRegularVisibilityMaskEnabled);
+        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
     }
 
     [Theory]

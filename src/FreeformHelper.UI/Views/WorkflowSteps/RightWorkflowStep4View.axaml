@@ -54,8 +54,8 @@
                 <SelectableTextBlock Classes="workflowStepMetricLabel"
                                      Text="Regular Visibility Mask"/>
                 <SelectableTextBlock Classes="workflowStepMetricText compact"
-                                     Text="{Binding RegularVisibilityMaskSummary}"
-                                     ToolTip.Tip="{Binding RegularVisibilityMaskSummary}"/>
+                                     Text="{Binding RegularVisibilityMaskUi.Summary}"
+                                     ToolTip.Tip="{Binding RegularVisibilityMaskUi.Summary}"/>
               </StackPanel>
             </Border>
           </StackPanel>
