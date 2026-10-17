@@ -11,7 +11,7 @@
     "bareCatch": 1,
     "catchException": 24,
     "suppressFlagFields": 4,
-    "freeformViewModelStateMembers": 96,
+    "freeformViewModelStateMembers": 95,
     "shellNavigationBooleans": 0,
     "noWarnIds": 3
   },
