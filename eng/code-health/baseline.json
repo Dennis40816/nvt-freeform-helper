@@ -15,7 +15,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 816
+        "fileLines": 602
       },
       "owner": "NFH",
       "locations": [
@@ -1727,7 +1727,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 1738
+        "fileLines": 1658
       },
       "owner": "NFH",
       "locations": [
@@ -8608,16 +8608,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "31907f53bc42f7dd20117665389a1d571b056479e8e4b6f24dafdc7bee9bb921",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.fields:ExpectedFwBaseMaskRuntimeValues",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "97762d305214fa56cd4e78e60b987f5fe139185d571055f4f90dde28538f3a47",
       "member": "FreeformHelper.Tests.NotchTableExporterTests.fields:ExpectedV21PayloadPrefix",
       "owner": "NFH",
@@ -12746,16 +12736,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
-      "syntaxHash": "c86dc6f93473928b8ffbaa374805093c32b24d955d33b08b75b28efa8c333bfa",
-      "member": "FreeformHelper.Tests.NotchExampleCExportDriftTests.GetActiveRegularPadIds(FreeformHelperViewModel)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchExampleCExportDriftTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "df4e81df7f8978dc95d97b734714d68d2082dee661d30a8e099768df6e3e6580",
