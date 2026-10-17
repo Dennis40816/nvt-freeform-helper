@@ -430,7 +430,6 @@ C export outputs a comment-only metadata region without adding C structures or a
 - `TargetCoverageGuard / TargetCoverageCapPercent`
 - export profile
 - Whether v2.1 / v2.2 actually has rows
-- The active diff count and span to clear to 0 for the FW simulation base mask (Debug profile only)
 
 ### 7.5 FW simulation base mask (removed)
 
