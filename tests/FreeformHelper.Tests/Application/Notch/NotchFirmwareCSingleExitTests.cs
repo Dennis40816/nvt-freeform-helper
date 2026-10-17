@@ -41,7 +41,6 @@ public sealed class NotchFirmwareCSingleExitTests
         Assert.DoesNotContain("return;", text, StringComparison.Ordinal);
         Assert.Contains("if (pstTable != NULL)", text, StringComparison.Ordinal);
         Assert.Contains("if (u8Ic < USER_NHC_IC_NUM)", text, StringComparison.Ordinal);
-        Assert.Contains("if (pstMaskInfo->pu16ActiveDiffs != NULL)", text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -101,8 +100,7 @@ public sealed class NotchFirmwareCSingleExitTests
             CreateCadSet(),
             CreateGrid(),
             CreateSettings(),
-            profile,
-            new HashSet<int> { 0, 1 });
+            profile);
 
     private static CadPadSet CreateCadSet() => new(
     [

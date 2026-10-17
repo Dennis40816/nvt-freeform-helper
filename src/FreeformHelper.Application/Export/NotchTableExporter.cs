@@ -63,6 +63,10 @@ public sealed class NotchTableExporter
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Exports the table as FW-style C source. <paramref name="activeRegularPadIds"/> is ignored: the C export no
+    /// longer depends on the active regular set. The parameter stays so the public signature does not change.
+    /// </summary>
     public static string ExportAsCInitializer(
         NotchTable table,
         CadPadSet cad,
@@ -81,7 +85,7 @@ public sealed class NotchTableExporter
             return "// Notch table is empty.\n";
         }
 
-        return NotchFirmwareCExporter.Export(table, grid, settings, profile, activeRegularPadIds);
+        return NotchFirmwareCExporter.Export(table, grid, settings, profile);
     }
 
     private static string EscapeCsv(string s)

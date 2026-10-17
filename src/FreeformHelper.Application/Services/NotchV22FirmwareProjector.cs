@@ -7,7 +7,7 @@ namespace FreeformHelper.Application.Services;
 internal static class NotchV22FirmwareProjector
 {
     internal const int ContinuationFlag = 1 << 0;
-    private const int AnchorOverrideFlag = 1 << 1;
+    internal const int AnchorOverrideFlag = 1 << 1;
 
     internal static NotchV22FirmwareProjection Project(
         IReadOnlyList<NotchTableRow> rows,
