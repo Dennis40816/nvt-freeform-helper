@@ -7,8 +7,8 @@ public sealed partial class FreeformHelperViewModel
 {
     public bool CanOffsetSelectedCadOutputFwDiffIndices =>
         _selectedCadIds.Any(id => _cadOutputFwDiffIndexByCadId.ContainsKey(id)) &&
-        decimal.Truncate(CadOutputFwDiffIndexShiftDelta) == CadOutputFwDiffIndexShiftDelta &&
-        CadOutputFwDiffIndexShiftDelta != 0m;
+        decimal.Truncate(Step4Index.ShiftDelta) == Step4Index.ShiftDelta &&
+        Step4Index.ShiftDelta != 0m;
 
     public string Step4DiffShiftSelectionSummary
     {
@@ -29,11 +29,11 @@ public sealed partial class FreeformHelperViewModel
                 .OrderBy(diff => diff)
                 .ToList();
             return FormattableString.Invariant(
-                $"Diff shift target: {visibleSelected.Count} CAD pad(s), current range {diffs.First()}-{diffs.Last()}, offset {CadOutputFwDiffIndexShiftDelta:0}.");
+                $"Diff shift target: {visibleSelected.Count} CAD pad(s), current range {diffs.First()}-{diffs.Last()}, offset {Step4Index.ShiftDelta:0}.");
         }
     }
 
-    partial void OnCadOutputFwDiffIndexShiftDeltaChanged(decimal value)
+    private void OnStep4ShiftDeltaChanged()
     {
         OnPropertyChanged(nameof(CanOffsetSelectedCadOutputFwDiffIndices));
         OnPropertyChanged(nameof(Step4DiffShiftSelectionSummary));
@@ -52,7 +52,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var delta = (int)decimal.Truncate(CadOutputFwDiffIndexShiftDelta);
+        var delta = (int)decimal.Truncate(Step4Index.ShiftDelta);
         var plan = CadOutputFwDiffIndexShiftService.BuildShiftPlan(
             selectedCadIds,
             workflowSnapshot.CadOutputFwDiffIndexByCadId,

@@ -130,7 +130,7 @@ public sealed partial class FreeformHelperViewModelTests
         updateVisibleCadIndexingMethod!.Invoke(vm, new object?[] { source });
 
         await SelectCadPadsAsync(vm, SelectedCad23);
-        vm.CadOutputFwDiffIndexShiftDelta = 1m;
+        vm.Step4Index.ShiftDelta = 1m;
 
         vm.OffsetSelectedCadOutputFwDiffIndicesCommand.Execute(null);
 
