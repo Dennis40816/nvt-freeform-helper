@@ -84,7 +84,6 @@ $applicationClasses = @(
 )
 
 $infrastructureClasses = @(
-    "ConsoleLinkParserTests",
     "AppLogFormattingTests",
     "LoggingConfigurationTests"
 )

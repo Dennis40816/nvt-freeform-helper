@@ -26,8 +26,6 @@
       <Color x:Key="ColorBlack">#000000</Color>
       <Color x:Key="ColorAccent">#4DA3FF</Color>
       <Color x:Key="ColorAccentSoft">#244DA3FF</Color>
-      <Color x:Key="ColorConsoleSearchHighlightBg">#6B5B2A</Color>
-      <Color x:Key="ColorConsoleSearchHighlightFg">#FFFFFF</Color>
       <Color x:Key="ColorDanger">#FF6B6B</Color>
       <Color x:Key="ColorSuccess">#4FD1A5</Color>
       <Color x:Key="ColorWarning">#FFB86B</Color>
@@ -214,8 +212,6 @@
       <Color x:Key="ColorBlack">#000000</Color>
       <Color x:Key="ColorAccent">#2B6CB0</Color>
       <Color x:Key="ColorAccentSoft">#1F2B6CB0</Color>
-      <Color x:Key="ColorConsoleSearchHighlightBg">#DCE6FF</Color>
-      <Color x:Key="ColorConsoleSearchHighlightFg">#1E2430</Color>
       <Color x:Key="ColorDanger">#D64545</Color>
       <Color x:Key="ColorSuccess">#2F855A</Color>
       <Color x:Key="ColorWarning">#C77D1A</Color>
@@ -403,9 +399,6 @@
   <SolidColorBrush x:Key="BrushIcon" Color="{DynamicResource ColorTextSubtle}"/>
   <SolidColorBrush x:Key="BrushAccent" Color="{DynamicResource ColorAccent}"/>
   <SolidColorBrush x:Key="BrushAccentSoft" Color="{DynamicResource ColorAccentSoft}"/>
-  <SolidColorBrush x:Key="BrushConsoleLink" Color="{DynamicResource ColorAccent}"/>
-  <SolidColorBrush x:Key="BrushConsoleSearchHighlightBg" Color="{DynamicResource ColorConsoleSearchHighlightBg}"/>
-  <SolidColorBrush x:Key="BrushConsoleSearchHighlightFg" Color="{DynamicResource ColorConsoleSearchHighlightFg}"/>
   <SolidColorBrush x:Key="BrushDanger" Color="{DynamicResource ColorDanger}"/>
   <SolidColorBrush x:Key="BrushSuccess" Color="{DynamicResource ColorSuccess}"/>
   <SolidColorBrush x:Key="BrushWarning" Color="{DynamicResource ColorWarning}"/>
@@ -615,7 +608,6 @@
   <Thickness x:Key="InsetRight8">0,0,8,0</Thickness>
   <Thickness x:Key="InsetRight8Bottom8">0,0,8,8</Thickness>
   <Thickness x:Key="InsetRight8Bottom6">0,0,8,6</Thickness>
-  <Thickness x:Key="InsetRight8Bottom4">0,0,8,4</Thickness>
   <Thickness x:Key="InsetBottom2">0,0,0,2</Thickness>
   <Thickness x:Key="InsetBottom4">0,0,0,4</Thickness>
   <Thickness x:Key="InsetBottom6">0,0,0,6</Thickness>
@@ -707,8 +699,6 @@
   <x:Double x:Key="SplitterRowThickness">6</x:Double>
   <x:Double x:Key="ConsoleActionWidth">28</x:Double>
   <x:Double x:Key="ConsoleActionHeight">24</x:Double>
-  <x:Double x:Key="ConsoleSearchWidth">200</x:Double>
-  <x:Double x:Key="ConsoleSearchHeight">26</x:Double>
   <x:Double x:Key="PanelToggleHeight">26</x:Double>
   <x:Double x:Key="FormControlHeight">30</x:Double>
   <x:Double x:Key="FormControlCompactHeight">24</x:Double>
@@ -745,8 +735,6 @@
   <x:Decimal x:Key="NumericInputMinimum">-1000000</x:Decimal>
   <x:Decimal x:Key="NumericInputMaximum">1000000</x:Decimal>
   <x:Double x:Key="ConsoleCollapsedMinHeight">32</x:Double>
-  <x:Double x:Key="ConsoleFontMin">8</x:Double>
-  <x:Double x:Key="ConsoleFontMax">32</x:Double>
   <x:Double x:Key="DialogWidth">360</x:Double>
   <x:Double x:Key="DialogHeight">170</x:Double>
   <x:Double x:Key="CadPadDialogHeight">320</x:Double>
@@ -962,9 +950,9 @@
   <x:Double x:Key="NotchPreviewToFullStrokeWidth">1.4</x:Double>
 
   <!-- Console layout -->
-  <x:Double x:Key="ConsolePanelMinHeight">120</x:Double>
+  <x:Double x:Key="ConsolePanelMinHeight">232</x:Double>
   <Thickness x:Key="ConsolePanelPadding">12,8</Thickness>
-  <GridLength x:Key="ConsolePanelRowHeight">180</GridLength>
+  <GridLength x:Key="ConsolePanelRowHeight">300</GridLength>
 
   <!-- Component preview sizes -->
   <x:Double x:Key="DevSwatchHeight">40</x:Double>

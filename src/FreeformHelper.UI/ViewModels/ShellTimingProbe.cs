@@ -1,17 +1,11 @@
 namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
-/// Marks the moments of the shell where a test must run code or hold the work back. Production code uses
+/// Marks the moment of the shell where a test must hold the work back. Production code uses
 /// <see cref="NullShellTimingProbe"/>; a test passes its own probe to the constructor of the shell.
 /// </summary>
 internal interface IShellTimingProbe
 {
-    /// <summary>Runs inside the console text gate, right after the text buffer is cleared and before the log snapshot is read.</summary>
-    void ConsoleSnapshotRead();
-
-    /// <summary>Runs on a notification thread that finds the console text gate held, right before it waits for the gate.</summary>
-    void ConsoleGateContended();
-
     /// <summary>Completes when a workspace build may continue past its first step.</summary>
     Task WorkspaceBuildPauseAsync();
 }
@@ -24,14 +18,6 @@ internal sealed class NullShellTimingProbe : IShellTimingProbe
     public static NullShellTimingProbe Instance { get; } = new();
 
     private NullShellTimingProbe()
-    {
-    }
-
-    public void ConsoleSnapshotRead()
-    {
-    }
-
-    public void ConsoleGateContended()
     {
     }
 
