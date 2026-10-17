@@ -8,7 +8,12 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    partial void OnCurrentPadInspectorSnapshotChanged(PadInspectorSnapshot? value)
+    private PadInspectorUiState? _padInspectorUi; // Created on first read so that the snapshot-change callback can point at this instance.
+
+    /// <summary>Gets the pad inspector snapshot and refresh flag that the inspector views bind to.</summary>
+    public PadInspectorUiState PadInspectorUi => _padInspectorUi ??= new PadInspectorUiState(OnPadInspectorSnapshotChanged);
+
+    private void OnPadInspectorSnapshotChanged(PadInspectorSnapshot? value)
     {
         var display = value is null ? null : BuildPadInspectorDisplay(value);
         PadInspectorDisplay = display ?? PadInspectorDisplay.CreateEmpty();

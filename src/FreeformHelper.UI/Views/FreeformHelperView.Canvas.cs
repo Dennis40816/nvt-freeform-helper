@@ -78,7 +78,7 @@ public sealed partial class FreeformHelperView
             pad.Id,
             includeExpensiveNotchDetails: false,
             includeNotchRowEligibilityDetails: false);
-        vm.CurrentPadInspectorSnapshot = snapshot;
+        vm.PadInspectorUi.Snapshot = snapshot;
         vm.QueueDeferredCadInspectorSnapshotRefresh(pad.Id);
         var info = new CadPadInfoViewModel(
             selectedPads,
@@ -121,7 +121,7 @@ public sealed partial class FreeformHelperView
     {
         var selectedPads = BuildRegularSelectionList(vm, pad); // Get selected regular pads.
         var snapshot = vm.BuildRegularPadInspectorSnapshot(pad.RegularPadId);
-        vm.CurrentPadInspectorSnapshot = snapshot;
+        vm.PadInspectorUi.Snapshot = snapshot;
         var info = new RegularPadInfoViewModel(
             selectedPads,
             vm.ToDisplayRow, // Function to convert actual row to display row.
@@ -279,7 +279,7 @@ public sealed partial class FreeformHelperView
             ClosePadInfo();
             if (DataContext is FreeformHelperViewModel vmOnClose)
             {
-                vmOnClose.CurrentPadInspectorSnapshot = null;
+                vmOnClose.PadInspectorUi.Snapshot = null;
             }
             // If there was a pending pad info context, open it now.
             if (_pendingPadInfoContext is not null && DataContext is FreeformHelperViewModel vm)

@@ -240,20 +240,20 @@ public sealed class RecoverableBoundaryTests
             var regularPadId = vm.RegularPads[0].RegularPadId;
             await SelectRegularPadAndSettleAsync(vm, regularPadId);
             // The rebuilt snapshot equals the shown one, and an equal value raises no change. Make the shown one differ.
-            vm.CurrentPadInspectorSnapshot = vm.CurrentPadInspectorSnapshot! with { Kind = "stale" };
+            vm.PadInspectorUi.Snapshot = vm.PadInspectorUi.Snapshot! with { Kind = "stale" };
             using var trap = FailOnce(
-                vm,
-                nameof(vm.CurrentPadInspectorSnapshot),
+                vm.PadInspectorUi,
+                nameof(PadInspectorUiState.Snapshot),
                 new InvalidOperationException("snapshot rejected"));
             var work = new RecordingBackgroundWorkRunner();
             vm.BackgroundWork.Runner = work;
 
             vm.QueueDeferredRegularInspectorSnapshotRefresh(regularPadId);
-            Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.True(vm.PadInspectorUi.IsDeferredRefreshPending);
             await work.LastStartedAsync(FreeformHelperViewModel.DeferredRegularInspectorRefreshWorkName);
 
             Assert.True(trap.Fired);
-            Assert.False(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.False(vm.PadInspectorUi.IsDeferredRefreshPending);
         }
         finally
         {
@@ -270,18 +270,18 @@ public sealed class RecoverableBoundaryTests
             var vm = await CreateNotchExportCacheViewModelAsync(path);
             var regularPadId = vm.RegularPads[0].RegularPadId;
             await SelectRegularPadAndSettleAsync(vm, regularPadId);
-            vm.CurrentPadInspectorSnapshot = vm.CurrentPadInspectorSnapshot! with { Kind = "stale" };
-            using var trap = FailOnce(vm, nameof(vm.CurrentPadInspectorSnapshot), CreateOutOfMemory());
+            vm.PadInspectorUi.Snapshot = vm.PadInspectorUi.Snapshot! with { Kind = "stale" };
+            using var trap = FailOnce(vm.PadInspectorUi, nameof(PadInspectorUiState.Snapshot), CreateOutOfMemory());
             var work = new RecordingBackgroundWorkRunner();
             vm.BackgroundWork.Runner = work;
 
             vm.QueueDeferredRegularInspectorSnapshotRefresh(regularPadId);
-            Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.True(vm.PadInspectorUi.IsDeferredRefreshPending);
             await Assert.ThrowsAsync<OutOfMemoryException>(() =>
                 work.LastStartedAsync(FreeformHelperViewModel.DeferredRegularInspectorRefreshWorkName));
 
             Assert.True(trap.Fired);
-            Assert.False(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.False(vm.PadInspectorUi.IsDeferredRefreshPending);
         }
         finally
         {
@@ -298,7 +298,7 @@ public sealed class RecoverableBoundaryTests
         var selectionApplied = 0;
 
         bool IsSettled() =>
-            vm.CurrentPadInspectorSnapshot?.Regular?.RegularPadId == regularPadId && !vm.IsPadInspectorDeferredRefreshPending;
+            vm.PadInspectorUi.Snapshot?.Regular?.RegularPadId == regularPadId && !vm.PadInspectorUi.IsDeferredRefreshPending;
 
         void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
@@ -311,6 +311,7 @@ public sealed class RecoverableBoundaryTests
         }
 
         vm.PropertyChanged += OnPropertyChanged;
+        vm.PadInspectorUi.PropertyChanged += OnPropertyChanged;
         try
         {
             vm.ApplyCanvasSelection(Array.Empty<int>(), [regularPadId]);
@@ -330,19 +331,20 @@ public sealed class RecoverableBoundaryTests
         finally
         {
             vm.PropertyChanged -= OnPropertyChanged;
+            vm.PadInspectorUi.PropertyChanged -= OnPropertyChanged;
         }
     }
 
-    private static PropertyChangedTrap FailOnce(FreeformHelperViewModel vm, string propertyName, Exception failure) =>
+    private static PropertyChangedTrap FailOnce(INotifyPropertyChanged vm, string propertyName, Exception failure) =>
         new(vm, propertyName, failure);
 
     private sealed class PropertyChangedTrap : IDisposable
     {
-        private readonly FreeformHelperViewModel _vm;
+        private readonly INotifyPropertyChanged _vm;
         private readonly string _propertyName;
         private readonly Exception _failure;
 
-        public PropertyChangedTrap(FreeformHelperViewModel vm, string propertyName, Exception failure)
+        public PropertyChangedTrap(INotifyPropertyChanged vm, string propertyName, Exception failure)
         {
             _vm = vm;
             _propertyName = propertyName;
