@@ -330,8 +330,8 @@ public sealed partial class FreeformHelperViewModel
         RefreshDxfRegularSourceHint();
         NotifySimulationWorkspaceSourceChanged();
 
-        var shouldClear = !SuppressSelectionClearOnRebuild;
-        SuppressSelectionClearOnRebuild = false;
+        var shouldClear = !_selection.SuppressClearOnRebuild;
+        _selection.SuppressClearOnRebuild = false;
         if (shouldClear)
         {
             _selectionCoordinator.ClearSelection(CanvasHost);
@@ -339,17 +339,17 @@ public sealed partial class FreeformHelperViewModel
 
         SetStatus(statusText);
         Logger.Info(CultureInfo.InvariantCulture, "Grid built. Rows={0}, Cols={1}, Pads={2}.", grid.Rows, grid.Cols, grid.Pads.Count);
-        if (!_startupInitialGridBuiltMarked && _cad is null)
+        if (!_gridStartup.InitialGridBuiltMarked && _cad is null)
         {
             StartupPerfTracker.Mark("workspace.initial-grid-built", $"pads={grid.Pads.Count}");
-            _startupInitialGridBuiltMarked = true;
+            _gridStartup.InitialGridBuiltMarked = true;
         }
 
         CanvasHost?.Invalidate();
-        if (_fitAfterNextGridBuild)
+        if (_gridStartup.FitAfterNextBuild)
         {
             CanvasHost?.FitToContent();
-            _fitAfterNextGridBuild = false;
+            _gridStartup.FitAfterNextBuild = false;
         }
         else if (_cad is null && !hadRegularBefore)
         {
@@ -372,9 +372,9 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(PitchSizeYSummary));
         RegularPads = new ObservableCollection<RegularPad>();
         ApplyRegularVisibilityMaskResult(
-            string.IsNullOrWhiteSpace(_regularVisibilityMaskSourcePath)
+            string.IsNullOrWhiteSpace(_regularVisibilityMask.SourcePath)
                 ? RegularVisibilityMaskResult.NotFound()
-                : RegularVisibilityMaskResult.NotFound(_regularVisibilityMaskSourcePath),
+                : RegularVisibilityMaskResult.NotFound(_regularVisibilityMask.SourcePath),
             grid: null);
         CanvasHintText = hint;
         ResetFreeformAutoDetectStats();
@@ -383,8 +383,8 @@ public sealed partial class FreeformHelperViewModel
             ResetWorkflowFromStep(WorkflowStepId.Step1Match, showStatus: false);
         }
 
-        var shouldClearSelection = !SuppressSelectionClearOnRebuild;
-        SuppressSelectionClearOnRebuild = false;
+        var shouldClearSelection = !_selection.SuppressClearOnRebuild;
+        _selection.SuppressClearOnRebuild = false;
         if (shouldClearSelection)
         {
             _selectionCoordinator.ClearSelection(CanvasHost);
@@ -464,7 +464,7 @@ public sealed partial class FreeformHelperViewModel
             return BuildFilteredCadPadSet();
         }
 
-        if (_autoHiddenDuplicateCadPadIds.Count == 0)
+        if (_cadEdit.AutoHiddenDuplicateCadPadIds.Count == 0)
         {
             return _cad;
         }

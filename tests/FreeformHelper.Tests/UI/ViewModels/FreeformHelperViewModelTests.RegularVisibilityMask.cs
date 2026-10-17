@@ -1,4 +1,3 @@
-using System.Reflection;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -18,17 +17,17 @@ public sealed partial class FreeformHelperViewModelTests
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
 
-        Assert.True(vm.IsRegularVisibilityMaskEnabled);
-        Assert.Contains("enabled", vm.RegularVisibilityMaskSummary, StringComparison.OrdinalIgnoreCase);
+        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.Contains("enabled", vm.RegularVisibilityMaskUi.Summary, StringComparison.OrdinalIgnoreCase);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(4848, out var maskedDiff4848));
         Assert.Equal(324, maskedDiff4848);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(4823, out var maskedDiff4823));
         Assert.Equal(323, maskedDiff4823);
         Assert.True(vm.TryGetCadDisplayIndex(4823, out var displayIndex4823));
 
-        vm.IsRegularVisibilityMaskEnabled = false;
+        vm.RegularVisibilityMaskUi.IsEnabled = false;
 
-        Assert.False(vm.IsRegularVisibilityMaskEnabled);
+        Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(4848, out var pureGeometryDiff4848));
         Assert.Equal(325, pureGeometryDiff4848);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(4823, out var pureGeometryDiff4823));
@@ -36,7 +35,7 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.True(vm.TryGetCadDisplayIndex(4823, out var pureGeometryDisplayIndex4823));
         Assert.Equal(displayIndex4823, pureGeometryDisplayIndex4823);
 
-        vm.IsRegularVisibilityMaskEnabled = true;
+        vm.RegularVisibilityMaskUi.IsEnabled = true;
 
         Assert.True(vm.TryGetCadOutputFwDiffIndex(4848, out var restoredDiff4848));
         Assert.Equal(324, restoredDiff4848);
@@ -64,7 +63,7 @@ public sealed partial class FreeformHelperViewModelTests
             await vm.LoadProjectCommand.ExecuteAsync(null);
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
-            Assert.True(vm.IsRegularVisibilityMaskEnabled);
+            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
             Assert.True(vm.TryGetCadOutputFwDiffIndex(4823, out var beforeSaveDiff));
             Assert.Equal(323, beforeSaveDiff);
 
@@ -96,14 +95,9 @@ public sealed partial class FreeformHelperViewModelTests
             };
             await loadedVm.LoadProjectCommand.ExecuteAsync(null);
 
-            var sourcePathField = typeof(FreeformHelperViewModel).GetField(
-                "_regularVisibilityMaskSourcePath",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(sourcePathField);
-
-            Assert.True(loadedVm.IsRegularVisibilityMaskEnabled);
-            Assert.Equal(csvPath, sourcePathField!.GetValue(loadedVm) as string);
-            Assert.Contains("not loaded", loadedVm.RegularVisibilityMaskSummary, StringComparison.OrdinalIgnoreCase);
+            Assert.True(loadedVm.RegularVisibilityMaskUi.IsEnabled);
+            Assert.Equal(csvPath, loadedVm.RegularVisibilityMaskForTests.SourcePath);
+            Assert.Contains("not loaded", loadedVm.RegularVisibilityMaskUi.Summary, StringComparison.OrdinalIgnoreCase);
         }
         finally
         {
@@ -133,7 +127,7 @@ public sealed partial class FreeformHelperViewModelTests
             await vm.LoadProjectCommand.ExecuteAsync(null);
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
-            Assert.True(vm.IsRegularVisibilityMaskEnabled);
+            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
             Assert.True(vm.TryGetCadOutputFwDiffIndex(4823, out var beforeSaveDiff));
             Assert.Equal(323, beforeSaveDiff);
 
@@ -164,9 +158,9 @@ public sealed partial class FreeformHelperViewModelTests
             };
             await loadedVm.LoadProjectCommand.ExecuteAsync(null);
 
-            Assert.True(loadedVm.IsRegularVisibilityMaskEnabled);
-            Assert.Contains("enabled", loadedVm.RegularVisibilityMaskSummary, StringComparison.OrdinalIgnoreCase);
-            Assert.DoesNotContain("not loaded", loadedVm.RegularVisibilityMaskSummary, StringComparison.OrdinalIgnoreCase);
+            Assert.True(loadedVm.RegularVisibilityMaskUi.IsEnabled);
+            Assert.Contains("enabled", loadedVm.RegularVisibilityMaskUi.Summary, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("not loaded", loadedVm.RegularVisibilityMaskUi.Summary, StringComparison.OrdinalIgnoreCase);
             Assert.True(loadedVm.TryGetCadOutputFwDiffIndex(4823, out var loadedDiff));
             Assert.Equal(323, loadedDiff);
         }
@@ -222,8 +216,8 @@ public sealed partial class FreeformHelperViewModelTests
 
         Assert.NotNull(session);
         Assert.Contains("ready", vm.LastSimulationWorkspaceAttemptMessage, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("none", vm.Step4DuplicateDiffSummary, StringComparison.OrdinalIgnoreCase);
-        Assert.True(vm.IsRegularVisibilityMaskEnabled);
+        Assert.Contains("none", vm.Step4Index.DuplicateDiffSummary, StringComparison.OrdinalIgnoreCase);
+        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
         Assert.NotEqual(session!.Grid.Pads.Count, session.ActiveRegularPadIds.Count);
         Assert.True(session.ActiveRegularPadIds.Count > 0);
     }
@@ -311,7 +305,7 @@ public sealed partial class FreeformHelperViewModelTests
 
             await vm.LoadProjectCommand.ExecuteAsync(null);
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
-            Assert.True(vm.IsRegularVisibilityMaskEnabled);
+            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
 
             var session = await vm.CreateSimulationWorkspaceSessionAsync();
 

@@ -9,10 +9,16 @@ public sealed partial class FreeformHelperViewModel
     private const string RegularVisibilityMaskNotLoadedSummary =
         "Regular visibility mask: not loaded. Import Regular Visibility Mask (SeeRegular.csv) in Step 1 to constrain Step 4 geometry seed and Simulation.";
 
-    private RegularVisibilityMaskResult _regularVisibilityMaskResult = RegularVisibilityMaskResult.NotFound();
-    private string? _regularVisibilityMaskSourcePath;
-    private byte[]? _embeddedRegularVisibilityMask;
-    private string? _embeddedRegularVisibilityMaskName;
+    private readonly RegularVisibilityMaskState _regularVisibilityMask = new(); // Holds the loaded regular visibility mask and where it came from.
+
+    private RegularVisibilityMaskUiState? _regularVisibilityMaskUi; // Created on first read so that the enabled-change callback can point at this instance.
+
+    /// <summary>Gets the mask values that the Step 1 and Step 4 views bind to.</summary>
+    public RegularVisibilityMaskUiState RegularVisibilityMaskUi =>
+        _regularVisibilityMaskUi ??= new RegularVisibilityMaskUiState(OnRegularVisibilityMaskEnabledChanged);
+
+    /// <summary>Gets the mask data so that tests can read it without reflection.</summary>
+    internal RegularVisibilityMaskState RegularVisibilityMaskForTests => _regularVisibilityMask;
 
     private async Task ImportRegularVisibilityMaskAsync()
     {
@@ -34,14 +40,14 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _regularVisibilityMaskSourcePath = sourcePath;
-        _embeddedRegularVisibilityMask = null;
-        _embeddedRegularVisibilityMaskName = null;
+        _regularVisibilityMask.SourcePath = sourcePath;
+        _regularVisibilityMask.EmbeddedMask = null;
+        _regularVisibilityMask.EmbeddedName = null;
         _projectFile.EmbeddedRegularVisibilityMask = null;
         _projectFile.EmbeddedRegularVisibilityMaskName = null;
         RefreshRegularVisibilityMask(_grid);
 
-        if (_regularVisibilityMaskResult.HasLoadedMask)
+        if (_regularVisibilityMask.Mask.HasLoadedMask)
         {
             SetRegularVisibilityMaskEnabled(value: true, refreshAssignment: true);
             SetStatus(
@@ -49,28 +55,28 @@ public sealed partial class FreeformHelperViewModel
                     CultureInfo.InvariantCulture,
                     "Regular visibility mask imported: {0}. Active={1}, inactive={2}, frames={3}.",
                     Path.GetFileName(sourcePath),
-                    _regularVisibilityMaskResult.ActiveRegularCount,
-                    _regularVisibilityMaskResult.InactiveRegularCount,
-                    _regularVisibilityMaskResult.FrameCount));
+                    _regularVisibilityMask.Mask.ActiveRegularCount,
+                    _regularVisibilityMask.Mask.InactiveRegularCount,
+                    _regularVisibilityMask.Mask.FrameCount));
             return;
         }
 
         SetRegularVisibilityMaskEnabled(value: false, refreshAssignment: true);
-        SetStatus(RegularVisibilityMaskSummary);
+        SetStatus(RegularVisibilityMaskUi.Summary);
     }
 
     private void RefreshRegularVisibilityMask(RegularGrid grid)
     {
         ArgumentNullException.ThrowIfNull(grid);
 
-        var result = _embeddedRegularVisibilityMask is not null
+        var result = _regularVisibilityMask.EmbeddedMask is not null
             ? RegularVisibilityMaskService.LoadEmbedded(
-                _embeddedRegularVisibilityMask,
+                _regularVisibilityMask.EmbeddedMask,
                 ResolveRegularVisibilityMaskSourceLabel(),
                 grid,
                 DiffFrameGridRowOrigin.TopRowIsRegularLastRow)
             : RegularVisibilityMaskService.Load(
-                _regularVisibilityMaskSourcePath,
+                _regularVisibilityMask.SourcePath,
                 grid,
                 DiffFrameGridRowOrigin.TopRowIsRegularLastRow);
 
@@ -84,11 +90,11 @@ public sealed partial class FreeformHelperViewModel
         byte[]? embeddedMask = null,
         string? embeddedMaskName = null)
     {
-        _regularVisibilityMaskSourcePath = string.IsNullOrWhiteSpace(sourcePath)
+        _regularVisibilityMask.SourcePath = string.IsNullOrWhiteSpace(sourcePath)
             ? null
             : sourcePath.Trim();
-        _embeddedRegularVisibilityMask = embeddedMask?.ToArray();
-        _embeddedRegularVisibilityMaskName = string.IsNullOrWhiteSpace(embeddedMaskName)
+        _regularVisibilityMask.EmbeddedMask = embeddedMask?.ToArray();
+        _regularVisibilityMask.EmbeddedName = string.IsNullOrWhiteSpace(embeddedMaskName)
             ? null
             : embeddedMaskName.Trim();
 
@@ -98,9 +104,9 @@ public sealed partial class FreeformHelperViewModel
         }
         else
         {
-            var result = string.IsNullOrWhiteSpace(_regularVisibilityMaskSourcePath)
+            var result = string.IsNullOrWhiteSpace(_regularVisibilityMask.SourcePath)
                 ? RegularVisibilityMaskResult.NotFound()
-                : RegularVisibilityMaskResult.NotFound(_regularVisibilityMaskSourcePath);
+                : RegularVisibilityMaskResult.NotFound(_regularVisibilityMask.SourcePath);
             ApplyRegularVisibilityMaskResult(result, _grid);
         }
 
@@ -110,13 +116,13 @@ public sealed partial class FreeformHelperViewModel
 
     private void ClearRegularVisibilityMask()
     {
-        var hadMask = !string.IsNullOrWhiteSpace(_regularVisibilityMaskSourcePath) ||
-                      _regularVisibilityMaskResult.HasLoadedMask ||
-                      IsRegularVisibilityMaskEnabled;
+        var hadMask = !string.IsNullOrWhiteSpace(_regularVisibilityMask.SourcePath) ||
+                      _regularVisibilityMask.Mask.HasLoadedMask ||
+                      RegularVisibilityMaskUi.IsEnabled;
 
-        _regularVisibilityMaskSourcePath = null;
-        _embeddedRegularVisibilityMask = null;
-        _embeddedRegularVisibilityMaskName = null;
+        _regularVisibilityMask.SourcePath = null;
+        _regularVisibilityMask.EmbeddedMask = null;
+        _regularVisibilityMask.EmbeddedName = null;
         _projectFile.EmbeddedRegularVisibilityMask = null;
         _projectFile.EmbeddedRegularVisibilityMaskName = null;
         ApplyRegularVisibilityMaskResult(RegularVisibilityMaskResult.NotFound(), _grid);
@@ -131,9 +137,9 @@ public sealed partial class FreeformHelperViewModel
 
     private void ResetRegularVisibilityMaskSelection(bool clearProjectEmbeddedMask)
     {
-        _regularVisibilityMaskSourcePath = null;
-        _embeddedRegularVisibilityMask = null;
-        _embeddedRegularVisibilityMaskName = null;
+        _regularVisibilityMask.SourcePath = null;
+        _regularVisibilityMask.EmbeddedMask = null;
+        _regularVisibilityMask.EmbeddedName = null;
         if (clearProjectEmbeddedMask)
         {
             _projectFile.EmbeddedRegularVisibilityMask = null;
@@ -146,9 +152,9 @@ public sealed partial class FreeformHelperViewModel
 
     private void ApplyRegularVisibilityMaskResult(RegularVisibilityMaskResult result, RegularGrid? grid)
     {
-        _regularVisibilityMaskResult = result;
+        _regularVisibilityMask.Mask = result;
         InvalidateWorkflowDataSnapshot();
-        RegularVisibilityMaskSummary = BuildRegularVisibilityMaskSummary(result, grid, IsRegularVisibilityMaskEnabled);
+        RegularVisibilityMaskUi.Summary = BuildRegularVisibilityMaskSummary(result, grid, RegularVisibilityMaskUi.IsEnabled);
         RefreshStep4DuplicateDiffGroups();
 
         if (result.HasLoadedMask)
@@ -160,7 +166,7 @@ public sealed partial class FreeformHelperViewModel
                 result.ActiveRegularCount,
                 result.InactiveRegularCount,
                 result.FrameCount,
-                IsRegularVisibilityMaskEnabled ? "Y" : "N");
+                RegularVisibilityMaskUi.IsEnabled ? "Y" : "N");
         }
         else if (result.Status == RegularVisibilityMaskStatus.Incompatible)
         {
@@ -182,8 +188,8 @@ public sealed partial class FreeformHelperViewModel
 
     private IReadOnlySet<int>? GetActiveRegularVisibilityMaskPadIds()
     {
-        return IsRegularVisibilityMaskEnabled && _regularVisibilityMaskResult.HasLoadedMask
-            ? _regularVisibilityMaskResult.ActiveRegularPadIds
+        return RegularVisibilityMaskUi.IsEnabled && _regularVisibilityMask.Mask.HasLoadedMask
+            ? _regularVisibilityMask.Mask.ActiveRegularPadIds
             : null;
     }
 
@@ -210,18 +216,18 @@ public sealed partial class FreeformHelperViewModel
 
     private void SetRegularVisibilityMaskEnabled(bool value, bool refreshAssignment)
     {
-        if (IsRegularVisibilityMaskEnabled == value)
+        if (RegularVisibilityMaskUi.IsEnabled == value)
         {
             return;
         }
 
         using (_settingsSuppression.EnterRegularVisibilityMaskStateChange())
         {
-            IsRegularVisibilityMaskEnabled = value;
+            RegularVisibilityMaskUi.IsEnabled = value;
         }
         InvalidateWorkflowDataSnapshot();
 
-        RegularVisibilityMaskSummary = BuildRegularVisibilityMaskSummary(_regularVisibilityMaskResult, _grid, IsRegularVisibilityMaskEnabled);
+        RegularVisibilityMaskUi.Summary = BuildRegularVisibilityMaskSummary(_regularVisibilityMask.Mask, _grid, RegularVisibilityMaskUi.IsEnabled);
         RefreshStep4DuplicateDiffGroups();
         if (refreshAssignment)
         {
@@ -229,9 +235,9 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
-    partial void OnIsRegularVisibilityMaskEnabledChanged(bool value)
+    private void OnRegularVisibilityMaskEnabledChanged(bool value)
     {
-        RegularVisibilityMaskSummary = BuildRegularVisibilityMaskSummary(_regularVisibilityMaskResult, _grid, value);
+        RegularVisibilityMaskUi.Summary = BuildRegularVisibilityMaskSummary(_regularVisibilityMask.Mask, _grid, value);
         RefreshStep4DuplicateDiffGroups();
         if (_settingsSuppression.IsRegularVisibilityMaskStateChangeActive)
         {
@@ -262,13 +268,13 @@ public sealed partial class FreeformHelperViewModel
 
     private string? ResolveRegularVisibilityMaskSourceLabel()
     {
-        if (!string.IsNullOrWhiteSpace(_embeddedRegularVisibilityMaskName))
+        if (!string.IsNullOrWhiteSpace(_regularVisibilityMask.EmbeddedName))
         {
-            return _embeddedRegularVisibilityMaskName;
+            return _regularVisibilityMask.EmbeddedName;
         }
 
-        return string.IsNullOrWhiteSpace(_regularVisibilityMaskSourcePath)
+        return string.IsNullOrWhiteSpace(_regularVisibilityMask.SourcePath)
             ? "SeeRegular.csv"
-            : Path.GetFileName(_regularVisibilityMaskSourcePath);
+            : Path.GetFileName(_regularVisibilityMask.SourcePath);
     }
 }

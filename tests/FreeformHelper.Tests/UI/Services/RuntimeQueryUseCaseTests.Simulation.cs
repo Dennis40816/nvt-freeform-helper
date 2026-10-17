@@ -195,12 +195,12 @@ public sealed partial class RuntimeQueryUseCaseTests
             yEdges: ValidationGridYEdges,
             pads: new[] { regularLeft, regularRight }));
 
-        var cadOutputFwDiffIndexByCadId = GetPrivateDictionary<int, int>(vm, "_cadOutputFwDiffIndexByCadId");
+        var cadOutputFwDiffIndexByCadId = vm.CadIndexMaps.OutputFwDiffIndexByCadId;
         cadOutputFwDiffIndexByCadId.Clear();
         cadOutputFwDiffIndexByCadId[cad.Id] = 10;
         cadOutputFwDiffIndexByCadId[blocker.Id] = 20;
 
-        var cadIcIndexByCadId = GetPrivateDictionary<int, int>(vm, "_cadIcIndexByCadId");
+        var cadIcIndexByCadId = vm.CadIndexMaps.IcIndexByCadId;
         cadIcIndexByCadId.Clear();
         cadIcIndexByCadId[cad.Id] = 0;
         cadIcIndexByCadId[blocker.Id] = 0;

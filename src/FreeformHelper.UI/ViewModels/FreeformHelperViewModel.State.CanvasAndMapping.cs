@@ -35,34 +35,179 @@ public sealed partial class FreeformHelperViewModel
 
     // --- Canvas Toggles (Directly bound to UI for visual state) ---
 
+    // The canvas display switches and the import flags are stored once. The properties below forward to
+    // the record and raise the same notifications and callbacks as the stored properties they replaced.
+    private CanvasDisplayToggles _canvasToggles = CanvasDisplayToggles.Initial;
+
     /// <summary>
     /// Gets or sets a value indicating whether CAD pads should be displayed on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _showCad = true;
+    public bool ShowCad
+    {
+        get => _canvasToggles.ShowCad;
+        set
+        {
+            if (_canvasToggles.ShowCad == value)
+            {
+                return;
+            }
+
+            OnShowCadChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ShowCad = value };
+            OnShowCadChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnShowCadChanging(bool value);
+
+    partial void OnShowCadChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether regular pads should be displayed on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _showRegular = true;
+    public bool ShowRegular
+    {
+        get => _canvasToggles.ShowRegular;
+        set
+        {
+            if (_canvasToggles.ShowRegular == value)
+            {
+                return;
+            }
+
+            OnShowRegularChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ShowRegular = value };
+            OnShowRegularChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnShowRegularChanging(bool value);
+
+    partial void OnShowRegularChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether unmatched pads should be highlighted on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _highlightUnmatched = true;
+    public bool HighlightUnmatched
+    {
+        get => _canvasToggles.HighlightUnmatched;
+        set
+        {
+            if (_canvasToggles.HighlightUnmatched == value)
+            {
+                return;
+            }
+
+            OnHighlightUnmatchedChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { HighlightUnmatched = value };
+            OnHighlightUnmatchedChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnHighlightUnmatchedChanging(bool value);
+
+    partial void OnHighlightUnmatchedChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether freeform pads should be highlighted on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _highlightFreeform = true;
+    public bool HighlightFreeform
+    {
+        get => _canvasToggles.HighlightFreeform;
+        set
+        {
+            if (_canvasToggles.HighlightFreeform == value)
+            {
+                return;
+            }
+
+            OnHighlightFreeformChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { HighlightFreeform = value };
+            OnHighlightFreeformChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnHighlightFreeformChanging(bool value);
+
+    partial void OnHighlightFreeformChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether CAD pads should be colored by area on the canvas.
     /// </summary>
-    [ObservableProperty] private bool _colorCadByArea = false;
+    public bool ColorCadByArea
+    {
+        get => _canvasToggles.ColorCadByArea;
+        set
+        {
+            if (_canvasToggles.ColorCadByArea == value)
+            {
+                return;
+            }
+
+            OnColorCadByAreaChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ColorCadByArea = value };
+            OnColorCadByAreaChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnColorCadByAreaChanging(bool value);
+
+    partial void OnColorCadByAreaChanged(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether only closed polylines should be imported from DXF.
     /// </summary>
-    [ObservableProperty] private bool _importOnlyClosedPolylines = true;
+    public bool ImportOnlyClosedPolylines
+    {
+        get => _canvasToggles.ImportOnlyClosedPolylines;
+        set
+        {
+            if (_canvasToggles.ImportOnlyClosedPolylines == value)
+            {
+                return;
+            }
+
+            OnImportOnlyClosedPolylinesChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ImportOnlyClosedPolylines = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnImportOnlyClosedPolylinesChanging(bool value);
+
     /// <summary>
     /// Gets or sets a value indicating whether polylines from the DXF BLOCKS section should be imported.
     /// </summary>
-    [ObservableProperty] private bool _importBlockPolylines = true;
+    public bool ImportBlockPolylines
+    {
+        get => _canvasToggles.ImportBlockPolylines;
+        set
+        {
+            if (_canvasToggles.ImportBlockPolylines == value)
+            {
+                return;
+            }
+
+            OnImportBlockPolylinesChanging(value);
+            OnPropertyChanging();
+            _canvasToggles = _canvasToggles with { ImportBlockPolylines = value };
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnImportBlockPolylinesChanging(bool value);
+
     /// <summary>
     /// Gets or sets the observable collection of <see cref="LayerToggle"/> objects
     /// used to control the visibility of CAD layers.
@@ -70,60 +215,39 @@ public sealed partial class FreeformHelperViewModel
     [ObservableProperty] private ObservableCollection<LayerToggle> _layerToggles = new();
 
     /// <summary>
-    /// Gets or sets a value indicating whether any CAD layers are available.
-    /// Used to hide the layer section when no DXF is loaded.
-    /// </summary>
-    [ObservableProperty] private bool _hasCadLayers;
-
-    /// <summary>
     /// Gets or sets the available layer options for bounding the grid.
     /// </summary>
     [ObservableProperty] private ObservableCollection<BoundLayerOption> _boundLayerOptions = new();
-
-    /// <summary>
-    /// Gets or sets the currently selected layer option for bounding the grid.
-    /// </summary>
-    [ObservableProperty] private BoundLayerOption _selectedBoundLayerOption = new BoundLayerOption(null, "Auto (visible layers)");
-
-    /// <summary>
-    /// Gets or sets the helper text shown under bounds layer selector,
-    /// including truncation hint when available layers exceed dropdown cap.
-    /// </summary>
-    [ObservableProperty] private string _boundLayerOptionSummary = "Hidden bounds layer is still valid.";
 
     /// <summary>
     /// Gets or sets the available layer options for DXF regular source mode.
     /// </summary>
     [ObservableProperty] private ObservableCollection<RegularSourceLayerOption> _regularSourceLayerOptions = new();
 
-    /// <summary>
-    /// Gets or sets the currently selected layer option for DXF regular source mode.
-    /// </summary>
-    [ObservableProperty] private RegularSourceLayerOption _selectedRegularSourceLayerOption = new RegularSourceLayerOption(null, "Select layer");
-
-    /// <summary>
-    /// Gets or sets helper text for DXF regular-source validation and suggested IC/grid settings.
-    /// </summary>
-    [ObservableProperty] private string _dxfRegularSourceHint = string.Empty;
-
     // --- DXF Quality Check Properties ---
 
     /// <summary>
-    /// Gets or sets a summary message for DXF overlap issues (e.g., "no overlaps detected").
+    /// Gets or sets the latest DXF overlap check result. The view model replaces the whole value.
+    /// The properties below forward to it and raise their change notification when their own
+    /// value changed.
     /// </summary>
-    [ObservableProperty] private string _dxfOverlapSummary = "DXF check: not run.";
+    [ObservableProperty] private DxfOverlapResult _dxfOverlapResult = DxfOverlapResult.CreateNotRun();
     /// <summary>
-    /// Gets or sets the observable collection of detailed DXF overlap issue messages.
+    /// Gets the summary message for DXF overlap issues (e.g., "no overlaps detected").
     /// </summary>
-    [ObservableProperty] private ObservableCollection<string> _dxfOverlapIssues = new();
+    public string DxfOverlapSummary => DxfOverlapResult.Summary;
     /// <summary>
-    /// Gets or sets the number of overlap issues currently loaded in details.
+    /// Gets the observable collection of detailed DXF overlap issue messages.
     /// </summary>
-    [ObservableProperty] private int _dxfOverlapIssueCount;
+    public ObservableCollection<string> DxfOverlapIssues => DxfOverlapResult.Issues;
     /// <summary>
-    /// Gets or sets a value indicating whether any DXF overlap issues were found.
+    /// Gets the number of overlap issues currently loaded in details.
     /// </summary>
-    [ObservableProperty] private bool _hasDxfOverlapIssues;
+    public int DxfOverlapIssueCount => DxfOverlapResult.Issues.Count;
+    /// <summary>
+    /// Gets a value indicating whether any DXF overlap issues were found.
+    /// </summary>
+    public bool HasDxfOverlapIssues => DxfOverlapResult.Issues.Count > 0;
     /// <summary>
     /// Gets or sets a value indicating whether DXF overlap checking is currently running.
     /// </summary>
@@ -141,13 +265,13 @@ public sealed partial class FreeformHelperViewModel
         set => SetOperationProgress(_dxfOverlapState, value, nameof(DxfOverlapProgress));
     }
     /// <summary>
-    /// Gets or sets CAD pad IDs highlighted by overlap checking.
+    /// Gets the CAD pad IDs highlighted by overlap checking.
     /// </summary>
-    [ObservableProperty] private ObservableCollection<int> _dxfOverlapHighlightedCadIds = new();
+    public ObservableCollection<int> DxfOverlapHighlightedCadIds => DxfOverlapResult.HighlightedCadIds;
     /// <summary>
-    /// Gets or sets a value indicating whether highlighted overlap CAD pads exist.
+    /// Gets a value indicating whether highlighted overlap CAD pads exist.
     /// </summary>
-    [ObservableProperty] private bool _hasDxfOverlapHighlights;
+    public bool HasDxfOverlapHighlights => DxfOverlapResult.HighlightedCadIds.Count > 0;
     /// <summary>
     /// Gets or sets the latest CAD?egular overlap links for canvas ratio labels.
     /// </summary>
@@ -166,13 +290,13 @@ public sealed partial class FreeformHelperViewModel
     [ObservableProperty] private bool _isModalLoadingSpinnerVisible;
 
     /// <summary>Gets the number of hidden CAD pads.</summary>
-    public int DeletedCadPadCount => _hiddenCadPadIds.Count;
+    public int DeletedCadPadCount => _cadEdit.HiddenCadPadIds.Count;
 
     /// <summary>Gets whether hidden CAD pads exist.</summary>
     public bool HasDeletedCadPads => DeletedCadPadCount > 0;
 
     /// <summary>Gets the number of detected duplicate CAD pads.</summary>
-    public int DuplicateCadPadCount => _duplicateCadPadIdToCanonicalId.Count;
+    public int DuplicateCadPadCount => _cadEdit.DuplicateCadPadIdToCanonicalId.Count;
 
     /// <summary>Gets whether detected duplicate CAD pads exist.</summary>
     public bool HasDuplicateCadPads => DuplicateCadPadCount > 0;
@@ -209,50 +333,151 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     [ObservableProperty] private ObservableCollection<string> _dxfEditLayerOptions = new();
 
+    // The DXF edit panel inputs are stored once. The properties below forward to the record and raise
+    // the same notifications and callbacks as the stored properties they replaced.
+    private DxfEditPanelInput _dxfEditPanel = DxfEditPanelInput.Initial;
+
     /// <summary>
     /// Gets or sets the target DXF layer name used to move selected pads.
     /// </summary>
-    [ObservableProperty] private string _dxfEditTargetLayerName = string.Empty;
+    public string DxfEditTargetLayerName
+    {
+        get => _dxfEditPanel.DxfEditTargetLayerName;
+        set
+        {
+            if (_dxfEditPanel.DxfEditTargetLayerName == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { DxfEditTargetLayerName = value };
+            OnDxfEditTargetLayerNameChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnDxfEditTargetLayerNameChanged(string value);
 
     /// <summary>
     /// Gets or sets the currently selected DXF rotation scope option.
     /// </summary>
-    [ObservableProperty] private DxfEditRotationScopeOption _selectedDxfEditRotationScopeOption;
+    public DxfEditRotationScopeOption SelectedDxfEditRotationScopeOption
+    {
+        get => _dxfEditPanel.SelectedDxfEditRotationScopeOption;
+        set
+        {
+            if (_dxfEditPanel.SelectedDxfEditRotationScopeOption == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { SelectedDxfEditRotationScopeOption = value };
+            OnSelectedDxfEditRotationScopeOptionChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnSelectedDxfEditRotationScopeOptionChanged(DxfEditRotationScopeOption value);
 
     /// <summary>
     /// Gets or sets the target DXF layer name used when rotating by layer scope.
     /// </summary>
-    [ObservableProperty] private string _dxfEditRotationLayerName = string.Empty;
+    public string DxfEditRotationLayerName
+    {
+        get => _dxfEditPanel.DxfEditRotationLayerName;
+        set
+        {
+            if (_dxfEditPanel.DxfEditRotationLayerName == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { DxfEditRotationLayerName = value };
+            OnDxfEditRotationLayerNameChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnDxfEditRotationLayerNameChanged(string value);
 
     /// <summary>
     /// Gets or sets the input text used to create a new DXF layer.
     /// </summary>
-    [ObservableProperty] private string _dxfEditNewLayerName = string.Empty;
+    public string DxfEditNewLayerName
+    {
+        get => _dxfEditPanel.DxfEditNewLayerName;
+        set
+        {
+            if (_dxfEditPanel.DxfEditNewLayerName == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { DxfEditNewLayerName = value };
+            OnDxfEditNewLayerNameChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnDxfEditNewLayerNameChanged(string value);
 
     /// <summary>
     /// Gets or sets the rotation angle for selected CAD pads in DXF edit workflow.
     /// </summary>
-    [ObservableProperty] private decimal _dxfEditRotationDegrees = 90m;
+    public decimal DxfEditRotationDegrees
+    {
+        get => _dxfEditPanel.DxfEditRotationDegrees;
+        set
+        {
+            if (_dxfEditPanel.DxfEditRotationDegrees == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { DxfEditRotationDegrees = value };
+            OnDxfEditRotationDegreesChanged(value);
+            OnPropertyChanged();
+        }
+    }
+
+    partial void OnDxfEditRotationDegreesChanged(decimal value);
 
     /// <summary>
     /// Gets or sets a value indicating whether the advanced DXF edit block is expanded.
     /// </summary>
-    [ObservableProperty] private bool _isDxfEditAdvancedPanelExpanded = true;
+    public bool IsDxfEditAdvancedPanelExpanded
+    {
+        get => _dxfEditPanel.IsDxfEditAdvancedPanelExpanded;
+        set
+        {
+            if (_dxfEditPanel.IsDxfEditAdvancedPanelExpanded == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _dxfEditPanel = _dxfEditPanel with { IsDxfEditAdvancedPanelExpanded = value };
+            OnPropertyChanged();
+        }
+    }
 
     // --- DXF/Regular Mapping Properties ---
 
     /// <summary>
-    /// Gets or sets a summary message for DXF/Regular mapping analysis.
+    /// Gets or sets the latest DXF/Regular mapping diagnostics result. The view model replaces the
+    /// whole value. The properties that forward to it raise their change notification when their
+    /// own value changed.
     /// </summary>
-    [ObservableProperty] private string _dxfRegularMappingSummary = "Diagnostics: not run.";
+    [ObservableProperty] private MappingDiagnosticsResult _mappingDiagnosticsResult = MappingDiagnosticsResult.CreateNotRun();
     /// <summary>
-    /// Gets or sets a summary message for the externally measured regular visibility mask.
+    /// Gets the summary message for DXF/Regular mapping analysis.
     /// </summary>
-    [ObservableProperty] private string _regularVisibilityMaskSummary = "Regular visibility mask: not loaded. Import Regular Visibility Mask (SeeRegular.csv) in Step 1 to constrain Step 4 and Simulation.";
-    /// <summary>
-    /// Gets or sets a value indicating whether the imported regular visibility mask should constrain Step 4 and Simulation.
-    /// </summary>
-    [ObservableProperty] private bool _isRegularVisibilityMaskEnabled;
+    public string DxfRegularMappingSummary => MappingDiagnosticsResult.Summary;
     /// <summary>
     /// Gets or sets a value indicating whether pad matching is currently running.
     /// </summary>
@@ -287,13 +512,13 @@ public sealed partial class FreeformHelperViewModel
     }
 
     /// <summary>
-    /// Gets or sets the observable collection of detailed DXF/Regular mapping issues.
+    /// Gets the observable collection of detailed DXF/Regular mapping issues.
     /// </summary>
-    [ObservableProperty] private ObservableCollection<string> _dxfRegularMappingIssues = new();
+    public ObservableCollection<string> DxfRegularMappingIssues => MappingDiagnosticsResult.Issues;
     /// <summary>
-    /// Gets or sets a value indicating whether any DXF/Regular mapping issues were found.
+    /// Gets a value indicating whether any DXF/Regular mapping issues were found.
     /// </summary>
-    [ObservableProperty] private bool _hasDxfRegularMappingIssues;
+    public bool HasDxfRegularMappingIssues => MappingDiagnosticsResult.HasIssues;
 
     /// <summary>
     /// Gets or sets whether the console panel is expanded.

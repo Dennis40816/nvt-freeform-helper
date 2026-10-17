@@ -52,8 +52,8 @@ public sealed partial class RuntimeQueryUseCaseTests
             yEdges: [0, 10],
             pads: regulars);
         SetPrivateField(helper, "_grid", grid);
-        GetPrivateDictionary<int, int>(helper, "_cadOutputFwDiffIndexByCadId")[cad.Id] = 83;
-        GetPrivateDictionary<int, int>(helper, "_cadIcIndexByCadId")[cad.Id] = 0;
+        helper.CadIndexMaps.OutputFwDiffIndexByCadId[cad.Id] = 83;
+        helper.CadIndexMaps.IcIndexByCadId[cad.Id] = 0;
         helper.InvalidateWorkflowDataSnapshot();
 
         Assert.Equal(1, Assert.Single(NotchAllocationService.BuildAllocations(cad, grid),

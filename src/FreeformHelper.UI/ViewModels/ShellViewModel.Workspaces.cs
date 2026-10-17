@@ -1,9 +1,9 @@
+using FreeformHelper.Application.Services;
+
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class ShellViewModel
 {
-    internal Task? WorkspaceBuildPauseForTests { get; set; }
-
     private async Task BuildSimulationWorkspaceAsync()
     {
         var viewModel = await BuildOrBindSimulationWorkspaceAsync(silent: false, overwriteExistingWorkspace: true);
@@ -20,7 +20,7 @@ public sealed partial class ShellViewModel
         await _simulationWorkspaceBuildGate.WaitAsync();
         try
         {
-            await (WorkspaceBuildPauseForTests ?? Task.CompletedTask);
+            await _timingProbe.WorkspaceBuildPauseAsync();
             var hasWorkspace = Simulation.CurrentWorkspace is not null;
             var overwriteExistingWorkspace = hasWorkspace &&
                                              Simulation.IsWorkspaceStale &&
@@ -64,7 +64,7 @@ public sealed partial class ShellViewModel
         await _simulationWorkspaceBuildGate.WaitAsync();
         try
         {
-            await (WorkspaceBuildPauseForTests ?? Task.CompletedTask);
+            await _timingProbe.WorkspaceBuildPauseAsync();
             return await BuildOrBindSimulationWorkspaceCoreAsync(silent, overwriteExistingWorkspace);
         }
         finally
@@ -106,7 +106,7 @@ public sealed partial class ShellViewModel
         await _coordinatePlannerWorkspaceBuildGate.WaitAsync();
         try
         {
-            await (WorkspaceBuildPauseForTests ?? Task.CompletedTask);
+            await _timingProbe.WorkspaceBuildPauseAsync();
             if (!overwriteExistingWorkspace && CoordinatePlanner.CurrentWorkspace is not null)
             {
                 return CoordinatePlanner.CurrentWorkspace;
@@ -161,11 +161,14 @@ public sealed partial class ShellViewModel
             return;
         }
 
-        _ = RunWorkspaceSourceChangeDrainAsync();
+        BackgroundWork.Run(WorkspaceSourceChangeDrainWorkName, RunWorkspaceSourceChangeDrainAsync);
     }
 
     private async Task RunWorkspaceSourceChangeDrainAsync()
     {
+        // Only a finished pass may start the next one. After out-of-memory the version stays behind, and a
+        // restart would run the same work again at once.
+        var mayRestart = false;
         try
         {
             while (true)
@@ -192,18 +195,22 @@ public sealed partial class ShellViewModel
                     ref _processedWorkspaceSourceChangeVersion,
                     Volatile.Read(ref _pendingWorkspaceSourceChangeVersion));
             }
+
+            mayRestart = true;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Volatile.Write(
                 ref _processedWorkspaceSourceChangeVersion,
                 Volatile.Read(ref _pendingWorkspaceSourceChangeVersion));
             Logger.Error(ex, "Derived workspace prewarm failed after workspace source change.");
+            mayRestart = true;
         }
         finally
         {
             Volatile.Write(ref _workspaceSourceChangeDrainRunning, 0);
-            if (Volatile.Read(ref _processedWorkspaceSourceChangeVersion) <
+            if (mayRestart &&
+                Volatile.Read(ref _processedWorkspaceSourceChangeVersion) <
                 Volatile.Read(ref _pendingWorkspaceSourceChangeVersion))
             {
                 TryRunWorkspaceSourceChangeDrain();

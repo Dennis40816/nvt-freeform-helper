@@ -1,4 +1,5 @@
 using System.Globalization;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
@@ -160,7 +161,7 @@ public sealed partial class FreeformHelperViewModel
             return false;
         }
 
-        if (_latestPadMatchResult.CadToRegular.Count == 0)
+        if (_workflowData.LatestPadMatch.CadToRegular.Count == 0)
         {
             return false;
         }
@@ -228,7 +229,7 @@ public sealed partial class FreeformHelperViewModel
                 setStatusFromSummary: true,
                 reapplyManualOverrides: false);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Auto detect failed", ex);
         }
@@ -244,7 +245,7 @@ public sealed partial class FreeformHelperViewModel
             cad,
             grid,
             matchingSettings,
-            _latestPadMatchResult));
+            _workflowData.LatestPadMatch));
     }
 
     private void CommitStep2FreeformResult(

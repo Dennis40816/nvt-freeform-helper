@@ -29,7 +29,7 @@ public sealed class ShellViewModelCoordinateTests
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         try
         {
-            using var shell = new ShellViewModel { WorkspaceBuildPauseForTests = release.Task };
+            using var shell = new ShellViewModel(null, new RecordingShellTimingProbe { WorkspaceBuildPause = release.Task });
             var buildTask = buildKind switch
             {
                 "coordinate" => shell.CoordinatePlanner.PrewarmWorkspaceAsync(),

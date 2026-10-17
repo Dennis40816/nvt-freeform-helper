@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia.Threading;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
 using Nvt.Core.Avalonia.Threading;
@@ -10,12 +11,10 @@ public sealed partial class FreeformHelperViewModel
 {
     private static readonly TimeSpan AppGeneralSettingsPersistDebounce = TimeSpan.FromMilliseconds(450);
     private readonly AppGeneralSettingsStore _appGeneralSettingsStore;
-    private DispatcherTimer? _appGeneralSettingsPersistTimer;
-    private bool _suppressAppGeneralPersistence;
-    private bool _deferAppGeneralPersistenceAfterProjectLoad;
-    private bool _hasDeferredAppGeneralPersistenceChanges;
-    private UiViewSnapshot _appGeneralViewSnapshot = new();
-    private UiImportSnapshot _appGeneralImportSnapshot = new();
+    private readonly AppGeneralPersistenceState _appGeneralPersistence = new(); // Holds the timer, the flags and the snapshots of the app general settings persistence.
+
+    /// <summary>Gets the app general settings persistence holder for tests.</summary>
+    internal AppGeneralPersistenceState AppGeneralPersistenceForTests => _appGeneralPersistence;
 
     private void InitializeAppGeneralSettingsPersistence()
     {
@@ -24,9 +23,9 @@ public sealed partial class FreeformHelperViewModel
 
     private DispatcherTimer? EnsureAppGeneralSettingsPersistTimer()
     {
-        if (_appGeneralSettingsPersistTimer is not null)
+        if (_appGeneralPersistence.PersistTimer is not null)
         {
-            return _appGeneralSettingsPersistTimer;
+            return _appGeneralPersistence.PersistTimer;
         }
 
         if (!UiThread.IsCurrent(out _, out _))
@@ -39,26 +38,26 @@ public sealed partial class FreeformHelperViewModel
             Interval = AppGeneralSettingsPersistDebounce,
         };
         timer.Tick += OnAppGeneralSettingsPersistTimerTick;
-        _appGeneralSettingsPersistTimer = timer;
+        _appGeneralPersistence.PersistTimer = timer;
         return timer;
     }
 
     private void OnAppGeneralSettingsPersistTimerTick(object? sender, EventArgs e)
     {
-        _appGeneralSettingsPersistTimer?.Stop();
+        _appGeneralPersistence.PersistTimer?.Stop();
         PersistAppGeneralSettingsNow();
     }
 
     private void SchedulePersistAppGeneralSettings()
     {
-        if (_suppressAppGeneralPersistence || _isLoadingSettings)
+        if (_appGeneralPersistence.SuppressPersistence || _isLoadingSettings)
         {
             return;
         }
 
         if (ShouldDeferAppGeneralSettingsPersistence())
         {
-            _hasDeferredAppGeneralPersistenceChanges = true;
+            _appGeneralPersistence.HasDeferredChanges = true;
             return;
         }
 
@@ -67,16 +66,16 @@ public sealed partial class FreeformHelperViewModel
         timer?.Start();
     }
 
-    private void PersistAppGeneralSettingsNow(bool forceWhenDeferred = false)
+    internal void PersistAppGeneralSettingsNow(bool forceWhenDeferred = false)
     {
-        if (_suppressAppGeneralPersistence || _isLoadingSettings)
+        if (_appGeneralPersistence.SuppressPersistence || _isLoadingSettings)
         {
             return;
         }
 
         if (!forceWhenDeferred && ShouldDeferAppGeneralSettingsPersistence())
         {
-            _hasDeferredAppGeneralPersistenceChanges = true;
+            _appGeneralPersistence.HasDeferredChanges = true;
             return;
         }
 
@@ -93,12 +92,12 @@ public sealed partial class FreeformHelperViewModel
                 }
             };
             _appGeneralSettingsStore.Save(document);
-            _appGeneralViewSnapshot = CloneViewSnapshot(document.View);
-            _appGeneralImportSnapshot = CloneImportSnapshot(document.Import);
-            _hasDeferredAppGeneralPersistenceChanges = false;
+            _appGeneralPersistence.ViewSnapshot = CloneViewSnapshot(document.View);
+            _appGeneralPersistence.ImportSnapshot = CloneImportSnapshot(document.Import);
+            _appGeneralPersistence.HasDeferredChanges = false;
             Logger.Debug(CultureInfo.InvariantCulture, "App general settings persisted: {0}", _appGeneralSettingsStore.SettingsPath);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Logger.Warn(ex, "Persist app general settings failed.");
         }
@@ -106,18 +105,18 @@ public sealed partial class FreeformHelperViewModel
 
     private bool ShouldDeferAppGeneralSettingsPersistence()
     {
-        return _deferAppGeneralPersistenceAfterProjectLoad;
+        return _appGeneralPersistence.DeferAfterProjectLoad;
     }
 
     private void MarkProjectLoadedForAppGeneralPersistence()
     {
-        _deferAppGeneralPersistenceAfterProjectLoad = true;
-        _appGeneralSettingsPersistTimer?.Stop();
+        _appGeneralPersistence.DeferAfterProjectLoad = true;
+        _appGeneralPersistence.PersistTimer?.Stop();
     }
 
     private void FlushDeferredAppGeneralSettingsIfNeeded()
     {
-        if (!_deferAppGeneralPersistenceAfterProjectLoad || !_hasDeferredAppGeneralPersistenceChanges)
+        if (!_appGeneralPersistence.DeferAfterProjectLoad || !_appGeneralPersistence.HasDeferredChanges)
         {
             return;
         }
@@ -133,16 +132,16 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _appGeneralViewSnapshot = CloneViewSnapshot(document.View);
-        _appGeneralImportSnapshot = CloneImportSnapshot(document.Import);
+        _appGeneralPersistence.ViewSnapshot = CloneViewSnapshot(document.View);
+        _appGeneralPersistence.ImportSnapshot = CloneImportSnapshot(document.Import);
         using (_settingsSuppression.EnterSettingsLoading())
         {
             ApplyAppVisualPreferencesOnProjectLoad = document.Behavior.ApplyVisualPreferencesOnProjectLoad;
         }
         _projectFile.UiSnapshot = new ProjectUiSnapshot
         {
-            View = CloneViewSnapshot(_appGeneralViewSnapshot),
-            Import = CloneImportSnapshot(_appGeneralImportSnapshot)
+            View = CloneViewSnapshot(_appGeneralPersistence.ViewSnapshot),
+            Import = CloneImportSnapshot(_appGeneralPersistence.ImportSnapshot)
         };
         Logger.Info(CultureInfo.InvariantCulture, "App general settings loaded: {0}", _appGeneralSettingsStore.SettingsPath);
     }
@@ -154,7 +153,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        ApplyViewSnapshot(CloneViewSnapshot(_appGeneralViewSnapshot));
+        ApplyViewSnapshot(CloneViewSnapshot(_appGeneralPersistence.ViewSnapshot));
         Logger.Info(CultureInfo.InvariantCulture, "Load project: app visual preferences layer applied.");
     }
 
@@ -219,6 +218,31 @@ public sealed partial class FreeformHelperViewModel
             IncludeBlockPolylines = source.IncludeBlockPolylines,
             LogLevel = source.LogLevel
         };
+    }
+
+    /// <summary>
+    /// Holds the debounce timer, the suppression and deferral flags and the last loaded or saved snapshots of the
+    /// app general settings persistence, for the main view model.
+    /// </summary>
+    internal sealed class AppGeneralPersistenceState
+    {
+        /// <summary>Gets or sets the debounce timer that writes the app general settings. It is created on first use on the UI thread.</summary>
+        internal DispatcherTimer? PersistTimer { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether writes wait for the next successful project save after a project load.</summary>
+        internal bool DeferAfterProjectLoad { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether changes are not persisted, for example while settings are applied in bulk.</summary>
+        internal bool SuppressPersistence { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether a change waited for the next successful project save.</summary>
+        internal bool HasDeferredChanges { get; set; }
+
+        /// <summary>Gets or sets the view snapshot of the last loaded or saved app general settings.</summary>
+        internal UiViewSnapshot ViewSnapshot { get; set; } = new();
+
+        /// <summary>Gets or sets the import snapshot of the last loaded or saved app general settings.</summary>
+        internal UiImportSnapshot ImportSnapshot { get; set; } = new();
     }
 }
 

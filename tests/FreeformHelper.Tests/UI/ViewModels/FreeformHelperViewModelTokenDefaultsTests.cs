@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -14,13 +13,9 @@ public sealed class FreeformHelperViewModelTokenDefaultsTests
     [Fact]
     public async Task Constructor_OffUiThread_DoesNotCreateDispatcherTimer()
     {
-        var timerField = typeof(FreeformHelperViewModel).GetField(
-            "_appGeneralSettingsPersistTimer", BindingFlags.NonPublic | BindingFlags.Instance);
-        Assert.NotNull(timerField);
-
         var viewModel = await Task.Run(static () => new FreeformHelperViewModel());
 
-        Assert.Null(timerField.GetValue(viewModel));
+        Assert.Null(viewModel.AppGeneralPersistenceForTests.PersistTimer);
     }
 
     [AvaloniaFact]
@@ -30,10 +25,8 @@ public sealed class FreeformHelperViewModelTokenDefaultsTests
         var app = global::Avalonia.Application.Current ?? throw new InvalidOperationException("Application.Current was not initialized.");
         var theme = app.ActualThemeVariant ?? ThemeVariant.Default;
         var vm = new FreeformHelperViewModel();
-        var timerField = typeof(FreeformHelperViewModel).GetField(
-            "_appGeneralSettingsPersistTimer", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        Assert.NotNull(timerField?.GetValue(vm));
+        Assert.NotNull(vm.AppGeneralPersistenceForTests.PersistTimer);
         Assert.Equal(GetRequiredColor(app, theme, "ColorCanvasCadLine"), vm.CadLineColor);
         Assert.Equal(GetRequiredColor(app, theme, "ColorCanvasRegularLine"), vm.RegularLineColor);
         Assert.Equal(GetRequiredColor(app, theme, "ColorCanvasRegularSelected"), vm.RegularSelectedColor);

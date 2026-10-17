@@ -69,15 +69,11 @@ public static class RegularVisibilityMaskService
             return RegularVisibilityMaskResult.NotFound(sourcePath);
         }
 
-        try
-        {
-            var file = DiffFrameCsvImporter.Import(sourcePath);
-            return ProjectCsvFile(file, sourcePath, grid, rowOrigin);
-        }
-        catch (Exception ex)
-        {
-            return RegularVisibilityMaskResult.Failed(sourcePath, ex.Message);
-        }
+        return ReadAndProject(
+            () => DiffFrameCsvImporter.Import(sourcePath),
+            sourcePath,
+            grid,
+            rowOrigin);
     }
 
     public static RegularVisibilityMaskResult LoadEmbedded(
@@ -97,15 +93,29 @@ public static class RegularVisibilityMaskService
             ? "embedded SeeRegular.csv"
             : sourceName.Trim();
 
+        return ReadAndProject(
+            () => DiffFrameCsvImporter.ImportContent(resolvedSourceName, DecodeText(content)),
+            resolvedSourceName,
+            grid,
+            rowOrigin);
+    }
+
+    // The one best-effort boundary of both entry points: a read or projection failure becomes a Failed result.
+    // An out-of-memory exception is not a failure of the file, so it is not turned into a result.
+    internal static RegularVisibilityMaskResult ReadAndProject(
+        Func<DiffFrameCsvSourceFile> readFile,
+        string sourceName,
+        RegularGrid grid,
+        DiffFrameGridRowOrigin rowOrigin)
+    {
         try
         {
-            var text = DecodeText(content);
-            var file = DiffFrameCsvImporter.ImportContent(resolvedSourceName, text);
-            return ProjectCsvFile(file, resolvedSourceName, grid, rowOrigin);
+            var file = readFile();
+            return ProjectCsvFile(file, sourceName, grid, rowOrigin);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
-            return RegularVisibilityMaskResult.Failed(resolvedSourceName, ex.Message);
+            return RegularVisibilityMaskResult.Failed(sourceName, ex.Message);
         }
     }
 

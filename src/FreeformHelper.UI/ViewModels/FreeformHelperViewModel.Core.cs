@@ -14,6 +14,7 @@ using FreeformHelper.UI.Services;
 using NLog;
 using Nvt.Core.Lifecycle;
 using Nvt.Core.Threading;
+using NotchResolvedCacheEntry = (int Revision, ulong CadPoolFingerprint, int ActiveRegularHash, ulong GridFingerprint, bool EnableToRegular, bool EnableToFull, bool EnableToFullRuleEngine, bool EnableToFullRuleTrace, double StrictOverlapRatio, int? AnchorIcIndex, int? AnchorDiffIndex, FreeformHelper.Application.Services.NotchV22TargetAllocationAreaMode TargetAllocationAreaMode, FreeformHelper.Application.Services.NotchV22ResolvedResult Resolved);
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -26,6 +27,10 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel : ObservableObject
 {
     internal UiEventRunner UiEvents { get; }
+
+    // Starts the fire-and-forget background loops and refreshes. Tests replace its runner to observe them.
+    internal BackgroundWorkRunnerSlot BackgroundWork { get; } = new();
+
     // Logger instance for recording events and debugging information.
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -75,19 +80,13 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     // --- Internal State Management ---
     private readonly Dictionary<int, double> _cadPadCustomValues = new(); // Stores custom user-defined values for CAD pads.
-    private readonly HashSet<int> _hiddenCadPadIds = new();
-    private readonly HashSet<int> _autoHiddenDuplicateCadPadIds = new();
-    private readonly Dictionary<int, int> _duplicateCadPadIdToCanonicalId = new();
-    private readonly Stack<List<int>> _hiddenCadUndoStack = new();
+    private readonly CadEditState _cadEdit = new(); // Holds the hidden, duplicate and baseline data of the CAD edits.
     private readonly CombinedCadState _combinedCad = new();
-    private CadPadSet? _dxfEditBaselineCad;
     private readonly Dictionary<string, WorkspaceHeaderItem> _workspaceHeaderItemMap = new(); // Maps keys to header items.
     private string? _lastSavedPath; // Stores the path where the project was last saved.
     // Independent nesting-safe suppression counters; UI-thread-only access.
     private readonly SettingsSuppressionScopes _settingsSuppression = new();
-    private Dictionary<string, bool>? _pendingLayerSelectionUndoSnapshot;
-    private string? _pendingBoundLayerName;
-    private string? _pendingRegularSourceLayerName;
+    private readonly PendingLayerSelectionState _pendingLayerSelection = new(); // Holds the layer selection data that waits for the next CAD load or layer toggle.
     private ProjectFile _projectFile = new(); // The core project data model.
 
     /// <summary>
@@ -98,16 +97,32 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     private CadPadSet? _cad; // The loaded CAD pad data.
     private RegularGrid? _grid; // The generated regular grid data.
-    private PadMatchResult _latestPadMatchResult = PadMatchResult.Empty;
+    private readonly WorkflowDataState _workflowData = new(); // Holds the latest pad match result and the cached workflow data snapshot built from it.
     private CadPadSet? _cachedFilteredCadForBuild; // Cache for layer-filtered CAD pads.
-    private readonly Dictionary<int, int> _cadOutputFwDiffIndexByCadId = new(); // Maps CAD pad ID -> Step 4 CAD output FW diff idx.
-    private readonly Dictionary<int, int> _cadDisplayIndexByCadId = new(); // Maps CAD pad ID -> stable display index (L->R, T->B, 1-based).
-    private readonly Dictionary<int, int> _cadIcIndexByCadId = new(); // Maps CAD pad ID -> inferred IC index (grid partition based).
-    private IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> _latestCadOutputFwDiffAssignmentDecisionsByCadId =
-        new Dictionary<int, CadOutputFwDiffAssignmentDecision>();
-    private (int Revision, WorkflowDataSnapshot Snapshot)? _workflowDataSnapshotCache;
+    // The four per-CAD-pad index tables are stored once. The members below keep the old names and
+    // read through it: members that carry analyzer debt read them, and renaming them would change
+    // their ledger fingerprints.
+    private readonly CadIndexMaps _cadIndexMaps = new();
+
+    internal CadIndexMaps CadIndexMaps => _cadIndexMaps;
+
+    // Maps CAD pad ID -> Step 4 CAD output FW diff idx.
+    private Dictionary<int, int> _cadOutputFwDiffIndexByCadId => _cadIndexMaps.OutputFwDiffIndexByCadId;
+
+    // Maps CAD pad ID -> stable display index (L->R, T->B, 1-based).
+    private Dictionary<int, int> _cadDisplayIndexByCadId => _cadIndexMaps.DisplayIndexByCadId;
+
+    // Maps CAD pad ID -> inferred IC index (grid partition based).
+    private Dictionary<int, int> _cadIcIndexByCadId => _cadIndexMaps.IcIndexByCadId;
+
+    private IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> _latestCadOutputFwDiffAssignmentDecisionsByCadId
+    {
+        get => _cadIndexMaps.LatestAssignmentDecisionsByCadId;
+        set => _cadIndexMaps.LatestAssignmentDecisionsByCadId = value;
+    }
+
     private int _workflowDataSnapshotRevision = 1;
-    private bool _fitAfterNextGridBuild; // Flag to request a canvas fit-to-content after the next grid rebuild.
+    private readonly GridStartupState _gridStartup = new(); // Holds the one-time startup flags and the fit request of the grid build.
     private readonly GridRebuildUseCase _gridRebuildUseCase;
     private readonly SelectionSummaryUseCase _selectionSummaryUseCase = new();
     private readonly ManualSizingUseCase _manualSizingUseCase;
@@ -131,20 +146,10 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly UndoService _undoService = new();
     private readonly UiOperationStatusReporter _statusReporter;
     private readonly NotchApplySimulationReviewUseCase _notchApplySimulationReviewUseCase = new();
-    private readonly Dictionary<int, (
-        int Revision, ulong CadPoolFingerprint, int ActiveRegularHash, ulong GridFingerprint,
-        bool EnableToRegular, bool EnableToFull, bool EnableToFullRuleEngine, bool EnableToFullRuleTrace,
-        double StrictOverlapRatio, int? AnchorIcIndex, int? AnchorDiffIndex,
-        NotchV22TargetAllocationAreaMode TargetAllocationAreaMode, NotchV22ResolvedResult Resolved)>
-        _notchResolvedResultCacheByCadId = new();
-    private (NotchValidationBucket Bucket, NotchTable Table, int NullDiffValue)? _notchValidationBucketCache;
-    private NotchTable? _lastGeneratedNotchTable;
+    private readonly NotchResultCacheState _notchCache = new(); // Holds the notch compensation and validation caches and the last generated notch table.
     private int _notchCompensationCacheRevision;
     private readonly NotchCompensationCacheCounters _notchCompensationCacheCounters = new();
     private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
-    private bool _lastNotchPreviewVisibleForPlayback;
-    private bool _startupInitialGridBuiltMarked;
-    private bool _initialGridBuildRequested;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperViewModel"/> class.
@@ -228,7 +233,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
                 "Disabled",
                 "Turn off To Full and To Regular for baseline comparison."),
         };
-        _selectedCadOutputFwDiffAutoModeOption = CadOutputFwDiffAutoModeOptions[0];
         _selectedNotchExportFileTypeOption = NotchExportFileTypeOptions[0];
         _selectedNotchExportProfileOption = NotchExportProfileOptions[0];
         _selectedNotchCompensationModelOption = NotchCompensationModelOptions[0];
@@ -254,18 +258,18 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             RegularSourceLayerOptions.Add(new RegularSourceLayerOption(null, "Select layer"));
             SelectedRegularSourceLayerOption = RegularSourceLayerOptions[0];
         }
-        _selectedDxfEditRotationScopeOption = DxfEditRotationScopeOptions[0];
+        _dxfEditPanel = _dxfEditPanel with { SelectedDxfEditRotationScopeOption = DxfEditRotationScopeOptions[0] };
         StartupPerfTracker.Mark("workspace.vm-options-initialized");
         // Layered settings precedence: Project > App General > Built-in defaults.
         // At startup without a project file loaded, app general overrides default values.
         TryApplyAppGeneralSettingsLayer();
-        _suppressAppGeneralPersistence = true;
+        _appGeneralPersistence.SuppressPersistence = true;
         ApplyCanvasColorDefaultsFromTokens();
         // Load initial settings to UI properties from layered settings snapshot.
         LoadSettingsToUi(_projectFile.Settings);
         ApplyViewSnapshot(_projectFile.UiSnapshot.View);
         ApplyImportSnapshot(_projectFile.UiSnapshot.Import);
-        _suppressAppGeneralPersistence = false;
+        _appGeneralPersistence.SuppressPersistence = false;
         StartupPerfTracker.Mark("workspace.vm-settings-loaded");
         InitializeWorkspaceHeaderItems(); // Set up items for the workspace header menu.
         StartupPerfTracker.Mark("workspace.vm-header-initialized");
@@ -291,7 +295,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     private void RequestFitAfterNextRebuild()
     {
-        _fitAfterNextGridBuild = true;
+        _gridStartup.FitAfterNextBuild = true;
     }
 
     /// <summary>
@@ -301,12 +305,12 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     public void EnsureInitialGrid()
     {
         // If CAD data is already loaded or a grid already exists, no initial grid is needed.
-        if (_cad is not null || RegularPads.Count > 0 || _initialGridBuildRequested)
+        if (_cad is not null || RegularPads.Count > 0 || _gridStartup.InitialBuildRequested)
         {
             return;
         }
 
-        _initialGridBuildRequested = true;
+        _gridStartup.InitialBuildRequested = true;
         _ = RequestInitialGridBuildAsync();
     }
 
@@ -330,7 +334,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         }
         finally
         {
-            _initialGridBuildRequested = false;
+            _gridStartup.InitialBuildRequested = false;
         }
     }
 
@@ -354,7 +358,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         {
             // If no data, but potentially will have data after a grid rebuild,
             // schedule a fit after the next rebuild.
-            _fitAfterNextGridBuild = true;
+            _gridStartup.FitAfterNextBuild = true;
         }
     }
 
@@ -365,11 +369,17 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     internal int WorkflowDataSnapshotRevision => _workflowDataSnapshotRevision;
 
+    /// <summary>Gets the pad match and workflow snapshot holder for tests.</summary>
+    internal WorkflowDataState WorkflowDataForTests => _workflowData;
+
+    /// <summary>Gets the notch result cache holder for tests.</summary>
+    internal NotchResultCacheState NotchCacheForTests => _notchCache;
+
     internal int WorkflowDataSnapshotBuildCount { get; private set; }
 
     private WorkflowDataSnapshot BuildWorkflowDataSnapshot()
     {
-        if (_workflowDataSnapshotCache is { } cached &&
+        if (_workflowData.SnapshotCache is { } cached &&
             cached.Revision == _workflowDataSnapshotRevision)
         {
             return cached.Snapshot;
@@ -377,7 +387,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
         var activeMask = GetActiveRegularVisibilityMaskPadIds()?.ToFrozenSet();
 
-        var cadToRegular = _latestPadMatchResult.CadToRegular
+        var cadToRegular = _workflowData.LatestPadMatch.CadToRegular
             .ToDictionary(
                 static pair => pair.Key,
                 static pair => (IReadOnlyList<PadMatchLink>)pair.Value.ToArray())
@@ -391,7 +401,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             cadToRegular,
             _projectFile.CadOutputFwDiffIndexOverrides.ToFrozenDictionary(),
             activeMask);
-        _workflowDataSnapshotCache = (_workflowDataSnapshotRevision, snapshot);
+        _workflowData.SnapshotCache = (_workflowDataSnapshotRevision, snapshot);
         WorkflowDataSnapshotBuildCount++;
         return snapshot;
     }
@@ -403,7 +413,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     private void SetLatestPadMatchResult(PadMatchResult result)
     {
-        _latestPadMatchResult = result;
+        _workflowData.LatestPadMatch = result;
         InvalidateWorkflowDataSnapshot();
     }
 
@@ -421,6 +431,36 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     public bool TryGetCadDisplayIndex(int cadPadId, out int displayIndex)
     {
         return _cadDisplayIndexByCadId.TryGetValue(cadPadId, out displayIndex);
+    }
+
+    /// <summary>
+    /// Holds the latest pad match result and the cached workflow data snapshot with the revision it was built for, for the main view model.
+    /// </summary>
+    internal sealed class WorkflowDataState
+    {
+        /// <summary>Gets or sets the pad match result of the last match run.</summary>
+        internal PadMatchResult LatestPadMatch { get; set; } = PadMatchResult.Empty;
+
+        /// <summary>Gets or sets the last built workflow data snapshot with the revision it was built for.</summary>
+        internal (int Revision, WorkflowDataSnapshot Snapshot)? SnapshotCache { get; set; }
+    }
+
+    /// <summary>
+    /// Holds the notch compensation result cache, the notch validation bucket cache, the last generated notch table and the last preview visibility seen by playback, for the main view model.
+    /// </summary>
+    internal sealed class NotchResultCacheState
+    {
+        /// <summary>Gets the resolved notch result cache keyed by CAD pad id.</summary>
+        internal Dictionary<int, NotchResolvedCacheEntry> ResolvedResultByCadId { get; } = new();
+
+        /// <summary>Gets or sets the cached validation bucket with the table and null diff value it was built for.</summary>
+        internal (NotchValidationBucket Bucket, NotchTable Table, int NullDiffValue)? ValidationBucket { get; set; }
+
+        /// <summary>Gets or sets the table of the last notch generation.</summary>
+        internal NotchTable? LastGeneratedTable { get; set; }
+
+        /// <summary>Gets or sets the preview visibility that the last playback sync saw.</summary>
+        internal bool LastPreviewVisibleForPlayback { get; set; }
     }
 }
 

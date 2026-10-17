@@ -9,6 +9,9 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
+    internal const string DeferredCadInspectorRefreshWorkName = "deferred-cad-inspector-refresh";
+    internal const string DeferredRegularInspectorRefreshWorkName = "deferred-regular-inspector-refresh";
+
     private const int PadInspectorDeferredRefreshDelayMs = 200;
     private const int RegularPadInspectorDeferredRefreshDelayMs = 150;
 
@@ -31,7 +34,9 @@ public sealed partial class FreeformHelperViewModel
         _padInspectorDeferredRefreshCts = cts;
         var requestId = Interlocked.Increment(ref _padInspectorDeferredRefreshRequestId);
         UpdatePadInspectorDeferredRefreshPendingState();
-        _ = RunDeferredCadInspectorSnapshotRefreshAsync(requestId, cadPadId, selectionRevision, cts, cts.Token);
+        BackgroundWork.Run(
+            DeferredCadInspectorRefreshWorkName,
+            () => RunDeferredCadInspectorSnapshotRefreshAsync(requestId, cadPadId, selectionRevision, cts, cts.Token));
     }
 
     public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId)
@@ -48,7 +53,9 @@ public sealed partial class FreeformHelperViewModel
         _regularPadInspectorDeferredRefreshCts = cts;
         var requestId = Interlocked.Increment(ref _regularPadInspectorDeferredRefreshRequestId);
         UpdatePadInspectorDeferredRefreshPendingState();
-        _ = RunDeferredRegularInspectorSnapshotRefreshAsync(requestId, regularPadId, selectionRevision, cts, cts.Token);
+        BackgroundWork.Run(
+            DeferredRegularInspectorRefreshWorkName,
+            () => RunDeferredRegularInspectorSnapshotRefreshAsync(requestId, regularPadId, selectionRevision, cts, cts.Token));
     }
 
     private void CancelDeferredCadInspectorSnapshotRefresh(bool clearPendingState)
@@ -251,7 +258,7 @@ public sealed partial class FreeformHelperViewModel
         {
             // Deferred refresh canceled.
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Logger.Warn(
                 ex,
@@ -317,7 +324,7 @@ public sealed partial class FreeformHelperViewModel
         {
             // Deferred refresh canceled.
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             Logger.Warn(
                 ex,

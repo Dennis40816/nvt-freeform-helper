@@ -20,10 +20,10 @@ public sealed partial class FreeformHelperViewModel
     {
         return new CadEditUndoSnapshot(
             _cad,
-            _hiddenCadPadIds.ToList(),
-            _autoHiddenDuplicateCadPadIds.ToList(),
-            _hiddenCadUndoStack.Select(batch => batch.ToList()).ToList(),
-            _duplicateCadPadIdToCanonicalId.ToDictionary(static pair => pair.Key, static pair => pair.Value),
+            _cadEdit.HiddenCadPadIds.ToList(),
+            _cadEdit.AutoHiddenDuplicateCadPadIds.ToList(),
+            _cadEdit.HiddenUndoStack.Select(batch => batch.ToList()).ToList(),
+            _cadEdit.DuplicateCadPadIdToCanonicalId.ToDictionary(static pair => pair.Key, static pair => pair.Value),
             _combinedCad.Clone());
     }
 
@@ -31,28 +31,28 @@ public sealed partial class FreeformHelperViewModel
     {
         var previous = new CadEditNotificationSnapshot(this);
         _cad = snapshot.Cad;
-        _hiddenCadPadIds.Clear();
+        _cadEdit.HiddenCadPadIds.Clear();
         foreach (var id in snapshot.HiddenCadIds)
         {
-            _hiddenCadPadIds.Add(id);
+            _cadEdit.HiddenCadPadIds.Add(id);
         }
 
-        _autoHiddenDuplicateCadPadIds.Clear();
+        _cadEdit.AutoHiddenDuplicateCadPadIds.Clear();
         foreach (var id in snapshot.AutoHiddenDuplicateCadIds)
         {
-            _autoHiddenDuplicateCadPadIds.Add(id);
+            _cadEdit.AutoHiddenDuplicateCadPadIds.Add(id);
         }
 
-        _hiddenCadUndoStack.Clear();
+        _cadEdit.HiddenUndoStack.Clear();
         for (var index = snapshot.HiddenUndoBatchesTopToBottom.Count - 1; index >= 0; index--)
         {
-            _hiddenCadUndoStack.Push(snapshot.HiddenUndoBatchesTopToBottom[index].ToList());
+            _cadEdit.HiddenUndoStack.Push(snapshot.HiddenUndoBatchesTopToBottom[index].ToList());
         }
 
-        _duplicateCadPadIdToCanonicalId.Clear();
+        _cadEdit.DuplicateCadPadIdToCanonicalId.Clear();
         foreach (var pair in snapshot.DuplicateCadPadIdToCanonicalId)
         {
-            _duplicateCadPadIdToCanonicalId[pair.Key] = pair.Value;
+            _cadEdit.DuplicateCadPadIdToCanonicalId[pair.Key] = pair.Value;
         }
 
         _combinedCad.CopyFrom(snapshot.Combined);
@@ -103,7 +103,7 @@ public sealed partial class FreeformHelperViewModel
             return null;
         }
 
-        if (_hiddenCadPadIds.Count == 0 && _autoHiddenDuplicateCadPadIds.Count == 0)
+        if (_cadEdit.HiddenCadPadIds.Count == 0 && _cadEdit.AutoHiddenDuplicateCadPadIds.Count == 0)
         {
             return _cad;
         }
@@ -133,15 +133,15 @@ public sealed partial class FreeformHelperViewModel
 
     private void RemoveHiddenCadIdFromUndoBatches(int cadPadId)
     {
-        if (_hiddenCadUndoStack.Count == 0)
+        if (_cadEdit.HiddenUndoStack.Count == 0)
         {
             return;
         }
 
-        var batchesTopToBottom = _hiddenCadUndoStack
+        var batchesTopToBottom = _cadEdit.HiddenUndoStack
             .Select(static batch => batch.ToList())
             .ToList();
-        _hiddenCadUndoStack.Clear();
+        _cadEdit.HiddenUndoStack.Clear();
 
         for (var index = batchesTopToBottom.Count - 1; index >= 0; index--)
         {
@@ -149,7 +149,7 @@ public sealed partial class FreeformHelperViewModel
             batch.RemoveAll(id => id == cadPadId);
             if (batch.Count > 0)
             {
-                _hiddenCadUndoStack.Push(batch);
+                _cadEdit.HiddenUndoStack.Push(batch);
             }
         }
     }

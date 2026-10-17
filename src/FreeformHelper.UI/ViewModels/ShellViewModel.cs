@@ -16,6 +16,9 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private ConsoleSession? _console;
+
+    // Tests pass their own probe to hold a workspace build back.
+    private readonly IShellTimingProbe _timingProbe;
     private bool _isDisposed;
     // Navigation selection is owned by the shell's UI-thread command entry point.
     private ShellPage _selectedPage = ShellPage.Workspace;
@@ -34,6 +37,12 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     private int _pendingWorkspaceSourceChangeVersion;
     private int _processedWorkspaceSourceChangeVersion;
     private int _workspaceSourceChangeDrainRunning;
+
+    internal const string WorkspaceSourceChangeDrainWorkName = "workspace-source-change-drain";
+
+    // Starts the workspace source change drain. Tests replace its runner to observe the drain and its failure.
+    internal BackgroundWorkRunnerSlot BackgroundWork { get; } = new();
+
     public HowToUseViewModel HowToUse => _howToUse ??= new HowToUseViewModel();
     public DevViewModel Dev => _dev ??= new DevViewModel { UiEvents = UiEvents };
     public SimulationHostViewModel Simulation => _simulation ??= new SimulationHostViewModel();
@@ -117,7 +126,14 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     }
 
     internal ShellViewModel(FreeformHelperViewModel? freeformHelper)
+        : this(freeformHelper, NullShellTimingProbe.Instance)
     {
+    }
+
+    internal ShellViewModel(FreeformHelperViewModel? freeformHelper, IShellTimingProbe timingProbe)
+    {
+        ArgumentNullException.ThrowIfNull(timingProbe);
+        _timingProbe = timingProbe;
         StartupPerfTracker.Mark("shell.vm-ctor-start");
         StartupPerfTracker.Mark("shell.freeform-vm-create-start");
         FreeformHelper = freeformHelper ?? new FreeformHelperViewModel();

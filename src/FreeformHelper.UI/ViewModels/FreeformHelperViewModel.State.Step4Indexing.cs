@@ -1,21 +1,11 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    /// <summary>
-    /// Gets or sets the shared diff-index shift delta applied to all selected CAD pads in Step 4.
-    /// </summary>
-    [ObservableProperty] private decimal _cadOutputFwDiffIndexShiftDelta = -1m;
+    private Step4IndexState? _step4Index; // Created on first read so that the shift-delta change callback can point at this instance.
 
     /// <summary>
-    /// Gets or sets the current duplicate diff summary for Step 4.
+    /// Gets the Step 4 diff-index values that the Step 4 view binds to.
     /// </summary>
-    [ObservableProperty] private string _step4DuplicateDiffSummary = "Duplicate CAD Output FW Diff: none.";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether duplicate diff groups are currently present in Step 4.
-    /// </summary>
-    [ObservableProperty] private bool _hasStep4DuplicateDiffGroups;
+    public Step4IndexState Step4Index => _step4Index ??= new Step4IndexState(OnStep4ShiftDeltaChanged);
 }

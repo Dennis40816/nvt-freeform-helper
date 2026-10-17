@@ -53,7 +53,7 @@
                 <SelectableTextBlock Classes="workflowStepMetricLabel"
                                      Text="Regular Visibility Mask"/>
                 <SelectableTextBlock Classes="workflowStepMetricText"
-                                     Text="{Binding RegularVisibilityMaskSummary}"/>
+                                     Text="{Binding RegularVisibilityMaskUi.Summary}"/>
               </StackPanel>
             </Border>
           </StackPanel>
@@ -65,7 +65,7 @@
                                  Text="Use Regular Visibility Mask"
                                  VerticalAlignment="Center"/>
             <ToggleSwitch Grid.Column="1"
-                          IsChecked="{Binding IsRegularVisibilityMaskEnabled, Mode=TwoWay}"
+                          IsChecked="{Binding RegularVisibilityMaskUi.IsEnabled, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"

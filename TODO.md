@@ -2,8 +2,17 @@
 
 - [x] After the Core release that ships `UiEventRunner` (0.9.1), delete the CoreSource project, drop `NVT_CORE_SOURCE_CONSUMPTION`, and bump the Core package pin. Remove copy-specific integrity guards and exclusions. Refs [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
 
+# Spinner process sites without tests
+
+- [ ] No deadline. `CadLoadSpinnerProcessHost.EnsureProcessStartedAsync`, the warmup `catch` in `QueueStateSync` and `CleanupProcess` have no test. Reaching them needs a real spinner process, and the only seam is `Process.Start` (`CadLoadSpinnerProcessHost.cs`). Moving that statement behind a delegate makes the ledger count a new banned-API fingerprint (RS0030), which it refuses. When the ledger tool stops treating a move as a new fingerprint, put `Process.Start` behind a delegate and test these sites.
+- [ ] No deadline. The pipe server loop of `CadLoadSpinnerWindow` keeps its bare `catch`. Changing it to `catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))` raises `catchException` from 25 to 26, because a bare catch does not count there and the new form does. The ledger only lowers. Change it when the ledger tool treats bare to this form as no increase.
+
 # Legacy console follow-up
 
 - [x] The Core console list replaced the legacy console panel. The text buffer of `ShellViewModel.Console.cs`, its gate and the `OnLogEntriesChanged` hook are deleted. Refs [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
-- [x] Core 0.9.2 is pinned and the console zoom is connected. `ConsoleSession` keeps the zoom value (Core does not store it), the panel assigns it when it creates the list, and the `ZoomChanged` event saves it (range 80% to 300%). Refs [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
+- [x] Core 0.9.4 is pinned and the console zoom is connected. `ConsoleSession` keeps the zoom value (Core does not store it), the panel assigns it when it creates the list, and the `ZoomChanged` event saves it (range 80% to 300%). Refs [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
 - [ ] Decide whether the console zoom should persist across restarts. It lasts for the session now. A persisted value needs an app-level setting and a rule for the deferred settings flush. Refs [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
+
+# Test seams that the ledger fingerprints make expensive
+
+- [ ] No deadline. `AppGeneralPersistenceForTests`, `NotchCacheForTests`, `WorkflowDataForTests` and `RegularVisibilityMaskForTests` (`FreeformHelperViewModel`) expose private state objects to tests. Removing them means rewriting about 12 tests to go through public commands. Renaming them does not lower any ledger number.

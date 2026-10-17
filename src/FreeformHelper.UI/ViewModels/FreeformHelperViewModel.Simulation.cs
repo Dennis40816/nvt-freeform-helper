@@ -6,8 +6,7 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private int _simulationWorkspaceSourceChangeSuspendDepth;
-    private bool _simulationWorkspaceSourceChangePending;
+    private readonly SimulationSourceChangeBatchState _simulationSourceChangeBatch = new(); // Holds the suspend depth and the pending flag of the simulation workspace source change batch.
 
     public event EventHandler? SimulationWorkspaceSourceChanged;
 
@@ -205,11 +204,11 @@ public sealed partial class FreeformHelperViewModel
         return activeRegularPadIds;
     }
 
-    private void NotifySimulationWorkspaceSourceChanged()
+    internal void NotifySimulationWorkspaceSourceChanged()
     {
-        if (_simulationWorkspaceSourceChangeSuspendDepth > 0)
+        if (_simulationSourceChangeBatch.SuspendDepth > 0)
         {
-            _simulationWorkspaceSourceChangePending = true;
+            _simulationSourceChangeBatch.Pending = true;
             return;
         }
 
@@ -218,21 +217,21 @@ public sealed partial class FreeformHelperViewModel
 
     private SimulationWorkspaceSourceChangeBatchScope BeginSimulationWorkspaceSourceChangeBatch()
     {
-        _simulationWorkspaceSourceChangeSuspendDepth++;
+        _simulationSourceChangeBatch.SuspendDepth++;
         return new SimulationWorkspaceSourceChangeBatchScope(this);
     }
 
     private void EndSimulationWorkspaceSourceChangeBatch()
     {
-        if (_simulationWorkspaceSourceChangeSuspendDepth <= 0)
+        if (_simulationSourceChangeBatch.SuspendDepth <= 0)
         {
             return;
         }
 
-        _simulationWorkspaceSourceChangeSuspendDepth--;
-        if (_simulationWorkspaceSourceChangeSuspendDepth == 0 && _simulationWorkspaceSourceChangePending)
+        _simulationSourceChangeBatch.SuspendDepth--;
+        if (_simulationSourceChangeBatch.SuspendDepth == 0 && _simulationSourceChangeBatch.Pending)
         {
-            _simulationWorkspaceSourceChangePending = false;
+            _simulationSourceChangeBatch.Pending = false;
             RaiseSimulationWorkspaceSourceChanged();
         }
     }
@@ -241,11 +240,6 @@ public sealed partial class FreeformHelperViewModel
     {
         SimulationWorkspaceSourceRevision++;
         SimulationWorkspaceSourceChanged?.Invoke(this, EventArgs.Empty);
-    }
-
-    internal void NotifySimulationWorkspaceSourceChangedForTests()
-    {
-        NotifySimulationWorkspaceSourceChanged();
     }
 
     private sealed class SimulationWorkspaceSourceChangeBatchScope : IDisposable

@@ -28,14 +28,14 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
         var release = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
         var vm = new FreeformHelperViewModel();
         SetField(vm, "_cad", new CadPadSet(new[] { CreateCad(10), CreateCad(11), CreateCad(12) }));
-        var hidden = GetField<HashSet<int>>(vm, "_hiddenCadPadIds");
+        var hidden = GetField<CadEditState>(vm, "_cadEdit").HiddenCadPadIds;
         hidden.Add(10);
-        var hiddenUndo = GetField<Stack<List<int>>>(vm, "_hiddenCadUndoStack");
+        var hiddenUndo = GetField<CadEditState>(vm, "_cadEdit").HiddenUndoStack;
         hiddenUndo.Push([10]);
-        var duplicateIds = GetField<Dictionary<int, int>>(vm, "_duplicateCadPadIdToCanonicalId");
+        var duplicateIds = GetField<CadEditState>(vm, "_cadEdit").DuplicateCadPadIdToCanonicalId;
         duplicateIds[11] = 10;
         duplicateIds[12] = 10;
-        var autoHidden = GetField<HashSet<int>>(vm, "_autoHiddenDuplicateCadPadIds");
+        var autoHidden = GetField<CadEditState>(vm, "_cadEdit").AutoHiddenDuplicateCadPadIds;
         autoHidden.Add(11);
         var view = new FreeformHelperView { DataContext = vm };
         var owner = new Window { Content = view };

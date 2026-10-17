@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Services;
@@ -17,7 +18,6 @@ public sealed class NotchTableExporterTests
     private static readonly string[] ExpectedV22PayloadPrefix = ["7", "8"];
     private static readonly int[] V21OnlyPayload = [10, 120, 120, 20, 1, 38, 65535, 0, 0];
     private static readonly double[] RuntimeParityBeforeValues = [100d, 50d, 25d, 80d, 40d, 30d];
-    private static readonly double[] ExpectedFwBaseMaskRuntimeValues = [400d, 0d, 400d, 123d, 0d, 0d];
     private static readonly int[] V21Q7BoundaryMagnitudes = [0, 1, 127, 128, 129, 255];
     private static readonly int[] V21Q7BoundaryTypes = [1, 2];
     private static readonly int[] V21MultiTermWrapDiffs = [10, 11, 12, 20];
@@ -258,7 +258,7 @@ public sealed class NotchTableExporterTests
     [Theory]
     [InlineData(NotchAlgorithmVersion.V21, NotchComputationMode.LegacyRegularAnchor)]
     [InlineData(NotchAlgorithmVersion.V22, NotchComputationMode.CadAllocation)]
-    public void ExportAsCInitializer_SnapshotsNullDiffBeforeReadingCallerCollections(
+    public void ExportAsCInitializer_DoesNotEnumerateTheIgnoredActiveRegularSet(
         NotchAlgorithmVersion version,
         NotchComputationMode computationMode)
     {
@@ -284,7 +284,8 @@ public sealed class NotchTableExporterTests
             NotchExportProfile.Debug,
             activeRegularPadIds);
 
-        Assert.Equal(ushort.MaxValue, settings.Notch.NullValue);
+        // The exporter ignores the set, so the mutation hook never ran and the null value is still the frozen one.
+        Assert.Equal(frozenNullDiff, settings.Notch.NullValue);
         Assert.Contains("#define NHC_DIFF_NONE            (0xFFFEu)", generatedSource, StringComparison.Ordinal);
         Assert.Contains(
             "65535",
@@ -565,38 +566,13 @@ public sealed class NotchTableExporterTests
         Assert.Contains("static const ST_PRI_NHC_TABLE_NODE_INFO castNHC_TABLE_IC1[USER_NHC_NODE_NUM_IC1]", text, StringComparison.Ordinal);
         Assert.DoesNotContain("static const ST_PRI_NHC_TABLE_NODE_INFO castNHC_TABLE_IC2", text, StringComparison.Ordinal);
         Assert.Contains("static const ST_PRI_NHC_TABLE_NODE_INFO castNHC_TABLE_IC3[USER_NHC_NODE_NUM_IC3]", text, StringComparison.Ordinal);
-        Assert.Contains("{ ((const ST_PRI_NHC_TABLE_NODE_INFO*)0), USER_NHC_NODE_NUM_IC2 }, // IC2", text, StringComparison.Ordinal);
+        Assert.Contains("{ NULL, USER_NHC_NODE_NUM_IC2 }, // IC2", text, StringComparison.Ordinal);
     }
 
-    [Fact]
-    public void ExportAsCInitializer_EmitsFwBaseMask_ForActiveRegularSimulation()
-    {
-        var grid = CreateRuntimeParityGrid();
-        var table = CreateRuntimeParityV22Table();
-        var activeRegularPadIds = new HashSet<int> { 0, 2, 3 };
-
-        var text = NotchTableExporter.ExportAsCInitializer(
-            table,
-            CreateCadSetWithIcCount(2),
-            grid,
-            CreateProjectSettings(),
-            NotchExportProfile.Debug,
-            activeRegularPadIds);
-
-        Assert.Contains("// FW simulation base mask", text, StringComparison.Ordinal);
-        Assert.Contains("#define USER_NHC_FW_MASK_NUM_IC1  (2u)", text, StringComparison.Ordinal);
-        Assert.Contains("#define USER_NHC_FW_MASK_SPAN_IC1 (3u)", text, StringComparison.Ordinal);
-        Assert.Contains("#define USER_NHC_FW_MASK_NUM_IC2  (1u)", text, StringComparison.Ordinal);
-        Assert.Contains("static const UINT16 cau16NHC_FW_BASE_MASK_IC1[USER_NHC_FW_MASK_NUM_IC1]", text, StringComparison.Ordinal);
-        Assert.Contains("    0, 2", text, StringComparison.Ordinal);
-        Assert.Contains("static const UINT16 cau16NHC_FW_BASE_MASK_IC2[USER_NHC_FW_MASK_NUM_IC2]", text, StringComparison.Ordinal);
-        Assert.Contains("void FUNC_NHC_SimulationLoadFwBaseMaskByIc(UINT8 u8Ic, INT16 s16BaseValue)", text, StringComparison.Ordinal);
-        Assert.Contains("S_2D_DIFFAFTER->as16Buf[u16j] = 0;", text, StringComparison.Ordinal);
-        Assert.Contains("S_2D_DIFFAFTER->as16Buf[pstMaskInfo->pu16ActiveDiffs[u16j]] = s16BaseValue;", text, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void ExportAsCInitializer_OmitsFwBaseMask_ForReleaseProfile()
+    [Theory]
+    [InlineData(NotchExportProfile.Release)]
+    [InlineData(NotchExportProfile.Debug)]
+    public void ExportAsCInitializer_NeverEmitsFwBaseMask(NotchExportProfile profile)
     {
         var grid = CreateRuntimeParityGrid();
         var table = CreateRuntimeParityV22Table();
@@ -606,14 +582,14 @@ public sealed class NotchTableExporterTests
             CreateCadSetWithIcCount(2),
             grid,
             CreateProjectSettings(),
-            NotchExportProfile.Release,
-            new HashSet<int> { 0, 2, 3 });
+            profile);
 
         Assert.DoesNotContain("// FW simulation base mask", text, StringComparison.Ordinal);
         Assert.DoesNotContain("USER_NHC_FW_MASK_NUM", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("USER_NHC_SIM_BASE_VALUE", text, StringComparison.Ordinal);
         Assert.DoesNotContain("ST_PRI_NHC_FW_BASE_MASK_INFO", text, StringComparison.Ordinal);
         Assert.DoesNotContain("cau16NHC_FW_BASE_MASK", text, StringComparison.Ordinal);
-        Assert.DoesNotContain("FUNC_NHC_SimulationLoadFwBaseMask", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("FwBaseMask", text, StringComparison.Ordinal);
         Assert.Contains("void FUNC_NHC_DiffCompensationByIc(UINT8 u8Ic)", text, StringComparison.Ordinal);
     }
 
@@ -642,7 +618,7 @@ public sealed class NotchTableExporterTests
 
         Assert.DoesNotContain("#include <stdint.h>", text, StringComparison.Ordinal);
         Assert.Contains("#include \"notch.h\"", text, StringComparison.Ordinal);
-        Assert.Contains("// Requires FW platform typedefs from notch.h / ap_gvariable.h: UINT8, UINT16, INT8, INT16.", text, StringComparison.Ordinal);
+        Assert.Contains("// Requires FW platform typedefs from notch.h / ap_gvariable.h: UINT8, UINT16, INT8, INT16, INT32.", text, StringComparison.Ordinal);
         Assert.Contains("UINT16 NHC_IDX;", text, StringComparison.Ordinal);
         Assert.Contains("INT8   NHC_1ST_RATIO;", text, StringComparison.Ordinal);
         Assert.DoesNotContain("ST_PRI_NHC_TABLE_META_INFO", text, StringComparison.Ordinal);
@@ -1034,29 +1010,6 @@ public sealed class NotchTableExporterTests
         }
     }
 
-    [Fact]
-    public void ExportAsCInitializer_GccRuntimeLoadsFwBaseMask_WhenGccIsAvailable()
-    {
-        if (!IsGccAvailable())
-        {
-            return;
-        }
-
-        var grid = CreateRuntimeParityGrid();
-        var table = CreateRuntimeParityV22Table();
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
-            table,
-            CreateCadSetWithIcCount(2),
-            grid,
-            CreateProjectSettings(),
-            NotchExportProfile.Debug,
-            new HashSet<int> { 0, 2, 3 });
-
-        var actual = RunCProgramWithGcc(CreateFwBaseMaskRuntimeHarnessSource(generatedSource));
-
-        Assert.Equal(ExpectedFwBaseMaskRuntimeValues, actual);
-    }
-
     private static CadPadSet CreateCadSet()
     {
         var polygon = new Polygon2(new[]
@@ -1411,7 +1364,11 @@ public sealed class NotchTableExporterTests
             process.WaitForExit(5000);
             return process.ExitCode == 0;
         }
-        catch
+        catch (Win32Exception)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
         {
             return false;
         }
@@ -1420,7 +1377,7 @@ public sealed class NotchTableExporterTests
     private static double[] RunCProgramWithGcc(string source)
     {
         var tempDirectory = Path.Combine(Path.GetTempPath(), "FreeformHelper.NotchExporterRuntimeTests", Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(tempDirectory);
+        NotchGccTestDirectory.Create(tempDirectory);
         var sourcePath = Path.Combine(tempDirectory, "notch_runtime.c");
         var executablePath = Path.Combine(tempDirectory, "notch_runtime.exe");
         File.WriteAllText(sourcePath, source);
@@ -1432,6 +1389,8 @@ public sealed class NotchTableExporterTests
                 "gcc",
                 [
                     "-std=c11",
+                    "-include",
+                    "stddef.h",
                     "-Wall",
                     "-Wextra",
                     "-Werror",
@@ -1448,14 +1407,7 @@ public sealed class NotchTableExporterTests
         }
         finally
         {
-            try
-            {
-                Directory.Delete(tempDirectory, recursive: true);
-            }
-            catch
-            {
-                // Best-effort temp cleanup only.
-            }
+            TestDirectoryCleanup.DeleteBestEffort(tempDirectory);
         }
     }
 
@@ -1495,7 +1447,7 @@ public sealed class NotchTableExporterTests
     private static void AssertCCompilesWithGcc(string source)
     {
         var tempDirectory = Path.Combine(Path.GetTempPath(), "FreeformHelper.NotchExporterTests", Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(tempDirectory);
+        NotchGccTestDirectory.Create(tempDirectory);
         var sourcePath = Path.Combine(tempDirectory, "notch_export.c");
         var objectPath = Path.Combine(tempDirectory, "notch_export.o");
         File.WriteAllText(sourcePath, CreateGccHarnessSource(source));
@@ -1512,14 +1464,11 @@ public sealed class NotchTableExporterTests
                 CreateNoWindow = true,
             },
         };
-        process.StartInfo.ArgumentList.Add("-std=c11");
-        process.StartInfo.ArgumentList.Add("-Wall");
-        process.StartInfo.ArgumentList.Add("-Wextra");
-        process.StartInfo.ArgumentList.Add("-Werror");
-        process.StartInfo.ArgumentList.Add("-c");
-        process.StartInfo.ArgumentList.Add(sourcePath);
-        process.StartInfo.ArgumentList.Add("-o");
-        process.StartInfo.ArgumentList.Add(objectPath);
+        string[] gccFlags = ["-std=c11", "-include", "stddef.h", "-Wall", "-Wextra", "-Werror", "-c", sourcePath, "-o", objectPath];
+        foreach (var flag in gccFlags)
+        {
+            process.StartInfo.ArgumentList.Add(flag);
+        }
 
         try
         {
@@ -1534,14 +1483,7 @@ public sealed class NotchTableExporterTests
         }
         finally
         {
-            try
-            {
-                Directory.Delete(tempDirectory, recursive: true);
-            }
-            catch
-            {
-                // Best-effort temp cleanup only.
-            }
+            TestDirectoryCleanup.DeleteBestEffort(tempDirectory);
         }
     }
 
@@ -1572,6 +1514,7 @@ extern NHC_DIFF_BUFFER g_stNhcDiffAfter;
 
     private static string CreateGccHarnessSource(string generatedSource) =>
         string.Concat(
+            "#include <stdint.h>\ntypedef int32_t INT32;\n",
             generatedSource,
             "\nNHC_DIFF_BUFFER g_stNhcDiffAfter;\n");
 
@@ -1651,39 +1594,6 @@ int main(void)
     printf("%d\n", g_stNhcDiffAfter.as16Buf[11]);
     printf("%d\n", g_stNhcDiffAfter.as16Buf[12]);
     printf("%d\n", g_stNhcDiffAfter.as16Buf[20]);
-    return 0;
-}
-""");
-
-    private static string CreateFwBaseMaskRuntimeHarnessSource(string generatedSource) =>
-        string.Concat(
-            CreateGccHarnessSource(generatedSource),
-            """
-
-#include <stdio.h>
-
-int main(void)
-{
-    for (int index = 0; index < 6; ++index)
-    {
-        g_stNhcDiffAfter.as16Buf[index] = 9;
-    }
-
-    FUNC_NHC_SimulationLoadFwBaseMaskByIc(0u, 400);
-    printf("%d\n", g_stNhcDiffAfter.as16Buf[0]);
-    printf("%d\n", g_stNhcDiffAfter.as16Buf[1]);
-    printf("%d\n", g_stNhcDiffAfter.as16Buf[2]);
-
-    for (int index = 0; index < 6; ++index)
-    {
-        g_stNhcDiffAfter.as16Buf[index] = 9;
-    }
-
-    FUNC_NHC_SimulationLoadFwBaseMaskByIc(1u, 123);
-    printf("%d\n", g_stNhcDiffAfter.as16Buf[0]);
-    printf("%d\n", g_stNhcDiffAfter.as16Buf[1]);
-    printf("%d\n", g_stNhcDiffAfter.as16Buf[2]);
-
     return 0;
 }
 """);

@@ -21,7 +21,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         var shell = new ShellViewModel();
         var vm = shell.FreeformHelper;
         SetPrivateField(vm, "_grid", BuildValidationGrid());
-        SetPrivateField(vm, "_lastGeneratedNotchTable", table);
+        vm.NotchCacheForTests.LastGeneratedTable = table;
         return shell;
     }
 
@@ -195,14 +195,6 @@ public sealed partial class RuntimeQueryUseCaseTests
         var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(field);
         field!.SetValue(target, value);
-    }
-
-    private static Dictionary<TKey, TValue> GetPrivateDictionary<TKey, TValue>(object target, string fieldName)
-        where TKey : notnull
-    {
-        var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return Assert.IsType<Dictionary<TKey, TValue>>(field!.GetValue(target));
     }
 
     private static void AssertTargetPayloadMatches(JsonElement payload, NotchV22TargetAllocation expected)

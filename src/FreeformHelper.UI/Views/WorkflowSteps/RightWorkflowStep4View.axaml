@@ -45,8 +45,8 @@
                 <SelectableTextBlock Classes="workflowStepMetricLabel"
                                      Text="Duplicate diff status"/>
                 <SelectableTextBlock Classes="workflowStepMetricText compact"
-                                     Text="{Binding Step4DuplicateDiffSummary}"
-                                     ToolTip.Tip="{Binding Step4DuplicateDiffSummary}"/>
+                                     Text="{Binding Step4Index.DuplicateDiffSummary}"
+                                     ToolTip.Tip="{Binding Step4Index.DuplicateDiffSummary}"/>
               </StackPanel>
             </Border>
             <Border Classes="workflowStepMetricTile">
@@ -54,8 +54,8 @@
                 <SelectableTextBlock Classes="workflowStepMetricLabel"
                                      Text="Regular Visibility Mask"/>
                 <SelectableTextBlock Classes="workflowStepMetricText compact"
-                                     Text="{Binding RegularVisibilityMaskSummary}"
-                                     ToolTip.Tip="{Binding RegularVisibilityMaskSummary}"/>
+                                     Text="{Binding RegularVisibilityMaskUi.Summary}"
+                                     ToolTip.Tip="{Binding RegularVisibilityMaskUi.Summary}"/>
               </StackPanel>
             </Border>
           </StackPanel>
@@ -108,7 +108,7 @@
                                        SmallChange="1"
                                        LargeChange="10"
                                        FormatString="0"
-                                       Value="{Binding CadOutputFwDiffIndexShiftDelta, Mode=TwoWay}"
+                                       Value="{Binding Step4Index.ShiftDelta, Mode=TwoWay}"
                                        ToolTip.Tip="Apply one shared diff offset to all selected CAD output pads."/>
               <Button Grid.Column="1"
                       Command="{Binding OffsetSelectedCadOutputFwDiffIndicesCommand}"

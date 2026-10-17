@@ -1,4 +1,5 @@
 using System.Globalization;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -112,7 +113,7 @@ public sealed partial class FreeformHelperViewModel
                 request.Value.Format,
                 request.Value.UseDarkTheme);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Export DXF image failed", ex);
             Logger.Error(ex, "Export DXF image failed.");
@@ -159,7 +160,7 @@ public sealed partial class FreeformHelperViewModel
             SetStatus($"DXF exported ({(visibleOnly ? "visible" : "all")}). Pads={pads.Count}.");
             Logger.Info(CultureInfo.InvariantCulture, "DXF exported to {0} (mode={1}, pads={2}).", path, visibleOnly ? "visible" : "all", pads.Count);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Export DXF failed", ex);
             Logger.Error(ex, "Export DXF failed.");

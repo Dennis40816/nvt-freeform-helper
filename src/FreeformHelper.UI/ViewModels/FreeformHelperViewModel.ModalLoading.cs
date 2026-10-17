@@ -8,7 +8,7 @@ public sealed partial class FreeformHelperViewModel
     private static readonly TimeSpan ModalLoadingSpinnerMinVisibleDuration = TimeSpan.FromMilliseconds(120);
     private readonly LoadingScopeCoordinator _modalLoadingSpinnerScope =
         new(YieldCadLoadCanvasOverlayFrameAsync, ModalLoadingSpinnerMinVisibleDuration);
-    private int _modalLoadingSpinnerScopeCount;
+    private readonly LoadingScopeCounts _loadingScopes = new(); // Holds how many loading scopes are open for the CAD load overlay and for the modal spinner.
 
     internal async Task RunWithModalLoadingSpinnerAsync(Func<Task> action)
     {
@@ -31,18 +31,18 @@ public sealed partial class FreeformHelperViewModel
 
     internal void BeginModalLoadingSpinnerScope()
     {
-        _modalLoadingSpinnerScopeCount++;
+        _loadingScopes.ModalLoadingSpinner++;
         IsModalLoadingSpinnerVisible = true;
     }
 
     internal void EndModalLoadingSpinnerScope()
     {
-        if (_modalLoadingSpinnerScopeCount > 0)
+        if (_loadingScopes.ModalLoadingSpinner > 0)
         {
-            _modalLoadingSpinnerScopeCount--;
+            _loadingScopes.ModalLoadingSpinner--;
         }
 
-        IsModalLoadingSpinnerVisible = _modalLoadingSpinnerScopeCount > 0;
+        IsModalLoadingSpinnerVisible = _loadingScopes.ModalLoadingSpinner > 0;
     }
 
     private void SetModalLoadingSpinnerVisibleAsyncContract(bool isVisible)

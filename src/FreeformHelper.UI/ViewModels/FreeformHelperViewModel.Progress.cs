@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using FreeformHelper.Application.Services;
 using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -36,7 +37,7 @@ public sealed partial class FreeformHelperViewModel
         };
     }
 
-    private async Task RunUiProgressOperationAsync(
+    internal async Task RunUiProgressOperationAsync(
         string operationName,
         Action<bool> setBusy,
         Action<double> setProgress,
@@ -63,7 +64,7 @@ public sealed partial class FreeformHelperViewModel
                 var reportProgress = CreateUiProgressReporter(setProgress);
                 await operationAsync(reportProgress);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 onError(ex);
             }
@@ -85,7 +86,7 @@ public sealed partial class FreeformHelperViewModel
         await ExecuteCoreAsync();
     }
 
-    private async Task RunUiOperationAsync(
+    internal async Task RunUiOperationAsync(
         string operationName,
         Func<Task> operationAsync,
         Action<Exception> onError,
@@ -104,7 +105,7 @@ public sealed partial class FreeformHelperViewModel
                 onStart?.Invoke();
                 await operationAsync();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 onError(ex);
             }
@@ -124,7 +125,7 @@ public sealed partial class FreeformHelperViewModel
         await ExecuteCoreAsync();
     }
 
-    private async Task<TResult> RunUiOperationAsync<TResult>(
+    internal async Task<TResult> RunUiOperationAsync<TResult>(
         string operationName,
         Func<Task<TResult>> operationAsync,
         Func<Exception, TResult> onError,
@@ -135,31 +136,16 @@ public sealed partial class FreeformHelperViewModel
         ArgumentNullException.ThrowIfNull(operationAsync);
         ArgumentNullException.ThrowIfNull(onError);
 
-        async Task<TResult> ExecuteCoreAsync()
+        // The Task overload owns the catch, the finish log and the spinner scope. This overload only carries the value.
+        TResult result = default!;
+
+        async Task CaptureResultAsync()
         {
-            var timer = Stopwatch.StartNew();
-            try
-            {
-                onStart?.Invoke();
-                return await operationAsync();
-            }
-            catch (Exception ex)
-            {
-                return onError(ex);
-            }
-            finally
-            {
-                timer.Stop();
-                Logger.Info(CultureInfo.InvariantCulture, "{0} finished in {1} ms.", operationName, timer.ElapsedMilliseconds);
-            }
+            result = await operationAsync();
         }
 
-        if (showModalSpinner)
-        {
-            return await RunWithModalLoadingSpinnerAsync(ExecuteCoreAsync);
-        }
-
-        return await ExecuteCoreAsync();
+        await RunUiOperationAsync(operationName, CaptureResultAsync, ex => result = onError(ex), onStart, showModalSpinner);
+        return result;
     }
 }
 

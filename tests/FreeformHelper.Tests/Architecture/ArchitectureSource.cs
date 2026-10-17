@@ -149,7 +149,8 @@ internal sealed record ArchitectureSource(string Path, string Text)
             })
             .ToArray();
 
-    // Each variable declarator is one storage slot. Readonly dependencies/collections count;
+    // Each variable declarator is one storage slot here. Readonly dependencies are listed too; the
+    // freeformViewModelStateMembers metric decides which of them count (see DebtBaselineTests).
     // instanceOnly excludes constants/static fields; events, properties and generated members never count.
     // An ObservableProperty field counts once, regardless of the generated public property.
     public IEnumerable<(string Name, string Type, string Modifiers, int Offset)> Fields(string? owner = null, bool instanceOnly = true)

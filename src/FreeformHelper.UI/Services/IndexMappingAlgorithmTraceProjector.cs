@@ -53,3 +53,34 @@ internal static class IndexMappingAlgorithmTraceProjector
         return entries;
     }
 }
+
+/// <summary>Builds the algorithm trace of one decision row.</summary>
+internal interface IIndexMappingTraceBuilder
+{
+    IReadOnlyList<IndexMappingAlgorithmTraceEntryViewModel> Build(IndexMappingDecisionRowViewModel row, int traceSchemaVersion);
+}
+
+/// <summary>Default builder: the projector with the current UTC time.</summary>
+internal sealed class IndexMappingTraceBuilder : IIndexMappingTraceBuilder
+{
+    public static IndexMappingTraceBuilder Instance { get; } = new();
+
+    private IndexMappingTraceBuilder()
+    {
+    }
+
+    public IReadOnlyList<IndexMappingAlgorithmTraceEntryViewModel> Build(IndexMappingDecisionRowViewModel row, int traceSchemaVersion) =>
+        IndexMappingAlgorithmTraceProjector.Build(row, traceSchemaVersion, TimeProvider.System.GetUtcNow().UtcDateTime);
+}
+
+/// <summary>
+/// The builder a report view model uses. It is fixed per view model and forwards to <see cref="Builder"/>,
+/// which is the default builder unless a test replaces it.
+/// </summary>
+internal sealed class IndexMappingTraceBuilderSlot : IIndexMappingTraceBuilder
+{
+    public IIndexMappingTraceBuilder Builder { get; set; } = IndexMappingTraceBuilder.Instance;
+
+    public IReadOnlyList<IndexMappingAlgorithmTraceEntryViewModel> Build(IndexMappingDecisionRowViewModel row, int traceSchemaVersion) =>
+        Builder.Build(row, traceSchemaVersion);
+}

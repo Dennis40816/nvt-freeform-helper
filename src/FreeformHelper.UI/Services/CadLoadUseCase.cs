@@ -9,11 +9,22 @@ namespace FreeformHelper.UI.Services;
 /// </summary>
 public sealed class CadLoadUseCase
 {
-    private readonly DxfImportService _dxfImportService;
+    private readonly Func<string, DxfImportOptions, CadPadSet> _importFromPath;
+    private readonly Func<Stream, DxfImportOptions, CadPadSet> _importFromStream;
 
     public CadLoadUseCase(DxfImportService dxfImportService)
+        : this(
+            (dxfImportService ?? throw new ArgumentNullException(nameof(dxfImportService))).ImportFromPath,
+            dxfImportService.ImportFromStream)
     {
-        _dxfImportService = dxfImportService ?? throw new ArgumentNullException(nameof(dxfImportService));
+    }
+
+    internal CadLoadUseCase(
+        Func<string, DxfImportOptions, CadPadSet> importFromPath,
+        Func<Stream, DxfImportOptions, CadPadSet> importFromStream)
+    {
+        _importFromPath = importFromPath ?? throw new ArgumentNullException(nameof(importFromPath));
+        _importFromStream = importFromStream ?? throw new ArgumentNullException(nameof(importFromStream));
     }
 
     public CadLoadOutcome? TryLoadFromPath(string? path, DxfImportOptions options)
@@ -23,7 +34,7 @@ public sealed class CadLoadUseCase
             return null;
         }
 
-        var cad = _dxfImportService.ImportFromPath(path, options);
+        var cad = _importFromPath(path, options);
         return BuildOutcome(cad, CadLoadSource.Path, path);
     }
 
@@ -35,7 +46,7 @@ public sealed class CadLoadUseCase
         }
 
         using var ms = new MemoryStream(data);
-        var cad = _dxfImportService.ImportFromStream(ms, options);
+        var cad = _importFromStream(ms, options);
         return BuildOutcome(cad, CadLoadSource.Embedded, null);
     }
 
@@ -54,7 +65,7 @@ public sealed class CadLoadUseCase
             {
                 return TryLoadFromPath(lastPath, options);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 pathLoadException = ex;
             }
@@ -68,7 +79,7 @@ public sealed class CadLoadUseCase
                 return embeddedOutcome;
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             if (pathLoadException is not null)
             {

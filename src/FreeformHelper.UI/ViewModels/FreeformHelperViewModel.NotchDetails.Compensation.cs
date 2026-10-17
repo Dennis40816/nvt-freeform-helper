@@ -21,7 +21,7 @@ public sealed partial class FreeformHelperViewModel
         var hitRate = total > 0 ? (double)hitCount / total : 0.0;
         return new NotchCompensationCacheMetricsSnapshot(
             Revision: _notchCompensationCacheRevision,
-            EntryCount: _notchResolvedResultCacheByCadId.Count,
+            EntryCount: _notchCache.ResolvedResultByCadId.Count,
             LastClearSize: _notchCompensationCacheCounters.LastClearSize,
             HitCount: hitCount,
             MissCount: missCount,
@@ -157,7 +157,7 @@ public sealed partial class FreeformHelperViewModel
             ? icIndex
             : (int?)null;
         var allocationAreaMode = NotchV22TargetAllocationPolicy.ResolveAreaMode(SelectedNotchCompensationModelOption.Value);
-        if (_notchResolvedResultCacheByCadId.TryGetValue(cadPadId, out var cached) &&
+        if (_notchCache.ResolvedResultByCadId.TryGetValue(cadPadId, out var cached) &&
             cached.Revision == _notchCompensationCacheRevision &&
             cached.CadPoolFingerprint == cadPoolFingerprint &&
             cached.ActiveRegularHash == activeRegularHash &&
@@ -202,7 +202,7 @@ public sealed partial class FreeformHelperViewModel
             ? precomputedResolved
             : NotchDetailUseCase.BuildResolvedResult(resolutionRequest);
 
-        _notchResolvedResultCacheByCadId[cadPadId] = (
+        _notchCache.ResolvedResultByCadId[cadPadId] = (
             _notchCompensationCacheRevision,
             cadPoolFingerprint,
             activeRegularHash,

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
@@ -172,7 +173,7 @@ public sealed class ShellViewModelSimulationTests
             return Task.CompletedTask;
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
 
         await WaitForConditionAsync(() => prewarmCount == 1);
         Assert.Equal(1, prewarmCount);
@@ -195,7 +196,7 @@ public sealed class ShellViewModelSimulationTests
             return Task.CompletedTask;
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
 
         await WaitForConditionAsync(() => prewarmCount == 1);
         Assert.Equal(1, prewarmCount);
@@ -236,7 +237,7 @@ public sealed class ShellViewModelSimulationTests
             return Task.CompletedTask;
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
 
         await WaitForConditionAsync(() => prewarmCount == 1);
         Assert.Equal(1, prewarmCount);
@@ -264,14 +265,86 @@ public sealed class ShellViewModelSimulationTests
             await Task.Delay(80);
         };
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChangedForTests();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
 
         await WaitForConditionAsync(() => Volatile.Read(ref prewarmCount) > 0);
         await Task.Delay(120, TestContext.Current.CancellationToken);
 
         Assert.Equal(1, Volatile.Read(ref prewarmCount));
+    }
+
+    [Fact]
+    public async Task WorkspaceSourceChangeDrain_WhenThePrewarmFails_EndsWithoutRestarting()
+    {
+        using var shell = new ShellViewModel();
+        var work = new RecordingBackgroundWorkRunner();
+        shell.BackgroundWork.Runner = work;
+        var prewarmCount = 0;
+        shell.Simulation.RequestPrewarmWorkspaceAsync = () =>
+        {
+            prewarmCount++;
+            throw new InvalidOperationException("prewarm rejected");
+        };
+
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+        await work.LastStartedAsync(ShellViewModel.WorkspaceSourceChangeDrainWorkName);
+
+        Assert.Equal(1, prewarmCount);
+    }
+
+    [Fact]
+    public async Task WorkspaceSourceChangeDrain_WhenThePrewarmRunsOutOfMemory_PropagatesAndDoesNotRestart()
+    {
+        using var shell = new ShellViewModel();
+        var work = new RecordingBackgroundWorkRunner();
+        shell.BackgroundWork.Runner = work;
+        var failure = (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
+        var prewarmCount = 0;
+        shell.Simulation.RequestPrewarmWorkspaceAsync = () =>
+        {
+            prewarmCount++;
+            throw failure;
+        };
+
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+        await Assert.ThrowsAsync<OutOfMemoryException>(() =>
+            work.LastStartedAsync(ShellViewModel.WorkspaceSourceChangeDrainWorkName));
+
+        Assert.Equal(1, prewarmCount);
+    }
+
+    [Fact]
+    public async Task WorkspaceSourceChangeDrain_AfterOutOfMemory_StartsAgainOnTheNextSourceChange()
+    {
+        using var shell = new ShellViewModel();
+        var work = new RecordingBackgroundWorkRunner();
+        shell.BackgroundWork.Runner = work;
+        var failure = (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
+        var prewarmCount = 0;
+        shell.Simulation.RequestPrewarmWorkspaceAsync = () =>
+        {
+            prewarmCount++;
+            if (prewarmCount == 1)
+            {
+                throw failure;
+            }
+
+            return Task.CompletedTask;
+        };
+
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+        await Assert.ThrowsAsync<OutOfMemoryException>(() =>
+            work.LastStartedAsync(ShellViewModel.WorkspaceSourceChangeDrainWorkName));
+        Assert.Equal(1, prewarmCount);
+        Assert.Equal(1, work.StartedCount(ShellViewModel.WorkspaceSourceChangeDrainWorkName));
+
+        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+        await work.LastStartedAsync(ShellViewModel.WorkspaceSourceChangeDrainWorkName);
+
+        Assert.Equal(2, work.StartedCount(ShellViewModel.WorkspaceSourceChangeDrainWorkName));
+        Assert.Equal(2, prewarmCount);
     }
 
     private static async Task WaitForConditionAsync(Func<bool> predicate, int timeoutMs = 1200)

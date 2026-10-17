@@ -13,19 +13,19 @@ Last updated: 2026-08-10
 1. Validate current settings with `ProjectSettings.ValidateOrThrow()` first; an invalid `NullValue` fails fast before readiness lookup
 2. The Grid must be built (otherwise return `Validation: build grid first.`)
 3. The target `REG id` must exist
-4. Step 5 Export must have run at least once, and `_lastGeneratedNotchTable` must be available
+4. Step 5 Export must have run at least once, and `_notchCache.LastGeneratedTable` must be available
 
 Direct VM/`RuntimeQueryUseCase` calls preserve validation exceptions; only at the outermost layer does the Named Pipe server convert unhandled command execution exceptions into a single-line `IPC_ERROR` failure envelope, preserving the original message. Normal grid/REG/table readiness failures still follow the existing return contract and must not be conflated with invalid-settings errors.
 
 ## Core Data Source (Single Source)
-- Validation only reads `_lastGeneratedNotchTable`; it does not rerun notch generation.
-- When `_lastGeneratedNotchTable` changes, rebuild the bucket; otherwise reuse the cache.
+- Validation only reads `_notchCache.LastGeneratedTable`; it does not rerun notch generation.
+- When `_notchCache.LastGeneratedTable` changes, rebuild the bucket; otherwise reuse the cache.
 
 ## Bucket Cache Behavior
 - Cache keys:
   - `ReferenceEquals(_notchValidationBucketTable, table)`
   - `nullDiffValue`
-- Cache hit: use `_notchValidationBucketCache` directly
+- Cache hit: use `_notchCache.ValidationBucket` directly
 - Rebuild after invalidation: `NotchValidationUseCase.BuildBucket(...)`
 - Log on rebuild:
   - `Validation bucket rebuilt: tableRows=..., null=..., elapsed=...ms`

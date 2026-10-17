@@ -12,7 +12,7 @@ public sealed partial class FreeformHelperViewModel
 {
     private const double CsvLocalRepairAutoApplyMinConfidence = 0.80;
 
-    private void FilterCadPadsByLayer()
+    internal void FilterCadPadsByLayer()
     {
         if (_cad is null)
         {
@@ -52,7 +52,7 @@ public sealed partial class FreeformHelperViewModel
                 _ = TriggerGridRebuildAsync(requestFit: false);
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Layer filter failed", ex);
             Logger.Error(ex, "Layer filter failed.");
@@ -152,14 +152,14 @@ public sealed partial class FreeformHelperViewModel
 
     private Dictionary<int, int?> BuildCadStrictMatchDiffById(IReadOnlyList<CadPad> ordered)
     {
-        if (_grid is null || _latestPadMatchResult.CadToRegular.Count == 0)
+        if (_grid is null || _workflowData.LatestPadMatch.CadToRegular.Count == 0)
         {
             return ordered.ToDictionary(static pad => pad.Id, static _ => (int?)null);
         }
 
         return CadBestMatchSeedService.BuildSeedByCadId(
             ordered,
-            _latestPadMatchResult.CadToRegular,
+            _workflowData.LatestPadMatch.CadToRegular,
             _grid.Pads.ToDictionary(pad => pad.RegularPadId),
             _cadIcIndexByCadId,
             GetActiveRegularVisibilityMaskPadIds());
@@ -268,7 +268,7 @@ public sealed partial class FreeformHelperViewModel
         IReadOnlyList<CadPad> ordered,
         bool allowCsvRepairAutoApply = false)
     {
-        if (_grid is null || _latestPadMatchResult.CadToRegular.Count == 0)
+        if (_grid is null || _workflowData.LatestPadMatch.CadToRegular.Count == 0)
         {
             SetLatestCadOutputFwDiffAssignmentDecisions(new Dictionary<int, CadOutputFwDiffAssignmentDecision>());
             return;
@@ -277,7 +277,7 @@ public sealed partial class FreeformHelperViewModel
         var regularPadById = _grid.Pads.ToDictionary(static pad => pad.RegularPadId);
         var decisions = DxfRegularMaskAuditService.BuildAssignmentDecisions(
             ordered,
-            _latestPadMatchResult.CadToRegular,
+            _workflowData.LatestPadMatch.CadToRegular,
             regularPadById,
             _cadIcIndexByCadId,
             GetActiveRegularVisibilityMaskPadIds(),
@@ -332,7 +332,7 @@ public sealed partial class FreeformHelperViewModel
 
         var refreshed = DxfRegularMaskAuditService.BuildAssignmentDecisions(
             ordered,
-            _latestPadMatchResult.CadToRegular,
+            _workflowData.LatestPadMatch.CadToRegular,
             regularPadById,
             _cadIcIndexByCadId,
             activeMaskPadIds,

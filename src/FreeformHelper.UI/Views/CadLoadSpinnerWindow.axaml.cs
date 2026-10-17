@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using FreeformHelper.UI.Services;
 using Nvt.Core.Avalonia.Threading;
+using static FreeformHelper.UI.Services.SpinnerWindowStyles;
 
 namespace FreeformHelper.UI.Views;
 
@@ -17,6 +18,7 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
     private Process? _parentProcess;
     private CancellationTokenSource? _ipcCts;
     private Task? _ipcLoopTask;
+    private bool _hasStarted;
 
     public CadLoadSpinnerWindow()
         : this(null)
@@ -33,6 +35,14 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
 
     private void OnOpened(object? sender, EventArgs e)
     {
+        // Avalonia raises Opened again every time Show() follows a Hide(). The start-up work (the hide after
+        // the warm-up open, the parent monitor and the pipe server) must run once, or each Show hides the window again.
+        if (_hasStarted)
+        {
+            return;
+        }
+
+        _hasStarted = true;
         ApplyWindowPresentationContract();
         StartParentMonitor();
         StartIpcServer();
@@ -75,11 +85,7 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
             return;
         }
 
-        try
-        {
-            _parentProcess = Process.GetProcessById(_options.ParentProcessId);
-        }
-        catch
+        if (!SpinnerParentProcess.TryGet(_options.ParentProcessId, out _parentProcess))
         {
             Close();
             return;
@@ -199,7 +205,7 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
         }
     }
 
-    private void ApplyRequest(CadLoadSpinnerRequest request)
+    internal void ApplyRequest(CadLoadSpinnerRequest request)
     {
         switch (request.Command)
         {
@@ -266,28 +272,6 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
             0,
             SwpNomove | SwpNosize | SwpNozorder | SwpNoActivate | SwpFrameChanged);
     }
-
-    private const int GwlStyle = -16;
-    private const int GwlExStyle = -20;
-
-    private const long WsCaption = 0x00C00000L;
-    private const long WsThickFrame = 0x00040000L;
-    private const long WsBorder = 0x00800000L;
-    private const long WsDlgFrame = 0x00400000L;
-    private const long WsSysMenu = 0x00080000L;
-    private const long WsMinimizeBox = 0x00020000L;
-    private const long WsMaximizeBox = 0x00010000L;
-
-    private const long WsExLayered = 0x00080000L;
-    private const long WsExTransparent = 0x00000020L;
-    private const long WsExToolWindow = 0x00000080L;
-    private const long WsExNoActivate = 0x08000000L;
-
-    private const uint SwpNosize = 0x0001;
-    private const uint SwpNomove = 0x0002;
-    private const uint SwpNozorder = 0x0004;
-    private const uint SwpNoActivate = 0x0010;
-    private const uint SwpFrameChanged = 0x0020;
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
     private static extern nint GetWindowLongPtr(nint hWnd, int nIndex);

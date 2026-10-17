@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Avalonia.Controls;
+using FreeformHelper.Application.Services;
 using NLog;
 
 namespace FreeformHelper.UI.Services;
@@ -36,6 +37,8 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
     private readonly SemaphoreSlim _stateSyncGate = new(1, 1);
     private readonly string _pipeName = CadLoadSpinnerIpcProtocol.BuildPipeName(Environment.ProcessId);
     private readonly Func<CadLoadSpinnerRequest, bool>? _sendRequestOverride;
+    private readonly Func<Task> _startProcess;
+    private readonly Func<bool>? _hasProcessExitedOverride;
     private Process? _process;
     private Task? _warmupTask;
     private Task _stateSyncTask = Task.CompletedTask;
@@ -47,12 +50,27 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
     public CadLoadSpinnerProcessHost()
     {
+        _startProcess = EnsureProcessStartedAsync;
     }
 
     internal CadLoadSpinnerProcessHost(Func<CadLoadSpinnerRequest, bool> sendRequest)
     {
         _sendRequestOverride = sendRequest;
+        _startProcess = EnsureProcessStartedAsync;
         _warmupTask = Task.CompletedTask;
+    }
+
+    // Lets a test play a spinner process that has exited, and the start of a new one.
+    internal CadLoadSpinnerProcessHost(
+        Func<CadLoadSpinnerRequest, bool> sendRequest,
+        Func<Task> startProcess,
+        Func<bool> hasProcessExited,
+        Task? warmupTask = null)
+    {
+        _sendRequestOverride = sendRequest;
+        _startProcess = startProcess;
+        _hasProcessExitedOverride = hasProcessExited;
+        _warmupTask = warmupTask ?? Task.CompletedTask;
     }
 
     public void Warmup()
@@ -66,7 +84,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 return;
             }
 
-            _warmupTask ??= Task.Run(EnsureProcessStartedAsync);
+            _warmupTask ??= Task.Run(_startProcess);
         }
     }
 
@@ -210,7 +228,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
     private void EnsureWarmupTaskLocked()
     {
-        _warmupTask ??= Task.Run(EnsureProcessStartedAsync);
+        _warmupTask ??= Task.Run(_startProcess);
     }
 
     private void QueueStateSync()
@@ -222,7 +240,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
             {
                 await SyncRequestedVisibilityStateAsync().ConfigureAwait(false);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 Logger.Warn(ex, "Failed to sync CAD load spinner visibility state.");
             }
@@ -251,7 +269,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
                 showRequestedAtStart = _requestedVisibility == VisibilityState.Visible;
                 showRequest = _latestShowRequest;
-                warmupTask = _warmupTask;
+                warmupTask = showRequestedAtStart && ResetExitedProcessLocked() ? null : _warmupTask;
             }
             CadLoadSpinnerDebugState.RecordHostStateSync(showRequestedAtStart);
 
@@ -308,7 +326,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 {
                     await warmupTask.ConfigureAwait(false);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
                 {
                     Logger.Warn(ex, "CAD load spinner warmup failed.");
                     CleanupProcess(forceKillIfStillRunning: true);
@@ -436,14 +454,18 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
             processToWait = _process;
         }
 
+        var serverReady = false;
         try
         {
             await WaitForServerReadyAsync(WarmupTimeoutMs).ConfigureAwait(false);
+            serverReady = true;
         }
-        catch
+        finally
         {
-            CleanupProcess(forceKillIfStillRunning: true);
-            throw;
+            if (!serverReady)
+            {
+                CleanupProcess(forceKillIfStillRunning: true);
+            }
         }
 
         if (processToWait is not null && processToWait.HasExited)
@@ -469,6 +491,13 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         throw new TimeoutException("CAD load spinner process did not become ready within timeout.");
     }
 
+    // The spinner is a helper process, so a failed send never ends the user's operation. The three senders below
+    // (SendRequest, SendShowRequestCoreLocked, TrySendRequest) catch the failures that sending can end in:
+    // IOException and TimeoutException (the pipe; TrySendRequestAsync already answers those two itself),
+    // InvalidOperationException (includes ObjectDisposedException; the pipe client is in a bad state),
+    // UnauthorizedAccessException (the pipe belongs to another user), NotSupportedException (JsonSerializer)
+    // and ArgumentException (includes ArgumentOutOfRangeException; the pipe name or the timeout). The send only
+    // writes, so a bad response cannot fail it. Any other exception, out-of-memory included, reaches the caller.
     private void SendRequest(CadLoadSpinnerRequest request, int timeoutMs, bool swallowIoErrors = false)
     {
         try
@@ -479,10 +508,35 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 throw new IOException($"CAD load spinner IPC command '{request.Command}' failed.");
             }
         }
-        catch when (swallowIoErrors)
+        catch (IOException) when (swallowIoErrors)
         {
-            Logger.Debug(CultureInfo.InvariantCulture, "Ignoring CAD load spinner IPC failure for command '{0}'.", request.Command);
+            LogIgnoredIpcFailure(request);
         }
+        catch (TimeoutException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+        catch (InvalidOperationException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+        catch (UnauthorizedAccessException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+        catch (NotSupportedException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+        catch (ArgumentException) when (swallowIoErrors)
+        {
+            LogIgnoredIpcFailure(request);
+        }
+    }
+
+    private static void LogIgnoredIpcFailure(CadLoadSpinnerRequest request)
+    {
+        Logger.Debug(CultureInfo.InvariantCulture, "Ignoring CAD load spinner IPC failure for command '{0}'.", request.Command);
     }
 
     private async Task<bool> TrySendRequestAsync(CadLoadSpinnerRequest request, int timeoutMs)
@@ -532,7 +586,40 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
     private bool HasRunningProcessLocked()
     {
+        if (_hasProcessExitedOverride is not null)
+        {
+            return !_hasProcessExitedOverride();
+        }
+
         return _sendRequestOverride is not null || (_process is not null && !_process.HasExited);
+    }
+
+    // The spinner process can end on its own. The warm-up task is already complete then, so without this reset
+    // no new process starts and every Show fails until the program restarts. Clearing the warm-up task makes the
+    // next sync start a new process. While the warm-up still runs, it owns the process and cleans up when it fails.
+    private bool ResetExitedProcessLocked()
+    {
+        var exited = _hasProcessExitedOverride is not null
+            ? _hasProcessExitedOverride()
+            : _sendRequestOverride is null && _process is not null && _process.HasExited;
+        if (!exited || _warmupTask is { IsCompleted: false })
+        {
+            return false;
+        }
+
+        if (_process is not null)
+        {
+            var exitCode = _process.ExitCode;
+            Logger.Warn(
+                CultureInfo.InvariantCulture,
+                "CAD load spinner process exited with code {0} at {1:O}. Starting a new one.",
+                exitCode,
+                _process.ExitTime);
+            CadLoadSpinnerDebugState.RecordHostProcessExit(exitCode);
+        }
+
+        CleanupProcess(forceKillIfStillRunning: false);
+        return true;
     }
 
     private bool SendShowRequestCoreLocked(CadLoadSpinnerRequest request)
@@ -549,7 +636,27 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
             _effectiveVisibility = VisibilityState.Visible;
             return true;
         }
-        catch
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (TimeoutException)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
         {
             return false;
         }
@@ -583,7 +690,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                     _process.WaitForExit(500);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 Logger.Warn(ex, "Failed to cleanup CAD load spinner process.");
             }
@@ -627,7 +734,27 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         {
             return TrySendRequestAsync(request, timeoutMs).GetAwaiter().GetResult();
         }
-        catch
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (TimeoutException)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
         {
             return false;
         }

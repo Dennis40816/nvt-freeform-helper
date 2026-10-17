@@ -78,14 +78,14 @@ public sealed partial class FreeformHelperViewModel
                 NotchPreviewAutoPlayEnabled = NotchPreviewAutoPlayEnabled,
                 NotchPreviewAutoPlayIntervalMs = (double)NotchPreviewAutoPlayIntervalMs,
                 NotchExportFileType = SelectedNotchExportFileTypeOption.Value.ToString(),
-                DxfLayerImagePreferredLayer = _dxfLayerImageExportPreferredLayerName,
-                DxfLayerImageWidthPixels = _dxfLayerImageExportWidthPixels,
-                DxfLayerImageHeightPixels = _dxfLayerImageExportHeightPixels,
-                DxfLayerImageLineWidthPixels = (double)_dxfLayerImageExportLineWidthPixels,
-                DxfLayerImagePaddingXPixels = _dxfLayerImageExportPaddingXPixels,
-                DxfLayerImagePaddingYPixels = _dxfLayerImageExportPaddingYPixels,
-                DxfLayerImageFormat = _dxfLayerImageExportFormat.ToString(),
-                DxfLayerImageUseDarkTheme = _dxfLayerImageExportUseDarkTheme,
+                DxfLayerImagePreferredLayer = _dxfLayerImageExportPreferences.LayerName,
+                DxfLayerImageWidthPixels = _dxfLayerImageExportPreferences.WidthPixels,
+                DxfLayerImageHeightPixels = _dxfLayerImageExportPreferences.HeightPixels,
+                DxfLayerImageLineWidthPixels = (double)_dxfLayerImageExportPreferences.LineWidthPixels,
+                DxfLayerImagePaddingXPixels = _dxfLayerImageExportPreferences.PaddingXPixels,
+                DxfLayerImagePaddingYPixels = _dxfLayerImageExportPreferences.PaddingYPixels,
+                DxfLayerImageFormat = _dxfLayerImageExportPreferences.Format.ToString(),
+                DxfLayerImageUseDarkTheme = _dxfLayerImageExportPreferences.UseDarkTheme,
                 CoordinatePixelWidth = (double)CoordinatePixelWidth,
                 CoordinatePixelHeight = (double)CoordinatePixelHeight,
                 CoordinatePreferredAaOutlineLayerName = CoordinatePreferredAaOutlineLayerName,
@@ -108,8 +108,8 @@ public sealed partial class FreeformHelperViewModel
                 OnlyClosedPolylines = ImportOnlyClosedPolylines,
                 IncludeBlockPolylines = ImportBlockPolylines,
                 LogLevel = SelectedLogLevelOption.Value,
-                RegularVisibilityMaskSourcePath = _regularVisibilityMaskSourcePath,
-                UseRegularVisibilityMask = IsRegularVisibilityMaskEnabled
+                RegularVisibilityMaskSourcePath = _regularVisibilityMask.SourcePath,
+                UseRegularVisibilityMask = RegularVisibilityMaskUi.IsEnabled
             }
         };
 

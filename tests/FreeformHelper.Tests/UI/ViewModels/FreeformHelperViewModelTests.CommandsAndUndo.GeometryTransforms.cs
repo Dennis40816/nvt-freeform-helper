@@ -130,7 +130,7 @@ public sealed partial class FreeformHelperViewModelTests
         updateVisibleCadIndexingMethod!.Invoke(vm, new object?[] { source });
 
         await SelectCadPadsAsync(vm, SelectedCad23);
-        vm.CadOutputFwDiffIndexShiftDelta = 1m;
+        vm.Step4Index.ShiftDelta = 1m;
 
         vm.OffsetSelectedCadOutputFwDiffIndicesCommand.Execute(null);
 
@@ -139,7 +139,7 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Equal(13, projectFile.CadOutputFwDiffIndexOverrides[3]);
         Assert.Equal("Shifted 2 CAD pad(s) by 1. Range 11-12 -> 12-13.", vm.StatusText);
 
-        var cadOutputFwDiffByCad = GetPrivateField<Dictionary<int, int>>(vm, "_cadOutputFwDiffIndexByCadId");
+        var cadOutputFwDiffByCad = vm.CadIndexMaps.OutputFwDiffIndexByCadId;
         Assert.Equal(10, cadOutputFwDiffByCad[1]);
         Assert.Equal(12, cadOutputFwDiffByCad[2]);
         Assert.Equal(13, cadOutputFwDiffByCad[3]);
@@ -147,7 +147,7 @@ public sealed partial class FreeformHelperViewModelTests
         vm.UndoCommand.Execute(null);
 
         Assert.Empty(projectFile.CadOutputFwDiffIndexOverrides);
-        cadOutputFwDiffByCad = GetPrivateField<Dictionary<int, int>>(vm, "_cadOutputFwDiffIndexByCadId");
+        cadOutputFwDiffByCad = vm.CadIndexMaps.OutputFwDiffIndexByCadId;
         Assert.Equal(10, cadOutputFwDiffByCad[1]);
         Assert.Equal(11, cadOutputFwDiffByCad[2]);
         Assert.Equal(12, cadOutputFwDiffByCad[3]);

@@ -36,9 +36,9 @@ public sealed partial class FreeformHelperViewModel
             Cad: cad,
             Catalog: _layerCatalogStateService.Catalog,
             LayerSelections: layerSelections,
-            PendingBoundLayerName: _pendingBoundLayerName,
+            PendingBoundLayerName: _pendingLayerSelection.BoundLayerName,
             SelectedBoundLayerName: SelectedBoundLayerOption?.Name,
-            PendingRegularSourceLayerName: _pendingRegularSourceLayerName,
+            PendingRegularSourceLayerName: _pendingLayerSelection.RegularSourceLayerName,
             SelectedRegularSourceLayerName: SelectedRegularSourceLayerOption?.Name,
             SelectedDxfEditTargetLayerName: DxfEditTargetLayerName,
             SelectedDxfEditRotationLayerName: DxfEditRotationLayerName,
@@ -85,8 +85,8 @@ public sealed partial class FreeformHelperViewModel
         DxfEditLayerOptions = new ObservableCollection<string>(snapshot.DxfEditLayerOptions);
         DxfEditTargetLayerName = snapshot.SelectedDxfEditTargetLayerName;
         DxfEditRotationLayerName = snapshot.SelectedDxfEditRotationLayerName;
-        _pendingBoundLayerName = null;
-        _pendingRegularSourceLayerName = null;
+        _pendingLayerSelection.BoundLayerName = null;
+        _pendingLayerSelection.RegularSourceLayerName = null;
         NotifyDxfEditPanelActionStateChanged();
         ApplyRegularSourceLayerAutoHidePolicy(filterCadPads: false);
         RefreshDxfRegularSourceHint();

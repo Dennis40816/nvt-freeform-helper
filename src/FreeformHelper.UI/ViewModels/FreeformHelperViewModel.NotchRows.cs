@@ -6,12 +6,12 @@ public sealed partial class FreeformHelperViewModel
 
     public IReadOnlyList<NotchRowPreview> GetLastNotchRowsForRegularPad(int regularPadId)
     {
-        if (_lastGeneratedNotchTable is null || _lastGeneratedNotchTable.Rows.Count == 0)
+        if (_notchCache.LastGeneratedTable is null || _notchCache.LastGeneratedTable.Rows.Count == 0)
         {
             return Array.Empty<NotchRowPreview>();
         }
 
-        return _lastGeneratedNotchTable.Rows
+        return _notchCache.LastGeneratedTable.Rows
             .Select((row, index) => new { row, index })
             .Where(item => item.row.RegularPadIndex == regularPadId)
             .OrderBy(item => item.index)
@@ -30,11 +30,11 @@ public sealed partial class FreeformHelperViewModel
 
     public int GetLastNotchRowCountForRegularPad(int regularPadId)
     {
-        if (_lastGeneratedNotchTable is null || _lastGeneratedNotchTable.Rows.Count == 0)
+        if (_notchCache.LastGeneratedTable is null || _notchCache.LastGeneratedTable.Rows.Count == 0)
         {
             return 0;
         }
 
-        return _lastGeneratedNotchTable.Rows.Count(row => row.RegularPadIndex == regularPadId);
+        return _notchCache.LastGeneratedTable.Rows.Count(row => row.RegularPadIndex == regularPadId);
     }
 }

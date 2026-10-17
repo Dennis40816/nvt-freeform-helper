@@ -5,7 +5,7 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private const string DiagnosticsNotRunSummary = "Diagnostics: not run.";
+    private const string DiagnosticsNotRunSummary = MappingDiagnosticsResult.NotRunSummary;
     private const string NotchExportNotRunSummary = "Notch export: not run.";
     private int _notchFinalProjectionRevision;
 
@@ -137,7 +137,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         _projectFile.FreeformOverrides.Clear();
-        ResetFreeformAutoDetectStats("Freeform stats: not run.");
+        ResetFreeformAutoDetectStats();
         NotifySimulationWorkspaceSourceChanged();
         CanvasHost?.Invalidate();
     }
@@ -150,9 +150,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void ClearStep4ResultCore()
     {
-        DxfRegularMappingSummary = DiagnosticsNotRunSummary;
-        DxfRegularMappingIssues.Clear();
-        HasDxfRegularMappingIssues = false;
+        MappingDiagnosticsResult = MappingDiagnosticsResult.CreateNotRun();
         IndexMappingProgress = 0;
     }
 
@@ -170,7 +168,7 @@ public sealed partial class FreeformHelperViewModel
         Interlocked.Increment(ref _notchFinalProjectionRevision);
         _notchExportGenerationCacheService.InvalidateCadAllocationProjectedRowCount();
         NotchExportSummary = NotchExportNotRunSummary;
-        _lastGeneratedNotchTable = null;
+        _notchCache.LastGeneratedTable = null;
         ClearNotchValidation();
     }
 

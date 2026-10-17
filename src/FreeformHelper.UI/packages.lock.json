@@ -82,13 +82,13 @@
       },
       "Nvt.Core.Avalonia": {
         "type": "Direct",
-        "requested": "[0.9.2, 0.9.2]",
-        "resolved": "0.9.2",
-        "contentHash": "/Ke+iVdmwSBvLUR0t5y8o72AC8oiNTTIs6bXxz0UkJKMsf9OQsR3VIJJAjtOYbSfPJrqyr3imPJYfy/rq6QT3g==",
+        "requested": "[0.9.4, 0.9.4]",
+        "resolved": "0.9.4",
+        "contentHash": "4hHJ6wC4eNwqZsK5N/dszzxmL9uAcCTBAbVAUt539VenVmt2SZZMa/4cKYG6vEiDmZqinOlk6Zl4p72NV+8VGw==",
         "dependencies": {
           "Avalonia": "12.1.1",
           "CommunityToolkit.Mvvm": "8.4.2",
-          "Nvt.Core": "0.9.2"
+          "Nvt.Core": "0.9.4"
         }
       },
       "Nvt.Core.Fonts": {
@@ -326,7 +326,7 @@
         "dependencies": {
           "FreeformHelper.Application": "[1.0.0, )",
           "FreeformHelper.Domain": "[1.0.0, )",
-          "Nvt.Core": "[0.9.2, 0.9.2]"
+          "Nvt.Core": "[0.9.4, 0.9.4]"
         }
       },
       "Clipper2": {
@@ -337,9 +337,9 @@
       },
       "Nvt.Core": {
         "type": "CentralTransitive",
-        "requested": "[0.9.2, 0.9.2]",
-        "resolved": "0.9.2",
-        "contentHash": "mOmTde+BQi6K8ZOffTFltLUELB/MQzO9lEWv83KkYaHnSPWk3St4hsa4YR63PDCb0vmfdCRKJunoBlrwJ31l1g=="
+        "requested": "[0.9.4, 0.9.4]",
+        "resolved": "0.9.4",
+        "contentHash": "5NfQsOFKT0jeCDmw7mMwUao6TKLAKPpmf5J7VjCnAv45vO75nghPZWbKVODRW9mwKNqkl2b0fk01pwdZA9V4bA=="
       }
     },
     "net10.0/win-arm64": {

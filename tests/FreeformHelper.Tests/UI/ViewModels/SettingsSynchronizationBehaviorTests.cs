@@ -63,8 +63,10 @@ public sealed class SettingsSynchronizationBehaviorTests
 
         pair.SetValue(1);
 
+        // The option is derived from the value, so the ignored re-entrant option change cannot leave
+        // the option behind the value (before the derivation it stayed at the re-entrant option).
         Assert.Equal(pair.Expected(1), pair.Value());
-        Assert.Equal(pair.Expected(0), pair.OptionValue());
+        Assert.Equal(pair.Expected(1), pair.OptionValue());
         pair.SetOption(1);
         pair.SetOption(0);
         Assert.Equal(pair.Expected(0), pair.Value());

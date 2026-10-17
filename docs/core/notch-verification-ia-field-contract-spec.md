@@ -30,7 +30,7 @@ Non-goals:
 - L1 diff assignment / decision truth
   - `DxfRegularMappingUseCase.Analyze(...)` + `DxfRegularMaskAuditService`。
 - L2 notch table truth
-  - The `GenerateCurrentNotchTableAsync(...)` output `NotchTable` (`_lastGeneratedNotchTable` is the latest snapshot).
+  - The `GenerateCurrentNotchTableAsync(...)` output `NotchTable` (`_notchCache.LastGeneratedTable` is the latest snapshot).
 - L3 validation trace truth
   - `NotchValidationUseCase.BuildBucket(...)` + `NotchValidationTraceService.BuildTrace(...)` (reads only L2 without recomputing notch).
 - L4 simulation projection truth
@@ -73,7 +73,7 @@ Non-goals:
   - `current mode`（geometry-only / csv-constrained）
   - `overall status`（pass / warning / blocked）
   - `open issues count` (aggregated by reasonCode)
-  - `last table revision` (corresponding `_lastGeneratedNotchTable` version/timestamp)
+  - `last table revision` (corresponding `_notchCache.LastGeneratedTable` version/timestamp)
   - `active step` (the node the user is currently reviewing)
 - Summary is read-only and cannot be edited; all changes must be triggered through step actions below it.
 
@@ -126,7 +126,7 @@ Non-goals:
 | `ApplyCadOutputFwDiffOverridesCommand` | manual override diff (batch) | L1 | Affects L2/L3/L4 |
 | `ApplySegmentDiffOverridesCommand` | manual override diff (segment) | L1 | Affects L2/L3/L4 |
 | `AnalyzeIndexMappingCommand` | No persistent write (produces a report snapshot) | L1 read | Only updates the Step4 report display |
-| `ExportNotchCommand` | `_lastGeneratedNotchTable` | L2 | Affects Step5 summary, Step6 source, and Simulation session source |
+| `ExportNotchCommand` | `_notchCache.LastGeneratedTable` | L2 | Affects Step5 summary, Step6 source, and Simulation session source |
 | `AnalyzeNotchValidationCommand` | validation trace UI state | L3 read | Updates the Step6 display |
 | `RefreshNotchCanvasPreviewCommand` | Step3 preview cache | Step3 display path | Should not write back to L1/L2 |
 

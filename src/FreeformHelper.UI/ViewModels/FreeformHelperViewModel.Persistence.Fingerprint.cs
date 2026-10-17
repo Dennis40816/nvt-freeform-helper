@@ -34,7 +34,7 @@ public sealed partial class FreeformHelperViewModel
             var hash = 1469598103934665603UL;
             hash = (hash * 1099511628211UL) ^ (uint)_notchExportFingerprintRevisions.Cad;
             hash = (hash * 1099511628211UL) ^ (uint)cad.Pads.Count;
-            hash = (hash * 1099511628211UL) ^ (uint)(_hiddenCadPadIds.Count + _autoHiddenDuplicateCadPadIds.Count);
+            hash = (hash * 1099511628211UL) ^ (uint)(_cadEdit.HiddenCadPadIds.Count + _cadEdit.AutoHiddenDuplicateCadPadIds.Count);
             return hash;
         }
     }

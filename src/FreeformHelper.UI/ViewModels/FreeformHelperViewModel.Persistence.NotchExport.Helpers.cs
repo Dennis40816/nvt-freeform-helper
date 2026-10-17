@@ -21,8 +21,7 @@ public sealed partial class FreeformHelperViewModel
                     cad,
                     grid,
                     _projectFile.Settings,
-                    _projectFile.Settings.Notch.ExportProfile,
-                    GetActiveRegularPadIdsForNotchComputation()));
+                    _projectFile.Settings.Notch.ExportProfile));
         }
 
         return (

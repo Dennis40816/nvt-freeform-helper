@@ -11,6 +11,11 @@ public sealed partial class FreeformHelperViewModel
 
     public IReadOnlyList<Step4DuplicateDiffGroupViewModel> Step4DuplicateDiffGroups => _step4DuplicateDiffGroups;
 
+    /// <summary>
+    /// Gets a value indicating whether duplicate diff groups are currently present in Step 4.
+    /// </summary>
+    public bool HasStep4DuplicateDiffGroups => _step4DuplicateDiffGroups.Length > 0;
+
     private void RefreshStep4DuplicateDiffGroups(
         IReadOnlyList<CadPad>? orderedVisiblePads = null,
         WorkflowDataSnapshot? workflowSnapshot = null)
@@ -20,9 +25,9 @@ public sealed partial class FreeformHelperViewModel
         if (orderedPads.Count == 0 || workflowSnapshot.CadOutputFwDiffIndexByCadId.Count == 0)
         {
             _step4DuplicateDiffGroups = Array.Empty<Step4DuplicateDiffGroupViewModel>();
-            HasStep4DuplicateDiffGroups = false;
-            Step4DuplicateDiffSummary = "Duplicate CAD Output FW Diff: none.";
+            Step4Index.DuplicateDiffSummary = "Duplicate CAD Output FW Diff: none.";
             OnPropertyChanged(nameof(Step4DuplicateDiffGroups));
+            OnPropertyChanged(nameof(HasStep4DuplicateDiffGroups));
             return;
         }
 
@@ -83,9 +88,9 @@ public sealed partial class FreeformHelperViewModel
                 SuggestionText: BuildDuplicateSuggestion(group)))
             .ToArray();
 
-        HasStep4DuplicateDiffGroups = _step4DuplicateDiffGroups.Length > 0;
-        Step4DuplicateDiffSummary = BuildStep4DuplicateDiffSummary(_step4DuplicateDiffGroups);
+        Step4Index.DuplicateDiffSummary = BuildStep4DuplicateDiffSummary(_step4DuplicateDiffGroups);
         OnPropertyChanged(nameof(Step4DuplicateDiffGroups));
+        OnPropertyChanged(nameof(HasStep4DuplicateDiffGroups));
     }
 
     private static string BuildDuplicateSuggestion(CadOutputFwDiffIndexDuplicateReviewGroup group)

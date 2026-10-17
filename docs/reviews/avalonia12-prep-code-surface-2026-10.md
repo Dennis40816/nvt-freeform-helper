@@ -46,7 +46,7 @@ The following UI locations total **37 files／86 matching lines**. Except for th
 | `U/ViewModels/FreeformHelperViewModel.Persistence.cs:ExportNotchTableAsync` | 2 | P1：Background queue yield |
 | `U/ViewModels/FreeformHelperViewModel.Progress.cs:CreateUiProgressReporter` | 1 | P1: background progress returns to the UI |
 | `U/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:ApplyCanvasColorDefaultsFromTokens／ResolveTokenColor` | 2 | P1: read theme／token only on the UI thread |
-| `U/ViewModels/FreeformHelperViewModel.AppSettings.cs:_appGeneralSettingsPersistTimer` | 1 | P1: DispatcherTimer; preserve the contract of deferral after Load and flush after successful Save |
+| `U/ViewModels/FreeformHelperViewModel.AppSettings.cs:_appGeneralPersistence.PersistTimer` | 1 | P1: DispatcherTimer; preserve the contract of deferral after Load and flush after successful Save |
 | `U/ViewModels/ShellViewModel.cs:ShellViewModel` constructor | 2 | P1: Background console initialization |
 | `U/ViewModels/SimulationWorkspaceViewModel.cs:_playbackTimer` | 1 | P1: Background playback timer |
 | `U/Controls/LoadingSpinner.axaml.cs:LoadingSpinner._timer`／constructor | 2 | P1: animation DispatcherTimer |

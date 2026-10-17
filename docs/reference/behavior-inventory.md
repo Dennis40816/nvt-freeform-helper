@@ -51,7 +51,7 @@ Current document baseline: FreeformHelper g1 current-state audit, production evi
   - After `Open DXF` succeeds, it clears the previously manually selected mask path and loaded result.
   - `Step 4` reads the current workflow snapshot mask directly; Notch generation consumes the CAD Output FW Diff assignment after the mask has been applied.
   - `Simulation` also uses the jointly generated notch table and intersects regular grid IDs with the active mask to form the active surface; it cannot currently be described as "Simulation only reads the table".
-- `RegularVisibilityMaskSummary` contract:
+- `RegularVisibilityMaskUi.Summary` contract:
   - `not loaded`: not yet manually imported
   - `loaded but disabled`: imported, but the toggle is off
   - `enabled`: imported and currently constraining `Step 4 / Simulation`
@@ -173,7 +173,7 @@ Marker descriptions:
 - [Status] Updates StatusText or console/log display
 
 Notes:
-- RebuildGridAsync clears selection unless SuppressSelectionClearOnRebuild is true.
+- RebuildGridAsync clears selection unless the selection holder flag SuppressClearOnRebuild is true.
 - RebuildGridAsync updates StatusText and may call FitToContent depending on requestFit/initial load.
 
 ## Completed feature baseline (2026-02)
@@ -263,7 +263,7 @@ Notes:
   - `ConsolePanel` composes the Core `Nvt.Core.Avalonia.LogConsole` controls (`ConsoleHeader`, `ConsoleToolbar`, `ConsoleListView`, `ConsoleEmptyState`) over one `ConsoleController` that `ShellViewModel.ConsoleSession` owns.
   - The Core theme tokens (`ThemeTokens.axaml`) and the two console style files stay app-level includes in `App.axaml`.
   - The terminal is expanded by default, with the initial dimensions `ConsolePanelRowHeight=300` and `ConsolePanelMinHeight=232`.
-  - The console list zooms from 80% to 300% in steps of 10% (Core 0.9.2). Ctrl and plus, Ctrl and minus, and Ctrl and 0 work while the list has focus. Ctrl and the mouse wheel work over the list with or without focus. The zoom scales the row height, the column widths and the text of the rows. It does not scale the toolbar, the header or the jump button. `ConsoleSession` keeps the value for the session of the shell, and the panel assigns it to the list when it creates the list. The value is not saved to the project or to the app settings, so it returns to 100% at the next start. The old terminal changed a font size in points with Ctrl +/-. That value no longer exists. The base font follows the Core Body font role.
+  - The console list zooms from 80% to 300% in steps of 10% (Core 0.9.4). Ctrl and plus, Ctrl and minus, and Ctrl and 0 work while the list has focus. Ctrl and the mouse wheel work over the list with or without focus. The zoom scales the row height, the column widths and the text of the rows. It does not scale the toolbar, the header or the jump button. `ConsoleSession` keeps the value for the session of the shell, and the panel assigns it to the list when it creates the list. The value is not saved to the project or to the app settings, so it returns to 100% at the next start. The old terminal changed a font size in points with Ctrl +/-. That value no longer exists. The base font follows the Core Body font role.
   - Copy visible, Copy selection and Save log write the time in UTC (the Core export has no time zone option). The list and the RuntimeQuery `terminal` command show local time.
   - A link opens on Ctrl+click or Ctrl+Enter. A plain click only selects the row. This is the Core 0.9.1 behavior. The old terminal opened a link on a plain click.
   - The Core scanner treats text as a link when it is an http or https URL or a path with a separator or a location suffix. A bare file name with neither (for example `notch_review.csv`) is not a link. A path with a separator is a link whatever its extension, because the old extension allowlist is gone. The repository-root search for a relative path starts from the current folder and the application folder only.
@@ -341,9 +341,9 @@ Notes:
   - [Rebuild] [View] [Status]
 - OnCadLineOpacityChanged / OnRegularLineOpacityChanged
   - [Rebuild] [Status]
-- OnSelectedScanOrderOptionChanged / OnSelectedScanOrderChanged
+- OnSelectedScanOrderChanged (SelectedScanOrderOption is derived from the value)
   - [Rebuild] [Status]
-- OnSelectedGridAlignmentOptionChanged / OnGridAlignmentModeChanged
+- OnGridAlignmentModeChanged (SelectedGridAlignmentOption is derived from the value)
   - [Rebuild] [View] [Status]
 - OnXChannelsChanged / OnYChannelsChanged / OnCascadeNumChanged / OnGridPaddingPercentChanged
   - [Rebuild] [View] [Status]
