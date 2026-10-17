@@ -120,12 +120,6 @@ public sealed partial class FreeformHelperViewModel
     }
 
     /// <summary>
-    /// Gets or sets the latest pad inspector snapshot used by popover/CLI/right-side details.
-    /// </summary>
-    [ObservableProperty]
-    private PadInspectorSnapshot? _currentPadInspectorSnapshot;
-
-    /// <summary>
     /// Gets or sets the text and lines that the pad inspector panels show for the current snapshot.
     /// The properties below read from this one value.
     /// </summary>
@@ -137,12 +131,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool HasPadInspectorSummary => PadInspectorDisplay.HasSummary;
     public bool HasNoPadInspectorSummary => !HasPadInspectorSummary;
-
-    /// <summary>
-    /// Gets or sets whether CAD inspector notch details are being refreshed in background.
-    /// </summary>
-    [ObservableProperty]
-    private bool _isPadInspectorDeferredRefreshPending;
 
     /// <summary>
     /// Gets or sets whether right panel is currently on Settings tab.

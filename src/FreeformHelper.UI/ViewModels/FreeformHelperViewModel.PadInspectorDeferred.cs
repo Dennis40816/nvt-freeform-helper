@@ -247,7 +247,7 @@ public sealed partial class FreeformHelperViewModel
                     return;
                 }
 
-                CurrentPadInspectorSnapshot = snapshot;
+                PadInspectorUi.Snapshot = snapshot;
                 Logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: CAD={0}, elapsed={1}ms (delay={2}ms).",
                     request.CadPad.Id,
                     sw.ElapsedMilliseconds,
@@ -313,7 +313,7 @@ public sealed partial class FreeformHelperViewModel
                     return;
                 }
 
-                CurrentPadInspectorSnapshot = snapshot;
+                PadInspectorUi.Snapshot = snapshot;
                 Logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: REG={0}, elapsed={1}ms (delay={2}ms).",
                     regularPadId,
                     sw.ElapsedMilliseconds,
@@ -408,7 +408,7 @@ public sealed partial class FreeformHelperViewModel
             return false;
         }
 
-        return CurrentPadInspectorSnapshot?.Cad?.CadPadId == request.CadPad.Id;
+        return PadInspectorUi.Snapshot?.Cad?.CadPadId == request.CadPad.Id;
     }
 
     private bool CanApplyDeferredRegularInspectorSnapshot(long requestId, int regularPadId, long selectionRevision)
@@ -423,12 +423,12 @@ public sealed partial class FreeformHelperViewModel
             return false;
         }
 
-        return CurrentPadInspectorSnapshot?.Regular?.RegularPadId == regularPadId;
+        return PadInspectorUi.Snapshot?.Regular?.RegularPadId == regularPadId;
     }
 
     private void UpdatePadInspectorDeferredRefreshPendingState()
     {
-        IsPadInspectorDeferredRefreshPending =
+        PadInspectorUi.IsDeferredRefreshPending =
             _padInspectorDeferredRefreshCts is not null ||
             _regularPadInspectorDeferredRefreshCts is not null;
     }

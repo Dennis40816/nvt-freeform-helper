@@ -29,13 +29,13 @@ public sealed partial class FreeformHelperViewModelTests
 
             vm.ApplyCanvasSelection([cad.Id], Array.Empty<int>());
 
-            var immediateInspector = Assert.IsType<CadPadInspectorSnapshot>(vm.CurrentPadInspectorSnapshot?.Cad);
+            var immediateInspector = Assert.IsType<CadPadInspectorSnapshot>(vm.PadInspectorUi.Snapshot?.Cad);
             Assert.Null(immediateInspector.Notch);
             Assert.Equal("Notch rows: computing...", immediateInspector.NotchRowSummary);
             var preview = Assert.Single(vm.NotchCanvasPreviewItems);
             var previewResolved = vm.GetCadV22ResolvedResult(cad.Id);
             Assert.NotNull(previewResolved);
-            Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.True(vm.PadInspectorUi.IsDeferredRefreshPending);
             Assert.Equal(missesBeforeSelection + 1, vm.GetNotchCompensationCacheMetrics().MissCount);
             Assert.Equal(previewResolved.Compensation.ToRegularRatio, preview.ToRegularRatio);
             Assert.Equal(previewResolved.Compensation.ToFullRatio, preview.ToFullRatio);
@@ -46,8 +46,8 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Same(previewResolved.Stage3FinalOutlinePolygons, preview.ToFullFinalOutlinePolygons);
 
             await WaitForConditionAsync(
-                () => !vm.IsPadInspectorDeferredRefreshPending &&
-                    vm.CurrentPadInspectorSnapshot?.Cad?.Notch is not null,
+                () => !vm.PadInspectorUi.IsDeferredRefreshPending &&
+                    vm.PadInspectorUi.Snapshot?.Cad?.Notch is not null,
                 timeoutMs: 3000);
 
             var inspectorResolved = vm.GetCadV22ResolvedResult(cad.Id);
@@ -85,7 +85,7 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Equal(revision, vm.GetNotchStep3Revision());
             AssertNotchDetailProjectsResolved(vm, cad, resolved, detail);
             await WaitForConditionAsync(
-                () => !vm.IsPadInspectorDeferredRefreshPending,
+                () => !vm.PadInspectorUi.IsDeferredRefreshPending,
                 timeoutMs: 3000);
         }
         finally
@@ -110,7 +110,7 @@ public sealed partial class FreeformHelperViewModelTests
             vm.EnableToFull = false;
             vm.ApplyCanvasSelection(selectedCadIds, Array.Empty<int>());
             Assert.Empty(vm.NotchCanvasPreviewItems);
-            Assert.False(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.False(vm.PadInspectorUi.IsDeferredRefreshPending);
 
             var detail = await OpenNotchDetailForTestAsync(vm);
             var cad = detail.CadPad;
@@ -206,8 +206,8 @@ public sealed partial class FreeformHelperViewModelTests
                 (target.IcIndex, target.DiffIndex, target.Ratio, target.RatioPercentRounded, target.IsAnchorDiff));
 
             await WaitForConditionAsync(
-                () => !vm.IsPadInspectorDeferredRefreshPending &&
-                    vm.CurrentPadInspectorSnapshot?.Cad?.Notch is not null,
+                () => !vm.PadInspectorUi.IsDeferredRefreshPending &&
+                    vm.PadInspectorUi.Snapshot?.Cad?.Notch is not null,
                 timeoutMs: 3000);
             Assert.Same(resolved, vm.GetCadV22ResolvedResult(cadA.Id));
             AssertInspectorProjectsResolved(vm, cadA.Id, resolved);
@@ -340,7 +340,7 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Contains($"C={expectedCombinedPercent}%", generatorRow.Comment, StringComparison.Ordinal);
         }
 
-        vm.CurrentPadInspectorSnapshot = vm.BuildCadPadInspectorSnapshot(cad.Id);
+        vm.PadInspectorUi.Snapshot = vm.BuildCadPadInspectorSnapshot(cad.Id);
         AssertInspectorProjectsResolved(vm, cad.Id, resolved);
         var combinedLine = Assert.Single(
             vm.PadInspectorCompensationLines,
@@ -365,23 +365,23 @@ public sealed partial class FreeformHelperViewModelTests
                 includeNotchRowEligibilityDetails: false,
                 includeMatchDetails: false,
                 includeRuleTrace: false);
-            vm.CurrentPadInspectorSnapshot = initial;
+            vm.PadInspectorUi.Snapshot = initial;
             Assert.Null(initial?.Cad?.Notch);
             Assert.Equal("Notch rows: computing...", initial?.Cad?.NotchRowSummary);
             var missesBeforeRefresh = vm.GetNotchCompensationCacheMetrics().MissCount;
 
             vm.QueueDeferredCadInspectorSnapshotRefresh(cad.Id);
             await WaitForConditionAsync(
-                () => !vm.IsPadInspectorDeferredRefreshPending &&
-                    vm.CurrentPadInspectorSnapshot?.Cad?.Notch is not null,
+                () => !vm.PadInspectorUi.IsDeferredRefreshPending &&
+                    vm.PadInspectorUi.Snapshot?.Cad?.Notch is not null,
                 timeoutMs: 3000);
 
             var first = vm.GetCadV22ResolvedResult(cad.Id);
             var second = vm.GetCadV22ResolvedResult(cad.Id);
             Assert.NotNull(first);
             Assert.Same(first, second);
-            Assert.Equal(cad.Id, vm.CurrentPadInspectorSnapshot?.Cad?.CadPadId);
-            Assert.NotEqual("Notch rows: computing...", vm.CurrentPadInspectorSnapshot?.Cad?.NotchRowSummary);
+            Assert.Equal(cad.Id, vm.PadInspectorUi.Snapshot?.Cad?.CadPadId);
+            Assert.NotEqual("Notch rows: computing...", vm.PadInspectorUi.Snapshot?.Cad?.NotchRowSummary);
             Assert.Equal(missesBeforeRefresh + 1, vm.GetNotchCompensationCacheMetrics().MissCount);
             AssertInspectorProjectsResolved(vm, cad.Id, first);
         }
@@ -406,19 +406,19 @@ public sealed partial class FreeformHelperViewModelTests
             vm.ApplyCanvasSelection([latest.Id], Array.Empty<int>());
 
             await WaitForConditionAsync(
-                () => !vm.IsPadInspectorDeferredRefreshPending &&
-                    vm.CurrentPadInspectorSnapshot?.Cad?.Notch is not null,
+                () => !vm.PadInspectorUi.IsDeferredRefreshPending &&
+                    vm.PadInspectorUi.Snapshot?.Cad?.Notch is not null,
                 timeoutMs: 3000);
 
-            Assert.Equal(latest.Id, vm.CurrentPadInspectorSnapshot?.Cad?.CadPadId);
+            Assert.Equal(latest.Id, vm.PadInspectorUi.Snapshot?.Cad?.CadPadId);
             Assert.Equal(latest.Id, Assert.Single(vm.NotchCanvasPreviewItems).CadPadId);
 
             vm.ApplyCanvasSelection([first.Id], Array.Empty<int>());
-            Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.True(vm.PadInspectorUi.IsDeferredRefreshPending);
             vm.ApplyCanvasSelection(Array.Empty<int>(), Array.Empty<int>());
 
-            Assert.False(vm.IsPadInspectorDeferredRefreshPending);
-            Assert.Null(vm.CurrentPadInspectorSnapshot);
+            Assert.False(vm.PadInspectorUi.IsDeferredRefreshPending);
+            Assert.Null(vm.PadInspectorUi.Snapshot);
             Assert.Empty(vm.NotchCanvasPreviewItems);
         }
         finally
@@ -439,7 +439,7 @@ public sealed partial class FreeformHelperViewModelTests
             var overridden = vm.GetCadV22ResolvedResult(cad.Id, strictOverlapRatioOverride: 1.0);
             Assert.NotNull(overridden);
 
-            vm.CurrentPadInspectorSnapshot = vm.BuildCadPadInspectorSnapshot(cad.Id);
+            vm.PadInspectorUi.Snapshot = vm.BuildCadPadInspectorSnapshot(cad.Id);
             var current = vm.GetCadV22ResolvedResult(cad.Id);
 
             Assert.NotNull(current);
@@ -496,8 +496,8 @@ public sealed partial class FreeformHelperViewModelTests
             var cad = Assert.Single(vm.CadPads, static pad => pad.Layer == "signal-a");
             vm.ApplyCanvasSelection([cad.Id], Array.Empty<int>());
             await WaitForConditionAsync(
-                () => !vm.IsPadInspectorDeferredRefreshPending &&
-                    vm.CurrentPadInspectorSnapshot?.Cad?.Notch is not null,
+                () => !vm.PadInspectorUi.IsDeferredRefreshPending &&
+                    vm.PadInspectorUi.Snapshot?.Cad?.Notch is not null,
                 timeoutMs: 3000);
             var revision = vm.GetNotchStep3Revision();
             var resolved = vm.GetCadV22ResolvedResult(cad.Id);
@@ -528,7 +528,7 @@ public sealed partial class FreeformHelperViewModelTests
             AssertNotchDetailProjectsResolved(vm, cad, resolved, await OpenNotchDetailForTestAsync(vm));
 
             vm.QueueDeferredCadInspectorSnapshotRefresh(cad.Id);
-            Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.True(vm.PadInspectorUi.IsDeferredRefreshPending);
 
             vm.ToFullStrictOverlapPercent += 0.1m;
 
@@ -538,8 +538,8 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.NotSame(resolved, invalidated);
             AssertNotchDetailProjectsResolved(vm, cad, invalidated, await OpenNotchDetailForTestAsync(vm));
             await WaitForConditionAsync(
-                () => !vm.IsPadInspectorDeferredRefreshPending &&
-                    vm.CurrentPadInspectorSnapshot?.Cad?.Notch is not null,
+                () => !vm.PadInspectorUi.IsDeferredRefreshPending &&
+                    vm.PadInspectorUi.Snapshot?.Cad?.Notch is not null,
                 timeoutMs: 3000);
             Assert.Same(invalidated, vm.GetCadV22ResolvedResult(cad.Id));
             AssertInspectorProjectsResolved(vm, cad.Id, invalidated);
@@ -607,7 +607,7 @@ public sealed partial class FreeformHelperViewModelTests
         int cadPadId,
         NotchV22ResolvedResult resolved)
     {
-        var inspector = Assert.IsType<PadInspectorNotchSnapshot>(vm.CurrentPadInspectorSnapshot?.Cad?.Notch);
+        var inspector = Assert.IsType<PadInspectorNotchSnapshot>(vm.PadInspectorUi.Snapshot?.Cad?.Notch);
         Assert.Equal(resolved.Compensation.ToRegularRatio, inspector.ToRegularRatio);
         Assert.Equal(resolved.Compensation.ToFullRatio, inspector.ToFullRatio);
         Assert.Equal(resolved.Compensation.CombinedRatio, inspector.CombinedRatio);
