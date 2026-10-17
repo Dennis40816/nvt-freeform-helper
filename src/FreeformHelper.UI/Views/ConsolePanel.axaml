@@ -44,7 +44,9 @@
             RowDefinitions="Auto,*"
             IsVisible="{Binding IsConsoleExpanded}">
         <logConsole:ConsoleToolbar Grid.Row="0"
-                                   Controller="{Binding ConsoleSession.Controller}"/>
+                                   Controller="{Binding ConsoleSession.Controller}"
+                                   List="{Binding #ConsoleList}"
+                                   CopyVisibleCommand="{Binding ConsoleSession.CopyVisibleCommand}"/>
         <Border Grid.Row="1"
                 Background="{DynamicResource BrushBgApp}"
                 BorderBrush="{DynamicResource BrushBorder}"

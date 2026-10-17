@@ -72,6 +72,16 @@ public sealed class ConsoleZoomTests
         Assert.Equal(ConsoleListView.MaximumZoom, console.Shell.ConsoleSession.Zoom);
     }
 
+    [AvaloniaFact]
+    public void ConsoleToolbar_InThePanel_IsWiredToTheListAndTheCopyVisibleCommand()
+    {
+        using var console = new ZoomFixture(1.0);
+
+        // Core disables the zoom, jump and copy buttons until both are set.
+        Assert.Same(console.List, console.Toolbar.List);
+        Assert.Same(console.Shell.ConsoleSession.CopyVisibleCommand, console.Toolbar.CopyVisibleCommand);
+    }
+
     private sealed class ZoomFixture : IDisposable
     {
         private readonly LoggingConfiguration? _previousConfiguration;
@@ -88,6 +98,7 @@ public sealed class ConsoleZoomTests
             Window.Show();
             HeadlessUiPump.Drain(Window);
             List = Window.GetVisualDescendants().OfType<ConsoleListView>().First();
+            Toolbar = Window.GetVisualDescendants().OfType<ConsoleToolbar>().First();
         }
 
         public ShellViewModel Shell { get; }
@@ -95,6 +106,8 @@ public sealed class ConsoleZoomTests
         public MainWindow Window { get; }
 
         public ConsoleListView List { get; }
+
+        public ConsoleToolbar Toolbar { get; }
 
         public void Dispose()
         {
