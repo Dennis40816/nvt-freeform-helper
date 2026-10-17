@@ -114,7 +114,7 @@
             </Grid>
             <Grid Classes="infoTierRow"
                   ColumnDefinitions="Auto,*"
-                  IsVisible="{Binding IsPadInspectorDeferredRefreshPending}">
+                  IsVisible="{Binding PadInspectorUi.IsDeferredRefreshPending}">
               <Border Classes="infoTierDot trace"/>
               <SelectableTextBlock Grid.Column="1"
                                    Classes="stepNote"
@@ -142,7 +142,7 @@
                                    Text="Snapshot details"
                                    FontWeight="SemiBold"/>
             </Grid>
-            <ContentControl Content="{Binding CurrentPadInspectorSnapshot}">
+            <ContentControl Content="{Binding PadInspectorUi.Snapshot}">
               <ContentControl.DataTemplates>
                 <DataTemplate DataType="{x:Type vm:PadInspectorSnapshot}">
                   <Grid ColumnDefinitions="Auto,8,*"
@@ -172,7 +172,7 @@
                 </DataTemplate>
               </ContentControl.DataTemplates>
             </ContentControl>
-            <ContentControl Content="{Binding CurrentPadInspectorSnapshot}">
+            <ContentControl Content="{Binding PadInspectorUi.Snapshot}">
               <ContentControl.DataTemplates>
                 <DataTemplate DataType="{x:Type vm:PadInspectorSnapshot}">
                   <Grid ColumnDefinitions="Auto,8,*"

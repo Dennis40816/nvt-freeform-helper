@@ -253,7 +253,7 @@ File: `src/FreeformHelper.Application/Services/DxfOverlapAnalyzer.cs`
 - This proves only display data consolidation, not that repository-wide compensation computation already has a single entry point. R13.102a-1/R13.102b-1 have made Step3 preview, deferred Inspector, and normal Notch Detail command share a revisioned per-CAD resolved result; the export generator and the remaining readers' per-CAD/per-IC batches are still R13.102/102a debt.
 - Status:
   - Complete: Popover (single selection) and `query pad` read the same snapshot; `RuleTrace` is displayed in both Popover and CLI.
-  - Complete: ViewModel adds `CurrentPadInspectorSnapshot` (for integration with the right/top information layers).
+  - Complete: ViewModel adds `PadInspectorUi.Snapshot` (for integration with the right/top information layers).
   - Complete: the right detail area binds directly to the snapshot, replacing scattered presentation field sources.
 
 ### 15.3 UI Information Layers (Avoid Duplication and Confusion)

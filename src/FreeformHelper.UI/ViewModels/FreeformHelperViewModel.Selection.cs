@@ -171,7 +171,7 @@ public sealed partial class FreeformHelperViewModel
         {
             CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
             var cadId = _selectedCadIds.First();
-            CurrentPadInspectorSnapshot = BuildCadPadInspectorSnapshot(
+            PadInspectorUi.Snapshot = BuildCadPadInspectorSnapshot(
                 cadId,
                 includeExpensiveNotchDetails: false,
                 includeNotchRowEligibilityDetails: false,
@@ -187,7 +187,7 @@ public sealed partial class FreeformHelperViewModel
             // Keep inspector lightweight and avoid blocking the selection interaction.
             CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: true);
             CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
-            CurrentPadInspectorSnapshot = null;
+            PadInspectorUi.Snapshot = null;
             return;
         }
 
@@ -198,7 +198,7 @@ public sealed partial class FreeformHelperViewModel
             var primaryRegular = RegularPads.FirstOrDefault(pad => pad.Index == selectedRegularIndex);
             if (primaryRegular is not null)
             {
-                CurrentPadInspectorSnapshot = BuildRegularPadInspectorSnapshot(
+                PadInspectorUi.Snapshot = BuildRegularPadInspectorSnapshot(
                     primaryRegular.RegularPadId,
                     includeMatchDetails: false,
                     includeRuleTrace: false);
@@ -209,12 +209,12 @@ public sealed partial class FreeformHelperViewModel
         else if (_selection.RegularIndices.Count > 1)
         {
             CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
-            CurrentPadInspectorSnapshot = null;
+            PadInspectorUi.Snapshot = null;
             return;
         }
 
         CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
-        CurrentPadInspectorSnapshot = null;
+        PadInspectorUi.Snapshot = null;
     }
 
     /// <summary>

@@ -379,7 +379,7 @@ public sealed partial class FreeformHelperViewModelTests
         {
             var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
             var cad = Assert.Single(vm.CadPads, static pad => pad.Layer == "signal-a");
-            vm.CurrentPadInspectorSnapshot = vm.BuildCadPadInspectorSnapshot(
+            vm.PadInspectorUi.Snapshot = vm.BuildCadPadInspectorSnapshot(
                 cad.Id,
                 includeExpensiveNotchDetails: false,
                 includeNotchRowEligibilityDetails: false,
@@ -390,11 +390,11 @@ public sealed partial class FreeformHelperViewModelTests
             vm.BackgroundWork.Runner = work;
 
             vm.QueueDeferredCadInspectorSnapshotRefresh(cad.Id);
-            Assert.True(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.True(vm.PadInspectorUi.IsDeferredRefreshPending);
             await work.LastStartedAsync(FreeformHelperViewModel.DeferredCadInspectorRefreshWorkName);
 
             Assert.True(trap.Fired);
-            Assert.False(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.False(vm.PadInspectorUi.IsDeferredRefreshPending);
         }
         finally
         {
@@ -411,7 +411,7 @@ public sealed partial class FreeformHelperViewModelTests
         {
             var vm = await CreateSingleCadNotchPreviewViewModelAsync(dxfPath);
             var cad = Assert.Single(vm.CadPads, static pad => pad.Layer == "signal-a");
-            vm.CurrentPadInspectorSnapshot = vm.BuildCadPadInspectorSnapshot(
+            vm.PadInspectorUi.Snapshot = vm.BuildCadPadInspectorSnapshot(
                 cad.Id,
                 includeExpensiveNotchDetails: false,
                 includeNotchRowEligibilityDetails: false,
@@ -426,7 +426,7 @@ public sealed partial class FreeformHelperViewModelTests
                 work.LastStartedAsync(FreeformHelperViewModel.DeferredCadInspectorRefreshWorkName));
 
             Assert.True(trap.Fired);
-            Assert.False(vm.IsPadInspectorDeferredRefreshPending);
+            Assert.False(vm.PadInspectorUi.IsDeferredRefreshPending);
         }
         finally
         {
@@ -449,7 +449,7 @@ public sealed partial class FreeformHelperViewModelTests
         var cad = Assert.Single(vm.CadPads, static pad => pad.Layer == "signal-a");
         vm.ApplyCanvasSelection([cad.Id], Array.Empty<int>());
         await WaitForConditionAsync(
-            () => !vm.IsPadInspectorDeferredRefreshPending && vm.IsNotchCanvasPreviewVisible,
+            () => !vm.PadInspectorUi.IsDeferredRefreshPending && vm.IsNotchCanvasPreviewVisible,
             timeoutMs: 3000);
     }
 
@@ -460,17 +460,17 @@ public sealed partial class FreeformHelperViewModelTests
         new(vm, nameof(vm.NotchPreviewVisualizationStep), failure);
 
     private static OnceThrowingPropertyChange FailOnSnapshotChange(FreeformHelperViewModel vm, Exception failure) =>
-        new(vm, nameof(vm.CurrentPadInspectorSnapshot), failure);
+        new(vm.PadInspectorUi, nameof(PadInspectorUiState.Snapshot), failure);
 
     // Throws the failure from the first change notification of one property, then lets later changes pass.
     private sealed class OnceThrowingPropertyChange : IDisposable
     {
-        private readonly FreeformHelperViewModel _vm;
+        private readonly INotifyPropertyChanged _vm;
         private readonly string _propertyName;
         private readonly Exception _failure;
         private int _fired;
 
-        public OnceThrowingPropertyChange(FreeformHelperViewModel vm, string propertyName, Exception failure)
+        public OnceThrowingPropertyChange(INotifyPropertyChanged vm, string propertyName, Exception failure)
         {
             _vm = vm;
             _propertyName = propertyName;

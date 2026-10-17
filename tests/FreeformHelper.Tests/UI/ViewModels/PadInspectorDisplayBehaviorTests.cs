@@ -40,7 +40,7 @@ public sealed class PadInspectorDisplayBehaviorTests
     {
         var vm = new FreeformHelperViewModel();
 
-        vm.CurrentPadInspectorSnapshot = CreateCadSnapshot(274);
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
 
         Assert.True(vm.HasPadInspectorSummary);
         Assert.False(vm.HasNoPadInspectorSummary);
@@ -55,7 +55,7 @@ public sealed class PadInspectorDisplayBehaviorTests
     {
         var vm = new FreeformHelperViewModel();
 
-        vm.CurrentPadInspectorSnapshot = CreateCadSnapshot(274);
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
 
         Assert.Equal(2, vm.PadInspectorCompensationLines.Count);
         Assert.Contains("Unavailable", vm.PadInspectorCompensationText, StringComparison.Ordinal);
@@ -66,7 +66,7 @@ public sealed class PadInspectorDisplayBehaviorTests
     {
         var vm = new FreeformHelperViewModel();
 
-        vm.CurrentPadInspectorSnapshot = CreateCadSnapshot(274);
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
 
         Assert.True(vm.HasPadInspectorRuleTrace);
         Assert.Single(vm.PadInspectorRuleTraceSections);
@@ -80,7 +80,7 @@ public sealed class PadInspectorDisplayBehaviorTests
     {
         var vm = new FreeformHelperViewModel();
 
-        vm.CurrentPadInspectorSnapshot = CreateRegularSnapshot(4616);
+        vm.PadInspectorUi.Snapshot = CreateRegularSnapshot(4616);
 
         Assert.True(vm.HasPadInspectorSummary);
         Assert.Equal("REG 4616 · Diff 72", vm.PadInspectorCompactHeaderText);
@@ -94,7 +94,7 @@ public sealed class PadInspectorDisplayBehaviorTests
     {
         var vm = new FreeformHelperViewModel();
 
-        vm.CurrentPadInspectorSnapshot = CreateRegularSnapshot(4616);
+        vm.PadInspectorUi.Snapshot = CreateRegularSnapshot(4616);
 
         Assert.False(vm.HasPadInspectorRuleTrace);
         Assert.Empty(vm.PadInspectorRuleTraceSections);
@@ -103,15 +103,13 @@ public sealed class PadInspectorDisplayBehaviorTests
     [Fact]
     public void CurrentPadInspectorSnapshot_Cleared_ResetsTextsAndCollapsesTrace()
     {
-        var vm = new FreeformHelperViewModel
-        {
-            CurrentPadInspectorSnapshot = CreateCadSnapshot(274),
-            IsPadInspectorTraceExpanded = true,
-            IsPadInspectorTracePopupOpen = true,
-            IsPadInspectorRawTraceExpanded = true,
-        };
+        var vm = new FreeformHelperViewModel();
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
+        vm.IsPadInspectorTraceExpanded = true;
+        vm.IsPadInspectorTracePopupOpen = true;
+        vm.IsPadInspectorRawTraceExpanded = true;
 
-        vm.CurrentPadInspectorSnapshot = null;
+        vm.PadInspectorUi.Snapshot = null;
 
         Assert.False(vm.HasPadInspectorSummary);
         Assert.True(vm.HasNoPadInspectorSummary);
@@ -127,15 +125,13 @@ public sealed class PadInspectorDisplayBehaviorTests
     [Fact]
     public void CurrentPadInspectorSnapshot_Replaced_KeepsTraceExpandedAndClosesPopup()
     {
-        var vm = new FreeformHelperViewModel
-        {
-            CurrentPadInspectorSnapshot = CreateCadSnapshot(274),
-            IsPadInspectorTraceExpanded = true,
-            IsPadInspectorTracePopupOpen = true,
-            IsPadInspectorRawTraceExpanded = true,
-        };
+        var vm = new FreeformHelperViewModel();
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
+        vm.IsPadInspectorTraceExpanded = true;
+        vm.IsPadInspectorTracePopupOpen = true;
+        vm.IsPadInspectorRawTraceExpanded = true;
 
-        vm.CurrentPadInspectorSnapshot = CreateCadSnapshot(275);
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(275);
 
         Assert.True(vm.IsPadInspectorTraceExpanded);
         Assert.False(vm.IsPadInspectorTracePopupOpen);
@@ -148,7 +144,7 @@ public sealed class PadInspectorDisplayBehaviorTests
         var vm = new FreeformHelperViewModel();
         var changes = RecordNotifications(vm, _summaryNames);
 
-        vm.CurrentPadInspectorSnapshot = CreateCadSnapshot(274);
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
 
         Assert.Equal(_summaryNames.Order(StringComparer.Ordinal), changes.OfType<string>().Order(StringComparer.Ordinal));
     }
@@ -156,10 +152,11 @@ public sealed class PadInspectorDisplayBehaviorTests
     [Fact]
     public void CurrentPadInspectorSnapshot_SecondSnapshotWithSameTexts_RaisesOnlyCollectionProperties()
     {
-        var vm = new FreeformHelperViewModel { CurrentPadInspectorSnapshot = CreateCadSnapshot(274) };
+        var vm = new FreeformHelperViewModel();
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
         var changes = RecordNotifications(vm, _summaryNames);
 
-        vm.CurrentPadInspectorSnapshot = CreateCadSnapshot(274) with { Kind = "cad-again" };
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274) with { Kind = "cad-again" };
 
         string[] expected =
         [
@@ -176,7 +173,7 @@ public sealed class PadInspectorDisplayBehaviorTests
         var vm = new FreeformHelperViewModel();
         var changes = RecordNotifications(vm, _summaryNames);
 
-        vm.CurrentPadInspectorSnapshot = new PadInspectorSnapshot("none", null, null);
+        vm.PadInspectorUi.Snapshot = new PadInspectorSnapshot("none", null, null);
 
         string[] expected =
         [
