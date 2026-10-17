@@ -479,14 +479,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public string DxfRegularMappingSummary => MappingDiagnosticsResult.Summary;
     /// <summary>
-    /// Gets or sets a summary message for the externally measured regular visibility mask.
-    /// </summary>
-    [ObservableProperty] private string _regularVisibilityMaskSummary = "Regular visibility mask: not loaded. Import Regular Visibility Mask (SeeRegular.csv) in Step 1 to constrain Step 4 and Simulation.";
-    /// <summary>
-    /// Gets or sets a value indicating whether the imported regular visibility mask should constrain Step 4 and Simulation.
-    /// </summary>
-    [ObservableProperty] private bool _isRegularVisibilityMaskEnabled;
-    /// <summary>
     /// Gets or sets a value indicating whether pad matching is currently running.
     /// </summary>
     public bool IsMatchingPads

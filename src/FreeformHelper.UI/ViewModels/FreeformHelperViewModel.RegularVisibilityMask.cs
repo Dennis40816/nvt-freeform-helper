@@ -11,6 +11,12 @@ public sealed partial class FreeformHelperViewModel
 
     private readonly RegularVisibilityMaskState _regularVisibilityMask = new(); // Holds the loaded regular visibility mask and where it came from.
 
+    private RegularVisibilityMaskUiState? _regularVisibilityMaskUi; // Created on first read so that the enabled-change callback can point at this instance.
+
+    /// <summary>Gets the mask values that the Step 1 and Step 4 views bind to.</summary>
+    public RegularVisibilityMaskUiState RegularVisibilityMaskUi =>
+        _regularVisibilityMaskUi ??= new RegularVisibilityMaskUiState(OnRegularVisibilityMaskEnabledChanged);
+
     /// <summary>Gets the mask data so that tests can read it without reflection.</summary>
     internal RegularVisibilityMaskState RegularVisibilityMaskForTests => _regularVisibilityMask;
 
@@ -56,7 +62,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetRegularVisibilityMaskEnabled(value: false, refreshAssignment: true);
-        SetStatus(RegularVisibilityMaskSummary);
+        SetStatus(RegularVisibilityMaskUi.Summary);
     }
 
     private void RefreshRegularVisibilityMask(RegularGrid grid)
@@ -112,7 +118,7 @@ public sealed partial class FreeformHelperViewModel
     {
         var hadMask = !string.IsNullOrWhiteSpace(_regularVisibilityMask.SourcePath) ||
                       _regularVisibilityMask.Mask.HasLoadedMask ||
-                      IsRegularVisibilityMaskEnabled;
+                      RegularVisibilityMaskUi.IsEnabled;
 
         _regularVisibilityMask.SourcePath = null;
         _regularVisibilityMask.EmbeddedMask = null;
@@ -148,7 +154,7 @@ public sealed partial class FreeformHelperViewModel
     {
         _regularVisibilityMask.Mask = result;
         InvalidateWorkflowDataSnapshot();
-        RegularVisibilityMaskSummary = BuildRegularVisibilityMaskSummary(result, grid, IsRegularVisibilityMaskEnabled);
+        RegularVisibilityMaskUi.Summary = BuildRegularVisibilityMaskSummary(result, grid, RegularVisibilityMaskUi.IsEnabled);
         RefreshStep4DuplicateDiffGroups();
 
         if (result.HasLoadedMask)
@@ -160,7 +166,7 @@ public sealed partial class FreeformHelperViewModel
                 result.ActiveRegularCount,
                 result.InactiveRegularCount,
                 result.FrameCount,
-                IsRegularVisibilityMaskEnabled ? "Y" : "N");
+                RegularVisibilityMaskUi.IsEnabled ? "Y" : "N");
         }
         else if (result.Status == RegularVisibilityMaskStatus.Incompatible)
         {
@@ -182,7 +188,7 @@ public sealed partial class FreeformHelperViewModel
 
     private IReadOnlySet<int>? GetActiveRegularVisibilityMaskPadIds()
     {
-        return IsRegularVisibilityMaskEnabled && _regularVisibilityMask.Mask.HasLoadedMask
+        return RegularVisibilityMaskUi.IsEnabled && _regularVisibilityMask.Mask.HasLoadedMask
             ? _regularVisibilityMask.Mask.ActiveRegularPadIds
             : null;
     }
@@ -210,18 +216,18 @@ public sealed partial class FreeformHelperViewModel
 
     private void SetRegularVisibilityMaskEnabled(bool value, bool refreshAssignment)
     {
-        if (IsRegularVisibilityMaskEnabled == value)
+        if (RegularVisibilityMaskUi.IsEnabled == value)
         {
             return;
         }
 
         using (_settingsSuppression.EnterRegularVisibilityMaskStateChange())
         {
-            IsRegularVisibilityMaskEnabled = value;
+            RegularVisibilityMaskUi.IsEnabled = value;
         }
         InvalidateWorkflowDataSnapshot();
 
-        RegularVisibilityMaskSummary = BuildRegularVisibilityMaskSummary(_regularVisibilityMask.Mask, _grid, IsRegularVisibilityMaskEnabled);
+        RegularVisibilityMaskUi.Summary = BuildRegularVisibilityMaskSummary(_regularVisibilityMask.Mask, _grid, RegularVisibilityMaskUi.IsEnabled);
         RefreshStep4DuplicateDiffGroups();
         if (refreshAssignment)
         {
@@ -229,9 +235,9 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
-    partial void OnIsRegularVisibilityMaskEnabledChanged(bool value)
+    private void OnRegularVisibilityMaskEnabledChanged(bool value)
     {
-        RegularVisibilityMaskSummary = BuildRegularVisibilityMaskSummary(_regularVisibilityMask.Mask, _grid, value);
+        RegularVisibilityMaskUi.Summary = BuildRegularVisibilityMaskSummary(_regularVisibilityMask.Mask, _grid, value);
         RefreshStep4DuplicateDiffGroups();
         if (_settingsSuppression.IsRegularVisibilityMaskStateChangeActive)
         {
