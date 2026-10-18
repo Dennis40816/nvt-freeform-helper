@@ -24,12 +24,10 @@ public sealed partial class FreeformHelperViewModelTests
         var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
         var resetBaselineMethod = typeof(FreeformHelperViewModel).GetMethod("ResetDxfEditBaseline", BindingFlags.Instance | BindingFlags.NonPublic);
         var applyCadLoadOutcomeMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyCadLoadOutcomeAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        var applyPersistedDxfEditProjectStateMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyPersistedDxfEditProjectState", BindingFlags.Instance | BindingFlags.NonPublic);
         var buildEntriesMethod = typeof(FreeformHelperViewModel).GetMethod("BuildDxfEditChangeEntries", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(cadField);
         Assert.NotNull(resetBaselineMethod);
         Assert.NotNull(applyCadLoadOutcomeMethod);
-        Assert.NotNull(applyPersistedDxfEditProjectStateMethod);
         Assert.NotNull(buildEntriesMethod);
 
         cadField!.SetValue(vm, new CadPadSet(source));
@@ -58,15 +56,11 @@ public sealed partial class FreeformHelperViewModelTests
                 null
             }));
         await applyTask;
-        applyPersistedDxfEditProjectStateMethod!.Invoke(
-            vm,
-            new object?[]
-            {
-                new ProjectFile
-                {
-                    HiddenCadPadIds = new HashSet<int> { 1 },
-                },
-            });
+        var persistedState = FreeformHelperViewModel.CapturePersistedDxfEditProjectState(new ProjectFile
+        {
+            HiddenCadPadIds = new HashSet<int> { 1 },
+        });
+        vm.ApplyCapturedDxfEditProjectState(persistedState);
 
         var entries = Assert.IsType<List<DxfEditChangeListEntry>>(buildEntriesMethod.Invoke(vm, null));
         var hiddenEntry = Assert.Single(entries, entry => entry.Kind == DxfEditChangeKind.Hidden);
