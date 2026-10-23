@@ -314,13 +314,12 @@ public sealed class HeadlessUiSmokeTests
     public async Task MainWindow_WithExpandedConsole_RendersVisibleConsoleText()
     {
         HeadlessAppBootstrap.EnsureInitialized();
+        using var consoleStore = await ConsoleLogTestSupport.CreateSeededStoreAsync("test", "terminal visible line");
         using var shell = new ShellViewModel
         {
             IsConsoleExpanded = true,
+            ConsoleStore = consoleStore,
         };
-        shell.ConsoleText = "08:00:00 | INFO  | test | terminal visible line";
-        shell.ConsoleRenderedLineCount = 1;
-        shell.ConsoleSourceLineCount = 1;
 
         var window = new MainWindow();
         window.SetShellViewModel(shell);
@@ -355,13 +354,12 @@ public sealed class HeadlessUiSmokeTests
     public async Task MainWindow_WithSimulationWorkspace_RendersVisibleConsoleText()
     {
         HeadlessAppBootstrap.EnsureInitialized();
+        using var consoleStore = await ConsoleLogTestSupport.CreateSeededStoreAsync("simulation", "shared terminal visible line");
         using var shell = new ShellViewModel
         {
             IsConsoleExpanded = true,
+            ConsoleStore = consoleStore,
         };
-        shell.ConsoleText = "09:30:00 | INFO  | simulation | shared terminal visible line";
-        shell.ConsoleRenderedLineCount = 1;
-        shell.ConsoleSourceLineCount = 1;
 
         var grid = BuildSimulationGrid();
         var workspaceViewModel = new SimulationWorkspaceViewModel(

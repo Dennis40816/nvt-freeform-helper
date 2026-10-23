@@ -1,13 +1,8 @@
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Text;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
 using NLog;
-using Nvt.Core.Avalonia.Threading;
 using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -19,13 +14,10 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 public sealed partial class ShellViewModel : ObservableObject, IDisposable
 {
-    private const int ConsoleRenderTailSourceLineLimit = 4000;
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    // Log notifications can arrive from another thread while this view model rebuilds the text. One lock
-    // guards the buffer and the text and counts that the notification handler decides from.
-    private readonly Lock _consoleTextGate = new();
-    private readonly StringBuilder _consoleTextBuffer = new();
-    // Tests pass their own probe to pause the work or to run code at a moment of a rebuild.
+    private ConsoleSession? _console;
+
+    // Tests pass their own probe to hold a workspace build back.
     private readonly IShellTimingProbe _timingProbe;
     private bool _isDisposed;
     // Navigation selection is owned by the shell's UI-thread command entry point.
@@ -87,96 +79,21 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
 
     // --- Console/Log Display ---
     /// <summary>
-    /// Gets a read-only observable collection of application log entries.
-    /// </summary>
-    public static ReadOnlyObservableCollection<AppLogEntry> LogEntries => AppLogStore.Instance.Entries;
-
-    /// <summary>
     /// Gets or sets a value indicating whether the in-app console panel is expanded.
     /// </summary>
     [ObservableProperty]
     private bool _isConsoleExpanded = true;
 
     /// <summary>
-    /// Gets or sets the console font size.
+    /// Gets the log store that the console shows. The default is the process-wide store that the NLog target writes to.
+    /// A test supplies a store of its own, so it never has to clear or filter the shared one.
     /// </summary>
-    [ObservableProperty]
-    private double _consoleFontSize = 14.0;
-
-    // The console text and its two counts are plain fields. The notification handler changes them inside the
-    // console text gate and raises the change notifications after it releases the gate (ShellViewModel.Console.cs).
-    private string _consoleText = string.Empty;
-    private int _consoleRenderedLineCount;
-    private int _consoleSourceLineCount;
+    public Nvt.Core.LogConsole.LogStore ConsoleStore { get; init; } = AppConsoleLog.Store;
 
     /// <summary>
-    /// Gets or sets the concatenated text content of all log entries for display in the console.
+    /// Gets the console session that the console panels bind to. The first read creates it and must run on the UI thread.
     /// </summary>
-    public string ConsoleText
-    {
-        get => _consoleText;
-        set => SetProperty(ref _consoleText, value);
-    }
-
-    /// <summary>
-    /// Gets or sets the rendered line count in current console view.
-    /// </summary>
-    public int ConsoleRenderedLineCount
-    {
-        get => _consoleRenderedLineCount;
-        set => SetProperty(ref _consoleRenderedLineCount, value);
-    }
-
-    /// <summary>
-    /// Gets or sets the source line count currently stored in app log entries.
-    /// </summary>
-    public int ConsoleSourceLineCount
-    {
-        get => _consoleSourceLineCount;
-        set => SetProperty(ref _consoleSourceLineCount, value);
-    }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether duplicated consecutive console lines are collapsed.
-    /// </summary>
-    [ObservableProperty]
-    private bool _isConsoleDedupEnabled;
-
-    /// <summary>
-    /// Gets or sets the console search keyword.
-    /// </summary>
-    [ObservableProperty]
-    private string _consoleSearchText = string.Empty;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether console should filter to matched lines only.
-    /// </summary>
-    [ObservableProperty]
-    private bool _isConsoleFilterEnabled;
-
-    /// <summary>
-    /// Gets the summary text shown in console header.
-    /// </summary>
-    public string ConsoleSummaryText
-    {
-        get
-        {
-            // Both counts come from one section, so the header never shows counts of two different rebuilds.
-            int renderedLineCount;
-            int sourceLineCount;
-            lock (_consoleTextGate)
-            {
-                renderedLineCount = _consoleRenderedLineCount;
-                sourceLineCount = _consoleSourceLineCount;
-            }
-
-            return IsConsoleDedupEnabled
-                ? $"Lines {renderedLineCount} (from {sourceLineCount})"
-                : renderedLineCount < sourceLineCount
-                    ? $"Lines {renderedLineCount} / {sourceLineCount}"
-                    : $"Lines {renderedLineCount}";
-        }
-    }
+    public ConsoleSession ConsoleSession => _console ??= new ConsoleSession(ConsoleStore, UiEvents, new ConsoleLinkOpener());
 
     // --- Commands ---
     /// <summary>
@@ -199,10 +116,6 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     /// Gets the command to show the Coordinate view.
     /// </summary>
     public IAsyncRelayCommand ShowCoordinateCommand { get; }
-    /// <summary>
-    /// Gets the command to clear all messages from the console.
-    /// </summary>
-    public IRelayCommand ClearConsoleCommand { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ShellViewModel"/> class.
@@ -231,7 +144,6 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
         ShowDevCommand = new RelayCommand(ShowDev);
         ShowSimulationCommand = new AsyncRelayCommand(ShowSimulationAsync);
         ShowCoordinateCommand = new AsyncRelayCommand(ShowCoordinateAsync);
-        ClearConsoleCommand = new RelayCommand(() => AppLogStore.Instance.Clear()); // Command to clear log store.
         StartupPerfTracker.Mark("shell.commands-initialized");
         FreeformHelper.GetCurrentSimulationSafetyAudit = () => Simulation.CurrentWorkspace?.GetSimulationSafetyAuditSnapshot();
         Simulation.RequestBuildWorkspaceAsync = BuildSimulationWorkspaceAsync;
@@ -242,28 +154,6 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
         CoordinatePlanner.RequestPrewarmWorkspaceAsync = PrewarmCoordinatePlannerWorkspaceAsync;
         CoordinatePlanner.UpdateSourceRevision(FreeformHelper.WorkspaceDerivedSourceRevision);
         FreeformHelper.WorkspaceDerivedSourceChanged += OnFreeformHelperWorkspaceSourceChanged;
-
-        // Subscribe to changes in the log entries collection to update the console text.
-        if (AppLogStore.Instance.Entries is INotifyCollectionChanged notify)
-        {
-            notify.CollectionChanged += OnLogEntriesChanged;
-        }
-
-        RefreshConsoleSummaryCounts();
-        if (IsConsoleExpanded)
-        {
-            RebuildConsoleText();
-        }
-
-        if (UiThread.TryGetRunningDispatcher(out var dispatcher))
-        {
-            dispatcher!.Post(() => { StartupPerfTracker.Mark("shell.console-background-ready"); }, DispatcherPriority.Background);
-        }
-        else
-        {
-            StartupPerfTracker.Mark("shell.console-background-ready");
-        }
-        StartupPerfTracker.Mark("shell.console-bound");
 
         if (!ShouldSkipInitialGridBootstrap())
         {
@@ -276,4 +166,17 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
         StartupPerfTracker.Mark("shell.vm-ctor-complete");
     }
 
+    private static bool ShouldSkipInitialGridBootstrap()
+    {
+        if (AppContext.TryGetSwitch("FreeformHelper.DisableInitialGridBootstrap", out var disabledBySwitch) &&
+            disabledBySwitch)
+        {
+            return true;
+        }
+
+        var processName = Environment.ProcessPath is { Length: > 0 }
+            ? Path.GetFileNameWithoutExtension(Environment.ProcessPath)
+            : string.Empty;
+        return processName.Contains("testhost", StringComparison.OrdinalIgnoreCase);
+    }
 }

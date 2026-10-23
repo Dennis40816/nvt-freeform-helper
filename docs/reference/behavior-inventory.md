@@ -260,9 +260,14 @@ Notes:
 - Important controls now use tokens (colors, spacing, borders, shadows), with layout guard tests added.
 - ScrollViewer/Scrollbar now use a unified style, reducing inconsistent interaction across pages.
 - The Terminal contract is fixed:
-  - `ConsolePanel` uses the single `AvaloniaEdit TextEditor` path; `TextBox fallback` is no longer allowed.
-  - The AvaloniaEdit theme remains an app-level include and must not be moved back to workspace lazy-load.
-  - The terminal is expanded by default, with the existing initial dimensions `ConsolePanelRowHeight=180` and `ConsolePanelMinHeight=120`.
+  - `ConsolePanel` composes the Core `Nvt.Core.Avalonia.LogConsole` controls (`ConsoleHeader`, `ConsoleToolbar`, `ConsoleListView`, `ConsoleEmptyState`) over one `ConsoleController` that `ShellViewModel.ConsoleSession` owns.
+  - The Core theme tokens (`ThemeTokens.axaml`) and the two console style files stay app-level includes in `App.axaml`.
+  - The terminal is expanded by default, with the initial dimensions `ConsolePanelRowHeight=300` and `ConsolePanelMinHeight=232`.
+  - The console list zooms from 80% to 300% in steps of 10% (Core 0.9.4). Ctrl and plus, Ctrl and minus, and Ctrl and 0 work while the list has focus. Ctrl and the mouse wheel work over the list with or without focus. The zoom scales the row height, the column widths and the text of the rows. It does not scale the toolbar, the header or the jump button. `ConsoleSession` keeps the value for the session of the shell, and the panel assigns it to the list when it creates the list. The value is not saved to the project or to the app settings, so it returns to 100% at the next start. The old terminal changed a font size in points with Ctrl +/-. That value no longer exists. The base font follows the Core Body font role.
+  - Copy visible, Copy selection and Save log write the time in UTC (the Core export has no time zone option). The list and the RuntimeQuery `terminal` command show local time.
+  - A link opens on Ctrl+click or Ctrl+Enter. A plain click only selects the row. This is the Core 0.9.1 behavior. The old terminal opened a link on a plain click.
+  - The Core scanner treats text as a link when it is an http or https URL or a path with a separator or a location suffix. A bare file name with neither (for example `notch_review.csv`) is not a link. A path with a separator is a link whatever its extension, because the old extension allowlist is gone. The repository-root search for a relative path starts from the current folder and the application folder only.
+  - A link opens only when it is an http or https URL, or a file or folder that exists. A file or folder link is selected in Explorer. A network path (a UNC path in any separator form) is never probed.
 
 ## Commands
 
@@ -304,10 +309,10 @@ Notes:
 ### ShellViewModel (src/FreeformHelper.UI/ViewModels/ShellViewModel.cs)
 - ShowWorkspaceCommand / ShowHowToUseCommand / ShowDevCommand
   - Switches CurrentViewModel and page visibility
-- ClearConsoleCommand
-  - [Status] (clears AppLogStore, including pending entries; queued Add callbacks from before Clear cannot restore old entries)
-  - The terminal is expanded by default at startup; the full console text is built from the ring buffer tail without depending on UI collection flush.
-  - After a startup/expansion ring snapshot, Add notifications replace the snapshot until the UI collection catches up; each stored entry appears once, including distinct entries with identical content.
+- ConsoleSession.Controller.ClearCommand (Core `ConsoleController`)
+  - [Status] (clears `AppConsoleLog.Store`; the store's writer drops queued writes from before the clear)
+  - The terminal is expanded by default at startup; the controller captures the store snapshot when it is created and refreshes on every store change.
+  - Each stored entry appears once. With dedupe on, entries with the same source, level and full message merge into one row with a count.
 
 ### Pad Info ViewModels (src/FreeformHelper.UI/ViewModels/PadInfoViewModels.cs)
 - CadPadInfoViewModel.ApplyChangesCommand → SetCadPadCustomValues
@@ -398,8 +403,7 @@ Notes:
   - Ctrl+S → SaveProjectAsync (save result displayed in a top toast) [Status]
   - Delete → DeleteSelectedCadPadsCommand (only when focus is outside text input) [Status]
 - F / Ctrl+A → globally forwarded to Fit / SelectAll (only when focus is outside text input and the source is not the canvas) [View]/[Set selection]
-  - Ctrl +/- (console focus) → ConsoleFontSize changes
-  - Global shortcuts are not handled when text input (TextBox/ComboBox/NumberScrubber) has focus
+  - Global shortcuts are not handled when text input (TextBox/ComboBox/NumberScrubber) has focus or when focus is inside the console panel
 - OnRootPointerPressed
   - An outside click closes pad info / otherwise focuses the canvas
 - WireCanvasEvents（Canvas.cs）
@@ -409,8 +413,9 @@ Notes:
 - PadInfoPopover wiring
   - ApplyCloseRequested / DiscardCloseRequested → ClosePadInfoViaState
   - CloseConfirmDismissed → re-enable hit testing
-- Console controls（Console.cs）
-  - Log changes → auto-scroll
+- Console controls（ConsolePanel.axaml.cs）
+  - ConsoleListView.ViewStateRequested → ConsoleController.RequestViewState (follow, pause, selection, expansion)
+  - Copy visible / Save log → `ConsoleSession` commands; the panel supplies the clipboard writer and the file picker
 - Panel buttons（Panels.cs）
   - Left/right panel show/hide (layout only)
 - File picker delegates（Pickers.cs）

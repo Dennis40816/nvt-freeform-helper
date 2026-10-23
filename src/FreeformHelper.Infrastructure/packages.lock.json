@@ -16,9 +16,9 @@
       },
       "Nvt.Core": {
         "type": "Direct",
-        "requested": "[0.9.1, 0.9.1]",
-        "resolved": "0.9.1",
-        "contentHash": "98llP7mypkn1QutX7XXwrAg+D+aFj1965ppX+BISLOymfoG28UneTF9VtVOVfe4/CzJL+/pxQ3kybegpb839Uw=="
+        "requested": "[0.9.4, 0.9.4]",
+        "resolved": "0.9.4",
+        "contentHash": "5NfQsOFKT0jeCDmw7mMwUao6TKLAKPpmf5J7VjCnAv45vO75nghPZWbKVODRW9mwKNqkl2b0fk01pwdZA9V4bA=="
       },
       "freeformhelper.application": {
         "type": "Project",
