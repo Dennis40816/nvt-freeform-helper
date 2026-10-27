@@ -352,7 +352,7 @@ try {
     foreach ($file in @('check-test-shard.ps1', 'read-trx.ps1', 'test-baseline.json', 'test-baseline.schema.json', 'shard-summary.schema.json')) {
         Copy-Item -LiteralPath (Join-Path $ciRoot $file) -Destination (Join-Path $fakeRepo "scripts/ci/$file")
     }
-    foreach ($file in @('run-tests.ps1', 'private-path-patterns.ps1')) {
+    foreach ($file in @('run-tests.ps1', 'private-path-patterns.ps1', 'project-version-format.ps1')) {
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination (Join-Path $fakeRepo "scripts/tests/$file")
     }
     [System.IO.File]::WriteAllText((Join-Path $fakeRepo "scripts/tests/assert-example-data.ps1"), 'param([switch]$AllowMissing); return $false')

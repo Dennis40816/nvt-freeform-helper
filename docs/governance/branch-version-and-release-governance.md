@@ -8,7 +8,7 @@ Status: Documentation for the `main` trunk, the 1.0.x version line and existing 
 
 ## Maintain a Single Version Identity
 
-For the `VERSION` value and the repository-external test area, see `ROADMAP.md` S15.005a. This repository cannot currently claim that the template mappings among `VERSION`, tag, package, manifest, and Catalog are in effect; the formal policy for version identity and release artifacts must be decided as part of `S15.005e`.
+While a version is in development, `VERSION` holds `X.Y.Z-g.N`. The format is defined in the "Version rules" of `ROADMAP.md` and checked by `scripts/verify.ps1`. For the `VERSION` value and the repository-external test area, see `ROADMAP.md` S15.005a. This repository cannot currently claim that the template mappings among `VERSION`, tag, package, manifest, and Catalog are in effect; the formal policy for version identity and release artifacts must be decided as part of `S15.005e`.
 
 ## Branch Authority and Work Direction
 
