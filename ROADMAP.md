@@ -25,7 +25,7 @@ Links of the form `Dennis40816/FreeformHelper/issues/N` point to the archived pr
 
 | Item | Value |
 |---|---|
-| Development line | Version line `1.0.x` (`VERSION` = 1.0.0). The branch is `main` |
+| Development line | Version line `1.0.x` (`VERSION` = 1.0.0-g.4). The branch is `main` |
 | Next customer release | `1.0.0`, after handoff group g4 (owner decision, 2026-10-07) |
 | Latest customer release in this repository | None yet |
 | Latest release overall | `1.2`, tagged only in the archived private repository. It was never shipped to customers |
@@ -38,7 +38,8 @@ These rules follow the owner decisions of 2026-10-07.
 - **Minor and patch**: raise the minor version only for a large set of features. Otherwise raise the patch version.
 - **Release branch**: to ship a customer release, cut a branch named after the version line, for example `1.0.x`, from `main`. It freezes the content and takes fixes only. `main` keeps moving.
 - **Internal names follow the next customer release**: `VERSION` and handoff names match the next customer release. No internal number may be larger than the next customer release. The next customer release is `1.0.0`, so the version line is `1.0.x`. The trunk is always `main`; the version line is not a branch name.
-- **Handoff groups and internal tags**: work is grouped in handoff order. When a whole group has merged into the trunk, the GitHub App creates one internal tag `dev/<line>/g<n>-<name>`, for example `dev/1.0.x/g<n>-<name>`. `<line>` is the version line of the next customer release, not a branch name. Internal tags get no Release.
+- **Development version format** (owner decision, 2026-10-18): `X.Y.Z` is the next customer release. While it is in development, `VERSION` holds `X.Y.Z-g.N`, for example `1.0.0-g.4`. A customer release removes only the suffix. The next commit after the release starts the next version at `-g.1`. `scripts/verify.ps1` checks the format.
+- **Handoff groups and internal tags**: work is grouped in handoff order. When a whole group has merged into the trunk, the GitHub App creates one annotated internal tag `vX.Y.Z-g.N`, for example `v1.0.0-g.4`, and the tag message names the group. The next commit raises `N` by 1 in `VERSION`. Internal tags get no Release. The older format `dev/<line>/g<n>-<name>` is retired. The existing `dev/` tag stays.
 - **Skipped versions**: a customer who skips versions must still be able to update. Settings and user data migrate from every customer release directly. The release notes list the accumulated changes.
 
 ## 1. Fix line
@@ -59,12 +60,12 @@ Groups g1 to g7 were named 1.3.0 to 1.3.5 before 2026-10-07. Older commits, PRs 
 |---|---|---|---|---|---|
 | g1 | 1.3.0 | Trusted gates and numeric contracts | Zero difference after the signed R13.002 correction | Done | None. Its commits are only in the archived private repository |
 | g2 | 1.3.1 | Notch single-result pipeline | Zero difference | Done. The owner closed it with A1/A2 on 2026-10-04; B1/B2 are accepted exceptions | None, for the same reason |
-| g3 | 1.3.2 | Matching and domain state | Zero difference | Done. The owner closed it with the delivered scope on 2026-10-06 | `dev/1.0.x/g3-matching-domain` at the closing merge of [#39](https://github.com/Dennis40816/nvt-freeform-helper/pull/39) |
-| g4 | 1.3.3, first part | Core integration (line 3) and the state batch-0 fixes | Zero data difference; the look PR changes appearance with owner approval | In progress | `dev/1.0.x/g4-core-adoption` |
-| g5 | 1.3.3, second part | Settings and presentation | Zero data difference; the R13.303 opacity change changes appearance with owner approval | Not started (after 2026-10-18) | `dev/1.0.x/g5-settings-presentation` |
-| g6 | 1.3.4 | Workspace ViewModel split | Zero difference | Not started. Waits for the g5 exit | `dev/1.0.x/g6-workspace-viewmodels` |
-| g7 | 1.3.5 | UI structure and token cleanup | Zero data difference | Not started. Waits for the g6 exit | `dev/1.0.x/g7-ui-structure` |
-| g8 | - | State refactor ST1 to ST5, after Core 1.0.0 | To be set with the plan | Not started | `dev/1.0.x/g8-state-refactor` |
+| g3 | 1.3.2 | Matching and domain state | Zero difference | Done. The owner closed it with the delivered scope on 2026-10-06 | `dev/1.0.x/g3-matching-domain` (the retired format, kept) at the closing merge of [#39](https://github.com/Dennis40816/nvt-freeform-helper/pull/39) |
+| g4 | 1.3.3, first part | Core integration (line 3) and the state batch-0 fixes | Zero data difference; the look PR changes appearance with owner approval | In progress | `v1.0.0-g.4` |
+| g5 | 1.3.3, second part | Settings and presentation | Zero data difference; the R13.303 opacity change changes appearance with owner approval | Not started (after 2026-10-18) | Named after 1.0.0 ships: `v<next release>-g.N` |
+| g6 | 1.3.4 | Workspace ViewModel split | Zero difference | Not started. Waits for the g5 exit | Named like g5 |
+| g7 | 1.3.5 | UI structure and token cleanup | Zero data difference | Not started. Waits for the g6 exit | Named like g5 |
+| g8 | - | State refactor ST1 to ST5, after Core 1.0.0 | To be set with the plan | Not started | Named like g5 |
 
 `1.0.0` ships after g4. Work in g5 and later goes into a later customer release.
 

@@ -28,6 +28,8 @@ $uiProcessWorkspaceScript = Join-Path $repoRoot "scripts/tests/check-ui-process-
 $privatePathCheckScript = Join-Path $repoRoot "scripts/tests/check-private-path-patterns.ps1"
 $temporaryEnvironmentCheckScript = Join-Path $repoRoot "scripts/tests/check-temporary-environment.ps1"
 . (Join-Path $repoRoot "scripts/tests/private-path-patterns.ps1")
+. (Join-Path $repoRoot "scripts/tests/project-version-format.ps1")
+$projectVersionCheckScript = Join-Path $repoRoot "scripts/tests/check-project-version-format.ps1"
 $buildOutputSelectionScript = Join-Path $repoRoot "scripts/tests/check-build-output-selection.ps1"
 $fetchCorePackagesScript = Join-Path $repoRoot "scripts/build/fetch-core-packages.ps1"
 $testShardCheckScript = Join-Path $repoRoot "scripts/ci/check-test-shard.ps1"
@@ -89,8 +91,8 @@ function Add-StructureFailures {
     $versionPath = Join-Path $repoRoot "VERSION"
     if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
         $versionText = [System.IO.File]::ReadAllText($versionPath)
-        if ($versionText -notmatch '\A(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\r\n\z') {
-            $failures.Add("VERSION must contain one MAJOR.MINOR.PATCH line ending in CRLF, without leading zeros.")
+        if ($versionText -cnotmatch (Get-ProjectVersionPattern)) {
+            $failures.Add("VERSION must contain one MAJOR.MINOR.PATCH line with an optional -g.N suffix, ending in CRLF, without leading zeros.")
         }
     }
 
@@ -170,6 +172,7 @@ function Invoke-StructureLane {
     Write-Lane "structure: required files, project version, submodule link, private paths, SDK pin, action pins"
     $failures = New-Object System.Collections.Generic.List[string]
     & $privatePathCheckScript
+    & $projectVersionCheckScript
     & $temporaryEnvironmentCheckScript
     Add-StructureFailures -failures $failures
 
