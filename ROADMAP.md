@@ -147,6 +147,14 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (target 
   - Never copy the data into this repository, a PR, an issue or a log.
 - [x] **DOC-TR Translate the remaining Chinese documents** · Target: - · Status: Done (the screen `HowToUseView.axaml` is tracked separately) · PR: [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30) (first batch), [#57](https://github.com/Dennis40816/nvt-freeform-helper/pull/57)
 
+### 2.6 UI text and redesign
+
+- [ ] **UI-TEXT1 Shorten the resident texts of the right panel, Step 4 first** · Target: - · Status: Not started · PR: -
+  - The owner approved Step 4 as the first panel on 2026-10-18. Keep the scope small. Add no new structure for the current layout, because UI-REDESIGN replaces it.
+  - Each text PR shows English before-and-after images in the PR conversation.
+- [ ] **UI-REDESIGN Redesign the whole NFH UI** · Target: - · Status: Waiting for owner (scope and timing) · PR: -
+  - Owner, 2026-10-18, on the right-panel text proposal: 「可以，但由於 NFH 是很久之前設計，理論上是整個都要大改」 ("Yes, but NFH was designed long ago, so in principle all of it needs a major redesign").
+
 ## 3. Core integration
 
 - [x] **H09 Adopt the pinned Core C# health bundle and enroll NFH** · Target: 1.0.0 · Status: Done. The baseline was enrolled in [#71](https://github.com/Dennis40816/nvt-freeform-helper/pull/71). The `dotnet / build` job runs Verify against the pull request base since [#75](https://github.com/Dennis40816/nvt-freeform-helper/pull/75) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
