@@ -115,7 +115,7 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
 
 ### 2.4 State refactor after Core 1.0.0
 
-- [ ] **H2 One shell navigation selection with computed binding projections** · Target: 1.0.0 (g4 health tasks) · Status: In progress (implementation and repeated-tab click fix verified locally; review pending) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
+- [x] **H2 One shell navigation selection with computed binding projections** · Target: 1.0.0 (g4 health tasks) · Status: Done · PR: [#70](https://github.com/Dennis40816/nvt-freeform-helper/pull/70) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
   - The authorized H2 slice precedes the larger state batches below; it preserves workspace build, source refresh and prewarm ordering.
 
 The owner scheduled these five batches after the NVT Core 1.0.0 release (target 2026-10-15). Each batch is one PR, and each starts with tests that pin the current behavior.
@@ -149,7 +149,7 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (target 
 
 ## 3. Core integration
 
-- [ ] **H09 Adopt the pinned Core C# health bundle and enroll NFH** · Target: 1.0.0 · Status: Baseline enrolled and verified on the host in LF and CRLF checkouts; the CI step that runs Verify with the merge base follows after this change is on main · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
+- [x] **H09 Adopt the pinned Core C# health bundle and enroll NFH** · Target: 1.0.0 · Status: Done. The baseline was enrolled in [#71](https://github.com/Dennis40816/nvt-freeform-helper/pull/71). The `dotnet / build` job runs Verify against the pull request base since [#75](https://github.com/Dennis40816/nvt-freeform-helper/pull/75) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
 
 NFH adopts NVT Core from g4: the non-UI library first, then the UI modules after R13.306. A Core module is done only when NFH uses the Core version and deletes its own copy. Each switch keeps the NFH tests passing and the non-UI output identical. Parent: R13.307, issue [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43).
 
@@ -167,7 +167,7 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
   - Set only the seven `NfcAccent*` keys for the NFH accent. Delete the local button, scroll and neutral token styles.
   - Map tool-specific button classes to the nearest Core role. Open a Core issue when none fits.
   - This replaces the former steps M3 (scroll styles) and M4 (button roles). It also removes the scroll selectors that match nothing on Avalonia 12 and fixes the neutral text button focus.
-- [ ] **C-CONSOLE Adopt the redesigned Core Console and delete NFH's console** · Target: g4 (Core 1.0.0) · Status: Not started; Core implements it first · PR: [Core #82](https://github.com/Dennis40816/nvt_fw_core/pull/82) (approved design)
+- [ ] **C-CONSOLE Adopt the redesigned Core Console and delete NFH's console** · Target: g4 (Core 1.0.0) · Status: In progress: [#113](https://github.com/Dennis40816/nvt-freeform-helper/pull/113) replaces the in-app console with the Core LogConsole controls and waits for Core 0.9.5, then for the owner's review · PR: [#113](https://github.com/Dennis40816/nvt-freeform-helper/pull/113), design in [Core #82](https://github.com/Dennis40816/nvt_fw_core/pull/82)
   - NFH fixed console review items 01 and 02 in [#49](https://github.com/Dennis40816/nvt-freeform-helper/pull/49). The Core redesign covers items 03 to 21, S15.017 and R13.304.
 - [ ] **R13.307-ICON Material Symbols becomes the shared Core icon system; delete the unused `MaterialIcons-Regular.ttf`** · Target: g4 · Status: In progress: Core font file adoption done; `NvtIcons` migration waits for the Core.Avalonia upgrade · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
 - [x] **R13.307-FONT Adopt the Core font set** · Target: g4 · Status: Done · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
