@@ -5,7 +5,6 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchOverlayVisibilityPolicyTests
 {
-
     [Fact]
     public void Resolve_WhenNoPreviewData_HidesAllLayers()
     {

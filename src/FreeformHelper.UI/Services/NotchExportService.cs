@@ -17,7 +17,7 @@ namespace FreeformHelper.UI.Services;
     Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class NotchExportService
 {
-    // Private instances of the underlying application services.
+    // Private instance of the underlying application service.
     private readonly NotchTableGenerator _notchGenerator = new();
 
     /// <summary>
