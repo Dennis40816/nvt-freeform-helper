@@ -31,7 +31,6 @@ public sealed partial class FreeformHelperView : UserControl
     private TextEditor? _consoleEditor;
     private Border? _consoleBorder;
     private bool _consoleHasFocus;
-    private IDisposable? _consoleFocusWithinSubscription;
     private ViewModels.ShellViewModel? _shellViewModel;
     private TopLevel? _topLevel;
     private Menu? _mainMenu;
@@ -72,7 +71,7 @@ public sealed partial class FreeformHelperView : UserControl
 
         if (_consoleBorder is not null)
         {
-            _consoleFocusWithinSubscription = _consoleBorder
+            _ = _consoleBorder
                 .GetObservable(InputElement.IsKeyboardFocusWithinProperty)
                 .Subscribe(focused => SetConsoleFocus(focused));
         }

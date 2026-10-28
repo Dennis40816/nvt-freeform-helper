@@ -285,7 +285,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _cadLoadUseCase = new CadLoadUseCase(_dxfImportService);
         _cadLoadWorkflowService = new CadLoadWorkflowService(_cadLoadUseCase);
         _layerCatalogStateService = new LayerCatalogStateService(_dxfLayerCatalogReader);
-        _gridRebuildOrchestrator = new GridRebuildOrchestrator(_gridBuildService, _padOverrideService);
+        _gridRebuildOrchestrator = new GridRebuildOrchestrator(_gridBuildService);
         _projectPersistenceUseCase = new ProjectPersistenceUseCase(_projectStore, _padOverrideService);
         _padEditUseCase = new PadEditUseCase(_manualSizingService);
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
