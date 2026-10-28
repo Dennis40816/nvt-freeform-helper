@@ -117,6 +117,7 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
 ### 2.4 State refactor after Core 1.0.0
 
 - [x] **H2 One shell navigation selection with computed binding projections** · Target: 1.0.0 (g4 health tasks) · Status: Done · PR: [#70](https://github.com/Dennis40816/nvt-freeform-helper/pull/70) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
+  - The U1 commit `7040979528523e71ea843cbd0a6641fa3b78b016` was pushed as work in progress, before it was built, linted or tested, and its body says so. The verification (build, lint, tests, ledger lowering, Verify) is in the body of the later commits of the same branch. The commit is not rewritten, as `docs/agents/issue-tracker.md` allows.
   - The authorized H2 slice precedes the larger state batches below; it preserves workspace build, source refresh and prewarm ordering.
 
 The owner scheduled these five batches after the NVT Core 1.0.0 release (the target date 2026-10-15 has passed; Core 1.0.0 is not released yet). Each batch is one PR, and each starts with tests that pin the current behavior.
