@@ -1,5 +1,5 @@
 # Settings Entry Matrix (M11 Phase 1~3)
-Last updated: 2026-08-08
+Last updated: 2026-10-28
 
 Current documentation baseline: FreeformHelper g1 current-state audit, production evidence commit `ef08945`. This document deliberately separates "editors that currently exist" from the "1.0.x normal-flow contract" to avoid mistaking the full persistence schema for a list of normal-flow UI fields.
 
@@ -36,10 +36,10 @@ Current documentation baseline: FreeformHelper g1 current-state audit, productio
 ## S4.6 stale-check (2026-03-05)
 1. This refactor iteration only splits structure (selection/notch services into partials), without changing settings entry roles or the single source.
 2. The app-level settings deferred policy remains unchanged:
-   - Defer after `Load Project`: `MarkProjectLoadedForAppGeneralPersistence()` (`src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`)
-   - Flush after successful `Save Project`: `FlushDeferredAppGeneralSettingsIfNeeded()` (`src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`)
-3. The `Ctrl+S -> SaveProjectAsync() -> top toast` contract remains unchanged: `src/FreeformHelper.UI/Views/FreeformHelperView.InputAndShortcuts.cs`.
-4. The runtime query single-entry (IPC -> `RuntimeQueryUseCase.ExecuteAsync`) remains unchanged: `src/FreeformHelper.UI/Services/RuntimeQueryIpc.cs`.
+   - Defer after `Load Project`: `MarkProjectLoadedForAppGeneralPersistence()` (called in `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`, defined in `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs`)
+   - Flush after successful `Save Project`: `FlushDeferredAppGeneralSettingsIfNeeded()` (called in `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`, defined in `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs`)
+3. The `Ctrl+S -> SaveProjectAsync() -> top toast` contract remains unchanged (shortcut handler: `src/FreeformHelper.UI/Views/FreeformHelperView.InputAndShortcuts.cs`).
+4. The runtime query single-entry (IPC -> `RuntimeQueryUseCase.ExecuteAsync`) remains unchanged: `src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs`.
 
 ## Purpose
 - Inventory the UI entry points that currently allow settings changes (Display popup / SettingsWindow / Right panel).

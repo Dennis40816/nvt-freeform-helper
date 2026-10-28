@@ -1,5 +1,5 @@
 # Behavior inventory
-Last updated: 2026-08-10
+Last updated: 2026-10-28
 
 Current document baseline: FreeformHelper g1 current-state audit, production evidence commit `ef08945`. Historical stale-checks preserve decision context; the R13.005 calibration sections represent the current owner/result/reader state.
 
@@ -106,7 +106,7 @@ Current document baseline: FreeformHelper g1 current-state audit, production evi
 - `Resolved result` contract:
   - `NotchV22ResolvedResultService` is the per-CAD projection entry for UI/query; it is not the repository-wide export source-of-truth.
   - `PadInspector`, `Notch preview`, `Notch detail`, and `RuntimeQuery query notch` read only the resolved result and must not independently rebuild `enabled / stage2 / stage3 / target allocation`. Detail's raw overlap allocation/Q7/freeform remains the existing view projection and is outside the target-allocation resolved model.
-  - current boundary: normal `CadAllocation` export already has a separate Application-owned output-request-neutral candidate batch; matching export does not rebuild candidates because of versions, threshold, `NullValue`, or target guard/cap. Phases 1～3 resolution and phase 4 final projection are separated; concurrent Export/Simulation with the same CAD/grid/Step3/computation identity and generation epoch share one in-flight resolution task, while each caller still projects with the final request frozen at its own entry. A fingerprint hit still performs full computation-settings equality; a fault removes the task for retry; final-only changes retain the task/batch, while full invalidation advances the epoch, detaches the old task, and rejects its store/publish. Live UI guard/cap-only changes also retain Step3 revision, per-CAD sparse identity, and this batch, clearing only the current Step5 table/validation and notifying Simulation source revision; only a full Step5 clear evicts the batch and resets operation state. A generation request freezes cache generation epoch, Step5 final-projection revision, and Simulation source revision; completion may commit row count, last table, progress/flow, and caller continuation only when all three are still current, and the Simulation session also retains the accepted source revision from that request. The V22 C exporter and simulation also share final node normalization from `NotchV22FirmwareProjector`; a batch request can reuse the exact resolved instance for the current single selected CAD, or return at most one identity-bound result after cold resolution and promote it back to the existing per-CAD owner after validating currentness. The batch still stores only compact candidate evidence, not polygons/debug results for all CADs. R13.101e makes normal generator/UI compensation build a complete `NotchV22CompensationContext` first; allocation/boundary/active/strict-query/policy evidence is no longer assembled from partial nullable values by the caller to control stage order; the old public API acts only as an adapter, explicitly empty allocations do not fall back to geometry, and final-output state still does not enter the context. `LegacyRegularAnchor` now fixes versions/threshold/`NullValue`/`LenScale` for the same generation through an owned request and uses the same explicit V21/V22 switch for generation and eligibility; the unused strategy registry/injection seam has been removed, but the request-specific table cache remains. R13.101c-2/R13.102/102a-2 and R13.103 remain open. Public compatibility `NotchDetailUseCase.Build` can still build an unanchored result, but the normal command no longer uses it.
+  - current boundary: normal `CadAllocation` export already has a separate Application-owned output-request-neutral candidate batch; matching export does not rebuild candidates because of versions, threshold, `NullValue`, or target guard/cap. Phases 1～3 resolution and phase 4 final projection are separated; concurrent Export/Simulation with the same CAD/grid/Step3/computation identity and generation epoch share one in-flight resolution task, while each caller still projects with the final request frozen at its own entry. A fingerprint hit still performs full computation-settings equality; a fault removes the task for retry; final-only changes retain the task/batch, while full invalidation advances the epoch, detaches the old task, and rejects its store/publish. Live UI guard/cap-only changes also retain Step3 revision, per-CAD sparse identity, and this batch, clearing only the current Step5 table/validation and notifying Simulation source revision; only a full Step5 clear evicts the batch and resets operation state. A generation request freezes cache generation epoch, Step5 final-projection revision, and Simulation source revision; completion may commit row count, last table, progress/flow, and caller continuation only when all three are still current, and the Simulation session also retains the accepted source revision from that request. The V22 C exporter and simulation also share final node normalization from `NotchV22FirmwareProjector`; a batch request can reuse the exact resolved instance for the current single selected CAD, or return at most one identity-bound result after cold resolution and promote it back to the existing per-CAD owner after validating currentness. The batch still stores only compact candidate evidence, not polygons/debug results for all CADs. R13.101e makes normal generator/UI compensation build a complete `NotchV22CompensationContext` first; allocation/boundary/active/strict-query/policy evidence is no longer assembled from partial nullable values by the caller to control stage order; the old public API acts only as an adapter, explicitly empty allocations do not fall back to geometry, and final-output state still does not enter the context. `LegacyRegularAnchor` now fixes versions/threshold/`NullValue`/`LenScale` for the same generation through an owned request and uses the same explicit V21/V22 switch for generation and eligibility; the unused strategy registry/injection seam has been removed, but the request-specific table cache remains. The owner closed R13.101, R13.102 and R13.103 on 2026-10-07 because their work is delivered; V21 and `LegacyRegularAnchor` stay as they are (`ROADMAP.md`, section 2.1). Public compatibility `NotchDetailUseCase.Build` can still build an unanchored result, but the normal command no longer uses it.
 
 ## S11.9 Notch 2.2 shared display projection（2026-03-09）
 - `NotchDisplayProjector` is the single path for Notch 2.2 display strings:
@@ -142,7 +142,7 @@ There are currently two source-of-truth result scopes and a Simulation review pr
 | Result scope | Current owner / entry | Readers | Current second-pass debt |
 | --- | --- | --- | --- |
 | Per-CAD diagnostics | `NotchV22ResolvedResultService`; root VM revision/cache; combined-overflow and normal target effective membership are projected by `NotchV22TargetAllocationPolicy` | Step3 preview/Canvas, deferred Inspector, CAD PadInfo, Notch detail, RuntimeQuery `pad/notch/notch-stage/multi-owner` | normal UI readers and `query multi-owner` already consume the revisioned per-CAD result; public compatibility `NotchDetailUseCase.Build` still retains unanchored standalone behavior; `GetCrossIcOwnerSharesForRegularPad` still derives from geometry, and the display projector still parses diagnostics (R13.102/104) |
-| Generated firmware artifact | `GenerateCurrentNotchTableAsync` -> `NotchExportGenerationCacheService` -> `NotchTableGenerator`; `NotchV22FirmwareProjector` owns final V22 node normalization | UI Step5 export, Runtime export adapter, Simulation workspace, Step6/Runtime validation | The normal `CadAllocation` cache stores a compact output-request-neutral candidate batch; phases 1～3 are resolved once by an identity/epoch-bound task, and concurrent full-table consumers share the task before each performs phase 4 final projection. final-only changes do not detach the task; full invalidation detaches it and rejects old stores; faults can be retried, and fingerprint collisions still reject incorrect joins through full settings identity. Generation completion also checks currentness using the captured cache epoch, final-projection revision, and source revision. The V22 exporter and simulation now share the `SourceRows`/`NodesByIc` projection; the selected sparse bridge lets the batch reuse a warm result or return at most one CAD + anchor-keyed resolved result when cold, promoting it back to the same per-CAD owner after validating currentness, without retaining complete diagnostics for the other candidates. R13.101e has consolidated the complete evidence and policy for normal generator/UI compensation into a single context/compute path; the compatibility adapter and explicit-empty correction do not change the final request, row projection, or schema. V21/V22 final projectors and Step6/Runtime validation share an Application-owned `0..65535` null-sentinel guard; an invalid sentinel fails fast in the VM/direct UseCase, actual IPC returns the exact message through the existing `IPC_ERROR` envelope, and default-sentinel C is unchanged. Legacy now shares an owned request within the same generation, and callback mutation affects only the next generation; generation/eligibility share fixed explicit V21/V22 dispatch, and the registry/injection seam has been removed. `LegacyRegularAnchor` still retains the request-specific `NotchTable` and compatibility boundary. R13.101c-2/R13.102/R13.102a-2/R13.103 remain open |
+| Generated firmware artifact | `GenerateCurrentNotchTableAsync` -> `NotchExportGenerationCacheService` -> `NotchTableGenerator`; `NotchV22FirmwareProjector` owns final V22 node normalization | UI Step5 export, Runtime export adapter, Simulation workspace, Step6/Runtime validation | The normal `CadAllocation` cache stores a compact output-request-neutral candidate batch; phases 1～3 are resolved once by an identity/epoch-bound task, and concurrent full-table consumers share the task before each performs phase 4 final projection. final-only changes do not detach the task; full invalidation detaches it and rejects old stores; faults can be retried, and fingerprint collisions still reject incorrect joins through full settings identity. Generation completion also checks currentness using the captured cache epoch, final-projection revision, and source revision. The V22 exporter and simulation now share the `SourceRows`/`NodesByIc` projection; the selected sparse bridge lets the batch reuse a warm result or return at most one CAD + anchor-keyed resolved result when cold, promoting it back to the same per-CAD owner after validating currentness, without retaining complete diagnostics for the other candidates. R13.101e has consolidated the complete evidence and policy for normal generator/UI compensation into a single context/compute path; the compatibility adapter and explicit-empty correction do not change the final request, row projection, or schema. V21/V22 final projectors and Step6/Runtime validation share an Application-owned `0..65535` null-sentinel guard; an invalid sentinel fails fast in the VM/direct UseCase, actual IPC returns the exact message through the existing `IPC_ERROR` envelope, and default-sentinel C is unchanged. Legacy now shares an owned request within the same generation, and callback mutation affects only the next generation; generation/eligibility share fixed explicit V21/V22 dispatch, and the registry/injection seam has been removed. `LegacyRegularAnchor` still retains the request-specific `NotchTable` and compatibility boundary. The owner closed R13.101, R13.102 and R13.103 on 2026-10-07 because their work is delivered; V21 and `LegacyRegularAnchor` stay as they are (`ROADMAP.md`, section 2.1) |
 | Simulation review | `NotchApplySimulationReviewUseCase` -> `NotchApplySimulationResult` / `SimulationSafetyAuditResult`; the EMS after-cap decision is owned by `SimulationSafetyAuditService.IsEmsAfterCapViolation`, and workspace/overview/export base severity, no-cell cap text, Copper replay severity, and Notch cap/target-cap guidance are owned respectively by `SimulationSafetyTextProjector.BuildStatusText`/`FormatEmsAfterCap`/`BuildReplayStatusText`/guidance builders; overview and physical-only export summary share `BuildPhysicalAuditSummaryText` evidence | `SimulationWorkspaceUseCase`, Simulation VM/overlay/validation, `CopperPillarPathReplayArtifactService`, export selection safety badge/summary, Step 3/5 Notch guidance, Runtime Query simulation regular snapshot, cell/overview/high-risk projections | This scope is a valid projection of the generated table; the active-surface mask is an additional explicit input, not a recalculation of Notch geometry. R13.104a-1 has consolidated the EMS predicate, a-4 through a-8 have consolidated workspace/overview/replay/export status and physical evidence, a-9 makes active Step 3/5 guidance read the current overview cap together, and a-10 further makes active Step 3 target-cap help use current target/EMS caps and Settings use the current draft target/default EMS cap; both share the same template. The complete EMS-blocked dialog text retains the existing contract, the artifact row synchronizes the JSON-ignored global-flow fact, and the serialized schema is unchanged. Overview-only stale/unavailable remains at the boundary, `HasRisk` means only EMS danger, `NeedsAttention` also includes physical/stale, and `MarginToCap` serves only as numeric evidence; other hard-coded cap and cell/high-risk/export/replay display/text debt still awaits the R13.104 parent. |
 
 Reader assessment:
@@ -156,13 +156,13 @@ Reader assessment:
 ## S4.6 stale-check（2026-03-05）
 - This round was confirmed as "structural reorganization with unchanged behavior": `FreeformHelperViewModel.Selection*` and `NotchV22CompensationService*` have been split into partials, but their external contracts are unchanged.
 - The deferred app settings contract still holds:
-  - Enter deferred mode after `Load Project`: `MarkProjectLoadedForAppGeneralPersistence()` (`src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`)
+  - Enter deferred mode after `Load Project`: `MarkProjectLoadedForAppGeneralPersistence()` (called in `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`, defined in `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs`)
   - Flush only after `Save Project` succeeds: `FlushDeferredAppGeneralSettingsIfNeeded()` (`src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs` / `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs`)
 - The `Ctrl+S` contract still holds:
   - shortcut handler：`src/FreeformHelper.UI/Views/FreeformHelperView.InputAndShortcuts.cs`
   - Calls `SaveProjectAsync()` and displays a top toast: `SaveProjectFromShortcutAsync(...)` (same file)
 - The runtime query single-entry contract still holds:
-  - The IPC server entry still goes through `RuntimeQueryUseCase.ExecuteAsync(...)`: `src/FreeformHelper.UI/Services/RuntimeQueryIpc.cs`
+  - The IPC server entry still goes through `RuntimeQueryUseCase.ExecuteAsync(...)`: `src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs`
 
 Marker descriptions:
 - [Rebuild] Triggers TriggerGridRebuildAsync / RebuildGridAsync
@@ -277,7 +277,7 @@ Notes:
   - [Status] (CanvasHost.Invalidate)
 - AutoDetectFreeformsCommand → AutoDetectFreeformsAsync
   - [Status] [Statistics] (updates Freeform stats table, CanvasHost.Invalidate)
-- SaveProjectCommand → SaveProjectAsync (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs)
+- SaveProjectCommand → SaveProjectAsync (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs)
   - [Status] (writes the project and clears HasUnsavedChanges)
 - LoadProjectCommand → LoadProjectAsync
   - [Status] [Rebuild] [View] [Clear selection]
@@ -298,7 +298,7 @@ Notes:
 - SelectAllLayersCommand / DeselectAllLayersCommand → SelectAllLayers / DeselectAllLayers
   - If RecalcBoundsOnLayerFilter=true, triggers [Rebuild] [View]
   - Calls MarkUnsaved when LayerToggle changes
-- CheckDxfQualityCommand → CheckDxfQuality (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs)
+- CheckDxfQualityCommand → CheckDxfQualityAsync (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs)
   - [Status]
 
 ### ShellViewModel (src/FreeformHelper.UI/ViewModels/ShellViewModel.cs)
@@ -309,7 +309,7 @@ Notes:
   - The terminal is expanded by default at startup; the full console text is built from the ring buffer tail without depending on UI collection flush.
   - After a startup/expansion ring snapshot, Add notifications replace the snapshot until the UI collection catches up; each stored entry appears once, including distinct entries with identical content.
 
-### Pad Info ViewModels (src/FreeformHelper.UI/ViewModels/PadInfoViewModels.cs)
+### Pad Info ViewModels (src/FreeformHelper.UI/ViewModels/PadInfo/)
 - CadPadInfoViewModel.ApplyChangesCommand → SetCadPadCustomValues
   - [Undo] [Status] (MarkUnsaved)
 - CadPadInfoViewModel.DiscardChangesCommand
@@ -329,7 +329,7 @@ Notes:
 
 ## Settings and property-change triggers
 
-### FreeformHelperViewModel.Settings.cs
+### FreeformHelperViewModel.Settings*.cs (FreeformHelperViewModel.Settings.cs, FreeformHelperViewModel.Settings.PropertyCallbacks.*.cs, FreeformHelperViewModel.Settings.NotchPreview.cs and FreeformHelperViewModel.Settings.DirtyTracking.cs; MatchThreshold is in FreeformHelperViewModel.State.Configuration.cs)
 - OnActiveAreaWidthChanged / OnActiveAreaHeightChanged
   - [Rebuild] [View] [Status]
 - OnPanelBiasXChanged / OnPanelBiasYChanged (when IsPanelAlignment)
@@ -366,10 +366,10 @@ Notes:
   - [Rebuild] [View] [Status]
 - OnCascadeSettingChanging
   - [Undo]
-- OnPropertyChanged（DirtySettingNames）
+- OnPropertyChanged（_dirtySettingNames）
   - MarkUnsaved (persisted settings)
 
-### FreeformHelperViewModel.State.cs
+### FreeformHelperViewModel.State*.cs (FreeformHelperViewModel.State.cs and FreeformHelperViewModel.State.Configuration.cs)
 - OnUseLocalSizingChanged / OnIsWidthRowLocalChanged / OnIsHeightColumnLocalChanged
   - [Rebuild] [Status]
 - OnStatusTextChanged
@@ -389,11 +389,11 @@ Notes:
 ## View / Control events
 
 ### FreeformHelperView (src/FreeformHelper.UI/Views/FreeformHelperView*.cs)
-- OnAttachedToVisualTree（Pickers.cs）
+- OnAttachedToVisualTree（Lifecycle.cs; the setup below runs in AttachViewModel, Pickers.cs）
   - Sets CanvasHost, subscribes to InteractionState, ConfigureFilePickers
   - EnsureInitialGrid → [Rebuild]
   - EnsureInitialFit → [View]
-- OnTopLevelKeyDown（FreeformHelperView.axaml.cs）
+- OnTopLevelKeyDown（FreeformHelperView.InputAndShortcuts.cs）
   - Ctrl+Z → UndoCommand [Undo] [Status]
   - Ctrl+S → SaveProjectAsync (save result displayed in a top toast) [Status]
   - Delete → DeleteSelectedCadPadsCommand (only when focus is outside text input) [Status]
@@ -435,8 +435,8 @@ Notes:
   - Triggers Value changes (downstream property changes and side effects)
 
 ### MainWindow (src/FreeformHelper.UI/MainWindow.axaml.cs)
-- OnClosingAsync
-  - Displays ConfirmDialog and calls SaveProjectAsync after confirmation
+- OnClosing (runs SaveBeforeClosingAsync)
+  - Displays ConfirmDialog and starts the save command (TryStartSaveProjectCommand, which runs SaveProjectAsync) after confirmation
 
 ### ConfirmDialog (src/FreeformHelper.UI/Views/ConfirmDialog.axaml.cs)
 - ConfirmButton_Click / CancelButton_Click
@@ -444,7 +444,7 @@ Notes:
 
 ## PadCanvas interaction
 
-### Input and selection (src/FreeformHelper.UI/Controls/PadCanvas.Input.cs)
+### Input and selection (src/FreeformHelper.UI/Controls/PadCanvas.Input.cs and src/FreeformHelper.UI/Controls/PadCanvas.Input.Selection.cs)
 - Left click: select / Ctrl/Shift additive / toggle
   - Click blank space without a modifier → [Clear selection]
 - Box selection (drag)
@@ -455,7 +455,7 @@ Notes:
   - Selects first if needed, then triggers the context menu
 - Row/Col/IC label click
   - Directly selects regular pads in that row/col/IC (additive supported) [Set selection]
-- SelectionChanged event
+- SelectionChanged event (declared in PadCanvas.cs, raised in PadCanvas.Input.Selection.cs)
   - Emits SelectionChanged (selected IDs/indices)
 
 ### View control (src/FreeformHelper.UI/Controls/PadCanvas.View.cs)
@@ -463,22 +463,22 @@ Notes:
   - [View]
 - ZoomAt（mouse wheel）
   - [View]
-- Pan (middle mouse button or spacebar)
+- Pan (middle mouse button or spacebar; started in PadCanvas.Input.cs)
   - [View] + ViewChanged event
 
-### Keyboard shortcuts (src/FreeformHelper.UI/Controls/PadCanvas.Input.cs)
+### Keyboard shortcuts (src/FreeformHelper.UI/Controls/PadCanvas.Input.Navigation.cs)
 - F → FitToContent [View]
 - Ctrl+A → SelectAllPads [Set selection]
 - Shift+Arrow → pan nudge [View]
 - Note: The same F/Ctrl+A also have TopLevel global entries to maintain consistent behavior when the canvas is not focused.
 
-### Programmatic selection (PadCanvas.Input.cs)
+### Programmatic selection (PadCanvas.Input.Selection.cs)
 - ClearSelection() → [Clear selection]
 - SetSelection() → [Set selection]
 
-### Resource / Theme initialization (src/FreeformHelper.UI/Controls/PadCanvas.cs)
-- ResourcesChanged / ActualThemeVariantChanged
-  - Clears cache + ApplyThemeDefaults + InvalidateVisual
+### Resource / Theme initialization (src/FreeformHelper.UI/Controls/PadCanvas.Lifecycle.cs)
+- ResourcesChanged / ActualThemeVariantChanged (OnResourcesChanged / OnActualThemeVariantChanged → RefreshThemeResources)
+  - Clears cache + ApplyThemeDefaults + RequestVisualRefresh
   - Prevents color/font failures caused by resource initialization timing
 
 ### ViewChanged event (PadCanvas.cs)
