@@ -13,7 +13,6 @@ public sealed partial class NotchV22CompensationService
     private const double AreaEpsilon = 1e-12;
     private const int ReachabilityResolution = 40;
     private const double DefaultStrictOverlapRatio = 0.001; // 0.1%
-    private const double BlockerCellCoverageRatio = 0.2; // legacy reachability helper
 
     /// <summary>
     /// Builds the complete context used by the canonical compensation path.

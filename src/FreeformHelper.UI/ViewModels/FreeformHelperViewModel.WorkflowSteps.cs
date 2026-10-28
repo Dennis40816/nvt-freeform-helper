@@ -9,11 +9,6 @@ public sealed partial class FreeformHelperViewModel
     private const string NotchExportNotRunSummary = "Notch export: not run.";
     private int _notchFinalProjectionRevision;
 
-    private void MoveToWorkflowStep(int step)
-    {
-        MoveToWorkflowStep(WorkflowPipelineService.NormalizeStepOrDefault(step));
-    }
-
     private void MoveToWorkflowStep(WorkflowStepId step)
     {
         var expansion = WorkflowPipelineService.BuildExpansionState(step);
@@ -63,11 +58,6 @@ public sealed partial class FreeformHelperViewModel
     {
         OnWorkflowStepChanged(changedStep, showStatus);
         MoveToWorkflowStep(changedStep);
-    }
-
-    private void InvalidateDownstreamFromStep1(bool showStatus)
-    {
-        OnWorkflowStepChanged(WorkflowStepId.Step1Match, showStatus);
     }
 
     private void InvalidateDownstreamFromStep2(bool showStatus)
