@@ -7024,16 +7024,6 @@
       "symbol": "IDE0051"
     },
     {
-      "syntaxHash": "a542905ca083abdb1d90f29b104e958ed1e99da21521690f51392a1c98706e68",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplyPersistedDxfEditProjectState(ProjectFile)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0051",
-      "symbol": "IDE0051"
-    },
-    {
       "syntaxHash": "71e4390b5413bb85fb21a8edbe7b9c685a90b450aaaea3fbbd799761418e41bb",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplySettingsChange(SettingsChangeKind,bool,SettingsChangeEffects)",
       "owner": "NFH",
@@ -10902,16 +10892,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
-      "syntaxHash": "3a22d65fce0433dbeb134c998457e0ce7c6c2a49790b5155151e54c7c13ed502",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.ApplyCadLoadOutcomeAsync_ClearsStaleCombinedMetadataBeforeApplyingHiddenRows()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.CommandsAndUndo.Duplicates.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "4a4f5cd4ac719a14ac359b32e11c7ed474e85a3b9e99b56d22fd1ab24bd8ae89",

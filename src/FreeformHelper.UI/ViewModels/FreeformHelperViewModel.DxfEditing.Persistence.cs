@@ -6,7 +6,7 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private sealed record PersistedDxfEditProjectState(
+    internal sealed record PersistedDxfEditProjectState(
         HashSet<int> HiddenCadPadIds,
         HashSet<int> VisibleDuplicateCadPadIds,
         Dictionary<int, string> CadLayerOverrides,
@@ -39,7 +39,7 @@ public sealed partial class FreeformHelperViewModel
         file.DxfCombinedCadGroups = CapturePersistedCombinedCadGroups();
     }
 
-    private static PersistedDxfEditProjectState CapturePersistedDxfEditProjectState(ProjectFile file)
+    internal static PersistedDxfEditProjectState CapturePersistedDxfEditProjectState(ProjectFile file)
     {
         ArgumentNullException.ThrowIfNull(file);
 
@@ -123,12 +123,7 @@ public sealed partial class FreeformHelperViewModel
         return groups;
     }
 
-    private void ApplyPersistedDxfEditProjectState(ProjectFile file)
-    {
-        ApplyCapturedDxfEditProjectState(CapturePersistedDxfEditProjectState(file));
-    }
-
-    private void ApplyCapturedDxfEditProjectState(PersistedDxfEditProjectState state)
+    internal void ApplyCapturedDxfEditProjectState(PersistedDxfEditProjectState state)
     {
         ArgumentNullException.ThrowIfNull(state);
         var previous = new CadEditNotificationSnapshot(this);
