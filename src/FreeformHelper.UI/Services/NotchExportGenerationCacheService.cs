@@ -14,7 +14,7 @@ public sealed class NotchExportGenerationCacheService
     private const ulong FnvPrime = 1099511628211UL;
     private const double SignatureCoordinateScale = 1_000_000.0;
 
-    private readonly object _generationEpochGate = new();
+    private readonly Lock _generationEpochGate = new();
     private CacheEntry? _entry;
     private CadAllocationInFlightEntry? _cadAllocationInFlight;
     private long _generationEpoch;

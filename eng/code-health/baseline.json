@@ -3134,16 +3134,6 @@
       "symbol": "WarningsNotAsErrors:IDE0052"
     },
     {
-      "syntaxHash": "bc367affce8c61f20132214d5a3e6f6387b65e648a8c29e55ad7454eb2b3860f",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:IDE0330"
-    },
-    {
       "syntaxHash": "c7c0ce178aea3d14f1838e12bab4b081985ba7bb3ad6443f4abd4c3c3fd0f1fa",
       "member": "MSBuild",
       "owner": "NFH",
@@ -7294,76 +7284,6 @@
       "symbol": "IDE0330"
     },
     {
-      "syntaxHash": "2ef4ffb844d9ed23beb1ca75f95279e3c70cf3e053df4e0c5a529d16a98eea84",
-      "member": "FreeformHelper.UI.Logging.AppLogStore.fields:_sync",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Logging/AppLogStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0330",
-      "symbol": "IDE0330"
-    },
-    {
-      "syntaxHash": "87dc60e0f02b222c8bfca889dbde41b4f76983226dec66aad198bd92d88750a1",
-      "member": "FreeformHelper.UI.Logging.AppLogStore.fields:_uiCollectionGate",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Logging/AppLogStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0330",
-      "symbol": "IDE0330"
-    },
-    {
-      "syntaxHash": "2a92ab18fc5ee37c3f5d82136bf369a211d351c41161bdeff38259176fff83bf",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerDebugState.fields:Sync",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerDebugState.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0330",
-      "symbol": "IDE0330"
-    },
-    {
-      "syntaxHash": "2ef4ffb844d9ed23beb1ca75f95279e3c70cf3e053df4e0c5a529d16a98eea84",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.fields:_sync",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0330",
-      "symbol": "IDE0330"
-    },
-    {
-      "syntaxHash": "2ef4ffb844d9ed23beb1ca75f95279e3c70cf3e053df4e0c5a529d16a98eea84",
-      "member": "FreeformHelper.UI.Services.GridRebuildUseCase.fields:_sync",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/GridRebuildUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0330",
-      "symbol": "IDE0330"
-    },
-    {
-      "syntaxHash": "7b4ae3a76dad5e2fb61fe10ad35b79259d47c31688666fc233fdb1d6db3dbc59",
-      "member": "FreeformHelper.UI.Services.NotchExportGenerationCacheService.fields:_generationEpochGate",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/NotchExportGenerationCacheService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0330",
-      "symbol": "IDE0330"
-    },
-    {
-      "syntaxHash": "2a92ab18fc5ee37c3f5d82136bf369a211d351c41161bdeff38259176fff83bf",
-      "member": "FreeformHelper.UI.Services.RuntimeQueryIpcHost.fields:Sync",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0330",
-      "symbol": "IDE0330"
-    },
-    {
       "syntaxHash": "829bc9f2701a1cb8a59569488af0bc9580d39d869e55c62638e333e4f1f28998",
       "member": "FreeformHelper.Application.Services.CoordinateArtifactService.fields:JsonOptions",
       "owner": "NFH",
@@ -9304,16 +9224,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "2a92ab18fc5ee37c3f5d82136bf369a211d351c41161bdeff38259176fff83bf",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerDebugState.fields:Sync",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerDebugState.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "870d4c03c38f5e5adf5c0d9f4ff90b94ded518a165966bda83d9b2b819fdedc0",
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerHostService.fields:SharedHostInstance",
       "owner": "NFH",
@@ -9496,16 +9406,6 @@
     {
       "syntaxHash": "927297af9d1ab3e258223e9755e568577b6e7897c0753f26be24e42aeadc5f34",
       "member": "FreeformHelper.UI.Services.RuntimeQueryIpcHost.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "2a92ab18fc5ee37c3f5d82136bf369a211d351c41161bdeff38259176fff83bf",
-      "member": "FreeformHelper.UI.Services.RuntimeQueryIpcHost.fields:Sync",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs",
       "project": "FreeformHelper.UI",

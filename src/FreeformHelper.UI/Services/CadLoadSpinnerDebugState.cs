@@ -25,7 +25,7 @@ internal sealed record CadLoadSpinnerDebugSnapshot(
 internal static class CadLoadSpinnerDebugState
 {
     private const int MaxEvents = 120;
-    private static readonly object Sync = new();
+    private static readonly Lock _sync = new();
     private static readonly Queue<CadLoadSpinnerDebugEvent> Events = new();
     private static long _sequence;
     private static int _vmOverlayShowCount;
@@ -119,7 +119,7 @@ internal static class CadLoadSpinnerDebugState
 
     public static CadLoadSpinnerDebugSnapshot GetSnapshot()
     {
-        lock (Sync)
+        lock (_sync)
         {
             return new CadLoadSpinnerDebugSnapshot(
                 VmOverlayShowCount: _vmOverlayShowCount,
@@ -151,7 +151,7 @@ internal static class CadLoadSpinnerDebugState
         Interlocked.Exchange(ref _hostShowIpcFailCount, 0);
         Interlocked.Exchange(ref _hostHideIpcCount, 0);
         Interlocked.Exchange(ref _hostShowRetryCount, 0);
-        lock (Sync)
+        lock (_sync)
         {
             Events.Clear();
         }
@@ -167,7 +167,7 @@ internal static class CadLoadSpinnerDebugState
             Source: source,
             Detail: detail);
 
-        lock (Sync)
+        lock (_sync)
         {
             Events.Enqueue(entry);
             while (Events.Count > MaxEvents)
