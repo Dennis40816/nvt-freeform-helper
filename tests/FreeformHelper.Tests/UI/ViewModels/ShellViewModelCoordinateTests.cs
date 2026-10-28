@@ -99,11 +99,12 @@ public sealed class ShellViewModelCoordinateTests
         using var shell = new ShellViewModel();
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        shell.CoordinatePlanner.RequestBuildWorkspaceAsync = async () =>
+        Func<Task> buildWorkspace = async () =>
         {
             entered.SetResult();
             await release.Task;
         };
+        shell.CoordinatePlanner.RequestBuildWorkspaceAsync = buildWorkspace;
 
         var showTask = shell.ShowCoordinateCommand.ExecuteAsync(null);
         try

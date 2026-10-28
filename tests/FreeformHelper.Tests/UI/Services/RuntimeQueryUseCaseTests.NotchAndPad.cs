@@ -21,7 +21,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         var secondEmittedMaxX = emittedMaxX + (emittedArea / cadHeight);
         var cadMaxX = secondEmittedMaxX + (roundedZeroArea / cadHeight);
         var gridMaxX = secondEmittedMaxX + 800.0;
-        var shell = new ShellViewModel();
+        using var shell = new ShellViewModel();
         var helper = shell.FreeformHelper;
         var cad = CreateCadPad(274, 0, 0, cadMaxX, cadHeight);
         var regulars = new[]

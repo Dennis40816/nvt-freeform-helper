@@ -88,11 +88,12 @@ public sealed class SimulationHostViewModelTests
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        host.RequestBuildWorkspaceAsync = async () =>
+        Func<Task> buildWorkspace = async () =>
         {
             entered.SetResult();
             await release.Task;
         };
+        host.RequestBuildWorkspaceAsync = buildWorkspace;
 
         var buildTask = host.EnsureWorkspaceAsync();
         await entered.Task;

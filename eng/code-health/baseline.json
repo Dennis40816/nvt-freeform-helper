@@ -2824,36 +2824,6 @@
       "symbol": "FreeformHelper.Tests.FreeformHelperViewModelTests"
     },
     {
-      "syntaxHash": "f50472257769ca33cc626a77dc974a6f6781e4fd71183293f8495b508160adc9",
-      "member": "FreeformHelper.Tests.ShellViewModelCoordinateTests.ShowCoordinateCommand_DelayedBuild_KeepsPreviousPageUntilCompletion()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelCoordinateTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "f50472257769ca33cc626a77dc974a6f6781e4fd71183293f8495b508160adc9",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.ShowSimulationCommand_ShowsSimulationHostBeforeDelayedBuildCompletes()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "3d1af720f0bc7c611703fbb13c89e7f72026971a903c82882eb417692d84d56a",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.WorkspaceSourceChanges_BurstOnlyPrewarmsOnce()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
       "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
       "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.SimulationSafetyOverview_WhenWorkspaceHasNoCells_UsesNotRunAvailabilityStatus()",
       "owner": "NFH",
@@ -2862,16 +2832,6 @@
       "count": 1,
       "rule": "blockingWait",
       "symbol": "Result"
-    },
-    {
-      "syntaxHash": "f50472257769ca33cc626a77dc974a6f6781e4fd71183293f8495b508160adc9",
-      "member": "FreeformHelper.Tests.SimulationHostViewModelTests.EnsureWorkspaceAsync_ReportsBuildingStateWhileRequestIsRunning()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/SimulationHostViewModelTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
     },
     {
       "syntaxHash": "789fc729cfe695cae06f751aea514723ffebdcc6bcbe728386a98eda79ff873c",
@@ -6802,46 +6762,6 @@
       "count": 2,
       "rule": "CA1307",
       "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "bc88a7fd573b3715865eb9f541b1846e3c263037bab7fc6c0e21d18214917b52",
-      "member": "FreeformHelper.Tests.HeadlessUiSmokeTests.CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA2000",
-      "symbol": "CA2000"
-    },
-    {
-      "syntaxHash": "c8b7a818298b966aba4c98e51cae70706626fe4e6f3c33d5aff39a92f712778d",
-      "member": "FreeformHelper.Tests.HeadlessUiSmokeTests.FreeformHelperView_CadLoadOverlay_TogglesSpinnerHostVisibility()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA2000",
-      "symbol": "CA2000"
-    },
-    {
-      "syntaxHash": "3d6869cff8b7d13a1b8112057dd502b52db5e9e85a4fa967dc42f97213421ca1",
-      "member": "FreeformHelper.Tests.RuntimeQueryUseCaseTests.ExecuteAsync_NotchPadAndInspector_SameResolvedDisplayWithRoundedZeroTarget()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryUseCaseTests.NotchAndPad.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA2000",
-      "symbol": "CA2000"
-    },
-    {
-      "syntaxHash": "70ea1abe3bb2a768d9533f897d98d5d1557011d0f441ba669fc5dd1efcf173c0",
-      "member": "FreeformHelper.Tests.TestInfrastructure.ClosingWindowFixture..ctor(Func<Window, Task<bool?>>,UiEventRunner?)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/UiEventProbe.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA2000",
-      "symbol": "CA2000"
     },
     {
       "syntaxHash": "5b07f87a0a51bcfaa25e363b6c0d93fa004a9650a3f1fb4e192b494a9f5c702d",
@@ -19614,48 +19534,8 @@
       "symbol": "VSTHRD003"
     },
     {
-      "syntaxHash": "582c2ef7897d5a60433a9897cce6d2ea2e5cdb2c3063f0bb7f0c4bca83868662",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_CancelledBeforePublication_PreservesExistingBytesAndLeavesNoTemporaryFiles()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD103",
-      "symbol": "VSTHRD103"
-    },
-    {
       "syntaxHash": "8faf7d81beab8c86a086e14795a07744681b88f40436bd2f26694ba6d22d4364",
       "member": "FreeformHelper.Tests.UiEventRunnerTests.Run_AsynchronousFailure_ReportsOnceWithoutDispatcherException()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD103",
-      "symbol": "VSTHRD103"
-    },
-    {
-      "syntaxHash": "45821796fc72154098e8024f270344509f75af6ee52b302b213217bceff33af4",
-      "member": "FreeformHelper.Tests.UiEventRunnerTests.RunAsync_ForeignCancellation_IsReported()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD103",
-      "symbol": "VSTHRD103"
-    },
-    {
-      "syntaxHash": "582c2ef7897d5a60433a9897cce6d2ea2e5cdb2c3063f0bb7f0c4bca83868662",
-      "member": "FreeformHelper.Tests.UiEventRunnerTests.RunAsync_ForeignCancellation_IsReported()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD103",
-      "symbol": "VSTHRD103"
-    },
-    {
-      "syntaxHash": "582c2ef7897d5a60433a9897cce6d2ea2e5cdb2c3063f0bb7f0c4bca83868662",
-      "member": "FreeformHelper.Tests.UiEventRunnerTests.RunAsync_MatchingCancellation_IsSilent()",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
       "project": "FreeformHelper.Tests",
