@@ -62,7 +62,7 @@ Groups g1 to g7 were named 1.3.0 to 1.3.5 before 2026-10-07. Older commits, PRs 
 | g2 | 1.3.1 | Notch single-result pipeline | Zero difference | Done. The owner closed it with A1/A2 on 2026-10-04; B1/B2 are accepted exceptions | None, for the same reason |
 | g3 | 1.3.2 | Matching and domain state | Zero difference | Done. The owner closed it with the delivered scope on 2026-10-06 | `dev/1.0.x/g3-matching-domain` (the retired format, kept) at the closing merge of [#39](https://github.com/Dennis40816/nvt-freeform-helper/pull/39) |
 | g4 | 1.3.3, first part | Core integration (line 3) and the state batch-0 fixes | Zero data difference; the look PR changes appearance with owner approval | In progress | `v1.0.0-g.4` |
-| g5 | 1.3.3, second part | Settings and presentation | Zero data difference; the R13.303 opacity change changes appearance with owner approval | Not started (after 2026-10-18) | Named after 1.0.0 ships: `v<next release>-g.N` |
+| g5 | 1.3.3, second part | Settings and presentation | Zero data difference; the R13.303 opacity change changes appearance with owner approval | Not started. Waits for the g4 exit | Named after 1.0.0 ships: `v<next release>-g.N` |
 | g6 | 1.3.4 | Workspace ViewModel split | Zero difference | Not started. Waits for the g5 exit | Named like g5 |
 | g7 | 1.3.5 | UI structure and token cleanup | Zero data difference | Not started. Waits for the g6 exit | Named like g5 |
 | g8 | - | State refactor ST1 to ST5, after Core 1.0.0 | To be set with the plan | Not started | Named like g5 |
@@ -71,7 +71,7 @@ Groups g1 to g7 were named 1.3.0 to 1.3.5 before 2026-10-07. Older commits, PRs 
 
 Order rules:
 
-- Core comes first until 2026-10-18. Until then, NFH product work is limited to urgent fixes.
+- NFH, Core and LDRA are all main lines (owner decision, 2026-10-27). The limit that NFH product work was urgent fixes only has ended.
 - Do one `R13.*` slice at a time.
 - Zero-difference rule: `V21_before == V21_after` and `V22_before == V22_after`. Work that must change Firmware C bytes leaves the refactor plan as a separate behavior item.
 
@@ -85,7 +85,7 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
 - [ ] **P-V21 Remove V21 and `LegacyRegularAnchor` completely** · Target: after g7 · Status: Waiting for owner (scope) · PR: -
   - No implicit conversion before then. Planning notes: `docs/reviews/v21-*-2026-10.md`.
 
-### 2.2 g5 settings and presentation (after 2026-10-18)
+### 2.2 g5 settings and presentation (after the g4 exit)
 
 - [ ] **R13.301 Settings draft snapshot with per-field Apply, Discard and round-trip tests; save only dirty fields** · Target: g5 · Status: Not started · PR: -
 - [ ] **R13.302 One apply plan and side-effect owner for all settings entries; typed Step 2/4/5 invalidation** · Target: g5 · Status: Not started · PR: -
@@ -102,7 +102,7 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
 - [ ] **R13.403 Move `MatchingWorkspaceViewModel` orchestration** · Target: g6 · Status: Not started · PR: -
 - [ ] **R13.404 Move `NotchWorkspaceViewModel` orchestration** · Target: g6 · Status: Not started · PR: -
 - [ ] **R13.405 Converge the `ProjectSessionViewModel` facade, Save/Load/IPC and cross-workspace tests** · Target: g6 · Status: Not started · PR: -
-- [ ] **R13.406 Remaining typed-ID chains (from R13.203) and RegularPad writer transitions (from R13.204)** · Target: g6 · Status: Not started (after 2026-10-18) · PR: -
+- [ ] **R13.406 Remaining typed-ID chains (from R13.203) and RegularPad writer transitions (from R13.204)** · Target: g6 · Status: Not started. Waits for the g5 exit · PR: -
   - Convert one API chain at a time and keep the integer adapters. Persistence, export, CSV, CLI and IPC stay numeric.
   - First verify four single-source risks: best-match identity, duplicate (IC, diff) grouping, matched-identity lookup and anchor identity.
 - [ ] **R13.501 Split Controls.Core responsibilities; scoped BasedOn and template dedup** · Target: g7 · Status: Not started · PR: -
@@ -119,7 +119,7 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
 - [x] **H2 One shell navigation selection with computed binding projections** · Target: 1.0.0 (g4 health tasks) · Status: Done · PR: [#70](https://github.com/Dennis40816/nvt-freeform-helper/pull/70) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
   - The authorized H2 slice precedes the larger state batches below; it preserves workspace build, source refresh and prewarm ordering.
 
-The owner scheduled these five batches after the NVT Core 1.0.0 release (target 2026-10-15). Each batch is one PR, and each starts with tests that pin the current behavior.
+The owner scheduled these five batches after the NVT Core 1.0.0 release (the target date 2026-10-15 has passed; Core 1.0.0 is not released yet). Each batch is one PR, and each starts with tests that pin the current behavior.
 
 - [ ] **ST1 Compute derived values instead of storing them in `FreeformHelperViewModel`** · Target: after Core 1.0.0 · Status: Not started · PR: -
 - [ ] **ST2 Nesting-safe suppression guards, a view-model mode enum and a PadCanvas gesture enum** · Target: after Core 1.0.0 · Status: Not started · PR: -
@@ -133,6 +133,7 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (target 
 - [ ] **S15.002 Remove the full-suite timeouts in `FreeformHelperViewModelTests`, then make the `viewmodel` CI shard required again** · Target: - · Status: Blocked: needs a new failure trace for root cause six (headless dispatcher race) · PR: -
   - Root causes 1 to 5, 7 and 8 are fixed. The earlier analysis predates Avalonia 12.1.1 and xUnit v3.
 - [ ] **R13.306-F1 Give the four main-window tests a fake CAD load spinner host** · Target: - · Status: Not started · PR: -
+- [ ] **H-LEDGER Lower the code-health ledgers in small slices** · Target: - · Status: In progress: T1 (test findings) is in review, then L1 (`Lock` types) and U1 (unused private members) · PR: [#207](https://github.com/Dennis40816/nvt-freeform-helper/pull/207) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
 - [ ] **S15.005c Review infrastructure: R0–R3 authority policy, CODEOWNERS, PR and issue templates, review records** · Target: - · Status: Blocked: waits for the shared CI pilot · PR: -
   - The report-only path guard merged in [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21) but is not wired into CI. Waiting for owner: the exception and calibration policy, and when it starts to block.
 - [ ] **S15.005d Owner-only settings: the `release` environment** · Target: - · Status: Waiting for owner · PR: -
