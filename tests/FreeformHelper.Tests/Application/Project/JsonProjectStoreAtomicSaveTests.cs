@@ -55,7 +55,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
             var original = Encoding.UTF8.GetBytes("original project bytes");
             File.WriteAllBytes(path, original);
             using var cancellation = new CancellationTokenSource();
-            cancellation.Cancel();
+            await cancellation.CancelAsync();
             var store = new JsonProjectStore(new FixedTimeProvider(SavedAt));
 
             await Assert.ThrowsAnyAsync<OperationCanceledException>(

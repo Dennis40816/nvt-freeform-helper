@@ -84,7 +84,7 @@ public sealed class UiEventRunnerTests
     public async Task RunAsync_MatchingCancellation_IsSilent()
     {
         using var cancellation = new CancellationTokenSource();
-        cancellation.Cancel();
+        await cancellation.CancelAsync();
         var probe = new UiEventProbe();
 
         await probe.Runner.RunAsync("Window.ClosingSave", token => Task.FromCanceled(token), cancellation.Token);
@@ -98,8 +98,8 @@ public sealed class UiEventRunnerTests
     {
         using var cancellation = new CancellationTokenSource();
         using var foreignCancellation = new CancellationTokenSource();
-        cancellation.Cancel();
-        foreignCancellation.Cancel();
+        await cancellation.CancelAsync();
+        await foreignCancellation.CancelAsync();
         var probe = new UiEventProbe();
 
         await probe.Runner.RunAsync("Window.ClosingSave", _ => Task.FromCanceled(foreignCancellation.Token), cancellation.Token);

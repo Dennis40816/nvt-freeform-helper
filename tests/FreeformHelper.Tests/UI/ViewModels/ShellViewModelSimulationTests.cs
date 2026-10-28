@@ -32,11 +32,12 @@ public sealed class ShellViewModelSimulationTests
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        shell.Simulation.RequestBuildWorkspaceAsync = async () =>
+        Func<Task> buildWorkspace = async () =>
         {
             entered.SetResult();
             await release.Task;
         };
+        shell.Simulation.RequestBuildWorkspaceAsync = buildWorkspace;
 
         var showTask = shell.ShowSimulationCommand.ExecuteAsync(null);
         await entered.Task;
@@ -259,11 +260,12 @@ public sealed class ShellViewModelSimulationTests
                 ActiveRegularPadIds: grid.Pads.Select(static pad => pad.RegularPadId).ToHashSet()));
 
         var prewarmCount = 0;
-        shell.Simulation.RequestPrewarmWorkspaceAsync = async () =>
+        Func<Task> prewarmWorkspace = async () =>
         {
             Interlocked.Increment(ref prewarmCount);
             await Task.Delay(80);
         };
+        shell.Simulation.RequestPrewarmWorkspaceAsync = prewarmWorkspace;
 
         shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
         shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
