@@ -132,6 +132,8 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
 
 - [ ] **S15.002 Remove the full-suite timeouts in `FreeformHelperViewModelTests`, then make the `viewmodel` CI shard required again** · Target: - · Status: Blocked: needs a new failure trace for root cause six (headless dispatcher race) · PR: -
   - Root causes 1 to 5, 7 and 8 are fixed. The earlier analysis predates Avalonia 12.1.1 and xUnit v3.
+  - On 2026-10-28 three CI test groups (`ui-snapshots`, `notch-core`, `ui-stable`) ended with test host exit 1 and zero results, the cause is unknown, and [#210](https://github.com/Dennis40816/nvt-freeform-helper/pull/210) now prints fixed host-error labels so that the next failure can be traced.
+  - The commit that added the note above (`52c6622`) was pushed without its verification in the commit body and without a `lint.ps1` run before it. Lint ran afterwards on the same tree and passed (exit 0). The results are in the checks of [#211](https://github.com/Dennis40816/nvt-freeform-helper/pull/211), and the commit is not rewritten, as `docs/agents/issue-tracker.md` allows.
 - [ ] **R13.306-F1 Give the four main-window tests a fake CAD load spinner host** · Target: - · Status: Not started · PR: -
 - [ ] **H-LEDGER Lower the code-health ledgers in small slices** · Target: - · Status: In progress: T1 (test findings) is merged, then L1 (`Lock` types) and U1 (unused private members) · PR: [#207](https://github.com/Dennis40816/nvt-freeform-helper/pull/207) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
 - [ ] **S15.005c Review infrastructure: R0–R3 authority policy, CODEOWNERS, PR and issue templates, review records** · Target: - · Status: Blocked: waits for the shared CI pilot · PR: -
