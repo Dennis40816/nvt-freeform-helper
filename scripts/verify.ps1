@@ -240,7 +240,7 @@ function Invoke-TestShard {
             }
             foreach ($group in $shardGroups[$Name]) {
                 $groupDirectory = Join-Path $resultsDirectory $group
-                $runStatus = @{ ExitCode = $null }
+                $runStatus = @{ ExitCode = $null; HostErrors = @() }
                 $phase = 'results-directory'
                 $exceptionType = $directoryExceptionType
                 if ([string]::IsNullOrEmpty($directoryExceptionType)) {
@@ -255,6 +255,11 @@ function Invoke-TestShard {
                         $runFailed = $true
                         $exceptionType = $_.Exception.GetType().FullName
                     }
+                }
+                # Only fixed labels from run-tests.ps1 are printed. The output they came from is never printed.
+                if (@($runStatus.HostErrors).Count -gt 0) {
+                    Write-Host ('[verify] diagnostic group={0} exit={1} host-errors={2}' -f
+                        $group, $runStatus.ExitCode, (@($runStatus.HostErrors) -join ','))
                 }
                 $directoryPresent = $false
                 $trxFiles = 0
