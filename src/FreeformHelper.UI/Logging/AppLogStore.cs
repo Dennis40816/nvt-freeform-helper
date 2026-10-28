@@ -14,12 +14,12 @@ public sealed class AppLogStore
 {
     private const int DefaultMaxEntries = 10000;
 
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     // The UI collection and whatever listens to it are not thread-safe. In the app only the UI thread changes
     // it. Where no UI loop runs (unit tests, or a dispatcher that is shutting down) every thread counts as the
     // UI thread, so the changes are made one at a time. Subscribers run while this gate is held; they must
     // not log synchronously or wait for another thread.
-    private readonly object _uiCollectionGate = new();
+    private readonly Lock _uiCollectionGate = new();
     private readonly Func<bool> _hasUiThreadAccess;
     private readonly Action<Action> _postToUiThread;
     // The main collection of log entries that the UI binds to.

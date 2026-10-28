@@ -13,14 +13,14 @@ internal static class RuntimeQueryIpcHost
     internal const int RequestReadTimeoutMs = 5000;
     internal const int ShutdownTimeoutMs = 1500;
     private static readonly Logger Logger = LogManager.GetLogger("FreeformHelper.UI.Services.RuntimeQueryIpcServer");
-    private static readonly object Sync = new();
+    private static readonly Lock _sync = new();
     private static RuntimeQueryIpcServer? _server;
 
     public static void Start(ShellViewModel shellViewModel)
     {
         ArgumentNullException.ThrowIfNull(shellViewModel);
 
-        lock (Sync)
+        lock (_sync)
         {
             if (_server is not null)
             {
@@ -57,7 +57,7 @@ internal static class RuntimeQueryIpcHost
     public static Task StopAsync()
     {
         RuntimeQueryIpcServer? server;
-        lock (Sync)
+        lock (_sync)
         {
             server = _server;
             _server = null;

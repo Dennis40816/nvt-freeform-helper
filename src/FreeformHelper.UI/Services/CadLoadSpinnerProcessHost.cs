@@ -33,7 +33,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
     private static readonly TimeSpan PostShowMinimumVisible = TimeSpan.FromMilliseconds(120);
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private readonly SemaphoreSlim _stateSyncGate = new(1, 1);
     private readonly string _pipeName = CadLoadSpinnerIpcProtocol.BuildPipeName(Environment.ProcessId);
     private readonly Func<CadLoadSpinnerRequest, bool>? _sendRequestOverride;
@@ -275,7 +275,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
             if (!showRequestedAtStart)
             {
-                var shouldHide = false;
+                bool shouldHide;
                 lock (_sync)
                 {
                     if (_disposed)
