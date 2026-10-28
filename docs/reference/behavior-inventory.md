@@ -156,7 +156,7 @@ Reader assessment:
 ## S4.6 stale-check（2026-03-05）
 - This round was confirmed as "structural reorganization with unchanged behavior": `FreeformHelperViewModel.Selection*` and `NotchV22CompensationService*` have been split into partials, but their external contracts are unchanged.
 - The deferred app settings contract still holds:
-  - Enter deferred mode after `Load Project`: `MarkProjectLoadedForAppGeneralPersistence()` (`src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`)
+  - Enter deferred mode after `Load Project`: `MarkProjectLoadedForAppGeneralPersistence()` (called in `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`, defined in `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs`)
   - Flush only after `Save Project` succeeds: `FlushDeferredAppGeneralSettingsIfNeeded()` (`src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs` / `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs`)
 - The `Ctrl+S` contract still holds:
   - shortcut handler：`src/FreeformHelper.UI/Views/FreeformHelperView.InputAndShortcuts.cs`
@@ -298,7 +298,7 @@ Notes:
 - SelectAllLayersCommand / DeselectAllLayersCommand → SelectAllLayers / DeselectAllLayers
   - If RecalcBoundsOnLayerFilter=true, triggers [Rebuild] [View]
   - Calls MarkUnsaved when LayerToggle changes
-- CheckDxfQualityCommand → CheckDxfQuality (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs)
+- CheckDxfQualityCommand → CheckDxfQualityAsync (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs)
   - [Status]
 
 ### ShellViewModel (src/FreeformHelper.UI/ViewModels/ShellViewModel.cs)
@@ -389,7 +389,7 @@ Notes:
 ## View / Control events
 
 ### FreeformHelperView (src/FreeformHelper.UI/Views/FreeformHelperView*.cs)
-- OnAttachedToVisualTree（Pickers.cs）
+- OnAttachedToVisualTree（Lifecycle.cs; the setup below runs in AttachViewModel, Pickers.cs）
   - Sets CanvasHost, subscribes to InteractionState, ConfigureFilePickers
   - EnsureInitialGrid → [Rebuild]
   - EnsureInitialFit → [View]
