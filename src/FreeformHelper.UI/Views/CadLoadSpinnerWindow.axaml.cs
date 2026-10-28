@@ -273,15 +273,12 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
     }
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
-    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern nint GetWindowLongPtr(nint hWnd, int nIndex);
 
     [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
-    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
 
     [DllImport("user32.dll", SetLastError = true)]
-    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetWindowPos(
         nint hWnd,
