@@ -117,7 +117,6 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
 ### 2.4 State refactor after Core 1.0.0
 
 - [x] **H2 One shell navigation selection with computed binding projections** · Target: 1.0.0 (g4 health tasks) · Status: Done · PR: [#70](https://github.com/Dennis40816/nvt-freeform-helper/pull/70) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
-  - The U1 commit `7040979528523e71ea843cbd0a6641fa3b78b016` was pushed as work in progress, before it was built, linted or tested, and its body says so. The verification (build, lint, tests, ledger lowering, Verify) is in the body of the later commits of the same branch. The commit is not rewritten, as `docs/agents/issue-tracker.md` allows.
   - The authorized H2 slice precedes the larger state batches below; it preserves workspace build, source refresh and prewarm ordering.
 
 The owner scheduled these five batches after the NVT Core 1.0.0 release (the target date 2026-10-15 has passed; Core 1.0.0 is not released yet). Each batch is one PR, and each starts with tests that pin the current behavior.
@@ -137,6 +136,10 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
   - The commit that added the note above (`52c6622`) was pushed without its verification in the commit body and without a `lint.ps1` run before it. Lint ran afterwards on the same tree and passed (exit 0). The results are in the checks of [#211](https://github.com/Dennis40816/nvt-freeform-helper/pull/211), and the commit is not rewritten, as `docs/agents/issue-tracker.md` allows.
 - [ ] **R13.306-F1 Give the four main-window tests a fake CAD load spinner host** · Target: - · Status: Not started · PR: -
 - [ ] **H-LEDGER Lower the code-health ledgers in small slices** · Target: - · Status: In progress: T1 (test findings) is merged, then L1 (`Lock` types) and U1 (unused private members) · PR: [#207](https://github.com/Dennis40816/nvt-freeform-helper/pull/207) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
+  - Commit-body exceptions on the U1 branch ([#212](https://github.com/Dennis40816/nvt-freeform-helper/pull/212)). Three commits were pushed before their verification was complete, so that the work is not lost when the PC loses power. None is rewritten or force-pushed, as `docs/agents/issue-tracker.md` allows. The complete verification is in the body of commit `cab51eed49ac1f0bfe2646372357dda0b6434a57` and in the pull request description.
+    - `7040979528523e71ea843cbd0a6641fa3b78b016`: the code change only. Its body says it was not built, linted or tested, and the ledger was not lowered.
+    - `1773343662e3f9934c4d88bcae473138be32f183`: removes one unused using. Its body says only the UI build ran. Lint, tests, LowerBaseline and Verify were still to do.
+    - `41123340d10c670d673df0cecfbf6c4a4c481d5d`: lowers the ledger and adds this note. Its body says Verify had not run yet. Its body also says the note is under the H-LEDGER row, but the note sat under the H2 row by mistake. This commit moves it here.
 - [ ] **S15.005c Review infrastructure: R0–R3 authority policy, CODEOWNERS, PR and issue templates, review records** · Target: - · Status: Blocked: waits for the shared CI pilot · PR: -
   - The report-only path guard merged in [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21) but is not wired into CI. Waiting for owner: the exception and calibration policy, and when it starts to block.
 - [ ] **S15.005d Owner-only settings: the `release` environment** · Target: - · Status: Waiting for owner · PR: -
