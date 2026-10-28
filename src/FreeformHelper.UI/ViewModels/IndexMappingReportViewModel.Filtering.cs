@@ -29,16 +29,6 @@ public sealed partial class IndexMappingReportViewModel
         RebuildWorkspaceView();
     }
 
-    private void ApplyIssueFilters()
-    {
-        RebuildWorkspaceView();
-    }
-
-    private void ApplyMaskAuditFilter()
-    {
-        RebuildWorkspaceView();
-    }
-
     private void RebuildWorkspaceView()
     {
         var filterResult = IndexMappingVerificationWorkspaceFilterService.Build(
