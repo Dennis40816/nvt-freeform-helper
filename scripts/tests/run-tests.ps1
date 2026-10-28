@@ -39,12 +39,12 @@ $hostErrorPatterns = [ordered]@{
     'test-host-crashed' = 'test host process crashed|testhost.{0,40}crashed'
     'test-run-aborted' = 'test run aborted|active test run was aborted'
     'hang-timeout' = 'hang timeout|hang detected|blame.{0,40}hang'
-    'test-host-start-failed' = 'failed to launch testhost|could not (find|load).{0,40}testhost'
+    'test-host-start-failed' = 'failed to (launch|start) testhost|could not (find|load).{0,40}testhost|testhost process.{0,60}exited'
     'no-test-matches-filter' = 'no test matches the given testcase filter'
     'no-test-available' = 'no test is available'
     'dispatcher-uithread-race' = 'another thread created dispatcher\.uithread'
     'fatal-runtime-error' = 'stack overflow|out of memory|fatal error'
-    'unhandled-exception' = '^\s*unhandled exception\.'
+    'unhandled-exception' = 'unhandled exception\.'
     'build-error' = '\berror (MSB|CS|NETSDK|NU)[0-9]{3,5}\b'
 }
 $maxHostErrorLabels = 6
