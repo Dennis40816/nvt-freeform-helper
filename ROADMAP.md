@@ -133,7 +133,7 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
 - [ ] **S15.002 Remove the full-suite timeouts in `FreeformHelperViewModelTests`, then make the `viewmodel` CI shard required again** · Target: - · Status: Blocked: needs a new failure trace for root cause six (headless dispatcher race) · PR: -
   - Root causes 1 to 5, 7 and 8 are fixed. The earlier analysis predates Avalonia 12.1.1 and xUnit v3.
 - [ ] **R13.306-F1 Give the four main-window tests a fake CAD load spinner host** · Target: - · Status: Not started · PR: -
-- [ ] **H-LEDGER Lower the code-health ledgers in small slices** · Target: - · Status: In progress: T1 (test findings) is in review, then L1 (`Lock` types) and U1 (unused private members) · PR: [#207](https://github.com/Dennis40816/nvt-freeform-helper/pull/207) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
+- [ ] **H-LEDGER Lower the code-health ledgers in small slices** · Target: - · Status: In progress: T1 (test findings) is merged, then L1 (`Lock` types) and U1 (unused private members) · PR: [#207](https://github.com/Dennis40816/nvt-freeform-helper/pull/207) · Issue: [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64)
 - [ ] **S15.005c Review infrastructure: R0–R3 authority policy, CODEOWNERS, PR and issue templates, review records** · Target: - · Status: Blocked: waits for the shared CI pilot · PR: -
   - The report-only path guard merged in [#21](https://github.com/Dennis40816/nvt-freeform-helper/pull/21) but is not wired into CI. Waiting for owner: the exception and calibration policy, and when it starts to block.
 - [ ] **S15.005d Owner-only settings: the `release` environment** · Target: - · Status: Waiting for owner · PR: -
