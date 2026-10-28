@@ -5,7 +5,6 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchOverlayVisibilityPolicyTests
 {
-    private readonly NotchOverlayVisibilityPolicy _policy = new();
 
     [Fact]
     public void Resolve_WhenNoPreviewData_HidesAllLayers()

@@ -19,7 +19,6 @@ public sealed class NotchExportService
 {
     // Private instances of the underlying application services.
     private readonly NotchTableGenerator _notchGenerator = new();
-    private readonly NotchTableExporter _notchExporter = new();
 
     /// <summary>
     /// Generates a <see cref="NotchTable"/> based on the provided CAD pads, regular grid, and project settings.

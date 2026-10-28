@@ -14,9 +14,6 @@ namespace FreeformHelper.UI.Services;
     Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class DxfImportService
 {
-    // Private instance of the DXF pad importer.
-    private readonly DxfPadImporter _importer = new();
-
     internal DxfLayerCatalog ImportedCatalog { get; private set; } = DxfLayerCatalog.Empty;
 
     /// <summary>
