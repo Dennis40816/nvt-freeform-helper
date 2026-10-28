@@ -444,7 +444,7 @@ Notes:
 
 ## PadCanvas interaction
 
-### Input and selection (src/FreeformHelper.UI/Controls/PadCanvas.Input.cs)
+### Input and selection (src/FreeformHelper.UI/Controls/PadCanvas.Input.cs and src/FreeformHelper.UI/Controls/PadCanvas.Input.Selection.cs)
 - Left click: select / Ctrl/Shift additive / toggle
   - Click blank space without a modifier → [Clear selection]
 - Box selection (drag)
@@ -455,7 +455,7 @@ Notes:
   - Selects first if needed, then triggers the context menu
 - Row/Col/IC label click
   - Directly selects regular pads in that row/col/IC (additive supported) [Set selection]
-- SelectionChanged event
+- SelectionChanged event (declared in PadCanvas.cs, raised in PadCanvas.Input.Selection.cs)
   - Emits SelectionChanged (selected IDs/indices)
 
 ### View control (src/FreeformHelper.UI/Controls/PadCanvas.View.cs)
@@ -476,9 +476,9 @@ Notes:
 - ClearSelection() → [Clear selection]
 - SetSelection() → [Set selection]
 
-### Resource / Theme initialization (src/FreeformHelper.UI/Controls/PadCanvas.cs)
-- ResourcesChanged / ActualThemeVariantChanged
-  - Clears cache + ApplyThemeDefaults + InvalidateVisual
+### Resource / Theme initialization (src/FreeformHelper.UI/Controls/PadCanvas.Lifecycle.cs)
+- ResourcesChanged / ActualThemeVariantChanged (OnResourcesChanged / OnActualThemeVariantChanged → RefreshThemeResources)
+  - Clears cache + ApplyThemeDefaults + RequestVisualRefresh
   - Prevents color/font failures caused by resource initialization timing
 
 ### ViewChanged event (PadCanvas.cs)
