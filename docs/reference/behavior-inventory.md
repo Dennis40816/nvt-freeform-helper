@@ -329,7 +329,7 @@ Notes:
 
 ## Settings and property-change triggers
 
-### FreeformHelperViewModel.Settings.cs
+### FreeformHelperViewModel.Settings*.cs (FreeformHelperViewModel.Settings.cs, FreeformHelperViewModel.Settings.PropertyCallbacks.*.cs, FreeformHelperViewModel.Settings.NotchPreview.cs and FreeformHelperViewModel.Settings.DirtyTracking.cs; MatchThreshold is in FreeformHelperViewModel.State.Configuration.cs)
 - OnActiveAreaWidthChanged / OnActiveAreaHeightChanged
   - [Rebuild] [View] [Status]
 - OnPanelBiasXChanged / OnPanelBiasYChanged (when IsPanelAlignment)
@@ -366,10 +366,10 @@ Notes:
   - [Rebuild] [View] [Status]
 - OnCascadeSettingChanging
   - [Undo]
-- OnPropertyChanged（DirtySettingNames）
+- OnPropertyChanged（_dirtySettingNames）
   - MarkUnsaved (persisted settings)
 
-### FreeformHelperViewModel.State.cs
+### FreeformHelperViewModel.State*.cs (FreeformHelperViewModel.State.cs and FreeformHelperViewModel.State.Configuration.cs)
 - OnUseLocalSizingChanged / OnIsWidthRowLocalChanged / OnIsHeightColumnLocalChanged
   - [Rebuild] [Status]
 - OnStatusTextChanged
@@ -435,8 +435,8 @@ Notes:
   - Triggers Value changes (downstream property changes and side effects)
 
 ### MainWindow (src/FreeformHelper.UI/MainWindow.axaml.cs)
-- OnClosingAsync
-  - Displays ConfirmDialog and calls SaveProjectAsync after confirmation
+- OnClosing (runs SaveBeforeClosingAsync)
+  - Displays ConfirmDialog and starts the save command (TryStartSaveProjectCommand, which runs SaveProjectAsync) after confirmation
 
 ### ConfirmDialog (src/FreeformHelper.UI/Views/ConfirmDialog.axaml.cs)
 - ConfirmButton_Click / CancelButton_Click
@@ -463,16 +463,16 @@ Notes:
   - [View]
 - ZoomAt（mouse wheel）
   - [View]
-- Pan (middle mouse button or spacebar)
+- Pan (middle mouse button or spacebar; started in PadCanvas.Input.cs)
   - [View] + ViewChanged event
 
-### Keyboard shortcuts (src/FreeformHelper.UI/Controls/PadCanvas.Input.cs)
+### Keyboard shortcuts (src/FreeformHelper.UI/Controls/PadCanvas.Input.Navigation.cs)
 - F → FitToContent [View]
 - Ctrl+A → SelectAllPads [Set selection]
 - Shift+Arrow → pan nudge [View]
 - Note: The same F/Ctrl+A also have TopLevel global entries to maintain consistent behavior when the canvas is not focused.
 
-### Programmatic selection (PadCanvas.Input.cs)
+### Programmatic selection (PadCanvas.Input.Selection.cs)
 - ClearSelection() → [Clear selection]
 - SetSelection() → [Set selection]
 
