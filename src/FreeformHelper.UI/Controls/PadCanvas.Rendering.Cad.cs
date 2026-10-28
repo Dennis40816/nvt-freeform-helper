@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Media;
-using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.Controls;
