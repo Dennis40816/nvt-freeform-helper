@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Globalization;
 using CommunityToolkit.Mvvm.Input;
 using Nvt.Core.Avalonia.LogConsole;
@@ -34,7 +33,7 @@ public sealed class ConsoleSession : IConsoleClipboard, IDisposable
             Culture = CultureInfo.InvariantCulture,
             AbsoluteTimeZone = TimeZoneInfo.Local
         };
-        Controller = new ConsoleController(_store, ImmutableArray<ConsoleSource>.Empty, options)
+        Controller = new ConsoleController(_store, ConsoleSourceNames.Registry, options)
         {
             LinkOpener = linkOpener,
             Clipboard = this
