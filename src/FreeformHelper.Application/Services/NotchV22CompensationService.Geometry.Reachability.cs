@@ -375,28 +375,6 @@ public sealed partial class NotchV22CompensationService
         });
     }
 
-    private static ToFullReachabilityResult ExpandToRegularBounds(
-        ToFullReachabilityResult sourceCoverage,
-        RegularPad regularPad,
-        double overlapArea)
-    {
-        var totalCellCount = sourceCoverage.TotalCellCount;
-        var reachableCellCount = totalCellCount > 0
-            ? totalCellCount
-            : sourceCoverage.ReachableCellCount;
-        return new ToFullReachabilityResult(
-            ReachableArea: Math.Max(overlapArea, regularPad.Area),
-            ReachablePolygons: new[] { ToRectPolygon(regularPad.Bounds) },
-            SourcePolygons: sourceCoverage.SourcePolygons,
-            SourceCellCount: sourceCoverage.SourceCellCount,
-            BlockedCellCount: 0,
-            ReachableCellCount: reachableCellCount,
-            TotalCellCount: totalCellCount,
-            SourceArea: sourceCoverage.SourceArea,
-            BlockedArea: 0.0,
-            BlockerCandidateCount: 0);
-    }
-
     private static List<Polygon2> BuildVisitedCellPolygons(
         bool[] visited,
         Rect2 bounds,

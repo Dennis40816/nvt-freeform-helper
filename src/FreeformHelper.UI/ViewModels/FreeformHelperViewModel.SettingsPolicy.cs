@@ -4,12 +4,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private void ApplySettingsChange(SettingsChangeKind kind, bool showStatus = false, SettingsChangeEffects suppress = SettingsChangeEffects.None)
-    {
-        var effects = SettingsChangePolicy.Resolve(kind) & ~suppress;
-        ApplySettingsChangeEffects(effects, showStatus);
-    }
-
     private void ApplySettingsChangeEffects(
         SettingsChangeEffects effects,
         bool showStatus = false,

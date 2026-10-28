@@ -171,7 +171,7 @@ Calculate for each overlapped regular:
 
 ### 5.3 reachability and Rule Engine
 The current Step3 path focuses on "rule gates":
-- If boundary + source present + expansion present + no blocker, use `ExpandToRegularBounds(...)`
+- Step 3 computes `hasDirectionalBlocker` and `hasReachableExpansion` from the reachability result and passes both to the rule engine
 - `NotchToFullRuleEngine.Evaluate(...)` produces the rule code and whether to apply
 
 Rule codes:

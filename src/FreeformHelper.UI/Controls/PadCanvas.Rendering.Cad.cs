@@ -90,11 +90,6 @@ public sealed partial class PadCanvas
                _diffIndexAnchorCadPadIds.Contains(cadPadId);
     }
 
-    private Rect2 GetWorldViewport()
-    {
-        return ResolveViewFrameSnapshot().WorldViewport;
-    }
-
     private void DrawDiffIndexOverlay(DrawingContext context, bool showCad, bool lowDetailMode, double cadOpacity)
     {
         if (!showCad || !ShowDiffIndexOverlay)
