@@ -38,7 +38,7 @@ Current documentation baseline: FreeformHelper g1 current-state audit, productio
 2. The app-level settings deferred policy remains unchanged:
    - Defer after `Load Project`: `MarkProjectLoadedForAppGeneralPersistence()` (`src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`)
    - Flush after successful `Save Project`: `FlushDeferredAppGeneralSettingsIfNeeded()` (`src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs`)
-3. The `Ctrl+S -> SaveProjectAsync() -> top toast` contract remains unchanged: `src/FreeformHelper.UI/Views/FreeformHelperView.InputAndShortcuts.cs`.
+3. The `Ctrl+S -> SaveProjectAsync() -> top toast` contract remains unchanged (shortcut handler: `src/FreeformHelper.UI/Views/FreeformHelperView.InputAndShortcuts.cs`).
 4. The runtime query single-entry (IPC -> `RuntimeQueryUseCase.ExecuteAsync`) remains unchanged: `src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs`.
 
 ## Purpose

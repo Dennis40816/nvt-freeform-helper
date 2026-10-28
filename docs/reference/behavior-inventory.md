@@ -277,7 +277,7 @@ Notes:
   - [Status] (CanvasHost.Invalidate)
 - AutoDetectFreeformsCommand → AutoDetectFreeformsAsync
   - [Status] [Statistics] (updates Freeform stats table, CanvasHost.Invalidate)
-- SaveProjectCommand → SaveProjectAsync (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs)
+- SaveProjectCommand → SaveProjectAsync (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs)
   - [Status] (writes the project and clears HasUnsavedChanges)
 - LoadProjectCommand → LoadProjectAsync
   - [Status] [Rebuild] [View] [Clear selection]
@@ -309,7 +309,7 @@ Notes:
   - The terminal is expanded by default at startup; the full console text is built from the ring buffer tail without depending on UI collection flush.
   - After a startup/expansion ring snapshot, Add notifications replace the snapshot until the UI collection catches up; each stored entry appears once, including distinct entries with identical content.
 
-### Pad Info ViewModels (src/FreeformHelper.UI/ViewModels/PadInfoViewModels.cs)
+### Pad Info ViewModels (src/FreeformHelper.UI/ViewModels/PadInfo/)
 - CadPadInfoViewModel.ApplyChangesCommand → SetCadPadCustomValues
   - [Undo] [Status] (MarkUnsaved)
 - CadPadInfoViewModel.DiscardChangesCommand
@@ -393,7 +393,7 @@ Notes:
   - Sets CanvasHost, subscribes to InteractionState, ConfigureFilePickers
   - EnsureInitialGrid → [Rebuild]
   - EnsureInitialFit → [View]
-- OnTopLevelKeyDown（FreeformHelperView.axaml.cs）
+- OnTopLevelKeyDown（FreeformHelperView.InputAndShortcuts.cs）
   - Ctrl+Z → UndoCommand [Undo] [Status]
   - Ctrl+S → SaveProjectAsync (save result displayed in a top toast) [Status]
   - Delete → DeleteSelectedCadPadsCommand (only when focus is outside text input) [Status]
