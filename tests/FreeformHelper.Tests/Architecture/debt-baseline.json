@@ -57,7 +57,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:99", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:212"
     ],
     "bareCatch": [
-      "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:201"
+      "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:200"
     ],
     "catchException": [
       "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs:116",
