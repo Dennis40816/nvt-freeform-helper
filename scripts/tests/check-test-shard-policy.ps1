@@ -485,6 +485,48 @@ try {
             }
         }
     }
+    # Known host messages become fixed labels on a failing group. The line they came from is never printed.
+    $labelCases = @(
+        @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT The active test run was aborted. Reason: Test host process crashed : PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'test-host-crashed,test-run-aborted' },
+        @{ Lines = @('  Another thread created Dispatcher.UIThread while the headless application was being set up PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'dispatcher-uithread-race' },
+        @{ Lines = @('x.cs(1,1): error CS1002: PRIVATE-MARKER-DO-NOT-PRINT', 'y.cs(2,2): error MSB3027: again'); Exit = 1; Expected = 'build-error' },
+        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT', 'Test Run Aborted.'); Exit = 1; Expected = 'no-test-matches-filter,test-run-aborted' },
+        @{ Lines = @('Test host process crashed'); Exit = 0; Expected = '' },
+        @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT and nothing else'); Exit = 1; Expected = '' },
+        @{ Lines = @(); StdErr = 'Test host process crashed PRIVATE-MARKER-DO-NOT-PRINT'; Exit = 1; Expected = 'test-host-crashed' }
+    )
+    foreach ($case in $labelCases) {
+        Invoke-WithTemporaryEnvironmentVariables -Settings @{ FREEFORMHELPER_TEST_AREA = (Join-Path $testRoot 'test-area') } -Action {
+            & {
+                function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
+                function dotnet {
+                    foreach ($line in $case.Lines) { Write-Output $line }
+                    if ($case.ContainsKey('StdErr')) {
+                        & pwsh -NoProfile -Command ('[Console]::Error.WriteLine(''{0}''); exit {1}' -f $case.StdErr, $case.Exit)
+                    } else {
+                        $global:LASTEXITCODE = $case.Exit
+                    }
+                }
+                $summaryFile = Join-Path $fakeRepo 'summary.json'
+                $message = ''
+                $entryOutput = @(
+                    try {
+                        & (Join-Path $fakeRepo 'scripts/verify.ps1') -CiLane test -Shard snapshots -AllowMissingExampleData `
+                            -EnforceFloors -SummaryPath $summaryFile *>&1
+                    } catch { $message = $_.Exception.Message }
+                )
+                $labelLines = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] diagnostic *' })
+                if ($case.Expected -ceq '') {
+                    Assert-Policy ($labelLines.Count -eq 0)
+                } else {
+                    $expectedLabelLine = '[verify] diagnostic group=ui-snapshots exit={0} host-errors={1}' -f $case.Exit, $case.Expected
+                    Assert-Policy ($labelLines.Count -eq 1 -and [string]$labelLines[0] -ceq $expectedLabelLine)
+                }
+                Assert-Policy (($entryOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
+                Assert-Policy ($message -ceq 'Shard validation failed.')
+            }
+        }
+    }
     # Real child exits prove that setup, precheck and cleanup failures cannot publish private filenames.
     Write-FixtureTrx -Directory $resultsPath -Tests $samples
     $entryTrx = Join-Path $testRoot 'entry.trx'
