@@ -415,14 +415,13 @@
         "dependencies": {
           "FreeformHelper.Application": "[1.0.0, )",
           "FreeformHelper.Domain": "[1.0.0, )",
-          "Nvt.Core": "[0.9.1, 0.9.1]"
+          "Nvt.Core": "[0.9.5, 0.9.5]"
         }
       },
       "freeformhelper.ui": {
         "type": "Project",
         "dependencies": {
           "Avalonia": "[12.1.1, )",
-          "Avalonia.AvaloniaEdit": "[12.0.0, )",
           "Avalonia.Desktop": "[12.1.1, )",
           "Avalonia.Fonts.Inter": "[12.1.1, )",
           "Avalonia.Themes.Fluent": "[12.1.1, )",
@@ -432,7 +431,7 @@
           "FreeformHelper.Infrastructure": "[1.0.0, )",
           "NLog": "[5.3.4, )",
           "NLog.Extensions.Logging": "[5.3.4, )",
-          "Nvt.Core.Avalonia": "[0.9.1, 0.9.1]",
+          "Nvt.Core.Avalonia": "[0.9.5, 0.9.5]",
           "Nvt.Core.Fonts": "[0.1.0, 0.1.0]",
           "System.Reactive": "[6.0.0, )"
         }
@@ -446,15 +445,6 @@
           "Avalonia.BuildServices": "11.3.2",
           "Avalonia.Remote.Protocol": "12.1.1",
           "MicroCom.Runtime": "0.11.6"
-        }
-      },
-      "Avalonia.AvaloniaEdit": {
-        "type": "CentralTransitive",
-        "requested": "[12.0.0, )",
-        "resolved": "12.0.0",
-        "contentHash": "VNfaYdTbiQ2DlSkSMoLg4DhTbQmQR0cFT6nqEqLkaYGLjBWmUdv5BNIuoObK4c9cgzFqnEJXBaOp4R/bxgFKfQ==",
-        "dependencies": {
-          "Avalonia": "12.0.0"
         }
       },
       "Avalonia.Desktop": {
@@ -520,19 +510,19 @@
       },
       "Nvt.Core": {
         "type": "CentralTransitive",
-        "requested": "[0.9.1, 0.9.1]",
-        "resolved": "0.9.1",
-        "contentHash": "98llP7mypkn1QutX7XXwrAg+D+aFj1965ppX+BISLOymfoG28UneTF9VtVOVfe4/CzJL+/pxQ3kybegpb839Uw=="
+        "requested": "[0.9.5, 0.9.5]",
+        "resolved": "0.9.5",
+        "contentHash": "M+BES6LRngIOX1Xh3smiWCJGSEeMs6iRCUQx4fNVkb0bSEcpWTvMiC9KgktdW1PJh1XdzmE6BcfvecEthfkpuQ=="
       },
       "Nvt.Core.Avalonia": {
         "type": "CentralTransitive",
-        "requested": "[0.9.1, 0.9.1]",
-        "resolved": "0.9.1",
-        "contentHash": "E8b3wFYk9MUUmXZLL2mnvzUoIf6+FBolfuEMopttQjs2HvOxkWlu38Q9Qx/UkWiUx/mrZLohBCHp1F72TFKXXw==",
+        "requested": "[0.9.5, 0.9.5]",
+        "resolved": "0.9.5",
+        "contentHash": "19Fa9GyYSpwLVvO/gYtYIlk95GHFWSuCOqiQG9u/7aEx33W/yQEKyruKPGcECG9GXwbOmiyo3tQZXpnb1B+vUA==",
         "dependencies": {
           "Avalonia": "12.1.1",
           "CommunityToolkit.Mvvm": "8.4.2",
-          "Nvt.Core": "0.9.1"
+          "Nvt.Core": "0.9.5"
         }
       },
       "Nvt.Core.Fonts": {

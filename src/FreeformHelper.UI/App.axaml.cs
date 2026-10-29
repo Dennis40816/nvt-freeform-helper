@@ -1,7 +1,6 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.Views;
 using NLog;
@@ -137,8 +136,6 @@ public sealed class App : global::Avalonia.Application
             };
         }
 
-        // Mark the UI as ready in the application log store.
-        AppLogStore.Instance.MarkUiReady();
         StartupPerfTracker.Mark("app.ui-ready");
 
         // Subscribe to unhandled exceptions on the UI thread to log them.

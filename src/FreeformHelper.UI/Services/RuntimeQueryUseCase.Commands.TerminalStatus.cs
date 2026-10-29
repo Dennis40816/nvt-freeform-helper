@@ -1,4 +1,5 @@
 using FreeformHelper.UI.Logging;
+using Nvt.Core.LogConsole;
 using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
@@ -66,7 +67,7 @@ internal sealed partial class RuntimeQueryUseCase
         return RuntimeQueryResponseEnvelope.Success(RuntimeQueryResponseBuilder.BuildSelectionPayload(helper));
     }
 
-    private static RuntimeQueryResponseEnvelope QueryTerminal(IReadOnlyDictionary<string, string>? args)
+    private async Task<RuntimeQueryResponseEnvelope> QueryTerminalAsync(IReadOnlyDictionary<string, string>? args)
     {
         var tail = DefaultTerminalTail;
         if (RuntimeQueryArgumentParser.TryGetIntArg(args, "tail", 1, MaxTerminalTail, out var parsedTail, out var tailError))
@@ -78,11 +79,7 @@ internal sealed partial class RuntimeQueryUseCase
             return tailError;
         }
 
-        var tailEntries = AppLogStore.Instance.GetTail(tail);
-        var lines = tailEntries
-            .Select(AppLogFormatter.FormatLine)
-            .ToList();
-        var totalLines = AppLogStore.Instance.GetTotalCount();
+        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(_shellViewModel.ConsoleStore, tail);
 
         return RuntimeQueryResponseEnvelope.Success(new
         {
@@ -93,7 +90,7 @@ internal sealed partial class RuntimeQueryUseCase
         });
     }
 
-    private static RuntimeQueryResponseEnvelope QueryTerminalLinks(IReadOnlyDictionary<string, string>? args)
+    private async Task<RuntimeQueryResponseEnvelope> QueryTerminalLinksAsync(IReadOnlyDictionary<string, string>? args)
     {
         var tail = DefaultTerminalTail;
         if (RuntimeQueryArgumentParser.TryGetIntArg(args, "tail", 1, MaxTerminalTail, out var parsedTail, out var tailError))
@@ -115,27 +112,23 @@ internal sealed partial class RuntimeQueryUseCase
             return limitError;
         }
 
-        var tailEntries = AppLogStore.Instance.GetTail(tail);
-        var lines = tailEntries
-            .Select(AppLogFormatter.FormatLine)
-            .ToList();
-        var totalLines = AppLogStore.Instance.GetTotalCount();
+        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(_shellViewModel.ConsoleStore, tail);
 
         var startLineNumber = Math.Max(1, totalLines - lines.Count + 1);
         var links = new List<object>();
         for (var lineIndex = 0; lineIndex < lines.Count; lineIndex++)
         {
             var lineText = lines[lineIndex];
-            var parsedLinks = ConsoleLinkParser.Parse(lineText);
+            var parsedLinks = ConsoleLinkScanner.Scan(lineText);
             foreach (var link in parsedLinks)
             {
                 links.Add(new
                 {
                     lineNumber = startLineNumber + lineIndex,
-                    startOffset = link.StartOffset,
+                    startOffset = link.Start,
                     length = link.Length,
-                    target = link.Target,
-                    isUrl = link.IsUrl,
+                    target = link.Target.Path,
+                    isUrl = link.Target.Kind == LinkKind.Url,
                     lineText
                 });
 
