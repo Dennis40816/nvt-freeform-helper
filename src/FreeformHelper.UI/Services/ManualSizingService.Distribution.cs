@@ -54,25 +54,6 @@ public sealed partial class ManualSizingService
     }
 
     /// <summary>
-    /// Helper method to restore grid settings from a snapshot and return a failed result.
-    /// (Note: This method is not directly used in the current version of the provided code snippet,
-    /// but is kept as a utility if needed).
-    /// </summary>
-    private static ManualSizingResult FailWithRestore(GridSettings grid, ManualSizingSnapshot snapshot, string error)
-    {
-        grid.ReplaceSizingCollections(
-            snapshot.ColumnWidths,
-            snapshot.RowHeights,
-            snapshot.ColumnOverrides,
-            snapshot.RowOverrides,
-            snapshot.RowWidthOverrides,
-            snapshot.RowWidthOverrideFlags,
-            snapshot.ColumnHeightOverrides,
-            snapshot.ColumnHeightOverrideFlags);
-        return ManualSizingResult.Fail(snapshot, error);
-    }
-
-    /// <summary>
     /// Determines the target total width and height of the grid based on alignment mode and CAD data.
     /// </summary>
     private static (double width, double height) GetTargetGridSize(GridSettings grid, GridAlignmentMode alignmentMode, CadPadSet? cad)

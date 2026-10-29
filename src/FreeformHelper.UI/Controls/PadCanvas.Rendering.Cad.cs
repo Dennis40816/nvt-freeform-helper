@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Media;
-using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.Controls;
@@ -88,11 +87,6 @@ public sealed partial class PadCanvas
                _notchPreviewByCadId.ContainsKey(cadPadId) ||
                _diffIndexOverrideCadIds.Contains(cadPadId) ||
                _diffIndexAnchorCadPadIds.Contains(cadPadId);
-    }
-
-    private Rect2 GetWorldViewport()
-    {
-        return ResolveViewFrameSnapshot().WorldViewport;
     }
 
     private void DrawDiffIndexOverlay(DrawingContext context, bool showCad, bool lowDetailMode, double cadOpacity)

@@ -63,18 +63,13 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     // --- Application Services ---
     // Instances of various services responsible for business logic and data manipulation.
-    private readonly DxfOverlapAnalyzer _dxfOverlapAnalyzer = new();
     private readonly CadAreaBucketService _cadAreaBucketService = new();
     private readonly JsonProjectStore _projectStore = new();
     private readonly DxfImportService _dxfImportService = new();
     private readonly DxfLayerCatalogReader _dxfLayerCatalogReader = new();
     private readonly GridBuildService _gridBuildService = new();
     private readonly NotchExportService _notchExportService = new();
-    private readonly DxfExportService _dxfExportService = new();
-    private readonly CadPadUnionService _cadPadUnionService = new();
     private readonly PadMatchService _padMatchService = new();
-    private readonly FreeformStatisticsBuilder _freeformStatisticsBuilder = new();
-    private readonly DxfIndexAssigner _dxfIndexAssigner = new();
     private readonly ManualSizingService _manualSizingService = new();
     private readonly PadOverrideService _padOverrideService = new();
 
@@ -124,28 +119,19 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private int _workflowDataSnapshotRevision = 1;
     private readonly GridStartupState _gridStartup = new(); // Holds the one-time startup flags and the fit request of the grid build.
     private readonly GridRebuildUseCase _gridRebuildUseCase;
-    private readonly SelectionSummaryUseCase _selectionSummaryUseCase = new();
     private readonly ManualSizingUseCase _manualSizingUseCase;
     private readonly SelectionCoordinator _selectionCoordinator;
-    private readonly LayerFilterUseCase _layerFilterUseCase = new();
-    private readonly WorkflowStepGateService _workflowStepGateService = new();
-    private readonly WorkflowPipelineService _workflowPipelineService = new();
     private readonly CadLoadUseCase _cadLoadUseCase;
     private readonly CadLoadWorkflowService _cadLoadWorkflowService;
     private readonly LayerCatalogStateService _layerCatalogStateService;
     private readonly GridRebuildOrchestrator _gridRebuildOrchestrator;
-    private readonly SettingsChangePolicy _settingsChangePolicy = new();
     private readonly ProjectPersistenceUseCase _projectPersistenceUseCase;
     private readonly PadEditUseCase _padEditUseCase;
-    private readonly NotchValidationUseCase _notchValidationUseCase = new();
-    private readonly NotchValidationTraceService _notchValidationTraceService = new();
     private readonly NotchExportGenerationCacheService _notchExportGenerationCacheService = new();
-    private readonly NotchOverlayVisibilityPolicy _notchOverlayVisibilityPolicy = new();
     private readonly DxfRegularMappingUseCase _dxfRegularMappingUseCase = new();
     private readonly CadOutputFwDiffIndexAssignmentService _cadOutputFwDiffIndexAssignmentService = new();
     private readonly UndoService _undoService = new();
     private readonly UiOperationStatusReporter _statusReporter;
-    private readonly NotchApplySimulationReviewUseCase _notchApplySimulationReviewUseCase = new();
     private readonly NotchResultCacheState _notchCache = new(); // Holds the notch compensation and validation caches and the last generated notch table.
     private int _notchCompensationCacheRevision;
     private readonly NotchCompensationCacheCounters _notchCompensationCacheCounters = new();
