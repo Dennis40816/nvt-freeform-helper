@@ -74,9 +74,11 @@ public sealed class TerminalStartupPathTests
     [AvaloniaFact]
     public void ConsoleStartup_LoadsCoreConsoleResources()
     {
-        HeadlessAppBootstrap.EnsureInitialized();
+        using var console = new ConsoleFixture();
 
-        Assert.True(Avalonia.Application.Current!.Styles.TryGetResource("Nvt.Console.MinimumWidth", null, out var minimumWidth));
+        // The console styles load in ConsolePanel, not at the application level.
+        var panel = console.Window.GetVisualDescendants().OfType<FreeformHelper.UI.Views.ConsolePanel>().First();
+        Assert.True(panel.TryGetResource("Nvt.Console.MinimumWidth", null, out var minimumWidth));
         Assert.IsType<double>(minimumWidth);
     }
 
