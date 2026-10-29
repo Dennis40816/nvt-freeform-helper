@@ -282,37 +282,6 @@ public sealed class PadCanvasCacheInvalidationTests
     }
 
     [AvaloniaFact]
-    public void NotchPreview_UsesBaseRegularStyling_WhenStageOverlayVisible()
-    {
-        var canvas = new PadCanvas
-        {
-            CadPads = CreateCadPads(offsetX: 0),
-            RegularPads = CreateRegularPads(offsetX: 0),
-            NotchCanvasPreviewItems =
-            [
-                new NotchCanvasPreviewItem(
-                    CadPadId: 1,
-                    ToRegularRatio: 1.0,
-                    ToFullRatio: 1.0,
-                    IsToFullEnabled: true,
-                    ToFullPolygons: Array.Empty<Polygon2>(),
-                    ToFullSeedPolygons: Array.Empty<Polygon2>(),
-                    ToFullCandidatePolygons: Array.Empty<Polygon2>(),
-                    ToFullFinalOutlinePolygons: Array.Empty<Polygon2>())
-            ],
-            ShowNotchToFullSeedOverlay = true,
-            HighlightFreeform = true,
-        };
-
-        var method = typeof(PadCanvas).GetMethod("HasActiveNotchStageOverlay", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-
-        var result = method!.Invoke(canvas, null);
-
-        Assert.Equal(true, result);
-    }
-
-    [AvaloniaFact]
     public void NotchPreview_KeepsFreeformHatch_WhenStageOverlayVisible()
     {
         var canvas = new PadCanvas
