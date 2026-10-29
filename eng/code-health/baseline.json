@@ -3011,16 +3011,6 @@
       "symbol": "WarningsNotAsErrors:CA2000"
     },
     {
-      "syntaxHash": "d4fffba3d5da0ccee8cc2d7cc3f104f0ee74be01570078c16d3dd117199ff61f",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:CA5392"
-    },
-    {
       "syntaxHash": "7b2c6a327c124d64f9bf569ebb5631954907e9b7ce7032d90d9a0697f0836f3e",
       "member": "MSBuild",
       "owner": "NFH",
@@ -6591,36 +6581,6 @@
       "symbol": "CA2000"
     },
     {
-      "syntaxHash": "5ca3f960d1aad7b0601ecd5997affc81ffcdc1c4ce94bdaeac6c2554ebc1165b",
-      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.GetWindowLongPtr(nint,int)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA5392",
-      "symbol": "CA5392"
-    },
-    {
-      "syntaxHash": "139504624fa14ef72f13d29c5dcd838c85a8c297c05fee464268729b845a1b9a",
-      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.SetWindowLongPtr(nint,int,nint)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA5392",
-      "symbol": "CA5392"
-    },
-    {
-      "syntaxHash": "6fdc1c2ee59392620a83fff594044729907519342471b8ff9abb9eadf76bf87e",
-      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.SetWindowPos(nint,nint,int,int,int,int,uint)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA5392",
-      "symbol": "CA5392"
-    },
-    {
       "syntaxHash": "8b7387f9dc9ede978c4d2aadcdfb0d7ac497fca46a729d49a7ce66d6b6834e57",
       "member": "MSBuild",
       "owner": "NFH",
@@ -6649,16 +6609,6 @@
       "count": 1,
       "rule": "IDE0051",
       "symbol": "IDE0051"
-    },
-    {
-      "syntaxHash": "deef884ffaa438dde61fe47272c0b71ee11d7a954f3e55c2acfe580b7e08f5b4",
-      "member": "FreeformHelper.UI.Services.GridRebuildOrchestrator.fields:_padOverrideService",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/GridRebuildOrchestrator.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0052",
-      "symbol": "IDE0052"
     },
     {
       "syntaxHash": "deef884ffaa438dde61fe47272c0b71ee11d7a954f3e55c2acfe580b7e08f5b4",
