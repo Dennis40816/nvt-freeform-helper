@@ -304,7 +304,7 @@ public sealed class PadCanvasCacheInvalidationTests
             HighlightFreeform = true,
         };
 
-        var method = typeof(PadCanvas).GetMethod("ShouldUseBaseRegularStylingForNotchPreview", BindingFlags.Instance | BindingFlags.NonPublic);
+        var method = typeof(PadCanvas).GetMethod("HasActiveNotchStageOverlay", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(method);
 
         var result = method!.Invoke(canvas, null);

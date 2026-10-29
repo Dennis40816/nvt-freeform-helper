@@ -239,9 +239,13 @@ public sealed class PadCanvasHitTestTests
 
     private static object InvokeTryHitRegular(PadCanvas canvas, Point2 world)
     {
-        var method = typeof(PadCanvas).GetMethod("TryHitRegular", BindingFlags.Instance | BindingFlags.NonPublic);
+        var field = typeof(PadCanvas).GetField("_selectionEngine", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(field);
+        var engine = field!.GetValue(canvas);
+        Assert.NotNull(engine);
+        var method = engine!.GetType().GetMethod("TryHitRegular", BindingFlags.Instance | BindingFlags.Public);
         Assert.NotNull(method);
-        var hit = method!.Invoke(canvas, new object[] { world });
+        var hit = method!.Invoke(engine, new object[] { world, false });
         Assert.NotNull(hit);
         return hit!;
     }

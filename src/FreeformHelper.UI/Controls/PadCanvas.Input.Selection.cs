@@ -206,11 +206,6 @@ public sealed partial class PadCanvas
         return _selectionEngine.HitTestForHoverDebug(screenPoint, regularOnly);
     }
 
-    private HitResult TryHitRegular(Point2 world)
-    {
-        return _selectionEngine.TryHitRegular(world);
-    }
-
     /// <summary>
     /// Applies a selection change based on a hit test result and modifiers.
     /// </summary>
