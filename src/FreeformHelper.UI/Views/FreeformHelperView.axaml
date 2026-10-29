@@ -129,6 +129,7 @@
                               ShowCad="{Binding ShowCad}"
                               ShowRegular="{Binding ShowRegular}"
                               HighlightUnmatched="{Binding HighlightUnmatched}"
+                              FitTopInset="{Binding TopToolbarInset, ElementName=CanvasOverlayControls}"
                               HighlightFreeform="{Binding HighlightFreeform}"
                               ColorCadByArea="{Binding ColorCadByArea}"
                               AreaBucketTolerance="{Binding AreaBucketTolerance}"

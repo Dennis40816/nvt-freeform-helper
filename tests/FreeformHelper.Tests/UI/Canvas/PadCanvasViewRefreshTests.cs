@@ -201,6 +201,35 @@ public sealed class PadCanvasViewRefreshTests
         Assert.Equal(expectedCenterY, viewportCenterY, 3);
     }
 
+    [AvaloniaFact]
+    public async Task FitToContent_WhenFitTopInsetIsSet_LeavesThatBandFreeAtTheTop()
+    {
+        var withoutInset = await FitZoomAsync(fitTopInset: 0d);
+        var withInset = await FitZoomAsync(fitTopInset: 40d);
+
+        // Canvas 300 x 200, margin 20 on every side, bounds 100 x 100: the height limits the zoom.
+        Assert.Equal(1.6d, withoutInset, 3);
+        Assert.Equal(1.2d, withInset, 3);
+    }
+
+    private static async Task<double> FitZoomAsync(double fitTopInset)
+    {
+        var canvas = new PadCanvas
+        {
+            Width = 300,
+            Height = 200,
+            FitBoundsOverride = new Rect2(0d, 0d, 100d, 100d),
+            FitTopInset = fitTopInset,
+        };
+        canvas.Measure(new Size(300, 200));
+        canvas.Arrange(new Rect(new Size(300, 200)));
+
+        canvas.FitToContent();
+        await DrainUiQueueAsync();
+
+        return canvas.GetViewFrameSnapshot().Zoom;
+    }
+
     private static async Task DrainUiQueueAsync()
     {
         await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
