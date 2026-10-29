@@ -1509,7 +1509,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 291
+        "axamlCodeBehindLines": 292
       },
       "owner": "NFH",
       "locations": [
@@ -6808,6 +6808,16 @@
       "member": "FreeformHelper.UI.Services.ProjectPersistenceUseCase.fields:_padOverrideService",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/ProjectPersistenceUseCase.cs",
+      "project": "FreeformHelper.UI",
+      "count": 1,
+      "rule": "IDE0052",
+      "symbol": "IDE0052"
+    },
+    {
+      "syntaxHash": "da685c4f4bb5c3a22cbb7fa42f6a16eeb83c601b1e110064c1aa9d33163ac5ff",
+      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.fields:_ipcLoopTask",
+      "owner": "NFH",
+      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "IDE0052",
