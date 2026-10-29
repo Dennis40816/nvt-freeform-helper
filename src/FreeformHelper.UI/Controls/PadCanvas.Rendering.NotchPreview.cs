@@ -12,11 +12,6 @@ public sealed partial class PadCanvas
                (ShowNotchToFullSeedOverlay || ShowNotchToFullCandidateOverlay || ShowNotchToFullFinalOverlay);
     }
 
-    private bool ShouldUseBaseRegularStylingForNotchPreview()
-    {
-        return HasActiveNotchStageOverlay();
-    }
-
     private bool ShouldSuppressFreeformAccentBorderForNotchPreview()
     {
         return HighlightFreeform && HasActiveNotchStageOverlay();

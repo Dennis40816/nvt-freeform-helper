@@ -529,7 +529,7 @@
       "ceilings": {
         "stateMembers": 65,
         "partialFiles": 28,
-        "viewTypeLines": 6219
+        "viewTypeLines": 6209
       },
       "owner": "NFH",
       "locations": [
@@ -3009,16 +3009,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "WarningsNotAsErrors:CA2000"
-    },
-    {
-      "syntaxHash": "7b2c6a327c124d64f9bf569ebb5631954907e9b7ce7032d90d9a0697f0836f3e",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:IDE0051"
     },
     {
       "syntaxHash": "7a49bbd0576270cd88a52a73b3fed068f067fa386555c36b1639eaa79612d1a8",
@@ -6589,26 +6579,6 @@
       "count": 1,
       "rule": "EnableGenerateDocumentationFile",
       "symbol": "Set MSBuild property 'GenerateDocumentationFile' to 'true' in project file to enable IDE0005 (Remove unnecessary usings/imports) on build"
-    },
-    {
-      "syntaxHash": "ddc78a490d09ae32a04ac0a93c20c969096aeea9174f5dd79712a5e6aa5109eb",
-      "member": "FreeformHelper.UI.Controls.PadCanvas.ShouldUseBaseRegularStylingForNotchPreview()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Controls/PadCanvas.Rendering.NotchPreview.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0051",
-      "symbol": "IDE0051"
-    },
-    {
-      "syntaxHash": "da15a97b2687e00cbd2f3a8ae21400d7dbf8aeb24d7bca2d0f6bfe12e7f10bb8",
-      "member": "FreeformHelper.UI.Controls.PadCanvas.TryHitRegular(Point2)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Controls/PadCanvas.Input.Selection.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0051",
-      "symbol": "IDE0051"
     },
     {
       "syntaxHash": "deef884ffaa438dde61fe47272c0b71ee11d7a954f3e55c2acfe580b7e08f5b4",
@@ -12071,16 +12041,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "35d14ccd10f0592c43080dadd6782ab51475ea5d525d3ed1a43dc3c9754a756b",
-      "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.NotchPreview_UsesBaseRegularStyling_WhenStageOverlayVisible()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasCacheInvalidationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "190b89c1d9dadd7877c347ab93698c32b454eebad5a6a199bea9b0911f32277e",
       "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.NotchPreviewCad_SuppressesAreaFill_WhenStageOverlayVisible()",
       "owner": "NFH",
@@ -12203,16 +12163,6 @@
     {
       "syntaxHash": "462779dc7c10f759b1eb1eda8ea41dfc164587adc2234ef0edcc3ae85f30e785",
       "member": "FreeformHelper.Tests.PadCanvasHitTestTests.InvokeHitTestForHoverDebug(PadCanvas,Avalonia.Point,bool)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "312fedeb02a2a0b78ed676730ad304a1677da7d0396c4e1546a42e80b464ab54",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.InvokeTryHitRegular(PadCanvas,Point2)",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
       "project": "FreeformHelper.Tests",

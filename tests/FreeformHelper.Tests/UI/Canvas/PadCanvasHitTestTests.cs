@@ -31,7 +31,9 @@ public sealed class PadCanvasHitTestTests
 
         // This point is inside row1-col0, but the spatial bucket (built from global edges)
         // may map to row1-col1 when per-row widths diverge.
-        var hit = InvokeTryHitRegular(canvas, new Point2(15, 15));
+        SetCanvasView(canvas, zoom: 1.0, panX: 0.0, panY: 0.0);
+        var screenPoint = GetScreenPointForWorld(canvas, new Point2(15, 15));
+        var hit = InvokeHitTestForHoverDebug(canvas, screenPoint, regularOnly: true);
 
         Assert.Equal("Regular", ReadHitKind(hit));
         Assert.Equal(2, ReadHitIdOrIndex(hit));
@@ -235,15 +237,6 @@ public sealed class PadCanvasHitTestTests
 
         Assert.Contains("REG 7", text);
         Assert.Contains("Diff 42", text);
-    }
-
-    private static object InvokeTryHitRegular(PadCanvas canvas, Point2 world)
-    {
-        var method = typeof(PadCanvas).GetMethod("TryHitRegular", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        var hit = method!.Invoke(canvas, new object[] { world });
-        Assert.NotNull(hit);
-        return hit!;
     }
 
     private static object InvokeHitTestForHoverDebug(PadCanvas canvas, Avalonia.Point screenPoint, bool regularOnly)
