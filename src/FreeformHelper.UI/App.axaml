@@ -15,7 +15,5 @@
     <FluentTheme />
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/Icons.axaml"/>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.axaml"/>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/LogConsole/LogConsoleStyles.axaml"/>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/LogConsole/ConsoleListStyles.axaml"/>
   </Application.Styles>
 </Application>

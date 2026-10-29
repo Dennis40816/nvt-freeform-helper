@@ -8,6 +8,11 @@
              xmlns:logConsole="clr-namespace:Nvt.Core.Avalonia.LogConsole;assembly=Nvt.Core.Avalonia"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.ConsolePanel">
+  <!-- Core's console styles load here, not in App.axaml: its button and scroll styles share class names with the NFH styles. -->
+  <UserControl.Styles>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/LogConsole/LogConsoleStyles.axaml"/>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/LogConsole/ConsoleListStyles.axaml"/>
+  </UserControl.Styles>
   <UserControl.Resources>
     <converters:BooleanGlyphConverter x:Key="ConsoleToggleGlyph"
                                       FalseGlyph="{x:Static icons:IconGlyphs.ExpandLess}"
