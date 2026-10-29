@@ -198,7 +198,6 @@
                         ShowsPreview="True"/>
 
           <views:ConsolePanel Grid.Row="3"
-                              UseShellHostedBehavior="True"
                               DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
         </Grid>
       </Border>

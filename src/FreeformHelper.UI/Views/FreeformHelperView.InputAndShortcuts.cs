@@ -1,11 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Input.Platform;
-using Avalonia.Interactivity;
 using Avalonia.VisualTree;
-using AvaloniaEdit;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
 
@@ -22,13 +18,6 @@ public sealed partial class FreeformHelperView
 
         if (e.Handled)
         {
-            return;
-        }
-
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && IsConsoleFontAdjustKey(e.Key) && IsConsoleFocused())
-        {
-            AdjustConsoleFontSize(e.Key);
-            e.Handled = true;
             return;
         }
 
@@ -200,17 +189,8 @@ public sealed partial class FreeformHelperView
             return false;
         }
 
-        for (StyledElement? current = visual; current is not null; current = current.Parent)
-        {
-            if (current is Control { Name: "ConsoleBorder" })
-            {
-                return false;
-            }
-        }
-
         // If the clicked element or any of its ancestors is an input control, don't clear focus.
         if (visual.FindAncestorOfType<TextBox>() is not null) return false;
-        if (visual.FindAncestorOfType<TextEditor>() is not null) return false;
         if (visual.FindAncestorOfType<ComboBox>() is not null) return false;
         if (visual.FindAncestorOfType<NumberScrubber>() is not null) return false;
 
@@ -224,17 +204,12 @@ public sealed partial class FreeformHelperView
             return false;
         }
 
-        if (visual is TextBox or TextEditor or ComboBox or NumberScrubber)
-        {
-            return true;
-        }
-
-        if (visual.FindAncestorOfType<TextBox>() is not null) return true;
-        if (visual.FindAncestorOfType<TextEditor>() is not null) return true;
-        if (visual.FindAncestorOfType<ComboBox>() is not null) return true;
-        if (visual.FindAncestorOfType<NumberScrubber>() is not null) return true;
-
-        return false;
+        // The console list handles its own keys. Delete, F and Ctrl+Z must not reach the canvas from a log row.
+        return visual is TextBox or ComboBox or NumberScrubber or ConsolePanel
+            || visual.FindAncestorOfType<TextBox>() is not null
+            || visual.FindAncestorOfType<ComboBox>() is not null
+            || visual.FindAncestorOfType<NumberScrubber>() is not null
+            || visual.FindAncestorOfType<ConsolePanel>() is not null;
     }
 
     private static bool IsCanvasInputSource(object? source)
@@ -251,109 +226,4 @@ public sealed partial class FreeformHelperView
 
         return visual.FindAncestorOfType<PadCanvas>() is not null;
     }
-
-    private static bool IsConsoleFontAdjustKey(Key key) =>
-        key is Key.OemPlus or Key.Add or Key.OemMinus or Key.Subtract;
-
-    private bool IsConsoleFocused()
-    {
-        return _consoleBorder?.IsKeyboardFocusWithin == true;
-    }
-
-    private void SetConsoleFocus(bool focused)
-    {
-        if (_consoleHasFocus == focused)
-        {
-            return;
-        }
-
-        _consoleHasFocus = focused;
-        UpdateConsoleFocusVisual();
-    }
-
-    private void UpdateConsoleFocusVisual()
-    {
-        if (_consoleBorder is null)
-        {
-            return;
-        }
-
-        var normalBrush = GetResourceBrush("BrushBorder");
-
-        if (normalBrush is not null)
-        {
-            _consoleBorder.BorderBrush = normalBrush;
-        }
-    }
-
-    private void AdjustConsoleFontSize(Key key)
-    {
-        EnsureShellViewModel();
-        if (_shellViewModel is null) return;
-
-        var delta = key is Key.OemPlus or Key.Add ? 1.0 : -1.0;
-        var min = GetResourceDouble("ConsoleFontMin", double.MinValue);
-        var max = GetResourceDouble("ConsoleFontMax", double.MaxValue);
-        var next = Math.Clamp(_shellViewModel.ConsoleFontSize + delta, min, max);
-        _shellViewModel.ConsoleFontSize = next;
-    }
-
-    private void OnConsolePointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (e.Source is Visual visual)
-        {
-            if (visual.FindAncestorOfType<Button>() is not null || visual.FindAncestorOfType<ToggleButton>() is not null)
-            {
-                return;
-            }
-        }
-
-        EnsureShellViewModel();
-        if (_shellViewModel?.IsConsoleExpanded == true && _consoleEditor is not null && _consoleEditor.IsVisible)
-        {
-            _consoleEditor.Focus();
-        }
-        else
-        {
-            _consoleBorder?.Focus();
-        }
-    }
-
-    private void OnConsoleFocusGained(object? sender, FocusChangedEventArgs e)
-    {
-        SetConsoleFocus(true);
-    }
-
-    private void OnConsoleFocusLost(object? sender, RoutedEventArgs e)
-    {
-        SetConsoleFocus(false);
-    }
-
-    private void OnConsoleFontIncrease(object? sender, RoutedEventArgs e) => AdjustConsoleFontSize(Key.OemPlus);
-
-    private void OnConsoleFontDecrease(object? sender, RoutedEventArgs e) => AdjustConsoleFontSize(Key.OemMinus);
-
-    private void OnConsoleJumpToBottom(object? sender, RoutedEventArgs e)
-    {
-        EnableConsoleAutoFollowAndScrollToEnd();
-    }
-
-    private void OnConsoleCopyAll(object? sender, RoutedEventArgs e)
-    {
-        _uiEvents?.Run("Workspace.CopyConsole", _ => CopyConsoleAsync(), CancellationToken.None);
-    }
-
-    private async Task CopyConsoleAsync()
-    {
-        EnsureShellViewModel();
-        var text = _shellViewModel?.ConsoleText ?? string.Empty;
-        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-        if (clipboard is null)
-        {
-            return;
-        }
-
-        await clipboard.SetTextAsync(text);
-    }
-
 }

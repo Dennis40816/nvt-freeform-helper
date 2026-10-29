@@ -13,12 +13,10 @@ public sealed class GridRebuildOrchestrator
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly GridBuildService _gridBuildService;
-    private readonly PadOverrideService _padOverrideService;
 
-    public GridRebuildOrchestrator(GridBuildService gridBuildService, PadOverrideService padOverrideService)
+    public GridRebuildOrchestrator(GridBuildService gridBuildService)
     {
         _gridBuildService = gridBuildService ?? throw new ArgumentNullException(nameof(gridBuildService));
-        _padOverrideService = padOverrideService ?? throw new ArgumentNullException(nameof(padOverrideService));
     }
 
     public GridRebuildBuildResult Build(GridRebuildBuildRequest request)

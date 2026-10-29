@@ -545,16 +545,6 @@
     },
     {
       "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "rule": "sourceTextReadsInTests",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.ConsoleStartup_UsesAppLevelAvaloniaEditTheme()",
-      "owner": "NFH",
-      "symbol": "ReadAllTextAsync",
-      "syntaxHash": "75052679aa49f3f1143653d05d7d83b66d9c2db41c8b605c9113d9b38f23a05b",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
       "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixture.cs",
       "rule": "sourceTextReadsInTests",
       "member": "FreeformHelper.Tests.TestInfrastructure.ExampleProjectFixture.Create(string)",
@@ -618,36 +608,6 @@
       "path": "tests/FreeformHelper.Tests/Application/Cad/CadLoadUseCaseTests.cs",
       "rule": "tempPathInTests",
       "member": "FreeformHelper.Tests.CadLoadUseCaseTests.TryLoadFromProject_PathInvalid_FallsBackToEmbedded()",
-      "owner": "NFH",
-      "symbol": "Path.GetTempPath",
-      "syntaxHash": "15972ffd0281f42a70b858ebd4b9b60671db7a9de50925492572bf0bb8b91a6f",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/Infrastructure/Console/ConsoleLinkParserTests.cs",
-      "rule": "tempPathInTests",
-      "member": "FreeformHelper.Tests.ConsoleLinkParserTests.Parse_DirectoryPath_IsDetected()",
-      "owner": "NFH",
-      "symbol": "Path.GetTempPath",
-      "syntaxHash": "15972ffd0281f42a70b858ebd4b9b60671db7a9de50925492572bf0bb8b91a6f",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/Infrastructure/Console/ConsoleLinkParserTests.cs",
-      "rule": "tempPathInTests",
-      "member": "FreeformHelper.Tests.ConsoleLinkParserTests.Parse_FilePathWithLineColumn_IsDetected()",
-      "owner": "NFH",
-      "symbol": "Path.GetTempPath",
-      "syntaxHash": "15972ffd0281f42a70b858ebd4b9b60671db7a9de50925492572bf0bb8b91a6f",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/Infrastructure/Console/ConsoleLinkParserTests.cs",
-      "rule": "tempPathInTests",
-      "member": "FreeformHelper.Tests.ConsoleLinkParserTests.Parse_UrlAndPath_CanCoexist()",
       "owner": "NFH",
       "symbol": "Path.GetTempPath",
       "syntaxHash": "15972ffd0281f42a70b858ebd4b9b60671db7a9de50925492572bf0bb8b91a6f",

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Avalonia;
 using Avalonia.Media;
 using FreeformHelper.Domain.Geometry;
@@ -223,52 +222,5 @@ public sealed partial class PadCanvas
     /// <summary>
     /// Calculates dynamic margins needed for fitting content, especially to accommodate axis labels.
     /// </summary>
-    private FitMargins GetFitMargins()
-    {
-        var baseMargin = GetResourceDouble("Space20", 20.0); // Base margin around content.
-
-        if (RegularPads is null || RegularPads.Count == 0)
-        {
-            return new FitMargins(baseMargin, baseMargin, baseMargin, baseMargin);
-        }
-
-        var axisTopMargin = GetResourceDouble("CanvasAxisLabelTopMargin", GetResourceDouble("Space8", 8.0));
-        var axisSideMargin = GetResourceDouble("CanvasAxisLabelSideMargin", GetResourceDouble("Space8", 8.0));
-        var labelHeight = GetResourceDouble("CanvasAxisLabelBaseFontSize", GetResourceDouble("FontSizeBase", 12.0)); // Approximate height of a label.
-        var charWidth = Math.Max(1.0, labelHeight * 0.65); // Approximate width of a character.
-        var labelMarginTop = Math.Max(axisTopMargin, labelHeight * 1.1);
-        var labelMarginSide = Math.Max(axisSideMargin, labelHeight * 0.8);
-        var fitSafetyPadding = GetResourceDouble("Space2", 2.0);
-        var blockHeight = Math.Max(
-            GetResourceDouble("CanvasIcBlockMinHeight", 18.0),
-            labelHeight + GetResourceDouble("CanvasIcBlockHeightExtra", 8.0)); // Height of an IC group block.
-        var blockPadding = GetResourceDouble("CanvasIcBlockPadding", GetResourceDouble("Space4", 4.0)); // Padding for IC group block.
-
-        // Calculate left margin based on row labels.
-        var minRow = RegularPads.Min(p => p.Row);
-        var maxRow = RegularPads.Max(p => p.Row);
-        var maxDisplayRow = maxRow - minRow;
-        var rowDigits = Math.Max(1, maxDisplayRow.ToString(CultureInfo.InvariantCulture).Length);
-        var rowLabelWidth = Math.Max(labelHeight, rowDigits * charWidth);
-        var leftExtra = labelMarginSide + rowLabelWidth + fitSafetyPadding;
-
-        // Calculate top margin based on column labels and potential IC group blocks.
-        var topExtra = labelMarginTop + labelHeight + fitSafetyPadding;
-        var firstRowPads = RegularPads.Where(p => p.Row == minRow).ToList();
-        if (firstRowPads.Count > 0)
-        {
-            var icGroups = firstRowPads.Select(p => p.IcIndex).Distinct().Count();
-            if (icGroups > 1)
-            {
-                topExtra += blockPadding + blockHeight; // Add space for IC group blocks if present.
-            }
-        }
-
-        return new FitMargins(baseMargin + leftExtra, baseMargin + topExtra, baseMargin, baseMargin);
-    }
-
-    /// <summary>
-    /// A private record struct to hold margin values for fitting content.
-    /// </summary>
-    private readonly record struct FitMargins(double Left, double Top, double Right, double Bottom);
+    private CanvasFitMargins GetFitMargins() => CanvasFitMarginCalculator.Calculate(RegularPads, FitTopInset, GetResourceDouble);
 }

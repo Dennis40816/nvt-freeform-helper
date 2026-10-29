@@ -33,6 +33,13 @@ public sealed partial class PadCanvas
         AvaloniaProperty.Register<PadCanvas, Rect2?>(nameof(FitBoundsOverride));
 
     /// <summary>
+    /// Defines the <see cref="FitTopInset"/> AvaloniaProperty.
+    /// The height at the top of the canvas that overlay controls cover. FitToContent adds it to the top margin.
+    /// </summary>
+    public static readonly StyledProperty<double> FitTopInsetProperty =
+        AvaloniaProperty.Register<PadCanvas, double>(nameof(FitTopInset));
+
+    /// <summary>
     /// Defines the <see cref="ShowCad"/> AvaloniaProperty.
     /// Controls the visibility of CAD pads.
     /// </summary>
@@ -344,6 +351,12 @@ public sealed partial class PadCanvas
     {
         get => GetValue(FitBoundsOverrideProperty);
         set => SetValue(FitBoundsOverrideProperty, value);
+    }
+
+    public double FitTopInset
+    {
+        get => GetValue(FitTopInsetProperty);
+        set => SetValue(FitTopInsetProperty, value);
     }
 
     public bool ShowCad

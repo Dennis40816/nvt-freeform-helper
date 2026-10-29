@@ -4,7 +4,6 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
-using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 using Xunit.v3;
@@ -126,7 +125,7 @@ public sealed class HeadlessSessionGuardTests
     }
 
     [AvaloniaFact]
-    public void CloseOpenWindowsAndRunQueuedWork_ClosesAMainWindowThatCancelledClose()
+    public async Task CloseOpenWindowsAndRunQueuedWork_ClosesAMainWindowThatCancelledClose()
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var window = new MainWindow();
@@ -137,29 +136,36 @@ public sealed class HeadlessSessionGuardTests
         window.Closed += (_, _) => closed = true;
         window.Show();
         Dispatcher.UIThread.RunJobs();
+        var controller = shell.ConsoleSession.Controller;
+        var sourceId = $"guard-{Guid.NewGuid():N}";
 
-        var store = AppLogStore.Instance;
-        store.MarkUiReady();
-        store.Add(new AppLogEntry(DateTimeOffset.UtcNow, "INFO", "test", "before window closes"));
-        Dispatcher.UIThread.RunJobs();
-        Assert.Contains("before window closes", shell.ConsoleText);
+        ConsoleLogTestSupport.Write(sourceId, "before window closes");
+        await ConsoleLogTestSupport.WaitForProjectionAsync(
+            controller,
+            projection => ConsoleLogTestSupport.RowTexts(projection, sourceId).Count == 1);
 
         // Unsaved changes make the window cancel the close and ask first.
         window.Close();
         Dispatcher.UIThread.RunJobs();
         Assert.False(closed);
-        var textBeforeClose = shell.ConsoleText;
-        store.Add(new AppLogEntry(DateTimeOffset.UtcNow, "INFO", "test", "after cancelled close"));
-        Dispatcher.UIThread.RunJobs();
-        Assert.NotEqual(textBeforeClose, shell.ConsoleText);
+        ConsoleLogTestSupport.Write(sourceId, "after cancelled close");
+        await ConsoleLogTestSupport.WaitForProjectionAsync(
+            controller,
+            projection => ConsoleLogTestSupport.RowTexts(projection, sourceId).Count == 2);
 
         HeadlessSessionGuardAttribute.CloseOpenWindowsAndRunQueuedWork();
 
         Assert.True(closed);
-        var textAfterClose = shell.ConsoleText;
-        store.Add(new AppLogEntry(DateTimeOffset.UtcNow, "INFO", "test", "after window closes"));
+        var notifications = 0;
+        controller.PropertyChanged += (_, _) => notifications++;
+        ConsoleLogTestSupport.Write(sourceId, "after window closes");
+        using (var snapshot = await ConsoleLogTestSupport.CaptureAsync())
+        {
+            Assert.Equal(3, snapshot.Entries.Count(entry => entry.SourceId == sourceId));
+        }
+
         Dispatcher.UIThread.RunJobs();
-        Assert.Equal(textAfterClose, shell.ConsoleText);
+        Assert.Equal(0, notifications);
     }
 
     [AvaloniaFact]

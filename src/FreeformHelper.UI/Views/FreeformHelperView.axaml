@@ -6,7 +6,6 @@
              xmlns:views="clr-namespace:FreeformHelper.UI.Views"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
-             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.FreeformHelperView"
              IsEnabled="{Binding IsProjectEditingEnabled}"
@@ -130,6 +129,7 @@
                               ShowCad="{Binding ShowCad}"
                               ShowRegular="{Binding ShowRegular}"
                               HighlightUnmatched="{Binding HighlightUnmatched}"
+                              FitTopInset="{Binding TopToolbarInset, ElementName=CanvasOverlayControls}"
                               HighlightFreeform="{Binding HighlightFreeform}"
                               ColorCadByArea="{Binding ColorCadByArea}"
                               AreaBucketTolerance="{Binding AreaBucketTolerance}"
@@ -183,13 +183,7 @@
         <!-- Bottom: app console (center column only) -->
         <views:ConsolePanel x:Name="ConsolePanelHost"
                             Grid.Row="2"
-                            DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
-                            ConsolePointerPressed="OnConsolePointerPressed"
-                            ConsoleEditorPointerReleased="OnConsoleEditorPointerReleased"
-                            CopyAllRequested="OnConsoleCopyAll"
-                            JumpToBottomRequested="OnConsoleJumpToBottom"
-                            FontIncreaseRequested="OnConsoleFontIncrease"
-                            FontDecreaseRequested="OnConsoleFontDecrease"/>
+                            DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
       </Grid>
     </Border>
 
