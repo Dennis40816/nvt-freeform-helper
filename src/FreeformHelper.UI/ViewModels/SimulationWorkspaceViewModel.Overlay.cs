@@ -35,11 +35,6 @@ public sealed partial class SimulationWorkspaceViewModel
         OnPropertyChanged(nameof(ShowSequentialLegend));
     }
 
-    private bool IsCellInSelectedArea(NotchApplySimulationDiffCell cell)
-    {
-        return !SelectedAreaOption.IcIndex.HasValue || cell.IcIndex == SelectedAreaOption.IcIndex.Value;
-    }
-
     private bool IsPadInSelectedArea(RegularPad pad)
     {
         return !SelectedAreaOption.IcIndex.HasValue || pad.IcIndex == SelectedAreaOption.IcIndex.Value;

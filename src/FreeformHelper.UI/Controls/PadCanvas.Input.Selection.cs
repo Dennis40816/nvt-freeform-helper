@@ -206,19 +206,9 @@ public sealed partial class PadCanvas
         return _selectionEngine.HitTestForHoverDebug(screenPoint, regularOnly);
     }
 
-    private HitResult TryHitCad(Point2 world)
-    {
-        return _selectionEngine.TryHitCad(world);
-    }
-
     private HitResult TryHitRegular(Point2 world)
     {
         return _selectionEngine.TryHitRegular(world);
-    }
-
-    private HitResult TryHitRegularByScan(Point2 world)
-    {
-        return _selectionEngine.TryHitRegularByScan(world);
     }
 
     /// <summary>

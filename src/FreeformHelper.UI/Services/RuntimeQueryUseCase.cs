@@ -1,4 +1,3 @@
-using FreeformHelper.Application.Services;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.RuntimeQuery;
 
@@ -41,8 +40,6 @@ internal sealed partial class RuntimeQueryUseCase
     ];
 
     private readonly ShellViewModel _shellViewModel;
-    private readonly NotchValidationTraceService _notchValidationTraceService = new();
-    private readonly NotchV22TargetAllocationService _targetAllocationService = new();
     private readonly RuntimeQueryNotchCacheService _notchQueryCacheService = new();
     private readonly RuntimeQueryCommandRouter _commandRouter;
 

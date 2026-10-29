@@ -81,7 +81,7 @@
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:17"
     ],
     "freeformViewModelStateMembers": [
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:150", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:85", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:82", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:86", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:90", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:98", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:99", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:101", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:124",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:136", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:85", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:77", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:80", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:81", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:93", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:94", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:96", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:119",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfIndexing.Duplicates.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfLayerImageExportSettings.cs:26",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:10",

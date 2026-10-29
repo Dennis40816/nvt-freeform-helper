@@ -11,7 +11,7 @@ Owner decision (2026-10-04; relayed by Commander): Only old issues that pass con
 - Before creating or changing an issue, search for the same `R13.*` or title to avoid duplicates.
 - Prefer GitHub native sub-issues and issue dependencies. Keep `Part of #N` / `Blocked by: #N` in the issue body too, so people can read them directly. If the repository does not support native relationships, the body relationships are the fallback contract.
 - Keep the commit title to one logical scope. Use `Refs #N` in the commit body. Only a PR that completes a ticket uses `Closes #N`.
-- The pull request body should list the covered issues, behavior or contract impact, verification commands, and golden evidence.
+- The pull request body should list the covered issues, behavior or contract impact, verification commands, and golden evidence. Use the headings in `docs/agents/pr-body-skeleton.md`.
 - From 2026-10-04, new PR titles and bodies default to English. Already-open PRs are not rewritten. If `AGENTS.md` or `CONTRIBUTING.md` says otherwise, ask the owner in chat before changing either file.
 
 ## Pull requests as a triage surface

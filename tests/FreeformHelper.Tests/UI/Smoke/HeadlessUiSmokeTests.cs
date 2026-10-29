@@ -191,7 +191,7 @@ public sealed class HeadlessUiSmokeTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var vm = new FreeformHelperViewModel();
-        var fakeHost = new FakeCadLoadSpinnerHost();
+        using var fakeHost = new FakeCadLoadSpinnerHost();
         var originalFactory = FreeformHelperView.CadLoadSpinnerHostFactory;
         FreeformHelperView.CadLoadSpinnerHostFactory = () => fakeHost;
         var view = new FreeformHelperView
@@ -252,7 +252,7 @@ public sealed class HeadlessUiSmokeTests
     public async Task CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates()
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        var spinnerWindow = new CadLoadSpinnerWindow();
+        using var spinnerWindow = new CadLoadSpinnerWindow();
 
         try
         {

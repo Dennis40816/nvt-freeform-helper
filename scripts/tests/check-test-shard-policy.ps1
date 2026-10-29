@@ -352,7 +352,7 @@ try {
     foreach ($file in @('check-test-shard.ps1', 'read-trx.ps1', 'test-baseline.json', 'test-baseline.schema.json', 'shard-summary.schema.json')) {
         Copy-Item -LiteralPath (Join-Path $ciRoot $file) -Destination (Join-Path $fakeRepo "scripts/ci/$file")
     }
-    foreach ($file in @('run-tests.ps1', 'private-path-patterns.ps1')) {
+    foreach ($file in @('run-tests.ps1', 'private-path-patterns.ps1', 'project-version-format.ps1')) {
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination (Join-Path $fakeRepo "scripts/tests/$file")
     }
     [System.IO.File]::WriteAllText((Join-Path $fakeRepo "scripts/tests/assert-example-data.ps1"), 'param([switch]$AllowMissing); return $false')
@@ -482,6 +482,60 @@ try {
                 $entrySummary = $summaryText | ConvertFrom-Json
                 Assert-Policy ($entrySummary.outcome -ceq 'failed' -and $entrySummary.total -eq 0)
                 Assert-Policy (-not (Test-Path -LiteralPath (Join-Path $fakeRepo 'build/ci-test-results')))
+            }
+        }
+    }
+    # Known host messages become fixed labels on a failing group. The line they came from is never printed.
+    $labelCases = @(
+        @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT The active test run was aborted. Reason: Test host process crashed : PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'test-host-crashed,test-run-aborted' },
+        @{ Lines = @('  Another thread created Dispatcher.UIThread while the headless application was being set up PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'dispatcher-uithread-race' },
+        @{ Lines = @('x.cs(1,1): error CS1002: PRIVATE-MARKER-DO-NOT-PRINT', 'y.cs(2,2): error MSB3027: again'); Exit = 1; Expected = 'build-error' },
+        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT', 'Test Run Aborted.'); Exit = 1; Expected = 'no-test-matches-filter,test-run-aborted' },
+        @{ Lines = @('Test host process crashed PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 0; Expected = '' },
+        @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT and nothing else'); Exit = 1; Expected = '' },
+        @{ Lines = @(); StdErr = 'Test host process crashed PRIVATE-MARKER-DO-NOT-PRINT'; Exit = 1; Expected = 'test-host-crashed' },
+        @{ Lines = @('Failed to start testhost PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'test-host-start-failed' },
+        @{ Lines = @('The test host exited. Unhandled exception. System.InvalidOperationException: PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'unhandled-exception' }
+    )
+    foreach ($case in $labelCases) {
+        Invoke-WithTemporaryEnvironmentVariables -Settings @{ FREEFORMHELPER_TEST_AREA = (Join-Path $testRoot 'test-area') } -Action {
+            & {
+                function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
+                function dotnet {
+                    foreach ($line in $case.Lines) { Write-Output $line }
+                    if ($case.ContainsKey('StdErr')) {
+                        & pwsh -NoProfile -Command ('[Console]::Error.WriteLine(''{0}''); exit {1}' -f $case.StdErr, $case.Exit)
+                    } else {
+                        $global:LASTEXITCODE = $case.Exit
+                    }
+                }
+                $summaryFile = Join-Path $fakeRepo 'summary.json'
+                if (Test-Path -LiteralPath $summaryFile) { Remove-Item -LiteralPath $summaryFile }
+                $message = ''
+                $entryOutput = @(
+                    try {
+                        & (Join-Path $fakeRepo 'scripts/verify.ps1') -CiLane test -Shard snapshots -AllowMissingExampleData `
+                            -EnforceFloors -SummaryPath $summaryFile *>&1
+                    } catch { $message = $_.Exception.Message }
+                )
+                $labelLines = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] diagnostic *' })
+                if ($case.Expected -ceq '') {
+                    Assert-Policy ($labelLines.Count -eq 0)
+                } else {
+                    $expectedLabelLine = '[verify] diagnostic group=ui-snapshots exit={0} host-errors={1}' -f $case.Exit, $case.Expected
+                    Assert-Policy ($labelLines.Count -eq 1 -and [string]$labelLines[0] -ceq $expectedLabelLine)
+                }
+                Assert-Policy (($entryOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
+                Assert-Policy ($message -ceq 'Shard validation failed.')
+                # The native command finished with the exit code of the case. A runner exception before that
+                # would leave the exit code unset and change the phase, so the case could not pass by accident.
+                $expectedPhase = if ($case.Exit -eq 0) { 'read-results' } else { 'run-tests' }
+                $expectedDiagnostic = '[check-test-shard] diagnostic shard=snapshots group=ui-snapshots phase={0} exit={1} trx-files=0 results-dir=missing' -f
+                    $expectedPhase, $case.Exit
+                $diagnostics = @($entryOutput | Where-Object { [string]$_ -like '[[]check-test-shard] diagnostic *' })
+                Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -ceq $expectedDiagnostic)
+                $caseSummary = Get-Content -LiteralPath $summaryFile -Raw | ConvertFrom-Json
+                Assert-Policy (@($caseSummary.groups).Count -eq 1 -and $caseSummary.groups[0].exitCode -eq $case.Exit)
             }
         }
     }

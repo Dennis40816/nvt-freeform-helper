@@ -8,7 +8,7 @@ public sealed class GridRebuildUseCase
 {
     private readonly Action _requestFit;
     private readonly Func<Task> _rebuildAsync;
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private bool _isRebuildInProgress;
     private bool _pendingRebuild;
     private bool _pendingRequestFit;

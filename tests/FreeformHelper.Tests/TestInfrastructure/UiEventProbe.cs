@@ -39,6 +39,8 @@ internal sealed class UiEventProbe
 
 internal sealed class ClosingWindowFixture : IDisposable
 {
+    private readonly ShellViewModel _shell;
+
     public FreeformHelperViewModel Helper { get; }
     public MainWindow Window { get; }
     public int ClosedCount { get; private set; }
@@ -47,10 +49,10 @@ internal sealed class ClosingWindowFixture : IDisposable
     public ClosingWindowFixture(Func<Window, Task<bool?>> confirmSave, UiEventRunner? runner = null)
     {
         Helper = new FreeformHelperViewModel(null, runner);
-        var shell = new ShellViewModel(Helper);
-        shell.ShowHowToUseCommand.Execute(null);
+        _shell = new ShellViewModel(Helper);
+        _shell.ShowHowToUseCommand.Execute(null);
         Window = new MainWindow(new MainWindowCloseSeams(confirmSave));
-        Window.SetShellViewModel(shell);
+        Window.SetShellViewModel(_shell);
         Window.Closed += (_, _) =>
         {
             ClosedCount++;
@@ -64,5 +66,6 @@ internal sealed class ClosingWindowFixture : IDisposable
     {
         Window.DataContext = null;
         Window.Close();
+        _shell.Dispose();
     }
 }

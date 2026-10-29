@@ -15,7 +15,6 @@ namespace FreeformHelper.Application.Services;
 public sealed class NotchV22FinalOutlineService
 {
     private const double AreaEpsilon = 1e-12;
-    private readonly CadPadUnionService _unionService = new();
 
     /// <summary>
     /// Produces a compact final outline that always contains the CAD body and

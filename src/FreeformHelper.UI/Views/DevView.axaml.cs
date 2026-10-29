@@ -56,12 +56,6 @@ public partial class DevView : UserControl
         DevLoadingPreviewOverlay.IsVisible = false;
     }
 
-    private void LogResourceProbe(string key)
-    {
-        var found = this.TryFindResource(key, out var value);
-        Logger.Info(CultureInfo.InvariantCulture, "DevView resource probe: {0} found={1} type={2}", key, found, value?.GetType().Name ?? "null");
-    }
-
     private string BuildProbeText()
     {
         var brushBgFound = this.TryFindResource("BrushBgApp", out var brushBg);
