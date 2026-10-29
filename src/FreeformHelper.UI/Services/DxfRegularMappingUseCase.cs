@@ -11,8 +11,6 @@ namespace FreeformHelper.UI.Services;
     Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class DxfRegularMappingUseCase
 {
-    private readonly DxfRegularMappingAnalyzer _analyzer = new();
-
     public DxfRegularMappingResult Analyze(
         CadPadSet cad,
         RegularGrid grid,

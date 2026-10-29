@@ -15,10 +15,8 @@ namespace FreeformHelper.UI.Services;
     Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class GridBuildService
 {
-    // Private instances of the underlying application services for grid building and diff-index mapping.
+    // Private instance of the underlying application service for grid building.
     private readonly RegularGridBuilder _gridBuilder = new();
-    private readonly DxfRegularLayerGridBuilder _dxfRegularLayerGridBuilder = new();
-    private readonly DiffIndexMapper _diffIndexMapper = new();
 
     /// <summary>
     /// Builds a <see cref="RegularGrid"/> based on the provided CAD pads (optional),
