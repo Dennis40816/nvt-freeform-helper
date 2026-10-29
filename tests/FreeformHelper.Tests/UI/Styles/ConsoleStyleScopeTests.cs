@@ -86,7 +86,7 @@ public sealed class ConsoleStyleScopeTests
 
     private static double ResourceDouble(string key)
     {
-        Assert.True(Application.Current!.TryGetResource(key, ThemeVariant.Dark, out var value));
+        Assert.True(Avalonia.Application.Current!.TryGetResource(key, ThemeVariant.Dark, out var value));
         return Assert.IsType<double>(value);
     }
 }

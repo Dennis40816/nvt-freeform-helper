@@ -15,10 +15,10 @@ public sealed class ConsoleDedupeContractTests
         HeadlessAppBootstrap.EnsureInitialized();
         using var store = await ConsoleLogTestSupport.CreateSeededStoreAsync("dedupe-order", "A", "B", "A");
         using var session = new ConsoleSession(store, new UiEventRunner(static (_, _) => { }, static (_, _) => { }), new ConsoleLinkOpener());
-        await ConsoleLogTestSupport.WaitForProjectionAsync(session.Controller, projection => projection.Rows.Count() == 3);
+        await ConsoleLogTestSupport.WaitForProjectionAsync(session.Controller, projection => projection.Rows.Length == 3);
 
         session.Controller.ToggleDedupeCommand.Execute(null);
-        await ConsoleLogTestSupport.WaitForProjectionAsync(session.Controller, projection => projection.Rows.Count() == 2);
+        await ConsoleLogTestSupport.WaitForProjectionAsync(session.Controller, projection => projection.Rows.Length == 2);
 
         // The old console folded only consecutive equal lines. Core groups equal messages across the history
         // and shows the groups in the order of their latest event, so A, B, A becomes B, A x2.
