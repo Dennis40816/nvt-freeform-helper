@@ -18,7 +18,7 @@ The primary preview surface is `DevView` section `Action role laboratory`. It mu
 ## Manual Checklist
 
 - `DevView`: all action role rows remain readable in default, checked, and disabled states.
-- Console terminal toolbar: Clear, Copy, Dedup, Jump, Search filter, and font controls keep consistent hover and checked behavior.
+- Dev page console header actions keep consistent hover and checked behavior. The app console uses the Core console controls and their own styles.
 - Main workflow checks: Quick Check / Overlap Check read as neutral actions, not primary actions.
 - Simulation viewport: Fit AA and viewport toggles read as overlay-safe icon actions.
 - Coordinate viewport: Fit AA, regular grid, and label toggles match Simulation viewport behavior.
