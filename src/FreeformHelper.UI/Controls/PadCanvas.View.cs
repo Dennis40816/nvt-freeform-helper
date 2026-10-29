@@ -226,10 +226,11 @@ public sealed partial class PadCanvas
     private FitMargins GetFitMargins()
     {
         var baseMargin = GetResourceDouble("Space20", 20.0); // Base margin around content.
+        var overlayTopInset = Math.Max(0.0, FitTopInset); // Height that the overlay controls (layer toggles) cover at the top.
 
         if (RegularPads is null || RegularPads.Count == 0)
         {
-            return new FitMargins(baseMargin, baseMargin, baseMargin, baseMargin);
+            return new FitMargins(baseMargin, baseMargin + overlayTopInset, baseMargin, baseMargin);
         }
 
         var axisTopMargin = GetResourceDouble("CanvasAxisLabelTopMargin", GetResourceDouble("Space8", 8.0));
@@ -264,7 +265,7 @@ public sealed partial class PadCanvas
             }
         }
 
-        return new FitMargins(baseMargin + leftExtra, baseMargin + topExtra, baseMargin, baseMargin);
+        return new FitMargins(baseMargin + leftExtra, baseMargin + topExtra + overlayTopInset, baseMargin, baseMargin);
     }
 
     /// <summary>
