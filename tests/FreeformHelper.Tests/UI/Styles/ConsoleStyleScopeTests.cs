@@ -4,7 +4,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Layout;
 using Avalonia.Styling;
-using Avalonia.Threading;
 using Avalonia.VisualTree;
 using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
@@ -64,7 +63,7 @@ public sealed class ConsoleStyleScopeTests
         try
         {
             scrollViewer.ApplyTemplate();
-            Dispatcher.UIThread.RunJobs();
+            window.Dispatcher.RunJobs();
 
             var scrollBar = Assert.Single(
                 scrollViewer.GetVisualDescendants().OfType<ScrollBar>(),
@@ -81,7 +80,7 @@ public sealed class ConsoleStyleScopeTests
     {
         var window = new Window { Content = new StackPanel { Children = { content } } };
         window.Show();
-        Dispatcher.UIThread.RunJobs();
+        window.Dispatcher.RunJobs();
         return window;
     }
 
