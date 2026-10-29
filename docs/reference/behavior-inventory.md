@@ -270,7 +270,7 @@ Notes:
   - The old header line with the line counts (`Lines N`, rendered and retained rows, deduplicated and source counts) is gone. Core shows a count per level and the dedupe count in its menu instead.
   - The list selects whole rows. The old terminal selected and copied any text range. Copy selection stops at 65,536 characters.
   - The list has no horizontal scroll bar. A long row ends with an ellipsis and expands on demand. The old terminal scrolled sideways.
-  - Search covers the message and the source of a row. It does not cover the time or the level. A search for a displayed time hides every row. `Only matches` is on by default, so search hides the rows without a hit. The old filter default was off, and the old search covered the whole formatted line.
+  - Search covers the message and the source of a row. It does not cover the time or the level. With `Only matches` enabled, displayed timestamps alone do not match; the query can still match message or source text. `Only matches` is on by default, so search hides the rows without a hit. The old filter default was off, and the old search covered the whole formatted line.
   - Dedupe groups equal messages (same source, same level, same text) across the retained history, not only consecutive ones, and orders the groups by their latest event. The lines `A, B, A` show as `B, A x2`. The old terminal folded only consecutive equal lines. `ConsoleDedupeContractTests` pins this.
   - A link opens only when it is an http or https URL, or a file or folder that exists. A file or folder link is selected in Explorer. A network path (a UNC path in any separator form) is never probed.
 
