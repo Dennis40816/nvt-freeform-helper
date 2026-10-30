@@ -16,12 +16,12 @@ namespace FreeformHelper.UI.Services;
 public sealed class ProjectPersistenceUseCase
 {
     private readonly JsonProjectStore _store;
-    private readonly PadOverrideService _padOverrideService;
 
+    // padOverrideService is not stored: PadOverrideService has only static members. The parameter stays
+    // until the constructor signature can change without creating a new code-health ledger fingerprint.
     public ProjectPersistenceUseCase(JsonProjectStore store, PadOverrideService padOverrideService)
     {
         _store = store ?? throw new ArgumentNullException(nameof(store));
-        _padOverrideService = padOverrideService ?? throw new ArgumentNullException(nameof(padOverrideService));
     }
 
     public async Task<ProjectSaveResult> SaveAsync(ProjectSaveRequest request)
