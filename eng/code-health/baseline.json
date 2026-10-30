@@ -3181,16 +3181,6 @@
       "symbol": "WarningsNotAsErrors:VSTHRD103"
     },
     {
-      "syntaxHash": "ef02d3fbb89c5a19265fb9e306e9f03a9c6f8908265f12771845324c64468be8",
-      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.RunIpcLoopAsync(string,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
-    },
-    {
       "syntaxHash": "f233455ef1be502c96497eeaa682c356dc55f2f31a9629b9c830abca191dd42a",
       "member": "FreeformHelper.Application.Export.NotchTableExporter.EscapeCsv(string)",
       "owner": "NFH",
