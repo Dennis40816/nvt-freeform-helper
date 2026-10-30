@@ -11,7 +11,7 @@ public readonly record struct NotchExportSelectionQuickFilterAction(
 
 public static class NotchExportSelectionQuickFilterService
 {
-    private static readonly NotchExportRowDisplayMode[] StatusFilterCycle =
+    private static readonly NotchExportRowDisplayMode[] _statusFilterCycle =
     {
         NotchExportRowDisplayMode.TransferOnly,
         NotchExportRowDisplayMode.LinkedOnly,
@@ -133,12 +133,12 @@ public static class NotchExportSelectionQuickFilterService
 
     private static NotchExportRowDisplayMode ResolveNextStatusMode(NotchExportRowDisplayMode currentRowDisplayMode)
     {
-        var index = Array.IndexOf(StatusFilterCycle, currentRowDisplayMode);
+        var index = Array.IndexOf(_statusFilterCycle, currentRowDisplayMode);
         if (index < 0)
         {
-            return StatusFilterCycle[0];
+            return _statusFilterCycle[0];
         }
 
-        return StatusFilterCycle[(index + 1) % StatusFilterCycle.Length];
+        return _statusFilterCycle[(index + 1) % _statusFilterCycle.Length];
     }
 }

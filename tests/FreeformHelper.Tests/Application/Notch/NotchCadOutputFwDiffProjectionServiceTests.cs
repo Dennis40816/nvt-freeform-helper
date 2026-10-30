@@ -8,23 +8,23 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchCadOutputFwDiffProjectionServiceTests
 {
-    private static readonly int[] DiffIndices101112 = [10, 11, 12];
-    private static readonly int[] DiffIndices2021 = [20, 21];
-    private static readonly int[] ProjectedAnchorDiffs101213 = [10, 12, 13];
-    private static readonly int[] RowValues10 = [10, 90, 110, 0, 0, 0, 0, 0, 0];
-    private static readonly int[] RowValues11 = [11, 90, 110, 0, 0, 0, 10, 1, 19];
-    private static readonly int[] RowValues12 = [12, 90, 110, 11, 1, 19, 0, 0, 0];
-    private static readonly int[] CadPadIds200201 = [200, 201];
+    private static readonly int[] _diffIndices101112 = [10, 11, 12];
+    private static readonly int[] _diffIndices2021 = [20, 21];
+    private static readonly int[] _projectedAnchorDiffs101213 = [10, 12, 13];
+    private static readonly int[] _rowValues10 = [10, 90, 110, 0, 0, 0, 0, 0, 0];
+    private static readonly int[] _rowValues11 = [11, 90, 110, 0, 0, 0, 10, 1, 19];
+    private static readonly int[] _rowValues12 = [12, 90, 110, 11, 1, 19, 0, 0, 0];
+    private static readonly int[] _cadPadIds200201 = [200, 201];
 
     [Fact]
     public void Project_WhenCadDiffsShiftLeaveGap_GapDoesNotRemainAsAnchor()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndices101112);
+        var grid = BuildLinearGrid(diffIndices: _diffIndices101112);
         var table = new NotchTable(new NotchTableRow[]
         {
-            new(NotchAlgorithmVersion.V21, 0, 10, 0, 100, RowValues10, "r0"),
-            new(NotchAlgorithmVersion.V21, 0, 11, 1, 101, RowValues11, "r1"),
-            new(NotchAlgorithmVersion.V21, 0, 12, 2, 102, RowValues12, "r2"),
+            new(NotchAlgorithmVersion.V21, 0, 10, 0, 100, _rowValues10, "r0"),
+            new(NotchAlgorithmVersion.V21, 0, 11, 1, 101, _rowValues11, "r1"),
+            new(NotchAlgorithmVersion.V21, 0, 12, 2, 102, _rowValues12, "r2"),
         });
 
         var projection = NotchCadOutputFwDiffProjectionService.Project(
@@ -38,7 +38,7 @@ public sealed class NotchCadOutputFwDiffProjectionServiceTests
 
         Assert.Equal(2, projection.ChangedRowCount);
         Assert.Equal(0, projection.ConflictedRawDiffKeyCount);
-        Assert.Equal(ProjectedAnchorDiffs101213, projection.Table.Rows.Select(static row => row.DiffIndex).ToArray());
+        Assert.Equal(_projectedAnchorDiffs101213, projection.Table.Rows.Select(static row => row.DiffIndex).ToArray());
         Assert.DoesNotContain(projection.Table.Rows, static row => row.CadPadId == 101 && row.Values[0] == 11);
         var rowCad102 = Assert.Single(projection.Table.Rows, static row => row.CadPadId == 102);
         Assert.Equal(11, rowCad102.Values[3]);
@@ -52,7 +52,7 @@ public sealed class NotchCadOutputFwDiffProjectionServiceTests
     [Fact]
     public void Project_WhenV22TypedRowShifted_ProjectsAnchorOnly_AndKeepsRegularTargets()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndices2021);
+        var grid = BuildLinearGrid(diffIndices: _diffIndices2021);
         var row = new NotchTableRow(
             icIndex: 0,
             diffIndex: 20,
@@ -138,7 +138,7 @@ public sealed class NotchCadOutputFwDiffProjectionServiceTests
     [Fact]
     public void Project_PreservesToFullCoverageAudit()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndices2021);
+        var grid = BuildLinearGrid(diffIndices: _diffIndices2021);
         var audit = new NotchToFullCoverageAudit(
             BucketCount: 1,
             ExpectedTargetDiffCount: 2,
@@ -149,7 +149,7 @@ public sealed class NotchCadOutputFwDiffProjectionServiceTests
                     IcIndex: 0,
                     SourceDiffIndex: 20,
                     TargetDiffIndex: 22,
-                    CadPadIds: CadPadIds200201),
+                    CadPadIds: _cadPadIds200201),
             });
         var row = new NotchTableRow(
             icIndex: 0,
@@ -180,7 +180,7 @@ public sealed class NotchCadOutputFwDiffProjectionServiceTests
     [Fact]
     public void Project_PreservesGenerationPhaseTimings()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndices2021);
+        var grid = BuildLinearGrid(diffIndices: _diffIndices2021);
         var timings = new NotchGenerationPhaseTimings(
             BuildProfilesElapsedMs: 11,
             BuildCanonicalCandidatesElapsedMs: 22,

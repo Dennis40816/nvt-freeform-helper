@@ -9,7 +9,7 @@ namespace FreeformHelper.UI.Logging;
 /// </summary>
 public static class LoggingBootstrapper
 {
-    private static readonly LogLevel[] SupportedLevels =
+    private static readonly LogLevel[] _supportedLevels =
     {
         LogLevel.Trace,
         LogLevel.Debug,
@@ -25,7 +25,7 @@ public static class LoggingBootstrapper
     /// Gets the list of supported minimum log levels that can be selected in UI.
     /// </summary>
     public static IReadOnlyList<string> SupportedMinimumLevels { get; } =
-        SupportedLevels.Select(static level => level.Name).ToList();
+        _supportedLevels.Select(static level => level.Name).ToList();
 
     /// <summary>
     /// Configures the NLog logging system.
@@ -102,7 +102,7 @@ public static class LoggingBootstrapper
     {
         if (!string.IsNullOrWhiteSpace(levelName))
         {
-            var match = SupportedLevels.FirstOrDefault(level =>
+            var match = _supportedLevels.FirstOrDefault(level =>
                 string.Equals(level.Name, levelName, StringComparison.OrdinalIgnoreCase));
             if (match is not null)
             {
@@ -124,7 +124,7 @@ public static class LoggingBootstrapper
         LogLevel? minimum = null;
         foreach (var rule in configuration.LoggingRules)
         {
-            foreach (var level in SupportedLevels)
+            foreach (var level in _supportedLevels)
             {
                 if (!rule.IsLoggingEnabledForLevel(level))
                 {

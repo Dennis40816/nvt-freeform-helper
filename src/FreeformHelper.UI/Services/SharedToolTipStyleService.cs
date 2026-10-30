@@ -7,11 +7,11 @@ namespace FreeformHelper.UI.Services;
 
 internal static class SharedToolTipStyleService
 {
-    private static IDisposable? registration;
+    private static IDisposable? _registration;
 
     public static void Register()
     {
-        registration ??= ToolTip.TipProperty.Changed.AddClassHandler<Control, object?>(NormalizeStringToolTip);
+        _registration ??= ToolTip.TipProperty.Changed.AddClassHandler<Control, object?>(NormalizeStringToolTip);
     }
 
     private static void NormalizeStringToolTip(Control target, AvaloniaPropertyChangedEventArgs<object?> change)

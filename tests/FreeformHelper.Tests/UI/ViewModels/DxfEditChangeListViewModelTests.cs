@@ -7,9 +7,9 @@ namespace FreeformHelper.Tests;
 
 public sealed class DxfEditChangeListViewModelTests
 {
-    private static readonly int[] AppliedHiddenCadIds = [10, 12];
-    private static readonly int[] RestoredDuplicateCadIds = [101, 103];
-    private static readonly int[] RehiddenDuplicateCadIds = [102];
+    private static readonly int[] _appliedHiddenCadIds = [10, 12];
+    private static readonly int[] _restoredDuplicateCadIds = [101, 103];
+    private static readonly int[] _rehiddenDuplicateCadIds = [102];
 
     [Fact]
     public void Rows_ExposesReadOnlyCollectionFacade()
@@ -58,7 +58,7 @@ public sealed class DxfEditChangeListViewModelTests
         vm.Rows[2].IsSelected = true;
         vm.ApplySelectedEntriesCommand.Execute(null);
 
-        Assert.Equal(AppliedHiddenCadIds, appliedCadIds);
+        Assert.Equal(_appliedHiddenCadIds, appliedCadIds);
     }
 
     [Fact]
@@ -82,11 +82,11 @@ public sealed class DxfEditChangeListViewModelTests
         }
 
         vm.RestoreSelectedDuplicateEntriesCommand.Execute(null);
-        Assert.Equal(RestoredDuplicateCadIds, appliedCadIds);
+        Assert.Equal(_restoredDuplicateCadIds, appliedCadIds);
 
         appliedCadIds.Clear();
         vm.RehideSelectedDuplicateEntriesCommand.Execute(null);
-        Assert.Equal(RehiddenDuplicateCadIds, appliedCadIds);
+        Assert.Equal(_rehiddenDuplicateCadIds, appliedCadIds);
     }
 
     [Fact]

@@ -8,8 +8,8 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchDiffIdentityPipelineTests
 {
-    private static readonly int[] DiffIndicesDuplicate = [10, 10, 11];
-    private static readonly int[] SuppressedRegularPads = [1];
+    private static readonly int[] _diffIndicesDuplicate = [10, 10, 11];
+    private static readonly int[] _suppressedRegularPads = [1];
 
     [Fact]
     public void BuildProjectionContract_WhenRawDiffHasConflicts_TracksConflictAndKeepsRawTarget()
@@ -54,7 +54,7 @@ public sealed class NotchDiffIdentityPipelineTests
     [Fact]
     public void BuildActiveDiffBaseline_WhenActiveDiffDuplicatesExist_MergesValuesAndReportsContributors()
     {
-        var regularPads = BuildLinearPads(diffIndices: DiffIndicesDuplicate);
+        var regularPads = BuildLinearPads(diffIndices: _diffIndicesDuplicate);
         var activeRegularPadIds = regularPads.Select(static pad => pad.RegularPadId).ToHashSet();
         var baseline = NotchDiffIdentityPipeline.BuildActiveDiffBaseline(
             regularPads,
@@ -70,7 +70,7 @@ public sealed class NotchDiffIdentityPipelineTests
         var duplicate = Assert.Single(baseline.DuplicateResolutions);
         Assert.Equal(new NotchDiffKey(0, 10), duplicate.DiffKey);
         Assert.Equal(0, duplicate.PrimaryRegularPadId);
-        Assert.Equal(SuppressedRegularPads, duplicate.SuppressedRegularPadIds);
+        Assert.Equal(_suppressedRegularPads, duplicate.SuppressedRegularPadIds);
     }
 
     private static List<RegularPad> BuildLinearPads(int[] diffIndices)

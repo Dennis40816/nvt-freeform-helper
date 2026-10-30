@@ -7,7 +7,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchExportSelectionSummaryProjectorTests
 {
-    private static readonly int[] LegacyRowPayload = [20, 1, 2];
+    private static readonly int[] _legacyRowPayload = [20, 1, 2];
 
     [Fact]
     public void Build_ProjectsScopedCountsAndTexts()
@@ -87,7 +87,7 @@ public sealed class NotchExportSelectionSummaryProjectorTests
                     TargetRatioPercent2: 0,
                     Flags: 0),
                 comment: "warn"),
-            new NotchTableRow(NotchAlgorithmVersion.V21, 1, 20, 120, 400, LegacyRowPayload, "legacy"),
+            new NotchTableRow(NotchAlgorithmVersion.V21, 1, 20, 120, 400, _legacyRowPayload, "legacy"),
         });
 
         return table.Rows

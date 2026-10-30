@@ -7,8 +7,8 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchExportSelectionWorkspaceLinkServiceTests
 {
-    private static readonly int[] LinkedWorkspaceCadIds = [200, 201];
-    private static readonly int[] MissingWorkspaceCadIds = [9999];
+    private static readonly int[] _linkedWorkspaceCadIds = [200, 201];
+    private static readonly int[] _missingWorkspaceCadIds = [9999];
 
     [Fact]
     public void Build_WithLinkedRows_PrefersFirstLinkedRow()
@@ -18,7 +18,7 @@ public sealed class NotchExportSelectionWorkspaceLinkServiceTests
 
         var snapshot = NotchExportSelectionWorkspaceLinkService.Build(
             rows,
-            workspaceCadIds: LinkedWorkspaceCadIds,
+            workspaceCadIds: _linkedWorkspaceCadIds,
             workspaceRegularIndices: Array.Empty<int>(),
             selectedRow: selectedBefore);
 
@@ -36,7 +36,7 @@ public sealed class NotchExportSelectionWorkspaceLinkServiceTests
 
         var snapshot = NotchExportSelectionWorkspaceLinkService.Build(
             rows,
-            workspaceCadIds: MissingWorkspaceCadIds,
+            workspaceCadIds: _missingWorkspaceCadIds,
             workspaceRegularIndices: Array.Empty<int>(),
             selectedRow: selectedBefore);
 

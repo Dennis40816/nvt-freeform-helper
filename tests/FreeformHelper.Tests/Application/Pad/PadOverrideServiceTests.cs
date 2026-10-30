@@ -8,8 +8,8 @@ namespace FreeformHelper.Tests;
 
 public sealed class PadOverrideServiceTests
 {
-    private static readonly double[] GridXEdges = [0.0, 10.0, 20.0];
-    private static readonly double[] GridYEdges = [0.0, 10.0];
+    private static readonly double[] _gridXEdges = [0.0, 10.0, 20.0];
+    private static readonly double[] _gridYEdges = [0.0, 10.0];
 
     [Fact]
     public void Capture_SavesFreeformAndCustomValues()
@@ -65,8 +65,8 @@ public sealed class PadOverrideServiceTests
         return new RegularGrid(
             rows: 1,
             cols: 2,
-            xEdges: GridXEdges,
-            yEdges: GridYEdges,
+            xEdges: _gridXEdges,
+            yEdges: _gridYEdges,
             pads: new List<RegularPad> { pad0, pad1 });
     }
 }

@@ -6,14 +6,14 @@ namespace FreeformHelper.Tests;
 
 public sealed class CoordinatePlannerActiveAreaResolverTests
 {
-    private static readonly string[] PreferredLayerNames = ["AA.drawing", "SIG.top"];
-    private static readonly string[] FallbackLayerNames = ["sig.top", "AA.drawing"];
-    private static readonly string[] SessionLayerNames = ["AA.drawing", "SIG"];
+    private static readonly string[] _preferredLayerNames = ["AA.drawing", "SIG.top"];
+    private static readonly string[] _fallbackLayerNames = ["sig.top", "AA.drawing"];
+    private static readonly string[] _sessionLayerNames = ["AA.drawing", "SIG"];
 
     [Fact]
     public void ResolvePreferredLayerName_WhenPreferredExists_ReturnsCanonicalLayerName()
     {
-        var resolved = CoordinatePlannerActiveAreaResolver.ResolvePreferredLayerName(PreferredLayerNames, "sig.TOP");
+        var resolved = CoordinatePlannerActiveAreaResolver.ResolvePreferredLayerName(_preferredLayerNames, "sig.TOP");
 
         Assert.Equal("SIG.top", resolved);
     }
@@ -21,7 +21,7 @@ public sealed class CoordinatePlannerActiveAreaResolverTests
     [Fact]
     public void ResolvePreferredLayerName_WhenPreferredMissing_FallsBackToAaDrawing()
     {
-        var resolved = CoordinatePlannerActiveAreaResolver.ResolvePreferredLayerName(FallbackLayerNames, "unknown");
+        var resolved = CoordinatePlannerActiveAreaResolver.ResolvePreferredLayerName(_fallbackLayerNames, "unknown");
 
         Assert.Equal("AA.drawing", resolved);
     }
@@ -32,7 +32,7 @@ public sealed class CoordinatePlannerActiveAreaResolverTests
         var session = new CoordinatePlannerWorkspaceSession(
             TestGeometryFactory.CreateRegularGrid(1, 1, cellWidth: 10d, cellHeight: 5d),
             new[] { TestGeometryFactory.CreateCadPad(1, "SIG", 10d, 20d, 30d, 40d) },
-            SessionLayerNames,
+            _sessionLayerNames,
             SourceRevision: 0,
             DefaultMachineWidth: 100d,
             DefaultMachineHeight: 50d,

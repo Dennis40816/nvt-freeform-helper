@@ -14,8 +14,8 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class MatchingBoundedContextContractTests
 {
-    private static readonly double[] XEdges = { 0, 10, 20 };
-    private static readonly double[] YEdges = { 0, 10 };
+    private static readonly double[] _xEdges = { 0, 10, 20 };
+    private static readonly double[] _yEdges = { 0, 10 };
 
     [AvaloniaFact]
     public void SameInput_AuditSettingsAndOverridesLeaveOverlapAndHitTestingUnchanged()
@@ -28,7 +28,7 @@ public sealed class MatchingBoundedContextContractTests
         pads[0].AssignMapping(2, 40);
         pads[1].AssignMapping(2, 41);
         pads[1].Freeform = FreeformType.XWay;
-        var grid = new RegularGrid(1, 2, XEdges, YEdges, pads);
+        var grid = new RegularGrid(1, 2, _xEdges, _yEdges, pads);
         var cad = new CadPadSet(new[]
         {
             new CadPad(10, "Large", "L1", Rectangle(-4, 0, 16, 10)),

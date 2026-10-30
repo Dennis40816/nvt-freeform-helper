@@ -7,13 +7,13 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchV22ResolvedResultServiceTests
 {
-    private static readonly double[] Grid10 = [10.0];
-    private static readonly double[] Grid10x2 = [10.0, 10.0];
+    private static readonly double[] _grid10 = [10.0];
+    private static readonly double[] _grid10x2 = [10.0, 10.0];
 
     [Fact]
     public void Build_UsesSingleStage3Source_ForRatioAllocationAndFinalOutline()
     {
-        var grid = CreateGrid(Grid10x2, Grid10);
+        var grid = CreateGrid(_grid10x2, _grid10);
         var cad = CreateCadRect(0, 0, 15, 5, id: 40);
         var blocker = CreateCadRect(12, 0, 20, 5, id: 41);
         var allCadPads = new[] { cad, blocker };
@@ -45,7 +45,7 @@ public sealed class NotchV22ResolvedResultServiceTests
     [Fact]
     public void Build_UsesResolvedStageModel_ForSharedReachableExpansion()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 3, 3, 7, id: 10);
         var blocker = CreateCadRect(5, 0, 10, 10, id: 11);
         var allCadPads = new[] { cad, blocker };

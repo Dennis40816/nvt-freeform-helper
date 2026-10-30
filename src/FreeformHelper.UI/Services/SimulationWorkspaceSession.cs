@@ -29,14 +29,14 @@ public sealed record SimulationWorkspaceSession(
     public int ColumnCount => Grid.Cols;
     public int PadCount => Grid.Pads.Count;
     public IReadOnlyList<CadPad> CadPads => CadPadsForCopperProjection ?? Array.Empty<CadPad>();
-    public IReadOnlyDictionary<int, int> CadOutputFwDiffIndices => CadOutputFwDiffIndexByCadId ?? EmptyIntMap;
-    public IReadOnlyDictionary<int, int> CadIcIndices => CadIcIndexByCadId ?? EmptyIntMap;
+    public IReadOnlyDictionary<int, int> CadOutputFwDiffIndices => CadOutputFwDiffIndexByCadId ?? _emptyIntMap;
+    public IReadOnlyDictionary<int, int> CadIcIndices => CadIcIndexByCadId ?? _emptyIntMap;
     public IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> CadOutputFwDiffAssignmentDecisions =>
-        CadOutputFwDiffAssignmentDecisionByCadId ?? EmptyDecisionMap;
+        CadOutputFwDiffAssignmentDecisionByCadId ?? _emptyDecisionMap;
 
-    private static readonly IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> EmptyDecisionMap =
+    private static readonly IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> _emptyDecisionMap =
         new Dictionary<int, CadOutputFwDiffAssignmentDecision>();
-    private static readonly IReadOnlyDictionary<int, int> EmptyIntMap =
+    private static readonly IReadOnlyDictionary<int, int> _emptyIntMap =
         new Dictionary<int, int>();
 }
 

@@ -14,8 +14,8 @@ namespace FreeformHelper.Tests;
 public sealed class WorkspaceViewsSmokeTests
 {
     private const int SimulationNullDiffValue = 65535;
-    private static readonly int[] SimulationDiffIndices = { 10, 11 };
-    private static readonly string[] CoordinateLayerNames = ["AA.drawing", "SIG"];
+    private static readonly int[] _simulationDiffIndices = { 10, 11 };
+    private static readonly string[] _coordinateLayerNames = ["AA.drawing", "SIG"];
 
     [AvaloniaFact]
     public void CoordinatePlannerWorkspaceView_Can_Layout_Headless()
@@ -32,7 +32,7 @@ public sealed class WorkspaceViewsSmokeTests
                         BuildCadPad(1, "AA.drawing", 0d, 0d, 10d, 5d),
                         BuildCadPad(2, "SIG", 2d, 1d, 4d, 3d),
                     },
-                    CoordinateLayerNames,
+                    _coordinateLayerNames,
                     SourceRevision: 0,
                     DefaultMachineWidth: 100d,
                     DefaultMachineHeight: 50d,
@@ -83,7 +83,7 @@ public sealed class WorkspaceViewsSmokeTests
 
     private static RegularGrid BuildSimulationGrid()
     {
-        return TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+        return TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
     }
 
     private static NotchTable BuildSimulationTable()

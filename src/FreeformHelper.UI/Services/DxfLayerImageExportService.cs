@@ -11,10 +11,10 @@ namespace FreeformHelper.UI.Services;
 public sealed class DxfLayerImageExportService
 {
     private const double BoundsEpsilon = 1e-9;
-    private static readonly SKColor LightBackground = new(255, 255, 255, 255);
-    private static readonly SKColor LightStroke = new(0, 0, 0, 255);
-    private static readonly SKColor DarkBackground = new(42, 42, 42, 255);
-    private static readonly SKColor DarkStroke = new(255, 255, 255, 255);
+    private static readonly SKColor _lightBackground = new(255, 255, 255, 255);
+    private static readonly SKColor _lightStroke = new(0, 0, 0, 255);
+    private static readonly SKColor _darkBackground = new(42, 42, 42, 255);
+    private static readonly SKColor _darkStroke = new(255, 255, 255, 255);
 
     public static void ExportLayerImage(
         IReadOnlyList<CadPad> pads,
@@ -55,8 +55,8 @@ public sealed class DxfLayerImageExportService
             throw new InvalidOperationException("Selected layer bounds are empty.");
         }
 
-        var bg = useDarkTheme ? DarkBackground : LightBackground;
-        var stroke = useDarkTheme ? DarkStroke : LightStroke;
+        var bg = useDarkTheme ? _darkBackground : _lightBackground;
+        var stroke = useDarkTheme ? _darkStroke : _lightStroke;
         var strokeWidthPixels = (double)lineWidthPixels;
         int outputWidthPixels;
         int outputHeightPixels;

@@ -6,7 +6,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class SimulationSafetyAuditServiceTests
 {
-    private static readonly int[] SingleSourceRowNumbers = { 1 };
+    private static readonly int[] _singleSourceRowNumbers = { 1 };
 
     [Theory]
     [InlineData(0d, false)]
@@ -47,7 +47,7 @@ public sealed class SimulationSafetyAuditServiceTests
             AnchorDiffIndex: 10,
             RegularPadId: 1,
             CadPadId: null,
-            SourceRowNumbers: SingleSourceRowNumbers,
+            SourceRowNumbers: _singleSourceRowNumbers,
             CombinePercent: 130,
             SourceRetainedPercent: 130,
             SourceBeforeValue: 470d,
@@ -121,7 +121,7 @@ public sealed class SimulationSafetyAuditServiceTests
                 AnchorDiffIndex: 10,
                 RegularPadId: 1,
                 CadPadId: 313,
-                SourceRowNumbers: SingleSourceRowNumbers,
+                SourceRowNumbers: _singleSourceRowNumbers,
                 CombinePercent: 100,
                 SourceRetainedPercent: 50,
                 SourceBeforeValue: 400d,
@@ -156,7 +156,7 @@ public sealed class SimulationSafetyAuditServiceTests
                 AnchorDiffIndex: 10,
                 RegularPadId: 1,
                 CadPadId: 313,
-                SourceRowNumbers: SingleSourceRowNumbers,
+                SourceRowNumbers: _singleSourceRowNumbers,
                 CombinePercent: 100,
                 SourceRetainedPercent: 50,
                 SourceBeforeValue: 400d,
@@ -215,7 +215,7 @@ public sealed class SimulationSafetyAuditServiceTests
             AnchorDiffIndex: anchorDiffIndex,
             RegularPadId: regularPadId,
             CadPadId: null,
-            SourceRowNumbers: SingleSourceRowNumbers,
+            SourceRowNumbers: _singleSourceRowNumbers,
             CombinePercent: sourceRetainedPercent + targetRatioPercent,
             SourceRetainedPercent: sourceRetainedPercent,
             SourceBeforeValue: 100d,
