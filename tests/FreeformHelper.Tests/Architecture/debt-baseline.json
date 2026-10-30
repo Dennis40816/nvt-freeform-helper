@@ -9,7 +9,7 @@
     "processStart": 1,
     "directClockReads": 15,
     "bareCatch": 1,
-    "catchException": 24,
+    "catchException": 1,
     "suppressFlagFields": 4,
     "freeformViewModelStateMembers": 95,
     "shellNavigationBooleans": 0,
@@ -59,21 +59,7 @@
       "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:201"
     ],
     "catchException": [
-      "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs:116",
-      "src/FreeformHelper.UI/Program.cs:54", "src/FreeformHelper.UI/Program.cs:141",
-      "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:69",
-      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:243", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:329", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:693",
-      "src/FreeformHelper.UI/Services/CadLoadUseCase.cs:68", "src/FreeformHelper.UI/Services/CadLoadUseCase.cs:82",
-      "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:72", "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs:137",
-      "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.cs:30",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs:100",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:116", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:163",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs:232",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:124",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:55",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:261", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:327",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:67", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Progress.cs:108",
-      "src/FreeformHelper.UI/ViewModels/IndexMappingReportViewModel.AlgorithmTrace.cs:82", "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs:201"
+      "src/FreeformHelper.UI/Program.cs:54"
     ],
     "suppressFlagFields": [
       "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:64",
