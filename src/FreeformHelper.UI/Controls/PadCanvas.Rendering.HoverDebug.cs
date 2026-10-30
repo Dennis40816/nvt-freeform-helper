@@ -33,7 +33,7 @@ public sealed partial class PadCanvas
             4,
             GetResourceDouble("CanvasNotchRatioOffsetY", GetResourceDouble("CanvasMatchRatioOffsetY", 4)));
 
-        var layout = new TextLayout(snapshot.Value.Text, AxisLabelTypeface, fontSize, GetBrush(textColor));
+        using var layout = new TextLayout(snapshot.Value.Text, AxisLabelTypeface, fontSize, GetBrush(textColor));
         var width = layout.Width + (paddingX * 2);
         var height = layout.Height + (paddingY * 2);
         var anchor = WorldToScreen(snapshot.Value.Anchor);

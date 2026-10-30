@@ -224,7 +224,7 @@ public sealed partial class PadCanvas
         IList<Rect> occupiedLabelRects)
     {
         var text = $"M {coverage * 100:0.#}%";
-        var layout = new TextLayout(
+        using var layout = new TextLayout(
             text,
             AxisLabelTypeface,
             fontSize,
