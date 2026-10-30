@@ -17,11 +17,13 @@ public sealed class DebtBaselineTests
     internal const string AsyncVoidLambdaPattern = @"[+\-]=\s*async\b";
 
     // A catch of Exception counts, except the policy form catch (Exception x) when (ExceptionPolicy.IsRecoverable(x)),
-    // where the filter variable is the caught variable and the filter has no other condition. The policy form
-    // lets fatal exceptions pass, so it is the accepted way to catch Exception and is no debt.
+    // where the filter variable is the caught variable and the filter has no other condition. ExceptionPolicy must be
+    // the approved helper FreeformHelper.Application.Services.ExceptionPolicy, unqualified or fully qualified. A helper of
+    // another namespace counts, because the text rule cannot see what it does. The approved helper lets out-of-memory
+    // exceptions pass (owner approval Q55, 2026-10-15 08:49), so the policy form is not counted by this metric.
     internal const string CatchExceptionPattern =
         @"\bcatch\s*\(\s*(?:(?:global::)?System\.)?Exception\b" +
-        @"(?!\s+(?<variable>\w+)\s*\)\s*when\s*\(\s*(?:[\w.]+\.)?ExceptionPolicy\s*\.\s*IsRecoverable\s*\(\s*\k<variable>\s*\)\s*\))";
+        @"(?!\s+(?<variable>\w+)\s*\)\s*when\s*\(\s*(?:(?:global::)?FreeformHelper\s*\.\s*Application\s*\.\s*Services\s*\.\s*)?ExceptionPolicy\s*\.\s*IsRecoverable\s*\(\s*\k<variable>\s*\)\s*\))";
 
     internal static Dictionary<string, string[]> Measure(ArchitectureSource[] sources, string repoRoot)
     {
@@ -252,7 +254,7 @@ public sealed class DebtBaselineTests
     }
 
     [Fact]
-    public void CatchExceptionMetric_ExcludesOnlyThePolicyFilterOnTheCaughtVariable()
+    public void CatchExceptionMetric_ExcludesOnlyTheApprovedPolicyFilterOnTheCaughtVariable()
     {
         var source = new ArchitectureSource("fixture.cs", """
             class Handlers
@@ -261,19 +263,22 @@ public sealed class DebtBaselineTests
                 {
                     // catch (Exception comment) { }
                     try { } catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex)) { }
-                    try { } catch (System.Exception ex) when (FreeformHelper.UI.ExceptionPolicy.IsRecoverable(ex)) { }
+                    try { } catch (System.Exception ex) when (FreeformHelper.Application.Services.ExceptionPolicy.IsRecoverable(ex)) { }
+                    try { } catch (Exception ex) when (global::FreeformHelper.Application.Services.ExceptionPolicy.IsRecoverable(ex)) { }
                     try { } catch (Exception ex) { }
                     try { } catch (Exception) { }
                     try { } catch (System.Exception ex) when (Log(ex)) { }
                     try { } catch (Exception ex) when (ExceptionPolicy.IsRecoverable(other)) { }
                     try { } catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex) || true) { }
+                    try { } catch (Exception ex) when (Other.ExceptionPolicy.IsRecoverable(ex)) { }
+                    try { } catch (Exception ex) when (FreeformHelper.UI.ExceptionPolicy.IsRecoverable(ex)) { }
                     try { } catch (IOException ex) { }
                     try { } catch { }
                 }
             }
             """);
 
-        Assert.Equal(5, source.Find(CatchExceptionPattern).Length);
+        Assert.Equal(7, source.Find(CatchExceptionPattern).Length);
     }
 
     [Fact]
