@@ -218,7 +218,7 @@ public sealed class NotchApplySimulationAaView : Control
         }
 
         var sizeFactor = Math.Clamp(Math.Min(rect.Width / 4.6d, rect.Height / 1.8d), valueFontMin, valueFontMax);
-        var valueLayout = new TextLayout(cell.ValueText, Typeface.Default, sizeFactor, valueBrush);
+        using var valueLayout = new TextLayout(cell.ValueText, Typeface.Default, sizeFactor, valueBrush);
         var origin = new Point(
             rect.X + Math.Max(0d, (rect.Width - valueLayout.Width) / 2d),
             rect.Y + Math.Max(0d, (rect.Height - valueLayout.Height) / 2d));

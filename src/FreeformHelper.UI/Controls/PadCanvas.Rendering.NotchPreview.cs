@@ -187,7 +187,7 @@ public sealed partial class PadCanvas
             var preview = _notchPreviewByCadId[pad.Id];
 
             var text = $"R {preview.ToRegularRatio * 100:0.#}%";
-            var layout = new TextLayout(text, AxisLabelTypeface, fontSize, labelBrush);
+            using var layout = new TextLayout(text, AxisLabelTypeface, fontSize, labelBrush);
             var labelWidth = layout.Width + (horizontalPadding * 2);
             var labelHeight = layout.Height + (verticalPadding * 2);
             var center = WorldToScreen(pad.Centroid);
