@@ -5,7 +5,7 @@
 # Spinner process sites without tests
 
 - [ ] No deadline. `CadLoadSpinnerProcessHost.EnsureProcessStartedAsync`, the warmup `catch` in `QueueStateSync` and `CleanupProcess` have no test. Reaching them needs a real spinner process, and the only seam is `Process.Start` (`CadLoadSpinnerProcessHost.cs`). Moving that statement behind a delegate makes the ledger count a new banned-API fingerprint (RS0030), which it refuses. When the ledger tool stops treating a move as a new fingerprint, put `Process.Start` behind a delegate and test these sites.
-- [ ] No deadline. The pipe server loop of `CadLoadSpinnerWindow` keeps its bare `catch`. Changing it to `catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))` raises `catchException` from 25 to 26, because a bare catch does not count there and the new form does. The ledger only lowers. Change it when the ledger tool treats bare to this form as no increase.
+- [ ] No deadline. The pipe server loop of `CadLoadSpinnerWindow` keeps its bare `catch`. The `catchException` metric no longer counts the form `catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))`, so the change lowers `bareCatch` from 1 to 0 and leaves `catchException` as it is. It is ready to do as a small production change.
 - [ ] No deadline. The spinner's IPC loop fails silently when the pipe cannot be created: the `NamedPipeServerStream` constructor in `RunIpcLoopAsync` is outside every `try`, and `CadLoadSpinnerWindow` keeps the faulted task in `_ipcLoopTask` without observing it. Handle and log it in a separate behavior PR. Refs [#64](https://github.com/Dennis40816/nvt-freeform-helper/issues/64).
 
 # Legacy console follow-up
