@@ -231,7 +231,7 @@ Notes:
   - `NotchPreviewVisualizationStep`（Stage 1/2/3）
   - `NotchPreviewAutoPlayEnabled` / interval
   - The above only trigger overlay visibility notifications and `CanvasHost.Invalidate()`.
-- `RefreshNotchCanvasPreviewCommand` currently has no production XAML binding; it is used only for CLI/internal/test entry. The normal user flow has no other clickable manual Recompute button; ordinary parameter/selection changes are handled by automatic refresh.
+- The Step 3 preview recompute has no command and no production XAML binding. The CLI/internal entry is `RunWorkflowStepAsync(WorkflowStepId.Step3NotchPreview)`. The normal user flow has no other clickable manual Recompute button; ordinary parameter/selection changes are handled by automatic refresh.
 - Main code entries:
   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkflowSteps.cs`
   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs`
@@ -303,11 +303,6 @@ Notes:
   - [Undo] [Status]
 - SetFreeformNone/X/Y/XY → SetFreeformForSelection (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Overrides.cs)
   - [Status] (CanvasHost.Invalidate, MarkUnsaved)
-- UseSelectionForManualRangeCommand → ApplySelectionToManualRange (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ManualSizing.cs)
-  - [Set selection], and may trigger [Rebuild] [View] [Status] through ApplySizingToCells
-- SelectAllLayersCommand / DeselectAllLayersCommand → SelectAllLayers / DeselectAllLayers
-  - If RecalcBoundsOnLayerFilter=true, triggers [Rebuild] [View]
-  - Calls MarkUnsaved when LayerToggle changes
 - CheckDxfQualityCommand → CheckDxfQualityAsync (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs)
   - [Status]
 

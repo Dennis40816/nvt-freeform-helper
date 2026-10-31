@@ -79,68 +79,7 @@ public sealed partial class FreeformHelperViewModelTests
     }
 
 
-    [Fact]
-    public void LocateCadByIdCommand_FocusesCadSelection()
-    {
-        var cadPads = new ObservableCollection<CadPad> { CreateRectCad(10, 0, 0, 5, 5) };
-        var regularPads = new ObservableCollection<RegularPad> { CreateRectRegular(0, 0, 100, 0, 0, 5, 5) };
-        var expectedCadIds = new[] { 10 };
-        var vm = new FreeformHelperViewModel
-        {
-            CadPads = cadPads,
-            RegularPads = regularPads,
-            QuickLocateCadPadId = 10,
-        };
-        var host = new TestCanvasHost();
-        vm.CanvasHost = host;
 
-        vm.LocateCadByIdCommand.Execute(null);
-
-        Assert.Equal(expectedCadIds, host.SelectedCadIds.OrderBy(id => id).ToArray());
-        Assert.Empty(host.SelectedRegularIds);
-        Assert.Equal(1, host.FocusWithMinZoomCount);
-        Assert.Equal("CAD 10 focused (CAD output=1).", vm.StatusText);
-    }
-
-
-    [Fact]
-    public void LocateRegularByIndexCommand_FocusesRegularSelection()
-    {
-        var cadPads = new ObservableCollection<CadPad> { CreateRectCad(33, 0, 0, 6, 6) };
-        var regularPads = new ObservableCollection<RegularPad> { CreateRectRegular(0, 0, 201, 0, 0, 6, 6) };
-        var expectedRegularIds = new[] { 201 };
-        var vm = new FreeformHelperViewModel
-        {
-            CadPads = cadPads,
-            RegularPads = regularPads,
-            QuickLocateRegularPadIndex = 201,
-        };
-        var host = new TestCanvasHost();
-        vm.CanvasHost = host;
-
-        vm.LocateRegularByIndexCommand.Execute(null);
-
-        Assert.Empty(host.SelectedCadIds);
-        Assert.Equal(expectedRegularIds, host.SelectedRegularIds.OrderBy(id => id).ToArray());
-        Assert.Equal(1, host.FocusWithMinZoomCount);
-        Assert.Equal("Regular index 201 focused (visible REG=1).", vm.StatusText);
-    }
-
-
-    [Fact]
-    public void LocateRegularByIndexCommand_WhenTargetMissing_SetsStatus()
-    {
-        var regularPads = new ObservableCollection<RegularPad> { CreateRectRegular(0, 0, 201, 0, 0, 6, 6) };
-        var vm = new FreeformHelperViewModel
-        {
-            RegularPads = regularPads,
-            QuickLocateRegularPadIndex = 999,
-        };
-
-        vm.LocateRegularByIndexCommand.Execute(null);
-
-        Assert.Equal("Regular index 999 is not visible.", vm.StatusText);
-    }
 
     [Fact]
     public void QuickFocusCommand_WithCadQuery_FocusesCadSelection()

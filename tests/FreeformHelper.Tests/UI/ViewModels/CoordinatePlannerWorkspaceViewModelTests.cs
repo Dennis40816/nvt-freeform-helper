@@ -300,7 +300,7 @@ public sealed class CoordinatePlannerWorkspaceViewModelTests
     }
 
     [Fact]
-    public async Task CopyArtifactsCommand_CopiesSelectedRowWhenAvailable()
+    public async Task CopySelectedArtifactCommand_CopiesSelectedRow()
     {
         var viewModel = new CoordinatePlannerWorkspaceViewModel(
             new CoordinatePlannerWorkspaceUseCase(),

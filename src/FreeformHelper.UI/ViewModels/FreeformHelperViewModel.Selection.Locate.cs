@@ -6,46 +6,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private void LocateCadByQuickInput()
-    {
-        var cadPadId = NormalizeQuickLocateInput(QuickLocateCadPadId);
-        using (_undoSuppression.Enter())
-        {
-            QuickLocateCadPadId = cadPadId;
-        }
-
-        TryLocateSelection(
-            new[] { cadPadId },
-            Array.Empty<int>(),
-            focusSelection: true,
-            notVisibleStatus: $"CAD {cadPadId} is not visible.",
-            successStatusBuilder: (cadCount, _) => $"CAD {cadPadId} focused (CAD output={cadCount}).");
-    }
-
-    private void LocateRegularByQuickInput()
-    {
-        var regularIndex = NormalizeQuickLocateInput(QuickLocateRegularPadIndex);
-        using (_undoSuppression.Enter())
-        {
-            QuickLocateRegularPadIndex = regularIndex;
-        }
-
-        var regularPad = RegularPads.FirstOrDefault(pad => pad.Index == regularIndex);
-        if (regularPad is null)
-        {
-            SetStatus($"Regular index {regularIndex} is not visible.");
-            return;
-        }
-
-        TryLocateSelection(
-            Array.Empty<int>(),
-            new[] { regularPad.RegularPadId },
-            focusSelection: true,
-            notVisibleStatus: $"Regular index {regularIndex} is not visible.",
-            successStatusBuilder: (_, regularCount) =>
-                $"Regular index {regularIndex} focused (visible REG={regularCount}).");
-    }
-
     private void ExecuteQuickFocus()
     {
         if (!QuickFocusQueryParser.TryParse(QuickFocusQueryText, out var query, out var error))
@@ -423,11 +383,5 @@ public sealed partial class FreeformHelperViewModel
             .Where(visibleIds.Contains)
             .Distinct()
             .ToList();
-    }
-
-    private static int NormalizeQuickLocateInput(decimal value)
-    {
-        var rounded = (int)Math.Round(value, MidpointRounding.AwayFromZero);
-        return Math.Clamp(rounded, 0, 2_000_000_000);
     }
 }

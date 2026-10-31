@@ -128,13 +128,13 @@ Non-goals:
 | `AnalyzeIndexMappingCommand` | No persistent write (produces a report snapshot) | L1 read | Only updates the Step4 report display |
 | `ExportNotchCommand` | `_notchCache.LastGeneratedTable` | L2 | Affects Step5 summary, Step6 source, and Simulation session source |
 | `AnalyzeNotchValidationCommand` | validation trace UI state | L3 read | Updates the Step6 display |
-| `RefreshNotchCanvasPreviewCommand` | Step3 preview cache | Step3 display path | Should not write back to L1/L2 |
+| `RunWorkflowStepAsync(Step3NotchPreview)` | Step3 preview cache | Step3 display path | Should not write back to L1/L2 |
 
 ## 6.1 Existing Features to Preserve (No Regressions)
 All of the following behaviors must remain after the right-side IA redesign; the UI redesign must not remove them:
 
 - Step 3（Notch compensation）
-  - `Recompute focused CAD (Step 3)`（`RefreshNotchCanvasPreviewCommand`）。
+  - `Recompute focused CAD (Step 3)`（`RunWorkflowStepAsync(Step3NotchPreview)`）。
   - stage switching (previous/next layer) and auto-play (including interval).
   - `Clear Step 3` clears Step 3 and downstream state.
   - The Step 3 entry point can still navigate to the corresponding Settings tab.

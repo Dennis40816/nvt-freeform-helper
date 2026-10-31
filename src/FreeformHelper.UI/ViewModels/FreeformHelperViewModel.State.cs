@@ -62,44 +62,6 @@ public sealed partial class FreeformHelperViewModel
     private InspectorPanelState _inspectorPanel = InspectorPanelState.Initial;
 
     /// <summary>
-    /// Gets or sets quick-locate CAD pad id input used by Inspector panel.
-    /// </summary>
-    public decimal QuickLocateCadPadId
-    {
-        get => _inspectorPanel.QuickLocateCadPadId;
-        set
-        {
-            if (_inspectorPanel.QuickLocateCadPadId == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _inspectorPanel = _inspectorPanel with { QuickLocateCadPadId = value };
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets quick-locate regular pad index input used by Inspector panel.
-    /// </summary>
-    public decimal QuickLocateRegularPadIndex
-    {
-        get => _inspectorPanel.QuickLocateRegularPadIndex;
-        set
-        {
-            if (_inspectorPanel.QuickLocateRegularPadIndex == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _inspectorPanel = _inspectorPanel with { QuickLocateRegularPadIndex = value };
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
     /// Gets or sets the unified quick-focus query used by the Inspector panel.
     /// Examples: CAD 4809, REG 4616, DIFF 72, IC1 DIFF72.
     /// </summary>
@@ -197,11 +159,6 @@ public sealed partial class FreeformHelperViewModel
     public string PadInspectorMatchText => PadInspectorDisplay.MatchText;
 
     /// <summary>
-    /// Gets top-strip notch/freeform summary text for current inspector snapshot.
-    /// </summary>
-    public string PadInspectorCompensationText => PadInspectorDisplay.CompensationText;
-
-    /// <summary>
     /// Gets segmented notch/freeform summary lines for inspector panel.
     /// </summary>
     public ObservableCollection<PadInspectorDisplayLine> PadInspectorCompensationLines => PadInspectorDisplay.CompensationLines;
@@ -220,60 +177,6 @@ public sealed partial class FreeformHelperViewModel
     /// Gets whether current inspector snapshot has rule trace lines.
     /// </summary>
     public bool HasPadInspectorRuleTrace => PadInspectorDisplay.HasRuleTrace;
-
-    /// <summary>
-    /// Gets or sets whether pad inspector trace is expanded in top strip.
-    /// </summary>
-    public bool IsPadInspectorTraceExpanded
-    {
-        get => _inspectorPanel.IsPadInspectorTraceExpanded;
-        set
-        {
-            if (_inspectorPanel.IsPadInspectorTraceExpanded == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _inspectorPanel = _inspectorPanel with { IsPadInspectorTraceExpanded = value };
-            OnIsPadInspectorTraceExpandedChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnIsPadInspectorTraceExpandedChanged(bool value);
-
-    /// <summary>
-    /// Gets the toggle text for pad inspector trace expander.
-    /// </summary>
-    public string PadInspectorTraceToggleText => IsPadInspectorTraceExpanded ? "Hide rule trace" : "Rule trace";
-
-    /// <summary>
-    /// Gets or sets whether top-strip rule trace popup is open.
-    /// </summary>
-    public bool IsPadInspectorTracePopupOpen
-    {
-        get => _inspectorPanel.IsPadInspectorTracePopupOpen;
-        set
-        {
-            if (_inspectorPanel.IsPadInspectorTracePopupOpen == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _inspectorPanel = _inspectorPanel with { IsPadInspectorTracePopupOpen = value };
-            OnIsPadInspectorTracePopupOpenChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnIsPadInspectorTracePopupOpenChanged(bool value);
-
-    /// <summary>
-    /// Gets the toggle text for the top-strip rule trace popup.
-    /// </summary>
-    public string PadInspectorTracePopupToggleText => IsPadInspectorTracePopupOpen ? "Hide rule trace" : "Rule trace";
 
     /// <summary>
     /// Gets or sets whether Debug raw section in inspector rule trace is expanded.

@@ -60,8 +60,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
         ChangedByMaskDecisionCount = _workspaceSnapshot.Metrics.ChangedByMaskDecisionCount;
         RemovedByMaskDecisionCount = _workspaceSnapshot.Metrics.RemovedByMaskDecisionCount;
 
-        PreviousIssueCommand = Editing.Create(() => MoveDecision(-1));
-        NextIssueCommand = Editing.Create(() => MoveDecision(1));
         LocateSelectedIssueCommand = Editing.Create(LocateSelectedDecision);
         ApplyOverrideCommand = Editing.Create(ApplyOverrideForSelectedDecision);
         ApplyDiffOverrideCommand = Editing.Create(ApplyDiffOverrideForSelectedDecision);
@@ -274,8 +272,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     public string SelectedSegmentPreviewText => BuildSelectedSegmentPreviewText();
     public bool CanClearSelectedIssueOverride => SelectedDecision?.CanClearOverride ?? false;
 
-    public IRelayCommand PreviousIssueCommand { get; }
-    public IRelayCommand NextIssueCommand { get; }
     public IRelayCommand LocateSelectedIssueCommand { get; }
     public IRelayCommand ApplyOverrideCommand { get; }
     public IRelayCommand ApplyDiffOverrideCommand { get; }

@@ -213,7 +213,7 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.True(stepResult.IsReady);
         vm.ApplyCanvasSelection([101, 102], Array.Empty<int>());
 
-        vm.RefreshNotchCanvasPreviewCommand.Execute(null);
+        await vm.RunWorkflowStepAsync(WorkflowStepId.Step3NotchPreview);
 
         Assert.Equal(SelectedCad101And102, vm.NotchCanvasPreviewItems.Select(static item => item.CadPadId).ToArray());
         Assert.All(vm.NotchCanvasPreviewItems, static item => Assert.NotEmpty(item.ToFullFinalOutlinePolygons));

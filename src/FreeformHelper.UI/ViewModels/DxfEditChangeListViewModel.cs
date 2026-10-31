@@ -93,8 +93,6 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
         FocusSelectedEntryCommand = Editing.Create(FocusSelectedEntry, () => SelectedEntry?.CanFocus == true);
         ApplySelectedEntryCommand = Editing.Create(ApplySelectedEntry, () => SelectedEntry?.CanApply == true);
         SelectEntryCommand = Editing.Create<DxfEditChangeListEntry?>(SelectEntry);
-        FocusEntryCommand = Editing.Create<DxfEditChangeListEntry?>(FocusEntry);
-        ApplyEntryCommand = Editing.Create<DxfEditChangeListEntry?>(ApplyEntry, entry => entry?.CanApply == true);
         CloseCommand = new RelayCommand(() => CloseRequested?.Invoke(this, EventArgs.Empty));
         SelectedKind = initialKind;
         RefreshEntries();
@@ -117,8 +115,6 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
     public IRelayCommand FocusSelectedEntryCommand { get; }
     public IRelayCommand ApplySelectedEntryCommand { get; }
     public IRelayCommand<DxfEditChangeListEntry?> SelectEntryCommand { get; }
-    public IRelayCommand<DxfEditChangeListEntry?> FocusEntryCommand { get; }
-    public IRelayCommand<DxfEditChangeListEntry?> ApplyEntryCommand { get; }
     public IRelayCommand CloseCommand { get; }
 
     [ObservableProperty] private DxfEditChangeKind _selectedKind;
@@ -364,17 +360,6 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
         RefreshEntries();
     }
 
-    private void FocusEntry(DxfEditChangeListEntry? entry)
-    {
-        if (entry is null)
-        {
-            return;
-        }
-
-        SelectedEntry = entry;
-        FocusSelectedEntry();
-    }
-
     private void SelectEntry(DxfEditChangeListEntry? entry)
     {
         if (entry is null)
@@ -383,17 +368,6 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
         }
 
         SelectedEntry = entry;
-    }
-
-    private void ApplyEntry(DxfEditChangeListEntry? entry)
-    {
-        if (entry is null)
-        {
-            return;
-        }
-
-        SelectedEntry = entry;
-        ApplySelectedEntry();
     }
 
     partial void OnSelectedKindChanged(DxfEditChangeKind value)

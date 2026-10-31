@@ -17,12 +17,6 @@ public sealed partial class FreeformHelperViewModel
     {
         var display = value is null ? null : BuildPadInspectorDisplay(value);
         PadInspectorDisplay = display ?? PadInspectorDisplay.CreateEmpty();
-        if (display is null)
-        {
-            IsPadInspectorTraceExpanded = false;
-        }
-
-        IsPadInspectorTracePopupOpen = false;
         IsPadInspectorRawTraceExpanded = false;
     }
 
@@ -39,7 +33,6 @@ public sealed partial class FreeformHelperViewModel
         RaiseWhenChanged(oldValue.PrimaryText, newValue.PrimaryText, nameof(PadInspectorPrimaryText));
         RaiseWhenChanged(oldValue.SecondaryText, newValue.SecondaryText, nameof(PadInspectorSecondaryText));
         RaiseWhenChanged(oldValue.MatchText, newValue.MatchText, nameof(PadInspectorMatchText));
-        RaiseWhenChanged(oldValue.CompensationText, newValue.CompensationText, nameof(PadInspectorCompensationText));
         RaiseWhenChanged(oldValue.CompensationLines, newValue.CompensationLines, nameof(PadInspectorCompensationLines));
         RaiseWhenChanged(oldValue.RuleTraceLines, newValue.RuleTraceLines, nameof(PadInspectorRuleTraceLines));
         RaiseWhenChanged(oldValue.RuleTraceSections, newValue.RuleTraceSections, nameof(PadInspectorRuleTraceSections));
@@ -112,16 +105,6 @@ public sealed partial class FreeformHelperViewModel
                     .Select(static line => line.DisplayText)),
             RuleTraceSections: ruleTraceSections,
             HasRuleTrace: ruleTraceSections.Any(static section => section.Lines.Count > 0));
-    }
-
-    partial void OnIsPadInspectorTraceExpandedChanged(bool value)
-    {
-        OnPropertyChanged(nameof(PadInspectorTraceToggleText));
-    }
-
-    partial void OnIsPadInspectorTracePopupOpenChanged(bool value)
-    {
-        OnPropertyChanged(nameof(PadInspectorTracePopupToggleText));
     }
 
     private static ObservableCollection<PadInspectorDisplayLine> BuildCompensationLines(PadInspectorSnapshot snapshot)

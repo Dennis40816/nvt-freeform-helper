@@ -65,10 +65,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public IAsyncRelayCommand ShowNotchDetailCommand { get; private set; } = null!;
     /// <summary>
-    /// Gets the command to refresh Notch 2.2 preview overlays on the main canvas.
-    /// </summary>
-    public IRelayCommand RefreshNotchCanvasPreviewCommand { get; private set; } = null!;
-    /// <summary>
     /// Gets the command to clear Step 1 result.
     /// </summary>
     public IRelayCommand ClearStep1ResultCommand { get; private set; } = null!;
@@ -105,10 +101,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public IRelayCommand<NotchValidationDisplayItem> FocusNotchValidationItemCommand { get; private set; } = null!;
     /// <summary>
-    /// Gets the command to clear Notch 2.2 preview overlays on the main canvas.
-    /// </summary>
-    public IRelayCommand ClearNotchCanvasPreviewCommand { get; private set; } = null!;
-    /// <summary>
     /// Gets the command to move Notch Stage preview to previous stage.
     /// </summary>
     public IRelayCommand PreviousNotchPreviewStageCommand { get; private set; } = null!;
@@ -124,14 +116,6 @@ public sealed partial class FreeformHelperViewModel
     /// Gets the command to clear the current selection on the canvas.
     /// </summary>
     public IRelayCommand ClearSelectionCommand { get; private set; } = null!;
-    /// <summary>
-    /// Gets the command to focus one CAD pad by quick-locate id input.
-    /// </summary>
-    public IRelayCommand LocateCadByIdCommand { get; private set; } = null!;
-    /// <summary>
-    /// Gets the command to focus one regular pad by quick-locate index input.
-    /// </summary>
-    public IRelayCommand LocateRegularByIndexCommand { get; private set; } = null!;
     /// <summary>
     /// Gets the command to focus a CAD pad, regular pad, or FW diff from one quick-focus query.
     /// </summary>
@@ -156,18 +140,6 @@ public sealed partial class FreeformHelperViewModel
     /// Gets the command to set the freeform type of selected pads to XY-Way.
     /// </summary>
     public IRelayCommand SetFreeformXYCommand { get; private set; } = null!;
-    /// <summary>
-    /// Gets the command to use the current selection to define a manual sizing range.
-    /// </summary>
-    public IRelayCommand UseSelectionForManualRangeCommand { get; private set; } = null!;
-    /// <summary>
-    /// Gets the command to select all layers for display.
-    /// </summary>
-    public IRelayCommand SelectAllLayersCommand { get; private set; } = null!;
-    /// <summary>
-    /// Gets the command to deselect all layers for display.
-    /// </summary>
-    public IRelayCommand DeselectAllLayersCommand { get; private set; } = null!;
     /// <summary>
     /// Gets the command to check the quality of the loaded DXF data.
     /// </summary>
@@ -272,7 +244,6 @@ public sealed partial class FreeformHelperViewModel
         ExportDxfAllCommand = CreateEditingAsyncCommand(ExportAllDxfAsync);
         ExportDxfLayerImageCommand = CreateEditingAsyncCommand(ExportDxfLayerImageAsync);
         ShowNotchDetailCommand = CreateEditingAsyncCommand(ShowNotchDetailAsync);
-        RefreshNotchCanvasPreviewCommand = CreateEditingCommand(ExecuteStep3PreviewWorkflow);
         ClearStep1ResultCommand = CreateEditingCommand(() => ClearWorkflowStep(WorkflowStepId.Step1Match));
         ClearStep2ResultCommand = CreateEditingCommand(() => ClearWorkflowStep(WorkflowStepId.Step2Freeform));
         ClearStep3ResultCommand = CreateEditingCommand(() => ClearWorkflowStep(WorkflowStepId.Step3NotchPreview));
@@ -282,22 +253,16 @@ public sealed partial class FreeformHelperViewModel
         AnalyzeNotchValidationCommand = CreateEditingCommand(AnalyzeNotchValidation);
         ClearNotchValidationCommand = CreateEditingCommand(ClearNotchValidation);
         FocusNotchValidationItemCommand = CreateEditingCommand<NotchValidationDisplayItem>(FocusNotchValidationItem);
-        ClearNotchCanvasPreviewCommand = CreateEditingCommand(ClearNotchCanvasPreview);
         PreviousNotchPreviewStageCommand = CreateEditingCommand(() => ShiftNotchPreviewStage(-1));
         NextNotchPreviewStageCommand = CreateEditingCommand(() => ShiftNotchPreviewStage(1));
         FitCommand = CreateEditingCommand(() => CanvasHost?.FitToContent());
         ClearSelectionCommand = CreateEditingCommand(ClearSelection);
-        LocateCadByIdCommand = CreateEditingCommand(LocateCadByQuickInput);
-        LocateRegularByIndexCommand = CreateEditingCommand(LocateRegularByQuickInput);
         QuickFocusCommand = CreateEditingCommand(ExecuteQuickFocus);
         UndoCommand = CreateEditingCommand(Undo, () => CanUndo); // Undo command with a CanExecute condition.
         SetFreeformNoneCommand = CreateEditingCommand(() => SetFreeformForSelection(FreeformType.None));
         SetFreeformXCommand = CreateEditingCommand(() => SetFreeformForSelection(FreeformType.XWay));
         SetFreeformYCommand = CreateEditingCommand(() => SetFreeformForSelection(FreeformType.YWay));
         SetFreeformXYCommand = CreateEditingCommand(() => SetFreeformForSelection(FreeformType.XYWay));
-        UseSelectionForManualRangeCommand = CreateEditingCommand(ApplySelectionToManualRange);
-        SelectAllLayersCommand = CreateEditingCommand(SelectAllLayers);
-        DeselectAllLayersCommand = CreateEditingCommand(DeselectAllLayers);
         CheckDxfQualityCommand = CreateEditingAsyncCommand(CheckDxfQualityAsync);
         SelectDxfOverlapPadsCommand = CreateEditingCommand(SelectDxfOverlapPads);
         ClearDxfOverlapHighlightsCommand = CreateEditingCommand(ClearDxfOverlapHighlights);
