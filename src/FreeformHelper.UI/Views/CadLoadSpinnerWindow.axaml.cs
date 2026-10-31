@@ -198,7 +198,7 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
             {
                 break;
             }
-            catch
+            catch (Exception ex) when (FreeformHelper.Application.Services.ExceptionPolicy.IsRecoverable(ex))
             {
                 // Best-effort helper process. Ignore malformed requests and keep serving.
             }

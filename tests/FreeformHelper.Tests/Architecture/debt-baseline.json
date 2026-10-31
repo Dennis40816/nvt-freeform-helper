@@ -8,7 +8,7 @@
     "fileWriteAllText": 5,
     "processStart": 1,
     "directClockReads": 15,
-    "bareCatch": 1,
+    "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 4,
     "freeformViewModelStateMembers": 95,
@@ -55,9 +55,7 @@
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:396", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:635",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:99", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs:212"
     ],
-    "bareCatch": [
-      "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs:201"
-    ],
+    "bareCatch": [],
     "catchException": [
       "src/FreeformHelper.UI/Program.cs:54"
     ],
