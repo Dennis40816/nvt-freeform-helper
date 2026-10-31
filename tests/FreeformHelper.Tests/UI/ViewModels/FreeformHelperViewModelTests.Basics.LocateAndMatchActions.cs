@@ -78,9 +78,6 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Empty(vm.DxfRegularMappingIssues);
     }
 
-
-
-
     [Fact]
     public void QuickFocusCommand_WithCadQuery_FocusesCadSelection()
     {

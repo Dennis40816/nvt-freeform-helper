@@ -8,7 +8,7 @@ using Xunit;
 namespace FreeformHelper.Tests;
 
 /// <summary>
-/// Pins the seven inspector panel settings of the main view model: the start values, the change notifications,
+/// Pins the three inspector panel settings of the main view model: the start values, the change notifications,
 /// the unsaved flag, the undo entry and a project file that stays identical, except for its save time,
 /// after a save, load and save.
 /// </summary>

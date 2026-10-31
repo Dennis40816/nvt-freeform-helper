@@ -285,7 +285,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public IAsyncRelayCommand CopyAllArtifactsCommand { get; }
 
-
     public IAsyncRelayCommand ExportArtifactsCsvCommand { get; }
 
     public IAsyncRelayCommand ExportArtifactsJsonCommand { get; }

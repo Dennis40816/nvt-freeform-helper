@@ -231,7 +231,7 @@ Notes:
   - `NotchPreviewVisualizationStep`（Stage 1/2/3）
   - `NotchPreviewAutoPlayEnabled` / interval
   - The above only trigger overlay visibility notifications and `CanvasHost.Invalidate()`.
-- The Step 3 preview recompute has no command and no production XAML binding. The CLI/internal entry is `RunWorkflowStepAsync(WorkflowStepId.Step3NotchPreview)`. The normal user flow has no other clickable manual Recompute button; ordinary parameter/selection changes are handled by automatic refresh.
+- The Step 3 preview recompute has no command and no production XAML binding. The CLI/internal entry is `RunWorkflowStepAsync(WorkflowStepId.Step3NotchPreview)`. The normal user flow has no clickable manual Recompute button; ordinary parameter/selection changes are handled by automatic refresh.
 - Main code entries:
   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkflowSteps.cs`
   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs`
