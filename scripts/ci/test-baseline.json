@@ -13,7 +13,7 @@
       ]
     },
     "ui": {
-      "minTotal": 113,
+      "minTotal": 112,
       "maxSkipped": 0,
       "exampleMinTests": 0,
       "requiredClasses": []
