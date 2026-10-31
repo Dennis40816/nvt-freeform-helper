@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Avalonia.Threading;
 using Avalonia.VisualTree;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
@@ -31,7 +30,7 @@ public sealed class InspectorDebugFoldTests
         HeadlessSessionGuardAttribute.CloseAtTestEnd(window);
 
         window.Show();
-        Dispatcher.UIThread.RunJobs();
+        HeadlessUiPump.Drain(window);
 
         var collapsed = VisibleTexts(window);
         Assert.Contains("Debug details", collapsed);
@@ -40,14 +39,14 @@ public sealed class InspectorDebugFoldTests
         Assert.DoesNotContain(collapsed, text => text.StartsWith("Rule trace", StringComparison.Ordinal));
 
         vm.PadInspectorUi.IsDebugDetailsExpanded = true;
-        Dispatcher.UIThread.RunJobs();
+        HeadlessUiPump.Drain(window);
 
         var opened = VisibleTexts(window);
         Assert.Contains("Snapshot details", opened);
         Assert.Contains(opened, text => text.StartsWith("Rule trace", StringComparison.Ordinal));
 
         vm.PadInspectorUi.Snapshot = PadInspectorDisplayBehaviorTests.CreateCadSnapshot(275);
-        Dispatcher.UIThread.RunJobs();
+        HeadlessUiPump.Drain(window);
 
         Assert.DoesNotContain("Snapshot details", VisibleTexts(window));
     }
