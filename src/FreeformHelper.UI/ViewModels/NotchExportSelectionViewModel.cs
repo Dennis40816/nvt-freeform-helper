@@ -136,15 +136,11 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
 
         IcGroups = new ReadOnlyObservableCollection<NotchExportIcGroupViewModel>(_icGroups);
 
-        SelectAllCommand = Editing.Create(SelectAll);
-        SelectNoneCommand = Editing.Create(SelectNone);
         UseShownOnlyCommand = Editing.Create(UseShownOnly);
         SetViewFilterModeCommand = Editing.Create<NotchExportRowDisplayMode>(SetViewFilterMode);
         ToggleSelectedOnlyCommand = Editing.Create(() => ShowSelectedOnly = !ShowSelectedOnly);
-        ApplyColumnFilterCommand = Editing.Create<string?>(ApplyColumnFilter);
         ClearSearchKeywordCommand = Editing.Create(ClearSearchKeyword);
         SelectPreviewRowCommand = Editing.Create<NotchExportRowItemViewModel?>(SelectPreviewRow);
-        ToggleSelectedRowDetailCommand = Editing.Create(() => ShowSelectedRowDetailSection = !ShowSelectedRowDetailSection);
         EnableWorkspaceLinkedRowsCommand = Editing.Create(() => SetWorkspaceLinkedRowsSelected(true));
         DisableWorkspaceLinkedRowsCommand = Editing.Create(() => SetWorkspaceLinkedRowsSelected(false));
         _hidePanelForInspectCommand = Editing.Create(RequestHidePanelForInspect, () => CanHidePanelForInspect);
@@ -156,15 +152,11 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public ReadOnlyObservableCollection<NotchExportRowItemViewModel> Rows { get; }
     public ReadOnlyObservableCollection<NotchExportIcGroupViewModel> IcGroups { get; }
     public ReadOnlyObservableCollection<NotchExportRowItemViewModel> WorkspaceLinkedRows { get; }
-    public IRelayCommand SelectAllCommand { get; }
-    public IRelayCommand SelectNoneCommand { get; }
     public IRelayCommand UseShownOnlyCommand { get; }
     public IRelayCommand<NotchExportRowDisplayMode> SetViewFilterModeCommand { get; }
     public IRelayCommand ToggleSelectedOnlyCommand { get; }
-    public IRelayCommand<string?> ApplyColumnFilterCommand { get; }
     public IRelayCommand ClearSearchKeywordCommand { get; }
     public IRelayCommand<NotchExportRowItemViewModel?> SelectPreviewRowCommand { get; }
-    public IRelayCommand ToggleSelectedRowDetailCommand { get; }
     public IRelayCommand EnableWorkspaceLinkedRowsCommand { get; }
     public IRelayCommand DisableWorkspaceLinkedRowsCommand { get; }
     public IRelayCommand HidePanelForInspectCommand { get; }
@@ -198,12 +190,9 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public bool HasVersionOptions => VersionOptions.Count > 0;
     public bool IsVersionSelectionPinnedByExportType => NotchExportFileTypeMetadata.TryGetPinnedVersion(SelectedExportTypeOption, out _);
     public bool CanSelectVersion => VersionOptions.Count > 1 && !IsVersionSelectionPinnedByExportType;
-    public bool HasRowDisplayModeOptions => RowDisplayModeOptions.Count > 0;
-    public bool CanSelectRowDisplayMode => RowDisplayModeOptions.Count > 1;
     public bool CanSelectSortMode => SortModeOptions.Count > 1;
     public bool IsSelectedOnlyActive => ShowSelectedOnly;
     public bool IsFilterTransferOnly => SelectedRowDisplayModeOption.Value == NotchExportRowDisplayMode.TransferOnly;
-    public bool IsFilterAllRows => SelectedRowDisplayModeOption.Value == NotchExportRowDisplayMode.AllRows;
     public bool IsFilterLinkedOnly => SelectedRowDisplayModeOption.Value == NotchExportRowDisplayMode.LinkedOnly;
     public bool IsFilterWarningOnly => SelectedRowDisplayModeOption.Value == NotchExportRowDisplayMode.WarningOnly;
     public bool IsFilterNoCadOnly => SelectedRowDisplayModeOption.Value == NotchExportRowDisplayMode.NoCadOnly;
@@ -230,15 +219,9 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public string CurrentSearchScopeText => _filterViewState.CurrentSearchScopeText;
     public string SearchWatermarkText { get; } = DefaultSearchWatermark;
     public string VisibleRowsSummaryText => _filterViewState.VisibleRowsSummaryText;
-    public string SelectedExportTypeText => string.IsNullOrWhiteSpace(SelectedExportTypeOption.Display)
-        ? "-"
-        : SelectedExportTypeOption.Display;
     public string SelectedRowDisplayModeText => string.IsNullOrWhiteSpace(SelectedRowDisplayModeOption.Display)
         ? "-"
         : SelectedRowDisplayModeOption.Display;
-    public string SelectedVersionText => string.IsNullOrWhiteSpace(SelectedVersionOption.Display)
-        ? "All versions"
-        : SelectedVersionOption.Display;
     public bool HasSelectedRow => SelectedRow is not null;
     public bool HasNoSelectedRow => !HasSelectedRow;
     public string SummaryText => _summarySnapshot.SummaryText;
@@ -253,7 +236,6 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public string ExportButtonText => SimulationSafetyTextProjector.BuildExportButtonText(
         IsExportBlockedBySimulationSafety,
         _summarySnapshot.ExportButtonText);
-    public bool CanConfirmExport => HasSelection;
     public string SelectedRowHeaderText => SelectedRow?.PreviewHeaderText ?? "No row selected.";
     public string SelectedRowContextText => SelectedRow?.CurrentRowContextText ?? "-";
     public string SelectedRowPositionText
@@ -285,18 +267,14 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public string SelectedRowPayloadTarget2Text => SelectedRow?.PayloadTarget2Text ?? "-";
     public string SelectedRowColumnBreakdownText => SelectedRow?.PayloadColumnsText ?? "-";
     public string SelectedRowFlagsText => SelectedRow?.PreviewFlagsText ?? "-";
-    public string SelectedRowValuesText => SelectedRow?.ValuesText ?? "-";
     public string SelectedRowCommentText => SelectedRow?.CommentText ?? "-";
-    public string SelectedRowAnalysisText => SelectedRow?.PreviewAnalysisText ?? "-";
     public string SelectedRowAnalysisRatioSumText => SelectedRow?.AnalysisRatioSumText ?? "-";
     public string SelectedRowAnalysisDeltaText => SelectedRow?.AnalysisDeltaText ?? "-";
     public bool HasWorkspaceLinkedRows => WorkspaceLinkedRows.Count > 0;
     public bool HasNoWorkspaceLinkedRows => !HasWorkspaceLinkedRows;
     public string WorkspaceSelectionSummaryText => BuildWorkspaceSelectionSummaryText();
-    public string SelectedRowSummaryText => $"{SelectedVersionText} · {SelectedRowDisplayModeText} · {SelectedExportTypeText}";
     public bool CanHidePanelForInspect => _hidePanelForInspectRequested is not null;
     public string RestoreShortcutHintText => _restoreShortcutHintText;
-    public bool HasToFullCoverageExpectations => _toFullCoverageAudit.HasExpectations;
     public bool HasToFullCoverageWarning => _toFullCoverageAudit.HasMissingCoverage;
     public bool HasToFullCoveragePass => _toFullCoverageAudit.HasExpectations && !_toFullCoverageAudit.HasMissingCoverage;
     public bool HasNoToFullCoverageExpectations => !_toFullCoverageAudit.HasExpectations;
@@ -358,7 +336,6 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedRowHeaderText));
         OnPropertyChanged(nameof(SelectedRowContextText));
         OnPropertyChanged(nameof(SelectedRowPositionText));
-        OnPropertyChanged(nameof(SelectedRowSummaryText));
         OnPropertyChanged(nameof(SelectedRowCodePreviewText));
         OnPropertyChanged(nameof(SelectedRowOutcomeText));
         OnPropertyChanged(nameof(SelectedRowPadRelationText));
@@ -370,9 +347,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedRowPayloadTarget2Text));
         OnPropertyChanged(nameof(SelectedRowColumnBreakdownText));
         OnPropertyChanged(nameof(SelectedRowFlagsText));
-        OnPropertyChanged(nameof(SelectedRowValuesText));
         OnPropertyChanged(nameof(SelectedRowCommentText));
-        OnPropertyChanged(nameof(SelectedRowAnalysisText));
         OnPropertyChanged(nameof(SelectedRowAnalysisRatioSumText));
         OnPropertyChanged(nameof(SelectedRowAnalysisDeltaText));
 
@@ -393,7 +368,6 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         OnPropertyChanged(nameof(SimulationSafetyExportSummaryText));
         OnPropertyChanged(nameof(SimulationSafetyExportHighRiskText));
         OnPropertyChanged(nameof(ExportButtonText));
-        OnPropertyChanged(nameof(CanConfirmExport));
     }
 
     private static string BuildToFullCoverageBadgeText(NotchToFullCoverageAudit audit)
@@ -446,24 +420,19 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     partial void OnSelectedExportTypeOptionChanged(FreeformHelperViewModel.NotchExportFileTypeOption value)
     {
         SyncVersionSelectionToExportType();
-        OnPropertyChanged(nameof(SelectedExportTypeText));
         OnPropertyChanged(nameof(IsVersionSelectionPinnedByExportType));
         OnPropertyChanged(nameof(CanSelectVersion));
-        OnPropertyChanged(nameof(SelectedRowSummaryText));
     }
 
     partial void OnSelectedVersionOptionChanged(NotchExportVersionOption value)
     {
         RebuildVisibleRows();
-        OnPropertyChanged(nameof(SelectedVersionText));
-        OnPropertyChanged(nameof(SelectedRowSummaryText));
     }
 
     partial void OnSelectedRowDisplayModeOptionChanged(NotchExportRowDisplayModeOption value)
     {
         RebuildVisibleRows();
         OnPropertyChanged(nameof(SelectedRowDisplayModeText));
-        OnPropertyChanged(nameof(SelectedRowSummaryText));
         NotifyFilterStateChanged();
     }
 

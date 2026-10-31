@@ -173,32 +173,6 @@ public sealed partial class NotchExportSelectionViewModelTests
     }
 
 
-    [Fact]
-    public void ApplyColumnFilterCommand_Status_CyclesViewFilterModes()
-    {
-        var table = BuildTransferOnlyFilterTable();
-        var vm = new NotchExportSelectionViewModel(table);
-
-        vm.ApplyColumnFilterCommand.Execute("status");
-        Assert.Equal(NotchExportRowDisplayMode.LinkedOnly, vm.SelectedRowDisplayModeOption.Value);
-
-        vm.ApplyColumnFilterCommand.Execute("status");
-        Assert.Equal(NotchExportRowDisplayMode.WarningOnly, vm.SelectedRowDisplayModeOption.Value);
-    }
-
-
-    [Fact]
-    public void ApplyColumnFilterCommand_Row_AppendsAndRemovesSearchToken()
-    {
-        var table = BuildTransferOnlyFilterTable();
-        var vm = new NotchExportSelectionViewModel(table);
-
-        vm.ApplyColumnFilterCommand.Execute("row");
-        Assert.Equal("row=", vm.SearchKeyword);
-
-        vm.ApplyColumnFilterCommand.Execute("row");
-        Assert.Equal(string.Empty, vm.SearchKeyword);
-    }
 
 
     [Fact]

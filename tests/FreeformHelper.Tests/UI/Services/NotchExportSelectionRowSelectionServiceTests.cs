@@ -10,28 +10,6 @@ public sealed class NotchExportSelectionRowSelectionServiceTests
     private static readonly int[] _legacyRowPayload = [20, 1, 2];
 
     [Fact]
-    public void SelectAll_MarksAllRowsSelected()
-    {
-        var rows = BuildRows();
-        rows[0].IsSelected = false;
-        rows[2].IsSelected = false;
-
-        NotchExportSelectionRowSelectionService.SelectAll(rows);
-
-        Assert.All(rows, row => Assert.True(row.IsSelected));
-    }
-
-    [Fact]
-    public void SelectNone_ClearsAllSelections()
-    {
-        var rows = BuildRows();
-
-        NotchExportSelectionRowSelectionService.SelectNone(rows);
-
-        Assert.All(rows, row => Assert.False(row.IsSelected));
-    }
-
-    [Fact]
     public void SelectVisibleOnly_KeepsOnlyVisibleRowsSelected()
     {
         var allRows = BuildRows();

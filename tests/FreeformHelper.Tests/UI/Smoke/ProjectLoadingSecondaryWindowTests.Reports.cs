@@ -112,14 +112,12 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             var row = export.Rows.Last();
             var selected = export.SelectedCount;
             var notifications = 0;
-            export.SelectNoneCommand.CanExecuteChanged += (_, _) => notifications++;
+            export.SelectPreviewRowCommand.CanExecuteChanged += (_, _) => notifications++;
             previews = 0;
             vm.PickLoadProjectPathAsync = () => release.Task;
             load = vm.LoadProjectCommand.ExecuteAsync(null);
             Assert.False(window.IsEnabled);
-            Assert.False(export.SelectNoneCommand.CanExecute(null));
             Assert.False(export.SelectPreviewRowCommand.CanExecute(row));
-            export.SelectNoneCommand.Execute(null);
             export.SelectPreviewRowCommand.Execute(row);
             export.SelectedRow = row;
             var confirm = typeof(NotchExportSelectionWindow).GetMethod("RequestClose", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -134,7 +132,6 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             release.SetResult(null);
             await load;
             Assert.True(window.IsEnabled);
-            Assert.True(export.SelectNoneCommand.CanExecute(null));
             Assert.True(export.SelectPreviewRowCommand.CanExecute(row));
             Assert.True(notifications >= 2);
             export.SelectedRow = null;

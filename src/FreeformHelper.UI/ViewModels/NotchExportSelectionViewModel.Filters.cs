@@ -68,7 +68,6 @@ public sealed partial class NotchExportSelectionViewModel
     private void NotifyFilterStateChanged()
     {
         OnPropertyChanged(nameof(IsFilterTransferOnly));
-        OnPropertyChanged(nameof(IsFilterAllRows));
         OnPropertyChanged(nameof(IsFilterLinkedOnly));
         OnPropertyChanged(nameof(IsFilterWarningOnly));
         OnPropertyChanged(nameof(IsFilterNoCadOnly));
