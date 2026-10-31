@@ -90,6 +90,7 @@ try {
     $null = New-Item -ItemType Directory -Path $testRoot
     $baselineText = Get-Content -LiteralPath (Join-Path $ciRoot "test-baseline.json") -Raw
     Assert-Policy (Test-Json -Json $baselineText -SchemaFile $baselineSchema)
+    $repoBaseline = $baselineText | ConvertFrom-Json
     $schemaCases = @(
         { param($b) $b.privatePayload = 'fixture' },
         { param($b) $b.Remove('schemaVersion') | Out-Null },
@@ -251,14 +252,16 @@ try {
         -MeasuredAtCommit ("b" * 40) -ExampleDataPresent 6>$null
     $raisedExamples = Get-Content -LiteralPath $baselinePath -Raw | ConvertFrom-Json
     Assert-Policy ($raisedExamples.shards.core.exampleMinTests -eq $allExampleTests.Count -and
-        $raisedExamples.shards.viewmodel.exampleMinTests -eq 15 -and $raisedExamples.shards.ui.minTotal -eq 113)
+        $raisedExamples.shards.viewmodel.exampleMinTests -eq $repoBaseline.shards.viewmodel.exampleMinTests -and
+        $raisedExamples.shards.ui.minTotal -eq $repoBaseline.shards.ui.minTotal)
     Write-FixtureBaseline -Shard viewmodel -ExampleFloor 1
     Write-FixtureTrx -Directory $resultsPath -Tests $viewmodelTests
     & $updateScript -Shard viewmodel -ResultsDirectory $resultsPath -BaselinePath $baselinePath `
         -MeasuredAtCommit ("b" * 40) -ExampleDataPresent 6>$null
     $raisedViewmodel = Get-Content -LiteralPath $baselinePath -Raw | ConvertFrom-Json
-    Assert-Policy ($raisedViewmodel.shards.viewmodel.exampleMinTests -eq 15 -and
-        $raisedViewmodel.shards.core.exampleMinTests -eq 11 -and $raisedViewmodel.shards.core.requiredClasses.Count -eq 3)
+    Assert-Policy ($raisedViewmodel.shards.viewmodel.exampleMinTests -eq $viewmodelTests.Count -and
+        $raisedViewmodel.shards.core.exampleMinTests -eq $repoBaseline.shards.core.exampleMinTests -and
+        $raisedViewmodel.shards.core.requiredClasses.Count -eq $repoBaseline.shards.core.requiredClasses.Count)
     Write-FixtureBaseline -Floor $allExampleTests.Count -ExampleFloor ($allExampleTests.Count + 1)
     Write-FixtureTrx -Directory $resultsPath -Tests $allExampleTests
     Assert-FixtureUpdateRejected -Present
