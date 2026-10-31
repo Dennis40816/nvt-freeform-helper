@@ -3,10 +3,10 @@ Last updated: 2026-10-28
 
 Current documentation baseline: FreeformHelper g1 current-state audit, production evidence commit `ef08945`. This document deliberately separates "editors that currently exist" from the "1.0.x normal-flow contract" to avoid mistaking the full persistence schema for a list of normal-flow UI fields.
 
-## S11.18 stale-check (2026-03-10)
+## S11.18 stale-check (2026-03-10, spinner items 2 and 3 updated 2026-10-31)
 1. The `DXF edits > Hidden / Combined / Moved` summary badge on the left specifically opens `DxfEditChangeListWindow`, a modal view entry point for DXF edit project state, not a settings fork.
-2. `Open DXF` / `Load Project` share the `RunWithCadLoadCanvasOverlayAsync(...) -> IsCadLoadCanvasOverlayVisible -> FreeformHelperView` inline spinner overlay; this is a fixed workflow contract, not a settings entry point.
-3. The CAD load overlay must not fork into another top-level loading window or appear in Display popup / SettingsWindow / Right panel.
+2. `Open DXF` / `Load Project` share the `RunWithCadLoadCanvasOverlayAsync(...) -> IsCadLoadCanvasOverlayVisible / IsModalLoadingSpinnerVisible -> FreeformHelperView.CadLoadSpinner.cs` path. It shows `CadLoadSpinnerWindow`, a borderless window in a separate process (`CadLoadSpinnerProcessHost`) placed over the main window; this is a fixed workflow contract, not a settings entry point.
+3. The CAD load spinner is the only loading window for CAD load. It must not fork into a second loading window or appear in Display popup / SettingsWindow / Right panel.
 
 ## S11.72 stale-check (2026-03-22)
 1. The `SeeRegular.csv` regular visibility mask is not automatically searched for in adjacent directories during `Load Project`; only the path/toggle explicitly saved in the project snapshot is restored, and embedded projects prefer the embedded mask.

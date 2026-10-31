@@ -1,5 +1,5 @@
 # Runtime CLI / IPC (Phase A++)
-Last updated: 2026-08-10
+Last updated: 2026-10-31
 
 ## Goals
 - Allow external commands to query the "running FreeformHelper UI" and perform common workflow operations.
@@ -11,6 +11,7 @@ Last updated: 2026-08-10
 - `freeformhelper.exe query status`
   - Returns: CAD/Regular counts, selection counts, workflow snapshot, and Notch preview state.
   - Added: `cache` (revision / hit-miss / hit-rate for the Step3 compensation cache + runtime notch query cache + Step5 export generation cache).
+  - Added: `cadLoadSpinner` (debug payload of the CAD loading spinner process; it has no UI counterpart).
 - `freeformhelper.exe query selection`
   - Returns: selected CAD ids, selected regular indices, and selected regular ids.
   - Added: `timings` (summary / inspector / notchPreview / total, from the latest selection pipeline).
@@ -173,10 +174,15 @@ Last updated: 2026-08-10
 - If UI-side command execution throws an unhandled exception, the Named Pipe server must return a single-line `IPC_ERROR` failure envelope and retain the original message; disconnection/`EMPTY_RESPONSE` must not replace the protocol response. Lifecycle cancellation still terminates the server directly and is not converted to an error response.
 - `IPC_TIMEOUT`: connected to a running UI instance, but the query did not complete within the `--timeout-ms` limit.
 - `IPC_REQUEST_TIMEOUT`: the client connected to the IPC server without sending a complete request, and the server terminated the connection.
+- `INVALID_REQUEST`: the request payload is empty.
+- `INVALID_JSON`: the request payload is not valid JSON.
+- `EMPTY_RESPONSE`: the client received an empty response from the server.
+- `INVALID_RESPONSE`: the client could not parse the response.
+- `BUILD_FAILED`: `query simulation` could not build the Simulation workspace.
 
 ## Architecture
 - `Program`: determines whether this is `query` mode; queries use the IPC client, otherwise the UI starts.
-- `RuntimeQueryIpcServer`: Named Pipe server inside the UI process.
+- `Nvt.Core.RuntimeQuery` Named Pipe server: runs inside the UI process. `RuntimeQueryIpcHost` is the NFH wrapper that starts it, and `RuntimeQueryErrorMapper` maps its failures to the error codes above.
 - `RuntimeQueryUseCase`: maps queries to ViewModel snapshots / common workflow actions.
 - `FreeformHelperViewModel.GetWorkflowStateSnapshot()`: provides workflow gate state to the CLI.
 - After `R13.102b-2`, `query multi-owner` first confirms that the CAD is still in the visible collection, then obtains only one current-revision `NotchV22ResolvedResult` determined by the current setting or `--overlap-percent` override; the lightweight Inspector snapshot only supplies existing CAD response metadata, and all multi-owner evidence is projected from `resolved.Compensation.RegularDebugInfos`. CLI arguments, payload schema, ordering, limit/truncation, and error codes remain unchanged.
