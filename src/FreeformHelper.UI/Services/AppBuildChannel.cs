@@ -29,6 +29,6 @@ internal static class AppBuildChannel
 
         var metadataStart = informationalVersion.IndexOf('+', StringComparison.Ordinal);
         var version = metadataStart < 0 ? informationalVersion : informationalVersion[..metadataStart];
-        return version.IndexOf('-', StringComparison.Ordinal) >= 0;
+        return version.Contains('-');
     }
 }
