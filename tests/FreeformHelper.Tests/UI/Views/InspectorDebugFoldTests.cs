@@ -51,7 +51,8 @@ public sealed class InspectorDebugFoldTests
         var ruleTrace = window.GetVisualDescendants()
             .OfType<SelectableTextBlock>()
             .Single(block => block.Text?.StartsWith("Rule trace", StringComparison.Ordinal) == true);
-        Assert.Equal("Shows rule-by-rule reasoning for the current pad.", ToolTip.GetTip(ruleTrace) as string);
+        var ruleTraceTip = Assert.IsType<TextBlock>(ToolTip.GetTip(ruleTrace));
+        Assert.Equal("Shows rule-by-rule reasoning for the current pad.", ruleTraceTip.Text);
 
         vm.PadInspectorUi.Snapshot = PadInspectorDisplayBehaviorTests.CreateCadSnapshot(275);
         HeadlessUiPump.Drain(window);
