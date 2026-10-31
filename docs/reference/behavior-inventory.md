@@ -128,7 +128,7 @@ Current document baseline: FreeformHelper g1 current-state audit, production evi
   - `Reason / To Regular / Combined` must read the shared display projection and must not independently parse `diagnostics` or reconstruct ratio text.
 - `PadInfo` contract:
   - The notch section of `CadPadInfoViewModel` (ratio / reason / stage3 / target summary / owner summary) must read the shared display projection.
-- `Notch detail` contract:
+- `Notch detail` contract (as of 2026-10-31 `ShowNotchDetailCommand` reaches `CadPadInfoViewModel.NotchDetailCommand`, but no AXAML binds it, so the window cannot be opened from the UI; the contract still applies to the code):
   - `NotchDetailUseCase` must build the shared display projection first, then pass it to `NotchDetailViewModel` for presentation.
   - `NotchDetailViewModel` should not recalculate ratio text on its own.
 - `RuntimeQuery` contract:
