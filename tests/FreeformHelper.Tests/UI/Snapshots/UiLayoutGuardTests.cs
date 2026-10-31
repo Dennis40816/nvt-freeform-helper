@@ -363,7 +363,6 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("same snapshot source as Popover and CLI", rightWorkflowInspector);
         Assert.DoesNotContain("Focus by CAD, REG, or DIFF id.", rightWorkflowInspector);
         Assert.DoesNotContain("Text=\"Shows rule-by-rule reasoning for the current pad.\"", rightWorkflowInspector);
-                                 Text=\"Shows rule-by-rule", rightWorkflowInspector);
         Assert.Contains("ToolTip.Tip=\"Shows rule-by-rule reasoning for the current pad.\"", rightWorkflowInspector);
         var debugFold = rightWorkflowInspector.IndexOf("Classes=\"workspaceFoldHeader\"", StringComparison.Ordinal);
         Assert.True(debugFold > 0, "The Inspector debug fold uses the shared workspaceFoldHeader accordion.");
