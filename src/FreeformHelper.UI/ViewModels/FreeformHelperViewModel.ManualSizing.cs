@@ -1,5 +1,4 @@
 using System.Globalization;
-using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -172,45 +171,6 @@ public sealed partial class FreeformHelperViewModel
             SyncSelectionFromManualRange(plan.Rows, plan.Cols); // Update canvas selection.
         }
         await Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Applies the current canvas selection to the manual sizing range input fields.
-    /// </summary>
-    public void ApplySelectionToManualRange()
-    {
-        if (_grid is null || _selection.RegularIndices.Count == 0)
-        {
-            SetStatus("Manual sizing: select regular pads first.");
-            Logger.Debug(CultureInfo.InvariantCulture, "Manual sizing range fill skipped: no regular selection.");
-            return;
-        }
-
-        // Get the actual RegularPad objects from the selected indices.
-        var pads = _selection.RegularIndices
-            .Select(i => _grid.Pads.FirstOrDefault(p => p.Index == i))
-            .Where(p => p is not null)
-            .Cast<RegularPad>()
-            .ToList();
-
-        if (pads.Count == 0)
-        {
-            SetStatus("Manual sizing: selection has no regular pads.");
-            Logger.Debug(CultureInfo.InvariantCulture, "Manual sizing range fill skipped: selection had no regular pads.");
-            return;
-        }
-
-        // Determine the distinct row and column indices from the selected pads.
-        var rows = pads.Select(p => ToDisplayRow(p.Row)).Distinct().OrderBy(r => r).ToList();
-        var cols = pads.Select(p => p.Col).Distinct().OrderBy(c => c).ToList();
-
-        // Set the UI input fields for manual range.
-        SetManualRangeInputs(FormatIndexRanges(rows), FormatIndexRanges(cols));
-        Logger.Debug(CultureInfo.InvariantCulture, "Manual sizing range filled from selection. Rows={0}, Cols={1}, Count={2}.",
-            FormatIndexRanges(rows),
-            FormatIndexRanges(cols),
-            pads.Count);
-        _ = TryApplyManualSizingAsync(); // Attempt to apply sizing after setting the range.
     }
 
     /// <summary>

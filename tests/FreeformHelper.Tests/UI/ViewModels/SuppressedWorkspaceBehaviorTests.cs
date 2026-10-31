@@ -72,19 +72,6 @@ public sealed class SuppressedWorkspaceBehaviorTests
     }
 
     [Fact]
-    public async Task ApplySelectionToManualRange_NoSelection_DoesNotCreateUndoOrChangeInput()
-    {
-        using var fixture = new WorkspaceFixture();
-        var vm = await fixture.OpenAsync();
-
-        vm.ApplySelectionToManualRange();
-
-        Assert.Equal(string.Empty, vm.ManualRowsRange);
-        Assert.False(vm.CanUndo);
-        Assert.Equal("Manual sizing: select regular pads first.", vm.StatusText);
-    }
-
-    [Fact]
     public async Task OpenDxfCommand_LayerOptions_InitializesSelectionsBeforePublicHandlersResume()
     {
         using var fixture = new WorkspaceFixture();

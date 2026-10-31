@@ -219,7 +219,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
         ExportPreviewPngCommand = new AsyncRelayCommand(ExportPreviewPngAsync);
         CopySelectedArtifactCommand = new AsyncRelayCommand(CopySelectedArtifactAsync);
         CopyAllArtifactsCommand = new AsyncRelayCommand(CopyAllArtifactsAsync);
-        CopyArtifactsCommand = new AsyncRelayCommand(CopyArtifactsAsync);
         ExportArtifactsCsvCommand = new AsyncRelayCommand(ExportArtifactsCsvAsync);
         ExportArtifactsJsonCommand = new AsyncRelayCommand(ExportArtifactsJsonAsync);
         AddCustomPointCommand = new RelayCommand(AddCustomPoint);
@@ -285,8 +284,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
     public IAsyncRelayCommand CopySelectedArtifactCommand { get; }
 
     public IAsyncRelayCommand CopyAllArtifactsCommand { get; }
-
-    public IAsyncRelayCommand CopyArtifactsCommand { get; }
 
     public IAsyncRelayCommand ExportArtifactsCsvCommand { get; }
 

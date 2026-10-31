@@ -22,17 +22,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             : "Coordinate preview export cancelled.";
     }
 
-    private async Task CopyArtifactsAsync()
-    {
-        if (SelectedArtifactRow is null)
-        {
-            await CopyAllArtifactsAsync();
-            return;
-        }
-
-        await CopySelectedArtifactAsync();
-    }
-
     private async Task CopySelectedArtifactAsync()
     {
         if (SelectedArtifactRow is null)

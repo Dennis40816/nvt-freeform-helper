@@ -42,37 +42,6 @@ public sealed partial class IndexMappingReportViewModel
         return $"Segment preview: {SelectedDecision.SegmentKey}, repair rows {repairRows.Count}/{memberCount}.";
     }
 
-    private void MoveDecision(int direction)
-    {
-        var navigationRows = DecisionRows.Count > 0 ? DecisionRows : AggregateDecisionRows;
-        if (navigationRows.Count == 0)
-        {
-            ActionStatus = "No diagnostic rows.";
-            return;
-        }
-
-        var currentIndex = -1;
-        if (SelectedDecision is not null)
-        {
-            for (var i = 0; i < navigationRows.Count; i++)
-            {
-                if (ReferenceEquals(navigationRows[i], SelectedDecision))
-                {
-                    currentIndex = i;
-                    break;
-                }
-            }
-        }
-
-        if (currentIndex < 0)
-        {
-            currentIndex = direction >= 0 ? -1 : 0;
-        }
-
-        var targetIndex = Math.Clamp(currentIndex + direction, 0, navigationRows.Count - 1);
-        SelectedDecision = navigationRows[targetIndex];
-    }
-
     private void SelectDecision(IndexMappingDecisionRowViewModel? row)
     {
         if (row is null)

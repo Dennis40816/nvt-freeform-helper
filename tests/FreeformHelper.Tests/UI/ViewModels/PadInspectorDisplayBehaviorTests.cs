@@ -16,7 +16,6 @@ public sealed class PadInspectorDisplayBehaviorTests
         nameof(FreeformHelperViewModel.PadInspectorPrimaryText),
         nameof(FreeformHelperViewModel.PadInspectorSecondaryText),
         nameof(FreeformHelperViewModel.PadInspectorMatchText),
-        nameof(FreeformHelperViewModel.PadInspectorCompensationText),
         nameof(FreeformHelperViewModel.PadInspectorCompensationLines),
         nameof(FreeformHelperViewModel.PadInspectorRuleTraceLines),
         nameof(FreeformHelperViewModel.PadInspectorRuleTraceSections),
@@ -58,7 +57,7 @@ public sealed class PadInspectorDisplayBehaviorTests
         vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
 
         Assert.Equal(2, vm.PadInspectorCompensationLines.Count);
-        Assert.Contains("Unavailable", vm.PadInspectorCompensationText, StringComparison.Ordinal);
+        Assert.Contains("Unavailable", vm.PadInspectorDisplay.CompensationText, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -105,8 +104,6 @@ public sealed class PadInspectorDisplayBehaviorTests
     {
         var vm = new FreeformHelperViewModel();
         vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
-        vm.IsPadInspectorTraceExpanded = true;
-        vm.IsPadInspectorTracePopupOpen = true;
         vm.IsPadInspectorRawTraceExpanded = true;
 
         vm.PadInspectorUi.Snapshot = null;
@@ -114,27 +111,21 @@ public sealed class PadInspectorDisplayBehaviorTests
         Assert.False(vm.HasPadInspectorSummary);
         Assert.True(vm.HasNoPadInspectorSummary);
         Assert.Equal(string.Empty, vm.PadInspectorPrimaryText);
-        Assert.Equal(string.Empty, vm.PadInspectorCompensationText);
+        Assert.Equal(string.Empty, vm.PadInspectorDisplay.CompensationText);
         Assert.Empty(vm.PadInspectorCompensationLines);
         Assert.False(vm.HasPadInspectorRuleTrace);
-        Assert.False(vm.IsPadInspectorTraceExpanded);
-        Assert.False(vm.IsPadInspectorTracePopupOpen);
         Assert.False(vm.IsPadInspectorRawTraceExpanded);
     }
 
     [Fact]
-    public void CurrentPadInspectorSnapshot_Replaced_KeepsTraceExpandedAndClosesPopup()
+    public void CurrentPadInspectorSnapshot_Replaced_CollapsesRawTrace()
     {
         var vm = new FreeformHelperViewModel();
         vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
-        vm.IsPadInspectorTraceExpanded = true;
-        vm.IsPadInspectorTracePopupOpen = true;
         vm.IsPadInspectorRawTraceExpanded = true;
 
         vm.PadInspectorUi.Snapshot = CreateCadSnapshot(275);
 
-        Assert.True(vm.IsPadInspectorTraceExpanded);
-        Assert.False(vm.IsPadInspectorTracePopupOpen);
         Assert.False(vm.IsPadInspectorRawTraceExpanded);
     }
 

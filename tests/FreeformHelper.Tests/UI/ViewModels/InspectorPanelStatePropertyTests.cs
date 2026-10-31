@@ -8,7 +8,7 @@ using Xunit;
 namespace FreeformHelper.Tests;
 
 /// <summary>
-/// Pins the seven inspector panel settings of the main view model: the start values, the change notifications,
+/// Pins the three inspector panel settings of the main view model: the start values, the change notifications,
 /// the unsaved flag, the undo entry and a project file that stays identical, except for its save time,
 /// after a save, load and save.
 /// </summary>
@@ -19,12 +19,8 @@ public sealed class InspectorPanelStatePropertyTests
 
     private static readonly Setting[] _settings =
     [
-        new(nameof(FreeformHelperViewModel.QuickLocateCadPadId), 5m, false, false),
-        new(nameof(FreeformHelperViewModel.QuickLocateRegularPadIndex), 3m, false, false),
         new(nameof(FreeformHelperViewModel.QuickFocusQueryText), "CAD 4809", false, false),
         new(nameof(FreeformHelperViewModel.IsRightPanelSettingsTab), false, false, false),
-        new(nameof(FreeformHelperViewModel.IsPadInspectorTraceExpanded), true, false, false),
-        new(nameof(FreeformHelperViewModel.IsPadInspectorTracePopupOpen), true, false, false),
         new(nameof(FreeformHelperViewModel.IsPadInspectorRawTraceExpanded), true, false, false),
     ];
 
@@ -35,12 +31,8 @@ public sealed class InspectorPanelStatePropertyTests
     {
         var vm = new FreeformHelperViewModel();
 
-        Assert.Equal(0m, vm.QuickLocateCadPadId);
-        Assert.Equal(0m, vm.QuickLocateRegularPadIndex);
         Assert.Equal("", vm.QuickFocusQueryText);
         Assert.True(vm.IsRightPanelSettingsTab);
-        Assert.False(vm.IsPadInspectorTraceExpanded);
-        Assert.False(vm.IsPadInspectorTracePopupOpen);
         Assert.False(vm.IsPadInspectorRawTraceExpanded);
     }
 
@@ -158,12 +150,8 @@ public sealed class InspectorPanelStatePropertyTests
     private static object RoundTripValue(Setting setting) =>
         setting.Name switch
         {
-            nameof(FreeformHelperViewModel.QuickLocateCadPadId) => 0m,
-            nameof(FreeformHelperViewModel.QuickLocateRegularPadIndex) => 0m,
             nameof(FreeformHelperViewModel.QuickFocusQueryText) => "",
             nameof(FreeformHelperViewModel.IsRightPanelSettingsTab) => true,
-            nameof(FreeformHelperViewModel.IsPadInspectorTraceExpanded) => false,
-            nameof(FreeformHelperViewModel.IsPadInspectorTracePopupOpen) => false,
             nameof(FreeformHelperViewModel.IsPadInspectorRawTraceExpanded) => false,
             _ => setting.NewValue,
         };

@@ -52,11 +52,10 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             changes.AreAllVisibleRowsSelected = true;
             var entry = Assert.IsType<DxfEditChangeListEntry>(changes.SelectedEntry);
             IRelayCommand[] commands = [changes.ApplySelectedEntriesCommand, changes.ApplySelectedEntryCommand,
-                changes.ApplyEntryCommand, changes.RestoreSelectedDuplicateEntriesCommand, changes.RehideSelectedDuplicateEntriesCommand];
+                changes.RestoreSelectedDuplicateEntriesCommand, changes.RehideSelectedDuplicateEntriesCommand];
             var before = commands.Select(command => command.CanExecute(entry)).ToArray();
             Assert.True(before[1]);
-            Assert.True(before[2]);
-            Assert.True(kind == DxfEditChangeKind.Hidden ? before[0] : before[3] && before[4]);
+            Assert.True(kind == DxfEditChangeKind.Hidden ? before[0] : before[2] && before[3]);
             var notifications = new int[commands.Length];
             for (var i = 0; i < commands.Length; i++)
             {

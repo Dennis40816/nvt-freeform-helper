@@ -82,7 +82,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SimulationSafetyOverview.cs:15",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:12", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:171", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:311",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Step4Indexing.cs:5",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorSummary.cs:11", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:20", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:26", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:32", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:47", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:62", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:127", 
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorSummary.cs:11", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:20", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:26", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:32", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:47", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:62", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:89", 
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkflowSteps.cs:10"
     ],
     "shellNavigationBooleans": [],
