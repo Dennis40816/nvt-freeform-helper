@@ -35,6 +35,6 @@ public sealed class MainWindowDevTabAvailabilityTests
 
         shell.FreeformHelper.HasUnsavedChanges = false;
         window.Close();
-        HeadlessUiPump.Drain(window);
+        window.Dispatcher.RunJobs();
     }
 }
