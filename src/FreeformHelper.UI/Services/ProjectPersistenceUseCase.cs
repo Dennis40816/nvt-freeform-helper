@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
@@ -9,17 +8,11 @@ namespace FreeformHelper.UI.Services;
 /// Single entry point for project file persistence (save/load).
 /// Handles disk I/O and schema-compatible round-tripping; UI is responsible for status updates and applying loaded state.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class ProjectPersistenceUseCase
 {
     private readonly JsonProjectStore _store;
 
-    // padOverrideService is not stored: PadOverrideService has only static members. The parameter stays
-    // until the constructor signature can change without creating a new code-health ledger fingerprint.
-    public ProjectPersistenceUseCase(JsonProjectStore store, PadOverrideService padOverrideService)
+    public ProjectPersistenceUseCase(JsonProjectStore store)
     {
         _store = store ?? throw new ArgumentNullException(nameof(store));
     }
@@ -61,7 +54,7 @@ public sealed class ProjectPersistenceUseCase
         return ProjectSaveResult.Saved(path, embedWarning);
     }
 
-    public async Task<ProjectLoadResult> LoadAsync(ProjectLoadRequest request)
+    public static async Task<ProjectLoadResult> LoadAsync(ProjectLoadRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         if (!request.CanProceedWithPendingEdits())

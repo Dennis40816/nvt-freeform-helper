@@ -2,7 +2,7 @@
   "metrics": {
     "asyncVoid": 0,
     "asyncVoidLambdas": 0,
-    "suppressMessage": 13,
+    "suppressMessage": 12,
     "pragmaWarningDisable": 0,
     "suppressUndoAssignments": 0,
     "fileWriteAllText": 5,
@@ -30,8 +30,7 @@
       "src/FreeformHelper.UI/Services/GridBuildService.cs:12",
       "src/FreeformHelper.UI/Services/ManualSizingService.cs:11",
       "src/FreeformHelper.UI/Services/NotchExportService.cs:14",
-      "src/FreeformHelper.UI/Services/PadMatchService.cs:12",
-      "src/FreeformHelper.UI/Services/ProjectPersistenceUseCase.cs:12"
+      "src/FreeformHelper.UI/Services/PadMatchService.cs:12"
     ],
     "pragmaWarningDisable": [],
     "suppressUndoAssignments": [],
@@ -65,7 +64,7 @@
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:17"
     ],
     "freeformViewModelStateMembers": [
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:136", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:85", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:77", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:80", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:81", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:93", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:94", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:96", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:119",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:135", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:84", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:76", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:79", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:80", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:92", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:93", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:95", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:118",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfIndexing.Duplicates.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfLayerImageExportSettings.cs:26",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:10",

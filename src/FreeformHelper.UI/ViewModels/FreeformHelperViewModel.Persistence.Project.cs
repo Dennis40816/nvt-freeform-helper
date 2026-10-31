@@ -186,7 +186,7 @@ public sealed partial class FreeformHelperViewModel
             operationAsync: async () =>
             {
                 var loadSw = Stopwatch.StartNew();
-                var result = await _projectPersistenceUseCase.LoadAsync(new ProjectLoadRequest(
+                var result = await ProjectPersistenceUseCase.LoadAsync(new ProjectLoadRequest(
                     PickLoadProjectPathAsync: () => Task.FromResult<string?>(normalizedPath),
                     CanProceedWithPendingEdits));
                 loadSw.Stop();
