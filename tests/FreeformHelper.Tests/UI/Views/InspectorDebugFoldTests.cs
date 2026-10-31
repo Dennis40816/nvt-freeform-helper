@@ -51,6 +51,25 @@ public sealed class InspectorDebugFoldTests
         Assert.DoesNotContain("Snapshot details", VisibleTexts(window));
     }
 
+    [Fact]
+    public void InspectorView_FoldsDebugDetailsUnderSharedAccordionAndDropsDeveloperText()
+    {
+        var axaml = File.ReadAllText(Path.Combine(TestPaths.RepoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowInspectorView.axaml"));
+
+        Assert.DoesNotContain("same snapshot source as Popover and CLI", axaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("Focus by CAD, REG, or DIFF id.", axaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("Text=\"Shows rule-by-rule reasoning for the current pad.\"", axaml, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"Shows rule-by-rule reasoning for the current pad.\"", axaml, StringComparison.Ordinal);
+
+        var fold = axaml.IndexOf("Classes=\"workspaceFoldHeader\"", StringComparison.Ordinal);
+        Assert.True(fold > 0, "The Inspector debug fold uses the shared workspaceFoldHeader accordion.");
+        Assert.Contains("IsChecked=\"{Binding PadInspectorUi.IsDebugDetailsExpanded, Mode=TwoWay}\"", axaml, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding PadInspectorUi.IsDebugDetailsExpanded}\"", axaml, StringComparison.Ordinal);
+        Assert.True(axaml.IndexOf("Text=\"Snapshot details\"", StringComparison.Ordinal) > fold);
+        Assert.True(axaml.IndexOf("StringFormat='Rule trace (x{0})'", StringComparison.Ordinal) > fold);
+        Assert.DoesNotContain("Background=\"#", axaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("FontSize=", axaml, StringComparison.Ordinal);
+    }
     private static List<string> VisibleTexts(Window window) =>
         window.GetVisualDescendants()
             .OfType<SelectableTextBlock>()
