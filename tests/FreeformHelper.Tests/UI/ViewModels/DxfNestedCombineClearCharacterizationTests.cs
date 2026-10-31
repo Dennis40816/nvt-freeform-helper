@@ -48,7 +48,8 @@ public sealed class DxfNestedCombineClearCharacterizationTests
             var changeList = Assert.IsType<DxfEditChangeListViewModel>(list);
             var innerRow = Assert.Single(changeList.Rows, row => row.CadPadId == innerId);
 
-            changeList.ApplyEntryCommand.Execute(innerRow);
+            changeList.SelectedEntry = innerRow;
+            changeList.ApplySelectedEntryCommand.Execute(null);
             await WaitForGridRebuildAsync(vm);
 
             // The inner group is gone, but the outer pad still covers its sources, so the
