@@ -10,7 +10,7 @@ namespace FreeformHelper.UI.Services;
 /// </summary>
 public sealed class LayerCatalogStateService
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private readonly Func<string, DxfLayerCatalog> _readFromPath;
     private readonly Func<Stream, DxfLayerCatalog> _readFromStream;
     private DxfLayerCatalog _catalog = DxfLayerCatalog.Empty;
@@ -60,7 +60,7 @@ public sealed class LayerCatalogStateService
             _cachePathWriteUtc == writeUtc)
         {
             _catalog = _cache;
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF layer catalog cache hit for path: {0}", path);
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF layer catalog cache hit for path: {0}", path);
             return;
         }
 
@@ -76,7 +76,7 @@ public sealed class LayerCatalogStateService
             _cachePath = null;
             _cachePathLength = -1;
             _cachePathWriteUtc = default;
-            Logger.Warn(ex, "Failed to parse DXF layer catalog from path: {0}", path);
+            _logger.Warn(ex, "Failed to parse DXF layer catalog from path: {0}", path);
         }
     }
 
@@ -101,7 +101,7 @@ public sealed class LayerCatalogStateService
         _cachePathWriteUtc = writeUtc;
         _cacheEmbeddedFingerprint = 0;
         _cacheEmbeddedLength = -1;
-        Logger.Info(CultureInfo.InvariantCulture, "DXF layer catalog loaded from path ({0} layers).", _catalog.Layers.Count);
+        _logger.Info(CultureInfo.InvariantCulture, "DXF layer catalog loaded from path ({0} layers).", _catalog.Layers.Count);
     }
 
     public void TryLoadFromEmbedded(byte[]? data)
@@ -118,7 +118,7 @@ public sealed class LayerCatalogStateService
             _cacheEmbeddedFingerprint == fingerprint)
         {
             _catalog = _cache;
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF layer catalog cache hit for embedded bytes (len={0}).", data.Length);
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF layer catalog cache hit for embedded bytes (len={0}).", data.Length);
             return;
         }
 
@@ -132,7 +132,7 @@ public sealed class LayerCatalogStateService
             _cachePath = null;
             _cachePathLength = -1;
             _cachePathWriteUtc = default;
-            Logger.Info(CultureInfo.InvariantCulture, "DXF layer catalog loaded from embedded bytes ({0} layers).", _catalog.Layers.Count);
+            _logger.Info(CultureInfo.InvariantCulture, "DXF layer catalog loaded from embedded bytes ({0} layers).", _catalog.Layers.Count);
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
@@ -140,7 +140,7 @@ public sealed class LayerCatalogStateService
             _cache = DxfLayerCatalog.Empty;
             _cacheEmbeddedLength = -1;
             _cacheEmbeddedFingerprint = 0;
-            Logger.Warn(ex, "Failed to parse DXF layer catalog from embedded bytes.");
+            _logger.Warn(ex, "Failed to parse DXF layer catalog from embedded bytes.");
         }
     }
 

@@ -136,7 +136,7 @@ public sealed record CopperPillarPathReplayArtifactRow(
 
 public static class CopperPillarPathReplayArtifactService
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
     {
         WriteIndented = true,
         Converters = { new JsonStringEnumConverter() },
@@ -209,7 +209,7 @@ public static class CopperPillarPathReplayArtifactService
     public static string ExportJson(CopperPillarPathReplayArtifactSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
-        return JsonSerializer.Serialize(snapshot, JsonOptions);
+        return JsonSerializer.Serialize(snapshot, _jsonOptions);
     }
 
     public static string ExportClipboardTable(IEnumerable<CopperPillarPathReplayArtifactRow> rows)
