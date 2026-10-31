@@ -360,6 +360,19 @@ public sealed class UiLayoutGuardTests
 
         var rightWorkflowInspector = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowInspectorView.axaml"));
         Assert.Contains("IsVisible=\"{Binding IsRightPanelInspectorTab}\"", rightWorkflowInspector);
+        Assert.DoesNotContain("same snapshot source as Popover and CLI", rightWorkflowInspector);
+        Assert.DoesNotContain("Focus by CAD, REG, or DIFF id.", rightWorkflowInspector);
+        Assert.DoesNotContain("Text=\"Shows rule-by-rule reasoning for the current pad.\"", rightWorkflowInspector);
+                                 Text=\"Shows rule-by-rule", rightWorkflowInspector);
+        Assert.Contains("ToolTip.Tip=\"Shows rule-by-rule reasoning for the current pad.\"", rightWorkflowInspector);
+        var debugFold = rightWorkflowInspector.IndexOf("Classes=\"workspaceFoldHeader\"", StringComparison.Ordinal);
+        Assert.True(debugFold > 0, "The Inspector debug fold uses the shared workspaceFoldHeader accordion.");
+        Assert.Contains("IsChecked=\"{Binding PadInspectorUi.IsDebugDetailsExpanded, Mode=TwoWay}\"", rightWorkflowInspector);
+        Assert.Contains("IsVisible=\"{Binding PadInspectorUi.IsDebugDetailsExpanded}\"", rightWorkflowInspector);
+        Assert.True(rightWorkflowInspector.IndexOf("Text=\"Snapshot details\"", StringComparison.Ordinal) > debugFold);
+        Assert.True(rightWorkflowInspector.IndexOf("StringFormat='Rule trace (x{0})'", StringComparison.Ordinal) > debugFold);
+        Assert.DoesNotContain("Background=\"#", rightWorkflowInspector);
+        Assert.DoesNotContain("FontSize=", rightWorkflowInspector);
 
         var step3View = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep3View.axaml"));
         Assert.Contains("Text=\"{Binding NotchPreviewStageSummary}\"", step3View);

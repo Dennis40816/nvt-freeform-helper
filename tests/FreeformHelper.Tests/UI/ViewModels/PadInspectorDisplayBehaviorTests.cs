@@ -185,7 +185,60 @@ public sealed class PadInspectorDisplayBehaviorTests
         Assert.False(vm.HasPadInspectorSummary);
     }
 
-    private static PadInspectorSnapshot CreateCadSnapshot(int cadPadId)
+    [Fact]
+    public void DebugDetails_NewViewModel_IsCollapsed()
+    {
+        var vm = new FreeformHelperViewModel();
+
+        Assert.False(vm.PadInspectorUi.IsDebugDetailsExpanded);
+
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
+
+        Assert.False(vm.PadInspectorUi.IsDebugDetailsExpanded);
+    }
+
+    [Fact]
+    public void DebugDetails_SamePadRefreshed_StaysOpen()
+    {
+        var vm = new FreeformHelperViewModel();
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
+        vm.PadInspectorUi.IsDebugDetailsExpanded = true;
+
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274) with { Kind = "cad-again" };
+
+        Assert.True(vm.PadInspectorUi.IsDebugDetailsExpanded);
+    }
+
+    [Fact]
+    public void DebugDetails_OtherPadSelected_Collapses()
+    {
+        var vm = new FreeformHelperViewModel();
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
+        vm.PadInspectorUi.IsDebugDetailsExpanded = true;
+
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(275);
+
+        Assert.False(vm.PadInspectorUi.IsDebugDetailsExpanded);
+
+        vm.PadInspectorUi.IsDebugDetailsExpanded = true;
+        vm.PadInspectorUi.Snapshot = CreateRegularSnapshot(4616);
+
+        Assert.False(vm.PadInspectorUi.IsDebugDetailsExpanded);
+    }
+
+    [Fact]
+    public void DebugDetails_SnapshotCleared_Collapses()
+    {
+        var vm = new FreeformHelperViewModel();
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
+        vm.PadInspectorUi.IsDebugDetailsExpanded = true;
+
+        vm.PadInspectorUi.Snapshot = null;
+
+        Assert.False(vm.PadInspectorUi.IsDebugDetailsExpanded);
+    }
+
+    internal static PadInspectorSnapshot CreateCadSnapshot(int cadPadId)
     {
         return new PadInspectorSnapshot(
             "cad",
@@ -215,7 +268,7 @@ public sealed class PadInspectorDisplayBehaviorTests
             Regular: null);
     }
 
-    private static PadInspectorSnapshot CreateRegularSnapshot(int regularPadId)
+    internal static PadInspectorSnapshot CreateRegularSnapshot(int regularPadId)
     {
         return new PadInspectorSnapshot(
             "regular",

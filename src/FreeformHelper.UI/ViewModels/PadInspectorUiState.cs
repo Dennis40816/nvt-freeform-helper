@@ -28,5 +28,25 @@ public sealed partial class PadInspectorUiState : ObservableObject
     /// </summary>
     [ObservableProperty] private bool _isDeferredRefreshPending;
 
-    partial void OnSnapshotChanged(PadInspectorSnapshot? value) => _snapshotChanged(value);
+    /// <summary>
+    /// Gets or sets whether the Debug details fold of the inspector is open.
+    /// It closes when the inspector shows another pad or no pad, and stays open while the same pad is refreshed.
+    /// </summary>
+    [ObservableProperty] private bool _isDebugDetailsExpanded;
+
+    partial void OnSnapshotChanged(PadInspectorSnapshot? oldValue, PadInspectorSnapshot? newValue)
+    {
+        if (!IsSamePad(oldValue, newValue))
+        {
+            IsDebugDetailsExpanded = false;
+        }
+
+        _snapshotChanged(newValue);
+    }
+
+    private static bool IsSamePad(PadInspectorSnapshot? first, PadInspectorSnapshot? second) =>
+        first is not null
+        && second is not null
+        && first.Cad?.CadPadId == second.Cad?.CadPadId
+        && first.Regular?.RegularPadId == second.Regular?.RegularPadId;
 }
