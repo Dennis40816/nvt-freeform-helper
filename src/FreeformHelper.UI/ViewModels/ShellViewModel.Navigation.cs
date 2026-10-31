@@ -6,7 +6,13 @@ public sealed partial class ShellViewModel
 
     private void ShowHowToUse() => _ = SelectPageAsync(ShellPage.HowToUse);
 
-    private void ShowDev() => _ = SelectPageAsync(ShellPage.Dev);
+    private void ShowDev()
+    {
+        if (IsDevPageAvailable)
+        {
+            _ = SelectPageAsync(ShellPage.Dev);
+        }
+    }
 
     private Task ShowSimulationAsync() => SelectPageAsync(ShellPage.Simulation);
 

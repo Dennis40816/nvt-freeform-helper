@@ -92,6 +92,20 @@ public sealed class ShellViewModelNavigationTests
         Assert.All(navigationObservations, observation => Assert.Same(ExpectedViewModel(shell, target), observation.ViewModel));
     }
 
+    [Fact]
+    public async Task ShowDev_WhenDevPageIsUnavailable_KeepsTheSelectedPage()
+    {
+        using var shell = new ShellViewModel { IsDevPageAvailable = false };
+        shell.Simulation.RequestBuildWorkspaceAsync = null;
+        shell.CoordinatePlanner.RequestBuildWorkspaceAsync = null;
+        await ShowPageAsync(shell, ShellPage.HowToUse);
+
+        await ShowPageAsync(shell, ShellPage.Dev);
+
+        Assert.Equal(ExpectedActiveFlags(ShellPage.HowToUse), ReadActiveFlags(shell));
+        Assert.Same(shell.HowToUse, shell.CurrentViewModel);
+    }
+
     internal static Task ShowPageAsync(ShellViewModel shell, ShellPage page) => page switch
     {
         ShellPage.Workspace => ExecuteAsync(shell.ShowWorkspaceCommand),
