@@ -11,7 +11,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class PadInfoViewModelTests
 {
-    private static readonly int[] MatchedRegularPadIds = [4808];
+    private static readonly int[] _matchedRegularPadIds = [4808];
 
     [Fact]
     public void RegularPadInfo_DefaultsToCollapsedGeometryDetails()
@@ -281,7 +281,7 @@ public sealed class PadInfoViewModelTests
                 IcIndex: 2,
                 MatchText: "IC3/diff112",
                 MatchDetailsText: "IC3/diff112 (best)",
-                MatchedRegularPadIds: MatchedRegularPadIds,
+                MatchedRegularPadIds: _matchedRegularPadIds,
                 MatchedRegularDetails: new[]
                 {
                     new PadInspectorMatchedRegularSnapshot(4808, 2, 112, 0.61, 0.54),

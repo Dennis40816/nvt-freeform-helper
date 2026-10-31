@@ -7,8 +7,8 @@ namespace FreeformHelper.Tests;
 
 public sealed class RegularGridDiffKeyValidatorTests
 {
-    private static readonly int[] DuplicateRegularPadIds = [100, 101];
-    private static readonly int[] ActiveRegularPadIds = [100, 102];
+    private static readonly int[] _duplicateRegularPadIds = [100, 101];
+    private static readonly int[] _activeRegularPadIds = [100, 102];
 
     [Fact]
     public void FindDuplicateDiffGroups_WhenGridHasSharedIcDiff_ReturnsDuplicateGroup()
@@ -20,7 +20,7 @@ public sealed class RegularGridDiffKeyValidatorTests
         var group = Assert.Single(groups);
         Assert.Equal(0, group.IcIndex);
         Assert.Equal(1541, group.DiffIndex);
-        Assert.Equal(DuplicateRegularPadIds, group.RegularPadIds);
+        Assert.Equal(_duplicateRegularPadIds, group.RegularPadIds);
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public sealed class RegularGridDiffKeyValidatorTests
 
         var groups = RegularGridDiffKeyValidator.FindDuplicateDiffGroups(
             grid,
-            activeRegularPadIds: new HashSet<int>(ActiveRegularPadIds));
+            activeRegularPadIds: new HashSet<int>(_activeRegularPadIds));
 
         Assert.Empty(groups);
     }

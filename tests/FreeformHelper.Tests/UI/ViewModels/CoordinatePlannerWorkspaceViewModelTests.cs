@@ -10,7 +10,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class CoordinatePlannerWorkspaceViewModelTests
 {
-    private static readonly string[] CoordinateLayerNames = ["AA.drawing", "SIG"];
+    private static readonly string[] _coordinateLayerNames = ["AA.drawing", "SIG"];
 
     [Fact]
     public void Constructor_WhenAaDrawingExists_DefaultsToAaDrawingBounds()
@@ -24,7 +24,7 @@ public sealed class CoordinatePlannerWorkspaceViewModelTests
                     BuildCadPad(1, "AA.drawing", 100d, 200d, 300d, 400d),
                     BuildCadPad(2, "SIG", 10d, 20d, 30d, 40d),
                 },
-                CoordinateLayerNames,
+                _coordinateLayerNames,
                 SourceRevision: 0,
                 DefaultMachineWidth: 100d,
                 DefaultMachineHeight: 50d,
@@ -137,7 +137,7 @@ public sealed class CoordinatePlannerWorkspaceViewModelTests
                 {
                     BuildCadPad(2, "SIG", 10d, 20d, 30d, 40d),
                 },
-                CoordinateLayerNames,
+                _coordinateLayerNames,
                 SourceRevision: 0,
                 DefaultMachineWidth: 100d,
                 DefaultMachineHeight: 50d,
@@ -194,7 +194,7 @@ public sealed class CoordinatePlannerWorkspaceViewModelTests
                 {
                     BuildCadPad(1, "AA.drawing", 100d, 200d, 300d, 400d),
                 },
-                CoordinateLayerNames,
+                _coordinateLayerNames,
                 SourceRevision: 0,
                 DefaultMachineWidth: 100d,
                 DefaultMachineHeight: 50d,

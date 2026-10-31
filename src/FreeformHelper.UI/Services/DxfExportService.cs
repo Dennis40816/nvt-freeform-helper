@@ -10,7 +10,7 @@ namespace FreeformHelper.UI.Services;
 /// </summary>
 public sealed class DxfExportService
 {
-    private static readonly CultureInfo Invariant = CultureInfo.InvariantCulture;
+    private static readonly CultureInfo _invariant = CultureInfo.InvariantCulture;
 
     public static string ExportAscii(IReadOnlyList<CadPad> pads)
     {
@@ -61,16 +61,16 @@ public sealed class DxfExportService
         sb.AppendLine("8");
         sb.AppendLine(string.IsNullOrWhiteSpace(pad.Layer) ? "0" : pad.Layer);
         sb.AppendLine("90");
-        sb.AppendLine(vertices.Count.ToString(Invariant));
+        sb.AppendLine(vertices.Count.ToString(_invariant));
         sb.AppendLine("70");
         sb.AppendLine("1");
 
         foreach (var vertex in vertices)
         {
             sb.AppendLine("10");
-            sb.AppendLine(vertex.X.ToString("0.###########", Invariant));
+            sb.AppendLine(vertex.X.ToString("0.###########", _invariant));
             sb.AppendLine("20");
-            sb.AppendLine(vertex.Y.ToString("0.###########", Invariant));
+            sb.AppendLine(vertex.Y.ToString("0.###########", _invariant));
         }
     }
 

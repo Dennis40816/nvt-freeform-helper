@@ -4,19 +4,19 @@ namespace FreeformHelper.UI.Services;
 
 internal static class CadLoadSpinnerHostService
 {
-    private static readonly CadLoadSpinnerProcessHost SharedInnerHost = new();
-    private static readonly ICadLoadSpinnerHost SharedHostInstance = new SharedCadLoadSpinnerHost(SharedInnerHost);
+    private static readonly CadLoadSpinnerProcessHost _sharedInnerHost = new();
+    private static readonly ICadLoadSpinnerHost _sharedHostInstance = new SharedCadLoadSpinnerHost(_sharedInnerHost);
 
-    public static ICadLoadSpinnerHost SharedHost => SharedHostInstance;
+    public static ICadLoadSpinnerHost SharedHost => _sharedHostInstance;
 
     public static void WarmupSharedHost()
     {
-        SharedInnerHost.Warmup();
+        _sharedInnerHost.Warmup();
     }
 
     public static void ShutdownSharedHost()
     {
-        SharedInnerHost.Dispose();
+        _sharedInnerHost.Dispose();
     }
 
     private sealed class SharedCadLoadSpinnerHost(CadLoadSpinnerProcessHost innerHost) : ICadLoadSpinnerHost

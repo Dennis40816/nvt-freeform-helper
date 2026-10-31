@@ -11,7 +11,7 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class NotchExportSelectionWindowSmokeTests
 {
-    private static readonly int[] SmokeRowValues = [12, 100, 65535, 0, 65535, 0, 0];
+    private static readonly int[] _smokeRowValues = [12, 100, 65535, 0, 65535, 0, 0];
 
     [AvaloniaFact]
     public void NotchExportSelectionWindow_Can_Layout_Headless()
@@ -25,7 +25,7 @@ public sealed class NotchExportSelectionWindowSmokeTests
                 diffIndex: 12,
                 regularPadIndex: 3456,
                 cadPadId: 7890,
-                values: SmokeRowValues,
+                values: _smokeRowValues,
                 comment: "smoke")
         });
 

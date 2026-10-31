@@ -5,7 +5,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class CopperPillarPathReplayArtifactServiceTests
 {
-    private static readonly string[] SampleDiagnostics = ["sample diagnostic"];
+    private static readonly string[] _sampleDiagnostics = ["sample diagnostic"];
 
     [Fact]
     public void ReplayResult_ProjectsStructuredSupportAndPhysicalRisk()
@@ -51,7 +51,7 @@ public sealed class CopperPillarPathReplayArtifactServiceTests
                 NetFlowResidualCount: 2,
                 TargetCoverageRiskCount: 3,
                 StatusText: "EMS risk",
-                Diagnostics: SampleDiagnostics),
+                Diagnostics: _sampleDiagnostics),
         });
 
         Assert.False(result.HasUnsupportedSteps);

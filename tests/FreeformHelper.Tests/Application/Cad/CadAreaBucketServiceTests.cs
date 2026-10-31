@@ -7,8 +7,8 @@ namespace FreeformHelper.Tests;
 
 public sealed class CadAreaBucketServiceTests
 {
-    private static readonly int[] ExpectedBucketIds1 = [1, 2];
-    private static readonly int[] ExpectedBucketIds2 = [3, 4];
+    private static readonly int[] _expectedBucketIds1 = [1, 2];
+    private static readonly int[] _expectedBucketIds2 = [3, 4];
 
     [Fact]
     public void BuildBuckets_GroupsPadsByRelativeTolerance()
@@ -25,8 +25,8 @@ public sealed class CadAreaBucketServiceTests
         var buckets = CadAreaBucketService.BuildBuckets(pads, 0.001);
 
         Assert.Equal(2, buckets.Count);
-        Assert.Equal(ExpectedBucketIds1, buckets[0]);
-        Assert.Equal(ExpectedBucketIds2, buckets[1]);
+        Assert.Equal(_expectedBucketIds1, buckets[0]);
+        Assert.Equal(_expectedBucketIds2, buckets[1]);
     }
 
     [Fact]

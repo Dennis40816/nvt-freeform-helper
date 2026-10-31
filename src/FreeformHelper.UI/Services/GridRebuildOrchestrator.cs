@@ -11,7 +11,7 @@ namespace FreeformHelper.UI.Services;
 /// </summary>
 public sealed class GridRebuildOrchestrator
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private readonly GridBuildService _gridBuildService;
 
     public GridRebuildOrchestrator(GridBuildService gridBuildService)
@@ -108,7 +108,7 @@ public sealed class GridRebuildOrchestrator
                 request.Settings.XChannels,
                 request.Settings.YChannels,
                 request.Settings.CascadeNum);
-            Logger.Warn(CultureInfo.InvariantCulture, "DXF regular source mismatch. {0}", mismatchHint);
+            _logger.Warn(CultureInfo.InvariantCulture, "DXF regular source mismatch. {0}", mismatchHint);
             return GridRebuildBuildResult.Failed(
                 $"DXF regular source mismatch. {mismatchHint}",
                 $"Regular source count mismatch.\n{mismatchHint}",
@@ -124,7 +124,7 @@ public sealed class GridRebuildOrchestrator
         }
         catch (InvalidOperationException ex)
         {
-            Logger.Warn(CultureInfo.InvariantCulture, "DXF regular source build skipped: {0}", ex.Message);
+            _logger.Warn(CultureInfo.InvariantCulture, "DXF regular source build skipped: {0}", ex.Message);
             var mismatchHint = BuildDxfRegularSourceMismatchHint(
                 layerPads.Count,
                 request.Settings.XChannels,
@@ -147,7 +147,7 @@ public sealed class GridRebuildOrchestrator
             cadForBuild is not null &&
             cadForBuild.Pads.Count == 0)
         {
-            Logger.Info(CultureInfo.InvariantCulture, "Grid build skipped: no CAD output pads for bounds.");
+            _logger.Info(CultureInfo.InvariantCulture, "Grid build skipped: no CAD output pads for bounds.");
             return GridRebuildBuildResult.Failed(
                 "No visible DXF pads (all layers off).",
                 "No visible DXF pads.\nTurn on a layer.");
@@ -159,7 +159,7 @@ public sealed class GridRebuildOrchestrator
         {
             effectiveAlignmentMode = GridAlignmentMode.FromPanelAa;
             postBuildStatus = "Ready (DXF not loaded; using panel AA alignment).";
-            Logger.Info(CultureInfo.InvariantCulture, "Grid alignment fallback: DXF bounds requested but no DXF loaded.");
+            _logger.Info(CultureInfo.InvariantCulture, "Grid alignment fallback: DXF bounds requested but no DXF loaded.");
         }
 
         var gridResult = _gridBuildService.Build(cadForBuild, request.Settings, effectiveAlignmentMode);

@@ -5,15 +5,15 @@ namespace FreeformHelper.Tests;
 
 public sealed class CadOutputFwDiffIndexShiftServiceTests
 {
-    private static readonly int[] SelectedCad23 = [2, 3];
-    private static readonly int[] SelectedCad2 = [2];
-    private static readonly int[] SelectedCad1 = [1];
+    private static readonly int[] _selectedCad23 = [2, 3];
+    private static readonly int[] _selectedCad2 = [2];
+    private static readonly int[] _selectedCad1 = [1];
 
     [Fact]
     public void BuildShiftPlan_ShiftsSelectedCadIdsBySharedOffset()
     {
         var result = CadOutputFwDiffIndexShiftService.BuildShiftPlan(
-            selectedCadIds: SelectedCad23,
+            selectedCadIds: _selectedCad23,
             currentCadOutputFwDiffByCadId: new Dictionary<int, int>
             {
                 [1] = 10,
@@ -39,7 +39,7 @@ public sealed class CadOutputFwDiffIndexShiftServiceTests
     public void BuildShiftPlan_BlocksWhenShiftCreatesDuplicateDiffInsideSameIc()
     {
         var result = CadOutputFwDiffIndexShiftService.BuildShiftPlan(
-            selectedCadIds: SelectedCad2,
+            selectedCadIds: _selectedCad2,
             currentCadOutputFwDiffByCadId: new Dictionary<int, int>
             {
                 [1] = 10,
@@ -61,7 +61,7 @@ public sealed class CadOutputFwDiffIndexShiftServiceTests
     public void BuildShiftPlan_BlocksWhenShiftMovesBelowZero()
     {
         var result = CadOutputFwDiffIndexShiftService.BuildShiftPlan(
-            selectedCadIds: SelectedCad1,
+            selectedCadIds: _selectedCad1,
             currentCadOutputFwDiffByCadId: new Dictionary<int, int>
             {
                 [1] = 0,

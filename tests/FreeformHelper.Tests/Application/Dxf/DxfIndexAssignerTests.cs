@@ -8,8 +8,8 @@ namespace FreeformHelper.Tests;
 
 public sealed class DxfIndexAssignerTests
 {
-    private static readonly int[] ExpectedRightToLeftOrder = [1, 2];
-    private static readonly int[] ExpectedLeftToRightOrder = [3, 4, 1, 2];
+    private static readonly int[] _expectedRightToLeftOrder = [1, 2];
+    private static readonly int[] _expectedLeftToRightOrder = [3, 4, 1, 2];
 
     [Fact]
     public void OrderPads_RespectsColumnLocalRowHeights_WhenAssigningScanRows()
@@ -43,7 +43,7 @@ public sealed class DxfIndexAssignerTests
             grid,
             ScanOrder.RightToLeft_TopToBottom);
 
-        Assert.Equal(ExpectedRightToLeftOrder, ordered.Select(p => p.Id).ToArray());
+        Assert.Equal(_expectedRightToLeftOrder, ordered.Select(p => p.Id).ToArray());
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public sealed class DxfIndexAssignerTests
             grid,
             ScanOrder.LeftToRight_TopToBottom);
 
-        Assert.Equal(ExpectedLeftToRightOrder, ordered.Select(p => p.Id).ToArray());
+        Assert.Equal(_expectedLeftToRightOrder, ordered.Select(p => p.Id).ToArray());
     }
 
     private static CadPad CreateCadPad(int id, double x0, double y0, double x1, double y1)

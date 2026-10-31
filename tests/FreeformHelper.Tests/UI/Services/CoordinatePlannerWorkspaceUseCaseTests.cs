@@ -6,7 +6,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class CoordinatePlannerWorkspaceUseCaseTests
 {
-    private static readonly string[] AaAndSignalLayerNames = ["AA", "SIG"];
+    private static readonly string[] _aaAndSignalLayerNames = ["AA", "SIG"];
 
     [Fact]
     public void BuildSnapshot_WhenOutlineLayerSelected_UsesThatLayerBounds()
@@ -18,7 +18,7 @@ public sealed class CoordinatePlannerWorkspaceUseCaseTests
                 TestGeometryFactory.CreateCadPad(1, "AA", 10d, 20d, 110d, 220d, name: "AA_BOX"),
                 TestGeometryFactory.CreateCadPad(2, "SIG", 40d, 60d, 70d, 90d, name: "OTHER"),
             },
-            AaAndSignalLayerNames,
+            _aaAndSignalLayerNames,
             SourceRevision: 0,
             DefaultMachineWidth: 100d,
             DefaultMachineHeight: 200d,
@@ -68,7 +68,7 @@ public sealed class CoordinatePlannerWorkspaceUseCaseTests
             {
                 TestGeometryFactory.CreateCadPad(1, "SIG", 10d, 20d, 110d, 220d, name: "SIG_BOX"),
             },
-            AaAndSignalLayerNames,
+            _aaAndSignalLayerNames,
             SourceRevision: 0,
             DefaultMachineWidth: 100d,
             DefaultMachineHeight: 200d,
@@ -101,7 +101,7 @@ public sealed class CoordinatePlannerWorkspaceUseCaseTests
             {
                 TestGeometryFactory.CreateCadPad(1, "SIG", 10d, 20d, 110d, 220d, name: "SIG_BOX"),
             },
-            AaAndSignalLayerNames,
+            _aaAndSignalLayerNames,
             SourceRevision: 0,
             DefaultMachineWidth: 100d,
             DefaultMachineHeight: 200d,
@@ -134,7 +134,7 @@ public sealed class CoordinatePlannerWorkspaceUseCaseTests
             {
                 TestGeometryFactory.CreateCadPad(1, "AA", 10d, 20d, 110d, 220d, name: "AA_BOX"),
             },
-            AaAndSignalLayerNames,
+            _aaAndSignalLayerNames,
             SourceRevision: 0,
             DefaultMachineWidth: 100d,
             DefaultMachineHeight: 200d,

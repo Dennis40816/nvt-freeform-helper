@@ -9,12 +9,12 @@ namespace FreeformHelper.Tests;
 
 public sealed class PadMatchOverlapContractTests
 {
-    private static readonly double[] ExpectedBestMatchScores = { 1.0, 1.0, 0.0 };
-    private static readonly int[] ExpectedTiedRegularIds = { 30, 20 };
-    private static readonly double[] ExpectedReplacementScores = { 0.5, 0.0 };
-    private static readonly double[] ExpectedEmptyGridProgress = { 0.0, 1.0 };
-    private static readonly double[] ExpectedEmptyCadProgress = { 0, 0.925, 1, 1 };
-    private static readonly double[] UnitYEdges = { 0.0, 1.0 };
+    private static readonly double[] _expectedBestMatchScores = { 1.0, 1.0, 0.0 };
+    private static readonly int[] _expectedTiedRegularIds = { 30, 20 };
+    private static readonly double[] _expectedReplacementScores = { 0.5, 0.0 };
+    private static readonly double[] _expectedEmptyGridProgress = { 0.0, 1.0 };
+    private static readonly double[] _expectedEmptyCadProgress = { 0, 0.925, 1, 1 };
+    private static readonly double[] _unitYEdges = { 0.0, 1.0 };
 
     [Theory]
     [InlineData(false)]
@@ -58,7 +58,7 @@ public sealed class PadMatchOverlapContractTests
         Assert.Equal(new[] { expected[2], expected[1] }, result.RegularToCad[20]);
         Assert.Equal(new PadMatchTelemetry(3, 6, 5, 4, 2, 3), result.Telemetry);
         Assert.Equal(new int?[] { 201, 202, null }, grid.Pads.Select(pad => pad.MatchedCadPadId));
-        Assert.Equal(ExpectedBestMatchScores, grid.Pads.Select(pad => pad.MatchScore));
+        Assert.Equal(_expectedBestMatchScores, grid.Pads.Select(pad => pad.MatchScore));
         Assert.All(grid.Pads, pad =>
         {
             Assert.Equal(7, pad.IcIndex);
@@ -136,7 +136,7 @@ public sealed class PadMatchOverlapContractTests
         var result = PadMatcher.Match(cad, grid);
 
         Assert.All(result.CadToRegular.Values, links =>
-            Assert.Equal(ExpectedTiedRegularIds, links.Select(link => link.RegularPadId)));
+            Assert.Equal(_expectedTiedRegularIds, links.Select(link => link.RegularPadId)));
         Assert.All(result.RegularToCad.Values, links =>
             Assert.Equal(new[] { firstCadId, secondCadId }, links.Select(link => link.CadPadId)));
         Assert.All(grid.Pads, pad =>
@@ -238,7 +238,7 @@ public sealed class PadMatchOverlapContractTests
         Assert.Equal(201, previous.RegularToCad[30][0].CadPadId);
         Assert.Equal(new PadMatchLink(202, 30, 0.5, 0.5, 1), Assert.Single(current.Links));
         Assert.Equal(new int?[] { 202, null }, grid.Pads.Select(pad => pad.MatchedCadPadId));
-        Assert.Equal(ExpectedReplacementScores, grid.Pads.Select(pad => pad.MatchScore));
+        Assert.Equal(_expectedReplacementScores, grid.Pads.Select(pad => pad.MatchScore));
     }
 
     [Theory]
@@ -267,7 +267,7 @@ public sealed class PadMatchOverlapContractTests
             Assert.Null(pad.MatchedCadPadId);
             Assert.Equal(0, pad.MatchScore);
         });
-        AssertProgress(emptyGrid ? ExpectedEmptyGridProgress : ExpectedEmptyCadProgress, progress);
+        AssertProgress(emptyGrid ? _expectedEmptyGridProgress : _expectedEmptyCadProgress, progress);
     }
 
     [Fact]
@@ -301,7 +301,7 @@ public sealed class PadMatchOverlapContractTests
         var pads = Enumerable.Range(0, xEdges.Length - 1)
             .Select(col => new RegularPad(0, col, 30 - (10 * col), CreateRectangle(xEdges[col], 0, xEdges[col + 1], 1)))
             .ToArray();
-        return new RegularGrid(1, pads.Length, xEdges, UnitYEdges, pads);
+        return new RegularGrid(1, pads.Length, xEdges, _unitYEdges, pads);
     }
 
     private static CadPad CreateCad(int id, double minX, double minY, double maxX, double maxY)

@@ -7,16 +7,16 @@ namespace FreeformHelper.Tests;
 
 public sealed class RegularGridCandidateQueryTests
 {
-    private static readonly double[] Uniform10x2 = [10.0, 10.0];
-    private static readonly double[] Uniform10x3 = [10.0, 10.0, 10.0];
-    private static readonly double[] IrregularWidths = [8.0, 12.0, 5.0, 20.0];
-    private static readonly double[] IrregularHeights = [6.0, 14.0, 9.0];
-    private static readonly int[] IntersectingIndices = [0, 1, 3, 4];
+    private static readonly double[] _uniform10x2 = [10.0, 10.0];
+    private static readonly double[] _uniform10x3 = [10.0, 10.0, 10.0];
+    private static readonly double[] _irregularWidths = [8.0, 12.0, 5.0, 20.0];
+    private static readonly double[] _irregularHeights = [6.0, 14.0, 9.0];
+    private static readonly int[] _intersectingIndices = [0, 1, 3, 4];
 
     [Fact]
     public void QueryByBounds_ReturnsOnlyIntersectingPads()
     {
-        var grid = CreateGrid(widths: Uniform10x3, heights: Uniform10x3);
+        var grid = CreateGrid(widths: _uniform10x3, heights: _uniform10x3);
         var rect = new Rect2(5, 5, 15, 15);
 
         var result = RegularGridCandidateQuery.QueryByBounds(grid, rect)
@@ -24,13 +24,13 @@ public sealed class RegularGridCandidateQueryTests
             .OrderBy(static index => index)
             .ToArray();
 
-        Assert.Equal(IntersectingIndices, result);
+        Assert.Equal(_intersectingIndices, result);
     }
 
     [Fact]
     public void QueryByBounds_WhenOutsideGrid_ReturnsEmpty()
     {
-        var grid = CreateGrid(widths: Uniform10x2, heights: Uniform10x2);
+        var grid = CreateGrid(widths: _uniform10x2, heights: _uniform10x2);
         var rect = new Rect2(100, 100, 120, 120);
 
         var result = RegularGridCandidateQuery.QueryByBounds(grid, rect).ToArray();
@@ -41,7 +41,7 @@ public sealed class RegularGridCandidateQueryTests
     [Fact]
     public void QueryByBounds_MatchesLinearScan_ForIrregularCellSizes()
     {
-        var grid = CreateGrid(widths: IrregularWidths, heights: IrregularHeights);
+        var grid = CreateGrid(widths: _irregularWidths, heights: _irregularHeights);
         var rect = new Rect2(7, 4, 30, 20);
 
         var indexed = RegularGridCandidateQuery.QueryByBounds(grid, rect)
@@ -60,7 +60,7 @@ public sealed class RegularGridCandidateQueryTests
     [Fact]
     public void GetCandidateRange_IncludesPaddingAndClampsToGrid()
     {
-        var grid = CreateGrid(widths: Uniform10x3, heights: Uniform10x3);
+        var grid = CreateGrid(widths: _uniform10x3, heights: _uniform10x3);
         var rect = new Rect2(11, 11, 12, 12);
 
         var range = RegularGridCandidateQuery.GetCandidateRange(grid, rect, padding: 1);

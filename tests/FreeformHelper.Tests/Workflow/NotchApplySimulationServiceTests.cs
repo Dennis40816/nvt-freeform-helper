@@ -9,20 +9,20 @@ namespace FreeformHelper.Tests;
 public sealed class NotchApplySimulationServiceTests
 {
     private const int NullDiffValue = 65535;
-    private static readonly int[] DiffIndices3 = { 10, 11, 12 };
-    private static readonly int[] DiffIndices4 = { 10, 11, 12, 13 };
-    private static readonly int[] DiffIndices2 = { 10, 11 };
-    private static readonly int[] DiffIndicesDuplicate = { 10, 10, 11 };
-    private static readonly int[] ContinuationSourceRows = [1, 2];
-    private static readonly int[] SuppressedDuplicateRegularPadIds = [1];
-    private static readonly int[] V21CanonicalMainPayload = [10, 120, 120, 11, 1, 77, 12, 1, 26];
-    private static readonly int[] V21CanonicalContinuationPayload = [10, 100, 100, 13, 1, 13, NullDiffValue, 0, 0];
-    private static readonly int[] V21LegacySamplePayload = [10, 127, 94, 11, 1, 56, NullDiffValue, 0, 0];
+    private static readonly int[] _diffIndices3 = { 10, 11, 12 };
+    private static readonly int[] _diffIndices4 = { 10, 11, 12, 13 };
+    private static readonly int[] _diffIndices2 = { 10, 11 };
+    private static readonly int[] _diffIndicesDuplicate = { 10, 10, 11 };
+    private static readonly int[] _continuationSourceRows = [1, 2];
+    private static readonly int[] _suppressedDuplicateRegularPadIds = [1];
+    private static readonly int[] _v21CanonicalMainPayload = [10, 120, 120, 11, 1, 77, 12, 1, 26];
+    private static readonly int[] _v21CanonicalContinuationPayload = [10, 100, 100, 13, 1, 13, NullDiffValue, 0, 0];
+    private static readonly int[] _v21LegacySamplePayload = [10, 127, 94, 11, 1, 56, NullDiffValue, 0, 0];
 
     [Fact]
     public void Simulate_WhenV22RowExists_TransformsAnchorAndTargetUsingCombinePayload()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndices3);
+        var grid = BuildLinearGrid(diffIndices: _diffIndices3);
         var projection = CreateProjection(grid, 100d, 50d, 25d);
         var frames = new[] { projection };
         var table = new NotchTable(new[]
@@ -67,7 +67,7 @@ public sealed class NotchApplySimulationServiceTests
     [Fact]
     public void Simulate_WhenV22ContinuationRowsExist_MergesAllLegsIntoSingleAnchorAction()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndices4);
+        var grid = BuildLinearGrid(diffIndices: _diffIndices4);
         var projection = CreateProjection(grid, 100d, 0d, 0d, 0d);
         var frames = new[] { projection };
         var table = new NotchTable(new NotchTableRow[]
@@ -105,7 +105,7 @@ public sealed class NotchApplySimulationServiceTests
             cell => Assert.Equal((13, 10d), (cell.DiffIndex, cell.AfterValue)));
 
         var action = Assert.Single(result.Actions);
-        Assert.Equal(ContinuationSourceRows, action.SourceRowNumbers);
+        Assert.Equal(_continuationSourceRows, action.SourceRowNumbers);
         Assert.Equal((0, 10, 0, 490), (action.IcIndex, action.AnchorDiffIndex, action.RegularPadId, action.CadPadId));
         Assert.Equal((120, 40, 100d, 40d),
             (action.CombinePercent, action.SourceRetainedPercent, action.SourceBeforeValue, action.SourceAfterValue));
@@ -118,7 +118,7 @@ public sealed class NotchApplySimulationServiceTests
     [Fact]
     public void Simulate_WhenCanonicalContinuationRowsAreProjected_PreservesEachFirmwareContract()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndices4);
+        var grid = BuildLinearGrid(diffIndices: _diffIndices4);
         var projection = CreateProjection(grid, 100d, 0d, 0d, 0d);
         var frames = new[] { projection };
         var v22Table = new NotchTable(new NotchTableRow[]
@@ -146,7 +146,7 @@ public sealed class NotchApplySimulationServiceTests
                 diffIndex: 10,
                 regularPadIndex: 0,
                 cadPadId: 490,
-                values: V21CanonicalMainPayload,
+                values: _v21CanonicalMainPayload,
                 comment: "MAIN"),
             new(
                 NotchAlgorithmVersion.V21,
@@ -154,7 +154,7 @@ public sealed class NotchApplySimulationServiceTests
                 diffIndex: 10,
                 regularPadIndex: 0,
                 cadPadId: 490,
-                values: V21CanonicalContinuationPayload,
+                values: _v21CanonicalContinuationPayload,
                 comment: "CONT")
         });
 
@@ -188,7 +188,7 @@ public sealed class NotchApplySimulationServiceTests
     [Fact]
     public void Simulate_WhenMeanAggregationRequested_AveragesProjectedFramesBeforeApplyingRows()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndices2);
+        var grid = BuildLinearGrid(diffIndices: _diffIndices2);
         var projectionA = CreateProjection(grid, 10d, 20d);
         var projectionB = CreateProjection(grid, 30d, 40d);
         var frames = new[] { projectionA, projectionB };
@@ -225,7 +225,7 @@ public sealed class NotchApplySimulationServiceTests
     [Fact]
     public void Simulate_WhenVersionIsV21_UsesProjectedCanonicalContract()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndices2);
+        var grid = BuildLinearGrid(diffIndices: _diffIndices2);
         var projection = CreateProjection(grid, 100d, 50d);
         var frames = new[] { projection };
         var table = new NotchTable(new[]
@@ -236,7 +236,7 @@ public sealed class NotchApplySimulationServiceTests
                 diffIndex: 10,
                 regularPadIndex: 0,
                 cadPadId: 313,
-                values: V21LegacySamplePayload,
+                values: _v21LegacySamplePayload,
                 comment: "legacy sample")
         });
 
@@ -477,7 +477,7 @@ public sealed class NotchApplySimulationServiceTests
     [Fact]
     public void Simulate_WhenActiveSurfaceContainsDuplicateDiffKey_DoesNotThrowAndWritesDiagnostics()
     {
-        var grid = BuildLinearGrid(diffIndices: DiffIndicesDuplicate);
+        var grid = BuildLinearGrid(diffIndices: _diffIndicesDuplicate);
         var projection = CreateProjection(grid, 120d, 80d, 30d);
         var frames = new[] { projection };
         var table = new NotchTable(new[]
@@ -507,7 +507,7 @@ public sealed class NotchApplySimulationServiceTests
         var duplicate = Assert.Single(result.DiffIdentityContract.DuplicateResolutions);
         Assert.Equal((0, 10), (duplicate.IcIndex, duplicate.DiffIndex));
         Assert.Equal(0, duplicate.PrimaryRegularPadId);
-        Assert.Equal(SuppressedDuplicateRegularPadIds, duplicate.SuppressedRegularPadIds);
+        Assert.Equal(_suppressedDuplicateRegularPadIds, duplicate.SuppressedRegularPadIds);
         Assert.Equal(NotchApplySimulationDuplicateDiffResolutionStrategy.MergeSumActiveRegularPads, duplicate.Strategy);
         Assert.All(
             result.Cells.Where(static cell => cell.DiffIndex == 10),

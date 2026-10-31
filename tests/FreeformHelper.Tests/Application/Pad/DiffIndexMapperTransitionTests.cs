@@ -8,7 +8,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class DiffIndexMapperTransitionTests
 {
-    private static readonly int[] UnequalIcIndices = { 0, 0, 1, 1, 1, 0, 0, 1, 1, 1 };
+    private static readonly int[] _unequalIcIndices = { 0, 0, 1, 1, 1, 0, 0, 1, 1, 1 };
 
     [Theory]
     [InlineData(ScanOrder.LeftToRight_TopToBottom, new[] { 2, 3, 3, 4, 5, 0, 1, 0, 1, 2 })]
@@ -25,7 +25,7 @@ public sealed class DiffIndexMapperTransitionTests
 
         DiffIndexMapper.ApplyMapping(grid, settings);
 
-        AssertMapping(grid, UnequalIcIndices, expectedDiffIndices);
+        AssertMapping(grid, _unequalIcIndices, expectedDiffIndices);
         Assert.Equal(otherState, grid.Pads.Select(pad => (pad.MatchedCadPadId, pad.MatchScore, pad.Freeform)));
     }
 
@@ -37,7 +37,7 @@ public sealed class DiffIndexMapperTransitionTests
         var settings = CreateSettings(ScanOrder.LeftToRight_BottomToTop);
         DiffIndexMapper.ApplyMapping(grid, settings);
         var initialDiffIndices = new[] { 0, 1, 0, 1, 2, 2, 3, 3, 4, 5 };
-        AssertMapping(grid, UnequalIcIndices, initialDiffIndices);
+        AssertMapping(grid, _unequalIcIndices, initialDiffIndices);
 
         settings.PerIcXChannels = new List<int> { 3, 2 };
         settings.ScanOrder = ScanOrder.RightToLeft_TopToBottom;

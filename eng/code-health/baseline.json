@@ -6561,220 +6561,10 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "768bba2f84e00da6846d426c8c216baa2ac4118bf50ef1f10a16e40a44412e49",
-      "member": "FreeformHelper.Tests.CadAreaBucketServiceTests.fields:ExpectedBucketIds1",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/CadAreaBucketServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "e522d9078fe62f0affbed5b1af1f67b4aabfd76594751287c7860f467ce44d3b",
-      "member": "FreeformHelper.Tests.CadAreaBucketServiceTests.fields:ExpectedBucketIds2",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/CadAreaBucketServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "e93d845992e1a52f873986787c4ad72d3e9968c7a5ba4a274f905631a906abab",
       "member": "FreeformHelper.Tests.CadLoadUseCaseTests.fields:ValidEmbeddedDxfBytes",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/Application/Cad/CadLoadUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "96d8a30fb2804ca196819a8fbe9b5df60a927fa706fc01182837903446005bcf",
-      "member": "FreeformHelper.Tests.CadOutputFwDiffIndexShiftServiceTests.fields:SelectedCad1",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/CadOutputFwDiffIndexShiftServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "48546703cb8df1c2579786386fe90157d16850ec98572ca16a5aa173e6da8fd5",
-      "member": "FreeformHelper.Tests.CadOutputFwDiffIndexShiftServiceTests.fields:SelectedCad2",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/CadOutputFwDiffIndexShiftServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "33e319760cd19a496661dfc52ae10fb12cf77611e7a1b832a89e9efc9c273e76",
-      "member": "FreeformHelper.Tests.CadOutputFwDiffIndexShiftServiceTests.fields:SelectedCad23",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/CadOutputFwDiffIndexShiftServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "5decfd28cd19fbd6438e281999a3787df3f410bbb22e9edfd51c289108069ecb",
-      "member": "FreeformHelper.Tests.CoordinatePlannerActiveAreaResolverTests.fields:FallbackLayerNames",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CoordinatePlannerActiveAreaResolverTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "b1a6a4d577582c0f5d98ce26028c02588d7f6a677911171895d8585735677768",
-      "member": "FreeformHelper.Tests.CoordinatePlannerActiveAreaResolverTests.fields:PreferredLayerNames",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CoordinatePlannerActiveAreaResolverTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "587068b2d124dead5901cd38a1157fa172e21a8598ec22d7e02230ef6903a492",
-      "member": "FreeformHelper.Tests.CoordinatePlannerActiveAreaResolverTests.fields:SessionLayerNames",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CoordinatePlannerActiveAreaResolverTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "02019da977da92e7c17409ca98ca19905a9e9889b4dd424582b9cdb666810a33",
-      "member": "FreeformHelper.Tests.CoordinatePlannerWorkspaceUseCaseTests.fields:AaAndSignalLayerNames",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CoordinatePlannerWorkspaceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "7180e880d6725e0c087ba758cd2a21806c0e04e13ffb44b17fbc85f3847ce4af",
-      "member": "FreeformHelper.Tests.CoordinatePlannerWorkspaceViewModelTests.fields:CoordinateLayerNames",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/CoordinatePlannerWorkspaceViewModelTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "7e9668d7d9d73e6d286fd81afca04af32aa0757193fcb1a76e9b7d6b961ffc70",
-      "member": "FreeformHelper.Tests.CopperPillarPathReplayArtifactServiceTests.fields:SampleDiagnostics",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Services/CopperPillarPathReplayArtifactServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "f1a79c7a4ac3eb197d0a166bf9dbef94741a3ee49a922be2ca885d92d909bc37",
-      "member": "FreeformHelper.Tests.DiffIndexMapperTransitionTests.fields:UnequalIcIndices",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Pad/DiffIndexMapperTransitionTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "2e5476dec5677e369a8e23e1230ad81fd0f1edc334743b42924327e13c64722e",
-      "member": "FreeformHelper.Tests.DxfEditChangeListViewModelTests.fields:AppliedHiddenCadIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/DxfEditChangeListViewModelTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "598ea408496980383881f58d2997ca82aa7b0a3a29efe0f8eb37ee2ce1649189",
-      "member": "FreeformHelper.Tests.DxfEditChangeListViewModelTests.fields:RehiddenDuplicateCadIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/DxfEditChangeListViewModelTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "8b914570104f65513def1490de123e7fd5ea91d7eb45acff0a6f1468a20e3a27",
-      "member": "FreeformHelper.Tests.DxfEditChangeListViewModelTests.fields:RestoredDuplicateCadIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/DxfEditChangeListViewModelTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "c310dcdf8ce8ac0cc9e7c25f1fbf2e333710633348bf2ae92f4a418f9f20992e",
-      "member": "FreeformHelper.Tests.DxfIndexAssignerTests.fields:ExpectedLeftToRightOrder",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfIndexAssignerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "0c27e4e01f60e0d9e0e8a45867126e5373b3322a3a63a4d7aa992fa952968770",
-      "member": "FreeformHelper.Tests.DxfIndexAssignerTests.fields:ExpectedRightToLeftOrder",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfIndexAssignerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "23d1ee9fe873e8e0c3900bdb763b72f665b3996cda39ca5030689bcb8ee3e469",
-      "member": "FreeformHelper.Tests.DxfManualOverrideIdentityContractTests.fields:ExpectedProgress",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfManualOverrideIdentityContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "a592ca2c48414a0ac966915faa1f04130d4b44dcb2d219cba16da6fc54a7d63a",
-      "member": "FreeformHelper.Tests.DxfManualOverrideIdentityContractTests.fields:OneCellEdges",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfManualOverrideIdentityContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "dc3267a238aa1e9668097ea4e7c539d6ce3bd458ec807a9edb3a1df0f3396975",
-      "member": "FreeformHelper.Tests.DxfManualOverrideIdentityContractTests.fields:TwoCellEdges",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfManualOverrideIdentityContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "f0145ffaa88376a0eb4886f2642ee07f9ad9eb1fe9958a67044eb8c18fb09390",
-      "member": "FreeformHelper.Tests.DxfManualOverrideIdentityContractTests.fields:UnsortedIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfManualOverrideIdentityContractTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "IDE1006",
@@ -7121,26 +6911,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "7a8c2b75a45a6df8abeb0a9d35f9da9815300b7abc9472df47f7964ddfda8ce9",
-      "member": "FreeformHelper.Tests.MatchingBoundedContextContractTests.fields:XEdges",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/MatchingBoundedContextContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "4ecdfc0f6eecce4ca11c5d5ee9d3ee0c1f125f5ec2c86fe78325ac5017c0717e",
-      "member": "FreeformHelper.Tests.MatchingBoundedContextContractTests.fields:YEdges",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/MatchingBoundedContextContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "866589f88022628efe540353da9193588ac766b4306a277ec5c9938a80698adf",
       "member": "FreeformHelper.Tests.Notch3635GenerationBenchmarkTests.fields:JsonOptions",
       "owner": "NFH",
@@ -7165,186 +6935,6 @@
       "member": "FreeformHelper.Tests.NotchApplySimulationReviewUseCaseTests.fields:V21LegacyValues",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationReviewUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "70c9eb4a73b12968c8a335c99068adc68a3ffb028a4afdc0c94cc02813ed6e63",
-      "member": "FreeformHelper.Tests.NotchApplySimulationServiceTests.fields:ContinuationSourceRows",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "83fe6760b97a2283cb23a2e074dd8af90cb6675010e20465e82584eb98daa6be",
-      "member": "FreeformHelper.Tests.NotchApplySimulationServiceTests.fields:DiffIndices2",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "cfbca0f80389d2d6020c273fd0d9597f8cc37c3dbf6926c553be7c1c0c318663",
-      "member": "FreeformHelper.Tests.NotchApplySimulationServiceTests.fields:DiffIndices3",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "dfe45e4d9e975bf1a095304beaffafaefa42e6be67046847825481462875cabc",
-      "member": "FreeformHelper.Tests.NotchApplySimulationServiceTests.fields:DiffIndices4",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "7406fa189b5194e8cfcd21603987338e6aaed98e8c4494770e2aff03272a2c4f",
-      "member": "FreeformHelper.Tests.NotchApplySimulationServiceTests.fields:DiffIndicesDuplicate",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "0941af1295791d00d1e1cef69cfed52b247fb2d474a4f3cdd49fdd0e359dfad2",
-      "member": "FreeformHelper.Tests.NotchApplySimulationServiceTests.fields:SuppressedDuplicateRegularPadIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "2bd662027f09c2e06d0f7eb161e3729e444e09e6254dd04b1aa25356b925527c",
-      "member": "FreeformHelper.Tests.NotchApplySimulationServiceTests.fields:V21CanonicalContinuationPayload",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "183c3b75c0935118023144cefd55632cd59956bda26d084826b45c998c8b7f82",
-      "member": "FreeformHelper.Tests.NotchApplySimulationServiceTests.fields:V21CanonicalMainPayload",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9567c01664cb4f9c9b550bce04cbf923a825bda14dd4fdb27605525967c4b0bd",
-      "member": "FreeformHelper.Tests.NotchApplySimulationServiceTests.fields:V21LegacySamplePayload",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "11b64f61822205aca8ce7186f3f01c8391c3406dca382dd35f08ae8f66a1a23a",
-      "member": "FreeformHelper.Tests.NotchCadOutputFwDiffProjectionServiceTests.fields:CadPadIds200201",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchCadOutputFwDiffProjectionServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "fbdade606714bf733b9db567ff66c5b97b69dd0e5b78b39be76ce06c6d5de6ca",
-      "member": "FreeformHelper.Tests.NotchCadOutputFwDiffProjectionServiceTests.fields:DiffIndices101112",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchCadOutputFwDiffProjectionServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "dd0ea481fc5d80b14762e7d1efe223626d12c0dbc494ad596dac2ef8fe48347c",
-      "member": "FreeformHelper.Tests.NotchCadOutputFwDiffProjectionServiceTests.fields:DiffIndices2021",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchCadOutputFwDiffProjectionServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "a5c04d749839c0a6b15de49ffe21fc311ba0df425462285b69387a99607c9a89",
-      "member": "FreeformHelper.Tests.NotchCadOutputFwDiffProjectionServiceTests.fields:ProjectedAnchorDiffs101213",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchCadOutputFwDiffProjectionServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "e38c49b670ed00d6ce6ce40677ad307410320fdd91634e05102fb0aa6fcbf935",
-      "member": "FreeformHelper.Tests.NotchCadOutputFwDiffProjectionServiceTests.fields:RowValues10",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchCadOutputFwDiffProjectionServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "f1d3f4d440f73165652cd636d2aeec7ee6bd61e3693a8558f0d2a0fffca67657",
-      "member": "FreeformHelper.Tests.NotchCadOutputFwDiffProjectionServiceTests.fields:RowValues11",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchCadOutputFwDiffProjectionServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "6fb9a3788a430ea80e6ad4ffc4ed8907f3ed849acea9190255fde9d79b9d9ce8",
-      "member": "FreeformHelper.Tests.NotchCadOutputFwDiffProjectionServiceTests.fields:RowValues12",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchCadOutputFwDiffProjectionServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "1307b4e58bbda4a9958079deaceaf2aa6e255281c09238fc070c2a2590ae0514",
-      "member": "FreeformHelper.Tests.NotchDiffIdentityPipelineTests.fields:DiffIndicesDuplicate",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchDiffIdentityPipelineTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "63ed6d5b3438103e371fd5af895f8936ad4c53bf1c3b36ddffa78015b254aea2",
-      "member": "FreeformHelper.Tests.NotchDiffIdentityPipelineTests.fields:SuppressedRegularPads",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchDiffIdentityPipelineTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "IDE1006",
@@ -7425,26 +7015,6 @@
       "member": "FreeformHelper.Tests.NotchExportSelectionProjectionBuilderTests.fields:WorkspaceCadIds",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Services/NotchExportSelectionProjectionBuilderTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "d88166737ecd0f0fc0be80535c8f136e3e35e17719d2be611902e29c5e7bbb30",
-      "member": "FreeformHelper.Tests.NotchExportSelectionRowSelectionServiceTests.fields:LegacyRowPayload",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/NotchExportSelectionRowSelectionServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "d88166737ecd0f0fc0be80535c8f136e3e35e17719d2be611902e29c5e7bbb30",
-      "member": "FreeformHelper.Tests.NotchExportSelectionSummaryProjectorTests.fields:LegacyRowPayload",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/NotchExportSelectionSummaryProjectorTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "IDE1006",
@@ -7555,36 +7125,6 @@
       "member": "FreeformHelper.Tests.NotchExportSelectionViewModelTests.fields:WorkspaceCad201",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/ViewModels/NotchExportSelectionViewModelTests.RowsAndWorkspace.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "32c3678e04d64752f15bd400ca9c887e0fa66570ee89cbc27bc7e5ca0b54c465",
-      "member": "FreeformHelper.Tests.NotchExportSelectionWindowSmokeTests.fields:SmokeRowValues",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/NotchExportSelectionWindowSmokeTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9d87a64924b6b4abf86e0edf5f4790aa93d1ee8707222eff485d942e60680c35",
-      "member": "FreeformHelper.Tests.NotchExportSelectionWorkspaceLinkServiceTests.fields:LinkedWorkspaceCadIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/NotchExportSelectionWorkspaceLinkServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "f62d3ae2fa64e2078c1eab601e6683423d53bcb9347852351431893067c06170",
-      "member": "FreeformHelper.Tests.NotchExportSelectionWorkspaceLinkServiceTests.fields:MissingWorkspaceCadIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/NotchExportSelectionWorkspaceLinkServiceTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "IDE1006",
@@ -7831,116 +7371,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "5fe831e2787ca8f94c5f31326ba7533157bf1773cc2dd05079c02d48c93aa2b9",
-      "member": "FreeformHelper.Tests.NotchV22ResolvedResultServiceTests.fields:Grid10",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchV22ResolvedResultServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "95d2ce5f12e4acdaab230ee2559756c5d232097f0f9f0a81eb8cb03fc7ce885d",
-      "member": "FreeformHelper.Tests.NotchV22ResolvedResultServiceTests.fields:Grid10x2",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchV22ResolvedResultServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "28044625f3e84f90a84cf64f073d1c3146b4b256fbe135c9a0085ecc900498cf",
-      "member": "FreeformHelper.Tests.PadInfoViewModelTests.fields:MatchedRegularPadIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/PadInfoViewModelTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "015ae39b44ea0550bad233b2625faaa8522b507d24e92b03a4e10291ff8c9dea",
-      "member": "FreeformHelper.Tests.PadMatchOverlapContractTests.fields:ExpectedBestMatchScores",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Pad/PadMatchOverlapContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "44ed858a7170a546701b23e990991b833b25a2b667fef76801d697575b7173d7",
-      "member": "FreeformHelper.Tests.PadMatchOverlapContractTests.fields:ExpectedEmptyCadProgress",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Pad/PadMatchOverlapContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "0327f8d5c88f2e10493753c73983950b78499eee1844c7d5828d3786417ae94d",
-      "member": "FreeformHelper.Tests.PadMatchOverlapContractTests.fields:ExpectedEmptyGridProgress",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Pad/PadMatchOverlapContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "966e7ddecbaf786033d404706b09b01fedbfa250c02f4ae507ead5d08c92b6b5",
-      "member": "FreeformHelper.Tests.PadMatchOverlapContractTests.fields:ExpectedReplacementScores",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Pad/PadMatchOverlapContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "d71eef48a2794fa3b80152b8011f49043bb2500ceeb098da2deed601055d77df",
-      "member": "FreeformHelper.Tests.PadMatchOverlapContractTests.fields:ExpectedTiedRegularIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Pad/PadMatchOverlapContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "4b4d40590324ecc613e2b67729845ec019e10a7429580a63541286cd78ba4dc5",
-      "member": "FreeformHelper.Tests.PadMatchOverlapContractTests.fields:UnitYEdges",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Pad/PadMatchOverlapContractTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "eaf7b70a3b34a084dfef6f1755f6a618a1e831d859e96939403550ef029eef99",
-      "member": "FreeformHelper.Tests.PadOverrideServiceTests.fields:GridXEdges",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Pad/PadOverrideServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "2137c578ebf26402e38aea4a82dd05ee906f71e6e6ef24ecfe1931ab0708185b",
-      "member": "FreeformHelper.Tests.PadOverrideServiceTests.fields:GridYEdges",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Pad/PadOverrideServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "963f14361e902d08db4ccdf3620b86174aeef3beab66ce26ad52364ec625ed3f",
       "member": "FreeformHelper.Tests.ProjectLoadingSecondaryWindowTests.fields:AutoHiddenIds",
       "owner": "NFH",
@@ -7975,76 +7405,6 @@
       "member": "FreeformHelper.Tests.ProjectStoreTests.fields:ExpectedEnabledVersions",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/Application/Project/ProjectStoreTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "fb41363f31d6c03b216d66abf98133506b4b0c53e1f6b35425908076688ec72f",
-      "member": "FreeformHelper.Tests.RegularGridCandidateQueryTests.fields:IntersectingIndices",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Services/RegularGridCandidateQueryTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "e5366b22e307763fa57b283e08c5e29bb9abadc69ba8feca627ffa5013bc5444",
-      "member": "FreeformHelper.Tests.RegularGridCandidateQueryTests.fields:IrregularHeights",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Services/RegularGridCandidateQueryTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "bbcd6308ce34e4938be8e3b72e3f09dc21bb2ca3215289546eed727cdae46edf",
-      "member": "FreeformHelper.Tests.RegularGridCandidateQueryTests.fields:IrregularWidths",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Services/RegularGridCandidateQueryTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "df95dfcf1965b6e0bf0bc20f3824dd1d3f8fcd564f82b12577099c8df87d99dc",
-      "member": "FreeformHelper.Tests.RegularGridCandidateQueryTests.fields:Uniform10x2",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Services/RegularGridCandidateQueryTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "69e518ba30ab23267f76eb68408636f937d656ddfd882e522f3f5db2c16bc4ff",
-      "member": "FreeformHelper.Tests.RegularGridCandidateQueryTests.fields:Uniform10x3",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Services/RegularGridCandidateQueryTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "c4f4c057b457741aa50ae71e95d5555ad9155d51afe5a12f2bc7ba34c0fb085d",
-      "member": "FreeformHelper.Tests.RegularGridDiffKeyValidatorTests.fields:ActiveRegularPadIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Simulation/RegularGridDiffKeyValidatorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "0638d428667116a206087448a6a23d4bb1f58f87b46c80fde9b8b796be02b059",
-      "member": "FreeformHelper.Tests.RegularGridDiffKeyValidatorTests.fields:DuplicateRegularPadIds",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Simulation/RegularGridDiffKeyValidatorTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "IDE1006",
@@ -8111,16 +7471,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "409644a62c2889b26be4a9d693df3e170970037e10ec1b13909e07d8aff22587",
-      "member": "FreeformHelper.Tests.SimulationSafetyAuditServiceTests.fields:SingleSourceRowNumbers",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/SimulationSafetyAuditServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "2fc766c29f59fcae88b676fc4d8624119aed52b9c5473943b29370c93bb4837f",
       "member": "FreeformHelper.Tests.SimulationWorkspaceUseCaseTests.fields:SimulationDiffIndices",
       "owner": "NFH",
@@ -8175,26 +7525,6 @@
       "member": "FreeformHelper.Tests.UiVisualSnapshotTests.fields:BaselineJsonOptions",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Snapshots/UiVisualSnapshotTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "7180e880d6725e0c087ba758cd2a21806c0e04e13ffb44b17fbc85f3847ce4af",
-      "member": "FreeformHelper.Tests.WorkspaceViewsSmokeTests.fields:CoordinateLayerNames",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/WorkspaceViewsSmokeTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "2fc766c29f59fcae88b676fc4d8624119aed52b9c5473943b29370c93bb4837f",
-      "member": "FreeformHelper.Tests.WorkspaceViewsSmokeTests.fields:SimulationDiffIndices",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/WorkspaceViewsSmokeTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "IDE1006",
@@ -8271,16 +7601,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "63e0266e2e6c4d41b251cd718ce7c8adbe7777010edd156a9f1d1d0867ca6657",
-      "member": "FreeformHelper.UI.Logging.LoggingBootstrapper.fields:SupportedLevels",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Logging/LoggingBootstrapper.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
       "member": "FreeformHelper.UI.Program.fields:Logger",
       "owner": "NFH",
@@ -8321,26 +7641,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "870d4c03c38f5e5adf5c0d9f4ff90b94ded518a165966bda83d9b2b819fdedc0",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerHostService.fields:SharedHostInstance",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerHostService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9b8d27892920b7bad894c00dde38b26cee25f294548977a9cc0aa81fe83ce4cc",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerHostService.fields:SharedInnerHost",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerHostService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.fields:Logger",
       "owner": "NFH",
@@ -8365,66 +7665,6 @@
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.fields:ShowRetryDelay",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "09b0e24dcac7e9f9ffb81c55dc8ed7a2552e3ba674e50b03a8fcc29f8c99ac01",
-      "member": "FreeformHelper.UI.Services.DxfExportService.fields:Invariant",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/DxfExportService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "688846369b30ab4e7628c45de54a0b2c7e5a85544eac5e4cb4b19b5ea82ef4e6",
-      "member": "FreeformHelper.UI.Services.DxfLayerImageExportService.fields:DarkBackground",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/DxfLayerImageExportService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "71e583725c1391ea7ffedc11515ad03bd923ee0c39b60d7f63b876c4e2954fb3",
-      "member": "FreeformHelper.UI.Services.DxfLayerImageExportService.fields:DarkStroke",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/DxfLayerImageExportService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "c8847a9de20591e4e62350bc6f80f7752f1e9d9e93cec9b03843854f911ec2ee",
-      "member": "FreeformHelper.UI.Services.DxfLayerImageExportService.fields:LightBackground",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/DxfLayerImageExportService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "272e68ac99f96c9113c19371dd5ba2dd03e031ef541021e58f5ddba42f61570e",
-      "member": "FreeformHelper.UI.Services.DxfLayerImageExportService.fields:LightStroke",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/DxfLayerImageExportService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
-      "member": "FreeformHelper.UI.Services.GridRebuildOrchestrator.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/GridRebuildOrchestrator.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "IDE1006",
@@ -8461,16 +7701,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "31868a60d3bb59847a099a51ade03f6c91834ebe29483946e92c996f093f3729",
-      "member": "FreeformHelper.UI.Services.NotchExportSelectionQuickFilterService.fields:StatusFilterCycle",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/NotchExportSelectionQuickFilterService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "9ce9fb697b6a8323c3b66e68c3c09209650d3bfadd03455519279329211efd10",
       "member": "FreeformHelper.UI.Services.RuntimeQueryCommandLine.fields:SupportedCommands",
       "owner": "NFH",
@@ -8485,36 +7715,6 @@
       "member": "FreeformHelper.UI.Services.RuntimeQueryUseCase.fields:QueryHelpExamples",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "3d83f00f6627ca8cdc1a83969457053bf3851dd15e066be4c79792149c515ab6",
-      "member": "FreeformHelper.UI.Services.SharedToolTipStyleService.fields:registration",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/SharedToolTipStyleService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "3cfbbd0913cd6849bb840dc89fcfbe6a94fdab14fce38ddb4e211270693ba94f",
-      "member": "FreeformHelper.UI.Services.SimulationWorkspaceSession.fields:EmptyDecisionMap",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/SimulationWorkspaceSession.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "caabac80bf2f2899a0e7a9dc3c30692f9cb8c6b5e8c867387422fc050f463eee",
-      "member": "FreeformHelper.UI.Services.SimulationWorkspaceSession.fields:EmptyIntMap",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/SimulationWorkspaceSession.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "IDE1006",
@@ -8545,16 +7745,6 @@
       "member": "FreeformHelper.UI.Services.StartupPerfTracker.fields:Stopwatch",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/StartupPerfTracker.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
-      "member": "FreeformHelper.UI.Services.UiEventFailureReporter.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/UiEventFailureReporter.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "IDE1006",

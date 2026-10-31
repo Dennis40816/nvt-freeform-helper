@@ -11,10 +11,10 @@ namespace FreeformHelper.Tests;
 
 public sealed class DxfManualOverrideIdentityContractTests
 {
-    private static readonly double[] OneCellEdges = { 0d, 1d };
-    private static readonly double[] TwoCellEdges = { 0d, 1d, 2d };
-    private static readonly double[] ExpectedProgress = { 0d, 0.6000000000000001, 0.6, 0.8, 0.9500000000000001, 1d };
-    private static readonly int[] UnsortedIds = { 10, int.MinValue, 2, int.MaxValue, 0, -7 };
+    private static readonly double[] _oneCellEdges = { 0d, 1d };
+    private static readonly double[] _twoCellEdges = { 0d, 1d, 2d };
+    private static readonly double[] _expectedProgress = { 0d, 0.6000000000000001, 0.6, 0.8, 0.9500000000000001, 1d };
+    private static readonly int[] _unsortedIds = { 10, int.MinValue, 2, int.MaxValue, 0, -7 };
 
     [Theory]
     [InlineData(0)]
@@ -101,7 +101,7 @@ public sealed class DxfManualOverrideIdentityContractTests
         var left = Rectangle(0, 0, 1, 1);
         var right = Rectangle(1, 0, 2, 1);
         var cad = new CadPadSet(new[] { new CadPad(10, "C10", "L1", left), new CadPad(cadId, "C", "L1", right) });
-        var grid = new RegularGrid(1, 2, TwoCellEdges, OneCellEdges, new[]
+        var grid = new RegularGrid(1, 2, _twoCellEdges, _oneCellEdges, new[]
         {
             new RegularPad(0, 0, regularId, left) { IcIndex = 0, DiffIndex = 100 },
             new RegularPad(0, 1, 80, right) { IcIndex = 1, DiffIndex = 101 },
@@ -124,7 +124,7 @@ public sealed class DxfManualOverrideIdentityContractTests
         Assert.Equal(1, result.Report.UnmappedCadCount);
         Assert.Equal(1, result.Report.UnmappedRegularCount);
         Assert.Equal(1, result.Report.LowConfidenceCount);
-        Assert.Equal(ExpectedProgress.SkipLast(1).Append(0.99).Append(1d), progress);
+        Assert.Equal(_expectedProgress.SkipLast(1).Append(0.99).Append(1d), progress);
 
         var typedProgress = new List<double>();
         var typed = DxfRegularMappingAnalyzer.AnalyzeWithTypedOverrides(cad, grid, CreateSettings(),
@@ -204,9 +204,9 @@ public sealed class DxfManualOverrideIdentityContractTests
     [Fact]
     public void TypedIds_SortNumericallyIncludingIntegerExtremes()
     {
-        var expected = UnsortedIds.Order().ToArray();
-        Assert.Equal(expected, UnsortedIds.Select(static value => new CadPadId(value)).Order().Select(static id => id.Value));
-        Assert.Equal(expected, UnsortedIds.Select(static value => new RegularPadId(value)).Order().Select(static id => id.Value));
+        var expected = _unsortedIds.Order().ToArray();
+        Assert.Equal(expected, _unsortedIds.Select(static value => new CadPadId(value)).Order().Select(static id => id.Value));
+        Assert.Equal(expected, _unsortedIds.Select(static value => new RegularPadId(value)).Order().Select(static id => id.Value));
 
         for (var i = 1; i < expected.Length; i++)
         {
@@ -340,7 +340,7 @@ public sealed class DxfManualOverrideIdentityContractTests
                     : "mapped=1, unmappedCad=1, unmappedRegular=1, lowConf=1, ambiguous=0, duplicateDiff=0",
                 issues.Count, false, issues, issues);
         AssertEquivalent(expectedReport, result.Report);
-        Assert.Equal(ExpectedProgress, progress);
+        Assert.Equal(_expectedProgress, progress);
     }
 
     private static DxfRegularMappingReport EmptyReport(int cadCount, int regularCount, int mappedCount)
@@ -372,7 +372,7 @@ public sealed class DxfManualOverrideIdentityContractTests
         var left = Rectangle(0, 0, 1, 1);
         var right = Rectangle(1, 0, 2, 1);
         var cad = new CadPadSet(new[] { new CadPad(10, "C10", "L1", right), new CadPad(2, "C2", "L1", left) });
-        var grid = new RegularGrid(1, 2, TwoCellEdges, OneCellEdges, new[]
+        var grid = new RegularGrid(1, 2, _twoCellEdges, _oneCellEdges, new[]
         {
             new RegularPad(0, 0, 80, left) { IcIndex = 0, DiffIndex = 100 },
             new RegularPad(0, 1, -7, right) { IcIndex = 1, DiffIndex = 101 },

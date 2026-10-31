@@ -7,7 +7,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchExportSelectionRowSelectionServiceTests
 {
-    private static readonly int[] LegacyRowPayload = [20, 1, 2];
+    private static readonly int[] _legacyRowPayload = [20, 1, 2];
 
     [Fact]
     public void SelectAll_MarksAllRowsSelected()
@@ -120,7 +120,7 @@ public sealed class NotchExportSelectionRowSelectionServiceTests
                     TargetRatioPercent2: 0,
                     Flags: 0),
                 comment: "linked-b"),
-            new NotchTableRow(NotchAlgorithmVersion.V21, 1, 20, 120, 400, LegacyRowPayload, "legacy"),
+            new NotchTableRow(NotchAlgorithmVersion.V21, 1, 20, 120, 400, _legacyRowPayload, "legacy"),
         });
 
         return table.Rows
