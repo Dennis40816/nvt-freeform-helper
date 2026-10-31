@@ -74,7 +74,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QuerySimulation_WhenWorkspaceBuildFails_ReportsBuildFailedWithTheMessage()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         shell.Simulation.RequestBuildWorkspaceAsync = static () => throw new InvalidOperationException("build exploded");
 
         var response = await new RuntimeQueryUseCase(shell).ExecuteAsync(new RuntimeQueryRequest(
@@ -92,7 +92,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QuerySimulation_WhenWorkspaceBuildRunsOutOfMemory_PropagatesTheException()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var memory = CreateOutOfMemory();
         shell.Simulation.RequestBuildWorkspaceAsync = () => Task.FromException(memory);
         var useCase = new RuntimeQueryUseCase(shell);

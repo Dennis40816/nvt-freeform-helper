@@ -49,7 +49,7 @@ internal sealed class ClosingWindowFixture : IDisposable
     public ClosingWindowFixture(Func<Window, Task<bool?>> confirmSave, UiEventRunner? runner = null)
     {
         Helper = new FreeformHelperViewModel(null, runner);
-        _shell = new ShellViewModel(Helper);
+        _shell = new ShellViewModel(Helper) { IsDevPageAvailable = true };
         _shell.ShowHowToUseCommand.Execute(null);
         Window = new MainWindow(new MainWindowCloseSeams(confirmSave));
         Window.SetShellViewModel(_shell);

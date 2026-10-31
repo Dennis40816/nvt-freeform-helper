@@ -169,7 +169,7 @@ public sealed class TerminalStartupPathTests
     [Fact]
     public void ShellViewModel_DefaultsConsoleExpanded()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         Assert.True(shell.IsConsoleExpanded);
     }
 
@@ -189,7 +189,7 @@ public sealed class TerminalStartupPathTests
             HeadlessAppBootstrap.EnsureInitialized();
             _previousConfiguration = LogManager.Configuration;
             LogManager.Configuration = new LoggingConfiguration();
-            Shell = new ShellViewModel();
+            Shell = new ShellViewModel { IsDevPageAvailable = true };
             Window = new MainWindow { Width = 1280, Height = 900 };
             Window.SetShellViewModel(Shell);
             Window.Show();

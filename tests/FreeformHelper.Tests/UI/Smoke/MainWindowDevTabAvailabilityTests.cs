@@ -22,19 +22,24 @@ public sealed class MainWindowDevTabAvailabilityTests
         HeadlessAppBootstrap.EnsureInitialized();
         using var shell = new ShellViewModel { IsConsoleExpanded = false, IsDevPageAvailable = devPageAvailable };
         var window = new MainWindow { Width = 1280, Height = 900, WindowState = WindowState.Normal };
-        window.SetShellViewModel(shell);
-        window.Show();
-        HeadlessUiPump.Drain(window);
+        try
+        {
+            window.SetShellViewModel(shell);
+            window.Show();
+            HeadlessUiPump.Drain(window);
 
-        var tabs = window.GetVisualDescendants().OfType<ToggleButton>()
-            .Where(static button => button.Classes.Contains("shellTab")).ToArray();
-        var devTab = tabs.Single(static tab => Equals(tab.Content, "Dev"));
+            var tabs = window.GetVisualDescendants().OfType<ToggleButton>()
+                .Where(static button => button.Classes.Contains("shellTab")).ToArray();
+            var devTab = tabs.Single(static tab => Equals(tab.Content, "Dev"));
 
-        Assert.Equal(devPageAvailable, devTab.IsVisible);
-        Assert.All(tabs.Where(static tab => !Equals(tab.Content, "Dev")), static tab => Assert.True(tab.IsVisible));
-
-        shell.FreeformHelper.HasUnsavedChanges = false;
-        window.Close();
-        window.Dispatcher.RunJobs();
+            Assert.Equal(devPageAvailable, devTab.IsVisible);
+            Assert.All(tabs.Where(static tab => !Equals(tab.Content, "Dev")), static tab => Assert.True(tab.IsVisible));
+        }
+        finally
+        {
+            shell.FreeformHelper.HasUnsavedChanges = false;
+            window.Close();
+            window.Dispatcher.RunJobs();
+        }
     }
 }

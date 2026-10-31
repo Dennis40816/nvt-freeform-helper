@@ -21,7 +21,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         var secondEmittedMaxX = emittedMaxX + (emittedArea / cadHeight);
         var cadMaxX = secondEmittedMaxX + (roundedZeroArea / cadHeight);
         var gridMaxX = secondEmittedMaxX + 800.0;
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var helper = shell.FreeformHelper;
         var cad = CreateCadPad(274, 0, 0, cadMaxX, cadHeight);
         var regulars = new[]
@@ -135,7 +135,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QuerySelectCad_ReturnsSelectionTimings()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var vm = shell.FreeformHelper;
         vm.CadPads.Add(CreateCadPad(id: 101, minX: 0, minY: 0, maxX: 10, maxY: 10));
         var useCase = new RuntimeQueryUseCase(shell);
@@ -363,7 +363,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryPad_IncludesSharedNotchDisplayProjection()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var vm = shell.FreeformHelper;
         var cad = CreateCadPad(id: 21, minX: 0, minY: 3, maxX: 3, maxY: 7);
         var blocker = CreateCadPad(id: 22, minX: 5, minY: 0, maxX: 10, maxY: 10);
@@ -443,7 +443,7 @@ public sealed partial class RuntimeQueryUseCaseTests
 
     private static (ShellViewModel Shell, CadPad TargetCad) BuildMultiOwnerQueryFixture()
     {
-        var shell = new ShellViewModel();
+        var shell = new ShellViewModel { IsDevPageAvailable = true };
         var vm = shell.FreeformHelper;
         var target = CreateCadPad(id: 31, minX: 0, minY: 0, maxX: 5, maxY: 10);
         var minorOwner = CreateCadPad(id: 32, minX: 9.95, minY: 0, maxX: 10, maxY: 10);

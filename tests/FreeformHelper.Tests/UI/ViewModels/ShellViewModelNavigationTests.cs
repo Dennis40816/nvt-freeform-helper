@@ -40,7 +40,7 @@ public sealed class ShellViewModelNavigationTests
     [Fact]
     public void Constructor_DefaultSelection_ProjectsWorkspaceOnly()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
 
         Assert.Equal((true, false, false, false, false), ReadActiveFlags(shell));
         Assert.Same(shell.FreeformHelper, shell.CurrentViewModel);
@@ -124,7 +124,7 @@ public sealed class ShellViewModelNavigationTests
 
     private static ShellViewModel CreateShellWithoutWorkspaceBuilders()
     {
-        var shell = new ShellViewModel();
+        var shell = new ShellViewModel { IsDevPageAvailable = true };
         shell.Simulation.RequestBuildWorkspaceAsync = null;
         shell.CoordinatePlanner.RequestBuildWorkspaceAsync = null;
         return shell;

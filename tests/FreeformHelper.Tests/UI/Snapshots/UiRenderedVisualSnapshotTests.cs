@@ -42,7 +42,7 @@ public sealed class UiRenderedVisualSnapshotTests
         HeadlessAppBootstrap.EnsureInitialized();
         var app = Assert.IsType<App>(Avalonia.Application.Current);
         var previousTheme = app.RequestedThemeVariant;
-        using var shell = new ShellViewModel { IsConsoleExpanded = false };
+        using var shell = new ShellViewModel { IsConsoleExpanded = false, IsDevPageAvailable = true };
         shell.Simulation.RequestBuildWorkspaceAsync = null;
         shell.CoordinatePlanner.RequestBuildWorkspaceAsync = null;
         var window = new MainWindow { Width = 1440, Height = 900 };
@@ -164,7 +164,7 @@ public sealed class UiRenderedVisualSnapshotTests
         private ConsoleSurface(LogStore? store)
         {
             _store = store;
-            Shell = store is null ? null : new ShellViewModel { ConsoleStore = store, IsConsoleExpanded = true };
+            Shell = store is null ? null : new ShellViewModel { ConsoleStore = store, IsConsoleExpanded = true, IsDevPageAvailable = true };
         }
 
         public ShellViewModel? Shell { get; }

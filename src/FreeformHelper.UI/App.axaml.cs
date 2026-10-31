@@ -71,7 +71,7 @@ public sealed class App : global::Avalonia.Application
                 if (mainWindow.DataContext is not ViewModels.ShellViewModel shellViewModel)
                 {
                     StartupPerfTracker.Mark("app.shell-vm-create-start");
-                    shellViewModel = new ViewModels.ShellViewModel();
+                    shellViewModel = new ViewModels.ShellViewModel { IsDevPageAvailable = AppBuildChannel.IsDevelopmentBuild };
                     StartupPerfTracker.Mark("app.shell-vm-assign-start");
                     mainWindow.SetShellViewModel(shellViewModel);
                     StartupPerfTracker.Mark("app.shell-vm-assigned");

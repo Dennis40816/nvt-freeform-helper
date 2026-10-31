@@ -29,7 +29,7 @@ public sealed class ShellViewModelCoordinateTests
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         try
         {
-            using var shell = new ShellViewModel(null, new RecordingShellTimingProbe { WorkspaceBuildPause = release.Task });
+            using var shell = new ShellViewModel(null, new RecordingShellTimingProbe { WorkspaceBuildPause = release.Task }) { IsDevPageAvailable = true };
             var buildTask = buildKind switch
             {
                 "coordinate" => shell.CoordinatePlanner.PrewarmWorkspaceAsync(),
@@ -57,7 +57,7 @@ public sealed class ShellViewModelCoordinateTests
     [Fact]
     public async Task ShowCoordinateAsync_BindsWorkspaceIntoCoordinatePage()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var workspaceViewModel = CreateWorkspace(shell.FreeformHelper.WorkspaceDerivedSourceRevision);
 
         await shell.ShowCoordinateAsync(workspaceViewModel);
@@ -72,7 +72,7 @@ public sealed class ShellViewModelCoordinateTests
     [Fact]
     public async Task ShowCoordinateCommand_HealthyWorkspace_BuildsOnlyOnFirstSelection()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var workspace = CreateWorkspace(shell.FreeformHelper.WorkspaceDerivedSourceRevision);
         var buildCount = 0;
         shell.CoordinatePlanner.RequestBuildWorkspaceAsync = () =>
@@ -96,7 +96,7 @@ public sealed class ShellViewModelCoordinateTests
     [Fact]
     public async Task ShowCoordinateCommand_DelayedBuild_KeepsPreviousPageUntilCompletion()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         Func<Task> buildWorkspace = async () =>
@@ -124,7 +124,7 @@ public sealed class ShellViewModelCoordinateTests
     [Fact]
     public async Task ShowCoordinateCommand_RepeatedSelectionWithoutWorkspace_RetriesBuild()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var buildCount = 0;
         shell.CoordinatePlanner.RequestBuildWorkspaceAsync = () =>
         {
@@ -142,7 +142,7 @@ public sealed class ShellViewModelCoordinateTests
     [Fact]
     public async Task ShowCoordinateCommand_RepeatedSelectionWithStaleWorkspace_RebuildsWorkspace()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var revision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
         await shell.ShowCoordinateAsync(CreateWorkspace(revision));
         var refreshedWorkspace = CreateWorkspace(revision + 1);
@@ -165,7 +165,7 @@ public sealed class ShellViewModelCoordinateTests
     [Fact]
     public async Task ShowCoordinateAsync_PropagatesCoordinatePreferencesToFreeformSnapshot()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var sourceRevision = shell.FreeformHelper.WorkspaceDerivedSourceRevision;
         var workspaceViewModel = new CoordinatePlannerWorkspaceViewModel(
             new CoordinatePlannerWorkspaceUseCase(),

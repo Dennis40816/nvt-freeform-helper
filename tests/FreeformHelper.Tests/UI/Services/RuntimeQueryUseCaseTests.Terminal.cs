@@ -17,7 +17,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         var logger = $"rq-{Guid.NewGuid():N}";
         var timestamp = new DateTimeOffset(2026, 10, 13, 8, 15, 42, TimeSpan.Zero);
         using var store = await CreateStoreAsync(timestamp, LogLevel.Warn, logger, "Pad 12 moved");
-        using var shell = new ShellViewModel { ConsoleStore = store };
+        using var shell = new ShellViewModel { ConsoleStore = store, IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(TerminalRequest("terminal", ("tail", TerminalTailCount.ToString(CultureInfo.InvariantCulture))));
@@ -32,7 +32,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     public async Task ExecuteAsync_QueryTerminal_ReportsTotalAndReturnedLineCounts()
     {
         using var store = await CreateStoreAsync(DateTimeOffset.UnixEpoch, LogLevel.Info, "rq-count", "count line");
-        using var shell = new ShellViewModel { ConsoleStore = store };
+        using var shell = new ShellViewModel { ConsoleStore = store, IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(TerminalRequest("terminal", ("tail", "1")));
@@ -46,7 +46,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryTerminal_RejectsATailBelowOne()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(TerminalRequest("terminal", ("tail", "0")));
@@ -62,7 +62,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         const string path = "C:/work/export/notch_review.csv";
         const string url = "https://github.com/Dennis40816/nvt-freeform-helper";
         using var store = await CreateStoreAsync(DateTimeOffset.UnixEpoch, LogLevel.Info, logger, $"see {path} and {url}");
-        using var shell = new ShellViewModel { ConsoleStore = store };
+        using var shell = new ShellViewModel { ConsoleStore = store, IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(TerminalRequest("terminal-links", ("tail", TerminalTailCount.ToString(CultureInfo.InvariantCulture))));
@@ -84,7 +84,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     {
         var logger = $"rq-limit-{Guid.NewGuid():N}";
         using var store = await CreateStoreAsync(DateTimeOffset.UnixEpoch, LogLevel.Info, logger, "open C:/work/a.txt then C:/work/b.txt");
-        using var shell = new ShellViewModel { ConsoleStore = store };
+        using var shell = new ShellViewModel { ConsoleStore = store, IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(TerminalRequest(

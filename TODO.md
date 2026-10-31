@@ -24,7 +24,11 @@
 - [x] Inspector tab: two developer-facing texts deleted, the rule trace description is a tooltip, and Snapshot details plus Rule trace sit under one Debug details fold that is closed when the inspector shows another pad (owner answers Q25 to Q27, 2026-10-31 08:54). Proposal: `nfh-pc-notes/proposal-right-panel-debug-fold.md`
 - [ ] Overview tab and Step 6 quick trace: apply the four classes word by word (write the text-by-text table first). One PR per panel
 - [ ] Step 1, 2, 3, 4 and 5 panels: same, one PR each. Step 3 has the largest block of debug notes (about 75 words) that should fold or become tooltips
-- [x] Dev tab: release builds hide it, development builds (version with a `-g.N` suffix) show it (inventory item F8, owner question Q1 default). `ShellViewModel.IsDevPageAvailable` reads `AppBuildChannel`
 - [ ] Snapshot details is written twice in `RightWorkflowInspectorView.axaml` (CAD and regular). Merge them into one template in a separate refactor
 - [ ] Decide whether the right panel needs one global "include debug" switch, like the message center, that opens every Debug details fold. Not needed while only the Inspector has a fold
 - [ ] When NFH adopts the Core version that ships `CollapsiblePanel`, move `HidePanelBlock` and the `workspaceFoldHeader` accordion to it
+
+# Shell tabs (inventory item F8, owner question Q147)
+
+- [x] Dev tab: release builds hide it, development builds show it. A development build has a pre-release suffix in its version (`X.Y.Z-g.N`, see the version rules in `ROADMAP.md`), and an unknown version counts as development. This is the default of owner question Q147 (inventory F8, PC chat Q40) until the owner decides. `ShellViewModel.IsDevPageAvailable` is a required property: the app start passes `AppBuildChannel.IsDevelopmentBuild` and every test says which value it wants
+- [ ] The How To Use text (`HowToUseView.axaml`, "Top tabs: Freeform Helper, How To Use, Dev.") still lists the Dev tab, so a release build describes a tab the user cannot see. Fix it in a separate PR together with the other stale texts

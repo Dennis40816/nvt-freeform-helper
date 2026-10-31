@@ -27,7 +27,7 @@ public sealed class CanvasFitToolbarClearanceTests
     public void FreeformHelperView_FitToContent_ReservesMeasuredToolbarBand(int icCount)
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var window = new MainWindow { Width = 1280, Height = 900 };
         window.SetShellViewModel(shell);
         window.Show();
