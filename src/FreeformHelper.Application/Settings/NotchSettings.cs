@@ -8,13 +8,13 @@ namespace FreeformHelper.Application.Settings;
 /// </summary>
 public sealed class NotchSettings
 {
-    private static readonly NotchAlgorithmVersion[] DefaultEnabledVersions =
+    private static readonly NotchAlgorithmVersion[] _defaultEnabledVersions =
     {
         NotchAlgorithmVersion.V21,
         NotchAlgorithmVersion.V22,
     };
 
-    private HashSet<NotchAlgorithmVersion> _enabledVersions = new(DefaultEnabledVersions);
+    private HashSet<NotchAlgorithmVersion> _enabledVersions = new(_defaultEnabledVersions);
 
     /// <summary>
     /// Gets or sets the notch row computation mode.

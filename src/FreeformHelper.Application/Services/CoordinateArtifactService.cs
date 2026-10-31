@@ -97,7 +97,7 @@ public static class CoordinateArtifactService
 {
     private const string CoordinateUnitText = "pixel/mm/world";
 
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
     {
         WriteIndented = true,
         Converters = { new JsonStringEnumConverter() },
@@ -232,7 +232,7 @@ public static class CoordinateArtifactService
     public static string ExportJson(CoordinateArtifactSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
-        return JsonSerializer.Serialize(snapshot, JsonOptions);
+        return JsonSerializer.Serialize(snapshot, _jsonOptions);
     }
 
     public static string ExportClipboardTable(IEnumerable<CoordinateArtifactRow> rows)

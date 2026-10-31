@@ -17,10 +17,10 @@ public sealed record PadMatchLink(
 /// </summary>
 public sealed class PadMatchResult
 {
-    private static readonly IReadOnlyDictionary<int, IReadOnlyList<PadMatchLink>> EmptyMap =
+    private static readonly IReadOnlyDictionary<int, IReadOnlyList<PadMatchLink>> _emptyMap =
         new ReadOnlyDictionary<int, IReadOnlyList<PadMatchLink>>(new Dictionary<int, IReadOnlyList<PadMatchLink>>());
 
-    public static readonly PadMatchResult Empty = new(EmptyMap, EmptyMap, PadMatchTelemetry.Empty);
+    public static readonly PadMatchResult Empty = new(_emptyMap, _emptyMap, PadMatchTelemetry.Empty);
 
     public IReadOnlyDictionary<int, IReadOnlyList<PadMatchLink>> CadToRegular { get; }
     public IReadOnlyDictionary<int, IReadOnlyList<PadMatchLink>> RegularToCad { get; }

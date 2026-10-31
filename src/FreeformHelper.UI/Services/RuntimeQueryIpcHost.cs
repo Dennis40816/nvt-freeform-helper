@@ -12,7 +12,7 @@ internal static class RuntimeQueryIpcHost
 {
     internal const int RequestReadTimeoutMs = 5000;
     internal const int ShutdownTimeoutMs = 1500;
-    private static readonly Logger Logger = LogManager.GetLogger("FreeformHelper.UI.Services.RuntimeQueryIpcServer");
+    private static readonly Logger _logger = LogManager.GetLogger("FreeformHelper.UI.Services.RuntimeQueryIpcServer");
     private static readonly Lock _sync = new();
     private static RuntimeQueryIpcServer? _server;
 
@@ -71,28 +71,28 @@ internal static class RuntimeQueryIpcHost
         switch (diagnostic)
         {
             case RuntimeQueryDiagnostic.Started:
-                Logger.Info(CultureInfo.InvariantCulture, "Runtime query IPC server started. pipe={0}", RuntimeQueryProtocol.PipeName);
+                _logger.Info(CultureInfo.InvariantCulture, "Runtime query IPC server started. pipe={0}", RuntimeQueryProtocol.PipeName);
                 break;
             case RuntimeQueryDiagnostic.Stopped:
-                Logger.Info(CultureInfo.InvariantCulture, "Runtime query IPC server stopped.");
+                _logger.Info(CultureInfo.InvariantCulture, "Runtime query IPC server stopped.");
                 break;
             case RuntimeQueryDiagnostic.ConnectionFailed:
-                Logger.Warn(exception, "Runtime query IPC wait failed.");
+                _logger.Warn(exception, "Runtime query IPC wait failed.");
                 break;
             case RuntimeQueryDiagnostic.RequestFailed:
-                Logger.Warn(exception, "Runtime query IPC request handling failed.");
+                _logger.Warn(exception, "Runtime query IPC request handling failed.");
                 break;
             case RuntimeQueryDiagnostic.HandlerFailed:
-                Logger.Warn(exception, "Runtime query execution failed.");
+                _logger.Warn(exception, "Runtime query execution failed.");
                 break;
             case RuntimeQueryDiagnostic.ShutdownFailed:
-                Logger.Debug(exception, "Runtime query IPC stop ignored run loop exception.");
+                _logger.Debug(exception, "Runtime query IPC stop ignored run loop exception.");
                 break;
             case RuntimeQueryDiagnostic.ShutdownTimedOut:
-                Logger.Debug(exception, "Runtime query IPC stop reached the shutdown timeout.");
+                _logger.Debug(exception, "Runtime query IPC stop reached the shutdown timeout.");
                 break;
             case RuntimeQueryDiagnostic.PipeCreationFailed:
-                Logger.Warn(exception, "Runtime query IPC pipe creation failed.");
+                _logger.Warn(exception, "Runtime query IPC pipe creation failed.");
                 break;
         }
     }

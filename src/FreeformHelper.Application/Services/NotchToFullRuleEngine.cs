@@ -12,7 +12,7 @@ public sealed class NotchToFullRuleEngine
     public const string RuleNoExpansionNeeded = "NO_EXPANSION_NEEDED";
     public const string RuleExpandClearPath = "EXPAND_CLEAR_PATH";
     public const string RuleExpandSharedReachable = "EXPAND_SHARED_REACHABLE";
-    private static readonly IReadOnlyList<NotchToFullRuleTraceEntry> EmptyTrace = Array.Empty<NotchToFullRuleTraceEntry>();
+    private static readonly IReadOnlyList<NotchToFullRuleTraceEntry> _emptyTrace = Array.Empty<NotchToFullRuleTraceEntry>();
 
     public static NotchToFullRuleDecision Evaluate(in NotchToFullRuleContext context, bool enableTrace)
     {
@@ -118,7 +118,7 @@ public sealed class NotchToFullRuleEngine
 
     private static IReadOnlyList<NotchToFullRuleTraceEntry> FreezeTrace(List<NotchToFullRuleTraceEntry>? trace)
     {
-        return trace is null ? EmptyTrace : trace;
+        return trace is null ? _emptyTrace : trace;
     }
 }
 
