@@ -125,7 +125,7 @@ internal static class RuntimeQueryCharacterizationSubject
 
     public static async Task<Response> ExecuteAsync(Request? request)
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
         var nativeRequest = request is null ? null : new RuntimeQueryRequest(request.Version, request.Command, request.Args);
         return Snapshot(await useCase.ExecuteAsync(nativeRequest));

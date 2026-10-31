@@ -20,7 +20,7 @@ public sealed class ConsoleZoomTests
     public void ConsoleSession_NewSession_StartsAtNormalZoom()
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
 
         Assert.Equal(1.0, shell.ConsoleSession.Zoom);
     }
@@ -91,7 +91,7 @@ public sealed class ConsoleZoomTests
             HeadlessAppBootstrap.EnsureInitialized();
             _previousConfiguration = LogManager.Configuration;
             LogManager.Configuration = new LoggingConfiguration();
-            Shell = new ShellViewModel();
+            Shell = new ShellViewModel { IsDevPageAvailable = true };
             Shell.ConsoleSession.Zoom = zoom;
             Window = new MainWindow { Width = 1280, Height = 900 };
             Window.SetShellViewModel(Shell);

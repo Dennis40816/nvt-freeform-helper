@@ -185,6 +185,13 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
 - [ ] **UI-TEXT1 Shorten the resident texts of the right panel, Step 4 first** · Target: - · Status: Not started · PR: -
   - The owner approved Step 4 as the first panel on 2026-10-18. Keep the scope small. Add no new structure for the current layout, because UI-REDESIGN replaces it.
   - Each text PR shows English before-and-after images in the PR conversation.
+- [ ] **UI-DEVTAB Hide the Dev tab in release builds** · Target: - · Status: In progress · PR: [#228](https://github.com/Dennis40816/nvt-freeform-helper/pull/228)
+  - Scope: feature inventory 2026-10-31, item F8 (owner question Q147; PC chat Q40, inventory Q1). The default that applies until the owner decides: release builds hide the Dev tab, development builds show it, and the page, `DevView` and `DevViewModel` stay as they are. The `DevView` split is R13.502.
+  - A development build is a version with a pre-release suffix (`X.Y.Z-g.N`, see the version rules above). `AppBuildChannel` reads it once. The app start passes it to `ShellViewModel.IsDevPageAvailable`, which is a required property, so every test says which value it wants.
+  - Commit-body exceptions on the Dev tab branch ([#228](https://github.com/Dennis40816/nvt-freeform-helper/pull/228)). Five commits were pushed before their verification was complete or without a required record. None is rewritten or force-pushed, as `docs/agents/issue-tracker.md` allows. A missing record does not mean that the command was not run. The verification of the final head is in the body of the last commit of the branch and in the description of #228.
+    - `c7f6200c2aba59caf81d66b29f1e5bdb65b4dc8a`: the first code change. Its body has no verification run and no `Refs` line.
+    - `1dc093e3fc8ab7be740c9f2eb9a9a6a97ed1ad00`: merges `main` into the branch. It has no body.
+    - `a9e867ebea6b0550962008acd8337552fd41fa7e`, `8583de4990ea5c4339b66e635b595729cf7321b6` and `ba3845bee394fe2171671decee634048ac78b80d`: three fixes after failed queue runs (`CA2249`, a closed window drained in the new test, a new `CA1307` finding). Each body says why the earlier run failed. None records the run on its own fix, and none has a `Refs` line. The queue run on `ba3845b` passed the build, 240 tests and the health chain (LowerBaseline, Verify, lint) on 2026-10-31. It is recorded in the description of #228.
 - [ ] **UI-REDESIGN Redesign the whole NFH UI** · Target: - · Status: Waiting for owner (scope and timing) · PR: -
   - Owner, 2026-10-18, on the right-panel text proposal: 「可以，但由於 NFH 是很久之前設計，理論上是整個都要大改」 ("Yes, but NFH was designed long ago, so in principle all of it needs a major redesign").
 

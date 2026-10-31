@@ -18,7 +18,7 @@ public sealed partial class RuntimeQueryUseCaseTests
 
     private static ShellViewModel BuildShellWithNotchValidationTable(NotchTable table)
     {
-        var shell = new ShellViewModel();
+        var shell = new ShellViewModel { IsDevPageAvailable = true };
         var vm = shell.FreeformHelper;
         SetPrivateField(vm, "_grid", BuildValidationGrid());
         vm.NotchCacheForTests.LastGeneratedTable = table;

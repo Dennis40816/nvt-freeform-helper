@@ -18,7 +18,7 @@ public sealed class RuntimeQueryProjectLoadingGuardCharacterizationTests
     [Fact]
     public async Task SetToFull_WhileProjectLoadIsPending_ChangesTheSettingWithoutBusyError()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var helper = shell.FreeformHelper;
         using var gate = new SemaphoreSlim(0, 1);
         helper.PickLoadProjectPathAsync = () => WaitForGateAsync(gate);

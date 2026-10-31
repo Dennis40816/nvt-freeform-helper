@@ -129,7 +129,7 @@ public sealed class HeadlessSessionGuardTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var window = new MainWindow();
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         shell.FreeformHelper.HasUnsavedChanges = true;
         window.SetShellViewModel(shell);
         var closed = false;

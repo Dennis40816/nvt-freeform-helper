@@ -17,7 +17,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         CadLoadSpinnerDebugState.RecordHostShowRequest("test");
         CadLoadSpinnerDebugState.RecordHostShowIpcResult(success: true, source: "test");
 
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
@@ -56,7 +56,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryExportNotch_RejectsUnsupportedFormat()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
 
         var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
@@ -77,7 +77,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryExportNotch_ReturnsFailureWhenWorkflowNotReady()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
         var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"freeformhelper-export-{Guid.NewGuid():N}.csv");
 
@@ -100,7 +100,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_QueryExportNotch_AcceptsVersionedCFormat_WhenWorkflowNotReady()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         shell.FreeformHelper.EnableV21 = true;
         shell.FreeformHelper.EnableV22 = false;
         var useCase = new RuntimeQueryUseCase(shell);

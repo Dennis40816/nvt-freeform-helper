@@ -296,6 +296,7 @@ public sealed class HeadlessUiSmokeTests
         HeadlessAppBootstrap.EnsureInitialized();
         using var shell = new ShellViewModel
         {
+            IsDevPageAvailable = true,
             IsConsoleExpanded = true,
         };
 
@@ -317,6 +318,7 @@ public sealed class HeadlessUiSmokeTests
         using var consoleStore = await ConsoleLogTestSupport.CreateSeededStoreAsync("test", "terminal visible line");
         using var shell = new ShellViewModel
         {
+            IsDevPageAvailable = true,
             IsConsoleExpanded = true,
             ConsoleStore = consoleStore,
         };
@@ -357,6 +359,7 @@ public sealed class HeadlessUiSmokeTests
         using var consoleStore = await ConsoleLogTestSupport.CreateSeededStoreAsync("simulation", "shared terminal visible line");
         using var shell = new ShellViewModel
         {
+            IsDevPageAvailable = true,
             IsConsoleExpanded = true,
             ConsoleStore = consoleStore,
         };

@@ -110,7 +110,7 @@ public sealed class UiEventRunnerTests
     [AvaloniaFact]
     public void ShellDependencies_ShareCompositionRunner()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
 
         Assert.Same(shell.FreeformHelper.UiEvents, shell.UiEvents);
         Assert.Same(shell.UiEvents, shell.Dev.UiEvents);
