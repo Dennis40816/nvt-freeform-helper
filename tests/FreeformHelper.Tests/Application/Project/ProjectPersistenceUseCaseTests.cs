@@ -14,7 +14,7 @@ public sealed class ProjectPersistenceUseCaseTests
     [Fact]
     public async Task SaveAsync_CancelledWhenNoPathSelected()
     {
-        var useCase = new ProjectPersistenceUseCase(new JsonProjectStore(), new PadOverrideService());
+        var useCase = new ProjectPersistenceUseCase(new JsonProjectStore());
         var file = new ProjectFile();
 
         var result = await useCase.SaveAsync(new ProjectSaveRequest(
@@ -38,7 +38,7 @@ public sealed class ProjectPersistenceUseCaseTests
         try
         {
             var store = new JsonProjectStore();
-            var useCase = new ProjectPersistenceUseCase(store, new PadOverrideService());
+            var useCase = new ProjectPersistenceUseCase(store);
             var file = new ProjectFile();
 
             var grid = BuildTestGrid(rows: 1, cols: 2);
@@ -92,7 +92,7 @@ public sealed class ProjectPersistenceUseCaseTests
             File.WriteAllBytes(maskPath, maskBytes);
 
             var store = new JsonProjectStore();
-            var useCase = new ProjectPersistenceUseCase(store, new PadOverrideService());
+            var useCase = new ProjectPersistenceUseCase(store);
             var file = new ProjectFile { LastDxfPath = dxfPath };
 
             var result = await useCase.SaveAsync(new ProjectSaveRequest(
@@ -147,7 +147,7 @@ public sealed class ProjectPersistenceUseCaseTests
         try
         {
             var store = new JsonProjectStore();
-            var useCase = new ProjectPersistenceUseCase(store, new PadOverrideService());
+            var useCase = new ProjectPersistenceUseCase(store);
             var file = new ProjectFile
             {
                 EmbeddedDxf = new byte[] { 9, 9, 9 },
@@ -190,7 +190,7 @@ public sealed class ProjectPersistenceUseCaseTests
         try
         {
             var store = new JsonProjectStore();
-            var useCase = new ProjectPersistenceUseCase(store, new PadOverrideService());
+            var useCase = new ProjectPersistenceUseCase(store);
             var file = new ProjectFile();
 
             var result = await useCase.SaveAsync(new ProjectSaveRequest(
@@ -258,7 +258,7 @@ public sealed class ProjectPersistenceUseCaseTests
         try
         {
             var store = new JsonProjectStore();
-            var useCase = new ProjectPersistenceUseCase(store, new PadOverrideService());
+            var useCase = new ProjectPersistenceUseCase(store);
             var file = new ProjectFile
             {
                 LastDxfPath = @"C:\temp\sample.dxf",
@@ -303,7 +303,7 @@ public sealed class ProjectPersistenceUseCaseTests
 
             Assert.True(save.IsSaved);
 
-            var load = await useCase.LoadAsync(new ProjectLoadRequest(
+            var load = await ProjectPersistenceUseCase.LoadAsync(new ProjectLoadRequest(
                 PickLoadProjectPathAsync: () => Task.FromResult<string?>(projectPath),
                 CanProceedWithPendingEdits: () => true));
 
@@ -341,7 +341,7 @@ public sealed class ProjectPersistenceUseCaseTests
         try
         {
             var store = new JsonProjectStore();
-            var useCase = new ProjectPersistenceUseCase(store, new PadOverrideService());
+            var useCase = new ProjectPersistenceUseCase(store);
             var file = new ProjectFile
             {
                 HiddenCadPadIds = new HashSet<int> { 2, 1500000000 },
@@ -400,7 +400,7 @@ public sealed class ProjectPersistenceUseCaseTests
 
             Assert.True(save.IsSaved);
 
-            var load = await useCase.LoadAsync(new ProjectLoadRequest(
+            var load = await ProjectPersistenceUseCase.LoadAsync(new ProjectLoadRequest(
                 PickLoadProjectPathAsync: () => Task.FromResult<string?>(projectPath),
                 CanProceedWithPendingEdits: () => true));
 
@@ -441,7 +441,7 @@ public sealed class ProjectPersistenceUseCaseTests
             {
                 Publisher = (_, _, _) => publication.Task,
             };
-            var useCase = new ProjectPersistenceUseCase(store, new PadOverrideService());
+            var useCase = new ProjectPersistenceUseCase(store);
 
             var saving = useCase.SaveAsync(new ProjectSaveRequest(
                 Project: new ProjectFile(),

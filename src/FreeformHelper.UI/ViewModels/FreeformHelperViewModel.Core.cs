@@ -71,7 +71,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly NotchExportService _notchExportService = new();
     private readonly PadMatchService _padMatchService = new();
     private readonly ManualSizingService _manualSizingService = new();
-    private readonly PadOverrideService _padOverrideService = new();
 
     // --- Internal State Management ---
     private readonly Dictionary<int, double> _cadPadCustomValues = new(); // Stores custom user-defined values for CAD pads.
@@ -272,7 +271,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _cadLoadWorkflowService = new CadLoadWorkflowService(_cadLoadUseCase);
         _layerCatalogStateService = new LayerCatalogStateService(_dxfLayerCatalogReader);
         _gridRebuildOrchestrator = new GridRebuildOrchestrator(_gridBuildService);
-        _projectPersistenceUseCase = new ProjectPersistenceUseCase(_projectStore, _padOverrideService);
+        _projectPersistenceUseCase = new ProjectPersistenceUseCase(_projectStore);
         _padEditUseCase = new PadEditUseCase(_manualSizingService);
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
         Logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
