@@ -27,3 +27,8 @@
 - [ ] Snapshot details is written twice in `RightWorkflowInspectorView.axaml` (CAD and regular). Merge them into one template in a separate refactor
 - [ ] Decide whether the right panel needs one global "include debug" switch, like the message center, that opens every Debug details fold. Not needed while only the Inspector has a fold
 - [ ] When NFH adopts the Core version that ships `CollapsiblePanel`, move `HidePanelBlock` and the `workspaceFoldHeader` accordion to it
+
+# Shell tabs (inventory item F8, owner question Q147)
+
+- [x] Dev tab: release builds hide it, development builds show it. A development build has a pre-release suffix in its version (`X.Y.Z-g.N`, see the version rules in `ROADMAP.md`), and an unknown version counts as development. This is the default of owner question Q147 (inventory F8, PC chat Q40) until the owner decides. `ShellViewModel.IsDevPageAvailable` is a required property: the app start passes `AppBuildChannel.IsDevelopmentBuild` and every test says which value it wants
+- [ ] The How To Use text (`HowToUseView.axaml`, "Top tabs: Freeform Helper, How To Use, Dev.") still lists the Dev tab, so a release build describes a tab the user cannot see. Fix it in a separate PR together with the other stale texts

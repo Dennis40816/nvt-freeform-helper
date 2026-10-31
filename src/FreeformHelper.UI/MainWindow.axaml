@@ -66,6 +66,7 @@
             <ToggleButton Classes="shellTab"
                           Content="Dev"
                           Tag="{x:Static vm:ShellPage.Dev}"
+                          IsVisible="{Binding IsDevPageAvailable}"
                           IsChecked="{Binding IsDevActive, Mode=OneWay}"
                           Command="{Binding ShowDevCommand}"/>
           </StackPanel>

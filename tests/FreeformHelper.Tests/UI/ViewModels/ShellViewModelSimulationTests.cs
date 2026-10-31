@@ -15,7 +15,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task ShowSimulationCommand_ActivatesSimulationPlaceholderPage_WhenWorkspaceCannotBeBuilt()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
 
         await shell.ShowSimulationCommand.ExecuteAsync(null);
 
@@ -28,7 +28,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task ShowSimulationCommand_ShowsSimulationHostBeforeDelayedBuildCompletes()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -54,7 +54,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task ShowSimulationAsync_BindsWorkspaceIntoSimulationPage()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var workspaceViewModel = CreateWorkspace(shell.FreeformHelper.SimulationWorkspaceSourceRevision);
 
         await shell.ShowSimulationAsync(workspaceViewModel);
@@ -68,7 +68,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task ShowSimulationCommand_HealthyWorkspace_BuildsOnlyOnFirstSelection()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var workspace = CreateWorkspace(shell.FreeformHelper.SimulationWorkspaceSourceRevision);
         var buildCount = 0;
         shell.Simulation.RequestBuildWorkspaceAsync = () =>
@@ -92,7 +92,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task ShowSimulationCommand_RepeatedSelectionWithoutWorkspace_RetriesBuild()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var buildCount = 0;
         shell.Simulation.RequestBuildWorkspaceAsync = () =>
         {
@@ -110,7 +110,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task ShowSimulationCommand_RepeatedSelectionWithStaleWorkspace_RebuildsWorkspace()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var revision = shell.FreeformHelper.SimulationWorkspaceSourceRevision;
         await shell.ShowSimulationAsync(CreateWorkspace(revision));
         var refreshedWorkspace = CreateWorkspace(revision + 1);
@@ -133,7 +133,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public void SimulationSafetyOverview_WhenWorkspaceHasNoCells_UsesNotRunAvailabilityStatus()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var grid = TestGeometryFactory.CreateLinearRegularGrid(Array.Empty<int>());
         var workspaceViewModel = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
@@ -160,7 +160,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task SimulationActiveWithoutWorkspace_PrewarmsArtifactsAfterWorkspaceSourceChanges()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
 
         await shell.ShowSimulationCommand.ExecuteAsync(null);
 
@@ -185,7 +185,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task WorkspaceSourceChanges_PrewarmsSimulationArtifactsWhenWorkspaceNotCreated()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
 
         Assert.True(shell.IsWorkspaceActive);
         Assert.True(shell.Simulation.HasNoWorkspace);
@@ -210,7 +210,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task WorkspaceSourceChanges_RebuildsStaleSimulationWorkspace_WhenWorkspaceIsPristine()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
         var initialWorkspace = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
@@ -248,7 +248,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task WorkspaceSourceChanges_BurstOnlyPrewarmsOnce()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
         shell.Simulation.CurrentWorkspace = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
@@ -280,7 +280,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task WorkspaceSourceChangeDrain_WhenThePrewarmFails_EndsWithoutRestarting()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var work = new RecordingBackgroundWorkRunner();
         shell.BackgroundWork.Runner = work;
         var prewarmCount = 0;
@@ -299,7 +299,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task WorkspaceSourceChangeDrain_WhenThePrewarmRunsOutOfMemory_PropagatesAndDoesNotRestart()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var work = new RecordingBackgroundWorkRunner();
         shell.BackgroundWork.Runner = work;
         var failure = (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));
@@ -320,7 +320,7 @@ public sealed class ShellViewModelSimulationTests
     [Fact]
     public async Task WorkspaceSourceChangeDrain_AfterOutOfMemory_StartsAgainOnTheNextSourceChange()
     {
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var work = new RecordingBackgroundWorkRunner();
         shell.BackgroundWork.Runner = work;
         var failure = (OutOfMemoryException)RuntimeHelpers.GetUninitializedObject(typeof(OutOfMemoryException));

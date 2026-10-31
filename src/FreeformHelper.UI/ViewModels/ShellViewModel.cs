@@ -69,6 +69,12 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     /// </summary>
     public bool IsDevActive => _selectedPage == ShellPage.Dev;
     /// <summary>
+    /// Gets a value indicating whether the Dev page is offered. Release builds hide it. The app start reads the
+    /// build channel once and passes it in. Every creator must say which value it wants, so a test never
+    /// depends on the version of the build that runs it.
+    /// </summary>
+    public required bool IsDevPageAvailable { get; init; }
+    /// <summary>
     /// Gets a value indicating whether the Simulation view is currently active.
     /// </summary>
     public bool IsSimulationActive => _selectedPage == ShellPage.Simulation;

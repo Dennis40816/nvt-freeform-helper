@@ -103,7 +103,7 @@ public sealed class MainWindowNavigationInputTests
         public static async Task<NavigationWindow> CreateAsync(ShellPage page)
         {
             HeadlessAppBootstrap.EnsureInitialized();
-            var shell = new ShellViewModel { IsConsoleExpanded = false };
+            var shell = new ShellViewModel { IsConsoleExpanded = false, IsDevPageAvailable = true };
             shell.Simulation.RequestBuildWorkspaceAsync = null;
             shell.CoordinatePlanner.RequestBuildWorkspaceAsync = null;
             await ShellViewModelNavigationTests.ShowPageAsync(shell, page);

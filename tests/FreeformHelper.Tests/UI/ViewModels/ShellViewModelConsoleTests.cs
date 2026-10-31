@@ -18,7 +18,7 @@ public sealed class ShellViewModelConsoleTests
         try
         {
             LogManager.Configuration = new LoggingConfiguration();
-            using var shell = new ShellViewModel();
+            using var shell = new ShellViewModel { IsDevPageAvailable = true };
             var controller = shell.ConsoleSession.Controller;
             var sourceId = $"shell-console-{Guid.NewGuid():N}";
 
@@ -43,7 +43,7 @@ public sealed class ShellViewModelConsoleTests
         try
         {
             LogManager.Configuration = new LoggingConfiguration();
-            var shell = new ShellViewModel();
+            var shell = new ShellViewModel { IsDevPageAvailable = true };
             var controller = shell.ConsoleSession.Controller;
             var sourceId = $"shell-dispose-{Guid.NewGuid():N}";
             ConsoleLogTestSupport.Write(sourceId, "before dispose");

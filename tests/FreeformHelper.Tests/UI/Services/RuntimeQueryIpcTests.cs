@@ -22,7 +22,7 @@ public sealed class RuntimeQueryIpcTests
     public async Task StopAsync_WhenHostStarted_CompletesWithinTimeout()
     {
         await RuntimeQueryIpcHost.StopAsync();
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         try
         {
             RuntimeQueryIpcHost.Start(shell);
@@ -43,7 +43,7 @@ public sealed class RuntimeQueryIpcTests
     public async Task StopAsync_WhenClientConnectedWithoutRequest_CompletesWithinTimeout()
     {
         await RuntimeQueryIpcHost.StopAsync();
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         await using var client = new NamedPipeClientStream(
             ".",
             RuntimeQueryProtocol.PipeName,
@@ -99,7 +99,7 @@ public sealed class RuntimeQueryIpcTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         await RuntimeQueryIpcHost.StopAsync();
-        using var shell = new ShellViewModel();
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var projectFile = new ProjectFile();
         projectFile.Settings.Notch.NullValue = ushort.MaxValue + 1;
         var projectFileField = typeof(FreeformHelperViewModel)
