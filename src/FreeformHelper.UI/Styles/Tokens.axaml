@@ -737,9 +737,6 @@
   <x:Double x:Key="ConsoleCollapsedMinHeight">32</x:Double>
   <x:Double x:Key="DialogWidth">360</x:Double>
   <x:Double x:Key="DialogHeight">170</x:Double>
-  <x:Double x:Key="CadPadDialogHeight">320</x:Double>
-  <x:Double x:Key="RegularPadDialogWidth">320</x:Double>
-  <x:Double x:Key="RegularPadDialogHeight">240</x:Double>
   <x:Double x:Key="CascadeIcSettingsDialogWidth">520</x:Double>
   <x:Double x:Key="CascadeIcSettingsDialogHeight">460</x:Double>
   <x:Double x:Key="CascadeIcSettingsDialogMinWidth">460</x:Double>

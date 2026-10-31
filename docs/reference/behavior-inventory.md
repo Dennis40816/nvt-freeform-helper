@@ -331,12 +331,6 @@ Notes:
 - RegularPadInfoViewModel.DiscardChangesCommand
   - No external side effects
 
-### Dialog ViewModels (src/FreeformHelper.UI/Views/*.axaml.cs)
-- CadPadDialogViewModel Save/Cancel
-  - Returns only the dialog result
-- RegularPadDialogViewModel Save/Cancel
-  - Returns only the dialog result
-
 ## Settings and property-change triggers
 
 ### FreeformHelperViewModel.Settings*.cs (FreeformHelperViewModel.Settings.cs, FreeformHelperViewModel.Settings.PropertyCallbacks.*.cs, FreeformHelperViewModel.Settings.NotchPreview.cs and FreeformHelperViewModel.Settings.DirtyTracking.cs; MatchThreshold is in FreeformHelperViewModel.State.Configuration.cs)
