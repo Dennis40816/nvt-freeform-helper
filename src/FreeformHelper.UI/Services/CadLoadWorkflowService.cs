@@ -10,7 +10,7 @@ namespace FreeformHelper.UI.Services;
 /// </summary>
 public sealed class CadLoadWorkflowService
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private readonly CadLoadUseCase _cadLoadUseCase;
 
     public CadLoadWorkflowService(CadLoadUseCase cadLoadUseCase)
@@ -28,7 +28,7 @@ public sealed class CadLoadWorkflowService
             {
                 var totalSw = Stopwatch.StartNew();
                 request.SetStatus("Importing DXF...");
-                Logger.Info(CultureInfo.InvariantCulture, "Importing DXF.");
+                _logger.Info(CultureInfo.InvariantCulture, "Importing DXF.");
 
                 var options = request.BuildDxfOptions();
                 var importElapsedMs = 0L;
@@ -73,7 +73,7 @@ public sealed class CadLoadWorkflowService
 
                 totalSw.Stop();
 
-                Logger.Info(CultureInfo.InvariantCulture, "Open DXF timing: import={0} ms, layerCatalog={1} ms, apply={2} ms, rebuild={3} ms, total={4} ms, pads={5}, includeBlock={6}, onlyClosed={7}.",
+                _logger.Info(CultureInfo.InvariantCulture, "Open DXF timing: import={0} ms, layerCatalog={1} ms, apply={2} ms, rebuild={3} ms, total={4} ms, pads={5}, includeBlock={6}, onlyClosed={7}.",
                     importElapsedMs,
                     layerCatalogElapsedMs,
                     applyElapsedMs,

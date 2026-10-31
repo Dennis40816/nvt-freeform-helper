@@ -2851,16 +2851,6 @@
       "symbol": "WarningsNotAsErrors:CA1307"
     },
     {
-      "syntaxHash": "c7c0ce178aea3d14f1838e12bab4b081985ba7bb3ad6443f4abd4c3c3fd0f1fa",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/FreeformHelper.Application.csproj",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:IDE1006"
-    },
-    {
       "syntaxHash": "2c4f3956570bce7332a7ff7f06c63c2ecd8ff0eaf045063be96b34e851276a6d",
       "member": "MSBuild",
       "owner": "NFH",
@@ -2979,16 +2969,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "NoWarn:1591"
-    },
-    {
-      "syntaxHash": "babcd6d0cf0c6c732cbdf22149224aa4dbb4af9a2a9273d689b97b880080f066",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:CA1031"
     },
     {
       "syntaxHash": "11296c0397a890e23ef507ec0659e1184f2e4bd21bfa743070e05f95234b6dbe",
@@ -3169,16 +3149,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "WarningsNotAsErrors:VSTHRD103"
-    },
-    {
-      "syntaxHash": "ef02d3fbb89c5a19265fb9e306e9f03a9c6f8908265f12771845324c64468be8",
-      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.RunIpcLoopAsync(string,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "CA1031",
-      "symbol": "CA1031"
     },
     {
       "syntaxHash": "f233455ef1be502c96497eeaa682c356dc55f2f31a9629b9c830abca191dd42a",
@@ -6521,16 +6491,6 @@
       "symbol": "Set MSBuild property 'GenerateDocumentationFile' to 'true' in project file to enable IDE0005 (Remove unnecessary usings/imports) on build"
     },
     {
-      "syntaxHash": "deef884ffaa438dde61fe47272c0b71ee11d7a954f3e55c2acfe580b7e08f5b4",
-      "member": "FreeformHelper.UI.Services.ProjectPersistenceUseCase.fields:_padOverrideService",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ProjectPersistenceUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0052",
-      "symbol": "IDE0052"
-    },
-    {
       "syntaxHash": "da685c4f4bb5c3a22cbb7fa42f6a16eeb83c601b1e110064c1aa9d33163ac5ff",
       "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.fields:_ipcLoopTask",
       "owner": "NFH",
@@ -6549,56 +6509,6 @@
       "count": 1,
       "rule": "IDE0330",
       "symbol": "IDE0330"
-    },
-    {
-      "syntaxHash": "829bc9f2701a1cb8a59569488af0bc9580d39d869e55c62638e333e4f1f28998",
-      "member": "FreeformHelper.Application.Services.CoordinateArtifactService.fields:JsonOptions",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/CoordinateArtifactService.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "829bc9f2701a1cb8a59569488af0bc9580d39d869e55c62638e333e4f1f28998",
-      "member": "FreeformHelper.Application.Services.CopperPillarPathReplayArtifactService.fields:JsonOptions",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/CopperPillarPathReplayArtifactService.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "6575061c76e00d09c661c8600b609340a89c15bb1ec2ed7b50f6881df372b792",
-      "member": "FreeformHelper.Application.Services.NotchToFullRuleEngine.fields:EmptyTrace",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/NotchToFullRuleEngine.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "52ad59844dd00ce57f9e64d04d6cb111b98bdd84173342dbd0744f69b2e317f4",
-      "member": "FreeformHelper.Application.Services.PadMatchResult.fields:EmptyMap",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/PadMatchResult.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9c3d784763815b6c43957d2c227e7f255f10c1cac466d9c938197699252f80ad",
-      "member": "FreeformHelper.Application.Settings.NotchSettings.fields:DefaultEnabledVersions",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Settings/NotchSettings.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
     },
     {
       "syntaxHash": "c75066ec9b9a2403401cf9495ff3e1816d552b82dbebd25974caa30790311441",
@@ -7761,26 +7671,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
-      "member": "FreeformHelper.UI.Services.CadLoadWorkflowService.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadWorkflowService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
-      "member": "FreeformHelper.UI.Services.LayerCatalogStateService.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/LayerCatalogStateService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "ccc0e5a0ece837dfba771bd070bc42cb7293db8689b671d9cda14863961c457c",
       "member": "FreeformHelper.UI.Services.NotchDetailUseCase.fields:ResolvedResultService",
       "owner": "NFH",
@@ -7815,16 +7705,6 @@
       "member": "FreeformHelper.UI.Services.RuntimeQueryCommandLine.fields:SupportedCommands",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/RuntimeQueryCommandLine.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "927297af9d1ab3e258223e9755e568577b6e7897c0753f26be24e42aeadc5f34",
-      "member": "FreeformHelper.UI.Services.RuntimeQueryIpcHost.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "IDE1006",
@@ -16605,16 +16485,6 @@
       "member": "FreeformHelper.UI.Services.PadMatchService.Match(CadPadSet,RegularGrid,Action<double>?)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/PadMatchService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "076165a8f5b48e2318430d429987cbc7d5e711d260b89add289eedf27b4f616c",
-      "member": "FreeformHelper.UI.Services.ProjectPersistenceUseCase..ctor(JsonProjectStore,PadOverrideService)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ProjectPersistenceUseCase.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "suppressionScopes",
