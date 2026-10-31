@@ -1404,20 +1404,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 81
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs"
-      ],
-      "contentHash": "d342e0f126003cd8564b1b3978753acb5afd8379695ffee24afc7955e3dfb16e",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.NotchExportSelectionViewModel..ctor(NotchTable,Action<NotchTableRow>?,IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption>?,FreeformHelperViewModel.NotchExportFileTypeOption?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 295
       },
       "owner": "NFH",
@@ -1581,20 +1567,6 @@
       "contentHash": "38f98e4078a560cf91b1c59759fb119cbbc597e2557b8ac0b432a66189172e34",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.Views.FreeformHelperView"
-    },
-    {
-      "kind": "file",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "axamlCodeBehindLines": 152
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml.cs"
-      ],
-      "contentHash": "fe0b9f6efe6de53275512c58da63e3fb9864fd7e2a25c83b3b57011df849e3f6",
-      "project": "FreeformHelper.UI",
-      "symbol": "file:FreeformHelper.UI.Views.NotchExportSelectionWindow"
     },
     {
       "kind": "file",
@@ -1936,7 +1908,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 1240
+        "fileLines": 1236
       },
       "owner": "NFH",
       "locations": [
