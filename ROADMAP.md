@@ -1,6 +1,6 @@
 # FreeformHelper Roadmap
 
-This file is the single plan for FreeformHelper. It replaces the former task list in `TODO.md` and `docs/guides/refactor-roadmap-1.3.x.md`; their history stays in git. `TODO.md` now holds only short follow-up notes that have no item here yet.
+This file is the single plan for FreeformHelper. It replaces the former task list in `TODO.md` and `docs/guides/refactor-roadmap-1.3.x.md`; their history stays in git.
 
 Work runs on three lines:
 
@@ -14,7 +14,7 @@ Core integration must never block the fix line.
 
 - Each item states its target version, status and PR or issue link.
 - Status is one of: `Not started`, `In progress`, `Blocked: <reason>`, `Waiting for owner`, `Done`.
-- Keep the existing IDs (`R13.*`, `S15.*`). The older `S11.*` IDs have no item in this file; they appear only in archived documents and in git history. The `13` in `R13` is a historical number, not a version. Commits and PRs refer to them as `Refs: ROADMAP.md <ID>` until the item has an issue; then use `Refs #N`.
+- Keep the existing IDs (`R13.*`, `S15.*`, `S11.*`). The `13` in `R13` is a historical number, not a version. Commits and PRs refer to them as `Refs: ROADMAP.md <ID>` until the item has an issue; then use `Refs #N`.
 - When you find new work, add it here under the right line at once.
 - When a release ships, delete its done items. Git history keeps them.
 - `pwsh .agents/skills/repo-optimizer-loop/scripts/list_pending_todo.ps1 -TodoPath ROADMAP.md` lists the open items.
@@ -230,7 +230,7 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
 - [ ] **R13.307-ICON Material Symbols becomes the shared Core icon system; delete the unused `MaterialIcons-Regular.ttf`** · Target: g4 · Status: In progress: Core font file adoption done; `NvtIcons` migration waits for the Core.Avalonia upgrade · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
 - [x] **R13.307-FONT Adopt the Core font set** · Target: g4 · Status: Done · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
 - [x] **R13.307-LIC Ship the Core license as `licenses/Nvt.Core/LICENSE` and the font licenses (including the Inter OFL text) under `licenses/`** · Target: first NFH release with Core · Status: Done · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
-  - The pinned Fonts 0.1.0 package supplies the Core license, three font license files and Material Symbols NOTICE. It omits a standalone Inter OFL license. NFH ships the Inter OFL text itself as `licenses/Inter/LICENSE` (`src/FreeformHelper.UI/licenses/Inter/LICENSE`, included by `FreeformHelper.UI.csproj`). The Core package still lacks it, and the Core packaging follow-up must supply it.
+  - The pinned Fonts 0.1.0 package supplies the Core license, three font license files and Material Symbols NOTICE. It omits a standalone Inter OFL license; the Core packaging follow-up must supply it before customer distribution. NFH already ships its own copy as `licenses/Inter/LICENSE` (`src/FreeformHelper.UI/licenses/Inter/LICENSE`, included by `FreeformHelper.UI.csproj`).
 - [x] **C-LSC Use LoadingScopeCoordinator from the Core non-UI library** · Target: g4 · Status: Done; Core side in [Core #44](https://github.com/Dennis40816/nvt_fw_core/pull/44) · PR: [#61](https://github.com/Dennis40816/nvt-freeform-helper/pull/61)
 - [x] **C-NONUI Move CoalescedRefresh and UndoService to the Core non-UI library** · Target: g4 · Status: Done · PR: [#60](https://github.com/Dennis40816/nvt-freeform-helper/pull/60)
 - [ ] **C-CTRL Move cards, dialogs and input controls to Core** · Target: g4 · Status: Not started · PR: -
