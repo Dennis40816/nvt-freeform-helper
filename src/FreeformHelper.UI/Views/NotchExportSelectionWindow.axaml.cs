@@ -92,41 +92,6 @@ public sealed partial class NotchExportSelectionWindow : Window
         viewModel.SearchKeyword = helper.GeneratedQuery;
     }
 
-    private void OpenHeaderFilterButton_Click(object? sender, RoutedEventArgs e)
-    {
-        var key = (sender as Control)?.Tag?.ToString();
-        _uiEvents?.Run("NotchExport.HeaderFilter", _ => OpenHeaderFilterAsync(key), CancellationToken.None);
-    }
-
-    private async Task OpenHeaderFilterAsync(string? key)
-    {
-        if (DataContext is not NotchExportSelectionViewModel viewModel)
-        {
-            return;
-        }
-
-        if (!viewModel.TryBuildColumnFilterDialog(key, out var dialogViewModel) || dialogViewModel is null)
-        {
-            return;
-        }
-
-        var dialog = new NotchExportColumnFilterWindow
-        {
-            DataContext = dialogViewModel,
-        };
-
-        var confirmed = await dialog.ShowDialog<bool>(this);
-        if (!confirmed)
-        {
-            return;
-        }
-
-        viewModel.ApplyColumnFilterSelection(
-            dialogViewModel.Field,
-            dialogViewModel.GetSelectedKeys(),
-            dialogViewModel.GetAllKeys());
-    }
-
     protected override void OnClosed(EventArgs e)
     {
         if (!_completionRaised)

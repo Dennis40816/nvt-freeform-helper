@@ -119,7 +119,7 @@
       "src/FreeformHelper.UI/Services/IndexMappingVerificationWorkspaceProjector.cs", "src/FreeformHelper.UI/Services/IndexMappingVerificationWorkspaceSnapshot.cs",
       "src/FreeformHelper.UI/Services/LayerFilterUseCase.cs", "src/FreeformHelper.UI/Services/NotchDetailUseCase.cs",
       "src/FreeformHelper.UI/Services/NotchDisplayProjector.cs", "src/FreeformHelper.UI/Services/NotchExportSelectionColumnFilterService.cs",
-      "src/FreeformHelper.UI/Services/NotchExportSelectionProjectionBuilder.cs", "src/FreeformHelper.UI/Services/NotchExportSelectionQuickFilterService.cs",
+      "src/FreeformHelper.UI/Services/NotchExportSelectionProjectionBuilder.cs",
       "src/FreeformHelper.UI/Services/NotchExportSelectionRowSelectionService.cs", "src/FreeformHelper.UI/Services/NotchExportSelectionSelectedRowService.cs",
       "src/FreeformHelper.UI/Services/NotchExportSelectionSummaryProjector.cs", "src/FreeformHelper.UI/Services/NotchExportSelectionWorkspaceLinkService.cs",
       "src/FreeformHelper.UI/Services/ProjectEditingCommands.cs", "src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs",

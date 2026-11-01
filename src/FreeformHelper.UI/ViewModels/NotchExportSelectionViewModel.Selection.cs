@@ -52,23 +52,6 @@ public sealed partial class NotchExportSelectionViewModel
         }
     }
 
-    private void ApplyColumnFilter(string? target)
-    {
-        var action = NotchExportSelectionQuickFilterService.ResolveAction(
-            target,
-            SearchKeyword,
-            SelectedRowDisplayModeOption.Value);
-        if (action.ShouldUpdateSearchKeyword)
-        {
-            SearchKeyword = action.SearchKeyword;
-        }
-
-        if (action.ShouldUpdateRowDisplayMode)
-        {
-            SetRowDisplayMode(action.RowDisplayMode);
-        }
-    }
-
     private NotchExportIcGroupViewModel CreateGroup(int icIndex, IReadOnlyList<NotchExportRowItemViewModel> rows)
     {
         var group = new NotchExportIcGroupViewModel(
@@ -104,16 +87,6 @@ public sealed partial class NotchExportSelectionViewModel
         }
 
         SelectedRow = row;
-    }
-
-    private void SelectAll()
-    {
-        NotchExportSelectionRowSelectionService.SelectAll(_allRows);
-    }
-
-    private void SelectNone()
-    {
-        NotchExportSelectionRowSelectionService.SelectNone(_allRows);
     }
 
     private void UseShownOnly()
@@ -165,7 +138,6 @@ public sealed partial class NotchExportSelectionViewModel
         OnPropertyChanged(nameof(SummaryText));
         OnPropertyChanged(nameof(DistributionText));
         OnPropertyChanged(nameof(ExportButtonText));
-        OnPropertyChanged(nameof(CanConfirmExport));
         OnPropertyChanged(nameof(AreAllVisibleRowsSelected));
     }
 

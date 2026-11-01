@@ -4,16 +4,6 @@ namespace FreeformHelper.UI.Services;
 
 internal static class NotchExportSelectionRowSelectionService
 {
-    public static void SelectAll(IReadOnlyList<NotchExportRowItemViewModel> rows)
-    {
-        SetRowsSelected(rows, selected: true);
-    }
-
-    public static void SelectNone(IReadOnlyList<NotchExportRowItemViewModel> rows)
-    {
-        SetRowsSelected(rows, selected: false);
-    }
-
     public static void SelectVisibleOnly(
         IReadOnlyList<NotchExportRowItemViewModel> allRows,
         IReadOnlyList<NotchExportRowItemViewModel> visibleRows)

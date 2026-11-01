@@ -622,11 +622,8 @@ public sealed class UiLayoutGuardTests
             {
                 "SummaryText",
                 "DistributionText",
-                "KeyValueDisplayText",
                 "PrimaryOutcomeText",
                 "CompactMetaText",
-                "CommentPreviewText",
-                "SelectedRowSummaryText",
                 "SelectedRowHeaderText",
                 "SelectedRowCodePreviewText",
                 "SelectedRowOutcomeText",
@@ -634,8 +631,7 @@ public sealed class UiLayoutGuardTests
                 "SelectedRowPayloadText",
                 "SelectedRowColumnBreakdownText",
                 "SelectedRowFlagsText",
-                "SelectedRowCommentText",
-                "SelectedRowAnalysisText"
+                "SelectedRowCommentText"
             }
         };
 

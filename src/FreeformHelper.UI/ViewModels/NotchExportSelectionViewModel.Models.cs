@@ -51,8 +51,6 @@ public sealed partial class NotchExportIcGroupViewModel : ObservableObject
     private readonly ObservableCollection<NotchExportRowItemViewModel> _rows;
     private readonly Action _onSelectAll;
     private readonly Action _onSelectNone;
-    private readonly int _v22Count;
-    private readonly int _cadLinkedCount;
 
     public NotchExportIcGroupViewModel(
         int icIndex,
@@ -63,8 +61,6 @@ public sealed partial class NotchExportIcGroupViewModel : ObservableObject
         IcIndex = icIndex;
         _rows = new ObservableCollection<NotchExportRowItemViewModel>(rows ?? throw new ArgumentNullException(nameof(rows)));
         Rows = new ReadOnlyObservableCollection<NotchExportRowItemViewModel>(_rows);
-        _v22Count = Rows.Count(item => item.Row.Version == NotchAlgorithmVersion.V22);
-        _cadLinkedCount = Rows.Count(item => item.Row.CadPadId.HasValue);
         _onSelectAll = onSelectAll ?? throw new ArgumentNullException(nameof(onSelectAll));
         _onSelectNone = onSelectNone ?? throw new ArgumentNullException(nameof(onSelectNone));
 
@@ -84,7 +80,6 @@ public sealed partial class NotchExportIcGroupViewModel : ObservableObject
     public int TotalCount => Rows.Count;
     public string HeaderText => $"IC {IcIndex + 1}";
     public string SummaryText => $"{SelectedCount}/{TotalCount}";
-    public string GroupDetailText => $"v2.2 {_v22Count} · legacy {TotalCount - _v22Count} · CAD linked {_cadLinkedCount}";
 
     internal void UpdateCounts()
     {
@@ -118,13 +113,9 @@ public sealed partial class NotchExportRowItemViewModel : ObservableObject
     public string RegularText => Row.RegularPadIndex.ToString(CultureInfo.InvariantCulture);
     public string CadText => Row.CadPadId?.ToString(CultureInfo.InvariantCulture) ?? "-";
     public bool IsCadLinked => Row.CadPadId.HasValue;
-    public string CadLinkStateText => Row.CadPadId.HasValue ? "CAD linked" : "No CAD";
     public string ValuesText => string.Join(", ", Row.Values ?? Array.Empty<int>());
     public string CodePreviewText => $"{{ {ValuesText} }}";
-    public string KeyValueDisplayText => CodePreviewText;
     public string CommentText => string.IsNullOrWhiteSpace(Row.Comment) ? "-" : Row.Comment;
-    public bool HasComment => !string.IsNullOrWhiteSpace(Row.Comment);
-    public string CommentPreviewText => HasComment ? $"Comment: {Row.Comment}" : "Comment: -";
     public string CompactHeaderText => $"{RowNumberText} · {VersionText} · IC {Row.IcIndex + 1} · Diff {DiffText}";
     public string CompactMetaText => Row.CadPadId.HasValue
         ? $"REG {RegularText} -> CAD {CadText}"
@@ -140,7 +131,6 @@ public sealed partial class NotchExportRowItemViewModel : ObservableObject
     public string StatusText => BuildStatusText();
     public string MatchSummaryText => BuildMatchSummaryText(Row);
     public string MappingText => $"REG {RegularText} -> CAD {CadText}";
-    public string SearchTokenText => BuildSearchTokenText();
     public string PrimaryOutcomeText => BuildPrimaryOutcomeText(Row, IsNoOpV22Node);
     public string PreviewHeaderText => $"{RowNumberText}  |  {VersionText}  |  IC {Row.IcIndex + 1}  |  Diff {DiffText}";
     public string CurrentRowContextText => $"{RowNumberText} · {VersionText} · IC {Row.IcIndex + 1} · Diff {DiffText}";
@@ -148,7 +138,6 @@ public sealed partial class NotchExportRowItemViewModel : ObservableObject
     public string PreviewPayloadText => BuildPayloadText(Row);
     public string PayloadColumnsText => BuildPayloadColumnsText(Row);
     public string PreviewFlagsText => BuildFlagsText(Row);
-    public string PreviewAnalysisText => BuildAnalysisText(Row);
     public string AnalysisRatioSumText => BuildAnalysisRatioSumText(Row);
     public string AnalysisDeltaText => BuildAnalysisDeltaText(Row);
     public string PayloadAnchorText => BuildPayloadAnchorText(Row);
@@ -204,18 +193,6 @@ public sealed partial class NotchExportRowItemViewModel : ObservableObject
         return $"anchor_diff={node.AnchorDiffIndex}, combine={node.CombinePercent}, " +
                $"target1_diff={FormatDiff(node.TargetDiffIndex1)}, target1_ratio={node.TargetRatioPercent1}, " +
                $"target2_diff={FormatDiff(node.TargetDiffIndex2)}, target2_ratio={node.TargetRatioPercent2}, flags={node.Flags}";
-    }
-
-    private static string BuildAnalysisText(NotchTableRow row)
-    {
-        if (row.V22Node is not NotchV22Node node)
-        {
-            return $"Values count={row.Values.Length}, version={row.Version.ToDisplayLabel()}.";
-        }
-
-        var ratioTotal = node.TargetRatioPercent1 + node.TargetRatioPercent2;
-        var ratioDelta = node.CombinePercent - ratioTotal;
-        return $"Target ratio sum={ratioTotal}% (combine={node.CombinePercent}%, delta={ratioDelta}%).";
     }
 
     private static string BuildAnalysisRatioSumText(NotchTableRow row)

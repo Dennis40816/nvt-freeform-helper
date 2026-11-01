@@ -35,12 +35,12 @@ public sealed partial class NotchExportSelectionViewModelTests
 
 
     [Fact]
-    public void SelectNoneCommand_ClearsAllSelections()
+    public void AreAllVisibleRowsSelected_False_ClearsAllSelections()
     {
         var table = BuildSampleTable();
         var vm = new NotchExportSelectionViewModel(table);
 
-        vm.SelectNoneCommand.Execute(null);
+        vm.AreAllVisibleRowsSelected = false;
 
         Assert.Equal(0, vm.SelectedCount);
         Assert.False(vm.HasSelection);
@@ -184,7 +184,7 @@ public sealed partial class NotchExportSelectionViewModelTests
         Assert.True(vm.HasExportTypeOptions);
         Assert.True(vm.CanSelectExportType);
         Assert.Equal(FreeformHelperViewModel.NotchExportFileType.Cv22, vm.SelectedExportTypeOption.Value);
-        Assert.Equal("C v2.2 (.c)", vm.SelectedExportTypeText);
+        Assert.Equal("C v2.2 (.c)", vm.SelectedExportTypeOption.Display);
     }
 
 
@@ -268,7 +268,7 @@ public sealed partial class NotchExportSelectionViewModelTests
         var table = new NotchTable(BuildSampleTable().Rows, audit);
         var vm = new NotchExportSelectionViewModel(table);
 
-        Assert.True(vm.HasToFullCoverageExpectations);
+        Assert.False(vm.HasNoToFullCoverageExpectations);
         Assert.True(vm.HasToFullCoveragePass);
         Assert.False(vm.HasToFullCoverageWarning);
         Assert.Equal("ToFull coverage ok 3/3", vm.ToFullCoverageBadgeText);
@@ -298,7 +298,7 @@ public sealed partial class NotchExportSelectionViewModelTests
         var table = new NotchTable(BuildSampleTable().Rows, audit);
         var vm = new NotchExportSelectionViewModel(table);
 
-        Assert.True(vm.HasToFullCoverageExpectations);
+        Assert.False(vm.HasNoToFullCoverageExpectations);
         Assert.True(vm.HasToFullCoverageWarning);
         Assert.True(vm.HasToFullCoverageMissingList);
         Assert.Equal("ToFull coverage missing 2/4", vm.ToFullCoverageBadgeText);
