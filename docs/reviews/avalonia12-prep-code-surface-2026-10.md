@@ -101,7 +101,7 @@ These are existing public initialization APIs. Platform detection, font source�
 
 ## 3. Headless test host and xUnit attributes (P0)
 
-**The host and session guard have the highest priority; this does not mean all headless attributes are considered broken.** This repository already has safeguards against dispatcher creation races, leftover layout work, and stale contexts; see S15.002 root causes five～eight in `TODO.md` for background. The current code assumes several aspects of session teardown implementation order as behavioral prerequisites, and each must be checked before the upgrade.
+**The host and session guard have the highest priority; this does not mean all headless attributes are considered broken.** This repository already has safeguards against dispatcher creation races, leftover layout work, and stale contexts; see S15.002 root causes five～eight in the former `TODO.md` (git history) for background. `ROADMAP.md` S15.002 keeps the summary. The current code assumes several aspects of session teardown implementation order as behavioral prerequisites, and each must be checked before the upgrade.
 
 | File:symbol | Count／dependencies | Key checks |
 |---|---|---|

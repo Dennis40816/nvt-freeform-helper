@@ -5,7 +5,7 @@ Status: The current development workflow for this repository. Use the root `AGEN
 ## Before Starting (Preflight)
 
 1. Check the current branch and working tree. Read `docs/generated/project-dependency-graph.md`, then follow `docs/agents/domain.md` to read `ROADMAP.md`, `docs/reference/refactor-contract.md`, and applicable reference contracts.
-2. Confirm the outcome, affected layers, side effects, acceptance criteria, targeted test, and human/golden gates for one roadmap slice/issue. See `ROADMAP.md S15.002` for the `S15.*` issue-link exception.
+2. Confirm the outcome, affected layers, side effects, acceptance criteria, targeted test, and human/golden gates for one roadmap slice/issue. For the `S15.*` exception, see `CONTRIBUTING.md`: use a separate line `Refs: ROADMAP.md <ID>` until an issue exists.
 3. Run `./scripts/dev/prepare-ui-workspace.ps1` before UI build/test/lint; initialize the private `example/` submodule in a new worktree before running gates. Do not copy its contents into records or public files.
 
 ## Work Admission (Admission)
