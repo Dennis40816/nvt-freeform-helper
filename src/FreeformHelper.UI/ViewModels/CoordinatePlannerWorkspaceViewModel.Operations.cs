@@ -243,15 +243,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
                 $"({point.MachineX:0.###}, {point.MachineY:0.###})",
                 $"({point.SafeMachineX:0.###}, {point.SafeMachineY:0.###})"))
             .ToArray();
-        BistCornerRows = _snapshot.Points
-            .Where(static point => point.Kind == CoordinatePlannerPointKind.BistCorner)
-            .Select(static point => new CoordinatePlannerPointRow(
-                point.Label,
-                "BIST corner",
-                $"({point.PixelX:0.###}, {point.PixelY:0.###})",
-                $"({point.MachineX:0.###}, {point.MachineY:0.###})",
-                $"({point.SafeMachineX:0.###}, {point.SafeMachineY:0.###})"))
-            .ToArray();
         CustomArrayCornerRows = _snapshot.Points
             .Where(static point => point.Kind == CoordinatePlannerPointKind.CustomArrayCorner)
             .Select(static point => new CoordinatePlannerPointRow(
@@ -300,7 +291,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
         OnPropertyChanged(nameof(Snapshot));
         OnPropertyChanged(nameof(PreviewBounds));
         OnPropertyChanged(nameof(AaCornerRows));
-        OnPropertyChanged(nameof(BistCornerRows));
         OnPropertyChanged(nameof(CustomArrayCornerRows));
         OnPropertyChanged(nameof(CustomArrayPointRows));
         OnPropertyChanged(nameof(HorizontalGuideRows));

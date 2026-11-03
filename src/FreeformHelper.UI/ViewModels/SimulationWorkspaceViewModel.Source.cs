@@ -119,8 +119,7 @@ public sealed partial class SimulationWorkspaceViewModel
             _csvFiles.Add(new NotchApplySimulationSourceFileItemViewModel(
                 file.FileName,
                 file.SummaryText,
-                file.ShapeText,
-                file.Diagnostics.Count > 0));
+                file.ShapeText));
         }
     }
 

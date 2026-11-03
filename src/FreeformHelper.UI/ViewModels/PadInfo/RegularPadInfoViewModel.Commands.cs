@@ -48,16 +48,6 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
         HighlightMatches();
     }
 
-    private void HighlightAllOwners()
-    {
-        if (_highlightCadOwnerPads is null || _allOwnerCadIds.Count == 0)
-        {
-            return;
-        }
-
-        _highlightCadOwnerPads(_allOwnerCadIds);
-    }
-
     private static string BuildMatchText(Func<int, int?>? getDxfIndex, List<int> cadIds)
     {
         if (cadIds.Count == 0)

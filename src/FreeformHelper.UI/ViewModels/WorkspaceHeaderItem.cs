@@ -1,11 +1,10 @@
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
-/// Represents a single item in the workspace header menu, typically a toggle button
-/// or a command button. It supports an ID, a display label, an icon, and can be grouped.
+/// Represents a toggle item in the workspace header menu.
+/// It supports an ID and a display label.
 /// </summary>
 public sealed class WorkspaceHeaderItem : ObservableObject
 {
@@ -25,44 +24,22 @@ public sealed class WorkspaceHeaderItem : ObservableObject
     /// </summary>
     public string Label { get; }
     /// <summary>
-    /// Gets the group name for this header item, used for logical grouping in the UI.
-    /// </summary>
-    public string? Group { get; }
-    /// <summary>
-    /// Gets the icon object associated with this header item.
-    /// </summary>
-    public object? Icon { get; }
-    /// <summary>
-    /// Gets the command to execute when this item is activated (if it's not a toggle).
-    /// </summary>
-    public ICommand? Command { get; }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="WorkspaceHeaderItem"/> class.
     /// </summary>
     /// <param name="id">A unique identifier for the item.</param>
     /// <param name="label">The display label for the item.</param>
     /// <param name="isChecked">The initial checked state of the item (for toggles).</param>
     /// <param name="onToggle">An optional action to execute when the checked state changes.</param>
-    /// <param name="command">An optional command to execute when the item is activated.</param>
-    /// <param name="group">An optional group name for the item.</param>
-    /// <param name="icon">An optional icon object for the item.</param>
     public WorkspaceHeaderItem(
         string id,
         string label,
         bool isChecked,
-        Action<bool>? onToggle = null,
-        ICommand? command = null,
-        string? group = null,
-        object? icon = null)
+        Action<bool>? onToggle = null)
     {
         Id = id;
         Label = label;
         _isChecked = isChecked;
         _onToggle = onToggle;
-        Command = command;
-        Group = group;
-        Icon = icon;
     }
 
     /// <summary>

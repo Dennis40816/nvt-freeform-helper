@@ -87,10 +87,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
             ? $"CAD pads · {Subtitle}"
             : $"CAD {pads[0].Id} · Diff idx {DxfIndexText}";
 
-        var bounds = UnionBounds(pads.Select(p => p.Bounds));
-        BoundsText = FormatBounds(bounds);
         var cadOutputFwDiffOverrideValue = (int?)null;
-        var hasNotchCompensationPreview = false;
         var notchRowSummaryText = "Notch rows: -";
         var toRegularRatioText = "Undo NF (To Regular): -";
         var toFullRatioText = "To Full: -";
@@ -153,7 +150,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
 
                 if (snapshotCad.Notch is { } resolvedDisplayInput)
                 {
-                    hasNotchCompensationPreview = true;
                     notchRowSummaryText = snapshotCad.NotchRowSummary;
                     var notchDisplay = NotchDisplayProjector.Build(resolvedDisplayInput);
                     toRegularRatioText = notchDisplay.ToRegularRatioText;
@@ -204,7 +200,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
                 var compensation = getCadV22CompensationPreview?.Invoke(cadPadId);
                 if (compensation.HasValue)
                 {
-                    hasNotchCompensationPreview = true;
                     notchRowSummaryText = "Notch rows: unknown (open from selection inspector)";
                     var allocation = getCadV22TargetAllocationSummary?.Invoke(cadPadId);
                     var diagnostics = getCadV22CompensationDiagnostics?.Invoke(cadPadId);
@@ -256,7 +251,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
             }
         }
 
-        HasNotchCompensationPreview = hasNotchCompensationPreview;
         NotchRowSummaryText = notchRowSummaryText;
         ToRegularRatioText = toRegularRatioText;
         ToFullRatioText = toFullRatioText;
@@ -287,7 +281,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
 
         // Handle custom values: check for mixed state and set initial value.
         var values = pads.Select(p => (decimal)getCustomValue(p.Id)).Distinct().ToList();
-        IsCustomValueMixed = values.Count > 1;
         _isLoading = true; // Suppress dirty tracking during initial load.
         CustomValue = values.Count == 1 ? values[0] : 0m; // If not mixed, use the common value; otherwise, default to 0.
         _isLoading = false;
@@ -305,11 +298,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
         FocusMatchCommand = new RelayCommand(FocusMatch);
         LocateMatchCommand = new RelayCommand(LocateMatch);
         OpenOwnerDetailCommand = FocusMatchCommand;
-        HighlightMatchesCommand = new RelayCommand(HighlightMatches);
         HighlightAllNotchOwnersCommand = new RelayCommand(HighlightAllNotchOwners);
-        ToggleNotchDiagnosticsCommand = new RelayCommand(() => ShowNotchDiagnostics = !ShowNotchDiagnostics);
-        ToggleRuleTraceCommand = new RelayCommand(() => ShowRuleTrace = !ShowRuleTrace);
-        ToggleGeometryDetailsCommand = new RelayCommand(() => ShowGeometryDetails = !ShowGeometryDetails);
         ToggleLowFrequencyDetailSectionCommand = new RelayCommand(ToggleLowFrequencyDetailSection);
         ShowGeometryDetails = false;
     }

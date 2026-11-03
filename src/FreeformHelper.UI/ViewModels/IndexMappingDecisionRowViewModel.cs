@@ -229,7 +229,6 @@ public sealed partial class IndexMappingDecisionRowViewModel : ObservableObject
             OverrideRegularPadIndex);
     }
 
-    [ObservableProperty] private bool _hasOverride;
     [ObservableProperty] private int? _overrideRegularPadIndex;
     [ObservableProperty] private bool _isInspectorSelected;
     [ObservableProperty] private string _overrideText = "Override: none.";
@@ -406,12 +405,10 @@ public sealed partial class IndexMappingDecisionRowViewModel : ObservableObject
         OverrideRegularPadIndex = regularPadIndex;
         if (regularPadIndex is int index)
         {
-            HasOverride = true;
             OverrideText = $"Override: CAD -> regular id {index}.";
         }
         else
         {
-            HasOverride = false;
             OverrideText = "Override: none.";
         }
     }

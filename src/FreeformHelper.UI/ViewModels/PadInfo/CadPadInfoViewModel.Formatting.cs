@@ -76,27 +76,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     }
 
     /// <summary>
-    /// Helper method to union the bounding boxes of a collection of rectangles.
-    /// </summary>
-    private static Rect2 UnionBounds(IEnumerable<Rect2> rects)
-    {
-        Rect2? bounds = null;
-        foreach (var r in rects)
-        {
-            bounds = bounds is null ? r : Rect2.Union(bounds.Value, r);
-        }
-        return bounds ?? new Rect2(0, 0, 0, 0);
-    }
-
-    /// <summary>
-    /// Helper method to format a <see cref="Rect2" /> into a human-readable string.
-    /// </summary>
-    private static string FormatBounds(Rect2 bounds)
-    {
-        return $"X {bounds.MinX:0.###} - {bounds.MaxX:0.###}\nY {bounds.MinY:0.###} - {bounds.MaxY:0.###}";
-    }
-
-    /// <summary>
     /// Helper method to format a <see cref="Point2" /> into a human-readable string.
     /// </summary>
     private static string FormatPoint(Point2 p)

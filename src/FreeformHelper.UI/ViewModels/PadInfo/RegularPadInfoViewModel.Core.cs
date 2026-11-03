@@ -27,7 +27,6 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
     private readonly IReadOnlyList<int> _rows; // Distinct rows of selected pads.
     private readonly IReadOnlyList<int> _cols; // Distinct columns of selected pads.
     private readonly int? _regularPadIdForMatchActions;
-    private readonly IReadOnlyList<int> _allOwnerCadIds = Array.Empty<int>();
 
     // Internal flags for change tracking.
     private bool _isLoading;
@@ -75,11 +74,9 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
     public string OwnerSummaryText { get; }
     public IReadOnlyList<PadInfoRelationCardViewModel> MatchAreaCards { get; }
     public bool HasMatchAreaCards => MatchAreaCards.Count > 0;
-    public IReadOnlyList<NotchOwnerLinkViewModel> OwnerLinks { get; }
     public string NotchRowsSummaryText { get; }
     public IReadOnlyList<PadInfoRelationCardViewModel> NotchRowFlowCards { get; }
     public bool HasNotchRowFlowCards => NotchRowFlowCards.Count > 0;
-    public IReadOnlyList<NotchOwnerLinkViewModel> NotchRowLinks { get; }
     public string RowRangeText { get; }
     public string ColRangeText { get; }
     public bool HasMatchNavigation { get; }
@@ -122,15 +119,12 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
     /// Gets the command to reset the pad size to its default (auto-distributed) state.
     /// </summary>
     public IRelayCommand ResetPadSizeCommand { get; }
-    public IRelayCommand NavigateToMatchCommand { get; }
     public IRelayCommand LocateMatchCommand { get; }
-    public IRelayCommand HighlightMatchesCommand { get; }
     public IRelayCommand ToggleGeometryDetailsCommand { get; }
     public IRelayCommand SetFreeformNoneCommand { get; }
     public IRelayCommand SetFreeformXCommand { get; }
     public IRelayCommand SetFreeformYCommand { get; }
     public IRelayCommand SetFreeformXYCommand { get; }
-    public IRelayCommand HighlightAllOwnersCommand { get; }
     public string GeometryDetailsToggleText => ShowGeometryDetails ? "Hide details" : "Show details";
     /// <inheritdoc />
     public ICommand ApplyChangesCommand { get; }
@@ -184,13 +178,10 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
             ? candidate
             : null;
         var ruleTraceLines = new List<string>();
-        var ownerLinks = new List<NotchOwnerLinkViewModel>();
         var matchAreaCards = new List<PadInfoRelationCardViewModel>();
-        var allOwnerCadIds = new List<int>();
         var ownerSummaryText = "Owners: -";
         var notchRowSummaryText = "Notch rows: generate Step 5 first.";
         var notchRowFlowCards = new List<PadInfoRelationCardViewModel>();
-        var notchRowLinks = new List<NotchOwnerLinkViewModel>();
 
         // Populate display texts based on whether it's a multi-selection or single.
         if (IsMulti)
@@ -302,19 +293,6 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
                 ?? new List<(int CadId, double RatioPercent)>();
             if (ownerInfos.Count > 0)
             {
-                foreach (var owner in ownerInfos)
-                {
-                    allOwnerCadIds.Add(owner.CadId);
-                    if (_highlightCadOwnerPads is null)
-                    {
-                        continue;
-                    }
-
-                    ownerLinks.Add(new NotchOwnerLinkViewModel(
-                        $"CAD {owner.CadId} ({owner.RatioPercent:0.##}%)",
-                        new RelayCommand(() => _highlightCadOwnerPads(new[] { owner.CadId }))));
-                }
-
                 var preview = ownerInfos
                     .Take(4)
                     .Select(owner => $"CAD {owner.CadId} {owner.RatioPercent:0.##}%");
@@ -347,15 +325,6 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
                         row.Version.ToDisplayLabel(),
                         rowText,
                         highlightCommand));
-
-                    if (_highlightCadOwnerPads is null || !row.CadPadId.HasValue)
-                    {
-                        continue;
-                    }
-
-                    notchRowLinks.Add(new NotchOwnerLinkViewModel(
-                        rowText,
-                        new RelayCommand(() => _highlightCadOwnerPads(new[] { row.CadPadId.Value }))));
                 }
             }
             else
@@ -396,11 +365,8 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
         HasHighlightMatchAction = _highlightRegularMatches is not null && _regularPadIdForMatchActions.HasValue;
         OwnerSummaryText = ownerSummaryText;
         MatchAreaCards = matchAreaCards;
-        OwnerLinks = ownerLinks;
-        _allOwnerCadIds = allOwnerCadIds;
         NotchRowsSummaryText = notchRowSummaryText;
         NotchRowFlowCards = notchRowFlowCards;
-        NotchRowLinks = notchRowLinks;
         RuleTraceLines = ruleTraceLines;
 
         ResetPadSizeCommand = new RelayCommand(() =>
@@ -408,15 +374,12 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
             _resetPadSize?.Invoke(_rows, _cols);
             _closePadInfo?.Invoke();
         });
-        NavigateToMatchCommand = new RelayCommand(NavigateToMatch);
         LocateMatchCommand = new RelayCommand(LocateMatch);
-        HighlightMatchesCommand = new RelayCommand(HighlightMatches);
         ToggleGeometryDetailsCommand = new RelayCommand(() => ShowGeometryDetails = !ShowGeometryDetails);
         SetFreeformNoneCommand = new RelayCommand(() => ApplyFreeform(FreeformType.None));
         SetFreeformXCommand = new RelayCommand(() => ApplyFreeform(FreeformType.XWay));
         SetFreeformYCommand = new RelayCommand(() => ApplyFreeform(FreeformType.YWay));
         SetFreeformXYCommand = new RelayCommand(() => ApplyFreeform(FreeformType.XYWay));
-        HighlightAllOwnersCommand = new RelayCommand(HighlightAllOwners);
         ApplyChangesCommand = new RelayCommand(ApplyChanges);
         DiscardChangesCommand = new RelayCommand(DiscardChanges);
     }
