@@ -1356,7 +1356,7 @@ public sealed class NotchTableGeneratorTests
         };
 
         var matchResult = PadMatcher.Match(cad, grid);
-        FreeformDetector.AutoTagFreeforms(cad, grid, matchSettings, matchResult);
+        TestInfrastructure.FreeformDetectorTestSupport.AutoTag(cad, grid, matchSettings, matchResult);
 
         var settings = new ProjectSettings
         {
@@ -1440,7 +1440,7 @@ public sealed class NotchTableGeneratorTests
         };
 
         var matchResult = PadMatcher.Match(cad, grid);
-        FreeformDetector.AutoTagFreeforms(cad, grid, matchSettings, matchResult);
+        TestInfrastructure.FreeformDetectorTestSupport.AutoTag(cad, grid, matchSettings, matchResult);
 
         var settings = new ProjectSettings
         {
@@ -1479,7 +1479,7 @@ public sealed class NotchTableGeneratorTests
         };
 
         var matchResult = PadMatcher.Match(cad, grid);
-        FreeformDetector.AutoTagFreeforms(cad, grid, matchSettings, matchResult);
+        TestInfrastructure.FreeformDetectorTestSupport.AutoTag(cad, grid, matchSettings, matchResult);
 
         var legacySettings = new ProjectSettings
         {

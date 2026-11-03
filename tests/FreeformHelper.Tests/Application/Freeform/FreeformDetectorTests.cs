@@ -2,6 +2,7 @@ using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -15,7 +16,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 1001, minX: 0.0, minY: 0.0, maxX: 3.0, maxY: 1.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetector.AutoTagFreeforms(
+        FreeformDetectorTestSupport.AutoTag(
             cad,
             grid,
             new MatchingSettings { FreeformAxisThreshold = 0.5 },
@@ -31,7 +32,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 2001, minX: 0.0, minY: 0.0, maxX: 1.0, maxY: 3.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetector.AutoTagFreeforms(
+        FreeformDetectorTestSupport.AutoTag(
             cad,
             grid,
             new MatchingSettings { FreeformAxisThreshold = 0.5 },
@@ -47,7 +48,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 3001, minX: 0.0, minY: 0.0, maxX: 1.1, maxY: 1.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetector.AutoTagFreeforms(
+        FreeformDetectorTestSupport.AutoTag(
             cad,
             grid,
             new MatchingSettings { FreeformAxisThreshold = 0.2 },
@@ -63,7 +64,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 4001, minX: 0.0, minY: 0.0, maxX: 2.0, maxY: 2.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetector.AutoTagFreeforms(
+        FreeformDetectorTestSupport.AutoTag(
             cad,
             grid,
             new MatchingSettings
@@ -105,7 +106,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 5001, minX: 0.9, minY: 0.0, maxX: 1.3, maxY: 1.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetector.AutoTagFreeforms(
+        FreeformDetectorTestSupport.AutoTag(
             cad,
             grid,
             new MatchingSettings
@@ -125,7 +126,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 5002, minX: 0.9, minY: 0.0, maxX: 1.3, maxY: 1.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetector.AutoTagFreeforms(
+        FreeformDetectorTestSupport.AutoTag(
             cad,
             grid,
             new MatchingSettings
@@ -181,7 +182,7 @@ public sealed class FreeformDetectorTests
                 [noisePad.RegularPadId] = new[] { noiseLink },
             });
 
-        FreeformDetector.AutoTagFreeforms(
+        FreeformDetectorTestSupport.AutoTag(
             cad,
             grid,
             new MatchingSettings

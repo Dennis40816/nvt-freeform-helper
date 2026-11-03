@@ -23,8 +23,6 @@ public sealed record SimulationWorkspaceSession(
 {
     public RegularGrid FwDiffGrid => Grid;
     public RegularGrid CadOutputFwDiffGrid => CadOutputFwDiffGridProjection ?? Grid;
-    // Backward-compatible alias for callers that still use the old simulation naming.
-    public RegularGrid CadLayerDiffGrid => CadOutputFwDiffGrid;
     public int RowCount => Grid.Rows;
     public int ColumnCount => Grid.Cols;
     public int PadCount => Grid.Pads.Count;

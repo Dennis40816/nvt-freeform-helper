@@ -92,18 +92,3 @@ public sealed class DiffIndexMapper
         };
     }
 }
-
-/// <summary>
-/// Backward-compatible alias. Prefer <see cref="DiffIndexMapper"/>.
-/// </summary>
-[Obsolete("Use DiffIndexMapper instead.")]
-public sealed class AfeMapper
-{
-    /// <summary>
-    /// Applies diff index and IC index mapping to all pads in the provided grid.
-    /// </summary>
-    public void ApplyMapping(RegularGrid grid, GridSettings settings)
-    {
-        DiffIndexMapper.ApplyMapping(grid, settings);
-    }
-}

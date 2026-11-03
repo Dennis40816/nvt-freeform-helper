@@ -22,20 +22,6 @@ public sealed class DxfIndexAssigner
         return ResolveGridCell(grid, centroid, rows, cols);
     }
 
-    public IReadOnlyDictionary<int, int> BuildIndexByCadId(IReadOnlyList<CadPad> visibleCadPads, RegularGrid? grid, ScanOrder scanOrder)
-    {
-        ArgumentNullException.ThrowIfNull(visibleCadPads);
-
-        var ordered = OrderPads(visibleCadPads, grid, scanOrder);
-        var map = new Dictionary<int, int>(ordered.Count);
-        for (var i = 0; i < ordered.Count; i++)
-        {
-            map[ordered[i].Id] = i;
-        }
-
-        return map;
-    }
-
     public static IReadOnlyList<CadPad> OrderPads(IReadOnlyList<CadPad> visibleCadPads, RegularGrid? grid, ScanOrder scanOrder)
     {
         ArgumentNullException.ThrowIfNull(visibleCadPads);

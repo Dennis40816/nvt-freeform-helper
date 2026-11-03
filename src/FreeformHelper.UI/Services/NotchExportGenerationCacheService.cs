@@ -606,10 +606,7 @@ public readonly record struct NotchExportGenerationCacheLookup(
     ulong CachedCadSignature,
     ulong CachedGridSignature,
     int CachedStep3Revision,
-    int CachedSettingsFingerprint)
-{
-    public bool IsHit => Status == NotchExportGenerationCacheLookupStatus.Hit;
-}
+    int CachedSettingsFingerprint);
 
 public enum NotchExportGenerationCacheLookupStatus
 {

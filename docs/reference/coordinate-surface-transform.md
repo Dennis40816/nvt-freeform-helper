@@ -29,10 +29,6 @@ This is the 1.1 data contract for future curved-screen coordinate output. It doe
 
 ## Release Scope
 
-For 1.1, this remains an Application data model plus transform helper:
-
-- `CoordinateSurfaceProfile`
-- `CoordinateSurfacePoint`
-- `CoordinateSurfaceTransformService.ProjectMachinePoint(...)`
+For 1.1, this was a data contract only. The Application data model and transform helper (`CoordinateSurfaceProfile`, `CoordinateSurfacePoint`, `CoordinateSurfaceTransformService.ProjectMachinePoint(...)`) were removed because no production code used them. The semantics above stay the contract for the future work.
 
 UI recipe controls, artifact export columns for `(x, y, z)`, and multi-segment/non-cylindrical surfaces are future work.

@@ -145,13 +145,6 @@ public sealed record NotchDiffProjectionContract(
             ? projectedAnchorDiff
             : row.DiffIndex;
     }
-
-    public int ResolveTargetDiff(int icIndex, int rawTargetDiff)
-    {
-        return ProjectedCadOutputFwDiffByRawDiff.TryGetValue(new NotchDiffKey(icIndex, rawTargetDiff), out var projectedTargetDiff)
-            ? projectedTargetDiff
-            : rawTargetDiff;
-    }
 }
 
 public sealed record NotchDiffDuplicateResolution(

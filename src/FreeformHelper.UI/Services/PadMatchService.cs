@@ -1,13 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Services;
-using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.Services;
 
 /// <summary>
-/// Provides a service layer for matching regular pads to CAD pads and detecting freeform pads.
-/// This service orchestrates the use of <see cref="PadMatcher"/> and <see cref="FreeformDetector"/>.
+/// Provides a service layer for matching regular pads to CAD pads.
+/// This service wraps <see cref="PadMatcher"/>.
 /// </summary>
 [SuppressMessage(
     "Performance",
@@ -23,16 +22,5 @@ public sealed class PadMatchService
     public PadMatchResult Match(CadPadSet cad, RegularGrid grid, Action<double>? reportProgress = null)
     {
         return PadMatcher.Match(cad, grid, reportProgress);
-    }
-
-    /// <summary>
-    /// Automatically detects and tags freeform pads within the regular grid after matching has occurred.
-    /// </summary>
-    /// <param name="cad">The set of CAD pads (needed for freeform detection logic).</param>
-    /// <param name="grid">The regular grid containing pads with match information.</param>
-    /// <param name="settings">The matching settings (potentially used by freeform detector).</param>
-    public void AutoDetectFreeforms(CadPadSet cad, RegularGrid grid, MatchingSettings settings, PadMatchResult? matchResult = null)
-    {
-        FreeformDetector.AutoTagFreeforms(cad, grid, settings, matchResult);
     }
 }

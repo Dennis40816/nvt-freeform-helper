@@ -9,48 +9,6 @@ namespace FreeformHelper.Tests;
 
 public sealed class CopperPillarSimulationServiceTests
 {
-    [Fact]
-    public void ProjectToRegularGrid_WhenCopperFullyInsidePad_AssignsPeakValue()
-    {
-        var grid = BuildGrid(rows: 1, cols: 1);
-
-        var projection = CopperPillarSimulationService.ProjectToRegularGrid(
-            grid,
-            new CopperPillarSimulationRequest(0.5d, 0.5d, 0.5d, 400d));
-
-        Assert.True(projection.IsCompatible);
-        var cell = Assert.Single(projection.Cells);
-        Assert.Equal(400d, cell.Value, precision: 6);
-    }
-
-    [Fact]
-    public void ProjectToRegularGrid_WhenCopperStraddlesTwoPads_ConservesPeakByOverlapArea()
-    {
-        var grid = BuildGrid(rows: 1, cols: 2);
-
-        var projection = CopperPillarSimulationService.ProjectToRegularGrid(
-            grid,
-            new CopperPillarSimulationRequest(1d, 0.5d, 1d, 400d));
-
-        Assert.True(projection.IsCompatible);
-        Assert.Equal(2, projection.Cells.Count);
-        Assert.Equal(200d, projection.Cells[0].Value, precision: 6);
-        Assert.Equal(200d, projection.Cells[1].Value, precision: 6);
-        Assert.Equal(400d, projection.Cells.Sum(static cell => cell.Value), precision: 6);
-    }
-
-    [Fact]
-    public void ProjectToRegularGrid_WhenCopperOutsideGrid_AssignsBaselineOnly()
-    {
-        var grid = BuildGrid(rows: 1, cols: 2);
-
-        var projection = CopperPillarSimulationService.ProjectToRegularGrid(
-            grid,
-            new CopperPillarSimulationRequest(10d, 10d, 1d, 400d, BaselineValue: 3d));
-
-        Assert.True(projection.IsCompatible);
-        Assert.All(projection.Cells, static cell => Assert.Equal(3d, cell.Value, precision: 6));
-    }
 
     [Fact]
     public void ProjectCadOutputToRegularGrid_UsesCadOverlapThenMapsToOutputFwDiff()

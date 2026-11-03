@@ -30,7 +30,7 @@
       "src/FreeformHelper.UI/Services/GridBuildService.cs:12",
       "src/FreeformHelper.UI/Services/ManualSizingService.cs:11",
       "src/FreeformHelper.UI/Services/NotchExportService.cs:14",
-      "src/FreeformHelper.UI/Services/PadMatchService.cs:12"
+      "src/FreeformHelper.UI/Services/PadMatchService.cs:11"
     ],
     "pragmaWarningDisable": [],
     "suppressUndoAssignments": [],

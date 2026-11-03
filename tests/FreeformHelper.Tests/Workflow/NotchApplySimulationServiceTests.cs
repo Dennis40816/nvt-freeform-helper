@@ -60,8 +60,8 @@ public sealed class NotchApplySimulationServiceTests
         Assert.Equal(50d, action.SourceAfterValue);
         var leg = Assert.Single(action.Legs);
         Assert.Equal((11, 44, 44d), (leg.TargetDiffIndex, leg.RatioPercent, leg.DeltaValue));
-        Assert.True(result.Histograms.Before.HasBins);
-        Assert.True(result.Heatmap.HasHotspots);
+        Assert.NotEmpty(result.Histograms.Before.Bins);
+        Assert.NotEmpty(result.Heatmap.Hotspots);
     }
 
     [Fact]
@@ -218,7 +218,8 @@ public sealed class NotchApplySimulationServiceTests
             result.Cells,
             cell => Assert.Equal((20d, 20d), (cell.BeforeValue, cell.AfterValue)),
             cell => Assert.Equal((30d, 30d), (cell.BeforeValue, cell.AfterValue)));
-        Assert.True(Assert.Single(result.Actions).IsNoOp);
+        var noOpAction = Assert.Single(result.Actions);
+        Assert.True(noOpAction.CombinePercent == 100 && noOpAction.SourceRetainedPercent == 100 && noOpAction.Legs.Count == 0);
         Assert.Empty(result.Diagnostics);
     }
 
@@ -255,12 +256,12 @@ public sealed class NotchApplySimulationServiceTests
             cell => Assert.Equal((10, 100d, 50d), (cell.DiffIndex, cell.BeforeValue, cell.AfterValue)),
             cell => Assert.Equal((11, 50d, 93d), (cell.DiffIndex, cell.BeforeValue, cell.AfterValue)));
         var action = Assert.Single(result.Actions);
-        Assert.True(action.IsLegacyApproximation);
+        Assert.Equal(NotchAlgorithmVersion.V21, action.Version);
         Assert.Equal(94, action.CombinePercent);
         Assert.Equal(50, action.SourceRetainedPercent);
         Assert.Equal(43d, Assert.Single(action.Legs).DeltaValue);
-        Assert.True(result.Histograms.Before.HasBins);
-        Assert.True(result.Heatmap.HasHotspots);
+        Assert.NotEmpty(result.Histograms.Before.Bins);
+        Assert.NotEmpty(result.Heatmap.Hotspots);
     }
 
     [Fact]
@@ -386,7 +387,7 @@ public sealed class NotchApplySimulationServiceTests
         Assert.All(result.Cells, static cell => Assert.Equal(0d, cell.DeltaValue));
         Assert.True(audit.GlobalFlowAudit.IsBalanced);
         Assert.False(audit.HasNetFlowResiduals);
-        Assert.False(result.Heatmap.HasHotspots);
+        Assert.Empty(result.Heatmap.Hotspots);
     }
 
     [Fact]
@@ -513,7 +514,7 @@ public sealed class NotchApplySimulationServiceTests
             result.Cells.Where(static cell => cell.DiffIndex == 10),
             static cell => Assert.Equal((200d, 200d, 0d), (cell.BeforeValue, cell.AfterValue, cell.DeltaValue)));
         Assert.All(result.Cells, static cell => Assert.Equal(0d, cell.DeltaValue));
-        Assert.False(result.Heatmap.HasHotspots);
+        Assert.Empty(result.Heatmap.Hotspots);
         Assert.True(SimulationSafetyAuditService.Analyze(result).GlobalFlowAudit.IsBalanced);
     }
 

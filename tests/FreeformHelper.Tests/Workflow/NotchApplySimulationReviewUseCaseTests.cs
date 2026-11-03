@@ -51,8 +51,8 @@ public sealed class NotchApplySimulationReviewUseCaseTests
         Assert.Single(snapshot.Dataset.Files);
         Assert.Equal(1, snapshot.Dataset.CompatibleFrameCount);
         Assert.Single(snapshot.Result.Actions);
-        Assert.True(snapshot.Result.Histograms.Before.HasBins);
-        Assert.True(snapshot.Result.Heatmap.HasHotspots);
+        Assert.NotEmpty(snapshot.Result.Histograms.Before.Bins);
+        Assert.NotEmpty(snapshot.Result.Heatmap.Hotspots);
         Assert.Collection(
             snapshot.Result.Cells.OrderBy(static cell => cell.DiffIndex),
             cell => Assert.Equal((10, 100d, 50d), (cell.DiffIndex, cell.BeforeValue, cell.AfterValue)),
