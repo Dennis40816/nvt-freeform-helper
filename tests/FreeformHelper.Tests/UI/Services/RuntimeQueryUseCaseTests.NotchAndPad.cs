@@ -124,7 +124,7 @@ public sealed partial class RuntimeQueryUseCaseTests
             expected.TargetAllocationLines,
             notchAllocation.GetProperty("display").GetProperty("targetAllocationLines").EnumerateArray().Select(static line => line.GetString()));
         Assert.Equal(coverage.DisplayCombinedRatio, inspector.TargetCoverageProjection?.DisplayCombinedRatio);
-        Assert.Equal(expected.CombinedRatioText, padInfo.CombinedRatioText);
+        Assert.Equal(expected.CombinedValueText, padInfo.CombinedValueText);
         Assert.Equal(expected.CombinedRatioText, notchDisplay.GetProperty("combinedRatioText").GetString());
         Assert.Equal(expected.CombinedRatioText, padDisplay.GetProperty("combinedRatioText").GetString());
         Assert.Equal(["IC1/diff83", "IC1/diff84", "IC1/diff85", "IC1/diff86"], padInfo.TargetAllocationItems.Select(static item => item.DiffText));

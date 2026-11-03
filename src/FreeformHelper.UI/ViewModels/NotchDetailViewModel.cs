@@ -1,4 +1,3 @@
-using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 
@@ -15,16 +14,11 @@ public sealed class NotchDetailViewModel
         int thresholdQ7,
         int maxAllocationQ7,
         string thresholdSummary,
-        double toRegularRatio,
-        double toFullRatio,
         double combinedRatio,
-        bool isToFullEnabled,
         string toRegularRatioText,
         string toFullRatioText,
         string combinedRatioText,
-        IReadOnlyList<Polygon2> toFullSeedPolygons,
-        IReadOnlyList<Polygon2> toFullPolygons,
-        IReadOnlyList<NotchV22RegularDebugInfo> regularDebugInfos)
+        IReadOnlyList<Polygon2> toFullPolygons)
     {
         CadPad = cadPad;
         DxfIndex = dxfIndex;
@@ -34,16 +28,11 @@ public sealed class NotchDetailViewModel
         ThresholdQ7 = thresholdQ7;
         MaxAllocationQ7 = maxAllocationQ7;
         ThresholdSummary = thresholdSummary;
-        ToRegularRatio = toRegularRatio;
-        ToFullRatio = toFullRatio;
         CombinedRatio = combinedRatio;
-        IsToFullEnabled = isToFullEnabled;
         ToRegularRatioText = toRegularRatioText;
         ToFullRatioText = toFullRatioText;
         CombinedRatioText = combinedRatioText;
-        ToFullSeedPolygons = toFullSeedPolygons;
         ToFullPolygons = toFullPolygons;
-        RegularDebugInfos = regularDebugInfos;
     }
 
     public CadPad CadPad { get; }
@@ -54,16 +43,11 @@ public sealed class NotchDetailViewModel
     public int ThresholdQ7 { get; }
     public int MaxAllocationQ7 { get; }
     public string ThresholdSummary { get; }
-    public double ToRegularRatio { get; }
-    public double ToFullRatio { get; }
     public double CombinedRatio { get; }
-    public bool IsToFullEnabled { get; }
     public string ToRegularRatioText { get; }
     public string ToFullRatioText { get; }
     public string CombinedRatioText { get; }
-    public IReadOnlyList<Polygon2> ToFullSeedPolygons { get; }
     public IReadOnlyList<Polygon2> ToFullPolygons { get; }
-    public IReadOnlyList<NotchV22RegularDebugInfo> RegularDebugInfos { get; }
 
     public string CadTitle => DxfIndex.HasValue ? $"CAD idx {DxfIndex.Value} (CAD id {CadPad.Id})" : $"CAD id {CadPad.Id}";
     public string CadLayer => string.IsNullOrWhiteSpace(CadPad.Layer) ? "Layer: -" : $"Layer: {CadPad.Layer}";

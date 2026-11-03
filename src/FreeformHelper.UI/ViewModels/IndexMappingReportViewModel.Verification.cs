@@ -73,11 +73,11 @@ public sealed partial class IndexMappingReportViewModel
     {
         var nodes = new List<IndexMappingVerificationStepNodeViewModel>(5)
         {
-            CreateStepNode(IndexMappingVerificationStep.Step3, "Step 3", "Notch input readiness", BuildStep3KeyChecks(), BuildStep3OpenAction()),
-            CreateStepNode(IndexMappingVerificationStep.Step4, "Step 4", "Diff assignment decision", BuildStep4KeyChecks(), BuildStep4OpenAction()),
-            CreateStepNode(IndexMappingVerificationStep.Step5, "Step 5", "Notch table row integrity", BuildStep5KeyChecks(), BuildStep5OpenAction()),
-            CreateStepNode(IndexMappingVerificationStep.Step6, "Step 6", "Validation trace consistency", BuildStep6KeyChecks(), BuildStep6OpenAction()),
-            CreateStepNode(IndexMappingVerificationStep.Simulation, "Simulation", "Before/After/Delta sanity", BuildSimulationKeyChecks(), BuildSimulationOpenAction()),
+            CreateStepNode(IndexMappingVerificationStep.Step3, "Step 3", "Notch input readiness", BuildStep3KeyChecks()),
+            CreateStepNode(IndexMappingVerificationStep.Step4, "Step 4", "Diff assignment decision", BuildStep4KeyChecks()),
+            CreateStepNode(IndexMappingVerificationStep.Step5, "Step 5", "Notch table row integrity", BuildStep5KeyChecks()),
+            CreateStepNode(IndexMappingVerificationStep.Step6, "Step 6", "Validation trace consistency", BuildStep6KeyChecks()),
+            CreateStepNode(IndexMappingVerificationStep.Simulation, "Simulation", "Before/After/Delta sanity", BuildSimulationKeyChecks()),
         };
 
         for (var i = 0; i < nodes.Count; i++)
@@ -98,11 +98,10 @@ public sealed partial class IndexMappingReportViewModel
         IndexMappingVerificationStep step,
         string title,
         string verifyHint,
-        string keyChecks,
-        string openActionText)
+        string keyChecks)
     {
         var status = BuildStepStatus(step);
-        return new IndexMappingVerificationStepNodeViewModel(step, title, verifyHint, keyChecks, status, openActionText);
+        return new IndexMappingVerificationStepNodeViewModel(step, title, verifyHint, keyChecks, status);
     }
 
     private string BuildStepStatus(IndexMappingVerificationStep step)

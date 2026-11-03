@@ -61,7 +61,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public string NotchRowSummaryText { get; }
     public string ToRegularRatioText { get; }
     public string ToFullRatioText { get; }
-    public string CombinedRatioText { get; }
     public string ToRegularValueText { get; }
     public string ToFullValueText { get; }
     public string CombinedValueText { get; }
@@ -144,9 +143,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public IRelayCommand ClearCadOutputFwDiffOverrideCommand { get; }
     public IRelayCommand SetDxfIndexAnchorCommand { get; }
     public IRelayCommand ClearDxfIndexAnchorCommand { get; }
-    public IRelayCommand FocusMatchCommand { get; }
     public IRelayCommand LocateMatchCommand { get; }
-    public IRelayCommand OpenOwnerDetailCommand { get; }
     public IRelayCommand HighlightAllNotchOwnersCommand { get; }
     public IRelayCommand ToggleLowFrequencyDetailSectionCommand { get; }
 

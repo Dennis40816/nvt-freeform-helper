@@ -22,7 +22,6 @@ public sealed class PadInfoTargetAllocationViewModel
         AreaText = string.IsNullOrWhiteSpace(areaText) ? "-" : areaText;
         RatioText = string.IsNullOrWhiteSpace(ratioText) ? "-" : ratioText;
         RawText = rawText;
-        RegularPadIds = regularPadIds;
         HighlightCommand = highlightRegularPads is null || regularPadIds.Count == 0
             ? null
             : new RelayCommand(() => highlightRegularPads(regularPadIds));
@@ -43,8 +42,6 @@ public sealed class PadInfoTargetAllocationViewModel
     public string RatioText { get; }
 
     public string RawText { get; }
-
-    public IReadOnlyList<int> RegularPadIds { get; }
 
     public ICommand? HighlightCommand { get; }
 
