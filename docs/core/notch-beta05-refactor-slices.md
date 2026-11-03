@@ -125,8 +125,8 @@ refactor(beta0.5-S11.xxx): <slice summary>
   - Introduce the shared contract in `NotchCurrentVisibleDiffProjectionService` / `NotchApplySimulationService`.
 - Key changes:
   - Consolidate raw/visible/projected rules:
-    - `BuildProjectionContract(...)`: `raw diff -> visible diff` mapping and the removal strategy for conflicted raw diff keys.
-    - `ResolveAnchorDiff(...)` / `ResolveTargetDiff(...)`: a single projection entry point for anchor/target diff.
+    - `BuildProjectionContract(...)`: `raw diff -> visible diff` mapping and the tracking of conflicted raw diff keys.
+    - `ResolveAnchorDiff(...)`: the single projection entry point for the anchor diff. `ResolveTargetDiff(...)` had no caller and was removed.
   - Consolidate simulation active diff baseline rules:
     - `BuildActiveDiffBaseline(...)`: model diff key primary/suppressed decisions and duplicate resolution.
     - `NotchApplySimulationService` uses the pipeline baseline to generate before/after diff keys, preserving existing diagnostics text.
