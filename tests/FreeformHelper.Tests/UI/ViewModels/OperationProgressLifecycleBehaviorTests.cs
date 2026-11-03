@@ -49,7 +49,7 @@ public sealed class OperationProgressLifecycleBehaviorTests
     {
         using var files = new OperationProgressLifecycleTestScope();
         var vm = await files.CreateWithoutDxfAsync();
-        await vm.RebuildGridCommand.ExecuteAsync(null);
+        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
         Assert.NotEmpty(vm.RegularPads);
         Assert.Empty(vm.CadPads);
         var operation = new ProgressOperation(vm, kind);
@@ -77,7 +77,7 @@ public sealed class OperationProgressLifecycleBehaviorTests
         vm.SelectedGridAlignmentOption = Assert.Single(vm.GridAlignmentOptions,
             option => option.Value == GridAlignmentMode.FromPanelAa);
         Assert.Single(vm.LayerToggles).IsSelected = false;
-        await vm.RebuildGridCommand.ExecuteAsync(null);
+        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
         Assert.Empty(vm.CadPads);
         var before = operation.Progress;
         using var changes = operation.Observe();
@@ -101,7 +101,7 @@ public sealed class OperationProgressLifecycleBehaviorTests
             option => option.Value == RegularSourceMode.FromDxfLayer);
         vm.SelectedRegularSourceLayerOption = Assert.Single(vm.RegularSourceLayerOptions,
             option => option.Name is null);
-        await vm.RebuildGridCommand.ExecuteAsync(null);
+        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
         Assert.Empty(vm.RegularPads);
         var operation = new ProgressOperation(vm, kind);
         using var changes = operation.Observe();
@@ -124,7 +124,7 @@ public sealed class OperationProgressLifecycleBehaviorTests
             option => option.Value == RegularSourceMode.FromDxfLayer);
         vm.SelectedRegularSourceLayerOption = Assert.Single(vm.RegularSourceLayerOptions,
             option => option.Name is null);
-        await vm.RebuildGridCommand.ExecuteAsync(null);
+        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
         Assert.Empty(vm.RegularPads);
         var operation = new ProgressOperation(vm, "Overlap");
         using var changes = operation.Observe();

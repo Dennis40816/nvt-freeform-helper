@@ -13,14 +13,14 @@ public sealed partial class FreeformHelperViewModelTests
     {
         var vm = new FreeformHelperViewModel
         {
-            ActiveAreaWidth = 120m,
-            ActiveAreaHeight = 80m,
             PanelBiasX = 12.5m,
             PanelBiasY = -3.75m,
             GridAlignmentMode = GridAlignmentMode.FromCadBounds,
+            ActiveAreaWidth = 120m,
+            ActiveAreaHeight = 80m,
         };
 
-        await vm.RebuildGridCommand.ExecuteAsync(null);
+        await WaitForGridRebuildAsync(vm);
 
         Assert.Equal("Ready (DXF not loaded; using panel AA alignment).", vm.StatusText);
         Assert.NotEmpty(vm.RegularPads);
@@ -78,8 +78,10 @@ public sealed partial class FreeformHelperViewModelTests
             }
         };
 
+        await WaitForGridRebuildAsync(vm);
         changed.Clear();
-        await vm.RebuildGridCommand.ExecuteAsync(null);
+        vm.GridPaddingPercent += 5m;
+        await WaitForGridRebuildAsync(vm);
 
         Assert.Contains(nameof(FreeformHelperViewModel.PitchSizeXSummary), changed);
         Assert.Contains(nameof(FreeformHelperViewModel.PitchSizeYSummary), changed);

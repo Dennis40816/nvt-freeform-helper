@@ -48,7 +48,7 @@ internal sealed class OperationProgressLifecycleTestScope : IDisposable
         var cascade = Assert.Single(vm.CascadeIcSettings);
         cascade.XChannels = 2;
         cascade.YChannels = 1;
-        await vm.RebuildGridCommand.ExecuteAsync(null);
+        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
         await vm.OpenDxfCommand.ExecuteAsync(null);
         Assert.Single(vm.CadPads);
         Assert.Equal(2, vm.RegularPads.Count);

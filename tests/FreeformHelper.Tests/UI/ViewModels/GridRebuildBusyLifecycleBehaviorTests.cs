@@ -11,14 +11,15 @@ public sealed class GridRebuildBusyLifecycleBehaviorTests
 {
     private static readonly bool[] _spinnerSequence = [true, false];
     [AvaloniaFact]
-    public async Task RebuildGridCommand_LoadedDxf_ShowsSpinnerDuringGridChangeAndHidesItAtCompletion()
+    public async Task GridRebuild_LoadedDxf_ShowsSpinnerDuringGridChangeAndHidesItAtCompletion()
     {
         using var files = new OperationProgressLifecycleTestScope();
         var vm = await files.CreateLoadedAsync();
         using var changes = ObserveSpinner(vm);
         using var grid = OnNextChange(vm, nameof(vm.RegularPads), () => Assert.True(vm.IsModalLoadingSpinnerVisible));
 
-        var rebuild = vm.RebuildGridCommand.ExecuteAsync(null);
+        vm.GridPaddingPercent += 5m;
+        var rebuild = vm.WaitForGridRebuildIdleAsync();
         Assert.True(vm.IsModalLoadingSpinnerVisible);
         await rebuild;
 
@@ -30,13 +31,14 @@ public sealed class GridRebuildBusyLifecycleBehaviorTests
     }
 
     [AvaloniaFact]
-    public async Task RebuildGridCommand_NoCad_HidesSpinnerAfterBuildingFallbackGrid()
+    public async Task GridRebuild_NoCad_HidesSpinnerAfterBuildingFallbackGrid()
     {
         using var files = new OperationProgressLifecycleTestScope();
         var vm = await files.CreateWithoutDxfAsync();
         using var changes = ObserveSpinner(vm);
 
-        var rebuild = vm.RebuildGridCommand.ExecuteAsync(null);
+        vm.GridPaddingPercent += 5m;
+        var rebuild = vm.WaitForGridRebuildIdleAsync();
         Assert.True(vm.IsModalLoadingSpinnerVisible);
         await rebuild;
 
@@ -48,23 +50,21 @@ public sealed class GridRebuildBusyLifecycleBehaviorTests
     }
 
     [AvaloniaFact]
-    public async Task RebuildGridCommand_RequestsDuringRebuild_CoalescesOneFollowUpUsingLatestChannels()
+    public async Task GridRebuild_RequestsDuringRebuild_CoalescesOneFollowUpUsingLatestChannels()
     {
         using var files = new OperationProgressLifecycleTestScope();
         var vm = await files.CreateLoadedAsync();
         using var changes = new LifecycleNotifications(vm, () => vm.IsModalLoadingSpinnerVisible, () => 0, "RegularPads");
-        Task second = Task.CompletedTask;
-        Task third = Task.CompletedTask;
         using var requests = OnNextChange(vm, nameof(vm.RegularPads), () =>
         {
-            Assert.False(vm.RebuildGridCommand.CanExecute(null));
+            Assert.False(vm.WaitForGridRebuildIdleAsync().IsCompleted);
             Assert.Single(vm.CascadeIcSettings).XChannels = 3;
-            second = vm.RebuildGridCommand.ExecuteAsync(null);
-            third = vm.RebuildGridCommand.ExecuteAsync(null);
+            vm.GridPaddingPercent += 5m;
+            vm.GridPaddingPercent += 5m;
         });
 
-        await vm.RebuildGridCommand.ExecuteAsync(null);
-        await Task.WhenAll(second, third);
+        vm.GridPaddingPercent += 5m;
+        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
 
         Assert.True(requests.WasInvoked);
         Assert.Equal(2, changes.Changes.Length);
@@ -76,13 +76,14 @@ public sealed class GridRebuildBusyLifecycleBehaviorTests
     }
 
     [AvaloniaFact]
-    public async Task RebuildGridCommand_OneRequest_ChangesRegularPadsOnce()
+    public async Task GridRebuild_OneRequest_ChangesRegularPadsOnce()
     {
         using var files = new OperationProgressLifecycleTestScope();
         var vm = await files.CreateLoadedAsync();
         using var changes = new LifecycleNotifications(vm, () => vm.IsModalLoadingSpinnerVisible, () => 0, "RegularPads");
 
-        await vm.RebuildGridCommand.ExecuteAsync(null);
+        vm.GridPaddingPercent += 5m;
+        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
 
         Assert.Single(changes.Changes);
         Assert.Equal(2, vm.RegularPads.Count);

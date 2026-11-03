@@ -29,7 +29,7 @@ public sealed class ProjectLoadingInputTests
             Assert.False(vm.IsProjectEditingEnabled);
             Assert.False(vm.SaveProjectCommand.CanExecute(null));
             Assert.False(vm.LoadProjectCommand.CanExecute(null));
-            Assert.False(vm.RebuildGridCommand.CanExecute(null));
+            Assert.False(vm.OpenDxfCommand.CanExecute(null));
         }
         finally
         {
@@ -86,7 +86,7 @@ public sealed class ProjectLoadingInputTests
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var vm = new FreeformHelperViewModel();
         var commandStates = new List<bool>();
-        vm.RebuildGridCommand.CanExecuteChanged += (_, _) => commandStates.Add(vm.RebuildGridCommand.CanExecute(null));
+        vm.OpenDxfCommand.CanExecuteChanged += (_, _) => commandStates.Add(vm.OpenDxfCommand.CanExecute(null));
         var scopeField = typeof(FreeformHelperViewModel).GetField("_cadLoadOverlayScope", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(scopeField);
         scopeField.SetValue(vm, new LoadingScopeCoordinator(() =>
