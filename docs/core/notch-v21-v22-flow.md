@@ -512,7 +512,7 @@ flowchart LR
 
 Key points:
 - The Simulation baseline uses `NotchDiffIdentityPipeline.BuildActiveDiffBaseline(...)`; UI/Simulation no longer independently re-derive duplicate diff rules.
-- Simulation workspace separates two paths: `FwDiffGrid` (FW Diff Idx) retains regular/raw diffs, while `CadOutputFwDiffGrid` (compatibility alias: `CadLayerDiffGrid`) is only a CAD output projection view for display.
+- Simulation workspace separates two paths: `FwDiffGrid` (FW Diff Idx) retains regular/raw diffs, while `CadOutputFwDiffGrid` is only a CAD output projection view for display.
 - Simulation active surface currently uses:
   - `full regular grid`, or
   - `full regular grid ∩ Regular Visibility Mask (SeeRegular.csv)` (when the mask is loaded and enabled)

@@ -103,9 +103,9 @@ These telemetry values are logged as `PERF PADMATCH` in the UI.
 Main entry points:
 - UI：`AutoDetectFreeformsAsync()`
   - `src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs`
-- UseCase：`FreeformTaggingUseCase.AutoDetect(...)`
+- UseCase：`FreeformTaggingUseCase.BuildAutoDetectAssignments(...)` and `ApplyAutoDetectAssignments(...)`
   - `src/FreeformHelper.UI/Services/FreeformTaggingUseCase.cs`
-- Application：`FreeformDetector.AutoTagFreeforms(...)`
+- Application：`FreeformDetector.DetectAssignments(...)` and `ApplyAssignments(...)`
   - `src/FreeformHelper.Application/Services/FreeformDetector.cs`
 
 ### 4.1 overlap-link Version (Main Path)
@@ -363,8 +363,8 @@ Corresponding locations:
 |---|---|---|
 | Step1 Match | `PadMatcher.Match` / `MatchOverlap` | `src/FreeformHelper.Application/Services/PadMatcher.cs` |
 | Step1 Result | `PadMatchResult`, `PadMatchLink` | `src/FreeformHelper.Application/Services/PadMatchResult.cs` |
-| Step2 Freeform | `FreeformDetector.AutoTagFreeforms` | `src/FreeformHelper.Application/Services/FreeformDetector.cs` |
-| Step2 UseCase | `FreeformTaggingUseCase.AutoDetect` | `src/FreeformHelper.UI/Services/FreeformTaggingUseCase.cs` |
+| Step2 Freeform | `FreeformDetector.DetectAssignments` / `ApplyAssignments` | `src/FreeformHelper.Application/Services/FreeformDetector.cs` |
+| Step2 UseCase | `FreeformTaggingUseCase.BuildAutoDetectAssignments` / `ApplyAutoDetectAssignments` | `src/FreeformHelper.UI/Services/FreeformTaggingUseCase.cs` |
 | Step3 Compensation | `NotchV22CompensationService.Compute` | `src/FreeformHelper.Application/Services/NotchV22CompensationService.cs` |
 | Step3 Gate | `NotchToFullRuleEngine.Evaluate` | `src/FreeformHelper.Application/Services/NotchToFullRuleEngine.cs` |
 | Step3 Final Outline | `NotchV22FinalOutlineService.Build` | `src/FreeformHelper.Application/Services/NotchV22FinalOutlineService.cs` |

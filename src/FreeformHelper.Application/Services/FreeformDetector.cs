@@ -11,18 +11,6 @@ public sealed class FreeformDetector
 {
     private const double CoverageNoiseFloor = 1e-6;
 
-    /// <summary>
-    /// Automatically identifies and tags freeform pads based on matching results.
-    /// </summary>
-    /// <param name="cad">The set of CAD pads (not directly used, but conceptually relevant).</param>
-    /// <param name="grid">The regular grid containing pads with match information.</param>
-    /// <param name="matchSettings">The settings used for matching.</param>
-    /// <param name="matchResult">Latest overlap mapping result.</param>
-    public static void AutoTagFreeforms(CadPadSet cad, RegularGrid grid, MatchingSettings matchSettings, PadMatchResult? matchResult = null)
-    {
-        ApplyAssignments(grid, DetectAssignments(cad, grid, matchSettings, matchResult));
-    }
-
     public static IReadOnlyDictionary<int, FreeformType> DetectAssignments(
         CadPadSet cad,
         RegularGrid grid,

@@ -198,14 +198,6 @@ public static class DiffFrameCsvImporter
             diagnostics);
     }
 
-    public static IReadOnlyList<DiffFrameCsvSourceFile> ImportMany(
-        IEnumerable<string> sourcePaths,
-        DiffFrameCsvImportOptions? options = null)
-    {
-        ArgumentNullException.ThrowIfNull(sourcePaths);
-        return sourcePaths.Select(path => Import(path, options)).ToArray();
-    }
-
     private static void FinalizeFrameIfNeeded(
         string sourcePath,
         List<DiffFrameCsvFrame> frames,

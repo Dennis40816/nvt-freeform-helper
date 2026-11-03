@@ -45,9 +45,4 @@ public sealed class FreeformTaggingUseCase
     {
         FreeformDetector.ApplyAssignments(grid, assignments);
     }
-
-    public static void AutoDetect(CadPadSet cad, RegularGrid grid, MatchingSettings settings, PadMatchResult? matchResult = null)
-    {
-        ApplyAutoDetectAssignments(grid, BuildAutoDetectAssignments(cad, grid, settings, matchResult));
-    }
 }

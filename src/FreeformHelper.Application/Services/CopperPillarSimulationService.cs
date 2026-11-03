@@ -19,50 +19,6 @@ public static class CopperPillarSimulationService
     private const int MinimumCircleSegments = 16;
     private const int MaximumCircleSegments = 256;
 
-    public static DiffFrameGridProjectionResult ProjectToRegularGrid(
-        RegularGrid grid,
-        CopperPillarSimulationRequest request)
-    {
-        ArgumentNullException.ThrowIfNull(grid);
-        ArgumentNullException.ThrowIfNull(request);
-
-        if (grid.Pads.Count == 0)
-        {
-            return DiffFrameGridProjectionResult.Incompatible("Regular grid has no pads.");
-        }
-
-        var diameter = Math.Max(0d, request.Diameter);
-        if (diameter <= AreaEpsilon)
-        {
-            return DiffFrameGridProjectionResult.Incompatible("Copper diameter must be greater than 0.");
-        }
-
-        var circle = BuildCirclePolygon(
-            new Point2(request.CenterX, request.CenterY),
-            diameter * 0.5d,
-            Math.Clamp(request.CircleSegmentCount, MinimumCircleSegments, MaximumCircleSegments));
-        var circleBounds = circle.Bounds;
-        var circleArea = Math.Max(circle.Area(), AreaEpsilon);
-        var cells = new List<DiffFrameGridCellValue>(grid.Pads.Count);
-
-        foreach (var pad in grid.Pads)
-        {
-            var overlapArea = pad.Bounds.Intersects(circleBounds)
-                ? Polygon2.IntersectionAreaWithRect(circle, pad.Bounds)
-                : 0d;
-            var value = request.BaselineValue + (request.PeakValue * (overlapArea / circleArea));
-            cells.Add(new DiffFrameGridCellValue(
-                pad.Row,
-                pad.Col,
-                pad.Row,
-                pad.Col,
-                pad.RegularPadId,
-                value));
-        }
-
-        return new DiffFrameGridProjectionResult(true, null, cells);
-    }
-
     public static DiffFrameGridProjectionResult ProjectCadOutputToRegularGrid(
         RegularGrid grid,
         IReadOnlyList<CadPad> cadPads,

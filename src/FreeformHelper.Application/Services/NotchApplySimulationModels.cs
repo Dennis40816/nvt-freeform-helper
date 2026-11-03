@@ -54,12 +54,7 @@ public sealed record NotchApplySimulationAction(
     int SourceRetainedPercent,
     double SourceBeforeValue,
     double SourceAfterValue,
-    IReadOnlyList<NotchApplySimulationLeg> Legs)
-{
-    public double OutputTotalValue => SourceAfterValue + Legs.Sum(static leg => leg.DeltaValue);
-    public bool IsNoOp => CombinePercent == 100 && SourceRetainedPercent == 100 && Legs.Count == 0;
-    public bool IsLegacyApproximation => Version == NotchAlgorithmVersion.V21;
-}
+    IReadOnlyList<NotchApplySimulationLeg> Legs);
 
 public sealed record NotchApplySimulationHistogramBin(
     int Index,
@@ -70,11 +65,7 @@ public sealed record NotchApplySimulationHistogramBin(
 
 public sealed record NotchApplySimulationHistogram(
     string Title,
-    IReadOnlyList<NotchApplySimulationHistogramBin> Bins)
-{
-    public int MaxCount => Bins.Count == 0 ? 0 : Bins.Max(static bin => bin.Count);
-    public bool HasBins => Bins.Count > 0;
-}
+    IReadOnlyList<NotchApplySimulationHistogramBin> Bins);
 
 public sealed record NotchApplySimulationHistogramSet(
     NotchApplySimulationHistogram Before,
@@ -108,7 +99,6 @@ public sealed record NotchApplySimulationHeatmap(
     IReadOnlyList<NotchApplySimulationHotspot> Hotspots)
 {
     public bool HasCells => Cells.Count > 0;
-    public bool HasHotspots => Hotspots.Count > 0;
 }
 
 public sealed record NotchApplySimulationDuplicateDiffResolution(

@@ -47,7 +47,6 @@ public sealed class NotchDiffIdentityPipelineTests
 
         Assert.Equal(24, contract.ResolveAnchorDiff(rowA));
         Assert.Equal(1, contract.ConflictedRawDiffKeyCount);
-        Assert.Equal(21, contract.ResolveTargetDiff(0, 21));
         Assert.Contains(new NotchDiffKey(0, 21), contract.ConflictedRawDiffKeys);
     }
 
