@@ -8,7 +8,6 @@ public sealed class IndexMappingMaskAuditRowViewModel
     public IndexMappingMaskAuditRowViewModel(DxfRegularMaskAuditRow row, Func<int, int?>? getOverrideRegularIndex = null)
     {
         CadPadId = row.CadPadId;
-        OrderedCadIndex = row.OrderedCadIndex;
         RawRegularPadIndex = row.RawSeed.RegularPadIndex;
         RawDiffIndex = row.RawSeed.BestMatchFwDiffIndex;
         RawRegularCoverage = row.RawSeed.RegularCoverage;
@@ -45,7 +44,6 @@ public sealed class IndexMappingMaskAuditRowViewModel
     }
 
     public int CadPadId { get; }
-    public int OrderedCadIndex { get; }
     public int? RawRegularPadIndex { get; }
     public int? RawDiffIndex { get; }
     public double? RawRegularCoverage { get; }

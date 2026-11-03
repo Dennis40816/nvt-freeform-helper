@@ -50,7 +50,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public string LayerText { get; }
     public string NameText { get; }
     public string CadIdText { get; }
-    public string BoundsText { get; }
     public string CentroidText { get; }
     public string AreaText { get; }
     public string VertexText { get; }
@@ -59,7 +58,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public string MatchDetailsText { get; }
     public string MatchConfidenceText { get; }
     public string GeometrySeedValueText { get; }
-    public bool HasNotchCompensationPreview { get; }
     public string NotchRowSummaryText { get; }
     public string ToRegularRatioText { get; }
     public string ToFullRatioText { get; }
@@ -87,10 +85,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public bool HasRuleTrace => RuleTraceLines.Count > 0;
     public string NotchRowCompactText => StripKnownPrefix(NotchRowSummaryText, "Notch rows:");
     public string DebugStatusText => BuildDebugStatusText();
-    /// <summary>
-    /// Gets a value indicating whether the custom value is mixed across multiple selected pads.
-    /// </summary>
-    public bool IsCustomValueMixed { get; }
     public ICommand? NotchDetailCommand { get; }
     public ICommand? SelectAreaBucketCommand { get; }
     public bool HasSelectAreaBucketCommand => SelectAreaBucketCommand is not null;
@@ -153,11 +147,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public IRelayCommand FocusMatchCommand { get; }
     public IRelayCommand LocateMatchCommand { get; }
     public IRelayCommand OpenOwnerDetailCommand { get; }
-    public IRelayCommand HighlightMatchesCommand { get; }
     public IRelayCommand HighlightAllNotchOwnersCommand { get; }
-    public IRelayCommand ToggleNotchDiagnosticsCommand { get; }
-    public IRelayCommand ToggleRuleTraceCommand { get; }
-    public IRelayCommand ToggleGeometryDetailsCommand { get; }
     public IRelayCommand ToggleLowFrequencyDetailSectionCommand { get; }
 
     private static string StripKnownPrefix(string value, string prefix)

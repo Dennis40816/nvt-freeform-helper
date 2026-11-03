@@ -68,13 +68,11 @@ public sealed partial class NotchApplySimulationSourceFileItemViewModel : Observ
     public NotchApplySimulationSourceFileItemViewModel(
         string fileName,
         string summaryText,
-        string shapeText,
-        bool hasDiagnostics)
+        string shapeText)
     {
         FileName = fileName;
         SummaryText = summaryText;
         ShapeText = shapeText;
-        HasDiagnostics = hasDiagnostics;
     }
 
     public string FileName { get; }
@@ -82,8 +80,6 @@ public sealed partial class NotchApplySimulationSourceFileItemViewModel : Observ
     public string SummaryText { get; }
 
     public string ShapeText { get; }
-
-    public bool HasDiagnostics { get; }
 }
 
 public sealed record NotchApplySimulationAaDisplayCell(

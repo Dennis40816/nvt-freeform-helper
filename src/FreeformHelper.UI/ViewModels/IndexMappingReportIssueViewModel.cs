@@ -71,22 +71,10 @@ public sealed partial class IndexMappingReportIssueViewModel : ObservableObject
     public double? Margin { get; }
     public IReadOnlyList<IndexMappingCandidateViewModel> TopCandidates { get; }
 
-    [ObservableProperty] private bool _hasOverride;
     [ObservableProperty] private int? _overrideRegularPadIndex;
-    [ObservableProperty] private string _overrideText = "Override: none.";
 
     public void SetOverride(int? regularPadIndex)
     {
         OverrideRegularPadIndex = regularPadIndex;
-        if (regularPadIndex is int index)
-        {
-            HasOverride = true;
-            OverrideText = $"Override: CAD -> regular id {index}.";
-        }
-        else
-        {
-            HasOverride = false;
-            OverrideText = "Override: none.";
-        }
     }
 }

@@ -61,7 +61,7 @@
     "suppressFlagFields": [
       "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:64",
       "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:14", "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:15",
-      "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:17"
+      "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:16"
     ],
     "freeformViewModelStateMembers": [
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:134", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:83", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:75", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:78", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:79", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:91", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:92", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:94", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:117",

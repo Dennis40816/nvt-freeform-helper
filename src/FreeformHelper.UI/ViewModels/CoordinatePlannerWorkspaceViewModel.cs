@@ -253,8 +253,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public IReadOnlyList<CoordinatePlannerPointRow> AaCornerRows { get; private set; } = Array.Empty<CoordinatePlannerPointRow>();
 
-    public IReadOnlyList<CoordinatePlannerPointRow> BistCornerRows { get; private set; } = Array.Empty<CoordinatePlannerPointRow>();
-
     public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayCornerRows { get; private set; } = Array.Empty<CoordinatePlannerPointRow>();
 
     public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayPointRows { get; private set; } = Array.Empty<CoordinatePlannerPointRow>();
