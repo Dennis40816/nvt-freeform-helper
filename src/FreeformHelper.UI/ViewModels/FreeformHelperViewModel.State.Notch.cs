@@ -404,10 +404,6 @@ public sealed partial class FreeformHelperViewModel
     /// Gets or sets selected C-export profile used by Step 5 C initializer export.
     /// </summary>
     [ObservableProperty] private NotchExportProfileOption _selectedNotchExportProfileOption;
-    /// <summary>
-    /// Gets a value indicating whether current Step 5 export type is C initializer.
-    /// </summary>
-    public bool IsNotchCExportType => NotchExportFileTypeMetadata.IsCExportType(SelectedNotchExportFileTypeOption.Value);
 
     /// <summary>
     /// Gets or sets the latest notch export summary (Step 5 result).

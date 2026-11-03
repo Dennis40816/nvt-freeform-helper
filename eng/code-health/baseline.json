@@ -960,7 +960,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 109
+        "methodLines": 107
       },
       "owner": "NFH",
       "locations": [
@@ -974,7 +974,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 165,
+        "stateMembers": 164,
         "partialFiles": 94
       },
       "owner": "NFH",
@@ -1082,7 +1082,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 132
+        "methodLines": 131
       },
       "owner": "NFH",
       "locations": [
@@ -1447,7 +1447,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 144
+        "methodLines": 143
       },
       "owner": "NFH",
       "locations": [
@@ -1537,7 +1537,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "viewTypeLines": 2275,
+        "viewTypeLines": 2252,
         "partialFiles": 17
       },
       "owner": "NFH",

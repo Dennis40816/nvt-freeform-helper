@@ -20,13 +20,6 @@ public sealed partial class SimulationWorkspaceViewModel
                FormatCellEmsStatus(cell);
     }
 
-    public double GetEditableRegularValue(int regularPadId)
-    {
-        return _manualOverridesByRegularPadId.TryGetValue(regularPadId, out var overrideValue)
-            ? overrideValue
-            : GlobalValue;
-    }
-
     public void ApplyRegularOverride(int regularPadId, double value)
     {
         if (!_regularPadById.ContainsKey(regularPadId))
@@ -240,7 +233,6 @@ public sealed partial class SimulationWorkspaceViewModel
         OnPropertyChanged(nameof(SelectedFlowLegs));
         OnPropertyChanged(nameof(HasSelectedFlowLegs));
         OnPropertyChanged(nameof(SelectedSourceText));
-        OnPropertyChanged(nameof(SelectedDiffBadgeText));
         OnPropertyChanged(nameof(ShowSelectedOverrideEditor));
         OnPropertyChanged(nameof(SelectedImpactSummaryText));
         OnPropertyChanged(nameof(HasSelectedImpactItems));
@@ -278,7 +270,6 @@ public sealed partial class SimulationWorkspaceViewModel
         OnPropertyChanged(nameof(HasSelectedRegular));
         OnPropertyChanged(nameof(HasManualOverrides));
         OnPropertyChanged(nameof(HasSelectedOverride));
-        OnPropertyChanged(nameof(InputSummaryText));
         OnPropertyChanged(nameof(InputPrimarySummaryText));
         OnPropertyChanged(nameof(InputSecondarySummaryText));
         OnPropertyChanged(nameof(InputContractTitleText));

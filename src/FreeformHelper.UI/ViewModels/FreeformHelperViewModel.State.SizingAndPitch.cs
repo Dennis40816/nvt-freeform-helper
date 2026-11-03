@@ -233,10 +233,6 @@ public sealed partial class FreeformHelperViewModel
     // --- Derived Read-Only Properties ---
 
     /// <summary>
-    /// Calculates the total active area of the regular sensor (width * height).
-    /// </summary>
-    public double RegularSensorArea => (double)(ActiveAreaWidth * ActiveAreaHeight);
-    /// <summary>
     /// Calculates the pitch size in the X-direction (width / XChannels).
     /// Returns 0.0 if XChannels is non-positive.
     /// </summary>
@@ -309,9 +305,4 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     [ObservableProperty]
     private ObservableCollection<CascadeIcSetting> _cascadeIcSettings = new();
-
-    /// <summary>
-    /// Gets a value indicating whether there is more than one cascaded IC.
-    /// </summary>
-    public bool IsCascadeMulti => CascadeNum > 1;
 }

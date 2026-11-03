@@ -44,7 +44,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     // These delegates are set by the View (FreeformHelperView) to enable the ViewModel
     // to trigger platform-specific file dialogs or confirmation prompts.
     public Func<Task<string?>>? PickOpenDxfPathAsync { get; set; }
-    public Func<Task<IReadOnlyList<string>>>? PickOpenDiffCsvPathsAsync { get; set; }
     public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get; set; }
     public Func<Task<string?>>? PickLoadProjectPathAsync { get; set; }
     public Func<Task<string?>>? PickSaveProjectPathAsync { get; set; }
@@ -154,7 +153,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _appGeneralSettingsStore = appGeneralSettingsStore ?? new AppGeneralSettingsStore();
         InitializeAppGeneralSettingsPersistence();
         // Populate dropdown options for ScanOrder.
-        ScanOrders = Enum.GetValues<ScanOrder>().ToList();
         ScanOrderOptions = new List<ScanOrderOption>
         {
             new(ScanOrder.LeftToRight_TopToBottom, "L->R, T->B"),

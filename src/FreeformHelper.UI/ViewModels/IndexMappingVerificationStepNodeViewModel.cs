@@ -29,7 +29,6 @@ public sealed partial class IndexMappingVerificationStepNodeViewModel : Observab
     public bool IsPass => string.Equals(StatusText, "pass", StringComparison.OrdinalIgnoreCase);
     public bool IsWarning => string.Equals(StatusText, "warning", StringComparison.OrdinalIgnoreCase);
     public bool IsBlocked => string.Equals(StatusText, "blocked", StringComparison.OrdinalIgnoreCase);
-    public bool IsPending => string.Equals(StatusText, "pending", StringComparison.OrdinalIgnoreCase);
     public bool HasConnector => !IsLast;
 
     [ObservableProperty] private bool _isActive;

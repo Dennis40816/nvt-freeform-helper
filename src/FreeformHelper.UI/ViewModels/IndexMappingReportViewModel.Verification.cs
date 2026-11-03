@@ -88,12 +88,9 @@ public sealed partial class IndexMappingReportViewModel
         }
 
         VerificationSteps = nodes;
-        OnPropertyChanged(nameof(HasVerificationSteps));
         OnPropertyChanged(nameof(OpenIssueCount));
         OnPropertyChanged(nameof(OverallStatusText));
         OnPropertyChanged(nameof(HeaderSubtitle));
-        OnPropertyChanged(nameof(HeaderAuditSummaryText));
-        OnPropertyChanged(nameof(HasHeaderAuditSummary));
         NotifyStepSurfaceStateChanged();
     }
 

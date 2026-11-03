@@ -40,10 +40,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     /// </summary>
     public bool IsMulti { get; }
     /// <summary>
-    /// Gets a value indicating whether a single CAD pad is being displayed/edited.
-    /// </summary>
-    public bool IsSingle => !IsMulti;
-    /// <summary>
     /// Gets the number of CAD pads currently selected.
     /// </summary>
     public int SelectedCount { get; }
@@ -79,23 +75,15 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public string TargetAllocationSummaryText { get; }
     public string TargetAllocationCompactText => StripKnownPrefix(TargetAllocationSummaryText, "Targets:");
     public IReadOnlyList<string> TargetAllocationLines { get; }
-    public bool HasTargetAllocationLines => TargetAllocationLines.Count > 0;
     public IReadOnlyList<PadInfoTargetAllocationViewModel> TargetAllocationItems { get; }
     public bool HasTargetAllocationItems => TargetAllocationItems.Count > 0;
     public string OwnerSummaryText { get; }
     public string OwnerSummaryCompactText => string.IsNullOrWhiteSpace(OwnerSummaryText) ? "-" : OwnerSummaryText;
     public bool HasOwnerSummary => !string.IsNullOrWhiteSpace(OwnerSummaryText);
-    public bool HasOwnerDetailNavigation => HasOwnerSummary && HasFocusMatchAction;
-    public static string OwnerDetailNavigationText => "Open owner details in Regular";
     public string ToFullDiagnosticsText { get; }
     public bool HasToFullDiagnosticsText => !string.IsNullOrWhiteSpace(ToFullDiagnosticsText);
-    public bool HasNotchDiagnosticsToggle => HasToFullDiagnosticsText;
     public string NotchDiagnosticsToggleText => ShowNotchDiagnostics ? "Hide diagnostics" : "Show diagnostics";
     public IReadOnlyList<NotchOwnerLinkViewModel> NotchOwnerLinks { get; }
-    public bool HasNotchOwnerLinks => NotchOwnerLinks.Count > 0;
-    public bool HasHighlightAllNotchOwners => HasNotchOwnerLinks && _allNotchOwnerCadIds.Count > 1;
-    public string HighlightAllNotchOwnersText => $"Highlight all owners ({_allNotchOwnerCadIds.Count})";
-    public string HighlightAllNotchOwnersShortText => $"Owners ({_allNotchOwnerCadIds.Count})";
     public IReadOnlyList<string> RuleTraceLines { get; }
     public bool HasRuleTrace => RuleTraceLines.Count > 0;
     public string RuleTraceToggleText => ShowRuleTrace ? "Hide Detail" : "Show Detail";

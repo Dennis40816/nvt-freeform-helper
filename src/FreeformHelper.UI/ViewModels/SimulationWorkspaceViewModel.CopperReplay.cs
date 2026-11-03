@@ -142,17 +142,11 @@ public sealed partial class SimulationWorkspaceViewModel
         }
 
         OnPropertyChanged(nameof(CopperPathReplayRows));
-        OnPropertyChanged(nameof(HasSelectedCopperPathReplayRow));
     }
 
     private static int ClampReplayStepCount(decimal value)
     {
         var rounded = (int)Math.Round(value, MidpointRounding.AwayFromZero);
         return Math.Max(1, rounded);
-    }
-
-    partial void OnSelectedCopperPathReplayRowChanged(CopperPillarPathReplayArtifactRow? value)
-    {
-        OnPropertyChanged(nameof(HasSelectedCopperPathReplayRow));
     }
 }

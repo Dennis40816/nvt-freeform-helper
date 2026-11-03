@@ -43,23 +43,4 @@ public sealed class PadEditUseCase
     {
         return _manualSizingService.ResetSizing(settings, alignmentMode, cad, rows, cols);
     }
-
-    public ManualSizingResult SetPadDimensions(
-        GridSettings settings,
-        GridAlignmentMode alignmentMode,
-        CadPadSet? cad,
-        int row,
-        int col,
-        double widthMm,
-        double heightMm)
-    {
-        return _manualSizingService.SetPadDimensions(
-            settings,
-            alignmentMode,
-            cad,
-            row,
-            col,
-            widthMm,
-            heightMm);
-    }
 }

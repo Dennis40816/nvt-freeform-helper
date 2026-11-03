@@ -28,17 +28,6 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
-    public void FocusRegularMatch(int cadPadId, int regularPadId)
-    {
-        TryLocateSelection(
-            new[] { cadPadId },
-            new[] { regularPadId },
-            focusSelection: true,
-            notVisibleStatus: "Match locate: target not visible.",
-            successStatusBuilder: (cadCount, regularCount) =>
-                $"Match focused: CAD {cadPadId}, Regular {regularPadId} (CAD output={cadCount}, Regular={regularCount}).");
-    }
-
     private bool TryAutoFocusByIdOrDiff(int value, int? icIndex)
     {
         return TryFocusCadPadById(value, icIndex, "Auto focus") ||

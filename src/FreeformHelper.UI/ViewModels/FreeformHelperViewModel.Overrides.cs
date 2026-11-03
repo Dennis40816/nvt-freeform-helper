@@ -81,45 +81,6 @@ public sealed partial class FreeformHelperViewModel
     }
 
     /// <summary>
-    /// Sets the width and/or height for a specific regular pad (cell) in the grid.
-    /// This delegates to the <see cref="ManualSizingService"/> to apply the changes and redistribute space.
-    /// </summary>
-    /// <param name="row">The row index of the pad.</param>
-    /// <param name="col">The column index of the pad.</param>
-    /// <param name="widthMm">The new width in millimeters, or 0 to reset.</param>
-    /// <param name="heightMm">The new height in millimeters, or 0 to reset.</param>
-    public void SetPadDimensions(int row, int col, double widthMm, double heightMm)
-    {
-        if (_cad is null)
-        {
-            SetStatus("Set pad dimensions: import DXF first.");
-            return;
-        }
-
-        ApplyUiToSettings(_projectFile.Settings); // Ensure current UI settings are applied.
-
-        // Use the ManualSizingService to apply the dimension changes.
-        var result = _padEditUseCase.SetPadDimensions(
-            _projectFile.Settings.Grid,
-            GridAlignmentMode,
-            BuildCadPadSetForBounds(),
-            row,
-            col,
-            widthMm,
-            heightMm);
-
-        if (!result.Success)
-        {
-            SetStatus($"Set pad dimensions: {result.Error}");
-            return;
-        }
-
-        SetStatus($"Pad ({row},{col}) AA updated to {widthMm:0.###} x {heightMm:0.###} mm. Rebuilding grid...");
-        _ = TriggerGridRebuildAsync(requestFit: true); // Trigger a grid rebuild with content fitting.
-        MarkUnsaved(); // Mark the project as unsaved.
-    }
-
-    /// <summary>
     /// Retrieves a custom numeric value associated with a specific CAD pad.
     /// </summary>
     /// <param name="cadId">The ID of the CAD pad.</param>
@@ -127,18 +88,6 @@ public sealed partial class FreeformHelperViewModel
     public double GetCadPadCustomValue(int cadId)
     {
         return _cadPadCustomValues.TryGetValue(cadId, out var v) ? v : 0.0;
-    }
-
-    /// <summary>
-    /// Sets a custom numeric value for a specific CAD pad.
-    /// </summary>
-    /// <param name="cadId">The ID of the CAD pad.</param>
-    /// <param name="value">The custom numeric value to set.</param>
-    public void SetCadPadCustomValue(int cadId, double value)
-    {
-        _cadPadCustomValues[cadId] = value;
-        SetStatus($"CAD pad #{cadId} note set to {value}.");
-        MarkUnsaved(); // Mark the project as unsaved.
     }
 
     /// <summary>

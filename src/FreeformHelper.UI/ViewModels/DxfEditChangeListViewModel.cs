@@ -128,7 +128,6 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
 
     public string TitleText => _titleText;
     public string SubtitleText => _subtitleText;
-    public string SelectedKindDisplayText => GetKindDisplayText(SelectedKind);
     public bool IsHiddenKindSelected => SelectedKind == DxfEditChangeKind.Hidden;
     public bool IsDuplicateKindSelected => SelectedKind == DxfEditChangeKind.Duplicate;
     public bool IsCombinedKindSelected => SelectedKind == DxfEditChangeKind.Combined;
@@ -141,7 +140,6 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
         get => Rows.Count > 0 && Rows.All(static row => row.IsSelected);
         set => SetVisibleRowsSelection(value);
     }
-    public bool HasSelectedVisibleRows => SelectedVisibleCount > 0;
     public bool IsDuplicateBulkMode => SelectedKind == DxfEditChangeKind.Duplicate;
     public bool IsSingleActionBulkMode => !IsDuplicateBulkMode;
     public bool CanApplySelectedEntries => SelectedVisibleCount > 0 && IsSingleActionBulkMode;
@@ -244,7 +242,6 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
         OnPropertyChanged(nameof(IsCombinedKindSelected));
         OnPropertyChanged(nameof(IsMovedKindSelected));
         OnPropertyChanged(nameof(IsRotatedKindSelected));
-        OnPropertyChanged(nameof(SelectedKindDisplayText));
         OnPropertyChanged(nameof(IsDuplicateBulkMode));
         OnPropertyChanged(nameof(IsSingleActionBulkMode));
         UpdateSelectionSummary();
@@ -316,7 +313,6 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
     {
         SelectedVisibleCount = Rows.Count(static row => row.IsSelected);
         OnPropertyChanged(nameof(AreAllVisibleRowsSelected));
-        OnPropertyChanged(nameof(HasSelectedVisibleRows));
         OnPropertyChanged(nameof(SelectedVisibleRowsSummaryText));
         UpdateBulkActionState();
     }

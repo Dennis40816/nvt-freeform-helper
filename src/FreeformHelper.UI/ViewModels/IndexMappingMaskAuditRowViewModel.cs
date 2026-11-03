@@ -64,7 +64,6 @@ public sealed class IndexMappingMaskAuditRowViewModel
     public bool IsChangedByMask => Status == DxfRegularMaskAuditStatus.ChangedByMask;
     public bool IsRemovedByMask => Status == DxfRegularMaskAuditStatus.MaskRemovedMatch;
     public bool IsDecisionRelevant => Status != DxfRegularMaskAuditStatus.Unchanged;
-    public int CsvConfirmedCandidateCount => CsvConfirmedCandidates.Count;
     public IReadOnlyList<DxfRegularMaskAuditCandidate> CsvConfirmedCandidates { get; }
     public IReadOnlyList<DxfRegularMaskAuditCandidate> GeometryCandidates { get; }
     public double? CsvConfirmedConfidence { get; }
@@ -88,31 +87,16 @@ public sealed class IndexMappingMaskAuditRowViewModel
         DxfRegularMaskAuditStatus.NoRawBestMatch => "No raw geometry seed",
         _ => "Unchanged",
     };
-    public string Display =>
-        $"CAD {CadPadId}: raw REG {FormatRegular(RawRegularPadIndex, RawDiffIndex)} -> masked REG {FormatRegular(MaskedRegularPadIndex, MaskedDiffIndex)}";
     public string CoverageText =>
         RawRegularCoverage is double regularCoverage && RawCadCoverage is double cadCoverage
             ? $"Coverage: regular={regularCoverage:P1}, cad={cadCoverage:P1}"
             : string.Empty;
-    public bool HasCoverageText => CoverageText.Length > 0;
     public string ModeText => Mode.ToContractString();
     public string ReasonCodeText => ReasonCode.ToContractString();
     public string DecisionSourceText => DecisionSource.ToContractString();
-    public string AssignmentText => PrimaryAssignedDiffIndex is int diff
-        ? $"Primary diff idx: {diff}"
-        : "Primary diff idx: none";
-    public string PassiveCompensationText => PassiveCompensationDiffIndex is int diff
-        ? $"Passive compensation diff idx: {diff}"
-        : "Passive compensation diff idx: none";
-    public string ConfirmationText => CsvConfirmedCandidateCount == 0
-        ? "CSV-confirmed candidates: none"
-        : $"CSV-confirmed candidates: {CsvConfirmedCandidateCount}, confidence={CsvConfirmedConfidence.GetValueOrDefault():P1}";
     public string SuggestionText => SuggestedDiffIndex is int diff
         ? $"Suggested diff idx: {diff}"
         : "Suggested diff idx: none";
-    public string RepairSuggestionText => RepairSuggestionDiffIndex is int diff
-        ? $"Repair suggestion diff idx: {diff}"
-        : "Repair suggestion diff idx: none";
     public string SegmentOffsetText => DetectedOffset is int offset
         ? $"Segment offset: {offset:+#;-#;0}, support={OffsetSupportCount}, ratio={OffsetSupportRatio.GetValueOrDefault():P1}, confidence={SegmentConfidence.GetValueOrDefault():P1}"
         : "Segment offset: none";
@@ -133,14 +117,4 @@ public sealed class IndexMappingMaskAuditRowViewModel
         : SuggestedDiffIndex is int diff
             ? $"Suggested diff idx: {diff}"
             : "Suggested: none";
-
-    private static string FormatRegular(int? regularPadIndex, int? diffIndex)
-    {
-        if (regularPadIndex is not int reg || diffIndex is not int diff)
-        {
-            return "none";
-        }
-
-        return $"{reg} / diff {diff}";
-    }
 }

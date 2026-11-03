@@ -4,14 +4,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    public IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> GetCadOutputFwDiffAssignmentDecisionsSnapshot()
-    {
-        var snapshot = BuildWorkflowDataSnapshot();
-        return snapshot.CadOutputFwDiffAssignmentDecisionsByCadId.ToDictionary(
-            static pair => pair.Key,
-            static pair => pair.Value);
-    }
-
     public CadOutputFwDiffAssignmentDecisionSummarySnapshot GetCadOutputFwDiffAssignmentDecisionSummarySnapshot()
     {
         var snapshot = BuildWorkflowDataSnapshot();

@@ -177,10 +177,6 @@ public sealed partial class FreeformHelperViewModel
             : "To Full rule engine: ON (trace OFF)")
         : "To Full rule engine: OFF (legacy gate path)";
 
-    public string NotchCompensationModelSummary => string.IsNullOrWhiteSpace(SelectedNotchCompensationModelOption.Description)
-        ? SelectedNotchCompensationModelOption.Display
-        : SelectedNotchCompensationModelOption.Description;
-
     public string NotchEffectiveModelSummary =>
         $"{SelectedNotchCompensationModelOption.Display} · ToRegular {(EnableToRegular ? "ON" : "OFF")} · ToFull {(EnableToFull ? "ON" : "OFF")}";
 
@@ -323,7 +319,6 @@ public sealed partial class FreeformHelperViewModel
 
     private void NotifyNotchModelSummaryChanged()
     {
-        OnPropertyChanged(nameof(NotchCompensationModelSummary));
         OnPropertyChanged(nameof(NotchEffectiveModelSummary));
         OnPropertyChanged(nameof(NotchAllocationModelSummary));
         OnPropertyChanged(nameof(NotchAllocationModelShortText));

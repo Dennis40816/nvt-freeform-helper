@@ -2,11 +2,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    public bool HasCadOutputFwDiffIndexOverride(int cadPadId)
-    {
-        return _projectFile.CadOutputFwDiffIndexOverrides.ContainsKey(cadPadId);
-    }
-
     public int? GetCadOutputFwDiffIndexOverride(int cadPadId)
     {
         return _projectFile.CadOutputFwDiffIndexOverrides.TryGetValue(cadPadId, out var index)

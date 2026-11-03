@@ -50,12 +50,7 @@ internal readonly record struct SimulationRegularQuerySnapshot(
     bool IsActiveSurface,
     bool IsWithinSelectedArea,
     string InputSourceText,
-    IReadOnlyList<NotchApplySimulationImpactItemViewModel> ImpactItems)
-{
-    // Backward-compatible alias for existing runtime query clients.
-    public int DiffIndex => FwDiffIndex;
-    public int CadLayerDiffIndex => CadOutputFwDiffIndex;
-}
+    IReadOnlyList<NotchApplySimulationImpactItemViewModel> ImpactItems);
 
 internal readonly record struct SimulationCadOutputFwDiffAssignmentDecisionSummarySnapshot(
     int DecisionCount,
@@ -351,11 +346,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         SimulationInputSourceMode.Copper => "Source: Copper",
         _ => "Source: Manual",
     };
-    public string InputSummaryText => IsCsvSource && HasCsvData
-        ? $"CSV {CsvFiles.Count} file(s) · Compatible frames {FrameOptions.Count}"
-        : IsCopperSource
-            ? CopperSummaryText
-            : $"Manual baseline {GlobalValue.ToString("0.###", CultureInfo.InvariantCulture)} · Overrides {_manualOverridesByRegularPadId.Count}";
     public string InputPrimarySummaryText => SelectedInputSourceOption.Value switch
     {
         SimulationInputSourceMode.Csv => HasCsvData ? $"CSV {CsvFiles.Count} file(s)" : "CSV not loaded",
@@ -510,9 +500,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         SimulationInputSourceMode.Copper => "CAD overlap -> CAD Output FW Diff",
         _ => "-",
     };
-    public string SelectedDiffBadgeText => TryGetSelectedRegularPad(out var badgePad)
-        ? $"FW Diff Idx {GetFwDiffIndex(badgePad.RegularPadId)} · CAD Output FW Diff Idx {GetCadOutputFwDiffIndex(badgePad.RegularPadId)}"
-        : "-";
     public string CanvasHintText => HasSimulationData
         ? string.Empty
         : $"No projected regular pads under {SelectedAreaOption.Display}.";
@@ -535,7 +522,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     public string CopperPathReplayArtifactSummaryText => HasCopperPathReplay
         ? $"Replay rows {_copperPathReplayArtifactSnapshot.StepCount.ToString(CultureInfo.InvariantCulture)} · EMS {_copperPathReplayArtifactSnapshot.TotalEmsViolationCount.ToString(CultureInfo.InvariantCulture)} · net-flow {_copperPathReplayArtifactSnapshot.TotalNetFlowResidualCount.ToString(CultureInfo.InvariantCulture)} · coverage {_copperPathReplayArtifactSnapshot.TotalTargetCoverageRiskCount.ToString(CultureInfo.InvariantCulture)}"
         : "Replay rows: not run.";
-    public bool HasSelectedCopperPathReplayRow => SelectedCopperPathReplayRow is not null;
 
     private int GetFwDiffIndex(int regularPadId)
     {

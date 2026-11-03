@@ -151,9 +151,6 @@ public sealed partial class IndexMappingDecisionRowViewModel : ObservableObject
     public string DecisionSourceText { get; }
     public IndexMappingReportIssueViewModel? Issue { get; }
     public bool HasCoverageText => CoverageText.Length > 0;
-    public bool HasOffsetSupportText => OffsetSupportText.Length > 0;
-    public bool HasCandidates => CandidateLines.Count > 0;
-    public bool HasNoCandidates => !HasCandidates;
     public bool CanLocate => CadPadId.HasValue || LocateRegularPadIndex.HasValue;
     public bool CanApplyOverride => CadPadId.HasValue && ApplyRegularPadIndex.HasValue;
     public bool CanApplyDiffOverride => CadPadId.HasValue && ApplyDiffIndex.HasValue;
