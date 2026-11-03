@@ -198,7 +198,6 @@ public sealed partial class IndexMappingReportViewModelTests
         Assert.Equal("CAD 4823", vm.SelectedEntityText);
         Assert.Contains("raw diff 324 -> assigned diff 324 -> suggested diff 323", vm.SelectedJourneyText, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("assigned=diff 324", vm.VerificationSteps[1].KeyChecks, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("Apply diff repair for CAD 4823", vm.VerificationSteps[1].OpenActionText, StringComparison.OrdinalIgnoreCase);
     }
 
 

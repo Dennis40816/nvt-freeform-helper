@@ -9,15 +9,13 @@ public sealed partial class IndexMappingVerificationStepNodeViewModel : Observab
         string title,
         string verifyHint,
         string keyChecks,
-        string statusText,
-        string openActionText)
+        string statusText)
     {
         Step = step;
         Title = title;
         VerifyHint = verifyHint;
         KeyChecks = keyChecks;
         StatusText = statusText;
-        OpenActionText = openActionText;
     }
 
     public IndexMappingVerificationStep Step { get; }
@@ -25,7 +23,6 @@ public sealed partial class IndexMappingVerificationStepNodeViewModel : Observab
     public string VerifyHint { get; }
     public string KeyChecks { get; }
     public string StatusText { get; }
-    public string OpenActionText { get; }
     public bool IsPass => string.Equals(StatusText, "pass", StringComparison.OrdinalIgnoreCase);
     public bool IsWarning => string.Equals(StatusText, "warning", StringComparison.OrdinalIgnoreCase);
     public bool IsBlocked => string.Equals(StatusText, "blocked", StringComparison.OrdinalIgnoreCase);

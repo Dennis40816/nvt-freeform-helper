@@ -62,14 +62,14 @@ public sealed class PadInfoViewModelTests
     }
 
     [Fact]
-    public void CadPadInfo_OpenOwnerDetailCommand_TriggersFocusAction()
+    public void CadPadInfo_LocateMatchCommand_TriggersFocusAction()
     {
         int? focusedCadId = null;
         var vm = CreateSingleCadPadViewModel(focusCadMatches: id => focusedCadId = id);
 
         Assert.True(vm.HasFocusMatchAction);
 
-        vm.OpenOwnerDetailCommand.Execute(null);
+        vm.LocateMatchCommand.Execute(null);
 
         Assert.Equal(274, focusedCadId);
     }
@@ -169,8 +169,9 @@ public sealed class PadInfoViewModelTests
         var roundedZeroTarget = Assert.Single(
             resolved.TargetAllocation.Targets,
             target => target.DiffIndex == roundedZero.DiffIndex);
-        var vm = CreateSingleCadPadViewModel(targetAllocation: resolved.TargetAllocation);
-
+        var highlightedRegularPadIds = new List<int>();
+        var vm = CreateSingleCadPadViewModel(targetAllocation: resolved.TargetAllocation,
+            highlightRegularPads: ids => highlightedRegularPadIds.Add(Assert.Single(ids)));
         Assert.Equal(emitted.DiffIndex, emittedTarget.DiffIndex);
         Assert.False(emittedTarget.PassesStrictThreshold);
         Assert.Equal(1, emittedTarget.ToFullAppliedRegularCount);
@@ -199,13 +200,21 @@ public sealed class PadInfoViewModelTests
         Assert.Equal(
             ["4533.91 mm²", "18.09 mm²", "18 mm²"],
             vm.TargetAllocationItems.Select(static item => item.AreaText));
-        Assert.Equal(
-            [4808, 4809, 4810],
-            vm.TargetAllocationItems.Select(static item => Assert.Single(item.RegularPadIds)));
+        HighlightTargetAllocations(vm.TargetAllocationItems);
+        Assert.Equal([4808, 4809, 4810], highlightedRegularPadIds);
         Assert.Equal("Self before To Full", diff83.RoleText);
         Assert.Equal("54%", diff83.RatioText);
         Assert.Equal("Target", diff84.RoleText);
         Assert.Equal("Below gate", diff85.RoleText);
+    }
+
+    private static void HighlightTargetAllocations(IEnumerable<PadInfoTargetAllocationViewModel> items)
+    {
+        foreach (var item in items)
+        {
+            Assert.NotNull(item.HighlightCommand);
+            item.HighlightCommand.Execute(null);
+        }
     }
 
     private static RegularPadInfoViewModel CreateSinglePadViewModel()
@@ -249,7 +258,8 @@ public sealed class PadInfoViewModelTests
     private static CadPadInfoViewModel CreateSingleCadPadViewModel(
         Action<int>? focusCadMatches = null,
         Action<int>? highlightCadMatches = null,
-        NotchV22TargetAllocationSummary? targetAllocation = null)
+        NotchV22TargetAllocationSummary? targetAllocation = null,
+        Action<IReadOnlyCollection<int>>? highlightRegularPads = null)
     {
         var cadPad = new CadPad(
             274,
@@ -263,7 +273,40 @@ public sealed class PadInfoViewModelTests
                 new Point2(0, 8),
             }));
 
-        var snapshot = new PadInspectorSnapshot(
+        var snapshot = CreateCadPadInspectorSnapshot(cadPad);
+
+        return new CadPadInfoViewModel(
+            pads: new List<CadPad> { cadPad },
+            getDxfIndex: _ => 112,
+            getCadOutputFwDiffOverride: null,
+            isDxfIndexAnchor: null,
+            getCustomValue: _ => 0,
+            applyCustomValue: null,
+            setCadOutputFwDiffOverride: null,
+            clearCadOutputFwDiffOverride: null,
+            setDxfIndexAnchor: null,
+            clearDxfIndexAnchor: null,
+            closePadInfo: null,
+            notchDetailCommand: null,
+            selectAreaBucket: null,
+            getMatchedRegularPadIds: null,
+            getMatchedRegularLinks: null,
+            getRegularPadIcDiff: null,
+            focusCadMatches: focusCadMatches,
+            highlightCadMatches: highlightCadMatches,
+            highlightCadOwnerPads: null,
+            highlightRegularPads: highlightRegularPads,
+            getCadV22CompensationPreview: targetAllocation is null
+                ? null
+                : _ => (0.941, 1.556, targetAllocation.TargetCoverageProjection.DisplayCombinedRatio, true),
+            getCadV22CompensationDiagnostics: null,
+            getCadV22TargetAllocationSummary: targetAllocation is null ? null : _ => targetAllocation,
+            inspectorSnapshot: targetAllocation is null ? snapshot : null);
+    }
+
+    private static PadInspectorSnapshot CreateCadPadInspectorSnapshot(CadPad cadPad)
+    {
+        return new PadInspectorSnapshot(
             "cad",
             new CadPadInspectorSnapshot(
                 CadPadId: cadPad.Id,
@@ -303,33 +346,5 @@ public sealed class PadInfoViewModelTests
                 },
                 MatchConfidence: 0.61),
             Regular: null);
-
-        return new CadPadInfoViewModel(
-            pads: new List<CadPad> { cadPad },
-            getDxfIndex: _ => 112,
-            getCadOutputFwDiffOverride: null,
-            isDxfIndexAnchor: null,
-            getCustomValue: _ => 0,
-            applyCustomValue: null,
-            setCadOutputFwDiffOverride: null,
-            clearCadOutputFwDiffOverride: null,
-            setDxfIndexAnchor: null,
-            clearDxfIndexAnchor: null,
-            closePadInfo: null,
-            notchDetailCommand: null,
-            selectAreaBucket: null,
-            getMatchedRegularPadIds: null,
-            getMatchedRegularLinks: null,
-            getRegularPadIcDiff: null,
-            focusCadMatches: focusCadMatches,
-            highlightCadMatches: highlightCadMatches,
-            highlightCadOwnerPads: null,
-            getCadV22CompensationPreview: targetAllocation is null
-                ? null
-                : _ => (0.941, 1.556, targetAllocation.TargetCoverageProjection.DisplayCombinedRatio, true),
-            getCadV22CompensationDiagnostics: null,
-            getCadV22TargetAllocationSummary: targetAllocation is null ? null : _ => targetAllocation,
-            inspectorSnapshot: targetAllocation is null ? snapshot : null);
     }
 }
-

@@ -91,7 +91,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
         var notchRowSummaryText = "Notch rows: -";
         var toRegularRatioText = "Undo NF (To Regular): -";
         var toFullRatioText = "To Full: -";
-        var combinedRatioText = "Combined ratio: -";
         var stage3AreaText = "Stage3 area: -";
         var targetAllocationSummaryText = "Targets: -";
         var targetAllocationLines = new List<string>();
@@ -154,7 +153,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
                     var notchDisplay = NotchDisplayProjector.Build(resolvedDisplayInput);
                     toRegularRatioText = notchDisplay.ToRegularRatioText;
                     toFullRatioText = notchDisplay.ToFullRatioText;
-                    combinedRatioText = notchDisplay.CombinedRatioText;
                     toRegularValueText = notchDisplay.ToRegularValueText;
                     toFullValueText = notchDisplay.ToFullValueText;
                     combinedValueText = notchDisplay.CombinedValueText;
@@ -228,7 +226,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
                         notchComputationMode);
                     toRegularRatioText = notchDisplay.ToRegularRatioText;
                     toFullRatioText = notchDisplay.ToFullRatioText;
-                    combinedRatioText = notchDisplay.CombinedRatioText;
                     toRegularValueText = notchDisplay.ToRegularValueText;
                     toFullValueText = notchDisplay.ToFullValueText;
                     combinedValueText = notchDisplay.CombinedValueText;
@@ -254,7 +251,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
         NotchRowSummaryText = notchRowSummaryText;
         ToRegularRatioText = toRegularRatioText;
         ToFullRatioText = toFullRatioText;
-        CombinedRatioText = combinedRatioText;
         ToRegularValueText = toRegularValueText;
         ToFullValueText = toFullValueText;
         CombinedValueText = combinedValueText;
@@ -295,9 +291,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
         ClearDxfIndexAnchorCommand = new RelayCommand(ClearDxfIndexAnchor);
         NotchDetailCommand = notchDetailCommand;
         SelectAreaBucketCommand = selectAreaBucket is null ? null : new RelayCommand(selectAreaBucket);
-        FocusMatchCommand = new RelayCommand(FocusMatch);
         LocateMatchCommand = new RelayCommand(LocateMatch);
-        OpenOwnerDetailCommand = FocusMatchCommand;
         HighlightAllNotchOwnersCommand = new RelayCommand(HighlightAllNotchOwners);
         ToggleLowFrequencyDetailSectionCommand = new RelayCommand(ToggleLowFrequencyDetailSection);
         ShowGeometryDetails = false;

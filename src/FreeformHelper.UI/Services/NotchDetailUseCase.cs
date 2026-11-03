@@ -174,16 +174,11 @@ public sealed class NotchDetailUseCase
             thresholdQ7,
             maxQ7,
             thresholdSummary,
-            compensation.ToRegularRatio,
-            compensation.ToFullRatio,
             compensation.CombinedRatio,
-            compensation.IsToFullEnabled,
             display.ToRegularRatioText,
             display.ToFullRatioText,
             display.CombinedRatioText,
-            resolved.Stage1SeedPolygons,
-            resolved.Stage2CandidatePolygons,
-            compensation.RegularDebugInfos);
+            resolved.Stage2CandidatePolygons);
     }
 }
 

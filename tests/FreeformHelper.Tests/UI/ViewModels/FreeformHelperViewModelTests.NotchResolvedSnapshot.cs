@@ -589,17 +589,12 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Equal(allocation.Q7, detail.MaxAllocationQ7);
         Assert.Equal("TH=0 (disabled)", detail.ThresholdSummary);
 
-        Assert.Equal(resolved.Compensation.ToRegularRatio, detail.ToRegularRatio);
-        Assert.Equal(resolved.Compensation.ToFullRatio, detail.ToFullRatio);
         Assert.Equal(resolved.Compensation.CombinedRatio, detail.CombinedRatio);
-        Assert.Equal(resolved.Compensation.IsToFullEnabled, detail.IsToFullEnabled);
         var display = NotchDisplayProjector.Build(resolved.Compensation, resolved.TargetAllocation);
         Assert.Equal(display.ToRegularRatioText, detail.ToRegularRatioText);
         Assert.Equal(display.ToFullRatioText, detail.ToFullRatioText);
         Assert.Equal(display.CombinedRatioText, detail.CombinedRatioText);
-        Assert.Same(resolved.Stage1SeedPolygons, detail.ToFullSeedPolygons);
         Assert.Same(resolved.Stage2CandidatePolygons, detail.ToFullPolygons);
-        Assert.Same(resolved.Compensation.RegularDebugInfos, detail.RegularDebugInfos);
     }
 
     private static void AssertInspectorProjectsResolved(
