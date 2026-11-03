@@ -85,3 +85,26 @@ The debt ledgers `eng/code-health/baseline.json` and `eng/code-health/test-debt.
 1. **Only down.** Do not raise a ledger count or add an entry by hand. Lower a ledger with the script and arguments of rule 3, using `-Mode LowerBaseline`.
 2. **Rename, move and reorder create new fingerprints.** The ledger stores a finding by rule, project, member, symbol and syntax hash. Changing the name or signature of a member that carries debt, moving it to another type, or reordering it inside its type makes the old entry disappear and a new one appear. Verify (rule 3) then fails. Do these only in a change that also removes the finding.
 3. **Run Verify before you open the pull request.** `pwsh -NoProfile -File eng/core-health/repo-health.ps1 -Mode Verify -Repo nfh -Root . -Solution FreeformHelper.sln -BaseRef origin/main`. Run it once on the final change. It takes about 25 minutes. Set `DOTNET_CLI_UI_LANGUAGE=en` and `VSLANG=1033` for English tool output.
+
+## Coding rules
+
+Owner approved this set on 2026-11-03 (chat).
+
+Work and review:
+
+- **Real inputs first.** Run each milestone end to end on a small sample of real input. A change is not done until it ran on real input.
+- **Name the metric.** State in the PR which metric the work moves, such as warning count, coverage, line count, time or memory. Work that moves no metric goes to the backlog.
+- **Check readers before deleting.** Before you delete code, a file or a setting, search for readers. Search `.axaml`, reflection strings, scripts and other repositories. If anything reads it, simplify it and keep it.
+- **Review at most 2 rounds.** Round 2 only checks that the round 1 fixes are right. Ask only "does a real input fail?". P2, P3 and contrived counter-examples go to the backlog.
+- **Test behavior, not implementation.** Tests check behavior and contracts. Do not pin bytes, private names or historical test numbers. Run large golden comparisons once before a release, not on every change.
+- **One batch, one PR.** A batch of work is one PR with several commits. If PRs must be separate, branch each from `main`, and no two PRs edit the same file. Put shared files (`ROADMAP.md`, `eng/code-health/baseline.json`, `eng/code-health/test-debt.json`) in the last PR of the batch.
+- **Estimate and report.** For work longer than one day, send a one-page plan first. Record the estimate and the actual time. Stop and report when the work passes 1.5 times the estimate.
+
+Design:
+
+- **One root cause, one general rule.** Do not patch for a single function, file or value.
+- **Few, named settings.** Each setting has a name, a default, a one-line description, and one test for on and one for off. Delete a setting that has no user.
+- **Find tools one way.** Look in project settings, then environment variables. If the tool is missing, fail before the run starts. Product code has no hard-coded machine paths and no silent fallback.
+- **Changing a default changes the output.** Say so in the PR. Do not call it a pure simplification.
+- **Smallest test set.** Generate only the cases that the coverage goal needs.
+- **Write rules as checks.** If a test, lint, CI step or hook can enforce a rule, add the check. Do not leave the rule as text only.
