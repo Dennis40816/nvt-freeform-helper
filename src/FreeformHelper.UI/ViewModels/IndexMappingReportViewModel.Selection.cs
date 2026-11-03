@@ -16,7 +16,6 @@ public sealed partial class IndexMappingReportViewModel
             }
         }
 
-        OnPropertyChanged(nameof(HasSelectedIssue));
         OnPropertyChanged(nameof(CanApplySelectedIssueOverride));
         OnPropertyChanged(nameof(CanApplySelectedDiffOverride));
         OnPropertyChanged(nameof(CanApplySelectedSegmentDiffOverrides));
@@ -38,7 +37,6 @@ public sealed partial class IndexMappingReportViewModel
             SelectedIssue = value?.Issue;
         }
 
-        OnPropertyChanged(nameof(HasSelectedDecision));
         OnPropertyChanged(nameof(CanApplySelectedIssueOverride));
         OnPropertyChanged(nameof(CanApplySelectedDiffOverride));
         OnPropertyChanged(nameof(CanApplySelectedSegmentDiffOverrides));
@@ -74,11 +72,7 @@ public sealed partial class IndexMappingReportViewModel
 
     partial void OnAlgorithmTraceStateChanged(IndexMappingAlgorithmTraceState value)
     {
-        OnPropertyChanged(nameof(IsAlgorithmTraceNotRequested));
-        OnPropertyChanged(nameof(IsAlgorithmTraceLoading));
         OnPropertyChanged(nameof(IsAlgorithmTraceReady));
-        OnPropertyChanged(nameof(IsAlgorithmTraceStale));
-        OnPropertyChanged(nameof(IsAlgorithmTraceFailed));
     }
 
     partial void OnTableRevisionChanged(int value)
@@ -90,17 +84,6 @@ public sealed partial class IndexMappingReportViewModel
     partial void OnSyncFilterWithStepRailChanged(bool value)
     {
         OnPropertyChanged(nameof(StepFilterSyncText));
-    }
-
-    private string BuildHeaderAuditSummaryText()
-    {
-        var activeNode = GetActiveStepNode();
-        if (activeNode is null)
-        {
-            return string.Empty;
-        }
-
-        return $"{activeNode.VerifyHint}. {activeNode.KeyChecks}.";
     }
 
     private string BuildSelectedEntityText()
@@ -174,16 +157,11 @@ public sealed partial class IndexMappingReportViewModel
         OnPropertyChanged(nameof(ShowSimulationActionButtons));
         OnPropertyChanged(nameof(ActiveStepCardTitle));
         OnPropertyChanged(nameof(ActiveStepCardStatusText));
-        OnPropertyChanged(nameof(ActiveStepWhatToVerifyText));
-        OnPropertyChanged(nameof(ActiveStepKeyChecksText));
-        OnPropertyChanged(nameof(ActiveStepOpenActionText));
         OnPropertyChanged(nameof(ActiveStepInputText));
         OnPropertyChanged(nameof(ActiveStepDecisionText));
         OnPropertyChanged(nameof(ActiveStepOutputText));
         OnPropertyChanged(nameof(ActiveStepImpactText));
         OnPropertyChanged(nameof(ActiveStepActionText));
-        OnPropertyChanged(nameof(HeaderAuditSummaryText));
-        OnPropertyChanged(nameof(HasHeaderAuditSummary));
         OnPropertyChanged(nameof(SimulationViewStateText));
         OnPropertyChanged(nameof(SimulationColorStateText));
     }
@@ -194,11 +172,8 @@ public sealed partial class IndexMappingReportViewModel
         OnPropertyChanged(nameof(SelectedDecisionSubtitleText));
         OnPropertyChanged(nameof(SelectedEntityText));
         OnPropertyChanged(nameof(SelectedJourneyText));
-        OnPropertyChanged(nameof(Step4ModeText));
         OnPropertyChanged(nameof(Step4ReasonCodeText));
         OnPropertyChanged(nameof(Step4DecisionSourceText));
-        OnPropertyChanged(nameof(Step4ReassignedByText));
-        OnPropertyChanged(nameof(Step4WeightBreakdownText));
         OnPropertyChanged(nameof(Step4RawBestText));
         OnPropertyChanged(nameof(Step4MaskedBestText));
         OnPropertyChanged(nameof(Step4AssignedText));
@@ -209,7 +184,6 @@ public sealed partial class IndexMappingReportViewModel
         OnPropertyChanged(nameof(Step4CandidateAttributionTitle));
         OnPropertyChanged(nameof(Step4CandidateAttributionLines));
         OnPropertyChanged(nameof(Step5RowNumberText));
-        OnPropertyChanged(nameof(Step5VersionText));
         OnPropertyChanged(nameof(Step5IcDiffText));
         OnPropertyChanged(nameof(Step5RegularCadText));
         OnPropertyChanged(nameof(Step5PayloadSummaryText));

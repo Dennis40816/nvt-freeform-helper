@@ -9,7 +9,6 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnSelectedNotchExportFileTypeOptionChanged(NotchExportFileTypeOption value)
     {
-        OnPropertyChanged(nameof(IsNotchCExportType));
         OnPropertyChanged(nameof(NotchExportSafetyPolicySummary));
         OnPropertyChanged(nameof(NotchExportHandoffFileText));
         OnPropertyChanged(nameof(NotchExportHandoffVersionText));

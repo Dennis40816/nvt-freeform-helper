@@ -23,7 +23,6 @@ public sealed record PadInspectorDisplayLine(
     PadInspectorFreeformDirection FreeformDirection = PadInspectorFreeformDirection.None)
 {
     public bool HasLabel => !string.IsNullOrWhiteSpace(Label);
-    public bool HasNoLabel => !HasLabel;
     public string ValueFontWeight =>
         IsEmphasized || Tone is PadInspectorLineTone.Key or PadInspectorLineTone.Warning
             ? "SemiBold"

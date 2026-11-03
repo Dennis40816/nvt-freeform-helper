@@ -13,12 +13,10 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     internal UiEventRunner UiEvents => _owner.UiEvents;
     private bool _suppressNotchThresholdSync;
     private bool _suppressCompensationModelSync;
-    private readonly bool _showInternalLegacyNotchFields;
 
     public SettingsWindowViewModel(FreeformHelperViewModel owner)
     {
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
-        _showInternalLegacyNotchFields = false;
 
         ScanOrderOptions = owner.ScanOrderOptions.ToList();
         var selectedScanOrder = ScanOrderOptions.FirstOrDefault(o => o.Value == owner.SelectedScanOrderOption.Value);
@@ -241,7 +239,6 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<LayerCategoryRow> _layerCategoryRows = new();
 
     public bool HasLayerCategoryRows => LayerCategoryRows.Count > 0;
-    public bool IsLenScaleVisible => EnableV21 && _showInternalLegacyNotchFields;
     public bool IsPanelAlignment => SelectedGridAlignmentOption.Value == FreeformHelper.Application.Settings.GridAlignmentMode.FromPanelAa;
     public bool IsDxfLayerRegularSource => SelectedRegularSourceModeOption.Value == FreeformHelper.Application.Settings.RegularSourceMode.FromDxfLayer;
     public bool IsGeneralSectionSelected
@@ -424,11 +421,6 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
             ? SimulationSafetyTextProjector.BuildNotchExportSafetyPolicySummary(
                 SimulationSafetyTextProjector.DefaultEmsAfterCapText)
             : string.Empty;
-
-    partial void OnEnableV21Changed(bool value)
-    {
-        OnPropertyChanged(nameof(IsLenScaleVisible));
-    }
 
     partial void OnSelectedGridAlignmentOptionChanged(FreeformHelperViewModel.GridAlignmentOption value)
     {

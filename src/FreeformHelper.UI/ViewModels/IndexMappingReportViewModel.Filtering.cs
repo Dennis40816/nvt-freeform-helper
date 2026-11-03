@@ -41,23 +41,14 @@ public sealed partial class IndexMappingReportViewModel
         DecisionRows = filterResult.EntityRows;
         AggregateDecisionRows = filterResult.AggregateRows;
 
-        OnPropertyChanged(nameof(HasIssues));
-        OnPropertyChanged(nameof(HasNoIssues));
-        OnPropertyChanged(nameof(IssueTitle));
-        OnPropertyChanged(nameof(TruncationNote));
-        OnPropertyChanged(nameof(HasTruncationNote));
         OnPropertyChanged(nameof(HasMaskAudit));
-        OnPropertyChanged(nameof(HasNoMaskAudit));
-        OnPropertyChanged(nameof(MaskAuditTitle));
         OnPropertyChanged(nameof(MaskAuditSummary));
         OnPropertyChanged(nameof(HasDecisionRows));
         OnPropertyChanged(nameof(HasNoDecisionRows));
         OnPropertyChanged(nameof(HasAggregateDecisionRows));
-        OnPropertyChanged(nameof(HasNoAggregateDecisionRows));
         OnPropertyChanged(nameof(VisibleDecisionCount));
         OnPropertyChanged(nameof(VisibleAggregateDecisionCount));
         OnPropertyChanged(nameof(TotalDecisionCount));
-        OnPropertyChanged(nameof(DecisionTitle));
         OnPropertyChanged(nameof(DecisionSummaryText));
         OnPropertyChanged(nameof(AggregateDecisionTitle));
         OnPropertyChanged(nameof(AggregateDecisionSummaryText));
@@ -66,7 +57,6 @@ public sealed partial class IndexMappingReportViewModel
         OnPropertyChanged(nameof(CanApplySelectedSegmentDiffOverrides));
         OnPropertyChanged(nameof(SelectedSegmentPreviewText));
         OnPropertyChanged(nameof(SimulationScopeText));
-        OnPropertyChanged(nameof(SimulationScaleText));
         OnPropertyChanged(nameof(HeaderSubtitle));
         RefreshVerificationSteps();
         MarkAlgorithmTraceNotRequested();

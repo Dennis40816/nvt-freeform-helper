@@ -60,8 +60,6 @@ public sealed partial class IndexMappingReportIssueViewModel : ObservableObject
     public string KindText { get; }
     public string Detail { get; }
     public string ActionHint { get; }
-    public string Display => $"[{KindText}] {Detail}";
-
     public int? DxfIndex { get; }
     public int? CadPadId { get; }
     public int? RegularPadIndex { get; }
@@ -99,9 +97,6 @@ public sealed partial class IndexMappingReportIssueViewModel : ObservableObject
             return parts.Count == 0 ? string.Empty : $"Score: {string.Join(", ", parts)}";
         }
     }
-
-    public bool CanApplyOverride => CadPadId.HasValue && RegularPadIndex.HasValue;
-    public bool CanClearOverride => CadPadId.HasValue;
 
     [ObservableProperty] private bool _hasOverride;
     [ObservableProperty] private int? _overrideRegularPadIndex;

@@ -258,7 +258,6 @@ public sealed partial class SimulationWorkspaceViewModel
         OnPropertyChanged(nameof(CopperSummaryText));
         OnPropertyChanged(nameof(CopperProjectionModelText));
         OnPropertyChanged(nameof(CopperContactModelSummaryText));
-        OnPropertyChanged(nameof(InputSummaryText));
         OnPropertyChanged(nameof(InputPrimarySummaryText));
         OnPropertyChanged(nameof(InputSecondarySummaryText));
         OnPropertyChanged(nameof(SelectedFrameDisplayText));

@@ -8,7 +8,6 @@ public sealed partial class FreeformHelperViewModel
     partial void OnActiveAreaWidthChanged(decimal value)
     {
         if (_isLoadingSettings) return;
-        OnPropertyChanged(nameof(RegularSensorArea)); // Update dependent property.
         OnPropertyChanged(nameof(PitchSizeX)); // Update dependent property.
         OnPropertyChanged(nameof(PitchSizeXSummary)); // Update dependent property.
         ApplySettingsOrchestration(nameof(ActiveAreaWidth));
@@ -17,7 +16,6 @@ public sealed partial class FreeformHelperViewModel
     partial void OnActiveAreaHeightChanged(decimal value)
     {
         if (_isLoadingSettings) return;
-        OnPropertyChanged(nameof(RegularSensorArea)); // Update dependent property.
         OnPropertyChanged(nameof(PitchSizeY)); // Update dependent property.
         OnPropertyChanged(nameof(PitchSizeYSummary)); // Update dependent property.
         ApplySettingsOrchestration(nameof(ActiveAreaHeight));
@@ -189,10 +187,8 @@ public sealed partial class FreeformHelperViewModel
     {
         if (_isLoadingSettings)
         {
-            OnPropertyChanged(nameof(IsCascadeMulti)); // Update dependent property even if loading.
             return;
         }
-        OnPropertyChanged(nameof(IsCascadeMulti)); // Update dependent property.
         ApplySettingsOrchestration(nameof(CascadeNum));
     }
 

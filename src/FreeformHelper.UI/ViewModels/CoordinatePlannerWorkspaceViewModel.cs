@@ -269,8 +269,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public CoordinatePlannerSnapshot Snapshot => _snapshot;
 
-    public CoordinateArtifactSnapshot ArtifactSnapshot => _artifactSnapshot;
-
     public Rect2 PreviewBounds => _previewBounds;
 
     public IRelayCommand SyncFromWorkspaceCommand { get; }
@@ -458,8 +456,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
     public bool ShowCad => _cadPadsForCanvas.Length > 0;
 
     public bool HasBistRectangle => _snapshot.Rectangles.Count > 0;
-
-    public bool HasCustomArray => ShowCustomArray;
 
     public bool HasCustomArtifacts => _customPointRequests.Count > 0 || _customPathRequests.Count > 0;
 

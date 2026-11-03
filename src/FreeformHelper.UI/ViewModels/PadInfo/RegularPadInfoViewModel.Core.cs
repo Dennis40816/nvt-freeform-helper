@@ -76,19 +76,13 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
     public IReadOnlyList<PadInfoRelationCardViewModel> MatchAreaCards { get; }
     public bool HasMatchAreaCards => MatchAreaCards.Count > 0;
     public IReadOnlyList<NotchOwnerLinkViewModel> OwnerLinks { get; }
-    public bool HasOwnerLinks => OwnerLinks.Count > 0;
-    public bool HasHighlightAllOwners => HasOwnerLinks && _allOwnerCadIds.Count > 1;
-    public string HighlightAllOwnersText => $"Highlight all owners ({_allOwnerCadIds.Count})";
     public string NotchRowsSummaryText { get; }
     public IReadOnlyList<PadInfoRelationCardViewModel> NotchRowFlowCards { get; }
     public bool HasNotchRowFlowCards => NotchRowFlowCards.Count > 0;
     public IReadOnlyList<NotchOwnerLinkViewModel> NotchRowLinks { get; }
-    public bool HasNotchRows => !string.IsNullOrWhiteSpace(NotchRowsSummaryText);
-    public bool HasNotchRowLinks => NotchRowLinks.Count > 0;
     public string RowRangeText { get; }
     public string ColRangeText { get; }
     public bool HasMatchNavigation { get; }
-    public bool HasNoMatchNavigation => !HasMatchNavigation;
     public bool HasHighlightMatchAction { get; }
     public bool HasAnyMatchAction => HasMatchNavigation || HasHighlightMatchAction;
     public bool HasLocateMatchAction => HasAnyMatchAction;

@@ -38,8 +38,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
         Func<int, int?>? getOverrideRegularIndex = null)
     {
         Summary = summary;
-        TotalIssueCount = Math.Max(0, report.TotalIssueCount);
-        IssuesTruncated = report.IssuesTruncated;
         _locateTarget = locateTarget;
         _applyOverride = applyOverride;
         _applyDiffOverride = applyDiffOverride;
@@ -76,8 +74,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     }
 
     public string Summary { get; }
-    public int TotalIssueCount { get; }
-    public bool IssuesTruncated { get; }
     public int MaskChangedCount { get; }
     public int MaskRemovedCount { get; }
     public int CountMismatchDecisionCount { get; }
@@ -88,27 +84,13 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     public int ChangedByMaskDecisionCount { get; }
     public int RemovedByMaskDecisionCount { get; }
 
-    public bool HasIssues => Issues.Count > 0;
-    public bool HasNoIssues => !HasIssues;
     public bool HasMaskAudit => _workspaceSnapshot.MaskAuditRows.Count > 0;
-    public bool HasNoMaskAudit => !HasMaskAudit;
-    public string IssueTitle => TotalIssueCount > 0
-        ? $"Issues ({Issues.Count} shown / {TotalIssueCount} total)"
-        : "Issues";
-    public string MaskAuditTitle => HasMaskAudit
-        ? $"CSV-confirmed geometry seed ({MaskAuditRows.Count} shown / {_workspaceSnapshot.MaskAuditRows.Count} total)"
-        : "CSV-confirmed geometry seed";
     public string MaskAuditSummary => !HasMaskAudit
         ? "No SeeRegular-based CSV confirmation data."
         : $"Changed by mask: {MaskChangedCount}, removed by mask: {MaskRemovedCount}.";
-    public bool HasTruncationNote => IssuesTruncated && Issues.Count > 0 && TotalIssueCount > Issues.Count;
-    public string TruncationNote => HasTruncationNote
-        ? $"Showing first {Issues.Count} of {TotalIssueCount} issues."
-        : string.Empty;
     public bool HasDecisionRows => DecisionRows.Count > 0;
     public bool HasNoDecisionRows => !HasDecisionRows;
     public bool HasAggregateDecisionRows => AggregateDecisionRows.Count > 0;
-    public bool HasNoAggregateDecisionRows => !HasAggregateDecisionRows;
     public int VisibleDecisionCount => DecisionRows.Count;
     public int VisibleAggregateDecisionCount => AggregateDecisionRows.Count;
     public int TotalDecisionCount => _allDecisionSeedRows.Count;
@@ -120,9 +102,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
                                  ChangedByMaskDecisionCount +
                                  RemovedByMaskDecisionCount;
     public string OverallStatusText => OpenIssueCount == 0 ? "pass" : "warning";
-    public string DecisionTitle => TotalDecisionCount > 0
-        ? $"Decision rows ({VisibleDecisionCount} shown / {TotalDecisionCount} total)"
-        : "Decision rows";
     public string DecisionSummaryText => HasDecisionRows
         ? $"Showing {VisibleDecisionCount} entity rows under {SelectedFilterLabel}."
         : HasAggregateDecisionRows
@@ -143,13 +122,7 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     public bool IsFilterLowConfidenceActive => SelectedFilterMode == IndexMappingDecisionFilterMode.LowConfidence;
     public bool IsFilterUnmappedActive => SelectedFilterMode == IndexMappingDecisionFilterMode.Unmapped;
     public bool IsFilterCountMismatchActive => SelectedFilterMode == IndexMappingDecisionFilterMode.CountMismatch;
-    public bool HasVerificationSteps => VerificationSteps.Count > 0;
-    public bool HasAlgorithmTraceEntries => AlgorithmTraceEntries.Count > 0;
-    public bool IsAlgorithmTraceNotRequested => AlgorithmTraceState == IndexMappingAlgorithmTraceState.NotRequested;
-    public bool IsAlgorithmTraceLoading => AlgorithmTraceState == IndexMappingAlgorithmTraceState.Loading;
     public bool IsAlgorithmTraceReady => AlgorithmTraceState == IndexMappingAlgorithmTraceState.Ready;
-    public bool IsAlgorithmTraceStale => AlgorithmTraceState == IndexMappingAlgorithmTraceState.Stale;
-    public bool IsAlgorithmTraceFailed => AlgorithmTraceState == IndexMappingAlgorithmTraceState.Failed;
     public string ActiveVerificationStepText => ActiveVerificationStep switch
     {
         IndexMappingVerificationStep.Step3 => "Step 3",
@@ -171,8 +144,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
         _ => "all diagnostics",
     };
     public string HeaderSubtitle => $"Open issues {OpenIssueCount} · Active {ActiveVerificationStepText} · {TableRevisionText}";
-    public string HeaderAuditSummaryText => BuildHeaderAuditSummaryText();
-    public bool HasHeaderAuditSummary => HeaderAuditSummaryText.Length > 0;
     public bool IsStep3Active => ActiveVerificationStep == IndexMappingVerificationStep.Step3;
     public bool IsStep4Active => ActiveVerificationStep == IndexMappingVerificationStep.Step4;
     public bool IsStep5Active => ActiveVerificationStep == IndexMappingVerificationStep.Step5;
@@ -185,9 +156,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     public bool CanLocateSelectedDecision => SelectedDecision?.CanLocate ?? false;
     public string ActiveStepCardTitle => GetActiveStepNode()?.Title ?? ActiveVerificationStepText;
     public string ActiveStepCardStatusText => $"status: {GetActiveStepNode()?.StatusText ?? OverallStatusText}";
-    public string ActiveStepWhatToVerifyText => GetActiveStepNode()?.VerifyHint ?? "Select step.";
-    public string ActiveStepKeyChecksText => GetActiveStepNode()?.KeyChecks ?? "key checks: n/a";
-    public string ActiveStepOpenActionText => GetActiveStepNode()?.OpenActionText ?? "open action: review selected row.";
     public string ActiveStepInputText => BuildActiveStepInputText();
     public string ActiveStepDecisionText => BuildActiveStepDecisionText();
     public string ActiveStepOutputText => BuildActiveStepOutputText();
@@ -197,13 +165,8 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     public string SelectedDecisionSubtitleText => SelectedDecision?.Subtitle ?? "Select a row in the verification table.";
     public string SelectedEntityText => BuildSelectedEntityText();
     public string SelectedJourneyText => BuildSelectedJourneyText();
-    public string Step4ModeText => $"mode: {SelectedDecision?.DecisionModeText ?? "n/a"}";
     public string Step4ReasonCodeText => $"reasonCode: {SelectedDecision?.DecisionReasonCodeText ?? "n/a"}";
     public string Step4DecisionSourceText => $"decisionSource: {SelectedDecision?.DecisionSourceText ?? "n/a"}";
-    public string Step4ReassignedByText => $"reassignedBy: {SelectedDecision?.DecisionSourceText ?? "n/a"} / {SelectedDecision?.DecisionReasonCodeText ?? "n/a"}";
-    public string Step4WeightBreakdownText => SelectedDecision?.CoverageText is { Length: > 0 } coverage
-        ? $"weight: {coverage}"
-        : "weight: not instrumented for this row";
     public string Step4RawBestText => SelectedDecision?.RawDetailText ?? "Raw geometry seed: n/a";
     public string Step4MaskedBestText => SelectedDecision?.MaskedDetailText ?? "Masked geometry seed: n/a";
     public string Step4AssignedText => $"primaryAssigned: {SelectedDecision?.CurrentDisplay ?? "-"}";
@@ -220,7 +183,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     public string Step4CandidateAttributionTitle => $"candidate attribution ({Step4CandidateAttributionLines.Count.ToString(CultureInfo.InvariantCulture)})";
     public IReadOnlyList<string> Step4CandidateAttributionLines => SelectedDecision?.CandidateLines ?? Array.Empty<string>();
     public string Step5RowNumberText => $"row: {(SelectedDecision?.RowIndex?.ToString(CultureInfo.InvariantCulture) ?? "n/a")}";
-    public string Step5VersionText => $"version: {SelectedDecision?.DecisionModeText ?? "n/a"}";
     public string Step5IcDiffText => $"IC: {(SelectedDecision?.IcIndex?.ToString(CultureInfo.InvariantCulture) ?? "n/a")} · diff: {SelectedDecision?.CurrentDisplay ?? "-"}";
     public string Step5RegularCadText => $"regular: {(SelectedDecision?.LocateRegularPadIndex?.ToString(CultureInfo.InvariantCulture) ?? "n/a")} · CAD: {(SelectedDecision?.CadPadId?.ToString(CultureInfo.InvariantCulture) ?? "n/a")}";
     public string Step5PayloadSummaryText => SelectedDecision?.DecisionContractText ?? "payload: n/a";
@@ -230,7 +192,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     public string Step6TraceDirectionText => BuildStep6TraceDirectionText();
     public string SimulationViewStateText => $"views: Before / After / Delta / Changed only ({ActiveVerificationStepText})";
     public string SimulationColorStateText => $"color mode: AUTO / TH ({SelectedFilterLabel})";
-    public string SimulationScaleText => $"color scale: full visible min/max, rows {VisibleDecisionCount}/{TotalDecisionCount}";
     public string SimulationImpactText => SelectedDecision is null
         ? "impact: select a row to inspect linked regular/notch rows."
         : $"impact: linked CAD {SelectedDecision.CadPadId?.ToString(CultureInfo.InvariantCulture) ?? "n/a"}, suggested {SelectedDecision.SuggestedDisplay}";
@@ -263,8 +224,6 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     [ObservableProperty] private bool _syncFilterWithStepRail;
     [ObservableProperty] private int _tableRevision = 1;
 
-    public bool HasSelectedIssue => SelectedIssue is not null;
-    public bool HasSelectedDecision => SelectedDecision is not null;
     public bool CanApplySelectedIssueOverride => SelectedDecision?.CanApplyOverride ?? false;
     public bool CanApplySelectedDiffOverride => SelectedDecision?.CanApplyDiffOverride ?? false;
     public bool CanApplySelectedSegmentDiffOverrides => GetSelectedSegmentRepairRows().Count > 0;

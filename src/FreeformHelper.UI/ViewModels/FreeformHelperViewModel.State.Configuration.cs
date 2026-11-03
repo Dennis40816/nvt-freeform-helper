@@ -10,10 +10,6 @@ public sealed partial class FreeformHelperViewModel
     // --- Static/Constant UI Options ---
 
     /// <summary>
-    /// Gets a read-only list of all possible <see cref="ScanOrder"/> enumeration values.
-    /// </summary>
-    public IReadOnlyList<ScanOrder> ScanOrders { get; }
-    /// <summary>
     /// Gets a read-only list of <see cref="ScanOrderOption"/> objects for display in UI dropdowns.
     /// </summary>
     public IReadOnlyList<ScanOrderOption> ScanOrderOptions { get; }

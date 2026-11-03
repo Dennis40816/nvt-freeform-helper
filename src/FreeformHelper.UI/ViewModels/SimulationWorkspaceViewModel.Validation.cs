@@ -42,7 +42,6 @@ public sealed partial class SimulationWorkspaceViewModel
     public int SimulationSafetyViolationCount => _simulationSafetyAudit.TotalViolationCount;
     public bool HasSimulationSafetyViolations => _simulationSafetyAudit.HasViolations;
     public bool HasSimulationHighRiskDiffs => _simulationSafetyAudit.HasHighRiskDiffs;
-    public bool HasSimulationPhysicalAuditRisks => _simulationSafetyAudit.HasPhysicalAuditRisks;
     public int SimulationNetFlowResidualCount => _simulationSafetyAudit.TotalNetFlowResidualCount;
     public int SimulationTargetCoverageRiskCount => _simulationSafetyAudit.TotalTargetCoverageRiskCount;
     public string SimulationNetFlowResidualCountText =>
@@ -214,7 +213,6 @@ public sealed partial class SimulationWorkspaceViewModel
         OnPropertyChanged(nameof(SimulationSafetyViolationCount));
         OnPropertyChanged(nameof(HasSimulationSafetyViolations));
         OnPropertyChanged(nameof(HasSimulationHighRiskDiffs));
-        OnPropertyChanged(nameof(HasSimulationPhysicalAuditRisks));
         OnPropertyChanged(nameof(SimulationNetFlowResidualCount));
         OnPropertyChanged(nameof(SimulationTargetCoverageRiskCount));
         OnPropertyChanged(nameof(SimulationNetFlowResidualCountText));

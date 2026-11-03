@@ -10,7 +10,6 @@ public sealed partial class IndexMappingReportViewModel
         AlgorithmTraceEntries = Array.Empty<IndexMappingAlgorithmTraceEntryViewModel>();
         AlgorithmTraceState = IndexMappingAlgorithmTraceState.NotRequested;
         AlgorithmTraceStatusText = "Trace: not requested.";
-        OnPropertyChanged(nameof(HasAlgorithmTraceEntries));
     }
 
     private async Task EnsureAlgorithmTraceForSelectedDecisionAsync(bool priorityOnly)
@@ -27,7 +26,6 @@ public sealed partial class IndexMappingReportViewModel
             AlgorithmTraceEntries = Array.Empty<IndexMappingAlgorithmTraceEntryViewModel>();
             AlgorithmTraceState = IndexMappingAlgorithmTraceState.NotRequested;
             AlgorithmTraceStatusText = "Trace: aggregate row (select CAD/REG entity).";
-            OnPropertyChanged(nameof(HasAlgorithmTraceEntries));
             return;
         }
 
@@ -37,7 +35,6 @@ public sealed partial class IndexMappingReportViewModel
             AlgorithmTraceEntries = cached;
             AlgorithmTraceState = IndexMappingAlgorithmTraceState.Ready;
             AlgorithmTraceStatusText = $"Trace: ready ({cached.Count.ToString(CultureInfo.InvariantCulture)} entries).";
-            OnPropertyChanged(nameof(HasAlgorithmTraceEntries));
         }
         else
         {
@@ -77,7 +74,6 @@ public sealed partial class IndexMappingReportViewModel
             AlgorithmTraceEntries = trace;
             AlgorithmTraceState = IndexMappingAlgorithmTraceState.Ready;
             AlgorithmTraceStatusText = $"Trace: ready ({trace.Count.ToString(CultureInfo.InvariantCulture)} entries).";
-            OnPropertyChanged(nameof(HasAlgorithmTraceEntries));
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {

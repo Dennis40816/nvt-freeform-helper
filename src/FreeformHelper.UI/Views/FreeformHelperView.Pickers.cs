@@ -73,7 +73,6 @@ public sealed partial class FreeformHelperView
         viewModel.InteractionState.PadInfoChanged -= OnPadInfoChanged;
         // Clear all delegate references to prevent memory leaks.
         viewModel.PickOpenDxfPathAsync = null;
-        viewModel.PickOpenDiffCsvPathsAsync = null;
         viewModel.PickOpenRegularVisibilityMaskPathAsync = null;
         viewModel.PickLoadProjectPathAsync = null;
         viewModel.PickSaveProjectPathAsync = null;
@@ -113,14 +112,6 @@ public sealed partial class FreeformHelperView
         {
             var res = await storage.OpenFilePickerAsync(BuildOpenDxfOptions());
             return res is { Count: > 0 } ? res[0].Path.LocalPath : null; // Return local path of selected file.
-        };
-
-        viewModel.PickOpenDiffCsvPathsAsync = async () =>
-        {
-            var res = await storage.OpenFilePickerAsync(BuildOpenDiffCsvOptions());
-            return res is { Count: > 0 }
-                ? res.Select(static file => file.Path.LocalPath).ToArray()
-                : Array.Empty<string>();
         };
 
         viewModel.PickOpenRegularVisibilityMaskPathAsync = async () =>
@@ -206,20 +197,6 @@ public sealed partial class FreeformHelperView
             FileTypeFilter = new List<FilePickerFileType>
             {
                 new FilePickerFileType("FreeformHelper Project") { Patterns = JsonFilePatterns }, // Custom project file extension.
-                new FilePickerFileType("All files") { Patterns = AllFilesPatterns },
-            }
-        };
-    }
-
-    private static FilePickerOpenOptions BuildOpenDiffCsvOptions()
-    {
-        return new FilePickerOpenOptions
-        {
-            AllowMultiple = true,
-            Title = "Import Diff CSV",
-            FileTypeFilter = new List<FilePickerFileType>
-            {
-                new FilePickerFileType("CSV") { Patterns = CsvFilePatterns },
                 new FilePickerFileType("All files") { Patterns = AllFilesPatterns },
             }
         };

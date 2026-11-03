@@ -298,7 +298,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             CustomArrayPointRows.Count);
 
         OnPropertyChanged(nameof(Snapshot));
-        OnPropertyChanged(nameof(ArtifactSnapshot));
         OnPropertyChanged(nameof(PreviewBounds));
         OnPropertyChanged(nameof(AaCornerRows));
         OnPropertyChanged(nameof(BistCornerRows));
@@ -308,7 +307,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
         OnPropertyChanged(nameof(VerticalGuideRows));
         OnPropertyChanged(nameof(ArtifactRows));
         OnPropertyChanged(nameof(HasBistRectangle));
-        OnPropertyChanged(nameof(HasCustomArray));
         OnPropertyChanged(nameof(MachineSummaryText));
         OnPropertyChanged(nameof(PixelSummaryText));
         OnPropertyChanged(nameof(CopperSummaryText));
