@@ -281,8 +281,6 @@ Notes:
   - [Status] [Rebuild] [View] [Clear selection]
   - Also updates layer toggles, CadPads, RegularPads, and MarkUnsaved.
   - `CadLoadWorkflowService` internally wraps import / apply / rebuild in `RunWithCadLoadCanvasOverlayAsync(...)`.
-- RebuildGridCommand → TriggerGridRebuildAsync(requestFit: true)
-  - [Rebuild] [View] [Clear selection] [Status]
 - MatchCommand → MatchAsync
   - [Status] (CanvasHost.Invalidate)
 - AutoDetectFreeformsCommand → AutoDetectFreeformsAsync
@@ -341,6 +339,7 @@ Notes:
   - [Rebuild] [View] [Status]
 - OnXChannelsChanged / OnYChannelsChanged / OnCascadeNumChanged / OnGridPaddingPercentChanged
   - [Rebuild] [View] [Status]
+  - `GridPaddingPercent` requests one rebuild with fit through `TriggerGridRebuildAsync(requestFit: true)` and `GridRebuildUseCase`, including selection clear. Tests change this setting and await `WaitForGridRebuildIdleAsync`.
 - MatchThreshold
   - [Visual] [Status] (only redraws unmatched highlight; does not rebuild the grid or change links)
 - `Mode` / centroid fallback / `NearestK`

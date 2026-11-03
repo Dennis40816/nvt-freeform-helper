@@ -87,7 +87,8 @@ public sealed class Cad3635LoadBenchmarkTests
         apply.Stop();
 
         var rebuild = Stopwatch.StartNew();
-        await InvokePrivateTaskAsync(vm, "TriggerGridRebuildAsync", [true]);
+        vm.GridPaddingPercent += 5m;
+        await vm.WaitForGridRebuildIdleAsync();
         rebuild.Stop();
 
         total.Stop();

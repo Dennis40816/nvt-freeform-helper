@@ -285,7 +285,7 @@ public sealed partial class FreeformHelperViewModelTests
         {
             CanvasHost = directHost
         };
-        await directVm.RebuildGridCommand.ExecuteAsync(null);
+        directVm.GridPaddingPercent += 5m;
         await WaitForGridRebuildAsync(directVm);
         var directPads = directVm.RegularPads;
         SetPadMatchResult(directVm, cadPadId: 101, regularPadId: directPads[0].RegularPadId);
@@ -317,7 +317,7 @@ public sealed partial class FreeformHelperViewModelTests
         {
             CanvasHost = windowHost
         };
-        await windowVm.RebuildGridCommand.ExecuteAsync(null);
+        windowVm.GridPaddingPercent += 5m;
         await WaitForGridRebuildAsync(windowVm);
         var windowPads = windowVm.RegularPads;
         SetPadMatchResult(windowVm, cadPadId: 303, regularPadId: windowPads[0].RegularPadId);

@@ -17,10 +17,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public IAsyncRelayCommand OpenDxfCommand { get; private set; } = null!;
     /// <summary>
-    /// Gets the command to rebuild the regular grid.
-    /// </summary>
-    public IAsyncRelayCommand RebuildGridCommand { get; private set; } = null!;
-    /// <summary>
     /// Gets the command to perform pad matching.
     /// </summary>
     public IAsyncRelayCommand MatchCommand { get; private set; } = null!;
@@ -232,7 +228,6 @@ public sealed partial class FreeformHelperViewModel
     private void InitializeCommands()
     {
         OpenDxfCommand = CreateEditingAsyncCommand(OpenDxfAsync);
-        RebuildGridCommand = CreateEditingAsyncCommand(() => TriggerGridRebuildAsync(requestFit: true));
         MatchCommand = CreateEditingAsyncCommand(MatchAsync);
         ImportRegularVisibilityMaskCommand = CreateEditingAsyncCommand(ImportRegularVisibilityMaskAsync);
         ClearRegularVisibilityMaskCommand = CreateEditingCommand(ClearRegularVisibilityMask);
