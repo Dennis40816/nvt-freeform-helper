@@ -13913,66 +13913,6 @@
       "symbol": "attribute:CA1822"
     },
     {
-      "syntaxHash": "2fe6fc1de24e7a5e88e63165901ce27ad197733e92bcbafe74d168e5519d0449",
-      "member": "FreeformHelper.Application.Services.DxfIndexAssigner.BuildIndexByCadId(IReadOnlyList<CadPad>,RegularGrid?,ScanOrder)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/DxfIndexAssigner.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "4452522d26043291fa64d3540c2f2a3f56abb9d9fd539ceff74db4abcedfb3ab",
-      "member": "FreeformHelper.Application.Services.DxfIndexAssigner.BuildIndexByCadId(IReadOnlyList<CadPad>,RegularGrid?,ScanOrder)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/DxfIndexAssigner.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "526c5bf34e11d2c22ddea919ea6381a508dc6eccae43e9e887fc538737d2e3d2",
-      "member": "FreeformHelper.Application.Services.DxfIndexAssigner.BuildIndexByCadId(IReadOnlyList<CadPad>,RegularGrid?,ScanOrder)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/DxfIndexAssigner.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "a05e0377a5508d627c6964522b7e63b19547778e21d157fb8d08aff8590808a7",
-      "member": "FreeformHelper.Application.Services.DxfIndexAssigner.BuildIndexByCadId(IReadOnlyList<CadPad>,RegularGrid?,ScanOrder)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/DxfIndexAssigner.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "df52f2a3c107273a92883ef343273f365bdd5e0209dd9f23a35702ea315ce391",
-      "member": "FreeformHelper.Application.Services.DxfIndexAssigner.BuildIndexByCadId(IReadOnlyList<CadPad>,RegularGrid?,ScanOrder)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/DxfIndexAssigner.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "fb72e669573f3fad5410b47709fa2ca26b72d5c582ad2d86ab92dbc9bad7da58",
-      "member": "FreeformHelper.Application.Services.DxfIndexAssigner.BuildIndexByCadId(IReadOnlyList<CadPad>,RegularGrid?,ScanOrder)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/DxfIndexAssigner.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
       "syntaxHash": "1295d0d99581387f7b175d3a7f232cd757a0e7b7fb3b3906b450348a78e2680d",
       "member": "FreeformHelper.Application.Services.DxfIndexAssigner.DistanceSquared(Point2,Point2)",
       "owner": "NFH",
@@ -16427,16 +16367,6 @@
       "member": "FreeformHelper.UI.Services.NotchExportService",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/NotchExportService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "dc51a7020524254f6344fb04b6ce5a7b0122dc29729a090dd1d8ca1dc838f588",
-      "member": "FreeformHelper.UI.Services.PadMatchService.AutoDetectFreeforms(CadPadSet,RegularGrid,MatchingSettings,PadMatchResult?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/PadMatchService.cs",
       "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "suppressionScopes",
