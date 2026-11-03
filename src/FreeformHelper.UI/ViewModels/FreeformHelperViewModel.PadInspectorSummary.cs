@@ -97,7 +97,6 @@ public sealed partial class FreeformHelperViewModel
             PrimaryText: primaryText,
             SecondaryText: secondaryText,
             MatchText: matchText,
-            CompensationText: string.Join(Environment.NewLine, compensationLines.Select(static line => line.DisplayText)),
             CompensationLines: compensationLines,
             RuleTraceLines: new ObservableCollection<string>(
                 ruleTraceSections

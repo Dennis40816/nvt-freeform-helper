@@ -57,7 +57,7 @@ public sealed class PadInspectorDisplayBehaviorTests
         vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
 
         Assert.Equal(2, vm.PadInspectorCompensationLines.Count);
-        Assert.Contains("Unavailable", vm.PadInspectorDisplay.CompensationText, StringComparison.Ordinal);
+        Assert.Contains("Unavailable", vm.PadInspectorCompensationLines[0].DisplayText, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -111,7 +111,6 @@ public sealed class PadInspectorDisplayBehaviorTests
         Assert.False(vm.HasPadInspectorSummary);
         Assert.True(vm.HasNoPadInspectorSummary);
         Assert.Equal(string.Empty, vm.PadInspectorPrimaryText);
-        Assert.Equal(string.Empty, vm.PadInspectorDisplay.CompensationText);
         Assert.Empty(vm.PadInspectorCompensationLines);
         Assert.False(vm.HasPadInspectorRuleTrace);
         Assert.False(vm.IsPadInspectorRawTraceExpanded);
