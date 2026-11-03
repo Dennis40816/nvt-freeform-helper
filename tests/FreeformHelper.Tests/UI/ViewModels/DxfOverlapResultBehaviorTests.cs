@@ -29,7 +29,6 @@ public sealed class DxfOverlapResultBehaviorTests
         Assert.Equal(0, vm.DxfOverlapIssueCount);
         Assert.False(vm.HasDxfOverlapIssues);
         Assert.Empty(vm.DxfOverlapHighlightedCadIds);
-        Assert.False(vm.HasDxfOverlapHighlights);
     }
 
     [Fact]
@@ -43,7 +42,6 @@ public sealed class DxfOverlapResultBehaviorTests
         Assert.Equal(vm.DxfOverlapSummary, vm.StatusText);
         Assert.Empty(vm.DxfOverlapIssues);
         Assert.False(vm.HasDxfOverlapIssues);
-        Assert.False(vm.HasDxfOverlapHighlights);
     }
 
     [Fact]
@@ -59,7 +57,6 @@ public sealed class DxfOverlapResultBehaviorTests
         Assert.Equal(dxf.Vm.DxfOverlapIssues.Count, dxf.Vm.DxfOverlapIssueCount);
         Assert.True(dxf.Vm.HasDxfOverlapIssues);
         Assert.Equal(dxf.Vm.CadPads.Select(static pad => pad.Id).Order(), dxf.Vm.DxfOverlapHighlightedCadIds);
-        Assert.True(dxf.Vm.HasDxfOverlapHighlights);
     }
 
     [Fact]
@@ -74,7 +71,6 @@ public sealed class DxfOverlapResultBehaviorTests
         Assert.Equal(0, dxf.Vm.DxfOverlapIssueCount);
         Assert.False(dxf.Vm.HasDxfOverlapIssues);
         Assert.Empty(dxf.Vm.DxfOverlapHighlightedCadIds);
-        Assert.False(dxf.Vm.HasDxfOverlapHighlights);
     }
 
     [Fact]
@@ -100,7 +96,6 @@ public sealed class DxfOverlapResultBehaviorTests
         dxf.Vm.ClearDxfOverlapHighlightsCommand.Execute(null);
 
         Assert.Empty(dxf.Vm.DxfOverlapHighlightedCadIds);
-        Assert.False(dxf.Vm.HasDxfOverlapHighlights);
         Assert.Equal(issueCount, dxf.Vm.DxfOverlapIssueCount);
         Assert.True(dxf.Vm.HasDxfOverlapIssues);
         Assert.StartsWith("DXF warnings:", dxf.Vm.DxfOverlapSummary, StringComparison.Ordinal);
@@ -113,11 +108,13 @@ public sealed class DxfOverlapResultBehaviorTests
         using var dxf = await DxfFixture.OpenAsync(_overlappingPads);
         await dxf.Vm.CheckDxfQualityCommand.ExecuteAsync(null);
         dxf.Vm.SelectDxfOverlapPadsCommand.Execute(null);
-        Assert.Equal("Selected: CAD=2.", dxf.Vm.SelectionSummary);
+        Assert.Equal(("CAD: 2 pads.", "Regular: 0 pads."),
+            (dxf.Vm.CadSelectionText, dxf.Vm.RegularSelectionText));
 
         dxf.Vm.ClearDxfOverlapHighlightsCommand.Execute(null);
 
-        Assert.Equal("No selection.", dxf.Vm.SelectionSummary);
+        Assert.Equal(("CAD: 0 pads.", "Regular: 0 pads."),
+            (dxf.Vm.CadSelectionText, dxf.Vm.RegularSelectionText));
     }
 
     [Fact]
@@ -129,7 +126,8 @@ public sealed class DxfOverlapResultBehaviorTests
         dxf.Vm.SelectDxfOverlapPadsCommand.Execute(null);
 
         Assert.Equal("DXF check: highlight + select (2 pads).", dxf.Vm.StatusText);
-        Assert.Equal("Selected: CAD=2.", dxf.Vm.SelectionSummary);
+        Assert.Equal(("CAD: 2 pads.", "Regular: 0 pads."),
+            (dxf.Vm.CadSelectionText, dxf.Vm.RegularSelectionText));
     }
 
     [Fact]
@@ -143,8 +141,8 @@ public sealed class DxfOverlapResultBehaviorTests
         dxf.Vm.SelectDxfOverlapPadsCommand.Execute(null);
 
         Assert.Equal(highlighted, dxf.Vm.DxfOverlapHighlightedCadIds);
-        Assert.True(dxf.Vm.HasDxfOverlapHighlights);
-        Assert.Equal("Selected: CAD=2.", dxf.Vm.SelectionSummary);
+        Assert.Equal(("CAD: 2 pads.", "Regular: 0 pads."),
+            (dxf.Vm.CadSelectionText, dxf.Vm.RegularSelectionText));
     }
 
     [Fact]
@@ -156,7 +154,6 @@ public sealed class DxfOverlapResultBehaviorTests
 
         Assert.Equal("DXF check: no overlap result.", vm.StatusText);
         Assert.Empty(vm.DxfOverlapHighlightedCadIds);
-        Assert.False(vm.HasDxfOverlapHighlights);
     }
 
     [Fact]
@@ -168,8 +165,7 @@ public sealed class DxfOverlapResultBehaviorTests
             nameof(FreeformHelperViewModel.DxfOverlapSummary),
             nameof(FreeformHelperViewModel.DxfOverlapIssueCount),
             nameof(FreeformHelperViewModel.HasDxfOverlapIssues),
-            nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds),
-            nameof(FreeformHelperViewModel.HasDxfOverlapHighlights));
+            nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds));
 
         await dxf.Vm.CheckDxfQualityCommand.ExecuteAsync(null);
 
@@ -177,7 +173,6 @@ public sealed class DxfOverlapResultBehaviorTests
         Assert.Contains(nameof(FreeformHelperViewModel.DxfOverlapIssueCount), changes);
         Assert.Contains(nameof(FreeformHelperViewModel.HasDxfOverlapIssues), changes);
         Assert.Contains(nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds), changes);
-        Assert.Contains(nameof(FreeformHelperViewModel.HasDxfOverlapHighlights), changes);
     }
 
     [Fact]
@@ -190,8 +185,7 @@ public sealed class DxfOverlapResultBehaviorTests
             nameof(FreeformHelperViewModel.DxfOverlapSummary),
             nameof(FreeformHelperViewModel.DxfOverlapIssueCount),
             nameof(FreeformHelperViewModel.HasDxfOverlapIssues),
-            nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds),
-            nameof(FreeformHelperViewModel.HasDxfOverlapHighlights));
+            nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds));
 
         await dxf.Vm.CheckDxfQualityCommand.ExecuteAsync(null);
 
@@ -199,7 +193,6 @@ public sealed class DxfOverlapResultBehaviorTests
         Assert.Contains(nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds), changes);
         Assert.DoesNotContain(nameof(FreeformHelperViewModel.DxfOverlapIssueCount), changes);
         Assert.DoesNotContain(nameof(FreeformHelperViewModel.HasDxfOverlapIssues), changes);
-        Assert.DoesNotContain(nameof(FreeformHelperViewModel.HasDxfOverlapHighlights), changes);
     }
 
     [Fact]
@@ -212,13 +205,11 @@ public sealed class DxfOverlapResultBehaviorTests
             nameof(FreeformHelperViewModel.DxfOverlapSummary),
             nameof(FreeformHelperViewModel.DxfOverlapIssueCount),
             nameof(FreeformHelperViewModel.HasDxfOverlapIssues),
-            nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds),
-            nameof(FreeformHelperViewModel.HasDxfOverlapHighlights));
+            nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds));
 
         dxf.Vm.ClearDxfOverlapHighlightsCommand.Execute(null);
 
         Assert.Contains(nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds), changes);
-        Assert.Contains(nameof(FreeformHelperViewModel.HasDxfOverlapHighlights), changes);
         Assert.DoesNotContain(nameof(FreeformHelperViewModel.DxfOverlapSummary), changes);
         Assert.DoesNotContain(nameof(FreeformHelperViewModel.DxfOverlapIssueCount), changes);
         Assert.DoesNotContain(nameof(FreeformHelperViewModel.HasDxfOverlapIssues), changes);
@@ -230,13 +221,11 @@ public sealed class DxfOverlapResultBehaviorTests
         var vm = new FreeformHelperViewModel();
         var changes = RecordNotifications(
             vm,
-            nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds),
-            nameof(FreeformHelperViewModel.HasDxfOverlapHighlights));
+            nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds));
 
         vm.ClearDxfOverlapHighlightsCommand.Execute(null);
 
         Assert.Contains(nameof(FreeformHelperViewModel.DxfOverlapHighlightedCadIds), changes);
-        Assert.DoesNotContain(nameof(FreeformHelperViewModel.HasDxfOverlapHighlights), changes);
     }
 
     private sealed class DxfFixture : IDisposable

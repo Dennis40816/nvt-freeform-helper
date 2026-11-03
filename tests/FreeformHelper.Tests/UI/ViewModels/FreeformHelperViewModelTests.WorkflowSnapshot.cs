@@ -17,13 +17,11 @@ public sealed partial class FreeformHelperViewModelTests
 
         Assert.Same(first, second);
         Assert.Equal(1, vm.WorkflowDataSnapshotBuildCount);
-        var revisionBeforeInvalidate = vm.WorkflowDataSnapshotRevision;
 
         InvalidateWorkflowDataSnapshot(vm);
         var third = BuildWorkflowDataSnapshot(vm);
 
         Assert.NotSame(first, third);
-        Assert.Equal(revisionBeforeInvalidate + 1, vm.WorkflowDataSnapshotRevision);
         Assert.Equal(2, vm.WorkflowDataSnapshotBuildCount);
     }
 

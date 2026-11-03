@@ -82,11 +82,9 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public bool HasOwnerSummary => !string.IsNullOrWhiteSpace(OwnerSummaryText);
     public string ToFullDiagnosticsText { get; }
     public bool HasToFullDiagnosticsText => !string.IsNullOrWhiteSpace(ToFullDiagnosticsText);
-    public string NotchDiagnosticsToggleText => ShowNotchDiagnostics ? "Hide diagnostics" : "Show diagnostics";
     public IReadOnlyList<NotchOwnerLinkViewModel> NotchOwnerLinks { get; }
     public IReadOnlyList<string> RuleTraceLines { get; }
     public bool HasRuleTrace => RuleTraceLines.Count > 0;
-    public string RuleTraceToggleText => ShowRuleTrace ? "Hide Detail" : "Show Detail";
     public string NotchRowCompactText => StripKnownPrefix(NotchRowSummaryText, "Notch rows:");
     public string DebugStatusText => BuildDebugStatusText();
     /// <summary>

@@ -79,7 +79,7 @@ public sealed class DiffFrameCsvFixtureTests
         var loadTask = Assert.IsAssignableFrom<Task>(loadMethod!.Invoke(vm, new object[] { projectPath }));
         await loadTask;
 
-        var session = await vm.CreateSimulationWorkspaceSessionAsync();
+        var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
         Assert.NotNull(session);
 
         var useCase = new NotchApplySimulationReviewUseCase();
@@ -113,7 +113,7 @@ public sealed class DiffFrameCsvFixtureTests
         var loadTask = Assert.IsAssignableFrom<Task>(loadMethod!.Invoke(vm, new object[] { projectPath }));
         await loadTask;
 
-        var session = await vm.CreateSimulationWorkspaceSessionAsync();
+        var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
         Assert.NotNull(session);
 
         var useCase = new NotchApplySimulationReviewUseCase();

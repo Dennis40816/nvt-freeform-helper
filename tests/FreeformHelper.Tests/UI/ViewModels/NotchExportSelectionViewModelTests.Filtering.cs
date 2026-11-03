@@ -108,35 +108,15 @@ public sealed partial class NotchExportSelectionViewModelTests
         Assert.NotEqual(NotchExportRowDisplayMode.AllRows, vm.SelectedRowDisplayModeOption.Value);
         Assert.True(vm.HasSearchKeyword);
         Assert.True(vm.ShowSelectedOnly);
-        Assert.True(vm.HasActiveColumnFilters);
         Assert.True(vm.HasResettableViewFilters);
 
         vm.ClearSearchKeywordCommand.Execute(null);
 
         Assert.False(vm.HasSearchKeyword);
         Assert.False(vm.ShowSelectedOnly);
-        Assert.False(vm.HasActiveColumnFilters);
         Assert.Equal(NotchExportRowDisplayMode.AllRows, vm.SelectedRowDisplayModeOption.Value);
         Assert.False(vm.HasResettableViewFilters);
         Assert.Equal(string.Empty, vm.SearchKeyword);
-    }
-
-
-    [Fact]
-    public void CurrentSearchScopeText_AlwaysReflectsEffectiveFilterState()
-    {
-        var table = BuildTransferOnlyFilterTable();
-        var vm = new NotchExportSelectionViewModel(table);
-
-        Assert.Contains("mode=Transfer-only", vm.CurrentSearchScopeText);
-        Assert.Contains("text=*", vm.CurrentSearchScopeText);
-        Assert.Contains("shown=1", vm.CurrentSearchScopeText);
-
-        vm.SearchKeyword = "diff=9";
-        Assert.Contains("text=diff=9", vm.CurrentSearchScopeText);
-
-        vm.ShowSelectedOnly = true;
-        Assert.Contains("selected=selected-only", vm.CurrentSearchScopeText);
     }
 
 
@@ -152,8 +132,7 @@ public sealed partial class NotchExportSelectionViewModelTests
         vm.SelectedVersionOption = v21OnlyOption;
         var selected = vm.BuildSelectedTable();
 
-        Assert.Equal(2, vm.TotalCount);
-        Assert.Equal(2, vm.AllRowCount);
+        Assert.Equal(2, vm.Rows.Count);
         Assert.Equal(2, vm.SelectedCount);
         Assert.Equal(2, selected.Rows.Count);
         Assert.All(selected.Rows, row => Assert.Equal(NotchAlgorithmVersion.V21, row.Version));
@@ -278,8 +257,6 @@ public sealed partial class NotchExportSelectionViewModelTests
         var selectedKeys = new[] { allKeys[0] };
         vm.ApplyColumnFilterSelection(NotchExportColumnFilterField.Diff, selectedKeys, allKeys);
 
-        Assert.True(vm.HasActiveColumnFilters);
-        Assert.Contains("Diff(1)", vm.ActiveColumnFilterSummaryText);
         Assert.Equal("Search by row / diff / mapping / CAD...", vm.SearchWatermarkText);
         Assert.True(vm.HasHeaderFilterChip);
         Assert.Contains("Header:", vm.HeaderFilterChipText);

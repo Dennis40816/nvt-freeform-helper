@@ -94,9 +94,6 @@ public sealed class IndexMappingMaskAuditRowViewModel
     public string ModeText => Mode.ToContractString();
     public string ReasonCodeText => ReasonCode.ToContractString();
     public string DecisionSourceText => DecisionSource.ToContractString();
-    public string SuggestionText => SuggestedDiffIndex is int diff
-        ? $"Suggested diff idx: {diff}"
-        : "Suggested diff idx: none";
     public string SegmentOffsetText => DetectedOffset is int offset
         ? $"Segment offset: {offset:+#;-#;0}, support={OffsetSupportCount}, ratio={OffsetSupportRatio.GetValueOrDefault():P1}, confidence={SegmentConfidence.GetValueOrDefault():P1}"
         : "Segment offset: none";

@@ -673,8 +673,6 @@ public sealed class UiLayoutGuardTests
 
         Assert.Contains("Classes=\"padInfoSectionToggle debugCard\"", regularPadInfoContent);
         Assert.Contains("Command=\"{Binding ToggleGeometryDetailsCommand}\"", regularPadInfoContent);
-        Assert.DoesNotContain("Content=\"{Binding NotchDiagnosticsToggleText}\"", regularPadInfoContent);
-        Assert.DoesNotContain("Content=\"{Binding RuleTraceToggleText}\"", regularPadInfoContent);
         Assert.DoesNotContain("Content=\"{Binding GeometryDetailsToggleText}\"", regularPadInfoContent);
     }
 

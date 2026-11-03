@@ -10,8 +10,6 @@ public sealed partial class FreeformHelperViewModel
 
     public bool AreSomeCadLayersSelected => LayerToggles.Count > 0 && !AreAllCadLayersSelected && !AreNoCadLayersSelected;
 
-    public bool IsCadLayersOffSegmentActive => LayerToggles.Count > 0 && !AreAllCadLayersSelected;
-
     public bool IsCadLayerBulkToggleChecked
     {
         get => AreAllCadLayersSelected;
@@ -79,7 +77,6 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(AreAllCadLayersSelected));
         OnPropertyChanged(nameof(AreNoCadLayersSelected));
         OnPropertyChanged(nameof(AreSomeCadLayersSelected));
-        OnPropertyChanged(nameof(IsCadLayersOffSegmentActive));
         OnPropertyChanged(nameof(IsCadLayerBulkToggleChecked));
         OnPropertyChanged(nameof(CadLayerBulkToggleText));
         OnPropertyChanged(nameof(CadLayerBulkToggleToolTip));

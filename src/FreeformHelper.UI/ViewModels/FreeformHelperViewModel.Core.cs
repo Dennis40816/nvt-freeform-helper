@@ -146,7 +146,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
-        _showInternalLegacyNotchFields = false;
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
         _statusReporter = new UiOperationStatusReporter(message => StatusText = message);
         UiEvents = uiEvents ?? new UiEventRunner(new UiEventFailureReporter(_statusReporter).Report, EmergencyLogSink.Report);
@@ -349,8 +348,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     {
         return _cadOutputFwDiffIndexByCadId.TryGetValue(cadPadId, out dxfIndex);
     }
-
-    internal int WorkflowDataSnapshotRevision => _workflowDataSnapshotRevision;
 
     /// <summary>Gets the pad match and workflow snapshot holder for tests.</summary>
     internal WorkflowDataState WorkflowDataForTests => _workflowData;

@@ -13,15 +13,27 @@ namespace FreeformHelper.Tests;
 public sealed partial class FreeformHelperViewModelTests
 {
     [Fact]
-    public void CadLoadCanvasOverlayScope_TogglesVisibilityAndRestoresAfterExit()
+    public async Task CadLoadCanvasOverlayScope_TogglesVisibilityAndRestoresAfterExit()
     {
         var vm = new FreeformHelperViewModel();
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        vm.BeginCadLoadCanvasOverlayScope();
-
-        Assert.True(vm.IsCadLoadCanvasOverlayVisible);
-
-        vm.EndCadLoadCanvasOverlayScope();
+        var loading = vm.RunWithCadLoadCanvasOverlayAsync(() =>
+        {
+            entered.SetResult();
+            return release.Task.WaitAsync(TestContext.Current.CancellationToken);
+        });
+        try
+        {
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            Assert.True(vm.IsCadLoadCanvasOverlayVisible);
+        }
+        finally
+        {
+            release.TrySetResult();
+            await loading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        }
 
         Assert.False(vm.IsCadLoadCanvasOverlayVisible);
     }
@@ -54,47 +66,81 @@ public sealed partial class FreeformHelperViewModelTests
     }
 
     [Fact]
-    public void CadLoadCanvasOverlayScope_NestedScopesKeepOverlayVisibleUntilOuterExit()
+    public async Task CadLoadCanvasOverlayScope_NestedScopesKeepOverlayVisibleUntilOuterExit()
     {
         var vm = new FreeformHelperViewModel();
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        vm.BeginCadLoadCanvasOverlayScope();
-        vm.BeginCadLoadCanvasOverlayScope();
-
-        vm.EndCadLoadCanvasOverlayScope();
-        Assert.True(vm.IsCadLoadCanvasOverlayVisible);
-
-        vm.EndCadLoadCanvasOverlayScope();
+        var loading = vm.RunWithCadLoadCanvasOverlayAsync(async () =>
+        {
+            await vm.RunWithCadLoadCanvasOverlayAsync(() => Task.CompletedTask);
+            entered.SetResult();
+            await release.Task.WaitAsync(TestContext.Current.CancellationToken);
+        });
+        try
+        {
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            Assert.True(vm.IsCadLoadCanvasOverlayVisible);
+        }
+        finally
+        {
+            release.TrySetResult();
+            await loading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        }
 
         Assert.False(vm.IsCadLoadCanvasOverlayVisible);
     }
 
     [Fact]
-    public void ModalLoadingSpinnerScope_TogglesVisibilityAndRestoresAfterExit()
+    public async Task ModalLoadingSpinnerScope_TogglesVisibilityAndRestoresAfterExit()
     {
         var vm = new FreeformHelperViewModel();
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        vm.BeginModalLoadingSpinnerScope();
-
-        Assert.True(vm.IsModalLoadingSpinnerVisible);
-
-        vm.EndModalLoadingSpinnerScope();
+        var loading = vm.RunWithModalLoadingSpinnerAsync(() =>
+        {
+            entered.SetResult();
+            return release.Task.WaitAsync(TestContext.Current.CancellationToken);
+        });
+        try
+        {
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            Assert.True(vm.IsModalLoadingSpinnerVisible);
+        }
+        finally
+        {
+            release.TrySetResult();
+            await loading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        }
 
         Assert.False(vm.IsModalLoadingSpinnerVisible);
     }
 
     [Fact]
-    public void ModalLoadingSpinnerScope_NestedScopesKeepSpinnerVisibleUntilOuterExit()
+    public async Task ModalLoadingSpinnerScope_NestedScopesKeepSpinnerVisibleUntilOuterExit()
     {
         var vm = new FreeformHelperViewModel();
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        vm.BeginModalLoadingSpinnerScope();
-        vm.BeginModalLoadingSpinnerScope();
-
-        vm.EndModalLoadingSpinnerScope();
-        Assert.True(vm.IsModalLoadingSpinnerVisible);
-
-        vm.EndModalLoadingSpinnerScope();
+        var loading = vm.RunWithModalLoadingSpinnerAsync(async () =>
+        {
+            await vm.RunWithModalLoadingSpinnerAsync(() => Task.CompletedTask);
+            entered.SetResult();
+            await release.Task.WaitAsync(TestContext.Current.CancellationToken);
+        });
+        try
+        {
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            Assert.True(vm.IsModalLoadingSpinnerVisible);
+        }
+        finally
+        {
+            release.TrySetResult();
+            await loading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        }
 
         Assert.False(vm.IsModalLoadingSpinnerVisible);
     }

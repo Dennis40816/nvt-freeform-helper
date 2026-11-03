@@ -269,10 +269,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public ObservableCollection<int> DxfOverlapHighlightedCadIds => DxfOverlapResult.HighlightedCadIds;
     /// <summary>
-    /// Gets a value indicating whether highlighted overlap CAD pads exist.
-    /// </summary>
-    public bool HasDxfOverlapHighlights => DxfOverlapResult.HighlightedCadIds.Count > 0;
-    /// <summary>
     /// Gets or sets the latest CAD?egular overlap links for canvas ratio labels.
     /// </summary>
     [ObservableProperty] private IReadOnlyList<PadMatchLink> _matchLinksForCanvas = Array.Empty<PadMatchLink>();

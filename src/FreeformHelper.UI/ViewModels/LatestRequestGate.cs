@@ -12,11 +12,6 @@ internal sealed class LatestRequestGate
     private Ticket _latest = new(0, null);
 
     /// <summary>
-    /// Gets a value indicating whether a request source is stored and not yet released or cancelled.
-    /// </summary>
-    public bool HasPendingRequest => Volatile.Read(ref _latest).Source is not null;
-
-    /// <summary>
     /// Gets the identifier of the latest started request.
     /// </summary>
     public long LatestRequestId => Volatile.Read(ref _latest).Number;

@@ -19,7 +19,6 @@ public sealed partial class NotchExportSelectionViewModelTests
 
         Assert.Equal(NotchExportRowDisplayMode.TransferOnly, vm.SelectedRowDisplayModeOption.Value);
         Assert.Single(vm.Rows);
-        Assert.Equal(1, vm.TotalCount);
         Assert.Equal(2, vm.SelectedCount);
         Assert.True(vm.Rows[0].IsTransferRow);
     }
@@ -34,7 +33,7 @@ public sealed partial class NotchExportSelectionViewModelTests
         var allRowsOption = vm.RowDisplayModeOptions.First(option => option.Value == NotchExportRowDisplayMode.AllRows);
         vm.SelectedRowDisplayModeOption = allRowsOption;
 
-        Assert.Equal(2, vm.TotalCount);
+        Assert.Equal(2, vm.Rows.Count);
         Assert.Equal(2, vm.SelectedCount);
 
         var selected = vm.BuildSelectedTable();

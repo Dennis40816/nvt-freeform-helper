@@ -175,9 +175,6 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     [ObservableProperty] private string _searchKeyword = string.Empty;
     [ObservableProperty] private bool _showSelectedOnly;
 
-    public int TotalCount => _summarySnapshot.VisibleCount;
-    public int AllRowCount => _summarySnapshot.AllRowCount;
-    public int VisibleCount => _summarySnapshot.VisibleCount;
     public bool HasRows => _summarySnapshot.HasRows;
     public bool HasSelection => _summarySnapshot.HasSelection;
     public bool AreAllVisibleRowsSelected
@@ -204,7 +201,6 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public bool IsMappingColumnFilterActive => _filterViewState.IsMappingColumnFilterActive;
     public bool IsStatusColumnFilterActive => _filterViewState.IsStatusColumnFilterActive;
     public bool HasSearchKeyword => _filterViewState.HasSearchKeyword;
-    public bool HasActiveColumnFilters => _filterViewState.HasActiveColumnFilters;
     public bool HasSearchFilterChip => _filterViewState.HasSearchFilterChip;
     public string SearchFilterChipText => _filterViewState.SearchFilterChipText;
     public bool HasModeFilterChip => _filterViewState.HasModeFilterChip;
@@ -215,8 +211,6 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public string HeaderFilterChipText => _filterViewState.HeaderFilterChipText;
     public bool HasNoActiveFilterChips => _filterViewState.HasNoActiveFilterChips;
     public bool HasResettableViewFilters => _filterViewState.HasResettableViewFilters;
-    public string ActiveColumnFilterSummaryText => _filterViewState.ActiveColumnFilterSummaryText;
-    public string CurrentSearchScopeText => _filterViewState.CurrentSearchScopeText;
     public string SearchWatermarkText { get; } = DefaultSearchWatermark;
     public string VisibleRowsSummaryText => _filterViewState.VisibleRowsSummaryText;
     public string SelectedRowDisplayModeText => string.IsNullOrWhiteSpace(SelectedRowDisplayModeOption.Display)

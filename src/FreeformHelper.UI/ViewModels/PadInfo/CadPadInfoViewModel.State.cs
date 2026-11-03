@@ -34,13 +34,11 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
 
     partial void OnShowNotchDiagnosticsChanged(bool value)
     {
-        OnPropertyChanged(nameof(NotchDiagnosticsToggleText));
         OnPropertyChanged(nameof(ShowLowFrequencyDetailSection));
     }
 
     partial void OnShowRuleTraceChanged(bool value)
     {
-        OnPropertyChanged(nameof(RuleTraceToggleText));
         OnPropertyChanged(nameof(ShowLowFrequencyDetailSection));
     }
 

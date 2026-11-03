@@ -14,11 +14,6 @@ public sealed partial class FreeformHelperViewModel
 
     public string LastSimulationWorkspaceAttemptMessage { get; private set; } = string.Empty;
 
-    public Task<SimulationWorkspaceSession?> CreateSimulationWorkspaceSessionAsync()
-    {
-        return CreateSimulationWorkspaceSessionAsync(silent: false);
-    }
-
     public async Task<SimulationWorkspaceSession?> CreateSimulationWorkspaceSessionAsync(bool silent)
     {
         return await CreateSimulationWorkspaceSessionAsync(silent, progressTextReporter: null);

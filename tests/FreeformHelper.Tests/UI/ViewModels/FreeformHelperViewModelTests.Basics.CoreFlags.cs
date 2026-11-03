@@ -80,24 +80,12 @@ public sealed partial class FreeformHelperViewModelTests
 
 
     [Fact]
-    public void LenScale_RemainsHidden_WhenV21Enabled()
-    {
-        var vm = new FreeformHelperViewModel();
-
-        vm.EnableV21 = true;
-
-        Assert.False(vm.IsLenScaleVisible);
-    }
-
-
-    [Fact]
     public void RightPanelTab_DefaultsToSettings()
     {
         var vm = new FreeformHelperViewModel();
 
         Assert.True(vm.IsRightPanelSettingsTab);
         Assert.False(vm.IsRightPanelInspectorTab);
-        Assert.Equal("Settings", vm.RightPanelActiveTabTitle);
     }
 
 
@@ -109,12 +97,10 @@ public sealed partial class FreeformHelperViewModelTests
         vm.IsRightPanelInspectorTab = true;
         Assert.False(vm.IsRightPanelSettingsTab);
         Assert.True(vm.IsRightPanelInspectorTab);
-        Assert.Equal("Inspector", vm.RightPanelActiveTabTitle);
 
         vm.IsRightPanelSettingsTab = true;
         Assert.True(vm.IsRightPanelSettingsTab);
         Assert.False(vm.IsRightPanelInspectorTab);
-        Assert.Equal("Settings", vm.RightPanelActiveTabTitle);
     }
 
 
@@ -165,13 +151,16 @@ public sealed partial class FreeformHelperViewModelTests
         var mixedRegularIds = new[] { 7 };
 
         vm.ApplyCanvasSelection(selectedCadIds, Array.Empty<int>());
-        Assert.Equal("Selected: CAD=2.", vm.SelectionSummary);
+        Assert.Equal(("CAD: 2 pads.", "Regular: 0 pads."),
+            (vm.CadSelectionText, vm.RegularSelectionText));
 
         vm.ApplyCanvasSelection(Array.Empty<int>(), selectedRegularIds);
-        Assert.Equal("Selected: Regular=3.", vm.SelectionSummary);
+        Assert.Equal(("CAD: 0 pads.", "Regular: 3 pads."),
+            (vm.CadSelectionText, vm.RegularSelectionText));
 
         vm.ApplyCanvasSelection(mixedCadIds, mixedRegularIds);
-        Assert.Equal("Selected: CAD=1, Regular=1.", vm.SelectionSummary);
+        Assert.Equal(("CAD: 1 pads.", "Regular: 1 pads."),
+            (vm.CadSelectionText, vm.RegularSelectionText));
     }
 
     [Fact]

@@ -27,14 +27,4 @@ public sealed partial class FreeformHelperViewModel
                 Comment: item.row.Comment ?? string.Empty))
             .ToList();
     }
-
-    public int GetLastNotchRowCountForRegularPad(int regularPadId)
-    {
-        if (_notchCache.LastGeneratedTable is null || _notchCache.LastGeneratedTable.Rows.Count == 0)
-        {
-            return 0;
-        }
-
-        return _notchCache.LastGeneratedTable.Rows.Count(row => row.RegularPadIndex == regularPadId);
-    }
 }

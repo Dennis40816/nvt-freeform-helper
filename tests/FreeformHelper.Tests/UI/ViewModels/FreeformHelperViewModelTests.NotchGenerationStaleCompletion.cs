@@ -56,7 +56,7 @@ public sealed partial class FreeformHelperViewModelTests
                 StringComparison.OrdinalIgnoreCase);
 
             var regularPadId = vm.RegularPads[0].RegularPadId;
-            Assert.Equal(0, vm.GetLastNotchRowCountForRegularPad(regularPadId));
+            Assert.Empty(vm.GetLastNotchRowsForRegularPad(regularPadId));
             Assert.False(vm.TryGetNotchValidationReportForRegularPad(
                 regularPadId,
                 out _,
@@ -73,7 +73,7 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Equal(1, staleMetrics.StoreCount);
             Assert.Equal(0, staleMetrics.ClearCount);
 
-            var currentSession = await vm.CreateSimulationWorkspaceSessionAsync();
+            var currentSession = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
             Assert.NotNull(currentSession);
             Assert.Equal(vm.SimulationWorkspaceSourceRevision, currentSession!.SourceRevision);
 
@@ -86,7 +86,7 @@ public sealed partial class FreeformHelperViewModelTests
             var freshVm = await CreateNotchExportCacheViewModelAsync(dxfPath);
             freshVm.EnableTargetCoverageGuard = true;
             freshVm.TargetCoverageCapPercent = applyThroughSettingsWindow ? 255m : 50m;
-            var freshSession = await freshVm.CreateSimulationWorkspaceSessionAsync();
+            var freshSession = await freshVm.CreateSimulationWorkspaceSessionAsync(silent: false);
 
             Assert.NotNull(freshSession);
             Assert.Equal(
@@ -139,7 +139,7 @@ public sealed partial class FreeformHelperViewModelTests
             vm.EnableTargetCoverageGuard = false;
             vm.TargetCoverageCapPercent = 50m;
 
-            var acceptedSession = await vm.CreateSimulationWorkspaceSessionAsync();
+            var acceptedSession = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
 
             Assert.NotNull(acceptedSession);
             Assert.Contains(
@@ -224,7 +224,7 @@ public sealed partial class FreeformHelperViewModelTests
                 currentResolved.Identity!.StrictOverlapRatio,
                 12);
 
-            var currentSession = await vm.CreateSimulationWorkspaceSessionAsync();
+            var currentSession = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
             Assert.NotNull(currentSession);
             var currentMetrics = vm.GetNotchExportGenerationCacheMetrics();
             Assert.True(currentMetrics.EntryRowCount > 0);
@@ -264,7 +264,7 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Equal(1, staleMetrics.StoreCount);
             Assert.Equal(1, staleMetrics.ClearCount);
 
-            var currentSession = await vm.CreateSimulationWorkspaceSessionAsync();
+            var currentSession = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
             Assert.NotNull(currentSession);
             var currentMetrics = vm.GetNotchExportGenerationCacheMetrics();
             Assert.True(currentMetrics.EntryRowCount > 0);
@@ -401,7 +401,7 @@ public sealed partial class FreeformHelperViewModelTests
                     }
 
                     vm.EnableTargetCoverageGuard = true;
-                    currentRequest = vm.CreateSimulationWorkspaceSessionAsync();
+                    currentRequest = vm.CreateSimulationWorkspaceSessionAsync(silent: false);
                 });
 
             var staleSession = await staleRequest;
@@ -421,7 +421,7 @@ public sealed partial class FreeformHelperViewModelTests
             var freshVm = await CreateNotchExportCacheViewModelAsync(dxfPath);
             freshVm.EnableTargetCoverageGuard = true;
             freshVm.TargetCoverageCapPercent = 50m;
-            var freshSession = await freshVm.CreateSimulationWorkspaceSessionAsync();
+            var freshSession = await freshVm.CreateSimulationWorkspaceSessionAsync(silent: false);
 
             Assert.NotNull(freshSession);
             Assert.Equal(

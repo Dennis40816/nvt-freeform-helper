@@ -300,7 +300,8 @@ public sealed partial class FreeformHelperViewModelTests
 
         vm.SelectCadAreaBucketFromPad(101);
 
-        Assert.Equal("Selected: CAD=2.", vm.SelectionSummary);
+        Assert.Equal(("CAD: 2 pads.", "Regular: 0 pads."),
+            (vm.CadSelectionText, vm.RegularSelectionText));
         Assert.Equal(expectedCadIds, vm.SelectedCadPadIds.OrderBy(id => id).ToArray());
     }
 
@@ -321,7 +322,8 @@ public sealed partial class FreeformHelperViewModelTests
 
         vm.SelectCadAreaBucketFromPad(201);
 
-        Assert.Equal("No selection.", vm.SelectionSummary);
+        Assert.Equal(("CAD: 0 pads.", "Regular: 0 pads."),
+            (vm.CadSelectionText, vm.RegularSelectionText));
         Assert.Empty(vm.SelectedCadPadIds);
     }
 

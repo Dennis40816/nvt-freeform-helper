@@ -5,8 +5,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private readonly bool _showInternalLegacyNotchFields;
-
     // Notch settings
     // The sixteen notch algorithm settings are stored once. The properties below forward to the
     // record and raise the same notifications and callbacks as the stored properties they replaced.
@@ -28,14 +26,11 @@ public sealed partial class FreeformHelperViewModel
             OnEnableV21Changing(value);
             OnPropertyChanging();
             _notchAlgorithm = _notchAlgorithm with { EnableV21 = value };
-            OnEnableV21Changed(value);
             OnPropertyChanged();
         }
     }
 
     partial void OnEnableV21Changing(bool value);
-
-    partial void OnEnableV21Changed(bool value);
 
     /// <summary>
     /// Gets or sets a value indicating whether Notch 2.2 output path is enabled.
@@ -82,11 +77,6 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnLenScaleChanging(decimal value);
 
-    /// <summary>
-    /// Gets a value indicating whether LenScale should be visible in UI.
-    /// LenScale is now treated as an internal legacy parameter and stays hidden.
-    /// </summary>
-    public bool IsLenScaleVisible => EnableV21 && _showInternalLegacyNotchFields;
     /// <summary>
     /// Gets or sets the null value used in notch tables.
     /// </summary>

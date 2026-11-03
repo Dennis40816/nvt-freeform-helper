@@ -204,6 +204,9 @@ public sealed class HeadlessUiSmokeTests
             Height = 800,
             Content = view,
         };
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Task? loading = null;
 
         try
         {
@@ -216,26 +219,32 @@ public sealed class HeadlessUiSmokeTests
             var initialShowCount = fakeHost.ShowCallCount;
             var initialHideCount = fakeHost.HideCallCount;
 
-            vm.BeginCadLoadCanvasOverlayScope();
+            loading = HoldCadLoadOverlayAsync(vm, entered, release);
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
             await FlushUiQueueAsync();
 
             Assert.Equal(initialShowCount + 1, fakeHost.ShowCallCount);
             Assert.Equal(initialHideCount, fakeHost.HideCallCount);
             Assert.Same(window, fakeHost.LastOwner);
 
-            vm.EndCadLoadCanvasOverlayScope();
+            release.SetResult();
+            await loading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
             await FlushUiQueueAsync();
 
             Assert.Equal(initialShowCount + 1, fakeHost.ShowCallCount);
             Assert.Equal(initialHideCount + 1, fakeHost.HideCallCount);
 
-            vm.BeginCadLoadCanvasOverlayScope();
+            entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            loading = HoldCadLoadOverlayAsync(vm, entered, release);
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
             await FlushUiQueueAsync();
 
             Assert.Equal(initialShowCount + 2, fakeHost.ShowCallCount);
             Assert.Equal(initialHideCount + 1, fakeHost.HideCallCount);
 
-            vm.EndCadLoadCanvasOverlayScope();
+            release.SetResult();
+            await loading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
             await FlushUiQueueAsync();
 
             Assert.Equal(initialShowCount + 2, fakeHost.ShowCallCount);
@@ -243,10 +252,23 @@ public sealed class HeadlessUiSmokeTests
         }
         finally
         {
+            release.TrySetResult();
             FreeformHelperView.CadLoadSpinnerHostFactory = originalFactory;
             window.Close();
+            if (loading is not null)
+            {
+                await loading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            }
         }
     }
+
+    // Holds the overlay scope open until release completes; entered completes once the scope body runs.
+    private static Task HoldCadLoadOverlayAsync(FreeformHelperViewModel vm, TaskCompletionSource entered, TaskCompletionSource release) =>
+        vm.RunWithCadLoadCanvasOverlayAsync(() =>
+        {
+            entered.SetResult();
+            return release.Task.WaitAsync(TestContext.Current.CancellationToken);
+        });
 
     [AvaloniaFact]
     public async Task CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates()

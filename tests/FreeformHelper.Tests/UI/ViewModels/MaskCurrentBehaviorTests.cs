@@ -102,7 +102,7 @@ public sealed class MaskCurrentBehaviorTests
             var grid = GetField<RegularGrid>(vm, "_grid");
             Assert.Equal(1, grid.Rows);
             Assert.Equal(2, grid.Cols);
-            var session = await vm.CreateSimulationWorkspaceSessionAsync();
+            var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
 
             Assert.NotNull(session);
             Assert.NotEmpty(session.Table.Rows);

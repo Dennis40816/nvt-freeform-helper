@@ -20,18 +20,6 @@ public sealed partial class SimulationWorkspaceViewModel
                FormatCellEmsStatus(cell);
     }
 
-    public void ApplyRegularOverride(int regularPadId, double value)
-    {
-        if (!_regularPadById.ContainsKey(regularPadId))
-        {
-            return;
-        }
-
-        SelectRegularPad(regularPadId);
-        SelectedManualValue = value;
-        ApplySelectedOverride();
-    }
-
     internal bool TryGetRegularQuerySnapshot(int regularPadId, out SimulationRegularQuerySnapshot snapshot)
     {
         if (!_regularPadById.TryGetValue(regularPadId, out var pad) || _snapshot is null)
@@ -278,8 +266,6 @@ public sealed partial class SimulationWorkspaceViewModel
         OnPropertyChanged(nameof(HasCsvInspectorData));
         OnPropertyChanged(nameof(CsvInspectorSummaryText));
         OnPropertyChanged(nameof(CsvInspectorShapeSummaryText));
-        OnPropertyChanged(nameof(CsvInspectorRowOriginText));
-        OnPropertyChanged(nameof(CsvInspectorBeforePreviewText));
         OnPropertyChanged(nameof(SourceModeSummaryText));
         OnPropertyChanged(nameof(FrameSummaryText));
         OnPropertyChanged(nameof(VersionSummaryText));

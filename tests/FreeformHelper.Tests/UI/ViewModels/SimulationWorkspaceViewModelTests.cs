@@ -74,8 +74,6 @@ public sealed class SimulationWorkspaceViewModelTests
         Assert.Contains("Compatible frames 1/1", viewModel.CsvInspectorSummaryText, StringComparison.Ordinal);
         Assert.Contains("Expected grid 2 x 1", viewModel.CsvInspectorSummaryText, StringComparison.Ordinal);
         Assert.Contains("Declared Xch/Ych: 2 x 1", viewModel.CsvInspectorShapeSummaryText, StringComparison.Ordinal);
-        Assert.Contains("CSV row 0", viewModel.CsvInspectorRowOriginText, StringComparison.Ordinal);
-        Assert.Contains("range 50..100", viewModel.CsvInspectorBeforePreviewText, StringComparison.Ordinal);
         Assert.Contains("Xch/Ych 2 x 1", viewModel.CsvFiles[0].ShapeText, StringComparison.Ordinal);
     }
 
@@ -513,7 +511,9 @@ public sealed class SimulationWorkspaceViewModelTests
             GlobalValue = 100d,
         };
 
-        viewModel.ApplyRegularOverride(1, 20d);
+        viewModel.SelectRegularPad(1);
+        viewModel.SelectedManualValue = 20d;
+        viewModel.ApplySelectedOverrideCommand.Execute(null);
 
         // Pads sharing one FW diff read the same firmware baseline, so their deltas cannot diverge.
         Assert.False(viewModel.HasDiffViolationPads);
