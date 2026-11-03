@@ -1404,7 +1404,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 284
+        "methodLines": 278
       },
       "owner": "NFH",
       "locations": [
@@ -2095,20 +2095,6 @@
       "contentHash": "00711e449d0fcb11ead705b79b6474a49915b44aeb0fee387bb81fcb5ac6f8dd",
       "project": "FreeformHelper.Tests",
       "symbol": "FreeformHelper.Tests.PadInfoViewModelTests.CadPadInfo_TargetAllocationDisplay_UsesFinalEmittedTargetEligibility()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 85
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/ViewModels/PadInfoViewModelTests.cs"
-      ],
-      "contentHash": "d719b34b99bcf3cf6292126bd1057db0c63f3071940b5944a4eef983e887bf2e",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.PadInfoViewModelTests.CreateSingleCadPadViewModel(Action<int>?,Action<int>?,NotchV22TargetAllocationSummary?)"
     }
   ],
   "findings": [
