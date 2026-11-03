@@ -8,8 +8,6 @@ public sealed class SelectionSummaryResultBehaviorTests
 {
     private static readonly string[] _textNames =
     [
-        nameof(FreeformHelperViewModel.SelectionSummary),
-        nameof(FreeformHelperViewModel.SelectedGridRangeSummary),
         nameof(FreeformHelperViewModel.CadSelectionText),
         nameof(FreeformHelperViewModel.RegularSelectionText),
         nameof(FreeformHelperViewModel.SelectionDetailText),
@@ -20,12 +18,11 @@ public sealed class SelectionSummaryResultBehaviorTests
     {
         var vm = new FreeformHelperViewModel();
 
-        Assert.Equal("No selection.", vm.SelectionSummary);
-        Assert.Equal("Select regular pads to edit size.", vm.SelectedGridRangeSummary);
+        Assert.Equal(("CAD: 0 pads.", "Regular: 0 pads."),
+            (vm.CadSelectionText, vm.RegularSelectionText));
         Assert.Equal("CAD: 0 pads.", vm.CadSelectionText);
         Assert.Equal("Regular: 0 pads.", vm.RegularSelectionText);
         Assert.Equal(string.Empty, vm.SelectionDetailText);
-        Assert.Null(vm.SelectedRegularRange);
     }
 
     [Fact]
@@ -35,8 +32,8 @@ public sealed class SelectionSummaryResultBehaviorTests
 
         vm.ApplyCanvasSelection([1, 2], []);
 
-        Assert.Equal("Selected: CAD=2.", vm.SelectionSummary);
-        Assert.Equal("Selected: 2 pads.", vm.SelectedGridRangeSummary);
+        Assert.Equal(("CAD: 2 pads.", "Regular: 0 pads."),
+            (vm.CadSelectionText, vm.RegularSelectionText));
         Assert.Equal("CAD: 2 pads.", vm.CadSelectionText);
         Assert.Equal("Regular: 0 pads.", vm.RegularSelectionText);
     }
@@ -49,8 +46,8 @@ public sealed class SelectionSummaryResultBehaviorTests
 
         vm.ApplyCanvasSelection([], []);
 
-        Assert.Equal("No selection.", vm.SelectionSummary);
-        Assert.Equal("No selection.", vm.SelectedGridRangeSummary);
+        Assert.Equal(("CAD: 0 pads.", "Regular: 0 pads."),
+            (vm.CadSelectionText, vm.RegularSelectionText));
         Assert.Equal("CAD: 0 pads.", vm.CadSelectionText);
     }
 
@@ -64,8 +61,6 @@ public sealed class SelectionSummaryResultBehaviorTests
 
         Assert.Equal(
             [
-                nameof(FreeformHelperViewModel.SelectionSummary),
-                nameof(FreeformHelperViewModel.SelectedGridRangeSummary),
                 nameof(FreeformHelperViewModel.CadSelectionText),
             ],
             changes);
@@ -91,6 +86,5 @@ public sealed class SelectionSummaryResultBehaviorTests
         vm.ApplyCanvasSelection([], [10, 11, 12]);
 
         Assert.Equal("Regular: 3 pads.", vm.RegularSelectionText);
-        Assert.Null(vm.SelectedRegularRange);
     }
 }

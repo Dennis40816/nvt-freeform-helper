@@ -31,12 +31,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public IReadOnlyCollection<int> SelectedRegularPadIndices => _selection.RegularIndices;
 
-    /// <summary>
-    /// Gets the rectangular range (min/max row/column) covered by the selected regular pads.
-    /// Null if no regular pads are selected or they do not form a contiguous block.
-    /// </summary>
-    public (int minR, int maxR, int minC, int maxC)? SelectedRegularRange => SelectionSummaryResult.RegularRange;
-
     public SelectionTimingSnapshot GetLastSelectionTimingSnapshot()
     {
         var last = _selectionTimings.Last;
@@ -88,7 +82,6 @@ public sealed partial class FreeformHelperViewModel
 
         OnPropertyChanged(nameof(SelectedCadPadIds));
         OnPropertyChanged(nameof(SelectedRegularPadIndices));
-        OnPropertyChanged(nameof(SelectedRegularRange));
         NotifyDxfEditPanelActionStateChanged();
         var inspectorStartMs = selectionSw.ElapsedMilliseconds;
         UpdateInspectorSnapshotFromSelection(selectionRevision);

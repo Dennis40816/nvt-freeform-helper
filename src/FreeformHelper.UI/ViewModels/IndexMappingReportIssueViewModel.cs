@@ -70,33 +70,6 @@ public sealed partial class IndexMappingReportIssueViewModel : ObservableObject
     public double? SecondScore { get; }
     public double? Margin { get; }
     public IReadOnlyList<IndexMappingCandidateViewModel> TopCandidates { get; }
-    public bool HasTopCandidates => TopCandidates.Count > 0;
-    public bool HasScoreDiagnostics => Score.HasValue || BestScore.HasValue || SecondScore.HasValue || Margin.HasValue;
-    public string ScoreDiagnosticsText
-    {
-        get
-        {
-            var parts = new List<string>(4);
-            if (Score is double assigned)
-            {
-                parts.Add($"assigned={assigned:0.###}");
-            }
-            if (BestScore is double best)
-            {
-                parts.Add($"best={best:0.###}");
-            }
-            if (SecondScore is double second)
-            {
-                parts.Add($"second={second:0.###}");
-            }
-            if (Margin is double margin)
-            {
-                parts.Add($"margin={margin:0.###}");
-            }
-
-            return parts.Count == 0 ? string.Empty : $"Score: {string.Join(", ", parts)}";
-        }
-    }
 
     [ObservableProperty] private bool _hasOverride;
     [ObservableProperty] private int? _overrideRegularPadIndex;

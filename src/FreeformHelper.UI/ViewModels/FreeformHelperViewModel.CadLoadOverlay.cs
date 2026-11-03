@@ -32,22 +32,6 @@ public sealed partial class FreeformHelperViewModel
         return result!;
     }
 
-    internal void BeginCadLoadCanvasOverlayScope()
-    {
-        _loadingScopes.CadLoadCanvasOverlay++;
-        IsCadLoadCanvasOverlayVisible = true;
-    }
-
-    internal void EndCadLoadCanvasOverlayScope()
-    {
-        if (_loadingScopes.CadLoadCanvasOverlay > 0)
-        {
-            _loadingScopes.CadLoadCanvasOverlay--;
-        }
-
-        IsCadLoadCanvasOverlayVisible = _loadingScopes.CadLoadCanvasOverlay > 0;
-    }
-
     private void SetCadLoadOverlayVisibleAsyncContract(bool isVisible)
     {
         CadLoadSpinnerDebugState.RecordVmOverlayVisibility(isVisible, "set-visible-contract");

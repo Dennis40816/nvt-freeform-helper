@@ -134,11 +134,6 @@ public sealed partial class FreeformHelperViewModel
     }
 
     /// <summary>
-    /// Gets the current right panel tab title.
-    /// </summary>
-    public string RightPanelActiveTabTitle => IsRightPanelSettingsTab ? "Settings" : "Inspector";
-
-    /// <summary>
     /// Gets top-strip primary text for current inspector snapshot.
     /// </summary>
     public string PadInspectorPrimaryText => PadInspectorDisplay.PrimaryText;
@@ -200,7 +195,6 @@ public sealed partial class FreeformHelperViewModel
     partial void OnIsRightPanelSettingsTabChanged(bool value)
     {
         OnPropertyChanged(nameof(IsRightPanelInspectorTab));
-        OnPropertyChanged(nameof(RightPanelActiveTabTitle));
     }
 
     /// <summary>

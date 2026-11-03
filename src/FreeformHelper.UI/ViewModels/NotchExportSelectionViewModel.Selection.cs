@@ -124,11 +124,8 @@ public sealed partial class NotchExportSelectionViewModel
             group.UpdateCounts();
         }
 
-        OnPropertyChanged(nameof(TotalCount));
-        OnPropertyChanged(nameof(VisibleCount));
         OnPropertyChanged(nameof(HasRows));
         OnPropertyChanged(nameof(HasSelection));
-        OnPropertyChanged(nameof(AllRowCount));
         OnPropertyChanged(nameof(V22RowCount));
         OnPropertyChanged(nameof(TransferRowCount));
         OnPropertyChanged(nameof(WarningRowCount));
@@ -144,7 +141,6 @@ public sealed partial class NotchExportSelectionViewModel
     private void NotifyProjectionViewStateChanged()
     {
         OnPropertyChanged(nameof(HasSearchKeyword));
-        OnPropertyChanged(nameof(HasActiveColumnFilters));
         OnPropertyChanged(nameof(IsRowColumnFilterActive));
         OnPropertyChanged(nameof(IsIcColumnFilterActive));
         OnPropertyChanged(nameof(IsDiffColumnFilterActive));
@@ -161,8 +157,6 @@ public sealed partial class NotchExportSelectionViewModel
         OnPropertyChanged(nameof(HeaderFilterChipText));
         OnPropertyChanged(nameof(HasNoActiveFilterChips));
         OnPropertyChanged(nameof(HasResettableViewFilters));
-        OnPropertyChanged(nameof(ActiveColumnFilterSummaryText));
-        OnPropertyChanged(nameof(CurrentSearchScopeText));
         OnPropertyChanged(nameof(VisibleRowsSummaryText));
     }
 

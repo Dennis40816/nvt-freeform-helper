@@ -212,7 +212,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
 
-        var session = await vm.CreateSimulationWorkspaceSessionAsync();
+        var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
 
         Assert.NotNull(session);
         Assert.Contains("ready", vm.LastSimulationWorkspaceAttemptMessage, StringComparison.OrdinalIgnoreCase);
@@ -236,7 +236,7 @@ public sealed partial class FreeformHelperViewModelTests
         await vm.LoadProjectCommand.ExecuteAsync(null);
         await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
-        var session = await vm.CreateSimulationWorkspaceSessionAsync();
+        var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
 
         Assert.NotNull(session);
         var reg3843 = Assert.Single(session!.FwDiffGrid.Pads, static pad => pad.RegularPadId == 3843);
@@ -277,7 +277,7 @@ public sealed partial class FreeformHelperViewModelTests
         await vm.LoadProjectCommand.ExecuteAsync(null);
         await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
-        var session = await vm.CreateSimulationWorkspaceSessionAsync();
+        var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
 
         Assert.NotNull(session);
         Assert.NotEqual(session!.Grid.Pads.Count, session.ActiveRegularPadIds.Count);
@@ -307,7 +307,7 @@ public sealed partial class FreeformHelperViewModelTests
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
             Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
 
-            var session = await vm.CreateSimulationWorkspaceSessionAsync();
+            var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
 
             Assert.NotNull(session);
             Assert.Empty(session!.ActiveRegularPadIds);

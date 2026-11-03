@@ -46,12 +46,12 @@ public sealed partial class IndexMappingReportViewModelTests
         var vm = new IndexMappingReportViewModel("summary", report);
         var selected = Assert.Single(vm.Issues);
 
-        Assert.True(selected.HasScoreDiagnostics);
-        Assert.Contains("assigned=0.21", selected.ScoreDiagnosticsText);
-        Assert.Contains("best=0.33", selected.ScoreDiagnosticsText);
-        Assert.Contains("second=0.29", selected.ScoreDiagnosticsText);
-        Assert.Contains("margin=0.04", selected.ScoreDiagnosticsText);
-        Assert.True(selected.HasTopCandidates);
+        Assert.True(selected.Score.HasValue || selected.BestScore.HasValue || selected.SecondScore.HasValue || selected.Margin.HasValue);
+        Assert.Equal(0.21, selected.Score);
+        Assert.Equal(0.33, selected.BestScore);
+        Assert.Equal(0.29, selected.SecondScore);
+        Assert.Equal(0.04, selected.Margin);
+        Assert.NotEmpty(selected.TopCandidates);
         Assert.Equal(2, selected.TopCandidates.Count);
         Assert.Contains("#1 diff45", selected.TopCandidates[0].Display);
     }
@@ -151,7 +151,7 @@ public sealed partial class IndexMappingReportViewModelTests
         Assert.True(vm.HasMaskAudit);
         Assert.Single(vm.MaskAuditRows);
         Assert.Equal(384, vm.MaskAuditRows[0].CadPadId);
-        Assert.Contains("Suggested diff idx: 39", vm.MaskAuditRows[0].SuggestionText);
+        Assert.Equal(39, vm.MaskAuditRows[0].SuggestedDiffIndex);
 
         vm.ShowChangedMaskRowsOnly = false;
         Assert.Equal(2, vm.MaskAuditRows.Count);

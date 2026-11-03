@@ -10,7 +10,6 @@ public sealed class LatestRequestGateTests
     public void Begin_StoresTheSourceAndCountsRequests()
     {
         var gate = new LatestRequestGate();
-        Assert.False(gate.HasPendingRequest);
         Assert.Equal(0, gate.LatestRequestId);
 
         var (firstId, firstSource) = gate.Begin();
@@ -19,7 +18,6 @@ public sealed class LatestRequestGateTests
         Assert.Equal(1, firstId);
         Assert.Equal(2, secondId);
         Assert.Equal(2, gate.LatestRequestId);
-        Assert.True(gate.HasPendingRequest);
         Assert.NotSame(firstSource, secondSource);
     }
 
@@ -33,7 +31,6 @@ public sealed class LatestRequestGateTests
         gate.Cancel();
 
         Assert.True(token.IsCancellationRequested);
-        Assert.False(gate.HasPendingRequest);
         Assert.Equal(1, gate.LatestRequestId);
         Assert.Throws<ObjectDisposedException>(() => source.Token.WaitHandle);
         gate.Cancel();
@@ -51,7 +48,6 @@ public sealed class LatestRequestGateTests
 
         Assert.Equal(2, nextId);
         Assert.Equal(2, gate.LatestRequestId);
-        Assert.True(gate.HasPendingRequest);
         Assert.False(nextSource.IsCancellationRequested);
     }
 
@@ -63,10 +59,8 @@ public sealed class LatestRequestGateTests
         var (_, currentSource) = gate.Begin();
 
         Assert.False(gate.Release(staleSource));
-        Assert.True(gate.HasPendingRequest);
         Assert.NotNull(staleSource.Token.WaitHandle);
         Assert.True(gate.Release(currentSource));
-        Assert.False(gate.HasPendingRequest);
         Assert.Throws<ObjectDisposedException>(() => currentSource.Token.WaitHandle);
         Assert.Equal(2, gate.LatestRequestId);
     }

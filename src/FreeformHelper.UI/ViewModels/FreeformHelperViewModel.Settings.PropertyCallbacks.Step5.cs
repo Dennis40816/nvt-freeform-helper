@@ -2,11 +2,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    partial void OnEnableV21Changed(bool value)
-    {
-        OnPropertyChanged(nameof(IsLenScaleVisible));
-    }
-
     partial void OnSelectedNotchExportFileTypeOptionChanged(NotchExportFileTypeOption value)
     {
         OnPropertyChanged(nameof(NotchExportSafetyPolicySummary));

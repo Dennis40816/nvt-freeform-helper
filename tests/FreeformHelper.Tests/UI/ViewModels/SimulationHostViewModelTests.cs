@@ -52,7 +52,9 @@ public sealed class SimulationHostViewModelTests
     {
         var host = new SimulationHostViewModel();
         var workspace = BuildWorkspace(sourceRevision: 1);
-        workspace.ApplyRegularOverride(regularPadId: 0, value: 12);
+        workspace.SelectRegularPad(0);
+        workspace.SelectedManualValue = 12;
+        workspace.ApplySelectedOverrideCommand.Execute(null);
         host.CurrentWorkspace = workspace;
         host.UpdateSourceRevision(2);
 

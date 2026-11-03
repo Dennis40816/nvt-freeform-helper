@@ -87,7 +87,6 @@ public sealed partial class FreeformHelperViewModel
                 EnableV21 = true;
                 EnableV22 = true;
             }
-            OnPropertyChanged(nameof(IsLenScaleVisible));
             LenScale = s.Notch.LenScale;
             NullValue = s.Notch.NullValue;
             using (_settingsSuppression.EnterNotchThresholdSync())

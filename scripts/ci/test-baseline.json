@@ -13,13 +13,13 @@
       ]
     },
     "ui": {
-      "minTotal": 112,
+      "minTotal": 111,
       "maxSkipped": 0,
       "exampleMinTests": 0,
       "requiredClasses": []
     },
     "viewmodel": {
-      "minTotal": 173,
+      "minTotal": 172,
       "maxSkipped": 0,
       "exampleMinTests": 15,
       "requiredClasses": []

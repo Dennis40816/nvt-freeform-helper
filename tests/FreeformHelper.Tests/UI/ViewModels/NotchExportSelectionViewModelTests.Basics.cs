@@ -28,7 +28,7 @@ public sealed partial class NotchExportSelectionViewModelTests
         var table = BuildSampleTable();
         var vm = new NotchExportSelectionViewModel(table);
 
-        Assert.Equal(3, vm.TotalCount);
+        Assert.Equal(3, vm.Rows.Count);
         Assert.Equal(3, vm.SelectedCount);
         Assert.True(vm.HasSelection);
     }
@@ -253,7 +253,7 @@ public sealed partial class NotchExportSelectionViewModelTests
             selectedExportTypeOption: options[1]);
 
         Assert.Equal(NotchAlgorithmVersion.V21, vm.SelectedVersionOption.Value);
-        Assert.Equal(0, vm.TotalCount);
+        Assert.Empty(vm.Rows);
         Assert.Empty(vm.BuildSelectedTable().Rows);
     }
 

@@ -153,10 +153,6 @@ public sealed partial class FreeformHelperViewModel
         RaiseWhenChanged(oldValue.Issues.Count, newValue.Issues.Count, nameof(DxfOverlapIssueCount));
         RaiseWhenChanged(oldValue.Issues.Count > 0, newValue.Issues.Count > 0, nameof(HasDxfOverlapIssues));
         RaiseWhenChanged(oldValue.HighlightedCadIds, newValue.HighlightedCadIds, nameof(DxfOverlapHighlightedCadIds));
-        RaiseWhenChanged(
-            oldValue.HighlightedCadIds.Count > 0,
-            newValue.HighlightedCadIds.Count > 0,
-            nameof(HasDxfOverlapHighlights));
     }
 }
 

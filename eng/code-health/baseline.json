@@ -1082,7 +1082,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 131
+        "methodLines": 130
       },
       "owner": "NFH",
       "locations": [
@@ -1306,7 +1306,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 151
+        "methodLines": 150
       },
       "owner": "NFH",
       "locations": [
@@ -1908,7 +1908,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 1236
+        "fileLines": 1234
       },
       "owner": "NFH",
       "locations": [
@@ -3203,56 +3203,6 @@
       "symbol": "CA1307"
     },
     {
-      "syntaxHash": "2fbf67710480bb20d60c897f48830e4150120a25c4c46a28454d9dd70622e937",
-      "member": "FreeformHelper.Tests.IndexMappingReportViewModelTests.IssueViewModel_ExposesScoreDiagnosticsAndTopCandidates()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/IndexMappingReportViewModelTests.BasicsAndFilters.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "69f9354775b4b300b891e67b22503147b032ec9121cb7a18ab1d9ee5e65b0df4",
-      "member": "FreeformHelper.Tests.IndexMappingReportViewModelTests.IssueViewModel_ExposesScoreDiagnosticsAndTopCandidates()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/IndexMappingReportViewModelTests.BasicsAndFilters.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "6d82ab3e464c9edf6ec6193e999b7cddb2a0637a0f22bb895abcf03f17bd9189",
-      "member": "FreeformHelper.Tests.IndexMappingReportViewModelTests.IssueViewModel_ExposesScoreDiagnosticsAndTopCandidates()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/IndexMappingReportViewModelTests.BasicsAndFilters.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "89af33bbc55e2f21a65a0bffb7bca8513c88025646f1bcb3d7fc23edc7e74ca1",
-      "member": "FreeformHelper.Tests.IndexMappingReportViewModelTests.IssueViewModel_ExposesScoreDiagnosticsAndTopCandidates()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/IndexMappingReportViewModelTests.BasicsAndFilters.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "36f82ece1840b3f35e50fdc19d5a93bc4b10d3db00a65cbd77302e2b5dc4436c",
-      "member": "FreeformHelper.Tests.IndexMappingReportViewModelTests.MaskAudit_Filter_DefaultsToChangedOnly()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/IndexMappingReportViewModelTests.BasicsAndFilters.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
       "syntaxHash": "d699cdc53aac4b4f3e81525668ba49724ef6dbb39160c16da0a9d63a7e89616f",
       "member": "FreeformHelper.Tests.ManualSizingUseCaseTests.Evaluate_ReturnsInvalid_WhenRangeInputIsInvalid()",
       "owner": "NFH",
@@ -3263,68 +3213,8 @@
       "symbol": "CA1307"
     },
     {
-      "syntaxHash": "d04e53d2e8bf1ad51268ff32e6a706c6c3ffb828bb2fc7845f83075e7c0b74a7",
-      "member": "FreeformHelper.Tests.NotchExportSelectionViewModelTests.ApplyColumnFilterSelection_UpdatesHeaderFilterSummary_AndChipState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/NotchExportSelectionViewModelTests.Filtering.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
       "syntaxHash": "f84bcd911eeb854a6769fb75b0df80379990ba10e1425b20a61dac1c6414dd43",
       "member": "FreeformHelper.Tests.NotchExportSelectionViewModelTests.ApplyColumnFilterSelection_UpdatesHeaderFilterSummary_AndChipState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/NotchExportSelectionViewModelTests.Filtering.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "8ebd12c1fe437623bfdd0507720723eb459250afc57466e2e7e59b48d55b905a",
-      "member": "FreeformHelper.Tests.NotchExportSelectionViewModelTests.CurrentSearchScopeText_AlwaysReflectsEffectiveFilterState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/NotchExportSelectionViewModelTests.Filtering.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "b4561324f658b5d78a54da292142b297911b88a3d44eed949066440c626b9394",
-      "member": "FreeformHelper.Tests.NotchExportSelectionViewModelTests.CurrentSearchScopeText_AlwaysReflectsEffectiveFilterState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/NotchExportSelectionViewModelTests.Filtering.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "b93a5cd06f1a37af014a9fd4b03de8f4de128f4bc4c4823bbe36e940f2a5faa4",
-      "member": "FreeformHelper.Tests.NotchExportSelectionViewModelTests.CurrentSearchScopeText_AlwaysReflectsEffectiveFilterState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/NotchExportSelectionViewModelTests.Filtering.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "e1c54a905a79efed582a4304bc6bbe294c904378f99ebd0d007b9f399a574957",
-      "member": "FreeformHelper.Tests.NotchExportSelectionViewModelTests.CurrentSearchScopeText_AlwaysReflectsEffectiveFilterState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/NotchExportSelectionViewModelTests.Filtering.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "f3d642ac8d9b7620e205205167728154186f13a1e6b249421866cc6f96879ec8",
-      "member": "FreeformHelper.Tests.NotchExportSelectionViewModelTests.CurrentSearchScopeText_AlwaysReflectsEffectiveFilterState()",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/ViewModels/NotchExportSelectionViewModelTests.Filtering.cs",
       "project": "FreeformHelper.Tests",
@@ -6093,27 +5983,7 @@
       "symbol": "CA1307"
     },
     {
-      "syntaxHash": "6f97926806b7496638abf549c7e917ded1037eec2d9db48fe5f48f9ca97ffb35",
-      "member": "FreeformHelper.Tests.UiLayoutGuardTests.PadInfoPopover_UsesDividerToggleForLowFrequencyDetailSections()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
       "syntaxHash": "833f420285a91d03c2a027e8eecbaec1c57a6a66a01c27f36fcef6820bd0cc89",
-      "member": "FreeformHelper.Tests.UiLayoutGuardTests.PadInfoPopover_UsesDividerToggleForLowFrequencyDetailSections()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "CA1307",
-      "symbol": "CA1307"
-    },
-    {
-      "syntaxHash": "d8a39a9337605b97a0376fb1251ddbd10f7e9aff47bce2d590c8d066a8ac91b7",
       "member": "FreeformHelper.Tests.UiLayoutGuardTests.PadInfoPopover_UsesDividerToggleForLowFrequencyDetailSections()",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs",

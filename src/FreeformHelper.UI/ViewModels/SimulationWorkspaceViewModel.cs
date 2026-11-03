@@ -381,9 +381,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         ? $"Files {CsvFiles.Count} · Compatible frames {_csvDataset.CompatibleFrameCount}/{_csvDataset.Frames.Count} · Expected grid {_session.FwDiffGrid.Cols} x {_session.FwDiffGrid.Rows}"
         : "No CSV loaded.";
     public string CsvInspectorShapeSummaryText => BuildCsvShapeSummaryText();
-    public string CsvInspectorRowOriginText =>
-        $"Row origin: CSV row 0 -> AA visual top (regular row {_session.FwDiffGrid.Rows - 1}); CSV last row -> regular row 0.";
-    public string CsvInspectorBeforePreviewText => BuildCsvBeforePreviewText();
     public string FrameSummaryText => IsCsvSource && FrameOptions.Count > 0
         ? $"Frame {SelectedFrameSliderIndex + 1}/{FrameOptions.Count}"
         : IsCopperSource
@@ -649,35 +646,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
 
         return $"Declared Xch/Ych: {string.Join(", ", declared)} · Detected frame: {string.Join(", ", detected)}";
     }
-
-    private string BuildCsvBeforePreviewText()
-    {
-        var compatibleFrames = _csvDataset.Frames
-            .Where(static frame => frame.Projection.IsCompatible)
-            .ToArray();
-        if (compatibleFrames.Length == 0)
-        {
-            return HasCsvFiles
-                ? "Before preview: no compatible frame. Check Xch/Ych and grid size."
-                : "Before preview: no CSV loaded.";
-        }
-
-        var selectedIndex = Math.Clamp(SelectedFrameSliderIndex, 0, compatibleFrames.Length - 1);
-        var frame = compatibleFrames[selectedIndex];
-        var values = frame.Projection.Cells.Select(static cell => cell.Value).ToArray();
-        if (values.Length == 0)
-        {
-            return "Before preview: compatible frame has no projected cells.";
-        }
-
-        var min = values.Min();
-        var max = values.Max();
-        var average = values.Average();
-        return $"Before preview: frame {selectedIndex + 1}/{compatibleFrames.Length} · shape {frame.Frame.ColCount} x {frame.Frame.RowCount} · projected {values.Length} cells · range {FormatCompactNumber(min)}..{FormatCompactNumber(max)} · avg {FormatCompactNumber(average)}";
-    }
-
-    private static string FormatCompactNumber(double value) =>
-        value.ToString("0.###", CultureInfo.InvariantCulture);
 
     private static double ResolveDefaultCopperDiameter(RegularGrid grid)
     {

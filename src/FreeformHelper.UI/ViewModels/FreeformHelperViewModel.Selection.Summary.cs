@@ -14,16 +14,6 @@ public sealed partial class FreeformHelperViewModel
     private SelectionSummaryModel _selectionSummaryResult = SelectionSummaryModel.Initial;
 
     /// <summary>
-    /// Gets a concise summary of the current selection (e.g., "Selected: CAD=5, Regular=12").
-    /// </summary>
-    public string SelectionSummary => SelectionSummaryResult.SelectionSummaryText;
-
-    /// <summary>
-    /// Gets a descriptive summary of the currently selected regular grid range.
-    /// </summary>
-    public string SelectedGridRangeSummary => SelectionSummaryResult.SelectedGridRangeSummary;
-
-    /// <summary>
     /// Gets a string indicating the count of selected CAD pads.
     /// </summary>
     public string CadSelectionText => SelectionSummaryResult.CadSelectionText;
@@ -49,14 +39,11 @@ public sealed partial class FreeformHelperViewModel
         IsPendingColumnWidthMixed = summary.WidthMixed;
         IsPendingRowHeightMixed = summary.HeightMixed;
         SetManualSizeDisplay(summary.PendingWidth, summary.PendingHeight, summary.WidthMixed, summary.HeightMixed);
-        OnPropertyChanged(nameof(SelectedRegularRange));
     }
 
     partial void OnSelectionSummaryResultChanged(SelectionSummaryModel? oldValue, SelectionSummaryModel newValue)
     {
         ArgumentNullException.ThrowIfNull(oldValue);
-        RaiseWhenChanged(oldValue.SelectionSummaryText, newValue.SelectionSummaryText, nameof(SelectionSummary));
-        RaiseWhenChanged(oldValue.SelectedGridRangeSummary, newValue.SelectedGridRangeSummary, nameof(SelectedGridRangeSummary));
         RaiseWhenChanged(oldValue.CadSelectionText, newValue.CadSelectionText, nameof(CadSelectionText));
         RaiseWhenChanged(oldValue.RegularSelectionText, newValue.RegularSelectionText, nameof(RegularSelectionText));
         RaiseWhenChanged(oldValue.SelectionDetailText, newValue.SelectionDetailText, nameof(SelectionDetailText));

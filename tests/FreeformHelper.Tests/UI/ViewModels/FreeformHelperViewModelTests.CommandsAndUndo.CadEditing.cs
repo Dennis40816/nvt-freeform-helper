@@ -239,7 +239,6 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.True(vm.AreAllCadLayersSelected);
         Assert.False(vm.AreNoCadLayersSelected);
         Assert.False(vm.AreSomeCadLayersSelected);
-        Assert.False(vm.IsCadLayersOffSegmentActive);
         Assert.True(vm.IsCadLayerBulkToggleChecked);
         Assert.Equal("All on", vm.CadLayerBulkToggleText);
 
@@ -248,7 +247,6 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.False(vm.AreAllCadLayersSelected);
         Assert.True(vm.AreNoCadLayersSelected);
         Assert.False(vm.AreSomeCadLayersSelected);
-        Assert.True(vm.IsCadLayersOffSegmentActive);
         Assert.False(vm.IsCadLayerBulkToggleChecked);
         Assert.Equal("All off", vm.CadLayerBulkToggleText);
 
@@ -257,7 +255,6 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.False(vm.AreAllCadLayersSelected);
         Assert.False(vm.AreNoCadLayersSelected);
         Assert.True(vm.AreSomeCadLayersSelected);
-        Assert.True(vm.IsCadLayersOffSegmentActive);
         Assert.False(vm.IsCadLayerBulkToggleChecked);
         Assert.Equal("All off", vm.CadLayerBulkToggleText);
 
@@ -266,7 +263,6 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.True(vm.AreAllCadLayersSelected);
         Assert.False(vm.AreNoCadLayersSelected);
         Assert.False(vm.AreSomeCadLayersSelected);
-        Assert.False(vm.IsCadLayersOffSegmentActive);
         Assert.True(vm.IsCadLayerBulkToggleChecked);
         Assert.Equal("All on", vm.CadLayerBulkToggleText);
     }
