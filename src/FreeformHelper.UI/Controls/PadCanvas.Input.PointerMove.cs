@@ -24,7 +24,7 @@ public sealed partial class PadCanvas
             InvalidateViewFrameSnapshot();
             _lastPointer = p; // Update last pointer position.
 
-            var now = DateTime.UtcNow.Ticks;
+            var now = TimeProvider.System.GetUtcNow().UtcTicks;
             if (_lastPanRedrawTicks == 0 || now - _lastPanRedrawTicks >= _panRedrawIntervalTicks)
             {
                 _lastPanRedrawTicks = now;
@@ -52,7 +52,7 @@ public sealed partial class PadCanvas
             if (_isBoxSelecting) // If currently box selecting, update box end point and redraw.
             {
                 _boxEnd = p;
-                var now = DateTime.UtcNow.Ticks;
+                var now = TimeProvider.System.GetUtcNow().UtcTicks;
                 if (_lastBoxSelectionRedrawTicks == 0 || now - _lastBoxSelectionRedrawTicks >= _boxSelectionRedrawIntervalTicks)
                 {
                     _lastBoxSelectionRedrawTicks = now;
