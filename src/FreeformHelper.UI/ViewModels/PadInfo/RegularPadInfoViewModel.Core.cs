@@ -51,48 +51,48 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
     // --- Display Properties ---
     public string Title { get; }
     public string Subtitle { get; }
-    public string HeaderAxisXText { get; }
-    public string HeaderAxisYText { get; }
-    public string IdentityText { get; }
-    public string RowText { get; }
-    public string ColText { get; }
-    public string IndexText { get; }
-    public string IcIndexText { get; }
-    public string DiffIndexText { get; }
-    public string IcText { get; }
-    public string RegularPadIdText { get; }
-    public string RowColText { get; }
-    public string MatchFreeformText { get; }
-    public string BoundsText { get; }
-    public string CentroidText { get; }
-    public string AreaText { get; }
-    public string MatchText { get; }
-    public string MatchDetailsText { get; }
-    public string MatchConfidenceText { get; }
-    public string FreeformText { get; }
-    public string DiffSourceText { get; }
-    public string OwnerSummaryText { get; }
-    public IReadOnlyList<PadInfoRelationCardViewModel> MatchAreaCards { get; }
+    public string HeaderAxisXText { get; private set; } = string.Empty;
+    public string HeaderAxisYText { get; private set; } = string.Empty;
+    public string IdentityText { get; private set; } = string.Empty;
+    public string RowText { get; private set; } = string.Empty;
+    public string ColText { get; private set; } = string.Empty;
+    public string IndexText { get; private set; } = string.Empty;
+    public string IcIndexText { get; private set; } = string.Empty;
+    public string DiffIndexText { get; private set; } = string.Empty;
+    public string IcText { get; private set; } = string.Empty;
+    public string RegularPadIdText { get; private set; } = string.Empty;
+    public string RowColText { get; private set; } = string.Empty;
+    public string MatchFreeformText { get; private set; } = string.Empty;
+    public string BoundsText { get; private set; } = string.Empty;
+    public string CentroidText { get; private set; } = string.Empty;
+    public string AreaText { get; private set; } = string.Empty;
+    public string MatchText { get; private set; } = string.Empty;
+    public string MatchDetailsText { get; private set; } = string.Empty;
+    public string MatchConfidenceText { get; private set; } = string.Empty;
+    public string FreeformText { get; private set; } = string.Empty;
+    public string DiffSourceText { get; private set; } = string.Empty;
+    public string OwnerSummaryText { get; private set; } = "Owners: -";
+    public IReadOnlyList<PadInfoRelationCardViewModel> MatchAreaCards { get; private set; } = Array.Empty<PadInfoRelationCardViewModel>();
     public bool HasMatchAreaCards => MatchAreaCards.Count > 0;
-    public string NotchRowsSummaryText { get; }
-    public IReadOnlyList<PadInfoRelationCardViewModel> NotchRowFlowCards { get; }
+    public string NotchRowsSummaryText { get; private set; } = "Notch rows: generate Step 5 first.";
+    public IReadOnlyList<PadInfoRelationCardViewModel> NotchRowFlowCards { get; private set; } = Array.Empty<PadInfoRelationCardViewModel>();
     public bool HasNotchRowFlowCards => NotchRowFlowCards.Count > 0;
-    public string RowRangeText { get; }
-    public string ColRangeText { get; }
+    public string RowRangeText { get; private set; } = string.Empty;
+    public string ColRangeText { get; private set; } = string.Empty;
     public bool HasMatchNavigation { get; }
     public bool HasHighlightMatchAction { get; }
     public bool HasAnyMatchAction => HasMatchNavigation || HasHighlightMatchAction;
     public bool HasLocateMatchAction => HasAnyMatchAction;
-    public IReadOnlyList<string> RuleTraceLines { get; }
+    public IReadOnlyList<string> RuleTraceLines { get; private set; } = Array.Empty<string>();
     public bool HasRuleTrace => RuleTraceLines.Count > 0;
     /// <summary>
     /// Gets a value indicating whether the pad width is mixed across multiple selected pads.
     /// </summary>
-    public bool IsPadWidthMixed { get; }
+    public bool IsPadWidthMixed { get; private set; }
     /// <summary>
     /// Gets a value indicating whether the pad height is mixed across multiple selected pads.
     /// </summary>
-    public bool IsPadHeightMixed { get; }
+    public bool IsPadHeightMixed { get; private set; }
 
     /// <inheritdoc />
     public bool HasPendingChanges => _padWidthDirty || _padHeightDirty;
@@ -172,174 +172,58 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
         IsMulti = pads.Count > 1;
         Title = IsMulti ? "Regular pads" : "Regular pad";
         Subtitle = IsMulti ? $"Selected: {SelectedCount} pads" : "Single pad";
-        var snapshotRegular = !IsMulti &&
-                              inspectorSnapshot?.Regular is RegularPadInspectorSnapshot candidate &&
-                              candidate.RegularPadId == pads[0].RegularPadId
-            ? candidate
-            : null;
-        var ruleTraceLines = new List<string>();
-        var matchAreaCards = new List<PadInfoRelationCardViewModel>();
-        var ownerSummaryText = "Owners: -";
-        var notchRowSummaryText = "Notch rows: generate Step 5 first.";
-        var notchRowFlowCards = new List<PadInfoRelationCardViewModel>();
 
         // Populate display texts based on whether it's a multi-selection or single.
         if (IsMulti)
         {
-            HeaderAxisXText = "-";
-            HeaderAxisYText = "-";
-            IdentityText = $"Regular pads · {Subtitle}";
-            RowText = "-";
-            ColText = "-";
-            IndexText = "-";
-            IcIndexText = PadInfoTextFormatter.RangeText(pads.Select(p => p.IcIndex + 1));
-            DiffIndexText = PadInfoTextFormatter.RangeText(pads.Select(p => p.DiffIndex));
-            IcText = IcIndexText;
-            RegularPadIdText = PadInfoTextFormatter.RangeText(pads.Select(p => p.RegularPadId));
-            RowColText = "-";
-            MatchFreeformText = "-";
-            var rows = pads.Select(p => toDisplayRow(p.Row));
-            var cols = pads.Select(p => p.Col);
-            RowRangeText = FormatIndexRanges(rows);
-            ColRangeText = FormatIndexRanges(cols);
-            MatchText = "Mixed";
-            MatchDetailsText = "Mixed";
-            MatchConfidenceText = "-";
-            DiffSourceText = "-";
-            FreeformText = PadInfoTextFormatter.DistinctText(pads.Select(p => p.Freeform.ToString()));
+            ApplyMultiSelectionDisplay(pads, toDisplayRow);
         }
         else
         {
-            var pad = pads[0];
-            var displayRow = snapshotRegular?.DisplayRow ?? toDisplayRow(pad.Row);
-            var xOneBased = pad.Col + 1;
-            var yOneBased = displayRow + 1;
-            HeaderAxisXText = $"X {xOneBased}";
-            HeaderAxisYText = $"Y {yOneBased}";
-            RowText = displayRow.ToString(CultureInfo.InvariantCulture);
-            ColText = pad.Col.ToString(CultureInfo.InvariantCulture);
-            IndexText = pad.RegularPadId.ToString(CultureInfo.InvariantCulture);
-            IcIndexText = (pad.IcIndex + 1).ToString(CultureInfo.InvariantCulture);
-            var diffIndexText = (snapshotRegular?.DiffIndex ?? pad.DiffIndex).ToString(CultureInfo.InvariantCulture);
-            DiffIndexText = diffIndexText;
-            IcText = IcIndexText;
-            RegularPadIdText = IndexText;
-            RowColText = $"Row {RowText}, Col {ColText}";
-            RowRangeText = RowText;
-            ColRangeText = ColText;
-            IdentityText = $"REG {pad.RegularPadId} · IC {pad.IcIndex + 1} · Diff idx {diffIndexText}";
-            if (snapshotRegular is not null)
-            {
-                MatchText = snapshotRegular.MatchText;
-                MatchDetailsText = snapshotRegular.MatchDetailsText;
-                MatchConfidenceText = snapshotRegular.MatchedCadPadIds.Count == 0
-                    ? "-"
-                    : snapshotRegular.MatchConfidence.ToString("P0", CultureInfo.InvariantCulture);
-                DiffSourceText = snapshotRegular.DiffSource;
-                FreeformText = snapshotRegular.Freeform == FreeformType.None
-                    ? snapshotRegular.Freeform.ToString()
-                    : $"{snapshotRegular.Freeform} ({snapshotRegular.FreeformSource})";
-                MatchFreeformText = $"Match {MatchText}, Freeform {FreeformText}";
-                if (snapshotRegular.MatchedCadPadIds.Count > 0)
-                {
-                    regularPadIdForMatchActions = pad.RegularPadId;
-                }
-
-                var matchedLinks = getMatchedCadLinks?.Invoke(pad.RegularPadId)
-                    .OrderByDescending(link => link.RegularCoverage)
-                    .ThenByDescending(link => link.CadCoverage)
-                    .ThenBy(link => link.CadPadId)
-                    .ToList()
-                    ?? new List<PadMatchLink>();
-                matchAreaCards.AddRange(BuildMatchAreaCards(
-                    matchedLinks,
-                    getDxfIndex,
-                    _highlightCadOwnerPads));
-
-                ruleTraceLines.AddRange(snapshotRegular.RuleTrace.Select(PadInspectorRuleTraceFormatter.Format));
-            }
-            else
-            {
-                var matchedLinks = getMatchedCadLinks?.Invoke(pad.RegularPadId)
-                    .OrderByDescending(link => link.CadCoverage)
-                    .ThenBy(link => link.CadPadId)
-                    .ToList()
-                    ?? new List<PadMatchLink>();
-                var matchedCadIds = (getMatchedCadPadIds?.Invoke(pad.RegularPadId) ?? Array.Empty<int>())
-                    .Distinct()
-                    .OrderBy(id => id)
-                    .ToList();
-                MatchText = BuildMatchText(getDxfIndex, matchedCadIds);
-                MatchDetailsText = BuildRegularMatchDetailsText(getDxfIndex, matchedCadIds, matchedLinks);
-                MatchConfidenceText = "-";
-                DiffSourceText = "-";
-                FreeformText = pad.Freeform.ToString();
-                MatchFreeformText = $"Match {MatchText}, Freeform {FreeformText}";
-                if (matchedCadIds.Count > 0)
-                {
-                    regularPadIdForMatchActions = pad.RegularPadId;
-                }
-
-                matchAreaCards.AddRange(BuildMatchAreaCards(
-                    matchedLinks,
-                    getDxfIndex,
-                    _highlightCadOwnerPads));
-            }
-
-            var ownerInfos = getCrossIcOwnerShares?.Invoke(pad.RegularPadId)
-                ?.OrderByDescending(info => info.RatioPercent)
-                .ThenBy(info => info.CadId)
-                .ToList()
-                ?? new List<(int CadId, double RatioPercent)>();
-            if (ownerInfos.Count > 0)
-            {
-                var preview = ownerInfos
-                    .Take(4)
-                    .Select(owner => $"CAD {owner.CadId} {owner.RatioPercent:0.##}%");
-                ownerSummaryText = string.Join(", ", preview);
-                if (ownerInfos.Count > 4)
-                {
-                    ownerSummaryText += $" (+{ownerInfos.Count - 4})";
-                }
-            }
-
-            var relatedRows = getNotchRowsByRegularPad?.Invoke(pad.RegularPadId)
-                ?.OrderBy(row => row.RowNumber)
-                .ToList()
-                ?? new List<FreeformHelperViewModel.NotchRowPreview>();
-            if (relatedRows.Count > 0)
-            {
-                notchRowSummaryText = $"Notch rows: {relatedRows.Count} (REG {pad.RegularPadId})";
-                foreach (var row in relatedRows.Take(8))
-                {
-                    var cadText = row.CadPadId.HasValue ? $"CAD {row.CadPadId.Value}" : "CAD -";
-                    var rowText = $"#{row.RowNumber} {row.Version.ToDisplayLabel()} IC{row.IcIndex + 1} diff{row.DiffIndex} {cadText}";
-                    var highlightCommand = _highlightCadOwnerPads is not null && row.CadPadId.HasValue
-                        ? new RelayCommand(() => _highlightCadOwnerPads(new[] { row.CadPadId.Value }))
-                        : null;
-                    notchRowFlowCards.Add(new PadInfoRelationCardViewModel(
-                        rowText,
-                        "Row",
-                        $"FW diff {row.DiffIndex}",
-                        "Step 5",
-                        row.Version.ToDisplayLabel(),
-                        rowText,
-                        highlightCommand));
-                }
-            }
-            else
-            {
-                notchRowSummaryText = $"Notch rows: 0 (REG {pad.RegularPadId})";
-            }
+            regularPadIdForMatchActions = ApplySingleSelectionDisplay(
+                pads[0],
+                inspectorSnapshot,
+                toDisplayRow,
+                getDxfIndex,
+                getMatchedCadPadIds,
+                getMatchedCadLinks,
+                getCrossIcOwnerShares,
+                getNotchRowsByRegularPad);
         }
 
+        ApplyGeometryTexts(pads);
+        InitializePadSize(pads);
+        _regularPadIdForMatchActions = regularPadIdForMatchActions;
+        HasMatchNavigation = _focusRegularMatches is not null && _regularPadIdForMatchActions.HasValue;
+        HasHighlightMatchAction = _highlightRegularMatches is not null && _regularPadIdForMatchActions.HasValue;
+
+        ResetPadSizeCommand = new RelayCommand(() =>
+        {
+            _resetPadSize?.Invoke(_rows, _cols);
+            _closePadInfo?.Invoke();
+        });
+        LocateMatchCommand = new RelayCommand(LocateMatch);
+        ToggleGeometryDetailsCommand = new RelayCommand(() => ShowGeometryDetails = !ShowGeometryDetails);
+        SetFreeformNoneCommand = new RelayCommand(() => ApplyFreeform(FreeformType.None));
+        SetFreeformXCommand = new RelayCommand(() => ApplyFreeform(FreeformType.XWay));
+        SetFreeformYCommand = new RelayCommand(() => ApplyFreeform(FreeformType.YWay));
+        SetFreeformXYCommand = new RelayCommand(() => ApplyFreeform(FreeformType.XYWay));
+        ApplyChangesCommand = new RelayCommand(ApplyChanges);
+        DiscardChangesCommand = new RelayCommand(DiscardChanges);
+    }
+
+    private void ApplyGeometryTexts(IReadOnlyList<RegularPad> pads)
+    {
         var bounds = UnionBounds(pads.Select(p => p.Bounds));
         BoundsText = FormatBounds(bounds);
         CentroidText = IsMulti ? "Mixed" : FormatPoint(pads[0].Centroid);
         AreaText = IsMulti
             ? $"{pads.Min(p => p.Area):0.####} - {pads.Max(p => p.Area):0.####} {PadInfoUnits.SquareMillimeter}"
             : $"{pads[0].Area:0.####} {PadInfoUnits.SquareMillimeter}";
+    }
 
+    private void InitializePadSize(IReadOnlyList<RegularPad> pads)
+    {
         // Handle pad dimensions: check for mixed state and set initial values.
         var widthValues = pads.Select(p => p.Bounds.Width).ToList();
         var heightValues = pads.Select(p => p.Bounds.Height).ToList();
@@ -360,28 +244,200 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
         _padWidthDirty = false;
         _padHeightDirty = false;
         ShowGeometryDetails = false;
-        _regularPadIdForMatchActions = regularPadIdForMatchActions;
-        HasMatchNavigation = _focusRegularMatches is not null && _regularPadIdForMatchActions.HasValue;
-        HasHighlightMatchAction = _highlightRegularMatches is not null && _regularPadIdForMatchActions.HasValue;
-        OwnerSummaryText = ownerSummaryText;
-        MatchAreaCards = matchAreaCards;
-        NotchRowsSummaryText = notchRowSummaryText;
-        NotchRowFlowCards = notchRowFlowCards;
-        RuleTraceLines = ruleTraceLines;
+    }
 
-        ResetPadSizeCommand = new RelayCommand(() =>
+    private void ApplyMultiSelectionDisplay(IReadOnlyList<RegularPad> pads, Func<int, int> toDisplayRow)
+    {
+        HeaderAxisXText = "-";
+        HeaderAxisYText = "-";
+        IdentityText = $"Regular pads · {Subtitle}";
+        RowText = "-";
+        ColText = "-";
+        IndexText = "-";
+        IcIndexText = PadInfoTextFormatter.RangeText(pads.Select(p => p.IcIndex + 1));
+        DiffIndexText = PadInfoTextFormatter.RangeText(pads.Select(p => p.DiffIndex));
+        IcText = IcIndexText;
+        RegularPadIdText = PadInfoTextFormatter.RangeText(pads.Select(p => p.RegularPadId));
+        RowColText = "-";
+        MatchFreeformText = "-";
+        var rows = pads.Select(p => toDisplayRow(p.Row));
+        var cols = pads.Select(p => p.Col);
+        RowRangeText = FormatIndexRanges(rows);
+        ColRangeText = FormatIndexRanges(cols);
+        MatchText = "Mixed";
+        MatchDetailsText = "Mixed";
+        MatchConfidenceText = "-";
+        DiffSourceText = "-";
+        FreeformText = PadInfoTextFormatter.DistinctText(pads.Select(p => p.Freeform.ToString()));
+    }
+
+    private int? ApplySingleSelectionDisplay(
+        RegularPad pad,
+        PadInspectorSnapshot? inspectorSnapshot,
+        Func<int, int> toDisplayRow,
+        Func<int, int?>? getDxfIndex,
+        Func<int, IReadOnlyList<int>>? getMatchedCadPadIds,
+        Func<int, IReadOnlyList<PadMatchLink>>? getMatchedCadLinks,
+        Func<int, IReadOnlyList<(int CadId, double RatioPercent)>>? getCrossIcOwnerShares,
+        Func<int, IReadOnlyList<FreeformHelperViewModel.NotchRowPreview>>? getNotchRowsByRegularPad)
+    {
+        var snapshotRegular = inspectorSnapshot?.Regular is RegularPadInspectorSnapshot candidate &&
+                              candidate.RegularPadId == pad.RegularPadId
+            ? candidate
+            : null;
+        var displayRow = snapshotRegular?.DisplayRow ?? toDisplayRow(pad.Row);
+        ApplySingleIdentityTexts(pad, displayRow, snapshotRegular?.DiffIndex ?? pad.DiffIndex);
+        var regularPadIdForMatchActions = snapshotRegular is not null
+            ? ApplySnapshotMatchDisplay(pad, snapshotRegular, getDxfIndex, getMatchedCadLinks)
+            : ApplyCallbackMatchDisplay(pad, getDxfIndex, getMatchedCadPadIds, getMatchedCadLinks);
+        ApplyOwnerSummary(pad, getCrossIcOwnerShares);
+        ApplyNotchRowSummary(pad, getNotchRowsByRegularPad);
+        return regularPadIdForMatchActions;
+    }
+
+    private void ApplySingleIdentityTexts(RegularPad pad, int displayRow, int diffIndex)
+    {
+        var xOneBased = pad.Col + 1;
+        var yOneBased = displayRow + 1;
+        HeaderAxisXText = $"X {xOneBased}";
+        HeaderAxisYText = $"Y {yOneBased}";
+        RowText = displayRow.ToString(CultureInfo.InvariantCulture);
+        ColText = pad.Col.ToString(CultureInfo.InvariantCulture);
+        IndexText = pad.RegularPadId.ToString(CultureInfo.InvariantCulture);
+        IcIndexText = (pad.IcIndex + 1).ToString(CultureInfo.InvariantCulture);
+        var diffIndexText = diffIndex.ToString(CultureInfo.InvariantCulture);
+        DiffIndexText = diffIndexText;
+        IcText = IcIndexText;
+        RegularPadIdText = IndexText;
+        RowColText = $"Row {RowText}, Col {ColText}";
+        RowRangeText = RowText;
+        ColRangeText = ColText;
+        IdentityText = $"REG {pad.RegularPadId} · IC {pad.IcIndex + 1} · Diff idx {diffIndexText}";
+    }
+
+    private int? ApplySnapshotMatchDisplay(
+        RegularPad pad,
+        RegularPadInspectorSnapshot snapshotRegular,
+        Func<int, int?>? getDxfIndex,
+        Func<int, IReadOnlyList<PadMatchLink>>? getMatchedCadLinks)
+    {
+        MatchText = snapshotRegular.MatchText;
+        MatchDetailsText = snapshotRegular.MatchDetailsText;
+        MatchConfidenceText = snapshotRegular.MatchedCadPadIds.Count == 0
+            ? "-"
+            : snapshotRegular.MatchConfidence.ToString("P0", CultureInfo.InvariantCulture);
+        DiffSourceText = snapshotRegular.DiffSource;
+        FreeformText = snapshotRegular.Freeform == FreeformType.None
+            ? snapshotRegular.Freeform.ToString()
+            : $"{snapshotRegular.Freeform} ({snapshotRegular.FreeformSource})";
+        MatchFreeformText = $"Match {MatchText}, Freeform {FreeformText}";
+        var regularPadIdForMatchActions = snapshotRegular.MatchedCadPadIds.Count > 0
+            ? pad.RegularPadId
+            : (int?)null;
+
+        var matchedLinks = getMatchedCadLinks?.Invoke(pad.RegularPadId)
+            .OrderByDescending(link => link.RegularCoverage)
+            .ThenByDescending(link => link.CadCoverage)
+            .ThenBy(link => link.CadPadId)
+            .ToList()
+            ?? new List<PadMatchLink>();
+        MatchAreaCards = BuildMatchAreaCards(
+            matchedLinks,
+            getDxfIndex,
+            _highlightCadOwnerPads);
+
+        RuleTraceLines = snapshotRegular.RuleTrace.Select(PadInspectorRuleTraceFormatter.Format).ToList();
+        return regularPadIdForMatchActions;
+    }
+
+    private int? ApplyCallbackMatchDisplay(
+        RegularPad pad,
+        Func<int, int?>? getDxfIndex,
+        Func<int, IReadOnlyList<int>>? getMatchedCadPadIds,
+        Func<int, IReadOnlyList<PadMatchLink>>? getMatchedCadLinks)
+    {
+        var matchedLinks = getMatchedCadLinks?.Invoke(pad.RegularPadId)
+            .OrderByDescending(link => link.CadCoverage)
+            .ThenBy(link => link.CadPadId)
+            .ToList()
+            ?? new List<PadMatchLink>();
+        var matchedCadIds = (getMatchedCadPadIds?.Invoke(pad.RegularPadId) ?? Array.Empty<int>())
+            .Distinct()
+            .OrderBy(id => id)
+            .ToList();
+        MatchText = BuildMatchText(getDxfIndex, matchedCadIds);
+        MatchDetailsText = BuildRegularMatchDetailsText(getDxfIndex, matchedCadIds, matchedLinks);
+        MatchConfidenceText = "-";
+        DiffSourceText = "-";
+        FreeformText = pad.Freeform.ToString();
+        MatchFreeformText = $"Match {MatchText}, Freeform {FreeformText}";
+        MatchAreaCards = BuildMatchAreaCards(
+            matchedLinks,
+            getDxfIndex,
+            _highlightCadOwnerPads);
+        return matchedCadIds.Count > 0 ? pad.RegularPadId : (int?)null;
+    }
+
+    private void ApplyOwnerSummary(
+        RegularPad pad,
+        Func<int, IReadOnlyList<(int CadId, double RatioPercent)>>? getCrossIcOwnerShares)
+    {
+        var ownerInfos = getCrossIcOwnerShares?.Invoke(pad.RegularPadId)
+            ?.OrderByDescending(info => info.RatioPercent)
+            .ThenBy(info => info.CadId)
+            .ToList()
+            ?? new List<(int CadId, double RatioPercent)>();
+        if (ownerInfos.Count == 0)
         {
-            _resetPadSize?.Invoke(_rows, _cols);
-            _closePadInfo?.Invoke();
-        });
-        LocateMatchCommand = new RelayCommand(LocateMatch);
-        ToggleGeometryDetailsCommand = new RelayCommand(() => ShowGeometryDetails = !ShowGeometryDetails);
-        SetFreeformNoneCommand = new RelayCommand(() => ApplyFreeform(FreeformType.None));
-        SetFreeformXCommand = new RelayCommand(() => ApplyFreeform(FreeformType.XWay));
-        SetFreeformYCommand = new RelayCommand(() => ApplyFreeform(FreeformType.YWay));
-        SetFreeformXYCommand = new RelayCommand(() => ApplyFreeform(FreeformType.XYWay));
-        ApplyChangesCommand = new RelayCommand(ApplyChanges);
-        DiscardChangesCommand = new RelayCommand(DiscardChanges);
+            return;
+        }
+
+        var preview = ownerInfos
+            .Take(4)
+            .Select(owner => $"CAD {owner.CadId} {owner.RatioPercent:0.##}%");
+        var ownerSummaryText = string.Join(", ", preview);
+        if (ownerInfos.Count > 4)
+        {
+            ownerSummaryText += $" (+{ownerInfos.Count - 4})";
+        }
+
+        OwnerSummaryText = ownerSummaryText;
+    }
+
+    private void ApplyNotchRowSummary(
+        RegularPad pad,
+        Func<int, IReadOnlyList<FreeformHelperViewModel.NotchRowPreview>>? getNotchRowsByRegularPad)
+    {
+        var relatedRows = getNotchRowsByRegularPad?.Invoke(pad.RegularPadId)
+            ?.OrderBy(row => row.RowNumber)
+            .ToList()
+            ?? new List<FreeformHelperViewModel.NotchRowPreview>();
+        if (relatedRows.Count == 0)
+        {
+            NotchRowsSummaryText = $"Notch rows: 0 (REG {pad.RegularPadId})";
+            return;
+        }
+
+        NotchRowsSummaryText = $"Notch rows: {relatedRows.Count} (REG {pad.RegularPadId})";
+        var notchRowFlowCards = new List<PadInfoRelationCardViewModel>();
+        foreach (var row in relatedRows.Take(8))
+        {
+            var cadText = row.CadPadId.HasValue ? $"CAD {row.CadPadId.Value}" : "CAD -";
+            var rowText = $"#{row.RowNumber} {row.Version.ToDisplayLabel()} IC{row.IcIndex + 1} diff{row.DiffIndex} {cadText}";
+            var highlightCommand = _highlightCadOwnerPads is not null && row.CadPadId.HasValue
+                ? new RelayCommand(() => _highlightCadOwnerPads(new[] { row.CadPadId.Value }))
+                : null;
+            notchRowFlowCards.Add(new PadInfoRelationCardViewModel(
+                rowText,
+                "Row",
+                $"FW diff {row.DiffIndex}",
+                "Step 5",
+                row.Version.ToDisplayLabel(),
+                rowText,
+                highlightCommand));
+        }
+
+        NotchRowFlowCards = notchRowFlowCards;
     }
 
     private static List<PadInfoRelationCardViewModel> BuildMatchAreaCards(
