@@ -1,4 +1,3 @@
-
 namespace FreeformHelper.UI.Controls;
 
 public sealed partial class PadCanvas
