@@ -33,7 +33,21 @@ Each work milestone still runs the UI build as required by `AGENTS.md`. Run `./s
 
 ## Merge Boundaries (Owner Decision, 2026-10-02)
 
-If a PR touches any of the following high-risk areas, the whole PR requires owner approval on GitHub: production code `src/**`, CI workflows `.github/**`, `scripts/**` that determine gate content, `.editorconfig`, `Directory.Build.props`, `Directory.Packages.props`, `global.json`, release-related files, and agent permission settings. High-risk PRs are still recommended to get independent review from this project. For other documentation and test changes, the bot merges once the independent review dispatched by this project concludes `accept`, leaves no P0 or P1 issues, and the required checks are green. Sessions in the template project do not review on behalf of this project.
+Every pull request has a tier. A machine check of the changed paths decides the tier. The author's own claim does not count.
+
+Tier A needs approval from the owner. A pull request is tier A when it changes any of these:
+
+- `.github/**`, and `scripts/**` that define a gate
+- `.editorconfig`, `Directory.Build.props`, `Directory.Packages.props`, `global.json`
+- release files and agent permission settings
+- tests that define a check (for example the architecture, guard, baseline, ratchet or contract tests)
+- new documents
+- `src/**`, unless the change only deletes code (see tier B)
+- golden or snapshot files, and `.axaml` view files
+
+Tier B needs no approval from the owner. A pull request is tier B when it only changes docs and tests, debt baselines that only go down, or `src/**` `.cs` files by deleting code only (no added line, at most 200 deleted lines in all, tests only shrink, no new test file). The bot merges a tier B pull request after an independent review concludes `accept` on the final head, with no P0 or P1 finding, required checks green and no open thread.
+
+A tier that the machine cannot prove is tier A.
 
 The bot is the repository's existing GitHub App, inherited from the template project. Changes to `AGENTS.md` or `CONTRIBUTING.md` require owner confirmation in chat before editing. The owner said on 2026-10-04: 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). A GitHub review is not required for this confirmation. The GitHub owner-approval rules for `src/**`, `scripts/**`, `.github/**`, and the other high-risk paths above continue to apply.
 
