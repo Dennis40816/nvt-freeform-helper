@@ -1376,11 +1376,11 @@ public sealed class NotchTableExporterTests
 
     private static double[] RunCProgramWithGcc(string source)
     {
-        var tempDirectory = Path.Combine(Path.GetTempPath(), "FreeformHelper.NotchExporterRuntimeTests", Guid.NewGuid().ToString("N"));
+        var tempDirectory = TestFiles.NewTempFilePath("notch-runtime-", string.Empty);
         NotchGccTestDirectory.Create(tempDirectory);
         var sourcePath = Path.Combine(tempDirectory, "notch_runtime.c");
         var executablePath = Path.Combine(tempDirectory, "notch_runtime.exe");
-        File.WriteAllText(sourcePath, source);
+        TestFiles.WriteText(sourcePath, source);
         WriteNotchHeaderStub(tempDirectory);
 
         try
@@ -1446,11 +1446,11 @@ public sealed class NotchTableExporterTests
 
     private static void AssertCCompilesWithGcc(string source)
     {
-        var tempDirectory = Path.Combine(Path.GetTempPath(), "FreeformHelper.NotchExporterTests", Guid.NewGuid().ToString("N"));
+        var tempDirectory = TestFiles.NewTempFilePath("notch-compile-", string.Empty);
         NotchGccTestDirectory.Create(tempDirectory);
         var sourcePath = Path.Combine(tempDirectory, "notch_export.c");
         var objectPath = Path.Combine(tempDirectory, "notch_export.o");
-        File.WriteAllText(sourcePath, CreateGccHarnessSource(source));
+        TestFiles.WriteText(sourcePath, CreateGccHarnessSource(source));
         WriteNotchHeaderStub(tempDirectory);
 
         using var process = new Process
@@ -1490,7 +1490,7 @@ public sealed class NotchTableExporterTests
     private static void WriteNotchHeaderStub(string tempDirectory)
     {
         var headerPath = Path.Combine(tempDirectory, "notch.h");
-        File.WriteAllText(
+        TestFiles.WriteText(
             headerPath,
             """
 #ifndef NOTCH_H_

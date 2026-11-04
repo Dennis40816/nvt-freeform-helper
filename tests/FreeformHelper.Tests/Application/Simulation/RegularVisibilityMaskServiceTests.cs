@@ -11,10 +11,10 @@ public sealed class RegularVisibilityMaskServiceTests
     [Fact]
     public void Load_SyntheticCsv_BuildsActiveAndInactiveRegularSets()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"regular-mask-{Guid.NewGuid():N}.csv");
+        var path = TestFiles.NewTempFilePath("regular-mask-", ".csv");
         try
         {
-            File.WriteAllText(
+            TestFiles.WriteText(
                 path,
                 """
                 Xch:"2",Ych:"2"
@@ -53,8 +53,8 @@ public sealed class RegularVisibilityMaskServiceTests
         var path = Path.Combine(repoRoot, relativePath.Replace('/', Path.DirectorySeparatorChar));
         Assert.True(File.Exists(path), $"Expected fixture path to exist: {path}");
 
-        var tempPath = Path.Combine(Path.GetTempPath(), $"regular-mask-fixture-{Guid.NewGuid():N}.csv");
-        File.Copy(path, tempPath, overwrite: true);
+        var tempPath = TestFiles.NewTempFilePath("regular-mask-fixture-", ".csv");
+        TestFiles.CopyOverwriting(path, tempPath);
 
         try
         {

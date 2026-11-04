@@ -25,7 +25,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
         {
             var path = Path.Combine(directory.FullName, "project.json");
             var original = Encoding.UTF8.GetBytes("original project bytes");
-            File.WriteAllBytes(path, original);
+            TestFiles.WriteBytes(path, original);
             var failure = new IOException("Publication failed.");
             var store = new JsonProjectStore(new FixedTimeProvider(_savedAt))
             {
@@ -36,7 +36,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
                 () => store.SaveAsync(path, new ProjectFile(), CancellationToken.None));
 
             Assert.Same(failure, actual);
-            Assert.Equal(original, File.ReadAllBytes(path));
+            Assert.Equal(original, TestFiles.ReadBytes(path));
             Assert.Equal(path, Assert.Single(Directory.GetFileSystemEntries(directory.FullName)));
         }
         finally
@@ -53,7 +53,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
         {
             var path = Path.Combine(directory.FullName, "project.json");
             var original = Encoding.UTF8.GetBytes("original project bytes");
-            File.WriteAllBytes(path, original);
+            TestFiles.WriteBytes(path, original);
             using var cancellation = new CancellationTokenSource();
             await cancellation.CancelAsync();
             var store = new JsonProjectStore(new FixedTimeProvider(_savedAt));
@@ -61,7 +61,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
             await Assert.ThrowsAnyAsync<OperationCanceledException>(
                 () => store.SaveAsync(path, new ProjectFile(), cancellation.Token));
 
-            Assert.Equal(original, File.ReadAllBytes(path));
+            Assert.Equal(original, TestFiles.ReadBytes(path));
             Assert.Equal(path, Assert.Single(Directory.GetFileSystemEntries(directory.FullName)));
         }
         finally
@@ -90,7 +90,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
 
             await store.SaveAsync(path, file, CancellationToken.None);
 
-            var bytes = File.ReadAllBytes(path);
+            var bytes = TestFiles.ReadBytes(path);
             var expected = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(file, _options));
             Assert.Equal(expected, bytes);
             Assert.False(bytes.AsSpan().StartsWith(new byte[] { 0xEF, 0xBB, 0xBF }));
@@ -133,7 +133,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
         try
         {
             var path = Path.Combine(directory.FullName, "project.json");
-            File.WriteAllText(path, "original project bytes");
+            TestFiles.WriteText(path, "original project bytes");
             var file = new ProjectFile { LastDxfPath = "replacement.dxf" };
             var store = new JsonProjectStore(new FixedTimeProvider(_savedAt));
 
@@ -156,7 +156,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
         {
             var path = Path.Combine(directory.FullName, "project.json");
             var original = Encoding.UTF8.GetBytes("original project bytes");
-            File.WriteAllBytes(path, original);
+            TestFiles.WriteBytes(path, original);
             var failure = new IOException("Writing the temporary file failed.");
             var store = new JsonProjectStore(new FixedTimeProvider(_savedAt))
             {
@@ -171,7 +171,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
                 () => store.SaveAsync(path, new ProjectFile(), CancellationToken.None));
 
             Assert.Same(failure, actual);
-            Assert.Equal(original, File.ReadAllBytes(path));
+            Assert.Equal(original, TestFiles.ReadBytes(path));
             Assert.Equal(path, Assert.Single(Directory.GetFileSystemEntries(directory.FullName)));
         }
         finally

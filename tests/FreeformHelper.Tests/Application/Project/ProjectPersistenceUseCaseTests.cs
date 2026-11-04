@@ -34,7 +34,7 @@ public sealed class ProjectPersistenceUseCaseTests
     [Fact]
     public async Task SaveAsync_WritesFileAndCapturesOverrides()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var store = new JsonProjectStore();
@@ -81,15 +81,15 @@ public sealed class ProjectPersistenceUseCaseTests
     [Fact]
     public async Task SaveAsync_EmbedDxf_EmbedsBytesAndName()
     {
-        var dxfPath = Path.Combine(Path.GetTempPath(), $"cad_{Guid.NewGuid():N}.dxf");
-        var maskPath = Path.Combine(Path.GetTempPath(), $"SeeRegular_{Guid.NewGuid():N}.csv");
-        var projectPath = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var dxfPath = TestFiles.NewTempFilePath("cad_", ".dxf");
+        var maskPath = TestFiles.NewTempFilePath("SeeRegular_", ".csv");
+        var projectPath = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var dxfBytes = new byte[] { 1, 2, 3, 4, 5 };
             var maskBytes = new byte[] { 6, 7, 8, 9 };
-            File.WriteAllBytes(dxfPath, dxfBytes);
-            File.WriteAllBytes(maskPath, maskBytes);
+            TestFiles.WriteBytes(dxfPath, dxfBytes);
+            TestFiles.WriteBytes(maskPath, maskBytes);
 
             var store = new JsonProjectStore();
             var useCase = new ProjectPersistenceUseCase(store);
@@ -143,7 +143,7 @@ public sealed class ProjectPersistenceUseCaseTests
     [Fact]
     public async Task SaveAsync_EmbedDeclined_ClearsEmbeddedFields()
     {
-        var projectPath = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var store = new JsonProjectStore();
@@ -186,7 +186,7 @@ public sealed class ProjectPersistenceUseCaseTests
     [Fact]
     public async Task SaveAsync_WritesMatchingAndMappingSettingsAndUiSnapshot()
     {
-        var projectPath = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var store = new JsonProjectStore();
@@ -254,7 +254,7 @@ public sealed class ProjectPersistenceUseCaseTests
     [Fact]
     public async Task SaveThenLoadAsync_RoundTrip_PreservesCriticalProjectData()
     {
-        var projectPath = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var store = new JsonProjectStore();
@@ -337,7 +337,7 @@ public sealed class ProjectPersistenceUseCaseTests
     [Fact]
     public async Task SaveThenLoadAsync_RoundTrip_PreservesDxfEditState()
     {
-        var projectPath = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var store = new JsonProjectStore();

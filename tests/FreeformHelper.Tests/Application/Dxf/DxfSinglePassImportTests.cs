@@ -1,5 +1,6 @@
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
+using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -113,8 +114,8 @@ public sealed class DxfSinglePassImportTests
 
     internal static string WriteTempDxf(int fixture)
     {
-        var path = Path.Combine(Path.GetTempPath(), $"dxf-single-pass-{Guid.NewGuid():N}.dxf");
-        File.WriteAllText(path, DxfTexts[fixture]);
+        var path = TestFiles.NewTempFilePath("dxf-single-pass-", ".dxf");
+        TestFiles.WriteText(path, DxfTexts[fixture]);
         return path;
     }
 

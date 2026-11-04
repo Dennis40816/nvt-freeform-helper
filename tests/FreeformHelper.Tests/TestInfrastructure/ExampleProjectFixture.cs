@@ -17,7 +17,7 @@ internal sealed class ExampleProjectFixture : IDisposable
     public static ExampleProjectFixture Create(string projectPath)
     {
         var originalProjectPath = Path.GetFullPath(projectPath);
-        var projectText = File.ReadAllText(originalProjectPath);
+        var projectText = TestFiles.ReadContent(originalProjectPath);
         var project = JsonNode.Parse(projectText);
         var maskPath = Path.Combine(Path.GetDirectoryName(originalProjectPath)!, "SeeRegular.csv");
         if (project?["uiSnapshot"]?["import"] is JsonObject import &&
@@ -33,7 +33,7 @@ internal sealed class ExampleProjectFixture : IDisposable
             Path.Combine(temporaryDirectory, Path.GetFileName(originalProjectPath)));
         try
         {
-            File.WriteAllText(fixture.ProjectPath, projectText);
+            TestFiles.WriteText(fixture.ProjectPath, projectText);
             return fixture;
         }
         catch

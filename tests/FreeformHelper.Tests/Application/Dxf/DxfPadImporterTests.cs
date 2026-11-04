@@ -1,4 +1,5 @@
 using FreeformHelper.Infrastructure.Dxf;
+using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -227,8 +228,8 @@ public sealed class DxfPadImporterTests
 
     private static string WriteTempDxf(string content)
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_test_{Guid.NewGuid():N}.dxf");
-        File.WriteAllText(path, content);
+        var path = TestFiles.NewTempFilePath("cad_test_", ".dxf");
+        TestFiles.WriteText(path, content);
         return path;
     }
 
