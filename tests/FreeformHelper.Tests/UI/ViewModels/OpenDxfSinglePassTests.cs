@@ -1,7 +1,7 @@
-using System.Reflection;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -57,8 +57,8 @@ public sealed class OpenDxfSinglePassTests
             await vm.OpenDxfCommand.ExecuteAsync(null);
             await vm.WaitForGridRebuildIdleAsync();
 
-            DxfSinglePassImportTests.AssertPadsEqual(expectedPads, GetField<CadPadSet>(vm, "_cad"));
-            var state = GetField<LayerCatalogStateService>(vm, "_layerCatalogStateService");
+            DxfSinglePassImportTests.AssertPadsEqual(expectedPads, FreeformHelperViewModelPrivateAccess.Cad(vm)!);
+            var state = FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm);
             DxfSinglePassImportTests.AssertCatalogsEqual(expectedCatalog, state.Catalog);
             Assert.False(vm.IsCadLoadCanvasOverlayVisible);
             Assert.Equal(1, GetTokenizationCount() - beforeOpen);
@@ -102,8 +102,8 @@ public sealed class OpenDxfSinglePassTests
             await vm.WaitForGridRebuildIdleAsync();
 
             Assert.Equal(2, GetTokenizationCount() - beforeProjectLoad);
-            var state = GetField<LayerCatalogStateService>(vm, "_layerCatalogStateService");
-            DxfSinglePassImportTests.AssertPadsEqual(expectedEmbeddedPads, GetField<CadPadSet>(vm, "_cad"));
+            var state = FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm);
+            DxfSinglePassImportTests.AssertPadsEqual(expectedEmbeddedPads, FreeformHelperViewModelPrivateAccess.Cad(vm)!);
             DxfSinglePassImportTests.AssertCatalogsEqual(expectedEmbeddedCatalog, state.Catalog);
 
             var beforeReopen = GetTokenizationCount();
@@ -111,7 +111,7 @@ public sealed class OpenDxfSinglePassTests
             await vm.WaitForGridRebuildIdleAsync();
 
             Assert.Equal(1, GetTokenizationCount() - beforeReopen);
-            DxfSinglePassImportTests.AssertPadsEqual(expectedOpenPads, GetField<CadPadSet>(vm, "_cad"));
+            DxfSinglePassImportTests.AssertPadsEqual(expectedOpenPads, FreeformHelperViewModelPrivateAccess.Cad(vm)!);
             DxfSinglePassImportTests.AssertCatalogsEqual(expectedOpenCatalog, state.Catalog);
 
             var openCatalog = state.Catalog;
@@ -131,15 +131,6 @@ public sealed class OpenDxfSinglePassTests
 
     private static long GetTokenizationCount()
     {
-        var property = typeof(DxfPadImporter).GetProperty("TokenizationCount", BindingFlags.Static | BindingFlags.NonPublic);
-        Assert.NotNull(property);
-        return Assert.IsType<long>(property.GetValue(null));
-    }
-
-    private static T GetField<T>(FreeformHelperViewModel vm, string name)
-    {
-        var field = typeof(FreeformHelperViewModel).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return Assert.IsType<T>(field.GetValue(vm));
+        return DxfPadImporter.TokenizationCount;
     }
 }
