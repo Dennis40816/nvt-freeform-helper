@@ -1,7 +1,7 @@
-using System.Reflection;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -21,17 +21,9 @@ public sealed partial class FreeformHelperViewModelTests
             CreateRectCad(1, 0, 0, 10, 10),
             CreateRectCad(2, 8, 0, 18, 10),
         };
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var resetBaselineMethod = typeof(FreeformHelperViewModel).GetMethod("ResetDxfEditBaseline", BindingFlags.Instance | BindingFlags.NonPublic);
-        var applyCadLoadOutcomeMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyCadLoadOutcomeAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        var buildEntriesMethod = typeof(FreeformHelperViewModel).GetMethod("BuildDxfEditChangeEntries", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(resetBaselineMethod);
-        Assert.NotNull(applyCadLoadOutcomeMethod);
-        Assert.NotNull(buildEntriesMethod);
 
-        cadField!.SetValue(vm, new CadPadSet(source));
-        resetBaselineMethod!.Invoke(vm, new object?[] { new CadPadSet(source) });
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(source);
+        FreeformHelperViewModelPrivateAccess.ResetDxfEditBaseline(vm, new CadPadSet(source));
         await SelectCadPadsAsync(vm, _pairCadSelection);
         vm.CombineSelectedCadPadsCommand.Execute(null);
         Assert.True(vm.HasCombinedCadPads);
@@ -40,21 +32,18 @@ public sealed partial class FreeformHelperViewModelTests
         {
             CreateRectCad(1, 100, 0, 110, 10),
         });
-        var applyTask = Assert.IsAssignableFrom<Task>(applyCadLoadOutcomeMethod!.Invoke(
+        var applyTask = FreeformHelperViewModelPrivateAccess.ApplyCadLoadOutcomeAsync(
             vm,
-            new object?[]
-            {
-                new CadLoadOutcome(
+            new CadLoadOutcome(
+                nextCad,
+                CadLoadSource.Path,
+                @"C:\temp\next.dxf",
+                new CadPadExactDuplicateSanitizationResult(
                     nextCad,
-                    CadLoadSource.Path,
-                    @"C:\temp\next.dxf",
-                    new CadPadExactDuplicateSanitizationResult(
-                        nextCad,
-                        0,
-                        Array.Empty<int>(),
-                        new Dictionary<int, int>())),
-                null
-            }));
+                    0,
+                    Array.Empty<int>(),
+                    new Dictionary<int, int>())),
+                null);
         await applyTask;
         var persistedState = FreeformHelperViewModel.CapturePersistedDxfEditProjectState(new ProjectFile
         {
@@ -62,7 +51,7 @@ public sealed partial class FreeformHelperViewModelTests
         });
         vm.ApplyCapturedDxfEditProjectState(persistedState);
 
-        var entries = Assert.IsType<List<DxfEditChangeListEntry>>(buildEntriesMethod.Invoke(vm, null));
+        var entries = Assert.IsType<List<DxfEditChangeListEntry>>(FreeformHelperViewModelPrivateAccess.BuildDxfEditChangeEntries(vm));
         var hiddenEntry = Assert.Single(entries, entry => entry.Kind == DxfEditChangeKind.Hidden);
         Assert.Equal("Hidden", hiddenEntry.StatusText);
         Assert.Equal("Restore", hiddenEntry.ActionLabel);
@@ -73,10 +62,6 @@ public sealed partial class FreeformHelperViewModelTests
     public async Task ApplyCadLoadOutcomeAsync_PreservesRawDuplicatePads_ButAutoHidesThemFromWorkingSet()
     {
         var vm = new FreeformHelperViewModel();
-        var applyCadLoadOutcomeMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyCadLoadOutcomeAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        var buildActiveCadPadSetMethod = typeof(FreeformHelperViewModel).GetMethod("BuildActiveCadPadSet", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(applyCadLoadOutcomeMethod);
-        Assert.NotNull(buildActiveCadPadSetMethod);
         var duplicateCadIds = new[] { 1 };
         var expectedVisibleCadIds = new[] { 0, 2 };
 
@@ -87,21 +72,18 @@ public sealed partial class FreeformHelperViewModelTests
             CreateCad(2, "OTHER", 0, 0, 10, 10),
         });
 
-        var applyTask = Assert.IsAssignableFrom<Task>(applyCadLoadOutcomeMethod!.Invoke(
+        var applyTask = FreeformHelperViewModelPrivateAccess.ApplyCadLoadOutcomeAsync(
             vm,
-            new object?[]
-            {
-                new CadLoadOutcome(
+            new CadLoadOutcome(
+                rawCad,
+                CadLoadSource.Path,
+                @"C:\temp\duplicate.dxf",
+                new CadPadExactDuplicateSanitizationResult(
                     rawCad,
-                    CadLoadSource.Path,
-                    @"C:\temp\duplicate.dxf",
-                    new CadPadExactDuplicateSanitizationResult(
-                        rawCad,
-                        1,
-                        duplicateCadIds,
-                        new Dictionary<int, int> { [1] = 0 })),
-                null,
-            }));
+                    1,
+                    duplicateCadIds,
+                    new Dictionary<int, int> { [1] = 0 })),
+                null);
         await applyTask;
 
         var currentCad = GetCurrentCadPadSet(vm);
@@ -109,7 +91,7 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Equal(0, vm.DeletedCadPadCount);
         Assert.Equal(expectedVisibleCadIds, vm.CadPads.Select(static pad => pad.Id).OrderBy(static id => id).ToArray());
 
-        var activeCad = Assert.IsType<CadPadSet>(buildActiveCadPadSetMethod!.Invoke(vm, null));
+        var activeCad = Assert.IsType<CadPadSet>(FreeformHelperViewModelPrivateAccess.BuildActiveCadPadSet(vm));
         Assert.Equal(expectedVisibleCadIds, activeCad.Pads.Select(static pad => pad.Id).OrderBy(static id => id).ToArray());
     }
 
@@ -118,8 +100,6 @@ public sealed partial class FreeformHelperViewModelTests
     public async Task ResetAllDxfEditsCommand_PreservesAutoHiddenDuplicatePads()
     {
         var vm = new FreeformHelperViewModel();
-        var applyCadLoadOutcomeMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyCadLoadOutcomeAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(applyCadLoadOutcomeMethod);
         var duplicateCadIds = new[] { 1 };
         var expectedVisibleCadIds = new[] { 0, 2 };
         var selectedCadIds = new[] { 2 };
@@ -131,21 +111,18 @@ public sealed partial class FreeformHelperViewModelTests
             CreateCad(2, "OTHER", 20, 0, 30, 10),
         });
 
-        var applyTask = Assert.IsAssignableFrom<Task>(applyCadLoadOutcomeMethod!.Invoke(
+        var applyTask = FreeformHelperViewModelPrivateAccess.ApplyCadLoadOutcomeAsync(
             vm,
-            new object?[]
-            {
-                new CadLoadOutcome(
+            new CadLoadOutcome(
+                rawCad,
+                CadLoadSource.Path,
+                @"C:\temp\duplicate.dxf",
+                new CadPadExactDuplicateSanitizationResult(
                     rawCad,
-                    CadLoadSource.Path,
-                    @"C:\temp\duplicate.dxf",
-                    new CadPadExactDuplicateSanitizationResult(
-                        rawCad,
-                        1,
-                        duplicateCadIds,
-                        new Dictionary<int, int> { [1] = 0 })),
-                null,
-            }));
+                    1,
+                    duplicateCadIds,
+                    new Dictionary<int, int> { [1] = 0 })),
+                null);
         await applyTask;
 
         await SelectCadPadsAsync(vm, selectedCadIds);
@@ -167,12 +144,6 @@ public sealed partial class FreeformHelperViewModelTests
     public async Task DxfEditChangeListApply_OnDuplicateRow_TogglesDuplicateVisibility()
     {
         var vm = new FreeformHelperViewModel();
-        var applyCadLoadOutcomeMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyCadLoadOutcomeAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        var buildEntriesMethod = typeof(FreeformHelperViewModel).GetMethod("BuildDxfEditChangeEntries", BindingFlags.Instance | BindingFlags.NonPublic);
-        var applyEntryMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyDxfEditChangeEntry", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(applyCadLoadOutcomeMethod);
-        Assert.NotNull(buildEntriesMethod);
-        Assert.NotNull(applyEntryMethod);
 
         var rawCad = new CadPadSet(new[]
         {
@@ -181,34 +152,31 @@ public sealed partial class FreeformHelperViewModelTests
             CreateCad(2, "OTHER", 20, 0, 30, 10),
         });
 
-        var applyTask = Assert.IsAssignableFrom<Task>(applyCadLoadOutcomeMethod!.Invoke(
+        var applyTask = FreeformHelperViewModelPrivateAccess.ApplyCadLoadOutcomeAsync(
             vm,
-            new object?[]
-            {
-                new CadLoadOutcome(
+            new CadLoadOutcome(
+                rawCad,
+                CadLoadSource.Path,
+                @"C:\temp\duplicate.dxf",
+                new CadPadExactDuplicateSanitizationResult(
                     rawCad,
-                    CadLoadSource.Path,
-                    @"C:\temp\duplicate.dxf",
-                    new CadPadExactDuplicateSanitizationResult(
-                        rawCad,
-                        1,
-                        [1],
-                        new Dictionary<int, int> { [1] = 0 })),
-                null,
-            }));
+                    1,
+                    [1],
+                    new Dictionary<int, int> { [1] = 0 })),
+                null);
         await applyTask;
 
-        var entries = Assert.IsType<List<DxfEditChangeListEntry>>(buildEntriesMethod!.Invoke(vm, null));
+        var entries = Assert.IsType<List<DxfEditChangeListEntry>>(FreeformHelperViewModelPrivateAccess.BuildDxfEditChangeEntries(vm));
         var duplicateEntry = Assert.Single(entries, entry => entry.Kind == DxfEditChangeKind.Duplicate);
         Assert.Equal(0, duplicateEntry.FocusCadPadId);
         Assert.Equal("Auto-hidden duplicate", duplicateEntry.StatusText);
         Assert.Equal("Restore", duplicateEntry.ActionLabel);
 
-        applyEntryMethod!.Invoke(vm, [duplicateEntry]);
+        FreeformHelperViewModelPrivateAccess.ApplyDxfEditChangeEntry(vm, duplicateEntry);
 
         Assert.Equal([0, 1, 2], vm.CadPads.Select(static pad => pad.Id).OrderBy(static id => id).ToArray());
 
-        entries = Assert.IsType<List<DxfEditChangeListEntry>>(buildEntriesMethod.Invoke(vm, null));
+        entries = Assert.IsType<List<DxfEditChangeListEntry>>(FreeformHelperViewModelPrivateAccess.BuildDxfEditChangeEntries(vm));
         duplicateEntry = Assert.Single(entries, entry => entry.Kind == DxfEditChangeKind.Duplicate);
         Assert.Equal(1, duplicateEntry.FocusCadPadId);
         Assert.Equal("Restored duplicate", duplicateEntry.StatusText);
@@ -225,12 +193,8 @@ public sealed partial class FreeformHelperViewModelTests
             CreateRectCad(1, 0, 0, 10, 10),
             CreateRectCad(2, 12, 0, 22, 10),
         };
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var restoreHiddenCadPadMethod = typeof(FreeformHelperViewModel).GetMethod("RestoreHiddenCadPad", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(restoreHiddenCadPadMethod);
 
-        cadField!.SetValue(vm, new CadPadSet(source));
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(source);
 
         await SelectCadPadsAsync(vm, [1]);
         vm.DeleteSelectedCadPadsCommand.Execute(null);
@@ -238,7 +202,7 @@ public sealed partial class FreeformHelperViewModelTests
         vm.DeleteSelectedCadPadsCommand.Execute(null);
         Assert.Equal(2, vm.DeletedCadPadCount);
 
-        restoreHiddenCadPadMethod!.Invoke(vm, new object?[] { 2 });
+        FreeformHelperViewModelPrivateAccess.RestoreHiddenCadPad(vm, 2);
         Assert.Equal(1, vm.DeletedCadPadCount);
 
         vm.RestoreLastDeletedCadPadsCommand.Execute(null);

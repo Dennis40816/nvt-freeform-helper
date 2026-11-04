@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Services;
@@ -272,19 +271,11 @@ public sealed partial class FreeformHelperViewModelTests
             vm.NotchCompensationModelOptions,
             static option => option.Value == NotchCompensationModel.ConservativeNoGain);
 
-        var cadField = typeof(FreeformHelperViewModel).GetField(
-            "_cad",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField(
-            "_grid",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
-        cadField!.SetValue(vm, new CadPadSet([cad]));
-        gridField!.SetValue(vm, grid);
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet([cad]);
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = grid;
         SetPadMatchResult(vm, cad.Id, anchorRegular.RegularPadId);
         SetCadOutputFwDiff(vm, cad.Id, anchorRegular.DiffIndex, anchorRegular.IcIndex);
-        InvalidateWorkflowDataSnapshot(vm);
+        vm.InvalidateWorkflowDataSnapshot();
 
         var resolved = Assert.IsType<NotchV22ResolvedResult>(vm.GetCadV22ResolvedResult(cad.Id));
         Assert.Equal(
@@ -681,7 +672,7 @@ public sealed partial class FreeformHelperViewModelTests
         SetPadMatchResults(vm, (cadA.Id, left.RegularPadId), (cadB.Id, right.RegularPadId));
         SetCadOutputFwDiff(vm, cadA.Id, left.DiffIndex, icIndex: 0);
         SetCadOutputFwDiff(vm, cadB.Id, right.DiffIndex, icIndex: 1);
-        InvalidateWorkflowDataSnapshot(vm);
+        vm.InvalidateWorkflowDataSnapshot();
         return vm;
     }
 

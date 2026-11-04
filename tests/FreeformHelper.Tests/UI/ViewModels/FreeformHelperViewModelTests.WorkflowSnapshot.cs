@@ -1,5 +1,5 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -12,35 +12,17 @@ public sealed partial class FreeformHelperViewModelTests
     {
         var vm = new FreeformHelperViewModel();
 
-        var first = BuildWorkflowDataSnapshot(vm);
-        var second = BuildWorkflowDataSnapshot(vm);
+        var first = FreeformHelperViewModelPrivateAccess.BuildWorkflowDataSnapshot(vm);
+        var second = FreeformHelperViewModelPrivateAccess.BuildWorkflowDataSnapshot(vm);
 
         Assert.Same(first, second);
         Assert.Equal(1, vm.WorkflowDataSnapshotBuildCount);
 
-        InvalidateWorkflowDataSnapshot(vm);
-        var third = BuildWorkflowDataSnapshot(vm);
+        vm.InvalidateWorkflowDataSnapshot();
+        var third = FreeformHelperViewModelPrivateAccess.BuildWorkflowDataSnapshot(vm);
 
         Assert.NotSame(first, third);
         Assert.Equal(2, vm.WorkflowDataSnapshotBuildCount);
-    }
-
-    private static object BuildWorkflowDataSnapshot(FreeformHelperViewModel vm)
-    {
-        var method = typeof(FreeformHelperViewModel).GetMethod(
-            "BuildWorkflowDataSnapshot",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        return method!.Invoke(vm, null)!;
-    }
-
-    private static void InvalidateWorkflowDataSnapshot(FreeformHelperViewModel vm)
-    {
-        var method = typeof(FreeformHelperViewModel).GetMethod(
-            "InvalidateWorkflowDataSnapshot",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        method!.Invoke(vm, null);
     }
 
     [AvaloniaFact]
