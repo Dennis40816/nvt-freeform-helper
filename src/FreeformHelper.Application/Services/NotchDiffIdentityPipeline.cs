@@ -17,7 +17,6 @@ public static class NotchDiffIdentityPipeline
         if (rows.Count == 0 || cadOutputFwDiffByCadId.Count == 0)
         {
             return new NotchDiffProjectionContract(
-                ProjectedCadOutputFwDiffByRawDiff: new Dictionary<NotchDiffKey, int>(),
                 ConflictedRawDiffKeys: Array.Empty<NotchDiffKey>(),
                 CadOutputFwDiffByCadId: cadOutputFwDiffByCadId);
         }
@@ -40,20 +39,11 @@ public static class NotchDiffIdentityPipeline
             }
         }
 
-        if (conflictedRawDiffKeys.Count > 0)
-        {
-            foreach (var diffKey in conflictedRawDiffKeys)
-            {
-                projectedCadOutputFwDiffByRawDiff.Remove(diffKey);
-            }
-        }
-
         var orderedConflictedRawDiffKeys = conflictedRawDiffKeys
             .OrderBy(static key => key.IcIndex)
             .ThenBy(static key => key.DiffIndex)
             .ToArray();
         return new NotchDiffProjectionContract(
-            ProjectedCadOutputFwDiffByRawDiff: projectedCadOutputFwDiffByRawDiff,
             ConflictedRawDiffKeys: orderedConflictedRawDiffKeys,
             CadOutputFwDiffByCadId: cadOutputFwDiffByCadId);
     }
@@ -131,7 +121,6 @@ public static class NotchDiffIdentityPipeline
 public readonly record struct NotchDiffKey(int IcIndex, int DiffIndex);
 
 public sealed record NotchDiffProjectionContract(
-    IReadOnlyDictionary<NotchDiffKey, int> ProjectedCadOutputFwDiffByRawDiff,
     IReadOnlyList<NotchDiffKey> ConflictedRawDiffKeys,
     IReadOnlyDictionary<int, int> CadOutputFwDiffByCadId)
 {
