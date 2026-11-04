@@ -3519,36 +3519,6 @@
       "symbol": "M:System.IO.File.WriteAllTextAsync(System.String,System.String,System.Threading.CancellationToken)"
     },
     {
-      "syntaxHash": "107fd090a71ae7c2e1a8266556f68bdbf33f9be2a9f661c7d74c22e9fd66286b",
-      "member": "FreeformHelper.Tests.Cad3635EndToEndBenchmarkTests.FlushUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Benchmarks/Cad3635EndToEndBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4943b34e7d633de7579ed96c9c7b62d95b6b929f158f72e4418282c683360cde",
-      "member": "FreeformHelper.Tests.Cad3635EndToEndBenchmarkTests.FlushUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Benchmarks/Cad3635EndToEndBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 2,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "83bf5ad1b87bca44dfc9dc9e7111043b9a8b00c8be39a95262b0a76484adc1ab",
-      "member": "FreeformHelper.Tests.Cad3635EndToEndBenchmarkTests.FlushUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Benchmarks/Cad3635EndToEndBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
       "syntaxHash": "fadfa6fd7c7ce94103deb8561a4135a8cffd188b7dae43f92949a24b38f6bb7f",
       "member": "FreeformHelper.Tests.Cad3635EndToEndBenchmarkTests.GetNonNegativeInt(string,int)",
       "owner": "NFH",
@@ -3877,36 +3847,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "107fd090a71ae7c2e1a8266556f68bdbf33f9be2a9f661c7d74c22e9fd66286b",
-      "member": "FreeformHelper.Tests.CanvasViewportAdapterTests.DrainUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CanvasViewportAdapterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4943b34e7d633de7579ed96c9c7b62d95b6b929f158f72e4418282c683360cde",
-      "member": "FreeformHelper.Tests.CanvasViewportAdapterTests.DrainUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CanvasViewportAdapterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 2,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "83bf5ad1b87bca44dfc9dc9e7111043b9a8b00c8be39a95262b0a76484adc1ab",
-      "member": "FreeformHelper.Tests.CanvasViewportAdapterTests.DrainUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CanvasViewportAdapterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
       "syntaxHash": "a3252511d48deaed283c69b86a1d14d88cae55cc3bb8c3a31846868c6ab85c10",
@@ -5419,16 +5359,6 @@
       "symbol": "P:System.Environment.TickCount64"
     },
     {
-      "syntaxHash": "aa5cd9fb9acab98fbcb2cc4e9760a426c142819608c178953e7773539370d8fe",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.YieldCadLoadCanvasOverlayFrame_OnTheUiThread_RunsQueuedRenderWorkFirst()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Basics.LoadOverlay.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
       "syntaxHash": "c81479aacdeac4e155ffb4a148616edec1099939c2d2e6f02dfce9b430e9db33",
       "member": "FreeformHelper.Tests.HeadlessDispatcherSetup.EnsureRunLoopDispatcher()",
       "owner": "NFH",
@@ -5557,36 +5487,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "107fd090a71ae7c2e1a8266556f68bdbf33f9be2a9f661c7d74c22e9fd66286b",
-      "member": "FreeformHelper.Tests.HeadlessUiSmokeTests.FlushUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4943b34e7d633de7579ed96c9c7b62d95b6b929f158f72e4418282c683360cde",
-      "member": "FreeformHelper.Tests.HeadlessUiSmokeTests.FlushUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 2,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "83bf5ad1b87bca44dfc9dc9e7111043b9a8b00c8be39a95262b0a76484adc1ab",
-      "member": "FreeformHelper.Tests.HeadlessUiSmokeTests.FlushUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
       "syntaxHash": "67f9bd307accabf973dc14c95f2824f323fd107681eca43cc4bf1ae6350ef3f1",
@@ -5757,86 +5657,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
-      "syntaxHash": "4f3190732b54cba40327c4606045b1a31785003075bd9fbca8d8f12144fce28e",
-      "member": "FreeformHelper.Tests.MainWindowCloseTests.OnClosing_MenuSaveRunning_DoesNotStartSecondSave()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/MainWindowCloseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4f3190732b54cba40327c4606045b1a31785003075bd9fbca8d8f12144fce28e",
-      "member": "FreeformHelper.Tests.MainWindowCloseTests.OnClosing_PromptPending_CancelsSynchronously()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/MainWindowCloseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4f3190732b54cba40327c4606045b1a31785003075bd9fbca8d8f12144fce28e",
-      "member": "FreeformHelper.Tests.MainWindowCloseTests.OnClosing_SavePickerFails_KeepsWindowOpenAndProjectDirty()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/MainWindowCloseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4f3190732b54cba40327c4606045b1a31785003075bd9fbca8d8f12144fce28e",
-      "member": "FreeformHelper.Tests.MainWindowCloseTests.OnClosing_SaveWriteFails_KeepsWindowOpenAndReleasesSaveCommand()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/MainWindowCloseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4f3190732b54cba40327c4606045b1a31785003075bd9fbca8d8f12144fce28e",
-      "member": "FreeformHelper.Tests.MainWindowCloseTests.OnClosing_SecondCloseWhileSaving_DoesNotStartSecondSave()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/MainWindowCloseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4943b34e7d633de7579ed96c9c7b62d95b6b929f158f72e4418282c683360cde",
-      "member": "FreeformHelper.Tests.MainWindowNavigationInputTests.NavigationWindow.ClickAsync(ToggleButton)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/MainWindowNavigationInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "ef18c441a32986f88e405cd4adf12b4f689351675c8164bf87d471fb0a5774d1",
-      "member": "FreeformHelper.Tests.MainWindowNavigationInputTests.NavigationWindow.CreateAsync(ShellPage)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/MainWindowNavigationInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "92a520b72daebdb8e0484d9cf79de9eb58a108bca1082c1f3232c9d1e5f53dc4",
-      "member": "FreeformHelper.Tests.MainWindowNavigationInputTests.NavigationWindow.Dispose()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/MainWindowNavigationInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
       "syntaxHash": "2e4f12b105a0f56c622b329c7d70f0516f8b537e19a583f06cd60690f8351697",
@@ -6439,26 +6259,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "107fd090a71ae7c2e1a8266556f68bdbf33f9be2a9f661c7d74c22e9fd66286b",
-      "member": "FreeformHelper.Tests.PadCanvasGestureResetTests.DrainUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasGestureResetTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4943b34e7d633de7579ed96c9c7b62d95b6b929f158f72e4418282c683360cde",
-      "member": "FreeformHelper.Tests.PadCanvasGestureResetTests.DrainUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasGestureResetTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
       "syntaxHash": "cb22764c658f661da63398858c3d7f6e20e383c96bc525f59342362882078064",
       "member": "FreeformHelper.Tests.PadCanvasGestureResetTests.ReadField`1(PadCanvas,string)",
       "owner": "NFH",
@@ -6667,36 +6467,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:System.DateTime.UtcNow"
-    },
-    {
-      "syntaxHash": "107fd090a71ae7c2e1a8266556f68bdbf33f9be2a9f661c7d74c22e9fd66286b",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.DrainUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4943b34e7d633de7579ed96c9c7b62d95b6b929f158f72e4418282c683360cde",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.DrainUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 2,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "83bf5ad1b87bca44dfc9dc9e7111043b9a8b00c8be39a95262b0a76484adc1ab",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.DrainUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
       "syntaxHash": "a5618acfdfe0d1fd5cd239cbd5ee4b4a8dc988227a443dfce5e3a0c97c11cf8b",
@@ -7389,36 +7159,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "107fd090a71ae7c2e1a8266556f68bdbf33f9be2a9f661c7d74c22e9fd66286b",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.FlushUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4943b34e7d633de7579ed96c9c7b62d95b6b929f158f72e4418282c683360cde",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.FlushUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 2,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "83bf5ad1b87bca44dfc9dc9e7111043b9a8b00c8be39a95262b0a76484adc1ab",
-      "member": "FreeformHelper.Tests.TerminalStartupPathTests.FlushUiQueueAsync()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/TerminalStartupPathTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
       "syntaxHash": "6708484140d7fc81aa5015d198e5a1a6b6821ee5704be9199bc8969089f80b7d",
       "member": "FreeformHelper.Tests.TestAppSettingsIsolation.Initialize()",
       "owner": "NFH",
@@ -7577,36 +7317,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "4f3190732b54cba40327c4606045b1a31785003075bd9fbca8d8f12144fce28e",
-      "member": "FreeformHelper.Tests.UiEventRunnerTests.Run_AsynchronousFailure_ReportsOnceWithoutDispatcherException()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "68374b61418becce6c4767305473068fdc2665ec2403d5ba3f61034995640ff1",
-      "member": "FreeformHelper.Tests.UiEventRunnerTests.Run_AsynchronousFailure_ReportsOnceWithoutDispatcherException()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "7349dedbc96a8a37956e369b127453ed2d80363a6dc0883f33ea6aeaed54aa12",
-      "member": "FreeformHelper.Tests.UiEventRunnerTests.Run_AsynchronousFailure_ReportsOnceWithoutDispatcherException()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
       "syntaxHash": "a29667e27901684198fdc84c0a5409f24d05731793227884f54145258ce8e186",

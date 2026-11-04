@@ -24,7 +24,7 @@ public sealed class UiEventRunnerTests
             dispatcherFailures++;
             e.Handled = true;
         }
-        Dispatcher.UIThread.UnhandledException += OnUnhandled;
+        HeadlessUiPump.RunningDispatcher.UnhandledException += OnUnhandled;
         try
         {
             probe.Runner.Run("Console.CopyAll", async _ =>
@@ -34,7 +34,7 @@ public sealed class UiEventRunnerTests
             });
             release.SetResult();
             var report = await probe.Reported.Task.WaitAsync(TimeSpan.FromSeconds(10));
-            await Dispatcher.UIThread.InvokeAsync(static () => { });
+            await HeadlessUiPump.YieldAsync();
 
             Assert.Equal("Console.CopyAll", report.Operation);
             Assert.Same(failure, report.Exception);
@@ -44,7 +44,7 @@ public sealed class UiEventRunnerTests
         }
         finally
         {
-            Dispatcher.UIThread.UnhandledException -= OnUnhandled;
+            HeadlessUiPump.RunningDispatcher.UnhandledException -= OnUnhandled;
         }
     }
 

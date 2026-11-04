@@ -5,6 +5,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using Xunit;
 
@@ -184,7 +185,7 @@ public sealed class PadCanvasGestureResetTests
 
     private static async Task DrainUiQueueAsync()
     {
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Render);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
+        await HeadlessUiPump.YieldAsync(DispatcherPriority.Render);
+        await HeadlessUiPump.YieldAsync(DispatcherPriority.Background);
     }
 }

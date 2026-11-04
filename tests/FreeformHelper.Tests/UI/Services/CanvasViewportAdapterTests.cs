@@ -1,8 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Avalonia.Threading;
 using FreeformHelper.Domain.Geometry;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using Xunit;
@@ -29,14 +29,14 @@ public sealed class CanvasViewportAdapterTests
         var emitter = new FitRequestEmitter();
 
         adapter.Attach(handler => emitter.FitCanvasRequested += handler);
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         var initialSnapshot = canvas.GetViewFrameSnapshot();
         Assert.True(initialSnapshot.Zoom > 1.0);
 
         var initialRevision = initialSnapshot.Revision;
         emitter.Raise();
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         var afterExplicitFit = canvas.GetViewFrameSnapshot();
         Assert.True(afterExplicitFit.Revision > initialRevision);
@@ -57,7 +57,7 @@ public sealed class CanvasViewportAdapterTests
         canvas.Measure(new Size(300, 200));
         canvas.Arrange(new Rect(new Size(300, 200)));
         canvas.FitToContent();
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         var adapter = new CanvasViewportAdapter(canvas, static () => { });
         var overlay = new Canvas();
@@ -84,14 +84,6 @@ public sealed class CanvasViewportAdapterTests
 
         Assert.True(grid.ClipToBounds);
         Assert.True(overlay.ClipToBounds);
-    }
-
-    private static async Task DrainUiQueueAsync()
-    {
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Loaded);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Render);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
     }
 
     private sealed class FitRequestEmitter

@@ -1,8 +1,8 @@
 using System.Reflection;
 using Avalonia;
 using Avalonia.Headless.XUnit;
-using Avalonia.Threading;
 using FreeformHelper.Domain.Geometry;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using Xunit;
 
@@ -94,7 +94,7 @@ public sealed class PadCanvasViewRefreshTests
         requestViewRefreshMethod!.Invoke(canvas, [true]);
         requestViewRefreshMethod.Invoke(canvas, [true]);
 
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         Assert.Equal(1, viewChangedCount);
     }
@@ -112,7 +112,7 @@ public sealed class PadCanvasViewRefreshTests
         requestVisualRefreshMethod!.Invoke(canvas, [false]);
         requestVisualRefreshMethod.Invoke(canvas, [false]);
 
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         Assert.Equal(0, viewChangedCount);
     }
@@ -123,7 +123,7 @@ public sealed class PadCanvasViewRefreshTests
         var canvas = new PadCanvas();
         var refreshQueuedField = typeof(PadCanvas).GetField("_isViewRefreshQueued", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(refreshQueuedField);
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         var viewChangedCount = 0;
         canvas.ViewChanged += (_, _) => viewChangedCount++;
@@ -131,7 +131,7 @@ public sealed class PadCanvasViewRefreshTests
         canvas.MatchThreshold += 0.01;
 
         Assert.True((bool)refreshQueuedField!.GetValue(canvas)!);
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         Assert.False((bool)refreshQueuedField.GetValue(canvas)!);
         Assert.Equal(0, viewChangedCount);
@@ -168,7 +168,7 @@ public sealed class PadCanvasViewRefreshTests
         canvas.ViewChanged += (_, _) => snapshotSeenByHandler = canvas.GetViewFrameSnapshot();
 
         requestViewRefreshMethod!.Invoke(canvas, [true]);
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         Assert.True(snapshotSeenByHandler.Revision > initialSnapshot.Revision);
         Assert.Equal(2.0, snapshotSeenByHandler.Zoom);
@@ -190,7 +190,7 @@ public sealed class PadCanvasViewRefreshTests
         canvas.Arrange(new Rect(new Size(300, 200)));
 
         canvas.FitToContent();
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         var viewFrame = canvas.GetViewFrameSnapshot();
         var viewportCenterX = (viewFrame.WorldViewport.MinX + viewFrame.WorldViewport.MaxX) / 2d;
@@ -225,16 +225,8 @@ public sealed class PadCanvasViewRefreshTests
         canvas.Arrange(new Rect(new Size(300, 200)));
 
         canvas.FitToContent();
-        await DrainUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         return canvas.GetViewFrameSnapshot().Zoom;
-    }
-
-    private static async Task DrainUiQueueAsync()
-    {
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Loaded);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Render);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
     }
 }

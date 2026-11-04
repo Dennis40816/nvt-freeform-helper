@@ -10,6 +10,32 @@ internal static class HeadlessUiPump
     // A failure guard for a layout that keeps invalidating itself, not a number of passes to wait.
     private const int MaxLayoutCycles = 100;
 
+    /// <summary>Gets the dispatcher of the running headless application.</summary>
+    public static Dispatcher RunningDispatcher =>
+        global::Avalonia.Application.Current?.Dispatcher
+        ?? throw new InvalidOperationException("No Avalonia application is current, so there is no UI dispatcher to use.");
+
+    /// <summary>Returns after the dispatcher has run the jobs queued at the default priority.</summary>
+    public static Task YieldAsync()
+    {
+        return YieldAsync(DispatcherPriority.Default);
+    }
+
+    /// <summary>Returns after the dispatcher has run the jobs queued at or above the given priority.</summary>
+    public static Task YieldAsync(DispatcherPriority priority)
+    {
+        return RunningDispatcher.InvokeAsync(static () => { }, priority).GetTask();
+    }
+
+    /// <summary>Lets the background, loaded and render work of the running application finish.</summary>
+    public static async Task FlushQueueAsync()
+    {
+        await YieldAsync(DispatcherPriority.Background);
+        await YieldAsync(DispatcherPriority.Loaded);
+        await YieldAsync(DispatcherPriority.Render);
+        await YieldAsync(DispatcherPriority.Background);
+    }
+
     public static void Drain(TopLevel root)
     {
         var dispatcher = root.Dispatcher;

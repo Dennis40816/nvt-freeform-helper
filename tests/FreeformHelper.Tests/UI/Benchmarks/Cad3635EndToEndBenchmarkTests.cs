@@ -3,7 +3,6 @@ using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
-using Avalonia.Threading;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
 using FreeformHelper.UI.Services;
@@ -95,7 +94,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
         try
         {
             window.Show();
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
             vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(projectPath);
             vm.PickSaveNotchPathAsync = (_, _) => Task.FromResult<string?>(exportPath);
             vm.OpenNotchExportSelectionAsync = null;
@@ -151,7 +150,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
         compute.Stop();
 
         var renderFlush = Stopwatch.StartNew();
-        await FlushUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
         renderFlush.Stop();
 
         var capture = Stopwatch.StartNew();
@@ -166,14 +165,6 @@ public sealed class Cad3635EndToEndBenchmarkTests
             compute.ElapsedMilliseconds,
             renderFlush.ElapsedMilliseconds,
             capture.ElapsedMilliseconds);
-    }
-
-    private static async Task FlushUiQueueAsync()
-    {
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Loaded);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Render);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
     }
 
     private static string ResolveOutputPath(string? outputPath)

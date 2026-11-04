@@ -5,7 +5,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Platform;
-using Avalonia.Threading;
 using Avalonia.VisualTree;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
@@ -85,10 +84,10 @@ public sealed class HeadlessUiSmokeTests
         try
         {
             window.Show();
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             ToolTip.SetIsOpen(target, true);
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             Assert.True(ToolTip.GetIsOpen(target));
         }
@@ -124,10 +123,10 @@ public sealed class HeadlessUiSmokeTests
         try
         {
             window.Show();
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             ToolTip.SetIsOpen(target, true);
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             Assert.True(ToolTip.GetIsOpen(target));
         }
@@ -165,7 +164,7 @@ public sealed class HeadlessUiSmokeTests
         try
         {
             window.Show();
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             var target = Assert.Single(
                 view.GetVisualDescendants().OfType<NumberScrubber>(),
@@ -176,7 +175,7 @@ public sealed class HeadlessUiSmokeTests
                 tip.Text);
 
             ToolTip.SetIsOpen(target, true);
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             Assert.True(ToolTip.GetIsOpen(target));
         }
@@ -211,7 +210,7 @@ public sealed class HeadlessUiSmokeTests
         try
         {
             window.Show();
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
             await WaitForSpinnerIdleAsync(vm);
 
             Assert.NotNull(view.CadLoadSpinnerHostForTest);
@@ -221,7 +220,7 @@ public sealed class HeadlessUiSmokeTests
 
             loading = HoldCadLoadOverlayAsync(vm, entered, release);
             await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             Assert.Equal(initialShowCount + 1, fakeHost.ShowCallCount);
             Assert.Equal(initialHideCount, fakeHost.HideCallCount);
@@ -229,7 +228,7 @@ public sealed class HeadlessUiSmokeTests
 
             release.SetResult();
             await loading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             Assert.Equal(initialShowCount + 1, fakeHost.ShowCallCount);
             Assert.Equal(initialHideCount + 1, fakeHost.HideCallCount);
@@ -238,14 +237,14 @@ public sealed class HeadlessUiSmokeTests
             release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             loading = HoldCadLoadOverlayAsync(vm, entered, release);
             await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             Assert.Equal(initialShowCount + 2, fakeHost.ShowCallCount);
             Assert.Equal(initialHideCount + 1, fakeHost.HideCallCount);
 
             release.SetResult();
             await loading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             Assert.Equal(initialShowCount + 2, fakeHost.ShowCallCount);
             Assert.Equal(initialHideCount + 2, fakeHost.HideCallCount);
@@ -279,7 +278,7 @@ public sealed class HeadlessUiSmokeTests
         try
         {
             spinnerWindow.Show();
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             var spinner = spinnerWindow.FindControl<LoadingSpinner>("PART_LoadingSpinner");
             Assert.NotNull(spinner);
@@ -302,7 +301,7 @@ public sealed class HeadlessUiSmokeTests
 
             var dashOffsetBefore = spinnerFlow!.StrokeDashOffset;
             await Task.Delay(120);
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             Assert.NotEqual(dashOffsetBefore, spinnerFlow.StrokeDashOffset);
         }
@@ -353,7 +352,7 @@ public sealed class HeadlessUiSmokeTests
         try
         {
             window.Show();
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             using var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
@@ -406,7 +405,7 @@ public sealed class HeadlessUiSmokeTests
         try
         {
             window.Show();
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
 
             using var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
@@ -427,19 +426,11 @@ public sealed class HeadlessUiSmokeTests
         }
     }
 
-    private static async Task FlushUiQueueAsync()
-    {
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Loaded);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Render);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
-    }
-
     private static async Task WaitForSpinnerIdleAsync(FreeformHelperViewModel viewModel)
     {
         for (var attempt = 0; attempt < 30; attempt++)
         {
-            await FlushUiQueueAsync();
+            await HeadlessUiPump.FlushQueueAsync();
             if (!viewModel.IsModalLoadingSpinnerVisible && !viewModel.IsCadLoadCanvasOverlayVisible)
             {
                 return;

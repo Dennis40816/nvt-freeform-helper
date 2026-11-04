@@ -108,7 +108,7 @@ public sealed class MainWindowNavigationInputTests
             shell.CoordinatePlanner.RequestBuildWorkspaceAsync = null;
             await ShellViewModelNavigationTests.ShowPageAsync(shell, page);
             var scenario = new NavigationWindow(shell);
-            await Dispatcher.UIThread.InvokeAsync(scenario._window.UpdateLayout, DispatcherPriority.Background);
+            await HeadlessUiPump.RunningDispatcher.InvokeAsync(scenario._window.UpdateLayout, DispatcherPriority.Background);
             return scenario;
         }
 
@@ -122,14 +122,14 @@ public sealed class MainWindowNavigationInputTests
             _window.MouseMove(point.Value);
             _window.MouseDown(point.Value, MouseButton.Left);
             _window.MouseUp(point.Value, MouseButton.Left);
-            await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
+            await HeadlessUiPump.YieldAsync(DispatcherPriority.Background);
         }
 
         public void Dispose()
         {
             Shell.FreeformHelper.HasUnsavedChanges = false;
             _window.Close();
-            Dispatcher.UIThread.RunJobs();
+            HeadlessUiPump.RunningDispatcher.RunJobs();
         }
 
         private static string TabContent(ShellPage page) => page switch
