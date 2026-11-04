@@ -90,6 +90,24 @@ internal static class TestFiles
         source.CopyTo(destination);
     }
 
+    public static string ReadContent(string path, Encoding encoding)
+    {
+        using var reader = new StreamReader(path, encoding);
+        return reader.ReadToEnd();
+    }
+
+    public static string[] ReadContentLines(string path)
+    {
+        using var reader = new StreamReader(path);
+        var lines = new List<string>();
+        while (reader.ReadLine() is { } line)
+        {
+            lines.Add(line);
+        }
+
+        return [.. lines];
+    }
+
     private static DirectoryInfo CreateSharedTempRoot()
     {
         var root = CreateTempDirectory();
