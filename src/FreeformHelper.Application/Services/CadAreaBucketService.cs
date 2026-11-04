@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.Application.Services;
@@ -6,10 +5,6 @@ namespace FreeformHelper.Application.Services;
 /// <summary>
 /// Groups CAD pads into area buckets using a relative area tolerance.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance API is intentionally preserved for service call-site stability.")]
 public sealed class CadAreaBucketService
 {
     private const double MinRelativeBaseArea = 1e-12;
@@ -74,7 +69,7 @@ public sealed class CadAreaBucketService
     /// <param name="relativeTolerance">Relative tolerance in [0, 0.5].</param>
     /// <param name="anchorPadId">Anchor CAD pad ID.</param>
     /// <returns>CAD pad IDs in the same bucket as the anchor; empty when not found.</returns>
-    public IReadOnlyList<int> ResolveBucketMembers(IReadOnlyList<CadPad> pads, double relativeTolerance, int anchorPadId)
+    public static IReadOnlyList<int> ResolveBucketMembers(IReadOnlyList<CadPad> pads, double relativeTolerance, int anchorPadId)
     {
         var buckets = BuildBuckets(pads, relativeTolerance);
         foreach (var bucket in buckets)

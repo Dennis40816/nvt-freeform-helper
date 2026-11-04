@@ -43,7 +43,7 @@ public sealed class NotchV22CompensationServiceTests
         Assert.Equal(0, owner.OverlapAreaTotal);
         Assert.Equal(0, owner.OverlapRegularCount);
         Assert.Empty(owner.RegularDebugInfos);
-        var resolved = new NotchV22ResolvedResultService().Build(
+        var resolved = NotchV22ResolvedResultService.Build(
             cad, owner, 0.001, 0, regular.DiffIndex, NotchV22TargetAllocationPolicy.ResolveAreaMode(model));
         Assert.Empty(resolved.TargetAllocation.Targets);
 
@@ -54,7 +54,7 @@ public sealed class NotchV22CompensationServiceTests
         Assert.Equal(0, readerCompensation.OverlapAreaTotal);
         Assert.Equal(0, readerCompensation.OverlapRegularCount);
         Assert.Empty(readerCompensation.RegularDebugInfos);
-        var readerResolved = new NotchV22ResolvedResultService().Build(
+        var readerResolved = NotchV22ResolvedResultService.Build(
             cad, readerCompensation, 0.001, 0, regular.DiffIndex, NotchV22TargetAllocationPolicy.ResolveAreaMode(model));
         Assert.Empty(readerResolved.TargetAllocation.Targets);
         var generated = new NotchTableGenerator().GenerateCadAllocationResolvedBatch(new CadPadSet([cad]), grid, settings);
@@ -91,7 +91,7 @@ public sealed class NotchV22CompensationServiceTests
             Assert.Equal(1, compensation.OverlapAreaTotal);
             Assert.Equal(1, compensation.OverlapRegularCount);
             Assert.Equal(1, Assert.Single(compensation.RegularDebugInfos).SourceArea);
-            var resolved = new NotchV22ResolvedResultService().Build(
+            var resolved = NotchV22ResolvedResultService.Build(
                 cad, compensation, 0.001, 0, grid.Pads[0].DiffIndex, NotchV22TargetAllocationPolicy.ResolveAreaMode(model));
             Assert.Equal(100, Assert.Single(resolved.TargetAllocation.Targets).RatioPercentRounded);
         }

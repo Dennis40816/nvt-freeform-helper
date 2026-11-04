@@ -12,14 +12,8 @@ namespace FreeformHelper.UI.Services;
 public sealed class GridRebuildOrchestrator
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    private readonly GridBuildService _gridBuildService;
 
-    public GridRebuildOrchestrator(GridBuildService gridBuildService)
-    {
-        _gridBuildService = gridBuildService ?? throw new ArgumentNullException(nameof(gridBuildService));
-    }
-
-    public GridRebuildBuildResult Build(GridRebuildBuildRequest request)
+    public static GridRebuildBuildResult Build(GridRebuildBuildRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -73,7 +67,7 @@ public sealed class GridRebuildOrchestrator
         return string.Join(" ", hints);
     }
 
-    private GridRebuildBuildResult BuildFromDxfLayer(GridRebuildBuildRequest request)
+    private static GridRebuildBuildResult BuildFromDxfLayer(GridRebuildBuildRequest request)
     {
         if (request.Cad is null)
         {
@@ -118,7 +112,7 @@ public sealed class GridRebuildOrchestrator
         var cadLayerSet = new CadPadSet(layerPads);
         try
         {
-            var grid = _gridBuildService.BuildFromDxfLayer(cadLayerSet, request.Settings);
+            var grid = GridBuildService.BuildFromDxfLayer(cadLayerSet, request.Settings);
             PadOverrideService.ApplyFreeformOverrides(request.ProjectFile, grid);
             return GridRebuildBuildResult.Succeeded(grid, "Ready.");
         }
@@ -137,7 +131,7 @@ public sealed class GridRebuildOrchestrator
         }
     }
 
-    private GridRebuildBuildResult BuildFromGeneratedGrid(GridRebuildBuildRequest request)
+    private static GridRebuildBuildResult BuildFromGeneratedGrid(GridRebuildBuildRequest request)
     {
         var cadForBuild = request.GridAlignmentMode == GridAlignmentMode.FromCadBounds
             ? request.BuildCadPadSetForBounds()
@@ -162,7 +156,7 @@ public sealed class GridRebuildOrchestrator
             _logger.Info(CultureInfo.InvariantCulture, "Grid alignment fallback: DXF bounds requested but no DXF loaded.");
         }
 
-        var gridResult = _gridBuildService.Build(cadForBuild, request.Settings, effectiveAlignmentMode);
+        var gridResult = GridBuildService.Build(cadForBuild, request.Settings, effectiveAlignmentMode);
         PadOverrideService.ApplyFreeformOverrides(request.ProjectFile, gridResult);
         return GridRebuildBuildResult.Succeeded(gridResult, postBuildStatus);
     }

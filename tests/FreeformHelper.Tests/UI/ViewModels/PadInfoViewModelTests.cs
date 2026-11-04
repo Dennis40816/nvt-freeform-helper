@@ -133,7 +133,7 @@ public sealed class PadInfoViewModelTests
             enableToFullRuleTrace: false,
             enableBoundaryVirtualAreaCap: true,
             boundaryVirtualAreaCapRatio: 1.0);
-        var resolved = new NotchV22ResolvedResultService().Build(
+        var resolved = NotchV22ResolvedResultService.Build(
             cad,
             compensation,
             strictOverlapRatio,

@@ -32,14 +32,13 @@ public sealed class CadAreaBucketServiceTests
     [Fact]
     public void ResolveBucketMembers_ReturnsEmptyWhenAnchorMissing()
     {
-        var service = new CadAreaBucketService();
         var pads = new List<CadPad>
         {
             CreateSquarePad(10, 80.0),
             CreateSquarePad(11, 80.01),
         };
 
-        var bucket = service.ResolveBucketMembers(pads, 0.01, 999);
+        var bucket = CadAreaBucketService.ResolveBucketMembers(pads, 0.01, 999);
 
         Assert.Empty(bucket);
     }

@@ -285,8 +285,8 @@ public sealed partial class FreeformHelperViewModel
         CanvasHintText = string.Empty;
         var buildRequest = CreateGridRebuildBuildRequestSnapshot();
         var buildResult = IsCadLoadCanvasOverlayVisible
-            ? await Task.Run(() => _gridRebuildOrchestrator.Build(buildRequest))
-            : _gridRebuildOrchestrator.Build(buildRequest);
+            ? await Task.Run(() => GridRebuildOrchestrator.Build(buildRequest))
+            : GridRebuildOrchestrator.Build(buildRequest);
         if (!string.IsNullOrWhiteSpace(buildResult.DxfRegularSourceHint))
         {
             DxfRegularSourceHint = buildResult.DxfRegularSourceHint;

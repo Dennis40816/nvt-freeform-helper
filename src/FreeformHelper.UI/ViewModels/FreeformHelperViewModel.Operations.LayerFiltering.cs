@@ -95,7 +95,7 @@ public sealed partial class FreeformHelperViewModel
         var autoMode = CadOutputFwDiffAutoMode;
         var strictMatchDiffByCadId = BuildCadStrictMatchDiffById(ordered);
 
-        var assignment = _cadOutputFwDiffIndexAssignmentService.Assign(
+        var assignment = CadOutputFwDiffIndexAssignmentService.Assign(
             ordered,
             _grid,
             _projectFile.Settings.Grid,

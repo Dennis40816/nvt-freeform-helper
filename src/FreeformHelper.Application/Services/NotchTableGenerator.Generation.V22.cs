@@ -339,7 +339,7 @@ public sealed partial class NotchTableGenerator
         }
         else if (isSelectedResult)
         {
-            selectedResolvedResult = new NotchV22ResolvedResultService().Build(
+            selectedResolvedResult = NotchV22ResolvedResultService.Build(
                 cadPad,
                 compensation,
                 context.ResolutionSettings.StrictOverlapRatio,

@@ -76,6 +76,6 @@ public sealed class ManualSizingUseCaseTests
             BoundsPaddingRatio = 0,
         };
 
-        return new RegularGridBuilder().BuildFromSettings(settings);
+        return RegularGridBuilder.BuildFromSettings(settings);
     }
 }

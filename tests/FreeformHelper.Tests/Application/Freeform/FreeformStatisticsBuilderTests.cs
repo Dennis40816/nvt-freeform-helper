@@ -25,7 +25,7 @@ public sealed class FreeformStatisticsBuilderTests
     [Fact]
     public void Build_CountsEachFreeformType()
     {
-        var grid = new RegularGridBuilder().BuildFromSettings(new GridSettings
+        var grid = RegularGridBuilder.BuildFromSettings(new GridSettings
         {
             XChannels = 2,
             YChannels = 2,

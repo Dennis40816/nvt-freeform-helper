@@ -19,8 +19,7 @@ public sealed class RegularGridBuilderTests
             ActiveAreaHeight = 10
         };
 
-        var builder = new RegularGridBuilder();
-        var grid = builder.BuildFromSettings(settings);
+        var grid = RegularGridBuilder.BuildFromSettings(settings);
 
         Assert.Equal(2, grid.Rows);
         Assert.Equal(4, grid.Cols);
@@ -49,8 +48,7 @@ public sealed class RegularGridBuilderTests
             BoundsPaddingRatio = 0
         };
 
-        var builder = new RegularGridBuilder();
-        var grid = builder.BuildFromCadBounds(cad, settings);
+        var grid = RegularGridBuilder.BuildFromCadBounds(cad, settings);
 
         Assert.Equal(1, grid.Rows);
         Assert.Equal(2, grid.Cols);
@@ -81,8 +79,7 @@ public sealed class RegularGridBuilderTests
             }
         };
 
-        var builder = new RegularGridBuilder();
-        var grid = builder.BuildFromSettings(settings);
+        var grid = RegularGridBuilder.BuildFromSettings(settings);
 
         Assert.Equal(5, grid.GetPad(0, 0).Bounds.Width, 6);
         Assert.Equal(15, grid.GetPad(0, 1).Bounds.Width, 6);
@@ -112,8 +109,7 @@ public sealed class RegularGridBuilderTests
             }
         };
 
-        var builder = new RegularGridBuilder();
-        var grid = builder.BuildFromSettings(settings);
+        var grid = RegularGridBuilder.BuildFromSettings(settings);
 
         Assert.Equal(5, grid.GetPad(0, 0).Bounds.Height, 6);
         Assert.Equal(15, grid.GetPad(1, 0).Bounds.Height, 6);

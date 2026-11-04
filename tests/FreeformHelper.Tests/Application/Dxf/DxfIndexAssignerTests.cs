@@ -32,7 +32,7 @@ public sealed class DxfIndexAssignerTests
             }
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(settings);
+        var grid = RegularGridBuilder.BuildFromSettings(settings);
         var assigner = new DxfIndexAssigner();
 
         var topLeft = CreateCadPad(id: 1, x0: 0.20, y0: 1.40, x1: 0.40, y1: 1.60);      // row=1, col=0
@@ -62,7 +62,7 @@ public sealed class DxfIndexAssignerTests
             RowHeights = new List<double> { 1, 1 }
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(settings);
+        var grid = RegularGridBuilder.BuildFromSettings(settings);
         var assigner = new DxfIndexAssigner();
 
         var bottomLeft = CreateCadPad(id: 1, x0: 0.20, y0: 0.20, x1: 0.40, y1: 0.40);
