@@ -233,8 +233,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             Math.Max(2, (int)Math.Ceiling(previewHost.Bounds.Height)));
         using var bitmap = new RenderTargetBitmap(pixelSize);
         bitmap.Render(previewHost);
-        await using var stream = File.Open(file.Path.LocalPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        PreviewImageWriter.Save(bitmap, stream, file.Path.LocalPath);
+        await PreviewImageWriter.SaveToFileAsync(bitmap, file.Path.LocalPath);
         return true;
     }
 

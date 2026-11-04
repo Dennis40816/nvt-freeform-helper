@@ -109,4 +109,20 @@ public sealed class BmpWriterTests
             BmpWriter.WriteBgra32AsBmp24(output, 2, 2, new byte[12], inputRowBytes: 8));
         Assert.Equal(0, output.Length);
     }
+
+    [Fact]
+    public void ComputeFileSize_ReportsSizesAboveTwoGigabytesWithoutAllocating()
+    {
+        Assert.Equal(54L + (300_000L * 100_000L), BmpWriter.ComputeFileSize(100_000, 100_000));
+    }
+
+    [Fact]
+    public void Write_RejectsAFileLargerThanTwoGigabytesBeforeReadingPixels()
+    {
+        using var output = new MemoryStream();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            BmpWriter.WriteBgra32AsBmp24(output, 100_000, 100_000, ReadOnlySpan<byte>.Empty, inputRowBytes: 400_000));
+        Assert.Equal(0, output.Length);
+    }
 }
