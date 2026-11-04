@@ -114,7 +114,7 @@ internal static class RuntimeQueryCommandLine
 
             string key;
             string value;
-            var equalIndex = token.IndexOf('=');
+            var equalIndex = token.IndexOf('=', StringComparison.Ordinal);
             if (equalIndex > 2)
             {
                 key = token.Substring(2, equalIndex - 2);

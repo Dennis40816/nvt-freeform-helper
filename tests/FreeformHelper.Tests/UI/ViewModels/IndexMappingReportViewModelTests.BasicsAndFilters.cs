@@ -53,7 +53,7 @@ public sealed partial class IndexMappingReportViewModelTests
         Assert.Equal(0.04, selected.Margin);
         Assert.NotEmpty(selected.TopCandidates);
         Assert.Equal(2, selected.TopCandidates.Count);
-        Assert.Contains("#1 diff45", selected.TopCandidates[0].Display);
+        Assert.Contains("#1 diff45", selected.TopCandidates[0].Display, StringComparison.Ordinal);
     }
 
 

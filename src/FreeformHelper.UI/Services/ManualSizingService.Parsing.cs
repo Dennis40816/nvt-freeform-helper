@@ -95,7 +95,7 @@ public sealed partial class ManualSizingService
                 continue;
             }
 
-            if (part.Contains('-')) // Handle range (e.g., "1-5")
+            if (part.Contains('-', StringComparison.Ordinal)) // Handle range (e.g., "1-5")
             {
                 var rangeParts = part.Split('-', StringSplitOptions.RemoveEmptyEntries);
                 if (rangeParts.Length != 2)

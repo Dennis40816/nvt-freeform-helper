@@ -271,7 +271,7 @@ internal static class NotchExportSelectionProjectionBuilder
     {
         field = string.Empty;
         value = string.Empty;
-        var index = term.IndexOf('=');
+        var index = term.IndexOf('=', StringComparison.Ordinal);
         if (index <= 0 || index >= term.Length - 1)
         {
             return false;

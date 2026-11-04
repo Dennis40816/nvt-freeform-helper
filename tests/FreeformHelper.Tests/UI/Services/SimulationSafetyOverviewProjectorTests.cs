@@ -33,7 +33,7 @@ public sealed class SimulationSafetyOverviewProjectorTests
         Assert.False(projection.HasAudit);
         Assert.False(projection.HasRisk);
         Assert.Equal("Simulation not run", projection.StatusText);
-        Assert.Contains("Run Simulation", projection.SummaryText);
+        Assert.Contains("Run Simulation", projection.SummaryText, StringComparison.Ordinal);
 
         var unavailable = SimulationSafetyOverviewProjector.Project(
             null,
@@ -138,7 +138,7 @@ public sealed class SimulationSafetyOverviewProjectorTests
         Assert.True(projection.NeedsAttention);
         Assert.Equal("EMS risk", projection.StatusText);
         Assert.Equal("492", projection.MaxAfterText);
-        Assert.Contains("REG 10/D72", projection.HighRiskDiffsText);
+        Assert.Contains("REG 10/D72", projection.HighRiskDiffsText, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public sealed class SimulationSafetyOverviewProjectorTests
         Assert.False(projection.HasRisk);
         Assert.True(projection.NeedsAttention);
         Assert.Equal("EMS OK (stale)", projection.StatusText);
-        Assert.Contains("Refresh Simulation", projection.SummaryText);
+        Assert.Contains("Refresh Simulation", projection.SummaryText, StringComparison.Ordinal);
     }
 
     [Fact]

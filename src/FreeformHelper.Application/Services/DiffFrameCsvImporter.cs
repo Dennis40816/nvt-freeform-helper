@@ -257,7 +257,7 @@ public static class DiffFrameCsvImporter
         var trimmed = line.Trim();
         return trimmed.Length > 0 &&
                trimmed.EndsWith(':') &&
-               !trimmed.Contains(',');
+               !trimmed.Contains(',', StringComparison.Ordinal);
     }
 
     private static Dictionary<string, string> ParseNamedFields(string line)

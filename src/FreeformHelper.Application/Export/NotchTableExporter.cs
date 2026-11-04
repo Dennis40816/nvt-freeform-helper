@@ -93,7 +93,7 @@ public sealed class NotchTableExporter
         // RFC4180-ish: escape quotes by doubling them.
         // We already wrap the field with quotes.
         s ??= string.Empty;
-        return s.Replace("\"", "\"\"");
+        return s.Replace("\"", "\"\"", StringComparison.Ordinal);
     }
 
     private static string ToCsvVersionLabel(NotchAlgorithmVersion version)

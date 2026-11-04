@@ -259,7 +259,7 @@ public sealed partial class NotchExportSelectionViewModelTests
 
         Assert.Equal("Search by row / diff / mapping / CAD...", vm.SearchWatermarkText);
         Assert.True(vm.HasHeaderFilterChip);
-        Assert.Contains("Header:", vm.HeaderFilterChipText);
+        Assert.Contains("Header:", vm.HeaderFilterChipText, StringComparison.Ordinal);
     }
 
 

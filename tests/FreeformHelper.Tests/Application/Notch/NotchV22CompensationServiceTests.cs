@@ -696,7 +696,7 @@ public sealed class NotchV22CompensationServiceTests
         var debug = Assert.Single(result.RegularDebugInfos);
         var legacyTrace = Assert.Single(debug.ToFullRuleTrace);
         Assert.Equal("legacy.inlineGate", legacyTrace.Rule);
-        Assert.Contains(debug.ToFullRuleCode, legacyTrace.Detail);
+        Assert.Contains(debug.ToFullRuleCode, legacyTrace.Detail, StringComparison.Ordinal);
     }
 
     private static RegularGrid CreateGrid(double[] widths, double[] heights)

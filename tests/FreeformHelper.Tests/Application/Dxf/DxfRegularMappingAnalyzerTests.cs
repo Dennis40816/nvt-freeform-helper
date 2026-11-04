@@ -344,8 +344,8 @@ public sealed class DxfRegularMappingAnalyzerTests
         var duplicateIssues = res.Report.Issues.Where(i => i.Kind == DxfRegularMappingIssueKind.DuplicateDiff).ToList();
         Assert.Equal(2, duplicateIssues.Count);
         Assert.All(duplicateIssues, issue => Assert.Equal(324, issue.DxfIndex));
-        Assert.Contains("IC1", duplicateIssues[0].Message);
-        Assert.Contains("shared by CAD 61, 62", duplicateIssues[0].Message);
+        Assert.Contains("IC1", duplicateIssues[0].Message, StringComparison.Ordinal);
+        Assert.Contains("shared by CAD 61, 62", duplicateIssues[0].Message, StringComparison.Ordinal);
     }
 
     [Fact]
