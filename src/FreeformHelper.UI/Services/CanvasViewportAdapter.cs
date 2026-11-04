@@ -98,7 +98,7 @@ public sealed class CanvasViewportAdapter
 
     private void QueueInitialFit()
     {
-        Dispatcher.UIThread.Post(FitToContent, DispatcherPriority.Loaded);
+        _canvas.Dispatcher.Post(FitToContent, DispatcherPriority.Loaded);
     }
 
     private void FitToContent()
