@@ -2,6 +2,7 @@
 
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
@@ -24,7 +25,7 @@ public sealed class UiEventFailureTests
         HeadlessSessionGuardAttribute.CloseAtTestEnd(owner);
         owner.Show();
 
-        UiEventProbe.Click(view, "EditCascadeDetailsButton_Click");
+        SettingsGeneralSectionViewPrivateAccess.EditCascadeDetailsButton_Click(view, view, new RoutedEventArgs());
 
         var report = Assert.Single(probe.Reports);
         Assert.Equal("Settings.CascadeDetails", report.Operation);
@@ -45,7 +46,7 @@ public sealed class UiEventFailureTests
         HeadlessSessionGuardAttribute.CloseAtTestEnd(window);
         window.Show();
 
-        UiEventProbe.Click(window, "CopyAll_Click");
+        DxfOverlapReportWindowPrivateAccess.CopyAll_Click(window, window, new RoutedEventArgs());
 
         var report = Assert.Single(probe.Reports);
         Assert.Equal("DxfOverlap.CopyAll", report.Operation);
@@ -67,7 +68,7 @@ public sealed class UiEventFailureTests
         };
         HeadlessSessionGuardAttribute.CloseAtTestEnd(window);
 
-        UiEventProbe.Click(window, "CopyAll_Click");
+        DxfOverlapReportWindowPrivateAccess.CopyAll_Click(window, window, new RoutedEventArgs());
 
         Assert.Equal("DxfOverlap.CopyAll failed: clipboard unavailable", helper.StatusText);
     }

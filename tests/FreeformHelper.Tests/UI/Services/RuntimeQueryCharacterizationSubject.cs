@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.IO.Pipes;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -24,13 +24,9 @@ internal static class RuntimeQueryCharacterizationSubject
     public static ParsedCommandLine ParseCommandLine(string[] args)
     {
         // The private parser is the only seam that exposes the timeout without timing an IPC round trip.
-        var method = typeof(RuntimeQueryCommandLine).GetMethod("TryParseCommandLine", BindingFlags.Static | BindingFlags.NonPublic)
-            ?? throw new InvalidOperationException("The command-line parser entry point is missing.");
-        object?[] parameters = [args, null, null, null, null, null];
-        var parsed = (bool)method.Invoke(null, parameters)!;
-        return new ParsedCommandLine(
-            parsed, (string)parameters[1]!, (Dictionary<string, string>)parameters[2]!,
-            (int)parameters[3]!, (bool)parameters[4]!, (string?)parameters[5]);
+        var parsed = RuntimeQueryCommandLinePrivateAccess.TryParseCommandLine(
+            null, args, out var command, out var commandArgs, out var timeoutMs, out var prettyJson, out var error);
+        return new ParsedCommandLine(parsed, command, commandArgs, timeoutMs, prettyJson, error);
     }
 
     public static CommandLineResult HandleCommandLine(string[] args)

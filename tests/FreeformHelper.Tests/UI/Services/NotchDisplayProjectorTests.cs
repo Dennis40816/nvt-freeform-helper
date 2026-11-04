@@ -1,11 +1,9 @@
 using System.Collections.ObjectModel;
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
-using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
@@ -136,15 +134,13 @@ public sealed class NotchDisplayProjectorTests
         vm.SelectedNotchCompensationModelOption = Assert.Single(
             vm.NotchCompensationModelOptions,
             static option => option.Value == NotchCompensationModel.Disabled);
-        var vmType = typeof(FreeformHelperViewModel);
-        const BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.NonPublic;
-        vmType.GetField("_grid", fieldFlags)!.SetValue(vm, grid);
-        vmType.GetField("_cad", fieldFlags)!.SetValue(vm, new CadPadSet([cad]));
-        var project = Assert.IsType<ProjectFile>(vmType.GetField("_projectFile", fieldFlags)!.GetValue(vm));
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = grid;
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet([cad]);
+        var project = FreeformHelperViewModelPrivateAccess.ProjectFile(vm);
         project.Settings.Notch.ComputationMode = NotchComputationMode.LegacyRegularAnchor;
         vm.CadIndexMaps.OutputFwDiffIndexByCadId.Add(cad.Id, 0);
         vm.CadIndexMaps.IcIndexByCadId.Add(cad.Id, 0);
-        vmType.GetMethod("InvalidateWorkflowDataSnapshot", fieldFlags)!.Invoke(vm, null);
+        vm.InvalidateWorkflowDataSnapshot();
 
         var snapshot = Assert.IsType<PadInspectorSnapshot>(vm.BuildCadPadInspectorSnapshot(
             cad.Id, includeNotchRowEligibilityDetails: false));

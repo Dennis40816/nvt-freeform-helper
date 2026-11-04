@@ -1,9 +1,9 @@
-using System.Reflection;
 using System.Text.Json;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -20,7 +20,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     {
         var shell = new ShellViewModel { IsDevPageAvailable = true };
         var vm = shell.FreeformHelper;
-        SetPrivateField(vm, "_grid", BuildValidationGrid());
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = BuildValidationGrid();
         vm.NotchCacheForTests.LastGeneratedTable = table;
         return shell;
     }
@@ -188,13 +188,6 @@ public sealed partial class RuntimeQueryUseCaseTests
             new Point2(minX, maxY),
         });
         return new CadPad(id, $"CAD{id}", "L1", polygon);
-    }
-
-    private static void SetPrivateField(object target, string fieldName, object? value)
-    {
-        var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        field!.SetValue(target, value);
     }
 
     private static void AssertTargetPayloadMatches(JsonElement payload, NotchV22TargetAllocation expected)
