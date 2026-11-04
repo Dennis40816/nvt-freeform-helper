@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -8,10 +7,6 @@ namespace FreeformHelper.Application.Services;
 /// <summary>
 /// Assigns a contiguous DXF index to CAD output pads based on physical position and <see cref="ScanOrder"/>.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance API is intentionally preserved for service call-site stability.")]
 public sealed class DxfIndexAssigner
 {
     public static (int Row, int Col) ResolveGridCell(RegularGrid grid, Point2 centroid)

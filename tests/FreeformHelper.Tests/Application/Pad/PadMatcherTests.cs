@@ -28,7 +28,7 @@ public sealed class PadMatcherTests
     [Fact]
     public void Match_Overlap_CreatesBidirectionalLinks_WhenCadSpansMultipleRegularPads()
     {
-        var grid = new RegularGridBuilder().BuildFromSettings(new GridSettings
+        var grid = RegularGridBuilder.BuildFromSettings(new GridSettings
         {
             XChannels = 2,
             YChannels = 1,
@@ -91,7 +91,7 @@ public sealed class PadMatcherTests
 
     private static (CadPadSet cad, RegularGrid grid) BuildPartialCoverageCase()
     {
-        var grid = new RegularGridBuilder().BuildFromSettings(new GridSettings
+        var grid = RegularGridBuilder.BuildFromSettings(new GridSettings
         {
             XChannels = 3,
             YChannels = 1,
@@ -138,7 +138,7 @@ public sealed class PadMatcherTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         var cadPads = new List<CadPad>();
         foreach (var reg in grid.Pads)
         {

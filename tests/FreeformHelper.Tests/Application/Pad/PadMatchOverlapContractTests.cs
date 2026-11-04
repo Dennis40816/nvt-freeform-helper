@@ -273,7 +273,7 @@ public sealed class PadMatchOverlapContractTests
     [Fact]
     public void Match_ProgressKeepsBothPhaseIntervalsAndDuplicateCompletion()
     {
-        var grid = new RegularGridBuilder().BuildFromSettings(new GridSettings
+        var grid = RegularGridBuilder.BuildFromSettings(new GridSettings
         {
             XChannels = 250,
             YChannels = 1,

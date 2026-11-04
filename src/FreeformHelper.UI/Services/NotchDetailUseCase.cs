@@ -7,9 +7,6 @@ namespace FreeformHelper.UI.Services;
 
 public sealed class NotchDetailUseCase
 {
-    private static readonly NotchV22ResolvedResultService _sharedResolvedResultService = new();
-    private readonly NotchV22ResolvedResultService _resolvedResultService = _sharedResolvedResultService;
-
     public static NotchV22CompensationResult BuildCompensation(
         CadPad cadPad,
         RegularGrid grid,
@@ -46,7 +43,7 @@ public sealed class NotchDetailUseCase
             : compensation with { CombinedRatio = effectiveCombinedRatio };
     }
 
-    public NotchV22ResolvedResult BuildResolvedResult(
+    public static NotchV22ResolvedResult BuildResolvedResult(
         CadPad cadPad,
         NotchV22CompensationResult compensation,
         double strictOverlapRatio,
@@ -54,7 +51,7 @@ public sealed class NotchDetailUseCase
         int? anchorDiffIndex = null,
         NotchV22TargetAllocationAreaMode allocationAreaMode = NotchV22TargetAllocationAreaMode.SourceAreaDominant)
     {
-        return _resolvedResultService.Build(
+        return NotchV22ResolvedResultService.Build(
             cadPad,
             compensation,
             strictOverlapRatio,
@@ -76,7 +73,7 @@ public sealed class NotchDetailUseCase
             request.StrictOverlapRatio,
             request.EnableToFullRuleEngine,
             request.EnableToFullRuleTrace);
-        return _sharedResolvedResultService.Build(
+        return NotchV22ResolvedResultService.Build(
             request.CadPad,
             compensation,
             request.StrictOverlapRatio,
@@ -107,7 +104,7 @@ public sealed class NotchDetailUseCase
             request.AnchorDiffIndex,
             request.AllocationAreaMode);
 
-    public NotchDetailViewModel Build(
+    public static NotchDetailViewModel Build(
         CadPad cadPad,
         int? dxfIndex,
         RegularGrid grid,

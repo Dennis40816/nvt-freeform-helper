@@ -26,7 +26,7 @@ public sealed class NotchDisplayProjectorTests
         var cad = TestGeometryFactory.CreateCadPad(1, "PAD", 0, 0, 10, 10);
         var compensation = NotchV22CompensationService.Compute(
             cad, grid, enableToRegular: true, enableToFull: false);
-        var resolved = new NotchV22ResolvedResultService().Build(
+        var resolved = NotchV22ResolvedResultService.Build(
             cad,
             compensation,
             strictOverlapRatio: 0.1,

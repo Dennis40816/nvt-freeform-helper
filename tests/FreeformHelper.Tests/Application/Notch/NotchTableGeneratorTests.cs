@@ -284,7 +284,7 @@ public sealed class NotchTableGeneratorTests
             switches.EnableToRegular, switches.EnableToFull,
             settings.Notch.EnableToFullRuleEngine, settings.Notch.EnableToFullRuleTrace,
             false, settings.Notch.BoundaryVirtualAreaCapRatio, 0.001, anchorIc, sourceDiff, areaMode);
-        var resolved = new NotchV22ResolvedResultService().Build(
+        var resolved = NotchV22ResolvedResultService.Build(
             cad.Pads[0], compensation, 0.001, anchorIc, sourceDiff, areaMode, identity);
         var batch = new NotchTableGenerator().ResolveCadAllocationBatch(
             cad, grid, settings, cadOutputFwDiffIndexByCadId: new Dictionary<int, int> { [cad.Pads[0].Id] = sourceDiff },
@@ -784,7 +784,7 @@ public sealed class NotchTableGeneratorTests
             enableToFullRuleTrace: settings.Notch.EnableToFullRuleTrace,
             enableBoundaryVirtualAreaCap: settings.Notch.EnableBoundaryVirtualAreaCap,
             boundaryVirtualAreaCapRatio: settings.Notch.BoundaryVirtualAreaCapRatio);
-        var warmResolved = new NotchV22ResolvedResultService().Build(
+        var warmResolved = NotchV22ResolvedResultService.Build(
             target,
             NotchV22CompensationService.Compute(context),
             strictOverlapRatio,
@@ -871,7 +871,7 @@ public sealed class NotchTableGeneratorTests
             allCadPads: cad.Pads,
             activeRegularPadIds: activeRegularPadIds,
             strictOverlapRatioOverride: 0.5);
-        var warmResolved = new NotchV22ResolvedResultService().Build(
+        var warmResolved = NotchV22ResolvedResultService.Build(
             target,
             compensation,
             strictOverlapRatio: 0.5,

@@ -23,7 +23,7 @@ public sealed class NotchV22ResolvedResultServiceTests
             enableToRegular: true,
             enableToFull: true,
             allCadPads: allCadPads);
-        var resolved = new NotchV22ResolvedResultService().Build(
+        var resolved = NotchV22ResolvedResultService.Build(
             cad,
             compensation,
             strictOverlapRatio: 0.001,
@@ -55,7 +55,7 @@ public sealed class NotchV22ResolvedResultServiceTests
             enableToRegular: true,
             enableToFull: true,
             allCadPads: allCadPads);
-        var resolved = new NotchV22ResolvedResultService().Build(
+        var resolved = NotchV22ResolvedResultService.Build(
             cad,
             compensation,
             strictOverlapRatio: 0.001);

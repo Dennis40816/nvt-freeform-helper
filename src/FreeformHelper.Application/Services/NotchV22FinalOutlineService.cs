@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 
@@ -8,10 +7,6 @@ namespace FreeformHelper.Application.Services;
 /// <summary>
 /// Builds Stage 3 (final) outline polygons for Notch 2.2 canvas preview.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance API is intentionally preserved for service call-site stability.")]
 public sealed class NotchV22FinalOutlineService
 {
     private const double AreaEpsilon = 1e-12;
@@ -20,7 +15,7 @@ public sealed class NotchV22FinalOutlineService
     /// Produces a compact final outline that always contains the CAD body and
     /// expanded To Full region in one visual boundary.
     /// </summary>
-    public IReadOnlyList<Polygon2> Build(
+    public static IReadOnlyList<Polygon2> Build(
         CadPad cadPad,
         IReadOnlyList<Polygon2> appliedToFullPolygons,
         bool isToFullEnabled)

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 
@@ -6,11 +5,7 @@ namespace FreeformHelper.Application.Services;
 
 public sealed partial class CadOutputFwDiffIndexAssignmentService
 {
-    [SuppressMessage(
-        "Performance",
-        "CA1822:Mark members as static",
-        Justification = "Instance API is intentionally preserved for ViewModel service call-site stability.")]
-    public CadOutputFwDiffIndexAssignmentResult Assign(
+    public static CadOutputFwDiffIndexAssignmentResult Assign(
         IReadOnlyList<CadPad> orderedPads,
         RegularGrid? grid,
         GridSettings gridSettings,

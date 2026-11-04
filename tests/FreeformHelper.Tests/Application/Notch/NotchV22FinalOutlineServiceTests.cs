@@ -10,7 +10,6 @@ public sealed class NotchV22FinalOutlineServiceTests
     [Fact]
     public void Build_WhenCadBodyAndAppliedRectFormFullFinalOutline_ReturnsSingleOuterPolygon()
     {
-        var service = new NotchV22FinalOutlineService();
         var cadPad = new CadPad(
             id: 4818,
             name: "PAD_4819",
@@ -35,7 +34,7 @@ public sealed class NotchV22FinalOutlineServiceTests
             }),
         };
 
-        var result = service.Build(cadPad, appliedToFullPolygons, isToFullEnabled: true);
+        var result = NotchV22FinalOutlineService.Build(cadPad, appliedToFullPolygons, isToFullEnabled: true);
 
         var polygon = Assert.Single(result);
         Assert.True(polygon.Area() > 24.2782 && polygon.Area() < 24.2784);

@@ -20,7 +20,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var cadPads = BuildCadPads(grid);
@@ -41,8 +41,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             seeds[secondRow.Cads[i].Id] = secondRowDiffs[i];
         }
 
-        var service = new CadOutputFwDiffIndexAssignmentService();
-        var result = service.Assign(
+        var result = CadOutputFwDiffIndexAssignmentService.Assign(
             ordered,
             grid,
             gridSettings,
@@ -79,7 +78,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var cadPads = BuildCadPads(grid);
@@ -95,8 +94,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             [row.Cads[3].Id] = rowDiffs[3],
         };
 
-        var service = new CadOutputFwDiffIndexAssignmentService();
-        var result = service.Assign(
+        var result = CadOutputFwDiffIndexAssignmentService.Assign(
             ordered,
             grid,
             gridSettings,
@@ -127,7 +125,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             ActiveAreaHeight = 1,
             BoundsPaddingRatio = 0,
         };
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
         var ordered = DxfIndexAssigner.OrderPads(
             BuildCadPads(grid),
@@ -140,16 +138,15 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             [first.Id] = 10,
             [second.Id] = 11,
         };
-        var service = new CadOutputFwDiffIndexAssignmentService();
 
-        var absent = service.Assign(
+        var absent = CadOutputFwDiffIndexAssignmentService.Assign(
             ordered,
             useGrid ? grid : null,
             gridSettings,
             CadOutputFwDiffAutoMode.StrictUnique,
             strictSeeds,
             manualOverrides: null);
-        var duplicate = service.Assign(
+        var duplicate = CadOutputFwDiffIndexAssignmentService.Assign(
             ordered,
             useGrid ? grid : null,
             gridSettings,
@@ -194,7 +191,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             BoundsPaddingRatio = 0,
             ScanOrder = ScanOrder.LeftToRight_TopToBottom,
         };
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
         var cadIdsByCell = new Dictionary<(int Row, int Col), int>
         {
@@ -212,7 +209,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             .ToDictionary(static item => item.Id, static item => item.DiffIndex);
         var duplicateOverrides = ordered.ToDictionary(static pad => pad.Id, static _ => 77);
 
-        var result = new CadOutputFwDiffIndexAssignmentService().Assign(
+        var result = CadOutputFwDiffIndexAssignmentService.Assign(
             ordered,
             grid,
             gridSettings,
@@ -248,7 +245,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var cadPads = BuildCadPads(grid);
@@ -263,8 +260,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             [rows[1].Cads[1].Id] = 43,
         };
 
-        var service = new CadOutputFwDiffIndexAssignmentService();
-        var result = service.Assign(
+        var result = CadOutputFwDiffIndexAssignmentService.Assign(
             ordered,
             grid,
             gridSettings,

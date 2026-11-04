@@ -20,7 +20,7 @@ public sealed class DxfRegularMappingAnalyzerTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var cadPads = new List<CadPad>();
@@ -82,7 +82,7 @@ public sealed class DxfRegularMappingAnalyzerTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var left = grid.GetPad(0, 0).Bounds;
@@ -119,7 +119,7 @@ public sealed class DxfRegularMappingAnalyzerTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var cad = new CadPadSet(new[]
@@ -162,7 +162,7 @@ public sealed class DxfRegularMappingAnalyzerTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var cadPads = new List<CadPad>();
@@ -204,7 +204,7 @@ public sealed class DxfRegularMappingAnalyzerTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var cad = new CadPadSet(new[]
@@ -247,7 +247,7 @@ public sealed class DxfRegularMappingAnalyzerTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var cad = new CadPadSet(new[]
@@ -285,7 +285,7 @@ public sealed class DxfRegularMappingAnalyzerTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
 
         var cad = new CadPadSet(new[]
@@ -317,7 +317,7 @@ public sealed class DxfRegularMappingAnalyzerTests
             BoundsPaddingRatio = 0,
         };
 
-        var grid = new RegularGridBuilder().BuildFromSettings(gridSettings);
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
         DiffIndexMapper.ApplyMapping(grid, gridSettings);
         var left = grid.GetPad(0, 0).Bounds;
         var right = grid.GetPad(0, 1).Bounds;

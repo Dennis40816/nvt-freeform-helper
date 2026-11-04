@@ -270,7 +270,7 @@ public sealed class FreeformDetectorTests
             BoundsPaddingRatio = 0,
         };
 
-        return new RegularGridBuilder().BuildFromSettings(settings);
+        return RegularGridBuilder.BuildFromSettings(settings);
     }
 
     private static CadPadSet BuildCadPadSet(int id, double minX, double minY, double maxX, double maxY)

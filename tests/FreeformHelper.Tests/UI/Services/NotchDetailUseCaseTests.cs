@@ -28,10 +28,9 @@ public sealed class NotchDetailUseCaseTests
 
         var cad = TestGeometryFactory.CreateCadPad(7, "signal", 0, 0, 20, 10);
         var settings = new ProjectSettings();
-        var useCase = new NotchDetailUseCase();
 
-        var compatibilityDetail = useCase.Build(cad, dxfIndex: 10, grid, settings);
-        var resolved = useCase.BuildResolvedResult(
+        var compatibilityDetail = NotchDetailUseCase.Build(cad, dxfIndex: 10, grid, settings);
+        var resolved = NotchDetailUseCase.BuildResolvedResult(
             cad,
             NotchDetailUseCase.BuildCompensation(cad, grid, settings),
             strictOverlapRatio: 0.001,

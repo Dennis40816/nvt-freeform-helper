@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
@@ -9,15 +8,8 @@ namespace FreeformHelper.UI.Services;
 /// Provides a service layer for building <see cref="RegularGrid"/> objects.
 /// This service orchestrates the process of grid construction and diff-index mapping.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class GridBuildService
 {
-    // Private instance of the underlying application service for grid building.
-    private readonly RegularGridBuilder _gridBuilder = new();
-
     /// <summary>
     /// Builds a <see cref="RegularGrid"/> based on the provided CAD pads (optional),
     /// grid settings, and the specified alignment mode.
@@ -26,18 +18,18 @@ public sealed class GridBuildService
     /// <param name="settings">The <see cref="GridSettings"/> containing parameters for grid construction.</param>
     /// <param name="alignmentMode">The <see cref="GridAlignmentMode"/> to dictate how the grid's dimensions are established.</param>
     /// <returns>A newly constructed <see cref="RegularGrid"/>.</returns>
-    public RegularGrid Build(CadPadSet? cad, GridSettings settings, GridAlignmentMode alignmentMode)
+    public static RegularGrid Build(CadPadSet? cad, GridSettings settings, GridAlignmentMode alignmentMode)
     {
         RegularGrid grid;
 
         // Decide whether to build the grid from CAD bounds or from explicit settings.
         if (alignmentMode == GridAlignmentMode.FromCadBounds && cad is not null)
         {
-            grid = _gridBuilder.BuildFromCadBounds(cad, settings);
+            grid = RegularGridBuilder.BuildFromCadBounds(cad, settings);
         }
         else
         {
-            grid = _gridBuilder.BuildFromSettings(settings, alignmentMode);
+            grid = RegularGridBuilder.BuildFromSettings(settings, alignmentMode);
         }
 
         // Apply diff-index mapping to the newly built grid.
@@ -51,7 +43,7 @@ public sealed class GridBuildService
     /// <param name="layerPads">CAD pads from the selected regular source layer.</param>
     /// <param name="settings">The <see cref="GridSettings"/> containing channel and scan settings.</param>
     /// <returns>A newly constructed <see cref="RegularGrid"/>.</returns>
-    public RegularGrid BuildFromDxfLayer(CadPadSet layerPads, GridSettings settings)
+    public static RegularGrid BuildFromDxfLayer(CadPadSet layerPads, GridSettings settings)
     {
         var grid = DxfRegularLayerGridBuilder.BuildFromLayer(layerPads, settings);
         DiffIndexMapper.ApplyMapping(grid, settings);

@@ -1,4 +1,5 @@
 using System.Globalization;
+using FreeformHelper.Application.Services;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -20,7 +21,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var visiblePads = CadPads.ToList();
-        var bucketIds = _cadAreaBucketService.ResolveBucketMembers(
+        var bucketIds = CadAreaBucketService.ResolveBucketMembers(
             visiblePads,
             (double)AreaBucketTolerance,
             anchorCadPadId);

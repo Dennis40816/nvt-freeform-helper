@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -9,10 +8,6 @@ namespace FreeformHelper.Application.Services;
 /// Constructs a <see cref="RegularGrid"/> based on a variety of settings,
 /// allowing for uniform or non-uniform cell sizes.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance API is intentionally preserved for service call-site stability.")]
 public sealed class RegularGridBuilder
 {
     /// <summary>
@@ -21,7 +16,7 @@ public sealed class RegularGridBuilder
     /// <param name="cad">The CAD pad set to derive the grid bounds from.</param>
     /// <param name="settings">The settings controlling the grid's dimensions and properties.</param>
     /// <returns>A new <see cref="RegularGrid"/>.</returns>
-    public RegularGrid BuildFromCadBounds(CadPadSet cad, GridSettings settings)
+    public static RegularGrid BuildFromCadBounds(CadPadSet cad, GridSettings settings)
     {
         settings.ValidateOrThrow();
 
@@ -46,7 +41,7 @@ public sealed class RegularGridBuilder
     /// </summary>
     /// <param name="settings">The settings defining the grid's dimensions and active area.</param>
     /// <returns>A new <see cref="RegularGrid"/>.</returns>
-    public RegularGrid BuildFromSettings(GridSettings settings)
+    public static RegularGrid BuildFromSettings(GridSettings settings)
     {
         return BuildFromSettings(settings, settings.AlignmentMode);
     }
@@ -57,7 +52,7 @@ public sealed class RegularGridBuilder
     /// <param name="settings">The settings defining the grid's dimensions and active area.</param>
     /// <param name="alignmentMode">The alignment mode to apply for this build request.</param>
     /// <returns>A new <see cref="RegularGrid"/>.</returns>
-    public RegularGrid BuildFromSettings(GridSettings settings, GridAlignmentMode alignmentMode)
+    public static RegularGrid BuildFromSettings(GridSettings settings, GridAlignmentMode alignmentMode)
     {
         settings.ValidateOrThrow();
 

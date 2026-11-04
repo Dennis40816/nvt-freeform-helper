@@ -12,9 +12,7 @@ namespace FreeformHelper.Application.Services;
 /// </summary>
 public sealed class NotchV22ResolvedResultService
 {
-    private readonly NotchV22FinalOutlineService _finalOutlineService = new();
-
-    public NotchV22ResolvedResult Build(
+    public static NotchV22ResolvedResult Build(
         CadPad cadPad,
         NotchV22CompensationResult compensation,
         double strictOverlapRatio,
@@ -33,7 +31,7 @@ public sealed class NotchV22ResolvedResultService
             ? compensation.ToFullCandidatePolygons
             : Array.Empty<Polygon2>();
         var stage3FinalOutlinePolygons = compensation.IsToFullEnabled
-            ? _finalOutlineService.Build(cadPad, compensation.ToFullPolygons, compensation.IsToFullEnabled)
+            ? NotchV22FinalOutlineService.Build(cadPad, compensation.ToFullPolygons, compensation.IsToFullEnabled)
             : Array.Empty<Polygon2>();
         var targetAllocation = NotchV22TargetAllocationService.Build(
             cadPad,
