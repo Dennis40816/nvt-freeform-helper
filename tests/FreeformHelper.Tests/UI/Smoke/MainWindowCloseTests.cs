@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using Avalonia.Headless.XUnit;
-using Avalonia.Threading;
 using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
@@ -28,7 +27,7 @@ public sealed class MainWindowCloseTests
         finally
         {
             prompt.TrySetResult(null);
-            await Dispatcher.UIThread.InvokeAsync(static () => { });
+            await HeadlessUiPump.YieldAsync();
         }
     }
 
@@ -43,7 +42,7 @@ public sealed class MainWindowCloseTests
 
         picker.SetException(new InvalidOperationException("save picker unavailable"));
         Assert.False(await save);
-        await Dispatcher.UIThread.InvokeAsync(static () => { });
+        await HeadlessUiPump.YieldAsync();
 
         Assert.True(fixture.Window.IsVisible);
         Assert.True(fixture.Helper.HasUnsavedChanges);
@@ -64,7 +63,7 @@ public sealed class MainWindowCloseTests
             fixture.Window.Close();
             var save = Assert.IsAssignableFrom<Task<bool>>(fixture.Helper.SaveProjectCommand.ExecutionTask);
             Assert.False(await save);
-            await Dispatcher.UIThread.InvokeAsync(static () => { });
+            await HeadlessUiPump.YieldAsync();
 
             Assert.True(fixture.Window.IsVisible);
             Assert.True(fixture.Helper.HasUnsavedChanges);
@@ -136,7 +135,7 @@ public sealed class MainWindowCloseTests
         {
             picker.TrySetResult(null);
             await save;
-            await Dispatcher.UIThread.InvokeAsync(static () => { });
+            await HeadlessUiPump.YieldAsync();
         }
     }
 
@@ -165,7 +164,7 @@ public sealed class MainWindowCloseTests
         {
             picker.TrySetResult(null);
             await menuSave;
-            await Dispatcher.UIThread.InvokeAsync(static () => { });
+            await HeadlessUiPump.YieldAsync();
         }
     }
 

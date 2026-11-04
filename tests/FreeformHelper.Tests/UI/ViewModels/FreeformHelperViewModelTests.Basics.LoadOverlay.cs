@@ -57,7 +57,7 @@ public sealed partial class FreeformHelperViewModelTests
     public async Task YieldCadLoadCanvasOverlayFrame_OnTheUiThread_RunsQueuedRenderWorkFirst()
     {
         var rendered = false;
-        Dispatcher.UIThread.Post(() => rendered = true, DispatcherPriority.Render);
+        HeadlessUiPump.RunningDispatcher.Post(() => rendered = true, DispatcherPriority.Render);
 
         await FreeformHelperViewModel.YieldCadLoadCanvasOverlayFrameAsync();
 

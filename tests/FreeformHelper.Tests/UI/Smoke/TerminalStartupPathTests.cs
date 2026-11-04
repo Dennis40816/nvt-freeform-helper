@@ -3,7 +3,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Platform;
-using Avalonia.Threading;
 using Avalonia.VisualTree;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
@@ -96,7 +95,7 @@ public sealed class TerminalStartupPathTests
             console.Controller,
             projection => ConsoleLogTestSupport.RowTexts(projection, console.SourceId).Count == 8);
         console.Shell.IsConsoleExpanded = true;
-        await FlushUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         Assert.True(console.List.IsVisible);
         Assert.Equal("startup line 0", ConsoleLogTestSupport.RowTexts(console.Controller.Projection, console.SourceId)[0]);
@@ -115,7 +114,7 @@ public sealed class TerminalStartupPathTests
             console.Controller,
             projection => ConsoleLogTestSupport.RowTexts(projection, console.SourceId).Count == 24);
         console.Shell.IsConsoleExpanded = true;
-        await FlushUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         using var frame = console.Window.CaptureRenderedFrame();
         Assert.NotNull(frame);
@@ -137,7 +136,7 @@ public sealed class TerminalStartupPathTests
         using var console = new ConsoleFixture();
 
         console.Shell.IsConsoleExpanded = false;
-        await FlushUiQueueAsync();
+        await HeadlessUiPump.FlushQueueAsync();
 
         Assert.False(console.List.IsEffectivelyVisible);
         Assert.NotEmpty(console.Window.GetVisualDescendants().OfType<ConsoleHeader>());
@@ -215,14 +214,6 @@ public sealed class TerminalStartupPathTests
             Shell.Dispose();
             LogManager.Configuration = _previousConfiguration;
         }
-    }
-
-    private static async Task FlushUiQueueAsync()
-    {
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Loaded);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Render);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
     }
 
     private static int CountBrightPixelsInConsoleBody(ILockedFramebuffer locked, int rowBytes, int width, int height)
