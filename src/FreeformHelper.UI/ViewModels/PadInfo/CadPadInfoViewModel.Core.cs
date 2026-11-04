@@ -33,7 +33,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     private bool _isLoading; // Prevents change tracking during initial loading.
     private decimal _customValueInitial; // The value of CustomValue when the ViewModel was loaded.
     private bool _customValueDirty; // True if CustomValue has been changed from its initial state.
-    private readonly IReadOnlyList<int> _allNotchOwnerCadIds = Array.Empty<int>();
+    private IReadOnlyList<int> _allNotchOwnerCadIds = Array.Empty<int>();
 
     /// <summary>
     /// Gets a value indicating whether multiple CAD pads are being displayed/edited.
@@ -50,45 +50,45 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public string LayerText { get; }
     public string NameText { get; }
     public string CadIdText { get; }
-    public string CentroidText { get; }
-    public string AreaText { get; }
-    public string VertexText { get; }
-    public string IdentityText { get; }
-    public string MatchText { get; }
-    public string MatchDetailsText { get; }
-    public string MatchConfidenceText { get; }
-    public string GeometrySeedValueText { get; }
-    public string NotchRowSummaryText { get; }
-    public string ToRegularRatioText { get; }
-    public string ToFullRatioText { get; }
-    public string ToRegularValueText { get; }
-    public string ToFullValueText { get; }
-    public string CombinedValueText { get; }
-    public string ToFullReasonShortText { get; }
-    public string ToFullReasonFullText { get; }
+    public string CentroidText { get; private set; } = string.Empty;
+    public string AreaText { get; private set; } = string.Empty;
+    public string VertexText { get; private set; } = string.Empty;
+    public string IdentityText { get; private set; } = string.Empty;
+    public string MatchText { get; private set; } = string.Empty;
+    public string MatchDetailsText { get; private set; } = string.Empty;
+    public string MatchConfidenceText { get; private set; } = "-";
+    public string GeometrySeedValueText { get; private set; } = "Unmatched";
+    public string NotchRowSummaryText { get; private set; } = "Notch rows: -";
+    public string ToRegularRatioText { get; private set; } = "Undo NF (To Regular): -";
+    public string ToFullRatioText { get; private set; } = "To Full: -";
+    public string ToRegularValueText { get; private set; } = "-";
+    public string ToFullValueText { get; private set; } = "-";
+    public string CombinedValueText { get; private set; } = "-";
+    public string ToFullReasonShortText { get; private set; } = string.Empty;
+    public string ToFullReasonFullText { get; private set; } = string.Empty;
     public bool HasToFullReason => !string.IsNullOrWhiteSpace(ToFullReasonFullText);
-    public string Stage3AreaText { get; }
+    public string Stage3AreaText { get; private set; } = "Stage3 area: -";
     public string Stage3AreaCompactText => StripKnownPrefix(Stage3AreaText, "Stage3 area:");
-    public string TargetAllocationSummaryText { get; }
+    public string TargetAllocationSummaryText { get; private set; } = "Targets: -";
     public string TargetAllocationCompactText => StripKnownPrefix(TargetAllocationSummaryText, "Targets:");
-    public IReadOnlyList<string> TargetAllocationLines { get; }
-    public IReadOnlyList<PadInfoTargetAllocationViewModel> TargetAllocationItems { get; }
+    public IReadOnlyList<string> TargetAllocationLines { get; private set; } = Array.Empty<string>();
+    public IReadOnlyList<PadInfoTargetAllocationViewModel> TargetAllocationItems { get; private set; } = Array.Empty<PadInfoTargetAllocationViewModel>();
     public bool HasTargetAllocationItems => TargetAllocationItems.Count > 0;
-    public string OwnerSummaryText { get; }
+    public string OwnerSummaryText { get; private set; } = string.Empty;
     public string OwnerSummaryCompactText => string.IsNullOrWhiteSpace(OwnerSummaryText) ? "-" : OwnerSummaryText;
     public bool HasOwnerSummary => !string.IsNullOrWhiteSpace(OwnerSummaryText);
-    public string ToFullDiagnosticsText { get; }
+    public string ToFullDiagnosticsText { get; private set; } = string.Empty;
     public bool HasToFullDiagnosticsText => !string.IsNullOrWhiteSpace(ToFullDiagnosticsText);
-    public IReadOnlyList<NotchOwnerLinkViewModel> NotchOwnerLinks { get; }
-    public IReadOnlyList<string> RuleTraceLines { get; }
+    public IReadOnlyList<NotchOwnerLinkViewModel> NotchOwnerLinks { get; private set; } = Array.Empty<NotchOwnerLinkViewModel>();
+    public IReadOnlyList<string> RuleTraceLines { get; private set; } = Array.Empty<string>();
     public bool HasRuleTrace => RuleTraceLines.Count > 0;
     public string NotchRowCompactText => StripKnownPrefix(NotchRowSummaryText, "Notch rows:");
     public string DebugStatusText => BuildDebugStatusText();
     public ICommand? NotchDetailCommand { get; }
     public ICommand? SelectAreaBucketCommand { get; }
     public bool HasSelectAreaBucketCommand => SelectAreaBucketCommand is not null;
-    public bool HasFocusMatchAction { get; }
-    public bool HasHighlightMatchAction { get; }
+    public bool HasFocusMatchAction { get; private set; }
+    public bool HasHighlightMatchAction { get; private set; }
     public bool HasAnyMatchAction => HasFocusMatchAction || HasHighlightMatchAction;
     public bool HasLocateMatchAction => HasAnyMatchAction;
     public bool HasCadOutputFwDiffOverrideEditor { get; }

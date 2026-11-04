@@ -62,6 +62,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
         _padIds = pads.Select(p => p.Id).ToList();
         SelectedCount = pads.Count;
         IsMulti = pads.Count > 1;
+        _singleCadPadId = IsMulti ? null : pads[0].Id;
 
         Title = IsMulti ? "CAD pads" : "CAD pad";
         Subtitle = IsMulti ? $"Selected: {SelectedCount} pads" : "Single pad";
@@ -88,185 +89,28 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
             : $"CAD {pads[0].Id} · Diff idx {DxfIndexText}";
 
         var cadOutputFwDiffOverrideValue = (int?)null;
-        var notchRowSummaryText = "Notch rows: -";
-        var toRegularRatioText = "Undo NF (To Regular): -";
-        var toFullRatioText = "To Full: -";
-        var stage3AreaText = "Stage3 area: -";
-        var targetAllocationSummaryText = "Targets: -";
-        var targetAllocationLines = new List<string>();
-        var targetAllocationItems = new List<PadInfoTargetAllocationViewModel>();
-        var ownerSummaryText = string.Empty;
-        var toFullDiagnosticsText = string.Empty;
-        var notchOwnerLinks = new List<NotchOwnerLinkViewModel>();
-        var allNotchOwnerCadIds = new List<int>();
-        var ruleTraceLines = new List<string>();
-        var matchConfidenceText = "-";
-        var geometrySeedValueText = "Unmatched";
-        var toRegularValueText = "-";
-        var toFullValueText = "-";
-        var combinedValueText = "-";
-        var toFullReasonShortText = string.Empty;
-        var toFullReasonFullText = string.Empty;
-
         if (IsMulti)
         {
-            var areas = pads.Select(p => p.Area).ToList();
-            AreaText = $"{areas.Min():0.####} - {areas.Max():0.####} {PadInfoUnits.SquareMillimeter}";
-            CentroidText = "Mixed"; // Centroid is mixed for multiple pads.
-            VertexText = PadInfoTextFormatter.RangeText(pads.Select(p => p.Polygon.Vertices.Length));
-            MatchText = "Mixed";
-            MatchDetailsText = "Mixed";
-            geometrySeedValueText = "Mixed";
-            _singleCadPadId = null;
-            HasFocusMatchAction = false;
-            HasHighlightMatchAction = false;
+            ApplyMultiSelectionDisplay(pads);
+        }
+        else if (snapshotCad is not null)
+        {
+            cadOutputFwDiffOverrideValue = ApplySnapshotDisplay(pads[0], snapshotCad);
         }
         else
         {
-            AreaText = $"{pads[0].Area:0.####} {PadInfoUnits.SquareMillimeter}";
-            CentroidText = FormatPoint(pads[0].Centroid);
-            VertexText = pads[0].Polygon.Vertices.Length.ToString(CultureInfo.InvariantCulture);
-            var cadPadId = pads[0].Id;
-            _singleCadPadId = cadPadId;
-
-            if (snapshotCad is not null)
-            {
-                MatchText = snapshotCad.MatchText;
-                MatchDetailsText = snapshotCad.MatchDetailsText;
-                geometrySeedValueText = snapshotCad.MatchText;
-                matchConfidenceText = snapshotCad.MatchedRegularPadIds.Count == 0
-                    ? "-"
-                    : snapshotCad.MatchConfidence.ToString("P0", CultureInfo.InvariantCulture);
-                DxfIndexText = snapshotCad.DxfIndexDisplayText;
-                cadOutputFwDiffOverrideValue = snapshotCad.CadOutputFwDiffOverride;
-                IsDxfIndexAnchor = snapshotCad.IsDxfIndexAnchor;
-                var icText = snapshotCad.IcIndex.HasValue
-                    ? (snapshotCad.IcIndex.Value + 1).ToString(CultureInfo.InvariantCulture)
-                    : "-";
-                IdentityText = $"CAD {cadPadId} · IC {icText} · Diff idx {DxfIndexText}";
-                HasFocusMatchAction = snapshotCad.MatchedRegularPadIds.Count > 0 && _focusCadMatches is not null;
-                HasHighlightMatchAction = snapshotCad.MatchedRegularPadIds.Count > 0 && _highlightCadMatches is not null;
-
-                if (snapshotCad.Notch is { } resolvedDisplayInput)
-                {
-                    notchRowSummaryText = snapshotCad.NotchRowSummary;
-                    var notchDisplay = NotchDisplayProjector.Build(resolvedDisplayInput);
-                    toRegularRatioText = notchDisplay.ToRegularRatioText;
-                    toFullRatioText = notchDisplay.ToFullRatioText;
-                    toRegularValueText = notchDisplay.ToRegularValueText;
-                    toFullValueText = notchDisplay.ToFullValueText;
-                    combinedValueText = notchDisplay.CombinedValueText;
-                    stage3AreaText = notchDisplay.Stage3AreaText;
-                    targetAllocationSummaryText = notchDisplay.TargetAllocationSummaryText;
-                    targetAllocationLines.AddRange(notchDisplay.TargetAllocationLines);
-                    targetAllocationItems.AddRange(notchDisplay.TargetAllocationItems.Select(item =>
-                        PadInfoTargetAllocationViewModel.FromDisplayItem(item, _highlightRegularPads)));
-                    toFullDiagnosticsText = notchDisplay.ToFullDiagnosticsText;
-                    toFullReasonFullText = notchDisplay.ToFullReasonFullText;
-                    toFullReasonShortText = notchDisplay.ToFullReasonShortText;
-                    BuildNotchOwnerLinks(
-                        notchDisplay.DiagnosticEntries,
-                        cadPadId,
-                        _highlightCadOwnerPads,
-                        notchOwnerLinks,
-                        allNotchOwnerCadIds);
-                    ownerSummaryText = notchDisplay.OwnerSummaryText;
-                }
-
-                ruleTraceLines.AddRange(snapshotCad.RuleTrace.Select(PadInspectorRuleTraceFormatter.Format));
-            }
-            else
-            {
-                var matchedLinks = getMatchedRegularLinks?.Invoke(cadPadId)
-                    .OrderByDescending(link => link.RegularCoverage)
-                    .ThenByDescending(link => link.CadCoverage)
-                    .ThenBy(link => link.RegularPadId)
-                    .ToList()
-                    ?? new List<PadMatchLink>();
-                var matchedRegularIds = (getMatchedRegularPadIds?.Invoke(cadPadId) ?? Array.Empty<int>())
-                    .Distinct()
-                    .OrderBy(id => id)
-                    .ToList();
-                MatchText = BuildCadMatchText(matchedRegularIds, matchedLinks, getRegularPadIcDiff);
-                MatchDetailsText = BuildCadMatchDetailsText(matchedRegularIds, matchedLinks, getRegularPadIcDiff);
-                geometrySeedValueText = MatchText;
-                cadOutputFwDiffOverrideValue = getCadOutputFwDiffOverride?.Invoke(cadPadId);
-                IsDxfIndexAnchor = isDxfIndexAnchor?.Invoke(cadPadId) ?? false;
-                HasFocusMatchAction = matchedRegularIds.Count > 0 && _focusCadMatches is not null;
-                HasHighlightMatchAction = matchedRegularIds.Count > 0 && _highlightCadMatches is not null;
-
-                var compensation = getCadV22CompensationPreview?.Invoke(cadPadId);
-                if (compensation.HasValue)
-                {
-                    notchRowSummaryText = "Notch rows: unknown (open from selection inspector)";
-                    var allocation = getCadV22TargetAllocationSummary?.Invoke(cadPadId);
-                    var diagnostics = getCadV22CompensationDiagnostics?.Invoke(cadPadId);
-                    var notchDisplay = NotchDisplayProjector.Build(
-                        compensation.Value.ToRegularRatio,
-                        compensation.Value.ToFullRatio,
-                        compensation.Value.CombinedRatio,
-                        compensation.Value.IsToFullEnabled,
-                        allocation?.Stage3Area,
-                        allocation?.Targets.Select(static target => new NotchDisplayTargetInput(
-                            target.IcIndex,
-                            target.DiffIndex,
-                            target.EffectiveArea,
-                            target.Ratio,
-                            target.RatioPercentRounded,
-                            target.PassesStrictThreshold,
-                            target.IsAnchorDiff,
-                            target.ToFullAppliedRegularCount,
-                            target.RegularCount,
-                            target.RegularAreas.Select(static area => new NotchDisplayRegularAreaInput(
-                                area.RegularPadId,
-                                area.EffectiveArea)).ToList(),
-                            target.RegularPadIds)).ToList(),
-                        diagnostics,
-                        allocation?.TargetCoverageProjection,
-                        notchComputationMode);
-                    toRegularRatioText = notchDisplay.ToRegularRatioText;
-                    toFullRatioText = notchDisplay.ToFullRatioText;
-                    toRegularValueText = notchDisplay.ToRegularValueText;
-                    toFullValueText = notchDisplay.ToFullValueText;
-                    combinedValueText = notchDisplay.CombinedValueText;
-                    stage3AreaText = notchDisplay.Stage3AreaText;
-                    targetAllocationSummaryText = notchDisplay.TargetAllocationSummaryText;
-                    targetAllocationLines.AddRange(notchDisplay.TargetAllocationLines);
-                    targetAllocationItems.AddRange(notchDisplay.TargetAllocationItems.Select(item =>
-                        PadInfoTargetAllocationViewModel.FromDisplayItem(item, _highlightRegularPads)));
-                    toFullDiagnosticsText = notchDisplay.ToFullDiagnosticsText;
-                    toFullReasonFullText = notchDisplay.ToFullReasonFullText;
-                    toFullReasonShortText = notchDisplay.ToFullReasonShortText;
-                    ownerSummaryText = notchDisplay.OwnerSummaryText;
-                    BuildNotchOwnerLinks(
-                        notchDisplay.DiagnosticEntries,
-                        cadPadId,
-                        _highlightCadOwnerPads,
-                        notchOwnerLinks,
-                        allNotchOwnerCadIds);
-                }
-            }
+            cadOutputFwDiffOverrideValue = ApplyCallbackDisplay(
+                pads[0],
+                getMatchedRegularLinks,
+                getMatchedRegularPadIds,
+                getRegularPadIcDiff,
+                getCadOutputFwDiffOverride,
+                isDxfIndexAnchor,
+                getCadV22CompensationPreview,
+                getCadV22CompensationDiagnostics,
+                getCadV22TargetAllocationSummary,
+                notchComputationMode);
         }
-
-        NotchRowSummaryText = notchRowSummaryText;
-        ToRegularRatioText = toRegularRatioText;
-        ToFullRatioText = toFullRatioText;
-        ToRegularValueText = toRegularValueText;
-        ToFullValueText = toFullValueText;
-        CombinedValueText = combinedValueText;
-        ToFullReasonShortText = toFullReasonShortText;
-        ToFullReasonFullText = toFullReasonFullText;
-        Stage3AreaText = stage3AreaText;
-        TargetAllocationSummaryText = targetAllocationSummaryText;
-        TargetAllocationLines = targetAllocationLines;
-        TargetAllocationItems = targetAllocationItems;
-        OwnerSummaryText = ownerSummaryText;
-        ToFullDiagnosticsText = toFullDiagnosticsText;
-        NotchOwnerLinks = notchOwnerLinks;
-        _allNotchOwnerCadIds = allNotchOwnerCadIds;
-        RuleTraceLines = ruleTraceLines;
-        MatchConfidenceText = matchConfidenceText;
-        GeometrySeedValueText = geometrySeedValueText;
 
         var dxfOverrideBase = cadOutputFwDiffOverrideValue
             ?? (dxfIndices.Count > 0 ? dxfIndices[0] : 0);
@@ -296,5 +140,149 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
         ToggleLowFrequencyDetailSectionCommand = new RelayCommand(ToggleLowFrequencyDetailSection);
         ShowGeometryDetails = false;
     }
-}
 
+    private void ApplyMultiSelectionDisplay(IReadOnlyList<CadPad> pads)
+    {
+        var areas = pads.Select(p => p.Area).ToList();
+        AreaText = $"{areas.Min():0.####} - {areas.Max():0.####} {PadInfoUnits.SquareMillimeter}";
+        CentroidText = "Mixed"; // Centroid is mixed for multiple pads.
+        VertexText = PadInfoTextFormatter.RangeText(pads.Select(p => p.Polygon.Vertices.Length));
+        MatchText = "Mixed";
+        MatchDetailsText = "Mixed";
+        GeometrySeedValueText = "Mixed";
+        HasFocusMatchAction = false;
+        HasHighlightMatchAction = false;
+    }
+
+    private void ApplyPadGeometryTexts(CadPad pad)
+    {
+        AreaText = $"{pad.Area:0.####} {PadInfoUnits.SquareMillimeter}";
+        CentroidText = FormatPoint(pad.Centroid);
+        VertexText = pad.Polygon.Vertices.Length.ToString(CultureInfo.InvariantCulture);
+    }
+
+    private int? ApplySnapshotDisplay(CadPad pad, CadPadInspectorSnapshot snapshotCad)
+    {
+        ApplyPadGeometryTexts(pad);
+        var cadPadId = pad.Id;
+        MatchText = snapshotCad.MatchText;
+        MatchDetailsText = snapshotCad.MatchDetailsText;
+        GeometrySeedValueText = snapshotCad.MatchText;
+        MatchConfidenceText = snapshotCad.MatchedRegularPadIds.Count == 0
+            ? "-"
+            : snapshotCad.MatchConfidence.ToString("P0", CultureInfo.InvariantCulture);
+        DxfIndexText = snapshotCad.DxfIndexDisplayText;
+        IsDxfIndexAnchor = snapshotCad.IsDxfIndexAnchor;
+        var icText = snapshotCad.IcIndex.HasValue
+            ? (snapshotCad.IcIndex.Value + 1).ToString(CultureInfo.InvariantCulture)
+            : "-";
+        IdentityText = $"CAD {cadPadId} · IC {icText} · Diff idx {DxfIndexText}";
+        HasFocusMatchAction = snapshotCad.MatchedRegularPadIds.Count > 0 && _focusCadMatches is not null;
+        HasHighlightMatchAction = snapshotCad.MatchedRegularPadIds.Count > 0 && _highlightCadMatches is not null;
+
+        if (snapshotCad.Notch is { } resolvedDisplayInput)
+        {
+            NotchRowSummaryText = snapshotCad.NotchRowSummary;
+            ApplyNotchDisplay(NotchDisplayProjector.Build(resolvedDisplayInput), cadPadId);
+        }
+
+        RuleTraceLines = snapshotCad.RuleTrace.Select(PadInspectorRuleTraceFormatter.Format).ToList();
+        return snapshotCad.CadOutputFwDiffOverride;
+    }
+
+    private int? ApplyCallbackDisplay(
+        CadPad pad,
+        Func<int, IReadOnlyList<PadMatchLink>>? getMatchedRegularLinks,
+        Func<int, IReadOnlyList<int>>? getMatchedRegularPadIds,
+        Func<int, (int IcIndex, int DiffIndex)?>? getRegularPadIcDiff,
+        Func<int, int?>? getCadOutputFwDiffOverride,
+        Func<int, bool>? isDxfIndexAnchor,
+        Func<int, (double ToRegularRatio, double ToFullRatio, double CombinedRatio, bool IsToFullEnabled)?>? getCadV22CompensationPreview,
+        Func<int, string?>? getCadV22CompensationDiagnostics,
+        Func<int, NotchV22TargetAllocationSummary?>? getCadV22TargetAllocationSummary,
+        NotchComputationMode notchComputationMode)
+    {
+        ApplyPadGeometryTexts(pad);
+        var cadPadId = pad.Id;
+        var matchedLinks = getMatchedRegularLinks?.Invoke(cadPadId)
+            .OrderByDescending(link => link.RegularCoverage)
+            .ThenByDescending(link => link.CadCoverage)
+            .ThenBy(link => link.RegularPadId)
+            .ToList()
+            ?? new List<PadMatchLink>();
+        var matchedRegularIds = (getMatchedRegularPadIds?.Invoke(cadPadId) ?? Array.Empty<int>())
+            .Distinct()
+            .OrderBy(id => id)
+            .ToList();
+        MatchText = BuildCadMatchText(matchedRegularIds, matchedLinks, getRegularPadIcDiff);
+        MatchDetailsText = BuildCadMatchDetailsText(matchedRegularIds, matchedLinks, getRegularPadIcDiff);
+        GeometrySeedValueText = MatchText;
+        var cadOutputFwDiffOverrideValue = getCadOutputFwDiffOverride?.Invoke(cadPadId);
+        IsDxfIndexAnchor = isDxfIndexAnchor?.Invoke(cadPadId) ?? false;
+        HasFocusMatchAction = matchedRegularIds.Count > 0 && _focusCadMatches is not null;
+        HasHighlightMatchAction = matchedRegularIds.Count > 0 && _highlightCadMatches is not null;
+
+        var compensation = getCadV22CompensationPreview?.Invoke(cadPadId);
+        if (compensation.HasValue)
+        {
+            NotchRowSummaryText = "Notch rows: unknown (open from selection inspector)";
+            var allocation = getCadV22TargetAllocationSummary?.Invoke(cadPadId);
+            var diagnostics = getCadV22CompensationDiagnostics?.Invoke(cadPadId);
+            ApplyNotchDisplay(
+                NotchDisplayProjector.Build(
+                    compensation.Value.ToRegularRatio,
+                    compensation.Value.ToFullRatio,
+                    compensation.Value.CombinedRatio,
+                    compensation.Value.IsToFullEnabled,
+                    allocation?.Stage3Area,
+                    allocation?.Targets.Select(static target => new NotchDisplayTargetInput(
+                        target.IcIndex,
+                        target.DiffIndex,
+                        target.EffectiveArea,
+                        target.Ratio,
+                        target.RatioPercentRounded,
+                        target.PassesStrictThreshold,
+                        target.IsAnchorDiff,
+                        target.ToFullAppliedRegularCount,
+                        target.RegularCount,
+                        target.RegularAreas.Select(static area => new NotchDisplayRegularAreaInput(
+                            area.RegularPadId,
+                            area.EffectiveArea)).ToList(),
+                        target.RegularPadIds)).ToList(),
+                    diagnostics,
+                    allocation?.TargetCoverageProjection,
+                    notchComputationMode),
+                cadPadId);
+        }
+
+        return cadOutputFwDiffOverrideValue;
+    }
+
+    private void ApplyNotchDisplay(NotchDisplayProjection notchDisplay, int cadPadId)
+    {
+        ToRegularRatioText = notchDisplay.ToRegularRatioText;
+        ToFullRatioText = notchDisplay.ToFullRatioText;
+        ToRegularValueText = notchDisplay.ToRegularValueText;
+        ToFullValueText = notchDisplay.ToFullValueText;
+        CombinedValueText = notchDisplay.CombinedValueText;
+        Stage3AreaText = notchDisplay.Stage3AreaText;
+        TargetAllocationSummaryText = notchDisplay.TargetAllocationSummaryText;
+        TargetAllocationLines = notchDisplay.TargetAllocationLines.ToList();
+        TargetAllocationItems = notchDisplay.TargetAllocationItems.Select(item =>
+            PadInfoTargetAllocationViewModel.FromDisplayItem(item, _highlightRegularPads)).ToList();
+        ToFullDiagnosticsText = notchDisplay.ToFullDiagnosticsText;
+        ToFullReasonFullText = notchDisplay.ToFullReasonFullText;
+        ToFullReasonShortText = notchDisplay.ToFullReasonShortText;
+        var notchOwnerLinks = new List<NotchOwnerLinkViewModel>();
+        var allNotchOwnerCadIds = new List<int>();
+        BuildNotchOwnerLinks(
+            notchDisplay.DiagnosticEntries,
+            cadPadId,
+            _highlightCadOwnerPads,
+            notchOwnerLinks,
+            allNotchOwnerCadIds);
+        NotchOwnerLinks = notchOwnerLinks;
+        _allNotchOwnerCadIds = allNotchOwnerCadIds;
+        OwnerSummaryText = notchDisplay.OwnerSummaryText;
+    }
+}
