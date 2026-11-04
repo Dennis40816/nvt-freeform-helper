@@ -78,7 +78,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
 
         _attachedViewModel.PropertyChanged += OnViewModelPropertyChanged;
         _attachedViewModel.RequestArtifactDetailAsync = ShowArtifactDetailAsync;
-        _attachedViewModel.RequestExportPreviewPngAsync = ExportPreviewPngAsync;
+        _attachedViewModel.RequestExportPreviewPngAsync = ExportPreviewImageAsync;
         _attachedViewModel.RequestSetClipboardTextAsync = SetClipboardTextAsync;
         _attachedViewModel.RequestSaveTextFileAsync = SaveTextFileAsync;
         var viewportAdapter = FindViewportAdapter();
@@ -196,7 +196,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         return true;
     }
 
-    private async Task<bool> ExportPreviewPngAsync()
+    private async Task<bool> ExportPreviewImageAsync()
     {
         var storage = TopLevel.GetTopLevel(this)?.StorageProvider;
         if (storage is null)
@@ -212,6 +212,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             FileTypeChoices = new List<FilePickerFileType>
             {
                 new("PNG") { Patterns = _pngFilePatterns },
+                new("BMP") { Patterns = ["*.bmp"] },
                 new("All files") { Patterns = _allFilesPatterns },
             },
         });
@@ -226,15 +227,14 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             return false;
         }
 
-        await Dispatcher.UIThread.InvokeAsync(RenderOverlay, DispatcherPriority.Render);
+        await Dispatcher.InvokeAsync(RenderOverlay, DispatcherPriority.Render);
         var pixelSize = new PixelSize(
             Math.Max(2, (int)Math.Ceiling(previewHost.Bounds.Width)),
             Math.Max(2, (int)Math.Ceiling(previewHost.Bounds.Height)));
-        var bitmap = new RenderTargetBitmap(pixelSize);
+        using var bitmap = new RenderTargetBitmap(pixelSize);
         bitmap.Render(previewHost);
         await using var stream = File.Open(file.Path.LocalPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        bitmap.Save(stream, PngBitmapEncoderOptions.Default);
-        bitmap.Dispose();
+        PreviewImageWriter.Save(bitmap, stream, file.Path.LocalPath);
         return true;
     }
 

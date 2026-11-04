@@ -8819,16 +8819,6 @@
       "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
-      "syntaxHash": "fbf5c1c4a1ed0d9d1f193ce3b0dfd5c6897aaa4b0b8ae4987b59126d8bb20650",
-      "member": "FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView.ExportPreviewPngAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
       "syntaxHash": "3343389c9f231cd2e41954917054326866ce8b5753281a79e29bf3c397763dda",
       "member": "FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView.SaveTextFileAsync(CoordinatePlannerWorkspaceViewModel.CoordinatePlannerTextExportRequest)",
       "owner": "NFH",

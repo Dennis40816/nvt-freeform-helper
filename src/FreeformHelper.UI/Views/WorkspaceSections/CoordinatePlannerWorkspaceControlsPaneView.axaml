@@ -30,7 +30,7 @@
             <Button Grid.Column="1"
                     Classes="actionGhost actionIconButton"
                     Command="{Binding ExportPreviewPngCommand}"
-                    ToolTip.Tip="Export coordinate preview PNG.">
+                    ToolTip.Tip="Export coordinate preview image (PNG or BMP).">
               <controls:FontIcon Classes="symbols"
                                  Glyph="{x:Static icons:IconGlyphs.ArrowDownward}"/>
             </Button>

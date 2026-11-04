@@ -208,18 +208,23 @@ public sealed class DxfLayerImageExportService
         return new SKPoint((float)x, (float)y);
     }
 
-    private static void SaveImage(SKBitmap bitmap, string outputPath, DxfLayerImageFormat format)
+    /// <summary>
+    /// Encodes the bitmap to the stream in the requested format. BMP is written by <see cref="SkiaBmpEncoder"/>
+    /// because Skia has no BMP encoder.
+    /// </summary>
+    public static void EncodeImage(SKBitmap bitmap, Stream output, DxfLayerImageFormat format)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? ".");
+        ArgumentNullException.ThrowIfNull(bitmap);
+        ArgumentNullException.ThrowIfNull(output);
+        if (format == DxfLayerImageFormat.Bmp)
+        {
+            SkiaBmpEncoder.Write(bitmap, output);
+            return;
+        }
+
         using var image = SKImage.FromBitmap(bitmap);
         using var data = image.Encode(
-            format switch
-            {
-                DxfLayerImageFormat.Png => SKEncodedImageFormat.Png,
-                DxfLayerImageFormat.Bmp => SKEncodedImageFormat.Bmp,
-                DxfLayerImageFormat.Jpg => SKEncodedImageFormat.Jpeg,
-                _ => SKEncodedImageFormat.Png,
-            },
+            format == DxfLayerImageFormat.Jpg ? SKEncodedImageFormat.Jpeg : SKEncodedImageFormat.Png,
             format == DxfLayerImageFormat.Jpg ? 95 : 100);
 
         if (data is null)
@@ -227,7 +232,17 @@ public sealed class DxfLayerImageExportService
             throw new InvalidOperationException("Failed to encode DXF layer image.");
         }
 
+        data.SaveTo(output);
+    }
+
+    private static void SaveImage(SKBitmap bitmap, string outputPath, DxfLayerImageFormat format)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? ".");
+        using var encoded = new MemoryStream();
+        EncodeImage(bitmap, encoded, format);
+
         using var stream = File.Open(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        data.SaveTo(stream);
+        encoded.Position = 0;
+        encoded.CopyTo(stream);
     }
 }
