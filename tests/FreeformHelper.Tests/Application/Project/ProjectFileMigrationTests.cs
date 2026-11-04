@@ -214,7 +214,7 @@ public sealed class ProjectFileMigrationTests
             await store.SaveAsync(output, loaded, CancellationToken.None);
 
             var outJson = File.ReadAllText(output);
-            Assert.Contains("\"legacyFoo\"", outJson);
+            Assert.Contains("\"legacyFoo\"", outJson, StringComparison.Ordinal);
         }
         finally
         {

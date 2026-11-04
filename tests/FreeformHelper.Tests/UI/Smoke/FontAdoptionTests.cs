@@ -137,7 +137,7 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
 
     // The pinned hash is of the LF text; a checkout may convert line endings.
     private static string HashLicenseText(string text) =>
-        Convert.ToHexStringLower(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(text.Replace("\r\n", "\n"))));
+        Convert.ToHexStringLower(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(text.Replace("\r\n", "\n", StringComparison.Ordinal))));
 
     private static void AssertLicenseCopy(string package, string source, string distribution, string relativeOutput)
     {

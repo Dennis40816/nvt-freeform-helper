@@ -60,7 +60,7 @@ public sealed class DxfRegularLayerGridBuilderTests
         var builder = new DxfRegularLayerGridBuilder();
 
         var ex = Assert.Throws<InvalidOperationException>(() => DxfRegularLayerGridBuilder.BuildFromLayer(set, settings));
-        Assert.Contains("Expected 4", ex.Message);
+        Assert.Contains("Expected 4", ex.Message, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -276,7 +276,7 @@ public sealed partial class FreeformHelperViewModel
 
     private static bool TrySplitLabelValue(string raw, out string label, out string value)
     {
-        var separatorIndex = raw.IndexOf(':');
+        var separatorIndex = raw.IndexOf(':', StringComparison.Ordinal);
         if (separatorIndex <= 0 || separatorIndex >= raw.Length - 1)
         {
             label = string.Empty;

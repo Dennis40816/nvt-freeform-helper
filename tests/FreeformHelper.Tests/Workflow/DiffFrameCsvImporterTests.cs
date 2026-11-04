@@ -181,7 +181,7 @@ public sealed class DiffFrameCsvImporterTests
         var projection = DiffFrameGridProjectionService.ProjectFrame(frame, grid);
 
         Assert.False(projection.IsCompatible);
-        Assert.Contains("do not match", projection.Diagnostic);
+        Assert.Contains("do not match", projection.Diagnostic, StringComparison.Ordinal);
         Assert.Empty(projection.Cells);
     }
 

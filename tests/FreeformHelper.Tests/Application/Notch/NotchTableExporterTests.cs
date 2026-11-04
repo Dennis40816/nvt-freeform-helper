@@ -431,7 +431,7 @@ public sealed class NotchTableExporterTests
         var emittedComments = text
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Where(static line => line.Contains("// keep-", StringComparison.Ordinal))
-            .Select(static line => line[(line.IndexOf("// ", StringComparison.Ordinal) + 3)..line.IndexOf(';')])
+            .Select(static line => line[(line.IndexOf("// ", StringComparison.Ordinal) + 3)..line.IndexOf(';', StringComparison.Ordinal)])
             .ToArray();
 
         Assert.DoesNotContain("drop-no-op", text, StringComparison.Ordinal);

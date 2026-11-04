@@ -235,8 +235,8 @@ public sealed class PadCanvasHitTestTests
         var snapshot = InvokeBuildHoverDebugSnapshot(canvas);
         var text = ReadSnapshotText(snapshot);
 
-        Assert.Contains("REG 7", text);
-        Assert.Contains("Diff 42", text);
+        Assert.Contains("REG 7", text, StringComparison.Ordinal);
+        Assert.Contains("Diff 42", text, StringComparison.Ordinal);
     }
 
     private static object InvokeHitTestForHoverDebug(PadCanvas canvas, Avalonia.Point screenPoint, bool regularOnly)

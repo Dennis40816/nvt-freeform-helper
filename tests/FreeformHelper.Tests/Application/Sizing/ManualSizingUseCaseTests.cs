@@ -22,7 +22,7 @@ public sealed class ManualSizingUseCaseTests
 
         Assert.Equal(ManualSizingAction.None, plan.Action);
         Assert.True(plan.HasError);
-        Assert.Contains("Invalid numbers in range", plan.ErrorMessage);
+        Assert.Contains("Invalid numbers in range", plan.ErrorMessage, StringComparison.Ordinal);
     }
 
     [Fact]

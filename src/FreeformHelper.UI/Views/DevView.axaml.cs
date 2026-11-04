@@ -30,7 +30,7 @@ public partial class DevView : UserControl
             ActualThemeVariant);
         var probeText = BuildProbeText();
         DevProbeText.Text = probeText;
-        Logger.Info(CultureInfo.InvariantCulture, "{0}", probeText.Replace(Environment.NewLine, " | "));
+        Logger.Info(CultureInfo.InvariantCulture, "{0}", probeText.Replace(Environment.NewLine, " | ", StringComparison.Ordinal));
     }
 
     private void OnDevTriggerSpinnerClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

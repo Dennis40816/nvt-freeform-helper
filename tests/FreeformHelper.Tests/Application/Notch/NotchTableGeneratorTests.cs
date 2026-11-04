@@ -1733,9 +1733,9 @@ public sealed class NotchTableGeneratorTests
         Assert.Equal(0, row.Values[3]);
         Assert.Equal(settings.Notch.NullValue, row.Values[4]);
         Assert.Equal(0, row.Values[5]);
-        Assert.Contains("R=50%", row.Comment);
-        Assert.Contains("F=200%", row.Comment);
-        Assert.Contains("C=100%", row.Comment);
+        Assert.Contains("R=50%", row.Comment, StringComparison.Ordinal);
+        Assert.Contains("F=200%", row.Comment, StringComparison.Ordinal);
+        Assert.Contains("C=100%", row.Comment, StringComparison.Ordinal);
     }
 
     [Fact]

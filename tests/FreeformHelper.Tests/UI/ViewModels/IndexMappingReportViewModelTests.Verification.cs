@@ -140,7 +140,7 @@ public sealed partial class IndexMappingReportViewModelTests
 
         var vm = new IndexMappingReportViewModel(verboseSummary, report);
 
-        Assert.Contains("Open issues", vm.HeaderSubtitle);
+        Assert.Contains("Open issues", vm.HeaderSubtitle, StringComparison.Ordinal);
         Assert.DoesNotContain("mapped=4838", vm.HeaderSubtitle, StringComparison.OrdinalIgnoreCase);
     }
 

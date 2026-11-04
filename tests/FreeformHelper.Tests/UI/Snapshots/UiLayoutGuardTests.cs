@@ -79,160 +79,160 @@ public sealed class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
 
         var controlsStyles = ReadAllStylesText(repoRoot);
-        Assert.Contains("Style Selector=\"ScrollViewer.viewportBoundScroll\"", controlsStyles);
-        Assert.Contains("HorizontalContentAlignment\" Value=\"Stretch", controlsStyles);
-        Assert.Contains("Padding\" Value=\"0", controlsStyles);
-        Assert.Contains("Style Selector=\"Border.viewportBoundContent\"", controlsStyles);
-        Assert.Contains("$parent[ScrollViewer].Viewport.Width", controlsStyles);
-        Assert.Contains("Style Selector=\"ToggleButton.rightPanelTab\"", controlsStyles);
+        Assert.Contains("Style Selector=\"ScrollViewer.viewportBoundScroll\"", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("HorizontalContentAlignment\" Value=\"Stretch", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("Padding\" Value=\"0", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("Style Selector=\"Border.viewportBoundContent\"", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("$parent[ScrollViewer].Viewport.Width", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("Style Selector=\"ToggleButton.rightPanelTab\"", controlsStyles, StringComparison.Ordinal);
 
         var mainWindow = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml"));
-        Assert.Contains("WindowState=\"Maximized\"", mainWindow);
-        Assert.DoesNotContain("WindowState=\"FullScreen\"", mainWindow);
+        Assert.Contains("WindowState=\"Maximized\"", mainWindow, StringComparison.Ordinal);
+        Assert.DoesNotContain("WindowState=\"FullScreen\"", mainWindow, StringComparison.Ordinal);
 
         var freeformView = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.axaml"));
-        Assert.Contains("x:Name=\"RightSettingsScroll\"", freeformView);
-        Assert.Contains("x:Name=\"LeftSettingsScroll\"", freeformView);
-        Assert.Contains("Classes=\"scrollDevCandidate viewportBoundScroll\"", freeformView);
-        Assert.Contains("Classes=\"viewportBoundContent\"", freeformView);
-        Assert.Contains("Padding=\"{StaticResource InsetRight12Bottom20}\"", freeformView);
-        Assert.Contains("ShowNotchToRegularLabels=\"{Binding IsNotchToRegularPreviewVisible}\"", freeformView);
-        Assert.Contains("Classes=\"rightPanelTabHost\"", freeformView);
-        Assert.Contains("IsChecked=\"{Binding IsRightPanelSettingsTab, Mode=TwoWay}\"", freeformView);
-        Assert.Contains("IsChecked=\"{Binding IsRightPanelInspectorTab, Mode=TwoWay}\"", freeformView);
+        Assert.Contains("x:Name=\"RightSettingsScroll\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"LeftSettingsScroll\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"scrollDevCandidate viewportBoundScroll\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"viewportBoundContent\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("Padding=\"{StaticResource InsetRight12Bottom20}\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("ShowNotchToRegularLabels=\"{Binding IsNotchToRegularPreviewVisible}\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"rightPanelTabHost\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding IsRightPanelSettingsTab, Mode=TwoWay}\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding IsRightPanelInspectorTab, Mode=TwoWay}\"", freeformView, StringComparison.Ordinal);
         Assert.Matches(@"GridSplitter\s+Grid\.Row=""1""[\s\S]*ResizeDirection=""Rows""[\s\S]*ShowsPreview=""True""", freeformView);
 
         var leftPanel = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "LeftDxfPanel.axaml"));
-        Assert.Contains("Classes=\"boundLayerSelector\"", leftPanel);
-        Assert.Contains("MaxDropDownHeight=\"{StaticResource LayerListMaxHeight}\"", leftPanel);
-        Assert.Contains("controls:BalancedWrapPanel Classes=\"badgeGroup dxfEditBadgeGroup\"", leftPanel);
-        Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", leftPanel);
-        Assert.Contains("IsChecked=\"{Binding IsCadLayerBulkToggleChecked, Mode=TwoWay}\"", leftPanel);
-        Assert.Contains("Classes=\"dxfLayerBulkToggleContent\"", leftPanel);
-        Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", leftPanel);
-        Assert.Contains("IsVisible=\"{Binding AreSomeCadLayersSelected}\"", leftPanel);
-        Assert.Contains("Classes=\"dxfLayerBulkToggleLabel\"", leftPanel);
-        Assert.Contains("Text=\"{Binding CadLayerBulkToggleText}\"", leftPanel);
-        Assert.DoesNotContain("dxfLayerBulkToggleIcon", leftPanel);
-        Assert.DoesNotContain("dxfLayerBulkToggleSwitch", leftPanel);
-        Assert.Contains("Classes=\"dangerTextButton dxfEditMiniAction\"", leftPanel);
-        Assert.Contains("Classes=\"dxfEditAlignedFieldRow\"", leftPanel);
-        Assert.Contains("Classes=\"dxfEditFieldActionSpacer\"", leftPanel);
-        Assert.DoesNotContain("actionDanger actionTextButton dxfEditMiniAction", leftPanel);
-        Assert.DoesNotContain("actionGhost actionTextButton dxfEditMiniAction", leftPanel);
-        Assert.DoesNotContain("actionNeutral actionTextButton dxfEditMiniAction", leftPanel);
+        Assert.Contains("Classes=\"boundLayerSelector\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("MaxDropDownHeight=\"{StaticResource LayerListMaxHeight}\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("controls:BalancedWrapPanel Classes=\"badgeGroup dxfEditBadgeGroup\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding IsCadLayerBulkToggleChecked, Mode=TwoWay}\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfLayerBulkToggleContent\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding AreSomeCadLayersSelected}\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfLayerBulkToggleLabel\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding CadLayerBulkToggleText}\"", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfLayerBulkToggleIcon", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfLayerBulkToggleSwitch", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dangerTextButton dxfEditMiniAction\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfEditAlignedFieldRow\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfEditFieldActionSpacer\"", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionDanger actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionGhost actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionNeutral actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
         var dxfOverlapCheckButton = FindXamlElementTagContaining(leftPanel, "Button", "CheckDxfQualityCommand");
-        Assert.Contains("Classes=\"workspaceActionButton\"", dxfOverlapCheckButton);
-        Assert.DoesNotContain("actionTextButton", dxfOverlapCheckButton);
-        Assert.DoesNotContain("actionNeutral", dxfOverlapCheckButton);
-        Assert.DoesNotContain("dxfLayerSegmentRail", leftPanel);
-        Assert.DoesNotContain("dxfLayerSegmentAction", leftPanel);
-        Assert.DoesNotContain("Margin=\"{StaticResource InsetRight12Bottom12}\"", leftPanel);
+        Assert.Contains("Classes=\"workspaceActionButton\"", dxfOverlapCheckButton, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionTextButton", dxfOverlapCheckButton, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionNeutral", dxfOverlapCheckButton, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfLayerSegmentRail", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfLayerSegmentAction", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("Margin=\"{StaticResource InsetRight12Bottom12}\"", leftPanel, StringComparison.Ordinal);
 
         var overlayControls = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "CanvasOverlayControls.axaml"));
-        Assert.Contains("Text=\"To Regular\"", overlayControls);
-        Assert.Contains("IsChecked=\"{Binding ShowNotchToRegularLabels, Mode=TwoWay}\"", overlayControls);
+        Assert.Contains("Text=\"To Regular\"", overlayControls, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding ShowNotchToRegularLabels, Mode=TwoWay}\"", overlayControls, StringComparison.Ordinal);
 
         var settingsWindow = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsWindow.axaml"));
-        Assert.Contains("x:Name=\"SettingsWindowScroll\"", settingsWindow);
-        Assert.Contains("Classes=\"viewportBoundScroll\"", settingsWindow);
-        Assert.Contains("Classes=\"viewportBoundContent\"", settingsWindow);
-        Assert.Contains("Padding=\"{StaticResource InsetRight10Bottom12}\"", settingsWindow);
-        Assert.Contains("IsChecked=\"{Binding IsGeneralSectionSelected, Mode=TwoWay}\"", settingsWindow);
-        Assert.Contains("IsChecked=\"{Binding IsStep1SectionSelected, Mode=TwoWay}\"", settingsWindow);
-        Assert.Contains("IsChecked=\"{Binding IsStep2SectionSelected, Mode=TwoWay}\"", settingsWindow);
-        Assert.Contains("IsChecked=\"{Binding IsStep3SectionSelected, Mode=TwoWay}\"", settingsWindow);
-        Assert.Contains("IsChecked=\"{Binding IsStep4SectionSelected, Mode=TwoWay}\"", settingsWindow);
-        Assert.Contains("IsChecked=\"{Binding IsStep5SectionSelected, Mode=TwoWay}\"", settingsWindow);
-        Assert.Contains("x:Name=\"GeneralSection\"", settingsWindow);
-        Assert.Contains("IsVisible=\"{Binding IsGeneralSectionSelected}\"", settingsWindow);
-        Assert.Contains("x:Name=\"Step1Section\"", settingsWindow);
-        Assert.Contains("IsVisible=\"{Binding IsStep1SectionSelected}\"", settingsWindow);
-        Assert.Contains("x:Name=\"Step2Section\"", settingsWindow);
-        Assert.Contains("IsVisible=\"{Binding IsStep2SectionSelected}\"", settingsWindow);
-        Assert.Contains("x:Name=\"Step3Section\"", settingsWindow);
-        Assert.Contains("IsVisible=\"{Binding IsStep3SectionSelected}\"", settingsWindow);
-        Assert.Contains("x:Name=\"Step4Section\"", settingsWindow);
-        Assert.Contains("IsVisible=\"{Binding IsStep4SectionSelected}\"", settingsWindow);
-        Assert.Contains("x:Name=\"Step5Section\"", settingsWindow);
-        Assert.Contains("IsVisible=\"{Binding IsStep5SectionSelected}\"", settingsWindow);
-        Assert.Contains("Classes=\"dangerTextButton\"", settingsWindow);
-        Assert.Contains("Content=\"Cancel\"", settingsWindow);
-        Assert.Contains("Content=\"Save Settings\"", settingsWindow);
-        Assert.DoesNotContain("actionDanger actionTextButton", settingsWindow);
-        Assert.DoesNotContain("actionGhost actionTextButton", settingsWindow);
-        Assert.DoesNotContain("actionPrimary actionTextButton", settingsWindow);
+        Assert.Contains("x:Name=\"SettingsWindowScroll\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"viewportBoundScroll\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"viewportBoundContent\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("Padding=\"{StaticResource InsetRight10Bottom12}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding IsGeneralSectionSelected, Mode=TwoWay}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding IsStep1SectionSelected, Mode=TwoWay}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding IsStep2SectionSelected, Mode=TwoWay}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding IsStep3SectionSelected, Mode=TwoWay}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding IsStep4SectionSelected, Mode=TwoWay}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding IsStep5SectionSelected, Mode=TwoWay}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"GeneralSection\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding IsGeneralSectionSelected}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"Step1Section\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding IsStep1SectionSelected}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"Step2Section\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding IsStep2SectionSelected}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"Step3Section\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding IsStep3SectionSelected}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"Step4Section\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding IsStep4SectionSelected}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"Step5Section\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding IsStep5SectionSelected}\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dangerTextButton\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("Content=\"Cancel\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("Content=\"Save Settings\"", settingsWindow, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionDanger actionTextButton", settingsWindow, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionGhost actionTextButton", settingsWindow, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionPrimary actionTextButton", settingsWindow, StringComparison.Ordinal);
 
         var settingsGeneralSection = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsSections", "SettingsGeneralSectionView.axaml"));
-        Assert.Contains("Value=\"{Binding HighlightStrokeWidthAdjust, Mode=TwoWay}\"", settingsGeneralSection);
-        Assert.Contains("Click=\"EditCascadeDetailsButton_Click\"", settingsGeneralSection);
-        Assert.Contains("Text=\"{Binding XChannels, StringFormat='{}{0:0}'}\"", settingsGeneralSection);
-        Assert.Contains("Text=\"{Binding YChannels, StringFormat='{}{0:0}'}\"", settingsGeneralSection);
-        Assert.DoesNotContain("Value=\"{Binding XChannels, Mode=TwoWay}\"", settingsGeneralSection);
-        Assert.DoesNotContain("Value=\"{Binding YChannels, Mode=TwoWay}\"", settingsGeneralSection);
+        Assert.Contains("Value=\"{Binding HighlightStrokeWidthAdjust, Mode=TwoWay}\"", settingsGeneralSection, StringComparison.Ordinal);
+        Assert.Contains("Click=\"EditCascadeDetailsButton_Click\"", settingsGeneralSection, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding XChannels, StringFormat='{}{0:0}'}\"", settingsGeneralSection, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding YChannels, StringFormat='{}{0:0}'}\"", settingsGeneralSection, StringComparison.Ordinal);
+        Assert.DoesNotContain("Value=\"{Binding XChannels, Mode=TwoWay}\"", settingsGeneralSection, StringComparison.Ordinal);
+        Assert.DoesNotContain("Value=\"{Binding YChannels, Mode=TwoWay}\"", settingsGeneralSection, StringComparison.Ordinal);
 
         var cascadeDetailsWindow = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "CascadeIcSettingsWindow.axaml"));
-        Assert.Contains("ItemsSource=\"{Binding CascadeIcSettings}\"", cascadeDetailsWindow);
-        Assert.Contains("Value=\"{Binding XChannels, Mode=TwoWay}\"", cascadeDetailsWindow);
-        Assert.Contains("Value=\"{Binding YChannels, Mode=TwoWay}\"", cascadeDetailsWindow);
-        Assert.Contains("Value=\"{Binding CascadeNum, Mode=TwoWay}\"", cascadeDetailsWindow);
-        Assert.Contains("Text=\"{Binding CascadeLayoutSummary}\"", cascadeDetailsWindow);
+        Assert.Contains("ItemsSource=\"{Binding CascadeIcSettings}\"", cascadeDetailsWindow, StringComparison.Ordinal);
+        Assert.Contains("Value=\"{Binding XChannels, Mode=TwoWay}\"", cascadeDetailsWindow, StringComparison.Ordinal);
+        Assert.Contains("Value=\"{Binding YChannels, Mode=TwoWay}\"", cascadeDetailsWindow, StringComparison.Ordinal);
+        Assert.Contains("Value=\"{Binding CascadeNum, Mode=TwoWay}\"", cascadeDetailsWindow, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding CascadeLayoutSummary}\"", cascadeDetailsWindow, StringComparison.Ordinal);
 
         var settingsStep3Section = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsSections", "SettingsStep3SectionView.axaml"));
-        Assert.Contains("IsChecked=\"{Binding ShowNotchToRegularLabels, Mode=TwoWay}\"", settingsStep3Section);
-        Assert.Contains("IsChecked=\"{Binding EnableToFullRuleEngine, Mode=TwoWay}\"", settingsStep3Section);
-        Assert.Contains("IsChecked=\"{Binding EnableToFullRuleTrace, Mode=TwoWay}\"", settingsStep3Section);
-        Assert.Contains("Text=\"{Binding ToFullRuleEngineSummary}\"", settingsStep3Section);
+        Assert.Contains("IsChecked=\"{Binding ShowNotchToRegularLabels, Mode=TwoWay}\"", settingsStep3Section, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding EnableToFullRuleEngine, Mode=TwoWay}\"", settingsStep3Section, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding EnableToFullRuleTrace, Mode=TwoWay}\"", settingsStep3Section, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding ToFullRuleEngineSummary}\"", settingsStep3Section, StringComparison.Ordinal);
 
         var workspaceHeader = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "WorkspaceHeader.axaml"));
-        Assert.Contains("x:Name=\"ViewMenuScroll\"", workspaceHeader);
-        Assert.Contains("Classes=\"viewportBoundScroll\"", workspaceHeader);
-        Assert.Contains("Classes=\"viewportBoundContent\"", workspaceHeader);
-        Assert.Contains("Padding=\"{StaticResource InsetRight12Bottom20}\"", workspaceHeader);
-        Assert.Contains("Text=\"Quick toggles\"", workspaceHeader);
-        Assert.Contains("Text=\"Line width\"", workspaceHeader);
-        Assert.Contains("Title=\"Colors and opacity (advanced)\"", workspaceHeader);
-        Assert.Contains("Title=\"CAD area buckets (advanced)\"", workspaceHeader);
-        Assert.Contains("Value=\"{Binding HighlightStrokeWidthAdjust, Mode=TwoWay}\"", workspaceHeader);
-        Assert.Contains("IsEnabled=\"{Binding ColorCadByArea}\"", workspaceHeader);
-        Assert.Contains("Style Selector=\"TextBox.workspaceHeaderInput\"", workspaceHeader);
-        Assert.Contains("BorderThickness\" Value=\"{StaticResource BorderInput}\"", workspaceHeader);
+        Assert.Contains("x:Name=\"ViewMenuScroll\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"viewportBoundScroll\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"viewportBoundContent\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("Padding=\"{StaticResource InsetRight12Bottom20}\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("Text=\"Quick toggles\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("Text=\"Line width\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("Title=\"Colors and opacity (advanced)\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("Title=\"CAD area buckets (advanced)\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("Value=\"{Binding HighlightStrokeWidthAdjust, Mode=TwoWay}\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("IsEnabled=\"{Binding ColorCadByArea}\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("Style Selector=\"TextBox.workspaceHeaderInput\"", workspaceHeader, StringComparison.Ordinal);
+        Assert.Contains("BorderThickness\" Value=\"{StaticResource BorderInput}\"", workspaceHeader, StringComparison.Ordinal);
         Assert.Equal(4, Regex.Count(workspaceHeader, "Classes=\"workspaceHeaderInput\""));
         Assert.DoesNotContain("<Expander", workspaceHeader, StringComparison.OrdinalIgnoreCase);
 
         var rightPanel = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowPanel.axaml"));
-        Assert.Contains("<views:RightWorkflowInspectorView/>", rightPanel);
-        Assert.Contains("<views:RightWorkflowSettingsTabView", rightPanel);
-        Assert.Contains("DataTemplate x:Key=\"NotchValidationRowTemplate\"", rightPanel);
+        Assert.Contains("<views:RightWorkflowInspectorView/>", rightPanel, StringComparison.Ordinal);
+        Assert.Contains("<views:RightWorkflowSettingsTabView", rightPanel, StringComparison.Ordinal);
+        Assert.Contains("DataTemplate x:Key=\"NotchValidationRowTemplate\"", rightPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("<Expander", rightPanel, StringComparison.OrdinalIgnoreCase);
 
         var actionStyles = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Action.axaml"));
-        Assert.Contains("Button.viewportOverlayAction:pointerover", actionStyles);
-        Assert.Contains("BrushActionInverseBackground", actionStyles);
-        Assert.Contains("Button.dangerTextButton", actionStyles);
-        Assert.Contains("BrushActionDangerOnNeutralForeground", actionStyles);
-        Assert.Contains("BrushActionDangerForeground", actionStyles);
-        Assert.Contains("Button.dxfEditMiniAction:pointerover", actionStyles);
-        Assert.Contains("BrushActionTextHoverBackground", actionStyles);
-        Assert.Contains("Button.dxfEditMiniAction", actionStyles);
-        Assert.Contains("CornerRadius\" Value=\"{StaticResource RadiusSm}\"", actionStyles);
-        Assert.Contains("HorizontalAlignment\" Value=\"Stretch\"", actionStyles);
+        Assert.Contains("Button.viewportOverlayAction:pointerover", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushActionInverseBackground", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("Button.dangerTextButton", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushActionDangerOnNeutralForeground", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushActionDangerForeground", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("Button.dxfEditMiniAction:pointerover", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushActionTextHoverBackground", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("Button.dxfEditMiniAction", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("CornerRadius\" Value=\"{StaticResource RadiusSm}\"", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("HorizontalAlignment\" Value=\"Stretch\"", actionStyles, StringComparison.Ordinal);
         var actionChipBaseStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.actionChip, ToggleButton.actionChip");
         var chipStatusBaseStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Border.chipStatus");
         Assert.Equal("{StaticResource BorderControl}", GetSetterValue(actionChipBaseStyle.Body, "BorderThickness"));
         Assert.Equal("{StaticResource BorderControl}", GetSetterValue(chipStatusBaseStyle.Body, "BorderThickness"));
-        Assert.Contains("Button.dangerTextButton.dxfEditMiniAction:pointerover", actionStyles);
-        Assert.DoesNotContain("ToggleButton.dxfLayerBulkToggle", actionStyles);
-        Assert.Contains("ToggleButton.actionTextButton.actionNeutral:checked", actionStyles);
-        Assert.DoesNotContain("Button.actionNeutral.dxfEditMiniAction", actionStyles);
-        Assert.DoesNotContain("Button.actionGhost.dxfEditMiniAction", actionStyles);
+        Assert.Contains("Button.dangerTextButton.dxfEditMiniAction:pointerover", actionStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("ToggleButton.dxfLayerBulkToggle", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("ToggleButton.actionTextButton.actionNeutral:checked", actionStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("Button.actionNeutral.dxfEditMiniAction", actionStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("Button.actionGhost.dxfEditMiniAction", actionStyles, StringComparison.Ordinal);
         var dxfMiniHoverStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.dxfEditMiniAction:pointerover");
         Assert.Equal("{DynamicResource BrushActionTextHoverForeground}", GetSetterValue(dxfMiniHoverStyle.Body, "Foreground"));
-        Assert.DoesNotContain("BrushButtonNeutralForeground", dxfMiniHoverStyle.Body);
-        Assert.DoesNotContain("BrushTextMuted", dxfMiniHoverStyle.Body);
+        Assert.DoesNotContain("BrushButtonNeutralForeground", dxfMiniHoverStyle.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("BrushTextMuted", dxfMiniHoverStyle.Body, StringComparison.Ordinal);
         var dxfMiniPressedStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.dxfEditMiniAction:pressed");
         Assert.Equal("{DynamicResource BrushActionTextHoverForeground}", GetSetterValue(dxfMiniPressedStyle.Body, "Foreground"));
@@ -245,14 +245,14 @@ public sealed class UiLayoutGuardTests
         var dxfMiniDisabledHoverStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.dxfEditMiniAction:disabled:pointerover, Button.dxfEditMiniAction:disabled:pressed");
         Assert.Equal("{DynamicResource BrushButtonDisabledForeground}", GetSetterValue(dxfMiniDisabledHoverStyle.Body, "Foreground"));
-        Assert.DoesNotContain("BrushButtonNeutralForeground", dxfMiniDisabledHoverStyle.Body);
+        Assert.DoesNotContain("BrushButtonNeutralForeground", dxfMiniDisabledHoverStyle.Body, StringComparison.Ordinal);
 
         var dxfResetButton = FindXamlElementTagContaining(leftPanel, "Button", "ResetAllDxfEditsButton_Click");
         var dxfRestoreLastButton = FindXamlElementTagContaining(leftPanel, "Button", "RestoreLastDeletedCadPadsCommand");
         var dxfRestoreAllButton = FindXamlElementTagContaining(leftPanel, "Button", "RestoreAllHiddenCadPadsCommand");
-        Assert.Contains("IconGlyphs.RestartAlt", dxfResetButton);
-        Assert.Contains("IconGlyphs.Undo", dxfRestoreLastButton);
-        Assert.Contains("IconGlyphs.Visibility", dxfRestoreAllButton);
+        Assert.Contains("IconGlyphs.RestartAlt", dxfResetButton, StringComparison.Ordinal);
+        Assert.Contains("IconGlyphs.Undo", dxfRestoreLastButton, StringComparison.Ordinal);
+        Assert.Contains("IconGlyphs.Visibility", dxfRestoreAllButton, StringComparison.Ordinal);
 
         var dxfHideSectionStart = leftPanel.IndexOf("Text=\"Hide / restore\"", StringComparison.Ordinal);
         var dxfCombineSectionStart = leftPanel.IndexOf("Text=\"Combine / split\"", StringComparison.Ordinal);
@@ -267,116 +267,116 @@ public sealed class UiLayoutGuardTests
         Assert.True(dxfCombineGroupStart > dxfHideGroupStart, "DXF Combine / split group container must follow Hide / restore.");
 
         var dxfHideSection = leftPanel[dxfHideGroupStart..dxfCombineGroupStart];
-        Assert.Contains("Classes=\"dxfEditActionGroup\"", dxfHideSection);
-        Assert.Contains("Classes=\"dxfEditActionGroupRow\"", dxfHideSection);
-        Assert.Contains("DeleteSelectedCadPadsCommand", dxfHideSection);
-        Assert.Contains("RestoreLastDeletedCadPadsCommand", dxfHideSection);
-        Assert.Contains("RestoreAllHiddenCadPadsCommand", dxfHideSection);
-        Assert.Contains("Text=\"Hide selected\"", dxfHideSection);
-        Assert.Contains("Text=\"Undo hide\"", dxfHideSection);
-        Assert.Contains("Text=\"Show all\"", dxfHideSection);
-        Assert.DoesNotContain("CombineSelectedCadPadsCommand", dxfHideSection);
+        Assert.Contains("Classes=\"dxfEditActionGroup\"", dxfHideSection, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfEditActionGroupRow\"", dxfHideSection, StringComparison.Ordinal);
+        Assert.Contains("DeleteSelectedCadPadsCommand", dxfHideSection, StringComparison.Ordinal);
+        Assert.Contains("RestoreLastDeletedCadPadsCommand", dxfHideSection, StringComparison.Ordinal);
+        Assert.Contains("RestoreAllHiddenCadPadsCommand", dxfHideSection, StringComparison.Ordinal);
+        Assert.Contains("Text=\"Hide selected\"", dxfHideSection, StringComparison.Ordinal);
+        Assert.Contains("Text=\"Undo hide\"", dxfHideSection, StringComparison.Ordinal);
+        Assert.Contains("Text=\"Show all\"", dxfHideSection, StringComparison.Ordinal);
+        Assert.DoesNotContain("CombineSelectedCadPadsCommand", dxfHideSection, StringComparison.Ordinal);
 
         var dxfCombineSection = leftPanel[dxfCombineGroupStart..dxfAdvancedSectionStart];
-        Assert.Contains("Classes=\"dxfEditActionGroup\"", dxfCombineSection);
-        Assert.DoesNotContain("ColumnDefinitions=\"*,*\"", dxfCombineSection);
-        Assert.Contains("CombineSelectedCadPadsCommand", dxfCombineSection);
-        Assert.Contains("ClearCombinedCadPadsCommand", dxfCombineSection);
-        Assert.Contains("IconGlyphs.CallSplit", dxfCombineSection);
-        Assert.Contains("Text=\"Combine\"", dxfCombineSection);
-        Assert.Contains("Text=\"Split selected\"", dxfCombineSection);
-        Assert.DoesNotContain("DeleteSelectedCadPadsCommand", dxfCombineSection);
-        Assert.DoesNotContain("controls:BalancedWrapPanel Classes=\"dxfEditToolbar\"", leftPanel);
-        Assert.DoesNotContain("dxfEditToolbarAction", leftPanel);
-        Assert.DoesNotContain("dxfEditToolbarSurface", leftPanel);
+        Assert.Contains("Classes=\"dxfEditActionGroup\"", dxfCombineSection, StringComparison.Ordinal);
+        Assert.DoesNotContain("ColumnDefinitions=\"*,*\"", dxfCombineSection, StringComparison.Ordinal);
+        Assert.Contains("CombineSelectedCadPadsCommand", dxfCombineSection, StringComparison.Ordinal);
+        Assert.Contains("ClearCombinedCadPadsCommand", dxfCombineSection, StringComparison.Ordinal);
+        Assert.Contains("IconGlyphs.CallSplit", dxfCombineSection, StringComparison.Ordinal);
+        Assert.Contains("Text=\"Combine\"", dxfCombineSection, StringComparison.Ordinal);
+        Assert.Contains("Text=\"Split selected\"", dxfCombineSection, StringComparison.Ordinal);
+        Assert.DoesNotContain("DeleteSelectedCadPadsCommand", dxfCombineSection, StringComparison.Ordinal);
+        Assert.DoesNotContain("controls:BalancedWrapPanel Classes=\"dxfEditToolbar\"", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfEditToolbarAction", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfEditToolbarSurface", leftPanel, StringComparison.Ordinal);
 
         var coreStyles = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Core.axaml"));
-        Assert.Contains("controls|BalancedWrapPanel.badgeGroup", coreStyles);
-        Assert.Contains("BalanceLastRow", coreStyles);
-        Assert.Contains("DxfEditSummaryBadgeMinWidth", coreStyles);
-        Assert.Contains("Button.workspaceActionButton", coreStyles);
-        Assert.Contains("ToggleButton.workspaceFoldHeader:checked", coreStyles);
-        Assert.Contains("Border.workspaceFileRow", coreStyles);
-        Assert.Contains("SelectableTextBlock.workspaceFileRowTitle", coreStyles);
-        Assert.Contains("Border.dxfEditAdvancedContent", coreStyles);
-        Assert.Contains("Border.dxfEditActionGroup", coreStyles);
-        Assert.Contains("Grid.dxfEditActionGroupRow", coreStyles);
-        Assert.Contains("ToggleButton.dxfLayerBulkToggleButton", coreStyles);
-        Assert.Contains("ToggleButton.dxfLayerBulkToggleButton:checked", coreStyles);
-        Assert.Contains("Border.dxfLayerBulkMixedIndicator", coreStyles);
-        Assert.Contains("SelectableTextBlock.dxfLayerBulkToggleLabel", coreStyles);
-        Assert.DoesNotContain("dxfLayerBulkToggleIcon", coreStyles);
-        Assert.DoesNotContain("dxfLayerBulkToggleSwitch", coreStyles);
-        Assert.Contains("Grid.dxfEditAlignedFieldRow", coreStyles);
-        Assert.Contains("Border.dxfEditFieldActionSpacer", coreStyles);
-        Assert.Contains("AncestorType=Button", coreStyles);
-        Assert.DoesNotContain("controls|BalancedWrapPanel.dxfEditToolbar", coreStyles);
-        Assert.DoesNotContain("dxfLayerSegmentRail", coreStyles);
-        Assert.DoesNotContain("dxfLayerSegmentAction", coreStyles);
-        Assert.DoesNotContain("dxfEditAccordionHeader", coreStyles);
+        Assert.Contains("controls|BalancedWrapPanel.badgeGroup", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("BalanceLastRow", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("DxfEditSummaryBadgeMinWidth", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Button.workspaceActionButton", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("ToggleButton.workspaceFoldHeader:checked", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Border.workspaceFileRow", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("SelectableTextBlock.workspaceFileRowTitle", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Border.dxfEditAdvancedContent", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Border.dxfEditActionGroup", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Grid.dxfEditActionGroupRow", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("ToggleButton.dxfLayerBulkToggleButton", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("ToggleButton.dxfLayerBulkToggleButton:checked", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Border.dxfLayerBulkMixedIndicator", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("SelectableTextBlock.dxfLayerBulkToggleLabel", coreStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfLayerBulkToggleIcon", coreStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfLayerBulkToggleSwitch", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Grid.dxfEditAlignedFieldRow", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Border.dxfEditFieldActionSpacer", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("AncestorType=Button", coreStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("controls|BalancedWrapPanel.dxfEditToolbar", coreStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfLayerSegmentRail", coreStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfLayerSegmentAction", coreStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("dxfEditAccordionHeader", coreStyles, StringComparison.Ordinal);
 
         var devView = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DevView.axaml"));
-        Assert.Contains("Classes=\"dangerTextButton dxfEditMiniAction\"", devView);
-        Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", devView);
-        Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", devView);
-        Assert.Contains("Classes=\"workspaceActionButton\"", devView);
-        Assert.DoesNotContain("actionDanger actionTextButton dxfEditMiniAction", devView);
-        Assert.DoesNotContain("actionGhost actionTextButton dxfEditMiniAction", devView);
-        Assert.DoesNotContain("actionNeutral actionTextButton dxfEditMiniAction", devView);
-        Assert.DoesNotContain("actionNeutral actionTextButton workspaceActionButton", devView);
+        Assert.Contains("Classes=\"dangerTextButton dxfEditMiniAction\"", devView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", devView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", devView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"workspaceActionButton\"", devView, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionDanger actionTextButton dxfEditMiniAction", devView, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionGhost actionTextButton dxfEditMiniAction", devView, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionNeutral actionTextButton dxfEditMiniAction", devView, StringComparison.Ordinal);
+        Assert.DoesNotContain("actionNeutral actionTextButton workspaceActionButton", devView, StringComparison.Ordinal);
 
         var simulationControlsPane = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkspaceSections", "SimulationWorkspaceControlsPaneView.axaml"));
-        Assert.Contains("Classes=\"workspaceFileRow\"", simulationControlsPane);
-        Assert.Contains("Classes=\"workspaceFileRowTitle\"", simulationControlsPane);
-        Assert.Contains("Glyph=\"{x:Static icons:IconGlyphs.DataObject}\"", simulationControlsPane);
+        Assert.Contains("Classes=\"workspaceFileRow\"", simulationControlsPane, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"workspaceFileRowTitle\"", simulationControlsPane, StringComparison.Ordinal);
+        Assert.Contains("Glyph=\"{x:Static icons:IconGlyphs.DataObject}\"", simulationControlsPane, StringComparison.Ordinal);
 
         var simulationWorkspace = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SimulationWorkspaceView.axaml"));
         Assert.Matches(@"GridSplitter\s+Grid\.Row=""2""[\s\S]*ResizeDirection=""Rows""[\s\S]*ShowsPreview=""True""", simulationWorkspace);
 
         var rightWorkflowSettings = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowSettingsTabView.axaml"));
-        Assert.Contains("Title=\"Overview\"", rightWorkflowSettings);
-        Assert.Contains("Text=\"Project / grid\"", rightWorkflowSettings);
-        Assert.Contains("Text=\"Simulation safety\"", rightWorkflowSettings);
-        Assert.Contains("Text=\"{Binding SimulationSafetyOverviewStatusText}\"", rightWorkflowSettings);
-        Assert.Contains("ToolTip.Tip=\"Loaded CAD pad count after DXF import and current DXF edits.\"", rightWorkflowSettings);
-        Assert.Contains("ToolTip.Tip=\"Generated regular-grid pad count.\"", rightWorkflowSettings);
-        Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyOverviewSummaryText}\"", rightWorkflowSettings);
-        Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyOverviewHighRiskDiffsText}\"", rightWorkflowSettings);
-        Assert.Contains("ToolTip.Tip=\"Step 5 export file type.\"", rightWorkflowSettings);
-        Assert.Contains("ToolTip.Tip=\"{Binding NotchExportSafetyPolicySummary}\"", rightWorkflowSettings);
-        Assert.Contains("Tag=\"General\"", rightWorkflowSettings);
-        Assert.Contains("Tag=\"Step3NotchCompensation\"", rightWorkflowSettings);
-        Assert.Contains("Tag=\"Step5NotchExport\"", rightWorkflowSettings);
-        Assert.DoesNotContain("Value=\"{Binding CascadeNum, Mode=TwoWay}\"", rightWorkflowSettings);
-        Assert.DoesNotContain("ComboBox Classes=\"regularLayerSelector\"", rightWorkflowSettings);
-        Assert.Contains("IsVisible=\"{Binding IsRightPanelSettingsTab}\"", rightWorkflowSettings);
-        Assert.Contains("Title=\"DIRECT details\"", rightWorkflowSettings);
-        Assert.Contains("Title=\"IN details\"", rightWorkflowSettings);
-        Assert.Contains("Title=\"OUT details\"", rightWorkflowSettings);
-        Assert.Contains("IsExpanded=\"False\"", rightWorkflowSettings);
-        Assert.Contains("ItemsSource=\"{Binding NotchValidationDirectItems}\"", rightWorkflowSettings);
-        Assert.Contains("ItemsSource=\"{Binding NotchValidationIncomingItems}\"", rightWorkflowSettings);
-        Assert.Contains("ItemsSource=\"{Binding NotchValidationOutgoingItems}\"", rightWorkflowSettings);
+        Assert.Contains("Title=\"Overview\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("Text=\"Project / grid\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("Text=\"Simulation safety\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding SimulationSafetyOverviewStatusText}\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"Loaded CAD pad count after DXF import and current DXF edits.\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"Generated regular-grid pad count.\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyOverviewSummaryText}\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyOverviewHighRiskDiffsText}\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"Step 5 export file type.\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"{Binding NotchExportSafetyPolicySummary}\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("Tag=\"General\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("Tag=\"Step3NotchCompensation\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("Tag=\"Step5NotchExport\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.DoesNotContain("Value=\"{Binding CascadeNum, Mode=TwoWay}\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.DoesNotContain("ComboBox Classes=\"regularLayerSelector\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding IsRightPanelSettingsTab}\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("Title=\"DIRECT details\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("Title=\"IN details\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("Title=\"OUT details\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("IsExpanded=\"False\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("ItemsSource=\"{Binding NotchValidationDirectItems}\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("ItemsSource=\"{Binding NotchValidationIncomingItems}\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Contains("ItemsSource=\"{Binding NotchValidationOutgoingItems}\"", rightWorkflowSettings, StringComparison.Ordinal);
 
         var rightWorkflowInspector = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowInspectorView.axaml"));
-        Assert.Contains("IsVisible=\"{Binding IsRightPanelInspectorTab}\"", rightWorkflowInspector);
+        Assert.Contains("IsVisible=\"{Binding IsRightPanelInspectorTab}\"", rightWorkflowInspector, StringComparison.Ordinal);
 
         var step3View = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep3View.axaml"));
-        Assert.Contains("Text=\"{Binding NotchPreviewStageSummary}\"", step3View);
-        Assert.Contains("Text=\"{Binding NotchToFullRuleEngineSummary}\"", step3View);
-        Assert.Contains("IsEnabled=\"{Binding CanControlNotchPreviewStage}\"", step3View);
-        Assert.Contains("Text=\"{Binding NotchPreviewSeedLayerStateText}\"", step3View);
-        Assert.Contains("ToolTip.Tip=\"{Binding NotchTargetCoverageCapHelpText}\"", step3View);
-        Assert.Contains("Tip=\"{Binding NotchTargetCoverageCapHelpText}\"", settingsStep3Section);
-        Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", step3View);
-        Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", settingsStep3Section);
+        Assert.Contains("Text=\"{Binding NotchPreviewStageSummary}\"", step3View, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding NotchToFullRuleEngineSummary}\"", step3View, StringComparison.Ordinal);
+        Assert.Contains("IsEnabled=\"{Binding CanControlNotchPreviewStage}\"", step3View, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding NotchPreviewSeedLayerStateText}\"", step3View, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"{Binding NotchTargetCoverageCapHelpText}\"", step3View, StringComparison.Ordinal);
+        Assert.Contains("Tip=\"{Binding NotchTargetCoverageCapHelpText}\"", settingsStep3Section, StringComparison.Ordinal);
+        Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", step3View, StringComparison.Ordinal);
+        Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", settingsStep3Section, StringComparison.Ordinal);
 
         var step5View = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep5View.axaml"));
-        Assert.Contains("Text=\"Handoff checklist\"", step5View);
-        Assert.Contains("Text=\"{Binding NotchExportHandoffFileText}\"", step5View);
-        Assert.Contains("Text=\"{Binding NotchExportHandoffVersionText}\"", step5View);
-        Assert.Contains("Text=\"{Binding NotchExportHandoffProfileText}\"", step5View);
-        Assert.Contains("Text=\"{Binding NotchExportHandoffChecklistText}\"", step5View);
+        Assert.Contains("Text=\"Handoff checklist\"", step5View, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding NotchExportHandoffFileText}\"", step5View, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding NotchExportHandoffVersionText}\"", step5View, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding NotchExportHandoffProfileText}\"", step5View, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding NotchExportHandoffChecklistText}\"", step5View, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -387,14 +387,14 @@ public sealed class UiLayoutGuardTests
             Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "NotchExportSelectionWindow.axaml"));
         var warningChip = FindXamlElementTagContaining(xaml, "Border", "HasSimulationPhysicalAuditWarning");
 
-        Assert.Contains("Classes=\"chipStatus warning\"", warningChip);
-        Assert.Contains("Classes=\"chipStatusText\"", warningChip);
-        Assert.Contains("IsVisible=\"{Binding HasSimulationPhysicalAuditWarning}\"", warningChip);
-        Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyExportSummaryText}\"", warningChip);
-        Assert.Contains("Text=\"{Binding SimulationSafetyExportBadgeText}\"", warningChip);
-        Assert.DoesNotContain("Background=", warningChip);
-        Assert.DoesNotContain("Foreground=", warningChip);
-        Assert.DoesNotContain("FontSize=", warningChip);
+        Assert.Contains("Classes=\"chipStatus warning\"", warningChip, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"chipStatusText\"", warningChip, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding HasSimulationPhysicalAuditWarning}\"", warningChip, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyExportSummaryText}\"", warningChip, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding SimulationSafetyExportBadgeText}\"", warningChip, StringComparison.Ordinal);
+        Assert.DoesNotContain("Background=", warningChip, StringComparison.Ordinal);
+        Assert.DoesNotContain("Foreground=", warningChip, StringComparison.Ordinal);
+        Assert.DoesNotContain("FontSize=", warningChip, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -459,13 +459,13 @@ public sealed class UiLayoutGuardTests
         foreach (var (file, commandName) in checks)
         {
             var button = FindXamlElementTagContaining(File.ReadAllText(file), "Button", commandName);
-            Assert.DoesNotContain("actionTextButton", button);
-            Assert.DoesNotContain("actionNeutral", button);
-            Assert.DoesNotContain("actionPrimary", button);
+            Assert.DoesNotContain("actionTextButton", button, StringComparison.Ordinal);
+            Assert.DoesNotContain("actionNeutral", button, StringComparison.Ordinal);
+            Assert.DoesNotContain("actionPrimary", button, StringComparison.Ordinal);
         }
 
         var step2View = File.ReadAllText(Path.Combine(stepsRoot, "RightWorkflowStep2View.axaml"));
-        Assert.Contains("ColumnSpacing=\"{StaticResource Space6}\"", step2View);
+        Assert.Contains("ColumnSpacing=\"{StaticResource Space6}\"", step2View, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -529,48 +529,48 @@ public sealed class UiLayoutGuardTests
         Assert.Equal(2, Regex.Count(tokens, "<Color x:Key=\"ColorTooltipForeground\">#000000</Color>"));
         AssertInteractiveActionStateContrast(actionStyles, tokens, 4.5);
 
-        Assert.Contains("Button.actionTextButton.actionNeutral, ToggleButton.actionTextButton.actionNeutral", actionStyles);
-        Assert.Contains("BrushButtonNeutralBackground", actionStyles);
-        Assert.Contains("BrushButtonNeutralHover", actionStyles);
-        Assert.Contains("BrushButtonNeutralPressed", actionStyles);
-        Assert.Contains("BrushButtonNeutralForeground", actionStyles);
-        Assert.Contains("BrushButtonDisabledForeground", actionStyles);
+        Assert.Contains("Button.actionTextButton.actionNeutral, ToggleButton.actionTextButton.actionNeutral", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushButtonNeutralBackground", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushButtonNeutralHover", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushButtonNeutralPressed", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushButtonNeutralForeground", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushButtonDisabledForeground", actionStyles, StringComparison.Ordinal);
         Assert.Equal(2, Regex.Count(tokens, "<Color x:Key=\"ColorButtonNeutralForeground\">#1E2430</Color>"));
         Assert.Equal(2, Regex.Count(tokens, "<Color x:Key=\"ColorButtonDisabledForeground\">#4A5568</Color>"));
 
         var appCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "App.axaml.cs"));
         var tooltipServiceCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Services", "SharedToolTipStyleService.cs"));
         Assert.Contains("Controls.Overlay.axaml", File.ReadAllText(Path.Combine(stylesRoot, "Controls.axaml")));
-        Assert.Contains("Style Selector=\"ToolTip TextBlock, ToolTip SelectableTextBlock\"", overlayStyles);
-        Assert.Contains("Style Selector=\"ToolTip /template/ ContentPresenter\"", overlayStyles);
-        Assert.Contains("BrushTooltipBackground", overlayStyles);
-        Assert.Contains("BrushTooltipBorder", overlayStyles);
-        Assert.Contains("BrushTooltipForeground", overlayStyles);
-        Assert.Contains("SharedToolTipStyleService.Register();", appCode);
-        Assert.Contains("ToolTip.TipProperty.Changed.AddClassHandler<Control, object?>", tooltipServiceCode);
-        Assert.Contains("target.SetCurrentValue(ToolTip.TipProperty", tooltipServiceCode);
-        Assert.Contains("BrushTooltipForeground", tooltipServiceCode);
+        Assert.Contains("Style Selector=\"ToolTip TextBlock, ToolTip SelectableTextBlock\"", overlayStyles, StringComparison.Ordinal);
+        Assert.Contains("Style Selector=\"ToolTip /template/ ContentPresenter\"", overlayStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushTooltipBackground", overlayStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushTooltipBorder", overlayStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushTooltipForeground", overlayStyles, StringComparison.Ordinal);
+        Assert.Contains("SharedToolTipStyleService.Register();", appCode, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.TipProperty.Changed.AddClassHandler<Control, object?>", tooltipServiceCode, StringComparison.Ordinal);
+        Assert.Contains("target.SetCurrentValue(ToolTip.TipProperty", tooltipServiceCode, StringComparison.Ordinal);
+        Assert.Contains("BrushTooltipForeground", tooltipServiceCode, StringComparison.Ordinal);
         var tooltipBaseStyle = ExtractStyleBlocks(overlayStyles)
             .Single(static style => style.Selector == "ToolTip");
         Assert.Equal("{DynamicResource BrushTooltipForeground}", GetSetterValue(tooltipBaseStyle.Body, "Foreground"));
-        Assert.DoesNotContain("TextBlock.Foreground", tooltipBaseStyle.Body);
-        Assert.DoesNotContain("AncestorType=ToolTip", allStyles);
-        Assert.Contains("Button:pointerover", coreStyles);
-        Assert.Contains("BrushButtonNeutralForeground", coreStyles);
+        Assert.DoesNotContain("TextBlock.Foreground", tooltipBaseStyle.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("AncestorType=ToolTip", allStyles, StringComparison.Ordinal);
+        Assert.Contains("Button:pointerover", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushButtonNeutralForeground", coreStyles, StringComparison.Ordinal);
         Assert.Equal(2, Regex.Count(coreStyles, "ToolTip.ShowOnDisabled"));
-        Assert.Contains("Property=\"ToolTip.ShowOnDisabled\" Value=\"True\"", coreStyles);
-        Assert.Contains("Button:disabled:pointerover, Button:disabled:pressed", coreStyles);
-        Assert.Contains("ToggleButton:disabled:pointerover, ToggleButton:disabled:pressed", coreStyles);
-        Assert.Contains("Button.dangerTextButton:disabled:pointerover, Button.dangerTextButton:disabled:pressed", actionStyles);
+        Assert.Contains("Property=\"ToolTip.ShowOnDisabled\" Value=\"True\"", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Button:disabled:pointerover, Button:disabled:pressed", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("ToggleButton:disabled:pointerover, ToggleButton:disabled:pressed", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Button.dangerTextButton:disabled:pointerover, Button.dangerTextButton:disabled:pressed", actionStyles, StringComparison.Ordinal);
         AssertDisabledInteractiveStatesKeepMutedForeground(coreStyles, actionStyles);
 
-        Assert.Contains("<Thickness x:Key=\"BorderInput\">2</Thickness>", tokens);
-        Assert.Contains("<Thickness x:Key=\"BorderControl\">1.5</Thickness>", tokens);
-        Assert.Contains("BorderThickness\" Value=\"{StaticResource BorderInput}\"", formStyles);
-        Assert.Contains("Style Selector=\"ToggleSwitch\"", formStyles);
-        Assert.Contains("Style Selector=\"ToggleSwitch:checked\"", formStyles);
-        Assert.Contains("BorderBrush\" Value=\"{DynamicResource BrushBorderStrong}\"", formStyles);
-        Assert.DoesNotContain("BorderInput", actionStyles);
+        Assert.Contains("<Thickness x:Key=\"BorderInput\">2</Thickness>", tokens, StringComparison.Ordinal);
+        Assert.Contains("<Thickness x:Key=\"BorderControl\">1.5</Thickness>", tokens, StringComparison.Ordinal);
+        Assert.Contains("BorderThickness\" Value=\"{StaticResource BorderInput}\"", formStyles, StringComparison.Ordinal);
+        Assert.Contains("Style Selector=\"ToggleSwitch\"", formStyles, StringComparison.Ordinal);
+        Assert.Contains("Style Selector=\"ToggleSwitch:checked\"", formStyles, StringComparison.Ordinal);
+        Assert.Contains("BorderBrush\" Value=\"{DynamicResource BrushBorderStrong}\"", formStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("BorderInput", actionStyles, StringComparison.Ordinal);
 
         var tooltipOffenders = FindIconActionButtonsWithoutToolTips(repoRoot);
         Assert.True(
@@ -585,19 +585,19 @@ public sealed class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
 
         var controlsStyles = ReadAllStylesText(repoRoot);
-        Assert.Contains("Style Selector=\"ComboBox.regularLayerSelector /template/ Popup\"", controlsStyles);
-        Assert.Contains("MinWidth\" Value=\"{Binding $parent[ComboBox].Bounds.Width}\"", controlsStyles);
-        Assert.Contains("MaxWidth\" Value=\"{Binding $parent[ComboBox].Bounds.Width}\"", controlsStyles);
-        Assert.Contains("PlacementConstraintAdjustment\" Value=\"All\"", controlsStyles);
+        Assert.Contains("Style Selector=\"ComboBox.regularLayerSelector /template/ Popup\"", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("MinWidth\" Value=\"{Binding $parent[ComboBox].Bounds.Width}\"", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("MaxWidth\" Value=\"{Binding $parent[ComboBox].Bounds.Width}\"", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("PlacementConstraintAdjustment\" Value=\"All\"", controlsStyles, StringComparison.Ordinal);
 
         var rightWorkflowSettings = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowSettingsTabView.axaml"));
-        Assert.DoesNotContain("ComboBox Classes=\"regularLayerSelector\"", rightWorkflowSettings);
+        Assert.DoesNotContain("ComboBox Classes=\"regularLayerSelector\"", rightWorkflowSettings, StringComparison.Ordinal);
 
         var settingsGeneralSection = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsSections", "SettingsGeneralSectionView.axaml"));
-        Assert.Contains("ComboBox Classes=\"regularLayerSelector\"", settingsGeneralSection);
+        Assert.Contains("ComboBox Classes=\"regularLayerSelector\"", settingsGeneralSection, StringComparison.Ordinal);
 
         var settingsWindowCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.SettingsWindow.cs"));
-        Assert.Contains("Open settings window requested: source={0}, section={1}.", settingsWindowCode);
+        Assert.Contains("Open settings window requested: source={0}, section={1}.", settingsWindowCode, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -660,9 +660,9 @@ public sealed class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
         var regularPadInfoContent = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "PadInfoSections", "RegularPadInfoContentView.axaml"));
 
-        Assert.Contains("x:Name=\"RegularPadInfoScroll\"", regularPadInfoContent);
-        Assert.Contains("MaxHeight=\"{StaticResource PadInfoContentMaxHeight}\"", regularPadInfoContent);
-        Assert.Contains("IsVisible=\"{Binding ShowGeometryDetails}\"", regularPadInfoContent);
+        Assert.Contains("x:Name=\"RegularPadInfoScroll\"", regularPadInfoContent, StringComparison.Ordinal);
+        Assert.Contains("MaxHeight=\"{StaticResource PadInfoContentMaxHeight}\"", regularPadInfoContent, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding ShowGeometryDetails}\"", regularPadInfoContent, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -671,9 +671,9 @@ public sealed class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
         var regularPadInfoContent = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "PadInfoSections", "RegularPadInfoContentView.axaml"));
 
-        Assert.Contains("Classes=\"padInfoSectionToggle debugCard\"", regularPadInfoContent);
-        Assert.Contains("Command=\"{Binding ToggleGeometryDetailsCommand}\"", regularPadInfoContent);
-        Assert.DoesNotContain("Content=\"{Binding GeometryDetailsToggleText}\"", regularPadInfoContent);
+        Assert.Contains("Classes=\"padInfoSectionToggle debugCard\"", regularPadInfoContent, StringComparison.Ordinal);
+        Assert.Contains("Command=\"{Binding ToggleGeometryDetailsCommand}\"", regularPadInfoContent, StringComparison.Ordinal);
+        Assert.DoesNotContain("Content=\"{Binding GeometryDetailsToggleText}\"", regularPadInfoContent, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -753,7 +753,7 @@ public sealed class UiLayoutGuardTests
         Assert.False(keyRPattern.IsMatch(freeformShortcutCode), "Global shortcut handler should not bind Key.R.");
         Assert.False(keyRPattern.IsMatch(canvasInputCode), "Canvas shortcut handler should not bind Key.R.");
         Assert.DoesNotContain("Reset view", howToUseXaml, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("R:", howToUseXaml);
+        Assert.DoesNotContain("R:", howToUseXaml, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -767,15 +767,15 @@ public sealed class UiLayoutGuardTests
         var dxfEditChangeListWindowCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DxfEditChangeListWindow.axaml.cs"));
         var mainWindowCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml.cs"));
 
-        Assert.Contains("Alt = Regular priority", overlayXaml);
-        Assert.Contains("_topLevel.KeyDown += OnTopLevelKeyDown;", freeformLifecycleCode);
-        Assert.Contains("_topLevel.KeyDown -= OnTopLevelKeyDown;", freeformLifecycleCode);
+        Assert.Contains("Alt = Regular priority", overlayXaml, StringComparison.Ordinal);
+        Assert.Contains("_topLevel.KeyDown += OnTopLevelKeyDown;", freeformLifecycleCode, StringComparison.Ordinal);
+        Assert.Contains("_topLevel.KeyDown -= OnTopLevelKeyDown;", freeformLifecycleCode, StringComparison.Ordinal);
         Assert.Matches(@"IsTextEntryControlSource\(e\.Source\)[\s\S]*private static bool IsTextEntryControlSource[\s\S]*?ConsolePanel[\s\S]*?private static bool IsCanvasInputSource", freeformShortcutCode);
-        Assert.Contains("if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.None)", freeformShortcutCode);
-        Assert.Contains("if (e.Key == Key.A && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode);
-        Assert.Contains("if (e.Key == Key.Z && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode);
-        Assert.Contains("if (e.Key == Key.S && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode);
-        Assert.Contains("if (e.Key == Key.Delete && e.KeyModifiers == KeyModifiers.None)", freeformShortcutCode);
+        Assert.Contains("if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.None)", freeformShortcutCode, StringComparison.Ordinal);
+        Assert.Contains("if (e.Key == Key.A && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode, StringComparison.Ordinal);
+        Assert.Contains("if (e.Key == Key.Z && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode, StringComparison.Ordinal);
+        Assert.Contains("if (e.Key == Key.S && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode, StringComparison.Ordinal);
+        Assert.Contains("if (e.Key == Key.Delete && e.KeyModifiers == KeyModifiers.None)", freeformShortcutCode, StringComparison.Ordinal);
         AssertShortcutBranchDefersCanvasSource(
             freeformShortcutCode,
             "if (e.Key == Key.A && e.KeyModifiers == KeyModifiers.Control)",
@@ -784,16 +784,16 @@ public sealed class UiLayoutGuardTests
             freeformShortcutCode,
             "if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.None)",
             "viewModel.FitCommand.Execute(null);");
-        Assert.Contains("SaveProjectFromShortcutAsync(viewModel)", freeformShortcutCode);
-        Assert.Contains("window.ShowTopToast(message, type);", freeformShortcutCode);
-        Assert.Contains("public void ShowTopToast(string message, NotificationType type = NotificationType.Information)", mainWindowCode);
+        Assert.Contains("SaveProjectFromShortcutAsync(viewModel)", freeformShortcutCode, StringComparison.Ordinal);
+        Assert.Contains("window.ShowTopToast(message, type);", freeformShortcutCode, StringComparison.Ordinal);
+        Assert.Contains("public void ShowTopToast(string message, NotificationType type = NotificationType.Information)", mainWindowCode, StringComparison.Ordinal);
 
-        Assert.Contains("if (e.Key == Key.F)", canvasNavigationCode);
-        Assert.Contains("if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.A)", canvasNavigationCode);
+        Assert.Contains("if (e.Key == Key.F)", canvasNavigationCode, StringComparison.Ordinal);
+        Assert.Contains("if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.A)", canvasNavigationCode, StringComparison.Ordinal);
         Assert.DoesNotMatch(@"\bKey\.Delete\b", canvasNavigationCode);
         Assert.DoesNotMatch(@"\bKey\.Z\b", canvasNavigationCode);
         Assert.DoesNotMatch(@"\bKey\.S\b", canvasNavigationCode);
-        Assert.Contains("if (e.Key == Key.A && e.KeyModifiers.HasFlag(KeyModifiers.Control))", dxfEditChangeListWindowCode);
+        Assert.Contains("if (e.Key == Key.A && e.KeyModifiers.HasFlag(KeyModifiers.Control))", dxfEditChangeListWindowCode, StringComparison.Ordinal);
         Assert.DoesNotMatch(@"\bKey\.F\b", dxfEditChangeListWindowCode);
         Assert.DoesNotMatch(@"\bKey\.Delete\b", dxfEditChangeListWindowCode);
     }
@@ -805,14 +805,14 @@ public sealed class UiLayoutGuardTests
         var tokens = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Tokens.axaml"));
         var visibleDrawListBuilder = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "PadCanvas.VisibleDrawListBuilder.cs"));
 
-        Assert.Contains("CanvasLowDetailRegularDecimationMaxStep", tokens);
-        Assert.Contains("CanvasLowDetailCadMaxVisibleUnselected", tokens);
-        Assert.Contains("CanvasLowDetailCadMinScreenSize", tokens);
+        Assert.Contains("CanvasLowDetailRegularDecimationMaxStep", tokens, StringComparison.Ordinal);
+        Assert.Contains("CanvasLowDetailCadMaxVisibleUnselected", tokens, StringComparison.Ordinal);
+        Assert.Contains("CanvasLowDetailCadMinScreenSize", tokens, StringComparison.Ordinal);
 
-        Assert.Contains("CanvasLowDetailRegularDecimationMaxStep", visibleDrawListBuilder);
-        Assert.Contains("CanvasLowDetailCadMaxVisibleUnselected", visibleDrawListBuilder);
-        Assert.Contains("CanvasLowDetailCadMinScreenSize", visibleDrawListBuilder);
-        Assert.Contains("_cadIndex.Query(worldViewport)", visibleDrawListBuilder);
+        Assert.Contains("CanvasLowDetailRegularDecimationMaxStep", visibleDrawListBuilder, StringComparison.Ordinal);
+        Assert.Contains("CanvasLowDetailCadMaxVisibleUnselected", visibleDrawListBuilder, StringComparison.Ordinal);
+        Assert.Contains("CanvasLowDetailCadMinScreenSize", visibleDrawListBuilder, StringComparison.Ordinal);
+        Assert.Contains("_cadIndex.Query(worldViewport)", visibleDrawListBuilder, StringComparison.Ordinal);
     }
 
     private static List<string> FindNonWrappedSelectableTextTags(string xaml, string bindingPath)
@@ -869,8 +869,8 @@ public sealed class UiLayoutGuardTests
         Assert.True(actionStart > branchStart, $"Shortcut action missing after branch: {actionSnippet}");
 
         var branchPrefix = source[branchStart..actionStart];
-        Assert.Contains("if (fromCanvas)", branchPrefix);
-        Assert.Contains("return false;", branchPrefix);
+        Assert.Contains("if (fromCanvas)", branchPrefix, StringComparison.Ordinal);
+        Assert.Contains("return false;", branchPrefix, StringComparison.Ordinal);
     }
 
     private static List<string> FindIconActionButtonsWithoutToolTips(string repoRoot)
