@@ -1,3 +1,4 @@
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -79,7 +80,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     {
         using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var useCase = new RuntimeQueryUseCase(shell);
-        var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"freeformhelper-export-{Guid.NewGuid():N}.csv");
+        var path = TestFiles.NewTempFilePath("freeformhelper-export-", ".csv");
 
         var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
             Version: RuntimeQueryProtocol.Version,
@@ -104,7 +105,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         shell.FreeformHelper.EnableV21 = true;
         shell.FreeformHelper.EnableV22 = false;
         var useCase = new RuntimeQueryUseCase(shell);
-        var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"freeformhelper-export-{Guid.NewGuid():N}.c");
+        var path = TestFiles.NewTempFilePath("freeformhelper-export-", ".c");
 
         var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
             Version: RuntimeQueryProtocol.Version,

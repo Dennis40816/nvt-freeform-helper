@@ -53,8 +53,8 @@ public sealed partial class FreeformHelperViewModelTests
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
         using var fixture = ExampleProjectFixture.Create(projectPath);
         var csvPath = Path.Combine(repoRoot, "example", "BOE36.35", "SeeRegular.csv");
-        var savePath = Path.Combine(Path.GetTempPath(), $"freeform-helper-mask-{Guid.NewGuid():N}.json");
-        var missingDxfPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-missing-{Guid.NewGuid():N}.dxf");
+        var savePath = TestFiles.NewTempFilePath("freeform-helper-mask-", ".json");
+        var missingDxfPath = TestFiles.NewTempFilePath("freeform-helper-missing-", ".dxf");
 
         try
         {
@@ -71,7 +71,7 @@ public sealed partial class FreeformHelperViewModelTests
             vm.ConfirmEmbedDxfAsync = () => Task.FromResult(false);
             Assert.True(await vm.SaveProjectAsync());
 
-            var savedProjectText = await File.ReadAllTextAsync(savePath);
+            var savedProjectText = await TestFiles.ReadContentAsync(savePath, TestContext.Current.CancellationToken);
             using (var doc = System.Text.Json.JsonDocument.Parse(savedProjectText))
             {
                 var import = doc.RootElement.GetProperty("uiSnapshot").GetProperty("import");
@@ -84,10 +84,10 @@ public sealed partial class FreeformHelperViewModelTests
             savedProjectNode!["lastDxfPath"] = missingDxfPath;
             savedProjectNode["embeddedDxf"] = null;
             savedProjectNode["embeddedDxfName"] = null;
-            await File.WriteAllTextAsync(savePath, savedProjectNode.ToJsonString(new System.Text.Json.JsonSerializerOptions
+            await TestFiles.WriteTextAsync(savePath, savedProjectNode.ToJsonString(new System.Text.Json.JsonSerializerOptions
             {
                 WriteIndented = true,
-            }));
+            }), TestContext.Current.CancellationToken);
 
             var loadedVm = new FreeformHelperViewModel
             {
@@ -116,9 +116,9 @@ public sealed partial class FreeformHelperViewModelTests
         var projectPath = Path.Combine(repoRoot, "example", "BOE36.35", "project_3635.json");
         using var fixture = ExampleProjectFixture.Create(projectPath);
         var csvPath = Path.Combine(repoRoot, "example", "BOE36.35", "SeeRegular.csv");
-        var savePath = Path.Combine(Path.GetTempPath(), $"freeform-helper-mask-embed-{Guid.NewGuid():N}.json");
-        var missingDxfPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-missing-{Guid.NewGuid():N}.dxf");
-        var missingMaskPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-missing-{Guid.NewGuid():N}.csv");
+        var savePath = TestFiles.NewTempFilePath("freeform-helper-mask-embed-", ".json");
+        var missingDxfPath = TestFiles.NewTempFilePath("freeform-helper-missing-", ".dxf");
+        var missingMaskPath = TestFiles.NewTempFilePath("freeform-helper-missing-", ".csv");
 
         try
         {
@@ -135,7 +135,7 @@ public sealed partial class FreeformHelperViewModelTests
             vm.ConfirmEmbedDxfAsync = () => Task.FromResult(true);
             Assert.True(await vm.SaveProjectAsync());
 
-            var savedProjectText = await File.ReadAllTextAsync(savePath);
+            var savedProjectText = await TestFiles.ReadContentAsync(savePath, TestContext.Current.CancellationToken);
             using (var doc = System.Text.Json.JsonDocument.Parse(savedProjectText))
             {
                 Assert.True(doc.RootElement.TryGetProperty("embeddedRegularVisibilityMask", out var embeddedMask));
@@ -147,10 +147,10 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.NotNull(savedProjectNode);
             savedProjectNode!["lastDxfPath"] = missingDxfPath;
             savedProjectNode["uiSnapshot"]!["import"]!["regularVisibilityMaskSourcePath"] = missingMaskPath;
-            await File.WriteAllTextAsync(savePath, savedProjectNode.ToJsonString(new System.Text.Json.JsonSerializerOptions
+            await TestFiles.WriteTextAsync(savePath, savedProjectNode.ToJsonString(new System.Text.Json.JsonSerializerOptions
             {
                 WriteIndented = true,
-            }));
+            }), TestContext.Current.CancellationToken);
 
             var loadedVm = new FreeformHelperViewModel
             {

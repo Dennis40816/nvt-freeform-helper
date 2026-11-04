@@ -68,7 +68,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
             var json = JsonSerializer.Serialize(result, _jsonOptions);
-            await File.WriteAllTextAsync(outputPath, json);
+            await TestFiles.WriteTextAsync(outputPath, json, TestContext.Current.CancellationToken);
         }
         finally
         {

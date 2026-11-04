@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -28,7 +29,7 @@ public sealed partial class FreeformHelperViewModelTests
     {
         Assert.Equal(-1.0, new UiViewSnapshot().HighlightStrokeWidthAdjust);
 
-        var appSettingsPath = Path.Combine(Path.GetTempPath(), $"freeform-app-general-{Guid.NewGuid():N}.json");
+        var appSettingsPath = TestFiles.NewTempFilePath("freeform-app-general-", ".json");
         try
         {
             var vm = new FreeformHelperViewModel(new AppGeneralSettingsStore(appSettingsPath));

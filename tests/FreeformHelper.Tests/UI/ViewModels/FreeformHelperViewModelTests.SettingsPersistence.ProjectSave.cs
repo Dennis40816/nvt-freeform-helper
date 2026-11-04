@@ -1,5 +1,6 @@
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -45,7 +46,7 @@ public sealed partial class FreeformHelperViewModelTests
     public async Task ShouldPromptSaveOnExit_WhenCadLoadedAndSavedWithoutChanges_ReturnsFalse()
     {
         var dxfPath = CreateTempDxfFile(("L1", 0, 0, 10, 10));
-        var projectPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("freeform-helper-", ".json");
         try
         {
             var vm = new FreeformHelperViewModel
@@ -118,7 +119,7 @@ public sealed partial class FreeformHelperViewModelTests
             HasUnsavedChanges = true,
         };
 
-        var path = Path.Combine(Path.GetTempPath(), $"freeform-helper-{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("freeform-helper-", ".json");
         try
         {
             vm.PickSaveProjectPathAsync = () => Task.FromResult<string?>(path);
@@ -157,7 +158,7 @@ public sealed partial class FreeformHelperViewModelTests
             HasUnsavedChanges = true,
         };
 
-        var directoryPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-dir-{Guid.NewGuid():N}");
+        var directoryPath = TestFiles.NewTempFilePath("freeform-helper-dir-", "");
         Directory.CreateDirectory(directoryPath);
         try
         {

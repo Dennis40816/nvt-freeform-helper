@@ -4,6 +4,7 @@ using System.Text;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
@@ -87,7 +88,7 @@ public sealed partial class FreeformHelperViewModelTests
 
     internal static string CreateTempDxfFile(params (string Layer, double MinX, double MinY, double MaxX, double MaxY)[] pads)
     {
-        var path = Path.Combine(Path.GetTempPath(), $"freeformhelper-test-{Guid.NewGuid():N}.dxf");
+        var path = TestFiles.NewTempFilePath("freeformhelper-test-", ".dxf");
         var builder = new StringBuilder();
         builder.AppendLine("0");
         builder.AppendLine("SECTION");
@@ -113,7 +114,7 @@ public sealed partial class FreeformHelperViewModelTests
         builder.AppendLine("ENDSEC");
         builder.AppendLine("0");
         builder.AppendLine("EOF");
-        File.WriteAllText(path, builder.ToString(), Encoding.UTF8);
+        TestFiles.WriteText(path, builder.ToString(), Encoding.UTF8);
         return path;
 
         void AppendVertex(double x, double y)

@@ -99,14 +99,14 @@ public sealed partial class FreeformHelperViewModelTests
         vm.RegularSourceMode = RegularSourceMode.FromDxfLayer;
         vm.SelectedRegularSourceLayerOption = new FreeformHelperViewModel.RegularSourceLayerOption("regular", "regular");
 
-        var outputPath = Path.Combine(Path.GetTempPath(), $"freeformhelper-visible-{Guid.NewGuid():N}.dxf");
+        var outputPath = TestFiles.NewTempFilePath("freeformhelper-visible-", ".dxf");
         vm.PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(outputPath);
 
         try
         {
             await vm.ExportDxfVisibleCommand.ExecuteAsync(null);
 
-            var text = await File.ReadAllTextAsync(outputPath, TestContext.Current.CancellationToken);
+            var text = await TestFiles.ReadContentAsync(outputPath, TestContext.Current.CancellationToken);
             var polylineCount = text
                 .Split("LWPOLYLINE", StringSplitOptions.None)
                 .Length - 1;

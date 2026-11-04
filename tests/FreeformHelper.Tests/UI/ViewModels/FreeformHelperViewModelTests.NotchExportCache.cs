@@ -30,8 +30,8 @@ public sealed partial class FreeformHelperViewModelTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var dxfPath = CreateTempDxfFile(("signal", 0, 0, 20, 10));
-        var projectPath = Path.Combine(Path.GetTempPath(), $"notch-legacy-cache-{Guid.NewGuid():N}.json");
-        var outputPath = Path.Combine(Path.GetTempPath(), $"notch-legacy-cache-{Guid.NewGuid():N}.c");
+        var projectPath = TestFiles.NewTempFilePath("notch-legacy-cache-", ".json");
+        var outputPath = TestFiles.NewTempFilePath("notch-legacy-cache-", ".c");
         try
         {
             await new JsonProjectStore().SaveAsync(projectPath, new ProjectFile
@@ -111,9 +111,9 @@ public sealed partial class FreeformHelperViewModelTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var dxfPath = CreateTempDxfFile(("signal", 0, 0, 20, 10));
-        var rejectedPath = Path.Combine(Path.GetTempPath(), $"notch-cache-rejected-{Guid.NewGuid():N}.c");
-        var cachedPath = Path.Combine(Path.GetTempPath(), $"notch-cache-admitted-{Guid.NewGuid():N}.c");
-        var freshPath = Path.Combine(Path.GetTempPath(), $"notch-cache-fresh-{Guid.NewGuid():N}.c");
+        var rejectedPath = TestFiles.NewTempFilePath("notch-cache-rejected-", ".c");
+        var cachedPath = TestFiles.NewTempFilePath("notch-cache-admitted-", ".c");
+        var freshPath = TestFiles.NewTempFilePath("notch-cache-fresh-", ".c");
         try
         {
             var vm = await CreateNotchExportCacheViewModelAsync(dxfPath);
@@ -135,7 +135,7 @@ public sealed partial class FreeformHelperViewModelTests
             await ExportNotchProfileAsync(freshVm, NotchExportProfile.Release, freshPath);
 
             Assert.Contains("//   Sections: v2.1=present, v2.2=empty", cachedPayload, StringComparison.Ordinal);
-            Assert.Equal(await File.ReadAllBytesAsync(freshPath), await File.ReadAllBytesAsync(cachedPath));
+            Assert.Equal(await TestFiles.ReadBytesAsync(freshPath, TestContext.Current.CancellationToken), await TestFiles.ReadBytesAsync(cachedPath, TestContext.Current.CancellationToken));
 
             Assert.True(afterRejected.HasEntry);
             Assert.Equal(0, afterRejected.EntryRowCount);
@@ -158,7 +158,7 @@ public sealed partial class FreeformHelperViewModelTests
             await ExportNotchProfileAsync(nullFreshVm, NotchExportProfile.Release, freshPath);
 
             Assert.NotEqual(cachedPayload, nullPayload);
-            Assert.Equal(await File.ReadAllBytesAsync(freshPath), await File.ReadAllBytesAsync(cachedPath));
+            Assert.Equal(await TestFiles.ReadBytesAsync(freshPath, TestContext.Current.CancellationToken), await TestFiles.ReadBytesAsync(cachedPath, TestContext.Current.CancellationToken));
             Assert.Equal(2, afterNullProjection.HitCount);
             Assert.Equal(1, afterNullProjection.MissCount);
             Assert.Equal(1, afterNullProjection.StoreCount);
@@ -191,9 +191,9 @@ public sealed partial class FreeformHelperViewModelTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var dxfPath = CreateTempDxfFile(("signal", 0, 0, 20, 10));
-        var warmPath = Path.Combine(Path.GetTempPath(), $"notch-target-warm-{Guid.NewGuid():N}.c");
-        var cachedPath = Path.Combine(Path.GetTempPath(), $"notch-target-cached-{Guid.NewGuid():N}.c");
-        var freshPath = Path.Combine(Path.GetTempPath(), $"notch-target-fresh-{Guid.NewGuid():N}.c");
+        var warmPath = TestFiles.NewTempFilePath("notch-target-warm-", ".c");
+        var cachedPath = TestFiles.NewTempFilePath("notch-target-cached-", ".c");
+        var freshPath = TestFiles.NewTempFilePath("notch-target-fresh-", ".c");
         try
         {
             var vm = await CreateNotchExportCacheViewModelAsync(dxfPath);
@@ -248,7 +248,7 @@ public sealed partial class FreeformHelperViewModelTests
             await ExportNotchProfileAsync(freshVm, NotchExportProfile.Release, freshPath);
 
             Assert.NotEqual(warmPayload, cachedPayload);
-            Assert.Equal(await File.ReadAllBytesAsync(freshPath), await File.ReadAllBytesAsync(cachedPath));
+            Assert.Equal(await TestFiles.ReadBytesAsync(freshPath, TestContext.Current.CancellationToken), await TestFiles.ReadBytesAsync(cachedPath, TestContext.Current.CancellationToken));
             Assert.Equal(afterWarm.HitCount + 1, afterProjection.HitCount);
             Assert.Equal(afterWarm.MissCount, afterProjection.MissCount);
             Assert.Equal(afterWarm.StoreCount, afterProjection.StoreCount);
@@ -270,8 +270,8 @@ public sealed partial class FreeformHelperViewModelTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var dxfPath = CreateTempDxfFile(("signal", 0, 0, 20, 10));
-        var cachedPath = Path.Combine(Path.GetTempPath(), $"notch-version-cached-{Guid.NewGuid():N}.c");
-        var freshPath = Path.Combine(Path.GetTempPath(), $"notch-version-fresh-{Guid.NewGuid():N}.c");
+        var cachedPath = TestFiles.NewTempFilePath("notch-version-cached-", ".c");
+        var freshPath = TestFiles.NewTempFilePath("notch-version-fresh-", ".c");
         try
         {
             var vm = await CreateNotchExportCacheViewModelAsync(dxfPath);
@@ -297,7 +297,7 @@ public sealed partial class FreeformHelperViewModelTests
             await ExportNotchProfileAsync(freshVm, NotchExportProfile.Release, freshPath);
 
             AssertVersionSections(cachedPayload, requestedVersion);
-            Assert.Equal(await File.ReadAllBytesAsync(freshPath), await File.ReadAllBytesAsync(cachedPath));
+            Assert.Equal(await TestFiles.ReadBytesAsync(freshPath, TestContext.Current.CancellationToken), await TestFiles.ReadBytesAsync(cachedPath, TestContext.Current.CancellationToken));
             Assert.NotEqual(warmPayload, cachedPayload);
             Assert.True(afterVersionChange.HasEntry);
             Assert.True(afterVersionChange.EntryRowCount > 0);
@@ -328,9 +328,9 @@ public sealed partial class FreeformHelperViewModelTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var dxfPath = CreateTempDxfFile(("signal", 0, 0, 20, 10));
-        var warmPath = Path.Combine(Path.GetTempPath(), $"notch-profile-warm-{Guid.NewGuid():N}.c");
-        var cachedPath = Path.Combine(Path.GetTempPath(), $"notch-profile-cached-{Guid.NewGuid():N}.c");
-        var freshPath = Path.Combine(Path.GetTempPath(), $"notch-profile-fresh-{Guid.NewGuid():N}.c");
+        var warmPath = TestFiles.NewTempFilePath("notch-profile-warm-", ".c");
+        var cachedPath = TestFiles.NewTempFilePath("notch-profile-cached-", ".c");
+        var freshPath = TestFiles.NewTempFilePath("notch-profile-fresh-", ".c");
         try
         {
             var vm = await CreateNotchExportCacheViewModelAsync(dxfPath);
@@ -352,7 +352,7 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Equal(1, afterProfileChange.MissCount);
             Assert.Equal(1, afterProfileChange.StoreCount);
             Assert.Equal(afterWarm.SettingsFingerprint, afterProfileChange.SettingsFingerprint);
-            Assert.Equal(await File.ReadAllBytesAsync(freshPath), await File.ReadAllBytesAsync(cachedPath));
+            Assert.Equal(await TestFiles.ReadBytesAsync(freshPath, TestContext.Current.CancellationToken), await TestFiles.ReadBytesAsync(cachedPath, TestContext.Current.CancellationToken));
             Assert.NotEqual(warmPayload, cachedPayload);
             Assert.Contains($"//   ExportProfile: {requestedProfile}", cachedPayload, StringComparison.Ordinal);
             Assert.DoesNotContain("FwBaseMask", cachedPayload, StringComparison.Ordinal);
@@ -436,7 +436,7 @@ public sealed partial class FreeformHelperViewModelTests
         await ExecuteNotchProfileCommandAsync(vm, profile, outputPath);
 
         Assert.True(File.Exists(outputPath), vm.StatusText);
-        return await File.ReadAllTextAsync(outputPath);
+        return await TestFiles.ReadContentAsync(outputPath, TestContext.Current.CancellationToken);
     }
 
     private static async Task ExecuteNotchProfileCommandAsync(

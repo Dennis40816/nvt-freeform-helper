@@ -2,6 +2,7 @@ using System.Reflection;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -74,7 +75,7 @@ public sealed class OpenDxfSinglePassTests
     {
         var path = DxfSinglePassImportTests.WriteTempDxf(0);
         var embeddedPath = DxfSinglePassImportTests.WriteTempDxf(1);
-        var projectPath = Path.Combine(Path.GetTempPath(), $"dxf-single-pass-project-{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("dxf-single-pass-project-", ".json");
         try
         {
             var options = new DxfImportOptions();
@@ -84,7 +85,7 @@ public sealed class OpenDxfSinglePassTests
             var expectedEmbeddedCatalog = DxfLayerCatalogReader.ReadFromPath(embeddedPath);
             await new JsonProjectStore().SaveAsync(projectPath, new ProjectFile
             {
-                EmbeddedDxf = File.ReadAllBytes(embeddedPath),
+                EmbeddedDxf = TestFiles.ReadBytes(embeddedPath),
                 EmbeddedDxfName = Path.GetFileName(embeddedPath),
             }, CancellationToken.None);
             var vm = new FreeformHelperViewModel

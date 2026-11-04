@@ -101,7 +101,7 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
     {
         // Set this to a publish directory to check the exact distribution with the same guard.
         var distribution = Environment.GetEnvironmentVariable("NFH_FONTS_DISTRIBUTION_PATH") ?? AppContext.BaseDirectory;
-        using var assets = JsonDocument.Parse(File.ReadAllText(Path.Combine(
+        using var assets = JsonDocument.Parse(TestFiles.ReadContent(Path.Combine(
             TestPaths.RepoRoot, "build", "obj", "FreeformHelper.UI", "project.assets.json")));
         var package = assets.RootElement.GetProperty("packageFolders").EnumerateObject()
             .Select(static folder => Path.Combine(folder.Name, "nvt.core.fonts", "0.1.0"))
@@ -124,13 +124,13 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
         var distribution = Environment.GetEnvironmentVariable("NFH_FONTS_DISTRIBUTION_PATH") ?? AppContext.BaseDirectory;
         var target = Path.Combine(distribution, "licenses", "Inter", "LICENSE");
         Assert.True(File.Exists(target), $"Distribution is missing licenses/Inter/LICENSE: {distribution}");
-        Assert.Equal(InterLicenseSha256, HashLicenseText(File.ReadAllText(target)));
+        Assert.Equal(InterLicenseSha256, HashLicenseText(TestFiles.ReadContent(target)));
     }
 
     [Fact]
     public void InterLicenseHash_WhenTextIsModified_DiffersFromThePinnedHash()
     {
-        var text = File.ReadAllText(Path.Combine(TestPaths.RepoRoot, "src", "FreeformHelper.UI", "licenses", "Inter", "LICENSE"));
+        var text = TestFiles.ReadContent(Path.Combine(TestPaths.RepoRoot, "src", "FreeformHelper.UI", "licenses", "Inter", "LICENSE"));
         Assert.Equal(InterLicenseSha256, HashLicenseText(text));
         Assert.NotEqual(InterLicenseSha256, HashLicenseText(text + " "));
     }
@@ -143,8 +143,8 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
     {
         var target = Path.Combine(distribution, relativeOutput);
         Assert.True(File.Exists(target), $"Distribution is missing {relativeOutput}: {distribution}");
-        Assert.Equal(SHA256.HashData(File.ReadAllBytes(Path.Combine(package, source))),
-            SHA256.HashData(File.ReadAllBytes(target)));
+        Assert.Equal(SHA256.HashData(TestFiles.ReadBytes(Path.Combine(package, source))),
+            SHA256.HashData(TestFiles.ReadBytes(target)));
     }
 
     private static SortedSet<string> ReadNfhIcons()
@@ -176,7 +176,7 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
 
         foreach (var file in Directory.EnumerateFiles(uiRoot, "*.cs", SearchOption.AllDirectories))
         {
-            foreach (Match icon in Regex.Matches(File.ReadAllText(file), @"new\s+FontIcon\s*\{(?<body>[\s\S]*?)\}"))
+            foreach (Match icon in Regex.Matches(TestFiles.ReadContent(file), @"new\s+FontIcon\s*\{(?<body>[\s\S]*?)\}"))
             {
                 foreach (Match literal in Regex.Matches(icon.Groups["body"].Value, @"\b(?:Glyph|Text)\s*=\s*""(?<text>(?:\\.|[^""\\])*)"""))
                 {

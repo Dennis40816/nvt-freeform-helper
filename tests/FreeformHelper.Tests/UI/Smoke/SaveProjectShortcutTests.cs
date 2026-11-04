@@ -1,5 +1,6 @@
 using System.Reflection;
 using Avalonia.Headless.XUnit;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
 using Xunit;
@@ -18,7 +19,7 @@ public sealed class SaveProjectShortcutTests
     [AvaloniaFact]
     public async Task SaveCommand_PreservesSaveResult()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"save-command-{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("save-command-", ".json");
         try
         {
             var vm = new FreeformHelperViewModel

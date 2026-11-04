@@ -4,6 +4,7 @@ using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
@@ -17,8 +18,8 @@ public sealed partial class FreeformHelperViewModelTests
     [Fact]
     public async Task LoadThenSaveProject_PreservesLegacyNotchComputationAndVersionFields()
     {
-        var sourcePath = Path.Combine(Path.GetTempPath(), $"freeform-helper-notch-source-{Guid.NewGuid():N}.json");
-        var savedPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-notch-saved-{Guid.NewGuid():N}.json");
+        var sourcePath = TestFiles.NewTempFilePath("freeform-helper-notch-source-", ".json");
+        var savedPath = TestFiles.NewTempFilePath("freeform-helper-notch-saved-", ".json");
         try
         {
             await new JsonProjectStore().SaveAsync(sourcePath, new ProjectFile
@@ -59,8 +60,8 @@ public sealed partial class FreeformHelperViewModelTests
     [Fact]
     public async Task LoadThenSaveProject_PreservesIgnoredMatchingCompatibilityValuesIndependently()
     {
-        var sourcePath = Path.Combine(Path.GetTempPath(), $"freeform-helper-matching-source-{Guid.NewGuid():N}.json");
-        var savedPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-matching-saved-{Guid.NewGuid():N}.json");
+        var sourcePath = TestFiles.NewTempFilePath("freeform-helper-matching-source-", ".json");
+        var savedPath = TestFiles.NewTempFilePath("freeform-helper-matching-saved-", ".json");
         try
         {
             await new JsonProjectStore().SaveAsync(sourcePath, new ProjectFile
@@ -128,7 +129,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         vm.SelectedLogLevelOption = persisted;
 
-        var path = Path.Combine(Path.GetTempPath(), $"freeform-helper-{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("freeform-helper-", ".json");
         try
         {
             vm.PickSaveProjectPathAsync = () => Task.FromResult<string?>(path);
@@ -239,7 +240,7 @@ public sealed partial class FreeformHelperViewModelTests
         var persistedProfile = vm.SelectedNotchExportProfileOption;
         var persistedAlignment = vm.SelectedGridAlignmentOption;
 
-        var path = Path.Combine(Path.GetTempPath(), $"freeform-helper-{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("freeform-helper-", ".json");
         try
         {
             vm.PickSaveProjectPathAsync = () => Task.FromResult<string?>(path);
@@ -308,7 +309,7 @@ public sealed partial class FreeformHelperViewModelTests
         settings.EnableV22 = false;
         settings.SaveCommand.Execute(null);
 
-        var path = Path.Combine(Path.GetTempPath(), $"freeform-helper-step5-{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("freeform-helper-step5-", ".json");
         try
         {
             vm.PickSaveProjectPathAsync = () => Task.FromResult<string?>(path);
@@ -316,7 +317,7 @@ public sealed partial class FreeformHelperViewModelTests
             var saveResult = await vm.SaveProjectAsync();
             Assert.True(saveResult);
 
-            using var doc = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(path, TestContext.Current.CancellationToken));
+            using var doc = System.Text.Json.JsonDocument.Parse(await TestFiles.ReadContentAsync(path, TestContext.Current.CancellationToken));
             var settingsVersions = doc.RootElement
                 .GetProperty("settings")
                 .GetProperty("notch")
@@ -380,7 +381,7 @@ public sealed partial class FreeformHelperViewModelTests
             ("L1", 0, 0, 10, 10),
             ("L1", 8, 0, 18, 10),
             ("L1", 30, 0, 42, 10));
-        var projectPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-dxf-edits-{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("freeform-helper-dxf-edits-", ".json");
         try
         {
             var importService = new DxfImportService();
@@ -469,7 +470,7 @@ public sealed partial class FreeformHelperViewModelTests
             ("L1", 0, 0, 10, 10),
             ("L1", 0, 0, 10, 10),
             ("L1", 20, 0, 30, 10));
-        var projectPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-duplicates-{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("freeform-helper-duplicates-", ".json");
         try
         {
             var vm = new FreeformHelperViewModel
@@ -495,7 +496,7 @@ public sealed partial class FreeformHelperViewModelTests
             vm.ConfirmEmbedDxfAsync = () => Task.FromResult(false);
             Assert.True(await vm.SaveProjectAsync());
 
-            using (var doc = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(projectPath, TestContext.Current.CancellationToken)))
+            using (var doc = System.Text.Json.JsonDocument.Parse(await TestFiles.ReadContentAsync(projectPath, TestContext.Current.CancellationToken)))
             {
                 var visibleDuplicates = doc.RootElement
                     .GetProperty("visibleDuplicateCadPadIds")
@@ -536,7 +537,7 @@ public sealed partial class FreeformHelperViewModelTests
             ("signal", 0, 0, 10, 10),
             ("regular", 12, 0, 22, 10),
             ("aux", 24, 0, 34, 10));
-        var projectPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-layer-ui-{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("freeform-helper-layer-ui-", ".json");
         try
         {
             var importService = new DxfImportService();
@@ -598,7 +599,7 @@ public sealed partial class FreeformHelperViewModelTests
     public async Task SaveThenLoadProject_ReplaysStep2FreeformAfterAsyncProjectLoad()
     {
         var dxfPath = CreateTempDxfFile(("signal", 0, 0, 30, 10));
-        var projectPath = Path.Combine(Path.GetTempPath(), $"freeform-helper-step2-replay-{Guid.NewGuid():N}.json");
+        var projectPath = TestFiles.NewTempFilePath("freeform-helper-step2-replay-", ".json");
         try
         {
             var vm = new FreeformHelperViewModel
