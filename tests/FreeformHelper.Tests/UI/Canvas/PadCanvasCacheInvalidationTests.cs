@@ -1,7 +1,7 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using Xunit;
 
@@ -19,17 +19,17 @@ public sealed class PadCanvasCacheInvalidationTests
             RegularPads = CreateRegularPads(offsetX: 0),
         };
 
-        InvokePrivate(canvas, "EnsureCadGeometryCache");
-        InvokePrivate(canvas, "EnsureCadSpatialIndex");
-        var cadGeometryCacheBefore = GetPrivateField(canvas, "_cadGeometryCache");
-        var cadSpatialIndexBefore = GetPrivateField(canvas, "_cadIndex");
+        PadCanvasPrivateAccess.EnsureCadGeometryCache(canvas);
+        PadCanvasPrivateAccess.EnsureCadSpatialIndex(canvas);
+        var cadGeometryCacheBefore = PadCanvasPrivateAccess.CadGeometryCache(canvas);
+        var cadSpatialIndexBefore = PadCanvasSpatialIndexReflection.CadIndex(canvas);
         Assert.NotNull(cadGeometryCacheBefore);
         Assert.NotNull(cadSpatialIndexBefore);
 
         canvas.RegularPads = CreateRegularPads(offsetX: 100);
 
-        var cadGeometryCacheAfter = GetPrivateField(canvas, "_cadGeometryCache");
-        var cadSpatialIndexAfter = GetPrivateField(canvas, "_cadIndex");
+        var cadGeometryCacheAfter = PadCanvasPrivateAccess.CadGeometryCache(canvas);
+        var cadSpatialIndexAfter = PadCanvasSpatialIndexReflection.CadIndex(canvas);
         Assert.Same(cadGeometryCacheBefore, cadGeometryCacheAfter);
         Assert.Same(cadSpatialIndexBefore, cadSpatialIndexAfter);
     }
@@ -43,13 +43,13 @@ public sealed class PadCanvasCacheInvalidationTests
             RegularPads = CreateRegularPads(offsetX: 0),
         };
 
-        InvokePrivate(canvas, "EnsureRegularSpatialIndex");
-        var regularIndexBefore = GetPrivateField(canvas, "_regularIndex");
+        PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
+        var regularIndexBefore = PadCanvasSpatialIndexReflection.RegularIndex(canvas);
         Assert.NotNull(regularIndexBefore);
 
         canvas.CadPads = CreateCadPads(offsetX: 200);
 
-        var regularIndexAfter = GetPrivateField(canvas, "_regularIndex");
+        var regularIndexAfter = PadCanvasSpatialIndexReflection.RegularIndex(canvas);
         Assert.Same(regularIndexBefore, regularIndexAfter);
     }
 
@@ -63,26 +63,26 @@ public sealed class PadCanvasCacheInvalidationTests
             ColorCadByArea = true,
         };
 
-        InvokePrivate(canvas, "EnsureCadGeometryCache");
-        InvokePrivate(canvas, "EnsureAreaColorCache");
-        InvokePrivate(canvas, "EnsureCadSpatialIndex");
-        InvokePrivate(canvas, "EnsureRegularSpatialIndex");
+        PadCanvasPrivateAccess.EnsureCadGeometryCache(canvas);
+        PadCanvasPrivateAccess.EnsureAreaColorCache(canvas);
+        PadCanvasPrivateAccess.EnsureCadSpatialIndex(canvas);
+        PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
 
-        var regularIndexBefore = GetPrivateField(canvas, "_regularIndex");
-        var cadIndexBefore = GetPrivateField(canvas, "_cadIndex");
+        var regularIndexBefore = PadCanvasSpatialIndexReflection.RegularIndex(canvas);
+        var cadIndexBefore = PadCanvasSpatialIndexReflection.CadIndex(canvas);
         Assert.NotNull(regularIndexBefore);
         Assert.NotNull(cadIndexBefore);
-        Assert.NotNull(GetPrivateField(canvas, "_cadGeometryCache"));
-        Assert.NotNull(GetPrivateField(canvas, "_cadAreaColorCache"));
-        Assert.NotNull(GetPrivateField(canvas, "_cadAreaBrushCache"));
+        Assert.NotNull(PadCanvasPrivateAccess.CadGeometryCache(canvas));
+        Assert.NotNull(PadCanvasPrivateAccess.CadAreaColorCache(canvas));
+        Assert.NotNull(PadCanvasPrivateAccess.CadAreaBrushCache(canvas));
 
         canvas.CadPads = CreateCadPads(offsetX: 300);
 
-        Assert.Null(GetPrivateField(canvas, "_cadGeometryCache"));
-        Assert.Null(GetPrivateField(canvas, "_cadAreaColorCache"));
-        Assert.Null(GetPrivateField(canvas, "_cadAreaBrushCache"));
-        Assert.Null(GetPrivateField(canvas, "_cadIndex"));
-        Assert.Same(regularIndexBefore, GetPrivateField(canvas, "_regularIndex"));
+        Assert.Null(PadCanvasPrivateAccess.CadGeometryCache(canvas));
+        Assert.Null(PadCanvasPrivateAccess.CadAreaColorCache(canvas));
+        Assert.Null(PadCanvasPrivateAccess.CadAreaBrushCache(canvas));
+        Assert.Null(PadCanvasSpatialIndexReflection.CadIndex(canvas));
+        Assert.Same(regularIndexBefore, PadCanvasSpatialIndexReflection.RegularIndex(canvas));
     }
 
     [AvaloniaFact]
@@ -95,21 +95,21 @@ public sealed class PadCanvasCacheInvalidationTests
             ColorCadByArea = true,
         };
 
-        InvokePrivate(canvas, "EnsureCadGeometryCache");
-        InvokePrivate(canvas, "EnsureAreaColorCache");
-        InvokePrivate(canvas, "EnsureRegularSpatialIndex");
+        PadCanvasPrivateAccess.EnsureCadGeometryCache(canvas);
+        PadCanvasPrivateAccess.EnsureAreaColorCache(canvas);
+        PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
 
-        var cadGeometryCacheBefore = GetPrivateField(canvas, "_cadGeometryCache");
-        var cadAreaColorCacheBefore = GetPrivateField(canvas, "_cadAreaColorCache");
+        var cadGeometryCacheBefore = PadCanvasPrivateAccess.CadGeometryCache(canvas);
+        var cadAreaColorCacheBefore = PadCanvasPrivateAccess.CadAreaColorCache(canvas);
         Assert.NotNull(cadGeometryCacheBefore);
         Assert.NotNull(cadAreaColorCacheBefore);
-        Assert.NotNull(GetPrivateField(canvas, "_regularIndex"));
+        Assert.NotNull(PadCanvasSpatialIndexReflection.RegularIndex(canvas));
 
         canvas.RegularPads = CreateRegularPads(offsetX: 100);
 
-        Assert.Null(GetPrivateField(canvas, "_regularIndex"));
-        Assert.Same(cadGeometryCacheBefore, GetPrivateField(canvas, "_cadGeometryCache"));
-        Assert.Same(cadAreaColorCacheBefore, GetPrivateField(canvas, "_cadAreaColorCache"));
+        Assert.Null(PadCanvasSpatialIndexReflection.RegularIndex(canvas));
+        Assert.Same(cadGeometryCacheBefore, PadCanvasPrivateAccess.CadGeometryCache(canvas));
+        Assert.Same(cadAreaColorCacheBefore, PadCanvasPrivateAccess.CadAreaColorCache(canvas));
     }
 
     [AvaloniaFact]
@@ -211,7 +211,7 @@ public sealed class PadCanvasCacheInvalidationTests
             RegularPads = CreateRegularPads(offsetX: 0),
         };
 
-        SetPrivateField(canvas, "_zoom", 0.1d);
+        PadCanvasPrivateAccess.Zoom(canvas) = 0.1d;
         InvokeBuildVisibleDrawLists(canvas, new Rect2(-5, -5, 120, 120), showRegular: false, showCad: true, lowDetailMode: true, lowDetailZoomThreshold: 0.3);
         var snapshot = canvas.GetVisibleDrawPerfSnapshot();
 
@@ -242,12 +242,9 @@ public sealed class PadCanvasCacheInvalidationTests
             ShowNotchToFullSeedOverlay = true,
         };
 
-        var method = typeof(PadCanvas).GetMethod("ShouldUsePreciseCadGeometry", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
+        var result = PadCanvasPrivateAccess.ShouldUsePreciseCadGeometry(canvas, 1, false, false, true);
 
-        var result = method!.Invoke(canvas, [1, false, false, true]);
-
-        Assert.Equal(true, result);
+        Assert.True(result);
     }
 
     [AvaloniaFact]
@@ -273,12 +270,9 @@ public sealed class PadCanvasCacheInvalidationTests
             ShowNotchToFullSeedOverlay = true,
         };
 
-        var method = typeof(PadCanvas).GetMethod("ShouldSuppressCadFillForNotchPreview", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
+        var result = PadCanvasPrivateAccess.ShouldSuppressCadFillForNotchPreview(canvas, 1);
 
-        var result = method!.Invoke(canvas, [1]);
-
-        Assert.Equal(true, result);
+        Assert.True(result);
     }
 
     [AvaloniaFact]
@@ -310,12 +304,9 @@ public sealed class PadCanvasCacheInvalidationTests
             HighlightFreeform = true,
         };
 
-        var method = typeof(PadCanvas).GetMethod("ShouldDrawFreeformHatch", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
+        var result = PadCanvasPrivateAccess.ShouldDrawFreeformHatch(canvas, canvas.RegularPads[0]);
 
-        var result = method!.Invoke(canvas, [canvas.RegularPads[0]]);
-
-        Assert.Equal(true, result);
+        Assert.True(result);
     }
 
     [AvaloniaFact]
@@ -341,12 +332,9 @@ public sealed class PadCanvasCacheInvalidationTests
             HighlightFreeform = true,
         };
 
-        var method = typeof(PadCanvas).GetMethod("ShouldSuppressFreeformAccentBorderForNotchPreview", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
+        var result = PadCanvasPrivateAccess.ShouldSuppressFreeformAccentBorderForNotchPreview(canvas);
 
-        var result = method!.Invoke(canvas, null);
-
-        Assert.Equal(true, result);
+        Assert.True(result);
     }
 
     [AvaloniaFact]
@@ -380,12 +368,9 @@ public sealed class PadCanvasCacheInvalidationTests
             ShowNotchToFullFinalOverlay = true,
         };
 
-        var method = typeof(PadCanvas).GetMethod("ShouldSimplifyAggregateNotchPreviewVisuals", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
+        var result = PadCanvasPrivateAccess.ShouldSimplifyAggregateNotchPreviewVisuals(canvas);
 
-        var result = method!.Invoke(canvas, null);
-
-        Assert.Equal(true, result);
+        Assert.True(result);
     }
 
     private static IReadOnlyList<CadPad> CreateCadPads(double offsetX)
@@ -434,13 +419,6 @@ public sealed class PadCanvasCacheInvalidationTests
             ]);
     }
 
-    private static void InvokePrivate(PadCanvas canvas, string methodName)
-    {
-        var method = typeof(PadCanvas).GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        method!.Invoke(canvas, null);
-    }
-
     private static void InvokeBuildVisibleDrawLists(
         PadCanvas canvas,
         Rect2 viewport,
@@ -449,22 +427,6 @@ public sealed class PadCanvasCacheInvalidationTests
         bool lowDetailMode,
         double lowDetailZoomThreshold)
     {
-        var method = typeof(PadCanvas).GetMethod("BuildVisibleDrawLists", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        method!.Invoke(canvas, [viewport, showRegular, showCad, lowDetailMode, lowDetailZoomThreshold]);
-    }
-
-    private static object? GetPrivateField(PadCanvas canvas, string fieldName)
-    {
-        var field = typeof(PadCanvas).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return field!.GetValue(canvas);
-    }
-
-    private static void SetPrivateField(PadCanvas canvas, string fieldName, object value)
-    {
-        var field = typeof(PadCanvas).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        field!.SetValue(canvas, value);
+        PadCanvasPrivateAccess.BuildVisibleDrawLists(canvas, viewport, showRegular, showCad, lowDetailMode, lowDetailZoomThreshold);
     }
 }
