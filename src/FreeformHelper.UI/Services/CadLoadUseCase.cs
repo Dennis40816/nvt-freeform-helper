@@ -15,7 +15,7 @@ public sealed class CadLoadUseCase
     public CadLoadUseCase(DxfImportService dxfImportService)
         : this(
             (dxfImportService ?? throw new ArgumentNullException(nameof(dxfImportService))).ImportFromPath,
-            dxfImportService.ImportFromStream)
+            DxfImportService.ImportFromStream)
     {
     }
 

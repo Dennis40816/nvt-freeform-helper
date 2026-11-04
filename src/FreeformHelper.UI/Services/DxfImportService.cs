@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 
@@ -8,10 +7,6 @@ namespace FreeformHelper.UI.Services;
 /// Provides a service layer for importing DXF data into <see cref="CadPadSet"/> objects.
 /// This service acts as a wrapper around the <see cref="DxfPadImporter"/> from the infrastructure layer.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class DxfImportService
 {
     internal DxfLayerCatalog ImportedCatalog { get; private set; } = DxfLayerCatalog.Empty;
@@ -35,7 +30,7 @@ public sealed class DxfImportService
     /// <param name="stream">The <see cref="Stream"/> containing the DXF data.</param>
     /// <param name="options">The <see cref="DxfImportOptions"/> to apply during import.</param>
     /// <returns>A <see cref="CadPadSet"/> containing the imported CAD pads.</returns>
-    public CadPadSet ImportFromStream(Stream stream, DxfImportOptions options)
+    public static CadPadSet ImportFromStream(Stream stream, DxfImportOptions options)
     {
         return DxfPadImporter.Import(stream, options);
     }

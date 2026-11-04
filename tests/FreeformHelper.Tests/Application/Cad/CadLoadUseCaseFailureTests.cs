@@ -52,8 +52,7 @@ public sealed class CadLoadUseCaseFailureTests
     [Fact]
     public void TryLoadFromProject_WhenPathImportFailsWithOrdinaryException_FallsBackToEmbedded()
     {
-        var service = new DxfImportService();
-        var useCase = new CadLoadUseCase(ThrowInvalidOperation, service.ImportFromStream);
+        var useCase = new CadLoadUseCase(ThrowInvalidOperation, DxfImportService.ImportFromStream);
 
         var outcome = useCase.TryLoadFromProject(ExistingPath, ValidEmbeddedDxfBytes, new DxfImportOptions());
 
@@ -65,9 +64,8 @@ public sealed class CadLoadUseCaseFailureTests
     [Fact]
     public void TryLoadFromProject_WhenPathImportFailsAndNoEmbedded_ThrowsTheOriginalException()
     {
-        var service = new DxfImportService();
         var failure = new InvalidOperationException("path import failed");
-        var useCase = new CadLoadUseCase((_, _) => throw failure, service.ImportFromStream);
+        var useCase = new CadLoadUseCase((_, _) => throw failure, DxfImportService.ImportFromStream);
 
         var thrown = Assert.Throws<InvalidOperationException>(
             () => useCase.TryLoadFromProject(ExistingPath, null, new DxfImportOptions()));
@@ -119,7 +117,7 @@ public sealed class CadLoadUseCaseFailureTests
             (_, _) =>
             {
                 embeddedCalls++;
-                return new DxfImportService().ImportFromStream(new MemoryStream(ValidEmbeddedDxfBytes), new DxfImportOptions());
+                return DxfImportService.ImportFromStream(new MemoryStream(ValidEmbeddedDxfBytes), new DxfImportOptions());
             });
 
         var thrown = Assert.Throws<OutOfMemoryException>(

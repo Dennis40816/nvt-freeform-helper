@@ -39,7 +39,7 @@ public sealed class PadMatchOverlapContractTests
 
         var progress = new List<double>();
         var result = throughUiService
-            ? new PadMatchService().Match(cad, grid, progress.Add)
+            ? PadMatchService.Match(cad, grid, progress.Add)
             : PadMatcher.Match(cad, grid, progress.Add);
         var expected = new[]
         {
