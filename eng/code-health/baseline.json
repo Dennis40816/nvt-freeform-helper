@@ -4889,26 +4889,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "2e4f12b105a0f56c622b329c7d70f0516f8b537e19a583f06cd60690f8351697",
-      "member": "FreeformHelper.Tests.OpenDxfSinglePassTests.GetField`1(FreeformHelperViewModel,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/OpenDxfSinglePassTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "dff9b02a07c72d967ca57de51cb1814a409435195bce8b907ed24e6b7e78591c",
-      "member": "FreeformHelper.Tests.OpenDxfSinglePassTests.GetTokenizationCount()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/OpenDxfSinglePassTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "317635dad5a158dde5cfbedf3f6b89c3dbb68bb518b9ccb8c5e849122a8f4a03",
       "member": "FreeformHelper.Tests.PadBestMatchProjectionCharacterizationTests.ResolveBestCadIdByRegular(PadCanvas,int)",
       "owner": "NFH",
@@ -5229,76 +5209,6 @@
       "symbol": "P:System.DateTime.UtcNow"
     },
     {
-      "syntaxHash": "a5618acfdfe0d1fd5cd239cbd5ee4b4a8dc988227a443dfce5e3a0c97c11cf8b",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.MatchThresholdChange_QueuesVisualRefreshWithoutViewChanged()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "76e1bf84513b0e037d987326bc0d0e28d0b3a20105d81fd9b7a18ed461a5b28a",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.RequestViewRefresh_CoalescesViewChangedNotifications()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "76e1bf84513b0e037d987326bc0d0e28d0b3a20105d81fd9b7a18ed461a5b28a",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.RequestViewRefresh_ResolvesLatestViewSnapshot_BeforeViewChanged()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "814951da6dbc192a332c118db1ce31101486e3751e4bec18cb0286b809955170",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.RequestViewRefresh_ResolvesLatestViewSnapshot_BeforeViewChanged()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "9390cb3eba0fd9fd4cd936e6d1bbbb56bab5310cfd4098ca80ac3b6752232508",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.RequestViewRefresh_ResolvesLatestViewSnapshot_BeforeViewChanged()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "a9864ab892c372f8953566c9a52352b03671fddc3529d109c4161346f931caee",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.RequestViewRefresh_ResolvesLatestViewSnapshot_BeforeViewChanged()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "da824b9a6501cdbb0d05e1048e685d371a2f56362ef2e7aefd99bd30684554ed",
-      "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.RequestVisualRefresh_DoesNotRaiseViewChanged()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasViewRefreshTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "843212021546e66e6a46b693db46bdaa4e1764279b16ccbbb7420fae65f0801c",
       "member": "FreeformHelper.Tests.PadCanvasViewRefreshTests.ShouldDeferSecondaryVisuals_ReturnsTrue_OnlyDuringActiveNavigationWindow()",
       "owner": "NFH",
@@ -5537,16 +5447,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "024b92a786eef95d24b531b5e6d0b4bc2b7805a27beb9a912d1cf2d90751c890",
-      "member": "FreeformHelper.Tests.SimulationWorkspaceViewModelTests.Constructor_OffUiThread_DoesNotCreateDispatcherTimer()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/SimulationWorkspaceViewModelTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "6708484140d7fc81aa5015d198e5a1a6b6821ee5704be9199bc8969089f80b7d",
@@ -6277,16 +6177,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.IO.File.WriteAllText(System.String,System.String,System.Text.Encoding)"
-    },
-    {
-      "syntaxHash": "fde31fb342328f7fbef5ac41079abc376ceac6baab1c13da990426d4d2d88b14",
-      "member": "FreeformHelper.Tests.UiThreadTests.TryGetRunningDispatcher_WhenGlobalSlotIsEmpty_UsesRegisteredDispatcher()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/UiThreadTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "f56034f3c19bc54a05c59d0de2eaa2805be33dc37fe38c24a5b00fa58473c671",

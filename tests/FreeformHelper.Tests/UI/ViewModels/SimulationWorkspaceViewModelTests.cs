@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Reflection;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Notch;
@@ -19,15 +18,11 @@ public sealed class SimulationWorkspaceViewModelTests
     [Fact]
     public async Task Constructor_OffUiThread_DoesNotCreateDispatcherTimer()
     {
-        var timerField = typeof(SimulationWorkspaceViewModel).GetField(
-            "_playbackTimer", BindingFlags.NonPublic | BindingFlags.Instance);
-        Assert.NotNull(timerField);
-
         var viewModel = await Task.Run(() => new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
             BuildSession()));
 
-        Assert.Null(timerField.GetValue(viewModel));
+        Assert.Null(SimulationWorkspaceViewModelPrivateAccess.PlaybackTimer(viewModel));
     }
 
     [Fact]

@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using FreeformHelper.Tests.TestInfrastructure;
@@ -14,22 +13,20 @@ public sealed class UiThreadTests
     public void TryGetRunningDispatcher_WhenGlobalSlotIsEmpty_UsesRegisteredDispatcher()
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        var dispatcherField = typeof(Dispatcher).GetField("s_uiThread", BindingFlags.NonPublic | BindingFlags.Static);
-        Assert.NotNull(dispatcherField);
-        var original = Assert.IsType<Dispatcher>(dispatcherField.GetValue(null));
+        var original = Assert.IsType<Dispatcher>(DispatcherPrivateAccess.UiThreadSlot(null));
         Assert.True(UiThread.TryGetRunningDispatcher(out var registered));
         Assert.Same(original, registered);
 
-        dispatcherField.SetValue(null, null);
+        DispatcherPrivateAccess.UiThreadSlot(null) = null;
         try
         {
             Assert.True(UiThread.TryGetRunningDispatcher(out var actual));
             Assert.Same(original, actual);
-            Assert.Null(dispatcherField.GetValue(null));
+            Assert.Null(DispatcherPrivateAccess.UiThreadSlot(null));
         }
         finally
         {
-            dispatcherField.SetValue(null, original);
+            DispatcherPrivateAccess.UiThreadSlot(null) = original;
         }
     }
 }
