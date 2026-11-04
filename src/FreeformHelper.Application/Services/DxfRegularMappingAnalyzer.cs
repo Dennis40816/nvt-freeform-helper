@@ -54,72 +54,49 @@ public sealed partial class DxfRegularMappingAnalyzer
 
         var cadPads = cad.Pads;
         var regPads = grid.Pads;
+
+        var scan = ScanCandidates(cad, grid, settings, reportProgress);
+        ReportProgress(reportProgress, 0.60);
+
+        var assignment = AssignPairs(cadPads, regPads, settings, manualOverrides, scan, reportProgress);
+        var mappedPairs = BuildMappedPairs(cadPads, regPads, assignment, expectedDiffIndexByCadId);
+
+        // --- Build report ---
+        var inputs = new ReportInputs(cadPads, regPads, settings, scan, assignment, expectedDiffIndexByCadId, reportProgress);
+        var tally = CollectIssues(inputs);
+        var report = BuildReport(inputs, mappedPairs.Count, tally);
+
+        ReportProgress(reportProgress, 1.0);
+        return new DxfRegularMappingResult(mappedPairs, report);
+    }
+
+    private static CandidateScan ScanCandidates(
+        CadPadSet cad,
+        RegularGrid grid,
+        IndexMappingSettings settings,
+        Action<double>? reportProgress)
+    {
+        var cadPads = cad.Pads;
         var cadCount = cadPads.Count;
-        var regCount = regPads.Count;
+        var regCount = grid.Pads.Count;
 
         var padding = Math.Max(0, settings.CandidatePaddingCells);
         var candidateNumber = Math.Max(1, settings.GetEffectiveCandidateNumber());
         var diagnosticTopK = Math.Max(1, settings.DiagnosticTopK);
-        var candidateRetainCount = Math.Max(candidateNumber, diagnosticTopK);
+        var limits = new CandidateLimits(padding, candidateNumber, diagnosticTopK, Math.Max(candidateNumber, diagnosticTopK));
 
         var estimatedCandidatesPerCad = Math.Max(1, (2 * padding + 1) * (2 * padding + 1));
-        var pairs = new List<CandidatePair>(cadCount * Math.Min(estimatedCandidatesPerCad, candidateRetainCount));
-        var cadTopCandidates = new List<DxfRegularMappingCandidate>[cadCount];
-
-        var cadBest = new double[cadCount];
-        var cadSecond = new double[cadCount];
-        var cadHasOverlapEvidence = new bool[cadCount];
-        var regularHasOverlapEvidence = new bool[regCount];
+        var scan = new CandidateScan(
+            new List<CandidatePair>(cadCount * Math.Min(estimatedCandidatesPerCad, limits.RetainCount)),
+            new List<DxfRegularMappingCandidate>[cadCount],
+            new double[cadCount],
+            new double[cadCount],
+            new bool[cadCount],
+            new bool[regCount]);
 
         for (var c = 0; c < cadCount; c++)
         {
-            var cp = cadPads[c];
-            var (rowMin, rowMax, colMin, colMax) = RegularGridCandidateQuery.GetCandidateRange(grid, cp.Bounds, padding);
-
-            var best = 0.0;
-            var second = 0.0;
-            var retainedCandidates = new List<CandidatePair>(candidateRetainCount);
-
-            for (var r = rowMin; r <= rowMax; r++)
-            {
-                var rowBase = r * grid.Cols;
-                for (var col = colMin; col <= colMax; col++)
-                {
-                    var regIndex = rowBase + col;
-                    var reg = regPads[regIndex];
-                    var score = ScoreBuilder.Compute(cp, reg, settings);
-                    if (score <= 0)
-                    {
-                        continue;
-                    }
-
-                    cadHasOverlapEvidence[c] = true;
-                    regularHasOverlapEvidence[regIndex] = true;
-
-                    CandidateDiagnosticsBuilder.UpdateTopCandidates(retainedCandidates, c, regIndex, score, candidateRetainCount);
-
-                    if (score > best)
-                    {
-                        second = best;
-                        best = score;
-                    }
-                    else if (score > second)
-                    {
-                        second = score;
-                    }
-                }
-            }
-
-            cadBest[c] = best;
-            cadSecond[c] = second;
-            cadTopCandidates[c] = CandidateDiagnosticsBuilder.BuildCandidateDiagnostics(
-                retainedCandidates.Take(Math.Min(diagnosticTopK, retainedCandidates.Count)).ToList(),
-                regPads);
-
-            foreach (var retained in retainedCandidates.Take(Math.Min(candidateNumber, retainedCandidates.Count)))
-            {
-                pairs.Add(retained);
-            }
+            ScanCadCandidates(scan, c, cadPads[c], grid, settings, limits);
 
             MaybeReportProgress(
                 reportProgress,
@@ -129,51 +106,100 @@ public sealed partial class DxfRegularMappingAnalyzer
                 interval: 4);
         }
 
-        ReportProgress(reportProgress, 0.60);
+        return scan;
+    }
 
-        var cadToReg = Enumerable.Repeat(-1, cadCount).ToArray();
-        var regToCad = Enumerable.Repeat(-1, regCount).ToArray();
-        var cadAssignedScore = new double[cadCount];
+    private static void ScanCadCandidates(
+        CandidateScan scan,
+        int c,
+        CadPad cp,
+        RegularGrid grid,
+        IndexMappingSettings settings,
+        CandidateLimits limits)
+    {
+        var regPads = grid.Pads;
+        var (rowMin, rowMax, colMin, colMax) = RegularGridCandidateQuery.GetCandidateRange(grid, cp.Bounds, limits.Padding);
 
-        int ResolveCadSequenceIndex(int cadIndex)
+        var best = 0.0;
+        var second = 0.0;
+        var retainedCandidates = new List<CandidatePair>(limits.RetainCount);
+
+        for (var r = rowMin; r <= rowMax; r++)
         {
-            if (expectedDiffIndexByCadId is not null &&
-                expectedDiffIndexByCadId.TryGetValue(cadPads[cadIndex].Id, out var mapped))
+            var rowBase = r * grid.Cols;
+            for (var col = colMin; col <= colMax; col++)
             {
-                return mapped;
-            }
+                var regIndex = rowBase + col;
+                var reg = regPads[regIndex];
+                var score = ScoreBuilder.Compute(cp, reg, settings);
+                if (score <= 0)
+                {
+                    continue;
+                }
 
-            return cadIndex;
+                scan.CadHasOverlapEvidence[c] = true;
+                scan.RegularHasOverlapEvidence[regIndex] = true;
+
+                CandidateDiagnosticsBuilder.UpdateTopCandidates(retainedCandidates, c, regIndex, score, limits.RetainCount);
+
+                if (score > best)
+                {
+                    second = best;
+                    best = score;
+                }
+                else if (score > second)
+                {
+                    second = score;
+                }
+            }
         }
+
+        scan.Best[c] = best;
+        scan.Second[c] = second;
+        scan.TopCandidates[c] = CandidateDiagnosticsBuilder.BuildCandidateDiagnostics(
+            retainedCandidates.Take(Math.Min(limits.DiagnosticTopK, retainedCandidates.Count)).ToList(),
+            regPads);
+
+        foreach (var retained in retainedCandidates.Take(Math.Min(limits.CandidateNumber, retainedCandidates.Count)))
+        {
+            scan.Pairs.Add(retained);
+        }
+    }
+
+    private static PadAssignment AssignPairs(
+        IReadOnlyList<CadPad> cadPads,
+        IReadOnlyList<RegularPad> regPads,
+        IndexMappingSettings settings,
+        IReadOnlyCollection<KeyValuePair<CadPadId, RegularPadId>>? manualOverrides,
+        CandidateScan scan,
+        Action<double>? reportProgress)
+    {
+        var assignment = new PadAssignment(
+            Enumerable.Repeat(-1, cadPads.Count).ToArray(),
+            Enumerable.Repeat(-1, regPads.Count).ToArray(),
+            new double[cadPads.Count]);
 
         ManualOverrideApplier.Apply(
             manualOverrides,
             cadPads,
             regPads,
             settings,
-            cadToReg,
-            regToCad,
-            cadAssignedScore);
+            assignment.CadToReg,
+            assignment.RegToCad,
+            assignment.CadAssignedScore);
 
+        var pairs = scan.Pairs;
         pairs.Sort(static (a, b) => b.Score.CompareTo(a.Score));
         var pairCount = pairs.Count;
         for (var i = 0; i < pairCount; i++)
         {
             var p = pairs[i];
-            if (cadToReg[p.CadIndex] >= 0 || regToCad[p.RegularPadIndex] >= 0)
+            if (assignment.CadToReg[p.CadIndex] < 0 && assignment.RegToCad[p.RegularPadIndex] < 0)
             {
-                MaybeReportProgress(
-                    reportProgress,
-                    0.60 + (0.20 * (i + 1) / Math.Max(1, pairCount)),
-                    i + 1,
-                    pairCount,
-                    interval: 2048);
-                continue;
+                assignment.CadToReg[p.CadIndex] = p.RegularPadIndex;
+                assignment.RegToCad[p.RegularPadIndex] = p.CadIndex;
+                assignment.CadAssignedScore[p.CadIndex] = p.Score;
             }
-
-            cadToReg[p.CadIndex] = p.RegularPadIndex;
-            regToCad[p.RegularPadIndex] = p.CadIndex;
-            cadAssignedScore[p.CadIndex] = p.Score;
 
             MaybeReportProgress(
                 reportProgress,
@@ -188,142 +214,200 @@ public sealed partial class DxfRegularMappingAnalyzer
             ReportProgress(reportProgress, 0.80);
         }
 
-        var mappedPairs = new List<DxfRegularMappingPair>(Math.Min(cadCount, regCount));
+        return assignment;
+    }
+
+    private static int ResolveCadSequenceIndex(
+        IReadOnlyList<CadPad> cadPads,
+        IReadOnlyDictionary<int, int>? expectedDiffIndexByCadId,
+        int cadIndex)
+    {
+        if (expectedDiffIndexByCadId is not null &&
+            expectedDiffIndexByCadId.TryGetValue(cadPads[cadIndex].Id, out var mapped))
+        {
+            return mapped;
+        }
+
+        return cadIndex;
+    }
+
+    private static List<DxfRegularMappingPair> BuildMappedPairs(
+        IReadOnlyList<CadPad> cadPads,
+        IReadOnlyList<RegularPad> regPads,
+        PadAssignment assignment,
+        IReadOnlyDictionary<int, int>? expectedDiffIndexByCadId)
+    {
+        var cadCount = cadPads.Count;
+        var mappedPairs = new List<DxfRegularMappingPair>(Math.Min(cadCount, regPads.Count));
         for (var c = 0; c < cadCount; c++)
         {
-            var regIndex = cadToReg[c];
+            var regIndex = assignment.CadToReg[c];
             if (regIndex < 0)
             {
                 continue;
             }
 
             var reg = regPads[regIndex];
-            var cadSequenceIndex = ResolveCadSequenceIndex(c);
+            var cadSequenceIndex = ResolveCadSequenceIndex(cadPads, expectedDiffIndexByCadId, c);
             mappedPairs.Add(new DxfRegularMappingPair(
                 DxfIndex: cadSequenceIndex,
                 CadPadId: cadPads[c].Id,
                 RegularPadIndex: reg.RegularPadId,
                 IcIndex: reg.IcIndex,
                 DiffIndex: reg.DiffIndex,
-                Score: cadAssignedScore[c]));
+                Score: assignment.CadAssignedScore[c]));
         }
 
-        // --- Build report ---
-        var mappedCount = mappedPairs.Count;
-        var unmappedCadCount = cadCount - mappedCount;
-        var unmappedRegularCount = regToCad.Count(x => x < 0);
+        return mappedPairs;
+    }
 
-        var lowConfidenceCount = 0;
-        var ambiguousCount = 0;
-        var duplicateDiffCount = 0;
-        var issues = new List<DxfRegularMappingIssue>(Math.Min(settings.MaxReportIssues, cadCount + regCount + 1));
+    private static IssueTally CollectIssues(ReportInputs inputs)
+    {
+        var cadCount = inputs.CadPads.Count;
+        var regCount = inputs.RegPads.Count;
+        var tally = new IssueTally(Math.Min(inputs.Settings.MaxReportIssues, cadCount + regCount + 1));
 
         if (cadCount != regCount)
         {
-            issues.Add(new DxfRegularMappingIssue(
+            tally.Issues.Add(new DxfRegularMappingIssue(
                 DxfRegularMappingIssueKind.CountMismatch,
                 $"visible DXF pads={cadCount}, regular pads={regCount}."));
         }
 
-        // Per-CAD issues
+        AddPerCadIssues(inputs, tally);
+
+        if (cadCount == 0)
+        {
+            ReportProgress(inputs.ReportProgress, 0.95);
+        }
+
+        AddDuplicateDiffIssues(inputs, tally);
+        AddUnmappedRegularIssues(inputs, tally);
+
+        if (regCount == 0)
+        {
+            ReportProgress(inputs.ReportProgress, 0.99);
+        }
+
+        return tally;
+    }
+
+    private static void AddPerCadIssues(ReportInputs inputs, IssueTally tally)
+    {
+        var cadCount = inputs.CadPads.Count;
         for (var c = 0; c < cadCount; c++)
         {
-            var cadId = cadPads[c].Id;
-            var cadSequenceIndex = ResolveCadSequenceIndex(c);
-            var regIndex = cadToReg[c];
+            var regIndex = inputs.Assignment.CadToReg[c];
             if (regIndex < 0)
             {
-                if (!cadHasOverlapEvidence[c])
-                {
-                    continue;
-                }
-
-                issues.Add(new DxfRegularMappingIssue(
-                    DxfRegularMappingIssueKind.UnmappedCad,
-                    $"Expected diff idx {cadSequenceIndex} (CAD id {cadId}).",
-                    DxfIndex: cadSequenceIndex,
-                    CadPadId: cadId,
-                    BestScore: cadBest[c],
-                    SecondScore: cadSecond[c],
-                    Margin: cadBest[c] - cadSecond[c],
-                    TopCandidates: cadTopCandidates[c]));
+                AddUnmappedCadIssue(inputs, tally, c);
                 continue;
             }
 
-            var assignedScore = cadAssignedScore[c];
-            var reg = regPads[regIndex];
-            var margin = cadBest[c] - cadSecond[c];
-
-            if (assignedScore < settings.LowConfidenceThreshold)
-            {
-                lowConfidenceCount++;
-                issues.Add(new DxfRegularMappingIssue(
-                    DxfRegularMappingIssueKind.LowConfidence,
-                    $"Expected diff idx {cadSequenceIndex} (CAD id {cadId}) -> diff{reg.DiffIndex} (IC{reg.IcIndex}, regId {reg.RegularPadId}), score={assignedScore:0.###}.",
-                    DxfIndex: cadSequenceIndex,
-                    CadPadId: cadId,
-                    RegularPadIndex: reg.RegularPadId,
-                    IcIndex: reg.IcIndex,
-                    DiffIndex: reg.DiffIndex,
-                    Score: assignedScore,
-                    BestScore: cadBest[c],
-                    SecondScore: cadSecond[c],
-                    Margin: margin,
-                    TopCandidates: cadTopCandidates[c]));
-            }
-
-            if (cadBest[c] > 0 && margin >= 0 && margin < settings.AmbiguousMargin)
-            {
-                ambiguousCount++;
-                issues.Add(new DxfRegularMappingIssue(
-                    DxfRegularMappingIssueKind.Ambiguous,
-                    $"Expected diff idx {cadSequenceIndex} (CAD id {cadId}) best={cadBest[c]:0.###}, second={cadSecond[c]:0.###}, margin={margin:0.###}.",
-                    DxfIndex: cadSequenceIndex,
-                    CadPadId: cadId,
-                    RegularPadIndex: reg.RegularPadId,
-                    IcIndex: reg.IcIndex,
-                    DiffIndex: reg.DiffIndex,
-                    Score: assignedScore,
-                    BestScore: cadBest[c],
-                    SecondScore: cadSecond[c],
-                    Margin: margin,
-                    TopCandidates: cadTopCandidates[c]));
-            }
+            AddMappedCadIssues(inputs, tally, c, inputs.RegPads[regIndex]);
 
             MaybeReportProgress(
-                reportProgress,
+                inputs.ReportProgress,
                 0.80 + (0.15 * (c + 1) / Math.Max(1, cadCount)),
                 c + 1,
                 cadCount,
                 interval: 64);
         }
+    }
 
-        if (cadCount == 0)
+    private static void AddUnmappedCadIssue(ReportInputs inputs, IssueTally tally, int c)
+    {
+        if (!inputs.Scan.CadHasOverlapEvidence[c])
         {
-            ReportProgress(reportProgress, 0.95);
+            return;
         }
 
-        var duplicateDiffGroups = Enumerable.Range(0, cadCount)
-            .Where(c => cadToReg[c] >= 0)
+        var cadId = inputs.CadPads[c].Id;
+        var cadSequenceIndex = ResolveCadSequenceIndex(inputs.CadPads, inputs.ExpectedDiffIndexByCadId, c);
+        tally.Issues.Add(new DxfRegularMappingIssue(
+            DxfRegularMappingIssueKind.UnmappedCad,
+            $"Expected diff idx {cadSequenceIndex} (CAD id {cadId}).",
+            DxfIndex: cadSequenceIndex,
+            CadPadId: cadId,
+            BestScore: inputs.Scan.Best[c],
+            SecondScore: inputs.Scan.Second[c],
+            Margin: inputs.Scan.Best[c] - inputs.Scan.Second[c],
+            TopCandidates: inputs.Scan.TopCandidates[c]));
+    }
+
+    private static void AddMappedCadIssues(ReportInputs inputs, IssueTally tally, int c, RegularPad reg)
+    {
+        var scan = inputs.Scan;
+        var settings = inputs.Settings;
+        var cadId = inputs.CadPads[c].Id;
+        var cadSequenceIndex = ResolveCadSequenceIndex(inputs.CadPads, inputs.ExpectedDiffIndexByCadId, c);
+        var assignedScore = inputs.Assignment.CadAssignedScore[c];
+        var margin = scan.Best[c] - scan.Second[c];
+
+        if (assignedScore < settings.LowConfidenceThreshold)
+        {
+            tally.LowConfidenceCount++;
+            tally.Issues.Add(new DxfRegularMappingIssue(
+                DxfRegularMappingIssueKind.LowConfidence,
+                $"Expected diff idx {cadSequenceIndex} (CAD id {cadId}) -> diff{reg.DiffIndex} (IC{reg.IcIndex}, regId {reg.RegularPadId}), score={assignedScore:0.###}.",
+                DxfIndex: cadSequenceIndex,
+                CadPadId: cadId,
+                RegularPadIndex: reg.RegularPadId,
+                IcIndex: reg.IcIndex,
+                DiffIndex: reg.DiffIndex,
+                Score: assignedScore,
+                BestScore: scan.Best[c],
+                SecondScore: scan.Second[c],
+                Margin: margin,
+                TopCandidates: scan.TopCandidates[c]));
+        }
+
+        if (scan.Best[c] > 0 && margin >= 0 && margin < settings.AmbiguousMargin)
+        {
+            tally.AmbiguousCount++;
+            tally.Issues.Add(new DxfRegularMappingIssue(
+                DxfRegularMappingIssueKind.Ambiguous,
+                $"Expected diff idx {cadSequenceIndex} (CAD id {cadId}) best={scan.Best[c]:0.###}, second={scan.Second[c]:0.###}, margin={margin:0.###}.",
+                DxfIndex: cadSequenceIndex,
+                CadPadId: cadId,
+                RegularPadIndex: reg.RegularPadId,
+                IcIndex: reg.IcIndex,
+                DiffIndex: reg.DiffIndex,
+                Score: assignedScore,
+                BestScore: scan.Best[c],
+                SecondScore: scan.Second[c],
+                Margin: margin,
+                TopCandidates: scan.TopCandidates[c]));
+        }
+    }
+
+    private static void AddDuplicateDiffIssues(ReportInputs inputs, IssueTally tally)
+    {
+        var cadPads = inputs.CadPads;
+        var regPads = inputs.RegPads;
+        var scan = inputs.Scan;
+        var assignment = inputs.Assignment;
+        var duplicateDiffGroups = Enumerable.Range(0, cadPads.Count)
+            .Where(c => assignment.CadToReg[c] >= 0)
             .Select(c => new
             {
                 CadIndex = c,
                 CadPadId = cadPads[c].Id,
-                DxfIndex = ResolveCadSequenceIndex(c),
-                Regular = regPads[cadToReg[c]],
-                Score = cadAssignedScore[c],
+                DxfIndex = ResolveCadSequenceIndex(cadPads, inputs.ExpectedDiffIndexByCadId, c),
+                Regular = regPads[assignment.CadToReg[c]],
+                Score = assignment.CadAssignedScore[c],
             })
             .GroupBy(static entry => (entry.Regular.IcIndex, entry.DxfIndex))
             .Where(static group => group.Count() > 1)
             .ToList();
-        duplicateDiffCount = duplicateDiffGroups.Sum(group => group.Count());
+        tally.DuplicateDiffCount = duplicateDiffGroups.Sum(group => group.Count());
         foreach (var duplicateGroup in duplicateDiffGroups)
         {
             var cadIdsText = string.Join(", ", duplicateGroup.Select(static entry => entry.CadPadId).OrderBy(static id => id));
             var message = $"Current diff idx {duplicateGroup.Key.DxfIndex} in IC{duplicateGroup.Key.IcIndex + 1} is shared by CAD {cadIdsText}.";
             foreach (var duplicateEntry in duplicateGroup)
             {
-                issues.Add(new DxfRegularMappingIssue(
+                tally.Issues.Add(new DxfRegularMappingIssue(
                     DxfRegularMappingIssueKind.DuplicateDiff,
                     message,
                     DxfIndex: duplicateEntry.DxfIndex,
@@ -332,28 +416,31 @@ public sealed partial class DxfRegularMappingAnalyzer
                     IcIndex: duplicateEntry.Regular.IcIndex,
                     DiffIndex: duplicateEntry.Regular.DiffIndex,
                     Score: duplicateEntry.Score,
-                    BestScore: cadBest[duplicateEntry.CadIndex],
-                    SecondScore: cadSecond[duplicateEntry.CadIndex],
-                    Margin: cadBest[duplicateEntry.CadIndex] - cadSecond[duplicateEntry.CadIndex],
-                    TopCandidates: cadTopCandidates[duplicateEntry.CadIndex]));
+                    BestScore: scan.Best[duplicateEntry.CadIndex],
+                    SecondScore: scan.Second[duplicateEntry.CadIndex],
+                    Margin: scan.Best[duplicateEntry.CadIndex] - scan.Second[duplicateEntry.CadIndex],
+                    TopCandidates: scan.TopCandidates[duplicateEntry.CadIndex]));
             }
         }
+    }
 
-        // Per-regular issues
+    private static void AddUnmappedRegularIssues(ReportInputs inputs, IssueTally tally)
+    {
+        var regCount = inputs.RegPads.Count;
         for (var i = 0; i < regCount; i++)
         {
-            if (regToCad[i] >= 0)
+            if (inputs.Assignment.RegToCad[i] >= 0)
             {
                 continue;
             }
 
-            if (!regularHasOverlapEvidence[i])
+            if (!inputs.Scan.RegularHasOverlapEvidence[i])
             {
                 continue;
             }
 
-            var reg = regPads[i];
-            issues.Add(new DxfRegularMappingIssue(
+            var reg = inputs.RegPads[i];
+            tally.Issues.Add(new DxfRegularMappingIssue(
                 DxfRegularMappingIssueKind.UnmappedRegular,
                 $"diff{reg.DiffIndex} (IC{reg.IcIndex}, regId {reg.RegularPadId}).",
                 RegularPadIndex: reg.RegularPadId,
@@ -361,18 +448,23 @@ public sealed partial class DxfRegularMappingAnalyzer
                 DiffIndex: reg.DiffIndex));
 
             MaybeReportProgress(
-                reportProgress,
+                inputs.ReportProgress,
                 0.95 + (0.04 * (i + 1) / Math.Max(1, regCount)),
                 i + 1,
                 regCount,
                 interval: 128);
         }
+    }
 
-        if (regCount == 0)
-        {
-            ReportProgress(reportProgress, 0.99);
-        }
+    private static DxfRegularMappingReport BuildReport(ReportInputs inputs, int mappedCount, IssueTally tally)
+    {
+        var settings = inputs.Settings;
+        var cadCount = inputs.CadPads.Count;
+        var regCount = inputs.RegPads.Count;
+        var unmappedCadCount = cadCount - mappedCount;
+        var unmappedRegularCount = inputs.Assignment.RegToCad.Count(x => x < 0);
 
+        var issues = tally.Issues;
         var totalIssueCount = issues.Count;
         var issuesTruncated = issues.Count > settings.MaxReportIssues;
         if (issuesTruncated)
@@ -384,26 +476,23 @@ public sealed partial class DxfRegularMappingAnalyzer
 
         var hasIssues = issues.Count > 0;
 
-        var summary = $"mapped={mappedCount}, unmappedCad={unmappedCadCount}, unmappedRegular={unmappedRegularCount}, lowConf={lowConfidenceCount}, ambiguous={ambiguousCount}, duplicateDiff={duplicateDiffCount}";
+        var summary = $"mapped={mappedCount}, unmappedCad={unmappedCadCount}, unmappedRegular={unmappedRegularCount}, lowConf={tally.LowConfidenceCount}, ambiguous={tally.AmbiguousCount}, duplicateDiff={tally.DuplicateDiffCount}";
 
-        var report = new DxfRegularMappingReport(
+        return new DxfRegularMappingReport(
             cadCount,
             regCount,
             mappedCount,
             unmappedCadCount,
             unmappedRegularCount,
-            lowConfidenceCount,
-            ambiguousCount,
+            tally.LowConfidenceCount,
+            tally.AmbiguousCount,
             hasIssues,
             summary,
             TotalIssueCount: totalIssueCount,
             IssuesTruncated: issuesTruncated,
             Issues: issues,
             sampleIssues,
-            DuplicateDiffCount: duplicateDiffCount);
-
-        ReportProgress(reportProgress, 1.0);
-        return new DxfRegularMappingResult(mappedPairs, report);
+            DuplicateDiffCount: tally.DuplicateDiffCount);
     }
 
     private static void ReportProgress(Action<double>? reportProgress, double value)
@@ -432,6 +521,38 @@ public sealed partial class DxfRegularMappingAnalyzer
         {
             ReportProgress(reportProgress, value);
         }
+    }
+
+    private readonly record struct CandidateLimits(int Padding, int CandidateNumber, int DiagnosticTopK, int RetainCount);
+
+    private readonly record struct CandidateScan(
+        List<CandidatePair> Pairs,
+        List<DxfRegularMappingCandidate>[] TopCandidates,
+        double[] Best,
+        double[] Second,
+        bool[] CadHasOverlapEvidence,
+        bool[] RegularHasOverlapEvidence);
+
+    private readonly record struct PadAssignment(int[] CadToReg, int[] RegToCad, double[] CadAssignedScore);
+
+    private readonly record struct ReportInputs(
+        IReadOnlyList<CadPad> CadPads,
+        IReadOnlyList<RegularPad> RegPads,
+        IndexMappingSettings Settings,
+        CandidateScan Scan,
+        PadAssignment Assignment,
+        IReadOnlyDictionary<int, int>? ExpectedDiffIndexByCadId,
+        Action<double>? ReportProgress);
+
+    private sealed class IssueTally(int capacity)
+    {
+        public List<DxfRegularMappingIssue> Issues { get; } = new(capacity);
+
+        public int LowConfidenceCount { get; set; }
+
+        public int AmbiguousCount { get; set; }
+
+        public int DuplicateDiffCount { get; set; }
     }
 }
 
