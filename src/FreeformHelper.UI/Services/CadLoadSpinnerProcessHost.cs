@@ -30,8 +30,8 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
     private const int ConnectTimeoutMs = 250;
     private const int WarmupTimeoutMs = 3000;
     private static readonly TimeSpan ShowRetryDelay = TimeSpan.FromMilliseconds(30);
-    private static readonly TimeSpan PostShowMinimumVisible = TimeSpan.FromMilliseconds(120);
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly TimeSpan _postShowMinimumVisible = TimeSpan.FromMilliseconds(120);
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly Lock _sync = new();
     private readonly SemaphoreSlim _stateSyncGate = new(1, 1);
@@ -242,7 +242,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
             }
             catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
-                Logger.Warn(ex, "Failed to sync CAD load spinner visibility state.");
+                _logger.Warn(ex, "Failed to sync CAD load spinner visibility state.");
             }
             finally
             {
@@ -328,7 +328,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 }
                 catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
                 {
-                    Logger.Warn(ex, "CAD load spinner warmup failed.");
+                    _logger.Warn(ex, "CAD load spinner warmup failed.");
                     CleanupProcess(forceKillIfStillRunning: true);
                     return;
                 }
@@ -394,7 +394,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 }
 
                 var elapsed = DateTimeOffset.UtcNow - showSentUtc;
-                var remaining = PostShowMinimumVisible - elapsed;
+                var remaining = _postShowMinimumVisible - elapsed;
                 if (remaining > TimeSpan.Zero)
                 {
                     await Task.Delay(remaining).ConfigureAwait(false);
@@ -536,7 +536,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
     private static void LogIgnoredIpcFailure(CadLoadSpinnerRequest request)
     {
-        Logger.Debug(CultureInfo.InvariantCulture, "Ignoring CAD load spinner IPC failure for command '{0}'.", request.Command);
+        _logger.Debug(CultureInfo.InvariantCulture, "Ignoring CAD load spinner IPC failure for command '{0}'.", request.Command);
     }
 
     private async Task<bool> TrySendRequestAsync(CadLoadSpinnerRequest request, int timeoutMs)
@@ -610,7 +610,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         if (_process is not null)
         {
             var exitCode = _process.ExitCode;
-            Logger.Warn(
+            _logger.Warn(
                 CultureInfo.InvariantCulture,
                 "CAD load spinner process exited with code {0} at {1:O}. Starting a new one.",
                 exitCode,
@@ -692,7 +692,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
             }
             catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
-                Logger.Warn(ex, "Failed to cleanup CAD load spinner process.");
+                _logger.Warn(ex, "Failed to cleanup CAD load spinner process.");
             }
             finally
             {
@@ -720,7 +720,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         }
         else
         {
-            Logger.Debug(
+            _logger.Debug(
                 CultureInfo.InvariantCulture,
                 "Ignoring CAD load spinner IPC failure for command '{0}' ({1}).",
                 CadLoadSpinnerIpcProtocol.HideCommand,
