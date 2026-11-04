@@ -1,6 +1,7 @@
 using System.Reflection;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -85,11 +86,7 @@ internal static class NotchCurrentWorkflowTableTestHelper
     {
         ArgumentNullException.ThrowIfNull(vm);
 
-        var method = typeof(FreeformHelperViewModel).GetMethod(
-            "BuildFilteredCadPadSet",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        return Assert.IsType<CadPadSet>(method!.Invoke(vm, null));
+        return Assert.IsType<CadPadSet>(FreeformHelperViewModelPrivateAccess.BuildFilteredCadPadSet(vm));
     }
 
     private static async Task<NotchTable> GenerateTableAsync(
@@ -102,27 +99,24 @@ internal static class NotchCurrentWorkflowTableTestHelper
         ArgumentNullException.ThrowIfNull(vm);
         ArgumentException.ThrowIfNullOrWhiteSpace(operationLabel);
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
-
         var cad = useExportCad
             ? GetExportCadPadSet(vm)
-            : Assert.IsType<CadPadSet>(cadField!.GetValue(vm));
-        var grid = Assert.IsType<RegularGrid>(gridField!.GetValue(vm));
+            : Assert.IsType<CadPadSet>(FreeformHelperViewModelPrivateAccess.Cad(vm));
+        var grid = Assert.IsType<RegularGrid>(FreeformHelperViewModelPrivateAccess.Grid(vm));
 
         vm.EnableV21 = true;
         vm.EnableV22 = true;
 
-        var generateMethod = typeof(FreeformHelperViewModel).GetMethod(
-            "GenerateCurrentNotchTableAsync",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(generateMethod);
-
-        var task = Assert.IsAssignableFrom<Task>(generateMethod!.Invoke(
+        var task = Assert.IsAssignableFrom<Task>(FreeformHelperViewModelPrivateAccess.GenerateCurrentNotchTable(
             vm,
-            [cad, grid, operationLabel, null, null, false, projectToCadOutputFwDiff, null]));
+            cad,
+            grid,
+            operationLabel,
+            null,
+            null,
+            false,
+            projectToCadOutputFwDiff,
+            null));
         await task;
 
         var resultProperty = task.GetType().GetProperty("Result", BindingFlags.Instance | BindingFlags.Public);
