@@ -3649,16 +3649,6 @@
       "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
     },
     {
-      "syntaxHash": "5ec669d6711569885a6ddefa29813779e53623db957b6bd0797bdd7a55082904",
-      "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.Boe3635_DxfLoadBenchmark_WhenEnabled()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllTextAsync(System.String,System.String,System.Threading.CancellationToken)"
-    },
-    {
       "syntaxHash": "eb05855ddbabfad52621d1ba5a75afbaad2faa96a126bf15f25e4734b3ff1b79",
       "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.fields:PrivateInstance",
       "owner": "NFH",
@@ -3809,46 +3799,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "c74df2a9384e5f07c31f79dfadde118acc7aee475992acf56e3ef757a8b17102",
-      "member": "FreeformHelper.Tests.CadLoadUseCaseTests.TryLoadFromProject_PathInvalid_AndNoEmbedded_Throws()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/CadLoadUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String,System.Text.Encoding)"
-    },
-    {
-      "syntaxHash": "5fafbffa52d35dc914648b1a0d0e8126ae61188606ea8e88343e4953cb6e50c6",
-      "member": "FreeformHelper.Tests.CadLoadUseCaseTests.TryLoadFromProject_PathInvalid_AndNoEmbedded_Throws()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/CadLoadUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "c74df2a9384e5f07c31f79dfadde118acc7aee475992acf56e3ef757a8b17102",
-      "member": "FreeformHelper.Tests.CadLoadUseCaseTests.TryLoadFromProject_PathInvalid_FallsBackToEmbedded()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/CadLoadUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String,System.Text.Encoding)"
-    },
-    {
-      "syntaxHash": "5fafbffa52d35dc914648b1a0d0e8126ae61188606ea8e88343e4953cb6e50c6",
-      "member": "FreeformHelper.Tests.CadLoadUseCaseTests.TryLoadFromProject_PathInvalid_FallsBackToEmbedded()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/CadLoadUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
       "syntaxHash": "a3252511d48deaed283c69b86a1d14d88cae55cc3bb8c3a31846868c6ab85c10",
       "member": "FreeformHelper.Tests.DiffFrameCsvFixtureTests.Tm81SingleFingerFixture_AllowsAfterValueForInactiveTargetDiffPads()",
       "owner": "NFH",
@@ -3897,166 +3847,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Thread.Sleep(System.Int32)"
-    },
-    {
-      "syntaxHash": "e9d188d1080a016ec84133c1149f165a16cab00287eca53251b13f5ec572232e",
-      "member": "FreeformHelper.Tests.DxfLayerImageExportServiceTests.ExportLayerImage_EmptyPads_Throws()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfLayerImageExportServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "e9d188d1080a016ec84133c1149f165a16cab00287eca53251b13f5ec572232e",
-      "member": "FreeformHelper.Tests.DxfLayerImageExportServiceTests.ExportLayerImage_LeavesOuterPadding()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfLayerImageExportServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "0924b2e40e9329a9fd196166928bab992a2d9973b50396e0fa45e5bd3bf08177",
-      "member": "FreeformHelper.Tests.DxfLayerImageExportServiceTests.ExportLayerImage_ThickerLineProducesMoreInkPixels()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfLayerImageExportServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "4a94a7b5024161f7396f092087f5a5520ae1052754703c2f49792c23d8c36102",
-      "member": "FreeformHelper.Tests.DxfLayerImageExportServiceTests.ExportLayerImage_ThickerLineProducesMoreInkPixels()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfLayerImageExportServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "e9d188d1080a016ec84133c1149f165a16cab00287eca53251b13f5ec572232e",
-      "member": "FreeformHelper.Tests.DxfLayerImageExportServiceTests.ExportLayerImage_WritesExpectedResolution()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfLayerImageExportServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "6a25c2b9bc4750b8cbc2489642dc854a81d53328b7640a2f508e3d9e6feaba10",
-      "member": "FreeformHelper.Tests.DxfLayerImageExportServiceTests.ExportLayerImage_ZeroPaddingStillKeepsWideStrokeInsideCanvas()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfLayerImageExportServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "70bcca0bd0ac0b258d4847ffdd34f17667260e0b12e10e8cebe74fd8b7e4de06",
-      "member": "FreeformHelper.Tests.DxfPadImporterTests.WriteTempDxf(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfPadImporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "4015123196f5447706c5fd6206db8db278640d44185946677f4cc95e04a3b013",
-      "member": "FreeformHelper.Tests.DxfPadImporterTests.WriteTempDxf(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfPadImporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "dfe1d6a8c3a31c79b6cc771d3f278d697a59fcbe98f0f1480a9f701e9e2ad758",
-      "member": "FreeformHelper.Tests.DxfSinglePassImportTests.WriteTempDxf(int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfSinglePassImportTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "e1eaf5c38eb68ee22ae08f659e40b815c3704b367af7457a838e38e7ae2f5b42",
-      "member": "FreeformHelper.Tests.DxfSinglePassImportTests.WriteTempDxf(int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfSinglePassImportTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "69c53514e7ed4e5e7fa3c22eb80c5158f4558f853398a91d370f1a0d21e41f1b",
-      "member": "FreeformHelper.Tests.ExampleProjectFixtureTests.Create_RewritesOnlyExistingMaskSourcePath_WhenSiblingCsvExists(bool,bool)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
-      "syntaxHash": "f601decf03c13cc7d336d8fd067b3233c03a9dc963ca6b8bbce790a09768d23b",
-      "member": "FreeformHelper.Tests.ExampleProjectFixtureTests.Create_RewritesOnlyExistingMaskSourcePath_WhenSiblingCsvExists(bool,bool)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
-      "syntaxHash": "ce68c3470060b258ba15f879b043660771afca1927ca2398a1fa65299ea509cb",
-      "member": "FreeformHelper.Tests.ExampleProjectFixtureTests.Create_RewritesOnlyExistingMaskSourcePath_WhenSiblingCsvExists(bool,bool)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "d8f66b2881808096b00c91e96bf18b5fbc2761ecb7b6a947c20234160241595c",
-      "member": "FreeformHelper.Tests.ExampleProjectFixtureTests.Create_RewritesOnlyExistingMaskSourcePath_WhenSiblingCsvExists(bool,bool)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "a07330ff0eee77dc6eb93f9a6cd323d9ad9cd894fe1afb173ab24be15833c5f7",
-      "member": "FreeformHelper.Tests.ExampleProjectFixtureTests.Create_UsesUniqueTemporaryFolders_AndDisposeDeletesWorkingCopy()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "a98886446fadddfb74f6b892af4842c6bd3a86d6151cc88961f8b3d413af3d36",
-      "member": "FreeformHelper.Tests.ExampleProjectFixtureTests.Create_UsesUniqueTemporaryFolders_AndDisposeDeletesWorkingCopy()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
     },
     {
       "syntaxHash": "1649e615fb03121d60bbeb220d129c1da32cbcd070c0fc36e470e1470124d5ab",
@@ -5529,86 +5319,6 @@
       "symbol": "T:System.Diagnostics.Stopwatch"
     },
     {
-      "syntaxHash": "d498a60faeb32ab9868bc536268ed1f885721fc3671fcc8ff76265979cbbb509",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_CancelledBeforePublication_PreservesExistingBytesAndLeavesNoTemporaryFiles()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllBytes(System.String)"
-    },
-    {
-      "syntaxHash": "0cec13c93b3b22d3b4c0c249adba09abcee3468742473aabfbcfd04527de59ac",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_CancelledBeforePublication_PreservesExistingBytesAndLeavesNoTemporaryFiles()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllBytes(System.String,System.Byte[])"
-    },
-    {
-      "syntaxHash": "d498a60faeb32ab9868bc536268ed1f885721fc3671fcc8ff76265979cbbb509",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_PublisherThrows_PreservesExistingBytesAndLeavesNoTemporaryFiles()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllBytes(System.String)"
-    },
-    {
-      "syntaxHash": "0cec13c93b3b22d3b4c0c249adba09abcee3468742473aabfbcfd04527de59ac",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_PublisherThrows_PreservesExistingBytesAndLeavesNoTemporaryFiles()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllBytes(System.String,System.Byte[])"
-    },
-    {
-      "syntaxHash": "58f5a7179e5242609ef89aa8bde4e7d777434da8da1d2b50be3d3a6e980febf8",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_Success_PreservesJsonBytesAndSettingsContract()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllBytes(System.String)"
-    },
-    {
-      "syntaxHash": "dbfdcccae4405df66e5a62d14a39bbae488f4a71a8876dae2d3e1728684efcad",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_Success_ReplacesExistingFileWithoutTemporaryFiles()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "d498a60faeb32ab9868bc536268ed1f885721fc3671fcc8ff76265979cbbb509",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_WriteFailure_PreservesExistingBytesAndRemovesTemporaryFile()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllBytes(System.String)"
-    },
-    {
-      "syntaxHash": "0cec13c93b3b22d3b4c0c249adba09abcee3468742473aabfbcfd04527de59ac",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.SaveAsync_WriteFailure_PreservesExistingBytesAndRemovesTemporaryFile()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllBytes(System.String,System.Byte[])"
-    },
-    {
       "syntaxHash": "4b29133608af2b9b6ce8b628d9658d89a041a4f4cedf1e9db0e3597612c6a45e",
       "member": "FreeformHelper.Tests.LoadingScopeCoordinatorTests.RunAsync_RespectsMinimumVisibleDuration()",
       "owner": "NFH",
@@ -5649,16 +5359,6 @@
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
     },
     {
-      "syntaxHash": "8cdcd838fdbc877c82e336abf9a8dccfa0d0d122fa92b34130fc2aedbc0dca53",
-      "member": "FreeformHelper.Tests.LoggingConfigurationTests.LoggingPolicy_Doc_CoversLevelAndFormatContract()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Infrastructure/Logging/LoggingConfigurationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
       "syntaxHash": "2e4f12b105a0f56c622b329c7d70f0516f8b537e19a583f06cd60690f8351697",
       "member": "FreeformHelper.Tests.MaskCurrentBehaviorTests.GetFieldValue(FreeformHelperViewModel,string)",
       "owner": "NFH",
@@ -5697,16 +5397,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "5ec669d6711569885a6ddefa29813779e53623db957b6bd0797bdd7a55082904",
-      "member": "FreeformHelper.Tests.Notch3635GenerationBenchmarkTests.Boe3635_NotchGenerationBenchmark_WhenEnabled()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Notch3635GenerationBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllTextAsync(System.String,System.String,System.Threading.CancellationToken)"
     },
     {
       "syntaxHash": "3e9c9d4efb11b91a5eb21a5db97882f547af5a195627096ed563202d287eebe2",
@@ -5799,46 +5489,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "c95a5941f24ee4f9188acefe0a1b618b996d0ec7a5da132f7bf9c9ae2b1f3959",
-      "member": "FreeformHelper.Tests.NotchExampleCExportDriftTests.AssertSignedOutput(string,JsonElement)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchExampleCExportDriftTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
-      "syntaxHash": "c708c2b5eb2d72e0e8fa5d49e75bed224bf9b61389ee01a7874723fa27be221d",
-      "member": "FreeformHelper.Tests.NotchExampleCExportDriftTests.Boe3635_CheckedInCExample_MatchesCurrentExportPipeline(NotchAlgorithmVersion,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchExampleCExportDriftTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
-      "syntaxHash": "593eddbdaf48784eac32ffd5362b42d28b072bac80efe875349a0165aef52719",
-      "member": "FreeformHelper.Tests.NotchExampleCExportDriftTests.Boe3635_CheckedInCExample_MatchesCurrentExportPipeline(NotchAlgorithmVersion,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchExampleCExportDriftTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "454448bd32c34bbcaacdf1a71ae1fac0354bdbe834613e0c00dadb462bd9980b",
-      "member": "FreeformHelper.Tests.NotchExampleCExportDriftTests.Boe3635_SignedGoldenManifest_MatchesCheckedInArtifacts()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchExampleCExportDriftTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
       "syntaxHash": "df4e81df7f8978dc95d97b734714d68d2082dee661d30a8e099768df6e3e6580",
       "member": "FreeformHelper.Tests.NotchExampleCExportDriftTests.GetPrivateField`1(FreeformHelperViewModel,string)",
       "owner": "NFH",
@@ -5919,26 +5569,6 @@
       "symbol": "M:System.Diagnostics.Process.Start"
     },
     {
-      "syntaxHash": "3396a6480789701303928a3714a799f0234532c12b9837f01320449b3139b182",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.AssertCCompilesWithGcc(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "db86aa10a55787896d35eb490964fd34fbf51ddac744bb3b26f2b55b4f976ef7",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.AssertCCompilesWithGcc(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
       "syntaxHash": "ee85316917f8a449b16f1f1091e00087b9e5cbd8e7a2e651e41b6fcdb4f2aa98",
       "member": "FreeformHelper.Tests.NotchTableExporterTests.IsGccAvailable()",
       "owner": "NFH",
@@ -5949,26 +5579,6 @@
       "symbol": "M:System.Diagnostics.Process.Start"
     },
     {
-      "syntaxHash": "a36776abf748a1460a8dd0c1f7718b8ee25a94ba033f8e37a568310918e67799",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.RunCProgramWithGcc(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "ab68ac32a2835e242602049fcf2283fb95fd0de70e357981de47edb75a2ab4bb",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.RunCProgramWithGcc(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
       "syntaxHash": "de07498443352d8395379381b06be36f55114e27fc693a8250a5e37f26f9ee20",
       "member": "FreeformHelper.Tests.NotchTableExporterTests.RunProcess(string,IEnumerable<string>,string)",
       "owner": "NFH",
@@ -5977,16 +5587,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Diagnostics.Process.Start"
-    },
-    {
-      "syntaxHash": "ccc5033d974b4a0e2774a61302a2084611c6d67ef05c74edd1a5cc90f3265c48",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.WriteNotchHeaderStub(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
     },
     {
       "syntaxHash": "2c8f533dd8fc5103c734c3c1e19b2c0218754b211fcda41433bb15f4d7d42a28",
@@ -6549,156 +6149,6 @@
       "symbol": "P:System.DateTime.UtcNow"
     },
     {
-      "syntaxHash": "640c1b14c5e75a077f217c172518b26d3afdd018aafefe3f251837906b5503db",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.Load_DropsUnsupportedLegacyNotchVersions()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.Load_DropsUnsupportedLegacyNotchVersions()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "2288f5df5632d552ada68c3b29857c62aae838c87e2e8c38c20c05d4a5dabccb",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.Load_MigratesLegacyChannelLimitAndPreservesLargeChannelCounts()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.Load_MigratesLegacyChannelLimitAndPreservesLargeChannelCounts()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "3d7fb8a9df78e7da3aac01235dcc4c2e544a6e8e2425346a84f4e0b62db0e8e0",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.Load_MigratesNullCollections()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.Load_MigratesNullCollections()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "80601a18349da6c686ece3feb4978352391369888ccbb7028a93b045a7841a32",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.LoadAndSave_PreservesUnknownRootProperties()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
-      "syntaxHash": "464f14af7ee682d9f4463f62edfc4ce58c03a7c9b93f2969bd733479adc1677a",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.LoadAndSave_PreservesUnknownRootProperties()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "7a3119463c6867f6e23f3c2b7dd13a424bb7b0771ed36006e60fe1c1a09bd704",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.LoadAndSave_PreservesUnknownRootProperties()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "b66aed3bdd1ede943e5b2af2459d1a0532a277ba061200a5ec604e2eb8b9de28",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.LoadAndSave_PreservesUnknownRootProperties()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.SaveAndLoad_PreservesCadOutputFwDiffIndexAnchorCadPadByIc()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.SaveAndLoad_PreservesCadOutputFwDiffIndexAnchorCadPadId()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.SaveAndLoad_PreservesCadOutputFwDiffIndexOverrides()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.SaveAndLoad_PreservesDxfCadGeometryOverrides()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectFileMigrationTests.SaveAndLoad_PreservesDxfRegularMappingOverrides()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
       "syntaxHash": "1ae3de078c92421ba9af52af3216e36cb90575dc5249247f5b0c8590ad41ac83",
       "member": "FreeformHelper.Tests.ProjectLoadingInputTests.FailedProjectLoad_RestoresReadyAndCommandAvailability()",
       "owner": "NFH",
@@ -6817,166 +6267,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "d9a14f9092859f425f3b5f26b1725dc846545b008d66c2fe987f6bdeb5528d9b",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveAsync_EmbedDeclined_ClearsEmbeddedFields()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "4b7c0f0b65fbb94ad75ab4c55fd7f43c06a41cad4a74941805342830c6e345df",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveAsync_EmbedDxf_EmbedsBytesAndName()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllBytes(System.String,System.Byte[])"
-    },
-    {
-      "syntaxHash": "bd9b71747917d93fa74189b1acf6b6a276c0d371436523d06d06a5030791aa63",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveAsync_EmbedDxf_EmbedsBytesAndName()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllBytes(System.String,System.Byte[])"
-    },
-    {
-      "syntaxHash": "c25ce6c23f2bbdb911daf58e7db997908536f743a2d72869dd601c990e68d219",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveAsync_EmbedDxf_EmbedsBytesAndName()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "d9a14f9092859f425f3b5f26b1725dc846545b008d66c2fe987f6bdeb5528d9b",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveAsync_EmbedDxf_EmbedsBytesAndName()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "f282c170652615288522cb7f341d3286ac797514bf7f1b11d7c479f29cd75e31",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveAsync_EmbedDxf_EmbedsBytesAndName()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveAsync_WritesFileAndCapturesOverrides()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "d9a14f9092859f425f3b5f26b1725dc846545b008d66c2fe987f6bdeb5528d9b",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveAsync_WritesMatchingAndMappingSettingsAndUiSnapshot()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "d9a14f9092859f425f3b5f26b1725dc846545b008d66c2fe987f6bdeb5528d9b",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveThenLoadAsync_RoundTrip_PreservesCriticalProjectData()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "d9a14f9092859f425f3b5f26b1725dc846545b008d66c2fe987f6bdeb5528d9b",
-      "member": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveThenLoadAsync_RoundTrip_PreservesDxfEditState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectStoreTests.SaveAndLoad_RoundTripsMatchingAndIndexMappingSettings()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectStoreTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "3de38ccda95740249c67e499ba9fea3efd880ca00a1902de43a34978f31d6ec1",
-      "member": "FreeformHelper.Tests.ProjectStoreTests.SaveAndLoad_RoundTripsSettings()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/ProjectStoreTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "1d02ab775f77b0d8ffa585968d52d2beec4e4fccabc7e43e418e76bfee71973f",
-      "member": "FreeformHelper.Tests.RegularVisibilityMaskServiceTests.Load_RealSeeRegularCsv_IsCompatibleWithMatchingGrid(string,int,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Simulation/RegularVisibilityMaskServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.Copy(System.String,System.String,System.Boolean)"
-    },
-    {
-      "syntaxHash": "7c1f85044a8eb9d432229aa86bda3dd1544a2b0d6f7b5bfad55477dc6593b0e5",
-      "member": "FreeformHelper.Tests.RegularVisibilityMaskServiceTests.Load_RealSeeRegularCsv_IsCompatibleWithMatchingGrid(string,int,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Simulation/RegularVisibilityMaskServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
-      "syntaxHash": "cb5ee61a972bc9fca0b156c1a235a1082a19f7c2c8a63d52834aa1bad27179a3",
-      "member": "FreeformHelper.Tests.RegularVisibilityMaskServiceTests.Load_SyntheticCsv_BuildsActiveAndInactiveRegularSets()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Simulation/RegularVisibilityMaskServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "afb4575a2f595b3bddc49c414d6c548506cdd7c5b00178836e634419d78ee795",
-      "member": "FreeformHelper.Tests.RegularVisibilityMaskServiceTests.Load_SyntheticCsv_BuildsActiveAndInactiveRegularSets()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Simulation/RegularVisibilityMaskServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
     },
     {
       "syntaxHash": "5661909ba5565b912c1d2eb19027077386642437edc8dc0525dee313f0048022",
@@ -7169,16 +6459,6 @@
       "symbol": "M:System.Environment.SetEnvironmentVariable(System.String,System.String)"
     },
     {
-      "syntaxHash": "96fd4e8bbb05fb66c300b10263c85b8fcbc41e74f5f7d6ed3249cc1bc401a08a",
-      "member": "FreeformHelper.Tests.TestAppSettingsIsolation.Initialize()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/TestAppSettingsIsolation.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
-    },
-    {
       "syntaxHash": "377c51da1aff45d4ba1a4ab0cc69637111e9c38c0f6d08af2efe68f8a42a73f8",
       "member": "FreeformHelper.Tests.TestInfrastructure.ExampleData.IsRequired",
       "owner": "NFH",
@@ -7187,46 +6467,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "5cab3715987c546ac15d921238594d6e725c82011d4b4e5b9ef6814ae7d8b2f4",
-      "member": "FreeformHelper.Tests.TestInfrastructure.ExampleProjectFixture.Create(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixture.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
-      "syntaxHash": "9152d57a79021b608bf2574df3aba8e2922d854d33e998178740c089026e4f9b",
-      "member": "FreeformHelper.Tests.TestInfrastructure.ExampleProjectFixture.Create(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleProjectFixture.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "2e05f67f288335a47b893984eec3b764ab744f1c4160ad04642a522fe0f0bd5a",
-      "member": "FreeformHelper.Tests.TestInfrastructure.TestFiles.WriteTempCsv(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/TestFiles.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "6644952c2d696d7e1dd1430672ecea54112517a9761bedf3338e48c62161fdfd",
-      "member": "FreeformHelper.Tests.TestInfrastructure.TestFiles.WriteTempCsv(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/TestFiles.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.Path.GetTempPath"
     },
     {
       "syntaxHash": "4d19dbe3f8bdca25cb6239dd28e18612e717628280f89a6ab85edab8ccb15280",
@@ -7277,26 +6517,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "16fd7f2bd5f16ed5a1165ddef8314fb194b97ae416e58e27f3fabce37d702f7e",
-      "member": "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests.TM81_MatchesAcceptanceMatrixSnapshot()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Tm81NotchAcceptanceMatrixTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
-    },
-    {
-      "syntaxHash": "3e0ab78b508f2934cbcd03971b1d2f22a0f964784804a9d4a7f4f8fee8f1e694",
-      "member": "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests.TM81_MatchesAcceptanceMatrixSnapshot()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Tm81NotchAcceptanceMatrixTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
     },
     {
       "syntaxHash": "43a38e1f636b387c0417187584f7bea25ede62fac5c32abcce607c9166225a80",

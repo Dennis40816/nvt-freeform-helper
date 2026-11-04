@@ -18,7 +18,7 @@ public sealed class NotchExampleCExportDriftTests
     {
         var repoRoot = TestPaths.RepoRoot;
         var manifestPath = Path.Combine(repoRoot, "example", "BOE36.35", "notch_export_golden_manifest.json");
-        using var document = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        using var document = JsonDocument.Parse(TestFiles.ReadContent(manifestPath));
         var manifest = document.RootElement;
 
         AssertSignedFile(
@@ -74,7 +74,7 @@ public sealed class NotchExampleCExportDriftTests
             project.Settings,
             project.Settings.Notch.ExportProfile);
 
-        var expected = NormalizeText(File.ReadAllText(examplePath));
+        var expected = NormalizeText(TestFiles.ReadContent(examplePath));
         var actual = NormalizeText(actualExport);
         if (!string.Equals(expected, actual, StringComparison.Ordinal))
         {
@@ -83,7 +83,7 @@ public sealed class NotchExampleCExportDriftTests
                 "build",
                 $"notch-example-drift-{version.ToDisplayLabel()}.actual.c");
             Directory.CreateDirectory(Path.GetDirectoryName(driftPath)!);
-            File.WriteAllText(driftPath, actualExport);
+            TestFiles.WriteText(driftPath, actualExport);
         }
 
         GoldenAssert.TextEqual(expected, actual, $"exported C text {version.ToDisplayLabel()}");
@@ -107,7 +107,7 @@ public sealed class NotchExampleCExportDriftTests
         AssertSignedFile(path, contract.GetProperty("sha256").GetString());
 
         var expectedNodes = contract.GetProperty("nodes").GetInt32();
-        var text = NormalizeText(File.ReadAllText(path));
+        var text = NormalizeText(TestFiles.ReadContent(path));
         GoldenAssert.TextContains(
             text,
             $"#define USER_NHC_NODE_NUM        ({expectedNodes}u)",

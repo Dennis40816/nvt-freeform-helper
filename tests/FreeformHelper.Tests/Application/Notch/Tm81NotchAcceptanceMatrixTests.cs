@@ -40,7 +40,7 @@ public sealed class Tm81NotchAcceptanceMatrixTests
 
         Assert.True(File.Exists(snapshotPath), "The acceptance matrix snapshot file is missing.");
         var expected = JsonSerializer.Deserialize<Tm81NotchAcceptanceMatrixDocument>(
-            File.ReadAllText(snapshotPath),
+            TestFiles.ReadContent(snapshotPath),
             MatrixJsonOptions);
         Assert.NotNull(expected);
         var expectedJson = JsonSerializer.Serialize(expected, MatrixJsonOptions);
@@ -51,7 +51,7 @@ public sealed class Tm81NotchAcceptanceMatrixTests
                 TestPaths.RepoRoot,
                 "build",
                 "tm81-notch-acceptance-matrix.actual.json");
-            File.WriteAllText(actualDumpPath, actualJson);
+            TestFiles.WriteText(actualDumpPath, actualJson);
         }
 
         GoldenAssert.TextEqual(expectedJson, actualJson, "TM8.1 acceptance matrix");

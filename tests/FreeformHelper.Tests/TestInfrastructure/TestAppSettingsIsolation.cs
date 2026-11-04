@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 
 namespace FreeformHelper.Tests;
@@ -13,10 +14,7 @@ internal static class TestAppSettingsIsolation
         AppContext.SetSwitch("FreeformHelper.DisableInitialGridBootstrap", true);
         AppContext.SetSwitch(CadLoadSpinnerProcessHost.DisableProcessLaunchSwitch, true);
 
-        var sandboxDir = Path.Combine(
-            Path.GetTempPath(),
-            "FreeformHelper.Tests",
-            "app-settings");
+        var sandboxDir = TestFiles.NewTempFilePath("app-settings-", string.Empty);
         Directory.CreateDirectory(sandboxDir);
         var sandboxPath = Path.Combine(sandboxDir, "{guid}", "app-general-settings.json");
         Environment.SetEnvironmentVariable(

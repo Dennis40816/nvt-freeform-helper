@@ -1,5 +1,6 @@
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -9,10 +10,10 @@ public sealed class ProjectFileMigrationTests
     [Fact]
     public void Load_MigratesNullCollections()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
-            File.WriteAllText(path, """
+            TestFiles.WriteText(path, """
             {
               "schemaVersion": "2",
               "settings": {
@@ -122,10 +123,10 @@ public sealed class ProjectFileMigrationTests
     [Fact]
     public void Load_MigratesLegacyChannelLimitAndPreservesLargeChannelCounts()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
-            File.WriteAllText(path, """
+            TestFiles.WriteText(path, """
             {
               "schemaVersion": "2",
               "settings": {
@@ -159,10 +160,10 @@ public sealed class ProjectFileMigrationTests
     [Fact]
     public void Load_DropsUnsupportedLegacyNotchVersions()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
-            File.WriteAllText(path, """
+            TestFiles.WriteText(path, """
             {
               "schemaVersion": "2",
               "settings": {
@@ -195,11 +196,11 @@ public sealed class ProjectFileMigrationTests
     [Fact]
     public async Task LoadAndSave_PreservesUnknownRootProperties()
     {
-        var input = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}_in.json");
-        var output = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}_out.json");
+        var input = TestFiles.NewTempFilePath("cad_project_", "_in.json");
+        var output = TestFiles.NewTempFilePath("cad_project_", "_out.json");
         try
         {
-            File.WriteAllText(input, """
+            TestFiles.WriteText(input, """
             {
               "schemaVersion": "2",
               "legacyFoo": { "bar": 1 },
@@ -213,7 +214,7 @@ public sealed class ProjectFileMigrationTests
             var loaded = JsonProjectStore.Load(input);
             await store.SaveAsync(output, loaded, CancellationToken.None);
 
-            var outJson = File.ReadAllText(output);
+            var outJson = TestFiles.ReadContent(output);
             Assert.Contains("\"legacyFoo\"", outJson, StringComparison.Ordinal);
         }
         finally
@@ -232,7 +233,7 @@ public sealed class ProjectFileMigrationTests
     [Fact]
     public async Task SaveAndLoad_PreservesDxfRegularMappingOverrides()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var file = new ProjectFile
@@ -263,7 +264,7 @@ public sealed class ProjectFileMigrationTests
     [Fact]
     public async Task SaveAndLoad_PreservesCadOutputFwDiffIndexOverrides()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var file = new ProjectFile
@@ -294,7 +295,7 @@ public sealed class ProjectFileMigrationTests
     [Fact]
     public async Task SaveAndLoad_PreservesDxfCadGeometryOverrides()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var file = new ProjectFile
@@ -334,7 +335,7 @@ public sealed class ProjectFileMigrationTests
     [Fact]
     public async Task SaveAndLoad_PreservesCadOutputFwDiffIndexAnchorCadPadId()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var file = new ProjectFile
@@ -359,7 +360,7 @@ public sealed class ProjectFileMigrationTests
     [Fact]
     public async Task SaveAndLoad_PreservesCadOutputFwDiffIndexAnchorCadPadByIc()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var file = new ProjectFile

@@ -59,15 +59,15 @@ public sealed class ExampleProjectFixtureTests
 
             var projectPath = Path.Combine(sourceDirectory, "project.json");
             var originalText = $"\r\n  {project.ToJsonString()}\r\n";
-            File.WriteAllText(projectPath, originalText);
+            TestFiles.WriteText(projectPath, originalText);
             var csvPath = Path.Combine(sourceDirectory, "SeeRegular.csv");
             if (hasSiblingCsv)
             {
-                File.WriteAllText(csvPath, "1,0");
+                TestFiles.WriteText(csvPath, "1,0");
             }
 
             using var fixture = ExampleProjectFixture.Create(projectPath);
-            var actualText = File.ReadAllText(fixture.ProjectPath);
+            var actualText = TestFiles.ReadContent(fixture.ProjectPath);
             var expected = project.DeepClone();
             if (hasSiblingCsv && hasSourcePath)
             {
@@ -79,7 +79,7 @@ public sealed class ExampleProjectFixtureTests
             }
 
             Assert.True(JsonNode.DeepEquals(expected, JsonNode.Parse(actualText)));
-            Assert.Equal(originalText, File.ReadAllText(projectPath));
+            Assert.Equal(originalText, TestFiles.ReadContent(projectPath));
         }
         finally
         {
@@ -94,7 +94,7 @@ public sealed class ExampleProjectFixtureTests
         try
         {
             var projectPath = Path.Combine(sourceDirectory, "project.json");
-            File.WriteAllText(projectPath, "{}");
+            TestFiles.WriteText(projectPath, "{}");
             using var first = ExampleProjectFixture.Create(projectPath);
             using var second = ExampleProjectFixture.Create(projectPath);
             var firstDirectory = Path.GetDirectoryName(first.ProjectPath)!;
@@ -103,7 +103,16 @@ public sealed class ExampleProjectFixtureTests
             Assert.False(
                 string.Equals(firstDirectory, secondDirectory, StringComparison.Ordinal),
                 "The two working copies share a folder.");
-            Assert.Equal(Path.TrimEndingDirectorySeparator(Path.GetTempPath()), Path.GetDirectoryName(firstDirectory));
+            var probeDirectory = TestFiles.CreateTempDirectory();
+            try
+            {
+                Assert.Equal(Path.GetDirectoryName(probeDirectory.FullName), Path.GetDirectoryName(firstDirectory));
+            }
+            finally
+            {
+                TestDirectoryCleanup.DeleteBestEffort(probeDirectory.FullName);
+            }
+
             Assert.Equal("project.json", Path.GetFileName(first.ProjectPath));
             Assert.True(File.Exists(first.ProjectPath));
             Assert.True(File.Exists(second.ProjectPath));

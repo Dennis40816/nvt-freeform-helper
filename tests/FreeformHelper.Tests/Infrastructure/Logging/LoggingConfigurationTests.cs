@@ -44,7 +44,7 @@ public sealed class LoggingConfigurationTests
         var path = Path.Combine(TestPaths.RepoRoot, "docs", "logging-policy.md");
         Assert.True(File.Exists(path), $"logging policy not found: {path}");
 
-        var content = File.ReadAllText(path);
+        var content = TestFiles.ReadContent(path);
         Assert.Contains("`Debug`", content, StringComparison.Ordinal);
         Assert.Contains("`Info`", content, StringComparison.Ordinal);
         Assert.Contains("`Warn`", content, StringComparison.Ordinal);

@@ -1,5 +1,6 @@
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -11,7 +12,7 @@ public sealed class ProjectStoreTests
     [Fact]
     public async Task SaveAndLoad_RoundTripsSettings()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var store = new JsonProjectStore();
@@ -53,7 +54,7 @@ public sealed class ProjectStoreTests
     [Fact]
     public async Task SaveAndLoad_RoundTripsMatchingAndIndexMappingSettings()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"cad_project_{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
             var store = new JsonProjectStore();

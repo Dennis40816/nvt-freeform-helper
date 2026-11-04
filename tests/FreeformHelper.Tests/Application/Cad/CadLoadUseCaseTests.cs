@@ -1,5 +1,6 @@
 using System.Text;
 using FreeformHelper.Infrastructure.Dxf;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using Xunit;
 
@@ -12,11 +13,11 @@ public sealed class CadLoadUseCaseTests
     {
         var useCase = new CadLoadUseCase(new DxfImportService());
         var options = new DxfImportOptions();
-        var brokenPath = Path.Combine(Path.GetTempPath(), $"broken-{Guid.NewGuid():N}.dxf");
+        var brokenPath = TestFiles.NewTempFilePath("broken-", ".dxf");
 
         try
         {
-            File.WriteAllText(brokenPath, BrokenDxfContent, Encoding.UTF8);
+            TestFiles.WriteText(brokenPath, BrokenDxfContent, Encoding.UTF8);
 
             var outcome = useCase.TryLoadFromProject(brokenPath, _validEmbeddedDxfBytes, options);
 
@@ -38,11 +39,11 @@ public sealed class CadLoadUseCaseTests
     {
         var useCase = new CadLoadUseCase(new DxfImportService());
         var options = new DxfImportOptions();
-        var brokenPath = Path.Combine(Path.GetTempPath(), $"broken-{Guid.NewGuid():N}.dxf");
+        var brokenPath = TestFiles.NewTempFilePath("broken-", ".dxf");
 
         try
         {
-            File.WriteAllText(brokenPath, BrokenDxfContent, Encoding.UTF8);
+            TestFiles.WriteText(brokenPath, BrokenDxfContent, Encoding.UTF8);
 
             Assert.Throws<FormatException>(() => useCase.TryLoadFromProject(brokenPath, null, options));
         }

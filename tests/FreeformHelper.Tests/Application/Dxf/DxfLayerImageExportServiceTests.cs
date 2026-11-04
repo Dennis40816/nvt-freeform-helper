@@ -1,5 +1,6 @@
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using SkiaSharp;
@@ -19,7 +20,7 @@ public sealed class DxfLayerImageExportServiceTests
             CreateSquareCad(2, "L_TOP", 20, 10, 15),
         };
 
-        var path = Path.Combine(Path.GetTempPath(), $"dxf-layer-{Guid.NewGuid():N}.png");
+        var path = TestFiles.NewTempFilePath("dxf-layer-", ".png");
         try
         {
             DxfLayerImageExportService.ExportLayerImage(
@@ -52,7 +53,7 @@ public sealed class DxfLayerImageExportServiceTests
     public void ExportLayerImage_EmptyPads_Throws()
     {
         var service = new DxfLayerImageExportService();
-        var path = Path.Combine(Path.GetTempPath(), $"dxf-layer-{Guid.NewGuid():N}.png");
+        var path = TestFiles.NewTempFilePath("dxf-layer-", ".png");
 
         Assert.Throws<InvalidOperationException>(() =>
             DxfLayerImageExportService.ExportLayerImage(
@@ -76,7 +77,7 @@ public sealed class DxfLayerImageExportServiceTests
             CreateSquareCad(1, "L_EDGE", 0, 0, 100),
         };
 
-        var path = Path.Combine(Path.GetTempPath(), $"dxf-layer-{Guid.NewGuid():N}.png");
+        var path = TestFiles.NewTempFilePath("dxf-layer-", ".png");
         try
         {
             DxfLayerImageExportService.ExportLayerImage(
@@ -113,8 +114,8 @@ public sealed class DxfLayerImageExportServiceTests
             CreateSquareCad(1, "L_EDGE", 0, 0, 100),
         };
 
-        var thinPath = Path.Combine(Path.GetTempPath(), $"dxf-layer-thin-{Guid.NewGuid():N}.png");
-        var thickPath = Path.Combine(Path.GetTempPath(), $"dxf-layer-thick-{Guid.NewGuid():N}.png");
+        var thinPath = TestFiles.NewTempFilePath("dxf-layer-thin-", ".png");
+        var thickPath = TestFiles.NewTempFilePath("dxf-layer-thick-", ".png");
         try
         {
             DxfLayerImageExportService.ExportLayerImage(
@@ -166,7 +167,7 @@ public sealed class DxfLayerImageExportServiceTests
             CreateSquareCad(1, "L_EDGE", 0, 0, 100),
         };
 
-        var path = Path.Combine(Path.GetTempPath(), $"dxf-layer-safe-inset-{Guid.NewGuid():N}.png");
+        var path = TestFiles.NewTempFilePath("dxf-layer-safe-inset-", ".png");
         try
         {
             DxfLayerImageExportService.ExportLayerImage(
