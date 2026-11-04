@@ -13,7 +13,7 @@ public sealed class MainWindowCloseTests
     public async Task OnClosing_PromptPending_CancelsSynchronously()
     {
         var prompt = new TaskCompletionSource<bool?>(TaskCreationOptions.RunContinuationsAsynchronously);
-        using var fixture = new ClosingWindowFixture(_ => prompt.Task);
+        using var fixture = new ClosingWindowFixture(_ => prompt.Task.WaitAsync(TestContext.Current.CancellationToken));
         var cancelledWhenHandlerReturned = false;
         fixture.Window.Closing += (_, e) => cancelledWhenHandlerReturned = e.Cancel;
 
@@ -36,7 +36,7 @@ public sealed class MainWindowCloseTests
     {
         var picker = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
         using var fixture = new ClosingWindowFixture(_ => Task.FromResult<bool?>(true));
-        fixture.Helper.PickSaveProjectPathAsync = () => picker.Task;
+        fixture.Helper.PickSaveProjectPathAsync = () => picker.Task.WaitAsync(TestContext.Current.CancellationToken);
         fixture.Window.Close();
         var save = Assert.IsAssignableFrom<Task<bool>>(fixture.Helper.SaveProjectCommand.ExecutionTask);
 
@@ -116,7 +116,7 @@ public sealed class MainWindowCloseTests
         fixture.Helper.PickSaveProjectPathAsync = () =>
         {
             saves++;
-            return picker.Task;
+            return picker.Task.WaitAsync(TestContext.Current.CancellationToken);
         };
         fixture.Window.Close();
         var save = Assert.IsAssignableFrom<Task<bool>>(fixture.Helper.SaveProjectCommand.ExecutionTask);
@@ -148,7 +148,7 @@ public sealed class MainWindowCloseTests
         fixture.Helper.PickSaveProjectPathAsync = () =>
         {
             saves++;
-            return picker.Task;
+            return picker.Task.WaitAsync(TestContext.Current.CancellationToken);
         };
         var menuSave = fixture.Helper.SaveProjectCommand.ExecuteAsync(null);
 

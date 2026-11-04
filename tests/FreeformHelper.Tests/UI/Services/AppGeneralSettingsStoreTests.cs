@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using Xunit;
 
@@ -11,7 +12,7 @@ public sealed class AppGeneralSettingsStoreTests
     public void DefaultCtor_UsesEnvironmentOverridePath()
     {
         var original = Environment.GetEnvironmentVariable(AppGeneralSettingsStore.SettingsPathOverrideEnvironmentVariable);
-        var expectedPath = Path.Combine(Path.GetTempPath(), $"app-general-env-{Guid.NewGuid():N}.json");
+        var expectedPath = TestWorkspace.NewFilePath("app-general-env", ".json");
 
         try
         {
@@ -36,7 +37,7 @@ public sealed class AppGeneralSettingsStoreTests
     [Fact]
     public void SaveThenLoad_WhitelistShape_RoundTrips()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"app-general-{Guid.NewGuid():N}.json");
+        var path = TestWorkspace.NewFilePath("app-general", ".json");
 
         try
         {
@@ -90,14 +91,14 @@ public sealed class AppGeneralSettingsStoreTests
     [Fact]
     public void TryLoad_LegacyDocument_MapsToWhitelistAndDefaultsBehavior()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"app-general-legacy-{Guid.NewGuid():N}.json");
+        var path = TestWorkspace.NewFilePath("app-general-legacy", ".json");
 
         try
         {
             var legacy = new
             {
                 SchemaVersion = 1,
-                SavedAtUtc = DateTimeOffset.UtcNow,
+                SavedAtUtc = TimeProvider.System.GetUtcNow(),
                 Settings = new
                 {
                     Matching = new
@@ -121,7 +122,7 @@ public sealed class AppGeneralSettingsStoreTests
                     }
                 }
             };
-            File.WriteAllText(path, JsonSerializer.Serialize(legacy));
+            TestFileIo.WriteContent(path, JsonSerializer.Serialize(legacy));
 
             var store = new AppGeneralSettingsStore(path);
             var loaded = store.TryLoad();
