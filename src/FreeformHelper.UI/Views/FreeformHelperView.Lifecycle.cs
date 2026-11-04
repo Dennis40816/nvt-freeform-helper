@@ -175,7 +175,7 @@ public sealed partial class FreeformHelperView
         _initialFitWindow = window;
         _initialFitHandler = Handler;
         window.LayoutUpdated += Handler;
-        Dispatcher.UIThread.Post(() => Handler(null, EventArgs.Empty), DispatcherPriority.Loaded);
+        Dispatcher.Post(() => Handler(null, EventArgs.Empty), DispatcherPriority.Loaded);
     }
 
     private void OnLayerTogglePointerPressed(object? sender, PointerPressedEventArgs e)

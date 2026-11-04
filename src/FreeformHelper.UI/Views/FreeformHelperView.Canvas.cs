@@ -256,7 +256,7 @@ public sealed partial class FreeformHelperView
         _padInfoOverlay.IsVisible = true;
         UpdatePadInfoLayout(); // Initial layout.
         // Post another layout update to ensure correct positioning after UI render cycle.
-        Avalonia.Threading.Dispatcher.UIThread.Post(UpdatePadInfoLayout);
+        Dispatcher.Post(UpdatePadInfoLayout);
     }
 
     /// <summary>

@@ -2,7 +2,6 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
 using FreeformHelper.UI.ViewModels;
 
 namespace FreeformHelper.UI.Views.RightWorkflowSections;
@@ -95,6 +94,6 @@ public sealed partial class RightWorkflowSettingsTabView : UserControl
             return;
         }
 
-        Dispatcher.UIThread.Post(() => block.BringIntoView());
+        Dispatcher.Post(() => block.BringIntoView());
     }
 }

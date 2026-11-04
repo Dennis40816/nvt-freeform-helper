@@ -48,7 +48,7 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
         StartIpcServer();
         if (_options is not null)
         {
-            Dispatcher.UIThread.Post(() =>
+            Dispatcher.Post(() =>
             {
                 if (IsVisible)
                 {
