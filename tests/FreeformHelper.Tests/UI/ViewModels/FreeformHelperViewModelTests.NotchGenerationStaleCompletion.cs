@@ -444,7 +444,7 @@ public sealed partial class FreeformHelperViewModelTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var dxfPath = CreateTempDxfFile(("signal", 0, 0, 20, 10));
-        var exportPath = Path.Combine(Path.GetTempPath(), $"stale-notch-export-{Guid.NewGuid():N}.csv");
+        var exportPath = TestFiles.NewTempFilePath("stale-notch-export-", ".csv");
         try
         {
             var vm = await CreateNotchExportCacheViewModelAsync(dxfPath);

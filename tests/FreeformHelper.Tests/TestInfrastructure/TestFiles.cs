@@ -49,6 +49,26 @@ internal static class TestFiles
         return reader.ReadToEnd();
     }
 
+    public static async Task WriteTextAsync(string path, string content, CancellationToken cancellationToken)
+    {
+        await using var writer = new StreamWriter(path, append: false);
+        await writer.WriteAsync(content.AsMemory(), cancellationToken);
+    }
+
+    public static async Task<string> ReadContentAsync(string path, CancellationToken cancellationToken)
+    {
+        using var reader = new StreamReader(path);
+        return await reader.ReadToEndAsync(cancellationToken);
+    }
+
+    public static async Task<byte[]> ReadBytesAsync(string path, CancellationToken cancellationToken)
+    {
+        await using var stream = File.OpenRead(path);
+        var content = new byte[stream.Length];
+        await stream.ReadExactlyAsync(content, cancellationToken);
+        return content;
+    }
+
     public static void WriteBytes(string path, byte[] content)
     {
         using var stream = File.Create(path);

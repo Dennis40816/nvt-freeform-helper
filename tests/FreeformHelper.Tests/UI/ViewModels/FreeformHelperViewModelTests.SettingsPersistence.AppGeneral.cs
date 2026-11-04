@@ -1,4 +1,5 @@
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -10,8 +11,8 @@ public sealed partial class FreeformHelperViewModelTests
     [Fact]
     public async Task SettingsLayerPrecedence_ProjectOverridesAppGeneralAndAppGeneralOverridesDefault()
     {
-        var appSettingsPath = Path.Combine(Path.GetTempPath(), $"freeform-app-general-{Guid.NewGuid():N}.json");
-        var projectPath = Path.Combine(Path.GetTempPath(), $"freeform-project-{Guid.NewGuid():N}.json");
+        var appSettingsPath = TestFiles.NewTempFilePath("freeform-app-general-", ".json");
+        var projectPath = TestFiles.NewTempFilePath("freeform-project-", ".json");
 
         try
         {
@@ -79,8 +80,8 @@ public sealed partial class FreeformHelperViewModelTests
     [Fact]
     public async Task LoadProject_WhenApplyAppVisualPreferencesEnabled_ReappliesAppVisualLayer()
     {
-        var appSettingsPath = Path.Combine(Path.GetTempPath(), $"freeform-app-general-{Guid.NewGuid():N}.json");
-        var projectPath = Path.Combine(Path.GetTempPath(), $"freeform-project-{Guid.NewGuid():N}.json");
+        var appSettingsPath = TestFiles.NewTempFilePath("freeform-app-general-", ".json");
+        var projectPath = TestFiles.NewTempFilePath("freeform-project-", ".json");
 
         try
         {
@@ -140,8 +141,8 @@ public sealed partial class FreeformHelperViewModelTests
     [Fact]
     public async Task AppGeneralSettings_AfterLoadProject_DefersUntilNextProjectSave()
     {
-        var appSettingsPath = Path.Combine(Path.GetTempPath(), $"freeform-app-general-{Guid.NewGuid():N}.json");
-        var projectPath = Path.Combine(Path.GetTempPath(), $"freeform-project-{Guid.NewGuid():N}.json");
+        var appSettingsPath = TestFiles.NewTempFilePath("freeform-app-general-", ".json");
+        var projectPath = TestFiles.NewTempFilePath("freeform-project-", ".json");
 
         try
         {

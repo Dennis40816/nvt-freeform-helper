@@ -7,6 +7,7 @@ using Avalonia.Input;
 using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
 using Nvt.Core.Progress;
@@ -46,10 +47,10 @@ public sealed class ProjectLoadingInputTests
     [AvaloniaFact]
     public async Task FailedProjectLoad_RestoresReadyAndCommandAvailability()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"loading-invalid-{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("loading-invalid-", ".json");
         try
         {
-            await File.WriteAllTextAsync(path, "{");
+            await TestFiles.WriteTextAsync(path, "{", TestContext.Current.CancellationToken);
             var vm = new FreeformHelperViewModel();
             var result = await vm.LoadProjectFromPathAsync(path);
             Assert.False(result.IsLoaded);
@@ -81,7 +82,7 @@ public sealed class ProjectLoadingInputTests
     [AvaloniaFact]
     public async Task ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"loading-input-{Guid.NewGuid():N}.json");
+        var path = TestFiles.NewTempFilePath("loading-input-", ".json");
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var vm = new FreeformHelperViewModel();
