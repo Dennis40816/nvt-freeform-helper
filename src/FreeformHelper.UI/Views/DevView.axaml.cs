@@ -12,7 +12,7 @@ public partial class DevView : UserControl
 {
     private UiEventRunner? _uiEvents => (DataContext as FreeformHelper.UI.ViewModels.DevViewModel)?.UiEvents;
 
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private int _previewSpinnerSequence;
 
     public DevView()
@@ -25,12 +25,12 @@ public partial class DevView : UserControl
     {
         AttachedToVisualTree -= OnAttachedToVisualTree;
         UiThread.IsCurrent(out _, out var app);
-        Logger.Info(CultureInfo.InvariantCulture, "DevView theme probe: Requested={0} Actual={1}",
+        _logger.Info(CultureInfo.InvariantCulture, "DevView theme probe: Requested={0} Actual={1}",
             app?.RequestedThemeVariant,
             ActualThemeVariant);
         var probeText = BuildProbeText();
         DevProbeText.Text = probeText;
-        Logger.Info(CultureInfo.InvariantCulture, "{0}", probeText.Replace(Environment.NewLine, " | ", StringComparison.Ordinal));
+        _logger.Info(CultureInfo.InvariantCulture, "{0}", probeText.Replace(Environment.NewLine, " | ", StringComparison.Ordinal));
     }
 
     private void OnDevTriggerSpinnerClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

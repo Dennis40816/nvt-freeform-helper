@@ -10,7 +10,7 @@ public sealed partial class FreeformHelperViewModel
         if (!HasAnyCadEdits)
         {
             SetStatus("DXF edit: no hidden/combined/layer edits.");
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF edit reset-all skipped: nothing to reset.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF edit reset-all skipped: nothing to reset.");
             return;
         }
 
@@ -53,7 +53,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus($"DXF edit: reset hidden ({restored}), combined ({removedCombined}), layer edits ({restoredLayerMoves}), rotated ({restoredRotations}).");
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "DXF edit reset all edits. hidden={0}, combined={1}, relayered={2}, rotated={3}.",
             restored,

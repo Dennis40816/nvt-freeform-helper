@@ -16,7 +16,7 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class Cad3635EndToEndBenchmarkTests
 {
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     private const string RunEnv = "FREEFORMHELPER_RUN_3635_E2E_BENCHMARK";
     private const string IterationsEnv = "FREEFORMHELPER_3635_E2E_BENCHMARK_ITERATIONS";
@@ -68,7 +68,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
                 BuildSummary(measured));
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
-            var json = JsonSerializer.Serialize(result, JsonOptions);
+            var json = JsonSerializer.Serialize(result, _jsonOptions);
             await File.WriteAllTextAsync(outputPath, json);
         }
         finally

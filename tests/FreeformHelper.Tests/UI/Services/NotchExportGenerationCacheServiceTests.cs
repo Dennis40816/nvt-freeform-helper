@@ -10,9 +10,9 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchExportGenerationCacheServiceTests
 {
-    private static readonly double[] GridXEdges = [0.0, 10.0];
-    private static readonly double[] GridYEdges = [0.0, 10.0];
-    private static readonly int[] CacheTableValues = [10, 100, 65535, 0, 65535, 0, 0];
+    private static readonly double[] _gridXEdges = [0.0, 10.0];
+    private static readonly double[] _gridYEdges = [0.0, 10.0];
+    private static readonly int[] _cacheTableValues = [10, 100, 65535, 0, 65535, 0, 0];
 
     [Fact]
     public void TryGet_WithSameReferencesAndKey_ReturnsCachedTable()
@@ -459,8 +459,8 @@ public sealed class NotchExportGenerationCacheServiceTests
         return new RegularGrid(
             rows: 1,
             cols: 1,
-            xEdges: GridXEdges,
-            yEdges: GridYEdges,
+            xEdges: _gridXEdges,
+            yEdges: _gridYEdges,
             pads: new[] { pad });
     }
 
@@ -485,7 +485,7 @@ public sealed class NotchExportGenerationCacheServiceTests
                 diffIndex: 10,
                 regularPadIndex: 100,
                 cadPadId: 10,
-                values: CacheTableValues,
+                values: _cacheTableValues,
                 comment: "cache")
         });
     }

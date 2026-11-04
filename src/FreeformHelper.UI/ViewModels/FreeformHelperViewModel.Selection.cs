@@ -113,7 +113,7 @@ public sealed partial class FreeformHelperViewModel
         _selectionTimings.Record(summaryDurationMs, inspectorDurationMs, notchPreviewDurationMs, totalDurationMs);
         var canvasPerfText = BuildCanvasPerfText();
 
-        Logger.Debug(
+        _logger.Debug(
             CultureInfo.InvariantCulture,
             "Selection updated: CAD={0}, Regular={1}, summary={2}ms, inspector={3}ms, notchPreview={4}ms, total={5}ms. {6} | {7}",
             _selectedCadIds.Count,

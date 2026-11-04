@@ -7,8 +7,8 @@ namespace FreeformHelper.UI.Services;
 
 public sealed class NotchDetailUseCase
 {
-    private static readonly NotchV22ResolvedResultService ResolvedResultService = new();
-    private readonly NotchV22ResolvedResultService _resolvedResultService = ResolvedResultService;
+    private static readonly NotchV22ResolvedResultService _sharedResolvedResultService = new();
+    private readonly NotchV22ResolvedResultService _resolvedResultService = _sharedResolvedResultService;
 
     public static NotchV22CompensationResult BuildCompensation(
         CadPad cadPad,
@@ -76,7 +76,7 @@ public sealed class NotchDetailUseCase
             request.StrictOverlapRatio,
             request.EnableToFullRuleEngine,
             request.EnableToFullRuleTrace);
-        return ResolvedResultService.Build(
+        return _sharedResolvedResultService.Build(
             request.CadPad,
             compensation,
             request.StrictOverlapRatio,

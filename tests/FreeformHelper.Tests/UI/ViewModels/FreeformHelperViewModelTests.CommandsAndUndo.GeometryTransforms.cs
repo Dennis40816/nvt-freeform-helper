@@ -113,8 +113,8 @@ public sealed partial class FreeformHelperViewModelTests
         var grid = new RegularGrid(
             rows: 1,
             cols: 3,
-            xEdges: ShiftGridXEdges,
-            yEdges: ShiftGridYEdges,
+            xEdges: _shiftGridXEdges,
+            yEdges: _shiftGridYEdges,
             pads: new[]
             {
                 CreateRegularPad(100, row: 0, col: 0, minX: 0, minY: 0, maxX: 10, maxY: 10, diffIndex: 10),
@@ -123,13 +123,13 @@ public sealed partial class FreeformHelperViewModelTests
             });
 
         InitializeVisibleCadIndexing(vm, source, grid);
-        SetPadMatchResults(vm, ShiftVisibleCadMatches);
+        SetPadMatchResults(vm, _shiftVisibleCadMatches);
 
         var updateVisibleCadIndexingMethod = typeof(FreeformHelperViewModel).GetMethod("UpdateCadOutputFwDiffIndexing", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(updateVisibleCadIndexingMethod);
         updateVisibleCadIndexingMethod!.Invoke(vm, new object?[] { source });
 
-        await SelectCadPadsAsync(vm, SelectedCad23);
+        await SelectCadPadsAsync(vm, _selectedCad23);
         vm.Step4Index.ShiftDelta = 1m;
 
         vm.OffsetSelectedCadOutputFwDiffIndicesCommand.Execute(null);
@@ -230,7 +230,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         cadField!.SetValue(vm, new CadPadSet(source));
         resetBaselineMethod!.Invoke(vm, new object?[] { new CadPadSet(source) });
-        await SelectCadPadsAsync(vm, PairCadSelection);
+        await SelectCadPadsAsync(vm, _pairCadSelection);
         vm.CombineSelectedCadPadsCommand.Execute(null);
 
         Assert.Equal(2, vm.CombinedCadPadCount);

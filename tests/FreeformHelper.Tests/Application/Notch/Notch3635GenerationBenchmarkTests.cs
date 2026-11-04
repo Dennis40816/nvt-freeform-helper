@@ -9,7 +9,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class Notch3635GenerationBenchmarkTests
 {
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     private const string RunEnv = "FREEFORMHELPER_RUN_NOTCH_BENCHMARK";
     private const string IterationsEnv = "FREEFORMHELPER_NOTCH_BENCHMARK_ITERATIONS";
@@ -70,7 +70,7 @@ public sealed class Notch3635GenerationBenchmarkTests
             BuildSummary(measured));
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
-        var json = JsonSerializer.Serialize(result, JsonOptions);
+        var json = JsonSerializer.Serialize(result, _jsonOptions);
         await File.WriteAllTextAsync(outputPath, json, TestContext.Current.CancellationToken);
     }
 

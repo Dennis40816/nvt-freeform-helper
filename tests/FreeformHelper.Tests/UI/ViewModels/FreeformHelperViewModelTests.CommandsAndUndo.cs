@@ -10,12 +10,12 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed partial class FreeformHelperViewModelTests
 {
-    private static readonly int[] SingleCadSelection = [1];
-    private static readonly int[] PairCadSelection = [1, 2];
-    private static readonly int[] SelectedCad23 = [2, 3];
-    private static readonly double[] ShiftGridXEdges = [0d, 10d, 20d, 30d];
-    private static readonly double[] ShiftGridYEdges = [0d, 10d];
-    private static readonly (int CadPadId, int RegularPadId)[] ShiftVisibleCadMatches =
+    private static readonly int[] _singleCadSelection = [1];
+    private static readonly int[] _pairCadSelection = [1, 2];
+    private static readonly int[] _selectedCad23 = [2, 3];
+    private static readonly double[] _shiftGridXEdges = [0d, 10d, 20d, 30d];
+    private static readonly double[] _shiftGridYEdges = [0d, 10d];
+    private static readonly (int CadPadId, int RegularPadId)[] _shiftVisibleCadMatches =
     [
         (1, 100),
         (2, 101),

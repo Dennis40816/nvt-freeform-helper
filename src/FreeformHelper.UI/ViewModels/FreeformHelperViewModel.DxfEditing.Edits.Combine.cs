@@ -9,7 +9,7 @@ public sealed partial class FreeformHelperViewModel
     {
         if (!TryGetLoadedCad(() => _cad, "DXF combine: import DXF first.", out var cad))
         {
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF combine skipped: no DXF loaded.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF combine skipped: no DXF loaded.");
             return;
         }
 
@@ -20,7 +20,7 @@ public sealed partial class FreeformHelperViewModel
         if (selected.Count < 2)
         {
             SetStatus("DXF combine: select at least 2 CAD pads.");
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF combine skipped: less than 2 pads selected.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF combine skipped: less than 2 pads selected.");
             return;
         }
 
@@ -31,7 +31,7 @@ public sealed partial class FreeformHelperViewModel
         if (sourcePads.Count < 2)
         {
             SetStatus("DXF combine: select at least 2 CAD output pads.");
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF combine skipped: less than 2 visible source pads.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF combine skipped: less than 2 visible source pads.");
             return;
         }
 
@@ -41,7 +41,7 @@ public sealed partial class FreeformHelperViewModel
         if (unionResult.OuterPolygons.Count == 0)
         {
             SetStatus("DXF combine: failed to build combined shape.");
-            Logger.Warn(CultureInfo.InvariantCulture, "DXF combine failed: union output empty.");
+            _logger.Warn(CultureInfo.InvariantCulture, "DXF combine failed: union output empty.");
             return;
         }
 
@@ -83,7 +83,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus($"DXF combine: merged {sourcePads.Count} pads into {combinedPads.Count}.");
-        Logger.Info(CultureInfo.InvariantCulture, "DXF combine applied. source={0}, outputPads={1}, hiddenTotal={2}, combinedTotal={3}, holes={4}.",
+        _logger.Info(CultureInfo.InvariantCulture, "DXF combine applied. source={0}, outputPads={1}, hiddenTotal={2}, combinedTotal={3}, holes={4}.",
             sourcePads.Count,
             combinedPads.Count,
             _cadEdit.HiddenCadPadIds.Count,
@@ -98,7 +98,7 @@ public sealed partial class FreeformHelperViewModel
         if (_cad is null || _combinedCad.OutputCadIds.Count == 0)
         {
             SetStatus("DXF combine: no combined pad.");
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF combine clear skipped: no combined pads.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF combine clear skipped: no combined pads.");
             return;
         }
 
@@ -111,7 +111,7 @@ public sealed partial class FreeformHelperViewModel
         if (selectedGroupIds.Count == 0)
         {
             SetStatus("DXF combine: select combined CAD pads first.");
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF combine clear skipped: no combined CAD pad selected.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF combine clear skipped: no combined CAD pad selected.");
             return;
         }
 
@@ -206,7 +206,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus($"{statusPrefix}: groups={validGroupIds.Count}, combined={outputIds.Count}, restored={restoredSources}.");
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "{0}. groups={1}, combinedRemoved={2}, restoredSources={3}, hiddenTotal={4}.",
             logContext,

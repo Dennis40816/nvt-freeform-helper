@@ -8,8 +8,8 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel
 {
     private const int MaxInspectorMatchDetailLines = 8;
-    private static readonly char[] ToFullDiagnosticsLineSeparators = ['\r', '\n'];
-    private static readonly char[] ToFullDiagnosticsOwnerSeparators = ['|', ';'];
+    private static readonly char[] _toFullDiagnosticsLineSeparators = ['\r', '\n'];
+    private static readonly char[] _toFullDiagnosticsOwnerSeparators = ['|', ';'];
 
     internal NotchComputationMode CurrentNotchComputationMode => _projectFile.Settings.Notch.ComputationMode;
 
@@ -132,7 +132,7 @@ public sealed partial class FreeformHelperViewModel
         }
         else if (!includeExpensiveNotchDetails && _grid is not null)
         {
-            Logger.Debug(System.Globalization.CultureInfo.InvariantCulture, "Pad inspector fast snapshot: CAD={0} skipped cold Notch 2.2 compute (cache miss).",
+            _logger.Debug(System.Globalization.CultureInfo.InvariantCulture, "Pad inspector fast snapshot: CAD={0} skipped cold Notch 2.2 compute (cache miss).",
                 cadPadId);
         }
 

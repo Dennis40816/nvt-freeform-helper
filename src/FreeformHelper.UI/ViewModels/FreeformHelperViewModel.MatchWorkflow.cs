@@ -58,13 +58,13 @@ public sealed partial class FreeformHelperViewModel
             {
                 ApplyUiToSettings(_projectFile.Settings);
                 status.ReportProgress("Matching pads...");
-                Logger.Info(CultureInfo.InvariantCulture, "Matching pads.");
+                _logger.Info(CultureInfo.InvariantCulture, "Matching pads.");
             },
             operationAsync: MatchPadsAsync,
             onError: ex =>
             {
                 status.ReportError("Match failed", ex);
-                Logger.Error(ex, "Match failed.");
+                _logger.Error(ex, "Match failed.");
             });
         async Task MatchPadsAsync(Action<double> reportProgress)
         {
@@ -75,7 +75,7 @@ public sealed partial class FreeformHelperViewModel
                 invalidateDownstream: true,
                 moveToStep2: true,
                 completionStatus: "Matching complete.");
-            Logger.Info(CultureInfo.InvariantCulture, "Matching complete.");
+            _logger.Info(CultureInfo.InvariantCulture, "Matching complete.");
         }
     }
 
@@ -97,7 +97,7 @@ public sealed partial class FreeformHelperViewModel
         RebuildVisibleDxfIndexMap(CadPads.ToList());
         MatchLinksForCanvas = result.Links;
         var telemetry = result.Telemetry;
-        Logger.Debug(CultureInfo.InvariantCulture, "PERF PADMATCH: cad={0}, candidateCells={1}, boundsIntersections={2}, polygonIntersections={3}, avgCandidatePerCad={4:0.##}, p95CandidatePerCad={5}.",
+        _logger.Debug(CultureInfo.InvariantCulture, "PERF PADMATCH: cad={0}, candidateCells={1}, boundsIntersections={2}, polygonIntersections={3}, avgCandidatePerCad={4:0.##}, p95CandidatePerCad={5}.",
             telemetry.CadPadCount,
             telemetry.CandidateCellVisits,
             telemetry.BoundsIntersections,

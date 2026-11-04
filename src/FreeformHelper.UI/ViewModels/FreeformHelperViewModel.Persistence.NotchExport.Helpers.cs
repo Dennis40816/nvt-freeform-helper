@@ -73,7 +73,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SelectedNotchExportFileTypeOption = resolved;
-        Logger.Info(CultureInfo.InvariantCulture, "{0} export stage 3 switched file type to {1}.", exportKind, resolved.Display);
+        _logger.Info(CultureInfo.InvariantCulture, "{0} export stage 3 switched file type to {1}.", exportKind, resolved.Display);
     }
 
     private void ApplyNotchExportVersionSelection(NotchExportVersionOption selectedOption, string exportKind)
@@ -100,7 +100,7 @@ public sealed partial class FreeformHelperViewModel
 
         EnableV21 = nextEnableV21;
         EnableV22 = nextEnableV22;
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "{0} export stage 3 switched notch version scope to {1} (persist-on-save).",
             exportKind,
@@ -135,7 +135,7 @@ public sealed partial class FreeformHelperViewModel
         NotchExportSummary = message;
         NotchExportProgressText = message;
         status.ReportProgress(message);
-        Logger.Info(message);
+        _logger.Info(message);
     }
 
     private Progress<NotchGenerationProgress> CreateNotchGenerationProgressReporter(string exportKind)

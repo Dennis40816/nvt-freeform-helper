@@ -5,7 +5,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class DxfPadImporterTests
 {
-    private static readonly string[] NestedInsertLayerInheritanceDxfLines =
+    private static readonly string[] _nestedInsertLayerInheritanceDxfLines =
     [
         "0",
         "SECTION",
@@ -395,6 +395,6 @@ public sealed class DxfPadImporterTests
 
     private static string BuildDxfWithNestedInsertLayerInheritance()
     {
-        return string.Join(Environment.NewLine, NestedInsertLayerInheritanceDxfLines);
+        return string.Join(Environment.NewLine, _nestedInsertLayerInheritanceDxfLines);
     }
 }

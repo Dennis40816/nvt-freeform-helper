@@ -146,7 +146,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var firstLine = diagnostics
-            .Split(ToFullDiagnosticsLineSeparators, StringSplitOptions.RemoveEmptyEntries)
+            .Split(_toFullDiagnosticsLineSeparators, StringSplitOptions.RemoveEmptyEntries)
             .FirstOrDefault();
         if (string.IsNullOrWhiteSpace(firstLine))
         {
@@ -219,7 +219,7 @@ public sealed partial class FreeformHelperViewModel
             : string.Empty;
         if (!string.IsNullOrWhiteSpace(ownersToken) && !string.Equals(ownersToken.Trim(), "-", StringComparison.Ordinal))
         {
-            foreach (var token in ownersToken.Split(ToFullDiagnosticsOwnerSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            foreach (var token in ownersToken.Split(_toFullDiagnosticsOwnerSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
                 if (int.TryParse(token, out var ownerId))
                 {

@@ -8,7 +8,7 @@ namespace FreeformHelper.UI.Services;
 
 internal static class RuntimeQueryCommandLine
 {
-    private static readonly string[] SupportedCommands =
+    private static readonly string[] _supportedCommands =
     {
         "help",
         "status",
@@ -80,14 +80,14 @@ internal static class RuntimeQueryCommandLine
 
         if (args.Length < 2)
         {
-            error = $"Usage: query <{string.Join("|", SupportedCommands)}> [--key value]";
+            error = $"Usage: query <{string.Join("|", _supportedCommands)}> [--key value]";
             return false;
         }
 
         command = args[1].Trim().ToLowerInvariant();
-        if (!SupportedCommands.Contains(command, StringComparer.Ordinal))
+        if (!_supportedCommands.Contains(command, StringComparer.Ordinal))
         {
-            error = $"Unsupported query command '{command}'. Supported: {string.Join(", ", SupportedCommands)}.";
+            error = $"Unsupported query command '{command}'. Supported: {string.Join(", ", _supportedCommands)}.";
             return false;
         }
 

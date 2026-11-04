@@ -203,7 +203,7 @@ public sealed partial class ShellViewModel
             Volatile.Write(
                 ref _processedWorkspaceSourceChangeVersion,
                 Volatile.Read(ref _pendingWorkspaceSourceChangeVersion));
-            Logger.Error(ex, "Derived workspace prewarm failed after workspace source change.");
+            _logger.Error(ex, "Derived workspace prewarm failed after workspace source change.");
             mayRestart = true;
         }
         finally

@@ -21,7 +21,7 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class UiRenderedVisualSnapshotTests
 {
-    private static readonly JsonSerializerOptions BaselineJsonOptions = new()
+    private static readonly JsonSerializerOptions _baselineJsonOptions = new()
     {
         WriteIndented = true
     };
@@ -134,7 +134,7 @@ public sealed class UiRenderedVisualSnapshotTests
                     }
                 }
 
-                var updatedBaselineText = JsonSerializer.Serialize(baseline, BaselineJsonOptions);
+                var updatedBaselineText = JsonSerializer.Serialize(baseline, _baselineJsonOptions);
                 File.WriteAllText(baselinePath, updatedBaselineText + Environment.NewLine, new UTF8Encoding(false));
             }
 

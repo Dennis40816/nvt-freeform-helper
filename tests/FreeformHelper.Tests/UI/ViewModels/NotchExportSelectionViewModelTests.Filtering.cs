@@ -7,13 +7,13 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class NotchExportSelectionViewModelTests
 {
-    private static readonly string[] LinkedStatusFilterKeys = ["Linked"];
-    private static readonly string[] StatusFilterAllKeys = ["Linked", "Warning", "No CAD", "Legacy"];
-    private static readonly string[] LinkedAndNoOpStatusKeys = ["Linked", "No-op"];
-    private static readonly string[] Diff9FilterKeys = ["9"];
-    private static readonly string[] DiffFilterAllKeys = ["8", "9", "10"];
-    private static readonly string[] ExpectedDiffDialogKeys = ["10", "9"];
-    private static readonly string[] ExpectedRangeSelectedKeys = ["21", "24"];
+    private static readonly string[] _linkedStatusFilterKeys = ["Linked"];
+    private static readonly string[] _statusFilterAllKeys = ["Linked", "Warning", "No CAD", "Legacy"];
+    private static readonly string[] _linkedAndNoOpStatusKeys = ["Linked", "No-op"];
+    private static readonly string[] _diff9FilterKeys = ["9"];
+    private static readonly string[] _diffFilterAllKeys = ["8", "9", "10"];
+    private static readonly string[] _expectedDiffDialogKeys = ["10", "9"];
+    private static readonly string[] _expectedRangeSelectedKeys = ["21", "24"];
 
 
     [Fact]
@@ -102,8 +102,8 @@ public sealed partial class NotchExportSelectionViewModelTests
         vm.ShowSelectedOnly = true;
         vm.ApplyColumnFilterSelection(
             NotchExportColumnFilterField.Status,
-            LinkedStatusFilterKeys,
-            StatusFilterAllKeys);
+            _linkedStatusFilterKeys,
+            _statusFilterAllKeys);
 
         Assert.NotEqual(NotchExportRowDisplayMode.AllRows, vm.SelectedRowDisplayModeOption.Value);
         Assert.True(vm.HasSearchKeyword);
@@ -200,12 +200,12 @@ public sealed partial class NotchExportSelectionViewModelTests
 
         vm.ApplyColumnFilterSelection(
             NotchExportColumnFilterField.Status,
-            LinkedStatusFilterKeys,
-            LinkedAndNoOpStatusKeys);
+            _linkedStatusFilterKeys,
+            _linkedAndNoOpStatusKeys);
         vm.ApplyColumnFilterSelection(
             NotchExportColumnFilterField.Diff,
-            Diff9FilterKeys,
-            DiffFilterAllKeys);
+            _diff9FilterKeys,
+            _diffFilterAllKeys);
 
         Assert.Single(vm.Rows);
 
@@ -213,7 +213,7 @@ public sealed partial class NotchExportSelectionViewModelTests
 
         Assert.True(built);
         Assert.NotNull(dialog);
-        Assert.Equal(ExpectedDiffDialogKeys, dialog!.Options.Select(option => option.Key).ToArray());
+        Assert.Equal(_expectedDiffDialogKeys, dialog!.Options.Select(option => option.Key).ToArray());
     }
 
 
@@ -283,7 +283,7 @@ public sealed partial class NotchExportSelectionViewModelTests
         vm.RangeToText = "24";
         var selectedKeys = vm.GetSelectedKeys();
 
-        Assert.Equal(ExpectedRangeSelectedKeys, selectedKeys);
+        Assert.Equal(_expectedRangeSelectedKeys, selectedKeys);
     }
 
 

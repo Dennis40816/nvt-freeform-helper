@@ -150,21 +150,21 @@ public sealed partial class FreeformHelperViewModel
         if (OpenNotchDetailAsync is null)
         {
             SetStatus("Notch detail: dialog handler not wired.");
-            Logger.Warn(CultureInfo.InvariantCulture, "Notch detail requested but dialog handler is not wired.");
+            _logger.Warn(CultureInfo.InvariantCulture, "Notch detail requested but dialog handler is not wired.");
             return;
         }
 
         if (_cad is null || _grid is null)
         {
             SetStatus("Notch detail: import DXF and build grid first.");
-            Logger.Debug(CultureInfo.InvariantCulture, "Notch detail skipped: cad/grid not ready.");
+            _logger.Debug(CultureInfo.InvariantCulture, "Notch detail skipped: cad/grid not ready.");
             return;
         }
 
         if (_selectedCadIds.Count == 0)
         {
             SetStatus("Notch detail: select a CAD pad first.");
-            Logger.Debug(CultureInfo.InvariantCulture, "Notch detail skipped: no CAD selected.");
+            _logger.Debug(CultureInfo.InvariantCulture, "Notch detail skipped: no CAD selected.");
             return;
         }
 
@@ -175,7 +175,7 @@ public sealed partial class FreeformHelperViewModel
         if (cad is null)
         {
             SetStatus("Notch detail: selected CAD pad not found.");
-            Logger.Warn(CultureInfo.InvariantCulture, "Notch detail skipped: selected CAD pad not found (id={0}).", cadId);
+            _logger.Warn(CultureInfo.InvariantCulture, "Notch detail skipped: selected CAD pad not found (id={0}).", cadId);
             return;
         }
 
@@ -193,7 +193,7 @@ public sealed partial class FreeformHelperViewModel
             _grid,
             _projectFile.Settings,
             resolved);
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "Notch detail opened: cadId={0}, dxfIndex={1}, allocations={2}.",
             cad.Id,

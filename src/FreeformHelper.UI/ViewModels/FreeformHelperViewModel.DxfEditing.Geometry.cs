@@ -23,7 +23,7 @@ public sealed partial class FreeformHelperViewModel
     {
         if (!TryGetLoadedCad(() => _cad, "DXF rotate: import DXF first.", out var cad))
         {
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF rotate skipped: no DXF loaded.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF rotate skipped: no DXF loaded.");
             return;
         }
 
@@ -38,7 +38,7 @@ public sealed partial class FreeformHelperViewModel
         if (selectedIds.Count == 0)
         {
             SetStatus(BuildRotateUnavailableStatus());
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF rotate skipped: no CAD pad resolved for scope {0}.", SelectedDxfEditRotationScopeOption.Value);
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF rotate skipped: no CAD pad resolved for scope {0}.", SelectedDxfEditRotationScopeOption.Value);
             return;
         }
 
@@ -63,7 +63,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus($"DXF rotate: rotated {result.ChangedCount} CAD pad(s) by {result.AppliedDegrees:0.###}°.");
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "DXF rotate applied. changedPads={0}, degrees={1:0.###}.",
             result.ChangedCount,
@@ -181,7 +181,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus($"DXF edit: restored CAD {cadPadId} geometry.");
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "DXF geometry restore applied. cadId={0}.",
             cadPadId);

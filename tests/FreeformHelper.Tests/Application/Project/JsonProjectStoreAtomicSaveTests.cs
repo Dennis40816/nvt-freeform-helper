@@ -10,8 +10,8 @@ namespace FreeformHelper.Tests;
 
 public sealed class JsonProjectStoreAtomicSaveTests
 {
-    private static readonly DateTimeOffset SavedAt = new(2026, 10, 9, 8, 30, 0, TimeSpan.Zero);
-    private static readonly JsonSerializerOptions Options = new()
+    private static readonly DateTimeOffset _savedAt = new(2026, 10, 9, 8, 30, 0, TimeSpan.Zero);
+    private static readonly JsonSerializerOptions _options = new()
     {
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -27,7 +27,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
             var original = Encoding.UTF8.GetBytes("original project bytes");
             File.WriteAllBytes(path, original);
             var failure = new IOException("Publication failed.");
-            var store = new JsonProjectStore(new FixedTimeProvider(SavedAt))
+            var store = new JsonProjectStore(new FixedTimeProvider(_savedAt))
             {
                 Publisher = (_, _, _) => throw failure,
             };
@@ -56,7 +56,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
             File.WriteAllBytes(path, original);
             using var cancellation = new CancellationTokenSource();
             await cancellation.CancelAsync();
-            var store = new JsonProjectStore(new FixedTimeProvider(SavedAt));
+            var store = new JsonProjectStore(new FixedTimeProvider(_savedAt));
 
             await Assert.ThrowsAnyAsync<OperationCanceledException>(
                 () => store.SaveAsync(path, new ProjectFile(), cancellation.Token));
@@ -86,16 +86,16 @@ public sealed class JsonProjectStoreAtomicSaveTests
                     Matching = new MatchingSettings { MatchThreshold = 0.41, NearestK = 9 },
                 },
             };
-            var store = new JsonProjectStore(new FixedTimeProvider(SavedAt));
+            var store = new JsonProjectStore(new FixedTimeProvider(_savedAt));
 
             await store.SaveAsync(path, file, CancellationToken.None);
 
             var bytes = File.ReadAllBytes(path);
-            var expected = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(file, Options));
+            var expected = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(file, _options));
             Assert.Equal(expected, bytes);
             Assert.False(bytes.AsSpan().StartsWith(new byte[] { 0xEF, 0xBB, 0xBF }));
             var loaded = JsonProjectStore.Load(path);
-            Assert.Equal(JsonSerializer.Serialize(file.Settings, Options), JsonSerializer.Serialize(loaded.Settings, Options));
+            Assert.Equal(JsonSerializer.Serialize(file.Settings, _options), JsonSerializer.Serialize(loaded.Settings, _options));
             Assert.Equal(file.LastDxfPath, loaded.LastDxfPath);
             Assert.Equal(path, Assert.Single(Directory.GetFileSystemEntries(directory.FullName)));
         }
@@ -113,12 +113,12 @@ public sealed class JsonProjectStoreAtomicSaveTests
         {
             var path = Path.Combine(directory.FullName, "project.json");
             var file = new ProjectFile { SavedAt = DateTimeOffset.MinValue };
-            var store = new JsonProjectStore(new FixedTimeProvider(SavedAt));
+            var store = new JsonProjectStore(new FixedTimeProvider(_savedAt));
 
             await store.SaveAsync(path, file, CancellationToken.None);
 
-            Assert.Equal(SavedAt, file.SavedAt);
-            Assert.Equal(SavedAt, JsonProjectStore.Load(path).SavedAt);
+            Assert.Equal(_savedAt, file.SavedAt);
+            Assert.Equal(_savedAt, JsonProjectStore.Load(path).SavedAt);
         }
         finally
         {
@@ -135,7 +135,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
             var path = Path.Combine(directory.FullName, "project.json");
             File.WriteAllText(path, "original project bytes");
             var file = new ProjectFile { LastDxfPath = "replacement.dxf" };
-            var store = new JsonProjectStore(new FixedTimeProvider(SavedAt));
+            var store = new JsonProjectStore(new FixedTimeProvider(_savedAt));
 
             await store.SaveAsync(path, file, CancellationToken.None);
 
@@ -158,7 +158,7 @@ public sealed class JsonProjectStoreAtomicSaveTests
             var original = Encoding.UTF8.GetBytes("original project bytes");
             File.WriteAllBytes(path, original);
             var failure = new IOException("Writing the temporary file failed.");
-            var store = new JsonProjectStore(new FixedTimeProvider(SavedAt))
+            var store = new JsonProjectStore(new FixedTimeProvider(_savedAt))
             {
                 Publisher = (target, bytes, token) => AtomicOutput.WriteAsync(target, async (stream, cancellationToken) =>
                 {

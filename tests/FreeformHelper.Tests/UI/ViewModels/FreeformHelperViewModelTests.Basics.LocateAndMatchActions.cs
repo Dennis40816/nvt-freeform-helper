@@ -92,7 +92,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         vm.QuickFocusCommand.Execute(null);
 
-        Assert.Equal(SelectedCad4809, host.SelectedCadIds.OrderBy(id => id).ToArray());
+        Assert.Equal(_selectedCad4809, host.SelectedCadIds.OrderBy(id => id).ToArray());
         Assert.Empty(host.SelectedRegularIds);
         Assert.Equal(1, host.FocusWithMinZoomCount);
         Assert.Equal("Quick focus: CAD 4809 focused (CAD output=1).", vm.StatusText);
@@ -116,7 +116,7 @@ public sealed partial class FreeformHelperViewModelTests
         vm.QuickFocusCommand.Execute(null);
 
         Assert.Empty(host.SelectedCadIds);
-        Assert.Equal(SelectedRegular4616, host.SelectedRegularIds.OrderBy(id => id).ToArray());
+        Assert.Equal(_selectedRegular4616, host.SelectedRegularIds.OrderBy(id => id).ToArray());
         Assert.Equal(1, host.FocusWithMinZoomCount);
         Assert.Equal("Quick focus: REG 4616 focused (visible REG=1).", vm.StatusText);
     }
@@ -139,8 +139,8 @@ public sealed partial class FreeformHelperViewModelTests
 
         vm.QuickFocusCommand.Execute(null);
 
-        Assert.Equal(SelectedCad4809, host.SelectedCadIds.OrderBy(id => id).ToArray());
-        Assert.Equal(SelectedRegular4616, host.SelectedRegularIds.OrderBy(id => id).ToArray());
+        Assert.Equal(_selectedCad4809, host.SelectedCadIds.OrderBy(id => id).ToArray());
+        Assert.Equal(_selectedRegular4616, host.SelectedRegularIds.OrderBy(id => id).ToArray());
         Assert.Equal(1, host.FocusWithMinZoomCount);
         Assert.Equal("Quick focus: FW diff 72 focused (CAD output=1, REG=1).", vm.StatusText);
     }
@@ -165,7 +165,7 @@ public sealed partial class FreeformHelperViewModelTests
         vm.QuickFocusCommand.Execute(null);
 
         Assert.Empty(host.SelectedCadIds);
-        Assert.Equal(SelectedRegular200, host.SelectedRegularIds.OrderBy(id => id).ToArray());
+        Assert.Equal(_selectedRegular200, host.SelectedRegularIds.OrderBy(id => id).ToArray());
         Assert.Equal(1, host.FocusWithMinZoomCount);
         Assert.Equal("Quick focus: IC 2 FW diff 72 focused (CAD output=0, REG=1).", vm.StatusText);
     }
@@ -187,7 +187,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         vm.QuickFocusCommand.Execute(null);
 
-        Assert.Equal(SelectedCad72, host.SelectedCadIds.OrderBy(id => id).ToArray());
+        Assert.Equal(_selectedCad72, host.SelectedCadIds.OrderBy(id => id).ToArray());
         Assert.Empty(host.SelectedRegularIds);
         Assert.Equal("Auto focus: CAD 72 focused (CAD output=1).", vm.StatusText);
     }

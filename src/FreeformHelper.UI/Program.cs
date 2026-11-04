@@ -15,7 +15,7 @@ namespace FreeformHelper.UI;
 internal sealed class Program
 {
     // Logger instance for recording application events and errors.
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     /// <summary>
     /// The main entry point of the application.
@@ -54,7 +54,7 @@ internal sealed class Program
         catch (Exception ex)
         {
             // Log any fatal exceptions that occur during application startup.
-            Logger.Error(ex, "Fatal exception during app startup.");
+            _logger.Error(ex, "Fatal exception during app startup.");
             throw; // Re-throw the exception to terminate the application.
         }
         finally
@@ -102,18 +102,18 @@ internal sealed class Program
         {
             if (e.ExceptionObject is Exception ex)
             {
-                Logger.Error(ex, "Unhandled exception.");
+                _logger.Error(ex, "Unhandled exception.");
             }
             else
             {
-                Logger.Error(CultureInfo.InvariantCulture, "Unhandled exception: {0}", e.ExceptionObject);
+                _logger.Error(CultureInfo.InvariantCulture, "Unhandled exception: {0}", e.ExceptionObject);
             }
         };
 
         // Handles exceptions that occur within tasks but are not observed (e.g., awaited).
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
-            Logger.Error(e.Exception, "Unobserved task exception.");
+            _logger.Error(e.Exception, "Unobserved task exception.");
             e.SetObserved(); // Mark the exception as observed to prevent the process from terminating.
         };
     }
@@ -136,11 +136,11 @@ internal sealed class Program
             }
 
             var appliedLevel = applyLevel(requestedLevel);
-            Logger.Info(CultureInfo.InvariantCulture, "Startup log level override applied from app settings: {0}", appliedLevel);
+            _logger.Info(CultureInfo.InvariantCulture, "Startup log level override applied from app settings: {0}", appliedLevel);
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
-            Logger.Warn(ex, "Failed to apply startup log level override.");
+            _logger.Warn(ex, "Failed to apply startup log level override.");
         }
     }
 }

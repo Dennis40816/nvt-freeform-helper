@@ -159,7 +159,7 @@ public sealed partial class FreeformHelperViewModel
 
         if (result.HasLoadedMask)
         {
-            Logger.Info(
+            _logger.Info(
                 CultureInfo.InvariantCulture,
                 "Regular visibility mask loaded: source={0}, active={1}, inactive={2}, frames={3}, enabled={4}.",
                 result.SourcePath,
@@ -170,7 +170,7 @@ public sealed partial class FreeformHelperViewModel
         }
         else if (result.Status == RegularVisibilityMaskStatus.Incompatible)
         {
-            Logger.Warn(
+            _logger.Warn(
                 CultureInfo.InvariantCulture,
                 "Regular visibility mask ignored: source={0}, diagnostic={1}.",
                 result.SourcePath,
@@ -178,7 +178,7 @@ public sealed partial class FreeformHelperViewModel
         }
         else if (result.Status == RegularVisibilityMaskStatus.Failed)
         {
-            Logger.Warn(
+            _logger.Warn(
                 CultureInfo.InvariantCulture,
                 "Regular visibility mask failed: source={0}, diagnostic={1}.",
                 result.SourcePath,

@@ -7,9 +7,9 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private static readonly TimeSpan CadLoadOverlayMinVisibleDuration = TimeSpan.FromMilliseconds(120);
+    private static readonly TimeSpan _cadLoadOverlayMinVisibleDuration = TimeSpan.FromMilliseconds(120);
     private readonly LoadingScopeCoordinator _cadLoadOverlayScope =
-        new(YieldCadLoadCanvasOverlayFrameAsync, CadLoadOverlayMinVisibleDuration);
+        new(YieldCadLoadCanvasOverlayFrameAsync, _cadLoadOverlayMinVisibleDuration);
 
     internal async Task RunWithCadLoadCanvasOverlayAsync(Func<Task> action)
     {

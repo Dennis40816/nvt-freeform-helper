@@ -9,7 +9,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class ProjectPersistenceUseCaseTests
 {
-    private static readonly int[] ExpectedCombinedSourceCadIds = [1, 2];
+    private static readonly int[] _expectedCombinedSourceCadIds = [1, 2];
 
     [Fact]
     public async Task SaveAsync_CancelledWhenNoPathSelected()
@@ -413,7 +413,7 @@ public sealed class ProjectPersistenceUseCaseTests
             Assert.Equal(0, loaded.DxfCadGeometryOverrides[3].Vertices[0].Y, 6);
             var group = Assert.Single(loaded.DxfCombinedCadGroups);
             Assert.Equal(4, group.GroupId);
-            Assert.Equal(ExpectedCombinedSourceCadIds, group.SourceCadIds);
+            Assert.Equal(_expectedCombinedSourceCadIds, group.SourceCadIds);
             var outputPad = Assert.Single(group.OutputPads);
             Assert.Equal(1_500_000_000, outputPad.Id);
             Assert.Equal("COMB_1500000000", outputPad.Name);

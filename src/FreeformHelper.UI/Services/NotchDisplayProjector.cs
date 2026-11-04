@@ -9,8 +9,8 @@ namespace FreeformHelper.UI.Services;
 
 internal static partial class NotchDisplayProjector
 {
-    private static readonly char[] DiagnosticLineSeparators = ['\r', '\n'];
-    private static readonly char[] DiagnosticOwnerSeparators = ['|', ';'];
+    private static readonly char[] _diagnosticLineSeparators = ['\r', '\n'];
+    private static readonly char[] _diagnosticOwnerSeparators = ['|', ';'];
 
     public static NotchDisplayProjection Build(PadInspectorNotchSnapshot notch)
     {
@@ -306,7 +306,7 @@ internal static partial class NotchDisplayProjector
 
         var entries = new List<NotchToFullDiagnosticEntry>();
         var lines = diagnostics
-            .Split(DiagnosticLineSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            .Split(_diagnosticLineSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         foreach (var line in lines)
         {
             if (TryParseDiagnosticLine(line, out var parsed))
@@ -326,7 +326,7 @@ internal static partial class NotchDisplayProjector
         }
 
         var lines = diagnostics
-            .Split(DiagnosticLineSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            .Split(_diagnosticLineSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (lines.Length == 0)
         {
             return string.Empty;
@@ -464,7 +464,7 @@ internal static partial class NotchDisplayProjector
             : string.Empty;
         if (!string.IsNullOrWhiteSpace(ownersToken) && !string.Equals(ownersToken.Trim(), "-", StringComparison.Ordinal))
         {
-            foreach (var token in ownersToken.Split(DiagnosticOwnerSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            foreach (var token in ownersToken.Split(_diagnosticOwnerSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
                 if (int.TryParse(token, out var ownerId))
                 {

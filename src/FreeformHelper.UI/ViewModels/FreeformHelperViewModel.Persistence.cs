@@ -61,7 +61,7 @@ public sealed partial class FreeformHelperViewModel
             NotchExportSummary = blockedMessage;
             NotchExportProgressText = blockedMessage;
             status.ReportBlocked("Export notch: dialog handler not wired.");
-            Logger.Warn(blockedMessage);
+            _logger.Warn(blockedMessage);
             return;
         }
 
@@ -105,7 +105,7 @@ public sealed partial class FreeformHelperViewModel
                         NotchExportSummary = cancelMessage;
                         NotchExportProgressText = cancelMessage;
                         status.ReportBlocked(cancelMessage);
-                        Logger.Info(cancelMessage);
+                        _logger.Info(cancelMessage);
                         return;
                     }
 
@@ -117,7 +117,7 @@ public sealed partial class FreeformHelperViewModel
                     NotchExportSummary = successMessage;
                     NotchExportProgressText = successMessage;
                     status.ReportSuccess($"{effectiveExportKind} notch exported. Rows={table.Rows.Count}.");
-                    Logger.Info(CultureInfo.InvariantCulture, "{0} notch export completed: path={1}, rows={2}.", effectiveExportKind, path, table.Rows.Count);
+                    _logger.Info(CultureInfo.InvariantCulture, "{0} notch export completed: path={1}, rows={2}.", effectiveExportKind, path, table.Rows.Count);
                 },
                 onError: ex =>
                 {
@@ -125,7 +125,7 @@ public sealed partial class FreeformHelperViewModel
                     NotchExportSummary = message;
                     NotchExportProgressText = message;
                     status.ReportStatus(message);
-                    Logger.Error(ex, "{0} export failed.", exportKind);
+                    _logger.Error(ex, "{0} export failed.", exportKind);
                 },
                 onStart: () =>
                 {
@@ -156,7 +156,7 @@ public sealed partial class FreeformHelperViewModel
             NotchExportSummary = $"{exportKind} export blocked at stage 1: {message}";
             NotchExportProgressText = NotchExportSummary;
             status.ReportBlocked(message);
-            Logger.Warn(CultureInfo.InvariantCulture, "{0} export blocked at stage 1: {1}", exportKind, message);
+            _logger.Warn(CultureInfo.InvariantCulture, "{0} export blocked at stage 1: {1}", exportKind, message);
             return null;
         }
 
@@ -179,16 +179,16 @@ public sealed partial class FreeformHelperViewModel
             NotchExportSummary = $"{exportKind} export stopped at stage 2: no rows generated.";
             NotchExportProgressText = NotchExportSummary;
             status.ReportBlocked("Export notch: no rows generated.");
-            Logger.Warn(CultureInfo.InvariantCulture, "{0} export stage 2 produced no rows.", exportKind);
+            _logger.Warn(CultureInfo.InvariantCulture, "{0} export stage 2 produced no rows.", exportKind);
             return null;
         }
 
-        Logger.Info(CultureInfo.InvariantCulture, "{0} export stage 2 generated {1} row(s).", exportKind, table.Rows.Count);
+        _logger.Info(CultureInfo.InvariantCulture, "{0} export stage 2 generated {1} row(s).", exportKind, table.Rows.Count);
         var stage2Summary = BuildStage2RowSummary(exportKind, table, crossIcMismatch);
         NotchExportSummary = stage2Summary;
         NotchExportProgressText = stage2Summary;
         status.ReportProgress(stage2Summary);
-        Logger.Info(stage2Summary);
+        _logger.Info(stage2Summary);
 
         var safetyAudit = GetCurrentSimulationSafetyAudit?.Invoke();
         if (OpenNotchExportSelectionAsync is null)
@@ -200,7 +200,7 @@ public sealed partial class FreeformHelperViewModel
                 return null;
             }
 
-            Logger.Debug(CultureInfo.InvariantCulture, "{0} export stage 3 skipped row selection: dialog handler not wired.", exportKind);
+            _logger.Debug(CultureInfo.InvariantCulture, "{0} export stage 3 skipped row selection: dialog handler not wired.", exportKind);
             return table;
         }
 
@@ -221,7 +221,7 @@ public sealed partial class FreeformHelperViewModel
             NotchExportSummary = cancelMessage;
             NotchExportProgressText = cancelMessage;
             status.ReportBlocked(cancelMessage);
-            Logger.Info(cancelMessage);
+            _logger.Info(cancelMessage);
             return null;
         }
 
@@ -237,7 +237,7 @@ public sealed partial class FreeformHelperViewModel
             NotchExportSummary = cancelMessage;
             NotchExportProgressText = cancelMessage;
             status.ReportBlocked(cancelMessage);
-            Logger.Info(cancelMessage);
+            _logger.Info(cancelMessage);
             return null;
         }
 
@@ -246,7 +246,7 @@ public sealed partial class FreeformHelperViewModel
             return null;
         }
 
-        Logger.Info(CultureInfo.InvariantCulture, "{0} export stage 3 kept {1}/{2} row(s).",
+        _logger.Info(CultureInfo.InvariantCulture, "{0} export stage 3 kept {1}/{2} row(s).",
             exportKind,
             selectedTable.Rows.Count,
             table.Rows.Count);
@@ -268,7 +268,7 @@ public sealed partial class FreeformHelperViewModel
         NotchExportSummary = blockedMessage;
         NotchExportProgressText = message;
         status.ReportBlocked(blockedMessage);
-        Logger.Warn(CultureInfo.InvariantCulture, "{0} {1}", blockedMessage, message);
+        _logger.Warn(CultureInfo.InvariantCulture, "{0} {1}", blockedMessage, message);
         return true;
     }
 

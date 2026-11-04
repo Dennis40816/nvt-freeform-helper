@@ -9,7 +9,7 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private static readonly TimeSpan AppGeneralSettingsPersistDebounce = TimeSpan.FromMilliseconds(450);
+    private static readonly TimeSpan _appGeneralSettingsPersistDebounce = TimeSpan.FromMilliseconds(450);
     private readonly AppGeneralSettingsStore _appGeneralSettingsStore;
     private readonly AppGeneralPersistenceState _appGeneralPersistence = new(); // Holds the timer, the flags and the snapshots of the app general settings persistence.
 
@@ -35,7 +35,7 @@ public sealed partial class FreeformHelperViewModel
 
         var timer = new DispatcherTimer(DispatcherPriority.Background)
         {
-            Interval = AppGeneralSettingsPersistDebounce,
+            Interval = _appGeneralSettingsPersistDebounce,
         };
         timer.Tick += OnAppGeneralSettingsPersistTimerTick;
         _appGeneralPersistence.PersistTimer = timer;
@@ -95,11 +95,11 @@ public sealed partial class FreeformHelperViewModel
             _appGeneralPersistence.ViewSnapshot = CloneViewSnapshot(document.View);
             _appGeneralPersistence.ImportSnapshot = CloneImportSnapshot(document.Import);
             _appGeneralPersistence.HasDeferredChanges = false;
-            Logger.Debug(CultureInfo.InvariantCulture, "App general settings persisted: {0}", _appGeneralSettingsStore.SettingsPath);
+            _logger.Debug(CultureInfo.InvariantCulture, "App general settings persisted: {0}", _appGeneralSettingsStore.SettingsPath);
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
-            Logger.Warn(ex, "Persist app general settings failed.");
+            _logger.Warn(ex, "Persist app general settings failed.");
         }
     }
 
@@ -143,7 +143,7 @@ public sealed partial class FreeformHelperViewModel
             View = CloneViewSnapshot(_appGeneralPersistence.ViewSnapshot),
             Import = CloneImportSnapshot(_appGeneralPersistence.ImportSnapshot)
         };
-        Logger.Info(CultureInfo.InvariantCulture, "App general settings loaded: {0}", _appGeneralSettingsStore.SettingsPath);
+        _logger.Info(CultureInfo.InvariantCulture, "App general settings loaded: {0}", _appGeneralSettingsStore.SettingsPath);
     }
 
     private void TryApplyAppGeneralVisualPreferencesAfterProjectLoad()
@@ -154,7 +154,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         ApplyViewSnapshot(CloneViewSnapshot(_appGeneralPersistence.ViewSnapshot));
-        Logger.Info(CultureInfo.InvariantCulture, "Load project: app visual preferences layer applied.");
+        _logger.Info(CultureInfo.InvariantCulture, "Load project: app visual preferences layer applied.");
     }
 
     private static UiViewSnapshot CloneViewSnapshot(UiViewSnapshot source)

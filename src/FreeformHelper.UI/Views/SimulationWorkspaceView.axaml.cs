@@ -18,8 +18,8 @@ public sealed partial class SimulationWorkspaceView : UserControl
 {
     private UiEventRunner? _uiEvents => (DataContext as SimulationWorkspaceViewModel)?.UiEvents;
 
-    private static readonly string[] CsvFilePatterns = ["*.csv"];
-    private static readonly string[] AllFilesPatterns = ["*"];
+    private static readonly string[] _csvFilePatterns = ["*.csv"];
+    private static readonly string[] _allFilesPatterns = ["*"];
     private PadCanvas? _canvas;
     private SimulationWorkspaceViewModel? _attachedViewModel;
     private int _hoveredRegularPadId = -1;
@@ -215,8 +215,8 @@ public sealed partial class SimulationWorkspaceView : UserControl
             Title = "Import Diff CSV",
             FileTypeFilter = new List<FilePickerFileType>
             {
-                new("CSV") { Patterns = CsvFilePatterns },
-                new("All files") { Patterns = AllFilesPatterns },
+                new("CSV") { Patterns = _csvFilePatterns },
+                new("All files") { Patterns = _allFilesPatterns },
             },
         });
 
@@ -253,7 +253,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
             FileTypeChoices = new List<FilePickerFileType>
             {
                 new(request.FileTypeName) { Patterns = request.Patterns },
-                new("All files") { Patterns = AllFilesPatterns },
+                new("All files") { Patterns = _allFilesPatterns },
             },
         });
         if (file is null)

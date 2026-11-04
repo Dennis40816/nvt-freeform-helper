@@ -191,8 +191,8 @@ public sealed partial class RuntimeQueryUseCaseTests
         SetPrivateField(vm, "_grid", new RegularGrid(
             rows: 1,
             cols: 2,
-            xEdges: ValidationGridXEdges,
-            yEdges: ValidationGridYEdges,
+            xEdges: _validationGridXEdges,
+            yEdges: _validationGridYEdges,
             pads: new[] { regularLeft, regularRight }));
 
         var cadOutputFwDiffIndexByCadId = vm.CadIndexMaps.OutputFwDiffIndexByCadId;

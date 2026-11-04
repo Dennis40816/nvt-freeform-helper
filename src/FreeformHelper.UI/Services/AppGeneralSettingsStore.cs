@@ -13,8 +13,8 @@ public sealed class AppGeneralSettingsStore
 {
     public const string SettingsPathOverrideEnvironmentVariable = "FREEFORMHELPER_APP_GENERAL_SETTINGS_PATH";
 
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = true
     };
@@ -68,7 +68,7 @@ public sealed class AppGeneralSettingsStore
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
-            Logger.Warn(ex, "Failed to load app general settings from '{0}'.", _settingsPath);
+            _logger.Warn(ex, "Failed to load app general settings from '{0}'.", _settingsPath);
             return null;
         }
     }
@@ -83,11 +83,11 @@ public sealed class AppGeneralSettingsStore
         AppGeneralSettingsDocument? document;
         if (LooksLikeWhitelistShape(json))
         {
-            document = JsonSerializer.Deserialize<AppGeneralSettingsDocument>(json, JsonOptions);
+            document = JsonSerializer.Deserialize<AppGeneralSettingsDocument>(json, _jsonOptions);
         }
         else
         {
-            var legacy = JsonSerializer.Deserialize<LegacyAppGeneralSettingsDocument>(json, JsonOptions);
+            var legacy = JsonSerializer.Deserialize<LegacyAppGeneralSettingsDocument>(json, _jsonOptions);
             if (legacy is null)
             {
                 return null;
@@ -131,7 +131,7 @@ public sealed class AppGeneralSettingsStore
 
         document.SchemaVersion = AppGeneralSettingsDocument.CurrentSchemaVersion;
         document.SavedAtUtc = DateTimeOffset.UtcNow;
-        var json = JsonSerializer.Serialize(document, JsonOptions);
+        var json = JsonSerializer.Serialize(document, _jsonOptions);
         File.WriteAllText(_settingsPath, json);
     }
 

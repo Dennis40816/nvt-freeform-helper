@@ -15,7 +15,7 @@ public sealed class NotchV22CompensationServiceTests
     [InlineData(NotchCompensationModel.Disabled)]
     public void A1Fact5_CadAllocation_Q7ZeroOwnerAndReaderAgreeAndEmitNoCandidate(NotchCompensationModel model)
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 2570, 10);
         var regular = grid.Pads[0];
         regular.Freeform = FreeformType.XWay;
@@ -62,10 +62,10 @@ public sealed class NotchV22CompensationServiceTests
         Assert.Empty(generated.Table.Rows);
     }
 
-    private static readonly double[] Grid10 = [10.0];
-    private static readonly double[] Grid10x2 = [10.0, 10.0];
-    private static readonly double[] Grid10x20 = [10.0, 20.0];
-    private static readonly double[] Grid10x3 = [10.0, 10.0, 10.0];
+    private static readonly double[] _grid10 = [10.0];
+    private static readonly double[] _grid10x2 = [10.0, 10.0];
+    private static readonly double[] _grid10x20 = [10.0, 20.0];
+    private static readonly double[] _grid10x3 = [10.0, 10.0, 10.0];
 
     [Theory]
     [InlineData(NotchCompensationModel.CurrentGain)]
@@ -124,7 +124,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_UsesSumOfOverlapOverRegularArea_ForUndoNf()
     {
-        var grid = CreateGrid(Grid10x20, Grid10); // areas: 100, 200
+        var grid = CreateGrid(_grid10x20, _grid10); // areas: 100, 200
         var cad = CreateCadRect(0, 0, 30, 10); // overlaps full two regular pads
         var result = NotchV22CompensationService.Compute(cad, grid, enableToRegular: true, enableToFull: false);
 
@@ -138,8 +138,8 @@ public sealed class NotchV22CompensationServiceTests
     public void Compute_WithPrecomputedAllocations_MatchesDirectGeometryPath()
     {
         var grid = CreateGrid(
-            Grid10x3,
-            Grid10x3);
+            _grid10x3,
+            _grid10x3);
         var cad = CreateCadRect(12, 0, 18, 20, id: 900);
         var allocations = NotchAllocationService.BuildAllocations(cad, grid);
 
@@ -179,7 +179,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_WithExplicitEmptyPrecomputedAllocations_DoesNotFallBackToGeometry()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 5, 10);
 
         var result = NotchV22CompensationService.Compute(
@@ -200,8 +200,8 @@ public sealed class NotchV22CompensationServiceTests
     public void Compute_WithSharedBoundaryQueryContext_IsStableUnderParallelReuse()
     {
         var grid = CreateGrid(
-            Grid10x3,
-            Grid10x3);
+            _grid10x3,
+            _grid10x3);
         var cadPads = new[]
         {
             CreateCadRect(1, 1, 9, 9, id: 1001),
@@ -248,7 +248,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_WithSharedBoundaryQueryContext_DoesNotReadFallbackCandidatePool()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 5, 10, id: 1);
         var blocker = CreateCadRect(5, 0, 10, 10, id: 2);
         var candidatePool = new[] { cad, blocker };
@@ -275,7 +275,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_WithoutSharedBoundaryQueryContext_AddsCurrentCadWhenFallbackPoolOmitsIt()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 5, 10, id: 1);
         var blocker = CreateCadRect(5, 0, 10, 10, id: 2);
 
@@ -297,7 +297,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_WithoutSharedBoundaryQueryContext_NormalizesNullEmptyAndSameIdPools()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 5, 10, id: 1);
         var sameIdCad = CreateCadRect(20, 20, 30, 30, id: 1);
         IReadOnlyList<CadPad>?[] fallbackPools =
@@ -340,8 +340,8 @@ public sealed class NotchV22CompensationServiceTests
     public void Compute_WhenTimingReporterProvided_ReportsStageElapsedMs()
     {
         var grid = CreateGrid(
-            Grid10x3,
-            Grid10x3);
+            _grid10x3,
+            _grid10x3);
         var cad = CreateCadRect(12, 0, 18, 20, id: 901);
         NotchV22CompensationStageTimings? timings = null;
 
@@ -371,7 +371,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_ToFullEnabled_UsesAreaBasedUpperBound()
     {
-        var grid = CreateGrid(Grid10, Grid10); // area 100
+        var grid = CreateGrid(_grid10, _grid10); // area 100
         var cad = CreateCadRect(0, 0, 5, 10); // area 50
         var result = NotchV22CompensationService.Compute(cad, grid, enableToRegular: true, enableToFull: true);
 
@@ -385,7 +385,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_ToFullEnabled_CompletelyBlockedByOtherCads_StaysAtOneHundredPercent()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(4, 4, 6, 6, id: 1); // area 4
 
         var blockers = new[]
@@ -407,8 +407,8 @@ public sealed class NotchV22CompensationServiceTests
     public void Compute_ToFullEnabled_OnlyCountsBoundaryPadsThatActuallyOverlap()
     {
         var grid = CreateGrid(
-            Grid10x3,
-            Grid10x3);
+            _grid10x3,
+            _grid10x3);
         var cad = CreateCadRect(0, 0, 5, 10); // overlaps only one boundary regular pad by 50%
         var result = NotchV22CompensationService.Compute(cad, grid, enableToRegular: true, enableToFull: true);
 
@@ -422,7 +422,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_ToFullEnabled_MultiOwnerRegular_UsesConnectedSafeFillWithoutCrossingForeignOwner()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 3, 3, 7, id: 10); // area 12
         var blocker = CreateCadRect(5, 0, 10, 10, id: 11); // blocks right-side expansion
         var allCadPads = new[] { cad, blocker };
@@ -442,7 +442,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_ToFullEnabled_WithManyCadPads_KeepsSameSharedReachableBehavior()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 5, 10, id: 200);
         var blocker = CreateCadRect(6, 0, 10, 10, id: 201);
         var allCadPads = new List<CadPad> { cad, blocker };
@@ -463,7 +463,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_ToFullEnabled_ThinOverlap_IsNotDroppedBySampling()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 4.98, 5, 5.02, id: 12); // very thin strip, area 0.2
         var result = NotchV22CompensationService.Compute(cad, grid, enableToRegular: true, enableToFull: true);
 
@@ -478,7 +478,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_WhenBoundaryVirtualAreaCapEnabled_LimitsStage3Gain()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 2, 10, id: 120); // area 20, full ToFull would expand to 100
         var result = NotchV22CompensationService.Compute(
             cad,
@@ -499,7 +499,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_ToFullEnabled_SeedUsesPolygonOverlap_NotBoundingBox()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = new CadPad(
             id: 13,
             layer: "C13",
@@ -519,7 +519,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_ToFullEnabled_WhenRegularIsAlreadyFilledByAdjacentCadPads_DisablesExpansion()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 9.96, 10, id: 70);
         var neighbor = CreateCadRect(9.96, 0, 10, 10, id: 71);
         var result = NotchV22CompensationService.Compute(
@@ -543,8 +543,8 @@ public sealed class NotchV22CompensationServiceTests
     public void Compute_ToFullEnabled_CenterRegularPad_ExpandsWhenSoleOwnerHasClearPath()
     {
         var grid = CreateGrid(
-            Grid10x3,
-            Grid10x3);
+            _grid10x3,
+            _grid10x3);
         var cad = CreateCadRect(12, 12, 18, 18, id: 20); // fully inside center regular (row=1,col=1)
         var result = NotchV22CompensationService.Compute(cad, grid, enableToRegular: true, enableToFull: true);
 
@@ -560,8 +560,8 @@ public sealed class NotchV22CompensationServiceTests
     public void Compute_ToFullEnabled_BoundaryCad_AlsoExpandsItsOverlappedInteriorRegulars()
     {
         var grid = CreateGrid(
-            Grid10,
-            Grid10x3);
+            _grid10,
+            _grid10x3);
         var cad = CreateCadRect(0, 0, 5, 20, id: 30); // overlaps top boundary + middle interior regular by 50% each
         var result = NotchV22CompensationService.Compute(cad, grid, enableToRegular: true, enableToFull: true);
 
@@ -576,8 +576,8 @@ public sealed class NotchV22CompensationServiceTests
     public void Compute_ToFullEnabled_ConnectedInteriorRegularAlsoExpands_WhenSafeFillExists()
     {
         var grid = CreateGrid(
-            Grid10x3,
-            Grid10x3);
+            _grid10x3,
+            _grid10x3);
         // Overlaps top-middle (boundary) + center-middle (interior), each by 60%.
         var cad = CreateCadRect(12, 0, 18, 20, id: 31);
         var result = NotchV22CompensationService.Compute(cad, grid, enableToRegular: true, enableToFull: true);
@@ -601,8 +601,8 @@ public sealed class NotchV22CompensationServiceTests
     public void Compute_ToFullEnabled_MixedBoundaryCandidates_UseClearAndSharedPathsWithoutOverlap()
     {
         var grid = CreateGrid(
-            Grid10x2,
-            Grid10);
+            _grid10x2,
+            _grid10);
         var cad = CreateCadRect(0, 0, 15, 5, id: 40); // overlaps reg0=50, reg1=25
         var blocker = CreateCadRect(12, 0, 20, 5, id: 41); // overlaps reg1 only => make reg1 multi-owner
         var allCadPads = new[] { cad, blocker };
@@ -630,8 +630,8 @@ public sealed class NotchV22CompensationServiceTests
     public void Compute_ToFullRuleEngineToggle_KeepsLegacyGateResultEquivalent()
     {
         var grid = CreateGrid(
-            Grid10x2,
-            Grid10);
+            _grid10x2,
+            _grid10);
         var cad = CreateCadRect(0, 0, 15, 5, id: 50);
         var blocker = CreateCadRect(12, 0, 20, 5, id: 51);
         var allPads = new[] { cad, blocker };
@@ -665,7 +665,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_ToFullRuleTraceEnabled_EmitsRuleTraceEntries()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 5, 10, id: 60);
         var result = NotchV22CompensationService.Compute(
             cad,
@@ -683,7 +683,7 @@ public sealed class NotchV22CompensationServiceTests
     [Fact]
     public void Compute_ToFullRuleTraceEnabledWithLegacyPath_ReportsLegacyTraceStep()
     {
-        var grid = CreateGrid(Grid10, Grid10);
+        var grid = CreateGrid(_grid10, _grid10);
         var cad = CreateCadRect(0, 0, 5, 10, id: 61);
         var result = NotchV22CompensationService.Compute(
             cad,

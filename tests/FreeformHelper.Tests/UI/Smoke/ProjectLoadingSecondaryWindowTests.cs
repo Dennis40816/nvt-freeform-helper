@@ -17,8 +17,8 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed partial class ProjectLoadingSecondaryWindowTests
 {
-    private static readonly int[] HiddenIds = [10];
-    private static readonly int[] AutoHiddenIds = [11];
+    private static readonly int[] _hiddenIds = [10];
+    private static readonly int[] _autoHiddenIds = [11];
 
     [AvaloniaTheory]
     [InlineData(DxfEditChangeKind.Hidden)]
@@ -76,9 +76,9 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             Assert.False(changes.AreAllVisibleRowsSelected);
             changes.AreAllVisibleRowsSelected = true;
             foreach (var command in commands) command.Execute(entry);
-            Assert.Equal(HiddenIds, hidden.Order().ToArray());
-            Assert.Equal(AutoHiddenIds, autoHidden.Order().ToArray());
-            Assert.Equal(HiddenIds, Assert.Single(hiddenUndo));
+            Assert.Equal(_hiddenIds, hidden.Order().ToArray());
+            Assert.Equal(_autoHiddenIds, autoHidden.Order().ToArray());
+            Assert.Equal(_hiddenIds, Assert.Single(hiddenUndo));
             Assert.False(GetField<UndoService>(vm, "_undoService").CanUndo);
             Assert.False(vm.HasUnsavedChanges);
 

@@ -25,8 +25,8 @@ public sealed partial class PadCanvas
     private Point _lastPointer; // Stores the last pointer position for drag calculations.
     private Point _pointerDown; // Stores the pointer position when a button was pressed down.
     private const double DragThreshold = 4.0; // Minimum drag distance before a drag operation is initiated.
-    private static readonly long PanRedrawIntervalTicks = TimeSpan.FromMilliseconds(16).Ticks;
-    private static readonly long BoxSelectionRedrawIntervalTicks = TimeSpan.FromMilliseconds(33).Ticks;
+    private static readonly long _panRedrawIntervalTicks = TimeSpan.FromMilliseconds(16).Ticks;
+    private static readonly long _boxSelectionRedrawIntervalTicks = TimeSpan.FromMilliseconds(33).Ticks;
     private long _lastPanRedrawTicks;
     private long _lastBoxSelectionRedrawTicks;
 
@@ -58,7 +58,7 @@ public sealed partial class PadCanvas
     private readonly List<RegularPad> _visibleRegularSelected = new();
     private readonly List<CadPad> _visibleCadUnselected = new();
     private readonly List<CadPad> _visibleCadSelected = new();
-    private static readonly TimeSpan HoverDebugRevealDelay = TimeSpan.FromMilliseconds(260);
+    private static readonly TimeSpan _hoverDebugRevealDelay = TimeSpan.FromMilliseconds(260);
     private DispatcherTimer? _hoverDebugRevealTimer;
     private Point _hoverDebugPendingPointer;
     private bool _hoverDebugPendingRegularOnlyMode;

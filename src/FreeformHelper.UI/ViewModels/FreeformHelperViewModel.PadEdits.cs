@@ -96,7 +96,7 @@ public sealed partial class FreeformHelperViewModel
         if (!result.Success)
         {
             SetStatus($"Manual sizing: {result.Error}");
-            Logger.Warn(CultureInfo.InvariantCulture, "Manual sizing apply failed. Error={0}", result.Error);
+            _logger.Warn(CultureInfo.InvariantCulture, "Manual sizing apply failed. Error={0}", result.Error);
             return;
         }
 
@@ -111,7 +111,7 @@ public sealed partial class FreeformHelperViewModel
         SetStatus("Manual sizing applied.");
         var rowLabel = FormatIndexRanges(rows.Select(ToDisplayRow));
         var colLabel = FormatIndexRanges(cols);
-        Logger.Info(CultureInfo.InvariantCulture, "Manual sizing apply requested. Rows={0}, Cols={1}, Width={2}, Height={3}.",
+        _logger.Info(CultureInfo.InvariantCulture, "Manual sizing apply requested. Rows={0}, Cols={1}, Width={2}, Height={3}.",
             rowLabel,
             colLabel,
             widthMm?.ToString(CultureInfo.InvariantCulture) ?? "unchanged",
@@ -148,7 +148,7 @@ public sealed partial class FreeformHelperViewModel
         if (!result.Success)
         {
             SetStatus($"Reset sizing: {result.Error}");
-            Logger.Warn(CultureInfo.InvariantCulture, "Manual sizing reset failed. Error={0}", result.Error);
+            _logger.Warn(CultureInfo.InvariantCulture, "Manual sizing reset failed. Error={0}", result.Error);
             return;
         }
 
@@ -163,7 +163,7 @@ public sealed partial class FreeformHelperViewModel
         SetStatus("Manual sizing reset to default.");
         var rowLabel = FormatIndexRanges(rows.Select(ToDisplayRow));
         var colLabel = FormatIndexRanges(cols);
-        Logger.Info(CultureInfo.InvariantCulture, "Manual sizing reset requested. Rows={0}, Cols={1}.", rowLabel, colLabel);
+        _logger.Info(CultureInfo.InvariantCulture, "Manual sizing reset requested. Rows={0}, Cols={1}.", rowLabel, colLabel);
         _selection.SuppressClearOnRebuild = true; // Suppress clearing selection during the rebuild.
         _ = TriggerGridRebuildAsync(requestFit: true); // Trigger a grid rebuild to reflect changes.
         MarkUnsaved(); // Mark the project as unsaved.

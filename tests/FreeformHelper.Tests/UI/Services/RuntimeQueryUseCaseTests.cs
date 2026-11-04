@@ -13,8 +13,8 @@ namespace FreeformHelper.Tests;
 [Collection("RuntimeQueryUseCaseSerial")]
 public sealed partial class RuntimeQueryUseCaseTests
 {
-    private static readonly double[] ValidationGridXEdges = [0.0, 10.0, 20.0];
-    private static readonly double[] ValidationGridYEdges = [0.0, 10.0];
+    private static readonly double[] _validationGridXEdges = [0.0, 10.0, 20.0];
+    private static readonly double[] _validationGridYEdges = [0.0, 10.0];
 
     private static ShellViewModel BuildShellWithNotchValidationTable(NotchTable table)
     {
@@ -31,8 +31,8 @@ public sealed partial class RuntimeQueryUseCaseTests
         var grid = new RegularGrid(
             rows: 1,
             cols: 2,
-            xEdges: ValidationGridXEdges,
-            yEdges: ValidationGridYEdges,
+            xEdges: _validationGridXEdges,
+            yEdges: _validationGridYEdges,
             pads: new[]
             {
                 CreateRegularPad(regularPadId: 0, row: 0, col: 0, minX: 0, minY: 0, maxX: 10, maxY: 10, icIndex: 0, diffIndex: 10),
@@ -147,8 +147,8 @@ public sealed partial class RuntimeQueryUseCaseTests
         return new RegularGrid(
             rows: 1,
             cols: 2,
-            xEdges: ValidationGridXEdges,
-            yEdges: ValidationGridYEdges,
+            xEdges: _validationGridXEdges,
+            yEdges: _validationGridYEdges,
             pads: new[] { pad100, pad101 });
     }
 

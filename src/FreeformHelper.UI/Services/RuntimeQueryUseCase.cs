@@ -15,7 +15,7 @@ internal sealed partial class RuntimeQueryUseCase
     private const int MaxNotchTargetLimit = 5000;
     private const int DefaultNotchPolygonLimit = 64;
     private const int MaxNotchPolygonLimit = 2000;
-    private static readonly string[] QueryHelpExamples =
+    private static readonly string[] _queryHelpExamples =
     [
         "freeformhelper.exe query help",
         "freeformhelper.exe query status",
@@ -259,7 +259,7 @@ internal sealed partial class RuntimeQueryUseCase
                 new { key = "timeout-ms", required = false, value = "1..120000", defaultValue = 1500 },
                 new { key = "json-pretty/json-compact", required = false, value = "output format" }
             },
-            examples = QueryHelpExamples
+            examples = _queryHelpExamples
         });
     }
 

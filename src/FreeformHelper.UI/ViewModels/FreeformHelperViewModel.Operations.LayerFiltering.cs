@@ -4,7 +4,6 @@ using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
-using NLog;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -55,7 +54,7 @@ public sealed partial class FreeformHelperViewModel
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Layer filter failed", ex);
-            Logger.Error(ex, "Layer filter failed.");
+            _logger.Error(ex, "Layer filter failed.");
         }
     }
 
@@ -122,7 +121,7 @@ public sealed partial class FreeformHelperViewModel
             assignment.AutoUnmatchedCount > 0 ||
             assignment.OverrideMismatchCount > 0)
         {
-            Logger.Warn(CultureInfo.InvariantCulture, "Auto CAD Output FW Diff assignment issues. mode={0}, duplicateOverrides={1}, invalidOverrides={2}, autoConflicts={3}, autoUnmatched={4}, overrideMismatch={5}.",
+            _logger.Warn(CultureInfo.InvariantCulture, "Auto CAD Output FW Diff assignment issues. mode={0}, duplicateOverrides={1}, invalidOverrides={2}, autoConflicts={3}, autoUnmatched={4}, overrideMismatch={5}.",
                 autoMode,
                 assignment.DuplicateOverrides,
                 assignment.InvalidOverrides,
@@ -131,12 +130,12 @@ public sealed partial class FreeformHelperViewModel
                 assignment.OverrideMismatchCount);
             if (assignment.ConflictSamples.Count > 0)
             {
-                Logger.Warn(CultureInfo.InvariantCulture, "Auto CAD Output FW Diff conflicts sample: {0}", string.Join("; ", assignment.ConflictSamples));
+                _logger.Warn(CultureInfo.InvariantCulture, "Auto CAD Output FW Diff conflicts sample: {0}", string.Join("; ", assignment.ConflictSamples));
             }
 
             if (assignment.UnmatchedSamples.Count > 0)
             {
-                Logger.Warn(CultureInfo.InvariantCulture, "Auto CAD Output FW Diff unmatched sample: {0}", string.Join("; ", assignment.UnmatchedSamples));
+                _logger.Warn(CultureInfo.InvariantCulture, "Auto CAD Output FW Diff unmatched sample: {0}", string.Join("; ", assignment.UnmatchedSamples));
             }
         }
 
@@ -352,7 +351,7 @@ public sealed partial class FreeformHelperViewModel
             };
         }
 
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "Auto-applied csv local repair suggestions: count={0}, samples={1}.",
             appliedCadIds.Count,

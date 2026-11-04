@@ -9,7 +9,7 @@ public sealed partial class PadCanvas
     // --- Selection Debouncing for Single Click ---
     // These fields are used to differentiate between a single click for selection
     // and the start of a drag/box selection, or a double click.
-    private static readonly TimeSpan PendingSingleSelectionDelay = TimeSpan.FromMilliseconds(150);
+    private static readonly TimeSpan _pendingSingleSelectionDelay = TimeSpan.FromMilliseconds(150);
     private DispatcherTimer? _pendingSingleTimer; // Timer to wait before confirming a single selection.
     private HitResult? _pendingSingleHit; // Stores the hit test result for a potential single selection.
     private int _pendingSelectionVersion; // Version of selection when single click was initiated.

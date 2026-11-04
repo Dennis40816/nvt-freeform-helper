@@ -73,7 +73,7 @@ public sealed partial class FreeformHelperViewModel
                 timer.Stop();
                 setProgress(1.0);
                 setBusy(false);
-                Logger.Info(CultureInfo.InvariantCulture, "{0} finished in {1} ms.", operationName, timer.ElapsedMilliseconds);
+                _logger.Info(CultureInfo.InvariantCulture, "{0} finished in {1} ms.", operationName, timer.ElapsedMilliseconds);
             }
         }
 
@@ -112,7 +112,7 @@ public sealed partial class FreeformHelperViewModel
             finally
             {
                 timer.Stop();
-                Logger.Info(CultureInfo.InvariantCulture, "{0} finished in {1} ms.", operationName, timer.ElapsedMilliseconds);
+                _logger.Info(CultureInfo.InvariantCulture, "{0} finished in {1} ms.", operationName, timer.ElapsedMilliseconds);
             }
         }
 

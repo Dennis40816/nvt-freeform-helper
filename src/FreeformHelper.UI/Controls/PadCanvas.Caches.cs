@@ -177,7 +177,7 @@ public sealed partial class PadCanvas
     private List<Color> BuildPalette(int n)
     {
         var palette = new List<Color>(n);
-        foreach (var key in CadAreaPaletteKeys)
+        foreach (var key in _cadAreaPaletteKeys)
         {
             if (UiResourceResolver.TryGetColor(this, key, out var color))
             {
@@ -235,7 +235,7 @@ public sealed partial class PadCanvas
         return result;
     }
 
-    private static readonly string[] CadAreaPaletteKeys =
+    private static readonly string[] _cadAreaPaletteKeys =
     {
         "ColorCadAreaBucket1",
         "ColorCadAreaBucket2",

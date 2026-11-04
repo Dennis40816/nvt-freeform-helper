@@ -57,7 +57,7 @@ public sealed partial class FreeformHelperViewModel
 
         if (_cadEdit.AutoHiddenDuplicateCadPadIds.Count > 0)
         {
-            Logger.Debug(
+            _logger.Debug(
                 CultureInfo.InvariantCulture,
                 "DXF duplicate pads auto-hidden. total={0}, ids={1}.",
                 _cadEdit.AutoHiddenDuplicateCadPadIds.Count,
