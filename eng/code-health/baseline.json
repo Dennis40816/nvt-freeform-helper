@@ -3189,66 +3189,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "4059d0d710fe9c14812fa88e1bd6b42b658a39d1629fdf0624307b9dfd9105a5",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:Marker",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "92e50eeb42ee154728b3452299aace3fb049f0e24d9a4bb91bfc2372c7aac80f",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:OpenWindows",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "fbdc2027b7815cb9b20468f8f5cfe6611ac2018f2b36402f92767a90cc122810",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:s_leftoverWork",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "d392533ecadd0241531048fe287738747820aac26c3516630510dd0e8cae3353",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:s_previousHeadlessTest",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "f0b439cf7bc0d38e8055a044109ad41d3c40ed6a7c984d1c5313a2aa20874787",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:s_tracksOpenedWindows",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "507db29b74c85f10a90a49c9f0a58f2149635b647084d1e1ed6c8a47cc3d0551",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:SeenContexts",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "6ef1b8384fceef16e58a4630f770566ee8391e08af9c3fabe62568c26dcba3d0",
       "member": "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests.fields:MatrixJsonOptions",
       "owner": "NFH",
@@ -3269,26 +3209,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "557adb51452c966c5b4b892ff3239bd74d804650f61449e68bb710840795b266",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.fields:PostShowMinimumVisible",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "1476694a6178e12605cdae7728066623ea6d7a144c277b5a6cdf315db63e521e",
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.fields:ShowRetryDelay",
       "owner": "NFH",
@@ -3301,26 +3221,6 @@
     {
       "syntaxHash": "5ffda8a7741863f733e79671929a04947a6989e9518ded807e574571d3d2864b",
       "member": "FreeformHelper.UI.Services.StartupPerfTracker.fields:EmitAsInfo",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/StartupPerfTracker.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
-      "member": "FreeformHelper.UI.Services.StartupPerfTracker.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/StartupPerfTracker.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "0cd5b3979ad1aaf7fd44655a614b3b1259e13150ded149368a0a3861fd3587b9",
-      "member": "FreeformHelper.UI.Services.StartupPerfTracker.fields:Stopwatch",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/StartupPerfTracker.cs",
       "project": "FreeformHelper.UI",

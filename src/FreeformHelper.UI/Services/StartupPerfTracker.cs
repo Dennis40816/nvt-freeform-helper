@@ -10,8 +10,8 @@ namespace FreeformHelper.UI.Services;
 /// </summary>
 internal static class StartupPerfTracker
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    private static readonly Stopwatch Stopwatch = Stopwatch.StartNew();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
     private static long _lastElapsedMs;
     private static int _markerIndex;
     private static readonly bool EmitAsInfo = IsTruthy(Environment.GetEnvironmentVariable("FREEFORM_PERF_MARKERS_INFO"));
@@ -23,7 +23,7 @@ internal static class StartupPerfTracker
             return;
         }
 
-        var elapsedMs = Stopwatch.ElapsedMilliseconds;
+        var elapsedMs = _stopwatch.ElapsedMilliseconds;
         var previous = Interlocked.Exchange(ref _lastElapsedMs, elapsedMs);
         var deltaMs = elapsedMs - previous;
         if (deltaMs < 0)
@@ -58,11 +58,11 @@ internal static class StartupPerfTracker
             const string message = "PERF STARTUP #{0}: stage={1}; elapsed={2}ms; delta={3}ms.";
             if (EmitAsInfo)
             {
-                Logger.Info(CultureInfo.InvariantCulture, message, index, stage, elapsedMs, deltaMs);
+                _logger.Info(CultureInfo.InvariantCulture, message, index, stage, elapsedMs, deltaMs);
             }
             else
             {
-                Logger.Debug(CultureInfo.InvariantCulture, message, index, stage, elapsedMs, deltaMs);
+                _logger.Debug(CultureInfo.InvariantCulture, message, index, stage, elapsedMs, deltaMs);
             }
 
             return;
@@ -71,11 +71,11 @@ internal static class StartupPerfTracker
         const string detailMessage = "PERF STARTUP #{0}: stage={1}; elapsed={2}ms; delta={3}ms; detail={4}.";
         if (EmitAsInfo)
         {
-            Logger.Info(CultureInfo.InvariantCulture, detailMessage, index, stage, elapsedMs, deltaMs, detail);
+            _logger.Info(CultureInfo.InvariantCulture, detailMessage, index, stage, elapsedMs, deltaMs, detail);
         }
         else
         {
-            Logger.Debug(CultureInfo.InvariantCulture, detailMessage, index, stage, elapsedMs, deltaMs, detail);
+            _logger.Debug(CultureInfo.InvariantCulture, detailMessage, index, stage, elapsedMs, deltaMs, detail);
         }
     }
 

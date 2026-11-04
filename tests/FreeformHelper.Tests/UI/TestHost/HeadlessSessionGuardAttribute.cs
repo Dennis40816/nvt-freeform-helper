@@ -32,14 +32,14 @@ namespace FreeformHelper.Tests;
 public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
 {
     private const int MaxClosePasses = 3;
-    private static readonly object Marker = new();
+    private static readonly object _marker = new();
     private static readonly object Gate = new();
-    private static readonly List<Window> OpenWindows = [];
+    private static readonly List<Window> _openWindows = [];
     private static readonly List<(string Test, Exception Exception)> LeftoverWorkFailures = [];
-    private static readonly ConditionalWeakTable<SynchronizationContext, object> SeenContexts = [];
-    private static bool s_tracksOpenedWindows;
-    private static LeftoverWorkWatch? s_leftoverWork;
-    private static string? s_previousHeadlessTest;
+    private static readonly ConditionalWeakTable<SynchronizationContext, object> _seenContexts = [];
+    private static bool _tracksOpenedWindows;
+    private static LeftoverWorkWatch? _leftoverWork;
+    private static string? _previousHeadlessTest;
 
     internal static string? CurrentHeadlessTest { get; private set; }
 
@@ -53,12 +53,12 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
 
         CurrentHeadlessTest = DescribeTest(methodUnderTest);
         TrackOpenedWindows();
-        s_leftoverWork = WatchForLeftoverWork(CurrentHeadlessTest);
+        _leftoverWork = WatchForLeftoverWork(CurrentHeadlessTest);
 
         var context = SynchronizationContext.Current;
         if (context is not null)
         {
-            ThrowIfContextWasUsedBefore(context, s_previousHeadlessTest);
+            ThrowIfContextWasUsedBefore(context, _previousHeadlessTest);
         }
     }
 
@@ -70,7 +70,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
             return;
         }
 
-        s_previousHeadlessTest = DescribeTest(methodUnderTest);
+        _previousHeadlessTest = DescribeTest(methodUnderTest);
         CurrentHeadlessTest = null;
         if (!Dispatcher.UIThread.CheckAccess())
         {
@@ -83,7 +83,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
         }
         finally
         {
-            if (s_leftoverWork is { } leftoverWork)
+            if (_leftoverWork is { } leftoverWork)
             {
                 leftoverWork.TestEnded = true;
             }
@@ -155,7 +155,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
     internal static void ThrowIfContextWasUsedBefore(SynchronizationContext context, string? previousHeadlessTest)
     {
         ArgumentNullException.ThrowIfNull(context);
-        if (SeenContexts.TryGetValue(context, out _))
+        if (_seenContexts.TryGetValue(context, out _))
         {
             throw new InvalidOperationException(
                 "The headless session still has the synchronization context of an earlier test, so awaits in this test " +
@@ -164,7 +164,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
                 "fails the same way; look at the first one.");
         }
 
-        SeenContexts.Add(context, Marker);
+        _seenContexts.Add(context, _marker);
     }
 
     /// <summary>
@@ -223,7 +223,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
         var stillOpen = SnapshotOpenWindows();
         lock (Gate)
         {
-            OpenWindows.Clear();
+            _openWindows.Clear();
         }
 
         foreach (var window in stillOpen)
@@ -248,12 +248,12 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
     // Runs on the session thread, so the window types are initialised there and not on a test runner thread.
     private static void TrackOpenedWindows()
     {
-        if (s_tracksOpenedWindows)
+        if (_tracksOpenedWindows)
         {
             return;
         }
 
-        s_tracksOpenedWindows = true;
+        _tracksOpenedWindows = true;
         Window.WindowOpenedEvent.AddClassHandler(typeof(Window), static (sender, _) =>
         {
             if (sender is Window window)
@@ -267,12 +267,12 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
     {
         lock (Gate)
         {
-            if (OpenWindows.Contains(window))
+            if (_openWindows.Contains(window))
             {
                 return;
             }
 
-            OpenWindows.Add(window);
+            _openWindows.Add(window);
         }
 
         window.Closed += OnWindowClosed;
@@ -288,7 +288,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
         window.Closed -= OnWindowClosed;
         lock (Gate)
         {
-            OpenWindows.Remove(window);
+            _openWindows.Remove(window);
         }
     }
 
@@ -296,7 +296,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
     {
         lock (Gate)
         {
-            return [.. OpenWindows];
+            return [.. _openWindows];
         }
     }
 
@@ -304,7 +304,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
     {
         lock (Gate)
         {
-            return OpenWindows.Contains(window);
+            return _openWindows.Contains(window);
         }
     }
 
