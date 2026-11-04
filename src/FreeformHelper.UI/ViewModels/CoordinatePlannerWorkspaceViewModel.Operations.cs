@@ -12,7 +12,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
     {
         if (RequestExportPreviewPngAsync is null)
         {
-            StatusText = "Coordinate PNG export is unavailable in the current host.";
+            StatusText = "Coordinate image export is unavailable in the current host.";
             return;
         }
 

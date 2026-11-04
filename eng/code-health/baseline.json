@@ -1509,7 +1509,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 651
+        "axamlCodeBehindLines": 650
       },
       "owner": "NFH",
       "locations": [
@@ -8811,16 +8811,6 @@
     {
       "syntaxHash": "5a728d05369288442a24d0b4f7d907054916308950da447c9443cb91daa73099",
       "member": "FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView.AttachDataContext(CoordinatePlannerWorkspaceViewModel?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "fbf5c1c4a1ed0d9d1f193ce3b0dfd5c6897aaa4b0b8ae4987b59126d8bb20650",
-      "member": "FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView.ExportPreviewPngAsync()",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs",
       "project": "FreeformHelper.UI",
