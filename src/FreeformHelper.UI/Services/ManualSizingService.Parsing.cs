@@ -4,7 +4,7 @@ namespace FreeformHelper.UI.Services;
 
 public sealed partial class ManualSizingService
 {
-    public bool TryParseRowRange(string input, int totalRows, out List<int> rows, out string error)
+    public static bool TryParseRowRange(string input, int totalRows, out List<int> rows, out string error)
     {
         error = string.Empty;
         rows = new List<int>();
@@ -40,7 +40,7 @@ public sealed partial class ManualSizingService
     /// <param name="cols">Output: A list of parsed column indices.</param>
     /// <param name="error">Output: An error message if parsing fails.</param>
     /// <returns>True if parsing was successful and at least one column was found, false otherwise.</returns>
-    public bool TryParseColRange(string input, int totalCols, out List<int> cols, out string error)
+    public static bool TryParseColRange(string input, int totalCols, out List<int> cols, out string error)
     {
         error = string.Empty;
         cols = new List<int>();

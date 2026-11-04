@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 
@@ -8,10 +7,6 @@ namespace FreeformHelper.UI.Services;
 /// Provides a service layer for matching regular pads to CAD pads.
 /// This service wraps <see cref="PadMatcher"/>.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class PadMatchService
 {
     /// <summary>
@@ -19,7 +14,7 @@ public sealed class PadMatchService
     /// </summary>
     /// <param name="cad">The set of CAD pads.</param>
     /// <param name="grid">The regular grid whose pads will be matched.</param>
-    public PadMatchResult Match(CadPadSet cad, RegularGrid grid, Action<double>? reportProgress = null)
+    public static PadMatchResult Match(CadPadSet cad, RegularGrid grid, Action<double>? reportProgress = null)
     {
         return PadMatcher.Match(cad, grid, reportProgress);
     }

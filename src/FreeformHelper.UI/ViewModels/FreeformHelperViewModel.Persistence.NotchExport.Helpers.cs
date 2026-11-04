@@ -1,4 +1,5 @@
 using System.Globalization;
+using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
@@ -16,7 +17,7 @@ public sealed partial class FreeformHelperViewModel
             return (
                 ExportKind: NotchExportFileTypeMetadata.GetExportKindLabel(option),
                 Extension: option.Extension,
-                Serialize: (table, cad, grid) => _notchExportService.ExportCInitializer(
+                Serialize: (table, cad, grid) => NotchTableExporter.ExportAsCInitializer(
                     table,
                     cad,
                     grid,
@@ -27,7 +28,7 @@ public sealed partial class FreeformHelperViewModel
         return (
             ExportKind: "CSV review",
             Extension: option.Extension,
-            Serialize: (table, _, _) => _notchExportService.ExportCsv(table));
+            Serialize: (table, _, _) => NotchTableExporter.ExportAsCsv(table));
     }
 
     internal static string ResolveSuggestedNotchExportBaseName(string requestedBaseName, string extension, NotchTable table)

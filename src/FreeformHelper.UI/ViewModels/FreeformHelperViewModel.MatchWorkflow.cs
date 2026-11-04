@@ -87,7 +87,7 @@ public sealed partial class FreeformHelperViewModel
         bool moveToStep2,
         string? completionStatus)
     {
-        var result = await Task.Run(() => _padMatchService.Match(
+        var result = await Task.Run(() => PadMatchService.Match(
             cad,
             grid,
             reportProgress));

@@ -73,7 +73,7 @@ public sealed class GridRebuildOrchestrator
         return string.Join(" ", hints);
     }
 
-    private GridRebuildBuildResult BuildFromDxfLayer(GridRebuildBuildRequest request)
+    private static GridRebuildBuildResult BuildFromDxfLayer(GridRebuildBuildRequest request)
     {
         if (request.Cad is null)
         {
@@ -118,7 +118,7 @@ public sealed class GridRebuildOrchestrator
         var cadLayerSet = new CadPadSet(layerPads);
         try
         {
-            var grid = _gridBuildService.BuildFromDxfLayer(cadLayerSet, request.Settings);
+            var grid = GridBuildService.BuildFromDxfLayer(cadLayerSet, request.Settings);
             PadOverrideService.ApplyFreeformOverrides(request.ProjectFile, grid);
             return GridRebuildBuildResult.Succeeded(grid, "Ready.");
         }

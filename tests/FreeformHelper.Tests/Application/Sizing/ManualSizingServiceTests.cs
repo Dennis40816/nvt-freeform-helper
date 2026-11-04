@@ -6,12 +6,10 @@ namespace FreeformHelper.Tests;
 
 public sealed class ManualSizingServiceTests
 {
-    private readonly ManualSizingService _service = new();
-
     [Fact]
     public void TryParseRowRange_ConvertsDisplayToActualRows()
     {
-        var ok = _service.TryParseRowRange("0-1,3", totalRows: 5, out var rows, out var error);
+        var ok = ManualSizingService.TryParseRowRange("0-1,3", totalRows: 5, out var rows, out var error);
 
         Assert.True(ok);
         Assert.Empty(error);
@@ -61,7 +59,7 @@ public sealed class ManualSizingServiceTests
     [Fact]
     public void TryParseRowRange_ReturnsGridNotBuilt_WhenTotalRowsIsZero()
     {
-        var ok = _service.TryParseRowRange("0-1", totalRows: 0, out var rows, out var error);
+        var ok = ManualSizingService.TryParseRowRange("0-1", totalRows: 0, out var rows, out var error);
 
         Assert.False(ok);
         Assert.Empty(rows);
@@ -71,7 +69,7 @@ public sealed class ManualSizingServiceTests
     [Fact]
     public void TryParseColRange_ReturnsFalseWithoutError_WhenInputEmpty()
     {
-        var ok = _service.TryParseColRange("   ", totalCols: 4, out var cols, out var error);
+        var ok = ManualSizingService.TryParseColRange("   ", totalCols: 4, out var cols, out var error);
 
         Assert.False(ok);
         Assert.Empty(cols);
@@ -92,7 +90,7 @@ public sealed class ManualSizingServiceTests
             WidthScope = WidthAdjustmentScope.ColumnGlobal,
         };
 
-        var result = _service.ApplySizing(
+        var result = ManualSizingService.ApplySizing(
             grid,
             GridAlignmentMode.FromPanelAa,
             cad: null,
@@ -120,7 +118,7 @@ public sealed class ManualSizingServiceTests
             WidthScope = WidthAdjustmentScope.ColumnGlobal,
         };
 
-        var result = _service.ResetSizing(
+        var result = ManualSizingService.ResetSizing(
             grid,
             GridAlignmentMode.FromPanelAa,
             cad: null,
@@ -146,7 +144,7 @@ public sealed class ManualSizingServiceTests
             WidthScope = WidthAdjustmentScope.ColumnGlobal,
         };
 
-        var result = _service.SetPadDimensions(
+        var result = ManualSizingService.SetPadDimensions(
             grid,
             GridAlignmentMode.FromPanelAa,
             cad: null,
@@ -175,7 +173,7 @@ public sealed class ManualSizingServiceTests
             WidthScope = WidthAdjustmentScope.ColumnGlobal,
         };
 
-        var result = _service.SetPadDimensions(
+        var result = ManualSizingService.SetPadDimensions(
             grid,
             GridAlignmentMode.FromPanelAa,
             cad: null,
@@ -202,7 +200,7 @@ public sealed class ManualSizingServiceTests
             ColumnWidths = new List<double> { 50, 50 },
         };
 
-        var result = _service.ApplySizing(
+        var result = ManualSizingService.ApplySizing(
             grid,
             GridAlignmentMode.FromPanelAa,
             cad: null,
@@ -229,7 +227,7 @@ public sealed class ManualSizingServiceTests
             RowHeights = new List<double> { 50, 50 },
         };
 
-        var result = _service.ApplySizing(
+        var result = ManualSizingService.ApplySizing(
             grid,
             GridAlignmentMode.FromPanelAa,
             cad: null,

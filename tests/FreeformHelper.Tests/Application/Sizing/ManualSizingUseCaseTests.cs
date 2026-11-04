@@ -10,10 +10,9 @@ public sealed class ManualSizingUseCaseTests
     [Fact]
     public void Evaluate_ReturnsInvalid_WhenRangeInputIsInvalid()
     {
-        var useCase = new ManualSizingUseCase(new ManualSizingService());
         var grid = BuildGrid(rows: 4, cols: 4);
 
-        var plan = useCase.Evaluate(
+        var plan = ManualSizingUseCase.Evaluate(
             grid,
             manualRowsRange: "1-a",
             manualColsRange: "0-1",
@@ -28,10 +27,9 @@ public sealed class ManualSizingUseCaseTests
     [Fact]
     public void Evaluate_ReturnsSyncSelection_WhenNoPositiveTargetSize()
     {
-        var useCase = new ManualSizingUseCase(new ManualSizingService());
         var grid = BuildGrid(rows: 4, cols: 4);
 
-        var plan = useCase.Evaluate(
+        var plan = ManualSizingUseCase.Evaluate(
             grid,
             manualRowsRange: "0-1",
             manualColsRange: "2",
@@ -49,10 +47,9 @@ public sealed class ManualSizingUseCaseTests
     [Fact]
     public void Evaluate_ReturnsApplySizing_WhenWidthOrHeightIsPositive()
     {
-        var useCase = new ManualSizingUseCase(new ManualSizingService());
         var grid = BuildGrid(rows: 4, cols: 4);
 
-        var plan = useCase.Evaluate(
+        var plan = ManualSizingUseCase.Evaluate(
             grid,
             manualRowsRange: "0",
             manualColsRange: "0-1",

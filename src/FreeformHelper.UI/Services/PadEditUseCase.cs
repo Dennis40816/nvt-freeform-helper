@@ -8,14 +8,7 @@ namespace FreeformHelper.UI.Services;
 /// </summary>
 public sealed class PadEditUseCase
 {
-    private readonly ManualSizingService _manualSizingService;
-
-    public PadEditUseCase(ManualSizingService manualSizingService)
-    {
-        _manualSizingService = manualSizingService ?? throw new ArgumentNullException(nameof(manualSizingService));
-    }
-
-    public ManualSizingResult ApplySizing(
+    public static ManualSizingResult ApplySizing(
         GridSettings settings,
         GridAlignmentMode alignmentMode,
         CadPadSet? cad,
@@ -24,7 +17,7 @@ public sealed class PadEditUseCase
         decimal? widthMm,
         decimal? heightMm)
     {
-        return _manualSizingService.ApplySizing(
+        return ManualSizingService.ApplySizing(
             settings,
             alignmentMode,
             cad,
@@ -34,13 +27,13 @@ public sealed class PadEditUseCase
             (double?)heightMm);
     }
 
-    public ManualSizingResult ResetSizing(
+    public static ManualSizingResult ResetSizing(
         GridSettings settings,
         GridAlignmentMode alignmentMode,
         CadPadSet? cad,
         IReadOnlyCollection<int> rows,
         IReadOnlyCollection<int> cols)
     {
-        return _manualSizingService.ResetSizing(settings, alignmentMode, cad, rows, cols);
+        return ManualSizingService.ResetSizing(settings, alignmentMode, cad, rows, cols);
     }
 }

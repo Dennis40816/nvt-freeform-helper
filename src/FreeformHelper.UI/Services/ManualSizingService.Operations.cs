@@ -17,7 +17,7 @@ public sealed partial class ManualSizingService
     /// <param name="width">The desired width to apply, or null if not changing width.</param>
     /// <param name="height">The desired height to apply, or null if not changing height.</param>
     /// <returns>A <see cref="ManualSizingResult"/> indicating success or failure and the previous snapshot.</returns>
-    public ManualSizingResult ApplySizing(
+    public static ManualSizingResult ApplySizing(
         GridSettings grid,
         GridAlignmentMode alignmentMode,
         CadPadSet? cad,
@@ -69,7 +69,7 @@ public sealed partial class ManualSizingService
     /// <param name="rows">A collection of row indices to reset height changes for.</param>
     /// <param name="cols">A collection of column indices to reset width changes for.</param>
     /// <returns>A <see cref="ManualSizingResult"/> indicating success or failure and the previous snapshot.</returns>
-    public ManualSizingResult ResetSizing(
+    public static ManualSizingResult ResetSizing(
         GridSettings grid,
         GridAlignmentMode alignmentMode,
         CadPadSet? cad,
@@ -189,7 +189,7 @@ public sealed partial class ManualSizingService
     /// Sets specific dimensions for a single pad (cell) in the grid.
     /// This is a convenience method that calls <see cref="ApplySizing"/> for a single row and column.
     /// </summary>
-    public ManualSizingResult SetPadDimensions(
+    public static ManualSizingResult SetPadDimensions(
         GridSettings grid,
         GridAlignmentMode alignmentMode,
         CadPadSet? cad,
@@ -216,7 +216,7 @@ public sealed partial class ManualSizingService
     /// <summary>
     /// Applies a specific width globally to a selection of columns, distributing remaining space.
     /// </summary>
-    private ManualSizingResult ApplyWidthGlobal(
+    private static ManualSizingResult ApplyWidthGlobal(
         GridSettings grid,
         IEnumerable<int> cols,
         double width,
@@ -246,7 +246,7 @@ public sealed partial class ManualSizingService
     /// <summary>
     /// Applies a specific width to a selection of cells within specific rows (row-local scope).
     /// </summary>
-    private ManualSizingResult ApplyWidthRowLocal(
+    private static ManualSizingResult ApplyWidthRowLocal(
         GridSettings grid,
         IEnumerable<int> rows,
         IEnumerable<int> cols,
@@ -289,7 +289,7 @@ public sealed partial class ManualSizingService
     /// <summary>
     /// Applies a specific height globally to a selection of rows, distributing remaining space.
     /// </summary>
-    private ManualSizingResult ApplyHeightGlobal(
+    private static ManualSizingResult ApplyHeightGlobal(
         GridSettings grid,
         IEnumerable<int> rows,
         double height,
@@ -319,7 +319,7 @@ public sealed partial class ManualSizingService
     /// <summary>
     /// Applies a specific height to a selection of cells within specific columns (column-local scope).
     /// </summary>
-    private ManualSizingResult ApplyHeightColumnLocal(
+    private static ManualSizingResult ApplyHeightColumnLocal(
         GridSettings grid,
         IEnumerable<int> rows,
         IEnumerable<int> cols,

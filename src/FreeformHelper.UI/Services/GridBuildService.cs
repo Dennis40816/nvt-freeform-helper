@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
@@ -9,10 +8,6 @@ namespace FreeformHelper.UI.Services;
 /// Provides a service layer for building <see cref="RegularGrid"/> objects.
 /// This service orchestrates the process of grid construction and diff-index mapping.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class GridBuildService
 {
     // Private instance of the underlying application service for grid building.
@@ -51,7 +46,7 @@ public sealed class GridBuildService
     /// <param name="layerPads">CAD pads from the selected regular source layer.</param>
     /// <param name="settings">The <see cref="GridSettings"/> containing channel and scan settings.</param>
     /// <returns>A newly constructed <see cref="RegularGrid"/>.</returns>
-    public RegularGrid BuildFromDxfLayer(CadPadSet layerPads, GridSettings settings)
+    public static RegularGrid BuildFromDxfLayer(CadPadSet layerPads, GridSettings settings)
     {
         var grid = DxfRegularLayerGridBuilder.BuildFromLayer(layerPads, settings);
         DiffIndexMapper.ApplyMapping(grid, settings);
