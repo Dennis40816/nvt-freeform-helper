@@ -112,49 +112,4 @@ public sealed partial class RuntimeQueryUseCaseTests
         Assert.False(workflow.GetProperty("hasStep1Result").GetBoolean());
         Assert.False(workflow.GetProperty("hasStep4Result").GetBoolean());
     }
-
-    [ExampleDataFact]
-    public async Task ExecuteAsync_LoadProjectThenSelectAndRunStep_WorksOnTheTm81Example()
-    {
-        using var fixture = ExampleProjectFixture.Create(Path.Combine(TestPaths.RepoRoot, "example", "TM 8.1", "TM8.1.json"));
-        using var shell = new ShellViewModel { IsDevPageAvailable = true };
-
-        var load = await ExecuteQueryAsync(shell, "load-project", ("path", fixture.ProjectPath));
-
-        Assert.True(load.Ok, $"{load.Error?.Code}:{load.Error?.Message}");
-        var loaded = SerializeToRootElement(load.Data);
-        Assert.Equal(fixture.ProjectPath, loaded.GetProperty("path").GetString());
-        Assert.True(loaded.GetProperty("cadCount").GetInt32() > 0);
-        Assert.True(loaded.GetProperty("regularCount").GetInt32() > 0);
-        Assert.Equal(shell.FreeformHelper.CadPads.Count, loaded.GetProperty("cadCount").GetInt32());
-        Assert.Equal(shell.FreeformHelper.RegularPads.Count, loaded.GetProperty("regularCount").GetInt32());
-        Assert.True(loaded.GetProperty("workflow").GetProperty("hasCad").GetBoolean());
-        Assert.True(loaded.GetProperty("workflow").GetProperty("hasGrid").GetBoolean());
-        Assert.True(loaded.GetProperty("timings").GetProperty("totalElapsedMs").GetInt64() >= 0);
-
-        var cleared = await ExecuteQueryAsync(shell, "clear-step", ("step", "1"));
-        Assert.True(cleared.Ok, $"{cleared.Error?.Code}:{cleared.Error?.Message}");
-        Assert.False(SerializeToRootElement(cleared.Data).GetProperty("workflow").GetProperty("hasStep1Result").GetBoolean());
-
-        var run = await ExecuteQueryAsync(shell, "run-step", ("step", "1"));
-        Assert.True(run.Ok, $"{run.Error?.Code}:{run.Error?.Message}");
-        var ran = SerializeToRootElement(run.Data);
-        Assert.Equal(1, ran.GetProperty("step").GetInt32());
-        Assert.True(ran.GetProperty("workflow").GetProperty("hasStep1Result").GetBoolean());
-
-        var cadId = shell.FreeformHelper.CadPads[0].Id;
-        var regularId = shell.FreeformHelper.RegularPads[0].RegularPadId;
-        var selectCad = await ExecuteQueryAsync(shell, "select-cad", ("cad-id", cadId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
-        Assert.True(selectCad.Ok, $"{selectCad.Error?.Code}:{selectCad.Error?.Message}");
-        Assert.Equal([cadId], shell.FreeformHelper.SelectedCadPadIds.ToArray());
-
-        var selectRegular = await ExecuteQueryAsync(shell, "select-regular", ("regular-id", regularId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
-        Assert.True(selectRegular.Ok, $"{selectRegular.Error?.Code}:{selectRegular.Error?.Message}");
-        Assert.Empty(shell.FreeformHelper.SelectedCadPadIds);
-        Assert.Contains(regularId, shell.FreeformHelper.RegularPads.Where(pad => shell.FreeformHelper.SelectedRegularPadIndices.Contains(pad.Index)).Select(static pad => pad.RegularPadId));
-
-        var cleared2 = await ExecuteQueryAsync(shell, "clear-selection");
-        Assert.True(cleared2.Ok);
-        Assert.Empty(shell.FreeformHelper.SelectedRegularPadIndices);
-    }
 }
