@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Geometry;
@@ -85,14 +84,12 @@ public sealed class PadCanvasViewRefreshTests
     public async Task RequestViewRefresh_CoalescesViewChangedNotifications()
     {
         var canvas = new PadCanvas();
-        var requestViewRefreshMethod = typeof(PadCanvas).GetMethod("RequestViewRefresh", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(requestViewRefreshMethod);
 
         var viewChangedCount = 0;
         canvas.ViewChanged += (_, _) => viewChangedCount++;
 
-        requestViewRefreshMethod!.Invoke(canvas, [true]);
-        requestViewRefreshMethod.Invoke(canvas, [true]);
+        PadCanvasPrivateAccess.RequestViewRefresh(canvas, true);
+        PadCanvasPrivateAccess.RequestViewRefresh(canvas, true);
 
         await HeadlessUiPump.FlushQueueAsync();
 
@@ -103,14 +100,12 @@ public sealed class PadCanvasViewRefreshTests
     public async Task RequestVisualRefresh_DoesNotRaiseViewChanged()
     {
         var canvas = new PadCanvas();
-        var requestVisualRefreshMethod = typeof(PadCanvas).GetMethod("RequestVisualRefresh", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(requestVisualRefreshMethod);
 
         var viewChangedCount = 0;
         canvas.ViewChanged += (_, _) => viewChangedCount++;
 
-        requestVisualRefreshMethod!.Invoke(canvas, [false]);
-        requestVisualRefreshMethod.Invoke(canvas, [false]);
+        PadCanvasPrivateAccess.RequestVisualRefresh(canvas, false);
+        PadCanvasPrivateAccess.RequestVisualRefresh(canvas, false);
 
         await HeadlessUiPump.FlushQueueAsync();
 
@@ -121,8 +116,6 @@ public sealed class PadCanvasViewRefreshTests
     public async Task MatchThresholdChange_QueuesVisualRefreshWithoutViewChanged()
     {
         var canvas = new PadCanvas();
-        var refreshQueuedField = typeof(PadCanvas).GetField("_isViewRefreshQueued", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(refreshQueuedField);
         await HeadlessUiPump.FlushQueueAsync();
 
         var viewChangedCount = 0;
@@ -130,10 +123,10 @@ public sealed class PadCanvasViewRefreshTests
 
         canvas.MatchThreshold += 0.01;
 
-        Assert.True((bool)refreshQueuedField!.GetValue(canvas)!);
+        Assert.True(PadCanvasPrivateAccess.IsViewRefreshQueued(canvas));
         await HeadlessUiPump.FlushQueueAsync();
 
-        Assert.False((bool)refreshQueuedField.GetValue(canvas)!);
+        Assert.False(PadCanvasPrivateAccess.IsViewRefreshQueued(canvas));
         Assert.Equal(0, viewChangedCount);
     }
 
@@ -151,23 +144,14 @@ public sealed class PadCanvasViewRefreshTests
         var initialSnapshot = canvas.GetViewFrameSnapshot();
         Assert.Equal(1.0, initialSnapshot.Zoom);
 
-        var zoomField = typeof(PadCanvas).GetField("_zoom", BindingFlags.Instance | BindingFlags.NonPublic);
-        var panField = typeof(PadCanvas).GetField("_pan", BindingFlags.Instance | BindingFlags.NonPublic);
-        var invalidateViewFrameSnapshotMethod = typeof(PadCanvas).GetMethod("InvalidateViewFrameSnapshot", BindingFlags.Instance | BindingFlags.NonPublic);
-        var requestViewRefreshMethod = typeof(PadCanvas).GetMethod("RequestViewRefresh", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(zoomField);
-        Assert.NotNull(panField);
-        Assert.NotNull(invalidateViewFrameSnapshotMethod);
-        Assert.NotNull(requestViewRefreshMethod);
-
-        zoomField!.SetValue(canvas, 2.0);
-        panField!.SetValue(canvas, new Vector(20, 30));
-        invalidateViewFrameSnapshotMethod!.Invoke(canvas, null);
+        PadCanvasPrivateAccess.Zoom(canvas) = 2.0;
+        PadCanvasPrivateAccess.Pan(canvas) = new Vector(20, 30);
+        PadCanvasPrivateAccess.InvalidateViewFrameSnapshot(canvas);
 
         PadCanvasViewFrameSnapshot snapshotSeenByHandler = default;
         canvas.ViewChanged += (_, _) => snapshotSeenByHandler = canvas.GetViewFrameSnapshot();
 
-        requestViewRefreshMethod!.Invoke(canvas, [true]);
+        PadCanvasPrivateAccess.RequestViewRefresh(canvas, true);
         await HeadlessUiPump.FlushQueueAsync();
 
         Assert.True(snapshotSeenByHandler.Revision > initialSnapshot.Revision);
