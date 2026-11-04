@@ -129,6 +129,77 @@ public sealed partial class FreeformHelperViewModel
             resolved.Stage3FinalOutlinePolygons);
     }
 
+    private PadInspectorNotchSnapshot? BuildCadInspectorNotch(
+        int cadPadId,
+        bool includeExpensiveNotchDetails,
+        WorkflowDataSnapshot workflowSnapshot,
+        NotchV22CompensationResult? precomputedCompensation,
+        string? precomputedDiagnostics)
+    {
+        var resolved = ResolveCadInspectorResolvedResult(
+            cadPadId,
+            includeExpensiveNotchDetails,
+            workflowSnapshot,
+            precomputedCompensation);
+        if (resolved is not null)
+        {
+            return BuildCadInspectorNotchSnapshot(resolved, includeExpensiveNotchDetails, precomputedDiagnostics);
+        }
+
+        if (!includeExpensiveNotchDetails && _grid is not null)
+        {
+            _logger.Debug(System.Globalization.CultureInfo.InvariantCulture, "Pad inspector fast snapshot: CAD={0} skipped cold Notch 2.2 compute (cache miss).",
+                cadPadId);
+        }
+
+        return null;
+    }
+
+    private NotchV22ResolvedResult? ResolveCadInspectorResolvedResult(
+        int cadPadId,
+        bool includeExpensiveNotchDetails,
+        WorkflowDataSnapshot workflowSnapshot,
+        NotchV22CompensationResult? precomputedCompensation)
+    {
+        CadPad notchCad = null!;
+        IReadOnlyList<CadPad> allCadPads = Array.Empty<CadPad>();
+        IReadOnlySet<int>? activeRegularPadIds = null;
+        var hasNotchInputs = !includeExpensiveNotchDetails && TryResolveNotchComputationInputs(
+            cadPadId,
+            out notchCad,
+            out allCadPads,
+            out activeRegularPadIds);
+        var resolved = includeExpensiveNotchDetails
+            ? GetCadV22ResolvedResult(cadPadId)
+            : hasNotchInputs && _notchCache.ResolvedResultByCadId.ContainsKey(cadPadId)
+                ? GetOrBuildCadV22ResolvedResultCached(
+                    notchCad,
+                    allCadPads,
+                    activeRegularPadIds,
+                    workflowSnapshot,
+                    buildIfMissing: false)
+                : null;
+        var compensationResult = precomputedCompensation ?? resolved?.Compensation;
+        if (compensationResult is not null &&
+            resolved is null &&
+            (hasNotchInputs ||
+             TryResolveNotchComputationInputs(
+                 cadPadId,
+                 out notchCad,
+                 out allCadPads,
+                 out activeRegularPadIds)))
+        {
+            resolved = GetOrBuildCadV22ResolvedResultCached(
+                notchCad,
+                allCadPads,
+                activeRegularPadIds,
+                workflowSnapshot,
+                precomputedCompensation: compensationResult);
+        }
+
+        return resolved;
+    }
+
     private NotchV22ResolvedResult? GetOrBuildCadV22ResolvedResultCached(
         CadPad cadPad,
         IReadOnlyList<CadPad> allCadPads,
