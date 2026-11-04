@@ -5,7 +5,6 @@ using System.Security;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
-using NLog;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -44,7 +43,7 @@ public sealed partial class FreeformHelperViewModel
         return await RunUiOperationAsync(
             operationName: "Save project",
             showModalSpinner: false,
-            onStart: () => Logger.Info(CultureInfo.InvariantCulture, "Saving project."),
+            onStart: () => _logger.Info(CultureInfo.InvariantCulture, "Saving project."),
             operationAsync: async () =>
             {
                 CaptureDxfEditProjectState(_projectFile);
@@ -67,10 +66,10 @@ public sealed partial class FreeformHelperViewModel
                     ? $"Project saved: {result.Path}"
                     : $"Project saved: {result.Path}. {result.EmbedWarning}";
                 status.ReportSuccess(successMessage);
-                Logger.Info(CultureInfo.InvariantCulture, "Project saved: {0}", result.Path);
+                _logger.Info(CultureInfo.InvariantCulture, "Project saved: {0}", result.Path);
                 if (!string.IsNullOrWhiteSpace(result.EmbedWarning))
                 {
-                    Logger.Warn(result.EmbedWarning);
+                    _logger.Warn(result.EmbedWarning);
                 }
 
                 HasUnsavedChanges = false;
@@ -81,7 +80,7 @@ public sealed partial class FreeformHelperViewModel
             onError: ex =>
             {
                 status.ReportError("Save project failed", ex);
-                Logger.Error(ex, "Save project failed.");
+                _logger.Error(ex, "Save project failed.");
                 return false;
             });
     }
@@ -180,8 +179,8 @@ public sealed partial class FreeformHelperViewModel
             showModalSpinner: true,
             onStart: () =>
             {
-                Logger.Info(CultureInfo.InvariantCulture, "Loading project from path: {0}", normalizedPath);
-                Logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT: stage=start path={0}.", normalizedPath);
+                _logger.Info(CultureInfo.InvariantCulture, "Loading project from path: {0}", normalizedPath);
+                _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT: stage=start path={0}.", normalizedPath);
             },
             operationAsync: async () =>
             {
@@ -193,7 +192,7 @@ public sealed partial class FreeformHelperViewModel
 
                 if (result.IsCancelled || result.Project is null || string.IsNullOrWhiteSpace(result.Path))
                 {
-                    Logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT: stage=cancelled path={0}.", normalizedPath);
+                    _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT: stage=cancelled path={0}.", normalizedPath);
                     commandResult = ProjectLoadCommandResult.Failed(
                         code: "CANCELLED",
                         message: "Load cancelled (pending edits were not committed).",
@@ -217,7 +216,7 @@ public sealed partial class FreeformHelperViewModel
             onError: ex =>
             {
                 status.ReportError("Load project failed", ex);
-                Logger.Error(ex, "Load project failed.");
+                _logger.Error(ex, "Load project failed.");
                 commandResult = ProjectLoadCommandResult.Failed(
                     code: "LOAD_FAILED",
                     message: ex.Message,
@@ -231,7 +230,7 @@ public sealed partial class FreeformHelperViewModel
     {
         var status = CreateStatusScope("LoadProject");
         var totalSw = Stopwatch.StartNew();
-        Logger.Info(CultureInfo.InvariantCulture, "Loading project: {0}", path);
+        _logger.Info(CultureInfo.InvariantCulture, "Loading project: {0}", path);
         var originalSuppressAppGeneralPersistence = _appGeneralPersistence.SuppressPersistence;
         _appGeneralPersistence.SuppressPersistence = true;
         _projectFile = file;
@@ -253,7 +252,7 @@ public sealed partial class FreeformHelperViewModel
             TryApplyAppGeneralVisualPreferencesAfterProjectLoad();
             ClearStep5ResultCore();
             status.ReportSuccess($"Project loaded: {path}");
-            Logger.Info(CultureInfo.InvariantCulture, "Project loaded: {0}", path);
+            _logger.Info(CultureInfo.InvariantCulture, "Project loaded: {0}", path);
             HasUnsavedChanges = false;
             MarkProjectLoadedForAppGeneralPersistence();
             applyStateSw.Stop();
@@ -313,15 +312,15 @@ public sealed partial class FreeformHelperViewModel
             }
 
             totalSw.Stop();
-            Logger.Info(CultureInfo.InvariantCulture, "Load project timing: total={0} ms, persistence={1} ms, apply-state={2} ms, dxf={3} ms, rebuild={4} ms.",
+            _logger.Info(CultureInfo.InvariantCulture, "Load project timing: total={0} ms, persistence={1} ms, apply-state={2} ms, dxf={3} ms, rebuild={4} ms.",
                 totalSw.ElapsedMilliseconds,
                 persistenceElapsedMs,
                 applyStateSw.ElapsedMilliseconds,
                 dxfElapsedMs,
                 rebuildElapsedMs);
-            Logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step1-auto-replay={0} ms (replayed={1}).", replayTiming.Step1ReplayElapsedMs, replayTiming.Step1Replayed);
-            Logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step2-auto-replay={0} ms (replayed={1}).", replayTiming.Step2ReplayElapsedMs, replayTiming.Step2Replayed);
-            Logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT SUMMARY: total={0}ms persistence={1}ms applyState={2}ms dxf={3}ms rebuild={4}ms step1={5}ms step2={6}ms step1Replayed={7} step2Replayed={8} path={9}",
+            _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step1-auto-replay={0} ms (replayed={1}).", replayTiming.Step1ReplayElapsedMs, replayTiming.Step1Replayed);
+            _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step2-auto-replay={0} ms (replayed={1}).", replayTiming.Step2ReplayElapsedMs, replayTiming.Step2Replayed);
+            _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT SUMMARY: total={0}ms persistence={1}ms applyState={2}ms dxf={3}ms rebuild={4}ms step1={5}ms step2={6}ms step1Replayed={7} step2Replayed={8} path={9}",
                 totalSw.ElapsedMilliseconds,
                 persistenceElapsedMs,
                 applyStateSw.ElapsedMilliseconds,
@@ -353,7 +352,7 @@ public sealed partial class FreeformHelperViewModel
     {
         if (!AutoReplayStep2AfterProjectLoad)
         {
-            Logger.Info(WorkflowPipelineService.GetProjectLoadReplaySkippedMessage(
+            _logger.Info(WorkflowPipelineService.GetProjectLoadReplaySkippedMessage(
                 WorkflowStepId.Step2Freeform,
                 "disabled by setting"));
         }
@@ -366,7 +365,7 @@ public sealed partial class FreeformHelperViewModel
 
         foreach (var step in replayPlan)
         {
-            Logger.Info(WorkflowPipelineService.GetProjectLoadReplayStartedMessage(step));
+            _logger.Info(WorkflowPipelineService.GetProjectLoadReplayStartedMessage(step));
             var stepSw = Stopwatch.StartNew();
             var replayed = step switch
             {
@@ -389,11 +388,11 @@ public sealed partial class FreeformHelperViewModel
 
             if (replayed)
             {
-                Logger.Info(WorkflowPipelineService.GetProjectLoadReplayCompletedMessage(step));
+                _logger.Info(WorkflowPipelineService.GetProjectLoadReplayCompletedMessage(step));
             }
             else
             {
-                Logger.Info(WorkflowPipelineService.GetProjectLoadReplaySkippedMessage(step, "preconditions not met"));
+                _logger.Info(WorkflowPipelineService.GetProjectLoadReplaySkippedMessage(step, "preconditions not met"));
             }
         }
 

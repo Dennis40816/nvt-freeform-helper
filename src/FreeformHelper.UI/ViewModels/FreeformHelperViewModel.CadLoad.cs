@@ -119,7 +119,7 @@ public sealed partial class FreeformHelperViewModel
     {
         if (outcome.DuplicateSanitization.HasExcludedDuplicates)
         {
-            Logger.Warn(
+            _logger.Warn(
                 CultureInfo.InvariantCulture,
                 "CAD load auto-hidden same-layer exact duplicate pads. groups={0}, duplicateIds={1}.",
                 outcome.DuplicateSanitization.DuplicateSameLayerGroupCount,
@@ -129,11 +129,11 @@ public sealed partial class FreeformHelperViewModel
         if (outcome.Source == CadLoadSource.Path)
         {
             var label = context == CadLoadContext.OpenDxf ? "DXF imported" : "DXF reloaded";
-            Logger.Info(CultureInfo.InvariantCulture, "{0}: {1} (pads={2})", label, outcome.SourcePath, outcome.Cad.Pads.Count);
+            _logger.Info(CultureInfo.InvariantCulture, "{0}: {1} (pads={2})", label, outcome.SourcePath, outcome.Cad.Pads.Count);
             return;
         }
 
-        Logger.Info(CultureInfo.InvariantCulture, "DXF loaded from embedded data (pads={0})", outcome.Cad.Pads.Count);
+        _logger.Info(CultureInfo.InvariantCulture, "DXF loaded from embedded data (pads={0})", outcome.Cad.Pads.Count);
     }
 
     private enum CadLoadContext

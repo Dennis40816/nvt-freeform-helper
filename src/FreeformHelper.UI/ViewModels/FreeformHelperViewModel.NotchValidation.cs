@@ -118,7 +118,7 @@ public sealed partial class FreeformHelperViewModel
             table,
             nullDiffValue);
         _notchCache.ValidationBucket = (bucket, table, nullDiffValue);
-        Logger.Info(CultureInfo.InvariantCulture, "Validation bucket rebuilt: tableRows={0}, null={1}, elapsed={2}ms.",
+        _logger.Info(CultureInfo.InvariantCulture, "Validation bucket rebuilt: tableRows={0}, null={1}, elapsed={2}ms.",
             table.Rows.Count,
             nullDiffValue,
             stopwatch.ElapsedMilliseconds);

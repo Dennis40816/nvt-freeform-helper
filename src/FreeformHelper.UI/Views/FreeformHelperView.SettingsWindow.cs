@@ -26,7 +26,7 @@ public sealed partial class FreeformHelperView
             return;
         }
 
-        Logger.Info(CultureInfo.InvariantCulture, "Open settings window requested: source={0}, section={1}.",
+        _logger.Info(CultureInfo.InvariantCulture, "Open settings window requested: source={0}, section={1}.",
             source,
             section?.ToString() ?? "General");
 

@@ -13,7 +13,7 @@ public sealed class JsonProjectStore
     /// <summary>
     /// Specifies the JSON serialization options to use for consistent formatting and camelCase property naming.
     /// </summary>
-    private static readonly JsonSerializerOptions Options = new()
+    private static readonly JsonSerializerOptions _options = new()
     {
         WriteIndented = true, // Makes the JSON output human-readable with indentation
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Converts C# PascalCase properties to camelCase in JSON
@@ -39,7 +39,7 @@ public sealed class JsonProjectStore
     public static ProjectFile Load(string path)
     {
         var json = File.ReadAllText(path); // Read the entire JSON content from the file
-        var file = JsonSerializer.Deserialize<ProjectFile>(json, Options) // Deserialize JSON to ProjectFile object
+        var file = JsonSerializer.Deserialize<ProjectFile>(json, _options) // Deserialize JSON to ProjectFile object
             ?? throw new InvalidOperationException("Failed to parse project file.");
         ProjectFileMigrator.MigrateInPlace(file);
         file.Settings.ValidateOrThrow(); // Validate the settings within the loaded project file
@@ -59,7 +59,7 @@ public sealed class JsonProjectStore
         ProjectFileMigrator.MigrateInPlace(file);
         file.Settings.ValidateOrThrow(); // Validate the settings before saving
 
-        var json = JsonSerializer.Serialize(file, Options); // Serialize the ProjectFile object to JSON
+        var json = JsonSerializer.Serialize(file, _options); // Serialize the ProjectFile object to JSON
         return PublishAsync(path, Encoding.UTF8.GetBytes(json), cancellationToken);
     }
 

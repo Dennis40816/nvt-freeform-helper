@@ -10,7 +10,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class UiVisualSnapshotTests
 {
-    private static readonly JsonSerializerOptions BaselineJsonOptions = new()
+    private static readonly JsonSerializerOptions _baselineJsonOptions = new()
     {
         WriteIndented = true
     };
@@ -62,7 +62,7 @@ public sealed class UiVisualSnapshotTests
                 baseline.Files = computedHashes
                     .OrderBy(static pair => pair.Key, StringComparer.Ordinal)
                     .ToDictionary(static pair => pair.Key, static pair => pair.Value, StringComparer.Ordinal);
-                var updatedBaselineText = JsonSerializer.Serialize(baseline, BaselineJsonOptions);
+                var updatedBaselineText = JsonSerializer.Serialize(baseline, _baselineJsonOptions);
                 File.WriteAllText(baselinePath, updatedBaselineText + Environment.NewLine, new UTF8Encoding(false));
             }
 

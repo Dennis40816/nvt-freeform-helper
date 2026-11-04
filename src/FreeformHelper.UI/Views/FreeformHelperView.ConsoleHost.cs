@@ -10,7 +10,7 @@ namespace FreeformHelper.UI.Views;
 /// </summary>
 public sealed partial class FreeformHelperView
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private void OnShellPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {

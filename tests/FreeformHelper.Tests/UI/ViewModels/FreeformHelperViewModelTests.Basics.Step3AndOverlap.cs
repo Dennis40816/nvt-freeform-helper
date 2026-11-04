@@ -204,8 +204,8 @@ public sealed partial class FreeformHelperViewModelTests
             new RegularGrid(
                 rows: 1,
                 cols: 2,
-                xEdges: TwoPadGridXEdges,
-                yEdges: SinglePadGridYEdges,
+                xEdges: _twoPadGridXEdges,
+                yEdges: _singlePadGridYEdges,
                 pads: new[] { regular1, regular2 }));
 
         SetPadMatchResults(vm, (101, 1001), (102, 1002));
@@ -215,7 +215,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         await vm.RunWorkflowStepAsync(WorkflowStepId.Step3NotchPreview);
 
-        Assert.Equal(SelectedCad101And102, vm.NotchCanvasPreviewItems.Select(static item => item.CadPadId).ToArray());
+        Assert.Equal(_selectedCad101And102, vm.NotchCanvasPreviewItems.Select(static item => item.CadPadId).ToArray());
         Assert.All(vm.NotchCanvasPreviewItems, static item => Assert.NotEmpty(item.ToFullFinalOutlinePolygons));
 
         Assert.Equal("Notch 2.2 preview updated: 2 selected CAD pads, To Full effective ON.", vm.StatusText);

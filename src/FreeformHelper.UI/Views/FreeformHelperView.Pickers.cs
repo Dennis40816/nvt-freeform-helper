@@ -12,11 +12,11 @@ namespace FreeformHelper.UI.Views;
 /// </summary>
 public sealed partial class FreeformHelperView
 {
-    private static readonly string[] DxfFilePatterns = ["*.dxf"];
-    private static readonly string[] JsonFilePatterns = ["*.json"];
-    private static readonly string[] CFilePatterns = ["*.c"];
-    private static readonly string[] CsvFilePatterns = ["*.csv"];
-    private static readonly string[] AllFilesPatterns = ["*"];
+    private static readonly string[] _dxfFilePatterns = ["*.dxf"];
+    private static readonly string[] _jsonFilePatterns = ["*.json"];
+    private static readonly string[] _cFilePatterns = ["*.c"];
+    private static readonly string[] _csvFilePatterns = ["*.csv"];
+    private static readonly string[] _allFilesPatterns = ["*"];
 
     /// <summary>
     /// Attaches the <see cref="FreeformHelperViewModel"/> to this view and
@@ -179,8 +179,8 @@ public sealed partial class FreeformHelperView
             Title = "Open DXF",
             FileTypeFilter = new List<FilePickerFileType>
             {
-                new FilePickerFileType("DXF") { Patterns = DxfFilePatterns },
-                new FilePickerFileType("All files") { Patterns = AllFilesPatterns },
+                new FilePickerFileType("DXF") { Patterns = _dxfFilePatterns },
+                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
             }
         };
     }
@@ -196,8 +196,8 @@ public sealed partial class FreeformHelperView
             Title = "Open Project",
             FileTypeFilter = new List<FilePickerFileType>
             {
-                new FilePickerFileType("FreeformHelper Project") { Patterns = JsonFilePatterns }, // Custom project file extension.
-                new FilePickerFileType("All files") { Patterns = AllFilesPatterns },
+                new FilePickerFileType("FreeformHelper Project") { Patterns = _jsonFilePatterns }, // Custom project file extension.
+                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
             }
         };
     }
@@ -210,8 +210,8 @@ public sealed partial class FreeformHelperView
             Title = "Import Regular Visibility Mask (SeeRegular.csv)",
             FileTypeFilter = new List<FilePickerFileType>
             {
-                new FilePickerFileType("CSV") { Patterns = CsvFilePatterns },
-                new FilePickerFileType("All files") { Patterns = AllFilesPatterns },
+                new FilePickerFileType("CSV") { Patterns = _csvFilePatterns },
+                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
             }
         };
     }
@@ -228,8 +228,8 @@ public sealed partial class FreeformHelperView
             SuggestedFileName = "freeform_helper_project.json",
             FileTypeChoices = new List<FilePickerFileType>
             {
-                new FilePickerFileType("FreeformHelper Project") { Patterns = JsonFilePatterns },
-                new FilePickerFileType("All files") { Patterns = AllFilesPatterns },
+                new FilePickerFileType("FreeformHelper Project") { Patterns = _jsonFilePatterns },
+                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
             }
         };
     }
@@ -259,7 +259,7 @@ public sealed partial class FreeformHelperView
             {
                 primary,
                 secondary,
-                new FilePickerFileType("All files") { Patterns = AllFilesPatterns },
+                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
             }
         };
     }
@@ -268,8 +268,8 @@ public sealed partial class FreeformHelperView
     {
         return ext.ToLowerInvariant() switch
         {
-            "c" => new FilePickerFileType("C source (*.c)") { Patterns = CFilePatterns },
-            _ => new FilePickerFileType("CSV (*.csv)") { Patterns = CsvFilePatterns },
+            "c" => new FilePickerFileType("C source (*.c)") { Patterns = _cFilePatterns },
+            _ => new FilePickerFileType("CSV (*.csv)") { Patterns = _csvFilePatterns },
         };
     }
 
@@ -303,7 +303,7 @@ public sealed partial class FreeformHelperView
             FileTypeChoices = new List<FilePickerFileType>
             {
                 new FilePickerFileType(typeDisplay) { Patterns = new[] { pattern } },
-                new FilePickerFileType("All files") { Patterns = AllFilesPatterns },
+                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
             }
         };
     }

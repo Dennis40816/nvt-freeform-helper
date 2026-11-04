@@ -294,7 +294,7 @@ public sealed partial class FreeformHelperViewModelTests
         vm.SelectedRegularSourceLayerOption = new FreeformHelperViewModel.RegularSourceLayerOption("regular", "regular");
         vm.SelectedBoundLayerOption = new FreeformHelperViewModel.BoundLayerOption("signal", "signal");
 
-        await SelectCadPadsAsync(vm, SingleCadSelection);
+        await SelectCadPadsAsync(vm, _singleCadSelection);
         vm.DeleteSelectedCadPadsCommand.Execute(null);
         vm.RestoreAllHiddenCadPadsCommand.Execute(null);
         await WaitForGridRebuildAsync(vm);

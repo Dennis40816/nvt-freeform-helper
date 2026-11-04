@@ -78,7 +78,7 @@ public sealed partial class PadCanvas
 
         _hoverDebugRevealTimer = new DispatcherTimer
         {
-            Interval = HoverDebugRevealDelay
+            Interval = _hoverDebugRevealDelay
         };
         _hoverDebugRevealTimer.Tick += (_, _) => ApplyPendingHoverDebugHit();
     }

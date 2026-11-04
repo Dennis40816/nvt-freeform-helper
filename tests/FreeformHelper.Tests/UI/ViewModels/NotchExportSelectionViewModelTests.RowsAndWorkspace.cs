@@ -6,8 +6,8 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class NotchExportSelectionViewModelTests
 {
-    private static readonly int[] WorkspaceCad201 = [201];
-    private static readonly int[] WorkspaceCad200 = [200];
+    private static readonly int[] _workspaceCad201 = [201];
+    private static readonly int[] _workspaceCad200 = [200];
 
 
 
@@ -81,7 +81,7 @@ public sealed partial class NotchExportSelectionViewModelTests
     {
         var table = BuildSampleTable();
         var vm = new NotchExportSelectionViewModel(table);
-        var selectedCadIds = WorkspaceCad201;
+        var selectedCadIds = _workspaceCad201;
 
         vm.ApplyWorkspaceSelection(selectedCadIds, Array.Empty<int>());
 
@@ -107,7 +107,7 @@ public sealed partial class NotchExportSelectionViewModelTests
         var callbackCount = 0;
         var vm = new NotchExportSelectionViewModel(table, _ => callbackCount++);
 
-        vm.ApplyWorkspaceSelection(WorkspaceCad201, Array.Empty<int>());
+        vm.ApplyWorkspaceSelection(_workspaceCad201, Array.Empty<int>());
 
         Assert.Equal(0, callbackCount);
         vm.SelectPreviewRowCommand.Execute(vm.Rows[1]);
@@ -120,7 +120,7 @@ public sealed partial class NotchExportSelectionViewModelTests
     {
         var table = BuildTransferOnlyFilterTable();
         var vm = new NotchExportSelectionViewModel(table);
-        var selectedCadIds = WorkspaceCad200;
+        var selectedCadIds = _workspaceCad200;
 
         vm.ApplyWorkspaceSelection(selectedCadIds, Array.Empty<int>());
         Assert.False(vm.HasWorkspaceLinkedRows);

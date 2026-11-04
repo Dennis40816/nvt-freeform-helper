@@ -73,7 +73,7 @@ public sealed partial class FreeformHelperViewModel
                     LastSimulationWorkspaceAttemptMessage = message;
                     if (silent)
                     {
-                        Logger.Info(message);
+                        _logger.Info(message);
                     }
                     else
                     {
@@ -101,7 +101,7 @@ public sealed partial class FreeformHelperViewModel
                         "Simulation warning: duplicate CAD output FW diff at IC{0}/diff{1}; results may include ambiguous mappings.",
                         sample.IcIndex + 1,
                         sample.DiffIndex);
-                    Logger.Warn(
+                    _logger.Warn(
                         CultureInfo.InvariantCulture,
                         "{0} duplicate-groups={1} sample-cads={2}.",
                         duplicateWarningMessage,
@@ -140,7 +140,7 @@ public sealed partial class FreeformHelperViewModel
                     : string.Concat(readyMessage, " ", duplicateWarningMessage);
                 if (silent)
                 {
-                    Logger.Info(
+                    _logger.Info(
                         CultureInfo.InvariantCulture,
                         duplicateWarningMessage is null
                             ? "Simulation prewarm ready. Rows={0}."
@@ -164,7 +164,7 @@ public sealed partial class FreeformHelperViewModel
                     SetStatus(message);
                 }
 
-                Logger.Error(ex, "Simulation workspace failed.");
+                _logger.Error(ex, "Simulation workspace failed.");
                 ReportSimulationBuildProgress(message, reportToStatus: false);
             },
             showModalSpinner: !silent);

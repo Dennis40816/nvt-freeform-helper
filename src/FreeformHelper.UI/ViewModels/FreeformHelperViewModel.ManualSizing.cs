@@ -167,7 +167,7 @@ public sealed partial class FreeformHelperViewModel
             ApplySizingToCells(plan.Rows, plan.Cols, plan.Width, plan.Height);
             var rowLabel = FormatIndexRanges(plan.Rows.Select(ToDisplayRow));
             var colLabel = FormatIndexRanges(plan.Cols);
-            Logger.Debug(CultureInfo.InvariantCulture, "Manual sizing applied. Rows={0}, Cols={1}, Width={2}, Height={3}.", rowLabel, colLabel, PendingColumnWidth, PendingRowHeight);
+            _logger.Debug(CultureInfo.InvariantCulture, "Manual sizing applied. Rows={0}, Cols={1}, Width={2}, Height={3}.", rowLabel, colLabel, PendingColumnWidth, PendingRowHeight);
             SyncSelectionFromManualRange(plan.Rows, plan.Cols); // Update canvas selection.
         }
         await Task.CompletedTask;

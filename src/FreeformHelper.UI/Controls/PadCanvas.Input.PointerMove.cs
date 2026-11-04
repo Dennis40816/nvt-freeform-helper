@@ -25,7 +25,7 @@ public sealed partial class PadCanvas
             _lastPointer = p; // Update last pointer position.
 
             var now = DateTime.UtcNow.Ticks;
-            if (_lastPanRedrawTicks == 0 || now - _lastPanRedrawTicks >= PanRedrawIntervalTicks)
+            if (_lastPanRedrawTicks == 0 || now - _lastPanRedrawTicks >= _panRedrawIntervalTicks)
             {
                 _lastPanRedrawTicks = now;
                 RequestViewRefresh(); // Coalesce redraw + view notification to the next render frame.
@@ -53,7 +53,7 @@ public sealed partial class PadCanvas
             {
                 _boxEnd = p;
                 var now = DateTime.UtcNow.Ticks;
-                if (_lastBoxSelectionRedrawTicks == 0 || now - _lastBoxSelectionRedrawTicks >= BoxSelectionRedrawIntervalTicks)
+                if (_lastBoxSelectionRedrawTicks == 0 || now - _lastBoxSelectionRedrawTicks >= _boxSelectionRedrawIntervalTicks)
                 {
                     _lastBoxSelectionRedrawTicks = now;
                     RequestVisualRefresh();

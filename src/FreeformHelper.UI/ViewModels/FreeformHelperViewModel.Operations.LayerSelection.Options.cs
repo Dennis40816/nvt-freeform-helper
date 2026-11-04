@@ -2,7 +2,6 @@ using System.Globalization;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
-using NLog;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -53,7 +52,7 @@ public sealed partial class FreeformHelperViewModel
             FilterCadPadsByLayer();
         }
 
-        Logger.Info(CultureInfo.InvariantCulture, "Auto-hidden regular source layer from CAD view: {0}", regularLayer);
+        _logger.Info(CultureInfo.InvariantCulture, "Auto-hidden regular source layer from CAD view: {0}", regularLayer);
         return true;
     }
 

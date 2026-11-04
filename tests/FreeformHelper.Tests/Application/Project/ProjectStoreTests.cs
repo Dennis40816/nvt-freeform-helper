@@ -6,7 +6,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class ProjectStoreTests
 {
-    private static readonly string[] ExpectedEnabledVersions = ["V21", "V22"];
+    private static readonly string[] _expectedEnabledVersions = ["V21", "V22"];
 
     [Fact]
     public async Task SaveAndLoad_RoundTripsSettings()
@@ -179,7 +179,7 @@ public sealed class ProjectStoreTests
             Assert.Equal("Jpg", loaded.UiSnapshot.View.DxfLayerImageFormat);
             Assert.True(loaded.UiSnapshot.View.DxfLayerImageUseDarkTheme);
             Assert.True(loaded.UiSnapshot.Notch.EnableToFull);
-            Assert.Equal(ExpectedEnabledVersions, loaded.UiSnapshot.Notch.EnabledVersions);
+            Assert.Equal(_expectedEnabledVersions, loaded.UiSnapshot.Notch.EnabledVersions);
             Assert.Equal(16, loaded.UiSnapshot.Notch.LenScale);
             Assert.Equal(65535, loaded.UiSnapshot.Notch.NullValue);
             Assert.Equal(32, loaded.UiSnapshot.Notch.ThresholdQ7);

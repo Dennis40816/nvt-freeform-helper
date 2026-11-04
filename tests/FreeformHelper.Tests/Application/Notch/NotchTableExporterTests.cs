@@ -13,20 +13,20 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchTableExporterTests
 {
-    private static readonly double[] UnitEdges = [0d, 10d];
-    private static readonly string[] ExpectedV21PayloadPrefix = ["1", "2", "3", "4"];
-    private static readonly string[] ExpectedV22PayloadPrefix = ["7", "8"];
-    private static readonly int[] V21OnlyPayload = [10, 120, 120, 20, 1, 38, 65535, 0, 0];
-    private static readonly double[] RuntimeParityBeforeValues = [100d, 50d, 25d, 80d, 40d, 30d];
-    private static readonly int[] V21Q7BoundaryMagnitudes = [0, 1, 127, 128, 129, 255];
-    private static readonly int[] V21Q7BoundaryTypes = [1, 2];
-    private static readonly int[] V21MultiTermWrapDiffs = [10, 11, 12, 20];
-    private static readonly int[] V21MultiTermWrapSourceDiffs = [12, 10, 11];
-    private static readonly int[] ExpectedV21Q7BoundarySignedPercents =
+    private static readonly double[] _unitEdges = [0d, 10d];
+    private static readonly string[] _expectedV21PayloadPrefix = ["1", "2", "3", "4"];
+    private static readonly string[] _expectedV22PayloadPrefix = ["7", "8"];
+    private static readonly int[] _v21OnlyPayload = [10, 120, 120, 20, 1, 38, 65535, 0, 0];
+    private static readonly double[] _runtimeParityBeforeValues = [100d, 50d, 25d, 80d, 40d, 30d];
+    private static readonly int[] _v21Q7BoundaryMagnitudes = [0, 1, 127, 128, 129, 255];
+    private static readonly int[] _v21Q7BoundaryTypes = [1, 2];
+    private static readonly int[] _v21MultiTermWrapDiffs = [10, 11, 12, 20];
+    private static readonly int[] _v21MultiTermWrapSourceDiffs = [12, 10, 11];
+    private static readonly int[] _expectedV21Q7BoundarySignedPercents =
         [1, -1, 99, -99, 100, -100, 101, -101, 199, -199];
-    private static readonly double[] ExpectedV21Q7BoundaryLegDeltas =
+    private static readonly double[] _expectedV21Q7BoundaryLegDeltas =
         [1d, -1d, 127d, -127d, 128d, -128d, 129d, -129d, 255d, -255d];
-    private static readonly double[] ExpectedV21Q7BoundaryRuntimeValues =
+    private static readonly double[] _expectedV21Q7BoundaryRuntimeValues =
     [
         128d, 0d,
         128d, 0d,
@@ -99,11 +99,11 @@ public sealed class NotchTableExporterTests
         Assert.Equal(19, v21Columns.Length);
         Assert.Equal(19, v22Columns.Length);
         Assert.Equal("4", v21Columns[8]);
-        Assert.Equal(ExpectedV21PayloadPrefix, v21Columns[9..13]);
+        Assert.Equal(_expectedV21PayloadPrefix, v21Columns[9..13]);
         Assert.All(v21Columns[13..18], static value => Assert.Equal(string.Empty, value));
         Assert.Equal("\"v21\"", v21Columns[18]);
         Assert.Equal("2", v22Columns[8]);
-        Assert.Equal(ExpectedV22PayloadPrefix, v22Columns[9..11]);
+        Assert.Equal(_expectedV22PayloadPrefix, v22Columns[9..11]);
         Assert.All(v22Columns[11..18], static value => Assert.Equal(string.Empty, value));
         Assert.Equal("\"v22\"", v22Columns[18]);
     }
@@ -655,7 +655,7 @@ public sealed class NotchTableExporterTests
                 diffIndex: 10,
                 regularPadIndex: 10,
                 cadPadId: 100,
-                values: V21OnlyPayload,
+                values: _v21OnlyPayload,
                 comment: "v21-only"),
         });
 
@@ -707,7 +707,7 @@ public sealed class NotchTableExporterTests
                 diffIndex: 10,
                 regularPadIndex: 10,
                 cadPadId: 100,
-                values: V21OnlyPayload,
+                values: _v21OnlyPayload,
                 comment: "v21-only"),
         });
 
@@ -954,18 +954,18 @@ public sealed class NotchTableExporterTests
 
         Assert.True(simulation.IsSupported);
         Assert.Empty(simulation.Diagnostics);
-        Assert.Equal(ExpectedV21Q7BoundaryRuntimeValues, firmwareValues);
-        Assert.Equal(ExpectedV21Q7BoundaryRuntimeValues, simulatedValues);
-        Assert.Equal(ExpectedV21Q7BoundarySignedPercents, simulation.Actions.SelectMany(static action => action.Legs).Select(static leg => leg.RatioPercent));
-        Assert.Equal(ExpectedV21Q7BoundaryLegDeltas, simulation.Actions.SelectMany(static action => action.Legs).Select(static leg => leg.DeltaValue));
-        Assert.Equal(ExpectedV21Q7BoundaryRuntimeValues.Where((_, index) => index % 2 == 0), simulation.Actions.Select(static action => action.SourceAfterValue));
+        Assert.Equal(_expectedV21Q7BoundaryRuntimeValues, firmwareValues);
+        Assert.Equal(_expectedV21Q7BoundaryRuntimeValues, simulatedValues);
+        Assert.Equal(_expectedV21Q7BoundarySignedPercents, simulation.Actions.SelectMany(static action => action.Legs).Select(static leg => leg.RatioPercent));
+        Assert.Equal(_expectedV21Q7BoundaryLegDeltas, simulation.Actions.SelectMany(static action => action.Legs).Select(static leg => leg.DeltaValue));
+        Assert.Equal(_expectedV21Q7BoundaryRuntimeValues.Where((_, index) => index % 2 == 0), simulation.Actions.Select(static action => action.SourceAfterValue));
     }
 
     [Fact]
     public void ExportAsCInitializer_V21ThreeTerms_SplitsNodesAndPreservesInt16Wrap()
     {
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(V21MultiTermWrapDiffs);
-        var table = new NotchTable(V21MultiTermWrapSourceDiffs
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_v21MultiTermWrapDiffs);
+        var table = new NotchTable(_v21MultiTermWrapSourceDiffs
             .Select(sourceDiff => new NotchTableRow(
                 NotchAlgorithmVersion.V21,
                 icIndex: 0,
@@ -1056,7 +1056,7 @@ public sealed class NotchTableExporterTests
             IcIndex = 0
         };
         var regularPads = new[] { regular };
-        return new RegularGrid(1, 1, UnitEdges, UnitEdges, regularPads);
+        return new RegularGrid(1, 1, _unitEdges, _unitEdges, regularPads);
     }
 
     private static RegularGrid CreateGridWithIcCount(int icCount)
@@ -1130,7 +1130,7 @@ public sealed class NotchTableExporterTests
 
     private static RegularGrid CreateV21Q7BoundaryGrid()
     {
-        var cols = V21Q7BoundaryMagnitudes.Length * V21Q7BoundaryTypes.Length * 2;
+        var cols = _v21Q7BoundaryMagnitudes.Length * _v21Q7BoundaryTypes.Length * 2;
         var xEdges = Enumerable.Range(0, cols + 1).Select(static index => (double)index).ToArray();
         var yEdges = new[] { 0d, 1d };
         var pads = Enumerable.Range(0, cols)
@@ -1157,9 +1157,9 @@ public sealed class NotchTableExporterTests
     {
         var rows = new List<NotchTableRow>();
         var pairIndex = 0;
-        foreach (var magnitudeQ7 in V21Q7BoundaryMagnitudes)
+        foreach (var magnitudeQ7 in _v21Q7BoundaryMagnitudes)
         {
-            foreach (var type in V21Q7BoundaryTypes)
+            foreach (var type in _v21Q7BoundaryTypes)
             {
                 var sourceDiffIndex = pairIndex * 2;
                 var targetDiffIndex = sourceDiffIndex + 1;
@@ -1292,7 +1292,7 @@ public sealed class NotchTableExporterTests
         IReadOnlyList<double>? beforeValues = null,
         int nullDiffValue = 65535)
     {
-        var projection = CreateRuntimeParityProjection(grid, beforeValues ?? RuntimeParityBeforeValues);
+        var projection = CreateRuntimeParityProjection(grid, beforeValues ?? _runtimeParityBeforeValues);
         var result = NotchApplySimulationService.Simulate(new NotchApplySimulationRequest(
             grid,
             grid.Pads.Select(static pad => pad.RegularPadId).ToHashSet(),

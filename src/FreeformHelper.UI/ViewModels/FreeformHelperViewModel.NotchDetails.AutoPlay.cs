@@ -123,7 +123,7 @@ public sealed partial class FreeformHelperViewModel
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
-            Logger.Warn(ex, "Notch preview auto-play loop crashed.");
+            _logger.Warn(ex, "Notch preview auto-play loop crashed.");
         }
         finally
         {

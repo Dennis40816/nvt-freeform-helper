@@ -79,7 +79,7 @@ public sealed partial class FreeformHelperViewModel
 
         SyncHiddenCadIdsToProject(previous);
         SyncCombinedCadState(previous);
-        Logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads set from project. Hidden total={0}.", _cadEdit.HiddenCadPadIds.Count);
+        _logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads set from project. Hidden total={0}.", _cadEdit.HiddenCadPadIds.Count);
     }
 
     private void ResetHiddenCadPads(CadEditNotificationSnapshot previous)
@@ -88,7 +88,7 @@ public sealed partial class FreeformHelperViewModel
         ClearAutoHiddenDuplicateCadPadState();
         SyncHiddenCadIdsToProject(previous);
         SyncCombinedCadState(previous);
-        Logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads reset.");
+        _logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads reset.");
     }
 
     private void SyncHiddenCadIdsToProject(CadEditNotificationSnapshot? previous = null)

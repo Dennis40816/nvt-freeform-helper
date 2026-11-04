@@ -26,7 +26,7 @@ internal static class CadLoadSpinnerDebugState
 {
     private const int MaxEvents = 120;
     private static readonly Lock _sync = new();
-    private static readonly Queue<CadLoadSpinnerDebugEvent> Events = new();
+    private static readonly Queue<CadLoadSpinnerDebugEvent> _events = new();
     private static long _sequence;
     private static int _vmOverlayShowCount;
     private static int _vmOverlayHideCount;
@@ -133,7 +133,7 @@ internal static class CadLoadSpinnerDebugState
                 HostShowIpcFailCount: _hostShowIpcFailCount,
                 HostHideIpcCount: _hostHideIpcCount,
                 HostShowRetryCount: _hostShowRetryCount,
-                Events: Events.ToList());
+                Events: _events.ToList());
         }
     }
 
@@ -153,7 +153,7 @@ internal static class CadLoadSpinnerDebugState
         Interlocked.Exchange(ref _hostShowRetryCount, 0);
         lock (_sync)
         {
-            Events.Clear();
+            _events.Clear();
         }
     }
 
@@ -169,10 +169,10 @@ internal static class CadLoadSpinnerDebugState
 
         lock (_sync)
         {
-            Events.Enqueue(entry);
-            while (Events.Count > MaxEvents)
+            _events.Enqueue(entry);
+            while (_events.Count > MaxEvents)
             {
-                _ = Events.Dequeue();
+                _ = _events.Dequeue();
             }
         }
     }

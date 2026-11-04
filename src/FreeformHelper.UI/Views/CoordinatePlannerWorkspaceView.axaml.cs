@@ -22,8 +22,8 @@ namespace FreeformHelper.UI.Views;
 
 public sealed partial class CoordinatePlannerWorkspaceView : UserControl
 {
-    private static readonly string[] PngFilePatterns = ["*.png"];
-    private static readonly string[] AllFilesPatterns = ["*"];
+    private static readonly string[] _pngFilePatterns = ["*.png"];
+    private static readonly string[] _allFilesPatterns = ["*"];
     private PadCanvas? _canvas;
     private Canvas? _overlayCanvas;
     private Canvas? _overlayLabelCanvas;
@@ -184,7 +184,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             FileTypeChoices = new List<FilePickerFileType>
             {
                 new(request.FileTypeName) { Patterns = request.Patterns },
-                new("All files") { Patterns = AllFilesPatterns },
+                new("All files") { Patterns = _allFilesPatterns },
             },
         });
         if (file is null)
@@ -211,8 +211,8 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             SuggestedFileName = "coordinate_planner.png",
             FileTypeChoices = new List<FilePickerFileType>
             {
-                new("PNG") { Patterns = PngFilePatterns },
-                new("All files") { Patterns = AllFilesPatterns },
+                new("PNG") { Patterns = _pngFilePatterns },
+                new("All files") { Patterns = _allFilesPatterns },
             },
         });
         if (file is null)

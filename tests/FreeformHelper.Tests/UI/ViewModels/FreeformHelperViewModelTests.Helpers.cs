@@ -13,15 +13,15 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class FreeformHelperViewModelTests
 {
-    private static readonly double[] SinglePadGridXEdges = [0.0, 10.0];
-    private static readonly double[] SinglePadGridYEdges = [0.0, 10.0];
-    private static readonly double[] TwoPadGridXEdges = [0.0, 10.0, 20.0];
-    private static readonly int[] SelectedCad101 = [101];
-    private static readonly int[] SelectedCad101And102 = [101, 102];
-    private static readonly int[] SelectedCad72 = [72];
-    private static readonly int[] SelectedCad4809 = [4809];
-    private static readonly int[] SelectedRegular200 = [200];
-    private static readonly int[] SelectedRegular4616 = [4616];
+    private static readonly double[] _singlePadGridXEdges = [0.0, 10.0];
+    private static readonly double[] _singlePadGridYEdges = [0.0, 10.0];
+    private static readonly double[] _twoPadGridXEdges = [0.0, 10.0, 20.0];
+    private static readonly int[] _selectedCad101 = [101];
+    private static readonly int[] _selectedCad101And102 = [101, 102];
+    private static readonly int[] _selectedCad72 = [72];
+    private static readonly int[] _selectedCad4809 = [4809];
+    private static readonly int[] _selectedRegular200 = [200];
+    private static readonly int[] _selectedRegular4616 = [4616];
 
     private static FreeformHelperViewModel CreateViewModelWithStep3PreviewReady()
     {
@@ -49,12 +49,12 @@ public sealed partial class FreeformHelperViewModelTests
             new RegularGrid(
                 rows: 1,
                 cols: 1,
-                xEdges: SinglePadGridXEdges,
-                yEdges: SinglePadGridYEdges,
+                xEdges: _singlePadGridXEdges,
+                yEdges: _singlePadGridYEdges,
                 pads: new[] { regular }));
 
         SetPadMatchResult(vm, cadPadId: 101, regularPadId: 1001);
-        vm.ApplyCanvasSelection(SelectedCad101, Array.Empty<int>());
+        vm.ApplyCanvasSelection(_selectedCad101, Array.Empty<int>());
         return vm;
     }
 

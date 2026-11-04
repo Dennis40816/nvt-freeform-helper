@@ -78,7 +78,7 @@ public sealed partial class FreeformHelperViewModel
     {
         if (!TryGetLoadedCad(() => _cad, "DXF edit: import DXF first.", out var cad))
         {
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF layer move skipped: no DXF loaded.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF layer move skipped: no DXF loaded.");
             return;
         }
 
@@ -89,7 +89,7 @@ public sealed partial class FreeformHelperViewModel
         if (selected.Count == 0)
         {
             SetStatus("DXF edit: select CAD pads first.");
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF layer move skipped: no CAD pad selected.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF layer move skipped: no CAD pad selected.");
             return;
         }
 
@@ -133,7 +133,7 @@ public sealed partial class FreeformHelperViewModel
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
         SetStatus($"DXF edit: moved {changedCount} CAD pad(s) to layer '{targetLayerName}'.");
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "DXF layer move applied. op={0}, targetLayer={1}, changedPads={2}.",
             operationName,

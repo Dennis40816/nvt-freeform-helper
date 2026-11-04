@@ -8,7 +8,7 @@ public sealed partial class FreeformHelperViewModel
     {
         if (!TryGetLoadedCad(() => _cad, "DXF edit: import DXF first.", out _))
         {
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF edit hide skipped: no DXF loaded.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF edit hide skipped: no DXF loaded.");
             return;
         }
 
@@ -18,7 +18,7 @@ public sealed partial class FreeformHelperViewModel
         if (selected.Count == 0)
         {
             SetStatus("DXF edit: select CAD pads first.");
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF edit hide skipped: no CAD pad selected.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF edit hide skipped: no CAD pad selected.");
             return;
         }
 
@@ -40,7 +40,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus($"DXF edit: hid {selected.Count} CAD pad(s).");
-        Logger.Info(CultureInfo.InvariantCulture, "DXF edit hid {0} pad(s). Hidden total={1}.", selected.Count, _cadEdit.HiddenCadPadIds.Count);
+        _logger.Info(CultureInfo.InvariantCulture, "DXF edit hid {0} pad(s). Hidden total={1}.", selected.Count, _cadEdit.HiddenCadPadIds.Count);
         MarkUnsaved();
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), "DXF hide CAD pads");
     }
@@ -49,7 +49,7 @@ public sealed partial class FreeformHelperViewModel
     {
         if (!TryGetLoadedCad(() => _cad, "DXF edit: import DXF first.", out _))
         {
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF edit restore-last skipped: no DXF loaded.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF edit restore-last skipped: no DXF loaded.");
             return;
         }
 
@@ -70,14 +70,14 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus("DXF edit: no deleted CAD pads to restore.");
-        Logger.Debug(CultureInfo.InvariantCulture, "DXF edit restore-last skipped: no deleted CAD pads.");
+        _logger.Debug(CultureInfo.InvariantCulture, "DXF edit restore-last skipped: no deleted CAD pads.");
     }
 
     private void RestoreAllHiddenCadPads()
     {
         if (!TryGetLoadedCad(() => _cad, "DXF edit: import DXF first.", out _))
         {
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF edit restore-hidden-all skipped: no DXF loaded.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF edit restore-hidden-all skipped: no DXF loaded.");
             return;
         }
 
@@ -85,7 +85,7 @@ public sealed partial class FreeformHelperViewModel
         if (hiddenCadIds.Count == 0)
         {
             SetStatus("DXF edit: no manual hidden CAD pads to restore.");
-            Logger.Debug(CultureInfo.InvariantCulture, "DXF edit restore-hidden-all skipped: no manual hidden CAD pads.");
+            _logger.Debug(CultureInfo.InvariantCulture, "DXF edit restore-hidden-all skipped: no manual hidden CAD pads.");
             return;
         }
 
@@ -171,7 +171,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus(statusTextFactory(changedIds.Count));
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "DXF duplicate visibility updated. autoHide={0}, changed={1}, autoHiddenTotal={2}.",
             autoHide,
@@ -234,7 +234,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus(statusTextFactory(restorableIds.Count));
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "{0}. restored={1}, hiddenTotal={2}.",
             logContext,

@@ -297,24 +297,24 @@ public sealed class NotchTableGeneratorTests
         return (Assert.Single(bucket.Cast<object>()), resolved);
     }
 
-    private static readonly int[] CrossIcIndices = [0, 1];
+    private static readonly int[] _crossIcIndices = [0, 1];
 
-    private static readonly int[] ExpectedLegacyDiffSet = [0, 1];
-    private static readonly int[] CadPadIds200 = [200];
-    private static readonly int[] CadPadIds201 = [201];
-    private static readonly string[] ExpectedCadAllocationGenerationPhases =
+    private static readonly int[] _expectedLegacyDiffSet = [0, 1];
+    private static readonly int[] _cadPadIds200 = [200];
+    private static readonly int[] _cadPadIds201 = [201];
+    private static readonly string[] _expectedCadAllocationGenerationPhases =
     [
         "1/4:Build allocation profiles",
         "2/4:Build canonical candidates",
         "3/4:Merge candidates by diff",
         "4/4:Finalize canonical exports",
     ];
-    private static readonly string[] ExpectedSubMicroLeftAnchorRows =
+    private static readonly string[] _expectedSubMicroLeftAnchorRows =
     [
         "V22|IC0|DIFF10|REG0|CAD7|10,150,20,75,65535,0,0",
         "V21|IC0|DIFF10|REG0|CAD7|10,150,150,20,1,96,65535,0,0",
     ];
-    private static readonly string[] ExpectedSubMicroRightAnchorRows =
+    private static readonly string[] _expectedSubMicroRightAnchorRows =
     [
         "V22|IC0|DIFF20|REG1|CAD7|20,150,10,75,65535,0,0",
         "V21|IC0|DIFF20|REG1|CAD7|20,150,150,10,1,96,65535,0,0",
@@ -1422,7 +1422,7 @@ public sealed class NotchTableGeneratorTests
             .Distinct()
             .ToArray();
 
-        Assert.Equal(ExpectedCadAllocationGenerationPhases, phases);
+        Assert.Equal(_expectedCadAllocationGenerationPhases, phases);
     }
 
     [Fact]
@@ -1460,7 +1460,7 @@ public sealed class NotchTableGeneratorTests
         Assert.All(table.Rows, row => Assert.Equal(cad.Pads[0].Id, row.CadPadId));
 
         var diffSet = table.Rows.Select(r => r.DiffIndex).OrderBy(v => v).ToArray();
-        Assert.Equal(ExpectedLegacyDiffSet, diffSet);
+        Assert.Equal(_expectedLegacyDiffSet, diffSet);
         Assert.All(table.Rows, row => Assert.Equal(row.DiffIndex, row.Values[0]));
     }
 
@@ -1692,13 +1692,13 @@ public sealed class NotchTableGeneratorTests
         Assert.Equal(0, firstGap.IcIndex);
         Assert.Equal(20, firstGap.SourceDiffIndex);
         Assert.Equal(22, firstGap.TargetDiffIndex);
-        Assert.Equal(CadPadIds200, firstGap.CadPadIds);
+        Assert.Equal(_cadPadIds200, firstGap.CadPadIds);
 
         var secondGap = audit.MissingGaps[1];
         Assert.Equal(1, secondGap.IcIndex);
         Assert.Equal(40, secondGap.SourceDiffIndex);
         Assert.Equal(42, secondGap.TargetDiffIndex);
-        Assert.Equal(CadPadIds201, secondGap.CadPadIds);
+        Assert.Equal(_cadPadIds201, secondGap.CadPadIds);
     }
 
     [Fact]
@@ -2046,7 +2046,7 @@ public sealed class NotchTableGeneratorTests
         var table = generator.Generate(cad, grid, settings);
 
         Assert.Equal(2, table.Rows.Count);
-        Assert.Equal(CrossIcIndices, table.Rows.Select(row => row.IcIndex).ToArray());
+        Assert.Equal(_crossIcIndices, table.Rows.Select(row => row.IcIndex).ToArray());
         Assert.All(table.Rows, row => Assert.Contains("XIC=1/2", row.Comment, StringComparison.Ordinal));
     }
 
@@ -2140,8 +2140,8 @@ public sealed class NotchTableGeneratorTests
             },
         };
 
-        AssertRefreshesMemo(leftAnchor, rightAnchor, ExpectedSubMicroRightAnchorRows);
-        AssertRefreshesMemo(rightAnchor, leftAnchor, ExpectedSubMicroLeftAnchorRows);
+        AssertRefreshesMemo(leftAnchor, rightAnchor, _expectedSubMicroRightAnchorRows);
+        AssertRefreshesMemo(rightAnchor, leftAnchor, _expectedSubMicroLeftAnchorRows);
 
         var vertices = leftAnchor.Polygon.Vertices;
         var cyclic = new CadPad(
@@ -2158,12 +2158,12 @@ public sealed class NotchTableGeneratorTests
         var reversedActual = BuildPayloadSnapshots(
             canonicalGenerator.Generate(new CadPadSet(new[] { reversed }), grid, settings));
 
-        Assert.Equal(ExpectedSubMicroLeftAnchorRows, canonical);
+        Assert.Equal(_expectedSubMicroLeftAnchorRows, canonical);
         Assert.Equal(canonical, cyclicActual);
         Assert.Equal(canonical, reversedActual);
 
-        AssertVersionProjection(NotchAlgorithmVersion.V21, ExpectedSubMicroRightAnchorRows[1]);
-        AssertVersionProjection(NotchAlgorithmVersion.V22, ExpectedSubMicroRightAnchorRows[0]);
+        AssertVersionProjection(NotchAlgorithmVersion.V21, _expectedSubMicroRightAnchorRows[1]);
+        AssertVersionProjection(NotchAlgorithmVersion.V22, _expectedSubMicroRightAnchorRows[0]);
 
         void AssertRefreshesMemo(CadPad warm, CadPad current, string[] expectedCurrent)
         {

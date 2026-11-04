@@ -98,7 +98,7 @@ public sealed partial class FreeformHelperViewModel
             NotchTable? legacyTableToStore = null;
             var stage2StartedAt = DateTime.UtcNow;
 
-            Logger.Info(
+            _logger.Info(
                 CultureInfo.InvariantCulture,
                 "{0} generation started: cad={1}, regular={2}, mode={3}, compModel={4}, versions={5}, thV21Q7={6}, thV22Pct={7}, thLink={8}, profile={9}, activeRegular={10}, activeHash={11}.",
                 operationLabel,
@@ -157,7 +157,7 @@ public sealed partial class FreeformHelperViewModel
                     includeResolutionTimings: !isBatchCacheHit));
                 if (isBatchCacheHit)
                 {
-                    Logger.Info(
+                    _logger.Info(
                         CultureInfo.InvariantCulture,
                         "{0} reused cached CAD-allocation batch: projectedRows={1}, step3Revision={2}, settingsFingerprint={3}.",
                         operationLabel,
@@ -175,7 +175,7 @@ public sealed partial class FreeformHelperViewModel
                          out cacheLookup))
             {
                 table = cachedTable;
-                Logger.Info(
+                _logger.Info(
                     CultureInfo.InvariantCulture,
                     "{0} reused cached notch table: rows={1}, step3Revision={2}, settingsFingerprint={3}.",
                     operationLabel,
@@ -211,7 +211,7 @@ public sealed partial class FreeformHelperViewModel
 
             var stage2ElapsedMs = (long)(DateTime.UtcNow - stage2StartedAt).TotalMilliseconds;
             var crossIcMismatch = BuildCrossIcMismatchSnapshot(grid);
-            Logger.Info(
+            _logger.Info(
                 CultureInfo.InvariantCulture,
                 "{0} metrics: elapsed={1} ms, cache={2}, crossIcCad={3}, crossIcRegular={4}, shiftedRows={5}, shiftedAnchors={6}, conflictedRawDiffKeys={7}, projectionMode={8}.",
                 operationLabel,
@@ -226,7 +226,7 @@ public sealed partial class FreeformHelperViewModel
             if (effectiveTable.GenerationPhaseTimings.HasData)
             {
                 var phaseTimings = effectiveTable.GenerationPhaseTimings;
-                Logger.Info(
+                _logger.Info(
                     CultureInfo.InvariantCulture,
                     "{0} phase timings: profiles={1} ms, candidates={2} ms, merge={3} ms, legacy={4} ms, finalize={5} ms, total={6} ms.",
                     operationLabel,
@@ -241,7 +241,7 @@ public sealed partial class FreeformHelperViewModel
                     var candidateBreakdown = phaseTimings.CandidateBreakdown;
                     var compensationStages = candidateBreakdown.CompensationStageTimings;
                     var stageCBreakdown = compensationStages.StageCBreakdown;
-                    Logger.Info(
+                    _logger.Info(
                         CultureInfo.InvariantCulture,
                         "{0} candidate breakdown: count={1}, buildCadCandidate={2} ms, compensation={3} ms, postCompute={4} ms, stageA={5} ms, stageB={6} ms, stageC={7} ms, stageD={8} ms.",
                         operationLabel,
@@ -255,7 +255,7 @@ public sealed partial class FreeformHelperViewModel
                         compensationStages.StageDElapsedMs);
                     if (stageCBreakdown?.HasData == true)
                     {
-                        Logger.Info(
+                        _logger.Info(
                             CultureInfo.InvariantCulture,
                             "{0} stageC breakdown: ownerLookup={1} ms, occupiedArea={2} ms, sourceCoverage={3} ms, reachability={4} ms, ruleDecision={5} ms, previewDebug={6} ms.",
                             operationLabel,
@@ -270,7 +270,7 @@ public sealed partial class FreeformHelperViewModel
             }
             if (crossIcMismatch.CadCount > 0)
             {
-                Logger.Warn(
+                _logger.Warn(
                     CultureInfo.InvariantCulture,
                     "{0} cross-IC mismatch detected: cadCount={1}, regularCount={2}, sample={3}.",
                     operationLabel,
@@ -333,7 +333,7 @@ public sealed partial class FreeformHelperViewModel
             }
 
             _notchCache.LastGeneratedTable = effectiveTable;
-            Logger.Info(
+            _logger.Info(
                 CultureInfo.InvariantCulture,
                 "{0} generated {1} row(s).",
                 operationLabel,
@@ -382,7 +382,7 @@ public sealed partial class FreeformHelperViewModel
 
     private static void LogSupersededNotchGeneration(string operationLabel)
     {
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "{0} generation superseded because its request identity changed.",
             operationLabel);
@@ -392,7 +392,7 @@ public sealed partial class FreeformHelperViewModel
         string operationLabel,
         NotchExportGenerationCacheLookup cacheLookup)
     {
-        Logger.Debug(
+        _logger.Debug(
             CultureInfo.InvariantCulture,
             "{0} cache miss: status={1}, requested(cad=0x{2:X},grid=0x{3:X},rev={4},settings={5}), " +
             "cached(cad=0x{6:X},grid=0x{7:X},rev={8},settings={9}).",

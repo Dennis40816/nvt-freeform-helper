@@ -26,8 +26,8 @@ namespace FreeformHelper.Tests;
 public sealed class HeadlessUiSmokeTests
 {
     private const int SimulationNullDiffValue = 65535;
-    private static readonly double[] SimulationXEdges = { 0d, 1d, 2d };
-    private static readonly double[] SimulationYEdges = { 0d, 1d };
+    private static readonly double[] _simulationXEdges = { 0d, 1d, 2d };
+    private static readonly double[] _simulationYEdges = { 0d, 1d };
 
     [AvaloniaFact]
     public void FreeformHelperView_Can_Layout_Headless()
@@ -558,7 +558,7 @@ public sealed class HeadlessUiSmokeTests
             CreateSimulationPad(row: 0, col: 0, index: 0, diffIndex: 10),
             CreateSimulationPad(row: 0, col: 1, index: 1, diffIndex: 11),
         };
-        return new RegularGrid(1, 2, SimulationXEdges, SimulationYEdges, pads);
+        return new RegularGrid(1, 2, _simulationXEdges, _simulationYEdges, pads);
     }
 
     private static RegularPad CreateSimulationPad(int row, int col, int index, int diffIndex)

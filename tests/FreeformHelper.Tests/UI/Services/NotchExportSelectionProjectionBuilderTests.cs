@@ -7,11 +7,11 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchExportSelectionProjectionBuilderTests
 {
-    private static readonly int[] WorkspaceCadIds = [200, 201, 202];
-    private static readonly int[] CadOutputFwDiffIndices = [8, 9];
-    private static readonly string[] ExpectedDiffFilterValues = ["10", "9"];
-    private static readonly string[] ExpectedStatusFilterValues = ["Linked"];
-    private static readonly int[] LegacyRowPayload = [20, 1, 2];
+    private static readonly int[] _workspaceCadIds = [200, 201, 202];
+    private static readonly int[] _cadOutputFwDiffIndices = [8, 9];
+    private static readonly string[] _expectedDiffFilterValues = ["10", "9"];
+    private static readonly string[] _expectedStatusFilterValues = ["Linked"];
+    private static readonly int[] _legacyRowPayload = [20, 1, 2];
 
     [Fact]
     public void Build_ProjectsVisibleRowsGroupsAndWorkspaceLinks_FromSingleScope()
@@ -37,13 +37,13 @@ public sealed class NotchExportSelectionProjectionBuilderTests
         var snapshot = NotchExportSelectionProjectionBuilder.Build(
             rows,
             filterState,
-            WorkspaceCadIds,
+            _workspaceCadIds,
             Array.Empty<int>());
 
-        Assert.Equal(CadOutputFwDiffIndices, snapshot.VisibleRows.Select(row => row.Row.DiffIndex).ToArray());
+        Assert.Equal(_cadOutputFwDiffIndices, snapshot.VisibleRows.Select(row => row.Row.DiffIndex).ToArray());
         Assert.Single(snapshot.IcGroups);
-        Assert.Equal(CadOutputFwDiffIndices, snapshot.IcGroups[0].Rows.Select(row => row.Row.DiffIndex).ToArray());
-        Assert.Equal(CadOutputFwDiffIndices, snapshot.WorkspaceLinkedRows.Select(row => row.Row.DiffIndex).ToArray());
+        Assert.Equal(_cadOutputFwDiffIndices, snapshot.IcGroups[0].Rows.Select(row => row.Row.DiffIndex).ToArray());
+        Assert.Equal(_cadOutputFwDiffIndices, snapshot.WorkspaceLinkedRows.Select(row => row.Row.DiffIndex).ToArray());
         Assert.True(snapshot.FilterViewState.HasSelectionFilterChip);
         Assert.True(snapshot.FilterViewState.HasHeaderFilterChip);
         Assert.Equal("Showing 2 rows", snapshot.FilterViewState.VisibleRowsSummaryText);
@@ -81,8 +81,8 @@ public sealed class NotchExportSelectionProjectionBuilderTests
             filterState,
             NotchExportColumnFilterField.Status);
 
-        Assert.Equal(ExpectedDiffFilterValues, diffValues);
-        Assert.Equal(ExpectedStatusFilterValues, statusValues);
+        Assert.Equal(_expectedDiffFilterValues, diffValues);
+        Assert.Equal(_expectedStatusFilterValues, statusValues);
     }
 
     private static List<NotchExportRowItemViewModel> BuildProjectionRows()
@@ -131,7 +131,7 @@ public sealed class NotchExportSelectionProjectionBuilderTests
                     TargetRatioPercent2: 0,
                     Flags: 0),
                 comment: "linked-b"),
-            new NotchTableRow(NotchAlgorithmVersion.V21, 1, 20, 300, 400, LegacyRowPayload, "legacy"),
+            new NotchTableRow(NotchAlgorithmVersion.V21, 1, 20, 300, 400, _legacyRowPayload, "legacy"),
         };
         var table = new NotchTable(rows);
 

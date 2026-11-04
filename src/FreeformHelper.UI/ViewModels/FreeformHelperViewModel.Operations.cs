@@ -6,7 +6,6 @@ using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
-using NLog;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -257,7 +256,7 @@ public sealed partial class FreeformHelperViewModel
             OnError = ex =>
             {
                 SetStatusError("DXF import failed", ex);
-                Logger.Error(ex, "DXF import failed.");
+                _logger.Error(ex, "DXF import failed.");
             },
         });
     }
@@ -273,7 +272,7 @@ public sealed partial class FreeformHelperViewModel
             onError: ex =>
             {
                 SetStatusError("Rebuild grid failed", ex);
-                Logger.Error(ex, "Rebuild grid failed.");
+                _logger.Error(ex, "Rebuild grid failed.");
             });
     }
 
@@ -282,7 +281,7 @@ public sealed partial class FreeformHelperViewModel
         var hadRegularBefore = RegularPads.Count > 0;
         ApplyUiToSettings(_projectFile.Settings);
         SetStatus("Building regular grid...");
-        Logger.Info(CultureInfo.InvariantCulture, "Building regular grid.");
+        _logger.Info(CultureInfo.InvariantCulture, "Building regular grid.");
         CanvasHintText = string.Empty;
         var buildRequest = CreateGridRebuildBuildRequestSnapshot();
         var buildResult = IsCadLoadCanvasOverlayVisible
@@ -338,7 +337,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetStatus(statusText);
-        Logger.Info(CultureInfo.InvariantCulture, "Grid built. Rows={0}, Cols={1}, Pads={2}.", grid.Rows, grid.Cols, grid.Pads.Count);
+        _logger.Info(CultureInfo.InvariantCulture, "Grid built. Rows={0}, Cols={1}, Pads={2}.", grid.Rows, grid.Cols, grid.Pads.Count);
         if (!_gridStartup.InitialGridBuiltMarked && _cad is null)
         {
             StartupPerfTracker.Mark("workspace.initial-grid-built", $"pads={grid.Pads.Count}");

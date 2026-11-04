@@ -12,8 +12,8 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class ShellViewModelCoordinateTests
 {
-    private static readonly string[] LayerL1 = ["L1"];
-    private static readonly string[] AaAndL1Layers = ["AA.drawing", "L1"];
+    private static readonly string[] _layerL1 = ["L1"];
+    private static readonly string[] _aaAndL1Layers = ["AA.drawing", "L1"];
 
     [Theory]
     [InlineData("coordinate")]
@@ -172,7 +172,7 @@ public sealed class ShellViewModelCoordinateTests
             new CoordinatePlannerWorkspaceSession(
                 BuildGrid(),
                 BuildCadPads(),
-                AaAndL1Layers,
+                _aaAndL1Layers,
                 sourceRevision,
                 DefaultMachineWidth: 2d,
                 DefaultMachineHeight: 1d,
@@ -199,7 +199,7 @@ public sealed class ShellViewModelCoordinateTests
         new CoordinatePlannerWorkspaceSession(
             BuildGrid(),
             BuildCadPads(),
-            LayerL1,
+            _layerL1,
             sourceRevision,
             DefaultMachineWidth: 2d,
             DefaultMachineHeight: 1d,

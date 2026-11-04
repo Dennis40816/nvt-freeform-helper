@@ -5,9 +5,9 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private static readonly TimeSpan ModalLoadingSpinnerMinVisibleDuration = TimeSpan.FromMilliseconds(120);
+    private static readonly TimeSpan _modalLoadingSpinnerMinVisibleDuration = TimeSpan.FromMilliseconds(120);
     private readonly LoadingScopeCoordinator _modalLoadingSpinnerScope =
-        new(YieldCadLoadCanvasOverlayFrameAsync, ModalLoadingSpinnerMinVisibleDuration);
+        new(YieldCadLoadCanvasOverlayFrameAsync, _modalLoadingSpinnerMinVisibleDuration);
 
     internal async Task RunWithModalLoadingSpinnerAsync(Func<Task> action)
     {

@@ -101,7 +101,7 @@ public sealed partial class FreeformHelperViewModel
                 path);
 
             SetStatus($"DXF image exported ({request.Value.Format}, layer={request.Value.LayerName}, pads={layerPads.Count}).");
-            Logger.Info(CultureInfo.InvariantCulture, "DXF layer image exported to {0}. layer={1}, pads={2}, size={3}x{4}, lineWidth={5}, paddingX={6}, paddingY={7}, format={8}, dark={9}.",
+            _logger.Info(CultureInfo.InvariantCulture, "DXF layer image exported to {0}. layer={1}, pads={2}, size={3}x{4}, lineWidth={5}, paddingX={6}, paddingY={7}, format={8}, dark={9}.",
                 path,
                 request.Value.LayerName,
                 layerPads.Count,
@@ -116,7 +116,7 @@ public sealed partial class FreeformHelperViewModel
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Export DXF image failed", ex);
-            Logger.Error(ex, "Export DXF image failed.");
+            _logger.Error(ex, "Export DXF image failed.");
         }
     }
 
@@ -158,12 +158,12 @@ public sealed partial class FreeformHelperViewModel
             var text = Services.DxfExportService.ExportAscii(pads);
             File.WriteAllText(path, text);
             SetStatus($"DXF exported ({(visibleOnly ? "visible" : "all")}). Pads={pads.Count}.");
-            Logger.Info(CultureInfo.InvariantCulture, "DXF exported to {0} (mode={1}, pads={2}).", path, visibleOnly ? "visible" : "all", pads.Count);
+            _logger.Info(CultureInfo.InvariantCulture, "DXF exported to {0} (mode={1}, pads={2}).", path, visibleOnly ? "visible" : "all", pads.Count);
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Export DXF failed", ex);
-            Logger.Error(ex, "Export DXF failed.");
+            _logger.Error(ex, "Export DXF failed.");
         }
     }
 
@@ -203,7 +203,7 @@ public sealed partial class FreeformHelperViewModel
 
         if (appended > 0)
         {
-            Logger.Info(CultureInfo.InvariantCulture, "DXF visible export appended regular source layer pads: layer={0}, appended={1}, total={2}.",
+            _logger.Info(CultureInfo.InvariantCulture, "DXF visible export appended regular source layer pads: layer={0}, appended={1}, total={2}.",
                 regularLayerName,
                 appended,
                 pads.Count);

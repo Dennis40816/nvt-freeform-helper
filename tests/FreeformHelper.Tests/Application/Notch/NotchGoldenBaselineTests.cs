@@ -12,7 +12,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class NotchGoldenBaselineTests
 {
-    private static readonly JsonSerializerOptions BaselineJsonOptions = new()
+    private static readonly JsonSerializerOptions _baselineJsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true,
@@ -32,8 +32,8 @@ public sealed class NotchGoldenBaselineTests
                 await BuildActualBaselineAsync(projectBaseline.ProjectRelativePath));
         }
 
-        var expectedJson = JsonSerializer.Serialize(expected, BaselineJsonOptions);
-        var actualJson = JsonSerializer.Serialize(actual, BaselineJsonOptions);
+        var expectedJson = JsonSerializer.Serialize(expected, _baselineJsonOptions);
+        var actualJson = JsonSerializer.Serialize(actual, _baselineJsonOptions);
         if (string.Equals(Environment.GetEnvironmentVariable("FREEFORMHELPER_UPDATE_NOTCH_BASELINE"), "1", StringComparison.Ordinal))
         {
             File.WriteAllText(baselinePath, actualJson);
@@ -178,7 +178,7 @@ public sealed class NotchGoldenBaselineTests
         Assert.True(File.Exists(baselinePath), "The golden baseline file is missing.");
 
         using var stream = File.OpenRead(baselinePath);
-        var baseline = JsonSerializer.Deserialize<NotchGoldenBaselineDocument>(stream, BaselineJsonOptions);
+        var baseline = JsonSerializer.Deserialize<NotchGoldenBaselineDocument>(stream, _baselineJsonOptions);
         Assert.NotNull(baseline);
         Assert.NotEmpty(baseline!.Projects);
         return baseline;

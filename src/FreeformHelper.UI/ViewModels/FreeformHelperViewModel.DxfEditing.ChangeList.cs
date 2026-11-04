@@ -333,7 +333,7 @@ public sealed partial class FreeformHelperViewModel
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
         SetStatus($"DXF edit: restored CAD {cadPadId} to layer '{baselinePad.Layer}'.");
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "DXF layer restore applied. cadId={0}, layer={1}.",
             cadPadId,

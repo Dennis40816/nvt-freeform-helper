@@ -32,7 +32,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     internal BackgroundWorkRunnerSlot BackgroundWork { get; } = new();
 
     // Logger instance for recording events and debugging information.
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     /// <summary>
     /// Gets or sets the <see cref="ICanvasHost"/> reference, allowing the ViewModel
@@ -271,7 +271,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _projectPersistenceUseCase = new ProjectPersistenceUseCase(_projectStore);
         _padEditUseCase = new PadEditUseCase(_manualSizingService);
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
-        Logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
+        _logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
         StartupPerfTracker.Mark("workspace.vm-ctor-complete");
     }
 

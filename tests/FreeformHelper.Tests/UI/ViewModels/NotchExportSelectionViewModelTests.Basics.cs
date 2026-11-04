@@ -8,8 +8,8 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class NotchExportSelectionViewModelTests
 {
-    private static readonly int[] CadPadIds4823And4848 = [4823, 4848];
-    private static readonly int[] CadPadIds3660 = [3660];
+    private static readonly int[] _cadPadIds4823And4848 = [4823, 4848];
+    private static readonly int[] _cadPadIds3660 = [3660];
 
     [Fact]
     public void Collections_ExposeReadOnlyFacade()
@@ -288,12 +288,12 @@ public sealed partial class NotchExportSelectionViewModelTests
                     IcIndex: 0,
                     SourceDiffIndex: 323,
                     TargetDiffIndex: 325,
-                    CadPadIds: CadPadIds4823And4848),
+                    CadPadIds: _cadPadIds4823And4848),
                 new NotchToFullCoverageGap(
                     IcIndex: 0,
                     SourceDiffIndex: 396,
                     TargetDiffIndex: 397,
-                    CadPadIds: CadPadIds3660),
+                    CadPadIds: _cadPadIds3660),
             });
         var table = new NotchTable(BuildSampleTable().Rows, audit);
         var vm = new NotchExportSelectionViewModel(table);

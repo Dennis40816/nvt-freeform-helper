@@ -100,7 +100,7 @@ public sealed partial class FreeformHelperViewModel
         NotifySimulationWorkspaceSourceChanged();
         MarkUnsaved();
         SetStatus(plan.Message);
-        Logger.Info(
+        _logger.Info(
             CultureInfo.InvariantCulture,
             "Diff idx batch shift applied. selected={0}, delta={1}, missing={2}.",
             plan.ShiftedDiffByCadId.Count,

@@ -11,7 +11,7 @@ namespace FreeformHelper.Tests;
 public sealed class SimulationWorkspaceUseCaseTests
 {
     private const int NullDiffValue = 65535;
-    private static readonly int[] SimulationDiffIndices = { 10, 11 };
+    private static readonly int[] _simulationDiffIndices = { 10, 11 };
 
     [Fact]
     public void BuildScenarioSnapshot_WhenSourcesVary_UsesSingleResultAndAuditModel()
@@ -100,7 +100,7 @@ public sealed class SimulationWorkspaceUseCaseTests
     [Fact]
     public void BuildScenarioSnapshot_PropagatesLegacyCompatibilityModeToTheSharedFirmwareProjection()
     {
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
         var table = new NotchTable(new[]
         {
             new NotchTableRow(
@@ -139,7 +139,7 @@ public sealed class SimulationWorkspaceUseCaseTests
     private static SimulationWorkspaceSession BuildSession()
     {
         var grid = TestGeometryFactory.CreateLinearRegularGrid(
-            SimulationDiffIndices,
+            _simulationDiffIndices,
             icIndexSelector: static col => col);
         var table = new NotchTable(new[]
         {

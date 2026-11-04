@@ -38,13 +38,13 @@ public sealed partial class FreeformHelperViewModel
                     Summary = "Diagnostics: running...",
                 };
                 SetStatus("Running mapping diagnostics...");
-                Logger.Info(CultureInfo.InvariantCulture, "Analyzing DXF/Regular mapping (cadVisible={0}, regular={1}).", cadVisible.Pads.Count, grid.Pads.Count);
+                _logger.Info(CultureInfo.InvariantCulture, "Analyzing DXF/Regular mapping (cadVisible={0}, regular={1}).", cadVisible.Pads.Count, grid.Pads.Count);
             },
             operationAsync: AnalyzeMappingAsync,
             onError: ex =>
             {
                 SetStatusError("Mapping analyze failed", ex);
-                Logger.Error(ex, "Mapping analyze failed.");
+                _logger.Error(ex, "Mapping analyze failed.");
             });
         async Task AnalyzeMappingAsync(Action<double> reportProgress)
         {
@@ -92,15 +92,15 @@ public sealed partial class FreeformHelperViewModel
 
             if (res.Report.HasIssues)
             {
-                Logger.Warn(CultureInfo.InvariantCulture, "DXF/Regular mapping warnings: {0}", res.Report.Summary);
+                _logger.Warn(CultureInfo.InvariantCulture, "DXF/Regular mapping warnings: {0}", res.Report.Summary);
                 foreach (var issue in res.Report.SampleIssues.Take(10))
                 {
-                    Logger.Warn(CultureInfo.InvariantCulture, "Mapping issue: {0}", issue.Message);
+                    _logger.Warn(CultureInfo.InvariantCulture, "Mapping issue: {0}", issue.Message);
                 }
             }
             else
             {
-                Logger.Info(CultureInfo.InvariantCulture, "DXF/Regular mapping OK: {0}", res.Report.Summary);
+                _logger.Info(CultureInfo.InvariantCulture, "DXF/Regular mapping OK: {0}", res.Report.Summary);
             }
 
             OnWorkflowStepCompleted(
@@ -151,7 +151,7 @@ public sealed partial class FreeformHelperViewModel
         InvalidateDownstreamFromStep4(showStatus: false);
         MarkUnsaved();
         SetStatus($"Mapping override saved: CAD {cadId} -> regular id {regularIndex}.");
-        Logger.Info(CultureInfo.InvariantCulture, "Mapping override saved: CAD {0} -> regular id {1}.", cadId, regularIndex);
+        _logger.Info(CultureInfo.InvariantCulture, "Mapping override saved: CAD {0} -> regular id {1}.", cadId, regularIndex);
         return true;
     }
 
@@ -166,7 +166,7 @@ public sealed partial class FreeformHelperViewModel
         InvalidateDownstreamFromStep4(showStatus: false);
         MarkUnsaved();
         SetStatus($"Mapping override cleared: CAD {cadId}.");
-        Logger.Info(CultureInfo.InvariantCulture, "Mapping override cleared for CAD {0}.", cadId);
+        _logger.Info(CultureInfo.InvariantCulture, "Mapping override cleared for CAD {0}.", cadId);
         return true;
     }
 
@@ -179,7 +179,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         SetCadOutputFwDiffIndexOverride(cadId, diffIndex);
-        Logger.Info(CultureInfo.InvariantCulture, "Diff repair override applied: CAD {0} -> diff {1}.", cadId, diffIndex);
+        _logger.Info(CultureInfo.InvariantCulture, "Diff repair override applied: CAD {0} -> diff {1}.", cadId, diffIndex);
         return true;
     }
 

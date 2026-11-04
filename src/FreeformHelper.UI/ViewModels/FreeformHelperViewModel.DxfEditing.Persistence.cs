@@ -207,7 +207,7 @@ public sealed partial class FreeformHelperViewModel
                 .ToList();
             if (distinctSourceCadIds.Any(sourceCadId => !currentPadIds.Contains(sourceCadId)))
             {
-                Logger.Warn(
+                _logger.Warn(
                     CultureInfo.InvariantCulture,
                     "DXF edit replay skipped combined group {0}: source pad missing in baseline.",
                     persistedGroup.GroupId);
@@ -225,7 +225,7 @@ public sealed partial class FreeformHelperViewModel
                 }
                 catch (ArgumentException ex)
                 {
-                    Logger.Warn(
+                    _logger.Warn(
                         ex,
                         "DXF edit replay skipped combined group {0}: output pad snapshot invalid.",
                         persistedGroup.GroupId);
@@ -235,7 +235,7 @@ public sealed partial class FreeformHelperViewModel
 
                 if (!currentPadIds.Add(outputPad.Id))
                 {
-                    Logger.Warn(
+                    _logger.Warn(
                         CultureInfo.InvariantCulture,
                         "DXF edit replay skipped combined group {0}: output pad id {1} conflicts.",
                         persistedGroup.GroupId,

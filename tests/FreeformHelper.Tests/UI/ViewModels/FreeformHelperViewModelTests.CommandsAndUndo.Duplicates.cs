@@ -32,7 +32,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         cadField!.SetValue(vm, new CadPadSet(source));
         resetBaselineMethod!.Invoke(vm, new object?[] { new CadPadSet(source) });
-        await SelectCadPadsAsync(vm, PairCadSelection);
+        await SelectCadPadsAsync(vm, _pairCadSelection);
         vm.CombineSelectedCadPadsCommand.Execute(null);
         Assert.True(vm.HasCombinedCadPads);
 

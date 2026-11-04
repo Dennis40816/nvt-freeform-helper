@@ -14,7 +14,7 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 public sealed partial class ShellViewModel : ObservableObject, IDisposable
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private ConsoleSession? _console;
 
     // Tests pass their own probe to hold a workspace build back.

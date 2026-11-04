@@ -336,7 +336,7 @@ public sealed partial class PadCanvas
 
         _pendingSingleHit = hit;
         _pendingSelectionVersion = _selectionVersion; // Capture current selection version.
-        _pendingSingleTimer = new DispatcherTimer { Interval = PendingSingleSelectionDelay };
+        _pendingSingleTimer = new DispatcherTimer { Interval = _pendingSingleSelectionDelay };
         _pendingSingleTimer.Tick += (_, _) =>
         {
             _pendingSingleTimer?.Stop();

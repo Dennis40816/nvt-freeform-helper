@@ -12,7 +12,7 @@ public sealed partial class LoadingSpinner : UserControl
     private const double FlowOffsetStep = 0.45d;
     private const double FlowUnitsPerSecond = 27d;
     private const double FlowPatternLength = 23d;
-    private static readonly TimeSpan TickInterval = TimeSpan.FromMilliseconds(16);
+    private static readonly TimeSpan _tickInterval = TimeSpan.FromMilliseconds(16);
     public static readonly StyledProperty<bool> IsAnimationActiveProperty =
         AvaloniaProperty.Register<LoadingSpinner, bool>(nameof(IsAnimationActive), true);
 
@@ -33,7 +33,7 @@ public sealed partial class LoadingSpinner : UserControl
     {
         InitializeComponent();
 
-        _timer = new DispatcherTimer { Interval = TickInterval };
+        _timer = new DispatcherTimer { Interval = _tickInterval };
         _timer.Tick += OnTick;
 
         _flowEllipse = this.FindControl<Ellipse>("SpinnerFlow");

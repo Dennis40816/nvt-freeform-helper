@@ -9,7 +9,7 @@ namespace FreeformHelper.Tests;
 public sealed class SimulationHostViewModelTests
 {
     private const int NullDiffValue = 65535;
-    private static readonly int[] SimulationDiffIndices = { 10, 11 };
+    private static readonly int[] _simulationDiffIndices = { 10, 11 };
 
     [Fact]
     public async Task PrewarmWorkspaceAsync_WhenWorkspaceIsStaleAndPristine_InvokesRequest()
@@ -119,7 +119,7 @@ public sealed class SimulationHostViewModelTests
 
     private static SimulationWorkspaceViewModel BuildWorkspace(int sourceRevision)
     {
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
         return new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
             new SimulationWorkspaceSession(

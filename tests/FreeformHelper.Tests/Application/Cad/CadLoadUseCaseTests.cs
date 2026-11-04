@@ -18,7 +18,7 @@ public sealed class CadLoadUseCaseTests
         {
             File.WriteAllText(brokenPath, BrokenDxfContent, Encoding.UTF8);
 
-            var outcome = useCase.TryLoadFromProject(brokenPath, ValidEmbeddedDxfBytes, options);
+            var outcome = useCase.TryLoadFromProject(brokenPath, _validEmbeddedDxfBytes, options);
 
             Assert.NotNull(outcome);
             Assert.Equal(CadLoadSource.Embedded, outcome!.Source);
@@ -149,7 +149,7 @@ public sealed class CadLoadUseCaseTests
         Assert.Contains(2, outcome.Cad.Pads.Select(static pad => pad.Id));
     }
 
-    private static readonly byte[] ValidEmbeddedDxfBytes = Encoding.UTF8.GetBytes(
+    private static readonly byte[] _validEmbeddedDxfBytes = Encoding.UTF8.GetBytes(
         """
         0
         SECTION

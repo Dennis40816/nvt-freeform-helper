@@ -9,13 +9,13 @@ namespace FreeformHelper.Tests;
 public sealed class NotchApplySimulationReviewUseCaseTests
 {
     private const int NullDiffValue = 65535;
-    private static readonly int[] SimulationDiffIndices = { 10, 11 };
-    private static readonly int[] V21LegacyValues = { 10, 127, 94, 11, 1, 56, NullDiffValue, 0, 0 };
+    private static readonly int[] _simulationDiffIndices = { 10, 11 };
+    private static readonly int[] _v21LegacyValues = { 10, 127, 94, 11, 1, 56, NullDiffValue, 0, 0 };
 
     [Fact]
     public void BuildSnapshot_WhenV22RowsImported_UsesSharedSimulationPath()
     {
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
         var csvPath = TestFiles.WriteTempCsv(
             """
             LogVer:"1.0",Xch:"2",Ych:"1",
@@ -62,7 +62,7 @@ public sealed class NotchApplySimulationReviewUseCaseTests
     [Fact]
     public void BuildSnapshot_WhenV21RowsImported_UsesSharedProjectedCanonicalPath()
     {
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
         var csvPath = TestFiles.WriteTempCsv(
             """
             LogVer:"1.0",Xch:"2",Ych:"1",
@@ -77,7 +77,7 @@ public sealed class NotchApplySimulationReviewUseCaseTests
                 diffIndex: 10,
                 regularPadIndex: 0,
                 cadPadId: 313,
-                values: V21LegacyValues,
+                values: _v21LegacyValues,
                 comment: "legacy")
         });
         var useCase = new NotchApplySimulationReviewUseCase();

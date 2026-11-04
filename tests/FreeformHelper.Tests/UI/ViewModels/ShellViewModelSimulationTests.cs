@@ -10,7 +10,7 @@ namespace FreeformHelper.Tests;
 public sealed class ShellViewModelSimulationTests
 {
     private const int NullDiffValue = 65535;
-    private static readonly int[] SimulationDiffIndices = { 10, 11 };
+    private static readonly int[] _simulationDiffIndices = { 10, 11 };
 
     [Fact]
     public async Task ShowSimulationCommand_ActivatesSimulationPlaceholderPage_WhenWorkspaceCannotBeBuilt()
@@ -211,7 +211,7 @@ public sealed class ShellViewModelSimulationTests
     public async Task WorkspaceSourceChanges_RebuildsStaleSimulationWorkspace_WhenWorkspaceIsPristine()
     {
         using var shell = new ShellViewModel { IsDevPageAvailable = true };
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
         var initialWorkspace = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
             new SimulationWorkspaceSession(
@@ -226,7 +226,7 @@ public sealed class ShellViewModelSimulationTests
         shell.Simulation.RequestPrewarmWorkspaceAsync = () =>
         {
             prewarmCount++;
-            var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+            var grid = TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
             shell.Simulation.CurrentWorkspace = new SimulationWorkspaceViewModel(
                 new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
                 new SimulationWorkspaceSession(
@@ -249,7 +249,7 @@ public sealed class ShellViewModelSimulationTests
     public async Task WorkspaceSourceChanges_BurstOnlyPrewarmsOnce()
     {
         using var shell = new ShellViewModel { IsDevPageAvailable = true };
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
         shell.Simulation.CurrentWorkspace = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
             new SimulationWorkspaceSession(
@@ -365,7 +365,7 @@ public sealed class ShellViewModelSimulationTests
 
     private static SimulationWorkspaceViewModel CreateWorkspace(int sourceRevision)
     {
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(SimulationDiffIndices);
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
         return new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
             new SimulationWorkspaceSession(

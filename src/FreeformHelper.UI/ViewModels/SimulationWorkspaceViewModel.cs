@@ -84,13 +84,13 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     private const double DefaultFingerPeakValue = 360d;
     private const double DefaultCopperBaselineValue = 0d;
     private const int DefaultPlaybackFramesPerSecond = 6;
-    private static readonly IReadOnlyList<SimulationInputSourceOption> SharedInputSourceOptions =
+    private static readonly IReadOnlyList<SimulationInputSourceOption> _sharedInputSourceOptions =
     [
         new SimulationInputSourceOption(SimulationInputSourceMode.Manual, "Manual"),
         new SimulationInputSourceOption(SimulationInputSourceMode.Csv, "CSV"),
         new SimulationInputSourceOption(SimulationInputSourceMode.Copper, "Copper"),
     ];
-    private static readonly IReadOnlyList<SimulationContactModelOption> SharedCopperContactModelOptions =
+    private static readonly IReadOnlyList<SimulationContactModelOption> _sharedCopperContactModelOptions =
     [
         new(
             SimulationContactModelMode.GroundedCopper,
@@ -104,7 +104,7 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
             "Finger press: same CAD overlap model, lower full-contact signal than grounded copper."),
     ];
 
-    private static readonly NotchApplySimulationCanvasViewOption[] SharedCanvasViewOptions =
+    private static readonly NotchApplySimulationCanvasViewOption[] _sharedCanvasViewOptions =
     {
         new(NotchApplySimulationCanvasViewMode.Before, "Before"),
         new(NotchApplySimulationCanvasViewMode.After, "After"),
@@ -112,7 +112,7 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         new(NotchApplySimulationCanvasViewMode.ChangedOnly, "Changed only"),
     };
 
-    private static readonly NotchApplySimulationCanvasColorOption[] SharedCanvasColorOptions =
+    private static readonly NotchApplySimulationCanvasColorOption[] _sharedCanvasColorOptions =
     {
         new(NotchApplySimulationCanvasColorMode.Auto, "AUTO"),
         new(NotchApplySimulationCanvasColorMode.Threshold, "TH"),
@@ -175,10 +175,10 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         _highlightFreeform = _session.DefaultHighlightFreeform;
         _highlightUnmatched = _session.DefaultHighlightUnmatched;
 
-        SourceOptions = SharedInputSourceOptions;
-        CopperContactModelOptions = SharedCopperContactModelOptions;
-        CanvasViewOptions = SharedCanvasViewOptions;
-        CanvasColorOptions = SharedCanvasColorOptions;
+        SourceOptions = _sharedInputSourceOptions;
+        CopperContactModelOptions = _sharedCopperContactModelOptions;
+        CanvasViewOptions = _sharedCanvasViewOptions;
+        CanvasColorOptions = _sharedCanvasColorOptions;
         VersionOptions = BuildVersionOptions(_session.Table);
         AreaOptions = BuildAreaOptions(_session.FwDiffGrid.Pads);
         CsvFiles = new ReadOnlyObservableCollection<NotchApplySimulationSourceFileItemViewModel>(_csvFiles);
@@ -217,8 +217,8 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         _selectedInputSourceOption = SourceOptions[0];
         _selectedCopperContactModelOption = CopperContactModelOptions[0];
         _selectedVersionOption = VersionOptions[0];
-        _selectedCanvasViewOption = SharedCanvasViewOptions[0];
-        _selectedCanvasColorOption = SharedCanvasColorOptions[0];
+        _selectedCanvasViewOption = _sharedCanvasViewOptions[0];
+        _selectedCanvasColorOption = _sharedCanvasColorOptions[0];
         _selectedAreaOption = AreaOptions[0];
         _colorThresholdValue = DefaultThresholdValue;
         _globalValue = DefaultGlobalValue;

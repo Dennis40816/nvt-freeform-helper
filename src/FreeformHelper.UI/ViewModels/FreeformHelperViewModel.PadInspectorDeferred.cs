@@ -248,7 +248,7 @@ public sealed partial class FreeformHelperViewModel
                 }
 
                 PadInspectorUi.Snapshot = snapshot;
-                Logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: CAD={0}, elapsed={1}ms (delay={2}ms).",
+                _logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: CAD={0}, elapsed={1}ms (delay={2}ms).",
                     request.CadPad.Id,
                     sw.ElapsedMilliseconds,
                     PadInspectorDeferredRefreshDelayMs);
@@ -260,7 +260,7 @@ public sealed partial class FreeformHelperViewModel
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
-            Logger.Warn(
+            _logger.Warn(
                 ex,
                 "Pad inspector deferred refresh failed: CAD={0}.",
                 cadPadId);
@@ -314,7 +314,7 @@ public sealed partial class FreeformHelperViewModel
                 }
 
                 PadInspectorUi.Snapshot = snapshot;
-                Logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: REG={0}, elapsed={1}ms (delay={2}ms).",
+                _logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: REG={0}, elapsed={1}ms (delay={2}ms).",
                     regularPadId,
                     sw.ElapsedMilliseconds,
                     RegularPadInspectorDeferredRefreshDelayMs);
@@ -326,7 +326,7 @@ public sealed partial class FreeformHelperViewModel
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
-            Logger.Warn(
+            _logger.Warn(
                 ex,
                 "Pad inspector deferred refresh failed: REG={0}.",
                 regularPadId);

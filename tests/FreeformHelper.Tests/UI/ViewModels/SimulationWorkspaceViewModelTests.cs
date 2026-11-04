@@ -13,8 +13,8 @@ namespace FreeformHelper.Tests;
 public sealed class SimulationWorkspaceViewModelTests
 {
     private const int NullDiffValue = 65535;
-    private static readonly int[] SimulationDiffIndices = { 10, 11 };
-    private static readonly int[] DuplicateDiffIndices = { 10, 10 };
+    private static readonly int[] _simulationDiffIndices = { 10, 11 };
+    private static readonly int[] _duplicateDiffIndices = { 10, 10 };
 
     [Fact]
     public async Task Constructor_OffUiThread_DoesNotCreateDispatcherTimer()
@@ -658,7 +658,7 @@ public sealed class SimulationWorkspaceViewModelTests
     private static SimulationWorkspaceSession BuildSession()
     {
         var grid = TestGeometryFactory.CreateLinearRegularGrid(
-            SimulationDiffIndices,
+            _simulationDiffIndices,
             icIndexSelector: static col => col);
         var table = new NotchTable(new[]
         {
@@ -696,7 +696,7 @@ public sealed class SimulationWorkspaceViewModelTests
 
     private static SimulationWorkspaceSession BuildSessionWithDuplicateDiff()
     {
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(DuplicateDiffIndices);
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_duplicateDiffIndices);
         var table = new NotchTable(new[]
         {
             new NotchTableRow(
@@ -718,7 +718,7 @@ public sealed class SimulationWorkspaceViewModelTests
 
     private static SimulationWorkspaceSession BuildSessionWithDuplicateDiffDeltaMismatch()
     {
-        var grid = TestGeometryFactory.CreateLinearRegularGrid(DuplicateDiffIndices);
+        var grid = TestGeometryFactory.CreateLinearRegularGrid(_duplicateDiffIndices);
         var table = new NotchTable(new[]
         {
             new NotchTableRow(

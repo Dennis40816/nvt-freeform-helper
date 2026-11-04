@@ -37,7 +37,7 @@ public sealed partial class FreeformHelperViewModel
             CanvasHost);
 
         SetStatus($"Area bucket selected: {bucketIds.Count} pads.");
-        Logger.Debug(CultureInfo.InvariantCulture, "Area bucket selected from CAD {0} (count={1}).", anchorCadPadId, bucketIds.Count);
+        _logger.Debug(CultureInfo.InvariantCulture, "Area bucket selected from CAD {0} (count={1}).", anchorCadPadId, bucketIds.Count);
     }
 }
 
