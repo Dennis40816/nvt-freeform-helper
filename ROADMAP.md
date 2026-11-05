@@ -180,6 +180,8 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
   - Update the CI deploy key `TESTDATA_DEPLOY_KEY` and the data checks in `scripts/tests/assert-example-data.ps1`.
   - Never copy the data into this repository, a PR, an issue or a log.
 - [x] **DOC-TR Translate the remaining Chinese documents** · Target: - · Status: Done (the screen `HowToUseView.axaml` is tracked separately) · PR: [#30](https://github.com/Dennis40816/nvt-freeform-helper/pull/30) (first batch), [#57](https://github.com/Dennis40816/nvt-freeform-helper/pull/57)
+- [ ] **PERF-CANVAS PadCanvas and grid-build hot-path fixes from the 2026-11-05 performance review** · Target: - · Status: Not started · PR: -
+  - Findings, measured relative costs and the ranked fixes are in `docs/audits/perf-review.md`. First slice: cache `Polygon2.Bounds` (98 % of the managed allocation of a static frame). The `Category=Perf` tests give the before and after numbers.
 
 ### 2.6 UI text and redesign
 
