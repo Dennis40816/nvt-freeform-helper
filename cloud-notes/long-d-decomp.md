@@ -23,7 +23,7 @@ are 80 lines or fewer and sit in the same file (no new partial files).
 |---|---|---:|---:|---|
 | 1 | `CadLoadSpinnerProcessHost.SyncRequestedVisibilityStateAsync()` (Services/CadLoadSpinnerProcessHost.cs) | 182 | 79 | TryCaptureStateSyncSnapshot, IsStateSyncHideNeeded, SendStateSyncHideAndCheckShowRequested, AcquireStateSyncWarmupTask, TrySendStateSyncShow, TryReadRequestedVisibility, ReadLastShowSentUtc |
 | 2 | `RuntimeQueryUseCase.QueryExportNotchAsync` (Services/RuntimeQueryUseCase.Commands.Export.cs) | 124 | 60 | TryResolveNotchExportFormat, CaptureNotchExportTargetState, BuildNotchExportResult, record struct NotchExportTargetState |
-| 3 | `RuntimeQueryUseCase.QuerySimulationAsync` (Services/RuntimeQueryUseCase.Commands.Simulation.cs) | 132 | 54 | BuildSimulationRegularPayload, BuildSimulationWorkspacePayload |
+| 3 | `RuntimeQueryUseCase.QuerySimulationAsync` (Services/RuntimeQueryUseCase.Commands.Simulation.cs) | 132 | 54 | BuildSimulationRegularPayload, BuildSimulationWorkspacePayload (placed in RuntimeQueryUseCase.Commands.Export.cs, which is already on the servicesViewModels offender list, so the Simulation partial does not gain a ViewModels reference) |
 | 4 | `SettingsApplyPlanBuilder.Resolve` (Services/SettingsApplyPlanBuilder.cs) | 99 | 17 | TryResolveLayoutProperty, ResolveStepProperty |
 | 5 | `FreeformHelperViewModel.ExportDxfLayerImageAsync()` (DxfEditing.Export.cs) | 103 | 66 | TryCollectDxfLayerImageExportSource, WriteDxfLayerImage |
 | 6 | `FreeformHelperViewModel.AnalyzeIndexMappingAsync()` (IndexMapping.cs) | 102 | 72 | ApplyMappingDiagnosticsReport, CreateIndexMappingReportViewModel, LogMappingDiagnosticsReport |
@@ -85,7 +85,16 @@ No other ledger entry should change:
 - `dotnet build FreeformHelper.sln` (SDK 10.0.301, after
   `python scripts/fetch_core_packages.py`): 0 errors, no warning that is not
   also in the `main` build.
-- Tests: see the commit message for the filtered test run.
+- Tests (filtered to the touched areas: settings, settings window, project
+  load/save, notch export, simulation, runtime query, CAD load spinner, index
+  mapping, pad inspector and the Architecture ratchets): 913 passed, 32
+  skipped, 1 failed. The failure,
+  `FreeformHelperViewModelTests.ExportDxfVisibleCommand_WhenDxfRegularSourceLayerSelected_IncludesRegularLayerPads`,
+  expects CRLF in DXF output and fails the same way on `main` under Linux
+  (checked in a separate `main` worktree); `ExportDxfAsync` is not changed.
+- `tests/FreeformHelper.Tests/Architecture/debt-baseline.json`: only the
+  file:line keys of moved offender lines were updated (directClockReads,
+  fileWriteAllText, processStart). Counts are unchanged.
 - `eng/core-health/repo-health.ps1 -Mode Verify` was **not run**: `pwsh` is
   not available in this environment. Line counts above come from a script that
   measures the same declaration span; run Verify (and then `LowerBaseline`)
