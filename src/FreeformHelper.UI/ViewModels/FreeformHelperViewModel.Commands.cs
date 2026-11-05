@@ -237,7 +237,7 @@ public sealed partial class FreeformHelperViewModel
         ExportNotchCommand = CreateEditingAsyncCommand(ExportNotchAsync);
         ExportDxfVisibleCommand = CreateEditingAsyncCommand(ExportVisibleDxfAsync);
         ExportDxfAllCommand = CreateEditingAsyncCommand(ExportAllDxfAsync);
-        ExportDxfLayerImageCommand = CreateEditingAsyncCommand(ExportDxfLayerImageAsync);
+        ExportDxfLayerImageCommand = CreateEditingAsyncCommand(ExportLayerImageAsync);
         ShowNotchDetailCommand = CreateEditingAsyncCommand(ShowNotchDetailAsync);
         ClearStep1ResultCommand = CreateEditingCommand(() => ClearWorkflowStep(WorkflowStepId.Step1Match));
         ClearStep2ResultCommand = CreateEditingCommand(() => ClearWorkflowStep(WorkflowStepId.Step2Freeform));
