@@ -26,7 +26,7 @@
     "suppressUndoAssignments": [],
     "fileWriteAllText": [
       "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:135",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:159",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:55",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs:114",
       "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs:195",
       "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs:264"
@@ -171,7 +171,6 @@
     "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml",
     "src/FreeformHelper.UI/Views/DevView.axaml",
     "src/FreeformHelper.UI/Views/DxfEditChangeListWindow.axaml",
-    "src/FreeformHelper.UI/Views/DxfLayerImageExportWindow.axaml",
     "src/FreeformHelper.UI/Views/DxfOverlapReportWindow.axaml",
     "src/FreeformHelper.UI/Views/FreeformHelperView.axaml",
     "src/FreeformHelper.UI/Views/IndexMappingReportWindow.axaml",

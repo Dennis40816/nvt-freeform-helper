@@ -25,18 +25,6 @@ public sealed partial class FreeformHelperViewModel
     // The layer name is the preferred layer. It may name a layer that the current DXF does not have.
     private DxfLayerImageExportRequest _dxfLayerImageExportPreferences = _defaultDxfLayerImageExportPreferences;
 
-    internal DxfLayerImageExportRequest BuildDxfLayerImageExportInitialRequest(IReadOnlyList<string> layerNames)
-    {
-        ArgumentNullException.ThrowIfNull(layerNames);
-        var preferences = _dxfLayerImageExportPreferences;
-        var layerName = layerNames.FirstOrDefault(name =>
-            string.Equals(name, preferences.LayerName, StringComparison.Ordinal))
-            ?? (layerNames.Count > 0 ? layerNames[0] : null)
-            ?? "0";
-
-        return NormalizeDxfLayerImageExportRequest(preferences with { LayerName = layerName });
-    }
-
     internal void RememberDxfLayerImageExportRequest(DxfLayerImageExportRequest request)
     {
         var normalized = NormalizeDxfLayerImageExportRequest(request);

@@ -58,7 +58,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get; set; }
     public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get; set; }
     public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get; set; }
-    public Func<IReadOnlyList<string>, Task<DxfLayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get; set; }
+    public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get; set; }
 
     // --- Application Services ---
     // Instances of various services responsible for business logic and data manipulation.

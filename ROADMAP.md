@@ -199,7 +199,7 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
 - [ ] **SETTINGS-STALE-DRAFT The settings window can write the settings of an earlier project into a later one** · Target: - · Status: Not started · PR: -
   - The settings window is not modal and its view model copies the settings when it opens. If another project is loaded while it stays open, saving it writes the old values into the new project. This was already true before AA-PIXELS. The pixel counts are guarded since the draft remembers its project.
   - Proposal from review: a project generation number. `ApplyLoadedProjectStateAsync` and `ResetAllSettingsToDefaults` raise it. `SettingsWindowViewModel` records it when it is created. A save with another number is refused with a message.
-- [ ] **EXPORT-IMG Export layer image: several layers on one sheet, with a live preview** · Target: - · Status: Waiting for owner (design draft) · PR: -
+- [ ] **EXPORT-IMG Export layer image: several layers on one sheet, with a live preview** · Target: - · Status: In progress: the design is approved (owner, 2026-11-05) and the code is on `feature/export/layer-image-modal`; AA-PIXELS has merged · PR: - (pending)
   - Replaces the single-layer dropdown window of Export DXF Layer Image. Layers are picked with check marks. The preview updates with every setting. One main action: Export.
   - Single-layer output stays byte-identical. The size can default to the AA pixel counts (AA-PIXELS) when they are set.
 - [ ] **UI-REDESIGN Redesign the whole NFH UI** · Target: - · Status: Waiting for owner (scope and timing) · PR: -
