@@ -72,10 +72,18 @@ internal static class NotchV22FirmwareProjector
         var values = row.Values ?? Array.Empty<int>();
         if (values.Length >= 7)
         {
+            var node = NotchV22Node.FromValues(values);
+            if (values.Length > 7)
+            {
+                // Nine-value rows from the legacy strategy keep a diff index or the null value at position 6,
+                // not a flags field. They keep the byte mask they always had.
+                node = node with { Flags = node.Flags & byte.MaxValue };
+            }
+
             return BuildProjectedRow(
                 row,
                 sourceOrdinal,
-                NotchV22Node.FromValues(values),
+                node,
                 nullValue,
                 NormalizeComment(row.Comment));
         }
@@ -120,7 +128,7 @@ internal static class NotchV22FirmwareProjector
             Math.Clamp(node.TargetRatioPercent1, -100, 100),
             node.TargetDiffIndex2 == nullValue ? null : node.TargetDiffIndex2,
             Math.Clamp(node.TargetRatioPercent2, -100, 100),
-            node.Flags & byte.MaxValue,
+            node.Flags,
             comment);
     }
 
