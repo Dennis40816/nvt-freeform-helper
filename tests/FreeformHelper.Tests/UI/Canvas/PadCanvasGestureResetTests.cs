@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -21,7 +20,7 @@ public sealed class PadCanvasGestureResetTests
         var window = CreateWindow(canvas);
         var captureLosses = 0;
         canvas.AddHandler(InputElement.PointerCaptureLostEvent, (_, _) => captureLosses++, handledEventsToo: true);
-        var selected = ReadField<HashSet<int>>(canvas, "_selectedCadIds");
+        var selected = PadCanvasPrivateAccess.SelectedCadIds(canvas);
         selected.Add(17);
         try
         {
@@ -32,23 +31,23 @@ public sealed class PadCanvasGestureResetTests
             for (var gesture = 1; gesture <= 2; gesture++)
             {
                 window.MouseDown(new Point(40, 40), MouseButton.Left);
-                Assert.True(ReadField<bool>(canvas, "_isSpacePanning"));
-                Assert.False(ReadField<bool>(canvas, "_isLeftPointerDown"));
+                Assert.True(PadCanvasPrivateAccess.IsSpacePanning(canvas));
+                Assert.False(PadCanvasPrivateAccess.IsLeftPointerDown(canvas));
                 window.MouseMove(new Point(60, 60));
                 Assert.Equal(new Vector(20 * gesture, 20 * gesture), canvas.GetViewFrameSnapshot().Pan);
-                Assert.False(ReadField<bool>(canvas, "_isBoxSelecting"));
+                Assert.False(PadCanvasPrivateAccess.IsBoxSelecting(canvas));
                 window.MouseUp(new Point(60, 60), MouseButton.Left);
-                Assert.False(ReadField<bool>(canvas, "_isSpacePanning"));
-                Assert.False(ReadField<bool>(canvas, "_isLeftPointerDown"));
-                Assert.False(ReadField<bool>(canvas, "_isBoxSelecting"));
+                Assert.False(PadCanvasPrivateAccess.IsSpacePanning(canvas));
+                Assert.False(PadCanvasPrivateAccess.IsLeftPointerDown(canvas));
+                Assert.False(PadCanvasPrivateAccess.IsBoxSelecting(canvas));
             }
 
             Assert.Equal(2, captureLosses);
             Assert.Single(selected);
             Assert.Contains(17, selected);
-            Assert.True(ReadField<bool>(canvas, "_isSpacePressed"));
+            Assert.True(PadCanvasPrivateAccess.IsSpacePressed(canvas));
             window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            Assert.False(ReadField<bool>(canvas, "_isSpacePressed"));
+            Assert.False(PadCanvasPrivateAccess.IsSpacePressed(canvas));
         }
         finally
         {
@@ -67,7 +66,7 @@ public sealed class PadCanvasGestureResetTests
         {
             window.Show();
             window.MouseDown(new Point(40, 40), MouseButton.Middle);
-            Assert.True(ReadField<bool>(canvas, "_isMiddlePanning"));
+            Assert.True(PadCanvasPrivateAccess.IsMiddlePanning(canvas));
             window.MouseMove(new Point(60, 60));
             var pan = canvas.GetViewFrameSnapshot().Pan;
             Assert.NotEqual(default, pan);
@@ -77,7 +76,7 @@ public sealed class PadCanvasGestureResetTests
             AssertGestureIsReset(canvas);
             window.MouseMove(new Point(100, 100));
             Assert.Equal(pan, canvas.GetViewFrameSnapshot().Pan);
-            Assert.False(ReadField<bool>(canvas, "_isBoxSelecting"));
+            Assert.False(PadCanvasPrivateAccess.IsBoxSelecting(canvas));
             window.MouseUp(new Point(100, 100), MouseButton.Middle);
         }
         finally
@@ -93,27 +92,27 @@ public sealed class PadCanvasGestureResetTests
         var window = CreateWindow(canvas);
         IPointer? pointer = null;
         canvas.AddHandler(InputElement.PointerPressedEvent, (_, e) => pointer = e.Pointer, handledEventsToo: true);
-        var selected = ReadField<HashSet<int>>(canvas, "_selectedCadIds");
+        var selected = PadCanvasPrivateAccess.SelectedCadIds(canvas);
         selected.Add(17);
         try
         {
             window.Show();
             window.MouseDown(new Point(40, 40), MouseButton.Left);
             window.MouseMove(new Point(80, 80));
-            Assert.True(ReadField<bool>(canvas, "_isBoxSelecting"));
+            Assert.True(PadCanvasPrivateAccess.IsBoxSelecting(canvas));
             await DrainUiQueueAsync();
-            Assert.False(ReadField<bool>(canvas, "_isViewRefreshQueued"));
+            Assert.False(PadCanvasPrivateAccess.IsViewRefreshQueued(canvas));
 
             Assert.NotNull(pointer);
             pointer.Capture(null);
             AssertGestureIsReset(canvas);
-            Assert.True(ReadField<bool>(canvas, "_isViewRefreshQueued"));
+            Assert.True(PadCanvasPrivateAccess.IsViewRefreshQueued(canvas));
             await DrainUiQueueAsync();
             var pan = canvas.GetViewFrameSnapshot().Pan;
             window.MouseMove(new Point(120, 120));
             window.MouseUp(new Point(120, 120), MouseButton.Left);
             Assert.Equal(pan, canvas.GetViewFrameSnapshot().Pan);
-            Assert.False(ReadField<bool>(canvas, "_isBoxSelecting"));
+            Assert.False(PadCanvasPrivateAccess.IsBoxSelecting(canvas));
             Assert.Single(selected);
             Assert.Contains(17, selected);
         }
@@ -141,7 +140,7 @@ public sealed class PadCanvasGestureResetTests
             Assert.True(canvas.Focus());
             window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
             window.MouseDown(new Point(40, 40), MouseButton.Left);
-            Assert.True(ReadField<bool>(canvas, "_isSpacePanning"));
+            Assert.True(PadCanvasPrivateAccess.IsSpacePanning(canvas));
             Assert.True(other.Focus());
             AssertGestureIsReset(canvas);
 
@@ -153,8 +152,8 @@ public sealed class PadCanvasGestureResetTests
             Assert.Null(pointer.Captured);
             Assert.True(canvas.Focus());
             window.MouseDown(new Point(140, 40), MouseButton.Left);
-            Assert.False(ReadField<bool>(canvas, "_isSpacePanning"));
-            Assert.True(ReadField<bool>(canvas, "_isLeftPointerDown"));
+            Assert.False(PadCanvasPrivateAccess.IsSpacePanning(canvas));
+            Assert.True(PadCanvasPrivateAccess.IsLeftPointerDown(canvas));
             window.MouseUp(new Point(140, 40), MouseButton.Left);
         }
         finally
@@ -167,20 +166,14 @@ public sealed class PadCanvasGestureResetTests
 
     private static void AssertGestureIsReset(PadCanvas canvas)
     {
-        foreach (var name in new[] { "_isMiddlePanning", "_isSpacePanning", "_isSpacePressed", "_isLeftPointerDown", "_isBoxSelecting" })
-        {
-            Assert.False(ReadField<bool>(canvas, name));
-        }
+        Assert.False(PadCanvasPrivateAccess.IsMiddlePanning(canvas));
+        Assert.False(PadCanvasPrivateAccess.IsSpacePanning(canvas));
+        Assert.False(PadCanvasPrivateAccess.IsSpacePressed(canvas));
+        Assert.False(PadCanvasPrivateAccess.IsLeftPointerDown(canvas));
+        Assert.False(PadCanvasPrivateAccess.IsBoxSelecting(canvas));
 
-        Assert.Equal(0, ReadField<long>(canvas, "_lastPanRedrawTicks"));
-        Assert.Equal(0, ReadField<long>(canvas, "_lastBoxSelectionRedrawTicks"));
-    }
-
-    private static T ReadField<T>(PadCanvas canvas, string name)
-    {
-        var field = typeof(PadCanvas).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return Assert.IsType<T>(field.GetValue(canvas));
+        Assert.Equal(0, PadCanvasPrivateAccess.LastPanRedrawTicks(canvas));
+        Assert.Equal(0, PadCanvasPrivateAccess.LastBoxSelectionRedrawTicks(canvas));
     }
 
     private static async Task DrainUiQueueAsync()
