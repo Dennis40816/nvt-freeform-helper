@@ -87,7 +87,7 @@ No other ledger entry should change:
   also in the `main` build.
 - Tests (filtered to the touched areas: settings, settings window, project
   load/save, notch export, simulation, runtime query, CAD load spinner, index
-  mapping, pad inspector and the Architecture ratchets): 913 passed, 32
+  mapping, pad inspector and the Architecture ratchets): 914 passed, 32
   skipped, 1 failed. The failure,
   `FreeformHelperViewModelTests.ExportDxfVisibleCommand_WhenDxfRegularSourceLayerSelected_IncludesRegularLayerPads`,
   expects CRLF in DXF output and fails the same way on `main` under Linux
