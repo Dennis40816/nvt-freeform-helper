@@ -1,6 +1,6 @@
 # Settings 視窗數值欄位邊界調查（cloud/settings-bounds）
 
-狀態：**調查完成，測試檔尚未加入本分支**（見「未完成項目」）。本分支未修改任何 production 程式碼。
+狀態：調查完成；已加入 `tests/FreeformHelper.Tests/UI/ViewModels/SettingsWindowNumericBoundsTests.cs`（7 項測試，本地通過，Architecture 102 項仍全過）。本分支未修改任何 production 程式碼。
 
 ## 方法
 
@@ -105,12 +105,25 @@ CascadeNum 重建 grid 的耗時超線性成長（本環境 Debug 建置實測�
 ### C. 已知現況（既有測試已記錄）
 `SettingsWindowDraftSnapshotCharacterizationTests`（SETTINGS-D01）：Save 會把整份草稿寫回，覆蓋視窗開啟後的 live 修改。本次探針沒有碰到此問題（每次只改一個欄位且無 live 修改），但會影響「只改一個欄位」的測試設計。
 
-## 未完成項目
+## 已加入的測試與未完成項目
 
-- 尚未提交測試檔。探針資料已足以決定斷言：
-  1. 欄位表（Name、Min、Max、是否取整、是否強制 Min／Max）加一個「Settings 草稿中所有 decimal 屬性都必須在表內或在例外清單」的反射守門測試。
-  2. 以 min／mid／max 做 Save → Reload round trip；範圍外值依表預期 clamp 或原樣（以特徵化測試釘住 B3／B4 的缺口，修正時需同步改表）。
-  3. 實際建立 `SettingsWindow`，用 `BindingOperations.GetBindingExpressionBase` 對照每個 `NumberScrubber` 的 Min／Max 與表一致；透過輸入框驅動空字串／非數字／`1e3`／小數／範圍外，確認值不變或被 clamp／snap，且草稿屬性等於 `Value`。
-  4. B1 以特徵化測試釘住（宣告 100、重新載入 50）。
-- 效能提醒：完整管線每筆約 0.8 s。31 欄 × 約 10 個探測值逐筆跑約 4 分鐘；正式測試應把整組欄位放進同一個草稿一次 Save／Reload（每組探測值一條管線），並避開 CascadeNum／通道數的大值。
-- 新測試必須避開專案禁用的 API：`Path.GetTempPath`、`BindingFlags.NonPublic`、`File.ReadAllTextAsync`，且 `catch (Exception)` 會觸發 CA1031（error）。可重用 `LoadingModeTestScope`（`SettingsLoadingRegionBehaviorTests.cs`）。
+已加入（`SettingsWindowNumericBoundsTests`）：
+
+- 反射守門：`SettingsWindowViewModel` 的所有 `decimal` 屬性必須在欄位表內，或在「未涵蓋」清單（CascadeNum、XChannels、YChannels、LenScale、CadOutputFwDiffIndexAnchorCadId）。新增數值欄位卻沒補邊界測試會失敗。
+- 以真正的草稿 VM → Settings Save → `SaveProjectAsync` → `LoadProjectFromPathAsync`，對 25 個欄位各做 min、中間值、max、min−一格、max＋一格的 round trip（每組一條管線，約 1–2 秒）。
+- 表中的 `MinEnforced`／`MaxEnforced` 旗標釘住 B3 的現況（模型不強制的那一側原樣通過）；`GridPaddingPercent` 的 `PersistedMax = 50` 釘住 B1。修正時要同步改旗標。
+- NullValue＝65536：專案存檔回傳 false，訊息含 `NullValue must be in [0,65535]`（B6）。
+
+尚未涵蓋（建議後續補）：
+
+1. 實際建立 `SettingsWindow`，用 `BindingOperations.GetBindingExpressionBase` 對照每個 `NumberScrubber` 的 Min／Max 與欄位表一致（探針已證實此 API 可用；隱藏 section 要先切換 `SelectedSection` 才會實體化；Cascade 視窗只實體化第一列 IC）。
+2. 透過輸入框驅動空字串、空白、非數字、`1e3`、小數、範圍外，確認值不變或被 clamp／snap，且草稿屬性等於 `Value`（行為見上方「控制項層的行為」，目前僅讀程式碼，未用測試驗證）。
+3. CascadeNum 與每顆 IC 通道數：只能用小值（32、64、2000）；邊界與負值、小數在探針中行為正確（草稿即 clamp／四捨五入、重新載入相同），但未寫成測試。
+4. 小數輸入整數欄位的 B4 不一致、B5 的 Q7 連動、B3 中「存檔後 owner 仍持有範圍外值」，只在本文記錄，沒有測試。
+5. ActiveAreaWidth／Height 的 ≤0 → 預設值（310）行為沒有測試（探針已驗證，測試中刻意排除）。
+
+注意事項：
+
+- 完整管線每筆約 0.8 s；逐欄逐值各跑一次約 4 分鐘。測試檔改為每組探測值一條管線。
+- 新測試要避開專案禁用的 API：`Path.GetTempPath`、`BindingFlags.NonPublic`、`File.ReadAllTextAsync`，且 `catch (Exception)` 會觸發 CA1031（error）。可重用 `LoadingModeTestScope`（`SettingsLoadingRegionBehaviorTests.cs`）。
+- 專案規定提交前跑 `./scripts/tests/lint.ps1 -UseNoAppHost`，本環境沒有 `pwsh`，未執行；只跑了 `dotnet test`（含 analyzer 編譯，新檔案零 warning）與 Architecture 測試。
