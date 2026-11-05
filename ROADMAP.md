@@ -202,9 +202,9 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
 - [ ] **SETTINGS-STALE-DRAFT The settings window can write the settings of an earlier project into a later one** · Target: - · Status: Fix in review on `fix/settings/stale-draft` · PR: - (pending)
   - The settings window is not modal and its view model copies the settings when it opens. If another project is loaded while it stays open, saving it writes the old values into the new project. This was already true before AA-PIXELS. The pixel counts are guarded since the draft remembers its project.
   - Fix: the draft records the project it was created for (`ActiveAreaPixels.ProjectIdentity`). `Save` on a draft of a replaced project is refused with a status message. A reload of the same file also replaces the project, so it is refused too.
-- [ ] **EXPORT-IMG Export layer image: several layers on one sheet, with a live preview** · Target: - · Status: Waiting for owner (design draft) · PR: -
+- [ ] **EXPORT-IMG Export layer image: several layers on one sheet, with a live preview** · Target: - · Status: In progress: the design is approved (owner, 2026-11-05) and the code is on `feature/export/layer-image-modal`; AA-PIXELS has merged · PR: [#262](https://github.com/Dennis40816/nvt-freeform-helper/pull/262)
   - Replaces the single-layer dropdown window of Export DXF Layer Image. Layers are picked with check marks. The preview updates with every setting. One main action: Export.
-  - Single-layer output stays byte-identical. The size can default to the AA pixel counts (AA-PIXELS) when they are set.
+  - Single-layer output keeps the same coordinates, colors and encoders (static comparison, no golden file yet). The size can default to the AA pixel counts (AA-PIXELS) when they are set.
 - [ ] **UI-REDESIGN Redesign the whole NFH UI** · Target: - · Status: Waiting for owner (scope and timing) · PR: -
   - Owner, 2026-10-18, on the right-panel text proposal: 「可以，但由於 NFH 是很久之前設計，理論上是整個都要大改」 ("Yes, but NFH was designed long ago, so in principle all of it needs a major redesign").
 
