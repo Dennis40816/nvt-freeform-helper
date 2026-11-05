@@ -1,0 +1,54 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+        x:Class="FreeformHelper.UI.Views.LayerImageExportSettingsDialog"
+        x:DataType="vm:LayerImageExportSettingsViewModel"
+        Width="{DynamicResource LayerImageExportSettingsWidth}"
+        Height="{DynamicResource LayerImageExportSettingsHeight}"
+        CanResize="False" WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushBgSurface}" Foreground="{DynamicResource BrushTextPrimary}"
+        FontFamily="{DynamicResource FontFamilyUi}" FontSize="{DynamicResource FontSizeMd}"
+        Title="Export settings">
+  <Window.Styles>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/LayerImageExport.axaml"/>
+  </Window.Styles>
+  <Window.KeyBindings>
+    <KeyBinding Gesture="Escape" Command="{Binding BackCommand}"/>
+  </Window.KeyBindings>
+  <Grid RowDefinitions="*,Auto">
+    <StackPanel Classes="panelForm" Spacing="{DynamicResource Space8}" Margin="{DynamicResource Inset16}">
+      <Grid ColumnDefinitions="Auto,*">
+        <TextBlock Text="Format" Classes="exportLabel"/>
+        <StackPanel Grid.Column="1" Classes="panelFormField">
+          <ComboBox x:Name="FormatComboBox" ItemsSource="{Binding FileSettings.FormatOptions}"
+                    SelectedValueBinding="{Binding Value, DataType=vm:LayerImageFileSettings+ImageFormatOption}"
+                    SelectedValue="{Binding FileSettings.Format, Mode=TwoWay}"
+                    Height="{DynamicResource NfcControlHeight}" AutomationProperties.Name="Format">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:LayerImageFileSettings+ImageFormatOption">
+                <TextBlock Text="{Binding Display}"/>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+      </Grid>
+      <Grid ColumnDefinitions="Auto,*">
+        <Border Width="{DynamicResource LayerImageExportLabelWidth}"/>
+        <CheckBox Grid.Column="1" x:Name="OneFilePerLayerCheckBox" Classes="exportCheck" Content="One file per layer"
+                  IsChecked="{Binding FileSettings.OneFilePerLayer, Mode=TwoWay}"/>
+      </Grid>
+      <TextBlock Text="{Binding SaveErrorText}" Classes="exportMuted" TextWrapping="Wrap"/>
+    </StackPanel>
+    <Border Grid.Row="1" BorderBrush="{DynamicResource BrushBorderMuted}" BorderThickness="{DynamicResource BorderTopThin}"
+            Padding="{DynamicResource Inset12_10}">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="{Binding FooterText}" Classes="exportMuted"/>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+          <Button Content="Back" Classes="actionGhost" Command="{Binding BackCommand}"/>
+          <Button x:Name="SaveButton" Content="Save…" Classes="actionPrimary" IsDefault="True" Command="{Binding SaveCommand}"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

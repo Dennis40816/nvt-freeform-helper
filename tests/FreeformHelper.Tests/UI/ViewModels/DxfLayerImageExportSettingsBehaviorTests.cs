@@ -1,8 +1,13 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
 using System.Text;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
+using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
+using FreeformHelper.UI.Views;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -10,105 +15,78 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class DxfLayerImageExportSettingsBehaviorTests
 {
-    private static readonly string[] _layers = ["L1", "L2"];
-
-    [Fact]
-    public void BuildDxfLayerImageExportInitialRequest_NewViewModel_ReturnsTheDefaultRequestForTheFirstLayer()
+    [Theory]
+    [InlineData("L2", 1)]
+    [InlineData("Gone", 2)]
+    public void PreferredLayerIsUsedWhenPresentOtherwiseAllLayersAreChecked(string preferred, int expectedCount)
     {
         var vm = new FreeformHelperViewModel();
+        vm.RememberDxfLayerImageExportRequest(CreateRequest(layerName: preferred));
 
-        var request = vm.BuildDxfLayerImageExportInitialRequest(_layers);
+        var context = CaptureContext(vm);
 
-        Assert.Equal(
-            new DxfLayerImageExportRequest("L1", 1024, 1024, 1m, 200, 200, DxfLayerImageFormat.Png, false),
-            request);
+        Assert.Equal(expectedCount, context.InitialCheckedLayers.Count);
+        Assert.Contains("L2", context.InitialCheckedLayers);
     }
 
     [Fact]
-    public void BuildDxfLayerImageExportInitialRequest_NoLayers_FallsBackToLayerZero()
+    public void ContextUsesProjectPixelsAndIgnoresRememberedPixelsAndPadding()
     {
-        var vm = new FreeformHelperViewModel();
+        var vm = new FreeformHelperViewModel { ActiveAreaPixelsX = 6480, ActiveAreaPixelsY = 848 };
+        vm.RememberDxfLayerImageExportRequest(new DxfLayerImageExportRequest("L2", 640, 480, 2.5m, 30, 40, DxfLayerImageFormat.Jpg, true));
 
-        var request = vm.BuildDxfLayerImageExportInitialRequest([]);
+        var context = CaptureContext(vm);
 
-        Assert.Equal("0", request.LayerName);
+        Assert.Equal(LayerImageSizeSource.Project, context.InitialSize.Source);
+        Assert.Equal(6480, context.InitialSize.PixelsX);
+        Assert.Equal(848, context.InitialSize.PixelsY);
+        Assert.Equal(0, context.InitialSize.PaddingX);
+        Assert.Equal(0, context.InitialSize.PaddingY);
+        Assert.Equal(2.5m, context.LineWidthPixels);
+        Assert.Equal(DxfLayerImageFormat.Jpg, context.Format);
+        Assert.True(context.UseDarkTheme);
     }
 
     [Fact]
-    public void BuildDxfLayerImageExportInitialRequest_NullLayers_Throws()
+    public void ContextGroupsPadsOrdinallyAndOmitsBlankLayerNames()
     {
         var vm = new FreeformHelperViewModel();
+        var pads = new List<CadPad>
+        {
+            LayerImageExportTestData.CreateSquareCad(1, "z", 0, 0, 10),
+            LayerImageExportTestData.CreateSquareCad(2, "A", 20, 0, 10),
+            LayerImageExportTestData.CreateSquareCad(3, "z", 40, 0, 10),
+            LayerImageExportTestData.CreateSquareCad(4, " ", 0, 0, 10),
+        };
 
-        Assert.Throws<ArgumentNullException>(() => vm.BuildDxfLayerImageExportInitialRequest(null!));
+        var context = vm.BuildLayerImageExportContext(pads, static (_, _) => Task.FromResult<string?>(null));
+
+        Assert.Equal(new List<string> { "A", "z" }, context.Entries.Select(entry => entry.Name));
+        Assert.Equal(2, context.Entries[1].PadCount);
+        Assert.Equal(4096, context.InitialSize.PixelsX);
+        Assert.Equal(819, context.InitialSize.PixelsY);
     }
 
     [Fact]
-    public void BuildDxfLayerImageExportInitialRequest_RememberedLayerIsListed_UsesTheRememberedLayer()
+    public void InitialSizeUsesOnlyTheCheckedLayerBounds()
     {
         var vm = new FreeformHelperViewModel();
         vm.RememberDxfLayerImageExportRequest(CreateRequest(layerName: "L2"));
+        var pads = new List<CadPad>
+        {
+            LayerImageExportTestData.CreateSquareCad(1, "L1", 0, 0, 10),
+            LayerImageExportTestData.CreateSquareCad(2, "L2", 20, 0, 10),
+        };
 
-        var request = vm.BuildDxfLayerImageExportInitialRequest(_layers);
+        var context = vm.BuildLayerImageExportContext(pads, static (_, _) => Task.FromResult<string?>(null));
 
-        Assert.Equal("L2", request.LayerName);
+        Assert.Equal(new List<string> { "L2" }, context.InitialCheckedLayers);
+        Assert.Equal(4096, context.InitialSize.PixelsX);
+        Assert.Equal(4096, context.InitialSize.PixelsY);
     }
 
     [Fact]
-    public void BuildDxfLayerImageExportInitialRequest_RememberedLayerIsNotListed_UsesTheFirstLayer()
-    {
-        var vm = new FreeformHelperViewModel();
-        vm.RememberDxfLayerImageExportRequest(CreateRequest(layerName: "Gone"));
-
-        var request = vm.BuildDxfLayerImageExportInitialRequest(_layers);
-
-        Assert.Equal("L1", request.LayerName);
-    }
-
-    [Fact]
-    public void RememberDxfLayerImageExportRequest_AllValuesChanged_ReturnsEveryValueFromTheInitialRequest()
-    {
-        var vm = new FreeformHelperViewModel();
-        var remembered = new DxfLayerImageExportRequest("L2", 640, 480, 2.5m, 30, 40, DxfLayerImageFormat.Jpg, true);
-
-        vm.RememberDxfLayerImageExportRequest(remembered);
-
-        Assert.Equal(remembered, vm.BuildDxfLayerImageExportInitialRequest(_layers));
-    }
-
-    [Fact]
-    public void RememberDxfLayerImageExportRequest_ValuesBelowTheRange_ClampsToTheMinimum()
-    {
-        var vm = new FreeformHelperViewModel();
-
-        vm.RememberDxfLayerImageExportRequest(
-            new DxfLayerImageExportRequest("L1", 1, -5, 0.01m, -1, -2, DxfLayerImageFormat.Png, false));
-
-        var request = vm.BuildDxfLayerImageExportInitialRequest(_layers);
-        Assert.Equal(2, request.WidthPixels);
-        Assert.Equal(2, request.HeightPixels);
-        Assert.Equal(0.1m, request.LineWidthPixels);
-        Assert.Equal(0, request.PaddingXPixels);
-        Assert.Equal(0, request.PaddingYPixels);
-    }
-
-    [Fact]
-    public void RememberDxfLayerImageExportRequest_ValuesAboveTheRange_ClampsToTheMaximum()
-    {
-        var vm = new FreeformHelperViewModel();
-
-        vm.RememberDxfLayerImageExportRequest(
-            new DxfLayerImageExportRequest("L1", 200_000, 100_001, 500m, 100_001, 999_999, DxfLayerImageFormat.Png, false));
-
-        var request = vm.BuildDxfLayerImageExportInitialRequest(_layers);
-        Assert.Equal(100_000, request.WidthPixels);
-        Assert.Equal(100_000, request.HeightPixels);
-        Assert.Equal(100m, request.LineWidthPixels);
-        Assert.Equal(100_000, request.PaddingXPixels);
-        Assert.Equal(100_000, request.PaddingYPixels);
-    }
-
-    [Fact]
-    public async Task RememberDxfLayerImageExportRequest_ChangedValue_MarksTheProjectUnsaved()
+    public async Task RememberChangedValueMarksTheProjectUnsavedAsync()
     {
         using var project = await ProjectFixture.LoadAsync();
         Assert.False(project.Vm.HasUnsavedChanges);
@@ -118,30 +96,20 @@ public sealed class DxfLayerImageExportSettingsBehaviorTests
         Assert.True(project.Vm.HasUnsavedChanges);
     }
 
-    [Fact]
-    public async Task RememberDxfLayerImageExportRequest_SameValues_KeepsTheProjectSaved()
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    public async Task RememberEquivalentValuesKeepsTheProjectSavedAsync(string? layer)
     {
         using var project = await ProjectFixture.LoadAsync();
-        var current = project.Vm.BuildDxfLayerImageExportInitialRequest(_layers);
 
-        project.Vm.RememberDxfLayerImageExportRequest(current with { LayerName = string.Empty });
+        project.Vm.RememberDxfLayerImageExportRequest(CreateRequest(layerName: layer!));
 
         Assert.False(project.Vm.HasUnsavedChanges);
     }
 
     [Fact]
-    public async Task RememberDxfLayerImageExportRequest_NullLayerName_IsTheStoredEmptyLayerAndKeepsTheProjectSaved()
-    {
-        using var project = await ProjectFixture.LoadAsync();
-        var current = project.Vm.BuildDxfLayerImageExportInitialRequest(_layers);
-
-        project.Vm.RememberDxfLayerImageExportRequest(current with { LayerName = null! });
-
-        Assert.False(project.Vm.HasUnsavedChanges);
-    }
-
-    [Fact]
-    public async Task RememberDxfLayerImageExportRequest_ValueClampedToTheStoredOne_KeepsTheProjectSaved()
+    public async Task RememberValueClampedToTheStoredOneKeepsTheProjectSavedAsync()
     {
         using var project = await ProjectFixture.LoadAsync();
         project.Vm.RememberDxfLayerImageExportRequest(CreateRequest(width: 100_000));
@@ -153,39 +121,99 @@ public sealed class DxfLayerImageExportSettingsBehaviorTests
     }
 
     [Fact]
-    public async Task ExportDxfLayerImageCommand_ConfirmedRequest_RemembersItWithoutAPath()
+    public async Task SuccessfulExportRemembersTheAdaptedClampedRequestAsync()
     {
         using var project = await ProjectFixture.LoadAsync();
-        project.Vm.OpenDxfLayerImageExportAsync = _ =>
-            Task.FromResult<DxfLayerImageExportRequest?>(
-                new DxfLayerImageExportRequest("L1", 320, 240, 3m, 10, 20, DxfLayerImageFormat.Bmp, true));
-        project.Vm.PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(null);
+        string path = TestFiles.NewTempFilePath("layer-export-", ".bmp");
+        project.Vm.PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(path);
+        project.Vm.OpenDxfLayerImageExportAsync = SaveClampedRequestAsync;
 
         await project.Vm.ExportDxfLayerImageCommand.ExecuteAsync(null);
+        await project.SaveAsync();
 
-        Assert.Equal(
-            new DxfLayerImageExportRequest("L1", 320, 240, 3m, 10, 20, DxfLayerImageFormat.Bmp, true),
-            project.Vm.BuildDxfLayerImageExportInitialRequest(_layers));
-        Assert.True(project.Vm.HasUnsavedChanges);
+        Assert.True(File.Exists(path));
+        var view = project.ReadSavedSnapshot().View;
+        Assert.Equal("L1", view.DxfLayerImagePreferredLayer);
+        Assert.Equal(32d, view.DxfLayerImageWidthPixels);
+        Assert.Equal(24d, view.DxfLayerImageHeightPixels);
+        Assert.Equal(100d, view.DxfLayerImageLineWidthPixels);
+        Assert.Equal(0d, view.DxfLayerImagePaddingXPixels);
+        Assert.Equal(3d, view.DxfLayerImagePaddingYPixels);
+        Assert.Equal("Bmp", view.DxfLayerImageFormat);
+        Assert.True(view.DxfLayerImageUseDarkTheme);
+    }
+
+    private static async Task<LayerImageExportRequest?> SaveClampedRequestAsync(LayerImageExportContext context)
+    {
+        context.WriteLayerImagesAsync = LayerImageExportWindowHost.WriteAsync;
+        using var dialog = new LayerImageExportViewModel(context, LayerImageExportTestData.CreateClock());
+        dialog.PreviewSettings.PixelsX = 32;
+        dialog.PreviewSettings.PixelsY = 24;
+        dialog.PreviewSettings.PaddingX = -1;
+        dialog.PreviewSettings.PaddingY = 3;
+        dialog.PreviewSettings.LineWidthPixels = 500m;
+        dialog.PreviewSettings.UseDarkTheme = true;
+        dialog.FileSettings.Format = DxfLayerImageFormat.Bmp;
+        var settings = new LayerImageExportSettingsViewModel(dialog, context.PickSavePathAsync);
+        await settings.SaveCommand.ExecuteAsync(null);
+        return settings.Request;
     }
 
     [Fact]
-    public async Task ExportDxfLayerImageCommand_CancelledDialog_KeepsTheStoredRequest()
+    public async Task CancelledDialogKeepsTheStoredPreferencesAsync()
     {
         using var project = await ProjectFixture.LoadAsync();
-        project.Vm.OpenDxfLayerImageExportAsync = _ => Task.FromResult<DxfLayerImageExportRequest?>(null);
+        project.Vm.OpenDxfLayerImageExportAsync = _ => Task.FromResult<LayerImageExportRequest?>(null);
         project.Vm.PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(null);
 
         await project.Vm.ExportDxfLayerImageCommand.ExecuteAsync(null);
 
-        Assert.Equal(
-            new DxfLayerImageExportRequest("L1", 1024, 1024, 1m, 200, 200, DxfLayerImageFormat.Png, false),
-            project.Vm.BuildDxfLayerImageExportInitialRequest(_layers));
+        Assert.Equal(DxfLayerImageFormat.Png, CaptureContext(project.Vm).Format);
         Assert.False(project.Vm.HasUnsavedChanges);
     }
 
     [Fact]
-    public async Task SaveProject_AfterRemembering_WritesTheRememberedValuesToTheUiSnapshot()
+    public async Task FailedWriteDoesNotRememberNewPreferencesAsync()
+    {
+        using var project = await ProjectFixture.LoadAsync();
+        project.Vm.PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(null);
+        project.Vm.OpenDxfLayerImageExportAsync = context =>
+        {
+            context.WriteLayerImagesAsync = LayerImageExportWindowHost.WriteAsync;
+            using var dialog = new LayerImageExportViewModel(context, LayerImageExportTestData.CreateClock());
+            dialog.PreviewSettings.PixelsX = 32;
+            dialog.PreviewSettings.PixelsY = 24;
+            dialog.FileSettings.Format = DxfLayerImageFormat.Bmp;
+            var request = dialog.BuildRequest(dialog.FileSettings) with { SavePath = project.DirectoryPath };
+            return Task.FromResult<LayerImageExportRequest?>(request);
+        };
+
+        await project.Vm.ExportDxfLayerImageCommand.ExecuteAsync(null);
+
+        Assert.Contains("Export DXF image failed", project.Vm.StatusText, StringComparison.Ordinal);
+        Assert.Equal(DxfLayerImageFormat.Png, CaptureContext(project.Vm).Format);
+        Assert.False(project.Vm.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public async Task MissingWriterReportsStatusWithoutRememberingPreferencesAsync()
+    {
+        using var project = await ProjectFixture.LoadAsync();
+        project.Vm.PickSaveExportPathAsync = static (_, _) => Task.FromResult<string?>(null);
+        project.Vm.OpenDxfLayerImageExportAsync = context => Task.FromResult<LayerImageExportRequest?>(new(
+            context.InitialCheckedLayers, context.InitialSize, context.LineWidthPixels, context.UseDarkTheme,
+            DxfLayerImageFormat.Bmp, false, Path.Combine(project.DirectoryPath, "unused.bmp")));
+
+        await project.Vm.ExportDxfLayerImageCommand.ExecuteAsync(null);
+
+        Assert.Equal("Export layer image: writer not wired.", project.Vm.StatusText);
+        Assert.Equal(DxfLayerImageFormat.Png, CaptureContext(project.Vm).Format);
+        Assert.False(project.Vm.HasUnsavedChanges);
+        Assert.False(File.Exists(Path.Combine(project.DirectoryPath, "unused.bmp")));
+    }
+
+    [Fact]
+    public async Task SaveProjectWritesTheExistingPreferenceSnapshotAsync()
     {
         using var project = await ProjectFixture.LoadAsync();
         project.Vm.RememberDxfLayerImageExportRequest(
@@ -205,7 +233,7 @@ public sealed class DxfLayerImageExportSettingsBehaviorTests
     }
 
     [Fact]
-    public async Task LoadProject_SnapshotValues_RestoresThemInTheInitialRequest()
+    public async Task LoadRestoresPreferencesButNeverPixelsOrPaddingAsync()
     {
         using var project = await ProjectFixture.LoadAsync(view =>
         {
@@ -219,60 +247,70 @@ public sealed class DxfLayerImageExportSettingsBehaviorTests
             view.DxfLayerImageUseDarkTheme = true;
         });
 
-        var request = project.Vm.BuildDxfLayerImageExportInitialRequest(_layers);
+        var context = CaptureContext(project.Vm);
 
-        Assert.Equal(
-            new DxfLayerImageExportRequest("L2", 640, 481, 2.5m, 30, 40, DxfLayerImageFormat.Bmp, true),
-            request);
+        Assert.Equal(new List<string> { "L2" }, context.InitialCheckedLayers);
+        Assert.Equal(LayerImageSizeSource.Auto, context.InitialSize.Source);
+        Assert.Equal(4096, context.InitialSize.PixelsX);
+        Assert.Equal(4096, context.InitialSize.PixelsY);
+        Assert.Equal(0, context.InitialSize.PaddingX);
+        Assert.Equal(0, context.InitialSize.PaddingY);
+        Assert.Equal(2.5m, context.LineWidthPixels);
+        Assert.Equal(DxfLayerImageFormat.Bmp, context.Format);
+        Assert.True(context.UseDarkTheme);
     }
 
     [Fact]
-    public async Task LoadProject_AppVisualPreferencesLayerOn_ReplacesTheProjectValuesWithTheAppValues()
+    public async Task AppVisualPreferencesStillOverrideProjectPreferencesAsync()
     {
         using var project = await ProjectFixture.LoadAsync(
-            view => view.DxfLayerImageWidthPixels = 640,
-            applyAppVisualPreferences: true);
+            view => view.DxfLayerImageLineWidthPixels = 3, applyAppVisualPreferences: true);
 
-        var request = project.Vm.BuildDxfLayerImageExportInitialRequest(_layers);
-
-        Assert.Equal(1024, request.WidthPixels);
+        Assert.Equal(1m, CaptureContext(project.Vm).LineWidthPixels);
     }
 
-    [Fact]
-    public async Task LoadProject_OutOfRangeSnapshotValues_ClampsThem()
+    [Theory]
+    [InlineData(0.001, 0.1)]
+    [InlineData(500, 100)]
+    public async Task InvalidSnapshotValuesRemainClampedAsync(double lineWidth, double expectedLineWidth)
     {
         using var project = await ProjectFixture.LoadAsync(view =>
         {
             view.DxfLayerImageWidthPixels = 0.2;
             view.DxfLayerImageHeightPixels = 500_000;
-            view.DxfLayerImageLineWidthPixels = 0.001;
+            view.DxfLayerImageLineWidthPixels = lineWidth;
             view.DxfLayerImagePaddingXPixels = -10;
             view.DxfLayerImagePaddingYPixels = 900_000;
         });
 
-        var request = project.Vm.BuildDxfLayerImageExportInitialRequest(_layers);
+        await project.SaveAsync();
 
-        Assert.Equal(2, request.WidthPixels);
-        Assert.Equal(100_000, request.HeightPixels);
-        Assert.Equal(0.1m, request.LineWidthPixels);
-        Assert.Equal(0, request.PaddingXPixels);
-        Assert.Equal(100_000, request.PaddingYPixels);
+        var view = project.ReadSavedSnapshot().View;
+        Assert.Equal(2d, view.DxfLayerImageWidthPixels);
+        Assert.Equal(100_000d, view.DxfLayerImageHeightPixels);
+        Assert.Equal(expectedLineWidth, view.DxfLayerImageLineWidthPixels);
+        Assert.Equal(0d, view.DxfLayerImagePaddingXPixels);
+        Assert.Equal(100_000d, view.DxfLayerImagePaddingYPixels);
+        Assert.Equal((decimal)expectedLineWidth, CaptureContext(project.Vm).LineWidthPixels);
     }
 
     [Fact]
-    public async Task LoadProject_UnknownFormatName_FallsBackToPng()
+    public async Task UnknownSnapshotFormatFallsBackToPngAsync()
     {
         using var project = await ProjectFixture.LoadAsync(view => view.DxfLayerImageFormat = "tiff");
 
-        var request = project.Vm.BuildDxfLayerImageExportInitialRequest(_layers);
-
-        Assert.Equal(DxfLayerImageFormat.Png, request.Format);
+        Assert.Equal(DxfLayerImageFormat.Png, CaptureContext(project.Vm).Format);
     }
 
-    private static DxfLayerImageExportRequest CreateRequest(string layerName = "L1", int width = 1024)
-    {
-        return new DxfLayerImageExportRequest(layerName, width, 1024, 1m, 200, 200, DxfLayerImageFormat.Png, false);
-    }
+    private static LayerImageExportContext CaptureContext(FreeformHelperViewModel vm) => vm.BuildLayerImageExportContext(
+        new List<CadPad>
+        {
+            LayerImageExportTestData.CreateSquareCad(1, "L1", 0, 0, 10),
+            LayerImageExportTestData.CreateSquareCad(2, "L2", 20, 0, 10),
+        }, static (_, _) => Task.FromResult<string?>(null));
+
+    private static DxfLayerImageExportRequest CreateRequest(string layerName = "L1", int width = 1024) =>
+        new(layerName, width, 1024, 1m, 200, 200, DxfLayerImageFormat.Png, false);
 
     private sealed class ProjectFixture : IDisposable
     {
@@ -287,6 +325,8 @@ public sealed class DxfLayerImageExportSettingsBehaviorTests
         }
 
         public FreeformHelperViewModel Vm { get; }
+
+        public string DirectoryPath => _directory.FullName;
 
         public static async Task<ProjectFixture> LoadAsync(
             Action<UiViewSnapshot>? configureView = null,

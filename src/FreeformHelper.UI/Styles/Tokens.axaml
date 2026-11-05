@@ -15,6 +15,7 @@
       <Color x:Key="ColorBorder">#1E2530</Color>
       <Color x:Key="ColorBorderMuted">#2A3340</Color>
       <Color x:Key="ColorBorderStrong">#3A475A</Color>
+      <Color x:Key="ColorFieldBorder">#707F94</Color>
       <Color x:Key="ColorScrollTrack">#DDDDE0</Color>
       <Color x:Key="ColorScrollThumb">#6F737A</Color>
       <Color x:Key="ColorScrollV2Track">#1A2535</Color>
@@ -201,6 +202,7 @@
       <Color x:Key="ColorBorder">#D8DEE6</Color>
       <Color x:Key="ColorBorderMuted">#B8C1CC</Color>
       <Color x:Key="ColorBorderStrong">#B8C1CC</Color>
+      <Color x:Key="ColorFieldBorder">#6E7B8E</Color>
       <Color x:Key="ColorScrollTrack">#D7D7DA</Color>
       <Color x:Key="ColorScrollThumb">#7A7D84</Color>
       <Color x:Key="ColorScrollV2Track">#CBD3DE</Color>
@@ -389,6 +391,7 @@
   <SolidColorBrush x:Key="BrushBorder" Color="{DynamicResource ColorBorder}"/>
   <SolidColorBrush x:Key="BrushBorderMuted" Color="{DynamicResource ColorBorderMuted}"/>
   <SolidColorBrush x:Key="BrushBorderStrong" Color="{DynamicResource ColorBorderStrong}"/>
+  <SolidColorBrush x:Key="BrushFieldBorder" Color="{DynamicResource ColorFieldBorder}"/>
   <SolidColorBrush x:Key="BrushScrollTrack" Color="{DynamicResource ColorScrollTrack}"/>
   <SolidColorBrush x:Key="BrushScrollThumb" Color="{DynamicResource ColorScrollThumb}"/>
   <SolidColorBrush x:Key="BrushScrollV2Track" Color="{DynamicResource ColorScrollV2Track}"/>
@@ -847,10 +850,22 @@
   <x:Double x:Key="SettingsWindowMinWidth">860</x:Double>
   <x:Double x:Key="SettingsWindowMinHeight">560</x:Double>
   <x:Double x:Key="SettingsContentMaxWidth">1200</x:Double>
-  <x:Double x:Key="LayerImageExportWidth">500</x:Double>
-  <x:Double x:Key="LayerImageExportHeight">520</x:Double>
-  <x:Double x:Key="LayerImageExportMinWidth">420</x:Double>
-  <x:Double x:Key="LayerImageExportMinHeight">320</x:Double>
+  <x:Double x:Key="LayerImageExportWidth">680</x:Double>
+  <x:Double x:Key="LayerImageExportHeight">500</x:Double>
+  <x:Double x:Key="LayerImageExportMinWidth">600</x:Double>
+  <x:Double x:Key="LayerImageExportMinHeight">420</x:Double>
+  <GridLength x:Key="LayerImageExportListColumn">220</GridLength>
+  <x:Double x:Key="LayerImageExportRowHeight">24</x:Double>
+  <x:Double x:Key="Nvt.LayerImageExport.CheckIndicatorSize">16</x:Double>
+  <x:Double x:Key="LayerImageExportCountWidth">56</x:Double>
+  <x:Double x:Key="LayerImageExportLabelWidth">80</x:Double>
+  <x:Double x:Key="LayerImageExportFieldWidth">92</x:Double>
+  <x:Double x:Key="LayerImageExportPreviewMinWidth">300</x:Double>
+  <x:Double x:Key="LayerImageExportPreviewMinHeight">180</x:Double>
+  <x:Double x:Key="LayerImageExportSettingsWidth">360</x:Double>
+  <x:Double x:Key="LayerImageExportSettingsHeight">208</x:Double>
+  <Thickness x:Key="LayerImageExportRowPadding">8,0</Thickness>
+  <Thickness x:Key="LayerImageExportSearchPadding">32,0,8,0</Thickness>
   <x:Double x:Key="ViewMenuPopupMaxHeight">520</x:Double>
   <x:Double x:Key="ViewMenuPopupMinWidth">200</x:Double>
   <x:Double x:Key="ViewMenuPopupWidth">264</x:Double>
