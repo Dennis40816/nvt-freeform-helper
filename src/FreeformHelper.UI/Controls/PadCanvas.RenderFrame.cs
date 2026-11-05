@@ -15,7 +15,7 @@ public sealed partial class PadCanvas
             _zoom,
             lowDetailZoomThreshold,
             _transientLowDetailUntilTicks,
-            DateTime.UtcNow.Ticks);
+            TimeProvider.System.GetUtcNow().UtcTicks);
         var secondaryVisualsDeferred = ShouldDeferSecondaryVisuals();
         var highlightStrokeWidthAdjust = HighlightStrokeWidthAdjust;
         var selectedWidthAdd = GetResourceDouble("CanvasCadSelectedStrokeWidthAdd", 0.8);
