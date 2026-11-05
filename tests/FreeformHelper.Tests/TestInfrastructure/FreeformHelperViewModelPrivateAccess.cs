@@ -52,6 +52,9 @@ internal static class FreeformHelperViewModelPrivateAccess
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildActiveCadPadSet")]
     public static extern CadPadSet? BuildActiveCadPadSet(FreeformHelperViewModel viewModel);
 
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildFilteredCadPadSet")]
+    public static extern CadPadSet? BuildFilteredCadPadSet(FreeformHelperViewModel viewModel);
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "UpdateCadOutputFwDiffIndexing")]
     public static extern void UpdateCadOutputFwDiffIndexing(FreeformHelperViewModel viewModel, IReadOnlyList<CadPad> visiblePads);
 
