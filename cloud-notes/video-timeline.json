@@ -1,0 +1,235 @@
+{
+  "title": "FreeformHelper 3635 panel walkthrough",
+  "language": "zh-TW",
+  "audience": "internal engineers",
+  "dueDate": "2026-11-25",
+  "storyboard": "cloud-notes/video-storyboard.md",
+  "types": {
+    "screen": "Screen recording of FreeformHelper UI or PowerShell",
+    "motion-canvas": "Motion Canvas animation"
+  },
+  "totalDurationSec": 1395,
+  "coreDurationSec": 1260,
+  "segments": [
+    {
+      "order": 1,
+      "id": "S00-intro",
+      "title": "片頭：這支影片教什麼",
+      "type": "motion-canvas",
+      "durationSec": 30,
+      "startSec": 0,
+      "endSec": 30,
+      "optional": false,
+      "narrationLines": 5
+    },
+    {
+      "order": 2,
+      "id": "A01-pipeline",
+      "title": "動畫：整體流程一覽",
+      "type": "motion-canvas",
+      "durationSec": 45,
+      "startSec": 30,
+      "endSec": 75,
+      "optional": false,
+      "narrationLines": 9
+    },
+    {
+      "order": 3,
+      "id": "R01-launch-tour",
+      "title": "啟動與畫面導覽",
+      "type": "screen",
+      "durationSec": 60,
+      "startSec": 75,
+      "endSec": 135,
+      "optional": false,
+      "narrationLines": 8
+    },
+    {
+      "order": 4,
+      "id": "R02-dxf-import",
+      "title": "匯入 DXF",
+      "type": "screen",
+      "durationSec": 60,
+      "startSec": 135,
+      "endSec": 195,
+      "optional": false,
+      "narrationLines": 7
+    },
+    {
+      "order": 5,
+      "id": "R03-layer-list",
+      "title": "圖層清單與 DXF 檢查",
+      "type": "screen",
+      "durationSec": 90,
+      "startSec": 195,
+      "endSec": 285,
+      "optional": false,
+      "narrationLines": 9
+    },
+    {
+      "order": 6,
+      "id": "R04-general-settings",
+      "title": "General 設定：IC、通道、AA、掃描順序",
+      "type": "screen",
+      "durationSec": 90,
+      "startSec": 285,
+      "endSec": 375,
+      "optional": false,
+      "narrationLines": 9
+    },
+    {
+      "order": 7,
+      "id": "A02-grid-diff-index",
+      "title": "動畫：Regular grid 與 diff 編號",
+      "type": "motion-canvas",
+      "durationSec": 75,
+      "startSec": 375,
+      "endSec": 450,
+      "optional": false,
+      "narrationLines": 8
+    },
+    {
+      "order": 8,
+      "id": "A03-pad-to-grid",
+      "title": "動畫：CAD pad 如何對應到 panel grid",
+      "type": "motion-canvas",
+      "durationSec": 75,
+      "startSec": 450,
+      "endSec": 525,
+      "optional": false,
+      "narrationLines": 8
+    },
+    {
+      "order": 9,
+      "id": "R05-step1-match",
+      "title": "Step 1：Geometry match 與 Visibility Mask",
+      "type": "screen",
+      "durationSec": 90,
+      "startSec": 525,
+      "endSec": 615,
+      "optional": false,
+      "narrationLines": 9
+    },
+    {
+      "order": 10,
+      "id": "A04-visibility-mask",
+      "title": "動畫：SeeRegular mask 的作用",
+      "type": "motion-canvas",
+      "durationSec": 45,
+      "startSec": 615,
+      "endSec": 660,
+      "optional": false,
+      "narrationLines": 6
+    },
+    {
+      "order": 11,
+      "id": "A05-freeform-rule",
+      "title": "動畫：Freeform 方向怎麼判定",
+      "type": "motion-canvas",
+      "durationSec": 60,
+      "startSec": 660,
+      "endSec": 720,
+      "optional": false,
+      "narrationLines": 8
+    },
+    {
+      "order": 12,
+      "id": "R06-step2-freeform",
+      "title": "Step 2：Freeform tagging",
+      "type": "screen",
+      "durationSec": 75,
+      "startSec": 720,
+      "endSec": 795,
+      "optional": false,
+      "narrationLines": 8
+    },
+    {
+      "order": 13,
+      "id": "A06-notch-tofull",
+      "title": "動畫：To Regular 與 To Full 三階段",
+      "type": "motion-canvas",
+      "durationSec": 75,
+      "startSec": 795,
+      "endSec": 870,
+      "optional": false,
+      "narrationLines": 9
+    },
+    {
+      "order": 14,
+      "id": "R07-step3-notch",
+      "title": "Step 3：Notch 預覽與安全設定",
+      "type": "screen",
+      "durationSec": 90,
+      "startSec": 870,
+      "endSec": 960,
+      "optional": false,
+      "narrationLines": 8
+    },
+    {
+      "order": 15,
+      "id": "R08-step4-diagnostics",
+      "title": "Step 4：Index diagnostics",
+      "type": "screen",
+      "durationSec": 90,
+      "startSec": 960,
+      "endSec": 1050,
+      "optional": false,
+      "narrationLines": 9
+    },
+    {
+      "order": 16,
+      "id": "R09-step5-notch-table",
+      "title": "Step 5：Notch 表審閱與匯出",
+      "type": "screen",
+      "durationSec": 120,
+      "startSec": 1050,
+      "endSec": 1170,
+      "optional": false,
+      "narrationLines": 12
+    },
+    {
+      "order": 17,
+      "id": "R10-save-load",
+      "title": "儲存與載入專案",
+      "type": "screen",
+      "durationSec": 60,
+      "startSec": 1170,
+      "endSec": 1230,
+      "optional": false,
+      "narrationLines": 6
+    },
+    {
+      "order": 18,
+      "id": "R11-simulation",
+      "title": "Simulation 頁：Before / After / Delta",
+      "type": "screen",
+      "durationSec": 75,
+      "startSec": 1230,
+      "endSec": 1305,
+      "optional": true,
+      "narrationLines": 7
+    },
+    {
+      "order": 19,
+      "id": "R12-runtime-cli",
+      "title": "進階：Runtime CLI 查詢",
+      "type": "screen",
+      "durationSec": 60,
+      "startSec": 1305,
+      "endSec": 1365,
+      "optional": true,
+      "narrationLines": 6
+    },
+    {
+      "order": 20,
+      "id": "S99-outro",
+      "title": "結尾：驗證清單",
+      "type": "motion-canvas",
+      "durationSec": 30,
+      "startSec": 1365,
+      "endSec": 1395,
+      "optional": false,
+      "narrationLines": 6
+    }
+  ]
+}
