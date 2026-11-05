@@ -183,6 +183,7 @@
                                          Text="Free-form edit actions using action role hierarchy."/>
                   </Grid>
                   <Button Grid.Column="1"
+                          AutomationProperties.Name="Reset all DXF edits"
                           Classes="actionDanger actionIconButton dxfEditHeaderAction"
                           ToolTip.Tip="Reset all DXF edits.">
                     <controls:FontIcon Classes="symbols iconSm"
@@ -336,18 +337,21 @@
                                          Classes="dxfEditFieldLabel"
                                          Text="Advanced compact actions"/>
                     <Button Grid.Column="1"
+                            AutomationProperties.Name="Rotate selected CAD pads"
                             Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                             ToolTip.Tip="Rotate selected CAD pads.">
                       <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
                                          Glyph="{x:Static icons:IconGlyphs.RotateRight}"/>
                     </Button>
                     <Button Grid.Column="2"
+                            AutomationProperties.Name="Move selected CAD pads to layer"
                             Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                             ToolTip.Tip="Move selected CAD pads to layer.">
                       <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
                                          Glyph="{x:Static icons:IconGlyphs.DriveFileMove}"/>
                     </Button>
                     <Button Grid.Column="3"
+                            AutomationProperties.Name="Create layer and move selected CAD pads"
                             Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                             ToolTip.Tip="Create layer and move selected CAD pads.">
                       <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
@@ -413,12 +417,14 @@
             </Border>
             <WrapPanel Orientation="Horizontal">
               <Button Classes="actionIconButton viewportOverlayAction"
+                      AutomationProperties.Name="Icon button"
                       Margin="{DynamicResource InsetRight8Bottom6}"
                       ToolTip.Tip="Icon button">
                 <controls:FontIcon Classes="symbols"
                                    Glyph="{x:Static icons:IconGlyphs.Search}"/>
               </Button>
               <ToggleButton Classes="actionIconButton viewportOverlayAction"
+                            AutomationProperties.Name="Selected icon button"
                             Margin="{DynamicResource InsetRight8Bottom6}"
                             IsChecked="True"
                             ToolTip.Tip="Selected icon button">
@@ -532,12 +538,14 @@
                 </Grid>
               </Button>
               <Button Classes="actionIconButton actionGhost"
+                      AutomationProperties.Name="Ghost icon action"
                       Margin="{DynamicResource InsetRight8Bottom6}"
                       ToolTip.Tip="Ghost icon action">
                 <controls:FontIcon Classes="symbols"
                                    Glyph="{x:Static icons:IconGlyphs.Edit}"/>
               </Button>
               <ToggleButton Classes="actionIconButton actionGhost"
+                            AutomationProperties.Name="Checked ghost icon action"
                             IsChecked="True"
                             Margin="{DynamicResource InsetRight8Bottom6}"
                             ToolTip.Tip="Checked ghost icon action">
@@ -547,12 +555,14 @@
             </WrapPanel>
             <WrapPanel Orientation="Horizontal">
               <Button Classes="actionIconButton viewportOverlayAction"
+                      AutomationProperties.Name="Viewport search action"
                       Margin="{DynamicResource InsetRight8Bottom6}"
                       ToolTip.Tip="Viewport search action">
                 <controls:FontIcon Classes="symbols"
                                    Glyph="{x:Static icons:IconGlyphs.Search}"/>
               </Button>
               <ToggleButton Classes="actionIconButton viewportOverlayAction"
+                            AutomationProperties.Name="Checked viewport visibility action"
                             IsChecked="True"
                             Margin="{DynamicResource InsetRight8Bottom6}"
                             ToolTip.Tip="Checked viewport visibility action">
@@ -560,6 +570,7 @@
                                    Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
               </ToggleButton>
               <Button Classes="actionIconButton panelChromeToggle"
+                      AutomationProperties.Name="Panel chrome toggle action"
                       Margin="{DynamicResource InsetRight8Bottom6}"
                       ToolTip.Tip="Panel chrome toggle action">
                 <controls:FontIcon Classes="symbols"
@@ -573,12 +584,14 @@
                       Margin="{DynamicResource InsetRight8Bottom6}">
                 <StackPanel Orientation="Horizontal">
                   <Button Classes="actionIconButton consoleHeaderAction"
+                          AutomationProperties.Name="Console copy action"
                           Margin="{DynamicResource InsetRight6}"
                           ToolTip.Tip="Console copy action">
                     <controls:FontIcon Classes="symbols"
                                        Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
                   </Button>
                   <ToggleButton Classes="actionIconButton consoleHeaderAction"
+                                AutomationProperties.Name="Checked console toggle action"
                                 IsChecked="True"
                                 ToolTip.Tip="Checked console toggle action">
                     <controls:FontIcon Classes="symbols"
@@ -629,6 +642,7 @@
                   <SelectableTextBlock Text="Checked"/>
                 </ToggleButton>
                 <Button Classes="actionIconButton actionNeutral"
+                        AutomationProperties.Name="Neutral icon action"
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Neutral icon action">
                   <controls:FontIcon Classes="symbols"
@@ -666,6 +680,7 @@
                   <SelectableTextBlock Text="Checked"/>
                 </ToggleButton>
                 <Button Classes="actionIconButton actionPrimary"
+                        AutomationProperties.Name="Primary icon action"
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Primary icon action">
                   <controls:FontIcon Classes="symbols"
@@ -703,6 +718,7 @@
                   <SelectableTextBlock Text="Checked"/>
                 </ToggleButton>
                 <Button Classes="actionIconButton actionDanger"
+                        AutomationProperties.Name="Danger icon action"
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Danger icon action">
                   <controls:FontIcon Classes="symbols"
@@ -740,6 +756,7 @@
                   <SelectableTextBlock Text="Checked"/>
                 </ToggleButton>
                 <Button Classes="actionIconButton actionGhost"
+                        AutomationProperties.Name="Ghost icon action"
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Ghost icon action">
                   <controls:FontIcon Classes="symbols"
@@ -768,12 +785,14 @@
                                    FontWeight="SemiBold"/>
               <WrapPanel Orientation="Horizontal">
                 <Button Classes="actionIconButton viewportOverlayAction"
+                        AutomationProperties.Name="Fit viewport"
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Fit viewport">
                   <controls:FontIcon Classes="symbols"
                                      Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
                 </Button>
                 <ToggleButton Classes="actionIconButton viewportOverlayAction"
+                              AutomationProperties.Name="Toggle viewport visibility"
                               IsChecked="True"
                               Margin="{DynamicResource InsetRight8Bottom6}"
                               ToolTip.Tip="Toggle viewport visibility">
@@ -781,6 +800,7 @@
                                      Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
                 </ToggleButton>
                 <Button Classes="actionIconButton viewportOverlayAction"
+                        AutomationProperties.Name="Disabled viewport search"
                         IsEnabled="False"
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Disabled viewport search">
@@ -799,12 +819,14 @@
                       Padding="{DynamicResource Inset8_4}">
                 <WrapPanel Orientation="Horizontal">
                   <Button Classes="actionIconButton consoleHeaderAction"
+                          AutomationProperties.Name="Copy console text"
                           Margin="{DynamicResource InsetRight6Bottom6}"
                           ToolTip.Tip="Copy console text">
                     <controls:FontIcon Classes="symbols"
                                        Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
                   </Button>
                   <ToggleButton Classes="actionIconButton consoleHeaderAction"
+                                AutomationProperties.Name="Toggle console filter"
                                 IsChecked="True"
                                 Margin="{DynamicResource InsetRight6Bottom6}"
                                 ToolTip.Tip="Toggle console filter">
@@ -812,6 +834,7 @@
                                        Glyph="{x:Static icons:IconGlyphs.ContentPasteOff}"/>
                   </ToggleButton>
                   <Button Classes="actionIconButton consoleHeaderAction"
+                          AutomationProperties.Name="Disabled console delete"
                           IsEnabled="False"
                           Margin="{DynamicResource InsetRight6Bottom6}"
                           ToolTip.Tip="Disabled console delete">

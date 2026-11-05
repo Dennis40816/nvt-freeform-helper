@@ -17,6 +17,7 @@
                                  Subtitle="{Binding SubtitleText}">
     <controls:ReviewWorkspaceShell.HeaderRight>
       <Button Classes="actionIconButton actionGhost dxfEditHeaderAction"
+              AutomationProperties.Name="Refresh rows"
               Command="{Binding RefreshCommand}"
               HorizontalAlignment="Right"
               VerticalAlignment="Top"

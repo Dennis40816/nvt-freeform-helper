@@ -165,6 +165,7 @@
                      Text="{Binding SearchKeyword, Mode=TwoWay}"
                      TextWrapping="NoWrap"/>
             <Button Classes="workspaceSearchClearButton"
+                    AutomationProperties.Name="Reset filters (view all)"
                     IsVisible="{Binding HasResettableViewFilters}"
                     Command="{Binding ClearSearchKeywordCommand}"
                     ToolTip.Tip="Reset filters (view all)"
@@ -175,6 +176,7 @@
             </Button>
           </Grid>
           <Button Grid.Row="0"
+                  AutomationProperties.Name="Filter helper"
                   Grid.Column="1"
                   Classes="workspaceInfoButton"
                   Click="ShowFilterBuilderButton_Click"
@@ -311,6 +313,7 @@
                                              Text="Payload"
                                              ToolTip.Tip="Raw export payload for current row."/>
                         <Button Grid.Column="1"
+                                AutomationProperties.Name="Copy payload"
                                 Classes="workspaceInfoButton"
                                 Click="CopyPayloadButton_Click"
                                 ToolTip.Tip="Copy payload">

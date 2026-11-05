@@ -245,6 +245,7 @@
                         ColumnDefinitions="Auto,Auto,Auto,*"
                         ColumnSpacing="{StaticResource Space6}">
                     <Button Classes="actionGhost actionIconButton"
+                            AutomationProperties.Name="Copy copper path replay"
                             Command="{Binding CopyCopperPathReplayCommand}"
                             IsEnabled="{Binding HasCopperPathReplay}"
                             ToolTip.Tip="Copy copper path replay.">
@@ -252,6 +253,7 @@
                                          Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
                     </Button>
                     <Button Grid.Column="1"
+                            AutomationProperties.Name="Export copper path replay as CSV"
                             Classes="actionGhost actionIconButton"
                             Command="{Binding ExportCopperPathReplayCsvCommand}"
                             IsEnabled="{Binding HasCopperPathReplay}"
@@ -260,6 +262,7 @@
                                          Glyph="{x:Static icons:IconGlyphs.ArrowDownward}"/>
                     </Button>
                     <Button Grid.Column="2"
+                            AutomationProperties.Name="Export copper path replay as JSON"
                             Classes="actionGhost actionIconButton"
                             Command="{Binding ExportCopperPathReplayJsonCommand}"
                             IsEnabled="{Binding HasCopperPathReplay}"

@@ -66,6 +66,7 @@
                                  Text="{Binding DxfOverlapIssueCount, StringFormat='Issues: {0}'}"
                                  VerticalAlignment="Center"/>
             <Button Grid.Column="2"
+                    AutomationProperties.Name="Open overlap details window (copy supported)"
                     Classes="actionIconButton actionGhost dxfEditInlineIconAction"
                     Command="{Binding ShowDxfOverlapDetailsCommand}"
                     ToolTip.Tip="Open overlap details window (copy supported).">
@@ -73,6 +74,7 @@
                                  Glyph="{x:Static icons:IconGlyphs.Info}"/>
             </Button>
             <Button Grid.Column="3"
+                    AutomationProperties.Name="Restore overlap highlight and select those CAD pads"
                     Classes="actionIconButton actionGhost dxfEditInlineIconAction"
                     Command="{Binding SelectDxfOverlapPadsCommand}"
                     ToolTip.Tip="Restore overlap highlight and select those CAD pads.">
@@ -80,6 +82,7 @@
                                  Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
             </Button>
             <Button Grid.Column="4"
+                    AutomationProperties.Name="Clear overlap highlight and current selection"
                     Classes="actionIconButton actionGhost dxfEditInlineIconAction"
                     Command="{Binding ClearDxfOverlapHighlightsCommand}"
                     ToolTip.Tip="Clear overlap highlight and current selection.">
@@ -106,6 +109,7 @@
                                FontWeight="SemiBold"/>
         </StackPanel>
         <Button Grid.Column="1"
+                AutomationProperties.Name="Reset all DXF edits, including hidden, combined, and layer-move changes"
                 Classes="actionDanger actionIconButton dxfEditHeaderAction"
                 Click="ResetAllDxfEditsButton_Click"
                 IsEnabled="{Binding HasAnyCadEdits}"
@@ -331,6 +335,7 @@
                                            FormatString="0"
                                            Value="{Binding DxfEditRotationDegrees, Mode=TwoWay}"/>
                   <Button Grid.Column="1"
+                          AutomationProperties.Name="Rotate the current DXF edit scope as one group around its shared center. 90° units are recommended"
                           Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                           Command="{Binding RotateSelectedCadPadsCommand}"
                           IsEnabled="{Binding CanRotateSelectedCadPads}"
@@ -351,6 +356,7 @@
                             SelectedItem="{Binding DxfEditTargetLayerName, Mode=TwoWay}"
                             ToolTip.Tip="Target layer for selected CAD pads."/>
                   <Button Grid.Column="1"
+                          AutomationProperties.Name="Move selected CAD pads to target layer"
                           Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                           Command="{Binding MoveSelectedCadPadsToLayerCommand}"
                           IsEnabled="{Binding CanMoveSelectedCadPadsToLayer}"
@@ -370,6 +376,7 @@
                            Text="{Binding DxfEditNewLayerName, Mode=TwoWay}"
                            PlaceholderText="New DXF layer"/>
                   <Button Grid.Column="1"
+                          AutomationProperties.Name="Create new layer and move selected CAD pads"
                           Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                           Command="{Binding CreateLayerAndMoveSelectedCadPadsCommand}"
                           IsEnabled="{Binding CanCreateLayerAndMoveSelectedCadPads}"

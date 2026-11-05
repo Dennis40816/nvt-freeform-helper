@@ -12,6 +12,7 @@
                                Classes="stepNote"
                                Text="Step 2 labels regular pads (None/XWay/YWay/XYWay) without changing Step 1 links."/>
           <Button Grid.Column="1"
+                  AutomationProperties.Name="Open Settings at Step 2 section"
                   Tag="Step2FreeformTagging"
                   Classes="actionIconButton actionGhost workflowStepAction"
                   Margin="{StaticResource InsetLeft10}"
@@ -21,6 +22,7 @@
                                Glyph="{x:Static icons:IconGlyphs.Settings}"/>
           </Button>
           <Button Grid.Column="2"
+                  AutomationProperties.Name="Clear Step 2 result and all downstream results"
                   Classes="actionIconButton actionGhost workflowStepAction"
                   Margin="{StaticResource InsetLeft10}"
                   Command="{Binding ClearStep2ResultCommand}"

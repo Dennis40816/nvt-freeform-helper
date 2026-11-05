@@ -34,6 +34,7 @@
                                            FormatString="0"
                                            Value="{Binding CascadeNum, Mode=TwoWay}"/>
                   <Button Grid.Column="1"
+                          AutomationProperties.Name="Edit per-IC X/Y channels"
                           Classes="actionIconButton actionGhost"
                           Click="EditCascadeDetailsButton_Click"
                           ToolTip.Tip="Edit per-IC X/Y channels.">

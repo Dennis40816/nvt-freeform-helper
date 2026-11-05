@@ -277,6 +277,7 @@
                                                  TextWrapping="Wrap"/>
                           </StackPanel>
                           <Button Grid.Column="1"
+                                  AutomationProperties.Name="Run copper path replay"
                                   Classes="actionPrimary actionIconButton"
                                   Command="{Binding ReplayCopperPathCommand}"
                                   ToolTip.Tip="Run copper path replay">
@@ -439,6 +440,7 @@
                                        Text="{Binding SelectedFrameDisplayText}"/>
                   <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="{StaticResource Space8}">
                     <Button Grid.Column="0"
+                            AutomationProperties.Name="Previous frame"
                             Classes="actionGhost actionIconButton"
                             Command="{Binding PreviousFrameCommand}"
                             IsEnabled="{Binding CanStepFrames}"
@@ -456,6 +458,7 @@
                       </Grid>
                     </Button>
                     <Button Grid.Column="2"
+                            AutomationProperties.Name="Next frame"
                             Classes="actionGhost actionIconButton"
                             Command="{Binding NextFrameCommand}"
                             IsEnabled="{Binding CanStepFrames}"

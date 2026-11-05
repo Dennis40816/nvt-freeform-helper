@@ -171,6 +171,7 @@
               </Border>
             </Canvas>
             <Button Classes="actionIconButton viewportOverlayAction"
+                    AutomationProperties.Name="Fit AA canvas"
                     Command="{Binding FitCanvasCommand}"
                     ToolTip.Tip="Fit AA canvas"
                     HorizontalAlignment="Right"

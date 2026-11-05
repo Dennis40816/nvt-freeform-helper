@@ -15,6 +15,7 @@
           Opacity="{StaticResource OpacityHigh}"
           Panel.ZIndex="5">
       <Button Grid.Column="0"
+              AutomationProperties.Name="Fit to content"
               Classes="actionIconButton viewportOverlayAction"
               ToolTip.Tip="Fit to content"
               Command="{Binding FitCommand}">
@@ -22,6 +23,7 @@
                            Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
       </Button>
       <Button Grid.Column="1"
+              AutomationProperties.Name="Show right panel"
               x:Name="ShowRightPanelButton"
               Classes="actionIconButton viewportOverlayAction"
               Margin="{StaticResource InsetLeft8}"
@@ -41,6 +43,7 @@
                 Margin="{StaticResource InsetLeft10Top16}"
                 Panel.ZIndex="5">
       <Button x:Name="ShowLeftPanelButton"
+              AutomationProperties.Name="Show left panel"
               Classes="actionIconButton viewportOverlayAction"
               ToolTip.Tip="Show left panel"
               Click="ShowLeftPanelButton_Click"

@@ -24,6 +24,7 @@
                     <SelectableTextBlock Classes="padInfoSubtle" Text="{Binding Subtitle}"/>
                   </StackPanel>
                   <Button Grid.Column="2"
+                          AutomationProperties.Name="Focus the best match when available; otherwise highlight related regular pads"
                           Classes="padInfoHeaderActionButton"
                           IsVisible="{Binding HasLocateMatchAction}"
                           Command="{Binding LocateMatchCommand}"
@@ -260,6 +261,7 @@
                                                  Value="{Binding CadOutputFwDiffOverride, Mode=TwoWay}"
                                                  ToolTip.Tip="Manual CAD Output FW Diff for this CAD pad (supports jump/offset)."/>
                         <Button Grid.Column="1"
+                                AutomationProperties.Name="Apply this FW output override"
                                 Classes="padInfoOverrideIconButton"
                                 Command="{Binding ApplyCadOutputFwDiffOverrideCommand}"
                                 ToolTip.Tip="Apply this FW output override.">
@@ -267,6 +269,7 @@
                                              Glyph="{x:Static icons:IconGlyphs.Edit}"/>
                         </Button>
                         <Button Grid.Column="2"
+                                AutomationProperties.Name="Clear the FW output override"
                                 Classes="padInfoOverrideIconButton"
                                 IsEnabled="{Binding CanClearCadOutputFwDiffOverride}"
                                 Command="{Binding ClearCadOutputFwDiffOverrideCommand}"
@@ -275,6 +278,7 @@
                                              Glyph="{x:Static icons:IconGlyphs.Close}"/>
                         </Button>
                         <Button Grid.Column="3"
+                                AutomationProperties.Name="Use this CAD pad as the per-IC CAD Output FW Diff start anchor"
                                 Classes="padInfoOverrideIconButton"
                                 IsVisible="{Binding HasDxfIndexAnchorEditor}"
                                 Command="{Binding SetDxfIndexAnchorCommand}"
@@ -283,6 +287,7 @@
                                              Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
                         </Button>
                         <Button Grid.Column="4"
+                                AutomationProperties.Name="Clear the per-IC CAD Output FW Diff start anchor"
                                 Classes="padInfoOverrideIconButton"
                                 IsVisible="{Binding HasDxfIndexAnchorEditor}"
                                 IsEnabled="{Binding CanClearDxfIndexAnchor}"
@@ -302,6 +307,7 @@
                           ColumnSpacing="{StaticResource Space8}"
                           IsVisible="{Binding HasSelectAreaBucketCommand}">
                       <Button Grid.Column="0"
+                              AutomationProperties.Name="Select the current CAD area bucket"
                               Classes="padInfoHeaderActionButton"
                               IsVisible="{Binding HasCadOutputFwDiffOverrideEditor}"
                               Command="{Binding SelectAreaBucketCommand}"

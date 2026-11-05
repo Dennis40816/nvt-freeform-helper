@@ -36,6 +36,7 @@
                                          HorizontalAlignment="Right"/>
                   </StackPanel>
                   <Button Grid.Column="3"
+                          AutomationProperties.Name="Focus the best match when available; otherwise highlight related CAD pads"
                           Classes="padInfoHeaderActionButton"
                           IsVisible="{Binding HasLocateMatchAction}"
                           Command="{Binding LocateMatchCommand}"

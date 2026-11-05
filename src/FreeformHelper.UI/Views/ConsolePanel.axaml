@@ -26,6 +26,7 @@
     <Grid RowDefinitions="Auto,*">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
         <ToggleButton x:Name="ConsoleToggleButton"
+                      AutomationProperties.Name="Toggle console panel"
                       Classes="actionIconButton panelChromeToggle"
                       IsChecked="{Binding IsConsoleExpanded, Mode=TwoWay}"
                       ToolTip.Tip="Toggle console panel"

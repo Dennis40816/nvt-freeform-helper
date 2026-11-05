@@ -14,6 +14,7 @@
             <Grid Classes="workflowOverviewHeader" ColumnDefinitions="*,Auto">
               <SelectableTextBlock Classes="workflowOverviewTitle" Text="Project / grid"/>
               <Button Grid.Column="1"
+                      AutomationProperties.Name="Open Settings &gt; General"
                       Tag="General"
                       Classes="actionIconButton actionGhost workflowOverviewAction"
                       Click="OpenSettingsButton_Click"
@@ -82,6 +83,7 @@
             <Grid Classes="workflowOverviewHeader" ColumnDefinitions="*,Auto">
               <SelectableTextBlock Classes="workflowOverviewTitle" Text="Notch model"/>
               <Button Grid.Column="1"
+                      AutomationProperties.Name="Open Settings &gt; Step 3"
                       Tag="Step3NotchCompensation"
                       Classes="actionIconButton actionGhost workflowOverviewAction"
                       Click="OpenSettingsButton_Click"
@@ -193,6 +195,7 @@
             <Grid Classes="workflowOverviewHeader" ColumnDefinitions="*,Auto">
               <SelectableTextBlock Classes="workflowOverviewTitle" Text="Export handoff"/>
               <Button Grid.Column="1"
+                      AutomationProperties.Name="Open Settings &gt; Step 5"
                       Tag="Step5NotchExport"
                       Classes="actionIconButton actionGhost workflowOverviewAction"
                       Click="OpenSettingsButton_Click"
@@ -257,6 +260,7 @@
                                Classes="stepNote"
                                Text="{Binding NotchValidationSummaryText}"/>
           <Button Grid.Column="1"
+                  AutomationProperties.Name="Clear validation trace"
                   Classes="actionIconButton actionGhost"
                   Margin="{StaticResource InsetLeft10}"
                   Command="{Binding ClearNotchValidationCommand}"
