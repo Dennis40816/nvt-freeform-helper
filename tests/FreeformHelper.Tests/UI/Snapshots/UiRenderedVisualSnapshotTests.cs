@@ -88,7 +88,7 @@ public sealed class UiRenderedVisualSnapshotTests
         var baselinePath = Path.Combine(repoRoot, "tests", "FreeformHelper.Tests", "Snapshots", "ui-rendered-visual-baseline.json");
         Assert.True(File.Exists(baselinePath), $"Rendered baseline file not found: {baselinePath}");
 
-        var baseline = JsonSerializer.Deserialize<RenderedVisualBaseline>(File.ReadAllText(baselinePath));
+        var baseline = JsonSerializer.Deserialize<RenderedVisualBaseline>(TestFiles.ReadContent(baselinePath));
         Assert.NotNull(baseline);
         Assert.NotNull(baseline!.Surfaces);
         Assert.NotEmpty(baseline.Surfaces);
@@ -135,7 +135,7 @@ public sealed class UiRenderedVisualSnapshotTests
                 }
 
                 var updatedBaselineText = JsonSerializer.Serialize(baseline, _baselineJsonOptions);
-                File.WriteAllText(baselinePath, updatedBaselineText + Environment.NewLine, new UTF8Encoding(false));
+                TestFiles.WriteText(baselinePath, updatedBaselineText + Environment.NewLine, new UTF8Encoding(false));
             }
 
             return;
@@ -275,10 +275,10 @@ public sealed class UiRenderedVisualSnapshotTests
 
     private static async Task FlushUiQueueAsync()
     {
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Loaded);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Render);
-        await Dispatcher.UIThread.InvokeAsync(static () => { }, DispatcherPriority.Background);
+        await HeadlessUiPump.YieldAsync(DispatcherPriority.Background);
+        await HeadlessUiPump.YieldAsync(DispatcherPriority.Loaded);
+        await HeadlessUiPump.YieldAsync(DispatcherPriority.Render);
+        await HeadlessUiPump.YieldAsync(DispatcherPriority.Background);
     }
 
     private static string ComputeAverageHashHex(byte[] bgra, int width, int height, int stride, int hashSize)
