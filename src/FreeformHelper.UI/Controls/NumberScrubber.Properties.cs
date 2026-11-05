@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Automation;
 
 namespace FreeformHelper.UI.Controls;
 
@@ -109,6 +110,12 @@ public sealed partial class NumberScrubber
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
+
+        if (change.Property == AutomationProperties.NameProperty && _inputBox is not null)
+        {
+            AutomationProperties.SetName(_inputBox, change.GetNewValue<string?>());
+            return;
+        }
 
         if (change.Property == ValueProperty)
         {

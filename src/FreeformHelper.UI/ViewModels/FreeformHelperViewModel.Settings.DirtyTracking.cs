@@ -28,6 +28,8 @@ public sealed partial class FreeformHelperViewModel
         nameof(GridPaddingPercent),
         nameof(ActiveAreaWidth),
         nameof(ActiveAreaHeight),
+        nameof(ActiveAreaPixelsX),
+        nameof(ActiveAreaPixelsY),
         nameof(PanelBiasX),
         nameof(PanelBiasY),
         nameof(MatchThreshold),
