@@ -1,8 +1,8 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using Xunit;
 
@@ -26,7 +26,7 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         var canvas = new PadCanvas { RegularPads = regularPads, PadMatchLinks = links };
 
         Assert.Equal(new CadBestMatchSeed(11, 0, 1011, 0.9d, 0.2d), BuildSeed(regularPads, links));
-        Assert.Same(regularPads[2], ResolveBestRegularByCad(canvas, 101));
+        Assert.Same(regularPads[2], PadCanvasPrivateAccess.ResolveBestRegularByCad(canvas, 101));
     }
 
     [AvaloniaTheory]
@@ -44,7 +44,7 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         };
         var canvas = new PadCanvas { RegularPads = regularPads, PadMatchLinks = links };
 
-        Assert.Same(regularPads.Single(pad => pad.RegularPadId == expectedRegularPadId), ResolveBestRegularByCad(canvas, 101));
+        Assert.Same(regularPads.Single(pad => pad.RegularPadId == expectedRegularPadId), PadCanvasPrivateAccess.ResolveBestRegularByCad(canvas, 101));
     }
 
     [AvaloniaFact]
@@ -57,7 +57,7 @@ public sealed class PadBestMatchProjectionCharacterizationTests
             var canvas = new PadCanvas { RegularPads = regularPads, PadMatchLinks = links };
 
             Assert.Equal(new CadBestMatchSeed(ids[0], 0, ids[0] + 1000, 0.8d, 0.8d), BuildSeed(regularPads, links));
-            Assert.Same(regularPads.Single(pad => pad.RegularPadId == ids[0]), ResolveBestRegularByCad(canvas, 101));
+            Assert.Same(regularPads.Single(pad => pad.RegularPadId == ids[0]), PadCanvasPrivateAccess.ResolveBestRegularByCad(canvas, 101));
         }
     }
 
@@ -73,7 +73,7 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         var canvas = new PadCanvas { RegularPads = regularPads, PadMatchLinks = links };
 
         Assert.Equal(new CadBestMatchSeed(11, 0, 1011, 0.9d, 0.9d), BuildSeed(regularPads, links));
-        Assert.Same(regularPads[0], ResolveBestRegularByCad(canvas, 101));
+        Assert.Same(regularPads[0], PadCanvasPrivateAccess.ResolveBestRegularByCad(canvas, 101));
 
         // The seed accepts a separate active mask; hover only receives the available pads and links.
         Assert.Equal(
@@ -95,7 +95,7 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         var canvas = new PadCanvas { RegularPads = regularPads, PadMatchLinks = links };
 
         Assert.Equal(new CadBestMatchSeed(22, 0, 1022, 0.8d, 0.8d), BuildSeed(regularPads, links));
-        Assert.Null(ResolveBestRegularByCad(canvas, 101));
+        Assert.Null(PadCanvasPrivateAccess.ResolveBestRegularByCad(canvas, 101));
     }
 
     [AvaloniaFact]
@@ -110,7 +110,7 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         var canvas = new PadCanvas { RegularPads = regularPads, PadMatchLinks = links };
 
         Assert.Equal(new CadBestMatchSeed(22, 0, 1022, 0.8d, 0.8d), BuildSeed(regularPads, links));
-        Assert.Same(regularPads[0], ResolveBestRegularByCad(canvas, 101));
+        Assert.Same(regularPads[0], PadCanvasPrivateAccess.ResolveBestRegularByCad(canvas, 101));
 
         Assert.Equal(
             new CadBestMatchSeed(11, 1, 1011, 0.9d, 0.9d),
@@ -128,7 +128,7 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         };
         var canvas = new PadCanvas { RegularPads = new[] { CreateRegular(11) }, PadMatchLinks = links };
 
-        Assert.Equal(101, ResolveBestCadIdByRegular(canvas, 11));
+        Assert.Equal(101, PadCanvasPrivateAccess.ResolveBestCadIdByRegular(canvas, 11));
     }
 
     [AvaloniaTheory]
@@ -145,7 +145,7 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         };
         var canvas = new PadCanvas { RegularPads = new[] { CreateRegular(11) }, PadMatchLinks = links };
 
-        Assert.Equal(expectedCadPadId, ResolveBestCadIdByRegular(canvas, 11));
+        Assert.Equal(expectedCadPadId, PadCanvasPrivateAccess.ResolveBestCadIdByRegular(canvas, 11));
     }
 
     [AvaloniaFact]
@@ -156,7 +156,7 @@ public sealed class PadBestMatchProjectionCharacterizationTests
             var links = ids.Select(id => new PadMatchLink(id, 11, 8d, 0.8d, 0.8d)).ToArray();
             var canvas = new PadCanvas { RegularPads = new[] { CreateRegular(11) }, PadMatchLinks = links };
 
-            Assert.Equal(ids[0], ResolveBestCadIdByRegular(canvas, 11));
+            Assert.Equal(ids[0], PadCanvasPrivateAccess.ResolveBestCadIdByRegular(canvas, 11));
         }
     }
 
@@ -168,8 +168,8 @@ public sealed class PadBestMatchProjectionCharacterizationTests
         var canvas = new PadCanvas { RegularPads = regularPads, PadMatchLinks = links };
 
         Assert.Equal(CadBestMatchSeed.Empty, BuildSeed(regularPads, links));
-        Assert.Null(ResolveBestRegularByCad(canvas, 101));
-        Assert.Null(ResolveBestCadIdByRegular(canvas, 11));
+        Assert.Null(PadCanvasPrivateAccess.ResolveBestRegularByCad(canvas, 101));
+        Assert.Null(PadCanvasPrivateAccess.ResolveBestCadIdByRegular(canvas, 11));
     }
 
     private static CadBestMatchSeed BuildSeed(
@@ -185,22 +185,6 @@ public sealed class PadBestMatchProjectionCharacterizationTests
             regularPads.ToDictionary(pad => pad.RegularPadId),
             cadIcIndexByCadId ?? new Dictionary<int, int> { [101] = 0 },
             activeRegularPadIds)[101];
-    }
-
-    private static RegularPad? ResolveBestRegularByCad(PadCanvas canvas, int cadPadId)
-    {
-        var method = typeof(PadCanvas).GetMethod("ResolveBestRegularByCad", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        var result = method!.Invoke(canvas, new object[] { cadPadId });
-        return result is null ? null : Assert.IsType<RegularPad>(result);
-    }
-
-    private static int? ResolveBestCadIdByRegular(PadCanvas canvas, int regularPadId)
-    {
-        var method = typeof(PadCanvas).GetMethod("ResolveBestCadIdByRegular", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        var result = method!.Invoke(canvas, new object[] { regularPadId });
-        return result is null ? null : Assert.IsType<int>(result);
     }
 
     private static RegularPad CreateRegular(int id, int icIndex = 0)
