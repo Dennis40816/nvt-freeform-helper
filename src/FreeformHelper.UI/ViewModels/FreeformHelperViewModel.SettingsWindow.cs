@@ -14,6 +14,21 @@ public sealed partial class FreeformHelperViewModel
         return window;
     }
 
+    /// <summary>
+    /// Checks that a settings window draft still belongs to the project that is loaded now.
+    /// A draft of a replaced project is refused with a status message and nothing is applied.
+    /// A draft that recorded no project (not made by <see cref="CreateSettingsWindowViewModel"/>) is accepted.
+    /// </summary>
+    /// <param name="draftProject">The project the draft recorded when it was created.</param>
+    /// <returns><see langword="true"/> when the draft may be applied.</returns>
+    internal bool TryAcceptSettingsWindowDraft(object? draftProject)
+    {
+        if (draftProject is null || ReferenceEquals(draftProject, _projectFile)) return true;
+
+        SetStatus("Settings not saved: another project was loaded after this window opened. Reopen Settings to edit the current project.");
+        return false;
+    }
+
     internal void ApplySettingsWindowDraft(SettingsWindowViewModel draft)
     {
         ArgumentNullException.ThrowIfNull(draft);

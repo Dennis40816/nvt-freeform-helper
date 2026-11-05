@@ -63,7 +63,7 @@ Current documentation baseline: FreeformHelper g1 current-state audit, productio
 
 ## Single Source (current state)
 1. `FreeformHelperViewModel` is live UI projection/orchestration, not the durable owner of all settings.
-2. `SettingsWindow` path: `CreateSettingsWindowViewModel` -> `SettingsWindowViewModel` (draft) -> `ApplySettingsWindowDraft`.
+2. `SettingsWindow` path: `CreateSettingsWindowViewModel` -> `SettingsWindowViewModel` (draft) -> `ApplySettingsWindowDraft`. The draft records the project it was created for (`ActiveAreaPixels.ProjectIdentity`). `Save` on a draft of a replaced project is refused with a status message (`TryAcceptSettingsWindowDraft`).
 3. `RightWorkflowPanel` deep-link path: `OpenSettingsRequested` -> `FreeformHelperView.OpenSettingsWindowCore(section)` -> `SettingsWindow.NavigateToSection(section)`.
 4. `Display popup` path: `src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml` binds directly to VM properties.
 
