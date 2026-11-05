@@ -195,6 +195,10 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
     - `a9e867ebea6b0550962008acd8337552fd41fa7e`, `8583de4990ea5c4339b66e635b595729cf7321b6` and `ba3845bee394fe2171671decee634048ac78b80d`: three fixes after failed queue runs (`CA2249`, a closed window drained in the new test, a new `CA1307` finding). Each body says why the earlier run failed. None records the run on its own fix, and none has a `Refs` line. The queue run on `ba3845b` passed the build, 240 tests and the health chain (LowerBaseline, Verify, lint) on 2026-10-31. It is recorded in the description of #228.
 - [ ] **UI-REDESIGN Redesign the whole NFH UI** · Target: - · Status: Waiting for owner (scope and timing) · PR: -
   - Owner, 2026-10-18, on the right-panel text proposal: 「可以，但由於 NFH 是很久之前設計，理論上是整個都要大改」 ("Yes, but NFH was designed long ago, so in principle all of it needs a major redesign").
+- [ ] **UI-A11Y1 Accessibility: names, keyboard and focus in the Avalonia views** · Target: - · Status: In progress · PR: -
+  - Audit: [docs/audits/a11y-audit.md](docs/audits/a11y-audit.md), 2026-11-05, branch `cloud/a11y-audit` (not merged). Metric: controls with an accessible name, 0 to 312.
+  - Done on the branch: names for 80 icon-only buttons, 87 text buttons and 145 form inputs (A11Y-01 to A11Y-03), and a guard test for icon-only buttons.
+  - Open: NumberScrubber name forwarding (A11Y-04), SelectableTextBlock Tab stops (A11Y-05), dialog Enter/Escape (A11Y-06, owner decides Enter in `ConfirmDialog`), focus ring of the bulk layer toggle (A11Y-08), and the bound or composite names listed in the audit.
 
 ## 3. Core integration
 
