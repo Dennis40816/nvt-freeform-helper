@@ -2,7 +2,7 @@
 
 This document only inventories the persistence impact and policy options for the TODO item "Complete V21／Legacy Removal". The owner has confirmed that 「2.1」 means V21 and still chooses to retain V21 and `LegacyRegularAnchor`; this document does not authorize removal, propose a new product or file format version, or schedule the order or date of removal.
 
-The basis is the code and test declarations on the current branch `feature/queue/v21-removal-persistence-plan`, the [dependency graph](../generated/project-dependency-graph.md), the [Notch contract](../reference/notch-system-reference.md), the [settings entry matrix](../guides/settings-entry-matrix.md), and the [owner decisions in the 1.3.x roadmap](../guides/refactor-roadmap-1.3.x.md). The following describes the current state and recommendations that have not been adopted; no private example data was read, and no golden or baseline was inspected or changed.
+The basis is the code and test declarations on the current branch `feature/queue/v21-removal-persistence-plan`, the [dependency graph](../generated/project-dependency-graph.md), the [Notch contract](../reference/notch-system-reference.md), the [settings entry matrix](../guides/settings-entry-matrix.md), and the [owner decisions in the 1.3.x roadmap](https://github.com/Dennis40816/nvt-freeform-helper/blob/d255245beea49ae36ea337b93a349e2333331949/docs/guides/refactor-roadmap-1.3.x.md). The following describes the current state and recommendations that have not been adopted; no private example data was read, and no golden or baseline was inspected or changed.
 
 ## 1. File Format and Enum Contracts
 

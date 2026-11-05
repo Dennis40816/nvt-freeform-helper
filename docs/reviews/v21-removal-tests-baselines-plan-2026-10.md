@@ -3,7 +3,7 @@
 - Inventory date: 2026-10-03; source revision: `7477b07d3969ad6ad15960d0d1ac8b60ef37a9bc`.
 - Related work item: [“V21/Legacy Complete Removal” in TODO.md](../../TODO.md). This document is planning only; it does not change checkboxes, the roadmap, code, or tests.
 - The owner's 「先保留」(keep it for now) decision remains in effect: V21 and `LegacyRegularAnchor` remain unchanged, protected by the existing zero-diff gates; no new legacy convergence/equivalence work is added. No removal version, schedule, or migration policy for old projects is proposed.
-- References: sections 0, 2, and 3 of the [1.3.x roadmap](../guides/refactor-roadmap-1.3.x.md), [Notch contract](../reference/notch-system-reference.md), [Runtime CLI contract](../reference/runtime-cli-plan.md), and [3635 regression baseline](../performance/regression-baseline-3635.md).
+- References: sections 0, 2, and 3 of the [1.3.x roadmap](https://github.com/Dennis40816/nvt-freeform-helper/blob/d255245beea49ae36ea337b93a349e2333331949/docs/guides/refactor-roadmap-1.3.x.md), [Notch contract](../reference/notch-system-reference.md), [Runtime CLI contract](../reference/runtime-cli-plan.md), and [3635 regression baseline](../performance/regression-baseline-3635.md).
 - No `example/` content was read, copied, or quoted. The private data names below come from strings in tests/scripts and public repository documents; the current contents, existence, or hashes of the private files have not been verified. This does not authorize removal or golden updates.
 
 ## 1. Counting Rules and CI Assignment
