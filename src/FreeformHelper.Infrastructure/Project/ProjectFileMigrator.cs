@@ -61,6 +61,7 @@ public static class ProjectFileMigrator
         settings.View ??= new ViewSettings();
         settings.Notch ??= new NotchSettings();
         settings.IndexMapping ??= new IndexMappingSettings();
+        settings.ActiveAreaPixels ??= new ActiveAreaPixelsSettings();
 
         var grid = settings.Grid;
         if (grid.MaxChannelsX <= 0 || grid.MaxChannelsX == GridSettings.LegacyChannelLimit)

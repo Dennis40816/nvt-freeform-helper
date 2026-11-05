@@ -32,6 +32,11 @@ public sealed class ProjectSettings
     public IndexMappingSettings IndexMapping { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the optional panel pixel counts of the active area.
+    /// </summary>
+    public ActiveAreaPixelsSettings ActiveAreaPixels { get; set; } = new();
+
+    /// <summary>
     /// Validates all aggregated settings and throws an <see cref="InvalidOperationException"/>
     /// if any of the settings or their sub-settings contain invalid values.
     /// This method performs a cascading validation call to each contained settings object.
