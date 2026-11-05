@@ -188,17 +188,7 @@ public sealed partial class FreeformHelperViewModel
 
             await dispatcher!.InvokeAsync(() =>
             {
-                if (cancellationToken.IsCancellationRequested || requestId != Interlocked.Read(ref _padInspectorDeferredRefreshRequestId))
-                {
-                    return;
-                }
-
-                if (!TryCreateDeferredCadInspectorContext(requestId, cadPadId, selectionRevision, out var created))
-                {
-                    return;
-                }
-
-                context = created;
+                context = CaptureDeferredCadInspectorContext(requestId, cadPadId, selectionRevision, cancellationToken);
             }, DispatcherPriority.Background, cancellationToken);
 
             if (context is null)
@@ -206,14 +196,7 @@ public sealed partial class FreeformHelperViewModel
                 return;
             }
 
-            var resolved = context.PrewarmedResolved;
-            if (resolved is null)
-            {
-                resolved = await Task.Run(
-                    () => NotchDetailUseCase.BuildResolvedResult(context.ResolutionRequest),
-                    cancellationToken).ConfigureAwait(false);
-            }
-            var diagnostics = BuildToFullDiagnosticsText(resolved.Compensation);
+            var (resolved, diagnostics) = await ResolveDeferredCadInspectorAsync(context, cancellationToken).ConfigureAwait(false);
 
             if (!UiThread.TryGetRunningDispatcher(out dispatcher))
             {
@@ -222,34 +205,13 @@ public sealed partial class FreeformHelperViewModel
 
             await dispatcher!.InvokeAsync(() =>
             {
-                if (!CanApplyDeferredCadInspectorSnapshot(context))
+                if (!TryApplyDeferredCadInspectorSnapshot(context, resolved, diagnostics))
                 {
                     return;
                 }
 
-                var request = context.ResolutionRequest;
-                if (context.PrewarmedResolved is null)
-                {
-                    _ = GetOrBuildCadV22ResolvedResultCached(
-                        request.CadPad,
-                        request.AllCadPads,
-                        request.ActiveRegularPadIds,
-                        BuildWorkflowDataSnapshot(),
-                        request.StrictOverlapRatio,
-                        precomputedResolved: resolved);
-                }
-                var snapshot = BuildCadPadInspectorSnapshot(
-                    request.CadPad.Id,
-                    includeExpensiveNotchDetails: true,
-                    precomputedDiagnostics: diagnostics);
-                if (snapshot is null)
-                {
-                    return;
-                }
-
-                PadInspectorUi.Snapshot = snapshot;
                 _logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: CAD={0}, elapsed={1}ms (delay={2}ms).",
-                    request.CadPad.Id,
+                    context.ResolutionRequest.CadPad.Id,
                     sw.ElapsedMilliseconds,
                     PadInspectorDeferredRefreshDelayMs);
             }, DispatcherPriority.Background, cancellationToken);
@@ -273,6 +235,75 @@ public sealed partial class FreeformHelperViewModel
                 UpdatePadInspectorDeferredRefreshPendingState();
             }
         }
+    }
+
+    private DeferredCadInspectorContext? CaptureDeferredCadInspectorContext(
+        long requestId,
+        int cadPadId,
+        long selectionRevision,
+        CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested || requestId != Interlocked.Read(ref _padInspectorDeferredRefreshRequestId))
+        {
+            return null;
+        }
+
+        if (!TryCreateDeferredCadInspectorContext(requestId, cadPadId, selectionRevision, out var created))
+        {
+            return null;
+        }
+
+        return created;
+    }
+
+    private static async Task<(NotchV22ResolvedResult Resolved, string? Diagnostics)> ResolveDeferredCadInspectorAsync(
+        DeferredCadInspectorContext context,
+        CancellationToken cancellationToken)
+    {
+        var resolved = context.PrewarmedResolved;
+        if (resolved is null)
+        {
+            resolved = await Task.Run(
+                () => NotchDetailUseCase.BuildResolvedResult(context.ResolutionRequest),
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        var diagnostics = BuildToFullDiagnosticsText(resolved.Compensation);
+        return (resolved, diagnostics);
+    }
+
+    private bool TryApplyDeferredCadInspectorSnapshot(
+        DeferredCadInspectorContext context,
+        NotchV22ResolvedResult resolved,
+        string? diagnostics)
+    {
+        if (!CanApplyDeferredCadInspectorSnapshot(context))
+        {
+            return false;
+        }
+
+        var request = context.ResolutionRequest;
+        if (context.PrewarmedResolved is null)
+        {
+            _ = GetOrBuildCadV22ResolvedResultCached(
+                request.CadPad,
+                request.AllCadPads,
+                request.ActiveRegularPadIds,
+                BuildWorkflowDataSnapshot(),
+                request.StrictOverlapRatio,
+                precomputedResolved: resolved);
+        }
+        var snapshot = BuildCadPadInspectorSnapshot(
+            request.CadPad.Id,
+            includeExpensiveNotchDetails: true,
+            precomputedDiagnostics: diagnostics);
+        if (snapshot is null)
+        {
+            return false;
+        }
+
+        PadInspectorUi.Snapshot = snapshot;
+        return true;
     }
 
     private async Task RunDeferredRegularInspectorSnapshotRefreshAsync(

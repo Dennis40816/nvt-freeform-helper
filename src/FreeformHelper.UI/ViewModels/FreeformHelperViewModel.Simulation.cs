@@ -46,14 +46,15 @@ public sealed partial class FreeformHelperViewModel
         LastSimulationWorkspaceAttemptMessage = string.Empty;
         SimulationWorkspaceSession? session = null;
         UiOperationStatusReporter.Scope? status = silent ? null : CreateStatusScope("SimulationWorkspace");
+        var reporter = new SimulationBuildReporter(silent, status, progressTextReporter);
         await RunUiOperationAsync(
             operationName: "Build simulation workspace",
             operationAsync: async () =>
             {
-                ReportSimulationBuildProgress("Preparing simulation workspace...");
+                reporter.Progress("Preparing simulation workspace...");
 
                 var workflowSnapshot = BuildWorkflowDataSnapshot();
-                ReportSimulationBuildProgress("Generating simulation notch table...");
+                reporter.Progress("Generating simulation notch table...");
                 var generation = await GenerateCurrentNotchTableAsync(
                     cad,
                     grid,
@@ -69,114 +70,150 @@ public sealed partial class FreeformHelperViewModel
 
                 if (generation.Table.Rows.Count == 0)
                 {
-                    var message = "Simulation: no notch rows generated under current settings.";
-                    LastSimulationWorkspaceAttemptMessage = message;
-                    if (silent)
-                    {
-                        _logger.Info(message);
-                    }
-                    else
-                    {
-                        status?.ReportBlocked(message);
-                        SetStatus(message);
-                    }
-
-                    ReportSimulationBuildProgress(message, reportToStatus: false);
-
+                    ReportSimulationNoRowsGenerated(reporter);
                     return;
                 }
 
-                ReportSimulationBuildProgress("Resolving simulation diff grid...");
+                reporter.Progress("Resolving simulation diff grid...");
                 var activeRegularPadIds = BuildSimulationActiveRegularPadIds(
                     generation.RawGrid,
                     workflowSnapshot.ActiveRegularVisibilityMaskPadIds);
 
                 RefreshStep4DuplicateDiffGroups(CadPads.ToList(), workflowSnapshot);
-                string? duplicateWarningMessage = null;
-                if (_step4DuplicateDiffGroups.Length > 0)
-                {
-                    var sample = _step4DuplicateDiffGroups[0];
-                    duplicateWarningMessage = string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Simulation warning: duplicate CAD output FW diff at IC{0}/diff{1}; results may include ambiguous mappings.",
-                        sample.IcIndex + 1,
-                        sample.DiffIndex);
-                    _logger.Warn(
-                        CultureInfo.InvariantCulture,
-                        "{0} duplicate-groups={1} sample-cads={2}.",
-                        duplicateWarningMessage,
-                        _step4DuplicateDiffGroups.Length,
-                        string.Join(", ", sample.CadPadIds));
-                    if (!silent)
-                    {
-                        status?.ReportWarning(duplicateWarningMessage);
-                    }
+                var duplicateWarningMessage = ReportSimulationDuplicateDiffWarning(reporter);
 
-                    ReportSimulationBuildProgress(duplicateWarningMessage, reportToStatus: false);
-                }
-
-                ReportSimulationBuildProgress("Finalizing simulation workspace...");
-                session = new SimulationWorkspaceSession(
-                    generation.RawGrid,
-                    generation.Table,
-                    generation.ExportSettings.Notch.NullValue,
-                    generation.SourceRevision,
-                    activeRegularPadIds,
-                    ShowRegular,
-                    HighlightUnmatched,
-                    HighlightFreeform,
-                    workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId,
-                    generation.CadOutputFwDiffGrid,
-                    cad.Pads.ToArray(),
-                    workflowSnapshot.CadOutputFwDiffIndexByCadId,
-                    workflowSnapshot.CadIcIndexByCadId,
-                    generation.ExportSettings.Notch.ComputationMode);
-                var readyMessage = string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Simulation ready. Rows={0}.",
-                    generation.Table.Rows.Count);
-                LastSimulationWorkspaceAttemptMessage = duplicateWarningMessage is null
-                    ? readyMessage
-                    : string.Concat(readyMessage, " ", duplicateWarningMessage);
-                if (silent)
-                {
-                    _logger.Info(
-                        CultureInfo.InvariantCulture,
-                        duplicateWarningMessage is null
-                            ? "Simulation prewarm ready. Rows={0}."
-                            : "Simulation prewarm ready with duplicate-diff warning. Rows={0}.",
-                        generation.Table.Rows.Count);
-                }
-                else
-                {
-                    status?.ReportSuccess(readyMessage);
-                }
-
-                ReportSimulationBuildProgress(readyMessage, reportToStatus: false);
+                reporter.Progress("Finalizing simulation workspace...");
+                session = CreateSimulationWorkspaceSession(generation, activeRegularPadIds, workflowSnapshot, cad);
+                ReportSimulationWorkspaceReady(reporter, generation, duplicateWarningMessage);
             },
-            onError: ex =>
-            {
-                var message = $"Simulation build failed: {ex.Message}";
-                LastSimulationWorkspaceAttemptMessage = message;
-                if (!silent)
-                {
-                    status?.ReportError("Simulation workspace failed", ex);
-                    SetStatus(message);
-                }
-
-                _logger.Error(ex, "Simulation workspace failed.");
-                ReportSimulationBuildProgress(message, reportToStatus: false);
-            },
+            onError: ex => ReportSimulationBuildFailed(reporter, ex),
             showModalSpinner: !silent);
 
         return session;
+    }
 
-        void ReportSimulationBuildProgress(string message, bool reportToStatus = true)
+    private void ReportSimulationNoRowsGenerated(SimulationBuildReporter reporter)
+    {
+        var message = "Simulation: no notch rows generated under current settings.";
+        LastSimulationWorkspaceAttemptMessage = message;
+        if (reporter.Silent)
         {
-            progressTextReporter?.Invoke(message);
+            _logger.Info(message);
+        }
+        else
+        {
+            reporter.Status?.ReportBlocked(message);
+            SetStatus(message);
+        }
+
+        reporter.Progress(message, reportToStatus: false);
+    }
+
+    private string? ReportSimulationDuplicateDiffWarning(SimulationBuildReporter reporter)
+    {
+        string? duplicateWarningMessage = null;
+        if (_step4DuplicateDiffGroups.Length > 0)
+        {
+            var sample = _step4DuplicateDiffGroups[0];
+            duplicateWarningMessage = string.Format(
+                CultureInfo.InvariantCulture,
+                "Simulation warning: duplicate CAD output FW diff at IC{0}/diff{1}; results may include ambiguous mappings.",
+                sample.IcIndex + 1,
+                sample.DiffIndex);
+            _logger.Warn(
+                CultureInfo.InvariantCulture,
+                "{0} duplicate-groups={1} sample-cads={2}.",
+                duplicateWarningMessage,
+                _step4DuplicateDiffGroups.Length,
+                string.Join(", ", sample.CadPadIds));
+            if (!reporter.Silent)
+            {
+                reporter.Status?.ReportWarning(duplicateWarningMessage);
+            }
+
+            reporter.Progress(duplicateWarningMessage, reportToStatus: false);
+        }
+
+        return duplicateWarningMessage;
+    }
+
+    private SimulationWorkspaceSession CreateSimulationWorkspaceSession(
+        NotchTableGenerationResult generation,
+        HashSet<int> activeRegularPadIds,
+        WorkflowDataSnapshot workflowSnapshot,
+        CadPadSet cad)
+    {
+        return new SimulationWorkspaceSession(
+            generation.RawGrid,
+            generation.Table,
+            generation.ExportSettings.Notch.NullValue,
+            generation.SourceRevision,
+            activeRegularPadIds,
+            ShowRegular,
+            HighlightUnmatched,
+            HighlightFreeform,
+            workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId,
+            generation.CadOutputFwDiffGrid,
+            cad.Pads.ToArray(),
+            workflowSnapshot.CadOutputFwDiffIndexByCadId,
+            workflowSnapshot.CadIcIndexByCadId,
+            generation.ExportSettings.Notch.ComputationMode);
+    }
+
+    private void ReportSimulationWorkspaceReady(
+        SimulationBuildReporter reporter,
+        NotchTableGenerationResult generation,
+        string? duplicateWarningMessage)
+    {
+        var readyMessage = string.Format(
+            CultureInfo.InvariantCulture,
+            "Simulation ready. Rows={0}.",
+            generation.Table.Rows.Count);
+        LastSimulationWorkspaceAttemptMessage = duplicateWarningMessage is null
+            ? readyMessage
+            : string.Concat(readyMessage, " ", duplicateWarningMessage);
+        if (reporter.Silent)
+        {
+            _logger.Info(
+                CultureInfo.InvariantCulture,
+                duplicateWarningMessage is null
+                    ? "Simulation prewarm ready. Rows={0}."
+                    : "Simulation prewarm ready with duplicate-diff warning. Rows={0}.",
+                generation.Table.Rows.Count);
+        }
+        else
+        {
+            reporter.Status?.ReportSuccess(readyMessage);
+        }
+
+        reporter.Progress(readyMessage, reportToStatus: false);
+    }
+
+    private void ReportSimulationBuildFailed(SimulationBuildReporter reporter, Exception ex)
+    {
+        var message = $"Simulation build failed: {ex.Message}";
+        LastSimulationWorkspaceAttemptMessage = message;
+        if (!reporter.Silent)
+        {
+            reporter.Status?.ReportError("Simulation workspace failed", ex);
+            SetStatus(message);
+        }
+
+        _logger.Error(ex, "Simulation workspace failed.");
+        reporter.Progress(message, reportToStatus: false);
+    }
+
+    private readonly record struct SimulationBuildReporter(
+        bool Silent,
+        UiOperationStatusReporter.Scope? Status,
+        Action<string>? ProgressTextReporter)
+    {
+        public void Progress(string message, bool reportToStatus = true)
+        {
+            ProgressTextReporter?.Invoke(message);
             if (reportToStatus)
             {
-                status?.ReportProgress(message);
+                Status?.ReportProgress(message);
             }
         }
     }

@@ -43,53 +43,14 @@ internal sealed partial class RuntimeQueryUseCase
                 message: "Argument '--path' is required for query export-notch.");
         }
 
-        var requestedFormat = formatText.Trim().ToLowerInvariant();
-        var mappedType = requestedFormat switch
+        var formatFailure = TryResolveNotchExportFormat(formatText, out var option, out var normalizedFormat);
+        if (formatFailure is not null)
         {
-            "csv" => FreeformHelperViewModel.NotchExportFileType.Csv,
-            "c-v21" => FreeformHelperViewModel.NotchExportFileType.Cv21,
-            "c-v22" => FreeformHelperViewModel.NotchExportFileType.Cv22,
-            _ => (FreeformHelperViewModel.NotchExportFileType?)null,
-        };
-        if (!mappedType.HasValue)
-        {
-            return RuntimeQueryResponseEnvelope.Failure(
-                code: "INVALID_ARGUMENTS",
-                message: $"Unsupported export format '{formatText}'. Use csv (CSV review)|c-v21|c-v22.");
+            return formatFailure;
         }
 
         var helper = _shellViewModel.FreeformHelper;
-        var option = helper.NotchExportFileTypeOptions.FirstOrDefault(candidate =>
-            candidate.Value == mappedType.Value);
-        var normalizedFormat = mappedType.Value switch
-        {
-            FreeformHelperViewModel.NotchExportFileType.Csv => "csv",
-            FreeformHelperViewModel.NotchExportFileType.Cv21 => "c-v21",
-            FreeformHelperViewModel.NotchExportFileType.Cv22 => "c-v22",
-            _ => requestedFormat,
-        };
-
-        if (string.IsNullOrWhiteSpace(option.Extension))
-        {
-            return RuntimeQueryResponseEnvelope.Failure(
-                code: "STEP_EXECUTION_FAILED",
-                message: $"Export format '{normalizedFormat}' is not available.");
-        }
-
-        var resolvedPath = Path.GetFullPath(outputPath);
-        var outputDirectory = Path.GetDirectoryName(resolvedPath);
-        if (!string.IsNullOrWhiteSpace(outputDirectory))
-        {
-            Directory.CreateDirectory(outputDirectory);
-        }
-
-        var fileExistedBefore = File.Exists(resolvedPath);
-        var previousWriteUtc = fileExistedBefore
-            ? File.GetLastWriteTimeUtc(resolvedPath)
-            : DateTime.MinValue;
-        var previousFileSize = fileExistedBefore
-            ? new FileInfo(resolvedPath).Length
-            : -1L;
+        var target = CaptureNotchExportTargetState(outputPath);
 
         var previousOption = helper.SelectedNotchExportFileTypeOption;
         var previousSavePathPicker = helper.PickSaveNotchPathAsync;
@@ -98,7 +59,7 @@ internal sealed partial class RuntimeQueryUseCase
         try
         {
             helper.SelectedNotchExportFileTypeOption = option;
-            helper.PickSaveNotchPathAsync = (_, _) => Task.FromResult<string?>(resolvedPath);
+            helper.PickSaveNotchPathAsync = (_, _) => Task.FromResult<string?>(target.ResolvedPath);
             helper.OpenNotchExportSelectionAsync = viewModel =>
             {
                 var selectedTable = viewModel.BuildSelectedTable();
@@ -119,6 +80,85 @@ internal sealed partial class RuntimeQueryUseCase
             helper.SelectedNotchExportFileTypeOption = previousOption;
         }
 
+        return BuildNotchExportResult(
+            helper,
+            option,
+            normalizedFormat,
+            target,
+            exportStopwatch.ElapsedMilliseconds);
+    }
+
+    private RuntimeQueryResponseEnvelope? TryResolveNotchExportFormat(
+        string formatText,
+        out FreeformHelperViewModel.NotchExportFileTypeOption option,
+        out string normalizedFormat)
+    {
+        var requestedFormat = formatText.Trim().ToLowerInvariant();
+        var mappedType = requestedFormat switch
+        {
+            "csv" => FreeformHelperViewModel.NotchExportFileType.Csv,
+            "c-v21" => FreeformHelperViewModel.NotchExportFileType.Cv21,
+            "c-v22" => FreeformHelperViewModel.NotchExportFileType.Cv22,
+            _ => (FreeformHelperViewModel.NotchExportFileType?)null,
+        };
+        if (!mappedType.HasValue)
+        {
+            option = default;
+            normalizedFormat = requestedFormat;
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: $"Unsupported export format '{formatText}'. Use csv (CSV review)|c-v21|c-v22.");
+        }
+
+        var helper = _shellViewModel.FreeformHelper;
+        option = helper.NotchExportFileTypeOptions.FirstOrDefault(candidate =>
+            candidate.Value == mappedType.Value);
+        normalizedFormat = mappedType.Value switch
+        {
+            FreeformHelperViewModel.NotchExportFileType.Csv => "csv",
+            FreeformHelperViewModel.NotchExportFileType.Cv21 => "c-v21",
+            FreeformHelperViewModel.NotchExportFileType.Cv22 => "c-v22",
+            _ => requestedFormat,
+        };
+
+        if (string.IsNullOrWhiteSpace(option.Extension))
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "STEP_EXECUTION_FAILED",
+                message: $"Export format '{normalizedFormat}' is not available.");
+        }
+
+        return null;
+    }
+
+    private static NotchExportTargetState CaptureNotchExportTargetState(string outputPath)
+    {
+        var resolvedPath = Path.GetFullPath(outputPath);
+        var outputDirectory = Path.GetDirectoryName(resolvedPath);
+        if (!string.IsNullOrWhiteSpace(outputDirectory))
+        {
+            Directory.CreateDirectory(outputDirectory);
+        }
+
+        var fileExistedBefore = File.Exists(resolvedPath);
+        var previousWriteUtc = fileExistedBefore
+            ? File.GetLastWriteTimeUtc(resolvedPath)
+            : DateTime.MinValue;
+        var previousFileSize = fileExistedBefore
+            ? new FileInfo(resolvedPath).Length
+            : -1L;
+
+        return new NotchExportTargetState(resolvedPath, fileExistedBefore, previousWriteUtc, previousFileSize);
+    }
+
+    private static RuntimeQueryResponseEnvelope BuildNotchExportResult(
+        FreeformHelperViewModel helper,
+        FreeformHelperViewModel.NotchExportFileTypeOption option,
+        string normalizedFormat,
+        NotchExportTargetState target,
+        long elapsedMs)
+    {
+        var (resolvedPath, fileExistedBefore, previousWriteUtc, previousFileSize) = target;
         var summaryText = helper.NotchExportSummary;
         if (!File.Exists(resolvedPath))
         {
@@ -145,10 +185,16 @@ internal sealed partial class RuntimeQueryUseCase
             path = resolvedPath,
             fileSize = fileInfo.Length,
             fileLastWriteUtc = fileInfo.LastWriteTimeUtc,
-            elapsedMs = exportStopwatch.ElapsedMilliseconds,
+            elapsedMs,
             statusText = helper.StatusText,
             summaryText,
             workflow = RuntimeQueryResponseBuilder.BuildWorkflowPayload(helper.GetWorkflowStateSnapshot())
         });
     }
+
+    private readonly record struct NotchExportTargetState(
+        string ResolvedPath,
+        bool FileExistedBefore,
+        DateTime PreviousWriteUtc,
+        long PreviousFileSize);
 }

@@ -17,6 +17,54 @@ public sealed partial class FreeformHelperViewModel
         ArgumentNullException.ThrowIfNull(draft);
         if (!IsProjectEditingEnabled) return;
 
+        var resolved = ResolveSettingsWindowDraftOptions(draft);
+        var draftPerIcXChannels = draft.PerIcXChannels.ToList();
+        var draftPerIcYChannels = draft.PerIcYChannels.ToList();
+        var hasCascadeDetailChanges = !CascadeIcLayoutService.HasSameChannels(
+            CascadeIcSettings.Select(static row => Math.Max(1, (int)Math.Round(row.XChannels))),
+            CascadeIcSettings.Select(static row => Math.Max(1, (int)Math.Round(row.YChannels))),
+            draftPerIcXChannels,
+            draftPerIcYChannels);
+
+        var changedProperties = CollectSettingsWindowDraftChanges(draft, resolved, hasCascadeDetailChanges);
+        var hasChanges = changedProperties.Count > 0;
+
+        if (!hasChanges)
+        {
+            return;
+        }
+
+        using (_settingsSuppression.EnterSettingsLoading())
+        {
+            ApplySettingsWindowDraftValues(draft, resolved, draftPerIcXChannels, draftPerIcYChannels);
+        }
+        if (changedProperties.Contains(nameof(SelectedLogLevelOption)))
+        {
+            var appliedLevelName = LoggingBootstrapper.ApplyMinimumLevel(resolved.LogLevel.Value);
+            var normalized = LogLevelOptions.FirstOrDefault(o =>
+                string.Equals(o.Value, appliedLevelName, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrWhiteSpace(normalized.Display) &&
+                !normalized.Equals(SelectedLogLevelOption))
+            {
+                using (_settingsSuppression.EnterSettingsLoading())
+                {
+                    SelectedLogLevelOption = normalized;
+                }
+            }
+        }
+        if (changedProperties.Contains(nameof(CadOutputFwDiffIndexAnchorCadId)) &&
+            !TryCommitCadOutputFwDiffIndexAnchorCadIdFromCurrentValue())
+        {
+            changedProperties.Remove(nameof(CadOutputFwDiffIndexAnchorCadId));
+        }
+
+        ApplySettingsWindowOrchestration(changedProperties);
+
+        return;
+    }
+
+    private SettingsWindowDraftOptions ResolveSettingsWindowDraftOptions(SettingsWindowViewModel draft)
+    {
         var resolvedScanOrder = ScanOrderOptions.FirstOrDefault(o => o.Value == draft.SelectedScanOrderOption.Value);
         if (string.IsNullOrWhiteSpace(resolvedScanOrder.Display))
         {
@@ -70,14 +118,19 @@ public sealed partial class FreeformHelperViewModel
             resolvedNotchExportFileType = SelectedNotchExportFileTypeOption;
         }
 
-        var draftPerIcXChannels = draft.PerIcXChannels.ToList();
-        var draftPerIcYChannels = draft.PerIcYChannels.ToList();
-        var hasCascadeDetailChanges = !CascadeIcLayoutService.HasSameChannels(
-            CascadeIcSettings.Select(static row => Math.Max(1, (int)Math.Round(row.XChannels))),
-            CascadeIcSettings.Select(static row => Math.Max(1, (int)Math.Round(row.YChannels))),
-            draftPerIcXChannels,
-            draftPerIcYChannels);
+        return new SettingsWindowDraftOptions(
+            resolvedScanOrder,
+            resolvedAlignment,
+            resolvedRegularSourceMode,
+            resolvedRegularSourceLayer,
+            resolvedLogLevel,
+            resolvedCadOutputFwDiffAutoMode,
+            resolvedNotchExportFileType);
+    }
 
+    private HashSet<string> CollectSettingsWindowDraftChanges(
+        SettingsWindowViewModel draft, SettingsWindowDraftOptions resolved, bool hasCascadeDetailChanges)
+    {
         var changedProperties = new HashSet<string>(StringComparer.Ordinal);
         AddChangedProperty(nameof(XChannels), XChannels != draft.XChannels);
         AddChangedProperty(nameof(YChannels), YChannels != draft.YChannels);
@@ -90,14 +143,14 @@ public sealed partial class FreeformHelperViewModel
         AddChangedProperty(nameof(ActiveAreaHeight), ActiveAreaHeight != draft.ActiveAreaHeight);
         AddChangedProperty(nameof(PanelBiasX), PanelBiasX != draft.PanelBiasX);
         AddChangedProperty(nameof(PanelBiasY), PanelBiasY != draft.PanelBiasY);
-        AddChangedProperty(nameof(SelectedScanOrder), SelectedScanOrder != resolvedScanOrder.Value);
+        AddChangedProperty(nameof(SelectedScanOrder), SelectedScanOrder != resolved.ScanOrder.Value);
         AddChangedProperty(nameof(ImportOnlyClosedPolylines), ImportOnlyClosedPolylines != draft.ImportOnlyClosedPolylines);
         AddChangedProperty(nameof(ImportBlockPolylines), ImportBlockPolylines != draft.ImportBlockPolylines);
         AddChangedProperty(nameof(RecalcBoundsOnLayerFilter), RecalcBoundsOnLayerFilter != draft.RecalcBoundsOnLayerFilter);
-        AddChangedProperty(nameof(GridAlignmentMode), GridAlignmentMode != resolvedAlignment.Value);
-        AddChangedProperty(nameof(RegularSourceMode), RegularSourceMode != resolvedRegularSourceMode.Value);
-        AddChangedProperty(nameof(SelectedRegularSourceLayerOption), !Equals(resolvedRegularSourceLayer, SelectedRegularSourceLayerOption));
-        AddChangedProperty(nameof(SelectedLogLevelOption), !resolvedLogLevel.Equals(SelectedLogLevelOption));
+        AddChangedProperty(nameof(GridAlignmentMode), GridAlignmentMode != resolved.Alignment.Value);
+        AddChangedProperty(nameof(RegularSourceMode), RegularSourceMode != resolved.RegularSourceMode.Value);
+        AddChangedProperty(nameof(SelectedRegularSourceLayerOption), !Equals(resolved.RegularSourceLayer, SelectedRegularSourceLayerOption));
+        AddChangedProperty(nameof(SelectedLogLevelOption), !resolved.LogLevel.Equals(SelectedLogLevelOption));
         AddChangedProperty(nameof(MatchThreshold), MatchThreshold != draft.MatchThreshold);
         AddChangedProperty(nameof(FreeformAxisThreshold), FreeformAxisThreshold != draft.FreeformAxisThreshold);
         AddChangedProperty(nameof(EnableAutoDetectXy), EnableAutoDetectXy != draft.EnableAutoDetectXy);
@@ -107,7 +160,7 @@ public sealed partial class FreeformHelperViewModel
         AddChangedProperty(nameof(CadOutputFwDiffIndexStart), CadOutputFwDiffIndexStart != draft.CadOutputFwDiffIndexStart);
         AddChangedProperty(nameof(CadOutputFwDiffIndexAnchorCadId), CadOutputFwDiffIndexAnchorCadId != draft.CadOutputFwDiffIndexAnchorCadId);
         AddChangedProperty(nameof(ShowDiffIndexOverlay), ShowDiffIndexOverlay != draft.ShowDiffIndexOverlay);
-        AddChangedProperty(nameof(CadOutputFwDiffAutoMode), CadOutputFwDiffAutoMode != resolvedCadOutputFwDiffAutoMode.Value);
+        AddChangedProperty(nameof(CadOutputFwDiffAutoMode), CadOutputFwDiffAutoMode != resolved.CadOutputFwDiffAutoMode.Value);
         AddChangedProperty(
             nameof(SelectedNotchCompensationModelOption),
             !SelectedNotchCompensationModelOption.Equals(draft.SelectedNotchCompensationModelOption));
@@ -127,7 +180,7 @@ public sealed partial class FreeformHelperViewModel
         AddChangedProperty(nameof(NotchPreviewAutoPlayIntervalMs), NotchPreviewAutoPlayIntervalMs != draft.NotchPreviewAutoPlayIntervalMs);
         AddChangedProperty(nameof(EnableV21), EnableV21 != draft.EnableV21);
         AddChangedProperty(nameof(EnableV22), EnableV22 != draft.EnableV22);
-        AddChangedProperty(nameof(SelectedNotchExportFileTypeOption), !resolvedNotchExportFileType.Equals(SelectedNotchExportFileTypeOption));
+        AddChangedProperty(nameof(SelectedNotchExportFileTypeOption), !resolved.NotchExportFileType.Equals(SelectedNotchExportFileTypeOption));
         AddChangedProperty(nameof(LenScale), LenScale != draft.LenScale);
         AddChangedProperty(nameof(NullValue), NullValue != draft.NullValue);
         AddChangedProperty(nameof(NotchThresholdQ7), NotchThresholdQ7 != draft.NotchThresholdQ7);
@@ -143,106 +196,7 @@ public sealed partial class FreeformHelperViewModel
         AddChangedProperty(nameof(UseLocalSizing), UseLocalSizing != draft.UseLocalSizing);
         AddChangedProperty(nameof(GlobalFontSizePercent), GlobalFontSizePercent != draft.GlobalFontSizePercent);
         AddChangedProperty(nameof(HighlightStrokeWidthAdjust), HighlightStrokeWidthAdjust != draft.HighlightStrokeWidthAdjust);
-        var hasChanges = changedProperties.Count > 0;
-
-        if (!hasChanges)
-        {
-            return;
-        }
-
-        using (_settingsSuppression.EnterSettingsLoading())
-        {
-            XChannels = draft.XChannels;
-            YChannels = draft.YChannels;
-            CascadeNum = draft.CascadeNum;
-            _projectFile.Settings.Grid.ReplacePerIcChannels(draftPerIcXChannels, draftPerIcYChannels);
-            CoordinatePixelWidth = draft.CoordinatePixelWidth;
-            CoordinatePixelHeight = draft.CoordinatePixelHeight;
-            GridPaddingPercent = draft.GridPaddingPercent;
-            ActiveAreaWidth = draft.ActiveAreaWidth;
-            ActiveAreaHeight = draft.ActiveAreaHeight;
-            PanelBiasX = draft.PanelBiasX;
-            PanelBiasY = draft.PanelBiasY;
-            SelectedScanOrder = resolvedScanOrder.Value;
-            SelectedScanOrderOption = resolvedScanOrder;
-            ImportOnlyClosedPolylines = draft.ImportOnlyClosedPolylines;
-            ImportBlockPolylines = draft.ImportBlockPolylines;
-            RecalcBoundsOnLayerFilter = draft.RecalcBoundsOnLayerFilter;
-            GridAlignmentMode = resolvedAlignment.Value;
-            SelectedGridAlignmentOption = resolvedAlignment;
-            RegularSourceMode = resolvedRegularSourceMode.Value;
-            SelectedRegularSourceModeOption = resolvedRegularSourceMode;
-            SelectedRegularSourceLayerOption = resolvedRegularSourceLayer;
-            SelectedLogLevelOption = resolvedLogLevel;
-            MatchThreshold = draft.MatchThreshold;
-            FreeformAxisThreshold = draft.FreeformAxisThreshold;
-            EnableAutoDetectXy = draft.EnableAutoDetectXy;
-            EnableFreeformEdgeSpecialization = draft.EnableFreeformEdgeSpecialization;
-            AutoReplayStep2AfterProjectLoad = draft.AutoReplayStep2AfterProjectLoad;
-            ApplyAppVisualPreferencesOnProjectLoad = draft.ApplyAppVisualPreferencesOnProjectLoad;
-            CadOutputFwDiffIndexStart = draft.CadOutputFwDiffIndexStart;
-            CadOutputFwDiffIndexAnchorCadId = draft.CadOutputFwDiffIndexAnchorCadId;
-            ShowDiffIndexOverlay = draft.ShowDiffIndexOverlay;
-            CadOutputFwDiffAutoMode = resolvedCadOutputFwDiffAutoMode.Value;
-            SelectedCadOutputFwDiffAutoModeOption = resolvedCadOutputFwDiffAutoMode;
-            SelectedNotchCompensationModelOption = draft.SelectedNotchCompensationModelOption;
-            EnableToRegular = draft.EnableToRegular;
-            EnableToFull = draft.EnableToFull;
-            EnableToFullRuleEngine = draft.EnableToFullRuleEngine;
-            EnableToFullRuleTrace = draft.EnableToFullRuleTrace;
-            EnableBoundaryVirtualAreaCap = draft.EnableBoundaryVirtualAreaCap;
-            BoundaryVirtualAreaCapPercent = draft.BoundaryVirtualAreaCapPercent;
-            EnableTargetCoverageGuard = draft.EnableTargetCoverageGuard;
-            TargetCoverageCapPercent = draft.TargetCoverageCapPercent;
-            ShowNotchCanvasPreview = draft.ShowNotchCanvasPreview;
-            ShowNotchToRegularLabels = draft.ShowNotchToRegularLabels;
-            NotchPreviewVisualizationStep = draft.NotchPreviewVisualizationStep;
-            ToFullStrictOverlapPercent = draft.ToFullStrictOverlapPercent;
-            NotchPreviewAutoPlayEnabled = draft.NotchPreviewAutoPlayEnabled;
-            NotchPreviewAutoPlayIntervalMs = draft.NotchPreviewAutoPlayIntervalMs;
-            EnableV21 = draft.EnableV21;
-            EnableV22 = draft.EnableV22;
-            SelectedNotchExportFileTypeOption = resolvedNotchExportFileType;
-            LenScale = draft.LenScale;
-            NullValue = draft.NullValue;
-            NotchThresholdQ7 = draft.NotchThresholdQ7;
-            NotchThresholdPercent = draft.NotchThresholdPercent;
-            LinkNotchThresholds = draft.LinkNotchThresholds;
-            SelectedNotchExportProfileOption = draft.SelectedNotchExportProfileOption;
-            MappingWeightIou = draft.MappingWeightIou;
-            MappingWeightCentroidDistance = draft.MappingWeightCentroidDistance;
-            MappingWeightAreaRatio = draft.MappingWeightAreaRatio;
-            MappingLowConfidenceThreshold = draft.MappingLowConfidenceThreshold;
-            MappingAmbiguousMargin = draft.MappingAmbiguousMargin;
-            MappingCandidateNumber = draft.MappingCandidateNumber;
-            MappingCandidatePaddingCells = IndexMappingSettings.PaddingFromCandidateNumber((int)Math.Round(draft.MappingCandidateNumber));
-            UseLocalSizing = draft.UseLocalSizing;
-            GlobalFontSizePercent = draft.GlobalFontSizePercent;
-            HighlightStrokeWidthAdjust = Math.Clamp(draft.HighlightStrokeWidthAdjust, -2m, 4m);
-        }
-        if (changedProperties.Contains(nameof(SelectedLogLevelOption)))
-        {
-            var appliedLevelName = LoggingBootstrapper.ApplyMinimumLevel(resolvedLogLevel.Value);
-            var normalized = LogLevelOptions.FirstOrDefault(o =>
-                string.Equals(o.Value, appliedLevelName, StringComparison.OrdinalIgnoreCase));
-            if (!string.IsNullOrWhiteSpace(normalized.Display) &&
-                !normalized.Equals(SelectedLogLevelOption))
-            {
-                using (_settingsSuppression.EnterSettingsLoading())
-                {
-                    SelectedLogLevelOption = normalized;
-                }
-            }
-        }
-        if (changedProperties.Contains(nameof(CadOutputFwDiffIndexAnchorCadId)) &&
-            !TryCommitCadOutputFwDiffIndexAnchorCadIdFromCurrentValue())
-        {
-            changedProperties.Remove(nameof(CadOutputFwDiffIndexAnchorCadId));
-        }
-
-        ApplySettingsWindowOrchestration(changedProperties);
-
-        return;
+        return changedProperties;
 
         void AddChangedProperty(string propertyName, bool condition)
         {
@@ -252,6 +206,90 @@ public sealed partial class FreeformHelperViewModel
             }
         }
     }
+
+    private void ApplySettingsWindowDraftValues(
+        SettingsWindowViewModel draft,
+        SettingsWindowDraftOptions resolved,
+        List<int> draftPerIcXChannels,
+        List<int> draftPerIcYChannels)
+    {
+        XChannels = draft.XChannels;
+        YChannels = draft.YChannels;
+        CascadeNum = draft.CascadeNum;
+        _projectFile.Settings.Grid.ReplacePerIcChannels(draftPerIcXChannels, draftPerIcYChannels);
+        CoordinatePixelWidth = draft.CoordinatePixelWidth;
+        CoordinatePixelHeight = draft.CoordinatePixelHeight;
+        GridPaddingPercent = draft.GridPaddingPercent;
+        ActiveAreaWidth = draft.ActiveAreaWidth;
+        ActiveAreaHeight = draft.ActiveAreaHeight;
+        PanelBiasX = draft.PanelBiasX;
+        PanelBiasY = draft.PanelBiasY;
+        SelectedScanOrder = resolved.ScanOrder.Value;
+        SelectedScanOrderOption = resolved.ScanOrder;
+        ImportOnlyClosedPolylines = draft.ImportOnlyClosedPolylines;
+        ImportBlockPolylines = draft.ImportBlockPolylines;
+        RecalcBoundsOnLayerFilter = draft.RecalcBoundsOnLayerFilter;
+        GridAlignmentMode = resolved.Alignment.Value;
+        SelectedGridAlignmentOption = resolved.Alignment;
+        RegularSourceMode = resolved.RegularSourceMode.Value;
+        SelectedRegularSourceModeOption = resolved.RegularSourceMode;
+        SelectedRegularSourceLayerOption = resolved.RegularSourceLayer;
+        SelectedLogLevelOption = resolved.LogLevel;
+        MatchThreshold = draft.MatchThreshold;
+        FreeformAxisThreshold = draft.FreeformAxisThreshold;
+        EnableAutoDetectXy = draft.EnableAutoDetectXy;
+        EnableFreeformEdgeSpecialization = draft.EnableFreeformEdgeSpecialization;
+        AutoReplayStep2AfterProjectLoad = draft.AutoReplayStep2AfterProjectLoad;
+        ApplyAppVisualPreferencesOnProjectLoad = draft.ApplyAppVisualPreferencesOnProjectLoad;
+        CadOutputFwDiffIndexStart = draft.CadOutputFwDiffIndexStart;
+        CadOutputFwDiffIndexAnchorCadId = draft.CadOutputFwDiffIndexAnchorCadId;
+        ShowDiffIndexOverlay = draft.ShowDiffIndexOverlay;
+        CadOutputFwDiffAutoMode = resolved.CadOutputFwDiffAutoMode.Value;
+        SelectedCadOutputFwDiffAutoModeOption = resolved.CadOutputFwDiffAutoMode;
+        SelectedNotchCompensationModelOption = draft.SelectedNotchCompensationModelOption;
+        EnableToRegular = draft.EnableToRegular;
+        EnableToFull = draft.EnableToFull;
+        EnableToFullRuleEngine = draft.EnableToFullRuleEngine;
+        EnableToFullRuleTrace = draft.EnableToFullRuleTrace;
+        EnableBoundaryVirtualAreaCap = draft.EnableBoundaryVirtualAreaCap;
+        BoundaryVirtualAreaCapPercent = draft.BoundaryVirtualAreaCapPercent;
+        EnableTargetCoverageGuard = draft.EnableTargetCoverageGuard;
+        TargetCoverageCapPercent = draft.TargetCoverageCapPercent;
+        ShowNotchCanvasPreview = draft.ShowNotchCanvasPreview;
+        ShowNotchToRegularLabels = draft.ShowNotchToRegularLabels;
+        NotchPreviewVisualizationStep = draft.NotchPreviewVisualizationStep;
+        ToFullStrictOverlapPercent = draft.ToFullStrictOverlapPercent;
+        NotchPreviewAutoPlayEnabled = draft.NotchPreviewAutoPlayEnabled;
+        NotchPreviewAutoPlayIntervalMs = draft.NotchPreviewAutoPlayIntervalMs;
+        EnableV21 = draft.EnableV21;
+        EnableV22 = draft.EnableV22;
+        SelectedNotchExportFileTypeOption = resolved.NotchExportFileType;
+        LenScale = draft.LenScale;
+        NullValue = draft.NullValue;
+        NotchThresholdQ7 = draft.NotchThresholdQ7;
+        NotchThresholdPercent = draft.NotchThresholdPercent;
+        LinkNotchThresholds = draft.LinkNotchThresholds;
+        SelectedNotchExportProfileOption = draft.SelectedNotchExportProfileOption;
+        MappingWeightIou = draft.MappingWeightIou;
+        MappingWeightCentroidDistance = draft.MappingWeightCentroidDistance;
+        MappingWeightAreaRatio = draft.MappingWeightAreaRatio;
+        MappingLowConfidenceThreshold = draft.MappingLowConfidenceThreshold;
+        MappingAmbiguousMargin = draft.MappingAmbiguousMargin;
+        MappingCandidateNumber = draft.MappingCandidateNumber;
+        MappingCandidatePaddingCells = IndexMappingSettings.PaddingFromCandidateNumber((int)Math.Round(draft.MappingCandidateNumber));
+        UseLocalSizing = draft.UseLocalSizing;
+        GlobalFontSizePercent = draft.GlobalFontSizePercent;
+        HighlightStrokeWidthAdjust = Math.Clamp(draft.HighlightStrokeWidthAdjust, -2m, 4m);
+    }
+
+    private readonly record struct SettingsWindowDraftOptions(
+        ScanOrderOption ScanOrder,
+        GridAlignmentOption Alignment,
+        RegularSourceModeOption RegularSourceMode,
+        RegularSourceLayerOption RegularSourceLayer,
+        LogLevelOption LogLevel,
+        CadOutputFwDiffAutoModeOption CadOutputFwDiffAutoMode,
+        NotchExportFileTypeOption NotchExportFileType);
 
     internal void ResetAllSettingsToDefaults()
     {

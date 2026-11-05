@@ -43,23 +43,8 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var activeCad = BuildActiveCadPadSet();
-        var pads = activeCad?.Pads ?? [];
-        if (pads.Count == 0)
+        if (!TryCollectDxfLayerImageExportSource(out var pads, out var layerNames))
         {
-            SetStatus("Export DXF image: no CAD pads available.");
-            return;
-        }
-
-        var layerNames = pads
-            .Select(p => p.Layer)
-            .Where(layer => !string.IsNullOrWhiteSpace(layer))
-            .Distinct(StringComparer.Ordinal)
-            .OrderBy(layer => layer, StringComparer.Ordinal)
-            .ToList();
-        if (layerNames.Count == 0)
-        {
-            SetStatus("Export DXF image: no layer found.");
             return;
         }
 
@@ -89,35 +74,66 @@ public sealed partial class FreeformHelperViewModel
                 return;
             }
 
-            Services.DxfLayerImageExportService.ExportLayerImage(
-                layerPads,
-                request.Value.WidthPixels,
-                request.Value.HeightPixels,
-                request.Value.LineWidthPixels,
-                request.Value.PaddingXPixels,
-                request.Value.PaddingYPixels,
-                request.Value.Format,
-                request.Value.UseDarkTheme,
-                path);
-
-            SetStatus($"DXF image exported ({request.Value.Format}, layer={request.Value.LayerName}, pads={layerPads.Count}).");
-            _logger.Info(CultureInfo.InvariantCulture, "DXF layer image exported to {0}. layer={1}, pads={2}, size={3}x{4}, lineWidth={5}, paddingX={6}, paddingY={7}, format={8}, dark={9}.",
-                path,
-                request.Value.LayerName,
-                layerPads.Count,
-                request.Value.WidthPixels,
-                request.Value.HeightPixels,
-                request.Value.LineWidthPixels,
-                request.Value.PaddingXPixels,
-                request.Value.PaddingYPixels,
-                request.Value.Format,
-                request.Value.UseDarkTheme);
+            WriteDxfLayerImage(layerPads, request.Value, path);
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Export DXF image failed", ex);
             _logger.Error(ex, "Export DXF image failed.");
         }
+    }
+
+    private bool TryCollectDxfLayerImageExportSource(out IReadOnlyList<CadPad> pads, out List<string> layerNames)
+    {
+        var activeCad = BuildActiveCadPadSet();
+        pads = activeCad?.Pads ?? [];
+        if (pads.Count == 0)
+        {
+            SetStatus("Export DXF image: no CAD pads available.");
+            layerNames = [];
+            return false;
+        }
+
+        layerNames = pads
+            .Select(p => p.Layer)
+            .Where(layer => !string.IsNullOrWhiteSpace(layer))
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(layer => layer, StringComparer.Ordinal)
+            .ToList();
+        if (layerNames.Count == 0)
+        {
+            SetStatus("Export DXF image: no layer found.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void WriteDxfLayerImage(List<CadPad> layerPads, DxfLayerImageExportRequest request, string path)
+    {
+        Services.DxfLayerImageExportService.ExportLayerImage(
+            layerPads,
+            request.WidthPixels,
+            request.HeightPixels,
+            request.LineWidthPixels,
+            request.PaddingXPixels,
+            request.PaddingYPixels,
+            request.Format,
+            request.UseDarkTheme,
+            path);
+
+        SetStatus($"DXF image exported ({request.Format}, layer={request.LayerName}, pads={layerPads.Count}).");
+        _logger.Info(CultureInfo.InvariantCulture, "DXF layer image exported to {0}. layer={1}, pads={2}, size={3}x{4}, lineWidth={5}, paddingX={6}, paddingY={7}, format={8}, dark={9}.",
+            path,
+            request.LayerName,
+            layerPads.Count,
+            request.WidthPixels,
+            request.HeightPixels,
+            request.LineWidthPixels,
+            request.PaddingXPixels,
+            request.PaddingYPixels,
+            request.Format,
+            request.UseDarkTheme);
     }
 
     private async Task ExportDxfAsync(bool visibleOnly)

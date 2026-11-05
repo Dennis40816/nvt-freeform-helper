@@ -14,6 +14,24 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
+        ApplySettingsSourceRefreshEffects(effects, invalidateNotchFinalProjection);
+
+        ApplySettingsDownstreamEffects(effects, showStatus);
+
+        if (effects.HasFlag(SettingsChangeEffects.TriggerGridRebuildWithFit))
+        {
+            _ = TriggerGridRebuildAsync(requestFit: true);
+            return;
+        }
+
+        if (effects.HasFlag(SettingsChangeEffects.TriggerGridRebuild))
+        {
+            _ = TriggerGridRebuildAsync(requestFit: false);
+        }
+    }
+
+    private void ApplySettingsSourceRefreshEffects(SettingsChangeEffects effects, bool invalidateNotchFinalProjection)
+    {
         if (effects.HasFlag(SettingsChangeEffects.RebuildCascadeSettings))
         {
             RebuildCascadeSettings();
@@ -43,7 +61,10 @@ public sealed partial class FreeformHelperViewModel
                 NotifySimulationWorkspaceSourceChanged();
             }
         }
+    }
 
+    private void ApplySettingsDownstreamEffects(SettingsChangeEffects effects, bool showStatus)
+    {
         if (effects.HasFlag(SettingsChangeEffects.InvalidateStep2))
         {
             InvalidateDownstreamFromStep2(showStatus: showStatus);
@@ -77,17 +98,6 @@ public sealed partial class FreeformHelperViewModel
         if (effects.HasFlag(SettingsChangeEffects.PersistAppGeneralNow))
         {
             PersistAppGeneralSettingsNow();
-        }
-
-        if (effects.HasFlag(SettingsChangeEffects.TriggerGridRebuildWithFit))
-        {
-            _ = TriggerGridRebuildAsync(requestFit: true);
-            return;
-        }
-
-        if (effects.HasFlag(SettingsChangeEffects.TriggerGridRebuild))
-        {
-            _ = TriggerGridRebuildAsync(requestFit: false);
         }
     }
 }
