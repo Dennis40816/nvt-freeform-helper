@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
@@ -21,8 +22,14 @@ internal static class FreeformHelperViewModelPrivateAccess
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_undoSuppression")]
     public static extern ref UndoSuppression UndoSuppression(FreeformHelperViewModel viewModel);
 
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_dxfImportService")]
+    public static extern ref DxfImportService DxfImportService(FreeformHelperViewModel viewModel);
+
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_layerCatalogStateService")]
     public static extern ref LayerCatalogStateService LayerCatalogState(FreeformHelperViewModel viewModel);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildDxfOptions")]
+    public static extern DxfImportOptions BuildDxfOptions(FreeformHelperViewModel viewModel);
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "UpdateLayerToggles")]
     public static extern void UpdateLayerToggles(FreeformHelperViewModel viewModel, CadPadSet cad);
