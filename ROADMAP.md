@@ -193,6 +193,15 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
     - `c7f6200c2aba59caf81d66b29f1e5bdb65b4dc8a`: the first code change. Its body has no verification run and no `Refs` line.
     - `1dc093e3fc8ab7be740c9f2eb9a9a6a97ed1ad00`: merges `main` into the branch. It has no body.
     - `a9e867ebea6b0550962008acd8337552fd41fa7e`, `8583de4990ea5c4339b66e635b595729cf7321b6` and `ba3845bee394fe2171671decee634048ac78b80d`: three fixes after failed queue runs (`CA2249`, a closed window drained in the new test, a new `CA1307` finding). Each body says why the earlier run failed. None records the run on its own fix, and none has a `Refs` line. The queue run on `ba3845b` passed the build, 240 tests and the health chain (LowerBaseline, Verify, lint) on 2026-10-31. It is recorded in the description of #228.
+- [ ] **AA-PIXELS Optional panel pixel counts for the active area (AA)** · Target: - · Status: In progress: the Settings fields are done on `feature/settings/aa-pixels`; the image export reads them later in EXPORT-IMG · PR: - (pending)
+  - Owner request, 2026-11-05: the full AA of the 3635 panel is 6480 x 848 pixels (915.52 x 119.59 mm), and the project should keep that fact.
+  - The counts are optional and stored in `settings.activeAreaPixels` (`x`, `y`). `ActiveAreaPixelPitch.Evaluate` is the single check against the AA size. Old project files read as not set. Nothing rebuilds from these values.
+- [ ] **SETTINGS-STALE-DRAFT The settings window can write the settings of an earlier project into a later one** · Target: - · Status: Not started · PR: -
+  - The settings window is not modal and its view model copies the settings when it opens. If another project is loaded while it stays open, saving it writes the old values into the new project. This was already true before AA-PIXELS. The pixel counts are guarded since the draft remembers its project.
+  - Proposal from review: a project generation number. `ApplyLoadedProjectStateAsync` and `ResetAllSettingsToDefaults` raise it. `SettingsWindowViewModel` records it when it is created. A save with another number is refused with a message.
+- [ ] **EXPORT-IMG Export layer image: several layers on one sheet, with a live preview** · Target: - · Status: Waiting for owner (design draft) · PR: -
+  - Replaces the single-layer dropdown window of Export DXF Layer Image. Layers are picked with check marks. The preview updates with every setting. One main action: Export.
+  - Single-layer output stays byte-identical. The size can default to the AA pixel counts (AA-PIXELS) when they are set.
 - [ ] **UI-REDESIGN Redesign the whole NFH UI** · Target: - · Status: Waiting for owner (scope and timing) · PR: -
   - Owner, 2026-10-18, on the right-panel text proposal: 「可以，但由於 NFH 是很久之前設計，理論上是整個都要大改」 ("Yes, but NFH was designed long ago, so in principle all of it needs a major redesign").
 

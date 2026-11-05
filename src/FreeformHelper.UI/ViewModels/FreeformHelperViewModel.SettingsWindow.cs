@@ -9,7 +9,9 @@ public sealed partial class FreeformHelperViewModel
 {
     public SettingsWindowViewModel CreateSettingsWindowViewModel()
     {
-        return new SettingsWindowViewModel(this);
+        var window = new SettingsWindowViewModel(this);
+        window.ActiveAreaPixels.Load(ActiveAreaWidth, ActiveAreaHeight, ActiveAreaPixelsX, ActiveAreaPixelsY, _projectFile);
+        return window;
     }
 
     internal void ApplySettingsWindowDraft(SettingsWindowViewModel draft)
