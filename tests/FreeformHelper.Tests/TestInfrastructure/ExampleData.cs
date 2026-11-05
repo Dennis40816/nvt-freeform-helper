@@ -25,7 +25,7 @@ internal static class ExampleData
         Directory.Exists(Root) && Directory.EnumerateFileSystemEntries(Root).Any();
 
     public static bool IsRequired { get; } = string.Equals(
-        Environment.GetEnvironmentVariable(RequireEnvironmentVariable),
+        TestEnvironment.Get(RequireEnvironmentVariable),
         "1",
         StringComparison.Ordinal);
 

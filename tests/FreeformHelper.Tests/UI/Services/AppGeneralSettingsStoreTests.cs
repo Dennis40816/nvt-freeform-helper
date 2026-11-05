@@ -11,12 +11,12 @@ public sealed class AppGeneralSettingsStoreTests
     [Fact]
     public void DefaultCtor_UsesEnvironmentOverridePath()
     {
-        var original = Environment.GetEnvironmentVariable(AppGeneralSettingsStore.SettingsPathOverrideEnvironmentVariable);
+        var original = TestEnvironment.Get(AppGeneralSettingsStore.SettingsPathOverrideEnvironmentVariable);
         var expectedPath = TestFiles.NewTempFilePath("app-general-env-", ".json");
 
         try
         {
-            Environment.SetEnvironmentVariable(
+            TestEnvironment.Set(
                 AppGeneralSettingsStore.SettingsPathOverrideEnvironmentVariable,
                 expectedPath);
             var store = new AppGeneralSettingsStore();
@@ -24,7 +24,7 @@ public sealed class AppGeneralSettingsStoreTests
         }
         finally
         {
-            Environment.SetEnvironmentVariable(
+            TestEnvironment.Set(
                 AppGeneralSettingsStore.SettingsPathOverrideEnvironmentVariable,
                 original);
             if (File.Exists(expectedPath))

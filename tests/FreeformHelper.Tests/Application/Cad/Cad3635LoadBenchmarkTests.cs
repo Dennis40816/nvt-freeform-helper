@@ -22,7 +22,7 @@ public sealed class Cad3635LoadBenchmarkTests
     [Fact]
     public async Task Boe3635_DxfLoadBenchmark_WhenEnabled()
     {
-        if (!string.Equals(Environment.GetEnvironmentVariable(RunEnv), "1", StringComparison.Ordinal))
+        if (!string.Equals(TestEnvironment.Get(RunEnv), "1", StringComparison.Ordinal))
         {
             return;
         }
@@ -34,7 +34,7 @@ public sealed class Cad3635LoadBenchmarkTests
             "example",
             "BOE36.35",
             "cz_36d2_6480x848_Lucid_panel_touch_block_CAD_20250729_NVTint_regular.dxf");
-        var outputPath = ResolveOutputPath(Environment.GetEnvironmentVariable(OutputEnv));
+        var outputPath = ResolveOutputPath(TestEnvironment.Get(OutputEnv));
 
         var samples = new List<Cad3635LoadBenchmarkSample>(warmupIterations + iterations);
         for (var run = 0; run < warmupIterations + iterations; run++)
@@ -173,7 +173,7 @@ public sealed class Cad3635LoadBenchmarkTests
 
     private static int GetNonNegativeInt(string name, int fallback)
     {
-        return int.TryParse(Environment.GetEnvironmentVariable(name), out var parsed) && parsed >= 0
+        return int.TryParse(TestEnvironment.Get(name), out var parsed) && parsed >= 0
             ? parsed
             : fallback;
     }

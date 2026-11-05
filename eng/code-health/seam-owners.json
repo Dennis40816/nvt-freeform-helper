@@ -1,4 +1,23 @@
 {
   "schemaVersion": 1,
-  "entries": []
+  "entries": [
+    {
+      "path": "tests/FreeformHelper.Tests/TestInfrastructure/TestEnvironment.cs",
+      "member": "*",
+      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)",
+      "owner": "NFH",
+      "reason": "The tests read and set a process environment variable here and nowhere else. The test project has no other way to switch the benchmark, baseline-update and example-data modes, or to point the app settings store at a test file.",
+      "kind": "permanent-seam",
+      "review": "Added with the change that routes all test environment access through TestEnvironment. Tier A: the owner approves the permanent seam in that pull request."
+    },
+    {
+      "path": "tests/FreeformHelper.Tests/TestInfrastructure/TestEnvironment.cs",
+      "member": "*",
+      "symbol": "M:System.Environment.SetEnvironmentVariable(System.String,System.String)",
+      "owner": "NFH",
+      "reason": "The tests read and set a process environment variable here and nowhere else. The test project has no other way to switch the benchmark, baseline-update and example-data modes, or to point the app settings store at a test file.",
+      "kind": "permanent-seam",
+      "review": "Added with the change that routes all test environment access through TestEnvironment. Tier A: the owner approves the permanent seam in that pull request."
+    }
+  ]
 }

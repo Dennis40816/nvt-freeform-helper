@@ -34,9 +34,9 @@ public sealed class NotchGoldenBaselineTests
 
         var expectedJson = JsonSerializer.Serialize(expected, _baselineJsonOptions);
         var actualJson = JsonSerializer.Serialize(actual, _baselineJsonOptions);
-        if (string.Equals(Environment.GetEnvironmentVariable("FREEFORMHELPER_UPDATE_NOTCH_BASELINE"), "1", StringComparison.Ordinal))
+        if (string.Equals(TestEnvironment.Get("FREEFORMHELPER_UPDATE_NOTCH_BASELINE"), "1", StringComparison.Ordinal))
         {
-            File.WriteAllText(baselinePath, actualJson);
+            TestFiles.WriteText(baselinePath, actualJson);
             return;
         }
 
@@ -46,7 +46,7 @@ public sealed class NotchGoldenBaselineTests
                 TestPaths.RepoRoot,
                 "build",
                 "notch-golden-baseline.actual.json");
-            File.WriteAllText(actualDumpPath, actualJson);
+            TestFiles.WriteText(actualDumpPath, actualJson);
         }
 
         GoldenAssert.TextEqual(expectedJson, actualJson, "notch golden baseline");

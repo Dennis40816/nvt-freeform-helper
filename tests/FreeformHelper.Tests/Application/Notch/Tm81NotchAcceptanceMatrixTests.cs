@@ -30,11 +30,11 @@ public sealed class Tm81NotchAcceptanceMatrixTests
         var actualJson = JsonSerializer.Serialize(actual, MatrixJsonOptions);
 
         if (string.Equals(
-                Environment.GetEnvironmentVariable("FREEFORMHELPER_UPDATE_TM81_NOTCH_MATRIX"),
+                TestEnvironment.Get("FREEFORMHELPER_UPDATE_TM81_NOTCH_MATRIX"),
                 "1",
                 StringComparison.Ordinal))
         {
-            File.WriteAllText(snapshotPath, actualJson);
+            TestFiles.WriteText(snapshotPath, actualJson);
             return;
         }
 

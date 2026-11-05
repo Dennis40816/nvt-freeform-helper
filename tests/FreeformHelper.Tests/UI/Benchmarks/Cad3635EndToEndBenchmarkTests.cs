@@ -25,7 +25,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
     [AvaloniaFact]
     public async Task Boe3635_EndToEndWorkflowBenchmark_WhenEnabled()
     {
-        if (!string.Equals(Environment.GetEnvironmentVariable(RunEnv), "1", StringComparison.Ordinal))
+        if (!string.Equals(TestEnvironment.Get(RunEnv), "1", StringComparison.Ordinal))
         {
             return;
         }
@@ -35,7 +35,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
         var warmupIterations = GetNonNegativeInt(WarmupEnv, 1);
         var projectPath = Path.Combine(TestPaths.RepoRoot, "example", "BOE36.35", "project_3635.json");
         using var fixture = ExampleProjectFixture.Create(projectPath);
-        var outputPath = ResolveOutputPath(Environment.GetEnvironmentVariable(OutputEnv));
+        var outputPath = ResolveOutputPath(TestEnvironment.Get(OutputEnv));
         var exportDirectory = Path.Combine(TestPaths.RepoRoot, "build", "perf", "3635-e2e-export");
         Directory.CreateDirectory(exportDirectory);
 
@@ -221,7 +221,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
 
     private static int GetNonNegativeInt(string name, int fallback)
     {
-        return int.TryParse(Environment.GetEnvironmentVariable(name), out var parsed) && parsed >= 0
+        return int.TryParse(TestEnvironment.Get(name), out var parsed) && parsed >= 0
             ? parsed
             : fallback;
     }

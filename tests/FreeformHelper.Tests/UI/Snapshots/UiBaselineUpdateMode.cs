@@ -1,3 +1,5 @@
+using FreeformHelper.Tests.TestInfrastructure;
+
 namespace FreeformHelper.Tests;
 
 internal enum UiBaselineUpdateMode
@@ -13,7 +15,7 @@ internal static class UiBaselineUpdateModeResolver
 
     public static UiBaselineUpdateMode Resolve()
     {
-        var value = Environment.GetEnvironmentVariable(EnvironmentVariableName);
+        var value = TestEnvironment.Get(EnvironmentVariableName);
         if (string.IsNullOrWhiteSpace(value))
         {
             return UiBaselineUpdateMode.Check;
