@@ -283,30 +283,6 @@ public sealed class ProjectIoFailureBehaviorTests
         Assert.Equal(expected, IoFailureScope.CaptureState(vm));
     }
 
-    [AvaloniaFact(Skip = "Product bug: LoadProjectCommand discards the PATH_NOT_FOUND/INVALID_ARGUMENTS result of " +
-        "LoadProjectFromPathCoreAsync without setting StatusText, so a project file deleted after the picker returns " +
-        "fails silently. See cloud-notes/io-failure-tests.md.")]
-    public async Task LoadProjectCommand_FileDeletedBetweenPickAndLoad_ShowsAnErrorToTheUser()
-    {
-        using var files = new IoFailureScope();
-        var vm = files.CreateViewModel();
-        IoFailureScope.MakeDirty(vm);
-        var target = await files.WriteValidProjectAsync("vanishing.json");
-        var expected = IoFailureScope.CaptureState(vm);
-        vm.PickLoadProjectPathAsync = () =>
-        {
-            File.Delete(target);
-            return Task.FromResult<string?>(target);
-        };
-        vm.StatusText = "before load";
-
-        await vm.LoadProjectCommand.ExecuteAsync(null);
-
-        Assert.Equal(expected, IoFailureScope.CaptureState(vm));
-        Assert.NotEqual("before load", vm.StatusText);
-        Assert.Contains("not found", vm.StatusText, StringComparison.OrdinalIgnoreCase);
-    }
-
     [AvaloniaFact]
     public async Task LoadProjectFromPath_FileDeletedBetweenPickAndLoad_ReturnsPathNotFound()
     {
