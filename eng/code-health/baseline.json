@@ -1880,7 +1880,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 109
+        "methodLines": 107
       },
       "owner": "NFH",
       "locations": [
@@ -4889,26 +4889,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "317635dad5a158dde5cfbedf3f6b89c3dbb68bb518b9ccb8c5e849122a8f4a03",
-      "member": "FreeformHelper.Tests.PadBestMatchProjectionCharacterizationTests.ResolveBestCadIdByRegular(PadCanvas,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadBestMatchProjectionCharacterizationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "79df07cd709f8fb5e8ecacb03177f0a84ca456192a47f5b775e628d4082d84a1",
-      "member": "FreeformHelper.Tests.PadBestMatchProjectionCharacterizationTests.ResolveBestRegularByCad(PadCanvas,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadBestMatchProjectionCharacterizationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "256dda932e406ddcbdfa219764777e6a08947ff098ffa06d77e9b9c5010b89f7",
       "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.GetPrivateField(PadCanvas,string)",
       "owner": "NFH",
@@ -4919,96 +4899,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "028347cada6227dbf67e4607ff94a4eace3968c2efa0fc3721d09f75bedcb251",
-      "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.InvokeBuildVisibleDrawLists(PadCanvas,Rect2,bool,bool,bool,double)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasCacheInvalidationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "9ac8b21cec5cb477b1015de6aceb0bcb35b893108af8a4e2f4c262d71c664ea5",
-      "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.InvokePrivate(PadCanvas,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasCacheInvalidationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "14c7a4ca46f887ae93ddc88471b503d7f660e0575fff33dd8998538751e2c220",
-      "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.NotchPreview_AggregateMode_SimplifiesSecondaryVisuals()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasCacheInvalidationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "65becbefe406e5d01a7260b71360987065eb06b37b98266d05df2678275b186d",
-      "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.NotchPreview_KeepsFreeformHatch_WhenStageOverlayVisible()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasCacheInvalidationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "238b82cb5155b2724d3c6e7c1f583ebc3c74785070011844bd52bad2a67a817c",
-      "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.NotchPreview_SuppressesFreeformAccentBorder_WhenStageOverlayVisible()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasCacheInvalidationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "190b89c1d9dadd7877c347ab93698c32b454eebad5a6a199bea9b0911f32277e",
-      "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.NotchPreviewCad_SuppressesAreaFill_WhenStageOverlayVisible()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasCacheInvalidationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "07708dac152828382531944ca4379c1c03ffef381727be4f1021b9a20d4f63f8",
-      "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.NotchPreviewCad_UsesPreciseGeometry_InLowDetailMode()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasCacheInvalidationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "256dda932e406ddcbdfa219764777e6a08947ff098ffa06d77e9b9c5010b89f7",
-      "member": "FreeformHelper.Tests.PadCanvasCacheInvalidationTests.SetPrivateField(PadCanvas,string,object)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasCacheInvalidationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "cb22764c658f661da63398858c3d7f6e20e383c96bc525f59342362882078064",
-      "member": "FreeformHelper.Tests.PadCanvasGestureResetTests.ReadField`1(PadCanvas,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasGestureResetTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "8c4ad47802eb0b6ac6bce49d9411fb416b271d4e53bdd76a88ded5eee6dbecda",
       "member": "FreeformHelper.Tests.PadCanvasHitTestTests.EnsureRegularSpatialIndex_DisablesIndex_ForNonSeparableGrid()",
       "owner": "NFH",
@@ -5041,16 +4931,6 @@
     {
       "syntaxHash": "b67b6df20a35c589eb906057d813bfc2526f6ffa06ad15f1393409e82f435a97",
       "member": "FreeformHelper.Tests.PadCanvasHitTestTests.EnsureRegularSpatialIndex_RebuildsAfterRegularPadsReplacement()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "f31d82bd4ff6af6c1996542c885c17026c0b8238067d645bdfca2f33c06ffaf9",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.GetScreenPointForWorld(PadCanvas,Point2)",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
       "project": "FreeformHelper.Tests",
@@ -5099,68 +4979,8 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "39cb80f7884ee57a1e4d15a4ed12c01a4d49bdcc3faa3c624cf48675dc3177eb",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.ReadSelectedCadIds(PadCanvas)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "fec61e8b8152b0288be89cc256924fcfda19a77f1c3e5d2a55638c5ae03d0b93",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.ReadSelectedRegularIndices(PadCanvas)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "f0c78df9142a8708a66ba964d1cacc38c054fcb6a108295e3277a496a5824556",
       "member": "FreeformHelper.Tests.PadCanvasHitTestTests.ReadSnapshotText(object)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "55e33a27de1faf87fb4eb14f642cff3b69cefa9873d08408b1d04fa83a9f9129",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.SelectPadsInWorldRect_Additive_PreservesExistingSelection()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "55e33a27de1faf87fb4eb14f642cff3b69cefa9873d08408b1d04fa83a9f9129",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.SelectPadsInWorldRect_NonAdditive_ReplacesExistingSelection()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "55e33a27de1faf87fb4eb14f642cff3b69cefa9873d08408b1d04fa83a9f9129",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.SelectPadsInWorldRect_UsesLinearFallback_WhenIndexDisabled()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "944f4127c053629ce13059076332446004a613e9fb85893b994f05ac2c32a838",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.SetCanvasView(PadCanvas,double,double,double)",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
       "project": "FreeformHelper.Tests",
@@ -5173,26 +4993,6 @@
       "member": "FreeformHelper.Tests.PadCanvasHitTestTests.SetPrivateField(PadCanvas,string,object)",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "028347cada6227dbf67e4607ff94a4eace3968c2efa0fc3721d09f75bedcb251",
-      "member": "FreeformHelper.Tests.PadCanvasRenderPerfTests.InvokeBuildVisibleDrawLists(PadCanvas,Rect2)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasRenderPerfTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "8def429d39fb55f96bdea56ef72702074bff923d6123ab12389d0e5a48530262",
-      "member": "FreeformHelper.Tests.PadCanvasRenderPerfTests.InvokeRecordRenderPerf(PadCanvas,long,long,long,long,long,long,long,bool,bool,bool,bool)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasRenderPerfTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "RS0030",
@@ -5217,16 +5017,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:System.DateTime.UtcNow"
-    },
-    {
-      "syntaxHash": "560e9601ab503844c8233af27153c6f825aa803e12e51be267611f330f46a587",
-      "member": "FreeformHelper.Tests.ProjectLoadingInputTests.ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "6823a99029ab553326648d982878b576ddd556fc9c35be4954042fe9aef0058a",

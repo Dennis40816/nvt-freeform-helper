@@ -1,7 +1,7 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using Xunit;
 
@@ -106,30 +106,24 @@ public sealed class PadCanvasRenderPerfTests
         bool lowDetailMode,
         bool secondaryVisualsDeferred)
     {
-        var method = typeof(PadCanvas).GetMethod("RecordRenderPerf", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        method!.Invoke(
+        PadCanvasPrivateAccess.RecordRenderPerf(
             canvas,
-            [
-                totalElapsedMs,
-                backgroundElapsedMs,
-                visibleBuildElapsedMs,
-                geometryDrawElapsedMs,
-                overlayElapsedMs,
-                labelElapsedMs,
-                viewFrameRevision,
-                showRegular,
-                showCad,
-                lowDetailMode,
-                secondaryVisualsDeferred,
-            ]);
+            totalElapsedMs,
+            backgroundElapsedMs,
+            visibleBuildElapsedMs,
+            geometryDrawElapsedMs,
+            overlayElapsedMs,
+            labelElapsedMs,
+            viewFrameRevision,
+            showRegular,
+            showCad,
+            lowDetailMode,
+            secondaryVisualsDeferred);
     }
 
     private static void InvokeBuildVisibleDrawLists(PadCanvas canvas, Rect2 viewport)
     {
-        var method = typeof(PadCanvas).GetMethod("BuildVisibleDrawLists", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        method!.Invoke(canvas, [viewport, true, true, false, 0.3]);
+        PadCanvasPrivateAccess.BuildVisibleDrawLists(canvas, viewport, true, true, false, 0.3);
     }
 
     private static IReadOnlyList<CadPad> CreateCadPads()

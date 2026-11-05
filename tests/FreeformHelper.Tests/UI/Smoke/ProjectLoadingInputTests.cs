@@ -140,9 +140,7 @@ public sealed class ProjectLoadingInputTests
             window.KeyPress(Key.S, RawInputModifiers.Control, PhysicalKey.S, "s");
             window.KeyRelease(Key.S, RawInputModifiers.Control, PhysicalKey.S, "s");
             var canvas = view.GetVisualDescendants().OfType<FreeformHelper.UI.Controls.PadCanvas>().Single();
-            var selectionField = typeof(FreeformHelper.UI.Controls.PadCanvas).GetField("_selectedCadIds", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(selectionField);
-            var selected = Assert.IsType<HashSet<int>>(selectionField.GetValue(canvas));
+            var selected = PadCanvasPrivateAccess.SelectedCadIds(canvas);
             selected.Add(17);
             window.KeyPress(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
             window.KeyRelease(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");

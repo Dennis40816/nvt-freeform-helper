@@ -1,9 +1,9 @@
-using System.Collections;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using Xunit;
 
@@ -82,9 +82,7 @@ public sealed class PadCanvasHitTestTests
             RegularPads = pads,
         };
 
-        var selectMethod = typeof(PadCanvas).GetMethod("SelectPadsInWorldRect", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(selectMethod);
-        selectMethod!.Invoke(canvas, new object[] { new Rect2(11, 11, 19, 19), false, true });
+        PadCanvasPrivateAccess.SelectPadsInWorldRect(canvas, new Rect2(11, 11, 19, 19), false, true);
 
         var selected = ReadSelectedRegularIndices(canvas);
         Assert.Contains(2, selected);
@@ -108,9 +106,7 @@ public sealed class PadCanvasHitTestTests
         };
         canvas.SetSelection([], [0, 1]);
 
-        var selectMethod = typeof(PadCanvas).GetMethod("SelectPadsInWorldRect", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(selectMethod);
-        selectMethod!.Invoke(canvas, [new Rect2(1, 31, 9, 39), false, true]);
+        PadCanvasPrivateAccess.SelectPadsInWorldRect(canvas, new Rect2(1, 31, 9, 39), false, true);
 
         Assert.Equal([2], ReadSelectedRegularIndices(canvas));
         Assert.Empty(ReadSelectedCadIds(canvas));
@@ -133,9 +129,7 @@ public sealed class PadCanvasHitTestTests
         };
         canvas.SetSelection([], [0]);
 
-        var selectMethod = typeof(PadCanvas).GetMethod("SelectPadsInWorldRect", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(selectMethod);
-        selectMethod!.Invoke(canvas, [new Rect2(1, 31, 9, 39), true, true]);
+        PadCanvasPrivateAccess.SelectPadsInWorldRect(canvas, new Rect2(1, 31, 9, 39), true, true);
 
         Assert.Equal([0, 2], ReadSelectedRegularIndices(canvas));
         Assert.Empty(ReadSelectedCadIds(canvas));
@@ -229,8 +223,8 @@ public sealed class PadCanvasHitTestTests
 
         var hit = InvokeHitTestForHoverDebug(canvas, screenPoint, regularOnly: true);
         SetPrivateField(canvas, "_hoverDebugHit", hit);
-        SetPrivateField(canvas, "_hoverDebugVisible", true);
-        SetPrivateField(canvas, "_hoverDebugRegularOnlyMode", true);
+        PadCanvasPrivateAccess.HoverDebugVisible(canvas) = true;
+        PadCanvasPrivateAccess.HoverDebugRegularOnlyMode(canvas) = true;
 
         var snapshot = InvokeBuildHoverDebugSnapshot(canvas);
         var text = ReadSnapshotText(snapshot);
@@ -273,18 +267,14 @@ public sealed class PadCanvasHitTestTests
 
     private static void SetCanvasView(PadCanvas canvas, double zoom, double panX, double panY)
     {
-        SetPrivateField(canvas, "_zoom", zoom);
-        SetPrivateField(canvas, "_pan", new Vector(panX, panY));
-        var invalidateMethod = typeof(PadCanvas).GetMethod("InvalidateViewFrameSnapshot", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(invalidateMethod);
-        invalidateMethod!.Invoke(canvas, null);
+        PadCanvasPrivateAccess.Zoom(canvas) = zoom;
+        PadCanvasPrivateAccess.Pan(canvas) = new Vector(panX, panY);
+        PadCanvasPrivateAccess.InvalidateViewFrameSnapshot(canvas);
     }
 
     private static Avalonia.Point GetScreenPointForWorld(PadCanvas canvas, Point2 worldPoint)
     {
-        var method = typeof(PadCanvas).GetMethod("WorldToScreen", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(Point2) }, null);
-        Assert.NotNull(method);
-        return Assert.IsType<Avalonia.Point>(method!.Invoke(canvas, new object[] { worldPoint }));
+        return canvas.WorldToScreen(worldPoint);
     }
 
     private static string ReadHitKind(object hit)
@@ -307,18 +297,12 @@ public sealed class PadCanvasHitTestTests
 
     private static List<int> ReadSelectedRegularIndices(PadCanvas canvas)
     {
-        var field = typeof(PadCanvas).GetField("_selectedRegIdx", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        var value = Assert.IsAssignableFrom<IEnumerable>(field!.GetValue(canvas));
-        return value.Cast<object>().Select(Assert.IsType<int>).ToList();
+        return PadCanvasPrivateAccess.SelectedRegIdx(canvas).ToList();
     }
 
     private static List<int> ReadSelectedCadIds(PadCanvas canvas)
     {
-        var field = typeof(PadCanvas).GetField("_selectedCadIds", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        var value = Assert.IsAssignableFrom<IEnumerable>(field!.GetValue(canvas));
-        return value.Cast<object>().Select(Assert.IsType<int>).ToList();
+        return PadCanvasPrivateAccess.SelectedCadIds(canvas).ToList();
     }
 
     private static RegularPad CreateRectPad(int row, int col, int index, double minX, double minY, double maxX, double maxY)
