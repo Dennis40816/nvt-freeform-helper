@@ -512,4 +512,68 @@ public sealed partial class FreeformHelperViewModel
             OnPropertyChanged();
         }
     }
+
+    /// <summary>
+    /// Gets or sets the panel pixel count across the active area width. Zero means not set.
+    /// The project settings hold the value, so no second copy exists.
+    /// </summary>
+    public decimal ActiveAreaPixelsX
+    {
+        get => _projectFile.Settings.ActiveAreaPixels.X ?? 0;
+        set
+        {
+            var next = NormalizeActiveAreaPixels(value);
+            if (_projectFile.Settings.ActiveAreaPixels.X == next)
+            {
+                return;
+            }
+
+            var previous = ActiveAreaPixelsX;
+            _projectFile.Settings.ActiveAreaPixels.X = next;
+            TrackUndo(previous, next ?? 0, RestoreActiveAreaPixelsX, "AA pixels X");
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the panel pixel count across the active area height. Zero means not set.
+    /// The project settings hold the value, so no second copy exists.
+    /// </summary>
+    public decimal ActiveAreaPixelsY
+    {
+        get => _projectFile.Settings.ActiveAreaPixels.Y ?? 0;
+        set
+        {
+            var next = NormalizeActiveAreaPixels(value);
+            if (_projectFile.Settings.ActiveAreaPixels.Y == next)
+            {
+                return;
+            }
+
+            var previous = ActiveAreaPixelsY;
+            _projectFile.Settings.ActiveAreaPixels.Y = next;
+            TrackUndo(previous, next ?? 0, RestoreActiveAreaPixelsY, "AA pixels Y");
+            OnPropertyChanged();
+        }
+    }
+
+    private void RestoreActiveAreaPixelsX(decimal value) => ActiveAreaPixelsX = value;
+
+    private void RestoreActiveAreaPixelsY(decimal value) => ActiveAreaPixelsY = value;
+
+    internal void ApplyActiveAreaPixelsDraft(ActiveAreaPixelsDraft draft)
+    {
+        ArgumentNullException.ThrowIfNull(draft);
+        if (!IsProjectEditingEnabled) return;
+
+        ActiveAreaPixelsX = draft.PixelsX;
+        ActiveAreaPixelsY = draft.PixelsY;
+    }
+
+    private static int? NormalizeActiveAreaPixels(decimal value)
+    {
+        return value < 1m
+            ? null
+            : (int)Math.Min(Math.Round(value), FreeformHelper.Application.Services.ActiveAreaPixelPitch.MaxPixels);
+    }
 }

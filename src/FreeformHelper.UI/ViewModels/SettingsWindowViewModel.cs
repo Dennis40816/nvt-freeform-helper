@@ -170,6 +170,8 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     public IReadOnlyList<FreeformHelperViewModel.NotchExportProfileOption> NotchExportProfileOptions { get; }
     public IReadOnlyList<FreeformHelperViewModel.NotchCompensationModelOption> NotchCompensationModelOptions { get; }
 
+    public ActiveAreaPixelsDraft ActiveAreaPixels { get; } = new();
+
     public IRelayCommand SaveCommand { get; }
     public IRelayCommand CancelCommand { get; }
 
@@ -422,6 +424,16 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
                 SimulationSafetyTextProjector.DefaultEmsAfterCapText)
             : string.Empty;
 
+    partial void OnActiveAreaWidthChanged(decimal value)
+    {
+        ActiveAreaPixels.WidthMm = value;
+    }
+
+    partial void OnActiveAreaHeightChanged(decimal value)
+    {
+        ActiveAreaPixels.HeightMm = value;
+    }
+
     partial void OnSelectedGridAlignmentOptionChanged(FreeformHelperViewModel.GridAlignmentOption value)
     {
         OnPropertyChanged(nameof(IsPanelAlignment));
@@ -641,6 +653,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     private void OnSave()
     {
         _owner.ApplySettingsWindowDraft(this);
+        _owner.ApplyActiveAreaPixelsDraft(ActiveAreaPixels);
         RequestClose?.Invoke();
     }
 
