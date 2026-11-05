@@ -49,7 +49,7 @@ public sealed partial class FreeformHelperViewModel
         async Task AnalyzeMappingAsync(Action<double> reportProgress)
         {
             var workflowSnapshot = BuildWorkflowDataSnapshot();
-            var res = await Task.Run(() => _dxfRegularMappingUseCase.Analyze(
+            var res = await Task.Run(() => DxfRegularMappingUseCase.Analyze(
                 cadVisible,
                 grid,
                 _projectFile.Settings,

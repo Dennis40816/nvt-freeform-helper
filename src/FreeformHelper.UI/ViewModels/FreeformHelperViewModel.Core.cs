@@ -66,7 +66,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly DxfImportService _dxfImportService = new();
     private readonly DxfLayerCatalogReader _dxfLayerCatalogReader = new();
     private readonly NotchExportService _notchExportService = new();
-    private readonly PadMatchService _padMatchService = new();
     private readonly ManualSizingService _manualSizingService = new();
 
     // --- Internal State Management ---
@@ -123,7 +122,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly ProjectPersistenceUseCase _projectPersistenceUseCase;
     private readonly PadEditUseCase _padEditUseCase;
     private readonly NotchExportGenerationCacheService _notchExportGenerationCacheService = new();
-    private readonly DxfRegularMappingUseCase _dxfRegularMappingUseCase = new();
     private readonly UndoService _undoService = new();
     private readonly UiOperationStatusReporter _statusReporter;
     private readonly NotchResultCacheState _notchCache = new(); // Holds the notch compensation and validation caches and the last generated notch table.

@@ -150,7 +150,7 @@ public sealed partial class FreeformHelperViewModel
                     resolvedBatch = await batchLease.ResolutionTask!;
                 }
 
-                table = await Task.Run(() => _notchExportService.ProjectCadAllocationResolvedBatch(
+                table = await Task.Run(() => NotchExportService.ProjectCadAllocationResolvedBatch(
                     resolvedBatch,
                     exportSettings,
                     effectiveProgress,

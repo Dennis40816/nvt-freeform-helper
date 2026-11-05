@@ -1,17 +1,12 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.Services;
 
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class DxfRegularMappingUseCase
 {
-    public DxfRegularMappingResult Analyze(
+    public static DxfRegularMappingResult Analyze(
         CadPadSet cad,
         RegularGrid grid,
         ProjectSettings settings,

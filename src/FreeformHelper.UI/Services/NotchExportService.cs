@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
@@ -11,10 +10,6 @@ namespace FreeformHelper.UI.Services;
 /// Provides a service layer for generating and exporting notch tables.
 /// This service orchestrates the use of <see cref="NotchTableGenerator"/> and <see cref="NotchTableExporter"/>.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance service API is retained for workflow composition stability.")]
 public sealed class NotchExportService
 {
     // Private instance of the underlying application service.
@@ -90,7 +85,7 @@ public sealed class NotchExportService
     /// <summary>
     /// Projects a previously generated CAD-allocation batch for the current output request.
     /// </summary>
-    public NotchTable ProjectCadAllocationResolvedBatch(
+    public static NotchTable ProjectCadAllocationResolvedBatch(
         NotchTableGenerator.CadAllocationResolvedBatch batch,
         ProjectSettings settings,
         IProgress<NotchGenerationProgress>? progress = null,
@@ -119,12 +114,12 @@ public sealed class NotchExportService
     /// </summary>
     /// <param name="table">The notch table to export.</param>
     /// <returns>A string containing the notch table data in CSV format.</returns>
-    public string ExportCsv(NotchTable table) => NotchTableExporter.ExportAsCsv(table);
+    public static string ExportCsv(NotchTable table) => NotchTableExporter.ExportAsCsv(table);
 
     /// <summary>
     /// Exports a given <see cref="NotchTable"/> as C-style initializer rows.
     /// </summary>
-    public string ExportCInitializer(
+    public static string ExportCInitializer(
         NotchTable table,
         CadPadSet cad,
         RegularGrid grid,
