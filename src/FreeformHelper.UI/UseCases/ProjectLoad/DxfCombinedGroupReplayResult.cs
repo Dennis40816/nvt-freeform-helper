@@ -12,9 +12,24 @@ internal sealed class DxfCombinedGroupReplayResult
     // The saved snapshots of the groups that this load could not restore. A project save writes them back unchanged.
     public List<ProjectDxfCombinedCadGroup> SkippedGroups { get; } = [];
 
-    public void ReportSkippedGroups(Action<string> reportWarning)
+    // Set when the project's DXF path did not work and the copy stored in the project was used instead.
+    public string? CadFallbackWarning { get; set; }
+
+    public void ReportWarnings(Action<string> reportWarning, Action<string> logWarning)
     {
         ArgumentNullException.ThrowIfNull(reportWarning);
+        ArgumentNullException.ThrowIfNull(logWarning);
+        if (CadFallbackWarning is not null)
+        {
+            logWarning(CadFallbackWarning);
+            reportWarning(CadFallbackWarning);
+        }
+
+        ReportSkippedGroups(reportWarning);
+    }
+
+    private void ReportSkippedGroups(Action<string> reportWarning)
+    {
         if (SkippedGroups.Count == 0)
         {
             return;
