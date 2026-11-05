@@ -104,6 +104,8 @@ public sealed class UiLayoutGuardTests
 
         var leftPanel = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "LeftDxfPanel.axaml"));
         Assert.Contains("Classes=\"boundLayerSelector\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("<leftPanel:LayerListSearchBox DataContext=\"{Binding LayerSearch}\"/>", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("ItemsSource=\"{Binding LayerSearch.VisibleLayers}\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("MaxDropDownHeight=\"{StaticResource LayerListMaxHeight}\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("controls:BalancedWrapPanel Classes=\"badgeGroup dxfEditBadgeGroup\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", leftPanel, StringComparison.Ordinal);

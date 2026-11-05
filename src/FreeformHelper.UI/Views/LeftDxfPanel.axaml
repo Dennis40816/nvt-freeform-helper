@@ -5,6 +5,7 @@
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
              xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:leftPanel="clr-namespace:FreeformHelper.UI.Views.LeftPanelSections"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.LeftDxfPanel">
   <UserControl.Resources>
@@ -438,6 +439,7 @@
                              Foreground="{DynamicResource BrushTextMuted}"
                              TextWrapping="Wrap"/>
       </StackPanel>
+      <leftPanel:LayerListSearchBox DataContext="{Binding LayerSearch}"/>
       <Border Background="{DynamicResource BrushBgSurface}"
               BorderBrush="{DynamicResource BrushBorder}"
               BorderThickness="{StaticResource BorderThin}"
@@ -448,7 +450,7 @@
                       HorizontalScrollBarVisibility="Disabled"
                       MaxHeight="{StaticResource LayerListMaxHeight}">
           <Border Padding="{StaticResource Inset8}">
-            <ItemsControl ItemsSource="{Binding LayerToggles}">
+            <ItemsControl ItemsSource="{Binding LayerSearch.VisibleLayers}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
                   <ToggleButton Classes="layerToggle"

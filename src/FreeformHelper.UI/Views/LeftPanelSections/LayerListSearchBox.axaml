@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:DataType="viewModels:LayerListSearchViewModel"
+             x:Class="FreeformHelper.UI.Views.LeftPanelSections.LayerListSearchBox">
+  <StackPanel Spacing="{StaticResource Space4}">
+    <Grid>
+      <TextBox Classes="layerListSearchInput"
+               PlaceholderText="Filter layers by name"
+               Text="{Binding SearchText, Mode=TwoWay}"
+               TextWrapping="NoWrap"/>
+      <Button Classes="workspaceSearchClearButton"
+              IsVisible="{Binding HasSearchText}"
+              Command="{Binding ClearSearchCommand}"
+              ToolTip.Tip="Clear layer search"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center">
+        <controls:FontIcon Classes="symbols iconSm"
+                           Glyph="{x:Static icons:IconGlyphs.Close}"/>
+      </Button>
+    </Grid>
+    <SelectableTextBlock Classes="stepNote"
+                         IsVisible="{Binding HasSearchText}"
+                         Text="{Binding MatchSummary}"/>
+  </StackPanel>
+</UserControl>
