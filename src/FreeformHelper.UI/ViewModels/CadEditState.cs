@@ -1,4 +1,5 @@
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Infrastructure.Project;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -22,4 +23,7 @@ internal sealed class CadEditState
 
     /// <summary>Gets or sets the CAD pads as they were loaded, before any DXF edit.</summary>
     internal CadPadSet? BaselineCad { get; set; }
+
+    /// <summary>Gets or sets the saved combined groups that the current CAD could not restore. A project save writes them back.</summary>
+    internal List<ProjectDxfCombinedCadGroup> UnrestoredCombinedGroups { get; set; } = [];
 }

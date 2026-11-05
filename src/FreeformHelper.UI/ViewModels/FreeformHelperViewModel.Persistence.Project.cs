@@ -5,6 +5,7 @@ using System.Security;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.UseCases.ProjectLoad;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -260,6 +261,7 @@ public sealed partial class FreeformHelperViewModel
             var dxfElapsedMs = 0L;
             var rebuildElapsedMs = 0L;
             var replayTiming = ProjectLoadReplayTiming.Empty;
+            DxfCombinedGroupReplayResult? combinedGroupReplay = null;
 
             using (_settingsSuppression.EnterSettingsLoading())
             {
@@ -268,13 +270,7 @@ public sealed partial class FreeformHelperViewModel
                 _cachedFilteredCadForBuild = null;
                 ClearDxfLayerCatalog();
                 CadPads = new ObservableCollection<CadPad>();
-                foreach (var toggle in LayerToggles)
-                {
-                    toggle.PropertyChanging -= OnLayerToggleChanging;
-                    toggle.PropertyChanged -= OnLayerToggleChanged;
-                }
-
-                LayerToggles.Clear();
+                DetachAndClearLayerToggles();
 
                 await RunWithCadLoadCanvasOverlayAsync(async () =>
                 {
@@ -297,9 +293,13 @@ public sealed partial class FreeformHelperViewModel
 
                         await ApplyCadLoadOutcomeAsync(outcome, file.UiSnapshot.View);
                         ApplyImportSnapshot(file.UiSnapshot.Import, file);
-                        ApplyCapturedDxfEditProjectState(persistedDxfEditState);
+                        combinedGroupReplay = ApplyCapturedDxfEditProjectState(persistedDxfEditState);
                         status.ReportProgress(BuildCadLoadStatus(outcome, CadLoadContext.LoadProject, path));
                         LogCadLoadOutcome(outcome, CadLoadContext.LoadProject);
+                    }
+                    else
+                    {
+                        combinedGroupReplay = KeepCombinedGroupsWithoutCad(CapturePersistedDxfEditProjectState(file).CombinedCadGroups);
                     }
 
                     var rebuildSw = Stopwatch.StartNew();
@@ -311,6 +311,7 @@ public sealed partial class FreeformHelperViewModel
                 });
             }
 
+            combinedGroupReplay?.ReportSkippedGroups(status.ReportWarning);
             totalSw.Stop();
             _logger.Info(CultureInfo.InvariantCulture, "Load project timing: total={0} ms, persistence={1} ms, apply-state={2} ms, dxf={3} ms, rebuild={4} ms.",
                 totalSw.ElapsedMilliseconds,
@@ -346,6 +347,17 @@ public sealed partial class FreeformHelperViewModel
         {
             _appGeneralPersistence.SuppressPersistence = originalSuppressAppGeneralPersistence;
         }
+    }
+
+    private void DetachAndClearLayerToggles()
+    {
+        foreach (var toggle in LayerToggles)
+        {
+            toggle.PropertyChanging -= OnLayerToggleChanging;
+            toggle.PropertyChanged -= OnLayerToggleChanged;
+        }
+
+        LayerToggles.Clear();
     }
 
     private async Task<ProjectLoadReplayTiming> ReplayWorkflowStepsAfterProjectLoadAsync()

@@ -1,6 +1,7 @@
 using System.Globalization;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.UseCases.ProjectLoad;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -23,7 +24,7 @@ public sealed partial class FreeformHelperViewModel
             file.VisibleDuplicateCadPadIds = new HashSet<int>();
             file.DxfCadLayerOverrides = new Dictionary<int, string>();
             file.DxfCadGeometryOverrides = new Dictionary<int, ProjectCadGeometrySnapshot>();
-            file.DxfCombinedCadGroups = new List<ProjectDxfCombinedCadGroup>();
+            file.DxfCombinedCadGroups = CapturePersistedCombinedCadGroups();
             return;
         }
 
@@ -91,13 +92,43 @@ public sealed partial class FreeformHelperViewModel
 
     private List<ProjectDxfCombinedCadGroup> CapturePersistedCombinedCadGroups()
     {
-        if (_cad is null || _combinedCad.Groups.Count == 0)
+        var groups = new List<ProjectDxfCombinedCadGroup>();
+        if (_cad is not null && _combinedCad.Groups.Count > 0)
         {
-            return new List<ProjectDxfCombinedCadGroup>();
+            AddCurrentCombinedCadGroups(groups, _cad);
         }
 
-        var currentPadsById = _cad.Pads.ToDictionary(static pad => pad.Id);
-        var groups = new List<ProjectDxfCombinedCadGroup>();
+        AppendUnrestoredCombinedCadGroups(groups);
+        return groups;
+    }
+
+    private void AppendUnrestoredCombinedCadGroups(List<ProjectDxfCombinedCadGroup> groups)
+    {
+        var usedGroupIds = groups.Select(static group => group.GroupId).ToHashSet();
+        var nextGroupId = usedGroupIds.Count == 0 ? 1 : usedGroupIds.Max() + 1;
+        foreach (var kept in _cadEdit.UnrestoredCombinedGroups)
+        {
+            var groupId = kept.GroupId;
+            if (groupId > 0 && !usedGroupIds.Add(groupId))
+            {
+                // A group made after a DXF reload may reuse this id. Give the kept group a free one.
+                groupId = nextGroupId;
+                usedGroupIds.Add(groupId);
+            }
+
+            nextGroupId = Math.Max(nextGroupId, groupId + 1);
+            groups.Add(new ProjectDxfCombinedCadGroup
+            {
+                GroupId = groupId,
+                SourceCadIds = kept.SourceCadIds,
+                OutputPads = kept.OutputPads,
+            });
+        }
+    }
+
+    private void AddCurrentCombinedCadGroups(List<ProjectDxfCombinedCadGroup> groups, CadPadSet cad)
+    {
+        var currentPadsById = cad.Pads.ToDictionary(static pad => pad.Id);
         foreach (var pair in _combinedCad.Groups.OrderBy(static pair => pair.Key))
         {
             var outputPads = pair.Value.OutputCadIds
@@ -119,11 +150,18 @@ public sealed partial class FreeformHelperViewModel
                 OutputPads = outputPads,
             });
         }
-
-        return groups;
     }
 
-    internal void ApplyCapturedDxfEditProjectState(PersistedDxfEditProjectState state)
+    // Keeps the saved groups of a project whose DXF is not available, so the next save does not drop them.
+    private DxfCombinedGroupReplayResult KeepCombinedGroupsWithoutCad(List<ProjectDxfCombinedCadGroup> combinedGroups)
+    {
+        var replay = new DxfCombinedGroupReplayResult();
+        replay.SkippedGroups.AddRange(combinedGroups);
+        _cadEdit.UnrestoredCombinedGroups = [.. combinedGroups];
+        return replay;
+    }
+
+    internal DxfCombinedGroupReplayResult? ApplyCapturedDxfEditProjectState(PersistedDxfEditProjectState state)
     {
         ArgumentNullException.ThrowIfNull(state);
         var previous = new CadEditNotificationSnapshot(this);
@@ -137,7 +175,7 @@ public sealed partial class FreeformHelperViewModel
             SyncHiddenCadIdsToProject(previous);
             SyncCombinedCadState(previous);
             SyncDuplicateCadState(previous);
-            return;
+            return KeepCombinedGroupsWithoutCad(state.CombinedCadGroups);
         }
 
         var layerSelectionSnapshot = CaptureLayerSelectionSnapshot();
@@ -145,8 +183,9 @@ public sealed partial class FreeformHelperViewModel
         ClearDxfEditRuntimeState(resetBaseline: false, previous);
         ApplyPersistedCadLayerOverrides(state.CadLayerOverrides);
         ApplyPersistedCadGeometryOverrides(state.CadGeometryOverrides);
-        var combinedSourceCadIds = ReplayPersistedCombinedCadGroups(state.CombinedCadGroups);
-        SetHiddenCadPads(state.HiddenCadPadIds.Concat(combinedSourceCadIds), previous);
+        var replay = ReplayPersistedCombinedCadGroups(state.CombinedCadGroups);
+        _cadEdit.UnrestoredCombinedGroups = [.. replay.SkippedGroups];
+        SetHiddenCadPads(state.HiddenCadPadIds.Concat(replay.CombinedSourceCadIds), previous);
         ApplyPersistedVisibleDuplicateCadPads(state.VisibleDuplicateCadPadIds);
         _cadEdit.HiddenUndoStack.Clear();
         _cachedFilteredCadForBuild = null;
@@ -155,6 +194,7 @@ public sealed partial class FreeformHelperViewModel
         SyncCombinedCadState(previous);
         UpdateLayerToggles(_cad);
         RestoreLayerSelectionAfterCadLayerEdit(layerSelectionSnapshot, ensureVisibleLayerName: string.Empty);
+        return replay;
     }
 
     private void ApplyPersistedCadLayerOverrides(Dictionary<int, string> layerOverrides)
@@ -181,12 +221,65 @@ public sealed partial class FreeformHelperViewModel
         _cad = new CadPadSet(updatedPads);
     }
 
-    private HashSet<int> ReplayPersistedCombinedCadGroups(List<ProjectDxfCombinedCadGroup> combinedGroups)
+    private static bool TryBuildCombinedOutputPads(
+        ProjectDxfCombinedCadGroup persistedGroup,
+        HashSet<int> currentPadIds,
+        ref int nextCombinedCadPadId,
+        out List<CadPad> outputPads)
     {
-        var combinedSourceCadIds = new HashSet<int>();
+        outputPads = new List<CadPad>(persistedGroup.OutputPads.Count);
+        var conflictingOutputPad = false;
+        foreach (var outputPadSnapshot in persistedGroup.OutputPads)
+        {
+            CadPad outputPad;
+            try
+            {
+                outputPad = outputPadSnapshot.ToCadPad();
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.Warn(
+                    ex,
+                    "DXF edit replay skipped combined group {0}: output pad snapshot invalid.",
+                    persistedGroup.GroupId);
+                conflictingOutputPad = true;
+                break;
+            }
+
+            if (!currentPadIds.Add(outputPad.Id))
+            {
+                _logger.Warn(
+                    CultureInfo.InvariantCulture,
+                    "DXF edit replay skipped combined group {0}: output pad id {1} conflicts.",
+                    persistedGroup.GroupId,
+                    outputPad.Id);
+                conflictingOutputPad = true;
+                break;
+            }
+
+            outputPads.Add(outputPad);
+            nextCombinedCadPadId = Math.Max(nextCombinedCadPadId, outputPad.Id + 1);
+        }
+
+        if (!conflictingOutputPad && outputPads.Count > 0)
+        {
+            return true;
+        }
+
+        foreach (var outputPad in outputPads)
+        {
+            currentPadIds.Remove(outputPad.Id);
+        }
+
+        return false;
+    }
+
+    private DxfCombinedGroupReplayResult ReplayPersistedCombinedCadGroups(List<ProjectDxfCombinedCadGroup> combinedGroups)
+    {
+        var replay = new DxfCombinedGroupReplayResult();
         if (_cad is null || combinedGroups.Count == 0)
         {
-            return combinedSourceCadIds;
+            return replay;
         }
 
         var currentPads = _cad.Pads.ToList();
@@ -196,8 +289,10 @@ public sealed partial class FreeformHelperViewModel
 
         foreach (var persistedGroup in combinedGroups.OrderBy(static group => group.GroupId))
         {
+            maxGroupId = Math.Max(maxGroupId, persistedGroup.GroupId);
             if (persistedGroup.SourceCadIds.Count == 0 || persistedGroup.OutputPads.Count == 0)
             {
+                replay.SkippedGroups.Add(persistedGroup);
                 continue;
             }
 
@@ -211,50 +306,13 @@ public sealed partial class FreeformHelperViewModel
                     CultureInfo.InvariantCulture,
                     "DXF edit replay skipped combined group {0}: source pad missing in baseline.",
                     persistedGroup.GroupId);
+                replay.SkippedGroups.Add(persistedGroup);
                 continue;
             }
 
-            var outputPads = new List<CadPad>(persistedGroup.OutputPads.Count);
-            var conflictingOutputPad = false;
-            foreach (var outputPadSnapshot in persistedGroup.OutputPads)
+            if (!TryBuildCombinedOutputPads(persistedGroup, currentPadIds, ref nextCombinedCadPadId, out var outputPads))
             {
-                CadPad outputPad;
-                try
-                {
-                    outputPad = outputPadSnapshot.ToCadPad();
-                }
-                catch (ArgumentException ex)
-                {
-                    _logger.Warn(
-                        ex,
-                        "DXF edit replay skipped combined group {0}: output pad snapshot invalid.",
-                        persistedGroup.GroupId);
-                    conflictingOutputPad = true;
-                    break;
-                }
-
-                if (!currentPadIds.Add(outputPad.Id))
-                {
-                    _logger.Warn(
-                        CultureInfo.InvariantCulture,
-                        "DXF edit replay skipped combined group {0}: output pad id {1} conflicts.",
-                        persistedGroup.GroupId,
-                        outputPad.Id);
-                    conflictingOutputPad = true;
-                    break;
-                }
-
-                outputPads.Add(outputPad);
-                nextCombinedCadPadId = Math.Max(nextCombinedCadPadId, outputPad.Id + 1);
-            }
-
-            if (conflictingOutputPad || outputPads.Count == 0)
-            {
-                foreach (var outputPad in outputPads)
-                {
-                    currentPadIds.Remove(outputPad.Id);
-                }
-
+                replay.SkippedGroups.Add(persistedGroup);
                 continue;
             }
 
@@ -270,7 +328,7 @@ public sealed partial class FreeformHelperViewModel
 
             foreach (var sourceCadId in distinctSourceCadIds)
             {
-                combinedSourceCadIds.Add(sourceCadId);
+                replay.CombinedSourceCadIds.Add(sourceCadId);
                 _combinedCad.GroupIdBySourceCadId[sourceCadId] = groupId;
             }
 
@@ -280,6 +338,6 @@ public sealed partial class FreeformHelperViewModel
         _combinedCad.NextGroupId = Math.Max(_combinedCad.NextGroupId, maxGroupId + 1);
         _combinedCad.NextPadId = nextCombinedCadPadId;
         _cad = new CadPadSet(currentPads);
-        return combinedSourceCadIds;
+        return replay;
     }
 }
