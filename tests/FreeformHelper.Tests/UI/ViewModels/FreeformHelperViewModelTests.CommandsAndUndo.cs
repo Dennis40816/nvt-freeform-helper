@@ -1,7 +1,7 @@
-using System.Reflection;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -38,23 +38,15 @@ public sealed partial class FreeformHelperViewModelTests
     private static void InitializeDxfEditCadState(FreeformHelperViewModel vm, IReadOnlyList<CadPad> source)
     {
         var cad = new CadPadSet(source);
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var updateLayerTogglesMethod = typeof(FreeformHelperViewModel).GetMethod("UpdateLayerToggles", BindingFlags.Instance | BindingFlags.NonPublic);
-        var resetBaselineMethod = typeof(FreeformHelperViewModel).GetMethod("ResetDxfEditBaseline", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(updateLayerTogglesMethod);
-        Assert.NotNull(resetBaselineMethod);
 
-        cadField!.SetValue(vm, cad);
-        resetBaselineMethod!.Invoke(vm, new object?[] { cad });
-        updateLayerTogglesMethod!.Invoke(vm, new object?[] { cad });
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
+        FreeformHelperViewModelPrivateAccess.ResetDxfEditBaseline(vm, cad);
+        FreeformHelperViewModelPrivateAccess.UpdateLayerToggles(vm, cad);
     }
 
     private static CadPadSet GetCurrentCadPadSet(FreeformHelperViewModel vm)
     {
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        return Assert.IsType<CadPadSet>(cadField!.GetValue(vm));
+        return Assert.IsType<CadPadSet>(FreeformHelperViewModelPrivateAccess.Cad(vm));
     }
 
     private static int[] GetCombinedCadPadIds(FreeformHelperViewModel vm)
@@ -69,18 +61,12 @@ public sealed partial class FreeformHelperViewModelTests
     private static void InitializeVisibleCadIndexing(FreeformHelperViewModel vm, IReadOnlyList<CadPad> source, RegularGrid grid)
     {
         var cad = new CadPadSet(source);
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        var projectFileField = typeof(FreeformHelperViewModel).GetField("_projectFile", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
-        Assert.NotNull(projectFileField);
 
-        cadField!.SetValue(vm, cad);
-        gridField!.SetValue(vm, grid);
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = grid;
         vm.CadPads = new System.Collections.ObjectModel.ObservableCollection<CadPad>(source);
 
-        var projectFile = Assert.IsType<ProjectFile>(projectFileField!.GetValue(vm));
+        var projectFile = Assert.IsType<ProjectFile>(FreeformHelperViewModelPrivateAccess.ProjectFile(vm));
         projectFile.Settings.Grid.XChannels = grid.Cols;
         projectFile.Settings.Grid.YChannels = grid.Rows;
         projectFile.Settings.Grid.ActiveAreaWidth = grid.XEdges[^1] - grid.XEdges[0];
@@ -93,12 +79,5 @@ public sealed partial class FreeformHelperViewModelTests
         pad.IcIndex = 0;
         pad.DiffIndex = diffIndex;
         return pad;
-    }
-
-    private static T GetPrivateField<T>(object target, string fieldName)
-    {
-        var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return Assert.IsType<T>(field!.GetValue(target));
     }
 }

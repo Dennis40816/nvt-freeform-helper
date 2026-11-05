@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
-using System.Reflection;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -45,10 +45,6 @@ public sealed partial class FreeformHelperViewModelTests
     public async Task AnalyzeIndexMappingCommand_WhenNoVisibleCadPads_KeepsDiagnosticsEmptyState()
     {
         var vm = new FreeformHelperViewModel();
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
 
         var cadPads = new[] { CreateRectCad(1, 0, 0, 10, 10) };
         var cad = new CadPadSet(cadPads);
@@ -65,8 +61,8 @@ public sealed partial class FreeformHelperViewModelTests
             yEdges: gridYEdges,
             pads: regularPads);
 
-        cadField!.SetValue(vm, cad);
-        gridField!.SetValue(vm, grid);
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = grid;
         vm.LayerToggles.Clear();
         vm.LayerToggles.Add(new FreeformHelperViewModel.LayerToggle("L1", isSelected: false));
 

@@ -1,5 +1,5 @@
-using System.Reflection;
 using FreeformHelper.Application.Services;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -259,16 +259,13 @@ public sealed partial class FreeformHelperViewModelTests
             targetAutoMode = vm.SelectedCadOutputFwDiffAutoModeOption;
         }
 
-        var projectField = typeof(FreeformHelperViewModel).GetField("_projectFile", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(projectField);
-
         vm.CadIndexMaps.IcIndexByCadId[4201] = 1;
 
         settings.SelectedCadOutputFwDiffAutoModeOption = targetAutoMode;
         settings.CadOutputFwDiffIndexAnchorCadId = 4201;
         settings.SaveCommand.Execute(null);
 
-        var project = Assert.IsType<FreeformHelper.Infrastructure.Project.ProjectFile>(projectField!.GetValue(vm));
+        var project = Assert.IsType<FreeformHelper.Infrastructure.Project.ProjectFile>(FreeformHelperViewModelPrivateAccess.ProjectFile(vm));
         Assert.Equal(targetAutoMode.Value, vm.CadOutputFwDiffAutoMode);
         Assert.Equal(targetAutoMode.Value, vm.SelectedCadOutputFwDiffAutoModeOption.Value);
         Assert.Equal(4201m, vm.CadOutputFwDiffIndexAnchorCadId);

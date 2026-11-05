@@ -1,6 +1,6 @@
-using System.Reflection;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -228,13 +228,8 @@ public sealed partial class FreeformHelperViewModelTests
             CreateCad(2, "L2", 12, 0, 22, 10),
         });
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var updateLayerTogglesMethod = typeof(FreeformHelperViewModel).GetMethod("UpdateLayerToggles", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(updateLayerTogglesMethod);
-
-        cadField!.SetValue(vm, cad);
-        updateLayerTogglesMethod!.Invoke(vm, new object?[] { cad });
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
+        FreeformHelperViewModelPrivateAccess.UpdateLayerToggles(vm, cad);
 
         Assert.True(vm.AreAllCadLayersSelected);
         Assert.False(vm.AreNoCadLayersSelected);
@@ -281,16 +276,9 @@ public sealed partial class FreeformHelperViewModelTests
             CreateCad(2, "regular", 12, 0, 22, 10),
         });
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var updateLayerTogglesMethod = typeof(FreeformHelperViewModel).GetMethod("UpdateLayerToggles", BindingFlags.Instance | BindingFlags.NonPublic);
-        var resetBaselineMethod = typeof(FreeformHelperViewModel).GetMethod("ResetDxfEditBaseline", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(updateLayerTogglesMethod);
-        Assert.NotNull(resetBaselineMethod);
-
-        cadField!.SetValue(vm, cad);
-        resetBaselineMethod!.Invoke(vm, new object?[] { cad });
-        updateLayerTogglesMethod!.Invoke(vm, new object?[] { cad });
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
+        FreeformHelperViewModelPrivateAccess.ResetDxfEditBaseline(vm, cad);
+        FreeformHelperViewModelPrivateAccess.UpdateLayerToggles(vm, cad);
         vm.SelectedRegularSourceLayerOption = new FreeformHelperViewModel.RegularSourceLayerOption("regular", "regular");
         vm.SelectedBoundLayerOption = new FreeformHelperViewModel.BoundLayerOption("signal", "signal");
 

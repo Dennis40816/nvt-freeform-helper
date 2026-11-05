@@ -1,6 +1,6 @@
-using System.Reflection;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -33,8 +33,6 @@ public sealed partial class FreeformHelperViewModelTests
     public void PitchSizeSummary_ListsDistinctGridWidthsAndHeights()
     {
         var vm = new FreeformHelperViewModel();
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(gridField);
 
         var pads = new List<RegularPad>
         {
@@ -52,7 +50,7 @@ public sealed partial class FreeformHelperViewModelTests
             yEdges: pitchYEdges,
             pads: pads);
 
-        gridField!.SetValue(vm, grid);
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = grid;
 
         Assert.Equal("Pitch X: X1=10 mm, X2=20 mm", vm.PitchSizeXSummary);
         Assert.Equal("Pitch Y: Y1=4 mm, Y2=6 mm", vm.PitchSizeYSummary);
