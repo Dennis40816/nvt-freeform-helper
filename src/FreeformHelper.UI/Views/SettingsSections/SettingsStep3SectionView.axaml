@@ -14,6 +14,7 @@
         <StackPanel Classes="panelFormField">
           <controls:SettingsInfoLabel Text="Compensation model" Tip="Select the Step 3 compensation model that drives To Regular and To Full behavior."/>
           <ComboBox ItemsSource="{Binding NotchCompensationModelOptions}"
+                    AutomationProperties.Name="Compensation model"
                     SelectedItem="{Binding SelectedNotchCompensationModelOption, Mode=TwoWay}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
@@ -101,6 +102,7 @@
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="To Regular EN (derived)"
                           IsEnabled="False"
                           IsChecked="{Binding EnableToRegular, Mode=TwoWay}"
                           OnContent=""
@@ -119,6 +121,7 @@
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="To Full EN (derived)"
                           IsEnabled="False"
                           IsChecked="{Binding EnableToFull, Mode=TwoWay}"
                           OnContent=""
@@ -130,6 +133,7 @@
         <StackPanel Classes="panelFormField">
           <controls:SettingsInfoLabel Text="Multi-owner strict overlap (%)" Tip="Minimum regular-area overlap ratio required before a CAD can own or block a boundary target."/>
           <controls:NumberScrubber Minimum="0"
+                                   AutomationProperties.Name="Multi-owner strict overlap (%)"
                                    Maximum="100"
                                    SmallChange="0.1"
                                    FormatString="0.###"
@@ -152,6 +156,7 @@
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="Use boundary area cap"
                           IsChecked="{Binding EnableBoundaryVirtualAreaCap, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
@@ -162,6 +167,7 @@
                       Classes="panelFormField right">
             <controls:SettingsInfoLabel Text="Virtual cap (%)" Tip="Maximum virtual To Full area relative to original overlap area. 100% means outside virtual area cannot exceed inside overlap area."/>
             <controls:NumberScrubber Minimum="0"
+                                     AutomationProperties.Name="Virtual cap (%)"
                                      Maximum="1000"
                                      SmallChange="10"
                                      FormatString="0.#"
@@ -185,6 +191,7 @@
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="Use target coverage guard"
                           IsChecked="{Binding EnableTargetCoverageGuard, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
@@ -195,6 +202,7 @@
                       Classes="panelFormField right">
             <controls:SettingsInfoLabel Text="Target cap (%)" Tip="{Binding NotchTargetCoverageCapHelpText}"/>
             <controls:NumberScrubber Minimum="0"
+                                     AutomationProperties.Name="Target cap (%)"
                                      Maximum="255"
                                      SmallChange="1"
                                      FormatString="0"
@@ -218,6 +226,7 @@
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="Use To Full rule engine"
                           IsChecked="{Binding EnableToFullRuleEngine, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
@@ -235,6 +244,7 @@
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="Keep To Full trace"
                           IsEnabled="{Binding EnableToFullRuleEngine}"
                           IsChecked="{Binding EnableToFullRuleTrace, Mode=TwoWay}"
                           OnContent=""
@@ -269,6 +279,7 @@
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="Stage auto play"
                           IsChecked="{Binding NotchPreviewAutoPlayEnabled, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
@@ -279,6 +290,7 @@
                       Classes="panelFormField right">
             <controls:SettingsInfoLabel Text="Interval (ms)" Tip="Delay between Step 3 preview layers during auto play."/>
             <controls:NumberScrubber Minimum="200"
+                                     AutomationProperties.Name="Interval (ms)"
                                      Maximum="5000"
                                      SmallChange="100"
                                      FormatString="0"
@@ -298,6 +310,7 @@
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="Show To Regular labels"
                           IsChecked="{Binding ShowNotchToRegularLabels, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
@@ -315,6 +328,7 @@
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="Show To Full overlay"
                           IsChecked="{Binding ShowNotchCanvasPreview, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
@@ -328,6 +342,7 @@
                       Classes="panelFormField left">
             <controls:SettingsInfoLabel Text="To Full layer stage" Tip="Choose the To Full preview layer: seed, candidate, or final support result."/>
             <controls:NumberScrubber Minimum="1"
+                                     AutomationProperties.Name="To Full layer stage"
                                      Maximum="3"
                                      SmallChange="1"
                                      FormatString="0"

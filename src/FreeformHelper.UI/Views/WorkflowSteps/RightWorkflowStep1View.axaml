@@ -67,6 +67,7 @@
                                  Text="Use Regular Visibility Mask"
                                  VerticalAlignment="Center"/>
             <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="Use Regular Visibility Mask"
                           IsChecked="{Binding RegularVisibilityMaskUi.IsEnabled, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""

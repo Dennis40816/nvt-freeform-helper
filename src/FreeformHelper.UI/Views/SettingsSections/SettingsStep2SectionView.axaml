@@ -21,6 +21,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Freeform TH (dominant axis ratio)" Tip="Dominant-axis ratio threshold used when Step 2 tags XWay, YWay, or XYWay."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="Freeform TH (dominant axis ratio)"
                                        Maximum="1"
                                        SmallChange="0.01"
                                        FormatString="0.##"
@@ -41,6 +42,7 @@
                                      TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
+                            AutomationProperties.Name="XY WAY EN"
                             IsChecked="{Binding EnableAutoDetectXy, Mode=TwoWay}"
                             OnContent=""
                             OffContent=""
@@ -61,6 +63,7 @@
                                      TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
+                            AutomationProperties.Name="Edge spill EN"
                             IsChecked="{Binding EnableFreeformEdgeSpecialization, Mode=TwoWay}"
                             OnContent=""
                             OffContent=""
@@ -81,6 +84,7 @@
                                      TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
+                            AutomationProperties.Name="Load auto-run Step 2"
                             IsChecked="{Binding AutoReplayStep2AfterProjectLoad, Mode=TwoWay}"
                             OnContent=""
                             OffContent=""

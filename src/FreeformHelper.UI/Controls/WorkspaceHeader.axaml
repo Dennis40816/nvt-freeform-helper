@@ -225,6 +225,7 @@
             <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
               <SelectableTextBlock Text="Rows"/>
               <TextBox Classes="workspaceHeaderInput"
+                       AutomationProperties.Name="Rows"
                        Width="{StaticResource ManualSizingInputWidth}"
                        PlaceholderText="e.g. 0-3,6"
                        Text="{Binding ManualRowsRange, Mode=TwoWay}"
@@ -234,6 +235,7 @@
             <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
               <SelectableTextBlock Text="Cols"/>
               <TextBox Classes="workspaceHeaderInput"
+                       AutomationProperties.Name="Cols"
                        Width="{StaticResource ManualSizingInputWidth}"
                        PlaceholderText="e.g. 2-6"
                        Text="{Binding ManualColsRange, Mode=TwoWay}"
@@ -243,6 +245,7 @@
             <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
               <SelectableTextBlock Text="Width (mm)"/>
               <TextBox Classes="workspaceHeaderInput"
+                       AutomationProperties.Name="Width (mm)"
                        Width="{StaticResource ManualSizingInputWidth}"
                        IsReadOnly="True"
                        Focusable="False"
@@ -253,6 +256,7 @@
             <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
               <SelectableTextBlock Text="Height (mm)"/>
               <TextBox Classes="workspaceHeaderInput"
+                       AutomationProperties.Name="Height (mm)"
                        Width="{StaticResource ManualSizingInputWidth}"
                        IsReadOnly="True"
                        Focusable="False"
@@ -376,6 +380,7 @@
                                          Text="Tune widths first; keep defaults for most color/opacity values unless diagnostics require it."/>
                     <SelectableTextBlock Classes="viewMenuLabel" Text="CAD line width"/>
                     <controls:NumberScrubber Minimum="0.1"
+                                             AutomationProperties.Name="CAD line width"
                                              Maximum="5"
                                              SmallChange="0.05"
                                              FormatString="0.0#"
@@ -383,6 +388,7 @@
                                              ToolTip.Tip="CAD stroke width (mm)."/>
                     <SelectableTextBlock Classes="viewMenuLabel" Text="Regular outline width"/>
                     <controls:NumberScrubber Minimum="0.1"
+                                             AutomationProperties.Name="Regular outline width"
                                              Maximum="5"
                                              SmallChange="0.05"
                                              FormatString="0.0#"
@@ -390,6 +396,7 @@
                                              ToolTip.Tip="Regular pad outline width (mm)."/>
                     <SelectableTextBlock Classes="viewMenuLabel" Text="Highlight line width adjust"/>
                     <controls:NumberScrubber Minimum="-2"
+                                             AutomationProperties.Name="Highlight line width adjust"
                                              Maximum="4"
                                              SmallChange="0.1"
                                              FormatString="0.0#"
@@ -408,6 +415,7 @@
                                            Text="Low-frequency appearance tuning for CAD/Regular rendering."/>
                       <SelectableTextBlock Classes="viewMenuLabel" Text="CAD line color (#RRGGBB)"/>
                       <TextBox Text="{Binding CadLineColorHex, Mode=TwoWay}"
+                               AutomationProperties.Name="CAD line color (#RRGGBB)"
                                ToolTip.Tip="CAD stroke color as hex (#RRGGBB)."/>
                       <Grid ColumnDefinitions="4*,8,1*" RowDefinitions="Auto,Auto">
                         <SelectableTextBlock Grid.ColumnSpan="3"
@@ -415,6 +423,7 @@
                                              Text="CAD fill opacity"
                                              ToolTip.Tip="Transparency for CAD fill rendering."/>
                         <Slider Grid.Row="1"
+                                AutomationProperties.Name="CAD fill opacity"
                                 Grid.Column="0"
                                 Classes="viewOpacitySlider"
                                 Value="{Binding CadFillOpacity, Mode=TwoWay}"/>
@@ -430,6 +439,7 @@
                                              Text="CAD line opacity"
                                              ToolTip.Tip="Transparency for CAD stroke rendering."/>
                         <Slider Grid.Row="1"
+                                AutomationProperties.Name="CAD line opacity"
                                 Grid.Column="0"
                                 Classes="viewOpacitySlider"
                                 Value="{Binding CadLineOpacity, Mode=TwoWay}"/>
@@ -441,9 +451,11 @@
                       </Grid>
                       <SelectableTextBlock Classes="viewMenuLabel" Text="Regular outline color (#RRGGBB)"/>
                       <TextBox Text="{Binding RegularLineColorHex, Mode=TwoWay}"
+                               AutomationProperties.Name="Regular outline color (#RRGGBB)"
                                ToolTip.Tip="Regular outline color as hex (#RRGGBB)."/>
                       <SelectableTextBlock Classes="viewMenuLabel" Text="Regular selection color (#RRGGBB)"/>
                       <TextBox Text="{Binding RegularSelectedColorHex, Mode=TwoWay}"
+                               AutomationProperties.Name="Regular selection color (#RRGGBB)"
                                ToolTip.Tip="Selection color for regular pads (#RRGGBB)."/>
                       <Grid ColumnDefinitions="4*,8,1*" RowDefinitions="Auto,Auto">
                         <SelectableTextBlock Grid.ColumnSpan="3"
@@ -451,6 +463,7 @@
                                              Text="Regular fill opacity"
                                              ToolTip.Tip="Transparency for regular pad fill rendering."/>
                         <Slider Grid.Row="1"
+                                AutomationProperties.Name="Regular fill opacity"
                                 Grid.Column="0"
                                 Classes="viewOpacitySlider"
                                 Value="{Binding RegularFillOpacity, Mode=TwoWay}"/>
@@ -466,6 +479,7 @@
                                              Text="Regular line opacity"
                                              ToolTip.Tip="Transparency for regular pad stroke rendering."/>
                         <Slider Grid.Row="1"
+                                AutomationProperties.Name="Regular line opacity"
                                 Grid.Column="0"
                                 Classes="viewOpacitySlider"
                                 Value="{Binding RegularLineOpacity, Mode=TwoWay}"/>
@@ -481,6 +495,7 @@
                                              Text="Regular selection fill opacity"
                                              ToolTip.Tip="Transparency for selected regular pad fill."/>
                         <Slider Grid.Row="1"
+                                AutomationProperties.Name="Regular selection fill opacity"
                                 Grid.Column="0"
                                 Classes="viewOpacitySlider"
                                 Value="{Binding RegularSelectedFillOpacity, Mode=TwoWay}"/>
@@ -503,6 +518,7 @@
                       <StackPanel Spacing="{StaticResource Space6}" IsEnabled="{Binding ColorCadByArea}">
                         <SelectableTextBlock Classes="viewMenuLabel" Text="Area bucket tolerance (relative)"/>
                         <controls:NumberScrubber Minimum="0"
+                                                 AutomationProperties.Name="Area bucket tolerance (relative)"
                                                  Maximum="0.1"
                                                  SmallChange="0.0001"
                                                  FormatString="0.####"
@@ -511,6 +527,7 @@
                                                  ToolTip.Tip="Relative area tolerance to group CAD pads."/>
                         <SelectableTextBlock Classes="viewMenuLabel" Text="Max area buckets"/>
                         <controls:NumberScrubber Minimum="1"
+                                                 AutomationProperties.Name="Max area buckets"
                                                  Maximum="1024"
                                                  SmallChange="1"
                                                  FormatString="0"

@@ -21,6 +21,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Weight IoU" Tip="Mapping score weight for geometric overlap quality between CAD and regular pads."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="Weight IoU"
                                        Maximum="10"
                                        SmallChange="0.05"
                                        FormatString="0.##"
@@ -34,6 +35,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Weight distance" Tip="Mapping score weight for CAD/regular centroid distance."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="Weight distance"
                                        Maximum="10"
                                        SmallChange="0.05"
                                        FormatString="0.##"
@@ -47,6 +49,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Weight area" Tip="Mapping score weight for CAD/regular area similarity."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="Weight area"
                                        Maximum="10"
                                        SmallChange="0.05"
                                        FormatString="0.##"
@@ -60,6 +63,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Candidate number" Tip="How many geometry candidates are retained for Step 4 mapping diagnostics."/>
               <controls:NumberScrubber Minimum="1"
+                                       AutomationProperties.Name="Candidate number"
                                        Maximum="400"
                                        SmallChange="1"
                                        FormatString="0"
@@ -72,6 +76,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Low confidence threshold" Tip="Mappings below this confidence are flagged for review."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="Low confidence threshold"
                                        Maximum="1"
                                        SmallChange="0.01"
                                        FormatString="0.##"
@@ -85,6 +90,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Ambiguous margin (best - 2nd)" Tip="If best score minus second score is below this margin, mapping is flagged ambiguous."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="Ambiguous margin (best - 2nd)"
                                        Maximum="1"
                                        SmallChange="0.01"
                                        FormatString="0.##"
@@ -114,6 +120,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="CAD Output FW Diff strategy" Tip="Strategy used to assign CAD Output FW Diff indices from geometry seed and overrides."/>
               <ComboBox ItemsSource="{Binding CadOutputFwDiffAutoModeOptions}"
+                        AutomationProperties.Name="CAD Output FW Diff strategy"
                         SelectedItem="{Binding SelectedCadOutputFwDiffAutoModeOption, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                   <DataTemplate>
@@ -133,6 +140,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="CAD Output FW Diff start" Tip="Starting index for automatic CAD Output FW Diff numbering."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="CAD Output FW Diff start"
                                        Maximum="1000000"
                                        SmallChange="1"
                                        FormatString="0"
@@ -162,6 +170,7 @@
                                      TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
+                            AutomationProperties.Name="Show CAD Output FW Diff markers"
                             IsChecked="{Binding ShowDiffIndexOverlay, Mode=TwoWay}"
                             OnContent=""
                             OffContent=""

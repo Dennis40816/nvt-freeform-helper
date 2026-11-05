@@ -42,6 +42,7 @@
                 <SelectableTextBlock Grid.Column="0"
                                      Text="v2.1"/>
                 <ToggleSwitch Grid.Column="1"
+                              AutomationProperties.Name="v2.1"
                               IsChecked="{Binding EnableV21, Mode=TwoWay}"
                               OnContent=""
                               OffContent=""
@@ -52,6 +53,7 @@
                 <SelectableTextBlock Grid.Column="0"
                                      Text="v2.2"/>
                 <ToggleSwitch Grid.Column="1"
+                              AutomationProperties.Name="v2.2"
                               IsChecked="{Binding EnableV22, Mode=TwoWay}"
                               OnContent=""
                               OffContent=""
@@ -65,6 +67,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Export type" Tip="Choose the generated file type, such as C source or CSV diagnostics."/>
               <ComboBox ItemsSource="{Binding NotchExportFileTypeOptions}"
+                        AutomationProperties.Name="Export type"
                         SelectedItem="{Binding SelectedNotchExportFileTypeOption, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                   <DataTemplate>
@@ -80,6 +83,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="C export profile" Tip="Select the C output profile expected by the downstream FW integration."/>
               <ComboBox ItemsSource="{Binding NotchExportProfileOptions}"
+                        AutomationProperties.Name="C export profile"
                         SelectedItem="{Binding SelectedNotchExportProfileOption, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                   <DataTemplate>
@@ -95,6 +99,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Null value" Tip="Placeholder value used for empty entries in exported notch payloads."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="Null value"
                                        Maximum="65535"
                                        SmallChange="1"
                                        FormatString="0"
@@ -123,6 +128,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Notch gate TH v2.1 (Q7/128)" Tip="v2.1 gate threshold stored in Q7 units where 128 means 100 percent."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="Notch gate TH v2.1 (Q7/128)"
                                        Maximum="128"
                                        SmallChange="1"
                                        FormatString="0"
@@ -136,6 +142,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Notch gate TH v2.2 (%)" Tip="v2.2 gate threshold expressed directly as percent."/>
               <controls:NumberScrubber Minimum="0"
+                                       AutomationProperties.Name="Notch gate TH v2.2 (%)"
                                        Maximum="100"
                                        SmallChange="0.1"
                                        FormatString="0.##"
@@ -158,6 +165,7 @@
                                      TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
+                            AutomationProperties.Name="Link TH (v2.1 Q7 &lt;-&gt; v2.2 %)"
                             IsChecked="{Binding LinkNotchThresholds, Mode=TwoWay}"
                             OnContent=""
                             OffContent=""

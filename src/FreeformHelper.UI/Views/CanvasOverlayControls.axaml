@@ -59,6 +59,7 @@
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
             <SelectableTextBlock Text="CAD layer" VerticalAlignment="Center"/>
             <ToggleSwitch IsChecked="{Binding ShowCad, Mode=TwoWay}"
+                          AutomationProperties.Name="CAD layer"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
@@ -68,6 +69,7 @@
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
             <SelectableTextBlock Text="Regular grid" VerticalAlignment="Center"/>
             <ToggleSwitch IsChecked="{Binding ShowRegular, Mode=TwoWay}"
+                          AutomationProperties.Name="Regular grid"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
@@ -77,6 +79,7 @@
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
             <SelectableTextBlock Text="Color by area" VerticalAlignment="Center"/>
             <ToggleSwitch IsChecked="{Binding ColorCadByArea, Mode=TwoWay}"
+                          AutomationProperties.Name="Color by area"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
@@ -86,6 +89,7 @@
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
             <SelectableTextBlock Text="To Regular" VerticalAlignment="Center"/>
             <ToggleSwitch IsChecked="{Binding ShowNotchToRegularLabels, Mode=TwoWay}"
+                          AutomationProperties.Name="To Regular"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
@@ -95,6 +99,7 @@
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}" VerticalAlignment="Center">
             <SelectableTextBlock Text="To Full" VerticalAlignment="Center"/>
             <ToggleSwitch IsChecked="{Binding ShowNotchCanvasPreview, Mode=TwoWay}"
+                          AutomationProperties.Name="To Full"
                           IsEnabled="{Binding CanShowToFullPreviewToggle}"
                           OnContent=""
                           OffContent=""

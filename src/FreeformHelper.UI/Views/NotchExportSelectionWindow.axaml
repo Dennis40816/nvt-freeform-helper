@@ -29,6 +29,7 @@
                                  Text="Notch version"
                                  ToolTip.Tip="Limits visible/exported rows to this scope. When confirming export, single-version choice is also kept for next project save."/>
             <ComboBox ItemsSource="{Binding VersionOptions}"
+                      AutomationProperties.Name="Notch version"
                       Width="{StaticResource NotchExportTopDropdownWidth}"
                       IsEnabled="{Binding CanSelectVersion}"
                       SelectedItem="{Binding SelectedVersionOption, Mode=TwoWay}">
@@ -47,6 +48,7 @@
                                  Text="Export format"
                                  ToolTip.Tip="Select output file format for this export run."/>
             <ComboBox ItemsSource="{Binding ExportTypeOptions}"
+                      AutomationProperties.Name="Export format"
                       Width="{StaticResource NotchExportTopDropdownWidth}"
                       IsEnabled="{Binding CanSelectExportType}"
                       SelectedItem="{Binding SelectedExportTypeOption, Mode=TwoWay}">
@@ -195,6 +197,7 @@
                                  VerticalAlignment="Center"
                                  Text="Sort:"/>
             <ComboBox Grid.Column="1"
+                      AutomationProperties.Name="Sort"
                       Width="{StaticResource NotchExportSortDropdownWidth}"
                       VerticalAlignment="Center"
                       ItemsSource="{Binding SortModeOptions}"

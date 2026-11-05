@@ -35,6 +35,7 @@
             <controls:SettingsInfoLabel Text="Cascade"
                                         Tip="Adjust IC count. The per-IC rows below update immediately."/>
             <controls:NumberScrubber Minimum="1"
+                                     AutomationProperties.Name="Cascade"
                                      Maximum="{StaticResource NumericInputMaximum}"
                                      SmallChange="1"
                                      FormatString="0"

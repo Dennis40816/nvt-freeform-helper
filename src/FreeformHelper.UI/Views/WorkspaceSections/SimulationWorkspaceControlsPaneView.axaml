@@ -55,6 +55,7 @@
                               IsVisible="{Binding IsManualSource}">
                     <SelectableTextBlock Text="Global value" FontWeight="SemiBold"/>
                     <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                             AutomationProperties.Name="Global value"
                                              Maximum="{StaticResource NumericInputMaximum}"
                                              SmallChange="0.1"
                                              FormatString="0.###"
@@ -208,6 +209,7 @@
                     <StackPanel Classes="panelFormField">
                       <SelectableTextBlock Text="Contact model"/>
                       <ComboBox ItemsSource="{Binding CopperContactModelOptions}"
+                                AutomationProperties.Name="Contact model"
                                 SelectedItem="{Binding SelectedCopperContactModelOption, Mode=TwoWay}"
                                 ToolTip.Tip="{Binding CopperContactModelSummaryText}">
                         <ComboBox.ItemTemplate>
@@ -221,6 +223,7 @@
                       <StackPanel Grid.Column="0" Classes="panelFormField">
                         <SelectableTextBlock Text="Center X"/>
                         <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                 AutomationProperties.Name="Center X"
                                                  Maximum="{StaticResource NumericInputMaximum}"
                                                  SmallChange="0.1"
                                                  FormatString="0.###"
@@ -231,6 +234,7 @@
                       <StackPanel Grid.Column="1" Classes="panelFormField">
                         <SelectableTextBlock Text="Center Y"/>
                         <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                 AutomationProperties.Name="Center Y"
                                                  Maximum="{StaticResource NumericInputMaximum}"
                                                  SmallChange="0.1"
                                                  FormatString="0.###"
@@ -243,6 +247,7 @@
                       <StackPanel Grid.Column="0" Classes="panelFormField">
                         <SelectableTextBlock Text="Diameter"/>
                         <controls:NumberScrubber Minimum="0"
+                                                 AutomationProperties.Name="Diameter"
                                                  Maximum="{StaticResource NumericInputMaximum}"
                                                  SmallChange="0.1"
                                                  FormatString="0.###"
@@ -253,6 +258,7 @@
                       <StackPanel Grid.Column="1" Classes="panelFormField">
                         <SelectableTextBlock Text="Full-pad signal"/>
                         <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                 AutomationProperties.Name="Full-pad signal"
                                                  Maximum="{StaticResource NumericInputMaximum}"
                                                  SmallChange="1"
                                                  FormatString="0.###"
@@ -264,6 +270,7 @@
                     <StackPanel Classes="panelFormField">
                       <SelectableTextBlock Text="Baseline"/>
                       <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                               AutomationProperties.Name="Baseline"
                                                Maximum="{StaticResource NumericInputMaximum}"
                                                SmallChange="1"
                                                FormatString="0.###"
@@ -298,6 +305,7 @@
                                       Classes="panelFormField">
                             <SelectableTextBlock Text="Start X"/>
                             <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                     AutomationProperties.Name="Start X"
                                                      Maximum="{StaticResource NumericInputMaximum}"
                                                      SmallChange="0.1"
                                                      FormatString="0.###"
@@ -308,6 +316,7 @@
                                       Classes="panelFormField">
                             <SelectableTextBlock Text="Start Y"/>
                             <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                     AutomationProperties.Name="Start Y"
                                                      Maximum="{StaticResource NumericInputMaximum}"
                                                      SmallChange="0.1"
                                                      FormatString="0.###"
@@ -321,6 +330,7 @@
                                       Classes="panelFormField">
                             <SelectableTextBlock Text="End X"/>
                             <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                     AutomationProperties.Name="End X"
                                                      Maximum="{StaticResource NumericInputMaximum}"
                                                      SmallChange="0.1"
                                                      FormatString="0.###"
@@ -331,6 +341,7 @@
                                       Classes="panelFormField">
                             <SelectableTextBlock Text="End Y"/>
                             <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                     AutomationProperties.Name="End Y"
                                                      Maximum="{StaticResource NumericInputMaximum}"
                                                      SmallChange="0.1"
                                                      FormatString="0.###"
@@ -341,6 +352,7 @@
                         <StackPanel Classes="panelFormField">
                           <SelectableTextBlock Text="Steps"/>
                           <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                                   AutomationProperties.Name="Steps"
                                                    Maximum="{StaticResource NumericInputMaximum}"
                                                    SmallChange="1"
                                                    FormatString="0"
@@ -500,6 +512,7 @@
                   <Grid Grid.Row="5" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource Space8}">
                     <SelectableTextBlock Grid.Column="0" Text="FPS" VerticalAlignment="Center"/>
                     <controls:NumberScrubber Grid.Column="1"
+                                             AutomationProperties.Name="FPS"
                                              Minimum="1"
                                              Maximum="60"
                                              SmallChange="1"

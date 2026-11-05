@@ -16,6 +16,7 @@
             <controls:SettingsInfoLabel Text="Unmatched TH (overlap / regular area)"
                                         Tip="Diagnostics threshold for unmatched regular pads; it does not rewrite Step 1 links."/>
             <controls:NumberScrubber Minimum="0"
+                                     AutomationProperties.Name="Unmatched TH (overlap / regular area)"
                                      Maximum="1"
                                      SmallChange="0.0001"
                                      FormatString="0.####"

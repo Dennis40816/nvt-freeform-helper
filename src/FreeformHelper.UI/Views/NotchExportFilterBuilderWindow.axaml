@@ -29,36 +29,42 @@
         <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="IC"/>
           <TextBox x:Name="IcTextBox"
+                   AutomationProperties.Name="IC"
                    PlaceholderText="e.g. 1"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="Diff"/>
           <TextBox x:Name="DiffTextBox"
+                   AutomationProperties.Name="Diff"
                    PlaceholderText="e.g. 20"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="REG"/>
           <TextBox x:Name="RegTextBox"
+                   AutomationProperties.Name="REG"
                    PlaceholderText="e.g. 4820"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="CAD"/>
           <TextBox x:Name="CadTextBox"
+                   AutomationProperties.Name="CAD"
                    PlaceholderText="e.g. 3777 / none"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="Anchor (A)"/>
           <TextBox x:Name="AnchorTextBox"
+                   AutomationProperties.Name="Anchor (A)"
                    PlaceholderText="e.g. 20"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="Status"/>
           <ComboBox x:Name="StatusComboBox"
+                    AutomationProperties.Name="Status"
                     SelectedIndex="0"
                     SelectionChanged="FilterInput_SelectionChanged">
             <ComboBoxItem Content="Any"/>
@@ -71,6 +77,7 @@
         <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}">
           <SelectableTextBlock Classes="stepNote" Text="Fuzzy text (optional)"/>
           <TextBox x:Name="FuzzyTextBox"
+                   AutomationProperties.Name="Fuzzy text (optional)"
                    PlaceholderText="e.g. CAD 3777 / transfer"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
@@ -80,6 +87,7 @@
                   Spacing="{StaticResource Space4}">
         <SelectableTextBlock Classes="stepNote" Text="Generated query"/>
         <TextBox x:Name="PreviewTextBox"
+                 AutomationProperties.Name="Generated query"
                  IsReadOnly="True"
                  TextWrapping="WrapWithOverflow"/>
       </StackPanel>

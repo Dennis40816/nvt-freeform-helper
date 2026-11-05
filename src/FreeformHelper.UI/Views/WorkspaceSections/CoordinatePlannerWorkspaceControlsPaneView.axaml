@@ -54,6 +54,7 @@
               <StackPanel Grid.Row="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
                 <SelectableTextBlock Text="Preview layer" FontWeight="SemiBold"/>
                 <ComboBox ItemsSource="{Binding LayerOptions}"
+                          AutomationProperties.Name="Preview layer"
                           SelectedItem="{Binding SelectedLayerOption, Mode=TwoWay}">
                   <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -65,6 +66,7 @@
               <StackPanel Grid.Row="2" Classes="panelFormField" Spacing="{StaticResource Space6}">
                 <SelectableTextBlock Text="AA outline" FontWeight="SemiBold"/>
                 <ComboBox ItemsSource="{Binding AaBoundsOptions}"
+                          AutomationProperties.Name="AA outline"
                           SelectedItem="{Binding SelectedAaBoundsOption, Mode=TwoWay}">
                   <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -109,6 +111,7 @@
                 <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="Origin X" FontWeight="SemiBold"/>
                   <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                           AutomationProperties.Name="Origin X"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.1"
                                            FormatString="0.###"
@@ -118,6 +121,7 @@
                 <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="Origin Y" FontWeight="SemiBold"/>
                   <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                           AutomationProperties.Name="Origin Y"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.1"
                                            FormatString="0.###"
@@ -132,6 +136,7 @@
                 <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="AA width (mm)" FontWeight="SemiBold"/>
                   <controls:NumberScrubber Minimum="0.001"
+                                           AutomationProperties.Name="AA width (mm)"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.1"
                                            FormatString="0.###"
@@ -141,6 +146,7 @@
                 <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="AA height (mm)" FontWeight="SemiBold"/>
                   <controls:NumberScrubber Minimum="0.001"
+                                           AutomationProperties.Name="AA height (mm)"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.1"
                                            FormatString="0.###"
@@ -155,6 +161,7 @@
                 <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="Pixel X" FontWeight="SemiBold"/>
                   <controls:NumberScrubber Minimum="1"
+                                           AutomationProperties.Name="Pixel X"
                                            Maximum="100000"
                                            SmallChange="1"
                                            FormatString="0"
@@ -163,6 +170,7 @@
                 <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="Pixel Y" FontWeight="SemiBold"/>
                   <controls:NumberScrubber Minimum="1"
+                                           AutomationProperties.Name="Pixel Y"
                                            Maximum="100000"
                                            SmallChange="1"
                                            FormatString="0"
@@ -175,6 +183,7 @@
                           IsVisible="{Binding ShowCalibrationDetails}">
                 <SelectableTextBlock Text="Copper pillar dia (mm)" FontWeight="SemiBold"/>
                 <controls:NumberScrubber Minimum="0"
+                                         AutomationProperties.Name="Copper pillar dia (mm)"
                                          Maximum="{StaticResource NumericInputMaximum}"
                                          SmallChange="0.01"
                                          FormatString="0.###"
@@ -201,6 +210,7 @@
               <StackPanel Grid.Row="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
                 <SelectableTextBlock Text="Guide reference" FontWeight="SemiBold"/>
                 <ComboBox ItemsSource="{Binding GuideBasisOptions}"
+                          AutomationProperties.Name="Guide reference"
                           SelectedItem="{Binding SelectedGuideBasisOption, Mode=TwoWay}">
                   <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -213,6 +223,7 @@
                 <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="Horizontal guides" FontWeight="SemiBold"/>
                   <ComboBox ItemsSource="{Binding GuideGenerationOptions}"
+                            AutomationProperties.Name="Horizontal guides"
                             SelectedItem="{Binding SelectedHorizontalGuideGenerationOption, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                       <DataTemplate>
@@ -224,6 +235,7 @@
                                        Text="Count"
                                        IsVisible="{Binding IsHorizontalGuideCountMode}"/>
                   <controls:NumberScrubber Minimum="0"
+                                           AutomationProperties.Name="Horizontal guides: Count"
                                            Maximum="100"
                                            SmallChange="1"
                                            FormatString="0"
@@ -233,6 +245,7 @@
                                        Text="Pitch (mm)"
                                        IsVisible="{Binding IsHorizontalGuidePitchMode}"/>
                   <controls:NumberScrubber Minimum="0"
+                                           AutomationProperties.Name="Horizontal guides: Pitch (mm)"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.1"
                                            FormatString="0.###"
@@ -243,10 +256,12 @@
                                        Text="Positions (mm)"
                                        IsVisible="{Binding IsHorizontalGuideExplicitMode}"/>
                   <TextBox Text="{Binding HorizontalGuidePositionListText, Mode=TwoWay}"
+                           AutomationProperties.Name="Horizontal guides: Positions (mm)"
                            PlaceholderText="0, 25, 50"
                            IsVisible="{Binding IsHorizontalGuideExplicitMode}"/>
                   <SelectableTextBlock Classes="workspaceSectionMeta" Text="Inset (mm)"/>
                   <controls:NumberScrubber Minimum="0"
+                                           AutomationProperties.Name="Horizontal guides: Inset (mm)"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.1"
                                            FormatString="0.###"
@@ -256,6 +271,7 @@
                 <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="Vertical guides" FontWeight="SemiBold"/>
                   <ComboBox ItemsSource="{Binding GuideGenerationOptions}"
+                            AutomationProperties.Name="Vertical guides"
                             SelectedItem="{Binding SelectedVerticalGuideGenerationOption, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                       <DataTemplate>
@@ -267,6 +283,7 @@
                                        Text="Count"
                                        IsVisible="{Binding IsVerticalGuideCountMode}"/>
                   <controls:NumberScrubber Minimum="0"
+                                           AutomationProperties.Name="Vertical guides: Count"
                                            Maximum="100"
                                            SmallChange="1"
                                            FormatString="0"
@@ -276,6 +293,7 @@
                                        Text="Pitch (mm)"
                                        IsVisible="{Binding IsVerticalGuidePitchMode}"/>
                   <controls:NumberScrubber Minimum="0"
+                                           AutomationProperties.Name="Vertical guides: Pitch (mm)"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.1"
                                            FormatString="0.###"
@@ -286,10 +304,12 @@
                                        Text="Positions (mm)"
                                        IsVisible="{Binding IsVerticalGuideExplicitMode}"/>
                   <TextBox Text="{Binding VerticalGuidePositionListText, Mode=TwoWay}"
+                           AutomationProperties.Name="Vertical guides: Positions (mm)"
                            PlaceholderText="0, 25, 50"
                            IsVisible="{Binding IsVerticalGuideExplicitMode}"/>
                   <SelectableTextBlock Classes="workspaceSectionMeta" Text="Inset (mm)"/>
                   <controls:NumberScrubber Minimum="0"
+                                           AutomationProperties.Name="Vertical guides: Inset (mm)"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.1"
                                            FormatString="0.###"
@@ -351,6 +371,7 @@
                 <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="Array columns" FontWeight="SemiBold"/>
                   <controls:NumberScrubber Minimum="0"
+                                           AutomationProperties.Name="Array columns"
                                            Maximum="100"
                                            SmallChange="1"
                                            FormatString="0"
@@ -359,6 +380,7 @@
                 <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="Array rows" FontWeight="SemiBold"/>
                   <controls:NumberScrubber Minimum="0"
+                                           AutomationProperties.Name="Array rows"
                                            Maximum="100"
                                            SmallChange="1"
                                            FormatString="0"
@@ -372,6 +394,7 @@
                 <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
                   <SelectableTextBlock Text="Selected handle" FontWeight="SemiBold"/>
                   <ComboBox ItemsSource="{Binding CustomArrayCornerOptions}"
+                            AutomationProperties.Name="Selected handle"
                             SelectedItem="{Binding SelectedCustomArrayCornerOption, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                       <DataTemplate>
@@ -384,6 +407,7 @@
                   <StackPanel Classes="panelFormField" Spacing="{StaticResource Space6}">
                     <SelectableTextBlock Text="X (mm)" FontWeight="SemiBold"/>
                     <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                             AutomationProperties.Name="X (mm)"
                                              Maximum="{StaticResource NumericInputMaximum}"
                                              SmallChange="0.1"
                                              FormatString="0.###"
@@ -393,6 +417,7 @@
                   <StackPanel Grid.Column="1" Classes="panelFormField" Spacing="{StaticResource Space6}">
                     <SelectableTextBlock Text="Y (mm)" FontWeight="SemiBold"/>
                     <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                             AutomationProperties.Name="Y (mm)"
                                              Maximum="{StaticResource NumericInputMaximum}"
                                              SmallChange="0.1"
                                              FormatString="0.###"
@@ -425,6 +450,7 @@
               <StackPanel Grid.Row="2" Classes="panelFormField" Spacing="{StaticResource Space6}">
                 <SelectableTextBlock Text="Point" FontWeight="SemiBold"/>
                 <TextBox Text="{Binding CustomPointLabelText, Mode=TwoWay}"
+                         AutomationProperties.Name="Point"
                          PlaceholderText="Point label"/>
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space8}">
                   <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
@@ -454,6 +480,7 @@
               <StackPanel Grid.Row="3" Classes="panelFormField" Spacing="{StaticResource Space6}">
                 <SelectableTextBlock Text="Path" FontWeight="SemiBold"/>
                 <TextBox Text="{Binding CustomPathLabelText, Mode=TwoWay}"
+                         AutomationProperties.Name="Path"
                          PlaceholderText="Path label"/>
                 <Grid RowDefinitions="Auto,Auto,Auto"
                       RowSpacing="{StaticResource Space6}">

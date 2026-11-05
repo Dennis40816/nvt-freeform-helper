@@ -68,6 +68,7 @@
               <StackPanel Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="AA size X (mm)" Tip="Active-area width in millimeters for generated regular grid placement."/>
                 <controls:NumberScrubber Minimum="0.1"
+                                         AutomationProperties.Name="AA size X (mm)"
                                          Maximum="{StaticResource NumericInputMaximum}"
                                          SmallChange="0.0001"
                                          FormatString="0.####"
@@ -81,6 +82,7 @@
               <StackPanel Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="AA size Y (mm)" Tip="Active-area height in millimeters for generated regular grid placement."/>
                 <controls:NumberScrubber Minimum="0.1"
+                                         AutomationProperties.Name="AA size Y (mm)"
                                          Maximum="{StaticResource NumericInputMaximum}"
                                          SmallChange="0.0001"
                                          FormatString="0.####"
@@ -94,6 +96,7 @@
               <StackPanel Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="Scan order" Tip="Diff-index numbering direction for the generated regular grid."/>
                 <ComboBox ItemsSource="{Binding ScanOrderOptions}"
+                          AutomationProperties.Name="Scan order"
                           SelectedItem="{Binding SelectedScanOrderOption, Mode=TwoWay}">
                   <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -109,6 +112,7 @@
               <StackPanel Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="Regular source" Tip="Choose generated regular grid or a DXF layer as the regular-pad source."/>
                 <ComboBox ItemsSource="{Binding RegularSourceModeOptions}"
+                          AutomationProperties.Name="Regular source"
                           SelectedItem="{Binding SelectedRegularSourceModeOption, Mode=TwoWay}">
                   <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -124,6 +128,7 @@
               <StackPanel Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="Regular layer" Tip="DXF layer used as regular geometry when Regular source is DXF layer."/>
                 <ComboBox Classes="regularLayerSelector"
+                          AutomationProperties.Name="Regular layer"
                           IsEnabled="{Binding IsDxfLayerRegularSource}"
                           ItemsSource="{Binding RegularSourceLayerOptions}"
                           SelectedItem="{Binding SelectedRegularSourceLayerOption, Mode=TwoWay}">
@@ -143,6 +148,7 @@
               <StackPanel Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="Grid padding (%)" Tip="Padding percentage applied when generating the regular grid inside the AA size."/>
                 <controls:NumberScrubber Minimum="0"
+                                         AutomationProperties.Name="Grid padding (%)"
                                          Maximum="100"
                                          SmallChange="1"
                                          FormatString="0"
@@ -165,6 +171,7 @@
               <StackPanel Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="Coordinate pixel X" Tip="FW reported X-coordinate width used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
                 <controls:NumberScrubber Minimum="1"
+                                         AutomationProperties.Name="Coordinate pixel X"
                                          Maximum="{StaticResource NumericInputMaximum}"
                                          SmallChange="1"
                                          FormatString="0"
@@ -177,6 +184,7 @@
               <StackPanel Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="Coordinate pixel Y" Tip="FW reported Y-coordinate height used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
                 <controls:NumberScrubber Minimum="1"
+                                         AutomationProperties.Name="Coordinate pixel Y"
                                          Maximum="{StaticResource NumericInputMaximum}"
                                          SmallChange="1"
                                          FormatString="0"
@@ -192,6 +200,7 @@
                             Classes="panelFormField left">
                   <controls:SettingsInfoLabel Text="Panel bias X" Tip="Horizontal panel alignment offset used only in panel alignment mode."/>
                   <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                           AutomationProperties.Name="Panel bias X"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.0001"
                                            FormatString="0.####"
@@ -203,6 +212,7 @@
                             Classes="panelFormField right">
                   <controls:SettingsInfoLabel Text="Panel bias Y" Tip="Vertical panel alignment offset used only in panel alignment mode."/>
                   <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                           AutomationProperties.Name="Panel bias Y"
                                            Maximum="{StaticResource NumericInputMaximum}"
                                            SmallChange="0.0001"
                                            FormatString="0.####"
@@ -245,6 +255,7 @@
                                      TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
+                            AutomationProperties.Name="Only closed polylines"
                             IsChecked="{Binding ImportOnlyClosedPolylines, Mode=TwoWay}"
                             OnContent=""
                             OffContent=""
@@ -265,6 +276,7 @@
                                      TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
+                            AutomationProperties.Name="Import block polylines"
                             IsChecked="{Binding ImportBlockPolylines, Mode=TwoWay}"
                             OnContent=""
                             OffContent=""
@@ -285,6 +297,7 @@
                                      TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
+                            AutomationProperties.Name="Auto bounds from visible layers"
                             IsChecked="{Binding RecalcBoundsOnLayerFilter, Mode=TwoWay}"
                             OnContent=""
                             OffContent=""
@@ -305,6 +318,7 @@
                                      TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
+                            AutomationProperties.Name="Apply visual preferences on load"
                             IsChecked="{Binding ApplyAppVisualPreferencesOnProjectLoad, Mode=TwoWay}"
                             OnContent=""
                             OffContent=""
@@ -334,6 +348,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Grid alignment mode" Tip="Controls how the generated regular grid is aligned to panel AA or CAD geometry."/>
               <ComboBox ItemsSource="{Binding GridAlignmentOptions}"
+                        AutomationProperties.Name="Grid alignment mode"
                         SelectedItem="{Binding SelectedGridAlignmentOption, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                   <DataTemplate>
@@ -349,6 +364,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Log level" Tip="Minimum log verbosity written to the app console and log file."/>
               <ComboBox ItemsSource="{Binding LogLevelOptions}"
+                        AutomationProperties.Name="Log level"
                         SelectedItem="{Binding SelectedLogLevelOption, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                   <DataTemplate>
@@ -364,6 +380,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Global font size (%)" Tip="Scales UI text across the app; project geometry is unchanged."/>
               <controls:NumberScrubber Minimum="80"
+                                       AutomationProperties.Name="Global font size (%)"
                                        Maximum="140"
                                        SmallChange="1"
                                        FormatString="0"
@@ -376,6 +393,7 @@
             <StackPanel Classes="panelFormField">
               <controls:SettingsInfoLabel Text="Highlight line width adjust" Tip="Extra stroke width for selected or highlighted pads on canvas."/>
               <controls:NumberScrubber Minimum="-2"
+                                       AutomationProperties.Name="Highlight line width adjust"
                                        Maximum="4"
                                        SmallChange="0.1"
                                        FormatString="0.0#"

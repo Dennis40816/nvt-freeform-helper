@@ -224,6 +224,7 @@
                               Spacing="{StaticResource Space4}">
                     <SelectableTextBlock Classes="padInfoKeyLabel" Text="Pad width (mm)"/>
                     <controls:NumberScrubber Minimum="0"
+                                             AutomationProperties.Name="Pad width (mm)"
                                              Maximum="1000000"
                                              SmallChange="0.0001"
                                              FormatString="0.####"
@@ -241,6 +242,7 @@
                               Spacing="{StaticResource Space4}">
                     <SelectableTextBlock Classes="padInfoKeyLabel" Text="Pad height (mm)"/>
                     <controls:NumberScrubber Minimum="0"
+                                             AutomationProperties.Name="Pad height (mm)"
                                              Maximum="1000000"
                                              SmallChange="0.0001"
                                              FormatString="0.####"
