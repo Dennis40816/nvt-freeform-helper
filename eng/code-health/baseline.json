@@ -1236,20 +1236,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 82
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs"
-      ],
-      "contentHash": "c9ede026a11cc60bfaf2db343851e670750d548a2e3b8036bf5167808d3e3ad2",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.LoadProjectFromPathCoreAsync(string)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 121
       },
       "owner": "NFH",
