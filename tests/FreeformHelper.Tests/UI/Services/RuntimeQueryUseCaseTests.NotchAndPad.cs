@@ -1,6 +1,7 @@
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -44,14 +45,14 @@ public sealed partial class RuntimeQueryUseCaseTests
         helper.EnableToFull = true;
         helper.ToFullStrictOverlapPercent = 0.1m;
         helper.EnableBoundaryVirtualAreaCap = true;
-        SetPrivateField(helper, "_cad", new CadPadSet([cad]));
+        FreeformHelperViewModelPrivateAccess.Cad(helper) = new CadPadSet([cad]);
         var grid = new RegularGrid(
             rows: 1,
             cols: 4,
             xEdges: [0, anchorMaxX, emittedMaxX, secondEmittedMaxX, gridMaxX],
             yEdges: [0, 10],
             pads: regulars);
-        SetPrivateField(helper, "_grid", grid);
+        FreeformHelperViewModelPrivateAccess.Grid(helper) = grid;
         helper.CadIndexMaps.OutputFwDiffIndexByCadId[cad.Id] = 83;
         helper.CadIndexMaps.IcIndexByCadId[cad.Id] = 0;
         helper.InvalidateWorkflowDataSnapshot();
@@ -199,7 +200,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         using var shell = BuildShellWithNotchValidationTable(BuildTypedValidationTable());
         var projectFile = new ProjectFile();
         projectFile.Settings.Notch.NullValue = ushort.MaxValue + 1;
-        SetPrivateField(shell.FreeformHelper, "_projectFile", projectFile);
+        FreeformHelperViewModelPrivateAccess.ProjectFile(shell.FreeformHelper) = projectFile;
         var useCase = new RuntimeQueryUseCase(shell);
 
         var error = await Assert.ThrowsAsync<InvalidOperationException>(() => useCase.ExecuteAsync(new RuntimeQueryRequest(
@@ -348,7 +349,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         Assert.Equal(before, await QueryStep3CompensationCacheMetricsAsync(useCase));
 
         vm.CadPads.Add(cad);
-        SetPrivateField(vm, "_grid", null);
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = null;
         var notReadyResponse = await ExecuteMultiOwnerAsync(useCase, cad.Id);
 
         Assert.False(notReadyResponse.Ok);
@@ -373,13 +374,13 @@ public sealed partial class RuntimeQueryUseCaseTests
         vm.RegularPads.Add(regular);
         vm.EnableToRegular = true;
         vm.EnableToFull = true;
-        SetPrivateField(vm, "_cad", new CadPadSet(new[] { cad, blocker }));
-        SetPrivateField(vm, "_grid", new RegularGrid(
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(new[] { cad, blocker });
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = new RegularGrid(
             rows: 1,
             cols: 1,
             xEdges: [0.0, 10.0],
             yEdges: [0.0, 10.0],
-            pads: new[] { regular }));
+            pads: new[] { regular });
 
         var useCase = new RuntimeQueryUseCase(shell);
         var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
@@ -463,13 +464,13 @@ public sealed partial class RuntimeQueryUseCaseTests
         vm.EnableToRegular = true;
         vm.EnableToFull = true;
         vm.ToFullStrictOverlapPercent = 0.1m;
-        SetPrivateField(vm, "_cad", new CadPadSet([target, minorOwner]));
-        SetPrivateField(vm, "_grid", new RegularGrid(
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet([target, minorOwner]);
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = new RegularGrid(
             rows: 1,
             cols: 1,
             xEdges: [0.0, 10.0],
             yEdges: [0.0, 10.0],
-            pads: [regular]));
+            pads: [regular]);
         return (shell, target);
     }
 }

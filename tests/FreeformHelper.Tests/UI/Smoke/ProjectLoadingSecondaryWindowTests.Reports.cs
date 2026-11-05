@@ -1,10 +1,9 @@
-using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Notch;
-using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
 using Xunit;
@@ -18,14 +17,12 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
     {
         var release = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
         var vm = new FreeformHelperViewModel();
-        var project = GetField<ProjectFile>(vm, "_projectFile");
+        var project = FreeformHelperViewModelPrivateAccess.ProjectFile(vm);
         project.DxfRegularMappingOverrides[10] = 200;
         var issue = new DxfRegularMappingIssue(DxfRegularMappingIssueKind.LowConfidence, "synthetic",
             CadPadId: 10, RegularPadIndex: 200, DiffIndex: 8);
         var report = new DxfRegularMappingReport(1, 1, 1, 0, 0, 1, 0, true, "synthetic", 1, false, [issue], [issue]);
-        var clear = typeof(FreeformHelperViewModel).GetMethod("ClearMappingOverrideFromReport", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(clear);
-        var clearOverride = clear.CreateDelegate<Func<int, bool>>(vm);
+        Func<int, bool> clearOverride = cadId => FreeformHelperViewModelPrivateAccess.ClearMappingOverrideFromReport(vm, cadId);
         var callbacks = 0;
         var reportVm = new IndexMappingReportViewModel("synthetic", report,
             locateTarget: (_, _) => { callbacks++; return true; },
@@ -40,8 +37,8 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
         try
         {
             owner.Show();
-            await ShowSecondaryWindowAsync(view, "ShowIndexMappingReportWindowAsync", reportVm);
-            window = GetField<IndexMappingReportWindow>(view, "_indexMappingReportWindow");
+            await FreeformHelperViewPrivateAccess.ShowIndexMappingReportWindowAsync(view, reportVm);
+            window = Assert.IsType<IndexMappingReportWindow>(FreeformHelperViewPrivateAccess.IndexMappingReportWindow(view));
             reportVm.SelectDecisionCommand.Execute(Assert.Single(reportVm.DecisionRows));
             Assert.True(reportVm.CanClearSelectedIssueOverride);
             callbacks = 0;
@@ -107,8 +104,8 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
         try
         {
             owner.Show();
-            selection = ShowSecondaryWindowAsync(view, "ShowNotchExportSelectionWindowAsync", export);
-            window = GetField<NotchExportSelectionWindow>(view, "_notchExportSelectionWindow");
+            selection = FreeformHelperViewPrivateAccess.ShowNotchExportSelectionWindowAsync(view, export);
+            window = Assert.IsType<NotchExportSelectionWindow>(FreeformHelperViewPrivateAccess.NotchExportSelectionWindow(view));
             var row = export.Rows.Last();
             var selected = export.SelectedCount;
             var notifications = 0;
@@ -120,9 +117,7 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             Assert.False(export.SelectPreviewRowCommand.CanExecute(row));
             export.SelectPreviewRowCommand.Execute(row);
             export.SelectedRow = row;
-            var confirm = typeof(NotchExportSelectionWindow).GetMethod("RequestClose", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(confirm);
-            confirm.Invoke(window, [true]);
+            NotchExportSelectionWindowPrivateAccess.RequestClose(window, true);
             Assert.False(selection.IsCompleted);
             Assert.Equal(selected, export.SelectedCount);
             Assert.Equal(0, previews);
@@ -137,7 +132,7 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             export.SelectedRow = null;
             export.SelectPreviewRowCommand.Execute(row);
             Assert.Equal(1, previews);
-            confirm.Invoke(window, [true]);
+            NotchExportSelectionWindowPrivateAccess.RequestClose(window, true);
             await selection;
         }
         finally
@@ -148,12 +143,5 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             if (selection is not null) await selection;
             owner.Close();
         }
-    }
-
-    private static Task ShowSecondaryWindowAsync(FreeformHelperView view, string name, object viewModel)
-    {
-        var method = typeof(FreeformHelperView).GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        return Assert.IsAssignableFrom<Task>(method.Invoke(view, [viewModel]));
     }
 }

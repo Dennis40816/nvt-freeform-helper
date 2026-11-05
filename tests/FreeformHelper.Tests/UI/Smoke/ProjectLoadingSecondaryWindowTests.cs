@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -7,9 +6,9 @@ using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
-using Nvt.Core.Lifecycle;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -27,15 +26,15 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
     {
         var release = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
         var vm = new FreeformHelperViewModel();
-        SetField(vm, "_cad", new CadPadSet(new[] { CreateCad(10), CreateCad(11), CreateCad(12) }));
-        var hidden = GetField<CadEditState>(vm, "_cadEdit").HiddenCadPadIds;
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(new[] { CreateCad(10), CreateCad(11), CreateCad(12) });
+        var hidden = FreeformHelperViewModelPrivateAccess.CadEdit(vm).HiddenCadPadIds;
         hidden.Add(10);
-        var hiddenUndo = GetField<CadEditState>(vm, "_cadEdit").HiddenUndoStack;
+        var hiddenUndo = FreeformHelperViewModelPrivateAccess.CadEdit(vm).HiddenUndoStack;
         hiddenUndo.Push([10]);
-        var duplicateIds = GetField<CadEditState>(vm, "_cadEdit").DuplicateCadPadIdToCanonicalId;
+        var duplicateIds = FreeformHelperViewModelPrivateAccess.CadEdit(vm).DuplicateCadPadIdToCanonicalId;
         duplicateIds[11] = 10;
         duplicateIds[12] = 10;
-        var autoHidden = GetField<CadEditState>(vm, "_cadEdit").AutoHiddenDuplicateCadPadIds;
+        var autoHidden = FreeformHelperViewModelPrivateAccess.CadEdit(vm).AutoHiddenDuplicateCadPadIds;
         autoHidden.Add(11);
         var view = new FreeformHelperView { DataContext = vm };
         var owner = new Window { Content = view };
@@ -47,7 +46,7 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             await (kind == DxfEditChangeKind.Hidden
                 ? vm.OpenHiddenDxfEditChangeListCommand
                 : vm.OpenDuplicateDxfEditChangeListCommand).ExecuteAsync(null);
-            window = GetField<DxfEditChangeListWindow>(view, "_dxfEditChangeListWindow");
+            window = Assert.IsType<DxfEditChangeListWindow>(FreeformHelperViewPrivateAccess.DxfEditChangeListWindow(view));
             var changes = Assert.IsType<DxfEditChangeListViewModel>(window.DataContext);
             changes.AreAllVisibleRowsSelected = true;
             var entry = Assert.IsType<DxfEditChangeListEntry>(changes.SelectedEntry);
@@ -79,7 +78,7 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             Assert.Equal(_hiddenIds, hidden.Order().ToArray());
             Assert.Equal(_autoHiddenIds, autoHidden.Order().ToArray());
             Assert.Equal(_hiddenIds, Assert.Single(hiddenUndo));
-            Assert.False(GetField<UndoService>(vm, "_undoService").CanUndo);
+            Assert.False(FreeformHelperViewModelPrivateAccess.UndoService(vm).CanUndo);
             Assert.False(vm.HasUnsavedChanges);
 
             release.SetResult(null);
@@ -106,18 +105,4 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
     {
         new Point2(0, 0), new Point2(10, 0), new Point2(10, 10), new Point2(0, 10)
     }));
-
-    private static T GetField<T>(object target, string name)
-    {
-        var field = target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return Assert.IsType<T>(field.GetValue(target));
-    }
-
-    private static void SetField(object target, string name, object value)
-    {
-        var field = target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        field.SetValue(target, value);
-    }
 }

@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
@@ -92,9 +91,5 @@ public sealed class SaveProjectShortcutTests
     }
 
     private static Task SaveFromShortcutAsync(FreeformHelperView view, FreeformHelperViewModel vm)
-    {
-        var method = typeof(FreeformHelperView).GetMethod("SaveProjectFromShortcutAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        return Assert.IsAssignableFrom<Task>(method.Invoke(view, [vm]));
-    }
+        => FreeformHelperViewPrivateAccess.SaveProjectFromShortcutAsync(view, vm);
 }

@@ -2,10 +2,10 @@
 
 using System.Collections.Concurrent;
 using System.IO.Pipes;
-using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using Nvt.Core.RuntimeQuery;
 using Xunit;
@@ -172,12 +172,11 @@ public sealed class RuntimeQueryCoreBehaviorTests
     private static async Task<NamedPipeServerStream> WaitForPipeAsync(
         RuntimeQueryIpcServer server, NamedPipeServerStream? previous = null)
     {
-        var activePipe = typeof(RuntimeQueryIpcServer).GetProperty("ActivePipe", BindingFlags.Instance | BindingFlags.NonPublic)!;
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         timeout.CancelAfter(TimeSpan.FromSeconds(3));
         while (true)
         {
-            if (activePipe.GetValue(server) is NamedPipeServerStream pipe && !ReferenceEquals(pipe, previous))
+            if (RuntimeQueryIpcServerPrivateAccess.ActivePipe(server) is { } pipe && !ReferenceEquals(pipe, previous))
             {
                 return pipe;
             }

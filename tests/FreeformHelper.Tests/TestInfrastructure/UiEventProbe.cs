@@ -1,12 +1,9 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
-using System.Reflection;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using FreeformHelper.UI;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Threading;
-using Xunit;
 
 namespace FreeformHelper.Tests.TestInfrastructure;
 
@@ -27,13 +24,6 @@ internal sealed class UiEventProbe
     {
         Reports.Add((operation, exception));
         Reported.TrySetResult((operation, exception));
-    }
-
-    public static void Click(object view, string handler)
-    {
-        var method = view.GetType().GetMethod(handler, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        method.Invoke(view, [view, new RoutedEventArgs()]);
     }
 }
 
