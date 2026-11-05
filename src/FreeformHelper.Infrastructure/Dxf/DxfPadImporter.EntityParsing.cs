@@ -99,11 +99,11 @@ public sealed partial class DxfPadImporter
             }
             else if (code == 10)
             {
-                baseX = ParseDouble(value);
+                baseX = ParseDouble(value, code);
             }
             else if (code == 20)
             {
-                baseY = ParseDouble(value);
+                baseY = ParseDouble(value, code);
             }
 
             headerIndex++;
@@ -184,14 +184,14 @@ public sealed partial class DxfPadImporter
             }
             else if (code == 10)
             {
-                vertices.Add(new Point2(ParseDouble(value), double.NaN));
+                vertices.Add(new Point2(ParseDouble(value, code), double.NaN));
             }
             else if (code == 20 && vertices.Count > 0)
             {
                 var last = vertices[^1];
                 if (double.IsNaN(last.Y))
                 {
-                    vertices[^1] = last with { Y = ParseDouble(value) };
+                    vertices[^1] = last with { Y = ParseDouble(value, code) };
                 }
             }
 
@@ -265,11 +265,11 @@ public sealed partial class DxfPadImporter
             var (code, value) = tokens[index];
             if (code == 10)
             {
-                x = ParseDouble(value);
+                x = ParseDouble(value, code);
             }
             else if (code == 20)
             {
-                y = ParseDouble(value);
+                y = ParseDouble(value, code);
             }
 
             index++;
@@ -314,19 +314,19 @@ public sealed partial class DxfPadImporter
                     blockName = value;
                     break;
                 case 10:
-                    insertionX = ParseDouble(value);
+                    insertionX = ParseDouble(value, code);
                     break;
                 case 20:
-                    insertionY = ParseDouble(value);
+                    insertionY = ParseDouble(value, code);
                     break;
                 case 41:
-                    scaleX = ParseDouble(value);
+                    scaleX = ParseDouble(value, code);
                     break;
                 case 42:
-                    scaleY = ParseDouble(value);
+                    scaleY = ParseDouble(value, code);
                     break;
                 case 50:
-                    rotationDegrees = ParseDouble(value);
+                    rotationDegrees = ParseDouble(value, code);
                     break;
                 case 70:
                     columns = Math.Max(1, ParseInt(value, fallback: 1));
@@ -335,10 +335,10 @@ public sealed partial class DxfPadImporter
                     rows = Math.Max(1, ParseInt(value, fallback: 1));
                     break;
                 case 44:
-                    columnSpacing = ParseDouble(value);
+                    columnSpacing = ParseDouble(value, code);
                     break;
                 case 45:
-                    rowSpacing = ParseDouble(value);
+                    rowSpacing = ParseDouble(value, code);
                     break;
             }
 

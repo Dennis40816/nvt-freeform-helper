@@ -45,7 +45,7 @@ public sealed class CadLoadUseCaseTests
         {
             TestFiles.WriteText(brokenPath, BrokenDxfContent, Encoding.UTF8);
 
-            Assert.Throws<FormatException>(() => useCase.TryLoadFromProject(brokenPath, null, options));
+            Assert.Throws<InvalidDataException>(() => useCase.TryLoadFromProject(brokenPath, null, options));
         }
         finally
         {
