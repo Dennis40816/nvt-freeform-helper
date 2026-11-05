@@ -53,21 +53,16 @@ public sealed class AppGeneralSettingsStore
     {
         try
         {
-            if (_readTextOverride is not null)
-            {
-                return ParseDocument(_readTextOverride(_settingsPath));
-            }
-
-            if (!File.Exists(_settingsPath))
-            {
-                return null;
-            }
-
-            var json = File.ReadAllText(_settingsPath);
+            var json = _readTextOverride is null ? AppGeneralSettingsFile.Read(_settingsPath) : _readTextOverride(_settingsPath);
             return ParseDocument(json);
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
+            if (AppGeneralSettingsFile.TryBackUpCorrupt(_settingsPath, ex, isFileRead: _readTextOverride is null))
+            {
+                return null;
+            }
+
             _logger.Warn(ex, "Failed to load app general settings from '{0}'.", _settingsPath);
             return null;
         }
@@ -123,16 +118,10 @@ public sealed class AppGeneralSettingsStore
             return;
         }
 
-        var dir = Path.GetDirectoryName(_settingsPath);
-        if (!string.IsNullOrWhiteSpace(dir))
-        {
-            Directory.CreateDirectory(dir);
-        }
-
         document.SchemaVersion = AppGeneralSettingsDocument.CurrentSchemaVersion;
         document.SavedAtUtc = DateTimeOffset.UtcNow;
         var json = JsonSerializer.Serialize(document, _jsonOptions);
-        File.WriteAllText(_settingsPath, json);
+        AppGeneralSettingsFile.WriteAtomically(_settingsPath, json);
     }
 
     private static string BuildDefaultSettingsPath()
