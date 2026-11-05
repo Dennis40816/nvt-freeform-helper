@@ -22,49 +22,28 @@ internal static class NotchFirmwareCExporter
         ArgumentNullException.ThrowIfNull(grid);
         ArgumentNullException.ThrowIfNull(settings);
         var nullValue = settings.Notch.NullValue;
+        var projection = NotchExportRangeCheck.ProjectAndValidate(table, grid, settings, nullValue, profile);
 
-        var v22Rows = table.Rows
-            .Where(static row => row.Version == NotchAlgorithmVersion.V22)
-            .ToList();
-        var orderedV21Rows = table.Rows
-            .Where(static row => row.Version == NotchAlgorithmVersion.V21)
-            .OrderBy(static row => row.IcIndex)
-            .ThenBy(static row => row.DiffIndex)
-            .ToList();
-
-        if (v22Rows.Count > 0 && orderedV21Rows.Count > 0)
+        if (projection.V22Nodes.Count > 0)
         {
-            throw new InvalidOperationException(
-                "C export is version-specific. Select C v2.1 or C v2.2 so the generated FW file has one table layout.");
+            return ExportV22FwFile(projection.V22Nodes, settings, nullValue, profile);
         }
 
-        if (v22Rows.Count > 0)
+        if (projection.V21Nodes.Count > 0)
         {
-            return ExportV22FwFile(v22Rows, grid, settings, nullValue, profile);
-        }
-
-        if (orderedV21Rows.Count > 0)
-        {
-            return ExportV21FwFile(orderedV21Rows, grid, settings, nullValue, profile);
+            return ExportV21FwFile(projection.V21Nodes, settings, nullValue, profile);
         }
 
         return "// Notch table contains no supported v2.1/v2.2 rows.\n";
     }
 
     private static string ExportV21FwFile(
-        IReadOnlyList<NotchTableRow> rows,
-        RegularGrid grid,
+        IReadOnlyList<IReadOnlyList<NotchV21FirmwareNode>> groupedNodes,
         ProjectSettings settings,
         int nullValue,
         NotchExportProfile profile)
     {
-        var icCount = ResolveIcCount(rows, grid);
-        var projection = NotchV21FirmwareProjector.Project(
-            rows,
-            nullValue,
-            icCount,
-            settings.Notch.ComputationMode);
-        var groupedNodes = projection.NodesByIc;
+        var icCount = groupedNodes.Count;
 
         var sb = new StringBuilder();
         AppendFwFileHeader(sb, "Notch v2.1 compensation export");
@@ -81,19 +60,12 @@ internal static class NotchFirmwareCExporter
     }
 
     private static string ExportV22FwFile(
-        IReadOnlyList<NotchTableRow> rows,
-        RegularGrid grid,
+        IReadOnlyList<IReadOnlyList<NotchV22FirmwareRow>> groupedNodes,
         ProjectSettings settings,
         int nullValue,
         NotchExportProfile profile)
     {
-        var icCount = ResolveIcCount(rows, grid);
-        var projection = NotchV22FirmwareProjector.Project(rows, nullValue, icCount);
-        var groupedNodes = profile == NotchExportProfile.Release
-            ? NotchV22FirmwareProjector.OrderNodesByIc(
-                projection.SourceRows.Where(static node => !IsNoOpNode(node)).ToList(),
-                icCount)
-            : projection.NodesByIc;
+        var icCount = groupedNodes.Count;
 
         var sb = new StringBuilder();
         AppendFwFileHeader(sb, "Notch v2.2 compensation export");
@@ -501,22 +473,6 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine("/*-----------------------------------------------------------------------------*/");
     }
 
-    private static int ResolveIcCount(IReadOnlyList<NotchTableRow> rows, RegularGrid grid)
-    {
-        var maxIcIndex = -1;
-        if (rows.Count > 0)
-        {
-            maxIcIndex = Math.Max(maxIcIndex, rows.Max(static row => row.IcIndex));
-        }
-
-        if (grid.Pads.Count > 0)
-        {
-            maxIcIndex = Math.Max(maxIcIndex, grid.Pads.Max(static pad => pad.IcIndex));
-        }
-
-        return Math.Max(1, maxIcIndex + 1);
-    }
-
     private static string DescribeSourceCombineRule(NotchCompensationModel model)
     {
         return model switch
@@ -529,15 +485,6 @@ internal static class NotchFirmwareCExporter
     }
 
     private static string ToOnOff(bool value) => value ? "ON" : "OFF";
-
-    private static bool IsNoOpNode(NotchV22FirmwareRow node)
-    {
-        return node.CombinePercent == 100 &&
-               node.FirstTargetDiffIndex is null &&
-               node.FirstRatioPercent == 0 &&
-               node.SecondTargetDiffIndex is null &&
-               node.SecondRatioPercent == 0;
-    }
 
     private static string GetIcTableSymbol(int icIndex) => string.Format(CultureInfo.InvariantCulture, "castNHC_TABLE_IC{0}", icIndex + 1);
 
@@ -557,7 +504,7 @@ internal static class NotchFirmwareCExporter
             FormatDiffLiteral(node.SecondDiffIndex, nullValue),
             secondType,
             node.SecondRatioQ7,
-            node.Comment);
+            SanitizeLineComment(node.Comment));
     }
 
     private static string FormatV22NodeLine(NotchV22FirmwareRow node)
@@ -574,9 +521,47 @@ internal static class NotchFirmwareCExporter
             FormatDiffLiteral(node.SecondTargetDiffIndex),
             node.SecondRatioPercent,
             NotchV22FirmwareProjector.FormatFlagsLiteral(node.Flags),
-            node.Comment,
+            SanitizeLineComment(node.Comment),
             keepPercent,
             movePercent);
+    }
+
+    /// <summary>
+    /// Makes free comment text safe to emit after a C <c>//</c> marker on one line.
+    /// Control characters (including CR and LF) become spaces, comment markers are broken
+    /// (MISRA C Rule 3.1), consecutive question marks are split so a trigraph such as <c>??/</c> (a backslash)
+    /// cannot start, and trailing backslashes are removed (Rule 3.2 line splicing).
+    /// </summary>
+    internal static string SanitizeLineComment(string? comment)
+    {
+        if (string.IsNullOrEmpty(comment))
+        {
+            return string.Empty;
+        }
+
+        var builder = new StringBuilder(comment.Length);
+        foreach (var character in comment)
+        {
+            var next = char.IsControl(character) ? ' ' : character;
+            if (builder.Length > 0 && IsCommentMarkerPair(builder[^1], next))
+            {
+                builder.Append(' ');
+            }
+
+            builder.Append(next);
+        }
+
+        var text = builder.ToString();
+        return text.TrimEnd(' ').EndsWith('\\')
+            ? text.TrimEnd('\\', ' ')
+            : text;
+    }
+
+    private static bool IsCommentMarkerPair(char previous, char next)
+    {
+        return (previous == '/' && (next == '*' || next == '/')) ||
+               (previous == '*' && next == '/') ||
+               (previous == '?' && next == '?');
     }
 
     private static string FormatDiffLiteral(int value, int nullValue)

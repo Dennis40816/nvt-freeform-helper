@@ -84,6 +84,9 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
 - [ ] **P-MASK Behavior for a missing saved mask path and for importing a mask while enabled** · Target: - · Status: Waiting for owner · PR: [#22](https://github.com/Dennis40816/nvt-freeform-helper/pull/22) (characterization tests only)
 - [ ] **P-V21 Remove V21 and `LegacyRegularAnchor` completely** · Target: after g7 · Status: Waiting for owner (scope) · PR: -
   - No implicit conversion before then. Planning notes: `docs/reviews/v21-*-2026-10.md`.
+- [ ] **NOTCH-EXPORT-RANGE The Notch C export wrote wrong firmware data for out-of-range input** · Target: - · Status: Fix in review on `fix/notch/export-range-checks` · PR: - (pending)
+  - Found by the cloud edge-case run (2026-11-05). A diff index of -1 became 65535 (`NHC_DIFF_NONE`), a V21 row with fewer than nine values became a node on diff 0, and 256 or more ICs, more than 65535 nodes in one IC and V22 flags outside a byte were truncated. A line break or trailing backslash in a row comment turned comment text into source (MISRA C:2012 rules 3.1 and 3.2).
+  - The export now refuses these inputs before it builds any C text (`NotchExportRangeCheck`) and sanitizes row comments. Output for valid tables is unchanged. MISRA F4 (signed shift in generated code) waits for an owner decision.
 
 ### 2.2 g5 settings and presentation (after the g4 exit)
 
