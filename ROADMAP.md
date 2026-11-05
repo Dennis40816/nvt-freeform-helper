@@ -193,6 +193,9 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
     - `c7f6200c2aba59caf81d66b29f1e5bdb65b4dc8a`: the first code change. Its body has no verification run and no `Refs` line.
     - `1dc093e3fc8ab7be740c9f2eb9a9a6a97ed1ad00`: merges `main` into the branch. It has no body.
     - `a9e867ebea6b0550962008acd8337552fd41fa7e`, `8583de4990ea5c4339b66e635b595729cf7321b6` and `ba3845bee394fe2171671decee634048ac78b80d`: three fixes after failed queue runs (`CA2249`, a closed window drained in the new test, a new `CA1307` finding). Each body says why the earlier run failed. None records the run on its own fix, and none has a `Refs` line. The queue run on `ba3845b` passed the build, 240 tests and the health chain (LowerBaseline, Verify, lint) on 2026-10-31. It is recorded in the description of #228.
+- [ ] **GRID-PADDING-LIMIT The Settings window let the user type a grid padding above the saved limit** · Target: - · Status: Fix in review on `fix/settings/grid-padding-limit` · PR: - (pending)
+  - Found by the cloud settings audit (2026-11-05). The Grid padding (%) input accepted 0 to 100, but the setting is saved as a ratio clamped to 0 to 0.5. A value above 50 was shown and then written as 50.
+  - The input now accepts 0 to 50, the same range as the saved value. A headless test checks the input limit.
 - [ ] **AA-PIXELS Optional panel pixel counts for the active area (AA)** · Target: - · Status: In progress: the Settings fields are done on `feature/settings/aa-pixels`; the image export reads them later in EXPORT-IMG · PR: - (pending)
   - Owner request, 2026-11-05: the full AA of the 3635 panel is 6480 x 848 pixels (915.52 x 119.59 mm), and the project should keep that fact.
   - The counts are optional and stored in `settings.activeAreaPixels` (`x`, `y`). `ActiveAreaPixelPitch.Evaluate` is the single check against the AA size. Old project files read as not set. Nothing rebuilds from these values.

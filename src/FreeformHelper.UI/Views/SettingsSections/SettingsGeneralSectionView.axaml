@@ -142,7 +142,7 @@
               <StackPanel Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="Grid padding (%)" Tip="Padding percentage applied when generating the regular grid inside the AA size."/>
                 <controls:NumberScrubber Minimum="0"
-                                         Maximum="100"
+                                         Maximum="50"
                                          SmallChange="1"
                                          FormatString="0"
                                          Value="{Binding GridPaddingPercent, Mode=TwoWay}"/>
