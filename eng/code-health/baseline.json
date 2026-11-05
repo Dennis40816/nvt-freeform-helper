@@ -3159,36 +3159,6 @@
       "symbol": "P:System.DateTimeOffset.UtcNow"
     },
     {
-      "syntaxHash": "5ee7521f526369963757b426a31cc958dd24e5ffaefc4a7790c4951a05b7c156",
-      "member": "FreeformHelper.Tests.AppGeneralSettingsStoreTests.DefaultCtor_UsesEnvironmentOverridePath()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/AppGeneralSettingsStoreTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "52608ac3f08456659f50461c6da0cefcdebed508050c19a8837c41f3b891a9be",
-      "member": "FreeformHelper.Tests.AppGeneralSettingsStoreTests.DefaultCtor_UsesEnvironmentOverridePath()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/AppGeneralSettingsStoreTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.SetEnvironmentVariable(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "e83ca99ad6ba40ab1c7f31770e63a38de41e15395134b6b85cf0e48b5089e34b",
-      "member": "FreeformHelper.Tests.AppGeneralSettingsStoreTests.DefaultCtor_UsesEnvironmentOverridePath()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/AppGeneralSettingsStoreTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.SetEnvironmentVariable(System.String,System.String)"
-    },
-    {
       "syntaxHash": "3fffce8ac5c35b2c8ac6fe03122172826d1c3134ed781a5cd410f7df2c6f7e1c",
       "member": "FreeformHelper.Tests.AppGeneralSettingsStoreTests.TryLoad_LegacyDocument_MapsToWhitelistAndDefaultsBehavior()",
       "owner": "NFH",
@@ -3197,36 +3167,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
-      "syntaxHash": "b053885ad032a56599cbe6b4d4008904d28bec88015583b6ac77ea4cbcc44e28",
-      "member": "FreeformHelper.Tests.Cad3635EndToEndBenchmarkTests.Boe3635_EndToEndWorkflowBenchmark_WhenEnabled()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Benchmarks/Cad3635EndToEndBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "d3ce9d51a41a812a6e0dfa60aea2ac7aa669e2b58c3c859ae00405469548c9fb",
-      "member": "FreeformHelper.Tests.Cad3635EndToEndBenchmarkTests.Boe3635_EndToEndWorkflowBenchmark_WhenEnabled()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Benchmarks/Cad3635EndToEndBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "fadfa6fd7c7ce94103deb8561a4135a8cffd188b7dae43f92949a24b38f6bb7f",
-      "member": "FreeformHelper.Tests.Cad3635EndToEndBenchmarkTests.GetNonNegativeInt(string,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Benchmarks/Cad3635EndToEndBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
     },
     {
       "syntaxHash": "1d286a79baaa1921a8b8133ca162f1ca218854b6a0bc1bc0f1414f5184a6c576",
@@ -3329,26 +3269,6 @@
       "symbol": "T:System.Diagnostics.Stopwatch"
     },
     {
-      "syntaxHash": "b053885ad032a56599cbe6b4d4008904d28bec88015583b6ac77ea4cbcc44e28",
-      "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.Boe3635_DxfLoadBenchmark_WhenEnabled()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "d3ce9d51a41a812a6e0dfa60aea2ac7aa669e2b58c3c859ae00405469548c9fb",
-      "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.Boe3635_DxfLoadBenchmark_WhenEnabled()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
       "syntaxHash": "eb05855ddbabfad52621d1ba5a75afbaad2faa96a126bf15f25e4734b3ff1b79",
       "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.fields:PrivateInstance",
       "owner": "NFH",
@@ -3357,16 +3277,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "fadfa6fd7c7ce94103deb8561a4135a8cffd188b7dae43f92949a24b38f6bb7f",
-      "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.GetNonNegativeInt(string,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
     },
     {
       "syntaxHash": "0619bb4152b1a2d22bb796b4fdfe1a4c250d1735b59ec0aea498c8d62cd31873",
@@ -3507,26 +3417,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Thread.Sleep(System.Int32)"
-    },
-    {
-      "syntaxHash": "f5e28798de926de6c5248091e8c52cc3e904b7dcca1c16db2775514595357e25",
-      "member": "FreeformHelper.Tests.FontAdoptionTests.DistributionIncludesRestoredCoreAndFontLicenses()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/FontAdoptionTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "f5e28798de926de6c5248091e8c52cc3e904b7dcca1c16db2775514595357e25",
-      "member": "FreeformHelper.Tests.FontAdoptionTests.DistributionIncludesTheUpstreamInterLicenseUnmodified()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/FontAdoptionTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
     },
     {
       "syntaxHash": "1e76e8dade2b5a679e978d5ac35a690c8233e5330d1ddd0d53bbf05491b1472e",
@@ -4439,26 +4329,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "ace89d120252bfdf446372729f7d8e7685e30c2dd6e9b4193bee362db1a05b33",
-      "member": "FreeformHelper.Tests.Notch3635GenerationBenchmarkTests.Boe3635_NotchGenerationBenchmark_WhenEnabled()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Notch3635GenerationBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "b053885ad032a56599cbe6b4d4008904d28bec88015583b6ac77ea4cbcc44e28",
-      "member": "FreeformHelper.Tests.Notch3635GenerationBenchmarkTests.Boe3635_NotchGenerationBenchmark_WhenEnabled()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Notch3635GenerationBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
       "syntaxHash": "3e9c9d4efb11b91a5eb21a5db97882f547af5a195627096ed563202d287eebe2",
       "member": "FreeformHelper.Tests.Notch3635GenerationBenchmarkTests.Boe3635_NotchGenerationBenchmark_WhenEnabled()",
       "owner": "NFH",
@@ -4487,16 +4357,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "T:System.Diagnostics.Stopwatch"
-    },
-    {
-      "syntaxHash": "fadfa6fd7c7ce94103deb8561a4135a8cffd188b7dae43f92949a24b38f6bb7f",
-      "member": "FreeformHelper.Tests.Notch3635GenerationBenchmarkTests.GetNonNegativeInt(string,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Notch3635GenerationBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
     },
     {
       "syntaxHash": "1e76e8dade2b5a679e978d5ac35a690c8233e5330d1ddd0d53bbf05491b1472e",
@@ -4577,36 +4437,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "7585b668fb2fb1c3f6576503c029d471ccc1a7622731b0d9d58e3bdc4bd1ce9f",
-      "member": "FreeformHelper.Tests.NotchGoldenBaselineTests.RealProjects_MatchGoldenBaseline()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchGoldenBaselineTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "3e0ab78b508f2934cbcd03971b1d2f22a0f964784804a9d4a7f4f8fee8f1e694",
-      "member": "FreeformHelper.Tests.NotchGoldenBaselineTests.RealProjects_MatchGoldenBaseline()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchGoldenBaselineTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "59ae7c9191aa88b21d33593ebd87445230f8c1eee266a0428622c8016862b075",
-      "member": "FreeformHelper.Tests.NotchGoldenBaselineTests.RealProjects_MatchGoldenBaseline()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchGoldenBaselineTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
     },
     {
       "syntaxHash": "7e81d6e2f22db252f163257959c634bf2bdf9e26ca1e28b4edb5fcad3ca18735",
@@ -5019,26 +4849,6 @@
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
     },
     {
-      "syntaxHash": "6708484140d7fc81aa5015d198e5a1a6b6821ee5704be9199bc8969089f80b7d",
-      "member": "FreeformHelper.Tests.TestAppSettingsIsolation.Initialize()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/TestAppSettingsIsolation.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.SetEnvironmentVariable(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "377c51da1aff45d4ba1a4ab0cc69637111e9c38c0f6d08af2efe68f8a42a73f8",
-      "member": "FreeformHelper.Tests.TestInfrastructure.ExampleData.IsRequired",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/ExampleData.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
       "syntaxHash": "1e76e8dade2b5a679e978d5ac35a690c8233e5330d1ddd0d53bbf05491b1472e",
       "member": "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests.ExtractRuntimeState(FreeformHelperViewModel)",
       "owner": "NFH",
@@ -5067,36 +4877,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "e90ff98328253c0269b10acf77fb14306b8e8bc60e4ab892adf60a2d90ced3c4",
-      "member": "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests.TM81_MatchesAcceptanceMatrixSnapshot()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Tm81NotchAcceptanceMatrixTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "43a38e1f636b387c0417187584f7bea25ede62fac5c32abcce607c9166225a80",
-      "member": "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests.TM81_MatchesAcceptanceMatrixSnapshot()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Tm81NotchAcceptanceMatrixTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "f650e21df5e0f8d2427d556a9a393b699bd404e3769abb17d5235efd8de47a4b",
-      "member": "FreeformHelper.Tests.UiBaselineUpdateModeResolver.Resolve()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Snapshots/UiBaselineUpdateMode.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
     },
     {
       "syntaxHash": "04956d396e684e321b436ae0d37e8d5ce34d5aa885859a107dfcc1366cf40b86",

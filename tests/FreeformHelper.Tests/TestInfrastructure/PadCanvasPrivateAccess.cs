@@ -7,7 +7,7 @@ using FreeformHelper.UI.Controls;
 
 namespace FreeformHelper.Tests.TestInfrastructure;
 
-/// <summary>Compile-time bound access to the private state and seams of <see cref="PadCanvas"/>.</summary>
+/// <summary>Typed access to the private state and seams of <see cref="PadCanvas"/>.</summary>
 internal static class PadCanvasPrivateAccess
 {
     // View state.

@@ -100,7 +100,7 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
     public void DistributionIncludesRestoredCoreAndFontLicenses()
     {
         // Set this to a publish directory to check the exact distribution with the same guard.
-        var distribution = Environment.GetEnvironmentVariable("NFH_FONTS_DISTRIBUTION_PATH") ?? AppContext.BaseDirectory;
+        var distribution = TestEnvironment.Get("NFH_FONTS_DISTRIBUTION_PATH") ?? AppContext.BaseDirectory;
         using var assets = JsonDocument.Parse(TestFiles.ReadContent(Path.Combine(
             TestPaths.RepoRoot, "build", "obj", "FreeformHelper.UI", "project.assets.json")));
         var package = assets.RootElement.GetProperty("packageFolders").EnumerateObject()
@@ -121,7 +121,7 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
     [Fact]
     public void DistributionIncludesTheUpstreamInterLicenseUnmodified()
     {
-        var distribution = Environment.GetEnvironmentVariable("NFH_FONTS_DISTRIBUTION_PATH") ?? AppContext.BaseDirectory;
+        var distribution = TestEnvironment.Get("NFH_FONTS_DISTRIBUTION_PATH") ?? AppContext.BaseDirectory;
         var target = Path.Combine(distribution, "licenses", "Inter", "LICENSE");
         Assert.True(File.Exists(target), $"Distribution is missing licenses/Inter/LICENSE: {distribution}");
         Assert.Equal(InterLicenseSha256, HashLicenseText(TestFiles.ReadContent(target)));

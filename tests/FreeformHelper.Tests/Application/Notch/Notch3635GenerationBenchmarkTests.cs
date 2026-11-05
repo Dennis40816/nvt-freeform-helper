@@ -19,14 +19,14 @@ public sealed class Notch3635GenerationBenchmarkTests
     [Fact]
     public async Task Boe3635_NotchGenerationBenchmark_WhenEnabled()
     {
-        if (!string.Equals(Environment.GetEnvironmentVariable(RunEnv), "1", StringComparison.Ordinal))
+        if (!string.Equals(TestEnvironment.Get(RunEnv), "1", StringComparison.Ordinal))
         {
             return;
         }
 
         var iterations = GetPositiveInt(IterationsEnv, 5);
         var warmupIterations = GetNonNegativeInt(WarmupEnv, 1);
-        var outputPath = Environment.GetEnvironmentVariable(OutputEnv);
+        var outputPath = TestEnvironment.Get(OutputEnv);
         if (string.IsNullOrWhiteSpace(outputPath))
         {
             outputPath = Path.Combine(TestPaths.RepoRoot, "build", "perf", "3635-notch-generation-benchmark.json");
@@ -142,7 +142,7 @@ public sealed class Notch3635GenerationBenchmarkTests
 
     private static int GetNonNegativeInt(string name, int fallback)
     {
-        return int.TryParse(Environment.GetEnvironmentVariable(name), out var parsed) && parsed >= 0
+        return int.TryParse(TestEnvironment.Get(name), out var parsed) && parsed >= 0
             ? parsed
             : fallback;
     }

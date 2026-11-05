@@ -7,7 +7,7 @@ using Nvt.Core.Lifecycle;
 
 namespace FreeformHelper.Tests.TestInfrastructure;
 
-/// <summary>Compile-time bound access to private state of <see cref="FreeformHelperViewModel"/>.</summary>
+/// <summary>Typed access to private state of <see cref="FreeformHelperViewModel"/>.</summary>
 internal static class FreeformHelperViewModelPrivateAccess
 {
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cad")]

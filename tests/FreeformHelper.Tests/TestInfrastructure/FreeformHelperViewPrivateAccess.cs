@@ -5,7 +5,7 @@ using FreeformHelper.UI.Views;
 
 namespace FreeformHelper.Tests.TestInfrastructure;
 
-/// <summary>Compile-time bound access to the private window slots and handlers of <see cref="FreeformHelperView"/>.</summary>
+/// <summary>Typed access to the private window slots and handlers of <see cref="FreeformHelperView"/>.</summary>
 internal static class FreeformHelperViewPrivateAccess
 {
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_notchExportSelectionWindow")]

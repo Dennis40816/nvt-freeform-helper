@@ -17,7 +17,7 @@ internal static class TestAppSettingsIsolation
         var sandboxDir = TestFiles.NewTempFilePath("app-settings-", string.Empty);
         Directory.CreateDirectory(sandboxDir);
         var sandboxPath = Path.Combine(sandboxDir, "{guid}", "app-general-settings.json");
-        Environment.SetEnvironmentVariable(
+        TestEnvironment.Set(
             AppGeneralSettingsStore.SettingsPathOverrideEnvironmentVariable,
             sandboxPath);
     }
