@@ -111,9 +111,11 @@ public sealed partial class FreeformHelperViewModelTests
                 .Split("LWPOLYLINE", StringSplitOptions.None)
                 .Length - 1;
 
+            // DxfExportService writes each line with StringBuilder.AppendLine, so the line break is Environment.NewLine.
+            var newLine = Environment.NewLine;
             Assert.Equal(2, polylineCount);
-            Assert.Contains("8\r\nsignal\r\n", text, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("8\r\nregular\r\n", text, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains($"8{newLine}signal{newLine}", text, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains($"8{newLine}regular{newLine}", text, StringComparison.OrdinalIgnoreCase);
         }
         finally
         {
