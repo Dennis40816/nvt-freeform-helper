@@ -77,6 +77,8 @@ public sealed class PadInfoViewModelTests
     [Fact]
     public void CadPadInfo_UsesSharedNotchDisplayProjectionTexts()
     {
+        // ToRegularRatioText and ToFullRatioText format percent values with the current culture.
+        using var culture = TestCulture.UseEnUs();
         var vm = CreateSingleCadPadViewModel();
 
         Assert.Equal("Undo NF (To Regular): 94.10%", vm.ToRegularRatioText);
