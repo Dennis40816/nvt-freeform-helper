@@ -33,9 +33,9 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
 {
     private const int MaxClosePasses = 3;
     private static readonly object _marker = new();
-    private static readonly object Gate = new();
+    private static readonly Lock _gate = new();
     private static readonly List<Window> _openWindows = [];
-    private static readonly List<(string Test, Exception Exception)> LeftoverWorkFailures = [];
+    private static readonly List<(string Test, Exception Exception)> _leftoverWorkFailures = [];
     private static readonly ConditionalWeakTable<SynchronizationContext, object> _seenContexts = [];
     private static bool _tracksOpenedWindows;
     private static LeftoverWorkWatch? _leftoverWork;
@@ -108,9 +108,9 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
             }
 
             e.Handled = true;
-            lock (Gate)
+            lock (_gate)
             {
-                LeftoverWorkFailures.Add((watch.Test, e.Exception));
+                _leftoverWorkFailures.Add((watch.Test, e.Exception));
             }
 
             Console.Error.WriteLine(
@@ -131,9 +131,9 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
     /// </summary>
     internal static IReadOnlyList<(string Test, Exception Exception)> SnapshotLeftoverWorkFailures()
     {
-        lock (Gate)
+        lock (_gate)
         {
-            return [.. LeftoverWorkFailures];
+            return [.. _leftoverWorkFailures];
         }
     }
 
@@ -221,7 +221,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
         }
 
         var stillOpen = SnapshotOpenWindows();
-        lock (Gate)
+        lock (_gate)
         {
             _openWindows.Clear();
         }
@@ -265,7 +265,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
 
     private static void Track(Window window)
     {
-        lock (Gate)
+        lock (_gate)
         {
             if (_openWindows.Contains(window))
             {
@@ -286,7 +286,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
         }
 
         window.Closed -= OnWindowClosed;
-        lock (Gate)
+        lock (_gate)
         {
             _openWindows.Remove(window);
         }
@@ -294,7 +294,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
 
     private static Window[] SnapshotOpenWindows()
     {
-        lock (Gate)
+        lock (_gate)
         {
             return [.. _openWindows];
         }
@@ -302,7 +302,7 @@ public sealed class HeadlessSessionGuardAttribute : BeforeAfterTestAttribute
 
     private static bool IsTracked(Window window)
     {
-        lock (Gate)
+        lock (_gate)
         {
             return _openWindows.Contains(window);
         }

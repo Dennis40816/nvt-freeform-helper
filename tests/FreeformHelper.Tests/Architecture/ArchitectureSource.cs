@@ -283,7 +283,7 @@ internal sealed record ArchitectureSource(string Path, string Text)
 
 internal sealed class ArchitectureBaseline
 {
-    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+    private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     public Dictionary<string, int> Metrics { get; set; } = new(StringComparer.Ordinal);
     public Dictionary<string, string[]> MetricOffenders { get; set; } = new(StringComparer.Ordinal);
@@ -292,7 +292,7 @@ internal sealed class ArchitectureBaseline
 
     public static ArchitectureBaseline Load(string repoRoot) => JsonSerializer.Deserialize<ArchitectureBaseline>(
         TestFiles.ReadContent(System.IO.Path.Combine(repoRoot, "tests/FreeformHelper.Tests/Architecture/debt-baseline.json")),
-        JsonOptions)
+        _jsonOptions)
         ?? throw new InvalidOperationException("Invalid debt-baseline.json.");
 
     public static string[] CompareFiles(string rule, string[] baseline, string[] actual)

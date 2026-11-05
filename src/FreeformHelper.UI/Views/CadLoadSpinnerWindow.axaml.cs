@@ -17,7 +17,6 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
     private DispatcherTimer? _parentMonitorTimer;
     private Process? _parentProcess;
     private CancellationTokenSource? _ipcCts;
-    private Task? _ipcLoopTask;
     private bool _hasStarted;
 
     public CadLoadSpinnerWindow()
@@ -128,7 +127,7 @@ public sealed partial class CadLoadSpinnerWindow : Window, IDisposable
         }
 
         _ipcCts = new CancellationTokenSource();
-        _ipcLoopTask = Task.Run(() => RunIpcLoopAsync(_options.PipeName, _ipcCts.Token));
+        _ = Task.Run(() => RunIpcLoopAsync(_options.PipeName, _ipcCts.Token));
     }
 
     private void StopIpcServer()

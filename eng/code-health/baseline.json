@@ -2789,26 +2789,6 @@
       "symbol": "NoWarn:1591"
     },
     {
-      "syntaxHash": "7a49bbd0576270cd88a52a73b3fed068f067fa386555c36b1639eaa79612d1a8",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:IDE0052"
-    },
-    {
-      "syntaxHash": "c7c0ce178aea3d14f1838e12bab4b081985ba7bb3ad6443f4abd4c3c3fd0f1fa",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:IDE1006"
-    },
-    {
       "syntaxHash": "2c4f3956570bce7332a7ff7f06c63c2ecd8ff0eaf045063be96b34e851276a6d",
       "member": "MSBuild",
       "owner": "NFH",
@@ -2889,26 +2869,6 @@
       "symbol": "WarningsNotAsErrors:EnableGenerateDocumentationFile"
     },
     {
-      "syntaxHash": "bc367affce8c61f20132214d5a3e6f6387b65e648a8c29e55ad7454eb2b3860f",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:IDE0330"
-    },
-    {
-      "syntaxHash": "c7c0ce178aea3d14f1838e12bab4b081985ba7bb3ad6443f4abd4c3c3fd0f1fa",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:IDE1006"
-    },
-    {
       "syntaxHash": "2c4f3956570bce7332a7ff7f06c63c2ecd8ff0eaf045063be96b34e851276a6d",
       "member": "MSBuild",
       "owner": "NFH",
@@ -2957,146 +2917,6 @@
       "count": 1,
       "rule": "EnableGenerateDocumentationFile",
       "symbol": "Set MSBuild property 'GenerateDocumentationFile' to 'true' in project file to enable IDE0005 (Remove unnecessary usings/imports) on build"
-    },
-    {
-      "syntaxHash": "da685c4f4bb5c3a22cbb7fa42f6a16eeb83c601b1e110064c1aa9d33163ac5ff",
-      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.fields:_ipcLoopTask",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0052",
-      "symbol": "IDE0052"
-    },
-    {
-      "syntaxHash": "c4292658bb65fc182e3863d267cadcc211e49d12d47e4b683e896078eb9580fd",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:Gate",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE0330",
-      "symbol": "IDE0330"
-    },
-    {
-      "syntaxHash": "6dc32fe06cb291502306ccb51e583b1494b2ca0942a01ac1a059a9bcf3b92cbd",
-      "member": "FreeformHelper.Tests.Architecture.ArchitectureBaseline.fields:JsonOptions",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Architecture/ArchitectureSource.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "866589f88022628efe540353da9193588ac766b4306a277ec5c9938a80698adf",
-      "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.fields:JsonOptions",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "eb05855ddbabfad52621d1ba5a75afbaad2faa96a126bf15f25e4734b3ff1b79",
-      "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.fields:PrivateInstance",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "3dec1c05c647868eb093080f33e0236ef487f7ba41177975a0070eb355a3a001",
-      "member": "FreeformHelper.Tests.DxfSinglePassImportTests.fields:DxfTexts",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfSinglePassImportTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "ab8f3d2708629cc380207b3e05d81a26824b11eeceed76e5041772c800ab45c8",
-      "member": "FreeformHelper.Tests.DxfSinglePassImportTests.fields:ExpectedLayers",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfSinglePassImportTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "0d9193cadc638ea0d6dedf0721932371cae7f927126dfe71225f99e8ee6b93e4",
-      "member": "FreeformHelper.Tests.DxfSinglePassImportTests.fields:ExpectedPadLayers",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfSinglePassImportTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "c4292658bb65fc182e3863d267cadcc211e49d12d47e4b683e896078eb9580fd",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:Gate",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "1d440e4f410a3c1e105477abec8c0ef4850e82e7bc82d371ff46ab87c2d5c649",
-      "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:LeftoverWorkFailures",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "6ef1b8384fceef16e58a4630f770566ee8391e08af9c3fabe62568c26dcba3d0",
-      "member": "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests.fields:MatrixJsonOptions",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Tm81NotchAcceptanceMatrixTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
-      "member": "FreeformHelper.UI.App.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/App.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "1476694a6178e12605cdae7728066623ea6d7a144c277b5a6cdf315db63e521e",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.fields:ShowRetryDelay",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "5ffda8a7741863f733e79671929a04947a6989e9518ded807e574571d3d2864b",
-      "member": "FreeformHelper.UI.Services.StartupPerfTracker.fields:EmitAsInfo",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/StartupPerfTracker.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
     },
     {
       "syntaxHash": "681fe578629b5e13e052c72906ba4fd6ce0f78aff3d3f77029b6426a465933ec",

@@ -11,8 +11,8 @@ namespace FreeformHelper.Tests;
 
 public sealed class Cad3635LoadBenchmarkTests
 {
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-    private static readonly BindingFlags PrivateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
+    private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
+    private static readonly BindingFlags _privateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
 
     private const string RunEnv = "FREEFORMHELPER_RUN_DXF_LOAD_BENCHMARK";
     private const string IterationsEnv = "FREEFORMHELPER_DXF_LOAD_BENCHMARK_ITERATIONS";
@@ -57,7 +57,7 @@ public sealed class Cad3635LoadBenchmarkTests
             BuildSummary(measured));
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
-        var json = JsonSerializer.Serialize(result, JsonOptions);
+        var json = JsonSerializer.Serialize(result, _jsonOptions);
         await TestFiles.WriteBenchmarkOutputAsync(outputPath, json, TestContext.Current.CancellationToken);
     }
 
@@ -144,7 +144,7 @@ public sealed class Cad3635LoadBenchmarkTests
     }
 
     private static TField GetPrivateField<TField>(object instance, string fieldName) =>
-        (TField)instance.GetType().GetField(fieldName, PrivateInstance)!.GetValue(instance)!;
+        (TField)instance.GetType().GetField(fieldName, _privateInstance)!.GetValue(instance)!;
 
     private static TResult InvokePrivate<TResult>(object instance, string methodName, object?[]? args = null)
     {
@@ -160,7 +160,7 @@ public sealed class Cad3635LoadBenchmarkTests
 
     private static object? InvokePrivate(object instance, string methodName, object?[]? args = null)
     {
-        var method = instance.GetType().GetMethod(methodName, PrivateInstance);
+        var method = instance.GetType().GetMethod(methodName, _privateInstance);
         Assert.NotNull(method);
         return method!.Invoke(instance, args);
     }

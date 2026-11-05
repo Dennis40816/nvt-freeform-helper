@@ -14,7 +14,7 @@ namespace FreeformHelper.UI;
 public sealed class App : global::Avalonia.Application
 {
     // Logger instance for recording application events and errors.
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     /// <summary>
     /// Initializes the Avalonia XAML framework for the application.
@@ -141,7 +141,7 @@ public sealed class App : global::Avalonia.Application
         // Subscribe to unhandled exceptions on the UI thread to log them.
         Dispatcher.UIThread.UnhandledException += (_, e) =>
         {
-            Logger.Error(e.Exception, "UI thread unhandled exception.");
+            _logger.Error(e.Exception, "UI thread unhandled exception.");
         };
 
         // Call the base class implementation.
