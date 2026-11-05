@@ -192,6 +192,96 @@ internal sealed partial class RuntimeQueryUseCase
         });
     }
 
+    private static object BuildSimulationRegularPayload(SimulationRegularQuerySnapshot snapshot)
+    {
+        return new
+        {
+            snapshot.RegularPadId,
+            snapshot.Row,
+            snapshot.Col,
+            snapshot.IcIndex,
+            snapshot.FwDiffIndex,
+            snapshot.CadOutputFwDiffIndex,
+            diffIndex = snapshot.FwDiffIndex,
+            snapshot.BeforeValue,
+            snapshot.AfterValue,
+            snapshot.DeltaValue,
+            snapshot.IsEmsSafetyRisk,
+            snapshot.IsActiveSurface,
+            snapshot.IsWithinSelectedArea,
+            snapshot.InputSourceText,
+            impacts = snapshot.ImpactItems.Select(static item => new
+            {
+                item.RoleText,
+                item.SummaryText,
+                item.DetailText,
+                item.DeltaText,
+                item.SourceRowsText
+            }).ToList()
+        };
+    }
+
+    private static object BuildSimulationWorkspacePayload(
+        SimulationHostViewModel simulation,
+        SimulationWorkspaceViewModel workspace)
+    {
+        var cadOutputFwDiffAssignmentDecision = workspace.BuildCadOutputFwDiffAssignmentDecisionSummarySnapshot();
+
+        return new
+        {
+            hasWorkspace = true,
+            simulation.SourceRevision,
+            isStale = simulation.IsWorkspaceStale,
+            sourceMode = workspace.SourceModeSummaryText,
+            version = workspace.SelectedVersionOption.Display,
+            viewMode = workspace.SelectedCanvasViewOption.Display,
+            colorMode = workspace.SelectedCanvasColorOption.Display,
+            area = workspace.SelectedAreaOption.Display,
+            frame = workspace.SelectedFrameDisplayText,
+            activeRegularCount = workspace.ActiveSurfaceRegularCount,
+            overlayCount = workspace.SimulationOverlayItems.Count,
+            legend = new
+            {
+                title = workspace.ColorLegendTitleText,
+                meaning = workspace.ColorLegendMeaningText,
+                start = workspace.ColorLegendStartText,
+                center = workspace.ShowLegendCenterLabel ? workspace.ColorLegendCenterText : null,
+                end = workspace.ColorLegendEndText
+            },
+            diffValidation = new
+            {
+                workspace.HasDiffViolationPads,
+                workspace.DiffViolationPadCount,
+                workspace.DiffViolationSummaryText,
+                workspace.DiffViolationPadListText
+            },
+            safety = new
+            {
+                workspace.SimulationEmsAfterCap,
+                workspace.SimulationMaxAfterText,
+                workspace.HasSimulationSafetyViolations,
+                workspace.SimulationSafetyViolationCount,
+                workspace.SimulationSafetySummaryText,
+                workspace.SimulationSafetyViolationListText
+            },
+            diffIdentity = new
+            {
+                workspace.HasDuplicateDiffResolutions,
+                workspace.DuplicateDiffResolutionCount,
+                workspace.DuplicateDiffResolutionStrategyText,
+                workspace.DuplicateDiffResolutionSummaryText,
+                workspace.DuplicateDiffResolutionSampleText
+            },
+            cadOutputFwDiffAssignmentDecision = new
+            {
+                cadOutputFwDiffAssignmentDecision.DecisionCount,
+                cadOutputFwDiffAssignmentDecision.Mode,
+                reasonCounts = cadOutputFwDiffAssignmentDecision.ReasonCounts,
+                decisionSourceCounts = cadOutputFwDiffAssignmentDecision.DecisionSourceCounts
+            }
+        };
+    }
+
     private readonly record struct NotchExportTargetState(
         string ResolvedPath,
         bool FileExistedBefore,
