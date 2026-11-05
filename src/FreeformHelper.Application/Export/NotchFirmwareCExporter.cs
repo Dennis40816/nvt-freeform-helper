@@ -557,7 +557,7 @@ internal static class NotchFirmwareCExporter
             FormatDiffLiteral(node.SecondDiffIndex, nullValue),
             secondType,
             node.SecondRatioQ7,
-            node.Comment);
+            SanitizeLineComment(node.Comment));
     }
 
     private static string FormatV22NodeLine(NotchV22FirmwareRow node)
@@ -574,9 +574,45 @@ internal static class NotchFirmwareCExporter
             FormatDiffLiteral(node.SecondTargetDiffIndex),
             node.SecondRatioPercent,
             NotchV22FirmwareProjector.FormatFlagsLiteral(node.Flags),
-            node.Comment,
+            SanitizeLineComment(node.Comment),
             keepPercent,
             movePercent);
+    }
+
+    /// <summary>
+    /// Makes free comment text safe to emit after a C <c>//</c> marker on one line.
+    /// Control characters (including CR and LF) become spaces, comment markers are broken
+    /// (MISRA C Rule 3.1), and trailing backslashes are removed (Rule 3.2 line splicing).
+    /// </summary>
+    internal static string SanitizeLineComment(string? comment)
+    {
+        if (string.IsNullOrEmpty(comment))
+        {
+            return string.Empty;
+        }
+
+        var builder = new StringBuilder(comment.Length);
+        foreach (var character in comment)
+        {
+            var next = char.IsControl(character) ? ' ' : character;
+            if (builder.Length > 0 && IsCommentMarkerPair(builder[^1], next))
+            {
+                builder.Append(' ');
+            }
+
+            builder.Append(next);
+        }
+
+        var text = builder.ToString();
+        return text.TrimEnd(' ').EndsWith('\\')
+            ? text.TrimEnd('\\', ' ')
+            : text;
+    }
+
+    private static bool IsCommentMarkerPair(char previous, char next)
+    {
+        return (previous == '/' && (next == '*' || next == '/')) ||
+               (previous == '*' && next == '/');
     }
 
     private static string FormatDiffLiteral(int value, int nullValue)

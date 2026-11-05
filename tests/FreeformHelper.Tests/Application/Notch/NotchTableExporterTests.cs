@@ -681,6 +681,65 @@ public sealed class NotchTableExporterTests
         Assert.DoesNotContain("UINT8  NHC_COMBINE;", v21OnlyText, StringComparison.Ordinal);
     }
 
+    [Theory]
+    [InlineData(NotchAlgorithmVersion.V21, "hostile first\r\nnewline tail")]
+    [InlineData(NotchAlgorithmVersion.V21, "hostile */ /* tail // nested")]
+    [InlineData(NotchAlgorithmVersion.V21, "hostile C:\\pads tail\\")]
+    [InlineData(NotchAlgorithmVersion.V22, "hostile first\nnewline tail")]
+    [InlineData(NotchAlgorithmVersion.V22, "hostile */ /* tail // nested")]
+    [InlineData(NotchAlgorithmVersion.V22, "hostile C:\\pads tail\\")]
+    public void ExportAsCInitializer_HostileRowComment_StaysOnOneSafeCommentLine(
+        NotchAlgorithmVersion version,
+        string comment)
+    {
+        var row = version == NotchAlgorithmVersion.V21
+            ? new NotchTableRow(
+                NotchAlgorithmVersion.V21,
+                icIndex: 0,
+                diffIndex: 10,
+                regularPadIndex: 10,
+                cadPadId: 100,
+                values: _v21OnlyPayload,
+                comment: comment)
+            : new NotchTableRow(
+                icIndex: 0,
+                diffIndex: 10,
+                regularPadIndex: 10,
+                cadPadId: 100,
+                v22Node: new NotchV22Node(10, 120, 20, 30, 65535, 0, 0),
+                comment: comment);
+
+        var text = NotchTableExporter.ExportAsCInitializer(
+            new NotchTable([row]),
+            CreateCadSet(),
+            CreateGrid(),
+            CreateProjectSettings(),
+            NotchExportProfile.Debug);
+
+        var commentLines = text
+            .Split('\n')
+            .Select(static line => line.TrimEnd('\r'))
+            .Where(static line => line.Contains("hostile", StringComparison.Ordinal))
+            .ToArray();
+        var line = Assert.Single(commentLines);
+        Assert.Contains("tail", line, StringComparison.Ordinal);
+        var commentText = line[(line.IndexOf("// ", StringComparison.Ordinal) + 3)..];
+        Assert.DoesNotContain("/*", commentText, StringComparison.Ordinal);
+        Assert.DoesNotContain("*/", commentText, StringComparison.Ordinal);
+        Assert.DoesNotContain("//", commentText, StringComparison.Ordinal);
+        Assert.False(line.EndsWith('\\'), line);
+    }
+
+    [Theory]
+    [InlineData("a\rb\nc", "a b c")]
+    [InlineData("*/ /* // ///", "* / / * / / / / /")]
+    [InlineData("C:\\pads\\", "C:\\pads")]
+    [InlineData("tail\\ \\\n", "tail")]
+    public void SanitizeLineComment_BreaksMarkersNewlinesAndTrailingBackslash(string comment, string expected)
+    {
+        Assert.Equal(expected, NotchFirmwareCExporter.SanitizeLineComment(comment));
+    }
+
     [Fact]
     public void ExportAsCInitializer_GccCompilesFwStyleExports_WhenGccIsAvailable()
     {
