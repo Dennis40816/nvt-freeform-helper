@@ -1,6 +1,5 @@
-using System.Reflection;
 using FreeformHelper.Domain.Pads;
-using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -125,16 +124,14 @@ public sealed partial class FreeformHelperViewModelTests
         InitializeVisibleCadIndexing(vm, source, grid);
         SetPadMatchResults(vm, _shiftVisibleCadMatches);
 
-        var updateVisibleCadIndexingMethod = typeof(FreeformHelperViewModel).GetMethod("UpdateCadOutputFwDiffIndexing", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(updateVisibleCadIndexingMethod);
-        updateVisibleCadIndexingMethod!.Invoke(vm, new object?[] { source });
+        FreeformHelperViewModelPrivateAccess.UpdateCadOutputFwDiffIndexing(vm, source);
 
         await SelectCadPadsAsync(vm, _selectedCad23);
         vm.Step4Index.ShiftDelta = 1m;
 
         vm.OffsetSelectedCadOutputFwDiffIndicesCommand.Execute(null);
 
-        var projectFile = GetPrivateField<ProjectFile>(vm, "_projectFile");
+        var projectFile = FreeformHelperViewModelPrivateAccess.ProjectFile(vm);
         Assert.Equal(12, projectFile.CadOutputFwDiffIndexOverrides[2]);
         Assert.Equal(13, projectFile.CadOutputFwDiffIndexOverrides[3]);
         Assert.Equal("Shifted 2 CAD pad(s) by 1. Range 11-12 -> 12-13.", vm.StatusText);
@@ -219,25 +216,16 @@ public sealed partial class FreeformHelperViewModelTests
             CreateRectCad(2, 30, 0, 40, 10),
         };
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var resetBaselineMethod = typeof(FreeformHelperViewModel).GetMethod("ResetDxfEditBaseline", BindingFlags.Instance | BindingFlags.NonPublic);
-        var buildEntriesMethod = typeof(FreeformHelperViewModel).GetMethod("BuildDxfEditChangeEntries", BindingFlags.Instance | BindingFlags.NonPublic);
-        var applyEntryMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyDxfEditChangeEntry", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(resetBaselineMethod);
-        Assert.NotNull(buildEntriesMethod);
-        Assert.NotNull(applyEntryMethod);
-
-        cadField!.SetValue(vm, new CadPadSet(source));
-        resetBaselineMethod!.Invoke(vm, new object?[] { new CadPadSet(source) });
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(source);
+        FreeformHelperViewModelPrivateAccess.ResetDxfEditBaseline(vm, new CadPadSet(source));
         await SelectCadPadsAsync(vm, _pairCadSelection);
         vm.CombineSelectedCadPadsCommand.Execute(null);
 
         Assert.Equal(2, vm.CombinedCadPadCount);
 
-        var entries = (List<DxfEditChangeListEntry>)buildEntriesMethod!.Invoke(vm, null)!;
+        var entries = (List<DxfEditChangeListEntry>)FreeformHelperViewModelPrivateAccess.BuildDxfEditChangeEntries(vm)!;
         var combinedEntry = Assert.Single(entries.Where(entry => entry.Kind == DxfEditChangeKind.Combined).Take(1));
-        applyEntryMethod!.Invoke(vm, new object?[] { combinedEntry });
+        FreeformHelperViewModelPrivateAccess.ApplyDxfEditChangeEntry(vm, combinedEntry);
 
         Assert.Equal(0, vm.CombinedCadPadCount);
         Assert.Equal(0, vm.DeletedCadPadCount);
@@ -255,18 +243,13 @@ public sealed partial class FreeformHelperViewModelTests
         InitializeDxfEditCadState(vm, source);
         vm.DxfEditRotationDegrees = 90m;
 
-        var buildEntriesMethod = typeof(FreeformHelperViewModel).GetMethod("BuildDxfEditChangeEntries", BindingFlags.Instance | BindingFlags.NonPublic);
-        var applyEntryMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyDxfEditChangeEntry", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(buildEntriesMethod);
-        Assert.NotNull(applyEntryMethod);
-
         await SelectCadPadsAsync(vm, [1]);
         vm.RotateSelectedCadPadsCommand.Execute(null);
         Assert.Equal(1, vm.RotatedCadPadCount);
 
-        var entries = Assert.IsType<List<DxfEditChangeListEntry>>(buildEntriesMethod!.Invoke(vm, null));
+        var entries = Assert.IsType<List<DxfEditChangeListEntry>>(FreeformHelperViewModelPrivateAccess.BuildDxfEditChangeEntries(vm));
         var rotatedEntry = Assert.Single(entries, entry => entry.Kind == DxfEditChangeKind.Rotated);
-        applyEntryMethod!.Invoke(vm, [rotatedEntry]);
+        FreeformHelperViewModelPrivateAccess.ApplyDxfEditChangeEntry(vm, rotatedEntry);
 
         Assert.Equal(0, vm.RotatedCadPadCount);
         var restoredPad = Assert.Single(GetCurrentCadPadSet(vm).Pads);

@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
-using System.Reflection;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -61,7 +61,7 @@ public sealed partial class FreeformHelperViewModelTests
             includeNotchRowEligibilityDetails: false,
             includeMatchDetails: true,
             includeRuleTrace: true);
-        InvokePrivateNoArg(vm, "BumpNotchExportGridFingerprint");
+        FreeformHelperViewModelPrivateAccess.BumpNotchExportGridFingerprint(vm);
         var second = vm.BuildCadPadInspectorSnapshot(
             cad.Id,
             includeExpensiveNotchDetails: false,
@@ -117,9 +117,7 @@ public sealed partial class FreeformHelperViewModelTests
         };
         SetPadMatchResult(vm, cad.Id, regular.RegularPadId);
 
-        var projectField = typeof(FreeformHelperViewModel).GetField("_projectFile", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(projectField);
-        var project = Assert.IsType<FreeformHelper.Infrastructure.Project.ProjectFile>(projectField!.GetValue(vm));
+        var project = Assert.IsType<FreeformHelper.Infrastructure.Project.ProjectFile>(FreeformHelperViewModelPrivateAccess.ProjectFile(vm));
         project.FreeformOverrides[regular.Index] = FreeformType.XWay;
 
         var snapshot = vm.BuildRegularPadInspectorSnapshot(
@@ -182,19 +180,13 @@ public sealed partial class FreeformHelperViewModelTests
             EnableToFull = true,
         };
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
-        cadField!.SetValue(
-            vm,
-            new FreeformHelper.Domain.Pads.CadPadSet(new[] { cad, blockerLeft, blockerRight, blockerTop, blockerBottom }));
-        gridField!.SetValue(vm, new FreeformHelper.Domain.Pads.RegularGrid(
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new FreeformHelper.Domain.Pads.CadPadSet(new[] { cad, blockerLeft, blockerRight, blockerTop, blockerBottom });
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = new FreeformHelper.Domain.Pads.RegularGrid(
             rows: 1,
             cols: 1,
             xEdges: [0.0, 10.0],
             yEdges: [0.0, 10.0],
-            pads: new[] { regular }));
+            pads: new[] { regular });
 
         var snapshot = vm.BuildCadPadInspectorSnapshot(
             cad.Id,
@@ -208,12 +200,5 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.False(notch!.IsToFullEnabled);
         Assert.Equal(cad.Area, notch.Stage3Area, 6);
         Assert.Equal(1.0, notch.ToFullRatio, 6);
-    }
-
-    private static void InvokePrivateNoArg(FreeformHelperViewModel vm, string methodName)
-    {
-        var method = typeof(FreeformHelperViewModel).GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        method!.Invoke(vm, Array.Empty<object>());
     }
 }

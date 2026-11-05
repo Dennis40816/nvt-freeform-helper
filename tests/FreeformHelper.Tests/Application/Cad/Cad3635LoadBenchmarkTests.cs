@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
-using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
@@ -64,10 +63,10 @@ public sealed class Cad3635LoadBenchmarkTests
     private static async Task<Cad3635LoadBenchmarkSample> RunSampleAsync(int run, bool warmup, string dxfPath)
     {
         var vm = new FreeformHelperViewModel();
-        var importService = GetPrivateField<DxfImportService>(vm, "_dxfImportService");
-        var catalogState = GetPrivateField<LayerCatalogStateService>(vm, "_layerCatalogStateService");
+        var importService = FreeformHelperViewModelPrivateAccess.DxfImportService(vm);
+        var catalogState = FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm);
         var useCase = new CadLoadUseCase(importService);
-        var options = InvokePrivate<DxfImportOptions>(vm, "BuildDxfOptions");
+        var options = FreeformHelperViewModelPrivateAccess.BuildDxfOptions(vm);
 
         var total = Stopwatch.StartNew();
 
@@ -82,8 +81,9 @@ public sealed class Cad3635LoadBenchmarkTests
         layerCatalog.Stop();
 
         var apply = Stopwatch.StartNew();
+        // Stays on reflection: the parameter type of ResetHiddenCadPads is a private nested class that an accessor cannot name.
         InvokePrivate(vm, "ResetHiddenCadPads");
-        await InvokePrivateTaskAsync(vm, "ApplyCadLoadOutcomeAsync", [outcome, null]);
+        await FreeformHelperViewModelPrivateAccess.ApplyCadLoadOutcomeAsync(vm, outcome!, null);
         apply.Stop();
 
         var rebuild = Stopwatch.StartNew();
@@ -141,21 +141,6 @@ public sealed class Cad3635LoadBenchmarkTests
             sorted[(sorted.Length - 1) / 2],
             Math.Round(average, 2),
             sorted[^1]);
-    }
-
-    private static TField GetPrivateField<TField>(object instance, string fieldName) =>
-        (TField)instance.GetType().GetField(fieldName, PrivateInstance)!.GetValue(instance)!;
-
-    private static TResult InvokePrivate<TResult>(object instance, string methodName, object?[]? args = null)
-    {
-        var result = InvokePrivate(instance, methodName, args);
-        return Assert.IsType<TResult>(result);
-    }
-
-    private static async Task InvokePrivateTaskAsync(object instance, string methodName, object?[]? args = null)
-    {
-        var task = Assert.IsAssignableFrom<Task>(InvokePrivate(instance, methodName, args));
-        await task;
     }
 
     private static object? InvokePrivate(object instance, string methodName, object?[]? args = null)

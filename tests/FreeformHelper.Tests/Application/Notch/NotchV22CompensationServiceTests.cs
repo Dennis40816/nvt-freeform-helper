@@ -35,9 +35,7 @@ public sealed class NotchV22CompensationServiceTests
         var switches = settings.Notch.ResolveStep3Switches();
         var ownerContext = NotchV22CompensationService.CreateContext(
             cad, grid, switches.EnableToRegular, switches.EnableToFull);
-        var ownerAllocations = (IReadOnlyList<NotchAllocation>)ownerContext.GetType()
-            .GetProperty("Allocations", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
-            .GetValue(ownerContext)!;
+        var ownerAllocations = ownerContext.Allocations;
         Assert.Empty(ownerAllocations);
         var owner = NotchV22CompensationService.Compute(ownerContext);
         Assert.Equal(0, owner.OverlapAreaTotal);

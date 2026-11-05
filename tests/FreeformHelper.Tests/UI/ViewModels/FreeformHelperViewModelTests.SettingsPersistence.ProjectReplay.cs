@@ -1,4 +1,3 @@
-using System.Reflection;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
@@ -355,17 +354,10 @@ public sealed partial class FreeformHelperViewModelTests
     public void ApplyViewSnapshot_Cv22ExportType_SelectsCv22()
     {
         var vm = new FreeformHelperViewModel();
-        var method = typeof(FreeformHelperViewModel).GetMethod(
-            "ApplyViewSnapshot",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
 
-        method!.Invoke(vm, new object?[]
+        FreeformHelperViewModelPrivateAccess.ApplyViewSnapshot(vm, new UiViewSnapshot
         {
-            new UiViewSnapshot
-            {
-                NotchExportFileType = "Cv22"
-            }
+            NotchExportFileType = "Cv22"
         });
 
         Assert.Equal(
@@ -391,20 +383,12 @@ public sealed partial class FreeformHelperViewModelTests
                 .Select(static pad => pad.Id)
                 .ToArray();
             var vm = new FreeformHelperViewModel();
-            var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-            var projectField = typeof(FreeformHelperViewModel).GetField("_projectFile", BindingFlags.Instance | BindingFlags.NonPublic);
-            var resetBaselineMethod = typeof(FreeformHelperViewModel).GetMethod("ResetDxfEditBaseline", BindingFlags.Instance | BindingFlags.NonPublic);
-            var updateLayerTogglesMethod = typeof(FreeformHelperViewModel).GetMethod("UpdateLayerToggles", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(cadField);
-            Assert.NotNull(projectField);
-            Assert.NotNull(resetBaselineMethod);
-            Assert.NotNull(updateLayerTogglesMethod);
 
-            cadField!.SetValue(vm, cad);
+            FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
             vm.CadPads = new System.Collections.ObjectModel.ObservableCollection<CadPad>(cad.Pads);
-            resetBaselineMethod!.Invoke(vm, new object?[] { cad });
-            updateLayerTogglesMethod!.Invoke(vm, new object?[] { cad });
-            var projectFile = Assert.IsType<FreeformHelper.Infrastructure.Project.ProjectFile>(projectField!.GetValue(vm));
+            FreeformHelperViewModelPrivateAccess.ResetDxfEditBaseline(vm, cad);
+            FreeformHelperViewModelPrivateAccess.UpdateLayerToggles(vm, cad);
+            var projectFile = Assert.IsType<FreeformHelper.Infrastructure.Project.ProjectFile>(FreeformHelperViewModelPrivateAccess.ProjectFile(vm));
             projectFile.LastDxfPath = dxfPath;
 
             await SelectCadPadsAsync(vm, [orderedCadIds[0], orderedCadIds[1]]);
@@ -440,7 +424,7 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Equal(1, loadedVm.RelayeredCadPadCount);
             Assert.Equal(1, loadedVm.RotatedCadPadCount);
 
-            var loadedCad = Assert.IsType<FreeformHelper.Domain.Pads.CadPadSet>(cadField.GetValue(loadedVm));
+            var loadedCad = Assert.IsType<FreeformHelper.Domain.Pads.CadPadSet>(FreeformHelperViewModelPrivateAccess.Cad(loadedVm));
             var movedPad = Assert.Single(loadedCad.Pads, pad => pad.Id == orderedCadIds[2]);
             Assert.Equal("MovedLayer", movedPad.Layer);
             var baselinePad = Assert.Single(cad.Pads, pad => pad.Id == orderedCadIds[2]);
@@ -481,15 +465,10 @@ public sealed partial class FreeformHelperViewModelTests
 
             Assert.Equal(2, vm.CadPads.Count);
 
-            var buildEntriesMethod = typeof(FreeformHelperViewModel).GetMethod("BuildDxfEditChangeEntries", BindingFlags.Instance | BindingFlags.NonPublic);
-            var applyEntryMethod = typeof(FreeformHelperViewModel).GetMethod("ApplyDxfEditChangeEntry", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(buildEntriesMethod);
-            Assert.NotNull(applyEntryMethod);
-
             var duplicateEntry = Assert.Single(
-                Assert.IsType<List<DxfEditChangeListEntry>>(buildEntriesMethod!.Invoke(vm, null)),
+                Assert.IsType<List<DxfEditChangeListEntry>>(FreeformHelperViewModelPrivateAccess.BuildDxfEditChangeEntries(vm)),
                 entry => entry.Kind == DxfEditChangeKind.Duplicate);
-            applyEntryMethod!.Invoke(vm, [duplicateEntry]);
+            FreeformHelperViewModelPrivateAccess.ApplyDxfEditChangeEntry(vm, duplicateEntry);
             Assert.Equal(3, vm.CadPads.Count);
 
             vm.PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath);
@@ -543,18 +522,10 @@ public sealed partial class FreeformHelperViewModelTests
             var importService = new DxfImportService();
             var cad = importService.ImportFromPath(dxfPath, new DxfImportOptions());
             var vm = new FreeformHelperViewModel();
-            var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-            var projectField = typeof(FreeformHelperViewModel).GetField("_projectFile", BindingFlags.Instance | BindingFlags.NonPublic);
-            var resetBaselineMethod = typeof(FreeformHelperViewModel).GetMethod("ResetDxfEditBaseline", BindingFlags.Instance | BindingFlags.NonPublic);
-            var updateLayerTogglesMethod = typeof(FreeformHelperViewModel).GetMethod("UpdateLayerToggles", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(cadField);
-            Assert.NotNull(projectField);
-            Assert.NotNull(resetBaselineMethod);
-            Assert.NotNull(updateLayerTogglesMethod);
 
-            cadField!.SetValue(vm, cad);
-            resetBaselineMethod!.Invoke(vm, new object?[] { cad });
-            updateLayerTogglesMethod!.Invoke(vm, new object?[] { cad });
+            FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
+            FreeformHelperViewModelPrivateAccess.ResetDxfEditBaseline(vm, cad);
+            FreeformHelperViewModelPrivateAccess.UpdateLayerToggles(vm, cad);
 
             var auxToggle = Assert.Single(vm.LayerToggles, static toggle => string.Equals(toggle.Name, "aux", StringComparison.OrdinalIgnoreCase));
             auxToggle.IsSelected = false;
@@ -563,7 +534,7 @@ public sealed partial class FreeformHelperViewModelTests
             vm.SelectedBoundLayerOption = new FreeformHelperViewModel.BoundLayerOption("signal", "signal");
             vm.DxfEditTargetLayerName = "signal";
 
-            var projectFile = Assert.IsType<FreeformHelper.Infrastructure.Project.ProjectFile>(projectField!.GetValue(vm));
+            var projectFile = Assert.IsType<FreeformHelper.Infrastructure.Project.ProjectFile>(FreeformHelperViewModelPrivateAccess.ProjectFile(vm));
             projectFile.LastDxfPath = dxfPath;
 
             vm.PickSaveProjectPathAsync = () => Task.FromResult<string?>(projectPath);

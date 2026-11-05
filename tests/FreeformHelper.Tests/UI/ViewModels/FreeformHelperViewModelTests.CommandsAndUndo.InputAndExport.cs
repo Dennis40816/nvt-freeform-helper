@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
@@ -91,9 +90,7 @@ public sealed partial class FreeformHelperViewModelTests
         var visiblePads = new System.Collections.ObjectModel.ObservableCollection<CadPad> { signalPad };
         var cad = new CadPadSet(importedPads);
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        cadField!.SetValue(vm, cad);
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
 
         vm.CadPads = visiblePads;
         vm.RegularSourceMode = RegularSourceMode.FromDxfLayer;

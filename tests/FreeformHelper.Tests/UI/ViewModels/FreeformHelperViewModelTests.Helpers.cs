@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Reflection;
 using System.Text;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
@@ -8,7 +7,6 @@ using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
-using Xunit;
 
 namespace FreeformHelper.Tests;
 
@@ -39,20 +37,13 @@ public sealed partial class FreeformHelperViewModelTests
             NotchPreviewAutoPlayEnabled = false,
         };
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
-
-        cadField!.SetValue(vm, new CadPadSet(new[] { cad }));
-        gridField!.SetValue(
-            vm,
-            new RegularGrid(
-                rows: 1,
-                cols: 1,
-                xEdges: _singlePadGridXEdges,
-                yEdges: _singlePadGridYEdges,
-                pads: new[] { regular }));
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(new[] { cad });
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = new RegularGrid(
+            rows: 1,
+            cols: 1,
+            xEdges: _singlePadGridXEdges,
+            yEdges: _singlePadGridYEdges,
+            pads: new[] { regular });
 
         SetPadMatchResult(vm, cadPadId: 101, regularPadId: 1001);
         vm.ApplyCanvasSelection(_selectedCad101, Array.Empty<int>());

@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Pads;
@@ -36,20 +35,13 @@ public sealed partial class FreeformHelperViewModelTests
             NotchPreviewAutoPlayEnabled = false,
         };
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
-
-        cadField!.SetValue(vm, new CadPadSet(importedCadPads));
-        gridField!.SetValue(
-            vm,
-            new RegularGrid(
-                rows: 1,
-                cols: 1,
-                xEdges: previewGridXEdges,
-                yEdges: previewGridYEdges,
-                pads: previewRegularPads));
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(importedCadPads);
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = new RegularGrid(
+            rows: 1,
+            cols: 1,
+            xEdges: previewGridXEdges,
+            yEdges: previewGridYEdges,
+            pads: previewRegularPads);
 
         SetPadMatchResult(vm, cadPadId: 101, regularPadId: 1001);
         vm.ApplyCanvasSelection(selectedCadIds, Array.Empty<int>());
@@ -148,20 +140,13 @@ public sealed partial class FreeformHelperViewModelTests
             NotchPreviewAutoPlayEnabled = false,
         };
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
-
-        cadField!.SetValue(vm, new CadPadSet(importedCadPads));
-        gridField!.SetValue(
-            vm,
-            new RegularGrid(
-                rows: 1,
-                cols: 1,
-                xEdges: previewGridXEdges,
-                yEdges: previewGridYEdges,
-                pads: previewRegularPads));
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(importedCadPads);
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = new RegularGrid(
+            rows: 1,
+            cols: 1,
+            xEdges: previewGridXEdges,
+            yEdges: previewGridYEdges,
+            pads: previewRegularPads);
 
         vm.ApplyCanvasSelection(selectedCadIds, Array.Empty<int>());
         Assert.Empty(vm.NotchCanvasPreviewItems);
@@ -193,20 +178,13 @@ public sealed partial class FreeformHelperViewModelTests
             NotchPreviewAutoPlayEnabled = false,
         };
 
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
-
-        cadField!.SetValue(vm, new CadPadSet(new[] { cad1, cad2 }));
-        gridField!.SetValue(
-            vm,
-            new RegularGrid(
-                rows: 1,
-                cols: 2,
-                xEdges: _twoPadGridXEdges,
-                yEdges: _singlePadGridYEdges,
-                pads: new[] { regular1, regular2 }));
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(new[] { cad1, cad2 });
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = new RegularGrid(
+            rows: 1,
+            cols: 2,
+            xEdges: _twoPadGridXEdges,
+            yEdges: _singlePadGridYEdges,
+            pads: new[] { regular1, regular2 });
 
         SetPadMatchResults(vm, (101, 1001), (102, 1002));
         var stepResult = await vm.RunWorkflowStepAsync(WorkflowStepId.Step1Match);

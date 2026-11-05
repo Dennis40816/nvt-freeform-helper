@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using FreeformHelper.Application.Services;
@@ -257,16 +256,9 @@ public sealed class Tm81NotchAcceptanceMatrixTests
 
     private static (CadPadSet Cad, RegularGrid Grid, ProjectFile Project) ExtractRuntimeState(FreeformHelperViewModel vm)
     {
-        var cadField = typeof(FreeformHelperViewModel).GetField("_cad", BindingFlags.Instance | BindingFlags.NonPublic);
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        var projectField = typeof(FreeformHelperViewModel).GetField("_projectFile", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(cadField);
-        Assert.NotNull(gridField);
-        Assert.NotNull(projectField);
-
-        var cad = Assert.IsType<CadPadSet>(cadField!.GetValue(vm));
-        var grid = Assert.IsType<RegularGrid>(gridField!.GetValue(vm));
-        var project = Assert.IsType<ProjectFile>(projectField!.GetValue(vm));
+        var cad = Assert.IsType<CadPadSet>(FreeformHelperViewModelPrivateAccess.Cad(vm));
+        var grid = Assert.IsType<RegularGrid>(FreeformHelperViewModelPrivateAccess.Grid(vm));
+        var project = Assert.IsType<ProjectFile>(FreeformHelperViewModelPrivateAccess.ProjectFile(vm));
         return (cad, grid, project);
     }
 
