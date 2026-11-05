@@ -166,6 +166,8 @@ public sealed class NotchDisplayProjectorTests
     [Fact]
     public void Build_FromPadInspectorSnapshot_ProducesSharedDisplayProjection()
     {
+        // ToRegularRatioText and ToFullRatioText format percent values with the current culture.
+        using var culture = TestCulture.UseEnUs();
         var notch = new PadInspectorNotchSnapshot(
             ToRegularRatio: 0.941,
             ToFullRatio: 1.5,
