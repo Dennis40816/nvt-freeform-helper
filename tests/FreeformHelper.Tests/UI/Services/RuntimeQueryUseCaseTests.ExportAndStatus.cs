@@ -123,4 +123,48 @@ public sealed partial class RuntimeQueryUseCaseTests
         Assert.True(shell.FreeformHelper.EnableV21);
         Assert.False(shell.FreeformHelper.EnableV22);
     }
+
+
+    [Fact]
+    public async Task ExecuteAsync_QueryExportNotch_RejectsMissingPath()
+    {
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var useCase = new RuntimeQueryUseCase(shell);
+
+        var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
+            Version: RuntimeQueryProtocol.Version,
+            Command: "export-notch",
+            Args: new Dictionary<string, string>
+            {
+                ["format"] = "csv"
+            }));
+
+        Assert.False(response.Ok);
+        Assert.NotNull(response.Error);
+        Assert.Equal("INVALID_ARGUMENTS", response.Error!.Code);
+    }
+
+
+    [Fact]
+    public async Task ExecuteAsync_QueryExportNotch_CreatesOutputFolderBeforeExport()
+    {
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var useCase = new RuntimeQueryUseCase(shell);
+        var outputFolder = TestFiles.NewTempFilePath("freeformhelper-export-folder-", string.Empty);
+        var path = Path.Combine(outputFolder, "notch.csv");
+
+        var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
+            Version: RuntimeQueryProtocol.Version,
+            Command: "export-notch",
+            Args: new Dictionary<string, string>
+            {
+                ["format"] = "csv",
+                ["path"] = path
+            }));
+
+        Assert.False(response.Ok);
+        Assert.Equal("STEP_EXECUTION_FAILED", response.Error!.Code);
+        Assert.True(Directory.Exists(outputFolder));
+        Assert.False(File.Exists(path));
+    }
 }
