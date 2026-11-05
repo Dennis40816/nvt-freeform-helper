@@ -23,7 +23,7 @@ public sealed class UiVisualSnapshotTests
         var baselinePath = Path.Combine(repoRoot, "tests", "FreeformHelper.Tests", "Snapshots", "ui-visual-minimal-baseline.json");
         Assert.True(File.Exists(baselinePath), $"Baseline file not found: {baselinePath}");
 
-        var baselineText = File.ReadAllText(baselinePath, Encoding.UTF8);
+        var baselineText = TestFiles.ReadContent(baselinePath, Encoding.UTF8);
         var baseline = JsonSerializer.Deserialize<UiVisualBaseline>(baselineText);
         Assert.NotNull(baseline);
         Assert.NotNull(baseline!.Files);
@@ -63,7 +63,7 @@ public sealed class UiVisualSnapshotTests
                     .OrderBy(static pair => pair.Key, StringComparer.Ordinal)
                     .ToDictionary(static pair => pair.Key, static pair => pair.Value, StringComparer.Ordinal);
                 var updatedBaselineText = JsonSerializer.Serialize(baseline, _baselineJsonOptions);
-                File.WriteAllText(baselinePath, updatedBaselineText + Environment.NewLine, new UTF8Encoding(false));
+                TestFiles.WriteText(baselinePath, updatedBaselineText + Environment.NewLine, new UTF8Encoding(false));
             }
 
             return;
@@ -86,7 +86,7 @@ public sealed class UiVisualSnapshotTests
 
     private static string ComputeNormalizedSha256(string filePath)
     {
-        var raw = File.ReadAllText(filePath, Encoding.UTF8);
+        var raw = TestFiles.ReadContent(filePath, Encoding.UTF8);
         var normalized = NormalizeVisualSource(raw);
         var bytes = Encoding.UTF8.GetBytes(normalized);
         var hash = SHA256.HashData(bytes);

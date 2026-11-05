@@ -75,7 +75,7 @@ public sealed class DebtBaselineTests
         // Semicolon/comma/whitespace separators are accepted; $(NoWarn) is not an ID.
         var noWarn = new List<string>();
         var projects = ArchitectureSource.Read(repoRoot, ".csproj", ".")
-            .Append(new ArchitectureSource("Directory.Build.props", File.ReadAllText(Path.Combine(repoRoot, "Directory.Build.props"))))
+            .Append(new ArchitectureSource("Directory.Build.props", TestFiles.ReadContent(Path.Combine(repoRoot, "Directory.Build.props"))))
             .OrderBy(static source => source.Path, StringComparer.Ordinal);
         foreach (var project in projects)
         {

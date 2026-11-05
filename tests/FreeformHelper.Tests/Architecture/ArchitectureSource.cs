@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using FreeformHelper.Tests.TestInfrastructure;
 
 namespace FreeformHelper.Tests.Architecture;
 
@@ -290,7 +291,7 @@ internal sealed class ArchitectureBaseline
     public string[] CompiledBindingExceptions { get; set; } = [];
 
     public static ArchitectureBaseline Load(string repoRoot) => JsonSerializer.Deserialize<ArchitectureBaseline>(
-        File.ReadAllText(System.IO.Path.Combine(repoRoot, "tests/FreeformHelper.Tests/Architecture/debt-baseline.json")),
+        TestFiles.ReadContent(System.IO.Path.Combine(repoRoot, "tests/FreeformHelper.Tests/Architecture/debt-baseline.json")),
         JsonOptions)
         ?? throw new InvalidOperationException("Invalid debt-baseline.json.");
 

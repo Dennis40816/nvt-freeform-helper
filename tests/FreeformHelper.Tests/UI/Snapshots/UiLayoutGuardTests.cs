@@ -28,7 +28,7 @@ public sealed class UiLayoutGuardTests
                                                path.EndsWith(".axaml", StringComparison.OrdinalIgnoreCase)))
             {
                 var relativePath = Path.GetRelativePath(uiRoot, file).Replace('\\', '/');
-                var lines = File.ReadAllLines(file);
+                var lines = TestFiles.ReadContentLines(file);
                 for (var lineNumber = 0; lineNumber < lines.Length; lineNumber++)
                 {
                     var line = lines[lineNumber].Trim();
@@ -56,7 +56,7 @@ public sealed class UiLayoutGuardTests
         var pattern = new Regex(@"(Width|MaxWidth)\s*=\s*""\{Binding\s+#.+?\.Bounds\.Width\}""", RegexOptions.Compiled);
         foreach (var file in Directory.EnumerateFiles(uiRoot, "*.axaml", SearchOption.AllDirectories))
         {
-            var lines = File.ReadAllLines(file);
+            var lines = TestFiles.ReadContentLines(file);
             for (var lineNumber = 0; lineNumber < lines.Length; lineNumber++)
             {
                 if (pattern.IsMatch(lines[lineNumber]))
@@ -86,11 +86,11 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("$parent[ScrollViewer].Viewport.Width", controlsStyles, StringComparison.Ordinal);
         Assert.Contains("Style Selector=\"ToggleButton.rightPanelTab\"", controlsStyles, StringComparison.Ordinal);
 
-        var mainWindow = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml"));
+        var mainWindow = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml"));
         Assert.Contains("WindowState=\"Maximized\"", mainWindow, StringComparison.Ordinal);
         Assert.DoesNotContain("WindowState=\"FullScreen\"", mainWindow, StringComparison.Ordinal);
 
-        var freeformView = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.axaml"));
+        var freeformView = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.axaml"));
         Assert.Contains("x:Name=\"RightSettingsScroll\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("x:Name=\"LeftSettingsScroll\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"scrollDevCandidate viewportBoundScroll\"", freeformView, StringComparison.Ordinal);
@@ -102,7 +102,7 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("IsChecked=\"{Binding IsRightPanelInspectorTab, Mode=TwoWay}\"", freeformView, StringComparison.Ordinal);
         Assert.Matches(@"GridSplitter\s+Grid\.Row=""1""[\s\S]*ResizeDirection=""Rows""[\s\S]*ShowsPreview=""True""", freeformView);
 
-        var leftPanel = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "LeftDxfPanel.axaml"));
+        var leftPanel = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "LeftDxfPanel.axaml"));
         Assert.Contains("Classes=\"boundLayerSelector\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("MaxDropDownHeight=\"{StaticResource LayerListMaxHeight}\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("controls:BalancedWrapPanel Classes=\"badgeGroup dxfEditBadgeGroup\"", leftPanel, StringComparison.Ordinal);
@@ -129,11 +129,11 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("dxfLayerSegmentAction", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("Margin=\"{StaticResource InsetRight12Bottom12}\"", leftPanel, StringComparison.Ordinal);
 
-        var overlayControls = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "CanvasOverlayControls.axaml"));
+        var overlayControls = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "CanvasOverlayControls.axaml"));
         Assert.Contains("Text=\"To Regular\"", overlayControls, StringComparison.Ordinal);
         Assert.Contains("IsChecked=\"{Binding ShowNotchToRegularLabels, Mode=TwoWay}\"", overlayControls, StringComparison.Ordinal);
 
-        var settingsWindow = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsWindow.axaml"));
+        var settingsWindow = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsWindow.axaml"));
         Assert.Contains("x:Name=\"SettingsWindowScroll\"", settingsWindow, StringComparison.Ordinal);
         Assert.Contains("Classes=\"viewportBoundScroll\"", settingsWindow, StringComparison.Ordinal);
         Assert.Contains("Classes=\"viewportBoundContent\"", settingsWindow, StringComparison.Ordinal);
@@ -163,7 +163,7 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("actionGhost actionTextButton", settingsWindow, StringComparison.Ordinal);
         Assert.DoesNotContain("actionPrimary actionTextButton", settingsWindow, StringComparison.Ordinal);
 
-        var settingsGeneralSection = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsSections", "SettingsGeneralSectionView.axaml"));
+        var settingsGeneralSection = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsSections", "SettingsGeneralSectionView.axaml"));
         Assert.Contains("Value=\"{Binding HighlightStrokeWidthAdjust, Mode=TwoWay}\"", settingsGeneralSection, StringComparison.Ordinal);
         Assert.Contains("Click=\"EditCascadeDetailsButton_Click\"", settingsGeneralSection, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding XChannels, StringFormat='{}{0:0}'}\"", settingsGeneralSection, StringComparison.Ordinal);
@@ -171,20 +171,20 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("Value=\"{Binding XChannels, Mode=TwoWay}\"", settingsGeneralSection, StringComparison.Ordinal);
         Assert.DoesNotContain("Value=\"{Binding YChannels, Mode=TwoWay}\"", settingsGeneralSection, StringComparison.Ordinal);
 
-        var cascadeDetailsWindow = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "CascadeIcSettingsWindow.axaml"));
+        var cascadeDetailsWindow = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "CascadeIcSettingsWindow.axaml"));
         Assert.Contains("ItemsSource=\"{Binding CascadeIcSettings}\"", cascadeDetailsWindow, StringComparison.Ordinal);
         Assert.Contains("Value=\"{Binding XChannels, Mode=TwoWay}\"", cascadeDetailsWindow, StringComparison.Ordinal);
         Assert.Contains("Value=\"{Binding YChannels, Mode=TwoWay}\"", cascadeDetailsWindow, StringComparison.Ordinal);
         Assert.Contains("Value=\"{Binding CascadeNum, Mode=TwoWay}\"", cascadeDetailsWindow, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding CascadeLayoutSummary}\"", cascadeDetailsWindow, StringComparison.Ordinal);
 
-        var settingsStep3Section = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsSections", "SettingsStep3SectionView.axaml"));
+        var settingsStep3Section = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsSections", "SettingsStep3SectionView.axaml"));
         Assert.Contains("IsChecked=\"{Binding ShowNotchToRegularLabels, Mode=TwoWay}\"", settingsStep3Section, StringComparison.Ordinal);
         Assert.Contains("IsChecked=\"{Binding EnableToFullRuleEngine, Mode=TwoWay}\"", settingsStep3Section, StringComparison.Ordinal);
         Assert.Contains("IsChecked=\"{Binding EnableToFullRuleTrace, Mode=TwoWay}\"", settingsStep3Section, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding ToFullRuleEngineSummary}\"", settingsStep3Section, StringComparison.Ordinal);
 
-        var workspaceHeader = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "WorkspaceHeader.axaml"));
+        var workspaceHeader = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "WorkspaceHeader.axaml"));
         Assert.Contains("x:Name=\"ViewMenuScroll\"", workspaceHeader, StringComparison.Ordinal);
         Assert.Contains("Classes=\"viewportBoundScroll\"", workspaceHeader, StringComparison.Ordinal);
         Assert.Contains("Classes=\"viewportBoundContent\"", workspaceHeader, StringComparison.Ordinal);
@@ -200,13 +200,13 @@ public sealed class UiLayoutGuardTests
         Assert.Equal(4, Regex.Count(workspaceHeader, "Classes=\"workspaceHeaderInput\""));
         Assert.DoesNotContain("<Expander", workspaceHeader, StringComparison.OrdinalIgnoreCase);
 
-        var rightPanel = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowPanel.axaml"));
+        var rightPanel = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowPanel.axaml"));
         Assert.Contains("<views:RightWorkflowInspectorView/>", rightPanel, StringComparison.Ordinal);
         Assert.Contains("<views:RightWorkflowSettingsTabView", rightPanel, StringComparison.Ordinal);
         Assert.Contains("DataTemplate x:Key=\"NotchValidationRowTemplate\"", rightPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("<Expander", rightPanel, StringComparison.OrdinalIgnoreCase);
 
-        var actionStyles = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Action.axaml"));
+        var actionStyles = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Action.axaml"));
         Assert.Contains("Button.viewportOverlayAction:pointerover", actionStyles, StringComparison.Ordinal);
         Assert.Contains("BrushActionInverseBackground", actionStyles, StringComparison.Ordinal);
         Assert.Contains("Button.dangerTextButton", actionStyles, StringComparison.Ordinal);
@@ -290,7 +290,7 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("dxfEditToolbarAction", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfEditToolbarSurface", leftPanel, StringComparison.Ordinal);
 
-        var coreStyles = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Core.axaml"));
+        var coreStyles = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Core.axaml"));
         Assert.Contains("controls|BalancedWrapPanel.badgeGroup", coreStyles, StringComparison.Ordinal);
         Assert.Contains("BalanceLastRow", coreStyles, StringComparison.Ordinal);
         Assert.Contains("DxfEditSummaryBadgeMinWidth", coreStyles, StringComparison.Ordinal);
@@ -315,7 +315,7 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("dxfLayerSegmentAction", coreStyles, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfEditAccordionHeader", coreStyles, StringComparison.Ordinal);
 
-        var devView = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DevView.axaml"));
+        var devView = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DevView.axaml"));
         Assert.Contains("Classes=\"dangerTextButton dxfEditMiniAction\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", devView, StringComparison.Ordinal);
@@ -325,15 +325,15 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("actionNeutral actionTextButton dxfEditMiniAction", devView, StringComparison.Ordinal);
         Assert.DoesNotContain("actionNeutral actionTextButton workspaceActionButton", devView, StringComparison.Ordinal);
 
-        var simulationControlsPane = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkspaceSections", "SimulationWorkspaceControlsPaneView.axaml"));
+        var simulationControlsPane = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkspaceSections", "SimulationWorkspaceControlsPaneView.axaml"));
         Assert.Contains("Classes=\"workspaceFileRow\"", simulationControlsPane, StringComparison.Ordinal);
         Assert.Contains("Classes=\"workspaceFileRowTitle\"", simulationControlsPane, StringComparison.Ordinal);
         Assert.Contains("Glyph=\"{x:Static icons:IconGlyphs.DataObject}\"", simulationControlsPane, StringComparison.Ordinal);
 
-        var simulationWorkspace = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SimulationWorkspaceView.axaml"));
+        var simulationWorkspace = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SimulationWorkspaceView.axaml"));
         Assert.Matches(@"GridSplitter\s+Grid\.Row=""2""[\s\S]*ResizeDirection=""Rows""[\s\S]*ShowsPreview=""True""", simulationWorkspace);
 
-        var rightWorkflowSettings = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowSettingsTabView.axaml"));
+        var rightWorkflowSettings = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowSettingsTabView.axaml"));
         Assert.Contains("Title=\"Overview\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("Text=\"Project / grid\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("Text=\"Simulation safety\"", rightWorkflowSettings, StringComparison.Ordinal);
@@ -358,10 +358,10 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("ItemsSource=\"{Binding NotchValidationIncomingItems}\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("ItemsSource=\"{Binding NotchValidationOutgoingItems}\"", rightWorkflowSettings, StringComparison.Ordinal);
 
-        var rightWorkflowInspector = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowInspectorView.axaml"));
+        var rightWorkflowInspector = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowInspectorView.axaml"));
         Assert.Contains("IsVisible=\"{Binding IsRightPanelInspectorTab}\"", rightWorkflowInspector, StringComparison.Ordinal);
 
-        var step3View = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep3View.axaml"));
+        var step3View = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep3View.axaml"));
         Assert.Contains("Text=\"{Binding NotchPreviewStageSummary}\"", step3View, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding NotchToFullRuleEngineSummary}\"", step3View, StringComparison.Ordinal);
         Assert.Contains("IsEnabled=\"{Binding CanControlNotchPreviewStage}\"", step3View, StringComparison.Ordinal);
@@ -371,7 +371,7 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", step3View, StringComparison.Ordinal);
         Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", settingsStep3Section, StringComparison.Ordinal);
 
-        var step5View = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep5View.axaml"));
+        var step5View = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep5View.axaml"));
         Assert.Contains("Text=\"Handoff checklist\"", step5View, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding NotchExportHandoffFileText}\"", step5View, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding NotchExportHandoffVersionText}\"", step5View, StringComparison.Ordinal);
@@ -383,7 +383,7 @@ public sealed class UiLayoutGuardTests
     public void NotchExportSelection_PhysicalAuditWarning_UsesExistingWarningChip()
     {
         var repoRoot = TestPaths.RepoRoot;
-        var xaml = File.ReadAllText(
+        var xaml = TestFiles.ReadContent(
             Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "NotchExportSelectionWindow.axaml"));
         var warningChip = FindXamlElementTagContaining(xaml, "Border", "HasSimulationPhysicalAuditWarning");
 
@@ -401,19 +401,19 @@ public sealed class UiLayoutGuardTests
     public void NotchSafetyGuidance_UsesSharedDynamicCapProjection()
     {
         var repoRoot = TestPaths.RepoRoot;
-        var mainState = File.ReadAllText(Path.Combine(
+        var mainState = TestFiles.ReadContent(Path.Combine(
             repoRoot,
             "src",
             "FreeformHelper.UI",
             "ViewModels",
             "FreeformHelperViewModel.State.NotchPreview.cs"));
-        var settingsState = File.ReadAllText(Path.Combine(
+        var settingsState = TestFiles.ReadContent(Path.Combine(
             repoRoot,
             "src",
             "FreeformHelper.UI",
             "ViewModels",
             "SettingsWindowViewModel.cs"));
-        var rightWorkflowSettings = File.ReadAllText(Path.Combine(
+        var rightWorkflowSettings = TestFiles.ReadContent(Path.Combine(
             repoRoot,
             "src",
             "FreeformHelper.UI",
@@ -458,13 +458,13 @@ public sealed class UiLayoutGuardTests
 
         foreach (var (file, commandName) in checks)
         {
-            var button = FindXamlElementTagContaining(File.ReadAllText(file), "Button", commandName);
+            var button = FindXamlElementTagContaining(TestFiles.ReadContent(file), "Button", commandName);
             Assert.DoesNotContain("actionTextButton", button, StringComparison.Ordinal);
             Assert.DoesNotContain("actionNeutral", button, StringComparison.Ordinal);
             Assert.DoesNotContain("actionPrimary", button, StringComparison.Ordinal);
         }
 
-        var step2View = File.ReadAllText(Path.Combine(stepsRoot, "RightWorkflowStep2View.axaml"));
+        var step2View = TestFiles.ReadContent(Path.Combine(stepsRoot, "RightWorkflowStep2View.axaml"));
         Assert.Contains("ColumnSpacing=\"{StaticResource Space6}\"", step2View, StringComparison.Ordinal);
     }
 
@@ -483,7 +483,7 @@ public sealed class UiLayoutGuardTests
 
         foreach (var file in files)
         {
-            var lines = File.ReadAllLines(file);
+            var lines = TestFiles.ReadContentLines(file);
             for (var lineNumber = 0; lineNumber < lines.Length; lineNumber++)
             {
                 if (!inlineFontSizePattern.IsMatch(lines[lineNumber]))
@@ -506,11 +506,11 @@ public sealed class UiLayoutGuardTests
     {
         var repoRoot = TestPaths.RepoRoot;
         var stylesRoot = Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles");
-        var actionStyles = File.ReadAllText(Path.Combine(stylesRoot, "Controls.Action.axaml"));
-        var coreStyles = File.ReadAllText(Path.Combine(stylesRoot, "Controls.Core.axaml"));
-        var overlayStyles = File.ReadAllText(Path.Combine(stylesRoot, "Controls.Overlay.axaml"));
-        var formStyles = File.ReadAllText(Path.Combine(stylesRoot, "Controls.Form.axaml"));
-        var tokens = File.ReadAllText(Path.Combine(stylesRoot, "Tokens.axaml"));
+        var actionStyles = TestFiles.ReadContent(Path.Combine(stylesRoot, "Controls.Action.axaml"));
+        var coreStyles = TestFiles.ReadContent(Path.Combine(stylesRoot, "Controls.Core.axaml"));
+        var overlayStyles = TestFiles.ReadContent(Path.Combine(stylesRoot, "Controls.Overlay.axaml"));
+        var formStyles = TestFiles.ReadContent(Path.Combine(stylesRoot, "Controls.Form.axaml"));
+        var tokens = TestFiles.ReadContent(Path.Combine(stylesRoot, "Tokens.axaml"));
         var allStyles = ReadAllStylesText(repoRoot);
         AssertNoStyleSetterCollisions(stylesRoot);
 
@@ -538,9 +538,9 @@ public sealed class UiLayoutGuardTests
         Assert.Equal(2, Regex.Count(tokens, "<Color x:Key=\"ColorButtonNeutralForeground\">#1E2430</Color>"));
         Assert.Equal(2, Regex.Count(tokens, "<Color x:Key=\"ColorButtonDisabledForeground\">#4A5568</Color>"));
 
-        var appCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "App.axaml.cs"));
-        var tooltipServiceCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Services", "SharedToolTipStyleService.cs"));
-        Assert.Contains("Controls.Overlay.axaml", File.ReadAllText(Path.Combine(stylesRoot, "Controls.axaml")));
+        var appCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "App.axaml.cs"));
+        var tooltipServiceCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Services", "SharedToolTipStyleService.cs"));
+        Assert.Contains("Controls.Overlay.axaml", TestFiles.ReadContent(Path.Combine(stylesRoot, "Controls.axaml")), StringComparison.Ordinal);
         Assert.Contains("Style Selector=\"ToolTip TextBlock, ToolTip SelectableTextBlock\"", overlayStyles, StringComparison.Ordinal);
         Assert.Contains("Style Selector=\"ToolTip /template/ ContentPresenter\"", overlayStyles, StringComparison.Ordinal);
         Assert.Contains("BrushTooltipBackground", overlayStyles, StringComparison.Ordinal);
@@ -590,13 +590,13 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("MaxWidth\" Value=\"{Binding $parent[ComboBox].Bounds.Width}\"", controlsStyles, StringComparison.Ordinal);
         Assert.Contains("PlacementConstraintAdjustment\" Value=\"All\"", controlsStyles, StringComparison.Ordinal);
 
-        var rightWorkflowSettings = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowSettingsTabView.axaml"));
+        var rightWorkflowSettings = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowSettingsTabView.axaml"));
         Assert.DoesNotContain("ComboBox Classes=\"regularLayerSelector\"", rightWorkflowSettings, StringComparison.Ordinal);
 
-        var settingsGeneralSection = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsSections", "SettingsGeneralSectionView.axaml"));
+        var settingsGeneralSection = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsSections", "SettingsGeneralSectionView.axaml"));
         Assert.Contains("ComboBox Classes=\"regularLayerSelector\"", settingsGeneralSection, StringComparison.Ordinal);
 
-        var settingsWindowCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.SettingsWindow.cs"));
+        var settingsWindowCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.SettingsWindow.cs"));
         Assert.Contains("Open settings window requested: source={0}, section={1}.", settingsWindowCode, StringComparison.Ordinal);
     }
 
@@ -638,7 +638,7 @@ public sealed class UiLayoutGuardTests
         var offenders = new List<string>();
         foreach (var pair in checks)
         {
-            var xaml = File.ReadAllText(pair.Key);
+            var xaml = TestFiles.ReadContent(pair.Key);
             var relativePath = Path.GetRelativePath(repoRoot, pair.Key);
             foreach (var bindingPath in pair.Value)
             {
@@ -658,7 +658,7 @@ public sealed class UiLayoutGuardTests
     public void PadInfoPopover_RegularDetails_UsesBoundedScrollPattern()
     {
         var repoRoot = TestPaths.RepoRoot;
-        var regularPadInfoContent = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "PadInfoSections", "RegularPadInfoContentView.axaml"));
+        var regularPadInfoContent = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "PadInfoSections", "RegularPadInfoContentView.axaml"));
 
         Assert.Contains("x:Name=\"RegularPadInfoScroll\"", regularPadInfoContent, StringComparison.Ordinal);
         Assert.Contains("MaxHeight=\"{StaticResource PadInfoContentMaxHeight}\"", regularPadInfoContent, StringComparison.Ordinal);
@@ -669,7 +669,7 @@ public sealed class UiLayoutGuardTests
     public void PadInfoPopover_UsesDividerToggleForLowFrequencyDetailSections()
     {
         var repoRoot = TestPaths.RepoRoot;
-        var regularPadInfoContent = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "PadInfoSections", "RegularPadInfoContentView.axaml"));
+        var regularPadInfoContent = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "PadInfoSections", "RegularPadInfoContentView.axaml"));
 
         Assert.Contains("Classes=\"padInfoSectionToggle debugCard\"", regularPadInfoContent, StringComparison.Ordinal);
         Assert.Contains("Command=\"{Binding ToggleGeometryDetailsCommand}\"", regularPadInfoContent, StringComparison.Ordinal);
@@ -689,7 +689,7 @@ public sealed class UiLayoutGuardTests
             var dir = Path.Combine(uiRoot, relative);
             foreach (var file in Directory.EnumerateFiles(dir, "*.axaml", SearchOption.AllDirectories))
             {
-                var lines = File.ReadAllLines(file);
+                var lines = TestFiles.ReadContentLines(file);
                 for (var lineNumber = 0; lineNumber < lines.Length; lineNumber++)
                 {
                     if (!hexPattern.IsMatch(lines[lineNumber]))
@@ -722,7 +722,7 @@ public sealed class UiLayoutGuardTests
                 continue;
             }
 
-            var lines = File.ReadAllLines(file);
+            var lines = TestFiles.ReadContentLines(file);
             for (var lineNumber = 0; lineNumber < lines.Length; lineNumber++)
             {
                 if (!hexPattern.IsMatch(lines[lineNumber]))
@@ -743,10 +743,10 @@ public sealed class UiLayoutGuardTests
     public void ShortcutContract_DoesNotExposeResetViewR()
     {
         var repoRoot = TestPaths.RepoRoot;
-        var freeformViewCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.axaml.cs"));
-        var freeformShortcutCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.InputAndShortcuts.cs"));
-        var canvasInputCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "PadCanvas.Input.cs"));
-        var howToUseXaml = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "HowToUseView.axaml"));
+        var freeformViewCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.axaml.cs"));
+        var freeformShortcutCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.InputAndShortcuts.cs"));
+        var canvasInputCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "PadCanvas.Input.cs"));
+        var howToUseXaml = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "HowToUseView.axaml"));
 
         var keyRPattern = new Regex(@"Key\.R\b", RegexOptions.Compiled);
         Assert.False(keyRPattern.IsMatch(freeformViewCode), "Global shortcut handler should not bind Key.R.");
@@ -760,12 +760,12 @@ public sealed class UiLayoutGuardTests
     public void ShortcutContract_GlobalAndCanvasScopesRemainConsistent()
     {
         var repoRoot = TestPaths.RepoRoot;
-        var overlayXaml = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "CanvasOverlayControls.axaml"));
-        var freeformLifecycleCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.Lifecycle.cs"));
-        var freeformShortcutCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.InputAndShortcuts.cs"));
-        var canvasNavigationCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "PadCanvas.Input.Navigation.cs"));
-        var dxfEditChangeListWindowCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DxfEditChangeListWindow.axaml.cs"));
-        var mainWindowCode = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml.cs"));
+        var overlayXaml = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "CanvasOverlayControls.axaml"));
+        var freeformLifecycleCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.Lifecycle.cs"));
+        var freeformShortcutCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.InputAndShortcuts.cs"));
+        var canvasNavigationCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "PadCanvas.Input.Navigation.cs"));
+        var dxfEditChangeListWindowCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DxfEditChangeListWindow.axaml.cs"));
+        var mainWindowCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml.cs"));
 
         Assert.Contains("Alt = Regular priority", overlayXaml, StringComparison.Ordinal);
         Assert.Contains("_topLevel.KeyDown += OnTopLevelKeyDown;", freeformLifecycleCode, StringComparison.Ordinal);
@@ -802,8 +802,8 @@ public sealed class UiLayoutGuardTests
     public void CanvasLowDetailDecimation_UsesTokenizedThresholds()
     {
         var repoRoot = TestPaths.RepoRoot;
-        var tokens = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Tokens.axaml"));
-        var visibleDrawListBuilder = File.ReadAllText(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "PadCanvas.VisibleDrawListBuilder.cs"));
+        var tokens = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Tokens.axaml"));
+        var visibleDrawListBuilder = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "PadCanvas.VisibleDrawListBuilder.cs"));
 
         Assert.Contains("CanvasLowDetailRegularDecimationMaxStep", tokens, StringComparison.Ordinal);
         Assert.Contains("CanvasLowDetailCadMaxVisibleUnselected", tokens, StringComparison.Ordinal);
@@ -886,7 +886,7 @@ public sealed class UiLayoutGuardTests
 
         foreach (var file in Directory.EnumerateFiles(uiRoot, "*.axaml", SearchOption.AllDirectories))
         {
-            var xaml = File.ReadAllText(file);
+            var xaml = TestFiles.ReadContent(file);
             foreach (Match match in tagPattern.Matches(xaml))
             {
                 var tag = match.Value;
@@ -947,7 +947,7 @@ public sealed class UiLayoutGuardTests
         var offenders = new List<string>();
         foreach (var file in Directory.EnumerateFiles(stylesRoot, "*.axaml", SearchOption.TopDirectoryOnly))
         {
-            var stylesText = File.ReadAllText(file);
+            var stylesText = TestFiles.ReadContent(file);
             foreach (var style in ExtractStyleBlocks(stylesText))
             {
                 var setterProperties = ExtractSetterProperties(style.Body);
@@ -1225,7 +1225,7 @@ public sealed class UiLayoutGuardTests
         var builder = new StringBuilder();
         foreach (var file in Directory.EnumerateFiles(stylesRoot, "*.axaml", SearchOption.AllDirectories).OrderBy(static path => path, StringComparer.OrdinalIgnoreCase))
         {
-            builder.AppendLine(File.ReadAllText(file));
+            builder.AppendLine(TestFiles.ReadContent(file));
         }
 
         return builder.ToString();
