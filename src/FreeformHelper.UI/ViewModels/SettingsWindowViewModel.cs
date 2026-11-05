@@ -652,6 +652,13 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
 
     private void OnSave()
     {
+        // The window is not modal. A draft opened before another project was loaded must not overwrite that project.
+        if (!_owner.TryAcceptSettingsWindowDraft(ActiveAreaPixels.ProjectIdentity))
+        {
+            RequestClose?.Invoke();
+            return;
+        }
+
         _owner.ApplySettingsWindowDraft(this);
         _owner.ApplyActiveAreaPixelsDraft(ActiveAreaPixels);
         RequestClose?.Invoke();
