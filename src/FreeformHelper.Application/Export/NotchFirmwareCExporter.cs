@@ -309,12 +309,35 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine();
     }
 
+    private static void AppendQ7ScaleFunction(StringBuilder sb)
+    {
+        sb.AppendLine("// Q7 ratio scaling: floor(s32Product / 128) written without a right shift of a signed operand");
+        sb.AppendLine("// (MISRA C:2012 Rule 10.1). Rounds toward negative infinity, like an arithmetic shift.");
+        sb.AppendLine("static INT32 FUNC_NHC_ScaleQ7Floor(INT32 s32Product)");
+        sb.AppendLine("{");
+        sb.AppendLine("    INT32 s32Bias = 0;");
+        sb.AppendLine();
+        sb.AppendLine("    if (s32Product < 0)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        s32Bias = 127;");
+        sb.AppendLine("    }");
+        sb.AppendLine("    else");
+        sb.AppendLine("    {");
+        sb.AppendLine("        ; // Comment for MISRA C Check");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+        sb.AppendLine("    return (s32Product - s32Bias) / 128;");
+        sb.AppendLine("}");
+        sb.AppendLine();
+    }
+
     private static void AppendV21FunctionBlock(StringBuilder sb)
     {
         sb.AppendLine("/*-----------------------------------------------------------------------------*/");
         sb.AppendLine("/* Interface Functions                                                         */");
         sb.AppendLine("/*-----------------------------------------------------------------------------*/");
         sb.AppendLine();
+        AppendQ7ScaleFunction(sb);
         sb.AppendLine("static void FUNC_NHC_DiffCompensationOneTable(const ST_PRI_NHC_TABLE_NODE_INFO* pstTable, UINT16 u16NodeNum)");
         sb.AppendLine("{");
         sb.AppendLine("    UINT16 u16j;");
@@ -343,13 +366,11 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine("            s16Sum = 0;");
         sb.AppendLine("            if (pstTable[u16j].NHC_1ST_TYPE == NHC_TYPE_ADD)");
         sb.AppendLine("            {");
-        sb.AppendLine("                // MISRA C:2012 Rule 10.1 deviation NHC-DEV-01: Q7 ratio, arithmetic right shift of INT32 is intended.");
-        sb.AppendLine("                s16Sum += (INT16)((((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_1ST_IDX]) * (INT32)pstTable[u16j].NHC_1ST_RATIO) >> 7);");
+        sb.AppendLine("                s16Sum += (INT16)FUNC_NHC_ScaleQ7Floor(((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_1ST_IDX]) * (INT32)pstTable[u16j].NHC_1ST_RATIO);");
         sb.AppendLine("            }");
         sb.AppendLine("            else if (pstTable[u16j].NHC_1ST_TYPE == NHC_TYPE_SUB)");
         sb.AppendLine("            {");
-        sb.AppendLine("                // MISRA C:2012 Rule 10.1 deviation NHC-DEV-01: Q7 ratio, arithmetic right shift of INT32 is intended.");
-        sb.AppendLine("                s16Sum -= (INT16)((((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_1ST_IDX]) * (INT32)pstTable[u16j].NHC_1ST_RATIO) >> 7);");
+        sb.AppendLine("                s16Sum -= (INT16)FUNC_NHC_ScaleQ7Floor(((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_1ST_IDX]) * (INT32)pstTable[u16j].NHC_1ST_RATIO);");
         sb.AppendLine("            }");
         sb.AppendLine("            else");
         sb.AppendLine("            {");
@@ -358,13 +379,11 @@ internal static class NotchFirmwareCExporter
         sb.AppendLine();
         sb.AppendLine("            if (pstTable[u16j].NHC_2ND_TYPE == NHC_TYPE_ADD)");
         sb.AppendLine("            {");
-        sb.AppendLine("                // MISRA C:2012 Rule 10.1 deviation NHC-DEV-01: Q7 ratio, arithmetic right shift of INT32 is intended.");
-        sb.AppendLine("                s16Sum += (INT16)((((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_2ND_IDX]) * (INT32)pstTable[u16j].NHC_2ND_RATIO) >> 7);");
+        sb.AppendLine("                s16Sum += (INT16)FUNC_NHC_ScaleQ7Floor(((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_2ND_IDX]) * (INT32)pstTable[u16j].NHC_2ND_RATIO);");
         sb.AppendLine("            }");
         sb.AppendLine("            else if (pstTable[u16j].NHC_2ND_TYPE == NHC_TYPE_SUB)");
         sb.AppendLine("            {");
-        sb.AppendLine("                // MISRA C:2012 Rule 10.1 deviation NHC-DEV-01: Q7 ratio, arithmetic right shift of INT32 is intended.");
-        sb.AppendLine("                s16Sum -= (INT16)((((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_2ND_IDX]) * (INT32)pstTable[u16j].NHC_2ND_RATIO) >> 7);");
+        sb.AppendLine("                s16Sum -= (INT16)FUNC_NHC_ScaleQ7Floor(((INT32)S_2D_DIFFAFTER->as16Buf[pstTable[u16j].NHC_2ND_IDX]) * (INT32)pstTable[u16j].NHC_2ND_RATIO);");
         sb.AppendLine("            }");
         sb.AppendLine("            else");
         sb.AppendLine("            {");
