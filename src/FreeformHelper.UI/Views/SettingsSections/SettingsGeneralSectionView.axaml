@@ -155,7 +155,7 @@
           <SelectableTextBlock Classes="settingsSectionMeta"
                                Text="Advanced mapping · adjust only for coordinate output or panel alignment."/>
           <Grid ColumnDefinitions="1*,1*,1*"
-                RowDefinitions="Auto"
+                RowDefinitions="Auto,Auto"
                 ColumnSpacing="{StaticResource Space12}"
                 RowSpacing="{StaticResource Space12}">
             <Border Grid.Row="0"
@@ -210,6 +210,40 @@
                                            Value="{Binding PanelBiasY, Mode=TwoWay}"/>
                 </StackPanel>
               </Grid>
+            </Border>
+            <Border Grid.Row="1"
+                    Grid.Column="0"
+                    Classes="settingsFieldTile">
+              <StackPanel Classes="panelFormField">
+                <controls:SettingsInfoLabel Text="AA pixels X" Tip="Optional. Panel pixel count across the AA width, for example 6480. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
+                <controls:NumberScrubber Minimum="0"
+                                         Maximum="100000"
+                                         SmallChange="1"
+                                         FormatString="0"
+                                         AutomationProperties.Name="AA pixels X"
+                                         Value="{Binding ActiveAreaPixels.PixelsX, Mode=TwoWay}"/>
+              </StackPanel>
+            </Border>
+            <Border Grid.Row="1"
+                    Grid.Column="1"
+                    Classes="settingsFieldTile">
+              <StackPanel Classes="panelFormField">
+                <controls:SettingsInfoLabel Text="AA pixels Y" Tip="Optional. Panel pixel count across the AA height, for example 848. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
+                <controls:NumberScrubber Minimum="0"
+                                         Maximum="100000"
+                                         SmallChange="1"
+                                         FormatString="0"
+                                         AutomationProperties.Name="AA pixels Y"
+                                         Value="{Binding ActiveAreaPixels.PixelsY, Mode=TwoWay}"/>
+              </StackPanel>
+            </Border>
+            <Border Grid.Row="1"
+                    Grid.Column="2"
+                    Classes="settingsFieldTile"
+                    IsVisible="{Binding ActiveAreaPixels.HasStatus}">
+              <SelectableTextBlock Classes="stepNote"
+                                   Text="{Binding ActiveAreaPixels.StatusText}"
+                                   TextWrapping="Wrap"/>
             </Border>
           </Grid>
         </StackPanel>
