@@ -131,6 +131,7 @@
                 IsVisible="{Binding HasPadInspectorSummary}"/>
 
         <ToggleButton Classes="workspaceFoldHeader"
+                      AutomationProperties.Name="Debug details"
                       HorizontalAlignment="Stretch"
                       IsVisible="{Binding HasPadInspectorSummary}"
                       IsChecked="{Binding PadInspectorUi.IsDebugDetailsExpanded, Mode=TwoWay}">

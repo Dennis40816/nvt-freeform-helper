@@ -92,7 +92,7 @@
                                        Text="Regular/FW memory frame input projected onto AA grid."/>
                 </Border>
                 <Grid ClipToBounds="False">
-                  <ToggleButton Classes="workspaceFoldHeader">
+                  <ToggleButton Classes="workspaceFoldHeader" AutomationProperties.Name="EMS safety">
                     <Grid Classes="workspaceFoldHeaderContent"
                           ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
@@ -110,7 +110,7 @@
                 </Grid>
                 <Grid ColumnDefinitions="*,*"
                       ColumnSpacing="{DynamicResource Space8}">
-                  <Button Classes="actionPrimary actionTextButton workspaceActionButton">
+                  <Button Classes="actionPrimary actionTextButton workspaceActionButton" AutomationProperties.Name="Import">
                     <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
                       <controls:FontIcon Grid.Column="0"
                                          Classes="symbols iconTextButtonLeadingIcon"
@@ -122,6 +122,7 @@
                     </Grid>
                   </Button>
                   <Button Grid.Column="1"
+                          AutomationProperties.Name="Clear"
                           Classes="actionDanger actionTextButton workspaceActionButton">
                     <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
                       <controls:FontIcon Grid.Column="0"
@@ -198,6 +199,7 @@
                       <SelectableTextBlock Classes="dxfEditActionGroupLabel"
                                            Text="Hide / restore"/>
                       <Button Classes="dangerTextButton dxfEditMiniAction"
+                              AutomationProperties.Name="Hide selected"
                               ToolTip.Tip="Hide selected CAD pads.">
                         <StackPanel Classes="dxfEditMiniActionContent"
                                     Orientation="Horizontal"
@@ -211,6 +213,7 @@
                       <Grid Classes="dxfEditActionGroupRow"
                             ColumnDefinitions="*,*">
                         <Button Grid.Column="0"
+                                AutomationProperties.Name="Undo hide"
                                 Classes="dxfEditMiniAction"
                                 ToolTip.Tip="Restore last hidden CAD batch.">
                           <StackPanel Classes="dxfEditMiniActionContent"
@@ -223,6 +226,7 @@
                           </StackPanel>
                         </Button>
                         <Button Grid.Column="1"
+                                AutomationProperties.Name="Show all"
                                 Classes="dxfEditMiniAction"
                                 ToolTip.Tip="Restore all manually hidden CAD pads.">
                           <StackPanel Classes="dxfEditMiniActionContent"
@@ -242,6 +246,7 @@
                       <SelectableTextBlock Classes="dxfEditActionGroupLabel"
                                            Text="Combine / split"/>
                       <Button Classes="dxfEditMiniAction"
+                              AutomationProperties.Name="Combine"
                               IsEnabled="False"
                               ToolTip.Tip="Combine selected CAD pads using geometry union.">
                         <StackPanel Classes="dxfEditMiniActionContent"
@@ -254,6 +259,7 @@
                         </StackPanel>
                       </Button>
                       <Button Classes="dxfEditMiniAction"
+                              AutomationProperties.Name="Split selected"
                               IsEnabled="False"
                               ToolTip.Tip="Split selected combined CAD groups back into their source pads.">
                         <StackPanel Classes="dxfEditMiniActionContent"
@@ -275,6 +281,7 @@
                     <StackPanel Orientation="Horizontal"
                                 Spacing="{DynamicResource Space6}">
                       <ToggleButton Classes="dxfLayerBulkToggleButton"
+                                    AutomationProperties.Name="All on"
                                     IsChecked="True"
                                     ToolTip.Tip="All layers are visible.">
                         <Grid Classes="dxfLayerBulkToggleContent"
@@ -287,6 +294,7 @@
                         </Grid>
                       </ToggleButton>
                       <ToggleButton Classes="dxfLayerBulkToggleButton"
+                                    AutomationProperties.Name="All off"
                                     ToolTip.Tip="Every layer is hidden.">
                         <Grid Classes="dxfLayerBulkToggleContent"
                               ColumnDefinitions="Auto,*">
@@ -298,6 +306,7 @@
                         </Grid>
                       </ToggleButton>
                       <ToggleButton Classes="dxfLayerBulkToggleButton"
+                                    AutomationProperties.Name="All off"
                                     ToolTip.Tip="Some layers are hidden.">
                         <Grid Classes="dxfLayerBulkToggleContent"
                               ColumnDefinitions="Auto,*">
@@ -314,6 +323,7 @@
                   <SelectableTextBlock Classes="dxfEditSectionLabel"
                                        Text="Advanced edit"/>
                   <ToggleButton Classes="workspaceFoldHeader"
+                                AutomationProperties.Name="Advanced edit"
                                 IsChecked="True">
                     <Grid Classes="workspaceFoldHeaderContent"
                           ColumnDefinitions="Auto,*,Auto">
@@ -432,6 +442,7 @@
                                    Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
               </ToggleButton>
               <Button Classes="workspaceActionButton"
+                      AutomationProperties.Name="Copy result"
                       Width="{StaticResource NotchExportPrimaryButtonMinWidth}"
                       Margin="{DynamicResource InsetRight8Bottom6}"
                       ToolTip.Tip="Icon + text action">
@@ -448,6 +459,7 @@
             </WrapPanel>
             <WrapPanel Orientation="Horizontal">
               <Button Classes="actionChip chipAction"
+                      AutomationProperties.Name="Uniform 400"
                       Margin="{DynamicResource InsetRight6Bottom6}">
                 <Grid Classes="workspacePresetButtonContent" ColumnDefinitions="Auto,*">
                   <controls:FontIcon Grid.Column="0"
@@ -459,6 +471,7 @@
                 </Grid>
               </Button>
               <Button Classes="actionChip chipAction"
+                      AutomationProperties.Name="Zero"
                       Margin="{DynamicResource InsetRight6Bottom6}">
                 <Grid Classes="workspacePresetButtonContent" ColumnDefinitions="Auto,*">
                   <controls:FontIcon Grid.Column="0"
@@ -500,15 +513,18 @@
                                  FontWeight="SemiBold"/>
             <WrapPanel Orientation="Horizontal">
               <Button Classes="actionTextButton actionNeutral"
+                      AutomationProperties.Name="Neutral"
                       Margin="{DynamicResource InsetRight8Bottom6}">
                 <SelectableTextBlock Text="Neutral"/>
               </Button>
               <ToggleButton Classes="actionTextButton actionNeutral"
+                            AutomationProperties.Name="Neutral selected"
                             IsChecked="True"
                             Margin="{DynamicResource InsetRight8Bottom6}">
                 <SelectableTextBlock Text="Neutral selected"/>
               </ToggleButton>
               <Button Classes="actionTextButton actionNeutral"
+                      AutomationProperties.Name="Neutral disabled"
                       IsEnabled="False"
                       Margin="{DynamicResource InsetRight8Bottom6}">
                 <SelectableTextBlock Text="Neutral disabled"/>
@@ -516,6 +532,7 @@
             </WrapPanel>
             <WrapPanel Orientation="Horizontal">
               <Button Classes="actionTextButton actionPrimary"
+                      AutomationProperties.Name="Primary"
                       Margin="{DynamicResource InsetRight8Bottom6}">
                 <Grid ColumnDefinitions="Auto,*"
                       ColumnSpacing="{DynamicResource Space6}">
@@ -527,6 +544,7 @@
                 </Grid>
               </Button>
               <Button Classes="actionTextButton actionDanger"
+                      AutomationProperties.Name="Danger"
                       Margin="{DynamicResource InsetRight8Bottom6}">
                 <Grid ColumnDefinitions="Auto,*"
                       ColumnSpacing="{DynamicResource Space6}">
@@ -602,15 +620,18 @@
             </WrapPanel>
             <WrapPanel Orientation="Horizontal">
               <Button Classes="actionChip chipAction"
+                      AutomationProperties.Name="Uniform 400"
                       Margin="{DynamicResource InsetRight8Bottom6}">
                 <SelectableTextBlock Text="Uniform 400"/>
               </Button>
               <ToggleButton Classes="actionChip chipAction"
+                            AutomationProperties.Name="Zero"
                             IsChecked="True"
                             Margin="{DynamicResource InsetRight8Bottom6}">
                 <SelectableTextBlock Text="Zero"/>
               </ToggleButton>
               <Button Classes="actionChip chipAction"
+                      AutomationProperties.Name="Disabled preset"
                       IsEnabled="False"
                       Margin="{DynamicResource InsetRight8Bottom6}">
                 <SelectableTextBlock Text="Disabled preset"/>
@@ -633,10 +654,12 @@
                                    FontWeight="SemiBold"/>
               <WrapPanel Orientation="Horizontal">
                 <Button Classes="actionTextButton actionNeutral"
+                        AutomationProperties.Name="Button"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Button"/>
                 </Button>
                 <ToggleButton Classes="actionTextButton actionNeutral"
+                              AutomationProperties.Name="Checked"
                               IsChecked="True"
                               Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Checked"/>
@@ -649,6 +672,7 @@
                                      Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
                 </Button>
                 <Button Classes="actionTextButton actionNeutral"
+                        AutomationProperties.Name="Icon + text"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <Grid ColumnDefinitions="Auto,*"
                         ColumnSpacing="{DynamicResource Space6}">
@@ -660,6 +684,7 @@
                   </Grid>
                 </Button>
                 <Button Classes="actionTextButton actionNeutral"
+                        AutomationProperties.Name="Disabled"
                         IsEnabled="False"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Disabled"/>
@@ -671,10 +696,12 @@
                                    FontWeight="SemiBold"/>
               <WrapPanel Orientation="Horizontal">
                 <Button Classes="actionTextButton actionPrimary"
+                        AutomationProperties.Name="Button"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Button"/>
                 </Button>
                 <ToggleButton Classes="actionTextButton actionPrimary"
+                              AutomationProperties.Name="Checked"
                               IsChecked="True"
                               Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Checked"/>
@@ -687,6 +714,7 @@
                                      Glyph="{x:Static icons:IconGlyphs.PlayArrow}"/>
                 </Button>
                 <Button Classes="actionTextButton actionPrimary"
+                        AutomationProperties.Name="Icon + text"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <Grid ColumnDefinitions="Auto,*"
                         ColumnSpacing="{DynamicResource Space6}">
@@ -698,6 +726,7 @@
                   </Grid>
                 </Button>
                 <Button Classes="actionTextButton actionPrimary"
+                        AutomationProperties.Name="Disabled"
                         IsEnabled="False"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Disabled"/>
@@ -709,10 +738,12 @@
                                    FontWeight="SemiBold"/>
               <WrapPanel Orientation="Horizontal">
                 <Button Classes="actionTextButton actionDanger"
+                        AutomationProperties.Name="Button"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Button"/>
                 </Button>
                 <ToggleButton Classes="actionTextButton actionDanger"
+                              AutomationProperties.Name="Checked"
                               IsChecked="True"
                               Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Checked"/>
@@ -725,6 +756,7 @@
                                      Glyph="{x:Static icons:IconGlyphs.Remove}"/>
                 </Button>
                 <Button Classes="actionTextButton actionDanger"
+                        AutomationProperties.Name="Icon + text"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <Grid ColumnDefinitions="Auto,*"
                         ColumnSpacing="{DynamicResource Space6}">
@@ -736,6 +768,7 @@
                   </Grid>
                 </Button>
                 <Button Classes="actionTextButton actionDanger"
+                        AutomationProperties.Name="Disabled"
                         IsEnabled="False"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Disabled"/>
@@ -747,10 +780,12 @@
                                    FontWeight="SemiBold"/>
               <WrapPanel Orientation="Horizontal">
                 <Button Classes="actionTextButton actionGhost"
+                        AutomationProperties.Name="Button"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Button"/>
                 </Button>
                 <ToggleButton Classes="actionTextButton actionGhost"
+                              AutomationProperties.Name="Checked"
                               IsChecked="True"
                               Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Checked"/>
@@ -763,6 +798,7 @@
                                      Glyph="{x:Static icons:IconGlyphs.Edit}"/>
                 </Button>
                 <Button Classes="actionTextButton actionGhost"
+                        AutomationProperties.Name="Icon + text"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <Grid ColumnDefinitions="Auto,*"
                         ColumnSpacing="{DynamicResource Space6}">
@@ -774,6 +810,7 @@
                   </Grid>
                 </Button>
                 <Button Classes="actionTextButton actionGhost"
+                        AutomationProperties.Name="Disabled"
                         IsEnabled="False"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Disabled"/>
@@ -849,15 +886,18 @@
                                    FontWeight="SemiBold"/>
               <WrapPanel Orientation="Horizontal">
                 <Button Classes="actionChip chipAction"
+                        AutomationProperties.Name="Preset"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Preset"/>
                 </Button>
                 <ToggleButton Classes="actionChip chipAction"
+                              AutomationProperties.Name="Checked"
                               IsChecked="True"
                               Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Checked"/>
                 </ToggleButton>
                 <Button Classes="actionChip chipAction"
+                        AutomationProperties.Name="Disabled"
                         IsEnabled="False"
                         Margin="{DynamicResource InsetRight8Bottom6}">
                   <SelectableTextBlock Text="Disabled"/>

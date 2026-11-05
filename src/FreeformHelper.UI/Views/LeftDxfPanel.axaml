@@ -43,6 +43,7 @@
                                Text="{Binding DxfOverlapSummary}"/>
         </Grid>
         <Button Classes="workspaceActionButton"
+                AutomationProperties.Name="Overlap check"
                 Command="{Binding CheckDxfQualityCommand}"
                 ToolTip.Tip="Scan the current DXF for duplicates or overlaps.">
           <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -195,6 +196,7 @@
               <SelectableTextBlock Classes="dxfEditActionGroupLabel"
                                    Text="Hide / restore"/>
               <Button Classes="dangerTextButton dxfEditMiniAction"
+                      AutomationProperties.Name="Hide selected"
                       Command="{Binding DeleteSelectedCadPadsCommand}"
                       ToolTip.Tip="Hide selected CAD pads from current workflow (shortcut: Delete).">
                 <StackPanel Classes="dxfEditMiniActionContent"
@@ -209,6 +211,7 @@
               <Grid Classes="dxfEditActionGroupRow"
                     ColumnDefinitions="*,*">
                 <Button Grid.Column="0"
+                        AutomationProperties.Name="Undo hide"
                         Classes="dxfEditMiniAction"
                         Command="{Binding RestoreLastDeletedCadPadsCommand}"
                         ToolTip.Tip="Restore last hidden CAD batch.">
@@ -222,6 +225,7 @@
                   </StackPanel>
                 </Button>
                 <Button Grid.Column="1"
+                        AutomationProperties.Name="Show all"
                         Classes="dxfEditMiniAction"
                         Command="{Binding RestoreAllHiddenCadPadsCommand}"
                         IsEnabled="{Binding HasManualHiddenCadPads}"
@@ -243,6 +247,7 @@
               <SelectableTextBlock Classes="dxfEditActionGroupLabel"
                                    Text="Combine / split"/>
               <Button Classes="dxfEditMiniAction"
+                      AutomationProperties.Name="Combine"
                       Command="{Binding CombineSelectedCadPadsCommand}"
                       ToolTip.Tip="Combine selected CAD pads using geometry union (preserves shape).">
                 <StackPanel Classes="dxfEditMiniActionContent"
@@ -255,6 +260,7 @@
                 </StackPanel>
               </Button>
               <Button Classes="dxfEditMiniAction"
+                      AutomationProperties.Name="Split selected"
                       Command="{Binding ClearCombinedCadPadsCommand}"
                       IsEnabled="{Binding HasSelectedCombinedCadPadsForDxfEdit}"
                       ToolTip.Tip="Split selected combined CAD groups back into their source pads.">
@@ -274,6 +280,7 @@
         <Grid RowDefinitions="Auto,Auto"
               RowSpacing="{StaticResource Space6}">
           <ToggleButton Classes="workspaceFoldHeader"
+                        AutomationProperties.Name="Advanced edit"
                         Grid.Row="0"
                         HorizontalAlignment="Stretch"
                         IsChecked="{Binding IsDxfEditAdvancedPanelExpanded, Mode=TwoWay}">

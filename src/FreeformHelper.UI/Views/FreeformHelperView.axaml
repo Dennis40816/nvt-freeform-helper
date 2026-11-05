@@ -210,6 +210,7 @@
             <StackPanel Orientation="Horizontal"
                         Spacing="{StaticResource Space4}">
               <ToggleButton Classes="rightPanelBrowserTab"
+                            AutomationProperties.Name="Settings"
                             IsChecked="{Binding IsRightPanelSettingsTab, Mode=TwoWay}">
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource Space6}">
@@ -220,6 +221,7 @@
                 </StackPanel>
               </ToggleButton>
               <ToggleButton Classes="rightPanelBrowserTab"
+                            AutomationProperties.Name="Inspector"
                             IsChecked="{Binding IsRightPanelInspectorTab, Mode=TwoWay}">
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource Space6}">

@@ -93,6 +93,7 @@
                                      Text="{Binding MachineSummaryText}"/>
               </Grid>
               <ToggleButton Grid.Row="2"
+                            AutomationProperties.Name="Edit calibration"
                             Classes="actionNeutral actionTextButton simulationActionButton"
                             IsChecked="{Binding ShowCalibrationDetails, Mode=TwoWay}">
                 <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -297,6 +298,7 @@
                 </StackPanel>
               </Grid>
               <ToggleButton Grid.Row="4"
+                            AutomationProperties.Name="BIST center rect"
                             Classes="actionNeutral actionTextButton simulationActionButton"
                             IsChecked="{Binding ShowBistRectangle, Mode=TwoWay}">
                 <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -326,6 +328,7 @@
                                      Text="{Binding CustomArraySummaryText}"/>
               </Grid>
               <ToggleButton Grid.Row="1"
+                            AutomationProperties.Name="Show array"
                             Classes="actionNeutral actionTextButton simulationActionButton"
                             IsChecked="{Binding ShowCustomArray, Mode=TwoWay}">
                 <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -335,6 +338,7 @@
                 </Grid>
               </ToggleButton>
               <Button Grid.Row="2"
+                      AutomationProperties.Name="Use safe AA corners"
                       Classes="actionNeutral actionTextButton simulationActionButton"
                       Command="{Binding UseActiveAreaSafeCornersCommand}">
                 <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -438,6 +442,7 @@
                                            Value="{Binding CustomPointMachineY, Mode=TwoWay}"/>
                 </Grid>
                 <Button Classes="actionPrimary actionTextButton simulationActionButton"
+                        AutomationProperties.Name="Add point"
                         Command="{Binding AddCustomPointCommand}">
                   <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
                     <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
@@ -490,6 +495,7 @@
                                            Value="{Binding CustomPathStepCount, Mode=TwoWay}"/>
                 </Grid>
                 <Button Classes="actionPrimary actionTextButton simulationActionButton"
+                        AutomationProperties.Name="Add path"
                         Command="{Binding AddCustomPathCommand}">
                   <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
                     <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
@@ -511,6 +517,7 @@
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
               <Button Grid.Row="5"
+                      AutomationProperties.Name="Clear custom"
                       Classes="actionDanger actionTextButton simulationActionButton"
                       Command="{Binding ClearCustomArtifactsCommand}"
                       IsVisible="{Binding HasCustomArtifacts}">

@@ -197,6 +197,7 @@
     <Grid ColumnDefinitions="Auto,*"
           RowDefinitions="Auto">
       <ToggleButton x:Name="ViewMenuButton"
+                    AutomationProperties.Name="Display"
                     Classes="viewMenuButton"
                     ToolTip.Tip="Display options"
                     PointerPressed="ViewMenuButton_PointerPressed"

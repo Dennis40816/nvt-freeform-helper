@@ -64,6 +64,7 @@
                       <SelectableTextBlock Text="Uniform presets" FontWeight="SemiBold"/>
                       <WrapPanel Orientation="Horizontal">
                         <Button Classes="actionChip chipAction"
+                                AutomationProperties.Name="Uniform 400"
                                 Margin="{StaticResource InsetRight6Bottom6}"
                                 Command="{Binding ApplyManualPresetCommand}"
                                 CommandParameter="400">
@@ -78,6 +79,7 @@
                           </Grid>
                         </Button>
                         <Button Classes="actionChip chipAction"
+                                AutomationProperties.Name="Uniform 360"
                                 Margin="{StaticResource InsetRight6Bottom6}"
                                 Command="{Binding ApplyManualPresetCommand}"
                                 CommandParameter="360">
@@ -92,6 +94,7 @@
                           </Grid>
                         </Button>
                         <Button Classes="actionChip chipAction"
+                                AutomationProperties.Name="Zero"
                                 Margin="{StaticResource InsetRight6Bottom6}"
                                 Command="{Binding ApplyManualPresetCommand}"
                                 CommandParameter="0">
@@ -109,6 +112,7 @@
                     </StackPanel>
                     <StackPanel Spacing="{StaticResource Space8}">
                       <Button Classes="actionPrimary actionTextButton simulationActionButton"
+                              AutomationProperties.Name="Random"
                               Command="{Binding RandomizeVisibleValuesCommand}"
                               IsEnabled="{Binding CanRandomizeVisibleValues}">
                         <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -118,6 +122,7 @@
                         </Grid>
                       </Button>
                       <Button Classes="actionDanger actionTextButton simulationActionButton"
+                              AutomationProperties.Name="Clear all"
                               Command="{Binding ClearAllManualOverridesCommand}"
                               IsEnabled="{Binding HasManualOverrides}">
                         <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -148,6 +153,7 @@
                     </Border>
                     <StackPanel Spacing="{StaticResource Space8}">
                       <Button Classes="actionPrimary actionTextButton simulationActionButton"
+                              AutomationProperties.Name="Import CSV"
                               Command="{Binding ImportCsvCommand}"
                               IsEnabled="{Binding CanImportCsv}">
                         <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -157,6 +163,7 @@
                         </Grid>
                       </Button>
                       <Button Classes="actionDanger actionTextButton simulationActionButton"
+                              AutomationProperties.Name="Clear CSV"
                               Command="{Binding ClearCsvCommand}"
                               IsEnabled="{Binding HasCsvFiles}">
                         <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -342,6 +349,7 @@
                         <Grid ColumnDefinitions="*,*,*"
                               ColumnSpacing="{StaticResource Space6}">
                           <Button Classes="actionNeutral actionTextButton simulationActionButton"
+                                  AutomationProperties.Name="Start"
                                   Command="{Binding UseCurrentCopperAsPathStartCommand}">
                             <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
                               <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Edit}"/>
@@ -350,6 +358,7 @@
                             </Grid>
                           </Button>
                           <Button Grid.Column="1"
+                                  AutomationProperties.Name="End"
                                   Classes="actionNeutral actionTextButton simulationActionButton"
                                   Command="{Binding UseCurrentCopperAsPathEndCommand}">
                             <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
@@ -359,6 +368,7 @@
                             </Grid>
                           </Button>
                           <Button Grid.Column="2"
+                                  AutomationProperties.Name="Run"
                                   Classes="actionPrimary actionTextButton simulationActionButton"
                                   Command="{Binding ReplayCopperPathCommand}">
                             <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">

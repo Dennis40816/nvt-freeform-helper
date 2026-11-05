@@ -150,6 +150,7 @@
                   <StackPanel Orientation="Horizontal"
                               Spacing="{StaticResource Space8}">
                     <Button Classes="actionNeutral actionTextButton simulationActionButton"
+                            AutomationProperties.Name="Apply override"
                             Command="{Binding ApplySelectedOverrideCommand}">
                       <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
                         <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Edit}"/>
@@ -158,6 +159,7 @@
                       </Grid>
                     </Button>
                     <Button Classes="actionNeutral actionTextButton simulationActionButton"
+                            AutomationProperties.Name="Use global"
                             Command="{Binding ClearSelectedOverrideCommand}"
                             IsEnabled="{Binding HasSelectedOverride}">
                       <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">

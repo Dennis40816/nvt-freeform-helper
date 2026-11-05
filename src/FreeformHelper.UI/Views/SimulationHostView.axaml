@@ -33,6 +33,7 @@
                              Foreground="{DynamicResource BrushWarning}"
                              TextWrapping="Wrap"/>
         <Button Grid.Column="1"
+                AutomationProperties.Name="Refresh"
                 Classes="actionNeutral actionTextButton"
                 Command="{Binding OpenSimulationCommand}"
                 IsEnabled="{Binding CanOpenSimulation}">
@@ -80,6 +81,7 @@
                                    TextWrapping="Wrap"/>
             </Border>
             <Button Classes="actionNeutral actionTextButton"
+                    AutomationProperties.Name="Build from current workspace"
                     Command="{Binding OpenSimulationCommand}"
                     IsEnabled="{Binding CanOpenSimulation}">
               <Grid Classes="iconTextButtonContent"
@@ -120,6 +122,7 @@
                                Foreground="{DynamicResource BrushWarning}"
                                TextWrapping="Wrap"/>
           <Button Classes="actionNeutral actionTextButton"
+                  AutomationProperties.Name="Retry build"
                   Command="{Binding OpenSimulationCommand}"
                   IsEnabled="{Binding CanOpenSimulation}">
             <Grid Classes="iconTextButtonContent"

@@ -107,6 +107,7 @@
                 <Border Classes="workspaceSectionCard">
                   <StackPanel Spacing="{StaticResource Space8}">
                     <ToggleButton Classes="workspaceFoldHeader"
+                                  AutomationProperties.Name="EMS safety"
                                   IsChecked="{Binding IsSimulationSafetyExpanded, Mode=TwoWay}"
                                   ToolTip.Tip="{Binding SimulationSafetySummaryText}">
                       <Grid Classes="workspaceFoldHeaderContent"
