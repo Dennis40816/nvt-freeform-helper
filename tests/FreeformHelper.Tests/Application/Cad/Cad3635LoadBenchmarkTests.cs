@@ -67,6 +67,7 @@ public sealed class Cad3635LoadBenchmarkTests
         var catalogState = FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm);
         var useCase = new CadLoadUseCase(importService);
         var options = FreeformHelperViewModelPrivateAccess.BuildDxfOptions(vm);
+        Assert.NotNull(options);
 
         var total = Stopwatch.StartNew();
 
