@@ -234,6 +234,7 @@ public sealed partial class FreeformHelperViewModel
         var originalSuppressAppGeneralPersistence = _appGeneralPersistence.SuppressPersistence;
         _appGeneralPersistence.SuppressPersistence = true;
         _projectFile = file;
+        _projectGeneration++;
         InvalidateWorkflowDataSnapshot();
         _lastSavedPath = path;
         try

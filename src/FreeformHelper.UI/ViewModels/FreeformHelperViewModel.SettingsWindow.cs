@@ -14,6 +14,26 @@ public sealed partial class FreeformHelperViewModel
         return window;
     }
 
+    /// <summary>
+    /// Gets the number of the current project settings. It rises whenever the settings are replaced as a whole,
+    /// so a settings window draft opened earlier can tell that its values belong to a replaced project.
+    /// </summary>
+    internal int ProjectGeneration => _projectGeneration;
+
+    /// <summary>
+    /// Checks that a settings window draft still belongs to the current project settings.
+    /// A stale draft is refused with a status message and nothing is applied.
+    /// </summary>
+    /// <param name="draftGeneration">The <see cref="ProjectGeneration"/> the draft recorded when it was created.</param>
+    /// <returns><see langword="true"/> when the draft may be applied.</returns>
+    internal bool TryAcceptSettingsWindowDraft(int draftGeneration)
+    {
+        if (draftGeneration == _projectGeneration) return true;
+
+        SetStatus("Settings not saved: another project was loaded after this window opened. Reopen Settings to edit the current project.");
+        return false;
+    }
+
     internal void ApplySettingsWindowDraft(SettingsWindowViewModel draft)
     {
         ArgumentNullException.ThrowIfNull(draft);
@@ -261,6 +281,7 @@ public sealed partial class FreeformHelperViewModel
         var defaultsUi = new ProjectUiSnapshot();
 
         _projectFile.Settings = defaultsSettings;
+        _projectGeneration++;
         _projectFile.UiSnapshot = defaultsUi;
         _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.Clear();
         _projectFile.CadOutputFwDiffIndexAnchorCadPadId = null;

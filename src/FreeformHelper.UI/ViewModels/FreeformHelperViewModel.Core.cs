@@ -78,6 +78,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly SettingsSuppressionScopes _settingsSuppression = new();
     private readonly PendingLayerSelectionState _pendingLayerSelection = new(); // Holds the layer selection data that waits for the next CAD load or layer toggle.
     private ProjectFile _projectFile = new(); // The core project data model.
+    private int _projectGeneration; // Raised each time the project settings are replaced as a whole (project load, reset to defaults).
 
     /// <summary>
     /// Gets the <see cref="WorkspaceInteractionState"/> instance, which manages global UI interaction states

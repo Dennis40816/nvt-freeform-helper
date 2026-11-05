@@ -10,6 +10,7 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class SettingsWindowViewModel : ObservableObject
 {
     private readonly FreeformHelperViewModel _owner;
+    private readonly int _projectGeneration;
     internal UiEventRunner UiEvents => _owner.UiEvents;
     private bool _suppressNotchThresholdSync;
     private bool _suppressCompensationModelSync;
@@ -17,6 +18,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     public SettingsWindowViewModel(FreeformHelperViewModel owner)
     {
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        _projectGeneration = owner.ProjectGeneration;
 
         ScanOrderOptions = owner.ScanOrderOptions.ToList();
         var selectedScanOrder = ScanOrderOptions.FirstOrDefault(o => o.Value == owner.SelectedScanOrderOption.Value);
@@ -652,6 +654,13 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
 
     private void OnSave()
     {
+        // The window is not modal. A draft opened before another project was loaded must not overwrite that project.
+        if (!_owner.TryAcceptSettingsWindowDraft(_projectGeneration))
+        {
+            RequestClose?.Invoke();
+            return;
+        }
+
         _owner.ApplySettingsWindowDraft(this);
         _owner.ApplyActiveAreaPixelsDraft(ActiveAreaPixels);
         RequestClose?.Invoke();
