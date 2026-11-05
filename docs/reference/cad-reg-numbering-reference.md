@@ -44,7 +44,7 @@ Related code entry points:
 The row shown to users in the UI is top-origin:
 
 ```text
-UI row 0 = AA 視覺上方第一排
+UI row 0 = the visually top row of the AA
 ```
 
 UI rows and internal rows therefore convert as follows:
@@ -123,7 +123,7 @@ In the normal case:
 ```text
 CAD pad
   -> Step1 geometry best-match REG
-  -> matched REG 的 FW Diff idx
+  -> FW Diff idx of the matched REG
   -> CAD Output FW Diff idx
 ```
 

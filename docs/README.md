@@ -1,12 +1,12 @@
 # Docs Guide
-Last updated: 2026-07-20
+Last updated: 2026-11-05
 
-## New User Chinese Entry
+## New User Entry
 
 If you are new to this project or new to operating the app, read this first:
 
 1. `docs/guides/new-user-reading-guide.md`
-   - Chinese reading route for new users, role split, and which documents to skip for now.
+   - Reading route for new users, split by role, and which documents to skip for now.
 
 Shortest operating route:
 
@@ -17,7 +17,7 @@ Shortest operating route:
 3. `docs/diagrams/notch-simulation/zh-TW/README.md`
    - Entry for the Chinese flow diagrams for Notch table and Simulation.
 
-This section lists only documents that have a Chinese main text or an existing Chinese version. If a must-read document for new users exists only in English, add a Chinese version first before adding it here.
+Documents default to English (owner decision of 2026-10-05). The diagram library also has a `zh-TW` version.
 
 ## Document Structure
 
@@ -33,6 +33,16 @@ This section lists only documents that have a Chinese main text or an existing C
   - Canonical reference, external contracts, CLI design, and behavior inventory.
 - `docs/generated/`
   - Tool-generated documents; not maintained by hand.
+- `docs/agents/`
+  - Agent rules: domain docs, issue tracker, triage labels, PR body skeleton, and skill sources.
+- `docs/governance/`
+  - Branch, version, and release governance, and the development workflow.
+- `docs/handoff/`
+  - Handoff record format and the bug ledger.
+- `docs/reviews/`
+  - Dated review and planning records. They describe the code at their date.
+- `docs/flow/`
+  - Freeform workflow notes.
 - `docs/archive/`
   - Historical documents that have left the main line but are kept for traceability.
 
@@ -78,13 +88,13 @@ This group is the reading order for taking over maintenance or debugging. It is 
 - `docs/reference/cad-reg-numbering-reference.md`
 - `docs/reference/notch-overlay-h5-design.md`
 - `docs/reference/runtime-cli-plan.md`
-- `example/BOE36.35/notch_export_v21_current.c`
-- `example/BOE36.35/notch_export_v22_current.c`
+- `example/BOE36.35/notch_export_v21_current.c` (private `example/` submodule)
+- `example/BOE36.35/notch_export_v22_current.c` (private `example/` submodule)
 
 ## Do Not Start Here
 
 - `docs/archive/`: Kept for history; does not represent the current main line. Old repo scan reports are collected in `docs/archive/repo-refactor-scans/`.
-- `docs/guides/repo-refactor-scan-2026-06-26.md`: The latest scan record; suitable for tracking technical debt, not for onboarding.
+- `docs/guides/repo-refactor-scan-2026-07-06.md`: The latest scan record; suitable for tracking technical debt, not for onboarding.
 - `docs/generated/`: Tool-generated; not maintained by hand.
 - `docs/diagrams/notch-simulation/en/`: English diagram library; new users should start with `zh-TW`.
 - `docs/guides/*redesign-plan*.md`, `docs/guides/post-1.0-*`: Design proposals or later plans, not operating manuals.
