@@ -1339,7 +1339,7 @@ public sealed class NotchTableExporterTests
         return line;
     }
 
-    private static bool IsGccAvailable()
+    internal static bool IsGccAvailable()
     {
         using var process = new Process
         {
@@ -1374,7 +1374,7 @@ public sealed class NotchTableExporterTests
         }
     }
 
-    private static double[] RunCProgramWithGcc(string source)
+    internal static double[] RunCProgramWithGcc(string source)
     {
         var tempDirectory = TestFiles.NewTempFilePath("notch-runtime-", string.Empty);
         NotchGccTestDirectory.Create(tempDirectory);
@@ -1512,7 +1512,7 @@ extern NHC_DIFF_BUFFER g_stNhcDiffAfter;
 """);
     }
 
-    private static string CreateGccHarnessSource(string generatedSource) =>
+    internal static string CreateGccHarnessSource(string generatedSource) =>
         string.Concat(
             "#include <stdint.h>\ntypedef int32_t INT32;\n",
             generatedSource,
