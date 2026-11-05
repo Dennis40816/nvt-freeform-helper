@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json;
 using FreeformHelper.Application.Export;
@@ -58,8 +57,8 @@ public sealed class NotchExampleCExportDriftTests
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
         var cad = NotchCurrentWorkflowTableTestHelper.GetExportCadPadSet(vm);
-        var grid = GetPrivateField<RegularGrid>(vm, "_grid");
-        var project = GetPrivateField<ProjectFile>(vm, "_projectFile");
+        var grid = Assert.IsType<RegularGrid>(FreeformHelperViewModelPrivateAccess.Grid(vm));
+        var project = Assert.IsType<ProjectFile>(FreeformHelperViewModelPrivateAccess.ProjectFile(vm));
 
         var exportTable = await NotchCurrentWorkflowTableTestHelper.GenerateExportTableAsync(
             vm,
@@ -128,12 +127,5 @@ public sealed class NotchExampleCExportDriftTests
         return Path.GetFullPath(Path.Combine(
             repoRoot,
             relativePath!.Replace('/', Path.DirectorySeparatorChar)));
-    }
-
-    private static T GetPrivateField<T>(FreeformHelperViewModel vm, string fieldName)
-    {
-        var field = typeof(FreeformHelperViewModel).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return Assert.IsType<T>(field!.GetValue(vm));
     }
 }

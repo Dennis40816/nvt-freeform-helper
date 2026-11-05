@@ -1,4 +1,5 @@
 using Avalonia.Media;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -92,7 +93,7 @@ public sealed partial class FreeformHelperViewModelTests
     public void Undo_InsideOuterSuppression_KeepsRecordingSuppressed()
     {
         var vm = new FreeformHelperViewModel();
-        var suppression = GetPrivateField<UndoSuppression>(vm, "_undoSuppression");
+        var suppression = FreeformHelperViewModelPrivateAccess.UndoSuppression(vm);
         var original = vm.ShowCad;
         vm.ShowCad = !original;
         Assert.True(vm.CanUndo);
@@ -117,7 +118,7 @@ public sealed partial class FreeformHelperViewModelTests
     public void Undo_OutsideSuppression_DoesNotRecordItsActionAndRestoresRecording()
     {
         var vm = new FreeformHelperViewModel();
-        var suppression = GetPrivateField<UndoSuppression>(vm, "_undoSuppression");
+        var suppression = FreeformHelperViewModelPrivateAccess.UndoSuppression(vm);
         var original = vm.ShowCad;
         vm.ShowCad = !original;
         Assert.True(vm.CanUndo);

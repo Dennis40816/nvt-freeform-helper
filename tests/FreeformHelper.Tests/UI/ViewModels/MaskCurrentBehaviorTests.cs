@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Reflection;
 using System.Text;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
@@ -99,7 +98,7 @@ public sealed class MaskCurrentBehaviorTests
             Assert.Equal(0, mask.ActiveRegularCount);
             Assert.Contains("not loaded", vm.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
 
-            var grid = GetField<RegularGrid>(vm, "_grid");
+            var grid = Assert.IsType<RegularGrid>(FreeformHelperViewModelPrivateAccess.Grid(vm));
             Assert.Equal(1, grid.Rows);
             Assert.Equal(2, grid.Cols);
             var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
@@ -133,8 +132,8 @@ public sealed class MaskCurrentBehaviorTests
                 CadOutputFwDiffAutoMode = CadOutputFwDiffAutoMode.BestMatchDirect,
             };
             await vm.WaitForGridRebuildIdleAsync();
-            SetField(vm, "_grid", grid);
-            SetField(vm, "_cad", cad);
+            FreeformHelperViewModelPrivateAccess.Grid(vm) = grid;
+            FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
             vm.WorkflowDataForTests.LatestPadMatch = PadMatcher.Match(cad, grid);
             vm.CadPads = new ObservableCollection<CadPad>([pad]);
             vm.RegularPads = new ObservableCollection<RegularPad>(grid.Pads);
@@ -174,24 +173,5 @@ public sealed class MaskCurrentBehaviorTests
             File.Delete(initialPath);
             File.Delete(changedPath);
         }
-    }
-
-    private static T GetField<T>(FreeformHelperViewModel vm, string name)
-    {
-        return Assert.IsType<T>(GetFieldValue(vm, name));
-    }
-
-    private static object? GetFieldValue(FreeformHelperViewModel vm, string name)
-    {
-        var field = typeof(FreeformHelperViewModel).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return field.GetValue(vm);
-    }
-
-    private static void SetField(FreeformHelperViewModel vm, string name, object value)
-    {
-        var field = typeof(FreeformHelperViewModel).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        field.SetValue(vm, value);
     }
 }

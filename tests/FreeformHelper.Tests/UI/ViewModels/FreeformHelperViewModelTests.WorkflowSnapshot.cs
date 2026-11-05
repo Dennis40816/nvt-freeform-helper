@@ -1,5 +1,6 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
+using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -25,22 +26,14 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Equal(2, vm.WorkflowDataSnapshotBuildCount);
     }
 
-    private static object BuildWorkflowDataSnapshot(FreeformHelperViewModel vm)
+    private static WorkflowDataSnapshot BuildWorkflowDataSnapshot(FreeformHelperViewModel vm)
     {
-        var method = typeof(FreeformHelperViewModel).GetMethod(
-            "BuildWorkflowDataSnapshot",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        return method!.Invoke(vm, null)!;
+        return FreeformHelperViewModelPrivateAccess.BuildWorkflowDataSnapshot(vm);
     }
 
     private static void InvalidateWorkflowDataSnapshot(FreeformHelperViewModel vm)
     {
-        var method = typeof(FreeformHelperViewModel).GetMethod(
-            "InvalidateWorkflowDataSnapshot",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        method!.Invoke(vm, null);
+        vm.InvalidateWorkflowDataSnapshot();
     }
 
     [AvaloniaFact]
