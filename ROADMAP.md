@@ -205,6 +205,9 @@ The owner scheduled these five batches after the NVT Core 1.0.0 release (the tar
 - [ ] **EXPORT-IMG Export layer image: several layers on one sheet, with a live preview** · Target: - · Status: In progress: the design is approved (owner, 2026-11-05) and the code is on `feature/export/layer-image-modal`; AA-PIXELS has merged · PR: [#262](https://github.com/Dennis40816/nvt-freeform-helper/pull/262)
   - Replaces the single-layer dropdown window of Export DXF Layer Image. Layers are picked with check marks. The preview updates with every setting. One main action: Export.
   - Single-layer output keeps the same coordinates, colors and encoders (static comparison, no golden file yet). The size can default to the AA pixel counts (AA-PIXELS) when they are set.
+- [ ] **DXF-IMPORT-ROBUSTNESS The DXF importer hung or aborted on malformed input** · Target: - · Status: Fix in review on `fix/dxf/import-robustness` · PR: - (pending)
+  - Found by the cloud malformed-input run (2026-11-05). A bad number aborted the whole import with a bare `FormatException`, and `0,5` was read as 5. Infinity and overflowing literals reached the pads, a ring that collapsed to two vertices threw, and an INSERT array count or a nested INSERT chain could expand to billions of pads (hang or out-of-memory).
+  - The importer now parses numbers with invariant rules and throws `InvalidDataException` with the group code and text, drops non-finite vertices like NaN, checks the vertex count after the closing vertex is removed, and caps INSERT expansion per axis, per INSERT and per import. A layer table cut before `ENDTAB` (low) is still open.
 - [ ] **UI-REDESIGN Redesign the whole NFH UI** · Target: - · Status: Waiting for owner (scope and timing) · PR: -
   - Owner, 2026-10-18, on the right-panel text proposal: 「可以，但由於 NFH 是很久之前設計，理論上是整個都要大改」 ("Yes, but NFH was designed long ago, so in principle all of it needs a major redesign").
 
