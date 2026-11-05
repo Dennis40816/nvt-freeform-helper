@@ -1010,6 +1010,117 @@ public sealed class NotchTableExporterTests
         }
     }
 
+    [Fact]
+    public void ExportAsCInitializer_V21_AvoidsSignedRightShiftAndDeviationMarker()
+    {
+        var v21 = ExportV21Q7NegativeSourceTable();
+        var v22 = NotchTableExporter.ExportAsCInitializer(
+            new NotchTable([new NotchTableRow(icIndex: 0, diffIndex: 0, regularPadIndex: 0, cadPadId: 1, v22Node: new NotchV22Node(0, 80, 1, 25, 65535, 0, 0), comment: "v22")]),
+            CreateCadSet(),
+            TestGeometryFactory.CreateLinearRegularGrid([0]),
+            CreateProjectSettings(),
+            NotchExportProfile.Release);
+
+        Assert.DoesNotContain(">>", v21, StringComparison.Ordinal);
+        Assert.DoesNotContain("NHC-DEV-01", v21, StringComparison.Ordinal);
+        Assert.Equal(1, CountOccurrences(v21, "static INT32 FUNC_NHC_ScaleQ7Floor(INT32 s32Product)"));
+        Assert.Equal(4, CountOccurrences(v21, "FUNC_NHC_ScaleQ7Floor(((INT32)"));
+        Assert.DoesNotContain("FUNC_NHC_ScaleQ7Floor", v22, StringComparison.Ordinal);
+        Assert.DoesNotContain(">>", v22, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ExportAsCInitializer_V21Q7Scale_EqualsArithmeticShiftForEveryInt16TimesUint8Product()
+    {
+        if (!IsGccAvailable())
+        {
+            return;
+        }
+
+        var generatedSource = ExportV21Q7NegativeSourceTable();
+
+        // The product of an INT16 source and a UINT8 ratio lies in [-8355840, 8355585].
+        var mismatches = RunCProgramWithGcc(string.Concat(
+            CreateGccHarnessSource(generatedSource),
+            """
+
+#include <stdio.h>
+
+int main(void)
+{
+    long mismatches = 0;
+    for (INT32 product = -8400000; product <= 8400000; ++product)
+    {
+        if (FUNC_NHC_ScaleQ7Floor(product) != (product >> 7))
+        {
+            ++mismatches;
+        }
+    }
+
+    printf("%ld\n", mismatches);
+    return 0;
+}
+"""));
+
+        Assert.Equal([0d], mismatches);
+    }
+
+    [Theory]
+    [InlineData(-3, -1)]
+    [InlineData(-127, -38)]
+    [InlineData(-128, -38)]
+    [InlineData(0, 0)]
+    [InlineData(3, 0)]
+    [InlineData(127, 37)]
+    public void ExportAsCInitializer_V21Q7Scale_RoundsTowardNegativeInfinityForNegativeSources(int sourceBefore, int expectedDestination)
+    {
+        if (!IsGccAvailable())
+        {
+            return;
+        }
+
+        var generatedSource = ExportV21Q7NegativeSourceTable();
+
+        var firmware = RunCProgramWithGcc(CreateSingleIcRuntimeParityHarnessSource(
+            generatedSource,
+            [0, 1],
+            [sourceBefore, 0]));
+
+        // The export is a transfer: the source pad gives up what the destination pad receives.
+        Assert.Equal([sourceBefore - expectedDestination, expectedDestination], firmware);
+    }
+
+    private static string ExportV21Q7NegativeSourceTable() =>
+        NotchTableExporter.ExportAsCInitializer(
+            new NotchTable(
+            [
+                new NotchTableRow(
+                    NotchAlgorithmVersion.V21,
+                    icIndex: 0,
+                    diffIndex: 0,
+                    regularPadIndex: 0,
+                    cadPadId: 1,
+                    values: [0, 100, 100, 1, 1, 38, 65535, 0, 0],
+                    comment: "Q7=38 ADD"),
+            ]),
+            CreateCadSet(),
+            TestGeometryFactory.CreateLinearRegularGrid([0, 1]),
+            CreateProjectSettings(),
+            NotchExportProfile.Debug);
+
+    private static int CountOccurrences(string text, string value)
+    {
+        var count = 0;
+        var index = text.IndexOf(value, StringComparison.Ordinal);
+        while (index >= 0)
+        {
+            count++;
+            index = text.IndexOf(value, index + value.Length, StringComparison.Ordinal);
+        }
+
+        return count;
+    }
+
     private static CadPadSet CreateCadSet()
     {
         var polygon = new Polygon2(new[]
