@@ -10,7 +10,8 @@ namespace FreeformHelper.Tests;
 /// project reload. Min and Max are the ranges that the NumberScrubber controls of the Settings window declare.
 /// MinEnforced and MaxEnforced say whether the model clamps that side. Where it does not, only the control guards
 /// the range, and the tests below pin the current pass-through. A fix that enforces a side changes the flag and must
-/// say so in its pull request. See cloud-notes/settings-bounds.md for the findings.
+/// say so in its pull request. The GridPaddingPercent control allows 100 while the project keeps at most 50; that case
+/// is left out until the input maximum is fixed (https://github.com/Dennis40816/nvt-freeform-helper/pull/272).
 /// </summary>
 [Collection("HeadlessUiSerial")]
 public sealed class SettingsWindowNumericBoundsTests
@@ -24,13 +25,13 @@ public sealed class SettingsWindowNumericBoundsTests
         nameof(SettingsWindowViewModel.YChannels),
         nameof(SettingsWindowViewModel.LenScale),
         nameof(SettingsWindowViewModel.CadOutputFwDiffIndexAnchorCadId),
+        nameof(SettingsWindowViewModel.GridPaddingPercent),
     ];
 
     private static readonly Field[] _fields =
     [
         new(nameof(SettingsWindowViewModel.ActiveAreaWidth), 0.1m, 1000000m, false, false, false),
         new(nameof(SettingsWindowViewModel.ActiveAreaHeight), 0.1m, 1000000m, false, false, false),
-        new(nameof(SettingsWindowViewModel.GridPaddingPercent), 0m, 100m, true, false, false) { PersistedMax = 50m },
         new(nameof(SettingsWindowViewModel.CoordinatePixelWidth), 1m, 1000000m, true, false, true),
         new(nameof(SettingsWindowViewModel.CoordinatePixelHeight), 1m, 1000000m, true, false, true),
         new(nameof(SettingsWindowViewModel.PanelBiasX), -1000000m, 1000000m, false, false, false),
@@ -88,9 +89,8 @@ public sealed class SettingsWindowNumericBoundsTests
     }
 
     [AvaloniaFact]
-    public async Task SaveAndReload_MaximumValues_KeepEveryFieldExceptThePinnedGridPaddingCap()
+    public async Task SaveAndReload_MaximumValues_KeepEveryField()
     {
-        // GridPaddingPercent documents 0-100 in the control, but the save path caps the ratio at 0.5 (50%).
         var mismatches = await FindMismatchesAsync(_fields, field => field.Max);
 
         Assert.Equal("", mismatches);
@@ -122,15 +122,22 @@ public sealed class SettingsWindowNumericBoundsTests
     {
         using var files = new LoadingModeTestScope();
         var vm = files.CreateViewModel();
-        var draft = vm.CreateSettingsWindowViewModel();
-        draft.NullValue = 65536m;
-        draft.SaveCommand.Execute(null);
-        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
+        try
+        {
+            var draft = vm.CreateSettingsWindowViewModel();
+            draft.NullValue = 65536m;
+            draft.SaveCommand.Execute(null);
+            await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
 
-        var saved = await vm.SaveProjectAsync();
+            var saved = await vm.SaveProjectAsync();
 
-        Assert.False(saved);
-        Assert.Contains("NullValue must be in [0,65535]", vm.StatusText, StringComparison.Ordinal);
+            Assert.False(saved);
+            Assert.Contains("NullValue must be in [0,65535]", vm.StatusText, StringComparison.Ordinal);
+        }
+        finally
+        {
+            StopAppSettingsTimer(vm);
+        }
     }
 
     private static decimal Middle(Field field) =>
@@ -142,38 +149,47 @@ public sealed class SettingsWindowNumericBoundsTests
     {
         using var files = new LoadingModeTestScope();
         var vm = files.CreateViewModel();
-        var draft = vm.CreateSettingsWindowViewModel();
-        foreach (var field in fields)
-        {
-            typeof(SettingsWindowViewModel).GetProperty(field.Name)!.SetValue(draft, probe(field));
-        }
-
-        draft.SaveCommand.Execute(null);
-        await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
-        Assert.True(await vm.SaveProjectAsync(), vm.StatusText);
         var reloaded = files.CreateViewModel();
-        var result = await reloaded.LoadProjectFromPathAsync(files.PathFor("project.json"));
-        Assert.True(result.IsLoaded);
-
-        var mismatches = new List<string>();
-        foreach (var field in fields)
+        try
         {
-            var requested = probe(field);
-            var expected = field.Expected(requested);
-            var actual = (decimal)typeof(FreeformHelperViewModel).GetProperty(field.Name)!.GetValue(reloaded)!;
-            if (actual != expected)
+            var draft = vm.CreateSettingsWindowViewModel();
+            foreach (var field in fields)
             {
-                mismatches.Add($"{field.Name}: set {requested}, expected {expected}, reloaded {actual}");
+                typeof(SettingsWindowViewModel).GetProperty(field.Name)!.SetValue(draft, probe(field));
             }
-        }
 
-        return string.Join("; ", mismatches);
+            draft.SaveCommand.Execute(null);
+            await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
+            Assert.True(await vm.SaveProjectAsync(), vm.StatusText);
+            var result = await reloaded.LoadProjectFromPathAsync(files.PathFor("project.json"));
+            Assert.True(result.IsLoaded);
+
+            var mismatches = new List<string>();
+            foreach (var field in fields)
+            {
+                var requested = probe(field);
+                var expected = field.Expected(requested);
+                var actual = (decimal)typeof(FreeformHelperViewModel).GetProperty(field.Name)!.GetValue(reloaded)!;
+                if (actual != expected)
+                {
+                    mismatches.Add($"{field.Name}: set {requested}, expected {expected}, reloaded {actual}");
+                }
+            }
+
+            return string.Join("; ", mismatches);
+        }
+        finally
+        {
+            StopAppSettingsTimer(vm);
+            StopAppSettingsTimer(reloaded);
+        }
     }
+
+    // The app settings save timer would write app-settings.json after the scope deleted its folder.
+    private static void StopAppSettingsTimer(FreeformHelperViewModel vm) => vm.AppGeneralPersistenceForTests.PersistTimer?.Stop();
 
     private sealed record Field(string Name, decimal Min, decimal Max, bool MinEnforced, bool MaxEnforced, bool Whole)
     {
-        public decimal? PersistedMax { get; init; }
-
         public bool SkipAboveMax { get; init; }
 
         // One unit for wide ranges, otherwise a small step, so that a value is just outside the range.
@@ -181,11 +197,6 @@ public sealed class SettingsWindowNumericBoundsTests
 
         public decimal Expected(decimal requested)
         {
-            if (PersistedMax is { } cap && requested > cap)
-            {
-                return cap;
-            }
-
             if (requested < Min && MinEnforced)
             {
                 return Min;

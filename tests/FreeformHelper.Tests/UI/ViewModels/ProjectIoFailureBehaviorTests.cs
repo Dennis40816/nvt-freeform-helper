@@ -320,6 +320,19 @@ public sealed class ProjectIoFailureBehaviorTests
 
     [AvaloniaTheory]
     [MemberData(nameof(ExportKinds))]
+    public async Task Export_NormalTarget_WritesTheFileAndReportsSuccess(string kind)
+    {
+        using var files = new IoFailureScope();
+        using var export = await ExportHarness.CreateAsync(kind);
+        var target = files.PathFor($"out.{export.Extension}");
+
+        await export.RunAsync(target);
+
+        export.AssertReportedSuccess(target);
+    }
+
+    [AvaloniaTheory]
+    [MemberData(nameof(ExportKinds))]
     public async Task Export_TargetFolderMissing_ReportsErrorAndCreatesNothing(string kind)
     {
         using var files = new IoFailureScope();
@@ -330,7 +343,7 @@ public sealed class ProjectIoFailureBehaviorTests
 
         await export.RunAsync(target);
 
-        export.AssertReportedFailure();
+        export.AssertReportedFailure(target);
         Assert.False(Directory.Exists(missingFolder));
         Assert.Equal(before, files.Snapshot());
     }
@@ -347,7 +360,7 @@ public sealed class ProjectIoFailureBehaviorTests
 
         await export.RunAsync(target);
 
-        export.AssertReportedFailure();
+        export.AssertReportedFailure(target);
         Assert.Equal(before, files.Snapshot());
     }
 
@@ -364,7 +377,7 @@ public sealed class ProjectIoFailureBehaviorTests
 
         await export.RunAsync(target);
 
-        export.AssertReportedFailure();
+        export.AssertReportedFailure(target);
         Assert.Equal("previous export", IoFailureScope.DecodeUtf8(target));
         Assert.Equal(before, files.Snapshot());
     }
@@ -384,7 +397,7 @@ public sealed class ProjectIoFailureBehaviorTests
             await export.RunAsync(target);
         }
 
-        export.AssertReportedFailure();
+        export.AssertReportedFailure(target);
         Assert.Equal("previous export", IoFailureScope.DecodeUtf8(target));
         Assert.Equal(before, files.Snapshot());
     }
@@ -394,6 +407,7 @@ public sealed class ProjectIoFailureBehaviorTests
         private readonly string _kind;
         private readonly OperationProgressLifecycleTestScope _scope;
         private readonly FreeformHelperViewModel _vm;
+        private int _pickerCalls;
 
         private ExportHarness(string kind, OperationProgressLifecycleTestScope scope, FreeformHelperViewModel vm)
         {
@@ -407,25 +421,60 @@ public sealed class ProjectIoFailureBehaviorTests
         public static async Task<ExportHarness> CreateAsync(string kind)
         {
             var scope = new OperationProgressLifecycleTestScope();
-            var vm = kind == "dxf" ? await scope.CreateLoadedAsync() : await scope.CreateExportReadyAsync();
-            return new ExportHarness(kind, scope, vm);
+            try
+            {
+                var vm = kind == "dxf" ? await scope.CreateLoadedAsync() : await scope.CreateExportReadyAsync();
+                return new ExportHarness(kind, scope, vm);
+            }
+            catch
+            {
+                scope.Dispose();
+                throw;
+            }
         }
 
         public async Task RunAsync(string target)
         {
             if (_kind == "dxf")
             {
-                _vm.PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(target);
+                _vm.PickSaveExportPathAsync = (_, _) => PickTargetAsync(target);
                 await _vm.ExportDxfAllCommand.ExecuteAsync(null);
             }
             else
             {
-                _vm.PickSaveNotchPathAsync = (_, _) => Task.FromResult<string?>(target);
+                _vm.PickSaveNotchPathAsync = (_, _) => PickTargetAsync(target);
                 await _vm.ExportNotchCommand.ExecuteAsync(null);
             }
         }
 
-        public void AssertReportedFailure()
+        private Task<string?> PickTargetAsync(string target)
+        {
+            _pickerCalls++;
+            return Task.FromResult<string?>(target);
+        }
+
+        /// <summary>Proves the export reached the file system: the path picker ran once and the status names the target file.</summary>
+        public void AssertReportedFailure(string target)
+        {
+            Assert.Equal(1, _pickerCalls);
+            AssertFailureText();
+            var fileName = Path.GetFileName(target);
+            Assert.Contains(fileName, _vm.StatusText, StringComparison.Ordinal);
+            if (_kind == "notch")
+            {
+                Assert.Contains(fileName, _vm.NotchExportProgressText, StringComparison.Ordinal);
+            }
+        }
+
+        public void AssertReportedSuccess(string target)
+        {
+            Assert.Equal(1, _pickerCalls);
+            Assert.Contains("exported", _vm.StatusText, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("failed", _vm.StatusText, StringComparison.OrdinalIgnoreCase);
+            Assert.True(new FileInfo(target).Length > 0);
+        }
+
+        private void AssertFailureText()
         {
             Assert.Contains("failed", _vm.StatusText, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain("exported", _vm.StatusText, StringComparison.OrdinalIgnoreCase);
@@ -436,7 +485,11 @@ public sealed class ProjectIoFailureBehaviorTests
             }
         }
 
-        public void Dispose() => _scope.Dispose();
+        public void Dispose()
+        {
+            IoFailureScope.StopAppSettingsTimer(_vm);
+            _scope.Dispose();
+        }
     }
 }
 
@@ -444,15 +497,26 @@ internal sealed class IoFailureScope : IDisposable
 {
     private readonly DirectoryInfo _directory = TestFiles.CreateTempDirectory();
 
+    // The app settings store lives in its own folder, so a late app-settings.json never lands in the folder under assertion.
+    private readonly DirectoryInfo _settingsDirectory = TestFiles.CreateTempDirectory();
+    private readonly List<FreeformHelperViewModel> _viewModels = [];
+
     public string Root => _directory.FullName;
 
     public string PathFor(string name) => Path.Combine(_directory.FullName, name);
 
-    public FreeformHelperViewModel CreateViewModel() => new(new AppGeneralSettingsStore(PathFor("app-settings.json")))
+    public FreeformHelperViewModel CreateViewModel()
     {
-        ApplyAppVisualPreferencesOnProjectLoad = false,
-        ConfirmEmbedDxfAsync = () => Task.FromResult(false),
-    };
+        var vm = new FreeformHelperViewModel(new AppGeneralSettingsStore(Path.Combine(_settingsDirectory.FullName, "app-settings.json")))
+        {
+            ApplyAppVisualPreferencesOnProjectLoad = false,
+            ConfirmEmbedDxfAsync = () => Task.FromResult(false),
+        };
+        _viewModels.Add(vm);
+        return vm;
+    }
+
+    public static void StopAppSettingsTimer(FreeformHelperViewModel vm) => vm.AppGeneralPersistenceForTests.PersistTimer?.Stop();
 
     public static void MakeDirty(FreeformHelperViewModel vm)
     {
@@ -537,6 +601,12 @@ internal sealed class IoFailureScope : IDisposable
 
     public void Dispose()
     {
+        foreach (var vm in _viewModels)
+        {
+            StopAppSettingsTimer(vm);
+        }
+
+        _settingsDirectory.Delete(recursive: true);
         foreach (var file in Directory.EnumerateFiles(_directory.FullName, "*", SearchOption.AllDirectories))
         {
             File.SetAttributes(file, FileAttributes.Normal);
