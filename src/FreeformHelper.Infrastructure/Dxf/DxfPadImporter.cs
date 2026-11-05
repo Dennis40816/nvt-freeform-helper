@@ -86,6 +86,7 @@ public sealed partial class DxfPadImporter
 
         if (options.IncludeBlockPolylines && modelInserts.Count > 0)
         {
+            new InsertExpansionCounter(blocks).Validate(modelInserts);
             var recursionStack = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var insert in modelInserts)
             {
