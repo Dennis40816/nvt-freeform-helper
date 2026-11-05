@@ -17,18 +17,18 @@ public sealed partial class DxfPadImporter
         List<Point2> vertices,
         DxfImportOptions options)
     {
-        // Filter out any points that might have incomplete (NaN) coordinates.
-        var vs = vertices.Where(p => !double.IsNaN(p.X) && !double.IsNaN(p.Y)).ToList();
-        // A polygon must have at least 3 vertices.
-        if (vs.Count < 3)
-        {
-            return;
-        }
-
+        // Filter out incomplete or non-finite coordinates before validating the ring.
+        var vs = vertices.Where(HasFiniteCoordinates).ToList();
         // Some DXF writers might repeat the first vertex at the end. Remove it if present.
         if (vs.Count >= 2 && vs[0].DistanceTo(vs[^1]) < 1e-9) // Using a small epsilon for double comparison
         {
             vs.RemoveAt(vs.Count - 1);
+        }
+
+        // A polygon must have at least 3 vertices after removing the closing vertex.
+        if (vs.Count < 3)
+        {
+            return;
         }
 
         var isClosed = closed;
@@ -45,12 +45,17 @@ public sealed partial class DxfPadImporter
 
     private static List<Point2> NormalizeVertices(IEnumerable<Point2> vertices)
     {
-        var vs = vertices.Where(p => !double.IsNaN(p.X) && !double.IsNaN(p.Y)).ToList();
+        var vs = vertices.Where(HasFiniteCoordinates).ToList();
         if (vs.Count >= 2 && vs[0].DistanceTo(vs[^1]) < 1e-9)
         {
             vs.RemoveAt(vs.Count - 1);
         }
 
         return vs;
+    }
+
+    private static bool HasFiniteCoordinates(Point2 point)
+    {
+        return double.IsFinite(point.X) && double.IsFinite(point.Y);
     }
 }

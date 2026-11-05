@@ -45,10 +45,17 @@ public sealed partial class DxfPadImporter
     /// (important for DXF which uses '.' as a decimal separator universally).
     /// </summary>
     /// <param name="s">The string representation of the double.</param>
+    /// <param name="groupCode">The DXF group code associated with the value.</param>
     /// <returns>The parsed double value.</returns>
-    private static double ParseDouble(string s)
+    private static double ParseDouble(string s, int groupCode)
     {
-        return double.Parse(s, CultureInfo.InvariantCulture);
+        if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+        {
+            return value;
+        }
+
+        var badText = s[..Math.Min(s.Length, 40)];
+        throw new InvalidDataException(FormattableString.Invariant($"Invalid DXF number for group code {groupCode}: '{badText}'."));
     }
 
     private static int ParseInt(string s, int fallback)
