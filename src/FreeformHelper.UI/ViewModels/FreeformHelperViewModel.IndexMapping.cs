@@ -61,52 +61,68 @@ public sealed partial class FreeformHelperViewModel
                 workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId,
                 reportProgress));
 
-            var issueMessages = res.Report.SampleIssues.Select(i => $"[{i.Kind}] {i.Message}").ToList();
-
-            MappingDiagnosticsResult = new MappingDiagnosticsResult(
-                res.Report.HasIssues
-                    ? $"Diagnostics warnings: {res.Report.Summary}"
-                    : $"Diagnostics OK: {res.Report.Summary}",
-                new ObservableCollection<string>(issueMessages),
-                HasIssues: (res.Report.HasIssues && res.Report.SampleIssues.Count > 0) ||
-                           res.Report.MaskChangedCount > 0 ||
-                           res.Report.MaskRemovedCount > 0);
-
-            SetStatus(BuildMappingStatusForWorkspaceHeader(res.Report));
+            ApplyMappingDiagnosticsReport(res.Report);
 
             if (OpenIndexMappingReportAsync is not null &&
                 (res.Report.TotalIssueCount > 0 ||
                  (res.Report.MaskAuditRows?.Count ?? 0) > 0))
             {
-                var reportViewModel = new IndexMappingReportViewModel(
-                    DxfRegularMappingSummary,
-                    res.Report,
-                    LocateMappingTargetFromReport,
-                    ApplyMappingOverrideFromReport,
-                    ApplyCadOutputFwDiffOverrideFromReport,
-                    ClearMappingOverrideFromReport,
-                    GetMappingOverrideRegularIndex);
-                reportViewModel.Editing.AttachProject(this);
+                var reportViewModel = CreateIndexMappingReportViewModel(res.Report);
                 await OpenIndexMappingReportAsync(reportViewModel);
             }
 
-            if (res.Report.HasIssues)
-            {
-                _logger.Warn(CultureInfo.InvariantCulture, "DXF/Regular mapping warnings: {0}", res.Report.Summary);
-                foreach (var issue in res.Report.SampleIssues.Take(10))
-                {
-                    _logger.Warn(CultureInfo.InvariantCulture, "Mapping issue: {0}", issue.Message);
-                }
-            }
-            else
-            {
-                _logger.Info(CultureInfo.InvariantCulture, "DXF/Regular mapping OK: {0}", res.Report.Summary);
-            }
+            LogMappingDiagnosticsReport(res.Report);
 
             OnWorkflowStepCompleted(
                 WorkflowStepId.Step4IndexDiagnostics,
                 invalidateDownstream: false,
                 moveToNextStep: true);
+        }
+    }
+
+    private void ApplyMappingDiagnosticsReport(DxfRegularMappingReport report)
+    {
+        var issueMessages = report.SampleIssues.Select(i => $"[{i.Kind}] {i.Message}").ToList();
+
+        MappingDiagnosticsResult = new MappingDiagnosticsResult(
+            report.HasIssues
+                ? $"Diagnostics warnings: {report.Summary}"
+                : $"Diagnostics OK: {report.Summary}",
+            new ObservableCollection<string>(issueMessages),
+            HasIssues: (report.HasIssues && report.SampleIssues.Count > 0) ||
+                       report.MaskChangedCount > 0 ||
+                       report.MaskRemovedCount > 0);
+
+        SetStatus(BuildMappingStatusForWorkspaceHeader(report));
+    }
+
+    private IndexMappingReportViewModel CreateIndexMappingReportViewModel(DxfRegularMappingReport report)
+    {
+        var reportViewModel = new IndexMappingReportViewModel(
+            DxfRegularMappingSummary,
+            report,
+            LocateMappingTargetFromReport,
+            ApplyMappingOverrideFromReport,
+            ApplyCadOutputFwDiffOverrideFromReport,
+            ClearMappingOverrideFromReport,
+            GetMappingOverrideRegularIndex);
+        reportViewModel.Editing.AttachProject(this);
+        return reportViewModel;
+    }
+
+    private static void LogMappingDiagnosticsReport(DxfRegularMappingReport report)
+    {
+        if (report.HasIssues)
+        {
+            _logger.Warn(CultureInfo.InvariantCulture, "DXF/Regular mapping warnings: {0}", report.Summary);
+            foreach (var issue in report.SampleIssues.Take(10))
+            {
+                _logger.Warn(CultureInfo.InvariantCulture, "Mapping issue: {0}", issue.Message);
+            }
+        }
+        else
+        {
+            _logger.Info(CultureInfo.InvariantCulture, "DXF/Regular mapping OK: {0}", report.Summary);
         }
     }
 

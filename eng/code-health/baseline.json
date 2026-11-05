@@ -682,20 +682,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 182
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs"
-      ],
-      "contentHash": "6e1679a264b1b654e57dfe845f624d928d322844b115a908f799c37ca9e6ba62",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SyncRequestedVisibilityStateAsync()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 90
       },
       "owner": "NFH",
@@ -817,34 +803,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 124
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.Export.cs"
-      ],
-      "contentHash": "57102d3b690a99b965f74dcae675809c984ac209b38e9436a8d5067856c344e9",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.RuntimeQueryUseCase.QueryExportNotchAsync(IReadOnlyDictionary<string, string>?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 132
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.Simulation.cs"
-      ],
-      "contentHash": "c360b7413dd3c89713b1f20b515e29991b4383ec1b9ad23a716f9d2fb00b4984",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.RuntimeQueryUseCase.QuerySimulationAsync(IReadOnlyDictionary<string, string>?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 187
       },
       "owner": "NFH",
@@ -910,20 +868,6 @@
       "contentHash": "7433abf65fbf6fd551c42e91df06943d305b4d207a130c05a4385e3b4e7528d0",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.Services.SelectionSummaryUseCase.Compute(RegularGrid?,IReadOnlyCollection<int>,IReadOnlyCollection<int>)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 99
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/SettingsApplyPlanBuilder.cs"
-      ],
-      "contentHash": "8545cc052b72e80a75562ec827007114c4d01a42a1f5a75259234e590a35b818",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.SettingsApplyPlanBuilder.Resolve(IEnumerable<string>,SettingsChangeContext)"
     },
     {
       "kind": "type",
@@ -1138,20 +1082,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 103
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs"
-      ],
-      "contentHash": "89746e17618ffe85c565516c45eb9eb26f6795596440b6b463f0c916bdca92d5",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ExportDxfLayerImageAsync()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 101
       },
       "owner": "NFH",
@@ -1166,20 +1096,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 102
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs"
-      ],
-      "contentHash": "67937564546f60c9808a976500ee425e9bb880d5e7d5fca9c0b4624a1c01eb2c",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.AnalyzeIndexMappingAsync()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 89
       },
       "owner": "NFH",
@@ -1189,20 +1105,6 @@
       "contentHash": "c10e24a427a0ef01bf852ec0157343627dafbe54432e8e6bcfbb3b8d43be03c0",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.GetOrBuildCadV22ResolvedResultCached(CadPad,IReadOnlyList<CadPad>,IReadOnlySet<int>?,WorkflowDataSnapshot,double?,NotchV22CompensationResult?,NotchV22ResolvedResult?,bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 340
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs"
-      ],
-      "contentHash": "0235057791d703c3c8953f50424788466d72dd2985df691823cefcd933bf6381",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.GenerateCurrentNotchTableAsync(CadPadSet,RegularGrid,string,IProgress<NotchGenerationProgress>?,WorkflowDataSnapshot?,bool,bool,Action<string>?)"
     },
     {
       "kind": "member",
@@ -1231,146 +1133,6 @@
       "contentHash": "a05108957c6bdeae770d0811f76f82b04dc568b558aea60e759e2e8b23826139",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.BuildCadPadInspectorSnapshot(int,bool,bool,bool,bool,NotchV22CompensationResult?,string?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 110
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs"
-      ],
-      "contentHash": "48738beab99f72477bc7407825039d44b753bf1b9b84cebd6ceb8074a0fcb981",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunDeferredCadInspectorSnapshotRefreshAsync(long,int,long,CancellationTokenSource,CancellationToken)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 108
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs"
-      ],
-      "contentHash": "0fb4108126ae0c0e31efd29a96eec98b3cea83221a32189cadba65300d90d34c",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ExportNotchTableAsync(string,string,string,string,Func<NotchTable, CadPadSet, RegularGrid, string>,bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 114
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs"
-      ],
-      "contentHash": "c6beb05e3415a4e7fa72c24445cddc201c2bb95c266d9f0e1fa4e1d406282e71",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.BuildNotchTableForExportAsync(CadPadSet,RegularGrid,string,bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 82
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs"
-      ],
-      "contentHash": "c9ede026a11cc60bfaf2db343851e670750d548a2e3b8036bf5167808d3e3ad2",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.LoadProjectFromPathCoreAsync(string)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 121
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs"
-      ],
-      "contentHash": "5220fab9445cf40bd4567d5a6581838348a1f97bd8967b1a0ba744046eeeaa21",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplyLoadedProjectStateAsync(ProjectFile,string,long)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 150
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.Sync.cs"
-      ],
-      "contentHash": "2ec9ea7b9ee3192f6ee63bba6864b7b2236b8259b05654908557ecb19d7ff2bf",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.LoadSettingsToUi(ProjectSettings)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 95
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.Sync.cs"
-      ],
-      "contentHash": "787cd30c9336806d1db471846e727c06b433cd0c679bb92ae74bebf4c364ac8e",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplyUiToSettings(ProjectSettings,bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 86
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.SettingsPolicy.cs"
-      ],
-      "contentHash": "247a334ab4603c7a5d1a7bb9530ad2d8433214eba842037c1fc9e09d1f861283",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplySettingsChangeEffects(SettingsChangeEffects,bool,bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 240
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.SettingsWindow.cs"
-      ],
-      "contentHash": "15b5613ddc73c5cd2e54d42f9e8f5936e8b1e13ba41bfb031fd93ef93ae396a6",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplySettingsWindowDraft(SettingsWindowViewModel)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 161
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Simulation.cs"
-      ],
-      "contentHash": "394120dd028e7bc0ba5ec49dab6142bfd470660843d4087d744115c7f1754fae",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.CreateSimulationWorkspaceSessionAsync(bool,Action<string>?)"
     },
     {
       "kind": "member",
