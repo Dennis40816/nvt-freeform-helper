@@ -146,27 +146,10 @@ public sealed partial class FreeformHelperViewModel
     private async Task<ProjectLoadCommandResult> LoadProjectFromPathCoreAsync(string path)
     {
         var status = CreateStatusScope("LoadProject");
-        if (string.IsNullOrWhiteSpace(path))
+        var pathFailure = TryNormalizeProjectLoadPath(path, out var normalizedPath);
+        if (pathFailure is not null)
         {
-            return ProjectLoadCommandResult.Failed(
-                code: "INVALID_ARGUMENTS",
-                message: "Argument '--path' is required.");
-        }
-
-        var normalizedPath = TryGetFullProjectPath(path, out var pathError);
-        if (normalizedPath is null)
-        {
-            return ProjectLoadCommandResult.Failed(
-                code: "INVALID_ARGUMENTS",
-                message: $"Invalid project path '{path}': {pathError!.Message}");
-        }
-
-        if (!File.Exists(normalizedPath))
-        {
-            return ProjectLoadCommandResult.Failed(
-                code: "PATH_NOT_FOUND",
-                message: $"Project file not found: {normalizedPath}",
-                path: normalizedPath);
+            return pathFailure;
         }
 
         var commandResult = ProjectLoadCommandResult.Failed(
@@ -201,17 +184,7 @@ public sealed partial class FreeformHelperViewModel
                 }
 
                 var timings = await ApplyLoadedProjectStateAsync(result.Project, result.Path, loadSw.ElapsedMilliseconds);
-                commandResult = ProjectLoadCommandResult.Loaded(
-                    path: result.Path,
-                    totalElapsedMs: timings.TotalElapsedMs,
-                    persistenceElapsedMs: loadSw.ElapsedMilliseconds,
-                    applyStateElapsedMs: timings.ApplyStateElapsedMs,
-                    dxfElapsedMs: timings.DxfElapsedMs,
-                    rebuildElapsedMs: timings.RebuildElapsedMs,
-                    step1ReplayElapsedMs: timings.Step1ReplayElapsedMs,
-                    step2ReplayElapsedMs: timings.Step2ReplayElapsedMs,
-                    step1Replayed: timings.Step1Replayed,
-                    step2Replayed: timings.Step2Replayed);
+                commandResult = CreateLoadedProjectCommandResult(result.Path, timings, loadSw.ElapsedMilliseconds);
             },
             onError: ex =>
             {
@@ -224,6 +197,54 @@ public sealed partial class FreeformHelperViewModel
             });
 
         return commandResult;
+    }
+
+    private static ProjectLoadCommandResult? TryNormalizeProjectLoadPath(string path, out string normalizedPath)
+    {
+        normalizedPath = string.Empty;
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return ProjectLoadCommandResult.Failed(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--path' is required.");
+        }
+
+        var fullPath = TryGetFullProjectPath(path, out var pathError);
+        if (fullPath is null)
+        {
+            return ProjectLoadCommandResult.Failed(
+                code: "INVALID_ARGUMENTS",
+                message: $"Invalid project path '{path}': {pathError!.Message}");
+        }
+
+        normalizedPath = fullPath;
+        if (!File.Exists(normalizedPath))
+        {
+            return ProjectLoadCommandResult.Failed(
+                code: "PATH_NOT_FOUND",
+                message: $"Project file not found: {normalizedPath}",
+                path: normalizedPath);
+        }
+
+        return null;
+    }
+
+    private static ProjectLoadCommandResult CreateLoadedProjectCommandResult(
+        string path,
+        ProjectLoadApplyTiming timings,
+        long persistenceElapsedMs)
+    {
+        return ProjectLoadCommandResult.Loaded(
+            path: path,
+            totalElapsedMs: timings.TotalElapsedMs,
+            persistenceElapsedMs: persistenceElapsedMs,
+            applyStateElapsedMs: timings.ApplyStateElapsedMs,
+            dxfElapsedMs: timings.DxfElapsedMs,
+            rebuildElapsedMs: timings.RebuildElapsedMs,
+            step1ReplayElapsedMs: timings.Step1ReplayElapsedMs,
+            step2ReplayElapsedMs: timings.Step2ReplayElapsedMs,
+            step1Replayed: timings.Step1Replayed,
+            step2Replayed: timings.Step2Replayed);
     }
 
     private async Task<ProjectLoadApplyTiming> ApplyLoadedProjectStateAsync(ProjectFile file, string path, long persistenceElapsedMs)
@@ -240,21 +261,7 @@ public sealed partial class FreeformHelperViewModel
         {
             using var sourceChangeBatch = BeginSimulationWorkspaceSourceChangeBatch();
             var applyStateSw = Stopwatch.StartNew();
-            _cadPadCustomValues.Clear();
-            foreach (var kv in file.CadPadCustomValues)
-            {
-                _cadPadCustomValues[kv.Key] = kv.Value;
-            }
-
-            LoadSettingsToUi(file.Settings);
-            ApplyViewSnapshot(file.UiSnapshot.View);
-            ApplyImportSnapshot(file.UiSnapshot.Import, file);
-            TryApplyAppGeneralVisualPreferencesAfterProjectLoad();
-            ClearStep5ResultCore();
-            status.ReportSuccess($"Project loaded: {path}");
-            _logger.Info(CultureInfo.InvariantCulture, "Project loaded: {0}", path);
-            HasUnsavedChanges = false;
-            MarkProjectLoadedForAppGeneralPersistence();
+            ApplyLoadedProjectSettingsState(file, path, status);
             applyStateSw.Stop();
 
             var dxfElapsedMs = 0L;
@@ -263,18 +270,7 @@ public sealed partial class FreeformHelperViewModel
 
             using (_settingsSuppression.EnterSettingsLoading())
             {
-                _cad = null;
-                ResetDxfEditBaseline(null);
-                _cachedFilteredCadForBuild = null;
-                ClearDxfLayerCatalog();
-                CadPads = new ObservableCollection<CadPad>();
-                foreach (var toggle in LayerToggles)
-                {
-                    toggle.PropertyChanging -= OnLayerToggleChanging;
-                    toggle.PropertyChanged -= OnLayerToggleChanged;
-                }
-
-                LayerToggles.Clear();
+                ResetCadStateForProjectLoad();
 
                 await RunWithCadLoadCanvasOverlayAsync(async () =>
                 {
@@ -285,21 +281,7 @@ public sealed partial class FreeformHelperViewModel
                     dxfElapsedMs = dxfLoadSw.ElapsedMilliseconds;
                     if (outcome is not null)
                     {
-                        var persistedDxfEditState = CapturePersistedDxfEditProjectState(file);
-                        if (outcome.Source == CadLoadSource.Path && !string.IsNullOrWhiteSpace(outcome.SourcePath))
-                        {
-                            await TryLoadDxfLayerCatalogFromPathAsync(outcome.SourcePath);
-                        }
-                        else
-                        {
-                            await TryLoadDxfLayerCatalogFromEmbeddedAsync(file.EmbeddedDxf);
-                        }
-
-                        await ApplyCadLoadOutcomeAsync(outcome, file.UiSnapshot.View);
-                        ApplyImportSnapshot(file.UiSnapshot.Import, file);
-                        ApplyCapturedDxfEditProjectState(persistedDxfEditState);
-                        status.ReportProgress(BuildCadLoadStatus(outcome, CadLoadContext.LoadProject, path));
-                        LogCadLoadOutcome(outcome, CadLoadContext.LoadProject);
+                        await ApplyProjectCadLoadOutcomeAsync(outcome, file, path, status);
                     }
 
                     var rebuildSw = Stopwatch.StartNew();
@@ -312,27 +294,7 @@ public sealed partial class FreeformHelperViewModel
             }
 
             totalSw.Stop();
-            _logger.Info(CultureInfo.InvariantCulture, "Load project timing: total={0} ms, persistence={1} ms, apply-state={2} ms, dxf={3} ms, rebuild={4} ms.",
-                totalSw.ElapsedMilliseconds,
-                persistenceElapsedMs,
-                applyStateSw.ElapsedMilliseconds,
-                dxfElapsedMs,
-                rebuildElapsedMs);
-            _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step1-auto-replay={0} ms (replayed={1}).", replayTiming.Step1ReplayElapsedMs, replayTiming.Step1Replayed);
-            _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step2-auto-replay={0} ms (replayed={1}).", replayTiming.Step2ReplayElapsedMs, replayTiming.Step2Replayed);
-            _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT SUMMARY: total={0}ms persistence={1}ms applyState={2}ms dxf={3}ms rebuild={4}ms step1={5}ms step2={6}ms step1Replayed={7} step2Replayed={8} path={9}",
-                totalSw.ElapsedMilliseconds,
-                persistenceElapsedMs,
-                applyStateSw.ElapsedMilliseconds,
-                dxfElapsedMs,
-                rebuildElapsedMs,
-                replayTiming.Step1ReplayElapsedMs,
-                replayTiming.Step2ReplayElapsedMs,
-                replayTiming.Step1Replayed ? "Y" : "N",
-                replayTiming.Step2Replayed ? "Y" : "N",
-                path);
-
-            return new ProjectLoadApplyTiming(
+            var timing = new ProjectLoadApplyTiming(
                 TotalElapsedMs: totalSw.ElapsedMilliseconds,
                 ApplyStateElapsedMs: applyStateSw.ElapsedMilliseconds,
                 DxfElapsedMs: dxfElapsedMs,
@@ -341,11 +303,94 @@ public sealed partial class FreeformHelperViewModel
                 Step2ReplayElapsedMs: replayTiming.Step2ReplayElapsedMs,
                 Step1Replayed: replayTiming.Step1Replayed,
                 Step2Replayed: replayTiming.Step2Replayed);
+            LogProjectLoadTiming(timing, persistenceElapsedMs, path);
+            return timing;
         }
         finally
         {
             _appGeneralPersistence.SuppressPersistence = originalSuppressAppGeneralPersistence;
         }
+    }
+
+    private void ApplyLoadedProjectSettingsState(ProjectFile file, string path, UiOperationStatusReporter.Scope status)
+    {
+        _cadPadCustomValues.Clear();
+        foreach (var kv in file.CadPadCustomValues)
+        {
+            _cadPadCustomValues[kv.Key] = kv.Value;
+        }
+
+        LoadSettingsToUi(file.Settings);
+        ApplyViewSnapshot(file.UiSnapshot.View);
+        ApplyImportSnapshot(file.UiSnapshot.Import, file);
+        TryApplyAppGeneralVisualPreferencesAfterProjectLoad();
+        ClearStep5ResultCore();
+        status.ReportSuccess($"Project loaded: {path}");
+        _logger.Info(CultureInfo.InvariantCulture, "Project loaded: {0}", path);
+        HasUnsavedChanges = false;
+        MarkProjectLoadedForAppGeneralPersistence();
+    }
+
+    private void ResetCadStateForProjectLoad()
+    {
+        _cad = null;
+        ResetDxfEditBaseline(null);
+        _cachedFilteredCadForBuild = null;
+        ClearDxfLayerCatalog();
+        CadPads = new ObservableCollection<CadPad>();
+        foreach (var toggle in LayerToggles)
+        {
+            toggle.PropertyChanging -= OnLayerToggleChanging;
+            toggle.PropertyChanged -= OnLayerToggleChanged;
+        }
+
+        LayerToggles.Clear();
+    }
+
+    private async Task ApplyProjectCadLoadOutcomeAsync(
+        CadLoadOutcome outcome,
+        ProjectFile file,
+        string path,
+        UiOperationStatusReporter.Scope status)
+    {
+        var persistedDxfEditState = CapturePersistedDxfEditProjectState(file);
+        if (outcome.Source == CadLoadSource.Path && !string.IsNullOrWhiteSpace(outcome.SourcePath))
+        {
+            await TryLoadDxfLayerCatalogFromPathAsync(outcome.SourcePath);
+        }
+        else
+        {
+            await TryLoadDxfLayerCatalogFromEmbeddedAsync(file.EmbeddedDxf);
+        }
+
+        await ApplyCadLoadOutcomeAsync(outcome, file.UiSnapshot.View);
+        ApplyImportSnapshot(file.UiSnapshot.Import, file);
+        ApplyCapturedDxfEditProjectState(persistedDxfEditState);
+        status.ReportProgress(BuildCadLoadStatus(outcome, CadLoadContext.LoadProject, path));
+        LogCadLoadOutcome(outcome, CadLoadContext.LoadProject);
+    }
+
+    private static void LogProjectLoadTiming(ProjectLoadApplyTiming timing, long persistenceElapsedMs, string path)
+    {
+        _logger.Info(CultureInfo.InvariantCulture, "Load project timing: total={0} ms, persistence={1} ms, apply-state={2} ms, dxf={3} ms, rebuild={4} ms.",
+            timing.TotalElapsedMs,
+            persistenceElapsedMs,
+            timing.ApplyStateElapsedMs,
+            timing.DxfElapsedMs,
+            timing.RebuildElapsedMs);
+        _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step1-auto-replay={0} ms (replayed={1}).", timing.Step1ReplayElapsedMs, timing.Step1Replayed);
+        _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step2-auto-replay={0} ms (replayed={1}).", timing.Step2ReplayElapsedMs, timing.Step2Replayed);
+        _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT SUMMARY: total={0}ms persistence={1}ms applyState={2}ms dxf={3}ms rebuild={4}ms step1={5}ms step2={6}ms step1Replayed={7} step2Replayed={8} path={9}",
+            timing.TotalElapsedMs,
+            persistenceElapsedMs,
+            timing.ApplyStateElapsedMs,
+            timing.DxfElapsedMs,
+            timing.RebuildElapsedMs,
+            timing.Step1ReplayElapsedMs,
+            timing.Step2ReplayElapsedMs,
+            timing.Step1Replayed ? "Y" : "N",
+            timing.Step2Replayed ? "Y" : "N",
+            path);
     }
 
     private async Task<ProjectLoadReplayTiming> ReplayWorkflowStepsAfterProjectLoadAsync()

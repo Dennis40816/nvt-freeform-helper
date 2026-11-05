@@ -38,322 +38,58 @@ public sealed partial class FreeformHelperViewModel
         var generationEpoch = _notchExportGenerationCacheService.CaptureGenerationEpoch();
         var finalProjectionRevision = Volatile.Read(ref _notchFinalProjectionRevision);
         var sourceRevision = SimulationWorkspaceSourceRevision;
-        IProgress<NotchGenerationProgress>? effectiveProgress = progress;
-        if (reportStep5Progress)
-        {
-            IProgress<NotchGenerationProgress> step5Reporter = CreateStep5GenerationProgressReporter(
-                operationLabel,
-                finalProjectionRevision,
-                sourceRevision,
-                progressTextReporter);
-            effectiveProgress = progress is null
-                ? step5Reporter
-                : new Progress<NotchGenerationProgress>(snapshot =>
-                {
-                    step5Reporter.Report(snapshot);
-                    progress.Report(snapshot);
-                });
-            BeginNotchOperationBusyScope();
-
-            NotchExportProgress = 0.0;
-            var preparingMessage = $"{operationLabel}: preparing generation...";
-            NotchExportProgressText = preparingMessage;
-            progressTextReporter?.Invoke(preparingMessage);
-        }
+        var effectiveProgress = reportStep5Progress
+            ? BeginStep5NotchGenerationProgress(operationLabel, progress, finalProjectionRevision, sourceRevision, progressTextReporter)
+            : progress;
 
         try
         {
-            ApplyUiToSettings(_projectFile.Settings);
-            workflowSnapshot ??= BuildWorkflowDataSnapshot();
-            var exportSettings = CreateExportSettingsSnapshot(_projectFile.Settings);
-            var activeRegularPadIds = GetActiveRegularPadIdsForNotchComputation();
-            var activeRegularHash = ComputeActiveRegularHash(activeRegularPadIds);
-            var cadOutputFwDiffHash = ComputeCadOutputFwDiffHash(workflowSnapshot.CadOutputFwDiffIndexByCadId);
-            var step3Revision = GetNotchStep3Revision();
-            var selectedSparseResultRequest = exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation
-                ? NotchSparseResultUseCase.CreateRequest(
-                    _selectedCadIds,
-                    cad,
-                    _grid,
-                    grid,
-                    workflowSnapshot,
-                    selectedCadPad => GetOrBuildCadV22ResolvedResultCached(
-                        selectedCadPad,
-                        GetCadPadsForNotchComputation(selectedCadPad.Id),
-                        activeRegularPadIds,
-                        workflowSnapshot,
-                        buildIfMissing: false))
-                : null;
-            var generationSettingsFingerprint = exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation
-                ? NotchTableGenerator.ComputeCadAllocationResolvedBatchSettingsFingerprint(exportSettings)
-                : ComputeNotchExportSettingsFingerprint(exportSettings);
-            var settingsFingerprint = CombineNotchExportSettingsFingerprint(
-                generationSettingsFingerprint,
-                activeRegularHash,
-                cadOutputFwDiffHash);
-            var cadFingerprint = BuildNotchExportCadFingerprint(cad);
-            var gridFingerprint = BuildNotchExportGridFingerprint(grid);
+            var inputs = PrepareNotchGenerationInputs(cad, grid, workflowSnapshot);
             NotchTable table;
             NotchTableGenerator.CadAllocationResolvedBatch? resolvedBatch = null;
             NotchTable? legacyTableToStore = null;
             var stage2StartedAt = DateTime.UtcNow;
 
-            _logger.Info(
-                CultureInfo.InvariantCulture,
-                "{0} generation started: cad={1}, regular={2}, mode={3}, compModel={4}, versions={5}, thV21Q7={6}, thV22Pct={7}, thLink={8}, profile={9}, activeRegular={10}, activeHash={11}.",
-                operationLabel,
-                cad.Pads.Count,
-                grid.Pads.Count,
-                exportSettings.Notch.ComputationMode,
-                exportSettings.Notch.CompensationModel,
-                string.Join(",", exportSettings.Notch.EnabledVersions
-                    .OrderBy(static version => (int)version)
-                    .Select(static version => version.ToDisplayLabel())),
-                exportSettings.Notch.ThresholdQ7,
-                exportSettings.Notch.ThresholdPercentV22,
-                exportSettings.Notch.LinkVersionThresholds ? "Y" : "N",
-                exportSettings.Notch.ExportProfile,
-                activeRegularPadIds?.Count ?? 0,
-                activeRegularHash);
+            LogNotchGenerationStarted(operationLabel, cad, grid, inputs);
 
             NotchExportGenerationCacheLookup cacheLookup;
-            if (exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation)
+            if (inputs.ExportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation)
             {
-                var batchLease = _notchExportGenerationCacheService.AcquireCadAllocationResolvedBatch(
-                    generationEpoch,
-                    cadFingerprint,
-                    gridFingerprint,
-                    step3Revision,
-                    settingsFingerprint,
-                    exportSettings,
-                    () => Task.Run(() => _notchExportService.ResolveCadAllocationBatch(
-                        cad,
-                        grid,
-                        exportSettings,
-                        effectiveProgress,
-                        activeRegularPadIds,
-                        workflowSnapshot.CadOutputFwDiffIndexByCadId,
-                        selectedSparseResultRequest)));
+                var batchLease = AcquireNotchCadAllocationBatch(generationEpoch, cad, grid, inputs, effectiveProgress);
                 cacheLookup = batchLease.Lookup;
                 var isBatchCacheHit = batchLease.CachedBatch is not null;
-                if (batchLease.CachedBatch is { } cachedBatch)
+                resolvedBatch = TakeCachedNotchBatchOrLogMiss(operationLabel, batchLease);
+                if (resolvedBatch is null)
                 {
-                    resolvedBatch = cachedBatch;
-                }
-                else
-                {
-                    if (batchLease.IsTaskOwner)
-                    {
-                        LogNotchGenerationCacheMiss(operationLabel, cacheLookup);
-                    }
-
                     resolvedBatch = await batchLease.ResolutionTask!;
                 }
 
-                table = await Task.Run(() => NotchExportService.ProjectCadAllocationResolvedBatch(
-                    resolvedBatch,
-                    exportSettings,
-                    effectiveProgress,
-                    includeResolutionTimings: !isBatchCacheHit));
-                if (isBatchCacheHit)
-                {
-                    _logger.Info(
-                        CultureInfo.InvariantCulture,
-                        "{0} reused cached CAD-allocation batch: projectedRows={1}, step3Revision={2}, settingsFingerprint={3}.",
-                        operationLabel,
-                        table.Rows.Count,
-                        step3Revision,
-                        settingsFingerprint);
-                }
-            }
-            else if (_notchExportGenerationCacheService.TryGet(
-                         cadFingerprint,
-                         gridFingerprint,
-                         step3Revision,
-                         settingsFingerprint,
-                         out var cachedTable,
-                         out cacheLookup))
-            {
-                table = cachedTable;
-                _logger.Info(
-                    CultureInfo.InvariantCulture,
-                    "{0} reused cached notch table: rows={1}, step3Revision={2}, settingsFingerprint={3}.",
-                    operationLabel,
-                    table.Rows.Count,
-                    step3Revision,
-                    settingsFingerprint);
+                table = await ProjectNotchCadAllocationBatchAsync(operationLabel, resolvedBatch, inputs, effectiveProgress, isBatchCacheHit);
             }
             else
             {
-                LogNotchGenerationCacheMiss(operationLabel, cacheLookup);
-                table = await Task.Run(() => _notchExportService.Generate(
-                    cad,
-                    grid,
-                    exportSettings,
-                    effectiveProgress,
-                    activeRegularPadIds,
-                    workflowSnapshot.CadOutputFwDiffIndexByCadId));
-
-                if (table.Rows.Count > 0)
-                {
-                    legacyTableToStore = table;
-                }
+                (table, cacheLookup, legacyTableToStore) = await GenerateLegacyNotchTableAsync(
+                    operationLabel, cad, grid, inputs, effectiveProgress);
             }
 
-            var projection = NotchCadOutputFwDiffProjectionService.Project(
-                grid,
-                table,
-                workflowSnapshot.CadOutputFwDiffIndexByCadId);
-            var projectedTable = projection.Table;
-            var projectedGrid = projection.Grid;
-            var effectiveTable = projectToCadOutputFwDiff ? projectedTable : table;
-            var effectiveGrid = projectToCadOutputFwDiff ? projectedGrid : grid;
+            var projection = NotchCadOutputFwDiffProjectionService.Project(grid, table, inputs.WorkflowSnapshot.CadOutputFwDiffIndexByCadId);
+            var effectiveTable = projectToCadOutputFwDiff ? projection.Table : table;
+            var effectiveGrid = projectToCadOutputFwDiff ? projection.Grid : grid;
 
             var stage2ElapsedMs = (long)(DateTime.UtcNow - stage2StartedAt).TotalMilliseconds;
             var crossIcMismatch = BuildCrossIcMismatchSnapshot(grid);
-            _logger.Info(
-                CultureInfo.InvariantCulture,
-                "{0} metrics: elapsed={1} ms, cache={2}, crossIcCad={3}, crossIcRegular={4}, shiftedRows={5}, shiftedAnchors={6}, conflictedRawDiffKeys={7}, projectionMode={8}.",
-                operationLabel,
-                stage2ElapsedMs,
-                cacheLookup.Status,
-                crossIcMismatch.CadCount,
-                crossIcMismatch.RegularCount,
-                projection.ChangedRowCount,
-                projection.ChangedAnchorCount,
-                projection.ConflictedRawDiffKeyCount,
-                projectToCadOutputFwDiff ? "visible" : "raw");
-            if (effectiveTable.GenerationPhaseTimings.HasData)
-            {
-                var phaseTimings = effectiveTable.GenerationPhaseTimings;
-                _logger.Info(
-                    CultureInfo.InvariantCulture,
-                    "{0} phase timings: profiles={1} ms, candidates={2} ms, merge={3} ms, legacy={4} ms, finalize={5} ms, total={6} ms.",
-                    operationLabel,
-                    phaseTimings.BuildProfilesElapsedMs,
-                    phaseTimings.BuildCanonicalCandidatesElapsedMs,
-                    phaseTimings.MergeCanonicalCandidatesElapsedMs,
-                    phaseTimings.BuildLegacyRowsElapsedMs,
-                    phaseTimings.FinalizeCanonicalExportsElapsedMs,
-                    phaseTimings.TotalElapsedMs);
-                if (phaseTimings.CandidateBreakdown?.HasData == true)
-                {
-                    var candidateBreakdown = phaseTimings.CandidateBreakdown;
-                    var compensationStages = candidateBreakdown.CompensationStageTimings;
-                    var stageCBreakdown = compensationStages.StageCBreakdown;
-                    _logger.Info(
-                        CultureInfo.InvariantCulture,
-                        "{0} candidate breakdown: count={1}, buildCadCandidate={2} ms, compensation={3} ms, postCompute={4} ms, stageA={5} ms, stageB={6} ms, stageC={7} ms, stageD={8} ms.",
-                        operationLabel,
-                        candidateBreakdown.CandidateCount,
-                        candidateBreakdown.BuildV22CadCandidateElapsedMs,
-                        candidateBreakdown.CompensationComputeElapsedMs,
-                        candidateBreakdown.CandidatePostComputeElapsedMs,
-                        compensationStages.StageAElapsedMs,
-                        compensationStages.StageBElapsedMs,
-                        compensationStages.StageCElapsedMs,
-                        compensationStages.StageDElapsedMs);
-                    if (stageCBreakdown?.HasData == true)
-                    {
-                        _logger.Info(
-                            CultureInfo.InvariantCulture,
-                            "{0} stageC breakdown: ownerLookup={1} ms, occupiedArea={2} ms, sourceCoverage={3} ms, reachability={4} ms, ruleDecision={5} ms, previewDebug={6} ms.",
-                            operationLabel,
-                            stageCBreakdown.OwnerAndBlockerLookupElapsedMs,
-                            stageCBreakdown.ExactOccupiedAreaElapsedMs,
-                            stageCBreakdown.SourceCoverageElapsedMs,
-                            stageCBreakdown.ReachabilityElapsedMs,
-                            stageCBreakdown.RuleDecisionElapsedMs,
-                            stageCBreakdown.PreviewAndDebugElapsedMs);
-                    }
-                }
-            }
-            if (crossIcMismatch.CadCount > 0)
-            {
-                _logger.Warn(
-                    CultureInfo.InvariantCulture,
-                    "{0} cross-IC mismatch detected: cadCount={1}, regularCount={2}, sample={3}.",
-                    operationLabel,
-                    crossIcMismatch.CadCount,
-                    crossIcMismatch.RegularCount,
-                    string.IsNullOrWhiteSpace(crossIcMismatch.SampleCadText) ? "-" : crossIcMismatch.SampleCadText);
-            }
+            LogNotchGenerationMetrics(operationLabel, stage2ElapsedMs, cacheLookup, crossIcMismatch, projection, projectToCadOutputFwDiff, effectiveTable);
 
-            if (!_notchExportGenerationCacheService.IsGenerationEpochCurrent(generationEpoch) ||
-                !IsNotchFinalProjectionCurrent(finalProjectionRevision, sourceRevision))
+            if (!TryAcceptNotchGeneration(operationLabel, generationEpoch, finalProjectionRevision, sourceRevision, inputs, table, resolvedBatch, legacyTableToStore))
             {
-                LogSupersededNotchGeneration(operationLabel);
                 return null;
             }
 
-            var cacheAccepted = resolvedBatch is not null
-                ? _notchExportGenerationCacheService.TryUpdateProjectedRowCount(
-                    generationEpoch,
-                    resolvedBatch,
-                    table.Rows.Count)
-                : legacyTableToStore is not null
-                    ? _notchExportGenerationCacheService.TryStore(
-                        generationEpoch,
-                        cadFingerprint,
-                        gridFingerprint,
-                        step3Revision,
-                        settingsFingerprint,
-                        legacyTableToStore)
-                    : _notchExportGenerationCacheService.IsGenerationEpochCurrent(generationEpoch);
-            if (!cacheAccepted ||
-                !IsNotchFinalProjectionCurrent(finalProjectionRevision, sourceRevision))
-            {
-                LogSupersededNotchGeneration(operationLabel);
-                return null;
-            }
-
-            if (resolvedBatch is not null && selectedSparseResultRequest is not null)
-            {
-                var promotionWorkflowSnapshot = BuildWorkflowDataSnapshot();
-                var selectedResolved = NotchSparseResultUseCase.GetCurrentResult(
-                    resolvedBatch,
-                    selectedSparseResultRequest,
-                    _selectedCadIds,
-                    _grid,
-                    grid,
-                    promotionWorkflowSnapshot);
-                if (selectedResolved is not null && TryResolveNotchComputationInputs(
-                        selectedSparseResultRequest.CadPadId,
-                        out var currentCadPad,
-                        out var currentCadPads,
-                        out var currentActiveRegularPadIds))
-                {
-                    _ = GetOrBuildCadV22ResolvedResultCached(
-                        currentCadPad,
-                        currentCadPads,
-                        currentActiveRegularPadIds,
-                        promotionWorkflowSnapshot,
-                        precomputedResolved: selectedResolved);
-                }
-            }
-
-            _notchCache.LastGeneratedTable = effectiveTable;
-            _logger.Info(
-                CultureInfo.InvariantCulture,
-                "{0} generated {1} row(s).",
-                operationLabel,
-                effectiveTable.Rows.Count);
-            if (reportStep5Progress)
-            {
-                NotchExportProgress = 1.0;
-                NotchExportProgressText = $"{operationLabel}: generated {effectiveTable.Rows.Count} row(s).";
-            }
-
+            PromoteSelectedNotchSparseResult(resolvedBatch, inputs.SelectedSparseResultRequest, grid);
+            CompleteNotchGeneration(operationLabel, effectiveTable, reportStep5Progress);
             return new NotchTableGenerationResult(
-                effectiveTable,
-                effectiveGrid,
-                table,
-                grid,
-                projectedTable,
-                projectedGrid,
-                exportSettings,
-                crossIcMismatch,
-                sourceRevision);
+                effectiveTable, effectiveGrid, table, grid, projection.Table, projection.Grid,
+                inputs.ExportSettings, crossIcMismatch, sourceRevision);
         }
         finally
         {
@@ -363,6 +99,384 @@ public sealed partial class FreeformHelperViewModel
             }
         }
     }
+
+    private IProgress<NotchGenerationProgress> BeginStep5NotchGenerationProgress(
+        string operationLabel,
+        IProgress<NotchGenerationProgress>? progress,
+        int finalProjectionRevision,
+        int sourceRevision,
+        Action<string>? progressTextReporter)
+    {
+        IProgress<NotchGenerationProgress> step5Reporter = CreateStep5GenerationProgressReporter(
+            operationLabel,
+            finalProjectionRevision,
+            sourceRevision,
+            progressTextReporter);
+        IProgress<NotchGenerationProgress> effectiveProgress = progress is null
+            ? step5Reporter
+            : new Progress<NotchGenerationProgress>(snapshot =>
+            {
+                step5Reporter.Report(snapshot);
+                progress.Report(snapshot);
+            });
+        BeginNotchOperationBusyScope();
+
+        NotchExportProgress = 0.0;
+        var preparingMessage = $"{operationLabel}: preparing generation...";
+        NotchExportProgressText = preparingMessage;
+        progressTextReporter?.Invoke(preparingMessage);
+        return effectiveProgress;
+    }
+
+    private NotchGenerationInputs PrepareNotchGenerationInputs(CadPadSet cad, RegularGrid grid, WorkflowDataSnapshot? workflowSnapshot)
+    {
+        ApplyUiToSettings(_projectFile.Settings);
+        workflowSnapshot ??= BuildWorkflowDataSnapshot();
+        var exportSettings = CreateExportSettingsSnapshot(_projectFile.Settings);
+        var activeRegularPadIds = GetActiveRegularPadIdsForNotchComputation();
+        var activeRegularHash = ComputeActiveRegularHash(activeRegularPadIds);
+        var cadOutputFwDiffHash = ComputeCadOutputFwDiffHash(workflowSnapshot.CadOutputFwDiffIndexByCadId);
+        var step3Revision = GetNotchStep3Revision();
+        var selectedSparseResultRequest = exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation
+            ? NotchSparseResultUseCase.CreateRequest(
+                _selectedCadIds,
+                cad,
+                _grid,
+                grid,
+                workflowSnapshot,
+                selectedCadPad => GetOrBuildCadV22ResolvedResultCached(
+                    selectedCadPad,
+                    GetCadPadsForNotchComputation(selectedCadPad.Id),
+                    activeRegularPadIds,
+                    workflowSnapshot,
+                    buildIfMissing: false))
+            : null;
+        var generationSettingsFingerprint = exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation
+            ? NotchTableGenerator.ComputeCadAllocationResolvedBatchSettingsFingerprint(exportSettings)
+            : ComputeNotchExportSettingsFingerprint(exportSettings);
+        var settingsFingerprint = CombineNotchExportSettingsFingerprint(
+            generationSettingsFingerprint,
+            activeRegularHash,
+            cadOutputFwDiffHash);
+        var cadFingerprint = BuildNotchExportCadFingerprint(cad);
+        var gridFingerprint = BuildNotchExportGridFingerprint(grid);
+        return new NotchGenerationInputs(
+            exportSettings,
+            activeRegularPadIds,
+            activeRegularHash,
+            step3Revision,
+            selectedSparseResultRequest,
+            settingsFingerprint,
+            cadFingerprint,
+            gridFingerprint,
+            workflowSnapshot);
+    }
+
+    private static void LogNotchGenerationStarted(string operationLabel, CadPadSet cad, RegularGrid grid, NotchGenerationInputs inputs)
+    {
+        _logger.Info(
+            CultureInfo.InvariantCulture,
+            "{0} generation started: cad={1}, regular={2}, mode={3}, compModel={4}, versions={5}, thV21Q7={6}, thV22Pct={7}, thLink={8}, profile={9}, activeRegular={10}, activeHash={11}.",
+            operationLabel,
+            cad.Pads.Count,
+            grid.Pads.Count,
+            inputs.ExportSettings.Notch.ComputationMode,
+            inputs.ExportSettings.Notch.CompensationModel,
+            string.Join(",", inputs.ExportSettings.Notch.EnabledVersions
+                .OrderBy(static version => (int)version)
+                .Select(static version => version.ToDisplayLabel())),
+            inputs.ExportSettings.Notch.ThresholdQ7,
+            inputs.ExportSettings.Notch.ThresholdPercentV22,
+            inputs.ExportSettings.Notch.LinkVersionThresholds ? "Y" : "N",
+            inputs.ExportSettings.Notch.ExportProfile,
+            inputs.ActiveRegularPadIds?.Count ?? 0,
+            inputs.ActiveRegularHash);
+    }
+
+    private NotchCadAllocationBatchLease AcquireNotchCadAllocationBatch(
+        long generationEpoch,
+        CadPadSet cad,
+        RegularGrid grid,
+        NotchGenerationInputs inputs,
+        IProgress<NotchGenerationProgress>? effectiveProgress)
+    {
+        return _notchExportGenerationCacheService.AcquireCadAllocationResolvedBatch(
+            generationEpoch,
+            inputs.CadFingerprint,
+            inputs.GridFingerprint,
+            inputs.Step3Revision,
+            inputs.SettingsFingerprint,
+            inputs.ExportSettings,
+            () => Task.Run(() => _notchExportService.ResolveCadAllocationBatch(
+                cad,
+                grid,
+                inputs.ExportSettings,
+                effectiveProgress,
+                inputs.ActiveRegularPadIds,
+                inputs.WorkflowSnapshot.CadOutputFwDiffIndexByCadId,
+                inputs.SelectedSparseResultRequest)));
+    }
+
+    private static NotchTableGenerator.CadAllocationResolvedBatch? TakeCachedNotchBatchOrLogMiss(
+        string operationLabel,
+        NotchCadAllocationBatchLease batchLease)
+    {
+        if (batchLease.CachedBatch is { } cachedBatch)
+        {
+            return cachedBatch;
+        }
+
+        if (batchLease.IsTaskOwner)
+        {
+            LogNotchGenerationCacheMiss(operationLabel, batchLease.Lookup);
+        }
+
+        return null;
+    }
+
+    private static async Task<NotchTable> ProjectNotchCadAllocationBatchAsync(
+        string operationLabel,
+        NotchTableGenerator.CadAllocationResolvedBatch resolvedBatch,
+        NotchGenerationInputs inputs,
+        IProgress<NotchGenerationProgress>? effectiveProgress,
+        bool isBatchCacheHit)
+    {
+        var table = await Task.Run(() => NotchExportService.ProjectCadAllocationResolvedBatch(
+            resolvedBatch,
+            inputs.ExportSettings,
+            effectiveProgress,
+            includeResolutionTimings: !isBatchCacheHit));
+        if (isBatchCacheHit)
+        {
+            _logger.Info(
+                CultureInfo.InvariantCulture,
+                "{0} reused cached CAD-allocation batch: projectedRows={1}, step3Revision={2}, settingsFingerprint={3}.",
+                operationLabel,
+                table.Rows.Count,
+                inputs.Step3Revision,
+                inputs.SettingsFingerprint);
+        }
+
+        return table;
+    }
+
+    private async Task<(NotchTable Table, NotchExportGenerationCacheLookup CacheLookup, NotchTable? LegacyTableToStore)> GenerateLegacyNotchTableAsync(
+        string operationLabel,
+        CadPadSet cad,
+        RegularGrid grid,
+        NotchGenerationInputs inputs,
+        IProgress<NotchGenerationProgress>? effectiveProgress)
+    {
+        if (_notchExportGenerationCacheService.TryGet(
+                inputs.CadFingerprint,
+                inputs.GridFingerprint,
+                inputs.Step3Revision,
+                inputs.SettingsFingerprint,
+                out var cachedTable,
+                out var cacheLookup))
+        {
+            _logger.Info(
+                CultureInfo.InvariantCulture,
+                "{0} reused cached notch table: rows={1}, step3Revision={2}, settingsFingerprint={3}.",
+                operationLabel,
+                cachedTable.Rows.Count,
+                inputs.Step3Revision,
+                inputs.SettingsFingerprint);
+            return (cachedTable, cacheLookup, null);
+        }
+
+        LogNotchGenerationCacheMiss(operationLabel, cacheLookup);
+        var table = await Task.Run(() => _notchExportService.Generate(
+            cad,
+            grid,
+            inputs.ExportSettings,
+            effectiveProgress,
+            inputs.ActiveRegularPadIds,
+            inputs.WorkflowSnapshot.CadOutputFwDiffIndexByCadId));
+
+        return (table, cacheLookup, table.Rows.Count > 0 ? table : null);
+    }
+
+    private static void LogNotchGenerationMetrics(
+        string operationLabel,
+        long stage2ElapsedMs,
+        NotchExportGenerationCacheLookup cacheLookup,
+        CrossIcMismatchSnapshot crossIcMismatch,
+        NotchCadOutputFwDiffProjectionResult projection,
+        bool projectToCadOutputFwDiff,
+        NotchTable effectiveTable)
+    {
+        _logger.Info(
+            CultureInfo.InvariantCulture,
+            "{0} metrics: elapsed={1} ms, cache={2}, crossIcCad={3}, crossIcRegular={4}, shiftedRows={5}, shiftedAnchors={6}, conflictedRawDiffKeys={7}, projectionMode={8}.",
+            operationLabel,
+            stage2ElapsedMs,
+            cacheLookup.Status,
+            crossIcMismatch.CadCount,
+            crossIcMismatch.RegularCount,
+            projection.ChangedRowCount,
+            projection.ChangedAnchorCount,
+            projection.ConflictedRawDiffKeyCount,
+            projectToCadOutputFwDiff ? "visible" : "raw");
+        if (effectiveTable.GenerationPhaseTimings.HasData)
+        {
+            LogNotchGenerationPhaseTimings(operationLabel, effectiveTable.GenerationPhaseTimings);
+        }
+
+        if (crossIcMismatch.CadCount > 0)
+        {
+            _logger.Warn(
+                CultureInfo.InvariantCulture,
+                "{0} cross-IC mismatch detected: cadCount={1}, regularCount={2}, sample={3}.",
+                operationLabel,
+                crossIcMismatch.CadCount,
+                crossIcMismatch.RegularCount,
+                string.IsNullOrWhiteSpace(crossIcMismatch.SampleCadText) ? "-" : crossIcMismatch.SampleCadText);
+        }
+    }
+
+    private static void LogNotchGenerationPhaseTimings(string operationLabel, NotchGenerationPhaseTimings phaseTimings)
+    {
+        _logger.Info(
+            CultureInfo.InvariantCulture,
+            "{0} phase timings: profiles={1} ms, candidates={2} ms, merge={3} ms, legacy={4} ms, finalize={5} ms, total={6} ms.",
+            operationLabel,
+            phaseTimings.BuildProfilesElapsedMs,
+            phaseTimings.BuildCanonicalCandidatesElapsedMs,
+            phaseTimings.MergeCanonicalCandidatesElapsedMs,
+            phaseTimings.BuildLegacyRowsElapsedMs,
+            phaseTimings.FinalizeCanonicalExportsElapsedMs,
+            phaseTimings.TotalElapsedMs);
+        if (phaseTimings.CandidateBreakdown?.HasData == true)
+        {
+            var candidateBreakdown = phaseTimings.CandidateBreakdown;
+            var compensationStages = candidateBreakdown.CompensationStageTimings;
+            var stageCBreakdown = compensationStages.StageCBreakdown;
+            _logger.Info(
+                CultureInfo.InvariantCulture,
+                "{0} candidate breakdown: count={1}, buildCadCandidate={2} ms, compensation={3} ms, postCompute={4} ms, stageA={5} ms, stageB={6} ms, stageC={7} ms, stageD={8} ms.",
+                operationLabel,
+                candidateBreakdown.CandidateCount,
+                candidateBreakdown.BuildV22CadCandidateElapsedMs,
+                candidateBreakdown.CompensationComputeElapsedMs,
+                candidateBreakdown.CandidatePostComputeElapsedMs,
+                compensationStages.StageAElapsedMs,
+                compensationStages.StageBElapsedMs,
+                compensationStages.StageCElapsedMs,
+                compensationStages.StageDElapsedMs);
+            if (stageCBreakdown?.HasData == true)
+            {
+                _logger.Info(
+                    CultureInfo.InvariantCulture,
+                    "{0} stageC breakdown: ownerLookup={1} ms, occupiedArea={2} ms, sourceCoverage={3} ms, reachability={4} ms, ruleDecision={5} ms, previewDebug={6} ms.",
+                    operationLabel,
+                    stageCBreakdown.OwnerAndBlockerLookupElapsedMs,
+                    stageCBreakdown.ExactOccupiedAreaElapsedMs,
+                    stageCBreakdown.SourceCoverageElapsedMs,
+                    stageCBreakdown.ReachabilityElapsedMs,
+                    stageCBreakdown.RuleDecisionElapsedMs,
+                    stageCBreakdown.PreviewAndDebugElapsedMs);
+            }
+        }
+    }
+
+    private bool TryAcceptNotchGeneration(
+        string operationLabel,
+        long generationEpoch,
+        int finalProjectionRevision,
+        int sourceRevision,
+        NotchGenerationInputs inputs,
+        NotchTable table,
+        NotchTableGenerator.CadAllocationResolvedBatch? resolvedBatch,
+        NotchTable? legacyTableToStore)
+    {
+        if (!_notchExportGenerationCacheService.IsGenerationEpochCurrent(generationEpoch) ||
+            !IsNotchFinalProjectionCurrent(finalProjectionRevision, sourceRevision))
+        {
+            LogSupersededNotchGeneration(operationLabel);
+            return false;
+        }
+
+        var cacheAccepted = resolvedBatch is not null
+            ? _notchExportGenerationCacheService.TryUpdateProjectedRowCount(
+                generationEpoch,
+                resolvedBatch,
+                table.Rows.Count)
+            : legacyTableToStore is not null
+                ? _notchExportGenerationCacheService.TryStore(
+                    generationEpoch,
+                    inputs.CadFingerprint,
+                    inputs.GridFingerprint,
+                    inputs.Step3Revision,
+                    inputs.SettingsFingerprint,
+                    legacyTableToStore)
+                : _notchExportGenerationCacheService.IsGenerationEpochCurrent(generationEpoch);
+        if (!cacheAccepted ||
+            !IsNotchFinalProjectionCurrent(finalProjectionRevision, sourceRevision))
+        {
+            LogSupersededNotchGeneration(operationLabel);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void PromoteSelectedNotchSparseResult(
+        NotchTableGenerator.CadAllocationResolvedBatch? resolvedBatch,
+        NotchTableGenerator.CadAllocationSparseResultRequest? selectedSparseResultRequest,
+        RegularGrid grid)
+    {
+        if (resolvedBatch is not null && selectedSparseResultRequest is not null)
+        {
+            var promotionWorkflowSnapshot = BuildWorkflowDataSnapshot();
+            var selectedResolved = NotchSparseResultUseCase.GetCurrentResult(
+                resolvedBatch,
+                selectedSparseResultRequest,
+                _selectedCadIds,
+                _grid,
+                grid,
+                promotionWorkflowSnapshot);
+            if (selectedResolved is not null && TryResolveNotchComputationInputs(
+                    selectedSparseResultRequest.CadPadId,
+                    out var currentCadPad,
+                    out var currentCadPads,
+                    out var currentActiveRegularPadIds))
+            {
+                _ = GetOrBuildCadV22ResolvedResultCached(
+                    currentCadPad,
+                    currentCadPads,
+                    currentActiveRegularPadIds,
+                    promotionWorkflowSnapshot,
+                    precomputedResolved: selectedResolved);
+            }
+        }
+    }
+
+    private void CompleteNotchGeneration(string operationLabel, NotchTable effectiveTable, bool reportStep5Progress)
+    {
+        _notchCache.LastGeneratedTable = effectiveTable;
+        _logger.Info(
+            CultureInfo.InvariantCulture,
+            "{0} generated {1} row(s).",
+            operationLabel,
+            effectiveTable.Rows.Count);
+        if (reportStep5Progress)
+        {
+            NotchExportProgress = 1.0;
+            NotchExportProgressText = $"{operationLabel}: generated {effectiveTable.Rows.Count} row(s).";
+        }
+    }
+
+    private sealed record NotchGenerationInputs(
+        ProjectSettings ExportSettings,
+        HashSet<int>? ActiveRegularPadIds,
+        int ActiveRegularHash,
+        int Step3Revision,
+        NotchTableGenerator.CadAllocationSparseResultRequest? SelectedSparseResultRequest,
+        int SettingsFingerprint,
+        ulong CadFingerprint,
+        ulong GridFingerprint,
+        WorkflowDataSnapshot WorkflowSnapshot);
 
     private void BeginNotchOperationBusyScope()
     {

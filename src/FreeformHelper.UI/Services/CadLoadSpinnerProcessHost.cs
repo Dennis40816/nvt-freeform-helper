@@ -255,71 +255,21 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
     {
         while (true)
         {
-            bool showRequestedAtStart;
-            CadLoadSpinnerRequest? showRequest;
-            Task? warmupTask;
-            var showSent = false;
-
-            lock (_sync)
+            if (!TryCaptureStateSyncSnapshot(out var showRequestedAtStart, out var showRequest, out var warmupTask))
             {
-                if (_disposed)
-                {
-                    return;
-                }
-
-                showRequestedAtStart = _requestedVisibility == VisibilityState.Visible;
-                showRequest = _latestShowRequest;
-                warmupTask = showRequestedAtStart && ResetExitedProcessLocked() ? null : _warmupTask;
-            }
-            CadLoadSpinnerDebugState.RecordHostStateSync(showRequestedAtStart);
-
-            if (!showRequestedAtStart)
-            {
-                bool shouldHide;
-                lock (_sync)
-                {
-                    if (_disposed)
-                    {
-                        return;
-                    }
-
-                    shouldHide = _requestedVisibility == VisibilityState.Hidden &&
-                        _effectiveVisibility == VisibilityState.Visible;
-                }
-
-                if (!shouldHide)
-                {
-                    // Nothing is visible, so there is nothing to sync. Looping here would spin this
-                    // thread-pool thread until the next Show; a later Show or Hide queues its own sync.
-                    return;
-                }
-
-                if (HasRunningProcess())
-                {
-                    CadLoadSpinnerDebugState.RecordHostHideIpc("state-sync-hide");
-                    SendHideRequest("state-sync-hide");
-                }
-
-                lock (_sync)
-                {
-                    if (_requestedVisibility == VisibilityState.Visible)
-                    {
-                        continue;
-                    }
-                }
-
                 return;
             }
 
-            if (warmupTask is null)
+            if (!showRequestedAtStart)
             {
-                lock (_sync)
+                if (!IsStateSyncHideNeeded() || !SendStateSyncHideAndCheckShowRequested("state-sync-hide"))
                 {
-                    EnsureWarmupTaskLocked();
-                    warmupTask = _warmupTask;
+                    return;
                 }
-            }
 
+                continue;
+            }
+            warmupTask ??= AcquireStateSyncWarmupTask();
             if (warmupTask is not null)
             {
                 try
@@ -334,33 +284,17 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 }
             }
 
-            lock (_sync)
+            if (!TrySendStateSyncShow(showRequest, out var showSent))
             {
-                if (_disposed)
-                {
-                    return;
-                }
-
-                if (showRequest is not null && HasRunningProcessLocked())
-                {
-                    showSent = SendShowRequestCoreLocked(showRequest);
-                    CadLoadSpinnerDebugState.RecordHostShowIpcResult(showSent, "state-sync");
-                }
+                return;
             }
 
             if (!showSent)
             {
-                bool stillShowRequested;
-                lock (_sync)
+                if (!TryReadRequestedVisibility(VisibilityState.Visible, out var stillShowRequested))
                 {
-                    if (_disposed)
-                    {
-                        return;
-                    }
-
-                    stillShowRequested = _requestedVisibility == VisibilityState.Visible;
+                    return;
                 }
-
                 if (stillShowRequested)
                 {
                     CadLoadSpinnerDebugState.RecordHostShowRetry();
@@ -369,30 +303,14 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 }
             }
 
-            bool shouldHideAfterShow;
-            lock (_sync)
-            {
-                if (_disposed)
-                {
-                    return;
-                }
-
-                shouldHideAfterShow = _requestedVisibility == VisibilityState.Hidden;
-            }
-
-            if (!shouldHideAfterShow)
+            if (!TryReadRequestedVisibility(VisibilityState.Hidden, out var shouldHideAfterShow) || !shouldHideAfterShow)
             {
                 return;
             }
 
             if (showSent)
             {
-                DateTimeOffset showSentUtc;
-                lock (_sync)
-                {
-                    showSentUtc = _lastShowSentUtc;
-                }
-
+                var showSentUtc = ReadLastShowSentUtc();
                 var elapsed = DateTimeOffset.UtcNow - showSentUtc;
                 var remaining = _postShowMinimumVisible - elapsed;
                 if (remaining > TimeSpan.Zero)
@@ -401,36 +319,111 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 }
             }
 
-            lock (_sync)
+            if (!TryReadRequestedVisibility(VisibilityState.Hidden, out shouldHideAfterShow))
             {
-                if (_disposed)
-                {
-                    return;
-                }
-
-                shouldHideAfterShow = _requestedVisibility == VisibilityState.Hidden;
+                return;
             }
 
-            if (!shouldHideAfterShow)
+            if (shouldHideAfterShow && !SendStateSyncHideAndCheckShowRequested("state-sync-post-show"))
             {
-                continue;
+                return;
+            }
+        }
+    }
+
+    private bool TryCaptureStateSyncSnapshot(
+        out bool showRequestedAtStart,
+        out CadLoadSpinnerRequest? showRequest,
+        out Task? warmupTask)
+    {
+        lock (_sync)
+        {
+            if (_disposed)
+            {
+                showRequestedAtStart = false;
+                showRequest = null;
+                warmupTask = null;
+                return false;
             }
 
-            if (HasRunningProcess())
+            showRequestedAtStart = _requestedVisibility == VisibilityState.Visible;
+            showRequest = _latestShowRequest;
+            warmupTask = showRequestedAtStart && ResetExitedProcessLocked() ? null : _warmupTask;
+        }
+
+        CadLoadSpinnerDebugState.RecordHostStateSync(showRequestedAtStart);
+        return true;
+    }
+
+    private bool IsStateSyncHideNeeded()
+    {
+        lock (_sync)
+        {
+            // Nothing is visible when this is false, so there is nothing to sync. Looping would spin
+            // this thread-pool thread until the next Show; a later Show or Hide queues its own sync.
+            return !_disposed &&
+                _requestedVisibility == VisibilityState.Hidden &&
+                _effectiveVisibility == VisibilityState.Visible;
+        }
+    }
+
+    private bool SendStateSyncHideAndCheckShowRequested(string reason)
+    {
+        if (HasRunningProcess())
+        {
+            CadLoadSpinnerDebugState.RecordHostHideIpc(reason);
+            SendHideRequest(reason);
+        }
+
+        lock (_sync)
+        {
+            return _requestedVisibility == VisibilityState.Visible;
+        }
+    }
+
+    private Task? AcquireStateSyncWarmupTask()
+    {
+        lock (_sync)
+        {
+            EnsureWarmupTaskLocked();
+            return _warmupTask;
+        }
+    }
+
+    private bool TrySendStateSyncShow(CadLoadSpinnerRequest? showRequest, out bool showSent)
+    {
+        showSent = false;
+        lock (_sync)
+        {
+            if (_disposed)
             {
-                CadLoadSpinnerDebugState.RecordHostHideIpc("state-sync-post-show");
-                SendHideRequest("state-sync-post-show");
+                return false;
             }
 
-            lock (_sync)
+            if (showRequest is not null && HasRunningProcessLocked())
             {
-                if (_requestedVisibility == VisibilityState.Visible)
-                {
-                    continue;
-                }
+                showSent = SendShowRequestCoreLocked(showRequest);
+                CadLoadSpinnerDebugState.RecordHostShowIpcResult(showSent, "state-sync");
             }
 
-            return;
+            return true;
+        }
+    }
+
+    private bool TryReadRequestedVisibility(VisibilityState expected, out bool matches)
+    {
+        lock (_sync)
+        {
+            matches = !_disposed && _requestedVisibility == expected;
+            return !_disposed;
+        }
+    }
+
+    private DateTimeOffset ReadLastShowSentUtc()
+    {
+        lock (_sync)
+        {
+            return _lastShowSentUtc;
         }
     }
 
