@@ -143,30 +143,30 @@ public sealed partial class FreeformHelperViewModel
         return null;
     }
 
+    // A rejected path must reach the status bar for every caller, so the user never sees a silent failed load.
+    private ProjectLoadCommandResult ReportLoadRejected(string code, string message, string? path)
+    {
+        CreateStatusScope("LoadProject").ReportBlocked(message);
+        return ProjectLoadCommandResult.Failed(code, message, path);
+    }
+
     private async Task<ProjectLoadCommandResult> LoadProjectFromPathCoreAsync(string path)
     {
         var status = CreateStatusScope("LoadProject");
         if (string.IsNullOrWhiteSpace(path))
         {
-            return ProjectLoadCommandResult.Failed(
-                code: "INVALID_ARGUMENTS",
-                message: "Argument '--path' is required.");
+            return ReportLoadRejected("INVALID_ARGUMENTS", "Argument '--path' is required.", null);
         }
 
         var normalizedPath = TryGetFullProjectPath(path, out var pathError);
         if (normalizedPath is null)
         {
-            return ProjectLoadCommandResult.Failed(
-                code: "INVALID_ARGUMENTS",
-                message: $"Invalid project path '{path}': {pathError!.Message}");
+            return ReportLoadRejected("INVALID_ARGUMENTS", $"Invalid project path '{path}': {pathError!.Message}", null);
         }
 
         if (!File.Exists(normalizedPath))
         {
-            return ProjectLoadCommandResult.Failed(
-                code: "PATH_NOT_FOUND",
-                message: $"Project file not found: {normalizedPath}",
-                path: normalizedPath);
+            return ReportLoadRejected("PATH_NOT_FOUND", $"Project file not found: {normalizedPath}", normalizedPath);
         }
 
         var commandResult = ProjectLoadCommandResult.Failed(
