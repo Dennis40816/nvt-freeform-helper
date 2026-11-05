@@ -187,13 +187,13 @@ public sealed partial class RuntimeQueryUseCaseTests
         vm.EnableToRegular = true;
         vm.EnableToFull = true;
 
-        SetPrivateField(vm, "_cad", new CadPadSet(new[] { cad, blocker }));
-        SetPrivateField(vm, "_grid", new RegularGrid(
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(new[] { cad, blocker });
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = new RegularGrid(
             rows: 1,
             cols: 2,
             xEdges: _validationGridXEdges,
             yEdges: _validationGridYEdges,
-            pads: new[] { regularLeft, regularRight }));
+            pads: new[] { regularLeft, regularRight });
 
         var cadOutputFwDiffIndexByCadId = vm.CadIndexMaps.OutputFwDiffIndexByCadId;
         cadOutputFwDiffIndexByCadId.Clear();

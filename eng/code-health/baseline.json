@@ -3499,46 +3499,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "a3252511d48deaed283c69b86a1d14d88cae55cc3bb8c3a31846868c6ab85c10",
-      "member": "FreeformHelper.Tests.DiffFrameCsvFixtureTests.Tm81SingleFingerFixture_AllowsAfterValueForInactiveTargetDiffPads()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/DiffFrameCsvFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "a3252511d48deaed283c69b86a1d14d88cae55cc3bb8c3a31846868c6ab85c10",
-      "member": "FreeformHelper.Tests.DiffFrameCsvFixtureTests.Tm81SingleFingerFixture_KeepsDiffMismatchedStep1PadsAtZero()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/DiffFrameCsvFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "1e76e8dade2b5a679e978d5ac35a690c8233e5330d1ddd0d53bbf05491b1472e",
-      "member": "FreeformHelper.Tests.DiffFrameCsvFixtureTests.Tm81SingleFingerFixture_KeepsUnassignedRegularPadsAtZero()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/DiffFrameCsvFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "a3252511d48deaed283c69b86a1d14d88cae55cc3bb8c3a31846868c6ab85c10",
-      "member": "FreeformHelper.Tests.DiffFrameCsvFixtureTests.Tm81SingleFingerFixture_KeepsUnassignedRegularPadsAtZero()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/DiffFrameCsvFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "aa0de1399740fbb5b208ad13ca4e104376c9ec2b4da69685bbbd316fbec58d9c",
       "member": "FreeformHelper.Tests.DxfLayerImageExportServiceTests.DeleteTempFileWithRetry(string)",
       "owner": "NFH",
@@ -4579,16 +4539,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "06f15cd701ac739e765434433cf72d024d7eb163c8885fcd8b92deeeb0e6b90b",
-      "member": "FreeformHelper.Tests.NotchDisplayProjectorTests.Build_LegacyRegularAnchor_DisabledRoundedZeroTargetPreservesPreviousDisplay()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/NotchDisplayProjectorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "df4e81df7f8978dc95d97b734714d68d2082dee661d30a8e099768df6e3e6580",
       "member": "FreeformHelper.Tests.NotchExampleCExportDriftTests.GetPrivateField`1(FreeformHelperViewModel,string)",
       "owner": "NFH",
@@ -4979,76 +4929,6 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "bc5f09ac12034a6537db00587bea111ba9b134a9945fbad1cfcf99c0aeb67b46",
-      "member": "FreeformHelper.Tests.ProjectLoadingSecondaryWindowTests.GetField`1(object,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingSecondaryWindowTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "ced11297b3d9c3478d8a40436a464243405dd6c4e6a8c9f3913d74bf9841b769",
-      "member": "FreeformHelper.Tests.ProjectLoadingSecondaryWindowTests.LoadPickerAwait_BlocksOpenMappingReportOverridesAndRestoresCommands()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingSecondaryWindowTests.Reports.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "b6346f6282f9cf574487f9d9e3b54ffd3a9adbcf21997d1800ca91e132aa76dd",
-      "member": "FreeformHelper.Tests.ProjectLoadingSecondaryWindowTests.LoadPickerAwait_BlocksOpenNotchExportSelectionPreviewAndConfirmation()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingSecondaryWindowTests.Reports.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "bc5f09ac12034a6537db00587bea111ba9b134a9945fbad1cfcf99c0aeb67b46",
-      "member": "FreeformHelper.Tests.ProjectLoadingSecondaryWindowTests.SetField(object,string,object)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingSecondaryWindowTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "729efa57f28267be412e9492a0455269ac3488f18f31fb6b8923958696ca67c7",
-      "member": "FreeformHelper.Tests.ProjectLoadingSecondaryWindowTests.ShowSecondaryWindowAsync(FreeformHelperView,string,object)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingSecondaryWindowTests.Reports.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "5661909ba5565b912c1d2eb19027077386642437edc8dc0525dee313f0048022",
-      "member": "FreeformHelper.Tests.RuntimeQueryCharacterizationSubject.ParseCommandLine(string[])",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryCharacterizationSubject.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "d4fa5a479ce7964cb7fc8afc28b75ac235ccd8d303a2781e3b8a6d5ee9f98eac",
-      "member": "FreeformHelper.Tests.RuntimeQueryCoreBehaviorTests.WaitForPipeAsync(RuntimeQueryIpcServer,NamedPipeServerStream?)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryCoreBehaviorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "1882e0659f93ba0f136afc77e8f129e617b5b25805074527ad69cc1609c47e49",
       "member": "FreeformHelper.Tests.RuntimeQueryCoreBehaviorTests.WaitForPipeAsync(RuntimeQueryIpcServer,NamedPipeServerStream?)",
       "owner": "NFH",
@@ -5057,16 +4937,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
-      "syntaxHash": "01e2d3adac3a82c2a2fa6e6ac3660724dc337280f4082470ddf086be1b510642",
-      "member": "FreeformHelper.Tests.RuntimeQueryIpcTests.SendRequest_WhenRuntimeQueryThrows_ReturnsIpcErrorEnvelope()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryIpcTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "f17c2ec556c59fd6e0fbd80e90752f11edfb2904ce1047df7a7e945b69acc86b",
@@ -5097,26 +4967,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
-      "syntaxHash": "d66155ecbb4dd6654c7d69c46b03772bb2d1cbbe1aa93ed941d3113422034551",
-      "member": "FreeformHelper.Tests.RuntimeQueryUseCaseTests.SetPrivateField(object,string,object?)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "f21e171a0c20b2951562e05c765f12472db85e4b5ce1b4fc7a90c1f08619b469",
-      "member": "FreeformHelper.Tests.SaveProjectShortcutTests.SaveFromShortcutAsync(FreeformHelperView,FreeformHelperViewModel)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/SaveProjectShortcutTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "67f9bd307accabf973dc14c95f2824f323fd107681eca43cc4bf1ae6350ef3f1",
@@ -5187,16 +5037,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "4d19dbe3f8bdca25cb6239dd28e18612e717628280f89a6ab85edab8ccb15280",
-      "member": "FreeformHelper.Tests.TestInfrastructure.UiEventProbe.Click(object,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/TestInfrastructure/UiEventProbe.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "1e76e8dade2b5a679e978d5ac35a690c8233e5330d1ddd0d53bbf05491b1472e",

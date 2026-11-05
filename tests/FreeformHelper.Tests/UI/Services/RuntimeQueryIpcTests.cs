@@ -1,5 +1,4 @@
 using System.IO.Pipes;
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
@@ -102,10 +101,7 @@ public sealed class RuntimeQueryIpcTests
         using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var projectFile = new ProjectFile();
         projectFile.Settings.Notch.NullValue = ushort.MaxValue + 1;
-        var projectFileField = typeof(FreeformHelperViewModel)
-            .GetField("_projectFile", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(projectFileField);
-        projectFileField!.SetValue(shell.FreeformHelper, projectFile);
+        FreeformHelperViewModelPrivateAccess.ProjectFile(shell.FreeformHelper) = projectFile;
 
         try
         {

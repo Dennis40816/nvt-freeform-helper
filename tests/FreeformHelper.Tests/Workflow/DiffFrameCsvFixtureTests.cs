@@ -1,4 +1,3 @@
-using System.Reflection;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
@@ -36,14 +35,9 @@ public sealed class DiffFrameCsvFixtureTests
         var fixturePath = Path.Combine(repoRoot, "example", "TM 8.1", "simulation-single-finger.csv");
 
         var vm = new FreeformHelperViewModel();
-        var loadMethod = typeof(FreeformHelperViewModel).GetMethod("LoadProjectFromPathAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(loadMethod);
+        await vm.LoadProjectFromPathAsync(projectPath);
 
-        var loadTask = Assert.IsAssignableFrom<Task>(loadMethod!.Invoke(vm, new object[] { projectPath }));
-        await loadTask;
-
-        var gridField = typeof(FreeformHelperViewModel).GetField("_grid", BindingFlags.Instance | BindingFlags.NonPublic);
-        var grid = Assert.IsType<RegularGrid>(gridField!.GetValue(vm));
+        var grid = Assert.IsType<RegularGrid>(FreeformHelperViewModelPrivateAccess.Grid(vm));
         var file = DiffFrameCsvImporter.Import(fixturePath);
 
         foreach (var frame in file.Frames)
@@ -73,11 +67,7 @@ public sealed class DiffFrameCsvFixtureTests
         var fixturePath = Path.Combine(repoRoot, "example", "TM 8.1", "simulation-single-finger.csv");
 
         var vm = new FreeformHelperViewModel();
-        var loadMethod = typeof(FreeformHelperViewModel).GetMethod("LoadProjectFromPathAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(loadMethod);
-
-        var loadTask = Assert.IsAssignableFrom<Task>(loadMethod!.Invoke(vm, new object[] { projectPath }));
-        await loadTask;
+        await vm.LoadProjectFromPathAsync(projectPath);
 
         var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
         Assert.NotNull(session);
@@ -107,11 +97,7 @@ public sealed class DiffFrameCsvFixtureTests
         var fixturePath = Path.Combine(repoRoot, "example", "TM 8.1", "simulation-single-finger.csv");
 
         var vm = new FreeformHelperViewModel();
-        var loadMethod = typeof(FreeformHelperViewModel).GetMethod("LoadProjectFromPathAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(loadMethod);
-
-        var loadTask = Assert.IsAssignableFrom<Task>(loadMethod!.Invoke(vm, new object[] { projectPath }));
-        await loadTask;
+        await vm.LoadProjectFromPathAsync(projectPath);
 
         var session = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
         Assert.NotNull(session);
