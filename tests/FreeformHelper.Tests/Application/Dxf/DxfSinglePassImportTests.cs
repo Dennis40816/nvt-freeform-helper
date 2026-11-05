@@ -20,8 +20,8 @@ public sealed class DxfSinglePassImportTests
             var pads = DxfPadImporter.Import(path);
             var catalog = DxfLayerCatalogReader.ReadFromPath(path);
 
-            Assert.Equal(ExpectedPadLayers[fixture], pads.Pads.Select(static pad => pad.Layer));
-            Assert.Equal(ExpectedLayers[fixture], catalog.Layers.Select(static layer =>
+            Assert.Equal(_expectedPadLayers[fixture], pads.Pads.Select(static pad => pad.Layer));
+            Assert.Equal(_expectedLayers[fixture], catalog.Layers.Select(static layer =>
                 (layer.Name, layer.IsDefinedInLayerTable, layer.ContentKinds, layer.EntityCount)));
         }
         finally
@@ -115,11 +115,11 @@ public sealed class DxfSinglePassImportTests
     internal static string WriteTempDxf(int fixture)
     {
         var path = TestFiles.NewTempFilePath("dxf-single-pass-", ".dxf");
-        TestFiles.WriteText(path, DxfTexts[fixture]);
+        TestFiles.WriteText(path, _dxfTexts[fixture]);
         return path;
     }
 
-    private static readonly string[][] ExpectedPadLayers =
+    private static readonly string[][] _expectedPadLayers =
     [
         ["Pads", "Spare"],
         ["Regular", "Explicit"],
@@ -127,7 +127,7 @@ public sealed class DxfSinglePassImportTests
         ["技術"],
     ];
 
-    private static readonly (string Name, bool Defined, DxfLayerContentKind Kinds, int Count)[][] ExpectedLayers =
+    private static readonly (string Name, bool Defined, DxfLayerContentKind Kinds, int Count)[][] _expectedLayers =
     [
         [
             ("Empty", true, DxfLayerContentKind.None, 0),
@@ -154,7 +154,7 @@ public sealed class DxfSinglePassImportTests
     ];
 
     // Small ASCII DXFs keep the old two-pass baseline independent of private example data.
-    private static readonly string[] DxfTexts =
+    private static readonly string[] _dxfTexts =
     [
         string.Join('\n',
             "0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER",

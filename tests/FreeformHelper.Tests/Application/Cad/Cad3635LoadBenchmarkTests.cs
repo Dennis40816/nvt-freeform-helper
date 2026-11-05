@@ -10,7 +10,7 @@ namespace FreeformHelper.Tests;
 
 public sealed class Cad3635LoadBenchmarkTests
 {
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
     private static readonly BindingFlags PrivateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
 
     private const string RunEnv = "FREEFORMHELPER_RUN_DXF_LOAD_BENCHMARK";
@@ -56,7 +56,7 @@ public sealed class Cad3635LoadBenchmarkTests
             BuildSummary(measured));
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
-        var json = JsonSerializer.Serialize(result, JsonOptions);
+        var json = JsonSerializer.Serialize(result, _jsonOptions);
         await TestFiles.WriteBenchmarkOutputAsync(outputPath, json, TestContext.Current.CancellationToken);
     }
 

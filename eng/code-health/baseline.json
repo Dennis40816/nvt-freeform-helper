@@ -2947,50 +2947,10 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "866589f88022628efe540353da9193588ac766b4306a277ec5c9938a80698adf",
-      "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.fields:JsonOptions",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "eb05855ddbabfad52621d1ba5a75afbaad2faa96a126bf15f25e4734b3ff1b79",
       "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.fields:PrivateInstance",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "3dec1c05c647868eb093080f33e0236ef487f7ba41177975a0070eb355a3a001",
-      "member": "FreeformHelper.Tests.DxfSinglePassImportTests.fields:DxfTexts",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfSinglePassImportTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "ab8f3d2708629cc380207b3e05d81a26824b11eeceed76e5041772c800ab45c8",
-      "member": "FreeformHelper.Tests.DxfSinglePassImportTests.fields:ExpectedLayers",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfSinglePassImportTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "0d9193cadc638ea0d6dedf0721932371cae7f927126dfe71225f99e8ee6b93e4",
-      "member": "FreeformHelper.Tests.DxfSinglePassImportTests.fields:ExpectedPadLayers",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfSinglePassImportTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "IDE1006",
@@ -3011,16 +2971,6 @@
       "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:LeftoverWorkFailures",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "6ef1b8384fceef16e58a4630f770566ee8391e08af9c3fabe62568c26dcba3d0",
-      "member": "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests.fields:MatrixJsonOptions",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/Tm81NotchAcceptanceMatrixTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "IDE1006",

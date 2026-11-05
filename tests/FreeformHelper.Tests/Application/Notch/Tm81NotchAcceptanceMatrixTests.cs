@@ -15,7 +15,7 @@ public sealed class Tm81NotchAcceptanceMatrixTests
 {
     private const double Stage3OverlapContactTolerance = 1e-4;
 
-    private static readonly JsonSerializerOptions MatrixJsonOptions = new()
+    private static readonly JsonSerializerOptions _matrixJsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true,
@@ -26,7 +26,7 @@ public sealed class Tm81NotchAcceptanceMatrixTests
     {
         var snapshotPath = GetSnapshotPath();
         var actual = await BuildActualMatrixAsync();
-        var actualJson = JsonSerializer.Serialize(actual, MatrixJsonOptions);
+        var actualJson = JsonSerializer.Serialize(actual, _matrixJsonOptions);
 
         if (string.Equals(
                 TestEnvironment.Get("FREEFORMHELPER_UPDATE_TM81_NOTCH_MATRIX"),
@@ -40,9 +40,9 @@ public sealed class Tm81NotchAcceptanceMatrixTests
         Assert.True(File.Exists(snapshotPath), "The acceptance matrix snapshot file is missing.");
         var expected = JsonSerializer.Deserialize<Tm81NotchAcceptanceMatrixDocument>(
             TestFiles.ReadContent(snapshotPath),
-            MatrixJsonOptions);
+            _matrixJsonOptions);
         Assert.NotNull(expected);
-        var expectedJson = JsonSerializer.Serialize(expected, MatrixJsonOptions);
+        var expectedJson = JsonSerializer.Serialize(expected, _matrixJsonOptions);
 
         if (!string.Equals(expectedJson, actualJson, StringComparison.Ordinal))
         {
