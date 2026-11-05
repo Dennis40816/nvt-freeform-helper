@@ -1152,20 +1152,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 101
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Persistence.cs"
-      ],
-      "contentHash": "72aed72895750007cb329dd309dd011b231a377cdfc626545703a448de50c29d",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ReplayPersistedCombinedCadGroups(List<ProjectDxfCombinedCadGroup>)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 102
       },
       "owner": "NFH",
@@ -5129,16 +5115,6 @@
       "symbol": "M:System.Environment.GetFolderPath(System.Environment.SpecialFolder)"
     },
     {
-      "syntaxHash": "e37f6fec61aed9563aad19301d6d7f8db9b66b5bbe774d535569bd4de28169ed",
-      "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.Save(AppGeneralSettingsDocument)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
       "syntaxHash": "b90d9b7bb56ad3dc00fcfaf493dc2cf4838ef11135916ffb2732ef5016116e35",
       "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.Save(AppGeneralSettingsDocument)",
       "owner": "NFH",
@@ -5147,16 +5123,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
-      "syntaxHash": "a473458534ae66d3a52b6f0ea80f89ad6ac77a172da50fd2f34d585eb8118881",
-      "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.TryLoad()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
     },
     {
       "syntaxHash": "02c390bc3abdfb46163178b6ad5574f0a3e4863993628686e772e8d22ca650bc",
