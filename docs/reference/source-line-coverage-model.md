@@ -33,7 +33,7 @@ The denominators have numerical guards; overlap must exceed the larger of the ab
 
 ### NotchV22CompensationService: SourceArea, reachability, and Stage3
 
-The canonical entry point in [`NotchV22CompensationService.cs`](../../src/FreeformHelper.Application/Services/NotchV22CompensationService.cs) is `Compute(NotchV22CompensationContext)`. The context can hold existing allocations; only when the compatibility adapter receives no allocations does `BuildCompensationAllocations` in [`Stages.cs`](../../src/FreeformHelper.Application/Services/NotchV22CompensationService.Stages.cs) compute polygon/regular intersections and establish allocations using `overlapArea / cadArea`. This fallback must not be described as directly consuming PadMatcher links; the two also have different filtering thresholds.
+The canonical entry point in [`NotchV22CompensationService.cs`](../../src/FreeformHelper.Application/Services/NotchV22CompensationService.cs) is `Compute(NotchV22CompensationContext)`. The context can hold existing allocations; only when the compatibility adapter receives no allocations does `NotchAllocationService.BuildAllocations` in [`NotchAllocationService.cs`](../../src/FreeformHelper.Application/Services/NotchAllocationService.cs) compute polygon/regular intersections and establish allocations using `overlapArea / cadArea`. This fallback must not be described as directly consuming PadMatcher links; the two also have different filtering thresholds.
 
 | Quantity | Current calculation and use |
 | --- | --- |

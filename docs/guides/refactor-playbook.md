@@ -20,7 +20,7 @@ This document provides a refactoring process that can be followed directly, so d
 - Codex scans `.agents/skills/<skill-name>/SKILL.md` in the repo.
 
 ## Branch and commit workflow
-1. **Check the branch first**: avoid editing directly on `master/main`.
+1. **Check the branch first**: avoid editing directly on `main`.
 2. **One commit per milestone**: do not mix in unrelated fixes.
 3. At every milestone, run:
    - `dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj`
