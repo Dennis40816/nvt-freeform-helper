@@ -434,7 +434,7 @@ Notes:
 
 ### MainWindow (src/FreeformHelper.UI/MainWindow.axaml.cs)
 - OnClosing (runs SaveBeforeClosingAsync)
-  - Displays ConfirmDialog and starts the save command (TryStartSaveProjectCommand, which runs SaveProjectAsync) after confirmation
+  - Displays ConfirmDialog and starts the save command (TryStartSaveProjectCommandAsync, which runs SaveProjectAsync) after confirmation
 
 ### ConfirmDialog (src/FreeformHelper.UI/Views/ConfirmDialog.axaml.cs)
 - ConfirmButton_Click / CancelButton_Click
