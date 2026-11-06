@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Dennis Liu
 // SPDX-License-Identifier: MIT
 
-// Shared source from Nvt.Core.TestSupport, copied unchanged.
+// Shared source from Nvt.Core.TestSupport (tests/Nvt.Core.TestSupport/TaskBlock.cs in nvt_fw_core).
+// One doc-comment phrase differs: Core says "is banned in tests", this copy says "is a poor choice in tests".
 
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
