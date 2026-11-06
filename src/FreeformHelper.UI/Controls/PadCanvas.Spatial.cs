@@ -59,7 +59,7 @@ public sealed partial class PadCanvas
     /// A coarse spatial index for CAD pads. It indexes pad bounds into fixed-size buckets
     /// so hit-test and box-select avoid scanning the full CAD set on every interaction.
     /// </summary>
-    private sealed class CadSpatialIndex
+    internal sealed class CadSpatialIndex
     {
         private const double EdgeEpsilon = 1e-9;
         private const int MinAxisBuckets = 8;
@@ -276,7 +276,7 @@ public sealed partial class PadCanvas
     /// A spatial index specifically designed for efficiently querying <see cref="RegularPad"/> objects.
     /// It uses a grid-like structure to map world coordinates to pad instances.
     /// </summary>
-    private sealed class RegularSpatialIndex
+    internal sealed class RegularSpatialIndex
     {
         private const double EdgeEpsilon = 1e-6;
         // Internal 2D array representing the grid of pads.

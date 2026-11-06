@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Geometry;
@@ -33,10 +32,10 @@ public sealed class PadCanvasHitTestTests
         // may map to row1-col1 when per-row widths diverge.
         SetCanvasView(canvas, zoom: 1.0, panX: 0.0, panY: 0.0);
         var screenPoint = GetScreenPointForWorld(canvas, new Point2(15, 15));
-        var hit = InvokeHitTestForHoverDebug(canvas, screenPoint, regularOnly: true);
+        var hit = PadCanvasPrivateAccess.HitTestForHoverDebug(canvas, screenPoint, regularOnly: true);
 
-        Assert.Equal("Regular", ReadHitKind(hit));
-        Assert.Equal(2, ReadHitIdOrIndex(hit));
+        Assert.Equal(PadCanvas.HitKind.Regular, hit.kind);
+        Assert.Equal(2, hit.idOrIndex);
     }
 
     [AvaloniaFact]
@@ -58,9 +57,7 @@ public sealed class PadCanvasHitTestTests
 
         PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
 
-        var field = typeof(PadCanvas).GetField("_regularIndex", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        Assert.Null(field!.GetValue(canvas));
+        Assert.Null(PadCanvasPrivateAccess.RegularIndex(canvas));
     }
 
     [AvaloniaFact]
@@ -158,15 +155,12 @@ public sealed class PadCanvasHitTestTests
             RegularPads = separablePads,
         };
 
-        var field = typeof(PadCanvas).GetField("_regularIndex", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-
         PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
-        Assert.NotNull(field!.GetValue(canvas));
+        Assert.NotNull(PadCanvasPrivateAccess.RegularIndex(canvas));
 
         canvas.RegularPads = nonSeparablePads;
         PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
-        Assert.Null(field.GetValue(canvas));
+        Assert.Null(PadCanvasPrivateAccess.RegularIndex(canvas));
     }
 
     [AvaloniaFact]
@@ -190,10 +184,10 @@ public sealed class PadCanvasHitTestTests
         SetCanvasView(canvas, zoom: 5.0, panX: 25.0, panY: 75.0);
         var screenPoint = GetScreenPointForWorld(canvas, pads[0].Centroid);
 
-        var hit = InvokeHitTestForHoverDebug(canvas, screenPoint, regularOnly: true);
+        var hit = PadCanvasPrivateAccess.HitTestForHoverDebug(canvas, screenPoint, regularOnly: true);
 
-        Assert.Equal("Regular", ReadHitKind(hit));
-        Assert.Equal(7, ReadHitIdOrIndex(hit));
+        Assert.Equal(PadCanvas.HitKind.Regular, hit.kind);
+        Assert.Equal(7, hit.idOrIndex);
     }
 
     [AvaloniaFact]
@@ -217,48 +211,17 @@ public sealed class PadCanvasHitTestTests
         SetCanvasView(canvas, zoom: 5.0, panX: 25.0, panY: 75.0);
         var screenPoint = GetScreenPointForWorld(canvas, pads[0].Centroid);
 
-        var hit = InvokeHitTestForHoverDebug(canvas, screenPoint, regularOnly: true);
-        SetPrivateField(canvas, "_hoverDebugHit", hit);
+        var hit = PadCanvasPrivateAccess.HitTestForHoverDebug(canvas, screenPoint, regularOnly: true);
+        PadCanvasPrivateAccess.HoverDebugHit(canvas) = hit;
         PadCanvasPrivateAccess.HoverDebugVisible(canvas) = true;
         PadCanvasPrivateAccess.HoverDebugRegularOnlyMode(canvas) = true;
 
-        var snapshot = InvokeBuildHoverDebugSnapshot(canvas);
-        var text = ReadSnapshotText(snapshot);
+        var snapshot = PadCanvasPrivateAccess.BuildHoverDebugSnapshot(canvas);
+        Assert.NotNull(snapshot);
+        var text = snapshot.Value.Text;
 
         Assert.Contains("REG 7", text, StringComparison.Ordinal);
         Assert.Contains("Diff 42", text, StringComparison.Ordinal);
-    }
-
-    private static object InvokeHitTestForHoverDebug(PadCanvas canvas, Avalonia.Point screenPoint, bool regularOnly)
-    {
-        var method = typeof(PadCanvas).GetMethod("HitTestForHoverDebug", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        var hit = method!.Invoke(canvas, new object[] { screenPoint, regularOnly });
-        Assert.NotNull(hit);
-        return hit!;
-    }
-
-    private static object InvokeBuildHoverDebugSnapshot(PadCanvas canvas)
-    {
-        var method = typeof(PadCanvas).GetMethod("BuildHoverDebugSnapshot", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        var snapshot = method!.Invoke(canvas, null);
-        Assert.NotNull(snapshot);
-        return snapshot!;
-    }
-
-    private static string ReadSnapshotText(object snapshot)
-    {
-        var property = snapshot.GetType().GetProperty("Text", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        Assert.NotNull(property);
-        return Assert.IsType<string>(property!.GetValue(snapshot));
-    }
-
-    private static void SetPrivateField(PadCanvas canvas, string fieldName, object value)
-    {
-        var field = typeof(PadCanvas).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        field!.SetValue(canvas, value);
     }
 
     private static void SetCanvasView(PadCanvas canvas, double zoom, double panX, double panY)
@@ -271,24 +234,6 @@ public sealed class PadCanvasHitTestTests
     private static Avalonia.Point GetScreenPointForWorld(PadCanvas canvas, Point2 worldPoint)
     {
         return canvas.WorldToScreen(worldPoint);
-    }
-
-    private static string ReadHitKind(object hit)
-    {
-        var type = hit.GetType();
-        var prop = type.GetProperty("kind", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                   ?? type.GetProperty("Kind", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        Assert.NotNull(prop);
-        return prop!.GetValue(hit)?.ToString() ?? string.Empty;
-    }
-
-    private static int ReadHitIdOrIndex(object hit)
-    {
-        var type = hit.GetType();
-        var prop = type.GetProperty("idOrIndex", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                   ?? type.GetProperty("IdOrIndex", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        Assert.NotNull(prop);
-        return Assert.IsType<int>(prop!.GetValue(hit));
     }
 
     private static List<int> ReadSelectedRegularIndices(PadCanvas canvas)

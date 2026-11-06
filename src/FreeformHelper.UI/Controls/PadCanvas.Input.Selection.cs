@@ -184,10 +184,10 @@ public sealed partial class PadCanvas
     }
 
     // Defines the kind of item hit during a hit test.
-    private enum HitKind { None, Cad, Regular }
+    internal enum HitKind { None, Cad, Regular }
 
     // Represents the result of a hit test, indicating the type of item and its ID/index.
-    private readonly record struct HitResult(HitKind kind, int idOrIndex);
+    internal readonly record struct HitResult(HitKind kind, int idOrIndex);
 
     /// <summary>
     /// Performs a hit test at the given screen point to identify which pad (if any) was clicked.

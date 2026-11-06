@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -23,14 +22,14 @@ public sealed class PadCanvasCacheInvalidationTests
         PadCanvasPrivateAccess.EnsureCadGeometryCache(canvas);
         PadCanvasPrivateAccess.EnsureCadSpatialIndex(canvas);
         var cadGeometryCacheBefore = PadCanvasPrivateAccess.CadGeometryCache(canvas);
-        var cadSpatialIndexBefore = GetPrivateField(canvas, "_cadIndex");
+        var cadSpatialIndexBefore = PadCanvasPrivateAccess.CadIndex(canvas);
         Assert.NotNull(cadGeometryCacheBefore);
         Assert.NotNull(cadSpatialIndexBefore);
 
         canvas.RegularPads = CreateRegularPads(offsetX: 100);
 
         var cadGeometryCacheAfter = PadCanvasPrivateAccess.CadGeometryCache(canvas);
-        var cadSpatialIndexAfter = GetPrivateField(canvas, "_cadIndex");
+        var cadSpatialIndexAfter = PadCanvasPrivateAccess.CadIndex(canvas);
         Assert.Same(cadGeometryCacheBefore, cadGeometryCacheAfter);
         Assert.Same(cadSpatialIndexBefore, cadSpatialIndexAfter);
     }
@@ -45,12 +44,12 @@ public sealed class PadCanvasCacheInvalidationTests
         };
 
         PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
-        var regularIndexBefore = GetPrivateField(canvas, "_regularIndex");
+        var regularIndexBefore = PadCanvasPrivateAccess.RegularIndex(canvas);
         Assert.NotNull(regularIndexBefore);
 
         canvas.CadPads = CreateCadPads(offsetX: 200);
 
-        var regularIndexAfter = GetPrivateField(canvas, "_regularIndex");
+        var regularIndexAfter = PadCanvasPrivateAccess.RegularIndex(canvas);
         Assert.Same(regularIndexBefore, regularIndexAfter);
     }
 
@@ -69,8 +68,8 @@ public sealed class PadCanvasCacheInvalidationTests
         PadCanvasPrivateAccess.EnsureCadSpatialIndex(canvas);
         PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
 
-        var regularIndexBefore = GetPrivateField(canvas, "_regularIndex");
-        var cadIndexBefore = GetPrivateField(canvas, "_cadIndex");
+        var regularIndexBefore = PadCanvasPrivateAccess.RegularIndex(canvas);
+        var cadIndexBefore = PadCanvasPrivateAccess.CadIndex(canvas);
         Assert.NotNull(regularIndexBefore);
         Assert.NotNull(cadIndexBefore);
         Assert.NotNull(PadCanvasPrivateAccess.CadGeometryCache(canvas));
@@ -82,8 +81,8 @@ public sealed class PadCanvasCacheInvalidationTests
         Assert.Null(PadCanvasPrivateAccess.CadGeometryCache(canvas));
         Assert.Null(PadCanvasPrivateAccess.CadAreaColorCache(canvas));
         Assert.Null(PadCanvasPrivateAccess.CadAreaBrushCache(canvas));
-        Assert.Null(GetPrivateField(canvas, "_cadIndex"));
-        Assert.Same(regularIndexBefore, GetPrivateField(canvas, "_regularIndex"));
+        Assert.Null(PadCanvasPrivateAccess.CadIndex(canvas));
+        Assert.Same(regularIndexBefore, PadCanvasPrivateAccess.RegularIndex(canvas));
     }
 
     [AvaloniaFact]
@@ -104,11 +103,11 @@ public sealed class PadCanvasCacheInvalidationTests
         var cadAreaColorCacheBefore = PadCanvasPrivateAccess.CadAreaColorCache(canvas);
         Assert.NotNull(cadGeometryCacheBefore);
         Assert.NotNull(cadAreaColorCacheBefore);
-        Assert.NotNull(GetPrivateField(canvas, "_regularIndex"));
+        Assert.NotNull(PadCanvasPrivateAccess.RegularIndex(canvas));
 
         canvas.RegularPads = CreateRegularPads(offsetX: 100);
 
-        Assert.Null(GetPrivateField(canvas, "_regularIndex"));
+        Assert.Null(PadCanvasPrivateAccess.RegularIndex(canvas));
         Assert.Same(cadGeometryCacheBefore, PadCanvasPrivateAccess.CadGeometryCache(canvas));
         Assert.Same(cadAreaColorCacheBefore, PadCanvasPrivateAccess.CadAreaColorCache(canvas));
     }
@@ -429,12 +428,5 @@ public sealed class PadCanvasCacheInvalidationTests
         double lowDetailZoomThreshold)
     {
         PadCanvasPrivateAccess.BuildVisibleDrawLists(canvas, viewport, showRegular, showCad, lowDetailMode, lowDetailZoomThreshold);
-    }
-
-    private static object? GetPrivateField(PadCanvas canvas, string fieldName)
-    {
-        var field = typeof(PadCanvas).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return field!.GetValue(canvas);
     }
 }
