@@ -29,7 +29,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
     internal const string DisableProcessLaunchSwitch = "FreeformHelper.DisableCadLoadSpinnerProcess";
     private const int ConnectTimeoutMs = 250;
     private const int WarmupTimeoutMs = 3000;
-    private static readonly TimeSpan ShowRetryDelay = TimeSpan.FromMilliseconds(30);
+    private static readonly TimeSpan _showRetryDelay = TimeSpan.FromMilliseconds(30);
     private static readonly TimeSpan _postShowMinimumVisible = TimeSpan.FromMilliseconds(120);
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -298,7 +298,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 if (stillShowRequested)
                 {
                     CadLoadSpinnerDebugState.RecordHostShowRetry();
-                    await Task.Delay(ShowRetryDelay).ConfigureAwait(false);
+                    await Task.Delay(_showRetryDelay, TimeProvider.System, CancellationToken.None).ConfigureAwait(false);
                     continue;
                 }
             }
