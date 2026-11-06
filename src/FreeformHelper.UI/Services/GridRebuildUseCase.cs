@@ -45,7 +45,8 @@ public sealed class GridRebuildUseCase
     {
         lock (_sync)
         {
-            return _activeRunTask;
+            // WaitAsync with no token and no timeout returns the same task, so callers see the same completion and exception.
+            return _activeRunTask.WaitAsync(CancellationToken.None);
         }
     }
 
