@@ -473,4 +473,186 @@ public sealed partial class RuntimeQueryUseCaseTests
             pads: [regular]);
         return (shell, target);
     }
+
+    [Fact]
+    public async Task ExecuteAsync_NotchQuery_KeepsPayloadStructureAndAppliesLimits()
+    {
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var helper = shell.FreeformHelper;
+        var cad = BuildToFullNotchQueryFixture(helper);
+        var resolved = Assert.IsType<NotchV22ResolvedResult>(helper.GetCadV22ResolvedResult(cad.Id));
+        var compensation = resolved.Compensation;
+        var allocation = resolved.TargetAllocation;
+        Assert.True(compensation.RegularDebugInfos.Count >= 3);
+        Assert.True(allocation.Targets.Count >= 3);
+        var useCase = new RuntimeQueryUseCase(shell);
+
+        var response = await useCase.ExecuteAsync(new RuntimeQueryRequest(
+            RuntimeQueryProtocol.Version,
+            "notch",
+            new Dictionary<string, string>
+            {
+                ["cad-id"] = cad.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                ["limit"] = "2",
+                ["target-limit"] = "2",
+                ["polygon-limit"] = "1"
+            }));
+
+        Assert.True(response.Ok, response.Error?.Message);
+        var root = SerializeToRootElement(response.Data);
+        Assert.Equal(ExpectedNotchQueryShape, DescribeJsonShape(root));
+        Assert.Equal("notch-v22", root.GetProperty("kind").GetString());
+        Assert.Equal(helper.GetNotchStep3Revision(), root.GetProperty("cache").GetProperty("step3Revision").GetInt32());
+        Assert.Equal(cad.Id, root.GetProperty("cadPad").GetProperty("id").GetInt32());
+        Assert.Equal(cad.Name, root.GetProperty("cadPad").GetProperty("name").GetString());
+        Assert.Equal(cad.Area, root.GetProperty("cadPad").GetProperty("area").GetDouble());
+
+        var ratios = root.GetProperty("ratios");
+        Assert.Equal(compensation.ToRegularRatio, ratios.GetProperty("toRegularRatio").GetDouble());
+        Assert.Equal(compensation.ToFullRatio, ratios.GetProperty("toFullRatio").GetDouble());
+        Assert.Equal(compensation.CombinedRatio, ratios.GetProperty("combinedRatio").GetDouble());
+        Assert.Equal(compensation.OverlapRegularCount, ratios.GetProperty("overlapRegularCount").GetInt32());
+
+        var threshold = root.GetProperty("threshold");
+        Assert.Equal(helper.GetNotchMultiOwnerStrictOverlapPercent(), threshold.GetProperty("strictOverlapPercent").GetDouble());
+        Assert.Equal(
+            threshold.GetProperty("strictOverlapPercent").GetDouble() / 100.0,
+            threshold.GetProperty("strictOverlapRatio").GetDouble());
+        Assert.Equal(helper.EnableToFullRuleEngine, threshold.GetProperty("ruleEngineEnabled").GetBoolean());
+        Assert.Equal(helper.EnableToFullRuleTrace, threshold.GetProperty("ruleTraceEnabled").GetBoolean());
+
+        var expectedRegulars = compensation.RegularDebugInfos
+            .OrderByDescending(static info => info.OverlapArea)
+            .ThenBy(static info => info.RegularPadId)
+            .Take(2)
+            .ToList();
+        var regularsJson = root.GetProperty("regulars");
+        Assert.Equal(
+            expectedRegulars.Select(static info => info.RegularPadId),
+            regularsJson.EnumerateArray().Select(static item => item.GetProperty("regularPadId").GetInt32()));
+        Assert.Equal(
+            expectedRegulars.Select(static info => info.ToFullRuleTrace.Count),
+            regularsJson.EnumerateArray().Select(static item => item.GetProperty("ruleTrace").GetArrayLength()));
+        var summary = root.GetProperty("summary");
+        Assert.Equal(compensation.RegularDebugInfos.Count, summary.GetProperty("totalRegulars").GetInt32());
+        Assert.Equal(2, summary.GetProperty("returnedRegulars").GetInt32());
+        Assert.Equal(compensation.RegularDebugInfos.Count - 2, summary.GetProperty("truncatedRegulars").GetInt32());
+        Assert.Equal(
+            compensation.RegularDebugInfos.Count(static info => info.IsBoundaryRegular),
+            summary.GetProperty("boundaryRegularCount").GetInt32());
+        Assert.Equal(
+            compensation.RegularDebugInfos.Count(static info => info.IsToFullApplied),
+            summary.GetProperty("toFullAppliedCount").GetInt32());
+        Assert.Equal(
+            compensation.RegularDebugInfos.Count(static info => info.BlockerCandidateCount > 0),
+            summary.GetProperty("blockerRegularCount").GetInt32());
+
+        AssertNotchQueryAllocationAndPolygons(root, resolved);
+    }
+
+    private static void AssertNotchQueryAllocationAndPolygons(System.Text.Json.JsonElement root, NotchV22ResolvedResult resolved)
+    {
+        var allocation = resolved.TargetAllocation;
+        var allocationJson = root.GetProperty("stage3Allocation");
+        Assert.Equal(allocation.Targets.Count, allocationJson.GetProperty("targetCount").GetInt32());
+        Assert.Equal(2, allocationJson.GetProperty("returnedTargets").GetInt32());
+        Assert.Equal(allocation.Targets.Count - 2, allocationJson.GetProperty("truncatedTargets").GetInt32());
+        Assert.Equal(
+            allocation.Targets.Take(2).Select(static target => target.DiffIndex),
+            allocationJson.GetProperty("targets").EnumerateArray().Select(static target => target.GetProperty("diffIndex").GetInt32()));
+
+        var polygons = root.GetProperty("toFullPolygons");
+        Assert.Equal(resolved.Stage1SeedPolygons.Count, polygons.GetProperty("seedCount").GetInt32());
+        Assert.Equal(resolved.Stage3FinalOutlinePolygons.Count, polygons.GetProperty("finalCount").GetInt32());
+        Assert.Equal(Math.Min(1, resolved.Stage1SeedPolygons.Count), polygons.GetProperty("returnedSeedBounds").GetInt32());
+        Assert.Equal(Math.Min(1, resolved.Stage3FinalOutlinePolygons.Count), polygons.GetProperty("returnedFinalBounds").GetInt32());
+        Assert.Equal(polygons.GetProperty("returnedSeedBounds").GetInt32(), polygons.GetProperty("seedBounds").GetArrayLength());
+        Assert.Equal(polygons.GetProperty("returnedFinalBounds").GetInt32(), polygons.GetProperty("finalBounds").GetArrayLength());
+    }
+
+    private static string DescribeJsonShape(System.Text.Json.JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case System.Text.Json.JsonValueKind.Object:
+                return "{" + string.Join(
+                    ",",
+                    element.EnumerateObject().Select(static property =>
+                    {
+                        var child = DescribeJsonShape(property.Value);
+                        return child.Length == 0 ? property.Name : property.Name + ":" + child;
+                    })) + "}";
+            case System.Text.Json.JsonValueKind.Array:
+                return element.GetArrayLength() == 0 ? "[]" : "[" + DescribeJsonShape(element[0]) + "]";
+            default:
+                return string.Empty;
+        }
+    }
+
+    private static CadPad BuildToFullNotchQueryFixture(FreeformHelperViewModel helper)
+    {
+        const double cadHeight = 5.4;
+        const double emittedArea = 18.09;
+        const double roundedZeroArea = 18.0;
+        var anchorMaxX = (4570.0 - (2 * emittedArea) - roundedZeroArea) / cadHeight;
+        var emittedMaxX = anchorMaxX + (emittedArea / cadHeight);
+        var secondEmittedMaxX = emittedMaxX + (emittedArea / cadHeight);
+        var cadMaxX = secondEmittedMaxX + (roundedZeroArea / cadHeight);
+        var gridMaxX = secondEmittedMaxX + 800.0;
+        var cad = CreateCadPad(274, 0, 0, cadMaxX, cadHeight);
+        var regulars = new[]
+        {
+            CreateRegularPad(4808, 0, 0, 0, 0, anchorMaxX, 10, 0, 83),
+            CreateRegularPad(4809, 0, 1, anchorMaxX, 0, emittedMaxX, 10, 0, 84),
+            CreateRegularPad(4810, 0, 2, emittedMaxX, 0, secondEmittedMaxX, 10, 0, 85),
+            CreateRegularPad(4811, 0, 3, secondEmittedMaxX, 0, gridMaxX, 10, 0, 86),
+        };
+        foreach (var regular in regulars)
+        {
+            regular.Freeform = FreeformType.XWay;
+            regular.MatchedCadPadId = cad.Id;
+            regular.MatchScore = 1.0;
+            helper.RegularPads.Add(regular);
+        }
+
+        helper.CadPads.Add(cad);
+        helper.EnableToRegular = true;
+        helper.EnableToFull = true;
+        helper.ToFullStrictOverlapPercent = 0.1m;
+        helper.EnableBoundaryVirtualAreaCap = true;
+        helper.EnableToFullRuleEngine = true;
+        helper.EnableToFullRuleTrace = true;
+        FreeformHelperViewModelPrivateAccess.Cad(helper) = new CadPadSet([cad]);
+        FreeformHelperViewModelPrivateAccess.Grid(helper) = new RegularGrid(
+            rows: 1,
+            cols: 4,
+            xEdges: [0, anchorMaxX, emittedMaxX, secondEmittedMaxX, gridMaxX],
+            yEdges: [0, 10],
+            pads: regulars);
+        helper.CadIndexMaps.OutputFwDiffIndexByCadId[cad.Id] = 83;
+        helper.CadIndexMaps.IcIndexByCadId[cad.Id] = 0;
+        helper.InvalidateWorkflowDataSnapshot();
+        return cad;
+    }
+
+    private const string ExpectedNotchQueryShape =
+        "{kind,cache:{step3Revision,cacheKey},cadPad:{id,name,layer,icIndex,diffIndex,diffSource,area}," +
+        "ratios:{toRegularRatio,toFullRatio,combinedRatio,stage3Area,isToFullEnabled,overlapAreaTotal," +
+        "overlappedRegularAreaTotal,overlapRegularCount,display:{toRegularRatioText,toFullRatioText," +
+        "combinedRatioText,toRegularValueText,toFullValueText,combinedValueText,toFullReasonShortText," +
+        "toFullReasonFullText,stage3AreaText}}," +
+        "threshold:{strictOverlapPercent,strictOverlapRatio,ruleEngineEnabled,ruleTraceEnabled}," +
+        "stage3Allocation:{cadArea,stage3Area,strictAreaThreshold,targetCount,returnedTargets,truncatedTargets," +
+        "targets:[{icIndex,diffIndex,effectiveArea,ratio,ratioPercentRounded,passesStrictThreshold,isAnchorDiff," +
+        "toFullAppliedRegularCount,regularCount,regularPadIds:[]}]," +
+        "display:{targetAllocationSummaryText,targetAllocationLines:[],ownerSummaryText}}," +
+        "summary:{totalRegulars,returnedRegulars,truncatedRegulars,boundaryRegularCount,toFullAppliedCount," +
+        "blockerRegularCount,isToFullEnabled}," +
+        "toFullPolygons:{seedCount,finalCount,returnedSeedBounds,returnedFinalBounds," +
+        "seedBounds:[{minX,minY,maxX,maxY}],finalBounds:[{minX,minY,maxX,maxY}]}," +
+        "regulars:[{regularPadId,regularIndex,icIndex,diffIndex,row,col,regularArea,overlapArea,sourceArea," +
+        "blockedArea,reachableArea,sourceCellCount,blockedCellCount,reachableCellCount,totalCellCount," +
+        "blockerCandidateCount,ownerCadPadCount,ownerCadPadIds:[],isBoundaryRegular,isToFullBoundaryCandidate," +
+        "hasEffectiveExpansion,hasDirectionalBlocker,toFullRuleCode,ruleTrace:[{rule,passed,detail}]," +
+        "isToFullApplied}],diagnosticsText}";
 }
