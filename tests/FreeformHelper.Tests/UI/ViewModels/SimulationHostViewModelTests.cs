@@ -12,6 +12,84 @@ public sealed class SimulationHostViewModelTests
     private static readonly int[] _simulationDiffIndices = { 10, 11 };
 
     [Fact]
+    public async Task OpenSimulationCommand_WithoutBuildRequest_DoesNotStartBuildingAsync()
+    {
+        var host = new SimulationHostViewModel();
+        Assert.False(host.CanOpenSimulation);
+
+        await host.OpenSimulationCommand.ExecuteAsync(null);
+
+        Assert.False(host.CanOpenSimulation);
+        Assert.False(host.IsBuildingWorkspace);
+        Assert.False(host.HasBuildProgressOverlay);
+        Assert.Empty(host.BuildProgressText);
+        Assert.Null(host.CurrentWorkspace);
+    }
+
+    [Fact]
+    public async Task OpenSimulationCommand_WithBuildRequest_InvokesOnceAndTracksBuildingStateAsync()
+    {
+        var host = new SimulationHostViewModel();
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var invokeCount = 0;
+        async Task BuildAsync()
+        {
+            invokeCount++;
+            await release.Task.WaitAsync(TestContext.Current.CancellationToken);
+        }
+
+        host.RequestBuildWorkspaceAsync = BuildAsync;
+        Assert.True(host.CanOpenSimulation);
+
+        var buildTask = host.OpenSimulationCommand.ExecuteAsync(null);
+        try
+        {
+            Assert.True(host.IsBuildingWorkspace);
+            Assert.True(host.HasBuildProgressOverlay);
+            Assert.True(host.HasBuildProgressText);
+            Assert.False(host.CanOpenSimulation);
+            Assert.False(host.OpenSimulationCommand.CanExecute(null));
+        }
+        finally
+        {
+            release.SetResult();
+            await buildTask;
+        }
+
+        Assert.Equal(1, invokeCount);
+        Assert.False(host.IsBuildingWorkspace);
+        Assert.False(host.HasBuildProgressOverlay);
+        Assert.False(host.HasBuildProgressText);
+        Assert.True(host.CanOpenSimulation);
+        Assert.True(host.OpenSimulationCommand.CanExecute(null));
+        Assert.Empty(host.BuildProgressText);
+    }
+
+    [Fact]
+    public async Task OpenSimulationCommand_WhenBuildRequestThrows_ResetsBuildingStateAndPropagatesAsync()
+    {
+        var host = new SimulationHostViewModel();
+        var failure = new InvalidOperationException("Simulation build failed.");
+        var wasBuilding = false;
+        host.RequestBuildWorkspaceAsync = () =>
+        {
+            wasBuilding = host.IsBuildingWorkspace;
+            throw failure;
+        };
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => host.OpenSimulationCommand.ExecuteAsync(null));
+
+        Assert.Same(failure, exception);
+        Assert.True(wasBuilding);
+        Assert.False(host.IsBuildingWorkspace);
+        Assert.False(host.HasBuildProgressOverlay);
+        Assert.True(host.CanOpenSimulation);
+        Assert.Empty(host.BuildProgressText);
+        Assert.Empty(host.BuildFailureText);
+    }
+
+    [Fact]
     public async Task PrewarmWorkspaceAsync_WhenWorkspaceIsStaleAndPristine_InvokesRequest()
     {
         var host = new SimulationHostViewModel();

@@ -74,6 +74,49 @@ public sealed class DxfOverlapResultBehaviorTests
     }
 
     [Fact]
+    public async Task ShowDxfOverlapDetailsCommand_WithOverlaps_PassesMatchingReportToHandlerAsync()
+    {
+        using var dxf = await DxfFixture.OpenAsync(_overlappingPads);
+        await dxf.Vm.CheckDxfQualityCommand.ExecuteAsync(null);
+        var expectedIssues = dxf.Vm.DxfOverlapIssues.ToArray();
+        var reports = new List<DxfOverlapReportViewModel>();
+        dxf.Vm.OpenDxfOverlapReportAsync = report =>
+        {
+            reports.Add(report);
+            return Task.CompletedTask;
+        };
+
+        await dxf.Vm.ShowDxfOverlapDetailsCommand.ExecuteAsync(null);
+
+        var captured = Assert.Single(reports);
+        Assert.NotEmpty(expectedIssues);
+        Assert.Equal(dxf.Vm.DxfOverlapSummary, captured.Summary);
+        Assert.Equal(expectedIssues, captured.Issues);
+        Assert.Equal(expectedIssues.Length, captured.IssueCount);
+    }
+
+    [Fact]
+    public async Task ShowDxfOverlapDetailsCommand_WithoutOverlaps_OpensReportWithNoIssuesMessageAsync()
+    {
+        using var dxf = await DxfFixture.OpenAsync(_separatePads);
+        await dxf.Vm.CheckDxfQualityCommand.ExecuteAsync(null);
+        var reports = new List<DxfOverlapReportViewModel>();
+        dxf.Vm.OpenDxfOverlapReportAsync = report =>
+        {
+            reports.Add(report);
+            return Task.CompletedTask;
+        };
+
+        await dxf.Vm.ShowDxfOverlapDetailsCommand.ExecuteAsync(null);
+
+        var captured = Assert.Single(reports);
+        Assert.Empty(dxf.Vm.DxfOverlapIssues);
+        Assert.Equal("DXF check: no overlaps detected.", dxf.Vm.StatusText);
+        Assert.Equal(dxf.Vm.DxfOverlapSummary, captured.Summary);
+        Assert.Equal("No overlap issues.", Assert.Single(captured.Issues));
+    }
+
+    [Fact]
     public async Task CheckDxfQuality_RunTwice_ReplacesTheResultWithTheSameContent()
     {
         using var dxf = await DxfFixture.OpenAsync(_overlappingPads);
