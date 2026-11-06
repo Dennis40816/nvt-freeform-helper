@@ -90,7 +90,7 @@ public sealed class ProjectLoadingInputTests
         FreeformHelperViewModelPrivateAccess.CadLoadOverlayScope(vm) = new LoadingScopeCoordinator(() =>
         {
             entered.TrySetResult();
-            return release.Task;
+            return release.Task.WaitAsync(TestContext.Current.CancellationToken);
         }, TimeSpan.Zero);
         var view = new FreeformHelperView { DataContext = vm };
         var window = new Window { Width = 1200, Height = 800, Content = view };

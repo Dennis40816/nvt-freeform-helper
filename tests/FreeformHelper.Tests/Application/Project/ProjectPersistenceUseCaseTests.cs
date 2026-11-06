@@ -439,7 +439,7 @@ public sealed class ProjectPersistenceUseCaseTests
             var publication = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             var store = new JsonProjectStore
             {
-                Publisher = (_, _, _) => publication.Task,
+                Publisher = (_, _, _) => publication.Task.WaitAsync(TestContext.Current.CancellationToken),
             };
             var useCase = new ProjectPersistenceUseCase(store);
 
@@ -457,7 +457,7 @@ public sealed class ProjectPersistenceUseCaseTests
             var failure = new IOException("Publication failed.");
             publication.SetException(failure);
 
-            var actual = await Assert.ThrowsAsync<IOException>(() => saving);
+            var actual = await Assert.ThrowsAsync<IOException>(() => saving.WaitAsync(TestContext.Current.CancellationToken));
             Assert.Same(failure, actual);
             Assert.False(completedBeforePublication);
             Assert.Empty(Directory.GetFileSystemEntries(directory.FullName));

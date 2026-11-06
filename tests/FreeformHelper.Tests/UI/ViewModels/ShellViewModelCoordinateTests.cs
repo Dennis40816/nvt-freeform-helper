@@ -42,7 +42,7 @@ public sealed class ShellViewModelCoordinateTests
             shell.Dispose();
             shell.Dispose();
             release.SetResult();
-            var exception = await Record.ExceptionAsync(() => buildTask);
+            var exception = await Record.ExceptionAsync(() => buildTask.WaitAsync(TestContext.Current.CancellationToken));
 
             Assert.Null(exception);
             Assert.Empty(errors.Logs);
@@ -102,7 +102,7 @@ public sealed class ShellViewModelCoordinateTests
         Func<Task> buildWorkspace = async () =>
         {
             entered.SetResult();
-            await release.Task;
+            await release.Task.WaitAsync(TestContext.Current.CancellationToken);
         };
         shell.CoordinatePlanner.RequestBuildWorkspaceAsync = buildWorkspace;
 

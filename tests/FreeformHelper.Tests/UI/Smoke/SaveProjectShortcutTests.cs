@@ -51,7 +51,7 @@ public sealed class SaveProjectShortcutTests
             PickSaveProjectPathAsync = () =>
             {
                 saveCount++;
-                return release.Task;
+                return release.Task.WaitAsync(TestContext.Current.CancellationToken);
             },
         };
         var view = new FreeformHelperView { DataContext = vm };

@@ -52,7 +52,7 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
                 command.CanExecuteChanged += (_, _) => notifications++;
             }
 
-            vm.PickLoadProjectPathAsync = () => release.Task;
+            vm.PickLoadProjectPathAsync = () => release.Task.WaitAsync(TestContext.Current.CancellationToken);
             load = vm.LoadProjectCommand.ExecuteAsync(null);
             Assert.False(window.IsEnabled);
             foreach (var command in commands)
@@ -111,7 +111,7 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             var notifications = 0;
             export.SelectPreviewRowCommand.CanExecuteChanged += (_, _) => notifications++;
             previews = 0;
-            vm.PickLoadProjectPathAsync = () => release.Task;
+            vm.PickLoadProjectPathAsync = () => release.Task.WaitAsync(TestContext.Current.CancellationToken);
             load = vm.LoadProjectCommand.ExecuteAsync(null);
             Assert.False(window.IsEnabled);
             Assert.False(export.SelectPreviewRowCommand.CanExecute(row));

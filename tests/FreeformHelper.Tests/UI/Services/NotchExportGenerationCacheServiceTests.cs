@@ -191,7 +191,7 @@ public sealed class NotchExportGenerationCacheServiceTests
             settingsFingerprint,
             settings,
             () => Task.FromResult(generation.Batch));
-        Assert.Same(generation.Batch, await initialLease.ResolutionTask!);
+        Assert.Same(generation.Batch, await initialLease.ResolutionTask!.WaitAsync(TestContext.Current.CancellationToken));
 
         var cachedLease = service.AcquireCadAllocationResolvedBatch(
             generationEpoch,
@@ -270,7 +270,7 @@ public sealed class NotchExportGenerationCacheServiceTests
             () => Task.FromResult(batch));
 
         Assert.True(retryLease.IsTaskOwner);
-        Assert.Same(batch, await retryLease.ResolutionTask!);
+        Assert.Same(batch, await retryLease.ResolutionTask!.WaitAsync(TestContext.Current.CancellationToken));
         var metrics = service.GetSnapshot();
         Assert.Equal(2, metrics.MissCount);
         Assert.Equal(1, metrics.StoreCount);
@@ -305,7 +305,7 @@ public sealed class NotchExportGenerationCacheServiceTests
             step3Revision,
             settingsFingerprint,
             firstSettings,
-            () => release.Task);
+            () => release.Task.WaitAsync(TestContext.Current.CancellationToken));
         var joinedLease = service.AcquireCadAllocationResolvedBatch(
             generationEpoch,
             cadFingerprint,
@@ -347,11 +347,11 @@ public sealed class NotchExportGenerationCacheServiceTests
             step3Revision,
             settingsFingerprint,
             settings,
-            () => release.Task);
+            () => release.Task.WaitAsync(TestContext.Current.CancellationToken));
 
         service.Clear();
         release.SetResult(batch);
-        Assert.Same(batch, await staleLease.ResolutionTask!);
+        Assert.Same(batch, await staleLease.ResolutionTask!.WaitAsync(TestContext.Current.CancellationToken));
         Assert.False(service.IsGenerationEpochCurrent(staleEpoch));
         var staleMetrics = service.GetSnapshot();
         Assert.False(staleMetrics.HasEntry);
@@ -366,7 +366,7 @@ public sealed class NotchExportGenerationCacheServiceTests
             settings,
             () => Task.FromResult(batch));
         Assert.True(retryLease.IsTaskOwner);
-        Assert.Same(batch, await retryLease.ResolutionTask!);
+        Assert.Same(batch, await retryLease.ResolutionTask!.WaitAsync(TestContext.Current.CancellationToken));
         var retryMetrics = service.GetSnapshot();
         Assert.Equal(2, retryMetrics.MissCount);
         Assert.Equal(1, retryMetrics.StoreCount);
@@ -405,7 +405,7 @@ public sealed class NotchExportGenerationCacheServiceTests
             step3Revision,
             settingsFingerprint,
             firstSettings,
-            () => firstRelease.Task);
+            () => firstRelease.Task.WaitAsync(TestContext.Current.CancellationToken));
         var collidingLease = service.AcquireCadAllocationResolvedBatch(
             generationEpoch,
             cadFingerprint,
@@ -413,7 +413,7 @@ public sealed class NotchExportGenerationCacheServiceTests
             step3Revision,
             settingsFingerprint,
             collidingSettings,
-            () => collidingRelease.Task);
+            () => collidingRelease.Task.WaitAsync(TestContext.Current.CancellationToken));
 
         try
         {
