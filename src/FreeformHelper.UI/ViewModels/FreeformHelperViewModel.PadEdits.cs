@@ -84,7 +84,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         // Use the ManualSizingService to apply the sizing changes.
-        var result = _padEditUseCase.ApplySizing(
+        var result = Services.PadEditUseCase.ApplySizing(
             _projectFile.Settings.Grid,
             GridAlignmentMode,
             BuildCadPadSetForBounds(),
@@ -138,7 +138,7 @@ public sealed partial class FreeformHelperViewModel
         ApplyUiToSettings(_projectFile.Settings); // Ensure current UI settings are applied to project file.
 
         // Use the ManualSizingService to reset the sizing for the specified cells.
-        var result = _padEditUseCase.ResetSizing(
+        var result = Services.PadEditUseCase.ResetSizing(
             _projectFile.Settings.Grid,
             GridAlignmentMode,
             BuildCadPadSetForBounds(),

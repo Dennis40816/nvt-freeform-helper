@@ -928,7 +928,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 129
+        "methodLines": 127
       },
       "owner": "NFH",
       "locations": [
@@ -1803,16 +1803,6 @@
       "count": 1,
       "rule": "blockingWait",
       "symbol": "GetResult"
-    },
-    {
-      "syntaxHash": "4a102f05d6a9e47ba13a9d958107225ffdfe5d72242c28e21204c403399a6905",
-      "member": "FreeformHelper.UI.Services.ManualSizingService",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ManualSizingService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "SuppressMessage:CA1822:Mark members as static"
     },
     {
       "syntaxHash": "bd24d4d9589213bcb79c8983b5d8611e6a606194753163df413ea5461b5c6eb5",
@@ -2723,76 +2713,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "c1e9022837d13e16dd478cd6afe3e49b3952c28f84d43d545481913f6e7ac465",
-      "member": "FreeformHelper.UI.Services.ManualSizingService.CaptureSnapshot(GridSettings)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ManualSizingService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "75fb614fcce0488e54a6cf573d7f05dd1dcd60dbfd58736ac1861a3c7251b608",
-      "member": "FreeformHelper.UI.Services.ManualSizingService.EnsureSizingLists(GridSettings)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ManualSizingService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "e9be639aef5b5fd16d800f92bb2e57507ad94057f91126f38b5f261f9145b8ff",
-      "member": "FreeformHelper.UI.Services.ManualSizingService.EnsureSizingLists(GridSettings)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ManualSizingService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "f2232863a86bfe8dea1cd81b85476747773b5ad32010d8fa7e2ec47f2b3b8447",
-      "member": "FreeformHelper.UI.Services.ManualSizingService.EnsureSizingLists(GridSettings)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ManualSizingService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "5e92674077ace934e319dc12047dca038fc1f07a43f012864dd613ed07b2d800",
-      "member": "FreeformHelper.UI.Services.ManualSizingService.RestoreSnapshot(GridSettings,ManualSizingSnapshot)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ManualSizingService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "98199843428e8161b8c42e05b4e5d2b9b0ffddc15cd8de8100ae97ffb48f7611",
-      "member": "FreeformHelper.UI.Services.ManualSizingService.RestoreSnapshot(GridSettings,ManualSizingSnapshot)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ManualSizingService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "cb3cff9a74d4b950850efa260fdadfaa8fa51a9949fbb1fde5ee8e9fbd799f87",
-      "member": "FreeformHelper.UI.Services.ManualSizingService.RestoreSnapshot(GridSettings,ManualSizingSnapshot)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ManualSizingService.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressionScopes",
-      "symbol": "attribute:CA1822"
     },
     {
       "syntaxHash": "e412e895bc654bb67e4f019d457b2283ff5bd04dac2d0f3cb916e45cb4761803",

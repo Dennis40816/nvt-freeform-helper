@@ -147,7 +147,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var plan = _manualSizingUseCase.Evaluate(_grid, ManualRowsRange, ManualColsRange, PendingColumnWidth, PendingRowHeight);
+        var plan = ManualSizingUseCase.Evaluate(_grid, ManualRowsRange, ManualColsRange, PendingColumnWidth, PendingRowHeight);
         if (plan.HasError)
         {
             ManualRangeError = plan.ErrorMessage;
@@ -179,7 +179,7 @@ public sealed partial class FreeformHelperViewModel
     private bool TryParseRowRange(string input, out List<int> rows, out string error)
     {
         var totalRows = _grid?.Rows ?? 0;
-        return _manualSizingService.TryParseRowRange(input, totalRows, out rows, out error);
+        return ManualSizingService.TryParseRowRange(input, totalRows, out rows, out error);
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ public sealed partial class FreeformHelperViewModel
     private bool TryParseColRange(string input, out List<int> cols, out string error)
     {
         var totalCols = _grid?.Cols ?? 0;
-        return _manualSizingService.TryParseColRange(input, totalCols, out cols, out error);
+        return ManualSizingService.TryParseColRange(input, totalCols, out cols, out error);
     }
 
     /// <summary>

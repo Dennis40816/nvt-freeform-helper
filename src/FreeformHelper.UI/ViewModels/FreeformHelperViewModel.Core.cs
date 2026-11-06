@@ -66,7 +66,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly DxfImportService _dxfImportService = new();
     private readonly DxfLayerCatalogReader _dxfLayerCatalogReader = new();
     private readonly NotchExportService _notchExportService = new();
-    private readonly ManualSizingService _manualSizingService = new();
 
     // --- Internal State Management ---
     private readonly Dictionary<int, double> _cadPadCustomValues = new(); // Stores custom user-defined values for CAD pads.
@@ -114,13 +113,11 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private int _workflowDataSnapshotRevision = 1;
     private readonly GridStartupState _gridStartup = new(); // Holds the one-time startup flags and the fit request of the grid build.
     private readonly GridRebuildUseCase _gridRebuildUseCase;
-    private readonly ManualSizingUseCase _manualSizingUseCase;
     private readonly SelectionCoordinator _selectionCoordinator;
     private readonly CadLoadUseCase _cadLoadUseCase;
     private readonly CadLoadWorkflowService _cadLoadWorkflowService;
     private readonly LayerCatalogStateService _layerCatalogStateService;
     private readonly ProjectPersistenceUseCase _projectPersistenceUseCase;
-    private readonly PadEditUseCase _padEditUseCase;
     private readonly NotchExportGenerationCacheService _notchExportGenerationCacheService = new();
     private readonly UndoService _undoService = new();
     private readonly UiOperationStatusReporter _statusReporter;
@@ -256,13 +253,11 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         // Subscribe to selection changes from the InteractionState.
         InteractionState.SelectionChanged += OnInteractionSelectionChanged;
         _gridRebuildUseCase = new GridRebuildUseCase(RequestFitAfterNextRebuild, RebuildGridAsync);
-        _manualSizingUseCase = new ManualSizingUseCase(_manualSizingService);
         _selectionCoordinator = new SelectionCoordinator(InteractionState);
         _cadLoadUseCase = new CadLoadUseCase(_dxfImportService);
         _cadLoadWorkflowService = new CadLoadWorkflowService(_cadLoadUseCase);
         _layerCatalogStateService = new LayerCatalogStateService(_dxfLayerCatalogReader);
         _projectPersistenceUseCase = new ProjectPersistenceUseCase(_projectStore);
-        _padEditUseCase = new PadEditUseCase(_manualSizingService);
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
         _logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
         StartupPerfTracker.Mark("workspace.vm-ctor-complete");

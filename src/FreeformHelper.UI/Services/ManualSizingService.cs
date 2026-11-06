@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FreeformHelper.Application.Settings;
 
 namespace FreeformHelper.UI.Services;
@@ -8,11 +7,7 @@ namespace FreeformHelper.UI.Services;
 /// This includes applying specific widths/heights to rows/columns/pads, resetting sizes,
 /// and handling the complex logic of distributing remaining space when some dimensions are fixed.
 /// </summary>
-[SuppressMessage(
-    "Performance",
-    "CA1822:Mark members as static",
-    Justification = "Instance service API is retained for workflow composition stability.")]
-public sealed partial class ManualSizingService
+public static partial class ManualSizingService
 {
     /// <summary>
     /// Captures the current state of grid sizing settings into a <see cref="ManualSizingSnapshot"/>.

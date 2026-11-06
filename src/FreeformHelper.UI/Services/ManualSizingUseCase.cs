@@ -5,16 +5,9 @@ namespace FreeformHelper.UI.Services;
 /// <summary>
 /// Evaluates manual sizing input and returns the action plan for the ViewModel.
 /// </summary>
-public sealed class ManualSizingUseCase
+public static class ManualSizingUseCase
 {
-    private readonly ManualSizingService _manualSizingService;
-
-    public ManualSizingUseCase(ManualSizingService manualSizingService)
-    {
-        _manualSizingService = manualSizingService ?? throw new ArgumentNullException(nameof(manualSizingService));
-    }
-
-    public ManualSizingPlan Evaluate(
+    public static ManualSizingPlan Evaluate(
         RegularGrid grid,
         string manualRowsRange,
         string manualColsRange,
@@ -44,14 +37,14 @@ public sealed class ManualSizingUseCase
         return ManualSizingPlan.ApplySizing(rows, cols, widthValue, heightValue);
     }
 
-    private bool TryParseRowRange(RegularGrid grid, string input, out List<int> rows, out string error)
+    private static bool TryParseRowRange(RegularGrid grid, string input, out List<int> rows, out string error)
     {
-        return _manualSizingService.TryParseRowRange(input, grid.Rows, out rows, out error);
+        return ManualSizingService.TryParseRowRange(input, grid.Rows, out rows, out error);
     }
 
-    private bool TryParseColRange(RegularGrid grid, string input, out List<int> cols, out string error)
+    private static bool TryParseColRange(RegularGrid grid, string input, out List<int> cols, out string error)
     {
-        return _manualSizingService.TryParseColRange(input, grid.Cols, out cols, out error);
+        return ManualSizingService.TryParseColRange(input, grid.Cols, out cols, out error);
     }
 }
 

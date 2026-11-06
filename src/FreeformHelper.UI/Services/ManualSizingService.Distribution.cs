@@ -3,7 +3,7 @@ using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.Services;
 
-public sealed partial class ManualSizingService
+public static partial class ManualSizingService
 {
     /// <summary>
     /// Composes the effective widths for a given row by combining global column widths and row-local overrides.
