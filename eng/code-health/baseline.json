@@ -789,34 +789,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 187
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.cs"
-      ],
-      "contentHash": "dea6215540c642b63accf0455d4e9ab9ce1488743095fc690727e3c0e8a9efb3",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.RuntimeQueryUseCase.QueryHelp()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 188
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.NotchDetails.cs"
-      ],
-      "contentHash": "7396efea02c0191f60c2f896b40dafdefa767a9456735daedb6f87b56bbd4a46",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.RuntimeQueryUseCase.QueryCadNotch(int,int,int,int)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 118
       },
       "owner": "NFH",
@@ -1026,20 +998,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 169
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.ChangeList.cs"
-      ],
-      "contentHash": "949bd2a98d8f4db2c7c59eeb981f4e75313a5c5e87f23e79f69dd81426a00a37",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.BuildDxfEditChangeEntries()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 87
       },
       "owner": "NFH",
@@ -1091,20 +1049,6 @@
       "contentHash": "3505c8e2580c28cc993d3369a4e9a95dbb436bf80f54d0dfd0050f6969159d47",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RebuildVisibleDxfIndexMap(IReadOnlyList<CadPad>)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 180
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.cs"
-      ],
-      "contentHash": "a05108957c6bdeae770d0811f76f82b04dc568b558aea60e759e2e8b23826139",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.BuildCadPadInspectorSnapshot(int,bool,bool,bool,bool,NotchV22CompensationResult?,string?)"
     },
     {
       "kind": "member",
