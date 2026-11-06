@@ -97,7 +97,7 @@ public sealed class App : global::Avalonia.Application
 
             void ScheduleRuntimeIpcStart()
             {
-                Dispatcher.UIThread.Post(() =>
+                Dispatcher.Post(() =>
                 {
                     StartupPerfTracker.Mark("app.runtime-ipc-background-dispatch");
                     StartRuntimeIpcIfNeeded();
@@ -116,7 +116,7 @@ public sealed class App : global::Avalonia.Application
                 ScheduleRuntimeIpcStart();
             };
 
-            Dispatcher.UIThread.Post(() =>
+            Dispatcher.Post(() =>
             {
                 // Fallback path for edge-cases where Opened may be delayed.
                 StartupPerfTracker.Mark("app.shell-vm-fallback-dispatch");
@@ -139,7 +139,7 @@ public sealed class App : global::Avalonia.Application
         StartupPerfTracker.Mark("app.ui-ready");
 
         // Subscribe to unhandled exceptions on the UI thread to log them.
-        Dispatcher.UIThread.UnhandledException += (_, e) =>
+        Dispatcher.UnhandledException += (_, e) =>
         {
             Logger.Error(e.Exception, "UI thread unhandled exception.");
         };

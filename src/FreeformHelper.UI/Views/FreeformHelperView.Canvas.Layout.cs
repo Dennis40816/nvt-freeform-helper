@@ -16,7 +16,7 @@ public sealed partial class FreeformHelperView
         }
 
         _isPadInfoLayoutUpdateQueued = true;
-        Dispatcher.UIThread.Post(() =>
+        Dispatcher.Post(() =>
         {
             _isPadInfoLayoutUpdateQueued = false;
             UpdatePadInfoLayout();

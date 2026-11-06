@@ -3639,36 +3639,6 @@
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
     },
     {
-      "syntaxHash": "04956d396e684e321b436ae0d37e8d5ce34d5aa885859a107dfcc1366cf40b86",
-      "member": "FreeformHelper.UI.App.OnFrameworkInitializationCompleted().local:ScheduleRuntimeIpcStart()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/App.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4c9290de48f73fc97ef77b3b2cd4ba3b6ac5f171deeceb9b7d98c8fe48ab9c71",
-      "member": "FreeformHelper.UI.App.OnFrameworkInitializationCompleted()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/App.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "5496ea286862bc4f18e064528e284c00f4190dc8965ec630aaff377933c46492",
-      "member": "FreeformHelper.UI.App.OnFrameworkInitializationCompleted()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/App.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
       "syntaxHash": "1e775d37b017329abab408b09b0c7f24f5da3a55cb4a5d2420143726aa342763",
       "member": "FreeformHelper.UI.Controls.PadCanvas.BeginTransientLowDetailNavigation()",
       "owner": "NFH",
@@ -3687,16 +3657,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:System.DateTime.UtcNow"
-    },
-    {
-      "syntaxHash": "faaaab646faae5cbd2c81f4d78c485cca80e52bc7311b41e5ab86d888acb986d",
-      "member": "FreeformHelper.UI.Controls.PadCanvas.FitToContent()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Controls/PadCanvas.View.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
       "syntaxHash": "0b0f4f2b339e5fa407fe2a3e9af473a9e60b5dfca7b123aa1eaec9c75805df9c",
@@ -3799,16 +3759,6 @@
       "symbol": "T:System.Diagnostics.Stopwatch"
     },
     {
-      "syntaxHash": "e256ea289bae0826647b4b715d65eb850cc19af7820621eb7fb04875b13e5910",
-      "member": "FreeformHelper.UI.Controls.PadCanvas.RequestVisualRefresh(bool)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Controls/PadCanvas.ViewRefresh.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
       "syntaxHash": "9bccf15c9653b6b55c313e12c20b74e06606a5f9c9a03172330c7bde55121c4c",
       "member": "FreeformHelper.UI.Controls.PadCanvas.ResolveRenderFrame()",
       "owner": "NFH",
@@ -3827,16 +3777,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:System.DateTime.UtcNow"
-    },
-    {
-      "syntaxHash": "064d1396bbfbd03aa6f070745ae6c819f405bd4a90be43813f707fb2881cf87d",
-      "member": "FreeformHelper.UI.Controls.WorkspaceHeader.ScheduleViewPopupHoverClose()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
       "syntaxHash": "a7acb7fb5362c57787265cbc570807a07d1076f16d7ab96fcc825e50636ef092",
@@ -3967,16 +3907,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "795732028cc622e8a8a0b46cda9619aa88c0eddca8c87bf8abfcfeeb0502308c",
-      "member": "FreeformHelper.UI.Services.CanvasViewportAdapter.QueueInitialFit()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CanvasViewportAdapter.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
       "syntaxHash": "1be76263fe682684473ea430e0e0922c6fbf198631bd9736d295c5d9bb19a118",
@@ -4129,26 +4059,6 @@
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
     },
     {
-      "syntaxHash": "fa3f1faa3b64939559a05589dd5dac407eeafe2647db218524e228ea4e775d6f",
-      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.OnOpened(object?,EventArgs)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "5a728d05369288442a24d0b4f7d907054916308950da447c9443cb91daa73099",
-      "member": "FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView.AttachDataContext(CoordinatePlannerWorkspaceViewModel?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
       "syntaxHash": "3343389c9f231cd2e41954917054326866ce8b5753281a79e29bf3c397763dda",
       "member": "FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView.SaveTextFileAsync(CoordinatePlannerWorkspaceViewModel.CoordinatePlannerTextExportRequest)",
       "owner": "NFH",
@@ -4167,86 +4077,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.TimeSpan)"
-    },
-    {
-      "syntaxHash": "91f39ec37eaefd577e4369c460ae0b196bcbd16a80ea657b760adb74152ec55e",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.QueuePadInfoLayoutUpdate()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Canvas.Layout.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "133d7bdabf7bd58531228d4e1fffbd65f6c1c819f3696a2c8f1f43f1103cf35e",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ScheduleInitialFit(FreeformHelperViewModel)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Lifecycle.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "0049d332bfb1d75a9aef357721a4fcaf9116054b57779d23e241bef0b8a292f5",
-      "member": "FreeformHelper.UI.Views.FreeformHelperView.ShowPadInfoOverlay()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/FreeformHelperView.Canvas.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "b7e524c7866de42df3bdbf5468ed64749301d07c41c40ac56856ebc51aa2be86",
-      "member": "FreeformHelper.UI.Views.RightWorkflowSections.RightWorkflowSettingsTabView.OnDataContextPropertyChanged(object?,PropertyChangedEventArgs)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/RightWorkflowSections/RightWorkflowSettingsTabView.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "5520fcb0b00294d1b85719b37db7fe8718e8ac1bbe15c10fe6a60339243b407e",
-      "member": "FreeformHelper.UI.Views.SettingsWindow.NavigateToSection(SettingsWindowSection?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/SettingsWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "5520fcb0b00294d1b85719b37db7fe8718e8ac1bbe15c10fe6a60339243b407e",
-      "member": "FreeformHelper.UI.Views.SettingsWindow.OnOpened(object?,EventArgs)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/SettingsWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "dd10005a43fe6480d63381c3dcbf5426e72078a5492364e114e8a15a1073a7ad",
-      "member": "FreeformHelper.UI.Views.SimulationWorkspaceView.FocusInlineEditorAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "43c98beb9b6b74e8d3a364190e750621370b56a48ff973d48cfee6d9502efeb0",
-      "member": "FreeformHelper.UI.Views.SimulationWorkspaceView.QueueInlineEditorLayoutUpdate()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
       "syntaxHash": "3343389c9f231cd2e41954917054326866ce8b5753281a79e29bf3c397763dda",
