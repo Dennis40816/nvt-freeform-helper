@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Text;
 
 using Avalonia;
 using Avalonia.Collections;
@@ -192,7 +191,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             return false;
         }
 
-        await File.WriteAllTextAsync(file.Path.LocalPath, request.Content, Encoding.UTF8);
+        await TextExportWriter.WriteAsync(file.Path.LocalPath, request.Content, includeBom: true, CancellationToken.None);
         return true;
     }
 

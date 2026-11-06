@@ -97,7 +97,7 @@ public sealed partial class FreeformHelperViewModel
 
                     ReportExportStage(effectiveExportKind, 5, $"Writing file to '{path}'");
                     var payload = await Task.Run(() => effectiveSerialize(table, cad, grid));
-                    await Task.Run(() => File.WriteAllText(path, payload));
+                    await TextExportWriter.WriteAsync(path, payload, includeBom: false, CancellationToken.None);
                     ReportNotchExportSucceeded(status, effectiveExportKind, path, table);
                 },
                 onError: ex => ReportNotchExportFailed(status, exportKind, ex),

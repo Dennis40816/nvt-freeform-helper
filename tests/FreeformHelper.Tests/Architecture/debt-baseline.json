@@ -5,7 +5,7 @@
     "suppressMessage": 2,
     "pragmaWarningDisable": 0,
     "suppressUndoAssignments": 0,
-    "fileWriteAllText": 4,
+    "fileWriteAllText": 0,
     "processStart": 1,
     "directClockReads": 0,
     "bareCatch": 0,
@@ -24,12 +24,7 @@
     ],
     "pragmaWarningDisable": [],
     "suppressUndoAssignments": [],
-    "fileWriteAllText": [
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs:55",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs:100",
-      "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs:195",
-      "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs:264"
-    ],
+    "fileWriteAllText": [],
     "processStart": [
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:451"
     ],

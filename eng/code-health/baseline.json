@@ -1103,7 +1103,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 650
+        "axamlCodeBehindLines": 649
       },
       "owner": "NFH",
       "locations": [
@@ -1166,7 +1166,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 435
+        "axamlCodeBehindLines": 434
       },
       "owner": "NFH",
       "locations": [
@@ -3235,26 +3235,6 @@
       "symbol": "P:System.Environment.TickCount64"
     },
     {
-      "syntaxHash": "055551beebecf29f50bb1059f789f80a15da484b6dc48210f7b847a672a906a0",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ExportDxfAsync(bool)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "420dd17b4aa1ca90eb19b5a9cd27dd6f1a41e79b65f5deb25cd8a35a9dcf4a88",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ExportNotchTableAsync(string,string,string,string,Func<NotchTable, CadPadSet, RegularGrid, string>,bool)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
       "syntaxHash": "64b86b3a412187e7b2a4501fa637cfdd0e156480528eab8de3ab45671561fe1c",
       "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunDeferredCadInspectorSnapshotRefreshAsync(long,int,long,CancellationTokenSource,CancellationToken)",
       "owner": "NFH",
@@ -3305,16 +3285,6 @@
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
     },
     {
-      "syntaxHash": "3343389c9f231cd2e41954917054326866ce8b5753281a79e29bf3c397763dda",
-      "member": "FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView.SaveTextFileAsync(CoordinatePlannerWorkspaceViewModel.CoordinatePlannerTextExportRequest)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllTextAsync(System.String,System.String,System.Text.Encoding,System.Threading.CancellationToken)"
-    },
-    {
       "syntaxHash": "2a1c72c87e86de2704e42774a6e346d0814e2d3e72dcc66c4b8c15fff5941aa4",
       "member": "FreeformHelper.UI.Views.DevView.HidePreviewSpinnerAsync(int)",
       "owner": "NFH",
@@ -3323,16 +3293,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.TimeSpan)"
-    },
-    {
-      "syntaxHash": "3343389c9f231cd2e41954917054326866ce8b5753281a79e29bf3c397763dda",
-      "member": "FreeformHelper.UI.Views.SimulationWorkspaceView.SaveTextFileAsync(SimulationWorkspaceViewModel.SimulationTextExportRequest)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.WriteAllTextAsync(System.String,System.String,System.Text.Encoding,System.Threading.CancellationToken)"
     },
     {
       "syntaxHash": "c1e9022837d13e16dd478cd6afe3e49b3952c28f84d43d545481913f6e7ac465",
