@@ -66,7 +66,7 @@ and run available tests, write `outcome: unverified`, then fail with `unverified
 Missing example data disables only the example-data checks. Zero skips and shard floors still apply.
 Baseline schema version 2 stores `exampleMinTests` and `requiredClasses` in each shard. Only the
 current shard's expectations apply when data is present: core has 11 distinct example-data methods
-and the three golden classes; viewmodel has 15 methods and no required classes; ui and snapshots
+and the three golden classes; viewmodel has 16 methods and no required classes; ui and snapshots
 have 0 methods and no required classes, so they have no example-data check. Summary schema version 1
 is unchanged; `exampleData.executed` counts distinct methods in this shard, independent of theory rows.
 `build/ci-test-results/` must **never be uploaded**. Upload only the explicit `shard-summary.json`;

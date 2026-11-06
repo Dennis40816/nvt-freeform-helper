@@ -21,7 +21,7 @@
     "viewmodel": {
       "minTotal": 172,
       "maxSkipped": 0,
-      "exampleMinTests": 15,
+      "exampleMinTests": 16,
       "requiredClasses": []
     },
     "snapshots": {

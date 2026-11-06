@@ -7,6 +7,90 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class FreeformHelperViewModelTests
 {
+    private const string SettingsCategoryEntities =
+        "0\nTEXT\n8\nlabels\n1\nnote\n10\n0\n20\n0\n40\n1\n0\nENDSEC\n" +
+        "0\nSECTION\n2\nBLOCKS\n0\nLINE\n8\nblocks\n10\n0\n20\n0\n11\n1\n21\n1\n0\nENDSEC\n0\nEOF\n";
+
+    [Theory]
+    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Polyline, "poly", true, 2)]
+    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Polyline, "poly", false, 2)]
+    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Block, "blocks", true, 1)]
+    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Block, "blocks", false, 1)]
+    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Text, "labels", true, 1)]
+    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Text, "labels", false, 1)]
+    public async Task SettingsCategoryCommand_ChangesOnlyTargetLayersAsync(
+        FreeformHelperViewModel.DxfLayerCategory category, string layerPrefix, bool enable, int layerCount)
+    {
+        var path = CreateTempDxfFile(("poly-a", 0, 0, 10, 10), ("poly-b", 20, 0, 30, 10));
+        try
+        {
+            var content = await TestFiles.ReadContentAsync(path, TestContext.Current.CancellationToken);
+            TestFiles.WriteText(path, content.ReplaceLineEndings("\n").Replace(
+                "0\nENDSEC\n0\nEOF\n", SettingsCategoryEntities, StringComparison.Ordinal));
+            var vm = new FreeformHelperViewModel
+            {
+                PickOpenDxfPathAsync = () => Task.FromResult<string?>(path),
+            };
+            await vm.OpenDxfCommand.ExecuteAsync(null);
+            if (enable)
+            {
+                vm.DeselectAllLayers();
+            }
+            else
+            {
+                vm.SelectAllLayers();
+            }
+            vm.HasUnsavedChanges = false;
+            var settings = vm.CreateSettingsWindowViewModel();
+            var row = Assert.Single(settings.LayerCategoryRows, item => item.Category == category);
+            Assert.Equal(layerCount, row.TotalCount);
+
+            (enable ? row.EnableCommand : row.DisableCommand).Execute(null);
+
+            Assert.Equal(4, vm.LayerToggles.Count);
+            Assert.All(vm.LayerToggles, toggle => Assert.Equal(
+                toggle.Name.StartsWith(layerPrefix, StringComparison.Ordinal) ? enable : !enable, toggle.IsSelected));
+            var refreshed = Assert.Single(settings.LayerCategoryRows, item => item.Category == category);
+            Assert.Equal(enable ? layerCount : 0, refreshed.SelectedCount);
+            Assert.True(vm.HasUnsavedChanges);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public async Task SettingsWindowDraft_SaveAppliesNormalizedCascadeRowsAfterCountReductionAsync()
+    {
+        using var files = new LoadingModeTestScope();
+        var vm = files.CreateViewModel();
+        var settings = vm.CreateSettingsWindowViewModel();
+        settings.CascadeNum = 3m;
+        settings.CascadeIcSettings[0].XChannels = 2.5m;
+        settings.CascadeIcSettings[0].YChannels = 0m;
+        settings.CascadeIcSettings[1].XChannels = 4m;
+        settings.CascadeIcSettings[1].YChannels = 3m;
+        settings.CascadeIcSettings[2].XChannels = 20m;
+        settings.CascadeIcSettings[2].YChannels = 30m;
+        settings.CascadeNum = 2m;
+
+        settings.SaveCommand.Execute(null);
+        await WaitForGridRebuildAsync(vm);
+
+        Assert.Equal(2m, vm.CascadeNum);
+        Assert.Equal(7m, vm.XChannels);
+        Assert.Equal(3m, vm.YChannels);
+        Assert.Collection(vm.CascadeIcSettings,
+            row => { Assert.Equal(3m, row.XChannels); Assert.Equal(1m, row.YChannels); },
+            row => { Assert.Equal(4m, row.XChannels); Assert.Equal(3m, row.YChannels); });
+        var reopened = vm.CreateSettingsWindowViewModel();
+        Assert.Equal(settings.XChannels, reopened.XChannels);
+        Assert.Equal(settings.YChannels, reopened.YChannels);
+        Assert.Equal(settings.CascadeIcSettings.Select(row => (row.XChannels, row.YChannels)),
+            reopened.CascadeIcSettings.Select(row => (row.XChannels, row.YChannels)));
+    }
+
     [Fact]
     public void SettingsWindowDraft_DoesNotApplyUntilSave()
     {

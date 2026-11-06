@@ -7,6 +7,50 @@ namespace FreeformHelper.Tests;
 public sealed partial class FreeformHelperViewModelTests
 {
     [ExampleDataFact]
+    public async Task ClearRegularVisibilityMaskCommand_AfterImport_ResetsMaskAndDependentResultsAsync()
+    {
+        var projectPath = Path.Combine(TestPaths.RepoRoot, "example", "BOE36.35", "project_3635.json");
+        using var fixture = ExampleProjectFixture.Create(projectPath);
+        var vm = new FreeformHelperViewModel
+        {
+            PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath),
+            PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(
+                Path.Combine(TestPaths.RepoRoot, "example", "BOE36.35", "SeeRegular.csv")),
+        };
+        await vm.LoadProjectCommand.ExecuteAsync(null);
+        await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
+        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularVisibilityMaskForTests.Mask.HasLoadedMask);
+        Assert.True(vm.TryGetCadOutputFwDiffIndex(4823, out var maskedDiff));
+        Assert.Equal(323, maskedDiff);
+        vm.NotchExportSummary = "Previous export completed.";
+        vm.NotchExportProgress = 1.0;
+        vm.NotchExportProgressText = "Previous export completed.";
+
+        vm.ClearRegularVisibilityMaskCommand.Execute(null);
+
+        Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.Null(vm.RegularVisibilityMaskForTests.SourcePath);
+        Assert.Null(vm.RegularVisibilityMaskForTests.EmbeddedMask);
+        Assert.Null(vm.RegularVisibilityMaskForTests.EmbeddedName);
+        var mask = vm.RegularVisibilityMaskForTests.Mask;
+        Assert.False(mask.HasLoadedMask);
+        Assert.Null(mask.SourcePath);
+        Assert.Equal(0, mask.FrameCount);
+        Assert.Empty(mask.ActiveRegularPadIds);
+        Assert.Empty(mask.InactiveRegularPadIds);
+        Assert.Contains("not loaded", vm.RegularVisibilityMaskUi.Summary, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("Regular visibility mask cleared. Step 4 uses pure geometry seed.", vm.StatusText);
+        Assert.True(vm.TryGetCadOutputFwDiffIndex(4823, out var pureGeometryDiff));
+        Assert.Equal(324, pureGeometryDiff);
+        Assert.Equal("Notch export: not run.", vm.NotchExportSummary);
+        Assert.Equal(0.0, vm.NotchExportProgress);
+        Assert.Equal("Idle.", vm.NotchExportProgressText);
+        Assert.False(vm.IsNotchExporting);
+        Assert.False(vm.GetNotchExportGenerationCacheMetrics().HasEntry);
+    }
+
+    [ExampleDataFact]
     public async Task LoadProject_AppliesSavedRegularVisibilityMaskSnapshot_AndToggleCanRestorePureGeometrySeed()
     {
         var vm = new FreeformHelperViewModel();
