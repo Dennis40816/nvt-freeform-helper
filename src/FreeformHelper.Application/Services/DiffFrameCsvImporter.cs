@@ -40,19 +40,7 @@ public static class DiffFrameCsvImporter
         var headerFields = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var diagnostics = new List<string>();
         var frames = new List<DiffFrameCsvFrame>();
-
-        var currentRows = new List<IReadOnlyList<double>>();
-        var currentHeaderLine = -1;
-        var currentMarkerLine = default(int?);
-        var currentDataStartLine = default(int?);
-        var currentDataEndLine = default(int?);
-        var currentTimestampText = default(string?);
-        var currentTimestamp = default(TimeSpan?);
-        var currentFrameIndex = default(int?);
-        var currentBreakpointIndex = default(int?);
-        var frameSequence = -1;
-        var inFrame = false;
-        var markerFound = false;
+        var state = new FrameParseState();
 
         for (var lineIndex = 0; lineIndex < lines.Count; lineIndex++)
         {
@@ -61,47 +49,12 @@ public static class DiffFrameCsvImporter
 
             if (IsTimestampLine(line, resolvedOptions.TimestampPrefix))
             {
-                FinalizeFrameIfNeeded(
-                    sourcePath,
-                    frames,
-                    currentRows,
-                    ref inFrame,
-                    ref frameSequence,
-                    currentHeaderLine,
-                    currentMarkerLine,
-                    currentDataStartLine,
-                    currentDataEndLine,
-                    currentTimestampText,
-                    currentTimestamp,
-                    currentFrameIndex,
-                    currentBreakpointIndex);
-
-                currentRows = new List<IReadOnlyList<double>>();
-                currentHeaderLine = lineNumber;
-                currentMarkerLine = null;
-                currentDataStartLine = null;
-                currentDataEndLine = null;
-                currentTimestampText = TryExtractNamedField(line, "timestamp");
-                currentTimestamp = TryParseTimestamp(currentTimestampText);
-                currentFrameIndex = TryParseIntField(line, "Frame index");
-                currentBreakpointIndex = TryParseIntField(line, "Break point index");
-                frameSequence++;
-                inFrame = true;
-                markerFound = false;
-
-                if (TryParseInlineCsvRowAfterMarker(line, resolvedOptions.DiffDataMarker, out var inlineRow))
-                {
-                    markerFound = true;
-                    currentMarkerLine = lineNumber;
-                    currentDataStartLine = lineNumber;
-                    currentDataEndLine = lineNumber;
-                    currentRows.Add(inlineRow);
-                }
-
+                FinalizeCurrentFrame(sourcePath, frames, state);
+                BeginFrame(state, line, lineNumber, resolvedOptions.DiffDataMarker);
                 continue;
             }
 
-            if (!inFrame)
+            if (!state.InFrame)
             {
                 foreach (var pair in ParseNamedFields(line))
                 {
@@ -111,78 +64,23 @@ public static class DiffFrameCsvImporter
                 continue;
             }
 
-            if (!markerFound && TryParseInlineCsvRowAfterMarker(line, resolvedOptions.DiffDataMarker, out var markerRow))
+            if (TryAppendMarkerRow(state, line, lineNumber, resolvedOptions.DiffDataMarker) ||
+                TryAppendNumericRow(state, line, lineNumber))
             {
-                markerFound = true;
-                currentMarkerLine = lineNumber;
-                currentDataStartLine ??= lineNumber;
-                currentDataEndLine = lineNumber;
-                currentRows.Add(markerRow);
                 continue;
             }
 
-            if (TryParseNumericRow(line, out var numericRow))
+            if (state.CurrentRows.Count > 0 && IsSectionHeaderLine(line))
             {
-                currentDataStartLine ??= lineNumber;
-                currentDataEndLine = lineNumber;
-                currentRows.Add(numericRow);
+                FinalizeCurrentFrame(sourcePath, frames, state);
+                ResetAfterSectionHeader(state);
                 continue;
             }
 
-            if (currentRows.Count > 0 && IsSectionHeaderLine(line))
-            {
-                FinalizeFrameIfNeeded(
-                    sourcePath,
-                    frames,
-                    currentRows,
-                    ref inFrame,
-                    ref frameSequence,
-                    currentHeaderLine,
-                    currentMarkerLine,
-                    currentDataStartLine,
-                    currentDataEndLine,
-                    currentTimestampText,
-                    currentTimestamp,
-                    currentFrameIndex,
-                    currentBreakpointIndex);
-
-                currentRows = new List<IReadOnlyList<double>>();
-                currentHeaderLine = -1;
-                currentMarkerLine = null;
-                currentDataStartLine = null;
-                currentDataEndLine = null;
-                currentTimestampText = null;
-                currentTimestamp = null;
-                currentFrameIndex = null;
-                currentBreakpointIndex = null;
-                markerFound = false;
-                continue;
-            }
-
-            if (!string.IsNullOrWhiteSpace(line) &&
-                !markerFound &&
-                line.Contains(resolvedOptions.DiffDataMarker, StringComparison.OrdinalIgnoreCase))
-            {
-                currentMarkerLine = lineNumber;
-                markerFound = true;
-                diagnostics.Add($"[{Path.GetFileName(sourcePath)}:{lineNumber}] DiffData marker found without inline numeric payload.");
-            }
+            RecordMarkerWithoutPayload(state, line, lineNumber, resolvedOptions.DiffDataMarker, sourcePath, diagnostics);
         }
 
-        FinalizeFrameIfNeeded(
-            sourcePath,
-            frames,
-            currentRows,
-            ref inFrame,
-            ref frameSequence,
-            currentHeaderLine,
-            currentMarkerLine,
-            currentDataStartLine,
-            currentDataEndLine,
-            currentTimestampText,
-            currentTimestamp,
-            currentFrameIndex,
-            currentBreakpointIndex);
+        FinalizeCurrentFrame(sourcePath, frames, state);
 
         headerFields.TryGetValue("Xch", out var declaredColsRaw);
         headerFields.TryGetValue("Ych", out var declaredRowsRaw);
@@ -196,6 +94,114 @@ public static class DiffFrameCsvImporter
             headerFields,
             frames,
             diagnostics);
+    }
+
+    private static void FinalizeCurrentFrame(
+        string sourcePath,
+        List<DiffFrameCsvFrame> frames,
+        FrameParseState state)
+    {
+        FinalizeFrameIfNeeded(
+            sourcePath,
+            frames,
+            state.CurrentRows,
+            ref state.InFrame,
+            ref state.FrameSequence,
+            state.CurrentHeaderLine,
+            state.CurrentMarkerLine,
+            state.CurrentDataStartLine,
+            state.CurrentDataEndLine,
+            state.CurrentTimestampText,
+            state.CurrentTimestamp,
+            state.CurrentFrameIndex,
+            state.CurrentBreakpointIndex);
+    }
+
+    private static void BeginFrame(FrameParseState state, string line, int lineNumber, string diffDataMarker)
+    {
+        state.CurrentRows = new List<IReadOnlyList<double>>();
+        state.CurrentHeaderLine = lineNumber;
+        state.CurrentMarkerLine = null;
+        state.CurrentDataStartLine = null;
+        state.CurrentDataEndLine = null;
+        state.CurrentTimestampText = TryExtractNamedField(line, "timestamp");
+        state.CurrentTimestamp = TryParseTimestamp(state.CurrentTimestampText);
+        state.CurrentFrameIndex = TryParseIntField(line, "Frame index");
+        state.CurrentBreakpointIndex = TryParseIntField(line, "Break point index");
+        state.FrameSequence++;
+        state.InFrame = true;
+        state.MarkerFound = false;
+
+        if (TryParseInlineCsvRowAfterMarker(line, diffDataMarker, out var inlineRow))
+        {
+            state.MarkerFound = true;
+            state.CurrentMarkerLine = lineNumber;
+            state.CurrentDataStartLine = lineNumber;
+            state.CurrentDataEndLine = lineNumber;
+            state.CurrentRows.Add(inlineRow);
+        }
+    }
+
+    private static bool TryAppendMarkerRow(FrameParseState state, string line, int lineNumber, string diffDataMarker)
+    {
+        if (state.MarkerFound || !TryParseInlineCsvRowAfterMarker(line, diffDataMarker, out var markerRow))
+        {
+            return false;
+        }
+
+        state.MarkerFound = true;
+        state.CurrentMarkerLine = lineNumber;
+        state.CurrentDataStartLine ??= lineNumber;
+        state.CurrentDataEndLine = lineNumber;
+        state.CurrentRows.Add(markerRow);
+        return true;
+    }
+
+    private static bool TryAppendNumericRow(FrameParseState state, string line, int lineNumber)
+    {
+        if (!TryParseNumericRow(line, out var numericRow))
+        {
+            return false;
+        }
+
+        state.CurrentDataStartLine ??= lineNumber;
+        state.CurrentDataEndLine = lineNumber;
+        state.CurrentRows.Add(numericRow);
+        return true;
+    }
+
+    private static void ResetAfterSectionHeader(FrameParseState state)
+    {
+        state.CurrentRows = new List<IReadOnlyList<double>>();
+        state.CurrentHeaderLine = -1;
+        state.CurrentMarkerLine = null;
+        state.CurrentDataStartLine = null;
+        state.CurrentDataEndLine = null;
+        state.CurrentTimestampText = null;
+        state.CurrentTimestamp = null;
+        state.CurrentFrameIndex = null;
+        state.CurrentBreakpointIndex = null;
+        state.MarkerFound = false;
+    }
+
+    private static void RecordMarkerWithoutPayload(
+        FrameParseState state,
+        string line,
+        int lineNumber,
+        string diffDataMarker,
+        string sourcePath,
+        List<string> diagnostics)
+    {
+        if (string.IsNullOrWhiteSpace(line) ||
+            state.MarkerFound ||
+            !line.Contains(diffDataMarker, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        state.CurrentMarkerLine = lineNumber;
+        state.MarkerFound = true;
+        diagnostics.Add($"[{Path.GetFileName(sourcePath)}:{lineNumber}] DiffData marker found without inline numeric payload.");
     }
 
     private static void FinalizeFrameIfNeeded(
@@ -496,5 +502,21 @@ public static class DiffFrameCsvImporter
 
         fields.Add(current.ToString());
         return fields;
+    }
+
+    private sealed class FrameParseState
+    {
+        public List<IReadOnlyList<double>> CurrentRows = new();
+        public int CurrentHeaderLine = -1;
+        public int? CurrentMarkerLine;
+        public int? CurrentDataStartLine;
+        public int? CurrentDataEndLine;
+        public string? CurrentTimestampText;
+        public TimeSpan? CurrentTimestamp;
+        public int? CurrentFrameIndex;
+        public int? CurrentBreakpointIndex;
+        public int FrameSequence = -1;
+        public bool InFrame;
+        public bool MarkerFound;
     }
 }
