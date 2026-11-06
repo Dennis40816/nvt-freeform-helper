@@ -110,7 +110,7 @@ The Exact gate requires `-LaunchIsolatedUi` and all existing UI instances to be 
 
 Slices involving version state/invalidation must run V22→V21 once more with `-ReverseCExportOrder` in addition to the default V21→V22; both orders must be exact to prove that the preceding export does not contaminate the following one.
 
-`-SkipBuild` may be used only when `build/bin/FreeformHelper.UI/Debug/net8.0/FreeformHelper.UI.exe` already exists; if the previous build used `UseAppHost=false`, remove `-SkipBuild` so the script rebuilds the apphost.
+`-SkipBuild` may be used only when `build/bin/FreeformHelper.UI/Debug/net10.0/FreeformHelper.UI.exe` already exists; if the previous build used `UseAppHost=false`, remove `-SkipBuild` so the script rebuilds the apphost.
 
 ## Main Outputs
 - `build/perf/3635-regression-latest/regression-baseline-summary.md`

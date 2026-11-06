@@ -91,7 +91,7 @@ Current automated baseline (already exists):
 dotnet test tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj
 dotnet build src/FreeformHelper.UI/FreeformHelper.UI.csproj
 
-# UI baseline 更新（先 dry-run，再 apply）
+# Update the UI baseline (dry run first, then apply)
 ./scripts/tests/update-ui-baseline.ps1 -Mode DryRun
 ./scripts/tests/update-ui-baseline.ps1 -Mode Apply
 ```
