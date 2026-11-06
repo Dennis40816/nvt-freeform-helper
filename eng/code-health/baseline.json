@@ -2745,36 +2745,6 @@
       "symbol": "VSTHRD003"
     },
     {
-      "syntaxHash": "080104331ecb52307b0b59242500423796198fb12ccef7c6a2ea31bfd7df11db",
-      "member": "FreeformHelper.Tests.NotchExportGenerationCacheServiceTests.AcquireCadAllocationResolvedBatch_FaultedTaskIsRemovedAndCanRetry()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/NotchExportGenerationCacheServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD003",
-      "symbol": "VSTHRD003"
-    },
-    {
-      "syntaxHash": "c9a2dcc5b080e3850514e84e408ee47043e22d3b4827ad31b3a1e501d0c90069",
-      "member": "FreeformHelper.Tests.NotchExportGenerationCacheServiceTests.AcquireCadAllocationResolvedBatch_FinalOnlyChangeJoinsPendingResolution()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/NotchExportGenerationCacheServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD003",
-      "symbol": "VSTHRD003"
-    },
-    {
-      "syntaxHash": "6c5bb4351bce9f77668c46146896f0c920e11222d876df567fe3d2d50ca396f7",
-      "member": "FreeformHelper.Tests.NotchExportGenerationCacheServiceTests.AcquireCadAllocationResolvedBatch_FingerprintCollisionDoesNotJoinIncompatibleTask()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/NotchExportGenerationCacheServiceTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD003",
-      "symbol": "VSTHRD003"
-    },
-    {
       "syntaxHash": "a4ef450a867728e4de53c383b58d47fb48cf6ee294b120e73a2f0042ff492d1d",
       "member": "FreeformHelper.Tests.ProjectLoadingInputTests.LoadPickerAwait_BlocksCommandsAndRestoresReadyAfterCancellation()",
       "owner": "NFH",
