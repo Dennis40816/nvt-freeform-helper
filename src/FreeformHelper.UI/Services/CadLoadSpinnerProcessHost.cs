@@ -45,7 +45,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
     private VisibilityState _requestedVisibility = VisibilityState.Hidden;
     private VisibilityState _effectiveVisibility = VisibilityState.Hidden;
     private CadLoadSpinnerRequest? _latestShowRequest;
-    private DateTimeOffset _lastShowSentUtc;
+    private long _lastShowSentTimestamp;
     private bool _disposed;
 
     public CadLoadSpinnerProcessHost()
@@ -310,12 +310,11 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
 
             if (showSent)
             {
-                var showSentUtc = ReadLastShowSentUtc();
-                var elapsed = DateTimeOffset.UtcNow - showSentUtc;
+                var elapsed = TimeProvider.System.GetElapsedTime(ReadLastShowSentTimestamp());
                 var remaining = _postShowMinimumVisible - elapsed;
                 if (remaining > TimeSpan.Zero)
                 {
-                    await Task.Delay(remaining).ConfigureAwait(false);
+                    await Task.Delay(remaining, TimeProvider.System, CancellationToken.None).ConfigureAwait(false);
                 }
             }
 
@@ -425,11 +424,11 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         }
     }
 
-    private DateTimeOffset ReadLastShowSentUtc()
+    private long ReadLastShowSentTimestamp()
     {
         lock (_sync)
         {
-            return _lastShowSentUtc;
+            return _lastShowSentTimestamp;
         }
     }
 
@@ -631,7 +630,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 return false;
             }
 
-            _lastShowSentUtc = DateTimeOffset.UtcNow;
+            _lastShowSentTimestamp = TimeProvider.System.GetTimestamp();
             _effectiveVisibility = VisibilityState.Visible;
             return true;
         }

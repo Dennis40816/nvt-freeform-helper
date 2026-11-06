@@ -3175,36 +3175,6 @@
       "symbol": "M:System.Diagnostics.Process.Start(System.Diagnostics.ProcessStartInfo)"
     },
     {
-      "syntaxHash": "4a1ed56b9e3f36d58ac267aa1ea4945ff1dc417c037d9213a47b647077f85bb2",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SendShowRequestCoreLocked(CadLoadSpinnerRequest)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
-      "syntaxHash": "54e1afa2dd2e0c47181fdf1b0a572b5e2b8f4e2bedb3cbd50c4bd5d6d2f002dd",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SyncRequestedVisibilityStateAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.TimeSpan)"
-    },
-    {
-      "syntaxHash": "63c4e3106eea589cf39af5aad323ab4b67d2d759fca04d07dbf7e8b6419bf9c8",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SyncRequestedVisibilityStateAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
       "syntaxHash": "9406f2ccbe66dec38eefe82f24d8faec5c0f844d759e18a74df048fac08e2521",
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.WaitForServerReadyAsync(int)",
       "owner": "NFH",

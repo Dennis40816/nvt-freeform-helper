@@ -7,7 +7,7 @@
     "suppressUndoAssignments": 0,
     "fileWriteAllText": 4,
     "processStart": 1,
-    "directClockReads": 2,
+    "directClockReads": 0,
     "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 4,
@@ -31,11 +31,9 @@
       "src/FreeformHelper.UI/Views/SimulationWorkspaceView.axaml.cs:264"
     ],
     "processStart": [
-      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:452"
+      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:451"
     ],
-    "directClockReads": [
-      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:314", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:634"
-    ],
+    "directClockReads": [],
     "bareCatch": [],
     "catchException": [
       "src/FreeformHelper.UI/Program.cs:54"
