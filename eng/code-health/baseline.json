@@ -1935,16 +1935,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.SimulationHostViewModel._sourceRevision"
     },
     {
-      "syntaxHash": "9c4c1d90c447342d5326b441fe63fa734322c098f002f5ba6b9293fb6e71304b",
-      "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.FixedTimeProvider",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Project/JsonProjectStoreAtomicSaveTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "fakeClockDuplicates",
-      "symbol": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.FixedTimeProvider"
-    },
-    {
       "syntaxHash": "d6b9138e255632021481a137cb249492806a3aea8192dbe2643cb7721d84eecd",
       "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.ExportAndSimulation_Overlap_CoalesceColdBatchAndKeepBusyUntilBothOperationsComplete()",
       "owner": "NFH",
