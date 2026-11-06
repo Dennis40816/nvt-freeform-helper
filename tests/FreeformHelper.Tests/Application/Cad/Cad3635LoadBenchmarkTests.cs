@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Reflection;
 using System.Text.Json;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
@@ -11,7 +10,6 @@ namespace FreeformHelper.Tests;
 public sealed class Cad3635LoadBenchmarkTests
 {
     private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
-    private static readonly BindingFlags PrivateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
 
     private const string RunEnv = "FREEFORMHELPER_RUN_DXF_LOAD_BENCHMARK";
     private const string IterationsEnv = "FREEFORMHELPER_DXF_LOAD_BENCHMARK_ITERATIONS";
@@ -82,8 +80,6 @@ public sealed class Cad3635LoadBenchmarkTests
         layerCatalog.Stop();
 
         var apply = Stopwatch.StartNew();
-        // Stays on reflection: the parameter type of ResetHiddenCadPads is a private nested class that an accessor cannot name.
-        InvokePrivate(vm, "ResetHiddenCadPads");
         await FreeformHelperViewModelPrivateAccess.ApplyCadLoadOutcomeAsync(vm, outcome!, null);
         apply.Stop();
 
@@ -142,13 +138,6 @@ public sealed class Cad3635LoadBenchmarkTests
             sorted[(sorted.Length - 1) / 2],
             Math.Round(average, 2),
             sorted[^1]);
-    }
-
-    private static object? InvokePrivate(object instance, string methodName, object?[]? args = null)
-    {
-        var method = instance.GetType().GetMethod(methodName, PrivateInstance);
-        Assert.NotNull(method);
-        return method!.Invoke(instance, args);
     }
 
     private static int GetPositiveInt(string name, int fallback)
