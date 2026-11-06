@@ -207,6 +207,76 @@ public sealed partial class FreeformHelperViewModelTests
 
 
     [Fact]
+    public async Task OpenMovedAndRotatedDxfEditChangeListCommands_ShowFocusAndRefreshEditedPadsAsync()
+    {
+        var dxfPath = CreateTempDxfFile(("signal", 0, 0, 10, 20), ("signal", 20, 0, 30, 20));
+        try
+        {
+            var vm = new FreeformHelperViewModel { PickOpenDxfPathAsync = () => Task.FromResult<string?>(dxfPath) };
+            await vm.OpenDxfCommand.ExecuteAsync(null);
+            var ids = vm.CadPads.OrderBy(static pad => pad.Id).Select(static pad => pad.Id).ToArray();
+            Assert.Equal(2, ids.Length);
+            vm.DxfEditTargetLayerName = "moved";
+            await SelectCadPadsAsync(vm, [ids[0]]);
+            vm.MoveSelectedCadPadsToLayerCommand.Execute(null);
+            vm.DxfEditRotationDegrees = 90m;
+            await SelectCadPadsAsync(vm, [ids[1]]);
+            vm.RotateSelectedCadPadsCommand.Execute(null);
+            await WaitForGridRebuildAsync(vm);
+            var canvasHost = new TestCanvasHost();
+            vm.CanvasHost = canvasHost;
+            var openedLists = new List<DxfEditChangeListViewModel>();
+            vm.OpenDxfEditChangeListAsync = list =>
+            {
+                openedLists.Add(list);
+                return Task.CompletedTask;
+            };
+
+            await vm.OpenMovedDxfEditChangeListCommand.ExecuteAsync(null);
+
+            var movedList = Assert.Single(openedLists);
+            Assert.Equal(DxfEditChangeKind.Moved, movedList.SelectedKind);
+            var movedEntry = Assert.Single(movedList.Rows);
+            Assert.Equal(ids[0], movedEntry.CadPadId);
+            movedList.FocusSelectedEntryCommand.Execute(null);
+            Assert.Equal(ids[0], Assert.Single(vm.SelectedCadPadIds));
+            Assert.Equal(ids[0], Assert.Single(canvasHost.SelectedCadIds));
+            Assert.Equal(1, canvasHost.FocusWithMinZoomCount);
+
+            await vm.OpenRotatedDxfEditChangeListCommand.ExecuteAsync(null);
+
+            Assert.Equal(2, openedLists.Count);
+            var rotatedList = openedLists[1];
+            Assert.Equal(DxfEditChangeKind.Rotated, rotatedList.SelectedKind);
+            var rotatedEntry = Assert.Single(rotatedList.Rows);
+            Assert.Equal(ids[1], rotatedEntry.CadPadId);
+            rotatedList.FocusSelectedEntryCommand.Execute(null);
+            Assert.Equal(ids[1], Assert.Single(vm.SelectedCadPadIds));
+            Assert.Equal(ids[1], Assert.Single(canvasHost.SelectedCadIds));
+            Assert.Equal(2, canvasHost.FocusWithMinZoomCount);
+
+            vm.UndoCommand.Execute(null);
+            await WaitForGridRebuildAsync(vm);
+            rotatedList.RefreshCommand.Execute(null);
+            movedList.RefreshCommand.Execute(null);
+            Assert.Empty(rotatedList.Rows);
+            Assert.Null(rotatedList.SelectedEntry);
+            Assert.False(rotatedList.FocusSelectedEntryCommand.CanExecute(null));
+            Assert.Equal(ids[0], Assert.Single(movedList.Rows).CadPadId);
+
+            vm.UndoCommand.Execute(null);
+            await WaitForGridRebuildAsync(vm);
+            movedList.RefreshCommand.Execute(null);
+            Assert.Empty(movedList.Rows);
+            Assert.Null(movedList.SelectedEntry);
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
+    }
+
+    [Fact]
     public async Task DxfEditChangeListApply_OnCombinedRow_ClearsWholeCombineGroup()
     {
         var vm = new FreeformHelperViewModel();

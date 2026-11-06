@@ -9,7 +9,7 @@ using Xunit;
 
 namespace FreeformHelper.Tests;
 
-public sealed class SimulationWorkspaceViewModelTests
+public sealed partial class SimulationWorkspaceViewModelTests
 {
     private const int NullDiffValue = 65535;
     private static readonly int[] _simulationDiffIndices = { 10, 11 };

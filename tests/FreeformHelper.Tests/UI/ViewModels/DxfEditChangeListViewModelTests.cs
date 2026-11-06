@@ -124,6 +124,94 @@ public sealed class DxfEditChangeListViewModelTests
         Assert.Empty(focusCadIds);
     }
 
+    [Theory]
+    [InlineData(DxfEditChangeKind.Hidden, 10)]
+    [InlineData(DxfEditChangeKind.Duplicate, 20)]
+    [InlineData(DxfEditChangeKind.Combined, 30)]
+    [InlineData(DxfEditChangeKind.Moved, 40)]
+    [InlineData(DxfEditChangeKind.Rotated, 50)]
+    public void SetKindCommands_ShowOnlyMatchingEntriesAndSelectVisibleRow(DxfEditChangeKind kind, int expectedCadId)
+    {
+        var entries = new List<DxfEditChangeListEntry>
+        {
+            CreateEntry(DxfEditChangeKind.Hidden, 10, "Restore"),
+            CreateEntry(DxfEditChangeKind.Duplicate, 20, "Restore"),
+            CreateEntry(DxfEditChangeKind.Combined, 30, "Clear group"),
+            CreateEntry(DxfEditChangeKind.Moved, 40, "Restore layer"),
+            CreateEntry(DxfEditChangeKind.Rotated, 50, "Restore geometry"),
+        };
+        var initialKind = kind == DxfEditChangeKind.Hidden ? DxfEditChangeKind.Rotated : DxfEditChangeKind.Hidden;
+        var vm = CreateViewModel(initialKind, entries);
+        var command = kind switch
+        {
+            DxfEditChangeKind.Hidden => vm.SetHiddenKindCommand,
+            DxfEditChangeKind.Duplicate => vm.SetDuplicateKindCommand,
+            DxfEditChangeKind.Combined => vm.SetCombinedKindCommand,
+            DxfEditChangeKind.Moved => vm.SetMovedKindCommand,
+            DxfEditChangeKind.Rotated => vm.SetRotatedKindCommand,
+            _ => throw new ArgumentOutOfRangeException(nameof(kind)),
+        };
+
+        command.Execute(null);
+
+        Assert.Equal(kind, vm.SelectedKind);
+        var row = Assert.Single(vm.Rows);
+        Assert.Equal(kind, row.Kind);
+        Assert.Equal(expectedCadId, row.CadPadId);
+        Assert.Same(row, vm.SelectedEntry);
+        Assert.True(row.IsInspectorSelected);
+    }
+
+    [Fact]
+    public void RefreshCommand_ReloadsEntriesAndReplacesRemovedSelection()
+    {
+        var entries = new List<DxfEditChangeListEntry>
+        {
+            CreateEntry(DxfEditChangeKind.Moved, 10, "Restore layer"),
+            CreateEntry(DxfEditChangeKind.Moved, 11, "Restore layer"),
+        };
+        var vm = CreateViewModel(DxfEditChangeKind.Moved, entries);
+        vm.SelectEntryCommand.Execute(vm.Rows[1]);
+        entries.RemoveAt(1);
+        entries.Add(CreateEntry(DxfEditChangeKind.Moved, 12, "Restore layer"));
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.Equal(2, vm.MovedCount);
+        Assert.Equal(2, vm.Rows.Count);
+        Assert.Equal(10, vm.Rows[0].CadPadId);
+        Assert.Equal(12, vm.Rows[1].CadPadId);
+        Assert.Same(vm.Rows[0], vm.SelectedEntry);
+        Assert.True(vm.Rows[0].IsInspectorSelected);
+    }
+
+    [Fact]
+    public void FocusSelectedEntryCommand_FocusesSelectedRowAndDisablesWhenListIsEmpty()
+    {
+        var focusedEntries = new List<DxfEditChangeListEntry>();
+        var entries = new List<DxfEditChangeListEntry>
+        {
+            CreateEntry(DxfEditChangeKind.Rotated, 10, "Restore geometry"),
+            CreateEntry(DxfEditChangeKind.Rotated, 11, "Restore geometry"),
+        };
+        var vm = CreateViewModel(DxfEditChangeKind.Rotated, entries, focusEntry: focusedEntries.Add);
+        var target = vm.Rows[1];
+        vm.SelectEntryCommand.Execute(target);
+        Assert.True(vm.FocusSelectedEntryCommand.CanExecute(null));
+
+        vm.FocusSelectedEntryCommand.Execute(null);
+
+        Assert.Same(target, Assert.Single(focusedEntries));
+        Assert.Same(target, vm.SelectedEntry);
+
+        entries.Clear();
+        vm.RefreshCommand.Execute(null);
+
+        Assert.Empty(vm.Rows);
+        Assert.Null(vm.SelectedEntry);
+        Assert.False(vm.FocusSelectedEntryCommand.CanExecute(null));
+    }
+
     private static DxfEditChangeListViewModel CreateViewModel(
         DxfEditChangeKind initialKind,
         List<DxfEditChangeListEntry> entries,
