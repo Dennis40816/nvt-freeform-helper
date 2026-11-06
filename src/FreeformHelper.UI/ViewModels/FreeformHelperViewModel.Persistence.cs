@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia.Threading;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
@@ -57,11 +58,7 @@ public sealed partial class FreeformHelperViewModel
         // Ensure the file picker delegate is wired up by the View.
         if (PickSaveNotchPathAsync is null)
         {
-            var blockedMessage = $"{exportKind} export blocked: save dialog handler not wired.";
-            NotchExportSummary = blockedMessage;
-            NotchExportProgressText = blockedMessage;
-            status.ReportBlocked("Export notch: dialog handler not wired.");
-            _logger.Warn(blockedMessage);
+            ReportNotchExportSavePickerMissing(exportKind, status);
             return;
         }
 
@@ -85,58 +82,77 @@ public sealed partial class FreeformHelperViewModel
                         return;
                     }
 
-                    var effectiveExportKind = exportKind;
-                    var effectiveExtension = extension;
-                    var effectiveSerialize = serialize;
-                    if (allowSelectionExportTypeOverride)
-                    {
-                        var selectedTarget = ResolveDynamicNotchExportTarget();
-                        effectiveExportKind = selectedTarget.ExportKind;
-                        effectiveExtension = selectedTarget.Extension;
-                        effectiveSerialize = selectedTarget.Serialize;
-                    }
+                    var (effectiveExportKind, effectiveExtension, effectiveSerialize) = allowSelectionExportTypeOverride
+                        ? ResolveDynamicNotchExportTarget()
+                        : (exportKind, extension, serialize);
 
                     ReportExportStage(effectiveExportKind, 4, "Waiting save path dialog...");
                     var suggestedBaseName = ResolveSuggestedNotchExportBaseName(baseName, effectiveExtension, table);
                     var path = await PickSaveNotchPathAsync(suggestedBaseName, effectiveExtension);
                     if (string.IsNullOrWhiteSpace(path))
                     {
-                        var cancelMessage = $"{effectiveExportKind} export canceled at stage 4 (save path not selected).";
-                        NotchExportSummary = cancelMessage;
-                        NotchExportProgressText = cancelMessage;
-                        status.ReportBlocked(cancelMessage);
-                        _logger.Info(cancelMessage);
+                        ReportNotchExportCanceled(status, $"{effectiveExportKind} export canceled at stage 4 (save path not selected).");
                         return;
                     }
 
                     ReportExportStage(effectiveExportKind, 5, $"Writing file to '{path}'");
                     var payload = await Task.Run(() => effectiveSerialize(table, cad, grid));
                     await Task.Run(() => File.WriteAllText(path, payload));
-                    NotchExportProgress = 1.0;
-                    var successMessage = $"{effectiveExportKind} exported: rows={table.Rows.Count}.";
-                    NotchExportSummary = successMessage;
-                    NotchExportProgressText = successMessage;
-                    status.ReportSuccess($"{effectiveExportKind} notch exported. Rows={table.Rows.Count}.");
-                    _logger.Info(CultureInfo.InvariantCulture, "{0} notch export completed: path={1}, rows={2}.", effectiveExportKind, path, table.Rows.Count);
+                    ReportNotchExportSucceeded(status, effectiveExportKind, path, table);
                 },
-                onError: ex =>
-                {
-                    var message = NotchExportErrorFormatter.Format(exportKind, ex);
-                    NotchExportSummary = message;
-                    NotchExportProgressText = message;
-                    status.ReportStatus(message);
-                    _logger.Error(ex, "{0} export failed.", exportKind);
-                },
-                onStart: () =>
-                {
-                    NotchExportProgress = 0.0;
-                    NotchExportProgressText = $"{exportKind} export starting...";
-                });
+                onError: ex => ReportNotchExportFailed(status, exportKind, ex),
+                onStart: () => ReportNotchExportStarting(exportKind));
         }
         finally
         {
             EndNotchOperationBusyScope();
         }
+    }
+
+    private void ReportNotchExportSavePickerMissing(string exportKind, UiOperationStatusReporter.Scope status)
+    {
+        var blockedMessage = $"{exportKind} export blocked: save dialog handler not wired.";
+        NotchExportSummary = blockedMessage;
+        NotchExportProgressText = blockedMessage;
+        status.ReportBlocked("Export notch: dialog handler not wired.");
+        _logger.Warn(blockedMessage);
+    }
+
+    private void ReportNotchExportStarting(string exportKind)
+    {
+        NotchExportProgress = 0.0;
+        NotchExportProgressText = $"{exportKind} export starting...";
+    }
+
+    private void ReportNotchExportCanceled(UiOperationStatusReporter.Scope status, string cancelMessage)
+    {
+        NotchExportSummary = cancelMessage;
+        NotchExportProgressText = cancelMessage;
+        status.ReportBlocked(cancelMessage);
+        _logger.Info(cancelMessage);
+    }
+
+    private void ReportNotchExportSucceeded(
+        UiOperationStatusReporter.Scope status,
+        string effectiveExportKind,
+        string path,
+        NotchTable table)
+    {
+        NotchExportProgress = 1.0;
+        var successMessage = $"{effectiveExportKind} exported: rows={table.Rows.Count}.";
+        NotchExportSummary = successMessage;
+        NotchExportProgressText = successMessage;
+        status.ReportSuccess($"{effectiveExportKind} notch exported. Rows={table.Rows.Count}.");
+        _logger.Info(CultureInfo.InvariantCulture, "{0} notch export completed: path={1}, rows={2}.", effectiveExportKind, path, table.Rows.Count);
+    }
+
+    private void ReportNotchExportFailed(UiOperationStatusReporter.Scope status, string exportKind, Exception ex)
+    {
+        var message = NotchExportErrorFormatter.Format(exportKind, ex);
+        NotchExportSummary = message;
+        NotchExportProgressText = message;
+        status.ReportStatus(message);
+        _logger.Error(ex, "{0} export failed.", exportKind);
     }
 
     private async Task<NotchTable?> BuildNotchTableForExportAsync(
@@ -146,17 +162,8 @@ public sealed partial class FreeformHelperViewModel
         bool allowExportTypeSelection = false)
     {
         var status = CreateStatusScope("BuildNotchTableForExport");
-        ReportExportStage(exportKind, 1, "Checking workflow prerequisites");
-        var gate = WorkflowStepGateService.Validate(WorkflowStepId.Step5Export, BuildWorkflowStateSnapshot());
-        if (!gate.IsAllowed)
+        if (!TryPassNotchExportWorkflowGate(exportKind, status))
         {
-            var message = string.IsNullOrWhiteSpace(gate.Message)
-                ? "Step 5: export is blocked by workflow prerequisites."
-                : gate.Message!;
-            NotchExportSummary = $"{exportKind} export blocked at stage 1: {message}";
-            NotchExportProgressText = NotchExportSummary;
-            status.ReportBlocked(message);
-            _logger.Warn(CultureInfo.InvariantCulture, "{0} export blocked at stage 1: {1}", exportKind, message);
             return null;
         }
 
@@ -183,45 +190,20 @@ public sealed partial class FreeformHelperViewModel
             return null;
         }
 
-        _logger.Info(CultureInfo.InvariantCulture, "{0} export stage 2 generated {1} row(s).", exportKind, table.Rows.Count);
-        var stage2Summary = BuildStage2RowSummary(exportKind, table, crossIcMismatch);
-        NotchExportSummary = stage2Summary;
-        NotchExportProgressText = stage2Summary;
-        status.ReportProgress(stage2Summary);
-        _logger.Info(stage2Summary);
+        ReportNotchExportStage2Summary(status, exportKind, table, crossIcMismatch);
 
         var safetyAudit = GetCurrentSimulationSafetyAudit?.Invoke();
         if (OpenNotchExportSelectionAsync is null)
         {
-            var directSelectionViewModel = new NotchExportSelectionViewModel(table);
-            directSelectionViewModel.AttachSimulationSafetyAudit(safetyAudit);
-            if (TryBlockNotchExportBySimulationSafety(exportKind, status, directSelectionViewModel))
-            {
-                return null;
-            }
-
-            _logger.Debug(CultureInfo.InvariantCulture, "{0} export stage 3 skipped row selection: dialog handler not wired.", exportKind);
-            return table;
+            return ResolveNotchExportTableWithoutSelectionDialog(status, exportKind, table, safetyAudit);
         }
 
         ReportExportStage(exportKind, 3, "Waiting row selection dialog");
-        var selectionViewModel = allowExportTypeSelection
-            ? new NotchExportSelectionViewModel(
-                table,
-                PreviewNotchExportRowSelection,
-                NotchExportFileTypeOptions,
-                SelectedNotchExportFileTypeOption)
-            : new NotchExportSelectionViewModel(table, PreviewNotchExportRowSelection);
-        selectionViewModel.Editing.AttachProject(this);
-        selectionViewModel.AttachSimulationSafetyAudit(safetyAudit);
+        var selectionViewModel = CreateNotchExportSelectionViewModel(table, allowExportTypeSelection, safetyAudit);
         var selectedTable = await OpenNotchExportSelectionAsync(selectionViewModel);
         if (selectedTable is null)
         {
-            var cancelMessage = $"{exportKind} export canceled at stage 3 (row selection).";
-            NotchExportSummary = cancelMessage;
-            NotchExportProgressText = cancelMessage;
-            status.ReportBlocked(cancelMessage);
-            _logger.Info(cancelMessage);
+            ReportNotchExportCanceled(status, $"{exportKind} export canceled at stage 3 (row selection).");
             return null;
         }
 
@@ -233,11 +215,7 @@ public sealed partial class FreeformHelperViewModel
 
         if (selectedTable.Rows.Count == 0)
         {
-            var cancelMessage = $"{exportKind} export canceled at stage 3: no rows selected.";
-            NotchExportSummary = cancelMessage;
-            NotchExportProgressText = cancelMessage;
-            status.ReportBlocked(cancelMessage);
-            _logger.Info(cancelMessage);
+            ReportNotchExportCanceled(status, $"{exportKind} export canceled at stage 3: no rows selected.");
             return null;
         }
 
@@ -252,6 +230,73 @@ public sealed partial class FreeformHelperViewModel
             table.Rows.Count);
 
         return selectedTable;
+    }
+
+    private bool TryPassNotchExportWorkflowGate(string exportKind, UiOperationStatusReporter.Scope status)
+    {
+        ReportExportStage(exportKind, 1, "Checking workflow prerequisites");
+        var gate = WorkflowStepGateService.Validate(WorkflowStepId.Step5Export, BuildWorkflowStateSnapshot());
+        if (!gate.IsAllowed)
+        {
+            var message = string.IsNullOrWhiteSpace(gate.Message)
+                ? "Step 5: export is blocked by workflow prerequisites."
+                : gate.Message!;
+            NotchExportSummary = $"{exportKind} export blocked at stage 1: {message}";
+            NotchExportProgressText = NotchExportSummary;
+            status.ReportBlocked(message);
+            _logger.Warn(CultureInfo.InvariantCulture, "{0} export blocked at stage 1: {1}", exportKind, message);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void ReportNotchExportStage2Summary(
+        UiOperationStatusReporter.Scope status,
+        string exportKind,
+        NotchTable table,
+        CrossIcMismatchSnapshot crossIcMismatch)
+    {
+        _logger.Info(CultureInfo.InvariantCulture, "{0} export stage 2 generated {1} row(s).", exportKind, table.Rows.Count);
+        var stage2Summary = BuildStage2RowSummary(exportKind, table, crossIcMismatch);
+        NotchExportSummary = stage2Summary;
+        NotchExportProgressText = stage2Summary;
+        status.ReportProgress(stage2Summary);
+        _logger.Info(stage2Summary);
+    }
+
+    private NotchTable? ResolveNotchExportTableWithoutSelectionDialog(
+        UiOperationStatusReporter.Scope status,
+        string exportKind,
+        NotchTable table,
+        SimulationSafetyAuditResult? safetyAudit)
+    {
+        var directSelectionViewModel = new NotchExportSelectionViewModel(table);
+        directSelectionViewModel.AttachSimulationSafetyAudit(safetyAudit);
+        if (TryBlockNotchExportBySimulationSafety(exportKind, status, directSelectionViewModel))
+        {
+            return null;
+        }
+
+        _logger.Debug(CultureInfo.InvariantCulture, "{0} export stage 3 skipped row selection: dialog handler not wired.", exportKind);
+        return table;
+    }
+
+    private NotchExportSelectionViewModel CreateNotchExportSelectionViewModel(
+        NotchTable table,
+        bool allowExportTypeSelection,
+        SimulationSafetyAuditResult? safetyAudit)
+    {
+        var selectionViewModel = allowExportTypeSelection
+            ? new NotchExportSelectionViewModel(
+                table,
+                PreviewNotchExportRowSelection,
+                NotchExportFileTypeOptions,
+                SelectedNotchExportFileTypeOption)
+            : new NotchExportSelectionViewModel(table, PreviewNotchExportRowSelection);
+        selectionViewModel.Editing.AttachProject(this);
+        selectionViewModel.AttachSimulationSafetyAudit(safetyAudit);
+        return selectionViewModel;
     }
 
     private bool TryBlockNotchExportBySimulationSafety(
