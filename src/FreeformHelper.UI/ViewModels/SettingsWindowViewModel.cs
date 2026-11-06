@@ -13,6 +13,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     internal UiEventRunner UiEvents => _owner.UiEvents;
     private bool _suppressNotchThresholdSync;
     private bool _suppressCompensationModelSync;
+    private readonly HashSet<string> _editedProperties = new(StringComparer.Ordinal);
 
     public SettingsWindowViewModel(FreeformHelperViewModel owner)
     {
@@ -649,6 +650,41 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
         _owner.ApplyLayerCategorySelection(category, isSelected);
         RefreshLayerCategoryRows();
     }
+
+    /// <summary>
+    /// Records every property this window changed, so Save can write back only those and leave
+    /// the values that the workflow panels changed while the window stayed open.
+    /// </summary>
+    protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.PropertyName is { } propertyName)
+        {
+            _editedProperties.Add(propertyName);
+        }
+    }
+
+    /// <summary>
+    /// Forgets the changes made while the draft was built. The window calls this once the draft is ready,
+    /// so only the edits of the user remain.
+    /// </summary>
+    internal void MarkOpened() => _editedProperties.Clear();
+
+    /// <summary>
+    /// Tells whether the user changed a setting in this window since it opened.
+    /// </summary>
+    /// <param name="ownerProperty">The name of the setting on <see cref="FreeformHelperViewModel"/>.</param>
+    internal bool IsEdited(string ownerProperty) => ownerProperty switch
+    {
+        nameof(FreeformHelperViewModel.SelectedScanOrder) => _editedProperties.Contains(nameof(SelectedScanOrderOption)),
+        nameof(FreeformHelperViewModel.GridAlignmentMode) => _editedProperties.Contains(nameof(SelectedGridAlignmentOption)),
+        nameof(FreeformHelperViewModel.RegularSourceMode) => _editedProperties.Contains(nameof(SelectedRegularSourceModeOption)),
+        nameof(FreeformHelperViewModel.CadOutputFwDiffAutoMode) =>
+            _editedProperties.Contains(nameof(SelectedCadOutputFwDiffAutoModeOption)),
+        nameof(FreeformHelperViewModel.CascadeIcSettings) =>
+            _editedProperties.Overlaps([nameof(CascadeIcSettings), nameof(XChannels), nameof(YChannels), nameof(CascadeNum)]),
+        _ => _editedProperties.Contains(ownerProperty),
+    };
 
     private void OnSave()
     {

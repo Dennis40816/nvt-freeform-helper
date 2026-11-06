@@ -11,6 +11,7 @@ public sealed partial class FreeformHelperViewModel
     {
         var window = new SettingsWindowViewModel(this);
         window.ActiveAreaPixels.Load(ActiveAreaWidth, ActiveAreaHeight, ActiveAreaPixelsX, ActiveAreaPixelsY, _projectFile);
+        window.MarkOpened();
         return window;
     }
 
@@ -53,7 +54,8 @@ public sealed partial class FreeformHelperViewModel
 
         using (_settingsSuppression.EnterSettingsLoading())
         {
-            ApplySettingsWindowDraftValues(draft, resolved, draftPerIcXChannels, draftPerIcYChannels);
+            ApplySettingsWindowDraftValues(draft, resolved, draftPerIcXChannels, draftPerIcYChannels, changedProperties);
+            ApplySettingsWindowDraftNotchValues(draft, resolved, changedProperties);
         }
         if (changedProperties.Contains(nameof(SelectedLogLevelOption)))
         {
@@ -217,7 +219,7 @@ public sealed partial class FreeformHelperViewModel
 
         void AddChangedProperty(string propertyName, bool condition)
         {
-            if (condition)
+            if (condition && draft.IsEdited(propertyName))
             {
                 changedProperties.Add(propertyName);
             }
@@ -228,75 +230,108 @@ public sealed partial class FreeformHelperViewModel
         SettingsWindowViewModel draft,
         SettingsWindowDraftOptions resolved,
         List<int> draftPerIcXChannels,
-        List<int> draftPerIcYChannels)
+        List<int> draftPerIcYChannels,
+        HashSet<string> changed)
     {
-        XChannels = draft.XChannels;
-        YChannels = draft.YChannels;
-        CascadeNum = draft.CascadeNum;
-        _projectFile.Settings.Grid.ReplacePerIcChannels(draftPerIcXChannels, draftPerIcYChannels);
-        CoordinatePixelWidth = draft.CoordinatePixelWidth;
-        CoordinatePixelHeight = draft.CoordinatePixelHeight;
-        GridPaddingPercent = draft.GridPaddingPercent;
-        ActiveAreaWidth = draft.ActiveAreaWidth;
-        ActiveAreaHeight = draft.ActiveAreaHeight;
-        PanelBiasX = draft.PanelBiasX;
-        PanelBiasY = draft.PanelBiasY;
-        SelectedScanOrder = resolved.ScanOrder.Value;
-        SelectedScanOrderOption = resolved.ScanOrder;
-        ImportOnlyClosedPolylines = draft.ImportOnlyClosedPolylines;
-        ImportBlockPolylines = draft.ImportBlockPolylines;
-        RecalcBoundsOnLayerFilter = draft.RecalcBoundsOnLayerFilter;
-        GridAlignmentMode = resolved.Alignment.Value;
-        SelectedGridAlignmentOption = resolved.Alignment;
-        RegularSourceMode = resolved.RegularSourceMode.Value;
-        SelectedRegularSourceModeOption = resolved.RegularSourceMode;
-        SelectedRegularSourceLayerOption = resolved.RegularSourceLayer;
-        SelectedLogLevelOption = resolved.LogLevel;
-        MatchThreshold = draft.MatchThreshold;
-        FreeformAxisThreshold = draft.FreeformAxisThreshold;
-        EnableAutoDetectXy = draft.EnableAutoDetectXy;
-        EnableFreeformEdgeSpecialization = draft.EnableFreeformEdgeSpecialization;
-        AutoReplayStep2AfterProjectLoad = draft.AutoReplayStep2AfterProjectLoad;
-        ApplyAppVisualPreferencesOnProjectLoad = draft.ApplyAppVisualPreferencesOnProjectLoad;
-        CadOutputFwDiffIndexStart = draft.CadOutputFwDiffIndexStart;
-        CadOutputFwDiffIndexAnchorCadId = draft.CadOutputFwDiffIndexAnchorCadId;
-        ShowDiffIndexOverlay = draft.ShowDiffIndexOverlay;
-        CadOutputFwDiffAutoMode = resolved.CadOutputFwDiffAutoMode.Value;
-        SelectedCadOutputFwDiffAutoModeOption = resolved.CadOutputFwDiffAutoMode;
-        SelectedNotchCompensationModelOption = draft.SelectedNotchCompensationModelOption;
-        EnableToRegular = draft.EnableToRegular;
-        EnableToFull = draft.EnableToFull;
-        EnableToFullRuleEngine = draft.EnableToFullRuleEngine;
-        EnableToFullRuleTrace = draft.EnableToFullRuleTrace;
-        EnableBoundaryVirtualAreaCap = draft.EnableBoundaryVirtualAreaCap;
-        BoundaryVirtualAreaCapPercent = draft.BoundaryVirtualAreaCapPercent;
-        EnableTargetCoverageGuard = draft.EnableTargetCoverageGuard;
-        TargetCoverageCapPercent = draft.TargetCoverageCapPercent;
-        ShowNotchCanvasPreview = draft.ShowNotchCanvasPreview;
-        ShowNotchToRegularLabels = draft.ShowNotchToRegularLabels;
-        NotchPreviewVisualizationStep = draft.NotchPreviewVisualizationStep;
-        ToFullStrictOverlapPercent = draft.ToFullStrictOverlapPercent;
-        NotchPreviewAutoPlayEnabled = draft.NotchPreviewAutoPlayEnabled;
-        NotchPreviewAutoPlayIntervalMs = draft.NotchPreviewAutoPlayIntervalMs;
-        EnableV21 = draft.EnableV21;
-        EnableV22 = draft.EnableV22;
-        SelectedNotchExportFileTypeOption = resolved.NotchExportFileType;
-        LenScale = draft.LenScale;
-        NullValue = draft.NullValue;
-        NotchThresholdQ7 = draft.NotchThresholdQ7;
-        NotchThresholdPercent = draft.NotchThresholdPercent;
-        LinkNotchThresholds = draft.LinkNotchThresholds;
-        SelectedNotchExportProfileOption = draft.SelectedNotchExportProfileOption;
-        MappingWeightIou = draft.MappingWeightIou;
-        MappingWeightCentroidDistance = draft.MappingWeightCentroidDistance;
-        MappingWeightAreaRatio = draft.MappingWeightAreaRatio;
-        MappingLowConfidenceThreshold = draft.MappingLowConfidenceThreshold;
-        MappingAmbiguousMargin = draft.MappingAmbiguousMargin;
-        MappingCandidateNumber = draft.MappingCandidateNumber;
-        MappingCandidatePaddingCells = IndexMappingSettings.PaddingFromCandidateNumber((int)Math.Round(draft.MappingCandidateNumber));
-        UseLocalSizing = draft.UseLocalSizing;
-        GlobalFontSizePercent = draft.GlobalFontSizePercent;
-        HighlightStrokeWidthAdjust = Math.Clamp(draft.HighlightStrokeWidthAdjust, -2m, 4m);
+        if (changed.Contains(nameof(XChannels))) XChannels = draft.XChannels;
+        if (changed.Contains(nameof(YChannels))) YChannels = draft.YChannels;
+        if (changed.Contains(nameof(CascadeNum))) CascadeNum = draft.CascadeNum;
+        if (changed.Contains(nameof(CascadeIcSettings)))
+        {
+            _projectFile.Settings.Grid.ReplacePerIcChannels(draftPerIcXChannels, draftPerIcYChannels);
+        }
+        if (changed.Contains(nameof(CoordinatePixelWidth))) CoordinatePixelWidth = draft.CoordinatePixelWidth;
+        if (changed.Contains(nameof(CoordinatePixelHeight))) CoordinatePixelHeight = draft.CoordinatePixelHeight;
+        if (changed.Contains(nameof(GridPaddingPercent))) GridPaddingPercent = draft.GridPaddingPercent;
+        if (changed.Contains(nameof(ActiveAreaWidth))) ActiveAreaWidth = draft.ActiveAreaWidth;
+        if (changed.Contains(nameof(ActiveAreaHeight))) ActiveAreaHeight = draft.ActiveAreaHeight;
+        if (changed.Contains(nameof(PanelBiasX))) PanelBiasX = draft.PanelBiasX;
+        if (changed.Contains(nameof(PanelBiasY))) PanelBiasY = draft.PanelBiasY;
+        if (changed.Contains(nameof(SelectedScanOrder))) SelectedScanOrder = resolved.ScanOrder.Value;
+        if (changed.Contains(nameof(SelectedScanOrder))) SelectedScanOrderOption = resolved.ScanOrder;
+        if (changed.Contains(nameof(ImportOnlyClosedPolylines))) ImportOnlyClosedPolylines = draft.ImportOnlyClosedPolylines;
+        if (changed.Contains(nameof(ImportBlockPolylines))) ImportBlockPolylines = draft.ImportBlockPolylines;
+        if (changed.Contains(nameof(RecalcBoundsOnLayerFilter))) RecalcBoundsOnLayerFilter = draft.RecalcBoundsOnLayerFilter;
+        if (changed.Contains(nameof(GridAlignmentMode))) GridAlignmentMode = resolved.Alignment.Value;
+        if (changed.Contains(nameof(GridAlignmentMode))) SelectedGridAlignmentOption = resolved.Alignment;
+        if (changed.Contains(nameof(RegularSourceMode))) RegularSourceMode = resolved.RegularSourceMode.Value;
+        if (changed.Contains(nameof(RegularSourceMode))) SelectedRegularSourceModeOption = resolved.RegularSourceMode;
+        if (changed.Contains(nameof(SelectedRegularSourceLayerOption))) SelectedRegularSourceLayerOption = resolved.RegularSourceLayer;
+        if (changed.Contains(nameof(SelectedLogLevelOption))) SelectedLogLevelOption = resolved.LogLevel;
+        if (changed.Contains(nameof(MatchThreshold))) MatchThreshold = draft.MatchThreshold;
+        if (changed.Contains(nameof(FreeformAxisThreshold))) FreeformAxisThreshold = draft.FreeformAxisThreshold;
+        if (changed.Contains(nameof(EnableAutoDetectXy))) EnableAutoDetectXy = draft.EnableAutoDetectXy;
+        if (changed.Contains(nameof(EnableFreeformEdgeSpecialization)))
+        {
+            EnableFreeformEdgeSpecialization = draft.EnableFreeformEdgeSpecialization;
+        }
+        if (changed.Contains(nameof(AutoReplayStep2AfterProjectLoad)))
+        {
+            AutoReplayStep2AfterProjectLoad = draft.AutoReplayStep2AfterProjectLoad;
+        }
+        if (changed.Contains(nameof(ApplyAppVisualPreferencesOnProjectLoad)))
+        {
+            ApplyAppVisualPreferencesOnProjectLoad = draft.ApplyAppVisualPreferencesOnProjectLoad;
+        }
+        if (changed.Contains(nameof(CadOutputFwDiffIndexStart))) CadOutputFwDiffIndexStart = draft.CadOutputFwDiffIndexStart;
+        if (changed.Contains(nameof(CadOutputFwDiffIndexAnchorCadId)))
+        {
+            CadOutputFwDiffIndexAnchorCadId = draft.CadOutputFwDiffIndexAnchorCadId;
+        }
+        if (changed.Contains(nameof(ShowDiffIndexOverlay))) ShowDiffIndexOverlay = draft.ShowDiffIndexOverlay;
+        if (changed.Contains(nameof(CadOutputFwDiffAutoMode))) CadOutputFwDiffAutoMode = resolved.CadOutputFwDiffAutoMode.Value;
+        if (changed.Contains(nameof(CadOutputFwDiffAutoMode))) SelectedCadOutputFwDiffAutoModeOption = resolved.CadOutputFwDiffAutoMode;
+    }
+
+    private void ApplySettingsWindowDraftNotchValues(
+        SettingsWindowViewModel draft, SettingsWindowDraftOptions resolved, HashSet<string> changed)
+    {
+        if (changed.Contains(nameof(SelectedNotchCompensationModelOption)))
+        {
+            SelectedNotchCompensationModelOption = draft.SelectedNotchCompensationModelOption;
+        }
+        if (changed.Contains(nameof(EnableToRegular))) EnableToRegular = draft.EnableToRegular;
+        if (changed.Contains(nameof(EnableToFull))) EnableToFull = draft.EnableToFull;
+        if (changed.Contains(nameof(EnableToFullRuleEngine))) EnableToFullRuleEngine = draft.EnableToFullRuleEngine;
+        if (changed.Contains(nameof(EnableToFullRuleTrace))) EnableToFullRuleTrace = draft.EnableToFullRuleTrace;
+        if (changed.Contains(nameof(EnableBoundaryVirtualAreaCap))) EnableBoundaryVirtualAreaCap = draft.EnableBoundaryVirtualAreaCap;
+        if (changed.Contains(nameof(BoundaryVirtualAreaCapPercent))) BoundaryVirtualAreaCapPercent = draft.BoundaryVirtualAreaCapPercent;
+        if (changed.Contains(nameof(EnableTargetCoverageGuard))) EnableTargetCoverageGuard = draft.EnableTargetCoverageGuard;
+        if (changed.Contains(nameof(TargetCoverageCapPercent))) TargetCoverageCapPercent = draft.TargetCoverageCapPercent;
+        if (changed.Contains(nameof(ShowNotchCanvasPreview))) ShowNotchCanvasPreview = draft.ShowNotchCanvasPreview;
+        if (changed.Contains(nameof(ShowNotchToRegularLabels))) ShowNotchToRegularLabels = draft.ShowNotchToRegularLabels;
+        if (changed.Contains(nameof(NotchPreviewVisualizationStep))) NotchPreviewVisualizationStep = draft.NotchPreviewVisualizationStep;
+        if (changed.Contains(nameof(ToFullStrictOverlapPercent))) ToFullStrictOverlapPercent = draft.ToFullStrictOverlapPercent;
+        if (changed.Contains(nameof(NotchPreviewAutoPlayEnabled))) NotchPreviewAutoPlayEnabled = draft.NotchPreviewAutoPlayEnabled;
+        if (changed.Contains(nameof(NotchPreviewAutoPlayIntervalMs))) NotchPreviewAutoPlayIntervalMs = draft.NotchPreviewAutoPlayIntervalMs;
+        if (changed.Contains(nameof(EnableV21))) EnableV21 = draft.EnableV21;
+        if (changed.Contains(nameof(EnableV22))) EnableV22 = draft.EnableV22;
+        if (changed.Contains(nameof(SelectedNotchExportFileTypeOption))) SelectedNotchExportFileTypeOption = resolved.NotchExportFileType;
+        if (changed.Contains(nameof(LenScale))) LenScale = draft.LenScale;
+        if (changed.Contains(nameof(NullValue))) NullValue = draft.NullValue;
+        if (changed.Contains(nameof(NotchThresholdQ7))) NotchThresholdQ7 = draft.NotchThresholdQ7;
+        if (changed.Contains(nameof(NotchThresholdPercent))) NotchThresholdPercent = draft.NotchThresholdPercent;
+        if (changed.Contains(nameof(LinkNotchThresholds))) LinkNotchThresholds = draft.LinkNotchThresholds;
+        if (changed.Contains(nameof(SelectedNotchExportProfileOption)))
+        {
+            SelectedNotchExportProfileOption = draft.SelectedNotchExportProfileOption;
+        }
+        if (changed.Contains(nameof(MappingWeightIou))) MappingWeightIou = draft.MappingWeightIou;
+        if (changed.Contains(nameof(MappingWeightCentroidDistance))) MappingWeightCentroidDistance = draft.MappingWeightCentroidDistance;
+        if (changed.Contains(nameof(MappingWeightAreaRatio))) MappingWeightAreaRatio = draft.MappingWeightAreaRatio;
+        if (changed.Contains(nameof(MappingLowConfidenceThreshold))) MappingLowConfidenceThreshold = draft.MappingLowConfidenceThreshold;
+        if (changed.Contains(nameof(MappingAmbiguousMargin))) MappingAmbiguousMargin = draft.MappingAmbiguousMargin;
+        if (changed.Contains(nameof(MappingCandidateNumber)))
+        {
+            MappingCandidateNumber = draft.MappingCandidateNumber;
+            MappingCandidatePaddingCells = IndexMappingSettings.PaddingFromCandidateNumber((int)Math.Round(MappingCandidateNumber));
+        }
+        if (changed.Contains(nameof(UseLocalSizing))) UseLocalSizing = draft.UseLocalSizing;
+        if (changed.Contains(nameof(GlobalFontSizePercent))) GlobalFontSizePercent = draft.GlobalFontSizePercent;
+        if (changed.Contains(nameof(HighlightStrokeWidthAdjust)))
+        {
+            HighlightStrokeWidthAdjust = Math.Clamp(draft.HighlightStrokeWidthAdjust, -2m, 4m);
+        }
     }
 
     private readonly record struct SettingsWindowDraftOptions(
