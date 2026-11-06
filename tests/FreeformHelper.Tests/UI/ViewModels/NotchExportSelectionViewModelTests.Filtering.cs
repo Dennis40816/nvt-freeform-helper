@@ -15,6 +15,31 @@ public sealed partial class NotchExportSelectionViewModelTests
     private static readonly string[] _expectedDiffDialogKeys = ["10", "9"];
     private static readonly string[] _expectedRangeSelectedKeys = ["21", "24"];
 
+    [Fact]
+    public void ToggleSelectedOnlyCommand_FiltersAndRestoresRowsWithoutChangingSelection()
+    {
+        var vm = new NotchExportSelectionViewModel(BuildSampleTable());
+        var originalRows = vm.Rows.ToArray();
+        var uncheckedRow = vm.Rows[1];
+        uncheckedRow.IsSelected = false;
+
+        vm.ToggleSelectedOnlyCommand.Execute(null);
+
+        Assert.True(vm.IsSelectedOnlyActive);
+        Assert.Equal(2, vm.Rows.Count);
+        Assert.DoesNotContain(uncheckedRow, vm.Rows);
+        Assert.All(vm.Rows, row => Assert.True(row.IsSelected));
+        Assert.Equal(2, vm.SelectedCount);
+        Assert.Equal(vm.Rows.Select(row => row.Row), vm.BuildSelectedTable().Rows);
+
+        vm.ToggleSelectedOnlyCommand.Execute(null);
+
+        Assert.False(vm.IsSelectedOnlyActive);
+        Assert.Equal(originalRows, vm.Rows);
+        Assert.False(uncheckedRow.IsSelected);
+        Assert.Equal(2, vm.SelectedCount);
+    }
+
 
     [Fact]
     public void RowDisplayMode_WarningOnly_ShowsNoOpRows()

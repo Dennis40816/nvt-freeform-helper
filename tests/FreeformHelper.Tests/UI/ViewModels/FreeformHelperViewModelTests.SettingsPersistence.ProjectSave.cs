@@ -8,6 +8,58 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class FreeformHelperViewModelTests
 {
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task SaveProjectAsync_EmbedConfirmation_WritesChosenDxfContentAsync(bool embed)
+    {
+        using var files = new LoadingModeTestScope();
+        var vm = files.CreateViewModel();
+        await vm.OpenDxfCommand.ExecuteAsync(null);
+        var confirmations = 0;
+        vm.ConfirmEmbedDxfAsync = () =>
+        {
+            confirmations++;
+            return Task.FromResult(embed);
+        };
+
+        Assert.True(await vm.SaveProjectAsync());
+
+        var saved = JsonProjectStore.Load(files.PathFor("project.json"));
+        Assert.Equal(1, confirmations);
+        Assert.False(vm.HasUnsavedChanges);
+        Assert.NotNull(saved.LastDxfPath);
+        if (embed)
+        {
+            Assert.Equal(Path.GetFileName(saved.LastDxfPath), saved.EmbeddedDxfName);
+            Assert.Equal(await TestFiles.ReadBytesAsync(saved.LastDxfPath, TestContext.Current.CancellationToken), saved.EmbeddedDxf);
+        }
+        else
+        {
+            Assert.Null(saved.EmbeddedDxf);
+            Assert.Null(saved.EmbeddedDxfName);
+        }
+    }
+
+    [Fact]
+    public async Task SaveProjectAsync_DecliningEmbedAfterEmbedding_RemovesSavedDxfContentAsync()
+    {
+        using var files = new LoadingModeTestScope();
+        var vm = files.CreateViewModel();
+        await vm.OpenDxfCommand.ExecuteAsync(null);
+        vm.ConfirmEmbedDxfAsync = () => Task.FromResult(true);
+        Assert.True(await vm.SaveProjectAsync());
+        Assert.NotEmpty(Assert.IsType<byte[]>(JsonProjectStore.Load(files.PathFor("project.json")).EmbeddedDxf));
+        vm.ConfirmEmbedDxfAsync = () => Task.FromResult(false);
+
+        Assert.True(await vm.SaveProjectAsync());
+
+        var saved = JsonProjectStore.Load(files.PathFor("project.json"));
+        Assert.Null(saved.EmbeddedDxf);
+        Assert.Null(saved.EmbeddedDxfName);
+        Assert.NotNull(saved.LastDxfPath);
+    }
+
     [Fact]
     public void ShouldPromptSaveOnExit_WhenEmptyAndUnchanged_ReturnsFalse()
     {
