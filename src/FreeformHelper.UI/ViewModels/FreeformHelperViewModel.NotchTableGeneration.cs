@@ -48,7 +48,7 @@ public sealed partial class FreeformHelperViewModel
             NotchTable table;
             NotchTableGenerator.CadAllocationResolvedBatch? resolvedBatch = null;
             NotchTable? legacyTableToStore = null;
-            var stage2StartedAt = DateTime.UtcNow;
+            var stage2StartedAt = TimeProvider.System.GetTimestamp();
 
             LogNotchGenerationStarted(operationLabel, cad, grid, inputs);
 
@@ -76,7 +76,7 @@ public sealed partial class FreeformHelperViewModel
             var effectiveTable = projectToCadOutputFwDiff ? projection.Table : table;
             var effectiveGrid = projectToCadOutputFwDiff ? projection.Grid : grid;
 
-            var stage2ElapsedMs = (long)(DateTime.UtcNow - stage2StartedAt).TotalMilliseconds;
+            var stage2ElapsedMs = (long)TimeProvider.System.GetElapsedTime(stage2StartedAt).TotalMilliseconds;
             var crossIcMismatch = BuildCrossIcMismatchSnapshot(grid);
             LogNotchGenerationMetrics(operationLabel, stage2ElapsedMs, cacheLookup, crossIcMismatch, projection, projectToCadOutputFwDiff, effectiveTable);
 

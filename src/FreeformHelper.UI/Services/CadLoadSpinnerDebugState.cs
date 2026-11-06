@@ -160,7 +160,7 @@ internal static class CadLoadSpinnerDebugState
     private static void AddEvent(string source, string detail)
     {
         var sequence = Interlocked.Increment(ref _sequence);
-        var timestamp = DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture);
+        var timestamp = TimeProvider.System.GetUtcNow().ToString("O", CultureInfo.InvariantCulture);
         var entry = new CadLoadSpinnerDebugEvent(
             Sequence: sequence,
             TimestampUtc: timestamp,

@@ -21,7 +21,7 @@ public sealed class ProjectFile
 
     public string SchemaVersion { get; set; } = ProjectSchema.CurrentVersion;
 
-    public DateTimeOffset SavedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset SavedAt { get; set; } = TimeProvider.System.GetUtcNow();
 
     public string? LastDxfPath { get; set; }
 

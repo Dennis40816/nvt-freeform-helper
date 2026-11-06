@@ -2619,16 +2619,6 @@
       "symbol": "M:System.IO.File.ReadAllText(System.String)"
     },
     {
-      "syntaxHash": "56ef2bef662fecc2e1066d050f22cb761b1d1068f90e980b719e1ad6fee4c51e",
-      "member": "FreeformHelper.Infrastructure.Project.ProjectFile.SavedAt",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Infrastructure/Project/ProjectFile.cs",
-      "project": "FreeformHelper.Infrastructure",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
       "syntaxHash": "3fffce8ac5c35b2c8ac6fe03122172826d1c3134ed781a5cd410f7df2c6f7e1c",
       "member": "FreeformHelper.Tests.AppGeneralSettingsStoreTests.TryLoad_LegacyDocument_MapsToWhitelistAndDefaultsBehavior()",
       "owner": "NFH",
@@ -3459,16 +3449,6 @@
       "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
-      "syntaxHash": "1be76263fe682684473ea430e0e0922c6fbf198631bd9736d295c5d9bb19a118",
-      "member": "FreeformHelper.UI.Services.AppGeneralSettingsDocument.SavedAtUtc",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
       "syntaxHash": "4eef2333991ded069ba9a43845baa8a7d0af35d2c7b9ea6d9e87fd55081c0a1f",
       "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.BuildDefaultSettingsPath()",
       "owner": "NFH",
@@ -3487,26 +3467,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Environment.GetFolderPath(System.Environment.SpecialFolder)"
-    },
-    {
-      "syntaxHash": "b90d9b7bb56ad3dc00fcfaf493dc2cf4838ef11135916ffb2732ef5016116e35",
-      "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.Save(AppGeneralSettingsDocument)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
-    },
-    {
-      "syntaxHash": "02c390bc3abdfb46163178b6ad5574f0a3e4863993628686e772e8d22ca650bc",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerDebugState.AddEvent(string,string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerDebugState.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
     },
     {
       "syntaxHash": "6b5350c3e7e3a5915e401315a92d1e1ac68c5dcf69c9d261cbbeae3e752bfa10",
@@ -3567,16 +3527,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "1be76263fe682684473ea430e0e0922c6fbf198631bd9736d295c5d9bb19a118",
-      "member": "FreeformHelper.UI.Services.LegacyAppGeneralSettingsDocument.SavedAtUtc",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTimeOffset.UtcNow"
     },
     {
       "syntaxHash": "4738efc4f7cd1129f3ea0f6c157e70dae6400c383f26abdd3a57844d544a0371",
@@ -3647,26 +3597,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.IO.File.WriteAllText(System.String,System.String)"
-    },
-    {
-      "syntaxHash": "cd95b9302c12f20b4a67ddea6e5984d67d1829eaf454d0005d860430b2c7f3d1",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.GenerateCurrentNotchTableAsync(CadPadSet,RegularGrid,string,IProgress<NotchGenerationProgress>?,WorkflowDataSnapshot?,bool,bool,Action<string>?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTime.UtcNow"
-    },
-    {
-      "syntaxHash": "cf158f166468a7d5a2d4783cdad37ce87686a6467be90836c1c2a7b07124ee95",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.GenerateCurrentNotchTableAsync(CadPadSet,RegularGrid,string,IProgress<NotchGenerationProgress>?,WorkflowDataSnapshot?,bool,bool,Action<string>?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.DateTime.UtcNow"
     },
     {
       "syntaxHash": "64b86b3a412187e7b2a4501fa637cfdd0e156480528eab8de3ab45671561fe1c",
