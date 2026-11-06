@@ -161,6 +161,12 @@ public sealed class NotchV22ReachabilityBlockedCellCharacterizationTests
             secondDebug with { OwnerCadPadIds = [], ToFullRuleTrace = [] });
         Assert.Equal(firstDebug.OwnerCadPadIds, secondDebug.OwnerCadPadIds);
         Assert.Equal(firstDebug.ToFullRuleTrace, secondDebug.ToFullRuleTrace);
+
+        var (_, firstTracedDebug) = ComputeSingleRegular(target, blocker, enableToFullRuleTrace: true);
+        var (_, secondTracedDebug) = ComputeSingleRegular(target, blocker, enableToFullRuleTrace: true);
+
+        Assert.NotEmpty(firstTracedDebug.ToFullRuleTrace);
+        Assert.Equal(firstTracedDebug.ToFullRuleTrace, secondTracedDebug.ToFullRuleTrace);
     }
 
     private static Point2[][] Vertices(IReadOnlyList<Polygon2> polygons)
@@ -187,14 +193,16 @@ public sealed class NotchV22ReachabilityBlockedCellCharacterizationTests
 
     private static (NotchV22CompensationResult Result, NotchV22RegularDebugInfo Debug) ComputeSingleRegular(
         CadPad target,
-        CadPad blocker)
+        CadPad blocker,
+        bool enableToFullRuleTrace = false)
     {
         var result = NotchV22CompensationService.Compute(
             target,
             CreateSingleRegularGrid(),
             enableToRegular: true,
             enableToFull: true,
-            allCadPads: [target, blocker]);
+            allCadPads: [target, blocker],
+            enableToFullRuleTrace: enableToFullRuleTrace);
 
         return (result, Assert.Single(result.RegularDebugInfos));
     }

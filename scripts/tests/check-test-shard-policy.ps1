@@ -201,12 +201,12 @@ try {
         ForEach-Object { @{ Name = $_; Outcome = 'Passed' } })
     $allExampleTests = @($exampleNames | Where-Object { $_ -notlike '*.FreeformHelperViewModelTests.*' } |
         ForEach-Object { @{ Name = $_; Outcome = 'Passed' } })
-    Assert-Policy ($allExampleTests.Count -eq 11 -and $viewmodelTests.Count -eq 15)
+    Assert-Policy ($allExampleTests.Count -eq 11 -and $viewmodelTests.Count -eq 16)
     Write-FixtureBaseline -Shard viewmodel -ExampleFloor $viewmodelTests.Count
     Write-FixtureTrx -Directory $resultsPath -Tests $viewmodelTests
     $actual = Invoke-FixtureCheck -Shard viewmodel -Present $true
     Assert-Policy ($actual.Summary.outcome -ceq 'passed' -and -not $actual.Summary.checks.requiredClassMissing -and
-        $actual.Summary.exampleData.executed -eq 15)
+        $actual.Summary.exampleData.executed -eq 16)
     Write-FixtureBaseline -Shard viewmodel -ExampleFloor ($viewmodelTests.Count + 1)
     $actual = Invoke-FixtureCheck -Shard viewmodel -Present $true
     Assert-Policy ($actual.Summary.outcome -ceq 'failed' -and $actual.Summary.checks.belowFloor -and
