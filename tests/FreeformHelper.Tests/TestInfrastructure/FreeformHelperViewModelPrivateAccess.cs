@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
@@ -12,6 +13,8 @@ namespace FreeformHelper.Tests.TestInfrastructure;
 /// <summary>Typed access to private state of <see cref="FreeformHelperViewModel"/>.</summary>
 internal static class FreeformHelperViewModelPrivateAccess
 {
+    private const string NotchTableGenerationTaskType = "System.Threading.Tasks.Task`1[[FreeformHelper.UI.ViewModels.FreeformHelperViewModel+NotchTableGenerationResult, FreeformHelper.UI]]";
+
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cad")]
     public static extern ref CadPadSet? Cad(FreeformHelperViewModel viewModel);
 
@@ -74,6 +77,21 @@ internal static class FreeformHelperViewModelPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyViewSnapshot")]
     public static extern void ApplyViewSnapshot(FreeformHelperViewModel viewModel, UiViewSnapshot snapshot);
+
+    // The real return type is Task<NotchTableGenerationResult?>, a private nested record, so it is named by string and returned as object.
+    // The object is always a Task; callers read its result by public property name.
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "GenerateCurrentNotchTableAsync")]
+    [return: UnsafeAccessorType(NotchTableGenerationTaskType)]
+    public static extern object GenerateCurrentNotchTable(
+        FreeformHelperViewModel viewModel,
+        CadPadSet cad,
+        RegularGrid grid,
+        string operationLabel,
+        IProgress<NotchGenerationProgress>? progress,
+        WorkflowDataSnapshot? workflowSnapshot,
+        bool reportStep5Progress,
+        bool projectToCadOutputFwDiff,
+        Action<string>? progressTextReporter);
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildWorkflowDataSnapshot")]
     public static extern WorkflowDataSnapshot BuildWorkflowDataSnapshot(FreeformHelperViewModel viewModel);

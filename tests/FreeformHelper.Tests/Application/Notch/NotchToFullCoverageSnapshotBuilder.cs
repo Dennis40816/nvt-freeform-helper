@@ -107,15 +107,16 @@ internal static class NotchCurrentWorkflowTableTestHelper
         vm.EnableV21 = true;
         vm.EnableV22 = true;
 
-        // Stays on reflection: the method returns Task<NotchTableGenerationResult?>, a private nested record that an accessor cannot name.
-        var generateMethod = typeof(FreeformHelperViewModel).GetMethod(
-            "GenerateCurrentNotchTableAsync",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(generateMethod);
-
-        var task = Assert.IsAssignableFrom<Task>(generateMethod!.Invoke(
+        var task = Assert.IsAssignableFrom<Task>(FreeformHelperViewModelPrivateAccess.GenerateCurrentNotchTable(
             vm,
-            [cad, grid, operationLabel, null, null, false, projectToCadOutputFwDiff, null]));
+            cad,
+            grid,
+            operationLabel,
+            null,
+            null,
+            false,
+            projectToCadOutputFwDiff,
+            null));
         await task;
 
         var resultProperty = task.GetType().GetProperty("Result", BindingFlags.Instance | BindingFlags.Public);
