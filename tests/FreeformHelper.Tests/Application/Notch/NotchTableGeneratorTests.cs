@@ -4,6 +4,7 @@ using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -97,9 +98,8 @@ public sealed class NotchTableGeneratorTests
             RegularDebugInfos = [info with { SourceArea = 40, RegularArea = 20 }],
             OverlapAreaTotal = 40,
         });
-        var select = typeof(NotchTableGenerator).GetMethod("SelectPrimaryV22Candidate", BindingFlags.NonPublic | BindingFlags.Static)!;
-        Assert.Same(larger, select.Invoke(null, [CreatePrivateList(larger.GetType(), smaller, larger)]));
-        Assert.Same(larger, select.Invoke(null, [CreatePrivateList(larger.GetType(), larger, smaller)]));
+        Assert.Same(larger, NotchTableGeneratorPrivateAccess.SelectPrimaryV22Candidate(null, CreatePrivateList(larger.GetType(), smaller, larger)));
+        Assert.Same(larger, NotchTableGeneratorPrivateAccess.SelectPrimaryV22Candidate(null, CreatePrivateList(larger.GetType(), larger, smaller)));
     }
 
     [Theory]
@@ -196,9 +196,12 @@ public sealed class NotchTableGeneratorTests
             (bool)leg.GetType().GetProperty("HasToFullCoverage")!.GetValue(leg)!)).ToArray();
         Assert.Equal(expected, actual);
 
-        var buildRows = typeof(NotchTableGenerator).GetMethod("BuildV22DiffCentricRows", BindingFlags.NonPublic | BindingFlags.Static)!;
-        var rows = (IReadOnlyList<NotchTableRow>)buildRows.Invoke(null,
-            [CreateCandidateDictionary(candidate.GetType(), ((0, 0), new[] { candidate })), 65535, false, 120])!;
+        var rows = NotchTableGeneratorPrivateAccess.BuildV22DiffCentricRows(
+            null,
+            CreateCandidateDictionary(candidate.GetType(), ((0, 0), new[] { candidate })),
+            65535,
+            false,
+            120);
         var ordered = expected.OrderByDescending(leg => Math.Abs(leg.Percent)).ThenBy(leg => leg.Diff)
             .Select(leg => (leg.Diff, leg.Percent)).ToArray();
         var nodeLegs = rows.SelectMany(row => new[]
@@ -221,7 +224,6 @@ public sealed class NotchTableGeneratorTests
     [InlineData(NotchCompensationModel.Disabled)]
     public void A1Fact6_CadAllocation_SignedAbiBoundariesOnlyClampOrChunkOwnedPercent(NotchCompensationModel model)
     {
-        var buildLegs = typeof(NotchTableGenerator).GetMethod("BuildV22DiffLegs", BindingFlags.NonPublic | BindingFlags.Static)!;
         var cases = new (int Percent, int Clamped, int[] Chunks)[]
         {
             (-250, -100, [-100, -100, -50]), (-101, -100, [-100, -1]), (-100, -100, [-100]),
@@ -235,7 +237,7 @@ public sealed class NotchTableGeneratorTests
                 true, false, 1, 1, [], []);
             var projection = NotchV22TargetAllocationPolicy.ProjectTargetCoverage(
                 [target], 0, 0, NotchV22TargetAllocationPolicy.ResolveAreaMode(model), 1);
-            var legs = (System.Collections.IEnumerable)buildLegs.Invoke(null, [projection.EmittedTargets, model])!;
+            var legs = (System.Collections.IEnumerable)NotchTableGeneratorPrivateAccess.BuildV22DiffLegs(null, projection.EmittedTargets, model);
             var actual = legs.Cast<object>().Select(leg =>
                 (int)leg.GetType().GetProperty("RatioPercent")!.GetValue(leg)!).ToArray();
             Assert.Equal(NotchV22TargetAllocationPolicy.UsesTargetRegularCoverage(model)
@@ -244,7 +246,7 @@ public sealed class NotchTableGeneratorTests
             {
                 var missingAnchor = NotchV22TargetAllocationPolicy.ProjectTargetCoverage(
                     [target], ic, source, NotchV22TargetAllocationPolicy.ResolveAreaMode(model), 1);
-                var missingLegs = (System.Collections.IEnumerable)buildLegs.Invoke(null, [missingAnchor.EmittedTargets, model])!;
+                var missingLegs = (System.Collections.IEnumerable)NotchTableGeneratorPrivateAccess.BuildV22DiffLegs(null, missingAnchor.EmittedTargets, model);
                 Assert.Empty(missingLegs.Cast<object>());
             }
         }
@@ -1594,30 +1596,11 @@ public sealed class NotchTableGeneratorTests
     [Fact]
     public void BuildToFullCoverageAudit_ReportsMissingTargetDiffsAcrossIcBuckets_WhenCanonicalRowsDoNotCoverAllToFullLegs()
     {
-        var generatorType = typeof(NotchTableGenerator);
-        var diffLegType = generatorType.GetNestedType("V22DiffLeg", BindingFlags.NonPublic);
-        var candidateType = generatorType.GetNestedType("V22CadCandidate", BindingFlags.NonPublic);
-        Assert.NotNull(diffLegType);
-        Assert.NotNull(candidateType);
-
-        var coveredLeg = CreatePrivateRecord(
-            diffLegType!,
-            21,
-            40,
-            true);
-        var missingLeg = CreatePrivateRecord(
-            diffLegType!,
-            22,
-            30,
-            true);
-        var ignoredLeg = CreatePrivateRecord(
-            diffLegType!,
-            23,
-            20,
-            false);
-        var legs = CreatePrivateList(diffLegType!, coveredLeg, missingLeg, ignoredLeg);
-        var candidate = CreatePrivateRecord(
-            candidateType!,
+        var coveredLeg = NotchTableGeneratorPrivateAccess.NewV22DiffLeg(21, 40, true);
+        var missingLeg = NotchTableGeneratorPrivateAccess.NewV22DiffLeg(22, 30, true);
+        var ignoredLeg = NotchTableGeneratorPrivateAccess.NewV22DiffLeg(23, 20, false);
+        var legs = CreatePrivateList(coveredLeg.GetType(), coveredLeg, missingLeg, ignoredLeg);
+        var candidate = NotchTableGeneratorPrivateAccess.NewV22CadCandidate(
             0,
             20,
             100,
@@ -1630,19 +1613,10 @@ public sealed class NotchTableGeneratorTests
             true,
             true,
             legs);
-        var ic2CoveredLeg = CreatePrivateRecord(
-            diffLegType!,
-            41,
-            25,
-            true);
-        var ic2MissingLeg = CreatePrivateRecord(
-            diffLegType!,
-            42,
-            20,
-            true);
-        var ic2Legs = CreatePrivateList(diffLegType!, ic2CoveredLeg, ic2MissingLeg);
-        var ic2Candidate = CreatePrivateRecord(
-            candidateType!,
+        var ic2CoveredLeg = NotchTableGeneratorPrivateAccess.NewV22DiffLeg(41, 25, true);
+        var ic2MissingLeg = NotchTableGeneratorPrivateAccess.NewV22DiffLeg(42, 20, true);
+        var ic2Legs = CreatePrivateList(ic2CoveredLeg.GetType(), ic2CoveredLeg, ic2MissingLeg);
+        var ic2Candidate = NotchTableGeneratorPrivateAccess.NewV22CadCandidate(
             1,
             40,
             101,
@@ -1656,7 +1630,7 @@ public sealed class NotchTableGeneratorTests
             true,
             ic2Legs);
         var candidatesByDiff = CreateCandidateDictionary(
-            candidateType!,
+            candidate.GetType(),
             ((0, 20), new[] { candidate }),
             ((1, 40), new[] { ic2Candidate }));
         var canonicalRows = new[]
@@ -1677,9 +1651,7 @@ public sealed class NotchTableGeneratorTests
                 comment: "main-ic2"),
         };
 
-        var method = generatorType.GetMethod("BuildToFullCoverageAudit", BindingFlags.NonPublic | BindingFlags.Static);
-        Assert.NotNull(method);
-        var audit = Assert.IsType<NotchToFullCoverageAudit>(method!.Invoke(null, [candidatesByDiff, canonicalRows, 65535]));
+        var audit = NotchTableGeneratorPrivateAccess.BuildToFullCoverageAudit(null, candidatesByDiff, canonicalRows, 65535);
 
         Assert.True(audit.HasExpectations);
         Assert.True(audit.HasMissingCoverage);
@@ -2400,15 +2372,6 @@ public sealed class NotchTableGeneratorTests
             .ToArray();
     }
 
-    private static object CreatePrivateRecord(Type type, params object?[] arguments)
-    {
-        var constructor = type
-            .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-            .Single(ctor => ctor.GetParameters().Length == arguments.Length);
-        var instance = constructor.Invoke(arguments);
-        Assert.NotNull(instance);
-        return instance!;
-    }
 
     private static object CreatePrivateList(Type elementType, params object[] items)
     {

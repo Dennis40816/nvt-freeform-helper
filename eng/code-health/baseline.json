@@ -1418,7 +1418,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 2450
+        "fileLines": 2413
       },
       "owner": "NFH",
       "locations": [
@@ -1455,20 +1455,6 @@
       "contentHash": "261500a61bcfd4d8f9081c92f4e11989a1d2ee54abf6d97bad984b7392f19d92",
       "project": "FreeformHelper.Tests",
       "symbol": "FreeformHelper.Tests.NotchTableGeneratorTests.ResolveCadAllocationBatchWithSelectedResult_ReusesOneWarmSparseResult()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 109
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs"
-      ],
-      "contentHash": "fe82397f491c8ef8ec175a9fc3da460f6ce9a5b755ab6e9333bae097a16f23af",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.NotchTableGeneratorTests.BuildToFullCoverageAudit_ReportsMissingTargetDiffsAcrossIcBuckets_WhenCanonicalRowsDoNotCoverAllToFullLegs()"
     },
     {
       "kind": "member",
@@ -3383,16 +3369,6 @@
       "symbol": "T:System.Diagnostics.Stopwatch"
     },
     {
-      "syntaxHash": "357b47078471c96a9caa125c24f0b589d2cdaa291c1fad4ab7e8e34390cbf823",
-      "member": "FreeformHelper.Tests.NotchCurrentWorkflowTableTestHelper.GenerateTableAsync(FreeformHelperViewModel,string,bool,bool,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchToFullCoverageSnapshotBuilder.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "7e81d6e2f22db252f163257959c634bf2bdf9e26ca1e28b4edb5fcad3ca18735",
       "member": "FreeformHelper.Tests.NotchTableExporterTests.AssertCCompilesWithGcc(string)",
       "owner": "NFH",
@@ -3421,66 +3397,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Diagnostics.Process.Start"
-    },
-    {
-      "syntaxHash": "2c8f533dd8fc5103c734c3c1e19b2c0218754b211fcda41433bb15f4d7d42a28",
-      "member": "FreeformHelper.Tests.NotchTableGeneratorTests.A1Fact3_CadAllocation_SourceScoreMatchesOwnedAreaAndFallback(NotchCompensationModel)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "6a5da7fb201c6c8108e04efd9b9bbff8a8e690219288ca57c6fefa5c14971a6e",
-      "member": "FreeformHelper.Tests.NotchTableGeneratorTests.A1Fact6_CadAllocation_EmittedLegChunksAndFinalOrderMatchOwner(NotchCompensationModel)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "490c5781ed7847f4bff3b454148af47d4e957f6e2da891e9d437139bbf5c7dc6",
-      "member": "FreeformHelper.Tests.NotchTableGeneratorTests.A1Fact6_CadAllocation_SignedAbiBoundariesOnlyClampOrChunkOwnedPercent(NotchCompensationModel)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "072070300258a58cca4e250605da0af4a71ed1584fba7d08723a9865e0fb5e7d",
-      "member": "FreeformHelper.Tests.NotchTableGeneratorTests.BuildToFullCoverageAudit_ReportsMissingTargetDiffsAcrossIcBuckets_WhenCanonicalRowsDoNotCoverAllToFullLegs()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "36543275ead706ac7ab00cc20163fa36bacd70d08e84d81c33e8060717668efc",
-      "member": "FreeformHelper.Tests.NotchTableGeneratorTests.BuildToFullCoverageAudit_ReportsMissingTargetDiffsAcrossIcBuckets_WhenCanonicalRowsDoNotCoverAllToFullLegs()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "9a22ee75b95290f0bf203557b2ab88448ff189f0f1cf9a504a3eccb040e6fa82",
-      "member": "FreeformHelper.Tests.NotchTableGeneratorTests.BuildToFullCoverageAudit_ReportsMissingTargetDiffsAcrossIcBuckets_WhenCanonicalRowsDoNotCoverAllToFullLegs()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "03c60795e16d24f7dc9187854d55f3af2247066b0d97692561475b4d3798837a",
@@ -3515,16 +3431,6 @@
     {
       "syntaxHash": "36fa47876352e0c6f80117dd099dd90f093a4aa1c8ea3bcbce2a9b228e071600",
       "member": "FreeformHelper.Tests.NotchTableGeneratorTests.CadAllocationCandidateHelpers_ConsumeOnlyFrozenGenerationContext()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "2a74bd9bc25f5beb0c9ca79ef7d5b133b50d696d5d203ef046283b4ca611be94",
-      "member": "FreeformHelper.Tests.NotchTableGeneratorTests.CreatePrivateRecord(Type,params object?[])",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs",
       "project": "FreeformHelper.Tests",
