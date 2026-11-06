@@ -65,16 +65,6 @@
     },
     {
       "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Services/LoadingScopeCoordinatorTests.cs",
-      "rule": "elapsedAssertionsInTests",
-      "member": "FreeformHelper.Tests.LoadingScopeCoordinatorTests.RunAsync_RespectsMinimumVisibleDuration()",
-      "owner": "NFH",
-      "symbol": "Assert.True",
-      "syntaxHash": "5564cee41f42c783f4f704f2abeec6f069270e5f3e610c2d834d1af57eb6ee05",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
       "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs",
       "rule": "elapsedAssertionsInTests",
       "member": "FreeformHelper.Tests.NotchTableGeneratorTests.Generate_CadAllocationMode_SelectsSingleAnchorPerCad()",

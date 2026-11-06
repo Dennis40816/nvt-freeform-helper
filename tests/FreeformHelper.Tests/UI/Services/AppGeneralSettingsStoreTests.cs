@@ -98,7 +98,7 @@ public sealed class AppGeneralSettingsStoreTests
             var legacy = new
             {
                 SchemaVersion = 1,
-                SavedAtUtc = DateTimeOffset.UtcNow,
+                SavedAtUtc = TimeProvider.System.GetUtcNow(),
                 Settings = new
                 {
                     Matching = new

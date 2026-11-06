@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
@@ -67,37 +66,37 @@ public sealed class Cad3635LoadBenchmarkTests
         var options = FreeformHelperViewModelPrivateAccess.BuildDxfOptions(vm);
         Assert.NotNull(options);
 
-        var total = Stopwatch.StartNew();
+        var total = TimeProvider.System.GetTimestamp();
 
-        var import = Stopwatch.StartNew();
+        var import = TimeProvider.System.GetTimestamp();
         var outcome = useCase.TryLoadFromPath(dxfPath, options);
-        import.Stop();
+        var importMs = (long)TimeProvider.System.GetElapsedTime(import).TotalMilliseconds;
         Assert.NotNull(outcome);
 
-        var layerCatalog = Stopwatch.StartNew();
+        var layerCatalog = TimeProvider.System.GetTimestamp();
         // Open DXF now hands the catalog built during the import to the catalog state (single read).
         catalogState.SetFromPath(dxfPath, importService.ImportedCatalog);
-        layerCatalog.Stop();
+        var layerCatalogMs = (long)TimeProvider.System.GetElapsedTime(layerCatalog).TotalMilliseconds;
 
-        var apply = Stopwatch.StartNew();
+        var apply = TimeProvider.System.GetTimestamp();
         await FreeformHelperViewModelPrivateAccess.ApplyCadLoadOutcomeAsync(vm, outcome!, null);
-        apply.Stop();
+        var applyMs = (long)TimeProvider.System.GetElapsedTime(apply).TotalMilliseconds;
 
-        var rebuild = Stopwatch.StartNew();
+        var rebuild = TimeProvider.System.GetTimestamp();
         vm.GridPaddingPercent += 5m;
         await vm.WaitForGridRebuildIdleAsync();
-        rebuild.Stop();
+        var rebuildMs = (long)TimeProvider.System.GetElapsedTime(rebuild).TotalMilliseconds;
 
-        total.Stop();
+        var totalMs = (long)TimeProvider.System.GetElapsedTime(total).TotalMilliseconds;
 
         return new Cad3635LoadBenchmarkSample(
             run,
             warmup,
-            total.ElapsedMilliseconds,
-            import.ElapsedMilliseconds,
-            layerCatalog.ElapsedMilliseconds,
-            apply.ElapsedMilliseconds,
-            rebuild.ElapsedMilliseconds,
+            totalMs,
+            importMs,
+            layerCatalogMs,
+            applyMs,
+            rebuildMs,
             outcome!.Cad.Pads.Count,
             vm.CadPads.Count,
             vm.LayerToggles.Count);

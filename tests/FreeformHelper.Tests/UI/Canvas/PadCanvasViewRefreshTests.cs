@@ -13,7 +13,7 @@ public sealed class PadCanvasViewRefreshTests
     [Fact]
     public void ComputeLowDetailMode_ReturnsTrue_WhenTransientNavigationIsActive()
     {
-        var nowTicks = DateTime.UtcNow.Ticks;
+        var nowTicks = TimeProvider.System.GetUtcNow().UtcDateTime.Ticks;
 
         Assert.True(PadCanvas.ComputeLowDetailMode(
             isMiddlePanning: false,
@@ -37,7 +37,7 @@ public sealed class PadCanvasViewRefreshTests
     [Fact]
     public void ShouldDeferSecondaryVisuals_ReturnsTrue_OnlyDuringActiveNavigationWindow()
     {
-        var nowTicks = DateTime.UtcNow.Ticks;
+        var nowTicks = TimeProvider.System.GetUtcNow().UtcDateTime.Ticks;
 
         Assert.True(PadCanvas.ShouldDeferSecondaryVisuals(
             isMiddlePanning: true,

@@ -483,7 +483,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
                 return;
             }
 
-            await Task.Delay(25).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(25), TimeProvider.System, CancellationToken.None).ConfigureAwait(false);
         }
 
         throw new TimeoutException("CAD load spinner process did not become ready within timeout.");
