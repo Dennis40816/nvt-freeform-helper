@@ -1,4 +1,3 @@
-using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -261,7 +260,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
             return false;
         }
 
-        await File.WriteAllTextAsync(file.Path.LocalPath, request.Content, Encoding.UTF8);
+        await TextExportWriter.WriteAsync(file.Path.LocalPath, request.Content, includeBom: true, CancellationToken.None);
         return true;
     }
 
