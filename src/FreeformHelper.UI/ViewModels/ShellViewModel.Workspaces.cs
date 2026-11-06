@@ -183,7 +183,7 @@ public sealed partial class ShellViewModel
                 // Keep prewarm strictly in background: do not contend with foreground Step5 export.
                 if (FreeformHelper.IsNotchExporting)
                 {
-                    await Task.Delay(200);
+                    await Task.Delay(TimeSpan.FromMilliseconds(200), TimeProvider.System, CancellationToken.None);
                     continue;
                 }
 

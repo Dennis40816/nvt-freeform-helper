@@ -95,7 +95,7 @@ public sealed partial class FreeformHelperViewModel
                     (double)NotchPreviewAutoPlayIntervalMs,
                     (double)NotchPreviewAutoPlayIntervalMinMs,
                     (double)NotchPreviewAutoPlayIntervalMaxMs));
-                await Task.Delay(delayMs, cancellationToken).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromMilliseconds(delayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
                 if (cancellationToken.IsCancellationRequested)
                 {
                     break;

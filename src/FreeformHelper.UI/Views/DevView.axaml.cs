@@ -47,7 +47,7 @@ public partial class DevView : UserControl
 
     private async Task HidePreviewSpinnerAsync(int currentSequence)
     {
-        await Task.Delay(TimeSpan.FromMilliseconds(1500));
+        await Task.Delay(TimeSpan.FromMilliseconds(1500), TimeProvider.System, CancellationToken.None);
         if (currentSequence != System.Threading.Volatile.Read(ref _previewSpinnerSequence))
         {
             return;

@@ -175,7 +175,7 @@ public sealed partial class FreeformHelperViewModel
         DeferredCadInspectorContext? context = null;
         try
         {
-            await Task.Delay(PadInspectorDeferredRefreshDelayMs, cancellationToken).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(PadInspectorDeferredRefreshDelayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
             if (cancellationToken.IsCancellationRequested || requestId != Interlocked.Read(ref _padInspectorDeferredRefreshRequestId))
             {
                 return;
@@ -316,7 +316,7 @@ public sealed partial class FreeformHelperViewModel
         var sw = Stopwatch.StartNew();
         try
         {
-            await Task.Delay(RegularPadInspectorDeferredRefreshDelayMs, cancellationToken).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(RegularPadInspectorDeferredRefreshDelayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
             if (cancellationToken.IsCancellationRequested ||
                 requestId != Interlocked.Read(ref _regularPadInspectorDeferredRefreshRequestId))
             {
