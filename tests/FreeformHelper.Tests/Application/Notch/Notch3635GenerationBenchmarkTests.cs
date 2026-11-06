@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Tests.TestInfrastructure;
@@ -51,13 +50,13 @@ public sealed class Notch3635GenerationBenchmarkTests
             };
             await vm.LoadProjectCommand.ExecuteAsync(null);
 
-            var wall = Stopwatch.StartNew();
+            var wall = TimeProvider.System.GetTimestamp();
             var rawTable = await NotchCurrentWorkflowTableTestHelper.GenerateRawTableAsync(
                 vm,
                 "3635 notch generation benchmark");
-            wall.Stop();
+            var wallMs = (long)TimeProvider.System.GetElapsedTime(wall).TotalMilliseconds;
 
-            samples.Add(BuildSample(run + 1, run < warmupIterations, wall.ElapsedMilliseconds, rawTable.GenerationPhaseTimings));
+            samples.Add(BuildSample(run + 1, run < warmupIterations, wallMs, rawTable.GenerationPhaseTimings));
         }
 
         var measured = samples.Where(static sample => !sample.Warmup).ToArray();
