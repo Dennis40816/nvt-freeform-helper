@@ -95,7 +95,7 @@ public sealed class SimulationWorkspaceViewModelTests
 
         var csvSnapshot = Assert.IsType<SimulationScenarioSnapshot>(viewModel.GetSimulationScenarioSnapshot());
         Assert.Equal(SimulationScenarioKind.Csv, csvSnapshot.Scenario.Kind);
-        Assert.Equal(csvSnapshot.Result.Cells.Count, viewModel.GetSimulationSafetyAuditSnapshot().CellCount);
+        Assert.Equal(csvSnapshot.SimulationResult.Cells.Count, viewModel.GetSimulationSafetyAuditSnapshot().CellCount);
 
         viewModel.SelectedInputSourceOption = viewModel.SourceOptions.Single(option => option.Value == SimulationInputSourceMode.Copper);
 

@@ -54,7 +54,7 @@ public sealed class SimulationWorkspaceCsvUnavailableCharacterizationTests
         Assert.False(viewModel.HasCsvData);
         var snapshot = Assert.IsType<SimulationScenarioSnapshot>(viewModel.GetSimulationScenarioSnapshot());
         Assert.Equal(SimulationScenarioKind.Manual, snapshot.Scenario.Kind);
-        Assert.True(snapshot is { Result.IsSupported: true });
+        Assert.True(snapshot is { SimulationResult.IsSupported: true });
     }
 
     private static SimulationWorkspaceViewModel CreateViewModel()

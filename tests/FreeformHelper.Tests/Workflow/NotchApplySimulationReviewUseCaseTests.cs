@@ -46,15 +46,15 @@ public sealed class NotchApplySimulationReviewUseCaseTests
             NotchApplySimulationAggregationMode.SingleFrame,
             selectedFrameIndex: 0);
 
-        Assert.True(snapshot.Result.IsSupported);
-        Assert.Equal("V2.2 diff-centric apply", snapshot.Result.ContractText);
+        Assert.True(snapshot.SimulationResult.IsSupported);
+        Assert.Equal("V2.2 diff-centric apply", snapshot.SimulationResult.ContractText);
         Assert.Single(snapshot.Dataset.Files);
         Assert.Equal(1, snapshot.Dataset.CompatibleFrameCount);
-        Assert.Single(snapshot.Result.Actions);
-        Assert.NotEmpty(snapshot.Result.Histograms.Before.Bins);
-        Assert.NotEmpty(snapshot.Result.Heatmap.Hotspots);
+        Assert.Single(snapshot.SimulationResult.Actions);
+        Assert.NotEmpty(snapshot.SimulationResult.Histograms.Before.Bins);
+        Assert.NotEmpty(snapshot.SimulationResult.Heatmap.Hotspots);
         Assert.Collection(
-            snapshot.Result.Cells.OrderBy(static cell => cell.DiffIndex),
+            snapshot.SimulationResult.Cells.OrderBy(static cell => cell.DiffIndex),
             cell => Assert.Equal((10, 100d, 50d), (cell.DiffIndex, cell.BeforeValue, cell.AfterValue)),
             cell => Assert.Equal((11, 50d, 94d), (cell.DiffIndex, cell.BeforeValue, cell.AfterValue)));
     }
@@ -94,11 +94,11 @@ public sealed class NotchApplySimulationReviewUseCaseTests
             NotchApplySimulationAggregationMode.SingleFrame,
             selectedFrameIndex: 0);
 
-        Assert.True(snapshot.Result.IsSupported);
-        Assert.Equal("V2.1 projected apply (v2.2 canonical)", snapshot.Result.ContractText);
-        Assert.Single(snapshot.Result.Actions);
+        Assert.True(snapshot.SimulationResult.IsSupported);
+        Assert.Equal("V2.1 projected apply (v2.2 canonical)", snapshot.SimulationResult.ContractText);
+        Assert.Single(snapshot.SimulationResult.Actions);
         Assert.Collection(
-            snapshot.Result.Cells.OrderBy(static cell => cell.DiffIndex),
+            snapshot.SimulationResult.Cells.OrderBy(static cell => cell.DiffIndex),
             cell => Assert.Equal((10, 100d, 50d), (cell.DiffIndex, cell.BeforeValue, cell.AfterValue)),
             cell => Assert.Equal((11, 50d, 93d), (cell.DiffIndex, cell.BeforeValue, cell.AfterValue)));
     }

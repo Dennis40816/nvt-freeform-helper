@@ -425,10 +425,10 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         : IsThresholdMode
             ? $"TH {ColorThresholdValue.ToString("0.###", CultureInfo.InvariantCulture)}"
             : FormatLegendValue(_legendMaximumValue);
-    public bool HasDuplicateDiffResolutions => _snapshot?.Result.DiffIdentityContract.HasDuplicateResolutions ?? false;
-    public int DuplicateDiffResolutionCount => _snapshot?.Result.DiffIdentityContract.DuplicateResolutionCount ?? 0;
+    public bool HasDuplicateDiffResolutions => _snapshot?.SimulationResult.DiffIdentityContract.HasDuplicateResolutions ?? false;
+    public int DuplicateDiffResolutionCount => _snapshot?.SimulationResult.DiffIdentityContract.DuplicateResolutionCount ?? 0;
     public string DuplicateDiffResolutionStrategyText => FormatDuplicateDiffResolutionStrategy(
-        _snapshot?.Result.DiffIdentityContract.DuplicateResolutionStrategy
+        _snapshot?.SimulationResult.DiffIdentityContract.DuplicateResolutionStrategy
         ?? NotchApplySimulationDuplicateDiffResolutionStrategy.MergeSumActiveRegularPads);
     public string DuplicateDiffResolutionSummaryText => HasDuplicateDiffResolutions
         ? $"Duplicate FW Diff Idx keys: {DuplicateDiffResolutionCount.ToString(CultureInfo.InvariantCulture)} (strategy: {DuplicateDiffResolutionStrategyText})."
@@ -442,7 +442,7 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
                 return "IC/diff -";
             }
 
-            var sample = _snapshot.Result.DiffIdentityContract.DuplicateResolutions[0];
+            var sample = _snapshot.SimulationResult.DiffIdentityContract.DuplicateResolutions[0];
             var mergedRegularPadIds = new[] { sample.PrimaryRegularPadId }
                 .Concat(sample.SuppressedRegularPadIds)
                 .OrderBy(static regularPadId => regularPadId)

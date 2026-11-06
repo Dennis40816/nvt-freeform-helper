@@ -198,5 +198,5 @@ public sealed record NotchApplySimulationImportedDataset(
 public sealed record NotchApplySimulationReviewSnapshot(
     NotchApplySimulationImportedDataset Dataset,
     NotchTable FilteredTable,
-    NotchApplySimulationResult Result,
+    NotchApplySimulationResult SimulationResult,
     IReadOnlyList<string> Diagnostics);

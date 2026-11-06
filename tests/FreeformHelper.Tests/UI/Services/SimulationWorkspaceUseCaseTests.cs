@@ -68,10 +68,10 @@ public sealed class SimulationWorkspaceUseCaseTests
             snapshots.Select(static snapshot => snapshot.Scenario.Kind));
         foreach (var snapshot in snapshots)
         {
-            Assert.True(snapshot.Result.IsSupported);
+            Assert.True(snapshot.SimulationResult.IsSupported);
             Assert.True(snapshot.SafetyAudit.HasCells);
-            Assert.Equal(snapshot.Result.Cells.Count, snapshot.SafetyAudit.CellCount);
-            Assert.Same(snapshot.ReviewSnapshot.Result, snapshot.Result);
+            Assert.Equal(snapshot.SimulationResult.Cells.Count, snapshot.SafetyAudit.CellCount);
+            Assert.Same(snapshot.ReviewSnapshot.SimulationResult, snapshot.SimulationResult);
             Assert.Same(snapshot.ReviewSnapshot.Dataset, snapshot.Dataset);
         }
     }
@@ -127,11 +127,11 @@ public sealed class SimulationWorkspaceUseCaseTests
 
         var snapshot = SimulationWorkspaceUseCase.BuildScenarioSnapshot(session, scenario);
 
-        Assert.Equal("V2.1 legacy firmware apply", snapshot.Result.ContractText);
-        Assert.Empty(snapshot.Result.Actions);
+        Assert.Equal("V2.1 legacy firmware apply", snapshot.SimulationResult.ContractText);
+        Assert.Empty(snapshot.SimulationResult.Actions);
         Assert.False(snapshot.SafetyAudit.GlobalFlowAudit.HasActionFlowModel);
         Assert.Collection(
-            snapshot.Result.Cells,
+            snapshot.SimulationResult.Cells,
             cell => Assert.Equal((10, 150d), (cell.DiffIndex, cell.AfterValue)),
             cell => Assert.Equal((11, 100d), (cell.DiffIndex, cell.AfterValue)));
     }

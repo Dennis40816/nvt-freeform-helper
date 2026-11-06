@@ -6,6 +6,7 @@ using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.TestSupport;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -50,7 +51,7 @@ public sealed partial class FreeformHelperViewModelTests
             await FreeformHelperViewModel.YieldCadLoadCanvasOverlayFrameAsync();
         });
 
-        Assert.True(yielded.Wait(TimeSpan.FromSeconds(5)));
+        TaskBlock.UntilComplete(yielded.WaitAsync(TimeSpan.FromSeconds(5)));
     }
 
     [AvaloniaFact]

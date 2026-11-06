@@ -92,12 +92,12 @@ public sealed partial class SimulationWorkspaceViewModel
         }
 
         _snapshot = snapshot;
-        _snapshotCellsByRegularPadId = snapshot.Result.Cells.ToDictionary(
+        _snapshotCellsByRegularPadId = snapshot.SimulationResult.Cells.ToDictionary(
             static cell => cell.RegularPadId,
             static cell => cell);
-        RebuildImpactItemIndex(snapshot.Result.Actions);
+        RebuildImpactItemIndex(snapshot.SimulationResult.Actions);
 
-        RebuildOverlayItems(snapshot.Result.Cells);
+        RebuildOverlayItems(snapshot.SimulationResult.Cells);
         RefreshDiffViolationState();
         RefreshSimulationSafetyState();
 
@@ -140,16 +140,16 @@ public sealed partial class SimulationWorkspaceViewModel
 
     private void UpdateStatus(SimulationScenarioSnapshot snapshot)
     {
-        if (!snapshot.Result.IsSupported)
+        if (!snapshot.SimulationResult.IsSupported)
         {
-            StatusText = snapshot.Result.PrimaryDiagnostic ?? "Simulation contract not supported under current version.";
+            StatusText = snapshot.SimulationResult.PrimaryDiagnostic ?? "Simulation contract not supported under current version.";
             return;
         }
 
-        var delta = snapshot.Result.DeltaTotal.ToString("+0.###;-0.###;0", System.Globalization.CultureInfo.InvariantCulture);
+        var delta = snapshot.SimulationResult.DeltaTotal.ToString("+0.###;-0.###;0", System.Globalization.CultureInfo.InvariantCulture);
         StatusText = IsCopperSource
             ? $"{CopperProjectionModelText} · total Δ {delta}"
-            : $"{snapshot.Result.ContractText} · frames {snapshot.Result.ConsumedFrameCount} · total Δ {delta}";
+            : $"{snapshot.SimulationResult.ContractText} · frames {snapshot.SimulationResult.ConsumedFrameCount} · total Δ {delta}";
     }
 
     private static IReadOnlyList<NotchApplySimulationVersionOption> BuildVersionOptions(NotchTable table)

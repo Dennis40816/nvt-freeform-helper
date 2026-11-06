@@ -67,7 +67,7 @@ public sealed partial class SimulationWorkspaceViewModel
         OnPropertyChanged(nameof(IsSignedCanvasView));
         if (_snapshot is not null)
         {
-            RebuildOverlayItems(_snapshot.Result.Cells);
+            RebuildOverlayItems(_snapshot.SimulationResult.Cells);
         }
     }
 
@@ -84,7 +84,7 @@ public sealed partial class SimulationWorkspaceViewModel
         OnPropertyChanged(nameof(CanvasStatusSummaryText));
         if (_snapshot is not null)
         {
-            RebuildOverlayItems(_snapshot.Result.Cells);
+            RebuildOverlayItems(_snapshot.SimulationResult.Cells);
             RefreshDiffViolationState();
         }
 

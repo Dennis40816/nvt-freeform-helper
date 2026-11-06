@@ -157,8 +157,8 @@ public sealed partial class SimulationWorkspaceViewModel
         }
 
         var violations = SimulationDeltaViolationService.Detect(
-            _snapshot.Result.Cells,
-            _snapshot.Result.Actions,
+            _snapshot.SimulationResult.Cells,
+            _snapshot.SimulationResult.Actions,
             SelectedAreaOption.IcIndex);
         _diffViolationRegularPadIds = violations
             .Select(static item => item.RegularPadId)
@@ -257,7 +257,7 @@ public sealed partial class SimulationWorkspaceViewModel
         var targetDelta = 0d;
         var lines = new List<string>();
         var legs = new List<SimulationSelectedFlowLegViewModel>();
-        foreach (var action in _snapshot.Result.Actions)
+        foreach (var action in _snapshot.SimulationResult.Actions)
         {
             if (action.IcIndex != cell.IcIndex)
             {

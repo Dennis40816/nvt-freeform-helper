@@ -8,6 +8,7 @@ using System.Text;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using Nvt.Core.RuntimeQuery;
+using Nvt.Core.TestSupport;
 using Xunit;
 using RuntimeQueryProtocol = FreeformHelper.UI.Services.RuntimeQueryProtocol;
 
@@ -93,11 +94,11 @@ public sealed class RuntimeQueryCoreBehaviorTests
         var entered = NewSignal();
         var returned = NewSignal();
         var diagnostics = new ConcurrentQueue<RuntimeQueryDiagnostic>();
-        using var release = new ManualResetEventSlim();
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         await using var server = CreateServer(pipeName, (_, _, _) =>
         {
             entered.TrySetResult();
-            release.Wait(TimeSpan.FromSeconds(10), CancellationToken.None);
+            TaskBlock.UntilComplete(release.Task.WaitAsync(TimeSpan.FromSeconds(10), CancellationToken.None));
             returned.TrySetResult();
             return Task.FromResult(RuntimeQueryResponseEnvelope.Success(null));
         }, (diagnostic, _) => diagnostics.Enqueue(diagnostic));
@@ -118,7 +119,7 @@ public sealed class RuntimeQueryCoreBehaviorTests
         }
         finally
         {
-            release.Set();
+            release.TrySetResult();
             await returned.Task.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
         }
     }

@@ -1845,36 +1845,6 @@
       "symbol": "FreeformHelper.UI.Services.RuntimeQueryNotchCacheService._revisionResetCount"
     },
     {
-      "syntaxHash": "b605b746cce4d5056b3e0b93ac5894f7678dda4e30a2655f70f9e24cd89634a4",
-      "member": "FreeformHelper.UI.Services.SimulationScenarioSnapshot.Result",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/SimulationWorkspaceUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "8fdc1ef5aa8de6739c5e123283c18a11eb371bd954abd791e540070c48267ff8",
-      "member": "FreeformHelper.UI.Services.SimulationWorkspaceUseCase.BuildScenarioSnapshot(SimulationWorkspaceSession,SimulationScenario)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/SimulationWorkspaceUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.UI.Services.SimulationWorkspaceUseCase.ReplayCopperPath(SimulationWorkspaceSession,NotchAlgorithmVersion,CopperPillarPathReplayRequest)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/SimulationWorkspaceUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 2,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
       "syntaxHash": "a70f8f3126559f5098d2f47c35cb253a824d65d516d82dda934877dd743856e3",
       "member": "FreeformHelper.UI.ViewModels.CoordinatePlannerHostViewModel.fields:_sourceRevision",
       "owner": "NFH",
@@ -1975,106 +1945,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.SimulationHostViewModel._sourceRevision"
     },
     {
-      "syntaxHash": "2f1358a4164a75c62a094afb4aba43bfd1e3b79b3fd2a6604785840094b557e6",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.DuplicateDiffResolutionSampleText.get",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "9539a51f059f9681cd86feb500c66e884b93d02a2ef5137ce7f7dfd91b04e28b",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.HasDuplicateDiffResolutions",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "9539a51f059f9681cd86feb500c66e884b93d02a2ef5137ce7f7dfd91b04e28b",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.DuplicateDiffResolutionCount",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "9539a51f059f9681cd86feb500c66e884b93d02a2ef5137ce7f7dfd91b04e28b",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.DuplicateDiffResolutionStrategyText",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "2f1358a4164a75c62a094afb4aba43bfd1e3b79b3fd2a6604785840094b557e6",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.OnSelectedCanvasViewOptionChanged(NotchApplySimulationCanvasViewOption)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Overlay.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "2f1358a4164a75c62a094afb4aba43bfd1e3b79b3fd2a6604785840094b557e6",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.OnSelectedAreaOptionChanged(NotchApplySimulationAreaOption)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Overlay.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.RefreshSnapshot()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Source.cs",
-      "project": "FreeformHelper.UI",
-      "count": 3,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.UpdateStatus(SimulationScenarioSnapshot)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Source.cs",
-      "project": "FreeformHelper.UI",
-      "count": 5,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "2f1358a4164a75c62a094afb4aba43bfd1e3b79b3fd2a6604785840094b557e6",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.RefreshDiffViolationState()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Validation.cs",
-      "project": "FreeformHelper.UI",
-      "count": 2,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "2f1358a4164a75c62a094afb4aba43bfd1e3b79b3fd2a6604785840094b557e6",
-      "member": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel.BuildSelectedDiffFlow(NotchApplySimulationDiffCell)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Validation.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
       "syntaxHash": "9c4c1d90c447342d5326b441fe63fa734322c098f002f5ba6b9293fb6e71304b",
       "member": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.FixedTimeProvider",
       "owner": "NFH",
@@ -2085,66 +1955,6 @@
       "symbol": "FreeformHelper.Tests.JsonProjectStoreAtomicSaveTests.FixedTimeProvider"
     },
     {
-      "syntaxHash": "59029d52a798dc37bcd51e81f9782fef2320cc6a083ebb698625290d4d5466e8",
-      "member": "FreeformHelper.Tests.CadLoadSpinnerProcessHostTests.Show_WhileHideSendIsInFlight_RestoresVisibleState()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CadLoadSpinnerProcessHostTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Wait"
-    },
-    {
-      "syntaxHash": "dd3622d0a7cfee8791b3ce6a8691e957e2abcde8d8ec851b5e332ac95d1d771e",
-      "member": "FreeformHelper.Tests.RuntimeQueryCoreBehaviorTests.DisposeAsync_WhenHandlerBlocksSynchronously_ReportsBoundAndReleasesPipe()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryCoreBehaviorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Wait"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.Tests.SimulationWorkspaceUseCaseTests.BuildScenarioSnapshot_WhenSourcesVary_UsesSingleResultAndAuditModel()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/SimulationWorkspaceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 3,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "c97d9cc8abe903bc77848d4580ebe956cd51d90255ac261ec9cf2fc6712b260f",
-      "member": "FreeformHelper.Tests.SimulationWorkspaceUseCaseTests.BuildScenarioSnapshot_WhenSourcesVary_UsesSingleResultAndAuditModel()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/SimulationWorkspaceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.Tests.SimulationWorkspaceUseCaseTests.BuildScenarioSnapshot_PropagatesLegacyCompatibilityModeToTheSharedFirmwareProjection()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/SimulationWorkspaceUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 3,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "b25639be4ec9b2e0cbebab31fdfcdaeddefe66df953544e6c089420981b00ab8",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.YieldCadLoadCanvasOverlayFrame_OffTheUiThread_DoesNotWaitForTheDispatcher()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Basics.LoadOverlay.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Wait"
-    },
-    {
       "syntaxHash": "d6b9138e255632021481a137cb249492806a3aea8192dbe2643cb7721d84eecd",
       "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.ExportAndSimulation_Overlap_CoalesceColdBatchAndKeepBusyUntilBothOperationsComplete()",
       "owner": "NFH",
@@ -2153,66 +1963,6 @@
       "count": 1,
       "rule": "asyncVoid",
       "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.SimulationSafetyOverview_WhenWorkspaceHasNoCells_UsesNotRunAvailabilityStatus()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "789fc729cfe695cae06f751aea514723ffebdcc6bcbe728386a98eda79ff873c",
-      "member": "FreeformHelper.Tests.SimulationWorkspaceViewModelTests.ScenarioSnapshot_WhenSourceChanges_TracksManualCsvAndCopperSources()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/SimulationWorkspaceViewModelTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.Tests.DiffFrameCsvFixtureTests.Tm81SingleFingerFixture_KeepsDiffMismatchedStep1PadsAtZero()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/DiffFrameCsvFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.Tests.DiffFrameCsvFixtureTests.Tm81SingleFingerFixture_AllowsAfterValueForInactiveTargetDiffPads()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/DiffFrameCsvFixtureTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.Tests.NotchApplySimulationReviewUseCaseTests.BuildSnapshot_WhenV22RowsImported_UsesSharedSimulationPath()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationReviewUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 6,
-      "rule": "blockingWait",
-      "symbol": "Result"
-    },
-    {
-      "syntaxHash": "d67b48ef3a4b165e85a3e1c7f5c12fa993e5d42e2d03121d81eeed3e0e6565c9",
-      "member": "FreeformHelper.Tests.NotchApplySimulationReviewUseCaseTests.BuildSnapshot_WhenV21RowsImported_UsesSharedProjectedCanonicalPath()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Workflow/NotchApplySimulationReviewUseCaseTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 4,
-      "rule": "blockingWait",
-      "symbol": "Result"
     },
     {
       "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
@@ -2473,16 +2223,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "WarningsNotAsErrors:RS0030"
-    },
-    {
-      "syntaxHash": "daab339bcf0172b6f0fc334d66774e49704deafb0aa842461b012aa152d87de2",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:VSTHRD002"
     },
     {
       "syntaxHash": "047d8df54cc83338058233045f8a201cf20a5f2e48d0a870e3df1e70c974940e",
@@ -3693,16 +3433,6 @@
       "count": 1,
       "rule": "suppressionScopes",
       "symbol": "attribute:CA1822"
-    },
-    {
-      "syntaxHash": "e91fe7a8c13790f8f970364a5357384fb282d4be2f96ed10f4c5acb260fa7dbb",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.YieldCadLoadCanvasOverlayFrame_OffTheUiThread_DoesNotWaitForTheDispatcher()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Basics.LoadOverlay.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD002",
-      "symbol": "VSTHRD002"
     },
     {
       "syntaxHash": "e412e895bc654bb67e4f019d457b2283ff5bd04dac2d0f3cb916e45cb4761803",
