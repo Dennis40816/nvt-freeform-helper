@@ -2,6 +2,7 @@
 
 using Avalonia.Controls;
 using Avalonia.Threading;
+using Xunit;
 
 namespace FreeformHelper.Tests.TestInfrastructure;
 
@@ -34,6 +35,24 @@ internal static class HeadlessUiPump
         await YieldAsync(DispatcherPriority.Loaded);
         await YieldAsync(DispatcherPriority.Render);
         await YieldAsync(DispatcherPriority.Background);
+    }
+
+    public static async Task WaitUntilAsync(Func<bool> condition, string failureMessage)
+    {
+        using var watchdog = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        watchdog.CancelAfter(TimeSpan.FromSeconds(10));
+        try
+        {
+            while (!condition())
+            {
+                watchdog.Token.ThrowIfCancellationRequested();
+                await FlushQueueAsync().WaitAsync(watchdog.Token);
+            }
+        }
+        catch (OperationCanceledException exception) when (!TestContext.Current.CancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException(failureMessage, exception);
+        }
     }
 
     public static void Drain(TopLevel root)

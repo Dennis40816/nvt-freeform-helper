@@ -29,6 +29,124 @@ public sealed class HeadlessUiSmokeTests
     private static readonly double[] _simulationYEdges = { 0d, 1d };
 
     [AvaloniaFact]
+    public async Task ConfirmDialogConfirmButtonReturnsTrueAsync()
+    {
+        Assert.True(await GetConfirmDialogResultAsync("ConfirmButton"));
+    }
+
+    [AvaloniaFact]
+    public async Task ConfirmDialogCancelButtonReturnsFalseAsync()
+    {
+        Assert.False(await GetConfirmDialogResultAsync("CancelButton"));
+    }
+
+    [AvaloniaFact]
+    public async Task ConfirmDialogClosingReturnsFalseForResetAsync()
+    {
+        Assert.False(await GetConfirmDialogResultAsync(null));
+    }
+
+    [AvaloniaFact]
+    public async Task ConfirmDialogWithoutDefaultButtonWaitsForChoiceAndClosingReturnsNullAsync()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var owner = new Window();
+        var dialog = new ConfirmDialog();
+        try
+        {
+            owner.Show();
+            var result = dialog.ShowDialog<bool?>(owner);
+            await HeadlessUiPump.WaitUntilAsync(() => dialog.IsVisible, "ConfirmDialog did not open.");
+            await HeadlessUiPump.FlushQueueAsync();
+
+            Assert.False(Assert.IsType<Button>(dialog.FindControl<Button>("ConfirmButton")).IsDefault);
+            Assert.False(Assert.IsType<Button>(dialog.FindControl<Button>("CancelButton")).IsDefault);
+            Assert.False(result.IsCompleted);
+
+            dialog.Close();
+
+            Assert.Null(await result.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
+            Assert.False(dialog.IsVisible);
+        }
+        finally
+        {
+            dialog.Close();
+            owner.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public Task WarningDialogOkButtonCompletesDialogAsync() => AssertWarningDialogCompletesAsync(clickOk: true);
+
+    [AvaloniaFact]
+    public Task WarningDialogWithoutDefaultButtonWaitsForChoiceAndClosingCompletesDialogAsync()
+        => AssertWarningDialogCompletesAsync(clickOk: false);
+
+    private static async Task<bool> GetConfirmDialogResultAsync(string? buttonName)
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var owner = new Window();
+        var dialog = new ConfirmDialog("Confirm action", "Continue with this action?", "Continue", "Cancel");
+        try
+        {
+            owner.Show();
+            var result = dialog.ShowDialog<bool>(owner);
+            await HeadlessUiPump.WaitUntilAsync(() => dialog.IsVisible, "ConfirmDialog did not open.");
+            if (buttonName is null)
+            {
+                dialog.Close();
+            }
+            else
+            {
+                UiEventProbe.Click(Assert.IsType<Button>(dialog.FindControl<Button>(buttonName)));
+            }
+
+            var confirmed = await result.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+            Assert.False(dialog.IsVisible);
+            return confirmed;
+        }
+        finally
+        {
+            dialog.Close();
+            owner.Close();
+        }
+    }
+
+    private static async Task AssertWarningDialogCompletesAsync(bool clickOk)
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var owner = new Window();
+        var dialog = new WarningDialog("Warning", "Review this warning before continuing.");
+        try
+        {
+            owner.Show();
+            var result = dialog.ShowDialog(owner);
+            await HeadlessUiPump.WaitUntilAsync(() => dialog.IsVisible, "WarningDialog did not open.");
+            await HeadlessUiPump.FlushQueueAsync();
+            var ok = Assert.IsType<Button>(dialog.FindControl<Button>("OkButton"));
+            Assert.False(ok.IsDefault);
+            Assert.False(result.IsCompleted);
+
+            if (clickOk)
+            {
+                UiEventProbe.Click(ok);
+            }
+            else
+            {
+                dialog.Close();
+            }
+
+            await result.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+            Assert.False(dialog.IsVisible);
+        }
+        finally
+        {
+            dialog.Close();
+            owner.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void FreeformHelperView_Can_Layout_Headless()
     {
         HeadlessAppBootstrap.EnsureInitialized();

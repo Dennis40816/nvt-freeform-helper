@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using FreeformHelper.UI;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Threading;
@@ -18,6 +19,17 @@ internal sealed class UiEventProbe
     public UiEventProbe()
     {
         Runner = new UiEventRunner(Report, (operation, exception) => FallbackReports.Add((operation, exception)));
+    }
+
+    public static void Click(Button button)
+    {
+        ArgumentNullException.ThrowIfNull(button);
+        if (!button.IsEffectivelyEnabled)
+        {
+            throw new InvalidOperationException("Cannot click a disabled button.");
+        }
+
+        button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
     }
 
     private void Report(string operation, Exception exception)
