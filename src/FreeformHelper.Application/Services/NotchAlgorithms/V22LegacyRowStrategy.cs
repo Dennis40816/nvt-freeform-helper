@@ -27,7 +27,42 @@ internal static class V22LegacyRowStrategy
         var nullVal = request.NullValue;
         var axis = NotchAlgorithmHelpers.ResolveAxisKind(reg.Freeform);
         var geometryContext = NotchAlgorithmHelpers.CreateAxisGeometryContext(grid, reg, axis);
-        var neighborContext = axis == NotchAxisKind.X
+        var neighborContext = CreateNeighborContext(grid, reg, axis, nullVal);
+
+        v[0] = reg.DiffIndex;
+        var regArea = Math.Max(reg.Area, 1e-12);
+        v[1] = (int)Math.Round((matchedCad.Area * 100.0) / regArea);
+        v[2] = (int)Math.Round((matchedCad.Bounds.Width * matchedCad.Bounds.Height * 100.0) / regArea);
+
+        v[3] = neighborContext.LeftCadNeighborDiff;
+        v[6] = neighborContext.RightCadNeighborDiff;
+
+        var caseId = geometryContext.ResolveOverlapCase(matchedCad);
+        var inputs = new SideInputs(geometryContext, neighborContext, matchedCad, caseId, reg.DiffIndex, nullVal, request.LenScale);
+        var sides = geometryContext.IsX ? ResolveXWaySides(inputs) : ResolveYWaySides(inputs);
+
+        if (sides.ClearCadNeighbors)
+        {
+            v[3] = nullVal;
+            v[6] = nullVal;
+        }
+
+        v[4] = (int)Math.Round(sides.LeftLen);
+        v[7] = (int)Math.Round(sides.RightLen);
+        v[5] = sides.LeftDiff;
+        v[8] = sides.RightDiff;
+
+        var comment = $"{NotchAlgorithmHelpers.BuildComment(reg, matchedCad)} Case={caseId}";
+        return new NotchTableRow(NotchAlgorithmVersion.V22, reg.IcIndex, reg.DiffIndex, reg.RegularPadId, matchedCad.Id, v, comment);
+    }
+
+    private static NotchAxisNeighborContext CreateNeighborContext(
+        RegularGrid grid,
+        RegularPad reg,
+        NotchAxisKind axis,
+        int nullVal)
+    {
+        return axis == NotchAxisKind.X
             ? NotchAlgorithmHelpers.CreateAxisNeighborContext(
                 grid,
                 reg,
@@ -42,191 +77,104 @@ internal static class V22LegacyRowStrategy
                 nullVal,
                 leftNeighbor: (reg.Row - 1, reg.Col),
                 rightNeighbor: (reg.Row + 1, reg.Col));
+    }
 
-        v[0] = reg.DiffIndex;
-        var regArea = Math.Max(reg.Area, 1e-12);
-        v[1] = (int)Math.Round((matchedCad.Area * 100.0) / regArea);
-        v[2] = (int)Math.Round((matchedCad.Bounds.Width * matchedCad.Bounds.Height * 100.0) / regArea);
-
-        var lenScale = request.LenScale;
-        var regDiff = reg.DiffIndex;
-
-        v[3] = neighborContext.LeftCadNeighborDiff;
-        v[6] = neighborContext.RightCadNeighborDiff;
-
-        int leftDiff;
-        int rightDiff;
-        var leftLen = 0.0;
-        var rightLen = 0.0;
-        var caseId = geometryContext.ResolveOverlapCase(matchedCad);
-
-        if (geometryContext.IsX)
+    private static SideValues ResolveXWaySides(SideInputs input)
+    {
+        // Case 0 = overlap on the 'near' side (right), case 1 = overlap on the 'far' side (left).
+        // Contained or no overlap keeps both diffs on the regular pad and clears the CAD neighbors.
+        if (input.CaseId is not (0 or 1))
         {
-            var regL = geometryContext.LeadingEdge;
-            var regN = geometryContext.TrailingEdge;
-            var cadL = matchedCad.Bounds.MinX;
-            var cadN = matchedCad.Bounds.MaxX;
-
-            if (geometryContext.IsTrailingBorder)
-            {
-                if (caseId == 0) // Overlap on the 'near' side (right)
-                {
-                    leftDiff = regDiff;
-                    rightDiff = nullVal; // No right neighbor
-                    leftLen = lenScale * (regN - cadL);
-                    rightLen = lenScale * (cadN - regN);
-                }
-                else if (caseId == 1) // Overlap on the 'far' side (left)
-                {
-                    leftDiff = neighborContext.LeftNeighborDiff;
-                    rightDiff = regDiff;
-                    leftLen = lenScale * (regL - cadL);
-                    rightLen = lenScale * (cadN - regL);
-                }
-                else // Contained or no overlap
-                {
-                    leftDiff = regDiff;
-                    rightDiff = regDiff;
-                    v[3] = nullVal;
-                    v[6] = nullVal;
-                }
-            }
-            else if (geometryContext.IsLeadingBorder)
-            {
-                if (caseId == 0)
-                {
-                    leftDiff = regDiff;
-                    rightDiff = neighborContext.RightNeighborDiff;
-                    leftLen = lenScale * (cadL - regL); // Different calculation for left border
-                    rightLen = lenScale * (regN - cadL);
-                }
-                else if (caseId == 1)
-                {
-                    leftDiff = nullVal; // No left neighbor
-                    rightDiff = regDiff;
-                    leftLen = lenScale * (regL - cadL);
-                    rightLen = lenScale * (cadN - regL);
-                }
-                else
-                {
-                    leftDiff = regDiff;
-                    rightDiff = regDiff;
-                    v[3] = nullVal;
-                    v[6] = nullVal;
-                }
-            }
-            else // Not a border pad
-            {
-                if (caseId == 0)
-                {
-                    leftDiff = regDiff;
-                    rightDiff = neighborContext.RightNeighborDiff;
-                    leftLen = lenScale * (regN - cadL);
-                    rightLen = lenScale * (cadN - regN);
-                }
-                else if (caseId == 1)
-                {
-                    leftDiff = neighborContext.LeftNeighborDiff;
-                    rightDiff = regDiff;
-                    leftLen = lenScale * (regL - cadL);
-                    rightLen = lenScale * (cadN - regL);
-                }
-                else
-                {
-                    leftDiff = regDiff;
-                    rightDiff = regDiff;
-                    v[3] = nullVal;
-                    v[6] = nullVal;
-                }
-            }
-        }
-        else // Y-Way
-        {
-            var regL = geometryContext.LeadingEdge; // top (MaxY)
-            var regN = geometryContext.TrailingEdge; // bottom (MinY)
-            var cadL = matchedCad.Bounds.MaxY;
-            var cadN = matchedCad.Bounds.MinY;
-
-            if (geometryContext.IsLeadingBorder)
-            {
-                if (caseId == 0) // Overlap on 'near' side (bottom)
-                {
-                    leftDiff = regDiff;
-                    rightDiff = neighborContext.RightNeighborDiff;
-                    leftLen = Math.Abs(lenScale * (regN - cadL));
-                    rightLen = Math.Abs(lenScale * (cadN - regN));
-                }
-                else if (caseId == 1) // Overlap on 'far' side (top)
-                {
-                    leftDiff = nullVal; // No top neighbor
-                    rightDiff = regDiff;
-                    leftLen = Math.Abs(lenScale * (regL - cadL));
-                    rightLen = Math.Abs(lenScale * (cadN - regL));
-                }
-                else
-                {
-                    leftDiff = regDiff;
-                    rightDiff = regDiff;
-                    v[3] = nullVal;
-                    v[6] = nullVal;
-                }
-            }
-            else if (geometryContext.IsTrailingBorder)
-            {
-                if (caseId == 0)
-                {
-                    leftDiff = regDiff;
-                    rightDiff = nullVal; // No bottom neighbor
-                    leftLen = Math.Abs(lenScale * (regN - cadL));
-                    rightLen = Math.Abs(lenScale * (cadN - regN));
-                }
-                else if (caseId == 1)
-                {
-                    leftDiff = neighborContext.LeftNeighborDiff;
-                    rightDiff = regDiff;
-                    leftLen = Math.Abs(lenScale * (regL - cadL));
-                    rightLen = Math.Abs(lenScale * (cadN - regL));
-                }
-                else
-                {
-                    leftDiff = regDiff;
-                    rightDiff = regDiff;
-                    v[3] = nullVal;
-                    v[6] = nullVal;
-                }
-            }
-            else // Not a border pad
-            {
-                if (caseId == 0)
-                {
-                    leftDiff = regDiff;
-                    rightDiff = neighborContext.RightNeighborDiff;
-                    leftLen = Math.Abs(lenScale * (regN - cadL));
-                    rightLen = Math.Abs(lenScale * (cadN - regN));
-                }
-                else if (caseId == 1)
-                {
-                    leftDiff = neighborContext.LeftNeighborDiff;
-                    rightDiff = regDiff;
-                    leftLen = Math.Abs(lenScale * (regL - cadL));
-                    rightLen = Math.Abs(lenScale * (cadN - regL));
-                }
-                else
-                {
-                    leftDiff = regDiff;
-                    rightDiff = regDiff;
-                    v[3] = nullVal;
-                    v[6] = nullVal;
-                }
-            }
+            return SideValues.Contained(input.RegDiff);
         }
 
-        v[4] = (int)Math.Round(leftLen);
-        v[7] = (int)Math.Round(rightLen);
-        v[5] = leftDiff;
-        v[8] = rightDiff;
+        var geometry = input.Geometry;
+        var neighbors = input.Neighbors;
+        var regL = geometry.LeadingEdge;
+        var regN = geometry.TrailingEdge;
+        var cadL = input.Cad.Bounds.MinX;
+        var cadN = input.Cad.Bounds.MaxX;
+        var lenScale = input.LenScale;
+        var regDiff = input.RegDiff;
+        var isNear = input.CaseId == 0;
 
-        var comment = $"{NotchAlgorithmHelpers.BuildComment(reg, matchedCad)} Case={caseId}";
-        return new NotchTableRow(NotchAlgorithmVersion.V22, reg.IcIndex, reg.DiffIndex, reg.RegularPadId, matchedCad.Id, v, comment);
+        if (geometry.IsTrailingBorder)
+        {
+            return isNear
+                ? new SideValues(regDiff, input.NullVal, lenScale * (regN - cadL), lenScale * (cadN - regN), false)
+                : new SideValues(neighbors.LeftNeighborDiff, regDiff, lenScale * (regL - cadL), lenScale * (cadN - regL), false);
+        }
+
+        if (geometry.IsLeadingBorder)
+        {
+            // Different calculation for the left border.
+            return isNear
+                ? new SideValues(regDiff, neighbors.RightNeighborDiff, lenScale * (cadL - regL), lenScale * (regN - cadL), false)
+                : new SideValues(input.NullVal, regDiff, lenScale * (regL - cadL), lenScale * (cadN - regL), false);
+        }
+
+        return isNear
+            ? new SideValues(regDiff, neighbors.RightNeighborDiff, lenScale * (regN - cadL), lenScale * (cadN - regN), false)
+            : new SideValues(neighbors.LeftNeighborDiff, regDiff, lenScale * (regL - cadL), lenScale * (cadN - regL), false);
+    }
+
+    private static SideValues ResolveYWaySides(SideInputs input)
+    {
+        // Case 0 = overlap on the 'near' side (bottom), case 1 = overlap on the 'far' side (top).
+        if (input.CaseId is not (0 or 1))
+        {
+            return SideValues.Contained(input.RegDiff);
+        }
+
+        var geometry = input.Geometry;
+        var neighbors = input.Neighbors;
+        var regL = geometry.LeadingEdge; // top (MaxY)
+        var regN = geometry.TrailingEdge; // bottom (MinY)
+        var cadL = input.Cad.Bounds.MaxY;
+        var cadN = input.Cad.Bounds.MinY;
+        var lenScale = input.LenScale;
+        var regDiff = input.RegDiff;
+        var isNear = input.CaseId == 0;
+        var nearLeftLen = Math.Abs(lenScale * (regN - cadL));
+        var nearRightLen = Math.Abs(lenScale * (cadN - regN));
+        var farLeftLen = Math.Abs(lenScale * (regL - cadL));
+        var farRightLen = Math.Abs(lenScale * (cadN - regL));
+
+        if (geometry.IsLeadingBorder)
+        {
+            return isNear
+                ? new SideValues(regDiff, neighbors.RightNeighborDiff, nearLeftLen, nearRightLen, false)
+                : new SideValues(input.NullVal, regDiff, farLeftLen, farRightLen, false);
+        }
+
+        if (geometry.IsTrailingBorder)
+        {
+            return isNear
+                ? new SideValues(regDiff, input.NullVal, nearLeftLen, nearRightLen, false)
+                : new SideValues(neighbors.LeftNeighborDiff, regDiff, farLeftLen, farRightLen, false);
+        }
+
+        return isNear
+            ? new SideValues(regDiff, neighbors.RightNeighborDiff, nearLeftLen, nearRightLen, false)
+            : new SideValues(neighbors.LeftNeighborDiff, regDiff, farLeftLen, farRightLen, false);
+    }
+
+    private readonly record struct SideInputs(
+        NotchAxisGeometryContext Geometry,
+        NotchAxisNeighborContext Neighbors,
+        CadPad Cad,
+        int CaseId,
+        int RegDiff,
+        int NullVal,
+        int LenScale);
+
+    private readonly record struct SideValues(
+        int LeftDiff,
+        int RightDiff,
+        double LeftLen,
+        double RightLen,
+        bool ClearCadNeighbors)
+    {
+        public static SideValues Contained(int regDiff) => new(regDiff, regDiff, 0.0, 0.0, true);
     }
 }

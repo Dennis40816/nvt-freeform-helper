@@ -18,136 +18,197 @@ public sealed partial class NotchV22CompensationService
         var cellHeight = bounds.Height / resolution;
         if (cellWidth <= AreaEpsilon || cellHeight <= AreaEpsilon)
         {
-            return new ToFullReachabilityResult(
-                ReachableArea: Math.Max(0.0, overlapArea),
-                ReachablePolygons: Array.Empty<Polygon2>(),
-                SourcePolygons: Array.Empty<Polygon2>(),
-                SourceCellCount: 0,
-                BlockedCellCount: 0,
-                ReachableCellCount: 0,
-                TotalCellCount: 0,
-                SourceArea: Math.Max(0.0, overlapArea),
-                BlockedArea: 0.0,
-                BlockerCandidateCount: blockerCandidateCount);
+            return BuildDegenerateCellReachability(overlapArea, blockerCandidateCount);
         }
 
         var cellArea = cellWidth * cellHeight;
         var total = resolution * resolution;
-        const int ContestedCell = -1;
-        const int FreeCell = -2;
-        var source = new bool[total];
-        var cellOwners = new int[total];
         var allPads = new CadPad[blockerCandidates.Length + 1];
         allPads[0] = targetCad;
         Array.Copy(blockerCandidates, 0, allPads, 1, blockerCandidates.Length);
-        const int TargetOwnerIndex = 0;
+        var grid = new ReachabilityGridSpec(bounds, resolution, cellWidth, cellHeight, cellArea);
+        var ownership = ClassifyCellOwners(allPads, grid);
+        var sourceCount = ownership.SourceCount;
+        var foreignOccupiedCount = ownership.ForeignOccupiedCount;
+
+        var sourcePolygons = sourceCount > 0
+            ? BuildVisitedCellPolygons(ownership.Source, bounds, resolution, cellWidth, cellHeight)
+            : new List<Polygon2>(0);
+
+        // Thin polygons can miss all sample points; preserve overlap-area lower bound.
+        if (sourceCount == 0)
+        {
+            return BuildNoSourceCellReachability(overlapArea, blockerCandidateCount, ownership, grid, sourcePolygons);
+        }
+
+        // No foreign-occupied cells in this regular: expand to full regular bounds.
+        if (foreignOccupiedCount == 0)
+        {
+            return BuildUnobstructedReachability(regularPad, overlapArea, blockerCandidateCount, ownership, grid, sourcePolygons);
+        }
+
+        var ownerDistances = ComputeOwnerDistances(allPads.Length, ownership, resolution);
+        var reachable = ClassifyReachableCells(ownership, ownerDistances);
+
+        var reachableArea = Math.Max(overlapArea, overlapArea + (reachable.AssignedFreeCount * cellArea));
+        var polygons = BuildVisitedCellPolygons(reachable.CurrentReachable, bounds, resolution, cellWidth, cellHeight);
+        return new ToFullReachabilityResult(
+            ReachableArea: reachableArea,
+            ReachablePolygons: polygons,
+            SourcePolygons: sourcePolygons,
+            SourceCellCount: sourceCount,
+            BlockedCellCount: reachable.BlockedCount,
+            ReachableCellCount: reachable.ReachableCount,
+            TotalCellCount: total,
+            SourceArea: Math.Max(0.0, overlapArea),
+            BlockedArea: reachable.BlockedCount * cellArea,
+            BlockerCandidateCount: blockerCandidateCount);
+    }
+
+    private static ToFullReachabilityResult BuildDegenerateCellReachability(double overlapArea, int blockerCandidateCount)
+    {
+        return new ToFullReachabilityResult(
+            ReachableArea: Math.Max(0.0, overlapArea),
+            ReachablePolygons: Array.Empty<Polygon2>(),
+            SourcePolygons: Array.Empty<Polygon2>(),
+            SourceCellCount: 0,
+            BlockedCellCount: 0,
+            ReachableCellCount: 0,
+            TotalCellCount: 0,
+            SourceArea: Math.Max(0.0, overlapArea),
+            BlockedArea: 0.0,
+            BlockerCandidateCount: blockerCandidateCount);
+    }
+
+    private static ToFullReachabilityResult BuildNoSourceCellReachability(
+        double overlapArea,
+        int blockerCandidateCount,
+        ReachabilityCellOwnership ownership,
+        ReachabilityGridSpec grid,
+        IReadOnlyList<Polygon2> sourcePolygons)
+    {
+        return new ToFullReachabilityResult(
+            ReachableArea: Math.Max(0.0, overlapArea),
+            ReachablePolygons: Array.Empty<Polygon2>(),
+            SourcePolygons: sourcePolygons,
+            SourceCellCount: 0,
+            BlockedCellCount: ownership.ForeignOccupiedCount,
+            ReachableCellCount: 0,
+            TotalCellCount: grid.Resolution * grid.Resolution,
+            SourceArea: Math.Max(0.0, overlapArea),
+            BlockedArea: ownership.ForeignOccupiedCount * grid.CellArea,
+            BlockerCandidateCount: blockerCandidateCount);
+    }
+
+    private static ToFullReachabilityResult BuildUnobstructedReachability(
+        RegularPad regularPad,
+        double overlapArea,
+        int blockerCandidateCount,
+        ReachabilityCellOwnership ownership,
+        ReachabilityGridSpec grid,
+        IReadOnlyList<Polygon2> sourcePolygons)
+    {
+        var total = grid.Resolution * grid.Resolution;
+        return new ToFullReachabilityResult(
+            ReachableArea: Math.Max(overlapArea, regularPad.Area),
+            ReachablePolygons: new[] { ToRectPolygon(grid.Bounds) },
+            SourcePolygons: sourcePolygons,
+            SourceCellCount: ownership.SourceCount,
+            BlockedCellCount: 0,
+            ReachableCellCount: total,
+            TotalCellCount: total,
+            SourceArea: Math.Max(0.0, overlapArea),
+            BlockedArea: 0.0,
+            BlockerCandidateCount: blockerCandidateCount);
+    }
+
+    private static ReachabilityCellOwnership ClassifyCellOwners(CadPad[] allPads, ReachabilityGridSpec grid)
+    {
+        var resolution = grid.Resolution;
+        var source = new bool[resolution * resolution];
+        var cellOwners = new int[resolution * resolution];
         var sourceCount = 0;
         var foreignOccupiedCount = 0;
-        var areaTieEpsilon = Math.Max(AreaEpsilon, cellArea * 1e-6);
+        var areaTieEpsilon = Math.Max(AreaEpsilon, grid.CellArea * 1e-6);
         for (var row = 0; row < resolution; row++)
         {
-            var y0 = bounds.MinY + (row * cellHeight);
-            var y1 = y0 + cellHeight;
+            var y0 = grid.Bounds.MinY + (row * grid.CellHeight);
+            var y1 = y0 + grid.CellHeight;
             for (var col = 0; col < resolution; col++)
             {
                 var idx = (row * resolution) + col;
-                var x0 = bounds.MinX + (col * cellWidth);
-                var x1 = x0 + cellWidth;
-                var cellRect = new Rect2(x0, y0, x1, y1);
-                var bestOwnerIndex = FreeCell;
-                var bestOwnerArea = 0.0;
-                var hasOwner = false;
-                var isTie = false;
-
-                for (var ownerIndex = 0; ownerIndex < allPads.Length; ownerIndex++)
-                {
-                    var ownerPad = allPads[ownerIndex];
-                    if (!ownerPad.Bounds.Intersects(cellRect))
-                    {
-                        continue;
-                    }
-
-                    var ownerArea = Polygon2.IntersectionAreaWithRect(ownerPad.Polygon, cellRect);
-                    if (ownerArea <= AreaEpsilon)
-                    {
-                        continue;
-                    }
-
-                    hasOwner = true;
-                    if (ownerArea > bestOwnerArea + areaTieEpsilon)
-                    {
-                        bestOwnerIndex = ownerIndex;
-                        bestOwnerArea = ownerArea;
-                        isTie = false;
-                        continue;
-                    }
-
-                    if (Math.Abs(ownerArea - bestOwnerArea) <= areaTieEpsilon)
-                    {
-                        isTie = true;
-                    }
-                }
-
-                var cellOwner = !hasOwner
-                    ? FreeCell
-                    : isTie
-                        ? ContestedCell
-                        : bestOwnerIndex;
+                var x0 = grid.Bounds.MinX + (col * grid.CellWidth);
+                var x1 = x0 + grid.CellWidth;
+                var cellOwner = ResolveCellOwner(allPads, new Rect2(x0, y0, x1, y1), areaTieEpsilon);
                 cellOwners[idx] = cellOwner;
 
-                if (cellOwner == TargetOwnerIndex)
+                if (cellOwner == ReachabilityTargetOwnerIndex)
                 {
                     source[idx] = true;
                     sourceCount++;
                     continue;
                 }
 
-                if (cellOwner != FreeCell)
+                if (cellOwner != ReachabilityFreeCell)
                 {
                     foreignOccupiedCount++;
                 }
             }
         }
 
-        var sourcePolygons = sourceCount > 0
-            ? BuildVisitedCellPolygons(source, bounds, resolution, cellWidth, cellHeight)
-            : new List<Polygon2>(0);
+        return new ReachabilityCellOwnership(source, cellOwners, sourceCount, foreignOccupiedCount);
+    }
 
-        // Thin polygons can miss all sample points; preserve overlap-area lower bound.
-        if (sourceCount == 0)
-        {
-            return new ToFullReachabilityResult(
-                ReachableArea: Math.Max(0.0, overlapArea),
-                ReachablePolygons: Array.Empty<Polygon2>(),
-                SourcePolygons: sourcePolygons,
-                SourceCellCount: 0,
-                BlockedCellCount: foreignOccupiedCount,
-                ReachableCellCount: 0,
-                TotalCellCount: total,
-                SourceArea: Math.Max(0.0, overlapArea),
-                BlockedArea: foreignOccupiedCount * cellArea,
-                BlockerCandidateCount: blockerCandidateCount);
-        }
+    private static int ResolveCellOwner(CadPad[] allPads, Rect2 cellRect, double areaTieEpsilon)
+    {
+        var bestOwnerIndex = ReachabilityFreeCell;
+        var bestOwnerArea = 0.0;
+        var hasOwner = false;
+        var isTie = false;
 
-        // No foreign-occupied cells in this regular: expand to full regular bounds.
-        if (foreignOccupiedCount == 0)
-        {
-            return new ToFullReachabilityResult(
-                ReachableArea: Math.Max(overlapArea, regularPad.Area),
-                ReachablePolygons: new[] { ToRectPolygon(bounds) },
-                SourcePolygons: sourcePolygons,
-                SourceCellCount: sourceCount,
-                BlockedCellCount: 0,
-                ReachableCellCount: total,
-                TotalCellCount: total,
-                SourceArea: Math.Max(0.0, overlapArea),
-                BlockedArea: 0.0,
-                BlockerCandidateCount: blockerCandidateCount);
-        }
-
-        var ownerDistances = new int[allPads.Length][];
-        var queue = new Queue<(int OwnerIndex, int CellIndex)>(Math.Max(sourceCount, allPads.Length));
         for (var ownerIndex = 0; ownerIndex < allPads.Length; ownerIndex++)
+        {
+            var ownerPad = allPads[ownerIndex];
+            if (!ownerPad.Bounds.Intersects(cellRect))
+            {
+                continue;
+            }
+
+            var ownerArea = Polygon2.IntersectionAreaWithRect(ownerPad.Polygon, cellRect);
+            if (ownerArea <= AreaEpsilon)
+            {
+                continue;
+            }
+
+            hasOwner = true;
+            if (ownerArea > bestOwnerArea + areaTieEpsilon)
+            {
+                bestOwnerIndex = ownerIndex;
+                bestOwnerArea = ownerArea;
+                isTie = false;
+                continue;
+            }
+
+            if (Math.Abs(ownerArea - bestOwnerArea) <= areaTieEpsilon)
+            {
+                isTie = true;
+            }
+        }
+
+        return !hasOwner
+            ? ReachabilityFreeCell
+            : isTie
+                ? ReachabilityContestedCell
+                : bestOwnerIndex;
+    }
+
+    private static int[][] ComputeOwnerDistances(int ownerCount, ReachabilityCellOwnership ownership, int resolution)
+    {
+        var cellOwners = ownership.CellOwners;
+        var total = resolution * resolution;
+        var ownerDistances = new int[ownerCount][];
+        var queue = new Queue<(int OwnerIndex, int CellIndex)>(Math.Max(ownership.SourceCount, ownerCount));
+        for (var ownerIndex = 0; ownerIndex < ownerCount; ownerIndex++)
         {
             var distances = Enumerable.Repeat(-1, total).ToArray();
             ownerDistances[ownerIndex] = distances;
@@ -175,72 +236,7 @@ public sealed partial class NotchV22CompensationService
             TryVisit(ownerIndex, currentDistance, row, col + 1);
         }
 
-        var currentReachable = new bool[total];
-        var reachableCount = 0;
-        var blockedCount = 0;
-        var assignedFreeCount = 0;
-        for (var cellIndex = 0; cellIndex < total; cellIndex++)
-        {
-            if (source[cellIndex])
-            {
-                currentReachable[cellIndex] = true;
-                reachableCount++;
-                continue;
-            }
-
-            if (cellOwners[cellIndex] != FreeCell)
-            {
-                blockedCount++;
-                continue;
-            }
-
-            var bestOwner = -1;
-            var bestDistance = int.MaxValue;
-            var isTie = false;
-            for (var ownerIndex = 0; ownerIndex < ownerDistances.Length; ownerIndex++)
-            {
-                var distance = ownerDistances[ownerIndex][cellIndex];
-                if (distance < 0)
-                {
-                    continue;
-                }
-
-                if (distance < bestDistance)
-                {
-                    bestDistance = distance;
-                    bestOwner = ownerIndex;
-                    isTie = false;
-                }
-                else if (distance == bestDistance)
-                {
-                    isTie = true;
-                }
-            }
-
-            if (bestOwner == TargetOwnerIndex && !isTie)
-            {
-                currentReachable[cellIndex] = true;
-                reachableCount++;
-                assignedFreeCount++;
-                continue;
-            }
-
-            blockedCount++;
-        }
-
-        var reachableArea = Math.Max(overlapArea, overlapArea + (assignedFreeCount * cellArea));
-        var polygons = BuildVisitedCellPolygons(currentReachable, bounds, resolution, cellWidth, cellHeight);
-        return new ToFullReachabilityResult(
-            ReachableArea: reachableArea,
-            ReachablePolygons: polygons,
-            SourcePolygons: sourcePolygons,
-            SourceCellCount: sourceCount,
-            BlockedCellCount: blockedCount,
-            ReachableCellCount: reachableCount,
-            TotalCellCount: total,
-            SourceArea: Math.Max(0.0, overlapArea),
-            BlockedArea: blockedCount * cellArea,
-            BlockerCandidateCount: blockerCandidateCount);
+        return ownerDistances;
 
         void TryVisit(int ownerIndex, int currentDistance, int row, int col)
         {
@@ -250,7 +246,7 @@ public sealed partial class NotchV22CompensationService
             }
 
             var neighbor = (row * resolution) + col;
-            if (cellOwners[neighbor] != FreeCell)
+            if (cellOwners[neighbor] != ReachabilityFreeCell)
             {
                 return;
             }
@@ -264,6 +260,72 @@ public sealed partial class NotchV22CompensationService
             distances[neighbor] = currentDistance + 1;
             queue.Enqueue((ownerIndex, neighbor));
         }
+    }
+
+    private static ReachableCellClassification ClassifyReachableCells(
+        ReachabilityCellOwnership ownership,
+        int[][] ownerDistances)
+    {
+        var total = ownership.Source.Length;
+        var currentReachable = new bool[total];
+        var reachableCount = 0;
+        var blockedCount = 0;
+        var assignedFreeCount = 0;
+        for (var cellIndex = 0; cellIndex < total; cellIndex++)
+        {
+            if (ownership.Source[cellIndex])
+            {
+                currentReachable[cellIndex] = true;
+                reachableCount++;
+                continue;
+            }
+
+            if (ownership.CellOwners[cellIndex] != ReachabilityFreeCell)
+            {
+                blockedCount++;
+                continue;
+            }
+
+            if (IsUniquelyNearestToTarget(ownerDistances, cellIndex))
+            {
+                currentReachable[cellIndex] = true;
+                reachableCount++;
+                assignedFreeCount++;
+                continue;
+            }
+
+            blockedCount++;
+        }
+
+        return new ReachableCellClassification(currentReachable, reachableCount, blockedCount, assignedFreeCount);
+    }
+
+    private static bool IsUniquelyNearestToTarget(int[][] ownerDistances, int cellIndex)
+    {
+        var bestOwner = -1;
+        var bestDistance = int.MaxValue;
+        var isTie = false;
+        for (var ownerIndex = 0; ownerIndex < ownerDistances.Length; ownerIndex++)
+        {
+            var distance = ownerDistances[ownerIndex][cellIndex];
+            if (distance < 0)
+            {
+                continue;
+            }
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestOwner = ownerIndex;
+                isTie = false;
+            }
+            else if (distance == bestDistance)
+            {
+                isTie = true;
+            }
+        }
+
+        return bestOwner == ReachabilityTargetOwnerIndex && !isTie;
     }
 
     private static ToFullReachabilityResult ComputeSourceCoverageInRegular(
@@ -445,4 +507,27 @@ public sealed partial class NotchV22CompensationService
                 BlockerCandidateCount: 0);
         }
     }
+
+    private const int ReachabilityContestedCell = -1;
+    private const int ReachabilityFreeCell = -2;
+    private const int ReachabilityTargetOwnerIndex = 0;
+
+    private readonly record struct ReachabilityGridSpec(
+        Rect2 Bounds,
+        int Resolution,
+        double CellWidth,
+        double CellHeight,
+        double CellArea);
+
+    private readonly record struct ReachabilityCellOwnership(
+        bool[] Source,
+        int[] CellOwners,
+        int SourceCount,
+        int ForeignOccupiedCount);
+
+    private readonly record struct ReachableCellClassification(
+        bool[] CurrentReachable,
+        int ReachableCount,
+        int BlockedCount,
+        int AssignedFreeCount);
 }

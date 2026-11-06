@@ -127,20 +127,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 166
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/DiffFrameCsvImporter.cs"
-      ],
-      "contentHash": "eb50b094927e0786b8a5ab05b9bef8bb8de5277be755ebfed367194a97bd4146",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.DiffFrameCsvImporter.ImportLines(string,IReadOnlyList<string>,DiffFrameCsvImportOptions?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 92
       },
       "owner": "NFH",
@@ -164,20 +150,6 @@
       "contentHash": "fafcdfc513463c2dff8042f936083d6dffa5d47657b8bca7c78b3a253b154c21",
       "project": "FreeformHelper.Application",
       "symbol": "FreeformHelper.Application.Services.DxfOverlapAnalyzer.Analyze(CadPadSet,int,Action<double>?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 368
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/DxfRegularMappingAnalyzer.cs"
-      ],
-      "contentHash": "aef96db08583bca3a9b275fbcfdc946753337dcb2542a0af7542f922ce7d185e",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.DxfRegularMappingAnalyzer.AnalyzeCore(CadPadSet,RegularGrid,IndexMappingSettings,IReadOnlyCollection<KeyValuePair<CadPadId, RegularPadId>>?,IReadOnlyDictionary<int, int>?,Action<double>?)"
     },
     {
       "kind": "member",
@@ -220,20 +192,6 @@
       "contentHash": "9f3142ada8a05abd6347e074d6b84deb9b5e252aa173b6c6913a159015bf983b",
       "project": "FreeformHelper.Application",
       "symbol": "FreeformHelper.Application.Services.V21NotchAlgorithm.FillAxis(NotchAxisGeometryContext,CadPad?,int,NotchAxisNeighborContext,int,int[])"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 217
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/NotchAlgorithms/V22LegacyRowStrategy.cs"
-      ],
-      "contentHash": "6fdc2949b7f348ff06f5d71e7045eb9a4080d7a64a34bd1a8055ad2863deb34a",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.V22LegacyRowStrategy.Build(RegularPad,CadPad?,RegularGrid,LegacyNotchGenerationRequest)"
     },
     {
       "kind": "member",
@@ -382,20 +340,6 @@
       "contentHash": "5b99fe9c64fdf8aef81afecc7772d553c734b57242c94628c303a9fd889cdad6",
       "project": "FreeformHelper.Application",
       "symbol": "FreeformHelper.Application.Services.NotchV21FirmwareProjector.ProjectCadAllocation(IReadOnlyList<NotchTableRow>,int,int)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 260
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/NotchV22CompensationService.Geometry.Reachability.cs"
-      ],
-      "contentHash": "bee6fe2474ab3c518d0ebb16d090a08bb27dd527cd94104a05681c7a7e539a51",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.NotchV22CompensationService.ComputeReachabilityInRegular(CadPad,RegularPad,CadPad[],double)"
     },
     {
       "kind": "member",
