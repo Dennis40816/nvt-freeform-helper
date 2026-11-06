@@ -49,14 +49,17 @@ internal static class PadCanvasPrivateAccess
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_selectedRegIdx")]
     public static extern ref HashSet<int> SelectedRegIdx(PadCanvas canvas);
 
-    // Hover-debug state. The hit result field has a private record-struct type and stays on reflection in its test.
+    // Hover-debug state.
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_hoverDebugVisible")]
     public static extern ref bool HoverDebugVisible(PadCanvas canvas);
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_hoverDebugRegularOnlyMode")]
     public static extern ref bool HoverDebugRegularOnlyMode(PadCanvas canvas);
 
-    // Caches. The spatial index fields have private nested class types and stay on reflection in their tests.
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_hoverDebugHit")]
+    public static extern ref PadCanvas.HitResult HoverDebugHit(PadCanvas canvas);
+
+    // Caches.
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cadGeometryCache")]
     public static extern ref Dictionary<int, Geometry>? CadGeometryCache(PadCanvas canvas);
 
@@ -65,6 +68,12 @@ internal static class PadCanvasPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cadAreaBrushCache")]
     public static extern ref Dictionary<int, ISolidColorBrush>? CadAreaBrushCache(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cadIndex")]
+    public static extern ref PadCanvas.CadSpatialIndex? CadIndex(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_regularIndex")]
+    public static extern ref PadCanvas.RegularSpatialIndex? RegularIndex(PadCanvas canvas);
 
     // Cache and index builders.
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "EnsureCadGeometryCache")]
@@ -118,6 +127,13 @@ internal static class PadCanvasPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ShouldSimplifyAggregateNotchPreviewVisuals")]
     public static extern bool ShouldSimplifyAggregateNotchPreviewVisuals(PadCanvas canvas);
+
+    // Hover-debug seams.
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "HitTestForHoverDebug")]
+    public static extern PadCanvas.HitResult HitTestForHoverDebug(PadCanvas canvas, Point screenPoint, bool regularOnly);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildHoverDebugSnapshot")]
+    public static extern PadCanvas.HoverDebugSnapshot? BuildHoverDebugSnapshot(PadCanvas canvas);
 
     // Selection and view seams.
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "SelectPadsInWorldRect")]

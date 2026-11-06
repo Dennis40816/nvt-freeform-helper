@@ -9,7 +9,7 @@ namespace FreeformHelper.UI.Controls;
 
 public sealed partial class PadCanvas
 {
-    private readonly record struct HoverDebugSnapshot(Point2 Anchor, string Text, bool IsRegularMode);
+    internal readonly record struct HoverDebugSnapshot(Point2 Anchor, string Text, bool IsRegularMode);
 
     private void UpdateHoverDebugHit(Point screenPoint, KeyModifiers modifiers)
     {
