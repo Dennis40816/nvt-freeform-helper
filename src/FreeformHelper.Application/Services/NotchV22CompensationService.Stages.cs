@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
@@ -94,7 +93,7 @@ public sealed partial class NotchV22CompensationService
             var regularArea = Math.Max(regularPad.Area, AreaEpsilon);
             var strictOverlapThreshold = Math.Max(AreaEpsilon, regularArea * boundaryContext.StrictOverlapRatio);
             var hasSourceArea = overlapArea > strictOverlapThreshold;
-            var stepStartedAt = Stopwatch.GetTimestamp();
+            var stepStartedAt = TimeProvider.System.GetTimestamp();
             var ownerCadPads = hasSourceArea
                 ? boundaryContext.GetStrictOwnerCadPads(regularPad)
                 : Array.Empty<CadPad>();
@@ -105,7 +104,7 @@ public sealed partial class NotchV22CompensationService
             ownerAndBlockerLookupElapsedMs += GetElapsedMilliseconds(stepStartedAt);
             var isBoundaryRegular = hasSourceArea && boundaryContext.EffectiveBoundaryRegularIndices.Contains(regularPad.Index);
             var effectiveExpansionEpsilon = Math.Max(AreaEpsilon, regularArea * 1e-9);
-            stepStartedAt = Stopwatch.GetTimestamp();
+            stepStartedAt = TimeProvider.System.GetTimestamp();
             var exactOccupiedArea = hasSourceArea
                 ? ComputeExactOccupiedAreaInRegular(cad, regularPad, blockerCandidates)
                 : overlapArea;
@@ -118,7 +117,7 @@ public sealed partial class NotchV22CompensationService
             var requiresReachability = enableToFull && hasSourceArea && hasEffectiveExpansion;
             var isToFullBoundaryCandidate = requiresReachability;
             ToFullReachabilityResult reachability;
-            stepStartedAt = Stopwatch.GetTimestamp();
+            stepStartedAt = TimeProvider.System.GetTimestamp();
             if (requiresReachability)
             {
                 reachability = ComputeReachabilityInRegular(cad, regularPad, blockerCandidates, overlapArea);
@@ -141,7 +140,7 @@ public sealed partial class NotchV22CompensationService
                                             reachability.ReachableArea > (overlapArea + effectiveExpansionThreshold)
                                         ) &&
                                         reachability.ReachableArea <= maxAllowedReachableArea;
-            stepStartedAt = Stopwatch.GetTimestamp();
+            stepStartedAt = TimeProvider.System.GetTimestamp();
             var toFullRuleDecision = EvaluateToFullRuleDecision(
                 enableToFull,
                 hasSourceArea,
@@ -157,7 +156,7 @@ public sealed partial class NotchV22CompensationService
                 ? toFullRuleDecision.Trace
                 : Array.Empty<NotchToFullRuleTraceEntry>();
 
-            stepStartedAt = Stopwatch.GetTimestamp();
+            stepStartedAt = TimeProvider.System.GetTimestamp();
             if (isToFullBoundaryCandidate)
             {
                 toFullCandidateRegionPolygons.Add(ToRectPolygon(regularPad.Bounds));
@@ -324,6 +323,6 @@ public sealed partial class NotchV22CompensationService
 
     private static long GetElapsedMilliseconds(long startedAtTimestamp)
     {
-        return (long)Stopwatch.GetElapsedTime(startedAtTimestamp).TotalMilliseconds;
+        return (long)TimeProvider.System.GetElapsedTime(startedAtTimestamp).TotalMilliseconds;
     }
 }
