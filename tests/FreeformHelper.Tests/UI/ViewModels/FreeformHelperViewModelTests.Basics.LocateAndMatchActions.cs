@@ -8,6 +8,76 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class FreeformHelperViewModelTests
 {
+    [Fact]
+    public void FitCommand_WithCanvasHost_RequestsFitOnce()
+    {
+        var vm = new FreeformHelperViewModel
+        {
+            CadPads = new ObservableCollection<CadPad> { CreateRectCad(4809, 0, 0, 5, 5) },
+        };
+        var host = new TestCanvasHost();
+        vm.CanvasHost = host;
+        Assert.Equal(0, host.FitToContentCount);
+
+        vm.FitCommand.Execute(null);
+
+        Assert.Equal(1, host.FitToContentCount);
+    }
+
+    [Fact]
+    public void ClearSelectionCommand_WithCadAndRegularSelected_ClearsCanvasAndViewModelSelection()
+    {
+        var vm = new FreeformHelperViewModel
+        {
+            CadPads = new ObservableCollection<CadPad> { CreateRectCad(4809, 0, 0, 5, 5) },
+            RegularPads = new ObservableCollection<RegularPad> { CreateRectRegular(0, 0, 4616, 0, 0, 5, 5) },
+        };
+        var host = new TestCanvasHost();
+        vm.CanvasHost = host;
+        host.SetSelection(_selectedCad4809, _selectedRegular4616);
+        vm.ApplyCanvasSelection(_selectedCad4809, _selectedRegular4616);
+        Assert.Equal(4809, Assert.Single(vm.SelectedCadPadIds));
+        Assert.Equal(4616, Assert.Single(vm.SelectedRegularPadIndices));
+        Assert.Equal(4809, Assert.Single(host.SelectedCadIds));
+        Assert.Equal(4616, Assert.Single(host.SelectedRegularIds));
+
+        vm.ClearSelectionCommand.Execute(null);
+
+        Assert.Empty(vm.SelectedCadPadIds);
+        Assert.Empty(vm.SelectedRegularPadIndices);
+        Assert.Empty(host.SelectedCadIds);
+        Assert.Empty(host.SelectedRegularIds);
+    }
+
+    [Fact]
+    public void QuickFocusCommand_WithExistingSelection_ReplacesSelectionWithFocusedCadPad()
+    {
+        var vm = new FreeformHelperViewModel
+        {
+            CadPads = new ObservableCollection<CadPad>
+            {
+                CreateRectCad(4809, 0, 0, 5, 5),
+                CreateRectCad(4810, 5, 0, 10, 5),
+            },
+            RegularPads = new ObservableCollection<RegularPad> { CreateRectRegular(0, 0, 4616, 0, 0, 5, 5) },
+            QuickFocusQueryText = "cad 4810",
+        };
+        var host = new TestCanvasHost();
+        vm.CanvasHost = host;
+        host.SetSelection(_selectedCad4809, _selectedRegular4616);
+        vm.ApplyCanvasSelection(_selectedCad4809, _selectedRegular4616);
+
+        vm.QuickFocusCommand.Execute(null);
+
+        Assert.Equal(4810, Assert.Single(vm.SelectedCadPadIds));
+        Assert.Equal(4810, Assert.Single(host.SelectedCadIds));
+        Assert.Empty(vm.SelectedRegularPadIndices);
+        Assert.Empty(host.SelectedRegularIds);
+        Assert.Equal(1, host.FocusWithMinZoomCount);
+        Assert.Equal(2.0, host.LastMinZoom, 6);
+        Assert.Equal("Quick focus: CAD 4810 focused (CAD output=1).", vm.StatusText);
+    }
+
     [Theory]
     [InlineData(0)]
     [InlineData(1)]
