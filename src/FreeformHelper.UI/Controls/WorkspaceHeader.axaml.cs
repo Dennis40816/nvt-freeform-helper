@@ -268,7 +268,7 @@ public partial class WorkspaceHeader : UserControl
             return;
         }
 
-        Dispatcher.UIThread.Post(() =>
+        Dispatcher.Post(() =>
         {
             if (_viewPinned || _isViewButtonHovered || _isViewPopupHovered)
             {

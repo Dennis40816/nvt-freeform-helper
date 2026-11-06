@@ -86,7 +86,7 @@ public sealed partial class SettingsWindow : Window
         }
 
         _viewModel.SelectedSection = section.Value;
-        Dispatcher.UIThread.Post(ScrollToTop, DispatcherPriority.Background);
+        Dispatcher.Post(ScrollToTop, DispatcherPriority.Background);
     }
 
     private void ScrollToTop()
@@ -107,6 +107,6 @@ public sealed partial class SettingsWindow : Window
             _viewModel.SelectedSection = SettingsWindowSection.General;
         }
 
-        Dispatcher.UIThread.Post(ScrollToTop, DispatcherPriority.Background);
+        Dispatcher.Post(ScrollToTop, DispatcherPriority.Background);
     }
 }

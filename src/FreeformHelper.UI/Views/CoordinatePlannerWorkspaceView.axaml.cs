@@ -88,7 +88,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             FindOverlayLabelCanvas());
         viewportAdapter.SetFitBoundsOverride(_attachedViewModel.PreviewBounds);
         viewportAdapter.Attach(handler => _attachedViewModel.FitCanvasRequested += handler);
-        Dispatcher.UIThread.Post(
+        Dispatcher.Post(
             RenderOverlay,
             DispatcherPriority.Loaded);
     }

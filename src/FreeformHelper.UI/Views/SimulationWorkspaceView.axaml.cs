@@ -325,7 +325,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
         }
 
         _isInlineEditorLayoutQueued = true;
-        Dispatcher.UIThread.Post(() =>
+        Dispatcher.Post(() =>
         {
             _isInlineEditorLayoutQueued = false;
             UpdateInlineEditorLayout();
@@ -397,7 +397,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
 
     private async Task FocusInlineEditorAsync()
     {
-        await Dispatcher.UIThread.InvokeAsync(
+        await Dispatcher.InvokeAsync(
             () =>
             {
                 QueueInlineEditorLayoutUpdate();

@@ -27,7 +27,7 @@ public sealed partial class PadCanvas
     public void FitToContent()
     {
         // Defer the fit operation to ensure the layout system has fully propagated changes (e.g. window maximization).
-        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        Dispatcher.Post(() =>
         {
             var wb = GetWorldBounds(); // Get the bounding box of all content in world coordinates.
             if (wb is null || wb.Value.IsEmpty)

@@ -72,7 +72,7 @@ public sealed partial class PadCanvas
         }
 
         _isViewRefreshQueued = true;
-        Dispatcher.UIThread.Post(() =>
+        Dispatcher.Post(() =>
         {
             _isViewRefreshQueued = false;
             var shouldRaiseViewChanged = _queuedViewRefreshNeedsViewChanged;
