@@ -293,7 +293,7 @@ public sealed partial class FreeformHelperViewModel
 
                         await ApplyCadLoadOutcomeAsync(outcome, file.UiSnapshot.View);
                         ApplyImportSnapshot(file.UiSnapshot.Import, file);
-                        combinedGroupReplay = ApplyCapturedDxfEditProjectState(persistedDxfEditState);
+                        combinedGroupReplay = ApplyCapturedDxfEditProjectState(persistedDxfEditState, outcome.FallbackWarning);
                         status.ReportProgress(BuildCadLoadStatus(outcome, CadLoadContext.LoadProject, path));
                         LogCadLoadOutcome(outcome, CadLoadContext.LoadProject);
                     }
@@ -311,7 +311,7 @@ public sealed partial class FreeformHelperViewModel
                 });
             }
 
-            combinedGroupReplay?.ReportSkippedGroups(status.ReportWarning);
+            combinedGroupReplay?.ReportWarnings(status.ReportWarning, message => _logger.Warn(CultureInfo.InvariantCulture, "{0}", message));
             totalSw.Stop();
             _logger.Info(CultureInfo.InvariantCulture, "Load project timing: total={0} ms, persistence={1} ms, apply-state={2} ms, dxf={3} ms, rebuild={4} ms.",
                 totalSw.ElapsedMilliseconds,

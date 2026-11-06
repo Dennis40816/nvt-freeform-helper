@@ -59,6 +59,7 @@ public sealed class CadLoadUseCase
     public CadLoadOutcome? TryLoadFromProject(string? lastPath, byte[]? embedded, DxfImportOptions options)
     {
         Exception? pathLoadException = null;
+        string? pathProblem = null;
         if (!string.IsNullOrWhiteSpace(lastPath) && File.Exists(lastPath))
         {
             try
@@ -68,7 +69,12 @@ public sealed class CadLoadUseCase
             catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
             {
                 pathLoadException = ex;
+                pathProblem = $"The DXF file could not be read ({ex.Message}): {lastPath}";
             }
+        }
+        else if (!string.IsNullOrWhiteSpace(lastPath))
+        {
+            pathProblem = $"The DXF file was not found: {lastPath}";
         }
 
         try
@@ -76,7 +82,10 @@ public sealed class CadLoadUseCase
             var embeddedOutcome = TryLoadFromEmbedded(embedded, options);
             if (embeddedOutcome is not null)
             {
-                return embeddedOutcome;
+                // The project names a DXF path that did not work. Say so, so the stored copy is never a quiet substitute.
+                return pathProblem is null
+                    ? embeddedOutcome
+                    : embeddedOutcome with { FallbackWarning = $"Warning: {pathProblem}. Using the DXF copy stored in the project." };
             }
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
@@ -108,4 +117,5 @@ public sealed record CadLoadOutcome(
     CadPadSet Cad,
     CadLoadSource Source,
     string? SourcePath,
-    CadPadExactDuplicateSanitizationResult DuplicateSanitization);
+    CadPadExactDuplicateSanitizationResult DuplicateSanitization,
+    string? FallbackWarning = null);

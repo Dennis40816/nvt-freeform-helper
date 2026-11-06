@@ -161,7 +161,7 @@ public sealed partial class FreeformHelperViewModel
         return replay;
     }
 
-    internal DxfCombinedGroupReplayResult? ApplyCapturedDxfEditProjectState(PersistedDxfEditProjectState state)
+    internal DxfCombinedGroupReplayResult? ApplyCapturedDxfEditProjectState(PersistedDxfEditProjectState state, string? cadFallbackWarning = null)
     {
         ArgumentNullException.ThrowIfNull(state);
         var previous = new CadEditNotificationSnapshot(this);
@@ -184,6 +184,7 @@ public sealed partial class FreeformHelperViewModel
         ApplyPersistedCadLayerOverrides(state.CadLayerOverrides);
         ApplyPersistedCadGeometryOverrides(state.CadGeometryOverrides);
         var replay = ReplayPersistedCombinedCadGroups(state.CombinedCadGroups);
+        replay.CadFallbackWarning = cadFallbackWarning;
         _cadEdit.UnrestoredCombinedGroups = [.. replay.SkippedGroups];
         SetHiddenCadPads(state.HiddenCadPadIds.Concat(replay.CombinedSourceCadIds), previous);
         ApplyPersistedVisibleDuplicateCadPads(state.VisibleDuplicateCadPadIds);
