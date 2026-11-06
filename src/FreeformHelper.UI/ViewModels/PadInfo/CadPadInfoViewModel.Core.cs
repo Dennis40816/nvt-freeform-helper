@@ -38,49 +38,49 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     /// <summary>
     /// Gets a value indicating whether multiple CAD pads are being displayed/edited.
     /// </summary>
-    public bool IsMulti { get; }
+    public bool IsMulti => _display.Identity.IsMulti;
     /// <summary>
     /// Gets the number of CAD pads currently selected.
     /// </summary>
-    public int SelectedCount { get; }
+    public int SelectedCount => _display.Identity.SelectedCount;
 
     // --- Display Properties ---
-    public string Title { get; }
-    public string Subtitle { get; }
-    public string LayerText { get; }
-    public string NameText { get; }
-    public string CadIdText { get; }
-    public string CentroidText { get; }
-    public string AreaText { get; }
-    public string VertexText { get; }
-    public string IdentityText { get; }
-    public string MatchText { get; }
-    public string MatchDetailsText { get; }
-    public string MatchConfidenceText { get; }
-    public string GeometrySeedValueText { get; }
-    public string NotchRowSummaryText { get; }
-    public string ToRegularRatioText { get; }
-    public string ToFullRatioText { get; }
-    public string ToRegularValueText { get; }
-    public string ToFullValueText { get; }
-    public string CombinedValueText { get; }
-    public string ToFullReasonShortText { get; }
-    public string ToFullReasonFullText { get; }
+    public string Title => _display.Identity.Title;
+    public string Subtitle => _display.Identity.Subtitle;
+    public string LayerText => _display.Identity.LayerText;
+    public string NameText => _display.Identity.NameText;
+    public string CadIdText => _display.Identity.CadIdText;
+    public string CentroidText => _display.Identity.CentroidText;
+    public string AreaText => _display.Identity.AreaText;
+    public string VertexText => _display.Identity.VertexText;
+    public string IdentityText => _display.Identity.IdentityText;
+    public string MatchText => _display.Match.MatchText;
+    public string MatchDetailsText => _display.Match.MatchDetailsText;
+    public string MatchConfidenceText => _display.Match.MatchConfidenceText;
+    public string GeometrySeedValueText => _display.Match.GeometrySeedValueText;
+    public string NotchRowSummaryText => _display.Notch.NotchRowSummaryText;
+    public string ToRegularRatioText => _display.Notch.ToRegularRatioText;
+    public string ToFullRatioText => _display.Notch.ToFullRatioText;
+    public string ToRegularValueText => _display.Notch.ToRegularValueText;
+    public string ToFullValueText => _display.Notch.ToFullValueText;
+    public string CombinedValueText => _display.Notch.CombinedValueText;
+    public string ToFullReasonShortText => _display.Notch.ToFullReasonShortText;
+    public string ToFullReasonFullText => _display.Notch.ToFullReasonFullText;
     public bool HasToFullReason => !string.IsNullOrWhiteSpace(ToFullReasonFullText);
-    public string Stage3AreaText { get; }
+    public string Stage3AreaText => _display.Notch.Stage3AreaText;
     public string Stage3AreaCompactText => StripKnownPrefix(Stage3AreaText, "Stage3 area:");
-    public string TargetAllocationSummaryText { get; }
+    public string TargetAllocationSummaryText => _display.Notch.TargetAllocationSummaryText;
     public string TargetAllocationCompactText => StripKnownPrefix(TargetAllocationSummaryText, "Targets:");
-    public IReadOnlyList<string> TargetAllocationLines { get; }
-    public IReadOnlyList<PadInfoTargetAllocationViewModel> TargetAllocationItems { get; }
+    public IReadOnlyList<string> TargetAllocationLines => _display.Notch.TargetAllocationLines;
+    public IReadOnlyList<PadInfoTargetAllocationViewModel> TargetAllocationItems => _display.Notch.TargetAllocationItems;
     public bool HasTargetAllocationItems => TargetAllocationItems.Count > 0;
-    public string OwnerSummaryText { get; }
+    public string OwnerSummaryText => _display.Notch.OwnerSummaryText;
     public string OwnerSummaryCompactText => string.IsNullOrWhiteSpace(OwnerSummaryText) ? "-" : OwnerSummaryText;
     public bool HasOwnerSummary => !string.IsNullOrWhiteSpace(OwnerSummaryText);
-    public string ToFullDiagnosticsText { get; }
+    public string ToFullDiagnosticsText => _display.Notch.ToFullDiagnosticsText;
     public bool HasToFullDiagnosticsText => !string.IsNullOrWhiteSpace(ToFullDiagnosticsText);
-    public IReadOnlyList<NotchOwnerLinkViewModel> NotchOwnerLinks { get; }
-    public IReadOnlyList<string> RuleTraceLines { get; }
+    public IReadOnlyList<NotchOwnerLinkViewModel> NotchOwnerLinks => _display.Notch.NotchOwnerLinks;
+    public IReadOnlyList<string> RuleTraceLines => _display.Notch.RuleTraceLines;
     public bool HasRuleTrace => RuleTraceLines.Count > 0;
     public string NotchRowCompactText => StripKnownPrefix(NotchRowSummaryText, "Notch rows:");
     public string DebugStatusText => BuildDebugStatusText();

@@ -1093,34 +1093,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.IndexMappingDecisionRowViewModel.FromIssue(IndexMappingReportIssueViewModel)"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 278
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/PadInfo/CadPadInfoViewModel.Construction.cs"
-      ],
-      "contentHash": "125cf60c14765fda0e3254adae38c406820690c7698bf7237ebd8936843c75ce",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.CadPadInfoViewModel..ctor(IReadOnlyList<CadPad>,Func<int, int?>,Func<int, int?>?,Func<int, bool>?,Func<int, double>,Action<IReadOnlyList<int>, decimal>?,Action<int, int>?,Action<int>?,Action<int>?,Action<int>?,Action?,ICommand?,Action?,Func<int, IReadOnlyList<int>>?,Func<int, IReadOnlyList<PadMatchLink>>?,Func<int, (int IcIndex, int DiffIndex)?>?,Action<int>?,Action<int>?,Action<IReadOnlyCollection<int>>?,Action<IReadOnlyCollection<int>>?,Func<int, (double ToRegularRatio, double ToFullRatio, double CombinedRatio, bool IsToFullEnabled)?>?,Func<int, string?>?,Func<int, NotchV22TargetAllocationSummary?>?,CadOutputFwDiffAutoMode,PadInspectorSnapshot?,NotchComputationMode)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 244
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/PadInfo/RegularPadInfoViewModel.Core.cs"
-      ],
-      "contentHash": "79aed1d4383d40c8dd8014d73546305556213391be40c3e2344ba769ea333515",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.RegularPadInfoViewModel..ctor(IReadOnlyList<RegularPad>,Func<int, int>,Func<int, int?>?,Func<int, IReadOnlyList<int>>?,Func<int, IReadOnlyList<PadMatchLink>>?,Action<IReadOnlyList<int>, IReadOnlyList<int>, decimal?, decimal?>?,Action<IReadOnlyList<int>, IReadOnlyList<int>>?,Action<IReadOnlyCollection<int>, FreeformType>?,Func<int, IReadOnlyList<(int CadId, double RatioPercent)>>?,Func<int, IReadOnlyList<FreeformHelperViewModel.NotchRowPreview>>?,Action<IReadOnlyCollection<int>>?,Action<int>?,Action<int>?,Action?,PadInspectorSnapshot?)"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
