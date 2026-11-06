@@ -119,7 +119,7 @@ public sealed class AppGeneralSettingsStore
         }
 
         document.SchemaVersion = AppGeneralSettingsDocument.CurrentSchemaVersion;
-        document.SavedAtUtc = DateTimeOffset.UtcNow;
+        document.SavedAtUtc = TimeProvider.System.GetUtcNow();
         var json = JsonSerializer.Serialize(document, _jsonOptions);
         EnsureInvalidOriginalIsPreserved();
         AppGeneralSettingsFile.WriteAtomically(_settingsPath, json);
@@ -197,7 +197,7 @@ public sealed class AppGeneralSettingsDocument
     public const int CurrentSchemaVersion = 2;
 
     public int SchemaVersion { get; set; } = CurrentSchemaVersion;
-    public DateTimeOffset SavedAtUtc { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset SavedAtUtc { get; set; } = TimeProvider.System.GetUtcNow();
     public UiViewSnapshot View { get; set; } = new();
     public UiImportSnapshot Import { get; set; } = new();
     public AppGeneralBehaviorSettings Behavior { get; set; } = new();
@@ -210,6 +210,6 @@ public sealed class AppGeneralBehaviorSettings
 
 internal sealed class LegacyAppGeneralSettingsDocument
 {
-    public DateTimeOffset SavedAtUtc { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset SavedAtUtc { get; set; } = TimeProvider.System.GetUtcNow();
     public ProjectUiSnapshot UiSnapshot { get; set; } = new();
 }
