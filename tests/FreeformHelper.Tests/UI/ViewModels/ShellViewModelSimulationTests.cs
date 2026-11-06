@@ -147,7 +147,7 @@ public sealed class ShellViewModelSimulationTests
         shell.Simulation.CurrentWorkspace = workspaceViewModel;
 
         var snapshot = Assert.IsType<SimulationScenarioSnapshot>(workspaceViewModel.GetSimulationScenarioSnapshot());
-        Assert.True(snapshot.Result.IsSupported);
+        Assert.True(snapshot.SimulationResult.IsSupported);
         Assert.False(snapshot.SafetyAudit.HasCells);
         Assert.Equal("EMS safety: no simulation cells.", workspaceViewModel.SimulationSafetySummaryText);
         Assert.Equal(

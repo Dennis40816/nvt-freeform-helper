@@ -85,7 +85,7 @@ public sealed class DiffFrameCsvFixtureTests
             NotchApplySimulationAggregationMode.SingleFrame,
             selectedFrameIndex: 0);
 
-        var reg72 = Assert.Single(snapshot.Result.Cells, static cell => cell.RegularPadId == 72);
+        var reg72 = Assert.Single(snapshot.SimulationResult.Cells, static cell => cell.RegularPadId == 72);
         Assert.Equal(0d, reg72.BeforeValue);
     }
 
@@ -114,7 +114,7 @@ public sealed class DiffFrameCsvFixtureTests
             NotchApplySimulationAggregationMode.SingleFrame,
             selectedFrameIndex: 0);
 
-        var reg473 = Assert.Single(snapshot.Result.Cells, static cell => cell.RegularPadId == 473);
+        var reg473 = Assert.Single(snapshot.SimulationResult.Cells, static cell => cell.RegularPadId == 473);
         Assert.Equal(0d, reg473.BeforeValue);
         Assert.True(reg473.AfterValue > 0d, $"Expected REG473 to receive a non-zero after value, but got {reg473.AfterValue}.");
     }

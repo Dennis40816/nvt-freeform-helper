@@ -44,8 +44,8 @@ public sealed class SimulationWorkspaceCsvFrameIndexCharacterizationTests
         Assert.NotNull(snapshot);
         Assert.Equal(1, snapshot.Scenario.SelectedFrameIndex);
         var simulation = Assert.IsType<SimulationScenarioSnapshot>(snapshot);
-        Assert.True(simulation is { Result.IsSupported: false });
-        Assert.True(simulation is { Result.Diagnostics: { } diagnostics } &&
+        Assert.True(simulation is { SimulationResult.IsSupported: false });
+        Assert.True(simulation is { SimulationResult.Diagnostics: { } diagnostics } &&
             diagnostics.Any(static diagnostic => diagnostic.Contains("1x3", StringComparison.Ordinal)));
         Assert.Contains("1x3", viewModel.StatusText, StringComparison.Ordinal);
     }

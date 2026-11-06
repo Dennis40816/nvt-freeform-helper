@@ -28,7 +28,7 @@ public sealed record SimulationScenarioSnapshot(
 {
     public NotchApplySimulationImportedDataset Dataset => ReviewSnapshot.Dataset;
     public NotchTable FilteredTable => ReviewSnapshot.FilteredTable;
-    public NotchApplySimulationResult Result => ReviewSnapshot.Result;
+    public NotchApplySimulationResult SimulationResult => ReviewSnapshot.SimulationResult;
     public IReadOnlyList<string> Diagnostics => ReviewSnapshot.Diagnostics;
 }
 
@@ -262,7 +262,7 @@ public sealed class SimulationWorkspaceUseCase
         return new SimulationScenarioSnapshot(
             scenario,
             reviewSnapshot,
-            SimulationSafetyAuditService.Analyze(reviewSnapshot.Result));
+            SimulationSafetyAuditService.Analyze(reviewSnapshot.SimulationResult));
     }
 
     public static CopperPillarPathReplayResult ReplayCopperPath(
@@ -303,12 +303,12 @@ public sealed class SimulationWorkspaceUseCase
                 NetFlowResidualCount: audit.TotalNetFlowResidualCount,
                 TargetCoverageRiskCount: audit.TotalTargetCoverageRiskCount,
                 StatusText: SimulationSafetyTextProjector.BuildReplayStatusText(
-                    snapshot.Result.IsSupported,
+                    snapshot.SimulationResult.IsSupported,
                     audit.HasViolations,
                     audit.HasPhysicalAuditRisks),
                 Diagnostics: snapshot.Diagnostics)
             {
-                IsSupported = snapshot.Result.IsSupported,
+                IsSupported = snapshot.SimulationResult.IsSupported,
                 HasGlobalFlowResidual = audit.HasGlobalFlowResidual,
             });
         }
