@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using Nvt.Core.Progress;
+using Nvt.Core.TestSupport;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -28,20 +28,23 @@ public sealed class LoadingScopeCoordinatorTests
     public async Task RunAsync_RespectsMinimumVisibleDuration()
     {
         var states = new List<bool>();
+        var clock = new ManualTimeProvider(DateTimeOffset.UnixEpoch);
         var coordinator = new LoadingScopeCoordinator(
             yieldFrameAsync: static () => Task.CompletedTask,
-            minimumVisibleDuration: TimeSpan.FromMilliseconds(60));
-        var sw = Stopwatch.StartNew();
+            minimumVisibleDuration: TimeSpan.FromMilliseconds(60),
+            timeProvider: clock);
 
-        await coordinator.RunAsync(
+        var run = coordinator.RunAsync(
             action: static () => Task.CompletedTask,
             setVisible: isVisible => states.Add(isVisible));
 
-        sw.Stop();
+        clock.Advance(TimeSpan.FromMilliseconds(59));
+        Assert.False(run.IsCompleted);
+        Assert.Equal([true], states);
+
+        clock.Advance(TimeSpan.FromMilliseconds(1));
+        await run;
 
         Assert.Equal([true, false], states);
-        Assert.True(
-            sw.ElapsedMilliseconds >= 45,
-            $"Expected visible duration >= 45ms, actual={sw.ElapsedMilliseconds}ms.");
     }
 }

@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace FreeformHelper.Tests;
 
 public sealed partial class IndexMappingReportViewModelTests
@@ -7,8 +5,8 @@ public sealed partial class IndexMappingReportViewModelTests
 
     private static async Task<bool> WaitUntilAsync(Func<bool> predicate, int timeoutMs)
     {
-        var sw = Stopwatch.StartNew();
-        while (sw.ElapsedMilliseconds < timeoutMs)
+        var start = TimeProvider.System.GetTimestamp();
+        while (TimeProvider.System.GetElapsedTime(start).TotalMilliseconds < timeoutMs)
         {
             if (predicate())
             {

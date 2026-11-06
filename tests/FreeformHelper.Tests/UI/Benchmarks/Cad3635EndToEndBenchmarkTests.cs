@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -99,7 +98,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
             vm.PickSaveNotchPathAsync = (_, _) => Task.FromResult<string?>(exportPath);
             vm.OpenNotchExportSelectionAsync = null;
 
-            var total = Stopwatch.StartNew();
+            var total = TimeProvider.System.GetTimestamp();
             var loadProject = await MeasureStageAsync(
                 "Load project",
                 () => vm.LoadProjectCommand.ExecuteAsync(null),
@@ -116,7 +115,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
                 "Step 5 export",
                 () => vm.ExportNotchCommand.ExecuteAsync(null),
                 window);
-            total.Stop();
+            var totalMs = (long)TimeProvider.System.GetElapsedTime(total).TotalMilliseconds;
             Assert.True(vm.CadPads.Count > 0, "Benchmark load did not populate CAD pads.");
             Assert.True(vm.LayerToggles.Count > 0, "Benchmark load did not populate DXF layer toggles.");
             Assert.True(File.Exists(exportPath), "Benchmark Step 5 export did not write an output file.");
@@ -124,7 +123,7 @@ public sealed class Cad3635EndToEndBenchmarkTests
             return new Cad3635EndToEndBenchmarkSample(
                 run,
                 warmup,
-                total.ElapsedMilliseconds,
+                totalMs,
                 loadProject,
                 step1Match,
                 step2Freeform,
@@ -145,26 +144,26 @@ public sealed class Cad3635EndToEndBenchmarkTests
         Func<Task> action,
         Window window)
     {
-        var compute = Stopwatch.StartNew();
+        var compute = TimeProvider.System.GetTimestamp();
         await action();
-        compute.Stop();
+        var computeMs = (long)TimeProvider.System.GetElapsedTime(compute).TotalMilliseconds;
 
-        var renderFlush = Stopwatch.StartNew();
+        var renderFlush = TimeProvider.System.GetTimestamp();
         await HeadlessUiPump.FlushQueueAsync();
-        renderFlush.Stop();
+        var renderFlushMs = (long)TimeProvider.System.GetElapsedTime(renderFlush).TotalMilliseconds;
 
-        var capture = Stopwatch.StartNew();
+        var capture = TimeProvider.System.GetTimestamp();
         using (var frame = window.CaptureRenderedFrame())
         {
             Assert.NotNull(frame);
         }
 
-        capture.Stop();
+        var captureMs = (long)TimeProvider.System.GetElapsedTime(capture).TotalMilliseconds;
         return new Cad3635EndToEndStageSample(
             name,
-            compute.ElapsedMilliseconds,
-            renderFlush.ElapsedMilliseconds,
-            capture.ElapsedMilliseconds);
+            computeMs,
+            renderFlushMs,
+            captureMs);
     }
 
     private static string ResolveOutputPath(string? outputPath)
