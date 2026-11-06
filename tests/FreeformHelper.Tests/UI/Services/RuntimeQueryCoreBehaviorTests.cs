@@ -66,7 +66,7 @@ public sealed class RuntimeQueryCoreBehaviorTests
         {
             handlerToken = token;
             entered.TrySetResult();
-            return work.Task;
+            return work.Task.WaitAsync(TestContext.Current.CancellationToken);
         });
         server.Start();
         await using var client = await ConnectAndWriteAsync(pipeName);

@@ -35,7 +35,7 @@ public sealed class ShellViewModelSimulationTests
         Func<Task> buildWorkspace = async () =>
         {
             entered.SetResult();
-            await release.Task;
+            await release.Task.WaitAsync(TestContext.Current.CancellationToken);
         };
         shell.Simulation.RequestBuildWorkspaceAsync = buildWorkspace;
 

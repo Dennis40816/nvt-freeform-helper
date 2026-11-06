@@ -62,7 +62,7 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
                 commands[i].CanExecuteChanged += (_, _) => notifications[index]++;
             }
 
-            vm.PickLoadProjectPathAsync = () => release.Task;
+            vm.PickLoadProjectPathAsync = () => release.Task.WaitAsync(TestContext.Current.CancellationToken);
             load = vm.LoadProjectCommand.ExecuteAsync(null);
             Assert.Equal(ProjectSessionMode.LoadingProject, vm.SessionMode);
             foreach (var command in commands) Assert.False(command.CanExecute(entry));

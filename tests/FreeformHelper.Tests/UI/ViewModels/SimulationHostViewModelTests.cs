@@ -93,7 +93,7 @@ public sealed class SimulationHostViewModelTests
         Func<Task> buildWorkspace = async () =>
         {
             entered.SetResult();
-            await release.Task;
+            await release.Task.WaitAsync(TestContext.Current.CancellationToken);
         };
         host.RequestBuildWorkspaceAsync = buildWorkspace;
 
