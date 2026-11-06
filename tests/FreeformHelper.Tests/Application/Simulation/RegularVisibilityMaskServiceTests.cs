@@ -26,7 +26,11 @@ public sealed class RegularVisibilityMaskServiceTests
 
             var grid = BuildRectGrid(rows: 2, cols: 2);
 
-            var result = RegularVisibilityMaskService.Load(path, grid, DiffFrameGridRowOrigin.TopRowIsRegularLastRow);
+            var result = RegularVisibilityMaskService.LoadText(
+                path,
+                () => new StringReader(TestFiles.ReadContent(path)),
+                grid,
+                DiffFrameGridRowOrigin.TopRowIsRegularLastRow);
 
             Assert.True(result.HasLoadedMask);
             Assert.Equal(2, result.FrameCount);
@@ -60,7 +64,11 @@ public sealed class RegularVisibilityMaskServiceTests
         {
             var grid = BuildRectGrid(rows, cols);
 
-            var result = RegularVisibilityMaskService.Load(tempPath, grid, DiffFrameGridRowOrigin.TopRowIsRegularLastRow);
+            var result = RegularVisibilityMaskService.LoadText(
+                tempPath,
+                () => new StringReader(TestFiles.ReadContent(tempPath)),
+                grid,
+                DiffFrameGridRowOrigin.TopRowIsRegularLastRow);
 
             Assert.True(result.HasLoadedMask, result.Diagnostic);
             Assert.True(result.ActiveRegularCount > 0);

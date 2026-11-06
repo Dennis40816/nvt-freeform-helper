@@ -120,6 +120,26 @@ public sealed partial class NotchExportSelectionViewModelTests
         Assert.Equal("0/1", vm.IcGroups[1].SummaryText);
     }
 
+    [Theory]
+    [InlineData(0, 2)]
+    [InlineData(1, 1)]
+    public void SelectAllGroupCommand_SelectsOnlyTargetIcRows(int groupIndex, int expectedSelectedCount)
+    {
+        var vm = new NotchExportSelectionViewModel(BuildSampleTable());
+        foreach (var group in vm.IcGroups)
+        {
+            group.SelectNoneGroupCommand.Execute(null);
+        }
+
+        vm.IcGroups[groupIndex].SelectAllGroupCommand.Execute(null);
+
+        Assert.Equal(expectedSelectedCount, vm.SelectedCount);
+        Assert.True(vm.HasSelection);
+        Assert.All(vm.Rows, row => Assert.Equal(row.Row.IcIndex == groupIndex, row.IsSelected));
+        Assert.Equal(expectedSelectedCount, vm.IcGroups[groupIndex].SelectedCount);
+        Assert.Equal(expectedSelectedCount, vm.BuildSelectedTable().Rows.Count);
+    }
+
 
     [Fact]
     public void SelectPreviewRowCommand_InvokesPreviewCallback()

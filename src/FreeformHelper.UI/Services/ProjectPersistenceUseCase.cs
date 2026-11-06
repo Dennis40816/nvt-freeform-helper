@@ -76,7 +76,7 @@ public sealed class ProjectPersistenceUseCase
     {
         if (!string.IsNullOrWhiteSpace(file.LastDxfPath) && File.Exists(file.LastDxfPath))
         {
-            file.EmbeddedDxf = File.ReadAllBytes(file.LastDxfPath);
+            file.EmbeddedDxf = ReadFileBytes(file.LastDxfPath);
             file.EmbeddedDxfName = Path.GetFileName(file.LastDxfPath);
             return null;
         }
@@ -95,7 +95,7 @@ public sealed class ProjectPersistenceUseCase
         var sourcePath = file.UiSnapshot.Import.RegularVisibilityMaskSourcePath;
         if (!string.IsNullOrWhiteSpace(sourcePath) && File.Exists(sourcePath))
         {
-            file.EmbeddedRegularVisibilityMask = File.ReadAllBytes(sourcePath);
+            file.EmbeddedRegularVisibilityMask = ReadFileBytes(sourcePath);
             file.EmbeddedRegularVisibilityMaskName = Path.GetFileName(sourcePath);
             return null;
         }
@@ -109,6 +109,14 @@ public sealed class ProjectPersistenceUseCase
         return string.IsNullOrWhiteSpace(sourcePath)
             ? null
             : "Embed SeeRegular mask skipped: source file not available.";
+    }
+
+    private static byte[] ReadFileBytes(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var content = new MemoryStream();
+        stream.CopyTo(content);
+        return content.ToArray();
     }
 
     private static string? CombineWarnings(params string?[] warnings)

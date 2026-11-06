@@ -32,7 +32,8 @@ public sealed class NotchApplySimulationReviewUseCase
         for (var sourceIndex = 0; sourceIndex < sourcePaths.Count; sourceIndex++)
         {
             var sourcePath = sourcePaths[sourceIndex];
-            var source = DiffFrameCsvImporter.Import(sourcePath);
+            using var reader = new StreamReader(sourcePath);
+            var source = DiffFrameCsvImporter.ImportContent(sourcePath, reader.ReadToEnd());
             var compatibleFrameCount = 0;
 
             diagnostics.AddRange(source.Diagnostics);

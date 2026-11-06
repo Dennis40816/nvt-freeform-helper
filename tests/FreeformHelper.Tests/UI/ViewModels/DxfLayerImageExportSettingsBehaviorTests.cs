@@ -163,13 +163,108 @@ public sealed class DxfLayerImageExportSettingsBehaviorTests
     public async Task CancelledDialogKeepsTheStoredPreferencesAsync()
     {
         using var project = await ProjectFixture.LoadAsync();
-        project.Vm.OpenDxfLayerImageExportAsync = _ => Task.FromResult<LayerImageExportRequest?>(null);
-        project.Vm.PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(null);
+        var path = Path.Combine(project.DirectoryPath, "cancelled.bmp");
+        var statusBeforeCancel = project.Vm.StatusText;
+        var pickerCalls = 0;
+        var writerCalls = 0;
+        bool? closed = null;
+        project.Vm.OpenDxfLayerImageExportAsync = context =>
+        {
+            context.WriteLayerImagesAsync = request =>
+            {
+                writerCalls++;
+                return LayerImageExportWindowHost.WriteAsync(request);
+            };
+            using var dialog = new LayerImageExportViewModel(context, LayerImageExportTestData.CreateClock());
+            dialog.PreviewSettings.PixelsX = 32;
+            dialog.PreviewSettings.PixelsY = 24;
+            dialog.FileSettings.Format = DxfLayerImageFormat.Bmp;
+            dialog.RequestClose += saved => closed = saved;
+            dialog.CancelCommand.Execute(null);
+            return Task.FromResult(dialog.CompletedRequest);
+        };
+        project.Vm.PickSaveExportPathAsync = (_, _) =>
+        {
+            pickerCalls++;
+            return Task.FromResult<string?>(path);
+        };
 
         await project.Vm.ExportDxfLayerImageCommand.ExecuteAsync(null);
 
+        Assert.False(closed);
+        Assert.Equal(0, pickerCalls);
+        Assert.Equal(0, writerCalls);
+        Assert.False(File.Exists(path));
+        Assert.Equal(statusBeforeCancel, project.Vm.StatusText);
         Assert.Equal(DxfLayerImageFormat.Png, CaptureContext(project.Vm).Format);
         Assert.False(project.Vm.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public async Task ExportDxfLayerImageCommand_ReopensWithChosenLayerAndFreshSizeDefaultsAsync()
+    {
+        using var project = await ProjectFixture.LoadAsync();
+        var dxfPath = FreeformHelperViewModelTests.CreateTempDxfFile(
+            ("L1", 0, 0, 20, 10), ("L2", 30, 0, 40, 10));
+        try
+        {
+            project.Vm.PickOpenDxfPathAsync = () => Task.FromResult<string?>(dxfPath);
+            await project.Vm.OpenDxfCommand.ExecuteAsync(null);
+            var outputPath = Path.Combine(project.DirectoryPath, "chosen-layer.bmp");
+            project.Vm.PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(outputPath);
+            project.Vm.OpenDxfLayerImageExportAsync = SaveSecondLayerRequestAsync;
+
+            await project.Vm.ExportDxfLayerImageCommand.ExecuteAsync(null);
+
+            Assert.True(File.Exists(outputPath), project.Vm.StatusText);
+            LayerImageExportContext? reopened = null;
+            project.Vm.OpenDxfLayerImageExportAsync = context =>
+            {
+                reopened = context;
+                return Task.FromResult<LayerImageExportRequest?>(null);
+            };
+
+            await project.Vm.ExportDxfLayerImageCommand.ExecuteAsync(null);
+
+            Assert.NotNull(reopened);
+            Assert.Equal("L2", Assert.Single(reopened.InitialCheckedLayers));
+            Assert.Equal(LayerImageSizeSource.Auto, reopened.InitialSize.Source);
+            Assert.Equal(4096, reopened.InitialSize.PixelsX);
+            Assert.Equal(4096, reopened.InitialSize.PixelsY);
+            Assert.Equal(0, reopened.InitialSize.PaddingX);
+            Assert.Equal(0, reopened.InitialSize.PaddingY);
+            Assert.Equal(2.5m, reopened.LineWidthPixels);
+            Assert.Equal(DxfLayerImageFormat.Bmp, reopened.Format);
+            Assert.True(reopened.UseDarkTheme);
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+        }
+    }
+
+    private static async Task<LayerImageExportRequest?> SaveSecondLayerRequestAsync(LayerImageExportContext context)
+    {
+        context.WriteLayerImagesAsync = LayerImageExportWindowHost.WriteAsync;
+        using var dialog = new LayerImageExportViewModel(context, LayerImageExportTestData.CreateClock());
+        foreach (var row in dialog.VisibleRows)
+        {
+            row.IsChecked = row.Name == "L2";
+        }
+        dialog.PreviewSettings.PixelsX = 32;
+        dialog.PreviewSettings.PixelsY = 24;
+        dialog.PreviewSettings.PaddingX = 3;
+        dialog.PreviewSettings.PaddingY = 4;
+        dialog.PreviewSettings.LineWidthPixels = 2.5m;
+        dialog.PreviewSettings.UseDarkTheme = true;
+        dialog.FileSettings.Format = DxfLayerImageFormat.Bmp;
+        var settings = new LayerImageExportSettingsViewModel(dialog, context.PickSavePathAsync);
+        await settings.SaveCommand.ExecuteAsync(null);
+        Assert.NotNull(settings.Request);
+        Assert.Equal("L2", Assert.Single(settings.Request.Layers));
+        Assert.Equal(32, settings.Request.Size.PixelsX);
+        Assert.Equal(24, settings.Request.Size.PixelsY);
+        return settings.Request;
     }
 
     [Fact]
