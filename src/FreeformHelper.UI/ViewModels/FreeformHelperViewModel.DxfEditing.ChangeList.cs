@@ -41,6 +41,19 @@ public sealed partial class FreeformHelperViewModel
         var currentPadsById = _cad?.Pads.ToDictionary(static pad => pad.Id) ?? new Dictionary<int, CadPad>();
         var baselinePadsById = _cadEdit.BaselineCad?.Pads.ToDictionary(static pad => pad.Id) ?? new Dictionary<int, CadPad>();
 
+        AppendHiddenDxfEditChangeEntries(entries, currentPadsById, baselinePadsById);
+        AppendDuplicateDxfEditChangeEntries(entries, currentPadsById, baselinePadsById);
+        AppendCombinedDxfEditChangeEntries(entries, currentPadsById);
+        AppendMovedDxfEditChangeEntries(entries, currentPadsById, baselinePadsById);
+        AppendRotatedDxfEditChangeEntries(entries, currentPadsById, baselinePadsById);
+        return entries;
+    }
+
+    private void AppendHiddenDxfEditChangeEntries(
+        List<DxfEditChangeListEntry> entries,
+        Dictionary<int, CadPad> currentPadsById,
+        Dictionary<int, CadPad> baselinePadsById)
+    {
         foreach (var cadPadId in _cadEdit.HiddenCadPadIds.OrderBy(static id => id))
         {
             var pad = currentPadsById.GetValueOrDefault(cadPadId) ?? baselinePadsById.GetValueOrDefault(cadPadId);
@@ -88,7 +101,13 @@ public sealed partial class FreeformHelperViewModel
                 canFocus: false,
                 canApply: true));
         }
+    }
 
+    private void AppendDuplicateDxfEditChangeEntries(
+        List<DxfEditChangeListEntry> entries,
+        Dictionary<int, CadPad> currentPadsById,
+        Dictionary<int, CadPad> baselinePadsById)
+    {
         foreach (var duplicateCadId in _cadEdit.DuplicateCadPadIdToCanonicalId.Keys.OrderBy(static id => id))
         {
             if (!currentPadsById.TryGetValue(duplicateCadId, out var duplicatePad))
@@ -124,7 +143,12 @@ public sealed partial class FreeformHelperViewModel
                 canFocus: true,
                 canApply: true));
         }
+    }
 
+    private void AppendCombinedDxfEditChangeEntries(
+        List<DxfEditChangeListEntry> entries,
+        Dictionary<int, CadPad> currentPadsById)
+    {
         foreach (var combinedCadId in _combinedCad.OutputCadIds.OrderBy(static id => id))
         {
             if (!currentPadsById.TryGetValue(combinedCadId, out var pad))
@@ -153,7 +177,13 @@ public sealed partial class FreeformHelperViewModel
                 canFocus: true,
                 canApply: groupId > 0));
         }
+    }
 
+    private void AppendMovedDxfEditChangeEntries(
+        List<DxfEditChangeListEntry> entries,
+        Dictionary<int, CadPad> currentPadsById,
+        Dictionary<int, CadPad> baselinePadsById)
+    {
         foreach (var currentPad in currentPadsById.Values.OrderBy(static pad => pad.Id))
         {
             if (!baselinePadsById.TryGetValue(currentPad.Id, out var baselinePad) ||
@@ -177,7 +207,13 @@ public sealed partial class FreeformHelperViewModel
                 canFocus: !IsCadPadEffectivelyHidden(currentPad.Id),
                 canApply: true));
         }
+    }
 
+    private void AppendRotatedDxfEditChangeEntries(
+        List<DxfEditChangeListEntry> entries,
+        Dictionary<int, CadPad> currentPadsById,
+        Dictionary<int, CadPad> baselinePadsById)
+    {
         foreach (var currentPad in currentPadsById.Values.OrderBy(static pad => pad.Id))
         {
             if (!baselinePadsById.TryGetValue(currentPad.Id, out var baselinePad) ||
@@ -201,8 +237,6 @@ public sealed partial class FreeformHelperViewModel
                 canFocus: !IsCadPadEffectivelyHidden(currentPad.Id),
                 canApply: true));
         }
-
-        return entries;
     }
 
     private void FocusDxfEditChangeEntry(DxfEditChangeListEntry entry)

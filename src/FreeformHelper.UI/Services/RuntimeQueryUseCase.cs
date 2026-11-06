@@ -79,181 +79,11 @@ internal sealed partial class RuntimeQueryUseCase
     {
         return RuntimeQueryResponseEnvelope.Success(new
         {
-            commands = new object[]
-            {
-                new
-                {
-                    name = "help",
-                    description = "List supported runtime query commands and arguments.",
-                    args = Array.Empty<object>()
-                },
-                new
-                {
-                    name = "status",
-                    description = "Return app/workflow/notch preview status.",
-                    args = Array.Empty<object>()
-                },
-                new
-                {
-                    name = "selection",
-                    description = "Return current CAD/Regular selection.",
-                    args = Array.Empty<object>()
-                },
-                new
-                {
-                    name = "terminal",
-                    description = "Return recent in-app log lines.",
-                    args = new object[]
-                    {
-                        new { key = "tail", required = false, value = "1..5000", defaultValue = DefaultTerminalTail }
-                    }
-                },
-                new
-                {
-                    name = "terminal-links",
-                    description = "Return parsed clickable links from recent terminal lines.",
-                    args = new object[]
-                    {
-                        new { key = "tail", required = false, value = "1..5000", defaultValue = DefaultTerminalTail },
-                        new { key = "limit", required = false, value = $"1..{MaxTerminalLinkLimit}", defaultValue = DefaultTerminalLinkLimit }
-                    }
-                },
-                new
-                {
-                    name = "pad",
-                    description = "Return one pad snapshot (same source as Popover/Inspector).",
-                    args = new object[]
-                    {
-                        new { key = "cad-id", required = false, value = ">=0", note = "Use exactly one of cad-id / regular-id." },
-                        new { key = "regular-id", required = false, value = ">=0", note = "Use exactly one of cad-id / regular-id." }
-                    }
-                },
-                new
-                {
-                    name = "notch",
-                    description = "Return Notch 2.2 compensation debug payload for one CAD pad.",
-                    args = new object[]
-                    {
-                        new { key = "cad-id", required = true, value = ">=0" },
-                        new { key = "limit", required = false, value = $"1..{MaxNotchRegularLimit}", defaultValue = DefaultNotchRegularLimit },
-                        new { key = "target-limit", required = false, value = $"1..{MaxNotchTargetLimit}", defaultValue = DefaultNotchTargetLimit },
-                        new { key = "polygon-limit", required = false, value = $"1..{MaxNotchPolygonLimit}", defaultValue = DefaultNotchPolygonLimit }
-                    }
-                },
-                new
-                {
-                    name = "multi-owner",
-                    description = "Return regular pads gated by multi-owner rule and owner CAD ids.",
-                    args = new object[]
-                    {
-                        new { key = "cad-id", required = true, value = ">=0" },
-                        new { key = "limit", required = false, value = $"1..{MaxNotchRegularLimit}", defaultValue = DefaultNotchRegularLimit },
-                        new { key = "overlap-percent", required = false, value = "0..100", note = "Override strict owner overlap threshold (%) for this query only." }
-                    }
-                },
-                new
-                {
-                    name = "notch-stage",
-                    description = "Return stage-1/2/3 notch overlay polygons for one CAD pad.",
-                    args = new object[]
-                    {
-                        new { key = "cad-id", required = true, value = ">=0" },
-                        new { key = "polygon-limit", required = false, value = $"1..{MaxNotchPolygonLimit}", defaultValue = DefaultNotchPolygonLimit }
-                    }
-                },
-                new
-                {
-                    name = "notch-validation",
-                    description = "Return Step 5 regular-centric validation rows (direct/incoming/outgoing).",
-                    args = new object[]
-                    {
-                        new { key = "regular-id", required = true, value = ">=0" }
-                    }
-                },
-                new
-                {
-                    name = "load-project",
-                    description = "Load a project JSON file into the running app instance.",
-                    args = new object[]
-                    {
-                        new { key = "path", required = true, value = "absolute or relative file path" }
-                    }
-                },
-                new
-                {
-                    name = "run-step",
-                    description = "Execute workflow step (1=match, 2=freeform detect, 3=refresh notch preview, 4=index diagnostics).",
-                    args = new object[]
-                    {
-                        new { key = "step", required = true, value = "1|2|3|4" }
-                    }
-                },
-                new
-                {
-                    name = "clear-step",
-                    description = "Clear workflow step result (and dependent downstream state).",
-                    args = new object[]
-                    {
-                        new { key = "step", required = true, value = "1|2|3|4|5" }
-                    }
-                },
-                new
-                {
-                    name = "select-cad",
-                    description = "Programmatically select CAD pads in canvas/inspector context.",
-                    args = new object[]
-                    {
-                        new { key = "cad-id", required = false, value = ">=0", note = "single id" },
-                        new { key = "cad-ids", required = false, value = "comma-separated >=0", note = "multiple ids" }
-                    }
-                },
-                new
-                {
-                    name = "select-regular",
-                    description = "Programmatically select regular pads by pad-id or index.",
-                    args = new object[]
-                    {
-                        new { key = "regular-id", required = false, value = ">=0", note = "single regular pad id" },
-                        new { key = "regular-ids", required = false, value = "comma-separated >=0", note = "multiple regular pad ids" },
-                        new { key = "regular-index", required = false, value = ">=0", note = "single grid index" },
-                        new { key = "regular-indices", required = false, value = "comma-separated >=0", note = "multiple grid indices" }
-                    }
-                },
-                new
-                {
-                    name = "clear-selection",
-                    description = "Clear CAD/regular selection.",
-                    args = Array.Empty<object>()
-                },
-                new
-                {
-                    name = "set-tofull",
-                    description = "Toggle Notch 2.2 To Full enable flag.",
-                    args = new object[]
-                    {
-                        new { key = "enable", required = true, value = "true|false|1|0|on|off" }
-                    }
-                },
-                new
-                {
-                    name = "simulation",
-                    description = "Return current Simulation workspace state and optionally one regular pad snapshot.",
-                    args = new object[]
-                    {
-                        new { key = "regular-id", required = false, value = ">=0", note = "specific regular pad to inspect in current simulation workspace" }
-                    }
-                },
-                new
-                {
-                    name = "export-notch",
-                    description = "Generate Step 5 notch table and export to a CSV review or C FW file (non-interactive).",
-                    args = new object[]
-                    {
-                        new { key = "format", required = true, value = "csv (CSV review)|c-v21|c-v22" },
-                        new { key = "path", required = true, value = "output file path" }
-                    }
-                }
-            },
+            commands = BuildHelpInfoCommands()
+                .Concat(BuildHelpNotchCommands())
+                .Concat(BuildHelpWorkflowCommands())
+                .Concat(BuildHelpSelectionAndExportCommands())
+                .ToArray(),
             commonArgs = new object[]
             {
                 new { key = "timeout-ms", required = false, value = "1..120000", defaultValue = 1500 },
@@ -263,5 +93,203 @@ internal sealed partial class RuntimeQueryUseCase
         });
     }
 
+    private static object[] BuildHelpInfoCommands()
+    {
+        return new object[]
+        {
+            new
+            {
+                name = "help",
+                description = "List supported runtime query commands and arguments.",
+                args = Array.Empty<object>()
+            },
+            new
+            {
+                name = "status",
+                description = "Return app/workflow/notch preview status.",
+                args = Array.Empty<object>()
+            },
+            new
+            {
+                name = "selection",
+                description = "Return current CAD/Regular selection.",
+                args = Array.Empty<object>()
+            },
+            new
+            {
+                name = "terminal",
+                description = "Return recent in-app log lines.",
+                args = new object[]
+                {
+                    new { key = "tail", required = false, value = "1..5000", defaultValue = DefaultTerminalTail }
+                }
+            },
+            new
+            {
+                name = "terminal-links",
+                description = "Return parsed clickable links from recent terminal lines.",
+                args = new object[]
+                {
+                    new { key = "tail", required = false, value = "1..5000", defaultValue = DefaultTerminalTail },
+                    new { key = "limit", required = false, value = $"1..{MaxTerminalLinkLimit}", defaultValue = DefaultTerminalLinkLimit }
+                }
+            },
+            new
+            {
+                name = "pad",
+                description = "Return one pad snapshot (same source as Popover/Inspector).",
+                args = new object[]
+                {
+                    new { key = "cad-id", required = false, value = ">=0", note = "Use exactly one of cad-id / regular-id." },
+                    new { key = "regular-id", required = false, value = ">=0", note = "Use exactly one of cad-id / regular-id." }
+                }
+            }
+        };
+    }
 
+    private static object[] BuildHelpNotchCommands()
+    {
+        return new object[]
+        {
+            new
+            {
+                name = "notch",
+                description = "Return Notch 2.2 compensation debug payload for one CAD pad.",
+                args = new object[]
+                {
+                    new { key = "cad-id", required = true, value = ">=0" },
+                    new { key = "limit", required = false, value = $"1..{MaxNotchRegularLimit}", defaultValue = DefaultNotchRegularLimit },
+                    new { key = "target-limit", required = false, value = $"1..{MaxNotchTargetLimit}", defaultValue = DefaultNotchTargetLimit },
+                    new { key = "polygon-limit", required = false, value = $"1..{MaxNotchPolygonLimit}", defaultValue = DefaultNotchPolygonLimit }
+                }
+            },
+            new
+            {
+                name = "multi-owner",
+                description = "Return regular pads gated by multi-owner rule and owner CAD ids.",
+                args = new object[]
+                {
+                    new { key = "cad-id", required = true, value = ">=0" },
+                    new { key = "limit", required = false, value = $"1..{MaxNotchRegularLimit}", defaultValue = DefaultNotchRegularLimit },
+                    new { key = "overlap-percent", required = false, value = "0..100", note = "Override strict owner overlap threshold (%) for this query only." }
+                }
+            },
+            new
+            {
+                name = "notch-stage",
+                description = "Return stage-1/2/3 notch overlay polygons for one CAD pad.",
+                args = new object[]
+                {
+                    new { key = "cad-id", required = true, value = ">=0" },
+                    new { key = "polygon-limit", required = false, value = $"1..{MaxNotchPolygonLimit}", defaultValue = DefaultNotchPolygonLimit }
+                }
+            },
+            new
+            {
+                name = "notch-validation",
+                description = "Return Step 5 regular-centric validation rows (direct/incoming/outgoing).",
+                args = new object[]
+                {
+                    new { key = "regular-id", required = true, value = ">=0" }
+                }
+            }
+        };
+    }
+
+    private static object[] BuildHelpWorkflowCommands()
+    {
+        return new object[]
+        {
+            new
+            {
+                name = "load-project",
+                description = "Load a project JSON file into the running app instance.",
+                args = new object[]
+                {
+                    new { key = "path", required = true, value = "absolute or relative file path" }
+                }
+            },
+            new
+            {
+                name = "run-step",
+                description = "Execute workflow step (1=match, 2=freeform detect, 3=refresh notch preview, 4=index diagnostics).",
+                args = new object[]
+                {
+                    new { key = "step", required = true, value = "1|2|3|4" }
+                }
+            },
+            new
+            {
+                name = "clear-step",
+                description = "Clear workflow step result (and dependent downstream state).",
+                args = new object[]
+                {
+                    new { key = "step", required = true, value = "1|2|3|4|5" }
+                }
+            }
+        };
+    }
+
+    private static object[] BuildHelpSelectionAndExportCommands()
+    {
+        return new object[]
+        {
+            new
+            {
+                name = "select-cad",
+                description = "Programmatically select CAD pads in canvas/inspector context.",
+                args = new object[]
+                {
+                    new { key = "cad-id", required = false, value = ">=0", note = "single id" },
+                    new { key = "cad-ids", required = false, value = "comma-separated >=0", note = "multiple ids" }
+                }
+            },
+            new
+            {
+                name = "select-regular",
+                description = "Programmatically select regular pads by pad-id or index.",
+                args = new object[]
+                {
+                    new { key = "regular-id", required = false, value = ">=0", note = "single regular pad id" },
+                    new { key = "regular-ids", required = false, value = "comma-separated >=0", note = "multiple regular pad ids" },
+                    new { key = "regular-index", required = false, value = ">=0", note = "single grid index" },
+                    new { key = "regular-indices", required = false, value = "comma-separated >=0", note = "multiple grid indices" }
+                }
+            },
+            new
+            {
+                name = "clear-selection",
+                description = "Clear CAD/regular selection.",
+                args = Array.Empty<object>()
+            },
+            new
+            {
+                name = "set-tofull",
+                description = "Toggle Notch 2.2 To Full enable flag.",
+                args = new object[]
+                {
+                    new { key = "enable", required = true, value = "true|false|1|0|on|off" }
+                }
+            },
+            new
+            {
+                name = "simulation",
+                description = "Return current Simulation workspace state and optionally one regular pad snapshot.",
+                args = new object[]
+                {
+                    new { key = "regular-id", required = false, value = ">=0", note = "specific regular pad to inspect in current simulation workspace" }
+                }
+            },
+            new
+            {
+                name = "export-notch",
+                description = "Generate Step 5 notch table and export to a CSV review or C FW file (non-interactive).",
+                args = new object[]
+                {
+                    new { key = "format", required = true, value = "csv (CSV review)|c-v21|c-v22" },
+                    new { key = "path", required = true, value = "output file path" }
+                }
+            }
+        };
+    }
 }

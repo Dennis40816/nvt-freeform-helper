@@ -29,8 +29,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var workflowSnapshot = BuildWorkflowDataSnapshot();
-        var hasDxfIndex = workflowSnapshot.TryGetCadOutputFwDiffIndex(cadPadId, out var dxfIndexValue);
-        var dxfIndex = hasDxfIndex ? dxfIndexValue : (int?)null;
+        var dxfIndex = workflowSnapshot.TryGetCadOutputFwDiffIndex(cadPadId, out var dxfIndexValue) ? dxfIndexValue : (int?)null;
         var cadOutputFwDiffOverride = GetCadOutputFwDiffIndexOverride(cadPadId);
         var isDxfIndexAnchor = IsCadOutputFwDiffIndexAnchorCadPad(cadPadId);
         var dxfIndexDisplayText = dxfIndex?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "-";
@@ -39,122 +38,21 @@ public sealed partial class FreeformHelperViewModel
             isDxfIndexAnchor,
             CadOutputFwDiffAutoMode);
 
-        var hasIcIndex = workflowSnapshot.TryGetCadIcIndex(cadPadId, out var icIndexValue);
-        var icIndex = hasIcIndex ? icIndexValue : (int?)null;
+        var icIndex = workflowSnapshot.TryGetCadIcIndex(cadPadId, out var icIndexValue) ? icIndexValue : (int?)null;
 
         var matchCache = GetOrBuildCadInspectorMatchCache(cadPadId);
-        var matchedRegularIds = matchCache.MatchedRegularIds;
-        var matchedRegularDetails = includeMatchDetails || includeRuleTrace
-            ? matchCache.MatchedRegularDetails
-            : (IReadOnlyList<PadInspectorMatchedRegularSnapshot>)Array.Empty<PadInspectorMatchedRegularSnapshot>();
-        var matchText = matchCache.MatchText;
-        var matchDetailsText = includeMatchDetails
-            ? matchCache.MatchDetailsText
-            : matchedRegularIds.Count == 0
-                ? "Unmatched"
-                : $"Matched regular pad(s): {matchedRegularIds.Count}.";
-
-        CadPad notchCad = null!;
-        IReadOnlyList<CadPad> allCadPads = Array.Empty<CadPad>();
-        IReadOnlySet<int>? activeRegularPadIds = null;
-        var hasNotchInputs = !includeExpensiveNotchDetails && TryResolveNotchComputationInputs(
+        var (matchedRegularDetails, matchText, matchDetailsText) = BuildCadInspectorMatchDisplay(
+            matchCache,
+            includeMatchDetails,
+            includeRuleTrace);
+        var notch = BuildCadInspectorNotch(
             cadPadId,
-            out notchCad,
-            out allCadPads,
-            out activeRegularPadIds);
-        var resolved = includeExpensiveNotchDetails
-            ? GetCadV22ResolvedResult(cadPadId)
-            : hasNotchInputs && _notchCache.ResolvedResultByCadId.ContainsKey(cadPadId)
-                ? GetOrBuildCadV22ResolvedResultCached(
-                    notchCad,
-                    allCadPads,
-                    activeRegularPadIds,
-                    workflowSnapshot,
-                    buildIfMissing: false)
-                : null;
-        var compensationResult = precomputedCompensation ?? resolved?.Compensation;
-        PadInspectorNotchSnapshot? notch = null;
-        if (compensationResult is not null &&
-            resolved is null &&
-            (hasNotchInputs ||
-             TryResolveNotchComputationInputs(
-                 cadPadId,
-                 out notchCad,
-                 out allCadPads,
-                 out activeRegularPadIds)))
-        {
-            resolved = GetOrBuildCadV22ResolvedResultCached(
-                notchCad,
-                allCadPads,
-                activeRegularPadIds,
-                workflowSnapshot,
-                precomputedCompensation: compensationResult);
-        }
+            includeExpensiveNotchDetails,
+            workflowSnapshot,
+            precomputedCompensation,
+            precomputedDiagnostics);
+        var (notchEligibility, notchRowSummary) = BuildCadInspectorNotchRowSummary(cadPad, includeNotchRowEligibilityDetails);
 
-        if (resolved is not null)
-        {
-            var resolvedCompensation = resolved.Compensation;
-            var stage3Area = resolvedCompensation.Stage3Area;
-            var strictAreaThreshold = resolved.TargetAllocation.StrictAreaThreshold;
-            var targets = resolved.TargetAllocation.Targets
-                .Select(target => new PadInspectorNotchTargetSnapshot(
-                    target.IcIndex,
-                    target.DiffIndex,
-                    target.EffectiveArea,
-                    target.Ratio,
-                    target.RatioPercentRounded,
-                    target.PassesStrictThreshold,
-                    target.IsAnchorDiff,
-                    target.ToFullAppliedRegularCount,
-                    target.RegularCount,
-                    target.RegularAreas
-                        .Select(area => new PadInspectorNotchTargetRegularAreaSnapshot(
-                            area.RegularPadId,
-                            area.EffectiveArea))
-                        .ToList(),
-                    target.RegularPadIds))
-                .ToList();
-            notch = new PadInspectorNotchSnapshot(
-                resolvedCompensation.ToRegularRatio,
-                resolvedCompensation.ToFullRatio,
-                resolvedCompensation.CombinedRatio,
-                resolvedCompensation.IsToFullEnabled,
-                stage3Area,
-                strictAreaThreshold,
-                targets,
-                includeExpensiveNotchDetails
-                    ? precomputedDiagnostics ?? BuildToFullDiagnosticsText(resolvedCompensation)
-                    : null)
-            {
-                TargetCoverageProjection = resolved.TargetAllocation.TargetCoverageProjection,
-                ComputationMode = CurrentNotchComputationMode
-            };
-        }
-        else if (!includeExpensiveNotchDetails && _grid is not null)
-        {
-            _logger.Debug(System.Globalization.CultureInfo.InvariantCulture, "Pad inspector fast snapshot: CAD={0} skipped cold Notch 2.2 compute (cache miss).",
-                cadPadId);
-        }
-
-        NotchCadRowEligibility notchEligibility;
-        string notchRowSummary;
-        if (includeNotchRowEligibilityDetails)
-        {
-            notchEligibility = BuildCadNotchRowEligibility(cadPad);
-            var eligibleVersionText = notchEligibility.EligibleVersions.Count == 0
-                ? "-"
-                : string.Join(", ", notchEligibility.EligibleVersions.Select(v => v.ToDisplayLabel()));
-            notchRowSummary = notchEligibility.HasRows
-                ? $"Notch rows: {notchEligibility.EstimatedRowCount} ({eligibleVersionText})"
-                : $"Notch rows: 0 ({notchEligibility.Reason})";
-        }
-        else
-        {
-            notchEligibility = BuildDeferredNotchRowEligibilityPlaceholder(cadPad.Id);
-            notchRowSummary = "Notch rows: computing...";
-        }
-
-        var confidence = matchCache.Confidence;
         var ruleTrace = includeRuleTrace
             ? BuildCadRuleTrace(
                 dxfIndex,
@@ -180,18 +78,97 @@ public sealed partial class FreeformHelperViewModel
             IcIndex: icIndex,
             MatchText: matchText,
             MatchDetailsText: matchDetailsText,
-            MatchedRegularPadIds: matchedRegularIds,
+            MatchedRegularPadIds: matchCache.MatchedRegularIds,
             MatchedRegularDetails: matchedRegularDetails,
             IsNotchRowEligible: notchEligibility.HasRows,
             NotchRowSummary: notchRowSummary,
             Notch: notch,
             RuleTrace: ruleTrace,
-            MatchConfidence: confidence);
+            MatchConfidence: matchCache.Confidence);
 
         return new PadInspectorSnapshot(
             Kind: "cad",
             Cad: snapshot,
             Regular: null);
+    }
+
+    private static (IReadOnlyList<PadInspectorMatchedRegularSnapshot> Details, string MatchText, string MatchDetailsText) BuildCadInspectorMatchDisplay(
+        CadInspectorMatchCacheEntry matchCache,
+        bool includeMatchDetails,
+        bool includeRuleTrace)
+    {
+        var matchedRegularIds = matchCache.MatchedRegularIds;
+        var matchedRegularDetails = includeMatchDetails || includeRuleTrace
+            ? matchCache.MatchedRegularDetails
+            : (IReadOnlyList<PadInspectorMatchedRegularSnapshot>)Array.Empty<PadInspectorMatchedRegularSnapshot>();
+        var matchDetailsText = includeMatchDetails
+            ? matchCache.MatchDetailsText
+            : matchedRegularIds.Count == 0
+                ? "Unmatched"
+                : $"Matched regular pad(s): {matchedRegularIds.Count}.";
+        return (matchedRegularDetails, matchCache.MatchText, matchDetailsText);
+    }
+
+    private PadInspectorNotchSnapshot BuildCadInspectorNotchSnapshot(
+        NotchV22ResolvedResult resolved,
+        bool includeExpensiveNotchDetails,
+        string? precomputedDiagnostics)
+    {
+        var resolvedCompensation = resolved.Compensation;
+        var stage3Area = resolvedCompensation.Stage3Area;
+        var strictAreaThreshold = resolved.TargetAllocation.StrictAreaThreshold;
+        var targets = resolved.TargetAllocation.Targets
+            .Select(target => new PadInspectorNotchTargetSnapshot(
+                target.IcIndex,
+                target.DiffIndex,
+                target.EffectiveArea,
+                target.Ratio,
+                target.RatioPercentRounded,
+                target.PassesStrictThreshold,
+                target.IsAnchorDiff,
+                target.ToFullAppliedRegularCount,
+                target.RegularCount,
+                target.RegularAreas
+                    .Select(area => new PadInspectorNotchTargetRegularAreaSnapshot(
+                        area.RegularPadId,
+                        area.EffectiveArea))
+                    .ToList(),
+                target.RegularPadIds))
+            .ToList();
+        return new PadInspectorNotchSnapshot(
+            resolvedCompensation.ToRegularRatio,
+            resolvedCompensation.ToFullRatio,
+            resolvedCompensation.CombinedRatio,
+            resolvedCompensation.IsToFullEnabled,
+            stage3Area,
+            strictAreaThreshold,
+            targets,
+            includeExpensiveNotchDetails
+                ? precomputedDiagnostics ?? BuildToFullDiagnosticsText(resolvedCompensation)
+                : null)
+        {
+            TargetCoverageProjection = resolved.TargetAllocation.TargetCoverageProjection,
+            ComputationMode = CurrentNotchComputationMode
+        };
+    }
+
+    private (NotchCadRowEligibility Eligibility, string Summary) BuildCadInspectorNotchRowSummary(
+        CadPad cadPad,
+        bool includeNotchRowEligibilityDetails)
+    {
+        if (!includeNotchRowEligibilityDetails)
+        {
+            return (BuildDeferredNotchRowEligibilityPlaceholder(cadPad.Id), "Notch rows: computing...");
+        }
+
+        var notchEligibility = BuildCadNotchRowEligibility(cadPad);
+        var eligibleVersionText = notchEligibility.EligibleVersions.Count == 0
+            ? "-"
+            : string.Join(", ", notchEligibility.EligibleVersions.Select(v => v.ToDisplayLabel()));
+        var notchRowSummary = notchEligibility.HasRows
+            ? $"Notch rows: {notchEligibility.EstimatedRowCount} ({eligibleVersionText})"
+            : $"Notch rows: 0 ({notchEligibility.Reason})";
+        return (notchEligibility, notchRowSummary);
     }
 
     public PadInspectorSnapshot? BuildRegularPadInspectorSnapshot(
