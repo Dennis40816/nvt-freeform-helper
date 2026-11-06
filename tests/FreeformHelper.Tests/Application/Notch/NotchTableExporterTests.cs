@@ -1411,7 +1411,7 @@ public sealed class NotchTableExporterTests
         }
     }
 
-    private static string RunProcess(string fileName, IEnumerable<string> arguments, string failureMessage)
+    internal static string RunProcess(string fileName, IEnumerable<string> arguments, string failureMessage)
     {
         using var process = new Process
         {
