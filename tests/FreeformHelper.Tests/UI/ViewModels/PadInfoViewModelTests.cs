@@ -149,12 +149,14 @@ public sealed class PadInfoViewModelTests
         Assert.Equal(274, Assert.Single(anchoredCadIds));
         Assert.True(vm.IsDxfIndexAnchor);
         Assert.True(vm.CanClearDxfIndexAnchor);
+        Assert.Equal("112", vm.DxfIndexText);
 
         vm.ClearDxfIndexAnchorCommand.Execute(null);
 
         Assert.Equal(274, Assert.Single(clearedCadIds));
         Assert.False(vm.IsDxfIndexAnchor);
         Assert.False(vm.CanClearDxfIndexAnchor);
+        Assert.Equal("112", vm.DxfIndexText);
     }
 
     [Fact]

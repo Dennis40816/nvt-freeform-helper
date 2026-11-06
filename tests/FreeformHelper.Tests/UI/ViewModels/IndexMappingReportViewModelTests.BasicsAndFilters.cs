@@ -45,7 +45,22 @@ public sealed partial class IndexMappingReportViewModelTests
         }
         else
         {
-            Assert.All(visibleRows, row => Assert.Equal(mode, row.FilterMode));
+            int?[] expectedCadIds = mode switch
+            {
+                IndexMappingDecisionFilterMode.ChangedByMask => [306],
+                IndexMappingDecisionFilterMode.RemovedByMask => [307],
+                IndexMappingDecisionFilterMode.Ambiguous => [302],
+                IndexMappingDecisionFilterMode.DuplicateDiff => [303],
+                IndexMappingDecisionFilterMode.LowConfidence => [301],
+                IndexMappingDecisionFilterMode.Unmapped => [null, 304],
+                IndexMappingDecisionFilterMode.CountMismatch => [],
+                _ => throw new ArgumentOutOfRangeException(nameof(mode)),
+            };
+            Assert.Equal(expectedCadIds, vm.DecisionRows.Select(static row => row.CadPadId).Order());
+            if (mode == IndexMappingDecisionFilterMode.Unmapped)
+            {
+                Assert.Equal(305, Assert.Single(vm.DecisionRows, static row => row.CadPadId is null).LocateRegularPadIndex);
+            }
 
             vm.SetDecisionFilterModeCommand.Execute(mode);
 

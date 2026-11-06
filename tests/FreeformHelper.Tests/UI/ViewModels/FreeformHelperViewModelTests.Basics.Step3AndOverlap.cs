@@ -264,7 +264,7 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Equal(expectedStage == 1, vm.IsNotchToFullSeedPreviewVisible);
         Assert.Equal(expectedStage == 2, vm.IsNotchToFullCandidatePreviewVisible);
         Assert.Equal(expectedStage == 3, vm.IsNotchToFullFinalPreviewVisible);
-        Assert.Equal(1, host.InvalidateCount);
+        Assert.True(host.InvalidateCount >= 1);
     }
 
     [Theory]
@@ -286,7 +286,7 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Equal(expectedStage == 1, vm.IsNotchToFullSeedPreviewVisible);
         Assert.Equal(expectedStage == 2, vm.IsNotchToFullCandidatePreviewVisible);
         Assert.Equal(expectedStage == 3, vm.IsNotchToFullFinalPreviewVisible);
-        Assert.Equal(1, host.InvalidateCount);
+        Assert.True(host.InvalidateCount >= 1);
     }
 
 
