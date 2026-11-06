@@ -241,112 +241,137 @@ public sealed partial class FreeformHelperViewModel
         {
             using var sourceChangeBatch = BeginSimulationWorkspaceSourceChangeBatch();
             var applyStateSw = Stopwatch.StartNew();
-            _cadPadCustomValues.Clear();
-            foreach (var kv in file.CadPadCustomValues)
-            {
-                _cadPadCustomValues[kv.Key] = kv.Value;
-            }
-
-            LoadSettingsToUi(file.Settings);
-            ApplyViewSnapshot(file.UiSnapshot.View);
-            ApplyImportSnapshot(file.UiSnapshot.Import, file);
-            TryApplyAppGeneralVisualPreferencesAfterProjectLoad();
-            ClearStep5ResultCore();
-            status.ReportSuccess($"Project loaded: {path}");
-            _logger.Info(CultureInfo.InvariantCulture, "Project loaded: {0}", path);
-            HasUnsavedChanges = false;
-            MarkProjectLoadedForAppGeneralPersistence();
+            ApplyLoadedProjectSettings(file, path, status);
             applyStateSw.Stop();
 
-            var dxfElapsedMs = 0L;
-            var rebuildElapsedMs = 0L;
-            var replayTiming = ProjectLoadReplayTiming.Empty;
-            DxfCombinedGroupReplayResult? combinedGroupReplay = null;
+            var cadReload = await ReloadCadAfterProjectLoadAsync(file, path, status);
 
-            using (_settingsSuppression.EnterSettingsLoading())
-            {
-                _cad = null;
-                ResetDxfEditBaseline(null);
-                _cachedFilteredCadForBuild = null;
-                ClearDxfLayerCatalog();
-                CadPads = new ObservableCollection<CadPad>();
-                DetachAndClearLayerToggles();
-
-                await RunWithCadLoadCanvasOverlayAsync(async () =>
-                {
-                    var dxfOptions = BuildDxfOptions();
-                    var dxfLoadSw = Stopwatch.StartNew();
-                    var outcome = await Task.Run(() => _cadLoadUseCase.TryLoadFromProject(file.LastDxfPath, file.EmbeddedDxf, dxfOptions));
-                    dxfLoadSw.Stop();
-                    dxfElapsedMs = dxfLoadSw.ElapsedMilliseconds;
-                    if (outcome is not null)
-                    {
-                        var persistedDxfEditState = CapturePersistedDxfEditProjectState(file);
-                        if (outcome.Source == CadLoadSource.Path && !string.IsNullOrWhiteSpace(outcome.SourcePath))
-                        {
-                            await TryLoadDxfLayerCatalogFromPathAsync(outcome.SourcePath);
-                        }
-                        else
-                        {
-                            await TryLoadDxfLayerCatalogFromEmbeddedAsync(file.EmbeddedDxf);
-                        }
-
-                        await ApplyCadLoadOutcomeAsync(outcome, file.UiSnapshot.View);
-                        ApplyImportSnapshot(file.UiSnapshot.Import, file);
-                        combinedGroupReplay = ApplyCapturedDxfEditProjectState(persistedDxfEditState, outcome.FallbackWarning);
-                        status.ReportProgress(BuildCadLoadStatus(outcome, CadLoadContext.LoadProject, path));
-                        LogCadLoadOutcome(outcome, CadLoadContext.LoadProject);
-                    }
-                    else
-                    {
-                        combinedGroupReplay = KeepCombinedGroupsWithoutCad(CapturePersistedDxfEditProjectState(file).CombinedCadGroups);
-                    }
-
-                    var rebuildSw = Stopwatch.StartNew();
-                    await TriggerGridRebuildAsync(requestFit: true);
-                    rebuildSw.Stop();
-                    rebuildElapsedMs = rebuildSw.ElapsedMilliseconds;
-
-                    replayTiming = await ReplayWorkflowStepsAfterProjectLoadAsync();
-                });
-            }
-
-            combinedGroupReplay?.ReportWarnings(status.ReportWarning, message => _logger.Warn(CultureInfo.InvariantCulture, "{0}", message));
+            cadReload.CombinedGroupReplay?.ReportWarnings(status.ReportWarning, message => _logger.Warn(CultureInfo.InvariantCulture, "{0}", message));
             totalSw.Stop();
-            _logger.Info(CultureInfo.InvariantCulture, "Load project timing: total={0} ms, persistence={1} ms, apply-state={2} ms, dxf={3} ms, rebuild={4} ms.",
-                totalSw.ElapsedMilliseconds,
-                persistenceElapsedMs,
-                applyStateSw.ElapsedMilliseconds,
-                dxfElapsedMs,
-                rebuildElapsedMs);
-            _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step1-auto-replay={0} ms (replayed={1}).", replayTiming.Step1ReplayElapsedMs, replayTiming.Step1Replayed);
-            _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step2-auto-replay={0} ms (replayed={1}).", replayTiming.Step2ReplayElapsedMs, replayTiming.Step2Replayed);
-            _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT SUMMARY: total={0}ms persistence={1}ms applyState={2}ms dxf={3}ms rebuild={4}ms step1={5}ms step2={6}ms step1Replayed={7} step2Replayed={8} path={9}",
-                totalSw.ElapsedMilliseconds,
-                persistenceElapsedMs,
-                applyStateSw.ElapsedMilliseconds,
-                dxfElapsedMs,
-                rebuildElapsedMs,
-                replayTiming.Step1ReplayElapsedMs,
-                replayTiming.Step2ReplayElapsedMs,
-                replayTiming.Step1Replayed ? "Y" : "N",
-                replayTiming.Step2Replayed ? "Y" : "N",
-                path);
+            LogProjectLoadTiming(path, persistenceElapsedMs, totalSw.ElapsedMilliseconds, applyStateSw.ElapsedMilliseconds, cadReload);
 
             return new ProjectLoadApplyTiming(
                 TotalElapsedMs: totalSw.ElapsedMilliseconds,
                 ApplyStateElapsedMs: applyStateSw.ElapsedMilliseconds,
-                DxfElapsedMs: dxfElapsedMs,
-                RebuildElapsedMs: rebuildElapsedMs,
-                Step1ReplayElapsedMs: replayTiming.Step1ReplayElapsedMs,
-                Step2ReplayElapsedMs: replayTiming.Step2ReplayElapsedMs,
-                Step1Replayed: replayTiming.Step1Replayed,
-                Step2Replayed: replayTiming.Step2Replayed);
+                DxfElapsedMs: cadReload.DxfElapsedMs,
+                RebuildElapsedMs: cadReload.RebuildElapsedMs,
+                Step1ReplayElapsedMs: cadReload.ReplayTiming.Step1ReplayElapsedMs,
+                Step2ReplayElapsedMs: cadReload.ReplayTiming.Step2ReplayElapsedMs,
+                Step1Replayed: cadReload.ReplayTiming.Step1Replayed,
+                Step2Replayed: cadReload.ReplayTiming.Step2Replayed);
         }
         finally
         {
             _appGeneralPersistence.SuppressPersistence = originalSuppressAppGeneralPersistence;
         }
+    }
+
+    private void ApplyLoadedProjectSettings(ProjectFile file, string path, UiOperationStatusReporter.Scope status)
+    {
+        _cadPadCustomValues.Clear();
+        foreach (var kv in file.CadPadCustomValues)
+        {
+            _cadPadCustomValues[kv.Key] = kv.Value;
+        }
+
+        LoadSettingsToUi(file.Settings);
+        ApplyViewSnapshot(file.UiSnapshot.View);
+        ApplyImportSnapshot(file.UiSnapshot.Import, file);
+        TryApplyAppGeneralVisualPreferencesAfterProjectLoad();
+        ClearStep5ResultCore();
+        status.ReportSuccess($"Project loaded: {path}");
+        _logger.Info(CultureInfo.InvariantCulture, "Project loaded: {0}", path);
+        HasUnsavedChanges = false;
+        MarkProjectLoadedForAppGeneralPersistence();
+    }
+
+    private async Task<ProjectLoadCadReload> ReloadCadAfterProjectLoadAsync(ProjectFile file, string path, UiOperationStatusReporter.Scope status)
+    {
+        var dxfElapsedMs = 0L;
+        var rebuildElapsedMs = 0L;
+        var replayTiming = ProjectLoadReplayTiming.Empty;
+        DxfCombinedGroupReplayResult? combinedGroupReplay = null;
+
+        using (_settingsSuppression.EnterSettingsLoading())
+        {
+            _cad = null;
+            ResetDxfEditBaseline(null);
+            _cachedFilteredCadForBuild = null;
+            ClearDxfLayerCatalog();
+            CadPads = new ObservableCollection<CadPad>();
+            DetachAndClearLayerToggles();
+
+            await RunWithCadLoadCanvasOverlayAsync(async () =>
+            {
+                (dxfElapsedMs, combinedGroupReplay) = await LoadProjectCadAsync(file, path, status);
+
+                var rebuildSw = Stopwatch.StartNew();
+                await TriggerGridRebuildAsync(requestFit: true);
+                rebuildSw.Stop();
+                rebuildElapsedMs = rebuildSw.ElapsedMilliseconds;
+
+                replayTiming = await ReplayWorkflowStepsAfterProjectLoadAsync();
+            });
+        }
+
+        return new ProjectLoadCadReload(dxfElapsedMs, rebuildElapsedMs, replayTiming, combinedGroupReplay);
+    }
+
+    private async Task<(long DxfElapsedMs, DxfCombinedGroupReplayResult? CombinedGroupReplay)> LoadProjectCadAsync(
+        ProjectFile file,
+        string path,
+        UiOperationStatusReporter.Scope status)
+    {
+        var dxfOptions = BuildDxfOptions();
+        var dxfLoadSw = Stopwatch.StartNew();
+        var outcome = await Task.Run(() => _cadLoadUseCase.TryLoadFromProject(file.LastDxfPath, file.EmbeddedDxf, dxfOptions));
+        dxfLoadSw.Stop();
+        var dxfElapsedMs = dxfLoadSw.ElapsedMilliseconds;
+        if (outcome is null)
+        {
+            return (dxfElapsedMs, KeepCombinedGroupsWithoutCad(CapturePersistedDxfEditProjectState(file).CombinedCadGroups));
+        }
+
+        var persistedDxfEditState = CapturePersistedDxfEditProjectState(file);
+        if (outcome.Source == CadLoadSource.Path && !string.IsNullOrWhiteSpace(outcome.SourcePath))
+        {
+            await TryLoadDxfLayerCatalogFromPathAsync(outcome.SourcePath);
+        }
+        else
+        {
+            await TryLoadDxfLayerCatalogFromEmbeddedAsync(file.EmbeddedDxf);
+        }
+
+        await ApplyCadLoadOutcomeAsync(outcome, file.UiSnapshot.View);
+        ApplyImportSnapshot(file.UiSnapshot.Import, file);
+        var combinedGroupReplay = ApplyCapturedDxfEditProjectState(persistedDxfEditState, outcome.FallbackWarning);
+        status.ReportProgress(BuildCadLoadStatus(outcome, CadLoadContext.LoadProject, path));
+        LogCadLoadOutcome(outcome, CadLoadContext.LoadProject);
+        return (dxfElapsedMs, combinedGroupReplay);
+    }
+
+    private static void LogProjectLoadTiming(string path, long persistenceElapsedMs, long totalElapsedMs, long applyStateElapsedMs, ProjectLoadCadReload cadReload)
+    {
+        var replayTiming = cadReload.ReplayTiming;
+        _logger.Info(CultureInfo.InvariantCulture, "Load project timing: total={0} ms, persistence={1} ms, apply-state={2} ms, dxf={3} ms, rebuild={4} ms.",
+            totalElapsedMs,
+            persistenceElapsedMs,
+            applyStateElapsedMs,
+            cadReload.DxfElapsedMs,
+            cadReload.RebuildElapsedMs);
+        _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step1-auto-replay={0} ms (replayed={1}).", replayTiming.Step1ReplayElapsedMs, replayTiming.Step1Replayed);
+        _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step2-auto-replay={0} ms (replayed={1}).", replayTiming.Step2ReplayElapsedMs, replayTiming.Step2Replayed);
+        _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT SUMMARY: total={0}ms persistence={1}ms applyState={2}ms dxf={3}ms rebuild={4}ms step1={5}ms step2={6}ms step1Replayed={7} step2Replayed={8} path={9}",
+            totalElapsedMs,
+            persistenceElapsedMs,
+            applyStateElapsedMs,
+            cadReload.DxfElapsedMs,
+            cadReload.RebuildElapsedMs,
+            replayTiming.Step1ReplayElapsedMs,
+            replayTiming.Step2ReplayElapsedMs,
+            replayTiming.Step1Replayed ? "Y" : "N",
+            replayTiming.Step2Replayed ? "Y" : "N",
+            path);
     }
 
     private void DetachAndClearLayerToggles()
@@ -487,6 +512,12 @@ internal sealed record ProjectLoadApplyTiming(
     long Step2ReplayElapsedMs,
     bool Step1Replayed,
     bool Step2Replayed);
+
+internal sealed record ProjectLoadCadReload(
+    long DxfElapsedMs,
+    long RebuildElapsedMs,
+    ProjectLoadReplayTiming ReplayTiming,
+    DxfCombinedGroupReplayResult? CombinedGroupReplay);
 
 internal sealed record ProjectLoadReplayTiming(
     long Step1ReplayElapsedMs,
