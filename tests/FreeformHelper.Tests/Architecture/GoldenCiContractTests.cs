@@ -56,7 +56,7 @@ public sealed class GoldenCiContractTests
     [Theory]
     [InlineData("core", 11)]
     [InlineData("ui", 0)]
-    [InlineData("viewmodel", 15)]
+    [InlineData("viewmodel", 16)]
     [InlineData("snapshots", 0)]
     public void BaselineShardContainsMeasuredExampleFloor(string shard, int expected)
     {
