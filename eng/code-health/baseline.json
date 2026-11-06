@@ -3175,16 +3175,6 @@
       "symbol": "M:System.Diagnostics.Process.Start(System.Diagnostics.ProcessStartInfo)"
     },
     {
-      "syntaxHash": "9406f2ccbe66dec38eefe82f24d8faec5c0f844d759e18a74df048fac08e2521",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.WaitForServerReadyAsync(int)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
       "syntaxHash": "4738efc4f7cd1129f3ea0f6c157e70dae6400c383f26abdd3a57844d544a0371",
       "member": "FreeformHelper.UI.Services.ProjectPersistenceUseCase.TryEmbedDxf(ProjectFile)",
       "owner": "NFH",
@@ -3233,66 +3223,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:System.Environment.TickCount64"
-    },
-    {
-      "syntaxHash": "64b86b3a412187e7b2a4501fa637cfdd0e156480528eab8de3ab45671561fe1c",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunDeferredCadInspectorSnapshotRefreshAsync(long,int,long,CancellationTokenSource,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
-      "syntaxHash": "0f386ebde7222958a2e0bde75f9f4db4cfb345c3b50659ce18e1b13721a83169",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunDeferredRegularInspectorSnapshotRefreshAsync(long,int,long,CancellationTokenSource,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
-      "syntaxHash": "e96e618f5f7d4a2eb2b283bdef302c1f5d3fd5b9be8ea42779984800a39a83b0",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunDeferredSelectionNotchPreviewRefreshAsync(long,CancellationTokenSource,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.NotchPreview.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
-      "syntaxHash": "26623b4bbbef822f6c97f3a51d9d68fbe211f60c674a18754d3ba2907a849a33",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RunNotchPreviewAutoPlayLoopAsync(CancellationTokenSource,CancellationToken)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
-      "syntaxHash": "4d14ac912418b225f0de9b528e6733316bb065b19a562da4f272df75a6b244e6",
-      "member": "FreeformHelper.UI.ViewModels.ShellViewModel.RunWorkspaceSourceChangeDrainAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/ShellViewModel.Workspaces.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "2a1c72c87e86de2704e42774a6e346d0814e2d3e72dcc66c4b8c15fff5941aa4",
-      "member": "FreeformHelper.UI.Views.DevView.HidePreviewSpinnerAsync(int)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/DevView.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.TimeSpan)"
     },
     {
       "syntaxHash": "c1e9022837d13e16dd478cd6afe3e49b3952c28f84d43d545481913f6e7ac465",
