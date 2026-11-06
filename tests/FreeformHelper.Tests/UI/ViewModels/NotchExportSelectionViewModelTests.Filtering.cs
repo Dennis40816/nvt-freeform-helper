@@ -8,7 +8,7 @@ namespace FreeformHelper.Tests;
 public sealed partial class NotchExportSelectionViewModelTests
 {
     private static readonly string[] _linkedStatusFilterKeys = ["Linked"];
-    private static readonly string[] _statusFilterAllKeys = ["Linked", "Warning", "No CAD", "Legacy"];
+    private static readonly string[] _statusFilterAllKeys = ["Linked", "No-op", "No CAD", "Legacy"];
     private static readonly string[] _linkedAndNoOpStatusKeys = ["Linked", "No-op"];
     private static readonly string[] _diff9FilterKeys = ["9"];
     private static readonly string[] _diffFilterAllKeys = ["8", "9", "10"];
@@ -40,6 +40,20 @@ public sealed partial class NotchExportSelectionViewModelTests
         Assert.Equal(2, vm.SelectedCount);
     }
 
+
+    [Fact]
+    public void RowDisplayMode_NoOpLabel_MatchesRowStatus()
+    {
+        var vm = new NotchExportSelectionViewModel(BuildTransferOnlyFilterTable());
+        var option = vm.RowDisplayModeOptions.Single(mode => mode.Value == NotchExportRowDisplayMode.WarningOnly);
+
+        vm.SelectedRowDisplayModeOption = option;
+
+        Assert.Equal("No-op", option.Display);
+        Assert.Equal("No-op", vm.SelectedRowDisplayModeText);
+        Assert.Equal(vm.SelectedRowDisplayModeText, Assert.Single(vm.Rows).StatusText);
+        Assert.True(vm.IsFilterWarningOnly);
+    }
 
     [Fact]
     public void RowDisplayMode_WarningOnly_ShowsNoOpRows()

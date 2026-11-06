@@ -192,44 +192,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool HasManualRangeError => !string.IsNullOrEmpty(_manualRangeError);
 
-    /// <summary>
-    /// Gets or sets the display text for pending column width, handling mixed state.
-    /// </summary>
-    public string PendingColumnWidthDisplay
-    {
-        get => _manualSizingInput.PendingColumnWidthDisplay;
-        set
-        {
-            if (_manualSizingInput.PendingColumnWidthDisplay == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _manualSizingInput = _manualSizingInput with { PendingColumnWidthDisplay = value };
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the display text for pending row height, handling mixed state.
-    /// </summary>
-    public string PendingRowHeightDisplay
-    {
-        get => _manualSizingInput.PendingRowHeightDisplay;
-        set
-        {
-            if (_manualSizingInput.PendingRowHeightDisplay == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _manualSizingInput = _manualSizingInput with { PendingRowHeightDisplay = value };
-            OnPropertyChanged();
-        }
-    }
-
     // --- Derived Read-Only Properties ---
 
     /// <summary>

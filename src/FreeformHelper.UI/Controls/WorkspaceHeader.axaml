@@ -239,26 +239,6 @@
                        ToolTip.Tip="Column range. Accepts 5 / 5-7 / 5,7."/>
             </StackPanel>
 
-            <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
-              <SelectableTextBlock Text="Width (mm)"/>
-              <TextBox Classes="workspaceHeaderInput"
-                       Width="{StaticResource ManualSizingInputWidth}"
-                       IsReadOnly="True"
-                       Focusable="False"
-                       Text="{Binding PendingColumnWidthDisplay}"
-                       ToolTip.Tip="Target pad width for the manual range (mm)."/>
-            </StackPanel>
-
-            <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
-              <SelectableTextBlock Text="Height (mm)"/>
-              <TextBox Classes="workspaceHeaderInput"
-                       Width="{StaticResource ManualSizingInputWidth}"
-                       IsReadOnly="True"
-                       Focusable="False"
-                       Text="{Binding PendingRowHeightDisplay}"
-                       ToolTip.Tip="Target pad height for the manual range (mm)."/>
-            </StackPanel>
-
           </StackPanel>
 
           <Grid Grid.Column="1"
