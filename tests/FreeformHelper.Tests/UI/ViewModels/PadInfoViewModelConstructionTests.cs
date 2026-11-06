@@ -21,6 +21,7 @@ public sealed class PadInfoViewModelConstructionTests
     [Fact]
     public void CadPadInfo_MultiSelection_ShowsMixedAndRangeTexts()
     {
+        using var culture = TestCulture.UseEnUs();
         var pads = new List<CadPad>
         {
             TestGeometryFactory.CreateCadPad(10, "L1", 0, 0, 10, 5, "A"),
@@ -44,6 +45,7 @@ public sealed class PadInfoViewModelConstructionTests
     [Fact]
     public void CadPadInfo_SingleWithInspectorSnapshot_UsesSnapshotTexts()
     {
+        using var culture = TestCulture.UseEnUs();
         var pad = TestGeometryFactory.CreateCadPad(20, "L3", 0, 0, 10, 8, "C");
         var vm = CreateCadViewModel(pad, snapshot: CreateCadSnapshot(pad));
 
@@ -53,6 +55,7 @@ public sealed class PadInfoViewModelConstructionTests
     [Fact]
     public void CadPadInfo_SingleFromCallbacks_UsesMatchLinksAndCompensationPreview()
     {
+        using var culture = TestCulture.UseEnUs();
         var pad = TestGeometryFactory.CreateCadPad(21, "L3", 0, 0, 10, 8, "C");
         var vm = CreateCadViewModel(pad, snapshot: null);
 
@@ -62,6 +65,7 @@ public sealed class PadInfoViewModelConstructionTests
     [Fact]
     public void RegularPadInfo_MultiSelection_ShowsMixedAndRangeTexts()
     {
+        using var culture = TestCulture.UseEnUs();
         var pads = new List<RegularPad>
         {
             CreateRegular(0, 0, 100, 0, 0, 10, 8, diffIndex: 3, icIndex: 0),
@@ -88,6 +92,7 @@ public sealed class PadInfoViewModelConstructionTests
     [Fact]
     public void RegularPadInfo_SingleWithInspectorSnapshot_UsesSnapshotTexts()
     {
+        using var culture = TestCulture.UseEnUs();
         var pad = CreateRegular(1, 3, 102, 0, 0, 10, 8, diffIndex: 55, icIndex: 1);
         var vm = CreateRegularViewModel(pad, snapshot: CreateRegularSnapshot(pad));
 
@@ -97,6 +102,7 @@ public sealed class PadInfoViewModelConstructionTests
     [Fact]
     public void RegularPadInfo_SingleFromCallbacks_UsesMatchLinksOwnersAndNotchRows()
     {
+        using var culture = TestCulture.UseEnUs();
         var pad = CreateRegular(1, 3, 102, 0, 0, 10, 8, diffIndex: 55, icIndex: 1);
         var vm = CreateRegularViewModel(pad, snapshot: null);
 
