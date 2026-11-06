@@ -2559,16 +2559,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "1476694a6178e12605cdae7728066623ea6d7a144c277b5a6cdf315db63e521e",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.fields:ShowRetryDelay",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "5ffda8a7741863f733e79671929a04947a6989e9518ded807e574571d3d2864b",
       "member": "FreeformHelper.UI.Services.StartupPerfTracker.fields:EmitAsInfo",
       "owner": "NFH",
@@ -3510,16 +3500,6 @@
     },
     {
       "syntaxHash": "54e1afa2dd2e0c47181fdf1b0a572b5e2b8f4e2bedb3cbd50c4bd5d6d2f002dd",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SyncRequestedVisibilityStateAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.TimeSpan)"
-    },
-    {
-      "syntaxHash": "8a8be07221b685384613fc7c418221571070bba6dbba1f9983ed32e37748f722",
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SyncRequestedVisibilityStateAsync()",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
