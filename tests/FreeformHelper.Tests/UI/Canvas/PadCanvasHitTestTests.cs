@@ -56,9 +56,7 @@ public sealed class PadCanvasHitTestTests
             RegularPads = pads,
         };
 
-        var ensureMethod = typeof(PadCanvas).GetMethod("EnsureRegularSpatialIndex", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(ensureMethod);
-        ensureMethod!.Invoke(canvas, null);
+        PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
 
         var field = typeof(PadCanvas).GetField("_regularIndex", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(field);
@@ -160,16 +158,14 @@ public sealed class PadCanvasHitTestTests
             RegularPads = separablePads,
         };
 
-        var ensureMethod = typeof(PadCanvas).GetMethod("EnsureRegularSpatialIndex", BindingFlags.Instance | BindingFlags.NonPublic);
         var field = typeof(PadCanvas).GetField("_regularIndex", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(ensureMethod);
         Assert.NotNull(field);
 
-        ensureMethod!.Invoke(canvas, null);
+        PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
         Assert.NotNull(field!.GetValue(canvas));
 
         canvas.RegularPads = nonSeparablePads;
-        ensureMethod.Invoke(canvas, null);
+        PadCanvasPrivateAccess.EnsureRegularSpatialIndex(canvas);
         Assert.Null(field.GetValue(canvas));
     }
 

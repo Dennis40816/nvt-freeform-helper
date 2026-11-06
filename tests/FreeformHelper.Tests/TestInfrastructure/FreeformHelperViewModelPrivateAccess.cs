@@ -5,6 +5,7 @@ using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Lifecycle;
+using Nvt.Core.Progress;
 
 namespace FreeformHelper.Tests.TestInfrastructure;
 
@@ -34,6 +35,9 @@ internal static class FreeformHelperViewModelPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_undoService")]
     public static extern ref UndoService UndoService(FreeformHelperViewModel viewModel);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cadLoadOverlayScope")]
+    public static extern ref LoadingScopeCoordinator CadLoadOverlayScope(FreeformHelperViewModel viewModel);
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ClearMappingOverrideFromReport")]
     public static extern bool ClearMappingOverrideFromReport(FreeformHelperViewModel viewModel, int cadId);

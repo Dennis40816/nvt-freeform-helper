@@ -8,6 +8,9 @@ namespace FreeformHelper.Tests.TestInfrastructure;
 /// <summary>Typed access to the private window slots and handlers of <see cref="FreeformHelperView"/>.</summary>
 internal static class FreeformHelperViewPrivateAccess
 {
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_settingsWindow")]
+    public static extern ref SettingsWindow? SettingsWindow(FreeformHelperView view);
+
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_notchExportSelectionWindow")]
     public static extern ref NotchExportSelectionWindow? NotchExportSelectionWindow(FreeformHelperView view);
 
@@ -16,6 +19,9 @@ internal static class FreeformHelperViewPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_indexMappingReportWindow")]
     public static extern ref IndexMappingReportWindow? IndexMappingReportWindow(FreeformHelperView view);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "OpenSettingsWindowCore")]
+    public static extern void OpenSettingsWindowCore(FreeformHelperView view, SettingsWindowSection? section, string source);
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "SaveProjectFromShortcutAsync")]
     public static extern Task SaveProjectFromShortcutAsync(FreeformHelperView view, FreeformHelperViewModel viewModel);

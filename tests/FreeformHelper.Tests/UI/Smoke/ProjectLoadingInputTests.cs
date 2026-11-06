@@ -1,4 +1,3 @@
-using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -88,13 +87,11 @@ public sealed class ProjectLoadingInputTests
         var vm = new FreeformHelperViewModel();
         var commandStates = new List<bool>();
         vm.OpenDxfCommand.CanExecuteChanged += (_, _) => commandStates.Add(vm.OpenDxfCommand.CanExecute(null));
-        var scopeField = typeof(FreeformHelperViewModel).GetField("_cadLoadOverlayScope", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(scopeField);
-        scopeField.SetValue(vm, new LoadingScopeCoordinator(() =>
+        FreeformHelperViewModelPrivateAccess.CadLoadOverlayScope(vm) = new LoadingScopeCoordinator(() =>
         {
             entered.TrySetResult();
             return release.Task;
-        }, TimeSpan.Zero));
+        }, TimeSpan.Zero);
         var view = new FreeformHelperView { DataContext = vm };
         var window = new Window { Width = 1200, Height = 800, Content = view };
         Task? load = null;
@@ -106,12 +103,8 @@ public sealed class ProjectLoadingInputTests
             var editor = view.GetVisualDescendants().OfType<CheckBox>()
                 .Single(c => Equals(c.Content, "Only closed polylines"));
             Assert.True(editor.Focus());
-            var openSettings = typeof(FreeformHelperView).GetMethod("OpenSettingsWindowCore", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(openSettings);
-            openSettings.Invoke(view, [null, "test"]);
-            var settingsField = typeof(FreeformHelperView).GetField("_settingsWindow", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(settingsField);
-            var settingsWindow = Assert.IsType<SettingsWindow>(settingsField.GetValue(view));
+            FreeformHelperViewPrivateAccess.OpenSettingsWindowCore(view, null, "test");
+            var settingsWindow = Assert.IsType<SettingsWindow>(FreeformHelperViewPrivateAccess.SettingsWindow(view));
             vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(path);
             vm.PickSaveProjectPathAsync = () =>
             {
@@ -140,9 +133,7 @@ public sealed class ProjectLoadingInputTests
             window.KeyPress(Key.S, RawInputModifiers.Control, PhysicalKey.S, "s");
             window.KeyRelease(Key.S, RawInputModifiers.Control, PhysicalKey.S, "s");
             var canvas = view.GetVisualDescendants().OfType<FreeformHelper.UI.Controls.PadCanvas>().Single();
-            var selectionField = typeof(FreeformHelper.UI.Controls.PadCanvas).GetField("_selectedCadIds", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(selectionField);
-            var selected = Assert.IsType<HashSet<int>>(selectionField.GetValue(canvas));
+            var selected = Assert.IsType<HashSet<int>>(PadCanvasPrivateAccess.SelectedCadIds(canvas));
             selected.Add(17);
             window.KeyPress(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
             window.KeyRelease(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");

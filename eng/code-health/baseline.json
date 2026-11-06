@@ -1824,7 +1824,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 109
+        "methodLines": 101
       },
       "owner": "NFH",
       "locations": [
@@ -3739,28 +3739,8 @@
       "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
-      "syntaxHash": "8c4ad47802eb0b6ac6bce49d9411fb416b271d4e53bdd76a88ded5eee6dbecda",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.EnsureRegularSpatialIndex_DisablesIndex_ForNonSeparableGrid()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
       "syntaxHash": "b67b6df20a35c589eb906057d813bfc2526f6ffa06ad15f1393409e82f435a97",
       "member": "FreeformHelper.Tests.PadCanvasHitTestTests.EnsureRegularSpatialIndex_DisablesIndex_ForNonSeparableGrid()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "8c4ad47802eb0b6ac6bce49d9411fb416b271d4e53bdd76a88ded5eee6dbecda",
-      "member": "FreeformHelper.Tests.PadCanvasHitTestTests.EnsureRegularSpatialIndex_RebuildsAfterRegularPadsReplacement()",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Canvas/PadCanvasHitTestTests.cs",
       "project": "FreeformHelper.Tests",
@@ -3857,46 +3837,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "P:System.DateTime.UtcNow"
-    },
-    {
-      "syntaxHash": "560e9601ab503844c8233af27153c6f825aa803e12e51be267611f330f46a587",
-      "member": "FreeformHelper.Tests.ProjectLoadingInputTests.ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "6823a99029ab553326648d982878b576ddd556fc9c35be4954042fe9aef0058a",
-      "member": "FreeformHelper.Tests.ProjectLoadingInputTests.ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "8cc9eddeb8333389db5f454f04e5b4bd3e82657234a136fcfb206585f4eb8fe8",
-      "member": "FreeformHelper.Tests.ProjectLoadingInputTests.ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
-    },
-    {
-      "syntaxHash": "f06676fc2b5fbb622ea816646eed7907344ae0c40a04bb0661b4aefef0e3eb91",
-      "member": "FreeformHelper.Tests.ProjectLoadingInputTests.ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "1882e0659f93ba0f136afc77e8f129e617b5b25805074527ad69cc1609c47e49",
