@@ -126,17 +126,46 @@ public sealed class NotchV22ReachabilityBlockedCellCharacterizationTests
     }
 
     [Fact]
-    public void Compute_SameInputsTwice_ProducesIdenticalDebugCounts()
+    public void Compute_SameInputsTwice_ProducesIdenticalResults()
     {
         var target = CreateCadRect(0, 0, 4, 4, id: 1);
         var blocker = CreateCadRect(6, 6, 10, 10, id: 2);
 
-        var first = ComputeSingleRegular(target, blocker).Debug;
-        var second = ComputeSingleRegular(target, blocker).Debug;
+        var (first, firstDebug) = ComputeSingleRegular(target, blocker);
+        var (second, secondDebug) = ComputeSingleRegular(target, blocker);
+
+        // A record compares its list members by reference, so each list is compared by content below
+        // and the records are compared with those members emptied.
+        Assert.Equal(
+            first with
+            {
+                ToFullSeedPolygons = [],
+                ToFullCandidatePolygons = [],
+                ToFullPolygons = [],
+                RegularDebugInfos = []
+            },
+            second with
+            {
+                ToFullSeedPolygons = [],
+                ToFullCandidatePolygons = [],
+                ToFullPolygons = [],
+                RegularDebugInfos = []
+            });
+        Assert.Equal(Vertices(first.ToFullSeedPolygons), Vertices(second.ToFullSeedPolygons));
+        Assert.Equal(Vertices(first.ToFullCandidatePolygons), Vertices(second.ToFullCandidatePolygons));
+        Assert.Equal(Vertices(first.ToFullPolygons), Vertices(second.ToFullPolygons));
+        Assert.NotEmpty(first.ToFullPolygons);
 
         Assert.Equal(
-            (first.SourceCellCount, first.BlockedCellCount, first.ReachableCellCount, first.ReachableArea),
-            (second.SourceCellCount, second.BlockedCellCount, second.ReachableCellCount, second.ReachableArea));
+            firstDebug with { OwnerCadPadIds = [], ToFullRuleTrace = [] },
+            secondDebug with { OwnerCadPadIds = [], ToFullRuleTrace = [] });
+        Assert.Equal(firstDebug.OwnerCadPadIds, secondDebug.OwnerCadPadIds);
+        Assert.Equal(firstDebug.ToFullRuleTrace, secondDebug.ToFullRuleTrace);
+    }
+
+    private static Point2[][] Vertices(IReadOnlyList<Polygon2> polygons)
+    {
+        return [.. polygons.Select(static polygon => polygon.Vertices.ToArray())];
     }
 
     private static void AssertAppliedReachability(
