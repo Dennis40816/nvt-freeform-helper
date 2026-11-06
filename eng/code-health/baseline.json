@@ -1187,7 +1187,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 292
+        "axamlCodeBehindLines": 291
       },
       "owner": "NFH",
       "locations": [
@@ -2453,16 +2453,6 @@
       "symbol": "NoWarn:1591"
     },
     {
-      "syntaxHash": "7a49bbd0576270cd88a52a73b3fed068f067fa386555c36b1639eaa79612d1a8",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:IDE0052"
-    },
-    {
       "syntaxHash": "c7c0ce178aea3d14f1838e12bab4b081985ba7bb3ad6443f4abd4c3c3fd0f1fa",
       "member": "MSBuild",
       "owner": "NFH",
@@ -2623,16 +2613,6 @@
       "symbol": "Set MSBuild property 'GenerateDocumentationFile' to 'true' in project file to enable IDE0005 (Remove unnecessary usings/imports) on build"
     },
     {
-      "syntaxHash": "da685c4f4bb5c3a22cbb7fa42f6a16eeb83c601b1e110064c1aa9d33163ac5ff",
-      "member": "FreeformHelper.UI.Views.CadLoadSpinnerWindow.fields:_ipcLoopTask",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Views/CadLoadSpinnerWindow.axaml.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE0052",
-      "symbol": "IDE0052"
-    },
-    {
       "syntaxHash": "c4292658bb65fc182e3863d267cadcc211e49d12d47e4b683e896078eb9580fd",
       "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:Gate",
       "owner": "NFH",
@@ -2641,16 +2621,6 @@
       "count": 1,
       "rule": "IDE0330",
       "symbol": "IDE0330"
-    },
-    {
-      "syntaxHash": "6dc32fe06cb291502306ccb51e583b1494b2ca0942a01ac1a059a9bcf3b92cbd",
-      "member": "FreeformHelper.Tests.Architecture.ArchitectureBaseline.fields:JsonOptions",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Architecture/ArchitectureSource.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
     },
     {
       "syntaxHash": "eb05855ddbabfad52621d1ba5a75afbaad2faa96a126bf15f25e4734b3ff1b79",
@@ -2678,16 +2648,6 @@
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
       "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "9395de94b5e3c021273a3d6113923c62c02fd67a998ec7b28e12a21f71bccbe8",
-      "member": "FreeformHelper.UI.App.fields:Logger",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/App.axaml.cs",
-      "project": "FreeformHelper.UI",
       "count": 1,
       "rule": "IDE1006",
       "symbol": "IDE1006"
