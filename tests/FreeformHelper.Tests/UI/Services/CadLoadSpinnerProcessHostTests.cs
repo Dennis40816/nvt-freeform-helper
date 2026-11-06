@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.UI.Services;
+using Nvt.Core.TestSupport;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -92,13 +93,13 @@ public sealed class CadLoadSpinnerProcessHostTests
     public async Task Show_WhileHideSendIsInFlight_RestoresVisibleState()
     {
         var hideSendEntered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        using var releaseHideSend = new ManualResetEventSlim(false);
+        var releaseHideSend = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         using var host = new CadLoadSpinnerProcessHost(request =>
         {
             if (request.Command == CadLoadSpinnerIpcProtocol.HideCommand)
             {
                 hideSendEntered.TrySetResult();
-                releaseHideSend.Wait();
+                TaskBlock.UntilComplete(releaseHideSend.Task);
             }
 
             return true;
@@ -117,7 +118,7 @@ public sealed class CadLoadSpinnerProcessHostTests
         }
         finally
         {
-            releaseHideSend.Set();
+            releaseHideSend.TrySetResult();
         }
 
         await AwaitWithStateAsync(stateSync, "The state sync did not finish", host, stateSync);
