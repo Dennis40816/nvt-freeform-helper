@@ -7,6 +7,48 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class RuntimeQueryUseCaseTests
 {
+    [Theory]
+    [InlineData("true", true)]
+    [InlineData("false", false)]
+    public async Task ExecuteAsync_QuerySetToFull_UpdatesSettingAndReturnsWorkflowAndPreviewAsync(string value, bool enabled)
+    {
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var helper = shell.FreeformHelper;
+        helper.EnableToFull = !enabled;
+
+        var response = await ExecuteQueryAsync(shell, "set-tofull", ("enable", value));
+
+        Assert.True(response.Ok, $"{response.Error?.Code}:{response.Error?.Message}");
+        Assert.Null(response.Error);
+        Assert.Equal(enabled, helper.EnableToFull);
+        var root = SerializeToRootElement(response.Data);
+        Assert.Equal(enabled, root.GetProperty("enableToFull").GetBoolean());
+        Assert.Equal(helper.StatusText, root.GetProperty("statusText").GetString());
+        var workflow = root.GetProperty("workflow");
+        Assert.False(workflow.GetProperty("hasCad").GetBoolean());
+        Assert.False(workflow.GetProperty("hasGrid").GetBoolean());
+        Assert.False(workflow.GetProperty("hasStep3Result").GetBoolean());
+        var preview = root.GetProperty("notchPreview");
+        Assert.Equal(helper.ShowNotchCanvasPreview, preview.GetProperty("isVisible").GetBoolean());
+        Assert.Equal(helper.ShowNotchToRegularLabels, preview.GetProperty("showToRegularLabels").GetBoolean());
+        Assert.Equal(0, preview.GetProperty("previewItemCount").GetInt32());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_QuerySetToFull_WithoutEnable_ReturnsInvalidArgumentsAndKeepsSettingAsync()
+    {
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var before = shell.FreeformHelper.EnableToFull;
+
+        var response = await ExecuteQueryAsync(shell, "set-tofull");
+
+        Assert.False(response.Ok);
+        Assert.NotNull(response.Error);
+        Assert.Equal("INVALID_ARGUMENTS", response.Error.Code);
+        Assert.Contains("--enable", response.Error.Message, StringComparison.Ordinal);
+        Assert.Null(response.Data);
+        Assert.Equal(before, shell.FreeformHelper.EnableToFull);
+    }
 
 
     [Fact]
