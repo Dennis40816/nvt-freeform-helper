@@ -152,7 +152,6 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var changed = false;
         using (_settingsSuppression.EnterLayerToggleChange())
         {
             foreach (var toggle in LayerToggles)
@@ -165,20 +164,12 @@ public sealed partial class FreeformHelperViewModel
                     isSelected = true;
                 }
 
-                if (toggle.IsSelected == isSelected)
-                {
-                    continue;
-                }
-
                 toggle.IsSelected = isSelected;
-                changed = true;
             }
         }
 
-        if (changed)
-        {
-            FilterCadPadsByLayer();
-        }
+        // The moved pads keep their old layer in the visible pad list until it is filtered again, so filter on every move.
+        FilterCadPadsByLayer();
 
         NotifyCadLayerAggregateStateChanged();
     }
