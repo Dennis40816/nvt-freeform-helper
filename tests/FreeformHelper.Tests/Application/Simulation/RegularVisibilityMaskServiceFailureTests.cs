@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -60,7 +61,10 @@ public sealed class RegularVisibilityMaskServiceFailureTests
     [Fact]
     public void Load_WhenFileHoldsNoFrames_ReturnsFailed()
     {
-        var result = RegularVisibilityMaskService.Load(ExistingNonCsvPath, BuildRectGrid(2, 2));
+        var result = RegularVisibilityMaskService.LoadText(
+            ExistingNonCsvPath,
+            () => new StringReader(TestFiles.ReadContent(ExistingNonCsvPath)),
+            BuildRectGrid(2, 2));
 
         Assert.Equal(RegularVisibilityMaskStatus.Failed, result.Status);
         Assert.Equal(ExistingNonCsvPath, result.SourcePath);
@@ -107,6 +111,34 @@ public sealed class RegularVisibilityMaskServiceFailureTests
             DiffFrameGridRowOrigin.TopRowIsRegularLastRow));
 
         Assert.Same(outOfMemory, thrown);
+    }
+
+    [Fact]
+    public void LoadText_WhenFileIsEmpty_ReturnsFailed()
+    {
+        var path = TestFiles.WriteTempCsv(string.Empty);
+
+        var result = RegularVisibilityMaskService.LoadText(
+            path,
+            () => new StringReader(TestFiles.ReadContent(path)),
+            BuildRectGrid(2, 2));
+
+        Assert.Equal(RegularVisibilityMaskStatus.Failed, result.Status);
+        Assert.Equal(path, result.SourcePath);
+        Assert.Equal("CSV does not contain any frames.", result.Diagnostic);
+    }
+
+    [Fact]
+    public void LoadText_WhenReaderCannotOpen_ReturnsFailedWithItsMessage()
+    {
+        var result = RegularVisibilityMaskService.LoadText(
+            "mask.csv",
+            static () => throw new IOException("disk read failed"),
+            BuildRectGrid(2, 2));
+
+        Assert.Equal(RegularVisibilityMaskStatus.Failed, result.Status);
+        Assert.Equal("mask.csv", result.SourcePath);
+        Assert.Equal("disk read failed", result.Diagnostic);
     }
 
     private static RegularGrid BuildRectGrid(int rows, int cols)

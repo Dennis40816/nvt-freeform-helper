@@ -57,21 +57,22 @@ public static class RegularVisibilityMaskService
 {
     private const double NonZeroEpsilon = 1e-9;
 
-    public static RegularVisibilityMaskResult Load(
-        string? sourcePath,
+    public static RegularVisibilityMaskResult LoadText(
+        string sourceName,
+        Func<TextReader> openText,
         RegularGrid grid,
         DiffFrameGridRowOrigin rowOrigin = DiffFrameGridRowOrigin.TopRowIsRegularLastRow)
     {
         ArgumentNullException.ThrowIfNull(grid);
-
-        if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
-        {
-            return RegularVisibilityMaskResult.NotFound(sourcePath);
-        }
+        ArgumentNullException.ThrowIfNull(openText);
 
         return ReadAndProject(
-            () => DiffFrameCsvImporter.Import(sourcePath),
-            sourcePath,
+            () =>
+            {
+                using var reader = openText();
+                return DiffFrameCsvImporter.ImportContent(sourceName, reader.ReadToEnd());
+            },
+            sourceName,
             grid,
             rowOrigin);
     }

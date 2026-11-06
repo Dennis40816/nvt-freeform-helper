@@ -5,14 +5,6 @@ namespace FreeformHelper.Application.Services;
 
 public static class DiffFrameCsvImporter
 {
-    public static DiffFrameCsvSourceFile Import(string sourcePath, DiffFrameCsvImportOptions? options = null)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
-
-        var lines = File.ReadAllLines(sourcePath);
-        return ImportLines(sourcePath, lines, options);
-    }
-
     public static DiffFrameCsvSourceFile ImportContent(string sourceName, string content, DiffFrameCsvImportOptions? options = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceName);
@@ -33,7 +25,7 @@ public static class DiffFrameCsvImporter
 
     private static DiffFrameCsvSourceFile ImportLines(
         string sourcePath,
-        IReadOnlyList<string> lines,
+        List<string> lines,
         DiffFrameCsvImportOptions? options)
     {
         var resolvedOptions = options ?? new DiffFrameCsvImportOptions();

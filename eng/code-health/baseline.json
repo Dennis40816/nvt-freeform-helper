@@ -1995,16 +1995,6 @@
       "symbol": "NoWarn:1591"
     },
     {
-      "syntaxHash": "2c4f3956570bce7332a7ff7f06c63c2ecd8ff0eaf045063be96b34e851276a6d",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/FreeformHelper.Application.csproj",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:RS0030"
-    },
-    {
       "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
       "member": "MSBuild",
       "owner": "NFH",
@@ -2063,16 +2053,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "NoWarn:1591"
-    },
-    {
-      "syntaxHash": "2c4f3956570bce7332a7ff7f06c63c2ecd8ff0eaf045063be96b34e851276a6d",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Infrastructure/FreeformHelper.Infrastructure.csproj",
-      "project": "FreeformHelper.Infrastructure",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:RS0030"
     },
     {
       "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
@@ -2293,36 +2273,6 @@
       "count": 1,
       "rule": "IDE1006",
       "symbol": "IDE1006"
-    },
-    {
-      "syntaxHash": "681fe578629b5e13e052c72906ba4fd6ce0f78aff3d3f77029b6426a465933ec",
-      "member": "FreeformHelper.Application.Services.DiffFrameCsvImporter.Import(string,DiffFrameCsvImportOptions?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/DiffFrameCsvImporter.cs",
-      "project": "FreeformHelper.Application",
-      "count": 2,
-      "rule": "RS0030",
-      "symbol": "T:System.IO.File"
-    },
-    {
-      "syntaxHash": "83a133c0ec54364d927d61accb21d0a11d42dc058d836b09adad2038fe5c97e0",
-      "member": "FreeformHelper.Application.Services.RegularVisibilityMaskService.Load(string?,RegularGrid,DiffFrameGridRowOrigin)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "T:System.IO.File"
-    },
-    {
-      "syntaxHash": "e810aa521a4446e0b48c22b0773b52c7a930dee8979046bfe2d729bdcd8bed2a",
-      "member": "FreeformHelper.Infrastructure.Project.JsonProjectStore.Load(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Infrastructure/Project/JsonProjectStore.cs",
-      "project": "FreeformHelper.Infrastructure",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllText(System.String)"
     },
     {
       "syntaxHash": "f4cc5fea9d839bb5308b7a01fe4b08564584051e45f59bae6d0701996f22e85b",
@@ -2855,26 +2805,6 @@
       "symbol": "M:System.Diagnostics.Process.Start(System.Diagnostics.ProcessStartInfo)"
     },
     {
-      "syntaxHash": "4738efc4f7cd1129f3ea0f6c157e70dae6400c383f26abdd3a57844d544a0371",
-      "member": "FreeformHelper.UI.Services.ProjectPersistenceUseCase.TryEmbedDxf(ProjectFile)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ProjectPersistenceUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllBytes(System.String)"
-    },
-    {
-      "syntaxHash": "b381327e76a263c8d71ba62c447badded274095b1b98bdeff7c9eb767d724da5",
-      "member": "FreeformHelper.UI.Services.ProjectPersistenceUseCase.TryEmbedRegularVisibilityMask(ProjectFile)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/ProjectPersistenceUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.IO.File.ReadAllBytes(System.String)"
-    },
-    {
       "syntaxHash": "5ffda8a7741863f733e79671929a04947a6989e9518ded807e574571d3d2864b",
       "member": "FreeformHelper.UI.Services.StartupPerfTracker.fields:EmitAsInfo",
       "owner": "NFH",
@@ -2883,26 +2813,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "effbee04ff06c432b12491354f7800a212fc5110ee70048dde08b344091d93d0",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.CreateNotchGenerationProgressReporter(string)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.NotchExport.Helpers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.Environment.TickCount64"
-    },
-    {
-      "syntaxHash": "effbee04ff06c432b12491354f7800a212fc5110ee70048dde08b344091d93d0",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.CreateStep5GenerationProgressReporter(string,int,int,Action<string>?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.NotchExport.Helpers.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.Environment.TickCount64"
     },
     {
       "syntaxHash": "c1e9022837d13e16dd478cd6afe3e49b3952c28f84d43d545481913f6e7ac465",

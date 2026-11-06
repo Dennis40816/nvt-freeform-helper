@@ -156,8 +156,8 @@ public sealed partial class FreeformHelperViewModel
             var total = Math.Max(progress.TotalCount, 1);
             var processed = Math.Clamp(progress.ProcessedCount, 0, total);
             var isFinal = processed >= total;
-            var now = Environment.TickCount64;
-            if (!isFinal && now - lastTick < minUpdateIntervalMs)
+            var now = TimeProvider.System.GetTimestamp();
+            if (!isFinal && TimeProvider.System.GetElapsedTime(lastTick).TotalMilliseconds < minUpdateIntervalMs)
             {
                 return;
             }
@@ -207,8 +207,8 @@ public sealed partial class FreeformHelperViewModel
             var total = Math.Max(progress.TotalCount, 1);
             var processed = Math.Clamp(progress.ProcessedCount, 0, total);
             var isFinal = processed >= total;
-            var now = Environment.TickCount64;
-            if (!isFinal && now - lastTick < minUpdateIntervalMs)
+            var now = TimeProvider.System.GetTimestamp();
+            if (!isFinal && TimeProvider.System.GetElapsedTime(lastTick).TotalMilliseconds < minUpdateIntervalMs)
             {
                 return;
             }

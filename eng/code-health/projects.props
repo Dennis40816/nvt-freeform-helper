@@ -16,12 +16,6 @@
     <HealthLayer>tests</HealthLayer>
   </PropertyGroup>
   <!-- BEGIN GENERATED HEALTH WARNING IDS -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Application'">
-    <HealthBaselineWarningIds>RS0030</HealthBaselineWarningIds>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Infrastructure'">
-    <HealthBaselineWarningIds>RS0030</HealthBaselineWarningIds>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.Tests'">
     <HealthBaselineWarningIds>EnableGenerateDocumentationFile;IDE0330;IDE1006;RS0030;VSTHRD003;VSTHRD103</HealthBaselineWarningIds>
   </PropertyGroup>
