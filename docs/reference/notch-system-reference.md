@@ -695,9 +695,9 @@ The future state that best matches your description should therefore be:
   - Geometric semantics and Q7 contract of the v2.1 legacy 9-field row
 - [Notch V22 Algorithm Details](../core/notch-v22-algorithm.md)
   - Algorithm breakdown of the v2.2 mainline and legacy compatibility branch
-- [Current v2.1 C export example](../../example/BOE36.35/notch_export_v21_current.c)
+- Current v2.1 C export example: `example/BOE36.35/notch_export_v21_current.c` (private `example/` submodule)
   - v2.1 `.c` example produced by the current exporter
-- [Current v2.2 C export example](../../example/BOE36.35/notch_export_v22_current.c)
+- Current v2.2 C export example: `example/BOE36.35/notch_export_v22_current.c` (private `example/` submodule)
   - v2.2 `.c` example produced by the current exporter
 
 ## 12. Maintenance Rules

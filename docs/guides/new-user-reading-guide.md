@@ -1,11 +1,11 @@
-# Beginner Chinese Reading Guide
+# Beginner Reading Guide
 
 Last updated: 2026-05-23
 
 This document answers two questions:
 
 1. Which documents to read first when taking over FreeformHelper for the first time.
-2. Which documents are primarily in Chinese or already have a Chinese version and can safely be included in the beginner reading path.
+2. Which language each beginner document is in.
 
 ## Shortest Path
 
@@ -17,11 +17,11 @@ If you are simply using the app or validating a panel for the first time, these 
 | 2 | `docs/guides/settings-parameter-guide.md` | People who need to tune parameters | What each Settings parameter does, how to adjust it, and how to use cascade per-IC X/Y. |
 | 3 | `docs/diagrams/notch-simulation/zh-TW/README.md` | People who need to understand the Notch / Simulation workflow | Notch table and Simulation are two separate lines of responsibility, and which diagram to open. |
 
-All three are primarily in Chinese; the third is the `zh-TW` version of the diagram library.
+The first two are in English. The third is the `zh-TW` (Chinese) version of the diagram library.
 
 ## Algorithm Mermaid Links
 
-The algorithm Mermaid diagrams are currently organized in Mermaid documents within the repo; beginners should start with the Chinese diagram library and do not need to read the English version first.
+The algorithm Mermaid diagrams live in Mermaid documents in the repo. Beginners should start with the Chinese diagram library. They do not need to read the English version first.
 
 | Purpose | Mermaid document | Description |
 | --- | --- | --- |
@@ -45,33 +45,33 @@ The algorithm Mermaid diagrams are currently organized in Mermaid documents with
 | Looking at Simulation for the first time | `docs/diagrams/notch-simulation/zh-TW/README.md` -> the Simulation section of `notch-system-reference.md` | Look at the diagrams first, then compare them with the canonical reference. |
 | Preparing to change code for the first time | `refactor-playbook.md` -> `workflow-pipeline.md` -> `behavior-inventory.md` | This path is for maintainers rather than an operating manual. |
 
-## Chinese Version Status
+## Language Status
 
-The beginner reading path should include only documents that are primarily in Chinese or already have a Chinese version. The following Chinese documents can currently be included in the beginner reading path:
+Owner decision of 2026-10-05: documents default to English. Existing Chinese documents are translated in low-priority batches. The diagram library keeps a `zh-TW` version.
 
-| Document | Chinese status | Purpose |
+| Document | Language | Purpose |
 | --- | --- | --- |
-| `docs/guides/new-user-reading-guide.md` | Primarily Chinese | Beginner entry point and reading paths. |
-| `docs/guides/app-user-manual.md` | Primarily Chinese | App user manual. |
-| `docs/guides/settings-parameter-guide.md` | Primarily Chinese | Settings parameter descriptions and tuning guidance. |
+| `docs/guides/new-user-reading-guide.md` | English | Beginner entry point and reading paths. |
+| `docs/guides/app-user-manual.md` | English | App user manual. |
+| `docs/guides/settings-parameter-guide.md` | English | Settings parameter descriptions and tuning guidance. |
 | `docs/diagrams/notch-simulation/zh-TW/README.md` | Chinese version | Notch / Simulation diagram library entry point. |
-| `docs/core/notch-overall-flow-mermaid.md` | Chinese explanations + Mermaid | Algorithm overview for maintainers. |
-| `docs/reference/notch-system-reference.md` | Primarily Chinese | Notch pipeline / Simulation / Export canonical reference. |
-| `docs/core/freeform-helper-algorithms.md` | Primarily Chinese | Step1~Step5 algorithm deep-dive. |
-| `docs/core/notch-v21-v22-flow.md` | Primarily Chinese | Step5 / v2.1 / v2.2 export flow deep-dive. |
-| `docs/core/workflow-pipeline.md` | Primarily Chinese | Step dependencies and invalidation rules. |
-| `docs/guides/settings-entry-matrix.md` | Primarily Chinese | Settings entry points and single source matrix. |
-| `docs/guides/refactor-playbook.md` | Primarily Chinese | Maintenance and refactoring workflow. |
-| `docs/reference/behavior-inventory.md` | Primarily Chinese | Inventory of current behavior and entry points for maintainer reference. |
+| `docs/core/notch-overall-flow-mermaid.md` | English + Mermaid | Algorithm overview for maintainers. |
+| `docs/reference/notch-system-reference.md` | English | Notch pipeline / Simulation / Export canonical reference. |
+| `docs/core/freeform-helper-algorithms.md` | English | Step1~Step5 algorithm deep-dive. |
+| `docs/core/notch-v21-v22-flow.md` | English | Step5 / v2.1 / v2.2 export flow deep-dive. |
+| `docs/core/workflow-pipeline.md` | English | Step dependencies and invalidation rules. |
+| `docs/guides/settings-entry-matrix.md` | English | Settings entry points and single source matrix. |
+| `docs/guides/refactor-playbook.md` | English | Maintenance and refactoring workflow. |
+| `docs/reference/behavior-inventory.md` | English | Inventory of current behavior and entry points for maintainer reference. |
 
-Before adding an English document to the "required reading for beginners" in the future, a Chinese version must first be provided or the document must be changed to be primarily in Chinese.
+A new beginner document is written in English, like every other document.
 
 ## Documents to Skip for Now
 
 The following documents are not beginner entry points unless you are investigating a specific historical or engineering issue:
 
 - `docs/archive/`: Historical records that do not represent the current mainline; old repo scan reports are collected in `docs/archive/repo-refactor-scans/`.
-- `docs/guides/repo-refactor-scan-2026-06-26.md`: The latest repo scan record, useful for tracking technical debt but unsuitable as an introduction.
+- `docs/guides/repo-refactor-scan-2026-07-06.md`: The latest repo scan record, useful for tracking technical debt but unsuitable as an introduction.
 - `docs/generated/`: Tool-generated and not maintained manually.
 - `docs/diagrams/notch-simulation/en/`: English diagram library; beginners should start with `zh-TW`.
 - `docs/guides/settings-overview-redesign-plan-*.md`, `post-1.0-*`: Design proposals or future plans, not operating procedures.
