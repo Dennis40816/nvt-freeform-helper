@@ -55,7 +55,7 @@ public sealed partial class PadCanvas
             _isSpacePanning,
             _isBoxSelecting,
             _transientLowDetailUntilTicks,
-            DateTime.UtcNow.Ticks);
+            TimeProvider.System.GetUtcNow().UtcTicks);
     }
 
     private void RequestViewRefresh(bool raiseViewChanged = true)
@@ -94,7 +94,7 @@ public sealed partial class PadCanvas
             return;
         }
 
-        _transientLowDetailUntilTicks = DateTime.UtcNow.AddMilliseconds(durationMs).Ticks;
+        _transientLowDetailUntilTicks = TimeProvider.System.GetUtcNow().AddMilliseconds(durationMs).UtcTicks;
         _transientLowDetailTimer ??= CreateTransientLowDetailTimer();
 
         _transientLowDetailTimer.Stop();
@@ -107,7 +107,7 @@ public sealed partial class PadCanvas
         var timer = new DispatcherTimer(DispatcherPriority.Render);
         timer.Tick += (_, _) =>
         {
-            var remainingTicks = _transientLowDetailUntilTicks - DateTime.UtcNow.Ticks;
+            var remainingTicks = _transientLowDetailUntilTicks - TimeProvider.System.GetUtcNow().UtcTicks;
             if (remainingTicks > 0)
             {
                 timer.Interval = TimeSpan.FromTicks(Math.Max(remainingTicks, TimeSpan.FromMilliseconds(16).Ticks));

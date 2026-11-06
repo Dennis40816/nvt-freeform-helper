@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace FreeformHelper.UI.Controls;
 
 public sealed partial class PadCanvas
@@ -115,7 +113,7 @@ public sealed partial class PadCanvas
 
     private static long ElapsedMilliseconds(long startTimestamp)
     {
-        return (long)Math.Round(Stopwatch.GetElapsedTime(startTimestamp).TotalMilliseconds);
+        return (long)Math.Round(TimeProvider.System.GetElapsedTime(startTimestamp).TotalMilliseconds);
     }
 }
 

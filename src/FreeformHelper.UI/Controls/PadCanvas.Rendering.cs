@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Avalonia;
 using Avalonia.Media;
 using FreeformHelper.Domain.Geometry;
@@ -26,11 +25,11 @@ public sealed partial class PadCanvas
     /// <param name="context">The <see cref="DrawingContext"/> used for rendering.</param>
     public override void Render(DrawingContext context)
     {
-        var renderStarted = Stopwatch.GetTimestamp();
+        var renderStarted = TimeProvider.System.GetTimestamp();
         base.Render(context); // Call base implementation for default rendering behavior.
 
         // Fill the background of the canvas using the themed brush.
-        var backgroundStarted = Stopwatch.GetTimestamp();
+        var backgroundStarted = TimeProvider.System.GetTimestamp();
         var background = GetResourceBrush("BrushCanvasBackground", Brushes.Transparent);
         context.FillRectangle(background, new Rect(Bounds.Size));
         var backgroundElapsedMs = ElapsedMilliseconds(backgroundStarted);
@@ -189,14 +188,14 @@ public sealed partial class PadCanvas
                 cadPenOverlap = new Pen(GetBrush(Color.FromArgb(selectedStrokeAlpha, cadOverlapColor.R, cadOverlapColor.G, cadOverlapColor.B)), overlapWidth);
             }
 
-            var visibleBuildStarted = Stopwatch.GetTimestamp();
+            var visibleBuildStarted = TimeProvider.System.GetTimestamp();
             BuildVisibleDrawLists(worldViewport, showRegular, showCad, lowDetailMode, lowDetailZoomThreshold);
             visibleBuildElapsedMs = ElapsedMilliseconds(visibleBuildStarted);
 
             // --- Rendering Order ---
             // 1) Unselected pads (regular -> CAD), 2) selected pads (regular -> CAD).
             // This keeps selected outlines above all unselected geometry.
-            var geometryStarted = Stopwatch.GetTimestamp();
+            var geometryStarted = TimeProvider.System.GetTimestamp();
 
             // 1. Draw Regular Pads (unselected)
             if (showRegular)
@@ -237,7 +236,7 @@ public sealed partial class PadCanvas
 
             if (!_isBoxSelecting && !secondaryVisualsDeferred)
             {
-                var overlayStarted = Stopwatch.GetTimestamp();
+                var overlayStarted = TimeProvider.System.GetTimestamp();
                 DrawDiffIndexOverlay(context, showCad, lowDetailMode, cadOpacity);
                 if (ShowNotchToFullSeedOverlay)
                 {
@@ -255,7 +254,7 @@ public sealed partial class PadCanvas
         var occupiedRatioLabelRects = new List<Rect>();
         if (!_isBoxSelecting && !secondaryVisualsDeferred && !ShouldSimplifyAggregateNotchPreviewVisuals())
         {
-            var labelStarted = Stopwatch.GetTimestamp();
+            var labelStarted = TimeProvider.System.GetTimestamp();
             // Priority: Match labels stay first; notch ratio labels are placed around them.
             DrawMatchAllocationLabels(context, occupiedRatioLabelRects);
             DrawNotchToRegularLabels(context, occupiedRatioLabelRects);
@@ -264,11 +263,11 @@ public sealed partial class PadCanvas
         }
         else if (!_isBoxSelecting && !secondaryVisualsDeferred)
         {
-            var simulationLabelStarted = Stopwatch.GetTimestamp();
+            var simulationLabelStarted = TimeProvider.System.GetTimestamp();
             DrawSimulationRegularLabels(context);
             labelElapsedMs += ElapsedMilliseconds(simulationLabelStarted);
         }
-        var overlayAfterTransformStarted = Stopwatch.GetTimestamp();
+        var overlayAfterTransformStarted = TimeProvider.System.GetTimestamp();
         DrawSimulationCopperPillar(context);
         DrawSelectionOverlay(context); // Draw any additional selection indicators (e.g., selection rectangle).
 
@@ -304,7 +303,7 @@ public sealed partial class PadCanvas
         overlayElapsedMs += ElapsedMilliseconds(overlayAfterTransformStarted);
 
         var tailVisualPolicy = ResolveTailVisualPolicy(secondaryVisualsDeferred, ShowAxisLabels);
-        var labelTailStarted = Stopwatch.GetTimestamp();
+        var labelTailStarted = TimeProvider.System.GetTimestamp();
         if (tailVisualPolicy.DrawAxisLabels)
         {
             DrawAxisLabels(context); // Keep IC / row / column labels visible during navigation.

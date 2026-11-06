@@ -7,7 +7,7 @@
     "suppressUndoAssignments": 0,
     "fileWriteAllText": 4,
     "processStart": 1,
-    "directClockReads": 15,
+    "directClockReads": 9,
     "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 4,
@@ -35,9 +35,6 @@
     ],
     "directClockReads": [
       "src/FreeformHelper.Infrastructure/Project/ProjectFile.cs:24",
-      "src/FreeformHelper.UI/Controls/PadCanvas.Input.PointerMove.cs:27", "src/FreeformHelper.UI/Controls/PadCanvas.Input.PointerMove.cs:55",
-      "src/FreeformHelper.UI/Controls/PadCanvas.RenderFrame.cs:18",
-      "src/FreeformHelper.UI/Controls/PadCanvas.ViewRefresh.cs:58", "src/FreeformHelper.UI/Controls/PadCanvas.ViewRefresh.cs:97", "src/FreeformHelper.UI/Controls/PadCanvas.ViewRefresh.cs:110",
       "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:122", "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:200", "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs:213",
       "src/FreeformHelper.UI/Services/CadLoadSpinnerDebugState.cs:163",
       "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:314", "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:634",
