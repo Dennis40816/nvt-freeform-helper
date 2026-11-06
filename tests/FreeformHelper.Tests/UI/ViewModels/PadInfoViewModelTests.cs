@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
@@ -9,9 +10,192 @@ using Xunit;
 
 namespace FreeformHelper.Tests;
 
+[Collection("HeadlessUiSerial")]
 public sealed class PadInfoViewModelTests
 {
     private static readonly int[] _matchedRegularPadIds = [4808];
+
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public void RegularPadInfo_ApplyChangesCommand_AppliesOnlyChangedDimensions(bool editWidth, bool editHeight)
+    {
+        var appliedSizes = new List<(decimal? Width, decimal? Height)>();
+        var closeCount = 0;
+        var vm = CreateSinglePadViewModel(
+            applyPadSize: (rows, cols, width, height) =>
+            {
+                Assert.Equal(1, Assert.Single(rows));
+                Assert.Equal(2, Assert.Single(cols));
+                appliedSizes.Add((width, height));
+            },
+            closePadInfo: () => closeCount++);
+        if (editWidth)
+        {
+            vm.PadWidth = 12m;
+        }
+        if (editHeight)
+        {
+            vm.PadHeight = 9m;
+        }
+        Assert.True(vm.HasPendingChanges);
+
+        vm.ApplyChangesCommand.Execute(null);
+
+        var applied = Assert.Single(appliedSizes);
+        Assert.Equal(editWidth ? 12m : (decimal?)null, applied.Width);
+        Assert.Equal(editHeight ? 9m : (decimal?)null, applied.Height);
+        Assert.False(vm.HasPendingChanges);
+        Assert.Equal(1, closeCount);
+
+        vm.ApplyChangesCommand.Execute(null);
+
+        Assert.Single(appliedSizes);
+        Assert.False(vm.HasPendingChanges);
+    }
+
+    [Fact]
+    public void RegularPadInfo_DiscardChangesCommand_RestoresDimensionsWithoutApplying()
+    {
+        var applyCount = 0;
+        var vm = CreateSinglePadViewModel(applyPadSize: (_, _, _, _) => applyCount++);
+        var initialWidth = vm.PadWidth;
+        var initialHeight = vm.PadHeight;
+        vm.PadWidth = 12m;
+        vm.PadHeight = 9m;
+        Assert.True(vm.HasPendingChanges);
+
+        vm.DiscardChangesCommand.Execute(null);
+
+        Assert.Equal(initialWidth, vm.PadWidth);
+        Assert.Equal(initialHeight, vm.PadHeight);
+        Assert.False(vm.HasPendingChanges);
+        Assert.Equal(0, applyCount);
+
+        vm.ApplyChangesCommand.Execute(null);
+
+        Assert.Equal(0, applyCount);
+    }
+
+    [Fact]
+    public void RegularPadInfo_ResetPadSizeCommand_ResetsSelectedRowAndColumnAndCloses()
+    {
+        var resetCount = 0;
+        var closeCount = 0;
+        var vm = CreateSinglePadViewModel(
+            resetPadSize: (rows, cols) =>
+            {
+                Assert.Equal(1, Assert.Single(rows));
+                Assert.Equal(2, Assert.Single(cols));
+                resetCount++;
+            },
+            closePadInfo: () => closeCount++);
+
+        vm.ResetPadSizeCommand.Execute(null);
+
+        Assert.Equal(1, resetCount);
+        Assert.Equal(1, closeCount);
+    }
+
+    [Theory]
+    [InlineData(7.6, 8)]
+    [InlineData(2_000_000.0, 1_000_000)]
+    [InlineData(-3.2, 0)]
+    public void CadPadInfo_OutputFwDiffCommands_ApplyRoundedClampedOverrideAndClear(double input, int expected)
+    {
+        var appliedOverrides = new List<(int CadId, int DiffIndex)>();
+        var clearedCadIds = new List<int>();
+        var vm = CreateSingleCadPadViewModel(
+            setCadOutputFwDiffOverride: (id, diff) => appliedOverrides.Add((id, diff)),
+            clearCadOutputFwDiffOverride: clearedCadIds.Add);
+        vm.CadOutputFwDiffOverride = (decimal)input;
+
+        vm.ApplyCadOutputFwDiffOverrideCommand.Execute(null);
+
+        Assert.Equal((274, expected), Assert.Single(appliedOverrides));
+        Assert.Equal((decimal)expected, vm.CadOutputFwDiffOverride);
+        Assert.True(vm.HasCadOutputFwDiffOverride);
+        Assert.True(vm.CanClearCadOutputFwDiffOverride);
+
+        vm.ClearCadOutputFwDiffOverrideCommand.Execute(null);
+
+        Assert.Equal(274, Assert.Single(clearedCadIds));
+        Assert.False(vm.HasCadOutputFwDiffOverride);
+        Assert.False(vm.CanClearCadOutputFwDiffOverride);
+    }
+
+    [Fact]
+    public void CadPadInfo_DxfIndexAnchorCommands_SetAndClearSelectedCadAnchor()
+    {
+        var isAnchor = false;
+        var anchoredCadIds = new List<int>();
+        var clearedCadIds = new List<int>();
+        var vm = CreateSingleCadPadViewModel(
+            isDxfIndexAnchor: _ => isAnchor,
+            setDxfIndexAnchor: id =>
+            {
+                anchoredCadIds.Add(id);
+                isAnchor = true;
+            },
+            clearDxfIndexAnchor: id =>
+            {
+                clearedCadIds.Add(id);
+                isAnchor = false;
+            });
+
+        vm.SetDxfIndexAnchorCommand.Execute(null);
+
+        Assert.Equal(274, Assert.Single(anchoredCadIds));
+        Assert.True(vm.IsDxfIndexAnchor);
+        Assert.True(vm.CanClearDxfIndexAnchor);
+
+        vm.ClearDxfIndexAnchorCommand.Execute(null);
+
+        Assert.Equal(274, Assert.Single(clearedCadIds));
+        Assert.False(vm.IsDxfIndexAnchor);
+        Assert.False(vm.CanClearDxfIndexAnchor);
+    }
+
+    [Fact]
+    public void CadPadInfo_SelectAreaBucketCommand_SelectsMatchingPads()
+    {
+        var workspace = new FreeformHelperViewModel
+        {
+            ColorCadByArea = true,
+            AreaBucketTolerance = 0.001m,
+            CadPads = new ObservableCollection<CadPad>
+            {
+                TestGeometryFactory.CreateCadPad(274, "AA", 0, 0, 10, 8),
+                TestGeometryFactory.CreateCadPad(275, "AA", 20, 0, 30, 8),
+                TestGeometryFactory.CreateCadPad(276, "AA", 40, 0, 55, 8),
+            },
+        };
+        var vm = CreateSingleCadPadViewModel(selectAreaBucket: () => workspace.SelectCadAreaBucketFromPad(274));
+
+        Assert.NotNull(vm.SelectAreaBucketCommand);
+        vm.SelectAreaBucketCommand.Execute(null);
+
+        Assert.Equal([274, 275], workspace.SelectedCadPadIds.Order());
+    }
+
+    [Fact]
+    public void CadPadInfo_HighlightAllNotchOwnersCommand_HighlightsDistinctOwnersExceptSelf()
+    {
+        IReadOnlyCollection<int>? highlightedCadIds = null;
+        var vm = CreateSingleCadPadViewModel(
+            highlightCadOwnerPads: ids => highlightedCadIds = ids,
+            notchDiagnostics:
+                "IC3/diff112 reg4808: ov=10, src=10, blk=0, reach=10, blocker=0, owners=32|274|31, " +
+                "ownerShare=50/50, boundary=Y, candidate=Y, tofull=Y (EXPAND_CLEAR_PATH)\n" +
+                "IC3/diff113 reg4809: ov=10, src=10, blk=0, reach=10, blocker=0, owners=32, " +
+                "ownerShare=100, boundary=Y, candidate=Y, tofull=Y (EXPAND_CLEAR_PATH)");
+
+        vm.HighlightAllNotchOwnersCommand.Execute(null);
+
+        Assert.NotNull(highlightedCadIds);
+        Assert.Equal([31, 32], highlightedCadIds);
+    }
 
     [Fact]
     public void RegularPadInfo_DefaultsToCollapsedGeometryDetails()
@@ -219,7 +403,10 @@ public sealed class PadInfoViewModelTests
         }
     }
 
-    private static RegularPadInfoViewModel CreateSinglePadViewModel()
+    private static RegularPadInfoViewModel CreateSinglePadViewModel(
+        Action<IReadOnlyList<int>, IReadOnlyList<int>, decimal?, decimal?>? applyPadSize = null,
+        Action<IReadOnlyList<int>, IReadOnlyList<int>>? resetPadSize = null,
+        Action? closePadInfo = null)
     {
         var pad = new RegularPad(
             row: 1,
@@ -246,22 +433,30 @@ public sealed class PadInfoViewModelTests
             getDxfIndex: null,
             getMatchedCadPadIds: null,
             getMatchedCadLinks: null,
-            applyPadSize: null,
-            resetPadSize: null,
+            applyPadSize: applyPadSize,
+            resetPadSize: resetPadSize,
             setFreeform: null,
             getCrossIcOwnerShares: null,
             getNotchRowsByRegularPad: null,
             highlightCadOwnerPads: null,
             focusRegularMatches: null,
             highlightRegularMatches: null,
-            closePadInfo: null);
+            closePadInfo: closePadInfo);
     }
 
     private static CadPadInfoViewModel CreateSingleCadPadViewModel(
         Action<int>? focusCadMatches = null,
         Action<int>? highlightCadMatches = null,
         NotchV22TargetAllocationSummary? targetAllocation = null,
-        Action<IReadOnlyCollection<int>>? highlightRegularPads = null)
+        Action<IReadOnlyCollection<int>>? highlightRegularPads = null,
+        Action<int, int>? setCadOutputFwDiffOverride = null,
+        Action<int>? clearCadOutputFwDiffOverride = null,
+        Func<int, bool>? isDxfIndexAnchor = null,
+        Action<int>? setDxfIndexAnchor = null,
+        Action<int>? clearDxfIndexAnchor = null,
+        Action? selectAreaBucket = null,
+        Action<IReadOnlyCollection<int>>? highlightCadOwnerPads = null,
+        string? notchDiagnostics = null)
     {
         var cadPad = new CadPad(
             274,
@@ -275,28 +470,28 @@ public sealed class PadInfoViewModelTests
                 new Point2(0, 8),
             }));
 
-        var snapshot = CreateCadPadInspectorSnapshot(cadPad);
+        var snapshot = CreateCadPadInspectorSnapshot(cadPad, notchDiagnostics);
 
         return new CadPadInfoViewModel(
             pads: new List<CadPad> { cadPad },
             getDxfIndex: _ => 112,
             getCadOutputFwDiffOverride: null,
-            isDxfIndexAnchor: null,
+            isDxfIndexAnchor: isDxfIndexAnchor,
             getCustomValue: _ => 0,
             applyCustomValue: null,
-            setCadOutputFwDiffOverride: null,
-            clearCadOutputFwDiffOverride: null,
-            setDxfIndexAnchor: null,
-            clearDxfIndexAnchor: null,
+            setCadOutputFwDiffOverride: setCadOutputFwDiffOverride,
+            clearCadOutputFwDiffOverride: clearCadOutputFwDiffOverride,
+            setDxfIndexAnchor: setDxfIndexAnchor,
+            clearDxfIndexAnchor: clearDxfIndexAnchor,
             closePadInfo: null,
             notchDetailCommand: null,
-            selectAreaBucket: null,
+            selectAreaBucket: selectAreaBucket,
             getMatchedRegularPadIds: null,
             getMatchedRegularLinks: null,
             getRegularPadIcDiff: null,
             focusCadMatches: focusCadMatches,
             highlightCadMatches: highlightCadMatches,
-            highlightCadOwnerPads: null,
+            highlightCadOwnerPads: highlightCadOwnerPads,
             highlightRegularPads: highlightRegularPads,
             getCadV22CompensationPreview: targetAllocation is null
                 ? null
@@ -306,7 +501,7 @@ public sealed class PadInfoViewModelTests
             inspectorSnapshot: targetAllocation is null ? snapshot : null);
     }
 
-    private static PadInspectorSnapshot CreateCadPadInspectorSnapshot(CadPad cadPad)
+    private static PadInspectorSnapshot CreateCadPadInspectorSnapshot(CadPad cadPad, string? notchDiagnostics = null)
     {
         return new PadInspectorSnapshot(
             "cad",
@@ -341,7 +536,9 @@ public sealed class PadInfoViewModelTests
                     Stage3Area: 12.3,
                     StrictAreaThreshold: 0.1,
                     Targets: Array.Empty<PadInspectorNotchTargetSnapshot>(),
-                    Diagnostics: "IC3/diff112 reg4808: ov=10, src=10, blk=0, reach=10, blocker=0, owners=-, ownerShare=-, boundary=N, candidate=Y, tofull=Y (GATE_NOT_BOUNDARY)"),
+                    Diagnostics: notchDiagnostics ??
+                        "IC3/diff112 reg4808: ov=10, src=10, blk=0, reach=10, blocker=0, owners=-, " +
+                        "ownerShare=-, boundary=N, candidate=Y, tofull=Y (GATE_NOT_BOUNDARY)"),
                 RuleTrace: new[]
                 {
                     new PadInspectorRuleTraceEntry("Sequence", "Adjusted", "IC-row sequence applied"),

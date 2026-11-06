@@ -6,6 +6,111 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class IndexMappingReportViewModelTests
 {
+    [Theory]
+    [InlineData(IndexMappingDecisionFilterMode.All, 7, 1)]
+    [InlineData(IndexMappingDecisionFilterMode.ChangedByMask, 1, 0)]
+    [InlineData(IndexMappingDecisionFilterMode.RemovedByMask, 1, 0)]
+    [InlineData(IndexMappingDecisionFilterMode.Ambiguous, 1, 0)]
+    [InlineData(IndexMappingDecisionFilterMode.DuplicateDiff, 1, 0)]
+    [InlineData(IndexMappingDecisionFilterMode.LowConfidence, 1, 0)]
+    [InlineData(IndexMappingDecisionFilterMode.Unmapped, 2, 0)]
+    [InlineData(IndexMappingDecisionFilterMode.CountMismatch, 0, 1)]
+    public void SetDecisionFilterModeCommand_SelectsMatchingDecisions(
+        IndexMappingDecisionFilterMode mode,
+        int expectedEntityCount,
+        int expectedAggregateCount)
+    {
+        var report = CreateDecisionFilterReport();
+        var vm = new IndexMappingReportViewModel("summary", report);
+        if (mode == IndexMappingDecisionFilterMode.All)
+        {
+            vm.SetDecisionFilterModeCommand.Execute(IndexMappingDecisionFilterMode.LowConfidence);
+            Assert.Single(vm.DecisionRows);
+        }
+
+        vm.SetDecisionFilterModeCommand.Execute(mode);
+
+        Assert.Equal(mode, vm.SelectedFilterMode);
+        Assert.Equal(expectedEntityCount, vm.DecisionRows.Count);
+        Assert.Equal(expectedAggregateCount, vm.AggregateDecisionRows.Count);
+        var visibleRows = vm.DecisionRows.Concat(vm.AggregateDecisionRows).ToList();
+        Assert.NotNull(vm.SelectedDecision);
+        Assert.Contains(vm.SelectedDecision, visibleRows);
+        if (mode == IndexMappingDecisionFilterMode.All)
+        {
+            Assert.Equal([301, 302, 303, 304, 306, 307],
+                vm.DecisionRows.Where(static row => row.CadPadId.HasValue).Select(static row => row.CadPadId!.Value).Order());
+            Assert.Contains(vm.DecisionRows, static row => row.CadPadId is null && row.LocateRegularPadIndex == 305);
+            Assert.Equal(IndexMappingDecisionFilterMode.CountMismatch, Assert.Single(vm.AggregateDecisionRows).FilterMode);
+        }
+        else
+        {
+            Assert.All(visibleRows, row => Assert.Equal(mode, row.FilterMode));
+
+            vm.SetDecisionFilterModeCommand.Execute(mode);
+
+            Assert.Equal(IndexMappingDecisionFilterMode.All, vm.SelectedFilterMode);
+            Assert.Equal(7, vm.DecisionRows.Count);
+            Assert.Single(vm.AggregateDecisionRows);
+        }
+    }
+
+    private static DxfRegularMappingReport CreateDecisionFilterReport()
+    {
+        var issues = new[]
+        {
+            new DxfRegularMappingIssue(DxfRegularMappingIssueKind.CountMismatch, "count mismatch"),
+            new DxfRegularMappingIssue(DxfRegularMappingIssueKind.LowConfidence, "low confidence", CadPadId: 301),
+            new DxfRegularMappingIssue(DxfRegularMappingIssueKind.Ambiguous, "ambiguous", CadPadId: 302),
+            new DxfRegularMappingIssue(DxfRegularMappingIssueKind.DuplicateDiff, "duplicate diff", CadPadId: 303),
+            new DxfRegularMappingIssue(DxfRegularMappingIssueKind.UnmappedCad, "unmapped CAD", CadPadId: 304),
+            new DxfRegularMappingIssue(DxfRegularMappingIssueKind.UnmappedRegular, "unmapped REG", RegularPadIndex: 305),
+        };
+        var report = new DxfRegularMappingReport(
+            CadCount: 6,
+            RegularCount: 7,
+            MappedCount: 5,
+            UnmappedCadCount: 1,
+            UnmappedRegularCount: 1,
+            LowConfidenceCount: 1,
+            AmbiguousCount: 1,
+            HasIssues: true,
+            Summary: "summary",
+            TotalIssueCount: issues.Length,
+            IssuesTruncated: false,
+            Issues: issues,
+            SampleIssues: issues,
+            MaskAuditRows:
+            [
+                new DxfRegularMaskAuditRow(
+                    CadPadId: 306,
+                    OrderedCadIndex: 4,
+                    RawSeed: new CadBestMatchSeed(400, 0, 40, 0.9, 0.9),
+                    MaskedSeed: new CadBestMatchSeed(401, 0, 41, 0.7, 0.7),
+                    CsvConfirmedCandidates: Array.Empty<DxfRegularMaskAuditCandidate>(),
+                    CsvConfirmedConfidence: null,
+                    SuggestedDiffIndex: 41,
+                    CurrentAssignedDiffIndex: 41,
+                    Status: DxfRegularMaskAuditStatus.ChangedByMask,
+                    Message: "changed"),
+                new DxfRegularMaskAuditRow(
+                    CadPadId: 307,
+                    OrderedCadIndex: 5,
+                    RawSeed: new CadBestMatchSeed(402, 0, 42, 0.9, 0.9),
+                    MaskedSeed: CadBestMatchSeed.Empty,
+                    CsvConfirmedCandidates: Array.Empty<DxfRegularMaskAuditCandidate>(),
+                    CsvConfirmedConfidence: null,
+                    SuggestedDiffIndex: null,
+                    CurrentAssignedDiffIndex: null,
+                    Status: DxfRegularMaskAuditStatus.MaskRemovedMatch,
+                    Message: "removed"),
+            ],
+            MaskChangedCount: 1,
+            MaskRemovedCount: 1,
+            DuplicateDiffCount: 1);
+
+        return report;
+    }
 
     [Fact]
     public void IssueViewModel_ExposesScoreDiagnosticsAndTopCandidates()

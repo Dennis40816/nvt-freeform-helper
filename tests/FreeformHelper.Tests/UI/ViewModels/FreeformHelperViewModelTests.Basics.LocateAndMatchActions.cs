@@ -8,6 +8,48 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class FreeformHelperViewModelTests
 {
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void FocusNotchValidationItemCommand_ListItem_FocusesItsCadAndRegularPads(int itemIndex)
+    {
+        var vm = new FreeformHelperViewModel
+        {
+            CadPads = new ObservableCollection<CadPad>
+            {
+                CreateRectCad(1, 0, 0, 10, 5),
+                CreateRectCad(2, 0, 5, 10, 10),
+            },
+            RegularPads = new ObservableCollection<RegularPad>
+            {
+                CreateRectRegular(0, 0, 1, 0, 0, 5, 5),
+                CreateRectRegular(0, 1, 2, 5, 0, 10, 5),
+                CreateRectRegular(1, 0, 3, 0, 5, 5, 10),
+                CreateRectRegular(1, 1, 4, 5, 5, 10, 10),
+            },
+            NotchValidationItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+            {
+                CreateValidationDisplayItem("DIRECT", isDirect: true),
+                CreateValidationDisplayItem("OUT", isOutgoing: true) with
+                {
+                    CadPadId = 2,
+                    SourceRegularPadId = 3,
+                    TargetRegularPadId = 4,
+                },
+            },
+        };
+        var host = new TestCanvasHost();
+        vm.CanvasHost = host;
+        var item = vm.NotchValidationItems[itemIndex];
+        var expectedRegularIds = new[] { item.SourceRegularPadId, item.TargetRegularPadId };
+
+        vm.FocusNotchValidationItemCommand.Execute(item);
+
+        Assert.Equal(item.CadPadId, Assert.Single(host.SelectedCadIds));
+        Assert.Equal(expectedRegularIds, host.SelectedRegularIds.OrderBy(static id => id));
+        Assert.Equal(1, host.FocusWithMinZoomCount);
+    }
+
     [Fact]
     public async Task MatchCommand_WhenPrerequisitesMissing_SetsStep1Status()
     {

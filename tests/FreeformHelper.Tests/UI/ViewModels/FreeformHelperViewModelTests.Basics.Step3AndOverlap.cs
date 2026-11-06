@@ -245,6 +245,50 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Equal("Hidden", vm.NotchPreviewFinalLayerStateText);
     }
 
+    [Theory]
+    [InlineData(1, 3)]
+    [InlineData(2, 1)]
+    [InlineData(3, 2)]
+    public void PreviousNotchPreviewStageCommand_MovesToPreviousStageAndWrapsAtFirst(int initialStage, int expectedStage)
+    {
+        var vm = CreateViewModelWithStep3PreviewReady();
+        vm.NotchPreviewVisualizationStep = initialStage;
+        var host = new TestCanvasHost();
+        vm.CanvasHost = host;
+        Assert.True(vm.CanControlNotchPreviewStage);
+
+        vm.PreviousNotchPreviewStageCommand.Execute(null);
+
+        Assert.Equal((decimal)expectedStage, vm.NotchPreviewVisualizationStep);
+        Assert.Equal(expectedStage, vm.NotchPreviewStageIndex);
+        Assert.Equal(expectedStage == 1, vm.IsNotchToFullSeedPreviewVisible);
+        Assert.Equal(expectedStage == 2, vm.IsNotchToFullCandidatePreviewVisible);
+        Assert.Equal(expectedStage == 3, vm.IsNotchToFullFinalPreviewVisible);
+        Assert.Equal(1, host.InvalidateCount);
+    }
+
+    [Theory]
+    [InlineData(1, 2)]
+    [InlineData(2, 3)]
+    [InlineData(3, 1)]
+    public void NextNotchPreviewStageCommand_MovesToNextStageAndWrapsAtLast(int initialStage, int expectedStage)
+    {
+        var vm = CreateViewModelWithStep3PreviewReady();
+        vm.NotchPreviewVisualizationStep = initialStage;
+        var host = new TestCanvasHost();
+        vm.CanvasHost = host;
+        Assert.True(vm.CanControlNotchPreviewStage);
+
+        vm.NextNotchPreviewStageCommand.Execute(null);
+
+        Assert.Equal((decimal)expectedStage, vm.NotchPreviewVisualizationStep);
+        Assert.Equal(expectedStage, vm.NotchPreviewStageIndex);
+        Assert.Equal(expectedStage == 1, vm.IsNotchToFullSeedPreviewVisible);
+        Assert.Equal(expectedStage == 2, vm.IsNotchToFullCandidatePreviewVisible);
+        Assert.Equal(expectedStage == 3, vm.IsNotchToFullFinalPreviewVisible);
+        Assert.Equal(1, host.InvalidateCount);
+    }
+
 
     [Fact]
     public void Step3Preview_AutoPlaySummaryReflectsToggleAndInterval()
