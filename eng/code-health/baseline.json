@@ -998,20 +998,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 121
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs"
-      ],
-      "contentHash": "5220fab9445cf40bd4567d5a6581838348a1f97bd8967b1a0ba744046eeeaa21",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ApplyLoadedProjectStateAsync(ProjectFile,string,long)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 100
       },
       "owner": "NFH",
