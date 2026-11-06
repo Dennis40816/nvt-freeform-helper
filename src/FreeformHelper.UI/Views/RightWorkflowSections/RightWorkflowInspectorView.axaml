@@ -19,6 +19,10 @@
         <SelectableTextBlock Classes="stepNote"
                              IsVisible="{Binding HasNoPadInspectorSummary}"
                              Text="Select a CAD or regular pad to inspect."/>
+        <SelectableTextBlock Classes="stepNote"
+                             IsVisible="{Binding HasPadInspectorMultiSelection}"
+                             Text="{Binding PadInspectorSelectionSummaryText}"
+                             TextWrapping="Wrap"/>
 
         <Border Classes="workspaceSectionCard">
           <StackPanel Spacing="{StaticResource Space6}">

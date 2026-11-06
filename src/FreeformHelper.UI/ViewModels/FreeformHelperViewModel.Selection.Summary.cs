@@ -38,7 +38,6 @@ public sealed partial class FreeformHelperViewModel
         SetManualSizeInputs(summary.PendingWidth, summary.PendingHeight);
         IsPendingColumnWidthMixed = summary.WidthMixed;
         IsPendingRowHeightMixed = summary.HeightMixed;
-        SetManualSizeDisplay(summary.PendingWidth, summary.PendingHeight, summary.WidthMixed, summary.HeightMixed);
     }
 
     partial void OnSelectionSummaryResultChanged(SelectionSummaryModel? oldValue, SelectionSummaryModel newValue)
@@ -89,16 +88,6 @@ public sealed partial class FreeformHelperViewModel
     {
         IsPendingColumnWidthMixed = false;
         IsPendingRowHeightMixed = false;
-    }
-
-    private void SetManualSizeDisplay(decimal width, decimal height, bool widthMixed, bool heightMixed)
-    {
-        PendingColumnWidthDisplay = widthMixed
-            ? "*"
-            : width.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
-        PendingRowHeightDisplay = heightMixed
-            ? "*"
-            : height.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
     }
 
     private static string FormatIndexRanges(IEnumerable<int> indices)

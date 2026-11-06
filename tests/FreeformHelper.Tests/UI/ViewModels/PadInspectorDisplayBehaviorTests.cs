@@ -29,9 +29,60 @@ public sealed class PadInspectorDisplayBehaviorTests
 
         Assert.False(vm.HasPadInspectorSummary);
         Assert.True(vm.HasNoPadInspectorSummary);
+        Assert.False(vm.HasPadInspectorMultiSelection);
+        Assert.Empty(vm.PadInspectorSelectionSummaryText);
         Assert.Equal(string.Empty, vm.PadInspectorPrimaryText);
         Assert.Empty(vm.PadInspectorCompensationLines);
         Assert.False(vm.HasPadInspectorRuleTrace);
+    }
+
+    [Theory]
+    [InlineData(2, 0)]
+    [InlineData(0, 2)]
+    [InlineData(1, 1)]
+    public void ApplyCanvasSelection_MultiplePads_ShowsCountInsteadOfPadDetails(int cadCount, int regularCount)
+    {
+        var vm = new FreeformHelperViewModel();
+        vm.PadInspectorUi.Snapshot = CreateCadSnapshot(274);
+        var cadIds = Enumerable.Range(1, cadCount).ToArray();
+        var regularIndices = Enumerable.Range(1, regularCount).ToArray();
+
+        vm.ApplyCanvasSelection(cadIds, regularIndices);
+
+        Assert.True(vm.HasPadInspectorMultiSelection);
+        Assert.Equal("2 pads selected", vm.PadInspectorSelectionSummaryText);
+        Assert.False(vm.HasPadInspectorSummary);
+        Assert.False(vm.HasNoPadInspectorSummary);
+        Assert.Null(vm.PadInspectorUi.Snapshot);
+        Assert.Empty(vm.PadInspectorPrimaryText);
+        Assert.Empty(vm.PadInspectorCompensationLines);
+        Assert.False(vm.PadInspectorUi.IsDeferredRefreshPending);
+    }
+
+    [Fact]
+    public void ApplyCanvasSelection_MultiSelectionChanges_UpdatesSummaryAndNotifiesBindings()
+    {
+        var vm = new FreeformHelperViewModel();
+        var cadIds = Enumerable.Range(1, 2).ToArray();
+        var expandedCadIds = Enumerable.Range(1, 3).ToArray();
+        vm.ApplyCanvasSelection(cadIds, Array.Empty<int>());
+        var changes = new List<string?>();
+        vm.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
+
+        vm.ApplyCanvasSelection(expandedCadIds, Array.Empty<int>());
+
+        Assert.Equal("3 pads selected", vm.PadInspectorSelectionSummaryText);
+        Assert.Contains(nameof(FreeformHelperViewModel.PadInspectorSelectionSummaryText), changes);
+        changes.Clear();
+
+        vm.ApplyCanvasSelection(Array.Empty<int>(), Array.Empty<int>());
+
+        Assert.Empty(vm.PadInspectorSelectionSummaryText);
+        Assert.False(vm.HasPadInspectorMultiSelection);
+        Assert.True(vm.HasNoPadInspectorSummary);
+        Assert.Contains(nameof(FreeformHelperViewModel.HasPadInspectorMultiSelection), changes);
+        Assert.Contains(nameof(FreeformHelperViewModel.PadInspectorSelectionSummaryText), changes);
+        Assert.Contains(nameof(FreeformHelperViewModel.HasNoPadInspectorSummary), changes);
     }
 
     [Fact]
@@ -43,6 +94,8 @@ public sealed class PadInspectorDisplayBehaviorTests
 
         Assert.True(vm.HasPadInspectorSummary);
         Assert.False(vm.HasNoPadInspectorSummary);
+        Assert.False(vm.HasPadInspectorMultiSelection);
+        Assert.Empty(vm.PadInspectorSelectionSummaryText);
         Assert.Equal("CAD 274 · Diff 112", vm.PadInspectorCompactHeaderText);
         Assert.Equal("CAD 274 · IC 3 · Diff idx 112", vm.PadInspectorPrimaryText);
         Assert.Equal("Diff source: Auto", vm.PadInspectorSecondaryText);

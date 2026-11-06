@@ -82,6 +82,9 @@ public sealed partial class FreeformHelperViewModel
 
         OnPropertyChanged(nameof(SelectedCadPadIds));
         OnPropertyChanged(nameof(SelectedRegularPadIndices));
+        OnPropertyChanged(nameof(HasPadInspectorMultiSelection));
+        OnPropertyChanged(nameof(PadInspectorSelectionSummaryText));
+        OnPropertyChanged(nameof(HasNoPadInspectorSummary));
         NotifyDxfEditPanelActionStateChanged();
         var inspectorStartMs = selectionSw.ElapsedMilliseconds;
         UpdateInspectorSnapshotFromSelection(selectionRevision);
@@ -160,6 +163,15 @@ public sealed partial class FreeformHelperViewModel
 
     private void UpdateInspectorSnapshotFromSelection(long selectionRevision)
     {
+        if (HasPadInspectorMultiSelection)
+        {
+            // Keep multi-selection updates lightweight during box drag.
+            CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: true);
+            CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
+            PadInspectorUi.Snapshot = null;
+            return;
+        }
+
         if (_selectedCadIds.Count == 1)
         {
             CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
@@ -171,16 +183,6 @@ public sealed partial class FreeformHelperViewModel
                 includeMatchDetails: false,
                 includeRuleTrace: false);
             QueueDeferredCadInspectorSnapshotRefresh(cadId, selectionRevision);
-            return;
-        }
-
-        if (_selectedCadIds.Count > 1)
-        {
-            // Multi-select can generate high-frequency updates during box drag.
-            // Keep inspector lightweight and avoid blocking the selection interaction.
-            CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: true);
-            CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
-            PadInspectorUi.Snapshot = null;
             return;
         }
 
@@ -199,13 +201,6 @@ public sealed partial class FreeformHelperViewModel
                 return;
             }
         }
-        else if (_selection.RegularIndices.Count > 1)
-        {
-            CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
-            PadInspectorUi.Snapshot = null;
-            return;
-        }
-
         CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
         PadInspectorUi.Snapshot = null;
     }
