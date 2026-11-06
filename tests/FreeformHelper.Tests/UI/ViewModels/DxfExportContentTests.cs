@@ -101,39 +101,30 @@ public sealed class DxfExportContentTests
     }
 
     [Fact]
-    public async Task ExportDxfCommands_CancelledSaveDialog_WriteNothingAndKeepStatusAsync()
+    public async Task ExportDxfCommands_CancelledSaveDialog_AsksForTheNameAndKeepsStatusAsync()
     {
         using var fixture = new WorkspaceFixture();
         var vm = await fixture.OpenAsync();
-        var directory = TestFiles.CreateTempDirectory();
-        try
+        var pickerRequests = new List<(string SuggestedName, string Extension)>();
+        vm.PickSaveExportPathAsync = (suggestedName, extension) =>
         {
-            var pickerCalls = 0;
-            vm.PickSaveExportPathAsync = (_, _) =>
-            {
-                pickerCalls++;
-                return Task.FromResult<string?>(null);
-            };
-            var statusBefore = vm.StatusText;
+            pickerRequests.Add((suggestedName, extension));
+            return Task.FromResult<string?>(null);
+        };
+        var statusBefore = vm.StatusText;
 
-            await vm.ExportDxfVisibleCommand.ExecuteAsync(null);
+        await vm.ExportDxfVisibleCommand.ExecuteAsync(null);
 
-            Assert.Equal(1, pickerCalls);
-            Assert.Empty(directory.EnumerateFileSystemInfos());
-            Assert.Equal(statusBefore, vm.StatusText);
-            Assert.DoesNotContain("exported", vm.StatusText, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(("cad_visible_layers", "dxf"), Assert.Single(pickerRequests));
+        Assert.Equal(statusBefore, vm.StatusText);
+        Assert.DoesNotContain("exported", vm.StatusText, StringComparison.OrdinalIgnoreCase);
 
-            await vm.ExportDxfAllCommand.ExecuteAsync(null);
+        await vm.ExportDxfAllCommand.ExecuteAsync(null);
 
-            Assert.Equal(2, pickerCalls);
-            Assert.Empty(directory.EnumerateFileSystemInfos());
-            Assert.Equal(statusBefore, vm.StatusText);
-            Assert.DoesNotContain("exported", vm.StatusText, StringComparison.OrdinalIgnoreCase);
-        }
-        finally
-        {
-            directory.Delete(recursive: true);
-        }
+        Assert.Equal(2, pickerRequests.Count);
+        Assert.Equal(("cad_all_layers", "dxf"), pickerRequests[1]);
+        Assert.Equal(statusBefore, vm.StatusText);
+        Assert.DoesNotContain("exported", vm.StatusText, StringComparison.OrdinalIgnoreCase);
     }
 
     private static async Task DeleteAlphaPadAsync(FreeformHelperViewModel vm)

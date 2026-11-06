@@ -18,7 +18,7 @@ using Xunit;
 namespace FreeformHelper.Tests;
 
 [Collection("HeadlessUiSerial")]
-public sealed class WorkflowSettingsAndSelectionEntryTests
+public sealed class WorkflowOpenSettingsEntryTests
 {
     private static readonly Point2[] _padCorners = [new(0, 0), new(10, 0), new(10, 10), new(0, 10)];
     private static readonly string[] _sectionNames = ["General", "Step1", "Step2", "Step3", "Step4", "Step5"];
