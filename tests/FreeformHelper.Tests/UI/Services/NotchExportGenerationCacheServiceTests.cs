@@ -257,7 +257,8 @@ public sealed class NotchExportGenerationCacheServiceTests
             static () => Task.FromException<NotchTableGenerator.CadAllocationResolvedBatch>(
                 new InvalidOperationException("synthetic resolution failure")));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => failedLease.ResolutionTask!);
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => failedLease.ResolutionTask!.WaitAsync(TestContext.Current.CancellationToken));
 
         var batch = BuildCadAllocationBatch(settings);
         var retryLease = service.AcquireCadAllocationResolvedBatch(
@@ -319,7 +320,9 @@ public sealed class NotchExportGenerationCacheServiceTests
         Assert.False(joinedLease.IsTaskOwner);
         Assert.Same(firstLease.ResolutionTask, joinedLease.ResolutionTask);
         release.SetResult(batch);
-        await Task.WhenAll(firstLease.ResolutionTask!, joinedLease.ResolutionTask!);
+        await Task.WhenAll(
+            firstLease.ResolutionTask!.WaitAsync(TestContext.Current.CancellationToken),
+            joinedLease.ResolutionTask!.WaitAsync(TestContext.Current.CancellationToken));
 
         var metrics = service.GetSnapshot();
         Assert.Equal(1, metrics.MissCount);
@@ -425,7 +428,9 @@ public sealed class NotchExportGenerationCacheServiceTests
         {
             firstRelease.TrySetResult(firstBatch);
             collidingRelease.TrySetResult(collidingBatch);
-            await Task.WhenAll(firstLease.ResolutionTask!, collidingLease.ResolutionTask!);
+            await Task.WhenAll(
+                firstLease.ResolutionTask!.WaitAsync(TestContext.Current.CancellationToken),
+                collidingLease.ResolutionTask!.WaitAsync(TestContext.Current.CancellationToken));
         }
 
         var metrics = service.GetSnapshot();
