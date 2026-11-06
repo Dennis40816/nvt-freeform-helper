@@ -277,10 +277,6 @@ public sealed partial class FreeformHelperView
         if (e.Context is null) // Pad info is being closed.
         {
             ClosePadInfo();
-            if (DataContext is FreeformHelperViewModel vmOnClose)
-            {
-                vmOnClose.PadInspectorUi.Snapshot = null;
-            }
             // If there was a pending pad info context, open it now.
             if (_pendingPadInfoContext is not null && DataContext is FreeformHelperViewModel vm)
             {

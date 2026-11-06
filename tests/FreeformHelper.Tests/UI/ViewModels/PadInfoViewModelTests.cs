@@ -1,11 +1,15 @@
 using System.Collections.ObjectModel;
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.Interaction;
 using FreeformHelper.UI.ViewModels;
+using FreeformHelper.UI.Views;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -14,6 +18,46 @@ namespace FreeformHelper.Tests;
 public sealed class PadInfoViewModelTests
 {
     private static readonly int[] _matchedRegularPadIds = [4808];
+    private static readonly int[] _inspectorCadSelection = [274];
+
+    [AvaloniaFact]
+    public void ClosePadInfo_PreservesInspectorAndPadSelection()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var vm = new FreeformHelperViewModel();
+        var window = new Window { Content = new FreeformHelperView { DataContext = vm } };
+        try
+        {
+            window.Show();
+            var pad = new CadPad(274, "CAD274", "AA", new Polygon2(
+            [
+                new Point2(0, 0), new Point2(10, 0), new Point2(10, 8), new Point2(0, 8),
+            ]));
+            vm.CadPads.Add(pad);
+            vm.ApplyCanvasSelection(_inspectorCadSelection, Array.Empty<int>());
+            var snapshot = Assert.IsType<PadInspectorSnapshot>(vm.PadInspectorUi.Snapshot);
+            var primaryText = vm.PadInspectorPrimaryText;
+            vm.IsPadInspectorRawTraceExpanded = true;
+            var context = new PadInfoContext(CreateSingleCadPadViewModel(), pad.Bounds, [pad.Bounds]);
+            vm.InteractionState.OpenPadInfo(context);
+            Assert.Same(context, vm.InteractionState.ActivePadInfo);
+
+            vm.InteractionState.ClosePadInfo();
+
+            Assert.Null(vm.InteractionState.ActivePadInfo);
+            Assert.Same(snapshot, vm.PadInspectorUi.Snapshot);
+            Assert.True(vm.HasPadInspectorSummary);
+            Assert.Equal(primaryText, vm.PadInspectorPrimaryText);
+            Assert.True(vm.IsPadInspectorRawTraceExpanded);
+            Assert.Equal(_inspectorCadSelection, vm.SelectedCadPadIds);
+            Assert.Empty(vm.SelectedRegularPadIndices);
+        }
+        finally
+        {
+            vm.ApplyCanvasSelection(Array.Empty<int>(), Array.Empty<int>());
+            window.Close();
+        }
+    }
 
     [Theory]
     [InlineData(true, false)]

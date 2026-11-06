@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "files": {
-    "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml": "83bbfda260e9f8c68393976bd02f4ed23bd9613f80fa3e8f6e5ea346c186c576",
+    "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml": "b19f74a0cd28cf4d44d7599fc12a536d501eb904ab0d580e308ca77fdb41d607",
     "src/FreeformHelper.UI/Styles/Controls.axaml": "c7d20df744546434fb507fee93427aae58f06ca52e2cd7c8fb54d1f14a6c92dd",
     "src/FreeformHelper.UI/Views/CanvasOverlayControls.axaml": "0f07abae660731f6e8f8c4a950e41a6ff48fe80dfce5e89b6d3a5749bf4c86f2",
     "src/FreeformHelper.UI/Views/ConsolePanel.axaml": "d6d63e9cf864b8d40f47d920364635c80d736e49729f8e88b5e9fd732b59f0d6",

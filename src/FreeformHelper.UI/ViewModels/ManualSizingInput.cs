@@ -2,7 +2,7 @@ namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
 /// Holds the manual sizing inputs of the main view model: the pending column width and row height, their
-/// mixed flags and display texts, the manual row and column ranges and the range status. The view model
+/// mixed flags, the manual row and column ranges and the range status. The view model
 /// replaces the whole value when one of them changes and forwards one property per member so the bindings
 /// keep their names.
 /// </summary>
@@ -13,8 +13,6 @@ namespace FreeformHelper.UI.ViewModels;
 /// <param name="ManualRowsRange">The string input for manual row range selection (e.g., "1-3,5").</param>
 /// <param name="ManualColsRange">The string input for manual column range selection (e.g., "A-C,E").</param>
 /// <param name="ManualRangeStatus">The status message for the manual range input (e.g., "No manual range.", "Invalid input.").</param>
-/// <param name="PendingColumnWidthDisplay">The display text for pending column width, handling mixed state.</param>
-/// <param name="PendingRowHeightDisplay">The display text for pending row height, handling mixed state.</param>
 public sealed record ManualSizingInput(
     decimal PendingColumnWidth,
     decimal PendingRowHeight,
@@ -22,9 +20,7 @@ public sealed record ManualSizingInput(
     bool IsPendingRowHeightMixed,
     string ManualRowsRange,
     string ManualColsRange,
-    string ManualRangeStatus,
-    string PendingColumnWidthDisplay,
-    string PendingRowHeightDisplay)
+    string ManualRangeStatus)
 {
     /// <summary>
     /// Gets the value of a new view model before any project settings are loaded.
@@ -36,7 +32,5 @@ public sealed record ManualSizingInput(
         false,
         string.Empty,
         string.Empty,
-        "No manual range.",
-        "0",
-        "0");
+        "No manual range.");
 }
