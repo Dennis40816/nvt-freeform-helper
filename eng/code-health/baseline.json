@@ -2539,16 +2539,6 @@
       "symbol": "IDE0330"
     },
     {
-      "syntaxHash": "eb05855ddbabfad52621d1ba5a75afbaad2faa96a126bf15f25e4734b3ff1b79",
-      "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.fields:PrivateInstance",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "c4292658bb65fc182e3863d267cadcc211e49d12d47e4b683e896078eb9580fd",
       "member": "FreeformHelper.Tests.HeadlessSessionGuardAttribute.fields:Gate",
       "owner": "NFH",
@@ -2737,16 +2727,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "T:System.Diagnostics.Stopwatch"
-    },
-    {
-      "syntaxHash": "eb05855ddbabfad52621d1ba5a75afbaad2faa96a126bf15f25e4734b3ff1b79",
-      "member": "FreeformHelper.Tests.Cad3635LoadBenchmarkTests.fields:PrivateInstance",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Cad/Cad3635LoadBenchmarkTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "F:System.Reflection.BindingFlags.NonPublic"
     },
     {
       "syntaxHash": "0619bb4152b1a2d22bb796b4fdfe1a4c250d1735b59ec0aea498c8d62cd31873",
