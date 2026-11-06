@@ -2895,26 +2895,6 @@
       "symbol": "VSTHRD003"
     },
     {
-      "syntaxHash": "a127033b9618cc6dc656c4ab011785fb336fefafb372f0373599e2f5ec508bbc",
-      "member": "FreeformHelper.UI.Services.GridRebuildUseCase.WaitForIdleAsync()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/GridRebuildUseCase.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "VSTHRD003",
-      "symbol": "VSTHRD003"
-    },
-    {
-      "syntaxHash": "ca84456a2e2eda1096600c9221918d12241be83642ce6bd3563de05180ffe5b2",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.GenerateCurrentNotchTableAsync(CadPadSet,RegularGrid,string,IProgress<NotchGenerationProgress>?,WorkflowDataSnapshot?,bool,bool,Action<string>?)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "VSTHRD003",
-      "symbol": "VSTHRD003"
-    },
-    {
       "syntaxHash": "8faf7d81beab8c86a086e14795a07744681b88f40436bd2f26694ba6d22d4364",
       "member": "FreeformHelper.Tests.UiEventRunnerTests.Run_AsynchronousFailure_ReportsOnceWithoutDispatcherException()",
       "owner": "NFH",

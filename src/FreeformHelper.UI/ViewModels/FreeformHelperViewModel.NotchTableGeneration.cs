@@ -61,7 +61,7 @@ public sealed partial class FreeformHelperViewModel
                 resolvedBatch = TakeCachedNotchBatchOrLogMiss(operationLabel, batchLease);
                 if (resolvedBatch is null)
                 {
-                    resolvedBatch = await batchLease.ResolutionTask!;
+                    resolvedBatch = await batchLease.ResolutionTask!.WaitAsync(CancellationToken.None);
                 }
 
                 table = await ProjectNotchCadAllocationBatchAsync(operationLabel, resolvedBatch, inputs, effectiveProgress, isBatchCacheHit);
