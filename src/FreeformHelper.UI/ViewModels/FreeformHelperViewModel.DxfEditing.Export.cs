@@ -52,7 +52,7 @@ public sealed partial class FreeformHelperViewModel
             }
 
             var text = Services.DxfExportService.ExportAscii(pads);
-            File.WriteAllText(path, text);
+            await Services.TextExportWriter.WriteAsync(path, text, includeBom: false, CancellationToken.None);
             SetStatus($"DXF exported ({(visibleOnly ? "visible" : "all")}). Pads={pads.Count}.");
             _logger.Info(CultureInfo.InvariantCulture, "DXF exported to {0} (mode={1}, pads={2}).", path, visibleOnly ? "visible" : "all", pads.Count);
         }
