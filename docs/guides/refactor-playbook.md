@@ -156,6 +156,11 @@ Recommended commands (examples):
    - Cause: DryRun/Apply were not distinguished, or unrelated UI changes were mixed in.
    - Safeguard: run `DryRun` first, confirm differences cover only the intended change, then run `Apply`.
 
+## Dispatcher rules (from the review of PR #281)
+1. A control, a view and `App` post with their own `Dispatcher` (`Dispatcher.Post(...)`). Create them on the UI thread. An object created on a background thread has no UI dispatcher, so a `Post` through it never runs.
+2. Code without a control (services, view models) must not name `Dispatcher.UIThread`: `RS0030` bans it. It gets the dispatcher with `UiThread.TryGetRunningDispatcher` and checks `UiThread.IsCurrent` before it posts back to the UI thread.
+3. One exception: `src/FreeformHelper.UI/Program.cs` (`AfterPlatformServicesSetup`) names `Avalonia.Threading.Dispatcher.UIThread` once, to register it through `UiThread.RegisterRunningDispatcher`. Add no second place.
+
 ## Handoff template (paste into PR or commit description)
 1. Goal of this iteration:
 2. Single entry point:
