@@ -1,3 +1,4 @@
+using System.Globalization;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.UI.ViewModels;
 
@@ -17,7 +18,18 @@ public readonly record struct NotchExportSelectionSummarySnapshot(
     string DistributionText,
     string ExportButtonText,
     bool HasRows,
-    bool HasSelection);
+    bool HasSelection,
+    int HiddenSelectedRowCount)
+{
+    public bool HasHiddenSelectedRows => HiddenSelectedRowCount > 0;
+
+    public string HiddenSelectedRowsHintText => HiddenSelectedRowCount switch
+    {
+        0 => string.Empty,
+        1 => "1 row hidden but still exported",
+        _ => $"{HiddenSelectedRowCount.ToString(CultureInfo.InvariantCulture)} rows hidden but still exported",
+    };
+}
 
 public static class NotchExportSelectionSummaryProjector
 {
@@ -26,13 +38,17 @@ public static class NotchExportSelectionSummaryProjector
         IReadOnlyList<NotchExportRowItemViewModel> visibleRows,
         NotchAlgorithmVersion? selectedVersion)
     {
-        static bool MatchesVersion(NotchExportRowItemViewModel row, NotchAlgorithmVersion? version) =>
-            !version.HasValue || row.Row.Version == version.Value;
-
-        var scopedRows = allRows.Where(row => MatchesVersion(row, selectedVersion)).ToArray();
+        var scopedRows = allRows
+            .Where(row => NotchExportSelectionProjectionBuilder.MatchesSelectedVersion(row, selectedVersion))
+            .ToArray();
+        var selectedRows = scopedRows
+            .Where(row => NotchExportSelectionProjectionBuilder.IsSelectedForExport(row, selectedVersion))
+            .ToArray();
+        var visibleRowSet = visibleRows.ToHashSet();
+        var hiddenSelectedRowCount = selectedRows.Count(row => !visibleRowSet.Contains(row));
         var allRowCount = scopedRows.Length;
         var visibleCount = visibleRows.Count;
-        var selectedCount = scopedRows.Count(static row => row.IsSelected);
+        var selectedCount = selectedRows.Length;
         var v22RowCount = scopedRows.Count(static row => row.Row.Version == NotchAlgorithmVersion.V22);
         var transferRowCount = scopedRows.Count(static row => row.IsTransferRow);
         var warningRowCount = scopedRows.Count(static row => row.IsStatusWarning);
@@ -60,6 +76,7 @@ public static class NotchExportSelectionSummaryProjector
             DistributionText: distributionText,
             ExportButtonText: exportButtonText,
             HasRows: visibleCount > 0,
-            HasSelection: hasSelection);
+            HasSelection: hasSelection,
+            HiddenSelectedRowCount: hiddenSelectedRowCount);
     }
 }

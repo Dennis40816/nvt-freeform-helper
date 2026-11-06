@@ -133,6 +133,9 @@ public sealed partial class NotchExportSelectionViewModel
         OnPropertyChanged(nameof(CadLinkedRowCount));
         OnPropertyChanged(nameof(CadMissingRowCount));
         OnPropertyChanged(nameof(SummaryText));
+        OnPropertyChanged(nameof(HiddenSelectedRowCount));
+        OnPropertyChanged(nameof(HasHiddenSelectedRows));
+        OnPropertyChanged(nameof(HiddenSelectedRowsHintText));
         OnPropertyChanged(nameof(DistributionText));
         OnPropertyChanged(nameof(ExportButtonText));
         OnPropertyChanged(nameof(AreAllVisibleRowsSelected));
