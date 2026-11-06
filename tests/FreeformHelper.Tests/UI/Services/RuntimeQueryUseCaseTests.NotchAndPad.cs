@@ -655,4 +655,78 @@ public sealed partial class RuntimeQueryUseCaseTests
         "blockerCandidateCount,ownerCadPadCount,ownerCadPadIds:[],isBoundaryRegular,isToFullBoundaryCandidate," +
         "hasEffectiveExpansion,hasDirectionalBlocker,toFullRuleCode,ruleTrace:[{rule,passed,detail}]," +
         "isToFullApplied}],diagnosticsText}";
+
+    [Fact]
+    public void BuildCadPadInspectorSnapshot_FullAndFastPaths_KeepFieldContract()
+    {
+        using var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var helper = shell.FreeformHelper;
+        var cad = BuildToFullNotchQueryFixture(helper);
+
+        var coldFast = Assert.IsType<CadPadInspectorSnapshot>(
+            helper.BuildCadPadInspectorSnapshot(cad.Id, false, false, false, false)?.Cad);
+        Assert.Null(coldFast.Notch);
+        Assert.False(coldFast.IsNotchRowEligible);
+        Assert.Equal("Notch rows: computing...", coldFast.NotchRowSummary);
+        Assert.Equal("Matched regular pad(s): 4.", coldFast.MatchDetailsText);
+        Assert.Empty(coldFast.MatchedRegularDetails);
+        Assert.Equal("Computing", Assert.Single(coldFast.RuleTrace).Rule);
+
+        var fullSnapshot = Assert.IsType<PadInspectorSnapshot>(helper.BuildCadPadInspectorSnapshot(cad.Id));
+        Assert.Equal("cad", fullSnapshot.Kind);
+        Assert.Null(fullSnapshot.Regular);
+        var full = Assert.IsType<CadPadInspectorSnapshot>(fullSnapshot.Cad);
+        var resolved = Assert.IsType<NotchV22ResolvedResult>(helper.GetCadV22ResolvedResult(cad.Id));
+        Assert.Equal(cad.Id, full.CadPadId);
+        Assert.Equal(cad.Name, full.Name);
+        Assert.Equal(cad.Layer, full.Layer);
+        Assert.Equal(cad.Area, full.Area);
+        Assert.Equal(cad.Bounds, full.Bounds);
+        Assert.Equal(cad.Centroid, full.Centroid);
+        Assert.Equal(cad.Polygon.Vertices.Length, full.Vertices);
+        Assert.Equal(83, full.DxfIndex);
+        Assert.Equal("83", full.DxfIndexDisplayText);
+        Assert.Null(full.CadOutputFwDiffOverride);
+        Assert.False(full.IsDxfIndexAnchor);
+        Assert.Equal("Auto (geometry seed)", full.CadOutputFwDiffAssignmentModeText);
+        Assert.Equal(0, full.IcIndex);
+        Assert.Equal("IC1/diff83 (+3)", full.MatchText);
+        Assert.Equal([4808, 4809, 4810, 4811], full.MatchedRegularPadIds);
+        Assert.Equal(4, full.MatchedRegularDetails.Count);
+        Assert.StartsWith("Regular: IC1/diff83 (regId 4808)", full.MatchDetailsText, StringComparison.Ordinal);
+        Assert.True(full.IsNotchRowEligible);
+        Assert.Equal("Notch rows: 2 (v2.1, v2.2)", full.NotchRowSummary);
+        Assert.Equal(
+            ["Diff idx", "Match", "Notch export", "To Regular", "To Full"],
+            full.RuleTrace.Select(static entry => entry.Rule));
+
+        var notch = Assert.IsType<PadInspectorNotchSnapshot>(full.Notch);
+        var compensation = resolved.Compensation;
+        Assert.Equal(compensation.ToRegularRatio, notch.ToRegularRatio);
+        Assert.Equal(compensation.ToFullRatio, notch.ToFullRatio);
+        Assert.Equal(compensation.CombinedRatio, notch.CombinedRatio);
+        Assert.Equal(compensation.IsToFullEnabled, notch.IsToFullEnabled);
+        Assert.Equal(compensation.Stage3Area, notch.Stage3Area);
+        Assert.Equal(resolved.TargetAllocation.StrictAreaThreshold, notch.StrictAreaThreshold);
+        Assert.Equal(
+            resolved.TargetAllocation.Targets.Select(static target => (target.IcIndex, target.DiffIndex, target.RegularCount)),
+            notch.Targets.Select(static target => (target.IcIndex, target.DiffIndex, target.RegularCount)));
+        Assert.False(string.IsNullOrWhiteSpace(notch.Diagnostics));
+        Assert.Same(resolved.TargetAllocation.TargetCoverageProjection, notch.TargetCoverageProjection);
+        Assert.Equal(helper.CurrentNotchComputationMode, notch.ComputationMode);
+
+        var warmFast = Assert.IsType<CadPadInspectorSnapshot>(
+            helper.BuildCadPadInspectorSnapshot(cad.Id, false, false, false, false)?.Cad);
+        var warmNotch = Assert.IsType<PadInspectorNotchSnapshot>(warmFast.Notch);
+        Assert.Equal(notch.CombinedRatio, warmNotch.CombinedRatio);
+        Assert.Equal(notch.Targets.Count, warmNotch.Targets.Count);
+        Assert.Null(warmNotch.Diagnostics);
+        Assert.Equal("Notch rows: computing...", warmFast.NotchRowSummary);
+        Assert.False(warmFast.IsNotchRowEligible);
+
+        var precomputed = Assert.IsType<CadPadInspectorSnapshot>(
+            helper.BuildCadPadInspectorSnapshot(cad.Id, true, false, false, false, compensation, "precomputed diagnostics")?.Cad);
+        Assert.Equal("precomputed diagnostics", precomputed.Notch?.Diagnostics);
+        Assert.Equal(notch.CombinedRatio, precomputed.Notch?.CombinedRatio);
+    }
 }
