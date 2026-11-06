@@ -69,6 +69,7 @@ public sealed partial class SettingsWindowViewModel
             return;
         }
 
+        _editedProperties.Add(nameof(CascadeIcSettings));
         RefreshCascadeTotalsFromRows();
     }
 
