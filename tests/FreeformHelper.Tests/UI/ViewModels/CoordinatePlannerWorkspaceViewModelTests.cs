@@ -470,6 +470,39 @@ public sealed class CoordinatePlannerWorkspaceViewModelTests
         Assert.Contains("\"rows\": [", requests[1].Content, StringComparison.Ordinal);
     }
 
+    [Theory]
+    [InlineData(true, "Coordinate preview exported.")]
+    [InlineData(false, "Coordinate preview export cancelled.")]
+    [InlineData(null, "Coordinate image export is unavailable in the current host.")]
+    public async Task ExportPreviewPngCommand_ReportsHostResultAsync(bool? hostResult, string expectedStatus)
+    {
+        var viewModel = new CoordinatePlannerWorkspaceViewModel(
+            new CoordinatePlannerWorkspaceUseCase(),
+            new CoordinatePlannerWorkspaceSession(
+                BuildGrid(),
+                Array.Empty<CadPad>(),
+                Array.Empty<string>(),
+                SourceRevision: 0,
+                DefaultMachineWidth: 100d,
+                DefaultMachineHeight: 50d,
+                DefaultPixelWidth: 1000,
+                DefaultPixelHeight: 500));
+        var exportRequests = 0;
+        if (hostResult.HasValue)
+        {
+            viewModel.RequestExportPreviewPngAsync = () =>
+            {
+                exportRequests++;
+                return Task.FromResult(hostResult.Value);
+            };
+        }
+
+        await viewModel.ExportPreviewPngCommand.ExecuteAsync(null);
+
+        Assert.Equal(expectedStatus, viewModel.StatusText);
+        Assert.Equal(hostResult.HasValue ? 1 : 0, exportRequests);
+    }
+
     private static RegularGrid BuildGrid()
     {
         return TestGeometryFactory.CreateRegularGrid(1, 1, cellWidth: 10d, cellHeight: 5d);

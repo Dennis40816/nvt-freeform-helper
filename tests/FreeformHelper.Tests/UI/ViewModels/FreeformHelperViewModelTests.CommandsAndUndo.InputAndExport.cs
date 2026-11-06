@@ -1,6 +1,7 @@
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
@@ -123,6 +124,81 @@ public sealed partial class FreeformHelperViewModelTests
         }
     }
 
+
+    [Fact]
+    public async Task ExportDxfCommands_WithEdits_PreserveGeometryAcrossVisibleAndAllLayersAsync()
+    {
+        var dxfPath = CreateTempDxfFile(
+            ("hidden", 0, 0, 10, 10),
+            ("signal", 20, 0, 30, 10),
+            ("signal", 28, 0, 38, 10),
+            ("signal", 50, 0, 60, 20),
+            ("aux", 80, 0, 90, 10));
+        var outputPath = TestFiles.NewTempFilePath("freeformhelper-edited-export-", ".dxf");
+        try
+        {
+            var vm = new FreeformHelperViewModel
+            {
+                PickOpenDxfPathAsync = () => Task.FromResult<string?>(dxfPath),
+                PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(outputPath),
+            };
+            await vm.OpenDxfCommand.ExecuteAsync(null);
+            var ids = vm.CadPads.OrderBy(static pad => pad.Id).Select(static pad => pad.Id).ToArray();
+            Assert.Equal(5, ids.Length);
+            await SelectCadPadsAsync(vm, [ids[0]]);
+            vm.DeleteSelectedCadPadsCommand.Execute(null);
+            await SelectCadPadsAsync(vm, [ids[1], ids[2]]);
+            vm.CombineSelectedCadPadsCommand.Execute(null);
+            await SelectCadPadsAsync(vm, [ids[3]]);
+            vm.DxfEditNewLayerName = "edited";
+            vm.CreateLayerAndMoveSelectedCadPadsCommand.Execute(null);
+            await SelectCadPadsAsync(vm, [ids[3]]);
+            vm.DxfEditRotationDegrees = 90m;
+            vm.RotateSelectedCadPadsCommand.Execute(null);
+            await WaitForGridRebuildAsync(vm);
+            vm.LayerToggles.Single(static layer => layer.Name == "aux").IsSelected = false;
+            await WaitForGridRebuildAsync(vm);
+
+            await vm.ExportDxfVisibleCommand.ExecuteAsync(null);
+
+            var visibleText = await TestFiles.ReadContentAsync(outputPath, TestContext.Current.CancellationToken);
+            Assert.Equal(2, visibleText.Split("LWPOLYLINE", StringSplitOptions.None).Length - 1);
+            var newLine = Environment.NewLine;
+            Assert.DoesNotContain($"8{newLine}hidden{newLine}", visibleText, StringComparison.Ordinal);
+            Assert.DoesNotContain($"8{newLine}aux{newLine}", visibleText, StringComparison.Ordinal);
+            Assert.Contains($"8{newLine}edited{newLine}", visibleText, StringComparison.Ordinal);
+            var visiblePads = DxfPadImporter.Import(outputPath).Pads;
+            var combined = Assert.Single(visiblePads, static pad => pad.Layer == "signal");
+            Assert.Equal(20d, combined.Bounds.MinX, 6);
+            Assert.Equal(38d, combined.Bounds.MaxX, 6);
+            Assert.Equal(180d, combined.Area, 6);
+            var rotated = Assert.Single(visiblePads, static pad => pad.Layer == "edited");
+            Assert.Equal(45d, rotated.Bounds.MinX, 6);
+            Assert.Equal(5d, rotated.Bounds.MinY, 6);
+            Assert.Equal(65d, rotated.Bounds.MaxX, 6);
+            Assert.Equal(15d, rotated.Bounds.MaxY, 6);
+
+            await vm.ExportDxfAllCommand.ExecuteAsync(null);
+
+            // Hidden pads stay excluded on every export (refactor-test-plan A02, A04); All only widens the layer scope.
+            var allText = await TestFiles.ReadContentAsync(outputPath, TestContext.Current.CancellationToken);
+            Assert.Equal(3, allText.Split("LWPOLYLINE", StringSplitOptions.None).Length - 1);
+            Assert.Contains($"8{newLine}aux{newLine}", allText, StringComparison.Ordinal);
+            Assert.Contains($"8{newLine}edited{newLine}", allText, StringComparison.Ordinal);
+            var allPads = DxfPadImporter.Import(outputPath).Pads;
+            Assert.Equal(3, allPads.Count);
+            Assert.All(visiblePads, pad => Assert.Contains(allPads, output =>
+                output.Layer == pad.Layer && output.Bounds == pad.Bounds));
+            var auxiliary = Assert.Single(allPads, static pad => pad.Layer == "aux");
+            Assert.Equal(80d, auxiliary.Bounds.MinX, 6);
+            Assert.Equal(90d, auxiliary.Bounds.MaxX, 6);
+        }
+        finally
+        {
+            File.Delete(dxfPath);
+            File.Delete(outputPath);
+        }
+    }
 
     [Fact]
     public async Task ExportNotchCommand_WhenPrerequisitesMissing_SetsStatus()
