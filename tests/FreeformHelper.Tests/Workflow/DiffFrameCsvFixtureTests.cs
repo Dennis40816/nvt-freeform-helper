@@ -15,7 +15,7 @@ public sealed class DiffFrameCsvFixtureTests
     {
         var fixturePath = Path.Combine(TestPaths.RepoRoot, "example", "TM 8.1", "simulation-single-finger.csv");
 
-        var file = DiffFrameCsvImporter.Import(fixturePath);
+        var file = DiffFrameCsvImporter.ImportContent(fixturePath, TestFiles.ReadContent(fixturePath));
 
         Assert.Equal(36, file.DeclaredCols);
         Assert.Equal(18, file.DeclaredRows);
@@ -38,7 +38,7 @@ public sealed class DiffFrameCsvFixtureTests
         await vm.LoadProjectFromPathAsync(projectPath);
 
         var grid = Assert.IsType<RegularGrid>(FreeformHelperViewModelPrivateAccess.Grid(vm));
-        var file = DiffFrameCsvImporter.Import(fixturePath);
+        var file = DiffFrameCsvImporter.ImportContent(fixturePath, TestFiles.ReadContent(fixturePath));
 
         foreach (var frame in file.Frames)
         {
@@ -123,7 +123,7 @@ public sealed class DiffFrameCsvFixtureTests
     public void Tm81SingleFingerFixture_FirstFrameStartsFromTopVisualRows()
     {
         var fixturePath = Path.Combine(TestPaths.RepoRoot, "example", "TM 8.1", "simulation-single-finger.csv");
-        var file = DiffFrameCsvImporter.Import(fixturePath);
+        var file = DiffFrameCsvImporter.ImportContent(fixturePath, TestFiles.ReadContent(fixturePath));
         var grid = BuildFixtureShapeGrid(rows: 18, cols: 36);
 
         var projection = DiffFrameGridProjectionService.ProjectFrame(
