@@ -101,7 +101,7 @@ public sealed partial class FreeformHelperView
 
     private async Task SaveProjectFromShortcutAsync(FreeformHelperViewModel viewModel)
     {
-        var save = viewModel.TryStartSaveProjectCommand();
+        var save = viewModel.TryStartSaveProjectCommandAsync();
         if (save is null)
         {
             return;

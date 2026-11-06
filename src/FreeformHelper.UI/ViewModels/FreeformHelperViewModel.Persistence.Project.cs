@@ -14,7 +14,7 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 public sealed partial class FreeformHelperViewModel
 {
-    internal Task<bool>? TryStartSaveProjectCommand()
+    internal Task<bool>? TryStartSaveProjectCommandAsync()
     {
         if (SaveProjectCommand.IsRunning || !SaveProjectCommand.CanExecute(null))
         {

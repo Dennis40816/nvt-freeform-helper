@@ -2933,16 +2933,6 @@
       "count": 1,
       "rule": "VSTHRD200",
       "symbol": "VSTHRD200"
-    },
-    {
-      "syntaxHash": "a199ac4560e0539ab3ad0fa0d5839ce62b061a2af132ba2ba4e543fb5a6d9881",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.TryStartSaveProjectCommand()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "VSTHRD200",
-      "symbol": "VSTHRD200"
     }
   ]
 }

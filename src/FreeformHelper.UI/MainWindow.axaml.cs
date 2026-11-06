@@ -102,7 +102,7 @@ public sealed partial class MainWindow : Window
             if (result is null) return;
             if (result.Value)
             {
-                var save = helper.TryStartSaveProjectCommand();
+                var save = helper.TryStartSaveProjectCommandAsync();
                 if (save is null || !await save) return;
             }
 
