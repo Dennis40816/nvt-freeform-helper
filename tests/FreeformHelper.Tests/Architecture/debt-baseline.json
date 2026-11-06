@@ -72,9 +72,7 @@
   },
   "layering": {
     "domainAndApplicationAvalonia": [],
-    "domainAndApplicationPlatformIo": [
-      "src/FreeformHelper.Application/Services/DiffFrameCsvImporter.cs", "src/FreeformHelper.Application/Services/RegularVisibilityMaskService.cs"
-    ],
+    "domainAndApplicationPlatformIo": [],
     "viewModelsAvalonia": [
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CadLoadOverlay.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs",

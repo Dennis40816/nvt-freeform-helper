@@ -22,7 +22,7 @@ public sealed class DiffFrameCsvImporterTests
             10,11,12
             """);
 
-        var result = DiffFrameCsvImporter.Import(path);
+        var result = DiffFrameCsvImporter.ImportContent(path, TestFiles.ReadContent(path));
 
         Assert.Equal(3, result.DeclaredCols);
         Assert.Equal(2, result.DeclaredRows);
@@ -67,7 +67,7 @@ public sealed class DiffFrameCsvImporterTests
             4,5
             """);
 
-        var error = Assert.Throws<InvalidDataException>(() => DiffFrameCsvImporter.Import(path));
+        var error = Assert.Throws<InvalidDataException>(() => DiffFrameCsvImporter.ImportContent(path, TestFiles.ReadContent(path)));
         Assert.Contains("inconsistent row width", error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -84,7 +84,7 @@ public sealed class DiffFrameCsvImporterTests
             5,6
             """);
 
-        var result = DiffFrameCsvImporter.Import(path);
+        var result = DiffFrameCsvImporter.ImportContent(path, TestFiles.ReadContent(path));
 
         Assert.Single(result.Frames);
         Assert.Empty(result.Diagnostics);

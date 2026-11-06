@@ -38,7 +38,8 @@ public sealed class JsonProjectStore
     /// </exception>
     public static ProjectFile Load(string path)
     {
-        var json = File.ReadAllText(path); // Read the entire JSON content from the file
+        using var reader = new StreamReader(path);
+        var json = reader.ReadToEnd(); // Read the entire JSON content from the file
         var file = JsonSerializer.Deserialize<ProjectFile>(json, _options) // Deserialize JSON to ProjectFile object
             ?? throw new InvalidOperationException("Failed to parse project file.");
         ProjectFileMigrator.MigrateInPlace(file);

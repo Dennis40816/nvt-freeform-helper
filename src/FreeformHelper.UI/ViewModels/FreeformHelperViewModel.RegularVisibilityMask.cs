@@ -75,12 +75,25 @@ public sealed partial class FreeformHelperViewModel
                 ResolveRegularVisibilityMaskSourceLabel(),
                 grid,
                 DiffFrameGridRowOrigin.TopRowIsRegularLastRow)
-            : RegularVisibilityMaskService.Load(
+            : LoadRegularVisibilityMask(
                 _regularVisibilityMask.SourcePath,
-                grid,
-                DiffFrameGridRowOrigin.TopRowIsRegularLastRow);
+                grid);
 
         ApplyRegularVisibilityMaskResult(result, grid);
+    }
+
+    private static RegularVisibilityMaskResult LoadRegularVisibilityMask(string? sourcePath, RegularGrid grid)
+    {
+        if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
+        {
+            return RegularVisibilityMaskResult.NotFound(sourcePath);
+        }
+
+        return RegularVisibilityMaskService.LoadText(
+            sourcePath,
+            () => new StreamReader(sourcePath),
+            grid,
+            DiffFrameGridRowOrigin.TopRowIsRegularLastRow);
     }
 
     private void ApplyRegularVisibilityMaskSnapshot(
