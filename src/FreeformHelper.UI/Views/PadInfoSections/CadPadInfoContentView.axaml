@@ -110,7 +110,7 @@
               </Grid>
             </Border>
             <StackPanel Spacing="{DynamicResource Space4}" IsVisible="{Binding HasTargetAllocationItems}">
-              <SelectableTextBlock Classes="padInfoTitle" Text="Area split to Regular pads"/>
+              <SelectableTextBlock Classes="padInfoTitle" Text="{Binding AllocationTitleText}"/>
               <SelectableTextBlock Classes="padInfoMetaText" Text="{Binding AllocationHintText}" TextWrapping="Wrap"/>
               <padInfo:PadInfoRelationCardListView Cards="{Binding TargetAllocationItems}" Compact="True"/>
             </StackPanel>

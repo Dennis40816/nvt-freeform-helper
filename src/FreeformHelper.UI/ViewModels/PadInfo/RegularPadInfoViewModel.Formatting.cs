@@ -5,6 +5,24 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfoChangeTracking
 {
+    public string PanelIdentityText => IsMulti ? Title : IdentityText;
+    public string AllocationTitleText { get; } = PadInfoRelationText.AllocationTitle;
+    public string AllocationHintText { get; } = PadInfoRelationText.HighlightHint;
+    public string IdentityToolTip => IsMulti
+        ? $"IC {IcText} · Diff idx {DiffIndexText}"
+        : $"X/Y are 1-based; row/col are 0-based{Environment.NewLine}{RowColText}";
+    public string MatchToolTip => $"{MatchDetailsText}{Environment.NewLine}Confidence: {MatchConfidenceText}" +
+                                  $"{Environment.NewLine}Diff source: {DiffSourceText}";
+    public string SizeScopeText { get; } = "Overrides pad width for selected rows/cols.";
+    public string FreeformActionHint { get; } = $"Changes apply immediately{Environment.NewLine}Apply changes and close.";
+    public string LocateMatchToolTip => HasLocateMatchAction
+        ? "Focus the best match when available; otherwise highlight related CAD pads."
+        : IsMulti
+            ? "Select a single Regular pad first"
+            : _regularPadIdForMatchActions.HasValue
+                ? "Match navigation is unavailable for this selection"
+                : "No related CAD pads are available";
+
     /// <summary>
     /// Helper method to format a collection of integers into formatted index ranges (e.g., "1, 3-5, 7").
     /// </summary>
