@@ -62,12 +62,14 @@ public sealed class CadLoadSpinnerProcessHostTests
         Assert.Equal("Hidden", snapshot.Effective);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Dispose_ResetsRequestedAndEffectiveVisibilityToHidden()
     {
-        using var host = new CadLoadSpinnerProcessHost();
-        SetVisibilityState(host, "_requestedVisibility", "Visible");
-        SetVisibilityState(host, "_effectiveVisibility", "Visible");
+        using var host = new CadLoadSpinnerProcessHost(_ => true);
+        host.Show(new Window());
+        var shown = host.GetVisibilityStateSnapshot();
+        Assert.Equal("Visible", shown.Requested);
+        Assert.Equal("Visible", shown.Effective);
 
         host.Dispose();
         var snapshot = host.GetVisibilityStateSnapshot();
@@ -142,14 +144,5 @@ public sealed class CadLoadSpinnerProcessHostTests
             Assert.Fail(
                 $"{what} within {SafetyNetTimeout.TotalSeconds:0} s. Requested={snapshot.Requested}, Effective={snapshot.Effective}, state sync status={stateSync.Status}.");
         }
-    }
-
-    private static void SetVisibilityState(CadLoadSpinnerProcessHost host, string fieldName, string stateName)
-    {
-        var field = typeof(CadLoadSpinnerProcessHost).GetField(fieldName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        var stateType = field!.FieldType;
-        var value = Enum.Parse(stateType, stateName);
-        field.SetValue(host, value);
     }
 }
