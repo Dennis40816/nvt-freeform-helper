@@ -157,7 +157,6 @@
     "src/FreeformHelper.UI/Views/FreeformHelperView.axaml",
     "src/FreeformHelper.UI/Views/IndexMappingReportWindow.axaml",
     "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml",
-    "src/FreeformHelper.UI/Views/NotchDetailWindow.axaml",
     "src/FreeformHelper.UI/Views/PadInfoPopover.axaml",
     "src/FreeformHelper.UI/Views/PadInfoSections/CadPadInfoContentView.axaml",
     "src/FreeformHelper.UI/Views/PadInfoSections/PadInfoRelationCardListView.axaml",
