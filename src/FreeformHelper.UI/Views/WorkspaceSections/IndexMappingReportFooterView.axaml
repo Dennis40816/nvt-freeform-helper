@@ -1,0 +1,32 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.IndexMappingReportFooterView"
+             x:DataType="viewModels:IndexMappingReportViewModel">
+  <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}"
+          Padding="{DynamicResource InsetTop10}">
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+      <StackPanel VerticalAlignment="Center" Spacing="{DynamicResource Space2}">
+        <SelectableTextBlock x:Name="LastActionStatus" Foreground="{DynamicResource BrushTextMuted}"
+                             Text="{Binding ActionStatus}" TextWrapping="WrapWithOverflow"/>
+        <SelectableTextBlock Foreground="{DynamicResource BrushTextMuted}"
+                             Text="Simulation uses exported notch table payload."
+                             IsVisible="{Binding ShowSimulationActionButtons}" TextWrapping="WrapWithOverflow"/>
+      </StackPanel>
+      <StackPanel x:Name="RepairActions" Grid.Column="1" Orientation="Horizontal"
+                  HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="{DynamicResource Space6}">
+        <Button Classes="actionNeutral" Content="Clear override" Command="{Binding ClearOverrideCommand}"
+                IsEnabled="{Binding CanClearSelectedIssueOverride}" IsVisible="{Binding ShowStep4ActionButtons}"/>
+        <Button Classes="actionNeutral" Content="Apply override" Command="{Binding ApplyOverrideCommand}"
+                IsEnabled="{Binding CanApplySelectedIssueOverride}" IsVisible="{Binding ShowStep4ActionButtons}"/>
+        <Button Classes="actionNeutral" Content="Apply segment repairs" Command="{Binding ApplySegmentDiffOverridesCommand}"
+                IsEnabled="{Binding CanApplySelectedSegmentDiffOverrides}" IsVisible="{Binding ShowStep5ActionButtons}"/>
+        <Button Classes="actionPrimary" Content="Apply diff repair" Command="{Binding ApplyDiffOverrideCommand}"
+                IsEnabled="{Binding CanApplySelectedDiffOverride}" IsVisible="{Binding ShowStep4ActionButtons}"/>
+        <Button Classes="actionPrimary" Content="Apply visible repairs" Command="{Binding ApplyCadOutputFwDiffOverridesCommand}"
+                IsEnabled="{Binding CanApplyCadOutputFwDiffOverrides}" IsVisible="{Binding ShowStep5ActionButtons}"/>
+      </StackPanel>
+    </Grid>
+  </Border>
+</UserControl>

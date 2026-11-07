@@ -1,0 +1,51 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
+             xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.IndexMappingReportFilterBarView"
+             x:DataType="viewModels:IndexMappingReportViewModel">
+  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+    <primitives:BalancedWrapPanel ItemSpacing="{DynamicResource Space2}" LineSpacing="{DynamicResource Space4}">
+      <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsFilterAllActive}"
+                    IsChecked="{Binding IsFilterAllActive, Mode=OneWay}" Content="{Binding AllFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.All}"/>
+      <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsFilterChangedByMaskActive}"
+                    IsChecked="{Binding IsFilterChangedByMaskActive, Mode=OneWay}" Content="{Binding ChangedFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.ChangedByMask}"/>
+      <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsFilterRemovedByMaskActive}"
+                    IsChecked="{Binding IsFilterRemovedByMaskActive, Mode=OneWay}" Content="{Binding RemovedFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.RemovedByMask}"/>
+      <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsFilterAmbiguousActive}"
+                    IsChecked="{Binding IsFilterAmbiguousActive, Mode=OneWay}" Content="{Binding AmbiguousFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.Ambiguous}"/>
+      <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsFilterDuplicateDiffActive}"
+                    IsChecked="{Binding IsFilterDuplicateDiffActive, Mode=OneWay}" Content="{Binding DuplicateFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.DuplicateDiff}"/>
+      <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsFilterLowConfidenceActive}"
+                    IsChecked="{Binding IsFilterLowConfidenceActive, Mode=OneWay}" Content="{Binding LowConfidenceFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.LowConfidence}"/>
+      <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsFilterUnmappedActive}"
+                    IsChecked="{Binding IsFilterUnmappedActive, Mode=OneWay}" Content="{Binding UnmappedFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.Unmapped}"/>
+      <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsFilterCountMismatchActive}"
+                    IsChecked="{Binding IsFilterCountMismatchActive, Mode=OneWay}" Content="{Binding MismatchFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.CountMismatch}"/>
+    </primitives:BalancedWrapPanel>
+    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space6}" VerticalAlignment="Top">
+      <TextBox x:Name="SearchBox" Width="{DynamicResource IndexMappingReportSearchWidth}"
+               PlaceholderText="{Binding SearchWatermarkText}" Text="{Binding SearchKeyword, Mode=TwoWay}"
+               TextWrapping="NoWrap" ToolTip.Tip="Ctrl+F to search · Esc clears"/>
+      <Button Classes="actionGhost" Content="Clear" Command="{Binding ClearSearchKeywordCommand}"
+              IsVisible="{Binding HasSearchKeyword}"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

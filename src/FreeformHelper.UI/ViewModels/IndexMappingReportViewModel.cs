@@ -195,7 +195,7 @@ public sealed partial class IndexMappingReportViewModel : ObservableObject
     public string SimulationImpactText => SelectedDecision is null
         ? "impact: select a row to inspect linked regular/notch rows."
         : $"impact: linked CAD {SelectedDecision.CadPadId?.ToString(CultureInfo.InvariantCulture) ?? "n/a"}, suggested {SelectedDecision.SuggestedDisplay}";
-    public string SimulationScopeText => $"scope: {SelectedFilterLabel}, visible rows {VisibleDecisionCount}/{TotalDecisionCount}";
+    public string SimulationScopeText => $"visible rows {VisibleDecisionCount}/{TotalDecisionCount}";
     public string StepFilterSyncText => SyncFilterWithStepRail ? "Step sync on" : "Step sync off";
 
     [ObservableProperty] private IReadOnlyList<IndexMappingReportIssueViewModel> _issues = Array.Empty<IndexMappingReportIssueViewModel>();

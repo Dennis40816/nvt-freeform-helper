@@ -155,7 +155,6 @@
     "src/FreeformHelper.UI/Views/DxfEditChangeListWindow.axaml",
     "src/FreeformHelper.UI/Views/DxfOverlapReportWindow.axaml",
     "src/FreeformHelper.UI/Views/FreeformHelperView.axaml",
-    "src/FreeformHelper.UI/Views/IndexMappingReportWindow.axaml",
     "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml",
     "src/FreeformHelper.UI/Views/NotchDetailWindow.axaml",
     "src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml",
@@ -182,8 +181,6 @@
     "src/FreeformHelper.UI/Views/WorkflowSteps/RightWorkflowStep5View.axaml",
     "src/FreeformHelper.UI/Views/WorkspaceSections/CoordinatePlannerWorkspaceControlsPaneView.axaml",
     "src/FreeformHelper.UI/Views/WorkspaceSections/CoordinatePlannerWorkspaceDetailsPaneView.axaml",
-    "src/FreeformHelper.UI/Views/WorkspaceSections/IndexMappingReportLeftPaneView.axaml",
-    "src/FreeformHelper.UI/Views/WorkspaceSections/IndexMappingReportRightPaneView.axaml",
     "src/FreeformHelper.UI/Views/WorkspaceSections/NotchExportSelectionRowsPaneView.axaml",
     "src/FreeformHelper.UI/Views/WorkspaceSections/SimulationWorkspaceControlsPaneView.axaml",
     "src/FreeformHelper.UI/Views/WorkspaceSections/SimulationWorkspaceDetailsPaneView.axaml"
