@@ -26,80 +26,8 @@ internal sealed partial class RuntimeQueryUseCase
             snapshot = new
             {
                 kind = snapshot.Kind,
-                cad = new
-                {
-                    cadPadId = cad.CadPadId,
-                    cad.Name,
-                    cad.Layer,
-                    cad.Area,
-                    centroid = new { cad.Centroid.X, cad.Centroid.Y },
-                    bounds = new { cad.Bounds.MinX, cad.Bounds.MinY, cad.Bounds.MaxX, cad.Bounds.MaxY },
-                    cad.Vertices,
-                    cad.DxfIndex,
-                    cad.CadOutputFwDiffOverride,
-                    cad.IsDxfIndexAnchor,
-                    cad.DxfIndexDisplayText,
-                    cad.CadOutputFwDiffAssignmentModeText,
-                    cad.IcIndex,
-                    cad.MatchText,
-                    cad.MatchDetailsText,
-                    cad.MatchConfidence,
-                    matchedRegularPadIds = cad.MatchedRegularPadIds,
-                    matchedRegularDetails = cad.MatchedRegularDetails.Select(detail => new
-                    {
-                        detail.RegularPadId,
-                        detail.IcIndex,
-                        detail.DiffIndex,
-                        detail.CadCoverage,
-                        detail.RegularCoverage
-                    }),
-                    notch = cad.Notch is null
-                        ? null
-                        : new
-                        {
-                            cad.Notch.ToRegularRatio,
-                            cad.Notch.ToFullRatio,
-                            cad.Notch.CombinedRatio,
-                            cad.Notch.IsToFullEnabled,
-                            cad.Notch.Stage3Area,
-                            cad.Notch.StrictAreaThreshold,
-                            targets = cad.Notch.Targets.Select(target => new
-                            {
-                                target.IcIndex,
-                                target.DiffIndex,
-                                target.EffectiveArea,
-                                target.Ratio,
-                                target.RatioPercentRounded,
-                                target.PassesStrictThreshold,
-                                target.IsAnchorDiff,
-                                target.ToFullAppliedRegularCount,
-                                target.RegularCount
-                            }),
-                            cad.Notch.Diagnostics,
-                            display = notchDisplay is null
-                                ? null
-                                : new
-                                {
-                                    notchDisplay.ToRegularRatioText,
-                                    notchDisplay.ToFullRatioText,
-                                    notchDisplay.CombinedRatioText,
-                                    notchDisplay.ToRegularValueText,
-                                    notchDisplay.ToFullValueText,
-                                    notchDisplay.CombinedValueText,
-                                    notchDisplay.ToFullReasonShortText,
-                                    notchDisplay.ToFullReasonFullText,
-                                    notchDisplay.Stage3AreaText,
-                                    notchDisplay.TargetAllocationSummaryText,
-                                    notchDisplay.OwnerSummaryText
-                                }
-                        }
-                },
-                ruleTrace = cad.RuleTrace.Select(step => new
-                {
-                    step.Rule,
-                    step.Outcome,
-                    step.Detail
-                })
+                cad = BuildCadSnapshotPayload(cad, notchDisplay),
+                ruleTrace = BuildRuleTracePayload(cad.RuleTrace)
             },
             cadPad = new
             {
@@ -114,27 +42,7 @@ internal sealed partial class RuntimeQueryUseCase
                 diffIndex = cad.DxfIndex,
                 isSelected = helper.SelectedCadPadIds.Contains(cadPadId)
             },
-            notchV22 = cad.Notch is null
-                ? null
-                : new
-                {
-                    toRegularRatio = cad.Notch.ToRegularRatio,
-                    toFullRatio = cad.Notch.ToFullRatio,
-                    combinedRatio = cad.Notch.CombinedRatio,
-                    isToFullEnabled = cad.Notch.IsToFullEnabled,
-                    stage3Area = cad.Notch.Stage3Area,
-                    strictAreaThreshold = cad.Notch.StrictAreaThreshold,
-                    targetCount = cad.Notch.Targets.Count,
-                    display = notchDisplay is null
-                        ? null
-                        : new
-                        {
-                            notchDisplay.ToRegularValueText,
-                            notchDisplay.ToFullValueText,
-                            notchDisplay.CombinedValueText,
-                            notchDisplay.ToFullReasonShortText
-                        }
-                },
+            notchV22 = BuildCadNotchSummaryPayload(cad.Notch, notchDisplay),
             matchedRegularIds = cad.MatchedRegularPadIds,
             matchedRegularDetails = cad.MatchedRegularDetails.Select(detail => new
             {
@@ -142,13 +50,116 @@ internal sealed partial class RuntimeQueryUseCase
                 icIndex = detail.IcIndex,
                 diffIndex = detail.DiffIndex
             }),
-            ruleTrace = cad.RuleTrace.Select(step => new
-            {
-                step.Rule,
-                step.Outcome,
-                step.Detail
-            })
+            ruleTrace = BuildRuleTracePayload(cad.RuleTrace)
         });
+    }
+
+    private static object BuildCadSnapshotPayload(CadPadInspectorSnapshot cad, NotchDisplayProjection? notchDisplay)
+    {
+        return new
+        {
+            cadPadId = cad.CadPadId,
+            cad.Name,
+            cad.Layer,
+            cad.Area,
+            centroid = new { cad.Centroid.X, cad.Centroid.Y },
+            bounds = new { cad.Bounds.MinX, cad.Bounds.MinY, cad.Bounds.MaxX, cad.Bounds.MaxY },
+            cad.Vertices,
+            cad.DxfIndex,
+            cad.CadOutputFwDiffOverride,
+            cad.IsDxfIndexAnchor,
+            cad.DxfIndexDisplayText,
+            cad.CadOutputFwDiffAssignmentModeText,
+            cad.IcIndex,
+            cad.MatchText,
+            cad.MatchDetailsText,
+            cad.MatchConfidence,
+            matchedRegularPadIds = cad.MatchedRegularPadIds,
+            matchedRegularDetails = cad.MatchedRegularDetails.Select(detail => new
+            {
+                detail.RegularPadId,
+                detail.IcIndex,
+                detail.DiffIndex,
+                detail.CadCoverage,
+                detail.RegularCoverage
+            }),
+            notch = BuildCadNotchDetailPayload(cad.Notch, notchDisplay)
+        };
+    }
+
+    private static object? BuildCadNotchDetailPayload(PadInspectorNotchSnapshot? notch, NotchDisplayProjection? notchDisplay)
+    {
+        if (notch is null)
+        {
+            return null;
+        }
+
+        return new
+        {
+            notch.ToRegularRatio,
+            notch.ToFullRatio,
+            notch.CombinedRatio,
+            notch.IsToFullEnabled,
+            notch.Stage3Area,
+            notch.StrictAreaThreshold,
+            targets = notch.Targets.Select(target => new
+            {
+                target.IcIndex,
+                target.DiffIndex,
+                target.EffectiveArea,
+                target.Ratio,
+                target.RatioPercentRounded,
+                target.PassesStrictThreshold,
+                target.IsAnchorDiff,
+                target.ToFullAppliedRegularCount,
+                target.RegularCount
+            }),
+            notch.Diagnostics,
+            display = notchDisplay is null
+                ? null
+                : new
+                {
+                    notchDisplay.ToRegularRatioText,
+                    notchDisplay.ToFullRatioText,
+                    notchDisplay.CombinedRatioText,
+                    notchDisplay.ToRegularValueText,
+                    notchDisplay.ToFullValueText,
+                    notchDisplay.CombinedValueText,
+                    notchDisplay.ToFullReasonShortText,
+                    notchDisplay.ToFullReasonFullText,
+                    notchDisplay.Stage3AreaText,
+                    notchDisplay.TargetAllocationSummaryText,
+                    notchDisplay.OwnerSummaryText
+                }
+        };
+    }
+
+    private static object? BuildCadNotchSummaryPayload(PadInspectorNotchSnapshot? notch, NotchDisplayProjection? notchDisplay)
+    {
+        if (notch is null)
+        {
+            return null;
+        }
+
+        return new
+        {
+            toRegularRatio = notch.ToRegularRatio,
+            toFullRatio = notch.ToFullRatio,
+            combinedRatio = notch.CombinedRatio,
+            isToFullEnabled = notch.IsToFullEnabled,
+            stage3Area = notch.Stage3Area,
+            strictAreaThreshold = notch.StrictAreaThreshold,
+            targetCount = notch.Targets.Count,
+            display = notchDisplay is null
+                ? null
+                : new
+                {
+                    notchDisplay.ToRegularValueText,
+                    notchDisplay.ToFullValueText,
+                    notchDisplay.CombinedValueText,
+                    notchDisplay.ToFullReasonShortText
+                }
+        };
     }
 
     private RuntimeQueryResponseEnvelope QueryRegularPad(int regularPadId)
@@ -195,12 +206,7 @@ internal sealed partial class RuntimeQueryUseCase
                         detail.RegularCoverage
                     })
                 },
-                ruleTrace = regular.RuleTrace.Select(step => new
-                {
-                    step.Rule,
-                    step.Outcome,
-                    step.Detail
-                })
+                ruleTrace = BuildRuleTracePayload(regular.RuleTrace)
             },
             regularPad = new
             {
@@ -218,12 +224,17 @@ internal sealed partial class RuntimeQueryUseCase
                 isSelected = helper.SelectedRegularPadIndices.Contains(regular.Index)
             },
             matchedCadIds = regular.MatchedCadPadIds,
-            ruleTrace = regular.RuleTrace.Select(step => new
-            {
-                step.Rule,
-                step.Outcome,
-                step.Detail
-            })
+            ruleTrace = BuildRuleTracePayload(regular.RuleTrace)
+        });
+    }
+
+    private static IEnumerable<object> BuildRuleTracePayload(IReadOnlyList<PadInspectorRuleTraceEntry> ruleTrace)
+    {
+        return ruleTrace.Select(step => (object)new
+        {
+            step.Rule,
+            step.Outcome,
+            step.Detail
         });
     }
 }

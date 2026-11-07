@@ -78,16 +78,8 @@ internal static class RuntimeQueryCommandLine
         prettyJson = true;
         error = null;
 
-        if (args.Length < 2)
+        if (!TryReadCommandName(args, out command, out error))
         {
-            error = $"Usage: query <{string.Join("|", _supportedCommands)}> [--key value]";
-            return false;
-        }
-
-        command = args[1].Trim().ToLowerInvariant();
-        if (!_supportedCommands.Contains(command, StringComparer.Ordinal))
-        {
-            error = $"Unsupported query command '{command}'. Supported: {string.Join(", ", _supportedCommands)}.";
             return false;
         }
 
@@ -112,27 +104,7 @@ internal static class RuntimeQueryCommandLine
                 return false;
             }
 
-            string key;
-            string value;
-            var equalIndex = token.IndexOf('=', StringComparison.Ordinal);
-            if (equalIndex > 2)
-            {
-                key = token.Substring(2, equalIndex - 2);
-                value = token[(equalIndex + 1)..];
-            }
-            else
-            {
-                key = token[2..];
-                if (i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal))
-                {
-                    value = args[++i];
-                }
-                else
-                {
-                    value = "true";
-                }
-            }
-
+            var (key, value) = ReadOption(args, ref i);
             if (string.Equals(key, "timeout-ms", StringComparison.OrdinalIgnoreCase))
             {
                 if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedTimeout) ||
@@ -151,5 +123,46 @@ internal static class RuntimeQueryCommandLine
         }
 
         return true;
+    }
+
+    private static bool TryReadCommandName(string[] args, out string command, out string? error)
+    {
+        command = string.Empty;
+        error = null;
+
+        if (args.Length < 2)
+        {
+            error = $"Usage: query <{string.Join("|", _supportedCommands)}> [--key value]";
+            return false;
+        }
+
+        command = args[1].Trim().ToLowerInvariant();
+        if (!_supportedCommands.Contains(command, StringComparer.Ordinal))
+        {
+            error = $"Unsupported query command '{command}'. Supported: {string.Join(", ", _supportedCommands)}.";
+            return false;
+        }
+
+        return true;
+    }
+
+    // Reads "--key=value", "--key value" or a bare "--key" (value "true") at args[index].
+    // A value that follows as the next token moves index onto it.
+    private static (string Key, string Value) ReadOption(string[] args, ref int index)
+    {
+        var token = args[index];
+        var equalIndex = token.IndexOf('=', StringComparison.Ordinal);
+        if (equalIndex > 2)
+        {
+            return (token.Substring(2, equalIndex - 2), token[(equalIndex + 1)..]);
+        }
+
+        var key = token[2..];
+        if (index + 1 < args.Length && !args[index + 1].StartsWith("--", StringComparison.Ordinal))
+        {
+            return (key, args[++index]);
+        }
+
+        return (key, "true");
     }
 }

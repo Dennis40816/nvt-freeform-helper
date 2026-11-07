@@ -241,6 +241,38 @@ public sealed class NotchDisplayProjectorTests
     }
 
     [Fact]
+    public void Build_WithSeveralDiagnosticsLines_JoinsBlocksWithBlankLineAndKeepsOtherLines()
+    {
+        var notch = new PadInspectorNotchSnapshot(
+            ToRegularRatio: 1.0,
+            ToFullRatio: 1.0,
+            CombinedRatio: 1.0,
+            IsToFullEnabled: true,
+            Stage3Area: 1.0,
+            StrictAreaThreshold: 0.1,
+            Targets: Array.Empty<PadInspectorNotchTargetSnapshot>(),
+            Diagnostics:
+                "IC1/diff84 reg4808: ov=10, src=10, blk=0, reach=15, blocker=0, " +
+                "owners=123|124, ownerShare=50/50, boundary=Y, candidate=Y, tofull=Y (EXPAND_CLEAR_PATH)\n" +
+                "+ 3 more\n" +
+                "not a diagnostics line\n" +
+                "IC2/diff7 reg9: ov=1.5, src=2, blk=0.25, reach=1, blocker=2, " +
+                "boundary=Y, candidate=N, tofull=Y (EXPAND_CLEAR_PATH)");
+
+        var projection = NotchDisplayProjector.Build(notch);
+
+        const string firstBlock =
+            "IC1/diff84  REG4808\nArea  ov=10, src=10, blk=0, reach=15\nOwners 2 (123, 124)\nShare  50/50\n" +
+            "Flags  boundary=Y, candidate=Y, tofull=Y, blocker=0\nRule   Expansion applied on clear path. (EXPAND_CLEAR_PATH)";
+        const string lastBlock =
+            "IC2/diff7  REG9\nArea  ov=1.5, src=2, blk=0.25, reach=1\nOwners 0 (-)\nShare  -\n" +
+            "Flags  boundary=Y, candidate=N, tofull=Y, blocker=2\nRule   Expansion applied on clear path. (EXPAND_CLEAR_PATH)";
+        Assert.Equal(
+            firstBlock + "\n\n+ 3 more\n\nnot a diagnostics line\n\n" + lastBlock,
+            projection.ToFullDiagnosticsText.Replace("\r\n", "\n", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void Build_WhenTargetCoverageIsCompatibilityMode_PreservesStrictOnlyDisplay()
     {
         var target = new NotchV22TargetAllocation(

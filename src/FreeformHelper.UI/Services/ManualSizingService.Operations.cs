@@ -79,7 +79,26 @@ public static partial class ManualSizingService
         EnsureSizingLists(grid);
         var snapshot = CaptureSnapshot(grid);
 
-        // --- Reset Widths ---
+        // The heights are only reset when the widths succeeded. Either failure restores the whole grid.
+        var error = TryResetWidths(grid, alignmentMode, cad, rows, cols)
+            ?? TryResetHeights(grid, alignmentMode, cad, rows, cols);
+        if (error is not null)
+        {
+            RestoreSnapshot(grid, snapshot);
+            return ManualSizingResult.Fail(snapshot, error);
+        }
+
+        return ManualSizingResult.Ok(snapshot);
+    }
+
+    // Returns null when the widths were reset, or the error of the redistribution.
+    private static string? TryResetWidths(
+        GridSettings grid,
+        GridAlignmentMode alignmentMode,
+        CadPadSet? cad,
+        IReadOnlyCollection<int> rows,
+        IReadOnlyCollection<int> cols)
+    {
         if (grid.WidthScope == WidthAdjustmentScope.ColumnGlobal)
         {
             // Reset individual column widths and overrides to default (0.0 for width, false for override).
@@ -92,46 +111,51 @@ public static partial class ManualSizingService
 
             // Redistribute remaining space among non-overridden columns.
             var target = GetTargetGridSize(grid, alignmentMode, cad);
-            if (!TryDistributeSizesWithOverrides(grid.ColumnWidths, grid.ColumnOverrides, target.width, out var colError))
-            {
-                RestoreSnapshot(grid, snapshot);
-                return ManualSizingResult.Fail(snapshot, colError);
-            }
+            return TryDistributeSizesWithOverrides(grid.ColumnWidths, grid.ColumnOverrides, target.width, out var colError)
+                ? null
+                : colError;
         }
-        else // RowLocal width scope
+
+        // RowLocal width scope: iterate through affected rows.
+        var rowTarget = GetTargetGridSize(grid, alignmentMode, cad);
+        foreach (var r in rows.Distinct())
         {
-            // Iterate through affected rows.
-            var target = GetTargetGridSize(grid, alignmentMode, cad);
-            foreach (var r in rows.Distinct())
+            if (r < 0 || r >= grid.YChannels) continue;
+            var rowFlags = grid.RowWidthOverrideFlags[r];
+            var rowVals = grid.RowWidthOverrides[r];
+            // Reset specific cells within the row.
+            foreach (var c in cols.Distinct())
             {
-                if (r < 0 || r >= grid.YChannels) continue;
-                var rowFlags = grid.RowWidthOverrideFlags[r];
-                var rowVals = grid.RowWidthOverrides[r];
-                // Reset specific cells within the row.
-                foreach (var c in cols.Distinct())
-                {
-                    if (c < 0 || c >= grid.XChannels) continue;
-                    rowVals[c] = 0.0;
-                    rowFlags[c] = false;
-                }
-
-                // Recalculate and redistribute widths for this row.
-                var composed = ComposeRowWidths(grid, r);
-                // autoFlags indicates which cells should automatically adjust their size.
-                var autoFlags = BuildAutoFlags(rowFlags, composed.Count);
-                if (!TryDistributeSizes(composed, autoFlags, target.width, out var err))
-                {
-                    RestoreSnapshot(grid, snapshot);
-                    return ManualSizingResult.Fail(snapshot, err);
-                }
-
-                // Update the grid settings with the new distributed values.
-                grid.RowWidthOverrides[r] = composed;
-                grid.RowWidthOverrideFlags[r] = rowFlags; // Store the flags (which are now inverted from autoFlags)
+                if (c < 0 || c >= grid.XChannels) continue;
+                rowVals[c] = 0.0;
+                rowFlags[c] = false;
             }
+
+            // Recalculate and redistribute widths for this row.
+            var composed = ComposeRowWidths(grid, r);
+            // autoFlags indicates which cells should automatically adjust their size.
+            var autoFlags = BuildAutoFlags(rowFlags, composed.Count);
+            if (!TryDistributeSizes(composed, autoFlags, rowTarget.width, out var err))
+            {
+                return err;
+            }
+
+            // Update the grid settings with the new distributed values.
+            grid.RowWidthOverrides[r] = composed;
+            grid.RowWidthOverrideFlags[r] = rowFlags; // Store the flags (which are now inverted from autoFlags)
         }
 
-        // --- Reset Heights ---
+        return null;
+    }
+
+    // Returns null when the heights were reset, or the error of the redistribution.
+    private static string? TryResetHeights(
+        GridSettings grid,
+        GridAlignmentMode alignmentMode,
+        CadPadSet? cad,
+        IReadOnlyCollection<int> rows,
+        IReadOnlyCollection<int> cols)
+    {
         if (grid.HeightScope == HeightAdjustmentScope.RowGlobal)
         {
             // Reset individual row heights and overrides to default.
@@ -144,45 +168,40 @@ public static partial class ManualSizingService
 
             // Redistribute remaining space among non-overridden rows.
             var target = GetTargetGridSize(grid, alignmentMode, cad);
-            if (!TryDistributeSizesWithOverrides(grid.RowHeights, grid.RowOverrides, target.height, out var rowError))
-            {
-                RestoreSnapshot(grid, snapshot);
-                return ManualSizingResult.Fail(snapshot, rowError);
-            }
+            return TryDistributeSizesWithOverrides(grid.RowHeights, grid.RowOverrides, target.height, out var rowError)
+                ? null
+                : rowError;
         }
-        else // ColumnLocal height scope
+
+        // ColumnLocal height scope: iterate through affected columns.
+        var columnTarget = GetTargetGridSize(grid, alignmentMode, cad);
+        foreach (var c in cols.Distinct())
         {
-            // Iterate through affected columns.
-            var target = GetTargetGridSize(grid, alignmentMode, cad);
-            foreach (var c in cols.Distinct())
+            if (c < 0 || c >= grid.XChannels) continue;
+            var colFlags = grid.ColumnHeightOverrideFlags[c];
+            var colVals = grid.ColumnHeightOverrides[c];
+            // Reset specific cells within the column.
+            foreach (var r in rows.Distinct())
             {
-                if (c < 0 || c >= grid.XChannels) continue;
-                var colFlags = grid.ColumnHeightOverrideFlags[c];
-                var colVals = grid.ColumnHeightOverrides[c];
-                // Reset specific cells within the column.
-                foreach (var r in rows.Distinct())
-                {
-                    if (r < 0 || r >= grid.YChannels) continue;
-                    colVals[r] = 0.0;
-                    colFlags[r] = false;
-                }
-
-                // Recalculate and redistribute heights for this column.
-                var composed = ComposeColumnHeights(grid, c);
-                var autoFlags = BuildAutoFlags(colFlags, composed.Count);
-                if (!TryDistributeSizes(composed, autoFlags, target.height, out var err))
-                {
-                    RestoreSnapshot(grid, snapshot);
-                    return ManualSizingResult.Fail(snapshot, err);
-                }
-
-                // Update the grid settings.
-                grid.ColumnHeightOverrides[c] = composed;
-                grid.ColumnHeightOverrideFlags[c] = colFlags; // Store the flags (which are now inverted from autoFlags)
+                if (r < 0 || r >= grid.YChannels) continue;
+                colVals[r] = 0.0;
+                colFlags[r] = false;
             }
+
+            // Recalculate and redistribute heights for this column.
+            var composed = ComposeColumnHeights(grid, c);
+            var autoFlags = BuildAutoFlags(colFlags, composed.Count);
+            if (!TryDistributeSizes(composed, autoFlags, columnTarget.height, out var err))
+            {
+                return err;
+            }
+
+            // Update the grid settings.
+            grid.ColumnHeightOverrides[c] = composed;
+            grid.ColumnHeightOverrideFlags[c] = colFlags; // Store the flags (which are now inverted from autoFlags)
         }
 
-        return ManualSizingResult.Ok(snapshot);
+        return null;
     }
 
     /// <summary>

@@ -131,6 +131,85 @@ public sealed class ManualSizingServiceTests
     }
 
     [Fact]
+    public void ResetSizing_RowLocalWidth_ClearsSelectedCellFlagAndScalesTheRowToTheGridWidth()
+    {
+        var grid = new GridSettings
+        {
+            XChannels = 2,
+            YChannels = 2,
+            ActiveAreaWidth = 100,
+            ActiveAreaHeight = 50,
+            WidthScope = WidthAdjustmentScope.RowLocal,
+            ColumnWidths = new List<double> { 50, 50 },
+        };
+        _ = ManualSizingService.ApplySizing(
+            grid, GridAlignmentMode.FromPanelAa, cad: null, rows: [1], cols: [0], width: 70, height: null);
+
+        var result = ManualSizingService.ResetSizing(
+            grid, GridAlignmentMode.FromPanelAa, cad: null, rows: [1], cols: [0]);
+
+        Assert.True(result.Success);
+        // Pins the current result: the reset does not give back equal cells; 62.5 and 37.5 add up to the grid width.
+        Assert.Equal(62.5, grid.RowWidthOverrides[1][0], 6);
+        Assert.Equal(37.5, grid.RowWidthOverrides[1][1], 6);
+        Assert.Equal(new List<bool> { false, false }, grid.RowWidthOverrideFlags[1]);
+    }
+
+    [Fact]
+    public void ResetSizing_ColumnLocalHeight_ClearsSelectedCellFlagAndScalesTheColumnToTheGridHeight()
+    {
+        var grid = new GridSettings
+        {
+            XChannels = 2,
+            YChannels = 2,
+            ActiveAreaWidth = 100,
+            ActiveAreaHeight = 100,
+            HeightScope = HeightAdjustmentScope.ColumnLocal,
+            RowHeights = new List<double> { 50, 50 },
+        };
+        _ = ManualSizingService.ApplySizing(
+            grid, GridAlignmentMode.FromPanelAa, cad: null, rows: [1], cols: [0], width: null, height: 70);
+
+        var result = ManualSizingService.ResetSizing(
+            grid, GridAlignmentMode.FromPanelAa, cad: null, rows: [1], cols: [0]);
+
+        Assert.True(result.Success);
+        // Pins the current result: the reset does not give back equal cells; 37.5 and 62.5 add up to the grid height.
+        Assert.Equal(37.5, grid.ColumnHeightOverrides[0][0], 6);
+        Assert.Equal(62.5, grid.ColumnHeightOverrides[0][1], 6);
+        Assert.Equal(new List<bool> { false, false }, grid.ColumnHeightOverrideFlags[0]);
+    }
+
+    [Fact]
+    public void ResetSizing_WhenHeightsCannotBeDistributed_RestoresTheWidthsToo()
+    {
+        var grid = new GridSettings
+        {
+            XChannels = 2,
+            YChannels = 2,
+            ActiveAreaWidth = 100,
+            ActiveAreaHeight = 10,
+            ColumnWidths = new List<double> { 40, 60 },
+            ColumnOverrides = new List<bool> { true, true },
+            RowHeights = new List<double> { 5, 20 },
+            RowOverrides = new List<bool> { true, true },
+            WidthScope = WidthAdjustmentScope.ColumnGlobal,
+            HeightScope = HeightAdjustmentScope.RowGlobal,
+        };
+
+        // The width reset succeeds. The heights are all fixed and add up to more than the grid, so the reset fails.
+        var result = ManualSizingService.ResetSizing(
+            grid, GridAlignmentMode.FromPanelAa, cad: null, rows: [], cols: [0]);
+
+        Assert.False(result.Success);
+        Assert.False(string.IsNullOrEmpty(result.Error));
+        Assert.Equal(new List<double> { 40, 60 }, grid.ColumnWidths);
+        Assert.Equal(new List<bool> { true, true }, grid.ColumnOverrides);
+        Assert.Equal(new List<double> { 5, 20 }, grid.RowHeights);
+        Assert.Equal(new List<bool> { true, true }, grid.RowOverrides);
+    }
+
+    [Fact]
     public void ApplySizing_SingleCellFailsWhenNoAutoCells()
     {
         var grid = new GridSettings
