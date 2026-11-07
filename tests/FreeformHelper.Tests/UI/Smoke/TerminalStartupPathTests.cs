@@ -166,10 +166,10 @@ public sealed class TerminalStartupPathTests
     }
 
     [Fact]
-    public void ShellViewModel_DefaultsConsoleExpanded()
+    public void ShellViewModel_DefaultsConsoleCollapsed()
     {
         using var shell = new ShellViewModel { IsDevPageAvailable = true };
-        Assert.True(shell.IsConsoleExpanded);
+        Assert.False(shell.IsConsoleExpanded);
     }
 
     private sealed class ConsoleFixture : IDisposable
