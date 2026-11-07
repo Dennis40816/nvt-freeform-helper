@@ -1,0 +1,114 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerGuidesSectionView"
+             x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
+             x:CompileBindings="True">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
+  </UserControl.Styles>
+  <panels:CollapsiblePanel Title="Guides" IsExpanded="True">
+    <StackPanel Spacing="{DynamicResource Space8}">
+      <StackPanel Classes="panelFormField">
+        <TextBlock Text="Guide reference"/>
+        <ComboBox ItemsSource="{Binding GuideBasisOptions}"
+                  SelectedItem="{Binding SelectedGuideBasisOption, Mode=TwoWay}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:CoordinatePlannerWorkspaceViewModel+CoordinatePlannerGuideBasisOption">
+              <TextBlock Text="{Binding Display}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+      <Grid ColumnDefinitions="*,*">
+        <StackPanel Classes="panelFormField left">
+          <TextBlock Text="Horizontal"/>
+          <ComboBox ItemsSource="{Binding GuideGenerationOptions}"
+                    SelectedItem="{Binding SelectedHorizontalGuideGenerationOption, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:CoordinatePlannerWorkspaceViewModel+CoordinatePlannerGuideGenerationOption">
+                <TextBlock Text="{Binding Display}"/>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBlock Text="Lines" IsVisible="{Binding IsHorizontalGuideCountMode}"/>
+          <controls:NumberScrubber Minimum="0"
+                                   Maximum="100"
+                                   SmallChange="1"
+                                   FormatString="0"
+                                   IsVisible="{Binding IsHorizontalGuideCountMode}"
+                                   Value="{Binding HorizontalGuideCount, Mode=TwoWay}"/>
+          <TextBlock Text="Pitch (mm)" IsVisible="{Binding IsHorizontalGuidePitchMode}"/>
+          <controls:NumberScrubber Minimum="0"
+                                   Maximum="{DynamicResource NumericInputMaximum}"
+                                   SmallChange="0.1"
+                                   FormatString="0.###"
+                                   SnapToStep="False"
+                                   IsVisible="{Binding IsHorizontalGuidePitchMode}"
+                                   Value="{Binding HorizontalGuidePitch, Mode=TwoWay}"/>
+          <TextBlock Text="Positions (mm)" IsVisible="{Binding IsHorizontalGuideExplicitMode}"/>
+          <TextBox Text="{Binding HorizontalGuidePositionListText, Mode=TwoWay}"
+                   PlaceholderText="0, 25, 50"
+                   ToolTip.Tip="{x:Static vm:CoordinatePlannerWorkspaceViewModel.GuidePositionsHelpText}"
+                   IsVisible="{Binding IsHorizontalGuideExplicitMode}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Classes="panelFormField right">
+          <TextBlock Text="Vertical"/>
+          <ComboBox ItemsSource="{Binding GuideGenerationOptions}"
+                    SelectedItem="{Binding SelectedVerticalGuideGenerationOption, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:CoordinatePlannerWorkspaceViewModel+CoordinatePlannerGuideGenerationOption">
+                <TextBlock Text="{Binding Display}"/>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBlock Text="Lines" IsVisible="{Binding IsVerticalGuideCountMode}"/>
+          <controls:NumberScrubber Minimum="0"
+                                   Maximum="100"
+                                   SmallChange="1"
+                                   FormatString="0"
+                                   IsVisible="{Binding IsVerticalGuideCountMode}"
+                                   Value="{Binding VerticalGuideCount, Mode=TwoWay}"/>
+          <TextBlock Text="Pitch (mm)" IsVisible="{Binding IsVerticalGuidePitchMode}"/>
+          <controls:NumberScrubber Minimum="0"
+                                   Maximum="{DynamicResource NumericInputMaximum}"
+                                   SmallChange="0.1"
+                                   FormatString="0.###"
+                                   SnapToStep="False"
+                                   IsVisible="{Binding IsVerticalGuidePitchMode}"
+                                   Value="{Binding VerticalGuidePitch, Mode=TwoWay}"/>
+          <TextBlock Text="Positions (mm)" IsVisible="{Binding IsVerticalGuideExplicitMode}"/>
+          <TextBox Text="{Binding VerticalGuidePositionListText, Mode=TwoWay}"
+                   PlaceholderText="0, 25, 50"
+                   ToolTip.Tip="{x:Static vm:CoordinatePlannerWorkspaceViewModel.GuidePositionsHelpText}"
+                   IsVisible="{Binding IsVerticalGuideExplicitMode}"/>
+        </StackPanel>
+      </Grid>
+      <panels:CollapsiblePanel Title="Inset" IsExpanded="False">
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Classes="panelFormField left">
+            <TextBlock Text="Horizontal inset (mm)"/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding HorizontalGuideInset, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Classes="panelFormField right">
+            <TextBlock Text="Vertical inset (mm)"/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding VerticalGuideInset, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
+      </panels:CollapsiblePanel>
+    </StackPanel>
+  </panels:CollapsiblePanel>
+</UserControl>

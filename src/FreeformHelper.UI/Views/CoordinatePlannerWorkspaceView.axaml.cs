@@ -7,7 +7,6 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using FreeformHelper.Application.Services;
@@ -21,7 +20,6 @@ namespace FreeformHelper.UI.Views;
 
 public sealed partial class CoordinatePlannerWorkspaceView : UserControl
 {
-    private static readonly string[] _pngFilePatterns = ["*.png"];
     private static readonly string[] _allFilesPatterns = ["*"];
     private PadCanvas? _canvas;
     private Canvas? _overlayCanvas;
@@ -30,6 +28,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
     private CanvasViewportAdapter? _viewportAdapter;
     private CoordinatePlannerWorkspaceViewModel? _attachedViewModel;
     private string? _draggedArrayCornerKey;
+    private bool _statusToastPending;
 
     public CoordinatePlannerWorkspaceView()
     {
@@ -90,6 +89,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         Dispatcher.Post(
             RenderOverlay,
             DispatcherPriority.Loaded);
+        QueueStatusToast();
     }
 
     private PadCanvas FindCanvas()
@@ -123,6 +123,11 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(CoordinatePlannerWorkspaceViewModel.StatusText))
+        {
+            QueueStatusToast();
+        }
+
         if (e.PropertyName is nameof(CoordinatePlannerWorkspaceViewModel.Snapshot) or
             nameof(CoordinatePlannerWorkspaceViewModel.CadPadsForCanvas) or
             nameof(CoordinatePlannerWorkspaceViewModel.SelectedArtifactRow) or
@@ -136,6 +141,29 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             }
 
             RenderOverlay();
+        }
+    }
+
+    private void QueueStatusToast()
+    {
+        if (_statusToastPending)
+        {
+            return;
+        }
+
+        _statusToastPending = true;
+        Dispatcher.Post(() =>
+        {
+            _statusToastPending = false;
+            ShowStatusToast();
+        });
+    }
+
+    private void ShowStatusToast()
+    {
+        if (_attachedViewModel is not null && TopLevel.GetTopLevel(this) is MainWindow owner)
+        {
+            owner.ShowTopToast(_attachedViewModel.StatusText);
         }
     }
 
@@ -192,47 +220,6 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         }
 
         await TextExportWriter.WriteAsync(file.Path.LocalPath, request.Content, includeBom: true, CancellationToken.None);
-        return true;
-    }
-
-    private async Task<bool> ExportPreviewImageAsync()
-    {
-        var storage = TopLevel.GetTopLevel(this)?.StorageProvider;
-        if (storage is null)
-        {
-            return false;
-        }
-
-        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = "Export Coordinate Preview",
-            DefaultExtension = "png",
-            SuggestedFileName = "coordinate_planner.png",
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                new("PNG") { Patterns = _pngFilePatterns },
-                new("BMP") { Patterns = ["*.bmp"] },
-                new("All files") { Patterns = _allFilesPatterns },
-            },
-        });
-        if (file is null)
-        {
-            return false;
-        }
-
-        var previewHost = FindPreviewHost();
-        if (previewHost.Bounds.Width <= 1 || previewHost.Bounds.Height <= 1)
-        {
-            return false;
-        }
-
-        await Dispatcher.InvokeAsync(RenderOverlay, DispatcherPriority.Render);
-        var pixelSize = new PixelSize(
-            Math.Max(2, (int)Math.Ceiling(previewHost.Bounds.Width)),
-            Math.Max(2, (int)Math.Ceiling(previewHost.Bounds.Height)));
-        using var bitmap = new RenderTargetBitmap(pixelSize);
-        bitmap.Render(previewHost);
-        await PreviewImageWriter.SaveToFileAsync(bitmap, file.Path.LocalPath);
         return true;
     }
 
@@ -578,7 +565,7 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         (point.Kind != CoordinatePlannerPointKind.CustomArrayDot &&
          mode == CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode.All) ||
         isSelected ||
-        point.Kind is CoordinatePlannerPointKind.AaCorner or CoordinatePlannerPointKind.BistCorner;
+        point.Kind is CoordinatePlannerPointKind.AaCorner or CoordinatePlannerPointKind.BistCorner or CoordinatePlannerPointKind.CustomArrayCorner;
 
     private static bool IsEssentialLine(CoordinatePlannerLine line) =>
         line.Kind is CoordinatePlannerLineKind.HorizontalGuide or CoordinatePlannerLineKind.VerticalGuide or CoordinatePlannerLineKind.CustomArrayEdge;

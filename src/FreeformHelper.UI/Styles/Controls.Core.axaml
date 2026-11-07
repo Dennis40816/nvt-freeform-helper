@@ -626,20 +626,20 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
   </Style>
 
-  <Style Selector="ListBox.workspaceDataList ListBoxItem">
+  <Style Selector="ListBox.workspaceDataList:not(.coordinateArtifactList) ListBoxItem">
     <Setter Property="Padding" Value="0"/>
     <Setter Property="Margin" Value="{StaticResource InsetBottom4}"/>
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="BorderThickness" Value="0"/>
   </Style>
 
-  <Style Selector="ListBox.workspaceDataList ListBoxItem:selected">
+  <Style Selector="ListBox.workspaceDataList:not(.coordinateArtifactList) ListBoxItem:selected">
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
     <Setter Property="BorderThickness" Value="0"/>
   </Style>
 
-  <Style Selector="ListBox.workspaceDataList ListBoxItem:selected:pointerover">
+  <Style Selector="ListBox.workspaceDataList:not(.coordinateArtifactList) ListBoxItem:selected:pointerover">
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
     <Setter Property="BorderThickness" Value="0"/>

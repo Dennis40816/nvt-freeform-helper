@@ -1,116 +1,93 @@
-<UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
-             x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerWorkspaceDetailsPaneView">
-  <Border Grid.Column="4"
-          Classes="workspaceSidePane right">
-    <Grid RowDefinitions="Auto,Auto,*"
-          RowSpacing="{StaticResource Space10}">
-      <StackPanel Grid.Row="0" Spacing="{StaticResource Space6}">
-        <SelectableTextBlock Text="Coordinate table" FontWeight="SemiBold"/>
-        <SelectableTextBlock Text="{Binding ArtifactSummaryText}"
-                             Foreground="{DynamicResource BrushTextMuted}"
-                             TextWrapping="Wrap"/>
-      </StackPanel>
-
-      <Border Grid.Row="1" Classes="workspaceInspectorContextStrip">
-        <Grid RowDefinitions="Auto,Auto,Auto"
-              RowSpacing="{StaticResource Space6}">
-          <Grid Grid.Row="0"
-                ColumnDefinitions="*,Auto"
-                ColumnSpacing="{StaticResource Space8}">
-            <SelectableTextBlock Text="{Binding ArtifactSortStatusText}"
-                                 Foreground="{DynamicResource BrushTextMuted}"
-                                 VerticalAlignment="Center"/>
-            <SelectableTextBlock Grid.Column="1"
-                                 Text="{Binding SafeCoordinatePolicyText}"
-                                 Foreground="{DynamicResource BrushTextMuted}"
-                                 TextWrapping="Wrap"
-                                 VerticalAlignment="Center"/>
-          </Grid>
-          <Grid Grid.Row="1"
-                ColumnDefinitions="Auto,Auto,Auto,Auto,*"
-                ColumnSpacing="{StaticResource Space6}">
-            <Button Classes="actionGhost actionIconButton"
-                    Command="{Binding CopySelectedArtifactCommand}"
-                    ToolTip.Tip="Copy selected coordinate row.">
-              <controls:FontIcon Classes="symbols"
-                                 Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
-            </Button>
-            <Button Grid.Column="1"
-                    Classes="actionGhost actionIconButton"
-                    Command="{Binding CopyAllArtifactsCommand}"
-                    ToolTip.Tip="Copy all coordinate rows.">
-              <controls:FontIcon Classes="symbols"
-                                 Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
-            </Button>
-            <Button Grid.Column="2"
-                    Classes="actionGhost actionIconButton"
-                    Command="{Binding ExportArtifactsCsvCommand}"
-                    ToolTip.Tip="Export coordinate rows as CSV.">
-              <controls:FontIcon Classes="symbols"
-                                 Glyph="{x:Static icons:IconGlyphs.ArrowDownward}"/>
-            </Button>
-            <Button Grid.Column="3"
-                    Classes="actionGhost actionIconButton"
-                    Command="{Binding ExportArtifactsJsonCommand}"
-                    ToolTip.Tip="Export coordinate rows as JSON.">
-              <controls:FontIcon Classes="symbols"
-                                 Glyph="{x:Static icons:IconGlyphs.DataObject}"/>
-            </Button>
-          </Grid>
-          <SelectableTextBlock Grid.Row="2"
-                               Text="Click a row to focus it on the canvas and open full coordinate details."
-                               Foreground="{DynamicResource BrushTextMuted}"
-                               TextWrapping="Wrap"/>
-        </Grid>
-      </Border>
-
-      <Grid Grid.Row="2"
-            RowDefinitions="Auto,*"
-            RowSpacing="{StaticResource Space6}">
-        <Border Grid.Row="0" Classes="workspaceTableHeader">
-          <Grid ColumnSpacing="{StaticResource Space8}">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="{StaticResource CoordinateArtifactLabelColumnGrid}"/>
-              <ColumnDefinition Width="{StaticResource CoordinateArtifactPixelColumnGrid}"/>
-              <ColumnDefinition Width="{StaticResource CoordinateArtifactMachineColumnGrid}"/>
-              <ColumnDefinition Width="{StaticResource CoordinateArtifactSafeColumnGrid}"/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0"
-                    Classes="workspaceTableHeaderButton"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             xmlns:app="clr-namespace:FreeformHelper.Application.Services;assembly=FreeformHelper.Application"
+             xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerWorkspaceDetailsPaneView"
+             x:Name="TableView"
+             x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
+             x:CompileBindings="True">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
+    <Style Selector="ListBox.coordinateArtifactList ListBoxItem">
+      <Setter Property="Padding" Value="{DynamicResource Inset8_6}"/>
+    </Style>
+  </UserControl.Styles>
+  <Border Classes="workspaceSidePane right">
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="{DynamicResource Space10}">
+      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{DynamicResource Space8}">
+        <TextBlock Text="Coordinate table" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="1"
+                   Text="{Binding ArtifactSummaryText}"
+                   Classes="workspaceSectionMeta"
+                   VerticalAlignment="Center"/>
+        <Button Grid.Column="2"
+                Content="Columns / sort"
+                Classes="actionGhost actionTextButton"
+                ToolTip.Tip="{Binding ArtifactSortStatusText}">
+          <Button.Flyout>
+            <MenuFlyout>
+              <MenuItem Header="Pixel column"
+                        ToggleType="CheckBox"
+                        IsChecked="{Binding #TableView.ShowPixelColumn, Mode=TwoWay}"/>
+              <MenuItem Header="Machine column"
+                        ToggleType="CheckBox"
+                        IsChecked="{Binding #TableView.ShowMachineColumn, Mode=TwoWay}"/>
+              <Separator/>
+              <MenuItem Header="{Binding ArtifactSortStatusText}" IsEnabled="False"/>
+              <MenuItem Header="Sort: original order"
+                        Command="{Binding SortArtifactRowsCommand}"
+                        CommandParameter="Default"/>
+              <MenuItem Header="Sort: Artifact" Command="{Binding SortArtifactRowsCommand}" CommandParameter="Label"/>
+              <MenuItem Header="Sort: Kind / recipe"
+                        Command="{Binding SortArtifactRowsCommand}"
+                        CommandParameter="Kind"/>
+              <MenuItem Header="Sort: Pixel" Command="{Binding SortArtifactRowsCommand}" CommandParameter="Pixel"/>
+              <MenuItem Header="Sort: Machine"
+                        Command="{Binding SortArtifactRowsCommand}"
+                        CommandParameter="Machine"/>
+              <MenuItem Header="Sort: Safe" Command="{Binding SortArtifactRowsCommand}" CommandParameter="Safe"/>
+            </MenuFlyout>
+          </Button.Flyout>
+        </Button>
+      </Grid>
+      <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*" RowSpacing="{DynamicResource Space6}">
+        <TextBlock Text="{Binding ArtifactSortStatusText}" Classes="workspaceSectionMeta"/>
+        <Border Grid.Row="1" Classes="workspaceTableHeader">
+          <Grid ColumnDefinitions="*,Auto,Auto,*" ColumnSpacing="{DynamicResource Space8}">
+            <Button Classes="workspaceTableHeaderButton"
                     Command="{Binding SortArtifactRowsCommand}"
-                    CommandParameter="Label">
-              <SelectableTextBlock Classes="workspaceTableHeaderText" Text="Artifact"/>
-            </Button>
+                    CommandParameter="Label"
+                    Content="Artifact"/>
             <Button Grid.Column="1"
                     Classes="workspaceTableHeaderButton"
                     Command="{Binding SortArtifactRowsCommand}"
-                    CommandParameter="Pixel">
-              <SelectableTextBlock Classes="workspaceTableHeaderText" Text="Pixel"/>
-            </Button>
+                    CommandParameter="Pixel"
+                    Content="Pixel"
+                    Width="{DynamicResource CoordinateTableOptionalColumnWidth}"
+                    IsVisible="{Binding #TableView.ShowPixelColumn}"/>
             <Button Grid.Column="2"
                     Classes="workspaceTableHeaderButton"
                     Command="{Binding SortArtifactRowsCommand}"
-                    CommandParameter="Machine">
-              <SelectableTextBlock Classes="workspaceTableHeaderText" Text="Machine"/>
-            </Button>
+                    CommandParameter="Machine"
+                    Content="Machine"
+                    Width="{DynamicResource CoordinateTableOptionalColumnWidth}"
+                    IsVisible="{Binding #TableView.ShowMachineColumn}"/>
             <Button Grid.Column="3"
                     Classes="workspaceTableHeaderButton"
                     Command="{Binding SortArtifactRowsCommand}"
-                    CommandParameter="Safe">
-              <SelectableTextBlock Classes="workspaceTableHeaderText" Text="Safe"/>
-            </Button>
+                    CommandParameter="Safe"
+                    Content="Safe"
+                    ToolTip.Tip="{Binding SafeCoordinatePolicyText}"/>
           </Grid>
         </Border>
-
-        <ListBox Grid.Row="1"
+        <ListBox Grid.Row="2"
+                 x:Name="CoordinateArtifactList"
                  ItemsSource="{Binding ArtifactRows}"
                  SelectedItem="{Binding SelectedArtifactRow, Mode=TwoWay}"
-                 Classes="scrollV2 workspaceDataList"
-                 Background="Transparent"
-                 BorderThickness="0"
+                 Classes="scrollV2 workspaceDataList coordinateArtifactList"
+                 Background="{DynamicResource BrushTransparent}"
+                 BorderThickness="{DynamicResource BorderNone}"
                  ScrollViewer.AllowAutoHide="False"
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -120,38 +97,69 @@
             </ItemsPanelTemplate>
           </ListBox.ItemsPanel>
           <ListBox.ItemTemplate>
-            <DataTemplate>
-              <Button Classes="workspaceDataRow"
-                      Command="{Binding DataContext.ShowArtifactDetailCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                      CommandParameter="{Binding}">
-                <Grid ColumnSpacing="{StaticResource Space8}">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{StaticResource CoordinateArtifactLabelColumnGrid}"/>
-                    <ColumnDefinition Width="{StaticResource CoordinateArtifactPixelColumnGrid}"/>
-                    <ColumnDefinition Width="{StaticResource CoordinateArtifactMachineColumnGrid}"/>
-                    <ColumnDefinition Width="{StaticResource CoordinateArtifactSafeColumnGrid}"/>
-                  </Grid.ColumnDefinitions>
-                  <StackPanel Grid.Column="0" Spacing="{StaticResource Space2}">
-                    <SelectableTextBlock Classes="workspaceDataCellText strong"
-                                         Text="{Binding Label}"/>
-                    <SelectableTextBlock Classes="workspaceDataCellText"
-                                         Text="{Binding KindRecipeText}"/>
-                  </StackPanel>
-                  <SelectableTextBlock Grid.Column="1"
-                                       Classes="workspaceDataCellText"
-                                       Text="{Binding PixelText}"/>
-                  <SelectableTextBlock Grid.Column="2"
-                                       Classes="workspaceDataCellText"
-                                       Text="{Binding MachineText}"/>
-                  <SelectableTextBlock Grid.Column="3"
-                                       Classes="workspaceDataCellText"
-                                       Text="{Binding SafeMachineText}"/>
-                </Grid>
-              </Button>
+            <DataTemplate x:DataType="app:CoordinateArtifactRow">
+              <Grid ColumnDefinitions="*,Auto,Auto,*" ColumnSpacing="{DynamicResource Space8}">
+                <StackPanel Spacing="{DynamicResource Space2}">
+                  <TextBlock Text="{Binding Label}"
+                             Classes="workspaceDataCellText strong"
+                             ToolTip.Tip="{Binding Label}"/>
+                  <TextBlock Text="{Binding KindRecipeText}" Classes="workspaceDataCellText"/>
+                </StackPanel>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding PixelText}"
+                           Classes="workspaceDataCellText"
+                           ToolTip.Tip="{Binding PixelText}"
+                           Width="{DynamicResource CoordinateTableOptionalColumnWidth}"
+                           IsVisible="{Binding $parent[sections:CoordinatePlannerWorkspaceDetailsPaneView].ShowPixelColumn}"/>
+                <TextBlock Grid.Column="2"
+                           Text="{Binding MachineText}"
+                           Classes="workspaceDataCellText"
+                           ToolTip.Tip="{Binding MachineText}"
+                           Width="{DynamicResource CoordinateTableOptionalColumnWidth}"
+                           IsVisible="{Binding $parent[sections:CoordinatePlannerWorkspaceDetailsPaneView].ShowMachineColumn}"/>
+                <TextBlock Grid.Column="3"
+                           Text="{Binding SafeMachineText}"
+                           Classes="workspaceDataCellText"
+                           ToolTip.Tip="{Binding SafeMachineText}"/>
+              </Grid>
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
       </Grid>
+      <Border Grid.Row="2"
+              BorderBrush="{DynamicResource BrushBorder}"
+              BorderThickness="{DynamicResource BorderTopThin}"
+              Padding="{DynamicResource InsetTop8}">
+        <StackPanel x:Name="CoordinateFooterActions"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="{DynamicResource Space6}">
+          <Button Content="Details"
+                  Classes="actionGhost actionTextButton"
+                  IsEnabled="{Binding HasSelectedArtifact}"
+                  Command="{Binding ShowArtifactDetailCommand}"
+                  CommandParameter="{Binding SelectedArtifactRow}"/>
+          <Button Content="Copy selected"
+                  Classes="actionGhost actionTextButton"
+                  IsEnabled="{Binding HasSelectedArtifact}"
+                  Command="{Binding CopySelectedArtifactCommand}"
+                  ToolTip.Tip="Copy the selected coordinate row."/>
+          <Button Content="Copy all"
+                  Classes="actionGhost actionTextButton"
+                  Command="{Binding CopyAllArtifactsCommand}"
+                  ToolTip.Tip="Copy all coordinate rows in table order."/>
+          <Button Content="Export…"
+                  Classes="actionPrimary actionTextButton"
+                  ToolTip.Tip="Export CSV or JSON in table order.">
+            <Button.Flyout>
+              <MenuFlyout>
+                <MenuItem Header="Export CSV…" Command="{Binding ExportArtifactsCsvCommand}"/>
+                <MenuItem Header="Export JSON…" Command="{Binding ExportArtifactsJsonCommand}"/>
+              </MenuFlyout>
+            </Button.Flyout>
+          </Button>
+        </StackPanel>
+      </Border>
     </Grid>
   </Border>
 </UserControl>

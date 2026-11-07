@@ -1,0 +1,133 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerCustomSectionView"
+             x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
+             x:CompileBindings="True">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
+  </UserControl.Styles>
+  <panels:CollapsiblePanel Title="Custom point / path" IsExpanded="False">
+    <StackPanel Spacing="{DynamicResource Space12}">
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}">
+        <ToggleButton x:Name="PointFormButton"
+                      Content="Point"
+                      Classes="actionGhost actionTextButton"
+                      IsChecked="True"
+                      Click="PointForm_Click"/>
+        <ToggleButton x:Name="PathFormButton"
+                      Content="Path"
+                      Classes="actionGhost actionTextButton"
+                      IsChecked="False"
+                      Click="PathForm_Click"/>
+      </StackPanel>
+      <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding #PointFormButton.IsChecked}">
+        <StackPanel Classes="panelFormField">
+          <TextBlock Text="Name"/>
+          <TextBox Text="{Binding CustomPointLabelText, Mode=TwoWay}"/>
+        </StackPanel>
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Classes="panelFormField left">
+            <TextBlock Text="X (machine mm)"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding CustomPointMachineX, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Classes="panelFormField right">
+            <TextBlock Text="Y (machine mm)"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding CustomPointMachineY, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
+        <Button Content="Add point"
+                Classes="actionNeutral actionTextButton"
+                HorizontalAlignment="Right"
+                Command="{Binding AddCustomPointCommand}"/>
+      </StackPanel>
+      <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding #PathFormButton.IsChecked}">
+        <StackPanel Classes="panelFormField">
+          <TextBlock Text="Name"/>
+          <TextBox Text="{Binding CustomPathLabelText, Mode=TwoWay}"/>
+        </StackPanel>
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Classes="panelFormField left">
+            <TextBlock Text="Start X (machine mm)"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding CustomPathStartMachineX, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Classes="panelFormField right">
+            <TextBlock Text="Start Y (machine mm)"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding CustomPathStartMachineY, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Classes="panelFormField left">
+            <TextBlock Text="End X (machine mm)"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding CustomPathEndMachineX, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Classes="panelFormField right">
+            <TextBlock Text="End Y (machine mm)"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding CustomPathEndMachineY, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
+        <StackPanel Classes="panelFormField">
+          <TextBlock Text="Samples"/>
+          <controls:NumberScrubber Minimum="2"
+                                   Maximum="500"
+                                   SmallChange="1"
+                                   FormatString="0"
+                                   Value="{Binding CustomPathStepCount, Mode=TwoWay}"/>
+        </StackPanel>
+        <Button Content="Add path"
+                Classes="actionNeutral actionTextButton"
+                HorizontalAlignment="Right"
+                Command="{Binding AddCustomPathCommand}"/>
+      </StackPanel>
+      <Border BorderBrush="{DynamicResource BrushBorder}"
+              BorderThickness="{DynamicResource BorderTopThin}"
+              Padding="{DynamicResource InsetTop8}">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+          <TextBlock Text="{x:Static vm:CoordinatePlannerWorkspaceViewModel.ClearCustomConsequenceText}"
+                     TextWrapping="Wrap"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Center"/>
+          <Button Grid.Column="1"
+                  Content="Clear custom"
+                  Classes="actionGhost actionTextButton"
+                  HorizontalAlignment="Right"
+                  Command="{Binding ClearCustomArtifactsCommand}"
+                  ToolTip.Tip="{x:Static vm:CoordinatePlannerWorkspaceViewModel.ClearCustomConsequenceText}"/>
+        </Grid>
+      </Border>
+    </StackPanel>
+  </panels:CollapsiblePanel>
+</UserControl>
