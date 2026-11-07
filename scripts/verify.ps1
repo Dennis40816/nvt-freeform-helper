@@ -312,13 +312,24 @@ function Invoke-TestShard {
 
     foreach ($group in $shardGroups[$Name]) {
         Write-Lane "test shard '$Name': group '$group'"
+        # The output passes through unchanged. The skipped count of each "Passed!" or "Failed!" summary line is
+        # added up, so the end of the run can say how many tests did not run on this machine.
         & $runTestsScript `
             -Group $group `
             -Configuration $Configuration `
             -UseNoAppHost `
-            -AllowMissingExampleData:$AllowMissingExampleData
+            -AllowMissingExampleData:$AllowMissingExampleData | ForEach-Object {
+                $_
+                if ([string]$_ -match '^\s*(?:Passed|Failed)!.*\bSkipped:\s*(?<skipped>[0-9]+)') {
+                    $script:locallySkippedTests += [int]$Matches['skipped']
+                }
+            }
     }
 }
+
+# Tests that skip on this machine, for example the golden tests without the private example data. A local
+# run that includes tests prints the number at the end, so a skip does not pass unnoticed.
+$script:locallySkippedTests = 0
 
 $lanes = @()
 if ($All) {
@@ -369,6 +380,10 @@ try {
                 }
             }
         }
+    }
+
+    if (($lanes -contains "test") -and -not $EnforceFloors) {
+        Write-Host ("[verify] skipped tests on this machine: {0}" -f $script:locallySkippedTests)
     }
 
     Write-Host ("[verify] OK ({0})" -f ($lanes -join ", ")) -ForegroundColor Green

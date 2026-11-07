@@ -113,6 +113,8 @@ public sealed class NotchDisplayProjectorTests
     [AvaloniaFact]
     public void Build_LegacyRegularAnchor_DisabledRoundedZeroTargetPreservesPreviousDisplay()
     {
+        // The assertions compare formatted numbers with the en-US decimal separator.
+        using var culture = TestCulture.UseEnUs();
         var grid = TestGeometryFactory.CreateRegularGrid(1, 2, cellWidth: 10, cellHeight: 10,
             diffIndexSelector: static (_, col) => col);
         var cad = TestGeometryFactory.CreateCadPad(1, "PAD", 0, 0, 10.045, 10);

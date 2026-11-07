@@ -339,7 +339,7 @@ public sealed class NotchTableExporterTests
             SimulateWithCSharp(grid, table, NotchAlgorithmVersion.V22, beforeValues: [100d]));
     }
 
-    [Fact]
+    [Fact, UseEnUsCulture]
     public void ExportAndSimulation_ShortV22Row_PreserveExactOverflowException()
     {
         var grid = TestGeometryFactory.CreateLinearRegularGrid([10]);
