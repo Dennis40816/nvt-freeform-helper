@@ -249,6 +249,8 @@ public sealed class ShellViewModelSimulationTests
     public async Task WorkspaceSourceChanges_BurstOnlyPrewarmsOnce()
     {
         using var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var work = new RecordingBackgroundWorkRunner();
+        shell.BackgroundWork.Runner = work;
         var grid = TestGeometryFactory.CreateLinearRegularGrid(_simulationDiffIndices);
         shell.Simulation.CurrentWorkspace = new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
@@ -260,21 +262,32 @@ public sealed class ShellViewModelSimulationTests
                 ActiveRegularPadIds: grid.Pads.Select(static pad => pad.RegularPadId).ToHashSet()));
 
         var prewarmCount = 0;
-        Func<Task> prewarmWorkspace = async () =>
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        shell.Simulation.RequestPrewarmWorkspaceAsync = () =>
         {
             Interlocked.Increment(ref prewarmCount);
-            await Task.Delay(80);
+            entered.TrySetResult();
+            return release.Task.WaitAsync(TestContext.Current.CancellationToken);
         };
-        shell.Simulation.RequestPrewarmWorkspaceAsync = prewarmWorkspace;
 
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
-        shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+        try
+        {
+            shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+            shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
+            shell.FreeformHelper.NotifySimulationWorkspaceSourceChanged();
 
-        await WaitForConditionAsync(() => Volatile.Read(ref prewarmCount) > 0);
-        await Task.Delay(120, TestContext.Current.CancellationToken);
+            await entered.Task.WaitAsync(TimeSpan.FromMilliseconds(1200), TestContext.Current.CancellationToken);
+            release.SetResult();
+            await work.LastStartedAsync(ShellViewModel.WorkspaceSourceChangeDrainWorkName)
+                .WaitAsync(TimeSpan.FromMilliseconds(1200), TestContext.Current.CancellationToken);
 
-        Assert.Equal(1, Volatile.Read(ref prewarmCount));
+            Assert.Equal(1, Volatile.Read(ref prewarmCount));
+        }
+        finally
+        {
+            release.TrySetResult();
+        }
     }
 
     [Fact]
@@ -351,15 +364,17 @@ public sealed class ShellViewModelSimulationTests
 
     private static async Task WaitForConditionAsync(Func<bool> predicate, int timeoutMs = 1200)
     {
-        var started = Environment.TickCount64;
+        using var watchdog = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        watchdog.CancelAfter(timeoutMs);
         while (!predicate())
         {
-            if (Environment.TickCount64 - started > timeoutMs)
+            TestContext.Current.CancellationToken.ThrowIfCancellationRequested();
+            if (watchdog.IsCancellationRequested)
             {
                 throw new TimeoutException("Condition was not satisfied within timeout.");
             }
 
-            await Task.Delay(20);
+            await Task.Yield();
         }
     }
 

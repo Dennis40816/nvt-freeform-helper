@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text;
+using Avalonia.Threading;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -7,6 +8,7 @@ using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
+using Xunit;
 
 namespace FreeformHelper.Tests;
 
@@ -215,15 +217,26 @@ public sealed partial class FreeformHelperViewModelTests
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
-        var startedAt = Environment.TickCount64;
-        while (!predicate())
+        using var watchdog = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        watchdog.CancelAfter(timeoutMs);
+        try
         {
-            if (Environment.TickCount64 - startedAt > timeoutMs)
+            while (!predicate())
             {
-                throw new TimeoutException("Timed out waiting for test condition.");
+                watchdog.Token.ThrowIfCancellationRequested();
+                if (SynchronizationContext.Current is AvaloniaSynchronizationContext)
+                {
+                    await HeadlessUiPump.FlushQueueAsync().WaitAsync(watchdog.Token);
+                }
+                else
+                {
+                    await Task.Yield();
+                }
             }
-
-            await Task.Delay(20);
+        }
+        catch (OperationCanceledException exception) when (!TestContext.Current.CancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException("Timed out waiting for test condition.", exception);
         }
     }
 

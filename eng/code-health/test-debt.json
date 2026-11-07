@@ -445,56 +445,6 @@
     },
     {
       "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Helpers.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.WaitForConditionAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "c49896ba4535f1fbac80945c99add016774b651d8f6d52b05971cf3cd7562149",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.HeadlessUiSmokeTests.CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates()",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "a10e1c07c64f3b2c9fb4bb9a6a1e6e45d95d121c477397bac1c8e39d9e34440d",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.HeadlessUiSmokeTests.WaitForSpinnerIdleAsync(FreeformHelperViewModel)",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "c49896ba4535f1fbac80945c99add016774b651d8f6d52b05971cf3cd7562149",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/IndexMappingReportViewModelTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.IndexMappingReportViewModelTests.WaitUntilAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "d90cf8ef9a6eb24cc7da4af537da82f60439b8a07a74843a4a751a1b7f23090c",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Services/LoadingScopeCoordinatorTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.LoadingScopeCoordinatorTests.RunAsync_ShowsBeforeAction_AndHidesAfterAction()",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "0815a33f3fcb669bfdaa2bb791b3f223c621861f5d6c2fa07c6f9a4da2bad2af",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
       "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryCoreBehaviorTests.cs",
       "rule": "timeWaitsInTests",
       "member": "FreeformHelper.Tests.RuntimeQueryCoreBehaviorTests.WaitForPipeAsync(RuntimeQueryIpcServer,NamedPipeServerStream?)",
@@ -531,36 +481,6 @@
       "owner": "NFH",
       "symbol": "Task.Delay",
       "syntaxHash": "b7532dc9ac24a505c38944f1623a71b0a54ad3ec0f54c4728183a9600a64b557",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.WaitForConditionAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "c49896ba4535f1fbac80945c99add016774b651d8f6d52b05971cf3cd7562149",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.WorkspaceSourceChanges_BurstOnlyPrewarmsOnce()",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "1b09deffe4e36652776b6c9befd36f5aa3656b684f338c74099e10482e8ecfde",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.WorkspaceSourceChanges_BurstOnlyPrewarmsOnce()",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "33e21a9ed5b984e69f63ff0eb4adb72e7f2943ae3cd961fc4002aed9e2532d1a",
       "count": 1
     }
   ]
