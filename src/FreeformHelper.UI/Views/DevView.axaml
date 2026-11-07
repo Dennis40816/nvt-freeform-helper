@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.DevView"
@@ -859,6 +860,11 @@
             </StackPanel>
           </StackPanel>
         </Border>
+        <panels:CollapsiblePanel Title="Integrated workspace controls" IsExpanded="True">
+          <StackPanel Spacing="{DynamicResource Space8}">
+            <panels:CollapsiblePanel Title="Flat diagnostic header" IsExpanded="False"/>
+          </StackPanel>
+        </panels:CollapsiblePanel>
         <SelectableTextBlock x:Name="DevProbeText"
                              TextWrapping="Wrap"
                              Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}}"/>
