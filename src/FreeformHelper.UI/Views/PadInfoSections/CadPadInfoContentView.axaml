@@ -165,6 +165,10 @@
 
                 <StackPanel Spacing="{StaticResource Space8}"
                             IsVisible="{Binding ShowLowFrequencyDetailSection}">
+                  <Button Classes="actionNeutral actionTextButton padInfoActionButton"
+                          Content="Open Notch detail"
+                          Command="{Binding NotchDetailCommand}"
+                          ToolTip.Tip="Open the Notch detail window for the selected CAD pad."/>
                   <Border Classes="padInfoInsetCard"
                           IsVisible="{Binding ShowGeometryDetails}">
                     <Grid ColumnDefinitions="*,*"
