@@ -34,19 +34,23 @@ public sealed partial class DxfOverlapReportWindow : Window
             return;
         }
 
+        vm.SetCopyCompleted(false);
         if (_seams?.CopyTextAsync is { } copyText)
         {
             await copyText(vm.ReportText);
-            return;
         }
-
-        var topLevel = TopLevel.GetTopLevel(this);
-        if (topLevel?.Clipboard is null)
+        else
         {
-            return;
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel?.Clipboard is null)
+            {
+                return;
+            }
+
+            await topLevel.Clipboard.SetTextAsync(vm.ReportText);
         }
 
-        await topLevel.Clipboard.SetTextAsync(vm.ReportText);
+        vm.SetCopyCompleted(true);
     }
 }
 
