@@ -660,7 +660,7 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
         }
     }
 
-    internal Task GetLatestStateSyncTask() => _stateSyncTask;
+    internal Task LatestStateSyncTask => _stateSyncTask;
 
     internal (string Requested, string Effective) GetVisibilityStateSnapshot()
     {

@@ -20,7 +20,7 @@
     <HealthBaselineWarningIds>EnableGenerateDocumentationFile;IDE0330;IDE1006;RS0030;VSTHRD003</HealthBaselineWarningIds>
   </PropertyGroup>
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'FreeformHelper.UI'">
-    <HealthBaselineWarningIds>IDE1006;RS0030;VSTHRD002;VSTHRD003;VSTHRD200</HealthBaselineWarningIds>
+    <HealthBaselineWarningIds>IDE1006;RS0030;VSTHRD002</HealthBaselineWarningIds>
   </PropertyGroup>
   <!-- END GENERATED HEALTH WARNING IDS -->
 </Project>
