@@ -1,3 +1,4 @@
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
@@ -21,7 +22,7 @@ public sealed class DxfLayerImageExportServiceTests
         };
 
         var path = TestFiles.NewTempFilePath("dxf-layer-", ".png");
-        DxfLayerImageExportService.ExportLayerImage(
+        ExportLayerImage(
             layerPads,
             320,
             240,
@@ -49,7 +50,7 @@ public sealed class DxfLayerImageExportServiceTests
         var path = TestFiles.NewTempFilePath("dxf-layer-", ".png");
 
         Assert.Throws<InvalidOperationException>(() =>
-            DxfLayerImageExportService.ExportLayerImage(
+            ExportLayerImage(
                 Array.Empty<CadPad>(),
                 320,
                 240,
@@ -71,7 +72,7 @@ public sealed class DxfLayerImageExportServiceTests
         };
 
         var path = TestFiles.NewTempFilePath("dxf-layer-", ".png");
-        DxfLayerImageExportService.ExportLayerImage(
+        ExportLayerImage(
             layerPads,
             300,
             300,
@@ -102,7 +103,7 @@ public sealed class DxfLayerImageExportServiceTests
 
         var thinPath = TestFiles.NewTempFilePath("dxf-layer-thin-", ".png");
         var thickPath = TestFiles.NewTempFilePath("dxf-layer-thick-", ".png");
-        DxfLayerImageExportService.ExportLayerImage(
+        ExportLayerImage(
             layerPads,
             320,
             320,
@@ -113,7 +114,7 @@ public sealed class DxfLayerImageExportServiceTests
             useDarkTheme: false,
             thinPath);
 
-        DxfLayerImageExportService.ExportLayerImage(
+        ExportLayerImage(
             layerPads,
             320,
             320,
@@ -146,7 +147,7 @@ public sealed class DxfLayerImageExportServiceTests
         };
 
         var path = TestFiles.NewTempFilePath("dxf-layer-safe-inset-", ".png");
-        DxfLayerImageExportService.ExportLayerImage(
+        ExportLayerImage(
             layerPads,
             320,
             320,
@@ -165,6 +166,26 @@ public sealed class DxfLayerImageExportServiceTests
             Assert.Equal(SKColors.White, bitmap.GetPixel(0, bitmap.Height - 1));
             Assert.Equal(SKColors.White, bitmap.GetPixel(bitmap.Width - 1, bitmap.Height - 1));
         }
+    }
+
+    // Renders one layer and writes it the way the export window does: LayerImageRenderer, then EncodeImage.
+    private static void ExportLayerImage(
+        CadPad[] pads,
+        int widthPixels,
+        int heightPixels,
+        decimal lineWidthPixels,
+        int paddingXPixels,
+        int paddingYPixels,
+        DxfLayerImageFormat format,
+        bool useDarkTheme,
+        string outputPath)
+    {
+        var layer = new LayerImageLayer(pads.Length == 0 ? string.Empty : pads[0].Layer, pads);
+        var request = new LayerImageRenderRequest(
+            [layer], widthPixels, heightPixels, paddingXPixels, paddingYPixels, lineWidthPixels, useDarkTheme);
+        using var bitmap = LayerImageRenderer.Render(request);
+        using var stream = File.Create(outputPath);
+        DxfLayerImageExportService.EncodeImage(bitmap, stream, format);
     }
 
     private static CadPad CreateSquareCad(int id, string layer, double x, double y, double size)

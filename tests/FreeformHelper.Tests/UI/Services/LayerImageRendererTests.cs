@@ -27,9 +27,12 @@ public sealed class LayerImageRendererTests
         string path = TestFiles.NewTempFilePath("layer-image-equivalence-", ".png");
         try
         {
-            DxfLayerImageExportService.ExportLayerImage(pads, 64, 48, 2m, 0, 0, DxfLayerImageFormat.Png, useDarkTheme, path);
-
             using var rendered = LayerImageRenderer.Render(request);
+            using (var stream = File.Create(path))
+            {
+                DxfLayerImageExportService.EncodeImage(rendered, stream, DxfLayerImageFormat.Png);
+            }
+
             using var decoded = SKBitmap.Decode(path);
             Assert.NotNull(decoded);
             Assert.Equal(64, rendered.Width);

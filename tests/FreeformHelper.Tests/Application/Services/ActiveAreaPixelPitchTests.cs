@@ -11,7 +11,6 @@ public sealed class ActiveAreaPixelPitchTests
         var result = ActiveAreaPixelPitch.Evaluate(915.52, 119.59, null, null);
 
         Assert.Equal(ActiveAreaPixelsStatus.NotSet, result.Status);
-        Assert.False(result.IsUsable);
         Assert.Equal(0, result.PixelsX);
         Assert.Equal(0, result.PixelsY);
     }
@@ -24,7 +23,6 @@ public sealed class ActiveAreaPixelPitchTests
         var result = ActiveAreaPixelPitch.Evaluate(915.52, 119.59, pixelsX, pixelsY);
 
         Assert.Equal(ActiveAreaPixelsStatus.Incomplete, result.Status);
-        Assert.False(result.IsUsable);
         Assert.Equal(0, result.PixelsX);
         Assert.Equal(0, result.PixelsY);
     }
@@ -39,7 +37,6 @@ public sealed class ActiveAreaPixelPitchTests
         var result = ActiveAreaPixelPitch.Evaluate(915.52, 119.59, pixelsX, pixelsY);
 
         Assert.Equal(ActiveAreaPixelsStatus.Invalid, result.Status);
-        Assert.False(result.IsUsable);
     }
 
     [Fact]
@@ -48,7 +45,6 @@ public sealed class ActiveAreaPixelPitchTests
         var result = ActiveAreaPixelPitch.Evaluate(915.52, 119.59, 6480, 848);
 
         Assert.Equal(ActiveAreaPixelsStatus.Ok, result.Status);
-        Assert.True(result.IsUsable);
         Assert.Equal(6480, result.PixelsX);
         Assert.Equal(848, result.PixelsY);
         Assert.Equal(915.52 / 6480, result.PitchXMm, 9);
@@ -62,7 +58,6 @@ public sealed class ActiveAreaPixelPitchTests
         var result = ActiveAreaPixelPitch.Evaluate(915.52, 119.59, 6480, 600);
 
         Assert.Equal(ActiveAreaPixelsStatus.PitchMismatch, result.Status);
-        Assert.True(result.IsUsable);
         Assert.True(result.RelativeDifference > ActiveAreaPixelPitch.MismatchThreshold);
     }
 

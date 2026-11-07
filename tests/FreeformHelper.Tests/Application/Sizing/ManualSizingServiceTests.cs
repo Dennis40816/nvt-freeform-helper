@@ -131,7 +131,7 @@ public sealed class ManualSizingServiceTests
     }
 
     [Fact]
-    public void SetPadDimensions_FailsWhenNoAutoCells()
+    public void ApplySizing_SingleCellFailsWhenNoAutoCells()
     {
         var grid = new GridSettings
         {
@@ -144,12 +144,12 @@ public sealed class ManualSizingServiceTests
             WidthScope = WidthAdjustmentScope.ColumnGlobal,
         };
 
-        var result = ManualSizingService.SetPadDimensions(
+        var result = ManualSizingService.ApplySizing(
             grid,
             GridAlignmentMode.FromPanelAa,
             cad: null,
-            row: 0,
-            col: 0,
+            rows: [0],
+            cols: [0],
             width: 70,
             height: null);
 
@@ -160,7 +160,7 @@ public sealed class ManualSizingServiceTests
     }
 
     [Fact]
-    public void SetPadDimensions_ScalesRemainingProportionally()
+    public void ApplySizing_SingleCellScalesRemainingProportionally()
     {
         var grid = new GridSettings
         {
@@ -173,12 +173,12 @@ public sealed class ManualSizingServiceTests
             WidthScope = WidthAdjustmentScope.ColumnGlobal,
         };
 
-        var result = ManualSizingService.SetPadDimensions(
+        var result = ManualSizingService.ApplySizing(
             grid,
             GridAlignmentMode.FromPanelAa,
             cad: null,
-            row: 0,
-            col: 0,
+            rows: [0],
+            cols: [0],
             width: 50,
             height: null);
 

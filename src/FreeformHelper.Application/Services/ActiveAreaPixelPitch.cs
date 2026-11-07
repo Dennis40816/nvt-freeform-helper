@@ -37,13 +37,7 @@ public readonly record struct ActiveAreaPixelsEvaluation(
     int PixelsY,
     double PitchXMm,
     double PitchYMm,
-    double RelativeDifference)
-{
-    /// <summary>
-    /// Gets a value indicating whether consumers may use <see cref="PixelsX"/> and <see cref="PixelsY"/>.
-    /// </summary>
-    public bool IsUsable => Status is ActiveAreaPixelsStatus.Ok or ActiveAreaPixelsStatus.PitchMismatch;
-}
+    double RelativeDifference);
 
 /// <summary>
 /// Checks the optional pixel counts of the active area against its size in millimeters.
