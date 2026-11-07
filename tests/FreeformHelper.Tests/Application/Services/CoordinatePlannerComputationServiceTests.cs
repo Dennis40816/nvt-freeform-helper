@@ -10,43 +10,7 @@ public sealed class CoordinatePlannerComputationServiceTests
     [Fact]
     public void BuildSnapshot_WithAllArtifactKinds_PreservesCompleteSnapshot()
     {
-        var request = BuildGuideModeRequest(CoordinateGuideGenerationMode.Count, CoordinateGuideGenerationMode.Count) with
-        {
-            MachineOriginX = 100d,
-            MachineOriginY = -20d,
-            MachineWidth = 80d,
-            MachineHeight = 40d,
-            PixelWidth = 800,
-            PixelHeight = 200,
-            HorizontalGuideCount = 2,
-            VerticalGuideCount = 1,
-            CopperPillarDiameter = 10d,
-            ShowBistRectangle = true,
-            ShowCustomArray = true,
-            CustomArrayColumnCount = 3,
-            CustomArrayRowCount = 2,
-            CustomArrayTopLeftMachineX = 90d,
-            CustomArrayTopLeftMachineY = -30d,
-            CustomArrayTopRightMachineX = 154d,
-            CustomArrayTopRightMachineY = 18d,
-            CustomArrayBottomRightMachineX = 154d,
-            CustomArrayBottomRightMachineY = 58d,
-            CustomArrayBottomLeftMachineX = 90d,
-            CustomArrayBottomLeftMachineY = 10d,
-            CustomPoints =
-            [
-                new CoordinateCustomPointRequest(" ", "Ignored", 0d, 0d),
-                new CoordinateCustomPointRequest("probe", "Probe A", 95d, 25d),
-                new CoordinateCustomPointRequest("fallback", " ", 140d, 0d),
-            ],
-            CustomPaths =
-            [
-                new CoordinateCustomPathRequest(" ", "Ignored", 0d, 0d, 0d, 0d, 3),
-                new CoordinateCustomPathRequest("sweep", "Edge sweep", 90d, -30d, 190d, 30d, 3),
-                new CoordinateCustomPathRequest("single", " ", 140d, -30d, 140d, 30d, 1),
-                new CoordinateCustomPathRequest("empty", "No steps", 120d, -10d, 160d, 10d, -1),
-            ],
-        };
+        var request = BuildAllArtifactKindsRequest();
 
         var snapshot = CoordinatePlannerComputationService.BuildSnapshot(
             new Rect2(10d, 20d, 90d, 60d), new Rect2(-8d, -4d, 8d, 4d), request);
@@ -91,6 +55,47 @@ public sealed class CoordinatePlannerComputationServiceTests
             R|bist-center|BIST center blank rect|BistCenter|world=30,30,70,50|safeWorld=35,35,65,45|pixel=200,50,600,150|machine=120,-10,160,10|safeMachine=125,-5,155,5
             """;
         AssertSnapshot(expected, snapshot);
+    }
+
+    private static CoordinatePlannerRequest BuildAllArtifactKindsRequest()
+    {
+        return BuildGuideModeRequest(CoordinateGuideGenerationMode.Count, CoordinateGuideGenerationMode.Count) with
+        {
+            MachineOriginX = 100d,
+            MachineOriginY = -20d,
+            MachineWidth = 80d,
+            MachineHeight = 40d,
+            PixelWidth = 800,
+            PixelHeight = 200,
+            HorizontalGuideCount = 2,
+            VerticalGuideCount = 1,
+            CopperPillarDiameter = 10d,
+            ShowBistRectangle = true,
+            ShowCustomArray = true,
+            CustomArrayColumnCount = 3,
+            CustomArrayRowCount = 2,
+            CustomArrayTopLeftMachineX = 90d,
+            CustomArrayTopLeftMachineY = -30d,
+            CustomArrayTopRightMachineX = 154d,
+            CustomArrayTopRightMachineY = 18d,
+            CustomArrayBottomRightMachineX = 154d,
+            CustomArrayBottomRightMachineY = 58d,
+            CustomArrayBottomLeftMachineX = 90d,
+            CustomArrayBottomLeftMachineY = 10d,
+            CustomPoints =
+            [
+                new CoordinateCustomPointRequest(" ", "Ignored", 0d, 0d),
+                new CoordinateCustomPointRequest("probe", "Probe A", 95d, 25d),
+                new CoordinateCustomPointRequest("fallback", " ", 140d, 0d),
+            ],
+            CustomPaths =
+            [
+                new CoordinateCustomPathRequest(" ", "Ignored", 0d, 0d, 0d, 0d, 3),
+                new CoordinateCustomPathRequest("sweep", "Edge sweep", 90d, -30d, 190d, 30d, 3),
+                new CoordinateCustomPathRequest("single", " ", 140d, -30d, 140d, 30d, 1),
+                new CoordinateCustomPathRequest("empty", "No steps", 120d, -10d, 160d, 10d, -1),
+            ],
+        };
     }
 
     [Theory]
