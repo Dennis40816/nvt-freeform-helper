@@ -29,20 +29,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 92
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/DxfOverlapAnalyzer.Candidates.cs"
-      ],
-      "contentHash": "f19a5912a493b91049c15ad83eb16746d2cf2319575296f352fddd91d438f97e",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.DxfOverlapAnalyzer.BuildOverlapCandidates(IReadOnlyList<CadPad>)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 147
       },
       "owner": "NFH",

@@ -23,55 +23,13 @@ public sealed partial class DxfOverlapAnalyzer
             return BuildFullCandidatePairs(pads.Count);
         }
 
-        var buckets = new Dictionary<long, List<int>>();
-        for (var index = 0; index < pads.Count; index++)
+        var buckets = BuildCellBuckets(pads, cellSize);
+        if (buckets is null)
         {
-            var bounds = pads[index].Bounds;
-            var minCol = ToCell(bounds.MinX, cellSize);
-            var maxCol = ToCell(bounds.MaxX, cellSize);
-            var minRow = ToCell(bounds.MinY, cellSize);
-            var maxRow = ToCell(bounds.MaxY, cellSize);
-
-            var colSpan = (long)maxCol - minCol + 1;
-            var rowSpan = (long)maxRow - minRow + 1;
-            var coveredCells = colSpan * rowSpan;
-            if (coveredCells <= 0 || coveredCells > MaxSpatialCellsPerPad)
-            {
-                return BuildFullCandidatePairs(pads.Count);
-            }
-
-            for (var col = minCol; col <= maxCol; col++)
-            {
-                for (var row = minRow; row <= maxRow; row++)
-                {
-                    var cellKey = BuildCellKey(col, row);
-                    if (!buckets.TryGetValue(cellKey, out var list))
-                    {
-                        list = new List<int>(4);
-                        buckets[cellKey] = list;
-                    }
-
-                    list.Add(index);
-                }
-            }
+            return BuildFullCandidatePairs(pads.Count);
         }
 
-        var pairKeys = new HashSet<long>();
-        foreach (var indices in buckets.Values)
-        {
-            if (indices.Count < 2)
-            {
-                continue;
-            }
-
-            for (var i = 0; i < indices.Count; i++)
-            {
-                for (var j = i + 1; j < indices.Count; j++)
-                {
-                    pairKeys.Add(BuildPairKey(indices[i], indices[j]));
-                }
-            }
-        }
+        var pairKeys = BuildPairKeysFromBuckets(buckets);
 
         if (pairKeys.Count == 0)
         {
@@ -95,6 +53,67 @@ public sealed partial class DxfOverlapAnalyzer
         }
 
         return result;
+    }
+
+    // Returns null when one pad covers more cells than MaxSpatialCellsPerPad, so the caller falls back to all pairs.
+    private static Dictionary<long, List<int>>? BuildCellBuckets(IReadOnlyList<CadPad> pads, double cellSize)
+    {
+        var buckets = new Dictionary<long, List<int>>();
+        for (var index = 0; index < pads.Count; index++)
+        {
+            var bounds = pads[index].Bounds;
+            var minCol = ToCell(bounds.MinX, cellSize);
+            var maxCol = ToCell(bounds.MaxX, cellSize);
+            var minRow = ToCell(bounds.MinY, cellSize);
+            var maxRow = ToCell(bounds.MaxY, cellSize);
+
+            var colSpan = (long)maxCol - minCol + 1;
+            var rowSpan = (long)maxRow - minRow + 1;
+            var coveredCells = colSpan * rowSpan;
+            if (coveredCells <= 0 || coveredCells > MaxSpatialCellsPerPad)
+            {
+                return null;
+            }
+
+            for (var col = minCol; col <= maxCol; col++)
+            {
+                for (var row = minRow; row <= maxRow; row++)
+                {
+                    var cellKey = BuildCellKey(col, row);
+                    if (!buckets.TryGetValue(cellKey, out var list))
+                    {
+                        list = new List<int>(4);
+                        buckets[cellKey] = list;
+                    }
+
+                    list.Add(index);
+                }
+            }
+        }
+
+        return buckets;
+    }
+
+    private static HashSet<long> BuildPairKeysFromBuckets(Dictionary<long, List<int>> buckets)
+    {
+        var pairKeys = new HashSet<long>();
+        foreach (var indices in buckets.Values)
+        {
+            if (indices.Count < 2)
+            {
+                continue;
+            }
+
+            for (var i = 0; i < indices.Count; i++)
+            {
+                for (var j = i + 1; j < indices.Count; j++)
+                {
+                    pairKeys.Add(BuildPairKey(indices[i], indices[j]));
+                }
+            }
+        }
+
+        return pairKeys;
     }
 
     private static List<IndexPair> BuildFullCandidatePairs(int count)
