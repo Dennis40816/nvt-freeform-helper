@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
 using System.Globalization;
 using FreeformHelper.Domain.Pads;
 
@@ -95,7 +96,10 @@ public sealed partial class FreeformHelperViewModel
     {
         previous ??= new CadEditNotificationSnapshot(this);
         var hadEdits = previous.HasAny;
-        _projectFile.HiddenCadPadIds = _cadEdit.HiddenCadPadIds.ToHashSet();
+        if (_cad is not null)
+        {
+            _projectFile.HiddenCadPadIds = _cadEdit.HiddenCadPadIds.ToHashSet();
+        }
         NotifyCadEditProjectionChange(nameof(DeletedCadPadCount), previous.Deleted, DeletedCadPadCount);
         NotifyCadEditProjectionChange(nameof(HasDeletedCadPads), previous.Deleted > 0, HasDeletedCadPads);
         previous.Deleted = DeletedCadPadCount;

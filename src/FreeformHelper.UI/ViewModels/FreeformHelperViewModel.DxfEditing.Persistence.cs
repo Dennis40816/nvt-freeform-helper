@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
 using System.Globalization;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
@@ -20,11 +21,7 @@ public sealed partial class FreeformHelperViewModel
 
         if (_cad is null)
         {
-            file.HiddenCadPadIds = new HashSet<int>();
-            file.VisibleDuplicateCadPadIds = new HashSet<int>();
-            file.DxfCadLayerOverrides = new Dictionary<int, string>();
-            file.DxfCadGeometryOverrides = new Dictionary<int, ProjectCadGeometrySnapshot>();
-            file.DxfCombinedCadGroups = CapturePersistedCombinedCadGroups();
+            // Without a CAD source, live state cannot invalidate the saved DXF edits.
             return;
         }
 
@@ -339,6 +336,18 @@ public sealed partial class FreeformHelperViewModel
         _combinedCad.NextGroupId = Math.Max(_combinedCad.NextGroupId, maxGroupId + 1);
         _combinedCad.NextPadId = nextCombinedCadPadId;
         _cad = new CadPadSet(currentPads);
+        return replay;
+    }
+
+    private DxfCombinedGroupReplayResult KeepDxfEditsWithoutCad(ProjectFile file)
+    {
+        var replay = KeepCombinedGroupsWithoutCad(CapturePersistedDxfEditProjectState(file).CombinedCadGroups);
+        if (!string.IsNullOrWhiteSpace(file.LastDxfPath))
+        {
+            replay.CadFallbackWarning =
+                $"Warning: The DXF file was not found: {file.LastDxfPath}. The saved DXF edits are kept in the project.";
+        }
+
         return replay;
     }
 }
