@@ -99,6 +99,9 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
   - Today Cancel closes the window, writes no file and keeps the old status text, so the user gets no sign that the export was cancelled. Suggested: show a short `cancelled` status, as the Coordinate preview export does. Found by the window tests (2026-11-08). Changing it changes visible text (tier A).
 - [ ] **P-PREVIEW-WRAP Notch preview previous and next stage wrap around** · Target: - · Status: Waiting for owner · PR: -
   - Today Previous on stage 1 goes to stage 3 and Next on stage 3 goes to stage 1. The tests lock this. Suggested: keep the wrap, because three stages are few and the buttons stay always usable. Stopping at the ends would disable a button. Changing it changes visible behaviour (tier A).
+- [ ] **P-RESET-SIZING Reset sizing does not give back equal cells** · Target: - · Status: Waiting for owner · PR: -
+  - Today Reset on a RowLocal width or a ColumnLocal height does not make the cells equal. Example: two cells, grid width 100, the user sets one cell to 70 and then resets it. The cells are 62.5 and 37.5, not 50 and 50. Found by the tests that came before the refactor of `ManualSizingService.ResetSizing` (2026-11-08). The tests `ResetSizing_RowLocalWidth_ClearsSelectedCellFlagAndScalesTheRowToTheGridWidth` and `ResetSizing_ColumnLocalHeight_ClearsSelectedCellFlagAndScalesTheColumnToTheGridHeight` lock the result. Suggested: after Reset the cells that are no longer fixed share the space equally (50 and 50). Changing it changes visible behaviour (tier A).
+
 ### 2.2 g5 settings and presentation (after the g4 exit)
 
 - [ ] **R13.301 Settings draft snapshot with per-field Apply, Discard and round-trip tests; save only dirty fields** · Target: g5 · Status: Not started · PR: -
