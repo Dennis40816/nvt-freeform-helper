@@ -1,0 +1,16 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+        x:DataType="vm:HowToUseViewModel">
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
+  <Style Selector="SelectableTextBlock">
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+  <Style Selector="Grid.howToGestureRow">
+    <Setter Property="ColumnSpacing" Value="{DynamicResource Space12}"/>
+  </Style>
+  <Style Selector="ListBox.workspaceDataList ListBoxItem">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+  </Style>
+</Styles>
