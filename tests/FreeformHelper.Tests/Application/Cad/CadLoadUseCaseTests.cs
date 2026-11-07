@@ -61,83 +61,7 @@ public sealed class CadLoadUseCaseTests
     {
         var useCase = new CadLoadUseCase(new DxfImportService());
         var options = new DxfImportOptions();
-        var bytes = Encoding.UTF8.GetBytes(
-            """
-            0
-            SECTION
-            2
-            ENTITIES
-            0
-            LWPOLYLINE
-            8
-            0
-            70
-            1
-            10
-            0
-            20
-            0
-            10
-            1
-            20
-            0
-            10
-            1
-            20
-            1
-            10
-            0
-            20
-            1
-            0
-            LWPOLYLINE
-            8
-            0
-            70
-            1
-            10
-            0
-            20
-            0
-            10
-            1
-            20
-            0
-            10
-            1
-            20
-            1
-            10
-            0
-            20
-            1
-            0
-            LWPOLYLINE
-            8
-            OTHER
-            70
-            1
-            10
-            0
-            20
-            0
-            10
-            1
-            20
-            0
-            10
-            1
-            20
-            1
-            10
-            0
-            20
-            1
-            0
-            ENDSEC
-            0
-            EOF
-            """);
+        var bytes = _sameLayerDuplicateDxfBytes;
 
         var outcome = useCase.TryLoadFromEmbedded(bytes, options);
 
@@ -149,6 +73,84 @@ public sealed class CadLoadUseCaseTests
         Assert.Contains(1, outcome.Cad.Pads.Select(static pad => pad.Id));
         Assert.Contains(2, outcome.Cad.Pads.Select(static pad => pad.Id));
     }
+
+    private static readonly byte[] _sameLayerDuplicateDxfBytes = Encoding.UTF8.GetBytes(
+        """
+        0
+        SECTION
+        2
+        ENTITIES
+        0
+        LWPOLYLINE
+        8
+        0
+        70
+        1
+        10
+        0
+        20
+        0
+        10
+        1
+        20
+        0
+        10
+        1
+        20
+        1
+        10
+        0
+        20
+        1
+        0
+        LWPOLYLINE
+        8
+        0
+        70
+        1
+        10
+        0
+        20
+        0
+        10
+        1
+        20
+        0
+        10
+        1
+        20
+        1
+        10
+        0
+        20
+        1
+        0
+        LWPOLYLINE
+        8
+        OTHER
+        70
+        1
+        10
+        0
+        20
+        0
+        10
+        1
+        20
+        0
+        10
+        1
+        20
+        1
+        10
+        0
+        20
+        1
+        0
+        ENDSEC
+        0
+        EOF
+        """);
 
     private static readonly byte[] _validEmbeddedDxfBytes = Encoding.UTF8.GetBytes(
         """

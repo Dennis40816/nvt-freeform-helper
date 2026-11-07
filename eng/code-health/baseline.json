@@ -1124,20 +1124,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 93
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Cad/CadLoadUseCaseTests.cs"
-      ],
-      "contentHash": "c922ddfb2932924166bdded269215f6008eb880a10cbd8130e0b7bf27c39c040",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.CadLoadUseCaseTests.TryLoadFromEmbedded_DetectsSameLayerExactDuplicates_ButKeepsRawCadSet()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 131
       },
       "owner": "NFH",
@@ -1273,20 +1259,6 @@
       "contentHash": "a4d48cf7d591cf4caf57793b5e7062feaebfd4aaca3d1f3e7b5a200f0a3c0d97",
       "project": "FreeformHelper.Tests",
       "symbol": "FreeformHelper.Tests.ProjectFileMigrationTests.Load_MigratesNullCollections()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 94
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs"
-      ],
-      "contentHash": "2c926a0d441df3dc959a798d69dfb89852a99bec77d282fca09d38ba1961af4b",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveThenLoadAsync_RoundTrip_PreservesDxfEditState()"
     },
     {
       "kind": "member",
