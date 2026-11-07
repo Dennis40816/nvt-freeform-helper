@@ -26,20 +26,6 @@
       "symbol": "FreeformHelper.Application.Services.CadOutputFwDiffIndexAssignmentService.AssignWithGridDirect(IReadOnlyList<CadPad>,RegularGrid,GridSettings,CadOutputFwDiffAutoMode,IReadOnlyDictionary<int, int?>,IReadOnlyDictionary<int, int>?,Dictionary<int, int>,Dictionary<int, int>,List<string>,List<string>)"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 103
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/CadOutputFwDiffIndexAssignmentService.Fallback.cs"
-      ],
-      "contentHash": "6a328d0b6303ae15061f14b839f3bbfc5879be23051ad67f41e51849cdb4b3d8",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.CadOutputFwDiffIndexAssignmentService.AssignWithoutGrid(IReadOnlyList<CadPad>,CadOutputFwDiffAutoMode,IReadOnlyDictionary<int, int?>,IReadOnlyDictionary<int, int>?,Dictionary<int, int>,Dictionary<int, int>,List<string>,List<string>)"
-    },
-    {
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
@@ -66,20 +52,6 @@
       "contentHash": "59f8349e4d5150db1114a36c23d907b4ca7a3729886b5f66144145be9fb3b1ed",
       "project": "FreeformHelper.Application",
       "symbol": "FreeformHelper.Application.Services.CoordinatePlannerRequest"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 99
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/CopperPillarSimulationService.cs"
-      ],
-      "contentHash": "4ac6e602dcce044b5ae9431a2e9881e1e976128270d2b737750bbeee37521395",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.CopperPillarSimulationService.ProjectCadOutputToRegularGrid(RegularGrid,IReadOnlyList<CadPad>,IReadOnlyDictionary<int, int>,IReadOnlyDictionary<int, int>,CopperPillarSimulationRequest)"
     },
     {
       "kind": "member",

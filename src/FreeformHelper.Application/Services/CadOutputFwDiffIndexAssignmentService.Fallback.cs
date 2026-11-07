@@ -55,6 +55,42 @@ public sealed partial class CadOutputFwDiffIndexAssignmentService
             }
         }
 
+        AssignAutoWithoutGrid(
+            orderedPads, autoMode, strictDiffByCadId, assignedByCadId, used, conflictSamples, unmatchedSamples,
+            ref autoAssignedCount, ref autoConflictCount, ref autoUnmatchedCount);
+
+        return new CadOutputFwDiffIndexAssignmentResult(
+            assignedByCadId,
+            cadIcIndexByCadId,
+            Array.Empty<int>(),
+            conflictSamples,
+            unmatchedSamples,
+            overrideAssignedCount,
+            autoAssignedCount,
+            autoConflictCount,
+            autoUnmatchedCount,
+            duplicateOverrides,
+            invalidOverrides,
+            overrideMismatchCount,
+            SequenceAdjustedCount: 0,
+            AnchorAppliedCount: 0,
+            AnchorIgnoredCount: 0,
+            RowSequenceAppliedCount: 0,
+            RowSequenceFallbackCount: 0);
+    }
+
+    private static void AssignAutoWithoutGrid(
+        IReadOnlyList<CadPad> orderedPads,
+        CadOutputFwDiffAutoMode autoMode,
+        IReadOnlyDictionary<int, int?> strictDiffByCadId,
+        Dictionary<int, int> assignedByCadId,
+        HashSet<int> used,
+        List<string> conflictSamples,
+        List<string> unmatchedSamples,
+        ref int autoAssignedCount,
+        ref int autoConflictCount,
+        ref int autoUnmatchedCount)
+    {
         foreach (var pad in orderedPads)
         {
             if (assignedByCadId.ContainsKey(pad.Id))
@@ -88,24 +124,5 @@ public sealed partial class CadOutputFwDiffIndexAssignmentService
             assignedByCadId[pad.Id] = targetIndex;
             autoAssignedCount++;
         }
-
-        return new CadOutputFwDiffIndexAssignmentResult(
-            assignedByCadId,
-            cadIcIndexByCadId,
-            Array.Empty<int>(),
-            conflictSamples,
-            unmatchedSamples,
-            overrideAssignedCount,
-            autoAssignedCount,
-            autoConflictCount,
-            autoUnmatchedCount,
-            duplicateOverrides,
-            invalidOverrides,
-            overrideMismatchCount,
-            SequenceAdjustedCount: 0,
-            AnchorAppliedCount: 0,
-            AnchorIgnoredCount: 0,
-            RowSequenceAppliedCount: 0,
-            RowSequenceFallbackCount: 0);
     }
 }

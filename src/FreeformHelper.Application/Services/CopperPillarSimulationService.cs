@@ -32,15 +32,10 @@ public static class CopperPillarSimulationService
         ArgumentNullException.ThrowIfNull(cadIcIndexByCadId);
         ArgumentNullException.ThrowIfNull(request);
 
-        if (grid.Pads.Count == 0)
+        var rejection = ValidateCadProjectionInputs(grid, cadPads, cadOutputFwDiffByCadId);
+        if (rejection is not null)
         {
-            return DiffFrameGridProjectionResult.Incompatible("Regular grid has no pads.");
-        }
-
-        if (cadPads.Count == 0 || cadOutputFwDiffByCadId.Count == 0)
-        {
-            return DiffFrameGridProjectionResult.Incompatible(
-                "Copper CAD projection requires CAD pads and CAD Output FW Diff mapping.");
+            return rejection;
         }
 
         // Physical source is CAD copper overlap; the FW-facing value is written to the CAD Output FW Diff slot.
@@ -61,14 +56,7 @@ public static class CopperPillarSimulationService
         var valueByRegularPadId = grid.Pads.ToDictionary(
             static pad => pad.RegularPadId,
             _ => request.BaselineValue);
-        var primaryRegularByDiff = grid.Pads
-            .GroupBy(static pad => new NotchDiffKey(pad.IcIndex, pad.DiffIndex))
-            .ToDictionary(
-                static group => group.Key,
-                static group => group
-                    .OrderBy(static pad => pad.Row)
-                    .ThenBy(static pad => pad.Col)
-                    .First());
+        var primaryRegularByDiff = BuildPrimaryRegularByDiff(grid);
 
         var touchedCadCount = 0;
         var missingCadOutputCount = 0;
@@ -106,7 +94,47 @@ public static class CopperPillarSimulationService
             valueByRegularPadId[targetRegular.RegularPadId] += request.PeakValue * (overlapArea / circleArea);
         }
 
-        var cells = grid.Pads
+        var cells = BuildProjectionCells(grid, valueByRegularPadId);
+        var diagnostics = BuildCadProjectionDiagnostic(touchedCadCount, missingCadOutputCount, missingTargetDiffCount);
+        return new DiffFrameGridProjectionResult(true, diagnostics, cells);
+    }
+
+    private static DiffFrameGridProjectionResult? ValidateCadProjectionInputs(
+        RegularGrid grid,
+        IReadOnlyList<CadPad> cadPads,
+        IReadOnlyDictionary<int, int> cadOutputFwDiffByCadId)
+    {
+        if (grid.Pads.Count == 0)
+        {
+            return DiffFrameGridProjectionResult.Incompatible("Regular grid has no pads.");
+        }
+
+        if (cadPads.Count == 0 || cadOutputFwDiffByCadId.Count == 0)
+        {
+            return DiffFrameGridProjectionResult.Incompatible(
+                "Copper CAD projection requires CAD pads and CAD Output FW Diff mapping.");
+        }
+
+        return null;
+    }
+
+    private static Dictionary<NotchDiffKey, RegularPad> BuildPrimaryRegularByDiff(RegularGrid grid)
+    {
+        return grid.Pads
+            .GroupBy(static pad => new NotchDiffKey(pad.IcIndex, pad.DiffIndex))
+            .ToDictionary(
+                static group => group.Key,
+                static group => group
+                    .OrderBy(static pad => pad.Row)
+                    .ThenBy(static pad => pad.Col)
+                    .First());
+    }
+
+    private static DiffFrameGridCellValue[] BuildProjectionCells(
+        RegularGrid grid,
+        Dictionary<int, double> valueByRegularPadId)
+    {
+        return grid.Pads
             .Select(pad => new DiffFrameGridCellValue(
                 pad.Row,
                 pad.Col,
@@ -115,8 +143,6 @@ public static class CopperPillarSimulationService
                 pad.RegularPadId,
                 valueByRegularPadId[pad.RegularPadId]))
             .ToArray();
-        var diagnostics = BuildCadProjectionDiagnostic(touchedCadCount, missingCadOutputCount, missingTargetDiffCount);
-        return new DiffFrameGridProjectionResult(true, diagnostics, cells);
     }
 
     private static Polygon2 BuildCirclePolygon(Point2 center, double radius, int segmentCount)
