@@ -1596,7 +1596,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 143
+        "methodLines": 115
       },
       "owner": "NFH",
       "locations": [
