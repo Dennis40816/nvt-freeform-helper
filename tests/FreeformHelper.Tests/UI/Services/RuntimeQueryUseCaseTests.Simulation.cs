@@ -1,5 +1,7 @@
 using System.Globalization;
+using System.Text.Json;
 using FreeformHelper.Application.Services;
+using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
@@ -173,7 +175,75 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_NotchReadersShareSingleResolvedPathAcrossOverlayAllocationQueryAndInspector()
     {
-        using var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var (shell, cad) = CreateSharedResolvedPathScenario();
+        using var shellScope = shell;
+        var vm = shell.FreeformHelper;
+        var resolved = vm.GetCadV22ResolvedResult(cad.Id);
+        var allocation = vm.GetCadV22TargetAllocationSummary(cad.Id);
+        var overlay = vm.GetCadV22StageOverlays(cad.Id);
+        var inspectorSnapshot = vm.BuildCadPadInspectorSnapshot(cad.Id);
+
+        Assert.NotNull(resolved);
+        Assert.NotNull(allocation);
+        Assert.True(overlay.HasValue);
+        var inspectorCad = Assert.IsType<CadPadInspectorSnapshot>(inspectorSnapshot?.Cad);
+        var inspectorNotch = Assert.IsType<PadInspectorNotchSnapshot>(inspectorCad.Notch);
+
+        var resolvedResult = resolved!;
+        var allocationSummary = allocation!;
+        var overlayValue = overlay.Value;
+        var inspectorDisplay = NotchDisplayProjector.Build(inspectorNotch);
+
+        AssertInspectorMatchesResolvedAndAllocation(resolvedResult, allocationSummary, inspectorNotch);
+
+        var useCase = new RuntimeQueryUseCase(shell);
+        var notchResponse = await useCase.ExecuteAsync(new RuntimeQueryRequest(
+            Version: RuntimeQueryProtocol.Version,
+            Command: "notch",
+            Args: new Dictionary<string, string>
+            {
+                ["cad-id"] = cad.Id.ToString(CultureInfo.InvariantCulture)
+            }));
+        var stageResponse = await useCase.ExecuteAsync(new RuntimeQueryRequest(
+            Version: RuntimeQueryProtocol.Version,
+            Command: "notch-stage",
+            Args: new Dictionary<string, string>
+            {
+                ["cad-id"] = cad.Id.ToString(CultureInfo.InvariantCulture)
+            }));
+        var padResponse = await useCase.ExecuteAsync(new RuntimeQueryRequest(
+            Version: RuntimeQueryProtocol.Version,
+            Command: "pad",
+            Args: new Dictionary<string, string>
+            {
+                ["cad-id"] = cad.Id.ToString(CultureInfo.InvariantCulture)
+            }));
+
+        Assert.True(notchResponse.Ok);
+        Assert.True(stageResponse.Ok);
+        Assert.True(padResponse.Ok);
+
+        var notchRoot = SerializeToRootElement(notchResponse.Data);
+        AssertNotchRatiosPayload(notchRoot.GetProperty("ratios"), resolvedResult, inspectorDisplay);
+        AssertNotchAllocationPayload(notchRoot.GetProperty("stage3Allocation"), allocationSummary, inspectorDisplay);
+        AssertNotchToFullPolygonsPayload(notchRoot.GetProperty("toFullPolygons"), overlayValue.Stage1Seed, overlayValue.Stage3Final);
+
+        var stageRoot = SerializeToRootElement(stageResponse.Data);
+        Assert.Equal(overlayValue.IsToFullEnabled, stageRoot.GetProperty("isToFullEnabled").GetBoolean());
+        var stages = stageRoot.GetProperty("stages");
+        AssertStagePayloadMatchesPolygons(stages.GetProperty("stage1"), "seed", overlayValue.Stage1Seed);
+        AssertStagePayloadMatchesPolygons(stages.GetProperty("stage2"), "candidate", overlayValue.Stage2Candidate);
+        AssertStagePayloadMatchesPolygons(stages.GetProperty("stage3"), "final", overlayValue.Stage3Final);
+
+        var padNotch = SerializeToRootElement(padResponse.Data).GetProperty("snapshot")
+            .GetProperty("cad")
+            .GetProperty("notch");
+        AssertPadNotchPayload(padNotch, inspectorNotch, inspectorDisplay);
+    }
+
+    private static (ShellViewModel Shell, CadPad Cad) CreateSharedResolvedPathScenario()
+    {
+        var shell = new ShellViewModel { IsDevPageAvailable = true };
         var vm = shell.FreeformHelper;
         var cad = CreateCadPad(id: 40, minX: 0, minY: 0, maxX: 15, maxY: 5);
         var blocker = CreateCadPad(id: 41, minX: 12, minY: 0, maxX: 20, maxY: 5);
@@ -205,22 +275,14 @@ public sealed partial class RuntimeQueryUseCaseTests
         cadIcIndexByCadId[cad.Id] = 0;
         cadIcIndexByCadId[blocker.Id] = 0;
 
-        var resolved = vm.GetCadV22ResolvedResult(cad.Id);
-        var allocation = vm.GetCadV22TargetAllocationSummary(cad.Id);
-        var overlay = vm.GetCadV22StageOverlays(cad.Id);
-        var inspectorSnapshot = vm.BuildCadPadInspectorSnapshot(cad.Id);
+        return (shell, cad);
+    }
 
-        Assert.NotNull(resolved);
-        Assert.NotNull(allocation);
-        Assert.True(overlay.HasValue);
-        var inspectorCad = Assert.IsType<CadPadInspectorSnapshot>(inspectorSnapshot?.Cad);
-        var inspectorNotch = Assert.IsType<PadInspectorNotchSnapshot>(inspectorCad.Notch);
-
-        var resolvedResult = resolved!;
-        var allocationSummary = allocation!;
-        var overlayValue = overlay.Value;
-        var inspectorDisplay = NotchDisplayProjector.Build(inspectorNotch);
-
+    private static void AssertInspectorMatchesResolvedAndAllocation(
+        NotchV22ResolvedResult resolvedResult,
+        NotchV22TargetAllocationSummary allocationSummary,
+        PadInspectorNotchSnapshot inspectorNotch)
+    {
         Assert.Equal(resolvedResult.TargetAllocation.Stage3Area, allocationSummary.Stage3Area, 6);
         if (resolvedResult.Stage3FinalOutlinePolygons.Count > 0)
         {
@@ -248,36 +310,13 @@ public sealed partial class RuntimeQueryUseCaseTests
             Assert.Equal(expectedTarget.ToFullAppliedRegularCount, inspectorTarget.ToFullAppliedRegularCount);
             Assert.Equal(expectedTarget.RegularCount, inspectorTarget.RegularCount);
         }
+    }
 
-        var useCase = new RuntimeQueryUseCase(shell);
-        var notchResponse = await useCase.ExecuteAsync(new RuntimeQueryRequest(
-            Version: RuntimeQueryProtocol.Version,
-            Command: "notch",
-            Args: new Dictionary<string, string>
-            {
-                ["cad-id"] = cad.Id.ToString(CultureInfo.InvariantCulture)
-            }));
-        var stageResponse = await useCase.ExecuteAsync(new RuntimeQueryRequest(
-            Version: RuntimeQueryProtocol.Version,
-            Command: "notch-stage",
-            Args: new Dictionary<string, string>
-            {
-                ["cad-id"] = cad.Id.ToString(CultureInfo.InvariantCulture)
-            }));
-        var padResponse = await useCase.ExecuteAsync(new RuntimeQueryRequest(
-            Version: RuntimeQueryProtocol.Version,
-            Command: "pad",
-            Args: new Dictionary<string, string>
-            {
-                ["cad-id"] = cad.Id.ToString(CultureInfo.InvariantCulture)
-            }));
-
-        Assert.True(notchResponse.Ok);
-        Assert.True(stageResponse.Ok);
-        Assert.True(padResponse.Ok);
-
-        var notchRoot = SerializeToRootElement(notchResponse.Data);
-        var ratios = notchRoot.GetProperty("ratios");
+    private static void AssertNotchRatiosPayload(
+        JsonElement ratios,
+        NotchV22ResolvedResult resolvedResult,
+        NotchDisplayProjection inspectorDisplay)
+    {
         Assert.Equal(resolvedResult.Compensation.ToRegularRatio, ratios.GetProperty("toRegularRatio").GetDouble(), 6);
         Assert.Equal(resolvedResult.Compensation.ToFullRatio, ratios.GetProperty("toFullRatio").GetDouble(), 6);
         Assert.Equal(resolvedResult.Compensation.CombinedRatio, ratios.GetProperty("combinedRatio").GetDouble(), 6);
@@ -290,8 +329,13 @@ public sealed partial class RuntimeQueryUseCaseTests
         Assert.Equal(inspectorDisplay.CombinedRatioText, queryNotchDisplay.GetProperty("combinedRatioText").GetString());
         Assert.Equal(inspectorDisplay.Stage3AreaText, queryNotchDisplay.GetProperty("stage3AreaText").GetString());
         Assert.Equal(inspectorDisplay.ToFullReasonShortText, queryNotchDisplay.GetProperty("toFullReasonShortText").GetString());
+    }
 
-        var stage3Allocation = notchRoot.GetProperty("stage3Allocation");
+    private static void AssertNotchAllocationPayload(
+        JsonElement stage3Allocation,
+        NotchV22TargetAllocationSummary allocationSummary,
+        NotchDisplayProjection inspectorDisplay)
+    {
         Assert.Equal(allocationSummary.CadArea, stage3Allocation.GetProperty("cadArea").GetDouble(), 6);
         Assert.Equal(allocationSummary.Stage3Area, stage3Allocation.GetProperty("stage3Area").GetDouble(), 6);
         Assert.Equal(allocationSummary.StrictAreaThreshold, stage3Allocation.GetProperty("strictAreaThreshold").GetDouble(), 6);
@@ -310,33 +354,33 @@ public sealed partial class RuntimeQueryUseCaseTests
         var queryAllocationDisplay = stage3Allocation.GetProperty("display");
         Assert.Equal(inspectorDisplay.TargetAllocationSummaryText, queryAllocationDisplay.GetProperty("targetAllocationSummaryText").GetString());
         Assert.Equal(inspectorDisplay.OwnerSummaryText, queryAllocationDisplay.GetProperty("ownerSummaryText").GetString());
+    }
 
-        var toFullPolygons = notchRoot.GetProperty("toFullPolygons");
-        Assert.Equal(overlayValue.Stage1Seed.Count, toFullPolygons.GetProperty("seedCount").GetInt32());
-        Assert.Equal(overlayValue.Stage3Final.Count, toFullPolygons.GetProperty("finalCount").GetInt32());
-        Assert.Equal(overlayValue.Stage1Seed.Count, toFullPolygons.GetProperty("seedBounds").GetArrayLength());
-        Assert.Equal(overlayValue.Stage3Final.Count, toFullPolygons.GetProperty("finalBounds").GetArrayLength());
-        for (var i = 0; i < overlayValue.Stage1Seed.Count; i++)
+    private static void AssertNotchToFullPolygonsPayload(
+        JsonElement toFullPolygons,
+        IReadOnlyList<Polygon2> seed,
+        IReadOnlyList<Polygon2> final)
+    {
+        Assert.Equal(seed.Count, toFullPolygons.GetProperty("seedCount").GetInt32());
+        Assert.Equal(final.Count, toFullPolygons.GetProperty("finalCount").GetInt32());
+        Assert.Equal(seed.Count, toFullPolygons.GetProperty("seedBounds").GetArrayLength());
+        Assert.Equal(final.Count, toFullPolygons.GetProperty("finalBounds").GetArrayLength());
+        for (var i = 0; i < seed.Count; i++)
         {
-            AssertBoundsMatch(toFullPolygons.GetProperty("seedBounds")[i], overlayValue.Stage1Seed[i]);
+            AssertBoundsMatch(toFullPolygons.GetProperty("seedBounds")[i], seed[i]);
         }
 
-        for (var i = 0; i < overlayValue.Stage3Final.Count; i++)
+        for (var i = 0; i < final.Count; i++)
         {
-            AssertBoundsMatch(toFullPolygons.GetProperty("finalBounds")[i], overlayValue.Stage3Final[i]);
+            AssertBoundsMatch(toFullPolygons.GetProperty("finalBounds")[i], final[i]);
         }
+    }
 
-        var stageRoot = SerializeToRootElement(stageResponse.Data);
-        Assert.Equal(overlayValue.IsToFullEnabled, stageRoot.GetProperty("isToFullEnabled").GetBoolean());
-        var stages = stageRoot.GetProperty("stages");
-        AssertStagePayloadMatchesPolygons(stages.GetProperty("stage1"), "seed", overlayValue.Stage1Seed);
-        AssertStagePayloadMatchesPolygons(stages.GetProperty("stage2"), "candidate", overlayValue.Stage2Candidate);
-        AssertStagePayloadMatchesPolygons(stages.GetProperty("stage3"), "final", overlayValue.Stage3Final);
-
-        var padRoot = SerializeToRootElement(padResponse.Data);
-        var padNotch = padRoot.GetProperty("snapshot")
-            .GetProperty("cad")
-            .GetProperty("notch");
+    private static void AssertPadNotchPayload(
+        JsonElement padNotch,
+        PadInspectorNotchSnapshot inspectorNotch,
+        NotchDisplayProjection inspectorDisplay)
+    {
         Assert.Equal(inspectorNotch.ToRegularRatio, padNotch.GetProperty("toRegularRatio").GetDouble(), 6);
         Assert.Equal(inspectorNotch.ToFullRatio, padNotch.GetProperty("toFullRatio").GetDouble(), 6);
         Assert.Equal(inspectorNotch.CombinedRatio, padNotch.GetProperty("combinedRatio").GetDouble(), 6);
