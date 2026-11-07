@@ -71,20 +71,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 97
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/FreeformDetector.cs"
-      ],
-      "contentHash": "085c8bff0c16db64b468468a0cdd109112aa973c7dd46acd8891fa986dbd017a",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.FreeformDetector.DetectAssignmentsFromOverlapLinks(RegularGrid,PadMatchResult,double,bool,bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 94
       },
       "owner": "NFH",
