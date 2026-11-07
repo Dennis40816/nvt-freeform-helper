@@ -66,9 +66,12 @@ public sealed partial class SettingsWindow : Window
         var owner = TopLevel.GetTopLevel(this) as Window ?? this;
         var dialog = new ConfirmDialog(
             "Reset all settings",
-            "Reset all settings to defaults? This also overwrites app-level general settings for next startup.",
+            "Reset all settings to defaults?",
             "Reset",
-            "Cancel");
+            "Cancel",
+            confirmTip: "Reset all settings to defaults.",
+            cancelTip: "Keep the current settings.",
+            nextStartMessage: "This also overwrites app-level general settings for next startup.");
         var confirmed = await dialog.ShowDialog<bool>(owner);
         if (!confirmed)
         {

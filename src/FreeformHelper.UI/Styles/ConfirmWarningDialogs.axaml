@@ -1,0 +1,43 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:DataType="Control">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Nvt.Core.Avalonia/Icons/IconResources.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Focus/ToolTipStyles.axaml"/>
+  <Style Selector=":is(Window).sharedMessageDialog">
+    <Setter Property="Width" Value="{DynamicResource SharedMessageDialogWidth}"/>
+    <Setter Property="MaxHeight" Value="{DynamicResource SharedMessageDialogMaxHeight}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+  </Style>
+  <Style Selector="ScrollViewer.dialogBody">
+    <Setter Property="MaxHeight" Value="{DynamicResource SharedMessageDialogBodyMaxHeight}"/>
+    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+    <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+  </Style>
+  <Style Selector="SelectableTextBlock.dialogBodyText">
+    <Setter Property="TextWrapping" Value="Wrap"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+  </Style>
+  <Style Selector="SelectableTextBlock.dialogQuestion">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+  <Style Selector="SelectableTextBlock.dialogTitle">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeLg}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+  </Style>
+  <Style Selector="Button.dialogCancel">
+    <Setter Property="HorizontalAlignment" Value="Right"/>
+  </Style>
+  <Style Selector="Button.dialogCancel.separated">
+    <Setter Property="HorizontalAlignment" Value="Left"/>
+  </Style>
+</Styles>

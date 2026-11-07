@@ -157,12 +157,12 @@ public sealed partial class FreeformHelperView
                 return false; // Cannot show dialog without a parent window.
             }
 
-            // Create and show a custom confirmation dialog.
             var dialog = new ConfirmDialog(
-                "Embed DXF",
-                "Embed the current DXF into the project file?\nThis increases file size but keeps the project self-contained.",
-                "Embed",
-                "Skip");
+                "Embed DXF", "Embed the current DXF into the project file?",
+                "Embed", "Skip",
+                confirmTip: "Embed DXF into the project file.",
+                cancelTip: "Cancel and keep external DXF reference.",
+                consequenceText: "This increases file size but keeps the project self-contained.");
 
             return await dialog.ShowDialog<bool>(owner); // Return the boolean result from the dialog.
         };
