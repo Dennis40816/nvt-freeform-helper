@@ -18,35 +18,7 @@ public sealed class CadPadUnionService
 
     public static CadPadUnionResult Union(IEnumerable<Polygon2> polygons)
     {
-        var inputPaths = new PathsD();
-        var inputCount = 0;
-        foreach (var polygon in polygons)
-        {
-            inputCount++;
-            if (polygon.Vertices.Length < 3)
-            {
-                continue;
-            }
-
-            var path = new PathD(polygon.Vertices.Length);
-            foreach (var vertex in polygon.Vertices)
-            {
-                path.Add(new PointD(vertex.X, vertex.Y));
-            }
-
-            if (path.Count >= 3)
-            {
-                // All input polygons here represent solid filled regions. Normalize
-                // orientation up front so Clipper won't reinterpret a valid CAD body
-                // as a hole just because the DXF vertex order is reversed.
-                if (!Clipper.IsPositive(path))
-                {
-                    path.Reverse();
-                }
-
-                inputPaths.Add(path);
-            }
-        }
+        var inputPaths = BuildInputPaths(polygons, out var inputCount);
 
         if (inputPaths.Count == 0)
         {
@@ -98,6 +70,41 @@ public sealed class CadPadUnionService
             inputCount,
             validPathCount,
             holeCount);
+    }
+
+    private static PathsD BuildInputPaths(IEnumerable<Polygon2> polygons, out int inputCount)
+    {
+        var inputPaths = new PathsD();
+        inputCount = 0;
+        foreach (var polygon in polygons)
+        {
+            inputCount++;
+            if (polygon.Vertices.Length < 3)
+            {
+                continue;
+            }
+
+            var path = new PathD(polygon.Vertices.Length);
+            foreach (var vertex in polygon.Vertices)
+            {
+                path.Add(new PointD(vertex.X, vertex.Y));
+            }
+
+            if (path.Count >= 3)
+            {
+                // All input polygons here represent solid filled regions. Normalize
+                // orientation up front so Clipper won't reinterpret a valid CAD body
+                // as a hole just because the DXF vertex order is reversed.
+                if (!Clipper.IsPositive(path))
+                {
+                    path.Reverse();
+                }
+
+                inputPaths.Add(path);
+            }
+        }
+
+        return inputPaths;
     }
 
     private static void CollectOuterPaths(

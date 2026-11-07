@@ -147,6 +147,22 @@ public static class CoordinateArtifactService
             rows.Add(BuildLineArtifactRow(line, "Vertical guides", "Line", guideSource, guideBoundsText, sortOrder++));
         }
 
+        AddCustomArtifactRows(rows, snapshot, activeBoundsText, ref sortOrder);
+
+        return new CoordinateArtifactSnapshot(
+            snapshot.ActiveAreaBounds,
+            guideBounds,
+            activeSource,
+            guideSource,
+            rows);
+    }
+
+    private static void AddCustomArtifactRows(
+        List<CoordinateArtifactRow> rows,
+        CoordinatePlannerSnapshot snapshot,
+        string activeBoundsText,
+        ref int sortOrder)
+    {
         foreach (var line in snapshot.Lines.Where(static line => line.Kind == CoordinatePlannerLineKind.CustomArrayEdge))
         {
             rows.Add(BuildLineArtifactRow(line, "4-point array", "Line", "4-point array reference", activeBoundsText, sortOrder++));
@@ -176,13 +192,6 @@ public static class CoordinateArtifactService
         {
             rows.Add(BuildPointArtifactRow(point, "Custom path", "Step", "Custom coordinate recipe", activeBoundsText, sortOrder++));
         }
-
-        return new CoordinateArtifactSnapshot(
-            snapshot.ActiveAreaBounds,
-            guideBounds,
-            activeSource,
-            guideSource,
-            rows);
     }
 
     public static string ExportCsv(CoordinateArtifactSnapshot snapshot)
