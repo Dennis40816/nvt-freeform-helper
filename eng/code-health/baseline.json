@@ -48,20 +48,6 @@
       "symbol": "FreeformHelper.Application.Services.NotchTableGenerator"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 129
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/PadMatcher.cs"
-      ],
-      "contentHash": "f24848eab51304caf5f0ed7d0419de94273347e85423003d87162ae0ccc7caab",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.PadMatcher.MatchOverlap(CadPadSet,RegularGrid,Action<double>?)"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
