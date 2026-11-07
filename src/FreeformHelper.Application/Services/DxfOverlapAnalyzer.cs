@@ -119,13 +119,33 @@ public sealed partial class DxfOverlapAnalyzer
             return new DxfOverlapReport(0, 0, 0, 0, Array.Empty<DxfOverlapIssue>());
         }
 
-        // --- Step 1: Find duplicates using a geometric signature ---
+        var duplicates = FindDuplicates(cad.Pads, maxSamples, reportProgress);
+        var overlapPairs = ScanOverlaps(cad.Pads, duplicates, maxSamples, reportProgress);
+
+        ReportProgress(reportProgress, 1.0);
+        return new DxfOverlapReport(
+            cad.Pads.Count,
+            duplicates.SameLayerPairs,
+            duplicates.CrossLayerPairs,
+            overlapPairs,
+            duplicates.Samples);
+    }
+
+    private readonly record struct DuplicateScan(
+        List<DxfOverlapIssue> Samples,
+        HashSet<long> Pairs,
+        int SameLayerPairs,
+        int CrossLayerPairs);
+
+    // Step 1 and 2: finds duplicates using a geometric signature, 0% to 40% of the progress.
+    private static DuplicateScan FindDuplicates(IReadOnlyList<CadPad> pads, int maxSamples, Action<double>? reportProgress)
+    {
         // A signature is a canonical string representation of a polygon's vertices.
         // Polygons with the same signature are considered geometrically identical.
         var signatureMap = new Dictionary<string, List<CadPad>>(StringComparer.Ordinal);
-        for (var index = 0; index < cad.Pads.Count; index++)
+        for (var index = 0; index < pads.Count; index++)
         {
-            var pad = cad.Pads[index];
+            var pad = pads[index];
             var signature = BuildSignature(pad.Polygon);
             if (!signatureMap.TryGetValue(signature, out var list))
             {
@@ -136,9 +156,9 @@ public sealed partial class DxfOverlapAnalyzer
             // Step 1 weight: 15%
             MaybeReportProgress(
                 reportProgress,
-                0.15 * (index + 1) / cad.Pads.Count,
+                0.15 * (index + 1) / pads.Count,
                 index + 1,
-                cad.Pads.Count,
+                pads.Count,
                 interval: 64);
         }
 
@@ -194,9 +214,17 @@ public sealed partial class DxfOverlapAnalyzer
             ReportProgress(reportProgress, 0.40);
         }
 
-        // --- Step 2: Find overlaps for non-duplicate pairs ---
+        return new DuplicateScan(samples, duplicatePairs, duplicateSameLayer, duplicateCrossLayer);
+    }
+
+    // Step 3: finds overlaps for non-duplicate pairs, 40% to 100% of the progress. Adds issues to duplicates.Samples.
+    private static int ScanOverlaps(
+        IReadOnlyList<CadPad> pads,
+        DuplicateScan duplicates,
+        int maxSamples,
+        Action<double>? reportProgress)
+    {
         var overlapPairs = 0;
-        var pads = cad.Pads;
         var candidatePairs = BuildOverlapCandidates(pads);
         var totalPairs = candidatePairs.Count;
         var processedPairs = 0L;
@@ -205,44 +233,17 @@ public sealed partial class DxfOverlapAnalyzer
             var a = pads[pair.LeftIndex];
             var b = pads[pair.RightIndex];
             processedPairs++;
-            // Skip if this pair was already identified as a duplicate
-            if (duplicatePairs.Contains(BuildPairKey(a.Id, b.Id)))
+            // Skip if this pair was already identified as a duplicate.
+            // Broad phase: check if bounding boxes intersect.
+            // Narrow phase: perform the more expensive polygon intersection test.
+            if (!duplicates.Pairs.Contains(BuildPairKey(a.Id, b.Id)) &&
+                a.Bounds.Intersects(b.Bounds) &&
+                PolygonsOverlap(a.Polygon, b.Polygon))
             {
-                MaybeReportProgress(
-                    reportProgress,
-                    0.40 + (0.60 * processedPairs / totalPairs),
-                    processedPairs,
-                    totalPairs,
-                    interval: 2048);
-                continue;
+                overlapPairs++;
+                AddSample(duplicates.Samples, maxSamples, new DxfOverlapIssue(DxfOverlapKind.Overlap, a, b));
             }
 
-            // Broad phase: check if bounding boxes intersect
-            if (!a.Bounds.Intersects(b.Bounds))
-            {
-                MaybeReportProgress(
-                    reportProgress,
-                    0.40 + (0.60 * processedPairs / totalPairs),
-                    processedPairs,
-                    totalPairs,
-                    interval: 2048);
-                continue;
-            }
-
-            // Narrow phase: perform more expensive polygon intersection test
-            if (!PolygonsOverlap(a.Polygon, b.Polygon))
-            {
-                MaybeReportProgress(
-                    reportProgress,
-                    0.40 + (0.60 * processedPairs / totalPairs),
-                    processedPairs,
-                    totalPairs,
-                    interval: 2048);
-                continue;
-            }
-
-            overlapPairs++;
-            AddSample(samples, maxSamples, new DxfOverlapIssue(DxfOverlapKind.Overlap, a, b));
             MaybeReportProgress(
                 reportProgress,
                 0.40 + (0.60 * processedPairs / totalPairs),
@@ -251,8 +252,7 @@ public sealed partial class DxfOverlapAnalyzer
                 interval: 2048);
         }
 
-        ReportProgress(reportProgress, 1.0);
-        return new DxfOverlapReport(pads.Count, duplicateSameLayer, duplicateCrossLayer, overlapPairs, samples);
+        return overlapPairs;
     }
 
     private static void AddSample(List<DxfOverlapIssue> samples, int maxSamples, DxfOverlapIssue issue)

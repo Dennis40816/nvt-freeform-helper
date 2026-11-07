@@ -98,6 +98,66 @@ public sealed class DxfOverlapAnalyzerTests
         Assert.Equal(1, report.OverlapPairs);
     }
 
+    [Fact]
+    public void Analyze_ReportsTheSameProgressValues_ForDuplicateAndOverlapInput()
+    {
+        var progress = new List<double>();
+        var pads = new List<CadPad>
+        {
+            CreatePad(1, "L1", 0, 0, 10, 10),
+            CreatePad(2, "L2", 0, 0, 10, 10),
+            CreatePad(3, "L3", 8, 8, 14, 14),
+        };
+
+        DxfOverlapAnalyzer.Analyze(new CadPadSet(pads), reportProgress: progress.Add);
+
+        // start, end of the signature step (15%), end of the duplicate step (40%), end of the overlap step, done.
+        var expected = new[] { 0.0, 0.15, 0.40, 1.0, 1.0 };
+        Assert.Equal(expected, progress.Select(value => Math.Round(value, 6)));
+    }
+
+    [Fact]
+    public void Analyze_ReportsTheSameProgressValues_ForSpatialAccelerationInput()
+    {
+        var progress = new List<double>();
+        var pads = new List<CadPad>();
+        for (var row = 0; row < 8; row++)
+        {
+            for (var col = 0; col < 8; col++)
+            {
+                pads.Add(CreatePad(row * 8 + col + 1, "L", col * 12.0, row * 12.0, (col * 12.0) + 10.0, (row * 12.0) + 10.0));
+            }
+        }
+
+        pads.Add(CreatePad(65, "L2", 0, 0, 10, 10));
+        pads.Add(CreatePad(66, "L", 5, 5, 15, 15));
+
+        DxfOverlapAnalyzer.Analyze(new CadPadSet(pads), reportProgress: progress.Add);
+
+        // The signature step also reports once at pad 64 of 66. Only the last candidate pair reports in the overlap step.
+        var expected = new[] { 0.0, 0.145455, 0.15, 0.40, 1.0, 1.0 };
+        Assert.Equal(expected, progress.Select(value => Math.Round(value, 6)));
+    }
+
+    [Fact]
+    public void Analyze_ReportsTheSameProgressValues_WhenTheOverlapStepPassesItsReportInterval()
+    {
+        var progress = new List<double>();
+        var pads = new List<CadPad>();
+        for (var index = 0; index < 70; index++)
+        {
+            // Every pad overlaps every other pad and none is a duplicate: 2415 pairs, above the interval of 2048.
+            var shift = index * 0.01;
+            pads.Add(CreatePad(index + 1, "L", shift, shift, 10.0 + shift, 10.0 + shift));
+        }
+
+        DxfOverlapAnalyzer.Analyze(new CadPadSet(pads), reportProgress: progress.Add);
+
+        // The overlap step reports at pair 2048 and at the last pair.
+        var expected = new[] { 0.0, 0.137143, 0.15, 0.40, 0.90882, 1.0, 1.0 };
+        Assert.Equal(expected, progress.Select(value => Math.Round(value, 6)));
+    }
+
     private static void AssertProgressIsMonotonic(List<double> progress)
     {
         for (var i = 0; i < progress.Count; i++)
