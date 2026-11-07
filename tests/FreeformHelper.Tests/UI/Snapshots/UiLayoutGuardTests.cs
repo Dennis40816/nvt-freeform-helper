@@ -661,7 +661,7 @@ public sealed class UiLayoutGuardTests
         var regularPadInfoContent = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "PadInfoSections", "RegularPadInfoContentView.axaml"));
 
         Assert.Contains("x:Name=\"RegularPadInfoScroll\"", regularPadInfoContent, StringComparison.Ordinal);
-        Assert.Contains("MaxHeight=\"{StaticResource PadInfoContentMaxHeight}\"", regularPadInfoContent, StringComparison.Ordinal);
+        Assert.Contains("MaxHeight=\"{DynamicResource PadInfoContentMaxHeight}\"", regularPadInfoContent, StringComparison.Ordinal);
         Assert.Contains("IsVisible=\"{Binding ShowGeometryDetails}\"", regularPadInfoContent, StringComparison.Ordinal);
     }
 
@@ -671,8 +671,8 @@ public sealed class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
         var regularPadInfoContent = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "PadInfoSections", "RegularPadInfoContentView.axaml"));
 
-        Assert.Contains("Classes=\"padInfoSectionToggle debugCard\"", regularPadInfoContent, StringComparison.Ordinal);
-        Assert.Contains("Command=\"{Binding ToggleGeometryDetailsCommand}\"", regularPadInfoContent, StringComparison.Ordinal);
+        Assert.Contains("panels:CollapsiblePanel x:Name=\"GeometryDebugSection\" Title=\"Geometry / Debug\"", regularPadInfoContent, StringComparison.Ordinal);
+        Assert.Contains("IsExpanded=\"{Binding ShowGeometryDetails, Mode=TwoWay}\"", regularPadInfoContent, StringComparison.Ordinal);
         Assert.DoesNotContain("Content=\"{Binding GeometryDetailsToggleText}\"", regularPadInfoContent, StringComparison.Ordinal);
     }
 

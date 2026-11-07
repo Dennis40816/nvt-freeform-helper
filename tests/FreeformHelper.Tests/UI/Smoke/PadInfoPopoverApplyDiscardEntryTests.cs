@@ -133,7 +133,7 @@ public sealed class PadInfoPopoverApplyDiscardEntryTests
     private static Button FindButton(PadInfoPopover popover, string content)
     {
         var button = Assert.Single(popover.GetVisualDescendants().OfType<Button>(),
-            candidate => candidate.Content is string text && text == content);
+            candidate => candidate.Command is null && candidate.Content is string text && text == content);
         Assert.True(button.IsEffectivelyVisible);
         return button;
     }

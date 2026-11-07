@@ -8,6 +8,12 @@ internal static class PadInfoUnits
     internal const string SquareMillimeter = "mm²";
 }
 
+internal static class PadInfoRelationText
+{
+    internal const string AllocationTitle = "Area split to Regular pads";
+    internal const string HighlightHint = "Click a card to highlight that pad";
+}
+
 internal static class PadInspectorRuleTraceFormatter
 {
     internal static string Format(PadInspectorRuleTraceEntry entry)
@@ -43,9 +49,11 @@ public sealed class PadInfoRelationCardViewModel
         string areaText,
         string ratioText,
         string rawText,
-        IRelayCommand? highlightCommand)
+        IRelayCommand? highlightCommand,
+        string? compactTitleText = null)
     {
         TitleText = titleText;
+        CompactTitleText = compactTitleText ?? titleText;
         RoleText = roleText;
         MetaText = metaText;
         AreaText = string.IsNullOrWhiteSpace(areaText) ? "-" : areaText;
@@ -55,6 +63,8 @@ public sealed class PadInfoRelationCardViewModel
     }
 
     public string TitleText { get; }
+
+    public string CompactTitleText { get; }
 
     public string RoleText { get; }
 

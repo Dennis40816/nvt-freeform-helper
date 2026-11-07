@@ -161,7 +161,6 @@
     "src/FreeformHelper.UI/Views/PadInfoPopover.axaml",
     "src/FreeformHelper.UI/Views/PadInfoSections/CadPadInfoContentView.axaml",
     "src/FreeformHelper.UI/Views/PadInfoSections/PadInfoRelationCardListView.axaml",
-    "src/FreeformHelper.UI/Views/PadInfoSections/RegularPadInfoContentView.axaml",
     "src/FreeformHelper.UI/Views/RightWorkflowPanel.axaml",
     "src/FreeformHelper.UI/Views/RightWorkflowSections/RightWorkflowInspectorView.axaml",
     "src/FreeformHelper.UI/Views/RightWorkflowSections/RightWorkflowSettingsTabView.axaml",
