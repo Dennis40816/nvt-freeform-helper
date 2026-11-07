@@ -1,5 +1,7 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Threading;
 
@@ -12,6 +14,24 @@ public partial class NotchExportSelectionRowsPaneView : UserControl
     public NotchExportSelectionRowsPaneView()
     {
         InitializeComponent();
+    }
+
+    private void InspectRow_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed ||
+            (e.Source is Control source &&
+             (source is CheckBox || source.GetVisualAncestors().OfType<CheckBox>().Any())))
+        {
+            return;
+        }
+
+        if (DataContext is NotchExportSelectionViewModel viewModel &&
+            sender is Control { DataContext: NotchExportRowItemViewModel row } target)
+        {
+            viewModel.SelectPreviewRowCommand.Execute(row);
+            target.GetVisualAncestors().OfType<ListBoxItem>().FirstOrDefault()?.Focus();
+            e.Handled = true;
+        }
     }
 
     private void OpenHeaderFilterButton_Click(object? sender, RoutedEventArgs e)

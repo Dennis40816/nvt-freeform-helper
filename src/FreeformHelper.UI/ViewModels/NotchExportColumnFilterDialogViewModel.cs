@@ -91,8 +91,11 @@ public sealed partial class NotchExportColumnFilterDialogViewModel : ObservableO
     {
         if (SupportsRangeInput && UseRangeFilter)
         {
-            var hasMin = int.TryParse(RangeFromText?.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var min);
-            var hasMax = int.TryParse(RangeToText?.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var max);
+            var range = RangeInput;
+            var hasMin = range.From.HasValue;
+            var hasMax = range.To.HasValue;
+            var min = range.From.GetValueOrDefault();
+            var max = range.To.GetValueOrDefault();
             if (hasMin || hasMax)
             {
                 return Options
@@ -119,6 +122,9 @@ public sealed partial class NotchExportColumnFilterDialogViewModel : ObservableO
 
     private void UpdateSummary()
     {
+        OnPropertyChanged(nameof(RangeErrorText));
+        OnPropertyChanged(nameof(HasRangeError));
+        OnPropertyChanged(nameof(CanApply));
         if (SupportsRangeInput && UseRangeFilter)
         {
             var fromText = string.IsNullOrWhiteSpace(RangeFromText) ? "-" : RangeFromText.Trim();

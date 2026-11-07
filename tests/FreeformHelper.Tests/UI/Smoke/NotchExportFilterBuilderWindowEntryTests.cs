@@ -1,13 +1,12 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.Controls;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
 using Xunit;
@@ -18,7 +17,7 @@ namespace FreeformHelper.Tests;
 public sealed class NotchExportFilterBuilderWindowEntryTests
 {
     private const string TextQuery = "ic=1 diff=20 reg=4820 cad=3777 a=20 \"transfer row\"";
-    private const string WarningQuery = "ic=1 diff=20 reg=4820 cad=3777 a=20 status=warning \"transfer row\"";
+    private const string NoOpQuery = "ic=1 diff=20 reg=4820 cad=3777 a=20 status=noop \"transfer row\"";
     private static readonly string[] _inputNames =
         ["IcTextBox", "DiffTextBox", "RegTextBox", "CadTextBox", "AnchorTextBox", "FuzzyTextBox"];
 
@@ -43,8 +42,8 @@ public sealed class NotchExportFilterBuilderWindowEntryTests
             FindStatusComboBox(window).SelectedIndex = 2;
             await HeadlessUiPump.FlushQueueAsync();
 
-            Assert.Equal(WarningQuery, window.GeneratedQuery);
-            Assert.Equal(WarningQuery, FindTextBox(window, "PreviewTextBox").Text);
+            Assert.Equal(NoOpQuery, window.GeneratedQuery);
+            Assert.Equal(NoOpQuery, FindTextBox(window, "PreviewTextBox").Text);
             Assert.True(window.IsVisible);
         }
         finally
@@ -72,7 +71,7 @@ public sealed class NotchExportFilterBuilderWindowEntryTests
             await ClickButtonAsync(window, "Apply");
 
             Assert.True(await result.WaitAsync(TimeSpan.FromSeconds(30), TestContext.Current.CancellationToken));
-            Assert.Equal(WarningQuery, window.GeneratedQuery);
+            Assert.Equal(NoOpQuery, window.GeneratedQuery);
             Assert.False(window.IsVisible);
             Assert.DoesNotContain(window, owner.OwnedWindows);
             Assert.True(owner.IsEnabled);
@@ -98,7 +97,7 @@ public sealed class NotchExportFilterBuilderWindowEntryTests
             FillTextInputs(window);
             FindStatusComboBox(window).SelectedIndex = 2;
             await HeadlessUiPump.FlushQueueAsync();
-            Assert.Equal(WarningQuery, window.GeneratedQuery);
+            Assert.Equal(NoOpQuery, window.GeneratedQuery);
 
             await ClickButtonAsync(window, "Clear");
 
@@ -141,8 +140,7 @@ public sealed class NotchExportFilterBuilderWindowEntryTests
 
             // Exercise the real caller so Cancel cannot replace the existing search filter.
             var helperButton = Assert.Single(owner.GetVisualDescendants().OfType<Button>(),
-                static button => button.Classes.Contains("workspaceInfoButton")
-                    && button.Content is FontIcon { Glyph: IconGlyphs.FilterAlt });
+                static button => AutomationProperties.GetName(button) == "Filter helper");
             helperButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             await HeadlessUiPump.FlushQueueAsync();
             var opened = Assert.Single(owner.OwnedWindows.OfType<NotchExportFilterBuilderWindow>());

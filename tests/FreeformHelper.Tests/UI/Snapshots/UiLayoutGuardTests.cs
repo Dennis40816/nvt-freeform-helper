@@ -391,7 +391,7 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("Classes=\"chipStatusText\"", warningChip, StringComparison.Ordinal);
         Assert.Contains("IsVisible=\"{Binding HasSimulationPhysicalAuditWarning}\"", warningChip, StringComparison.Ordinal);
         Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyExportSummaryText}\"", warningChip, StringComparison.Ordinal);
-        Assert.Contains("Text=\"{Binding SimulationSafetyExportBadgeText}\"", warningChip, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding SimulationSafetyExportSummaryText}\"", warningChip, StringComparison.Ordinal);
         Assert.DoesNotContain("Background=", warningChip, StringComparison.Ordinal);
         Assert.DoesNotContain("Foreground=", warningChip, StringComparison.Ordinal);
         Assert.DoesNotContain("FontSize=", warningChip, StringComparison.Ordinal);
@@ -620,16 +620,16 @@ public sealed class UiLayoutGuardTests
             },
             [Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "NotchExportSelectionWindow.axaml")] = new[]
             {
-                "SummaryText",
-                "DistributionText",
-                "PrimaryOutcomeText",
-                "CompactMetaText",
-                "SelectedRowHeaderText",
+                "ExportSummaryText",
+                "HiddenSelectedRowsHintText",
+                "InspectorHeaderText",
                 "SelectedRowCodePreviewText",
-                "SelectedRowOutcomeText",
+                "SelectedRowAnalysisText",
                 "SelectedRowPadRelationText",
-                "SelectedRowPayloadText",
-                "SelectedRowColumnBreakdownText",
+                "SelectedRowPayloadAnchorText",
+                "SelectedRowPayloadCombineText",
+                "SelectedRowPayloadTarget1Text",
+                "SelectedRowPayloadTarget2Text",
                 "SelectedRowFlagsText",
                 "SelectedRowCommentText"
             }

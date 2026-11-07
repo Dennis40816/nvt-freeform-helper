@@ -1,5 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:FreeformHelper.UI.Views"
+        x:DataType="views:NotchExportFilterBuilderWindow"
         x:Class="FreeformHelper.UI.Views.NotchExportFilterBuilderWindow"
         Width="{StaticResource NotchExportFilterHelperWidth}"
         Height="{StaticResource NotchExportFilterHelperHeight}"
@@ -9,6 +11,9 @@
         Background="{DynamicResource BrushBgSurface}"
         Foreground="{DynamicResource BrushTextPrimary}"
         Title="Filter helper">
+  <Window.Styles>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/ExportNotchRows.axaml"/>
+  </Window.Styles>
   <Border Padding="{StaticResource Inset14}">
     <Grid RowDefinitions="Auto,Auto,*,Auto"
           RowSpacing="{StaticResource Space10}">
@@ -17,58 +22,57 @@
                              FontWeight="SemiBold"
                              FontSize="{StaticResource FontSizeSectionTitle}"/>
         <SelectableTextBlock Classes="stepNote"
-                             Text="Examples: ic=1 diff=20 status=warning a=20 cad=3777. Plain text still does fuzzy search."
+                             Text="Examples: ic=1 diff=20 status=noop a=20 cad=3777. Plain text still does fuzzy search."
                              TextWrapping="WrapWithOverflow"/>
       </StackPanel>
 
       <Grid Grid.Row="1"
             ColumnDefinitions="*,*"
-            ColumnSpacing="{StaticResource Space8}"
             RowDefinitions="Auto,Auto,Auto,Auto"
             RowSpacing="{StaticResource Space8}">
-        <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{StaticResource Space2}">
+        <StackPanel Grid.Row="0" Grid.Column="0" Classes="panelFormField left">
           <SelectableTextBlock Classes="stepNote" Text="IC"/>
           <TextBox x:Name="IcTextBox"
                    PlaceholderText="e.g. 1"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource Space2}">
+        <StackPanel Grid.Row="0" Grid.Column="1" Classes="panelFormField right">
           <SelectableTextBlock Classes="stepNote" Text="Diff"/>
           <TextBox x:Name="DiffTextBox"
                    PlaceholderText="e.g. 20"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource Space2}">
+        <StackPanel Grid.Row="1" Grid.Column="0" Classes="panelFormField left">
           <SelectableTextBlock Classes="stepNote" Text="REG"/>
           <TextBox x:Name="RegTextBox"
                    PlaceholderText="e.g. 4820"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource Space2}">
+        <StackPanel Grid.Row="1" Grid.Column="1" Classes="panelFormField right">
           <SelectableTextBlock Classes="stepNote" Text="CAD"/>
           <TextBox x:Name="CadTextBox"
                    PlaceholderText="e.g. 3777 / none"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
-        <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
+        <StackPanel Grid.Row="2" Grid.Column="0" Classes="panelFormField left">
           <SelectableTextBlock Classes="stepNote" Text="Anchor (A)"/>
           <TextBox x:Name="AnchorTextBox"
                    PlaceholderText="e.g. 20"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
-        <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
+        <StackPanel Grid.Row="2" Grid.Column="1" Classes="panelFormField right">
           <SelectableTextBlock Classes="stepNote" Text="Status"/>
           <ComboBox x:Name="StatusComboBox"
                     SelectedIndex="0"
                     SelectionChanged="FilterInput_SelectionChanged">
             <ComboBoxItem Content="Any"/>
             <ComboBoxItem Content="Linked"/>
-            <ComboBoxItem Content="Warning"/>
+            <ComboBoxItem Content="No-op"/>
             <ComboBoxItem Content="No CAD"/>
             <ComboBoxItem Content="Legacy"/>
           </ComboBox>
         </StackPanel>
-        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}">
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Classes="panelFormField">
           <SelectableTextBlock Classes="stepNote" Text="Fuzzy text (optional)"/>
           <TextBox x:Name="FuzzyTextBox"
                    PlaceholderText="e.g. CAD 3777 / transfer"
@@ -85,16 +89,17 @@
       </StackPanel>
 
       <Grid Grid.Row="3"
-            ColumnDefinitions="*,Auto,Auto,Auto"
+            HorizontalAlignment="Right"
+            ColumnDefinitions="Auto,Auto,Auto,Auto"
             ColumnSpacing="{StaticResource Space8}">
         <Button Grid.Column="1"
-                Content="Clear"
+                Classes="actionGhost" Content="Clear"
                 Click="ClearButton_Click"/>
         <Button Grid.Column="2"
-                Content="Cancel"
+                Classes="actionGhost" Content="Cancel"
                 Click="CancelButton_Click"/>
         <Button Grid.Column="3"
-                Content="Apply"
+                Classes="actionPrimary" Content="Apply"
                 Click="ApplyButton_Click"/>
       </Grid>
     </Grid>

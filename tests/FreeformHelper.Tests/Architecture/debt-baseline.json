@@ -158,7 +158,6 @@
     "src/FreeformHelper.UI/Views/IndexMappingReportWindow.axaml",
     "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml",
     "src/FreeformHelper.UI/Views/NotchDetailWindow.axaml",
-    "src/FreeformHelper.UI/Views/NotchExportSelectionWindow.axaml",
     "src/FreeformHelper.UI/Views/PadInfoPopover.axaml",
     "src/FreeformHelper.UI/Views/PadInfoSections/CadPadInfoContentView.axaml",
     "src/FreeformHelper.UI/Views/PadInfoSections/PadInfoRelationCardListView.axaml",
@@ -184,7 +183,6 @@
     "src/FreeformHelper.UI/Views/WorkspaceSections/CoordinatePlannerWorkspaceDetailsPaneView.axaml",
     "src/FreeformHelper.UI/Views/WorkspaceSections/IndexMappingReportLeftPaneView.axaml",
     "src/FreeformHelper.UI/Views/WorkspaceSections/IndexMappingReportRightPaneView.axaml",
-    "src/FreeformHelper.UI/Views/WorkspaceSections/NotchExportSelectionRowsPaneView.axaml",
     "src/FreeformHelper.UI/Views/WorkspaceSections/SimulationWorkspaceControlsPaneView.axaml",
     "src/FreeformHelper.UI/Views/WorkspaceSections/SimulationWorkspaceDetailsPaneView.axaml"
   ]

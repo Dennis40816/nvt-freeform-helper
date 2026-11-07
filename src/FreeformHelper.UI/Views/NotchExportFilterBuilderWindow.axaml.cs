@@ -5,6 +5,8 @@ namespace FreeformHelper.UI.Views;
 
 public sealed partial class NotchExportFilterBuilderWindow : Window
 {
+    private string _initialQuery = string.Empty;
+
     public NotchExportFilterBuilderWindow()
     {
         InitializeComponent();
@@ -20,7 +22,8 @@ public sealed partial class NotchExportFilterBuilderWindow : Window
             return;
         }
 
-        FuzzyTextBox.Text = query ?? string.Empty;
+        _initialQuery = query ?? string.Empty;
+        FuzzyTextBox.Text = _initialQuery;
         UpdatePreview();
     }
 
@@ -62,47 +65,6 @@ public sealed partial class NotchExportFilterBuilderWindow : Window
         Close(true);
     }
 
-    private string BuildQuery()
-    {
-        if (!HasInputControls())
-        {
-            return string.Empty;
-        }
-
-        var segments = new List<string>();
-        Append(segments, "ic", IcTextBox.Text);
-        Append(segments, "diff", DiffTextBox.Text);
-        Append(segments, "reg", RegTextBox.Text);
-        Append(segments, "cad", CadTextBox.Text);
-        Append(segments, "a", AnchorTextBox.Text);
-
-        if (StatusComboBox.SelectedItem is ComboBoxItem item)
-        {
-            var status = item.Content?.ToString() ?? string.Empty;
-            var normalized = status switch
-            {
-                "Linked" => "linked",
-                "Warning" => "warning",
-                "No CAD" => "nocad",
-                "Legacy" => "legacy",
-                _ => string.Empty,
-            };
-
-            if (!string.IsNullOrWhiteSpace(normalized))
-            {
-                segments.Add($"status={normalized}");
-            }
-        }
-
-        var fuzzy = FuzzyTextBox.Text?.Trim();
-        if (!string.IsNullOrWhiteSpace(fuzzy))
-        {
-            segments.Add(NeedsQuote(fuzzy) ? $"\"{fuzzy}\"" : fuzzy);
-        }
-
-        return string.Join(' ', segments);
-    }
-
     private void UpdatePreview()
     {
         var query = BuildQuery();
@@ -111,30 +73,6 @@ public sealed partial class NotchExportFilterBuilderWindow : Window
         {
             PreviewTextBox.Text = string.IsNullOrWhiteSpace(query) ? "(empty)" : query;
         }
-    }
-
-    private static void Append(List<string> segments, string key, string? value)
-    {
-        var text = value?.Trim();
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return;
-        }
-
-        segments.Add($"{key}={text}");
-    }
-
-    private static bool NeedsQuote(string text)
-    {
-        foreach (var ch in text)
-        {
-            if (char.IsWhiteSpace(ch))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private bool HasInputControls()
