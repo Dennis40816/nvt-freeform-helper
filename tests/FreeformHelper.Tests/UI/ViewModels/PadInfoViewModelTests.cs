@@ -316,7 +316,7 @@ public sealed class PadInfoViewModelTests
         Assert.Equal("Regular pad is not boundary.", vm.ToFullReasonShortText);
     }
 
-    [Fact]
+    [Fact, UseEnUsCulture]
     public void CadPadInfo_TargetAllocationDisplay_UsesFinalEmittedTargetEligibility()
     {
         const double cadArea = 4570.0;

@@ -546,6 +546,7 @@ try {
                 } else {
                     Assert-Policy ($discoveryLines.Count -eq 0)
                 }
+                Assert-Policy (@($entryOutput | Where-Object { [string]$_ -like '*skipped tests on this machine*' }).Count -eq 0)
                 Assert-Policy (($entryOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
                 Assert-Policy ($message -ceq 'Shard validation failed.')
                 # The native command finished with the exit code of the case. A runner exception before that
@@ -558,6 +559,22 @@ try {
                 $caseSummary = Get-Content -LiteralPath $summaryFile -Raw | ConvertFrom-Json
                 Assert-Policy (@($caseSummary.groups).Count -eq 1 -and $caseSummary.groups[0].exitCode -eq $case.Exit)
             }
+        }
+    }
+    # A local run (no floors) adds up the skipped count of the test summaries and prints it before the final line.
+    # A CI run reads the count from the shard summary instead, so it must not print the line.
+    Invoke-WithTemporaryEnvironmentVariables -Settings @{ FREEFORMHELPER_TEST_AREA = (Join-Path $testRoot 'test-area') } -Action {
+        & {
+            function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
+            function dotnet {
+                Write-Output 'Passed!  - Failed:     0, Passed:     5, Skipped:     2, Total:     7, Duration: 1 s - FreeformHelper.Tests.dll (net10.0)'
+                $global:LASTEXITCODE = 0
+            }
+            $localOutput = @(& (Join-Path $fakeRepo 'scripts/verify.ps1') -CiLane test -Shard snapshots -AllowMissingExampleData *>&1)
+            $skipIndex = [Array]::FindIndex($localOutput, [Predicate[object]]{ param($line) [string]$line -ceq '[verify] skipped tests on this machine: 2' })
+            $okIndex = [Array]::FindIndex($localOutput, [Predicate[object]]{ param($line) [string]$line -like '[[]verify] OK *' })
+            Assert-Policy ($skipIndex -ge 0 -and $okIndex -gt $skipIndex)
+            Assert-Policy (@($localOutput | Where-Object { [string]$_ -like '*skipped tests on this machine*' }).Count -eq 1)
         }
     }
     # Real child exits prove that setup, precheck and cleanup failures cannot publish private filenames.
