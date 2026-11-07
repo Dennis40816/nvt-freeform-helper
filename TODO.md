@@ -24,7 +24,7 @@
 - [x] Inspector tab: two developer-facing texts deleted, the rule trace description is a tooltip, and Snapshot details plus Rule trace sit under one Debug details fold that is closed when the inspector shows another pad (owner answers Q25 to Q27, 2026-10-31 08:54). Proposal: `nfh-pc-notes/proposal-right-panel-debug-fold.md`
 - [ ] Overview tab and Step 6 quick trace: apply the four classes word by word (write the text-by-text table first). One PR per panel
 - [ ] Step 1, 2, 3, 4 and 5 panels: same, one PR each. Step 3 has the largest block of debug notes (about 75 words) that should fold or become tooltips
-- [ ] Snapshot details is written twice in `RightWorkflowInspectorView.axaml` (CAD and regular). Merge them into one template in a separate refactor
+- [x] Snapshot details is written twice in `RightWorkflowInspectorView.axaml` (CAD and regular). Merged into one template in [#391](https://github.com/Dennis40816/nvt-freeform-helper/pull/391) (2026-11-08, merge commit `12958ed`). The rendered output is byte-identical in both themes. The new template keeps the old 6 px empty slot (`HasLeadingGap`); removing it moves the content by 6 px and needs an owner decision
 - [ ] Decide whether the right panel needs one global "include debug" switch, like the message center, that opens every Debug details fold. Not needed while only the Inspector has a fold
 - [ ] When NFH adopts the Core version that ships `CollapsiblePanel`, move `HidePanelBlock` and the `workspaceFoldHeader` accordion to it
 
