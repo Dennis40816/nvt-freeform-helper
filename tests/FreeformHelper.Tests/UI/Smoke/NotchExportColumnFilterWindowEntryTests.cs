@@ -185,7 +185,8 @@ public sealed class NotchExportColumnFilterWindowEntryTests
     private static async Task ClickButtonAsync(Control root, string content)
     {
         var button = Assert.Single(root.GetVisualDescendants().OfType<Button>(),
-            button => button.Content is string text && text == content);
+            button => (button.Content is string text && text == content)
+                || (content == "Diff" && button.Tag as string == "diff"));
         button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         await HeadlessUiPump.FlushQueueAsync();
     }

@@ -70,7 +70,7 @@ public sealed class NotchExportSelectionWindowEntryTests
             await HeadlessUiPump.FlushQueueAsync();
             Assert.False(viewModel.TryGetExportBlockMessage(out _, out _));
 
-            await ClickAsync(FindContentButton(window, viewModel.ExportButtonText));
+            await ClickAsync(FindContentButton(window, "Export"));
 
             Assert.True(Assert.Single(completions));
             Assert.False(window.IsVisible);
@@ -104,7 +104,7 @@ public sealed class NotchExportSelectionWindowEntryTests
             await HeadlessUiPump.FlushQueueAsync();
             Assert.True(viewModel.TryGetExportBlockMessage(out var title, out var message));
 
-            await ClickAsync(FindContentButton(window, viewModel.ExportButtonText));
+            await ClickAsync(FindContentButton(window, "Export"));
 
             var dialog = Assert.Single(window.OwnedWindows.OfType<WarningDialog>());
             Assert.Same(window, dialog.Owner);

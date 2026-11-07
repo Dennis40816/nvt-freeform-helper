@@ -331,6 +331,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
 
         OnPropertyChanged(nameof(HasSelectedRow));
         OnPropertyChanged(nameof(HasNoSelectedRow));
+        NotifyInspectorDisplayChanged();
         OnPropertyChanged(nameof(SelectedRowHeaderText));
         OnPropertyChanged(nameof(SelectedRowContextText));
         OnPropertyChanged(nameof(SelectedRowPositionText));
@@ -361,7 +362,10 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         OnPropertyChanged(nameof(HasNoSimulationSafetyAudit));
         OnPropertyChanged(nameof(IsExportBlockedBySimulationSafety));
         OnPropertyChanged(nameof(HasSimulationPhysicalAuditWarning));
+        OnPropertyChanged(nameof(HasNoSimulationPhysicalAuditWarning));
         OnPropertyChanged(nameof(IsSimulationSafetyClean));
+        OnPropertyChanged(nameof(NeedsSimulationCheckAttention));
+        OnPropertyChanged(nameof(HasPassedExportChecks));
         OnPropertyChanged(nameof(SimulationSafetyExportBadgeText));
         OnPropertyChanged(nameof(SimulationSafetyExportSummaryText));
         OnPropertyChanged(nameof(SimulationSafetyExportHighRiskText));

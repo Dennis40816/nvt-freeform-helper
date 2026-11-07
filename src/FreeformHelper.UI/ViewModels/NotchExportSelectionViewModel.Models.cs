@@ -105,6 +105,14 @@ public sealed partial class NotchExportRowItemViewModel : ObservableObject
 
     [ObservableProperty] private bool _isSelected = true;
     [ObservableProperty] private bool _isPreviewSelected;
+    [ObservableProperty] private NotchExportIcGroupViewModel? _visibleGroup;
+
+    public bool HasVisibleGroup => VisibleGroup is not null;
+
+    partial void OnVisibleGroupChanged(NotchExportIcGroupViewModel? value)
+    {
+        OnPropertyChanged(nameof(HasVisibleGroup));
+    }
 
     public string RowNumberText => $"#{RowIndex + 1}";
     public string VersionText => Row.Version.ToDisplayLabel();
