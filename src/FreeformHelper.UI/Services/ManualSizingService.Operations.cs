@@ -186,34 +186,6 @@ public static partial class ManualSizingService
     }
 
     /// <summary>
-    /// Sets specific dimensions for a single pad (cell) in the grid.
-    /// This is a convenience method that calls <see cref="ApplySizing"/> for a single row and column.
-    /// </summary>
-    public static ManualSizingResult SetPadDimensions(
-        GridSettings grid,
-        GridAlignmentMode alignmentMode,
-        CadPadSet? cad,
-        int row,
-        int col,
-        double? width,
-        double? height)
-    {
-        EnsureSizingLists(grid);
-        var snapshot = CaptureSnapshot(grid);
-
-        var rows = new[] { row };
-        var cols = new[] { col };
-        var result = ApplySizing(grid, alignmentMode, cad, rows, cols, width, height);
-        if (!result.Success)
-        {
-            RestoreSnapshot(grid, snapshot); // Rollback changes if unsuccessful.
-            return result;
-        }
-
-        return result;
-    }
-
-    /// <summary>
     /// Applies a specific width globally to a selection of columns, distributing remaining space.
     /// </summary>
     private static ManualSizingResult ApplyWidthGlobal(
