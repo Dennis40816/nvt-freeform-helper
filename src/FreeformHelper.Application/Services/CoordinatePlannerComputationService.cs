@@ -431,36 +431,28 @@ public static class CoordinatePlannerComputationService
         int pixelWidth,
         int pixelHeight)
     {
-        if (request.CustomPoints is not null)
+        foreach (var point in request.CustomPoints ?? [])
         {
-            foreach (var point in request.CustomPoints)
+            if (string.IsNullOrWhiteSpace(point.Key))
             {
-                if (string.IsNullOrWhiteSpace(point.Key))
-                {
-                    continue;
-                }
-
-                var machinePoint = new MachinePoint(point.MachineX, point.MachineY);
-                var safeMachinePoint = ClampMachinePoint(machinePoint, request);
-                points.Add(BuildPointFromMachine(
-                    $"custom-point-{point.Key}",
-                    string.IsNullOrWhiteSpace(point.Label) ? "Custom point" : point.Label,
-                    CoordinatePlannerPointKind.CustomPoint,
-                    aaBounds,
-                    request,
-                    pixelWidth,
-                    pixelHeight,
-                    machinePoint,
-                    safeMachinePoint));
+                continue;
             }
+
+            var machinePoint = new MachinePoint(point.MachineX, point.MachineY);
+            var safeMachinePoint = ClampMachinePoint(machinePoint, request);
+            points.Add(BuildPointFromMachine(
+                $"custom-point-{point.Key}",
+                string.IsNullOrWhiteSpace(point.Label) ? "Custom point" : point.Label,
+                CoordinatePlannerPointKind.CustomPoint,
+                aaBounds,
+                request,
+                pixelWidth,
+                pixelHeight,
+                machinePoint,
+                safeMachinePoint));
         }
 
-        if (request.CustomPaths is null)
-        {
-            return;
-        }
-
-        foreach (var path in request.CustomPaths)
+        foreach (var path in request.CustomPaths ?? [])
         {
             if (string.IsNullOrWhiteSpace(path.Key))
             {

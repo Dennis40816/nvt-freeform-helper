@@ -43,7 +43,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 908
+        "fileLines": 900
       },
       "owner": "NFH",
       "locations": [
@@ -66,20 +66,6 @@
       "contentHash": "59f8349e4d5150db1114a36c23d907b4ca7a3729886b5f66144145be9fb3b1ed",
       "project": "FreeformHelper.Application",
       "symbol": "FreeformHelper.Application.Services.CoordinatePlannerRequest"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 82
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/CoordinatePlannerComputationService.cs"
-      ],
-      "contentHash": "1b0e4ee4aa046cdae9db20a546187846d21801bf2b34fd3fb696f9878dc201eb",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.CoordinatePlannerComputationService.AddCustomCoordinates(List<CoordinatePlannerLine>,List<CoordinatePlannerPoint>,Rect2,CoordinatePlannerRequest,int,int)"
     },
     {
       "kind": "member",
