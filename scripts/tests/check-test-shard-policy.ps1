@@ -493,7 +493,12 @@ try {
         @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT The active test run was aborted. Reason: Test host process crashed : PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'test-host-crashed,test-run-aborted' },
         @{ Lines = @('  Another thread created Dispatcher.UIThread while the headless application was being set up PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'dispatcher-uithread-race' },
         @{ Lines = @('x.cs(1,1): error CS1002: PRIVATE-MARKER-DO-NOT-PRINT', 'y.cs(2,2): error MSB3027: again'); Exit = 1; Expected = 'build-error' },
-        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT', 'Test Run Aborted.'); Exit = 1; Expected = 'no-test-matches-filter,test-run-aborted' },
+        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT', 'Test Run Aborted.'); Exit = 1; Expected = 'no-test-matches-filter,test-run-aborted'; Listed = 0 },
+        # The host lists tests again after the empty run. Only the number is printed, never a listed name.
+        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = 2
+            ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '    PRIVATE-MARKER-DO-NOT-PRINT.Second', '') },
+        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = -1
+            ListLines = @('PRIVATE-MARKER-DO-NOT-PRINT listing failed'); ListExit = 1 },
         @{ Lines = @('Test host process crashed PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 0; Expected = '' },
         @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT and nothing else'); Exit = 1; Expected = '' },
         @{ Lines = @(); StdErr = 'Test host process crashed PRIVATE-MARKER-DO-NOT-PRINT'; Exit = 1; Expected = 'test-host-crashed' },
@@ -505,6 +510,11 @@ try {
             & {
                 function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
                 function dotnet {
+                    if ($args -contains '--list-tests') {
+                        if ($case.ContainsKey('ListLines')) { foreach ($line in $case.ListLines) { Write-Output $line } }
+                        $global:LASTEXITCODE = $(if ($case.ContainsKey('ListExit')) { $case.ListExit } else { 0 })
+                        return
+                    }
                     foreach ($line in $case.Lines) { Write-Output $line }
                     if ($case.ContainsKey('StdErr')) {
                         & pwsh -NoProfile -Command ('[Console]::Error.WriteLine(''{0}''); exit {1}' -f $case.StdErr, $case.Exit)
@@ -527,6 +537,14 @@ try {
                 } else {
                     $expectedLabelLine = '[verify] diagnostic group=ui-snapshots exit={0} host-errors={1}' -f $case.Exit, $case.Expected
                     Assert-Policy ($labelLines.Count -eq 1 -and [string]$labelLines[0] -ceq $expectedLabelLine)
+                }
+                # Only a group that found no test prints the discovery line, and it holds numbers only.
+                $discoveryLines = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] discovery-diagnostic *' })
+                if ($case.ContainsKey('Listed')) {
+                    Assert-Policy ($discoveryLines.Count -eq 1 -and
+                        [string]$discoveryLines[0] -cmatch ('^\[verify\] discovery-diagnostic group=ui-snapshots elapsed-seconds=[0-9]+ listed-tests={0}$' -f $case.Listed))
+                } else {
+                    Assert-Policy ($discoveryLines.Count -eq 0)
                 }
                 Assert-Policy (($entryOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
                 Assert-Policy ($message -ceq 'Shard validation failed.')

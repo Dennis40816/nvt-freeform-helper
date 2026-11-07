@@ -15,6 +15,8 @@ $ErrorActionPreference = "Stop"
 if ($null -ne $RunStatus) {
     $RunStatus['ExitCode'] = $null
     $RunStatus['HostErrors'] = @()
+    $RunStatus['ElapsedSeconds'] = $null
+    $RunStatus['ListedTests'] = $null
 }
 
 $project = "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj"
@@ -48,6 +50,28 @@ $hostErrorPatterns = [ordered]@{
     'build-error' = '\berror (MSB|CS|NETSDK|NU)[0-9]{3,5}\b'
 }
 $maxHostErrorLabels = 6
+
+# After a run that found no test, ask the test host again how many tests it can list without the filter being
+# applied to a build. Only the number leaves this function, never a test name. -1 means the listing itself failed.
+function Get-ListedTestCount {
+    param(
+        [string[]]$ListArguments
+    )
+
+    try {
+        $listOutput = @(dotnet @ListArguments *>&1)
+        if ($LASTEXITCODE -ne 0) { return -1 }
+        $headerIndex = -1
+        for ($i = 0; $i -lt $listOutput.Count; $i++) {
+            if ([string]$listOutput[$i] -match 'The following Tests are available') { $headerIndex = $i; break }
+        }
+        if ($headerIndex -lt 0 -or $headerIndex + 1 -ge $listOutput.Count) { return 0 }
+        return @($listOutput[($headerIndex + 1)..($listOutput.Count - 1)] |
+            Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }).Count
+    } catch {
+        return -1
+    }
+}
 
 function Get-HostErrorLabels {
     param(
@@ -260,6 +284,7 @@ try {
     }
     [Environment]::SetEnvironmentVariable($requireExampleDataEnv, $(if ($exampleDataPresent) { "1" } else { [NullString]::Value }))
     $hostOutput = @()
+    $runTimer = [System.Diagnostics.Stopwatch]::StartNew()
     if (-not [string]::IsNullOrWhiteSpace($ResultsDirectory)) {
         # Even a console logger can expose theory arguments or assertions. The output stays in memory and is
         # never printed: only the fixed labels from Get-HostErrorLabels and the safe summary leave CI.
@@ -268,9 +293,17 @@ try {
         dotnet @args
     }
     $testExitCode = $LASTEXITCODE
+    $runTimer.Stop()
     if ($null -ne $RunStatus) {
         $RunStatus['ExitCode'] = [int]$testExitCode
         if ($testExitCode -ne 0) { $RunStatus['HostErrors'] = @(Get-HostErrorLabels -Output $hostOutput) }
+        if (@($RunStatus['HostErrors']) -contains 'no-test-matches-filter') {
+            $RunStatus['ElapsedSeconds'] = [int][math]::Round($runTimer.Elapsed.TotalSeconds)
+            $listArguments = @("test", $project, "-c", $Configuration, "--nologo", "--no-build", "--list-tests")
+            if ($UseNoAppHost) { $listArguments += "/p:UseAppHost=false" }
+            if (-not [string]::IsNullOrWhiteSpace($filter)) { $listArguments += @("--filter", $filter) }
+            $RunStatus['ListedTests'] = Get-ListedTestCount -ListArguments $listArguments
+        }
     }
 }
 finally {

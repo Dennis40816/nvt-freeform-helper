@@ -260,6 +260,12 @@ function Invoke-TestShard {
                 if (@($runStatus.HostErrors).Count -gt 0) {
                     Write-Host ('[verify] diagnostic group={0} exit={1} host-errors={2}' -f
                         $group, $runStatus.ExitCode, (@($runStatus.HostErrors) -join ','))
+                    # A group that found no test: print how long it ran and how many tests the host lists now.
+                    # Both are numbers only, so the line cannot carry a test name.
+                    if ($null -ne $runStatus.ListedTests) {
+                        Write-Host ('[verify] discovery-diagnostic group={0} elapsed-seconds={1} listed-tests={2}' -f
+                            $group, $runStatus.ElapsedSeconds, $runStatus.ListedTests)
+                    }
                 }
                 $directoryPresent = $false
                 $trxFiles = 0
