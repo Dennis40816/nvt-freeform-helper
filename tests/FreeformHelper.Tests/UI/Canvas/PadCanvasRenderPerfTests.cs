@@ -46,19 +46,23 @@ public sealed class PadCanvasRenderPerfTests
             secondaryVisualsDeferred: true);
         var secondSnapshot = canvas.GetRenderPerfSnapshot();
 
+        var expectedSnapshot = new PadCanvasRenderPerfSnapshot(
+            Revision: 2,
+            TotalElapsedMs: 20,
+            BackgroundElapsedMs: 2,
+            VisibleBuildElapsedMs: 5,
+            GeometryDrawElapsedMs: 7,
+            OverlayElapsedMs: 3,
+            LabelElapsedMs: 3,
+            ViewFrameRevision: viewFrame.Revision,
+            VisibleDrawRevision: canvas.GetVisibleDrawPerfSnapshot().Revision,
+            ShowRegular: false,
+            ShowCad: true,
+            LowDetailMode: true,
+            SecondaryVisualsDeferred: true);
+
         Assert.Equal(1, firstSnapshot.Revision);
-        Assert.Equal(2, secondSnapshot.Revision);
-        Assert.Equal(20, secondSnapshot.TotalElapsedMs);
-        Assert.Equal(2, secondSnapshot.BackgroundElapsedMs);
-        Assert.Equal(5, secondSnapshot.VisibleBuildElapsedMs);
-        Assert.Equal(7, secondSnapshot.GeometryDrawElapsedMs);
-        Assert.Equal(3, secondSnapshot.OverlayElapsedMs);
-        Assert.Equal(3, secondSnapshot.LabelElapsedMs);
-        Assert.Equal(viewFrame.Revision, secondSnapshot.ViewFrameRevision);
-        Assert.False(secondSnapshot.ShowRegular);
-        Assert.True(secondSnapshot.ShowCad);
-        Assert.True(secondSnapshot.LowDetailMode);
-        Assert.True(secondSnapshot.SecondaryVisualsDeferred);
+        Assert.Equal(expectedSnapshot, secondSnapshot);
     }
 
     [AvaloniaFact]
