@@ -13,12 +13,17 @@ namespace FreeformHelper.Tests;
 public sealed class UiEventRunnerTests
 {
     [AvaloniaFact]
-    public async Task Run_AsynchronousFailure_ReportsOnceWithoutDispatcherException()
+    public async Task RunAsync_AsynchronousFailure_ReportsOnceWithoutDispatcherExceptionAsync()
     {
         var probe = new UiEventProbe();
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var failure = new InvalidOperationException("clipboard unavailable");
         var dispatcherFailures = 0;
+        async Task FailAfterReleaseAsync(CancellationToken cancellationToken)
+        {
+            await release.Task.WaitAsync(cancellationToken);
+            throw failure;
+        }
         void OnUnhandled(object? sender, DispatcherUnhandledExceptionEventArgs e)
         {
             dispatcherFailures++;
@@ -27,13 +32,10 @@ public sealed class UiEventRunnerTests
         HeadlessUiPump.RunningDispatcher.UnhandledException += OnUnhandled;
         try
         {
-            probe.Runner.Run("Console.CopyAll", async _ =>
-            {
-                await release.Task;
-                throw failure;
-            });
+            var run = probe.Runner.RunAsync("Console.CopyAll", FailAfterReleaseAsync, TestContext.Current.CancellationToken);
             release.SetResult();
             var report = await probe.Reported.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            await run.WaitAsync(TestContext.Current.CancellationToken);
             await HeadlessUiPump.YieldAsync();
 
             Assert.Equal("Console.CopyAll", report.Operation);
