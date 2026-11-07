@@ -33,7 +33,7 @@
       "src/FreeformHelper.UI/Program.cs:54"
     ],
     "suppressFlagFields": [
-      "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:64",
+      "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:65",
       "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:14", "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:15",
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:16"
     ],

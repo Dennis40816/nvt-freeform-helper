@@ -138,7 +138,14 @@ internal static class NotchExportSelectionProjectionBuilder
             VisibleRowsSummaryText: $"Showing {visibleCount} rows");
     }
 
-    private static bool MatchesSelectedVersion(
+    public static bool IsSelectedForExport(
+        NotchExportRowItemViewModel row,
+        NotchAlgorithmVersion? selectedVersion)
+    {
+        return row.IsSelected && MatchesSelectedVersion(row, selectedVersion);
+    }
+
+    public static bool MatchesSelectedVersion(
         NotchExportRowItemViewModel row,
         NotchAlgorithmVersion? selectedVersion)
     {

@@ -239,10 +239,15 @@
               </Border>
             </WrapPanel>
 
-            <SelectableTextBlock Grid.Column="1"
-                                 Classes="workspaceFilterResultText"
-                                 VerticalAlignment="Center"
-                                 Text="{Binding VisibleRowsSummaryText}"/>
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Spacing="{StaticResource Space2}">
+              <SelectableTextBlock Classes="workspaceFilterResultText"
+                                   Text="{Binding VisibleRowsSummaryText}"/>
+              <SelectableTextBlock Classes="workspaceFilterResultText"
+                                   Text="{Binding HiddenSelectedRowsHintText}"
+                                   IsVisible="{Binding HasHiddenSelectedRows}"/>
+            </StackPanel>
           </Grid>
       </Grid>
     </controls:ReviewWorkspaceShell.ToolbarContent>

@@ -57,7 +57,8 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         DistributionText: "v2.2 0 · warning 0 · legacy 0 · CAD linked 0 · no CAD 0",
         ExportButtonText: "Export selected",
         HasRows: false,
-        HasSelection: false);
+        HasSelection: false,
+        HiddenSelectedRowCount: 0);
     private readonly Action<NotchTableRow>? _previewRowChanged;
     private IReadOnlyList<int> _workspaceCadIds = Array.Empty<int>();
     private IReadOnlyList<int> _workspaceRegularIndices = Array.Empty<int>();
@@ -213,6 +214,9 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public bool HasResettableViewFilters => _filterViewState.HasResettableViewFilters;
     public string SearchWatermarkText { get; } = DefaultSearchWatermark;
     public string VisibleRowsSummaryText => _filterViewState.VisibleRowsSummaryText;
+    public int HiddenSelectedRowCount => _summarySnapshot.HiddenSelectedRowCount;
+    public bool HasHiddenSelectedRows => _summarySnapshot.HasHiddenSelectedRows;
+    public string HiddenSelectedRowsHintText => _summarySnapshot.HiddenSelectedRowsHintText;
     public string SelectedRowDisplayModeText => string.IsNullOrWhiteSpace(SelectedRowDisplayModeOption.Display)
         ? "-"
         : SelectedRowDisplayModeOption.Display;
@@ -291,7 +295,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public NotchTable BuildSelectedTable()
     {
         var selected = _allRows
-            .Where(row => row.IsSelected && MatchesSelectedVersion(row))
+            .Where(row => NotchExportSelectionProjectionBuilder.IsSelectedForExport(row, SelectedVersionOption.Value))
             .OrderBy(row => row.RowIndex)
             .Select(row => row.Row)
             .ToList();
@@ -456,11 +460,6 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     private void RequestHidePanelForInspect()
     {
         _hidePanelForInspectRequested?.Invoke();
-    }
-
-    private bool MatchesSelectedVersion(NotchExportRowItemViewModel row)
-    {
-        return !SelectedVersionOption.Value.HasValue || row.Row.Version == SelectedVersionOption.Value.Value;
     }
 
     private static List<NotchExportVersionOption> BuildVersionOptions(
