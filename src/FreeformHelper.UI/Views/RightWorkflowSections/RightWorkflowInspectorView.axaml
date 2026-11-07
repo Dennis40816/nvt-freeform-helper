@@ -164,63 +164,39 @@
                                      Text="Snapshot details"
                                      FontWeight="SemiBold"/>
               </Grid>
-              <ContentControl Content="{Binding PadInspectorUi.Snapshot}">
+              <ContentControl Content="{Binding PadInspectorUi.Snapshot.Details}">
                 <ContentControl.DataTemplates>
-                  <DataTemplate DataType="{x:Type vm:PadInspectorSnapshot}">
-                    <Grid ColumnDefinitions="Auto,8,*"
-                          RowDefinitions="Auto,Auto,Auto,Auto"
-                          RowSpacing="{StaticResource Space4}"
-                          IsVisible="{Binding HasCad}">
-                      <SelectableTextBlock Text="Diff source"/>
-                      <SelectableTextBlock Grid.Column="2"
-                                           Text="{Binding Cad.CadOutputFwDiffAssignmentModeText}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="1" Text="Diff idx"/>
-                      <SelectableTextBlock Grid.Row="1"
-                                           Grid.Column="2"
-                                           Text="{Binding Cad.DxfIndexDisplayText}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="2" Text="Match confidence"/>
-                      <SelectableTextBlock Grid.Row="2"
-                                           Grid.Column="2"
-                                           Text="{Binding Cad.MatchConfidence, StringFormat={}{0:P1}}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="3" Text="Match"/>
-                      <SelectableTextBlock Grid.Row="3"
-                                           Grid.Column="2"
-                                           Text="{Binding Cad.MatchText}"
-                                           TextWrapping="Wrap"/>
-                    </Grid>
-                  </DataTemplate>
-                </ContentControl.DataTemplates>
-              </ContentControl>
-              <ContentControl Content="{Binding PadInspectorUi.Snapshot}">
-                <ContentControl.DataTemplates>
-                  <DataTemplate DataType="{x:Type vm:PadInspectorSnapshot}">
-                    <Grid ColumnDefinitions="Auto,8,*"
-                          RowDefinitions="Auto,Auto,Auto,Auto"
-                          RowSpacing="{StaticResource Space4}"
-                          IsVisible="{Binding HasRegular}">
-                      <SelectableTextBlock Text="Diff source"/>
-                      <SelectableTextBlock Grid.Column="2"
-                                           Text="{Binding Regular.DiffSource}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="1" Text="Diff idx"/>
-                      <SelectableTextBlock Grid.Row="1"
-                                           Grid.Column="2"
-                                           Text="{Binding Regular.DiffIndex}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="2" Text="Match confidence"/>
-                      <SelectableTextBlock Grid.Row="2"
-                                           Grid.Column="2"
-                                           Text="{Binding Regular.MatchConfidence, StringFormat={}{0:P1}}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="3" Text="Match"/>
-                      <SelectableTextBlock Grid.Row="3"
-                                           Grid.Column="2"
-                                           Text="{Binding Regular.MatchText}"
-                                           TextWrapping="Wrap"/>
-                    </Grid>
+                  <DataTemplate DataType="{x:Type vm:PadInspectorSnapshotDetails}"
+                                x:DataType="vm:PadInspectorSnapshotDetails"
+                                x:CompileBindings="True">
+                    <StackPanel Spacing="{StaticResource Space6}">
+                      <Border IsVisible="{Binding HasLeadingGap}"/>
+                      <Grid ColumnDefinitions="Auto,*"
+                            ColumnSpacing="{StaticResource Space8}"
+                            RowDefinitions="Auto,Auto,Auto,Auto"
+                            RowSpacing="{StaticResource Space4}">
+                        <SelectableTextBlock Text="Diff source"/>
+                        <SelectableTextBlock Grid.Column="1"
+                                             Text="{Binding DiffSource}"
+                                             TextWrapping="Wrap"/>
+                        <SelectableTextBlock Grid.Row="1" Text="Diff idx"/>
+                        <SelectableTextBlock Grid.Row="1"
+                                             Grid.Column="1"
+                                             Text="{Binding DiffIndex}"
+                                             TextWrapping="Wrap"/>
+                        <SelectableTextBlock Grid.Row="2" Text="Match confidence"/>
+                        <SelectableTextBlock Grid.Row="2"
+                                             Grid.Column="1"
+                                             Text="{Binding MatchConfidenceText}"
+                                             TextWrapping="Wrap"/>
+                        <SelectableTextBlock Grid.Row="3" Text="Match"/>
+                        <SelectableTextBlock Grid.Row="3"
+                                             Grid.Column="1"
+                                             Text="{Binding MatchText}"
+                                             TextWrapping="Wrap"/>
+                      </Grid>
+                      <Border IsVisible="{Binding !HasLeadingGap}"/>
+                    </StackPanel>
                   </DataTemplate>
                 </ContentControl.DataTemplates>
               </ContentControl>

@@ -1,3 +1,4 @@
+using System.Globalization;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
@@ -102,6 +103,16 @@ public sealed record RegularPadInspectorSnapshot(
     public string FreeformSourceDetail { get; init; } = "No Step 2 freeform tag.";
 }
 
+public sealed record PadInspectorSnapshotDetails(
+    string DiffSource,
+    string DiffIndex,
+    string MatchConfidenceText,
+    string MatchText)
+{
+    // Preserve the gap left by the empty CAD content slot before regular details.
+    public bool HasLeadingGap { get; init; }
+}
+
 public sealed record PadInspectorSnapshot(
     string Kind,
     CadPadInspectorSnapshot? Cad,
@@ -109,6 +120,24 @@ public sealed record PadInspectorSnapshot(
 {
     public bool HasCad => Cad is not null;
     public bool HasRegular => Regular is not null;
+
+    public PadInspectorSnapshotDetails? Details => (Cad, Regular) switch
+    {
+        ({ } cad, _) => new(
+            cad.CadOutputFwDiffAssignmentModeText,
+            cad.DxfIndexDisplayText,
+            cad.MatchConfidence.ToString("P1", CultureInfo.CurrentCulture),
+            cad.MatchText),
+        (_, { } regular) => new(
+            regular.DiffSource,
+            regular.DiffIndex.ToString(CultureInfo.CurrentCulture),
+            regular.MatchConfidence.ToString("P1", CultureInfo.CurrentCulture),
+            regular.MatchText)
+        {
+            HasLeadingGap = true,
+        },
+        _ => null,
+    };
 
     public IReadOnlyList<PadInspectorRuleTraceEntry> RuleTrace =>
         Cad?.RuleTrace ?? Regular?.RuleTrace ?? Array.Empty<PadInspectorRuleTraceEntry>();
