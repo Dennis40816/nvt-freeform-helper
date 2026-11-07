@@ -1138,20 +1138,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 86
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Dxf/DxfPadImporterTests.cs"
-      ],
-      "contentHash": "12a3023c4751dc769b563f05badc41c221affd94c788bf573f6f36e265a0a821",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.DxfPadImporterTests.BuildDxfWithEntityAndBlock(string,string)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 131
       },
       "owner": "NFH",
@@ -1315,20 +1301,6 @@
       "contentHash": "42b62955144aa4cd2dad0ab9d1e801ad2b8aa6b4fac58d6815533825da76c9e5",
       "project": "FreeformHelper.Tests",
       "symbol": "FreeformHelper.Tests.ProjectStoreTests.SaveAndLoad_RoundTripsMatchingAndIndexMappingSettings()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 85
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Services/CoordinatePlannerComputationServiceTests.cs"
-      ],
-      "contentHash": "c5f74cd003820e49db5f0b685d65429c83ab0ee2c7b956c6c78296873570a9ff",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.CoordinatePlannerComputationServiceTests.BuildSnapshot_WithAllArtifactKinds_PreservesCompleteSnapshot()"
     },
     {
       "kind": "member",
