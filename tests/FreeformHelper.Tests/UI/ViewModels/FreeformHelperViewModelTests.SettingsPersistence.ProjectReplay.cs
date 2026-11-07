@@ -119,6 +119,7 @@ public sealed partial class FreeformHelperViewModelTests
     [Fact]
     public async Task SaveThenLoadProject_RestoresImportLogLevelFromProjectSnapshot()
     {
+        using var logLevel = new ProcessLogLevelScope("Info");
         var vm = new FreeformHelperViewModel();
         Assert.True(vm.LogLevelOptions.Count >= 2);
 
@@ -157,6 +158,7 @@ public sealed partial class FreeformHelperViewModelTests
     [Fact]
     public async Task SaveThenLoadProject_RestoresStepAndExportSettingsFromProjectSnapshot()
     {
+        using var logLevel = new ProcessLogLevelScope("Info");
         var vm = new FreeformHelperViewModel
         {
             ApplyAppVisualPreferencesOnProjectLoad = false
@@ -222,22 +224,7 @@ public sealed partial class FreeformHelperViewModelTests
         settings.SelectedGridAlignmentOption = targetAlignment;
         settings.SaveCommand.Execute(null);
 
-        var persistedEnableToFullRuleEngine = vm.EnableToFullRuleEngine;
-        var persistedEnableToFullRuleTrace = vm.EnableToFullRuleTrace;
-        var persistedStrictOverlap = vm.ToFullStrictOverlapPercent;
-        var persistedAutoReplayStep2 = vm.AutoReplayStep2AfterProjectLoad;
-        var persistedMappingWeightIou = vm.MappingWeightIou;
-        var persistedShowNotchPreview = vm.ShowNotchCanvasPreview;
-        var persistedShowToRegularLabels = vm.ShowNotchToRegularLabels;
-        var persistedPreviewStage = vm.NotchPreviewVisualizationStep;
-        var persistedAutoPlay = vm.NotchPreviewAutoPlayEnabled;
-        var persistedAutoPlayInterval = vm.NotchPreviewAutoPlayIntervalMs;
-        var persistedGlobalFont = vm.GlobalFontSizePercent;
-        var persistedImportOnlyClosed = vm.ImportOnlyClosedPolylines;
-        var persistedLogLevel = vm.SelectedLogLevelOption;
-        var persistedFileType = vm.SelectedNotchExportFileTypeOption;
-        var persistedProfile = vm.SelectedNotchExportProfileOption;
-        var persistedAlignment = vm.SelectedGridAlignmentOption;
+        var persisted = CaptureRestoredSettings(vm);
 
         var path = TestFiles.NewTempFilePath("freeform-helper-", ".json");
         try
@@ -247,47 +234,33 @@ public sealed partial class FreeformHelperViewModelTests
             var saveResult = await vm.SaveProjectAsync();
             Assert.True(saveResult);
 
-            vm.EnableToFullRuleEngine = !persistedEnableToFullRuleEngine;
-            vm.EnableToFullRuleTrace = !persistedEnableToFullRuleTrace;
-            vm.ToFullStrictOverlapPercent = persistedStrictOverlap <= 1m ? 2m : persistedStrictOverlap - 1m;
-            vm.AutoReplayStep2AfterProjectLoad = !persistedAutoReplayStep2;
-            vm.MappingWeightIou = persistedMappingWeightIou + 0.5m;
-            vm.ShowNotchCanvasPreview = !persistedShowNotchPreview;
-            vm.ShowNotchToRegularLabels = !persistedShowToRegularLabels;
-            vm.NotchPreviewVisualizationStep = persistedPreviewStage >= 3m ? 1m : 3m;
-            vm.NotchPreviewAutoPlayEnabled = !persistedAutoPlay;
-            vm.NotchPreviewAutoPlayIntervalMs = persistedAutoPlayInterval >= 900m ? 700m : 900m;
-            vm.GlobalFontSizePercent = persistedGlobalFont >= 130m ? 120m : 130m;
-            vm.ImportOnlyClosedPolylines = !persistedImportOnlyClosed;
+            vm.EnableToFullRuleEngine = !vm.EnableToFullRuleEngine;
+            vm.EnableToFullRuleTrace = !vm.EnableToFullRuleTrace;
+            vm.ToFullStrictOverlapPercent = vm.ToFullStrictOverlapPercent <= 1m ? 2m : vm.ToFullStrictOverlapPercent - 1m;
+            vm.AutoReplayStep2AfterProjectLoad = !vm.AutoReplayStep2AfterProjectLoad;
+            vm.MappingWeightIou = vm.MappingWeightIou + 0.5m;
+            vm.ShowNotchCanvasPreview = !vm.ShowNotchCanvasPreview;
+            vm.ShowNotchToRegularLabels = !vm.ShowNotchToRegularLabels;
+            vm.NotchPreviewVisualizationStep = vm.NotchPreviewVisualizationStep >= 3m ? 1m : 3m;
+            vm.NotchPreviewAutoPlayEnabled = !vm.NotchPreviewAutoPlayEnabled;
+            vm.NotchPreviewAutoPlayIntervalMs = vm.NotchPreviewAutoPlayIntervalMs >= 900m ? 700m : 900m;
+            vm.GlobalFontSizePercent = vm.GlobalFontSizePercent >= 130m ? 120m : 130m;
+            vm.ImportOnlyClosedPolylines = !vm.ImportOnlyClosedPolylines;
             vm.SelectedLogLevelOption = vm.LogLevelOptions.FirstOrDefault(option =>
-                !option.Equals(persistedLogLevel));
+                !option.Equals(vm.SelectedLogLevelOption));
             LoggingBootstrapper.ApplyMinimumLevel(vm.SelectedLogLevelOption.Value);
             vm.SelectedNotchExportFileTypeOption = vm.NotchExportFileTypeOptions.FirstOrDefault(option =>
-                option.Value != persistedFileType.Value);
+                option.Value != vm.SelectedNotchExportFileTypeOption.Value);
             vm.SelectedNotchExportProfileOption = vm.NotchExportProfileOptions.FirstOrDefault(option =>
-                option.Value != persistedProfile.Value);
+                option.Value != vm.SelectedNotchExportProfileOption.Value);
             vm.SelectedGridAlignmentOption = vm.GridAlignmentOptions.FirstOrDefault(option =>
-                option.Value != persistedAlignment.Value);
+                option.Value != vm.SelectedGridAlignmentOption.Value);
 
             vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(path);
             await vm.LoadProjectCommand.ExecuteAsync(null);
 
-            Assert.Equal(persistedEnableToFullRuleEngine, vm.EnableToFullRuleEngine);
-            Assert.Equal(persistedEnableToFullRuleTrace, vm.EnableToFullRuleTrace);
-            Assert.Equal(persistedStrictOverlap, vm.ToFullStrictOverlapPercent);
-            Assert.Equal(persistedAutoReplayStep2, vm.AutoReplayStep2AfterProjectLoad);
-            Assert.Equal(persistedMappingWeightIou, vm.MappingWeightIou);
-            Assert.Equal(persistedShowNotchPreview, vm.ShowNotchCanvasPreview);
-            Assert.Equal(persistedShowToRegularLabels, vm.ShowNotchToRegularLabels);
-            Assert.Equal(persistedPreviewStage, vm.NotchPreviewVisualizationStep);
-            Assert.Equal(persistedAutoPlay, vm.NotchPreviewAutoPlayEnabled);
-            Assert.Equal(persistedAutoPlayInterval, vm.NotchPreviewAutoPlayIntervalMs);
-            Assert.Equal(persistedGlobalFont, vm.GlobalFontSizePercent);
-            Assert.Equal(persistedImportOnlyClosed, vm.ImportOnlyClosedPolylines);
-            Assert.Equal(persistedLogLevel.Value, vm.SelectedLogLevelOption.Value);
-            Assert.Equal(persistedFileType.Value, vm.SelectedNotchExportFileTypeOption.Value);
-            Assert.Equal(persistedProfile.Value, vm.SelectedNotchExportProfileOption.Value);
-            Assert.Equal(persistedAlignment.Value, vm.SelectedGridAlignmentOption.Value);
+            // One comparison for every restored setting, so a failure lists all values that differ.
+            Assert.Equal(persisted, CaptureRestoredSettings(vm));
         }
         finally
         {
@@ -298,6 +271,26 @@ public sealed partial class FreeformHelperViewModelTests
         }
     }
 
+
+    private static (string Setting, object? Value)[] CaptureRestoredSettings(FreeformHelperViewModel vm) =>
+    [
+        (nameof(vm.EnableToFullRuleEngine), vm.EnableToFullRuleEngine),
+        (nameof(vm.EnableToFullRuleTrace), vm.EnableToFullRuleTrace),
+        (nameof(vm.ToFullStrictOverlapPercent), vm.ToFullStrictOverlapPercent),
+        (nameof(vm.AutoReplayStep2AfterProjectLoad), vm.AutoReplayStep2AfterProjectLoad),
+        (nameof(vm.MappingWeightIou), vm.MappingWeightIou),
+        (nameof(vm.ShowNotchCanvasPreview), vm.ShowNotchCanvasPreview),
+        (nameof(vm.ShowNotchToRegularLabels), vm.ShowNotchToRegularLabels),
+        (nameof(vm.NotchPreviewVisualizationStep), vm.NotchPreviewVisualizationStep),
+        (nameof(vm.NotchPreviewAutoPlayEnabled), vm.NotchPreviewAutoPlayEnabled),
+        (nameof(vm.NotchPreviewAutoPlayIntervalMs), vm.NotchPreviewAutoPlayIntervalMs),
+        (nameof(vm.GlobalFontSizePercent), vm.GlobalFontSizePercent),
+        (nameof(vm.ImportOnlyClosedPolylines), vm.ImportOnlyClosedPolylines),
+        (nameof(vm.SelectedLogLevelOption), vm.SelectedLogLevelOption.Value),
+        (nameof(vm.SelectedNotchExportFileTypeOption), vm.SelectedNotchExportFileTypeOption.Value),
+        (nameof(vm.SelectedNotchExportProfileOption), vm.SelectedNotchExportProfileOption.Value),
+        (nameof(vm.SelectedGridAlignmentOption), vm.SelectedGridAlignmentOption.Value),
+    ];
 
     [Fact]
     public async Task SaveThenLoadProject_PersistsStep5NotchVersionSelection()

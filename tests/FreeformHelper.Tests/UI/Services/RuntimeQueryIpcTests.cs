@@ -27,10 +27,7 @@ public sealed class RuntimeQueryIpcTests
             RuntimeQueryIpcHost.Start(shell);
 
             var stopTask = RuntimeQueryIpcHost.StopAsync();
-            var completed = await Task.WhenAny(stopTask, Task.Delay(1500, TestContext.Current.CancellationToken));
-
-            Assert.Same(stopTask, completed);
-            await stopTask;
+            await stopTask.WaitAsync(TimeSpan.FromMilliseconds(1500), TestContext.Current.CancellationToken);
         }
         finally
         {
@@ -55,10 +52,7 @@ public sealed class RuntimeQueryIpcTests
             await client.ConnectAsync(1500, TestContext.Current.CancellationToken);
 
             var stopTask = RuntimeQueryIpcHost.StopAsync();
-            var completed = await Task.WhenAny(stopTask, Task.Delay(1500, TestContext.Current.CancellationToken));
-
-            Assert.Same(stopTask, completed);
-            await stopTask;
+            await stopTask.WaitAsync(TimeSpan.FromMilliseconds(1500), TestContext.Current.CancellationToken);
         }
         finally
         {
@@ -77,20 +71,28 @@ public sealed class RuntimeQueryIpcTests
             PipeTransmissionMode.Byte,
             PipeOptions.Asynchronous);
 
+        var releaseServer = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var serverTask = Task.Run(async () =>
         {
-            await server.WaitForConnectionAsync();
+            await server.WaitForConnectionAsync(TestContext.Current.CancellationToken);
             using var reader = new StreamReader(server, leaveOpen: true);
-            _ = await reader.ReadLineAsync();
-            await Task.Delay(500);
+            _ = await reader.ReadLineAsync(TestContext.Current.CancellationToken);
+            await releaseServer.Task.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
         }, TestContext.Current.CancellationToken);
         var request = new RuntimeQueryRequest(RuntimeQueryProtocol.Version, "status", Args: null);
 
-        var response = RuntimeQueryCommandLine.SendRequest(request, timeoutMs: 100);
+        try
+        {
+            var response = RuntimeQueryCommandLine.SendRequest(request, timeoutMs: 100);
 
-        Assert.False(response.Ok);
-        Assert.Equal("IPC_TIMEOUT", response.Error?.Code);
-        await serverTask.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
+            Assert.False(response.Ok);
+            Assert.Equal("IPC_TIMEOUT", response.Error?.Code);
+        }
+        finally
+        {
+            releaseServer.TrySetResult();
+            await serverTask.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
+        }
     }
 
     [AvaloniaFact]

@@ -182,7 +182,8 @@ public sealed class RuntimeQueryCoreBehaviorTests
                 return pipe;
             }
 
-            await Task.Delay(10, timeout.Token);
+            timeout.Token.ThrowIfCancellationRequested();
+            await Task.Yield();
         }
     }
 

@@ -135,72 +135,12 @@
     },
     {
       "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Services/CadLoadSpinnerProcessHostTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.CadLoadSpinnerProcessHostTests.Hide_WhenSpinnerIsNotVisible_CompletesStateSync()",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "0f00fe23890e11d2194484f978e9a13ec72daf0344ddc4a17fbc96a7dbae15dd",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/Application/Dxf/DxfLayerImageExportServiceTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.DxfLayerImageExportServiceTests.DeleteTempFileWithRetry(string)",
-      "owner": "NFH",
-      "symbol": "Thread.Sleep",
-      "syntaxHash": "1823134f2a9e19261424c78971d95669dd68d29c7819c43c0be442b350c5ca2c",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
       "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.SettingsPersistence.AppGeneral.cs",
       "rule": "timeWaitsInTests",
       "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.AppGeneralSettings_AfterLoadProject_DefersUntilNextProjectSave()",
       "owner": "NFH",
       "symbol": "Task.Delay",
       "syntaxHash": "bb62c0106412c750cc108521d56b82a4b34ea61f5c579358003cee0f39551b52",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryCoreBehaviorTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.RuntimeQueryCoreBehaviorTests.WaitForPipeAsync(RuntimeQueryIpcServer,NamedPipeServerStream?)",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "98798536dcbf7f650f042fa93b105f241c23088ab7f0d04dcdde40703211de8b",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryIpcTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.RuntimeQueryIpcTests.SendRequest_WhenServerAcceptsButDoesNotRespond_ReturnsTimeout()",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "1a4d65a7bc699a2e2149f44695f30883c889d3323483e06eec981f9e3008952e",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryIpcTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.RuntimeQueryIpcTests.StopAsync_WhenClientConnectedWithoutRequest_CompletesWithinTimeout()",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "b7532dc9ac24a505c38944f1623a71b0a54ad3ec0f54c4728183a9600a64b557",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryIpcTests.cs",
-      "rule": "timeWaitsInTests",
-      "member": "FreeformHelper.Tests.RuntimeQueryIpcTests.StopAsync_WhenHostStarted_CompletesWithinTimeout()",
-      "owner": "NFH",
-      "symbol": "Task.Delay",
-      "syntaxHash": "b7532dc9ac24a505c38944f1623a71b0a54ad3ec0f54c4728183a9600a64b557",
       "count": 1
     }
   ]

@@ -85,10 +85,9 @@ public sealed class CadLoadSpinnerProcessHostTests
 
         host.Hide();
         var stateSync = host.LatestStateSyncTask;
-        var finished = await Task.WhenAny(stateSync, Task.Delay(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
 
         // A state sync that never ends holds a thread-pool thread in a busy loop until the host is disposed.
-        Assert.Same(stateSync, finished);
+        await stateSync.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
     }
 
     [AvaloniaFact]
