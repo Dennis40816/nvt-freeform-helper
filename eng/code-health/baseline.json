@@ -12,20 +12,6 @@
   },
   "entities": [
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 117
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/CadOutputFwDiffIndexAssignmentService.cs"
-      ],
-      "contentHash": "60bb8ccd1791967cccb1503839485b8fc806388552992de90d4bf0c10d05d59b",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.CadOutputFwDiffIndexAssignmentService.AssignWithGridDirect(IReadOnlyList<CadPad>,RegularGrid,GridSettings,CadOutputFwDiffAutoMode,IReadOnlyDictionary<int, int?>,IReadOnlyDictionary<int, int>?,Dictionary<int, int>,Dictionary<int, int>,List<string>,List<string>)"
-    },
-    {
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
