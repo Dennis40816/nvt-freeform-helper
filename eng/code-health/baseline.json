@@ -1019,7 +1019,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 649
+        "axamlCodeBehindLines": 636
       },
       "owner": "NFH",
       "locations": [
