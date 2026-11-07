@@ -153,33 +153,11 @@ public sealed class DxfRegularMaskAuditSegmentContextTests
         var assignments = new Dictionary<int, int> { [43] = 10, [7] = 11 };
         var manualOverrides = new Dictionary<int, int> { [7] = 11 };
         IReadOnlySet<int>? activeIds = hasCsvMask ? new HashSet<int> { 100, 101 } : null;
-        var candidates = new List<DxfRegularMaskAuditCandidate> { new(100, 8, 10, 1d, 1d) };
-        var seed = new CadBestMatchSeed(100, 8, 10, 1d, 1d);
-        var supplied = CadOutputFwDiffAssignmentDecision.Empty(43, 99, CadOutputFwDiffAssignmentMode.GeometryOnly) with
-        {
-            RawSeed = seed,
-            MaskedSeed = seed,
-            GeometryCandidates = candidates,
-            CsvConfirmedCandidates = candidates,
-            CurrentPrimaryDiffIndex = 50,
-            PassiveCompensationDiffIndex = 51,
-            RepairSuggestionDiffIndex = 52,
-            ReasonCode = CadOutputFwDiffAssignmentReasonCode.DuplicateConflict,
-            DecisionSource = CadOutputFwDiffAssignmentDecisionSource.PropagatedOverride,
-            Confidence = 0.42d,
-            DetectedOffset = 40,
-            OffsetSupportCount = 2,
-            OffsetSupportRatio = 0.75d,
-            SegmentConfidence = 0.75d,
-            IcIndex = 8,
-            RowIndex = 9,
-            SegmentIndex = 3,
-            SegmentMemberCount = 4,
-        };
+        var supplied = BuildSuppliedDecision();
         var precomputed = new Dictionary<int, CadOutputFwDiffAssignmentDecision>();
         if (hasDecision)
         {
-            precomputed[43] = supplied;
+            precomputed[43] = supplied.Decision;
         }
 
         var rows = DxfRegularMaskAuditService.BuildAuditRows(
@@ -192,27 +170,8 @@ public sealed class DxfRegularMaskAuditSegmentContextTests
         Assert.Equal(hasDecision ? 1 : 0, precomputed.Count);
         if (hasDecision)
         {
-            var row = rows[0];
-            Assert.Same(supplied, precomputed[43]);
-            Assert.Same(seed, row.RawSeed);
-            Assert.Same(seed, row.MaskedSeed);
-            Assert.Same(candidates, row.GeometryCandidates);
-            Assert.Same(candidates, row.CsvConfirmedCandidates);
-            Assert.Equal(CadOutputFwDiffAssignmentMode.GeometryOnly, row.Mode);
-            Assert.Equal(CadOutputFwDiffAssignmentReasonCode.DuplicateConflict, row.ReasonCode);
-            Assert.Equal(CadOutputFwDiffAssignmentDecisionSource.PropagatedOverride, row.DecisionSource);
-            Assert.Equal(50, row.PrimaryAssignedDiffIndex);
-            Assert.Equal(51, row.PassiveCompensationDiffIndex);
-            Assert.Equal(52, row.RepairSuggestionDiffIndex);
-            Assert.Equal(0.42d, row.CsvConfirmedConfidence);
-            Assert.Equal(40, row.DetectedOffset);
-            Assert.Equal(2, row.OffsetSupportCount);
-            Assert.Equal(0.75d, row.OffsetSupportRatio);
-            Assert.Equal(0.75d, row.SegmentConfidence);
-            Assert.Equal(8, row.IcIndex);
-            Assert.Equal(9, row.RowIndex);
-            Assert.Equal(3, row.SegmentIndex);
-            Assert.Equal(4, row.SegmentMemberCount);
+            Assert.Same(supplied.Decision, precomputed[43]);
+            AssertSuppliedDecisionProjected(rows[0], supplied);
         }
 
         Assert.All(hasDecision ? rows.Skip(1) : rows, row =>
@@ -237,6 +196,63 @@ public sealed class DxfRegularMaskAuditSegmentContextTests
             Assert.Null(row.SegmentIndex);
             Assert.Equal(0, row.SegmentMemberCount);
         });
+    }
+
+    private sealed record SuppliedDecision(
+        CadOutputFwDiffAssignmentDecision Decision,
+        CadBestMatchSeed Seed,
+        List<DxfRegularMaskAuditCandidate> Candidates);
+
+    private static SuppliedDecision BuildSuppliedDecision()
+    {
+        var candidates = new List<DxfRegularMaskAuditCandidate> { new(100, 8, 10, 1d, 1d) };
+        var seed = new CadBestMatchSeed(100, 8, 10, 1d, 1d);
+        var decision = CadOutputFwDiffAssignmentDecision.Empty(43, 99, CadOutputFwDiffAssignmentMode.GeometryOnly) with
+        {
+            RawSeed = seed,
+            MaskedSeed = seed,
+            GeometryCandidates = candidates,
+            CsvConfirmedCandidates = candidates,
+            CurrentPrimaryDiffIndex = 50,
+            PassiveCompensationDiffIndex = 51,
+            RepairSuggestionDiffIndex = 52,
+            ReasonCode = CadOutputFwDiffAssignmentReasonCode.DuplicateConflict,
+            DecisionSource = CadOutputFwDiffAssignmentDecisionSource.PropagatedOverride,
+            Confidence = 0.42d,
+            DetectedOffset = 40,
+            OffsetSupportCount = 2,
+            OffsetSupportRatio = 0.75d,
+            SegmentConfidence = 0.75d,
+            IcIndex = 8,
+            RowIndex = 9,
+            SegmentIndex = 3,
+            SegmentMemberCount = 4,
+        };
+
+        return new SuppliedDecision(decision, seed, candidates);
+    }
+
+    private static void AssertSuppliedDecisionProjected(DxfRegularMaskAuditRow row, SuppliedDecision supplied)
+    {
+        Assert.Same(supplied.Seed, row.RawSeed);
+        Assert.Same(supplied.Seed, row.MaskedSeed);
+        Assert.Same(supplied.Candidates, row.GeometryCandidates);
+        Assert.Same(supplied.Candidates, row.CsvConfirmedCandidates);
+        Assert.Equal(CadOutputFwDiffAssignmentMode.GeometryOnly, row.Mode);
+        Assert.Equal(CadOutputFwDiffAssignmentReasonCode.DuplicateConflict, row.ReasonCode);
+        Assert.Equal(CadOutputFwDiffAssignmentDecisionSource.PropagatedOverride, row.DecisionSource);
+        Assert.Equal(50, row.PrimaryAssignedDiffIndex);
+        Assert.Equal(51, row.PassiveCompensationDiffIndex);
+        Assert.Equal(52, row.RepairSuggestionDiffIndex);
+        Assert.Equal(0.42d, row.CsvConfirmedConfidence);
+        Assert.Equal(40, row.DetectedOffset);
+        Assert.Equal(2, row.OffsetSupportCount);
+        Assert.Equal(0.75d, row.OffsetSupportRatio);
+        Assert.Equal(0.75d, row.SegmentConfidence);
+        Assert.Equal(8, row.IcIndex);
+        Assert.Equal(9, row.RowIndex);
+        Assert.Equal(3, row.SegmentIndex);
+        Assert.Equal(4, row.SegmentMemberCount);
     }
 
     private static CadPad BuildCad(int id) => new(id, $"CAD{id}", "L1", BuildRect());

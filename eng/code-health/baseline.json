@@ -841,48 +841,6 @@
       "symbol": "file:FreeformHelper.UI.Views.SimulationWorkspaceView"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 131
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Dxf/DxfRegularMaskAuditPipelineContractTests.cs"
-      ],
-      "contentHash": "f1d27f5a68f7c29423d0b26b03b27187270dfa6e1703482e43cf9baef0354438",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.DxfRegularMaskAuditPipelineContractTests.AssignmentAndAudit_SegmentOffsetPrecedesRepairAndChangesPassiveDiff(bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 94
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Dxf/DxfRegularMaskAuditPipelineContractTests.cs"
-      ],
-      "contentHash": "31ee988a415b01b2cf8258d7c1333cc6ab7f8dbe66a1d80561c9ad829a877b36",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.DxfRegularMaskAuditPipelineContractTests.AssignmentAndAudit_NullAndEmptyMaskKeepGeometryAndCsvBoundaries(bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 107
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Dxf/DxfRegularMaskAuditSegmentContextTests.cs"
-      ],
-      "contentHash": "ed20f9f0fa94a2caff7c669d6ea15b07876b7fb80c01bb2f83ccb82df657ad46",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.DxfRegularMaskAuditSegmentContextTests.BuildAuditRows_PartialOrEmptyPrecomputedDecisionsBypassAllStages(bool,bool)"
-    },
-    {
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {

@@ -12,61 +12,10 @@ public sealed class DxfRegularMaskAuditPipelineContractTests
     [InlineData(false)]
     public void AssignmentAndAudit_SegmentOffsetPrecedesRepairAndChangesPassiveDiff(bool hasOffset)
     {
-        var ordered = new[]
-        {
-            new CadPad(43, "CAD43", "L1", BuildRect()),
-            new CadPad(7, "CAD7", "L1", BuildRect()),
-            new CadPad(91, "CAD91", "L1", BuildRect()),
-            new CadPad(18, "CAD18", "L1", BuildRect()),
-        };
-        var regularById = new Dictionary<int, RegularPad>
-        {
-            [100] = BuildRegular(100, 10, icIndex: 0, row: 2),
-            [101] = BuildRegular(101, 12, icIndex: 0, row: 2),
-            [102] = BuildRegular(102, 11, icIndex: 0, row: 2),
-            [103] = BuildRegular(103, 13, icIndex: 0, row: 2),
-            [104] = BuildRegular(104, 12, icIndex: 0, row: 2),
-            [105] = BuildRegular(105, 14, icIndex: 0, row: 2),
-            [106] = BuildRegular(106, 13, icIndex: 0, row: 2),
-            [107] = BuildRegular(107, 15, icIndex: 0, row: 2),
-        };
-        var cadToRegular = new Dictionary<int, IReadOnlyList<PadMatchLink>>
-        {
-            [43] = new[]
-            {
-                new PadMatchLink(43, 100, 1d, 1d, 1d),
-                new PadMatchLink(43, 101, 0.9d, 0.9d, 0.9d),
-            },
-            [7] = new[]
-            {
-                new PadMatchLink(7, 102, 1d, 1d, 1d),
-                new PadMatchLink(7, 103, 0.9d, 0.9d, 0.9d),
-            },
-            [91] = new[]
-            {
-                new PadMatchLink(91, 104, 1d, 1d, 1d),
-                new PadMatchLink(91, 105, 0.9d, 0.9d, 0.9d),
-            },
-            [18] = new[]
-            {
-                new PadMatchLink(18, 106, 1d, 1d, 1d),
-                new PadMatchLink(18, 107, 0.9d, 0.9d, 0.9d),
-            },
-        };
-        var cadIcById = new Dictionary<int, int> { [43] = 0, [7] = 0, [91] = 0, [18] = 0 };
-        var currentAssigned = new Dictionary<int, int>
-        {
-            [43] = hasOffset ? 12 : 10,
-            [7] = hasOffset ? 13 : 11,
-            [91] = hasOffset ? 14 : 12,
-            [18] = 16,
-        };
-        var manualOverrides = new Dictionary<int, int> { [43] = currentAssigned[43] };
-        var activeRegularIds = new HashSet<int> { 100, 101, 102, 103, 104, 105 };
+        var inputs = BuildSegmentOffsetInputs(hasOffset);
 
-        var decisions = DxfRegularMaskAuditService.BuildAssignmentDecisions(
-            ordered, cadToRegular, regularById, cadIcById, activeRegularIds, currentAssigned, manualOverrides);
-        var orderedDecisions = ordered.Select(pad => decisions[pad.Id]).ToArray();
+        var decisions = inputs.BuildDecisions();
+        var orderedDecisions = inputs.Ordered.Select(pad => decisions[pad.Id]).ToArray();
 
         // Fixed outputs from the current production seams; only the three anchor assignments vary.
         var expectedCadIds = new[] { 43, 7, 91, 18 };
@@ -124,8 +73,7 @@ public sealed class DxfRegularMaskAuditPipelineContractTests
             Assert.Equal(hasOffset ? 0.75d : (double?)null, decision.SegmentConfidence);
         });
 
-        var rows = DxfRegularMaskAuditService.BuildAuditRows(
-            ordered, cadToRegular, regularById, cadIcById, activeRegularIds, currentAssigned, manualOverrides);
+        var rows = inputs.BuildRows();
         AssertAuditProjection(orderedDecisions, rows);
         Assert.Equal(new int?[] { 10, 11, 12, null }, rows.Select(row => row.SuggestedDiffIndex));
         Assert.Equal(
@@ -144,28 +92,10 @@ public sealed class DxfRegularMaskAuditPipelineContractTests
     [InlineData(true)]
     public void AssignmentAndAudit_NullAndEmptyMaskKeepGeometryAndCsvBoundaries(bool hasCsvMask)
     {
-        var ordered = new[]
-        {
-            new CadPad(70, "CAD70", "L1", BuildRect()),
-            new CadPad(2, "CAD2", "L1", BuildRect()),
-            new CadPad(5, "CAD5", "L1", BuildRect()),
-        };
-        var regularById = new Dictionary<int, RegularPad>
-        {
-            [200] = BuildRegular(200, 30, icIndex: 1, row: 4),
-            [201] = BuildRegular(201, 40, icIndex: 1, row: 4),
-        };
-        var cadToRegular = new Dictionary<int, IReadOnlyList<PadMatchLink>>
-        {
-            [70] = new[] { new PadMatchLink(70, 200, 0.8d, 0.8d, 0.7d) },
-            [5] = new[] { new PadMatchLink(5, 201, 0d, 0d, 0d) },
-        };
-        var cadIcById = new Dictionary<int, int> { [70] = 1, [2] = 1, [5] = 1 };
-        IReadOnlySet<int>? activeRegularIds = hasCsvMask ? new HashSet<int>() : null;
+        var inputs = BuildNullAndEmptyMaskInputs(hasCsvMask);
 
-        var decisions = DxfRegularMaskAuditService.BuildAssignmentDecisions(
-            ordered, cadToRegular, regularById, cadIcById, activeRegularIds);
-        var orderedDecisions = ordered.Select(pad => decisions[pad.Id]).ToArray();
+        var decisions = inputs.BuildDecisions();
+        var orderedDecisions = inputs.Ordered.Select(pad => decisions[pad.Id]).ToArray();
 
         var expectedCadIds = new[] { 70, 2, 5 };
         var expectedOrderedIndices = new[] { 0, 1, 2 };
@@ -218,8 +148,7 @@ public sealed class DxfRegularMaskAuditPipelineContractTests
             Assert.Null(decision.SegmentConfidence);
         });
 
-        var rows = DxfRegularMaskAuditService.BuildAuditRows(
-            ordered, cadToRegular, regularById, cadIcById, activeRegularIds);
+        var rows = inputs.BuildRows();
         AssertAuditProjection(orderedDecisions, rows);
         Assert.Equal(
             hasCsvMask ? new int?[] { null, null, null } : new int?[] { 30, null, 40 },
@@ -232,6 +161,105 @@ public sealed class DxfRegularMaskAuditPipelineContractTests
                 hasCsvMask ? DxfRegularMaskAuditStatus.MaskRemovedMatch : DxfRegularMaskAuditStatus.Unchanged,
             },
             rows.Select(row => row.Status));
+    }
+
+    private static AuditInputs BuildSegmentOffsetInputs(bool hasOffset)
+    {
+        var ordered = new[]
+        {
+            new CadPad(43, "CAD43", "L1", BuildRect()),
+            new CadPad(7, "CAD7", "L1", BuildRect()),
+            new CadPad(91, "CAD91", "L1", BuildRect()),
+            new CadPad(18, "CAD18", "L1", BuildRect()),
+        };
+        var regularById = new Dictionary<int, RegularPad>
+        {
+            [100] = BuildRegular(100, 10, icIndex: 0, row: 2),
+            [101] = BuildRegular(101, 12, icIndex: 0, row: 2),
+            [102] = BuildRegular(102, 11, icIndex: 0, row: 2),
+            [103] = BuildRegular(103, 13, icIndex: 0, row: 2),
+            [104] = BuildRegular(104, 12, icIndex: 0, row: 2),
+            [105] = BuildRegular(105, 14, icIndex: 0, row: 2),
+            [106] = BuildRegular(106, 13, icIndex: 0, row: 2),
+            [107] = BuildRegular(107, 15, icIndex: 0, row: 2),
+        };
+        var cadToRegular = new Dictionary<int, IReadOnlyList<PadMatchLink>>
+        {
+            [43] = new[]
+            {
+                new PadMatchLink(43, 100, 1d, 1d, 1d),
+                new PadMatchLink(43, 101, 0.9d, 0.9d, 0.9d),
+            },
+            [7] = new[]
+            {
+                new PadMatchLink(7, 102, 1d, 1d, 1d),
+                new PadMatchLink(7, 103, 0.9d, 0.9d, 0.9d),
+            },
+            [91] = new[]
+            {
+                new PadMatchLink(91, 104, 1d, 1d, 1d),
+                new PadMatchLink(91, 105, 0.9d, 0.9d, 0.9d),
+            },
+            [18] = new[]
+            {
+                new PadMatchLink(18, 106, 1d, 1d, 1d),
+                new PadMatchLink(18, 107, 0.9d, 0.9d, 0.9d),
+            },
+        };
+        var cadIcById = new Dictionary<int, int> { [43] = 0, [7] = 0, [91] = 0, [18] = 0 };
+        var currentAssigned = new Dictionary<int, int>
+        {
+            [43] = hasOffset ? 12 : 10,
+            [7] = hasOffset ? 13 : 11,
+            [91] = hasOffset ? 14 : 12,
+            [18] = 16,
+        };
+        var manualOverrides = new Dictionary<int, int> { [43] = currentAssigned[43] };
+        var activeRegularIds = new HashSet<int> { 100, 101, 102, 103, 104, 105 };
+
+        return new AuditInputs(ordered, cadToRegular, regularById, cadIcById, activeRegularIds, currentAssigned, manualOverrides);
+    }
+
+    private static AuditInputs BuildNullAndEmptyMaskInputs(bool hasCsvMask)
+    {
+        var ordered = new[]
+        {
+            new CadPad(70, "CAD70", "L1", BuildRect()),
+            new CadPad(2, "CAD2", "L1", BuildRect()),
+            new CadPad(5, "CAD5", "L1", BuildRect()),
+        };
+        var regularById = new Dictionary<int, RegularPad>
+        {
+            [200] = BuildRegular(200, 30, icIndex: 1, row: 4),
+            [201] = BuildRegular(201, 40, icIndex: 1, row: 4),
+        };
+        var cadToRegular = new Dictionary<int, IReadOnlyList<PadMatchLink>>
+        {
+            [70] = new[] { new PadMatchLink(70, 200, 0.8d, 0.8d, 0.7d) },
+            [5] = new[] { new PadMatchLink(5, 201, 0d, 0d, 0d) },
+        };
+        var cadIcById = new Dictionary<int, int> { [70] = 1, [2] = 1, [5] = 1 };
+        IReadOnlySet<int>? activeRegularIds = hasCsvMask ? new HashSet<int>() : null;
+
+        return new AuditInputs(ordered, cadToRegular, regularById, cadIcById, activeRegularIds);
+    }
+
+    private sealed record AuditInputs(
+        CadPad[] Ordered,
+        Dictionary<int, IReadOnlyList<PadMatchLink>> CadToRegular,
+        Dictionary<int, RegularPad> RegularById,
+        Dictionary<int, int> CadIcById,
+        IReadOnlySet<int>? ActiveRegularIds,
+        Dictionary<int, int>? CurrentAssigned = null,
+        Dictionary<int, int>? ManualOverrides = null)
+    {
+        public IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> BuildDecisions() =>
+            DxfRegularMaskAuditService.BuildAssignmentDecisions(
+                Ordered, CadToRegular, RegularById, CadIcById, ActiveRegularIds, CurrentAssigned, ManualOverrides);
+
+        public IReadOnlyList<DxfRegularMaskAuditRow> BuildRows() =>
+            DxfRegularMaskAuditService.BuildAuditRows(
+                Ordered, CadToRegular, RegularById, CadIcById, ActiveRegularIds, CurrentAssigned, ManualOverrides);
     }
 
     private static void AssertAuditProjection(
