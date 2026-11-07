@@ -21,31 +21,24 @@ public sealed class DxfLayerImageExportServiceTests
         };
 
         var path = TestFiles.NewTempFilePath("dxf-layer-", ".png");
-        try
-        {
-            DxfLayerImageExportService.ExportLayerImage(
-                layerPads,
-                320,
-                240,
-                lineWidthPixels: 1m,
-                paddingXPixels: 4,
-                paddingYPixels: 4,
-                DxfLayerImageFormat.Png,
-                useDarkTheme: false,
-                path);
+        DxfLayerImageExportService.ExportLayerImage(
+            layerPads,
+            320,
+            240,
+            lineWidthPixels: 1m,
+            paddingXPixels: 4,
+            paddingYPixels: 4,
+            DxfLayerImageFormat.Png,
+            useDarkTheme: false,
+            path);
 
-            Assert.True(File.Exists(path));
-            using (var bitmap = SKBitmap.Decode(path))
-            {
-                Assert.NotNull(bitmap);
-                Assert.Equal(328, bitmap.Width);
-                Assert.Equal(248, bitmap.Height);
-                Assert.Equal(SKColors.White, bitmap.GetPixel(bitmap.Width / 2, bitmap.Height / 2));
-            }
-        }
-        finally
+        Assert.True(File.Exists(path));
+        using (var bitmap = SKBitmap.Decode(path))
         {
-            File.Delete(path);
+            Assert.NotNull(bitmap);
+            Assert.Equal(328, bitmap.Width);
+            Assert.Equal(248, bitmap.Height);
+            Assert.Equal(SKColors.White, bitmap.GetPixel(bitmap.Width / 2, bitmap.Height / 2));
         }
     }
 
@@ -78,30 +71,23 @@ public sealed class DxfLayerImageExportServiceTests
         };
 
         var path = TestFiles.NewTempFilePath("dxf-layer-", ".png");
-        try
-        {
-            DxfLayerImageExportService.ExportLayerImage(
-                layerPads,
-                300,
-                300,
-                lineWidthPixels: 1m,
-                paddingXPixels: 40,
-                paddingYPixels: 30,
-                DxfLayerImageFormat.Png,
-                useDarkTheme: false,
-                path);
+        DxfLayerImageExportService.ExportLayerImage(
+            layerPads,
+            300,
+            300,
+            lineWidthPixels: 1m,
+            paddingXPixels: 40,
+            paddingYPixels: 30,
+            DxfLayerImageFormat.Png,
+            useDarkTheme: false,
+            path);
 
-            using (var bitmap = SKBitmap.Decode(path))
-            {
-                Assert.NotNull(bitmap);
-                Assert.Equal(SKColors.White, bitmap.GetPixel(0, 0));
-                Assert.Equal(SKColors.White, bitmap.GetPixel(bitmap.Width - 1, bitmap.Height - 1));
-                Assert.NotEqual(SKColors.White, bitmap.GetPixel(41, 31));
-            }
-        }
-        finally
+        using (var bitmap = SKBitmap.Decode(path))
         {
-            File.Delete(path);
+            Assert.NotNull(bitmap);
+            Assert.Equal(SKColors.White, bitmap.GetPixel(0, 0));
+            Assert.Equal(SKColors.White, bitmap.GetPixel(bitmap.Width - 1, bitmap.Height - 1));
+            Assert.NotEqual(SKColors.White, bitmap.GetPixel(41, 31));
         }
     }
 
@@ -116,45 +102,37 @@ public sealed class DxfLayerImageExportServiceTests
 
         var thinPath = TestFiles.NewTempFilePath("dxf-layer-thin-", ".png");
         var thickPath = TestFiles.NewTempFilePath("dxf-layer-thick-", ".png");
-        try
+        DxfLayerImageExportService.ExportLayerImage(
+            layerPads,
+            320,
+            320,
+            lineWidthPixels: 1m,
+            paddingXPixels: 12,
+            paddingYPixels: 12,
+            DxfLayerImageFormat.Png,
+            useDarkTheme: false,
+            thinPath);
+
+        DxfLayerImageExportService.ExportLayerImage(
+            layerPads,
+            320,
+            320,
+            lineWidthPixels: 8m,
+            paddingXPixels: 12,
+            paddingYPixels: 12,
+            DxfLayerImageFormat.Png,
+            useDarkTheme: false,
+            thickPath);
+
+        using (var thinBitmap = SKBitmap.Decode(thinPath))
+        using (var thickBitmap = SKBitmap.Decode(thickPath))
         {
-            DxfLayerImageExportService.ExportLayerImage(
-                layerPads,
-                320,
-                320,
-                lineWidthPixels: 1m,
-                paddingXPixels: 12,
-                paddingYPixels: 12,
-                DxfLayerImageFormat.Png,
-                useDarkTheme: false,
-                thinPath);
+            Assert.NotNull(thinBitmap);
+            Assert.NotNull(thickBitmap);
 
-            DxfLayerImageExportService.ExportLayerImage(
-                layerPads,
-                320,
-                320,
-                lineWidthPixels: 8m,
-                paddingXPixels: 12,
-                paddingYPixels: 12,
-                DxfLayerImageFormat.Png,
-                useDarkTheme: false,
-                thickPath);
-
-            using (var thinBitmap = SKBitmap.Decode(thinPath))
-            using (var thickBitmap = SKBitmap.Decode(thickPath))
-            {
-                Assert.NotNull(thinBitmap);
-                Assert.NotNull(thickBitmap);
-
-                var thinInk = CountNonWhitePixels(thinBitmap);
-                var thickInk = CountNonWhitePixels(thickBitmap);
-                Assert.True(thickInk > thinInk, $"Expected thick line pixels > thin line pixels, got {thickInk} <= {thinInk}.");
-            }
-        }
-        finally
-        {
-            File.Delete(thinPath);
-            File.Delete(thickPath);
+            var thinInk = CountNonWhitePixels(thinBitmap);
+            var thickInk = CountNonWhitePixels(thickBitmap);
+            Assert.True(thickInk > thinInk, $"Expected thick line pixels > thin line pixels, got {thickInk} <= {thinInk}.");
         }
     }
 
@@ -168,31 +146,24 @@ public sealed class DxfLayerImageExportServiceTests
         };
 
         var path = TestFiles.NewTempFilePath("dxf-layer-safe-inset-", ".png");
-        try
-        {
-            DxfLayerImageExportService.ExportLayerImage(
-                layerPads,
-                320,
-                320,
-                lineWidthPixels: 14m,
-                paddingXPixels: 0,
-                paddingYPixels: 0,
-                DxfLayerImageFormat.Png,
-                useDarkTheme: false,
-                path);
+        DxfLayerImageExportService.ExportLayerImage(
+            layerPads,
+            320,
+            320,
+            lineWidthPixels: 14m,
+            paddingXPixels: 0,
+            paddingYPixels: 0,
+            DxfLayerImageFormat.Png,
+            useDarkTheme: false,
+            path);
 
-            using (var bitmap = SKBitmap.Decode(path))
-            {
-                Assert.NotNull(bitmap);
-                Assert.Equal(SKColors.White, bitmap.GetPixel(0, 0));
-                Assert.Equal(SKColors.White, bitmap.GetPixel(bitmap.Width - 1, 0));
-                Assert.Equal(SKColors.White, bitmap.GetPixel(0, bitmap.Height - 1));
-                Assert.Equal(SKColors.White, bitmap.GetPixel(bitmap.Width - 1, bitmap.Height - 1));
-            }
-        }
-        finally
+        using (var bitmap = SKBitmap.Decode(path))
         {
-            File.Delete(path);
+            Assert.NotNull(bitmap);
+            Assert.Equal(SKColors.White, bitmap.GetPixel(0, 0));
+            Assert.Equal(SKColors.White, bitmap.GetPixel(bitmap.Width - 1, 0));
+            Assert.Equal(SKColors.White, bitmap.GetPixel(0, bitmap.Height - 1));
+            Assert.Equal(SKColors.White, bitmap.GetPixel(bitmap.Width - 1, bitmap.Height - 1));
         }
     }
 
