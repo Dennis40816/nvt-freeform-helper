@@ -7,7 +7,7 @@ public sealed partial class SimulationHostViewModel : ObservableObject
 {
     private readonly string _placeholderTitle = "Simulation";
     private readonly string _placeholderSubtitle = "Build from the current Freeform Helper workspace, then simulate regular-pad values directly on the AA canvas.";
-    private readonly string _staleWorkspaceBannerText = "Freeform Helper workspace changed. Refresh simulation to use the latest project/grid state.";
+    private readonly string _staleWorkspaceBannerText = "Refresh rebuilds from the latest workspace, clears CSV files, every manual override and Copper settings, then returns to Manual.";
     private const string DefaultBuildProgressText = "Preparing simulation workspace...";
     private int _buildProgressScopeCount;
 

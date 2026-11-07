@@ -139,6 +139,7 @@ public sealed partial class NotchExportSelectionViewModel
         OnPropertyChanged(nameof(DistributionText));
         OnPropertyChanged(nameof(ExportButtonText));
         OnPropertyChanged(nameof(AreAllVisibleRowsSelected));
+        NotifyDisplayCountsChanged();
     }
 
     private void NotifyProjectionViewStateChanged()
@@ -176,9 +177,25 @@ public sealed partial class NotchExportSelectionViewModel
     {
         _icGroups.Clear();
         _groupByIcIndex.Clear();
+        foreach (var row in _allRows)
+        {
+            row.VisibleGroup = null;
+        }
         foreach (var group in groups)
         {
-            _icGroups.Add(CreateGroup(group.IcIndex, group.Rows));
+            var viewModel = CreateGroup(group.IcIndex, group.Rows);
+            _icGroups.Add(viewModel);
+        }
+
+        int? previousIc = null;
+        foreach (var row in Rows)
+        {
+            if (previousIc != row.Row.IcIndex)
+            {
+                row.VisibleGroup = _groupByIcIndex[row.Row.IcIndex];
+            }
+
+            previousIc = row.Row.IcIndex;
         }
     }
 

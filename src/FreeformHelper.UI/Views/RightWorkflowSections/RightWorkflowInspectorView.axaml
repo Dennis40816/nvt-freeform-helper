@@ -1,6 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
              xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
@@ -21,28 +22,10 @@
                              Text="Select a CAD or regular pad to inspect."/>
         <SelectableTextBlock Classes="stepNote"
                              IsVisible="{Binding HasPadInspectorMultiSelection}"
-                             Text="{Binding PadInspectorSelectionSummaryText}"
+                             Text="Select one pad to inspect its details."
                              TextWrapping="Wrap"/>
 
-        <Border Classes="workspaceSectionCard">
-          <StackPanel Spacing="{StaticResource Space6}">
-            <Grid Classes="workspaceSectionHeader">
-              <SelectableTextBlock Classes="workspaceSectionTitle"
-                                   Text="Quick focus"/>
-            </Grid>
-            <Grid ColumnDefinitions="*,Auto"
-                  ColumnSpacing="{StaticResource Space8}">
-              <TextBox Text="{Binding QuickFocusQueryText, Mode=TwoWay}"
-                       PlaceholderText="diff 72 / cad 4809 / reg 4616"
-                       ToolTip.Tip="Focus by typed target. Examples: diff 72, ic1 diff72, cad 4809, reg 4616. Plain number auto-resolves CAD, REG, then diff."/>
-              <Button Grid.Column="1"
-                      Classes="actionPrimary actionTextButton"
-                      Content="Focus"
-                      Command="{Binding QuickFocusCommand}"
-                      ToolTip.Tip="Select and zoom the matching CAD output pad, regular pad, or FW diff."/>
-            </Grid>
-          </StackPanel>
-        </Border>
+
 
         <Border Classes="workspaceSectionCard"
                 IsVisible="{Binding HasPadInspectorSummary}">
@@ -130,26 +113,32 @@
           </StackPanel>
         </Border>
 
+        <panels:CollapsiblePanel Title="Quick focus" IsExpanded="False">
+          <StackPanel Spacing="{StaticResource Space6}">
+            <SelectableTextBlock Classes="stepNote" Text="Examples: ic1 diff72 · cad 4809 · reg 4616" TextWrapping="Wrap"/>
+
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space8}">
+              <TextBox Text="{Binding QuickFocusQueryText, Mode=TwoWay}"
+                       PlaceholderText="diff 72 / cad 4809 / reg 4616"
+                       ToolTip.Tip="Focus by typed target. Examples: diff 72, ic1 diff72, cad 4809, reg 4616. Plain number auto-resolves CAD, REG, then diff."/>
+              <Button Grid.Column="1"
+                      Classes="actionNeutral actionTextButton"
+                      Content="Focus"
+                      Command="{Binding QuickFocusCommand}"
+                      ToolTip.Tip="Select and zoom the matching CAD output pad, regular pad, or FW diff."/>
+            </Grid>
+          </StackPanel>
+        </panels:CollapsiblePanel>
         <Border Height="{StaticResource Space1}"
                 Background="{DynamicResource BrushBorder}"
                 IsVisible="{Binding HasPadInspectorSummary}"/>
 
-        <ToggleButton Classes="workspaceFoldHeader"
-                      HorizontalAlignment="Stretch"
-                      IsVisible="{Binding HasPadInspectorSummary}"
-                      IsChecked="{Binding PadInspectorUi.IsDebugDetailsExpanded, Mode=TwoWay}">
-          <Grid Classes="workspaceFoldHeaderContent"
-                ColumnDefinitions="*,Auto">
-            <SelectableTextBlock Text="Debug details"
-                                 FontWeight="SemiBold"/>
-            <controls:FontIcon Grid.Column="1"
-                               Classes="symbols iconSm"
-                               Glyph="{Binding PadInspectorUi.IsDebugDetailsExpanded, Converter={StaticResource AccordionExpandGlyph}}"/>
-          </Grid>
-        </ToggleButton>
 
-        <StackPanel Spacing="{StaticResource Space8}"
-                    IsVisible="{Binding PadInspectorUi.IsDebugDetailsExpanded}">
+
+        <panels:CollapsiblePanel Title="Debug details" IsExpanded="{Binding PadInspectorUi.IsDebugDetailsExpanded, Mode=TwoWay}"
+                                 IsVisible="{Binding HasPadInspectorSummary}">
+          <StackPanel Spacing="{StaticResource Space8}">
           <Border Background="{DynamicResource BrushBgSurfaceInset}"
                   BorderBrush="{DynamicResource BrushBorder}"
                   BorderThickness="{StaticResource BorderThin}"
@@ -167,29 +156,9 @@
               <ContentControl Content="{Binding PadInspectorUi.Snapshot}">
                 <ContentControl.DataTemplates>
                   <DataTemplate DataType="{x:Type vm:PadInspectorSnapshot}">
-                    <Grid ColumnDefinitions="Auto,8,*"
-                          RowDefinitions="Auto,Auto,Auto,Auto"
-                          RowSpacing="{StaticResource Space4}"
-                          IsVisible="{Binding HasCad}">
-                      <SelectableTextBlock Text="Diff source"/>
-                      <SelectableTextBlock Grid.Column="2"
-                                           Text="{Binding Cad.CadOutputFwDiffAssignmentModeText}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="1" Text="Diff idx"/>
-                      <SelectableTextBlock Grid.Row="1"
-                                           Grid.Column="2"
-                                           Text="{Binding Cad.DxfIndexDisplayText}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="2" Text="Match confidence"/>
-                      <SelectableTextBlock Grid.Row="2"
-                                           Grid.Column="2"
-                                           Text="{Binding Cad.MatchConfidence, StringFormat={}{0:P1}}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="3" Text="Match"/>
-                      <SelectableTextBlock Grid.Row="3"
-                                           Grid.Column="2"
-                                           Text="{Binding Cad.MatchText}"
-                                           TextWrapping="Wrap"/>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource Space8}" IsVisible="{Binding HasCad}">
+                      <SelectableTextBlock Text="Match confidence"/>
+                      <SelectableTextBlock Grid.Column="1" Text="{Binding Cad.MatchConfidence, StringFormat={}{0:P1}}" TextWrapping="Wrap"/>
                     </Grid>
                   </DataTemplate>
                 </ContentControl.DataTemplates>
@@ -197,29 +166,9 @@
               <ContentControl Content="{Binding PadInspectorUi.Snapshot}">
                 <ContentControl.DataTemplates>
                   <DataTemplate DataType="{x:Type vm:PadInspectorSnapshot}">
-                    <Grid ColumnDefinitions="Auto,8,*"
-                          RowDefinitions="Auto,Auto,Auto,Auto"
-                          RowSpacing="{StaticResource Space4}"
-                          IsVisible="{Binding HasRegular}">
-                      <SelectableTextBlock Text="Diff source"/>
-                      <SelectableTextBlock Grid.Column="2"
-                                           Text="{Binding Regular.DiffSource}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="1" Text="Diff idx"/>
-                      <SelectableTextBlock Grid.Row="1"
-                                           Grid.Column="2"
-                                           Text="{Binding Regular.DiffIndex}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="2" Text="Match confidence"/>
-                      <SelectableTextBlock Grid.Row="2"
-                                           Grid.Column="2"
-                                           Text="{Binding Regular.MatchConfidence, StringFormat={}{0:P1}}"
-                                           TextWrapping="Wrap"/>
-                      <SelectableTextBlock Grid.Row="3" Text="Match"/>
-                      <SelectableTextBlock Grid.Row="3"
-                                           Grid.Column="2"
-                                           Text="{Binding Regular.MatchText}"
-                                           TextWrapping="Wrap"/>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource Space8}" IsVisible="{Binding HasRegular}">
+                      <SelectableTextBlock Text="Match confidence"/>
+                      <SelectableTextBlock Grid.Column="1" Text="{Binding Regular.MatchConfidence, StringFormat={}{0:P1}}" TextWrapping="Wrap"/>
                     </Grid>
                   </DataTemplate>
                 </ContentControl.DataTemplates>
@@ -352,6 +301,7 @@
             </StackPanel>
           </Border>
         </StackPanel>
+        </panels:CollapsiblePanel>
       </StackPanel>
     </controls:HidePanelBlock>
 </UserControl>

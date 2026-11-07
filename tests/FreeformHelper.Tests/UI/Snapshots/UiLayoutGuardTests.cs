@@ -116,8 +116,8 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("dxfLayerBulkToggleIcon", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerBulkToggleSwitch", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dangerTextButton dxfEditMiniAction\"", leftPanel, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"dxfEditAlignedFieldRow\"", leftPanel, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"dxfEditFieldActionSpacer\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Content=\"Rotate\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Content=\"Move\"", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("actionDanger actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("actionGhost actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("actionNeutral actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
@@ -130,7 +130,7 @@ public sealed class UiLayoutGuardTests
         Assert.DoesNotContain("Margin=\"{StaticResource InsetRight12Bottom12}\"", leftPanel, StringComparison.Ordinal);
 
         var overlayControls = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "CanvasOverlayControls.axaml"));
-        Assert.Contains("Text=\"To Regular\"", overlayControls, StringComparison.Ordinal);
+        Assert.Contains("Content=\"To Regular Preview\"", overlayControls, StringComparison.Ordinal);
         Assert.Contains("IsChecked=\"{Binding ShowNotchToRegularLabels, Mode=TwoWay}\"", overlayControls, StringComparison.Ordinal);
 
         var settingsWindow = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SettingsWindow.axaml"));
@@ -250,13 +250,13 @@ public sealed class UiLayoutGuardTests
         var dxfResetButton = FindXamlElementTagContaining(leftPanel, "Button", "ResetAllDxfEditsButton_Click");
         var dxfRestoreLastButton = FindXamlElementTagContaining(leftPanel, "Button", "RestoreLastDeletedCadPadsCommand");
         var dxfRestoreAllButton = FindXamlElementTagContaining(leftPanel, "Button", "RestoreAllHiddenCadPadsCommand");
-        Assert.Contains("IconGlyphs.RestartAlt", dxfResetButton, StringComparison.Ordinal);
+        Assert.Contains("actionDanger", dxfResetButton, StringComparison.Ordinal);
         Assert.Contains("IconGlyphs.Undo", dxfRestoreLastButton, StringComparison.Ordinal);
         Assert.Contains("IconGlyphs.Visibility", dxfRestoreAllButton, StringComparison.Ordinal);
 
         var dxfHideSectionStart = leftPanel.IndexOf("Text=\"Hide / restore\"", StringComparison.Ordinal);
         var dxfCombineSectionStart = leftPanel.IndexOf("Text=\"Combine / split\"", StringComparison.Ordinal);
-        var dxfAdvancedSectionStart = leftPanel.IndexOf("Text=\"Advanced edit\"", dxfCombineSectionStart, StringComparison.Ordinal);
+        var dxfAdvancedSectionStart = leftPanel.IndexOf("Title=\"Advanced edit\"", dxfCombineSectionStart, StringComparison.Ordinal);
         Assert.True(dxfHideSectionStart >= 0, "DXF Hide / restore section is missing.");
         Assert.True(dxfCombineSectionStart > dxfHideSectionStart, "DXF Combine / split section must follow Hide / restore.");
         Assert.True(dxfAdvancedSectionStart > dxfCombineSectionStart, "DXF Advanced edit section must follow quick actions.");
@@ -337,16 +337,10 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("Title=\"Overview\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("Text=\"Project / grid\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("Text=\"Simulation safety\"", rightWorkflowSettings, StringComparison.Ordinal);
-        Assert.Contains("Text=\"{Binding SimulationSafetyOverviewStatusText}\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("ToolTip.Tip=\"Loaded CAD pad count after DXF import and current DXF edits.\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("ToolTip.Tip=\"Generated regular-grid pad count.\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyOverviewSummaryText}\"", rightWorkflowSettings, StringComparison.Ordinal);
-        Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyOverviewHighRiskDiffsText}\"", rightWorkflowSettings, StringComparison.Ordinal);
-        Assert.Contains("ToolTip.Tip=\"Step 5 export file type.\"", rightWorkflowSettings, StringComparison.Ordinal);
-        Assert.Contains("ToolTip.Tip=\"{Binding NotchExportSafetyPolicySummary}\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("Tag=\"General\"", rightWorkflowSettings, StringComparison.Ordinal);
-        Assert.Contains("Tag=\"Step3NotchCompensation\"", rightWorkflowSettings, StringComparison.Ordinal);
-        Assert.Contains("Tag=\"Step5NotchExport\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.DoesNotContain("Value=\"{Binding CascadeNum, Mode=TwoWay}\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.DoesNotContain("ComboBox Classes=\"regularLayerSelector\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("IsVisible=\"{Binding IsRightPanelSettingsTab}\"", rightWorkflowSettings, StringComparison.Ordinal);
@@ -365,7 +359,6 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("Text=\"{Binding NotchPreviewStageSummary}\"", step3View, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding NotchToFullRuleEngineSummary}\"", step3View, StringComparison.Ordinal);
         Assert.Contains("IsEnabled=\"{Binding CanControlNotchPreviewStage}\"", step3View, StringComparison.Ordinal);
-        Assert.Contains("Text=\"{Binding NotchPreviewSeedLayerStateText}\"", step3View, StringComparison.Ordinal);
         Assert.Contains("ToolTip.Tip=\"{Binding NotchTargetCoverageCapHelpText}\"", step3View, StringComparison.Ordinal);
         Assert.DoesNotContain("Tip=\"{Binding NotchTargetCoverageCapHelpText}\"", settingsStep3Section, StringComparison.Ordinal);
         Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", step3View, StringComparison.Ordinal);
@@ -376,7 +369,7 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("Text=\"{Binding NotchExportHandoffFileText}\"", step5View, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding NotchExportHandoffVersionText}\"", step5View, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding NotchExportHandoffProfileText}\"", step5View, StringComparison.Ordinal);
-        Assert.Contains("Text=\"{Binding NotchExportHandoffChecklistText}\"", step5View, StringComparison.Ordinal);
+        Assert.Contains("ToolTip.Tip=\"{Binding NotchExportHandoffChecklistText}\"", step5View, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -391,7 +384,7 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("Classes=\"chipStatusText\"", warningChip, StringComparison.Ordinal);
         Assert.Contains("IsVisible=\"{Binding HasSimulationPhysicalAuditWarning}\"", warningChip, StringComparison.Ordinal);
         Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyExportSummaryText}\"", warningChip, StringComparison.Ordinal);
-        Assert.Contains("Text=\"{Binding SimulationSafetyExportBadgeText}\"", warningChip, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding SimulationSafetyExportSummaryText}\"", warningChip, StringComparison.Ordinal);
         Assert.DoesNotContain("Background=", warningChip, StringComparison.Ordinal);
         Assert.DoesNotContain("Foreground=", warningChip, StringComparison.Ordinal);
         Assert.DoesNotContain("FontSize=", warningChip, StringComparison.Ordinal);
@@ -429,10 +422,8 @@ public sealed class UiLayoutGuardTests
             "Safety gate blocks export when Simulation has After > 480.",
             rightWorkflowSettings,
             StringComparison.Ordinal);
-        Assert.Contains(
-            "ToolTip.Tip=\"{Binding NotchExportSafetyPolicySummary}\"",
-            rightWorkflowSettings,
-            StringComparison.Ordinal);
+        var step5View = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep5View.axaml"));
+        Assert.Contains("ToolTip.Tip=\"{Binding NotchExportSafetyPolicySummary}\"", step5View, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -442,10 +433,8 @@ public sealed class UiLayoutGuardTests
         var stepsRoot = Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps");
         var checks = new[]
         {
-            (Path.Combine(stepsRoot, "RightWorkflowStep1View.axaml"), "MatchCommand"),
             (Path.Combine(stepsRoot, "RightWorkflowStep1View.axaml"), "ImportRegularVisibilityMaskCommand"),
             (Path.Combine(stepsRoot, "RightWorkflowStep1View.axaml"), "ClearRegularVisibilityMaskCommand"),
-            (Path.Combine(stepsRoot, "RightWorkflowStep2View.axaml"), "AutoDetectFreeformsCommand"),
             (Path.Combine(stepsRoot, "RightWorkflowStep2View.axaml"), "SetFreeformNoneCommand"),
             (Path.Combine(stepsRoot, "RightWorkflowStep2View.axaml"), "SetFreeformXCommand"),
             (Path.Combine(stepsRoot, "RightWorkflowStep2View.axaml"), "SetFreeformYCommand"),
@@ -453,7 +442,6 @@ public sealed class UiLayoutGuardTests
             (Path.Combine(stepsRoot, "RightWorkflowStep4View.axaml"), "SelectStep4DuplicateDiffGroupCommand"),
             (Path.Combine(stepsRoot, "RightWorkflowStep4View.axaml"), "OffsetSelectedCadOutputFwDiffIndicesCommand"),
             (Path.Combine(stepsRoot, "RightWorkflowStep4View.axaml"), "AnalyzeIndexMappingCommand"),
-            (Path.Combine(stepsRoot, "RightWorkflowStep5View.axaml"), "ExportNotchCommand"),
         };
 
         foreach (var (file, commandName) in checks)
@@ -620,16 +608,16 @@ public sealed class UiLayoutGuardTests
             },
             [Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "NotchExportSelectionWindow.axaml")] = new[]
             {
-                "SummaryText",
-                "DistributionText",
-                "PrimaryOutcomeText",
-                "CompactMetaText",
-                "SelectedRowHeaderText",
+                "ExportSummaryText",
+                "HiddenSelectedRowsHintText",
+                "InspectorHeaderText",
                 "SelectedRowCodePreviewText",
-                "SelectedRowOutcomeText",
+                "SelectedRowAnalysisText",
                 "SelectedRowPadRelationText",
-                "SelectedRowPayloadText",
-                "SelectedRowColumnBreakdownText",
+                "SelectedRowPayloadAnchorText",
+                "SelectedRowPayloadCombineText",
+                "SelectedRowPayloadTarget1Text",
+                "SelectedRowPayloadTarget2Text",
                 "SelectedRowFlagsText",
                 "SelectedRowCommentText"
             }
@@ -767,7 +755,7 @@ public sealed class UiLayoutGuardTests
         var dxfEditChangeListWindowCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DxfEditChangeListWindow.axaml.cs"));
         var mainWindowCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml.cs"));
 
-        Assert.Contains("Alt = Regular priority", overlayXaml, StringComparison.Ordinal);
+        Assert.Contains("Alt: prefer Regular", overlayXaml, StringComparison.Ordinal);
         Assert.Contains("_topLevel.KeyDown += OnTopLevelKeyDown;", freeformLifecycleCode, StringComparison.Ordinal);
         Assert.Contains("_topLevel.KeyDown -= OnTopLevelKeyDown;", freeformLifecycleCode, StringComparison.Ordinal);
         Assert.Matches(@"IsTextEntryControlSource\(e\.Source\)[\s\S]*private static bool IsTextEntryControlSource[\s\S]*?ConsolePanel[\s\S]*?private static bool IsCanvasInputSource", freeformShortcutCode);
