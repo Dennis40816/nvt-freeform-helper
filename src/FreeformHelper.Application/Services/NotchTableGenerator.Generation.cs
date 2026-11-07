@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.ExceptionServices;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
@@ -574,67 +573,21 @@ public sealed partial class NotchTableGenerator
         var totalCount = cadProfiles.Count;
         if (cadProfiles.Count == 0)
         {
-            ReportGenerationProgress(
+            return CompleteEmptyCanonicalCandidateBuild(
                 progress,
-                1,
-                1,
-                0,
-                null,
-                null,
-                GenerationPhaseBuildCanonicalCandidates,
-                phaseStep: candidatePhaseStep,
-                phaseStepCount: phaseStepCount);
-            ReportGenerationProgress(
-                progress,
-                1,
-                1,
-                0,
-                null,
-                null,
-                GenerationPhaseMergeCanonicalCandidates,
-                phaseStep: mergePhaseStep,
-                phaseStepCount: phaseStepCount);
-            return CanonicalCandidateBuildResult.Empty;
+                candidatePhaseStep,
+                mergePhaseStep,
+                phaseStepCount);
         }
 
-        var candidatesByProfile = new List<KeyValuePair<(int IcIndex, int DiffIndex), V22CadCandidate>>?[cadProfiles.Count];
-        var selectedResolvedByProfile = new NotchV22ResolvedResult?[cadProfiles.Count];
-        var processedInParallel = 0;
-        var candidateTimingAccumulator = new CandidateTimingAccumulator();
-        var candidateStopwatch = Stopwatch.StartNew();
-        try
-        {
-            Parallel.For(0, cadProfiles.Count, index =>
-            {
-                var profile = cadProfiles[index];
-                candidatesByProfile[index] = BuildCanonicalCandidatesForProfile(
-                    profile,
-                    context,
-                    candidateTimingAccumulator,
-                    out selectedResolvedByProfile[index]);
-
-                var processed = Interlocked.Increment(ref processedInParallel);
-                if (ShouldReportGenerationProgress(processed, totalCount))
-                {
-                    ReportGenerationProgress(
-                        progress,
-                        processed,
-                        totalCount,
-                        0,
-                        profile.CadPad.Id,
-                        null,
-                        GenerationPhaseBuildCanonicalCandidates,
-                        phaseStep: candidatePhaseStep,
-                        phaseStepCount: phaseStepCount);
-                }
-            });
-        }
-        catch (AggregateException ex) when (ex.InnerExceptions.Count == 1)
-        {
-            ExceptionDispatchInfo.Capture(ex.InnerExceptions[0]).Throw();
-            throw;
-        }
-        candidateStopwatch.Stop();
+        var (candidatesByProfile, selectedResolvedByProfile, candidateTimingAccumulator, candidateStopwatch) =
+            BuildCanonicalProfileCandidates(
+                context,
+                cadProfiles,
+                totalCount,
+                progress,
+                candidatePhaseStep,
+                phaseStepCount);
 
         var candidatesByDiff = new Dictionary<(int IcIndex, int DiffIndex), List<V22CadCandidate>>();
         var mergeStopwatch = Stopwatch.StartNew();
@@ -648,53 +601,13 @@ public sealed partial class NotchTableGenerator
             GenerationPhaseMergeCanonicalCandidates,
             phaseStep: mergePhaseStep,
             phaseStepCount: phaseStepCount);
-        for (var index = 0; index < candidatesByProfile.Length; index++)
-        {
-            var candidates = candidatesByProfile[index];
-            if (candidates is null || candidates.Count == 0)
-            {
-                if (ShouldReportGenerationProgress(index + 1, candidatesByProfile.Length))
-                {
-                    ReportGenerationProgress(
-                        progress,
-                        index + 1,
-                        candidatesByProfile.Length,
-                        0,
-                        cadProfiles[index].CadPad.Id,
-                        null,
-                        GenerationPhaseMergeCanonicalCandidates,
-                        phaseStep: mergePhaseStep,
-                        phaseStepCount: phaseStepCount);
-                }
-
-                continue;
-            }
-
-            foreach (var candidate in candidates)
-            {
-                if (!candidatesByDiff.TryGetValue(candidate.Key, out var sameDiffCandidates))
-                {
-                    sameDiffCandidates = new List<V22CadCandidate>();
-                    candidatesByDiff[candidate.Key] = sameDiffCandidates;
-                }
-
-                sameDiffCandidates.Add(candidate.Value);
-            }
-
-            if (ShouldReportGenerationProgress(index + 1, candidatesByProfile.Length))
-            {
-                ReportGenerationProgress(
-                    progress,
-                    index + 1,
-                    candidatesByProfile.Length,
-                    candidatesByDiff.Count,
-                    cadProfiles[index].CadPad.Id,
-                    null,
-                    GenerationPhaseMergeCanonicalCandidates,
-                    phaseStep: mergePhaseStep,
-                    phaseStepCount: phaseStepCount);
-            }
-        }
+        candidatesByDiff = MergeCanonicalProfileCandidates(
+            candidatesByProfile,
+            cadProfiles,
+            candidatesByDiff,
+            progress,
+            mergePhaseStep,
+            phaseStepCount);
 
         var selectedSparseResult = context.SelectedSparseResultRequest is { } selectedRequest &&
                                    selectedResolvedByProfile.FirstOrDefault(
@@ -837,5 +750,4 @@ public sealed partial class NotchTableGenerator
             Math.Max(0, phaseStep),
             Math.Max(0, phaseStepCount)));
     }
-
 }
