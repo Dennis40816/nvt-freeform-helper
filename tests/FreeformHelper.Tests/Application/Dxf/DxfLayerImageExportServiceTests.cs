@@ -45,7 +45,7 @@ public sealed class DxfLayerImageExportServiceTests
         }
         finally
         {
-            DeleteTempFileWithRetry(path);
+            File.Delete(path);
         }
     }
 
@@ -101,7 +101,7 @@ public sealed class DxfLayerImageExportServiceTests
         }
         finally
         {
-            DeleteTempFileWithRetry(path);
+            File.Delete(path);
         }
     }
 
@@ -153,8 +153,8 @@ public sealed class DxfLayerImageExportServiceTests
         }
         finally
         {
-            DeleteTempFileWithRetry(thinPath);
-            DeleteTempFileWithRetry(thickPath);
+            File.Delete(thinPath);
+            File.Delete(thickPath);
         }
     }
 
@@ -192,25 +192,7 @@ public sealed class DxfLayerImageExportServiceTests
         }
         finally
         {
-            DeleteTempFileWithRetry(path);
-        }
-    }
-
-    private static void DeleteTempFileWithRetry(string path)
-    {
-        const int maxAttempts = 10;
-        const int retryDelayMs = 100;
-        for (var attempt = 1; attempt <= maxAttempts; attempt++)
-        {
-            try
-            {
-                File.Delete(path);
-                return;
-            }
-            catch (IOException) when (attempt < maxAttempts)
-            {
-                Thread.Sleep(retryDelayMs);
-            }
+            File.Delete(path);
         }
     }
 
