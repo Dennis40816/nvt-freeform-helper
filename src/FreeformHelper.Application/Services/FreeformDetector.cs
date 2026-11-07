@@ -66,36 +66,10 @@ public sealed class FreeformDetector
                 continue;
             }
 
-            var rowCoverage = new Dictionary<int, double>();
-            var colCoverage = new Dictionary<int, double>();
-            var totalCoverage = 0.0;
-
-            foreach (var link in links)
-            {
-                var regularPad = regularById[link.RegularPadId];
-
-                var coverage = Math.Max(0.0, link.CadCoverage);
-                if (coverage <= CoverageNoiseFloor)
-                {
-                    continue;
-                }
-
-                totalCoverage += coverage;
-                rowCoverage.TryGetValue(regularPad.Row, out var rowSum);
-                rowCoverage[regularPad.Row] = rowSum + coverage;
-                colCoverage.TryGetValue(regularPad.Col, out var colSum);
-                colCoverage[regularPad.Col] = colSum + coverage;
-            }
-
-            if (totalCoverage <= CoverageNoiseFloor)
+            if (!TryComputeSpreads(links, regularById, out var xSpread, out var ySpread))
             {
                 continue;
             }
-
-            var rowDominance = rowCoverage.Count == 0 ? 1.0 : rowCoverage.Values.Max() / totalCoverage;
-            var colDominance = colCoverage.Count == 0 ? 1.0 : colCoverage.Values.Max() / totalCoverage;
-            var xSpread = 1.0 - colDominance;
-            var ySpread = 1.0 - rowDominance;
 
             var freeformType = ResolveTypeFromSpread(xSpread, ySpread, threshold, enableXy);
             var isBoundarySpecialization = false;
@@ -140,6 +114,47 @@ public sealed class FreeformDetector
         return bestAssignments.ToDictionary(
             static pair => pair.Key,
             static pair => pair.Value.type);
+    }
+
+    private static bool TryComputeSpreads(
+        List<PadMatchLink> links,
+        Dictionary<int, RegularPad> regularById,
+        out double xSpread,
+        out double ySpread)
+    {
+        var rowCoverage = new Dictionary<int, double>();
+        var colCoverage = new Dictionary<int, double>();
+        var totalCoverage = 0.0;
+
+        foreach (var link in links)
+        {
+            var regularPad = regularById[link.RegularPadId];
+
+            var coverage = Math.Max(0.0, link.CadCoverage);
+            if (coverage <= CoverageNoiseFloor)
+            {
+                continue;
+            }
+
+            totalCoverage += coverage;
+            rowCoverage.TryGetValue(regularPad.Row, out var rowSum);
+            rowCoverage[regularPad.Row] = rowSum + coverage;
+            colCoverage.TryGetValue(regularPad.Col, out var colSum);
+            colCoverage[regularPad.Col] = colSum + coverage;
+        }
+
+        if (totalCoverage <= CoverageNoiseFloor)
+        {
+            xSpread = 0.0;
+            ySpread = 0.0;
+            return false;
+        }
+
+        var rowDominance = rowCoverage.Count == 0 ? 1.0 : rowCoverage.Values.Max() / totalCoverage;
+        var colDominance = colCoverage.Count == 0 ? 1.0 : colCoverage.Values.Max() / totalCoverage;
+        xSpread = 1.0 - colDominance;
+        ySpread = 1.0 - rowDominance;
+        return true;
     }
 
     private static FreeformType ResolveTypeFromSpread(double xSpread, double ySpread, double threshold, bool enableXy)
