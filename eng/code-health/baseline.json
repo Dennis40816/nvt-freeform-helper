@@ -12,20 +12,6 @@
   },
   "entities": [
     {
-      "kind": "file",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "fileLines": 900
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/CoordinatePlannerComputationService.cs"
-      ],
-      "contentHash": "329adaeed69890d9cd9b45277547c5a7c5da1846a7e509ac44ff527a7ec1cb0c",
-      "project": "FreeformHelper.Application",
-      "symbol": "file:FreeformHelper.Application.Services.CoordinateCustomPathRequest;FreeformHelper.Application.Services.CoordinateCustomPointRequest;FreeformHelper.Application.Services.CoordinateGuideGenerationMode;FreeformHelper.Application.Services.CoordinatePlannerComputationService;FreeformHelper.Application.Services.CoordinatePlannerComputationService.MachinePoint;FreeformHelper.Application.Services.CoordinatePlannerLine;FreeformHelper.Application.Services.CoordinatePlannerLineKind;FreeformHelper.Application.Services.CoordinatePlannerPoint;FreeformHelper.Application.Services.CoordinatePlannerPointKind;FreeformHelper.Application.Services.CoordinatePlannerRectangle;FreeformHelper.Application.Services.CoordinatePlannerRectangleKind;FreeformHelper.Application.Services.CoordinatePlannerRequest;FreeformHelper.Application.Services.CoordinatePlannerSnapshot"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
