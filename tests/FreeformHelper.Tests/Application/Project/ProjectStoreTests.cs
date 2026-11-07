@@ -62,80 +62,8 @@ public sealed class ProjectStoreTests
             {
                 EmbeddedRegularVisibilityMask = new byte[] { 5, 4, 3, 2, 1 },
                 EmbeddedRegularVisibilityMaskName = "SeeRegular.csv",
-                Settings = new ProjectSettings
-                {
-                    Matching = new MatchingSettings
-                    {
-                        Mode = MatchMode.LegacyOverlap,
-                        MatchThreshold = 0.41,
-                        FreeformAxisThreshold = 0.62,
-                        EnableAutoDetectXy = true,
-                        EnableFreeformEdgeSpecialization = true,
-                        EnableCentroidFallback = false,
-                        NearestK = 9,
-                    },
-                    IndexMapping = new IndexMappingSettings
-                    {
-                        WeightIou = 1.7,
-                        WeightCentroidDistance = 0.4,
-                        WeightAreaRatio = 0.2,
-                        LowConfidenceThreshold = 0.61,
-                        AmbiguousMargin = 0.07,
-                        CandidateNumber = 25,
-                        CandidatePaddingCells = 2,
-                        DiagnosticTopK = 4,
-                        MaxSampleIssues = 120,
-                        MaxReportIssues = 4096,
-                    },
-                },
-                UiSnapshot = new ProjectUiSnapshot
-                {
-                    Matching = new UiMatchingSnapshot
-                    {
-                        MatchMode = "CAD -> Regular",
-                        MatchThreshold = 0.41,
-                        FreeformAxisThreshold = 0.62,
-                        EnableAutoDetectXy = true,
-                        EnableFreeformEdgeSpecialization = true,
-                        EnableCentroidFallback = false,
-                        NearestK = 9,
-                    },
-                    View = new UiViewSnapshot
-                    {
-                        GlobalFontSizePercent = 112,
-                        ShowNotchCanvasPreview = false,
-                        NotchPreviewVisualizationStep = 2,
-                        NotchPreviewAutoPlayEnabled = false,
-                        NotchPreviewAutoPlayIntervalMs = 900,
-                        NotchExportFileType = "Cv22",
-                        DxfLayerImagePreferredLayer = "AA_LAYER",
-                        DxfLayerImageWidthPixels = 2048,
-                        DxfLayerImageHeightPixels = 1024,
-                        DxfLayerImageLineWidthPixels = 1.6,
-                        DxfLayerImagePaddingXPixels = 80,
-                        DxfLayerImagePaddingYPixels = 120,
-                        DxfLayerImageFormat = "Jpg",
-                        DxfLayerImageUseDarkTheme = true,
-                    },
-                    Notch = new UiNotchSnapshot
-                    {
-                        EnableToFull = true,
-                        EnabledVersions = new List<string> { "V21", "V22" },
-                        LenScale = 16,
-                        NullValue = 65535,
-                        ThresholdQ7 = 32,
-                        ThresholdPercentV22 = 25.0,
-                        LinkThresholds = false,
-                    },
-                    Import = new UiImportSnapshot
-                    {
-                        OnlyClosedPolylines = true,
-                        IncludeBlockPolylines = true,
-                        LogLevel = "Debug",
-                        RegularVisibilityMaskSourcePath = @"C:\mask\SeeRegular.csv",
-                        UseRegularVisibilityMask = true,
-                    },
-                },
+                Settings = BuildMatchingAndIndexMappingSettings(),
+                UiSnapshot = BuildMatchingAndIndexMappingUiSnapshot(),
             };
 
             await store.SaveAsync(path, file, CancellationToken.None);
@@ -199,5 +127,87 @@ public sealed class ProjectStoreTests
                 File.Delete(path);
             }
         }
+    }
+
+    private static ProjectSettings BuildMatchingAndIndexMappingSettings()
+    {
+        return new ProjectSettings
+        {
+            Matching = new MatchingSettings
+            {
+                Mode = MatchMode.LegacyOverlap,
+                MatchThreshold = 0.41,
+                FreeformAxisThreshold = 0.62,
+                EnableAutoDetectXy = true,
+                EnableFreeformEdgeSpecialization = true,
+                EnableCentroidFallback = false,
+                NearestK = 9,
+            },
+            IndexMapping = new IndexMappingSettings
+            {
+                WeightIou = 1.7,
+                WeightCentroidDistance = 0.4,
+                WeightAreaRatio = 0.2,
+                LowConfidenceThreshold = 0.61,
+                AmbiguousMargin = 0.07,
+                CandidateNumber = 25,
+                CandidatePaddingCells = 2,
+                DiagnosticTopK = 4,
+                MaxSampleIssues = 120,
+                MaxReportIssues = 4096,
+            },
+        };
+    }
+
+    private static ProjectUiSnapshot BuildMatchingAndIndexMappingUiSnapshot()
+    {
+        return new ProjectUiSnapshot
+        {
+            Matching = new UiMatchingSnapshot
+            {
+                MatchMode = "CAD -> Regular",
+                MatchThreshold = 0.41,
+                FreeformAxisThreshold = 0.62,
+                EnableAutoDetectXy = true,
+                EnableFreeformEdgeSpecialization = true,
+                EnableCentroidFallback = false,
+                NearestK = 9,
+            },
+            View = new UiViewSnapshot
+            {
+                GlobalFontSizePercent = 112,
+                ShowNotchCanvasPreview = false,
+                NotchPreviewVisualizationStep = 2,
+                NotchPreviewAutoPlayEnabled = false,
+                NotchPreviewAutoPlayIntervalMs = 900,
+                NotchExportFileType = "Cv22",
+                DxfLayerImagePreferredLayer = "AA_LAYER",
+                DxfLayerImageWidthPixels = 2048,
+                DxfLayerImageHeightPixels = 1024,
+                DxfLayerImageLineWidthPixels = 1.6,
+                DxfLayerImagePaddingXPixels = 80,
+                DxfLayerImagePaddingYPixels = 120,
+                DxfLayerImageFormat = "Jpg",
+                DxfLayerImageUseDarkTheme = true,
+            },
+            Notch = new UiNotchSnapshot
+            {
+                EnableToFull = true,
+                EnabledVersions = new List<string> { "V21", "V22" },
+                LenScale = 16,
+                NullValue = 65535,
+                ThresholdQ7 = 32,
+                ThresholdPercentV22 = 25.0,
+                LinkThresholds = false,
+            },
+            Import = new UiImportSnapshot
+            {
+                OnlyClosedPolylines = true,
+                IncludeBlockPolylines = true,
+                LogLevel = "Debug",
+                RegularVisibilityMaskSourcePath = @"C:\mask\SeeRegular.csv",
+                UseRegularVisibilityMask = true,
+            },
+        };
     }
 }

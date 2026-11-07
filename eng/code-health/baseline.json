@@ -970,34 +970,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 112
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Project/ProjectFileMigrationTests.cs"
-      ],
-      "contentHash": "a4d48cf7d591cf4caf57793b5e7062feaebfd4aaca3d1f3e7b5a200f0a3c0d97",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.ProjectFileMigrationTests.Load_MigratesNullCollections()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 149
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Project/ProjectStoreTests.cs"
-      ],
-      "contentHash": "42b62955144aa4cd2dad0ab9d1e801ad2b8aa6b4fac58d6815533825da76c9e5",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.ProjectStoreTests.SaveAndLoad_RoundTripsMatchingAndIndexMappingSettings()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 115
       },
       "owner": "NFH",
