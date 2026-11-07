@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
+using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
@@ -8,6 +9,7 @@ using Xunit;
 
 namespace FreeformHelper.Tests;
 
+[Collection("HeadlessUiSerial")]
 public sealed class ManualFreeformTaggingTests
 {
     private static readonly double[] _threePadGridXEdges = [0.0, 10.0, 20.0, 30.0];
@@ -107,7 +109,7 @@ public sealed class ManualFreeformTaggingTests
         Assert.False(overrides.ContainsKey(1));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void SetFreeformNoneCommand_ClearsEarlierTagsAndRemovesTheirOverrides()
     {
         var vm = CreateViewModelWithThreeRegularPads(out var pads);
@@ -122,8 +124,10 @@ public sealed class ManualFreeformTaggingTests
         Assert.Equal(FreeformType.XWay, pads[0].Freeform);
         Assert.Equal(FreeformType.None, pads[2].Freeform);
         Assert.Equal("Freeform set to None for 1 regular pads.", vm.StatusText);
-        Assert.Single(overrides);
+        Assert.Equal(2, overrides.Count);
         Assert.Equal(FreeformType.XWay, overrides[0]);
+        Assert.Equal(FreeformType.None, overrides[2]);
+        Assert.False(overrides.ContainsKey(1));
     }
 
     [Fact]

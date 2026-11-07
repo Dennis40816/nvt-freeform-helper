@@ -27,11 +27,11 @@ public sealed class PadOverrideService
             return; // No grid, no freeform overrides to capture.
         }
 
-        // Capture non-default FreeformType assignments from regular pads.
+        // Capture non-default assignments and explicitly recorded None overrides.
         var freeform = new Dictionary<int, FreeformType>();
         foreach (var pad in grid.Pads)
         {
-            if (pad.Freeform != FreeformType.None)
+            if (ShouldCaptureFreeformOverride(file, pad))
             {
                 freeform[pad.Index] = pad.Freeform;
             }
@@ -63,5 +63,19 @@ public sealed class PadOverrideService
                 pad.Freeform = type;
             }
         }
+    }
+
+    public static void SetManualFreeformOverrides(ProjectFile file, IEnumerable<RegularPad> pads, FreeformType type)
+    {
+        foreach (var pad in pads)
+        {
+            file.FreeformOverrides[pad.Index] = type;
+        }
+    }
+
+    private static bool ShouldCaptureFreeformOverride(ProjectFile file, RegularPad pad)
+    {
+        return pad.Freeform != FreeformType.None ||
+            (file.FreeformOverrides.TryGetValue(pad.Index, out var type) && type == FreeformType.None);
     }
 }

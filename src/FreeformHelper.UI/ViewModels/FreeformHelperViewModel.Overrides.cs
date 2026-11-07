@@ -68,16 +68,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void SyncManualFreeformOverrides(IEnumerable<RegularPad> pads, FreeformType type)
     {
-        foreach (var pad in pads)
-        {
-            if (type == FreeformType.None)
-            {
-                _projectFile.FreeformOverrides.Remove(pad.Index);
-                continue;
-            }
-
-            _projectFile.FreeformOverrides[pad.Index] = type;
-        }
+        PadOverrideService.SetManualFreeformOverrides(_projectFile, pads, type);
     }
 
     /// <summary>

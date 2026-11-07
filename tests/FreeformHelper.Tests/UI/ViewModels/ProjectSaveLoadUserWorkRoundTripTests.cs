@@ -69,7 +69,7 @@ public sealed class ProjectSaveLoadUserWorkRoundTripTests
     }
 
     [AvaloniaFact]
-    public async Task SaveLoadWithReplayRedetectsManualNoneButKeepsXAndYAndXYAsync()
+    public async Task SaveLoadWithReplayPreservesManualNoneAndXAndYAndXYAsync()
     {
         using var files = new LoadingModeTestScope();
         var original = await OpenAsync(files, ("signal", 0, 0, 40, 20));
@@ -85,10 +85,51 @@ public sealed class ProjectSaveLoadUserWorkRoundTripTests
         Assert.True(await original.SaveProjectAsync(), original.StatusText);
         var loaded = await LoadFreshAsync(files);
 
-        // None removes its override today, so replay detects that pad again.
-        Assert.Equal([FreeformType.XYWay, FreeformType.XWay, FreeformType.YWay, FreeformType.XYWay],
+        Assert.Equal([FreeformType.None, FreeformType.XWay, FreeformType.YWay, FreeformType.XYWay],
             loaded.RegularPads.OrderBy(static pad => pad.Index).Select(static pad => pad.Freeform));
         Assert.Contains("Step 2 freeform restored", loaded.StatusText, StringComparison.Ordinal);
+        var nonePad = Assert.Single(loaded.RegularPads, static pad => pad.Freeform == FreeformType.None);
+        var snapshot = loaded.BuildRegularPadInspectorSnapshot(nonePad.RegularPadId,
+            includeMatchDetails: true, includeRuleTrace: true);
+        var regular = Assert.IsType<RegularPadInspectorSnapshot>(snapshot?.Regular);
+        Assert.Equal("Override", regular.FreeformSource);
+        var trace = Assert.Single(regular.RuleTrace, static entry => entry.Rule == "Freeform");
+        Assert.Contains("Source: Override", trace.Detail, StringComparison.Ordinal);
+
+        var legacy = JsonProjectStore.Load(files.PathFor("project.json"));
+        Assert.True(legacy.FreeformOverrides.Remove(nonePad.Index));
+        await new JsonProjectStore().SaveAsync(files.PathFor("project.json"), legacy, TestContext.Current.CancellationToken);
+        var legacyLoaded = await LoadFreshAsync(files);
+        Assert.Equal([FreeformType.XYWay, FreeformType.XWay, FreeformType.YWay, FreeformType.XYWay],
+            legacyLoaded.RegularPads.OrderBy(static pad => pad.Index).Select(static pad => pad.Freeform));
+    }
+
+    [AvaloniaFact]
+    public async Task SaveLoadWithoutReplayPreservesManualNoneForLaterReplayAsync()
+    {
+        using var files = new LoadingModeTestScope();
+        var original = await OpenAsync(files, ("signal", 0, 0, 40, 20));
+        original.EnableAutoDetectXy = true;
+        var padIndex = original.RegularPads.Min(static pad => pad.Index);
+        original.ApplyCanvasSelection([], [padIndex]);
+        original.SetFreeformNoneCommand.Execute(null);
+
+        Assert.True(await original.SaveProjectAsync(), original.StatusText);
+        var loaded = await LoadFreshAsync(files);
+
+        Assert.False(loaded.AutoReplayStep2AfterProjectLoad);
+        Assert.All(loaded.RegularPads, static pad => Assert.Equal(FreeformType.None, pad.Freeform));
+        var savedOverride = Assert.Single(JsonProjectStore.Load(files.PathFor("project.json")).FreeformOverrides);
+        Assert.Equal(padIndex, savedOverride.Key);
+        Assert.Equal(FreeformType.None, savedOverride.Value);
+        loaded.AutoReplayStep2AfterProjectLoad = true;
+        Assert.True(await loaded.SaveProjectAsync(), loaded.StatusText);
+
+        var replayed = await LoadFreshAsync(files);
+
+        Assert.Equal([FreeformType.None, FreeformType.XYWay, FreeformType.XYWay, FreeformType.XYWay],
+            replayed.RegularPads.OrderBy(static pad => pad.Index).Select(static pad => pad.Freeform));
+        Assert.Contains("Step 2 freeform restored", replayed.StatusText, StringComparison.Ordinal);
     }
 
     [AvaloniaFact]
