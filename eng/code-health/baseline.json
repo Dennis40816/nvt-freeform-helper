@@ -1749,16 +1749,6 @@
       "symbol": "WarningsNotAsErrors:RS0030"
     },
     {
-      "syntaxHash": "047d8df54cc83338058233045f8a201cf20a5f2e48d0a870e3df1e70c974940e",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:VSTHRD003"
-    },
-    {
       "syntaxHash": "8b7387f9dc9ede978c4d2aadcdfb0d7ac497fca46a729d49a7ce66d6b6834e57",
       "member": "MSBuild",
       "owner": "NFH",
@@ -2057,16 +2047,6 @@
       "count": 1,
       "rule": "VSTHRD002",
       "symbol": "VSTHRD002"
-    },
-    {
-      "syntaxHash": "a4ef450a867728e4de53c383b58d47fb48cf6ee294b120e73a2f0042ff492d1d",
-      "member": "FreeformHelper.Tests.ProjectLoadingInputTests.LoadPickerAwait_BlocksCommandsAndRestoresReadyAfterCancellation()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD003",
-      "symbol": "VSTHRD003"
     }
   ]
 }
