@@ -1,0 +1,35 @@
+<UserControl x:CompileBindings="True" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+    x:DataType="viewModels:SimulationWorkspaceViewModel"
+    x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspacePlaybackView">
+  <StackPanel IsVisible="{Binding IsCsvSource}" Spacing="{DynamicResource Space6}" Margin="{DynamicResource Inset8}">
+    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="{DynamicResource Space6}">
+      <Button Classes="actionGhost actionIconButton" Command="{Binding PreviousFrameCommand}" IsEnabled="{Binding CanStepFrames}" ToolTip.Tip="Previous frame (stops playback)">
+        <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+      </Button>
+      <Button Grid.Column="1" Classes="actionTextButton simulationActionButton" Classes.actionPrimary="{Binding CanPlayFrames}" Classes.actionNeutral="{Binding !CanPlayFrames}"
+          Command="{Binding TogglePlaybackCommand}" IsEnabled="{Binding CanPlayFrames}">
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}">
+          <controls:FontIcon Classes="symbols" Glyph="{Binding PlaybackButtonGlyph}"/>
+          <TextBlock Text="{Binding PlaybackButtonText}"/>
+        </StackPanel>
+      </Button>
+      <Button Grid.Column="2" Classes="actionGhost actionIconButton" Command="{Binding NextFrameCommand}" IsEnabled="{Binding CanStepFrames}" ToolTip.Tip="Next frame (stops playback)">
+        <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.ChevronRight}"/>
+      </Button>
+      <Slider Grid.Column="3" x:Name="FrameSlider" Minimum="0" Maximum="{Binding SelectedFrameSliderMaximum}" TickFrequency="1" IsSnapToTickEnabled="True"
+          Value="{Binding SelectedFrameSliderIndex, Mode=TwoWay}" IsEnabled="{Binding HasCsvData}" ToolTip.Tip="Navigate frames without stopping playback."/>
+      <TextBlock Grid.Column="4" Text="{Binding FrameSummaryText}" VerticalAlignment="Center"/>
+      <ToggleButton Grid.Column="5" Classes="actionGhost actionTextButton" Content="Loop" IsChecked="{Binding IsPlaybackLoopEnabled, Mode=TwoWay}"/>
+    </Grid>
+    <controls:HidePanelBlock Title="Playback settings" IsExpanded="False">
+      <StackPanel Classes="panelFormField">
+        <TextBlock Text="FPS"/>
+        <controls:NumberScrubber Minimum="1" Maximum="60" SmallChange="1" FormatString="0" Value="{Binding PlaybackFramesPerSecond, Mode=TwoWay}"/>
+      </StackPanel>
+    </controls:HidePanelBlock>
+  </StackPanel>
+</UserControl>
