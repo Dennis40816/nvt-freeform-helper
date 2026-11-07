@@ -37,14 +37,7 @@ public sealed class MatchingBoundedContextContractTests
         var canvas = CreateCanvas(cad.Pads, grid.Pads);
 
         var overlap = PadMatcher.Match(cad, grid);
-        var expectedRelations = new[] { (10, 0), (10, 1), (20, 0), (20, 1) };
-        Assert.Equal(expectedRelations, overlap.Links
-            .OrderBy(link => link.CadPadId).ThenBy(link => link.RegularPadId)
-            .Select(link => (link.CadPadId, link.RegularPadId)));
-        Assert.All(overlap.CadToRegular.Values, links => Assert.Equal(2, links.Count));
-        Assert.All(overlap.RegularToCad.Values, links => Assert.Equal(2, links.Count));
-        Assert.All(overlap.Links, link => Assert.True(link.OverlapArea > 0));
-        Assert.All(pads, pad => Assert.Equal(10, pad.MatchedCadPadId));
+        AssertBothCadsOverlapBothRegulars(overlap, pads);
         canvas.PadMatchLinks = overlap.Links;
         var matchState = CapturePadState(pads);
         var linksBeforeAudit = overlap.Links.ToArray();
@@ -130,6 +123,18 @@ public sealed class MatchingBoundedContextContractTests
         canvas.ShowRegular = false;
         Assert.Equal(("None", 0), HitTest(canvas, new Point2(3, 3)));
         Assert.Equal(matchState, CapturePadState(pads));
+    }
+
+    private static void AssertBothCadsOverlapBothRegulars(PadMatchResult overlap, IEnumerable<RegularPad> pads)
+    {
+        var expectedRelations = new[] { (10, 0), (10, 1), (20, 0), (20, 1) };
+        Assert.Equal(expectedRelations, overlap.Links
+            .OrderBy(link => link.CadPadId).ThenBy(link => link.RegularPadId)
+            .Select(link => (link.CadPadId, link.RegularPadId)));
+        Assert.All(overlap.CadToRegular.Values, links => Assert.Equal(2, links.Count));
+        Assert.All(overlap.RegularToCad.Values, links => Assert.Equal(2, links.Count));
+        Assert.All(overlap.Links, link => Assert.True(link.OverlapArea > 0));
+        Assert.All(pads, pad => Assert.Equal(10, pad.MatchedCadPadId));
     }
 
     private static void AssertHitPolicy(PadCanvas canvas)
