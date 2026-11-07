@@ -1264,13 +1264,13 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 2404
+        "fileLines": 2395
       },
       "owner": "NFH",
       "locations": [
         "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs"
       ],
-      "contentHash": "187661540e25c50a479723b272670ecd029e580421c9b53f78797e362a8afdf2",
+      "contentHash": "7f9cd894e6f6d97642c6c9e54dbceb0e257b82523eb64e665026a7424353896e",
       "project": "FreeformHelper.Tests",
       "symbol": "file:FreeformHelper.Tests.NotchTableGeneratorTests;FreeformHelper.Tests.NotchTableGeneratorTests.CallbackProgress`1;FreeformHelper.Tests.NotchTableGeneratorTests.SnapshotOnlySet"
     },
@@ -1278,7 +1278,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 110
+        "methodLines": 107
       },
       "owner": "NFH",
       "locations": [
