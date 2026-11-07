@@ -21,7 +21,7 @@ public sealed class ProjectLoadingInputTests
     public async Task LoadPickerAwait_BlocksCommandsAndRestoresReadyAfterCancellation()
     {
         var release = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var vm = new FreeformHelperViewModel { PickLoadProjectPathAsync = () => release.Task };
+        var vm = new FreeformHelperViewModel { PickLoadProjectPathAsync = () => release.Task.WaitAsync(TestContext.Current.CancellationToken) };
         var load = vm.LoadProjectCommand.ExecuteAsync(null);
         try
         {
