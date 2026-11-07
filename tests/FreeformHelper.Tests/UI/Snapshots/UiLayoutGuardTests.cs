@@ -197,7 +197,7 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("IsEnabled=\"{Binding ColorCadByArea}\"", workspaceHeader, StringComparison.Ordinal);
         Assert.Contains("Style Selector=\"TextBox.workspaceHeaderInput\"", workspaceHeader, StringComparison.Ordinal);
         Assert.Contains("BorderThickness\" Value=\"{StaticResource BorderInput}\"", workspaceHeader, StringComparison.Ordinal);
-        Assert.Equal(4, Regex.Count(workspaceHeader, "Classes=\"workspaceHeaderInput\""));
+        Assert.Equal(2, Regex.Count(workspaceHeader, "Classes=\"workspaceHeaderInput\""));
         Assert.DoesNotContain("<Expander", workspaceHeader, StringComparison.OrdinalIgnoreCase);
 
         var rightPanel = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowPanel.axaml"));

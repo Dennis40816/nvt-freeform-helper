@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Domain.Pads;
 
@@ -92,7 +93,13 @@ public sealed partial class FreeformHelperViewModel
     /// Gets whether the top-strip pad inspector summary is visible.
     /// </summary>
     public bool HasPadInspectorSummary => PadInspectorDisplay.HasSummary;
-    public bool HasNoPadInspectorSummary => !HasPadInspectorSummary;
+    public bool HasNoPadInspectorSummary => !HasPadInspectorSummary && !HasPadInspectorMultiSelection;
+    public bool HasPadInspectorMultiSelection => SelectedPadCount > 1;
+    public string PadInspectorSelectionSummaryText => HasPadInspectorMultiSelection
+        ? string.Create(CultureInfo.InvariantCulture, $"{SelectedPadCount} pads selected")
+        : string.Empty;
+
+    private int SelectedPadCount => _selectedCadIds.Count + _selection.RegularIndices.Count;
 
     /// <summary>
     /// Gets or sets whether right panel is currently on Settings tab.

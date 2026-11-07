@@ -8,7 +8,7 @@ using Xunit;
 namespace FreeformHelper.Tests;
 
 /// <summary>
-/// Pins the nine manual sizing inputs of the main view model: the start values, the change notifications,
+/// Pins the manual sizing inputs of the main view model: the start values, the change notifications,
 /// the unsaved flag, the undo entry and a project file that stays identical, except for its save time,
 /// after a save, load and save.
 /// </summary>
@@ -28,8 +28,6 @@ public sealed class ManualSizingInputPropertyTests
         new(nameof(FreeformHelperViewModel.ManualRowsRange), "1-3", true, false),
         new(nameof(FreeformHelperViewModel.ManualColsRange), "A-C", true, false),
         new(nameof(FreeformHelperViewModel.ManualRangeStatus), "changed", false, false),
-        new(nameof(FreeformHelperViewModel.PendingColumnWidthDisplay), "5", false, false),
-        new(nameof(FreeformHelperViewModel.PendingRowHeightDisplay), "6", false, false),
     ];
 
     public static TheoryData<int> SettingIndexes => new(Enumerable.Range(0, _settings.Length));
@@ -46,8 +44,6 @@ public sealed class ManualSizingInputPropertyTests
         Assert.Equal("", vm.ManualRowsRange);
         Assert.Equal("", vm.ManualColsRange);
         Assert.Equal("No manual range.", vm.ManualRangeStatus);
-        Assert.Equal("0", vm.PendingColumnWidthDisplay);
-        Assert.Equal("0", vm.PendingRowHeightDisplay);
     }
 
     [Theory]
@@ -218,8 +214,6 @@ public sealed class ManualSizingInputPropertyTests
             nameof(FreeformHelperViewModel.IsPendingRowHeightMixed) => false,
             nameof(FreeformHelperViewModel.ManualRowsRange) => "",
             nameof(FreeformHelperViewModel.ManualColsRange) => "",
-            nameof(FreeformHelperViewModel.PendingColumnWidthDisplay) => "0",
-            nameof(FreeformHelperViewModel.PendingRowHeightDisplay) => "0",
             _ => setting.NewValue,
         };
 

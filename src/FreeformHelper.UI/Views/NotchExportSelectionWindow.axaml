@@ -85,10 +85,10 @@
           <Button Classes="actionChip chipAction outgoing"
                   Classes.active="{Binding IsFilterWarningOnly}"
                   Margin="{StaticResource InsetRight6Bottom6}"
-                  Content="{Binding WarningRowCount, StringFormat='Warning {0}'}"
+                  Content="{Binding WarningRowCount, StringFormat='No-op {0}'}"
                   Command="{Binding SetViewFilterModeCommand}"
                   CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.WarningOnly}"
-                  ToolTip.Tip="Show warning rows only. Click again to clear."/>
+                  ToolTip.Tip="Show no-op rows only. Click again to clear."/>
           <Button Classes="actionChip chipAction nocad"
                   Classes.active="{Binding IsFilterNoCadOnly}"
                   Margin="{StaticResource InsetRight6Bottom6}"
@@ -286,7 +286,7 @@
                               Margin="{StaticResource InsetRight6Bottom6}"
                               IsVisible="{Binding SelectedRow.IsStatusWarning}">
                         <SelectableTextBlock Classes="validationRowKindText"
-                                             Text="Warning"/>
+                                             Text="No-op"/>
                       </Border>
                       <Border Classes="validationRowKindTag nocad workspaceContextBadge"
                               Margin="{StaticResource InsetRight6Bottom6}"

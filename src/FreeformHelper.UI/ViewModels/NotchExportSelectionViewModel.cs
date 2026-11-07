@@ -89,7 +89,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
             new NotchExportRowDisplayModeOption(NotchExportRowDisplayMode.TransferOnly, "Transfer-only"),
             new NotchExportRowDisplayModeOption(NotchExportRowDisplayMode.AllRows, "All"),
             new NotchExportRowDisplayModeOption(NotchExportRowDisplayMode.LinkedOnly, "Linked"),
-            new NotchExportRowDisplayModeOption(NotchExportRowDisplayMode.WarningOnly, "Warning"),
+            new NotchExportRowDisplayModeOption(NotchExportRowDisplayMode.WarningOnly, "No-op"),
             new NotchExportRowDisplayModeOption(NotchExportRowDisplayMode.NoCadOnly, "No CAD"),
             new NotchExportRowDisplayModeOption(NotchExportRowDisplayMode.LegacyOnly, "Legacy"),
         };
