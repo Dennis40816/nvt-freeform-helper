@@ -367,7 +367,7 @@ public sealed class UiLayoutGuardTests
         Assert.Contains("IsEnabled=\"{Binding CanControlNotchPreviewStage}\"", step3View, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding NotchPreviewSeedLayerStateText}\"", step3View, StringComparison.Ordinal);
         Assert.Contains("ToolTip.Tip=\"{Binding NotchTargetCoverageCapHelpText}\"", step3View, StringComparison.Ordinal);
-        Assert.Contains("Tip=\"{Binding NotchTargetCoverageCapHelpText}\"", settingsStep3Section, StringComparison.Ordinal);
+        Assert.DoesNotContain("Tip=\"{Binding NotchTargetCoverageCapHelpText}\"", settingsStep3Section, StringComparison.Ordinal);
         Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", step3View, StringComparison.Ordinal);
         Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", settingsStep3Section, StringComparison.Ordinal);
 
