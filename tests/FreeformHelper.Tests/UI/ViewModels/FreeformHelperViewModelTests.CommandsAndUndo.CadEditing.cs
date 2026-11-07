@@ -251,7 +251,7 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.False(vm.AreNoCadLayersSelected);
         Assert.True(vm.AreSomeCadLayersSelected);
         Assert.False(vm.IsCadLayerBulkToggleChecked);
-        Assert.Equal("All off", vm.CadLayerBulkToggleText);
+        Assert.Equal("Partly on", vm.CadLayerBulkToggleText);
 
         vm.IsCadLayerBulkToggleChecked = true;
 

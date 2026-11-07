@@ -40,8 +40,8 @@ public partial class CanvasOverlayControls : UserControl
     public CanvasOverlayControls()
     {
         InitializeComponent();
-        CanvasLeftOverlay.GetObservable(BoundsProperty)
-            .Subscribe(bounds => TopToolbarInset = CanvasLeftOverlay.Margin.Top + bounds.Height);
+        CanvasToolbar.GetObservable(BoundsProperty)
+            .Subscribe(bounds => TopToolbarInset = CanvasToolbar.Margin.Top + bounds.Height);
     }
 
     private void ShowLeftPanelButton_Click(object? sender, RoutedEventArgs e)

@@ -75,7 +75,7 @@ public sealed class WorkflowPipelineServiceTests
     [Theory]
     [InlineData(WorkflowStepId.Step1Match, WorkflowStepId.Step2Freeform)]
     [InlineData(WorkflowStepId.Step2Freeform, WorkflowStepId.Step3NotchPreview)]
-    [InlineData(WorkflowStepId.Step3NotchPreview, WorkflowStepId.Step4IndexDiagnostics)]
+    [InlineData(WorkflowStepId.Step3NotchPreview, WorkflowStepId.Step5Export)]
     [InlineData(WorkflowStepId.Step4IndexDiagnostics, WorkflowStepId.Step5Export)]
     public void TryGetNextStepOnSuccess_ForSupportedSteps_ReturnsExpectedNext(
         WorkflowStepId step,
