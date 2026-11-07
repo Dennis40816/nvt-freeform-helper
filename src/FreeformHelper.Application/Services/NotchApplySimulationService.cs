@@ -36,8 +36,8 @@ public static class NotchApplySimulationService
         var diffIdentityContract = BuildDiffIdentityContract(diffBaseline);
         AppendDuplicateDiffDiagnostics(diffBaseline, diagnostics);
         var beforeByDiff = diffBaseline.ValueByDiffKey;
-        IReadOnlyDictionary<NotchDiffKey, double> effectiveBeforeByDiff = beforeByDiff;
-        var afterByDiff = new Dictionary<NotchDiffKey, double>(beforeByDiff);
+        IReadOnlyDictionary<NotchDiffKey, double> effectiveBeforeByDiff;
+        Dictionary<NotchDiffKey, double> afterByDiff;
         var actions = new List<NotchApplySimulationAction>();
 
         if (request.Version == NotchAlgorithmVersion.V21)
@@ -60,29 +60,10 @@ public static class NotchApplySimulationService
         }
         else if (request.Version == NotchAlgorithmVersion.V22)
         {
-            var firmwareProjection = NotchV22FirmwareProjector.Project(
-                request.Table.Rows,
-                request.NullDiffValue,
-                ResolveIcCount(request));
-            var firmwareBeforeByDiff = beforeByDiff.ToDictionary(
-                static item => item.Key,
-                static item => NotchV21FirmwareEvaluator.QuantizeToFirmwareInt16(item.Value));
-            var firmwareAfterByDiff = new Dictionary<NotchDiffKey, short>(firmwareBeforeByDiff);
-            var firmwareEvaluations = ApplyV22FirmwareRows(
-                firmwareProjection.NodesByIc,
-                firmwareBeforeByDiff,
-                firmwareAfterByDiff);
-            effectiveBeforeByDiff = firmwareBeforeByDiff.ToDictionary(
-                static item => item.Key,
-                static item => (double)item.Value);
-            afterByDiff = firmwareAfterByDiff.ToDictionary(
-                static item => item.Key,
-                static item => (double)item.Value);
-            actions.AddRange(BuildV22Actions(
-                firmwareProjection.SourceRows,
-                firmwareEvaluations,
-                firmwareBeforeByDiff,
-                diagnostics));
+            var firmwareSimulation = EvaluateV22Simulation(request, beforeByDiff, diagnostics);
+            effectiveBeforeByDiff = firmwareSimulation.BeforeByDiff;
+            afterByDiff = firmwareSimulation.AfterByDiff;
+            actions.AddRange(firmwareSimulation.Actions);
         }
         else
         {
@@ -94,51 +75,14 @@ public static class NotchApplySimulationService
                 diagnostics.ToArray());
         }
 
-        var cells = request.Grid.Pads
-            .OrderBy(static pad => pad.Row)
-            .ThenBy(static pad => pad.Col)
-            .Select(pad =>
-            {
-                var isActiveSurfacePad = request.ActiveRegularPadIds.Contains(pad.RegularPadId);
-                var diffKey = new NotchDiffKey(pad.IcIndex, pad.DiffIndex);
-                var beforeValue = !isActiveSurfacePad
-                    ? 0d
-                    : effectiveBeforeByDiff.GetValueOrDefault(diffKey);
-                var afterValue = afterByDiff.GetValueOrDefault(diffKey, beforeValue);
-                return new NotchApplySimulationDiffCell(
-                    pad.RegularPadId,
-                    pad.Row,
-                    pad.Col,
-                    pad.IcIndex,
-                    pad.DiffIndex,
-                    beforeValue,
-                    afterValue);
-            })
-            .ToList();
-
-        var histograms = BuildHistograms(cells);
-        var heatmap = BuildHeatmap(request.Grid, cells);
-        var contractText = request.Version switch
-        {
-            NotchAlgorithmVersion.V22 => "V2.2 diff-centric apply",
-            NotchAlgorithmVersion.V21 when request.ComputationMode == NotchComputationMode.LegacyRegularAnchor =>
-                "V2.1 legacy firmware apply",
-            NotchAlgorithmVersion.V21 => "V2.1 projected apply (v2.2 canonical)",
-            _ => string.Empty,
-        };
-
-        return new NotchApplySimulationResult(
-            IsSupported: true,
-            Diagnostics: diagnostics,
-            Version: request.Version,
-            ContractText: contractText,
-            AggregationMode: request.AggregationMode,
-            ConsumedFrameCount: selectedFrames.Count,
-            Cells: cells,
-            Actions: actions,
-            DiffIdentityContract: diffIdentityContract,
-            Histograms: histograms,
-            Heatmap: heatmap);
+        return BuildSimulationResult(
+            request,
+            selectedFrames,
+            diagnostics,
+            effectiveBeforeByDiff,
+            afterByDiff,
+            actions,
+            diffIdentityContract);
     }
 
     private static int ResolveIcCount(NotchApplySimulationRequest request)
@@ -359,47 +303,14 @@ public static class NotchApplySimulationService
                     $"Source retained percent below zero for IC{first.IcIndex + 1}/diff{first.SourceDiffIndex}; clamped to zero.");
             }
 
-            var projectedLegs = evaluatedRows
-                .SelectMany(static evaluation => evaluation.Targets)
-                .GroupBy(static target => target.TargetDiffIndex)
-                .Select(groupedTargets =>
-                {
-                    short delta = 0;
-                    foreach (var target in groupedTargets)
-                    {
-                        delta = AddV22FirmwareValue(delta, target.DeltaValue);
-                    }
-
-                    return (
-                        Leg: new NotchApplySimulationLeg(
-                            groupedTargets.Key,
-                            groupedTargets.Sum(static target => target.RatioPercent),
-                            delta),
-                        TargetFound: groupedTargets.All(static target => target.TargetFound));
-                })
-                .Where(static item => item.Leg.RatioPercent != 0 || Math.Abs(item.Leg.DeltaValue) > 1e-9)
-                .OrderByDescending(static item => Math.Abs(item.Leg.RatioPercent))
-                .ThenBy(static item => item.Leg.TargetDiffIndex)
-                .ToList();
-
-            foreach (var projectedLeg in projectedLegs.Where(static item => !item.TargetFound))
-            {
-                diagnostics.Add(
-                    $"Missing target diff IC{first.IcIndex + 1}/diff{projectedLeg.Leg.TargetDiffIndex} in projected grid.");
-            }
-
-            actions.Add(new NotchApplySimulationAction(
-                NotchAlgorithmVersion.V22,
-                first.IcIndex,
-                first.SourceDiffIndex,
-                first.RegularPadId,
-                first.CadPadId,
-                evaluatedRows.Select(static evaluation => evaluation.Row.SourceOrdinal).ToArray(),
+            actions.Add(BuildV22Action(
+                evaluatedRows,
+                first,
                 combinePercent,
                 sourceRetainedPercent,
                 sourceBefore,
                 sourceAfter,
-                projectedLegs.Select(static item => item.Leg).ToList()));
+                diagnostics));
         }
 
         return actions;
@@ -628,5 +539,147 @@ public static class NotchApplySimulationService
         int RatioPercent,
         short DeltaValue,
         bool TargetFound);
+
+    private static (
+        IReadOnlyDictionary<NotchDiffKey, double> BeforeByDiff,
+        Dictionary<NotchDiffKey, double> AfterByDiff,
+        List<NotchApplySimulationAction> Actions) EvaluateV22Simulation(
+        NotchApplySimulationRequest request,
+        IReadOnlyDictionary<NotchDiffKey, double> beforeByDiff,
+        List<string> diagnostics)
+    {
+        var firmwareProjection = NotchV22FirmwareProjector.Project(
+            request.Table.Rows,
+            request.NullDiffValue,
+            ResolveIcCount(request));
+        var firmwareBeforeByDiff = beforeByDiff.ToDictionary(
+            static item => item.Key,
+            static item => NotchV21FirmwareEvaluator.QuantizeToFirmwareInt16(item.Value));
+        var firmwareAfterByDiff = new Dictionary<NotchDiffKey, short>(firmwareBeforeByDiff);
+        var firmwareEvaluations = ApplyV22FirmwareRows(
+            firmwareProjection.NodesByIc,
+            firmwareBeforeByDiff,
+            firmwareAfterByDiff);
+        IReadOnlyDictionary<NotchDiffKey, double> effectiveBeforeByDiff = firmwareBeforeByDiff.ToDictionary(
+            static item => item.Key,
+            static item => (double)item.Value);
+        var afterByDiff = firmwareAfterByDiff.ToDictionary(
+            static item => item.Key,
+            static item => (double)item.Value);
+        var actions = BuildV22Actions(
+            firmwareProjection.SourceRows,
+            firmwareEvaluations,
+            firmwareBeforeByDiff,
+            diagnostics);
+        return (effectiveBeforeByDiff, afterByDiff, actions);
+    }
+
+    private static NotchApplySimulationResult BuildSimulationResult(
+        NotchApplySimulationRequest request,
+        IReadOnlyList<DiffFrameGridProjectionResult> selectedFrames,
+        List<string> diagnostics,
+        IReadOnlyDictionary<NotchDiffKey, double> effectiveBeforeByDiff,
+        Dictionary<NotchDiffKey, double> afterByDiff,
+        List<NotchApplySimulationAction> actions,
+        NotchApplySimulationDiffIdentityContract diffIdentityContract)
+    {
+        var cells = request.Grid.Pads
+            .OrderBy(static pad => pad.Row)
+            .ThenBy(static pad => pad.Col)
+            .Select(pad =>
+            {
+                var isActiveSurfacePad = request.ActiveRegularPadIds.Contains(pad.RegularPadId);
+                var diffKey = new NotchDiffKey(pad.IcIndex, pad.DiffIndex);
+                var beforeValue = !isActiveSurfacePad
+                    ? 0d
+                    : effectiveBeforeByDiff.GetValueOrDefault(diffKey);
+                var afterValue = afterByDiff.GetValueOrDefault(diffKey, beforeValue);
+                return new NotchApplySimulationDiffCell(
+                    pad.RegularPadId,
+                    pad.Row,
+                    pad.Col,
+                    pad.IcIndex,
+                    pad.DiffIndex,
+                    beforeValue,
+                    afterValue);
+            })
+            .ToList();
+
+        var histograms = BuildHistograms(cells);
+        var heatmap = BuildHeatmap(request.Grid, cells);
+        var contractText = request.Version switch
+        {
+            NotchAlgorithmVersion.V22 => "V2.2 diff-centric apply",
+            NotchAlgorithmVersion.V21 when request.ComputationMode == NotchComputationMode.LegacyRegularAnchor =>
+                "V2.1 legacy firmware apply",
+            NotchAlgorithmVersion.V21 => "V2.1 projected apply (v2.2 canonical)",
+            _ => string.Empty,
+        };
+
+        return new NotchApplySimulationResult(
+            IsSupported: true,
+            Diagnostics: diagnostics,
+            Version: request.Version,
+            ContractText: contractText,
+            AggregationMode: request.AggregationMode,
+            ConsumedFrameCount: selectedFrames.Count,
+            Cells: cells,
+            Actions: actions,
+            DiffIdentityContract: diffIdentityContract,
+            Histograms: histograms,
+            Heatmap: heatmap);
+    }
+
+    private static NotchApplySimulationAction BuildV22Action(
+        List<V22FirmwareRowEvaluation> evaluatedRows,
+        NotchV22FirmwareRow first,
+        int combinePercent,
+        int sourceRetainedPercent,
+        short sourceBefore,
+        short sourceAfter,
+        List<string> diagnostics)
+    {
+        var projectedLegs = evaluatedRows
+            .SelectMany(static evaluation => evaluation.Targets)
+            .GroupBy(static target => target.TargetDiffIndex)
+            .Select(groupedTargets =>
+            {
+                short delta = 0;
+                foreach (var target in groupedTargets)
+                {
+                    delta = AddV22FirmwareValue(delta, target.DeltaValue);
+                }
+
+                return (
+                    Leg: new NotchApplySimulationLeg(
+                        groupedTargets.Key,
+                        groupedTargets.Sum(static target => target.RatioPercent),
+                        delta),
+                    TargetFound: groupedTargets.All(static target => target.TargetFound));
+            })
+            .Where(static item => item.Leg.RatioPercent != 0 || Math.Abs(item.Leg.DeltaValue) > 1e-9)
+            .OrderByDescending(static item => Math.Abs(item.Leg.RatioPercent))
+            .ThenBy(static item => item.Leg.TargetDiffIndex)
+            .ToList();
+
+        foreach (var projectedLeg in projectedLegs.Where(static item => !item.TargetFound))
+        {
+            diagnostics.Add(
+                $"Missing target diff IC{first.IcIndex + 1}/diff{projectedLeg.Leg.TargetDiffIndex} in projected grid.");
+        }
+
+        return new NotchApplySimulationAction(
+            NotchAlgorithmVersion.V22,
+            first.IcIndex,
+            first.SourceDiffIndex,
+            first.RegularPadId,
+            first.CadPadId,
+            evaluatedRows.Select(static evaluation => evaluation.Row.SourceOrdinal).ToArray(),
+            combinePercent,
+            sourceRetainedPercent,
+            sourceBefore,
+            sourceAfter,
+            projectedLegs.Select(static item => item.Leg).ToList());
+    }
 }
 

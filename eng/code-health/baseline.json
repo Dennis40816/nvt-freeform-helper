@@ -96,34 +96,6 @@
       "symbol": "FreeformHelper.Application.Services.V21NotchAlgorithm.FillAxis(NotchAxisGeometryContext,CadPad?,int,NotchAxisNeighborContext,int,int[])"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 132
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/NotchApplySimulationService.cs"
-      ],
-      "contentHash": "9543a5c5e5644478f42048cdd615c6fb0a1964fbc18139b23f075ff62ca95843",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.NotchApplySimulationService.Simulate(NotchApplySimulationRequest)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 100
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/NotchApplySimulationService.cs"
-      ],
-      "contentHash": "2ca71d44f0dd773a629debde73f91b1f70fc13c934e0c71aa589342c3bc59b19",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.NotchApplySimulationService.BuildV22Actions(IReadOnlyList<NotchV22FirmwareRow>,IReadOnlyDictionary<int, V22FirmwareRowEvaluation>,Dictionary<NotchDiffKey, short>,List<string>)"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
