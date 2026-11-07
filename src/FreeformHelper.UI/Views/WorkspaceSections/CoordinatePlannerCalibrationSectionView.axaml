@@ -1,0 +1,101 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerCalibrationSectionView"
+             x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
+             x:CompileBindings="True">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
+  </UserControl.Styles>
+  <panels:CollapsiblePanel Title="Calibration" IsExpanded="{Binding ShowCalibrationDetails, Mode=TwoWay}">
+    <panels:CollapsiblePanel.HeaderRight>
+      <TextBlock Text="{Binding MachineSummaryText}"
+                 IsVisible="{Binding !ShowCalibrationDetails}"
+                 MaxWidth="{DynamicResource CoordinateCalibrationSummaryMaxWidth}"
+                 ToolTip.Tip="{Binding MachineSummaryText}"
+                 TextTrimming="CharacterEllipsis"/>
+    </panels:CollapsiblePanel.HeaderRight>
+    <StackPanel Spacing="{DynamicResource Space8}">
+      <Grid ColumnDefinitions="*,*">
+        <StackPanel Classes="panelFormField left">
+          <TextBlock Text="Origin X (mm)"/>
+          <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                   Maximum="{DynamicResource NumericInputMaximum}"
+                                   SmallChange="0.1"
+                                   FormatString="0.###"
+                                   SnapToStep="False"
+                                   Value="{Binding MachineOriginX, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Classes="panelFormField right">
+          <TextBlock Text="Origin Y (mm)"/>
+          <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                   Maximum="{DynamicResource NumericInputMaximum}"
+                                   SmallChange="0.1"
+                                   FormatString="0.###"
+                                   SnapToStep="False"
+                                   Value="{Binding MachineOriginY, Mode=TwoWay}"/>
+        </StackPanel>
+      </Grid>
+      <Grid ColumnDefinitions="*,*">
+        <StackPanel Classes="panelFormField left">
+          <TextBlock Text="AA width (mm)"/>
+          <controls:NumberScrubber Minimum="0.001"
+                                   Maximum="{DynamicResource NumericInputMaximum}"
+                                   SmallChange="0.1"
+                                   FormatString="0.###"
+                                   SnapToStep="False"
+                                   Value="{Binding MachineWidth, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Classes="panelFormField right">
+          <TextBlock Text="AA height (mm)"/>
+          <controls:NumberScrubber Minimum="0.001"
+                                   Maximum="{DynamicResource NumericInputMaximum}"
+                                   SmallChange="0.1"
+                                   FormatString="0.###"
+                                   SnapToStep="False"
+                                   Value="{Binding MachineHeight, Mode=TwoWay}"/>
+        </StackPanel>
+      </Grid>
+      <Grid ColumnDefinitions="*,*">
+        <StackPanel Classes="panelFormField left">
+          <TextBlock Text="Pixel X"/>
+          <controls:NumberScrubber Minimum="1"
+                                   Maximum="100000"
+                                   SmallChange="1"
+                                   FormatString="0"
+                                   Value="{Binding PixelWidth, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Classes="panelFormField right">
+          <TextBlock Text="Pixel Y"/>
+          <controls:NumberScrubber Minimum="1"
+                                   Maximum="100000"
+                                   SmallChange="1"
+                                   FormatString="0"
+                                   Value="{Binding PixelHeight, Mode=TwoWay}"/>
+        </StackPanel>
+      </Grid>
+      <StackPanel Classes="panelFormField">
+        <TextBlock Text="Copper pillar dia (mm)"/>
+        <controls:NumberScrubber Minimum="0"
+                                 Maximum="{DynamicResource NumericInputMaximum}"
+                                 SmallChange="0.01"
+                                 FormatString="0.###"
+                                 SnapToStep="False"
+                                 Value="{Binding CopperPillarDiameter, Mode=TwoWay}"/>
+      </StackPanel>
+      <TextBlock Text="{Binding SafeCoordinatePolicyText}" Classes="workspaceSectionMeta" TextWrapping="Wrap"/>
+      <TextBlock Text="{x:Static vm:CoordinatePlannerWorkspaceViewModel.SyncConsequenceText}" TextWrapping="Wrap" HorizontalAlignment="Left"/>
+      <TextBlock Text="If the source changed, use Refresh at the top to load the latest workspace."
+                 Classes="workspaceSectionMeta"
+                 TextWrapping="Wrap"/>
+      <Button Content="Sync"
+              Classes="actionNeutral actionTextButton"
+              HorizontalAlignment="Right"
+              Command="{Binding SyncFromWorkspaceCommand}"
+              ToolTip.Tip="{x:Static vm:CoordinatePlannerWorkspaceViewModel.SyncConsequenceText}"/>
+    </StackPanel>
+  </panels:CollapsiblePanel>
+</UserControl>
