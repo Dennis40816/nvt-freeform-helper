@@ -2,62 +2,31 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep1View">
-    <controls:HidePanelBlock x:Name="Step1Block"
-                             Title="Step 1 · Geometry match"
+    <panels:CollapsiblePanel x:Name="Step1Block" Title="Step 1 · Geometry match"
                              IsExpanded="{Binding IsStep1Expanded, Mode=TwoWay}">
+      <panels:CollapsiblePanel.HeaderRight>
+        <Button Tag="Step1GeometryMatch"
+                Classes="actionIconButton actionGhost workflowStepAction" Click="OpenSettingsButton_Click"
+                ToolTip.Tip="Open Settings at Step 1 section.">
+          <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+        </Button>
+      </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
-        <Grid ColumnDefinitions="*,Auto,Auto">
-          <SelectableTextBlock Grid.Column="0"
-                               Classes="stepNote"
-                               Text="Run overlap first, then tune unmatched TH for diagnostics visibility only."/>
-          <Button Grid.Column="1"
-                  Tag="Step1GeometryMatch"
-                  Classes="actionIconButton actionGhost workflowStepAction"
-                  Margin="{StaticResource InsetLeft10}"
-                  Click="OpenSettingsButton_Click"
-                  ToolTip.Tip="Open Settings at Step 1 section.">
-            <controls:FontIcon Classes="symbols iconSm"
-                               Glyph="{x:Static icons:IconGlyphs.Settings}"/>
-          </Button>
-          <Button Grid.Column="2"
-                  Classes="actionIconButton actionGhost workflowStepAction"
-                  Margin="{StaticResource InsetLeft10}"
-                  Command="{Binding ClearStep1ResultCommand}"
-                  ToolTip.Tip="Clear Step 1 result and all downstream results.">
-            <controls:FontIcon Classes="symbols iconSm"
-                               Glyph="{x:Static icons:IconGlyphs.Delete}"/>
-          </Button>
-        </Grid>
-        <Button Content="Match overlaps"
-                Command="{Binding MatchCommand}"
-                HorizontalAlignment="Stretch"
-                ToolTip.Tip="Step 1: build CAD↔Regular overlap links."/>
-        <ProgressBar Minimum="0"
-                     Maximum="1"
-                     Value="{Binding MatchProgress}"
-                     IsVisible="{Binding IsMatchingPads}"
-                     Height="{StaticResource Space6}"/>
-        <Border Classes="workflowStepStatusStrip">
+        <SelectableTextBlock Classes="stepNote" Text="{Binding WorkspaceMatchSummary}" TextWrapping="Wrap"/>
+        <SelectableTextBlock Classes="stepNote" Text="The threshold changes diagnostic visibility only."/>
+        <ProgressBar Minimum="0" Maximum="1" Value="{Binding MatchProgress}"
+                     IsVisible="{Binding IsMatchingPads}" Height="{StaticResource Space6}"/>
+        <SelectableTextBlock Text="{Binding MatchThreshold, StringFormat='Diagnostic threshold: {0:0.####}'}"/>
+        <panels:CollapsiblePanel Title="Regular Visibility Mask" IsExpanded="False">
+          <panels:CollapsiblePanel.HeaderRight>
+            <SelectableTextBlock Classes="stepNote" Text="{Binding RegularVisibilityMaskUi.Summary}"
+                                 MaxWidth="{DynamicResource WorkspaceCompactStatusMaxWidth}" TextTrimming="CharacterEllipsis"
+                                 TextWrapping="NoWrap"
+                                 ToolTip.Tip="{Binding RegularVisibilityMaskUi.Summary}"/>
+          </panels:CollapsiblePanel.HeaderRight>
           <StackPanel Spacing="{StaticResource Space6}">
-            <Border Classes="workflowStepMetricTile">
-              <StackPanel Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Classes="workflowStepMetricLabel"
-                                     Text="Unmatched diagnostics threshold"/>
-                <SelectableTextBlock Classes="workflowStepMetricText"
-                                     Text="{Binding MatchThreshold, StringFormat='{}{0:0.####} · diagnostics only; does not change links'}"/>
-              </StackPanel>
-            </Border>
-            <Border Classes="workflowStepMetricTile">
-              <StackPanel Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Classes="workflowStepMetricLabel"
-                                     Text="Regular Visibility Mask"/>
-                <SelectableTextBlock Classes="workflowStepMetricText"
-                                     Text="{Binding RegularVisibilityMaskUi.Summary}"/>
-              </StackPanel>
-            </Border>
-          </StackPanel>
-        </Border>
         <StackPanel Classes="panelFormField">
           <Grid ColumnDefinitions="*,Auto"
                 ColumnSpacing="{StaticResource Space10}">
@@ -86,7 +55,13 @@
                     ToolTip.Tip="Remove the imported regular visibility mask and return to pure geometry seed."/>
           </Grid>
         </StackPanel>
+          </StackPanel>
+        </panels:CollapsiblePanel>
+        <Separator/>
+        <SelectableTextBlock Classes="stepNote" Text="Clears matching and invalidates Steps 2 to 5 and validation." TextWrapping="Wrap"/>
+        <Button Classes="actionTextButton actionDanger" Content="Clear result"
+                HorizontalAlignment="Right" Command="{Binding ClearStep1ResultCommand}"
+                ToolTip.Tip="Clears matching and invalidates Steps 2 to 5 and validation."/>
       </StackPanel>
-    </controls:HidePanelBlock>
+    </panels:CollapsiblePanel>
 </UserControl>
-

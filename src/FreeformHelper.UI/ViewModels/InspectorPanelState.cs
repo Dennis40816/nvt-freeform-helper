@@ -1,3 +1,4 @@
+
 namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
@@ -8,11 +9,13 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 /// <param name="QuickFocusQueryText">The unified quick-focus query used by the Inspector panel. Examples: CAD 4809, REG 4616, DIFF 72, IC1 DIFF72.</param>
 /// <param name="IsRightPanelSettingsTab">Whether right panel is currently on Settings tab.</param>
+/// <param name="WorkStep">The current main workspace action, retained when its section is collapsed.</param>
 /// <param name="IsPadInspectorRawTraceExpanded">Whether Debug raw section in inspector rule trace is expanded.</param>
 public sealed record InspectorPanelState(
     string QuickFocusQueryText,
     bool IsRightPanelSettingsTab,
-    bool IsPadInspectorRawTraceExpanded)
+    bool IsPadInspectorRawTraceExpanded,
+    WorkspaceWorkStep WorkStep = WorkspaceWorkStep.Step1Match)
 {
     /// <summary>
     /// Gets the value of a new view model before any project settings are loaded.
