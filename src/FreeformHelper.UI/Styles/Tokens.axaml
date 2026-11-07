@@ -647,6 +647,7 @@
   <Thickness x:Key="BorderNotchExportActiveRow">2,1,1,1</Thickness>
   <Thickness x:Key="BorderBottomThin">0,0,0,1</Thickness>
   <Thickness x:Key="BorderTopThin">0,1,0,0</Thickness>
+  <Thickness x:Key="BorderHorizontal">0,1,0,1</Thickness>
   <Thickness x:Key="BorderLeftThin">0,0,1,0</Thickness>
   <Thickness x:Key="BorderRightThin">1,0,0,0</Thickness>
   <Thickness x:Key="BorderTabThickness">1,1,1,0</Thickness>
@@ -731,6 +732,8 @@
   <x:Double x:Key="PadInfoLineInset">12</x:Double>
   <x:Double x:Key="PadInfoAnchorPanelMargin">6</x:Double>
   <x:Double x:Key="PadInfoContentMaxHeight">560</x:Double>
+  <x:Double x:Key="PadHeaderActionLabelsMinWidth">312</x:Double>
+  <x:Double x:Key="PadHeaderNarrowPreviewWidth">244</x:Double>
   <x:Double x:Key="ButtonMinWidthSm">70</x:Double>
     <x:Double x:Key="CadLoadCanvasOverlaySpinnerSize">64</x:Double>
     <x:Double x:Key="CadLoadSpinnerWindowSize">88</x:Double>

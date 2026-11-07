@@ -1,7 +1,22 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:padInfo="clr-namespace:FreeformHelper.UI.Views.PadInfoSections"
              x:Class="FreeformHelper.UI.Views.PadInfoSections.PadInfoRelationCardListView"
              x:Name="Root">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Nvt.Core.Avalonia/Icons/IconResources.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+  <UserControl.Styles>
+    <Style Selector="Border.padInfoAllocationCard.cadAllocation">
+      <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
+    </Style>
+  </UserControl.Styles>
   <ItemsControl ItemsSource="{Binding Cards, ElementName=Root}">
     <ItemsControl.ItemsPanel>
       <ItemsPanelTemplate>
@@ -14,35 +29,45 @@
                 Command="{Binding HighlightCommand}"
                 IsEnabled="{Binding HasHighlightCommand}"
                 ToolTip.Tip="{Binding RawText}">
-          <Border Classes="padInfoAllocationCard">
-            <Grid RowDefinitions="Auto,Auto,Auto"
-                  RowSpacing="{StaticResource Space6}">
-              <Grid ColumnDefinitions="*,Auto"
-                    ColumnSpacing="{StaticResource Space8}">
-                <SelectableTextBlock Grid.Column="0"
-                                     Classes="padInfoAllocationTitle"
-                                     Text="{Binding TitleText}"/>
-                <SelectableTextBlock Grid.Column="1"
-                                     Classes="padInfoAllocationRole"
-                                     Text="{Binding RoleText}"/>
+          <Border Classes="padInfoAllocationCard"
+                  Classes.cadAllocation="{Binding Compact, RelativeSource={RelativeSource AncestorType=padInfo:PadInfoRelationCardListView}}">
+            <Panel>
+              <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{DynamicResource Space8}"
+                    IsVisible="{Binding Compact, RelativeSource={RelativeSource AncestorType=padInfo:PadInfoRelationCardListView}}">
+                <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding TitleText}" VerticalAlignment="Center"/>
+                <SelectableTextBlock Grid.Column="1" Classes="padInfoKeyValue" Text="{Binding RatioText}" VerticalAlignment="Center"/>
+                <controls:FontIcon Grid.Column="2" Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.Visibility}"/>
               </Grid>
-              <Grid Grid.Row="1"
-                    ColumnDefinitions="*,Auto"
-                    ColumnSpacing="{StaticResource Space8}">
-                <SelectableTextBlock Grid.Column="0"
-                                     Classes="padInfoAllocationMeta"
-                                     Text="{Binding MetaText}"/>
-                <SelectableTextBlock Grid.Column="1"
-                                     Classes="padInfoAllocationRatio"
-                                     Text="{Binding RatioText}"/>
+              <Grid RowDefinitions="Auto,Auto,Auto"
+                    IsVisible="{Binding !Compact, RelativeSource={RelativeSource AncestorType=padInfo:PadInfoRelationCardListView}}"
+                    RowSpacing="{StaticResource Space6}">
+                <Grid ColumnDefinitions="*,Auto"
+                      ColumnSpacing="{StaticResource Space8}">
+                  <SelectableTextBlock Grid.Column="0"
+                                       Classes="padInfoAllocationTitle"
+                                       Text="{Binding TitleText}"/>
+                  <SelectableTextBlock Grid.Column="1"
+                                       Classes="padInfoAllocationRole"
+                                       Text="{Binding RoleText}"/>
+                </Grid>
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="*,Auto"
+                      ColumnSpacing="{StaticResource Space8}">
+                  <SelectableTextBlock Grid.Column="0"
+                                       Classes="padInfoAllocationMeta"
+                                       Text="{Binding MetaText}"/>
+                  <SelectableTextBlock Grid.Column="1"
+                                       Classes="padInfoAllocationRatio"
+                                       Text="{Binding RatioText}"/>
+                </Grid>
+                <StackPanel Grid.Row="2"
+                            Spacing="{StaticResource Space2}">
+                  <SelectableTextBlock Classes="padInfoAllocationLabel" Text="Area / flow"/>
+                  <SelectableTextBlock Classes="padInfoAllocationArea"
+                                       Text="{Binding AreaText}"/>
+                </StackPanel>
               </Grid>
-              <StackPanel Grid.Row="2"
-                          Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Classes="padInfoAllocationLabel" Text="Area / flow"/>
-                <SelectableTextBlock Classes="padInfoAllocationArea"
-                                     Text="{Binding AreaText}"/>
-              </StackPanel>
-            </Grid>
+            </Panel>
           </Border>
         </Button>
       </DataTemplate>

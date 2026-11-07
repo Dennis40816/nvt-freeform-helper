@@ -206,6 +206,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
                 AreaText = $"{pad.Area:0.####} {PadInfoUnits.SquareMillimeter}",
                 CentroidText = FormatPoint(pad.Centroid),
                 VertexText = pad.Polygon.Vertices.Length.ToString(CultureInfo.InvariantCulture),
+                BoundsText = $"{pad.Bounds.Width:0.####} × {pad.Bounds.Height:0.####} mm",
             },
         };
     }
@@ -237,6 +238,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
                 DxfIndexText = snapshotCad.DxfIndexDisplayText,
                 CadOutputFwDiffOverrideValue = snapshotCad.CadOutputFwDiffOverride,
                 IsDxfIndexAnchor = snapshotCad.IsDxfIndexAnchor,
+                AnchorIcText = $"IC {icText}",
                 IdentityText = $"CAD {cadPadId} · IC {icText} · Diff idx {snapshotCad.DxfIndexDisplayText}",
             },
         };
@@ -419,6 +421,8 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
         string AreaText = "",
         string CentroidText = "",
         string VertexText = "",
+        string BoundsText = "Mixed",
+        string AnchorIcText = "IC -",
         int? CadOutputFwDiffOverrideValue = null,
         bool IsDxfIndexAnchor = false);
 
