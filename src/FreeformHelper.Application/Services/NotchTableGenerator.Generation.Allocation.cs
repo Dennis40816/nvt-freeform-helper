@@ -56,20 +56,8 @@ public sealed partial class NotchTableGenerator
                 continue;
             }
 
-            var anchor = SelectCadAllocationAnchor(cadPad.Id, allocations);
-            var icIndices = allocations
-                .Select(allocation => allocation.Pad.IcIndex)
-                .Distinct()
-                .OrderBy(ic => ic)
-                .ToArray();
-            profiles.Add(new CadAllocationProfile(
-                CadPad: cadPad,
-                Anchor: anchor,
-                MaxRatio: allocations[0].Ratio,
-                IcIndices: icIndices,
-                HasAllocations: true,
-                Allocations: allocations));
-
+            var profile = BuildCadAllocationProfile(cadPad, allocations);
+            profiles.Add(profile);
             if (ShouldReportGenerationProgress(index + 1, totalCount))
             {
                 ReportGenerationProgress(
@@ -78,7 +66,7 @@ public sealed partial class NotchTableGenerator
                     totalCount,
                     0,
                     cadPad.Id,
-                    anchor?.RegularPadId,
+                    profile.Anchor?.RegularPadId,
                     phase,
                     phaseStep,
                     phaseStepCount);
@@ -220,4 +208,24 @@ public sealed partial class NotchTableGenerator
         IReadOnlyList<int> IcIndices,
         bool HasAllocations,
         IReadOnlyList<NotchAllocation> Allocations);
+
+    private static CadAllocationProfile BuildCadAllocationProfile(
+        CadPad cadPad,
+        IReadOnlyList<NotchAllocation> allocations)
+    {
+        var anchor = SelectCadAllocationAnchor(cadPad.Id, allocations);
+        var icIndices = allocations
+            .Select(allocation => allocation.Pad.IcIndex)
+            .Distinct()
+            .OrderBy(ic => ic)
+            .ToArray();
+
+        return new CadAllocationProfile(
+            CadPad: cadPad,
+            Anchor: anchor,
+            MaxRatio: allocations[0].Ratio,
+            IcIndices: icIndices,
+            HasAllocations: true,
+            Allocations: allocations);
+    }
 }

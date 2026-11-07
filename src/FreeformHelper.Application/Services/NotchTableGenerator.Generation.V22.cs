@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
@@ -42,21 +43,7 @@ public sealed partial class NotchTableGenerator
 
             if (orderedLegs.Count == 0)
             {
-                var node = new NotchV22Node(
-                    AnchorDiffIndex: selected.DiffIndex,
-                    CombinePercent: selected.CombinePercent,
-                    TargetDiffIndex1: nullValue,
-                    TargetRatioPercent1: 0,
-                    TargetDiffIndex2: nullValue,
-                    TargetRatioPercent2: 0,
-                    Flags: 0);
-                rows.Add(new NotchTableRow(
-                    selected.IcIndex,
-                    selected.DiffIndex,
-                    selected.RegularPadId,
-                    selected.CadPadId,
-                    node,
-                    $"{selected.CommentPrefix} NT"));
+                rows.Add(BuildV22NoTargetRow(selected, nullValue));
                 continue;
             }
 
@@ -276,36 +263,12 @@ public sealed partial class NotchTableGenerator
         context.BoundaryQueryContextsByIc.TryGetValue(anchor.IcIndex, out var sharedBoundaryQueryContext);
         NotchV22CompensationStageTimings compensationStageTimings = NotchV22CompensationStageTimings.Empty;
         var compensationComputeStopwatch = Stopwatch.StartNew();
-        var selectedRequest = context.SelectedSparseResultRequest;
-        var isSelectedResult = selectedRequest is not null &&
-                               selectedRequest.CadPadId == cadPad.Id &&
-                               selectedRequest.AnchorIcIndex == anchor.IcIndex &&
-                               selectedRequest.AnchorDiffIndex == sourceDiffIndex;
-        var reusableResolved = isSelectedResult ? selectedRequest!.ReusableResult : null;
-        var selectedIdentity = isSelectedResult
-            ? NotchV22ResolvedResultService.CreateIdentity(
-                cadPad,
-                context.Grid,
-                candidateCadPool,
-                context.ActiveRegularPadIds,
-                context.ResolutionSettings.CompensationModel,
-                context.ResolutionSettings.EnableToRegular,
-                context.ResolutionSettings.EnableToFull,
-                context.ResolutionSettings.EnableToFullRuleEngine,
-                context.ResolutionSettings.EnableToFullRuleTrace,
-                context.ResolutionSettings.EnableBoundaryVirtualAreaCap,
-                context.ResolutionSettings.BoundaryVirtualAreaCapRatio,
-                context.ResolutionSettings.StrictOverlapRatio,
-                anchor.IcIndex,
-                sourceDiffIndex,
-                context.TargetAllocationAreaMode)
-            : null;
-        if (reusableResolved is not null && reusableResolved.Identity != selectedIdentity)
-        {
-            throw new ArgumentException(
-                "Reusable selected CadAllocation result does not match the current computation identity.",
-                nameof(context));
-        }
+        var (isSelectedResult, reusableResolved, selectedIdentity) = ResolveSelectedV22CandidateIdentity(
+            cadPad,
+            anchor,
+            sourceDiffIndex,
+            context,
+            candidateCadPool);
 
         var compensation = reusableResolved?.Compensation ?? NotchV22CompensationService.Compute(
             new NotchV22CompensationContext(
@@ -331,75 +294,26 @@ public sealed partial class NotchTableGenerator
         var toFullPercent = context.ResolutionSettings.EnableToFull
             ? NotchV22CompensationService.ToPercentRounded(compensation.ToFullRatio)
             : 100;
-        NotchV22TargetAllocationSummary allocation;
-        if (reusableResolved is not null)
-        {
-            selectedResolvedResult = reusableResolved;
-            allocation = reusableResolved.TargetAllocation;
-        }
-        else if (isSelectedResult)
-        {
-            selectedResolvedResult = NotchV22ResolvedResultService.Build(
-                cadPad,
-                compensation,
-                context.ResolutionSettings.StrictOverlapRatio,
-                anchorIcIndex: anchor.IcIndex,
-                anchorDiffIndex: sourceDiffIndex,
-                allocationAreaMode: context.TargetAllocationAreaMode,
-                identity: selectedIdentity);
-            allocation = selectedResolvedResult.TargetAllocation;
-        }
-        else
-        {
-            allocation = NotchV22TargetAllocationService.Build(
-                cadPad,
-                compensation,
-                context.ResolutionSettings.StrictOverlapRatio,
-                anchorIcIndex: anchor.IcIndex,
-                anchorDiffIndex: sourceDiffIndex,
-                areaMode: context.TargetAllocationAreaMode);
-        }
-        var hasToFullInfluenceOnAnchorIc = allocation.Targets
-            .Any(target => target.ToFullAppliedRegularCount > 0);
-        var targetCoverageProjection = allocation.TargetCoverageProjection;
-        var legs = BuildV22DiffLegs(
-            targetCoverageProjection.EmittedTargets,
-            context.ResolutionSettings.CompensationModel);
-        var rawCombinedPercent = targetCoverageProjection.RawCombinedPercent ??
-                                 NotchSettings.ResolveCombinedPercent(
-                                     context.ResolutionSettings.CompensationModel,
-                                     toRegularPercent,
-                                     toFullPercent);
-        var hasCombinedOverflowRisk = targetCoverageProjection.RawCombinedPercent.HasValue
-            ? targetCoverageProjection.HasCombinedOverflowRisk
-            : NotchV22TargetAllocationPolicy.HasCombinedOverflowRisk(rawCombinedPercent);
-        var projectionError = hasCombinedOverflowRisk
-            ? $"Combine ratio exceeds 255% at IC{anchor.IcIndex + 1}/diff{sourceDiffIndex} " +
-              $"(CAD {cadPad.Id}): toRegular={toRegularPercent}%, toFull={toFullPercent}%, raw={rawCombinedPercent}%."
-            : null;
-        var combinedPercent = Math.Clamp(rawCombinedPercent, 0, 255);
-
-        var anchorSourceArea = allocation.Targets
-            .SingleOrDefault(target => target.IsAnchorDiff)?.EffectiveArea ?? compensation.OverlapAreaTotal;
-        var isAnchorMatchedCad = anchor.MatchedCadPadId.HasValue && anchor.MatchedCadPadId.Value == cadPad.Id;
-        var crossIcText = profile.IcIndices.Count > 1
-            ? $" XIC={string.Join("/", profile.IcIndices.Select(ic => ic + 1))}"
-            : string.Empty;
-        var commentPrefix =
-            $"CAD={cadPad.Id} R={toRegularPercent}% F={toFullPercent}% C={combinedPercent}%{crossIcText}";
-        var candidate = new V22CadCandidate(
-            anchor.IcIndex,
+        var allocation = BuildV22CandidateAllocation(
+            reusableResolved,
+            isSelectedResult,
+            cadPad,
+            compensation,
+            context,
+            anchor,
             sourceDiffIndex,
-            anchor.RegularPadId,
-            cadPad.Id,
-            profile.MaxRatio,
-            projectionError,
-            combinedPercent,
-            commentPrefix,
-            anchorSourceArea,
-            isAnchorMatchedCad,
-            hasToFullInfluenceOnAnchorIc,
-            legs);
+            selectedIdentity,
+            out selectedResolvedResult);
+        var candidate = CreateV22CadCandidate(
+            anchor,
+            sourceDiffIndex,
+            profile,
+            context,
+            cadPad,
+            compensation,
+            allocation,
+            toRegularPercent,
+            toFullPercent);
         buildCadCandidateStopwatch.Stop();
         timingAccumulator?.Add(
             buildCadCandidateStopwatch.ElapsedMilliseconds,
@@ -488,4 +402,307 @@ public sealed partial class NotchTableGenerator
         int TargetDiffIndex,
         int RatioPercent,
         bool HasToFullCoverage);
+
+    private static (
+        bool IsSelectedResult,
+        NotchV22ResolvedResult? ReusableResolved,
+        NotchV22ResolvedResultIdentity? SelectedIdentity) ResolveSelectedV22CandidateIdentity(
+            CadPad cadPad,
+            RegularPad anchor,
+            int sourceDiffIndex,
+            CadAllocationGenerationContext context,
+            IReadOnlyList<CadPad> candidateCadPool)
+    {
+        var selectedRequest = context.SelectedSparseResultRequest;
+        var isSelectedResult = selectedRequest is not null &&
+                               selectedRequest.CadPadId == cadPad.Id &&
+                               selectedRequest.AnchorIcIndex == anchor.IcIndex &&
+                               selectedRequest.AnchorDiffIndex == sourceDiffIndex;
+        var reusableResolved = isSelectedResult ? selectedRequest!.ReusableResult : null;
+        var selectedIdentity = isSelectedResult
+            ? NotchV22ResolvedResultService.CreateIdentity(
+                cadPad,
+                context.Grid,
+                candidateCadPool,
+                context.ActiveRegularPadIds,
+                context.ResolutionSettings.CompensationModel,
+                context.ResolutionSettings.EnableToRegular,
+                context.ResolutionSettings.EnableToFull,
+                context.ResolutionSettings.EnableToFullRuleEngine,
+                context.ResolutionSettings.EnableToFullRuleTrace,
+                context.ResolutionSettings.EnableBoundaryVirtualAreaCap,
+                context.ResolutionSettings.BoundaryVirtualAreaCapRatio,
+                context.ResolutionSettings.StrictOverlapRatio,
+                anchor.IcIndex,
+                sourceDiffIndex,
+                context.TargetAllocationAreaMode)
+            : null;
+        if (reusableResolved is not null && reusableResolved.Identity != selectedIdentity)
+        {
+            throw new ArgumentException(
+                "Reusable selected CadAllocation result does not match the current computation identity.",
+                nameof(context));
+        }
+
+        return (isSelectedResult, reusableResolved, selectedIdentity);
+    }
+
+    private static NotchV22TargetAllocationSummary BuildV22CandidateAllocation(
+        NotchV22ResolvedResult? reusableResolved,
+        bool isSelectedResult,
+        CadPad cadPad,
+        NotchV22CompensationResult compensation,
+        CadAllocationGenerationContext context,
+        RegularPad anchor,
+        int sourceDiffIndex,
+        NotchV22ResolvedResultIdentity? selectedIdentity,
+        out NotchV22ResolvedResult? selectedResolvedResult)
+    {
+        selectedResolvedResult = null;
+        NotchV22TargetAllocationSummary allocation;
+        if (reusableResolved is not null)
+        {
+            selectedResolvedResult = reusableResolved;
+            allocation = reusableResolved.TargetAllocation;
+        }
+        else if (isSelectedResult)
+        {
+            selectedResolvedResult = NotchV22ResolvedResultService.Build(
+                cadPad,
+                compensation,
+                context.ResolutionSettings.StrictOverlapRatio,
+                anchorIcIndex: anchor.IcIndex,
+                anchorDiffIndex: sourceDiffIndex,
+                allocationAreaMode: context.TargetAllocationAreaMode,
+                identity: selectedIdentity);
+            allocation = selectedResolvedResult.TargetAllocation;
+        }
+        else
+        {
+            allocation = NotchV22TargetAllocationService.Build(
+                cadPad,
+                compensation,
+                context.ResolutionSettings.StrictOverlapRatio,
+                anchorIcIndex: anchor.IcIndex,
+                anchorDiffIndex: sourceDiffIndex,
+                areaMode: context.TargetAllocationAreaMode);
+        }
+
+        return allocation;
+    }
+
+    private static V22CadCandidate CreateV22CadCandidate(
+        RegularPad anchor,
+        int sourceDiffIndex,
+        CadAllocationProfile profile,
+        CadAllocationGenerationContext context,
+        CadPad cadPad,
+        NotchV22CompensationResult compensation,
+        NotchV22TargetAllocationSummary allocation,
+        int toRegularPercent,
+        int toFullPercent)
+    {
+        var hasToFullInfluenceOnAnchorIc = allocation.Targets
+            .Any(target => target.ToFullAppliedRegularCount > 0);
+        var targetCoverageProjection = allocation.TargetCoverageProjection;
+        var legs = BuildV22DiffLegs(
+            targetCoverageProjection.EmittedTargets,
+            context.ResolutionSettings.CompensationModel);
+        var rawCombinedPercent = targetCoverageProjection.RawCombinedPercent ??
+                                 NotchSettings.ResolveCombinedPercent(
+                                     context.ResolutionSettings.CompensationModel,
+                                     toRegularPercent,
+                                     toFullPercent);
+        var hasCombinedOverflowRisk = targetCoverageProjection.RawCombinedPercent.HasValue
+            ? targetCoverageProjection.HasCombinedOverflowRisk
+            : NotchV22TargetAllocationPolicy.HasCombinedOverflowRisk(rawCombinedPercent);
+        var projectionError = hasCombinedOverflowRisk
+            ? $"Combine ratio exceeds 255% at IC{anchor.IcIndex + 1}/diff{sourceDiffIndex} " +
+              $"(CAD {cadPad.Id}): toRegular={toRegularPercent}%, toFull={toFullPercent}%, raw={rawCombinedPercent}%."
+            : null;
+        var combinedPercent = Math.Clamp(rawCombinedPercent, 0, 255);
+
+        var anchorSourceArea = allocation.Targets
+            .SingleOrDefault(target => target.IsAnchorDiff)?.EffectiveArea ?? compensation.OverlapAreaTotal;
+        var isAnchorMatchedCad = anchor.MatchedCadPadId.HasValue && anchor.MatchedCadPadId.Value == cadPad.Id;
+        var crossIcText = profile.IcIndices.Count > 1
+            ? $" XIC={string.Join("/", profile.IcIndices.Select(ic => ic + 1))}"
+            : string.Empty;
+        var commentPrefix =
+            $"CAD={cadPad.Id} R={toRegularPercent}% F={toFullPercent}% C={combinedPercent}%{crossIcText}";
+        var candidate = new V22CadCandidate(
+            anchor.IcIndex,
+            sourceDiffIndex,
+            anchor.RegularPadId,
+            cadPad.Id,
+            profile.MaxRatio,
+            projectionError,
+            combinedPercent,
+            commentPrefix,
+            anchorSourceArea,
+            isAnchorMatchedCad,
+            hasToFullInfluenceOnAnchorIc,
+            legs);
+        return candidate;
+    }
+
+    private static NotchTableRow BuildV22NoTargetRow(V22CadCandidate selected, int nullValue)
+    {
+        var node = new NotchV22Node(
+            AnchorDiffIndex: selected.DiffIndex,
+            CombinePercent: selected.CombinePercent,
+            TargetDiffIndex1: nullValue,
+            TargetRatioPercent1: 0,
+            TargetDiffIndex2: nullValue,
+            TargetRatioPercent2: 0,
+            Flags: 0);
+        return new NotchTableRow(
+            selected.IcIndex,
+            selected.DiffIndex,
+            selected.RegularPadId,
+            selected.CadPadId,
+            node,
+            $"{selected.CommentPrefix} NT");
+    }
+
+    private static CanonicalCandidateBuildResult CompleteEmptyCanonicalCandidateBuild(
+        IProgress<NotchGenerationProgress>? progress,
+        int candidatePhaseStep,
+        int mergePhaseStep,
+        int phaseStepCount)
+    {
+        ReportGenerationProgress(
+            progress,
+            1,
+            1,
+            0,
+            null,
+            null,
+            GenerationPhaseBuildCanonicalCandidates,
+            phaseStep: candidatePhaseStep,
+            phaseStepCount: phaseStepCount);
+        ReportGenerationProgress(
+            progress,
+            1,
+            1,
+            0,
+            null,
+            null,
+            GenerationPhaseMergeCanonicalCandidates,
+            phaseStep: mergePhaseStep,
+            phaseStepCount: phaseStepCount);
+        return CanonicalCandidateBuildResult.Empty;
+    }
+
+    private static (
+        List<KeyValuePair<(int IcIndex, int DiffIndex), V22CadCandidate>>?[] CandidatesByProfile,
+        NotchV22ResolvedResult?[] SelectedResolvedByProfile,
+        CandidateTimingAccumulator CandidateTimingAccumulator,
+        Stopwatch CandidateStopwatch) BuildCanonicalProfileCandidates(
+            CadAllocationGenerationContext context,
+            IReadOnlyList<CadAllocationProfile> cadProfiles,
+            int totalCount,
+            IProgress<NotchGenerationProgress>? progress,
+            int candidatePhaseStep,
+            int phaseStepCount)
+    {
+        var candidatesByProfile = new List<KeyValuePair<(int IcIndex, int DiffIndex), V22CadCandidate>>?[cadProfiles.Count];
+        var selectedResolvedByProfile = new NotchV22ResolvedResult?[cadProfiles.Count];
+        var processedInParallel = 0;
+        var candidateTimingAccumulator = new CandidateTimingAccumulator();
+        var candidateStopwatch = Stopwatch.StartNew();
+        try
+        {
+            Parallel.For(0, cadProfiles.Count, index =>
+            {
+                var profile = cadProfiles[index];
+                candidatesByProfile[index] = BuildCanonicalCandidatesForProfile(
+                    profile,
+                    context,
+                    candidateTimingAccumulator,
+                    out selectedResolvedByProfile[index]);
+
+                var processed = Interlocked.Increment(ref processedInParallel);
+                if (ShouldReportGenerationProgress(processed, totalCount))
+                {
+                    ReportGenerationProgress(
+                        progress,
+                        processed,
+                        totalCount,
+                        0,
+                        profile.CadPad.Id,
+                        null,
+                        GenerationPhaseBuildCanonicalCandidates,
+                        phaseStep: candidatePhaseStep,
+                        phaseStepCount: phaseStepCount);
+                }
+            });
+        }
+        catch (AggregateException ex) when (ex.InnerExceptions.Count == 1)
+        {
+            ExceptionDispatchInfo.Capture(ex.InnerExceptions[0]).Throw();
+            throw;
+        }
+        candidateStopwatch.Stop();
+        return (candidatesByProfile, selectedResolvedByProfile, candidateTimingAccumulator, candidateStopwatch);
+    }
+
+    private static Dictionary<(int IcIndex, int DiffIndex), List<V22CadCandidate>> MergeCanonicalProfileCandidates(
+        List<KeyValuePair<(int IcIndex, int DiffIndex), V22CadCandidate>>?[] candidatesByProfile,
+        IReadOnlyList<CadAllocationProfile> cadProfiles,
+        Dictionary<(int IcIndex, int DiffIndex), List<V22CadCandidate>> candidatesByDiff,
+        IProgress<NotchGenerationProgress>? progress,
+        int mergePhaseStep,
+        int phaseStepCount)
+    {
+        for (var index = 0; index < candidatesByProfile.Length; index++)
+        {
+            var candidates = candidatesByProfile[index];
+            if (candidates is null || candidates.Count == 0)
+            {
+                if (ShouldReportGenerationProgress(index + 1, candidatesByProfile.Length))
+                {
+                    ReportGenerationProgress(
+                        progress,
+                        index + 1,
+                        candidatesByProfile.Length,
+                        0,
+                        cadProfiles[index].CadPad.Id,
+                        null,
+                        GenerationPhaseMergeCanonicalCandidates,
+                        phaseStep: mergePhaseStep,
+                        phaseStepCount: phaseStepCount);
+                }
+
+                continue;
+            }
+
+            foreach (var candidate in candidates)
+            {
+                if (!candidatesByDiff.TryGetValue(candidate.Key, out var sameDiffCandidates))
+                {
+                    sameDiffCandidates = new List<V22CadCandidate>();
+                    candidatesByDiff[candidate.Key] = sameDiffCandidates;
+                }
+
+                sameDiffCandidates.Add(candidate.Value);
+            }
+
+            if (ShouldReportGenerationProgress(index + 1, candidatesByProfile.Length))
+            {
+                ReportGenerationProgress(
+                    progress,
+                    index + 1,
+                    candidatesByProfile.Length,
+                    candidatesByDiff.Count,
+                    cadProfiles[index].CadPad.Id,
+                    null,
+                    GenerationPhaseMergeCanonicalCandidates,
+                    phaseStep: mergePhaseStep,
+                    phaseStepCount: phaseStepCount);
+            }
+        }
+
+        return candidatesByDiff;
+    }
 }
