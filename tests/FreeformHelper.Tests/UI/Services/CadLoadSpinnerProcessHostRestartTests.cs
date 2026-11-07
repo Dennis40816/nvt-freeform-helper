@@ -75,7 +75,7 @@ public sealed class CadLoadSpinnerProcessHostRestartTests
         using var host = new CadLoadSpinnerProcessHost(process.Send, process.StartAsync, () => process.HasExited);
 
         host.Show(new Window());
-        await AwaitStateSyncAsync(host.GetLatestStateSyncTask());
+        await AwaitStateSyncAsync(host.LatestStateSyncTask);
 
         Assert.Equal(1, process.Starts);
         Assert.Contains(CadLoadSpinnerIpcProtocol.ShowCommand, process.Commands);
@@ -106,7 +106,7 @@ public sealed class CadLoadSpinnerProcessHostRestartTests
         using var host = new CadLoadSpinnerProcessHost(process.Send, process.StartAsync, HasExited, warmup.Task);
 
         host.Show(new Window());
-        var stateSync = host.GetLatestStateSyncTask();
+        var stateSync = host.LatestStateSyncTask;
         await reset.Task.WaitAsync(SafetyNetTimeout);
 
         // The snapshot takes the host lock, and the restart decision is made under the same lock. Once it returns,
