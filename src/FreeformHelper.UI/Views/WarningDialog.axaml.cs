@@ -1,41 +1,25 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using FreeformHelper.UI.ViewModels;
 
 namespace FreeformHelper.UI.Views;
 
 public sealed partial class WarningDialog : Window
 {
-    private SelectableTextBlock? _titleText;
-    private SelectableTextBlock? _messageText;
-
-    public WarningDialog()
+    public WarningDialog() : this(string.Empty, string.Empty)
     {
+    }
+
+    public WarningDialog(string title, string message)
+    {
+        DataContext = new WarningDialogViewModel(title, message);
         InitializeComponent();
     }
 
-    public WarningDialog(string title, string message) : this()
-    {
-        if (_titleText is not null)
-        {
-            _titleText.Text = title;
-        }
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-        if (_messageText is not null)
-        {
-            _messageText.Text = message;
-        }
-    }
-
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
-        _titleText = this.FindControl<SelectableTextBlock>("TitleText");
-        _messageText = this.FindControl<SelectableTextBlock>("MessageText");
-    }
-
-    private void OkButton_Click(object? sender, RoutedEventArgs e)
-    {
-        Close();
-    }
+    private void OkButton_Click(object? sender, RoutedEventArgs e) => Close();
 }

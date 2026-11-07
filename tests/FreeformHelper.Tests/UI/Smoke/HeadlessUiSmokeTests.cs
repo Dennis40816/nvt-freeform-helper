@@ -81,7 +81,7 @@ public sealed class HeadlessUiSmokeTests
     public Task WarningDialogOkButtonCompletesDialogAsync() => AssertWarningDialogCompletesAsync(clickOk: true);
 
     [AvaloniaFact]
-    public Task WarningDialogWithoutDefaultButtonWaitsForChoiceAndClosingCompletesDialogAsync()
+    public Task WarningDialogWaitsForChoiceAndClosingCompletesDialogAsync()
         => AssertWarningDialogCompletesAsync(clickOk: false);
 
     private static async Task<bool> GetConfirmDialogResultAsync(string? buttonName)
@@ -126,7 +126,8 @@ public sealed class HeadlessUiSmokeTests
             await HeadlessUiPump.WaitUntilAsync(() => dialog.IsVisible, "WarningDialog did not open.");
             await HeadlessUiPump.FlushQueueAsync();
             var ok = Assert.IsType<Button>(dialog.FindControl<Button>("OkButton"));
-            Assert.False(ok.IsDefault);
+            Assert.True(ok.IsDefault);
+            Assert.True(ok.IsCancel);
             Assert.False(result.IsCompleted);
 
             if (clickOk)

@@ -44,9 +44,12 @@ public partial class LeftDxfPanel : UserControl
 
         var dialog = new ConfirmDialog(
             "Reset DXF edits",
-            "Reset all DXF edits, including hidden pads, combined pads, and layer moves?",
+            "Reset all DXF edits?",
             "Reset",
-            "Cancel");
+            "Cancel",
+            confirmTip: "Reset all DXF edits in this project.",
+            cancelTip: "Keep the current DXF edits.",
+            consequenceText: "Hidden pads, duplicated pads, combined pads, layer moves, and rotations will be reset in this project.");
         var confirmed = await dialog.ShowDialog<bool>(owner);
         if (!confirmed)
         {

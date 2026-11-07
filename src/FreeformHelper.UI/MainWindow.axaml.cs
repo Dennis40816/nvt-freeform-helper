@@ -119,10 +119,15 @@ public sealed partial class MainWindow : Window
     {
         var dialog = new Views.ConfirmDialog(
             "Unsaved project",
-            "Project has not been saved. Save before exiting?",
+            "Save before exiting?",
             "Save and exit",
             "Exit without saving",
-            emphasizeCancel: true);
+            emphasizeCancel: true,
+            confirmTip: "Save the project and exit.",
+            cancelTip: "Exit without saving the project.",
+            consequenceText: "Project has not been saved.",
+            dismissText: "Cancel",
+            dismissTip: "Keep the project open.");
         return dialog.ShowDialog<bool?>(owner);
     }
 }
