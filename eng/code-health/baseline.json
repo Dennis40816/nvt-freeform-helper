@@ -177,20 +177,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 100
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/NotchV21FirmwareProjector.cs"
-      ],
-      "contentHash": "5b99fe9c64fdf8aef81afecc7772d553c734b57242c94628c303a9fd889cdad6",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.NotchV21FirmwareProjector.ProjectCadAllocation(IReadOnlyList<NotchTableRow>,int,int)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 172
       },
       "owner": "NFH",
@@ -200,20 +186,6 @@
       "contentHash": "efddcfe60959cf8960f6f9462ef1da40a0a25f9ffae4e58650229a0677c00d94",
       "project": "FreeformHelper.Application",
       "symbol": "FreeformHelper.Application.Services.NotchV22CompensationService.RunStageCEvaluateToFullAndDiagnostics(CadPad,IReadOnlyList<OverlappedRegularInfo>,StageBBoundaryContext,bool,bool,bool,bool,double)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 110
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/NotchV22TargetAllocationService.cs"
-      ],
-      "contentHash": "a9cfa0dec19b4601dfeeb69659863e2372439d3a79e1e735a373dc8af5e4429f",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.NotchV22TargetAllocationService.Build(CadPad,NotchV22CompensationResult,double,int?,int?,NotchV22TargetAllocationAreaMode)"
     },
     {
       "kind": "member",
