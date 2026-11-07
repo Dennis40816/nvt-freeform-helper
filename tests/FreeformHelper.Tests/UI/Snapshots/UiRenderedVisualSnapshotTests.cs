@@ -83,6 +83,8 @@ public sealed class UiRenderedVisualSnapshotTests
     public async Task RenderedUiSurfaces_MatchAdvancedVisualBaseline()
     {
         HeadlessAppBootstrap.EnsureInitialized();
+        using var fakeHost = new FakeCadLoadSpinnerHost();
+        using var spinnerFactory = fakeHost.Install();
         var mode = UiBaselineUpdateModeResolver.Resolve();
         var repoRoot = TestPaths.RepoRoot;
         var baselinePath = Path.Combine(repoRoot, "tests", "FreeformHelper.Tests", "Snapshots", "ui-rendered-visual-baseline.json");

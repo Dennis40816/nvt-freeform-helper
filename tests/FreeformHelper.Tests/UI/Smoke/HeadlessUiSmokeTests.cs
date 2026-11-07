@@ -312,8 +312,7 @@ public sealed class HeadlessUiSmokeTests
         HeadlessAppBootstrap.EnsureInitialized();
         var vm = new FreeformHelperViewModel();
         using var fakeHost = new FakeCadLoadSpinnerHost();
-        var originalFactory = FreeformHelperView.CadLoadSpinnerHostFactory;
-        FreeformHelperView.CadLoadSpinnerHostFactory = () => fakeHost;
+        using var spinnerFactory = fakeHost.Install();
         var view = new FreeformHelperView
         {
             DataContext = vm
@@ -373,7 +372,6 @@ public sealed class HeadlessUiSmokeTests
         finally
         {
             release.TrySetResult();
-            FreeformHelperView.CadLoadSpinnerHostFactory = originalFactory;
             window.Close();
             if (loading is not null)
             {
@@ -453,6 +451,8 @@ public sealed class HeadlessUiSmokeTests
     public void MainWindow_WithExpandedConsole_Can_Layout_Headless()
     {
         HeadlessAppBootstrap.EnsureInitialized();
+        using var fakeHost = new FakeCadLoadSpinnerHost();
+        using var spinnerFactory = fakeHost.Install();
         using var shell = new ShellViewModel
         {
             IsDevPageAvailable = true,
@@ -468,12 +468,15 @@ public sealed class HeadlessUiSmokeTests
         window.Arrange(new Rect(size));
 
         Assert.NotNull(window);
+        Assert.True(fakeHost.WarmupCallCount > 0);
     }
 
     [AvaloniaFact]
     public async Task MainWindow_WithExpandedConsole_RendersVisibleConsoleText()
     {
         HeadlessAppBootstrap.EnsureInitialized();
+        using var fakeHost = new FakeCadLoadSpinnerHost();
+        using var spinnerFactory = fakeHost.Install();
         using var consoleStore = await ConsoleLogTestSupport.CreateSeededStoreAsync("test", "terminal visible line");
         using var shell = new ShellViewModel
         {
@@ -515,6 +518,8 @@ public sealed class HeadlessUiSmokeTests
     public async Task MainWindow_WithSimulationWorkspace_RendersVisibleConsoleText()
     {
         HeadlessAppBootstrap.EnsureInitialized();
+        using var fakeHost = new FakeCadLoadSpinnerHost();
+        using var spinnerFactory = fakeHost.Install();
         using var consoleStore = await ConsoleLogTestSupport.CreateSeededStoreAsync("simulation", "shared terminal visible line");
         using var shell = new ShellViewModel
         {
@@ -647,36 +652,6 @@ public sealed class HeadlessUiSmokeTests
         }
 
         return visibleCount;
-    }
-
-    private sealed class FakeCadLoadSpinnerHost : ICadLoadSpinnerHost
-    {
-        public int WarmupCallCount { get; private set; }
-        public int ShowCallCount { get; private set; }
-        public int HideCallCount { get; private set; }
-        public int DisposeCallCount { get; private set; }
-        public Window? LastOwner { get; private set; }
-
-        public void Warmup()
-        {
-            WarmupCallCount++;
-        }
-
-        public void Show(Window owner)
-        {
-            ShowCallCount++;
-            LastOwner = owner;
-        }
-
-        public void Hide()
-        {
-            HideCallCount++;
-        }
-
-        public void Dispose()
-        {
-            DisposeCallCount++;
-        }
     }
 
     private static NotchTable BuildSimulationTable()
