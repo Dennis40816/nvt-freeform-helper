@@ -16,121 +16,7 @@ internal sealed record ArchitectureSource(string Path, string Text)
     // Preserve offsets/newlines. Mask comments and literal text, but retain executable
     // interpolation expressions so $"{DateTime.Now}" cannot evade a counted API.
     // This handles ordinary/verbatim/raw strings, escaped braces and nested expressions.
-    public static string Mask(string text)
-    {
-        char[] code = text.Select(static c => c is '\r' or '\n' ? c : ' ').ToArray();
-        int ScanCode(int offset, bool interpolation = false)
-        {
-            int depth = 0;
-            while (offset < text.Length)
-            {
-                char c = text[offset];
-                if (interpolation && c == '}' && depth == 0)
-                {
-                    return offset;
-                }
-
-                if (text.AsSpan(offset).StartsWith("//", StringComparison.Ordinal))
-                {
-                    int end = text.IndexOf('\n', offset);
-                    offset = end < 0 ? text.Length : end;
-                    continue;
-                }
-
-                if (text.AsSpan(offset).StartsWith("/*", StringComparison.Ordinal))
-                {
-                    int end = text.IndexOf("*/", offset + 2, StringComparison.Ordinal);
-                    offset = end < 0 ? text.Length : end + 2;
-                    continue;
-                }
-
-                int quote = offset;
-                while (quote < text.Length && text[quote] is '$' or '@')
-                {
-                    quote++;
-                }
-
-                if (quote < text.Length && (text[quote] == '"' || (quote == offset && c == '\'')))
-                {
-                    offset = ScanString(offset, quote);
-                    continue;
-                }
-
-                code[offset] = c;
-                depth += c == '{' ? 1 : c == '}' ? -1 : 0;
-                offset++;
-            }
-
-            return offset;
-        }
-
-        int ScanString(int start, int quote)
-        {
-            char delimiter = text[quote];
-            bool verbatim = text.AsSpan(start, quote - start).Contains('@');
-            int dollars = text.AsSpan(start, quote - start).Count('$');
-            int quotes = 1;
-            while (delimiter == '"' && quote + quotes < text.Length && text[quote + quotes] == '"')
-            {
-                quotes++;
-            }
-
-            bool raw = quotes >= 3;
-            int offset = quote + (raw ? quotes : 1);
-            while (offset < text.Length)
-            {
-                if (text[offset] == delimiter)
-                {
-                    int run = 1;
-                    while (offset + run < text.Length && text[offset + run] == delimiter)
-                    {
-                        run++;
-                    }
-
-                    if (raw ? run >= quotes : !verbatim || run == 1)
-                    {
-                        return offset + (raw ? quotes : 1);
-                    }
-
-                    offset += raw ? run : 2;
-                }
-                else if (!raw && !verbatim && text[offset] == '\\')
-                {
-                    offset += 2;
-                }
-                else if (dollars > 0 && text[offset] == '{')
-                {
-                    int run = 1;
-                    while (offset + run < text.Length && text[offset + run] == '{')
-                    {
-                        run++;
-                    }
-
-                    if (!raw && run >= 2)
-                    {
-                        offset += 2;
-                    }
-                    else if (!raw || run >= dollars)
-                    {
-                        offset = ScanCode(offset + (raw ? dollars : 1), interpolation: true) + (raw ? dollars : 1);
-                    }
-                    else
-                    {
-                        offset += run;
-                    }
-                }
-                else
-                {
-                    offset++;
-                }
-            }
-
-            return offset;
-        }
-
-        ScanCode(0);
-        return new string(code);
-    }
+    public static string Mask(string text) => new SourceMasker(text).Run();
 
     public string Location(int offset) => $"{Path}:{Text.AsSpan(0, offset).Count('\n') + 1}";
 
@@ -278,6 +164,128 @@ internal sealed record ArchitectureSource(string Path, string Text)
                        @"[<,]\s*Process\s*[>,]|" +
                        @"\busing\s+static\s+(?:global::)?System\.(?:IO\.(?:File|Directory)|Diagnostics\.Process)\s*;")
             .IsMatch(code);
+    }
+
+    // Scans one source text. The two scan methods call each other for nested interpolations and share the buffer.
+    private sealed class SourceMasker(string text)
+    {
+        private readonly string _text = text;
+        private readonly char[] _code = text.Select(static c => c is '\r' or '\n' ? c : ' ').ToArray();
+
+        public string Run()
+        {
+            ScanCode(0);
+            return new string(_code);
+        }
+
+        private int ScanCode(int offset, bool interpolation = false)
+        {
+            int depth = 0;
+            while (offset < _text.Length)
+            {
+                char c = _text[offset];
+                if (interpolation && c == '}' && depth == 0)
+                {
+                    return offset;
+                }
+
+                if (_text.AsSpan(offset).StartsWith("//", StringComparison.Ordinal))
+                {
+                    int end = _text.IndexOf('\n', offset);
+                    offset = end < 0 ? _text.Length : end;
+                    continue;
+                }
+
+                if (_text.AsSpan(offset).StartsWith("/*", StringComparison.Ordinal))
+                {
+                    int end = _text.IndexOf("*/", offset + 2, StringComparison.Ordinal);
+                    offset = end < 0 ? _text.Length : end + 2;
+                    continue;
+                }
+
+                int quote = offset;
+                while (quote < _text.Length && _text[quote] is '$' or '@')
+                {
+                    quote++;
+                }
+
+                if (quote < _text.Length && (_text[quote] == '"' || (quote == offset && c == '\'')))
+                {
+                    offset = ScanString(offset, quote);
+                    continue;
+                }
+
+                _code[offset] = c;
+                depth += c == '{' ? 1 : c == '}' ? -1 : 0;
+                offset++;
+            }
+
+            return offset;
+        }
+
+        private int ScanString(int start, int quote)
+        {
+            char delimiter = _text[quote];
+            bool verbatim = _text.AsSpan(start, quote - start).Contains('@');
+            int dollars = _text.AsSpan(start, quote - start).Count('$');
+            int quotes = 1;
+            while (delimiter == '"' && quote + quotes < _text.Length && _text[quote + quotes] == '"')
+            {
+                quotes++;
+            }
+
+            bool raw = quotes >= 3;
+            int offset = quote + (raw ? quotes : 1);
+            while (offset < _text.Length)
+            {
+                if (_text[offset] == delimiter)
+                {
+                    int run = 1;
+                    while (offset + run < _text.Length && _text[offset + run] == delimiter)
+                    {
+                        run++;
+                    }
+
+                    if (raw ? run >= quotes : !verbatim || run == 1)
+                    {
+                        return offset + (raw ? quotes : 1);
+                    }
+
+                    offset += raw ? run : 2;
+                }
+                else if (!raw && !verbatim && _text[offset] == '\\')
+                {
+                    offset += 2;
+                }
+                else if (dollars > 0 && _text[offset] == '{')
+                {
+                    int run = 1;
+                    while (offset + run < _text.Length && _text[offset + run] == '{')
+                    {
+                        run++;
+                    }
+
+                    if (!raw && run >= 2)
+                    {
+                        offset += 2;
+                    }
+                    else if (!raw || run >= dollars)
+                    {
+                        offset = ScanCode(offset + (raw ? dollars : 1), interpolation: true) + (raw ? dollars : 1);
+                    }
+                    else
+                    {
+                        offset += run;
+                    }
+                }
+                else
+                {
+                    offset++;
+                }
+            }
+
+            return offset;
+        }
     }
 }
 

@@ -928,34 +928,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 115
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Architecture/ArchitectureSource.cs"
-      ],
-      "contentHash": "dd1cb0c4ca32c3d27be00bcda5268dee7e80da1ad812e881fa580dbc361af536",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.Architecture.ArchitectureSource.Mask(string)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 83
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/Canvas/MatchingBoundedContextContractTests.cs"
-      ],
-      "contentHash": "22d459e6cec939d63160303e3d1f8aafdd4b01c59d9f2ef15ad864341abaf437",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.MatchingBoundedContextContractTests.SameInput_AuditSettingsAndOverridesLeaveOverlapAndHitTestingUnchanged()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 121
       },
       "owner": "NFH",
