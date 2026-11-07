@@ -576,6 +576,7 @@
   <!-- Insets -->
   <Thickness x:Key="Inset1">1</Thickness>
   <Thickness x:Key="InsetNone">0</Thickness>
+  <Thickness x:Key="Inset2">2</Thickness>
   <Thickness x:Key="Inset4">4</Thickness>
   <Thickness x:Key="Inset6">6</Thickness>
   <Thickness x:Key="Inset8">8</Thickness>
@@ -646,6 +647,7 @@
   <Thickness x:Key="BorderNotchExportActiveRow">2,1,1,1</Thickness>
   <Thickness x:Key="BorderBottomThin">0,0,0,1</Thickness>
   <Thickness x:Key="BorderTopThin">0,1,0,0</Thickness>
+  <Thickness x:Key="BorderHorizontal">0,1,0,1</Thickness>
   <Thickness x:Key="BorderLeftThin">0,0,1,0</Thickness>
   <Thickness x:Key="BorderRightThin">1,0,0,0</Thickness>
   <Thickness x:Key="BorderTabThickness">1,1,1,0</Thickness>
@@ -723,6 +725,7 @@
   <x:Double x:Key="WorkspaceFoldCornerBadgeSize">24</x:Double>
   <x:Double x:Key="PanelBlockChevronHostSize">20</x:Double>
   <x:Double x:Key="ManualSizingInputWidth">110</x:Double>
+  <x:Double x:Key="WorkspaceCompactStatusMaxWidth">76</x:Double>
   <x:Double x:Key="PadInfoAnchorSize">6</x:Double>
   <x:Double x:Key="PadInfoAnchorClampMargin">8</x:Double>
   <x:Double x:Key="PadInfoGap">20</x:Double>
@@ -730,6 +733,8 @@
   <x:Double x:Key="PadInfoLineInset">12</x:Double>
   <x:Double x:Key="PadInfoAnchorPanelMargin">6</x:Double>
   <x:Double x:Key="PadInfoContentMaxHeight">560</x:Double>
+  <x:Double x:Key="PadHeaderActionLabelsMinWidth">312</x:Double>
+  <x:Double x:Key="PadHeaderNarrowPreviewWidth">244</x:Double>
   <x:Double x:Key="ButtonMinWidthSm">70</x:Double>
     <x:Double x:Key="CadLoadCanvasOverlaySpinnerSize">64</x:Double>
     <x:Double x:Key="CadLoadSpinnerWindowSize">88</x:Double>
@@ -766,6 +771,14 @@
   <x:Double x:Key="NotchExportSelectionListMaxHeight">580</x:Double>
   <x:Double x:Key="NotchExportSelectionWorkspaceListMaxHeight">150</x:Double>
   <x:Double x:Key="NotchExportSelectionPreviewMinWidth">320</x:Double>
+  <GridLength x:Key="NotchExportIntegratedInspectorWidth">320</GridLength>
+  <x:Double x:Key="NotchExportIntegratedVersionWidth">110</x:Double>
+  <GridLength x:Key="NotchExportIntegratedCheckWidth">28</GridLength>
+  <GridLength x:Key="NotchExportIntegratedRowWidth">42</GridLength>
+  <GridLength x:Key="NotchExportIntegratedIcWidth">44</GridLength>
+  <GridLength x:Key="NotchExportIntegratedDiffWidth">56</GridLength>
+  <GridLength x:Key="NotchExportIntegratedMatchWidth">76</GridLength>
+  <GridLength x:Key="NotchExportIntegratedStatusWidth">76</GridLength>
   <x:Double x:Key="NotchExportFilterHelperWidth">560</x:Double>
   <x:Double x:Key="NotchExportFilterHelperHeight">420</x:Double>
   <x:Double x:Key="NotchExportFilterHelperMinWidth">520</x:Double>
@@ -776,6 +789,12 @@
   <x:Double x:Key="NotchExportColumnFilterMinHeight">320</x:Double>
   <x:Double x:Key="NotchExportPrimaryButtonMinWidth">160</x:Double>
   <x:Double x:Key="NotchExportTopDropdownWidth">180</x:Double>
+  <!-- Integrated Simulation workspace layout. -->
+  <x:Double x:Key="SimulationViewFieldMinWidth">80</x:Double>
+  <x:Double x:Key="SimulationLegendWidth">180</x:Double>
+  <x:Double x:Key="SimulationCanvasMinHeight">240</x:Double>
+  <x:Double x:Key="SimulationReplayMaxHeight">300</x:Double>
+  <x:Double x:Key="SimulationConsoleHeight">240</x:Double>
   <x:Double x:Key="NotchApplySimulationFrameDropdownWidth">260</x:Double>
   <x:Double x:Key="NotchApplySimulationModeDropdownWidth">180</x:Double>
   <x:Double x:Key="NotchApplySimulationAreaDropdownWidth">180</x:Double>
@@ -821,6 +840,8 @@
   <x:Double x:Key="CoordinatePlannerRegularLineOpacity">0.32</x:Double>
   <x:Double x:Key="CoordinatePlannerRegularFillOpacity">0.12</x:Double>
   <x:Double x:Key="CoordinateOverlayModeComboWidth">132</x:Double>
+  <x:Double x:Key="CoordinateCalibrationSummaryMaxWidth">112</x:Double>
+  <x:Double x:Key="CoordinateTableOptionalColumnWidth">96</x:Double>
   <x:Double x:Key="NotchExportSearchWidth">300</x:Double>
   <x:Double x:Key="NotchExportSortDropdownWidth">160</x:Double>
   <x:Double x:Key="NotchExportMiniPreviewMinHeight">84</x:Double>

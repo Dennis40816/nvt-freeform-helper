@@ -1,8 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Input.Platform;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.UI.Controls;
@@ -32,6 +30,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
     public SimulationWorkspaceView()
     {
         InitializeComponent();
+        InitializeSimulationConsole();
         AttachedToVisualTree += (_, _) => AttachDataContext(DataContext as SimulationWorkspaceViewModel);
         DetachedFromVisualTree += (_, _) => AttachDataContext(null);
         DataContextChanged += (_, _) => AttachDataContext(DataContext as SimulationWorkspaceViewModel);
@@ -52,6 +51,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
                 _viewportAdapter.Detach(handler => previousViewModel.FitCanvasRequested -= handler);
             }
 
+            _attachedViewModel.PropertyChanged -= OnWorkspacePresentationChanged;
             _attachedViewModel.PickOpenDiffCsvPathsAsync = null;
             _attachedViewModel.RequestSetClipboardTextAsync = null;
             _attachedViewModel.RequestSaveTextFileAsync = null;
@@ -66,11 +66,14 @@ public sealed partial class SimulationWorkspaceView : UserControl
 
         var viewportAdapter = FindViewportAdapter();
         CanvasViewportAdapter.ApplyClipPolicy(FindCanvas(), FindInlineEditorOverlay());
+        _attachedViewModel.PropertyChanged += OnWorkspacePresentationChanged;
         _attachedViewModel.PickOpenDiffCsvPathsAsync = PickOpenDiffCsvPathsAsync;
         _attachedViewModel.RequestSetClipboardTextAsync = SetClipboardTextAsync;
         _attachedViewModel.RequestSaveTextFileAsync = SaveTextFileAsync;
         viewportAdapter.Attach(handler => _attachedViewModel.FitCanvasRequested += handler);
         _attachedViewModel.RefreshExternalBindings();
+        UpdateInlineEditorVisibility();
+        QueueInlineEditorLayoutUpdate();
     }
 
     private PadCanvas FindCanvas()
@@ -91,6 +94,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
             return;
         }
 
+        HideRiskLocation();
         var canvas = FindCanvas();
         if (viewModel.IsCopperSource)
         {
@@ -148,6 +152,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
 
     private void SimulationPadCanvas_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
+        HideRiskLocation();
         var canvas = FindCanvas();
         canvas.Focus();
         if (DataContext is SimulationWorkspaceViewModel viewModel &&
@@ -200,70 +205,6 @@ public sealed partial class SimulationWorkspaceView : UserControl
         }
     }
 
-    private async Task<IReadOnlyList<string>> PickOpenDiffCsvPathsAsync()
-    {
-        var storage = TopLevel.GetTopLevel(this)?.StorageProvider;
-        if (storage is null)
-        {
-            return Array.Empty<string>();
-        }
-
-        var result = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            AllowMultiple = true,
-            Title = "Import Diff CSV",
-            FileTypeFilter = new List<FilePickerFileType>
-            {
-                new("CSV") { Patterns = _csvFilePatterns },
-                new("All files") { Patterns = _allFilesPatterns },
-            },
-        });
-
-        return result is { Count: > 0 }
-            ? result.Select(static file => file.Path.LocalPath).ToArray()
-            : Array.Empty<string>();
-    }
-
-    private async Task<bool> SetClipboardTextAsync(string text)
-    {
-        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-        if (clipboard is null)
-        {
-            return false;
-        }
-
-        await clipboard.SetTextAsync(text);
-        return true;
-    }
-
-    private async Task<bool> SaveTextFileAsync(SimulationWorkspaceViewModel.SimulationTextExportRequest request)
-    {
-        var storage = TopLevel.GetTopLevel(this)?.StorageProvider;
-        if (storage is null)
-        {
-            return false;
-        }
-
-        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = request.Title,
-            DefaultExtension = request.DefaultExtension,
-            SuggestedFileName = request.SuggestedFileName,
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                new(request.FileTypeName) { Patterns = request.Patterns },
-                new("All files") { Patterns = _allFilesPatterns },
-            },
-        });
-        if (file is null)
-        {
-            return false;
-        }
-
-        await TextExportWriter.WriteAsync(file.Path.LocalPath, request.Content, includeBom: true, CancellationToken.None);
-        return true;
-    }
-
     private void SimulationPadCanvas_SelectionChanged(object? sender, PadCanvasSelectionChangedEventArgs e)
     {
         if (DataContext is not SimulationWorkspaceViewModel viewModel)
@@ -271,6 +212,8 @@ public sealed partial class SimulationWorkspaceView : UserControl
             return;
         }
 
+        HideRiskLocation();
+        SimulationSelectionCount.Text = SimulationWorkspaceViewModel.FormatSelectionCount(e.SelectedRegularPadIndices.Length);
         var regularId = e.SelectedRegularPadIndices.Length > 0 ? e.SelectedRegularPadIndices[0] : -1;
         viewModel.SelectRegularPad(regularId);
         if (regularId < 0)
@@ -308,12 +251,11 @@ public sealed partial class SimulationWorkspaceView : UserControl
     {
         var overlay = FindInlineEditorOverlay();
         var card = FindInlineEditorCard();
-        var isVisible = _isInlineEditorOpen &&
-                        DataContext is SimulationWorkspaceViewModel viewModel &&
-                        viewModel.ShowSelectedOverrideEditor &&
-                        viewModel.HasSelectedRegular;
-        overlay.IsVisible = isVisible;
-        card.IsVisible = isVisible;
+        var canEdit = DataContext is SimulationWorkspaceViewModel viewModel &&
+                      viewModel.ShowSelectedOverrideEditor && viewModel.HasSelectedRegular;
+        overlay.IsVisible = canEdit;
+        card.IsVisible = canEdit && _isInlineEditorOpen;
+        SimulationInlineEditAction.IsVisible = canEdit && !_isInlineEditorOpen;
     }
 
     private void QueueInlineEditorLayoutUpdate()
@@ -337,8 +279,7 @@ public sealed partial class SimulationWorkspaceView : UserControl
         var card = FindInlineEditorCard();
         var viewportAdapter = FindViewportAdapter();
         var canvas = FindCanvas();
-        if (!_isInlineEditorOpen ||
-            DataContext is not SimulationWorkspaceViewModel viewModel ||
+        if (DataContext is not SimulationWorkspaceViewModel viewModel ||
             !viewModel.ShowSelectedOverrideEditor ||
             !viewModel.HasSelectedRegular)
         {
@@ -356,9 +297,10 @@ public sealed partial class SimulationWorkspaceView : UserControl
         }
 
         overlay.IsVisible = true;
-        card.IsVisible = true;
-
-        var panelSize = MeasureOverlayCard(card, overlay.Bounds.Size);
+        card.IsVisible = _isInlineEditorOpen;
+        SimulationInlineEditAction.IsVisible = !_isInlineEditorOpen;
+        Control editor = _isInlineEditorOpen ? card : SimulationInlineEditAction;
+        var panelSize = MeasureOverlayCard(editor, overlay.Bounds.Size);
         var canvasOrigin = canvas.TranslatePoint(new Point(0, 0), overlay) ?? new Point(0, 0);
         var canvasRect = new Rect(canvasOrigin, canvas.Bounds.Size);
         var selectionRect = BuildPadScreenRect(viewportAdapter, overlay, regularPad.Bounds);
@@ -377,8 +319,8 @@ public sealed partial class SimulationWorkspaceView : UserControl
             canvasRect.Top + gap,
             Math.Max(canvasRect.Top + gap, canvasRect.Bottom - panelSize.Height - gap));
 
-        Canvas.SetLeft(card, x);
-        Canvas.SetTop(card, y);
+        Canvas.SetLeft(editor, x);
+        Canvas.SetTop(editor, y);
     }
 
     private static Size MeasureOverlayCard(Control card, Size available)
@@ -425,10 +367,8 @@ public sealed partial class SimulationWorkspaceView : UserControl
 
     private void OnViewportChanged()
     {
-        if (_isInlineEditorOpen)
-        {
-            QueueInlineEditorLayoutUpdate();
-        }
+        QueueInlineEditorLayoutUpdate();
+        PositionRiskLocation();
     }
 
 }

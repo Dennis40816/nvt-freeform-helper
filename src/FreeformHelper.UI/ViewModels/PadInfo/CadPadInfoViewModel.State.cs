@@ -50,10 +50,7 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
 
     private void ToggleLowFrequencyDetailSection()
     {
-        var shouldExpand = !ShowLowFrequencyDetailSection;
-        ShowNotchDiagnostics = shouldExpand && HasToFullDiagnosticsText;
-        ShowRuleTrace = shouldExpand && HasRuleTrace;
-        ShowGeometryDetails = shouldExpand;
+        ShowLowFrequencyDetailSection = !ShowLowFrequencyDetailSection;
     }
 }
 

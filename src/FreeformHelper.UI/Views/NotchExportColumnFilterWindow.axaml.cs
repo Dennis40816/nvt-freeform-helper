@@ -34,6 +34,11 @@ public sealed partial class NotchExportColumnFilterWindow : Window
 
     private void ApplyButton_Click(object? sender, RoutedEventArgs e)
     {
+        if (DataContext is NotchExportColumnFilterDialogViewModel { CanApply: false })
+        {
+            return;
+        }
+
         Close(true);
     }
 }

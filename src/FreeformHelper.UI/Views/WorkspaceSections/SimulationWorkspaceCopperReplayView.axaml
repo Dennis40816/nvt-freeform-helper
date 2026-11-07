@@ -1,0 +1,112 @@
+<UserControl x:CompileBindings="True" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+    xmlns:services="clr-namespace:FreeformHelper.Application.Services;assembly=FreeformHelper.Application"
+    x:DataType="viewModels:SimulationWorkspaceViewModel"
+    x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspaceCopperReplayView">
+  <controls:HidePanelBlock x:Name="CopperReplayPanel" Title="Copper path replay" IsVisible="{Binding IsCopperSource}" IsExpanded="False" Margin="{DynamicResource Inset8}">
+    <ScrollViewer MaxHeight="{DynamicResource SimulationReplayMaxHeight}" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Classes="panelForm" Spacing="{DynamicResource Space8}">
+        <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="{DynamicResource Space8}">
+          <StackPanel Grid.Column="0" Classes="panelFormField">
+            <TextBlock Text="Start X"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}" Maximum="{DynamicResource NumericInputMaximum}"
+                SmallChange="0.1" FormatString="0.###" SnapToStep="False" Value="{Binding CopperPathStartX, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Classes="panelFormField">
+            <TextBlock Text="Start Y"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}" Maximum="{DynamicResource NumericInputMaximum}"
+                SmallChange="0.1" FormatString="0.###" SnapToStep="False" Value="{Binding CopperPathStartY, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Classes="panelFormField">
+            <TextBlock Text="End X"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}" Maximum="{DynamicResource NumericInputMaximum}"
+                SmallChange="0.1" FormatString="0.###" SnapToStep="False" Value="{Binding CopperPathEndX, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="3" Classes="panelFormField">
+            <TextBlock Text="End Y"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}" Maximum="{DynamicResource NumericInputMaximum}"
+                SmallChange="0.1" FormatString="0.###" SnapToStep="False" Value="{Binding CopperPathEndY, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="4" Classes="panelFormField">
+            <TextBlock Text="Steps"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}" Maximum="{DynamicResource NumericInputMaximum}"
+                SmallChange="1" FormatString="0" Value="{Binding CopperPathStepCount, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
+        <StackPanel x:Name="ReplayRunActions" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{DynamicResource Space6}">
+          <Button Classes="actionGhost actionTextButton" Content="Start" Command="{Binding UseCurrentCopperAsPathStartCommand}" ToolTip.Tip="Use the current copper position as the path start."/>
+          <Button Classes="actionGhost actionTextButton" Content="End" Command="{Binding UseCurrentCopperAsPathEndCommand}" ToolTip.Tip="Use the current copper position as the path end."/>
+          <Button Classes="actionPrimary actionTextButton simulationActionButton" Command="{Binding ReplayCopperPathCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}">
+              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.PlayArrow}"/>
+              <TextBlock Text="Run"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+        <TextBlock Text="Start and End take the current copper position." Classes="workspaceSectionMeta"/>
+        <SelectableTextBlock Text="{Binding CopperPathReplaySummaryText}" TextWrapping="Wrap"/>
+        <Border Classes="workspaceTableHeader">
+          <Grid ColumnDefinitions="Auto,*,*,*"
+              ColumnSpacing="{StaticResource Space8}">
+            <SelectableTextBlock Grid.Column="0" Classes="workspaceTableHeaderText" Text="Step"/>
+            <SelectableTextBlock Grid.Column="1" Classes="workspaceTableHeaderText" Text="Center"/>
+            <SelectableTextBlock Grid.Column="2" Classes="workspaceTableHeaderText" Text="Max"/>
+            <SelectableTextBlock Grid.Column="3" Classes="workspaceTableHeaderText" Text="Audit"/>
+          </Grid>
+        </Border>
+        <ListBox
+            ItemsSource="{Binding CopperPathReplayRows}"
+            SelectedItem="{Binding SelectedCopperPathReplayRow, Mode=OneWay}"
+            SelectionChanged="ReplayRows_SelectionChanged"
+            Classes="scrollV2 workspaceDataList"
+            Background="{DynamicResource BrushTransparent}"
+            BorderThickness="{DynamicResource BorderNone}"
+            ScrollViewer.AllowAutoHide="False"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <VirtualizingStackPanel/>
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="services:CopperPillarPathReplayArtifactRow">
+              <Button Classes="workspaceDataRow" CommandParameter="{Binding}" Click="ReplayRow_Click" Focusable="False">
+                <Grid ColumnDefinitions="Auto,*,*,*"
+                    ColumnSpacing="{StaticResource Space8}">
+                  <SelectableTextBlock Grid.Column="0"
+                      Classes="workspaceDataCellText strong"
+                      Text="{Binding StepText}"/>
+                  <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="workspaceDataCellText strong"
+                        Text="{Binding CenterText}"/>
+                    <SelectableTextBlock Classes="workspaceDataCellText"
+                        Text="{Binding StatusText}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Column="2" Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="workspaceDataCellText strong"
+                        Text="{Binding MaxAfterText}"/>
+                    <SelectableTextBlock Classes="workspaceDataCellText"
+                        Text="{Binding WorstText}"/>
+                  </StackPanel>
+                  <SelectableTextBlock Grid.Column="3"
+                      Classes="workspaceDataCellText"
+                      Text="{Binding AuditText}"
+                      TextWrapping="Wrap"/>
+                </Grid>
+              </Button>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel x:Name="ReplayExportActions" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{DynamicResource Space6}">
+          <Button Classes="actionGhost actionTextButton" Content="Copy" Command="{Binding CopyCopperPathReplayCommand}" IsEnabled="{Binding HasCopperPathReplay}"/>
+          <Button Classes="actionGhost actionTextButton" Content="Export CSV" Command="{Binding ExportCopperPathReplayCsvCommand}" IsEnabled="{Binding HasCopperPathReplay}"/>
+          <Button Classes="actionGhost actionTextButton" Content="Export JSON" Command="{Binding ExportCopperPathReplayJsonCommand}" IsEnabled="{Binding HasCopperPathReplay}"/>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </controls:HidePanelBlock>
+</UserControl>

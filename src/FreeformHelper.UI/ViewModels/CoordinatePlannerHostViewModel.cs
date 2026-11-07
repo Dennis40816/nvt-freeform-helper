@@ -5,9 +5,9 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class CoordinatePlannerHostViewModel : ObservableObject
 {
-    private readonly string _placeholderTitle = "Coordinate";
+    private readonly string _placeholderTitle = "No coordinate plan yet";
     private readonly string _placeholderSubtitle = "Build from the current workspace, then inspect AA corners, guide lines, BIST rectangle, and copper-pillar-safe machine coordinates on the same canvas.";
-    private readonly string _staleWorkspaceBannerText = "Freeform Helper workspace changed. Refresh coordinate planning to use the latest AA/grid state.";
+    private readonly string _staleWorkspaceBannerText = "Refresh rebuilds the plan from the current workspace and clears custom points and paths.";
 
     [ObservableProperty]
     private CoordinatePlannerWorkspaceViewModel? _currentWorkspace;
@@ -38,6 +38,10 @@ public sealed partial class CoordinatePlannerHostViewModel : ObservableObject
     public bool IsWorkspaceStale => CurrentWorkspace is not null && CurrentWorkspace.SourceRevision != SourceRevision;
 
     public bool CanOpenCoordinatePlanner => RequestBuildWorkspaceAsync is not null;
+
+    public string SourceStatusText => HasNoWorkspace ? "No plan built" : IsWorkspaceStale ? "Source changed" : "Source up to date";
+
+    public string SourceDimensionsTooltipText => CurrentWorkspace?.WorkspaceSummaryText ?? "Build a plan from the current Freeform workspace.";
 
     public async Task EnsureWorkspaceAsync()
     {
@@ -84,11 +88,14 @@ public sealed partial class CoordinatePlannerHostViewModel : ObservableObject
         OnPropertyChanged(nameof(HasWorkspace));
         OnPropertyChanged(nameof(HasNoWorkspace));
         OnPropertyChanged(nameof(IsWorkspaceStale));
+        OnPropertyChanged(nameof(SourceStatusText));
+        OnPropertyChanged(nameof(SourceDimensionsTooltipText));
     }
 
     partial void OnSourceRevisionChanged(int value)
     {
         OnPropertyChanged(nameof(IsWorkspaceStale));
+        OnPropertyChanged(nameof(SourceStatusText));
     }
 
     private async Task OpenCoordinatePlannerAsync()

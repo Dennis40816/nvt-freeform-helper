@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -17,11 +18,8 @@ public sealed partial class FreeformHelperViewModel
         _workspaceHeaderItemMap.Clear(); // Clear existing map to avoid duplicates on reinitialization.
         WorkspaceHeaderItems = new ObservableCollection<WorkspaceHeaderItem>
         {
-            CreateWorkspaceToggle("cadLayer", "CAD layer", () => ShowCad, v => ShowCad = v),
-            CreateWorkspaceToggle("regularGrid", "Regular grid", () => ShowRegular, v => ShowRegular = v),
             CreateWorkspaceToggle("highlightUnmatched", "Highlight unmatched regular", () => HighlightUnmatched, v => HighlightUnmatched = v),
             CreateWorkspaceToggle("highlightFreeform", "Highlight freeform regular", () => HighlightFreeform, v => HighlightFreeform = v),
-            CreateWorkspaceToggle("colorByArea", "Color CAD by area", () => ColorCadByArea, v => ColorCadByArea = v),
             // Add other workspace header items here as needed.
         };
     }
@@ -55,4 +53,133 @@ public sealed partial class FreeformHelperViewModel
             item.SetCheckedFromSource(value); // Update the item's checked state without triggering its own setter logic.
         }
     }
+    private WorkspaceWorkStep? WorkspaceActionStep => GetWorkflowStateSnapshot().HasCad
+        ? _inspectorPanel.WorkStep
+        : null;
+
+    public string WorkspacePrimaryActionText => WorkspaceActionStep switch
+    {
+        null => "Open DXF",
+        WorkspaceWorkStep.Step1Match => "Match overlaps",
+        WorkspaceWorkStep.Step2Freeform => "Detect freeform",
+        _ => "Export",
+    };
+
+    public ICommand WorkspacePrimaryActionCommand => WorkspaceActionStep switch
+    {
+        null => OpenDxfCommand,
+        WorkspaceWorkStep.Step1Match => MatchCommand,
+        WorkspaceWorkStep.Step2Freeform => AutoDetectFreeformsCommand,
+        _ => ExportNotchCommand,
+    };
+
+    public string WorkspaceWorkHint => WorkspaceActionStep switch
+    {
+        null => "Open DXF or use File > Load Project to begin.",
+        WorkspaceWorkStep.Step1Match => "Step 1 · Geometry match",
+        WorkspaceWorkStep.Step2Freeform => "Step 2 · Freeform tagging",
+        _ => "Step 3 preview → Step 5 · Notch export",
+    };
+
+    public string WorkspaceMatchSummary => GetWorkflowStateSnapshot().HasStep1Result
+        ? "Overlap links are ready."
+        : "Build CAD↔Regular overlap links with Match overlaps.";
+
+    public string ManualOverrideHint => SelectionSummaryResult.RegularCount == 0
+        ? "Select a Regular pad first."
+        : "Applies to selected Regular; Step 1 links stay unchanged.";
+
+    public string ToFullPreviewToggleHint => CanShowToFullPreviewToggle
+        ? "Display only; show or hide the To Full overlay."
+        : "Enable To Full in Settings > Step 3 to show its preview.";
+
+    public string DxfCheckHeaderText => IsCheckingDxfOverlap ? "Checking…"
+        : HasDxfOverlapIssues ? $"{DxfOverlapIssueCount} overlaps"
+        : DxfOverlapSummary == DxfOverlapResult.NotRunSummary ? "Not checked" : "Checked";
+
+    public string DxfEditsHeaderText =>
+        $"Hidden {DeletedCadPadCount} · Merged {CombinedCadPadCount}";
+
+    public string DxfRotationScopeHint
+    {
+        get
+        {
+            if (!IsDxfEditRotationLayerScope || _cad is null) return "Applies to selected CAD pads.";
+            var targets = GetRotationTargetCadIds(_cad);
+            return targets.SetEquals(_selectedCadIds)
+                ? "Applies to the chosen layer."
+                : $"Layer scope · {targets.Count} target pads; selection is unchanged.";
+        }
+    }
+
+    public string ValidationTraceHint => HasNotchValidationItems
+        ? "Trace ready; expand a category to inspect its rows."
+        : NotchValidationSummaryText;
+
+    private void NotifyWorkspaceLayoutChanged(string? propertyName)
+    {
+        if (propertyName is nameof(CadPads) or nameof(IsStep1Expanded) or nameof(IsStep2Expanded)
+            or nameof(IsStep3Expanded) or nameof(IsStep5Expanded))
+        {
+            OnPropertyChanged(nameof(WorkspacePrimaryActionText));
+            OnPropertyChanged(nameof(WorkspacePrimaryActionCommand));
+            OnPropertyChanged(nameof(WorkspaceWorkHint));
+        }
+        if (propertyName == nameof(MatchLinksForCanvas))
+        {
+            OnPropertyChanged(nameof(WorkspaceMatchSummary));
+        }
+        if (propertyName == nameof(SelectionSummaryResult))
+        {
+            OnPropertyChanged(nameof(ManualOverrideHint));
+        }
+        if (propertyName is nameof(NotchValidationSummaryText) or nameof(HasNotchValidationItems))
+        {
+            OnPropertyChanged(nameof(ValidationTraceHint));
+        }
+        if (propertyName == nameof(CanShowToFullPreviewToggle))
+        {
+            OnPropertyChanged(nameof(ToFullPreviewToggleHint));
+        }
+        if (propertyName is nameof(DxfOverlapResult) or nameof(IsCheckingDxfOverlap))
+        {
+            OnPropertyChanged(nameof(DxfCheckHeaderText));
+        }
+        if (propertyName is nameof(DeletedCadPadCount) or nameof(CombinedCadPadCount))
+        {
+            OnPropertyChanged(nameof(DxfEditsHeaderText));
+        }
+        if (propertyName is nameof(SelectedDxfEditRotationScopeOption) or nameof(DxfEditRotationLayerName)
+            or nameof(CanRotateSelectedCadPads))
+        {
+            OnPropertyChanged(nameof(DxfRotationScopeHint));
+        }
+    }
+
+    private void SelectWorkspaceWorkStep(WorkspaceWorkStep step)
+    {
+        _inspectorPanel = _inspectorPanel with { WorkStep = step };
+        MoveToWorkflowStep(step);
+    }
+
+    partial void OnIsStep1ExpandedChanged(bool value)
+    {
+        if (value) SelectWorkspaceWorkStep(WorkspaceWorkStep.Step1Match);
+    }
+
+    partial void OnIsStep2ExpandedChanged(bool value)
+    {
+        if (value) SelectWorkspaceWorkStep(WorkspaceWorkStep.Step2Freeform);
+    }
+
+    partial void OnIsStep3ExpandedChanged(bool value)
+    {
+        if (value) SelectWorkspaceWorkStep(WorkspaceWorkStep.Step3NotchPreview);
+    }
+
+    partial void OnIsStep5ExpandedChanged(bool value)
+    {
+        if (value) SelectWorkspaceWorkStep(WorkspaceWorkStep.Step5Export);
+    }
+
 }

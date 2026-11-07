@@ -192,6 +192,7 @@ public sealed partial class FreeformHelperViewModel
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
+        NotifyWorkspaceLayoutChanged(e.PropertyName);
 
         if (_isLoadingSettings || e.PropertyName is null)
         {

@@ -37,7 +37,7 @@ public sealed class CanvasFitToolbarClearanceTests
         {
             var canvas = window.GetVisualDescendants().OfType<PadCanvas>().Single();
             var overlay = window.GetVisualDescendants().OfType<CanvasOverlayControls>().Single();
-            var toolbar = overlay.GetVisualDescendants().OfType<StackPanel>().Single(static panel => panel.Name == "CanvasLeftOverlay");
+            var toolbar = overlay.GetVisualDescendants().OfType<Grid>().Single(static panel => panel.Name == "CanvasLeftOverlay");
 
             // A tall, narrow grid, so the height of the canvas limits the zoom and the top margin shows on the screen.
             // With several ICs the first row also gets the IC group blocks above the column labels.

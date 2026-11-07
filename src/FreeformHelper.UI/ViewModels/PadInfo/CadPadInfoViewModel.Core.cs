@@ -96,7 +96,16 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     public bool CanClearCadOutputFwDiffOverride => HasCadOutputFwDiffOverride;
     public bool CanClearDxfIndexAnchor => IsDxfIndexAnchor;
     public string GeometryDetailsToggleText => ShowGeometryDetails ? "Hide details" : "Show details";
-    public bool ShowLowFrequencyDetailSection => ShowNotchDiagnostics || ShowRuleTrace || ShowGeometryDetails;
+    public bool ShowLowFrequencyDetailSection
+    {
+        get => ShowNotchDiagnostics || ShowRuleTrace || ShowGeometryDetails;
+        set
+        {
+            ShowGeometryDetails = value;
+            ShowNotchDiagnostics = value && HasToFullDiagnosticsText;
+            ShowRuleTrace = value && HasRuleTrace;
+        }
+    }
     public string CadOutputFwDiffAssignmentModeText => HasCadOutputFwDiffOverride
             ? "Manual override"
         : IsDxfIndexAnchor

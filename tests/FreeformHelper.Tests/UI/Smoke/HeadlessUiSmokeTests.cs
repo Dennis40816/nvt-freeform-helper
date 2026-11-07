@@ -286,6 +286,9 @@ public sealed class HeadlessUiSmokeTests
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
 
+            Assert.Single(view.GetVisualDescendants().OfType<Nvt.Core.Avalonia.Panels.CollapsiblePanel>(),
+                static panel => panel.Title == "Edit guards").IsExpanded = true;
+            await HeadlessUiPump.FlushQueueAsync();
             var target = Assert.Single(
                 view.GetVisualDescendants().OfType<NumberScrubber>(),
                 static scrubber => scrubber is { Value: 128m, Maximum: 255m });
@@ -542,6 +545,11 @@ public sealed class HeadlessUiSmokeTests
         try
         {
             window.Show();
+            await HeadlessUiPump.FlushQueueAsync();
+
+            var simulation = Assert.Single(window.GetVisualDescendants().OfType<SimulationWorkspaceView>());
+            var console = Assert.IsType<ConsolePanel>(simulation.FindControl<ConsolePanel>("SimulationConsole"));
+            Assert.IsType<Avalonia.Controls.Primitives.ToggleButton>(console.FindControl<Avalonia.Controls.Primitives.ToggleButton>("ConsoleToggleButton")).IsChecked = true;
             await HeadlessUiPump.FlushQueueAsync();
 
             using var frame = window.CaptureRenderedFrame();

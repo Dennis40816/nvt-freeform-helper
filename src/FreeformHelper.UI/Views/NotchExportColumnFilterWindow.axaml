@@ -11,6 +11,9 @@
         Background="{DynamicResource BrushBgSurface}"
         Foreground="{DynamicResource BrushTextPrimary}"
         Title="Column filter">
+  <Window.Styles>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/ExportNotchRows.axaml"/>
+  </Window.Styles>
   <Border Padding="{StaticResource Inset14}">
     <Grid RowDefinitions="Auto,Auto,Auto,*,Auto"
           RowSpacing="{StaticResource Space4}">
@@ -23,13 +26,14 @@
       </StackPanel>
 
       <Grid Grid.Row="1"
-            ColumnDefinitions="*,Auto,Auto"
+            HorizontalAlignment="Right"
+            ColumnDefinitions="Auto,Auto,Auto"
             ColumnSpacing="{StaticResource Space8}">
         <Button Grid.Column="1"
-                Content="Select all"
+                Classes="actionGhost" Content="Select all"
                 Click="SelectAllButton_Click"/>
         <Button Grid.Column="2"
-                Content="Clear"
+                Classes="actionGhost" Content="Clear"
                 Click="ClearButton_Click"/>
       </Grid>
 
@@ -56,6 +60,8 @@
                      Text="{Binding RangeToText, Mode=TwoWay}"
                      PlaceholderText="max"/>
           </Grid>
+          <TextBlock Foreground="{DynamicResource BrushDanger}"
+                     IsVisible="{Binding HasRangeError}" Text="{Binding RangeErrorText}" TextWrapping="Wrap"/>
           <SelectableTextBlock Classes="stepNote"
                                IsVisible="{Binding IsRangeSuggested}"
                                Text="Large value set detected: range mode is recommended."/>
@@ -90,13 +96,15 @@
       </ListBox>
 
       <Grid Grid.Row="4"
-            ColumnDefinitions="*,Auto,Auto"
+            HorizontalAlignment="Right"
+            ColumnDefinitions="Auto,Auto,Auto"
             ColumnSpacing="{StaticResource Space8}">
         <Button Grid.Column="1"
-                Content="Cancel"
+                Classes="actionGhost" Content="Cancel"
                 Click="CancelButton_Click"/>
         <Button Grid.Column="2"
-                Content="Apply"
+                Classes="actionPrimary" Content="Apply"
+                IsEnabled="{Binding CanApply}"
                 Click="ApplyButton_Click"/>
       </Grid>
     </Grid>

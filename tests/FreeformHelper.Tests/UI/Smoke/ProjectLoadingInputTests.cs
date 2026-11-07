@@ -9,6 +9,7 @@ using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
+using Nvt.Core.Avalonia.Panels;
 using Nvt.Core.Progress;
 using Xunit;
 
@@ -78,6 +79,14 @@ public sealed class ProjectLoadingInputTests
         Assert.Equal(ProjectSessionMode.Ready, vm.SessionMode);
     }
 
+    private static async Task<CheckBox> OpenImportEditorAsync(FreeformHelperView view)
+    {
+        Assert.Single(view.GetVisualDescendants().OfType<CollapsiblePanel>(), static panel => panel.Title == "Import & DXF check")
+            .SetCurrentValue(CollapsiblePanel.IsExpandedProperty, true);
+        await HeadlessUiPump.FlushQueueAsync();
+        return view.GetVisualDescendants().OfType<CheckBox>().Single(static c => Equals(c.Content, "Only closed polylines"));
+    }
+
     [AvaloniaFact]
     public async Task ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()
     {
@@ -100,8 +109,7 @@ public sealed class ProjectLoadingInputTests
         {
             await new JsonProjectStore().SaveAsync(path, new ProjectFile(), CancellationToken.None);
             window.Show();
-            var editor = view.GetVisualDescendants().OfType<CheckBox>()
-                .Single(c => Equals(c.Content, "Only closed polylines"));
+            var editor = await OpenImportEditorAsync(view);
             Assert.True(editor.Focus());
             FreeformHelperViewPrivateAccess.OpenSettingsWindowCore(view, null, "test");
             var settingsWindow = Assert.IsType<SettingsWindow>(FreeformHelperViewPrivateAccess.SettingsWindow(view));
