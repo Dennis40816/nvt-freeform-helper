@@ -93,7 +93,7 @@ public sealed class CadLoadSpinnerProcessHostFailureTests
         Assert.Equal("Visible", host.GetVisibilityStateSnapshot().Effective);
 
         host.Hide();
-        await AwaitStateSyncAsync(host.GetLatestStateSyncTask());
+        await AwaitStateSyncAsync(host.LatestStateSyncTask);
 
         var snapshot = host.GetVisibilityStateSnapshot();
         Assert.Equal("Hidden", snapshot.Requested);
@@ -108,9 +108,17 @@ public sealed class CadLoadSpinnerProcessHostFailureTests
         host.Show(new Window());
 
         host.Hide();
-        var thrown = await Record.ExceptionAsync(() => AwaitStateSyncAsync(host.GetLatestStateSyncTask()));
+        OutOfMemoryException? thrown = null;
+        try
+        {
+            await AwaitStateSyncAsync(host.LatestStateSyncTask);
+        }
+        catch (OutOfMemoryException ex)
+        {
+            thrown = ex;
+        }
 
-        Assert.IsType<OutOfMemoryException>(thrown);
+        Assert.NotNull(thrown);
     }
 
     [Theory]

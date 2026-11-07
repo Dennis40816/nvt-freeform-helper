@@ -84,7 +84,7 @@ public sealed class CadLoadSpinnerProcessHostTests
         using var host = new CadLoadSpinnerProcessHost();
 
         host.Hide();
-        var stateSync = host.GetLatestStateSyncTask();
+        var stateSync = host.LatestStateSyncTask;
 
         // A state sync that never ends holds a thread-pool thread in a busy loop until the host is disposed.
         await stateSync.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
@@ -111,7 +111,7 @@ public sealed class CadLoadSpinnerProcessHostTests
         Assert.Equal("Visible", host.GetVisibilityStateSnapshot().Effective);
 
         host.Hide();
-        var stateSync = host.GetLatestStateSyncTask();
+        var stateSync = host.LatestStateSyncTask;
         try
         {
             await AwaitWithStateAsync(hideSendEntered.Task, "The hide message was not sent", host, stateSync);

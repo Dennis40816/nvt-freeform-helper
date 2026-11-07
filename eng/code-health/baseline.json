@@ -2085,26 +2085,6 @@
       "symbol": "WarningsNotAsErrors:VSTHRD002"
     },
     {
-      "syntaxHash": "047d8df54cc83338058233045f8a201cf20a5f2e48d0a870e3df1e70c974940e",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:VSTHRD003"
-    },
-    {
-      "syntaxHash": "27099c24eba1604aedca43b9014bdc9515e896e67df661c943f668c4a446b1c1",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:VSTHRD200"
-    },
-    {
       "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
       "member": "MSBuild",
       "owner": "NFH",
@@ -2493,26 +2473,6 @@
       "count": 1,
       "rule": "VSTHRD003",
       "symbol": "VSTHRD003"
-    },
-    {
-      "syntaxHash": "7c4570caae4f03d48c070dbfc73a091850730fefb9cd42f5e69c2d8b6429e9c5",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.GetLatestStateSyncTask()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "VSTHRD003",
-      "symbol": "VSTHRD003"
-    },
-    {
-      "syntaxHash": "7c4570caae4f03d48c070dbfc73a091850730fefb9cd42f5e69c2d8b6429e9c5",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.GetLatestStateSyncTask()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "VSTHRD200",
-      "symbol": "VSTHRD200"
     }
   ]
 }
