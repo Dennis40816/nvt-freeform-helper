@@ -347,51 +347,7 @@ public sealed class ProjectPersistenceUseCaseTests
         {
             var store = new JsonProjectStore();
             var useCase = new ProjectPersistenceUseCase(store);
-            var file = new ProjectFile
-            {
-                HiddenCadPadIds = new HashSet<int> { 2, 1500000000 },
-                DxfCadLayerOverrides = new Dictionary<int, string>
-                {
-                    [3] = "MovedLayer",
-                },
-                DxfCadGeometryOverrides = new Dictionary<int, ProjectCadGeometrySnapshot>
-                {
-                    [3] = new ProjectCadGeometrySnapshot
-                    {
-                        Vertices =
-                        [
-                            new Point2(20, 0),
-                            new Point2(30, 0),
-                            new Point2(30, 10),
-                            new Point2(20, 10),
-                        ],
-                    },
-                },
-                DxfCombinedCadGroups =
-                [
-                    new ProjectDxfCombinedCadGroup
-                    {
-                        GroupId = 4,
-                        SourceCadIds = new List<int> { 1, 2 },
-                        OutputPads =
-                        [
-                            new ProjectCadPadSnapshot
-                            {
-                                Id = 1_500_000_000,
-                                Name = "COMB_1500000000",
-                                Layer = "L1",
-                                Vertices = new List<Point2>
-                                {
-                                    new(0, 0),
-                                    new(10, 0),
-                                    new(10, 10),
-                                    new(0, 10),
-                                },
-                            },
-                        ],
-                    },
-                ],
-            };
+            var file = BuildDxfEditStateProject();
 
             var save = await useCase.SaveAsync(new ProjectSaveRequest(
                 Project: file,
@@ -432,6 +388,55 @@ public sealed class ProjectPersistenceUseCaseTests
                 File.Delete(projectPath);
             }
         }
+    }
+
+    private static ProjectFile BuildDxfEditStateProject()
+    {
+        return new ProjectFile
+        {
+            HiddenCadPadIds = new HashSet<int> { 2, 1500000000 },
+            DxfCadLayerOverrides = new Dictionary<int, string>
+            {
+                [3] = "MovedLayer",
+            },
+            DxfCadGeometryOverrides = new Dictionary<int, ProjectCadGeometrySnapshot>
+            {
+                [3] = new ProjectCadGeometrySnapshot
+                {
+                    Vertices =
+                    [
+                        new Point2(20, 0),
+                        new Point2(30, 0),
+                        new Point2(30, 10),
+                        new Point2(20, 10),
+                    ],
+                },
+            },
+            DxfCombinedCadGroups =
+            [
+                new ProjectDxfCombinedCadGroup
+                {
+                    GroupId = 4,
+                    SourceCadIds = new List<int> { 1, 2 },
+                    OutputPads =
+                    [
+                        new ProjectCadPadSnapshot
+                        {
+                            Id = 1_500_000_000,
+                            Name = "COMB_1500000000",
+                            Layer = "L1",
+                            Vertices = new List<Point2>
+                            {
+                                new(0, 0),
+                                new(10, 0),
+                                new(10, 10),
+                                new(0, 10),
+                            },
+                        },
+                    ],
+                },
+            ],
+        };
     }
 
     [Fact]
