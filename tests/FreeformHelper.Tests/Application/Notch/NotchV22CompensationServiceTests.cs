@@ -1,3 +1,5 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
@@ -341,29 +343,19 @@ public sealed class NotchV22CompensationServiceTests
             _grid10x3,
             _grid10x3);
         var cad = CreateCadRect(12, 0, 18, 20, id: 901);
-        NotchV22CompensationStageTimings? timings = null;
+        var reports = new List<NotchV22CompensationStageTimings>();
 
-        _ = NotchV22CompensationService.Compute(
+        var result = NotchV22CompensationService.Compute(
             cad,
             grid,
             enableToRegular: true,
             enableToFull: true,
-            timingReporter: reported => timings = reported);
+            timingReporter: reports.Add);
 
-        var reportedTimings = Assert.IsType<NotchV22CompensationStageTimings>(timings);
-        Assert.True(reportedTimings.StageAElapsedMs >= 0);
-        Assert.True(reportedTimings.StageBElapsedMs >= 0);
-        Assert.True(reportedTimings.StageCElapsedMs >= 0);
-        Assert.True(reportedTimings.StageDElapsedMs >= 0);
-        Assert.True(reportedTimings.TotalElapsedMs >= 0);
-        var stageCBreakdown = Assert.IsType<NotchV22StageCSubphaseTimings>(reportedTimings.StageCBreakdown);
-        Assert.True(stageCBreakdown.OwnerAndBlockerLookupElapsedMs >= 0);
-        Assert.True(stageCBreakdown.ExactOccupiedAreaElapsedMs >= 0);
-        Assert.True(stageCBreakdown.SourceCoverageElapsedMs >= 0);
-        Assert.True(stageCBreakdown.ReachabilityElapsedMs >= 0);
-        Assert.True(stageCBreakdown.RuleDecisionElapsedMs >= 0);
-        Assert.True(stageCBreakdown.PreviewAndDebugElapsedMs >= 0);
-        Assert.True(stageCBreakdown.TotalElapsedMs >= 0);
+        var reportedTimings = Assert.IsType<NotchV22CompensationStageTimings>(Assert.Single(reports));
+        Assert.IsType<NotchV22StageCSubphaseTimings>(reportedTimings.StageCBreakdown);
+        Assert.Equal(2, result.RegularDebugInfos.Count);
+        Assert.All(result.RegularDebugInfos, static info => Assert.True(info.IsToFullApplied));
     }
 
     [Fact]
