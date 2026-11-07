@@ -147,6 +147,7 @@ public sealed partial class FreeformHelperViewModelTests
     [Fact]
     public void SettingsWindowDraft_SaveAppliesToViewModel()
     {
+        using var logLevel = new ProcessLogLevelScope("Info");
         var vm = new FreeformHelperViewModel();
         var settings = vm.CreateSettingsWindowViewModel();
         var targetWeightIou = vm.MappingWeightIou + 2m;
