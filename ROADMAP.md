@@ -87,6 +87,14 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
 - [x] **NOTCH-EXPORT-RANGE The Notch C export wrote wrong firmware data for out-of-range input** · Target: - · Status: Done: merged on 2026-11-05 (merge commit `a9e9689`) · PR: [#265](https://github.com/Dennis40816/nvt-freeform-helper/pull/265)
   - Found by the cloud edge-case run (2026-11-05). A diff index of -1 became 65535 (`NHC_DIFF_NONE`), a V21 row with fewer than nine values became a node on diff 0, and 256 or more ICs, more than 65535 nodes in one IC and V22 flags outside a byte were truncated. A line break or trailing backslash in a row comment turned comment text into source (MISRA C:2012 rules 3.1 and 3.2).
   - The export now refuses these inputs before it builds any C text (`NotchExportRangeCheck`) and sanitizes row comments. Output for valid tables is unchanged. MISRA F4 (signed shift in generated code) waits for an owner decision.
+- [ ] **P-IDXMAP-CLEAR What Clear in the Index mapping report should remove** · Target: - · Status: Waiting for owner · PR: -
+  - Today Clear removes the Regular mapping only. It does not undo an FW diff repair, so the user still sees the repaired value after Clear. Found by the repair effect tests (2026-11-08). Changing it changes visible behaviour (tier A).
+- [ ] **P-IDXMAP-STALE When an open decision updates after a repair** · Target: - · Status: Waiting for owner · PR: -
+  - Today an open decision shows the old result until the user analyzes again. The user can read a stale decision right after a repair. Found by the repair effect tests (2026-11-08). Changing it changes visible behaviour (tier A).
+- [ ] **P-LOAD-NONE Manual None freeform tag after a project load with replay** · Target: - · Status: Waiting for owner · PR: -
+  - Today a pad that the user set to None is detected as XY again after Save and Load when replay is on. The user loses that manual choice. Found by the project round trip tests (2026-11-08). Changing it changes saved-project behaviour (tier A).
+- [ ] **P-LOAD-MISSING-DXF Loading a project whose un-embedded DXF is missing** · Target: - · Status: Waiting for owner · PR: -
+  - Today the load shows no warning, and saving again clears the hidden-pad edits. The user can lose DXF edits without knowing. Found by the project round trip tests (2026-11-08). Changing it changes visible behaviour (tier A).
 
 ### 2.2 g5 settings and presentation (after the g4 exit)
 
