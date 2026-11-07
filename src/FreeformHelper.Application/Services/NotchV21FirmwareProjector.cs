@@ -95,36 +95,7 @@ internal static class NotchV21FirmwareProjector
             }
         }
 
-        var nodesByIc = CreateNodeBuckets(icCount);
-        foreach (var group in termsByDestination
-                     .OrderBy(static item => item.Key.IcIndex)
-                     .ThenBy(static item => item.Key.DestinationDiffIndex))
-        {
-            var terms = group.Value
-                .OrderBy(static term => term.RefDiffIndex)
-                .ThenBy(static term => term.Type)
-                .ThenBy(static term => term.RatioQ7)
-                .ToList();
-            for (var index = 0; index < terms.Count; index += 2)
-            {
-                var first = terms[index];
-                var second = index + 1 < terms.Count
-                    ? terms[index + 1]
-                    : new FirmwareTerm(nullValue, NotchV21Q7Codec.TypeNone, 0, "-");
-                _ = TryAddNode(group.Key.IcIndex, nodesByIc, new NotchV21FirmwareNode(
-                    DestinationDiffIndex: group.Key.DestinationDiffIndex,
-                    RegularPercent: 100,
-                    ReguToFullPercent: 100,
-                    FirstDiffIndex: first.RefDiffIndex,
-                    FirstType: first.Type,
-                    FirstRatioQ7: first.RatioQ7,
-                    SecondDiffIndex: second.RefDiffIndex,
-                    SecondType: second.Type,
-                    SecondRatioQ7: second.RatioQ7,
-                    Comment: MergeTermComments(first, second)));
-            }
-        }
-
+        var nodesByIc = BuildDestinationNodes(termsByDestination, nullValue, icCount);
         SortNodes(nodesByIc);
         return BuildProjection(nodesByIc, sourceRows);
 
@@ -300,6 +271,44 @@ internal static class NotchV21FirmwareProjector
         return string.Equals(first.Comment, second.Comment, StringComparison.Ordinal)
             ? first.Comment
             : string.Concat(first.Comment, " | ", second.Comment);
+    }
+
+    private static List<List<NotchV21FirmwareNode>> BuildDestinationNodes(
+        Dictionary<(int IcIndex, int DestinationDiffIndex), List<FirmwareTerm>> termsByDestination,
+        int nullValue,
+        int icCount)
+    {
+        var nodesByIc = CreateNodeBuckets(icCount);
+        foreach (var group in termsByDestination
+                     .OrderBy(static item => item.Key.IcIndex)
+                     .ThenBy(static item => item.Key.DestinationDiffIndex))
+        {
+            var terms = group.Value
+                .OrderBy(static term => term.RefDiffIndex)
+                .ThenBy(static term => term.Type)
+                .ThenBy(static term => term.RatioQ7)
+                .ToList();
+            for (var index = 0; index < terms.Count; index += 2)
+            {
+                var first = terms[index];
+                var second = index + 1 < terms.Count
+                    ? terms[index + 1]
+                    : new FirmwareTerm(nullValue, NotchV21Q7Codec.TypeNone, 0, "-");
+                _ = TryAddNode(group.Key.IcIndex, nodesByIc, new NotchV21FirmwareNode(
+                    DestinationDiffIndex: group.Key.DestinationDiffIndex,
+                    RegularPercent: 100,
+                    ReguToFullPercent: 100,
+                    FirstDiffIndex: first.RefDiffIndex,
+                    FirstType: first.Type,
+                    FirstRatioQ7: first.RatioQ7,
+                    SecondDiffIndex: second.RefDiffIndex,
+                    SecondType: second.Type,
+                    SecondRatioQ7: second.RatioQ7,
+                    Comment: MergeTermComments(first, second)));
+            }
+        }
+
+        return nodesByIc;
     }
 
     private sealed record FirmwareTerm(int RefDiffIndex, int Type, int RatioQ7, string Comment);

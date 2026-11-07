@@ -24,55 +24,7 @@ public sealed class NotchV22TargetAllocationService
         var normalizedStrictRatio = NotchV22CompensationService.NormalizeStrictOverlapRatio(strictOverlapRatio);
         var cadArea = Math.Max(cadPad.Area, AreaEpsilon);
         var stage3Area = Math.Max(cadArea, compensation.Stage3Area);
-        var groupedTargets = compensation.RegularDebugInfos
-            .Select(info =>
-            {
-                var sourceArea = Math.Max(0.0, info.SourceArea);
-                var baseWeightArea = areaMode is NotchV22TargetAllocationAreaMode.Stage3EffectiveArea or NotchV22TargetAllocationAreaMode.TargetRegularStage3Coverage
-                                     && info.IsToFullApplied
-                    ? Math.Max(sourceArea, info.Stage3EffectiveArea)
-                    : sourceArea;
-                var regularArea = Math.Max(info.RegularArea, AreaEpsilon);
-                return new
-                {
-                    info.IcIndex,
-                    info.DiffIndex,
-                    info.RegularPadId,
-                    info.IsToFullApplied,
-                    BaseWeightArea = baseWeightArea,
-                    CoverageRatio = areaMode is NotchV22TargetAllocationAreaMode.TargetRegularSourceCoverage or NotchV22TargetAllocationAreaMode.TargetRegularStage3Coverage
-                        ? baseWeightArea / regularArea
-                        : 0.0
-                };
-            })
-            .Where(item => item.BaseWeightArea > AreaEpsilon)
-            .GroupBy(item => (item.IcIndex, item.DiffIndex))
-            .Select(group =>
-            {
-                return new
-                {
-                    group.Key.IcIndex,
-                    group.Key.DiffIndex,
-                    BaseWeightArea = group.Sum(item => item.BaseWeightArea),
-                    CoverageRatio = group.Sum(item => item.CoverageRatio),
-                    ToFullAppliedRegularCount = group.Count(item => item.IsToFullApplied),
-                    RegularCount = group.Count(),
-                    RegularAreas = group
-                        .GroupBy(item => item.RegularPadId)
-                        .Select(regularGroup => new NotchV22TargetRegularArea(
-                            RegularPadId: regularGroup.Key,
-                            EffectiveArea: regularGroup.Sum(item => item.BaseWeightArea)))
-                        .OrderBy(area => area.RegularPadId)
-                        .ToArray(),
-                    RegularPadIds = group
-                        .Select(item => item.RegularPadId)
-                        .Distinct()
-                        .OrderBy(id => id)
-                        .ToArray()
-                };
-            })
-            .Where(target => !anchorIcIndex.HasValue || target.IcIndex == anchorIcIndex.Value)
-            .ToList();
+        var groupedTargets = BuildGroupedTargets(compensation, anchorIcIndex, areaMode);
 
         var allocationBasisArea = Math.Max(
             AreaEpsilon,
@@ -119,6 +71,77 @@ public sealed class NotchV22TargetAllocationService
             StrictAreaThreshold: strictAreaThreshold,
             Targets: targets,
             TargetCoverageProjection: targetCoverageProjection);
+    }
+
+    private static List<(
+        int IcIndex,
+        int DiffIndex,
+        double BaseWeightArea,
+        double CoverageRatio,
+        int ToFullAppliedRegularCount,
+        int RegularCount,
+        NotchV22TargetRegularArea[] RegularAreas,
+        int[] RegularPadIds)> BuildGroupedTargets(
+        NotchV22CompensationResult compensation,
+        int? anchorIcIndex,
+        NotchV22TargetAllocationAreaMode areaMode)
+    {
+        return compensation.RegularDebugInfos
+            .Select(info =>
+            {
+                var sourceArea = Math.Max(0.0, info.SourceArea);
+                var baseWeightArea = GetBaseWeightArea(info, sourceArea, areaMode);
+                var regularArea = Math.Max(info.RegularArea, AreaEpsilon);
+                return new
+                {
+                    info.IcIndex,
+                    info.DiffIndex,
+                    info.RegularPadId,
+                    info.IsToFullApplied,
+                    BaseWeightArea = baseWeightArea,
+                    CoverageRatio = areaMode is NotchV22TargetAllocationAreaMode.TargetRegularSourceCoverage or NotchV22TargetAllocationAreaMode.TargetRegularStage3Coverage
+                        ? baseWeightArea / regularArea
+                        : 0.0
+                };
+            })
+            .Where(item => item.BaseWeightArea > AreaEpsilon)
+            .GroupBy(item => (item.IcIndex, item.DiffIndex))
+            .Select(group =>
+            {
+                return (
+                    group.Key.IcIndex,
+                    group.Key.DiffIndex,
+                    BaseWeightArea: group.Sum(item => item.BaseWeightArea),
+                    CoverageRatio: group.Sum(item => item.CoverageRatio),
+                    ToFullAppliedRegularCount: group.Count(item => item.IsToFullApplied),
+                    RegularCount: group.Count(),
+                    RegularAreas: group
+                        .GroupBy(item => item.RegularPadId)
+                        .Select(regularGroup => new NotchV22TargetRegularArea(
+                            RegularPadId: regularGroup.Key,
+                            EffectiveArea: regularGroup.Sum(item => item.BaseWeightArea)))
+                        .OrderBy(area => area.RegularPadId)
+                        .ToArray(),
+                    RegularPadIds: group
+                        .Select(item => item.RegularPadId)
+                        .Distinct()
+                        .OrderBy(id => id)
+                        .ToArray());
+            })
+            .Where(target => !anchorIcIndex.HasValue || target.IcIndex == anchorIcIndex.Value)
+            .ToList();
+    }
+
+    private static double GetBaseWeightArea(
+        NotchV22RegularDebugInfo info,
+        double sourceArea,
+        NotchV22TargetAllocationAreaMode areaMode)
+    {
+        return areaMode is NotchV22TargetAllocationAreaMode.Stage3EffectiveArea or
+                           NotchV22TargetAllocationAreaMode.TargetRegularStage3Coverage
+                          && info.IsToFullApplied
+            ? Math.Max(sourceArea, info.Stage3EffectiveArea)
+            : sourceArea;
     }
 }
 
