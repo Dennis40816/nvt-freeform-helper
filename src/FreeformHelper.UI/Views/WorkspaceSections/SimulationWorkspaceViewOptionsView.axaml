@@ -1,0 +1,98 @@
+<UserControl x:CompileBindings="True" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
+    x:DataType="viewModels:SimulationWorkspaceViewModel"
+    x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspaceViewOptionsView">
+  <StackPanel Classes="panelForm" Spacing="{DynamicResource Space6}" Margin="{DynamicResource Inset8}">
+    <WrapPanel Orientation="Horizontal" ToolTip.Tip="Keyboard: B Before, A After, D Delta, C Changed, V toggles Before/After.">
+      <StackPanel Classes="panelFormField" MinWidth="{DynamicResource SimulationViewFieldMinWidth}" Margin="{DynamicResource InsetRight8}">
+        <TextBlock Text="Version"/>
+        <ComboBox ItemsSource="{Binding VersionOptions}" SelectedItem="{Binding SelectedVersionOption, Mode=TwoWay}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="viewModels:NotchApplySimulationVersionOption">
+              <TextBlock Text="{Binding Display}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+      <StackPanel Classes="panelFormField" MinWidth="{DynamicResource SimulationViewFieldMinWidth}" Margin="{DynamicResource InsetRight8}">
+        <TextBlock Text="Values"/>
+        <ComboBox ItemsSource="{Binding CanvasViewOptions}" SelectedItem="{Binding SelectedCanvasViewOption, Mode=TwoWay}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="viewModels:NotchApplySimulationCanvasViewOption">
+              <TextBlock Text="{Binding Display}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+      <StackPanel Classes="panelFormField" MinWidth="{DynamicResource SimulationViewFieldMinWidth}" Margin="{DynamicResource InsetRight8}">
+        <TextBlock Text="Scale"/>
+        <ComboBox ItemsSource="{Binding CanvasColorOptions}" SelectedItem="{Binding SelectedCanvasColorOption, Mode=TwoWay}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="viewModels:NotchApplySimulationCanvasColorOption">
+              <TextBlock Text="{Binding Display}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+      <StackPanel Classes="panelFormField" MinWidth="{DynamicResource SimulationViewFieldMinWidth}" Margin="{DynamicResource InsetRight8}">
+        <TextBlock Text="AA range"/>
+        <ComboBox ItemsSource="{Binding AreaOptions}" SelectedItem="{Binding SelectedAreaOption, Mode=TwoWay}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="viewModels:NotchApplySimulationAreaOption">
+              <TextBlock Text="{Binding Display}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+      <StackPanel Width="{DynamicResource SimulationLegendWidth}" Spacing="{DynamicResource Space2}" ToolTip.Tip="{Binding ColorLegendMeaningText}">
+        <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding ColorScaleCaptionText}"/>
+        <Border Height="{StaticResource Space12}"
+            CornerRadius="{StaticResource RadiusXs}"
+            ClipToBounds="True"
+            IsVisible="{Binding ShowLegendCenterLabel}">
+          <Grid ColumnDefinitions="1.25*,1.1*,1.1*,1.05*,1*"
+              ColumnSpacing="{DynamicResource Space1}"
+              Background="{DynamicResource BrushBgSurfaceInset}">
+            <Border Grid.Column="0" Background="{DynamicResource BrushSimulationScaleLow}"/>
+            <Border Grid.Column="1" Background="{DynamicResource BrushSimulationScaleZero}"/>
+            <Border Grid.Column="2" Background="{DynamicResource BrushSimulationScaleMid}"/>
+            <Border Grid.Column="3" Background="{DynamicResource BrushSimulationScaleWarm}"/>
+            <Border Grid.Column="4" Background="{DynamicResource BrushSimulationScaleHigh}"/>
+          </Grid>
+        </Border>
+        <Border Height="{StaticResource Space12}"
+            CornerRadius="{StaticResource RadiusXs}"
+            ClipToBounds="True"
+            IsVisible="{Binding ShowSequentialLegend}">
+          <Grid ColumnDefinitions="1.4*,1.2*,1.1*,1*"
+              ColumnSpacing="{DynamicResource Space1}"
+              Background="{DynamicResource BrushBgSurfaceInset}">
+            <Border Grid.Column="0" Background="{DynamicResource BrushSimulationScaleZero}"/>
+            <Border Grid.Column="1" Background="{DynamicResource BrushSimulationScaleMid}"/>
+            <Border Grid.Column="2" Background="{DynamicResource BrushSimulationScaleWarm}"/>
+            <Border Grid.Column="3" Background="{DynamicResource BrushSimulationScaleHigh}"/>
+          </Grid>
+        </Border>
+        <Grid ColumnDefinitions="Auto,*,Auto"
+            IsVisible="{Binding ShowLegendCenterLabel}">
+          <SelectableTextBlock Grid.Column="0" Classes="workspaceSectionMeta" Text="{Binding ColorLegendStartText}"/>
+          <SelectableTextBlock Grid.Column="1" Classes="workspaceSectionMeta" Text="{Binding ColorLegendCenterText}" HorizontalAlignment="Center"/>
+          <SelectableTextBlock Grid.Column="2" Classes="workspaceSectionMeta" Text="{Binding ColorLegendEndText}" HorizontalAlignment="Right"/>
+        </Grid>
+        <Grid ColumnDefinitions="Auto,*"
+            IsVisible="{Binding ShowSequentialLegend}">
+          <SelectableTextBlock Grid.Column="0" Classes="workspaceSectionMeta" Text="{Binding ColorLegendStartText}"/>
+          <SelectableTextBlock Grid.Column="1" Classes="workspaceSectionMeta" Text="{Binding ColorLegendEndText}" HorizontalAlignment="Right"/>
+        </Grid>
+      </StackPanel>
+    </WrapPanel>
+    <StackPanel Classes="panelFormField" IsVisible="{Binding IsThresholdMode}">
+      <controls:SettingsInfoLabel Text="TH (color scale only)" Tip="Controls the color scale reference; simulation thresholds and results stay the same."/>
+      <controls:NumberScrubber Minimum="0" Maximum="{DynamicResource NumericInputMaximum}" SmallChange="0.1"
+          FormatString="0.###" SnapToStep="False" Value="{Binding ColorThresholdValue, Mode=TwoWay}"/>
+    </StackPanel>
+  </StackPanel>
+</UserControl>
