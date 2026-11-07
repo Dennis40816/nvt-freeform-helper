@@ -54,20 +54,6 @@
       "symbol": "FreeformHelper.Application.Services.DxfOverlapAnalyzer.Analyze(CadPadSet,int,Action<double>?)"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 94
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/NotchAlgorithms/V21NotchAlgorithm.cs"
-      ],
-      "contentHash": "9f3142ada8a05abd6347e074d6b84deb9b5e252aa173b6c6913a159015bf983b",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.V21NotchAlgorithm.FillAxis(NotchAxisGeometryContext,CadPad?,int,NotchAxisNeighborContext,int,int[])"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
@@ -158,20 +144,6 @@
       "contentHash": "bef1a72ae3f8e9048e4178d8bc898f6fd60c81316d316c10a23c9e2e349a3b77",
       "project": "FreeformHelper.Application",
       "symbol": "FreeformHelper.Application.Services.NotchTableGenerator.BuildV22CadCandidate(RegularPad,int,CadAllocationProfile,CadAllocationGenerationContext,CandidateTimingAccumulator?,out NotchV22ResolvedResult?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 172
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/NotchV22CompensationService.Stages.cs"
-      ],
-      "contentHash": "efddcfe60959cf8960f6f9462ef1da40a0a25f9ffae4e58650229a0677c00d94",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.NotchV22CompensationService.RunStageCEvaluateToFullAndDiagnostics(CadPad,IReadOnlyList<OverlappedRegularInfo>,StageBBoundaryContext,bool,bool,bool,bool,double)"
     },
     {
       "kind": "member",

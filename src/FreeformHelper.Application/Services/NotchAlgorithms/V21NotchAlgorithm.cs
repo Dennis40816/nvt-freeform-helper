@@ -134,41 +134,52 @@ internal static class V21NotchAlgorithm
         }
         else // Y-axis
         {
-            var deltaUp = geometryContext.GetLeadingDelta(cad);
-            var deltaDown = geometryContext.GetTrailingDelta(cad);
+            FillYAxis(geometryContext, cad, nullValue, neighborContext, regDiff, v);
+        }
+    }
 
-            var addUp = geometryContext.ExpandsLeading(cad);
-            var addDown = geometryContext.ExpandsTrailing(cad);
+    private static void FillYAxis(
+        NotchAxisGeometryContext geometryContext,
+        CadPad cad,
+        int nullValue,
+        NotchAxisNeighborContext neighborContext,
+        int regDiff,
+        int[] v)
+    {
+        var deltaUp = geometryContext.GetLeadingDelta(cad);
+        var deltaDown = geometryContext.GetTrailingDelta(cad);
 
-            // Note: In Y-axis, leftNeighbor corresponds to the pad "above" (higher row index),
-            // and rightNeighbor corresponds to the pad "below" (lower row index).
-            if (neighborContext.LeftNeighborDiff == nullValue)
-            {
-                v[3] = NotchV21Q7Codec.TypeNone;
-                v[4] = NotchV21Q7Codec.TypeNone;
-                v[5] = NotchV21Q7Codec.TypeNone;
-            }
-            else
-            {
-                v[3] = addUp ? neighborContext.LeftNeighborDiff : regDiff;
-                v[4] = addUp ? NotchV21Q7Codec.TypeAdd : NotchV21Q7Codec.TypeSub;
-                v[5] = NotchV21Q7Codec.EncodeLegacyRowFractionRaw(
-                    deltaUp / Math.Max(addUp ? neighborContext.LeftNeighborLength : geometryContext.CurrentCellLength, 1e-12));
-            }
+        var addUp = geometryContext.ExpandsLeading(cad);
+        var addDown = geometryContext.ExpandsTrailing(cad);
 
-            if (neighborContext.RightNeighborDiff == nullValue)
-            {
-                v[6] = NotchV21Q7Codec.TypeNone;
-                v[7] = NotchV21Q7Codec.TypeNone;
-                v[8] = NotchV21Q7Codec.TypeNone;
-            }
-            else
-            {
-                v[6] = addDown ? neighborContext.RightNeighborDiff : regDiff;
-                v[7] = addDown ? NotchV21Q7Codec.TypeAdd : NotchV21Q7Codec.TypeSub;
-                v[8] = NotchV21Q7Codec.EncodeLegacyRowFractionRaw(
-                    deltaDown / Math.Max(addDown ? neighborContext.RightNeighborLength : geometryContext.CurrentCellLength, 1e-12));
-            }
+        // Note: In Y-axis, leftNeighbor corresponds to the pad "above" (higher row index),
+        // and rightNeighbor corresponds to the pad "below" (lower row index).
+        if (neighborContext.LeftNeighborDiff == nullValue)
+        {
+            v[3] = NotchV21Q7Codec.TypeNone;
+            v[4] = NotchV21Q7Codec.TypeNone;
+            v[5] = NotchV21Q7Codec.TypeNone;
+        }
+        else
+        {
+            v[3] = addUp ? neighborContext.LeftNeighborDiff : regDiff;
+            v[4] = addUp ? NotchV21Q7Codec.TypeAdd : NotchV21Q7Codec.TypeSub;
+            v[5] = NotchV21Q7Codec.EncodeLegacyRowFractionRaw(
+                deltaUp / Math.Max(addUp ? neighborContext.LeftNeighborLength : geometryContext.CurrentCellLength, 1e-12));
+        }
+
+        if (neighborContext.RightNeighborDiff == nullValue)
+        {
+            v[6] = NotchV21Q7Codec.TypeNone;
+            v[7] = NotchV21Q7Codec.TypeNone;
+            v[8] = NotchV21Q7Codec.TypeNone;
+        }
+        else
+        {
+            v[6] = addDown ? neighborContext.RightNeighborDiff : regDiff;
+            v[7] = addDown ? NotchV21Q7Codec.TypeAdd : NotchV21Q7Codec.TypeSub;
+            v[8] = NotchV21Q7Codec.EncodeLegacyRowFractionRaw(
+                deltaDown / Math.Max(addDown ? neighborContext.RightNeighborLength : geometryContext.CurrentCellLength, 1e-12));
         }
     }
 }

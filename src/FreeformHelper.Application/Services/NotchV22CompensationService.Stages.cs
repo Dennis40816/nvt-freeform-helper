@@ -90,57 +90,18 @@ public sealed partial class NotchV22CompensationService
         {
             var regularPad = overlap.Pad;
             var overlapArea = overlap.OverlapArea;
-            var regularArea = Math.Max(regularPad.Area, AreaEpsilon);
-            var strictOverlapThreshold = Math.Max(AreaEpsilon, regularArea * boundaryContext.StrictOverlapRatio);
-            var hasSourceArea = overlapArea > strictOverlapThreshold;
-            var stepStartedAt = TimeProvider.System.GetTimestamp();
-            var ownerCadPads = hasSourceArea
-                ? boundaryContext.GetStrictOwnerCadPads(regularPad)
-                : Array.Empty<CadPad>();
-            var ownerCadIds = ownerCadPads.Select(static pad => pad.Id).ToArray();
-            var blockerCandidates = hasSourceArea
-                ? boundaryContext.GetBlockingCadPads(regularPad, cad.Id)
-                : Array.Empty<CadPad>();
-            ownerAndBlockerLookupElapsedMs += GetElapsedMilliseconds(stepStartedAt);
-            var isBoundaryRegular = hasSourceArea && boundaryContext.EffectiveBoundaryRegularIndices.Contains(regularPad.Index);
-            var effectiveExpansionEpsilon = Math.Max(AreaEpsilon, regularArea * 1e-9);
-            stepStartedAt = TimeProvider.System.GetTimestamp();
-            var exactOccupiedArea = hasSourceArea
-                ? ComputeExactOccupiedAreaInRegular(cad, regularPad, blockerCandidates)
-                : overlapArea;
-            exactOccupiedAreaElapsedMs += GetElapsedMilliseconds(stepStartedAt);
-            var exactFreeArea = hasSourceArea
-                ? Math.Max(0.0, regularArea - exactOccupiedArea)
-                : 0.0;
-            var effectiveExpansionThreshold = Math.Max(strictOverlapThreshold, effectiveExpansionEpsilon);
-            var hasEffectiveExpansion = hasSourceArea && exactFreeArea > effectiveExpansionThreshold;
-            var requiresReachability = enableToFull && hasSourceArea && hasEffectiveExpansion;
+            var (
+                regularArea, hasSourceArea, ownerCadIds, blockerCandidates, isBoundaryRegular,
+                effectiveExpansionEpsilon, exactFreeArea, effectiveExpansionThreshold, hasEffectiveExpansion,
+                requiresReachability) = EvaluateToFullRegularExpansion(
+                    cad, regularPad, overlapArea, boundaryContext, enableToFull,
+                    ref ownerAndBlockerLookupElapsedMs, ref exactOccupiedAreaElapsedMs);
             var isToFullBoundaryCandidate = requiresReachability;
-            ToFullReachabilityResult reachability;
-            stepStartedAt = TimeProvider.System.GetTimestamp();
-            if (requiresReachability)
-            {
-                reachability = ComputeReachabilityInRegular(cad, regularPad, blockerCandidates, overlapArea);
-                reachabilityElapsedMs += GetElapsedMilliseconds(stepStartedAt);
-            }
-            else
-            {
-                reachability = ComputeSourceCoverageInRegular(cad, regularPad, overlapArea);
-                sourceCoverageElapsedMs += GetElapsedMilliseconds(stepStartedAt);
-            }
-            var hasDirectionalBlocker = hasSourceArea && reachability.BlockedCellCount > 0;
-            var reachabilityAreaTolerance = Math.Max(
-                effectiveExpansionEpsilon,
-                regularArea / (ReachabilityResolution * ReachabilityResolution));
-            var maxAllowedReachableArea = overlapArea + exactFreeArea + reachabilityAreaTolerance;
-            var hasReachableExpansion = hasEffectiveExpansion &&
-                                        (
-                                            (reachability.TotalCellCount > 0 &&
-                                             reachability.ReachableCellCount > reachability.SourceCellCount) ||
-                                            reachability.ReachableArea > (overlapArea + effectiveExpansionThreshold)
-                                        ) &&
-                                        reachability.ReachableArea <= maxAllowedReachableArea;
-            stepStartedAt = TimeProvider.System.GetTimestamp();
+            var (reachability, hasDirectionalBlocker, hasReachableExpansion) = EvaluateToFullRegularReachability(
+                cad, regularPad, blockerCandidates, overlapArea, regularArea, hasSourceArea,
+                effectiveExpansionEpsilon, exactFreeArea, effectiveExpansionThreshold, hasEffectiveExpansion,
+                requiresReachability, ref reachabilityElapsedMs, ref sourceCoverageElapsedMs);
+            var stepStartedAt = TimeProvider.System.GetTimestamp();
             var toFullRuleDecision = EvaluateToFullRuleDecision(
                 enableToFull,
                 hasSourceArea,
@@ -157,69 +118,15 @@ public sealed partial class NotchV22CompensationService
                 : Array.Empty<NotchToFullRuleTraceEntry>();
 
             stepStartedAt = TimeProvider.System.GetTimestamp();
-            if (isToFullBoundaryCandidate)
-            {
-                toFullCandidateRegionPolygons.Add(ToRectPolygon(regularPad.Bounds));
+            CollectToFullPreviewPolygons(
+                cad, regularPad, isToFullBoundaryCandidate, applyToFullOnThisRegular, reachability,
+                toFullCandidateRegionPolygons, toFullSeedRegionPolygons, toFullRegionPolygons);
 
-                var overlapPolygons = BuildCadOverlapPolygons(cad.Polygon, regularPad.Bounds);
-                if (overlapPolygons.Length > 0)
-                {
-                    toFullSeedRegionPolygons.AddRange(overlapPolygons);
-                }
-                else
-                {
-                    if (reachability.SourcePolygons.Count > 0)
-                    {
-                        toFullSeedRegionPolygons.AddRange(reachability.SourcePolygons);
-                    }
-                }
-            }
-
-            if (applyToFullOnThisRegular)
-            {
-                if (reachability.ReachablePolygons.Count > 0)
-                {
-                    toFullRegionPolygons.AddRange(reachability.ReachablePolygons);
-                }
-            }
-
-            var sourceArea = hasSourceArea ? reachability.SourceArea : 0.0;
-            var reachableArea = applyToFullOnThisRegular
-                ? Math.Max(overlapArea, reachability.ReachableArea)
-                : overlapArea;
-            var stage3EffectiveArea = ResolveStage3EffectiveArea(
-                overlapArea,
-                reachableArea,
-                applyToFullOnThisRegular,
-                enableBoundaryVirtualAreaCap,
-                normalizedBoundaryVirtualAreaCapRatio);
-            regularDebugInfos.Add(new NotchV22RegularDebugInfo(
-                RegularPadId: regularPad.RegularPadId,
-                RegularIndex: regularPad.Index,
-                IcIndex: regularPad.IcIndex,
-                DiffIndex: regularPad.DiffIndex,
-                Row: regularPad.Row,
-                Col: regularPad.Col,
-                RegularArea: regularArea,
-                OverlapArea: overlapArea,
-                SourceArea: sourceArea,
-                BlockedArea: hasDirectionalBlocker ? Math.Max(0.0, reachability.BlockedArea) : 0.0,
-                ReachableArea: reachableArea,
-                Stage3EffectiveArea: stage3EffectiveArea,
-                SourceCellCount: reachability.SourceCellCount,
-                BlockedCellCount: hasDirectionalBlocker ? reachability.BlockedCellCount : 0,
-                ReachableCellCount: reachability.ReachableCellCount,
-                TotalCellCount: reachability.TotalCellCount,
-                BlockerCandidateCount: blockerCandidates.Length,
-                OwnerCadPadCount: ownerCadIds.Length,
-                OwnerCadPadIds: ownerCadIds,
-                IsBoundaryRegular: isBoundaryRegular,
-                IsToFullBoundaryCandidate: isToFullBoundaryCandidate,
-                HasEffectiveExpansion: hasReachableExpansion,
-                HasDirectionalBlocker: hasDirectionalBlocker,
-                ToFullRuleTrace: toFullRuleTrace,
-                ToFullRuleCode: toFullRuleCode,
-                IsToFullApplied: applyToFullOnThisRegular));
+            regularDebugInfos.Add(BuildToFullRegularDebugInfo(
+                regularPad, regularArea, overlapArea, hasSourceArea, reachability, applyToFullOnThisRegular,
+                enableBoundaryVirtualAreaCap, normalizedBoundaryVirtualAreaCapRatio, hasDirectionalBlocker,
+                blockerCandidates, ownerCadIds, isBoundaryRegular, isToFullBoundaryCandidate,
+                hasReachableExpansion, toFullRuleTrace, toFullRuleCode));
             previewAndDebugElapsedMs += GetElapsedMilliseconds(stepStartedAt);
         }
 
@@ -324,5 +231,186 @@ public sealed partial class NotchV22CompensationService
     private static long GetElapsedMilliseconds(long startedAtTimestamp)
     {
         return (long)TimeProvider.System.GetElapsedTime(startedAtTimestamp).TotalMilliseconds;
+    }
+
+    private static (
+        double RegularArea, bool HasSourceArea, int[] OwnerCadIds, CadPad[] BlockerCandidates,
+        bool IsBoundaryRegular, double EffectiveExpansionEpsilon, double ExactFreeArea,
+        double EffectiveExpansionThreshold, bool HasEffectiveExpansion, bool RequiresReachability)
+        EvaluateToFullRegularExpansion(
+            CadPad cad,
+            RegularPad regularPad,
+            double overlapArea,
+            StageBBoundaryContext boundaryContext,
+            bool enableToFull,
+            ref long ownerAndBlockerLookupElapsedMs,
+            ref long exactOccupiedAreaElapsedMs)
+    {
+        var regularArea = Math.Max(regularPad.Area, AreaEpsilon);
+        var strictOverlapThreshold = Math.Max(AreaEpsilon, regularArea * boundaryContext.StrictOverlapRatio);
+        var hasSourceArea = overlapArea > strictOverlapThreshold;
+        var stepStartedAt = TimeProvider.System.GetTimestamp();
+        var ownerCadPads = hasSourceArea
+            ? boundaryContext.GetStrictOwnerCadPads(regularPad)
+            : Array.Empty<CadPad>();
+        var ownerCadIds = ownerCadPads.Select(static pad => pad.Id).ToArray();
+        var blockerCandidates = hasSourceArea
+            ? boundaryContext.GetBlockingCadPads(regularPad, cad.Id)
+            : Array.Empty<CadPad>();
+        ownerAndBlockerLookupElapsedMs += GetElapsedMilliseconds(stepStartedAt);
+        var isBoundaryRegular = hasSourceArea && boundaryContext.EffectiveBoundaryRegularIndices.Contains(regularPad.Index);
+        var effectiveExpansionEpsilon = Math.Max(AreaEpsilon, regularArea * 1e-9);
+        stepStartedAt = TimeProvider.System.GetTimestamp();
+        var exactOccupiedArea = hasSourceArea
+            ? ComputeExactOccupiedAreaInRegular(cad, regularPad, blockerCandidates)
+            : overlapArea;
+        exactOccupiedAreaElapsedMs += GetElapsedMilliseconds(stepStartedAt);
+        var exactFreeArea = hasSourceArea
+            ? Math.Max(0.0, regularArea - exactOccupiedArea)
+            : 0.0;
+        var effectiveExpansionThreshold = Math.Max(strictOverlapThreshold, effectiveExpansionEpsilon);
+        var hasEffectiveExpansion = hasSourceArea && exactFreeArea > effectiveExpansionThreshold;
+        var requiresReachability = enableToFull && hasSourceArea && hasEffectiveExpansion;
+        return (
+            regularArea, hasSourceArea, ownerCadIds, blockerCandidates, isBoundaryRegular,
+            effectiveExpansionEpsilon, exactFreeArea, effectiveExpansionThreshold, hasEffectiveExpansion,
+            requiresReachability);
+    }
+
+    private static (ToFullReachabilityResult Reachability, bool HasDirectionalBlocker, bool HasReachableExpansion)
+        EvaluateToFullRegularReachability(
+            CadPad cad,
+            RegularPad regularPad,
+            CadPad[] blockerCandidates,
+            double overlapArea,
+            double regularArea,
+            bool hasSourceArea,
+            double effectiveExpansionEpsilon,
+            double exactFreeArea,
+            double effectiveExpansionThreshold,
+            bool hasEffectiveExpansion,
+            bool requiresReachability,
+            ref long reachabilityElapsedMs,
+            ref long sourceCoverageElapsedMs)
+    {
+        ToFullReachabilityResult reachability;
+        var stepStartedAt = TimeProvider.System.GetTimestamp();
+        if (requiresReachability)
+        {
+            reachability = ComputeReachabilityInRegular(cad, regularPad, blockerCandidates, overlapArea);
+            reachabilityElapsedMs += GetElapsedMilliseconds(stepStartedAt);
+        }
+        else
+        {
+            reachability = ComputeSourceCoverageInRegular(cad, regularPad, overlapArea);
+            sourceCoverageElapsedMs += GetElapsedMilliseconds(stepStartedAt);
+        }
+        var hasDirectionalBlocker = hasSourceArea && reachability.BlockedCellCount > 0;
+        var reachabilityAreaTolerance = Math.Max(
+            effectiveExpansionEpsilon,
+            regularArea / (ReachabilityResolution * ReachabilityResolution));
+        var maxAllowedReachableArea = overlapArea + exactFreeArea + reachabilityAreaTolerance;
+        var hasReachableExpansion = hasEffectiveExpansion &&
+                                    (
+                                        (reachability.TotalCellCount > 0 &&
+                                         reachability.ReachableCellCount > reachability.SourceCellCount) ||
+                                        reachability.ReachableArea > (overlapArea + effectiveExpansionThreshold)
+                                    ) &&
+                                    reachability.ReachableArea <= maxAllowedReachableArea;
+        return (reachability, hasDirectionalBlocker, hasReachableExpansion);
+    }
+
+    private static void CollectToFullPreviewPolygons(
+        CadPad cad,
+        RegularPad regularPad,
+        bool isToFullBoundaryCandidate,
+        bool applyToFullOnThisRegular,
+        ToFullReachabilityResult reachability,
+        List<Polygon2> toFullCandidateRegionPolygons,
+        List<Polygon2> toFullSeedRegionPolygons,
+        List<Polygon2> toFullRegionPolygons)
+    {
+        if (isToFullBoundaryCandidate)
+        {
+            toFullCandidateRegionPolygons.Add(ToRectPolygon(regularPad.Bounds));
+
+            var overlapPolygons = BuildCadOverlapPolygons(cad.Polygon, regularPad.Bounds);
+            if (overlapPolygons.Length > 0)
+            {
+                toFullSeedRegionPolygons.AddRange(overlapPolygons);
+            }
+            else
+            {
+                if (reachability.SourcePolygons.Count > 0)
+                {
+                    toFullSeedRegionPolygons.AddRange(reachability.SourcePolygons);
+                }
+            }
+        }
+
+        if (applyToFullOnThisRegular)
+        {
+            if (reachability.ReachablePolygons.Count > 0)
+            {
+                toFullRegionPolygons.AddRange(reachability.ReachablePolygons);
+            }
+        }
+    }
+
+    private static NotchV22RegularDebugInfo BuildToFullRegularDebugInfo(
+        RegularPad regularPad,
+        double regularArea,
+        double overlapArea,
+        bool hasSourceArea,
+        ToFullReachabilityResult reachability,
+        bool applyToFullOnThisRegular,
+        bool enableBoundaryVirtualAreaCap,
+        double normalizedBoundaryVirtualAreaCapRatio,
+        bool hasDirectionalBlocker,
+        CadPad[] blockerCandidates,
+        int[] ownerCadIds,
+        bool isBoundaryRegular,
+        bool isToFullBoundaryCandidate,
+        bool hasReachableExpansion,
+        IReadOnlyList<NotchToFullRuleTraceEntry> toFullRuleTrace,
+        string toFullRuleCode)
+    {
+        var sourceArea = hasSourceArea ? reachability.SourceArea : 0.0;
+        var reachableArea = applyToFullOnThisRegular
+            ? Math.Max(overlapArea, reachability.ReachableArea)
+            : overlapArea;
+        var stage3EffectiveArea = ResolveStage3EffectiveArea(
+            overlapArea,
+            reachableArea,
+            applyToFullOnThisRegular,
+            enableBoundaryVirtualAreaCap,
+            normalizedBoundaryVirtualAreaCapRatio);
+        return new NotchV22RegularDebugInfo(
+            RegularPadId: regularPad.RegularPadId,
+            RegularIndex: regularPad.Index,
+            IcIndex: regularPad.IcIndex,
+            DiffIndex: regularPad.DiffIndex,
+            Row: regularPad.Row,
+            Col: regularPad.Col,
+            RegularArea: regularArea,
+            OverlapArea: overlapArea,
+            SourceArea: sourceArea,
+            BlockedArea: hasDirectionalBlocker ? Math.Max(0.0, reachability.BlockedArea) : 0.0,
+            ReachableArea: reachableArea,
+            Stage3EffectiveArea: stage3EffectiveArea,
+            SourceCellCount: reachability.SourceCellCount,
+            BlockedCellCount: hasDirectionalBlocker ? reachability.BlockedCellCount : 0,
+            ReachableCellCount: reachability.ReachableCellCount,
+            TotalCellCount: reachability.TotalCellCount,
+            BlockerCandidateCount: blockerCandidates.Length,
+            OwnerCadPadCount: ownerCadIds.Length,
+            OwnerCadPadIds: ownerCadIds,
+            IsBoundaryRegular: isBoundaryRegular,
+            IsToFullBoundaryCandidate: isToFullBoundaryCandidate,
+            HasEffectiveExpansion: hasReachableExpansion,
+            HasDirectionalBlocker: hasDirectionalBlocker,
+            ToFullRuleTrace: toFullRuleTrace,
+            ToFullRuleCode: toFullRuleCode,
+            IsToFullApplied: applyToFullOnThisRegular);
     }
 }
