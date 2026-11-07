@@ -11,7 +11,7 @@ using Xunit;
 namespace FreeformHelper.Tests;
 
 [Collection("HeadlessUiSerial")]
-public sealed class ResetConfirmDialogEntryTests
+public sealed class EmbedDxfConfirmDialogEntryTests
 {
     [AvaloniaFact]
     public async Task EmbedDxfConfirmation_EmbedReturnsTrueAndSkipReturnsFalseAsync()
