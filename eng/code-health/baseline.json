@@ -40,34 +40,6 @@
       "symbol": "FreeformHelper.Application.Services.CadOutputFwDiffIndexAssignmentService.AssignWithoutGrid(IReadOnlyList<CadPad>,CadOutputFwDiffAutoMode,IReadOnlyDictionary<int, int?>,IReadOnlyDictionary<int, int>?,Dictionary<int, int>,Dictionary<int, int>,List<string>,List<string>)"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 83
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/CadPadUnionService.cs"
-      ],
-      "contentHash": "7ae5f61e25d222679c1b5c6fc0f5eb5b0b6f54954f19311f159b36eab84d5c08",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.CadPadUnionService.Union(IEnumerable<Polygon2>)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 81
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/CoordinateArtifactService.cs"
-      ],
-      "contentHash": "e6852e2c360f086af431dcb2c97c2c5e1764d5588b9234a455191ed6c4f289e9",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.CoordinateArtifactService.BuildSnapshot(CoordinatePlannerSnapshot,Rect2,string,string)"
-    },
-    {
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
