@@ -47,9 +47,9 @@ public sealed class ShellNavigationEntryTests
             completion = openSelectionAsync(selection);
             exportWindow = Assert.Single(owner.OwnedWindows.OfType<NotchExportSelectionWindow>());
             await HeadlessUiPump.FlushQueueAsync();
-            var hint = Assert.IsType<Border>(view.FindControl<Border>("NotchExportRestoreHintBorder"));
+            var hint = Assert.IsType<Border>(Assert.Single(view.GetVisualDescendants().OfType<WorkspaceActionBar>()).FindControl<Border>("RestoreHint"));
             var restore = Assert.Single(view.GetVisualDescendants().OfType<Button>(),
-                static button => button.Classes.Contains("notchExportRestoreHintAction"));
+                static button => Equals(button.Content, "Restore Export Notch Rows"));
             Assert.True(exportWindow.IsVisible);
             Assert.False(hint.IsVisible);
             Assert.False(completion.IsCompleted);

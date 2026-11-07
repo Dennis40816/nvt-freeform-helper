@@ -1,34 +1,21 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
              x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep4View">
-    <controls:HidePanelBlock x:Name="Step4Block"
-                             Title="Step 4 · Index diagnostics"
+    <panels:CollapsiblePanel x:Name="Step4Block"
+                             Title="Index diagnostics"
                              IsExpanded="{Binding IsStep4Expanded, Mode=TwoWay}">
+      <panels:CollapsiblePanel.HeaderRight>
+        <Button Tag="Step4IndexDiagnostics"
+                Classes="actionIconButton actionGhost workflowStepAction" Click="OpenSettingsButton_Click"
+                ToolTip.Tip="Open Settings at Step 4 section.">
+          <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+        </Button>
+      </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
-        <Grid ColumnDefinitions="*,Auto,Auto">
-          <SelectableTextBlock Grid.Column="0"
-                               Classes="stepNote"
-                               Text="Index numbering, duplicate diffs, and visibility mask."/>
-          <Button Grid.Column="1"
-                  Tag="Step4IndexDiagnostics"
-                  Classes="actionIconButton actionGhost workflowStepAction"
-                  Margin="{StaticResource InsetLeft10}"
-                  Click="OpenSettingsButton_Click"
-                  ToolTip.Tip="Open Settings at Step 4 section.">
-            <controls:FontIcon Classes="symbols iconSm"
-                               Glyph="{x:Static icons:IconGlyphs.Settings}"/>
-          </Button>
-          <Button Grid.Column="2"
-                  Classes="actionIconButton actionGhost workflowStepAction"
-                  Margin="{StaticResource InsetLeft10}"
-                  Command="{Binding ClearStep4ResultCommand}"
-                  ToolTip.Tip="Clear Step 4 result and downstream Step 5/6 results.">
-            <controls:FontIcon Classes="symbols iconSm"
-                               Glyph="{x:Static icons:IconGlyphs.Delete}"/>
-          </Button>
-        </Grid>
+
         <Border Classes="workflowStepStatusStrip">
           <StackPanel Spacing="{StaticResource Space6}">
             <Border Classes="workflowStepMetricTile">
@@ -49,17 +36,13 @@
                                      ToolTip.Tip="{Binding Step4Index.DuplicateDiffSummary}"/>
               </StackPanel>
             </Border>
-            <Border Classes="workflowStepMetricTile">
-              <StackPanel Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Classes="workflowStepMetricLabel"
-                                     Text="Regular Visibility Mask"/>
-                <SelectableTextBlock Classes="workflowStepMetricText compact"
-                                     Text="{Binding RegularVisibilityMaskUi.Summary}"
-                                     ToolTip.Tip="{Binding RegularVisibilityMaskUi.Summary}"/>
-              </StackPanel>
-            </Border>
+
           </StackPanel>
         </Border>
+        <Button Content="Analyze mapping"
+                Command="{Binding AnalyzeIndexMappingCommand}"
+                HorizontalAlignment="Stretch"
+                ToolTip.Tip="Step 4: analyze CAD↔Regular index mapping and open report window."/>
         <Border Classes="workflowStepSubsection"
                 IsVisible="{Binding HasStep4DuplicateDiffGroups}">
           <StackPanel Spacing="{StaticResource Space8}">
@@ -96,10 +79,10 @@
         </Border>
         <Border Classes="workflowStepSubsection">
           <StackPanel Spacing="{StaticResource Space8}">
-            <SelectableTextBlock Text="Offset selected CAD Output FW Diff"
+            <SelectableTextBlock Text="Manual fix (changes indexes)"
                                  FontWeight="SemiBold"/>
             <SelectableTextBlock Classes="stepNote"
-                                 Text="{Binding Step4DiffShiftSelectionSummary}"/>
+                                 Text="Shift applies to selected CAD output pads."/>
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space8}">
               <controls:NumberScrubber Grid.Column="0"
@@ -120,10 +103,7 @@
                                  Text="Gap diffs stay empty. They can remain target-only and will not become anchor rows."/>
           </StackPanel>
         </Border>
-        <Button Content="Analyze mapping"
-                Command="{Binding AnalyzeIndexMappingCommand}"
-                HorizontalAlignment="Stretch"
-                ToolTip.Tip="Step 4: analyze CAD↔Regular index mapping and open report window."/>
+
         <ProgressBar Minimum="0"
                      Maximum="1"
                      Value="{Binding IndexMappingProgress}"
@@ -132,7 +112,11 @@
         <SelectableTextBlock Classes="stepNote" Text="{Binding DxfRegularMappingSummary}"/>
         <SelectableTextBlock Classes="stepNote"
                              Text="Detailed issues open in a separate report window (copy supported)."/>
+        <Separator/>
+        <SelectableTextBlock Classes="stepNote" Text="Clears mapping diagnostics and invalidates export and validation." TextWrapping="Wrap"/>
+        <Button Classes="actionTextButton actionDanger" Content="Clear result"
+                HorizontalAlignment="Right" Command="{Binding ClearStep4ResultCommand}"
+                ToolTip.Tip="Clears mapping diagnostics and invalidates export and validation."/>
       </StackPanel>
-    </controls:HidePanelBlock>
+    </panels:CollapsiblePanel>
 </UserControl>
-

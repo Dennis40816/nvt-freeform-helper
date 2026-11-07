@@ -51,11 +51,11 @@ public sealed partial class FreeformHelperViewModelTests
         var vm = new FreeformHelperViewModel();
 
         var toggleIds = vm.WorkspaceHeaderItems.Select(static item => item.Id).ToArray();
-        Assert.Contains("cadLayer", toggleIds);
-        Assert.Contains("regularGrid", toggleIds);
+        Assert.DoesNotContain("cadLayer", toggleIds);
+        Assert.DoesNotContain("regularGrid", toggleIds);
         Assert.Contains("highlightUnmatched", toggleIds);
         Assert.Contains("highlightFreeform", toggleIds);
-        Assert.Contains("colorByArea", toggleIds);
+        Assert.DoesNotContain("colorByArea", toggleIds);
     }
 
 

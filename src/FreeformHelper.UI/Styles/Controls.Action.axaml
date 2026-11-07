@@ -1,6 +1,7 @@
 <Styles x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls">
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia">
   <!-- Action primitives: mechanical layout only. Semantic role classes own state colors. -->
   <Style Selector="Button.actionButton, ToggleButton.actionButton, Button.actionTextButton, ToggleButton.actionTextButton">
     <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
@@ -796,5 +797,11 @@
     <Setter Property="BorderBrush" Value="{DynamicResource BrushButtonNeutralBorder}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushButtonDisabledForeground}"/>
     <Setter Property="Opacity" Value="1"/>
+  </Style>
+  <!-- Core 0.9.5 panel headers need the stock checked presenter accent reset. -->
+  <Style Selector="panels|CollapsiblePanel /template/ ToggleButton.panelBlockHeader:checked /template/ ContentPresenter#PART_ContentPresenter, panels|CollapsiblePanel /template/ ToggleButton.panelBlockHeader:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter, panels|CollapsiblePanel /template/ ToggleButton.panelBlockHeader:checked:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{x:Null}"/>
+    <Setter Property="BorderBrush" Value="{x:Null}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushActionGhostForeground}"/>
   </Style>
 </Styles>
