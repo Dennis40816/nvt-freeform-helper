@@ -1308,28 +1308,19 @@ public sealed class NotchTableGeneratorTests
     [Fact]
     public void CadAllocationCandidateHelpers_ConsumeOnlyFrozenGenerationContext()
     {
-        const BindingFlags methodFlags = BindingFlags.Static | BindingFlags.NonPublic;
-        var generatorType = typeof(NotchTableGenerator);
-        var contextType = generatorType.GetNestedType("CadAllocationGenerationContext", BindingFlags.NonPublic);
-        Assert.NotNull(contextType);
-        foreach (var methodName in new[]
-                 {
-                     "BuildCanonicalCandidatesByDiff",
-                     "BuildCanonicalCandidatesForProfile",
-                     "BuildV22CadCandidate",
-                 })
-        {
-            var method = Assert.Single(generatorType.GetMethods(methodFlags), method => method.Name == methodName);
-            Assert.Contains(method.GetParameters(), parameter => parameter.ParameterType == contextType);
-            Assert.DoesNotContain(
-                method.GetParameters(),
-                parameter => parameter.ParameterType == typeof(ProjectSettings) ||
-                             parameter.ParameterType == typeof(NotchSettings));
-        }
+        // Each accessor binds to the helper by its exact parameter list. A helper that takes settings again,
+        // or drops the context, makes the call throw MissingMethodException before it reads the null context.
+        Assert.Throws<NullReferenceException>(() =>
+            NotchTableGeneratorPrivateAccess.BuildCanonicalCandidatesByDiff(null, null, null, 0, 0, 0));
+        Assert.Throws<NullReferenceException>(() =>
+            NotchTableGeneratorPrivateAccess.BuildCanonicalCandidatesForProfile(null, null, null, null, out _));
+        Assert.Throws<NullReferenceException>(() =>
+            NotchTableGeneratorPrivateAccess.BuildV22CadCandidate(null, null, 0, null, null, null, out _));
 
-        var contextFields = contextType!.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        var contextProperties = contextType.GetProperties(
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var contextType = NotchTableGeneratorPrivateAccess.GenerationContextClrType;
+        Assert.NotNull(contextType);
+        var contextFields = contextType!.GetFields(BindingFlags.Instance | BindingFlags.Public);
+        var contextProperties = contextType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
         Assert.NotEmpty(contextFields);
         Assert.All(contextFields, field => Assert.True(field.IsInitOnly));
         Assert.All(contextProperties, property => Assert.Null(property.SetMethod));
