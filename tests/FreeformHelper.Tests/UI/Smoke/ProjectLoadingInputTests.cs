@@ -34,7 +34,7 @@ public sealed class ProjectLoadingInputTests
         finally
         {
             release.TrySetResult(null);
-            await load;
+            await load.WaitAsync(TestContext.Current.CancellationToken);
         }
 
         Assert.Equal(ProjectSessionMode.Ready, vm.SessionMode);
