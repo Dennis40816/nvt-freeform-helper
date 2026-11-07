@@ -26,20 +26,6 @@
       "symbol": "FreeformHelper.Application.Services.CoordinatePlannerRequest"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 147
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/DxfOverlapAnalyzer.cs"
-      ],
-      "contentHash": "fafcdfc513463c2dff8042f936083d6dffa5d47657b8bca7c78b3a253b154c21",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.DxfOverlapAnalyzer.Analyze(CadPadSet,int,Action<double>?)"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
