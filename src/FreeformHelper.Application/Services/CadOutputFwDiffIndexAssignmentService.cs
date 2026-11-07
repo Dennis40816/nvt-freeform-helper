@@ -99,75 +99,13 @@ public sealed partial class CadOutputFwDiffIndexAssignmentService
             var icIndex = icEntry.Key;
             var usedDiffs = new HashSet<int>();
 
-            foreach (var rowGroup in icEntry.Value)
-            {
-                foreach (var pad in rowGroup.Pads)
-                {
-                    if (manualOverrides is null ||
-                        !manualOverrides.TryGetValue(pad.Id, out var overrideIndex))
-                    {
-                        continue;
-                    }
+            ApplyOverridesForIc(
+                icEntry.Value, manualOverrides, strictDiffByCadId, assignedByCadId, usedDiffs,
+                ref overrideAssignedCount, ref duplicateOverrides, ref invalidOverrides, ref overrideMismatchCount);
 
-                    if (overrideIndex < 0)
-                    {
-                        invalidOverrides++;
-                        continue;
-                    }
-
-                    if (!usedDiffs.Add(overrideIndex))
-                    {
-                        duplicateOverrides++;
-                        continue;
-                    }
-
-                    assignedByCadId[pad.Id] = overrideIndex;
-                    overrideAssignedCount++;
-                    if (strictDiffByCadId.TryGetValue(pad.Id, out var strictDiff) &&
-                        strictDiff.HasValue &&
-                        strictDiff.Value != overrideIndex)
-                    {
-                        overrideMismatchCount++;
-                    }
-                }
-            }
-
-            foreach (var rowGroup in icEntry.Value)
-            {
-                foreach (var pad in rowGroup.Pads)
-                {
-                    if (assignedByCadId.ContainsKey(pad.Id))
-                    {
-                        continue;
-                    }
-
-                    if (!strictDiffByCadId.TryGetValue(pad.Id, out var strictDiff) || !strictDiff.HasValue)
-                    {
-                        autoUnmatchedCount++;
-                        if (unmatchedSamples.Count < 5)
-                        {
-                            unmatchedSamples.Add($"IC{icIndex + 1}/R{rowGroup.RowIndex}: CAD {pad.Id}");
-                        }
-
-                        continue;
-                    }
-
-                    var targetIndex = strictDiff.Value;
-                    if (autoMode == CadOutputFwDiffAutoMode.StrictUnique && !usedDiffs.Add(targetIndex))
-                    {
-                        autoConflictCount++;
-                        if (conflictSamples.Count < 5)
-                        {
-                            conflictSamples.Add($"IC{icIndex + 1}/R{rowGroup.RowIndex}: CAD {pad.Id} -> diff {targetIndex}");
-                        }
-
-                        continue;
-                    }
-
-                    assignedByCadId[pad.Id] = targetIndex;
-                    autoAssignedCount++;
-                }
-            }
+            AssignAutoForIc(
+                icIndex, icEntry.Value, autoMode, strictDiffByCadId, assignedByCadId, usedDiffs, conflictSamples, unmatchedSamples,
+                ref autoAssignedCount, ref autoConflictCount, ref autoUnmatchedCount);
         }
 
         return new CadOutputFwDiffIndexAssignmentResult(
@@ -188,6 +126,102 @@ public sealed partial class CadOutputFwDiffIndexAssignmentService
             AnchorIgnoredCount: 0,
             RowSequenceAppliedCount: 0,
             RowSequenceFallbackCount: 0);
+    }
+
+    private static void ApplyOverridesForIc(
+        List<RowGroup> rowGroups,
+        IReadOnlyDictionary<int, int>? manualOverrides,
+        IReadOnlyDictionary<int, int?> strictDiffByCadId,
+        Dictionary<int, int> assignedByCadId,
+        HashSet<int> usedDiffs,
+        ref int overrideAssignedCount,
+        ref int duplicateOverrides,
+        ref int invalidOverrides,
+        ref int overrideMismatchCount)
+    {
+        foreach (var rowGroup in rowGroups)
+        {
+            foreach (var pad in rowGroup.Pads)
+            {
+                if (manualOverrides is null ||
+                    !manualOverrides.TryGetValue(pad.Id, out var overrideIndex))
+                {
+                    continue;
+                }
+
+                if (overrideIndex < 0)
+                {
+                    invalidOverrides++;
+                    continue;
+                }
+
+                if (!usedDiffs.Add(overrideIndex))
+                {
+                    duplicateOverrides++;
+                    continue;
+                }
+
+                assignedByCadId[pad.Id] = overrideIndex;
+                overrideAssignedCount++;
+                if (strictDiffByCadId.TryGetValue(pad.Id, out var strictDiff) &&
+                    strictDiff.HasValue &&
+                    strictDiff.Value != overrideIndex)
+                {
+                    overrideMismatchCount++;
+                }
+            }
+        }
+    }
+
+    private static void AssignAutoForIc(
+        int icIndex,
+        List<RowGroup> rowGroups,
+        CadOutputFwDiffAutoMode autoMode,
+        IReadOnlyDictionary<int, int?> strictDiffByCadId,
+        Dictionary<int, int> assignedByCadId,
+        HashSet<int> usedDiffs,
+        List<string> conflictSamples,
+        List<string> unmatchedSamples,
+        ref int autoAssignedCount,
+        ref int autoConflictCount,
+        ref int autoUnmatchedCount)
+    {
+        foreach (var rowGroup in rowGroups)
+        {
+            foreach (var pad in rowGroup.Pads)
+            {
+                if (assignedByCadId.ContainsKey(pad.Id))
+                {
+                    continue;
+                }
+
+                if (!strictDiffByCadId.TryGetValue(pad.Id, out var strictDiff) || !strictDiff.HasValue)
+                {
+                    autoUnmatchedCount++;
+                    if (unmatchedSamples.Count < 5)
+                    {
+                        unmatchedSamples.Add($"IC{icIndex + 1}/R{rowGroup.RowIndex}: CAD {pad.Id}");
+                    }
+
+                    continue;
+                }
+
+                var targetIndex = strictDiff.Value;
+                if (autoMode == CadOutputFwDiffAutoMode.StrictUnique && !usedDiffs.Add(targetIndex))
+                {
+                    autoConflictCount++;
+                    if (conflictSamples.Count < 5)
+                    {
+                        conflictSamples.Add($"IC{icIndex + 1}/R{rowGroup.RowIndex}: CAD {pad.Id} -> diff {targetIndex}");
+                    }
+
+                    continue;
+                }
+
+                assignedByCadId[pad.Id] = targetIndex;
+                autoAssignedCount++;
+            }
+        }
     }
 }
 
