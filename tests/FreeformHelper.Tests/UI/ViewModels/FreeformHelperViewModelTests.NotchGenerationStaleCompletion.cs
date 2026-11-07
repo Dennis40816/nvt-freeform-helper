@@ -1,6 +1,7 @@
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Services;
+using FreeformHelper.Domain.Notch;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
@@ -331,12 +332,13 @@ public sealed partial class FreeformHelperViewModelTests
             var selectedResolved = Assert.IsType<NotchV22ResolvedResult>(
                 vm.GetCadV22ResolvedResult(selectedCad.Id));
             vm.PickSaveNotchPathAsync = (_, _) => Task.FromResult<string?>(null);
-            vm.OpenNotchExportSelectionAsync = async _ =>
+            async Task<NotchTable?> SelectAfterReleaseAsync(NotchExportSelectionViewModel _)
             {
                 selectionEntered.TrySetResult();
-                await releaseSelection.Task;
+                await releaseSelection.Task.WaitAsync(TestContext.Current.CancellationToken);
                 return null;
-            };
+            }
+            vm.OpenNotchExportSelectionAsync = SelectAfterReleaseAsync;
 
             var exportStarted = 0;
             var session = await vm.CreateSimulationWorkspaceSessionAsync(

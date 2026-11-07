@@ -1935,16 +1935,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.SimulationHostViewModel._sourceRevision"
     },
     {
-      "syntaxHash": "d6b9138e255632021481a137cb249492806a3aea8192dbe2643cb7721d84eecd",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.ExportAndSimulation_Overlap_CoalesceColdBatchAndKeepBusyUntilBothOperationsComplete()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.NotchGenerationStaleCompletion.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "asyncVoid",
-      "symbol": "async-lambda:unresolved-void-delegate"
-    },
-    {
       "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
       "member": "MSBuild",
       "owner": "NFH",
@@ -2193,16 +2183,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "WarningsNotAsErrors:VSTHRD003"
-    },
-    {
-      "syntaxHash": "730f5cf58209220c8bb07a0c13ba2ba6977761bc420cc4aca8f73a41274ed392",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:VSTHRD103"
     },
     {
       "syntaxHash": "8b7387f9dc9ede978c4d2aadcdfb0d7ac497fca46a729d49a7ce66d6b6834e57",
@@ -2565,30 +2545,10 @@
       "symbol": "VSTHRD002"
     },
     {
-      "syntaxHash": "5ff76aa0bb56c9bd7dac7ba067b44ad562bb212e6dcc504aa2c9eac1d659a0dd",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.ExportAndSimulation_Overlap_CoalesceColdBatchAndKeepBusyUntilBothOperationsComplete()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.NotchGenerationStaleCompletion.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD003",
-      "symbol": "VSTHRD003"
-    },
-    {
       "syntaxHash": "a4ef450a867728e4de53c383b58d47fb48cf6ee294b120e73a2f0042ff492d1d",
       "member": "FreeformHelper.Tests.ProjectLoadingInputTests.LoadPickerAwait_BlocksCommandsAndRestoresReadyAfterCancellation()",
       "owner": "NFH",
       "path": "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingInputTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD003",
-      "symbol": "VSTHRD003"
-    },
-    {
-      "syntaxHash": "ca56f945c4291344f0a3447e9fbae770a0c0b62ee1c71c80e7d5e9fd0f0b3371",
-      "member": "FreeformHelper.Tests.UiEventRunnerTests.Run_AsynchronousFailure_ReportsOnceWithoutDispatcherException()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
       "project": "FreeformHelper.Tests",
       "count": 1,
       "rule": "VSTHRD003",
@@ -2603,16 +2563,6 @@
       "count": 1,
       "rule": "VSTHRD003",
       "symbol": "VSTHRD003"
-    },
-    {
-      "syntaxHash": "8faf7d81beab8c86a086e14795a07744681b88f40436bd2f26694ba6d22d4364",
-      "member": "FreeformHelper.Tests.UiEventRunnerTests.Run_AsynchronousFailure_ReportsOnceWithoutDispatcherException()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/UiEventRunnerTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "VSTHRD103",
-      "symbol": "VSTHRD103"
     },
     {
       "syntaxHash": "7c4570caae4f03d48c070dbfc73a091850730fefb9cd42f5e69c2d8b6429e9c5",
