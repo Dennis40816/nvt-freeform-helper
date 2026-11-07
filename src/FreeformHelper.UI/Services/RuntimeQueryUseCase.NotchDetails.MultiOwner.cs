@@ -1,3 +1,4 @@
+using FreeformHelper.Application.Services;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.RuntimeQuery;
 
@@ -42,45 +43,10 @@ internal sealed partial class RuntimeQueryUseCase
 
         var compensation = resolved.Compensation;
 
-        var rows = compensation.RegularDebugInfos
-            .Where(info =>
-                string.Equals(info.ToFullRuleCode, "GATE_MULTI_OWNER", StringComparison.Ordinal) ||
-                info.OwnerCadPadCount > 1)
-            .OrderByDescending(info => string.Equals(info.ToFullRuleCode, "GATE_MULTI_OWNER", StringComparison.Ordinal))
-            .ThenByDescending(info => info.OwnerCadPadCount)
-            .ThenByDescending(info => info.OverlapArea)
-            .ThenBy(info => info.RegularPadId)
-            .ToList();
+        var rows = SelectMultiOwnerRows(compensation.RegularDebugInfos);
         var returnedRows = rows
             .Take(limit)
-            .Select(info => new
-            {
-                regularPadId = info.RegularPadId,
-                regularIndex = info.RegularIndex,
-                icIndex = info.IcIndex,
-                diffIndex = info.DiffIndex,
-                info.Row,
-                info.Col,
-                info.RegularArea,
-                info.OverlapArea,
-                info.SourceArea,
-                info.BlockedArea,
-                info.ReachableArea,
-                info.OwnerCadPadCount,
-                ownerCadPadIds = info.OwnerCadPadIds,
-                info.BlockerCandidateCount,
-                info.IsBoundaryRegular,
-                info.IsToFullBoundaryCandidate,
-                info.HasDirectionalBlocker,
-                info.ToFullRuleCode,
-                ruleTrace = info.ToFullRuleTrace.Select(step => new
-                {
-                    step.Rule,
-                    step.Passed,
-                    step.Detail
-                }).ToList(),
-                info.IsToFullApplied
-            })
+            .Select(BuildMultiOwnerRegularPayload)
             .ToList();
 
         var currentSettingPercent = helper.GetNotchMultiOwnerStrictOverlapPercent();
@@ -93,16 +59,7 @@ internal sealed partial class RuntimeQueryUseCase
         return RuntimeQueryResponseEnvelope.Success(new
         {
             kind = "notch-v22-multi-owner",
-            cadPad = new
-            {
-                id = cad.CadPadId,
-                cad.Name,
-                cad.Layer,
-                cad.IcIndex,
-                diffIndex = cad.DxfIndex,
-                diffSource = cad.CadOutputFwDiffAssignmentModeText,
-                cad.Area
-            },
+            cadPad = BuildMultiOwnerCadPayload(cad),
             threshold = new
             {
                 source = overlapPercentOverride.HasValue ? "override" : "settings",
@@ -122,6 +79,65 @@ internal sealed partial class RuntimeQueryUseCase
             },
             regulars = returnedRows
         });
+    }
+
+    private static object BuildMultiOwnerCadPayload(CadPadInspectorSnapshot cad)
+    {
+        return new
+        {
+            id = cad.CadPadId,
+            cad.Name,
+            cad.Layer,
+            cad.IcIndex,
+            diffIndex = cad.DxfIndex,
+            diffSource = cad.CadOutputFwDiffAssignmentModeText,
+            cad.Area
+        };
+    }
+
+    private static List<NotchV22RegularDebugInfo> SelectMultiOwnerRows(IReadOnlyList<NotchV22RegularDebugInfo> debugInfos)
+    {
+        return debugInfos
+            .Where(info =>
+                string.Equals(info.ToFullRuleCode, "GATE_MULTI_OWNER", StringComparison.Ordinal) ||
+                info.OwnerCadPadCount > 1)
+            .OrderByDescending(info => string.Equals(info.ToFullRuleCode, "GATE_MULTI_OWNER", StringComparison.Ordinal))
+            .ThenByDescending(info => info.OwnerCadPadCount)
+            .ThenByDescending(info => info.OverlapArea)
+            .ThenBy(info => info.RegularPadId)
+            .ToList();
+    }
+
+    private static object BuildMultiOwnerRegularPayload(NotchV22RegularDebugInfo info)
+    {
+        return new
+        {
+            regularPadId = info.RegularPadId,
+            regularIndex = info.RegularIndex,
+            icIndex = info.IcIndex,
+            diffIndex = info.DiffIndex,
+            info.Row,
+            info.Col,
+            info.RegularArea,
+            info.OverlapArea,
+            info.SourceArea,
+            info.BlockedArea,
+            info.ReachableArea,
+            info.OwnerCadPadCount,
+            ownerCadPadIds = info.OwnerCadPadIds,
+            info.BlockerCandidateCount,
+            info.IsBoundaryRegular,
+            info.IsToFullBoundaryCandidate,
+            info.HasDirectionalBlocker,
+            info.ToFullRuleCode,
+            ruleTrace = info.ToFullRuleTrace.Select(step => new
+            {
+                step.Rule,
+                step.Passed,
+                step.Detail
+            }).ToList(),
+            info.IsToFullApplied
+        };
     }
 
     private RuntimeQueryResponseEnvelope QueryCadNotchStage(int cadPadId, int polygonLimit)

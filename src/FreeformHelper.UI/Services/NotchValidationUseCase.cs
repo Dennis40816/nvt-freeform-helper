@@ -25,54 +25,14 @@ public sealed class NotchValidationUseCase
         foreach (var item in indexedRows)
         {
             var row = item.Row;
-            if (!directRowsByRegularPadId.TryGetValue(row.RegularPadIndex, out var directRows))
-            {
-                directRows = new List<IndexedNotchRow>();
-                directRowsByRegularPadId[row.RegularPadIndex] = directRows;
-            }
-
-            directRows.Add(item);
+            AddToBucket(directRowsByRegularPadId, row.RegularPadIndex, item);
 
             if (row.Version != NotchAlgorithmVersion.V22 || !row.CadPadId.HasValue)
             {
                 continue;
             }
 
-            var cadId = row.CadPadId!.Value;
-            foreach (var leg in DecodeV22Legs(row, nullDiffValue))
-            {
-                if (leg.RatioPercent == 0)
-                {
-                    continue;
-                }
-
-                var flow = new NotchValidationFlowRow(
-                    SourceRegularPadId: row.RegularPadIndex,
-                    SourceCadPadId: cadId,
-                    SourceDiffIndex: row.DiffIndex,
-                    TargetDiffIndex: leg.TargetDiffIndex,
-                    TargetIcIndex: row.IcIndex,
-                    RatioPercent: leg.RatioPercent,
-                    EffectiveArea: double.NaN,
-                    SourceRow: item);
-
-                var incomingKey = (row.IcIndex, leg.TargetDiffIndex);
-                if (!incomingRowsByIcDiff.TryGetValue(incomingKey, out var incomingRows))
-                {
-                    incomingRows = new List<NotchValidationFlowRow>();
-                    incomingRowsByIcDiff[incomingKey] = incomingRows;
-                }
-
-                incomingRows.Add(flow);
-
-                if (!outgoingRowsByRegularPadId.TryGetValue(row.RegularPadIndex, out var outgoingRows))
-                {
-                    outgoingRows = new List<NotchValidationFlowRow>();
-                    outgoingRowsByRegularPadId[row.RegularPadIndex] = outgoingRows;
-                }
-
-                outgoingRows.Add(flow);
-            }
+            AddFlowRows(item, nullDiffValue, incomingRowsByIcDiff, outgoingRowsByRegularPadId);
         }
 
         foreach (var rows in directRowsByRegularPadId.Values)
@@ -82,39 +42,86 @@ public sealed class NotchValidationUseCase
 
         foreach (var rows in incomingRowsByIcDiff.Values)
         {
-            rows.Sort(static (left, right) =>
-            {
-                var cmp = Math.Abs(right.RatioPercent).CompareTo(Math.Abs(left.RatioPercent));
-                if (cmp != 0)
-                {
-                    return cmp;
-                }
-
-                cmp = left.SourceRegularPadId.CompareTo(right.SourceRegularPadId);
-                if (cmp != 0)
-                {
-                    return cmp;
-                }
-
-                return left.SourceCadPadId.CompareTo(right.SourceCadPadId);
-            });
+            rows.Sort(CompareIncomingFlowRows);
         }
 
         foreach (var rows in outgoingRowsByRegularPadId.Values)
         {
-            rows.Sort(static (left, right) =>
-            {
-                var cmp = Math.Abs(right.RatioPercent).CompareTo(Math.Abs(left.RatioPercent));
-                if (cmp != 0)
-                {
-                    return cmp;
-                }
-
-                return left.TargetDiffIndex.CompareTo(right.TargetDiffIndex);
-            });
+            rows.Sort(CompareOutgoingFlowRows);
         }
 
         return new NotchValidationBucket(directRowsByRegularPadId, incomingRowsByIcDiff, outgoingRowsByRegularPadId);
+    }
+
+    // Records each non-zero leg of one V22 row as a flow from its regular pad into the (IC, target diff) it feeds.
+    private static void AddFlowRows(
+        IndexedNotchRow item,
+        int nullDiffValue,
+        Dictionary<(int IcIndex, int DiffIndex), List<NotchValidationFlowRow>> incomingRowsByIcDiff,
+        Dictionary<int, List<NotchValidationFlowRow>> outgoingRowsByRegularPadId)
+    {
+        var row = item.Row;
+        var cadId = row.CadPadId!.Value;
+        foreach (var leg in DecodeV22Legs(row, nullDiffValue))
+        {
+            if (leg.RatioPercent == 0)
+            {
+                continue;
+            }
+
+            var flow = new NotchValidationFlowRow(
+                SourceRegularPadId: row.RegularPadIndex,
+                SourceCadPadId: cadId,
+                SourceDiffIndex: row.DiffIndex,
+                TargetDiffIndex: leg.TargetDiffIndex,
+                TargetIcIndex: row.IcIndex,
+                RatioPercent: leg.RatioPercent,
+                EffectiveArea: double.NaN,
+                SourceRow: item);
+
+            AddToBucket(incomingRowsByIcDiff, (row.IcIndex, leg.TargetDiffIndex), flow);
+            AddToBucket(outgoingRowsByRegularPadId, row.RegularPadIndex, flow);
+        }
+    }
+
+    private static void AddToBucket<TKey, TValue>(Dictionary<TKey, List<TValue>> buckets, TKey key, TValue value)
+        where TKey : notnull
+    {
+        if (!buckets.TryGetValue(key, out var bucket))
+        {
+            bucket = new List<TValue>();
+            buckets[key] = bucket;
+        }
+
+        bucket.Add(value);
+    }
+
+    private static int CompareIncomingFlowRows(NotchValidationFlowRow left, NotchValidationFlowRow right)
+    {
+        var cmp = Math.Abs(right.RatioPercent).CompareTo(Math.Abs(left.RatioPercent));
+        if (cmp != 0)
+        {
+            return cmp;
+        }
+
+        cmp = left.SourceRegularPadId.CompareTo(right.SourceRegularPadId);
+        if (cmp != 0)
+        {
+            return cmp;
+        }
+
+        return left.SourceCadPadId.CompareTo(right.SourceCadPadId);
+    }
+
+    private static int CompareOutgoingFlowRows(NotchValidationFlowRow left, NotchValidationFlowRow right)
+    {
+        var cmp = Math.Abs(right.RatioPercent).CompareTo(Math.Abs(left.RatioPercent));
+        if (cmp != 0)
+        {
+            return cmp;
+        }
+
+        return left.TargetDiffIndex.CompareTo(right.TargetDiffIndex);
     }
 
     private static List<DecodedV22Leg> DecodeV22Legs(NotchTableRow row, int nullDiffValue)

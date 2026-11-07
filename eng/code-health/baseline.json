@@ -301,76 +301,6 @@
       "symbol": "FreeformHelper.UI.Services.IndexMappingDecisionRowContract"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 115
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/ManualSizingService.Operations.cs"
-      ],
-      "contentHash": "33333f1df19764d7eb0601b604a88da8e19ba359b50943f914e8b0806801f006",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.ManualSizingService.ResetSizing(GridSettings,GridAlignmentMode,CadPadSet?,IReadOnlyCollection<int>,IReadOnlyCollection<int>)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 89
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/NotchDisplayProjector.cs"
-      ],
-      "contentHash": "6c2ff23871bfdbc8b328ecc7ebc38bc3cc9c6afe5a60ec7226f10ddb54b324ff",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.NotchDisplayProjector.FormatToFullDiagnosticsText(string?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 108
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/NotchValidationUseCase.cs"
-      ],
-      "contentHash": "87bacd7a850b4cd22fc0ef69cc1485c1bf18ba39165950a2937bb6017f851195",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.NotchValidationUseCase.BuildBucket(NotchTable,int)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 88
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/RuntimeQueryCommandLine.cs"
-      ],
-      "contentHash": "5d0cf22c9e070573903439edcb9ac18a786a05bc39b9a1decdc5066f1868f223",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.RuntimeQueryCommandLine.TryParseCommandLine(string[],out string,out Dictionary<string, string>,out int,out bool,out string?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 113
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/RuntimeQuerySelectionParser.cs"
-      ],
-      "contentHash": "f260b37fead6b8aeb7a59b3dd3b0763d315ffcb17885f4c174962e8bd1d64aa9",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.RuntimeQuerySelectionParser.ParseRegularSelectionArgs(IReadOnlyDictionary<string, string>?,IReadOnlyDictionary<int, int>,out RuntimeQueryResponseEnvelope?,out IReadOnlyList<int>,out IReadOnlyList<int>)"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
@@ -392,48 +322,6 @@
       "contentHash": "63f969613396540b0f9ef101bab4363d7eabb88e8909211e49ea902e46761660",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.Services.RuntimeQueryUseCase"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 118
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.NotchDetails.MultiOwner.cs"
-      ],
-      "contentHash": "e150c220f14896ac757862704901001a31f153ba32c5620553aba3a618f59dff",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.RuntimeQueryUseCase.QueryCadMultiOwner(int,int,double?,double?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 145
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.NotchDetails.PadQueries.cs"
-      ],
-      "contentHash": "63f101cf5d42347a7af93517255b27bb794bd3dd59c24ec143ad77ef6255ab6e",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.RuntimeQueryUseCase.QueryCadPad(int)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 141
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/SelectionSummaryUseCase.cs"
-      ],
-      "contentHash": "7433abf65fbf6fd551c42e91df06943d305b4d207a130c05a4385e3b4e7528d0",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.SelectionSummaryUseCase.Compute(RegularGrid?,IReadOnlyCollection<int>,IReadOnlyCollection<int>)"
     },
     {
       "kind": "type",

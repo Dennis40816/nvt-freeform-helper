@@ -335,77 +335,67 @@ internal static partial class NotchDisplayProjector
         var builder = new StringBuilder();
         foreach (var line in lines)
         {
-            if (line.StartsWith('+'))
-            {
-                if (builder.Length > 0)
-                {
-                    builder.AppendLine().AppendLine();
-                }
-
-                builder.Append(line);
-                continue;
-            }
-
-            if (!TryParseDiagnosticLine(line, out var parsed))
-            {
-                if (builder.Length > 0)
-                {
-                    builder.AppendLine().AppendLine();
-                }
-
-                builder.Append(line);
-                continue;
-            }
-
             if (builder.Length > 0)
             {
                 builder.AppendLine().AppendLine();
             }
 
-            var ownersText = parsed.OwnerCadPadIds.Count == 0
-                ? "-"
-                : BuildCompactList(parsed.OwnerCadPadIds);
+            // A line that starts with "+" or that does not parse is kept as it is.
+            if (line.StartsWith('+') || !TryParseDiagnosticLine(line, out var parsed))
+            {
+                builder.Append(line);
+                continue;
+            }
 
-            builder.Append("IC")
-                .Append(parsed.IcIndex)
-                .Append("/diff")
-                .Append(parsed.DiffIndex)
-                .Append("  REG")
-                .Append(parsed.RegularPadId)
-                .AppendLine()
-                .Append("Area  ov=")
-                .Append(parsed.OverlapArea.ToString("0.######", CultureInfo.InvariantCulture))
-                .Append(", src=")
-                .Append(parsed.SourceArea.ToString("0.######", CultureInfo.InvariantCulture))
-                .Append(", blk=")
-                .Append(parsed.BlockedArea.ToString("0.######", CultureInfo.InvariantCulture))
-                .Append(", reach=")
-                .Append(parsed.ReachableArea.ToString("0.######", CultureInfo.InvariantCulture))
-                .AppendLine()
-                .Append("Owners ")
-                .Append(parsed.OwnerCadPadIds.Count)
-                .Append(" (")
-                .Append(ownersText)
-                .AppendLine(")")
-                .Append("Share  ")
-                .AppendLine(string.IsNullOrWhiteSpace(parsed.OwnerShareText) ? "-" : parsed.OwnerShareText)
-                .Append("Flags  boundary=")
-                .Append(parsed.IsBoundary ? "Y" : "N")
-                .Append(", candidate=")
-                .Append(parsed.IsCandidate ? "Y" : "N")
-                .Append(", tofull=")
-                .Append(parsed.IsToFull ? "Y" : "N")
-                .Append(", blocker=")
-                .Append(parsed.BlockerCount)
-                .AppendLine()
-                .Append("Rule   ")
-                .Append(NotchToFullRuleText.BuildReasonWithCode(
-                    parsed.RuleCode,
-                    parsed.IsToFull,
-                    parsed.IsBoundary));
+            AppendDiagnosticBlock(builder, parsed);
         }
 
         return builder.ToString();
+    }
+
+    private static void AppendDiagnosticBlock(StringBuilder builder, NotchToFullDiagnosticEntry parsed)
+    {
+        var ownersText = parsed.OwnerCadPadIds.Count == 0
+            ? "-"
+            : BuildCompactList(parsed.OwnerCadPadIds);
+
+        builder.Append("IC")
+            .Append(parsed.IcIndex)
+            .Append("/diff")
+            .Append(parsed.DiffIndex)
+            .Append("  REG")
+            .Append(parsed.RegularPadId)
+            .AppendLine()
+            .Append("Area  ov=")
+            .Append(parsed.OverlapArea.ToString("0.######", CultureInfo.InvariantCulture))
+            .Append(", src=")
+            .Append(parsed.SourceArea.ToString("0.######", CultureInfo.InvariantCulture))
+            .Append(", blk=")
+            .Append(parsed.BlockedArea.ToString("0.######", CultureInfo.InvariantCulture))
+            .Append(", reach=")
+            .Append(parsed.ReachableArea.ToString("0.######", CultureInfo.InvariantCulture))
+            .AppendLine()
+            .Append("Owners ")
+            .Append(parsed.OwnerCadPadIds.Count)
+            .Append(" (")
+            .Append(ownersText)
+            .AppendLine(")")
+            .Append("Share  ")
+            .AppendLine(string.IsNullOrWhiteSpace(parsed.OwnerShareText) ? "-" : parsed.OwnerShareText)
+            .Append("Flags  boundary=")
+            .Append(parsed.IsBoundary ? "Y" : "N")
+            .Append(", candidate=")
+            .Append(parsed.IsCandidate ? "Y" : "N")
+            .Append(", tofull=")
+            .Append(parsed.IsToFull ? "Y" : "N")
+            .Append(", blocker=")
+            .Append(parsed.BlockerCount)
+            .AppendLine()
+            .Append("Rule   ")
+            .Append(NotchToFullRuleText.BuildReasonWithCode(
+                parsed.RuleCode,
+                parsed.IsToFull,
+                parsed.IsBoundary));
     }
 
     private static string BuildCompactList(IReadOnlyList<int> values)

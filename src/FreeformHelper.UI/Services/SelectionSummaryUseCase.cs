@@ -16,34 +16,89 @@ public sealed class SelectionSummaryUseCase
     {
         var cadCount = selectedCadIds.Count;
         var regularCount = selectedRegIndices.Count;
-        var totalCount = cadCount + regularCount;
 
-        var selectionSummary = BuildSelectionSummary(cadCount, regularCount);
-        var selectedGridRangeSummary = totalCount == 0 ? "No selection." : $"Selected: {totalCount} pads.";
-        var cadSelectionText = $"CAD: {cadCount} pads.";
-        var regularSelectionText = $"Regular: {regularCount} pads.";
+        // The cases below only change what they know more about than this summary of a selection without regular pads.
+        var emptySummary = BuildEmptySummary(cadCount, regularCount);
 
         if (grid is null || regularCount == 0)
         {
-            return new SelectionSummary(
-                cadCount,
-                regularCount,
-                selectionSummary,
-                selectedGridRangeSummary,
-                cadSelectionText,
-                regularSelectionText,
-                string.Empty,
-                null,
-                string.Empty,
-                string.Empty,
-                false,
-                string.Empty,
-                0m,
-                0m,
-                false,
-                false);
+            return emptySummary;
         }
 
+        var pads = ResolveSelectedPads(grid, selectedRegIndices);
+        if (pads.Count == 0)
+        {
+            return emptySummary;
+        }
+
+        var regularRange = (
+            minR: pads.Min(p => p.Row),
+            maxR: pads.Max(p => p.Row),
+            minC: pads.Min(p => p.Col),
+            maxC: pads.Max(p => p.Col));
+
+        var rowIndices = pads.Select(p => p.Row).Distinct().ToList();
+        var colIndices = pads.Select(p => p.Col).Distinct().ToList();
+        var isRectangular = pads.Count == rowIndices.Count * colIndices.Count;
+
+        var rowLabel = FormatIndexRanges(pads.Select(p => ToDisplayRow(p.Row, grid.Rows)));
+        var colLabel = FormatIndexRanges(pads.Select(p => p.Col));
+
+        var (widthValue, widthMixed) = MeasurePendingSize(pads.Select(p => p.Bounds.Width));
+        var (heightValue, heightMixed) = MeasurePendingSize(pads.Select(p => p.Bounds.Height));
+
+        var selectedSummary = emptySummary with
+        {
+            SelectionDetailText = BuildSelectionDetailText(cadCount, regularCount, rowLabel, colLabel),
+            RegularRange = regularRange,
+            PendingWidth = widthValue,
+            PendingHeight = heightValue,
+            WidthMixed = widthMixed,
+            HeightMixed = heightMixed,
+        };
+
+        if (isRectangular)
+        {
+            return selectedSummary with
+            {
+                RegularSelectionText = $"Regular: Rows {rowLabel}, Cols {colLabel} ({regularCount})",
+                ManualRowsRange = rowLabel,
+                ManualColsRange = colLabel,
+                IsRectangular = true,
+            };
+        }
+
+        return selectedSummary with
+        {
+            RegularSelectionText = $"Regular: {regularCount} pads (non-rectangular)",
+            ManualRangeError = "Selection is not a full rectangle; rows/cols range not applied.",
+        };
+    }
+
+    private static SelectionSummary BuildEmptySummary(int cadCount, int regularCount)
+    {
+        var totalCount = cadCount + regularCount;
+        return new SelectionSummary(
+            cadCount,
+            regularCount,
+            BuildSelectionSummary(cadCount, regularCount),
+            totalCount == 0 ? "No selection." : $"Selected: {totalCount} pads.",
+            $"CAD: {cadCount} pads.",
+            $"Regular: {regularCount} pads.",
+            string.Empty,
+            null,
+            string.Empty,
+            string.Empty,
+            false,
+            string.Empty,
+            0m,
+            0m,
+            false,
+            false);
+    }
+
+    private static List<RegularPad> ResolveSelectedPads(RegularGrid grid, IReadOnlyCollection<int> selectedRegIndices)
+    {
         Dictionary<int, RegularPad>? fallbackPadMap = null;
         var pads = new List<RegularPad>(selectedRegIndices.Count);
         foreach (var index in selectedRegIndices)
@@ -55,100 +110,18 @@ public sealed class SelectionSummaryUseCase
             }
         }
 
-        if (pads.Count == 0)
-        {
-            return new SelectionSummary(
-                cadCount,
-                regularCount,
-                selectionSummary,
-                selectedGridRangeSummary,
-                cadSelectionText,
-                regularSelectionText,
-                string.Empty,
-                null,
-                string.Empty,
-                string.Empty,
-                false,
-                string.Empty,
-                0m,
-                0m,
-                false,
-                false);
-        }
+        return pads;
+    }
 
-        var minR = pads.Min(p => p.Row);
-        var maxR = pads.Max(p => p.Row);
-        var minC = pads.Min(p => p.Col);
-        var maxC = pads.Max(p => p.Col);
-        var regularRange = (minR, maxR, minC, maxC);
-
-        var rowIndices = pads.Select(p => p.Row).Distinct().ToList();
-        var colIndices = pads.Select(p => p.Col).Distinct().ToList();
-        var isRectangular = pads.Count == rowIndices.Count * colIndices.Count;
-
-        var displayRows = pads
-            .Select(p => ToDisplayRow(p.Row, grid.Rows))
-            .ToList();
-        var columns = pads
-            .Select(p => p.Col)
-            .ToList();
-
-        var rowLabel = FormatIndexRanges(displayRows);
-        var colLabel = FormatIndexRanges(columns);
-
-        var widthValues = pads.Select(p => p.Bounds.Width).ToList();
-        var heightValues = pads.Select(p => p.Bounds.Height).ToList();
-        var widthMin = widthValues.Min();
-        var widthMax = widthValues.Max();
-        var heightMin = heightValues.Min();
-        var heightMax = heightValues.Max();
-        var widthMixed = (widthMax - widthMin) > SizeEpsilon;
-        var heightMixed = (heightMax - heightMin) > SizeEpsilon;
-        var widthValue = widthMixed ? 0m : (decimal)((widthMin + widthMax) * 0.5);
-        var heightValue = heightMixed ? 0m : (decimal)((heightMin + heightMax) * 0.5);
-
-        var detailText = BuildSelectionDetailText(cadCount, regularCount, rowLabel, colLabel);
-
-        if (isRectangular)
-        {
-            regularSelectionText = $"Regular: Rows {rowLabel}, Cols {colLabel} ({regularCount})";
-            return new SelectionSummary(
-                cadCount,
-                regularCount,
-                selectionSummary,
-                selectedGridRangeSummary,
-                cadSelectionText,
-                regularSelectionText,
-                detailText,
-                regularRange,
-                rowLabel,
-                colLabel,
-                true,
-                string.Empty,
-                widthValue,
-                heightValue,
-                widthMixed,
-                heightMixed);
-        }
-
-        regularSelectionText = $"Regular: {regularCount} pads (non-rectangular)";
-        return new SelectionSummary(
-            cadCount,
-            regularCount,
-            selectionSummary,
-            selectedGridRangeSummary,
-            cadSelectionText,
-            regularSelectionText,
-            detailText,
-            regularRange,
-            string.Empty,
-            string.Empty,
-            false,
-            "Selection is not a full rectangle; rows/cols range not applied.",
-            widthValue,
-            heightValue,
-            widthMixed,
-            heightMixed);
+    // The size shown for a selection: the middle of the smallest and largest value, or "mixed" with value 0
+    // when they differ by more than SizeEpsilon.
+    private static (decimal Value, bool Mixed) MeasurePendingSize(IEnumerable<double> sizes)
+    {
+        var sizeList = sizes.ToList();
+        var min = sizeList.Min();
+        var max = sizeList.Max();
+        var mixed = (max - min) > SizeEpsilon;
+        return (mixed ? 0m : (decimal)((min + max) * 0.5), mixed);
     }
 
     private static string BuildSelectionSummary(int cadCount, int regularCount)
