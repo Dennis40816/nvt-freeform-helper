@@ -9,6 +9,8 @@ public sealed partial class PadInfoRelationCardListView : UserControl
 {
     public static readonly StyledProperty<IEnumerable?> CardsProperty =
         AvaloniaProperty.Register<PadInfoRelationCardListView, IEnumerable?>(nameof(Cards));
+    public static readonly StyledProperty<bool> CompactProperty =
+        AvaloniaProperty.Register<PadInfoRelationCardListView, bool>(nameof(Compact));
 
     public PadInfoRelationCardListView()
     {
@@ -19,6 +21,12 @@ public sealed partial class PadInfoRelationCardListView : UserControl
     {
         get => GetValue(CardsProperty);
         set => SetValue(CardsProperty, value);
+    }
+
+    public bool Compact
+    {
+        get => GetValue(CompactProperty);
+        set => SetValue(CompactProperty, value);
     }
 
     private void InitializeComponent()

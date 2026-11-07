@@ -19,25 +19,23 @@
       <Border Grid.Row="1"
               Classes="padInfoConfirm"
               IsVisible="{Binding IsCloseConfirmVisible, RelativeSource={RelativeSource AncestorType=UserControl}}"
-              HorizontalAlignment="Left">
-        <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+              HorizontalAlignment="Stretch">
+        <StackPanel Spacing="{DynamicResource Space8}">
           <SelectableTextBlock Classes="padInfoSubtle"
                                Text="Unsaved changes. Apply or discard."
-                               VerticalAlignment="Center"/>
+                               TextWrapping="Wrap" HorizontalAlignment="Left"/>
 
-          <StackPanel Grid.Column="1"
-                      Orientation="Horizontal"
-                      Spacing="{StaticResource Space8}"
-                      Margin="{StaticResource InsetLeft10}"
+          <StackPanel Orientation="Horizontal"
+                      Spacing="{DynamicResource Space8}"
                       HorizontalAlignment="Right">
-            <Button Content="Apply"
-                    ToolTip.Tip="Apply changes and close."
-                    Click="ApplyAndClose_Click"/>
-            <Button Content="Discard"
+            <Button Classes="actionTextButton actionGhost" Content="Discard"
                     ToolTip.Tip="Discard changes and close."
                     Click="DiscardAndClose_Click"/>
+            <Button Classes="actionTextButton actionNeutral" Content="Apply"
+                    ToolTip.Tip="Apply changes and close."
+                    Click="ApplyAndClose_Click"/>
           </StackPanel>
-        </Grid>
+        </StackPanel>
       </Border>
     </Grid>
   </Border>
