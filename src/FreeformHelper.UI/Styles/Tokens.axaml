@@ -878,6 +878,12 @@
   <x:Double x:Key="LayerImageExportSettingsHeight">208</x:Double>
   <Thickness x:Key="LayerImageExportRowPadding">8,0</Thickness>
   <Thickness x:Key="LayerImageExportSearchPadding">32,0,8,0</Thickness>
+  <x:Double x:Key="LayerImageExportIntegratedWidth">900</x:Double>
+  <x:Double x:Key="LayerImageExportIntegratedHeight">600</x:Double>
+  <x:Double x:Key="LayerImageExportIntegratedMinWidth">800</x:Double>
+  <x:Double x:Key="LayerImageExportIntegratedMinHeight">560</x:Double>
+  <GridLength x:Key="LayerImageExportIntegratedListColumn">300</GridLength>
+  <x:Double x:Key="LayerImageExportIntegratedOptionsMaxHeight">200</x:Double>
   <x:Double x:Key="ViewMenuPopupMaxHeight">520</x:Double>
   <x:Double x:Key="ViewMenuPopupMinWidth">200</x:Double>
   <x:Double x:Key="ViewMenuPopupWidth">264</x:Double>

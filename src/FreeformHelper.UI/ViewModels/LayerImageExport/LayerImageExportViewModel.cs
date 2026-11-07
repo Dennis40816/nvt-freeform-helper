@@ -69,12 +69,17 @@ public sealed class LayerImageExportViewModel : ObservableObject, IDisposable
             RefreshVisibleRows();
             OnPropertyChanged();
             OnPropertyChanged(nameof(AllLayersState));
+            OnPropertyChanged(nameof(AllLayersText));
         }
     }
 
     public AllLayersState AllLayersState => _selection.AllLayersState;
 
     public string CountText => string.Create(CultureInfo.InvariantCulture, $"{_selection.CheckedCount:N0} / {_selection.TotalCount:N0}");
+
+    public string AllLayersText => string.IsNullOrEmpty(SearchText) ? "All layers" : "All shown layers";
+    public string SelectionSummaryText => string.Create(CultureInfo.InvariantCulture,
+        $"{_visibleRows.Count(static row => row.IsChecked):N0} of {_visibleRows.Count:N0} shown selected · {CountText} layers selected");
 
     public string FooterText => $"{LayerImageSizeText.FormatSelection(_selection.CheckedCount)} · {PreviewSettings.OutputText}";
 
@@ -130,6 +135,7 @@ public sealed class LayerImageExportViewModel : ObservableObject, IDisposable
         }
 
         OnPropertyChanged(nameof(VisibleRows));
+        OnPropertyChanged(nameof(SelectionSummaryText));
     }
 
     private void ToggleAllLayers()
@@ -147,6 +153,7 @@ public sealed class LayerImageExportViewModel : ObservableObject, IDisposable
 
         OnPropertyChanged(nameof(AllLayersState));
         OnPropertyChanged(nameof(CountText));
+        OnPropertyChanged(nameof(SelectionSummaryText));
         OnPropertyChanged(nameof(FooterText));
         ConfirmCommand.NotifyCanExecuteChanged();
         bool updated = _selection.CheckedCount > 0 && PreviewSettings.CurrentSize.Source != LayerImageSizeSource.Custom &&
