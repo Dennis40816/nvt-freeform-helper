@@ -1,0 +1,29 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
+        x:DataType="panels:WorkspaceShell">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Nvt.Core.Avalonia/Icons/IconResources.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
+  <Style Selector="panels|WorkspaceShell.dxfEditDetails /template/ SelectableTextBlock.workspaceMainTitle">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+  <Style Selector="panels|WorkspaceShell.dxfEditDetails /template/ Border.workspaceTopLayerBox">
+    <Setter Property="Background" Value="{x:Null}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource BorderNone}"/>
+    <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
+  </Style>
+  <Style Selector="Button.actionGhost controls|FontIcon">
+    <Setter Property="Foreground" Value="{Binding $parent[Button].Foreground}"/>
+  </Style>
+</Styles>
