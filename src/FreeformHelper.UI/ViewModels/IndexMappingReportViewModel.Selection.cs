@@ -123,7 +123,7 @@ public sealed partial class IndexMappingReportViewModel
             return "journey: aggregate diagnostics row. Select a CAD/REG entity row to inspect step-by-step attribution.";
         }
 
-        return $"journey: raw {SelectedDecision.RawDisplay} -> assigned {SelectedDecision.CurrentDisplay} -> suggested {SelectedDecision.SuggestedDisplay} ({SelectedDecision.DecisionReasonCodeText}/{SelectedDecision.DecisionSourceText})";
+        return $"journey: raw {SelectedDecision.RawDisplay} -> assigned {SelectedDecision.CurrentDisplay} -> suggested {SelectedDecision.SuggestedDisplay} ({SelectedDecision.DecisionReasonCodeText})";
     }
 
     private string BuildStep6TraceDirectionText()
@@ -146,6 +146,7 @@ public sealed partial class IndexMappingReportViewModel
 
     private void NotifyStepSurfaceStateChanged()
     {
+        OnPropertyChanged(nameof(ActiveStepFieldsTitle));
         OnPropertyChanged(nameof(IsStep3Active));
         OnPropertyChanged(nameof(IsStep4Active));
         OnPropertyChanged(nameof(IsStep5Active));
@@ -168,6 +169,9 @@ public sealed partial class IndexMappingReportViewModel
 
     private void NotifySelectedDecisionDetailChanged()
     {
+        OnPropertyChanged(nameof(SelectedMappingTargetText));
+        OnPropertyChanged(nameof(SelectedDecisionSourceText));
+        OnPropertyChanged(nameof(SelectedDecisionConfidenceText));
         OnPropertyChanged(nameof(SelectedDecisionKeyText));
         OnPropertyChanged(nameof(SelectedDecisionSubtitleText));
         OnPropertyChanged(nameof(SelectedEntityText));

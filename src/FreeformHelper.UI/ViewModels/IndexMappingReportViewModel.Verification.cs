@@ -6,7 +6,15 @@ public sealed partial class IndexMappingReportViewModel
 {
     private void SelectVerificationStep(IndexMappingVerificationStep step)
     {
-        ActiveVerificationStep = step;
+        if (ActiveVerificationStep == step)
+        {
+            // Restore the active toggle after selecting the current step again.
+            RefreshVerificationSteps();
+        }
+        else
+        {
+            ActiveVerificationStep = step;
+        }
         if (!SyncFilterWithStepRail)
         {
             return;
@@ -90,6 +98,8 @@ public sealed partial class IndexMappingReportViewModel
         VerificationSteps = nodes;
         OnPropertyChanged(nameof(OpenIssueCount));
         OnPropertyChanged(nameof(OverallStatusText));
+        OnPropertyChanged(nameof(OverallStatusSummaryText));
+        OnPropertyChanged(nameof(OpenIssueSummaryText));
         OnPropertyChanged(nameof(HeaderSubtitle));
         NotifyStepSurfaceStateChanged();
     }
@@ -243,7 +253,7 @@ public sealed partial class IndexMappingReportViewModel
         return ActiveVerificationStep switch
         {
             IndexMappingVerificationStep.Step3 => SelectedDecision is null || SelectedDecision.IsAggregateRow
-                ? $"rows={TotalDecisionCount}, filter={SelectedFilterLabel}"
+                ? $"rows={TotalDecisionCount}"
                 : $"{SelectedEntityText}, {SelectedDecision.SegmentScopeText}",
             IndexMappingVerificationStep.Step4 => $"{Step4RawBestText}; {Step4MaskedBestText}",
             IndexMappingVerificationStep.Step5 => $"{Step5RowNumberText}; {Step5IcDiffText}",
@@ -257,10 +267,10 @@ public sealed partial class IndexMappingReportViewModel
         return ActiveVerificationStep switch
         {
             IndexMappingVerificationStep.Step3 => BuildStep3KeyChecks(),
-            IndexMappingVerificationStep.Step4 => $"{Step4ReasonCodeText}; {Step4DecisionSourceText}; {Step4ConfidenceText}",
-            IndexMappingVerificationStep.Step5 => Step5PayloadSummaryText,
+            IndexMappingVerificationStep.Step4 => Step4ReasonCodeText,
+            IndexMappingVerificationStep.Step5 => SelectedDecision?.DecisionModeText ?? "n/a",
             IndexMappingVerificationStep.Step6 => Step6TraceDirectionText,
-            _ => SimulationColorStateText,
+            _ => "color mode: AUTO / TH",
         };
     }
 
@@ -280,7 +290,7 @@ public sealed partial class IndexMappingReportViewModel
     {
         return ActiveVerificationStep switch
         {
-            IndexMappingVerificationStep.Step3 => $"openIssues={OpenIssueCount}, countMismatch={CountMismatchDecisionCount}",
+            IndexMappingVerificationStep.Step3 => $"countMismatch={CountMismatchDecisionCount}",
             IndexMappingVerificationStep.Step4 => SelectedDecision?.DiffRepairPreviewText ?? "Diff preview: n/a.",
             IndexMappingVerificationStep.Step5 => SelectedDecision?.HasSegmentScope == true
                 ? SelectedSegmentPreviewText

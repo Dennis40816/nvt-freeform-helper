@@ -102,5 +102,7 @@ public sealed partial class IndexMappingReportViewModel
         SelectedFilterMode = SelectedFilterMode == mode && mode != IndexMappingDecisionFilterMode.All
             ? IndexMappingDecisionFilterMode.All
             : mode;
+        // Clicking All must keep its toggle selected even when the filter does not change.
+        OnPropertyChanged(nameof(IsFilterAllActive));
     }
 }
