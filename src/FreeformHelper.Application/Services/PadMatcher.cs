@@ -42,62 +42,14 @@ public sealed class PadMatcher
         var cadToRegular = new Dictionary<int, List<PadMatchLink>>(cadPads.Count);
         var regularToCad = new Dictionary<int, List<PadMatchLink>>(Math.Max(1, grid.Pads.Count / 2));
         var candidateCellsPerCad = new int[cadPads.Count];
-        long candidateCellVisits = 0;
-        long boundsIntersections = 0;
-        long polygonIntersections = 0;
+        var counters = new OverlapScanCounters();
         var cadCount = Math.Max(1, cadPads.Count);
         var cadProgressInterval = Math.Max(1, cadCount / 100);
 
         for (var cadIndex = 0; cadIndex < cadPads.Count; cadIndex++)
         {
             var cadPad = cadPads[cadIndex];
-            var links = new List<PadMatchLink>();
-            var (rowMin, rowMax, colMin, colMax) = RegularGridCandidateQuery.GetCandidateRange(grid, cadPad.Bounds);
-            var candidateCountForCad = 0;
-
-            for (var row = rowMin; row <= rowMax; row++)
-            {
-                for (var col = colMin; col <= colMax; col++)
-                {
-                    candidateCountForCad++;
-                    candidateCellVisits++;
-                    var regularPad = grid.GetPad(row, col);
-                    if (!cadPad.Bounds.Intersects(regularPad.Bounds))
-                    {
-                        continue;
-                    }
-
-                    boundsIntersections++;
-
-                    var overlapArea = Polygon2.IntersectionAreaWithRect(cadPad.Polygon, regularPad.Bounds);
-                    var overlapFloor = Math.Max(
-                        OverlapAreaFloorAbsolute,
-                        regularPad.Area * OverlapAreaFloorRegularRatio);
-                    if (overlapArea <= overlapFloor)
-                    {
-                        continue;
-                    }
-
-                    var regularCoverage = overlapArea / Math.Max(regularPad.Area, 1e-12);
-                    var cadCoverage = overlapArea / Math.Max(cadPad.Area, 1e-12);
-                    var link = new PadMatchLink(
-                        CadPadId: cadPad.Id,
-                        RegularPadId: regularPad.RegularPadId,
-                        OverlapArea: overlapArea,
-                        RegularCoverage: regularCoverage,
-                        CadCoverage: cadCoverage);
-
-                    polygonIntersections++;
-                    links.Add(link);
-                    if (!regularToCad.TryGetValue(regularPad.RegularPadId, out var regularLinks))
-                    {
-                        regularLinks = new List<PadMatchLink>();
-                        regularToCad[regularPad.RegularPadId] = regularLinks;
-                    }
-
-                    regularLinks.Add(link);
-                }
-            }
+            var links = ScanCadCandidateCells(grid, cadPad, regularToCad, counters, out var candidateCountForCad);
 
             if (links.Count > 0)
             {
@@ -120,6 +72,100 @@ public sealed class PadMatcher
             list.Sort(static (a, b) => CompareLinksDescending(a, b));
         }
 
+        ApplyBestMatchesToRegularPads(grid, regularToCad, reportProgress);
+
+        ReportProgress(reportProgress, 1.0);
+        var telemetry = BuildTelemetry(
+            cadPads.Count,
+            counters.CandidateCellVisits,
+            counters.BoundsIntersections,
+            counters.PolygonIntersections,
+            candidateCellsPerCad);
+
+        return new PadMatchResult(
+            cadToRegular.ToDictionary(
+                pair => pair.Key,
+                pair => (IReadOnlyList<PadMatchLink>)pair.Value.AsReadOnly()),
+            regularToCad.ToDictionary(
+                pair => pair.Key,
+                pair => (IReadOnlyList<PadMatchLink>)pair.Value.AsReadOnly()),
+            telemetry);
+    }
+
+    private sealed class OverlapScanCounters
+    {
+        public long CandidateCellVisits { get; set; }
+
+        public long BoundsIntersections { get; set; }
+
+        public long PolygonIntersections { get; set; }
+    }
+
+    // Collects the overlap links of one CAD pad over the grid cells that its bounds can reach.
+    // Each link is added to the CAD pad's list (returned) and to the list of its regular pad.
+    private static List<PadMatchLink> ScanCadCandidateCells(
+        RegularGrid grid,
+        CadPad cadPad,
+        Dictionary<int, List<PadMatchLink>> regularToCad,
+        OverlapScanCounters counters,
+        out int candidateCountForCad)
+    {
+        var links = new List<PadMatchLink>();
+        var (rowMin, rowMax, colMin, colMax) = RegularGridCandidateQuery.GetCandidateRange(grid, cadPad.Bounds);
+        candidateCountForCad = 0;
+
+        for (var row = rowMin; row <= rowMax; row++)
+        {
+            for (var col = colMin; col <= colMax; col++)
+            {
+                candidateCountForCad++;
+                counters.CandidateCellVisits++;
+                var regularPad = grid.GetPad(row, col);
+                if (!cadPad.Bounds.Intersects(regularPad.Bounds))
+                {
+                    continue;
+                }
+
+                counters.BoundsIntersections++;
+
+                var overlapArea = Polygon2.IntersectionAreaWithRect(cadPad.Polygon, regularPad.Bounds);
+                var overlapFloor = Math.Max(
+                    OverlapAreaFloorAbsolute,
+                    regularPad.Area * OverlapAreaFloorRegularRatio);
+                if (overlapArea <= overlapFloor)
+                {
+                    continue;
+                }
+
+                var regularCoverage = overlapArea / Math.Max(regularPad.Area, 1e-12);
+                var cadCoverage = overlapArea / Math.Max(cadPad.Area, 1e-12);
+                var link = new PadMatchLink(
+                    CadPadId: cadPad.Id,
+                    RegularPadId: regularPad.RegularPadId,
+                    OverlapArea: overlapArea,
+                    RegularCoverage: regularCoverage,
+                    CadCoverage: cadCoverage);
+
+                counters.PolygonIntersections++;
+                links.Add(link);
+                if (!regularToCad.TryGetValue(regularPad.RegularPadId, out var regularLinks))
+                {
+                    regularLinks = new List<PadMatchLink>();
+                    regularToCad[regularPad.RegularPadId] = regularLinks;
+                }
+
+                regularLinks.Add(link);
+            }
+        }
+
+        return links;
+    }
+
+    private static void ApplyBestMatchesToRegularPads(
+        RegularGrid grid,
+        Dictionary<int, List<PadMatchLink>> regularToCad,
+        Action<double>? reportProgress)
+    {
         var regularCount = Math.Max(1, grid.Pads.Count);
         var regularProgressInterval = Math.Max(1, regularCount / 100);
         for (var i = 0; i < grid.Pads.Count; i++)
@@ -144,23 +190,6 @@ public sealed class PadMatcher
                 regularCount,
                 regularProgressInterval);
         }
-
-        ReportProgress(reportProgress, 1.0);
-        var telemetry = BuildTelemetry(
-            cadPads.Count,
-            candidateCellVisits,
-            boundsIntersections,
-            polygonIntersections,
-            candidateCellsPerCad);
-
-        return new PadMatchResult(
-            cadToRegular.ToDictionary(
-                pair => pair.Key,
-                pair => (IReadOnlyList<PadMatchLink>)pair.Value.AsReadOnly()),
-            regularToCad.ToDictionary(
-                pair => pair.Key,
-                pair => (IReadOnlyList<PadMatchLink>)pair.Value.AsReadOnly()),
-            telemetry);
     }
 
     private static void ReportProgress(Action<double>? reportProgress, double value)
