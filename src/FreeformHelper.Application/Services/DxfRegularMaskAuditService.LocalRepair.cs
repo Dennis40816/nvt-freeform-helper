@@ -42,63 +42,73 @@ public static partial class DxfRegularMaskAuditService
             var hasRowMaskMismatch = HasCsvRowMaskMismatch(orderedSamples, decisions);
             for (var index = 0; index < orderedSamples.Count; index++)
             {
-                var sample = orderedSamples[index];
-                if (!decisions.TryGetValue(sample.CadPadId, out var decision))
-                {
-                    continue;
-                }
-
-                var preferredCandidates = ResolvePreferredCandidates(decision);
-                var seedDiff = ResolveSeedDiffForOffset(decision);
-                var referenceDiff = decision.CurrentPrimaryDiffIndex ?? seedDiff;
-                var prevDiff = ResolveNeighborCurrentDiff(decisions, orderedSamples, index - 1);
-                var nextDiff = ResolveNeighborCurrentDiff(decisions, orderedSamples, index + 1);
-                var repairEvidence = new LocalRepairEvidence(
-                    decision,
-                    preferredCandidates,
-                    referenceDiff,
-                    prevDiff,
-                    nextDiff,
-                    primaryCountsByIc,
-                    sample.IcIndex);
-                var localRepairResult = ResolveLocalRepairSuggestion(repairEvidence);
-                // Passive compensation reads the segment-enriched decision before any repair is projected.
-                var passiveCompensationResult = ResolvePassiveCompensationDiff(new PassiveCompensationInput(
-                    repairEvidence.OriginalDecision,
-                    repairEvidence.ReferenceDiff));
-                var rowMismatchShiftSuggestion = hasRowMaskMismatch
-                    ? ResolveRowMismatchShiftSuggestion(
-                        decision,
-                        referenceDiff,
-                        prevDiff,
-                        nextDiff,
-                        primaryCountsByIc,
-                        sample.IcIndex)
-                    : null;
-                var effectiveRepairSuggestion = localRepairResult.SuggestedDiff;
-                var effectiveConfidence = localRepairResult.Confidence ?? decision.Confidence;
-                if (rowMismatchShiftSuggestion.HasValue)
-                {
-                    effectiveRepairSuggestion = rowMismatchShiftSuggestion;
-                    effectiveConfidence = Math.Max(effectiveConfidence ?? 0d, LocalRepairAutoApplyMinConfidence);
-                }
-                else if (effectiveRepairSuggestion.HasValue &&
-                         localRepairResult.Confidence.HasValue &&
-                         localRepairResult.Confidence.Value < LocalRepairAutoApplyMinConfidence)
-                {
-                    effectiveRepairSuggestion = decision.RepairSuggestionDiffIndex;
-                }
-
-                decisions[sample.CadPadId] = decision with
-                {
-                    RepairSuggestionDiffIndex = effectiveRepairSuggestion ?? decision.RepairSuggestionDiffIndex,
-                    PassiveCompensationDiffIndex = passiveCompensationResult.DiffIndex,
-                    Confidence = effectiveConfidence,
-                };
+                ApplyLocalRepairToSample(decisions, orderedSamples, index, hasRowMaskMismatch, primaryCountsByIc);
             }
         }
 
         return decisions;
+    }
+
+    private static void ApplyLocalRepairToSample(
+        Dictionary<int, CadOutputFwDiffAssignmentDecision> decisions,
+        List<SegmentRowSample> orderedSamples,
+        int index,
+        bool hasRowMaskMismatch,
+        Dictionary<int, Dictionary<int, int>> primaryCountsByIc)
+    {
+        var sample = orderedSamples[index];
+        if (!decisions.TryGetValue(sample.CadPadId, out var decision))
+        {
+            return;
+        }
+
+        var preferredCandidates = ResolvePreferredCandidates(decision);
+        var seedDiff = ResolveSeedDiffForOffset(decision);
+        var referenceDiff = decision.CurrentPrimaryDiffIndex ?? seedDiff;
+        var prevDiff = ResolveNeighborCurrentDiff(decisions, orderedSamples, index - 1);
+        var nextDiff = ResolveNeighborCurrentDiff(decisions, orderedSamples, index + 1);
+        var repairEvidence = new LocalRepairEvidence(
+            decision,
+            preferredCandidates,
+            referenceDiff,
+            prevDiff,
+            nextDiff,
+            primaryCountsByIc,
+            sample.IcIndex);
+        var localRepairResult = ResolveLocalRepairSuggestion(repairEvidence);
+        // Passive compensation reads the segment-enriched decision before any repair is projected.
+        var passiveCompensationResult = ResolvePassiveCompensationDiff(new PassiveCompensationInput(
+            repairEvidence.OriginalDecision,
+            repairEvidence.ReferenceDiff));
+        var rowMismatchShiftSuggestion = hasRowMaskMismatch
+            ? ResolveRowMismatchShiftSuggestion(
+                decision,
+                referenceDiff,
+                prevDiff,
+                nextDiff,
+                primaryCountsByIc,
+                sample.IcIndex)
+            : null;
+        var effectiveRepairSuggestion = localRepairResult.SuggestedDiff;
+        var effectiveConfidence = localRepairResult.Confidence ?? decision.Confidence;
+        if (rowMismatchShiftSuggestion.HasValue)
+        {
+            effectiveRepairSuggestion = rowMismatchShiftSuggestion;
+            effectiveConfidence = Math.Max(effectiveConfidence ?? 0d, LocalRepairAutoApplyMinConfidence);
+        }
+        else if (effectiveRepairSuggestion.HasValue &&
+                 localRepairResult.Confidence.HasValue &&
+                 localRepairResult.Confidence.Value < LocalRepairAutoApplyMinConfidence)
+        {
+            effectiveRepairSuggestion = decision.RepairSuggestionDiffIndex;
+        }
+
+        decisions[sample.CadPadId] = decision with
+        {
+            RepairSuggestionDiffIndex = effectiveRepairSuggestion ?? decision.RepairSuggestionDiffIndex,
+            PassiveCompensationDiffIndex = passiveCompensationResult.DiffIndex,
+            Confidence = effectiveConfidence,
+        };
     }
 
     private static bool HasCsvRowMaskMismatch(
