@@ -276,22 +276,7 @@ public sealed class ProjectPersistenceUseCaseTests
                 CadPadCustomValues: cadValues,
                 PickSaveProjectPathAsync: () => Task.FromResult<string?>(projectPath),
                 ConfirmEmbedDxfAsync: null,
-                BuildUiSnapshot: () => new ProjectUiSnapshot
-                {
-                    View = new UiViewSnapshot
-                    {
-                        ShowCad = false,
-                        ShowRegular = true,
-                        CadLineWidth = 1.75,
-                        CadLineColor = "#123456",
-                    },
-                    Matching = new UiMatchingSnapshot
-                    {
-                        MatchMode = "Legacy overlap",
-                        MatchThreshold = 0.61,
-                        FreeformAxisThreshold = 0.72,
-                    },
-                },
+                BuildUiSnapshot: BuildCriticalUiSnapshot,
                 ApplyUiToSettings: settings =>
                 {
                     settings.Grid.XChannels = 88;
@@ -332,6 +317,26 @@ public sealed class ProjectPersistenceUseCaseTests
                 File.Delete(projectPath);
             }
         }
+    }
+
+    private static ProjectUiSnapshot BuildCriticalUiSnapshot()
+    {
+        return new ProjectUiSnapshot
+        {
+            View = new UiViewSnapshot
+            {
+                ShowCad = false,
+                ShowRegular = true,
+                CadLineWidth = 1.75,
+                CadLineColor = "#123456",
+            },
+            Matching = new UiMatchingSnapshot
+            {
+                MatchMode = "Legacy overlap",
+                MatchThreshold = 0.61,
+                FreeformAxisThreshold = 0.72,
+            },
+        };
     }
 
     [Fact]

@@ -275,20 +275,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 82
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/NotchV21FirmwareEvaluator.cs"
-      ],
-      "contentHash": "4eda4cb186b8976c0f090755ffffa77e1de11688b7978fb1a462ae5bcedca909",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.NotchV21FirmwareEvaluator.Apply(NotchV21FirmwareProjection,IReadOnlyDictionary<NotchDiffKey, double>,ICollection<string>)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 100
       },
       "owner": "NFH",
@@ -1301,20 +1287,6 @@
       "contentHash": "a4d48cf7d591cf4caf57793b5e7062feaebfd4aaca3d1f3e7b5a200f0a3c0d97",
       "project": "FreeformHelper.Tests",
       "symbol": "FreeformHelper.Tests.ProjectFileMigrationTests.Load_MigratesNullCollections()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 82
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Project/ProjectPersistenceUseCaseTests.cs"
-      ],
-      "contentHash": "62571460b7b5db7f0b5330056938d696f9843d074ba397a72579666833ca974d",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.ProjectPersistenceUseCaseTests.SaveThenLoadAsync_RoundTrip_PreservesCriticalProjectData()"
     },
     {
       "kind": "member",

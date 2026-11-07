@@ -18,25 +18,7 @@ internal static class NotchV21FirmwareEvaluator
             static item => item.Key,
             static item => (double)item.Value);
 
-        for (var icIndex = 0; icIndex < projection.NodesByIc.Count; icIndex++)
-        {
-            foreach (var node in projection.NodesByIc[icIndex])
-            {
-                var destination = new NotchDiffKey(
-                    icIndex,
-                    node.DestinationDiffIndex);
-                if (!buffer.TryGetValue(destination, out var current))
-                {
-                    AppendMissingDestinationDiagnostic(destination, diagnostics);
-                    continue;
-                }
-
-                var percent = node.ReguToFullPercent;
-                buffer[destination] = percent == 0
-                    ? (short)0
-                    : unchecked((short)((current * percent) / 100));
-            }
-        }
+        ApplyReguToFullPercent(projection, buffer, diagnostics);
 
         var pendingOffsets = new List<(NotchDiffKey Destination, short Offset)>();
         for (var icIndex = 0; icIndex < projection.NodesByIc.Count; icIndex++)
@@ -83,6 +65,32 @@ internal static class NotchV21FirmwareEvaluator
         return new NotchV21FirmwareEvaluation(
             firmwareBaseline,
             buffer.ToDictionary(static item => item.Key, static item => (double)item.Value));
+    }
+
+    private static void ApplyReguToFullPercent(
+        NotchV21FirmwareProjection projection,
+        Dictionary<NotchDiffKey, short> buffer,
+        ICollection<string> diagnostics)
+    {
+        for (var icIndex = 0; icIndex < projection.NodesByIc.Count; icIndex++)
+        {
+            foreach (var node in projection.NodesByIc[icIndex])
+            {
+                var destination = new NotchDiffKey(
+                    icIndex,
+                    node.DestinationDiffIndex);
+                if (!buffer.TryGetValue(destination, out var current))
+                {
+                    AppendMissingDestinationDiagnostic(destination, diagnostics);
+                    continue;
+                }
+
+                var percent = node.ReguToFullPercent;
+                buffer[destination] = percent == 0
+                    ? (short)0
+                    : unchecked((short)((current * percent) / 100));
+            }
+        }
     }
 
     internal static short QuantizeToFirmwareInt16(double value)
