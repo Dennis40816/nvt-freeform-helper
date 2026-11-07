@@ -7,62 +7,64 @@ namespace FreeformHelper.Tests;
 
 public sealed class ProjectFileMigrationTests
 {
+    private const string NullCollectionsProjectJson = """
+    {
+      "schemaVersion": "2",
+      "settings": {
+        "grid": {
+          "xChannels": 32,
+          "yChannels": 20,
+          "perIcXChannels": null,
+          "perIcYChannels": null,
+          "columnWidths": null,
+          "columnOverrides": null,
+          "rowHeights": null,
+          "rowOverrides": null,
+          "rowWidthOverrides": [ null ],
+          "rowWidthOverrideFlags": [ null ],
+          "columnHeightOverrides": [ null ],
+          "columnHeightOverrideFlags": [ null ]
+        },
+        "notch": {
+          "enabledVersions": null
+        }
+      },
+      "uiSnapshot": {
+        "view": {
+          "layerSelections": null
+        }
+      },
+      "freeformOverrides": null,
+      "cadPadCustomValues": null,
+      "hiddenCadPadIds": null,
+      "dxfCadLayerOverrides": null,
+      "dxfCadGeometryOverrides": null,
+      "dxfCombinedCadGroups": [
+        {
+          "sourceCadIds": null,
+          "outputPads": [
+            {
+              "name": null,
+              "layer": null,
+              "vertices": null
+            }
+          ]
+        }
+      ],
+      "dxfRegularMappingOverrides": null,
+      "cadOutputFwDiffIndexOverrides": null,
+      "cadOutputFwDiffIndexAnchorCadPadId": null,
+      "cadOutputFwDiffIndexAnchorCadPadByIc": null
+    }
+    """;
+
     [Fact]
     public void Load_MigratesNullCollections()
     {
         var path = TestFiles.NewTempFilePath("cad_project_", ".json");
         try
         {
-            TestFiles.WriteText(path, """
-            {
-              "schemaVersion": "2",
-              "settings": {
-                "grid": {
-                  "xChannels": 32,
-                  "yChannels": 20,
-                  "perIcXChannels": null,
-                  "perIcYChannels": null,
-                  "columnWidths": null,
-                  "columnOverrides": null,
-                  "rowHeights": null,
-                  "rowOverrides": null,
-                  "rowWidthOverrides": [ null ],
-                  "rowWidthOverrideFlags": [ null ],
-                  "columnHeightOverrides": [ null ],
-                  "columnHeightOverrideFlags": [ null ]
-                },
-                "notch": {
-                  "enabledVersions": null
-                }
-              },
-              "uiSnapshot": {
-                "view": {
-                  "layerSelections": null
-                }
-              },
-              "freeformOverrides": null,
-              "cadPadCustomValues": null,
-              "hiddenCadPadIds": null,
-              "dxfCadLayerOverrides": null,
-              "dxfCadGeometryOverrides": null,
-              "dxfCombinedCadGroups": [
-                {
-                  "sourceCadIds": null,
-                  "outputPads": [
-                    {
-                      "name": null,
-                      "layer": null,
-                      "vertices": null
-                    }
-                  ]
-                }
-              ],
-              "dxfRegularMappingOverrides": null,
-              "cadOutputFwDiffIndexOverrides": null,
-              "cadOutputFwDiffIndexAnchorCadPadId": null,
-              "cadOutputFwDiffIndexAnchorCadPadByIc": null
-            }
-            """);
+            TestFiles.WriteText(path, NullCollectionsProjectJson);
 
             var store = new JsonProjectStore();
             var loaded = JsonProjectStore.Load(path);
