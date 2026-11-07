@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -19,7 +20,7 @@ namespace FreeformHelper.Tests;
 public sealed class NotchDetailEntryTests
 {
     [AvaloniaFact]
-    public async Task DebugButtonOpensNotchDetailAndPreservesPadInfoAsync()
+    public async Task HeaderActionOpensNotchDetailAndPreservesPadInfoAsync()
     {
         HeadlessAppBootstrap.EnsureInitialized();
         using var fixture = new SuppressedWorkspaceBehaviorTests.WorkspaceFixture();
@@ -43,10 +44,8 @@ public sealed class NotchDetailEntryTests
             Assert.Same(info, popover.DataContext);
             Assert.True(overlay.IsVisible);
             Assert.False(info.ShowLowFrequencyDetailSection);
-            info.ToggleLowFrequencyDetailSectionCommand.Execute(null);
-            await HeadlessUiPump.FlushQueueAsync();
             var button = Assert.Single(popover.GetVisualDescendants().OfType<Button>(),
-                static candidate => candidate.Content is string text && text == "Open Notch detail");
+                static candidate => AutomationProperties.GetName(candidate) == "Notch detail");
             Assert.True(button.IsEffectivelyVisible);
             Assert.True(button.IsEffectivelyEnabled);
             var command = button.Command;
@@ -76,7 +75,7 @@ public sealed class NotchDetailEntryTests
             Assert.Same(info, popover.DataContext);
             Assert.True(popover.IsEffectivelyVisible);
             Assert.True(overlay.IsVisible);
-            Assert.True(info.ShowLowFrequencyDetailSection);
+            Assert.False(info.ShowLowFrequencyDetailSection);
             Assert.False(popover.IsCloseConfirmVisible);
         }
         finally

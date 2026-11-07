@@ -859,6 +859,94 @@
             </StackPanel>
           </StackPanel>
         </Border>
+        <Border Classes="workspaceSectionCard">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <SelectableTextBlock Classes="padInfoTitle" Text="PadHeader: common actions, wide and narrow"/>
+            <SelectableTextBlock Classes="padInfoSubtle" Text="Unavailable actions keep their slot and explain why in a tooltip."/>
+            <controls:PadHeader x:Name="DevCadHeader" Title="CAD pad" Subtitle="Single pad"
+                                Width="{DynamicResource PanelRightWidth}" HorizontalAlignment="Left">
+              <controls:PadHeader.KindMark>
+                <Path Width="{DynamicResource IconSizeMd}" Height="{DynamicResource IconSizeMd}"
+                      Fill="{DynamicResource BrushCanvasCadSelected}" Data="M2 12 L12 2 L22 12 L12 22 Z"/>
+              </controls:PadHeader.KindMark>
+              <controls:PadHeader.Actions>
+                <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="{DynamicResource Space2}">
+                  <Border Grid.Column="0" ToolTip.Tip="Focus the best Regular match">
+                    <Button Classes="actionGhost" ToolTip.Tip="Focus the best Regular match"
+                            Classes.actionTextButton="{Binding ShowActionLabels, ElementName=DevCadHeader}"
+                            Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=DevCadHeader}">
+                      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+                        <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.FitScreen}"/>
+                        <TextBlock Text="Locate match" IsVisible="{Binding ShowActionLabels, ElementName=DevCadHeader}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+                  <Border Grid.Column="1" ToolTip.Tip="Open Notch detail">
+                    <Button Classes="actionGhost" ToolTip.Tip="Open Notch detail"
+                            Classes.actionTextButton="{Binding ShowActionLabels, ElementName=DevCadHeader}"
+                            Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=DevCadHeader}">
+                      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+                        <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.DataObject}"/>
+                        <TextBlock Text="Notch detail" IsVisible="{Binding ShowActionLabels, ElementName=DevCadHeader}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+                  <Border Grid.Column="2" ToolTip.Tip="Turn on Color CAD by area first">
+                    <Button Classes="actionGhost" IsEnabled="False" ToolTip.Tip="Turn on Color CAD by area first"
+                            Classes.actionTextButton="{Binding ShowActionLabels, ElementName=DevCadHeader}"
+                            Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=DevCadHeader}">
+                      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+                        <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.Layers}"/>
+                        <TextBlock Text="Area bucket" IsVisible="{Binding ShowActionLabels, ElementName=DevCadHeader}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+                </Grid>
+              </controls:PadHeader.Actions>
+            </controls:PadHeader>
+            <controls:PadHeader x:Name="DevCadHeaderNarrow" Title="CAD pad" Subtitle="Single pad"
+                                Width="{DynamicResource PadHeaderNarrowPreviewWidth}" HorizontalAlignment="Left">
+              <controls:PadHeader.KindMark>
+                <Path Width="{DynamicResource IconSizeMd}" Height="{DynamicResource IconSizeMd}"
+                      Fill="{DynamicResource BrushCanvasCadSelected}" Data="M2 12 L12 2 L22 12 L12 22 Z"/>
+              </controls:PadHeader.KindMark>
+              <controls:PadHeader.Actions>
+                <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="{DynamicResource Space2}">
+                  <Border Grid.Column="0" ToolTip.Tip="Focus the best Regular match">
+                    <Button Classes="actionGhost" ToolTip.Tip="Focus the best Regular match"
+                            Classes.actionTextButton="{Binding ShowActionLabels, ElementName=DevCadHeaderNarrow}"
+                            Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=DevCadHeaderNarrow}">
+                      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+                        <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.FitScreen}"/>
+                        <TextBlock Text="Locate match" IsVisible="{Binding ShowActionLabels, ElementName=DevCadHeaderNarrow}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+                  <Border Grid.Column="1" ToolTip.Tip="Open Notch detail">
+                    <Button Classes="actionGhost" ToolTip.Tip="Open Notch detail"
+                            Classes.actionTextButton="{Binding ShowActionLabels, ElementName=DevCadHeaderNarrow}"
+                            Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=DevCadHeaderNarrow}">
+                      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+                        <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.DataObject}"/>
+                        <TextBlock Text="Notch detail" IsVisible="{Binding ShowActionLabels, ElementName=DevCadHeaderNarrow}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+                  <Border Grid.Column="2" ToolTip.Tip="Turn on Color CAD by area first">
+                    <Button Classes="actionGhost" IsEnabled="False" ToolTip.Tip="Turn on Color CAD by area first"
+                            Classes.actionTextButton="{Binding ShowActionLabels, ElementName=DevCadHeaderNarrow}"
+                            Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=DevCadHeaderNarrow}">
+                      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+                        <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.Layers}"/>
+                        <TextBlock Text="Area bucket" IsVisible="{Binding ShowActionLabels, ElementName=DevCadHeaderNarrow}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+                </Grid>
+              </controls:PadHeader.Actions>
+            </controls:PadHeader>
+          </StackPanel>
+        </Border>
         <SelectableTextBlock x:Name="DevProbeText"
                              TextWrapping="Wrap"
                              Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}}"/>

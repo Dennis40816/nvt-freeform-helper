@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             x:Class="FreeformHelper.UI.Controls.PadHeader"
+             x:DataType="controls:PadHeader"
+             x:Name="Root">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Nvt.Core.Avalonia/Icons/IconResources.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+  <UserControl.Styles>
+    <Style Selector="controls|PadHeader Button.actionTextButton">
+      <Setter Property="Padding" Value="{DynamicResource Inset6_4}"/>
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
+    </Style>
+    <Style Selector="controls|PadHeader Button.actionIconButton">
+      <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
+    </Style>
+  </UserControl.Styles>
+  <StackPanel Spacing="{DynamicResource Space8}">
+    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
+      <ContentControl Content="{Binding KindMark, ElementName=Root}" VerticalAlignment="Center"/>
+      <StackPanel Grid.Column="1" Spacing="{DynamicResource Space2}">
+        <SelectableTextBlock Classes="padInfoTitle" Text="{Binding Title, ElementName=Root}"/>
+        <SelectableTextBlock Classes="padInfoSubtle" Text="{Binding Subtitle, ElementName=Root}"/>
+      </StackPanel>
+    </Grid>
+    <Border BorderBrush="{DynamicResource BrushBorder}"
+            BorderThickness="{DynamicResource BorderHorizontal}"
+            Padding="{DynamicResource Inset4}">
+      <ContentControl Content="{Binding Actions, ElementName=Root}"/>
+    </Border>
+  </StackPanel>
+</UserControl>
