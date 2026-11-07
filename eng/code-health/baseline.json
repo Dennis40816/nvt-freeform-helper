@@ -57,20 +57,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 90
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.Application/Services/DxfRegularMaskAuditService.LocalRepair.cs"
-      ],
-      "contentHash": "019f9e62d91720cb49108dcc67608c54fb9b0ffcf91f9ae30b3c2aff73a48749",
-      "project": "FreeformHelper.Application",
-      "symbol": "FreeformHelper.Application.Services.DxfRegularMaskAuditService.ApplyLocalRepairAndPassiveCompensationSignals(AuditInvocationContext,SegmentAnalysisResult)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 94
       },
       "owner": "NFH",
