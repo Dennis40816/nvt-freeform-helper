@@ -95,7 +95,10 @@ The owner closed these parents on 2026-10-07 because their work is delivered: R1
   - Today a pad that the user set to None is detected as XY again after Save and Load when replay is on. The user loses that manual choice. Found by the project round trip tests (2026-11-08). Changing it changes saved-project behaviour (tier A).
 - [ ] **P-LOAD-MISSING-DXF Loading a project whose un-embedded DXF is missing** · Target: - · Status: Waiting for owner · PR: -
   - Today the load shows no warning, and saving again clears the hidden-pad edits. The user can lose DXF edits without knowing. Found by the project round trip tests (2026-11-08). Changing it changes visible behaviour (tier A).
-
+- [ ] **P-LAYERIMG-CANCEL Cancel in the DXF layer image export gives no message** · Target: - · Status: Waiting for owner · PR: -
+  - Today Cancel closes the window, writes no file and keeps the old status text, so the user gets no sign that the export was cancelled. Suggested: show a short `cancelled` status, as the Coordinate preview export does. Found by the window tests (2026-11-08). Changing it changes visible text (tier A).
+- [ ] **P-PREVIEW-WRAP Notch preview previous and next stage wrap around** · Target: - · Status: Waiting for owner · PR: -
+  - Today Previous on stage 1 goes to stage 3 and Next on stage 3 goes to stage 1. The tests lock this. Suggested: keep the wrap, because three stages are few and the buttons stay always usable. Stopping at the ends would disable a button. Changing it changes visible behaviour (tier A).
 ### 2.2 g5 settings and presentation (after the g4 exit)
 
 - [ ] **R13.301 Settings draft snapshot with per-field Apply, Discard and round-trip tests; save only dirty fields** · Target: g5 · Status: Not started · PR: -
