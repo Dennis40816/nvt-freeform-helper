@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace FreeformHelper.Tests;
 
 public sealed partial class IndexMappingReportViewModelTests
@@ -5,17 +7,19 @@ public sealed partial class IndexMappingReportViewModelTests
 
     private static async Task<bool> WaitUntilAsync(Func<bool> predicate, int timeoutMs)
     {
-        var start = TimeProvider.System.GetTimestamp();
-        while (TimeProvider.System.GetElapsedTime(start).TotalMilliseconds < timeoutMs)
+        using var watchdog = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        watchdog.CancelAfter(timeoutMs);
+        while (!watchdog.IsCancellationRequested)
         {
             if (predicate())
             {
                 return true;
             }
 
-            await Task.Delay(25);
+            await Task.Yield();
         }
 
+        TestContext.Current.CancellationToken.ThrowIfCancellationRequested();
         return predicate();
     }
 }

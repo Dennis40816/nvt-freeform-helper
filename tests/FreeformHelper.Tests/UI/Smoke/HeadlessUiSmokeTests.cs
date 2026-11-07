@@ -1,6 +1,8 @@
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
@@ -418,10 +420,27 @@ public sealed class HeadlessUiSmokeTests
             }
 
             var dashOffsetBefore = spinnerFlow!.StrokeDashOffset;
-            await Task.Delay(120);
-            await HeadlessUiPump.FlushQueueAsync();
+            var animated = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            void OnSpinnerFlowChanged(object? sender, AvaloniaPropertyChangedEventArgs args)
+            {
+                if (args.Property == Shape.StrokeDashOffsetProperty && spinnerFlow.StrokeDashOffset != dashOffsetBefore)
+                {
+                    animated.TrySetResult();
+                }
+            }
 
-            Assert.NotEqual(dashOffsetBefore, spinnerFlow.StrokeDashOffset);
+            spinnerFlow.PropertyChanged += OnSpinnerFlowChanged;
+            try
+            {
+                await animated.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+                await HeadlessUiPump.FlushQueueAsync();
+
+                Assert.NotEqual(dashOffsetBefore, spinnerFlow.StrokeDashOffset);
+            }
+            finally
+            {
+                spinnerFlow.PropertyChanged -= OnSpinnerFlowChanged;
+            }
         }
         finally
         {
@@ -546,19 +565,32 @@ public sealed class HeadlessUiSmokeTests
 
     private static async Task WaitForSpinnerIdleAsync(FreeformHelperViewModel viewModel)
     {
-        for (var attempt = 0; attempt < 30; attempt++)
+        var idle = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        void OnLoadingVisibilityChanged(object? sender, PropertyChangedEventArgs args)
         {
-            await HeadlessUiPump.FlushQueueAsync();
             if (!viewModel.IsModalLoadingSpinnerVisible && !viewModel.IsCadLoadCanvasOverlayVisible)
             {
-                return;
+                idle.TrySetResult();
             }
-
-            await Task.Delay(20);
         }
 
-        Assert.False(viewModel.IsModalLoadingSpinnerVisible);
-        Assert.False(viewModel.IsCadLoadCanvasOverlayVisible);
+        viewModel.PropertyChanged += OnLoadingVisibilityChanged;
+        try
+        {
+            await HeadlessUiPump.FlushQueueAsync();
+            if (viewModel.IsModalLoadingSpinnerVisible || viewModel.IsCadLoadCanvasOverlayVisible)
+            {
+                await idle.Task.WaitAsync(TimeSpan.FromMilliseconds(600), TestContext.Current.CancellationToken);
+                await HeadlessUiPump.FlushQueueAsync();
+            }
+
+            Assert.False(viewModel.IsModalLoadingSpinnerVisible);
+            Assert.False(viewModel.IsCadLoadCanvasOverlayVisible);
+        }
+        finally
+        {
+            viewModel.PropertyChanged -= OnLoadingVisibilityChanged;
+        }
     }
 
     private static int CountBrightPixelsInConsoleBody(ILockedFramebuffer locked, int rowBytes, int width, int height)

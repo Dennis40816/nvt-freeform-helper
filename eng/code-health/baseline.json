@@ -2295,36 +2295,6 @@
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
     },
     {
-      "syntaxHash": "67f9bd307accabf973dc14c95f2824f323fd107681eca43cc4bf1ae6350ef3f1",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.WaitForConditionAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Helpers.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "51e221d03048bb0c03e27f742b48155685ed89cbebed215a10685cbf00a3404c",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.WaitForConditionAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Helpers.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.Environment.TickCount64"
-    },
-    {
-      "syntaxHash": "c2d2741248b66c64328f53aab130dce78b03962f5481c5fab0f87287fe1391e1",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.WaitForConditionAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.Helpers.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.Environment.TickCount64"
-    },
-    {
       "syntaxHash": "c81479aacdeac4e155ffb4a148616edec1099939c2d2e6f02dfce9b430e9db33",
       "member": "FreeformHelper.Tests.HeadlessDispatcherSetup.EnsureRunLoopDispatcher()",
       "owner": "NFH",
@@ -2445,46 +2415,6 @@
       "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
-      "syntaxHash": "5efa0b1eb877ac42b80d331556cb878637ea7442ddc83e5d15722032958cbca8",
-      "member": "FreeformHelper.Tests.HeadlessUiSmokeTests.CadLoadSpinnerWindow_RendersVisibleSpinner_AndAnimates()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "67f9bd307accabf973dc14c95f2824f323fd107681eca43cc4bf1ae6350ef3f1",
-      "member": "FreeformHelper.Tests.HeadlessUiSmokeTests.WaitForSpinnerIdleAsync(FreeformHelperViewModel)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Smoke/HeadlessUiSmokeTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "bda1fb1341872d914200b84faca6687f377a90929a768555a368b0985e11b766",
-      "member": "FreeformHelper.Tests.IndexMappingReportViewModelTests.WaitUntilAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/IndexMappingReportViewModelTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "095c3abfe63ca77f9e02d2534fe8641b763f794bbc105fd0762bfaff117e6597",
-      "member": "FreeformHelper.Tests.LoadingScopeCoordinatorTests.RunAsync_ShowsBeforeAction_AndHidesAfterAction()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/Services/LoadingScopeCoordinatorTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
       "syntaxHash": "7e81d6e2f22db252f163257959c634bf2bdf9e26ca1e28b4edb5fcad3ca18735",
       "member": "FreeformHelper.Tests.NotchTableExporterTests.AssertCCompilesWithGcc(string)",
       "owner": "NFH",
@@ -2593,56 +2523,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
-      "syntaxHash": "67f9bd307accabf973dc14c95f2824f323fd107681eca43cc4bf1ae6350ef3f1",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.WaitForConditionAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
-    },
-    {
-      "syntaxHash": "1848cd75b6a92efc85a151379d34564755e9315109cda770c201e07e6ece04f5",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.WaitForConditionAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.Environment.TickCount64"
-    },
-    {
-      "syntaxHash": "d4904fa44097844457f6492247cf102d285048488e2e0995b414e429fccd3cd7",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.WaitForConditionAsync(Func<bool>,int)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:System.Environment.TickCount64"
-    },
-    {
-      "syntaxHash": "2a77d40433dc755b70772858d27ebb0d68d932b7e0a1f86388d5bd147e2e75d5",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.WorkspaceSourceChanges_BurstOnlyPrewarmsOnce()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
-      "syntaxHash": "b3c3090daedfbfb6063c5992d53cd1c7d8d0f90fbfcb5caff8f5d409e256af35",
-      "member": "FreeformHelper.Tests.ShellViewModelSimulationTests.WorkspaceSourceChanges_BurstOnlyPrewarmsOnce()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/ShellViewModelSimulationTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32)"
     },
     {
       "syntaxHash": "a7acb7fb5362c57787265cbc570807a07d1076f16d7ab96fcc825e50636ef092",

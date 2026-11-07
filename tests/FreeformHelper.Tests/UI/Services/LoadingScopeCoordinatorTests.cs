@@ -14,13 +14,21 @@ public sealed class LoadingScopeCoordinatorTests
             yieldFrameAsync: static () => Task.CompletedTask,
             minimumVisibleDuration: TimeSpan.Zero);
 
-        await coordinator.RunAsync(
-            action: async () =>
-            {
-                await Task.Delay(10);
-            },
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var run = coordinator.RunAsync(
+            action: () => release.Task.WaitAsync(TestContext.Current.CancellationToken),
             setVisible: isVisible => states.Add(isVisible));
 
+        try
+        {
+            Assert.Equal([true], states);
+        }
+        finally
+        {
+            release.TrySetResult();
+        }
+
+        await run.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
         Assert.Equal([true, false], states);
     }
 
