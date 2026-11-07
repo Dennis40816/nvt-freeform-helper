@@ -982,4 +982,6 @@
   <x:Double x:Key="DevSwatchHeight">40</x:Double>
   <x:Double x:Key="DevScrollPreviewHeight">260</x:Double>
   <x:Double x:Key="HowToFigureHeight">220</x:Double>
+  <GridLength x:Key="HowToGestureColumnWidth">2*</GridLength>
+  <GridLength x:Key="HowToActionColumnWidth">3*</GridLength>
 </ResourceDictionary>

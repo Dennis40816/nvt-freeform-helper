@@ -1,147 +1,178 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
-             x:Class="FreeformHelper.UI.Views.HowToUseView">
+             x:Class="FreeformHelper.UI.Views.HowToUseView"
+             x:DataType="vm:HowToUseViewModel">
   <Design.DataContext>
     <vm:HowToUseViewModel/>
   </Design.DataContext>
-  <ScrollViewer>
-    <Border Padding="{StaticResource Inset20}">
-      <StackPanel Spacing="{StaticResource Space16}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Text="How To Use"
-                     FontSize="{StaticResource FontSizeTitle}"
-                     FontWeight="SemiBold"/>
-          <SelectableTextBlock TextWrapping="Wrap"
-                     Text="Workflow, controls, and settings reference."/>
+  <UserControl.Styles>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/HowToUse.axaml"/>
+  </UserControl.Styles>
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <Border Padding="{DynamicResource Inset20}">
+      <StackPanel x:Name="HelpSections" Spacing="{DynamicResource Space12}">
+        <StackPanel Spacing="{DynamicResource Space4}">
+          <SelectableTextBlock Text="How To Use" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"/>
+          <SelectableTextBlock Text="Workflow, controls, and settings reference." Foreground="{DynamicResource BrushTextMuted}"/>
         </StackPanel>
-
-        <StackPanel Spacing="{StaticResource Space12}">
-          <SelectableTextBlock Text="Quick Start" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="1) Open DXF → 2) Review grid settings → 3) Match → 4) Tag freeforms → 5) Export."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="Regular pads are generated from AA size + channels even before a DXF is loaded."/>
+        <controls:HidePanelBlock Title="Quick Start" IsExpanded="True" DefaultExpanded="True" IsCollapsible="False">
+          <StackPanel Spacing="{DynamicResource Space6}">
+            <SelectableTextBlock Text="1) Open DXF → 2) Review grid settings → 3) Match → 4) Tag freeforms → 5) Export."/>
+            <SelectableTextBlock Text="Regular pads are generated from AA size + channels even before a DXF is loaded."/>
           </StackPanel>
-
-          <SelectableTextBlock Text="Navigation" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Top tabs: Freeform Helper, How To Use, Dev."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Fit icon: top-right of the canvas."/>
+        </controls:HidePanelBlock>
+        <controls:HidePanelBlock Title="Interface tour" IsExpanded="False" DefaultExpanded="False">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <controls:PadInfoSectionFrame Title="Navigation">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- Top tabs: Freeform Helper, How To Use, Dev."/>
+                <SelectableTextBlock Text="- Fit icon: top-right of the canvas."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
+            <controls:PadInfoSectionFrame Title="Menu Bar">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- File: Open DXF, Save Project, Load Project."/>
+                <SelectableTextBlock Text="- Match: Run pad matching."/>
+                <SelectableTextBlock Text="- Export: Notch CSV review or C v2.1/v2.2."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
           </StackPanel>
-
-          <SelectableTextBlock Text="Menu Bar" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- File: Open DXF, Save Project, Load Project."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Match: Run pad matching."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Export: Notch CSV review or C v2.1/v2.2."/>
+        </controls:HidePanelBlock>
+        <controls:HidePanelBlock Title="Display and DXF settings" IsExpanded="False" DefaultExpanded="False">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <controls:PadInfoSectionFrame Title="Workspace Header (Display)">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- Display menu: CAD layer, Regular grid, Highlight unmatched/freeform, Color by area."/>
+                <SelectableTextBlock Text="- CAD display: line width and line color."/>
+                <SelectableTextBlock Text="- Area buckets: CAD-only area grouping colors."/>
+                <SelectableTextBlock Text="- Status and selection summaries update automatically."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
+            <controls:PadInfoSectionFrame Title="DXF Settings (Left Panel)">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- Only closed polylines: import closed shapes only."/>
+                <SelectableTextBlock Text="- Layer toggles: hide/show CAD pads by layer after import."/>
+                <SelectableTextBlock Text="- Check DXF overlaps: scan duplicates and overlaps on demand."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
           </StackPanel>
-
-          <SelectableTextBlock Text="Workspace Header (Display)" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Display menu: CAD layer, Regular grid, Highlight unmatched/freeform, Color by area."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- CAD display: line width and line color."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Area buckets: CAD-only area grouping colors."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Status and selection summaries update automatically."/>
+        </controls:HidePanelBlock>
+        <controls:HidePanelBlock Title="Canvas navigation and selection" IsExpanded="False" DefaultExpanded="False">
+          <StackPanel Spacing="{DynamicResource Space4}">
+            <Border Classes="workspaceTableHeader">
+              <Grid x:Name="CanvasNavigationHeader" Classes="howToGestureRow">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="{DynamicResource HowToGestureColumnWidth}"/>
+                  <ColumnDefinition Width="{DynamicResource HowToActionColumnWidth}"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Classes="workspaceTableHeaderText" Text="Gesture or key"/>
+                <TextBlock Grid.Column="1" Classes="workspaceTableHeaderText" Text="Action"/>
+              </Grid>
+            </Border>
+            <ListBox x:Name="CanvasNavigationTable" Classes="workspaceDataList" ItemsSource="{Binding CanvasGestures}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+              <ListBox.ItemsPanel>
+                <ItemsPanelTemplate><StackPanel/></ItemsPanelTemplate>
+              </ListBox.ItemsPanel>
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:HowToUseGestureRow">
+                  <Border Classes="workspaceTableHeader">
+                    <Grid Classes="howToGestureRow">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{DynamicResource HowToGestureColumnWidth}"/>
+                        <ColumnDefinition Width="{DynamicResource HowToActionColumnWidth}"/>
+                      </Grid.ColumnDefinitions>
+                      <SelectableTextBlock Classes="workspaceDataCellText strong" Text="{Binding Gesture}" TextWrapping="Wrap"/>
+                      <SelectableTextBlock Grid.Column="1" Classes="workspaceDataCellText" Text="{Binding Action}" TextWrapping="Wrap"/>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
           </StackPanel>
-
-          <SelectableTextBlock Text="DXF Settings (Left Panel)" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Only closed polylines: import closed shapes only."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Layer toggles: hide/show CAD pads by layer after import."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Check DXF overlaps: scan duplicates and overlaps on demand."/>
+        </controls:HidePanelBlock>
+        <controls:HidePanelBlock Title="Manual sizing and right-pane settings" IsExpanded="False" DefaultExpanded="False">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <controls:PadInfoSectionFrame Title="Manual Sizing (Header Bar)">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- Rows/Cols: enter ranges like 5, 5-7, 5,7."/>
+                <SelectableTextBlock Text="- Width/Height: set target size for selected regular pads."/>
+                <SelectableTextBlock Text="- Use Selection: fill Rows/Cols from current selection."/>
+                <SelectableTextBlock Text="- '*' means mixed values in the current selection."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
+            <controls:PadInfoSectionFrame Title="Right Panel: General Settings">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- IC layout: Cascade count and per-IC X/Y channels."/>
+                <SelectableTextBlock Text="- Grid settings: Padding percent, scan order, and sizing scope (Local/Global)."/>
+                <SelectableTextBlock Text="- Panel AA size (mm): Physical panel size used to compute pitch."/>
+                <SelectableTextBlock Text="- Alignment mode: Choose AA vs DXF bounds."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
+            <controls:PadInfoSectionFrame Title="Right Panel: Analysis">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- Matching: overlap-based CAD↔Regular relation; one CAD can map to multiple regular pads."/>
+                <SelectableTextBlock Text="- Unmatched threshold: Display-only overlap / regular area diagnostic; changing it does not change links."/>
+                <SelectableTextBlock Text="- Freeform tagging: Assign X/Y/XY/None to selected pads."/>
+                <SelectableTextBlock Text="- Notch export: Enable versions and legacy values."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
           </StackPanel>
-
-          <SelectableTextBlock Text="Canvas Navigation" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Middle mouse drag: Pan (recommended)."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Space + Left mouse drag: Pan (laptop fallback)."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Mouse wheel: Zoom around cursor. Ctrl + wheel = faster zoom."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Shift + Arrow keys: Fine pan."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- F: Fit to content. Ctrl + A: Select all visible pads."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- F / Ctrl + A work globally when not editing text."/>
+        </controls:HidePanelBlock>
+        <controls:HidePanelBlock Title="Notch reference" IsExpanded="False" DefaultExpanded="False">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <controls:PadInfoSectionFrame Title="Notch Terms &amp; Thresholds">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- BBoxArea: CAD pad bounding-box area, formula = width × height (used by V2.1 REGU_TO_FULL field)."/>
+                <SelectableTextBlock Text="- Freeform TH (Matching &gt; Freeform axis threshold): decides XWay/YWay/None classification during auto-detect."/>
+                <SelectableTextBlock Text="- Notch TH (Notch threshold Q7): after allocation, if max allocation &lt; TH, that CAD is skipped from notch export."/>
+                <SelectableTextBlock Text="- Effective boundary: To Full can only start from CAD-overlapped regulars that are connected to boundary seeds (outer edge or inactive-neighbor seed)."/>
+                <SelectableTextBlock Text="- Multi-owner gate: if one regular is owned by more than one CAD (strict overlap over TH), that regular cannot be a To Full target."/>
+                <SelectableTextBlock Text="- Active regular visibility mask: boundary inactive-neighbor check uses current active regular set (match result scope), not all grid cells."/>
+                <SelectableTextBlock Text="- Allocation cutoff: reserved for future FW-oriented row minimization (not enabled in current build)."/>
+                <SelectableTextBlock Text="- Export notch now opens a row picker, so each generated notch row can be included/excluded manually before file output."/>
+                <Image Source="avares://FreeformHelper.UI/Assets/HowTo/notch-flow.png" Height="{DynamicResource HowToFigureHeight}"
+                       Stretch="Uniform" HorizontalAlignment="Left"/>
+                <Image Source="avares://FreeformHelper.UI/Assets/HowTo/threshold-scope.png" Height="{DynamicResource HowToFigureHeight}"
+                       Stretch="Uniform" HorizontalAlignment="Left"/>
+                <Image Source="avares://FreeformHelper.UI/Assets/HowTo/bbox-area.png" Height="{DynamicResource HowToFigureHeight}"
+                       Stretch="Uniform" HorizontalAlignment="Left"/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
           </StackPanel>
-
-          <SelectableTextBlock Text="Selection &amp; Pad Info" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Left click: Select pad under cursor."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Ctrl + click / Shift + click: Add/remove selection."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Alt + click: Prefer regular pad when CAD/regular overlap."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Drag empty space: Box select. Ctrl/Shift = add to selection."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Double click: Open pad info for the clicked pad."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Right click: Open pad info (keeps selection if already selected)."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Click empty space: Clear selection."/>
+        </controls:HidePanelBlock>
+        <controls:HidePanelBlock Title="Numeric input and Console" IsExpanded="False" DefaultExpanded="False">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <controls:PadInfoSectionFrame Title="Number Inputs">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- Type a value and press Enter or click away to commit."/>
+                <SelectableTextBlock Text="- Up/Down buttons step by the configured increment."/>
+                <SelectableTextBlock Text="- Drag the right scrub area to adjust quickly."/>
+                <SelectableTextBlock Text="- Alt + mouse wheel changes the value."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
+            <controls:PadInfoSectionFrame Title="Console &amp; Undo">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- Bottom console streams logs and auto-scrolls to the latest entry."/>
+                <SelectableTextBlock Text="- Clear removes entries."/>
+                <SelectableTextBlock Text="- Ctrl + Z undoes settings and pad edits (global when not editing text)."/>
+                <SelectableTextBlock Text="- Delete hides selected CAD pads (global when not editing text)."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
           </StackPanel>
-
-          <SelectableTextBlock Text="Manual Sizing (Header Bar)" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Rows/Cols: enter ranges like 5, 5-7, 5,7."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Width/Height: set target size for selected regular pads."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Use Selection: fill Rows/Cols from current selection."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- '*' means mixed values in the current selection."/>
+        </controls:HidePanelBlock>
+        <controls:HidePanelBlock Title="Advanced reference" IsExpanded="False" DefaultExpanded="False">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <controls:PadInfoSectionFrame Title="Build &amp; Tests">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Text="- Run scripts/build.ps1 to build and execute unit tests."/>
+              </StackPanel>
+            </controls:PadInfoSectionFrame>
           </StackPanel>
-
-          <SelectableTextBlock Text="Right Panel: General Settings" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- IC layout: Cascade count and per-IC X/Y channels."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Grid settings: Padding percent, scan order, and sizing scope (Local/Global)."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Panel AA size (mm): Physical panel size used to compute pitch."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Alignment mode: Choose AA vs DXF bounds."/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="Right Panel: Analysis" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Matching: overlap-based CAD↔Regular relation; one CAD can map to multiple regular pads."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Unmatched threshold: Display-only overlap / regular area diagnostic; changing it does not change links."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Freeform tagging: Assign X/Y/XY/None to selected pads."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Notch export: Enable versions and legacy values."/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="Notch Terms &amp; Thresholds" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- BBoxArea: CAD pad bounding-box area, formula = width × height (used by V2.1 REGU_TO_FULL field)."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Freeform TH (Matching &gt; Freeform axis threshold): decides XWay/YWay/None classification during auto-detect."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Notch TH (Notch threshold Q7): after allocation, if max allocation &lt; TH, that CAD is skipped from notch export."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Effective boundary: To Full can only start from CAD-overlapped regulars that are connected to boundary seeds (outer edge or inactive-neighbor seed)."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Multi-owner gate: if one regular is owned by more than one CAD (strict overlap over TH), that regular cannot be a To Full target."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Active regular visibility mask: boundary inactive-neighbor check uses current active regular set (match result scope), not all grid cells."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Allocation cutoff: reserved for future FW-oriented row minimization (not enabled in current build)."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Export notch now opens a row picker, so each generated notch row can be included/excluded manually before file output."/>
-          </StackPanel>
-
-          <Image Source="avares://FreeformHelper.UI/Assets/HowTo/notch-flow.png"
-                 Height="{StaticResource HowToFigureHeight}"
-                 Stretch="Uniform"
-                 HorizontalAlignment="Left"/>
-          <Image Source="avares://FreeformHelper.UI/Assets/HowTo/threshold-scope.png"
-                 Height="{StaticResource HowToFigureHeight}"
-                 Stretch="Uniform"
-                 HorizontalAlignment="Left"/>
-          <Image Source="avares://FreeformHelper.UI/Assets/HowTo/bbox-area.png"
-                 Height="{StaticResource HowToFigureHeight}"
-                 Stretch="Uniform"
-                 HorizontalAlignment="Left"/>
-
-          <SelectableTextBlock Text="Number Inputs" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Type a value and press Enter or click away to commit."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Up/Down buttons step by the configured increment."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Drag the right scrub area to adjust quickly."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Alt + mouse wheel changes the value."/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="Console &amp; Undo" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Bottom console streams logs and auto-scrolls to the latest entry."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Clear removes entries."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Ctrl + Z undoes settings and pad edits (global when not editing text)."/>
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Delete hides selected CAD pads (global when not editing text)."/>
-          </StackPanel>
-
-          <SelectableTextBlock Text="Build &amp; Tests" FontSize="{StaticResource FontSizeSectionTitle}" FontWeight="SemiBold"/>
-          <StackPanel Spacing="{StaticResource Space6}">
-            <SelectableTextBlock TextWrapping="Wrap" Text="- Run scripts/build.ps1 to build and execute unit tests."/>
-          </StackPanel>
-        </StackPanel>
+        </controls:HidePanelBlock>
       </StackPanel>
     </Border>
   </ScrollViewer>
