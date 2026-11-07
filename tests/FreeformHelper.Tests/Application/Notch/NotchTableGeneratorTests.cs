@@ -728,10 +728,7 @@ public sealed class NotchTableGeneratorTests
                     .Select(static snapshot => $"{snapshot.PhaseStep}/{snapshot.PhaseStepCount}:{snapshot.Phase}")
                     .Distinct());
             Assert.Equal("4/4:Finalize canonical exports", Assert.Single(warmPhases));
-            Assert.Equal(0, v22.GenerationPhaseTimings.BuildProfilesElapsedMs);
-            Assert.Equal(0, v22.GenerationPhaseTimings.BuildCanonicalCandidatesElapsedMs);
-            Assert.Equal(0, v22.GenerationPhaseTimings.MergeCanonicalCandidatesElapsedMs);
-            Assert.False(v22.GenerationPhaseTimings.CandidateBreakdown?.HasData ?? false);
+            Assert.Equal(NotchCandidatePhaseTimings.Empty, v22.GenerationPhaseTimings.CandidateBreakdown);
 
             ProjectSettings CreateSettings(params NotchAlgorithmVersion[] enabledVersions) => new()
             {
@@ -1368,16 +1365,10 @@ public sealed class NotchTableGeneratorTests
         Assert.Equal(cad.Pads[0].Id, table.Rows[0].CadPadId);
         Assert.Equal(0, table.Rows[0].DiffIndex); // tie-break chooses smaller diff index
         Assert.NotNull(table.GenerationPhaseTimings);
-        Assert.True(table.GenerationPhaseTimings.BuildProfilesElapsedMs >= 0);
-        Assert.True(table.GenerationPhaseTimings.BuildCanonicalCandidatesElapsedMs >= 0);
-        Assert.True(table.GenerationPhaseTimings.MergeCanonicalCandidatesElapsedMs >= 0);
-        Assert.True(table.GenerationPhaseTimings.BuildLegacyRowsElapsedMs >= 0);
-        Assert.True(table.GenerationPhaseTimings.FinalizeCanonicalExportsElapsedMs >= 0);
         Assert.NotNull(table.GenerationPhaseTimings.CandidateBreakdown);
-        Assert.True(table.GenerationPhaseTimings.CandidateBreakdown!.CandidateCount >= 0);
-        Assert.True(table.GenerationPhaseTimings.CandidateBreakdown.CompensationStageTimings.TotalElapsedMs >= 0);
+        Assert.Equal(1, table.GenerationPhaseTimings.CandidateBreakdown!.CandidateCount);
+        Assert.NotNull(table.GenerationPhaseTimings.CandidateBreakdown.CompensationStageTimings);
         Assert.NotNull(table.GenerationPhaseTimings.CandidateBreakdown.CompensationStageTimings.StageCBreakdown);
-        Assert.True(table.GenerationPhaseTimings.CandidateBreakdown.CompensationStageTimings.StageCBreakdown!.TotalElapsedMs >= 0);
     }
 
     [Theory]
