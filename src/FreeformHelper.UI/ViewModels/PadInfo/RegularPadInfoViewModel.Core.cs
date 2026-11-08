@@ -479,7 +479,8 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
                 "Step 5",
                 row.Version.ToDisplayLabel(),
                 rowText,
-                highlightCommand));
+                highlightCommand,
+                compactTitleText: $"#{row.RowNumber} IC{row.IcIndex + 1} diff{row.DiffIndex} {cadText}"));
         }
 
         return display with

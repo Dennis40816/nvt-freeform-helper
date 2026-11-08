@@ -8,7 +8,8 @@ public sealed partial class CadPadInfoViewModel
     public string BoundsText => _display.Identity.BoundsText;
     public string RotationText { get; } = "Not provided by CAD polygon";
     public string AnchorIcText => _display.Identity.AnchorIcText;
-    public string AllocationHintText { get; } = "Click a card to highlight that pad";
+    public string AllocationTitleText { get; } = PadInfoRelationText.AllocationTitle;
+    public string AllocationHintText { get; } = PadInfoRelationText.HighlightHint;
     public string GeometrySeedToolTip => $"{MatchDetailsText}{Environment.NewLine}Seed confidence: {MatchConfidenceText}";
     public string ToFullReasonLineText => $"To Full: {ToFullReasonShortText}";
     public string ToFullReasonToolTip => $"{ToFullReasonFullText}{Environment.NewLine}Seed confidence: {MatchConfidenceText}";

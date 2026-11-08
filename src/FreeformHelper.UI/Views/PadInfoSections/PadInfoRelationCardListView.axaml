@@ -34,7 +34,7 @@
             <Panel>
               <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{DynamicResource Space8}"
                     IsVisible="{Binding Compact, RelativeSource={RelativeSource AncestorType=padInfo:PadInfoRelationCardListView}}">
-                <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding TitleText}" VerticalAlignment="Center"/>
+                <SelectableTextBlock Classes="padInfoKeyValue" Text="{Binding CompactTitleText}" VerticalAlignment="Center"/>
                 <SelectableTextBlock Grid.Column="1" Classes="padInfoKeyValue" Text="{Binding RatioText}" VerticalAlignment="Center"/>
                 <controls:FontIcon Grid.Column="2" Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.Visibility}"/>
               </Grid>

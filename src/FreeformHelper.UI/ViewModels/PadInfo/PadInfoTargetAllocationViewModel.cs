@@ -33,6 +33,8 @@ public sealed class PadInfoTargetAllocationViewModel
 
     public string TitleText => TargetText;
 
+    public string CompactTitleText => TitleText;
+
     public string DiffText { get; }
 
     public string MetaText => DiffText;
