@@ -1,329 +1,128 @@
-<UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
              xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
-             x:Class="FreeformHelper.UI.Views.WorkspaceSections.IndexMappingReportRightPaneView">
-      <Border Classes="workspaceInspectorHost">
-        <Grid RowDefinitions="Auto,*,Auto"
-              RowSpacing="{StaticResource Space8}">
-          <Border Grid.Row="0"
-                  Classes="workspaceInspectorContextStrip">
-            <Grid ColumnDefinitions="Auto,*,Auto"
-                  ColumnSpacing="{StaticResource Space8}">
-              <SelectableTextBlock Classes="workspaceGroupTitle"
-                                   Text="{Binding SelectedDecision.CategoryText, FallbackValue='Decision'}"/>
-              <SelectableTextBlock Grid.Column="1"
-                                   Classes="workspaceInspectorContextText"
-                                   Text="{Binding SelectedDecision.Title, FallbackValue='Select a row'}"
-                                   TextTrimming="CharacterEllipsis"
-                                   MaxLines="1"/>
-              <SelectableTextBlock Grid.Column="2"
-                                   Classes="workspaceInspectorContextText"
-                                   Text="{Binding ActiveVerificationStepText}"
-                                   HorizontalAlignment="Right"/>
-            </Grid>
-          </Border>
-
-          <ScrollViewer Grid.Row="1"
-                        Classes="scrollV2"
-                        VerticalScrollBarVisibility="Auto"
-                        HorizontalScrollBarVisibility="Disabled">
-            <StackPanel Spacing="{StaticResource Space8}">
-              <Border Classes="workspaceInspectorSection">
-                <StackPanel Spacing="{StaticResource Space6}">
-                  <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
-                                       Text="Verification summary"/>
-                  <Grid ColumnDefinitions="*,*"
-                        ColumnSpacing="{StaticResource Space8}"
-                        RowDefinitions="Auto,Auto,Auto">
-                    <SelectableTextBlock Classes="workspaceInspectorValue"
-                                         Text="{Binding SelectedFilterLabel, StringFormat='Mode: {0}'}"/>
-                    <SelectableTextBlock Grid.Column="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding OverallStatusText, StringFormat='Status: {0}'}"/>
-                    <SelectableTextBlock Grid.Row="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding OpenIssueCount, StringFormat='Open issues: {0}'}"/>
-                    <SelectableTextBlock Grid.Row="1"
-                                         Grid.Column="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding ActiveVerificationStepText, StringFormat='Active step: {0}'}"/>
-                    <SelectableTextBlock Grid.Row="2"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding TableRevisionText}"/>
-                    <SelectableTextBlock Grid.Row="2"
-                                         Grid.Column="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding DecisionSummaryText}"
-                                         Foreground="{DynamicResource BrushTextMuted}"
-                                         TextTrimming="CharacterEllipsis"
-                                         MaxLines="1"/>
-                  </Grid>
-                </StackPanel>
-              </Border>
-
-              <Border Classes="workspaceInspectorSection">
-                <StackPanel Spacing="{StaticResource Space6}">
-                  <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
-                                       Text="Step rail"/>
-                  <CheckBox Content="{Binding StepFilterSyncText}"
-                            IsChecked="{Binding SyncFilterWithStepRail, Mode=TwoWay}"
-                            ToolTip.Tip="When enabled, selecting a step rail node also switches the left-table filter to the preferred diagnostics mode for that step."/>
-                  <ItemsControl ItemsSource="{Binding VerificationSteps}">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate>
-                        <Button Classes="verificationTableRow"
-                                Classes.verificationTableRowActive="{Binding IsActive}"
-                                Command="{Binding DataContext.SelectVerificationStepCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                CommandParameter="{Binding Step}">
-                          <Grid ColumnDefinitions="Auto,*"
-                                ColumnSpacing="{StaticResource Space8}">
-                            <Grid RowDefinitions="Auto,*"
-                                  Width="12"
-                                  VerticalAlignment="Stretch"
-                                  HorizontalAlignment="Center">
-                              <Border Classes="verificationStepRailNode"
-                                      Classes.active="{Binding IsActive}"
-                                      Classes.pass="{Binding IsPass}"
-                                      Classes.warning="{Binding IsWarning}"
-                                      Classes.blocked="{Binding IsBlocked}"
-                                      Margin="{StaticResource InsetTop4}"/>
-                              <Border Grid.Row="1"
-                                      Classes="verificationStepRailConnector"
-                                      IsVisible="{Binding HasConnector}"/>
-                            </Grid>
-                            <StackPanel Grid.Column="1"
-                                        Spacing="{StaticResource Space2}">
-                              <Grid ColumnDefinitions="*,Auto"
-                                    ColumnSpacing="{StaticResource Space6}">
-                                <SelectableTextBlock Classes="verificationTableCellText strong"
-                                                     Text="{Binding Title}"/>
-                                <SelectableTextBlock Grid.Column="1"
-                                                     Classes="verificationTableCellText"
-                                                     Text="{Binding StatusText, StringFormat='status: {0}'}"
-                                                     Foreground="{DynamicResource BrushTextMuted}"/>
-                              </Grid>
-                              <SelectableTextBlock Classes="verificationTableCellText"
-                                                   Text="{Binding VerifyHint}"
-                                                   Foreground="{DynamicResource BrushTextMuted}"
-                                                   TextWrapping="WrapWithOverflow"
-                                                   MaxLines="2"
-                                                   TextTrimming="CharacterEllipsis"/>
-                              <SelectableTextBlock Classes="verificationTableCellText"
-                                                   Text="{Binding KeyChecks}"
-                                                   Foreground="{DynamicResource BrushTextMuted}"
-                                                   TextWrapping="NoWrap"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   MaxLines="1"/>
-                            </StackPanel>
-                          </Grid>
-                        </Button>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
-                </StackPanel>
-              </Border>
-              <Border Classes="workspaceInspectorSection">
-                <StackPanel Spacing="{StaticResource Space6}">
-                  <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
-                                       Text="Entity journey"/>
-                  <Border Classes="workspaceCodeBlock">
-                    <StackPanel Spacing="{StaticResource Space2}">
-                      <SelectableTextBlock Classes="workspaceInspectorValue"
-                                           Text="{Binding SelectedDecisionKeyText}"/>
-                      <SelectableTextBlock Classes="workspaceInspectorValue"
-                                           Text="{Binding SelectedDecisionSubtitleText}"
-                                           Foreground="{DynamicResource BrushTextMuted}"
-                                           TextWrapping="WrapWithOverflow"
-                                           MaxLines="2"
-                                           TextTrimming="CharacterEllipsis"/>
-                      <SelectableTextBlock Classes="workspaceInspectorValue"
-                                           Text="{Binding SelectedJourneyText}"
-                                           Foreground="{DynamicResource BrushTextMuted}"
-                                           TextWrapping="WrapWithOverflow"/>
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.IndexMappingReportRightPaneView"
+             x:DataType="viewModels:IndexMappingReportViewModel">
+  <Border Classes="workspaceInspectorHost mappingInspector">
+    <ScrollViewer Classes="scrollV2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Spacing="{DynamicResource Space8}">
+        <StackPanel Spacing="{DynamicResource Space6}">
+          <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Step rail"/>
+          <ItemsControl ItemsSource="{Binding VerificationSteps}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <primitives:BalancedWrapPanel ItemSpacing="{DynamicResource Space2}" LineSpacing="{DynamicResource Space2}"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:IndexMappingVerificationStepNodeViewModel">
+                <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsActive}"
+                              Padding="{DynamicResource Inset6_2}"
+                              IsChecked="{Binding IsActive, Mode=OneWay}" Content="{Binding Title}"
+                              Command="{Binding $parent[UserControl].((viewModels:IndexMappingReportViewModel)DataContext).SelectVerificationStepCommand}"
+                              CommandParameter="{Binding Step}">
+                  <ToolTip.Tip>
+                    <StackPanel Spacing="{DynamicResource Space2}">
+                      <TextBlock Text="{Binding VerifyHint}" TextWrapping="WrapWithOverflow"/>
+                      <TextBlock Text="{Binding StatusText}"/>
+                      <TextBlock Text="{Binding KeyChecks}" TextWrapping="WrapWithOverflow"/>
                     </StackPanel>
-                  </Border>
-                </StackPanel>
-              </Border>
-
-              <Border Classes="workspaceInspectorSection">
-                <StackPanel Spacing="{StaticResource Space6}">
-                  <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
-                                       Text="Active step detail"/>
-                  <SelectableTextBlock Classes="workspaceInspectorValue"
-                                       Text="{Binding ActiveStepCardTitle}"/>
-                  <SelectableTextBlock Classes="workspaceInspectorValue"
-                                       Text="{Binding ActiveStepCardStatusText}"
-                                       Foreground="{DynamicResource BrushTextMuted}"/>
-                  <Grid ColumnDefinitions="Auto,*"
-                        ColumnSpacing="{StaticResource Space8}"
-                        RowDefinitions="Auto,Auto,Auto,Auto,Auto"
-                        RowSpacing="{StaticResource Space6}">
-                    <SelectableTextBlock Classes="workspaceInspectorValue"
-                                         Text="Input"
-                                         Foreground="{DynamicResource BrushTextMuted}"/>
-                    <SelectableTextBlock Grid.Column="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding ActiveStepInputText}"
-                                         TextWrapping="WrapWithOverflow"/>
-                    <SelectableTextBlock Grid.Row="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="Decision"
-                                         Foreground="{DynamicResource BrushTextMuted}"/>
-                    <SelectableTextBlock Grid.Row="1"
-                                         Grid.Column="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding ActiveStepDecisionText}"
-                                         TextWrapping="WrapWithOverflow"/>
-                    <SelectableTextBlock Grid.Row="2"
-                                         Classes="workspaceInspectorValue"
-                                         Text="Output"
-                                         Foreground="{DynamicResource BrushTextMuted}"/>
-                    <SelectableTextBlock Grid.Row="2"
-                                         Grid.Column="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding ActiveStepOutputText}"
-                                         TextWrapping="WrapWithOverflow"/>
-                    <SelectableTextBlock Grid.Row="3"
-                                         Classes="workspaceInspectorValue"
-                                         Text="Impact"
-                                         Foreground="{DynamicResource BrushTextMuted}"/>
-                    <SelectableTextBlock Grid.Row="3"
-                                         Grid.Column="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding ActiveStepImpactText}"
-                                         TextWrapping="WrapWithOverflow"/>
-                    <SelectableTextBlock Grid.Row="4"
-                                         Classes="workspaceInspectorValue"
-                                         Text="Action"
-                                         Foreground="{DynamicResource BrushTextMuted}"/>
-                    <SelectableTextBlock Grid.Row="4"
-                                         Grid.Column="1"
-                                         Classes="workspaceInspectorValue"
-                                         Text="{Binding ActiveStepActionText}"
-                                         TextWrapping="WrapWithOverflow"/>
-                  </Grid>
-                </StackPanel>
-              </Border>
-
-              <Border Classes="workspaceInspectorSection">
-                <StackPanel Spacing="{StaticResource Space6}">
-                  <Expander IsExpanded="{Binding IsAlgorithmTraceExpanded, Mode=TwoWay}">
-                    <Expander.Header>
-                      <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
-                                           Text="Advanced details"/>
-                    </Expander.Header>
-                    <StackPanel Spacing="{StaticResource Space6}"
-                                Margin="{StaticResource InsetTop6}">
-                      <SelectableTextBlock Classes="workspaceInspectorValue"
-                                           Text="{Binding Step4RawBestText}"
-                                           IsVisible="{Binding IsStep4Active}"/>
-                      <SelectableTextBlock Classes="workspaceInspectorValue"
-                                           Text="{Binding Step4MaskedBestText}"
-                                           IsVisible="{Binding IsStep4Active}"/>
-                      <SelectableTextBlock Classes="workspaceInspectorValue"
-                                           Text="{Binding Step4PassiveCompensationText}"
-                                           IsVisible="{Binding IsStep4Active}"/>
-                      <SelectableTextBlock Classes="workspaceInspectorValue"
-                                           Text="{Binding Step4OffsetSupportText}"
-                                           IsVisible="{Binding IsStep4Active}"/>
-                      <SelectableTextBlock Classes="workspaceInspectorValue"
-                                           Text="{Binding Step4CandidateAttributionTitle}"
-                                           Foreground="{DynamicResource BrushTextMuted}"
-                                           IsVisible="{Binding IsStep4Active}"/>
-                      <ItemsControl ItemsSource="{Binding Step4CandidateAttributionLines}"
-                                    IsVisible="{Binding IsStep4Active}">
-                        <ItemsControl.ItemTemplate>
-                          <DataTemplate>
-                            <SelectableTextBlock Classes="workspaceInspectorValue"
-                                                 Text="{Binding ., StringFormat='- {0}'}"
-                                                 Foreground="{DynamicResource BrushTextMuted}"
-                                                 TextWrapping="WrapWithOverflow"/>
-                          </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                      </ItemsControl>
-
-                      <SelectableTextBlock Classes="workspaceInspectorValue"
-                                           Text="{Binding AlgorithmTraceStatusText}"
-                                           Foreground="{DynamicResource BrushTextMuted}"/>
-                      <ItemsControl ItemsSource="{Binding AlgorithmTraceEntries}"
-                                    IsVisible="{Binding IsAlgorithmTraceReady}">
-                        <ItemsControl.ItemTemplate>
-                          <DataTemplate>
-                            <Grid ColumnDefinitions="Auto,*"
-                                  ColumnSpacing="{StaticResource Space6}">
-                              <SelectableTextBlock Text="{Binding Label}"
-                                                   FontWeight="SemiBold"
-                                                   IsVisible="{Binding IsKey}"/>
-                              <SelectableTextBlock Grid.Column="1"
-                                                   Text="{Binding Value}"
-                                                   TextWrapping="WrapWithOverflow"/>
-                            </Grid>
-                          </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                      </ItemsControl>
-                    </StackPanel>
-                  </Expander>
-                </StackPanel>
-              </Border>
-            </StackPanel>
-          </ScrollViewer>
-
-          <Grid Grid.Row="2"
-                ColumnDefinitions="*,Auto"
-                ColumnSpacing="{StaticResource Space8}">
-            <SelectableTextBlock Grid.Column="0"
-                                 VerticalAlignment="Center"
-                                 Foreground="{DynamicResource BrushTextMuted}"
-                                 Text="{Binding ActionStatus}"
+                  </ToolTip.Tip>
+                </ToggleButton>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <CheckBox Content="Sync filter with step" IsChecked="{Binding SyncFilterWithStepRail, Mode=TwoWay}"
+                    ToolTip.Tip="When enabled, selecting a step rail node also switches the left-table filter to the preferred diagnostics mode for that step."/>
+        </StackPanel>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space6}">
+          <StackPanel Spacing="{DynamicResource Space4}">
+            <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="{Binding SelectedMappingTargetText}"
                                  TextWrapping="WrapWithOverflow"/>
-            <WrapPanel Grid.Column="1"
-                       Orientation="Horizontal"
-                       HorizontalAlignment="Right">
-              <Button Classes="workspaceSubtleAction"
-                      Margin="{StaticResource InsetLeft6}"
-                      Content="Locate"
-                      Command="{Binding LocateSelectedIssueCommand}"
-                      IsEnabled="{Binding CanLocateSelectedDecision}"
-                      IsVisible="{Binding ShowStep3ActionButtons}"/>
-              <Button Classes="actionTextButton actionPrimary"
-                      Margin="{StaticResource InsetLeft6}"
-                      Content="Apply diff repair"
-                      Command="{Binding ApplyDiffOverrideCommand}"
-                      IsEnabled="{Binding CanApplySelectedDiffOverride}"
-                      IsVisible="{Binding ShowStep4ActionButtons}"/>
-              <Button Classes="actionTextButton actionPrimary"
-                      Margin="{StaticResource InsetLeft6}"
-                      Content="Apply override"
-                      Command="{Binding ApplyOverrideCommand}"
-                      IsEnabled="{Binding CanApplySelectedIssueOverride}"
-                      IsVisible="{Binding ShowStep4ActionButtons}"/>
-              <Button Classes="workspaceSubtleAction"
-                      Margin="{StaticResource InsetLeft6}"
-                      Content="Clear override"
-                      Command="{Binding ClearOverrideCommand}"
-                      IsEnabled="{Binding CanClearSelectedIssueOverride}"
-                      IsVisible="{Binding ShowStep4ActionButtons}"/>
-              <Button Classes="actionTextButton actionPrimary"
-                      Margin="{StaticResource InsetLeft6}"
-                      Content="Apply visible repairs"
-                      Command="{Binding ApplyCadOutputFwDiffOverridesCommand}"
-                      IsEnabled="{Binding CanApplyCadOutputFwDiffOverrides}"
-                      IsVisible="{Binding ShowStep5ActionButtons}"/>
-              <Button Classes="actionTextButton actionPrimary"
-                      Margin="{StaticResource InsetLeft6}"
-                      Content="Apply segment repairs"
-                      Command="{Binding ApplySegmentDiffOverridesCommand}"
-                      IsEnabled="{Binding CanApplySelectedSegmentDiffOverrides}"
-                      IsVisible="{Binding ShowStep5ActionButtons}"/>
-              <SelectableTextBlock Margin="{StaticResource InsetLeft6}"
-                                   VerticalAlignment="Center"
-                                   Foreground="{DynamicResource BrushTextMuted}"
-                                   Text="Simulation uses exported notch table payload."
-                                   IsVisible="{Binding ShowSimulationActionButtons}"/>
-            </WrapPanel>
-          </Grid>
+            <Border Classes="chipStatus" HorizontalAlignment="Left">
+              <SelectableTextBlock Classes="chipStatusText" Text="{Binding SelectedDecision.StatusDisplay}"
+                                   TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding SelectedDecision.StatusDisplay}"/>
+            </Border>
+          </StackPanel>
+          <Button Grid.Column="1" Classes="actionGhost" Content="Locate" VerticalAlignment="Top"
+                  Command="{Binding LocateSelectedIssueCommand}" IsEnabled="{Binding CanLocateSelectedDecision}"/>
         </Grid>
-      </Border>
+        <Border Classes="workspaceCodeBlock">
+          <StackPanel Spacing="{DynamicResource Space4}">
+            <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Impact"/>
+            <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding ActiveStepImpactText}"
+                                 TextWrapping="WrapWithOverflow"/>
+          </StackPanel>
+        </Border>
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+              ColumnSpacing="{DynamicResource Space8}" RowSpacing="{DynamicResource Space4}">
+          <TextBlock Foreground="{DynamicResource BrushTextMuted}" Text="Source"/>
+          <SelectableTextBlock Grid.Column="1" Text="{Binding SelectedDecisionSourceText}" TextWrapping="WrapWithOverflow"/>
+          <TextBlock Grid.Row="1" Foreground="{DynamicResource BrushTextMuted}" Text="Confidence"/>
+          <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedDecisionConfidenceText}"/>
+        </Grid>
+        <controls:HidePanelBlock x:Name="EntityJourney" Title="Entity journey" DefaultExpanded="False" IsExpanded="False">
+          <StackPanel Spacing="{DynamicResource Space4}">
+            <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding SelectedDecisionSubtitleText}"
+                                 TextWrapping="WrapWithOverflow"/>
+            <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding SelectedJourneyText}"
+                                 TextWrapping="WrapWithOverflow"/>
+          </StackPanel>
+        </controls:HidePanelBlock>
+        <controls:HidePanelBlock x:Name="StepFields" Title="{Binding ActiveStepFieldsTitle}"
+                                 DefaultExpanded="False" IsExpanded="False">
+          <StackPanel Spacing="{DynamicResource Space6}">
+            <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding ActiveStepCardStatusText}"/>
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                  ColumnSpacing="{DynamicResource Space8}" RowSpacing="{DynamicResource Space6}">
+              <TextBlock Text="IC" Foreground="{DynamicResource BrushTextMuted}"/>
+              <SelectableTextBlock Grid.Column="1" Text="{Binding SelectedDecision.IcDisplayText}"/>
+              <TextBlock Grid.Row="1" Text="Diff" Foreground="{DynamicResource BrushTextMuted}"/>
+              <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedDecision.CurrentDisplay}"/>
+              <TextBlock Grid.Row="2" Text="Input" Foreground="{DynamicResource BrushTextMuted}"/>
+              <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ActiveStepInputText}" TextWrapping="WrapWithOverflow"/>
+              <TextBlock Grid.Row="3" Text="Decision" Foreground="{DynamicResource BrushTextMuted}"/>
+              <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ActiveStepDecisionText}" TextWrapping="WrapWithOverflow"/>
+              <TextBlock Grid.Row="4" Text="Output" Foreground="{DynamicResource BrushTextMuted}"/>
+              <SelectableTextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ActiveStepOutputText}" TextWrapping="WrapWithOverflow"/>
+              <TextBlock Grid.Row="5" Text="Action" Foreground="{DynamicResource BrushTextMuted}"/>
+              <SelectableTextBlock Grid.Row="5" Grid.Column="1" Text="{Binding ActiveStepActionText}" TextWrapping="WrapWithOverflow"/>
+            </Grid>
+          </StackPanel>
+        </controls:HidePanelBlock>
+        <controls:HidePanelBlock x:Name="AdvancedDetails" Title="Advanced details" DefaultExpanded="False"
+                                 IsExpanded="{Binding IsAlgorithmTraceExpanded, Mode=TwoWay}">
+          <StackPanel Spacing="{DynamicResource Space6}">
+            <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding Step4RawBestText}" IsVisible="{Binding IsStep4Active}"/>
+            <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding Step4MaskedBestText}" IsVisible="{Binding IsStep4Active}"/>
+            <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding Step4PassiveCompensationText}" IsVisible="{Binding IsStep4Active}"/>
+            <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding Step4OffsetSupportText}" IsVisible="{Binding IsStep4Active}"/>
+            <SelectableTextBlock Classes="workspaceInspectorContextText" Text="{Binding Step4CandidateAttributionTitle}" IsVisible="{Binding IsStep4Active}"/>
+            <ItemsControl ItemsSource="{Binding Step4CandidateAttributionLines}" IsVisible="{Binding IsStep4Active}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <SelectableTextBlock Classes="workspaceInspectorContextText" Text="{Binding ., StringFormat='- {0}'}"
+                                       TextWrapping="WrapWithOverflow"/>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <SelectableTextBlock Classes="workspaceInspectorContextText" Text="{Binding AlgorithmTraceStatusText}"/>
+            <ItemsControl ItemsSource="{Binding AlgorithmTraceDetailEntries}" IsVisible="{Binding IsAlgorithmTraceReady}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:IndexMappingAlgorithmTraceEntryViewModel">
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space6}">
+                    <SelectableTextBlock Text="{Binding Label}" FontWeight="SemiBold" IsVisible="{Binding IsKey}"/>
+                    <SelectableTextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="WrapWithOverflow"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </controls:HidePanelBlock>
+      </StackPanel>
+    </ScrollViewer>
+  </Border>
 </UserControl>

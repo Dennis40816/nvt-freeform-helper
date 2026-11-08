@@ -1,0 +1,38 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
+        x:DataType="panels:WorkspaceShell">
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
+
+  <!-- The native title bar owns the title; the summary owns all report status. -->
+  <Style Selector="panels|WorkspaceShell.indexMappingReport /template/ Border">
+    <Setter Property="Padding" Value="{DynamicResource Inset12}"/>
+  </Style>
+  <Style Selector="panels|WorkspaceShell.indexMappingReport /template/ Grid > Grid">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+  <Style Selector="panels|WorkspaceShell.indexMappingReport /template/ Grid">
+    <Setter Property="RowSpacing" Value="{DynamicResource Space8}"/>
+  </Style>
+  <Style Selector="panels|WorkspaceShell.indexMappingReport /template/ Border > Grid > Border">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource BorderNone}"/>
+    <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
+  </Style>
+  <Style Selector="Border.mappingInspector">
+    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource BorderLeftThin}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusNone}"/>
+    <Setter Property="Padding" Value="{DynamicResource Inset12}"/>
+  </Style>
+  <Style Selector="ListBox.mappingDecisions ListBoxItem">
+    <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
+  </Style>
+  <Style Selector="ListBox.mappingDecisions Button.actionGhost.flat">
+    <Setter Property="Padding" Value="{DynamicResource Inset8_6}"/>
+  </Style>
+</Styles>
