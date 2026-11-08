@@ -220,7 +220,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 301
+        "axamlCodeBehindLines": 285
       },
       "owner": "NFH",
       "locations": [

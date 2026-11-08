@@ -246,19 +246,7 @@ public partial class WorkspaceHeader : UserControl
     /// </summary>
     private void UpdateViewPopupState()
     {
-        var shouldOpen = _viewPinned || _isViewButtonHovered || _isViewPopupHovered;
-
-        if (shouldOpen)
-        {
-            if (!ViewMenuPopup.IsOpen)
-            {
-                ViewMenuPopup.IsOpen = true;
-            }
-        }
-        else
-        {
-            ViewMenuPopup.IsOpen = false;
-        }
+        ViewMenuPopup.IsOpen = WorkspaceHeaderPopupPolicy.ShouldBeOpen(_viewPinned, _isViewButtonHovered, _isViewPopupHovered);
     }
 
     private void ScheduleViewPopupHoverClose()
@@ -270,7 +258,7 @@ public partial class WorkspaceHeader : UserControl
 
         Dispatcher.Post(() =>
         {
-            if (_viewPinned || _isViewButtonHovered || _isViewPopupHovered)
+            if (WorkspaceHeaderPopupPolicy.ShouldBeOpen(_viewPinned, _isViewButtonHovered, _isViewPopupHovered))
             {
                 return;
             }
@@ -290,12 +278,8 @@ public partial class WorkspaceHeader : UserControl
             return;
         }
 
-        // Calculate maximum width/height with some padding.
-        var maxWidth = Math.Max(260, _topLevel.Bounds.Width - 30);
-        var maxHeight = Math.Max(200, _topLevel.Bounds.Height - 30);
-
-        ViewMenuPopupRoot.MaxWidth = maxWidth;
-        ViewMenuPopupRoot.MaxHeight = maxHeight;
+        var maxSize = WorkspaceHeaderPopupPolicy.MaxSize(_topLevel.Bounds.Size);
+        ViewMenuPopupRoot.MaxWidth = maxSize.Width;
+        ViewMenuPopupRoot.MaxHeight = maxSize.Height;
     }
-
 }
