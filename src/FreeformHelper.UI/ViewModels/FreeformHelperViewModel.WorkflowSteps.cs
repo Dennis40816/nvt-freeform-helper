@@ -235,7 +235,7 @@ public sealed partial class FreeformHelperViewModel
         {
             WorkflowStepId.Step1Match => snapshot.HasStep1Result,
             WorkflowStepId.Step2Freeform => snapshot.HasStep2Result,
-            WorkflowStepId.Step3NotchPreview => ShowNotchCanvasPreview || NotchCanvasPreviewItems.Count > 0,
+            WorkflowStepId.Step3NotchPreview => snapshot.HasStep3Result,
             WorkflowStepId.Step4IndexDiagnostics => snapshot.HasStep4Result,
             _ => false
         };

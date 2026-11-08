@@ -317,20 +317,22 @@ public sealed partial class RuntimeQueryContractTests
                 helper.ShowNotchCanvasPreview = true;
             }
 
+            if (step == 3)
+            {
+                // This fixture has no To Full result for the selected CAD, so Step 3 is not ready.
+                var notReady = await useCase.ExecuteAsync(new("1", "run-step", ParseArguments("step=3")));
+                Assert.False(notReady.Ok);
+                Assert.Equal("STEP_NOT_READY", notReady.Error?.Code);
+                Assert.Equal("Notch 2.2 preview: selected CAD has no effective To Full result.", notReady.Error?.Message);
+                Assert.False(helper.GetWorkflowStateSnapshot().HasStep3Result);
+                Assert.Empty(helper.NotchCanvasPreviewItems);
+                continue;
+            }
+
             var root = await QueryAsync(useCase, "run-step", "step=" + step.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(step, root.GetProperty("step").GetInt32());
             AssertWorkflow(root.GetProperty("workflow"), helper);
-            if (step == 3)
-            {
-                // Characterization: this fixture has no To Full result for the selected CAD, so Step 3 has no preview.
-                Assert.Equal("Notch 2.2 preview: selected CAD has no effective To Full result.", root.GetProperty("statusText").GetString());
-                Assert.False(root.GetProperty("workflow").GetProperty("hasStep3Result").GetBoolean());
-                Assert.Equal(0, root.GetProperty("notchPreview").GetProperty("previewItemCount").GetInt32());
-            }
-            else
-            {
-                Assert.True(root.GetProperty("workflow").GetProperty($"hasStep{step}Result").GetBoolean(), root.ToString());
-            }
+            Assert.True(root.GetProperty("workflow").GetProperty($"hasStep{step}Result").GetBoolean(), root.ToString());
         }
     }
 
