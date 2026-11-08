@@ -319,11 +319,65 @@ public sealed class PadInfoViewModelTests
     [Fact, UseEnUsCulture]
     public void CadPadInfo_TargetAllocationDisplay_UsesFinalEmittedTargetEligibility()
     {
+        const double roundedZeroArea = 18.0; // Q7-positive CAD allocation with rounded-zero regular coverage.
+        const double strictOverlapRatio = 0.00398;
+        var (cad, grid, regulars, activeRegularPadIds) = CreateEmittedTargetScenario(roundedZeroArea);
+        var anchor = regulars[0];
+        var emitted = regulars[1];
+        var roundedZero = regulars[2];
+        Assert.Equal(1, Assert.Single(NotchAllocationService.BuildAllocations(cad, grid),
+            allocation => allocation.Pad.DiffIndex == roundedZero.DiffIndex).Q7);
+        var resolved = BuildResolvedEmittedTarget(cad, grid, anchor, activeRegularPadIds, strictOverlapRatio);
+        var (node, nullValue) = GenerateEmittedTargetNode(cad, grid, anchor, activeRegularPadIds, strictOverlapRatio);
+        var emittedTarget = Assert.Single(resolved.TargetAllocation.TargetCoverageProjection.EmittedTargets);
+        var roundedZeroTarget = Assert.Single(
+            resolved.TargetAllocation.Targets,
+            target => target.DiffIndex == roundedZero.DiffIndex);
+        var highlightedRegularPadIds = new List<int>();
+        var vm = CreateSingleCadPadViewModel(targetAllocation: resolved.TargetAllocation,
+            highlightRegularPads: ids => highlightedRegularPadIds.Add(Assert.Single(ids)));
+        Assert.Equal(emitted.DiffIndex, emittedTarget.DiffIndex);
+        Assert.False(emittedTarget.PassesStrictThreshold);
+        Assert.Equal(1, emittedTarget.ToFullAppliedRegularCount);
+        Assert.Equal(54, emittedTarget.RatioPercentRounded);
+        Assert.False(roundedZeroTarget.PassesStrictThreshold);
+        Assert.Equal(1, roundedZeroTarget.ToFullAppliedRegularCount);
+        Assert.Equal(0, roundedZeroTarget.RatioPercentRounded);
+        Assert.Equal(roundedZeroArea, roundedZeroTarget.EffectiveArea, 12);
+        Assert.Equal(18.1886, resolved.TargetAllocation.StrictAreaThreshold, 4);
+        Assert.Equal(3, resolved.TargetAllocation.Targets.Count);
+        Assert.Equal(108, resolved.TargetAllocation.TargetCoverageProjection.RawCombinedPercent);
+        Assert.Equal(108, node.CombinePercent);
+        Assert.Equal(emitted.DiffIndex, node.TargetDiffIndex1);
+        Assert.Equal(54, node.TargetRatioPercent1);
+        Assert.Equal(nullValue, node.TargetDiffIndex2);
+        Assert.Equal(0, node.TargetRatioPercent2);
+        Assert.Equal("Targets: 1 effective / 3 total", vm.TargetAllocationSummaryText);
+        var line = Assert.Single(vm.TargetAllocationLines);
+        Assert.Equal("IC1/diff84  A 18.09 mm²  R 54%", line);
+        var diff83 = Assert.Single(vm.TargetAllocationItems, item => item.DiffText == "IC1/diff83");
+        var diff84 = Assert.Single(vm.TargetAllocationItems, item => item.DiffText == "IC1/diff84");
+        var diff85 = Assert.Single(vm.TargetAllocationItems, item => item.DiffText == "IC1/diff85");
+        Assert.Equal(
+            ["IC1/diff83", "IC1/diff84", "IC1/diff85"],
+            vm.TargetAllocationItems.Select(static item => item.DiffText));
+        Assert.Equal(
+            ["4533.91 mm²", "18.09 mm²", "18 mm²"],
+            vm.TargetAllocationItems.Select(static item => item.AreaText));
+        HighlightTargetAllocations(vm.TargetAllocationItems);
+        Assert.Equal([4808, 4809, 4810], highlightedRegularPadIds);
+        Assert.Equal("Self before To Full", diff83.RoleText);
+        Assert.Equal("54%", diff83.RatioText);
+        Assert.Equal("Target", diff84.RoleText);
+        Assert.Equal("Below gate", diff85.RoleText);
+    }
+
+    private static (CadPad Cad, RegularGrid Grid, RegularPad[] Regulars, HashSet<int> ActiveRegularPadIds) CreateEmittedTargetScenario(
+        double roundedZeroArea)
+    {
         const double cadArea = 4570.0;
         const double cadHeight = 5.4;
         const double emittedArea = 18.09;
-        const double roundedZeroArea = 18.0; // Q7-positive CAD allocation with rounded-zero regular coverage.
-        const double strictOverlapRatio = 0.00398;
         var anchorMaxX = (cadArea - emittedArea - roundedZeroArea) / cadHeight;
         var emittedMaxX = anchorMaxX + (emittedArea / cadHeight);
         var cadMaxX = emittedMaxX + (roundedZeroArea / cadHeight);
@@ -350,8 +404,17 @@ public sealed class PadInfoViewModelTests
             yEdges: [0, 10],
             pads: regulars);
         var activeRegularPadIds = regulars.Select(static regular => regular.RegularPadId).ToHashSet();
-        Assert.Equal(1, Assert.Single(NotchAllocationService.BuildAllocations(cad, grid),
-            allocation => allocation.Pad.DiffIndex == roundedZero.DiffIndex).Q7);
+
+        return (cad, grid, regulars, activeRegularPadIds);
+    }
+
+    private static NotchV22ResolvedResult BuildResolvedEmittedTarget(
+        CadPad cad,
+        RegularGrid grid,
+        RegularPad anchor,
+        HashSet<int> activeRegularPadIds,
+        double strictOverlapRatio)
+    {
         var compensation = NotchV22CompensationService.Compute(
             cad,
             grid,
@@ -364,13 +427,22 @@ public sealed class PadInfoViewModelTests
             enableToFullRuleTrace: false,
             enableBoundaryVirtualAreaCap: true,
             boundaryVirtualAreaCapRatio: 1.0);
-        var resolved = NotchV22ResolvedResultService.Build(
+        return NotchV22ResolvedResultService.Build(
             cad,
             compensation,
             strictOverlapRatio,
             anchorIcIndex: 0,
             anchorDiffIndex: anchor.DiffIndex,
             allocationAreaMode: NotchV22TargetAllocationAreaMode.TargetRegularSourceCoverage);
+    }
+
+    private static (NotchV22Node Node, int NullValue) GenerateEmittedTargetNode(
+        CadPad cad,
+        RegularGrid grid,
+        RegularPad anchor,
+        HashSet<int> activeRegularPadIds,
+        double strictOverlapRatio)
+    {
         var settings = new ProjectSettings
         {
             Notch = new NotchSettings
@@ -396,47 +468,8 @@ public sealed class PadInfoViewModelTests
             activeRegularPadIds: activeRegularPadIds,
             cadOutputFwDiffIndexByCadId: new Dictionary<int, int> { [cad.Id] = anchor.DiffIndex });
         var node = Assert.IsType<NotchV22Node>(Assert.Single(table.Rows).V22Node);
-        var emittedTarget = Assert.Single(resolved.TargetAllocation.TargetCoverageProjection.EmittedTargets);
-        var roundedZeroTarget = Assert.Single(
-            resolved.TargetAllocation.Targets,
-            target => target.DiffIndex == roundedZero.DiffIndex);
-        var highlightedRegularPadIds = new List<int>();
-        var vm = CreateSingleCadPadViewModel(targetAllocation: resolved.TargetAllocation,
-            highlightRegularPads: ids => highlightedRegularPadIds.Add(Assert.Single(ids)));
-        Assert.Equal(emitted.DiffIndex, emittedTarget.DiffIndex);
-        Assert.False(emittedTarget.PassesStrictThreshold);
-        Assert.Equal(1, emittedTarget.ToFullAppliedRegularCount);
-        Assert.Equal(54, emittedTarget.RatioPercentRounded);
-        Assert.False(roundedZeroTarget.PassesStrictThreshold);
-        Assert.Equal(1, roundedZeroTarget.ToFullAppliedRegularCount);
-        Assert.Equal(0, roundedZeroTarget.RatioPercentRounded);
-        Assert.Equal(roundedZeroArea, roundedZeroTarget.EffectiveArea, 12);
-        Assert.Equal(18.1886, resolved.TargetAllocation.StrictAreaThreshold, 4);
-        Assert.Equal(3, resolved.TargetAllocation.Targets.Count);
-        Assert.Equal(108, resolved.TargetAllocation.TargetCoverageProjection.RawCombinedPercent);
-        Assert.Equal(108, node.CombinePercent);
-        Assert.Equal(emitted.DiffIndex, node.TargetDiffIndex1);
-        Assert.Equal(54, node.TargetRatioPercent1);
-        Assert.Equal(settings.Notch.NullValue, node.TargetDiffIndex2);
-        Assert.Equal(0, node.TargetRatioPercent2);
-        Assert.Equal("Targets: 1 effective / 3 total", vm.TargetAllocationSummaryText);
-        var line = Assert.Single(vm.TargetAllocationLines);
-        Assert.Equal("IC1/diff84  A 18.09 mm²  R 54%", line);
-        var diff83 = Assert.Single(vm.TargetAllocationItems, item => item.DiffText == "IC1/diff83");
-        var diff84 = Assert.Single(vm.TargetAllocationItems, item => item.DiffText == "IC1/diff84");
-        var diff85 = Assert.Single(vm.TargetAllocationItems, item => item.DiffText == "IC1/diff85");
-        Assert.Equal(
-            ["IC1/diff83", "IC1/diff84", "IC1/diff85"],
-            vm.TargetAllocationItems.Select(static item => item.DiffText));
-        Assert.Equal(
-            ["4533.91 mm²", "18.09 mm²", "18 mm²"],
-            vm.TargetAllocationItems.Select(static item => item.AreaText));
-        HighlightTargetAllocations(vm.TargetAllocationItems);
-        Assert.Equal([4808, 4809, 4810], highlightedRegularPadIds);
-        Assert.Equal("Self before To Full", diff83.RoleText);
-        Assert.Equal("54%", diff83.RatioText);
-        Assert.Equal("Target", diff84.RoleText);
-        Assert.Equal("Below gate", diff85.RoleText);
+
+        return (node, settings.Notch.NullValue);
     }
 
     private static void HighlightTargetAllocations(IEnumerable<PadInfoTargetAllocationViewModel> items)

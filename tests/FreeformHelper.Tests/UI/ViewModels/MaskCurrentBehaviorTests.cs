@@ -20,66 +20,7 @@ public sealed class MaskCurrentBehaviorTests
         {
             var missingMaskPath = Path.Combine(directory.FullName, "missing.csv");
             var projectPath = Path.Combine(directory.FullName, "project.json");
-            await new JsonProjectStore().SaveAsync(projectPath, new ProjectFile
-            {
-                EmbeddedDxfName = "synthetic.dxf",
-                EmbeddedDxf = Encoding.UTF8.GetBytes("""
-                    0
-                    SECTION
-                    2
-                    ENTITIES
-                    0
-                    LWPOLYLINE
-                    8
-                    L1
-                    70
-                    1
-                    90
-                    4
-                    10
-                    0
-                    20
-                    0
-                    10
-                    20
-                    20
-                    0
-                    10
-                    20
-                    20
-                    10
-                    10
-                    0
-                    20
-                    10
-                    0
-                    ENDSEC
-                    0
-                    EOF
-                    """),
-                Settings = new ProjectSettings
-                {
-                    Grid = new GridSettings { XChannels = 2, YChannels = 1 },
-                },
-                UiSnapshot = new ProjectUiSnapshot
-                {
-                    Grid = new UiGridSnapshot
-                    {
-                        CascadeCount = 1,
-                        IcX = [2],
-                        IcY = [1],
-                        TotalX = 2,
-                        TotalY = 1,
-                        ActiveAreaWidthMm = 20,
-                        ActiveAreaHeightMm = 10,
-                    },
-                    Import = new UiImportSnapshot
-                    {
-                        RegularVisibilityMaskSourcePath = missingMaskPath,
-                        UseRegularVisibilityMask = true,
-                    },
-                },
-            }, CancellationToken.None);
+            await SaveMissingMaskProjectAsync(projectPath, missingMaskPath);
             Assert.False(File.Exists(missingMaskPath));
             Assert.Null(JsonProjectStore.Load(projectPath).EmbeddedRegularVisibilityMask);
 
@@ -114,6 +55,70 @@ public sealed class MaskCurrentBehaviorTests
         {
             directory.Delete(recursive: true);
         }
+    }
+
+    private static async Task SaveMissingMaskProjectAsync(string projectPath, string missingMaskPath)
+    {
+        await new JsonProjectStore().SaveAsync(projectPath, new ProjectFile
+        {
+            EmbeddedDxfName = "synthetic.dxf",
+            EmbeddedDxf = Encoding.UTF8.GetBytes("""
+                0
+                SECTION
+                2
+                ENTITIES
+                0
+                LWPOLYLINE
+                8
+                L1
+                70
+                1
+                90
+                4
+                10
+                0
+                20
+                0
+                10
+                20
+                20
+                0
+                10
+                20
+                20
+                10
+                10
+                0
+                20
+                10
+                0
+                ENDSEC
+                0
+                EOF
+                """),
+            Settings = new ProjectSettings
+            {
+                Grid = new GridSettings { XChannels = 2, YChannels = 1 },
+            },
+            UiSnapshot = new ProjectUiSnapshot
+            {
+                Grid = new UiGridSnapshot
+                {
+                    CascadeCount = 1,
+                    IcX = [2],
+                    IcY = [1],
+                    TotalX = 2,
+                    TotalY = 1,
+                    ActiveAreaWidthMm = 20,
+                    ActiveAreaHeightMm = 10,
+                },
+                Import = new UiImportSnapshot
+                {
+                    RegularVisibilityMaskSourcePath = missingMaskPath,
+                    UseRegularVisibilityMask = true,
+                },
+            },
+        }, CancellationToken.None);
     }
 
     [Fact]
