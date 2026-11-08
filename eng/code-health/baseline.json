@@ -93,20 +93,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 83
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Controls/NotchApplySimulationAaView.cs"
-      ],
-      "contentHash": "eeab2480074a3caeea395295e634bdac660f0c875f5fb8871c3f54b52debc97f",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Controls.NotchApplySimulationAaView.Render(DrawingContext)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 141
       },
       "owner": "NFH",
@@ -118,26 +104,12 @@
       "symbol": "FreeformHelper.UI.Controls.NotchApplySimulationAaView.BuildFillBrush(NotchApplySimulationAaDisplayCell,Color,Color,Color,Color,Color,Color,double,double,double,double,double,double,double,double)"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 88
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Controls/NotchPreviewCanvas.cs"
-      ],
-      "contentHash": "5042410282cc35f3af5cfa81b39d1253ba2aa0b5e71e1b1ada1e4a67e72e52bb",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Controls.NotchPreviewCanvas.Render(DrawingContext)"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
         "stateMembers": 65,
         "partialFiles": 28,
-        "viewTypeLines": 6209
+        "viewTypeLines": 6197
       },
       "owner": "NFH",
       "locations": [
@@ -229,20 +201,6 @@
       "contentHash": "bab388b897e22279f6f69b4bf2d0651256956ec9a86aafde710cf6829674031a",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.Controls.PadCanvas.Render(DrawingContext)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 81
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Controls/PadCanvas.Rendering.NotchPreview.cs"
-      ],
-      "contentHash": "803a9987a21a02a9d2cacbecd2399b593da5312417f83db175b207b5bc86dbc6",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Controls.PadCanvas.TryResolveNotchRatioLabelRect(Point,double,double,double,double,int,Rect,IList<Rect>,out Rect,bool)"
     },
     {
       "kind": "member",
@@ -494,20 +452,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 87
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Edits.Combine.cs"
-      ],
-      "contentHash": "f0e65ed516280faee8f4d3cecb1cfcfef52ac8c751dc1d6084221de84c6ccb30",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.CombineSelectedCadPads()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 95
       },
       "owner": "NFH",
@@ -522,34 +466,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 89
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.Compensation.cs"
-      ],
-      "contentHash": "c10e24a427a0ef01bf852ec0157343627dafbe54432e8e6bcfbb3b8d43be03c0",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.GetOrBuildCadV22ResolvedResultCached(CadPad,IReadOnlyList<CadPad>,IReadOnlySet<int>?,WorkflowDataSnapshot,double?,NotchV22CompensationResult?,NotchV22ResolvedResult?,bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 81
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs"
-      ],
-      "contentHash": "3505c8e2580c28cc993d3369a4e9a95dbb436bf80f54d0dfd0050f6969159d47",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RebuildVisibleDxfIndexMap(IReadOnlyList<CadPad>)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 100
       },
       "owner": "NFH",
@@ -559,20 +475,6 @@
       "contentHash": "dbed7e53b03e6757b35f5d2c24ca4b74a1566ecb66b479fd17eed00afa0ddb68",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.BuildUiSnapshot()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 83
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/IndexMappingDecisionRowViewModel.cs"
-      ],
-      "contentHash": "7e02f04bcf3c33f011302d47e33c6cda0a332eaadf276d38f9197f15f366effe",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.IndexMappingDecisionRowViewModel.FromIssue(IndexMappingReportIssueViewModel)"
     },
     {
       "kind": "type",
@@ -622,20 +524,6 @@
       "contentHash": "99c395204568bb71b56eda092a1d8b6a44515987328084f6c3f91f9256b7b009",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 85
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.cs"
-      ],
-      "contentHash": "4721a2b9497c45dff615b3568012c48040f997ec2e3f2f93b1e50caf737faba9",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel..ctor(SimulationWorkspaceUseCase,SimulationWorkspaceSession)"
     },
     {
       "kind": "file",

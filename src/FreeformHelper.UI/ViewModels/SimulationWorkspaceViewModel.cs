@@ -162,14 +162,8 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _cadPads = _session.CadPads;
         _regularPadById = _session.FwDiffGrid.Pads.ToDictionary(pad => pad.RegularPadId);
-        _cadOutputFwDiffByRegularPadId = _session.CadOutputFwDiffGrid.Pads.ToDictionary(
-            static pad => pad.RegularPadId,
-            static pad => pad.DiffIndex);
-        _regularPadIdsByIcDiff = _session.FwDiffGrid.Pads
-            .GroupBy(static pad => (pad.IcIndex, pad.DiffIndex))
-            .ToDictionary(
-                static group => group.Key,
-                static group => group.Select(static pad => pad.RegularPadId).ToArray());
+        _cadOutputFwDiffByRegularPadId = BuildCadOutputFwDiffByRegularPadId(_session);
+        _regularPadIdsByIcDiff = BuildRegularPadIdsByIcDiff(_session);
         _showCad = false;
         _showRegular = _session.DefaultShowRegular;
         _highlightFreeform = _session.DefaultHighlightFreeform;
@@ -239,6 +233,18 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         RefreshFrameOptions();
         RefreshSnapshot();
     }
+
+    private static Dictionary<int, int> BuildCadOutputFwDiffByRegularPadId(SimulationWorkspaceSession session) =>
+        session.CadOutputFwDiffGrid.Pads.ToDictionary(
+            static pad => pad.RegularPadId,
+            static pad => pad.DiffIndex);
+
+    private static Dictionary<(int IcIndex, int DiffIndex), int[]> BuildRegularPadIdsByIcDiff(SimulationWorkspaceSession session) =>
+        session.FwDiffGrid.Pads
+            .GroupBy(static pad => (pad.IcIndex, pad.DiffIndex))
+            .ToDictionary(
+                static group => group.Key,
+                static group => group.Select(static pad => pad.RegularPadId).ToArray());
 
     private readonly record struct SimulationSnapshotCacheKey(
         NotchAlgorithmVersion Version,
