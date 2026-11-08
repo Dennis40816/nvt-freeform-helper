@@ -180,28 +180,9 @@ public sealed partial class SimulationWorkspaceView : UserControl
             return;
         }
 
-        switch (e.Key)
+        if (SimulationCanvasKeyMap.TryApply(e.Key, viewModel))
         {
-            case Key.B:
-                viewModel.SetCanvasViewMode(NotchApplySimulationCanvasViewMode.Before);
-                e.Handled = true;
-                break;
-            case Key.A:
-                viewModel.SetCanvasViewMode(NotchApplySimulationCanvasViewMode.After);
-                e.Handled = true;
-                break;
-            case Key.D:
-                viewModel.SetCanvasViewMode(NotchApplySimulationCanvasViewMode.Delta);
-                e.Handled = true;
-                break;
-            case Key.C:
-                viewModel.SetCanvasViewMode(NotchApplySimulationCanvasViewMode.ChangedOnly);
-                e.Handled = true;
-                break;
-            case Key.V:
-                viewModel.ToggleBeforeAfterCanvasView();
-                e.Handled = true;
-                break;
+            e.Handled = true;
         }
     }
 
@@ -306,21 +287,10 @@ public sealed partial class SimulationWorkspaceView : UserControl
         var selectionRect = BuildPadScreenRect(viewportAdapter, overlay, regularPad.Bounds);
         var anchor = selectionRect.Center;
         var gap = UiResourceResolver.GetDouble(this, "PadInfoGap", 20.0);
-        var minX = canvasRect.Left + gap;
-        var maxX = Math.Max(minX, canvasRect.Right - panelSize.Width - gap);
-        var x = Math.Min(anchor.X + gap, maxX);
-        if (x + panelSize.Width > canvasRect.Right - gap)
-        {
-            x = Math.Max(minX, anchor.X - gap - panelSize.Width);
-        }
+        var position = InlineEditorPlacement.Compute(canvasRect, anchor, panelSize, gap);
 
-        var y = Math.Clamp(
-            anchor.Y - panelSize.Height * 0.5,
-            canvasRect.Top + gap,
-            Math.Max(canvasRect.Top + gap, canvasRect.Bottom - panelSize.Height - gap));
-
-        Canvas.SetLeft(editor, x);
-        Canvas.SetTop(editor, y);
+        Canvas.SetLeft(editor, position.X);
+        Canvas.SetTop(editor, position.Y);
     }
 
     private static Size MeasureOverlayCard(Control card, Size available)
