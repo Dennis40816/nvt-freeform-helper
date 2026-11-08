@@ -62,7 +62,8 @@ public sealed partial class SimulationWorkspaceViewModel
         SimulationScenarioSnapshot snapshot;
         if (IsCsvSource && HasCsvData)
         {
-            var frameIndex = Math.Clamp(SelectedFrameSliderIndex, 0, Math.Max(FrameOptions.Count - 1, 0));
+            var sliderIndex = Math.Clamp(SelectedFrameSliderIndex, 0, Math.Max(FrameOptions.Count - 1, 0));
+            var frameIndex = FrameOptions.Count > 0 ? FrameOptions[sliderIndex].Value : sliderIndex;
             var cacheKey = new SimulationSnapshotCacheKey(SelectedVersionOption.Value, frameIndex);
             if (!_csvSnapshotCache.TryGetValue(cacheKey, out snapshot!))
             {

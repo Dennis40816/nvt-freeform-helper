@@ -10,11 +10,9 @@ namespace FreeformHelper.Tests;
 /// <summary>
 /// Pins how the simulation workspace maps the frame slider to a CSV frame when some frames are
 /// incompatible with the grid (issue #64). The slider and the frame option list contain only the
-/// compatible frames. The scenario takes the slider position as an index into the complete frame
-/// list. With the frames [compatible A, incompatible B, compatible C], the second slider position
-/// shows frame C but requests frame B. These tests describe the current result, not the wanted
-/// one. A fix that resolves the option value once changes the expected values here and must say
-/// so in its pull request.
+/// compatible frames. The scenario resolves the slider position to the global index of the listed
+/// frame. With the frames [compatible A, incompatible B, compatible C], the second slider
+/// position shows frame C and requests frame C.
 /// </summary>
 public sealed class SimulationWorkspaceCsvFrameIndexCharacterizationTests
 {
@@ -33,7 +31,7 @@ public sealed class SimulationWorkspaceCsvFrameIndexCharacterizationTests
     }
 
     [Fact]
-    public async Task SelectingTheSecondListedFrame_RequestsTheIncompatibleFrameInstead()
+    public async Task SelectingTheSecondListedFrame_RequestsThatFrameByItsGlobalIndex()
     {
         var viewModel = await ImportFramesAsync();
 
@@ -42,12 +40,10 @@ public sealed class SimulationWorkspaceCsvFrameIndexCharacterizationTests
         Assert.Equal("Frame 2/2", viewModel.FrameSummaryText);
         var snapshot = viewModel.GetSimulationScenarioSnapshot();
         Assert.NotNull(snapshot);
-        Assert.Equal(1, snapshot.Scenario.SelectedFrameIndex);
+        Assert.Equal(2, snapshot.Scenario.SelectedFrameIndex);
         var simulation = Assert.IsType<SimulationScenarioSnapshot>(snapshot);
-        Assert.True(simulation is { SimulationResult.IsSupported: false });
-        Assert.True(simulation is { SimulationResult.Diagnostics: { } diagnostics } &&
-            diagnostics.Any(static diagnostic => diagnostic.Contains("1x3", StringComparison.Ordinal)));
-        Assert.Contains("1x3", viewModel.StatusText, StringComparison.Ordinal);
+        Assert.True(simulation is { SimulationResult.IsSupported: true });
+        Assert.DoesNotContain("1x3", viewModel.StatusText, StringComparison.Ordinal);
     }
 
     private static async Task<SimulationWorkspaceViewModel> ImportFramesAsync()
