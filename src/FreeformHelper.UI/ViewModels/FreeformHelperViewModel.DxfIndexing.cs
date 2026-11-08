@@ -129,6 +129,18 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
+        // Keep the stored selection in step with the project anchors, so selecting the same CAD again commits it.
+        if (CadOutputFwDiffIndexAnchorCadId == cadPadId)
+        {
+            using (_settingsSuppression.EnterDxfIndexAnchorChange())
+            {
+                using (_undoSuppression.Enter())
+                {
+                    CadOutputFwDiffIndexAnchorCadId = -1;
+                }
+            }
+        }
+
         UpdateCadOutputFwDiffIndexing(CadPads.ToList());
         InvalidateDownstreamFromStep4(showStatus: false);
         NotifySimulationWorkspaceSourceChanged();
