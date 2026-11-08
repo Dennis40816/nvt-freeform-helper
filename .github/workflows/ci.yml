@@ -59,6 +59,29 @@ jobs:
       - name: Install pinned .NET SDK and runtime
         shell: pwsh
         run: ./scripts/ci/install-dotnet.ps1
+      # Core packages come from a Release of Dennis40816/nvt_fw_core. The cache holds the three files for as long as
+      # core-packages.json is unchanged, so most jobs do not download anything. The fetch step always runs: it
+      # checks the SHA-256 of every cached file and downloads again only what is missing or wrong. Its API
+      # fallback gets the read-only token of this run, because Core is public and unauthenticated API calls
+      # time out in GitHub incidents. The cache is saved right after the fetch, so a later failing test
+      # step does not lose it.
+      - name: Restore the NVT Core packages from the cache
+        id: core-packages-cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: artifacts/core-packages
+          key: core-packages-${{ hashFiles('core-packages.json') }}
+      - name: Fetch the NVT Core packages
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./scripts/build/fetch-core-packages.ps1
+      - name: Save the NVT Core packages to the cache
+        if: steps.core-packages-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: artifacts/core-packages
+          key: core-packages-${{ hashFiles('core-packages.json') }}
       - name: Format, analyzers and build
         shell: pwsh
         run: ./scripts/verify.ps1 -CiLane build -AllowMissingExampleData
@@ -181,6 +204,24 @@ jobs:
       - name: Install pinned .NET SDK and runtime
         shell: pwsh
         run: ./scripts/ci/install-dotnet.ps1
+      # Same cache and fetch steps as in the build job.
+      - name: Restore the NVT Core packages from the cache
+        id: core-packages-cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: artifacts/core-packages
+          key: core-packages-${{ hashFiles('core-packages.json') }}
+      - name: Fetch the NVT Core packages
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./scripts/build/fetch-core-packages.ps1
+      - name: Save the NVT Core packages to the cache
+        if: steps.core-packages-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: artifacts/core-packages
+          key: core-packages-${{ hashFiles('core-packages.json') }}
       - name: Require gcc for the generated firmware C tests
         if: matrix.shard == 'core'
         shell: pwsh
