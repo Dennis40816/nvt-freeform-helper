@@ -35,17 +35,21 @@
       </Grid>
       <Grid ColumnDefinitions="Auto,*">
         <Border Width="{DynamicResource LayerImageExportLabelWidth}"/>
-        <CheckBox Grid.Column="1" x:Name="OneFilePerLayerCheckBox" Classes="exportCheck" Content="One file per layer"
-                  IsChecked="{Binding FileSettings.OneFilePerLayer, Mode=TwoWay}"/>
+        <Grid Grid.Column="1" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+          <CheckBox x:Name="OneFilePerLayerCheckBox" Classes="exportCheck" Content="One file per layer"
+                    IsChecked="{Binding FileSettings.OneFilePerLayer, Mode=TwoWay}"/>
+          <TextBlock Grid.Column="1" x:Name="ExpectedFileCountText" Classes="exportMuted" Text="{Binding ExpectedFileCountText}"/>
+        </Grid>
       </Grid>
-      <TextBlock Text="{Binding SaveErrorText}" Classes="exportMuted" TextWrapping="Wrap"/>
+      <TextBlock x:Name="SaveErrorText" Text="{Binding SaveErrorText}" IsVisible="{Binding HasSaveError}"
+                 Classes="exportMuted" TextWrapping="Wrap"/>
     </StackPanel>
     <Border Grid.Row="1" BorderBrush="{DynamicResource BrushBorderMuted}" BorderThickness="{DynamicResource BorderTopThin}"
             Padding="{DynamicResource Inset12_10}">
       <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Text="{Binding FooterText}" Classes="exportMuted"/>
+        <TextBlock x:Name="FooterText" Text="{Binding FooterText}" Classes="exportMuted"/>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-          <Button Content="Back" Classes="actionGhost" Command="{Binding BackCommand}"/>
+          <Button Content="Back" Classes="actionNeutral" Command="{Binding BackCommand}"/>
           <Button x:Name="SaveButton" Content="Save…" Classes="actionPrimary" IsDefault="True" Command="{Binding SaveCommand}"/>
         </StackPanel>
       </Grid>
