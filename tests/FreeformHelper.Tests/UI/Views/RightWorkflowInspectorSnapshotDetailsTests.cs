@@ -17,7 +17,7 @@ public sealed class RightWorkflowInspectorSnapshotDetailsTests
     [AvaloniaTheory]
     [InlineData(false)]
     [InlineData(true)]
-    public void SnapshotDetailsPreserveLabelsValuesAndSpacing(bool isRegular)
+    public void SnapshotDetailsShowOnlyMatchConfidenceWithTheOldSpacing(bool isRegular)
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var snapshot = isRegular
@@ -39,11 +39,7 @@ public sealed class RightWorkflowInspectorSnapshotDetailsTests
         var texts = panel.GetVisualDescendants().OfType<SelectableTextBlock>()
             .Where(block => block.IsEffectivelyVisible).ToArray();
         var details = Assert.IsType<PadInspectorSnapshotDetails>(snapshot.Details);
-        string[] expected =
-        [
-            "Snapshot details", "Diff source", details.DiffSource, "Diff idx", details.DiffIndex,
-            "Match confidence", details.MatchConfidenceText, "Match", details.MatchText,
-        ];
+        string[] expected = ["Snapshot details", "Match confidence", details.MatchConfidenceText];
         Assert.Equal(expected, texts.Select(block => block.Text));
 
         var grid = texts[1].GetVisualAncestors().OfType<Grid>().First();
@@ -53,10 +49,9 @@ public sealed class RightWorkflowInspectorSnapshotDetailsTests
         // The old pair of content controls left an empty slot before regular details and after CAD details.
         Assert.Equal(headerGrid.Bounds.Bottom + gap + (snapshot.HasRegular ? gap : 0), gridOrigin.Y, 6);
         Assert.Equal(snapshot.HasCad ? gap : 0, panel.Bounds.Height - gridOrigin.Y - grid.Bounds.Height, 6);
-        Assert.Equal(Assert.IsType<double>(view.FindResource("Space4")), grid.RowSpacing);
         Assert.Equal(
             Assert.IsType<double>(view.FindResource("Space8")),
-            texts[6].TranslatePoint(default, grid)!.Value.X - texts[5].Bounds.Right,
+            texts[2].TranslatePoint(default, grid)!.Value.X - texts[1].Bounds.Right,
             6);
     }
 }

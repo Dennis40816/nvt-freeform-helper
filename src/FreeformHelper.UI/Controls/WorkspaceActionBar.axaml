@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             x:Class="FreeformHelper.UI.Controls.WorkspaceActionBar"
+             x:DataType="vm:FreeformHelperViewModel"
+             IsVisible="{Binding IsRightPanelSettingsTab}">
+  <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}"
+          Background="{DynamicResource BrushBgPanel}" Padding="{DynamicResource Inset8}">
+    <StackPanel Spacing="{DynamicResource Space6}">
+      <SelectableTextBlock Classes="stepNote" Text="{Binding WorkspaceWorkHint}" TextWrapping="Wrap"/>
+      <controls:BalancedWrapPanel HorizontalAlignment="Right" BalanceLastRow="False"
+                                  ItemSpacing="{DynamicResource Space6}" LineSpacing="{DynamicResource Space6}">
+        <Border x:Name="RestoreHint" IsVisible="False">
+          <Button Classes="actionTextButton actionGhost" Content="Restore Export Notch Rows"
+                  Click="RestoreButton_Click"
+                  ToolTip.Tip="Restore the hidden Export Notch Rows window (Ctrl+Shift+E)."/>
+        </Border>
+        <Button Classes="actionTextButton actionPrimary" Content="{Binding WorkspacePrimaryActionText}"
+                Command="{Binding WorkspacePrimaryActionCommand}"/>
+      </controls:BalancedWrapPanel>
+    </StackPanel>
+  </Border>
+</UserControl>
