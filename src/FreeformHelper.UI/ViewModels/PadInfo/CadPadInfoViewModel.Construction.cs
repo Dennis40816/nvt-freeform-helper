@@ -17,9 +17,31 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     /// Initializes a new instance of the <see cref="CadPadInfoViewModel" /> class.
     /// </summary>
     /// <param name="pads">A list of <see cref="CadPad" /> objects to display information for.</param>
+    /// <param name="getDxfIndex">A function that returns the DXF index of a pad ID, or <c>null</c>.</param>
+    /// <param name="getCadOutputFwDiffOverride">A function that returns the output FW diff override of a CAD pad ID, or <c>null</c>.</param>
+    /// <param name="isDxfIndexAnchor">A function that tells whether a CAD pad ID is the DXF index anchor.</param>
     /// <param name="getCustomValue">A function to retrieve the custom value for a given CAD pad ID.</param>
     /// <param name="applyCustomValue">An action to apply a new custom value to a list of CAD pad IDs.</param>
+    /// <param name="setCadOutputFwDiffOverride">An action that sets the output FW diff override (CAD pad ID, value).</param>
+    /// <param name="clearCadOutputFwDiffOverride">An action that clears the output FW diff override of a CAD pad ID.</param>
+    /// <param name="setDxfIndexAnchor">An action that makes a CAD pad ID the DXF index anchor.</param>
+    /// <param name="clearDxfIndexAnchor">An action that clears the DXF index anchor for a CAD pad ID.</param>
     /// <param name="closePadInfo">An action to close the pad information popup.</param>
+    /// <param name="notchDetailCommand">The command that opens the notch detail view.</param>
+    /// <param name="selectAreaBucket">An action that selects the area bucket of the shown pad.</param>
+    /// <param name="getMatchedRegularPadIds">A function that returns the IDs of the regular pads matched to a CAD pad ID.</param>
+    /// <param name="getMatchedRegularLinks">A function that returns the match links from a CAD pad ID to regular pads.</param>
+    /// <param name="getRegularPadIcDiff">A function that returns the IC index and diff index of a regular pad ID, or <c>null</c>.</param>
+    /// <param name="focusCadMatches">An action that focuses the matches of a CAD pad ID on the canvas.</param>
+    /// <param name="highlightCadMatches">An action that highlights the matches of a CAD pad ID.</param>
+    /// <param name="highlightCadOwnerPads">An action that highlights the CAD pads that own the given IDs.</param>
+    /// <param name="highlightRegularPads">An action that highlights the regular pads of the given IDs.</param>
+    /// <param name="getCadV22CompensationPreview">A function that returns the To Regular, To Full and combined ratios of a CAD pad ID, or <c>null</c>.</param>
+    /// <param name="getCadV22CompensationDiagnostics">A function that returns the compensation diagnostics text of a CAD pad ID, or <c>null</c>.</param>
+    /// <param name="getCadV22TargetAllocationSummary">A function that returns the target allocation summary of a CAD pad ID, or <c>null</c>.</param>
+    /// <param name="cadOutputFwDiffAutoMode">The automatic mode for the output FW diff index.</param>
+    /// <param name="inspectorSnapshot">Optional inspector snapshot of the shown pads.</param>
+    /// <param name="notchComputationMode">The notch computation mode.</param>
     public CadPadInfoViewModel(
         IReadOnlyList<CadPad> pads,
         Func<int, int?> getDxfIndex,

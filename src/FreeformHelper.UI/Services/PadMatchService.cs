@@ -14,6 +14,7 @@ public sealed class PadMatchService
     /// </summary>
     /// <param name="cad">The set of CAD pads.</param>
     /// <param name="grid">The regular grid whose pads will be matched.</param>
+    /// <param name="reportProgress">Optional callback that receives the matching progress.</param>
     public static PadMatchResult Match(CadPadSet cad, RegularGrid grid, Action<double>? reportProgress = null)
     {
         return PadMatcher.Match(cad, grid, reportProgress);

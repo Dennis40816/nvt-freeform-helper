@@ -173,6 +173,8 @@ internal static class NotchAlgorithmHelpers
     /// </summary>
     /// <param name="grid">The regular grid.</param>
     /// <param name="row">The row index of the neighbor.</param>
+    /// <param name="col">The column index of the neighbor.</param>
+    /// <param name="fallback">The pad whose height is returned when the neighbor lies outside the grid.</param>
     internal static double GetNeighborLenY(RegularGrid grid, int row, int col, RegularPad fallback)
     {
         if (row < 0 || row >= grid.Rows || col < 0 || col >= grid.Cols) return fallback.Bounds.Height;

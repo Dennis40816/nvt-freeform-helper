@@ -278,9 +278,6 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Provides event data for when a channel count within a <see cref="CascadeIcSetting"/> is changing.
     /// </summary>
-    /// <param name="PropertyName">The name of the property that is changing (e.g., "XChannels", "YChannels").</param>
-    /// <param name="OldValue">The old decimal value of the channel count.</param>
-    /// <param name="NewValue">The new decimal value of the channel count.</param>
     public sealed class CascadeChannelChangingEventArgs : EventArgs
     {
         public CascadeChannelChangingEventArgs(string propertyName, decimal oldValue, decimal newValue)

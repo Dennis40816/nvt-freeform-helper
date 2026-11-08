@@ -13,7 +13,7 @@
     "suppressFlagFields": 4,
     "freeformViewModelStateMembers": 95,
     "shellNavigationBooleans": 0,
-    "noWarnIds": 3
+    "noWarnIds": 1
   },
   "metricOffenders": {
     "asyncVoid": [],
@@ -61,7 +61,7 @@
     ],
     "shellNavigationBooleans": [],
     "noWarnIds": [
-      "Directory.Build.props:13 (1572)", "Directory.Build.props:13 (1573)", "Directory.Build.props:13 (1591)"
+      "Directory.Build.props:13 (1591)"
     ]
   },
   "layering": {

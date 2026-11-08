@@ -137,9 +137,19 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
     /// </summary>
     /// <param name="pads">A list of <see cref="RegularPad" /> objects to display information for.</param>
     /// <param name="toDisplayRow">A function to convert an actual row index to a display row index.</param>
+    /// <param name="getDxfIndex">A function that returns the DXF index of a pad ID, or <c>null</c>.</param>
+    /// <param name="getMatchedCadPadIds">A function that returns the IDs of the CAD pads matched to a regular pad ID.</param>
+    /// <param name="getMatchedCadLinks">A function that returns the match links from a regular pad ID to CAD pads.</param>
     /// <param name="applyPadSize">An action to apply new width/height to selected pads.</param>
     /// <param name="resetPadSize">An action to reset sizing for selected pads.</param>
+    /// <param name="setFreeform">An action that sets the freeform type of the given regular pad IDs.</param>
+    /// <param name="getCrossIcOwnerShares">A function that returns the CAD owner shares (CAD ID, percent) of a regular pad ID across ICs.</param>
+    /// <param name="getNotchRowsByRegularPad">A function that returns the notch row previews of a regular pad ID.</param>
+    /// <param name="highlightCadOwnerPads">An action that highlights the CAD pads that own the given IDs.</param>
+    /// <param name="focusRegularMatches">An action that focuses the matches of a regular pad ID on the canvas.</param>
+    /// <param name="highlightRegularMatches">An action that highlights the matches of a regular pad ID.</param>
     /// <param name="closePadInfo">An action to close the pad information popup.</param>
+    /// <param name="inspectorSnapshot">Optional inspector snapshot of the shown pads.</param>
     public RegularPadInfoViewModel(
         IReadOnlyList<RegularPad> pads,
         Func<int, int> toDisplayRow,
