@@ -487,7 +487,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 536
+        "axamlCodeBehindLines": 350
       },
       "owner": "NFH",
       "locations": [
@@ -496,20 +496,6 @@
       "contentHash": "092cda063675e66144d06af24d878f483399ac4523c887d61cbf77c56a08ac08",
       "project": "FreeformHelper.UI",
       "symbol": "file:FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 165
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs"
-      ],
-      "contentHash": "f4ae1b6c041e2bd8f1e2d6f19b33dfffb94ea7944284be09c4f17f04d426edcc",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView.RenderOverlay()"
     },
     {
       "kind": "type",

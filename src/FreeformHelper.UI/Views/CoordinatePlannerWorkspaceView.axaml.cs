@@ -1,20 +1,15 @@
 using System.ComponentModel;
 
-using Avalonia;
-using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
-using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
-using Nvt.Core.Avalonia.Theme;
-using static FreeformHelper.UI.Views.CoordinatePlannerOverlayRules;
 
 namespace FreeformHelper.UI.Views;
 
@@ -242,151 +237,17 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         }
 
         var viewFrame = viewportAdapter.GetViewFrameSnapshot();
-        var snapshot = viewModel.Snapshot;
-        var guideBrush = GetBrush("BrushCoordinatePlannerGuide", Brushes.DeepSkyBlue);
-        var cornerBrush = GetBrush("BrushCoordinatePlannerPoint", Brushes.Gold);
-        var bistBrush = GetBrush("BrushCoordinatePlannerBist", Brushes.Orange);
-        var arrayBrush = GetBrush("BrushCoordinatePlannerArray", guideBrush);
-        var mutedBrush = GetBrush("BrushTextMuted", Brushes.Gray);
-        var labelBackground = GetBrush("BrushCoordinatePlannerLabelBackground", Brushes.Black);
-        var labelForeground = GetBrush("BrushCoordinatePlannerLabelForeground", Brushes.White);
-        var guideThickness = GetResourceDouble("CoordinatePlannerGuideStrokeThickness", 2d);
-        var bistThickness = GetResourceDouble("CoordinatePlannerBistStrokeThickness", 2d);
-        var pointThickness = GetResourceDouble("CoordinatePlannerPointStrokeThickness", 2d);
-        var focusThickness = GetResourceDouble("CoordinatePlannerFocusStrokeThickness", 3d);
-        var mutedOpacity = GetResourceDouble("CoordinatePlannerMutedOverlayOpacity", 0.34d);
-        var focusOpacity = GetResourceDouble("CoordinatePlannerFocusOverlayOpacity", 0.96d);
-        var labelFontSize = GetResourceDouble("CoordinatePlannerLabelFontSize", 12d);
-        var labelOffset = GetResourceDouble("CoordinatePlannerLabelOffset", 10d);
-        var minRadiusScreen = GetResourceDouble("CoordinatePlannerPointMinRadiusScreen", 5d);
-        var arrayDotMinRadiusScreen = GetResourceDouble("CoordinatePlannerArrayPointMinRadiusScreen", 3d);
-        var labelCornerRadius = GetResourceCornerRadius("RadiusSm", new CornerRadius(6));
-        var labelPadding = GetResourceThickness("Inset6_2", new Thickness(6, 2));
-        var overlayMode = viewModel.SelectedOverlayModeOption.Mode;
-        var selectedKey = viewModel.SelectedArtifactRow?.Key;
-
-        foreach (var rect in snapshot.Rectangles)
-        {
-            var isSelected = IsSelected(rect.Key, selectedKey);
-            var isMuted = IsMutedOverlay(overlayMode, selectedKey, rect.Key);
-            var brush = isMuted ? mutedBrush : rect.Kind == CoordinatePlannerRectangleKind.BistCenter ? bistBrush : guideBrush;
-            var screenRect = viewportAdapter.ToOverlayRect(overlayShapes, rect.WorldBounds, viewFrame);
-            var rectangle = new Rectangle
-            {
-                Width = screenRect.Width,
-                Height = screenRect.Height,
-                Stroke = brush,
-                StrokeThickness = isSelected ? focusThickness : bistThickness,
-                Fill = Brushes.Transparent,
-                StrokeDashArray = new AvaloniaList<double> { 6, 4 },
-                Opacity = isMuted ? mutedOpacity : focusOpacity,
-            };
-            Canvas.SetLeft(rectangle, screenRect.X);
-            Canvas.SetTop(rectangle, screenRect.Y);
-            overlayShapes.Children.Add(rectangle);
-            if (ShouldLabelRectangle(overlayMode, isSelected))
-            {
-                overlayLabels.Children.Add(BuildLabel(
-                    rect.Label,
-                    new Point(screenRect.X + labelOffset, screenRect.Y - labelOffset),
-                    labelBackground,
-                    labelForeground,
-                    labelFontSize,
-                    labelCornerRadius,
-                    labelPadding));
-            }
-        }
-
-        foreach (var line in snapshot.Lines)
-        {
-            if (!ShouldRenderLine(line, overlayMode, selectedKey))
-            {
-                continue;
-            }
-
-            var isSelected = IsSelected(line.Key, selectedKey);
-            var isMuted = IsMutedOverlay(overlayMode, selectedKey, line.Key);
-            var colorBrush = line.Kind switch
-            {
-                CoordinatePlannerLineKind.HorizontalGuide => guideBrush,
-                CoordinatePlannerLineKind.VerticalGuide => bistBrush,
-                CoordinatePlannerLineKind.CustomArrayEdge => arrayBrush,
-                _ => guideBrush,
-            };
-            var brush = isMuted ? mutedBrush : colorBrush;
-            var start = viewportAdapter.ToOverlayPoint(overlayShapes, line.SafeStartWorld, viewFrame);
-            var end = viewportAdapter.ToOverlayPoint(overlayShapes, line.SafeEndWorld, viewFrame);
-            overlayShapes.Children.Add(new Line
-            {
-                StartPoint = start,
-                EndPoint = end,
-                Stroke = brush,
-                StrokeThickness = isSelected ? focusThickness : guideThickness,
-                Opacity = isMuted ? mutedOpacity : focusOpacity,
-            });
-            if (ShouldLabelLine(line, overlayMode, isSelected))
-            {
-                overlayLabels.Children.Add(BuildLabel(
-                    line.Label,
-                    new Point(start.X + labelOffset, start.Y - labelOffset),
-                    labelBackground,
-                    labelForeground,
-                    labelFontSize,
-                    labelCornerRadius,
-                    labelPadding));
-            }
-        }
-
-        foreach (var point in snapshot.Points)
-        {
-            if (!ShouldRenderPoint(point, overlayMode, selectedKey))
-            {
-                continue;
-            }
-
-            var isSelected = IsSelected(point.Key, selectedKey);
-            var isMuted = IsMutedOverlay(overlayMode, selectedKey, point.Key);
-            var (colorBrush, radiusFloor) = point.Kind switch
-            {
-                CoordinatePlannerPointKind.AaCorner => (cornerBrush, minRadiusScreen),
-                CoordinatePlannerPointKind.BistCorner => (bistBrush, minRadiusScreen),
-                CoordinatePlannerPointKind.CustomArrayCorner => (arrayBrush, minRadiusScreen),
-                CoordinatePlannerPointKind.CustomArrayDot => (arrayBrush, arrayDotMinRadiusScreen),
-                _ => (cornerBrush, minRadiusScreen),
-            };
-            var brush = isMuted ? mutedBrush : colorBrush;
-            var center = viewportAdapter.ToOverlayPoint(overlayShapes, point.SafeWorld, viewFrame);
-            var radiusX = ComputeScreenRadiusX(viewportAdapter, overlayShapes, viewFrame, point.SafeWorld, snapshot.WorldPillarRadiusX, radiusFloor);
-            var radiusY = ComputeScreenRadiusY(viewportAdapter, overlayShapes, viewFrame, point.SafeWorld, snapshot.WorldPillarRadiusY, radiusFloor);
-            var ellipse = new Ellipse
-            {
-                Width = radiusX * 2d,
-                Height = radiusY * 2d,
-                Stroke = brush,
-                StrokeThickness = isSelected ? focusThickness : pointThickness,
-                Fill = isSelected ? brush : Brushes.Transparent,
-                Opacity = isMuted ? mutedOpacity : focusOpacity,
-            };
-            if (point.Kind == CoordinatePlannerPointKind.CustomArrayCorner)
-            {
-                ConfigureArrayCornerHandle(ellipse, point.Key, point.Label);
-            }
-
-            Canvas.SetLeft(ellipse, center.X - radiusX);
-            Canvas.SetTop(ellipse, center.Y - radiusY);
-            overlayShapes.Children.Add(ellipse);
-            if (ShouldLabelPoint(point, overlayMode, isSelected))
-            {
-                overlayLabels.Children.Add(BuildLabel(
-                    point.Label,
-                    new Point(center.X + labelOffset, center.Y - labelOffset),
-                    labelBackground,
-                    labelForeground,
-                    labelFontSize,
-                    labelCornerRadius,
-                    labelPadding));
-            }
-        }
+        var renderer = new CoordinatePlannerOverlayRenderer(
+            overlayShapes,
+            overlayLabels,
+            viewportAdapter,
+            viewFrame,
+            viewModel.Snapshot,
+            CoordinatePlannerOverlayStyle.Resolve(this),
+            viewModel.SelectedOverlayModeOption.Mode,
+            viewModel.SelectedArtifactRow?.Key,
+            ConfigureArrayCornerHandle);
+        renderer.Draw();
     }
 
     private void ConfigureArrayCornerHandle(
@@ -485,52 +346,5 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         {
             _overlayLabelCanvas.Children.Clear();
         }
-    }
-
-    private static Border BuildLabel(
-        string text,
-        Point position,
-        IBrush background,
-        IBrush foreground,
-        double fontSize,
-        CornerRadius cornerRadius,
-        Thickness padding)
-    {
-        var border = new Border
-        {
-            Background = background,
-            CornerRadius = cornerRadius,
-            Padding = padding,
-            Child = new TextBlock
-            {
-                Text = text,
-                Foreground = foreground,
-                FontSize = fontSize,
-                FontWeight = FontWeight.SemiBold,
-            },
-        };
-        Canvas.SetLeft(border, position.X);
-        Canvas.SetTop(border, position.Y);
-        return border;
-    }
-
-    private IBrush GetBrush(string resourceKey, IBrush fallback)
-    {
-        return UiResourceResolver.GetBrush(this, resourceKey, fallback, static color => new SolidColorBrush(color));
-    }
-
-    private CornerRadius GetResourceCornerRadius(string resourceKey, CornerRadius fallback)
-    {
-        return UiResourceResolver.GetCornerRadius(this, resourceKey, fallback);
-    }
-
-    private Thickness GetResourceThickness(string resourceKey, Thickness fallback)
-    {
-        return UiResourceResolver.GetThickness(this, resourceKey, fallback);
-    }
-
-    private double GetResourceDouble(string resourceKey, double fallback)
-    {
-        return UiResourceResolver.GetDouble(this, resourceKey, fallback);
     }
 }
