@@ -124,26 +124,8 @@ public sealed class ProjectLoadingInputTests
             var value = vm.ImportOnlyClosedPolylines;
             draft.ImportOnlyClosedPolylines = !value;
             vm.ApplySettingsWindowDraft(draft);
-            window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            var point = editor.TranslatePoint(new Avalonia.Rect(editor.Bounds.Size).Center, window);
-            Assert.NotNull(point);
-            window.MouseDown(point.Value, MouseButton.Left);
-            window.MouseUp(point.Value, MouseButton.Left);
-            window.KeyPress(Key.S, RawInputModifiers.Control, PhysicalKey.S, "s");
-            window.KeyRelease(Key.S, RawInputModifiers.Control, PhysicalKey.S, "s");
-            var canvas = view.GetVisualDescendants().OfType<FreeformHelper.UI.Controls.PadCanvas>().Single();
-            var selected = Assert.IsType<HashSet<int>>(PadCanvasPrivateAccess.SelectedCadIds(canvas));
-            selected.Add(17);
-            window.KeyPress(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
-            window.KeyRelease(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
-            Assert.Contains(17, selected);
-            foreach (var property in typeof(FreeformHelperViewModel).GetProperties()
-                         .Where(p => typeof(IRelayCommand).IsAssignableFrom(p.PropertyType)))
-            {
-                var command = Assert.IsAssignableFrom<IRelayCommand>(property.GetValue(vm));
-                Assert.False(command.CanExecute(null), property.Name);
-            }
+            SendInputWhileLoading(window, view, editor);
+            AssertEveryCommandDisabled(vm);
 
             await vm.SaveProjectCommand.ExecuteAsync(null);
             await vm.LoadProjectCommand.ExecuteAsync(null);
@@ -154,22 +136,7 @@ public sealed class ProjectLoadingInputTests
 
             release.SetResult();
             await load;
-            Assert.Equal(ProjectSessionMode.Ready, vm.SessionMode);
-            Assert.True(view.IsEnabled);
-            Assert.True(settingsWindow.IsEnabled);
-            Assert.True(draft.SaveCommand.CanExecute(null));
-            Assert.Contains(true, commandStates);
-            settingsWindow.Close();
-            window.Activate();
-            Assert.True(editor.IsEffectivelyEnabled);
-            Assert.True(vm.SaveProjectCommand.CanExecute(null));
-            Assert.True(vm.LoadProjectCommand.CanExecute(null));
-            Assert.True(editor.Focus());
-            window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
-            Assert.NotEqual(value, vm.ImportOnlyClosedPolylines);
-            Assert.True(vm.CanUndo);
-            Assert.True(vm.HasUnsavedChanges);
+            AssertEditingRestored(vm, view, window, editor, settingsWindow, draft, commandStates, value);
         }
         finally
         {
@@ -178,5 +145,61 @@ public sealed class ProjectLoadingInputTests
             window.Close();
             File.Delete(path);
         }
+    }
+
+    private static void SendInputWhileLoading(Window window, FreeformHelperView view, CheckBox editor)
+    {
+        window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
+        window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
+        var point = editor.TranslatePoint(new Avalonia.Rect(editor.Bounds.Size).Center, window);
+        Assert.NotNull(point);
+        window.MouseDown(point.Value, MouseButton.Left);
+        window.MouseUp(point.Value, MouseButton.Left);
+        window.KeyPress(Key.S, RawInputModifiers.Control, PhysicalKey.S, "s");
+        window.KeyRelease(Key.S, RawInputModifiers.Control, PhysicalKey.S, "s");
+        var canvas = view.GetVisualDescendants().OfType<FreeformHelper.UI.Controls.PadCanvas>().Single();
+        var selected = Assert.IsType<HashSet<int>>(PadCanvasPrivateAccess.SelectedCadIds(canvas));
+        selected.Add(17);
+        window.KeyPress(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        window.KeyRelease(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        Assert.Contains(17, selected);
+    }
+
+    private static void AssertEveryCommandDisabled(FreeformHelperViewModel vm)
+    {
+        foreach (var property in typeof(FreeformHelperViewModel).GetProperties()
+                     .Where(p => typeof(IRelayCommand).IsAssignableFrom(p.PropertyType)))
+        {
+            var command = Assert.IsAssignableFrom<IRelayCommand>(property.GetValue(vm));
+            Assert.False(command.CanExecute(null), property.Name);
+        }
+    }
+
+    private static void AssertEditingRestored(
+        FreeformHelperViewModel vm,
+        FreeformHelperView view,
+        Window window,
+        CheckBox editor,
+        SettingsWindow settingsWindow,
+        SettingsWindowViewModel draft,
+        List<bool> commandStates,
+        bool value)
+    {
+        Assert.Equal(ProjectSessionMode.Ready, vm.SessionMode);
+        Assert.True(view.IsEnabled);
+        Assert.True(settingsWindow.IsEnabled);
+        Assert.True(draft.SaveCommand.CanExecute(null));
+        Assert.Contains(true, commandStates);
+        settingsWindow.Close();
+        window.Activate();
+        Assert.True(editor.IsEffectivelyEnabled);
+        Assert.True(vm.SaveProjectCommand.CanExecute(null));
+        Assert.True(vm.LoadProjectCommand.CanExecute(null));
+        Assert.True(editor.Focus());
+        window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
+        window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
+        Assert.NotEqual(value, vm.ImportOnlyClosedPolylines);
+        Assert.True(vm.CanUndo);
+        Assert.True(vm.HasUnsavedChanges);
     }
 }

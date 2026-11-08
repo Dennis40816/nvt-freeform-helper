@@ -164,6 +164,38 @@ public sealed partial class FreeformHelperViewModelTests
             ApplyAppVisualPreferencesOnProjectLoad = false
         };
 
+        ApplyDistinctSettingsThroughSettingsWindow(vm);
+
+        var persisted = CaptureRestoredSettings(vm);
+
+        var path = TestFiles.NewTempFilePath("freeform-helper-", ".json");
+        try
+        {
+            vm.PickSaveProjectPathAsync = () => Task.FromResult<string?>(path);
+            vm.ConfirmEmbedDxfAsync = () => Task.FromResult(false);
+            var saveResult = await vm.SaveProjectAsync();
+            Assert.True(saveResult);
+
+            ChangeSettingsAwayFromSavedValues(vm);
+
+            vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(path);
+            await vm.LoadProjectCommand.ExecuteAsync(null);
+
+            // One comparison for every restored setting, so a failure lists all values that differ.
+            Assert.Equal(persisted, CaptureRestoredSettings(vm));
+        }
+        finally
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+    }
+
+
+    private static void ApplyDistinctSettingsThroughSettingsWindow(FreeformHelperViewModel vm)
+    {
         var targetLogLevel = vm.LogLevelOptions.FirstOrDefault(option =>
             !option.Equals(vm.SelectedLogLevelOption));
         if (string.IsNullOrWhiteSpace(targetLogLevel.Display))
@@ -223,54 +255,32 @@ public sealed partial class FreeformHelperViewModelTests
         settings.SelectedNotchExportProfileOption = targetProfile;
         settings.SelectedGridAlignmentOption = targetAlignment;
         settings.SaveCommand.Execute(null);
-
-        var persisted = CaptureRestoredSettings(vm);
-
-        var path = TestFiles.NewTempFilePath("freeform-helper-", ".json");
-        try
-        {
-            vm.PickSaveProjectPathAsync = () => Task.FromResult<string?>(path);
-            vm.ConfirmEmbedDxfAsync = () => Task.FromResult(false);
-            var saveResult = await vm.SaveProjectAsync();
-            Assert.True(saveResult);
-
-            vm.EnableToFullRuleEngine = !vm.EnableToFullRuleEngine;
-            vm.EnableToFullRuleTrace = !vm.EnableToFullRuleTrace;
-            vm.ToFullStrictOverlapPercent = vm.ToFullStrictOverlapPercent <= 1m ? 2m : vm.ToFullStrictOverlapPercent - 1m;
-            vm.AutoReplayStep2AfterProjectLoad = !vm.AutoReplayStep2AfterProjectLoad;
-            vm.MappingWeightIou = vm.MappingWeightIou + 0.5m;
-            vm.ShowNotchCanvasPreview = !vm.ShowNotchCanvasPreview;
-            vm.ShowNotchToRegularLabels = !vm.ShowNotchToRegularLabels;
-            vm.NotchPreviewVisualizationStep = vm.NotchPreviewVisualizationStep >= 3m ? 1m : 3m;
-            vm.NotchPreviewAutoPlayEnabled = !vm.NotchPreviewAutoPlayEnabled;
-            vm.NotchPreviewAutoPlayIntervalMs = vm.NotchPreviewAutoPlayIntervalMs >= 900m ? 700m : 900m;
-            vm.GlobalFontSizePercent = vm.GlobalFontSizePercent >= 130m ? 120m : 130m;
-            vm.ImportOnlyClosedPolylines = !vm.ImportOnlyClosedPolylines;
-            vm.SelectedLogLevelOption = vm.LogLevelOptions.FirstOrDefault(option =>
-                !option.Equals(vm.SelectedLogLevelOption));
-            LoggingBootstrapper.ApplyMinimumLevel(vm.SelectedLogLevelOption.Value);
-            vm.SelectedNotchExportFileTypeOption = vm.NotchExportFileTypeOptions.FirstOrDefault(option =>
-                option.Value != vm.SelectedNotchExportFileTypeOption.Value);
-            vm.SelectedNotchExportProfileOption = vm.NotchExportProfileOptions.FirstOrDefault(option =>
-                option.Value != vm.SelectedNotchExportProfileOption.Value);
-            vm.SelectedGridAlignmentOption = vm.GridAlignmentOptions.FirstOrDefault(option =>
-                option.Value != vm.SelectedGridAlignmentOption.Value);
-
-            vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(path);
-            await vm.LoadProjectCommand.ExecuteAsync(null);
-
-            // One comparison for every restored setting, so a failure lists all values that differ.
-            Assert.Equal(persisted, CaptureRestoredSettings(vm));
-        }
-        finally
-        {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-        }
     }
 
+    private static void ChangeSettingsAwayFromSavedValues(FreeformHelperViewModel vm)
+    {
+        vm.EnableToFullRuleEngine = !vm.EnableToFullRuleEngine;
+        vm.EnableToFullRuleTrace = !vm.EnableToFullRuleTrace;
+        vm.ToFullStrictOverlapPercent = vm.ToFullStrictOverlapPercent <= 1m ? 2m : vm.ToFullStrictOverlapPercent - 1m;
+        vm.AutoReplayStep2AfterProjectLoad = !vm.AutoReplayStep2AfterProjectLoad;
+        vm.MappingWeightIou = vm.MappingWeightIou + 0.5m;
+        vm.ShowNotchCanvasPreview = !vm.ShowNotchCanvasPreview;
+        vm.ShowNotchToRegularLabels = !vm.ShowNotchToRegularLabels;
+        vm.NotchPreviewVisualizationStep = vm.NotchPreviewVisualizationStep >= 3m ? 1m : 3m;
+        vm.NotchPreviewAutoPlayEnabled = !vm.NotchPreviewAutoPlayEnabled;
+        vm.NotchPreviewAutoPlayIntervalMs = vm.NotchPreviewAutoPlayIntervalMs >= 900m ? 700m : 900m;
+        vm.GlobalFontSizePercent = vm.GlobalFontSizePercent >= 130m ? 120m : 130m;
+        vm.ImportOnlyClosedPolylines = !vm.ImportOnlyClosedPolylines;
+        vm.SelectedLogLevelOption = vm.LogLevelOptions.FirstOrDefault(option =>
+            !option.Equals(vm.SelectedLogLevelOption));
+        LoggingBootstrapper.ApplyMinimumLevel(vm.SelectedLogLevelOption.Value);
+        vm.SelectedNotchExportFileTypeOption = vm.NotchExportFileTypeOptions.FirstOrDefault(option =>
+            option.Value != vm.SelectedNotchExportFileTypeOption.Value);
+        vm.SelectedNotchExportProfileOption = vm.NotchExportProfileOptions.FirstOrDefault(option =>
+            option.Value != vm.SelectedNotchExportProfileOption.Value);
+        vm.SelectedGridAlignmentOption = vm.GridAlignmentOptions.FirstOrDefault(option =>
+            option.Value != vm.SelectedGridAlignmentOption.Value);
+    }
 
     private static (string Setting, object? Value)[] CaptureRestoredSettings(FreeformHelperViewModel vm) =>
     [

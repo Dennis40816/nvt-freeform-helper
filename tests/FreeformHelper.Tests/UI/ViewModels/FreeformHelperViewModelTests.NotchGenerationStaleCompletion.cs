@@ -43,36 +43,7 @@ public sealed partial class FreeformHelperViewModelTests
                     }
                 });
 
-            Assert.Null(staleSession);
-            Assert.Equal(step3Revision, vm.GetNotchStep3Revision());
-            Assert.True(vm.SimulationWorkspaceSourceRevision > sourceRevision);
-            Assert.Equal("Notch export: not run.", vm.NotchExportSummary);
-            Assert.DoesNotContain(
-                "Simulation ready",
-                vm.LastSimulationWorkspaceAttemptMessage,
-                StringComparison.OrdinalIgnoreCase);
-            Assert.DoesNotContain(
-                "generated",
-                vm.NotchExportProgressText,
-                StringComparison.OrdinalIgnoreCase);
-
-            var regularPadId = vm.RegularPads[0].RegularPadId;
-            Assert.Empty(vm.GetLastNotchRowsForRegularPad(regularPadId));
-            Assert.False(vm.TryGetNotchValidationReportForRegularPad(
-                regularPadId,
-                out _,
-                out _,
-                out var validationFailureCode,
-                out _));
-            Assert.Equal("NOT_READY", validationFailureCode);
-
-            var staleMetrics = vm.GetNotchExportGenerationCacheMetrics();
-            Assert.True(staleMetrics.HasEntry);
-            Assert.Equal(0, staleMetrics.EntryRowCount);
-            Assert.Equal(1, staleMetrics.MissCount);
-            Assert.Equal(0, staleMetrics.HitCount);
-            Assert.Equal(1, staleMetrics.StoreCount);
-            Assert.Equal(0, staleMetrics.ClearCount);
+            AssertStaleSessionRejected(vm, staleSession, step3Revision, sourceRevision);
 
             var currentSession = await vm.CreateSimulationWorkspaceSessionAsync(silent: false);
             Assert.NotNull(currentSession);
@@ -84,24 +55,70 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Equal(1, currentMetrics.HitCount);
             Assert.Equal(1, currentMetrics.StoreCount);
 
-            var freshVm = await CreateNotchExportCacheViewModelAsync(dxfPath);
-            freshVm.EnableTargetCoverageGuard = true;
-            freshVm.TargetCoverageCapPercent = applyThroughSettingsWindow ? 255m : 50m;
-            var freshSession = await freshVm.CreateSimulationWorkspaceSessionAsync(silent: false);
-
-            Assert.NotNull(freshSession);
-            Assert.Equal(
-                NotchTableExporter.ExportAsCsv(freshSession!.Table),
-                NotchTableExporter.ExportAsCsv(currentSession.Table));
-            Assert.Equivalent(
-                freshSession.Table.ToFullCoverageAudit,
-                currentSession.Table.ToFullCoverageAudit,
-                strict: true);
+            await AssertCurrentSessionMatchesFreshExportAsync(dxfPath, currentSession, applyThroughSettingsWindow);
         }
         finally
         {
             File.Delete(dxfPath);
         }
+    }
+
+    private static void AssertStaleSessionRejected(
+        FreeformHelperViewModel vm,
+        SimulationWorkspaceSession? staleSession,
+        int step3Revision,
+        int sourceRevision)
+    {
+        Assert.Null(staleSession);
+        Assert.Equal(step3Revision, vm.GetNotchStep3Revision());
+        Assert.True(vm.SimulationWorkspaceSourceRevision > sourceRevision);
+        Assert.Equal("Notch export: not run.", vm.NotchExportSummary);
+        Assert.DoesNotContain(
+            "Simulation ready",
+            vm.LastSimulationWorkspaceAttemptMessage,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(
+            "generated",
+            vm.NotchExportProgressText,
+            StringComparison.OrdinalIgnoreCase);
+
+        var regularPadId = vm.RegularPads[0].RegularPadId;
+        Assert.Empty(vm.GetLastNotchRowsForRegularPad(regularPadId));
+        Assert.False(vm.TryGetNotchValidationReportForRegularPad(
+            regularPadId,
+            out _,
+            out _,
+            out var validationFailureCode,
+            out _));
+        Assert.Equal("NOT_READY", validationFailureCode);
+
+        var staleMetrics = vm.GetNotchExportGenerationCacheMetrics();
+        Assert.True(staleMetrics.HasEntry);
+        Assert.Equal(0, staleMetrics.EntryRowCount);
+        Assert.Equal(1, staleMetrics.MissCount);
+        Assert.Equal(0, staleMetrics.HitCount);
+        Assert.Equal(1, staleMetrics.StoreCount);
+        Assert.Equal(0, staleMetrics.ClearCount);
+    }
+
+    private static async Task AssertCurrentSessionMatchesFreshExportAsync(
+        string dxfPath,
+        SimulationWorkspaceSession currentSession,
+        bool applyThroughSettingsWindow)
+    {
+        var freshVm = await CreateNotchExportCacheViewModelAsync(dxfPath);
+        freshVm.EnableTargetCoverageGuard = true;
+        freshVm.TargetCoverageCapPercent = applyThroughSettingsWindow ? 255m : 50m;
+        var freshSession = await freshVm.CreateSimulationWorkspaceSessionAsync(silent: false);
+
+        Assert.NotNull(freshSession);
+        Assert.Equal(
+            NotchTableExporter.ExportAsCsv(freshSession!.Table),
+            NotchTableExporter.ExportAsCsv(currentSession.Table));
+        Assert.Equivalent(
+            freshSession.Table.ToFullCoverageAudit,
+            currentSession.Table.ToFullCoverageAudit,
+            strict: true);
     }
 
     [AvaloniaFact]
