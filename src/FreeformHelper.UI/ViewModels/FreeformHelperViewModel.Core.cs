@@ -161,25 +161,11 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             new(RegularSourceMode.GeneratedGrid, "Generated grid"),
             new(RegularSourceMode.FromDxfLayer, "DXF layer pads"),
         };
-        DxfEditRotationScopeOptions = new List<DxfEditRotationScopeOption>
-        {
-            new(DxfEditRotationScope.SelectedPads, "Selected pads", "Rotate the currently selected baseline CAD pads as one rigid group."),
-            new(DxfEditRotationScope.TargetLayer, "Target layer", "Rotate all visible baseline CAD pads in the selected rotation layer as one rigid group."),
-        };
+        DxfEditRotationScopeOptions = BuildDxfEditRotationScopeOptions();
         LogLevelOptions = LoggingBootstrapper.SupportedMinimumLevels
             .Select(static level => new LogLevelOption(level, level))
             .ToList();
-        CadOutputFwDiffAutoModeOptions = new List<CadOutputFwDiffAutoModeOption>
-        {
-            new(
-                CadOutputFwDiffAutoMode.BestMatchDirect,
-                "Geometry seed",
-                "Use each CAD pad's geometry-seeded regular diff directly. Choose this when hardware behavior should follow the primary regular one-to-one."),
-            new(
-                CadOutputFwDiffAutoMode.StrictUnique,
-                "Geometry seed (unique per IC)",
-                "Use geometry seed directly, but keep diff idx unique within each IC. Conflicts stay unresolved instead of shifting other CAD pads."),
-        };
+        CadOutputFwDiffAutoModeOptions = BuildCadOutputFwDiffAutoModeOptions();
         NotchExportFileTypeOptions = new List<NotchExportFileTypeOption>
         {
             new(NotchExportFileType.Csv, "CSV review (.csv)", "csv"),
@@ -191,46 +177,12 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             new(NotchExportProfile.Release, "Release (minimal FW)"),
             new(NotchExportProfile.Debug, "Debug (trace + sim mask)"),
         };
-        NotchCompensationModelOptions = new List<NotchCompensationModelOption>
-        {
-            new(
-                NotchCompensationModel.CurrentGain,
-                "Current (Gain)",
-                "To Regular x To Full (current model)."),
-            new(
-                NotchCompensationModel.ConservativeNoGain,
-                "Conservative (No Gain)",
-                "Apply ToRegular source combine; ToFull only gates boundary support."),
-            new(
-                NotchCompensationModel.Disabled,
-                "Disabled",
-                "Turn off To Full and To Regular for baseline comparison."),
-        };
+        NotchCompensationModelOptions = BuildNotchCompensationModelOptions();
         _selectedNotchExportFileTypeOption = NotchExportFileTypeOptions[0];
         _selectedNotchExportProfileOption = NotchExportProfileOptions[0];
         _selectedNotchCompensationModelOption = NotchCompensationModelOptions[0];
-        var initialLogLevelName = LoggingBootstrapper.GetCurrentMinimumLevelName();
-        var initialLogLevel = LogLevelOptions.FirstOrDefault(option =>
-            string.Equals(option.Value, initialLogLevelName, StringComparison.OrdinalIgnoreCase));
-        if (string.IsNullOrWhiteSpace(initialLogLevel.Display))
-        {
-            initialLogLevel = LogLevelOptions.Count > 0 ? LogLevelOptions[0] : default;
-        }
-        if (string.IsNullOrWhiteSpace(initialLogLevel.Display))
-        {
-            initialLogLevel = new LogLevelOption("Info", "Info");
-        }
-        _selectedLogLevelOption = initialLogLevel;
-        using (_settingsSuppression.EnterBoundLayerSelectionChange())
-        {
-            BoundLayerOptions.Add(new BoundLayerOption(null, "Auto (visible layers)"));
-            SelectedBoundLayerOption = BoundLayerOptions[0];
-        }
-        using (_settingsSuppression.EnterRegularSourceLayerSelectionChange())
-        {
-            RegularSourceLayerOptions.Add(new RegularSourceLayerOption(null, "Select layer"));
-            SelectedRegularSourceLayerOption = RegularSourceLayerOptions[0];
-        }
+        _selectedLogLevelOption = ResolveInitialLogLevelOption();
+        InitializeLayerSelectionOptions();
         _dxfEditPanel = _dxfEditPanel with { SelectedDxfEditRotationScopeOption = DxfEditRotationScopeOptions[0] };
         StartupPerfTracker.Mark("workspace.vm-options-initialized");
         // Layered settings precedence: Project > App General > Built-in defaults.
@@ -261,6 +213,74 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
         _logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
         StartupPerfTracker.Mark("workspace.vm-ctor-complete");
+    }
+
+    private static List<DxfEditRotationScopeOption> BuildDxfEditRotationScopeOptions() =>
+        new List<DxfEditRotationScopeOption>
+        {
+            new(DxfEditRotationScope.SelectedPads, "Selected pads", "Rotate the currently selected baseline CAD pads as one rigid group."),
+            new(DxfEditRotationScope.TargetLayer, "Target layer", "Rotate all visible baseline CAD pads in the selected rotation layer as one rigid group."),
+        };
+
+    private static List<CadOutputFwDiffAutoModeOption> BuildCadOutputFwDiffAutoModeOptions() =>
+        new List<CadOutputFwDiffAutoModeOption>
+        {
+            new(
+                CadOutputFwDiffAutoMode.BestMatchDirect,
+                "Geometry seed",
+                "Use each CAD pad's geometry-seeded regular diff directly. Choose this when hardware behavior should follow the primary regular one-to-one."),
+            new(
+                CadOutputFwDiffAutoMode.StrictUnique,
+                "Geometry seed (unique per IC)",
+                "Use geometry seed directly, but keep diff idx unique within each IC. Conflicts stay unresolved instead of shifting other CAD pads."),
+        };
+
+    private static List<NotchCompensationModelOption> BuildNotchCompensationModelOptions() =>
+        new List<NotchCompensationModelOption>
+        {
+            new(
+                NotchCompensationModel.CurrentGain,
+                "Current (Gain)",
+                "To Regular x To Full (current model)."),
+            new(
+                NotchCompensationModel.ConservativeNoGain,
+                "Conservative (No Gain)",
+                "Apply ToRegular source combine; ToFull only gates boundary support."),
+            new(
+                NotchCompensationModel.Disabled,
+                "Disabled",
+                "Turn off To Full and To Regular for baseline comparison."),
+        };
+
+    private LogLevelOption ResolveInitialLogLevelOption()
+    {
+        var initialLogLevelName = LoggingBootstrapper.GetCurrentMinimumLevelName();
+        var initialLogLevel = LogLevelOptions.FirstOrDefault(option =>
+            string.Equals(option.Value, initialLogLevelName, StringComparison.OrdinalIgnoreCase));
+        if (string.IsNullOrWhiteSpace(initialLogLevel.Display))
+        {
+            initialLogLevel = LogLevelOptions.Count > 0 ? LogLevelOptions[0] : default;
+        }
+        if (string.IsNullOrWhiteSpace(initialLogLevel.Display))
+        {
+            initialLogLevel = new LogLevelOption("Info", "Info");
+        }
+
+        return initialLogLevel;
+    }
+
+    private void InitializeLayerSelectionOptions()
+    {
+        using (_settingsSuppression.EnterBoundLayerSelectionChange())
+        {
+            BoundLayerOptions.Add(new BoundLayerOption(null, "Auto (visible layers)"));
+            SelectedBoundLayerOption = BoundLayerOptions[0];
+        }
+        using (_settingsSuppression.EnterRegularSourceLayerSelectionChange())
+        {
+            RegularSourceLayerOptions.Add(new RegularSourceLayerOption(null, "Select layer"));
+            SelectedRegularSourceLayerOption = RegularSourceLayerOptions[0];
+        }
     }
 
     private void RequestFitAfterNextRebuild()

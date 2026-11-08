@@ -134,42 +134,9 @@ public sealed partial class FreeformHelperViewModel
 
         var undoSnapshot = CaptureCadEditUndoSnapshot();
         var previous = new CadEditNotificationSnapshot(this);
-        var outputIds = new HashSet<int>();
-        var sourceIds = new HashSet<int>();
-        foreach (var groupId in validGroupIds)
-        {
-            if (!_combinedCad.Groups.TryGetValue(groupId, out var group))
-            {
-                continue;
-            }
-
-            foreach (var outputId in group.OutputCadIds)
-            {
-                outputIds.Add(outputId);
-            }
-
-            foreach (var sourceId in group.SourceCadIds)
-            {
-                sourceIds.Add(sourceId);
-            }
-        }
-
+        var (outputIds, sourceIds) = CollectCombinedGroupMemberIds(validGroupIds);
         _cad = new CadPadSet(_cad.Pads.Where(pad => !outputIds.Contains(pad.Id)).ToList());
-        foreach (var outputId in outputIds)
-        {
-            _combinedCad.GroupIdByOutputCadId.Remove(outputId);
-            _cadEdit.HiddenCadPadIds.Remove(outputId);
-        }
-        var restoredSources = 0;
-        foreach (var sourceId in sourceIds)
-        {
-            if (_cadEdit.HiddenCadPadIds.Remove(sourceId))
-            {
-                restoredSources++;
-            }
-
-            _combinedCad.GroupIdBySourceCadId.Remove(sourceId);
-        }
+        var restoredSources = RemoveCombinedGroupMembers(outputIds, sourceIds);
 
         foreach (var groupId in validGroupIds)
         {
@@ -205,6 +172,52 @@ public sealed partial class FreeformHelperViewModel
             _cadEdit.HiddenCadPadIds.Count);
         MarkUnsaved();
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), undoLabel);
+    }
+
+    private (HashSet<int> OutputIds, HashSet<int> SourceIds) CollectCombinedGroupMemberIds(List<int> validGroupIds)
+    {
+        var outputIds = new HashSet<int>();
+        var sourceIds = new HashSet<int>();
+        foreach (var groupId in validGroupIds)
+        {
+            if (!_combinedCad.Groups.TryGetValue(groupId, out var group))
+            {
+                continue;
+            }
+
+            foreach (var outputId in group.OutputCadIds)
+            {
+                outputIds.Add(outputId);
+            }
+
+            foreach (var sourceId in group.SourceCadIds)
+            {
+                sourceIds.Add(sourceId);
+            }
+        }
+
+        return (outputIds, sourceIds);
+    }
+
+    private int RemoveCombinedGroupMembers(HashSet<int> outputIds, HashSet<int> sourceIds)
+    {
+        foreach (var outputId in outputIds)
+        {
+            _combinedCad.GroupIdByOutputCadId.Remove(outputId);
+            _cadEdit.HiddenCadPadIds.Remove(outputId);
+        }
+        var restoredSources = 0;
+        foreach (var sourceId in sourceIds)
+        {
+            if (_cadEdit.HiddenCadPadIds.Remove(sourceId))
+            {
+                restoredSources++;
+            }
+
+            _combinedCad.GroupIdBySourceCadId.Remove(sourceId);
+        }
+
+        return restoredSources;
     }
 
     private int AllocateCombinedCadPadId()

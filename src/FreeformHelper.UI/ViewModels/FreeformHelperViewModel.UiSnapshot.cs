@@ -21,23 +21,7 @@ public sealed partial class FreeformHelperViewModel
         var snapshot = new ProjectUiSnapshot
         {
             // --- Grid UI Snapshot ---
-            Grid = new UiGridSnapshot
-            {
-                CascadeCount = (int)Math.Round(CascadeNum),
-                // Capture per-IC channel settings.
-                IcX = CascadeIcSettings.Select(s => Math.Max(1, (int)Math.Round(s.XChannels))).ToList(),
-                IcY = CascadeIcSettings.Select(s => Math.Max(1, (int)Math.Round(s.YChannels))).ToList(),
-                TotalX = (int)Math.Round(XChannels),
-                TotalY = (int)Math.Round(YChannels),
-                // Store display strings for selected options.
-                ScanOrder = SelectedScanOrderOption.Display ?? SelectedScanOrder.ToString(),
-                AlignmentMode = SelectedGridAlignmentOption.Display ?? GridAlignmentMode.ToString(),
-                GridPaddingPercent = (double)GridPaddingPercent,
-                ActiveAreaWidthMm = (double)ActiveAreaWidth,
-                ActiveAreaHeightMm = (double)ActiveAreaHeight,
-                PitchXmm = PitchSizeX,
-                PitchYmm = PitchSizeY
-            },
+            Grid = BuildGridSnapshot(),
             // --- Matching UI Snapshot ---
             Matching = new UiMatchingSnapshot
             {
@@ -50,48 +34,7 @@ public sealed partial class FreeformHelperViewModel
                 NearestK = persistedMatching.NearestK
             },
             // --- View UI Snapshot ---
-            View = new UiViewSnapshot
-            {
-                ShowCad = ShowCad,
-                ShowRegular = ShowRegular,
-                HighlightUnmatched = HighlightUnmatched,
-                HighlightFreeform = HighlightFreeform,
-                ColorCadByArea = ColorCadByArea,
-                CadLineWidth = (double)CadLineWidth,
-                CadLineColor = CadLineColorHex, // Store as hex string.
-                CadFillOpacity = (double)CadFillOpacity,
-                CadLineOpacity = (double)CadLineOpacity,
-                RegularLineWidth = (double)RegularLineWidth,
-                HighlightStrokeWidthAdjust = (double)HighlightStrokeWidthAdjust,
-                RegularLineColor = RegularLineColorHex, // Store as hex string.
-                RegularFillOpacity = (double)RegularFillOpacity,
-                RegularLineOpacity = (double)RegularLineOpacity,
-                RegularSelectedColor = RegularSelectedColorHex,
-                RegularSelectedFillOpacity = (double)RegularSelectedFillOpacity,
-                AreaBucketTolerance = (double)AreaBucketTolerance,
-                MaxAreaBuckets = (int)Math.Round(MaxAreaBuckets),
-                ShowDiffIndexOverlay = ShowDiffIndexOverlay,
-                ShowNotchCanvasPreview = ShowNotchCanvasPreview,
-                ShowNotchToRegularLabels = ShowNotchToRegularLabels,
-                GlobalFontSizePercent = (double)GlobalFontSizePercent,
-                NotchPreviewVisualizationStep = (double)NotchPreviewVisualizationStep,
-                NotchPreviewAutoPlayEnabled = NotchPreviewAutoPlayEnabled,
-                NotchPreviewAutoPlayIntervalMs = (double)NotchPreviewAutoPlayIntervalMs,
-                NotchExportFileType = SelectedNotchExportFileTypeOption.Value.ToString(),
-                DxfLayerImagePreferredLayer = _dxfLayerImageExportPreferences.LayerName,
-                DxfLayerImageWidthPixels = _dxfLayerImageExportPreferences.WidthPixels,
-                DxfLayerImageHeightPixels = _dxfLayerImageExportPreferences.HeightPixels,
-                DxfLayerImageLineWidthPixels = (double)_dxfLayerImageExportPreferences.LineWidthPixels,
-                DxfLayerImagePaddingXPixels = _dxfLayerImageExportPreferences.PaddingXPixels,
-                DxfLayerImagePaddingYPixels = _dxfLayerImageExportPreferences.PaddingYPixels,
-                DxfLayerImageFormat = _dxfLayerImageExportPreferences.Format.ToString(),
-                DxfLayerImageUseDarkTheme = _dxfLayerImageExportPreferences.UseDarkTheme,
-                CoordinatePixelWidth = (double)CoordinatePixelWidth,
-                CoordinatePixelHeight = (double)CoordinatePixelHeight,
-                CoordinatePreferredAaOutlineLayerName = CoordinatePreferredAaOutlineLayerName,
-                // Capture the selection state of each layer toggle.
-                LayerSelections = LayerToggles.Select(t => new LayerSelectionSnapshot { Name = t.Name, IsSelected = t.IsSelected }).ToList()
-            },
+            View = BuildViewSnapshot(),
             // --- Notch UI Snapshot ---
             Notch = new UiNotchSnapshot
             {
@@ -115,4 +58,67 @@ public sealed partial class FreeformHelperViewModel
 
         return snapshot;
     }
+
+    private UiGridSnapshot BuildGridSnapshot() =>
+        new UiGridSnapshot
+        {
+            CascadeCount = (int)Math.Round(CascadeNum),
+            // Capture per-IC channel settings.
+            IcX = CascadeIcSettings.Select(s => Math.Max(1, (int)Math.Round(s.XChannels))).ToList(),
+            IcY = CascadeIcSettings.Select(s => Math.Max(1, (int)Math.Round(s.YChannels))).ToList(),
+            TotalX = (int)Math.Round(XChannels),
+            TotalY = (int)Math.Round(YChannels),
+            // Store display strings for selected options.
+            ScanOrder = SelectedScanOrderOption.Display ?? SelectedScanOrder.ToString(),
+            AlignmentMode = SelectedGridAlignmentOption.Display ?? GridAlignmentMode.ToString(),
+            GridPaddingPercent = (double)GridPaddingPercent,
+            ActiveAreaWidthMm = (double)ActiveAreaWidth,
+            ActiveAreaHeightMm = (double)ActiveAreaHeight,
+            PitchXmm = PitchSizeX,
+            PitchYmm = PitchSizeY
+        };
+
+    private UiViewSnapshot BuildViewSnapshot() =>
+        new UiViewSnapshot
+        {
+            ShowCad = ShowCad,
+            ShowRegular = ShowRegular,
+            HighlightUnmatched = HighlightUnmatched,
+            HighlightFreeform = HighlightFreeform,
+            ColorCadByArea = ColorCadByArea,
+            CadLineWidth = (double)CadLineWidth,
+            CadLineColor = CadLineColorHex, // Store as hex string.
+            CadFillOpacity = (double)CadFillOpacity,
+            CadLineOpacity = (double)CadLineOpacity,
+            RegularLineWidth = (double)RegularLineWidth,
+            HighlightStrokeWidthAdjust = (double)HighlightStrokeWidthAdjust,
+            RegularLineColor = RegularLineColorHex, // Store as hex string.
+            RegularFillOpacity = (double)RegularFillOpacity,
+            RegularLineOpacity = (double)RegularLineOpacity,
+            RegularSelectedColor = RegularSelectedColorHex,
+            RegularSelectedFillOpacity = (double)RegularSelectedFillOpacity,
+            AreaBucketTolerance = (double)AreaBucketTolerance,
+            MaxAreaBuckets = (int)Math.Round(MaxAreaBuckets),
+            ShowDiffIndexOverlay = ShowDiffIndexOverlay,
+            ShowNotchCanvasPreview = ShowNotchCanvasPreview,
+            ShowNotchToRegularLabels = ShowNotchToRegularLabels,
+            GlobalFontSizePercent = (double)GlobalFontSizePercent,
+            NotchPreviewVisualizationStep = (double)NotchPreviewVisualizationStep,
+            NotchPreviewAutoPlayEnabled = NotchPreviewAutoPlayEnabled,
+            NotchPreviewAutoPlayIntervalMs = (double)NotchPreviewAutoPlayIntervalMs,
+            NotchExportFileType = SelectedNotchExportFileTypeOption.Value.ToString(),
+            DxfLayerImagePreferredLayer = _dxfLayerImageExportPreferences.LayerName,
+            DxfLayerImageWidthPixels = _dxfLayerImageExportPreferences.WidthPixels,
+            DxfLayerImageHeightPixels = _dxfLayerImageExportPreferences.HeightPixels,
+            DxfLayerImageLineWidthPixels = (double)_dxfLayerImageExportPreferences.LineWidthPixels,
+            DxfLayerImagePaddingXPixels = _dxfLayerImageExportPreferences.PaddingXPixels,
+            DxfLayerImagePaddingYPixels = _dxfLayerImageExportPreferences.PaddingYPixels,
+            DxfLayerImageFormat = _dxfLayerImageExportPreferences.Format.ToString(),
+            DxfLayerImageUseDarkTheme = _dxfLayerImageExportPreferences.UseDarkTheme,
+            CoordinatePixelWidth = (double)CoordinatePixelWidth,
+            CoordinatePixelHeight = (double)CoordinatePixelHeight,
+            CoordinatePreferredAaOutlineLayerName = CoordinatePreferredAaOutlineLayerName,
+            // Capture the selection state of each layer toggle.
+            LayerSelections = LayerToggles.Select(t => new LayerSelectionSnapshot { Name = t.Name, IsSelected = t.IsSelected }).ToList()
+        };
 }

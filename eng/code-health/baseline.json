@@ -421,48 +421,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 127
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs"
-      ],
-      "contentHash": "93b916d94e4a15b05044cdcb2e265bd44eb2296f4d85989d3200f042f6a7662f",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel..ctor(AppGeneralSettingsStore?,UiEventRunner?)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 95
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Edits.Combine.cs"
-      ],
-      "contentHash": "0f4f9080c79bf58ac8083cbd5a9fb74f3779dec5ea0c786c65baa5442378197c",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.ClearCombinedCadGroups(List<int>,string,string,string)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 100
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.UiSnapshot.cs"
-      ],
-      "contentHash": "dbed7e53b03e6757b35f5d2c24ca4b74a1566ecb66b479fd17eed00afa0ddb68",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.BuildUiSnapshot()"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
