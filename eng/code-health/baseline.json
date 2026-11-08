@@ -746,7 +746,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 2395
+        "fileLines": 2053
       },
       "owner": "NFH",
       "locations": [
@@ -755,62 +755,6 @@
       "contentHash": "7f9cd894e6f6d97642c6c9e54dbceb0e257b82523eb64e665026a7424353896e",
       "project": "FreeformHelper.Tests",
       "symbol": "file:FreeformHelper.Tests.NotchTableGeneratorTests;FreeformHelper.Tests.NotchTableGeneratorTests.CallbackProgress`1;FreeformHelper.Tests.NotchTableGeneratorTests.SnapshotOnlySet"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 107
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs"
-      ],
-      "contentHash": "4c1fbb46933eeb024c2701956aeeff3d8ebd63305660fe01c91fc72a9e66e156",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.NotchTableGeneratorTests.ProjectCadAllocationResolvedBatch_ReusesVersionNeutralCandidatesAcrossFinalRequests()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 123
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs"
-      ],
-      "contentHash": "261500a61bcfd4d8f9081c92f4e11989a1d2ee54abf6d97bad984b7392f19d92",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.NotchTableGeneratorTests.ResolveCadAllocationBatchWithSelectedResult_ReusesOneWarmSparseResult()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 109
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Notch/NotchTableGeneratorTests.cs"
-      ],
-      "contentHash": "6dd15cfcb705f144a769d048875c6de581a5cc18419d1405029449d093ef506d",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.NotchTableGeneratorTests.Generate_CadAllocationMode_WhenSubMicroPolygonChangeFlipsAllocation_UsesCurrentGeometry()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 81
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingSecondaryWindowTests.cs"
-      ],
-      "contentHash": "b597d015d28fafa1d1686fd37a7b1584201a407a62f1d676b32f7ce6091a12bd",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.ProjectLoadingSecondaryWindowTests.LoadPickerAwait_BlocksOpenDxfChangeListWithoutChangingHiddenUndoOrDirtyState(DxfEditChangeKind)"
     },
     {
       "kind": "file",
