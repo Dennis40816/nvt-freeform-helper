@@ -40,29 +40,21 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        _regularVisibilityMask.SourcePath = sourcePath;
-        _regularVisibilityMask.EmbeddedMask = null;
-        _regularVisibilityMask.EmbeddedName = null;
-        _projectFile.EmbeddedRegularVisibilityMask = null;
-        _projectFile.EmbeddedRegularVisibilityMaskName = null;
-        RefreshRegularVisibilityMask(_grid);
-
-        if (_regularVisibilityMask.Mask.HasLoadedMask)
+        var result = LoadRegularVisibilityMask(sourcePath, _grid);
+        if (!TryApplyRegularVisibilityMaskLoad(result, _grid, importSourcePath: sourcePath))
         {
-            SetRegularVisibilityMaskEnabled(value: true, refreshAssignment: true);
-            SetStatus(
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Regular visibility mask imported: {0}. Active={1}, inactive={2}, frames={3}.",
-                    Path.GetFileName(sourcePath),
-                    _regularVisibilityMask.Mask.ActiveRegularCount,
-                    _regularVisibilityMask.Mask.InactiveRegularCount,
-                    _regularVisibilityMask.Mask.FrameCount));
             return;
         }
 
-        SetRegularVisibilityMaskEnabled(value: false, refreshAssignment: true);
-        SetStatus(RegularVisibilityMaskUi.Summary);
+        SetRegularVisibilityMaskEnabled(value: true, refreshAssignment: true);
+        SetStatus(
+            string.Format(
+                CultureInfo.InvariantCulture,
+                "Regular visibility mask imported: {0}. Active={1}, inactive={2}, frames={3}.",
+                Path.GetFileName(sourcePath),
+                _regularVisibilityMask.Mask.ActiveRegularCount,
+                _regularVisibilityMask.Mask.InactiveRegularCount,
+                _regularVisibilityMask.Mask.FrameCount));
     }
 
     private void RefreshRegularVisibilityMask(RegularGrid grid)
@@ -79,7 +71,35 @@ public sealed partial class FreeformHelperViewModel
                 _regularVisibilityMask.SourcePath,
                 grid);
 
+        TryApplyRegularVisibilityMaskLoad(result, grid);
+    }
+
+    private bool TryApplyRegularVisibilityMaskLoad(
+        RegularVisibilityMaskResult result,
+        RegularGrid grid,
+        string? importSourcePath = null)
+    {
+        if (importSourcePath is not null)
+        {
+            if (!result.HasLoadedMask)
+            {
+                var failure = result.Status == RegularVisibilityMaskStatus.NotFound
+                    ? RegularVisibilityMaskResult.Failed(importSourcePath, "File not found or unreadable.")
+                    : result;
+                RegularVisibilityMaskUi.Summary = BuildRegularVisibilityMaskSummary(failure, grid, RegularVisibilityMaskUi.IsEnabled);
+                SetStatus(RegularVisibilityMaskUi.Summary);
+                return false;
+            }
+
+            _regularVisibilityMask.SourcePath = importSourcePath;
+            _regularVisibilityMask.EmbeddedMask = null;
+            _regularVisibilityMask.EmbeddedName = null;
+            _projectFile.EmbeddedRegularVisibilityMask = null;
+            _projectFile.EmbeddedRegularVisibilityMaskName = null;
+        }
+
         ApplyRegularVisibilityMaskResult(result, grid);
+        return true;
     }
 
     private static RegularVisibilityMaskResult LoadRegularVisibilityMask(string? sourcePath, RegularGrid grid)
