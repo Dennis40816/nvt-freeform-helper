@@ -32,7 +32,7 @@ public sealed record SimulationScenarioSnapshot(
     public IReadOnlyList<string> Diagnostics => ReviewSnapshot.Diagnostics;
 }
 
-public sealed class SimulationWorkspaceUseCase
+public sealed partial class SimulationWorkspaceUseCase
 {
     private readonly NotchApplySimulationReviewUseCase _reviewUseCase;
 

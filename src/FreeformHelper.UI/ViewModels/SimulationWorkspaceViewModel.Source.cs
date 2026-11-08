@@ -20,12 +20,19 @@ public sealed partial class SimulationWorkspaceViewModel
             return;
         }
 
-        _csvSourcePaths = _csvSourcePaths
+        var sourcePaths = _csvSourcePaths
             .Concat(picked)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
-        _csvDataset = _useCase.ImportCsvSources(_csvSourcePaths, _session.FwDiffGrid);
+        if (!_useCase.TryImportCsvSources(sourcePaths, _session.FwDiffGrid, out var dataset, out var diagnostic))
+        {
+            StatusText = $"CSV import failed: {diagnostic}";
+            return;
+        }
+
+        _csvSourcePaths = sourcePaths;
+        _csvDataset = dataset;
         _csvSnapshotCache.Clear();
         RebuildCsvFiles();
         RefreshFrameOptions();

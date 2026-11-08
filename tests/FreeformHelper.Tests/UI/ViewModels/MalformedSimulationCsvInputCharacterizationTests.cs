@@ -60,7 +60,7 @@ public sealed class MalformedSimulationCsvInputCharacterizationTests
     }
 
     [AvaloniaFact]
-    public async Task ImportCsv_NonNumericCell_CharacterizationThrowsWithoutUpdatingStatusAndKeepsLoadedResultAsync()
+    public async Task ImportCsv_NonNumericCell_ReportsImportFailureWithoutThrowingAndKeepsLoadedResultAsync()
     {
         var vm = await CreateLoadedWorkspaceAsync();
         var previous = CaptureCells(vm);
@@ -68,10 +68,11 @@ public sealed class MalformedSimulationCsvInputCharacterizationTests
         var path = TestFiles.WriteTempCsv("Xch:\"2\",Ych:\"1\"\ntimestamp(0:0:0),DiffData:\n7,abc\n");
         vm.PickOpenDiffCsvPathsAsync = () => Task.FromResult<IReadOnlyList<string>>([path]);
 
-        var error = await Assert.ThrowsAsync<InvalidDataException>(() => vm.ImportCsvCommand.ExecuteAsync(null));
+        await vm.ImportCsvCommand.ExecuteAsync(null);
 
-        Assert.Equal($"[{Path.GetFileName(path)}] Frame 0 at line 2 does not contain numeric rows.", error.Message);
-        Assert.Equal("V2.2 diff-centric apply · frames 1 · total Δ 0", vm.StatusText);
+        Assert.Contains("CSV import failed", vm.StatusText, StringComparison.Ordinal);
+        Assert.Contains(Path.GetFileName(path), vm.StatusText, StringComparison.Ordinal);
+        Assert.Contains("line 2", vm.StatusText, StringComparison.Ordinal);
         Assert.Equal(previous, CaptureCells(vm));
         Assert.Same(previousSnapshot, GetSnapshot(vm));
         Assert.Equal("Frame 1/1", vm.FrameSummaryText);
