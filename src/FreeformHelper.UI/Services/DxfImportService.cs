@@ -19,7 +19,7 @@ public sealed class DxfImportService
     /// <returns>A <see cref="CadPadSet"/> containing the imported CAD pads.</returns>
     public CadPadSet ImportFromPath(string path, DxfImportOptions options)
     {
-        var pads = DxfPadImporter.Import(path, out var catalog, options);
+        var pads = DxfPadImporter.ImportForCadLoad(path, out var catalog, options);
         ImportedCatalog = catalog;
         return pads;
     }
@@ -32,6 +32,6 @@ public sealed class DxfImportService
     /// <returns>A <see cref="CadPadSet"/> containing the imported CAD pads.</returns>
     public static CadPadSet ImportFromStream(Stream stream, DxfImportOptions options)
     {
-        return DxfPadImporter.Import(stream, options);
+        return DxfPadImporter.ImportForCadLoad(stream, options);
     }
 }

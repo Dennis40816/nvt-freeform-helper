@@ -12,8 +12,9 @@ public sealed partial class DxfPadImporter
     /// Reads DXF group code-value pairs from a <see cref="TextReader"/>.
     /// </summary>
     /// <param name="reader">The <see cref="TextReader"/> providing DXF content.</param>
+    /// <param name="requireCompletePairs">Whether an unmatched group code must reject a CAD load.</param>
     /// <returns>An enumerable of (int code, string value) tuples.</returns>
-    internal static IEnumerable<(int code, string value)> ReadPairs(TextReader reader)
+    internal static IEnumerable<(int code, string value)> ReadPairs(TextReader reader, bool requireCompletePairs = false)
     {
         Interlocked.Increment(ref _tokenizationCount);
         while (true)
@@ -24,7 +25,7 @@ public sealed partial class DxfPadImporter
                 yield break; // End of stream
             }
 
-            var valueLine = reader.ReadLine();
+            var valueLine = ReadGroupValue(reader, requireCompletePairs);
             if (valueLine is null)
             {
                 yield break; // Malformed DXF (odd number of lines)
@@ -36,7 +37,14 @@ public sealed partial class DxfPadImporter
                 continue;
             }
 
-            yield return (code, valueLine.Trim());
+            var value = valueLine.Trim();
+            yield return (code, value);
+
+            // Anything after the EOF marker is ignored, as CAD applications do.
+            if (requireCompletePairs && code == 0 && string.Equals(value, "EOF", StringComparison.OrdinalIgnoreCase))
+            {
+                yield break;
+            }
         }
     }
 

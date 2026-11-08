@@ -15,7 +15,7 @@ namespace FreeformHelper.Tests;
 public sealed class MalformedCadAndMaskInputCharacterizationTests
 {
     [AvaloniaFact]
-    public async Task OpenDxf_EmptyHeaderOnlyOrUnsupportedOnly_CharacterizationClearsPreviousPadsAndReportsReadyAsync()
+    public async Task OpenDxf_EmptyHeaderOnlyOrUnsupportedOnly_ReportsNoUsablePadsAndKeepsPreviousStateAsync()
     {
         string[][] documents =
         [
@@ -27,39 +27,65 @@ public sealed class MalformedCadAndMaskInputCharacterizationTests
         {
             using var files = new IoFailureScope();
             var vm = await OpenBaselineAsync(files);
+            vm.ShowCad = false;
+            vm.NotchThresholdQ7 = 96m;
+            var previousCad = FreeformHelperViewModelPrivateAccess.Cad(vm);
+            var previousPads = vm.CadPads.ToArray();
+            var previousGrid = FreeformHelperViewModelPrivateAccess.Grid(vm);
+            var previousCatalog = FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm).Catalog;
+            var previousLayers = vm.LayerToggles.Select(static layer => (layer.Name, layer.IsSelected)).ToArray();
             var path = WriteDxf(lines);
 
-            var statuses = await OpenDxfAsync(vm, path);
+            await OpenDxfAsync(vm, path);
 
-            Assert.Contains("DXF imported (path). CAD pads: 0/0.", statuses);
-            Assert.Equal("Ready.", vm.StatusText);
-            Assert.Empty(vm.CadPads);
-            Assert.Empty(FreeformHelperViewModelPrivateAccess.Cad(vm)!.Pads);
-            Assert.DoesNotContain(vm.LayerToggles, static layer => layer.Name == "PREVIOUS");
+            Assert.StartsWith("DXF import failed:", vm.StatusText, StringComparison.Ordinal);
+            Assert.Contains("no usable pads", vm.StatusText, StringComparison.Ordinal);
+            Assert.Contains(Path.GetFileName(path), vm.StatusText, StringComparison.Ordinal);
+            Assert.Same(previousCad, FreeformHelperViewModelPrivateAccess.Cad(vm));
+            Assert.Equal(previousPads, vm.CadPads);
+            Assert.Same(previousGrid, FreeformHelperViewModelPrivateAccess.Grid(vm));
+            Assert.Same(previousCatalog, FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm).Catalog);
+            Assert.Equal(previousLayers, vm.LayerToggles.Select(static layer => (layer.Name, layer.IsSelected)));
+            Assert.False(vm.ShowCad);
+            Assert.Equal(96m, vm.NotchThresholdQ7);
             Assert.True(vm.HasUnsavedChanges);
         }
     }
 
     [AvaloniaFact]
-    public async Task OpenDxf_TruncatedAfterCompletePad_CharacterizationReplacesPreviousStateWithPartialImportAsync()
+    public async Task OpenDxf_TruncatedAfterCompletePad_ReportsErrorAndKeepsPreviousStateAsync()
     {
-        using var files = new IoFailureScope();
-        var vm = await OpenBaselineAsync(files);
-        var path = WriteDxf(
+        string[][] tails =
         [
-            .. SectionHeader("ENTITIES"), .. ClosedSquare("PARTIAL", 40, 50, 2),
-            "0", "LWPOLYLINE", "8", "PARTIAL", "70", "1", "10", "0", "20", "0", "10", "5",
-        ]);
+            ["0", "LWPOLYLINE", "8", "PARTIAL", "70", "1", "10", "0", "20", "0", "10", "5"],
+            ["0", "LWPOLYLINE", "8", "PARTIAL", "70", "1", "10", "0", "20", "0", "10", "5", "20"],
+            ["0", "POLYLINE", "8", "PARTIAL", "70", "1", "0", "VERTEX", "10", "0", "20", "0", "0", "VERTEX", "10", "5", "20", "0", "0", "VERTEX", "10", "5", "20", "5"],
+        ];
+        foreach (var tail in tails)
+        {
+            using var files = new IoFailureScope();
+            var vm = await OpenBaselineAsync(files);
+            vm.ShowCad = false;
+            vm.NotchThresholdQ7 = 96m;
+            var previousCad = FreeformHelperViewModelPrivateAccess.Cad(vm);
+            var previousPads = vm.CadPads.ToArray();
+            var previousGrid = FreeformHelperViewModelPrivateAccess.Grid(vm);
+            var previousCatalog = FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm).Catalog;
+            var previousLayers = vm.LayerToggles.Select(static layer => (layer.Name, layer.IsSelected)).ToArray();
+            var path = WriteDxf([.. SectionHeader("ENTITIES"), .. ClosedSquare("PARTIAL", 40, 50, 2), .. tail]);
 
-        var statuses = await OpenDxfAsync(vm, path);
+            await OpenDxfAsync(vm, path);
 
-        Assert.Contains("DXF imported (path). CAD pads: 1/1.", statuses);
-        Assert.Equal("Ready.", vm.StatusText);
-        var pad = Assert.Single(vm.CadPads);
-        Assert.Equal("PARTIAL", pad.Layer);
-        Assert.Equal(TestGeometryFactory.CreateRect(40, 50, 42, 52).Vertices, pad.Polygon.Vertices);
-        Assert.Single(FreeformHelperViewModelPrivateAccess.Cad(vm)!.Pads);
-        Assert.DoesNotContain(vm.LayerToggles, static layer => layer.Name == "PREVIOUS");
+            Assert.StartsWith("DXF import failed:", vm.StatusText, StringComparison.Ordinal);
+            Assert.Contains("incomplete", vm.StatusText, StringComparison.Ordinal);
+            Assert.Same(previousCad, FreeformHelperViewModelPrivateAccess.Cad(vm));
+            Assert.Equal(previousPads, vm.CadPads);
+            Assert.Same(previousGrid, FreeformHelperViewModelPrivateAccess.Grid(vm));
+            Assert.Same(previousCatalog, FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm).Catalog);
+            Assert.Equal(previousLayers, vm.LayerToggles.Select(static layer => (layer.Name, layer.IsSelected)));
+            Assert.False(vm.ShowCad);
+            Assert.Equal(96m, vm.NotchThresholdQ7);
+        }
     }
 
     [AvaloniaFact]

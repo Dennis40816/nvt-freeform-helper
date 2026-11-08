@@ -55,9 +55,17 @@ public sealed class OpenDxfSinglePassTests
             await vm.OpenDxfCommand.ExecuteAsync(null);
             await vm.WaitForGridRebuildIdleAsync();
 
-            DxfSinglePassImportTests.AssertPadsEqual(expectedPads, FreeformHelperViewModelPrivateAccess.Cad(vm)!);
-            var state = FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm);
-            DxfSinglePassImportTests.AssertCatalogsEqual(expectedCatalog, state.Catalog);
+            if (expectedPads.Pads.Count == 0)
+            {
+                // A file without usable pads is rejected, so no CAD replaces the empty workspace.
+                Assert.Null(FreeformHelperViewModelPrivateAccess.Cad(vm));
+            }
+            else
+            {
+                DxfSinglePassImportTests.AssertPadsEqual(expectedPads, FreeformHelperViewModelPrivateAccess.Cad(vm)!);
+                var state = FreeformHelperViewModelPrivateAccess.LayerCatalogState(vm);
+                DxfSinglePassImportTests.AssertCatalogsEqual(expectedCatalog, state.Catalog);
+            }
             Assert.False(vm.IsCadLoadCanvasOverlayVisible);
             Assert.Equal(1, GetTokenizationCount() - beforeOpen);
         }
