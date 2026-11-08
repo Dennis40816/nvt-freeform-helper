@@ -15,8 +15,9 @@ namespace FreeformHelper.Tests.TestInfrastructure;
 /// <summary>Owns the real dialog, model, clock and synthetic CAD sample for headless view tests.</summary>
 internal sealed class LayerImageExportViewTestSession : IDisposable
 {
-    // A failure guard for a preview that never settles, not a number of rounds to wait.
+    // Failure guards for a preview that never settles. They are limits, not times or rounds to wait.
     private const int MaxPreviewRounds = 5;
+    private const int PreviewTimeoutSeconds = 60;
 
     public LayerImageExportViewTestSession(LayerImageExportContext? context = null)
     {
@@ -46,7 +47,7 @@ internal sealed class LayerImageExportViewTestSession : IDisposable
         for (var round = 0; round < MaxPreviewRounds; round++)
         {
             Clock.Advance(TimeSpan.FromMilliseconds(150));
-            await Model.WaitForPreviewAsync().WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+            await WaitForPreviewOrDescribeAsync(round + 1);
             await HeadlessUiPump.FlushQueueAsync();
             if (Model.WaitForPreviewAsync().IsCompleted)
             {
@@ -55,8 +56,25 @@ internal sealed class LayerImageExportViewTestSession : IDisposable
         }
 
         throw new InvalidOperationException(
-            $"The export preview kept restarting after {MaxPreviewRounds} rounds (updating={Model.IsPreviewUpdating}, error='{Model.PreviewErrorText}').");
+            $"The export preview kept restarting after {MaxPreviewRounds} rounds ({DescribePreviewState()}).");
     }
+
+    private async Task WaitForPreviewOrDescribeAsync(int round)
+    {
+        try
+        {
+            await Model.WaitForPreviewAsync().WaitAsync(TimeSpan.FromSeconds(PreviewTimeoutSeconds), TestContext.Current.CancellationToken);
+        }
+        catch (TimeoutException exception)
+        {
+            throw new TimeoutException(
+                $"The export preview did not finish within {PreviewTimeoutSeconds} s in round {round} of {MaxPreviewRounds} ({DescribePreviewState()}).",
+                exception);
+        }
+    }
+
+    private string DescribePreviewState() =>
+        $"updating={Model.IsPreviewUpdating}, error='{Model.PreviewErrorText}'";
 
     public static LayerImageExportContext CreateContext()
     {
