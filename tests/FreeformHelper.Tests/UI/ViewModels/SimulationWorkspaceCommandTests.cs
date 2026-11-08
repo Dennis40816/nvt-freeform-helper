@@ -55,6 +55,61 @@ public sealed class SimulationWorkspaceCommandTests
     }
 
     [Fact]
+    public async Task ClearCsvCommand_WithoutPlayback_ClearsFilesAndAllowsFreshImportAsync()
+    {
+        var viewModel = CreateViewModel();
+        viewModel.GlobalValue = 40d;
+        var firstPath = TestFiles.WriteTempCsv(
+            """
+            LogVer:"1.0",Xch:"2",Ych:"1",
+            timestamp(mm:ss:nnn):"09:14:165",Frame index:"0",Break point index:"0",DiffData:
+            100,50
+            timestamp(mm:ss:nnn):"09:14:265",Frame index:"1",Break point index:"0",DiffData:
+            200,80
+            """);
+        var secondPath = TestFiles.WriteTempCsv(
+            """
+            LogVer:"1.0",Xch:"2",Ych:"1",
+            timestamp(mm:ss:nnn):"09:14:365",Frame index:"0",Break point index:"0",DiffData:
+            300,90
+            """);
+        try
+        {
+            Assert.False(viewModel.ClearCsvCommand.CanExecute(null));
+            await ImportCsvAsync(viewModel, firstPath);
+            Assert.Single(viewModel.CsvFiles);
+            Assert.Equal(2, viewModel.FrameOptions.Count);
+            Assert.True(viewModel.HasCsvFiles);
+            Assert.False(viewModel.IsPlaybackRunning);
+
+            Assert.True(viewModel.ClearCsvCommand.CanExecute(null));
+            viewModel.ClearCsvCommand.Execute(null);
+
+            Assert.Empty(viewModel.CsvFiles);
+            Assert.Empty(viewModel.FrameOptions);
+            Assert.False(viewModel.HasCsvFiles);
+            Assert.False(viewModel.HasCsvData);
+            Assert.False(viewModel.CanStepFrames);
+            Assert.False(viewModel.ClearCsvCommand.CanExecute(null));
+            viewModel.SelectRegularPad(0);
+            Assert.Equal("40", viewModel.SelectedBeforeText);
+
+            await ImportCsvAsync(viewModel, secondPath);
+
+            Assert.Single(viewModel.CsvFiles);
+            Assert.Single(viewModel.FrameOptions);
+            Assert.True(viewModel.HasCsvFiles);
+            Assert.True(viewModel.ClearCsvCommand.CanExecute(null));
+            Assert.Equal("300", viewModel.SelectedBeforeText);
+        }
+        finally
+        {
+            File.Delete(firstPath);
+            File.Delete(secondPath);
+        }
+    }
+
+    [Fact]
     public void ClearSelectedOverrideCommand_AfterBaselineChanges_RestoresCurrentComputedValues()
     {
         var viewModel = CreateViewModel();
@@ -110,6 +165,34 @@ public sealed class SimulationWorkspaceCommandTests
     }
 
     [Fact]
+    public void ClearAllManualOverridesCommand_WithoutSelection_RestoresBothComputedResults()
+    {
+        var viewModel = CreateViewModel();
+        viewModel.GlobalValue = 100d;
+        Assert.False(viewModel.ClearAllManualOverridesCommand.CanExecute(null));
+        ApplyOverride(viewModel, regularPadId: 0, value: 240d);
+        ApplyOverride(viewModel, regularPadId: 1, value: 320d);
+        viewModel.SelectRegularPad(-1);
+        Assert.False(viewModel.HasSelectedRegular);
+        Assert.True(viewModel.HasManualOverrides);
+
+        Assert.True(viewModel.ClearAllManualOverridesCommand.CanExecute(null));
+        viewModel.ClearAllManualOverridesCommand.Execute(null);
+
+        Assert.False(viewModel.HasManualOverrides);
+        Assert.False(viewModel.ClearAllManualOverridesCommand.CanExecute(null));
+        Assert.False(viewModel.HasSelectedRegular);
+        viewModel.SelectRegularPad(0);
+        Assert.False(viewModel.HasSelectedOverride);
+        Assert.Equal("100", viewModel.SelectedBeforeText);
+        Assert.Equal("50", viewModel.SelectedAfterText);
+        viewModel.SelectRegularPad(1);
+        Assert.False(viewModel.HasSelectedOverride);
+        Assert.Equal("100", viewModel.SelectedBeforeText);
+        Assert.Equal("100", viewModel.SelectedAfterText);
+    }
+
+    [Fact]
     public void SelectCopperPathReplayRowCommand_IgnoresNullBeforeAndAfterSelection()
     {
         var viewModel = CreateViewModel();
@@ -152,6 +235,12 @@ public sealed class SimulationWorkspaceCommandTests
         Assert.Equal(0, viewModel.SelectedRegularPadId);
         Assert.Equal("400", viewModel.SelectedBeforeText);
         Assert.Equal(selectedStatus, viewModel.StatusText);
+    }
+
+    private static Task ImportCsvAsync(SimulationWorkspaceViewModel viewModel, string path)
+    {
+        viewModel.PickOpenDiffCsvPathsAsync = () => Task.FromResult<IReadOnlyList<string>>(new[] { path });
+        return viewModel.ImportCsvAsync();
     }
 
     private static void ApplyOverride(SimulationWorkspaceViewModel viewModel, int regularPadId, double value)
