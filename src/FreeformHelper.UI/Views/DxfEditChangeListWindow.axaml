@@ -1,187 +1,94 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
 <Window x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
+        xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
         x:Class="FreeformHelper.UI.Views.DxfEditChangeListWindow"
-        Width="{StaticResource DxfEditChangeListWidth}"
-        Height="{StaticResource DxfEditChangeListHeight}"
-        MinWidth="{StaticResource DxfEditChangeListMinWidth}"
-        MinHeight="{StaticResource DxfEditChangeListMinHeight}"
+        Width="{DynamicResource DxfEditChangeListWidth}"
+        Height="{DynamicResource DxfEditChangeListHeight}"
+        MinWidth="{DynamicResource DxfEditChangeListMinWidth}"
+        MinHeight="{DynamicResource DxfEditChangeListMinHeight}"
         WindowStartupLocation="CenterOwner"
         IsEnabled="{Binding Editing.IsProjectEditingEnabled}"
         ShowInTaskbar="False"
         Background="{DynamicResource BrushBgSurface}"
         Foreground="{DynamicResource BrushTextPrimary}"
         Title="DXF Edit Details">
-  <controls:ReviewWorkspaceShell Title="{Binding TitleText}"
-                                 Subtitle="{Binding SubtitleText}">
-    <controls:ReviewWorkspaceShell.HeaderRight>
-      <Button Classes="actionIconButton actionGhost dxfEditHeaderAction"
-              Command="{Binding RefreshCommand}"
-              HorizontalAlignment="Right"
-              VerticalAlignment="Top"
-              ToolTip.Tip="Refresh rows">
-        <controls:FontIcon Classes="symbols iconSm"
-                           Glyph="{x:Static icons:IconGlyphs.Undo}"/>
-      </Button>
-    </controls:ReviewWorkspaceShell.HeaderRight>
-
-    <controls:ReviewWorkspaceShell.SummaryContent>
-      <Grid ColumnDefinitions="*,Auto"
-            ColumnSpacing="{StaticResource Space12}">
-        <WrapPanel Orientation="Horizontal">
-          <Button Classes="actionChip chipAction direct"
-                  Classes.active="{Binding IsHiddenKindSelected}"
-                  Margin="{StaticResource InsetRight6Bottom6}"
-                  Content="{Binding HiddenCount, StringFormat='Hidden {0}'}"
-                  Command="{Binding SetHiddenKindCommand}"/>
-          <Button Classes="actionChip chipAction linked"
-                  Classes.active="{Binding IsDuplicateKindSelected}"
-                  Margin="{StaticResource InsetRight6Bottom6}"
-                  Content="{Binding DuplicateCount, StringFormat='Duplicate {0}'}"
-                  Command="{Binding SetDuplicateKindCommand}"/>
-          <Button Classes="actionChip chipAction incoming"
-                  Classes.active="{Binding IsCombinedKindSelected}"
-                  Margin="{StaticResource InsetRight6Bottom6}"
-                  Content="{Binding CombinedCount, StringFormat='Combined {0}'}"
-                  Command="{Binding SetCombinedKindCommand}"/>
-          <Button Classes="actionChip chipAction legacy"
-                  Classes.active="{Binding IsMovedKindSelected}"
-                  Margin="{StaticResource InsetRight6Bottom6}"
-                  Content="{Binding MovedCount, StringFormat='Moved {0}'}"
-                  Command="{Binding SetMovedKindCommand}"/>
-          <Button Classes="actionChip chipAction direct"
-                  Classes.active="{Binding IsRotatedKindSelected}"
-                  Margin="{StaticResource InsetRight6Bottom6}"
-                  Content="{Binding RotatedCount, StringFormat='Rotated {0}'}"
-                  Command="{Binding SetRotatedKindCommand}"/>
-        </WrapPanel>
-
-        <SelectableTextBlock Grid.Column="1"
-                             VerticalAlignment="Center"
-                             Classes="workspaceFilterResultText"
-                             Text="{Binding VisibleRowsSummaryText}"/>
-      </Grid>
-    </controls:ReviewWorkspaceShell.SummaryContent>
-
-    <controls:ReviewWorkspaceShell.ToolbarContent>
-      <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto"
-            ColumnSpacing="{StaticResource Space8}">
-        <SelectableTextBlock VerticalAlignment="Center"
-                             Classes="workspaceFilterResultText"
-                             Text="{Binding SelectedVisibleRowsSummaryText}"/>
-        <SelectableTextBlock Grid.Column="1"
-                             VerticalAlignment="Center"
-                             Foreground="{DynamicResource BrushTextMuted}"
-                             Text="Bulk action follows current tab scope."
-                             TextWrapping="WrapWithOverflow"/>
-        <Button Grid.Column="2"
-                Classes="workspaceSubtleAction iconTextButton"
-                Command="{Binding ApplySelectedEntriesCommand}"
-                IsEnabled="{Binding CanApplySelectedEntries}"
-                IsVisible="{Binding IsSingleActionBulkMode}">
-          <Grid Classes="iconTextButtonContent"
-                ColumnDefinitions="Auto,*,Auto">
-            <controls:FontIcon Grid.Column="0"
-                               Classes="symbols iconTextButtonLeadingIcon"
-                               Glyph="{Binding BulkActionGlyph}"/>
-            <SelectableTextBlock Grid.Column="1"
-                                 Classes="iconTextButtonLabel"
-                                 Text="{Binding BulkActionText}"/>
-            <Border Grid.Column="2"
-                    Classes="iconTextButtonTrailingSpacer"/>
-          </Grid>
-        </Button>
-        <Button Grid.Column="3"
-                Classes="workspaceTextAction iconTextButton"
-                Command="{Binding RestoreSelectedDuplicateEntriesCommand}"
-                IsEnabled="{Binding CanRestoreSelectedDuplicateEntries}"
-                IsVisible="{Binding IsDuplicateBulkMode}">
-          <Grid Classes="iconTextButtonContent"
-                ColumnDefinitions="Auto,*,Auto">
-            <controls:FontIcon Grid.Column="0"
-                               Classes="symbols iconTextButtonLeadingIcon"
-                               Glyph="{Binding RestoreSelectedDuplicateGlyph}"/>
-            <SelectableTextBlock Grid.Column="1"
-                                 Classes="iconTextButtonLabel"
-                                 Text="Restore selected"/>
-            <Border Grid.Column="2"
-                    Classes="iconTextButtonTrailingSpacer"/>
-          </Grid>
-        </Button>
-        <Button Grid.Column="4"
-                Classes="workspaceTextAction iconTextButton"
-                Command="{Binding RehideSelectedDuplicateEntriesCommand}"
-                IsEnabled="{Binding CanRehideSelectedDuplicateEntries}"
-                IsVisible="{Binding IsDuplicateBulkMode}">
-          <Grid Classes="iconTextButtonContent"
-                ColumnDefinitions="Auto,*,Auto">
-            <controls:FontIcon Grid.Column="0"
-                               Classes="symbols iconTextButtonLeadingIcon"
-                               Glyph="{Binding RehideSelectedDuplicateGlyph}"/>
-            <SelectableTextBlock Grid.Column="1"
-                                 Classes="iconTextButtonLabel"
-                                 Text="Hide selected"/>
-            <Border Grid.Column="2"
-                    Classes="iconTextButtonTrailingSpacer"/>
-          </Grid>
-        </Button>
-      </Grid>
-    </controls:ReviewWorkspaceShell.ToolbarContent>
-
-    <controls:ReviewWorkspaceShell.LeftContent>
-      <Grid RowDefinitions="Auto,*"
-            RowSpacing="{StaticResource Space6}">
-        <Border Grid.Row="0"
-                Classes="workspaceTableHeader">
-          <Grid ColumnSpacing="{StaticResource Space8}">
+  <Window.Styles>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/DxfEditDetails.axaml"/>
+  </Window.Styles>
+  <panels:WorkspaceShell Classes="dxfEditDetails"
+                         x:DataType="vm:DxfEditChangeListViewModel" x:CompileBindings="True"
+                         Subtitle="{Binding SubtitleText}"
+                         LeftColumnWidth="{DynamicResource NotchExportMainLeftColumnWidth}"
+                         RightColumnWidth="{DynamicResource DxfEditDetailsInspectorWidth}">
+    <panels:WorkspaceShell.HeaderRight>
+      <Button Classes="actionNeutral" Content="Refresh"
+              Command="{Binding RefreshCommand}" ToolTip.Tip="Refresh rows"/>
+    </panels:WorkspaceShell.HeaderRight>
+    <panels:WorkspaceShell.SummaryContent>
+      <WrapPanel x:Name="CategorySwitches" Orientation="Horizontal">
+        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsHiddenKindSelected}"
+                      IsChecked="{Binding IsHiddenKindSelected, Mode=OneWay}"
+                      Content="{Binding HiddenCategoryText}" Command="{Binding SetHiddenKindCommand}"/>
+        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsDuplicateKindSelected}"
+                      IsChecked="{Binding IsDuplicateKindSelected, Mode=OneWay}"
+                      Content="{Binding DuplicateCategoryText}" Command="{Binding SetDuplicateKindCommand}"/>
+        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsCombinedKindSelected}"
+                      IsChecked="{Binding IsCombinedKindSelected, Mode=OneWay}"
+                      Content="{Binding CombinedCategoryText}" Command="{Binding SetCombinedKindCommand}"/>
+        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsMovedKindSelected}"
+                      IsChecked="{Binding IsMovedKindSelected, Mode=OneWay}"
+                      Content="{Binding MovedCategoryText}" Command="{Binding SetMovedKindCommand}"/>
+        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsRotatedKindSelected}"
+                      IsChecked="{Binding IsRotatedKindSelected, Mode=OneWay}"
+                      Content="{Binding RotatedCategoryText}" Command="{Binding SetRotatedKindCommand}"/>
+      </WrapPanel>
+    </panels:WorkspaceShell.SummaryContent>
+    <panels:WorkspaceShell.LeftContent>
+      <Grid RowDefinitions="Auto,Auto,*" RowSpacing="{DynamicResource Space8}">
+        <Grid x:Name="BulkToolbar" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+          <TextBlock Text="{Binding SelectedVisibleRowsSummaryText}" VerticalAlignment="Center"
+                     Classes="workspaceFilterResultText" TextWrapping="Wrap"/>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space6}">
+            <Button Classes="actionNeutral" Content="{Binding BulkActionCountText}"
+                    Command="{Binding ApplySelectedEntriesCommand}"
+                    IsEnabled="{Binding CanApplySelectedEntries}" IsVisible="{Binding IsSingleActionBulkMode}"
+                    ToolTip.Tip="{Binding BulkActionToolTip}"/>
+            <Button Classes="actionNeutral" Content="{Binding RestoreSelectedDuplicateCountText}"
+                    Command="{Binding RestoreSelectedDuplicateEntriesCommand}"
+                    IsEnabled="{Binding CanRestoreSelectedDuplicateEntries}" IsVisible="{Binding IsDuplicateBulkMode}"
+                    ToolTip.Tip="{Binding RestoreSelectedDuplicateToolTip}"/>
+            <Button Classes="actionNeutral" Content="{Binding RehideSelectedDuplicateCountText}"
+                    Command="{Binding RehideSelectedDuplicateEntriesCommand}"
+                    IsEnabled="{Binding CanRehideSelectedDuplicateEntries}" IsVisible="{Binding IsDuplicateBulkMode}"
+                    ToolTip.Tip="{Binding RehideSelectedDuplicateToolTip}"/>
+          </StackPanel>
+        </Grid>
+        <Border Grid.Row="1" x:Name="RowsHeader" Classes="workspaceTableHeader">
+          <Grid ColumnSpacing="{DynamicResource Space8}">
             <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="{StaticResource NotchExportTableColCheckWidth}"/>
-              <ColumnDefinition Width="2*"/>
-              <ColumnDefinition Width="1.2*"/>
-              <ColumnDefinition Width="2.9*"/>
-              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="{DynamicResource NotchExportTableColCheckWidth}"/>
+              <ColumnDefinition Width="{DynamicResource DxfEditDetailsPadColumnWidth}"/>
+              <ColumnDefinition Width="{DynamicResource DxfEditDetailsChangeColumnWidth}"/>
             </Grid.ColumnDefinitions>
-            <CheckBox Grid.Column="0"
-                      IsChecked="{Binding AreAllVisibleRowsSelected, Mode=TwoWay}"
-                      IsEnabled="{Binding HasRows}"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
-                      Opacity="{StaticResource OpacityHigh}"/>
-            <SelectableTextBlock Grid.Column="1"
-                                 Classes="workspaceTableHeaderText"
-                                 Text="CAD"
-                                 VerticalAlignment="Center"/>
-            <SelectableTextBlock Grid.Column="2"
-                                 Classes="workspaceTableHeaderText"
-                                 Text="Layer"
-                                 VerticalAlignment="Center"/>
-            <SelectableTextBlock Grid.Column="3"
-                                 Classes="workspaceTableHeaderText"
-                                 Text="Detail"
-                                 VerticalAlignment="Center"/>
-            <SelectableTextBlock Grid.Column="4"
-                                 Classes="workspaceTableHeaderText"
-                                 Text="Action"
-                                 VerticalAlignment="Center"
-                                 HorizontalAlignment="Center"/>
+            <CheckBox IsChecked="{Binding AreAllVisibleRowsSelected, Mode=TwoWay}"
+                      IsEnabled="{Binding HasRows}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      ToolTip.Tip="Select all rows in this category (Ctrl+A)"
+                      AutomationProperties.Name="Select all rows in this category"/>
+            <TextBlock Grid.Column="1" Classes="workspaceTableHeaderText" Text="Pad"/>
+            <TextBlock Grid.Column="2" Classes="workspaceTableHeaderText" Text="Change"/>
           </Grid>
         </Border>
-
-        <Grid Grid.Row="1">
-          <SelectableTextBlock Text="No DXF edit rows in this scope."
-                               IsVisible="{Binding HasNoRows}"
-                               Foreground="{DynamicResource BrushTextMuted}"
-                               Margin="{StaticResource Inset8}"/>
-          <ListBox ItemsSource="{Binding Rows}"
-                   x:Name="RowsListBox"
-                   Classes="scrollV2 workspaceDataList"
-                   SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
-                   IsVisible="{Binding HasRows}"
-                   Background="Transparent"
-                   BorderThickness="0"
-                   ScrollViewer.AllowAutoHide="False"
-                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+        <Grid Grid.Row="2">
+          <TextBlock x:Name="EmptyRowsHint" Text="No DXF edit rows in this scope."
+                     IsVisible="{Binding HasNoRows}" Foreground="{DynamicResource BrushTextMuted}"
+                     Margin="{DynamicResource Inset8}" TextWrapping="Wrap"/>
+          <ListBox x:Name="RowsListBox" ItemsSource="{Binding Rows}" Classes="scrollV2 workspaceDataList"
+                   SelectedItem="{Binding SelectedEntry, Mode=TwoWay}" IsVisible="{Binding HasRows}"
+                   Background="{DynamicResource BrushTransparent}" BorderThickness="{DynamicResource BorderNone}"
+                   ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto"
                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemsPanel>
               <ItemsPanelTemplate>
@@ -189,45 +96,25 @@
               </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListBox.ItemTemplate>
-              <DataTemplate>
-                <Button Classes="workspaceDataRow"
-                        Classes.workspaceDataRowActive="{Binding IsInspectorSelected}"
-                        Command="{Binding DataContext.SelectEntryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+              <DataTemplate x:DataType="vm:DxfEditChangeListEntry">
+                <Button Classes="workspaceDataRow" Classes.workspaceDataRowActive="{Binding IsInspectorSelected}"
+                        Command="{Binding $parent[Window].((vm:DxfEditChangeListViewModel)DataContext).SelectEntryCommand}"
                         CommandParameter="{Binding}">
-                  <Grid ColumnSpacing="{StaticResource Space8}">
+                  <Grid ColumnSpacing="{DynamicResource Space8}">
                     <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="{StaticResource NotchExportTableColCheckWidth}"/>
-                      <ColumnDefinition Width="2*"/>
-                      <ColumnDefinition Width="1.2*"/>
-                      <ColumnDefinition Width="2.9*"/>
-                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="{DynamicResource NotchExportTableColCheckWidth}"/>
+                      <ColumnDefinition Width="{DynamicResource DxfEditDetailsPadColumnWidth}"/>
+                      <ColumnDefinition Width="{DynamicResource DxfEditDetailsChangeColumnWidth}"/>
                     </Grid.ColumnDefinitions>
-                    <CheckBox Grid.Column="0"
-                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Opacity="{StaticResource OpacityHigh}"/>
-                    <StackPanel Grid.Column="1"
-                                Spacing="{StaticResource Space2}">
-                      <SelectableTextBlock Classes="workspaceDataCellText strong"
-                                           Text="{Binding RowTitleText}"/>
-                      <SelectableTextBlock Classes="workspaceDataCellText"
-                                           Text="{Binding KindDisplayText}"/>
+                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                              AutomationProperties.Name="{Binding RowTitleText}"/>
+                    <StackPanel Grid.Column="1" Spacing="{DynamicResource Space2}">
+                      <TextBlock Classes="workspaceDataCellText strong" Text="{Binding RowTitleText}"/>
+                      <TextBlock Classes="workspaceDataCellText" Text="{Binding CurrentLayerText}"/>
                     </StackPanel>
-                    <SelectableTextBlock Grid.Column="2"
-                                         Classes="workspaceDataCellText"
-                                         Text="{Binding CurrentLayerText}"
-                                         VerticalAlignment="Center"/>
-                    <SelectableTextBlock Grid.Column="3"
-                                         Classes="workspaceDataCellText"
-                                         Text="{Binding ListDetailText}"
-                                         VerticalAlignment="Center"
-                                         TextWrapping="NoWrap"/>
-                    <SelectableTextBlock Grid.Column="4"
-                                         Classes="workspaceDataCellText"
-                                         Text="{Binding ActionLabel}"
-                                         VerticalAlignment="Center"
-                                         HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Classes="workspaceDataCellText"
+                               Text="{Binding ListDetailText}" ToolTip.Tip="{Binding DetailText}"/>
                   </Grid>
                 </Button>
               </DataTemplate>
@@ -235,95 +122,42 @@
           </ListBox>
         </Grid>
       </Grid>
-    </controls:ReviewWorkspaceShell.LeftContent>
-
-    <controls:ReviewWorkspaceShell.RightContent>
-      <Border Classes="workspaceInspectorHost">
-        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto"
-              RowSpacing="{StaticResource Space10}">
-          <SelectableTextBlock Grid.Row="0"
-                               Text="Inspector"
-                               FontWeight="SemiBold"/>
-          <Border Grid.Row="1"
-                  Classes="chipStatus">
-            <SelectableTextBlock Classes="chipStatusText"
-                                 Text="{Binding SelectedRowHeaderText}"/>
+    </panels:WorkspaceShell.LeftContent>
+    <panels:WorkspaceShell.RightContent>
+      <Border x:Name="Inspector" Classes="workspaceInspectorHost">
+        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="{DynamicResource Space10}">
+          <TextBlock Text="Inspector" FontWeight="SemiBold"/>
+          <TextBlock Grid.Row="1" x:Name="InspectorSelectionHint" Text="{Binding SelectedRowHeaderText}" TextWrapping="Wrap"/>
+          <Border Grid.Row="2" Classes="chipStatus" IsVisible="{Binding HasSelectedEntry}">
+            <TextBlock Classes="chipStatusText" Text="{Binding SelectedRowStatusText}" TextWrapping="Wrap"/>
           </Border>
-          <SelectableTextBlock Grid.Row="2"
-                               Text="{Binding SelectedRowStatusText}"
-                               Foreground="{DynamicResource BrushTextMuted}"
-                               TextWrapping="Wrap"/>
-          <Border Grid.Row="3"
-                  Classes="workspaceInspectorSection">
-            <StackPanel Spacing="{StaticResource Space8}">
-              <StackPanel Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
-                                     Text="Detail"/>
-                <SelectableTextBlock Classes="workspaceInspectorValue"
-                                     Text="{Binding SelectedRowDetailText}"/>
-              </StackPanel>
-              <StackPanel Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Classes="workspaceInspectorSectionTitle"
-                                     Text="Quick action"/>
-                <SelectableTextBlock Classes="workspaceInspectorValue"
-                                     Text="{Binding SelectedRowActionText}"
-                                     Foreground="{DynamicResource BrushTextMuted}"/>
-              </StackPanel>
-            </StackPanel>
+          <Border Grid.Row="3" Classes="workspaceInspectorSection" IsVisible="{Binding HasSelectedEntry}">
+            <Grid RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space4}">
+              <TextBlock Classes="workspaceInspectorSectionTitle" Text="Detail"/>
+              <ScrollViewer Grid.Row="1" x:Name="InspectorDetailScroll"
+                            VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding SelectedRowDetailText}" TextWrapping="Wrap"/>
+              </ScrollViewer>
+            </Grid>
           </Border>
-          <Grid Grid.Row="4"
-                ColumnDefinitions="Auto,Auto,*"
-                ColumnSpacing="{StaticResource Space8}">
-            <Button Grid.Column="0"
-                    Classes="workspaceSubtleAction iconTextButton"
-                    Command="{Binding FocusSelectedEntryCommand}"
-                    IsEnabled="{Binding CanFocusSelectedEntry}">
-              <Grid Classes="iconTextButtonContent"
-                    ColumnDefinitions="Auto,*,Auto">
-                <controls:FontIcon Grid.Column="0"
-                                   Classes="symbols iconTextButtonLeadingIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.Search}"/>
-                <SelectableTextBlock Grid.Column="1"
-                                     Classes="iconTextButtonLabel"
-                                     Text="Focus"/>
-                <Border Grid.Column="2"
-                        Classes="iconTextButtonTrailingSpacer"/>
-              </Grid>
+          <StackPanel Grid.Row="4" x:Name="InspectorActions" Orientation="Horizontal"
+                      HorizontalAlignment="Right" Spacing="{DynamicResource Space6}">
+            <Button Classes="actionGhost actionIconButton" IsVisible="{Binding HasSelectedEntry}"
+                    ToolTip.Tip="{Binding SelectedRowActionText}" AutomationProperties.Name="Quick action">
+              <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.Info}"/>
             </Button>
-            <Button Grid.Column="1"
-                    Classes="actionTextButton actionPrimary"
-                    Command="{Binding ApplySelectedEntryCommand}"
-                    IsEnabled="{Binding CanApplySelectedEntry}">
-              <Grid Classes="iconTextButtonContent"
-                    ColumnDefinitions="Auto,*,Auto">
-                <controls:FontIcon Grid.Column="0"
-                                   Classes="symbols iconTextButtonLeadingIcon"
-                                   Glyph="{Binding SelectedEntry.ActionGlyph}"/>
-                <SelectableTextBlock Grid.Column="1"
-                                     Classes="iconTextButtonLabel"
-                                     Text="{Binding SelectedRowActionLabelText}"/>
-                <Border Grid.Column="2"
-                        Classes="iconTextButtonTrailingSpacer"/>
-              </Grid>
-            </Button>
-          </Grid>
+            <Button Classes="actionGhost" Content="Focus"
+                    Command="{Binding FocusSelectedEntryCommand}" IsEnabled="{Binding CanFocusSelectedEntry}"/>
+            <Button Classes="actionPrimary" Content="{Binding SelectedRowActionLabelText}"
+                    Command="{Binding ApplySelectedEntryCommand}" IsEnabled="{Binding CanApplySelectedEntry}"/>
+          </StackPanel>
         </Grid>
       </Border>
-    </controls:ReviewWorkspaceShell.RightContent>
-
-    <controls:ReviewWorkspaceShell.FooterContent>
-      <Grid ColumnDefinitions="*,Auto"
-            ColumnSpacing="{StaticResource Space12}">
-        <SelectableTextBlock Grid.Column="0"
-                             VerticalAlignment="Center"
-                             Foreground="{DynamicResource BrushTextMuted}"
-                             Text="{Binding SummaryText}"/>
-        <Button Grid.Column="1"
-                Classes="actionNeutral actionTextButton"
-                Command="{Binding CloseCommand}">
-          <SelectableTextBlock Text="Close"/>
-        </Button>
-      </Grid>
-    </controls:ReviewWorkspaceShell.FooterContent>
-  </controls:ReviewWorkspaceShell>
+    </panels:WorkspaceShell.RightContent>
+    <panels:WorkspaceShell.FooterContent>
+      <StackPanel x:Name="FooterActions" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button Classes="actionNeutral" Content="Close" Command="{Binding CloseCommand}"/>
+      </StackPanel>
+    </panels:WorkspaceShell.FooterContent>
+  </panels:WorkspaceShell>
 </Window>

@@ -143,10 +143,10 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
     public bool IsDuplicateBulkMode => SelectedKind == DxfEditChangeKind.Duplicate;
     public bool IsSingleActionBulkMode => !IsDuplicateBulkMode;
     public bool CanApplySelectedEntries => SelectedVisibleCount > 0 && IsSingleActionBulkMode;
-    public bool CanRestoreSelectedDuplicateEntries => GetSelectedVisibleRows().Any(static row => row.Kind == DxfEditChangeKind.Duplicate && row.ActionLabel == "Restore");
-    public bool CanRehideSelectedDuplicateEntries => GetSelectedVisibleRows().Any(static row => row.Kind == DxfEditChangeKind.Duplicate && row.ActionLabel == "Hide again");
+    public bool CanRestoreSelectedDuplicateEntries => GetSelectedVisibleRows().Any(IsRestorableDuplicate);
+    public bool CanRehideSelectedDuplicateEntries => GetSelectedVisibleRows().Any(IsRehidableDuplicate);
     public string VisibleRowsSummaryText => $"Showing {Rows.Count} rows";
-    public string SelectedVisibleRowsSummaryText => $"Selected {SelectedVisibleCount}/{Rows.Count} shown";
+    public string SelectedVisibleRowsSummaryText => $"{SelectedVisibleCount} checked";
     public string SummaryText => $"Hidden {HiddenCount} · Duplicate {DuplicateCount} · Combined {CombinedCount} · Moved {MovedCount} · Rotated {RotatedCount}";
     public string SelectedRowHeaderText => SelectedEntry?.RowTitleText ?? "No DXF edit selected.";
     public string SelectedRowStatusText => SelectedEntry?.RowStatusText ?? "-";
@@ -257,9 +257,7 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
 
     private void ApplySelectedEntries()
     {
-        var selectedRows = GetSelectedVisibleRows()
-            .Where(static row => row.CanApply)
-            .ToList();
+        var selectedRows = GetApplicableSelectedRows();
         if (selectedRows.Count == 0)
         {
             return;
@@ -275,20 +273,17 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
 
     private void RestoreSelectedDuplicateEntries()
     {
-        ApplySelectedEntries(static row => row.Kind == DxfEditChangeKind.Duplicate && row.ActionLabel == "Restore");
+        ApplySelectedEntries(IsRestorableDuplicate);
     }
 
     private void RehideSelectedDuplicateEntries()
     {
-        ApplySelectedEntries(static row => row.Kind == DxfEditChangeKind.Duplicate && row.ActionLabel == "Hide again");
+        ApplySelectedEntries(IsRehidableDuplicate);
     }
 
     private void ApplySelectedEntries(Func<DxfEditChangeListEntry, bool> predicate)
     {
-        var selectedRows = GetSelectedVisibleRows()
-            .Where(predicate)
-            .Where(static row => row.CanApply)
-            .ToList();
+        var selectedRows = GetApplicableSelectedRows(predicate);
         if (selectedRows.Count == 0)
         {
             return;
@@ -309,6 +304,23 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
             .ToList();
     }
 
+    private List<DxfEditChangeListEntry> GetApplicableSelectedRows(Func<DxfEditChangeListEntry, bool>? predicate = null)
+    {
+        return GetSelectedVisibleRows()
+            .Where(row => row.CanApply && (predicate is null || predicate(row)))
+            .ToList();
+    }
+
+    private static bool IsRestorableDuplicate(DxfEditChangeListEntry row)
+    {
+        return row.Kind == DxfEditChangeKind.Duplicate && row.ActionLabel == "Restore";
+    }
+
+    private static bool IsRehidableDuplicate(DxfEditChangeListEntry row)
+    {
+        return row.Kind == DxfEditChangeKind.Duplicate && row.ActionLabel == "Hide again";
+    }
+
     private void UpdateSelectionSummary()
     {
         SelectedVisibleCount = Rows.Count(static row => row.IsSelected);
@@ -319,6 +331,7 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
 
     private void UpdateBulkActionState()
     {
+        NotifyPresentationChanged();
         OnPropertyChanged(nameof(CanApplySelectedEntries));
         OnPropertyChanged(nameof(CanRestoreSelectedDuplicateEntries));
         OnPropertyChanged(nameof(CanRehideSelectedDuplicateEntries));
@@ -379,6 +392,7 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
         }
 
         OnPropertyChanged(nameof(SelectedRowHeaderText));
+        OnPropertyChanged(nameof(HasSelectedEntry));
         OnPropertyChanged(nameof(SelectedRowStatusText));
         OnPropertyChanged(nameof(SelectedRowDetailText));
         OnPropertyChanged(nameof(SelectedRowActionText));

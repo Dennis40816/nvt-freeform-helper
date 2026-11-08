@@ -843,6 +843,9 @@
   <x:Double x:Key="DxfEditChangeListHeight">680</x:Double>
   <x:Double x:Key="DxfEditChangeListMinWidth">760</x:Double>
   <x:Double x:Key="DxfEditChangeListMinHeight">500</x:Double>
+  <GridLength x:Key="DxfEditDetailsInspectorWidth">300</GridLength>
+  <GridLength x:Key="DxfEditDetailsPadColumnWidth">*</GridLength>
+  <GridLength x:Key="DxfEditDetailsChangeColumnWidth">2*</GridLength>
   <GridLength x:Key="NotchExportTableColCheckWidth">34</GridLength>
   <GridLength x:Key="NotchExportTableColRowWidth">72</GridLength>
   <GridLength x:Key="NotchExportTableColIcWidth">58</GridLength>
