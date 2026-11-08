@@ -550,7 +550,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 1222
+        "fileLines": 923
       },
       "owner": "NFH",
       "locations": [
@@ -559,20 +559,6 @@
       "contentHash": "d0fb1cba6be2610f931e505823a51a220ce6326e95f5c581a183b976c1b6dcc1",
       "project": "FreeformHelper.Tests",
       "symbol": "file:FreeformHelper.Tests.UiLayoutGuardTests"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 298
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs"
-      ],
-      "contentHash": "279a3ce8a861a71c115d52a0d0f4ea980433c9e13717904c12eb5f789b2aad22",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.UiLayoutGuardTests.CriticalScrollContainers_UseViewportBoundedWidth()"
     },
     {
       "kind": "type",
