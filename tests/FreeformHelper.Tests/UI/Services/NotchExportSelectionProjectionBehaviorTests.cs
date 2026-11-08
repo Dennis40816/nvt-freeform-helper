@@ -72,14 +72,14 @@ public sealed class NotchExportSelectionProjectionBehaviorTests : IDisposable
     }
 
     [Fact]
-    public void Build_Characterization_MatchSortPlacesLegacyBelowTypedRowsDespiteDisplayedMatch()
+    public void Build_MatchSortOrdersLegacyRowsByTheirDisplayedMatch()
     {
         var rows = CreateRows().Reverse().ToArray();
         var byMatch = Build(rows, CreateFilter() with { SortMode = NotchExportSortMode.MatchDescending });
         var byIcAndDiff = Build(rows, CreateFilter() with { SortMode = NotchExportSortMode.IcThenDiff });
 
-        Assert.Equal([4, 1, 2, 0, 5, 3], byMatch.VisibleRows.Select(static row => row.RowIndex));
-        Assert.Equal("99%", byMatch.VisibleRows[^1].MatchSummaryText);
+        Assert.Equal([4, 3, 1, 2, 0, 5], byMatch.VisibleRows.Select(static row => row.RowIndex));
+        Assert.Equal("99%", byMatch.VisibleRows[1].MatchSummaryText);
         Assert.Equal("80%", byMatch.VisibleRows[^2].MatchSummaryText);
         Assert.Equal([1, 3, 4, 0, 5, 2], byIcAndDiff.VisibleRows.Select(static row => row.RowIndex));
     }
