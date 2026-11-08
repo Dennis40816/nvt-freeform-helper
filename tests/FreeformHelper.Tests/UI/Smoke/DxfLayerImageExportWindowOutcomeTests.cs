@@ -36,6 +36,8 @@ public sealed class DxfLayerImageExportWindowOutcomeTests
             var firstLayer = Assert.Single(layerList.GetVisualDescendants().OfType<CheckBox>(),
                 box => AutomationProperties.GetName(box) == "L1");
             firstLayer.IsChecked = false;
+            window.FindControl<HidePanelBlock>("AdvancedOptions")!.IsExpanded = true;
+            await HeadlessUiPump.FlushQueueAsync();
             SetNumber(window, "Pixels X", 64m);
             SetNumber(window, "Pixels Y", 40m);
             SetNumber(window, "Padding X", 4m);
