@@ -550,7 +550,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 374
+        "axamlCodeBehindLines": 344
       },
       "owner": "NFH",
       "locations": [
