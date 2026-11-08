@@ -121,6 +121,59 @@ function Read-TrxResults {
     }
 }
 
+function Read-TrxFailureDetails {
+    # Reads the exception type and the first message line of failed tests, and only of the tests named in
+    # AllowedTests. Read-TrxResults never reads Output; this is the one place that does, so the allowlist is the
+    # only way a message can reach the log. A line is cut to MaxLength, and any token with a slash is replaced.
+    param([Parameter(Mandatory = $true)][string]$ResultsDirectory,
+        [Parameter(Mandatory = $true)][string[]]$AllowedTests,
+        [int]$MaxLength = 200)
+
+    $details = [System.Collections.Generic.List[object]]::new()
+    foreach ($file in @(Get-ChildItem -LiteralPath $ResultsDirectory -Filter *.trx -File -Recurse)) {
+        $settings = [System.Xml.XmlReaderSettings]::new()
+        $settings.DtdProcessing = [System.Xml.DtdProcessing]::Prohibit
+        $settings.XmlResolver = $null
+        $reader = [System.Xml.XmlReader]::Create($file.FullName, $settings)
+        try {
+            $document = [System.Xml.XmlDocument]::new()
+            $document.XmlResolver = $null
+            $document.Load($reader)
+        } finally {
+            $reader.Dispose()
+        }
+        $ns = [System.Xml.XmlNamespaceManager]::new($document.NameTable)
+        $ns.AddNamespace("t", "http://microsoft.com/schemas/VisualStudio/TeamTest/2010")
+        $names = @{}
+        foreach ($definition in $document.SelectNodes("/t:TestRun/t:TestDefinitions/t:UnitTest", $ns)) {
+            $method = $definition.SelectSingleNode("t:TestMethod", $ns)
+            if ($null -eq $method) { continue }
+            $className = ($method.GetAttribute("className") -split ',', 2)[0].Trim()
+            $methodName = ($method.GetAttribute("name") -split '\(', 2)[0].Trim()
+            $names[$definition.GetAttribute("id")] = "$className.$methodName"
+        }
+        foreach ($result in $document.SelectNodes("/t:TestRun/t:Results/t:UnitTestResult", $ns)) {
+            $name = $names[$result.GetAttribute("testId")]
+            if ($result.GetAttribute("outcome") -cne "Failed" -or $null -eq $name -or $AllowedTests -cnotcontains $name) { continue }
+            $messageNode = $result.SelectSingleNode("t:Output/t:ErrorInfo/t:Message", $ns)
+            $text = if ($null -ne $messageNode) { [string]$messageNode.InnerText } else { '' }
+            $line = @($text -split '\r?\n' | Where-Object { $_.Trim() -ne '' } | Select-Object -First 1)
+            $line = if ($line.Count -gt 0) { [string]$line[0] } else { '' }
+            $type = 'unknown'
+            $typeMatch = [regex]::Match($line, '^\s*([A-Za-z_][A-Za-z0-9_.+]*) : ')
+            if ($typeMatch.Success) {
+                $type = $typeMatch.Groups[1].Value
+                $line = $line.Substring($typeMatch.Length)
+            }
+            $line = ($line -split '\s+' | ForEach-Object { if ($_ -match '[\\/]') { '<path>' } else { $_ } }) -join ' '
+            $line = [regex]::Replace($line, '[^\x20-\x7E]', '?')
+            if ($line.Length -gt $MaxLength) { $line = $line.Substring(0, $MaxLength) + '...' }
+            $details.Add([pscustomobject]@{ MethodName = $name; ExceptionType = $type; Message = $line })
+        }
+    }
+    return @($details)
+}
+
 function Get-ExampleDataTestNames {
     # Read public test declarations, never example/. Count methods once, independent of theory rows.
     $testRoot = Join-Path $PSScriptRoot "../../tests/FreeformHelper.Tests"
