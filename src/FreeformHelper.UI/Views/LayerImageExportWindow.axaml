@@ -7,10 +7,10 @@
         x:Class="FreeformHelper.UI.Views.LayerImageExportWindow"
         x:DataType="vm:LayerImageExportViewModel"
         x:Name="ExportWindow"
-        Width="{DynamicResource LayerImageExportWidth}"
-        Height="{DynamicResource LayerImageExportHeight}"
-        MinWidth="{DynamicResource LayerImageExportMinWidth}"
-        MinHeight="{DynamicResource LayerImageExportMinHeight}"
+        Width="{DynamicResource LayerImageExportIntegratedWidth}"
+        Height="{DynamicResource LayerImageExportIntegratedHeight}"
+        MinWidth="{DynamicResource LayerImageExportIntegratedMinWidth}"
+        MinHeight="{DynamicResource LayerImageExportIntegratedMinHeight}"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource BrushBgSurface}"
         Foreground="{DynamicResource BrushTextPrimary}"
@@ -26,7 +26,7 @@
     <converters:BooleanGlyphConverter x:Key="RatioGlyph" TrueGlyph="link" FalseGlyph="link_off"/>
   </Window.Resources>
   <Window.Styles>
-    <StyleInclude Source="avares://FreeformHelper.UI/Styles/LayerImageExport.axaml"/>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/LayerImageExportIntegrated.axaml"/>
   </Window.Styles>
   <Window.KeyBindings>
     <KeyBinding Gesture="Ctrl+F" Command="{Binding #ExportWindow.FocusSearchCommand}"/>
@@ -36,29 +36,32 @@
   <Grid RowDefinitions="*,Auto">
     <Grid>
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="{DynamicResource LayerImageExportListColumn}"/>
+        <ColumnDefinition Width="{DynamicResource LayerImageExportIntegratedListColumn}"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
       <Border BorderBrush="{DynamicResource BrushBorderMuted}" BorderThickness="{DynamicResource BorderLeftThin}"
               Padding="{DynamicResource Inset12}">
-        <Grid RowDefinitions="Auto,Auto,*">
-          <Grid Margin="{DynamicResource InsetBottom12}">
-            <TextBox x:Name="SearchBox" Classes="exportSearch" PlaceholderText="Search layers"
-                     Height="{DynamicResource NfcControlHeight}"
-                     Padding="{DynamicResource LayerImageExportSearchPadding}"
-                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     AutomationProperties.Name="Search layers"/>
-            <controls:FontIcon Classes="symbols" Glyph="search" IsHitTestVisible="False"
-                               HorizontalAlignment="Left" Margin="{DynamicResource InsetLeft8}"/>
+        <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="{DynamicResource Space8}">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+            <Grid>
+              <TextBox x:Name="SearchBox" Classes="exportSearch" PlaceholderText="Search layers"
+                       Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                       AutomationProperties.Name="Search layers"/>
+              <controls:FontIcon Classes="symbols" Glyph="{DynamicResource Nvt.Icon.Search}" IsHitTestVisible="False"
+                                 HorizontalAlignment="Left" Margin="{DynamicResource InsetLeft8}"/>
+            </Grid>
+            <Button x:Name="ClearSearchButton" Grid.Column="1" Classes="actionIconButton actionGhost flat"
+                    Command="{Binding ClearSearchCommand}" ToolTip.Tip="Clear search (Esc)" AutomationProperties.Name="Clear search">
+              <controls:FontIcon Classes="symbols" Glyph="{DynamicResource Nvt.Icon.Close}"/>
+            </Button>
           </Grid>
-          <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="{DynamicResource InsetBottom4}">
-            <CheckBox x:Name="AllLayersCheckBox" Classes="exportCheck" Content="All layers"
-                      IsThreeState="True" Foreground="{DynamicResource BrushTextMuted}"
+          <Border Grid.Row="1" Classes="workspaceTableHeader" Padding="{DynamicResource InsetNone}">
+            <CheckBox x:Name="AllLayersCheckBox" Classes="exportCheck" Content="{Binding AllLayersText}"
+                      IsThreeState="True"
                       IsChecked="{Binding AllLayersState, Mode=OneWay, Converter={StaticResource AllLayersStateConverter}}"
                       Command="{Binding ToggleAllLayersCommand}"/>
-            <TextBlock Grid.Column="1" Classes="exportMuted exportCount" Text="{Binding CountText}"/>
-          </Grid>
-          <ListBox x:Name="LayerList" Grid.Row="2" Classes="exportLayers" ItemsSource="{Binding VisibleRows}"
+          </Border>
+          <ListBox x:Name="LayerList" Grid.Row="2" Classes="workspaceDataList exportLayers" ItemsSource="{Binding VisibleRows}"
                    Focusable="True"
                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                    ScrollViewer.VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Layers">
@@ -82,11 +85,21 @@
           </ListBox>
           <TextBlock x:Name="NoMatchesHint" Grid.Row="2" Classes="exportMuted" Text="No layers match"
                      IsVisible="{Binding !VisibleRows.Count}" VerticalAlignment="Top"/>
+          <TextBlock x:Name="SelectionSummary" Grid.Row="3" Classes="exportMuted" Text="{Binding SelectionSummaryText}"
+                     TextWrapping="Wrap"/>
         </Grid>
       </Border>
 
-      <Grid Grid.Column="1" RowDefinitions="*,Auto" Margin="{DynamicResource Inset16}">
-        <Border Background="{DynamicResource BrushBgSurfaceInset}" CornerRadius="{DynamicResource NfcSurfaceCornerRadius}"
+      <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" RowSpacing="{DynamicResource Space12}" Margin="{DynamicResource Inset12}">
+        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{DynamicResource Space8}">
+          <TextBlock Text="Preview" Classes="workspaceTableHeaderText" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="1" Text="Updating" Classes="exportMuted" IsVisible="{Binding IsPreviewUpdating}"/>
+          <Button Grid.Column="2" Classes="actionIconButton actionGhost flat" Command="{Binding PreviewSettings.ToggleThemeCommand}"
+                  ToolTip.Tip="Image background: light / dark" AutomationProperties.Name="Image background: light / dark">
+            <controls:FontIcon Classes="symbols" Glyph="{Binding PreviewSettings.UseDarkTheme, Converter={StaticResource ThemeGlyph}}"/>
+          </Button>
+        </Grid>
+        <Border Grid.Row="1" Background="{DynamicResource BrushBgSurfaceInset}" CornerRadius="{DynamicResource NfcSurfaceCornerRadius}"
                 MinWidth="{DynamicResource LayerImageExportPreviewMinWidth}"
                 MinHeight="{DynamicResource LayerImageExportPreviewMinHeight}" ClipToBounds="True">
           <Grid>
@@ -110,64 +123,67 @@
               </TextBlock.IsVisible>
             </TextBlock>
             <StackPanel Margin="{DynamicResource Inset12}" VerticalAlignment="Bottom">
-              <TextBlock Text="Updating" Classes="exportMuted" IsVisible="{Binding IsPreviewUpdating}"/>
               <TextBlock Text="{Binding PreviewErrorText}" Classes="exportMuted" TextWrapping="Wrap"/>
             </StackPanel>
-            <Button Classes="actionIconButton actionGhost flat" HorizontalAlignment="Right" VerticalAlignment="Top"
-                    Margin="{DynamicResource Inset8}" Command="{Binding PreviewSettings.ToggleThemeCommand}"
-                    ToolTip.Tip="Light / dark" AutomationProperties.Name="Light / dark">
-              <controls:FontIcon Classes="symbols" Glyph="{Binding PreviewSettings.UseDarkTheme, Converter={StaticResource ThemeGlyph}}"/>
-            </Button>
           </Grid>
         </Border>
-        <StackPanel Grid.Row="1" Classes="panelForm" Spacing="{DynamicResource Space8}" Margin="{DynamicResource InsetTop10}">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Classes="exportLabel" Text="Pixels"/>
-            <StackPanel Classes="panelFormField">
+        <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space8}"
+              MaxHeight="{DynamicResource LayerImageExportIntegratedOptionsMaxHeight}">
+          <Grid ColumnDefinitions="Auto,Auto,Auto,Auto">
+            <StackPanel Classes="panelFormField left">
+              <TextBlock Text="Width" Classes="exportLabel"/>
               <controls:NumberScrubber Classes="exportNumber" Minimum="2" Maximum="100000" SmallChange="1" FormatString="0"
                                        Value="{Binding PreviewSettings.PixelsX, Mode=TwoWay}" AutomationProperties.Name="Pixels X"/>
             </StackPanel>
-            <ToggleButton Classes="actionIconButton actionGhost flat" IsChecked="{Binding PreviewSettings.KeepRatio, Mode=TwoWay}"
+            <ToggleButton Grid.Column="1" Classes="actionIconButton actionGhost flat" VerticalAlignment="Bottom"
+                          IsChecked="{Binding PreviewSettings.KeepRatio, Mode=TwoWay}"
                           ToolTip.Tip="Keep ratio" AutomationProperties.Name="Keep ratio">
               <controls:FontIcon Classes="symbols" Glyph="{Binding PreviewSettings.KeepRatio, Converter={StaticResource RatioGlyph}}"/>
             </ToggleButton>
-            <StackPanel Classes="panelFormField">
+            <StackPanel Grid.Column="2" Classes="panelFormField right">
+              <TextBlock Text="Height" Classes="exportLabel"/>
               <controls:NumberScrubber Classes="exportNumber" Minimum="2" Maximum="100000" SmallChange="1" FormatString="0"
                                        Value="{Binding PreviewSettings.PixelsY, Mode=TwoWay}" AutomationProperties.Name="Pixels Y"/>
             </StackPanel>
-            <Button Classes="actionIconButton actionGhost flat" Command="{Binding PreviewSettings.ResetToProjectSizeCommand}"
+            <Button Grid.Column="3" Classes="actionIconButton actionGhost flat" VerticalAlignment="Bottom"
+                    Command="{Binding PreviewSettings.ResetToProjectSizeCommand}"
                     ToolTip.Tip="Reset to project size" AutomationProperties.Name="Reset to project size">
-              <controls:FontIcon Classes="symbols" Glyph="restart_alt"/>
+              <controls:FontIcon Classes="symbols" Glyph="{DynamicResource Nvt.Icon.RestartAlt}"/>
             </Button>
-          </StackPanel>
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Classes="exportLabel" Text="Padding"/>
-            <StackPanel Classes="panelFormField">
-              <controls:NumberScrubber Classes="exportNumber" Minimum="0" Maximum="100000" SmallChange="1" FormatString="0"
-                                       Value="{Binding PreviewSettings.PaddingX, Mode=TwoWay}" AutomationProperties.Name="Padding X"/>
-            </StackPanel>
-            <TextBlock Text="×" Classes="exportMuted" Width="{DynamicResource NfcControlHeight}" TextAlignment="Center"/>
-            <StackPanel Classes="panelFormField">
-              <controls:NumberScrubber Classes="exportNumber" Minimum="0" Maximum="100000" SmallChange="1" FormatString="0"
-                                       Value="{Binding PreviewSettings.PaddingY, Mode=TwoWay}" AutomationProperties.Name="Padding Y"/>
-            </StackPanel>
-          </StackPanel>
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Classes="exportLabel" Text="Line width"/>
-            <StackPanel Classes="panelFormField">
-              <controls:NumberScrubber Classes="exportNumber" Minimum="0.1" Maximum="100" SmallChange="0.1"
-                                       FormatString="0.##" SnapToStep="False"
-                                       Value="{Binding PreviewSettings.LineWidthPixels, Mode=TwoWay}" AutomationProperties.Name="Line width in pixels"/>
-            </StackPanel>
-            <TextBlock Text="px" Classes="exportMuted" Margin="{DynamicResource InsetLeft8}"/>
-          </StackPanel>
-        </StackPanel>
+          </Grid>
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <controls:HidePanelBlock x:Name="AdvancedOptions" Classes="exportAdvanced" Title="Advanced" DefaultExpanded="False">
+              <StackPanel Spacing="{DynamicResource Space8}">
+                <Grid ColumnDefinitions="Auto,Auto">
+                  <StackPanel Classes="panelFormField left">
+                    <TextBlock Classes="exportLabel" Text="Padding"/>
+                    <controls:NumberScrubber Classes="exportNumber" Minimum="0" Maximum="100000" SmallChange="1" FormatString="0"
+                                             Value="{Binding PreviewSettings.PaddingX, Mode=TwoWay}" AutomationProperties.Name="Padding X"/>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Classes="panelFormField right" VerticalAlignment="Bottom">
+                    <controls:NumberScrubber Classes="exportNumber" Minimum="0" Maximum="100000" SmallChange="1" FormatString="0"
+                                             Value="{Binding PreviewSettings.PaddingY, Mode=TwoWay}" AutomationProperties.Name="Padding Y"/>
+                  </StackPanel>
+                </Grid>
+                <StackPanel Classes="panelFormField">
+                  <TextBlock Classes="exportLabel" Text="Line width"/>
+                  <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                    <controls:NumberScrubber Classes="exportNumber" Minimum="0.1" Maximum="100" SmallChange="0.1"
+                                             FormatString="0.##" SnapToStep="False"
+                                             Value="{Binding PreviewSettings.LineWidthPixels, Mode=TwoWay}" AutomationProperties.Name="Line width in pixels"/>
+                    <TextBlock Text="px" Classes="exportMuted"/>
+                  </StackPanel>
+                </StackPanel>
+              </StackPanel>
+            </controls:HidePanelBlock>
+          </ScrollViewer>
+        </Grid>
       </Grid>
     </Grid>
     <Border Grid.Row="1" BorderBrush="{DynamicResource BrushBorderMuted}" BorderThickness="{DynamicResource BorderTopThin}"
             Padding="{DynamicResource Inset12_10}">
       <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Text="{Binding FooterText}" Classes="exportMuted" TextTrimming="CharacterEllipsis"/>
+        <TextBlock x:Name="ExportSummary" Text="{Binding FooterText}" Classes="exportMuted" TextTrimming="CharacterEllipsis"/>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
           <Button Content="Cancel" Classes="actionGhost" Command="{Binding CancelCommand}"/>
           <Button x:Name="ExportButton" Content="Export…" Classes="actionPrimary" IsDefault="True" Command="{Binding ConfirmCommand}"/>

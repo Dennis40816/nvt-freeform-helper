@@ -1,0 +1,65 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+        x:DataType="vm:LayerImageExportViewModel">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Nvt.Core.Avalonia/Icons/IconResources.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
+  <Style Selector="TextBlock.exportMuted, TextBlock.exportLabel">
+    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+  <Style Selector="TextBlock.exportCount">
+    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyCode}"/>
+    <Setter Property="TextAlignment" Value="Right"/>
+  </Style>
+  <Style Selector="controls|NumberScrubber.exportNumber">
+    <Setter Property="Width" Value="{DynamicResource LayerImageExportFieldWidth}"/>
+    <Setter Property="Height" Value="{DynamicResource NfcControlHeight}"/>
+    <Setter Property="MinHeight" Value="{DynamicResource NfcControlHeight}"/>
+  </Style>
+  <!-- Keep Core choice states and marks; align the existing layer rows. -->
+  <Style Selector="CheckBox.exportCheck">
+    <Setter Property="MinHeight" Value="{DynamicResource NfcControlHeight}"/>
+    <Setter Property="Padding" Value="{DynamicResource LayerImageExportRowPadding}"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+  </Style>
+  <Style Selector="CheckBox.exportCheck /template/ Border#ChoiceIndicator">
+    <Setter Property="Width" Value="{DynamicResource Nvt.LayerImageExport.CheckIndicatorSize}"/>
+    <Setter Property="Height" Value="{DynamicResource Nvt.LayerImageExport.CheckIndicatorSize}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+  <Style Selector="CheckBox.exportCheck /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="MinHeight" Value="{DynamicResource Nvt.LayerImageExport.CheckIndicatorSize}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+  <Style Selector="TextBox.exportSearch">
+    <Setter Property="Height" Value="{DynamicResource NfcControlHeight}"/>
+    <Setter Property="Padding" Value="{DynamicResource LayerImageExportSearchPadding}"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+  <Style Selector="ListBox.exportLayers ListBoxItem">
+    <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
+  </Style>
+  <!-- Reuse the existing disclosure, without nesting another card around it. -->
+  <Style Selector="controls|HidePanelBlock.exportAdvanced /template/ Border.panelBlockRoot">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource BorderNone}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusNone}"/>
+  </Style>
+  <Style Selector="Image.exportPreview.updating">
+    <Setter Property="Opacity" Value="{DynamicResource OpacitySubtle}"/>
+  </Style>
+</Styles>
