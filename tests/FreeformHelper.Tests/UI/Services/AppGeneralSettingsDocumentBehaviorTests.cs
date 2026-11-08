@@ -7,6 +7,12 @@ using Xunit;
 
 namespace FreeformHelper.Tests;
 
+// One test sets the process-wide settings path variable and Dispose removes the folder it points to.
+// Run the class alone so that no parallel test reads that path with a default-built store.
+[CollectionDefinition("AppSettingsEnvironmentSerial", DisableParallelization = true)]
+public sealed class AppSettingsEnvironmentSerialDefinition;
+
+[Collection("AppSettingsEnvironmentSerial")]
 public sealed class AppGeneralSettingsDocumentBehaviorTests : IDisposable
 {
     private readonly DirectoryInfo _directory = TestFiles.CreateTempDirectory();
