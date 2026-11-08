@@ -41,7 +41,9 @@ public sealed partial class NotchExportColumnFilterDialogViewModel : ObservableO
             option.PropertyChanged += (_, _) => UpdateSummary();
         }
 
-        if (SupportsRangeInput && Options.Count >= RangeModeSuggestedThreshold)
+        // Suggest the range mode only while nothing is restricted. When the user reopens a column that
+        // already has a value filter, the value list must show it, or OK would silently clear the filter.
+        if (SupportsRangeInput && Options.Count >= RangeModeSuggestedThreshold && Options.All(static option => option.IsSelected))
         {
             if (TryGetNumericBounds(out var min, out var max))
             {
