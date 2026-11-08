@@ -149,7 +149,7 @@ public sealed class ProjectSaveLoadUserWorkRoundTripTests
     }
 
     [AvaloniaFact]
-    public async Task MissingUnembeddedDxfLoadsManualRegularWorkButResavingDropsDxfEditsAsync()
+    public async Task MissingUnembeddedDxfWarnsAndResavingPreservesDxfEditsAndManualRegularWorkAsync()
     {
         using var files = new LoadingModeTestScope();
         var original = await OpenAsync(files, ("signal", 0, 0, 40, 20), ("signal", 50, 0, 60, 20));
@@ -170,15 +170,19 @@ public sealed class ProjectSaveLoadUserWorkRoundTripTests
         Assert.Empty(loaded.CadPads);
         Assert.Equal(expectedGrid, CaptureRegularWork(loaded));
         Assert.Equal(37, loaded.GetCadOutputFwDiffIndexOverride(cadId));
-        // A missing external DXF currently leaves a success/ready status rather than a missing-file warning.
-        Assert.Equal("Project loaded: no CAD output pads; Step 1 auto replay skipped.", loaded.StatusText);
+        Assert.StartsWith("Warning: The DXF file was not found:", loaded.StatusText, StringComparison.Ordinal);
+        Assert.Contains(before.LastDxfPath!, loaded.StatusText, StringComparison.Ordinal);
+        Assert.Contains("The saved DXF edits are kept", loaded.StatusText, StringComparison.Ordinal);
+        loaded.MatchThreshold = 0.42m;
         Assert.True(await loaded.SaveProjectAsync(), loaded.StatusText);
         var after = JsonProjectStore.Load(files.PathFor("project.json"));
         Assert.Equal(before.LastDxfPath, after.LastDxfPath);
         Assert.Equal(before.FreeformOverrides.OrderBy(static pair => pair.Key),
             after.FreeformOverrides.OrderBy(static pair => pair.Key));
         Assert.Equal(37, after.CadOutputFwDiffIndexOverrides[cadId]);
-        Assert.Empty(after.HiddenCadPadIds);
+        Assert.True(before.HiddenCadPadIds.SetEquals(after.HiddenCadPadIds));
+        Assert.Equal(0.42, after.Settings.Matching.MatchThreshold);
+        Assert.Equal(expectedGrid, CaptureRegularWork(await LoadFreshAsync(files)));
     }
 
     private static async Task<FreeformHelperViewModel> OpenAsync(LoadingModeTestScope files,

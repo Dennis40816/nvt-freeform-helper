@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -329,7 +330,7 @@ public sealed partial class FreeformHelperViewModel
         var dxfElapsedMs = dxfLoadSw.ElapsedMilliseconds;
         if (outcome is null)
         {
-            return (dxfElapsedMs, KeepCombinedGroupsWithoutCad(CapturePersistedDxfEditProjectState(file).CombinedCadGroups));
+            return (dxfElapsedMs, KeepDxfEditsWithoutCad(file));
         }
 
         var persistedDxfEditState = CapturePersistedDxfEditProjectState(file);
