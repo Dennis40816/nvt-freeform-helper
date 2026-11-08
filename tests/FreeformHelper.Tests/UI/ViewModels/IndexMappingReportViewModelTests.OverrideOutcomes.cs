@@ -99,4 +99,151 @@ public sealed partial class IndexMappingReportViewModelTests
             HasIssues: true, Summary: "summary", TotalIssueCount: 1, IssuesTruncated: false,
             Issues: [issue], SampleIssues: [issue]);
     }
+
+    [Fact]
+    public void DecisionActions_AfterSearchHidesAllRows_ReportMissingSelectionWithoutCallingHandlers()
+    {
+        using var culture = TestCulture.UseEnUs();
+        var calls = new List<string>();
+        var vm = CreateActionAvailabilityViewModel(CreateRepairOutcomeReport(CreateRepairOutcomeRow(9011, 22)), calls);
+        var previousSelection = Assert.Single(vm.DecisionRows);
+
+        vm.SearchKeyword = "no matching CAD or REG";
+
+        Assert.Null(vm.SelectedDecision);
+        Assert.False(previousSelection.IsInspectorSelected);
+        Assert.Equal("Segment preview: select a row.", vm.SelectedSegmentPreviewText);
+        var commands = new[]
+        {
+            vm.LocateSelectedIssueCommand, vm.ApplyOverrideCommand, vm.ApplyDiffOverrideCommand,
+            vm.ApplySegmentDiffOverridesCommand, vm.ClearOverrideCommand,
+        };
+        foreach (var command in commands)
+        {
+            vm.ActionStatus = string.Empty;
+
+            command.Execute(null);
+
+            Assert.Equal("Select a row first.", vm.ActionStatus);
+            Assert.Null(vm.SelectedDecision);
+        }
+
+        Assert.Empty(calls);
+        Assert.Null(previousSelection.OverrideRegularPadIndex);
+    }
+
+    [Fact]
+    public void DecisionActions_OnCountMismatchDiagnostic_ReportUnsupportedActionsWithoutCallingHandlers()
+    {
+        using var culture = TestCulture.UseEnUs();
+        var calls = new List<string>();
+        var vm = CreateActionAvailabilityViewModel(
+            CreateVerificationFallbackReport(IndexMappingDecisionFilterMode.CountMismatch), calls);
+        var aggregate = Assert.Single(vm.AggregateDecisionRows);
+
+        vm.SelectDecisionCommand.Execute(aggregate);
+
+        Assert.Same(aggregate, vm.SelectedDecision);
+        Assert.Equal("Segment preview: selected row has no segment metadata.", vm.SelectedSegmentPreviewText);
+        var actions = new[]
+        {
+            (vm.LocateSelectedIssueCommand, "Selected row has no locate target."),
+            (vm.ApplyOverrideCommand, "Selected row cannot create an override."),
+            (vm.ApplyDiffOverrideCommand, "Selected row has no diff repair suggestion."),
+            (vm.ApplySegmentDiffOverridesCommand, "Selected row has no segment metadata."),
+            (vm.ClearOverrideCommand, "Selected row has no CAD override to clear."),
+        };
+        foreach (var (command, expectedStatus) in actions)
+        {
+            vm.ActionStatus = string.Empty;
+
+            command.Execute(null);
+
+            Assert.Equal(expectedStatus, vm.ActionStatus);
+            Assert.Same(aggregate, vm.SelectedDecision);
+        }
+
+        Assert.Empty(calls);
+        Assert.True(aggregate.IsInspectorSelected);
+        Assert.Null(aggregate.OverrideRegularPadIndex);
+    }
+
+    [Fact]
+    public void DecisionActions_WithoutOptionalHandlers_ReportUnavailableAndPreserveExistingOverride()
+    {
+        using var culture = TestCulture.UseEnUs();
+        var report = CreateRepairOutcomeReport(CreateRepairOutcomeRow(9011, 22));
+        var vm = new IndexMappingReportViewModel("mapping", report, getOverrideRegularIndex: static _ => 66);
+        var selected = Assert.Single(vm.DecisionRows);
+        Assert.True(vm.CanLocateSelectedDecision);
+        Assert.True(vm.CanApplySelectedIssueOverride);
+        Assert.True(vm.CanApplySelectedSegmentDiffOverrides);
+        Assert.True(vm.CanApplyCadOutputFwDiffOverrides);
+        Assert.True(vm.CanClearSelectedIssueOverride);
+        var actions = new[]
+        {
+            (vm.LocateSelectedIssueCommand, "Locate handler not available."),
+            (vm.ApplyOverrideCommand, "Override handler not available."),
+            (vm.ClearOverrideCommand, "Override clear handler not available."),
+            (vm.ApplySegmentDiffOverridesCommand, "Diff override handler not available."),
+            (vm.ApplyCadOutputFwDiffOverridesCommand, "Diff override handler not available."),
+        };
+        foreach (var (command, expectedStatus) in actions)
+        {
+            vm.ActionStatus = string.Empty;
+
+            command.Execute(null);
+
+            Assert.Equal(expectedStatus, vm.ActionStatus);
+            Assert.Same(selected, vm.SelectedDecision);
+            Assert.Equal(66, selected.OverrideRegularPadIndex);
+            Assert.Equal("Override: CAD -> regular id 66.", selected.OverrideText);
+        }
+    }
+
+    [Fact]
+    public void ApplySegmentDiffOverrides_WithoutSuggestions_ReportsEmptySegmentAndKeepsSelection()
+    {
+        using var culture = TestCulture.UseEnUs();
+        var calls = new List<string>();
+        var report = CreateRepairOutcomeReport(CreateRepairOutcomeRow(9011, null, memberCount: 3));
+        var vm = CreateActionAvailabilityViewModel(report, calls);
+        var selected = Assert.Single(vm.DecisionRows);
+        Assert.True(selected.HasSegmentScope);
+        Assert.False(vm.CanApplySelectedSegmentDiffOverrides);
+        Assert.Equal("Segment preview: IC 1, row 7, segment 0, repair rows 0/3.", vm.SelectedSegmentPreviewText);
+
+        vm.ApplySegmentDiffOverridesCommand.Execute(null);
+
+        Assert.Equal("Selected segment has no diff repair suggestions.", vm.ActionStatus);
+        Assert.Empty(calls);
+        Assert.Same(selected, vm.SelectedDecision);
+        Assert.Null(selected.OverrideRegularPadIndex);
+    }
+
+    private static IndexMappingReportViewModel CreateActionAvailabilityViewModel(
+        DxfRegularMappingReport report, List<string> calls)
+    {
+        return new IndexMappingReportViewModel("mapping", report,
+            locateTarget: (_, _) =>
+            {
+                calls.Add("locate");
+                return true;
+            },
+            applyOverride: (_, _) =>
+            {
+                calls.Add("regular override");
+                return true;
+            },
+            applyDiffOverride: (_, _) =>
+            {
+                calls.Add("diff override");
+                return true;
+            },
+            clearOverride: _ =>
+            {
+                calls.Add("clear override");
+                return true;
+            });
+    }
 }
