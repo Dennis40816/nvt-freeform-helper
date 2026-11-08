@@ -1337,16 +1337,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "0b8cc79b67b74d4f53bcc820f0f9e2cd753e29eede0b6e2d84401ad92ff629a7",
-      "member": "FreeformHelper.Tests.FreeformHelperViewModelTests.AppGeneralSettings_AfterLoadProject_DefersUntilNextProjectSave()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.SettingsPersistence.AppGeneral.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken)"
-    },
-    {
       "syntaxHash": "c81479aacdeac4e155ffb4a148616edec1099939c2d2e6f02dfce9b430e9db33",
       "member": "FreeformHelper.Tests.HeadlessDispatcherSetup.EnsureRunLoopDispatcher()",
       "owner": "NFH",

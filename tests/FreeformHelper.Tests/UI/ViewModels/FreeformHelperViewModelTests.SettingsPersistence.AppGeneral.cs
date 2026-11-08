@@ -172,7 +172,11 @@ public sealed partial class FreeformHelperViewModelTests
             vm.GlobalFontSizePercent = baselineFont >= 130
                 ? 118m
                 : (decimal)baselineFont + 8m;
-            await Task.Delay(700, TestContext.Current.CancellationToken);
+            // After a project load the change waits for the next project save; no write is scheduled.
+            var persistence = vm.AppGeneralPersistenceForTests;
+            Assert.True(persistence.DeferAfterProjectLoad);
+            Assert.True(persistence.HasDeferredChanges);
+            Assert.False(persistence.PersistTimer?.IsEnabled ?? false);
 
             var deferredDoc = appStore.TryLoad();
             Assert.NotNull(deferredDoc);
