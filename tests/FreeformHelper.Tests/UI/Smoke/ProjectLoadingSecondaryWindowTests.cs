@@ -26,16 +26,7 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
     {
         var release = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
         var vm = new FreeformHelperViewModel();
-        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(new[] { CreateCad(10), CreateCad(11), CreateCad(12) });
-        var hidden = FreeformHelperViewModelPrivateAccess.CadEdit(vm).HiddenCadPadIds;
-        hidden.Add(10);
-        var hiddenUndo = FreeformHelperViewModelPrivateAccess.CadEdit(vm).HiddenUndoStack;
-        hiddenUndo.Push([10]);
-        var duplicateIds = FreeformHelperViewModelPrivateAccess.CadEdit(vm).DuplicateCadPadIdToCanonicalId;
-        duplicateIds[11] = 10;
-        duplicateIds[12] = 10;
-        var autoHidden = FreeformHelperViewModelPrivateAccess.CadEdit(vm).AutoHiddenDuplicateCadPadIds;
-        autoHidden.Add(11);
+        var (hidden, hiddenUndo, autoHidden) = SeedHiddenAndDuplicateEdits(vm);
         var view = new FreeformHelperView { DataContext = vm };
         var owner = new Window { Content = view };
         DxfEditChangeListWindow? window = null;
@@ -99,6 +90,21 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
             window?.Close();
             owner.Close();
         }
+    }
+
+    private static (HashSet<int> Hidden, Stack<List<int>> HiddenUndo, HashSet<int> AutoHidden) SeedHiddenAndDuplicateEdits(FreeformHelperViewModel vm)
+    {
+        FreeformHelperViewModelPrivateAccess.Cad(vm) = new CadPadSet(new[] { CreateCad(10), CreateCad(11), CreateCad(12) });
+        var hidden = FreeformHelperViewModelPrivateAccess.CadEdit(vm).HiddenCadPadIds;
+        hidden.Add(10);
+        var hiddenUndo = FreeformHelperViewModelPrivateAccess.CadEdit(vm).HiddenUndoStack;
+        hiddenUndo.Push([10]);
+        var duplicateIds = FreeformHelperViewModelPrivateAccess.CadEdit(vm).DuplicateCadPadIdToCanonicalId;
+        duplicateIds[11] = 10;
+        duplicateIds[12] = 10;
+        var autoHidden = FreeformHelperViewModelPrivateAccess.CadEdit(vm).AutoHiddenDuplicateCadPadIds;
+        autoHidden.Add(11);
+        return (hidden, hiddenUndo, autoHidden);
     }
 
     private static CadPad CreateCad(int id) => new(id, $"CAD{id}", "L1", new Polygon2(new[]
