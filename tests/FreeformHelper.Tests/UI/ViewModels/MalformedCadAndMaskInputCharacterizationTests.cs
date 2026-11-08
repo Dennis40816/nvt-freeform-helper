@@ -92,7 +92,7 @@ public sealed class MalformedCadAndMaskInputCharacterizationTests
     }
 
     [AvaloniaFact]
-    public async Task ImportMask_InvalidOrWrongShapeJson_CharacterizationDisablesAndReplacesPreviousMaskButKeepsPadsAsync()
+    public async Task ImportMask_InvalidOrWrongShapeJson_ReportsFailureAndKeepsPreviousMaskEnabledStatePathAndPadsAsync()
     {
         foreach (var content in new[] { "not valid JSON", "{}", "[]" })
         {
@@ -103,6 +103,7 @@ public sealed class MalformedCadAndMaskInputCharacterizationTests
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
             Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
             Assert.Equal(0, Assert.Single(vm.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
+            var previousMask = vm.RegularVisibilityMaskForTests.Mask;
             var cad = vm.CadPads.ToArray();
             var regular = vm.RegularPads.ToArray();
             var grid = FreeformHelperViewModelPrivateAccess.Grid(vm);
@@ -114,12 +115,14 @@ public sealed class MalformedCadAndMaskInputCharacterizationTests
 
             Assert.Equal("Regular visibility mask: failed to load bad-mask.json. Ignored. CSV does not contain any frames.", vm.StatusText);
             Assert.Equal(vm.StatusText, vm.RegularVisibilityMaskUi.Summary);
-            Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
+            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
             var mask = vm.RegularVisibilityMaskForTests.Mask;
-            Assert.Equal(RegularVisibilityMaskStatus.Failed, mask.Status);
-            Assert.Equal(invalidPath, mask.SourcePath);
-            Assert.Empty(mask.ActiveRegularPadIds);
-            Assert.Empty(mask.InactiveRegularPadIds);
+            Assert.Same(previousMask, mask);
+            Assert.Equal(RegularVisibilityMaskStatus.Loaded, mask.Status);
+            Assert.Equal(validPath, mask.SourcePath);
+            Assert.Equal(validPath, vm.RegularVisibilityMaskForTests.SourcePath);
+            Assert.Equal(0, Assert.Single(mask.ActiveRegularPadIds));
+            Assert.Equal(1, Assert.Single(mask.InactiveRegularPadIds));
             Assert.Equal(cad, vm.CadPads);
             Assert.Equal(regular, vm.RegularPads);
             Assert.Same(grid, FreeformHelperViewModelPrivateAccess.Grid(vm));
