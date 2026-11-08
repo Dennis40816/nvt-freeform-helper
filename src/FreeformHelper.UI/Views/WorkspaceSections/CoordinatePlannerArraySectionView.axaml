@@ -1,0 +1,82 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerArraySectionView"
+             x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
+             x:CompileBindings="True">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
+  </UserControl.Styles>
+  <StackPanel Spacing="{DynamicResource Space6}">
+    <ToggleButton Content="4-point array"
+                  Classes="actionGhost actionTextButton"
+                  HorizontalContentAlignment="Left"
+                  IsChecked="{Binding ShowCustomArray, Mode=TwoWay}"
+                  ToolTip.Tip="Enable array generation. Expanding settings does not change this switch."/>
+    <panels:CollapsiblePanel Title="Array settings" IsExpanded="False" IsVisible="{Binding ShowCustomArray}">
+      <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding ShowCustomArray}">
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Classes="panelFormField left">
+            <TextBlock Text="Array columns"/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="100"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     Value="{Binding CustomArrayColumnCount, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Classes="panelFormField right">
+            <TextBlock Text="Array rows"/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="100"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     Value="{Binding CustomArrayRowCount, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
+        <TextBlock Text="{x:Static vm:CoordinatePlannerWorkspaceViewModel.SafeCornersConsequenceText}" TextWrapping="Wrap" HorizontalAlignment="Left"/>
+        <Button Content="Use safe AA corners"
+                Classes="actionNeutral actionTextButton"
+                HorizontalAlignment="Right"
+                Command="{Binding UseActiveAreaSafeCornersCommand}"
+                ToolTip.Tip="{x:Static vm:CoordinatePlannerWorkspaceViewModel.SafeCornersConsequenceText}"/>
+        <StackPanel Classes="panelFormField">
+          <TextBlock Text="Selected handle"/>
+          <ComboBox ItemsSource="{Binding CustomArrayCornerOptions}"
+                    SelectedItem="{Binding SelectedCustomArrayCornerOption, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:CoordinatePlannerWorkspaceViewModel+CoordinatePlannerCustomArrayCornerOption">
+                <TextBlock Text="{Binding Display}"/>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Classes="panelFormField left">
+            <TextBlock Text="X (machine mm)"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding SelectedCustomArrayCornerMachineX, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Classes="panelFormField right">
+            <TextBlock Text="Y (machine mm)"/>
+            <controls:NumberScrubber Minimum="{DynamicResource NumericInputMinimum}"
+                                     Maximum="{DynamicResource NumericInputMaximum}"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding SelectedCustomArrayCornerMachineY, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
+        <TextBlock Text="Drag TL, TR, BR or BL on the canvas, or edit the selected handle here. The selected handle is filled on the canvas."
+                   Classes="workspaceSectionMeta"
+                   TextWrapping="Wrap"/>
+      </StackPanel>
+    </panels:CollapsiblePanel>
+  </StackPanel>
+</UserControl>
