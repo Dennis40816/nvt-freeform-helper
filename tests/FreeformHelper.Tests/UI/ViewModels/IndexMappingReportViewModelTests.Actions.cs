@@ -158,7 +158,63 @@ public sealed partial class IndexMappingReportViewModelTests
     [Fact]
     public void ApplySegmentDiffOverridesCommand_AppliesRowsInSelectedSegment()
     {
-        var report = new DxfRegularMappingReport(
+        var report = CreateSegmentRepairReport();
+
+        var applyCalls = new List<(int CadId, int DiffIndex)>();
+        var vm = new IndexMappingReportViewModel(
+            "summary",
+            report,
+            applyDiffOverride: (cadId, diffIndex) =>
+            {
+                applyCalls.Add((cadId, diffIndex));
+                return true;
+            });
+        var selected = Assert.Single(vm.DecisionRows, row => row.CadPadId == 9101);
+        vm.SelectDecisionCommand.Execute(selected);
+
+        Assert.True(vm.CanApplySelectedSegmentDiffOverrides);
+        Assert.Contains("repair rows 2/3", vm.SelectedSegmentPreviewText, StringComparison.OrdinalIgnoreCase);
+
+        vm.ApplySegmentDiffOverridesCommand.Execute(null);
+
+        Assert.Equal(2, applyCalls.Count);
+        Assert.Contains(applyCalls, call => call.CadId == 9101 && call.DiffIndex == 100);
+        Assert.Contains(applyCalls, call => call.CadId == 9102 && call.DiffIndex == 101);
+        Assert.DoesNotContain(applyCalls, call => call.CadId == 9103);
+        Assert.Equal("Segment diff repair applied for 2/2 rows.", vm.ActionStatus);
+    }
+
+
+    [Fact]
+    public void ApplyCadOutputFwDiffOverridesCommand_AppliesOnlyVisibleRows()
+    {
+        var report = CreateVisibleRowsReport();
+
+        var applyCalls = new List<(int CadId, int DiffIndex)>();
+        var vm = new IndexMappingReportViewModel(
+            "summary",
+            report,
+            applyDiffOverride: (cadId, diffIndex) =>
+            {
+                applyCalls.Add((cadId, diffIndex));
+                return true;
+            });
+        vm.SearchKeyword = "9202";
+
+        Assert.True(vm.CanApplyCadOutputFwDiffOverrides);
+        Assert.Single(vm.DecisionRows);
+
+        vm.ApplyCadOutputFwDiffOverridesCommand.Execute(null);
+
+        var applied = Assert.Single(applyCalls);
+        Assert.Equal(9202, applied.CadId);
+        Assert.Equal(201, applied.DiffIndex);
+        Assert.Equal("Visible diff repairs applied for 1/1 rows.", vm.ActionStatus);
+    }
+
+    private static DxfRegularMappingReport CreateSegmentRepairReport()
+    {
+        return new DxfRegularMappingReport(
             CadCount: 3,
             RegularCount: 3,
             MappedCount: 3,
@@ -216,60 +272,40 @@ public sealed partial class IndexMappingReportViewModelTests
                     RowIndex: 7,
                     SegmentIndex: 0,
                     SegmentMemberCount: 3),
-                new DxfRegularMaskAuditRow(
-                    CadPadId: 9103,
-                    OrderedCadIndex: 2,
-                    RawSeed: new CadBestMatchSeed(503, 1, 110, 0.88, 0.83),
-                    MaskedSeed: new CadBestMatchSeed(503, 1, 110, 0.88, 0.83),
-                    CsvConfirmedCandidates: new[] { new DxfRegularMaskAuditCandidate(503, 1, 110, 0.88, 0.83) },
-                    CsvConfirmedConfidence: 0.88,
-                    SuggestedDiffIndex: 110,
-                    CurrentAssignedDiffIndex: 108,
-                    Status: DxfRegularMaskAuditStatus.ChangedByMask,
-                    Message: "row3",
-                    Mode: CadOutputFwDiffAssignmentMode.CsvConstrained,
-                    ReasonCode: CadOutputFwDiffAssignmentReasonCode.SegmentOffsetSuspected,
-                    DecisionSource: CadOutputFwDiffAssignmentDecisionSource.AutoRepaired,
-                    PrimaryAssignedDiffIndex: 108,
-                    PassiveCompensationDiffIndex: null,
-                    RepairSuggestionDiffIndex: 110,
-                    IcIndex: 1,
-                    RowIndex: 7,
-                    SegmentIndex: 1,
-                    SegmentMemberCount: 1),
+                CreateOtherSegmentAuditRow(),
             },
             MaskChangedCount: 3,
             MaskRemovedCount: 0);
-
-        var applyCalls = new List<(int CadId, int DiffIndex)>();
-        var vm = new IndexMappingReportViewModel(
-            "summary",
-            report,
-            applyDiffOverride: (cadId, diffIndex) =>
-            {
-                applyCalls.Add((cadId, diffIndex));
-                return true;
-            });
-        var selected = Assert.Single(vm.DecisionRows, row => row.CadPadId == 9101);
-        vm.SelectDecisionCommand.Execute(selected);
-
-        Assert.True(vm.CanApplySelectedSegmentDiffOverrides);
-        Assert.Contains("repair rows 2/3", vm.SelectedSegmentPreviewText, StringComparison.OrdinalIgnoreCase);
-
-        vm.ApplySegmentDiffOverridesCommand.Execute(null);
-
-        Assert.Equal(2, applyCalls.Count);
-        Assert.Contains(applyCalls, call => call.CadId == 9101 && call.DiffIndex == 100);
-        Assert.Contains(applyCalls, call => call.CadId == 9102 && call.DiffIndex == 101);
-        Assert.DoesNotContain(applyCalls, call => call.CadId == 9103);
-        Assert.Equal("Segment diff repair applied for 2/2 rows.", vm.ActionStatus);
     }
 
-
-    [Fact]
-    public void ApplyCadOutputFwDiffOverridesCommand_AppliesOnlyVisibleRows()
+    private static DxfRegularMaskAuditRow CreateOtherSegmentAuditRow()
     {
-        var report = new DxfRegularMappingReport(
+        return new DxfRegularMaskAuditRow(
+            CadPadId: 9103,
+            OrderedCadIndex: 2,
+            RawSeed: new CadBestMatchSeed(503, 1, 110, 0.88, 0.83),
+            MaskedSeed: new CadBestMatchSeed(503, 1, 110, 0.88, 0.83),
+            CsvConfirmedCandidates: new[] { new DxfRegularMaskAuditCandidate(503, 1, 110, 0.88, 0.83) },
+            CsvConfirmedConfidence: 0.88,
+            SuggestedDiffIndex: 110,
+            CurrentAssignedDiffIndex: 108,
+            Status: DxfRegularMaskAuditStatus.ChangedByMask,
+            Message: "row3",
+            Mode: CadOutputFwDiffAssignmentMode.CsvConstrained,
+            ReasonCode: CadOutputFwDiffAssignmentReasonCode.SegmentOffsetSuspected,
+            DecisionSource: CadOutputFwDiffAssignmentDecisionSource.AutoRepaired,
+            PrimaryAssignedDiffIndex: 108,
+            PassiveCompensationDiffIndex: null,
+            RepairSuggestionDiffIndex: 110,
+            IcIndex: 1,
+            RowIndex: 7,
+            SegmentIndex: 1,
+            SegmentMemberCount: 1);
+    }
+
+    private static DxfRegularMappingReport CreateVisibleRowsReport()
+    {
+        return new DxfRegularMappingReport(
             CadCount: 2,
             RegularCount: 2,
             MappedCount: 2,
@@ -328,26 +364,5 @@ public sealed partial class IndexMappingReportViewModelTests
             },
             MaskChangedCount: 2,
             MaskRemovedCount: 0);
-
-        var applyCalls = new List<(int CadId, int DiffIndex)>();
-        var vm = new IndexMappingReportViewModel(
-            "summary",
-            report,
-            applyDiffOverride: (cadId, diffIndex) =>
-            {
-                applyCalls.Add((cadId, diffIndex));
-                return true;
-            });
-        vm.SearchKeyword = "9202";
-
-        Assert.True(vm.CanApplyCadOutputFwDiffOverrides);
-        Assert.Single(vm.DecisionRows);
-
-        vm.ApplyCadOutputFwDiffOverridesCommand.Execute(null);
-
-        var applied = Assert.Single(applyCalls);
-        Assert.Equal(9202, applied.CadId);
-        Assert.Equal(201, applied.DiffIndex);
-        Assert.Equal("Visible diff repairs applied for 1/1 rows.", vm.ActionStatus);
     }
 }

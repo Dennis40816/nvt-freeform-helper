@@ -802,20 +802,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 101
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/Smoke/ProjectLoadingInputTests.cs"
-      ],
-      "contentHash": "e0781ce18c011a2a76a571d5ce1920d2e376ba4c5197cd490cc508bafe4c7a41",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.ProjectLoadingInputTests.ProjectLoad_BlocksEditingAtFrameAwaitAndRestoresItAfterCompletion()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 81
       },
       "owner": "NFH",
@@ -891,118 +877,6 @@
       "contentHash": "a70dcad3e84b8cd55afc1fcd0e55e5c3526a19927a6e4816c624b0c87b267c95",
       "project": "FreeformHelper.Tests",
       "symbol": "FreeformHelper.Tests.FreeformHelperViewModelTests"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 92
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.NotchGenerationStaleCompletion.cs"
-      ],
-      "contentHash": "97a515250864b190c1402ce698f277805c3e2ceb38aa61a81df17704ed896b4f",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.FreeformHelperViewModelTests.CreateSimulationWorkspaceSessionAsync_FinalProjectionChangesAtCompletion_RetainsBatchButRejectsProjection(bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 102
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.NotchResolvedSnapshot.cs"
-      ],
-      "contentHash": "c7084d214042b81c0a8ea5fdbd85d2925c85dcb1418eab3699296f9c5b3971ad",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.FreeformHelperViewModelTests.ResolvedSnapshot_CrossIcAllocationPool_MatchesGeneratorCompensation()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 111
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.NotchResolvedSnapshot.cs"
-      ],
-      "contentHash": "5ee33a9ea205d9b62964007a3eab4ca3cb56f9e1d5735d4a71bf1421f7107b8b",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.FreeformHelperViewModelTests.InspectorCombinedRatio_MatchesGeneratorFinalTargetEligibility(double,int,string,bool)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 115
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/ViewModels/FreeformHelperViewModelTests.SettingsPersistence.ProjectReplay.cs"
-      ],
-      "contentHash": "1c81ed3af302b152bb00fd0da68ba69ab818dd5ce20141a8a2423e810d2f6292",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.FreeformHelperViewModelTests.SaveThenLoadProject_RestoresStepAndExportSettingsFromProjectSnapshot()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 109
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/ViewModels/IndexMappingReportViewModelTests.Actions.cs"
-      ],
-      "contentHash": "b1a357f8984bcb86bd683fb3c11e62a3aa6ab31b96635a6792f86e6dc7ebb69b",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.IndexMappingReportViewModelTests.ApplySegmentDiffOverridesCommand_AppliesRowsInSelectedSegment()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 84
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/ViewModels/IndexMappingReportViewModelTests.Actions.cs"
-      ],
-      "contentHash": "042684f16508d756c4859fef7bd7f8ae5579ac4b125973e6becc71b91a6f5fae",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.IndexMappingReportViewModelTests.ApplyCadOutputFwDiffOverridesCommand_AppliesOnlyVisibleRows()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 103
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/ViewModels/MaskCurrentBehaviorTests.cs"
-      ],
-      "contentHash": "4aaaf3d6335251c58de463d562e32adc0b6e622eb8f16679d949e1af6a59a397",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.MaskCurrentBehaviorTests.LoadProject_CurrentBehavior_MissingMaskStaysEnabledWithNoMaskAndFullSimulationGrid()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 122
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/ViewModels/PadInfoViewModelTests.cs"
-      ],
-      "contentHash": "00711e449d0fcb11ead705b79b6474a49915b44aeb0fee387bb81fcb5ac6f8dd",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.PadInfoViewModelTests.CadPadInfo_TargetAllocationDisplay_UsesFinalEmittedTargetEligibility()"
     }
   ],
   "findings": [

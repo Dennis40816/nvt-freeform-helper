@@ -152,57 +152,11 @@ public sealed partial class FreeformHelperViewModelTests
                 xEdges: [left.Bounds.MinX, left.Bounds.MaxX, right.Bounds.MaxX],
                 yEdges: [left.Bounds.MinY, left.Bounds.MaxY],
                 pads: [left, right]);
-            var settings = new ProjectSettings
-            {
-                Notch = new NotchSettings
-                {
-                    ComputationMode = NotchComputationMode.CadAllocation,
-                    EnableToFullRuleEngine = true,
-                    EnableToFullRuleTrace = true,
-                    EnabledVersions = new HashSet<NotchAlgorithmVersion> { NotchAlgorithmVersion.V22 },
-                },
-            };
-            var table = new NotchTableGenerator().Generate(
-                new CadPadSet([cadA, cadB]),
-                grid,
-                settings,
-                activeRegularPadIds: new HashSet<int> { left.RegularPadId, right.RegularPadId },
-                cadOutputFwDiffIndexByCadId: new Dictionary<int, int>
-                {
-                    [cadA.Id] = left.DiffIndex,
-                    [cadB.Id] = right.DiffIndex,
-                });
-
-            var generatorRow = Assert.Single(
-                table.Rows,
-                row => row.Version == NotchAlgorithmVersion.V22 && row.CadPadId == cadA.Id);
-            var generatorNode = Assert.IsType<NotchV22Node>(generatorRow.V22Node);
-            Assert.Equal(50, generatorNode.CombinePercent);
-            Assert.Contains("R=50% F=100% C=50%", generatorRow.Comment, StringComparison.Ordinal);
+            AssertGeneratorSplitsCrossIcOwners(cadA, cadB, grid, left, right);
 
             vm.ApplyCanvasSelection([cadA.Id], Array.Empty<int>());
             Assert.Empty(vm.NotchCanvasPreviewItems);
-            var resolved = Assert.IsType<NotchV22ResolvedResult>(vm.GetCadV22ResolvedResult(cadA.Id));
-            var debug = Assert.Single(resolved.Compensation.RegularDebugInfos);
-            var expectedDebug = Assert.Single(NotchV22CompensationService.Compute(
-                cadA,
-                grid,
-                enableToRegular: true,
-                enableToFull: true,
-                allCadPads: [cadA, cadB],
-                activeRegularPadIds: new HashSet<int> { left.RegularPadId, right.RegularPadId },
-                enableToFullRuleEngine: true,
-                enableToFullRuleTrace: true).RegularDebugInfos);
-            Assert.Equal(0.5, resolved.Compensation.ToRegularRatio, 6);
-            Assert.Equal(1.0, resolved.Compensation.ToFullRatio, 6);
-            Assert.Equal(0.5, resolved.Compensation.CombinedRatio, 6);
-            Assert.Equal(new[] { cadA.Id, cadB.Id }.Order(), debug.OwnerCadPadIds);
-            Assert.Equal(1, debug.BlockerCandidateCount);
-            Assert.Equal(expectedDebug.ToFullRuleCode, debug.ToFullRuleCode);
-            Assert.Equal(expectedDebug.ToFullRuleTrace, debug.ToFullRuleTrace);
-            var target = Assert.Single(resolved.TargetAllocation.Targets);
-            Assert.Equal((0, left.DiffIndex, 0.5, 50, true),
-                (target.IcIndex, target.DiffIndex, target.Ratio, target.RatioPercentRounded, target.IsAnchorDiff));
+            var resolved = ResolveAndAssertCrossIcCompensation(vm, cadA, cadB, grid, left, right);
 
             await WaitForConditionAsync(
                 () => !vm.PadInspectorUi.IsDeferredRefreshPending &&
@@ -212,21 +166,99 @@ public sealed partial class FreeformHelperViewModelTests
             AssertInspectorProjectsResolved(vm, cadA.Id, resolved);
             AssertNotchDetailProjectsResolved(vm, cadA, resolved, await OpenNotchDetailForTestAsync(vm));
 
-            var revision = vm.GetNotchStep3Revision();
-            var misses = vm.GetNotchCompensationCacheMetrics().MissCount;
-            var replacement = new CadPad(cadB.Id + 1000, "signal-c", "signal-c", cadB.Polygon);
-            vm.CadPads = new ObservableCollection<CadPad>([replacement, cadA]);
-            var replaced = Assert.IsType<NotchV22ResolvedResult>(vm.GetCadV22ResolvedResult(cadA.Id));
-            var replacedDebug = Assert.Single(replaced.Compensation.RegularDebugInfos);
-            Assert.Equal(revision, vm.GetNotchStep3Revision());
-            Assert.Equal(misses + 1, vm.GetNotchCompensationCacheMetrics().MissCount);
-            Assert.NotSame(resolved, replaced);
-            Assert.Equal(new[] { cadA.Id, replacement.Id }.Order(), replacedDebug.OwnerCadPadIds);
+            AssertReplacingOwnerInvalidatesResolved(vm, cadA, cadB, resolved);
         }
         finally
         {
             File.Delete(dxfPath);
         }
+    }
+
+    private static void AssertGeneratorSplitsCrossIcOwners(
+        CadPad cadA,
+        CadPad cadB,
+        RegularGrid grid,
+        RegularPad left,
+        RegularPad right)
+    {
+        var settings = new ProjectSettings
+        {
+            Notch = new NotchSettings
+            {
+                ComputationMode = NotchComputationMode.CadAllocation,
+                EnableToFullRuleEngine = true,
+                EnableToFullRuleTrace = true,
+                EnabledVersions = new HashSet<NotchAlgorithmVersion> { NotchAlgorithmVersion.V22 },
+            },
+        };
+        var table = new NotchTableGenerator().Generate(
+            new CadPadSet([cadA, cadB]),
+            grid,
+            settings,
+            activeRegularPadIds: new HashSet<int> { left.RegularPadId, right.RegularPadId },
+            cadOutputFwDiffIndexByCadId: new Dictionary<int, int>
+            {
+                [cadA.Id] = left.DiffIndex,
+                [cadB.Id] = right.DiffIndex,
+            });
+
+        var generatorRow = Assert.Single(
+            table.Rows,
+            row => row.Version == NotchAlgorithmVersion.V22 && row.CadPadId == cadA.Id);
+        var generatorNode = Assert.IsType<NotchV22Node>(generatorRow.V22Node);
+        Assert.Equal(50, generatorNode.CombinePercent);
+        Assert.Contains("R=50% F=100% C=50%", generatorRow.Comment, StringComparison.Ordinal);
+    }
+
+    private static NotchV22ResolvedResult ResolveAndAssertCrossIcCompensation(
+        FreeformHelperViewModel vm,
+        CadPad cadA,
+        CadPad cadB,
+        RegularGrid grid,
+        RegularPad left,
+        RegularPad right)
+    {
+        var resolved = Assert.IsType<NotchV22ResolvedResult>(vm.GetCadV22ResolvedResult(cadA.Id));
+        var debug = Assert.Single(resolved.Compensation.RegularDebugInfos);
+        var expectedDebug = Assert.Single(NotchV22CompensationService.Compute(
+            cadA,
+            grid,
+            enableToRegular: true,
+            enableToFull: true,
+            allCadPads: [cadA, cadB],
+            activeRegularPadIds: new HashSet<int> { left.RegularPadId, right.RegularPadId },
+            enableToFullRuleEngine: true,
+            enableToFullRuleTrace: true).RegularDebugInfos);
+        Assert.Equal(0.5, resolved.Compensation.ToRegularRatio, 6);
+        Assert.Equal(1.0, resolved.Compensation.ToFullRatio, 6);
+        Assert.Equal(0.5, resolved.Compensation.CombinedRatio, 6);
+        Assert.Equal(new[] { cadA.Id, cadB.Id }.Order(), debug.OwnerCadPadIds);
+        Assert.Equal(1, debug.BlockerCandidateCount);
+        Assert.Equal(expectedDebug.ToFullRuleCode, debug.ToFullRuleCode);
+        Assert.Equal(expectedDebug.ToFullRuleTrace, debug.ToFullRuleTrace);
+        var target = Assert.Single(resolved.TargetAllocation.Targets);
+        Assert.Equal((0, left.DiffIndex, 0.5, 50, true),
+            (target.IcIndex, target.DiffIndex, target.Ratio, target.RatioPercentRounded, target.IsAnchorDiff));
+
+        return resolved;
+    }
+
+    private static void AssertReplacingOwnerInvalidatesResolved(
+        FreeformHelperViewModel vm,
+        CadPad cadA,
+        CadPad cadB,
+        NotchV22ResolvedResult resolved)
+    {
+        var revision = vm.GetNotchStep3Revision();
+        var misses = vm.GetNotchCompensationCacheMetrics().MissCount;
+        var replacement = new CadPad(cadB.Id + 1000, "signal-c", "signal-c", cadB.Polygon);
+        vm.CadPads = new ObservableCollection<CadPad>([replacement, cadA]);
+        var replaced = Assert.IsType<NotchV22ResolvedResult>(vm.GetCadV22ResolvedResult(cadA.Id));
+        var replacedDebug = Assert.Single(replaced.Compensation.RegularDebugInfos);
+        Assert.Equal(revision, vm.GetNotchStep3Revision());
+        Assert.Equal(misses + 1, vm.GetNotchCompensationCacheMetrics().MissCount);
+        Assert.NotSame(resolved, replaced);
+        Assert.Equal(new[] { cadA.Id, replacement.Id }.Order(), replacedDebug.OwnerCadPadIds);
     }
 
     [AvaloniaTheory]
@@ -239,6 +271,43 @@ public sealed partial class FreeformHelperViewModelTests
         bool expectedOverflow)
     {
         HeadlessAppBootstrap.EnsureInitialized();
+        var (vm, cad, grid, regulars) = CreateFinalTargetEligibilityViewModel(cadMaxX);
+        var anchorRegular = regulars[0];
+        var eligibleRegular = regulars[1];
+        var finalRegular = regulars[2];
+
+        var resolved = Assert.IsType<NotchV22ResolvedResult>(vm.GetCadV22ResolvedResult(cad.Id));
+        Assert.Equal(
+            [
+                (anchorRegular.DiffIndex, 100, true, true),
+                (eligibleRegular.DiffIndex, 100, true, false),
+                (finalRegular.DiffIndex, 100, expectedOverflow, false),
+            ],
+            resolved.TargetAllocation.Targets
+                .OrderBy(static target => target.DiffIndex)
+                .Select(static target => (
+                    target.DiffIndex,
+                    target.RatioPercentRounded,
+                    target.PassesStrictThreshold,
+                    target.IsAnchorDiff)));
+        Assert.Equal(expectedCombinedPercent, resolved.TargetAllocation.TargetCoverageProjection.RawCombinedPercent);
+        Assert.Equal(expectedOverflow, resolved.TargetAllocation.TargetCoverageProjection.HasCombinedOverflowRisk);
+
+        AssertGeneratorFinalTargetEligibility(cad, grid, regulars, anchorRegular, expectedCombinedPercent, expectedOverflow);
+
+        vm.PadInspectorUi.Snapshot = vm.BuildCadPadInspectorSnapshot(cad.Id);
+        AssertInspectorProjectsResolved(vm, cad.Id, resolved);
+        var combinedLine = Assert.Single(
+            vm.PadInspectorCompensationLines,
+            static line => line.Label == "Combined");
+        Assert.Equal(expectedDisplay, combinedLine.Value);
+        Assert.Equal(expectedOverflow, combinedLine.IsEmphasized);
+        Assert.Equal(expectedOverflow ? PadInspectorLineTone.Warning : PadInspectorLineTone.Normal, combinedLine.Tone);
+    }
+
+    private static (FreeformHelperViewModel Vm, CadPad Cad, RegularGrid Grid, RegularPad[] Regulars) CreateFinalTargetEligibilityViewModel(
+        double cadMaxX)
+    {
         var cad = CreateRectCad(101, 0, 0, cadMaxX, 10);
         var anchorRegular = CreateRectRegular(0, 0, 1001, 0, 0, 10, 10);
         var eligibleRegular = CreateRectRegular(0, 1, 1002, 10, 0, 20, 10);
@@ -277,23 +346,17 @@ public sealed partial class FreeformHelperViewModelTests
         SetCadOutputFwDiff(vm, cad.Id, anchorRegular.DiffIndex, anchorRegular.IcIndex);
         InvalidateWorkflowDataSnapshot(vm);
 
-        var resolved = Assert.IsType<NotchV22ResolvedResult>(vm.GetCadV22ResolvedResult(cad.Id));
-        Assert.Equal(
-            [
-                (anchorRegular.DiffIndex, 100, true, true),
-                (eligibleRegular.DiffIndex, 100, true, false),
-                (finalRegular.DiffIndex, 100, expectedOverflow, false),
-            ],
-            resolved.TargetAllocation.Targets
-                .OrderBy(static target => target.DiffIndex)
-                .Select(static target => (
-                    target.DiffIndex,
-                    target.RatioPercentRounded,
-                    target.PassesStrictThreshold,
-                    target.IsAnchorDiff)));
-        Assert.Equal(expectedCombinedPercent, resolved.TargetAllocation.TargetCoverageProjection.RawCombinedPercent);
-        Assert.Equal(expectedOverflow, resolved.TargetAllocation.TargetCoverageProjection.HasCombinedOverflowRisk);
+        return (vm, cad, grid, regulars);
+    }
 
+    private static void AssertGeneratorFinalTargetEligibility(
+        CadPad cad,
+        RegularGrid grid,
+        RegularPad[] regulars,
+        RegularPad anchorRegular,
+        int expectedCombinedPercent,
+        bool expectedOverflow)
+    {
         var settings = new ProjectSettings
         {
             Notch = new NotchSettings
@@ -330,15 +393,6 @@ public sealed partial class FreeformHelperViewModelTests
             Assert.Equal(expectedCombinedPercent, generatorNode.CombinePercent);
             Assert.Contains($"C={expectedCombinedPercent}%", generatorRow.Comment, StringComparison.Ordinal);
         }
-
-        vm.PadInspectorUi.Snapshot = vm.BuildCadPadInspectorSnapshot(cad.Id);
-        AssertInspectorProjectsResolved(vm, cad.Id, resolved);
-        var combinedLine = Assert.Single(
-            vm.PadInspectorCompensationLines,
-            static line => line.Label == "Combined");
-        Assert.Equal(expectedDisplay, combinedLine.Value);
-        Assert.Equal(expectedOverflow, combinedLine.IsEmphasized);
-        Assert.Equal(expectedOverflow ? PadInspectorLineTone.Warning : PadInspectorLineTone.Normal, combinedLine.Tone);
     }
 
     [AvaloniaFact]
