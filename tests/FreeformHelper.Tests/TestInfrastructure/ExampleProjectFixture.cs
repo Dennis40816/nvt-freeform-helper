@@ -27,7 +27,7 @@ internal sealed class ExampleProjectFixture : IDisposable
             projectText = project.ToJsonString();
         }
 
-        var temporaryDirectory = Directory.CreateTempSubdirectory("freeform-helper-example-").FullName;
+        var temporaryDirectory = TestFiles.CreateTempDirectory().FullName;
         var fixture = new ExampleProjectFixture(
             temporaryDirectory,
             Path.Combine(temporaryDirectory, Path.GetFileName(originalProjectPath)));

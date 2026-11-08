@@ -32,7 +32,7 @@ public sealed class ExampleProjectFixtureTests
     [InlineData(true, false)]
     public void Create_RewritesOnlyExistingMaskSourcePath_WhenSiblingCsvExists(bool hasSiblingCsv, bool hasSourcePath)
     {
-        var sourceDirectory = Directory.CreateTempSubdirectory("freeform-helper-fixture-test-").FullName;
+        var sourceDirectory = TestFiles.CreateTempDirectory().FullName;
         try
         {
             var project = JsonNode.Parse("""
@@ -90,7 +90,7 @@ public sealed class ExampleProjectFixtureTests
     [Fact]
     public void Create_UsesUniqueTemporaryFolders_AndDisposeDeletesWorkingCopy()
     {
-        var sourceDirectory = Directory.CreateTempSubdirectory("freeform-helper-fixture-test-").FullName;
+        var sourceDirectory = TestFiles.CreateTempDirectory().FullName;
         try
         {
             var projectPath = Path.Combine(sourceDirectory, "project.json");

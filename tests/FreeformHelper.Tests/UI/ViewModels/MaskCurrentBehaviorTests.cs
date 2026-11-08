@@ -15,7 +15,7 @@ public sealed class MaskCurrentBehaviorTests
     [Fact]
     public async Task LoadProject_CurrentBehavior_MissingMaskStaysEnabledWithNoMaskAndFullSimulationGrid()
     {
-        var directory = Directory.CreateTempSubdirectory("freeformhelper-mask-current-");
+        var directory = TestFiles.CreateTempDirectory();
         try
         {
             var missingMaskPath = Path.Combine(directory.FullName, "missing.csv");
