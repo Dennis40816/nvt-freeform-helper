@@ -6,6 +6,7 @@ using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views.WorkflowSteps;
+using Nvt.Core.Avalonia.Panels;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -80,6 +81,9 @@ public sealed class RightWorkflowStep3GuardBindingTests
         var view = new RightWorkflowStep3View { DataContext = viewModel };
         var window = new Window { Width = 480, Height = 900, Content = view };
         window.Show();
+        await HeadlessUiPump.FlushQueueAsync();
+        Assert.Single(view.GetVisualDescendants().OfType<CollapsiblePanel>(),
+            static panel => panel.Title == "Edit guards").IsExpanded = true;
         await HeadlessUiPump.FlushQueueAsync();
         return (viewModel, view, window);
     }

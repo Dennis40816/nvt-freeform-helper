@@ -108,7 +108,8 @@ public sealed class UiOperationProgressStateTests
         vm.IsCheckingDxfOverlap = busy;
         vm.DxfOverlapProgress = progress;
 
-        Assert.Equal(new[] { ("changing", (string?)name, false, 0.0), ("changed", (string?)name, busy, progress) }, changes);
+        Assert.Equal(new[] { ("changing", (string?)name, false, 0.0), ("changed", (string?)name, busy, progress) },
+            changes.Where(static change => change.Name != nameof(FreeformHelperViewModel.DxfCheckHeaderText)));
     }
 
     [AvaloniaTheory]

@@ -8,11 +8,11 @@ using Avalonia.VisualTree;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
 using FreeformHelper.UI.Views.RightWorkflowSections;
 using FreeformHelper.UI.Views.WorkflowSteps;
+using Nvt.Core.Avalonia.Panels;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -65,16 +65,16 @@ public sealed class WorkflowOpenSettingsEntryTests
             owner.Show();
             await HeadlessUiPump.FlushQueueAsync();
             var settingsTab = Assert.Single(view.GetVisualDescendants().OfType<RightWorkflowSettingsTabView>());
-            var overview = Assert.Single(settingsTab.GetVisualDescendants().OfType<HidePanelBlock>(),
+            var overview = Assert.Single(settingsTab.GetVisualDescendants().OfType<CollapsiblePanel>(),
                 static block => block.Title == "Overview");
             overview.IsExpanded = true;
             await HeadlessUiPump.FlushQueueAsync();
 
             var window = await ClickOpenSettingsAsync(overview, owner, SettingsWindowSection.General, "General");
             Assert.Same(window, await ClickOpenSettingsAsync(
-                overview, owner, SettingsWindowSection.Step3NotchCompensation, "Step3"));
+                Assert.Single(view.GetVisualDescendants().OfType<RightWorkflowStep3View>()), owner, SettingsWindowSection.Step3NotchCompensation, "Step3"));
             Assert.Same(window, await ClickOpenSettingsAsync(
-                overview, owner, SettingsWindowSection.Step5NotchExport, "Step5"));
+                Assert.Single(view.GetVisualDescendants().OfType<RightWorkflowStep5View>()), owner, SettingsWindowSection.Step5NotchExport, "Step5"));
             Assert.Same(window, await ClickOpenSettingsAsync(overview, owner, SettingsWindowSection.General, "General"));
         }
         finally
@@ -95,7 +95,7 @@ public sealed class WorkflowOpenSettingsEntryTests
         where TStep : UserControl
     {
         var step = Assert.Single(view.GetVisualDescendants().OfType<TStep>());
-        var block = Assert.Single(step.GetVisualDescendants().OfType<HidePanelBlock>());
+        var block = Assert.IsType<CollapsiblePanel>(step.Content);
         block.IsExpanded = true;
         await HeadlessUiPump.FlushQueueAsync();
 

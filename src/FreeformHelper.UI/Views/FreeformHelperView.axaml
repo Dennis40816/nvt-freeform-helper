@@ -40,9 +40,15 @@
           <MenuItem Header="Load Project" Command="{Binding LoadProjectCommand}"/>
         </MenuItem>
         <MenuItem Header="Export">
-          <MenuItem Header="Export Notch" Command="{Binding ExportNotchCommand}"/>
-          <MenuItem Header="Export DXF (Visible Layers)" Command="{Binding ExportDxfVisibleCommand}"/>
-          <MenuItem Header="Export DXF (All Layers)" Command="{Binding ExportDxfAllCommand}"/>
+          <MenuItem Header="Notch" IsEnabled="False"/>
+          <MenuItem Header="Export Notch Rows…" Command="{Binding ExportNotchCommand}"
+                    ToolTip.Tip="Pick Notch rows, then export using the existing file type selection."/>
+          <Separator/>
+          <MenuItem Header="DXF" IsEnabled="False"/>
+          <MenuItem Header="Export DXF (Visible Layers)" Command="{Binding ExportDxfVisibleCommand}"
+                    ToolTip.Tip="Export visible canvas layers plus DXF-layer pads using the current export rules."/>
+          <MenuItem Header="Export DXF (All Layers)" Command="{Binding ExportDxfAllCommand}"
+                    ToolTip.Tip="Export all DXF layers, including layers hidden on the canvas."/>
           <MenuItem Header="Export DXF Layer Image" Command="{Binding ExportDxfLayerImageCommand}"/>
         </MenuItem>
         <MenuItem Header="Settings">
@@ -59,24 +65,6 @@
                               StatusText="{Binding StatusText}"
                               ClearSelectionCommand="{Binding ClearSelectionCommand}"/>
 
-    <Border x:Name="NotchExportRestoreHintBorder"
-            Grid.Row="1"
-            Grid.ColumnSpan="5"
-            Classes="notchExportRestoreHint"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Center"
-            Margin="{StaticResource InsetRight12}"
-            IsVisible="False">
-      <StackPanel Orientation="Horizontal"
-                  Spacing="{StaticResource Space8}">
-        <SelectableTextBlock Classes="notchExportRestoreHintText"
-                             Text="Notch export panel hidden"/>
-        <Button Classes="notchExportRestoreHintAction"
-                Content="Restore (Ctrl+Shift+E)"
-                Click="RestoreNotchExportSelectionWindow_Click"/>
-      </StackPanel>
-    </Border>
-
     <!-- Left: DXF controls -->
     <Border x:Name="LeftPanel"
             Grid.Row="2"
@@ -84,10 +72,10 @@
             Classes="workspaceSidePane left">
       <Grid RowDefinitions="Auto,*">
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="{StaticResource InsetBottom12}">
-          <SelectableTextBlock Text="DXF Settings" FontWeight="SemiBold"/>
+          <SelectableTextBlock Text="DXF" FontWeight="SemiBold"/>
           <Button Grid.Column="1"
                   Classes="actionIconButton panelChromeToggle"
-                  ToolTip.Tip="Hide left panel"
+                  ToolTip.Tip="Hide Layers &amp; DXF panel"
                   Click="HideLeftPanel_Click">
             <controls:FontIcon Classes="symbols"
                                Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
@@ -199,7 +187,7 @@
             Grid.Row="2"
             Grid.Column="4"
             Classes="workspaceSidePane right">
-      <Grid RowDefinitions="Auto,*">
+      <Grid RowDefinitions="Auto,*,Auto">
         <Grid Grid.Row="0"
               ColumnDefinitions="*,Auto"
               ColumnSpacing="{StaticResource Space8}"
@@ -233,7 +221,7 @@
           <Button Grid.Column="1"
                   VerticalAlignment="Center"
                   Classes="actionIconButton panelChromeToggle"
-                  ToolTip.Tip="Hide right panel"
+                  ToolTip.Tip="Hide Settings &amp; Inspector panel"
                   Click="HideRightPanel_Click">
             <controls:FontIcon Classes="symbols"
                                Glyph="{x:Static icons:IconGlyphs.ChevronRight}"/>
@@ -250,6 +238,9 @@
             <views:RightWorkflowPanel OpenSettingsRequested="OnRightPanelOpenSettingsRequested"/>
           </Border>
         </ScrollViewer>
+        <controls:WorkspaceActionBar x:Name="WorkspaceActions" Grid.Row="2"
+                                     IsVisible="{Binding IsRightPanelSettingsTab}"
+                                     RestoreRequested="RestoreNotchExportSelectionWindow_Click"/>
       </Grid>
     </Border>
 

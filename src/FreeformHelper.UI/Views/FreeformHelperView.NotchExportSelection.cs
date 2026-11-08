@@ -90,7 +90,7 @@ public sealed partial class FreeformHelperView
         if (TopLevel.GetTopLevel(this) is MainWindow window)
         {
             window.ShowTopToast(
-                "Export panel hidden. Use top-right Restore or Ctrl+Shift+E.",
+                "Export panel hidden. Use Restore Export Notch Rows in the action bar or Ctrl+Shift+E.",
                 Avalonia.Controls.Notifications.NotificationType.Information);
         }
     }

@@ -1,10 +1,10 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views.RightWorkflowSections;
+using Nvt.Core.Avalonia.Panels;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -47,7 +47,7 @@ public sealed class InspectorDebugFoldTests
         Assert.Contains(opened, text => text.StartsWith("Rule trace", StringComparison.Ordinal));
         Assert.DoesNotContain(opened, text => text.Contains("same snapshot source", StringComparison.Ordinal));
         Assert.DoesNotContain(opened, text => text.Contains("Focus by CAD, REG, or DIFF id.", StringComparison.Ordinal));
-        Assert.Contains(window.GetVisualDescendants().OfType<ToggleButton>(), button => button.Classes.Contains("workspaceFoldHeader"));
+        Assert.Contains(window.GetVisualDescendants().OfType<CollapsiblePanel>(), panel => panel.Title == "Debug details");
         var ruleTrace = window.GetVisualDescendants()
             .OfType<SelectableTextBlock>()
             .Single(block => block.Text?.StartsWith("Rule trace", StringComparison.Ordinal) == true);
