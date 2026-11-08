@@ -28,7 +28,7 @@ public sealed class NotchAllocationBoundaryBehaviorTests
         grid.Pads[0].Freeform = FreeformType.XWay;
         var reports = new ConcurrentQueue<NotchGenerationProgress>();
 
-        var table = new NotchTableGenerator().Generate(new CadPadSet(pads), grid, CreateSettings(), new RecordingProgress(reports));
+        var table = new NotchTableGenerator().Generate(new CadPadSet(pads), grid, CreateSettings(), new QueuedGenerationProgress(reports));
 
         var row = Assert.Single(table.Rows);
         Assert.Equal(3, row.CadPadId);
@@ -57,7 +57,7 @@ public sealed class NotchAllocationBoundaryBehaviorTests
         settings.Notch.EnabledVersions = [NotchAlgorithmVersion.V21];
         var reports = new ConcurrentQueue<NotchGenerationProgress>();
 
-        var table = new NotchTableGenerator().Generate(cad, grid, settings, new RecordingProgress(reports));
+        var table = new NotchTableGenerator().Generate(cad, grid, settings, new QueuedGenerationProgress(reports));
 
         Assert.Empty(table.Rows);
         Assert.False(table.ToFullCoverageAudit.HasExpectations);
@@ -83,7 +83,7 @@ public sealed class NotchAllocationBoundaryBehaviorTests
         },
     };
 
-    private sealed class RecordingProgress(ConcurrentQueue<NotchGenerationProgress> reports) : IProgress<NotchGenerationProgress>
+    private sealed class QueuedGenerationProgress(ConcurrentQueue<NotchGenerationProgress> reports) : IProgress<NotchGenerationProgress>
     {
         public void Report(NotchGenerationProgress value) => reports.Enqueue(value);
     }
