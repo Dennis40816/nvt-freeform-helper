@@ -683,7 +683,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "viewTypeLines": 2232,
+        "viewTypeLines": 2205,
         "partialFiles": 17
       },
       "owner": "NFH",
@@ -732,7 +732,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "fileLines": 1234
+        "fileLines": 1222
       },
       "owner": "NFH",
       "locations": [
@@ -746,7 +746,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 305
+        "methodLines": 298
       },
       "owner": "NFH",
       "locations": [

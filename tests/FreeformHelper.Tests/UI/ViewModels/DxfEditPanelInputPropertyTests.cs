@@ -24,7 +24,7 @@ public sealed class DxfEditPanelInputPropertyTests
         new(nameof(FreeformHelperViewModel.DxfEditRotationLayerName), "L2", false, false),
         new(nameof(FreeformHelperViewModel.DxfEditNewLayerName), "N1", false, false),
         new(nameof(FreeformHelperViewModel.DxfEditRotationDegrees), 45m, false, false),
-        new(nameof(FreeformHelperViewModel.IsDxfEditAdvancedPanelExpanded), false, false, false),
+        new(nameof(FreeformHelperViewModel.IsDxfEditAdvancedPanelExpanded), true, false, false),
     ];
 
     public static TheoryData<int> SettingIndexes => new(Enumerable.Range(0, _settings.Length));
@@ -39,7 +39,7 @@ public sealed class DxfEditPanelInputPropertyTests
         Assert.Equal("", vm.DxfEditRotationLayerName);
         Assert.Equal("", vm.DxfEditNewLayerName);
         Assert.Equal(90m, vm.DxfEditRotationDegrees);
-        Assert.True(vm.IsDxfEditAdvancedPanelExpanded);
+        Assert.False(vm.IsDxfEditAdvancedPanelExpanded);
     }
 
     [Theory]
@@ -161,7 +161,7 @@ public sealed class DxfEditPanelInputPropertyTests
             nameof(FreeformHelperViewModel.DxfEditRotationLayerName) => "",
             nameof(FreeformHelperViewModel.DxfEditNewLayerName) => "",
             nameof(FreeformHelperViewModel.DxfEditRotationDegrees) => 90m,
-            nameof(FreeformHelperViewModel.IsDxfEditAdvancedPanelExpanded) => true,
+            nameof(FreeformHelperViewModel.IsDxfEditAdvancedPanelExpanded) => false,
             _ => setting.NewValue,
         };
 

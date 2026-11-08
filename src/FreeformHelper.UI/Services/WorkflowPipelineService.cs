@@ -21,7 +21,7 @@ public sealed class WorkflowPipelineService
                 nextStep = WorkflowStepId.Step3NotchPreview;
                 return true;
             case WorkflowStepId.Step3NotchPreview:
-                nextStep = WorkflowStepId.Step4IndexDiagnostics;
+                nextStep = WorkflowStepId.Step5Export;
                 return true;
             case WorkflowStepId.Step4IndexDiagnostics:
                 nextStep = WorkflowStepId.Step5Export;

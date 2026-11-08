@@ -3,6 +3,7 @@
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
         xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
         xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
   <!-- Panel block (settings card with collapsible header) -->
   <Style Selector="controls|HidePanelBlock">
     <Setter Property="HorizontalAlignment" Value="Stretch"/>
