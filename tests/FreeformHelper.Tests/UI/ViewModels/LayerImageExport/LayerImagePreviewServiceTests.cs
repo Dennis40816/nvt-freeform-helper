@@ -32,6 +32,33 @@ public sealed class LayerImagePreviewServiceTests
     }
 
     [Fact]
+    public async Task NextPreviewRendersWhenTheCallerContextNeverRunsItsContinuationAsync()
+    {
+        // A caller whose synchronization context stops pumping (a closed window, a finished test) must not keep the
+        // shared render gate: every later preview in the process would wait on it forever.
+        var context = LayerImageExportTestData.CreateContext();
+        var layers = context.InitialCheckedLayers.Select(name => new LayerImageLayer(name, context.PadsOfLayer(name))).ToList();
+        var request = LayerImageRenderRequest.FromSize(layers, context.InitialSize, 1m, false);
+        Task<byte[]?> abandoned;
+        var previous = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new AbandonedSynchronizationContext());
+        try
+        {
+            abandoned = LayerImagePreviewService.RenderPngAsync(request, 1200, TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+
+        var next = await LayerImagePreviewService.RenderPngAsync(request, 1200, TestContext.Current.CancellationToken)
+            .WaitAsync(TimeSpan.FromSeconds(30), TestContext.Current.CancellationToken);
+
+        Assert.NotNull(next);
+        Assert.NotNull(await abandoned.WaitAsync(TimeSpan.FromSeconds(30), TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
     public async Task EmptyOrCancelledPreviewReturnsNullAsync()
     {
         var request = new LayerImageRenderRequest(Array.Empty<LayerImageLayer>(), 100, 100, 0, 0, 1m, false);
