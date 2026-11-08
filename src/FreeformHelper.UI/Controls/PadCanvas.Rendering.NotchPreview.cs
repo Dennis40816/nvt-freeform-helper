@@ -229,20 +229,8 @@ public sealed partial class PadCanvas
         var rightCandidate = new Rect(center.X + offset, center.Y - (labelHeight / 2.0), labelWidth, labelHeight);
         var leftCandidate = new Rect(center.X - (labelWidth + offset), center.Y - (labelHeight / 2.0), labelWidth, labelHeight);
         var candidates = preferBelow
-            ? new[]
-            {
-                bottomCandidate,
-                topCandidate,
-                rightCandidate,
-                leftCandidate,
-            }
-            : new[]
-        {
-            topCandidate,
-            bottomCandidate,
-            rightCandidate,
-            leftCandidate,
-        };
+            ? new[] { bottomCandidate, topCandidate, rightCandidate, leftCandidate }
+            : new[] { topCandidate, bottomCandidate, rightCandidate, leftCandidate };
 
         foreach (var candidate in candidates)
         {

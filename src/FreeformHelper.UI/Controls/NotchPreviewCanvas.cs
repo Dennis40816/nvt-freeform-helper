@@ -97,6 +97,19 @@ public sealed class NotchPreviewCanvas : Control
         var toFullPen = new Pen(GetBrush(toFullStrokeColor), toFullStrokeWidth);
         var hatchPen = new Pen(GetBrush(hatchColor), hatchWidth);
 
+        DrawWorldShapes(context, worldToScreen, hatchSpacing / scale, cadFill, cadPen, regPen, toFullPen, hatchPen);
+    }
+
+    private void DrawWorldShapes(
+        DrawingContext context,
+        Matrix worldToScreen,
+        double spacingWorld,
+        IBrush cadFill,
+        Pen cadPen,
+        Pen regPen,
+        Pen toFullPen,
+        Pen hatchPen)
+    {
         using (context.PushTransform(worldToScreen))
         {
             if (CadPad is not null)
@@ -110,7 +123,6 @@ public sealed class NotchPreviewCanvas : Control
 
             if (RegularPads.Count > 0)
             {
-                var spacingWorld = hatchSpacing / scale;
                 foreach (var pad in RegularPads)
                 {
                     var b = pad.Bounds;
