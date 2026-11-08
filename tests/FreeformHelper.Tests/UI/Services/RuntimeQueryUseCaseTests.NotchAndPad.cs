@@ -13,67 +13,16 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task ExecuteAsync_NotchPadAndInspector_SameResolvedDisplayWithRoundedZeroTarget()
     {
-        const double cadArea = 4570.0;
-        const double cadHeight = 5.4;
-        const double emittedArea = 18.09;
-        const double roundedZeroArea = 18.0; // Q7-positive CAD allocation with rounded-zero regular coverage.
-        var anchorMaxX = (cadArea - (2 * emittedArea) - roundedZeroArea) / cadHeight;
-        var emittedMaxX = anchorMaxX + (emittedArea / cadHeight);
-        var secondEmittedMaxX = emittedMaxX + (emittedArea / cadHeight);
-        var cadMaxX = secondEmittedMaxX + (roundedZeroArea / cadHeight);
-        var gridMaxX = secondEmittedMaxX + 800.0;
-        using var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var (shell, cad, grid) = CreateRoundedZeroTargetScenario();
+        using var shellScope = shell;
         var helper = shell.FreeformHelper;
-        var cad = CreateCadPad(274, 0, 0, cadMaxX, cadHeight);
-        var regulars = new[]
-        {
-            CreateRegularPad(4808, 0, 0, 0, 0, anchorMaxX, 10, 0, 83),
-            CreateRegularPad(4809, 0, 1, anchorMaxX, 0, emittedMaxX, 10, 0, 84),
-            CreateRegularPad(4810, 0, 2, emittedMaxX, 0, secondEmittedMaxX, 10, 0, 85),
-            CreateRegularPad(4811, 0, 3, secondEmittedMaxX, 0, gridMaxX, 10, 0, 86),
-        };
-        foreach (var regular in regulars)
-        {
-            regular.Freeform = FreeformType.XWay;
-            regular.MatchedCadPadId = cad.Id;
-            regular.MatchScore = 1.0;
-            helper.RegularPads.Add(regular);
-        }
-
-        helper.CadPads.Add(cad);
-        helper.EnableToRegular = true;
-        helper.EnableToFull = true;
-        helper.ToFullStrictOverlapPercent = 0.1m;
-        helper.EnableBoundaryVirtualAreaCap = true;
-        FreeformHelperViewModelPrivateAccess.Cad(helper) = new CadPadSet([cad]);
-        var grid = new RegularGrid(
-            rows: 1,
-            cols: 4,
-            xEdges: [0, anchorMaxX, emittedMaxX, secondEmittedMaxX, gridMaxX],
-            yEdges: [0, 10],
-            pads: regulars);
-        FreeformHelperViewModelPrivateAccess.Grid(helper) = grid;
-        helper.CadIndexMaps.OutputFwDiffIndexByCadId[cad.Id] = 83;
-        helper.CadIndexMaps.IcIndexByCadId[cad.Id] = 0;
-        helper.InvalidateWorkflowDataSnapshot();
 
         Assert.Equal(1, Assert.Single(NotchAllocationService.BuildAllocations(cad, grid),
             allocation => allocation.Pad.DiffIndex == 86).Q7);
         var resolved = Assert.IsType<NotchV22ResolvedResult>(helper.GetCadV22ResolvedResult(cad.Id));
         var snapshot = Assert.IsType<PadInspectorSnapshot>(helper.BuildCadPadInspectorSnapshot(cad.Id));
         var inspector = Assert.IsType<PadInspectorNotchSnapshot>(snapshot.Cad?.Notch);
-        var padInfo = new CadPadInfoViewModel(
-            pads: [cad],
-            getDxfIndex: _ => 83,
-            getCadOutputFwDiffOverride: null,
-            isDxfIndexAnchor: null,
-            getCustomValue: _ => 0,
-            applyCustomValue: null,
-            setCadOutputFwDiffOverride: null,
-            clearCadOutputFwDiffOverride: null,
-            setDxfIndexAnchor: null,
-            clearDxfIndexAnchor: null,
-            inspectorSnapshot: snapshot);
+        var padInfo = CreateCadPadInfo(cad, snapshot);
         var useCase = new RuntimeQueryUseCase(shell);
         var args = new Dictionary<string, string> { ["cad-id"] = cad.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) };
         var notchResponse = await useCase.ExecuteAsync(new RuntimeQueryRequest(RuntimeQueryProtocol.Version, "notch", args));
@@ -130,6 +79,71 @@ public sealed partial class RuntimeQueryUseCaseTests
         Assert.Equal(expected.CombinedRatioText, padDisplay.GetProperty("combinedRatioText").GetString());
         Assert.Equal(["IC1/diff83", "IC1/diff84", "IC1/diff85", "IC1/diff86"], padInfo.TargetAllocationItems.Select(static item => item.DiffText));
         Assert.Equal("Below gate", padInfo.TargetAllocationItems[3].RoleText);
+    }
+
+    private static (ShellViewModel Shell, CadPad Cad, RegularGrid Grid) CreateRoundedZeroTargetScenario()
+    {
+        const double cadArea = 4570.0;
+        const double cadHeight = 5.4;
+        const double emittedArea = 18.09;
+        const double roundedZeroArea = 18.0; // Q7-positive CAD allocation with rounded-zero regular coverage.
+        var anchorMaxX = (cadArea - (2 * emittedArea) - roundedZeroArea) / cadHeight;
+        var emittedMaxX = anchorMaxX + (emittedArea / cadHeight);
+        var secondEmittedMaxX = emittedMaxX + (emittedArea / cadHeight);
+        var cadMaxX = secondEmittedMaxX + (roundedZeroArea / cadHeight);
+        var gridMaxX = secondEmittedMaxX + 800.0;
+        var shell = new ShellViewModel { IsDevPageAvailable = true };
+        var helper = shell.FreeformHelper;
+        var cad = CreateCadPad(274, 0, 0, cadMaxX, cadHeight);
+        var regulars = new[]
+        {
+            CreateRegularPad(4808, 0, 0, 0, 0, anchorMaxX, 10, 0, 83),
+            CreateRegularPad(4809, 0, 1, anchorMaxX, 0, emittedMaxX, 10, 0, 84),
+            CreateRegularPad(4810, 0, 2, emittedMaxX, 0, secondEmittedMaxX, 10, 0, 85),
+            CreateRegularPad(4811, 0, 3, secondEmittedMaxX, 0, gridMaxX, 10, 0, 86),
+        };
+        foreach (var regular in regulars)
+        {
+            regular.Freeform = FreeformType.XWay;
+            regular.MatchedCadPadId = cad.Id;
+            regular.MatchScore = 1.0;
+            helper.RegularPads.Add(regular);
+        }
+
+        helper.CadPads.Add(cad);
+        helper.EnableToRegular = true;
+        helper.EnableToFull = true;
+        helper.ToFullStrictOverlapPercent = 0.1m;
+        helper.EnableBoundaryVirtualAreaCap = true;
+        FreeformHelperViewModelPrivateAccess.Cad(helper) = new CadPadSet([cad]);
+        var grid = new RegularGrid(
+            rows: 1,
+            cols: 4,
+            xEdges: [0, anchorMaxX, emittedMaxX, secondEmittedMaxX, gridMaxX],
+            yEdges: [0, 10],
+            pads: regulars);
+        FreeformHelperViewModelPrivateAccess.Grid(helper) = grid;
+        helper.CadIndexMaps.OutputFwDiffIndexByCadId[cad.Id] = 83;
+        helper.CadIndexMaps.IcIndexByCadId[cad.Id] = 0;
+        helper.InvalidateWorkflowDataSnapshot();
+
+        return (shell, cad, grid);
+    }
+
+    private static CadPadInfoViewModel CreateCadPadInfo(CadPad cad, PadInspectorSnapshot snapshot)
+    {
+        return new CadPadInfoViewModel(
+            pads: [cad],
+            getDxfIndex: _ => 83,
+            getCadOutputFwDiffOverride: null,
+            isDxfIndexAnchor: null,
+            getCustomValue: _ => 0,
+            applyCustomValue: null,
+            setCadOutputFwDiffOverride: null,
+            clearCadOutputFwDiffOverride: null,
+            setDxfIndexAnchor: null,
+            clearDxfIndexAnchor: null,
+            inspectorSnapshot: snapshot);
     }
 
 

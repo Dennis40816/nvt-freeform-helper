@@ -802,48 +802,6 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 82
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/Application/Notch/Tm81NotchAcceptanceMatrixTests.cs"
-      ],
-      "contentHash": "2d550a3be9a4a203d8aa34569bd2ab37efb3312173c8aaecf2045ce3d75700d8",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.Tm81NotchAcceptanceMatrixTests.BuildCaseContracts(FreeformHelperViewModel)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 121
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryUseCaseTests.NotchAndPad.cs"
-      ],
-      "contentHash": "3347554f9a2f2ae35d4450af01f5f75d4d89c3dfe921d4c17add04be9acad430",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.RuntimeQueryUseCaseTests.ExecuteAsync_NotchPadAndInspector_SameResolvedDisplayWithRoundedZeroTarget()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 184
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/Services/RuntimeQueryUseCaseTests.Simulation.cs"
-      ],
-      "contentHash": "c9041f11d5fb280f66fafedeb89e5382b9a3677ebdcc22ae4125275cbc9d2a8c",
-      "project": "FreeformHelper.Tests",
-      "symbol": "FreeformHelper.Tests.RuntimeQueryUseCaseTests.ExecuteAsync_NotchReadersShareSingleResolvedPathAcrossOverlayAllocationQueryAndInspector()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "methodLines": 101
       },
       "owner": "NFH",

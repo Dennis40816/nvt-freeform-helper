@@ -173,25 +173,70 @@ public sealed class Tm81NotchAcceptanceMatrixTests
 
     private static Tm81CaseContracts BuildCaseContracts(FreeformHelperViewModel vm)
     {
-        var cad113Compensation = vm.GetCadV22CompensationResult(113);
-        var cad113Overlay = vm.GetCadV22StageOverlays(113);
-        Assert.NotNull(cad113Compensation);
-        Assert.NotNull(cad113Overlay);
-        var cad113MainInfo = GoldenAssert.SingleMatch(cad113Compensation!.RegularDebugInfos, static info => info.RegularIndex == 445, "CAD 113 regular debug info 445");
+        return new Tm81CaseContracts
+        {
+            Cad113 = BuildCad113Case(vm),
+            Cad364 = BuildCad364Case(vm),
+            Cad402 = BuildCad402Case(vm),
+            Cad490Cad491 = BuildCad490491Case(vm),
+            FreeformTailLink = BuildFreeformTailLinkCase(vm),
+        };
+    }
 
-        var cad364Compensation = vm.GetCadV22CompensationResult(364);
-        var cad364Overlay = vm.GetCadV22StageOverlays(364);
-        Assert.NotNull(cad364Compensation);
-        Assert.NotNull(cad364Overlay);
+    private static Tm81Cad113Case BuildCad113Case(FreeformHelperViewModel vm)
+    {
+        var compensation = vm.GetCadV22CompensationResult(113);
+        var overlay = vm.GetCadV22StageOverlays(113);
+        Assert.NotNull(compensation);
+        Assert.NotNull(overlay);
+        var mainInfo = GoldenAssert.SingleMatch(compensation!.RegularDebugInfos, static info => info.RegularIndex == 445, "CAD 113 regular debug info 445");
+
+        return new Tm81Cad113Case
+        {
+            IsToFullEnabled = overlay!.Value.IsToFullEnabled,
+            ToFullRatio = compensation.ToFullRatio,
+            RuleCode = mainInfo.ToFullRuleCode,
+            Stage1Count = overlay.Value.Stage1Seed.Count,
+            Stage2Count = overlay.Value.Stage2Candidate.Count,
+            Stage3Count = overlay.Value.Stage3Final.Count,
+        };
+    }
+
+    private static Tm81Cad364Case BuildCad364Case(FreeformHelperViewModel vm)
+    {
+        var compensation = vm.GetCadV22CompensationResult(364);
+        var overlay = vm.GetCadV22StageOverlays(364);
+        Assert.NotNull(compensation);
+        Assert.NotNull(overlay);
         var reg291 = GoldenAssert.SingleMatch(vm.RegularPads, static pad => pad.Index == 291, "regular pad 291");
-        var cad364Reg291Info = GoldenAssert.SingleMatch(cad364Compensation!.RegularDebugInfos, static info => info.RegularIndex == 291, "CAD 364 regular debug info 291");
-        var cad364Stage2Coverage = ComputeRectCoverage(cad364Overlay!.Value.Stage2Candidate, reg291.Bounds);
-        var cad364Stage3Coverage = ComputeRectCoverage(cad364Overlay.Value.Stage3Final, reg291.Bounds);
+        var reg291Info = GoldenAssert.SingleMatch(compensation!.RegularDebugInfos, static info => info.RegularIndex == 291, "CAD 364 regular debug info 291");
 
-        var cad402Compensation = vm.GetCadV22CompensationResult(402);
-        Assert.NotNull(cad402Compensation);
-        var reg624Info = GoldenAssert.SingleMatch(cad402Compensation!.RegularDebugInfos, static info => info.RegularIndex == 624, "CAD 402 regular debug info 624");
+        return new Tm81Cad364Case
+        {
+            RuleCodeReg291 = reg291Info.ToFullRuleCode,
+            IsBoundaryReg291 = reg291Info.IsBoundaryRegular,
+            Stage2CoverageReg291 = ComputeRectCoverage(overlay!.Value.Stage2Candidate, reg291.Bounds),
+            Stage3CoverageReg291 = ComputeRectCoverage(overlay.Value.Stage3Final, reg291.Bounds),
+            Reg291Area = reg291.Area,
+        };
+    }
 
+    private static Tm81Cad402Case BuildCad402Case(FreeformHelperViewModel vm)
+    {
+        var compensation = vm.GetCadV22CompensationResult(402);
+        Assert.NotNull(compensation);
+        var reg624Info = GoldenAssert.SingleMatch(compensation!.RegularDebugInfos, static info => info.RegularIndex == 624, "CAD 402 regular debug info 624");
+
+        return new Tm81Cad402Case
+        {
+            Reg624OwnerCount = reg624Info.OwnerCadPadCount,
+            Reg624OwnerCadPadIds = reg624Info.OwnerCadPadIds.OrderBy(static id => id).ToArray(),
+            Reg624MatchedCadPadIds = vm.GetMatchedCadPadIds(reg624Info.RegularPadId).OrderBy(static id => id).ToArray(),
+        };
+    }
+
+    private static Tm81Cad490491Case BuildCad490491Case(FreeformHelperViewModel vm)
+    {
         var cad490Compensation = vm.GetCadV22CompensationResult(490);
         var cad491Compensation = vm.GetCadV22CompensationResult(491);
         var cad490Overlay = vm.GetCadV22StageOverlays(490);
@@ -202,55 +247,29 @@ public sealed class Tm81NotchAcceptanceMatrixTests
         Assert.NotNull(cad491Overlay);
         var cad490SharedInfo = GoldenAssert.SingleMatch(cad490Compensation!.RegularDebugInfos, static info => info.RegularIndex == 643, "CAD 490 regular debug info 643");
         var cad491SharedInfo = GoldenAssert.SingleMatch(cad491Compensation!.RegularDebugInfos, static info => info.RegularIndex == 643, "CAD 491 regular debug info 643");
-        var stage3Overlap = ComputeRectangleIntersectionArea(cad490Overlay!.Value.Stage3Final, cad491Overlay!.Value.Stage3Final);
 
-        var reg387Snapshot = vm.BuildRegularPadInspectorSnapshot(387);
-        var reg388Snapshot = vm.BuildRegularPadInspectorSnapshot(388);
-        var reg389Snapshot = vm.BuildRegularPadInspectorSnapshot(389);
-        var reg387 = Assert.IsType<RegularPadInspectorSnapshot>(reg387Snapshot?.Regular);
-        var reg388 = Assert.IsType<RegularPadInspectorSnapshot>(reg388Snapshot?.Regular);
-        var reg389 = Assert.IsType<RegularPadInspectorSnapshot>(reg389Snapshot?.Regular);
-
-        return new Tm81CaseContracts
+        return new Tm81Cad490491Case
         {
-            Cad113 = new Tm81Cad113Case
-            {
-                IsToFullEnabled = cad113Overlay!.Value.IsToFullEnabled,
-                ToFullRatio = cad113Compensation.ToFullRatio,
-                RuleCode = cad113MainInfo.ToFullRuleCode,
-                Stage1Count = cad113Overlay.Value.Stage1Seed.Count,
-                Stage2Count = cad113Overlay.Value.Stage2Candidate.Count,
-                Stage3Count = cad113Overlay.Value.Stage3Final.Count,
-            },
-            Cad364 = new Tm81Cad364Case
-            {
-                RuleCodeReg291 = cad364Reg291Info.ToFullRuleCode,
-                IsBoundaryReg291 = cad364Reg291Info.IsBoundaryRegular,
-                Stage2CoverageReg291 = cad364Stage2Coverage,
-                Stage3CoverageReg291 = cad364Stage3Coverage,
-                Reg291Area = reg291.Area,
-            },
-            Cad402 = new Tm81Cad402Case
-            {
-                Reg624OwnerCount = reg624Info.OwnerCadPadCount,
-                Reg624OwnerCadPadIds = reg624Info.OwnerCadPadIds.OrderBy(static id => id).ToArray(),
-                Reg624MatchedCadPadIds = vm.GetMatchedCadPadIds(reg624Info.RegularPadId).OrderBy(static id => id).ToArray(),
-            },
-            Cad490Cad491 = new Tm81Cad490491Case
-            {
-                Cad490RuleCodeReg643 = cad490SharedInfo.ToFullRuleCode,
-                Cad491RuleCodeReg643 = cad491SharedInfo.ToFullRuleCode,
-                Stage3OverlapArea = stage3Overlap,
-            },
-            FreeformTailLink = new Tm81FreeformTailLinkCase
-            {
-                Reg387Freeform = reg387.Freeform.ToString(),
-                Reg387Source = reg387.FreeformSource,
-                Reg388Freeform = reg388.Freeform.ToString(),
-                Reg388Source = reg388.FreeformSource,
-                Reg389Freeform = reg389.Freeform.ToString(),
-                Reg389Source = reg389.FreeformSource,
-            },
+            Cad490RuleCodeReg643 = cad490SharedInfo.ToFullRuleCode,
+            Cad491RuleCodeReg643 = cad491SharedInfo.ToFullRuleCode,
+            Stage3OverlapArea = ComputeRectangleIntersectionArea(cad490Overlay!.Value.Stage3Final, cad491Overlay!.Value.Stage3Final),
+        };
+    }
+
+    private static Tm81FreeformTailLinkCase BuildFreeformTailLinkCase(FreeformHelperViewModel vm)
+    {
+        var reg387 = Assert.IsType<RegularPadInspectorSnapshot>(vm.BuildRegularPadInspectorSnapshot(387)?.Regular);
+        var reg388 = Assert.IsType<RegularPadInspectorSnapshot>(vm.BuildRegularPadInspectorSnapshot(388)?.Regular);
+        var reg389 = Assert.IsType<RegularPadInspectorSnapshot>(vm.BuildRegularPadInspectorSnapshot(389)?.Regular);
+
+        return new Tm81FreeformTailLinkCase
+        {
+            Reg387Freeform = reg387.Freeform.ToString(),
+            Reg387Source = reg387.FreeformSource,
+            Reg388Freeform = reg388.Freeform.ToString(),
+            Reg388Source = reg388.FreeformSource,
+            Reg389Freeform = reg389.Freeform.ToString(),
+            Reg389Source = reg389.FreeformSource,
         };
     }
 
