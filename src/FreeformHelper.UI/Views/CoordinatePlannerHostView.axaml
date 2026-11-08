@@ -1,90 +1,63 @@
-<UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:views="clr-namespace:FreeformHelper.UI.Views"
-             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
-             mc:Ignorable="d"
+             xmlns:views="clr-namespace:FreeformHelper.UI.Views"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              x:Class="FreeformHelper.UI.Views.CoordinatePlannerHostView"
+             x:DataType="vm:CoordinatePlannerHostViewModel"
+             x:CompileBindings="True"
              Background="{DynamicResource BrushBgApp}"
              Foreground="{DynamicResource BrushTextPrimary}">
-  <Design.DataContext>
-    <vm:CoordinatePlannerHostViewModel/>
-  </Design.DataContext>
-
   <Grid RowDefinitions="Auto,*">
-    <Border Grid.Row="0"
-            IsVisible="{Binding IsWorkspaceStale}"
-            Margin="{StaticResource Inset24_24_24_0}"
-            Background="{DynamicResource BrushBgPanel}"
-            BorderBrush="{DynamicResource BrushWarning}"
-            BorderThickness="{StaticResource BorderThin}"
-            CornerRadius="{StaticResource RadiusMd}"
-            Padding="{StaticResource Inset12}">
-      <Grid ColumnDefinitions="*,Auto"
-            ColumnSpacing="{StaticResource Space12}">
-        <SelectableTextBlock Grid.Column="0"
-                             Text="{Binding StaleWorkspaceBannerText}"
-                             VerticalAlignment="Center"
-                             Foreground="{DynamicResource BrushWarning}"
-                             TextWrapping="Wrap"/>
-        <Button Grid.Column="1"
+    <Border Classes="workspaceFirstPeekBar">
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}">
+        <TextBlock Text="Coordinate" Classes="workspaceFirstPeekTitle" VerticalAlignment="Center"/>
+        <Border Grid.Column="1"
+                Classes="chipStatus"
+                Classes.warning="{Binding IsWorkspaceStale}"
+                ToolTip.Tip="{Binding SourceDimensionsTooltipText}"
+                VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}">
+            <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.Info}" IsVisible="{Binding !IsWorkspaceStale}"/>
+            <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.Warning}" IsVisible="{Binding IsWorkspaceStale}"/>
+            <TextBlock Text="{Binding SourceStatusText}"/>
+          </StackPanel>
+        </Border>
+        <TextBlock Grid.Column="2"
+                   Text="{Binding StaleWorkspaceBannerText}"
+                   IsVisible="{Binding IsWorkspaceStale}"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center"/>
+        <Button Grid.Column="3"
+                x:Name="RefreshPlanButton"
+                Content="Refresh"
                 Classes="actionNeutral actionTextButton"
-                Command="{Binding OpenCoordinatePlannerCommand}">
-          <Grid Classes="iconTextButtonContent"
-                ColumnDefinitions="Auto,*,Auto">
-            <controls:FontIcon Grid.Column="0"
-                               Classes="symbols iconTextButtonLeadingIcon"
-                               Glyph="{x:Static icons:IconGlyphs.Undo}"/>
-            <SelectableTextBlock Grid.Column="1"
-                                 Classes="iconTextButtonLabel"
-                                 Text="Refresh"/>
-            <Border Grid.Column="2"
-                    Classes="iconTextButtonTrailingSpacer"/>
-          </Grid>
-        </Button>
+                IsVisible="{Binding IsWorkspaceStale}"
+                ToolTip.Tip="{Binding StaleWorkspaceBannerText}"
+                Command="{Binding OpenCoordinatePlannerCommand}"/>
       </Grid>
     </Border>
-
-    <Border IsVisible="{Binding HasNoWorkspace}"
-            Grid.Row="1"
-            Padding="{StaticResource Inset24}">
-      <Border Background="{DynamicResource BrushBgPanel}"
-              BorderBrush="{DynamicResource BrushBorder}"
-              BorderThickness="{StaticResource BorderThin}"
-              CornerRadius="{StaticResource RadiusMd}"
-              Padding="{StaticResource Inset20}">
-        <StackPanel Spacing="{StaticResource Space12}"
-                    MaxWidth="{StaticResource IndexMappingReportMinWidth}">
-          <SelectableTextBlock Text="{Binding PlaceholderTitle}"
-                               FontSize="{DynamicResource FontSizeXl}"
-                               FontWeight="SemiBold"/>
-          <SelectableTextBlock Text="{Binding PlaceholderSubtitle}"
-                               Foreground="{DynamicResource BrushTextMuted}"
-                               TextWrapping="Wrap"/>
-          <Button Classes="actionNeutral actionTextButton"
-                  Command="{Binding OpenCoordinatePlannerCommand}"
-                  IsEnabled="{Binding CanOpenCoordinatePlanner}">
-            <Grid Classes="iconTextButtonContent"
-                  ColumnDefinitions="Auto,*,Auto">
-              <controls:FontIcon Grid.Column="0"
-                                 Classes="symbols iconTextButtonLeadingIcon"
-                                 Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
-              <SelectableTextBlock Grid.Column="1"
-                                   Classes="iconTextButtonLabel"
-                                   Text="Build from current workspace"/>
-              <Border Grid.Column="2"
-                      Classes="iconTextButtonTrailingSpacer"/>
-            </Grid>
-          </Button>
-        </StackPanel>
-      </Border>
+    <Border Grid.Row="1" IsVisible="{Binding HasNoWorkspace}" Padding="{DynamicResource Inset24}">
+      <StackPanel Spacing="{DynamicResource Space12}"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  MaxWidth="{DynamicResource IndexMappingReportMinWidth}">
+        <TextBlock Text="{Binding PlaceholderTitle}" FontSize="{DynamicResource FontSizeXl}" FontWeight="SemiBold"/>
+        <TextBlock Text="{Binding PlaceholderSubtitle}"
+                   Foreground="{DynamicResource BrushTextMuted}"
+                   TextWrapping="Wrap"/>
+        <Button x:Name="BuildPlanButton"
+                Content="Build from current workspace"
+                HorizontalAlignment="Right"
+                Classes="actionPrimary actionTextButton"
+                Command="{Binding OpenCoordinatePlannerCommand}"
+                IsEnabled="{Binding CanOpenCoordinatePlanner}"/>
+      </StackPanel>
     </Border>
-
-    <views:CoordinatePlannerWorkspaceView Grid.Row="1"
-                                          IsVisible="{Binding HasWorkspace}"
-                                          DataContext="{Binding CurrentWorkspace}"/>
+    <Border Grid.Row="1" IsVisible="{Binding HasWorkspace}">
+      <views:CoordinatePlannerWorkspaceView DataContext="{Binding CurrentWorkspace}"/>
+    </Border>
   </Grid>
 </UserControl>
