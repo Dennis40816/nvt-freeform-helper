@@ -550,6 +550,11 @@ public sealed class HeadlessUiSmokeTests
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
 
+            var simulation = Assert.Single(window.GetVisualDescendants().OfType<SimulationWorkspaceView>());
+            var console = Assert.IsType<ConsolePanel>(simulation.FindControl<ConsolePanel>("SimulationConsole"));
+            Assert.IsType<Avalonia.Controls.Primitives.ToggleButton>(console.FindControl<Avalonia.Controls.Primitives.ToggleButton>("ConsoleToggleButton")).IsChecked = true;
+            await HeadlessUiPump.FlushQueueAsync();
+
             using var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
             using var locked = frame.Lock();

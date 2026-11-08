@@ -718,7 +718,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 434
+        "axamlCodeBehindLines": 374
       },
       "owner": "NFH",
       "locations": [

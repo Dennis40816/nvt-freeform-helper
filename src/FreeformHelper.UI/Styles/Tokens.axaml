@@ -791,6 +791,12 @@
   <x:Double x:Key="NotchExportColumnFilterMinHeight">320</x:Double>
   <x:Double x:Key="NotchExportPrimaryButtonMinWidth">160</x:Double>
   <x:Double x:Key="NotchExportTopDropdownWidth">180</x:Double>
+  <!-- Integrated Simulation workspace layout. -->
+  <x:Double x:Key="SimulationViewFieldMinWidth">80</x:Double>
+  <x:Double x:Key="SimulationLegendWidth">180</x:Double>
+  <x:Double x:Key="SimulationCanvasMinHeight">240</x:Double>
+  <x:Double x:Key="SimulationReplayMaxHeight">300</x:Double>
+  <x:Double x:Key="SimulationConsoleHeight">240</x:Double>
   <x:Double x:Key="NotchApplySimulationFrameDropdownWidth">260</x:Double>
   <x:Double x:Key="NotchApplySimulationModeDropdownWidth">180</x:Double>
   <x:Double x:Key="NotchApplySimulationAreaDropdownWidth">180</x:Double>
