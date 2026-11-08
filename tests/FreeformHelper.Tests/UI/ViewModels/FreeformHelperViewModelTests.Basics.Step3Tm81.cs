@@ -1,3 +1,4 @@
+using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
@@ -175,5 +176,112 @@ public sealed partial class FreeformHelperViewModelTests
         }
 
         return area;
+    }
+
+    [ExampleDataFact]
+    public async Task GetCadV22StageOverlays_CAD4818_ReturnsFinalOutlineCoveringFullReg384()
+    {
+        var vm = new FreeformHelperViewModel();
+        var projectPath = Path.Combine(TestPaths.RepoRoot, "example", "BOE36.35", "project_3635.json");
+        using var fixture = ExampleProjectFixture.Create(projectPath);
+        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(fixture.ProjectPath);
+
+        await vm.LoadProjectCommand.ExecuteAsync(null);
+
+        var overlay = vm.GetCadV22StageOverlays(4818);
+
+        Assert.NotNull(overlay);
+        Assert.True(overlay.Value.IsToFullEnabled);
+        var stage2 = Assert.Single(overlay.Value.Stage2Candidate);
+        Assert.Equal(2.94776, stage2.Bounds.MinX, 5);
+        Assert.Equal(15.82673, stage2.Bounds.MinY, 5);
+        Assert.Equal(5.49116, stage2.Bounds.MaxX, 5);
+        Assert.Equal(20.34833, stage2.Bounds.MaxY, 5);
+
+        var stage3 = Assert.Single(overlay.Value.Stage3Final);
+        Assert.True(stage3.Area() > 24.2782 && stage3.Area() < 24.2784);
+        Assert.Equal(2.94776, stage3.Bounds.MinX, 5);
+        Assert.Equal(15.82673, stage3.Bounds.MinY, 5);
+        Assert.Equal(8.31716, stage3.Bounds.MaxX, 5);
+        Assert.Equal(20.34833, stage3.Bounds.MaxY, 5);
+    }
+
+    [Fact]
+    public async Task RebuildGrid_WhenDxfBoundsWithoutDxf_FallsBackToPanelAaAlignment()
+    {
+        var vm = new FreeformHelperViewModel
+        {
+            PanelBiasX = 12.5m,
+            PanelBiasY = -3.75m,
+            GridAlignmentMode = GridAlignmentMode.FromCadBounds,
+            ActiveAreaWidth = 120m,
+            ActiveAreaHeight = 80m,
+        };
+
+        await WaitForGridRebuildAsync(vm);
+
+        Assert.Equal("Ready (DXF not loaded; using panel AA alignment).", vm.StatusText);
+        Assert.NotEmpty(vm.RegularPads);
+        Assert.Equal(12.5, vm.RegularPads.Min(p => p.Bounds.MinX), 3);
+        Assert.Equal(-3.75, vm.RegularPads.Min(p => p.Bounds.MinY), 3);
+    }
+
+
+    [Fact]
+    public void PitchSizeSummary_ListsDistinctGridWidthsAndHeights()
+    {
+        var vm = new FreeformHelperViewModel();
+
+        var pads = new List<RegularPad>
+        {
+            CreateRectRegular(0, 0, 0, 0, 0, 10, 4),
+            CreateRectRegular(0, 1, 1, 10, 0, 30, 4),
+            CreateRectRegular(1, 0, 2, 0, 4, 10, 10),
+            CreateRectRegular(1, 1, 3, 10, 4, 30, 10),
+        };
+        var pitchXEdges = new[] { 0.0, 10.0, 30.0 };
+        var pitchYEdges = new[] { 0.0, 4.0, 10.0 };
+        var grid = new RegularGrid(
+            rows: 2,
+            cols: 2,
+            xEdges: pitchXEdges,
+            yEdges: pitchYEdges,
+            pads: pads);
+
+        FreeformHelperViewModelPrivateAccess.Grid(vm) = grid;
+
+        Assert.Equal("Pitch X: X1=10 mm, X2=20 mm", vm.PitchSizeXSummary);
+        Assert.Equal("Pitch Y: Y1=4 mm, Y2=6 mm", vm.PitchSizeYSummary);
+    }
+
+
+    [Fact]
+    public async Task RebuildGrid_RaisesPitchSizeSummaryPropertyChanged()
+    {
+        var vm = new FreeformHelperViewModel
+        {
+            ActiveAreaWidth = 120m,
+            ActiveAreaHeight = 80m,
+            XChannels = 4m,
+            YChannels = 2m,
+        };
+        var changed = new System.Collections.Concurrent.ConcurrentQueue<string>();
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (!string.IsNullOrWhiteSpace(e.PropertyName))
+            {
+                changed.Enqueue(e.PropertyName!);
+            }
+        };
+
+        await WaitForGridRebuildAsync(vm);
+        changed.Clear();
+        vm.GridPaddingPercent += 5m;
+        await WaitForGridRebuildAsync(vm);
+
+        Assert.Contains(nameof(FreeformHelperViewModel.PitchSizeXSummary), changed);
+        Assert.Contains(nameof(FreeformHelperViewModel.PitchSizeYSummary), changed);
+        Assert.StartsWith("Pitch X: X1=", vm.PitchSizeXSummary, StringComparison.Ordinal);
+        Assert.StartsWith("Pitch Y: Y1=", vm.PitchSizeYSummary, StringComparison.Ordinal);
     }
 }
