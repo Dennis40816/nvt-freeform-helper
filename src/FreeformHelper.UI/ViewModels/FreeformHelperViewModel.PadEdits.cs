@@ -74,7 +74,8 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        ApplyUiToSettings(_projectFile.Settings); // Ensure current UI settings are applied to project file.
+        // A rejected request must not mark the project unsaved. The success path calls MarkUnsaved below.
+        ApplyUiToSettings(_projectFile.Settings, markUnsaved: false); // Ensure current UI settings are applied to project file.
 
         var hasWidth = widthMm.HasValue && widthMm.Value > 0;
         var hasHeight = heightMm.HasValue && heightMm.Value > 0;
@@ -135,7 +136,8 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        ApplyUiToSettings(_projectFile.Settings); // Ensure current UI settings are applied to project file.
+        // A rejected request must not mark the project unsaved. The success path calls MarkUnsaved below.
+        ApplyUiToSettings(_projectFile.Settings, markUnsaved: false); // Ensure current UI settings are applied to project file.
 
         // Use the ManualSizingService to reset the sizing for the specified cells.
         var result = Services.PadEditUseCase.ResetSizing(
