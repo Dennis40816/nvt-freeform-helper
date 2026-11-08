@@ -142,7 +142,8 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
     }
     public bool IsDuplicateBulkMode => SelectedKind == DxfEditChangeKind.Duplicate;
     public bool IsSingleActionBulkMode => !IsDuplicateBulkMode;
-    public bool CanApplySelectedEntries => SelectedVisibleCount > 0 && IsSingleActionBulkMode;
+    // Enabled only when a checked row can really be applied, so the button never stays on while Apply does nothing.
+    public bool CanApplySelectedEntries => IsSingleActionBulkMode && GetApplicableSelectedRows().Count > 0;
     public bool CanRestoreSelectedDuplicateEntries => GetSelectedVisibleRows().Any(IsRestorableDuplicate);
     public bool CanRehideSelectedDuplicateEntries => GetSelectedVisibleRows().Any(IsRehidableDuplicate);
     public string VisibleRowsSummaryText => $"Showing {Rows.Count} rows";
