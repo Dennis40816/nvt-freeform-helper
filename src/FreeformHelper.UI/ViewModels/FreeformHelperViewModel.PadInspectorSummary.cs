@@ -386,15 +386,15 @@ public sealed partial class FreeformHelperViewModel
 
     private (string Source, string Detail) BuildRegularFreeformSource(RegularPad regularPad)
     {
-        if (regularPad.Freeform == FreeformType.None)
-        {
-            return ("None", "No Step 2 freeform tag.");
-        }
-
         if (_projectFile.FreeformOverrides.TryGetValue(regularPad.Index, out var overrideType) &&
             overrideType == regularPad.Freeform)
         {
             return ("Override", $"Saved/manual override keeps this regular pad as {regularPad.Freeform}.");
+        }
+
+        if (regularPad.Freeform == FreeformType.None)
+        {
+            return ("None", "No Step 2 freeform tag.");
         }
 
         return ("Step 2 auto-detect", $"Current value comes from Step 2 auto-detect ({regularPad.Freeform}).");
