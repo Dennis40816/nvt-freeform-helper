@@ -180,23 +180,23 @@ public sealed class NotchApplySimulationAaView : Control
 
             DrawCellText(context, cell, rect, textBrush, valueFontMin, valueFontMax);
         }
+    }
 
-        (double MinValue, double MaxValue, double MaxAbsDelta, double AutoNegativeClampAbs, double AutoPositiveClamp) ResolveExtents()
+    private (double MinValue, double MaxValue, double MaxAbsDelta, double AutoNegativeClampAbs, double AutoPositiveClamp) ResolveExtents()
+    {
+        if (Cells.Count == 0)
         {
-            if (Cells.Count == 0)
-            {
-                return (0d, 0d, 0d, 0d, 0d);
-            }
-
-            var values = Cells.Select(static cell => cell.DisplayValue).ToList();
-            var autoScaleRange = SimulationColorScaleResolver.ComputeAutoScaleRange(values);
-            return (
-                autoScaleRange.Minimum,
-                autoScaleRange.Maximum,
-                values.Max(static value => Math.Abs(value)),
-                autoScaleRange.NegativeClampAbs,
-                autoScaleRange.PositiveClamp);
+            return (0d, 0d, 0d, 0d, 0d);
         }
+
+        var values = Cells.Select(static cell => cell.DisplayValue).ToList();
+        var autoScaleRange = SimulationColorScaleResolver.ComputeAutoScaleRange(values);
+        return (
+            autoScaleRange.Minimum,
+            autoScaleRange.Maximum,
+            values.Max(static value => Math.Abs(value)),
+            autoScaleRange.NegativeClampAbs,
+            autoScaleRange.PositiveClamp);
     }
 
     private static void DrawCellText(

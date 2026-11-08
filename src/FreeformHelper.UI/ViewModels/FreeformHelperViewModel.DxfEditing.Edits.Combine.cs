@@ -45,19 +45,8 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var layer = sourcePads[0].Layer;
-        var combinedPads = new List<CadPad>(unionResult.OuterPolygons.Count);
         var groupId = _combinedCad.NextGroupId++;
-        foreach (var polygon in unionResult.OuterPolygons)
-        {
-            var combinedId = AllocateCombinedCadPadId();
-            combinedPads.Add(new CadPad(
-                combinedId,
-                $"COMB_{combinedId}",
-                layer,
-                polygon));
-            _combinedCad.GroupIdByOutputCadId[combinedId] = groupId;
-        }
+        var combinedPads = CreateCombinedCadPads(sourcePads[0].Layer, unionResult.OuterPolygons, groupId);
 
         var sourcePadIds = sourcePads.Select(static p => p.Id).Distinct().ToList();
         _combinedCad.Groups[groupId] = new CombinedCadGroupState(
@@ -232,5 +221,22 @@ public sealed partial class FreeformHelperViewModel
         }
 
         return _combinedCad.NextPadId++;
+    }
+
+    private List<CadPad> CreateCombinedCadPads(string layer, IReadOnlyList<Domain.Geometry.Polygon2> polygons, int groupId)
+    {
+        var combinedPads = new List<CadPad>(polygons.Count);
+        foreach (var polygon in polygons)
+        {
+            var combinedId = AllocateCombinedCadPadId();
+            combinedPads.Add(new CadPad(
+                combinedId,
+                $"COMB_{combinedId}",
+                layer,
+                polygon));
+            _combinedCad.GroupIdByOutputCadId[combinedId] = groupId;
+        }
+
+        return combinedPads;
     }
 }
