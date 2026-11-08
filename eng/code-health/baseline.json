@@ -550,7 +550,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "partialFiles": 25
+        "partialFiles": 20
       },
       "owner": "NFH",
       "locations": [
