@@ -91,8 +91,9 @@ public static class CanvasFocusViewportService
 
         var targetXScreen = (visibleLeft + visibleRight) / 2.0;
         var targetYScreen = (canvasTop + canvasBottom) / 2.0;
-        var localX = Math.Clamp(targetXScreen - canvasLeft, 0.0, canvas.Bounds.Width);
-        var localY = Math.Clamp(targetYScreen - canvasTop, 0.0, canvas.Bounds.Height);
+        var renderScaling = TopLevel.GetTopLevel(canvas)?.RenderScaling ?? 1.0;
+        var localX = Math.Clamp((targetXScreen - canvasLeft) / renderScaling, 0.0, canvas.Bounds.Width);
+        var localY = Math.Clamp((targetYScreen - canvasTop) / renderScaling, 0.0, canvas.Bounds.Height);
         targetPoint = new Point(localX, localY);
         return true;
     }
