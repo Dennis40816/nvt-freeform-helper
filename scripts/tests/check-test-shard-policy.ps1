@@ -37,7 +37,7 @@ function Write-FixtureTrx {
         $method = $test.Name.Substring($separator + 1)
         # Synthetic sentinels prove that neither display names, parameters nor Output are exported.
         $definitions += "<UnitTest id='$index'><TestMethod className='$class, Assembly' name='$method(CONFIDENTIAL_SENTINEL)' /></UnitTest>"
-        $results += "<UnitTestResult testId='$index' testName='CONFIDENTIAL_SENTINEL' outcome='$($test.Outcome)'><Output><ErrorInfo><Message>CONFIDENTIAL_SENTINEL</Message><StackTrace>CONFIDENTIAL_SENTINEL</StackTrace></ErrorInfo></Output></UnitTestResult>"
+        $results += "<UnitTestResult testId='$index' testName='CONFIDENTIAL_SENTINEL' outcome='$($test.Outcome)'><Output><ErrorInfo><Message>$(if ($test.ContainsKey('Message')) { $test.Message } else { 'CONFIDENTIAL_SENTINEL' })</Message><StackTrace>CONFIDENTIAL_SENTINEL</StackTrace></ErrorInfo></Output></UnitTestResult>"
     }
     $passed = @($Tests | Where-Object Outcome -eq 'Passed').Count
     $failed = @($Tests | Where-Object Outcome -eq 'Failed').Count
@@ -168,6 +168,31 @@ try {
         Assert-Policy ($actual.Summary.checks.skippedNotZero -eq ($case.Skipped -gt 0))
     }
     Assert-Policy (@($actual.Summary.failedTests).Count -eq 0)
+    # Only the allowlisted failed tests print their exception type and first message line. All other output stays as before.
+    $allowedFailing = 'FreeformHelper.Tests.LayerImageExportScreenshotTests.CaptureTheRealExportWindowsInBothThemesAsync'
+    $detailMessage = "System.TimeoutException : The export preview did not finish within 60 s in round 2 of 5 (updating=True, error='') at C:\private\example\file.dxf`nSECOND_LINE_SENTINEL"
+    $detailTests = @($samples[0], $samples[1], @{ Name = $allowedFailing; Outcome = 'Failed'; Message = [System.Security.SecurityElement]::Escape($detailMessage) })
+    Write-FixtureTrx -Directory $resultsPath -Tests $detailTests -RunOutcome Failed
+    $detailOutput = @(try { & $checkScript -Shard core -ResultsDirectory $resultsPath -BaselinePath $baselinePath `
+        -ExampleDataPresent $false -SummaryPath (Join-Path $testRoot "summary.json") -Commit ("a" * 40) 6>&1 } catch { })
+    $detailLines = @($detailOutput | Where-Object { [string]$_ -like '*failure-detail*' })
+    Assert-Policy ($detailLines.Count -eq 1)
+    Assert-Policy ([string]$detailLines[0] -ceq ("[check-test-shard] failure-detail test=$allowedFailing type=System.TimeoutException " +
+        "message=The export preview did not finish within 60 s in round 2 of 5 (updating=True, error='') at <path>"))
+    Assert-Policy (($detailOutput -join "`n") -notmatch 'SECOND_LINE_SENTINEL|private|StackTrace|CONFIDENTIAL_SENTINEL')
+    # A failed test that is not on the allowlist prints nothing, even when the allowlisted test passes.
+    $otherTests = @($samples[0], $samples[1], @{ Name = 'Tests.Sample.Three'; Outcome = 'Failed'; Message = 'OTHER_SENTINEL' })
+    Write-FixtureTrx -Directory $resultsPath -Tests $otherTests -RunOutcome Failed
+    $otherOutput = @(try { & $checkScript -Shard core -ResultsDirectory $resultsPath -BaselinePath $baselinePath `
+        -ExampleDataPresent $false -SummaryPath (Join-Path $testRoot "summary.json") -Commit ("a" * 40) 6>&1 } catch { })
+    Assert-Policy (($otherOutput -join "`n") -ceq '[check-test-shard] total 3 passed 2 failed 1 skipped 0 notExecuted 0')
+    # The line is cut to 200 characters.
+    $longTests = @($samples[0], $samples[1], @{ Name = $allowedFailing; Outcome = 'Failed'; Message = ('x' * 500) })
+    Write-FixtureTrx -Directory $resultsPath -Tests $longTests -RunOutcome Failed
+    $longOutput = @(try { & $checkScript -Shard core -ResultsDirectory $resultsPath -BaselinePath $baselinePath `
+        -ExampleDataPresent $false -SummaryPath (Join-Path $testRoot "summary.json") -Commit ("a" * 40) 6>&1 } catch { })
+    $longLine = [string]@($longOutput | Where-Object { [string]$_ -like '*failure-detail*' })[0]
+    Assert-Policy ($longLine -ceq ("[check-test-shard] failure-detail test=$allowedFailing type=unknown message=" + ('x' * 200) + '...'))
     foreach ($runOutcome in @('Aborted', 'Failed', '', 'Passed')) {
         Write-FixtureTrx -Directory $resultsPath -Tests $samples -RunOutcome $runOutcome
         $actual = Invoke-FixtureCheck

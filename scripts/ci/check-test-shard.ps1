@@ -143,5 +143,21 @@ if ($counts.Total -eq 0 -and $RunDiagnostics.Count -gt 0) {
     Write-Host ('[check-test-shard] diagnostic shard={0} group={1} phase={2} exit={3} trx-files={4} results-dir={5}' -f
         $Shard, $diagnostic.Group, $diagnostic.Phase, $exit, $diagnostic.TrxFiles, $directory)
 }
+# Failure text is private by default. Only the tests named here print their exception type and first message line.
+# These two fail intermittently on CI and the job log has no test output (issue #64). Remove a name once its cause is fixed.
+$failureDetailAllowlist = @(
+    'FreeformHelper.Tests.LayerImageExportScreenshotTests.CaptureTheRealExportWindowsInBothThemesAsync',
+    'FreeformHelper.Tests.LayerPreviewBitmapConverterTests.RebindingReusesTheBitmapAndNewBytesReplaceItAsync'
+)
+if (@($counts.FailedTests | Where-Object { $failureDetailAllowlist -ccontains $_ }).Count -gt 0) {
+    try {
+        foreach ($detail in @(Read-TrxFailureDetails -ResultsDirectory $ResultsDirectory -AllowedTests $failureDetailAllowlist)) {
+            Write-Host ('[check-test-shard] failure-detail test={0} type={1} message={2}' -f
+                $detail.MethodName, $detail.ExceptionType, $detail.Message)
+        }
+    } catch {
+        Write-Host '[check-test-shard] failure-detail unavailable'
+    }
+}
 if ($Unverified) { throw "unverified, cannot merge" }
 if ($failed) { throw "Shard validation failed." }
