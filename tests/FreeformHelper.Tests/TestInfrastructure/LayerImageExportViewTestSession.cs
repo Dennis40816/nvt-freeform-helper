@@ -15,6 +15,9 @@ namespace FreeformHelper.Tests.TestInfrastructure;
 /// <summary>Owns the real dialog, model, clock and synthetic CAD sample for headless view tests.</summary>
 internal sealed class LayerImageExportViewTestSession : IDisposable
 {
+    // A failure guard for a preview that never settles, not a number of rounds to wait.
+    private const int MaxPreviewRounds = 5;
+
     public LayerImageExportViewTestSession(LayerImageExportContext? context = null)
     {
         HeadlessAppBootstrap.EnsureInitialized();
@@ -35,11 +38,24 @@ internal sealed class LayerImageExportViewTestSession : IDisposable
         await HeadlessUiPump.FlushQueueAsync();
     }
 
+    /// <summary>Runs the preview debounce on the manual clock until the newest preview has finished.</summary>
     public async Task CompletePreviewAsync()
     {
-        Clock.Advance(TimeSpan.FromMilliseconds(150));
-        await Model.WaitForPreviewAsync().WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
-        await HeadlessUiPump.FlushQueueAsync();
+        // A preview that starts while an earlier one is still running cancels it and waits on a new timer.
+        // Advancing once would leave that new timer unfired, so repeat until no newer preview is pending.
+        for (var round = 0; round < MaxPreviewRounds; round++)
+        {
+            Clock.Advance(TimeSpan.FromMilliseconds(150));
+            await Model.WaitForPreviewAsync().WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+            await HeadlessUiPump.FlushQueueAsync();
+            if (Model.WaitForPreviewAsync().IsCompleted)
+            {
+                return;
+            }
+        }
+
+        throw new InvalidOperationException(
+            $"The export preview kept restarting after {MaxPreviewRounds} rounds (updating={Model.IsPreviewUpdating}, error='{Model.PreviewErrorText}').");
     }
 
     public static LayerImageExportContext CreateContext()
