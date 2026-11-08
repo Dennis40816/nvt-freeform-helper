@@ -2,6 +2,7 @@
 
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.ViewModels;
 using Xunit;
 using static FreeformHelper.Tests.FreeformHelperViewModelTests;
 using static FreeformHelper.Tests.SuppressedWorkspaceBehaviorTests;
@@ -94,13 +95,7 @@ public sealed class DxfEditUndoRestorationBehaviorTests
                 suggestions.Add((name, extension));
                 return Task.FromResult<string?>(null);
             };
-            vm.OpenDxfLayerImageExportAsync = async context =>
-            {
-                var layer = Assert.Single(context.Entries);
-                Assert.Equal("訊號/Tx", layer.Name);
-                Assert.Null(await context.PickSavePathAsync("dxf_" + layer.Name, "png"));
-                return null;
-            };
+            vm.OpenDxfLayerImageExportAsync = PickUnicodeLayerPathAsync;
 
             await vm.ExportDxfLayerImageCommand.ExecuteAsync(null);
 
@@ -110,5 +105,13 @@ public sealed class DxfEditUndoRestorationBehaviorTests
         {
             File.Delete(path);
         }
+    }
+
+    private static async Task<LayerImageExportRequest?> PickUnicodeLayerPathAsync(LayerImageExportContext context)
+    {
+        var layer = Assert.Single(context.Entries);
+        Assert.Equal("訊號/Tx", layer.Name);
+        Assert.Null(await context.PickSavePathAsync("dxf_" + layer.Name, "png"));
+        return null;
     }
 }
