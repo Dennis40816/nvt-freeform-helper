@@ -10,11 +10,11 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using FreeformHelper.Application.Services;
-using FreeformHelper.Domain.Geometry;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Avalonia.Theme;
+using static FreeformHelper.UI.Views.CoordinatePlannerOverlayRules;
 
 namespace FreeformHelper.UI.Views;
 
@@ -486,106 +486,6 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
             _overlayLabelCanvas.Children.Clear();
         }
     }
-
-    private static double ComputeScreenRadiusX(
-        CanvasViewportAdapter viewportAdapter,
-        Canvas overlay,
-        in PadCanvasViewFrameSnapshot viewFrame,
-        Point2 center,
-        double worldRadiusX,
-        double fallback)
-    {
-        if (worldRadiusX <= 1e-9)
-        {
-            return fallback;
-        }
-
-        var centerPoint = viewportAdapter.ToOverlayPoint(overlay, center, viewFrame);
-        var offsetPoint = viewportAdapter.ToOverlayPoint(overlay, new Point2(center.X + worldRadiusX, center.Y), viewFrame);
-        return Math.Max(fallback, Math.Abs(offsetPoint.X - centerPoint.X));
-    }
-
-    private static double ComputeScreenRadiusY(
-        CanvasViewportAdapter viewportAdapter,
-        Canvas overlay,
-        in PadCanvasViewFrameSnapshot viewFrame,
-        Point2 center,
-        double worldRadiusY,
-        double fallback)
-    {
-        if (worldRadiusY <= 1e-9)
-        {
-            return fallback;
-        }
-
-        var centerPoint = viewportAdapter.ToOverlayPoint(overlay, center, viewFrame);
-        var offsetPoint = viewportAdapter.ToOverlayPoint(overlay, new Point2(center.X, center.Y - worldRadiusY), viewFrame);
-        return Math.Max(fallback, Math.Abs(offsetPoint.Y - centerPoint.Y));
-    }
-
-    private static bool ShouldRenderLine(
-        CoordinatePlannerLine line,
-        CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode mode,
-        string? selectedKey) =>
-        mode switch
-        {
-            CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode.All => true,
-            CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode.Focus => HasSelectedArtifact(selectedKey) || IsEssentialLine(line) || IsSelected(line.Key, selectedKey),
-            _ => IsEssentialLine(line) || IsSelected(line.Key, selectedKey),
-        };
-
-    private static bool ShouldRenderPoint(
-        CoordinatePlannerPoint point,
-        CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode mode,
-        string? selectedKey) =>
-        mode switch
-        {
-            CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode.All => true,
-            CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode.Focus => HasSelectedArtifact(selectedKey) || IsEssentialPoint(point) || IsSelected(point.Key, selectedKey),
-            _ => IsEssentialPoint(point) || IsSelected(point.Key, selectedKey),
-        };
-
-    private static bool ShouldLabelRectangle(
-        CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode mode,
-        bool isSelected) =>
-        isSelected && mode != CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode.All;
-
-    private static bool ShouldLabelLine(
-        CoordinatePlannerLine line,
-        CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode mode,
-        bool isSelected) =>
-        mode == CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode.All ||
-        isSelected ||
-        line.Kind == CoordinatePlannerLineKind.CustomArrayEdge;
-
-    private static bool ShouldLabelPoint(
-        CoordinatePlannerPoint point,
-        CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode mode,
-        bool isSelected) =>
-        (point.Kind != CoordinatePlannerPointKind.CustomArrayDot &&
-         mode == CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode.All) ||
-        isSelected ||
-        point.Kind is CoordinatePlannerPointKind.AaCorner or CoordinatePlannerPointKind.BistCorner or CoordinatePlannerPointKind.CustomArrayCorner;
-
-    private static bool IsEssentialLine(CoordinatePlannerLine line) =>
-        line.Kind is CoordinatePlannerLineKind.HorizontalGuide or CoordinatePlannerLineKind.VerticalGuide or CoordinatePlannerLineKind.CustomArrayEdge;
-
-    private static bool IsEssentialPoint(CoordinatePlannerPoint point) =>
-        point.Kind is CoordinatePlannerPointKind.AaCorner or CoordinatePlannerPointKind.BistCorner or CoordinatePlannerPointKind.CustomArrayCorner;
-
-    private static bool IsMutedOverlay(
-        CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode mode,
-        string? selectedKey,
-        string key) =>
-        mode == CoordinatePlannerWorkspaceViewModel.CoordinatePlannerOverlayMode.Focus &&
-        HasSelectedArtifact(selectedKey) &&
-        !IsSelected(key, selectedKey);
-
-    private static bool IsSelected(string key, string? selectedKey) =>
-        string.Equals(key, selectedKey, StringComparison.Ordinal);
-
-    private static bool HasSelectedArtifact(string? selectedKey) =>
-        !string.IsNullOrWhiteSpace(selectedKey);
 
     private static Border BuildLabel(
         string text,
