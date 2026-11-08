@@ -59,13 +59,13 @@ public sealed class QuickFocusQueryParserBehaviorTests
     }
 
     [Fact]
-    public void TryParse_Characterization_IcFirstWithoutTargetUsesQualifierAsSearchValue()
+    public void TryParse_IcFirstWithoutTargetKeepsQualifierOutOfTheSearchValue()
     {
         var parsed = QuickFocusQueryParser.TryParse("IC2 72", out var query, out var error);
 
         Assert.True(parsed);
         Assert.Equal(QuickFocusTargetKind.Auto, query.TargetKind);
-        Assert.Equal(2, query.Value);
+        Assert.Equal(72, query.Value);
         Assert.Equal(1, query.IcIndex);
         Assert.Empty(error);
     }

@@ -54,9 +54,10 @@ internal static partial class QuickFocusQueryParser
 
             if (IsIcAlias(token))
             {
-                if (TryReadNextInt(tokens, index + 1, out var oneBasedIc))
+                if (index + 1 < tokens.Length && TryParseInt(tokens[index + 1], out var oneBasedIc))
                 {
                     icIndex = Math.Max(0, oneBasedIc - 1);
+                    index++;
                 }
 
                 continue;
