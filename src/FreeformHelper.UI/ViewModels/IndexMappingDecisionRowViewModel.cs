@@ -261,16 +261,7 @@ public sealed partial class IndexMappingDecisionRowViewModel : ObservableObject
             : issue.RegularPadIndex is int regularPadIndex
                 ? $"REG {regularPadIndex}"
                 : issue.KindText;
-        var subtitle = issue.Kind switch
-        {
-            DxfRegularMappingIssueKind.CountMismatch => "Visible CAD/Regular counts diverge.",
-            DxfRegularMappingIssueKind.UnmappedCad => issue.DxfIndex is int unmappedCadDiff ? $"Current diff idx {unmappedCadDiff} has no regular match." : "CAD has no regular match.",
-            DxfRegularMappingIssueKind.UnmappedRegular => issue.RegularPadIndex is int unmappedReg && issue.DiffIndex is int unmappedRegDiff ? $"REG {unmappedReg} / diff {unmappedRegDiff} has no CAD." : "Regular pad has no CAD.",
-            DxfRegularMappingIssueKind.LowConfidence => issue.DiffIndex is int assignedDiff ? $"Assigned diff {assignedDiff} is below confidence threshold." : "Assigned diff is below confidence threshold.",
-            DxfRegularMappingIssueKind.Ambiguous => issue.DiffIndex is int ambiguousDiff ? $"Assigned diff {ambiguousDiff} is close to another candidate." : "Assigned diff is close to another candidate.",
-            DxfRegularMappingIssueKind.DuplicateDiff => issue.DxfIndex is int duplicateDiff ? $"Current diff idx {duplicateDiff} is assigned more than once." : "Current diff idx is assigned more than once.",
-            _ => issue.Detail,
-        };
+        var subtitle = BuildIssueSubtitle(issue);
 
         var topCandidate = issue.TopCandidates.Count > 0 ? issue.TopCandidates[0] : null;
         var candidateLines = issue.TopCandidates.Select(candidate => candidate.Display).ToList();
@@ -315,6 +306,20 @@ public sealed partial class IndexMappingDecisionRowViewModel : ObservableObject
             decisionSourceText: "n/a",
             issue,
             issue.OverrideRegularPadIndex);
+    }
+
+    private static string BuildIssueSubtitle(IndexMappingReportIssueViewModel issue)
+    {
+        return issue.Kind switch
+        {
+            DxfRegularMappingIssueKind.CountMismatch => "Visible CAD/Regular counts diverge.",
+            DxfRegularMappingIssueKind.UnmappedCad => issue.DxfIndex is int unmappedCadDiff ? $"Current diff idx {unmappedCadDiff} has no regular match." : "CAD has no regular match.",
+            DxfRegularMappingIssueKind.UnmappedRegular => issue.RegularPadIndex is int unmappedReg && issue.DiffIndex is int unmappedRegDiff ? $"REG {unmappedReg} / diff {unmappedRegDiff} has no CAD." : "Regular pad has no CAD.",
+            DxfRegularMappingIssueKind.LowConfidence => issue.DiffIndex is int assignedDiff ? $"Assigned diff {assignedDiff} is below confidence threshold." : "Assigned diff is below confidence threshold.",
+            DxfRegularMappingIssueKind.Ambiguous => issue.DiffIndex is int ambiguousDiff ? $"Assigned diff {ambiguousDiff} is close to another candidate." : "Assigned diff is close to another candidate.",
+            DxfRegularMappingIssueKind.DuplicateDiff => issue.DxfIndex is int duplicateDiff ? $"Current diff idx {duplicateDiff} is assigned more than once." : "Current diff idx is assigned more than once.",
+            _ => issue.Detail,
+        };
     }
 
     public static IndexMappingDecisionRowViewModel FromMaskAudit(IndexMappingMaskAuditRowViewModel row)

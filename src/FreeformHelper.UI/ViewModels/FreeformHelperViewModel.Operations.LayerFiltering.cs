@@ -74,13 +74,7 @@ public sealed partial class FreeformHelperViewModel
         _cadIcIndexByCadId.Clear();
         if (ordered.Count == 0)
         {
-            CadOutputFwDiffIndexOverrideCadIds = new ObservableCollection<int>();
-            CadOutputFwDiffIndexAnchorCadIdsForCanvas = new ObservableCollection<int>();
-            CadOutputFwDiffAssignmentSummary = "CAD Output FW Diff assignment: no CAD output pads.";
-            SetLatestCadOutputFwDiffAssignmentDecisions(new Dictionary<int, CadOutputFwDiffAssignmentDecision>());
-            RefreshStep4DuplicateDiffGroups(Array.Empty<CadPad>());
-            BumpNotchExportIndexFingerprint();
-            InvalidateWorkflowDataSnapshot();
+            ResetVisibleDxfIndexMapToEmpty();
             return;
         }
 
@@ -145,6 +139,17 @@ public sealed partial class FreeformHelperViewModel
             autoMode,
             assignment);
         RefreshStep4DuplicateDiffGroups(ordered);
+        BumpNotchExportIndexFingerprint();
+        InvalidateWorkflowDataSnapshot();
+    }
+
+    private void ResetVisibleDxfIndexMapToEmpty()
+    {
+        CadOutputFwDiffIndexOverrideCadIds = new ObservableCollection<int>();
+        CadOutputFwDiffIndexAnchorCadIdsForCanvas = new ObservableCollection<int>();
+        CadOutputFwDiffAssignmentSummary = "CAD Output FW Diff assignment: no CAD output pads.";
+        SetLatestCadOutputFwDiffAssignmentDecisions(new Dictionary<int, CadOutputFwDiffAssignmentDecision>());
+        RefreshStep4DuplicateDiffGroups(Array.Empty<CadPad>());
         BumpNotchExportIndexFingerprint();
         InvalidateWorkflowDataSnapshot();
     }

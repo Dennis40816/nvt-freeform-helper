@@ -252,26 +252,17 @@ public sealed partial class FreeformHelperViewModel
         }
 
         _notchCompensationCacheCounters.RecordMiss();
-        var resolutionRequest = new NotchResolvedResultRequest(
-            cadPad,
+        var resolved = BuildCadV22ResolvedResult(
             _grid,
-            _projectFile.Settings,
+            cadPad,
             allCadPads,
             activeRegularPadIds,
-            SelectedNotchCompensationModelOption.Value,
-            EnableToRegular,
-            EnableToFull,
-            EnableToFullRuleEngine,
-            EnableToFullRuleTrace,
             strictOverlapRatio,
             anchorIc,
             anchorDiff,
             allocationAreaMode,
-            precomputedCompensation);
-        var resolved = precomputedResolved is not null &&
-                       NotchDetailUseCase.MatchesRequest(precomputedResolved, resolutionRequest)
-            ? precomputedResolved
-            : NotchDetailUseCase.BuildResolvedResult(resolutionRequest);
+            precomputedCompensation,
+            precomputedResolved);
 
         _notchCache.ResolvedResultByCadId[cadPadId] = (
             _notchCompensationCacheRevision,
@@ -288,5 +279,39 @@ public sealed partial class FreeformHelperViewModel
             allocationAreaMode,
             resolved);
         return resolved;
+    }
+
+    private NotchV22ResolvedResult BuildCadV22ResolvedResult(
+        RegularGrid grid,
+        CadPad cadPad,
+        IReadOnlyList<CadPad> allCadPads,
+        IReadOnlySet<int>? activeRegularPadIds,
+        double strictOverlapRatio,
+        int? anchorIc,
+        int? anchorDiff,
+        NotchV22TargetAllocationAreaMode allocationAreaMode,
+        NotchV22CompensationResult? precomputedCompensation,
+        NotchV22ResolvedResult? precomputedResolved)
+    {
+        var resolutionRequest = new NotchResolvedResultRequest(
+            cadPad,
+            grid,
+            _projectFile.Settings,
+            allCadPads,
+            activeRegularPadIds,
+            SelectedNotchCompensationModelOption.Value,
+            EnableToRegular,
+            EnableToFull,
+            EnableToFullRuleEngine,
+            EnableToFullRuleTrace,
+            strictOverlapRatio,
+            anchorIc,
+            anchorDiff,
+            allocationAreaMode,
+            precomputedCompensation);
+        return precomputedResolved is not null &&
+               NotchDetailUseCase.MatchesRequest(precomputedResolved, resolutionRequest)
+            ? precomputedResolved
+            : NotchDetailUseCase.BuildResolvedResult(resolutionRequest);
     }
 }
