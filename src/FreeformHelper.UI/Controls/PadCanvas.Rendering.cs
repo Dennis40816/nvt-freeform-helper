@@ -92,61 +92,27 @@ public sealed partial class PadCanvas
                 regFillOpacity = 0.0;
             }
 
-            // --- Initialize Brushes and Pens for Regular Pads ---
-            IBrush? regFillBase = null; // Base fill color for regular pads.
-            IBrush? regFillSelected = null; // Fill color for selected regular pads.
-            IBrush? regFillFreeform = null; // Fill color for freeform regular pads.
-            Pen? regPenBase = null; // Base stroke pen for regular pads.
-            Pen? regPenSelected = null; // Stroke pen for selected regular pads.
-            Pen? regPenFreeform = null; // Stroke pen for freeform regular pads.
-            Pen? regPenUnmatched = null; // Stroke pen for unmatched regular pads.
-
-            // --- Initialize Brushes and Pens for CAD Pads ---
-            IBrush? cadFillDefault = null; // Default fill color for CAD pads.
-            IBrush? cadFillSelected = null; // Fill color for selected CAD pads.
-            IBrush? cadFillOverlap = null; // Fill color for overlap-highlighted CAD pads.
-            Pen? cadPen = null; // Base stroke pen for CAD pads.
-            Pen? cadPenSelected = null; // Stroke pen for selected CAD pads.
-            Pen? cadPenOverlap = null; // Stroke pen for overlap-highlighted CAD pads.
+            // The brushes and pens of each pad kind come from the style builder.
+            RegularPadStyle? regularStyle = null;
+            CadPadStyle? cadStyle = null;
+            var styleBuilder = new PadCanvasPadStyleBuilder(new PadCanvasPadStyleBuilder.Services(
+                GetResourceColor,
+                GetResourceAlpha,
+                GetResourceDouble,
+                GetBrush,
+                ApplyOpacity));
 
             if (showRegular)
             {
-                var baseColor = RegularLineColor;
-                var selectedColor = RegularSelectedColor ?? GetResourceColor("ColorCanvasRegularSelected", baseColor);
-                var freeformColor = GetResourceColor("ColorCanvasRegularFreeform", baseColor);
-                var unmatchedColor = GetResourceColor("ColorCanvasRegularUnmatched", baseColor);
-
-                var regFillAlpha = GetResourceAlpha("CanvasRegularFillAlpha", 0.0);
-                var regFillSelectedAlpha = RegularSelectedFillOpacity.HasValue
-                    ? (byte)Math.Clamp((int)Math.Round(RegularSelectedFillOpacity.Value * 255.0), 0, 255)
-                    : GetResourceAlpha("CanvasRegularSelectedFillAlpha", 0.0);
-                var regFillFreeformAlpha = GetResourceAlpha("CanvasRegularFreeformFillAlpha", 0.0);
-                var regStrokeAlpha = GetResourceAlpha("CanvasRegularStrokeAlpha", 0.0);
-                var highlightAlpha = GetResourceAlpha("CanvasHighlightStrokeAlpha", regStrokeAlpha);
-
-                // Create semi-transparent fill brushes for regular pads.
-                var regBaseFillAlpha = ApplyOpacity(regFillAlpha, regFillOpacity);
-                var regSelectedFillAlpha = ApplyOpacity(regFillSelectedAlpha, regFillOpacity);
-                var regFreeformFillAlpha = ApplyOpacity(regFillFreeformAlpha, regFillOpacity);
-                regFillBase = regBaseFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(regBaseFillAlpha, baseColor.R, baseColor.G, baseColor.B));
-                regFillSelected = regSelectedFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(regSelectedFillAlpha, selectedColor.R, selectedColor.G, selectedColor.B));
-                regFillFreeform = regFreeformFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(regFreeformFillAlpha, freeformColor.R, freeformColor.G, freeformColor.B));
-
-                // Create pens for regular pads, including different styles for various states.
-                var baseStrokeAlpha = ApplyOpacity(regStrokeAlpha, regOpacity);
-                var stateStrokeAlpha = ApplyOpacity(highlightAlpha, regOpacity);
-                var highlightedRegularWidth = Math.Max(0.05, RegularLineWidth + highlightStrokeWidthAdjust);
-                regPenBase = new Pen(GetBrush(Color.FromArgb(baseStrokeAlpha, baseColor.R, baseColor.G, baseColor.B)), RegularLineWidth);
-                regPenSelected = new Pen(GetBrush(Color.FromArgb(stateStrokeAlpha, selectedColor.R, selectedColor.G, selectedColor.B)), selectedOutlineWidth);
-                // Freeform remains color-coded, but does not get selection-style thick highlight.
-                regPenFreeform = new Pen(GetBrush(Color.FromArgb(baseStrokeAlpha, freeformColor.R, freeformColor.G, freeformColor.B)), RegularLineWidth);
-                regPenUnmatched = new Pen(GetBrush(Color.FromArgb(stateStrokeAlpha, unmatchedColor.R, unmatchedColor.G, unmatchedColor.B)), highlightedRegularWidth);
+                regularStyle = styleBuilder.BuildRegular(new PadCanvasPadStyleBuilder.RegularInput(
+                    RegularLineColor,
+                    RegularSelectedColor,
+                    RegularSelectedFillOpacity,
+                    RegularLineWidth,
+                    regOpacity,
+                    regFillOpacity,
+                    selectedOutlineWidth,
+                    highlightStrokeWidthAdjust));
             }
 
             if (showCad)
@@ -156,36 +122,14 @@ public sealed partial class PadCanvas
                     EnsureAreaColorCache(); // Ensure area-based color cache for CAD pads is built.
                 }
 
-                // Create semi-transparent fill brushes for CAD pads.
-                var cadFillDefaultColor = GetResourceColor("ColorCanvasCadFillDefault", Colors.Transparent);
-                var cadFillSelectedColor = GetResourceColor("ColorCanvasCadFillSelected", Colors.Transparent);
-                var cadFillOverlapColor = GetResourceColor("ColorCanvasCadOverlapFill", Colors.Transparent);
-                var cadDefaultFillAlpha = ApplyOpacity(cadFillDefaultColor.A, cadFillOpacity);
-                var cadSelectedFillAlpha = ApplyOpacity(cadFillSelectedColor.A, cadFillOpacity);
-                var cadOverlapFillAlpha = ApplyOpacity(cadFillOverlapColor.A, cadFillOpacity);
-                cadFillDefault = cadDefaultFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(cadDefaultFillAlpha, cadFillDefaultColor.R, cadFillDefaultColor.G, cadFillDefaultColor.B));
-                cadFillSelected = cadSelectedFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(cadSelectedFillAlpha, cadFillSelectedColor.R, cadFillSelectedColor.G, cadFillSelectedColor.B));
-                cadFillOverlap = cadOverlapFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(cadOverlapFillAlpha, cadFillOverlapColor.R, cadFillOverlapColor.G, cadFillOverlapColor.B));
-
-                var cadStrokeAlpha = GetResourceAlpha("CanvasCadStrokeAlpha", 0.0);
-                var highlightAlpha = GetResourceAlpha("CanvasHighlightStrokeAlpha", cadStrokeAlpha);
-                var cadSelectedColor = GetResourceColor("ColorCanvasCadSelected", CadLineColor);
-                var cadOverlapColor = GetResourceColor("ColorCanvasCadOverlapStroke", cadSelectedColor);
-                var overlapWidthAdd = GetResourceDouble("CanvasCadOverlapStrokeWidthAdd", selectedWidthAdd);
-                var overlapWidth = Math.Max(CadLineWidth + 0.05, CadLineWidth + overlapWidthAdd + highlightStrokeWidthAdjust);
-
-                // Create pens for CAD pads, including a thicker pen for selected state.
-                var baseStrokeAlpha = ApplyOpacity(cadStrokeAlpha, cadOpacity);
-                var selectedStrokeAlpha = ApplyOpacity(highlightAlpha, cadOpacity);
-                cadPen = new Pen(GetBrush(Color.FromArgb(baseStrokeAlpha, CadLineColor.R, CadLineColor.G, CadLineColor.B)), CadLineWidth);
-                cadPenSelected = new Pen(GetBrush(Color.FromArgb(selectedStrokeAlpha, cadSelectedColor.R, cadSelectedColor.G, cadSelectedColor.B)), selectedOutlineWidth);
-                cadPenOverlap = new Pen(GetBrush(Color.FromArgb(selectedStrokeAlpha, cadOverlapColor.R, cadOverlapColor.G, cadOverlapColor.B)), overlapWidth);
+                cadStyle = styleBuilder.BuildCad(new PadCanvasPadStyleBuilder.CadInput(
+                    CadLineColor,
+                    CadLineWidth,
+                    cadOpacity,
+                    cadFillOpacity,
+                    selectedOutlineWidth,
+                    selectedWidthAdd,
+                    highlightStrokeWidthAdjust));
             }
 
             var visibleBuildStarted = TimeProvider.System.GetTimestamp();
@@ -202,7 +146,7 @@ public sealed partial class PadCanvas
             {
                 foreach (var pad in _visibleRegularUnselected)
                 {
-                    DrawRegularPad(context, pad, isSelected: false, regFillBase!, regFillSelected!, regFillFreeform!, regPenBase!, regPenSelected!, regPenFreeform!, regPenUnmatched!);
+                    DrawRegularPad(context, pad, isSelected: false, regularStyle!.FillBase, regularStyle.FillSelected, regularStyle.FillFreeform, regularStyle.PenBase, regularStyle.PenSelected, regularStyle.PenFreeform, regularStyle.PenUnmatched);
                 }
             }
 
@@ -211,7 +155,7 @@ public sealed partial class PadCanvas
             {
                 foreach (var pad in _visibleCadUnselected)
                 {
-                    DrawCadPad(context, pad, isSelected: false, cadFillDefault!, cadFillSelected!, cadFillOverlap!, cadPen!, cadPenSelected!, cadPenOverlap!, lowDetailMode);
+                    DrawCadPad(context, pad, isSelected: false, cadStyle!.FillDefault, cadStyle.FillSelected, cadStyle.FillOverlap, cadStyle.Pen, cadStyle.PenSelected, cadStyle.PenOverlap, lowDetailMode);
                 }
             }
 
@@ -220,7 +164,7 @@ public sealed partial class PadCanvas
             {
                 foreach (var pad in _visibleRegularSelected)
                 {
-                    DrawRegularPad(context, pad, isSelected: true, regFillBase!, regFillSelected!, regFillFreeform!, regPenBase!, regPenSelected!, regPenFreeform!, regPenUnmatched!);
+                    DrawRegularPad(context, pad, isSelected: true, regularStyle!.FillBase, regularStyle.FillSelected, regularStyle.FillFreeform, regularStyle.PenBase, regularStyle.PenSelected, regularStyle.PenFreeform, regularStyle.PenUnmatched);
                 }
             }
 
@@ -229,7 +173,7 @@ public sealed partial class PadCanvas
             {
                 foreach (var pad in _visibleCadSelected)
                 {
-                    DrawCadPad(context, pad, isSelected: true, cadFillDefault!, cadFillSelected!, cadFillOverlap!, cadPen!, cadPenSelected!, cadPenOverlap!, lowDetailMode);
+                    DrawCadPad(context, pad, isSelected: true, cadStyle!.FillDefault, cadStyle.FillSelected, cadStyle.FillOverlap, cadStyle.Pen, cadStyle.PenSelected, cadStyle.PenOverlap, lowDetailMode);
                 }
             }
             geometryDrawElapsedMs = ElapsedMilliseconds(geometryStarted);
