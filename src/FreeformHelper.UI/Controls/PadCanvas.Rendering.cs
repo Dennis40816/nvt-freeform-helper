@@ -141,41 +141,14 @@ public sealed partial class PadCanvas
             // This keeps selected outlines above all unselected geometry.
             var geometryStarted = TimeProvider.System.GetTimestamp();
 
-            // 1. Draw Regular Pads (unselected)
-            if (showRegular)
-            {
-                foreach (var pad in _visibleRegularUnselected)
-                {
-                    DrawRegularPad(context, pad, isSelected: false, regularStyle!.FillBase, regularStyle.FillSelected, regularStyle.FillFreeform, regularStyle.PenBase, regularStyle.PenSelected, regularStyle.PenFreeform, regularStyle.PenUnmatched);
-                }
-            }
-
-            // 2. Draw CAD Pads (unselected)
-            if (showCad)
-            {
-                foreach (var pad in _visibleCadUnselected)
-                {
-                    DrawCadPad(context, pad, isSelected: false, cadStyle!.FillDefault, cadStyle.FillSelected, cadStyle.FillOverlap, cadStyle.Pen, cadStyle.PenSelected, cadStyle.PenOverlap, lowDetailMode);
-                }
-            }
-
-            // 3. Draw Regular Pads (selected)
-            if (showRegular)
-            {
-                foreach (var pad in _visibleRegularSelected)
-                {
-                    DrawRegularPad(context, pad, isSelected: true, regularStyle!.FillBase, regularStyle.FillSelected, regularStyle.FillFreeform, regularStyle.PenBase, regularStyle.PenSelected, regularStyle.PenFreeform, regularStyle.PenUnmatched);
-                }
-            }
-
-            // 4. Draw CAD Pads (selected)
-            if (showCad)
-            {
-                foreach (var pad in _visibleCadSelected)
-                {
-                    DrawCadPad(context, pad, isSelected: true, cadStyle!.FillDefault, cadStyle.FillSelected, cadStyle.FillOverlap, cadStyle.Pen, cadStyle.PenSelected, cadStyle.PenOverlap, lowDetailMode);
-                }
-            }
+            var padPainter = new PadCanvasVisiblePadPainter(
+                _visibleRegularUnselected,
+                _visibleCadUnselected,
+                _visibleRegularSelected,
+                _visibleCadSelected,
+                (ctx, pad, selected, style) => DrawRegularPad(ctx, pad, selected, style.FillBase, style.FillSelected, style.FillFreeform, style.PenBase, style.PenSelected, style.PenFreeform, style.PenUnmatched),
+                (ctx, pad, selected, style, lowDetail) => DrawCadPad(ctx, pad, selected, style.FillDefault, style.FillSelected, style.FillOverlap, style.Pen, style.PenSelected, style.PenOverlap, lowDetail));
+            padPainter.Draw(context, showRegular, showCad, regularStyle, cadStyle, lowDetailMode);
             geometryDrawElapsedMs = ElapsedMilliseconds(geometryStarted);
 
             if (!_isBoxSelecting && !secondaryVisualsDeferred)
