@@ -137,6 +137,7 @@ public sealed partial class NotchExportRowItemViewModel : ObservableObject
     public bool IsStatusWarning => !IsStatusNoCad && !IsStatusLegacy && IsNoOpV22Node;
     public bool IsStatusLinked => !IsStatusNoCad && !IsStatusLegacy && !IsStatusWarning;
     public string StatusText => BuildStatusText();
+    public double? MatchPercent => ResolveMatchPercent(Row);
     public string MatchSummaryText => BuildMatchSummaryText(Row);
     public string MappingText => $"REG {RegularText} -> CAD {CadText}";
     public string PrimaryOutcomeText => BuildPrimaryOutcomeText(Row, IsNoOpV22Node);
@@ -309,14 +310,16 @@ public sealed partial class NotchExportRowItemViewModel : ObservableObject
             : "Linked";
     }
 
+    private static double? ResolveMatchPercent(NotchTableRow row)
+    {
+        return row.V22Node is NotchV22Node node
+            ? node.CombinePercent
+            : TryExtractMatchPercentFromComment(row.Comment);
+    }
+
     private static string BuildMatchSummaryText(NotchTableRow row)
     {
-        if (row.V22Node is NotchV22Node node)
-        {
-            return $"{node.CombinePercent}%";
-        }
-
-        var matchPercent = TryExtractMatchPercentFromComment(row.Comment);
+        var matchPercent = ResolveMatchPercent(row);
         return matchPercent.HasValue
             ? $"{matchPercent.Value.ToString(CultureInfo.InvariantCulture)}%"
             : "-";

@@ -173,7 +173,7 @@ internal static class NotchExportSelectionProjectionBuilder
         return !showSelectedOnly || row.IsSelected;
     }
 
-    private static int BuildSortKey(
+    private static double BuildSortKey(
         NotchExportRowItemViewModel row,
         NotchExportSortMode sortMode)
     {
@@ -181,20 +181,10 @@ internal static class NotchExportSelectionProjectionBuilder
         {
             NotchExportSortMode.RowId => row.RowIndex,
             NotchExportSortMode.DiffAscending => row.Row.DiffIndex,
-            NotchExportSortMode.MatchDescending => -ExtractMatchSortValue(row),
+            NotchExportSortMode.MatchDescending => -(row.MatchPercent ?? 0d),
             NotchExportSortMode.IcThenDiff => (row.Row.IcIndex * 100000) + row.Row.DiffIndex,
             _ => row.RowIndex,
         };
-    }
-
-    private static int ExtractMatchSortValue(NotchExportRowItemViewModel row)
-    {
-        if (row.Row.V22Node is NotchV22Node node)
-        {
-            return node.CombinePercent;
-        }
-
-        return 0;
     }
 
     private static bool MatchesSearchQuery(NotchExportRowItemViewModel row, string? searchKeyword)
