@@ -46,6 +46,9 @@ public sealed partial class NotchTableGenerator
     /// <param name="cad">The set of CAD pads.</param>
     /// <param name="grid">The regular grid with pad matching information.</param>
     /// <param name="settings">The project settings, including which notch algorithm versions are enabled.</param>
+    /// <param name="progress">Optional receiver of generation progress updates.</param>
+    /// <param name="activeRegularPadIds">Optional IDs of the active regular pads; <c>null</c> leaves the regular pads unfiltered.</param>
+    /// <param name="cadOutputFwDiffIndexByCadId">Optional map from CAD pad ID to its output FW diff index.</param>
     /// <returns>A new <see cref="NotchTable"/> containing the generated rows.</returns>
     public NotchTable Generate(
         CadPadSet cad,

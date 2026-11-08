@@ -132,8 +132,6 @@ public sealed class WorkspaceInteractionState
 /// <summary>
 /// Provides data for the <see cref="WorkspaceInteractionState.SelectionChanged"/> event.
 /// </summary>
-/// <param name="CadIds">The IDs of the currently selected CAD pads.</param>
-/// <param name="RegularIndices">The indices of the currently selected regular pads.</param>
 public sealed class SelectionChangedEventArgs : EventArgs
 {
     public SelectionChangedEventArgs(IReadOnlyList<int> cadIds, IReadOnlyList<int> regularIndices)
@@ -150,7 +148,6 @@ public sealed class SelectionChangedEventArgs : EventArgs
 /// <summary>
 /// Provides data for the <see cref="WorkspaceInteractionState.PadInfoChanged"/> event.
 /// </summary>
-/// <param name="Context">The <see cref="PadInfoContext"/> for the active pad info, or null if closed.</param>
 public sealed class PadInfoChangedEventArgs : EventArgs
 {
     public PadInfoChangedEventArgs(PadInfoContext? context)

@@ -899,26 +899,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.SimulationHostViewModel._sourceRevision"
     },
     {
-      "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/FreeformHelper.Application.csproj",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1572"
-    },
-    {
-      "syntaxHash": "8226352477fca82ef0fb7bedbeb0113846d7faff87be00201e0c8fdd1d10b9cc",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Application/FreeformHelper.Application.csproj",
-      "project": "FreeformHelper.Application",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1573"
-    },
-    {
       "syntaxHash": "1815d28b376e0ae3fab7869b60b08daadbdd8e45f6356b6dd946b6001fca0b0c",
       "member": "MSBuild",
       "owner": "NFH",
@@ -927,26 +907,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "NoWarn:1591"
-    },
-    {
-      "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Domain/FreeformHelper.Domain.csproj",
-      "project": "FreeformHelper.Domain",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1572"
-    },
-    {
-      "syntaxHash": "8226352477fca82ef0fb7bedbeb0113846d7faff87be00201e0c8fdd1d10b9cc",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Domain/FreeformHelper.Domain.csproj",
-      "project": "FreeformHelper.Domain",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1573"
     },
     {
       "syntaxHash": "1815d28b376e0ae3fab7869b60b08daadbdd8e45f6356b6dd946b6001fca0b0c",
@@ -959,26 +919,6 @@
       "symbol": "NoWarn:1591"
     },
     {
-      "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Infrastructure/FreeformHelper.Infrastructure.csproj",
-      "project": "FreeformHelper.Infrastructure",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1572"
-    },
-    {
-      "syntaxHash": "8226352477fca82ef0fb7bedbeb0113846d7faff87be00201e0c8fdd1d10b9cc",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.Infrastructure/FreeformHelper.Infrastructure.csproj",
-      "project": "FreeformHelper.Infrastructure",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1573"
-    },
-    {
       "syntaxHash": "1815d28b376e0ae3fab7869b60b08daadbdd8e45f6356b6dd946b6001fca0b0c",
       "member": "MSBuild",
       "owner": "NFH",
@@ -987,26 +927,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "NoWarn:1591"
-    },
-    {
-      "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1572"
-    },
-    {
-      "syntaxHash": "8226352477fca82ef0fb7bedbeb0113846d7faff87be00201e0c8fdd1d10b9cc",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1573"
     },
     {
       "syntaxHash": "1815d28b376e0ae3fab7869b60b08daadbdd8e45f6356b6dd946b6001fca0b0c",
@@ -1047,26 +967,6 @@
       "count": 1,
       "rule": "suppressions",
       "symbol": "WarningsNotAsErrors:VSTHRD002"
-    },
-    {
-      "syntaxHash": "067237db47958985a9b63ebe82f7f927009feecf8c94f00a9ccf0c09a6243be4",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1572"
-    },
-    {
-      "syntaxHash": "8226352477fca82ef0fb7bedbeb0113846d7faff87be00201e0c8fdd1d10b9cc",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "NoWarn:1573"
     },
     {
       "syntaxHash": "1815d28b376e0ae3fab7869b60b08daadbdd8e45f6356b6dd946b6001fca0b0c",

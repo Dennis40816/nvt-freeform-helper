@@ -59,6 +59,16 @@ public sealed partial class NotchV22CompensationService
     /// <param name="enableToRegular">Whether To Regular compensation is enabled.</param>
     /// <param name="enableToFull">Whether To Full compensation is enabled.</param>
     /// <param name="allCadPads">Optional full CAD set used as collision blockers for directional To Full expansion.</param>
+    /// <param name="activeRegularPadIds">Optional IDs of the active regular pads; <c>null</c> leaves the regular pads unfiltered.</param>
+    /// <param name="strictOverlapRatioOverride">Optional strict overlap ratio; <c>null</c> or a non-finite value uses the default, and other values are clamped to 0..1.</param>
+    /// <param name="enableToFullRuleEngine">Whether the To Full rule engine runs.</param>
+    /// <param name="enableToFullRuleTrace">Whether the To Full rule trace is recorded.</param>
+    /// <param name="enableBoundaryVirtualAreaCap">Whether the boundary virtual area cap applies.</param>
+    /// <param name="boundaryVirtualAreaCapRatio">The cap ratio used when the boundary virtual area cap is enabled.</param>
+    /// <param name="precomputedAllocations">Optional allocations built by the caller; <c>null</c> builds them from <paramref name="cad"/> and <paramref name="grid"/>.</param>
+    /// <param name="precomputedBoundaryRegularIndices">Optional boundary regular indices built by the caller; <c>null</c> builds them from the allocations.</param>
+    /// <param name="sharedBoundaryQueryContext">Optional boundary query context shared between calls; <c>null</c> creates one from <paramref name="allCadPads"/>.</param>
+    /// <param name="timingReporter">Optional callback that receives the stage timings.</param>
     /// <returns>Compensation ratios and overlap diagnostics.</returns>
     public static NotchV22CompensationResult Compute(
         CadPad cad,

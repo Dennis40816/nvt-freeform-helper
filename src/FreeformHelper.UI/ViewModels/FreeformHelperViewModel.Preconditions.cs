@@ -13,6 +13,7 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     /// <param name="cadFactory">Factory that returns the CAD set for the operation context.</param>
     /// <param name="missingStatus">Status text to show when prerequisites are missing.</param>
+    /// <param name="onCadUnavailable">Optional custom side effect when CAD is unavailable; <c>null</c> shows <paramref name="missingStatus"/> instead.</param>
     /// <param name="cad">Resolved CAD set when available.</param>
     /// <param name="grid">Resolved regular grid when available.</param>
     /// <returns><c>true</c> when both CAD and grid are ready; otherwise <c>false</c>.</returns>
