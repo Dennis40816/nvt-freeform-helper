@@ -547,20 +547,6 @@
       "symbol": "file:FreeformHelper.UI.Views.SimulationWorkspaceView"
     },
     {
-      "kind": "file",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "fileLines": 923
-      },
-      "owner": "NFH",
-      "locations": [
-        "tests/FreeformHelper.Tests/UI/Snapshots/UiLayoutGuardTests.cs"
-      ],
-      "contentHash": "d0fb1cba6be2610f931e505823a51a220ce6326e95f5c581a183b976c1b6dcc1",
-      "project": "FreeformHelper.Tests",
-      "symbol": "file:FreeformHelper.Tests.UiLayoutGuardTests"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
