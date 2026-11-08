@@ -7,6 +7,7 @@ using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
+using Nvt.Core.Avalonia.Panels;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -39,6 +40,8 @@ public sealed class CoordinateArtifactDetailWindowEntryTests
             await HeadlessUiPump.FlushQueueAsync();
             var window = Assert.Single(owner.OwnedWindows.OfType<CoordinateArtifactDetailWindow>());
             Assert.True(window.IsVisible);
+            window.FindControl<CollapsiblePanel>("SourceDetailSection")!.IsExpanded = true;
+            await HeadlessUiPump.FlushQueueAsync();
             var text = window.GetVisualDescendants().OfType<SelectableTextBlock>()
                 .Where(block => block.IsVisible).Select(block => block.Text).ToArray();
             Assert.Contains(row.PixelText, text);
@@ -49,7 +52,7 @@ public sealed class CoordinateArtifactDetailWindowEntryTests
             Assert.False(detail.IsCompleted);
 
             UiEventProbe.Click(Assert.Single(window.GetVisualDescendants().OfType<Button>(),
-                button => button.Content is SelectableTextBlock { Text: "Close" }));
+                button => button.Content is "Close"));
             await detail.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
             await HeadlessUiPump.FlushQueueAsync();
 
