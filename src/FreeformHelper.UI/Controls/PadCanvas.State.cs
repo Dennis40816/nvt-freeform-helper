@@ -88,12 +88,12 @@ public sealed partial class PadCanvas
     private readonly Dictionary<uint, ISolidColorBrush> _brushCache = new(); // General brush cache.
     private readonly Dictionary<string, TextLayout> _labelLayoutCache = new(); // Cache for rendered text layouts (labels).
 
-    private enum AxisLabelKind
+    internal enum AxisLabelKind
     {
         Row,
         Column,
         Ic
     }
 
-    private readonly record struct AxisLabelHit(AxisLabelKind Kind, int Index, Rect Bounds);
+    internal readonly record struct AxisLabelHit(AxisLabelKind Kind, int Index, Rect Bounds);
 }
