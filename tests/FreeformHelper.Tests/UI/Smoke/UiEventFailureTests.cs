@@ -46,8 +46,11 @@ public sealed class UiEventFailureTests
             Assert.Equal(1, vm.RelayeredCadPadCount);
             owner.Show();
             await HeadlessUiPump.FlushQueueAsync();
+            Assert.Single(panel.GetVisualDescendants().OfType<Nvt.Core.Avalonia.Panels.CollapsiblePanel>(),
+                static block => block.Title == "DXF edits").IsExpanded = true;
+            await HeadlessUiPump.FlushQueueAsync();
             var reset = Assert.Single(panel.GetVisualDescendants().OfType<Button>(),
-                static button => button.Classes.Contains("dxfEditHeaderAction"));
+                static button => Equals(button.Content, "Reset all DXF edits"));
 
             var cancelled = await ClickResetAndWaitForConfirmAsync(owner, reset);
             UiEventProbe.Click(Assert.IsType<Button>(cancelled.FindControl<Button>("CancelButton")));

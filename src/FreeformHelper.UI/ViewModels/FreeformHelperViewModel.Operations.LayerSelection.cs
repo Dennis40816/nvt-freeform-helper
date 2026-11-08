@@ -37,7 +37,7 @@ public sealed partial class FreeformHelperViewModel
         ? "No layers"
         : AreAllCadLayersSelected
             ? "All on"
-            : "All off";
+            : AreSomeCadLayersSelected ? "Partly on" : "All off";
 
     public string CadLayerBulkToggleToolTip => LayerToggles.Count == 0
         ? "Load a DXF before changing layer visibility."

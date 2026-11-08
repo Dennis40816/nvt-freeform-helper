@@ -88,7 +88,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     /// Gets or sets a value indicating whether the in-app console panel is expanded.
     /// </summary>
     [ObservableProperty]
-    private bool _isConsoleExpanded = true;
+    private bool _isConsoleExpanded;
 
     /// <summary>
     /// Gets the log store that the console shows. The default is the process-wide store that the NLog target writes to.

@@ -287,6 +287,9 @@ public sealed class HeadlessUiSmokeTests
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
 
+            Assert.Single(view.GetVisualDescendants().OfType<Nvt.Core.Avalonia.Panels.CollapsiblePanel>(),
+                static panel => panel.Title == "Edit guards").IsExpanded = true;
+            await HeadlessUiPump.FlushQueueAsync();
             var target = Assert.Single(
                 view.GetVisualDescendants().OfType<NumberScrubber>(),
                 static scrubber => scrubber is { Value: 128m, Maximum: 255m });

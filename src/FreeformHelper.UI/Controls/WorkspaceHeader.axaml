@@ -219,81 +219,36 @@
               CornerRadius="{StaticResource RadiusMd}"
               Padding="{StaticResource Inset12_10}"
               VerticalAlignment="Stretch">
-        <Grid ColumnDefinitions="Auto,*">
-          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="{StaticResource Space12}" VerticalAlignment="Center">
-            <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
-              <SelectableTextBlock Text="Rows"/>
-              <TextBox Classes="workspaceHeaderInput"
-                       Width="{StaticResource ManualSizingInputWidth}"
-                       PlaceholderText="e.g. 0-3,6"
-                       Text="{Binding ManualRowsRange, Mode=TwoWay}"
-                       ToolTip.Tip="Rows range (0 = top). Accepts 5 / 5-7 / 5,7."/>
-            </StackPanel>
-
-            <StackPanel Spacing="{StaticResource Space2}" Margin="{StaticResource InsetRight12}">
-              <SelectableTextBlock Text="Cols"/>
-              <TextBox Classes="workspaceHeaderInput"
-                       Width="{StaticResource ManualSizingInputWidth}"
-                       PlaceholderText="e.g. 2-6"
-                       Text="{Binding ManualColsRange, Mode=TwoWay}"
-                       ToolTip.Tip="Column range. Accepts 5 / 5-7 / 5,7."/>
-            </StackPanel>
-
+        <StackPanel Spacing="{StaticResource Space6}">
+          <SelectableTextBlock Classes="workspaceHeaderStatus"
+                               Text="{Binding StatusDisplayText}" IsVisible="{Binding HasStatusDisplay}"
+                               ToolTip.Tip="{Binding StatusDisplayText}"/>
+          <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space8}">
+            <Border Classes="chipStatus"><SelectableTextBlock Text="{Binding CadSelectionText}"/></Border>
+            <Border Classes="chipStatus"><SelectableTextBlock Text="{Binding RegularSelectionText}"/></Border>
           </StackPanel>
-
-          <Grid Grid.Column="1"
-                ColumnDefinitions="*,Auto">
-            <Border Grid.Column="0"
-                    Background="{DynamicResource BrushBgSurface}"
-                    BorderBrush="{DynamicResource BrushBorder}"
-                    BorderThickness="{StaticResource BorderThin}"
-                    CornerRadius="{StaticResource RadiusSm}"
-                    Padding="{StaticResource Inset8_4}"
-                    MaxWidth="{StaticResource WorkspaceHeaderStatusMaxWidth}"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center">
-              <StackPanel Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Classes="workspaceHeaderStatus"
-                                     Text="{Binding StatusDisplayText}"
-                                     IsVisible="{Binding HasStatusDisplay}"
-                                     ToolTip.Tip="{Binding StatusDisplayText}"/>
-                <StackPanel Orientation="Horizontal"
-                            Spacing="{StaticResource Space8}">
-                  <SelectableTextBlock Classes="workspaceHeaderSelection"
-                                       Text="{Binding CadSelectionText}"/>
-                  <SelectableTextBlock Classes="workspaceHeaderSelection"
-                                       Text="{Binding RegularSelectionText}"/>
+          <SelectableTextBlock Text="{Binding ManualRangeError}" Foreground="{DynamicResource BrushDanger}"
+                               TextWrapping="Wrap" IsVisible="{Binding HasManualRangeError}"/>
+          <controls:HidePanelBlock Title="Range selection" IsExpanded="False">
+            <StackPanel Spacing="{StaticResource Space6}">
+              <Grid ColumnDefinitions="*,*">
+                <StackPanel Classes="panelFormField left">
+                  <SelectableTextBlock Text="Rows"/>
+                  <TextBox Classes="workspaceHeaderInput" PlaceholderText="e.g. 0-3,6"
+                           Text="{Binding ManualRowsRange, Mode=TwoWay}"
+                           ToolTip.Tip="Rows range (0 = top). Accepts 5 / 5-7 / 5,7."/>
                 </StackPanel>
-                <SelectableTextBlock Text="{Binding ManualRangeError}"
-                                     Foreground="{DynamicResource BrushDanger}"
-                                    
-                                     IsVisible="{Binding HasManualRangeError}"/>
-              </StackPanel>
-            </Border>
-
-            <Border Grid.Column="1"
-                    Classes="workspaceHeaderInspectorCompact"
-                    IsVisible="{Binding HasPadInspectorSummary}"
-                    Margin="{StaticResource InsetLeft10}"
-                    HorizontalAlignment="Stretch">
-              <StackPanel Spacing="{StaticResource Space4}">
-                <Grid ColumnDefinitions="*">
-                  <StackPanel Grid.Column="0"
-                              Classes="workspaceHeaderInspectorChipRow"
-                              Orientation="Horizontal"
-                              Spacing="{StaticResource Space8}"
-                              VerticalAlignment="Center">
-                    <Border Classes="workspaceHeaderInspectorChip workspaceHeaderInspectorChipPrimary">
-                      <SelectableTextBlock Classes="workspaceHeaderInspectorPrimary"
-                                           Text="{Binding PadInspectorCompactHeaderText}"
-                                           ToolTip.Tip="{Binding PadInspectorCompactHeaderText}"/>
-                    </Border>
-                  </StackPanel>
-                </Grid>
-              </StackPanel>
-            </Border>
-          </Grid>
-        </Grid>
+                <StackPanel Grid.Column="1" Classes="panelFormField right">
+                  <SelectableTextBlock Text="Cols"/>
+                  <TextBox Classes="workspaceHeaderInput" PlaceholderText="e.g. 2-6"
+                           Text="{Binding ManualColsRange, Mode=TwoWay}"
+                           ToolTip.Tip="Column range. Accepts 5 / 5-7 / 5,7."/>
+                </StackPanel>
+              </Grid>
+              <SelectableTextBlock Classes="stepNote" Text="0-based; applies immediately"/>
+            </StackPanel>
+          </controls:HidePanelBlock>
+        </StackPanel>
       </Border>
 
       <Popup x:Name="ViewMenuPopup"
@@ -317,7 +272,7 @@
                           HorizontalAlignment="Stretch">
                 <SelectableTextBlock Classes="viewMenuTitle" Text="Display options"/>
                 <SelectableTextBlock Classes="viewMenuHint"
-                                     Text="Quick toggles stay on top. Advanced appearance tuning is folded below to reduce clutter."/>
+                                     Text="Layer and preview toggles are on the canvas toolbar."/>
 
                 <Border Classes="viewMenuSection">
                   <StackPanel Spacing="{StaticResource Space8}">
@@ -348,6 +303,7 @@
                   </StackPanel>
                 </Border>
 
+                <controls:HidePanelBlock Title="Line width" IsExpanded="False">
                 <Border Classes="viewMenuSection">
                   <StackPanel Spacing="{StaticResource Space8}">
                     <SelectableTextBlock Classes="viewMenuSectionTitle" Text="Line width"/>
@@ -378,6 +334,7 @@
                                          Text="Default -1 keeps highlight overlays thinner than normal outlines."/>
                   </StackPanel>
                 </Border>
+                </controls:HidePanelBlock>
 
                 <controls:HidePanelBlock Title="Colors and opacity (advanced)"
                                          IsExpanded="False">
@@ -478,7 +435,7 @@
                   <Border Classes="viewMenuSection">
                     <StackPanel Spacing="{StaticResource Space8}">
                       <SelectableTextBlock Classes="viewMenuHint"
-                                           Text="Enable &quot;Color CAD by area&quot; in Quick toggles, then tune tolerance and bucket count."/>
+                                           Text="Enable &quot;Color by area&quot; on the canvas toolbar, then tune tolerance and bucket count."/>
                       <StackPanel Spacing="{StaticResource Space6}" IsEnabled="{Binding ColorCadByArea}">
                         <SelectableTextBlock Classes="viewMenuLabel" Text="Area bucket tolerance (relative)"/>
                         <controls:NumberScrubber Minimum="0"
@@ -509,4 +466,3 @@
     </Grid>
   </Border>
 </UserControl>
-

@@ -29,5 +29,5 @@ public sealed record DxfEditPanelInput(
         string.Empty,
         string.Empty,
         90m,
-        true);
+        false);
 }

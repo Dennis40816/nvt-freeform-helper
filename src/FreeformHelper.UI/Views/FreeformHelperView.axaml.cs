@@ -54,7 +54,7 @@ public sealed partial class FreeformHelperView : UserControl
 
         _canvas = FindCanvas();
         WireCanvasEvents(_canvas);
-        _notchExportRestoreHint = this.FindControl<Border>("NotchExportRestoreHintBorder");
+        _notchExportRestoreHint = WorkspaceActions.FindControl<Border>("RestoreHint");
 
         _consoleRow = this.FindControl<Grid>("CanvasGrid")?.RowDefinitions.ElementAtOrDefault(2);
         _mainMenu = this.FindControl<Menu>("MainMenu");
