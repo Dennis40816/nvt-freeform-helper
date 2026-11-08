@@ -423,6 +423,7 @@ internal static partial class NotchDisplayProjector
             @"reach=(?<reach>[-\d.]+),\s*" +
             @"blocker=(?<blocker>\d+)," +
             @"(?:\s*owners=(?<owners>[^,]+),)?" +
+            @"(?:\s*ownerCnt=\d+,)?" +
             @"(?:\s*ownerShare=(?<ownershare>[^,]+),)?" +
             @"\s*boundary=(?<boundary>[YN])," +
             @"(?:\s*candidate=(?<candidate>[YN]),)?" +
