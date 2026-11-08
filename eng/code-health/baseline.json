@@ -95,7 +95,7 @@
       "ceilings": {
         "stateMembers": 65,
         "partialFiles": 28,
-        "viewTypeLines": 6197
+        "viewTypeLines": 6007
       },
       "owner": "NFH",
       "locations": [
@@ -201,20 +201,6 @@
       "contentHash": "d7b5b3185b47a5ff85155e4d63cf1f087315f965737605a318d5c3e681804d5e",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.Controls.PadCanvas.TryBuildSimulationRegularFillBrush(RegularPad)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 227
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Controls/PadCanvas.View.AxisLabels.cs"
-      ],
-      "contentHash": "f69a4225a12d93cd9ed5d254031e6b9b0c5485035634b04e465ad34d30a1f956",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Controls.PadCanvas.DrawAxisLabels(DrawingContext)"
     },
     {
       "kind": "file",

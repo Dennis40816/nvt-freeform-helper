@@ -136,7 +136,7 @@ public sealed partial class PadCanvas
     /// </summary>
     /// <param name="r">The <see cref="Rect2"/> whose center is to be found.</param>
     /// <returns>A <see cref="Point2"/> representing the center of the rectangle.</returns>
-    private static Point2 GetBoundsCenter(Rect2 r)
+    internal static Point2 GetBoundsCenter(Rect2 r)
     {
         return new Point2((r.MinX + r.MaxX) / 2.0, (r.MinY + r.MaxY) / 2.0);
     }

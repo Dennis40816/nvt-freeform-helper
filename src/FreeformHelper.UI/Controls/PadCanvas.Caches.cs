@@ -50,7 +50,7 @@ public sealed partial class PadCanvas
     /// </summary>
     /// <param name="c">The color for which to get the brush.</param>
     /// <returns>An <see cref="ISolidColorBrush"/> instance.</returns>
-    private ISolidColorBrush GetBrush(Color c)
+    internal ISolidColorBrush GetBrush(Color c)
     {
         // Use an integer representation of the color as the cache key.
         var key = ((uint)c.A << 24) | ((uint)c.R << 16) | ((uint)c.G << 8) | c.B;
@@ -64,17 +64,17 @@ public sealed partial class PadCanvas
         return brush;
     }
 
-    private Color GetResourceColor(string key, Color fallback = default)
+    internal Color GetResourceColor(string key, Color fallback = default)
     {
         return UiResourceResolver.GetColor(this, key, fallback);
     }
 
-    private IBrush GetResourceBrush(string key, IBrush fallback)
+    internal IBrush GetResourceBrush(string key, IBrush fallback)
     {
         return UiResourceResolver.GetBrush(this, key, fallback, GetBrush);
     }
 
-    private double GetResourceDouble(string key, double fallback = 0.0)
+    internal double GetResourceDouble(string key, double fallback = 0.0)
     {
         return UiResourceResolver.GetDouble(this, key, fallback);
     }
