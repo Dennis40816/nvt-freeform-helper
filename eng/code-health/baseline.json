@@ -90,20 +90,6 @@
       "symbol": "FreeformHelper.UI.App.OnFrameworkInitializationCompleted()"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 141
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Controls/NotchApplySimulationAaView.cs"
-      ],
-      "contentHash": "3ff014adcedfba0ce3d65af9268c3e8173ecefaa69cd18a02a3c0c769efb5c51",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Controls.NotchApplySimulationAaView.BuildFillBrush(NotchApplySimulationAaDisplayCell,Color,Color,Color,Color,Color,Color,double,double,double,double,double,double,double,double)"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {

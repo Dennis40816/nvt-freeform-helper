@@ -261,110 +261,112 @@ public sealed class NotchApplySimulationAaView : Control
                     localMaxOpacity: maxOpacity,
                     localMin: minValue,
                     localMax: maxValue,
-                    localThreshold: threshold),
+                    localThreshold: threshold,
+                    autoNegativeClampAbs: autoNegativeClampAbs,
+                    autoPositiveClamp: autoPositiveClamp),
             _ => BuildDeltaBrush(cell.DisplayValue, lowColor, zeroColor, midColor, warmColor, highColor, minOpacity, maxOpacity, maxAbsDelta, threshold),
         };
+    }
 
-        IBrush BuildSingleScaleBrush(double value, Color lowScaleColor, Color zeroScaleColor, Color midScaleColor, Color warmScaleColor, Color highScaleColor, double localMinOpacity, double localMaxOpacity, double localMin, double localMax, double localThreshold)
+    private IBrush BuildSingleScaleBrush(double value, Color lowScaleColor, Color zeroScaleColor, Color midScaleColor, Color warmScaleColor, Color highScaleColor, double localMinOpacity, double localMaxOpacity, double localMin, double localMax, double localThreshold, double autoNegativeClampAbs, double autoPositiveClamp)
+    {
+        var useAutoAsymmetricScale = ColorMode == NotchApplySimulationCanvasColorMode.Auto;
+        var signedRange = ColorMode == NotchApplySimulationCanvasColorMode.Threshold
+            ? localThreshold
+            : Math.Max(Math.Abs(localMin), Math.Abs(localMax));
+        var useSignedScale = ColorMode == NotchApplySimulationCanvasColorMode.Threshold &&
+                             localMin < -1e-9;
+        if (useSignedScale)
         {
-            var useAutoAsymmetricScale = ColorMode == NotchApplySimulationCanvasColorMode.Auto;
-            var signedRange = ColorMode == NotchApplySimulationCanvasColorMode.Threshold
-                ? localThreshold
-                : Math.Max(Math.Abs(localMin), Math.Abs(localMax));
-            var useSignedScale = ColorMode == NotchApplySimulationCanvasColorMode.Threshold &&
-                                 localMin < -1e-9;
-            if (useSignedScale)
-            {
-                var signedNormalized = ColorMode == NotchApplySimulationCanvasColorMode.Threshold
-                    ? NormalizeThresholdScale(Math.Abs(value), localThreshold)
-                    : signedRange <= 1e-9
-                        ? 0d
-                        : Math.Clamp(Math.Abs(value) / signedRange, 0d, 1d);
-                var signedMixed = SimulationColorScaleResolver.ResolveSignedColor(
-                    value,
-                    signedRange,
-                    lowScaleColor,
-                    zeroScaleColor,
-                    midScaleColor,
-                    warmScaleColor,
-                    highScaleColor);
-                return BuildAlphaBrush(
-                    signedMixed,
-                    localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.18d + (0.82d * Math.Pow(signedNormalized, 0.78d)))));
-            }
-
-            if (useAutoAsymmetricScale)
-            {
-                var positiveRange = Math.Max(autoPositiveClamp, Math.Max(localMax, 0d));
-                var negativeRange = Math.Max(autoNegativeClampAbs, Math.Abs(Math.Min(localMin, 0d)));
-                if (value < 0d)
-                {
-                    var negativeNormalized = negativeRange <= 1e-9
-                        ? 0d
-                        : Math.Clamp(Math.Abs(value) / negativeRange, 0d, 1d);
-                    var negativeMixed = SimulationColorScaleResolver.ResolveNegativeColor(value, negativeRange, lowScaleColor, zeroScaleColor);
-                    return BuildAlphaBrush(
-                        negativeMixed,
-                        localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.22d + (0.78d * Math.Pow(negativeNormalized, 1.3d)))));
-                }
-
-                var positiveNormalized = positiveRange <= 1e-9
-                    ? 0d
-                    : Math.Clamp(value / positiveRange, 0d, 1d);
-                var positiveMixed = SimulationColorScaleResolver.ResolvePositiveColor(value, positiveRange, zeroScaleColor, midScaleColor, warmScaleColor, highScaleColor);
-                return BuildAlphaBrush(
-                    positiveMixed,
-                    localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.28d + (0.72d * Math.Pow(positiveNormalized, 0.72d)))));
-            }
-
-            var sequentialRange = ColorMode == NotchApplySimulationCanvasColorMode.Threshold
-                ? localThreshold
-                : Math.Max(localMax, 0d);
-            var sequentialNormalized = NormalizeThresholdScale(value, sequentialRange);
-            var sequentialMixed = SimulationColorScaleResolver.ResolvePositiveColor(value, sequentialRange, zeroScaleColor, midScaleColor, warmScaleColor, highScaleColor);
-            return BuildAlphaBrush(
-                sequentialMixed,
-                localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.34d + (0.66d * Math.Pow(sequentialNormalized, 0.78d)))));
-        }
-
-        IBrush BuildDeltaBrush(double value, Color lowScaleColor, Color zeroScaleColor, Color midScaleColor, Color warmScaleColor, Color highScaleColor, double localMinOpacity, double localMaxOpacity, double localMaxAbs, double localThreshold)
-        {
-            if (Math.Abs(value) <= 1e-9)
-            {
-                return BuildAlphaBrush(zeroScaleColor, localMinOpacity + ((localMaxOpacity - localMinOpacity) * 0.18d));
-            }
-
-            var magnitude = ColorMode == NotchApplySimulationCanvasColorMode.Threshold
+            var signedNormalized = ColorMode == NotchApplySimulationCanvasColorMode.Threshold
                 ? NormalizeThresholdScale(Math.Abs(value), localThreshold)
-                : localMaxAbs <= 1e-9
+                : signedRange <= 1e-9
                     ? 0d
-                    : Math.Clamp(Math.Abs(value) / localMaxAbs, 0d, 1d);
-            var mixed = SimulationColorScaleResolver.ResolveSignedColor(
+                    : Math.Clamp(Math.Abs(value) / signedRange, 0d, 1d);
+            var signedMixed = SimulationColorScaleResolver.ResolveSignedColor(
                 value,
-                ColorMode == NotchApplySimulationCanvasColorMode.Threshold ? localThreshold : localMaxAbs,
+                signedRange,
                 lowScaleColor,
                 zeroScaleColor,
                 midScaleColor,
                 warmScaleColor,
                 highScaleColor);
-            return BuildAlphaBrush(mixed, localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.30d + (0.70d * Math.Pow(magnitude, 0.78d)))));
+            return BuildAlphaBrush(
+                signedMixed,
+                localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.18d + (0.82d * Math.Pow(signedNormalized, 0.78d)))));
         }
 
-        IBrush BuildAlphaBrush(Color baseColor, double opacity)
+        if (useAutoAsymmetricScale)
         {
-            var alpha = (byte)Math.Clamp(Math.Round(opacity * 255d), 0d, 255d);
-            return GetBrush(Color.FromArgb(alpha, baseColor.R, baseColor.G, baseColor.B));
-        }
-
-        static double NormalizeThresholdScale(double value, double localThreshold)
-        {
-            if (localThreshold <= 1e-9)
+            var positiveRange = Math.Max(autoPositiveClamp, Math.Max(localMax, 0d));
+            var negativeRange = Math.Max(autoNegativeClampAbs, Math.Abs(Math.Min(localMin, 0d)));
+            if (value < 0d)
             {
-                return Math.Abs(value) <= 1e-9 ? 0d : 1d;
+                var negativeNormalized = negativeRange <= 1e-9
+                    ? 0d
+                    : Math.Clamp(Math.Abs(value) / negativeRange, 0d, 1d);
+                var negativeMixed = SimulationColorScaleResolver.ResolveNegativeColor(value, negativeRange, lowScaleColor, zeroScaleColor);
+                return BuildAlphaBrush(
+                    negativeMixed,
+                    localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.22d + (0.78d * Math.Pow(negativeNormalized, 1.3d)))));
             }
 
-            return Math.Clamp(value / localThreshold, 0d, 1d);
+            var positiveNormalized = positiveRange <= 1e-9
+                ? 0d
+                : Math.Clamp(value / positiveRange, 0d, 1d);
+            var positiveMixed = SimulationColorScaleResolver.ResolvePositiveColor(value, positiveRange, zeroScaleColor, midScaleColor, warmScaleColor, highScaleColor);
+            return BuildAlphaBrush(
+                positiveMixed,
+                localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.28d + (0.72d * Math.Pow(positiveNormalized, 0.72d)))));
         }
+
+        var sequentialRange = ColorMode == NotchApplySimulationCanvasColorMode.Threshold
+            ? localThreshold
+            : Math.Max(localMax, 0d);
+        var sequentialNormalized = NormalizeThresholdScale(value, sequentialRange);
+        var sequentialMixed = SimulationColorScaleResolver.ResolvePositiveColor(value, sequentialRange, zeroScaleColor, midScaleColor, warmScaleColor, highScaleColor);
+        return BuildAlphaBrush(
+            sequentialMixed,
+            localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.34d + (0.66d * Math.Pow(sequentialNormalized, 0.78d)))));
+    }
+
+    private IBrush BuildDeltaBrush(double value, Color lowScaleColor, Color zeroScaleColor, Color midScaleColor, Color warmScaleColor, Color highScaleColor, double localMinOpacity, double localMaxOpacity, double localMaxAbs, double localThreshold)
+    {
+        if (Math.Abs(value) <= 1e-9)
+        {
+            return BuildAlphaBrush(zeroScaleColor, localMinOpacity + ((localMaxOpacity - localMinOpacity) * 0.18d));
+        }
+
+        var magnitude = ColorMode == NotchApplySimulationCanvasColorMode.Threshold
+            ? NormalizeThresholdScale(Math.Abs(value), localThreshold)
+            : localMaxAbs <= 1e-9
+                ? 0d
+                : Math.Clamp(Math.Abs(value) / localMaxAbs, 0d, 1d);
+        var mixed = SimulationColorScaleResolver.ResolveSignedColor(
+            value,
+            ColorMode == NotchApplySimulationCanvasColorMode.Threshold ? localThreshold : localMaxAbs,
+            lowScaleColor,
+            zeroScaleColor,
+            midScaleColor,
+            warmScaleColor,
+            highScaleColor);
+        return BuildAlphaBrush(mixed, localMinOpacity + ((localMaxOpacity - localMinOpacity) * (0.30d + (0.70d * Math.Pow(magnitude, 0.78d)))));
+    }
+
+    private IBrush BuildAlphaBrush(Color baseColor, double opacity)
+    {
+        var alpha = (byte)Math.Clamp(Math.Round(opacity * 255d), 0d, 255d);
+        return GetBrush(Color.FromArgb(alpha, baseColor.R, baseColor.G, baseColor.B));
+    }
+
+    private static double NormalizeThresholdScale(double value, double localThreshold)
+    {
+        if (localThreshold <= 1e-9)
+        {
+            return Math.Abs(value) <= 1e-9 ? 0d : 1d;
+        }
+
+        return Math.Clamp(value / localThreshold, 0d, 1d);
     }
 
     private IBrush GetResourceBrush(string key, IBrush fallback)
