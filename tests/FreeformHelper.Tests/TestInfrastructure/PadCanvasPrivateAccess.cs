@@ -157,4 +157,11 @@ internal static class PadCanvasPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "TryBuildSimulationRegularFillBrush")]
     public static extern IBrush? TryBuildSimulationRegularFillBrush(PadCanvas canvas, RegularPad pad);
+
+    // Pointer-press seams.
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_axisLabelHits")]
+    public static extern ref List<PadCanvas.AxisLabelHit> AxisLabelHits(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_pendingSingleHit")]
+    public static extern ref PadCanvas.HitResult? PendingSingleHit(PadCanvas canvas);
 }
