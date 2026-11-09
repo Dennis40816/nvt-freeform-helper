@@ -6,6 +6,7 @@ using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
+using Nvt.Core.Processes;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -372,22 +373,20 @@ public sealed partial class NotchTableExporterTests
 
     internal static bool IsGccAvailable()
     {
-        using var process = new Process
+        var startInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "gcc",
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            },
+            FileName = "gcc",
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
         };
-        process.StartInfo.ArgumentList.Add("--version");
+        startInfo.ArgumentList.Add("--version");
 
         try
         {
-            if (!process.Start())
+            using var process = ProcessLaunchGate.Start(startInfo);
+            if (process is null)
             {
                 return false;
             }
@@ -444,23 +443,25 @@ public sealed partial class NotchTableExporterTests
 
     internal static string RunProcess(string fileName, IEnumerable<string> arguments, string failureMessage)
     {
-        using var process = new Process
+        var startInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = fileName,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            },
+            FileName = fileName,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
         };
         foreach (var argument in arguments)
         {
-            process.StartInfo.ArgumentList.Add(argument);
+            startInfo.ArgumentList.Add(argument);
         }
 
-        Assert.True(process.Start(), $"{fileName} did not start.");
+        using var process = ProcessLaunchGate.Start(startInfo);
+        if (process is null)
+        {
+            Assert.Fail($"{fileName} did not start.");
+        }
+
         var stdOut = process.StandardOutput.ReadToEnd();
         var stdErr = process.StandardError.ReadToEnd();
         var exited = process.WaitForExit(15000);
@@ -484,26 +485,28 @@ public sealed partial class NotchTableExporterTests
         TestFiles.WriteText(sourcePath, CreateGccHarnessSource(source));
         WriteNotchHeaderStub(tempDirectory);
 
-        using var process = new Process
+        var startInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "gcc",
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            },
+            FileName = "gcc",
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
         };
         string[] gccFlags = ["-std=c11", "-include", "stddef.h", "-Wall", "-Wextra", "-Werror", "-c", sourcePath, "-o", objectPath];
         foreach (var flag in gccFlags)
         {
-            process.StartInfo.ArgumentList.Add(flag);
+            startInfo.ArgumentList.Add(flag);
         }
 
         try
         {
-            Assert.True(process.Start(), "gcc did not start.");
+            using var process = ProcessLaunchGate.Start(startInfo);
+            if (process is null)
+            {
+                Assert.Fail("gcc did not start.");
+            }
+
             var stdOut = process.StandardOutput.ReadToEnd();
             var stdErr = process.StandardError.ReadToEnd();
             process.WaitForExit(15000);

@@ -1063,36 +1063,6 @@
       "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
-      "syntaxHash": "7e81d6e2f22db252f163257959c634bf2bdf9e26ca1e28b4edb5fcad3ca18735",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.AssertCCompilesWithGcc(string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Diagnostics.Process.Start"
-    },
-    {
-      "syntaxHash": "ee85316917f8a449b16f1f1091e00087b9e5cbd8e7a2e651e41b6fcdb4f2aa98",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.IsGccAvailable()",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Diagnostics.Process.Start"
-    },
-    {
-      "syntaxHash": "de07498443352d8395379381b06be36f55114e27fc693a8250a5e37f26f9ee20",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.RunProcess(string,IEnumerable<string>,string)",
-      "owner": "NFH",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "project": "FreeformHelper.Tests",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Diagnostics.Process.Start"
-    },
-    {
       "syntaxHash": "a7acb7fb5362c57787265cbc570807a07d1076f16d7ab96fcc825e50636ef092",
       "member": "FreeformHelper.UI.Program.BuildAvaloniaApp()",
       "owner": "NFH",
