@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.VisualTree;
-using FreeformHelper.UI.Controls;
+using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 
 namespace FreeformHelper.UI.Views;
@@ -21,7 +21,7 @@ public sealed partial class FreeformHelperView
             return;
         }
 
-        if (IsTextEntryControlSource(e.Source))
+        if (MainWindowInputSources.IsTextEntry(e.Source))
         {
             return;
         }
@@ -39,64 +39,38 @@ public sealed partial class FreeformHelperView
             return false;
         }
 
-        var fromCanvas = IsCanvasInputSource(e.Source);
-
-        if (e.Key == Key.E && e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift))
+        var shortcut = MainWindowShortcutRouter.Resolve(e.Key, e.KeyModifiers, MainWindowInputSources.IsCanvas(e.Source));
+        switch (shortcut)
         {
-            return RestoreNotchExportSelectionWindowIfHidden();
-        }
-
-        if (e.Key == Key.Delete && e.KeyModifiers == KeyModifiers.None)
-        {
-            if (!viewModel.DeleteSelectedCadPadsCommand.CanExecute(null))
-            {
+            case MainWindowShortcut.RestoreNotchExportSelection:
+                return RestoreNotchExportSelectionWindowIfHidden();
+            case MainWindowShortcut.DeleteSelectedCadPads:
+                return TryExecute(viewModel.DeleteSelectedCadPadsCommand);
+            case MainWindowShortcut.Undo:
+                return TryExecute(viewModel.UndoCommand);
+            case MainWindowShortcut.SaveProject:
+                _uiEvents?.Run("Workspace.SaveShortcut", _ => SaveProjectFromShortcutAsync(viewModel), CancellationToken.None);
+                return true;
+            case MainWindowShortcut.SelectAllPads:
+                _canvas?.SelectAllPads();
+                return true;
+            case MainWindowShortcut.Fit:
+                viewModel.FitCommand.Execute(null);
+                return true;
+            default:
                 return false;
-            }
-
-            viewModel.DeleteSelectedCadPadsCommand.Execute(null);
-            return true;
         }
+    }
 
-        if (e.Key == Key.Z && e.KeyModifiers == KeyModifiers.Control)
+    private static bool TryExecute(System.Windows.Input.ICommand command)
+    {
+        if (!command.CanExecute(null))
         {
-            if (!viewModel.UndoCommand.CanExecute(null))
-            {
-                return false;
-            }
-
-            viewModel.UndoCommand.Execute(null);
-            return true;
+            return false;
         }
 
-        if (e.Key == Key.S && e.KeyModifiers == KeyModifiers.Control)
-        {
-            _uiEvents?.Run("Workspace.SaveShortcut", _ => SaveProjectFromShortcutAsync(viewModel), CancellationToken.None);
-            return true;
-        }
-
-        if (e.Key == Key.A && e.KeyModifiers == KeyModifiers.Control)
-        {
-            if (fromCanvas)
-            {
-                return false;
-            }
-
-            _canvas?.SelectAllPads();
-            return true;
-        }
-
-        if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.None)
-        {
-            if (fromCanvas)
-            {
-                return false;
-            }
-
-            viewModel.FitCommand.Execute(null);
-            return true;
-        }
-
-        return false;
+        command.Execute(null);
+        return true;
     }
 
     private async Task SaveProjectFromShortcutAsync(FreeformHelperViewModel viewModel)
@@ -169,61 +143,5 @@ public sealed partial class FreeformHelperView
         }
 
         CloseAllRootMenus();
-    }
-
-    /// <summary>
-    /// Determines if the focus should be cleared from input controls and transferred to the canvas.
-    /// This is typically true if the clicked element is not an input control.
-    /// </summary>
-    /// <param name="source">The source element of the pointer event.</param>
-    /// <returns>True if focus should be cleared, false otherwise.</returns>
-    private static bool ShouldClearFocus(object? source)
-    {
-        if (source is not Visual visual)
-        {
-            return true;
-        }
-
-        if (visual is ConsolePanel || visual.FindAncestorOfType<ConsolePanel>() is not null)
-        {
-            return false;
-        }
-
-        // If the clicked element or any of its ancestors is an input control, don't clear focus.
-        if (visual.FindAncestorOfType<TextBox>() is not null) return false;
-        if (visual.FindAncestorOfType<ComboBox>() is not null) return false;
-        if (visual.FindAncestorOfType<NumberScrubber>() is not null) return false;
-
-        return true; // Otherwise, clear focus (e.g., focus canvas).
-    }
-
-    private static bool IsTextEntryControlSource(object? source)
-    {
-        if (source is not Visual visual)
-        {
-            return false;
-        }
-
-        // The console list handles its own keys. Delete, F and Ctrl+Z must not reach the canvas from a log row.
-        return visual is TextBox or ComboBox or NumberScrubber or ConsolePanel
-            || visual.FindAncestorOfType<TextBox>() is not null
-            || visual.FindAncestorOfType<ComboBox>() is not null
-            || visual.FindAncestorOfType<NumberScrubber>() is not null
-            || visual.FindAncestorOfType<ConsolePanel>() is not null;
-    }
-
-    private static bool IsCanvasInputSource(object? source)
-    {
-        if (source is not Visual visual)
-        {
-            return false;
-        }
-
-        if (visual is PadCanvas)
-        {
-            return true;
-        }
-
-        return visual.FindAncestorOfType<PadCanvas>() is not null;
     }
 }
