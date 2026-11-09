@@ -389,7 +389,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "viewTypeLines": 1647,
+        "viewTypeLines": 1601,
         "partialFiles": 17
       },
       "owner": "NFH",
