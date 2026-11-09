@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using Avalonia.Controls;
+using FreeformHelper.UI.Services;
 using NLog;
 
 namespace FreeformHelper.UI.Views;
@@ -42,52 +42,6 @@ public sealed partial class FreeformHelperView
 
     private void SyncConsoleRowHeight(bool isExpanded)
     {
-        if (_consoleRow is null)
-        {
-            return;
-        }
-
-        if (isExpanded)
-        {
-            var heightResource = this.FindResource("ConsolePanelRowHeight");
-            if (heightResource is GridLength gridLength)
-            {
-                _consoleRow.Height = gridLength;
-            }
-            else if (heightResource is double heightDouble)
-            {
-                _consoleRow.Height = new GridLength(heightDouble);
-            }
-
-            var minResource = this.FindResource("ConsolePanelMinHeight");
-            if (minResource is double minDouble)
-            {
-                _consoleRow.MinHeight = minDouble;
-            }
-        }
-        else
-        {
-            _consoleRow.Height = GridLength.Auto;
-            var collapsedMin = GetResourceDouble("ConsoleCollapsedMinHeight");
-            _consoleRow.MinHeight = collapsedMin > 0 ? collapsedMin : 0;
-        }
-    }
-
-    private double GetResourceDouble(string key, double fallback = 0.0)
-    {
-        if (this.TryFindResource(key, out var value))
-        {
-            switch (value)
-            {
-                case double doubleValue:
-                    return doubleValue;
-                case float floatValue:
-                    return floatValue;
-                case int intValue:
-                    return intValue;
-            }
-        }
-
-        return fallback;
+        WorkspaceLayoutResourcePolicy.ApplyConsoleRowHeight(this, _consoleRow, isExpanded);
     }
 }

@@ -47,13 +47,13 @@ public sealed partial class FreeformHelperView
         var anchorCanvas = _canvas.WorldToScreen(anchorWorld); // Convert anchor to canvas screen coordinates.
         var anchorScreen = ToOverlay(anchorCanvas); // Convert anchor to overlay screen coordinates.
         var anchorClampMargin = selectionVisible
-            ? GetResourceDouble("PadInfoAnchorClampMargin", 8.0)
+            ? WorkspaceLayoutResourcePolicy.GetResourceDouble(this, "PadInfoAnchorClampMargin", 8.0)
             : 0.0;
         anchorScreen = PadInfoLayoutCalculator.ClampPointToRect(anchorScreen, canvasRect, anchorClampMargin);
 
-        var gap = GetResourceDouble("PadInfoGap", 20.0); // Minimum gap between popover and selection.
-        var minLine = GetResourceDouble("PadInfoMinLineLength", 20.0); // Minimum length of the link line.
-        var lineInset = GetResourceDouble("PadInfoLineInset", 12.0); // Inset for the link line start/end points on the popover.
+        var gap = WorkspaceLayoutResourcePolicy.GetResourceDouble(this, "PadInfoGap", 20.0); // Minimum gap between popover and selection.
+        var minLine = WorkspaceLayoutResourcePolicy.GetResourceDouble(this, "PadInfoMinLineLength", 20.0); // Minimum length of the link line.
+        var lineInset = WorkspaceLayoutResourcePolicy.GetResourceDouble(this, "PadInfoLineInset", 12.0); // Inset for the link line start/end points on the popover.
 
         // Choose the optimal placement for the popover relative to the selection.
         var placement = PadInfoLayoutCalculator.ChoosePlacement(selectionRect, panelSize, canvasRect, gap, minLine, lineInset);
@@ -67,7 +67,7 @@ public sealed partial class FreeformHelperView
         if (selectionVisible)
         {
             // Adjust the anchor point to be outside the popover panel if it's inside.
-            var anchorPanelMargin = GetResourceDouble("PadInfoAnchorPanelMargin", 6.0);
+            var anchorPanelMargin = WorkspaceLayoutResourcePolicy.GetResourceDouble(this, "PadInfoAnchorPanelMargin", 6.0);
             anchorScreen = PadInfoLayoutCalculator.PushAnchorOutsidePanel(panelRect, anchorScreen, anchorPanelMargin);
 
             // Position the anchor visual element.
