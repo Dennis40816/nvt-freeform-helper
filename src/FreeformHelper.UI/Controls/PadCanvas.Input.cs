@@ -70,60 +70,10 @@ public sealed partial class PadCanvas
         }
 
         // --- Right Mouse Button Context Menu / Selection ---
-        if (props.IsRightButtonPressed)
+        if (props.IsRightButtonPressed && CreateContextPressHandler().Handle(_lastPointer, e.KeyModifiers))
         {
-            var modifiers = e.KeyModifiers;
-            var hit = HitTest(_lastPointer, modifiers.HasFlag(KeyModifiers.Alt));
-            if (hit.kind == HitKind.None)
-            {
-                ClearSelectionInternal(); // Clear selection if nothing was hit.
-                RequestVisualRefresh();
-                e.Handled = true;
-                return;
-            }
-
-            var isControlDown = modifiers.HasFlag(KeyModifiers.Control);
-
-            var isAlreadySelected = IsHitSelected(hit);
-
-            // If Ctrl is held, perform additive toggle.
-            if (isControlDown)
-            {
-                // Toggle the item. Additive ensures existing selection is not cleared.
-                ApplyHitSelection(hit, toggle: true, additive: true);
-            }
-            else
-            {
-                // If Ctrl is not held, and the item is not already selected, select it (non-toggle, non-additive).
-                // If it IS already selected and Ctrl is not held, do nothing to selection, just raise context menu.
-                if (!isAlreadySelected)
-                {
-                    ApplyHitSelection(hit, toggle: false, additive: false);
-                }
-            }
-
-            // Raise context menu events based on the type of hit item.
-            if (hit.kind == HitKind.Cad && CadPads is { Count: > 0 })
-            {
-                var cad = CadPads.FirstOrDefault(p => p.Id == hit.idOrIndex);
-                if (cad is not null)
-                {
-                    CadPadContextRequested?.Invoke(this, new CadPadContextRequestedEventArgs(cad));
-                    e.Handled = true;
-                    return;
-                }
-            }
-
-            if (hit.kind == HitKind.Regular && RegularPads is { Count: > 0 })
-            {
-                var pad = RegularPads.FirstOrDefault(p => p.Index == hit.idOrIndex);
-                if (pad is not null)
-                {
-                    RegularPadContextRequested?.Invoke(this, new RegularPadContextRequestedEventArgs(pad));
-                    e.Handled = true;
-                    return;
-                }
-            }
+            e.Handled = true;
+            return;
         }
 
         // --- Spacebar Panning (alternative to middle mouse) ---
@@ -148,6 +98,17 @@ public sealed partial class PadCanvas
             e.Handled = true;
         }
     }
+
+    private PadCanvasContextPressHandler CreateContextPressHandler() => new(new PadCanvasContextPressHandler.Services(
+        HitTest,
+        () => ClearSelectionInternal(),
+        () => RequestVisualRefresh(),
+        IsHitSelected,
+        ApplyHitSelection,
+        id => CadPads?.FirstOrDefault(p => p.Id == id),
+        index => RegularPads?.FirstOrDefault(p => p.Index == index),
+        pad => CadPadContextRequested?.Invoke(this, new CadPadContextRequestedEventArgs(pad)),
+        pad => RegularPadContextRequested?.Invoke(this, new RegularPadContextRequestedEventArgs(pad))));
 
     /// <summary>
     /// Handles <see cref="PointerReleasedEventArgs"/> events, finalizing interactions.
