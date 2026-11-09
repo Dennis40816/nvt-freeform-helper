@@ -93,7 +93,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly ProjectPersistenceUseCase _projectPersistenceUseCase;
     private readonly UndoService _undoService = new();
     private readonly UiOperationStatusReporter _statusReporter;
-    private int _notchCompensationCacheRevision;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperViewModel"/> class.

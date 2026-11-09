@@ -9,20 +9,21 @@ public sealed partial class FreeformHelperViewModel
 {
     public int GetNotchStep3Revision()
     {
-        return _notchCompensationCacheRevision;
+        return _notchComputationSession.Revision;
     }
 
     public NotchCompensationCacheMetricsSnapshot GetNotchCompensationCacheMetrics()
     {
-        var hitCount = _notchCompensationCacheCounters.HitCount;
-        var missCount = _notchCompensationCacheCounters.MissCount;
-        var invalidationCount = _notchCompensationCacheCounters.InvalidationCount;
+        var metrics = _notchComputationSession.GetMetrics();
+        var hitCount = metrics.HitCount;
+        var missCount = metrics.MissCount;
+        var invalidationCount = metrics.InvalidationCount;
         var total = hitCount + missCount;
         var hitRate = total > 0 ? (double)hitCount / total : 0.0;
         return new NotchCompensationCacheMetricsSnapshot(
-            Revision: _notchCompensationCacheRevision,
-            EntryCount: _notchCache.ResolvedResultByCadId.Count,
-            LastClearSize: _notchCompensationCacheCounters.LastClearSize,
+            Revision: metrics.Revision,
+            EntryCount: metrics.EntryCount,
+            LastClearSize: metrics.LastClearSize,
             HitCount: hitCount,
             MissCount: missCount,
             InvalidationCount: invalidationCount,
@@ -171,7 +172,7 @@ public sealed partial class FreeformHelperViewModel
             out activeRegularPadIds);
         var resolved = includeExpensiveNotchDetails
             ? GetCadV22ResolvedResult(cadPadId)
-            : hasNotchInputs && _notchCache.ResolvedResultByCadId.ContainsKey(cadPadId)
+            : hasNotchInputs && _notchComputationSession.Contains(cadPadId)
                 ? GetOrBuildCadV22ResolvedResultCached(
                     notchCad,
                     allCadPads,
@@ -228,77 +229,12 @@ public sealed partial class FreeformHelperViewModel
             ? icIndex
             : (int?)null;
         var allocationAreaMode = NotchV22TargetAllocationPolicy.ResolveAreaMode(SelectedNotchCompensationModelOption.Value);
-        if (_notchCache.ResolvedResultByCadId.TryGetValue(cadPadId, out var cached) &&
-            cached.Revision == _notchCompensationCacheRevision &&
-            cached.CadPoolFingerprint == cadPoolFingerprint &&
-            cached.ActiveRegularHash == activeRegularHash &&
-            cached.GridFingerprint == gridFingerprint &&
-            cached.EnableToRegular == EnableToRegular &&
-            cached.EnableToFull == EnableToFull &&
-            cached.EnableToFullRuleEngine == EnableToFullRuleEngine &&
-            cached.EnableToFullRuleTrace == EnableToFullRuleTrace &&
-            Math.Abs(cached.StrictOverlapRatio - strictOverlapRatio) <= 1e-12 &&
-            cached.AnchorIcIndex == anchorIc &&
-            cached.AnchorDiffIndex == anchorDiff &&
-            cached.TargetAllocationAreaMode == allocationAreaMode)
-        {
-            _notchCompensationCacheCounters.RecordHit();
-            return cached.Resolved;
-        }
-
-        if (!buildIfMissing)
-        {
-            return null;
-        }
-
-        _notchCompensationCacheCounters.RecordMiss();
-        var resolved = BuildCadV22ResolvedResult(
+        var request = new NotchComputationRequest(
             _grid,
             cadPad,
             allCadPads,
             activeRegularPadIds,
-            strictOverlapRatio,
-            anchorIc,
-            anchorDiff,
-            allocationAreaMode,
-            precomputedCompensation,
-            precomputedResolved);
-
-        _notchCache.ResolvedResultByCadId[cadPadId] = (
-            _notchCompensationCacheRevision,
-            cadPoolFingerprint,
-            activeRegularHash,
-            gridFingerprint,
-            EnableToRegular,
-            EnableToFull,
-            EnableToFullRuleEngine,
-            EnableToFullRuleTrace,
-            strictOverlapRatio,
-            anchorIc,
-            anchorDiff,
-            allocationAreaMode,
-            resolved);
-        return resolved;
-    }
-
-    private NotchV22ResolvedResult BuildCadV22ResolvedResult(
-        RegularGrid grid,
-        CadPad cadPad,
-        IReadOnlyList<CadPad> allCadPads,
-        IReadOnlySet<int>? activeRegularPadIds,
-        double strictOverlapRatio,
-        int? anchorIc,
-        int? anchorDiff,
-        NotchV22TargetAllocationAreaMode allocationAreaMode,
-        NotchV22CompensationResult? precomputedCompensation,
-        NotchV22ResolvedResult? precomputedResolved)
-    {
-        var resolutionRequest = new NotchResolvedResultRequest(
-            cadPad,
-            grid,
             _projectFile.Settings,
-            allCadPads,
-            activeRegularPadIds,
             SelectedNotchCompensationModelOption.Value,
             EnableToRegular,
             EnableToFull,
@@ -308,10 +244,9 @@ public sealed partial class FreeformHelperViewModel
             anchorIc,
             anchorDiff,
             allocationAreaMode,
-            precomputedCompensation);
-        return precomputedResolved is not null &&
-               NotchDetailUseCase.MatchesRequest(precomputedResolved, resolutionRequest)
-            ? precomputedResolved
-            : NotchDetailUseCase.BuildResolvedResult(resolutionRequest);
+            cadPoolFingerprint,
+            activeRegularHash,
+            gridFingerprint);
+        return _notchComputationSession.GetOrBuild(request, precomputedCompensation, precomputedResolved, buildIfMissing);
     }
 }
