@@ -413,16 +413,16 @@ public sealed class CoordinatePlannerWorkspaceViewModelTests
                 DefaultPixelWidth: 1000,
                 DefaultPixelHeight: 500));
 
-        viewModel.CustomPointLabelText = "Probe A";
-        viewModel.CustomPointMachineX = 25m;
-        viewModel.CustomPointMachineY = 10m;
+        viewModel.CustomEditor.CustomPointLabelText = "Probe A";
+        viewModel.CustomEditor.CustomPointMachineX = 25m;
+        viewModel.CustomEditor.CustomPointMachineY = 10m;
         viewModel.AddCustomPointCommand.Execute(null);
-        viewModel.CustomPathLabelText = "Edge sweep";
-        viewModel.CustomPathStartMachineX = 0m;
-        viewModel.CustomPathStartMachineY = 5m;
-        viewModel.CustomPathEndMachineX = 100m;
-        viewModel.CustomPathEndMachineY = 5m;
-        viewModel.CustomPathStepCount = 3m;
+        viewModel.CustomEditor.CustomPathLabelText = "Edge sweep";
+        viewModel.CustomEditor.CustomPathStartMachineX = 0m;
+        viewModel.CustomEditor.CustomPathStartMachineY = 5m;
+        viewModel.CustomEditor.CustomPathEndMachineX = 100m;
+        viewModel.CustomEditor.CustomPathEndMachineY = 5m;
+        viewModel.CustomEditor.CustomPathStepCount = 3m;
         viewModel.AddCustomPathCommand.Execute(null);
 
         Assert.True(viewModel.HasCustomArtifacts);

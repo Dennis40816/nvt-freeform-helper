@@ -154,16 +154,16 @@ public sealed class ExportedFileContentCharacterizationTests
             clipboard = text;
             return Task.FromResult(true);
         };
-        viewModel.CustomPointLabelText = "Probe A";
-        viewModel.CustomPointMachineX = 12.5m;
-        viewModel.CustomPointMachineY = 7.25m;
+        viewModel.CustomEditor.CustomPointLabelText = "Probe A";
+        viewModel.CustomEditor.CustomPointMachineX = 12.5m;
+        viewModel.CustomEditor.CustomPointMachineY = 7.25m;
         viewModel.AddCustomPointCommand.Execute(null);
-        viewModel.CustomPathLabelText = "Sweep 1";
-        viewModel.CustomPathStartMachineX = 10m;
-        viewModel.CustomPathStartMachineY = 10m;
-        viewModel.CustomPathEndMachineX = 40m;
-        viewModel.CustomPathEndMachineY = 20m;
-        viewModel.CustomPathStepCount = 3;
+        viewModel.CustomEditor.CustomPathLabelText = "Sweep 1";
+        viewModel.CustomEditor.CustomPathStartMachineX = 10m;
+        viewModel.CustomEditor.CustomPathStartMachineY = 10m;
+        viewModel.CustomEditor.CustomPathEndMachineX = 40m;
+        viewModel.CustomEditor.CustomPathEndMachineY = 20m;
+        viewModel.CustomEditor.CustomPathStepCount = 3;
         viewModel.AddCustomPathCommand.Execute(null);
 
         await viewModel.ExportArtifactsCsvCommand.ExecuteAsync(null);

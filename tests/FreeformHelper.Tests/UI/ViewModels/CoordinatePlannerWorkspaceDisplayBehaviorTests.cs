@@ -106,12 +106,12 @@ public sealed class CoordinatePlannerWorkspaceDisplayBehaviorTests
         var viewModel = CreateViewModel();
         Assert.Equal("Custom artifacts disabled.", viewModel.CustomArtifactSummaryText);
         Assert.False(viewModel.ClearCustomArtifactsCommand.CanExecute(null));
-        viewModel.CustomPathLabelText = " \t ";
-        viewModel.CustomPathStartMachineX = 10m;
-        viewModel.CustomPathStartMachineY = 5m;
-        viewModel.CustomPathEndMachineX = 30m;
-        viewModel.CustomPathEndMachineY = 15m;
-        viewModel.CustomPathStepCount = 1m;
+        viewModel.CustomEditor.CustomPathLabelText = " \t ";
+        viewModel.CustomEditor.CustomPathStartMachineX = 10m;
+        viewModel.CustomEditor.CustomPathStartMachineY = 5m;
+        viewModel.CustomEditor.CustomPathEndMachineX = 30m;
+        viewModel.CustomEditor.CustomPathEndMachineY = 15m;
+        viewModel.CustomEditor.CustomPathStepCount = 1m;
 
         viewModel.AddCustomPathCommand.Execute(null);
 
@@ -123,9 +123,9 @@ public sealed class CoordinatePlannerWorkspaceDisplayBehaviorTests
         Assert.Equal("Machine (10, 5) -> (30, 15) · 2 step(s)", path.DetailText);
         Assert.Equal("Custom path 'Path' added.", viewModel.StatusText);
         Assert.Equal(2, viewModel.Snapshot.Points.Count(static point => point.Kind == CoordinatePlannerPointKind.CustomPathStep));
-        viewModel.CustomPointLabelText = " \r\n ";
-        viewModel.CustomPointMachineX = 12.5m;
-        viewModel.CustomPointMachineY = 7.25m;
+        viewModel.CustomEditor.CustomPointLabelText = " \r\n ";
+        viewModel.CustomEditor.CustomPointMachineX = 12.5m;
+        viewModel.CustomEditor.CustomPointMachineY = 7.25m;
 
         viewModel.AddCustomPointCommand.Execute(null);
 
