@@ -160,7 +160,7 @@ public sealed partial class FreeformHelperViewModel
                 strictOverlapRatio,
                 buildIfMissing: false),
             WorkflowDataSnapshotRevision: _workflowDataSnapshotRevision,
-            CacheRevision: _notchCompensationCacheRevision);
+            CacheRevision: _notchComputationSession.Revision);
         return true;
     }
 
@@ -385,7 +385,7 @@ public sealed partial class FreeformHelperViewModel
             return false;
         }
 
-        if (_notchCompensationCacheRevision != context.CacheRevision)
+        if (_notchComputationSession.Revision != context.CacheRevision)
         {
             return false;
         }

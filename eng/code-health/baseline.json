@@ -204,7 +204,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 163,
+        "stateMembers": 162,
         "partialFiles": 91
       },
       "owner": "NFH",
@@ -663,16 +663,6 @@
       "count": 1,
       "rule": "generationFields",
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._workflowDataSnapshotRevision"
-    },
-    {
-      "syntaxHash": "8d6e6b306dd49f643f9d89644d5f1ebf78f389cb34d344a63b22eef622537d1d",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_notchCompensationCacheRevision",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._notchCompensationCacheRevision"
     },
     {
       "syntaxHash": "ba4db073403ee10d21828d5e382615ffa425fc702072a7ca5659c2bcb227436c",

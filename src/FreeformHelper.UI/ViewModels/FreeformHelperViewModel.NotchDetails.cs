@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
-using NotchResolvedCacheEntry = (int Revision, ulong CadPoolFingerprint, int ActiveRegularHash, ulong GridFingerprint, bool EnableToRegular, bool EnableToFull, bool EnableToFullRuleEngine, bool EnableToFullRuleTrace, double StrictOverlapRatio, int? AnchorIcIndex, int? AnchorDiffIndex, FreeformHelper.Application.Services.NotchV22TargetAllocationAreaMode TargetAllocationAreaMode, FreeformHelper.Application.Services.NotchV22ResolvedResult Resolved);
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -260,23 +259,20 @@ public sealed partial class FreeformHelperViewModel
 
     private readonly NotchExportGenerationCacheService _notchExportGenerationCacheService = new();
 
-    private readonly NotchCompensationCacheCounters _notchCompensationCacheCounters = new();
+    private readonly NotchComputationSession _notchComputationSession = new();
 
     private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
 
-    private readonly NotchResultCacheState _notchCache = new(); // Holds the notch compensation and validation caches and the last generated notch table.
+    private readonly NotchResultCacheState _notchCache = new(); // Holds the notch validation cache, last generated table and playback visibility.
 
     /// <summary>Gets the notch result cache holder for tests.</summary>
     internal NotchResultCacheState NotchCacheForTests => _notchCache;
 
     /// <summary>
-    /// Holds the notch compensation result cache, the notch validation bucket cache, the last generated notch table and the last preview visibility seen by playback, for the main view model.
+    /// Holds the notch validation bucket cache, the last generated notch table and the last preview visibility seen by playback, for the main view model.
     /// </summary>
     internal sealed class NotchResultCacheState
     {
-        /// <summary>Gets the resolved notch result cache keyed by CAD pad id.</summary>
-        internal Dictionary<int, NotchResolvedCacheEntry> ResolvedResultByCadId { get; } = new();
-
         /// <summary>Gets or sets the cached validation bucket with the table and null diff value it was built for.</summary>
         internal (NotchValidationBucket Bucket, NotchTable Table, int NullDiffValue)? ValidationBucket { get; set; }
 
