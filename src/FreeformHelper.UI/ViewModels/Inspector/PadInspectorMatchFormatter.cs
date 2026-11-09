@@ -4,9 +4,14 @@ using FreeformHelper.Application.Settings;
 
 namespace FreeformHelper.UI.ViewModels;
 
-public sealed partial class FreeformHelperViewModel
+/// <summary>
+/// Formats pad inspector match and assignment text.
+/// </summary>
+internal static class PadInspectorMatchFormatter
 {
-    private static string BuildCadOutputFwDiffAssignmentModeText(
+    private const int MaxInspectorMatchDetailLines = 8;
+
+    internal static string BuildCadOutputFwDiffAssignmentModeText(
         bool hasCadOutputFwDiffOverride,
         bool isDxfIndexAnchor,
         CadOutputFwDiffAutoMode autoMode)
@@ -26,7 +31,7 @@ public sealed partial class FreeformHelperViewModel
             : "Auto (geometry seed, unique per IC)";
     }
 
-    private static string BuildRegularDiffSource(
+    internal static string BuildRegularDiffSource(
         int regularDiffIndex,
         List<PadInspectorMatchedCadSnapshot> matchedCadDetails)
     {
@@ -48,7 +53,7 @@ public sealed partial class FreeformHelperViewModel
         return "Auto";
     }
 
-    private static string BuildCadMatchText(
+    internal static string BuildCadMatchText(
         List<int> regularIds,
         List<PadMatchLink> links,
         Func<int, (int IcIndex, int DiffIndex)?>? getRegularPadIcDiff)
@@ -73,7 +78,7 @@ public sealed partial class FreeformHelperViewModel
         return $"{bestText} (+{ordered.Count - 1})";
     }
 
-    private static string BuildCadMatchDetailsText(
+    internal static string BuildCadMatchDetailsText(
         List<int> regularIds,
         List<PadMatchLink> links,
         Func<int, (int IcIndex, int DiffIndex)?>? getRegularPadIcDiff)
@@ -109,7 +114,7 @@ public sealed partial class FreeformHelperViewModel
         return string.Join(Environment.NewLine, lines);
     }
 
-    private static string BuildRegularMatchKey(
+    internal static string BuildRegularMatchKey(
         int regularPadId,
         Func<int, (int IcIndex, int DiffIndex)?>? getRegularPadIcDiff)
     {
@@ -119,7 +124,7 @@ public sealed partial class FreeformHelperViewModel
             : $"regId {regularPadId}";
     }
 
-    private static string BuildRegularMatchDetail(
+    internal static string BuildRegularMatchDetail(
         int regularPadId,
         Func<int, (int IcIndex, int DiffIndex)?>? getRegularPadIcDiff)
     {
@@ -129,7 +134,7 @@ public sealed partial class FreeformHelperViewModel
             : $"regId {regularPadId}";
     }
 
-    private static string BuildRegularMatchText(
+    internal static string BuildRegularMatchText(
         IReadOnlyList<PadInspectorMatchedCadSnapshot> matchedCadDetails,
         List<int> cadIds)
     {
@@ -156,7 +161,7 @@ public sealed partial class FreeformHelperViewModel
         return $"CAD id {cadListText}";
     }
 
-    private static string BuildRegularMatchDetailsText(
+    internal static string BuildRegularMatchDetailsText(
         List<PadInspectorMatchedCadSnapshot> matchedCadDetails,
         List<PadMatchLink> links)
     {
@@ -197,7 +202,7 @@ public sealed partial class FreeformHelperViewModel
         return string.Join(Environment.NewLine, lines);
     }
 
-    private static string BuildCompactList(IReadOnlyList<int> values)
+    internal static string BuildCompactList(IReadOnlyList<int> values)
     {
         if (values.Count == 0)
         {

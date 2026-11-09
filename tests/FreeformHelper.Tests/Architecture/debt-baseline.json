@@ -47,7 +47,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:63",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:10", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs:11",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.cs:255",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.cs:251",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:18", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:19", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:20", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs:21",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorSummary.cs:11",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:8", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:9", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:100",
