@@ -95,7 +95,7 @@
       "ceilings": {
         "stateMembers": 65,
         "partialFiles": 28,
-        "viewTypeLines": 5806
+        "viewTypeLines": 5772
       },
       "owner": "NFH",
       "locations": [
@@ -131,20 +131,6 @@
       "contentHash": "b94585598cdfe700e4a560484d0fcc39a3808331049d77c06afc921ecc14edd6",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.Controls.PadCanvas"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 93
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Controls/PadCanvas.Input.cs"
-      ],
-      "contentHash": "65cd1a0440e545328272f1c001478110dd083a29d08974a37ff6415699bae9d4",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Controls.PadCanvas.OnPointerReleased(PointerReleasedEventArgs)"
     },
     {
       "kind": "member",

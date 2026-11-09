@@ -153,57 +153,23 @@ public sealed partial class PadCanvas
         // --- Single Click Selection Completion ---
         if (_isLeftPointerDown)
         {
-            var modifiers = e.KeyModifiers;
-            var hit = HitTest(e.GetPosition(this), modifiers.HasFlag(KeyModifiers.Alt)); // Perform hit test at release position.
-
-            // Handle Shift for extend selection (if not also Ctrl)
-            if (modifiers.HasFlag(KeyModifiers.Shift) && !modifiers.HasFlag(KeyModifiers.Control) && hit.kind != HitKind.None)
-            {
-                if (_lastSingleSelectedPad.HasValue)
-                {
-                    ApplyExtendSelection(_lastSingleSelectedPad.Value, hit);
-                }
-                else // If no anchor, just select the current hit, and set it as anchor
-                {
-                    ClearSelectionInternal(); // Clear existing selections if no anchor
-                    ApplyHitSelection(hit, toggle: false, additive: false);
-                    _lastSingleSelectedPad = hit;
-                }
-            }
-            else // All other single left clicks (Ctrl, no modifiers, or both Ctrl+Shift)
-            {
-                var toggle = modifiers.HasFlag(KeyModifiers.Control) || modifiers.HasFlag(KeyModifiers.Shift); // True if Ctrl or Shift is pressed
-                var additive = toggle; // If toggle, it's also additive (doesn't clear others)
-
-                if (hit.kind == HitKind.None && !toggle && !additive)
-                {
-                    ClearSelectionInternal(); // Clear selection if no item hit and no modifiers
-                    _lastSingleSelectedPad = null; // Clear anchor if nothing is selected
-                    RequestVisualRefresh(); // Coalesce stale-highlight redraw without forcing synchronous layout.
-                }
-                else
-                {
-                    var totalSelected = _selectedCadIds.Count + _selectedRegIdx.Count;
-                    var alreadySelected = IsHitSelected(hit);
-
-                    // If multiple items are selected and the user clicks on an already selected item
-                    // without toggle/additive modifiers, it's a potential single selection intent.
-                    if (!toggle && !additive && alreadySelected && totalSelected > 1)
-                    {
-                        SchedulePendingSingleSelection(hit); // Schedule a delayed single selection.
-                    }
-                    else
-                    {
-                        ApplyHitSelection(hit, toggle, additive); // Apply immediate selection.
-                        _lastSingleSelectedPad = hit; // Update anchor for single selection
-                    }
-                }
-            }
-
+            CreateClickReleaseHandler().Handle(e.GetPosition(this), e.KeyModifiers);
             _isLeftPointerDown = false;
             ReleaseGestureCapture(e.Pointer);
             e.Handled = true;
-            RefreshHoverDebugHitFromCurrentPointer(modifiers);
+            RefreshHoverDebugHitFromCurrentPointer(e.KeyModifiers);
         }
     }
+
+    private PadCanvasClickReleaseHandler CreateClickReleaseHandler() => new(new PadCanvasClickReleaseHandler.Services(
+        HitTest,
+        () => _lastSingleSelectedPad,
+        hit => _lastSingleSelectedPad = hit,
+        ApplyExtendSelection,
+        () => ClearSelectionInternal(),
+        () => RequestVisualRefresh(),
+        () => _selectedCadIds.Count + _selectedRegIdx.Count,
+        IsHitSelected,
+        SchedulePendingSingleSelection,
+        ApplyHitSelection));
 }
