@@ -14,7 +14,6 @@ public sealed partial class FreeformHelperViewModel
 {
     private const double LocateFocusMinZoom = 2.0;
     private const double NotchExportPreviewFocusMinZoom = 2.4;
-    private const int SelectionNotchPreviewDeferredDelayMs = 120;
 
     // HashSets for efficient storage and lookup of selected pad IDs/indices.
     private readonly HashSet<int> _selectedCadIds = new();

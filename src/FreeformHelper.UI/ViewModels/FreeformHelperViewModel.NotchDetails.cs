@@ -263,12 +263,17 @@ public sealed partial class FreeformHelperViewModel
 
     private readonly NotchValidationSession _notchValidationSession = new();
 
+    private readonly NotchPreviewTiming _notchPreviewTiming = new();
+
     private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
 
     private readonly NotchResultCacheState _notchCache = new(); // Holds the notch validation cache, last generated table and playback visibility.
 
     /// <summary>Gets the notch result cache holder for tests.</summary>
     internal NotchResultCacheState NotchCacheForTests => _notchCache;
+
+    /// <summary>Gets the notch preview timing for tests.</summary>
+    internal NotchPreviewTiming NotchPreviewTimingForTests => _notchPreviewTiming;
 
     /// <summary>
     /// Holds the last generated notch table and the last preview visibility seen by playback, for the main view model.
