@@ -261,6 +261,8 @@ public sealed partial class FreeformHelperViewModel
 
     private readonly NotchComputationSession _notchComputationSession = new();
 
+    private readonly NotchValidationSession _notchValidationSession = new();
+
     private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
 
     private readonly NotchResultCacheState _notchCache = new(); // Holds the notch validation cache, last generated table and playback visibility.
@@ -269,13 +271,10 @@ public sealed partial class FreeformHelperViewModel
     internal NotchResultCacheState NotchCacheForTests => _notchCache;
 
     /// <summary>
-    /// Holds the notch validation bucket cache, the last generated notch table and the last preview visibility seen by playback, for the main view model.
+    /// Holds the last generated notch table and the last preview visibility seen by playback, for the main view model.
     /// </summary>
     internal sealed class NotchResultCacheState
     {
-        /// <summary>Gets or sets the cached validation bucket with the table and null diff value it was built for.</summary>
-        internal (NotchValidationBucket Bucket, NotchTable Table, int NullDiffValue)? ValidationBucket { get; set; }
-
         /// <summary>Gets or sets the table of the last notch generation.</summary>
         internal NotchTable? LastGeneratedTable { get; set; }
 

@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Globalization;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.UI.Services;
@@ -66,63 +65,30 @@ public sealed partial class FreeformHelperViewModel
         out string failureCode,
         out string failureMessage)
     {
-        report = default!;
         _projectFile.Settings.ValidateOrThrow();
+        report = default!;
         nullDiffValue = _projectFile.Settings.Notch.NullValue;
         failureCode = string.Empty;
         failureMessage = string.Empty;
 
-        if (_grid is null)
-        {
-            failureCode = "NOT_READY";
-            failureMessage = "Validation: build grid first.";
-            return false;
-        }
-
-        var regularPad = _grid.Pads.FirstOrDefault(pad => pad.RegularPadId == regularPadId);
-        if (regularPad is null)
-        {
-            failureCode = "PAD_NOT_FOUND";
-            failureMessage = $"Validation: REG {regularPadId} not found.";
-            return false;
-        }
-
-        if (_notchCache.LastGeneratedTable is null || _notchCache.LastGeneratedTable.Rows.Count == 0)
-        {
-            failureCode = "NOT_READY";
-            failureMessage = "Validation: no generated notch table. Run Step 5 Export once first.";
-            return false;
-        }
-
-        var bucket = EnsureNotchValidationBucket(_notchCache.LastGeneratedTable, nullDiffValue);
-        report = NotchValidationUseCase.BuildRegularReportFromBucket(
+        var success = _notchValidationSession.TryBuildReport(
+            _grid,
+            _notchCache.LastGeneratedTable,
             regularPadId,
-            regularPad,
-            bucket);
-        return true;
-    }
-
-    private NotchValidationBucket EnsureNotchValidationBucket(
-        NotchTable table,
-        int nullDiffValue)
-    {
-        if (_notchCache.ValidationBucket is { } cached &&
-            ReferenceEquals(cached.Table, table) &&
-            cached.NullDiffValue == nullDiffValue)
+            nullDiffValue,
+            out var result);
+        report = result.Report!;
+        failureCode = result.FailureCode;
+        failureMessage = result.FailureMessage;
+        if (result.BucketResult is { WasRebuilt: true } bucketResult)
         {
-            return cached.Bucket;
+            _logger.Info(CultureInfo.InvariantCulture, "Validation bucket rebuilt: tableRows={0}, null={1}, elapsed={2}ms.",
+                _notchCache.LastGeneratedTable!.Rows.Count,
+                nullDiffValue,
+                bucketResult.ElapsedMilliseconds);
         }
 
-        var stopwatch = Stopwatch.StartNew();
-        var bucket = NotchValidationUseCase.BuildBucket(
-            table,
-            nullDiffValue);
-        _notchCache.ValidationBucket = (bucket, table, nullDiffValue);
-        _logger.Info(CultureInfo.InvariantCulture, "Validation bucket rebuilt: tableRows={0}, null={1}, elapsed={2}ms.",
-            table.Rows.Count,
-            nullDiffValue,
-            stopwatch.ElapsedMilliseconds);
-        return bucket;
+        return success;
     }
 
     private void ClearNotchValidation()
@@ -169,7 +135,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void InvalidateNotchValidationCache()
     {
-        _notchCache.ValidationBucket = null;
+        _notchValidationSession.Invalidate();
         ClearNotchValidationCollections();
     }
 
