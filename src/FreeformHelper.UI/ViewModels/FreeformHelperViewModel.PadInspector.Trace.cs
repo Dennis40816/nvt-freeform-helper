@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
-using FreeformHelper.UI.Services;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -182,7 +181,7 @@ public sealed partial class FreeformHelperViewModel
     private static bool TryParseToFullDiagnosticRow(string row, out ToFullDiagnosticRow parsed)
     {
         var match = Regex.Match(
-            row, NotchDisplayProjector.ToFullDiagnosticLinePattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+            row, NotchToFullDiagnosticLine.Pattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
         if (!match.Success)
         {
             parsed = default;

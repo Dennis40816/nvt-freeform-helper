@@ -9,23 +9,6 @@ namespace FreeformHelper.UI.Services;
 
 internal static partial class NotchDisplayProjector
 {
-    // The one pattern of a To Full diagnostics line. The generator writes the line, and the notch details and
-    // the pad inspector trace both parse it with this pattern, so a new field cannot be added to only one parser.
-    internal const string ToFullDiagnosticLinePattern =
-        @"IC(?<ic>\d+)\/diff(?<diff>-?\d+)\s+reg(?<reg>\d+)\s*:\s*" +
-        @"ov=(?<ov>[-\d.]+),\s*" +
-        @"src=(?<src>[-\d.]+),\s*" +
-        @"blk=(?<blk>[-\d.]+),\s*" +
-        @"reach=(?<reach>[-\d.]+),\s*" +
-        @"blocker=(?<blocker>\d+)," +
-        @"(?:\s*owners=(?<owners>[^,]+),)?" +
-        @"(?:\s*ownerCnt=\d+,)?" +
-        @"(?:\s*ownerShare=(?<ownershare>[^,]+),)?" +
-        @"\s*boundary=(?<boundary>[YN])," +
-        @"(?:\s*candidate=(?<candidate>[YN]),)?" +
-        @"\s*tofull=(?<tofull>[YN])" +
-        @"(?:\s*\((?<rule>[A-Z_]+)\))?";
-
     private static readonly char[] _diagnosticLineSeparators = ['\r', '\n'];
     private static readonly char[] _diagnosticOwnerSeparators = ['|', ';'];
 
@@ -432,7 +415,7 @@ internal static partial class NotchDisplayProjector
 
     private static bool TryParseDiagnosticLine(string line, out NotchToFullDiagnosticEntry parsed)
     {
-        var match = Regex.Match(line, ToFullDiagnosticLinePattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+        var match = Regex.Match(line, NotchToFullDiagnosticLine.Pattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
         if (!match.Success)
         {
             parsed = default;
