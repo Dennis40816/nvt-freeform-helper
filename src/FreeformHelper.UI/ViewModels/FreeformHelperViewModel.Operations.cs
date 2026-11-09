@@ -202,7 +202,7 @@ public sealed partial class FreeformHelperViewModel
     /// <returns>True if a save prompt is needed, false otherwise.</returns>
     public bool ShouldPromptSaveOnExit()
     {
-        return HasUnsavedChanges || (_cad is not null && string.IsNullOrWhiteSpace(_lastSavedPath));
+        return ProjectClosePolicy.ShouldPromptSave(HasUnsavedChanges, _cad is not null, _lastSavedPath);
     }
 
     /// <summary>
