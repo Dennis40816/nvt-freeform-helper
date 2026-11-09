@@ -3,8 +3,6 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
-using Avalonia.Input.Platform;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Controls;
@@ -15,7 +13,6 @@ namespace FreeformHelper.UI.Views;
 
 public sealed partial class CoordinatePlannerWorkspaceView : UserControl
 {
-    private static readonly string[] _allFilesPatterns = ["*"];
     private PadCanvas? _canvas;
     private Canvas? _overlayCanvas;
     private Canvas? _overlayLabelCanvas;
@@ -178,44 +175,22 @@ public sealed partial class CoordinatePlannerWorkspaceView : UserControl
         dialog.Show();
     }
 
-    private async Task<bool> SetClipboardTextAsync(string text)
+    private Task<bool> SetClipboardTextAsync(string text)
     {
-        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-        if (clipboard is null)
-        {
-            return false;
-        }
-
-        await clipboard.SetTextAsync(text);
-        return true;
+        return TextExportHost.TrySetClipboardTextAsync(TopLevel.GetTopLevel(this), text);
     }
 
     private async Task<bool> SaveTextFileAsync(CoordinatePlannerWorkspaceViewModel.CoordinatePlannerTextExportRequest request)
     {
-        var storage = TopLevel.GetTopLevel(this)?.StorageProvider;
-        if (storage is null)
-        {
-            return false;
-        }
-
-        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = request.Title,
-            DefaultExtension = request.DefaultExtension,
-            SuggestedFileName = request.SuggestedFileName,
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                new(request.FileTypeName) { Patterns = request.Patterns },
-                new("All files") { Patterns = _allFilesPatterns },
-            },
-        });
-        if (file is null)
-        {
-            return false;
-        }
-
-        await TextExportWriter.WriteAsync(file.Path.LocalPath, request.Content, includeBom: true, CancellationToken.None);
-        return true;
+        var outcome = await TextExportHost.SaveTextFileAsync(
+            TopLevel.GetTopLevel(this),
+            request.Title,
+            request.DefaultExtension,
+            request.SuggestedFileName,
+            request.FileTypeName,
+            request.Patterns,
+            request.Content);
+        return outcome == TextExportOutcome.Saved;
     }
 
     private void RenderOverlay()

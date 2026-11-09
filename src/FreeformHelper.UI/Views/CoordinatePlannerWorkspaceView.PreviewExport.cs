@@ -3,7 +3,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
@@ -12,9 +11,6 @@ namespace FreeformHelper.UI.Views;
 
 public sealed partial class CoordinatePlannerWorkspaceView
 {
-    private static readonly string[] _pngFilePatterns = ["*.png"];
-    private static readonly string[] _bmpFilePatterns = ["*.bmp"];
-
     private PixelSize GetPreviewPixelSize()
     {
         var bounds = FindPreviewHost().Bounds;
@@ -35,18 +31,7 @@ public sealed partial class CoordinatePlannerWorkspaceView
             return false;
         }
 
-        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = "Export Coordinate Preview",
-            DefaultExtension = "png",
-            SuggestedFileName = "coordinate_planner.png",
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                new("PNG") { Patterns = _pngFilePatterns },
-                new("BMP") { Patterns = _bmpFilePatterns },
-                new("All files") { Patterns = _allFilesPatterns },
-            },
-        });
+        var file = await storage.SaveFilePickerAsync(CoordinatePlannerFilePickerOptions.SavePreviewImage());
         if (file is null)
         {
             return false;
