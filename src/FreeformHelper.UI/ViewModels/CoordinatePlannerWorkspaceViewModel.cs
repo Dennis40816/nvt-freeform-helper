@@ -143,24 +143,9 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
         LayerOptions = BuildLayerOptions(session.VisibleLayerNames);
         AaBoundsOptions = BuildAaBoundsOptions(session.VisibleLayerNames);
-        GuideBasisOptions =
-        [
-            new(CoordinatePlannerGuideBasisMode.ActiveArea, "AA outline"),
-            new(CoordinatePlannerGuideBasisMode.RegularGrid, "Regular grid"),
-        ];
-        GuideGenerationOptions =
-        [
-            new(CoordinatePlannerGuideGenerationMode.Count, "Count"),
-            new(CoordinatePlannerGuideGenerationMode.Pitch, "Pitch"),
-            new(CoordinatePlannerGuideGenerationMode.ExplicitPositions, "Positions"),
-        ];
-        CustomArrayCornerOptions =
-        [
-            new("array-tl", "TL"),
-            new("array-tr", "TR"),
-            new("array-br", "BR"),
-            new("array-bl", "BL"),
-        ];
+        GuideBasisOptions = CoordinatePlannerPresentationCatalog.GuideBasisOptions;
+        GuideGenerationOptions = CoordinatePlannerPresentationCatalog.GuideGenerationOptions;
+        CustomArrayCornerOptions = CoordinatePlannerPresentationCatalog.CustomArrayCornerOptions;
         _selectedLayerOption = LayerOptions[1];
         _selectedAaBoundsOption = ResolveInitialAaBoundsOption(
             AaBoundsOptions,
@@ -197,12 +182,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
         _customArrayBottomLeftMachineX = _machineOriginX;
         _customArrayBottomLeftMachineY = _machineOriginY + _machineHeight;
 
-        OverlayModeOptions =
-        [
-            new(CoordinatePlannerOverlayMode.Focus, "Focus"),
-            new(CoordinatePlannerOverlayMode.Essentials, "Essentials"),
-            new(CoordinatePlannerOverlayMode.All, "All"),
-        ];
+        OverlayModeOptions = CoordinatePlannerPresentationCatalog.OverlayModeOptions;
         _selectedOverlayModeOption = OverlayModeOptions[1];
         CustomRecipeRows = new ReadOnlyObservableCollection<CoordinatePlannerCustomRecipeRow>(_customRecipeRows);
         _customPointMachineX = _machineOriginX + (_machineWidth * 0.5m);
