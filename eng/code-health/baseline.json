@@ -204,7 +204,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 161,
+        "stateMembers": 157,
         "partialFiles": 91
       },
       "owner": "NFH",
@@ -663,46 +663,6 @@
       "count": 1,
       "rule": "generationFields",
       "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._workflowDataSnapshotRevision"
-    },
-    {
-      "syntaxHash": "ba4db073403ee10d21828d5e382615ffa425fc702072a7ca5659c2bcb227436c",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_padInspectorDerivedCacheRevision",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._padInspectorDerivedCacheRevision"
-    },
-    {
-      "syntaxHash": "cd7d9c5030951744f22b5f9fda9f50a961fdae3bdcb5dc86b1d24cf171d8db35",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_padInspectorSelectionRevision",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.Cache.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._padInspectorSelectionRevision"
-    },
-    {
-      "syntaxHash": "1d068c787d9a2ebb3a8fe8fa8a6180dbbfc64823bca48a8ea685f43403d5f73c",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_padInspectorDeferredRefreshRequestId",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._padInspectorDeferredRefreshRequestId"
-    },
-    {
-      "syntaxHash": "0da45118053dd154df02b612f6949262065a4cfa3eb0b4b0601220101232f657",
-      "member": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel.fields:_regularPadInspectorDeferredRefreshRequestId",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "generationFields",
-      "symbol": "FreeformHelper.UI.ViewModels.FreeformHelperViewModel._regularPadInspectorDeferredRefreshRequestId"
     },
     {
       "syntaxHash": "75a0068f69b37adf91fb2acc75c86bd9f8686eb673520f600fd02ea58eecc64b",

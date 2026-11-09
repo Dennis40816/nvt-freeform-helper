@@ -16,15 +16,13 @@ public sealed partial class FreeformHelperViewModel
     private const int RegularPadInspectorDeferredRefreshDelayMs = 150;
 
     private CancellationTokenSource? _padInspectorDeferredRefreshCts;
-    private long _padInspectorDeferredRefreshRequestId;
     private CancellationTokenSource? _regularPadInspectorDeferredRefreshCts;
-    private long _regularPadInspectorDeferredRefreshRequestId;
 
     public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId)
     {
         QueueDeferredCadInspectorSnapshotRefresh(
             cadPadId,
-            Interlocked.Read(ref _padInspectorSelectionRevision));
+            _padInspectorRequests.ReadSelectionRevision());
     }
 
     public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId, long selectionRevision)
@@ -32,7 +30,7 @@ public sealed partial class FreeformHelperViewModel
         CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: false);
         var cts = new CancellationTokenSource();
         _padInspectorDeferredRefreshCts = cts;
-        var requestId = Interlocked.Increment(ref _padInspectorDeferredRefreshRequestId);
+        var requestId = _padInspectorRequests.NextCadRefreshRequestId();
         UpdatePadInspectorDeferredRefreshPendingState();
         BackgroundWork.Run(
             DeferredCadInspectorRefreshWorkName,
@@ -43,7 +41,7 @@ public sealed partial class FreeformHelperViewModel
     {
         QueueDeferredRegularInspectorSnapshotRefresh(
             regularPadId,
-            Interlocked.Read(ref _padInspectorSelectionRevision));
+            _padInspectorRequests.ReadSelectionRevision());
     }
 
     public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId, long selectionRevision)
@@ -51,7 +49,7 @@ public sealed partial class FreeformHelperViewModel
         CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: false);
         var cts = new CancellationTokenSource();
         _regularPadInspectorDeferredRefreshCts = cts;
-        var requestId = Interlocked.Increment(ref _regularPadInspectorDeferredRefreshRequestId);
+        var requestId = _padInspectorRequests.NextRegularRefreshRequestId();
         UpdatePadInspectorDeferredRefreshPendingState();
         BackgroundWork.Run(
             DeferredRegularInspectorRefreshWorkName,
@@ -176,7 +174,7 @@ public sealed partial class FreeformHelperViewModel
         try
         {
             await Task.Delay(TimeSpan.FromMilliseconds(PadInspectorDeferredRefreshDelayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
-            if (cancellationToken.IsCancellationRequested || requestId != Interlocked.Read(ref _padInspectorDeferredRefreshRequestId))
+            if (cancellationToken.IsCancellationRequested || requestId != _padInspectorRequests.ReadCadRefreshRequestId())
             {
                 return;
             }
@@ -243,7 +241,7 @@ public sealed partial class FreeformHelperViewModel
         long selectionRevision,
         CancellationToken cancellationToken)
     {
-        if (cancellationToken.IsCancellationRequested || requestId != Interlocked.Read(ref _padInspectorDeferredRefreshRequestId))
+        if (cancellationToken.IsCancellationRequested || requestId != _padInspectorRequests.ReadCadRefreshRequestId())
         {
             return null;
         }
@@ -318,7 +316,7 @@ public sealed partial class FreeformHelperViewModel
         {
             await Task.Delay(TimeSpan.FromMilliseconds(RegularPadInspectorDeferredRefreshDelayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
             if (cancellationToken.IsCancellationRequested ||
-                requestId != Interlocked.Read(ref _regularPadInspectorDeferredRefreshRequestId))
+                requestId != _padInspectorRequests.ReadRegularRefreshRequestId())
             {
                 return;
             }
@@ -375,12 +373,12 @@ public sealed partial class FreeformHelperViewModel
     private bool CanApplyDeferredCadInspectorSnapshot(DeferredCadInspectorContext context)
     {
         var request = context.ResolutionRequest;
-        if (context.RequestId != Interlocked.Read(ref _padInspectorDeferredRefreshRequestId))
+        if (context.RequestId != _padInspectorRequests.ReadCadRefreshRequestId())
         {
             return false;
         }
 
-        if (context.SelectionRevision != Interlocked.Read(ref _padInspectorSelectionRevision))
+        if (context.SelectionRevision != _padInspectorRequests.ReadSelectionRevision())
         {
             return false;
         }
@@ -444,12 +442,12 @@ public sealed partial class FreeformHelperViewModel
 
     private bool CanApplyDeferredRegularInspectorSnapshot(long requestId, int regularPadId, long selectionRevision)
     {
-        if (requestId != Interlocked.Read(ref _regularPadInspectorDeferredRefreshRequestId))
+        if (requestId != _padInspectorRequests.ReadRegularRefreshRequestId())
         {
             return false;
         }
 
-        if (selectionRevision != Interlocked.Read(ref _padInspectorSelectionRevision))
+        if (selectionRevision != _padInspectorRequests.ReadSelectionRevision())
         {
             return false;
         }

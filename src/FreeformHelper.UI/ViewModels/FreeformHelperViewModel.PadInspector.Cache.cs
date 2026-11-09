@@ -1,30 +1,22 @@
-using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private const int PadInspectorCacheMaxEntries = 4096;
-    private readonly PadInspectorCacheState _padInspectorCache = new(); // Holds the match caches of the pad inspector.
-    private int _padInspectorDerivedCacheRevision = 1;
-    private long _padInspectorSelectionRevision;
+    private readonly PadInspectorRequestState _padInspectorRequests = new();
+    private readonly PadInspectorMatchCache _padInspectorCache = new(); // Holds the match caches of the pad inspector.
 
     private void InvalidatePadInspectorDerivedCache()
     {
-        unchecked
-        {
-            _padInspectorDerivedCacheRevision++;
-        }
-
-        _padInspectorCache.CadMatches.Clear();
-        _padInspectorCache.RegularMatches.Clear();
+        _padInspectorRequests.BumpDerivedCacheRevision();
+        _padInspectorCache.Clear();
     }
 
     private CadInspectorMatchCacheEntry GetOrBuildCadInspectorMatchCache(int cadPadId)
     {
         if (_padInspectorCache.CadMatches.TryGetValue(cadPadId, out var cached) &&
-            cached.Revision == _padInspectorDerivedCacheRevision)
+            cached.Revision == _padInspectorRequests.ReadDerivedCacheRevision())
         {
             return cached;
         }
@@ -45,21 +37,21 @@ public sealed partial class FreeformHelperViewModel
             ? 0.0
             : matchedRegularDetails.Max(detail => detail.CadCoverage);
         var entry = new CadInspectorMatchCacheEntry(
-            _padInspectorDerivedCacheRevision,
+            _padInspectorRequests.ReadDerivedCacheRevision(),
             matchedLinks,
             matchedRegularIds,
             matchedRegularDetails,
             matchText,
             matchDetailsText,
             confidence);
-        StoreCadInspectorMatchCache(cadPadId, entry);
+        _padInspectorCache.StoreCadInspectorMatchCache(cadPadId, entry);
         return entry;
     }
 
     private RegularInspectorMatchCacheEntry GetOrBuildRegularInspectorMatchCache(RegularPad regularPad)
     {
         if (_padInspectorCache.RegularMatches.TryGetValue(regularPad.RegularPadId, out var cached) &&
-            cached.Revision == _padInspectorDerivedCacheRevision)
+            cached.Revision == _padInspectorRequests.ReadDerivedCacheRevision())
         {
             return cached;
         }
@@ -89,7 +81,7 @@ public sealed partial class FreeformHelperViewModel
             freeformSource,
             freeformSourceDetail);
         var entry = new RegularInspectorMatchCacheEntry(
-            _padInspectorDerivedCacheRevision,
+            _padInspectorRequests.ReadDerivedCacheRevision(),
             matchedLinks,
             matchedCadIds,
             matchedCadDetails,
@@ -100,63 +92,7 @@ public sealed partial class FreeformHelperViewModel
             freeformSourceDetail,
             confidence,
             ruleTrace);
-        StoreRegularInspectorMatchCache(regularPad.RegularPadId, entry);
+        _padInspectorCache.StoreRegularInspectorMatchCache(regularPad.RegularPadId, entry);
         return entry;
-    }
-
-    private void StoreCadInspectorMatchCache(int cadPadId, CadInspectorMatchCacheEntry entry)
-    {
-        if (_padInspectorCache.CadMatches.Count >= PadInspectorCacheMaxEntries &&
-            !_padInspectorCache.CadMatches.ContainsKey(cadPadId))
-        {
-            _padInspectorCache.CadMatches.Clear();
-        }
-
-        _padInspectorCache.CadMatches[cadPadId] = entry;
-    }
-
-    private void StoreRegularInspectorMatchCache(int regularPadId, RegularInspectorMatchCacheEntry entry)
-    {
-        if (_padInspectorCache.RegularMatches.Count >= PadInspectorCacheMaxEntries &&
-            !_padInspectorCache.RegularMatches.ContainsKey(regularPadId))
-        {
-            _padInspectorCache.RegularMatches.Clear();
-        }
-
-        _padInspectorCache.RegularMatches[regularPadId] = entry;
-    }
-
-    private sealed record CadInspectorMatchCacheEntry(
-        int Revision,
-        IReadOnlyList<PadMatchLink> MatchedLinks,
-        IReadOnlyList<int> MatchedRegularIds,
-        IReadOnlyList<PadInspectorMatchedRegularSnapshot> MatchedRegularDetails,
-        string MatchText,
-        string MatchDetailsText,
-        double Confidence);
-
-    private sealed record RegularInspectorMatchCacheEntry(
-        int Revision,
-        IReadOnlyList<PadMatchLink> MatchedLinks,
-        IReadOnlyList<int> MatchedCadIds,
-        IReadOnlyList<PadInspectorMatchedCadSnapshot> MatchedCadDetails,
-        string MatchText,
-        string MatchDetailsText,
-        string DiffSource,
-        string FreeformSource,
-        string FreeformSourceDetail,
-        double Confidence,
-        IReadOnlyList<PadInspectorRuleTraceEntry> RuleTrace);
-
-    /// <summary>
-    /// Holds the match caches of the pad inspector.
-    /// </summary>
-    private sealed class PadInspectorCacheState
-    {
-        /// <summary>Gets the cached CAD pad matches, keyed by CAD pad id.</summary>
-        internal Dictionary<int, CadInspectorMatchCacheEntry> CadMatches { get; } = new();
-
-        /// <summary>Gets the cached regular pad matches, keyed by regular pad id.</summary>
-        internal Dictionary<int, RegularInspectorMatchCacheEntry> RegularMatches { get; } = new();
     }
 }
