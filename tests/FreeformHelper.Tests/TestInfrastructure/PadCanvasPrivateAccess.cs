@@ -154,4 +154,7 @@ internal static class PadCanvasPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ResolveBestCadIdByRegular")]
     public static extern int? ResolveBestCadIdByRegular(PadCanvas canvas, int regularPadId);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "TryBuildSimulationRegularFillBrush")]
+    public static extern IBrush? TryBuildSimulationRegularFillBrush(PadCanvas canvas, RegularPad pad);
 }
