@@ -20,94 +20,21 @@ public sealed partial class PadCanvas
             return null;
         }
 
-        var lowColor = GetResourceColor("ColorSimulationScaleLow", Colors.DeepSkyBlue);
-        var zeroColor = GetResourceColor("ColorSimulationScaleZero", Colors.LimeGreen);
-        var midColor = GetResourceColor("ColorSimulationScaleMid", Colors.Gold);
-        var warmColor = GetResourceColor("ColorSimulationScaleWarm", Colors.Orange);
-        var highColor = GetResourceColor("ColorSimulationScaleHigh", Colors.IndianRed);
-        var neutralColor = GetResourceColor("ColorSimulationScaleNeutral", Colors.Gray);
-        var minOpacity = GetResourceDouble("NotchApplySimulationAaMinOpacity", 0.12d);
-        var maxOpacity = GetResourceDouble("NotchApplySimulationAaMaxOpacity", 0.92d);
-        var threshold = Math.Max(0d, SimulationRegularOverlayThresholdValue);
-
-        if (SimulationRegularOverlayViewMode == ViewModels.NotchApplySimulationCanvasViewMode.ChangedOnly && !cell.IsChanged)
-        {
-            return GetBrush(Color.FromArgb(18, neutralColor.R, neutralColor.G, neutralColor.B));
-        }
-
-        var value = cell.DisplayValue;
-        if (SimulationRegularOverlayViewMode is ViewModels.NotchApplySimulationCanvasViewMode.Before or ViewModels.NotchApplySimulationCanvasViewMode.After)
-        {
-            var useAutoAsymmetricScale = SimulationRegularOverlayColorMode == ViewModels.NotchApplySimulationCanvasColorMode.Auto;
-            var signedRange = SimulationRegularOverlayColorMode == ViewModels.NotchApplySimulationCanvasColorMode.Threshold
-                ? threshold
-                : Math.Max(Math.Abs(_simulationOverlayMinValue), Math.Abs(_simulationOverlayMaxValue));
-            var useSignedScale = SimulationRegularOverlayColorMode == ViewModels.NotchApplySimulationCanvasColorMode.Threshold &&
-                                 _simulationOverlayMinValue < -1e-9;
-            if (useSignedScale)
-            {
-                var normalizedSigned = SimulationRegularOverlayColorMode == ViewModels.NotchApplySimulationCanvasColorMode.Threshold
-                    ? NormalizeThresholdScale(Math.Abs(value), threshold)
-                    : signedRange <= 1e-9
-                        ? 0d
-                        : Math.Clamp(Math.Abs(value) / signedRange, 0d, 1d);
-                var signedMixed = SimulationColorScaleResolver.ResolveSignedColor(value, signedRange, lowColor, zeroColor, midColor, warmColor, highColor);
-                var signedOpacity = minOpacity + ((maxOpacity - minOpacity) * (0.18d + (0.82d * Math.Pow(normalizedSigned, 0.78d))));
-                return BuildAlphaBrush(signedMixed, signedOpacity);
-            }
-
-            if (useAutoAsymmetricScale)
-            {
-                var positiveRange = Math.Max(_simulationOverlayAutoPositiveClamp, Math.Max(_simulationOverlayMaxValue, 0d));
-                var negativeRange = Math.Max(_simulationOverlayAutoNegativeClampAbs, Math.Abs(Math.Min(_simulationOverlayMinValue, 0d)));
-                if (value < 0d)
-                {
-                    var negativeNormalized = negativeRange <= 1e-9
-                        ? 0d
-                        : Math.Clamp(Math.Abs(value) / negativeRange, 0d, 1d);
-                    var negativeMixed = SimulationColorScaleResolver.ResolveNegativeColor(value, negativeRange, lowColor, zeroColor);
-                    var negativeOpacity = minOpacity + ((maxOpacity - minOpacity) * (0.22d + (0.78d * Math.Pow(negativeNormalized, 1.3d))));
-                    return BuildAlphaBrush(negativeMixed, negativeOpacity);
-                }
-
-                var positiveNormalized = positiveRange <= 1e-9
-                    ? 0d
-                    : Math.Clamp(value / positiveRange, 0d, 1d);
-                var positiveMixed = SimulationColorScaleResolver.ResolvePositiveColor(value, positiveRange, zeroColor, midColor, warmColor, highColor);
-                var positiveOpacity = minOpacity + ((maxOpacity - minOpacity) * (0.28d + (0.72d * Math.Pow(positiveNormalized, 0.72d))));
-                return BuildAlphaBrush(positiveMixed, positiveOpacity);
-            }
-
-            var sequentialRange = SimulationRegularOverlayColorMode == ViewModels.NotchApplySimulationCanvasColorMode.Threshold
-                ? threshold
-                : Math.Max(_simulationOverlayMaxValue, 0d);
-            var sequentialNormalized = NormalizeThresholdScale(value, sequentialRange);
-            var sequentialMixed = SimulationColorScaleResolver.ResolvePositiveColor(value, sequentialRange, zeroColor, midColor, warmColor, highColor);
-            var sequentialOpacity = minOpacity + ((maxOpacity - minOpacity) * (0.34d + (0.66d * Math.Pow(sequentialNormalized, 0.78d))));
-            return BuildAlphaBrush(sequentialMixed, sequentialOpacity);
-        }
-
-        var magnitude = Math.Abs(value);
-        if (magnitude <= 1e-9)
-        {
-            return BuildAlphaBrush(zeroColor, minOpacity + ((maxOpacity - minOpacity) * 0.18d));
-        }
-
-        var deltaNormalized = SimulationRegularOverlayColorMode == ViewModels.NotchApplySimulationCanvasColorMode.Threshold
-            ? NormalizeThresholdScale(magnitude, threshold)
-            : _simulationOverlayMaxAbsDelta <= 1e-9
-                ? 1d
-                : Math.Clamp(magnitude / _simulationOverlayMaxAbsDelta, 0d, 1d);
-        var deltaMixed = SimulationColorScaleResolver.ResolveSignedColor(
-            value,
-            SimulationRegularOverlayColorMode == ViewModels.NotchApplySimulationCanvasColorMode.Threshold ? threshold : _simulationOverlayMaxAbsDelta,
-            lowColor,
-            zeroColor,
-            midColor,
-            warmColor,
-            highColor);
-        var deltaOpacity = minOpacity + ((maxOpacity - minOpacity) * (0.30d + (0.70d * Math.Pow(deltaNormalized, 0.78d))));
-        return BuildAlphaBrush(deltaMixed, deltaOpacity);
+        var builder = new SimulationRegularFillBrushBuilder(new SimulationRegularFillBrushBuilder.Services(
+            GetResourceColor,
+            GetResourceDouble,
+            GetBrush));
+        return builder.Build(cell.DisplayValue, cell.IsChanged, new SimulationRegularFillBrushBuilder.Scale(
+            SimulationRegularOverlayViewMode == ViewModels.NotchApplySimulationCanvasViewMode.ChangedOnly,
+            SimulationRegularOverlayViewMode is ViewModels.NotchApplySimulationCanvasViewMode.Before or ViewModels.NotchApplySimulationCanvasViewMode.After,
+            SimulationRegularOverlayColorMode == ViewModels.NotchApplySimulationCanvasColorMode.Auto,
+            SimulationRegularOverlayColorMode == ViewModels.NotchApplySimulationCanvasColorMode.Threshold,
+            SimulationRegularOverlayThresholdValue,
+            _simulationOverlayMinValue,
+            _simulationOverlayMaxValue,
+            _simulationOverlayMaxAbsDelta,
+            _simulationOverlayAutoNegativeClampAbs,
+            _simulationOverlayAutoPositiveClamp));
     }
 
     private void DrawSimulationRegularLabels(DrawingContext context)
@@ -209,20 +136,5 @@ public sealed partial class PadCanvas
             rect.X + Math.Max(0d, (rect.Width - valueLayout.Width) / 2d),
             rect.Y + Math.Max(0d, (rect.Height - valueLayout.Height) / 2d));
         valueLayout.Draw(context, origin);
-    }
-
-    private IBrush BuildAlphaBrush(Color baseColor, double opacity)
-    {
-        var alpha = (byte)Math.Clamp(Math.Round(opacity * 255d), 0d, 255d);
-        return GetBrush(Color.FromArgb(alpha, baseColor.R, baseColor.G, baseColor.B));
-    }
-    private static double NormalizeThresholdScale(double value, double threshold)
-    {
-        if (threshold <= 1e-9)
-        {
-            return Math.Abs(value) <= 1e-9 ? 0d : 1d;
-        }
-
-        return Math.Clamp(value / threshold, 0d, 1d);
     }
 }
