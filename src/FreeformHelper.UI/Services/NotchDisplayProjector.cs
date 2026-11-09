@@ -415,21 +415,7 @@ internal static partial class NotchDisplayProjector
 
     private static bool TryParseDiagnosticLine(string line, out NotchToFullDiagnosticEntry parsed)
     {
-        const string pattern =
-            @"IC(?<ic>\d+)\/diff(?<diff>-?\d+)\s+reg(?<reg>\d+)\s*:\s*" +
-            @"ov=(?<ov>[-\d.]+),\s*" +
-            @"src=(?<src>[-\d.]+),\s*" +
-            @"blk=(?<blk>[-\d.]+),\s*" +
-            @"reach=(?<reach>[-\d.]+),\s*" +
-            @"blocker=(?<blocker>\d+)," +
-            @"(?:\s*owners=(?<owners>[^,]+),)?" +
-            @"(?:\s*ownerCnt=\d+,)?" +
-            @"(?:\s*ownerShare=(?<ownershare>[^,]+),)?" +
-            @"\s*boundary=(?<boundary>[YN])," +
-            @"(?:\s*candidate=(?<candidate>[YN]),)?" +
-            @"\s*tofull=(?<tofull>[YN])" +
-            @"(?:\s*\((?<rule>[A-Z_]+)\))?";
-        var match = Regex.Match(line, pattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+        var match = Regex.Match(line, NotchToFullDiagnosticLine.Pattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
         if (!match.Success)
         {
             parsed = default;

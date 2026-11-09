@@ -180,20 +180,8 @@ public sealed partial class FreeformHelperViewModel
 
     private static bool TryParseToFullDiagnosticRow(string row, out ToFullDiagnosticRow parsed)
     {
-        const string Pattern =
-            @"IC(?<ic>\d+)\/diff(?<diff>-?\d+)\s+reg(?<reg>\d+)\s*:\s*" +
-            @"ov=(?<ov>[-\d.]+),\s*" +
-            @"src=(?<src>[-\d.]+),\s*" +
-            @"blk=(?<blk>[-\d.]+),\s*" +
-            @"reach=(?<reach>[-\d.]+),\s*" +
-            @"blocker=(?<blocker>\d+)," +
-            @"(?:\s*owners=(?<owners>[^,]+),)?" +
-            @"(?:\s*ownerShare=(?<ownershare>[^,]+),)?" +
-            @"\s*boundary=(?<boundary>[YN])," +
-            @"(?:\s*candidate=(?<candidate>[YN]),)?" +
-            @"\s*tofull=(?<tofull>[YN])" +
-            @"(?:\s*\((?<reason>[A-Z_]+)\))?";
-        var match = Regex.Match(row, Pattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+        var match = Regex.Match(
+            row, NotchToFullDiagnosticLine.Pattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
         if (!match.Success)
         {
             parsed = default;
@@ -235,8 +223,8 @@ public sealed partial class FreeformHelperViewModel
         var isBoundaryCandidate = !match.Groups["candidate"].Success ||
                                   string.Equals(match.Groups["candidate"].Value, "Y", StringComparison.OrdinalIgnoreCase);
         var isToFullApplied = string.Equals(match.Groups["tofull"].Value, "Y", StringComparison.OrdinalIgnoreCase);
-        var reasonCode = match.Groups["reason"].Success
-            ? match.Groups["reason"].Value
+        var reasonCode = match.Groups["rule"].Success
+            ? match.Groups["rule"].Value
             : string.Empty;
 
         parsed = new ToFullDiagnosticRow(
