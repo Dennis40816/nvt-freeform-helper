@@ -4,6 +4,7 @@ using Avalonia.Media;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Controls;
+using FreeformHelper.UI.ViewModels;
 
 namespace FreeformHelper.Tests.TestInfrastructure;
 
@@ -167,4 +168,41 @@ internal static class PadCanvasPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_lastSingleSelectedPad")]
     public static extern ref PadCanvas.HitResult? LastSingleSelectedPad(PadCanvas canvas);
+
+    // Overlay data that the canvas copies from its styled properties.
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_highlightedCadIds")]
+    public static extern ref HashSet<int> HighlightedCadIds(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_diffIndexOverrideCadIds")]
+    public static extern ref HashSet<int> DiffIndexOverrideCadIds(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_diffIndexAnchorCadPadIds")]
+    public static extern ref HashSet<int> DiffIndexAnchorCadPadIds(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_notchPreviewByCadId")]
+    public static extern ref Dictionary<int, NotchCanvasPreviewItem> NotchPreviewByCadId(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_notchToFullSeedPolygons")]
+    public static extern ref List<Polygon2> NotchToFullSeedPolygons(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_notchToFullCandidatePolygons")]
+    public static extern ref List<Polygon2> NotchToFullCandidatePolygons(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayByRegularPadId")]
+    public static extern ref Dictionary<int, NotchApplySimulationAaDisplayCell> SimulationOverlayByRegularPadId(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayMinValue")]
+    public static extern ref double SimulationOverlayMinValue(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayMaxValue")]
+    public static extern ref double SimulationOverlayMaxValue(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayMaxAbsDelta")]
+    public static extern ref double SimulationOverlayMaxAbsDelta(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayAutoNegativeClampAbs")]
+    public static extern ref double SimulationOverlayAutoNegativeClampAbs(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayAutoPositiveClamp")]
+    public static extern ref double SimulationOverlayAutoPositiveClamp(PadCanvas canvas);
 }
