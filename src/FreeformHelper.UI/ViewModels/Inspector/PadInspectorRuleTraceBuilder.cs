@@ -6,9 +6,15 @@ using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.ViewModels;
 
-public sealed partial class FreeformHelperViewModel
+/// <summary>
+/// Builds pad inspector rule traces and diagnostic details.
+/// </summary>
+internal static class PadInspectorRuleTraceBuilder
 {
-    private static List<PadInspectorRuleTraceEntry> BuildCadRuleTrace(
+    private static readonly char[] _toFullDiagnosticsLineSeparators = ['\r', '\n'];
+    private static readonly char[] _toFullDiagnosticsOwnerSeparators = ['|', ';'];
+
+    internal static List<PadInspectorRuleTraceEntry> BuildCadRuleTrace(
         int? dxfIndex,
         string cadOutputFwDiffAssignmentModeText,
         IReadOnlyList<PadInspectorMatchedRegularSnapshot> matchedRegularDetails,
@@ -84,7 +90,7 @@ public sealed partial class FreeformHelperViewModel
         return trace;
     }
 
-    private static List<PadInspectorRuleTraceEntry> BuildRegularRuleTrace(
+    internal static List<PadInspectorRuleTraceEntry> BuildRegularRuleTrace(
         RegularPad regularPad,
         List<PadInspectorMatchedCadSnapshot> matchedCadDetails,
         string diffSource,
@@ -134,7 +140,7 @@ public sealed partial class FreeformHelperViewModel
         return trace;
     }
 
-    private static string BuildToFullDetail(bool isToFullEnabled, string? diagnostics, double toFullRatio)
+    internal static string BuildToFullDetail(bool isToFullEnabled, string? diagnostics, double toFullRatio)
     {
         var ratioText = toFullRatio.ToString("P1", CultureInfo.InvariantCulture);
         var switchText = isToFullEnabled ? "ON" : "OFF";
@@ -164,7 +170,7 @@ public sealed partial class FreeformHelperViewModel
 
         var ownersText = parsed.OwnerCadPadIds.Count == 0
             ? "-"
-            : BuildCompactList(parsed.OwnerCadPadIds);
+            : PadInspectorMatchFormatter.BuildCompactList(parsed.OwnerCadPadIds);
 
         return $"To Full ratio: {ratioText}{Environment.NewLine}" +
                $"Switch: {switchText}{Environment.NewLine}" +
@@ -178,7 +184,7 @@ public sealed partial class FreeformHelperViewModel
                (string.IsNullOrWhiteSpace(parsed.ReasonCode) ? string.Empty : $" ({parsed.ReasonCode})");
     }
 
-    private static bool TryParseToFullDiagnosticRow(string row, out ToFullDiagnosticRow parsed)
+    internal static bool TryParseToFullDiagnosticRow(string row, out ToFullDiagnosticRow parsed)
     {
         var match = Regex.Match(
             row, NotchToFullDiagnosticLine.Pattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
@@ -246,7 +252,7 @@ public sealed partial class FreeformHelperViewModel
         return true;
     }
 
-    private static string ResolveToFullReasonText(string reasonCode, bool isBoundary, bool isToFullApplied)
+    internal static string ResolveToFullReasonText(string reasonCode, bool isBoundary, bool isToFullApplied)
     {
         return NotchToFullRuleText.ResolveReasonText(
             reasonCode,
@@ -254,12 +260,12 @@ public sealed partial class FreeformHelperViewModel
             isBoundary);
     }
 
-    private static string ToYesNo(bool value)
+    internal static string ToYesNo(bool value)
     {
         return value ? "Yes" : "No";
     }
 
-    private static IReadOnlyList<PadInspectorRuleTraceEntry> BuildDeferredRuleTracePlaceholder()
+    internal static IReadOnlyList<PadInspectorRuleTraceEntry> BuildDeferredRuleTracePlaceholder()
     {
         return
         [
@@ -270,7 +276,7 @@ public sealed partial class FreeformHelperViewModel
         ];
     }
 
-    private readonly record struct ToFullDiagnosticRow(
+    internal readonly record struct ToFullDiagnosticRow(
         int IcIndex,
         int DiffIndex,
         int RegularPadId,

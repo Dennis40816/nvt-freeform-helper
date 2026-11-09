@@ -39,8 +39,8 @@ public sealed partial class FreeformHelperViewModel
             .OrderBy(id => id)
             .ToList();
         var matchedRegularDetails = BuildMatchedRegularDetails(matchedRegularIds, matchedLinks);
-        var matchText = BuildCadMatchText(matchedRegularIds, matchedLinks, GetRegularPadIcDiff);
-        var matchDetailsText = BuildCadMatchDetailsText(matchedRegularIds, matchedLinks, GetRegularPadIcDiff);
+        var matchText = PadInspectorMatchFormatter.BuildCadMatchText(matchedRegularIds, matchedLinks, GetRegularPadIcDiff);
+        var matchDetailsText = PadInspectorMatchFormatter.BuildCadMatchDetailsText(matchedRegularIds, matchedLinks, GetRegularPadIcDiff);
         var confidence = matchedRegularDetails.Count == 0
             ? 0.0
             : matchedRegularDetails.Max(detail => detail.CadCoverage);
@@ -73,14 +73,14 @@ public sealed partial class FreeformHelperViewModel
             .OrderBy(id => id)
             .ToList();
         var matchedCadDetails = BuildMatchedCadDetails(matchedCadIds, matchedLinks);
-        var matchText = BuildRegularMatchText(matchedCadDetails, matchedCadIds);
-        var matchDetailsText = BuildRegularMatchDetailsText(matchedCadDetails, matchedLinks);
-        var diffSource = BuildRegularDiffSource(regularPad.DiffIndex, matchedCadDetails);
+        var matchText = PadInspectorMatchFormatter.BuildRegularMatchText(matchedCadDetails, matchedCadIds);
+        var matchDetailsText = PadInspectorMatchFormatter.BuildRegularMatchDetailsText(matchedCadDetails, matchedLinks);
+        var diffSource = PadInspectorMatchFormatter.BuildRegularDiffSource(regularPad.DiffIndex, matchedCadDetails);
         var (freeformSource, freeformSourceDetail) = BuildRegularFreeformSource(regularPad);
         var confidence = matchedCadDetails.Count == 0
             ? 0.0
             : matchedCadDetails.Max(detail => detail.CadCoverage);
-        var ruleTrace = BuildRegularRuleTrace(
+        var ruleTrace = PadInspectorRuleTraceBuilder.BuildRegularRuleTrace(
             regularPad,
             matchedCadDetails,
             diffSource,

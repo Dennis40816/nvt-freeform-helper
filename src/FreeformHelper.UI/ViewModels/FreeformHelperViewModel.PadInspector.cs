@@ -10,10 +10,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private const int MaxInspectorMatchDetailLines = 8;
-    private static readonly char[] _toFullDiagnosticsLineSeparators = ['\r', '\n'];
-    private static readonly char[] _toFullDiagnosticsOwnerSeparators = ['|', ';'];
-
     internal NotchComputationMode CurrentNotchComputationMode => _projectFile.Settings.Notch.ComputationMode;
 
     public PadInspectorSnapshot? BuildCadPadInspectorSnapshot(
@@ -36,7 +32,7 @@ public sealed partial class FreeformHelperViewModel
         var cadOutputFwDiffOverride = GetCadOutputFwDiffIndexOverride(cadPadId);
         var isDxfIndexAnchor = IsCadOutputFwDiffIndexAnchorCadPad(cadPadId);
         var dxfIndexDisplayText = dxfIndex?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "-";
-        var cadOutputFwDiffAssignmentModeText = BuildCadOutputFwDiffAssignmentModeText(
+        var cadOutputFwDiffAssignmentModeText = PadInspectorMatchFormatter.BuildCadOutputFwDiffAssignmentModeText(
             cadOutputFwDiffOverride.HasValue,
             isDxfIndexAnchor,
             CadOutputFwDiffAutoMode);
@@ -57,13 +53,13 @@ public sealed partial class FreeformHelperViewModel
         var (notchEligibility, notchRowSummary) = BuildCadInspectorNotchRowSummary(cadPad, includeNotchRowEligibilityDetails);
 
         var ruleTrace = includeRuleTrace
-            ? BuildCadRuleTrace(
+            ? PadInspectorRuleTraceBuilder.BuildCadRuleTrace(
                 dxfIndex,
                 cadOutputFwDiffAssignmentModeText,
                 matchedRegularDetails,
                 notch,
                 notchEligibility)
-            : BuildDeferredRuleTracePlaceholder();
+            : PadInspectorRuleTraceBuilder.BuildDeferredRuleTracePlaceholder();
 
         var snapshot = new CadPadInspectorSnapshot(
             CadPadId: cadPad.Id,
@@ -215,7 +211,7 @@ public sealed partial class FreeformHelperViewModel
         var confidence = matchCache.Confidence;
         var ruleTrace = includeRuleTrace
             ? matchCache.RuleTrace
-            : BuildDeferredRuleTracePlaceholder();
+            : PadInspectorRuleTraceBuilder.BuildDeferredRuleTracePlaceholder();
 
         var snapshot = new RegularPadInspectorSnapshot(
             RegularPadId: regularPad.RegularPadId,
