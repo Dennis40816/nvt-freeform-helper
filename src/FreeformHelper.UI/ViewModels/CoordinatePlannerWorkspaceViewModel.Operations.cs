@@ -122,40 +122,33 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
 
     private void AddCustomPoint()
     {
-        var label = NormalizeCustomLabel(CustomPointLabelText, "Point");
-        var key = (_nextCustomPointId++).ToString(CultureInfo.InvariantCulture);
-        _customPointRequests.Add(new CoordinateCustomPointRequest(
-            key,
-            label,
+        var label = _customArtifacts.AddPoint(
+            CustomPointLabelText,
             (double)CustomPointMachineX,
-            (double)CustomPointMachineY));
-        RefreshCustomRecipeRows();
+            (double)CustomPointMachineY);
+        NotifyCustomArtifactsChanged();
         RebuildSnapshot();
         StatusText = $"Custom point '{label}' added.";
     }
 
     private void AddCustomPath()
     {
-        var label = NormalizeCustomLabel(CustomPathLabelText, "Path");
-        var key = (_nextCustomPathId++).ToString(CultureInfo.InvariantCulture);
-        _customPathRequests.Add(new CoordinateCustomPathRequest(
-            key,
-            label,
+        var label = _customArtifacts.AddPath(
+            CustomPathLabelText,
             (double)CustomPathStartMachineX,
             (double)CustomPathStartMachineY,
             (double)CustomPathEndMachineX,
             (double)CustomPathEndMachineY,
-            Math.Max(2, ClampNonNegativeInt(CustomPathStepCount))));
-        RefreshCustomRecipeRows();
+            Math.Max(2, ClampNonNegativeInt(CustomPathStepCount)));
+        NotifyCustomArtifactsChanged();
         RebuildSnapshot();
         StatusText = $"Custom path '{label}' added.";
     }
 
     private void ClearCustomArtifacts()
     {
-        _customPointRequests.Clear();
-        _customPathRequests.Clear();
-        RefreshCustomRecipeRows();
+        _customArtifacts.Clear();
+        NotifyCustomArtifactsChanged();
         RebuildSnapshot();
         StatusText = "Custom coordinate artifacts cleared.";
     }
@@ -379,8 +372,8 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             VerticalGuideInset: Math.Max(0d, (double)VerticalGuideInset),
             HorizontalGuidePositions: ParseGuidePositionList(HorizontalGuidePositionListText),
             VerticalGuidePositions: ParseGuidePositionList(VerticalGuidePositionListText),
-            CustomPoints: _customPointRequests.ToArray(),
-            CustomPaths: _customPathRequests.ToArray());
+            CustomPoints: _customArtifacts.PointRequests(),
+            CustomPaths: _customArtifacts.PathRequests());
     }
 
     private static CoordinatePlannerRequest BuildRequestFromDefaults(CoordinatePlannerWorkspaceSession session)
@@ -532,47 +525,11 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
         };
     }
 
-    private void RefreshCustomRecipeRows()
+    private void NotifyCustomArtifactsChanged()
     {
-        _customRecipeRows.Clear();
-        foreach (var point in _customPointRequests)
-        {
-            _customRecipeRows.Add(new CoordinatePlannerCustomRecipeRow(
-                $"custom-point-{point.Key}",
-                point.Label,
-                "Point",
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Machine ({0:0.###}, {1:0.###})",
-                    point.MachineX,
-                    point.MachineY)));
-        }
-
-        foreach (var path in _customPathRequests)
-        {
-            _customRecipeRows.Add(new CoordinatePlannerCustomRecipeRow(
-                $"custom-path-{path.Key}",
-                path.Label,
-                "Path",
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Machine ({0:0.###}, {1:0.###}) -> ({2:0.###}, {3:0.###}) · {4} step(s)",
-                    path.StartMachineX,
-                    path.StartMachineY,
-                    path.EndMachineX,
-                    path.EndMachineY,
-                    Math.Max(0, path.StepCount))));
-        }
-
         ClearCustomArtifactsCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(HasCustomArtifacts));
         OnPropertyChanged(nameof(CustomArtifactSummaryText));
-    }
-
-    private static string NormalizeCustomLabel(string label, string fallback)
-    {
-        var normalized = label.Trim();
-        return string.IsNullOrWhiteSpace(normalized) ? fallback : normalized;
     }
 
     private void PublishWorkspacePreferencesChanged()
