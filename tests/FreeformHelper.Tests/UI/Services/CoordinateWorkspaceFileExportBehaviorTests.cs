@@ -23,11 +23,7 @@ public sealed class CoordinateWorkspaceFileExportBehaviorTests
         using var culture = TestCulture.UseEnUs();
         var viewModel = CreateWorkspace();
         string path = TestFiles.NewTempFilePath("coordinate-artifacts-", ".csv");
-        viewModel.RequestSaveTextFileAsync = async request =>
-        {
-            await TextExportWriter.WriteAsync(path, request.Content, includeBom: true, TestContext.Current.CancellationToken);
-            return true;
-        };
+        viewModel.RequestSaveTextFileAsync = request => WriteTextAsync(path, request.Content);
         viewModel.CustomPointLabelText = "Probe, \"A\" 測試";
         viewModel.CustomPointMachineX = 25.25m;
         viewModel.CustomPointMachineY = 10.5m;
@@ -79,6 +75,12 @@ public sealed class CoordinateWorkspaceFileExportBehaviorTests
             window.Close();
             await HeadlessUiPump.FlushQueueAsync();
         }
+    }
+
+    private static async Task<bool> WriteTextAsync(string path, string content)
+    {
+        await TextExportWriter.WriteAsync(path, content, includeBom: true, TestContext.Current.CancellationToken);
+        return true;
     }
 
     private static CoordinatePlannerWorkspaceViewModel CreateWorkspace()

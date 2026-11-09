@@ -13,6 +13,12 @@ namespace FreeformHelper.Tests;
 
 public sealed class SimulationWorkspaceFileExportBehaviorTests
 {
+    private static async Task<bool> WriteTextAsync(string path, string content)
+    {
+        await TextExportWriter.WriteAsync(path, content, includeBom: true, TestContext.Current.CancellationToken);
+        return true;
+    }
+
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
     [Fact]
@@ -21,11 +27,7 @@ public sealed class SimulationWorkspaceFileExportBehaviorTests
         using var culture = TestCulture.UseEnUs();
         var viewModel = CreateWorkspace();
         string path = TestFiles.NewTempFilePath("copper-path-replay-", ".json");
-        viewModel.RequestSaveTextFileAsync = async request =>
-        {
-            await TextExportWriter.WriteAsync(path, request.Content, includeBom: true, TestContext.Current.CancellationToken);
-            return true;
-        };
+        viewModel.RequestSaveTextFileAsync = request => WriteTextAsync(path, request.Content);
         viewModel.ReplayCopperPath(new Point2(0.5d, 0.5d), new Point2(1.5d, 0.5d), stepCount: 2);
         var result = viewModel.ReplayCopperPath(new Point2(1.5d, 0.5d), new Point2(0.5d, 0.5d), stepCount: 3);
         var expected = CopperPillarPathReplayArtifactService.BuildSnapshot(result);
