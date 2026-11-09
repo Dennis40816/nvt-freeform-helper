@@ -520,10 +520,21 @@ try {
         @{ Lines = @('x.cs(1,1): error CS1002: PRIVATE-MARKER-DO-NOT-PRINT', 'y.cs(2,2): error MSB3027: again'); Exit = 1; Expected = 'build-error' },
         @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT', 'Test Run Aborted.'); Exit = 1; Expected = 'no-test-matches-filter,test-run-aborted'; Listed = 0 },
         # The host lists tests again after the empty run. Only the number is printed, never a listed name.
+        # Because the host lists tests, the empty start is run once more. The second start is empty as well, so the group stays failed.
         @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = 2
-            ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '    PRIVATE-MARKER-DO-NOT-PRINT.Second', '') },
+            ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '    PRIVATE-MARKER-DO-NOT-PRINT.Second', '')
+            Retry = 'retries=1 listed-tests=2 executed-tests=-1' },
         @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = -1
             ListLines = @('PRIVATE-MARKER-DO-NOT-PRINT listing failed'); ListExit = 1 },
+        # An empty start is run once more when the host lists tests now.
+        # The second run finds the tests. The group ends with the exit code of the second run and prints its test count.
+        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = ''
+            SecondLines = @('Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration: 1 s - FreeformHelper.Tests.dll (net10.0)'); SecondExit = 0
+            ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '')
+            Retry = 'retries=1 listed-tests=1 executed-tests=7' },
+        # A failing test is final: the host found the tests, so nothing is run again.
+        @{ Lines = @('Failed!  - Failed:     1, Passed:     4, Skipped:     0, Total:     5, Duration: 1 s - FreeformHelper.Tests.dll (net10.0)'); Exit = 1; Expected = ''
+            ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '') },
         @{ Lines = @('Test host process crashed PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 0; Expected = '' },
         @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT and nothing else'); Exit = 1; Expected = '' },
         @{ Lines = @(); StdErr = 'Test host process crashed PRIVATE-MARKER-DO-NOT-PRINT'; Exit = 1; Expected = 'test-host-crashed' },
@@ -534,10 +545,17 @@ try {
         Invoke-WithTemporaryEnvironmentVariables -Settings @{ FREEFORMHELPER_TEST_AREA = (Join-Path $testRoot 'test-area') } -Action {
             & {
                 function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
+                $runCalls = @{ Count = 0 }
                 function dotnet {
                     if ($args -contains '--list-tests') {
                         if ($case.ContainsKey('ListLines')) { foreach ($line in $case.ListLines) { Write-Output $line } }
                         $global:LASTEXITCODE = $(if ($case.ContainsKey('ListExit')) { $case.ListExit } else { 0 })
+                        return
+                    }
+                    $runCalls.Count++
+                    if ($runCalls.Count -gt 1 -and $case.ContainsKey('SecondExit')) {
+                        foreach ($line in $case.SecondLines) { Write-Output $line }
+                        $global:LASTEXITCODE = $case.SecondExit
                         return
                     }
                     foreach ($line in $case.Lines) { Write-Output $line }
@@ -574,15 +592,24 @@ try {
                 Assert-Policy (@($entryOutput | Where-Object { [string]$_ -like '*skipped tests on this machine*' }).Count -eq 0)
                 Assert-Policy (($entryOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
                 Assert-Policy ($message -ceq 'Shard validation failed.')
+                # A group is run again only after an empty start that the host can list tests for. The line holds numbers only.
+                $retryLines = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] retry-diagnostic *' })
+                if ($case.ContainsKey('Retry')) {
+                    Assert-Policy ($retryLines.Count -eq 1 -and
+                        [string]$retryLines[0] -ceq ('[verify] retry-diagnostic group=ui-snapshots {0}' -f $case.Retry))
+                } else {
+                    Assert-Policy ($retryLines.Count -eq 0)
+                }
                 # The native command finished with the exit code of the case. A runner exception before that
                 # would leave the exit code unset and change the phase, so the case could not pass by accident.
-                $expectedPhase = if ($case.Exit -eq 0) { 'read-results' } else { 'run-tests' }
+                $finalExit = if ($case.ContainsKey('SecondExit')) { $case.SecondExit } else { $case.Exit }
+                $expectedPhase = if ($finalExit -eq 0) { 'read-results' } else { 'run-tests' }
                 $expectedDiagnostic = '[check-test-shard] diagnostic shard=snapshots group=ui-snapshots phase={0} exit={1} trx-files=0 results-dir=missing' -f
-                    $expectedPhase, $case.Exit
+                    $expectedPhase, $finalExit
                 $diagnostics = @($entryOutput | Where-Object { [string]$_ -like '[[]check-test-shard] diagnostic *' })
                 Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -ceq $expectedDiagnostic)
                 $caseSummary = Get-Content -LiteralPath $summaryFile -Raw | ConvertFrom-Json
-                Assert-Policy (@($caseSummary.groups).Count -eq 1 -and $caseSummary.groups[0].exitCode -eq $case.Exit)
+                Assert-Policy (@($caseSummary.groups).Count -eq 1 -and $caseSummary.groups[0].exitCode -eq $finalExit)
             }
         }
     }

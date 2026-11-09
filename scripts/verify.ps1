@@ -240,7 +240,7 @@ function Invoke-TestShard {
             }
             foreach ($group in $shardGroups[$Name]) {
                 $groupDirectory = Join-Path $resultsDirectory $group
-                $runStatus = @{ ExitCode = $null; HostErrors = @() }
+                $runStatus = @{ ExitCode = $null; HostErrors = @(); RetryCount = 0 }
                 $phase = 'results-directory'
                 $exceptionType = $directoryExceptionType
                 if ([string]::IsNullOrEmpty($directoryExceptionType)) {
@@ -255,6 +255,11 @@ function Invoke-TestShard {
                         $runFailed = $true
                         $exceptionType = $_.Exception.GetType().FullName
                     }
+                }
+                # A group that was run again after an empty start: numbers only, so the line cannot carry a test name.
+                if ([int]$runStatus.RetryCount -gt 0) {
+                    Write-Host ('[verify] retry-diagnostic group={0} retries={1} listed-tests={2} executed-tests={3}' -f
+                        $group, $runStatus.RetryCount, $runStatus.RetryListedTests, $runStatus.ExecutedTests)
                 }
                 # Only fixed labels from run-tests.ps1 are printed. The output they came from is never printed.
                 if (@($runStatus.HostErrors).Count -gt 0) {

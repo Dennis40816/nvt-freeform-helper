@@ -17,6 +17,9 @@ if ($null -ne $RunStatus) {
     $RunStatus['HostErrors'] = @()
     $RunStatus['ElapsedSeconds'] = $null
     $RunStatus['ListedTests'] = $null
+    $RunStatus['RetryCount'] = 0
+    $RunStatus['RetryListedTests'] = $null
+    $RunStatus['ExecutedTests'] = $null
 }
 
 $project = "tests/FreeformHelper.Tests/FreeformHelper.Tests.csproj"
@@ -50,6 +53,9 @@ $hostErrorPatterns = [ordered]@{
     'build-error' = '\berror (MSB|CS|NETSDK|NU)[0-9]{3,5}\b'
 }
 $maxHostErrorLabels = 6
+# The host sometimes starts without finding any test, although the same filter lists tests afterwards.
+# A group that ends this way is run once more. Every other failure is final.
+$maxNoTestRetries = 1
 
 # After a run that found no test, ask the test host again how many tests it can list without the filter being
 # applied to a build. Only the number leaves this function, never a test name. -1 means the listing itself failed.
@@ -71,6 +77,23 @@ function Get-ListedTestCount {
     } catch {
         return -1
     }
+}
+
+# The number of tests the host reports in its summary lines ("Total: n"), or -1 when there is no summary line.
+# Only the number leaves this function, never a line of the output.
+function Get-ExecutedTestCount {
+    param(
+        [object[]]$Output
+    )
+
+    $total = -1
+    foreach ($item in $Output) {
+        if ([string]$item -match '\bTotal:\s+(?<count>[0-9]+)\b') {
+            $total = [math]::Max($total, 0) + [int]$Matches['count']
+        }
+    }
+
+    return $total
 }
 
 function Get-HostErrorLabels {
@@ -294,14 +317,32 @@ try {
     }
     $testExitCode = $LASTEXITCODE
     $runTimer.Stop()
+    $listArguments = @("test", $project, "-c", $Configuration, "--nologo", "--no-build", "--list-tests")
+    if ($UseNoAppHost) { $listArguments += "/p:UseAppHost=false" }
+    if (-not [string]::IsNullOrWhiteSpace($filter)) { $listArguments += @("--filter", $filter) }
+    $noTestRetries = 0
+    $retryListedTests = $null
+    # Only a captured run can be classified, so only a run with a results directory is retried.
+    while ($testExitCode -ne 0 -and $noTestRetries -lt $maxNoTestRetries -and
+        -not [string]::IsNullOrWhiteSpace($ResultsDirectory) -and
+        @(Get-HostErrorLabels -Output $hostOutput) -contains 'no-test-matches-filter') {
+        # Run again only when the host lists tests for the same filter now. A filter that matches nothing stays failed.
+        $retryListedTests = Get-ListedTestCount -ListArguments $listArguments
+        if ($retryListedTests -le 0) { break }
+        $noTestRetries++
+        $hostOutput = @(dotnet @args *>&1)
+        $testExitCode = $LASTEXITCODE
+    }
     if ($null -ne $RunStatus) {
         $RunStatus['ExitCode'] = [int]$testExitCode
+        $RunStatus['RetryCount'] = $noTestRetries
+        if ($noTestRetries -gt 0) {
+            $RunStatus['RetryListedTests'] = $retryListedTests
+            $RunStatus['ExecutedTests'] = Get-ExecutedTestCount -Output $hostOutput
+        }
         if ($testExitCode -ne 0) { $RunStatus['HostErrors'] = @(Get-HostErrorLabels -Output $hostOutput) }
         if (@($RunStatus['HostErrors']) -contains 'no-test-matches-filter') {
             $RunStatus['ElapsedSeconds'] = [int][math]::Round($runTimer.Elapsed.TotalSeconds)
-            $listArguments = @("test", $project, "-c", $Configuration, "--nologo", "--no-build", "--list-tests")
-            if ($UseNoAppHost) { $listArguments += "/p:UseAppHost=false" }
-            if (-not [string]::IsNullOrWhiteSpace($filter)) { $listArguments += @("--filter", $filter) }
             $RunStatus['ListedTests'] = Get-ListedTestCount -ListArguments $listArguments
         }
     }
