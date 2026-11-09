@@ -31,4 +31,22 @@ public sealed class MainWindowLayerPointerTests
         Assert.False(vm.GetWorkflowStateSnapshot().HasStep1Result);
         Assert.Empty(vm.MatchLinksForCanvas);
     }
+
+    [AvaloniaFact]
+    public async Task CtrlClick_SecondLayer_ShowsOnlyThatLayerAndClearsStep1ResultAsync()
+    {
+        using var culture = TestCulture.UseEnUs();
+        await using var fixture = await MainWindowGlobalInputFixture.CreateAsync();
+        var vm = fixture.Helper;
+        Assert.Equal("beta", vm.LayerToggles[1].Name);
+        await vm.MatchCommand.ExecuteAsync(null);
+        Assert.True(vm.GetWorkflowStateSnapshot().HasStep1Result);
+
+        await fixture.ClickLayerAsync("beta", RawInputModifiers.Control);
+
+        Assert.Equal(["beta"], vm.LayerToggles.Where(static layer => layer.IsSelected).Select(static layer => layer.Name));
+        Assert.All(vm.CadPads, static pad => Assert.Equal("beta", pad.Layer));
+        Assert.False(vm.GetWorkflowStateSnapshot().HasStep1Result);
+        Assert.Empty(vm.MatchLinksForCanvas);
+    }
 }

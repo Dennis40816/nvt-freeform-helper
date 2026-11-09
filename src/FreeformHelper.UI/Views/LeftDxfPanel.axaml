@@ -75,7 +75,6 @@
                 <DataTemplate>
                   <ToggleButton Classes="layerToggle"
                                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                PointerPressed="OnLayerTogglePointerPressedInternal"
                                 HorizontalAlignment="Stretch"
                                 HorizontalContentAlignment="Left"
                                 Padding="{StaticResource Inset4}"
