@@ -73,14 +73,13 @@ internal sealed class Program
         var builder = AppBuilder.Configure<App>() // Start configuration for the 'App' class.
             .UsePlatformDetect() // Automatically detect and configure for the current platform.
             .WithAppFonts() // Use the embedded Core font fallback.
-            .AfterPlatformServicesSetup(static _ => UiThread.RegisterRunningDispatcher(
-                Avalonia.Threading.Dispatcher.UIThread));
+            .AfterPlatformServicesSetup(static _ => UiThread.RegisterCurrentDispatcher());
 
 #if DEBUG
         builder = builder.LogToTrace();
 #else
         // Release default keeps startup leaner; allow forcing trace with env toggle.
-        var forceTrace = Environment.GetEnvironmentVariable("FREEFORM_ENABLE_AVALONIA_TRACE");
+        var forceTrace = Nvt.Core.Hosting.HostEnvironment.GetVariable("FREEFORM_ENABLE_AVALONIA_TRACE");
         if (string.Equals(forceTrace, "1", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(forceTrace, "true", StringComparison.OrdinalIgnoreCase))
         {

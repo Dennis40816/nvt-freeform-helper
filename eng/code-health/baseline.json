@@ -785,16 +785,6 @@
       "symbol": "NoWarn:1591"
     },
     {
-      "syntaxHash": "c7c0ce178aea3d14f1838e12bab4b081985ba7bb3ad6443f4abd4c3c3fd0f1fa",
-      "member": "MSBuild",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/FreeformHelper.UI.csproj",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "suppressions",
-      "symbol": "WarningsNotAsErrors:IDE1006"
-    },
-    {
       "syntaxHash": "2c4f3956570bce7332a7ff7f06c63c2ecd8ff0eaf045063be96b34e851276a6d",
       "member": "MSBuild",
       "owner": "NFH",
@@ -905,16 +895,6 @@
       "symbol": "IDE1006"
     },
     {
-      "syntaxHash": "5ffda8a7741863f733e79671929a04947a6989e9518ded807e574571d3d2864b",
-      "member": "FreeformHelper.UI.Services.StartupPerfTracker.fields:EmitAsInfo",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/StartupPerfTracker.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "IDE1006",
-      "symbol": "IDE1006"
-    },
-    {
       "syntaxHash": "c81479aacdeac4e155ffb4a148616edec1099939c2d2e6f02dfce9b430e9db33",
       "member": "FreeformHelper.Tests.HeadlessDispatcherSetup.EnsureRunLoopDispatcher()",
       "owner": "NFH",
@@ -925,46 +905,6 @@
       "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
     },
     {
-      "syntaxHash": "a7acb7fb5362c57787265cbc570807a07d1076f16d7ab96fcc825e50636ef092",
-      "member": "FreeformHelper.UI.Program.BuildAvaloniaApp()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Program.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "9f27bde447ba207d8e20e0967627ea4318f332ad3d21c46ab2e4db2ab390ddce",
-      "member": "FreeformHelper.UI.Program.BuildAvaloniaApp()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Program.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread"
-    },
-    {
-      "syntaxHash": "4eef2333991ded069ba9a43845baa8a7d0af35d2c7b9ea6d9e87fd55081c0a1f",
-      "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.BuildDefaultSettingsPath()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
-    },
-    {
-      "syntaxHash": "d5e0a1e98635e4783bfbd5ae429f1753cbdf3e48772163deade7c59d13664a09",
-      "member": "FreeformHelper.UI.Services.AppGeneralSettingsStore.BuildDefaultSettingsPath()",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/AppGeneralSettingsStore.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetFolderPath(System.Environment.SpecialFolder)"
-    },
-    {
       "syntaxHash": "6b5350c3e7e3a5915e401315a92d1e1ac68c5dcf69c9d261cbbeae3e752bfa10",
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.EnsureProcessStartedAsync()",
       "owner": "NFH",
@@ -973,16 +913,6 @@
       "count": 1,
       "rule": "RS0030",
       "symbol": "M:System.Diagnostics.Process.Start(System.Diagnostics.ProcessStartInfo)"
-    },
-    {
-      "syntaxHash": "5ffda8a7741863f733e79671929a04947a6989e9518ded807e574571d3d2864b",
-      "member": "FreeformHelper.UI.Services.StartupPerfTracker.fields:EmitAsInfo",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/StartupPerfTracker.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "RS0030",
-      "symbol": "M:System.Environment.GetEnvironmentVariable(System.String)"
     },
     {
       "syntaxHash": "e412e895bc654bb67e4f019d457b2283ff5bd04dac2d0f3cb916e45cb4761803",
