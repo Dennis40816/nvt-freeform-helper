@@ -121,13 +121,18 @@ public sealed partial class FreeformHelperViewModel
         SyncCadEditAggregateState(hadEdits, previous.HasAny);
     }
 
-    private void SyncDuplicateCadState(CadEditNotificationSnapshot? previous = null)
+    // Without a CAD, the saved visible duplicate ids stay in the project file (persistToProject: false).
+    private void SyncDuplicateCadState(CadEditNotificationSnapshot? previous = null, bool persistToProject = true)
     {
         previous ??= new CadEditNotificationSnapshot(this);
         NotifyCadEditProjectionChange(nameof(DuplicateCadPadCount), previous.Duplicate, DuplicateCadPadCount);
         NotifyCadEditProjectionChange(nameof(HasDuplicateCadPads), previous.Duplicate > 0, HasDuplicateCadPads);
         previous.Duplicate = DuplicateCadPadCount;
-        _projectFile.VisibleDuplicateCadPadIds = GetRestoredDuplicateCadPadIds();
+        if (persistToProject)
+        {
+            _projectFile.VisibleDuplicateCadPadIds = GetRestoredDuplicateCadPadIds();
+        }
+
         OnPropertyChanged(nameof(HasDetectedDuplicateCadPads));
         OnPropertyChanged(nameof(DuplicateDxfEditBadgeTooltip));
     }

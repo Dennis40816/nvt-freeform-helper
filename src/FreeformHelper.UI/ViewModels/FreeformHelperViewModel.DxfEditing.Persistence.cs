@@ -149,6 +149,21 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
+    // Drops the runtime edit state of the previous project when the new project has no DXF,
+    // so the edit badges and counts do not show values that belong to the previous DXF.
+    private DxfCombinedGroupReplayResult ClearDxfEditStateWithoutCad(
+        PersistedDxfEditProjectState state, CadEditNotificationSnapshot previous)
+    {
+        ClearDxfEditRuntimeState(resetBaseline: false, previous);
+        ClearAutoHiddenDuplicateCadPadState();
+        SyncRelayeredCadState(previous);
+        SyncRotatedCadState(previous);
+        SyncHiddenCadIdsToProject(previous);
+        SyncCombinedCadState(previous);
+        SyncDuplicateCadState(previous, persistToProject: false);
+        return KeepCombinedGroupsWithoutCad(state.CombinedCadGroups);
+    }
+
     // Keeps the saved groups of a project whose DXF is not available, so the next save does not drop them.
     private DxfCombinedGroupReplayResult KeepCombinedGroupsWithoutCad(List<ProjectDxfCombinedCadGroup> combinedGroups)
     {
@@ -165,14 +180,7 @@ public sealed partial class FreeformHelperViewModel
 
         if (_cad is null)
         {
-            ClearDxfEditRuntimeState(resetBaseline: false, previous);
-            ClearAutoHiddenDuplicateCadPadState();
-            SyncRelayeredCadState(previous);
-            SyncRotatedCadState(previous);
-            SyncHiddenCadIdsToProject(previous);
-            SyncCombinedCadState(previous);
-            SyncDuplicateCadState(previous);
-            return KeepCombinedGroupsWithoutCad(state.CombinedCadGroups);
+            return ClearDxfEditStateWithoutCad(state, previous);
         }
 
         var layerSelectionSnapshot = CaptureLayerSelectionSnapshot();
@@ -341,7 +349,8 @@ public sealed partial class FreeformHelperViewModel
 
     private DxfCombinedGroupReplayResult KeepDxfEditsWithoutCad(ProjectFile file)
     {
-        var replay = KeepCombinedGroupsWithoutCad(CapturePersistedDxfEditProjectState(file).CombinedCadGroups);
+        var replay = ClearDxfEditStateWithoutCad(
+            CapturePersistedDxfEditProjectState(file), new CadEditNotificationSnapshot(this));
         if (!string.IsNullOrWhiteSpace(file.LastDxfPath))
         {
             replay.CadFallbackWarning =
