@@ -76,7 +76,9 @@ public sealed partial class FreeformHelperViewModel
         var matchText = PadInspectorMatchFormatter.BuildRegularMatchText(matchedCadDetails, matchedCadIds);
         var matchDetailsText = PadInspectorMatchFormatter.BuildRegularMatchDetailsText(matchedCadDetails, matchedLinks);
         var diffSource = PadInspectorMatchFormatter.BuildRegularDiffSource(regularPad.DiffIndex, matchedCadDetails);
-        var (freeformSource, freeformSourceDetail) = BuildRegularFreeformSource(regularPad);
+        var (freeformSource, freeformSourceDetail) = PadInspectorDisplayProjector.BuildRegularFreeformSource(
+            regularPad,
+            _projectFile.FreeformOverrides);
         var confidence = matchedCadDetails.Count == 0
             ? 0.0
             : matchedCadDetails.Max(detail => detail.CadCoverage);
