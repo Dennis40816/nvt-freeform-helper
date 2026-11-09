@@ -11,7 +11,7 @@ public sealed partial class FreeformHelperView
 {
     internal static Func<ICadLoadSpinnerHost> CadLoadSpinnerHostFactory { get; set; } = static () => CadLoadSpinnerHostService.SharedHost;
 
-    internal ICadLoadSpinnerHost? CadLoadSpinnerHostForTest => _cadLoadSpinnerHost;
+    internal ICadLoadSpinnerHost? CadLoadSpinnerHostForTest => _cadLoadSpinner.Host;
 
     private void AttachCadLoadSpinnerWindow(FreeformHelperViewModel viewModel)
     {
@@ -22,8 +22,7 @@ public sealed partial class FreeformHelperView
 
         _observedViewModel = viewModel;
         _observedViewModel.PropertyChanged += OnObservedViewModelPropertyChanged;
-        _cadLoadSpinnerHost ??= CadLoadSpinnerHostFactory();
-        _cadLoadSpinnerHost.Warmup();
+        _cadLoadSpinner.Warmup(CadLoadSpinnerHostFactory);
         SyncCadLoadSpinnerHost();
     }
 
@@ -36,9 +35,7 @@ public sealed partial class FreeformHelperView
 
         _observedViewModel.PropertyChanged -= OnObservedViewModelPropertyChanged;
         _observedViewModel = null;
-        _cadLoadSpinnerHost?.Hide();
-        _cadLoadSpinnerHost?.Dispose();
-        _cadLoadSpinnerHost = null;
+        _cadLoadSpinner.Detach();
     }
 
     private void OnObservedViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -66,51 +63,11 @@ public sealed partial class FreeformHelperView
 
     private void SyncCadLoadSpinnerHost()
     {
-        if (_observedViewModel is null)
-        {
-            HideCadLoadSpinnerHost();
-            return;
-        }
-
-        var shouldShow = _observedViewModel.IsCadLoadCanvasOverlayVisible ||
-                         _observedViewModel.IsModalLoadingSpinnerVisible;
-        if (shouldShow)
-        {
-            CadLoadSpinnerDebugState.RecordViewHostSync("show", overlayVisible: true);
-            ShowCadLoadSpinnerHost();
-            return;
-        }
-
-        CadLoadSpinnerDebugState.RecordViewHostSync("hide", overlayVisible: false);
-        HideCadLoadSpinnerHost();
-    }
-
-    private void ShowCadLoadSpinnerHost()
-    {
-        if (_isCadLoadSpinnerHostVisible)
-        {
-            return;
-        }
-
-        var owner = TopLevel.GetTopLevel(this) as Window;
-        if (owner is null)
-        {
-            return;
-        }
-
-        _cadLoadSpinnerHost ??= CadLoadSpinnerHostFactory();
-        _cadLoadSpinnerHost.Show(owner);
-        _isCadLoadSpinnerHostVisible = true;
-    }
-
-    private void HideCadLoadSpinnerHost()
-    {
-        if (!_isCadLoadSpinnerHostVisible)
-        {
-            return;
-        }
-
-        _cadLoadSpinnerHost?.Hide();
-        _isCadLoadSpinnerHostVisible = false;
+        _cadLoadSpinner.Sync(
+            _observedViewModel is not null,
+            _observedViewModel?.IsCadLoadCanvasOverlayVisible ?? false,
+            _observedViewModel?.IsModalLoadingSpinnerVisible ?? false,
+            () => TopLevel.GetTopLevel(this) as Window,
+            CadLoadSpinnerHostFactory);
     }
 }
