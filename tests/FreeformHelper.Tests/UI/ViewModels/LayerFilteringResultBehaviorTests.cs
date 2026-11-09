@@ -47,7 +47,7 @@ public sealed class LayerFilteringResultBehaviorTests
     }
 
     [AvaloniaFact]
-    public async Task ImportAllZeroMask_PreservesGeometryDiffsWithoutRepairingOntoInactiveCellsAsync()
+    public async Task ImportAllZeroMask_LeavesCadWithoutOutputIndexAndDoesNotRepairOntoInactiveCellsAsync()
     {
         using var culture = TestCulture.UseEnUs();
         var vm = await OpenWorkspaceAsync([("fixed", 0, 0, 10, 10), ("repair", 0, 0, 19, 10)], cascadeCount: 1);
@@ -65,10 +65,8 @@ public sealed class LayerFilteringResultBehaviorTests
         Assert.Contains("Active=0, inactive=2, frames=1.", vm.StatusText, StringComparison.Ordinal);
         Assert.Equal(2, vm.CadPads.Count);
         Assert.Equal(2, vm.RegularPads.Count);
-        Assert.True(vm.TryGetCadOutputFwDiffIndex(fixedId, out var actualFixed));
-        Assert.True(vm.TryGetCadOutputFwDiffIndex(repairId, out var actualRepair));
-        Assert.Equal(fixedDiff, actualFixed);
-        Assert.Equal(repairDiff, actualRepair);
+        Assert.False(vm.TryGetCadOutputFwDiffIndex(fixedId, out _));
+        Assert.False(vm.TryGetCadOutputFwDiffIndex(repairId, out _));
         Assert.Null(vm.GetCadOutputFwDiffIndexOverride(repairId));
         var summary = vm.GetCadOutputFwDiffAssignmentDecisionSummarySnapshot();
         Assert.Equal("csv-constrained", summary.Mode);
