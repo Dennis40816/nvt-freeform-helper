@@ -1,5 +1,3 @@
-using System.Globalization;
-using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
 
@@ -7,14 +5,14 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private Step4DuplicateDiffGroupViewModel[] _step4DuplicateDiffGroups = Array.Empty<Step4DuplicateDiffGroupViewModel>();
+    private readonly Step4DuplicateGroupsModel _step4DuplicateGroups = new();
 
-    public IReadOnlyList<Step4DuplicateDiffGroupViewModel> Step4DuplicateDiffGroups => _step4DuplicateDiffGroups;
+    public IReadOnlyList<Step4DuplicateDiffGroupViewModel> Step4DuplicateDiffGroups => _step4DuplicateGroups.Groups;
 
     /// <summary>
     /// Gets a value indicating whether duplicate diff groups are currently present in Step 4.
     /// </summary>
-    public bool HasStep4DuplicateDiffGroups => _step4DuplicateDiffGroups.Length > 0;
+    public bool HasStep4DuplicateDiffGroups => _step4DuplicateGroups.HasGroups;
 
     private void RefreshStep4DuplicateDiffGroups(
         IReadOnlyList<CadPad>? orderedVisiblePads = null,
@@ -22,106 +20,19 @@ public sealed partial class FreeformHelperViewModel
     {
         var orderedPads = orderedVisiblePads ?? CadPads.ToList();
         workflowSnapshot ??= BuildWorkflowDataSnapshot();
-        if (orderedPads.Count == 0 || workflowSnapshot.CadOutputFwDiffIndexByCadId.Count == 0)
-        {
-            _step4DuplicateDiffGroups = Array.Empty<Step4DuplicateDiffGroupViewModel>();
-            Step4Index.DuplicateDiffSummary = "Duplicate CAD Output FW Diff: none.";
-            OnPropertyChanged(nameof(Step4DuplicateDiffGroups));
-            OnPropertyChanged(nameof(HasStep4DuplicateDiffGroups));
-            return;
-        }
-
-        IReadOnlyDictionary<int, CadBestMatchSeed>? rawSeedByCadId = null;
-        IReadOnlyDictionary<int, CadBestMatchSeed>? maskedSeedByCadId = null;
-        if (workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId.Count > 0)
-        {
-            rawSeedByCadId = workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId.ToDictionary(
-                static pair => pair.Key,
-                static pair => pair.Value.RawSeed);
-            maskedSeedByCadId = workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId.ToDictionary(
-                static pair => pair.Key,
-                static pair => pair.Value.MaskedSeed);
-        }
-        else if (_grid is not null && workflowSnapshot.CadToRegularByCadId.Count > 0)
-        {
-            var regularPadById = _grid.Pads.ToDictionary(static pad => pad.RegularPadId);
-            rawSeedByCadId = CadBestMatchSeedService.BuildSeedDetailsByCadId(
-                orderedPads,
-                workflowSnapshot.CadToRegularByCadId,
-                regularPadById,
-                workflowSnapshot.CadIcIndexByCadId,
-                activeRegularPadIds: null);
-            maskedSeedByCadId = CadBestMatchSeedService.BuildSeedDetailsByCadId(
-                orderedPads,
-                workflowSnapshot.CadToRegularByCadId,
-                regularPadById,
-                workflowSnapshot.CadIcIndexByCadId,
-                workflowSnapshot.ActiveRegularVisibilityMaskPadIds);
-        }
-
-        var duplicateGroups = CadOutputFwDiffIndexDuplicateReviewService.BuildGroups(
+        var result = DxfDuplicateGroupBuilder.Build(
             orderedPads,
-            workflowSnapshot.CadOutputFwDiffIndexByCadId,
-            workflowSnapshot.CadIcIndexByCadId,
-            rawSeedByCadId,
-            maskedSeedByCadId);
-
-        _step4DuplicateDiffGroups = duplicateGroups
-            .Select(static group => new Step4DuplicateDiffGroupViewModel(
-                group.IcIndex,
-                group.DiffIndex,
-                group.Entries.Select(static entry => entry.CadPadId).ToArray(),
-                TitleText: FormattableString.Invariant($"IC{group.IcIndex + 1} · diff {group.DiffIndex}"),
-                CadSummaryText: string.Join(
-                    Environment.NewLine,
-                    group.Entries.Select(static entry =>
-                    {
-                        var rawText = entry.RawBestDiffIndex.HasValue
-                            ? $"raw {entry.RawBestDiffIndex}"
-                            : "raw -";
-                        var maskedText = entry.MaskedBestDiffIndex.HasValue
-                            ? $"masked {entry.MaskedBestDiffIndex}"
-                            : "masked -";
-                        return FormattableString.Invariant(
-                            $"CAD {entry.CadPadId} [{entry.LayerName}] -> current {entry.CurrentDiffIndex}, {rawText}, {maskedText}");
-                    })),
-                SuggestionText: BuildDuplicateSuggestion(group)))
-            .ToArray();
-
-        Step4Index.DuplicateDiffSummary = BuildStep4DuplicateDiffSummary(_step4DuplicateDiffGroups);
+            new DxfDuplicateGroupInputs(
+                workflowSnapshot.CadOutputFwDiffIndexByCadId,
+                workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId,
+                workflowSnapshot.CadIcIndexByCadId,
+                workflowSnapshot.CadToRegularByCadId,
+                workflowSnapshot.ActiveRegularVisibilityMaskPadIds),
+            _grid);
+        _step4DuplicateGroups.Replace(result.Groups);
+        Step4Index.DuplicateDiffSummary = result.Summary;
         OnPropertyChanged(nameof(Step4DuplicateDiffGroups));
         OnPropertyChanged(nameof(HasStep4DuplicateDiffGroups));
-    }
-
-    private static string BuildDuplicateSuggestion(CadOutputFwDiffIndexDuplicateReviewGroup group)
-    {
-        var rawDiffs = group.Entries
-            .Select(static entry => entry.RawBestDiffIndex)
-            .Distinct()
-            .OrderBy(static diff => diff ?? int.MaxValue)
-            .Select(static diff => diff?.ToString(CultureInfo.InvariantCulture) ?? "-")
-            .ToArray();
-        var maskedDiffs = group.Entries
-            .Select(static entry => entry.MaskedBestDiffIndex)
-            .Distinct()
-            .OrderBy(static diff => diff ?? int.MaxValue)
-            .Select(static diff => diff?.ToString(CultureInfo.InvariantCulture) ?? "-")
-            .ToArray();
-        return FormattableString.Invariant(
-            $"Use Select to load these CAD pads into the shared diff-shift workflow. Raw candidates: {string.Join("/", rawDiffs)} · Masked candidates: {string.Join("/", maskedDiffs)}.");
-    }
-
-    private static string BuildStep4DuplicateDiffSummary(Step4DuplicateDiffGroupViewModel[] groups)
-    {
-        if (groups.Length == 0)
-        {
-            return "Duplicate CAD Output FW Diff: none.";
-        }
-
-        var impactedCadCount = groups.Sum(static group => group.CadPadIds.Count);
-        var sample = groups[0];
-        return FormattableString.Invariant(
-            $"Duplicate CAD Output FW Diff: {groups.Length} group(s), {impactedCadCount} CAD pad(s). Sample: IC{sample.IcIndex + 1}/diff{sample.DiffIndex} -> CAD {string.Join(", ", sample.CadPadIds)}.");
     }
 
     private void SelectStep4DuplicateDiffGroup(Step4DuplicateDiffGroupViewModel? group)

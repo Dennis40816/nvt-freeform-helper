@@ -112,9 +112,9 @@ public sealed partial class FreeformHelperViewModel
     private string? ReportSimulationDuplicateDiffWarning(SimulationBuildReporter reporter)
     {
         string? duplicateWarningMessage = null;
-        if (_step4DuplicateDiffGroups.Length > 0)
+        if (HasStep4DuplicateDiffGroups)
         {
-            var sample = _step4DuplicateDiffGroups[0];
+            var sample = Step4DuplicateDiffGroups[0];
             duplicateWarningMessage = string.Format(
                 CultureInfo.InvariantCulture,
                 "Simulation warning: duplicate CAD output FW diff at IC{0}/diff{1}; results may include ambiguous mappings.",
@@ -124,7 +124,7 @@ public sealed partial class FreeformHelperViewModel
                 CultureInfo.InvariantCulture,
                 "{0} duplicate-groups={1} sample-cads={2}.",
                 duplicateWarningMessage,
-                _step4DuplicateDiffGroups.Length,
+                Step4DuplicateDiffGroups.Count,
                 string.Join(", ", sample.CadPadIds));
             if (!reporter.Silent)
             {
