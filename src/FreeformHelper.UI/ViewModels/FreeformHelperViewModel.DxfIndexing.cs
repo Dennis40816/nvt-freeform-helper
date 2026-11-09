@@ -14,42 +14,25 @@ public sealed partial class FreeformHelperViewModel
 
     public void SetCadOutputFwDiffIndexOverride(int cadPadId, int targetIndex)
     {
-        var clampedIndex = Math.Clamp(targetIndex, 0, 1_000_000);
         var overrides = _projectFile.CadOutputFwDiffIndexOverrides;
-        var targetIc = _cadIcIndexByCadId.TryGetValue(cadPadId, out var inferredIc)
-            ? inferredIc
-            : (int?)null;
-        var hadPrevious = overrides.TryGetValue(cadPadId, out var previousIndex);
-        if (hadPrevious && previousIndex == clampedIndex)
+        var result = DxfOverrideService.SetOverride(cadPadId, targetIndex, overrides, _cadIcIndexByCadId);
+        if (!result.Changed)
         {
             return;
         }
 
-        var replaced = overrides
-            .Where(kv =>
-                kv.Key != cadPadId &&
-                kv.Value == clampedIndex &&
-                IsSameIcForOverrideConflict(kv.Key, targetIc))
-            .ToDictionary(kv => kv.Key, kv => kv.Value);
-
-        foreach (var cadId in replaced.Keys)
-        {
-            overrides.Remove(cadId);
-        }
-
-        overrides[cadPadId] = clampedIndex;
         PushUndo(() =>
         {
-            if (hadPrevious)
+            if (result.HadPrevious)
             {
-                overrides[cadPadId] = previousIndex;
+                overrides[cadPadId] = result.PreviousIndex;
             }
             else
             {
                 overrides.Remove(cadPadId);
             }
 
-            foreach (var pair in replaced)
+            foreach (var pair in result.ReplacedOverrides)
             {
                 overrides[pair.Key] = pair.Value;
             }
@@ -61,25 +44,22 @@ public sealed partial class FreeformHelperViewModel
         InvalidateDownstreamFromStep4(showStatus: false);
         NotifySimulationWorkspaceSourceChanged();
         MarkUnsaved();
-        SetStatus(
-            replaced.Count == 0
-                ? BuildOverrideSavedMessage(cadPadId, clampedIndex, targetIc)
-                : $"{BuildOverrideSavedMessage(cadPadId, clampedIndex, targetIc)} Replaced {replaced.Count} conflicting override(s) in same IC.");
+        SetStatus(result.Message);
     }
 
     public void ClearCadOutputFwDiffIndexOverride(int cadPadId)
     {
         var overrides = _projectFile.CadOutputFwDiffIndexOverrides;
-        if (!overrides.TryGetValue(cadPadId, out var previousIndex))
+        var result = DxfOverrideService.ClearOverride(cadPadId, overrides);
+        if (!result.HadPrevious)
         {
             SetStatus($"CAD Output FW Diff override clear: CAD {cadPadId} has no override.");
             return;
         }
 
-        overrides.Remove(cadPadId);
         PushUndo(() =>
         {
-            overrides[cadPadId] = previousIndex;
+            overrides[cadPadId] = result.PreviousIndex;
             UpdateCadOutputFwDiffIndexing(CadPads.ToList());
         }, "CAD Output FW Diff override clear");
 
@@ -92,13 +72,7 @@ public sealed partial class FreeformHelperViewModel
 
     public bool IsCadOutputFwDiffIndexAnchorCadPad(int cadPadId)
     {
-        if (!_cadIcIndexByCadId.TryGetValue(cadPadId, out var icIndex))
-        {
-            return false;
-        }
-
-        return _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.TryGetValue(icIndex, out var anchorCadId) &&
-               anchorCadId == cadPadId;
+        return DxfOverrideService.IsAnchor(cadPadId, _cadIcIndexByCadId, _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc);
     }
 
     public void SetCadOutputFwDiffIndexAnchorCadPad(int cadPadId)
@@ -149,28 +123,6 @@ public sealed partial class FreeformHelperViewModel
         NotifySimulationWorkspaceSourceChanged();
         MarkUnsaved();
         SetStatus($"CAD Output FW Diff anchor cleared: IC {icIndex + 1} uses scan-order first CAD.");
-    }
-
-    private bool IsSameIcForOverrideConflict(int cadPadId, int? targetIc)
-    {
-        if (!targetIc.HasValue)
-        {
-            return true;
-        }
-
-        if (_cadIcIndexByCadId.TryGetValue(cadPadId, out var otherIc))
-        {
-            return otherIc == targetIc.Value;
-        }
-
-        return false;
-    }
-
-    private static string BuildOverrideSavedMessage(int cadPadId, int index, int? targetIc)
-    {
-        return targetIc.HasValue
-            ? $"CAD Output FW Diff override saved: IC {targetIc.Value + 1}, CAD {cadPadId} -> {index}."
-            : $"CAD Output FW Diff override saved: CAD {cadPadId} -> {index}.";
     }
 
     /// <summary>

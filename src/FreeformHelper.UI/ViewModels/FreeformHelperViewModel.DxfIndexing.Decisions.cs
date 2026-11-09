@@ -1,5 +1,3 @@
-using FreeformHelper.Application.Services;
-
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
@@ -12,29 +10,7 @@ public sealed partial class FreeformHelperViewModel
             return CadOutputFwDiffAssignmentDecisionSummarySnapshot.Empty;
         }
 
-        var decisions = snapshot.CadOutputFwDiffAssignmentDecisionsByCadId.Values.ToArray();
-        var mode = decisions
-            .GroupBy(static decision => decision.Mode)
-            .OrderByDescending(static group => group.Count())
-            .ThenBy(static group => group.Key)
-            .Select(static group => group.Key)
-            .FirstOrDefault();
-        var reasonCounts = decisions
-            .GroupBy(static decision => decision.ReasonCode.ToContractString())
-            .OrderByDescending(static group => group.Count())
-            .ThenBy(static group => group.Key, StringComparer.Ordinal)
-            .ToDictionary(static group => group.Key, static group => group.Count(), StringComparer.Ordinal);
-        var sourceCounts = decisions
-            .GroupBy(static decision => decision.DecisionSource.ToContractString())
-            .OrderByDescending(static group => group.Count())
-            .ThenBy(static group => group.Key, StringComparer.Ordinal)
-            .ToDictionary(static group => group.Key, static group => group.Count(), StringComparer.Ordinal);
-
-        return new CadOutputFwDiffAssignmentDecisionSummarySnapshot(
-            DecisionCount: decisions.Length,
-            Mode: mode.ToContractString(),
-            ReasonCounts: reasonCounts,
-            DecisionSourceCounts: sourceCounts);
+        return DxfAssignmentSummaryBuilder.Build(snapshot.CadOutputFwDiffAssignmentDecisionsByCadId.Values.ToArray());
     }
 }
 
