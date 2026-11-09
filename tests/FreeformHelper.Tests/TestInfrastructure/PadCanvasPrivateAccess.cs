@@ -164,4 +164,7 @@ internal static class PadCanvasPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_pendingSingleHit")]
     public static extern ref PadCanvas.HitResult? PendingSingleHit(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_lastSingleSelectedPad")]
+    public static extern ref PadCanvas.HitResult? LastSingleSelectedPad(PadCanvas canvas);
 }
