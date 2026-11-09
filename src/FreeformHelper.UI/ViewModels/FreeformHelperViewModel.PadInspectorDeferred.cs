@@ -15,8 +15,8 @@ public sealed partial class FreeformHelperViewModel
     private const int PadInspectorDeferredRefreshDelayMs = 200;
     private const int RegularPadInspectorDeferredRefreshDelayMs = 150;
 
-    private CancellationTokenSource? _padInspectorDeferredRefreshCts;
-    private CancellationTokenSource? _regularPadInspectorDeferredRefreshCts;
+    private readonly PadInspectorDeferredRefreshSlot _padInspectorDeferredCadSlot = new();
+    private readonly PadInspectorDeferredRefreshSlot _padInspectorDeferredRegularSlot = new();
 
     public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId)
     {
@@ -29,7 +29,7 @@ public sealed partial class FreeformHelperViewModel
     {
         CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: false);
         var cts = new CancellationTokenSource();
-        _padInspectorDeferredRefreshCts = cts;
+        _padInspectorDeferredCadSlot.Install(cts);
         var requestId = _padInspectorRequests.NextCadRefreshRequestId();
         UpdatePadInspectorDeferredRefreshPendingState();
         BackgroundWork.Run(
@@ -48,7 +48,7 @@ public sealed partial class FreeformHelperViewModel
     {
         CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: false);
         var cts = new CancellationTokenSource();
-        _regularPadInspectorDeferredRefreshCts = cts;
+        _padInspectorDeferredRegularSlot.Install(cts);
         var requestId = _padInspectorRequests.NextRegularRefreshRequestId();
         UpdatePadInspectorDeferredRefreshPendingState();
         BackgroundWork.Run(
@@ -58,18 +58,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void CancelDeferredCadInspectorSnapshotRefresh(bool clearPendingState)
     {
-        var cts = Interlocked.Exchange(ref _padInspectorDeferredRefreshCts, null);
-        if (cts is not null)
-        {
-            try
-            {
-                cts.Cancel();
-            }
-            finally
-            {
-                cts.Dispose();
-            }
-        }
+        _padInspectorDeferredCadSlot.Cancel();
 
         if (clearPendingState)
         {
@@ -79,18 +68,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void CancelDeferredRegularInspectorSnapshotRefresh(bool clearPendingState)
     {
-        var cts = Interlocked.Exchange(ref _regularPadInspectorDeferredRefreshCts, null);
-        if (cts is not null)
-        {
-            try
-            {
-                cts.Cancel();
-            }
-            finally
-            {
-                cts.Dispose();
-            }
-        }
+        _padInspectorDeferredRegularSlot.Cancel();
 
         if (clearPendingState)
         {
@@ -227,9 +205,8 @@ public sealed partial class FreeformHelperViewModel
         }
         finally
         {
-            if (ReferenceEquals(Interlocked.CompareExchange(ref _padInspectorDeferredRefreshCts, null, cts), cts))
+            if (_padInspectorDeferredCadSlot.TryComplete(cts))
             {
-                cts.Dispose();
                 UpdatePadInspectorDeferredRefreshPendingState();
             }
         }
@@ -362,9 +339,8 @@ public sealed partial class FreeformHelperViewModel
         }
         finally
         {
-            if (ReferenceEquals(Interlocked.CompareExchange(ref _regularPadInspectorDeferredRefreshCts, null, cts), cts))
+            if (_padInspectorDeferredRegularSlot.TryComplete(cts))
             {
-                cts.Dispose();
                 UpdatePadInspectorDeferredRefreshPendingState();
             }
         }
@@ -458,8 +434,8 @@ public sealed partial class FreeformHelperViewModel
     private void UpdatePadInspectorDeferredRefreshPendingState()
     {
         PadInspectorUi.IsDeferredRefreshPending =
-            _padInspectorDeferredRefreshCts is not null ||
-            _regularPadInspectorDeferredRefreshCts is not null;
+            _padInspectorDeferredCadSlot.IsActive ||
+            _padInspectorDeferredRegularSlot.IsActive;
     }
 
     private sealed record DeferredCadInspectorContext(
