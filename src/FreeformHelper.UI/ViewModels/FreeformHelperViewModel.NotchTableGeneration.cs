@@ -77,7 +77,7 @@ public sealed partial class FreeformHelperViewModel
             var effectiveGrid = projectToCadOutputFwDiff ? projection.Grid : grid;
 
             var stage2ElapsedMs = (long)TimeProvider.System.GetElapsedTime(stage2StartedAt).TotalMilliseconds;
-            var crossIcMismatch = BuildCrossIcMismatchSnapshot(grid);
+            var crossIcMismatch = NotchCrossIcMismatch.BuildCrossIcMismatchSnapshot(grid);
             LogNotchGenerationMetrics(operationLabel, stage2ElapsedMs, cacheLookup, crossIcMismatch, projection, projectToCadOutputFwDiff, effectiveTable);
 
             if (!TryAcceptNotchGeneration(operationLabel, generationEpoch, finalProjectionRevision, sourceRevision, inputs, table, resolvedBatch, legacyTableToStore))
@@ -135,7 +135,7 @@ public sealed partial class FreeformHelperViewModel
         var exportSettings = CreateExportSettingsSnapshot(_projectFile.Settings);
         var activeRegularPadIds = GetActiveRegularPadIdsForNotchComputation();
         var activeRegularHash = ComputeActiveRegularHash(activeRegularPadIds);
-        var cadOutputFwDiffHash = ComputeCadOutputFwDiffHash(workflowSnapshot.CadOutputFwDiffIndexByCadId);
+        var cadOutputFwDiffHash = NotchExportFingerprints.ComputeCadOutputFwDiffHash(workflowSnapshot.CadOutputFwDiffIndexByCadId);
         var step3Revision = GetNotchStep3Revision();
         var selectedSparseResultRequest = exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation
             ? NotchSparseResultUseCase.CreateRequest(
@@ -153,8 +153,8 @@ public sealed partial class FreeformHelperViewModel
             : null;
         var generationSettingsFingerprint = exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation
             ? NotchTableGenerator.ComputeCadAllocationResolvedBatchSettingsFingerprint(exportSettings)
-            : ComputeNotchExportSettingsFingerprint(exportSettings);
-        var settingsFingerprint = CombineNotchExportSettingsFingerprint(
+            : NotchExportFingerprints.ComputeNotchExportSettingsFingerprint(exportSettings);
+        var settingsFingerprint = NotchExportFingerprints.CombineNotchExportSettingsFingerprint(
             generationSettingsFingerprint,
             activeRegularHash,
             cadOutputFwDiffHash);

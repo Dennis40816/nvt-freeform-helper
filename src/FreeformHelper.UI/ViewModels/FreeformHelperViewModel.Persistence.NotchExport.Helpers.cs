@@ -32,28 +32,7 @@ public sealed partial class FreeformHelperViewModel
     }
 
     internal static string ResolveSuggestedNotchExportBaseName(string requestedBaseName, string extension, NotchTable table)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(requestedBaseName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(extension);
-        ArgumentNullException.ThrowIfNull(table);
-
-        var normalizedExtension = extension.TrimStart('.').Trim();
-        if (!string.Equals(normalizedExtension, "c", StringComparison.OrdinalIgnoreCase))
-        {
-            return requestedBaseName;
-        }
-
-        var versions = table.Rows
-            .Select(static row => row.Version)
-            .Distinct()
-            .ToList();
-        if (versions.Count != 1)
-        {
-            return requestedBaseName;
-        }
-
-        return $"notch_{versions[0].ToDisplayLabel()}";
-    }
+        => NotchExportText.ResolveSuggestedNotchExportBaseName(requestedBaseName, extension, table);
 
     private void ApplyNotchExportTypeSelection(NotchExportFileTypeOption selectedOption, string exportKind)
     {
@@ -170,7 +149,7 @@ public sealed partial class FreeformHelperViewModel
     private void ReportExportGenerationProgress(string exportKind, NotchGenerationProgress progress)
     {
         var status = CreateStatusScope("NotchExport");
-        var phaseFraction = ComputeGenerationPhaseFraction(progress);
+        var phaseFraction = NotchExportText.ComputeGenerationPhaseFraction(progress);
         var stageStart = 1.0 / NotchExportStageCount;
         var stageSpan = 1.0 / NotchExportStageCount;
         NotchExportProgress = stageStart + stageSpan * Math.Clamp(phaseFraction, 0.0, 1.0);
@@ -223,31 +202,10 @@ public sealed partial class FreeformHelperViewModel
         NotchGenerationProgress progress,
         Action<string>? progressTextReporter = null)
     {
-        NotchExportProgress = Math.Clamp(ComputeGenerationPhaseFraction(progress), 0.0, 1.0);
-        var message = BuildStep5GenerationProgressText(operationLabel, progress);
+        NotchExportProgress = Math.Clamp(NotchExportText.ComputeGenerationPhaseFraction(progress), 0.0, 1.0);
+        var message = NotchExportText.BuildStep5GenerationProgressText(operationLabel, progress);
         NotchExportProgressText = message;
         progressTextReporter?.Invoke(message);
-    }
-
-    private static double ComputeGenerationPhaseFraction(NotchGenerationProgress progress)
-    {
-        var total = Math.Max(progress.TotalCount, 1);
-        var processed = Math.Clamp(progress.ProcessedCount, 0, total);
-        var phaseStepCount = Math.Max(progress.PhaseStepCount, 1);
-        var phaseStep = Math.Clamp(progress.PhaseStep <= 0 ? 1 : progress.PhaseStep, 1, phaseStepCount);
-        return ((phaseStep - 1) + (processed / (double)total)) / phaseStepCount;
-    }
-
-    private static string BuildStep5GenerationProgressText(string operationLabel, NotchGenerationProgress progress)
-    {
-        var displayTotal = Math.Max(progress.TotalCount, 0);
-        var displayProcessed = displayTotal <= 0
-            ? 0
-            : Math.Clamp(progress.ProcessedCount, 0, displayTotal);
-        var phaseLabel = string.IsNullOrWhiteSpace(progress.Phase)
-            ? "Scan CAD"
-            : progress.Phase;
-        return $"{operationLabel}: {phaseLabel} {displayProcessed}/{displayTotal}, rows={progress.GeneratedRowCount}";
     }
 
     private static ProjectSettings CreateExportSettingsSnapshot(ProjectSettings source)
@@ -280,156 +238,4 @@ public sealed partial class FreeformHelperViewModel
         };
     }
 
-    private static string BuildStage2RowSummary(
-        string exportKind,
-        NotchTable table,
-        CrossIcMismatchSnapshot crossIcMismatch)
-    {
-        var versionText = BuildVersionBreakdownText(table);
-        var cadCount = table.Rows
-            .Where(row => row.CadPadId.HasValue)
-            .Select(row => row.CadPadId!.Value)
-            .Distinct()
-            .Count();
-        var regularCount = table.Rows
-            .Select(row => row.RegularPadIndex)
-            .Distinct()
-            .Count();
-        var crossIcText = crossIcMismatch.CadCount > 0
-            ? $" | crossIC={crossIcMismatch.CadCount} cad/{crossIcMismatch.RegularCount} reg"
-            : string.Empty;
-        var toFullCoverageText = BuildToFullCoverageStatusText(table.ToFullCoverageAudit);
-        return $"{exportKind} export [2/{NotchExportStageCount}]: rows={table.Rows.Count} | cad={cadCount} | reg={regularCount} | {versionText} | {toFullCoverageText}{crossIcText}";
-    }
-
-    private static string BuildVersionBreakdownText(NotchTable table)
-    {
-        var items = table.Rows
-            .GroupBy(row => row.Version)
-            .OrderBy(group => (int)group.Key)
-            .Select(group => $"{group.Key.ToDisplayLabel()}={group.Count()}")
-            .ToList();
-        return items.Count == 0
-            ? "versions=-"
-            : $"versions:{string.Join(", ", items)}";
-    }
-
-    private static string BuildToFullCoverageStatusText(NotchToFullCoverageAudit audit)
-    {
-        if (!audit.HasExpectations)
-        {
-            return "toFullCoverage=n/a";
-        }
-
-        return audit.HasMissingCoverage
-            ? $"toFullCoverage=miss {audit.CoveredTargetDiffCount}/{audit.ExpectedTargetDiffCount}"
-            : $"toFullCoverage=ok {audit.CoveredTargetDiffCount}/{audit.ExpectedTargetDiffCount}";
-    }
-
-    private static int ComputeNotchExportSettingsFingerprint(ProjectSettings settings)
-    {
-        ArgumentNullException.ThrowIfNull(settings);
-
-        unchecked
-        {
-            var notch = settings.Notch;
-            var hash = 17;
-            hash = (hash * 31) + (int)notch.ComputationMode;
-            hash = (hash * 31) + (int)notch.CompensationModel;
-            hash = (hash * 31) + notch.LenScale;
-            hash = (hash * 31) + notch.NullValue;
-            hash = (hash * 31) + notch.ThresholdQ7;
-            hash = (hash * 31) + notch.ThresholdPercentV22.GetHashCode();
-            hash = (hash * 31) + (notch.LinkVersionThresholds ? 1 : 0);
-            hash = (hash * 31) + (notch.EnableToRegular ? 1 : 0);
-            hash = (hash * 31) + (notch.EnableToFull ? 1 : 0);
-            hash = (hash * 31) + (notch.EnableToFullRuleEngine ? 1 : 0);
-            hash = (hash * 31) + (notch.EnableToFullRuleTrace ? 1 : 0);
-            hash = (hash * 31) + (notch.EnableBoundaryVirtualAreaCap ? 1 : 0);
-            hash = (hash * 31) + notch.BoundaryVirtualAreaCapRatio.GetHashCode();
-            hash = (hash * 31) + (notch.EnableTargetCoverageGuard ? 1 : 0);
-            hash = (hash * 31) + notch.TargetCoverageCapPercent;
-            hash = (hash * 31) + notch.EnabledVersions.Count;
-            hash = (hash * 31) + notch.MultiOwnerStrictOverlapPercent.GetHashCode();
-            foreach (var version in notch.EnabledVersions.OrderBy(static version => (int)version))
-            {
-                hash = (hash * 31) + (int)version;
-            }
-
-            return hash;
-        }
-    }
-
-    private static int CombineNotchExportSettingsFingerprint(
-        int settingsFingerprint,
-        int activeRegularHash,
-        int cadOutputFwDiffHash)
-    {
-        unchecked
-        {
-            var hash = (settingsFingerprint * 31) + activeRegularHash;
-            return (hash * 31) + cadOutputFwDiffHash;
-        }
-    }
-
-    private static int ComputeCadOutputFwDiffHash(IReadOnlyDictionary<int, int> cadOutputFwDiffIndexByCadId)
-    {
-        ArgumentNullException.ThrowIfNull(cadOutputFwDiffIndexByCadId);
-
-        unchecked
-        {
-            var hash = 17;
-            foreach (var pair in cadOutputFwDiffIndexByCadId.OrderBy(static pair => pair.Key))
-            {
-                hash = (hash * 31) + pair.Key;
-                hash = (hash * 31) + pair.Value;
-            }
-
-            return hash;
-        }
-    }
-
-    private static CrossIcMismatchSnapshot BuildCrossIcMismatchSnapshot(RegularGrid grid)
-    {
-        ArgumentNullException.ThrowIfNull(grid);
-
-        var crossIcGroups = grid.Pads
-            .Where(pad => pad.MatchedCadPadId.HasValue)
-            .GroupBy(pad => pad.MatchedCadPadId!.Value)
-            .Select(group => new
-            {
-                CadId = group.Key,
-                RegularCount = group.Count(),
-                IcIndices = group
-                    .Select(pad => pad.IcIndex)
-                    .Distinct()
-                    .OrderBy(ic => ic)
-                    .ToList(),
-            })
-            .Where(item => item.IcIndices.Count > 1)
-            .OrderBy(item => item.CadId)
-            .ToList();
-
-        if (crossIcGroups.Count == 0)
-        {
-            return new CrossIcMismatchSnapshot(
-                CadCount: 0,
-                RegularCount: 0,
-                SampleCadText: string.Empty);
-        }
-
-        var sample = crossIcGroups
-            .Take(6)
-            .Select(item => $"CAD{item.CadId}(IC:{string.Join("/", item.IcIndices.Select(ic => ic + 1))})");
-        var suffix = crossIcGroups.Count > 6 ? $"+{crossIcGroups.Count - 6}" : string.Empty;
-        return new CrossIcMismatchSnapshot(
-            CadCount: crossIcGroups.Count,
-            RegularCount: crossIcGroups.Sum(item => item.RegularCount),
-            SampleCadText: string.Join(", ", sample) + suffix);
-    }
-
-    private readonly record struct CrossIcMismatchSnapshot(
-        int CadCount,
-        int RegularCount,
-        string SampleCadText);
 }
