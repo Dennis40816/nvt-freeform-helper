@@ -199,7 +199,7 @@ public sealed partial class FreeformHelperView
     /// <param name="bounds">The world coordinate bounding boxes of the pads for context.</param>
     private void TryOpenPadInfo(FreeformHelperViewModel vm, object infoViewModel, IEnumerable<Rect2> bounds)
     {
-        var context = new PadInfoContext(infoViewModel, BuildBounds(bounds), bounds.ToList());
+        var context = new PadInfoContext(infoViewModel, PadInfoLayoutCalculator.BuildBounds(bounds), bounds.ToList());
         // If a dirty pad info is active, store this context as pending.
         if (RequestClosePadInfo(context))
         {
