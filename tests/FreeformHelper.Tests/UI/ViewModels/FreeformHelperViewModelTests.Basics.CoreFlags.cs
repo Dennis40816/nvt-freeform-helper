@@ -7,6 +7,7 @@ using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
+using static FreeformHelper.Tests.SuppressedWorkspaceBehaviorTests;
 
 namespace FreeformHelper.Tests;
 
@@ -532,5 +533,48 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Contains(nameof(FreeformHelperViewModel.CanOffsetSelectedCadOutputFwDiffIndices), raised);
         Assert.Contains(nameof(FreeformHelperViewModel.Step4DiffShiftSelectionSummary), raised);
         Assert.Same(vm.Step4Index, vm.Step4Index);
+    }
+
+    [AvaloniaFact]
+    public async Task ClearStep1ResultCommand_MatchedGrid_RedrawsClearedResultsAfterReturningToStep1Async()
+    {
+        using var culture = TestCulture.UseEnUs();
+        using var fixture = new WorkspaceFixture();
+        var vm = await ManualRangeStatusCoverageTests.OpenGridAsync(fixture);
+        await vm.MatchCommand.ExecuteAsync(null);
+        await vm.AutoDetectFreeformsCommand.ExecuteAsync(null);
+        Assert.NotEmpty(vm.MatchLinksForCanvas);
+        Assert.Contains(vm.RegularPads, static pad => pad.MatchedCadPadId.HasValue);
+        vm.IsStep5Expanded = true;
+        Assert.False(vm.IsStep1Expanded);
+        var host = new TestCanvasHost();
+        vm.CanvasHost = host;
+        vm.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is nameof(FreeformHelperViewModel.IsStep1Expanded))
+            {
+                // Observe redraws requested after the cleared step becomes active.
+                host.ResetCounters();
+            }
+        };
+
+        vm.ClearStep1ResultCommand.Execute(null);
+
+        Assert.True(host.InvalidateCount > 0);
+        Assert.Empty(vm.MatchLinksForCanvas);
+        Assert.All(vm.RegularPads, static pad =>
+        {
+            Assert.Null(pad.MatchedCadPadId);
+            Assert.Equal(0d, pad.MatchScore);
+        });
+        Assert.Equal("Freeform stats: not run.", vm.FreeformAutoDetectSummary);
+        Assert.Equal("Notch export: not run.", vm.NotchExportSummary);
+        Assert.Equal("Step 1 result cleared.", vm.StatusText);
+        Assert.True(vm.IsStep1Expanded);
+        Assert.False(vm.IsStep2Expanded);
+        Assert.False(vm.IsStep3Expanded);
+        Assert.False(vm.IsStep4Expanded);
+        Assert.False(vm.IsStep5Expanded);
+        Assert.False(vm.IsStep6Expanded);
     }
 }

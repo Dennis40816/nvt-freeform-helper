@@ -402,4 +402,26 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Equal("Match highlighted: Regular 202 -> 1 CAD pad(s).", vm.StatusText);
     }
 
+    [Fact]
+    public void UseSelectedRegularForNotchValidationCommand_StaleCanvasIndex_KeepsThePreviousTraceAndRequestsSelection()
+    {
+        using var culture = TestCulture.UseEnUs();
+        var vm = new FreeformHelperViewModel { NotchValidationRegularPadId = 11m };
+        vm.RegularPads.Add(CreateRectRegular(0, 0, 11, 0, 0, 10, 10));
+        vm.RegularPads.Add(CreateRectRegular(0, 1, 12, 10, 0, 20, 10));
+        var previousRow = CreateValidationDisplayItem("DIRECT", isDirect: true);
+        vm.NotchValidationItems.Add(previousRow);
+        vm.NotchValidationDirectItems.Add(previousRow);
+        vm.ApplyCanvasSelection([], [13]);
+        Assert.Equal(13, Assert.Single(vm.SelectedRegularPadIndices));
+
+        vm.UseSelectedRegularForNotchValidationCommand.Execute(null);
+
+        Assert.Equal(11m, vm.NotchValidationRegularPadId);
+        Assert.Equal("Validation: select one REG first.", vm.NotchValidationSummaryText);
+        Assert.Equal("Validation: no Regular selected.", vm.StatusText);
+        Assert.Equal(previousRow, Assert.Single(vm.NotchValidationItems));
+        Assert.Equal(previousRow, Assert.Single(vm.NotchValidationDirectItems));
+        Assert.Equal(13, Assert.Single(vm.SelectedRegularPadIndices));
+    }
 }
