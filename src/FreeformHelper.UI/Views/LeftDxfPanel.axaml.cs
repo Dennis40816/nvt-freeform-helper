@@ -1,6 +1,9 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Threading;
 
@@ -15,11 +18,25 @@ public partial class LeftDxfPanel : UserControl
     public LeftDxfPanel()
     {
         InitializeComponent();
+        // A toggle button handles its own press before a handler on the button runs.
+        // Listen in the tunnel phase so Ctrl+click can show only one layer.
+        AddHandler(PointerPressedEvent, OnLayerTogglePointerPressedTunnel, RoutingStrategies.Tunnel);
     }
 
-    private void OnLayerTogglePointerPressedInternal(object? sender, PointerPressedEventArgs e)
+    private void OnLayerTogglePointerPressedTunnel(object? sender, PointerPressedEventArgs e)
     {
-        LayerTogglePointerPressed?.Invoke(sender, e);
+        if (e.Source is not Visual source)
+        {
+            return;
+        }
+
+        var button = source as ToggleButton ?? source.FindAncestorOfType<ToggleButton>();
+        if (button is null || !button.Classes.Contains("layerToggle"))
+        {
+            return;
+        }
+
+        LayerTogglePointerPressed?.Invoke(button, e);
     }
 
     private void ResetAllDxfEditsButton_Click(object? sender, RoutedEventArgs e)
