@@ -50,8 +50,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     public Func<string, string, Task<string?>>? PickSaveNotchPathAsync { get; set; }
     public Func<string, string, Task<string?>>? PickSaveExportPathAsync { get; set; }
     public Func<Task<bool>>? ConfirmEmbedDxfAsync { get; set; }
-    /// <summary>Gets the confirmation hooks for project save and load that the View wires.</summary>
-    public ProjectDialogHooks ProjectDialogs { get; } = new();
     public Func<string, string, Task>? ShowWarningAsync { get; set; }
     public Func<bool>? EnsureNoPendingEdits { get; set; }
     public Func<NotchDetailViewModel, Task>? OpenNotchDetailAsync { get; set; }
@@ -127,6 +125,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private int _notchCompensationCacheRevision;
     private readonly NotchCompensationCacheCounters _notchCompensationCacheCounters = new();
     private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
+
+    /// <summary>Gets the confirmation hooks for project save and load that the View wires.</summary>
+    public ProjectDialogHooks ProjectDialogs { get; } = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperViewModel"/> class.

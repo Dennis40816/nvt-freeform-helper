@@ -110,7 +110,7 @@ public sealed partial class FreeformHelperViewModel
                 return ProjectLoadCommandResult.Failed("CANCELLED", "Load cancelled.");
             }
 
-            if (ShouldPromptSaveOnExit())
+            if (HasUnsavedProjectWork())
             {
                 // The backup comes first, so a wrong click in the prompt can never lose the unsaved work.
                 backupPath = await TryBackUpUnsavedProjectAsync();
@@ -170,12 +170,28 @@ public sealed partial class FreeformHelperViewModel
             _logger.Info(CultureInfo.InvariantCulture, "Unsaved project backed up: {0}", backupPath);
             return backupPath;
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (IOException ex)
         {
-            _logger.Warn(CultureInfo.InvariantCulture, "Unsaved project backup failed: {0}", ex.Message);
-            CreateStatusScope("LoadProject").ReportWarning($"Could not back up the unsaved project: {ex.Message}");
-            return null;
+            return ReportBackupFailed(ex);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            return ReportBackupFailed(ex);
+        }
+    }
+
+    private string? ReportBackupFailed(Exception ex)
+    {
+        _logger.Warn(CultureInfo.InvariantCulture, "Unsaved project backup failed: {0}", ex.Message);
+        CreateStatusScope("LoadProject").ReportWarning($"Could not back up the unsaved project: {ex.Message}");
+        return null;
+    }
+
+    // A fresh session reports unsaved changes after the View applies its settings, so the prompt and the
+    // backup need a project that holds something: a loaded DXF or a project file the session came from.
+    private bool HasUnsavedProjectWork()
+    {
+        return ShouldPromptSaveOnExit() && (_cad is not null || !string.IsNullOrWhiteSpace(_lastSavedPath));
     }
 
     internal Task<ProjectLoadCommandResult> LoadProjectFromPathAsync(string path)
