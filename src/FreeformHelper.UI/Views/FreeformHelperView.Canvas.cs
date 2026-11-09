@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Controls;
@@ -72,7 +73,7 @@ public sealed partial class FreeformHelperView
     /// <param name="pad">The <see cref="CadPad"/> that triggered the request.</param>
     private Task ShowCadPadInfoAsync(FreeformHelperViewModel vm, CadPad pad)
     {
-        var selectedPads = BuildCadSelectionList(vm, pad); // Get selected CAD pads.
+        var selectedPads = PadInfoSelectionResolver.Resolve(vm.CadPads, vm.SelectedCadPadIds, pad); // Get selected CAD pads.
         var canSelectAreaBucket = vm.ColorCadByArea && selectedPads.Count == 1;
         var snapshot = vm.BuildCadPadInspectorSnapshot(
             pad.Id,
@@ -119,7 +120,8 @@ public sealed partial class FreeformHelperView
     /// <param name="pad">The <see cref="RegularPad"/> that triggered the request.</param>
     private Task ShowRegularPadInfoAsync(FreeformHelperViewModel vm, RegularPad pad)
     {
-        var selectedPads = BuildRegularSelectionList(vm, pad); // Get selected regular pads.
+        var selectedPads = PadInfoSelectionResolver.Resolve(
+            vm.RegularPads, vm.SelectedRegularPadIndices, pad); // Get selected regular pads.
         var snapshot = vm.BuildRegularPadInspectorSnapshot(pad.RegularPadId);
         vm.PadInspectorUi.Snapshot = snapshot;
         var info = new RegularPadInfoViewModel(
@@ -186,42 +188,6 @@ public sealed partial class FreeformHelperView
         yield return _dxfEditChangeListWindow;
         yield return _notchExportSelectionWindow;
         yield return _indexMappingReportWindow;
-    }
-
-    /// <summary>
-    /// Builds a list of <see cref="CadPad"/> objects for display in the info popover.
-    /// If the clicked pad is part of a multi-selection, the entire selection is returned.
-    /// Otherwise, only the clicked pad.
-    /// </summary>
-    /// <param name="vm">The <see cref="FreeformHelperViewModel"/>.</param>
-    /// <param name="pad">The <see cref="CadPad"/> that was clicked.</param>
-    /// <returns>A list of CAD pads to display info for.</returns>
-    private static List<CadPad> BuildCadSelectionList(FreeformHelperViewModel vm, CadPad pad)
-    {
-        // If multiple pads are selected and the clicked pad is among them, display info for all selected.
-        if (vm.SelectedCadPadIds.Count <= 1 || !vm.SelectedCadPadIds.Contains(pad.Id))
-        {
-            return new List<CadPad> { pad }; // Only the clicked pad.
-        }
-
-        return vm.CadPads.Where(p => vm.SelectedCadPadIds.Contains(p.Id)).ToList(); // All selected pads.
-    }
-
-    /// <summary>
-    /// Builds a list of <see cref="RegularPad"/> objects for display in the info popover.
-    /// Similar logic to <see cref="BuildCadSelectionList"/>.
-    /// </summary>
-    /// <param name="vm">The <see cref="FreeformHelperViewModel"/>.</param>
-    /// <param name="pad">The <see cref="RegularPad"/> that was clicked.</param>
-    /// <returns>A list of regular pads to display info for.</returns>
-    private static List<RegularPad> BuildRegularSelectionList(FreeformHelperViewModel vm, RegularPad pad)
-    {
-        if (vm.SelectedRegularPadIndices.Count <= 1 || !vm.SelectedRegularPadIndices.Contains(pad.Index))
-        {
-            return new List<RegularPad> { pad };
-        }
-
-        return vm.RegularPads.Where(p => vm.SelectedRegularPadIndices.Contains(p.Index)).ToList();
     }
 
     /// <summary>
