@@ -518,20 +518,36 @@ try {
         @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT The active test run was aborted. Reason: Test host process crashed : PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'test-host-crashed,test-run-aborted' },
         @{ Lines = @('  Another thread created Dispatcher.UIThread while the headless application was being set up PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'dispatcher-uithread-race' },
         @{ Lines = @('x.cs(1,1): error CS1002: PRIVATE-MARKER-DO-NOT-PRINT', 'y.cs(2,2): error MSB3027: again'); Exit = 1; Expected = 'build-error' },
-        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT', 'Test Run Aborted.'); Exit = 1; Expected = 'no-test-matches-filter,test-run-aborted'; Listed = 0 },
+        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT', 'Test Run Aborted.'); Exit = 1; Expected = 'no-test-matches-filter,test-run-aborted'; Listed = 0
+            Attempts = 1; Rows = @('No test matches the given testcase filter <filter> in <path>', 'Test Run Aborted.') },
+        # A run without a test prints its redacted shape. Only a known message shape keeps its fixed words and numbers.
+        # Every other line, including a test name, a path or a build message text, prints as <line>, and equal rows in a row print once.
+        @{ Lines = @('Test run for C:\PRIVATE-MARKER-DO-NOT-PRINT\FreeformHelper.Tests.dll(.NETCoreApp,Version=v10.0)',
+                'VSTest version 18.7.0 (x64)',
+                '[xUnit.net 00:00:01.23]   Discovering: FreeformHelper.Tests',
+                '[xUnit.net 00:00:02.50]     PRIVATE-MARKER-DO-NOT-PRINT [FAIL]',
+                'FreeformHelper.Tests.PRIVATE-MARKER-DO-NOT-PRINT.Case failed',
+                'PRIVATE-MARKER-DO-NOT-PRINT second line',
+                'src/PRIVATE-MARKER-DO-NOT-PRINT.cs(1,1): warning CS8618: PRIVATE-MARKER-DO-NOT-PRINT',
+                'FreeformHelper.UI -> C:\PRIVATE-MARKER-DO-NOT-PRINTin\FreeformHelper.UI.dll',
+                'No test matches the given testcase filter `FullyQualifiedName~.PRIVATE-MARKER-DO-NOT-PRINT.` in C:\PRIVATE-MARKER-DO-NOT-PRINT\FreeformHelper.Tests.dll'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = 0
+            Attempts = 1; Rows = @('Test run for <path>(.NETCoreApp,Version=v10.0)', 'VSTest version 18.7.0 (x64)',
+                '[xUnit.net 00:00:01.23] Discovering: <assembly>', '[xUnit.net 00:00:02.50] <text>', '<line> (x2)',
+                '<location>: warning CS8618: <text>', '<project> -> <path>',
+                'No test matches the given testcase filter <filter> in <path>') },
         # The host lists tests again after the empty run. Only the number is printed, never a listed name.
         # Because the host lists tests, the empty start is run once more. The second start is empty as well, so the group stays failed.
         @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = 2
             ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '    PRIVATE-MARKER-DO-NOT-PRINT.Second', '')
-            Retry = 'retries=1 listed-tests=2 executed-tests=-1' },
+            Retry = 'retries=1 listed-tests=2 executed-tests=-1'; Attempts = 2 },
         @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = -1
-            ListLines = @('PRIVATE-MARKER-DO-NOT-PRINT listing failed'); ListExit = 1 },
+            ListLines = @('PRIVATE-MARKER-DO-NOT-PRINT listing failed'); ListExit = 1; Attempts = 1 },
         # An empty start is run once more when the host lists tests now.
         # The second run finds the tests. The group ends with the exit code of the second run and prints its test count.
         @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = ''
             SecondLines = @('Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration: 1 s - FreeformHelper.Tests.dll (net10.0)'); SecondExit = 0
             ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '')
-            Retry = 'retries=1 listed-tests=1 executed-tests=7' },
+            Retry = 'retries=1 listed-tests=1 executed-tests=7'; Attempts = 1 },
         # A failing test is final: the host found the tests, so nothing is run again.
         @{ Lines = @('Failed!  - Failed:     1, Passed:     4, Skipped:     0, Total:     5, Duration: 1 s - FreeformHelper.Tests.dll (net10.0)'); Exit = 1; Expected = ''
             ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '') },
@@ -592,6 +608,17 @@ try {
                 Assert-Policy (@($entryOutput | Where-Object { [string]$_ -like '*skipped tests on this machine*' }).Count -eq 0)
                 Assert-Policy (($entryOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
                 Assert-Policy ($message -ceq 'Shard validation failed.')
+                # Only a start that found no test prints its redacted rows, one block for each start, and the rows hold no private text.
+                $redactedHeaders = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] redacted-host-output group=*' })
+                $expectedAttempts = if ($case.ContainsKey('Attempts')) { $case.Attempts } else { 0 }
+                Assert-Policy ($redactedHeaders.Count -eq $expectedAttempts)
+                Assert-Policy (@($entryOutput | Where-Object { [string]$_ -ceq '[verify] redacted-host-output end' }).Count -eq $expectedAttempts)
+                if ($case.ContainsKey('Rows')) {
+                    $startIndex = [Array]::FindIndex($entryOutput, [Predicate[object]]{ param($line) [string]$line -like '[[]verify] redacted-host-output group=*' })
+                    $rows = @($entryOutput[($startIndex + 1)..($startIndex + $case.Rows.Count)] | ForEach-Object { ([string]$_).Substring(2) })
+                    Assert-Policy (($rows -join "`n") -ceq ($case.Rows -join "`n"))
+                    Assert-Policy ([string]$entryOutput[$startIndex + $case.Rows.Count + 1] -ceq '[verify] redacted-host-output end')
+                }
                 # A group is run again only after an empty start that the host can list tests for. The line holds numbers only.
                 $retryLines = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] retry-diagnostic *' })
                 if ($case.ContainsKey('Retry')) {

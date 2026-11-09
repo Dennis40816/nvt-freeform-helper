@@ -240,7 +240,7 @@ function Invoke-TestShard {
             }
             foreach ($group in $shardGroups[$Name]) {
                 $groupDirectory = Join-Path $resultsDirectory $group
-                $runStatus = @{ ExitCode = $null; HostErrors = @(); RetryCount = 0 }
+                $runStatus = @{ ExitCode = $null; HostErrors = @(); RetryCount = 0; RedactedOutput = @() }
                 $phase = 'results-directory'
                 $exceptionType = $directoryExceptionType
                 if ([string]::IsNullOrEmpty($directoryExceptionType)) {
@@ -260,6 +260,12 @@ function Invoke-TestShard {
                 if ([int]$runStatus.RetryCount -gt 0) {
                     Write-Host ('[verify] retry-diagnostic group={0} retries={1} listed-tests={2} executed-tests={3}' -f
                         $group, $runStatus.RetryCount, $runStatus.RetryListedTests, $runStatus.ExecutedTests)
+                }
+                # The redacted shape of each start that found no test, also when the start was run again and passed.
+                # run-tests.ps1 builds it from known message shapes only, so a test name, a path or a message text is
+                # already replaced.
+                foreach ($redactedRow in @($runStatus.RedactedOutput)) {
+                    Write-Host $redactedRow
                 }
                 # Only fixed labels from run-tests.ps1 are printed. The output they came from is never printed.
                 if (@($runStatus.HostErrors).Count -gt 0) {
