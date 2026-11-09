@@ -48,9 +48,9 @@ public sealed class CoordinatePlannerBuildRefreshBehaviorTests
         var host = shell.CoordinatePlanner;
         await host.OpenCoordinatePlannerCommand.ExecuteAsync(null);
         var original = Assert.IsType<CoordinatePlannerWorkspaceViewModel>(host.CurrentWorkspace);
-        original.CustomPointLabelText = "Probe";
+        original.CustomEditor.CustomPointLabelText = "Probe";
         original.AddCustomPointCommand.Execute(null);
-        original.CustomPathLabelText = "Sweep";
+        original.CustomEditor.CustomPathLabelText = "Sweep";
         original.AddCustomPathCommand.Execute(null);
         Assert.Single(original.Snapshot.Points, static point => point.Kind == CoordinatePlannerPointKind.CustomPoint);
         Assert.Single(original.Snapshot.Lines, static line => line.Kind == CoordinatePlannerLineKind.CustomPath);

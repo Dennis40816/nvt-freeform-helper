@@ -24,9 +24,9 @@ public sealed class CoordinateWorkspaceFileExportBehaviorTests
         var viewModel = CreateWorkspace();
         string path = TestFiles.NewTempFilePath("coordinate-artifacts-", ".csv");
         viewModel.RequestSaveTextFileAsync = request => WriteTextAsync(path, request.Content);
-        viewModel.CustomPointLabelText = "Probe, \"A\" 測試";
-        viewModel.CustomPointMachineX = 25.25m;
-        viewModel.CustomPointMachineY = 10.5m;
+        viewModel.CustomEditor.CustomPointLabelText = "Probe, \"A\" 測試";
+        viewModel.CustomEditor.CustomPointMachineX = 25.25m;
+        viewModel.CustomEditor.CustomPointMachineY = 10.5m;
         viewModel.AddCustomPointCommand.Execute(null);
         viewModel.SelectedArtifactRow = viewModel.ArtifactRows[viewModel.ArtifactRows.Count - 1];
         string expected = CoordinateArtifactService.ExportCsv(viewModel.ArtifactRows);

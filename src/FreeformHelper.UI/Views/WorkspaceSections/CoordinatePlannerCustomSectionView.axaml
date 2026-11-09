@@ -27,7 +27,7 @@
       <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding #PointFormButton.IsChecked}">
         <StackPanel Classes="panelFormField">
           <TextBlock Text="Name"/>
-          <TextBox Text="{Binding CustomPointLabelText, Mode=TwoWay}"/>
+          <TextBox Text="{Binding CustomEditor.CustomPointLabelText, Mode=TwoWay}"/>
         </StackPanel>
         <Grid ColumnDefinitions="*,*">
           <StackPanel Classes="panelFormField left">
@@ -37,7 +37,7 @@
                                      SmallChange="0.1"
                                      FormatString="0.###"
                                      SnapToStep="False"
-                                     Value="{Binding CustomPointMachineX, Mode=TwoWay}"/>
+                                     Value="{Binding CustomEditor.CustomPointMachineX, Mode=TwoWay}"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Classes="panelFormField right">
             <TextBlock Text="Y (machine mm)"/>
@@ -46,7 +46,7 @@
                                      SmallChange="0.1"
                                      FormatString="0.###"
                                      SnapToStep="False"
-                                     Value="{Binding CustomPointMachineY, Mode=TwoWay}"/>
+                                     Value="{Binding CustomEditor.CustomPointMachineY, Mode=TwoWay}"/>
           </StackPanel>
         </Grid>
         <Button Content="Add point"
@@ -57,7 +57,7 @@
       <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding #PathFormButton.IsChecked}">
         <StackPanel Classes="panelFormField">
           <TextBlock Text="Name"/>
-          <TextBox Text="{Binding CustomPathLabelText, Mode=TwoWay}"/>
+          <TextBox Text="{Binding CustomEditor.CustomPathLabelText, Mode=TwoWay}"/>
         </StackPanel>
         <Grid ColumnDefinitions="*,*">
           <StackPanel Classes="panelFormField left">
@@ -67,7 +67,7 @@
                                      SmallChange="0.1"
                                      FormatString="0.###"
                                      SnapToStep="False"
-                                     Value="{Binding CustomPathStartMachineX, Mode=TwoWay}"/>
+                                     Value="{Binding CustomEditor.CustomPathStartMachineX, Mode=TwoWay}"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Classes="panelFormField right">
             <TextBlock Text="Start Y (machine mm)"/>
@@ -76,7 +76,7 @@
                                      SmallChange="0.1"
                                      FormatString="0.###"
                                      SnapToStep="False"
-                                     Value="{Binding CustomPathStartMachineY, Mode=TwoWay}"/>
+                                     Value="{Binding CustomEditor.CustomPathStartMachineY, Mode=TwoWay}"/>
           </StackPanel>
         </Grid>
         <Grid ColumnDefinitions="*,*">
@@ -87,7 +87,7 @@
                                      SmallChange="0.1"
                                      FormatString="0.###"
                                      SnapToStep="False"
-                                     Value="{Binding CustomPathEndMachineX, Mode=TwoWay}"/>
+                                     Value="{Binding CustomEditor.CustomPathEndMachineX, Mode=TwoWay}"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Classes="panelFormField right">
             <TextBlock Text="End Y (machine mm)"/>
@@ -96,7 +96,7 @@
                                      SmallChange="0.1"
                                      FormatString="0.###"
                                      SnapToStep="False"
-                                     Value="{Binding CustomPathEndMachineY, Mode=TwoWay}"/>
+                                     Value="{Binding CustomEditor.CustomPathEndMachineY, Mode=TwoWay}"/>
           </StackPanel>
         </Grid>
         <StackPanel Classes="panelFormField">
@@ -105,7 +105,7 @@
                                    Maximum="500"
                                    SmallChange="1"
                                    FormatString="0"
-                                   Value="{Binding CustomPathStepCount, Mode=TwoWay}"/>
+                                   Value="{Binding CustomEditor.CustomPathStepCount, Mode=TwoWay}"/>
         </StackPanel>
         <Button Content="Add path"
                 Classes="actionNeutral actionTextButton"

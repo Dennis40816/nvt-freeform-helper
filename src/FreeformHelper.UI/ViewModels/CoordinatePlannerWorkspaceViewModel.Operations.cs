@@ -123,9 +123,9 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
     private void AddCustomPoint()
     {
         var label = _customArtifacts.AddPoint(
-            CustomPointLabelText,
-            (double)CustomPointMachineX,
-            (double)CustomPointMachineY);
+            CustomEditor.CustomPointLabelText,
+            (double)CustomEditor.CustomPointMachineX,
+            (double)CustomEditor.CustomPointMachineY);
         NotifyCustomArtifactsChanged();
         RebuildSnapshot();
         StatusText = $"Custom point '{label}' added.";
@@ -134,12 +134,12 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
     private void AddCustomPath()
     {
         var label = _customArtifacts.AddPath(
-            CustomPathLabelText,
-            (double)CustomPathStartMachineX,
-            (double)CustomPathStartMachineY,
-            (double)CustomPathEndMachineX,
-            (double)CustomPathEndMachineY,
-            Math.Max(2, ClampNonNegativeInt(CustomPathStepCount)));
+            CustomEditor.CustomPathLabelText,
+            (double)CustomEditor.CustomPathStartMachineX,
+            (double)CustomEditor.CustomPathStartMachineY,
+            (double)CustomEditor.CustomPathEndMachineX,
+            (double)CustomEditor.CustomPathEndMachineY,
+            Math.Max(2, ClampNonNegativeInt(CustomEditor.CustomPathStepCount)));
         NotifyCustomArtifactsChanged();
         RebuildSnapshot();
         StatusText = $"Custom path '{label}' added.";

@@ -181,13 +181,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
         OverlayModeOptions = CoordinatePlannerPresentationCatalog.OverlayModeOptions;
         _selectedOverlayModeOption = OverlayModeOptions[1];
         CustomRecipeRows = _customArtifacts.RecipeRows;
-        _customPointMachineX = _machineOriginX + (_machineWidth * 0.5m);
-        _customPointMachineY = _machineOriginY + (_machineHeight * 0.5m);
-        _customPathStartMachineX = _machineOriginX;
-        _customPathStartMachineY = _machineOriginY + (_machineHeight * 0.5m);
-        _customPathEndMachineX = _machineOriginX + _machineWidth;
-        _customPathEndMachineY = _customPathStartMachineY;
-        _customPathStepCount = 5m;
+        CustomEditor = new CoordinatePlannerCustomEditorModel(_machineOriginX, _machineOriginY, _machineWidth, _machineHeight);
 
         SyncFromWorkspaceCommand = new RelayCommand(SyncFromWorkspace);
         UseActiveAreaSafeCornersCommand = new RelayCommand(UseActiveAreaSafeCorners);
@@ -240,6 +234,8 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
     public IReadOnlyList<CoordinateArtifactRow> ArtifactRows { get; private set; } = Array.Empty<CoordinateArtifactRow>();
 
     public ReadOnlyObservableCollection<CoordinatePlannerCustomRecipeRow> CustomRecipeRows { get; }
+
+    public CoordinatePlannerCustomEditorModel CustomEditor { get; }
 
     public CoordinatePlannerSnapshot Snapshot => _snapshot;
 
@@ -360,33 +356,6 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     [ObservableProperty]
     private string _verticalGuidePositionListText = string.Empty;
-
-    [ObservableProperty]
-    private string _customPointLabelText = "Point";
-
-    [ObservableProperty]
-    private decimal _customPointMachineX;
-
-    [ObservableProperty]
-    private decimal _customPointMachineY;
-
-    [ObservableProperty]
-    private string _customPathLabelText = "Path";
-
-    [ObservableProperty]
-    private decimal _customPathStartMachineX;
-
-    [ObservableProperty]
-    private decimal _customPathStartMachineY;
-
-    [ObservableProperty]
-    private decimal _customPathEndMachineX;
-
-    [ObservableProperty]
-    private decimal _customPathEndMachineY;
-
-    [ObservableProperty]
-    private decimal _customPathStepCount;
 
     [ObservableProperty]
     private bool _showBistRectangle;
