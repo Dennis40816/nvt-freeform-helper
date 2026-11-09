@@ -41,12 +41,12 @@ public sealed partial class RuntimeQueryContractTests
     [InlineData("run-step", "step=1", "STEP_NOT_READY", "Step 1: import DXF and build grid first.")]
     [InlineData("run-step", "step=2", "STEP_NOT_READY", "Step 2: import DXF and run Step 1 first.")]
     [InlineData("run-step", "step=4", "STEP_NOT_READY", "Step 4: import DXF and build grid first.")]
-    [InlineData("run-step", "step=3", "SUCCESS", "Notch 2.2 preview: build grid first.")]
+    [InlineData("run-step", "step=3", "STEP_NOT_READY", "Notch 2.2 preview: build grid first.")]
     [InlineData("export-notch", "format=csv;path={output}", "STEP_EXECUTION_FAILED",
         "Notch export did not produce output file. summary=Notch export: not run.")]
     [InlineData("simulation", "", "NOT_READY",
         "Simulation workspace is not ready. Simulation workspace is not ready for current workflow state.")]
-    public async Task UnloadedCommandsCharacterizationPreservesFailuresAndStep3VisibilityReadinessAsync(
+    public async Task UnloadedCommandsCharacterizationPreservesFailuresAsync(
         string command, string arguments, string code, string message)
     {
         var response = await ExecuteUnloadedAsync(command, arguments);
@@ -65,19 +65,6 @@ public sealed partial class RuntimeQueryContractTests
 
     private static void AssertUnloadedOutcome(RuntimeQueryCharacterizationSubject.Response response, string code, string message)
     {
-        if (code == "SUCCESS")
-        {
-            // Current readiness accepts the preview visibility switch even when there is no grid or selection.
-            Assert.True(response.Ok);
-            Assert.Null(response.ErrorCode);
-            using var json = JsonDocument.Parse(response.Json);
-            var data = json.RootElement.GetProperty("data");
-            Assert.Equal(message, data.GetProperty("statusText").GetString());
-            Assert.False(data.GetProperty("workflow").GetProperty("hasGrid").GetBoolean());
-            Assert.Equal(0, data.GetProperty("notchPreview").GetProperty("previewItemCount").GetInt32());
-            return;
-        }
-
         Assert.False(response.Ok);
         Assert.Equal(code, response.ErrorCode);
         Assert.Equal(message, response.ErrorMessage);
