@@ -97,6 +97,7 @@ public sealed partial class DxfOverlapAnalyzer
     private const int DefaultMaxSamples = 12;
     private const int SpatialAccelerationMinPadCount = 64;
     private const int MaxSpatialCellsPerPad = 4096;
+    private const int MaxInteriorSampleCuts = 34;
 
     /// <summary>
     /// Analyzes the provided CAD pad set for overlap issues.
