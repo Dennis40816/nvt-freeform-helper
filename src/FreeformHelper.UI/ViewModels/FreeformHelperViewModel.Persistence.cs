@@ -87,7 +87,7 @@ public sealed partial class FreeformHelperViewModel
                         : (exportKind, extension, serialize);
 
                     ReportExportStage(effectiveExportKind, 4, "Waiting save path dialog...");
-                    var suggestedBaseName = ResolveSuggestedNotchExportBaseName(baseName, effectiveExtension, table);
+                    var suggestedBaseName = NotchExportText.ResolveSuggestedNotchExportBaseName(baseName, effectiveExtension, table);
                     var path = await PickSaveNotchPathAsync(suggestedBaseName, effectiveExtension);
                     if (string.IsNullOrWhiteSpace(path))
                     {
@@ -258,7 +258,7 @@ public sealed partial class FreeformHelperViewModel
         CrossIcMismatchSnapshot crossIcMismatch)
     {
         _logger.Info(CultureInfo.InvariantCulture, "{0} export stage 2 generated {1} row(s).", exportKind, table.Rows.Count);
-        var stage2Summary = BuildStage2RowSummary(exportKind, table, crossIcMismatch);
+        var stage2Summary = NotchExportText.BuildStage2RowSummary(exportKind, table, crossIcMismatch, NotchExportStageCount);
         NotchExportSummary = stage2Summary;
         NotchExportProgressText = stage2Summary;
         status.ReportProgress(stage2Summary);
