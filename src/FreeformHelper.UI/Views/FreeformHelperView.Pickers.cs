@@ -73,6 +73,7 @@ public sealed partial class FreeformHelperView
         viewModel.PickSaveNotchPathAsync = null;
         viewModel.PickSaveExportPathAsync = null;
         viewModel.ConfirmEmbedDxfAsync = null;
+        viewModel.ProjectDialogs.ConfirmSaveBeforeLoadAsync = null;
         viewModel.EnsureNoPendingEdits = null;
         viewModel.OpenNotchDetailAsync = null;
         viewModel.OpenNotchExportSelectionAsync = null;
@@ -142,24 +143,9 @@ public sealed partial class FreeformHelperView
             return res?.Path.LocalPath;
         };
 
-        // Delegate for confirming whether to embed DXF data.
-        viewModel.ConfirmEmbedDxfAsync = async () =>
-        {
-            var owner = TopLevel.GetTopLevel(this) as Window; // Get parent window for dialog ownership.
-            if (owner is null)
-            {
-                return false; // Cannot show dialog without a parent window.
-            }
-
-            var dialog = new ConfirmDialog(
-                "Embed DXF", "Embed the current DXF into the project file?",
-                "Embed", "Skip",
-                confirmTip: "Embed DXF into the project file.",
-                cancelTip: "Cancel and keep external DXF reference.",
-                consequenceText: "This increases file size but keeps the project self-contained.");
-
-            return await dialog.ShowDialog<bool>(owner); // Return the boolean result from the dialog.
-        };
+        // Delegates for the project save/load confirmation dialogs.
+        viewModel.ConfirmEmbedDxfAsync = () => ProjectDialogPrompts.ConfirmEmbedDxfAsync(TopLevel.GetTopLevel(this) as Window);
+        viewModel.ProjectDialogs.ConfirmSaveBeforeLoadAsync = backupPath => ProjectDialogPrompts.ConfirmSaveBeforeLoadAsync(TopLevel.GetTopLevel(this) as Window, backupPath);
     }
 
     private async Task ShowWarningDialogAsync(string title, string message)
