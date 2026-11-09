@@ -38,7 +38,7 @@ public sealed partial class FreeformHelperViewModel
             .Distinct()
             .OrderBy(id => id)
             .ToList();
-        var matchedRegularDetails = BuildMatchedRegularDetails(matchedRegularIds, matchedLinks);
+        var matchedRegularDetails = PadInspectorMatchDetailBuilder.BuildMatchedRegularDetails(matchedRegularIds, matchedLinks, GetRegularPadIcDiff);
         var matchText = PadInspectorMatchFormatter.BuildCadMatchText(matchedRegularIds, matchedLinks, GetRegularPadIcDiff);
         var matchDetailsText = PadInspectorMatchFormatter.BuildCadMatchDetailsText(matchedRegularIds, matchedLinks, GetRegularPadIcDiff);
         var confidence = matchedRegularDetails.Count == 0
@@ -72,7 +72,7 @@ public sealed partial class FreeformHelperViewModel
             .Distinct()
             .OrderBy(id => id)
             .ToList();
-        var matchedCadDetails = BuildMatchedCadDetails(matchedCadIds, matchedLinks);
+        var matchedCadDetails = PadInspectorMatchDetailBuilder.BuildMatchedCadDetails(matchedCadIds, matchedLinks, TryGetCadOutputFwDiffIndex);
         var matchText = PadInspectorMatchFormatter.BuildRegularMatchText(matchedCadDetails, matchedCadIds);
         var matchDetailsText = PadInspectorMatchFormatter.BuildRegularMatchDetailsText(matchedCadDetails, matchedLinks);
         var diffSource = PadInspectorMatchFormatter.BuildRegularDiffSource(regularPad.DiffIndex, matchedCadDetails);
