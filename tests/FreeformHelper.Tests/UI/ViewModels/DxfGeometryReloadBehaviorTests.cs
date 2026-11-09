@@ -12,26 +12,21 @@ namespace FreeformHelper.Tests;
 public sealed class DxfGeometryReloadBehaviorTests
 {
     [AvaloniaFact]
-    public async Task Rotate_AfterImportingDxfWithoutOutlines_RejectsStaleSelectionWithoutEditsAsync()
+    public async Task Import_DxfWithoutUsablePads_KeepsPreviousCadAndReportsFailureAsync()
     {
         using var culture = TestCulture.UseEnUs();
         using var files = new DxfEditingBehaviorTestScope();
         var vm = files.CreateViewModel();
         await files.OpenAsync(vm, ("signal", 0, 0, 10, 20));
         var previousId = Assert.Single(vm.CadPads).Id;
-        await files.OpenAsync(vm);
-        Assert.Empty(vm.CadPads);
         await SelectCadPadsAsync(vm, [previousId]);
-        vm.DxfEditRotationDegrees = 45m;
         vm.HasUnsavedChanges = false;
-        Assert.False(vm.CanRotateSelectedCadPads);
 
-        vm.RotateSelectedCadPadsCommand.Execute(null);
+        await files.OpenAsync(vm);
 
-        Assert.Equal("DXF rotate: select baseline CAD pads first.", vm.StatusText);
-        Assert.Empty(vm.CadPads);
+        Assert.Contains("has no usable pads", vm.StatusText, StringComparison.Ordinal);
+        Assert.Equal(previousId, Assert.Single(vm.CadPads).Id);
         Assert.Equal(previousId, Assert.Single(vm.SelectedCadPadIds));
-        Assert.Equal(0, vm.RotatedCadPadCount);
         Assert.False(vm.HasAnyCadEdits);
         Assert.False(vm.HasUnsavedChanges);
         Assert.False(vm.CanUndo);
