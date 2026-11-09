@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.UI.Interaction;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -227,6 +228,45 @@ public sealed partial class FreeformHelperViewModel
         /// during a grid rebuild operation. Used for undo/redo.
         /// </summary>
         internal bool SuppressClearOnRebuild { get; set; }
+    }
+
+    /// <summary>
+    /// Gets or sets the unified quick-focus query used by the Inspector panel.
+    /// Examples: CAD 4809, REG 4616, DIFF 72, IC1 DIFF72.
+    /// </summary>
+    public string QuickFocusQueryText
+    {
+        get => _inspectorPanel.QuickFocusQueryText;
+        set
+        {
+            if (_inspectorPanel.QuickFocusQueryText == value)
+            {
+                return;
+            }
+
+            OnPropertyChanging();
+            _inspectorPanel = _inspectorPanel with { QuickFocusQueryText = value };
+            OnPropertyChanged();
+        }
+    }
+
+    private int SelectedPadCount => _selectedCadIds.Count + _selection.RegularIndices.Count;
+
+    /// <summary>
+    /// Gets the command to clear the current selection on the canvas.
+    /// </summary>
+    public IRelayCommand ClearSelectionCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the command to focus a CAD pad, regular pad, or FW diff from one quick-focus query.
+    /// </summary>
+    public IRelayCommand QuickFocusCommand { get; private set; } = null!;
+
+    /// <summary>Creates the Selection commands. <see cref="InitializeCommands"/> calls it once during construction.</summary>
+    private void InitializeSelectionCommands()
+    {
+        ClearSelectionCommand = CreateEditingCommand(ClearSelection);
+        QuickFocusCommand = CreateEditingCommand(ExecuteQuickFocus);
     }
 }
 

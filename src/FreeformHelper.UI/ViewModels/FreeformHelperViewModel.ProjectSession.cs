@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -88,5 +89,30 @@ public sealed partial class FreeformHelperViewModel
             CanEditProject);
         _projectSessionCommands.Add(command);
         return command;
+    }
+
+    // --- Project State Flags ---
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the current project has unsaved changes.
+    /// </summary>
+    [ObservableProperty]
+    private bool _hasUnsavedChanges;
+
+    /// <summary>
+    /// Gets the command to save the current project.
+    /// </summary>
+    public IAsyncRelayCommand SaveProjectCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the command to load an existing project.
+    /// </summary>
+    public IAsyncRelayCommand LoadProjectCommand { get; private set; } = null!;
+
+    /// <summary>Creates the Project commands. <see cref="InitializeCommands"/> calls it once during construction.</summary>
+    private void InitializeProjectCommands()
+    {
+        SaveProjectCommand = CreateEditingAsyncCommand(SaveProjectAsync);
+        LoadProjectCommand = CreateEditingAsyncCommand(LoadProjectAsync);
     }
 }

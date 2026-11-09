@@ -1,38 +1,12 @@
-using System.Collections.ObjectModel;
 using Avalonia.Media;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
-using FreeformHelper.Application.Services;
 using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    // --- Workspace Header Items ---
-
-    /// <summary>
-    /// Gets or sets the observable collection of <see cref="WorkspaceHeaderItem"/>
-    /// that are displayed in the application's header menu.
-    /// </summary>
-    [ObservableProperty]
-    private ObservableCollection<WorkspaceHeaderItem> _workspaceHeaderItems = new();
-
-    // --- Project State Flags ---
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the current project has unsaved changes.
-    /// </summary>
-    [ObservableProperty]
-    private bool _hasUnsavedChanges;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether CAD bounds should be recalculated from visible layers
-    /// when layer filters change and on grid rebuilds.
-    /// </summary>
-    [ObservableProperty]
-    private bool _recalcBoundsOnLayerFilter;
-
     // --- Canvas Toggles (Directly bound to UI for visual state) ---
 
     // The canvas display switches and the import flags are stored once. The properties below forward to
@@ -209,314 +183,6 @@ public sealed partial class FreeformHelperViewModel
     partial void OnImportBlockPolylinesChanging(bool value);
 
     /// <summary>
-    /// Gets or sets the observable collection of <see cref="LayerToggle"/> objects
-    /// used to control the visibility of CAD layers.
-    /// </summary>
-    [ObservableProperty] private ObservableCollection<LayerToggle> _layerToggles = new();
-
-    /// <summary>
-    /// Gets or sets the available layer options for bounding the grid.
-    /// </summary>
-    [ObservableProperty] private ObservableCollection<BoundLayerOption> _boundLayerOptions = new();
-
-    /// <summary>
-    /// Gets or sets the available layer options for DXF regular source mode.
-    /// </summary>
-    [ObservableProperty] private ObservableCollection<RegularSourceLayerOption> _regularSourceLayerOptions = new();
-
-    // --- DXF Quality Check Properties ---
-
-    /// <summary>
-    /// Gets or sets the latest DXF overlap check result. The view model replaces the whole value.
-    /// The properties below forward to it and raise their change notification when their own
-    /// value changed.
-    /// </summary>
-    [ObservableProperty] private DxfOverlapResult _dxfOverlapResult = DxfOverlapResult.CreateNotRun();
-    /// <summary>
-    /// Gets the summary message for DXF overlap issues (e.g., "no overlaps detected").
-    /// </summary>
-    public string DxfOverlapSummary => DxfOverlapResult.Summary;
-    /// <summary>
-    /// Gets the observable collection of detailed DXF overlap issue messages.
-    /// </summary>
-    public ObservableCollection<string> DxfOverlapIssues => DxfOverlapResult.Issues;
-    /// <summary>
-    /// Gets the number of overlap issues currently loaded in details.
-    /// </summary>
-    public int DxfOverlapIssueCount => DxfOverlapResult.Issues.Count;
-    /// <summary>
-    /// Gets a value indicating whether any DXF overlap issues were found.
-    /// </summary>
-    public bool HasDxfOverlapIssues => DxfOverlapResult.Issues.Count > 0;
-    /// <summary>
-    /// Gets or sets a value indicating whether DXF overlap checking is currently running.
-    /// </summary>
-    public bool IsCheckingDxfOverlap
-    {
-        get => _dxfOverlapState.Current.IsBusy;
-        set => SetOperationBusy(_dxfOverlapState, value, nameof(IsCheckingDxfOverlap));
-    }
-    /// <summary>
-    /// Gets or sets the current progress value (0-1) for DXF overlap checking.
-    /// </summary>
-    public double DxfOverlapProgress
-    {
-        get => _dxfOverlapState.Current.Progress;
-        set => SetOperationProgress(_dxfOverlapState, value, nameof(DxfOverlapProgress));
-    }
-    /// <summary>
-    /// Gets the CAD pad IDs highlighted by overlap checking.
-    /// </summary>
-    public ObservableCollection<int> DxfOverlapHighlightedCadIds => DxfOverlapResult.HighlightedCadIds;
-    /// <summary>
-    /// Gets or sets the latest CAD?egular overlap links for canvas ratio labels.
-    /// </summary>
-    [ObservableProperty] private IReadOnlyList<PadMatchLink> _matchLinksForCanvas = Array.Empty<PadMatchLink>();
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the AA canvas should show the shared CAD-load overlay.
-    /// This is used by both Open DXF and Load Project while DXF import/reload and grid rebuild are in progress.
-    /// </summary>
-    [ObservableProperty] private bool _isCadLoadCanvasOverlayVisible;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the global modal loading spinner host should be visible.
-    /// Long-running operations use this as a single entry/exit lifecycle rather than re-deriving ad hoc busy UI.
-    /// </summary>
-    [ObservableProperty] private bool _isModalLoadingSpinnerVisible;
-
-    /// <summary>Gets the number of hidden CAD pads.</summary>
-    public int DeletedCadPadCount => _cadEdit.HiddenCadPadIds.Count;
-
-    /// <summary>Gets whether hidden CAD pads exist.</summary>
-    public bool HasDeletedCadPads => DeletedCadPadCount > 0;
-
-    /// <summary>Gets the number of detected duplicate CAD pads.</summary>
-    public int DuplicateCadPadCount => _cadEdit.DuplicateCadPadIdToCanonicalId.Count;
-
-    /// <summary>Gets whether detected duplicate CAD pads exist.</summary>
-    public bool HasDuplicateCadPads => DuplicateCadPadCount > 0;
-
-    /// <summary>Gets the number of synthetic combined CAD pads.</summary>
-    public int CombinedCadPadCount => _combinedCad.OutputCadIds.Count;
-
-    /// <summary>Gets whether synthetic combined CAD pads exist.</summary>
-    public bool HasCombinedCadPads => CombinedCadPadCount > 0;
-
-    /// <summary>
-    /// Gets or sets the count of CAD pads whose layer differs from the current DXF edit baseline.
-    /// </summary>
-    // UI-thread owned; sync measures the O(n) baseline scan so binding reads stay O(1).
-    [ObservableProperty] private int _relayeredCadPadCount;
-
-    /// <summary>Gets whether any CAD pad has been moved to a different layer.</summary>
-    public bool HasRelayeredCadPads => RelayeredCadPadCount > 0;
-
-    /// <summary>
-    /// Gets or sets the count of CAD pads whose polygon differs from the current DXF edit baseline.
-    /// </summary>
-    // UI-thread owned; sync measures the O(n) baseline scan so binding reads stay O(1).
-    [ObservableProperty] private int _rotatedCadPadCount;
-
-    /// <summary>Gets whether any CAD pad geometry differs from baseline.</summary>
-    public bool HasRotatedCadPads => RotatedCadPadCount > 0;
-
-    /// <summary>Gets whether hidden, combined, relayered or rotated CAD edits exist.</summary>
-    public bool HasAnyCadEdits => HasDxfEditChanges(HasDeletedCadPads, HasCombinedCadPads, HasRelayeredCadPads, HasRotatedCadPads);
-
-    /// <summary>
-    /// Gets or sets available DXF layer names for "move selected pads" action.
-    /// </summary>
-    [ObservableProperty] private ObservableCollection<string> _dxfEditLayerOptions = new();
-
-    // The DXF edit panel inputs are stored once. The properties below forward to the record and raise
-    // the same notifications and callbacks as the stored properties they replaced.
-    private DxfEditPanelInput _dxfEditPanel = DxfEditPanelInput.Initial;
-
-    /// <summary>
-    /// Gets or sets the target DXF layer name used to move selected pads.
-    /// </summary>
-    public string DxfEditTargetLayerName
-    {
-        get => _dxfEditPanel.DxfEditTargetLayerName;
-        set
-        {
-            if (_dxfEditPanel.DxfEditTargetLayerName == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _dxfEditPanel = _dxfEditPanel with { DxfEditTargetLayerName = value };
-            OnDxfEditTargetLayerNameChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnDxfEditTargetLayerNameChanged(string value);
-
-    /// <summary>
-    /// Gets or sets the currently selected DXF rotation scope option.
-    /// </summary>
-    public DxfEditRotationScopeOption SelectedDxfEditRotationScopeOption
-    {
-        get => _dxfEditPanel.SelectedDxfEditRotationScopeOption;
-        set
-        {
-            if (_dxfEditPanel.SelectedDxfEditRotationScopeOption == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _dxfEditPanel = _dxfEditPanel with { SelectedDxfEditRotationScopeOption = value };
-            OnSelectedDxfEditRotationScopeOptionChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnSelectedDxfEditRotationScopeOptionChanged(DxfEditRotationScopeOption value);
-
-    /// <summary>
-    /// Gets or sets the target DXF layer name used when rotating by layer scope.
-    /// </summary>
-    public string DxfEditRotationLayerName
-    {
-        get => _dxfEditPanel.DxfEditRotationLayerName;
-        set
-        {
-            if (_dxfEditPanel.DxfEditRotationLayerName == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _dxfEditPanel = _dxfEditPanel with { DxfEditRotationLayerName = value };
-            OnDxfEditRotationLayerNameChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnDxfEditRotationLayerNameChanged(string value);
-
-    /// <summary>
-    /// Gets or sets the input text used to create a new DXF layer.
-    /// </summary>
-    public string DxfEditNewLayerName
-    {
-        get => _dxfEditPanel.DxfEditNewLayerName;
-        set
-        {
-            if (_dxfEditPanel.DxfEditNewLayerName == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _dxfEditPanel = _dxfEditPanel with { DxfEditNewLayerName = value };
-            OnDxfEditNewLayerNameChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnDxfEditNewLayerNameChanged(string value);
-
-    /// <summary>
-    /// Gets or sets the rotation angle for selected CAD pads in DXF edit workflow.
-    /// </summary>
-    public decimal DxfEditRotationDegrees
-    {
-        get => _dxfEditPanel.DxfEditRotationDegrees;
-        set
-        {
-            if (_dxfEditPanel.DxfEditRotationDegrees == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _dxfEditPanel = _dxfEditPanel with { DxfEditRotationDegrees = value };
-            OnDxfEditRotationDegreesChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnDxfEditRotationDegreesChanged(decimal value);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the advanced DXF edit block is expanded.
-    /// </summary>
-    public bool IsDxfEditAdvancedPanelExpanded
-    {
-        get => _dxfEditPanel.IsDxfEditAdvancedPanelExpanded;
-        set
-        {
-            if (_dxfEditPanel.IsDxfEditAdvancedPanelExpanded == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _dxfEditPanel = _dxfEditPanel with { IsDxfEditAdvancedPanelExpanded = value };
-            OnPropertyChanged();
-        }
-    }
-
-    // --- DXF/Regular Mapping Properties ---
-
-    /// <summary>
-    /// Gets or sets the latest DXF/Regular mapping diagnostics result. The view model replaces the
-    /// whole value. The properties that forward to it raise their change notification when their
-    /// own value changed.
-    /// </summary>
-    [ObservableProperty] private MappingDiagnosticsResult _mappingDiagnosticsResult = MappingDiagnosticsResult.CreateNotRun();
-    /// <summary>
-    /// Gets the summary message for DXF/Regular mapping analysis.
-    /// </summary>
-    public string DxfRegularMappingSummary => MappingDiagnosticsResult.Summary;
-    /// <summary>
-    /// Gets or sets a value indicating whether pad matching is currently running.
-    /// </summary>
-    public bool IsMatchingPads
-    {
-        get => _matchState.Current.IsBusy;
-        set => SetOperationBusy(_matchState, value, nameof(IsMatchingPads));
-    }
-    /// <summary>
-    /// Gets or sets the current progress value (0-1) for pad matching.
-    /// </summary>
-    public double MatchProgress
-    {
-        get => _matchState.Current.Progress;
-        set => SetOperationProgress(_matchState, value, nameof(MatchProgress));
-    }
-    /// <summary>
-    /// Gets or sets a value indicating whether index mapping diagnostics are currently running.
-    /// </summary>
-    public bool IsAnalyzingIndexMapping
-    {
-        get => _indexMappingState.Current.IsBusy;
-        set => SetOperationBusy(_indexMappingState, value, nameof(IsAnalyzingIndexMapping));
-    }
-    /// <summary>
-    /// Gets or sets the current progress value (0-1) for index mapping diagnostics.
-    /// </summary>
-    public double IndexMappingProgress
-    {
-        get => _indexMappingState.Current.Progress;
-        set => SetOperationProgress(_indexMappingState, value, nameof(IndexMappingProgress));
-    }
-
-    /// <summary>
-    /// Gets the observable collection of detailed DXF/Regular mapping issues.
-    /// </summary>
-    public ObservableCollection<string> DxfRegularMappingIssues => MappingDiagnosticsResult.Issues;
-    /// <summary>
-    /// Gets a value indicating whether any DXF/Regular mapping issues were found.
-    /// </summary>
-    public bool HasDxfRegularMappingIssues => MappingDiagnosticsResult.HasIssues;
-
-    /// <summary>
     /// Gets or sets whether the console panel is expanded.
     /// </summary>
     [ObservableProperty] private bool _isConsoleExpanded = true;
@@ -555,8 +221,6 @@ public sealed partial class FreeformHelperViewModel
 
     private const decimal GlobalFontSizePercentMin = 80m;
     private const decimal GlobalFontSizePercentMax = 140m;
-    private const decimal NotchPreviewAutoPlayIntervalMinMs = 200m;
-    private const decimal NotchPreviewAutoPlayIntervalMaxMs = 5000m;
 
     /// <summary>
     /// Gets or sets the line width for drawing CAD pads on the canvas.
@@ -684,4 +348,18 @@ public sealed partial class FreeformHelperViewModel
         return false;
     }
 
+    partial void OnShowCadChanging(bool value) => TrackUndo(ShowCad, value, v => ShowCad = v, "Toggle CAD layer");
+    partial void OnShowRegularChanging(bool value) => TrackUndo(ShowRegular, value, v => ShowRegular = v, "Toggle regular grid");
+    partial void OnHighlightUnmatchedChanging(bool value) => TrackUndo(HighlightUnmatched, value, v => HighlightUnmatched = v, "Toggle unmatched highlight");
+    partial void OnHighlightFreeformChanging(bool value) => TrackUndo(HighlightFreeform, value, v => HighlightFreeform = v, "Toggle freeform highlight");
+    partial void OnColorCadByAreaChanging(bool value) => TrackUndo(ColorCadByArea, value, v => ColorCadByArea = v, "Toggle CAD area colors");
+    partial void OnImportOnlyClosedPolylinesChanging(bool value) => TrackUndo(ImportOnlyClosedPolylines, value, v => ImportOnlyClosedPolylines = v, "Import closed polylines");
+    partial void OnImportBlockPolylinesChanging(bool value) => TrackUndo(ImportBlockPolylines, value, v => ImportBlockPolylines = v, "Import block polylines");
+    partial void OnCadLineWidthChanging(decimal value) => TrackUndo(CadLineWidth, value, v => CadLineWidth = v, "CAD line width");
+    partial void OnRegularLineWidthChanging(decimal value) => TrackUndo(RegularLineWidth, value, v => RegularLineWidth = v, "Regular line width");
+    partial void OnHighlightStrokeWidthAdjustChanging(decimal value) => TrackUndo(HighlightStrokeWidthAdjust, value, v => HighlightStrokeWidthAdjust = v, "Highlight line width");
+    partial void OnCadLineColorHexChanging(string value) => TrackUndo(CadLineColorHex, value, v => CadLineColorHex = v, "CAD line color");
+    partial void OnRegularLineColorHexChanging(string value) => TrackUndo(RegularLineColorHex, value, v => RegularLineColorHex = v, "Regular line color");
+    partial void OnRegularSelectedColorHexChanging(string value) => TrackUndo(RegularSelectedColorHex, value, v => RegularSelectedColorHex = v, "Regular selection color");
+    partial void OnRegularSelectedFillOpacityChanging(decimal value) => TrackUndo(RegularSelectedFillOpacity, value, v => RegularSelectedFillOpacity = v, "Regular selection fill opacity");
 }

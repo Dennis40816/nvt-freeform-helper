@@ -273,4 +273,6 @@ public sealed partial class FreeformHelperViewModel
 
         NotifyCadLayerAggregateStateChanged();
     }
+
+    private readonly PendingLayerSelectionState _pendingLayerSelection = new(); // Holds the layer selection data that waits for the next CAD load or layer toggle.
 }

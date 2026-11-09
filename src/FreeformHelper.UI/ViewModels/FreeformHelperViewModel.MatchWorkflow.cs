@@ -301,5 +301,23 @@ public sealed partial class FreeformHelperViewModel
             EnableFreeformEdgeSpecialization = source.EnableFreeformEdgeSpecialization,
         };
     }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether pad matching is currently running.
+    /// </summary>
+    public bool IsMatchingPads
+    {
+        get => _matchState.Current.IsBusy;
+        set => SetOperationBusy(_matchState, value, nameof(IsMatchingPads));
+    }
+
+    /// <summary>
+    /// Gets or sets the current progress value (0-1) for pad matching.
+    /// </summary>
+    public double MatchProgress
+    {
+        get => _matchState.Current.Progress;
+        set => SetOperationProgress(_matchState, value, nameof(MatchProgress));
+    }
 }
 

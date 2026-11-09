@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Application.Settings;
+using FreeformHelper.UI.Logging;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -22,29 +23,9 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public IReadOnlyList<RegularSourceModeOption> RegularSourceModeOptions { get; }
     /// <summary>
-    /// Gets a read-only list of <see cref="DxfEditRotationScopeOption"/> objects for DXF rotation scope selection.
-    /// </summary>
-    public IReadOnlyList<DxfEditRotationScopeOption> DxfEditRotationScopeOptions { get; }
-    /// <summary>
     /// Gets a read-only list of <see cref="LogLevelOption"/> objects for display in UI dropdowns.
     /// </summary>
     public IReadOnlyList<LogLevelOption> LogLevelOptions { get; }
-    /// <summary>
-    /// Gets a read-only list of <see cref="CadOutputFwDiffAutoModeOption"/> objects for Step 4 auto CAD Output FW Diff mode.
-    /// </summary>
-    public IReadOnlyList<CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions { get; }
-    /// <summary>
-    /// Gets a read-only list of notch export file-type options.
-    /// </summary>
-    public IReadOnlyList<NotchExportFileTypeOption> NotchExportFileTypeOptions { get; }
-    /// <summary>
-    /// Gets a read-only list of notch C-export profile options.
-    /// </summary>
-    public IReadOnlyList<NotchExportProfileOption> NotchExportProfileOptions { get; }
-    /// <summary>
-    /// Gets a read-only list of Step3 compensation model options.
-    /// </summary>
-    public IReadOnlyList<NotchCompensationModelOption> NotchCompensationModelOptions { get; }
 
     // --- Settings Exposed in UI (persisted via project settings) ---
 
@@ -600,32 +581,6 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(propertyName);
     }
     /// <summary>
-    /// Gets or sets the selected CAD auto CAD Output FW Diff assignment mode option.
-    /// </summary>
-    public CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption
-    {
-        get => CadOutputFwDiffAutoModeOptions.FirstOrDefault(option => option.Value == CadOutputFwDiffAutoMode);
-        set
-        {
-            if (_settingsSuppression.IsCadOutputFwDiffAutoModeSelectionSyncActive || value.Value == CadOutputFwDiffAutoMode)
-            {
-                return;
-            }
-
-            using (_settingsSuppression.EnterCadOutputFwDiffAutoModeSelectionSync())
-            {
-                CadOutputFwDiffAutoMode = value.Value;
-            }
-
-            if (!_isLoadingSettings)
-            {
-                ApplySettingsOrchestration(nameof(CadOutputFwDiffAutoMode));
-            }
-
-            OnPropertyChanged(nameof(SelectedCadOutputFwDiffAutoModeOption));
-        }
-    }
-    /// <summary>
     /// Gets or sets the CAD output ids that currently use manual CAD Output FW Diff override.
     /// </summary>
     [ObservableProperty] private ObservableCollection<int> _cadOutputFwDiffIndexOverrideCadIds = new();
@@ -699,13 +654,59 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(GlobalFontBaseSize));
     }
 
-    private void OnIsNotchExportingChanged(bool _)
+    private LogLevelOption ResolveInitialLogLevelOption()
     {
-        OnPropertyChanged(nameof(ShouldShowNotchExportProgress));
+        var initialLogLevelName = LoggingBootstrapper.GetCurrentMinimumLevelName();
+        var initialLogLevel = LogLevelOptions.FirstOrDefault(option =>
+            string.Equals(option.Value, initialLogLevelName, StringComparison.OrdinalIgnoreCase));
+        if (string.IsNullOrWhiteSpace(initialLogLevel.Display))
+        {
+            initialLogLevel = LogLevelOptions.Count > 0 ? LogLevelOptions[0] : default;
+        }
+        if (string.IsNullOrWhiteSpace(initialLogLevel.Display))
+        {
+            initialLogLevel = new LogLevelOption("Info", "Info");
+        }
+
+        return initialLogLevel;
     }
 
-    private void OnNotchExportProgressChanged(double _)
-    {
-        OnPropertyChanged(nameof(ShouldShowNotchExportProgress));
-    }
+    partial void OnXChannelsChanging(decimal value) => TrackUndo(XChannels, value, v => XChannels = v, "X channels");
+    partial void OnYChannelsChanging(decimal value) => TrackUndo(YChannels, value, v => YChannels = v, "Y channels");
+    partial void OnCascadeNumChanging(decimal value) => TrackUndo(CascadeNum, value, v => CascadeNum = v, "Cascade count");
+    partial void OnGridPaddingPercentChanging(decimal value) => TrackUndo(GridPaddingPercent, value, v => GridPaddingPercent = v, "Grid padding");
+    partial void OnActiveAreaWidthChanging(decimal value) => TrackUndo(ActiveAreaWidth, value, v => ActiveAreaWidth = v, "AA width");
+    partial void OnActiveAreaHeightChanging(decimal value) => TrackUndo(ActiveAreaHeight, value, v => ActiveAreaHeight = v, "AA height");
+    partial void OnMatchThresholdChanging(decimal value) => TrackUndo(MatchThreshold, value, v => MatchThreshold = v, "Match threshold");
+    partial void OnFreeformAxisThresholdChanging(decimal value) => TrackUndo(FreeformAxisThreshold, value, v => FreeformAxisThreshold = v, "Freeform TH");
+    partial void OnEnableAutoDetectXyChanging(bool value) => TrackUndo(EnableAutoDetectXy, value, v => EnableAutoDetectXy = v, "Auto XY detect");
+    partial void OnEnableFreeformEdgeSpecializationChanging(bool value) => TrackUndo(EnableFreeformEdgeSpecialization, value, v => EnableFreeformEdgeSpecialization = v, "Edge freeform");
+
+    private static List<ScanOrderOption> BuildScanOrderOptions() =>
+        new List<ScanOrderOption>
+        {
+            new(ScanOrder.LeftToRight_TopToBottom, "L->R, T->B"),
+            new(ScanOrder.RightToLeft_TopToBottom, "R->L, T->B"),
+            new(ScanOrder.LeftToRight_BottomToTop, "L->R, B->T"),
+            new(ScanOrder.RightToLeft_BottomToTop, "R->L, B->T"),
+        };
+
+    private static List<GridAlignmentOption> BuildGridAlignmentOptions() =>
+        new List<GridAlignmentOption>
+        {
+            new(GridAlignmentMode.FromPanelAa, "Use panel AA"),
+            new(GridAlignmentMode.FromCadBounds, "Use DXF bounds"),
+        };
+
+    private static List<RegularSourceModeOption> BuildRegularSourceModeOptions() =>
+        new List<RegularSourceModeOption>
+        {
+            new(RegularSourceMode.GeneratedGrid, "Generated grid"),
+            new(RegularSourceMode.FromDxfLayer, "DXF layer pads"),
+        };
+
+    private static List<LogLevelOption> BuildLogLevelOptions() =>
+        LoggingBootstrapper.SupportedMinimumLevels
+            .Select(static level => new LogLevelOption(level, level))
+            .ToList();
 }
