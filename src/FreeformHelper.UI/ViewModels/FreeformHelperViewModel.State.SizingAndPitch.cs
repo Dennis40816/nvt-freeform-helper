@@ -267,4 +267,9 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     [ObservableProperty]
     private ObservableCollection<CascadeIcSetting> _cascadeIcSettings = new();
+
+    partial void OnPendingColumnWidthChanging(decimal value) => TrackUndo(PendingColumnWidth, value, v => PendingColumnWidth = v, "Manual width");
+    partial void OnPendingRowHeightChanging(decimal value) => TrackUndo(PendingRowHeight, value, v => PendingRowHeight = v, "Manual height");
+    partial void OnManualRowsRangeChanging(string value) => TrackUndo(ManualRowsRange, value, v => ManualRowsRange = v, "Manual rows range");
+    partial void OnManualColsRangeChanging(string value) => TrackUndo(ManualColsRange, value, v => ManualColsRange = v, "Manual cols range");
 }

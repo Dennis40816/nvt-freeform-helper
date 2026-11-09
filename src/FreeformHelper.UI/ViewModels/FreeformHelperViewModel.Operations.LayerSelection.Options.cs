@@ -99,4 +99,18 @@ public sealed partial class FreeformHelperViewModel
         var cascade = Math.Max(1, (int)Math.Round(CascadeNum));
         DxfRegularSourceHint = GridRebuildOrchestrator.BuildDxfRegularSourceMismatchHint(layerPads.Count, x, y, cascade);
     }
+
+    private void InitializeLayerSelectionOptions()
+    {
+        using (_settingsSuppression.EnterBoundLayerSelectionChange())
+        {
+            BoundLayerOptions.Add(new BoundLayerOption(null, "Auto (visible layers)"));
+            SelectedBoundLayerOption = BoundLayerOptions[0];
+        }
+        using (_settingsSuppression.EnterRegularSourceLayerSelectionChange())
+        {
+            RegularSourceLayerOptions.Add(new RegularSourceLayerOption(null, "Select layer"));
+            SelectedRegularSourceLayerOption = RegularSourceLayerOptions[0];
+        }
+    }
 }

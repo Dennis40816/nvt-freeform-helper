@@ -1,6 +1,9 @@
 using System.Globalization;
+using CommunityToolkit.Mvvm.Input;
+using FreeformHelper.Domain.Notch;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
+using NotchResolvedCacheEntry = (int Revision, ulong CadPoolFingerprint, int ActiveRegularHash, ulong GridFingerprint, bool EnableToRegular, bool EnableToFull, bool EnableToFullRuleEngine, bool EnableToFullRuleTrace, double StrictOverlapRatio, int? AnchorIcIndex, int? AnchorDiffIndex, FreeformHelper.Application.Services.NotchV22TargetAllocationAreaMode TargetAllocationAreaMode, FreeformHelper.Application.Services.NotchV22ResolvedResult Resolved);
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -200,5 +203,87 @@ public sealed partial class FreeformHelperViewModel
             dxfIndex?.ToString(CultureInfo.InvariantCulture) ?? "-",
             detail.Allocations.Count);
         await OpenNotchDetailAsync(detail);
+    }
+
+    /// <summary>
+    /// Gets the command to export the notch table in the currently selected format.
+    /// </summary>
+    public IAsyncRelayCommand ExportNotchCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the command to open the notch detail view for the selected CAD pad.
+    /// </summary>
+    public IAsyncRelayCommand ShowNotchDetailCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the command to set notch validation target REG from current selection.
+    /// </summary>
+    public IRelayCommand UseSelectedRegularForNotchValidationCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the command to analyze notch rows/flow for current validation REG.
+    /// </summary>
+    public IRelayCommand AnalyzeNotchValidationCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the command to clear notch validation result.
+    /// </summary>
+    public IRelayCommand ClearNotchValidationCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the command to focus canvas selection based on one validation row.
+    /// </summary>
+    public IRelayCommand<NotchValidationDisplayItem> FocusNotchValidationItemCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the command to move Notch Stage preview to previous stage.
+    /// </summary>
+    public IRelayCommand PreviousNotchPreviewStageCommand { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets the command to move Notch Stage preview to next stage.
+    /// </summary>
+    public IRelayCommand NextNotchPreviewStageCommand { get; private set; } = null!;
+
+    /// <summary>Creates the Notch commands. <see cref="InitializeCommands"/> calls it once during construction.</summary>
+    private void InitializeNotchCommands()
+    {
+        ExportNotchCommand = CreateEditingAsyncCommand(ExportNotchAsync);
+        ShowNotchDetailCommand = CreateEditingAsyncCommand(ShowNotchDetailAsync);
+        UseSelectedRegularForNotchValidationCommand = CreateEditingCommand(UseSelectedRegularForNotchValidation);
+        AnalyzeNotchValidationCommand = CreateEditingCommand(AnalyzeNotchValidation);
+        ClearNotchValidationCommand = CreateEditingCommand(ClearNotchValidation);
+        FocusNotchValidationItemCommand = CreateEditingCommand<NotchValidationDisplayItem>(FocusNotchValidationItem);
+        PreviousNotchPreviewStageCommand = CreateEditingCommand(() => ShiftNotchPreviewStage(-1));
+        NextNotchPreviewStageCommand = CreateEditingCommand(() => ShiftNotchPreviewStage(1));
+    }
+
+    private readonly NotchExportGenerationCacheService _notchExportGenerationCacheService = new();
+
+    private readonly NotchCompensationCacheCounters _notchCompensationCacheCounters = new();
+
+    private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
+
+    private readonly NotchResultCacheState _notchCache = new(); // Holds the notch compensation and validation caches and the last generated notch table.
+
+    /// <summary>Gets the notch result cache holder for tests.</summary>
+    internal NotchResultCacheState NotchCacheForTests => _notchCache;
+
+    /// <summary>
+    /// Holds the notch compensation result cache, the notch validation bucket cache, the last generated notch table and the last preview visibility seen by playback, for the main view model.
+    /// </summary>
+    internal sealed class NotchResultCacheState
+    {
+        /// <summary>Gets the resolved notch result cache keyed by CAD pad id.</summary>
+        internal Dictionary<int, NotchResolvedCacheEntry> ResolvedResultByCadId { get; } = new();
+
+        /// <summary>Gets or sets the cached validation bucket with the table and null diff value it was built for.</summary>
+        internal (NotchValidationBucket Bucket, NotchTable Table, int NullDiffValue)? ValidationBucket { get; set; }
+
+        /// <summary>Gets or sets the table of the last notch generation.</summary>
+        internal NotchTable? LastGeneratedTable { get; set; }
+
+        /// <summary>Gets or sets the preview visibility that the last playback sync saw.</summary>
+        internal bool LastPreviewVisibleForPlayback { get; set; }
     }
 }

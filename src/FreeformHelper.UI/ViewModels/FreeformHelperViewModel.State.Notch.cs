@@ -1,5 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FreeformHelper.Application.Export;
+using FreeformHelper.Application.Settings;
+using FreeformHelper.Domain.Notch;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -615,4 +618,73 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool IsNotchValidationOutgoingEmpty => NotchValidationOutgoingItems.Count == 0;
 
+    /// <summary>
+    /// Gets a read-only list of notch export file-type options.
+    /// </summary>
+    public IReadOnlyList<NotchExportFileTypeOption> NotchExportFileTypeOptions { get; }
+
+    /// <summary>
+    /// Gets a read-only list of notch C-export profile options.
+    /// </summary>
+    public IReadOnlyList<NotchExportProfileOption> NotchExportProfileOptions { get; }
+
+    /// <summary>
+    /// Gets a read-only list of Step3 compensation model options.
+    /// </summary>
+    public IReadOnlyList<NotchCompensationModelOption> NotchCompensationModelOptions { get; }
+
+    private void OnIsNotchExportingChanged(bool _)
+    {
+        OnPropertyChanged(nameof(ShouldShowNotchExportProgress));
+    }
+
+    private void OnNotchExportProgressChanged(double _)
+    {
+        OnPropertyChanged(nameof(ShouldShowNotchExportProgress));
+    }
+
+    private static List<NotchCompensationModelOption> BuildNotchCompensationModelOptions() =>
+        new List<NotchCompensationModelOption>
+        {
+            new(
+                NotchCompensationModel.CurrentGain,
+                "Current (Gain)",
+                "To Regular x To Full (current model)."),
+            new(
+                NotchCompensationModel.ConservativeNoGain,
+                "Conservative (No Gain)",
+                "Apply ToRegular source combine; ToFull only gates boundary support."),
+            new(
+                NotchCompensationModel.Disabled,
+                "Disabled",
+                "Turn off To Full and To Regular for baseline comparison."),
+        };
+
+    partial void OnShowNotchToRegularLabelsChanging(bool value) => TrackUndo(ShowNotchToRegularLabels, value, v => ShowNotchToRegularLabels = v, "Toggle To Regular labels");
+    partial void OnEnableV21Changing(bool value) => TrackUndo(EnableV21, value, v => EnableV21 = v, "Export v2.1");
+    partial void OnEnableV22Changing(bool value) => TrackUndo(EnableV22, value, v => EnableV22 = v, "Export v2.2");
+    partial void OnSelectedNotchCompensationModelOptionChanging(NotchCompensationModelOption value) => TrackUndo(SelectedNotchCompensationModelOption, value, v => SelectedNotchCompensationModelOption = v, "Compensation model");
+    partial void OnEnableToRegularChanging(bool value) => TrackUndo(EnableToRegular, value, v => EnableToRegular = v, "To Regular");
+    partial void OnEnableToFullChanging(bool value) => TrackUndo(EnableToFull, value, v => EnableToFull = v, "To Full");
+    partial void OnToFullStrictOverlapPercentChanging(decimal value) => TrackUndo(ToFullStrictOverlapPercent, value, v => ToFullStrictOverlapPercent = v, "To Full owner TH");
+    partial void OnLenScaleChanging(decimal value) => TrackUndo(LenScale, value, v => LenScale = v, "LenScale");
+    partial void OnNullValueChanging(decimal value) => TrackUndo(NullValue, value, v => NullValue = v, "Null value");
+    partial void OnNotchThresholdQ7Changing(decimal value) => TrackUndo(NotchThresholdQ7, value, v => NotchThresholdQ7 = v, "Notch gate v2.1");
+    partial void OnNotchThresholdPercentChanging(decimal value) => TrackUndo(NotchThresholdPercent, value, v => NotchThresholdPercent = v, "Notch gate TH");
+    partial void OnLinkNotchThresholdsChanging(bool value) => TrackUndo(LinkNotchThresholds, value, v => LinkNotchThresholds = v, "Link notch TH");
+
+    private static List<NotchExportFileTypeOption> BuildNotchExportFileTypeOptions() =>
+        new List<NotchExportFileTypeOption>
+        {
+            new(NotchExportFileType.Csv, "CSV review (.csv)", "csv"),
+            new(NotchExportFileType.Cv21, "C v2.1 (.c)", "c", NotchAlgorithmVersion.V21),
+            new(NotchExportFileType.Cv22, "C v2.2 (.c)", "c", NotchAlgorithmVersion.V22),
+        };
+
+    private static List<NotchExportProfileOption> BuildNotchExportProfileOptions() =>
+        new List<NotchExportProfileOption>
+        {
+            new(NotchExportProfile.Release, "Release (minimal FW)"),
+            new(NotchExportProfile.Debug, "Debug (trace + sim mask)"),
+        };
 }

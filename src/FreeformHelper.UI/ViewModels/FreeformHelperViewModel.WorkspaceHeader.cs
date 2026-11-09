@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -182,4 +183,12 @@ public sealed partial class FreeformHelperViewModel
         if (value) SelectWorkspaceWorkStep(WorkspaceWorkStep.Step5Export);
     }
 
+    // --- Workspace Header Items ---
+
+    /// <summary>
+    /// Gets or sets the observable collection of <see cref="WorkspaceHeaderItem"/>
+    /// that are displayed in the application's header menu.
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<WorkspaceHeaderItem> _workspaceHeaderItems = new();
 }

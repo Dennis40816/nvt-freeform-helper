@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -153,5 +154,72 @@ public sealed partial class FreeformHelperViewModel
         RaiseWhenChanged(oldValue.Issues.Count > 0, newValue.Issues.Count > 0, nameof(HasDxfOverlapIssues));
         RaiseWhenChanged(oldValue.HighlightedCadIds, newValue.HighlightedCadIds, nameof(DxfOverlapHighlightedCadIds));
     }
+
+    /// <summary>
+    /// Gets or sets the observable collection of <see cref="LayerToggle"/> objects
+    /// used to control the visibility of CAD layers.
+    /// </summary>
+    [ObservableProperty] private ObservableCollection<LayerToggle> _layerToggles = new();
+
+    /// <summary>
+    /// Gets or sets the available layer options for bounding the grid.
+    /// </summary>
+    [ObservableProperty] private ObservableCollection<BoundLayerOption> _boundLayerOptions = new();
+
+    /// <summary>
+    /// Gets or sets the available layer options for DXF regular source mode.
+    /// </summary>
+    [ObservableProperty] private ObservableCollection<RegularSourceLayerOption> _regularSourceLayerOptions = new();
+
+    // --- DXF Quality Check Properties ---
+
+    /// <summary>
+    /// Gets or sets the latest DXF overlap check result. The view model replaces the whole value.
+    /// The properties below forward to it and raise their change notification when their own
+    /// value changed.
+    /// </summary>
+    [ObservableProperty] private DxfOverlapResult _dxfOverlapResult = DxfOverlapResult.CreateNotRun();
+    /// <summary>
+    /// Gets the summary message for DXF overlap issues (e.g., "no overlaps detected").
+    /// </summary>
+    public string DxfOverlapSummary => DxfOverlapResult.Summary;
+
+    /// <summary>
+    /// Gets the observable collection of detailed DXF overlap issue messages.
+    /// </summary>
+    public ObservableCollection<string> DxfOverlapIssues => DxfOverlapResult.Issues;
+
+    /// <summary>
+    /// Gets the number of overlap issues currently loaded in details.
+    /// </summary>
+    public int DxfOverlapIssueCount => DxfOverlapResult.Issues.Count;
+
+    /// <summary>
+    /// Gets a value indicating whether any DXF overlap issues were found.
+    /// </summary>
+    public bool HasDxfOverlapIssues => DxfOverlapResult.Issues.Count > 0;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether DXF overlap checking is currently running.
+    /// </summary>
+    public bool IsCheckingDxfOverlap
+    {
+        get => _dxfOverlapState.Current.IsBusy;
+        set => SetOperationBusy(_dxfOverlapState, value, nameof(IsCheckingDxfOverlap));
+    }
+
+    /// <summary>
+    /// Gets or sets the current progress value (0-1) for DXF overlap checking.
+    /// </summary>
+    public double DxfOverlapProgress
+    {
+        get => _dxfOverlapState.Current.Progress;
+        set => SetOperationProgress(_dxfOverlapState, value, nameof(DxfOverlapProgress));
+    }
+
+    /// <summary>
+    /// Gets the CAD pad IDs highlighted by overlap checking.
+    /// </summary>
+    public ObservableCollection<int> DxfOverlapHighlightedCadIds => DxfOverlapResult.HighlightedCadIds;
 }
 

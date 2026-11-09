@@ -133,4 +133,8 @@ public sealed partial class FreeformHelperViewModel
             }
         }
     }
+
+    private const decimal NotchPreviewAutoPlayIntervalMinMs = 200m;
+
+    private const decimal NotchPreviewAutoPlayIntervalMaxMs = 5000m;
 }

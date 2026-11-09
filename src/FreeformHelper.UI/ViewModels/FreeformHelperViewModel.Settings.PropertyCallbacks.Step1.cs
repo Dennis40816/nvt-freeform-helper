@@ -581,4 +581,9 @@ public sealed partial class FreeformHelperViewModel
             ? null
             : (int)Math.Min(Math.Round(value), FreeformHelper.Application.Services.ActiveAreaPixelPitch.MaxPixels);
     }
+
+    partial void OnAreaBucketToleranceChanging(decimal value) => TrackUndo(AreaBucketTolerance, value, v => AreaBucketTolerance = v, "Area bucket tolerance");
+    partial void OnMaxAreaBucketsChanging(decimal value) => TrackUndo(MaxAreaBuckets, value, v => MaxAreaBuckets = v, "Max area buckets");
+    partial void OnSelectedScanOrderChanging(ScanOrder value) => TrackUndo(SelectedScanOrder, value, v => SelectedScanOrder = v, "Scan order");
+    partial void OnGridAlignmentModeChanging(GridAlignmentMode value) => TrackUndo(GridAlignmentMode, value, v => GridAlignmentMode = v, "Alignment mode");
 }
