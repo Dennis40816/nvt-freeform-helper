@@ -204,7 +204,7 @@
       "kind": "member",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "methodLines": 105
+        "methodLines": 85
       },
       "owner": "NFH",
       "locations": [
@@ -213,20 +213,6 @@
       "contentHash": "641ae7e4bdb6aa7c699ebd0351b6473f8bdb105e9a83364156dc883e2ef592b0",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.ViewModels.CoordinatePlannerWorkspaceViewModel..ctor(CoordinatePlannerWorkspaceUseCase,CoordinatePlannerWorkspaceSession)"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 97
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/CoordinatePlannerWorkspaceViewModel.Operations.cs"
-      ],
-      "contentHash": "320f3cb640d11c402257e742d9a3ff88eb13a6c8491935b2929624981e9d64ee",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.CoordinatePlannerWorkspaceViewModel.RebuildSnapshot()"
     },
     {
       "kind": "type",
