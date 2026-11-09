@@ -238,7 +238,42 @@ function Invoke-TestShard {
                 $runFailed = $true
                 $directoryExceptionType = $_.Exception.GetType().FullName
             }
+            # Build the test project once for the whole shard. Each group then runs with -NoBuild, so the first
+            # group no longer builds inside its own 'dotnet test'. Only the exit code, the seconds and the error
+            # codes of the build are printed.
+            $buildPassed = $true
+            $buildStatus = @{ ExitCode = $null; ElapsedSeconds = $null; BuildErrorCodes = @() }
+            $buildExceptionType = ''
+            if ([string]::IsNullOrEmpty($directoryExceptionType)) {
+                try {
+                    & $runTestsScript -BuildOnly -Configuration $Configuration -UseNoAppHost `
+                        -AllowMissingExampleData:($AllowMissingExampleData -or $Unverified) `
+                        -RunStatus $buildStatus *> $null
+                } catch {
+                    $buildPassed = $false
+                    $runFailed = $true
+                    $buildExceptionType = $_.Exception.GetType().FullName
+                }
+                Write-Host ('[verify] build-step shard={0} exit={1} elapsed-seconds={2}' -f
+                    $Name, $buildStatus.ExitCode, $buildStatus.ElapsedSeconds)
+                if (@($buildStatus.BuildErrorCodes).Count -gt 0) {
+                    Write-Host ('[verify] build-step-errors shard={0} codes={1}' -f
+                        $Name, (@($buildStatus.BuildErrorCodes) -join ','))
+                }
+            }
             foreach ($group in $shardGroups[$Name]) {
+                if (-not $buildPassed) {
+                    # The groups are not run after a failed build. Each one is recorded with the build phase.
+                    $runDiagnostics.Add([pscustomobject]@{
+                        Group = $group
+                        Phase = 'build'
+                        ExitCode = $buildStatus.ExitCode
+                        ExceptionType = $buildExceptionType
+                        TrxFiles = 0
+                        DirectoryPresent = $false
+                    })
+                    continue
+                }
                 $groupDirectory = Join-Path $resultsDirectory $group
                 $runStatus = @{ ExitCode = $null; HostErrors = @(); RetryCount = 0; RedactedOutput = @() }
                 $phase = 'results-directory'
@@ -246,7 +281,7 @@ function Invoke-TestShard {
                 if ([string]::IsNullOrEmpty($directoryExceptionType)) {
                     try {
                         $phase = 'run-tests'
-                        & $runTestsScript -Group $group -Configuration $Configuration -UseNoAppHost `
+                        & $runTestsScript -Group $group -Configuration $Configuration -UseNoAppHost -NoBuild `
                             -AllowMissingExampleData:($AllowMissingExampleData -or $Unverified) `
                             -ResultsDirectory $groupDirectory -RunStatus $runStatus *> $null
                         $phase = 'read-results'

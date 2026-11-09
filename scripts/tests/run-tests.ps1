@@ -5,6 +5,10 @@ param(
     [switch]$UseNoAppHost,
     [switch]$ValidateOnly,
     [switch]$AllowMissingExampleData,
+    # Build the test project once and run nothing. verify.ps1 does this once for a shard, then runs each group with
+    # -NoBuild, so the first group no longer builds inside its own 'dotnet test'.
+    [switch]$BuildOnly,
+    [switch]$NoBuild,
     # Internal CI result collection. Policy and summaries belong to verify.ps1, which owns shards.
     [string]$ResultsDirectory = "",
     # Internal CI status channel: the native exit code and fixed host-error labels, never tool output.
@@ -13,6 +17,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 if ($null -ne $RunStatus) {
+    $RunStatus['BuildErrorCodes'] = @()
     $RunStatus['ExitCode'] = $null
     $RunStatus['HostErrors'] = @()
     $RunStatus['ElapsedSeconds'] = $null
@@ -349,6 +354,10 @@ if ($UseNoAppHost) {
     $args += "/p:UseAppHost=false"
 }
 
+if ($NoBuild) {
+    $args += "--no-build"
+}
+
 if (-not [string]::IsNullOrWhiteSpace($filter)) {
     $args += @("--filter", $filter)
 }
@@ -389,6 +398,24 @@ try {
         [Environment]::SetEnvironmentVariable("TMPDIR", $testTempPath)
     }
     [Environment]::SetEnvironmentVariable($requireExampleDataEnv, $(if ($exampleDataPresent) { "1" } else { [NullString]::Value }))
+    if ($BuildOnly) {
+        # The build output stays in memory: it can hold file names. Only the exit code, the seconds and the
+        # compiler or MSBuild error codes (such as CS0103) leave this script.
+        $buildArguments = @("build", $project, "-c", $Configuration, "--nologo", "-m:4", "-nodeReuse:false")
+        if ($UseNoAppHost) { $buildArguments += "/p:UseAppHost=false" }
+        $buildTimer = [System.Diagnostics.Stopwatch]::StartNew()
+        $buildOutput = @(dotnet @buildArguments *>&1)
+        $buildExitCode = $LASTEXITCODE
+        $buildTimer.Stop()
+        if ($null -ne $RunStatus) {
+            $RunStatus['ExitCode'] = [int]$buildExitCode
+            $RunStatus['ElapsedSeconds'] = [int][math]::Round($buildTimer.Elapsed.TotalSeconds)
+            $RunStatus['BuildErrorCodes'] = @($buildOutput | ForEach-Object { [regex]::Matches([string]$_, '\berror ((?:MSB|CS|NETSDK|NU)[0-9]{3,5})\b') } |
+                ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique -First 10)
+        }
+        if ($buildExitCode -ne 0) { throw "Build failed with exit code $buildExitCode." }
+        return
+    }
     $hostOutput = @()
     $runTimer = [System.Diagnostics.Stopwatch]::StartNew()
     if (-not [string]::IsNullOrWhiteSpace($ResultsDirectory)) {

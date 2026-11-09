@@ -406,6 +406,8 @@ try {
                 function git { $global:LASTEXITCODE = 0; return ("a" * 40) }
                 function dotnet {
                     $calls.Add($args)
+                    # The shard builds the test project once before its groups. The build always succeeds here.
+                    if ($args[0] -ceq 'build') { $global:LASTEXITCODE = 0; return }
                     $index = [Array]::IndexOf($args, '--results-directory')
                     if ($index -ge 0) { Write-FixtureTrx -Directory $args[$index + 1] -Tests $samples }
                     Write-Output 'CONFIDENTIAL_SENTINEL'
@@ -420,15 +422,23 @@ try {
                             -EnforceFloors:$case.Enforce -Unverified:$case.Unverified -SummaryPath $summaryFile 6>&1
                     } catch { $message = $_.Exception.Message }
                 )
-                $expectedCalls = if (-not $case.Enforce -and $case.Fail) { 1 } else { 4 }
+                # A CI run (floors enforced) builds once, then runs each of the four groups without a build.
+                $expectedCalls = if (-not $case.Enforce -and $case.Fail) { 1 } elseif ($case.Enforce) { 5 } else { 4 }
                 Assert-Policy ($calls.Count -eq $expectedCalls)
                 Assert-Policy (((($entryOutput -join '') -match 'CONFIDENTIAL_SENTINEL') -eq (-not $case.Enforce)))
                 Assert-Policy (-not (Test-Path -LiteralPath (Join-Path $fakeRepo "build/ci-test-results")))
                 Assert-Policy (-not (Test-Path -LiteralPath (Join-Path $fakeRepo "tests/FreeformHelper.Tests/TestResults")))
                 foreach ($call in $calls) {
-                    Assert-Policy (($call -contains '--logger') -eq $case.Enforce)
                     Assert-Policy (-not ($call -contains '--no-restore'))
+                    if ($call[0] -ceq 'build') {
+                        Assert-Policy ($case.Enforce -and $call.Count -ge 4 -and ($call -contains '/p:UseAppHost=false') -and
+                            ($call -contains '-m:4') -and -not ($call -contains '--logger') -and -not ($call -contains '--no-build'))
+                        continue
+                    }
+                    Assert-Policy (($call -contains '--logger') -eq $case.Enforce)
+                    Assert-Policy (($call -contains '--no-build') -eq $case.Enforce)
                 }
+                Assert-Policy (@($calls | Where-Object { $_[0] -ceq 'build' }).Count -eq $(if ($case.Enforce) { 1 } else { 0 }))
                 if ($case.Enforce) {
                     $summaryText = Get-Content -LiteralPath $summaryFile -Raw
                     Assert-Policy (Test-Json -Json $summaryText -SchemaFile $summarySchema)
@@ -441,7 +451,11 @@ try {
                         '[check-test-shard] total 12 passed 12 failed 0 skipped 0 notExecuted 0'
                     )
                     if (-not $case.Fail -and -not $case.Unverified) { $expectedOutput += '[verify] OK (test)' }
-                    Assert-Policy (($entryOutput -join "`n") -ceq ($expectedOutput -join "`n"))
+                    # The build step prints one line with the exit code and the seconds; the seconds vary.
+                    $buildLines = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] build-step *' })
+                    Assert-Policy ($buildLines.Count -eq 1 -and [string]$buildLines[0] -cmatch '^\[verify\] build-step shard=core exit=0 elapsed-seconds=[0-9]+$')
+                    $outputWithoutBuild = @($entryOutput | Where-Object { [string]$_ -notlike '[[]verify] build-step *' })
+                    Assert-Policy (($outputWithoutBuild -join "`n") -ceq ($expectedOutput -join "`n"))
                 } else {
                     Assert-Policy (-not (Test-Path -LiteralPath $summaryFile) -and ($message.Length -gt 0) -eq $case.Fail)
                     if ($case.Fail) { Assert-Policy ($message -ceq "Test group 'notch-core' failed with exit code 1.") }
@@ -465,6 +479,7 @@ try {
             & {
                 function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
                 function dotnet {
+                    if ($args[0] -ceq 'build') { $global:LASTEXITCODE = 0; return }
                     $index = [Array]::IndexOf($args, '--results-directory')
                     $directory = $args[$index + 1]
                     Write-Output 'PRIVATE-MARKER-DO-NOT-PRINT'
@@ -563,6 +578,7 @@ try {
                 function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
                 $runCalls = @{ Count = 0 }
                 function dotnet {
+                    if ($args[0] -ceq 'build') { $global:LASTEXITCODE = 0; return }
                     if ($args -contains '--list-tests') {
                         if ($case.ContainsKey('ListLines')) { foreach ($line in $case.ListLines) { Write-Output $line } }
                         $global:LASTEXITCODE = $(if ($case.ContainsKey('ListExit')) { $case.ListExit } else { 0 })
@@ -640,6 +656,53 @@ try {
             }
         }
     }
+    # A failed build stops the shard before any group runs. The log gets the exit code, the seconds and the error codes
+    # only, never a line of the build output, and each group is recorded with the build phase.
+    foreach ($buildCase in @(
+            @{ Lines = @('x.cs(1,1): error CS0103: PRIVATE-MARKER-DO-NOT-PRINT', 'y.cs(2,2): error MSB3027: PRIVATE-MARKER-DO-NOT-PRINT',
+                    'z.cs(3,3): error CS0103: again PRIVATE-MARKER-DO-NOT-PRINT'); Codes = 'CS0103,MSB3027' },
+            @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT and nothing else'); Codes = '' })) {
+        Invoke-WithTemporaryEnvironmentVariables -Settings @{ FREEFORMHELPER_TEST_AREA = (Join-Path $testRoot 'test-area') } -Action {
+            & {
+                function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
+                $testCalls = @{ Count = 0 }
+                function dotnet {
+                    if ($args[0] -ceq 'build') {
+                        foreach ($line in $buildCase.Lines) { Write-Output $line }
+                        $global:LASTEXITCODE = 1
+                        return
+                    }
+                    $testCalls.Count++
+                    $global:LASTEXITCODE = 0
+                }
+                $summaryFile = Join-Path $fakeRepo 'summary.json'
+                if (Test-Path -LiteralPath $summaryFile) { Remove-Item -LiteralPath $summaryFile }
+                $message = ''
+                $buildOutput = @(
+                    try {
+                        & (Join-Path $fakeRepo 'scripts/verify.ps1') -CiLane test -Shard snapshots -AllowMissingExampleData `
+                            -EnforceFloors -SummaryPath $summaryFile *>&1
+                    } catch { $message = $_.Exception.Message }
+                )
+                Assert-Policy ($testCalls.Count -eq 0)
+                Assert-Policy ($message -ceq 'Shard validation failed.')
+                Assert-Policy (($buildOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
+                $stepLines = @($buildOutput | Where-Object { [string]$_ -like '[[]verify] build-step *' })
+                Assert-Policy ($stepLines.Count -eq 1 -and [string]$stepLines[0] -cmatch '^\[verify\] build-step shard=snapshots exit=1 elapsed-seconds=[0-9]+$')
+                $codeLines = @($buildOutput | Where-Object { [string]$_ -like '[[]verify] build-step-errors *' })
+                if ($buildCase.Codes -ceq '') {
+                    Assert-Policy ($codeLines.Count -eq 0)
+                } else {
+                    Assert-Policy ($codeLines.Count -eq 1 -and [string]$codeLines[0] -ceq ('[verify] build-step-errors shard=snapshots codes={0}' -f $buildCase.Codes))
+                }
+                $expectedDiagnostic = '[check-test-shard] diagnostic shard=snapshots group=ui-snapshots phase=build exit=1 trx-files=0 results-dir=missing'
+                $diagnostics = @($buildOutput | Where-Object { [string]$_ -like '[[]check-test-shard] diagnostic *' })
+                Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -ceq $expectedDiagnostic)
+                $buildSummary = Get-Content -LiteralPath $summaryFile -Raw | ConvertFrom-Json
+                Assert-Policy ($buildSummary.outcome -ceq 'failed' -and $buildSummary.total -eq 0)
+            }
+        }
+    }
     # A local run (no floors) adds up the skipped count of the test summaries and prints it before the final line.
     # A CI run reads the count from the shard summary instead, so it must not print the line.
     Invoke-WithTemporaryEnvironmentVariables -Settings @{ FREEFORMHELPER_TEST_AREA = (Join-Path $testRoot 'test-area') } -Action {
@@ -667,6 +730,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
 function dotnet {
+    if ($args[0] -ceq 'build') { $global:LASTEXITCODE = 0; return }
     $index = [Array]::IndexOf($args, '--results-directory')
     $directory = $args[$index + 1]
     Write-Output 'PRIVATE-MARKER-DO-NOT-PRINT'
