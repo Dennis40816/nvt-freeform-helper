@@ -82,14 +82,7 @@ public sealed partial class FreeformHelperView
         }
 
         var ok = await save;
-        var message = string.IsNullOrWhiteSpace(viewModel.StatusText)
-            ? ok ? "Project saved." : "Save project failed."
-            : viewModel.StatusText;
-        var type = ok
-            ? Avalonia.Controls.Notifications.NotificationType.Success
-            : message.Contains("cancel", StringComparison.OrdinalIgnoreCase)
-                ? Avalonia.Controls.Notifications.NotificationType.Information
-                : Avalonia.Controls.Notifications.NotificationType.Warning;
+        var (message, type) = SaveShortcutToastPolicy.Resolve(ok, viewModel.StatusText);
         if (TopLevel.GetTopLevel(this) is MainWindow window)
         {
             window.ShowTopToast(message, type);

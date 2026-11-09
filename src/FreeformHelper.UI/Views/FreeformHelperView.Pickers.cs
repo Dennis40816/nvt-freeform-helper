@@ -105,41 +105,41 @@ public sealed partial class FreeformHelperView
         viewModel.PickOpenDxfPathAsync = async () =>
         {
             var res = await storage.OpenFilePickerAsync(FilePickerOptionFactory.OpenDxf());
-            return res is { Count: > 0 } ? res[0].Path.LocalPath : null; // Return local path of selected file.
+            return StoragePickerPaths.FirstLocalPath(res); // Return local path of selected file.
         };
 
         viewModel.PickOpenRegularVisibilityMaskPathAsync = async () =>
         {
             var res = await storage.OpenFilePickerAsync(FilePickerOptionFactory.OpenRegularVisibilityMask());
-            return res is { Count: > 0 } ? res[0].Path.LocalPath : null;
+            return StoragePickerPaths.FirstLocalPath(res);
         };
 
         // Delegate for loading a project file.
         viewModel.PickLoadProjectPathAsync = async () =>
         {
             var res = await storage.OpenFilePickerAsync(FilePickerOptionFactory.OpenProject());
-            return res is { Count: > 0 } ? res[0].Path.LocalPath : null;
+            return StoragePickerPaths.FirstLocalPath(res);
         };
 
         // Delegate for saving a project file.
         viewModel.PickSaveProjectPathAsync = async () =>
         {
             var res = await storage.SaveFilePickerAsync(FilePickerOptionFactory.SaveProject());
-            return res?.Path.LocalPath;
+            return StoragePickerPaths.LocalPath(res);
         };
 
         // Delegate for saving notch table files.
         viewModel.PickSaveNotchPathAsync = async (baseName, ext) =>
         {
             var res = await storage.SaveFilePickerAsync(FilePickerOptionFactory.SaveNotch(baseName, ext));
-            return res?.Path.LocalPath;
+            return StoragePickerPaths.LocalPath(res);
         };
 
         // Delegate for saving generic export files (DXF, image, etc.).
         viewModel.PickSaveExportPathAsync = async (baseName, ext) =>
         {
             var res = await storage.SaveFilePickerAsync(FilePickerOptionFactory.SaveExport(baseName, ext));
-            return res?.Path.LocalPath;
+            return StoragePickerPaths.LocalPath(res);
         };
 
         // Delegate for confirming whether to embed DXF data.
