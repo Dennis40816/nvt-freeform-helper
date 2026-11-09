@@ -234,49 +234,11 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             result.GuideBounds,
             _activeAreaSourceText,
             _guideSourceText);
-        AaCornerRows = _snapshot.Points
-            .Where(static point => point.Kind == CoordinatePlannerPointKind.AaCorner)
-            .Select(static point => new CoordinatePlannerPointRow(
-                point.Label,
-                "AA corner",
-                $"({point.PixelX:0.###}, {point.PixelY:0.###})",
-                $"({point.MachineX:0.###}, {point.MachineY:0.###})",
-                $"({point.SafeMachineX:0.###}, {point.SafeMachineY:0.###})"))
-            .ToArray();
-        CustomArrayCornerRows = _snapshot.Points
-            .Where(static point => point.Kind == CoordinatePlannerPointKind.CustomArrayCorner)
-            .Select(static point => new CoordinatePlannerPointRow(
-                point.Label,
-                "4-point corner",
-                $"({point.PixelX:0.###}, {point.PixelY:0.###})",
-                $"({point.MachineX:0.###}, {point.MachineY:0.###})",
-                $"({point.SafeMachineX:0.###}, {point.SafeMachineY:0.###})"))
-            .ToArray();
-        CustomArrayPointRows = _snapshot.Points
-            .Where(static point => point.Kind == CoordinatePlannerPointKind.CustomArrayDot)
-            .Select(static point => new CoordinatePlannerPointRow(
-                point.Label,
-                "Array dot",
-                $"({point.PixelX:0.###}, {point.PixelY:0.###})",
-                $"({point.MachineX:0.###}, {point.MachineY:0.###})",
-                $"({point.SafeMachineX:0.###}, {point.SafeMachineY:0.###})"))
-            .ToArray();
-        HorizontalGuideRows = _snapshot.Lines
-            .Where(static line => line.Kind == CoordinatePlannerLineKind.HorizontalGuide)
-            .Select(static line => new CoordinatePlannerLineRow(
-                line.Label,
-                $"({line.StartPixelX:0.###}, {line.StartPixelY:0.###}) -> ({line.EndPixelX:0.###}, {line.EndPixelY:0.###})",
-                $"({line.StartMachineX:0.###}, {line.StartMachineY:0.###}) -> ({line.EndMachineX:0.###}, {line.EndMachineY:0.###})",
-                $"({line.SafeStartMachineX:0.###}, {line.SafeStartMachineY:0.###}) -> ({line.SafeEndMachineX:0.###}, {line.SafeEndMachineY:0.###})"))
-            .ToArray();
-        VerticalGuideRows = _snapshot.Lines
-            .Where(static line => line.Kind == CoordinatePlannerLineKind.VerticalGuide)
-            .Select(static line => new CoordinatePlannerLineRow(
-                line.Label,
-                $"({line.StartPixelX:0.###}, {line.StartPixelY:0.###}) -> ({line.EndPixelX:0.###}, {line.EndPixelY:0.###})",
-                $"({line.StartMachineX:0.###}, {line.StartMachineY:0.###}) -> ({line.EndMachineX:0.###}, {line.EndMachineY:0.###})",
-                $"({line.SafeStartMachineX:0.###}, {line.SafeStartMachineY:0.###}) -> ({line.SafeEndMachineX:0.###}, {line.SafeEndMachineY:0.###})"))
-            .ToArray();
+        AaCornerRows = CoordinatePlannerRowProjector.PointRows(_snapshot, CoordinatePlannerPointKind.AaCorner, "AA corner");
+        CustomArrayCornerRows = CoordinatePlannerRowProjector.PointRows(_snapshot, CoordinatePlannerPointKind.CustomArrayCorner, "4-point corner");
+        CustomArrayPointRows = CoordinatePlannerRowProjector.PointRows(_snapshot, CoordinatePlannerPointKind.CustomArrayDot, "Array dot");
+        HorizontalGuideRows = CoordinatePlannerRowProjector.LineRows(_snapshot, CoordinatePlannerLineKind.HorizontalGuide);
+        VerticalGuideRows = CoordinatePlannerRowProjector.LineRows(_snapshot, CoordinatePlannerLineKind.VerticalGuide);
         ArtifactRows = SortArtifactRows(_artifactSnapshot.Rows);
         SelectedArtifactRow = ArtifactRows.FirstOrDefault(row => string.Equals(row.Key, selectedArtifactKey, StringComparison.Ordinal));
 
