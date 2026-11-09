@@ -34,8 +34,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var current = Math.Clamp((int)Math.Round((double)NotchPreviewVisualizationStep), 1, 3);
-        var next = current >= 3 ? 1 : current + 1;
+        var next = NotchPreviewTiming.NextAutoPlayStage((int)Math.Round((double)NotchPreviewVisualizationStep));
         using (_undoSuppression.Enter())
         {
             NotchPreviewVisualizationStep = next;
@@ -49,17 +48,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var current = Math.Clamp((int)Math.Round((double)NotchPreviewVisualizationStep), 1, 3);
-        var next = current + delta;
-        while (next < 1)
-        {
-            next += 3;
-        }
-
-        while (next > 3)
-        {
-            next -= 3;
-        }
+        var next = NotchPreviewTiming.ShiftStage((int)Math.Round((double)NotchPreviewVisualizationStep), delta);
 
         using (_undoSuppression.Enter())
         {
@@ -91,11 +80,8 @@ public sealed partial class FreeformHelperViewModel
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var delayMs = (int)Math.Round(Math.Clamp(
-                    (double)NotchPreviewAutoPlayIntervalMs,
-                    (double)NotchPreviewAutoPlayIntervalMinMs,
-                    (double)NotchPreviewAutoPlayIntervalMaxMs));
-                await Task.Delay(TimeSpan.FromMilliseconds(delayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
+                var delayMs = NotchPreviewTiming.ClampAutoPlayIntervalMs(NotchPreviewAutoPlayIntervalMs);
+                await _notchPreviewTiming.DelayAsync(TimeSpan.FromMilliseconds(delayMs), cancellationToken).ConfigureAwait(false);
                 if (cancellationToken.IsCancellationRequested)
                 {
                     break;
@@ -133,8 +119,4 @@ public sealed partial class FreeformHelperViewModel
             }
         }
     }
-
-    private const decimal NotchPreviewAutoPlayIntervalMinMs = 200m;
-
-    private const decimal NotchPreviewAutoPlayIntervalMaxMs = 5000m;
 }

@@ -277,7 +277,7 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnNotchPreviewAutoPlayIntervalMsChanged(decimal value)
     {
-        var clamped = Math.Clamp(value, NotchPreviewAutoPlayIntervalMinMs, NotchPreviewAutoPlayIntervalMaxMs);
+        var clamped = Math.Clamp(value, NotchPreviewTiming.AutoPlayIntervalMinMs, NotchPreviewTiming.AutoPlayIntervalMaxMs);
         if (clamped != value)
         {
             using (_undoSuppression.Enter())

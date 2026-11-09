@@ -24,7 +24,8 @@ public sealed partial class FreeformHelperViewModel
     {
         try
         {
-            await Task.Delay(TimeSpan.FromMilliseconds(SelectionNotchPreviewDeferredDelayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
+            await _notchPreviewTiming.DelayAsync(
+                TimeSpan.FromMilliseconds(NotchPreviewTiming.SelectionDeferredDelayMs), cancellationToken).ConfigureAwait(false);
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
