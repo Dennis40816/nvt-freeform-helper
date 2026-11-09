@@ -283,8 +283,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool HasDxfRegularMappingIssues => MappingDiagnosticsResult.HasIssues;
 
-    private const double CsvLocalRepairAutoApplyMinConfidence = 0.80;
-
     private void UpdateCadOutputFwDiffIndexing(IReadOnlyList<CadPad> visiblePads)
     {
         var ordered = DxfIndexAssigner.OrderPads(visiblePads, _grid, SelectedScanOrder);
@@ -401,7 +399,7 @@ public sealed partial class FreeformHelperViewModel
         var groups = new Dictionary<int, List<CadPad>>();
         foreach (var pad in ordered)
         {
-            var ic = ResolveCadIcIndex(pad);
+            var ic = DxfIcResolver.Resolve(_grid, _projectFile.Settings.Grid, pad);
             _cadIcIndexByCadId[pad.Id] = ic;
             if (!groups.TryGetValue(ic, out var list))
             {
@@ -450,49 +448,17 @@ public sealed partial class FreeformHelperViewModel
         CadOutputFwDiffAutoMode autoMode,
         CadOutputFwDiffIndexAssignmentResult assignment)
     {
-        var visibleCadIds = ordered.Select(p => p.Id).ToHashSet();
-        var visibleOverrideCadIds = _projectFile.CadOutputFwDiffIndexOverrides.Keys
-            .Where(visibleCadIds.Contains)
-            .OrderBy(id => id)
-            .ToList();
-
-        CadOutputFwDiffIndexOverrideCadIds = new ObservableCollection<int>(visibleOverrideCadIds);
-
-        var anchorCadIds = _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc
-            .OrderBy(kv => kv.Key)
-            .Where(kv => visibleCadIds.Contains(kv.Value))
-            .Select(kv => kv.Value)
-            .Distinct()
-            .ToList();
-        CadOutputFwDiffIndexAnchorCadIdsForCanvas = new ObservableCollection<int>(anchorCadIds);
-
-        var anchorPairs = _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc
-            .OrderBy(kv => kv.Key)
-            .Take(4)
-            .Select(kv => $"IC{kv.Key + 1}->CAD {kv.Value}")
-            .ToList();
-        var anchorText = anchorPairs.Count == 0
-            ? "anchor=none"
-            : $"anchor=stored (inactive in current modes: {string.Join(", ", anchorPairs)}{(_projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.Count > anchorPairs.Count ? " (+)" : string.Empty)})";
-        var scanOrderText = $"scan={SelectedScanOrder}";
-        var icText = $"IC groups={padsByIc.Count}";
-        var unresolvedCount = assignment.AutoConflictCount + assignment.AutoUnmatchedCount;
-        var modeText = autoMode == CadOutputFwDiffAutoMode.BestMatchDirect
-            ? "geometry seed"
-            : "geometry seed (unique per IC)";
-        var priorityText = autoMode == CadOutputFwDiffAutoMode.BestMatchDirect
-            ? "override > direct geometry-seed"
-            : "override > direct geometry-seed (per-IC unique)";
-        var qualityText = assignment.DuplicateOverrides == 0 &&
-                          assignment.InvalidOverrides == 0 &&
-                          assignment.AutoConflictCount == 0 &&
-                          assignment.AutoUnmatchedCount == 0 &&
-                          assignment.OverrideMismatchCount == 0
-            ? string.Empty
-            : $" | issues: overrideDuplicate={assignment.DuplicateOverrides}, overrideInvalid={assignment.InvalidOverrides}, autoConflict={assignment.AutoConflictCount}, autoUnmatched={assignment.AutoUnmatchedCount}, overrideMismatch={assignment.OverrideMismatchCount}";
-
-        CadOutputFwDiffAssignmentSummary =
-            $"CAD Output FW Diff assignment: override={assignment.OverrideAssignedCount}, auto={assignment.AutoAssignedCount}, unresolved={unresolvedCount}, {icText}, {anchorText}, {scanOrderText}. Mode: {modeText}. Priority: {priorityText}{qualityText}.";
+        var hints = DxfIndexHintsBuilder.Build(
+            ordered.Select(p => p.Id).ToHashSet(),
+            _projectFile.CadOutputFwDiffIndexOverrides,
+            _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc,
+            SelectedScanOrder,
+            padsByIc.Count,
+            autoMode,
+            assignment);
+        CadOutputFwDiffIndexOverrideCadIds = new ObservableCollection<int>(hints.OverrideCadIds);
+        CadOutputFwDiffIndexAnchorCadIdsForCanvas = new ObservableCollection<int>(hints.AnchorCadIdsForCanvas);
+        CadOutputFwDiffAssignmentSummary = hints.Summary;
     }
 
     private void RefreshLatestCadOutputFwDiffAssignmentDecisions(
@@ -538,23 +504,11 @@ public sealed partial class FreeformHelperViewModel
             return decisions;
         }
 
-        var appliedCadIds = new List<int>();
-        foreach (var decision in decisions.Values.OrderBy(static row => row.OrderedCadIndex))
-        {
-            if (!ShouldAutoApplyCsvRepair(decision))
-            {
-                continue;
-            }
-
-            var targetDiff = decision.RepairSuggestionDiffIndex!.Value;
-            if (WouldCreateSameIcDuplicate(decision.CadPadId, targetDiff))
-            {
-                continue;
-            }
-
-            _cadOutputFwDiffIndexByCadId[decision.CadPadId] = targetDiff;
-            appliedCadIds.Add(decision.CadPadId);
-        }
+        var appliedCadIds = DxfCsvRepairRule.SelectRepairs(
+            decisions,
+            _projectFile.CadOutputFwDiffIndexOverrides,
+            _cadOutputFwDiffIndexByCadId,
+            _cadIcIndexByCadId);
 
         if (appliedCadIds.Count == 0)
         {
@@ -591,58 +545,4 @@ public sealed partial class FreeformHelperViewModel
         return refreshedByCadId;
     }
 
-    private bool ShouldAutoApplyCsvRepair(CadOutputFwDiffAssignmentDecision decision)
-    {
-        if (decision.Mode != CadOutputFwDiffAssignmentMode.CsvConstrained ||
-            decision.RepairSuggestionDiffIndex is null ||
-            !decision.Confidence.HasValue ||
-            decision.Confidence.Value < CsvLocalRepairAutoApplyMinConfidence)
-        {
-            return false;
-        }
-
-        if (decision.CurrentPrimaryDiffIndex.HasValue &&
-            decision.CurrentPrimaryDiffIndex.Value == decision.RepairSuggestionDiffIndex.Value)
-        {
-            return false;
-        }
-
-        return !_projectFile.CadOutputFwDiffIndexOverrides.ContainsKey(decision.CadPadId);
-    }
-
-    private bool WouldCreateSameIcDuplicate(int cadPadId, int targetDiff)
-    {
-        if (!_cadIcIndexByCadId.TryGetValue(cadPadId, out var cadIcIndex))
-        {
-            return false;
-        }
-
-        foreach (var (otherCadId, otherDiff) in _cadOutputFwDiffIndexByCadId)
-        {
-            if (otherCadId == cadPadId || otherDiff != targetDiff)
-            {
-                continue;
-            }
-
-            if (_cadIcIndexByCadId.TryGetValue(otherCadId, out var otherIcIndex) &&
-                otherIcIndex == cadIcIndex)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private int ResolveCadIcIndex(CadPad pad)
-    {
-        if (_grid is null || _grid.Cols <= 0 || _grid.XEdges.Count < 2)
-        {
-            return 0;
-        }
-
-        var (_, col) = DxfIndexAssigner.ResolveGridCell(_grid, pad.Centroid);
-        var perIcCols = GridIcChannelAllocationService.ResolvePerIcColumns(_projectFile.Settings.Grid, _grid.Cols);
-        return GridIcChannelAllocationService.ResolveIcIndexForColumn(col, perIcCols);
-    }
 }
