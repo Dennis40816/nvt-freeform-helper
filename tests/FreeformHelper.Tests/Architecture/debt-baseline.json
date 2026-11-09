@@ -11,7 +11,7 @@
     "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 4,
-    "freeformViewModelStateMembers": 94,
+    "freeformViewModelStateMembers": 93,
     "shellNavigationBooleans": 0,
     "noWarnIds": 1
   },
@@ -40,7 +40,6 @@
     "freeformViewModelStateMembers": [
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:68", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:69", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:70", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:73", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:81", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:82", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:84", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:86",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:206", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:212", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:218", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:242", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:251", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:262", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:266",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfIndexing.Duplicates.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfLayerImageExportSettings.cs:26",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:162", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:167", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:172", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:181",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs:252",

@@ -1,35 +1,19 @@
 using System.Globalization;
-using FreeformHelper.Application.Services;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
     public bool CanOffsetSelectedCadOutputFwDiffIndices =>
-        _selectedCadIds.Any(id => _cadOutputFwDiffIndexByCadId.ContainsKey(id)) &&
-        decimal.Truncate(Step4Index.ShiftDelta) == Step4Index.ShiftDelta &&
-        Step4Index.ShiftDelta != 0m;
+        DxfDiffShiftService.CanOffset(_selectedCadIds, _cadOutputFwDiffIndexByCadId, Step4Index.ShiftDelta);
 
     public string Step4DiffShiftSelectionSummary
     {
         get
         {
             var workflowSnapshot = BuildWorkflowDataSnapshot();
-            var visibleSelected = _selectedCadIds
-                .Where(id => workflowSnapshot.CadOutputFwDiffIndexByCadId.ContainsKey(id))
-                .OrderBy(id => id)
-                .ToList();
-            if (visibleSelected.Count == 0)
-            {
-                return "Diff shift: select CAD output pads in AA first.";
-            }
-
-            var diffs = visibleSelected
-                .Select(id => workflowSnapshot.CadOutputFwDiffIndexByCadId[id])
-                .OrderBy(diff => diff)
-                .ToList();
-            return FormattableString.Invariant(
-                $"Diff shift target: {visibleSelected.Count} CAD pad(s), current range {diffs.First()}-{diffs.Last()}, offset {Step4Index.ShiftDelta:0}.");
+            return DxfDiffShiftService.BuildSelectionSummary(
+                _selectedCadIds, workflowSnapshot.CadOutputFwDiffIndexByCadId, Step4Index.ShiftDelta);
         }
     }
 
@@ -53,11 +37,13 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var delta = (int)decimal.Truncate(Step4Index.ShiftDelta);
-        var plan = CadOutputFwDiffIndexShiftService.BuildShiftPlan(
+        var result = DxfDiffShiftService.ApplyShift(
             selectedCadIds,
             workflowSnapshot.CadOutputFwDiffIndexByCadId,
             workflowSnapshot.CadIcIndexByCadId,
-            delta);
+            delta,
+            _projectFile.CadOutputFwDiffIndexOverrides);
+        var plan = result.Plan;
         if (!plan.IsSuccessful)
         {
             SetStatus(plan.Message);
@@ -65,20 +51,8 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var overrides = _projectFile.CadOutputFwDiffIndexOverrides;
-        var previousOverrides = overrides.ToDictionary(static pair => pair.Key, static pair => pair.Value);
-        var changedCount = 0;
-        foreach (var pair in plan.ShiftedDiffByCadId.OrderBy(static pair => pair.Key))
-        {
-            if (overrides.TryGetValue(pair.Key, out var previous) && previous == pair.Value)
-            {
-                continue;
-            }
-
-            overrides[pair.Key] = pair.Value;
-            changedCount++;
-        }
-
-        if (changedCount == 0)
+        var previousOverrides = result.PreviousOverrides;
+        if (result.ChangedCount == 0)
         {
             SetStatus("CAD Output FW Diff offset: selected CAD pads already match the requested offset.");
             return;
