@@ -63,7 +63,7 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     private void ApplySelection(IReadOnlyList<int> cadPadIds, IReadOnlyList<int> regularPadIndices)
     {
-        var selectionRevision = Interlocked.Increment(ref _padInspectorSelectionRevision);
+        var selectionRevision = _padInspectorRequests.NextSelectionRevision();
         var selectionSw = Stopwatch.StartNew();
         _selectedCadIds.Clear();
         foreach (var id in cadPadIds)
@@ -167,7 +167,7 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public void RefreshInspectorFromSelection()
     {
-        var selectionRevision = Interlocked.Increment(ref _padInspectorSelectionRevision);
+        var selectionRevision = _padInspectorRequests.NextSelectionRevision();
         UpdateInspectorSnapshotFromSelection(selectionRevision);
     }
 
