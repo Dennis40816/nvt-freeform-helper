@@ -12,12 +12,6 @@ namespace FreeformHelper.UI.Views;
 /// </summary>
 public sealed partial class FreeformHelperView
 {
-    private static readonly string[] _dxfFilePatterns = ["*.dxf"];
-    private static readonly string[] _jsonFilePatterns = ["*.json"];
-    private static readonly string[] _cFilePatterns = ["*.c"];
-    private static readonly string[] _csvFilePatterns = ["*.csv"];
-    private static readonly string[] _allFilesPatterns = ["*"];
-
     /// <summary>
     /// Attaches the <see cref="FreeformHelperViewModel"/> to this view and
     /// configures necessary UI-related delegates for file pickers and initial setup.
@@ -110,41 +104,41 @@ public sealed partial class FreeformHelperView
         // Delegate for opening a DXF file.
         viewModel.PickOpenDxfPathAsync = async () =>
         {
-            var res = await storage.OpenFilePickerAsync(BuildOpenDxfOptions());
+            var res = await storage.OpenFilePickerAsync(FilePickerOptionFactory.OpenDxf());
             return res is { Count: > 0 } ? res[0].Path.LocalPath : null; // Return local path of selected file.
         };
 
         viewModel.PickOpenRegularVisibilityMaskPathAsync = async () =>
         {
-            var res = await storage.OpenFilePickerAsync(BuildOpenRegularVisibilityMaskOptions());
+            var res = await storage.OpenFilePickerAsync(FilePickerOptionFactory.OpenRegularVisibilityMask());
             return res is { Count: > 0 } ? res[0].Path.LocalPath : null;
         };
 
         // Delegate for loading a project file.
         viewModel.PickLoadProjectPathAsync = async () =>
         {
-            var res = await storage.OpenFilePickerAsync(BuildOpenProjectOptions());
+            var res = await storage.OpenFilePickerAsync(FilePickerOptionFactory.OpenProject());
             return res is { Count: > 0 } ? res[0].Path.LocalPath : null;
         };
 
         // Delegate for saving a project file.
         viewModel.PickSaveProjectPathAsync = async () =>
         {
-            var res = await storage.SaveFilePickerAsync(BuildSaveProjectOptions());
+            var res = await storage.SaveFilePickerAsync(FilePickerOptionFactory.SaveProject());
             return res?.Path.LocalPath;
         };
 
         // Delegate for saving notch table files.
         viewModel.PickSaveNotchPathAsync = async (baseName, ext) =>
         {
-            var res = await storage.SaveFilePickerAsync(BuildSaveNotchOptions(baseName, ext));
+            var res = await storage.SaveFilePickerAsync(FilePickerOptionFactory.SaveNotch(baseName, ext));
             return res?.Path.LocalPath;
         };
 
         // Delegate for saving generic export files (DXF, image, etc.).
         viewModel.PickSaveExportPathAsync = async (baseName, ext) =>
         {
-            var res = await storage.SaveFilePickerAsync(BuildSaveExportOptions(baseName, ext));
+            var res = await storage.SaveFilePickerAsync(FilePickerOptionFactory.SaveExport(baseName, ext));
             return res?.Path.LocalPath;
         };
 
@@ -166,179 +160,6 @@ public sealed partial class FreeformHelperView
 
             return await dialog.ShowDialog<bool>(owner); // Return the boolean result from the dialog.
         };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerOpenOptions"/> for opening a DXF file.
-    /// </summary>
-    private static FilePickerOpenOptions BuildOpenDxfOptions()
-    {
-        return new FilePickerOpenOptions
-        {
-            AllowMultiple = false,
-            Title = "Open DXF",
-            FileTypeFilter = new List<FilePickerFileType>
-            {
-                new FilePickerFileType("DXF") { Patterns = _dxfFilePatterns },
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerOpenOptions"/> for opening a project file.
-    /// </summary>
-    private static FilePickerOpenOptions BuildOpenProjectOptions()
-    {
-        return new FilePickerOpenOptions
-        {
-            AllowMultiple = false,
-            Title = "Open Project",
-            FileTypeFilter = new List<FilePickerFileType>
-            {
-                new FilePickerFileType("FreeformHelper Project") { Patterns = _jsonFilePatterns }, // Custom project file extension.
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    private static FilePickerOpenOptions BuildOpenRegularVisibilityMaskOptions()
-    {
-        return new FilePickerOpenOptions
-        {
-            AllowMultiple = false,
-            Title = "Import Regular Visibility Mask (SeeRegular.csv)",
-            FileTypeFilter = new List<FilePickerFileType>
-            {
-                new FilePickerFileType("CSV") { Patterns = _csvFilePatterns },
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerSaveOptions"/> for saving a project file.
-    /// </summary>
-    private static FilePickerSaveOptions BuildSaveProjectOptions()
-    {
-        return new FilePickerSaveOptions
-        {
-            Title = "Save Project",
-            DefaultExtension = "json",
-            SuggestedFileName = "freeform_helper_project.json",
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                new FilePickerFileType("FreeformHelper Project") { Patterns = _jsonFilePatterns },
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerSaveOptions"/> for notch table exports.
-    /// </summary>
-    /// <param name="baseName">The suggested base name for the file.</param>
-    /// <param name="ext">The suggested file extension.</param>
-    private static FilePickerSaveOptions BuildSaveNotchOptions(string baseName, string ext)
-    {
-        var normalizedExt = NormalizeNotchSaveExtension(ext);
-        var primary = BuildNotchFileTypeChoice(normalizedExt);
-        var secondary = BuildNotchFileTypeChoice(normalizedExt switch
-        {
-            "csv" => "c",
-            "c" => "csv",
-            _ => "csv",
-        });
-
-        return new FilePickerSaveOptions
-        {
-            Title = "Save Notch Table",
-            DefaultExtension = normalizedExt,
-            SuggestedFileName = $"{baseName}.{normalizedExt}",
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                primary,
-                secondary,
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    private static FilePickerFileType BuildNotchFileTypeChoice(string ext)
-    {
-        return ext.ToLowerInvariant() switch
-        {
-            "c" => new FilePickerFileType("C source (*.c)") { Patterns = _cFilePatterns },
-            _ => new FilePickerFileType("CSV (*.csv)") { Patterns = _csvFilePatterns },
-        };
-    }
-
-    private static string NormalizeNotchSaveExtension(string ext)
-    {
-        var normalized = NormalizeExtension(ext, "csv");
-        return normalized switch
-        {
-            "c" => "c",
-            _ => "csv",
-        };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerSaveOptions"/> for generic exports such as DXF and images.
-    /// </summary>
-    /// <param name="baseName">The suggested base name for the file.</param>
-    /// <param name="ext">The suggested file extension.</param>
-    private static FilePickerSaveOptions BuildSaveExportOptions(string baseName, string ext)
-    {
-        var normalizedExt = NormalizeExtension(ext, "dat");
-        var pattern = $"*.{normalizedExt}";
-        var title = ResolveExportDialogTitle(normalizedExt);
-        var typeDisplay = ResolveExportFileTypeDisplay(normalizedExt);
-
-        return new FilePickerSaveOptions
-        {
-            Title = title,
-            DefaultExtension = normalizedExt,
-            SuggestedFileName = $"{baseName}.{normalizedExt}",
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                new FilePickerFileType(typeDisplay) { Patterns = new[] { pattern } },
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    private static string ResolveExportDialogTitle(string ext)
-    {
-        return ext switch
-        {
-            "png" or "bmp" or "jpg" or "jpeg" => "Save Image",
-            "dxf" => "Save DXF",
-            _ => "Save Export File",
-        };
-    }
-
-    private static string ResolveExportFileTypeDisplay(string ext)
-    {
-        return ext switch
-        {
-            "png" => "PNG image",
-            "bmp" => "BMP image",
-            "jpg" or "jpeg" => "JPG image",
-            "dxf" => "DXF file",
-            _ => $"{ext.ToUpperInvariant()} file",
-        };
-    }
-
-    private static string NormalizeExtension(string ext, string fallback)
-    {
-        var trimmed = (ext ?? string.Empty).Trim();
-        if (trimmed.StartsWith('.'))
-        {
-            trimmed = trimmed[1..];
-        }
-
-        return string.IsNullOrWhiteSpace(trimmed) ? fallback : trimmed.ToLowerInvariant();
     }
 
     private async Task ShowWarningDialogAsync(string title, string message)
