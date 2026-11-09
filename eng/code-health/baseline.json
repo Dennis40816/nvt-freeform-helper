@@ -95,7 +95,7 @@
       "ceilings": {
         "stateMembers": 65,
         "partialFiles": 28,
-        "viewTypeLines": 5933
+        "viewTypeLines": 5845
       },
       "owner": "NFH",
       "locations": [
@@ -173,20 +173,6 @@
       "contentHash": "5a15a6ccddce70dec3843d7a1fbb793c0d614ac3a6cfe9c0d63ef05f5a30ed23",
       "project": "FreeformHelper.UI",
       "symbol": "FreeformHelper.UI.Controls.PadCanvas..ctor()"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 96
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Controls/PadCanvas.Rendering.Simulation.cs"
-      ],
-      "contentHash": "d7b5b3185b47a5ff85155e4d63cf1f087315f965737605a318d5c3e681804d5e",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Controls.PadCanvas.TryBuildSimulationRegularFillBrush(RegularPad)"
     },
     {
       "kind": "file",
