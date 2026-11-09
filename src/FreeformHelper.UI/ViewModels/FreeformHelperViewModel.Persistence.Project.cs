@@ -178,6 +178,11 @@ public sealed partial class FreeformHelperViewModel
         {
             return ReportBackupFailed(ex);
         }
+        catch (InvalidOperationException ex)
+        {
+            // The store refuses settings that fail validation, and the backup must not block the prompt.
+            return ReportBackupFailed(ex);
+        }
     }
 
     private string? ReportBackupFailed(Exception ex)

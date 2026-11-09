@@ -129,6 +129,34 @@ public sealed class ProjectLoadUnsavedPromptBehaviorTests
     }
 
     [AvaloniaFact]
+    public async Task LoadCommand_BackupRejectedBySettingsValidation_StillPromptsWithoutBackupPathAsync()
+    {
+        using var culture = TestCulture.UseEnUs();
+        using var files = new ProjectLoadCharacterizationScope();
+        await files.CreateSavedCadAsync("replacement.json");
+        var vm = await files.CreateSavedCadAsync("current.json");
+        await ProjectLoadCharacterizationScope.HideOnlyPadAsync(vm);
+        vm.NullValue = 70000m;
+        var prompts = 0;
+        string? promptedBackup = "not called";
+        vm.ProjectDialogs.ConfirmSaveBeforeLoadAsync = backupPath =>
+        {
+            prompts++;
+            promptedBackup = backupPath;
+            return Task.FromResult<bool?>(null);
+        };
+        vm.PickLoadProjectPathAsync = () => Task.FromResult<string?>(files.PathFor("replacement.json"));
+
+        await vm.LoadProjectCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, prompts);
+        Assert.Null(promptedBackup);
+        Assert.False(File.Exists(UnsavedProjectBackup.PathFor(files.AppStore.SettingsPath)));
+        Assert.Empty(vm.CadPads);
+        Assert.True(vm.HasUnsavedChanges);
+    }
+
+    [AvaloniaFact]
     public async Task LoadCommand_SettingsChangedWithoutAnyProjectContent_LoadsWithoutPromptOrBackupAsync()
     {
         using var culture = TestCulture.UseEnUs();
