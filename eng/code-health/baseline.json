@@ -389,7 +389,7 @@
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "axamlCodeBehindLines": 350
+        "axamlCodeBehindLines": 325
       },
       "owner": "NFH",
       "locations": [
