@@ -157,7 +157,7 @@ public sealed partial class FreeformHelperViewModel
     {
         if (!includeNotchRowEligibilityDetails)
         {
-            return (BuildDeferredNotchRowEligibilityPlaceholder(cadPad.Id), "Notch rows: computing...");
+            return (PadInspectorMatchDetailBuilder.BuildDeferredNotchRowEligibilityPlaceholder(cadPad.Id), "Notch rows: computing...");
         }
 
         var notchEligibility = BuildCadNotchRowEligibility(cadPad);
