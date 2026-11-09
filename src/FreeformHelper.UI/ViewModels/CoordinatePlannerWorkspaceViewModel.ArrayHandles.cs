@@ -1,5 +1,6 @@
 using System.Globalization;
 using FreeformHelper.Domain.Geometry;
+using static FreeformHelper.UI.ViewModels.CoordinatePlannerArrayHandleMath;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -39,7 +40,13 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             ShowCustomArray = true;
         }
 
-        var (machineX, machineY) = BuildMachinePointFromWorld(worldPoint);
+        var (machineX, machineY) = MachinePointFromWorld(
+            _snapshot.ActiveAreaBounds,
+            MachineOriginX,
+            MachineOriginY,
+            MachineWidth,
+            MachineHeight,
+            worldPoint);
         SetCustomArrayCornerMachinePoint(key, machineX, machineY);
         SelectArtifactRowByKey(key);
         return true;
@@ -106,7 +113,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
         decimal machineX,
         decimal machineY)
     {
-        if (!IsCustomArrayCornerKey(key))
+        if (!IsCornerKey(key))
         {
             return;
         }
@@ -193,29 +200,4 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             "array-bl" => CustomArrayBottomLeftMachineY,
             _ => 0m,
         };
-
-    private (decimal X, decimal Y) BuildMachinePointFromWorld(Point2 worldPoint)
-    {
-        var bounds = _snapshot.ActiveAreaBounds;
-        var normX = bounds.Width <= 1e-9
-            ? 0d
-            : (worldPoint.X - bounds.MinX) / bounds.Width;
-        var normY = bounds.Height <= 1e-9
-            ? 0d
-            : (bounds.MaxY - worldPoint.Y) / bounds.Height;
-        normX = Math.Clamp(normX, 0d, 1d);
-        normY = Math.Clamp(normY, 0d, 1d);
-
-        var machineWidth = Math.Max(0.001m, MachineWidth);
-        var machineHeight = Math.Max(0.001m, MachineHeight);
-        return (
-            RoundMachineCoordinate(MachineOriginX + (machineWidth * (decimal)normX)),
-            RoundMachineCoordinate(MachineOriginY + (machineHeight * (decimal)normY)));
-    }
-
-    private static bool IsCustomArrayCornerKey(string key) =>
-        key is "array-tl" or "array-tr" or "array-br" or "array-bl";
-
-    private static decimal RoundMachineCoordinate(decimal value) =>
-        decimal.Round(value, 3, MidpointRounding.AwayFromZero);
 }

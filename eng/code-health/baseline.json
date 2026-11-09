@@ -187,7 +187,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 70
+        "stateMembers": 68
       },
       "owner": "NFH",
       "locations": [

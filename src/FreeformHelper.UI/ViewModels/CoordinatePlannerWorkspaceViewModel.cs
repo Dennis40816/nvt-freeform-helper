@@ -108,17 +108,13 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
     private readonly CoordinatePlannerWorkspaceSession _session;
     private readonly bool _highlightUnmatched;
     private readonly bool _highlightFreeform;
-    private readonly List<CoordinateCustomPointRequest> _customPointRequests = new();
-    private readonly List<CoordinateCustomPathRequest> _customPathRequests = new();
-    private readonly ObservableCollection<CoordinatePlannerCustomRecipeRow> _customRecipeRows = new();
+    private readonly CoordinatePlannerCustomArtifactsModel _customArtifacts = new();
     private CadPad[] _cadPadsForCanvas = Array.Empty<CadPad>();
     private CoordinatePlannerSnapshot _snapshot;
     private CoordinateArtifactSnapshot _artifactSnapshot;
     private Rect2 _previewBounds;
     private string _activeAreaSourceText = "AA outline: regular grid bounds";
     private string _guideSourceText = "Guide reference: AA outline";
-    private int _nextCustomPointId = 1;
-    private int _nextCustomPathId = 1;
     private bool _isBatchUpdatingCustomArrayCorners;
 
     public event EventHandler? FitCanvasRequested;
@@ -184,7 +180,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
         OverlayModeOptions = CoordinatePlannerPresentationCatalog.OverlayModeOptions;
         _selectedOverlayModeOption = OverlayModeOptions[1];
-        CustomRecipeRows = new ReadOnlyObservableCollection<CoordinatePlannerCustomRecipeRow>(_customRecipeRows);
+        CustomRecipeRows = _customArtifacts.RecipeRows;
         _customPointMachineX = _machineOriginX + (_machineWidth * 0.5m);
         _customPointMachineY = _machineOriginY + (_machineHeight * 0.5m);
         _customPathStartMachineX = _machineOriginX;
@@ -435,7 +431,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public bool HasBistRectangle => _snapshot.Rectangles.Count > 0;
 
-    public bool HasCustomArtifacts => _customPointRequests.Count > 0 || _customPathRequests.Count > 0;
+    public bool HasCustomArtifacts => _customArtifacts.HasAny;
 
     public string WorkspaceSummaryText =>
         string.Format(
@@ -570,8 +566,8 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
             ? string.Format(
                 CultureInfo.InvariantCulture,
                 "Custom artifacts: {0} point(s), {1} path(s).",
-                _customPointRequests.Count,
-                _customPathRequests.Count)
+                _customArtifacts.PointCount,
+                _customArtifacts.PathCount)
             : "Custom artifacts disabled.";
 
 }
