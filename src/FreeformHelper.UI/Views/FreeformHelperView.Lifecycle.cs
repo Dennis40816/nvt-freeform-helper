@@ -133,7 +133,7 @@ public sealed partial class FreeformHelperView
             return;
         }
 
-        if (ShouldClearFocus(e.Source))
+        if (MainWindowInputSources.ShouldClearFocus(e.Source))
         {
             _canvas?.Focus();
         }
@@ -180,11 +180,6 @@ public sealed partial class FreeformHelperView
 
     private void OnLayerTogglePointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed is false)
-        {
-            return;
-        }
-
         if (sender is not ToggleButton control)
         {
             return;
@@ -200,7 +195,7 @@ public sealed partial class FreeformHelperView
             return;
         }
 
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        if (LayerTogglePointerPolicy.IsSoloRequest(e.GetCurrentPoint(this).Properties.IsLeftButtonPressed, e.KeyModifiers))
         {
             viewModel.ApplyLayerSelection(toggle, soloSelect: true);
             e.Handled = true;

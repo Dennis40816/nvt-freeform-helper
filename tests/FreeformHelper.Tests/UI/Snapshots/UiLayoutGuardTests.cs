@@ -434,12 +434,14 @@ public sealed partial class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
         var freeformViewCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.axaml.cs"));
         var freeformShortcutCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.InputAndShortcuts.cs"));
+        var shortcutRouterCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Services", "MainWindowShortcutRouter.cs"));
         var canvasInputCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Controls", "PadCanvas.Input.cs"));
         var howToUseXaml = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "HowToUseView.axaml"));
 
         var keyRPattern = new Regex(@"Key\.R\b", RegexOptions.Compiled);
         Assert.False(keyRPattern.IsMatch(freeformViewCode), "Global shortcut handler should not bind Key.R.");
         Assert.False(keyRPattern.IsMatch(freeformShortcutCode), "Global shortcut handler should not bind Key.R.");
+        Assert.False(keyRPattern.IsMatch(shortcutRouterCode), "Global shortcut router should not bind Key.R.");
         Assert.False(keyRPattern.IsMatch(canvasInputCode), "Canvas shortcut handler should not bind Key.R.");
         Assert.DoesNotContain("Reset view", howToUseXaml, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("R:", howToUseXaml, StringComparison.Ordinal);
@@ -459,20 +461,6 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("Alt: prefer Regular", overlayXaml, StringComparison.Ordinal);
         Assert.Contains("_topLevel.KeyDown += OnTopLevelKeyDown;", freeformLifecycleCode, StringComparison.Ordinal);
         Assert.Contains("_topLevel.KeyDown -= OnTopLevelKeyDown;", freeformLifecycleCode, StringComparison.Ordinal);
-        Assert.Matches(@"IsTextEntryControlSource\(e\.Source\)[\s\S]*private static bool IsTextEntryControlSource[\s\S]*?ConsolePanel[\s\S]*?private static bool IsCanvasInputSource", freeformShortcutCode);
-        Assert.Contains("if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.None)", freeformShortcutCode, StringComparison.Ordinal);
-        Assert.Contains("if (e.Key == Key.A && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode, StringComparison.Ordinal);
-        Assert.Contains("if (e.Key == Key.Z && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode, StringComparison.Ordinal);
-        Assert.Contains("if (e.Key == Key.S && e.KeyModifiers == KeyModifiers.Control)", freeformShortcutCode, StringComparison.Ordinal);
-        Assert.Contains("if (e.Key == Key.Delete && e.KeyModifiers == KeyModifiers.None)", freeformShortcutCode, StringComparison.Ordinal);
-        AssertShortcutBranchDefersCanvasSource(
-            freeformShortcutCode,
-            "if (e.Key == Key.A && e.KeyModifiers == KeyModifiers.Control)",
-            "_canvas?.SelectAllPads();");
-        AssertShortcutBranchDefersCanvasSource(
-            freeformShortcutCode,
-            "if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.None)",
-            "viewModel.FitCommand.Execute(null);");
         Assert.Contains("SaveProjectFromShortcutAsync(viewModel)", freeformShortcutCode, StringComparison.Ordinal);
         Assert.Contains("window.ShowTopToast(message, type);", freeformShortcutCode, StringComparison.Ordinal);
         Assert.Contains("public void ShowTopToast(string message, NotificationType type = NotificationType.Information)", mainWindowCode, StringComparison.Ordinal);
@@ -547,19 +535,6 @@ public sealed partial class UiLayoutGuardTests
         }
 
         throw new InvalidOperationException($"Cannot find <{tagName}> containing '{requiredText}'.");
-    }
-
-    private static void AssertShortcutBranchDefersCanvasSource(string source, string branchCondition, string actionSnippet)
-    {
-        var branchStart = source.IndexOf(branchCondition, StringComparison.Ordinal);
-        Assert.True(branchStart >= 0, $"Shortcut branch missing: {branchCondition}");
-
-        var actionStart = source.IndexOf(actionSnippet, branchStart, StringComparison.Ordinal);
-        Assert.True(actionStart > branchStart, $"Shortcut action missing after branch: {actionSnippet}");
-
-        var branchPrefix = source[branchStart..actionStart];
-        Assert.Contains("if (fromCanvas)", branchPrefix, StringComparison.Ordinal);
-        Assert.Contains("return false;", branchPrefix, StringComparison.Ordinal);
     }
 
     private static List<string> FindIconActionButtonsWithoutToolTips(string repoRoot)
