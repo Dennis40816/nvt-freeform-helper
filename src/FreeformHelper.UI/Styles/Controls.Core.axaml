@@ -100,59 +100,8 @@
     <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
   </Style>
 
-  <Style Selector="Button.verificationSummaryChip">
-    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
-    <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
-    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
-    <Setter Property="BorderThickness" Value="{StaticResource BorderNotchExportBadge}"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
-    <Setter Property="FontWeight" Value="SemiBold"/>
-    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-    <Setter Property="VerticalContentAlignment" Value="Center"/>
-    <Setter Property="ClipToBounds" Value="True"/>
-  </Style>
-
-  <Style Selector="Button.verificationSummaryChip:pointerover">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
-  </Style>
-
   <Style Selector="Border.validationRowKindTag.workspaceContextBadge">
     <Setter Property="BorderThickness" Value="{StaticResource BorderNotchExportBadge}"/>
-  </Style>
-
-  <Style Selector="Button.verificationSummaryChip.active">
-    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceSelected}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
-  </Style>
-
-  <Style Selector="Button.verificationSummaryChip.direct, Button.verificationSummaryChip.transfer">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
-  </Style>
-
-  <Style Selector="Button.verificationSummaryChip.incoming">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushSuccess}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
-  </Style>
-
-  <Style Selector="Button.verificationSummaryChip.outgoing">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushWarning}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
-  </Style>
-
-  <Style Selector="Button.verificationSummaryChip.nocad">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
-  </Style>
-
-  <Style Selector="Button.verificationSummaryChip.legacy">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushTextMuted}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
   </Style>
 
   <Style Selector="Grid.workspacePresetButtonContent">
@@ -529,33 +478,6 @@
     <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
     <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
-  </Style>
-
-  <Style Selector="Button.workspaceSearchClearButton">
-    <Setter Property="Width" Value="{StaticResource ConsoleActionHeight}"/>
-    <Setter Property="Height" Value="{StaticResource ConsoleActionHeight}"/>
-    <Setter Property="MinWidth" Value="{StaticResource ConsoleActionHeight}"/>
-    <Setter Property="Padding" Value="{StaticResource Inset4}"/>
-    <Setter Property="Margin" Value="{StaticResource InsetRight6}"/>
-    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
-    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
-    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-    <Setter Property="VerticalContentAlignment" Value="Center"/>
-  </Style>
-
-  <Style Selector="Button.workspaceSearchClearButton:pointerover">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderMuted}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
-  </Style>
-
-  <Style Selector="Button.workspaceSearchClearButton:pressed">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
   </Style>
 
   <Style Selector="Border.workspaceGroupToolbarItem">

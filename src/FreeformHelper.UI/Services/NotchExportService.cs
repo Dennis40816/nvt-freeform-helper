@@ -118,16 +118,4 @@ public sealed class NotchExportService
     /// <param name="table">The notch table to export.</param>
     /// <returns>A string containing the notch table data in CSV format.</returns>
     public static string ExportCsv(NotchTable table) => NotchTableExporter.ExportAsCsv(table);
-
-    /// <summary>
-    /// Exports a given <see cref="NotchTable"/> as C-style initializer rows.
-    /// </summary>
-    public static string ExportCInitializer(
-        NotchTable table,
-        CadPadSet cad,
-        RegularGrid grid,
-        ProjectSettings settings,
-        NotchExportProfile profile = NotchExportProfile.Release,
-        IReadOnlySet<int>? activeRegularPadIds = null)
-        => NotchTableExporter.ExportAsCInitializer(table, cad, grid, settings, profile, activeRegularPadIds);
 }
