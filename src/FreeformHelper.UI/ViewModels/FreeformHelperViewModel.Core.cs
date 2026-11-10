@@ -144,9 +144,11 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         StartupPerfTracker.Mark("workspace.vm-header-initialized");
         RebuildCascadeSettings(); // Initialize cascade-related settings.
         StartupPerfTracker.Mark("workspace.vm-cascade-initialized");
-        InitializeCommands(); // Set up Notch, project, and selection commands.
+        _notchCommands = CreateNotchCommands(); // Register Notch commands first.
+        _projectCommands = CreateProjectCommands(); // Register project commands next.
+        _selectionCommands = CreateSelectionCommands(); // Register selection commands next.
         _dxfEditCommands = CreateDxfEditCommands(); // Keep DXF edit command registration next.
-        InitializeGeneralCommands(); // Finish UI command setup in the original order.
+        _generalCommands = CreateGeneralCommands(); // Finish command registration in the original order.
         StartupPerfTracker.Mark("workspace.vm-commands-initialized");
         // Subscribe to selection changes from the InteractionState.
         InteractionState.SelectionChanged += OnInteractionSelectionChanged;

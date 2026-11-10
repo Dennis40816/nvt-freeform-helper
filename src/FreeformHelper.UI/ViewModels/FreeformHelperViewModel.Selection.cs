@@ -254,18 +254,21 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets the command to clear the current selection on the canvas.
     /// </summary>
-    public IRelayCommand ClearSelectionCommand { get; private set; } = null!;
+    public IRelayCommand ClearSelectionCommand => _selectionCommands.ClearSelectionCommand;
 
     /// <summary>
     /// Gets the command to focus a CAD pad, regular pad, or FW diff from one quick-focus query.
     /// </summary>
-    public IRelayCommand QuickFocusCommand { get; private set; } = null!;
+    public IRelayCommand QuickFocusCommand => _selectionCommands.QuickFocusCommand;
 
-    /// <summary>Creates the Selection commands. <see cref="InitializeCommands"/> calls it once during construction.</summary>
-    private void InitializeSelectionCommands()
+    private readonly SelectionCommands _selectionCommands;
+
+    /// <summary>Creates the selection commands once during construction.</summary>
+    private SelectionCommands CreateSelectionCommands()
     {
-        ClearSelectionCommand = CreateEditingCommand(ClearSelection);
-        QuickFocusCommand = CreateEditingCommand(ExecuteQuickFocus);
+        return new SelectionCommands(
+            ClearSelectionCommand: CreateEditingCommand(ClearSelection),
+            QuickFocusCommand: CreateEditingCommand(ExecuteQuickFocus));
     }
 }
 
