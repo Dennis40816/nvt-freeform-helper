@@ -11,7 +11,11 @@ public sealed partial class FreeformHelperViewModel
     // Notch settings
     // The sixteen notch algorithm settings are stored once. The properties below forward to the
     // record and raise the same notifications and callbacks as the stored properties they replaced.
-    private NotchAlgorithmSettings _notchAlgorithm = NotchAlgorithmSettings.Initial;
+    private NotchAlgorithmSettings _notchAlgorithm
+    {
+        get => _calculationAndPreview.NotchAlgorithm;
+        set => _calculationAndPreview.NotchAlgorithm = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether Notch Algorithm Version 2.1 is enabled.
