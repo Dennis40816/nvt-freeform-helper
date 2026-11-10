@@ -45,7 +45,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs:252",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:63",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.cs:251",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.cs:123",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorSummary.cs:8",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:8", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:9", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:100",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.RegularVisibilityMask.cs:14",
