@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
 using System.Collections.ObjectModel;
 
 namespace FreeformHelper.UI.ViewModels;

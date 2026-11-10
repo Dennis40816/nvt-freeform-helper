@@ -3,7 +3,6 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
-using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -40,7 +39,7 @@ public sealed partial class FreeformHelperViewModel
         var icIndex = workflowSnapshot.TryGetCadIcIndex(cadPadId, out var icIndexValue) ? icIndexValue : (int?)null;
 
         var matchCache = GetOrBuildCadInspectorMatchCache(cadPadId);
-        var (matchedRegularDetails, matchText, matchDetailsText) = BuildCadInspectorMatchDisplay(
+        var (matchedRegularDetails, matchText, matchDetailsText) = PadInspectorSnapshotProjector.BuildCadMatchDisplay(
             matchCache,
             includeMatchDetails,
             includeRuleTrace);
@@ -52,60 +51,22 @@ public sealed partial class FreeformHelperViewModel
             precomputedDiagnostics);
         var (notchEligibility, notchRowSummary) = BuildCadInspectorNotchRowSummary(cadPad, includeNotchRowEligibilityDetails);
 
-        var ruleTrace = includeRuleTrace
-            ? PadInspectorRuleTraceBuilder.BuildCadRuleTrace(
-                dxfIndex,
-                cadOutputFwDiffAssignmentModeText,
-                matchedRegularDetails,
-                notch,
-                notchEligibility)
-            : PadInspectorRuleTraceBuilder.BuildDeferredRuleTracePlaceholder();
-
-        var snapshot = new CadPadInspectorSnapshot(
-            CadPadId: cadPad.Id,
-            Name: cadPad.Name,
-            Layer: cadPad.Layer,
-            Area: cadPad.Area,
-            Bounds: cadPad.Bounds,
-            Centroid: cadPad.Centroid,
-            Vertices: cadPad.Polygon.Vertices.Length,
-            DxfIndex: dxfIndex,
-            CadOutputFwDiffOverride: cadOutputFwDiffOverride,
-            IsDxfIndexAnchor: isDxfIndexAnchor,
-            DxfIndexDisplayText: dxfIndexDisplayText,
-            CadOutputFwDiffAssignmentModeText: cadOutputFwDiffAssignmentModeText,
-            IcIndex: icIndex,
-            MatchText: matchText,
-            MatchDetailsText: matchDetailsText,
-            MatchedRegularPadIds: matchCache.MatchedRegularIds,
-            MatchedRegularDetails: matchedRegularDetails,
-            IsNotchRowEligible: notchEligibility.HasRows,
-            NotchRowSummary: notchRowSummary,
-            Notch: notch,
-            RuleTrace: ruleTrace,
-            MatchConfidence: matchCache.Confidence);
-
-        return new PadInspectorSnapshot(
-            Kind: "cad",
-            Cad: snapshot,
-            Regular: null);
-    }
-
-    private static (IReadOnlyList<PadInspectorMatchedRegularSnapshot> Details, string MatchText, string MatchDetailsText) BuildCadInspectorMatchDisplay(
-        CadInspectorMatchCacheEntry matchCache,
-        bool includeMatchDetails,
-        bool includeRuleTrace)
-    {
-        var matchedRegularIds = matchCache.MatchedRegularIds;
-        var matchedRegularDetails = includeMatchDetails || includeRuleTrace
-            ? matchCache.MatchedRegularDetails
-            : (IReadOnlyList<PadInspectorMatchedRegularSnapshot>)Array.Empty<PadInspectorMatchedRegularSnapshot>();
-        var matchDetailsText = includeMatchDetails
-            ? matchCache.MatchDetailsText
-            : matchedRegularIds.Count == 0
-                ? "Unmatched"
-                : $"Matched regular pad(s): {matchedRegularIds.Count}.";
-        return (matchedRegularDetails, matchCache.MatchText, matchDetailsText);
+        return PadInspectorSnapshotProjector.BuildCad(
+            cadPad,
+            dxfIndex,
+            cadOutputFwDiffOverride,
+            isDxfIndexAnchor,
+            dxfIndexDisplayText,
+            cadOutputFwDiffAssignmentModeText,
+            icIndex,
+            matchCache,
+            matchedRegularDetails,
+            matchText,
+            matchDetailsText,
+            notch,
+            notchEligibility,
+            notchRowSummary,
+            includeRuleTrace);
     }
 
     private PadInspectorNotchSnapshot BuildCadInspectorNotchSnapshot(
@@ -113,42 +74,12 @@ public sealed partial class FreeformHelperViewModel
         bool includeExpensiveNotchDetails,
         string? precomputedDiagnostics)
     {
-        var resolvedCompensation = resolved.Compensation;
-        var stage3Area = resolvedCompensation.Stage3Area;
-        var strictAreaThreshold = resolved.TargetAllocation.StrictAreaThreshold;
-        var targets = resolved.TargetAllocation.Targets
-            .Select(target => new PadInspectorNotchTargetSnapshot(
-                target.IcIndex,
-                target.DiffIndex,
-                target.EffectiveArea,
-                target.Ratio,
-                target.RatioPercentRounded,
-                target.PassesStrictThreshold,
-                target.IsAnchorDiff,
-                target.ToFullAppliedRegularCount,
-                target.RegularCount,
-                target.RegularAreas
-                    .Select(area => new PadInspectorNotchTargetRegularAreaSnapshot(
-                        area.RegularPadId,
-                        area.EffectiveArea))
-                    .ToList(),
-                target.RegularPadIds))
-            .ToList();
-        return new PadInspectorNotchSnapshot(
-            resolvedCompensation.ToRegularRatio,
-            resolvedCompensation.ToFullRatio,
-            resolvedCompensation.CombinedRatio,
-            resolvedCompensation.IsToFullEnabled,
-            stage3Area,
-            strictAreaThreshold,
-            targets,
-            includeExpensiveNotchDetails
-                ? precomputedDiagnostics ?? BuildToFullDiagnosticsText(resolvedCompensation)
-                : null)
-        {
-            TargetCoverageProjection = resolved.TargetAllocation.TargetCoverageProjection,
-            ComputationMode = CurrentNotchComputationMode
-        };
+        return PadInspectorSnapshotProjector.BuildNotch(
+            resolved,
+            includeExpensiveNotchDetails,
+            precomputedDiagnostics,
+            BuildToFullDiagnosticsText,
+            CurrentNotchComputationMode);
     }
 
     private (NotchCadRowEligibility Eligibility, string Summary) BuildCadInspectorNotchRowSummary(
@@ -161,13 +92,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var notchEligibility = BuildCadNotchRowEligibility(cadPad);
-        var eligibleVersionText = notchEligibility.EligibleVersions.Count == 0
-            ? "-"
-            : string.Join(", ", notchEligibility.EligibleVersions.Select(v => v.ToDisplayLabel()));
-        var notchRowSummary = notchEligibility.HasRows
-            ? $"Notch rows: {notchEligibility.EstimatedRowCount} ({eligibleVersionText})"
-            : $"Notch rows: 0 ({notchEligibility.Reason})";
-        return (notchEligibility, notchRowSummary);
+        return (notchEligibility, PadInspectorSnapshotProjector.FormatNotchRowSummary(notchEligibility));
     }
 
     public PadInspectorSnapshot? BuildRegularPadInspectorSnapshot(
@@ -182,65 +107,12 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var matchCache = GetOrBuildRegularInspectorMatchCache(regularPad);
-        var matchedCadIds = matchCache.MatchedCadIds;
-        var matchedCadDetails = includeMatchDetails || includeRuleTrace
-            ? matchCache.MatchedCadDetails
-            : (IReadOnlyList<PadInspectorMatchedCadSnapshot>)Array.Empty<PadInspectorMatchedCadSnapshot>();
-        var matchText = matchCache.MatchText;
-        var matchDetailsText = includeMatchDetails
-            ? matchCache.MatchDetailsText
-            : matchedCadIds.Count == 0
-                ? "Unmatched"
-                : $"Matched CAD pad(s): {matchedCadIds.Count}.";
-
-        var diffSource = includeMatchDetails || includeRuleTrace
-            ? matchCache.DiffSource
-            : matchedCadIds.Count == 0
-                ? "Unmatched"
-                : "Computing...";
-        var freeformSource = includeMatchDetails || includeRuleTrace
-            ? matchCache.FreeformSource
-            : regularPad.Freeform == FreeformType.None
-                ? "None"
-                : "Computing...";
-        var freeformSourceDetail = includeMatchDetails || includeRuleTrace
-            ? matchCache.FreeformSourceDetail
-            : regularPad.Freeform == FreeformType.None
-                ? "No Step 2 freeform tag."
-                : "Computing...";
-        var confidence = matchCache.Confidence;
-        var ruleTrace = includeRuleTrace
-            ? matchCache.RuleTrace
-            : PadInspectorRuleTraceBuilder.BuildDeferredRuleTracePlaceholder();
-
-        var snapshot = new RegularPadInspectorSnapshot(
-            RegularPadId: regularPad.RegularPadId,
-            Index: regularPad.Index,
-            Row: regularPad.Row,
-            Col: regularPad.Col,
-            DisplayRow: ToDisplayRow(regularPad.Row),
-            IcIndex: regularPad.IcIndex,
-            DiffIndex: regularPad.DiffIndex,
-            Area: regularPad.Area,
-            Bounds: regularPad.Bounds,
-            Centroid: regularPad.Centroid,
-            Freeform: regularPad.Freeform,
-            MatchText: matchText,
-            MatchDetailsText: matchDetailsText,
-            MatchedCadPadIds: matchedCadIds,
-            MatchedCadDetails: matchedCadDetails,
-            RuleTrace: ruleTrace,
-            MatchConfidence: confidence,
-            DiffSource: diffSource)
-        {
-            FreeformSource = freeformSource,
-            FreeformSourceDetail = freeformSourceDetail,
-        };
-
-        return new PadInspectorSnapshot(
-            Kind: "regular",
-            Cad: null,
-            Regular: snapshot);
+        return PadInspectorSnapshotProjector.BuildRegular(
+            regularPad,
+            matchCache,
+            includeMatchDetails,
+            includeRuleTrace,
+            ToDisplayRow(regularPad.Row));
     }
 
     /// <summary>
