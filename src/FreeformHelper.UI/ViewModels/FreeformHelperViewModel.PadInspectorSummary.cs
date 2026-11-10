@@ -49,48 +49,19 @@ public sealed partial class FreeformHelperViewModel
 
     private static ObservableCollection<PadInspectorDisplayLine> BuildCadCompensationLines(CadPadInspectorSnapshot cad)
     {
-        var lines = new List<PadInspectorDisplayLine>();
-        if (cad.Notch is null)
+        PadInspectorCompensationValues? values = null;
+        if (cad.Notch is not null)
         {
-            lines.Add(new("Notch 2.2", "Unavailable", IsEmphasized: true, Tone: PadInspectorLineTone.Warning));
-            lines.Add(new("Notch rows", cad.NotchRowSummary));
-            return new ObservableCollection<PadInspectorDisplayLine>(lines);
+            var notchDisplay = NotchDisplayProjector.Build(cad.Notch);
+            values = new PadInspectorCompensationValues(
+                IsToFullEnabled: cad.Notch.IsToFullEnabled,
+                ToFullValueText: notchDisplay.ToFullValueText,
+                ToFullReasonFullText: notchDisplay.ToFullReasonFullText,
+                ToRegularValueText: notchDisplay.ToRegularValueText,
+                CombinedValueText: notchDisplay.CombinedValueText,
+                HasCombinedOverflowRisk: notchDisplay.HasCombinedOverflowRisk);
         }
 
-        var notchDisplay = NotchDisplayProjector.Build(cad.Notch);
-        var toFullTone = cad.Notch.IsToFullEnabled ? PadInspectorLineTone.Key : PadInspectorLineTone.Warning;
-        var reasonTone = cad.Notch.IsToFullEnabled ? PadInspectorLineTone.Key : PadInspectorLineTone.Warning;
-
-        lines.Add(new(
-            "To Full",
-            notchDisplay.ToFullValueText,
-            IsEmphasized: true,
-            Tone: toFullTone));
-        if (!string.IsNullOrWhiteSpace(notchDisplay.ToFullReasonFullText))
-        {
-            lines.Add(new("Reason", notchDisplay.ToFullReasonFullText, IsEmphasized: true, Tone: reasonTone));
-        }
-
-        if (PadInspectorTraceSectionProjector.TryExtractNotchFreeformDirection(cad.NotchRowSummary, out var freeformDirection))
-        {
-            lines.Add(new(
-                "Freeform",
-                freeformDirection.ToString(),
-                IsEmphasized: true,
-                Tone: PadInspectorLineTone.Key,
-                FreeformDirection: PadInspectorTraceSectionProjector.ToFreeformDirection(freeformDirection)));
-        }
-
-        lines.Add(new(
-            "To Regular",
-            notchDisplay.ToRegularValueText));
-        lines.Add(new(
-            "Combined",
-            notchDisplay.CombinedValueText,
-            IsEmphasized: notchDisplay.HasCombinedOverflowRisk,
-            Tone: notchDisplay.HasCombinedOverflowRisk ? PadInspectorLineTone.Warning : PadInspectorLineTone.Normal));
-        lines.Add(new("Notch rows", cad.NotchRowSummary));
-
-        return new ObservableCollection<PadInspectorDisplayLine>(lines);
+        return PadInspectorCompensationLineProjector.Build(cad.NotchRowSummary, values);
     }
 }
