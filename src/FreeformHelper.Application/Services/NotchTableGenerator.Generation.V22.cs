@@ -330,32 +330,17 @@ public sealed partial class NotchTableGenerator
             : BuildSourceAreaDominantLegs(targets);
 
     private static List<V22DiffLeg> BuildSourceAreaDominantLegs(
-        IReadOnlyList<NotchV22TargetAllocation> targets)
+        IReadOnlyList<NotchV22TargetAllocation> targets) =>
+        BuildV22Legs(targets, static ratioPercent => new[] { Math.Clamp(ratioPercent, -100, 100) });
+
+    private static List<V22DiffLeg> BuildV22Legs(
+        IReadOnlyList<NotchV22TargetAllocation> targets,
+        Func<int, IEnumerable<int>> projectRatio)
     {
         var legs = new List<V22DiffLeg>();
         foreach (var target in targets)
         {
-            if (target.RatioPercentRounded == 0)
-            {
-                continue;
-            }
-
-            legs.Add(new V22DiffLeg(
-                TargetDiffIndex: target.DiffIndex,
-                RatioPercent: Math.Clamp(target.RatioPercentRounded, -100, 100),
-                HasToFullCoverage: target.ToFullAppliedRegularCount > 0));
-        }
-
-        return legs;
-    }
-
-    private static List<V22DiffLeg> BuildTargetCoverageLegs(
-        IReadOnlyList<NotchV22TargetAllocation> targets)
-    {
-        var legs = new List<V22DiffLeg>();
-        foreach (var target in targets)
-        {
-            foreach (var chunk in SplitRatioPercent(target.RatioPercentRounded))
+            foreach (var chunk in projectRatio(target.RatioPercentRounded))
             {
                 if (chunk == 0)
                 {
@@ -371,6 +356,10 @@ public sealed partial class NotchTableGenerator
 
         return legs;
     }
+
+    private static List<V22DiffLeg> BuildTargetCoverageLegs(
+        IReadOnlyList<NotchV22TargetAllocation> targets) =>
+        BuildV22Legs(targets, SplitRatioPercent);
 
     private static IEnumerable<int> SplitRatioPercent(int ratioPercent)
     {
@@ -658,34 +647,22 @@ public sealed partial class NotchTableGenerator
         for (var index = 0; index < candidatesByProfile.Length; index++)
         {
             var candidates = candidatesByProfile[index];
-            if (candidates is null || candidates.Count == 0)
+            // Empty profiles report zero even when earlier profiles created buckets.
+            var generatedRows = 0;
+            if (candidates is not null && candidates.Count > 0)
             {
-                if (ShouldReportGenerationProgress(index + 1, candidatesByProfile.Length))
+                foreach (var candidate in candidates)
                 {
-                    ReportGenerationProgress(
-                        progress,
-                        index + 1,
-                        candidatesByProfile.Length,
-                        0,
-                        cadProfiles[index].CadPad.Id,
-                        null,
-                        GenerationPhaseMergeCanonicalCandidates,
-                        phaseStep: mergePhaseStep,
-                        phaseStepCount: phaseStepCount);
+                    if (!candidatesByDiff.TryGetValue(candidate.Key, out var sameDiffCandidates))
+                    {
+                        sameDiffCandidates = new List<V22CadCandidate>();
+                        candidatesByDiff[candidate.Key] = sameDiffCandidates;
+                    }
+
+                    sameDiffCandidates.Add(candidate.Value);
                 }
 
-                continue;
-            }
-
-            foreach (var candidate in candidates)
-            {
-                if (!candidatesByDiff.TryGetValue(candidate.Key, out var sameDiffCandidates))
-                {
-                    sameDiffCandidates = new List<V22CadCandidate>();
-                    candidatesByDiff[candidate.Key] = sameDiffCandidates;
-                }
-
-                sameDiffCandidates.Add(candidate.Value);
+                generatedRows = candidatesByDiff.Count;
             }
 
             if (ShouldReportGenerationProgress(index + 1, candidatesByProfile.Length))
@@ -694,7 +671,7 @@ public sealed partial class NotchTableGenerator
                     progress,
                     index + 1,
                     candidatesByProfile.Length,
-                    candidatesByDiff.Count,
+                    generatedRows,
                     cadProfiles[index].CadPad.Id,
                     null,
                     GenerationPhaseMergeCanonicalCandidates,

@@ -102,12 +102,7 @@ public sealed partial class NotchTableGenerator
             .ToList();
         if (enabled.Count == 0)
         {
-            return new NotchCadRowEligibility(
-                CadPadId: cadPad.Id,
-                EligibleVersions: Array.Empty<NotchAlgorithmVersion>(),
-                EstimatedRowCount: 0,
-                AnchorRegularPadId: null,
-                Reason: "No notch version enabled.");
+            return CreateEmptyCadRowEligibility(cadPad.Id, "No notch version enabled.");
         }
 
         return settings.Notch.ComputationMode switch
