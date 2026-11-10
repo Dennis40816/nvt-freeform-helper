@@ -112,6 +112,14 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
+        _canvasStrokeFillState = new CanvasStrokeFillState(
+            () => _isLoadingSettings,
+            () => _undoSuppression.IsActive,
+            () => _undoSuppression.Enter(),
+            PushUndo,
+            () => CanvasHost?.Invalidate(),
+            OnPropertyChanging,
+            OnPropertyChanged);
         _projectEditingSession = new ProjectEditingSession(PublishProjectEditingAvailabilityChange);
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
         _statusReporter = new UiOperationStatusReporter(message => StatusText = message);
