@@ -136,29 +136,6 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "partialFiles": 10
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.cs",
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.Export.cs",
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.NotchQueries.cs",
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.Simulation.cs",
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.TerminalStatus.cs",
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.Commands.WorkflowSelection.cs",
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.cs",
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.NotchDetails.cs",
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.NotchDetails.MultiOwner.cs",
-        "src/FreeformHelper.UI/Services/RuntimeQueryUseCase.NotchDetails.PadQueries.cs"
-      ],
-      "contentHash": "63f969613396540b0f9ef101bab4363d7eabb88e8909211e49ea902e46761660",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.Services.RuntimeQueryUseCase"
-    },
-    {
-      "kind": "type",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "stateMembers": 44
       },
       "owner": "NFH",

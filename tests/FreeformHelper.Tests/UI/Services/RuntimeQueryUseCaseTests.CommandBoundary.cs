@@ -20,7 +20,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     {
         var runs = 0;
 
-        var failure = await RuntimeQueryUseCase.RunCommandOperationAsync(
+        var failure = await RuntimeQueryCommandOperation.RunAsync(
             () =>
             {
                 runs++;
@@ -36,7 +36,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task RunCommandOperationAsync_WhenOperationFailsLater_ReturnsTheFailureWithCodeAndMessage()
     {
-        var failure = await RuntimeQueryUseCase.RunCommandOperationAsync(
+        var failure = await RuntimeQueryCommandOperation.RunAsync(
             () => Task.FromException(new IOException("disk gone")),
             "TEST_FAILED",
             static ex => $"Failed: {ex.Message}");
@@ -50,7 +50,7 @@ public sealed partial class RuntimeQueryUseCaseTests
     [Fact]
     public async Task RunCommandOperationAsync_WhenOperationThrowsBeforeReturningTask_ReturnsTheFailure()
     {
-        var failure = await RuntimeQueryUseCase.RunCommandOperationAsync(
+        var failure = await RuntimeQueryCommandOperation.RunAsync(
             static () => throw new InvalidOperationException("not ready"),
             "TEST_FAILED",
             static ex => ex.Message);
@@ -66,7 +66,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         var describeCalls = 0;
         var memory = CreateOutOfMemory();
 
-        var thrown = await Assert.ThrowsAsync<OutOfMemoryException>(() => RuntimeQueryUseCase.RunCommandOperationAsync(
+        var thrown = await Assert.ThrowsAsync<OutOfMemoryException>(() => RuntimeQueryCommandOperation.RunAsync(
             () => Task.FromException(memory),
             "TEST_FAILED",
             ex =>

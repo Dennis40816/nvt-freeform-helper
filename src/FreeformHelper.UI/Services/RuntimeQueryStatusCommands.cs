@@ -4,11 +4,31 @@ using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 
-internal sealed partial class RuntimeQueryUseCase
+/// <summary>
+/// Runtime query commands that report the app state: status, selection and the in-app terminal.
+/// </summary>
+internal sealed class RuntimeQueryStatusCommands
 {
+    private readonly RuntimeQueryContext _context;
+
+    public RuntimeQueryStatusCommands(RuntimeQueryContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    /// <summary>Adds the commands of this group to the registry.</summary>
+    /// <param name="registry">The registry that receives the handlers.</param>
+    public void Register(RuntimeQueryCommandRegistry registry)
+    {
+        registry.AddSync("status", _ => QueryStatus());
+        registry.AddSync("selection", _ => QuerySelection());
+        registry.Add("terminal", QueryTerminalAsync);
+        registry.Add("terminal-links", QueryTerminalLinksAsync);
+    }
+
     private RuntimeQueryResponseEnvelope QueryStatus()
     {
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         var workflow = helper.GetWorkflowStateSnapshot();
         var selectedCadCount = helper.SelectedCadPadIds.Count;
         var selectedRegularCount = helper.SelectedRegularPadIndices.Count;
@@ -56,21 +76,21 @@ internal sealed partial class RuntimeQueryUseCase
                 reasonCounts = cadOutputFwDiffAssignmentDecision.ReasonCounts,
                 decisionSourceCounts = cadOutputFwDiffAssignmentDecision.DecisionSourceCounts
             },
-            cache = RuntimeQueryResponseBuilder.BuildNotchCachePayload(helper, _notchQueryCacheService.GetMetrics()),
+            cache = RuntimeQueryResponseBuilder.BuildNotchCachePayload(helper, _context.NotchCache.GetMetrics()),
             cadLoadSpinner = RuntimeQueryResponseBuilder.BuildCadLoadSpinnerDebugPayload()
         });
     }
 
     private RuntimeQueryResponseEnvelope QuerySelection()
     {
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         return RuntimeQueryResponseEnvelope.Success(RuntimeQueryResponseBuilder.BuildSelectionPayload(helper));
     }
 
     private async Task<RuntimeQueryResponseEnvelope> QueryTerminalAsync(IReadOnlyDictionary<string, string>? args)
     {
-        var tail = DefaultTerminalTail;
-        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "tail", 1, MaxTerminalTail, out var parsedTail, out var tailError))
+        var tail = RuntimeQueryLimits.DefaultTerminalTail;
+        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "tail", 1, RuntimeQueryLimits.MaxTerminalTail, out var parsedTail, out var tailError))
         {
             tail = parsedTail;
         }
@@ -79,7 +99,7 @@ internal sealed partial class RuntimeQueryUseCase
             return tailError;
         }
 
-        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(_shellViewModel.ConsoleStore, tail);
+        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(_context.Shell.ConsoleStore, tail);
 
         return RuntimeQueryResponseEnvelope.Success(new
         {
@@ -92,8 +112,8 @@ internal sealed partial class RuntimeQueryUseCase
 
     private async Task<RuntimeQueryResponseEnvelope> QueryTerminalLinksAsync(IReadOnlyDictionary<string, string>? args)
     {
-        var tail = DefaultTerminalTail;
-        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "tail", 1, MaxTerminalTail, out var parsedTail, out var tailError))
+        var tail = RuntimeQueryLimits.DefaultTerminalTail;
+        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "tail", 1, RuntimeQueryLimits.MaxTerminalTail, out var parsedTail, out var tailError))
         {
             tail = parsedTail;
         }
@@ -102,8 +122,8 @@ internal sealed partial class RuntimeQueryUseCase
             return tailError;
         }
 
-        var limit = DefaultTerminalLinkLimit;
-        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "limit", 1, MaxTerminalLinkLimit, out var parsedLimit, out var limitError))
+        var limit = RuntimeQueryLimits.DefaultTerminalLinkLimit;
+        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "limit", 1, RuntimeQueryLimits.MaxTerminalLinkLimit, out var parsedLimit, out var limitError))
         {
             limit = parsedLimit;
         }
@@ -112,7 +132,7 @@ internal sealed partial class RuntimeQueryUseCase
             return limitError;
         }
 
-        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(_shellViewModel.ConsoleStore, tail);
+        var (lines, totalLines) = await AppLogFormatter.GetTailLinesAsync(_context.Shell.ConsoleStore, tail);
 
         var startLineNumber = Math.Max(1, totalLines - lines.Count + 1);
         var links = new List<object>();
