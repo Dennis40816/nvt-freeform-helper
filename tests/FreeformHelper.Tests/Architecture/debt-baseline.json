@@ -116,7 +116,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ModalLoading.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.Compensation.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchTableGeneration.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchValidation.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerSelection.Options.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerSelection.Options.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Overrides.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadEdits.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorSummary.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.Project.cs",

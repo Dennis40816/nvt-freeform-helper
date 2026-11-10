@@ -278,7 +278,7 @@ Notes:
 ## Commands
 
 ### FreeformHelperViewModel (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Commands.cs)
-- OpenDxfCommand → OpenDxfAsync (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.cs)
+- OpenDxfCommand → OpenDxfAsync (src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CadLoad.cs)
   - [Status] [Rebuild] [View] [Clear selection]
   - Also updates layer toggles, CadPads, RegularPads, and MarkUnsaved.
   - `CadLoadWorkflowService` internally wraps import / apply / rebuild in `RunWithCadLoadCanvasOverlayAsync(...)`.
