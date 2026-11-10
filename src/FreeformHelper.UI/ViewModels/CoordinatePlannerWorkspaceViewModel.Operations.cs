@@ -342,64 +342,50 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
 
     private CoordinatePlannerRequest BuildCurrentRequest()
     {
-        return new CoordinatePlannerRequest(
-            MachineOriginX: (double)MachineOriginX,
-            MachineOriginY: (double)MachineOriginY,
-            MachineWidth: Math.Max(0.001, (double)MachineWidth),
-            MachineHeight: Math.Max(0.001, (double)MachineHeight),
-            PixelWidth: ClampPositiveInt(PixelWidth),
-            PixelHeight: ClampPositiveInt(PixelHeight),
-            HorizontalGuideCount: ClampNonNegativeInt(HorizontalGuideCount),
-            VerticalGuideCount: ClampNonNegativeInt(VerticalGuideCount),
-            CopperPillarDiameter: Math.Max(0d, (double)CopperPillarDiameter),
-            ShowBistRectangle: ShowBistRectangle,
-            ShowCustomArray: ShowCustomArray,
-            CustomArrayColumnCount: ClampNonNegativeInt(CustomArrayColumnCount),
-            CustomArrayRowCount: ClampNonNegativeInt(CustomArrayRowCount),
-            CustomArrayTopLeftMachineX: (double)CustomArrayTopLeftMachineX,
-            CustomArrayTopLeftMachineY: (double)CustomArrayTopLeftMachineY,
-            CustomArrayTopRightMachineX: (double)CustomArrayTopRightMachineX,
-            CustomArrayTopRightMachineY: (double)CustomArrayTopRightMachineY,
-            CustomArrayBottomRightMachineX: (double)CustomArrayBottomRightMachineX,
-            CustomArrayBottomRightMachineY: (double)CustomArrayBottomRightMachineY,
-            CustomArrayBottomLeftMachineX: (double)CustomArrayBottomLeftMachineX,
-            CustomArrayBottomLeftMachineY: (double)CustomArrayBottomLeftMachineY,
-            HorizontalGuideMode: ToApplicationGuideMode(SelectedHorizontalGuideGenerationOption.Mode),
-            VerticalGuideMode: ToApplicationGuideMode(SelectedVerticalGuideGenerationOption.Mode),
-            HorizontalGuidePitch: Math.Max(0d, (double)HorizontalGuidePitch),
-            VerticalGuidePitch: Math.Max(0d, (double)VerticalGuidePitch),
-            HorizontalGuideInset: Math.Max(0d, (double)HorizontalGuideInset),
-            VerticalGuideInset: Math.Max(0d, (double)VerticalGuideInset),
-            HorizontalGuidePositions: ParseGuidePositionList(HorizontalGuidePositionListText),
-            VerticalGuidePositions: ParseGuidePositionList(VerticalGuidePositionListText),
-            CustomPoints: _customArtifacts.PointRequests(),
-            CustomPaths: _customArtifacts.PathRequests());
+        var dimensions = (MachineOriginX, MachineOriginY, MachineWidth, MachineHeight, PixelWidth, PixelHeight);
+        var counts = (HorizontalGuideCount, VerticalGuideCount);
+        var geometry = new CoordinatePlannerGeometryInput(
+            dimensions.MachineOriginX,
+            dimensions.MachineOriginY,
+            dimensions.MachineWidth,
+            dimensions.MachineHeight,
+            dimensions.PixelWidth,
+            dimensions.PixelHeight,
+            CopperPillarDiameter,
+            ShowBistRectangle);
+        var array = new CoordinatePlannerArrayInput(
+            ShowCustomArray,
+            CustomArrayColumnCount,
+            CustomArrayRowCount,
+            CustomArrayTopLeftMachineX,
+            CustomArrayTopLeftMachineY,
+            CustomArrayTopRightMachineX,
+            CustomArrayTopRightMachineY,
+            CustomArrayBottomRightMachineX,
+            CustomArrayBottomRightMachineY,
+            CustomArrayBottomLeftMachineX,
+            CustomArrayBottomLeftMachineY);
+        var modes = (Horizontal: SelectedHorizontalGuideGenerationOption.Mode, Vertical: SelectedVerticalGuideGenerationOption.Mode);
+        var pitches = (HorizontalGuidePitch, VerticalGuidePitch);
+        var insets = (HorizontalGuideInset, VerticalGuideInset);
+        return CoordinatePlannerRequestBuilder.Build(
+            geometry,
+            new CoordinatePlannerGuideInput(counts.HorizontalGuideCount, modes.Horizontal,
+                pitches.HorizontalGuidePitch, insets.HorizontalGuideInset, HorizontalGuidePositionListText),
+            new CoordinatePlannerGuideInput(counts.VerticalGuideCount, modes.Vertical,
+                pitches.VerticalGuidePitch, insets.VerticalGuideInset, VerticalGuidePositionListText),
+            array,
+            _customArtifacts.PointRequests(),
+            _customArtifacts.PathRequests());
     }
 
     private static CoordinatePlannerRequest BuildRequestFromDefaults(CoordinatePlannerWorkspaceSession session)
     {
-        return new CoordinatePlannerRequest(
-            0d,
-            0d,
-            Math.Max(0.001, session.DefaultMachineWidth),
-            Math.Max(0.001, session.DefaultMachineHeight),
-            Math.Max(1, session.DefaultPixelWidth),
-            Math.Max(1, session.DefaultPixelHeight),
-            5,
-            5,
-            0d,
-            true,
-            false,
-            5,
-            5,
-            0d,
-            0d,
-            Math.Max(0.001, session.DefaultMachineWidth),
-            0d,
-            Math.Max(0.001, session.DefaultMachineWidth),
-            Math.Max(0.001, session.DefaultMachineHeight),
-            0d,
-            Math.Max(0.001, session.DefaultMachineHeight));
+        return CoordinatePlannerRequestBuilder.FromDefaults(
+            session.DefaultMachineWidth,
+            session.DefaultMachineHeight,
+            session.DefaultPixelWidth,
+            session.DefaultPixelHeight);
     }
 
     private static List<CoordinatePlannerCadLayerOption> BuildLayerOptions(IReadOnlyList<string> layerNames)
@@ -475,28 +461,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             ? CoordinatePlannerGuideBasisKind.RegularGrid
             : CoordinatePlannerGuideBasisKind.ActiveArea;
 
-    private static CoordinateGuideGenerationMode ToApplicationGuideMode(CoordinatePlannerGuideGenerationMode mode) =>
-        mode switch
-        {
-            CoordinatePlannerGuideGenerationMode.Pitch => CoordinateGuideGenerationMode.Pitch,
-            CoordinatePlannerGuideGenerationMode.ExplicitPositions => CoordinateGuideGenerationMode.ExplicitPositions,
-            _ => CoordinateGuideGenerationMode.Count,
-        };
-
-    private static double[] ParseGuidePositionList(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return Array.Empty<double>();
-        }
-
-        return text
-            .Split([',', ';', ' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(static part => double.TryParse(part, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) ? (double?)value : null)
-            .Where(static value => value.HasValue)
-            .Select(static value => Math.Max(0d, value!.Value))
-            .ToArray();
-    }
+    private static double[] ParseGuidePositionList(string text) => CoordinatePlannerRequestBuilder.ParsePositions(text);
 
     private static string BuildGuideModeSummaryText(
         CoordinatePlannerGuideGenerationMode mode,
@@ -568,16 +533,8 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
         NotifySelectedCustomArrayCornerChanged();
     }
 
-    private static int ClampPositiveInt(decimal value)
-    {
-        var rounded = (int)Math.Round(value, MidpointRounding.AwayFromZero);
-        return Math.Max(1, rounded);
-    }
+    private static int ClampPositiveInt(decimal value) => CoordinatePlannerRequestBuilder.PositiveInt(value);
 
-    private static int ClampNonNegativeInt(decimal value)
-    {
-        var rounded = (int)Math.Round(value, MidpointRounding.AwayFromZero);
-        return Math.Max(0, rounded);
-    }
+    private static int ClampNonNegativeInt(decimal value) => CoordinatePlannerRequestBuilder.NonNegativeInt(value);
 
 }
