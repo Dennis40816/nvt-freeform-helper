@@ -1,4 +1,5 @@
 using System.Globalization;
+using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -20,6 +21,28 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
         StatusText = exported
             ? "Coordinate preview exported."
             : "Coordinate preview export cancelled.";
+    }
+
+    [RelayCommand]
+    private async Task ExportCornerCircleImageAsync()
+    {
+        var image = CornerCircles.BuildImage();
+        if (image is null)
+        {
+            StatusText = CornerCircles.StatusText;
+            return;
+        }
+
+        if (CornerCircles.RequestExportAsync is null)
+        {
+            StatusText = "Corner circle image export is unavailable in the current host.";
+            return;
+        }
+
+        var exported = await CornerCircles.RequestExportAsync(image);
+        StatusText = exported
+            ? $"Corner circle image exported ({image.Width} x {image.Height} px)."
+            : "Corner circle image export cancelled.";
     }
 
     private async Task CopySelectedArtifactAsync()

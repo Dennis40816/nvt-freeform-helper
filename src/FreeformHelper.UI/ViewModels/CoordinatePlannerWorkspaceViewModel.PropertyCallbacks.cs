@@ -46,12 +46,14 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
     partial void OnMachineHeightChanged(decimal value) => RebuildSnapshot();
     partial void OnPixelWidthChanged(decimal value)
     {
+        CornerCircles.SetPixelSize(ClampPositiveInt(value), ClampPositiveInt(PixelHeight));
         RebuildSnapshot();
         PublishWorkspacePreferencesChanged();
     }
 
     partial void OnPixelHeightChanged(decimal value)
     {
+        CornerCircles.SetPixelSize(ClampPositiveInt(PixelWidth), ClampPositiveInt(value));
         RebuildSnapshot();
         PublishWorkspacePreferencesChanged();
     }

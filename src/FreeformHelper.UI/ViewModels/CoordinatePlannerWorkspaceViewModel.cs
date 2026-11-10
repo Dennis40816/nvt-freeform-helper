@@ -182,6 +182,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
         _selectedOverlayModeOption = OverlayModeOptions[1];
         CustomRecipeRows = _customArtifacts.RecipeRows;
         CustomEditor = new CoordinatePlannerCustomEditorModel(_machineOriginX, _machineOriginY, _machineWidth, _machineHeight);
+        CornerCircles = new CoordinatePlannerCornerCircleModel(session.DefaultPixelWidth, session.DefaultPixelHeight);
 
         SyncFromWorkspaceCommand = new RelayCommand(SyncFromWorkspace);
         UseActiveAreaSafeCornersCommand = new RelayCommand(UseActiveAreaSafeCorners);
@@ -236,6 +237,8 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
     public ReadOnlyObservableCollection<CoordinatePlannerCustomRecipeRow> CustomRecipeRows { get; }
 
     public CoordinatePlannerCustomEditorModel CustomEditor { get; }
+
+    public CoordinatePlannerCornerCircleModel CornerCircles { get; }
 
     public CoordinatePlannerSnapshot Snapshot => _snapshot;
 
