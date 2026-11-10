@@ -372,20 +372,6 @@
       "symbol": "file:FreeformHelper.UI.Views.CadLoadSpinnerWindow"
     },
     {
-      "kind": "file",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "axamlCodeBehindLines": 325
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/Views/CoordinatePlannerWorkspaceView.axaml.cs"
-      ],
-      "contentHash": "092cda063675e66144d06af24d878f483399ac4523c887d61cbf77c56a08ac08",
-      "project": "FreeformHelper.UI",
-      "symbol": "file:FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
