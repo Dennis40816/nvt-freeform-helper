@@ -21,12 +21,13 @@ public sealed partial class FreeformHelperViewModel
     private void MoveToWorkflowStep(WorkflowStepId step)
     {
         var expansion = WorkflowPipelineService.BuildExpansionState(step);
-        IsStep1Expanded = expansion.IsStep1Expanded;
-        IsStep2Expanded = expansion.IsStep2Expanded;
-        IsStep3Expanded = expansion.IsStep3Expanded;
-        IsStep4Expanded = expansion.IsStep4Expanded;
-        IsStep5Expanded = expansion.IsStep5Expanded;
-        IsStep6Expanded = expansion.IsStep6Expanded;
+        _workflowPanelState.ApplyExpansion(
+            expansion.IsStep1Expanded,
+            expansion.IsStep2Expanded,
+            expansion.IsStep3Expanded,
+            expansion.IsStep4Expanded,
+            expansion.IsStep5Expanded,
+            expansion.IsStep6Expanded);
     }
 
     private void TryMoveToNextWorkflowStep(WorkflowStepId completedStep)

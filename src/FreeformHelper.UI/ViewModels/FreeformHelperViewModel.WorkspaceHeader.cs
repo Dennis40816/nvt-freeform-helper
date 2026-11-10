@@ -163,26 +163,6 @@ public sealed partial class FreeformHelperViewModel
         MoveToWorkflowStep(step);
     }
 
-    partial void OnIsStep1ExpandedChanged(bool value)
-    {
-        if (value) SelectWorkspaceWorkStep(WorkspaceWorkStep.Step1Match);
-    }
-
-    partial void OnIsStep2ExpandedChanged(bool value)
-    {
-        if (value) SelectWorkspaceWorkStep(WorkspaceWorkStep.Step2Freeform);
-    }
-
-    partial void OnIsStep3ExpandedChanged(bool value)
-    {
-        if (value) SelectWorkspaceWorkStep(WorkspaceWorkStep.Step3NotchPreview);
-    }
-
-    partial void OnIsStep5ExpandedChanged(bool value)
-    {
-        if (value) SelectWorkspaceWorkStep(WorkspaceWorkStep.Step5Export);
-    }
-
     // --- Workspace Header Items ---
 
     /// <summary>

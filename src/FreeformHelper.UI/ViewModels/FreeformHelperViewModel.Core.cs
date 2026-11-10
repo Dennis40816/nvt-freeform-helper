@@ -120,6 +120,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             () => CanvasHost?.Invalidate(),
             OnPropertyChanging,
             OnPropertyChanged);
+        _workflowPanelState = new WorkflowPanelState(SelectWorkspaceWorkStep, OnPropertyChanging, OnPropertyChanged);
         _projectEditingSession = new ProjectEditingSession(PublishProjectEditingAvailabilityChange);
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
         _statusReporter = new UiOperationStatusReporter(message => StatusText = message);

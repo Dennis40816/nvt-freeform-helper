@@ -182,23 +182,25 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnImportBlockPolylinesChanging(bool value);
 
+    private readonly WorkflowPanelState _workflowPanelState;
+
     /// <summary>
     /// Gets or sets whether the console panel is expanded.
     /// </summary>
-    [ObservableProperty] private bool _isConsoleExpanded = true;
+    public bool IsConsoleExpanded { get => _workflowPanelState.IsConsoleExpanded; set => _workflowPanelState.IsConsoleExpanded = value; }
 
     /// <summary>
     /// Gets or sets whether Step 1 workflow block is expanded.
     /// </summary>
-    [ObservableProperty] private bool _isStep1Expanded = true;
+    public bool IsStep1Expanded { get => _workflowPanelState.IsStep1Expanded; set => _workflowPanelState.IsStep1Expanded = value; }
     /// <summary>
     /// Gets or sets whether Step 2 workflow block is expanded.
     /// </summary>
-    [ObservableProperty] private bool _isStep2Expanded;
+    public bool IsStep2Expanded { get => _workflowPanelState.IsStep2Expanded; set => _workflowPanelState.IsStep2Expanded = value; }
     /// <summary>
     /// Gets or sets whether Step 3 workflow block is expanded.
     /// </summary>
-    [ObservableProperty] private bool _isStep3Expanded;
+    public bool IsStep3Expanded { get => _workflowPanelState.IsStep3Expanded; set => _workflowPanelState.IsStep3Expanded = value; }
     /// <summary>
     /// Gets or sets whether Step 3 shows detailed To Full explanation text.
     /// </summary>
@@ -206,16 +208,16 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets whether Step 4 workflow block is expanded.
     /// </summary>
-    [ObservableProperty] private bool _isStep4Expanded;
+    public bool IsStep4Expanded { get => _workflowPanelState.IsStep4Expanded; set => _workflowPanelState.IsStep4Expanded = value; }
 
     /// <summary>
     /// Gets or sets whether Step 5 workflow block is expanded.
     /// </summary>
-    [ObservableProperty] private bool _isStep5Expanded;
+    public bool IsStep5Expanded { get => _workflowPanelState.IsStep5Expanded; set => _workflowPanelState.IsStep5Expanded = value; }
     /// <summary>
     /// Gets or sets whether Step 6 workflow block is expanded.
     /// </summary>
-    [ObservableProperty] private bool _isStep6Expanded;
+    public bool IsStep6Expanded { get => _workflowPanelState.IsStep6Expanded; set => _workflowPanelState.IsStep6Expanded = value; }
 
     // --- Canvas Visual Style Properties ---
 
