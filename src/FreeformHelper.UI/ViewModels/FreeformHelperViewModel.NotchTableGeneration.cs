@@ -134,7 +134,7 @@ public sealed partial class FreeformHelperViewModel
         workflowSnapshot ??= BuildWorkflowDataSnapshot();
         var exportSettings = CreateExportSettingsSnapshot(_projectFile.Settings);
         var activeRegularPadIds = GetActiveRegularPadIdsForNotchComputation();
-        var activeRegularHash = ComputeActiveRegularHash(activeRegularPadIds);
+        var activeRegularHash = NotchExportFingerprints.ComputeActiveRegularHash(activeRegularPadIds);
         var cadOutputFwDiffHash = NotchExportFingerprints.ComputeCadOutputFwDiffHash(workflowSnapshot.CadOutputFwDiffIndexByCadId);
         var step3Revision = GetNotchStep3Revision();
         var selectedSparseResultRequest = exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation

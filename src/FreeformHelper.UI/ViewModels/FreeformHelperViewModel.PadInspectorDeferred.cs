@@ -125,8 +125,8 @@ public sealed partial class FreeformHelperViewModel
             RequestId: requestId,
             SelectionRevision: selectionRevision,
             ResolutionRequest: resolutionRequest,
-            CadPoolFingerprint: ComputeCadPoolFingerprint(allCadSnapshot),
-            ActiveRegularHash: ComputeActiveRegularHash(activeRegularSnapshot),
+            CadPoolFingerprint: NotchExportFingerprints.ComputeCadPoolFingerprint(allCadSnapshot),
+            ActiveRegularHash: NotchExportFingerprints.ComputeActiveRegularHash(activeRegularSnapshot),
             GridFingerprint: BuildNotchComputationGridFingerprint(_grid),
             PrewarmedResolved: GetOrBuildCadV22ResolvedResultCached(
                 cad,
@@ -379,8 +379,8 @@ public sealed partial class FreeformHelperViewModel
                 out var currentCadPad,
                 out var currentCadPads,
                 out var currentActiveRegularPadIds) ||
-            ComputeCadPoolFingerprint(currentCadPads) != context.CadPoolFingerprint ||
-            ComputeActiveRegularHash(currentActiveRegularPadIds) != context.ActiveRegularHash)
+            NotchExportFingerprints.ComputeCadPoolFingerprint(currentCadPads) != context.CadPoolFingerprint ||
+            NotchExportFingerprints.ComputeActiveRegularHash(currentActiveRegularPadIds) != context.ActiveRegularHash)
         {
             return false;
         }

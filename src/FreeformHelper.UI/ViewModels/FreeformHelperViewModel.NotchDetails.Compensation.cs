@@ -217,8 +217,8 @@ public sealed partial class FreeformHelperViewModel
             throw new InvalidOperationException("Resolved notch result requires an active regular grid.");
         }
 
-        var activeRegularHash = ComputeActiveRegularHash(activeRegularPadIds);
-        var cadPoolFingerprint = ComputeCadPoolFingerprint(allCadPads);
+        var activeRegularHash = NotchExportFingerprints.ComputeActiveRegularHash(activeRegularPadIds);
+        var cadPoolFingerprint = NotchExportFingerprints.ComputeCadPoolFingerprint(allCadPads);
         var gridFingerprint = BuildNotchComputationGridFingerprint(_grid);
         var strictOverlapRatio = NotchV22CompensationService.NormalizeStrictOverlapRatio(
             strictOverlapRatioOverride ?? GetStrictOverlapRatioForNotchCompensation());
