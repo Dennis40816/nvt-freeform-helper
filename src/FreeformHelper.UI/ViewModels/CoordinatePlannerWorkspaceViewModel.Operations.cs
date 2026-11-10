@@ -82,7 +82,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             "json",
             "JSON",
             ["*.json"],
-            CoordinateArtifactService.ExportJson(_artifactSnapshot with { Rows = rows }),
+            CoordinateArtifactService.ExportJson(_render.ArtifactSnapshot with { Rows = rows }),
             rows.Length);
     }
 
@@ -167,10 +167,10 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
 
     private void UseActiveAreaSafeCorners()
     {
-        var topLeft = _snapshot.Points.FirstOrDefault(static point => point.Key == "aa-tl");
-        var topRight = _snapshot.Points.FirstOrDefault(static point => point.Key == "aa-tr");
-        var bottomRight = _snapshot.Points.FirstOrDefault(static point => point.Key == "aa-br");
-        var bottomLeft = _snapshot.Points.FirstOrDefault(static point => point.Key == "aa-bl");
+        var topLeft = _render.Snapshot.Points.FirstOrDefault(static point => point.Key == "aa-tl");
+        var topRight = _render.Snapshot.Points.FirstOrDefault(static point => point.Key == "aa-tr");
+        var bottomRight = _render.Snapshot.Points.FirstOrDefault(static point => point.Key == "aa-br");
+        var bottomLeft = _render.Snapshot.Points.FirstOrDefault(static point => point.Key == "aa-bl");
         if (topLeft is null ||
             topRight is null ||
             bottomRight is null ||
@@ -195,14 +195,17 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
 
     private void UpdateCadPadsForCanvas()
     {
-        _cadPadsForCanvas = SelectedLayerOption.Mode switch
+        _render = _render with
         {
-            CoordinatePlannerCadLayerMode.None => Array.Empty<CadPad>(),
-            CoordinatePlannerCadLayerMode.AllVisible => _session.CadPads.ToArray(),
-            CoordinatePlannerCadLayerMode.SingleLayer => _session.CadPads
-                .Where(pad => string.Equals(pad.Layer, SelectedLayerOption.LayerName, StringComparison.Ordinal))
-                .ToArray(),
-            _ => Array.Empty<CadPad>(),
+            CadPads = SelectedLayerOption.Mode switch
+            {
+                CoordinatePlannerCadLayerMode.None => Array.Empty<CadPad>(),
+                CoordinatePlannerCadLayerMode.AllVisible => _session.CadPads.ToArray(),
+                CoordinatePlannerCadLayerMode.SingleLayer => _session.CadPads
+                    .Where(pad => string.Equals(pad.Layer, SelectedLayerOption.LayerName, StringComparison.Ordinal))
+                    .ToArray(),
+                _ => Array.Empty<CadPad>(),
+            },
         };
 
         OnPropertyChanged(nameof(CadPadsForCanvas));
@@ -218,21 +221,25 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             BuildCurrentRequest(),
             ResolveSelectedAaOutlineLayerName(),
             ToGuideBasisKind(SelectedGuideBasisOption.Mode));
-        _snapshot = result.Snapshot;
-        _previewBounds = Rect2.Union(result.Snapshot.ActiveAreaBounds, result.GuideBounds);
-        _activeAreaSourceText = result.ActiveAreaSourceText;
-        _guideSourceText = result.GuideSourceText;
-        _artifactSnapshot = CoordinateArtifactService.BuildSnapshot(
-            _snapshot,
+        var snapshot = result.Snapshot;
+        var previewBounds = Rect2.Union(result.Snapshot.ActiveAreaBounds, result.GuideBounds);
+        var activeAreaSourceText = result.ActiveAreaSourceText;
+        var guideSourceText = result.GuideSourceText;
+        var artifactSnapshot = CoordinateArtifactService.BuildSnapshot(
+            snapshot,
             result.GuideBounds,
-            _activeAreaSourceText,
-            _guideSourceText);
-        AaCornerRows = CoordinatePlannerRowProjector.PointRows(_snapshot, CoordinatePlannerPointKind.AaCorner, "AA corner");
-        CustomArrayCornerRows = CoordinatePlannerRowProjector.PointRows(_snapshot, CoordinatePlannerPointKind.CustomArrayCorner, "4-point corner");
-        CustomArrayPointRows = CoordinatePlannerRowProjector.PointRows(_snapshot, CoordinatePlannerPointKind.CustomArrayDot, "Array dot");
-        HorizontalGuideRows = CoordinatePlannerRowProjector.LineRows(_snapshot, CoordinatePlannerLineKind.HorizontalGuide);
-        VerticalGuideRows = CoordinatePlannerRowProjector.LineRows(_snapshot, CoordinatePlannerLineKind.VerticalGuide);
-        ArtifactRows = SortArtifactRows(_artifactSnapshot.Rows);
+            activeAreaSourceText,
+            guideSourceText);
+        var aaCornerRows = CoordinatePlannerRowProjector.PointRows(snapshot, CoordinatePlannerPointKind.AaCorner, "AA corner");
+        var customArrayCornerRows = CoordinatePlannerRowProjector.PointRows(
+            snapshot, CoordinatePlannerPointKind.CustomArrayCorner, "4-point corner");
+        var customArrayPointRows = CoordinatePlannerRowProjector.PointRows(
+            snapshot, CoordinatePlannerPointKind.CustomArrayDot, "Array dot");
+        var horizontalGuideRows = CoordinatePlannerRowProjector.LineRows(snapshot, CoordinatePlannerLineKind.HorizontalGuide);
+        var verticalGuideRows = CoordinatePlannerRowProjector.LineRows(snapshot, CoordinatePlannerLineKind.VerticalGuide);
+        var artifactRows = SortArtifactRows(artifactSnapshot.Rows);
+        _render = new(snapshot, artifactSnapshot, previewBounds, activeAreaSourceText, guideSourceText, _render.CadPads,
+            aaCornerRows, customArrayCornerRows, customArrayPointRows, horizontalGuideRows, verticalGuideRows, artifactRows);
         SelectedArtifactRow = ArtifactRows.FirstOrDefault(row => string.Equals(row.Key, selectedArtifactKey, StringComparison.Ordinal));
 
         StatusText = string.Format(
@@ -297,7 +304,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             ArtifactSortDescending = false;
         }
 
-        ArtifactRows = SortArtifactRows(ArtifactRows);
+        _render = _render with { ArtifactRows = SortArtifactRows(_render.ArtifactRows) };
         OnPropertyChanged(nameof(ArtifactRows));
         OnPropertyChanged(nameof(ArtifactSortStatusText));
     }
