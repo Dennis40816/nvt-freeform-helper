@@ -273,20 +273,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.SettingsWindowViewModel"
     },
     {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 143
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs"
-      ],
-      "contentHash": "ae48c0cde98d51570a9ac075864c7b71028628badcc95e83579f6f56b3d3378d",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.SettingsWindowViewModel..ctor(FreeformHelperViewModel)"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {

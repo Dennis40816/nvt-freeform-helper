@@ -15,88 +15,22 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     private bool _suppressNotchThresholdSync;
     private bool _suppressCompensationModelSync;
     private readonly HashSet<string> _editedProperties = new(StringComparer.Ordinal);
+    private readonly SettingsWindowOptionSet _options;
 
     public SettingsWindowViewModel(FreeformHelperViewModel owner)
     {
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        _options = new SettingsWindowOptionSet(owner);
 
-        ScanOrderOptions = owner.ScanOrderOptions.ToList();
-        var selectedScanOrder = ScanOrderOptions.FirstOrDefault(o => o.Value == owner.SelectedScanOrderOption.Value);
-        if (string.IsNullOrWhiteSpace(selectedScanOrder.Display))
-        {
-            selectedScanOrder = GetFirstOrDefault(ScanOrderOptions);
-        }
-
-        GridAlignmentOptions = owner.GridAlignmentOptions.ToList();
-        var selectedAlignment = GridAlignmentOptions.FirstOrDefault(o => o.Value == owner.SelectedGridAlignmentOption.Value);
-        if (string.IsNullOrWhiteSpace(selectedAlignment.Display))
-        {
-            selectedAlignment = GetFirstOrDefault(GridAlignmentOptions);
-        }
-
-        RegularSourceModeOptions = owner.RegularSourceModeOptions.ToList();
-        var selectedRegularSourceMode = RegularSourceModeOptions.FirstOrDefault(o =>
-            o.Value == owner.SelectedRegularSourceModeOption.Value);
-        if (string.IsNullOrWhiteSpace(selectedRegularSourceMode.Display))
-        {
-            selectedRegularSourceMode = GetFirstOrDefault(RegularSourceModeOptions);
-        }
-
-        RegularSourceLayerOptions = owner.RegularSourceLayerOptions.ToList();
-        var selectedRegularSourceLayer = RegularSourceLayerOptions.FirstOrDefault(o =>
-            string.Equals(o.Name, owner.SelectedRegularSourceLayerOption.Name, StringComparison.Ordinal))
-            ?? GetFirstOrDefault(RegularSourceLayerOptions)
-            ?? new FreeformHelperViewModel.RegularSourceLayerOption(null, "Select layer");
-
-        LogLevelOptions = owner.LogLevelOptions.ToList();
-        var selectedLogLevel = LogLevelOptions.FirstOrDefault(o =>
-            string.Equals(o.Value, owner.SelectedLogLevelOption.Value, StringComparison.OrdinalIgnoreCase));
-        if (string.IsNullOrWhiteSpace(selectedLogLevel.Display))
-        {
-            selectedLogLevel = GetFirstOrDefault(LogLevelOptions);
-        }
-
-        CadOutputFwDiffAutoModeOptions = owner.CadOutputFwDiffAutoModeOptions.ToList();
-        var selectedCadOutputFwDiffAutoMode = CadOutputFwDiffAutoModeOptions.FirstOrDefault(o =>
-            o.Value == owner.SelectedCadOutputFwDiffAutoModeOption.Value);
-        if (string.IsNullOrWhiteSpace(selectedCadOutputFwDiffAutoMode.Display))
-        {
-            selectedCadOutputFwDiffAutoMode = GetFirstOrDefault(CadOutputFwDiffAutoModeOptions);
-        }
-
-        NotchExportFileTypeOptions = owner.NotchExportFileTypeOptions.ToList();
-        var selectedNotchExportFileType = NotchExportFileTypeOptions.FirstOrDefault(o =>
-            o.Value == owner.SelectedNotchExportFileTypeOption.Value);
-        if (string.IsNullOrWhiteSpace(selectedNotchExportFileType.Display))
-        {
-            selectedNotchExportFileType = GetFirstOrDefault(NotchExportFileTypeOptions);
-        }
-
-        NotchExportProfileOptions = owner.NotchExportProfileOptions.ToList();
-        var selectedNotchExportProfile = NotchExportProfileOptions.FirstOrDefault(o =>
-            o.Value == owner.SelectedNotchExportProfileOption.Value);
-        if (string.IsNullOrWhiteSpace(selectedNotchExportProfile.Display))
-        {
-            selectedNotchExportProfile = GetFirstOrDefault(NotchExportProfileOptions);
-        }
-
-        NotchCompensationModelOptions = owner.NotchCompensationModelOptions.ToList();
-        var selectedNotchCompensationModel = NotchCompensationModelOptions.FirstOrDefault(o =>
-            o.Value == owner.SelectedNotchCompensationModelOption.Value);
-        if (string.IsNullOrWhiteSpace(selectedNotchCompensationModel.Display))
-        {
-            selectedNotchCompensationModel = GetFirstOrDefault(NotchCompensationModelOptions);
-        }
-
-        _selectedScanOrderOption = selectedScanOrder;
-        _selectedGridAlignmentOption = selectedAlignment;
-        _selectedRegularSourceModeOption = selectedRegularSourceMode;
-        _selectedRegularSourceLayerOption = selectedRegularSourceLayer;
-        _selectedLogLevelOption = selectedLogLevel;
-        _selectedCadOutputFwDiffAutoModeOption = selectedCadOutputFwDiffAutoMode;
-        _selectedNotchExportFileTypeOption = selectedNotchExportFileType;
-        _selectedNotchExportProfileOption = selectedNotchExportProfile;
-        _selectedNotchCompensationModelOption = selectedNotchCompensationModel;
+        _selectedScanOrderOption = _options.SelectedScanOrder;
+        _selectedGridAlignmentOption = _options.SelectedGridAlignment;
+        _selectedRegularSourceModeOption = _options.SelectedRegularSourceMode;
+        _selectedRegularSourceLayerOption = _options.SelectedRegularSourceLayer;
+        _selectedLogLevelOption = _options.SelectedLogLevel;
+        _selectedCadOutputFwDiffAutoModeOption = _options.SelectedCadOutputFwDiffAutoMode;
+        _selectedNotchExportFileTypeOption = _options.SelectedNotchExportFileType;
+        _selectedNotchExportProfileOption = _options.SelectedNotchExportProfile;
+        _selectedNotchCompensationModelOption = _options.SelectedNotchCompensationModel;
 
         _xChannels = owner.XChannels;
         _yChannels = owner.YChannels;
@@ -162,15 +96,15 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
 
     public event Action? RequestClose;
 
-    public IReadOnlyList<FreeformHelperViewModel.ScanOrderOption> ScanOrderOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.GridAlignmentOption> GridAlignmentOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> RegularSourceModeOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayerOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.LogLevelOption> LogLevelOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> NotchExportFileTypeOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportProfileOption> NotchExportProfileOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.NotchCompensationModelOption> NotchCompensationModelOptions { get; }
+    public IReadOnlyList<FreeformHelperViewModel.ScanOrderOption> ScanOrderOptions => _options.ScanOrder;
+    public IReadOnlyList<FreeformHelperViewModel.GridAlignmentOption> GridAlignmentOptions => _options.GridAlignment;
+    public IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> RegularSourceModeOptions => _options.RegularSourceMode;
+    public IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayerOptions => _options.RegularSourceLayer;
+    public IReadOnlyList<FreeformHelperViewModel.LogLevelOption> LogLevelOptions => _options.LogLevel;
+    public IReadOnlyList<FreeformHelperViewModel.CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions => _options.CadOutputFwDiffAutoMode;
+    public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> NotchExportFileTypeOptions => _options.NotchExportFileType;
+    public IReadOnlyList<FreeformHelperViewModel.NotchExportProfileOption> NotchExportProfileOptions => _options.NotchExportProfile;
+    public IReadOnlyList<FreeformHelperViewModel.NotchCompensationModelOption> NotchCompensationModelOptions => _options.NotchCompensationModel;
 
     public ActiveAreaPixelsDraft ActiveAreaPixels { get; } = new();
 
@@ -704,11 +638,6 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     private void OnCancel()
     {
         RequestClose?.Invoke();
-    }
-
-    private static T GetFirstOrDefault<T>(IReadOnlyList<T> list)
-    {
-        return list.Count > 0 ? list[0] : default!;
     }
 
     public void ResetAllSettingsToDefaults()
