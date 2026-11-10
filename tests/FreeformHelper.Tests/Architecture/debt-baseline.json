@@ -11,7 +11,7 @@
     "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 4,
-    "freeformViewModelStateMembers": 76,
+    "freeformViewModelStateMembers": 69,
     "shellNavigationBooleans": 0,
     "noWarnIds": 1
   },
@@ -53,7 +53,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.cs:19",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step1.cs:204", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step1.cs:412",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.Step4.cs:57",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:188", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:193", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:197", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:201", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:205", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:209", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:214", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:218", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:234", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:259", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:271", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:283", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:287", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:291",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:207", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:236", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:261", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:273", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:285", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:289", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:293",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:36", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:50", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:252", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:485", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:490", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:496", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:514", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:586", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:590",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:391", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:395", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:399", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:404", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:469", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:472",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.NotchPreview.cs:12", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.NotchPreview.cs:16",
@@ -61,7 +61,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:12", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:171", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:269",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Step4Indexing.cs:5",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:20", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:26", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:32", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:47", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:62",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkspaceHeader.cs:193"
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkspaceHeader.cs:173"
     ],
     "shellNavigationBooleans": [],
     "noWarnIds": [
