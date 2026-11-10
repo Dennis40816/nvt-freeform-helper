@@ -1,3 +1,4 @@
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
 
@@ -7,7 +8,7 @@ public sealed partial class FreeformHelperViewModel
 {
     private const string DiagnosticsNotRunSummary = MappingDiagnosticsResult.NotRunSummary;
     private const string NotchExportNotRunSummary = "Notch export: not run.";
-    private int _notchFinalProjectionRevision;
+    private readonly AsyncGeneration _notchFinalProjection = new();
 
     private void MoveToWorkflowStep(WorkspaceWorkStep step) => MoveToWorkflowStep(step switch
     {
@@ -163,7 +164,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void ClearStep5ProjectedResultCore()
     {
-        Interlocked.Increment(ref _notchFinalProjectionRevision);
+        _notchFinalProjection.Next();
         _notchExportGenerationCacheService.InvalidateCadAllocationProjectedRowCount();
         NotchExportSummary = NotchExportNotRunSummary;
         _notchCache.LastGeneratedTable = null;

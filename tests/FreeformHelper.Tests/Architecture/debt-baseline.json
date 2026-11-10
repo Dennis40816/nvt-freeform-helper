@@ -11,7 +11,7 @@
     "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 4,
-    "freeformViewModelStateMembers": 87,
+    "freeformViewModelStateMembers": 86,
     "shellNavigationBooleans": 0,
     "noWarnIds": 1
   },
@@ -61,7 +61,6 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:12", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:171", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:269",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Step4Indexing.cs:5",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:20", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:26", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:32", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:47", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:62",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkflowSteps.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkspaceHeader.cs:193"
     ],
     "shellNavigationBooleans": [],

@@ -121,7 +121,7 @@ public sealed partial class FreeformHelperViewModel
     private Progress<NotchGenerationProgress> CreateNotchGenerationProgressReporter(string exportKind)
     {
         const int minUpdateIntervalMs = 120;
-        var finalProjectionRevision = Volatile.Read(ref _notchFinalProjectionRevision);
+        var finalProjectionRevision = _notchFinalProjection.Read();
         var sourceRevision = SimulationWorkspaceSourceRevision;
         var lastTick = 0L;
 
@@ -169,7 +169,7 @@ public sealed partial class FreeformHelperViewModel
 
     private Progress<NotchGenerationProgress> CreateStep5GenerationProgressReporter(
         string operationLabel,
-        int finalProjectionRevision,
+        long finalProjectionRevision,
         int sourceRevision,
         Action<string>? progressTextReporter = null)
     {
