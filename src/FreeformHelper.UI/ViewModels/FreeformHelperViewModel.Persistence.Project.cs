@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Security;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
@@ -204,34 +203,6 @@ public sealed partial class FreeformHelperViewModel
         return RunProjectLoadAsync(() => LoadProjectFromPathCoreAsync(path));
     }
 
-    // Path.GetFullPath documents exactly these four exception types; anything else is not an input problem.
-    private static string? TryGetFullProjectPath(string path, out Exception? error)
-    {
-        error = null;
-        try
-        {
-            return Path.GetFullPath(path.Trim());
-        }
-        catch (ArgumentException ex)
-        {
-            error = ex;
-        }
-        catch (NotSupportedException ex)
-        {
-            error = ex;
-        }
-        catch (PathTooLongException ex)
-        {
-            error = ex;
-        }
-        catch (SecurityException ex)
-        {
-            error = ex;
-        }
-
-        return null;
-    }
-
     // A rejected path must reach the status bar for every caller, so the user never sees a silent failed load.
     private ProjectLoadCommandResult ReportLoadRejected(string code, string message, string? path)
     {
@@ -242,21 +213,13 @@ public sealed partial class FreeformHelperViewModel
     private async Task<ProjectLoadCommandResult> LoadProjectFromPathCoreAsync(string path)
     {
         var status = CreateStatusScope("LoadProject");
-        if (string.IsNullOrWhiteSpace(path))
+        var resolution = ProjectPathResolver.Resolve(path, File.Exists);
+        if (resolution.Code is not null)
         {
-            return ReportLoadRejected("INVALID_ARGUMENTS", "Argument '--path' is required.", null);
+            return ReportLoadRejected(resolution.Code, resolution.Message!, resolution.NormalizedPath);
         }
 
-        var normalizedPath = TryGetFullProjectPath(path, out var pathError);
-        if (normalizedPath is null)
-        {
-            return ReportLoadRejected("INVALID_ARGUMENTS", $"Invalid project path '{path}': {pathError!.Message}", null);
-        }
-
-        if (!File.Exists(normalizedPath))
-        {
-            return ReportLoadRejected("PATH_NOT_FOUND", $"Project file not found: {normalizedPath}", normalizedPath);
-        }
+        var normalizedPath = resolution.NormalizedPath!;
 
         var commandResult = ProjectLoadCommandResult.Failed(
             code: "LOAD_FAILED",
