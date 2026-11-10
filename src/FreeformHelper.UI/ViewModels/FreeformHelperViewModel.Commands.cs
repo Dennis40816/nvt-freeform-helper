@@ -78,15 +78,19 @@ public sealed partial class FreeformHelperViewModel
     public IRelayCommand SetFreeformXYCommand { get; private set; } = null!;
 
     /// <summary>
-    /// Initializes all commands used by the ViewModel.
-    /// This method is typically called during the ViewModel's construction.
+    /// Initializes Notch, project, and selection commands during construction.
+    /// DXF edit and general commands are initialized next by the constructor.
     /// </summary>
     private void InitializeCommands()
     {
         InitializeNotchCommands();
         InitializeProjectCommands();
         InitializeSelectionCommands();
-        InitializeDxfCommands();
+    }
+
+    /// <summary>Initializes general commands after the DXF edit commands during construction.</summary>
+    private void InitializeGeneralCommands()
+    {
         OpenDxfCommand = CreateEditingAsyncCommand(OpenDxfAsync);
         MatchCommand = CreateEditingAsyncCommand(MatchAsync);
         ImportRegularVisibilityMaskCommand = CreateEditingAsyncCommand(ImportRegularVisibilityMaskAsync);
