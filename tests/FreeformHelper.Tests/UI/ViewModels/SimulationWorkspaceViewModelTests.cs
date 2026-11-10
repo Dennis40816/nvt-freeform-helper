@@ -16,13 +16,21 @@ public sealed partial class SimulationWorkspaceViewModelTests
     private static readonly int[] _duplicateDiffIndices = { 10, 10 };
 
     [Fact]
-    public async Task Constructor_OffUiThread_DoesNotCreateDispatcherTimer()
+    public async Task ConstructorOffUiThreadAllowsPlaybackCommandsWithoutCsvAsync()
     {
         var viewModel = await Task.Run(() => new SimulationWorkspaceViewModel(
             new SimulationWorkspaceUseCase(new NotchApplySimulationReviewUseCase()),
             BuildSession()));
 
-        Assert.Null(SimulationWorkspaceViewModelPrivateAccess.PlaybackTimer(viewModel));
+        viewModel.TogglePlaybackCommand.Execute(null);
+        viewModel.NextFrameCommand.Execute(null);
+        viewModel.PreviousFrameCommand.Execute(null);
+
+        Assert.False(viewModel.IsPlaybackRunning);
+        Assert.False(viewModel.CanPlayFrames);
+        Assert.False(viewModel.CanStepFrames);
+        Assert.Equal(0, viewModel.SelectedFrameSliderIndex);
+        Assert.Equal("Play", viewModel.PlaybackButtonText);
     }
 
     [Fact]
