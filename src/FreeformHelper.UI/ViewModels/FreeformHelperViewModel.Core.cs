@@ -37,25 +37,27 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     /// </summary>
     public ICanvasHost? CanvasHost { get; set; }
 
+    private readonly ViewCallbacks _viewCallbacks = new();
+
     // --- Delegates for UI-specific Dialogs ---
     // These delegates are set by the View (FreeformHelperView) to enable the ViewModel
     // to trigger platform-specific file dialogs or confirmation prompts.
-    public Func<Task<string?>>? PickOpenDxfPathAsync { get; set; }
-    public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get; set; }
-    public Func<Task<string?>>? PickLoadProjectPathAsync { get; set; }
-    public Func<Task<string?>>? PickSaveProjectPathAsync { get; set; }
-    public Func<string, string, Task<string?>>? PickSaveNotchPathAsync { get; set; }
-    public Func<string, string, Task<string?>>? PickSaveExportPathAsync { get; set; }
-    public Func<Task<bool>>? ConfirmEmbedDxfAsync { get; set; }
-    public Func<string, string, Task>? ShowWarningAsync { get; set; }
-    public Func<bool>? EnsureNoPendingEdits { get; set; }
-    public Func<NotchDetailViewModel, Task>? OpenNotchDetailAsync { get; set; }
-    public Func<NotchExportSelectionViewModel, Task<NotchTable?>>? OpenNotchExportSelectionAsync { get; set; }
-    public Func<SimulationSafetyAuditResult?>? GetCurrentSimulationSafetyAudit { get; set; }
-    public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get; set; }
-    public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get; set; }
-    public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get; set; }
-    public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get; set; }
+    public Func<Task<string?>>? PickOpenDxfPathAsync { get => _viewCallbacks.PickOpenDxfPathAsync; set => _viewCallbacks.PickOpenDxfPathAsync = value; }
+    public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get => _viewCallbacks.PickOpenRegularVisibilityMaskPathAsync; set => _viewCallbacks.PickOpenRegularVisibilityMaskPathAsync = value; }
+    public Func<Task<string?>>? PickLoadProjectPathAsync { get => _viewCallbacks.PickLoadProjectPathAsync; set => _viewCallbacks.PickLoadProjectPathAsync = value; }
+    public Func<Task<string?>>? PickSaveProjectPathAsync { get => _viewCallbacks.PickSaveProjectPathAsync; set => _viewCallbacks.PickSaveProjectPathAsync = value; }
+    public Func<string, string, Task<string?>>? PickSaveNotchPathAsync { get => _viewCallbacks.PickSaveNotchPathAsync; set => _viewCallbacks.PickSaveNotchPathAsync = value; }
+    public Func<string, string, Task<string?>>? PickSaveExportPathAsync { get => _viewCallbacks.PickSaveExportPathAsync; set => _viewCallbacks.PickSaveExportPathAsync = value; }
+    public Func<Task<bool>>? ConfirmEmbedDxfAsync { get => _viewCallbacks.ConfirmEmbedDxfAsync; set => _viewCallbacks.ConfirmEmbedDxfAsync = value; }
+    public Func<string, string, Task>? ShowWarningAsync { get => _viewCallbacks.ShowWarningAsync; set => _viewCallbacks.ShowWarningAsync = value; }
+    public Func<bool>? EnsureNoPendingEdits { get => _viewCallbacks.EnsureNoPendingEdits; set => _viewCallbacks.EnsureNoPendingEdits = value; }
+    public Func<NotchDetailViewModel, Task>? OpenNotchDetailAsync { get => _viewCallbacks.OpenNotchDetailAsync; set => _viewCallbacks.OpenNotchDetailAsync = value; }
+    public Func<NotchExportSelectionViewModel, Task<NotchTable?>>? OpenNotchExportSelectionAsync { get => _viewCallbacks.OpenNotchExportSelectionAsync; set => _viewCallbacks.OpenNotchExportSelectionAsync = value; }
+    public Func<SimulationSafetyAuditResult?>? GetCurrentSimulationSafetyAudit { get => _viewCallbacks.GetCurrentSimulationSafetyAudit; set => _viewCallbacks.GetCurrentSimulationSafetyAudit = value; }
+    public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get => _viewCallbacks.OpenDxfEditChangeListAsync; set => _viewCallbacks.OpenDxfEditChangeListAsync = value; }
+    public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get => _viewCallbacks.OpenIndexMappingReportAsync; set => _viewCallbacks.OpenIndexMappingReportAsync = value; }
+    public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get => _viewCallbacks.OpenDxfOverlapReportAsync; set => _viewCallbacks.OpenDxfOverlapReportAsync = value; }
+    public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get => _viewCallbacks.OpenDxfLayerImageExportAsync; set => _viewCallbacks.OpenDxfLayerImageExportAsync = value; }
 
     // --- Application Services ---
     // Instances of various services responsible for business logic and data manipulation.
