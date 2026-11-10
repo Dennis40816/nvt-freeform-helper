@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -20,9 +19,22 @@ public sealed partial class FreeformHelperView
     // --- Pad Info Popover State ---
     private Rect2? _padInfoBoundsWorld; // World coordinates of the pad(s) for which info is shown.
     private IReadOnlyList<Rect2> _padInfoSelectedBounds = Array.Empty<Rect2>(); // Bounding boxes of all selected pads for layout.
-    private PadInfoContext? _pendingPadInfoContext; // Context for a pad info request that's delayed due to dirty state.
-    private INotifyPropertyChanged? _padInfoChangeNotifier; // Used to observe changes in the pad info ViewModel.
-    private bool _hasPadInfoPendingChanges; // Flag indicating if the active pad info has unsaved changes.
+    private PadInfoOverlaySession? _padInfoSession; // UI thread only, retained across reattach.
+
+    internal PadInfoContext? _pendingPadInfoContext
+    {
+        get => PadInfoSession.PendingContext;
+        set => PadInfoSession.PendingContext = value;
+    }
+
+    private PadInfoOverlaySession PadInfoSession => _padInfoSession ??= new(
+        () => DataContext as FreeformHelperViewModel,
+        () => _padInfoOverlay,
+        () => _padInfoPopover,
+        () => _canvas,
+        bounds => _padInfoBoundsWorld = bounds,
+        bounds => _padInfoSelectedBounds = bounds,
+        ShowPadInfoOverlay);
 
     private PadInfoOverlayRenderer PadInfoRenderer => _padInfoRenderer ??= new(
         this,
@@ -213,16 +225,7 @@ public sealed partial class FreeformHelperView
     /// <param name="infoViewModel">The ViewModel containing the data for the popover.</param>
     /// <param name="bounds">The world coordinate bounding boxes of the pads for context.</param>
     private void TryOpenPadInfo(FreeformHelperViewModel vm, object infoViewModel, IEnumerable<Rect2> bounds)
-    {
-        var context = new PadInfoContext(infoViewModel, PadInfoLayoutCalculator.BuildBounds(bounds), bounds.ToList());
-        // If a dirty pad info is active, store this context as pending.
-        if (RequestClosePadInfo(context))
-        {
-            return;
-        }
-
-        vm.InteractionState.OpenPadInfo(context); // Open the pad info via the InteractionState.
-    }
+        => PadInfoSession.TryOpenPadInfo(vm, infoViewModel, bounds);
 
     /// <summary>
     /// Shows the pad information overlay and triggers a layout update for the popover position.
@@ -254,96 +257,16 @@ public sealed partial class FreeformHelperView
     /// Manages the opening, closing, and content of the pad information popover.
     /// </summary>
     private void OnPadInfoChanged(object? sender, PadInfoChangedEventArgs e)
-    {
-        if (e.Context is null) // Pad info is being closed.
-        {
-            ClosePadInfo();
-            if (DataContext is not FreeformHelperViewModel vm) return;
-            // Open the waiting popover, or show the current selection again so edited values replace the old ones.
-            var pending = _pendingPadInfoContext;
-            _pendingPadInfoContext = null;
-            if (pending is null) vm.RefreshInspectorFromSelection();
-            else vm.InteractionState.OpenPadInfo(pending);
-            return;
-        }
+        => PadInfoSession.OnPadInfoChanged(e);
 
-        // Pad info is being opened or updated.
-        _padInfoBoundsWorld = e.Context.BoundsWorld;
-        _padInfoSelectedBounds = e.Context.SelectedBounds;
-        if (_padInfoPopover is not null)
-        {
-            _padInfoPopover.DataContext = e.Context.ViewModel; // Set ViewModel for the popover content.
-        }
-
-        ObservePadInfoChanges(e.Context.ViewModel as IPadInfoChangeTracking); // Observe changes for dirty state.
-        UpdatePadAreaInteraction(); // Update canvas interaction based on popover state.
-        ShowPadInfoOverlay(); // Show the popover.
-    }
-
-    /// <summary>
-    /// Hides the pad information popover and resets its state.
-    /// </summary>
-    private void ClosePadInfo()
-    {
-        if (_padInfoOverlay is null)
-        {
-            return;
-        }
-
-        _padInfoOverlay.IsVisible = false; // Hide the overlay.
-        if (_padInfoPopover is not null)
-        {
-            _padInfoPopover.DataContext = null; // Clear DataContext.
-            _padInfoPopover.HideCloseConfirm(); // Hide any close confirmation.
-        }
-        ObservePadInfoChanges(null); // Stop observing changes.
-        SetPadAreaHitTest(true); // Re-enable hit testing on pads.
-        _padInfoBoundsWorld = null;
-        _padInfoSelectedBounds = Array.Empty<Rect2>();
-    }
-
-    /// <summary>
-    /// Requests to close the pad information popover, potentially prompting the user if there are unsaved changes.
-    /// </summary>
-    /// <param name="replacement">An optional <see cref="PadInfoContext"/> to open after closing, if not dirty.</param>
-    /// <returns>True if the popover is dirty and a confirmation is shown, false otherwise.</returns>
     private bool RequestClosePadInfo(PadInfoContext? replacement = null)
-    {
-        // If popover is not visible or not present, no need to close.
-        if (_padInfoOverlay is null || _padInfoPopover is null || !_padInfoOverlay.IsVisible)
-        {
-            _pendingPadInfoContext = null;
-            return false;
-        }
+        => PadInfoSession.RequestClosePadInfo(replacement);
 
-        // Check if the current pad info has unsaved changes.
-        if (_padInfoPopover.DataContext is IPadInfoChangeTracking tracking && tracking.HasPendingChanges)
-        {
-            // If dirty, store the new context as pending and show a confirmation.
-            _pendingPadInfoContext = replacement;
-            _padInfoPopover.ShowCloseConfirm();
-            SetPadAreaHitTest(false); // Disable hit testing on pads while confirmation is active.
-            return true;
-        }
+    private void ClosePadInfoViaState() => PadInfoSession.ClosePadInfoViaState();
 
-        // If not dirty, close immediately and open replacement if provided.
-        _pendingPadInfoContext = replacement;
-        ClosePadInfoViaState();
-        return true;
-    }
+    private void SetPadAreaHitTest(bool isEnabled) => PadInfoSession.SetPadAreaHitTest(isEnabled);
 
-    /// <summary>
-    /// Requests the ViewModel to close the pad info popover.
-    /// </summary>
-    private void ClosePadInfoViaState()
-    {
-        if (DataContext is FreeformHelperViewModel vm)
-        {
-            vm.InteractionState.ClosePadInfo(); // Delegate to ViewModel.
-            return;
-        }
+    private bool HandleDirtyPadInfo() => PadInfoSession.HandleDirtyPadInfo();
 
-        ClosePadInfo(); // Fallback if ViewModel is not set.
-    }
-
+    private bool EnsureNoPendingEdits() => PadInfoSession.EnsureNoPendingEdits();
 }

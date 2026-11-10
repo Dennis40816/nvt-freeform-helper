@@ -106,19 +106,7 @@ public sealed partial class FreeformHelperView
         _padInfoLink = this.FindControl<Avalonia.Controls.Shapes.Path>("PadInfoLink");
         _padInfoAnchor = this.FindControl<Avalonia.Controls.Shapes.Ellipse>("PadInfoAnchor");
 
-        if (_padInfoPopover is not null)
-        {
-            _padInfoPopover.ApplyCloseRequested += (_, _) => ClosePadInfoViaState();
-            _padInfoPopover.DiscardCloseRequested += (_, _) => ClosePadInfoViaState();
-            _padInfoPopover.CloseConfirmDismissed += (_, _) =>
-            {
-                _pendingPadInfoContext = null;
-                SetPadAreaHitTest(true);
-            };
-            _padInfoPopover
-                .GetObservable(PadInfoPopover.IsCloseConfirmVisibleProperty)
-                .Subscribe(visible => SetPadAreaHitTest(!visible));
-        }
+        PadInfoSession.WirePopoverEvents();
     }
 
     /// <summary>

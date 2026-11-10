@@ -310,8 +310,8 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "viewTypeLines": 1331,
-        "partialFiles": 12
+        "viewTypeLines": 1153,
+        "partialFiles": 11
       },
       "owner": "NFH",
       "locations": [
