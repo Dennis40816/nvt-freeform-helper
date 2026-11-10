@@ -357,7 +357,7 @@ internal static partial class NotchDisplayProjector
     {
         var ownersText = parsed.OwnerCadPadIds.Count == 0
             ? "-"
-            : BuildCompactList(parsed.OwnerCadPadIds);
+            : PadMatchTextFormatter.CompactList(parsed.OwnerCadPadIds);
 
         builder.Append("IC")
             .Append(parsed.IcIndex)
@@ -396,21 +396,6 @@ internal static partial class NotchDisplayProjector
                 parsed.RuleCode,
                 parsed.IsToFull,
                 parsed.IsBoundary));
-    }
-
-    private static string BuildCompactList(IReadOnlyList<int> values)
-    {
-        if (values.Count == 0)
-        {
-            return "-";
-        }
-
-        if (values.Count <= 3)
-        {
-            return string.Join(", ", values);
-        }
-
-        return $"{values[0]}, {values[1]}, {values[2]} (+{values.Count - 3})";
     }
 
     private static bool TryParseDiagnosticLine(string line, out NotchToFullDiagnosticEntry parsed)
