@@ -201,7 +201,12 @@ public sealed partial class FreeformHelperViewModel
 
     // The grid build options are stored once. The properties below forward to the record and raise
     // the same notifications and callbacks as the stored properties they replaced.
-    private GridBuildOptions _gridBuild = GridBuildOptions.Initial;
+    private readonly WorkflowInputState _workflowInput = new();
+    private GridBuildOptions _gridBuild
+    {
+        get => _workflowInput.GridBuild;
+        set => _workflowInput.GridBuild = value;
+    }
 
     /// <summary>
     /// Gets or sets the preferred AA outline layer name used by Coordinate.
@@ -409,7 +414,11 @@ public sealed partial class FreeformHelperViewModel
 
     // The layer source selection is stored once. The properties below forward to the record and raise
     // the same notifications and callbacks as the stored properties they replaced.
-    private LayerSourceSelection _layerSource = LayerSourceSelection.Initial;
+    private LayerSourceSelection _layerSource
+    {
+        get => _workflowInput.LayerSource;
+        set => _workflowInput.LayerSource = value;
+    }
 
     /// <summary>
     /// Gets or sets helper text for DXF regular-source validation and suggested IC/grid settings.

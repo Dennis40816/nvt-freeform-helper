@@ -54,7 +54,11 @@ public sealed partial class FreeformHelperViewModel
 
     // The CAD Output FW Diff assignment settings are stored once. The properties below forward to the
     // record and raise the same notifications and callbacks as the stored properties they replaced.
-    private FwDiffAssignmentSettings _fwDiffAssignment = FwDiffAssignmentSettings.Initial;
+    private FwDiffAssignmentSettings _fwDiffAssignment
+    {
+        get => _workflowInput.FwDiffAssignment;
+        set => _workflowInput.FwDiffAssignment = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether to display CAD Output FW Diff overlay hints on canvas.
