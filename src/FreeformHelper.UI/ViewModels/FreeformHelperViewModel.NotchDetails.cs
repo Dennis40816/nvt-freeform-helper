@@ -207,54 +207,57 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets the command to export the notch table in the currently selected format.
     /// </summary>
-    public IAsyncRelayCommand ExportNotchCommand { get; private set; } = null!;
+    public IAsyncRelayCommand ExportNotchCommand => _notchCommands.ExportNotchCommand;
 
     /// <summary>
     /// Gets the command to open the notch detail view for the selected CAD pad.
     /// </summary>
-    public IAsyncRelayCommand ShowNotchDetailCommand { get; private set; } = null!;
+    public IAsyncRelayCommand ShowNotchDetailCommand => _notchCommands.ShowNotchDetailCommand;
 
     /// <summary>
     /// Gets the command to set notch validation target REG from current selection.
     /// </summary>
-    public IRelayCommand UseSelectedRegularForNotchValidationCommand { get; private set; } = null!;
+    public IRelayCommand UseSelectedRegularForNotchValidationCommand => _notchCommands.UseSelectedRegularForNotchValidationCommand;
 
     /// <summary>
     /// Gets the command to analyze notch rows/flow for current validation REG.
     /// </summary>
-    public IRelayCommand AnalyzeNotchValidationCommand { get; private set; } = null!;
+    public IRelayCommand AnalyzeNotchValidationCommand => _notchCommands.AnalyzeNotchValidationCommand;
 
     /// <summary>
     /// Gets the command to clear notch validation result.
     /// </summary>
-    public IRelayCommand ClearNotchValidationCommand { get; private set; } = null!;
+    public IRelayCommand ClearNotchValidationCommand => _notchCommands.ClearNotchValidationCommand;
 
     /// <summary>
     /// Gets the command to focus canvas selection based on one validation row.
     /// </summary>
-    public IRelayCommand<NotchValidationDisplayItem> FocusNotchValidationItemCommand { get; private set; } = null!;
+    public IRelayCommand<NotchValidationDisplayItem> FocusNotchValidationItemCommand => _notchCommands.FocusNotchValidationItemCommand;
 
     /// <summary>
     /// Gets the command to move Notch Stage preview to previous stage.
     /// </summary>
-    public IRelayCommand PreviousNotchPreviewStageCommand { get; private set; } = null!;
+    public IRelayCommand PreviousNotchPreviewStageCommand => _notchCommands.PreviousNotchPreviewStageCommand;
 
     /// <summary>
     /// Gets the command to move Notch Stage preview to next stage.
     /// </summary>
-    public IRelayCommand NextNotchPreviewStageCommand { get; private set; } = null!;
+    public IRelayCommand NextNotchPreviewStageCommand => _notchCommands.NextNotchPreviewStageCommand;
 
-    /// <summary>Creates the Notch commands. <see cref="InitializeCommands"/> calls it once during construction.</summary>
-    private void InitializeNotchCommands()
+    private readonly NotchCommands _notchCommands;
+
+    /// <summary>Creates the notch commands once during construction.</summary>
+    private NotchCommands CreateNotchCommands()
     {
-        ExportNotchCommand = CreateEditingAsyncCommand(ExportNotchAsync);
-        ShowNotchDetailCommand = CreateEditingAsyncCommand(ShowNotchDetailAsync);
-        UseSelectedRegularForNotchValidationCommand = CreateEditingCommand(UseSelectedRegularForNotchValidation);
-        AnalyzeNotchValidationCommand = CreateEditingCommand(AnalyzeNotchValidation);
-        ClearNotchValidationCommand = CreateEditingCommand(ClearNotchValidation);
-        FocusNotchValidationItemCommand = CreateEditingCommand<NotchValidationDisplayItem>(FocusNotchValidationItem);
-        PreviousNotchPreviewStageCommand = CreateEditingCommand(() => ShiftNotchPreviewStage(-1));
-        NextNotchPreviewStageCommand = CreateEditingCommand(() => ShiftNotchPreviewStage(1));
+        return new NotchCommands(
+            ExportNotchCommand: CreateEditingAsyncCommand(ExportNotchAsync),
+            ShowNotchDetailCommand: CreateEditingAsyncCommand(ShowNotchDetailAsync),
+            UseSelectedRegularForNotchValidationCommand: CreateEditingCommand(UseSelectedRegularForNotchValidation),
+            AnalyzeNotchValidationCommand: CreateEditingCommand(AnalyzeNotchValidation),
+            ClearNotchValidationCommand: CreateEditingCommand(ClearNotchValidation),
+            FocusNotchValidationItemCommand: CreateEditingCommand<NotchValidationDisplayItem>(FocusNotchValidationItem),
+            PreviousNotchPreviewStageCommand: CreateEditingCommand(() => ShiftNotchPreviewStage(-1)),
+            NextNotchPreviewStageCommand: CreateEditingCommand(() => ShiftNotchPreviewStage(1)));
     }
 
     private readonly NotchExportGenerationCacheService _notchExportGenerationCacheService = new();

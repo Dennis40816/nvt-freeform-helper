@@ -102,17 +102,20 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets the command to save the current project.
     /// </summary>
-    public IAsyncRelayCommand SaveProjectCommand { get; private set; } = null!;
+    public IAsyncRelayCommand SaveProjectCommand => _projectCommands.SaveProjectCommand;
 
     /// <summary>
     /// Gets the command to load an existing project.
     /// </summary>
-    public IAsyncRelayCommand LoadProjectCommand { get; private set; } = null!;
+    public IAsyncRelayCommand LoadProjectCommand => _projectCommands.LoadProjectCommand;
 
-    /// <summary>Creates the Project commands. <see cref="InitializeCommands"/> calls it once during construction.</summary>
-    private void InitializeProjectCommands()
+    private readonly ProjectCommands _projectCommands;
+
+    /// <summary>Creates the project commands once during construction.</summary>
+    private ProjectCommands CreateProjectCommands()
     {
-        SaveProjectCommand = CreateEditingAsyncCommand(SaveProjectAsync);
-        LoadProjectCommand = CreateEditingAsyncCommand(LoadProjectAsync);
+        return new ProjectCommands(
+            SaveProjectCommand: CreateEditingAsyncCommand(SaveProjectAsync),
+            LoadProjectCommand: CreateEditingAsyncCommand(LoadProjectAsync));
     }
 }
