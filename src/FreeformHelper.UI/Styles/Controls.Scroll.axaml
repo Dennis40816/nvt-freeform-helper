@@ -271,20 +271,6 @@
     <Setter Property="Background" Value="{DynamicResource BrushScrollV2Thumb}"/>
   </Style>
 
-  <Style Selector="ScrollViewer.workspaceGroupStripScroll /template/ primitives|ScrollBar[Orientation=Horizontal]">
-    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Track}"/>
-    <Setter Property="Margin" Value="{StaticResource InsetTop4}"/>
-  </Style>
-
-  <Style Selector="ScrollViewer.workspaceGroupStripScroll /template/ primitives|ScrollBar[Orientation=Horizontal] Thumb">
-    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Thumb}"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
-  </Style>
-
-  <Style Selector="ScrollViewer.workspaceGroupStripScroll /template/ primitives|ScrollBar[Orientation=Horizontal] Thumb:pointerover">
-    <Setter Property="Background" Value="{DynamicResource BrushScrollV2Thumb}"/>
-  </Style>
-
   <Style Selector="ScrollViewer.scrollDevCandidate /template/ primitives|ScrollBar[Orientation=Vertical] Thumb">
     <Setter Property="MinHeight" Value="{StaticResource ScrollBarDevCandidateThumbMinLength}"/>
   </Style>

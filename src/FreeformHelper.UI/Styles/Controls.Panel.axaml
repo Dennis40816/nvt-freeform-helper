@@ -285,11 +285,6 @@
     <Setter Property="MaxLines" Value="2"/>
   </Style>
 
-  <Style Selector="Grid.workflowLegendRow">
-    <Setter Property="ColumnSpacing" Value="{StaticResource Space8}"/>
-    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-  </Style>
-
   <Style Selector="SelectableTextBlock.workflowLegendTitle, TextBlock.workflowLegendTitle">
     <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
