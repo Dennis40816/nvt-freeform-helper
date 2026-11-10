@@ -46,8 +46,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var groupId = _combinedCad.NextGroupId++;
-        var combinedPads = DxfCombinedGroupRules.CreatePads(
-            sourcePads[0].Layer, unionResult.OuterPolygons, groupId, _cad, _combinedCad);
+        var combinedPads = CreateCombinedCadPads(sourcePads[0].Layer, unionResult.OuterPolygons, groupId);
 
         var sourcePadIds = sourcePads.Select(static p => p.Id).Distinct().ToList();
         _combinedCad.Groups[groupId] = new CombinedCadGroupState(
@@ -135,10 +134,9 @@ public sealed partial class FreeformHelperViewModel
 
         var undoSnapshot = CaptureCadEditUndoSnapshot();
         var previous = new CadEditNotificationSnapshot(this);
-        var (outputIds, sourceIds) = DxfCombinedGroupRules.CollectGroupMemberIds(_combinedCad, validGroupIds);
+        var (outputIds, sourceIds) = CollectCombinedGroupMemberIds(validGroupIds);
         _cad = new CadPadSet(_cad.Pads.Where(pad => !outputIds.Contains(pad.Id)).ToList());
-        var restoredSources = DxfCombinedGroupRules.RemoveGroupMembers(
-            _combinedCad, _cadEdit.HiddenCadPadIds, outputIds, sourceIds);
+        var restoredSources = RemoveCombinedGroupMembers(outputIds, sourceIds);
 
         foreach (var groupId in validGroupIds)
         {
@@ -174,5 +172,84 @@ public sealed partial class FreeformHelperViewModel
             _cadEdit.HiddenCadPadIds.Count);
         MarkUnsaved();
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), undoLabel);
+    }
+
+    private (HashSet<int> OutputIds, HashSet<int> SourceIds) CollectCombinedGroupMemberIds(List<int> validGroupIds)
+    {
+        var outputIds = new HashSet<int>();
+        var sourceIds = new HashSet<int>();
+        foreach (var groupId in validGroupIds)
+        {
+            if (!_combinedCad.Groups.TryGetValue(groupId, out var group))
+            {
+                continue;
+            }
+
+            foreach (var outputId in group.OutputCadIds)
+            {
+                outputIds.Add(outputId);
+            }
+
+            foreach (var sourceId in group.SourceCadIds)
+            {
+                sourceIds.Add(sourceId);
+            }
+        }
+
+        return (outputIds, sourceIds);
+    }
+
+    private int RemoveCombinedGroupMembers(HashSet<int> outputIds, HashSet<int> sourceIds)
+    {
+        foreach (var outputId in outputIds)
+        {
+            _combinedCad.GroupIdByOutputCadId.Remove(outputId);
+            _cadEdit.HiddenCadPadIds.Remove(outputId);
+        }
+        var restoredSources = 0;
+        foreach (var sourceId in sourceIds)
+        {
+            if (_cadEdit.HiddenCadPadIds.Remove(sourceId))
+            {
+                restoredSources++;
+            }
+
+            _combinedCad.GroupIdBySourceCadId.Remove(sourceId);
+        }
+
+        return restoredSources;
+    }
+
+    private int AllocateCombinedCadPadId()
+    {
+        if (_cad is null)
+        {
+            return _combinedCad.NextPadId++;
+        }
+
+        var used = _cad.Pads.Select(p => p.Id).ToHashSet();
+        while (used.Contains(_combinedCad.NextPadId))
+        {
+            _combinedCad.NextPadId++;
+        }
+
+        return _combinedCad.NextPadId++;
+    }
+
+    private List<CadPad> CreateCombinedCadPads(string layer, IReadOnlyList<Domain.Geometry.Polygon2> polygons, int groupId)
+    {
+        var combinedPads = new List<CadPad>(polygons.Count);
+        foreach (var polygon in polygons)
+        {
+            var combinedId = AllocateCombinedCadPadId();
+            combinedPads.Add(new CadPad(
+                combinedId,
+                $"COMB_{combinedId}",
+                layer,
+                polygon));
+            _combinedCad.GroupIdByOutputCadId[combinedId] = groupId;
+        }
+
+        return combinedPads;
     }
 }

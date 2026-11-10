@@ -12,7 +12,9 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var selected = DxfVisibilityRules.SelectVisibleSelectedCadIds(_selectedCadIds, IsCadPadEffectivelyHidden);
+        var selected = _selectedCadIds
+            .Where(id => !IsCadPadEffectivelyHidden(id))
+            .ToList();
         if (selected.Count == 0)
         {
             SetStatus("DXF edit: select CAD pads first.");
@@ -79,7 +81,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var hiddenCadIds = DxfVisibilityRules.SelectManualHiddenCadPadIds(_cadEdit.HiddenCadPadIds, _combinedCad);
+        var hiddenCadIds = GetManualHiddenCadPadIds();
         if (hiddenCadIds.Count == 0)
         {
             SetStatus("DXF edit: no manual hidden CAD pads to restore.");
@@ -118,8 +120,28 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var changedIds = DxfVisibilityRules.SelectChangedDuplicateCadPadIds(
-            cadPadIds, _cadEdit.DuplicateCadPadIdToCanonicalId, _cadEdit.AutoHiddenDuplicateCadPadIds, autoHide);
+        var duplicateIds = cadPadIds
+            .Where(_cadEdit.DuplicateCadPadIdToCanonicalId.ContainsKey)
+            .Distinct()
+            .OrderBy(static id => id)
+            .ToList();
+        if (duplicateIds.Count == 0)
+        {
+            return;
+        }
+
+        var changedIds = new List<int>();
+        foreach (var duplicateId in duplicateIds)
+        {
+            var isCurrentlyAutoHidden = _cadEdit.AutoHiddenDuplicateCadPadIds.Contains(duplicateId);
+            if (autoHide == isCurrentlyAutoHidden)
+            {
+                continue;
+            }
+
+            changedIds.Add(duplicateId);
+        }
+
         if (changedIds.Count == 0)
         {
             return;
@@ -159,6 +181,15 @@ public sealed partial class FreeformHelperViewModel
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), undoLabel);
     }
 
+    private List<int> GetManualHiddenCadPadIds()
+    {
+        return _cadEdit.HiddenCadPadIds
+            .Where(id => !_combinedCad.GroupIdBySourceCadId.ContainsKey(id))
+            .Distinct()
+            .OrderBy(static id => id)
+            .ToList();
+    }
+
     private int RestoreHiddenCadPadsCore(
         IEnumerable<int> cadPadIds,
         string undoLabel,
@@ -171,8 +202,11 @@ public sealed partial class FreeformHelperViewModel
             return 0;
         }
 
-        var restorableIds = DxfVisibilityRules.SelectRestorableHiddenCadPadIds(
-            cadPadIds, _cadEdit.HiddenCadPadIds, _combinedCad);
+        var restorableIds = cadPadIds
+            .Where(id => _cadEdit.HiddenCadPadIds.Contains(id) && !_combinedCad.GroupIdBySourceCadId.ContainsKey(id))
+            .Distinct()
+            .OrderBy(static id => id)
+            .ToList();
         if (restorableIds.Count == 0)
         {
             return 0;

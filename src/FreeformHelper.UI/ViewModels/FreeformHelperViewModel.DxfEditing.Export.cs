@@ -82,9 +82,20 @@ public sealed partial class FreeformHelperViewModel
             return pads;
         }
 
-        var toAppend = DxfVisibilityRules.SelectRegularSourceLayerPadsToAppend(pads, cad, regularLayerName, IsCadPadEffectivelyHidden);
-        pads.AddRange(toAppend);
-        var appended = toAppend.Count;
+        var visibleIds = pads.Select(pad => pad.Id).ToHashSet();
+        var appended = 0;
+        foreach (var pad in cad.Pads)
+        {
+            if (IsCadPadEffectivelyHidden(pad.Id) ||
+                !string.Equals(pad.Layer, regularLayerName, StringComparison.OrdinalIgnoreCase) ||
+                !visibleIds.Add(pad.Id))
+            {
+                continue;
+            }
+
+            pads.Add(pad);
+            appended++;
+        }
 
         if (appended > 0)
         {
