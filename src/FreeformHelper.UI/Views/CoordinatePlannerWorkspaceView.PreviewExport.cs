@@ -13,7 +13,7 @@ public sealed partial class CoordinatePlannerWorkspaceView
 {
     private PixelSize GetPreviewPixelSize()
     {
-        var bounds = FindPreviewHost().Bounds;
+        var bounds = _overlayHost.FindPreviewHost().Bounds;
         return new PixelSize(Math.Max(2, (int)Math.Ceiling(bounds.Width)), Math.Max(2, (int)Math.Ceiling(bounds.Height)));
     }
 
@@ -37,13 +37,13 @@ public sealed partial class CoordinatePlannerWorkspaceView
             return false;
         }
 
-        var previewHost = FindPreviewHost();
+        var previewHost = _overlayHost.FindPreviewHost();
         if (previewHost.Bounds.Width <= 1 || previewHost.Bounds.Height <= 1)
         {
             return false;
         }
 
-        await Dispatcher.InvokeAsync(RenderOverlay, DispatcherPriority.Render);
+        await Dispatcher.InvokeAsync(_overlayHost.Render, DispatcherPriority.Render);
         var pixelSize = GetPreviewPixelSize();
         using var bitmap = new RenderTargetBitmap(pixelSize);
         bitmap.Render(previewHost);
