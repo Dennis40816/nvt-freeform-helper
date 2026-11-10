@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
@@ -156,12 +157,11 @@ public sealed partial class FreeformHelperView
         var expectedState = window.WindowState;
         void Handler(object? sender, EventArgs e)
         {
-            if (expectedState == WindowState.Maximized && window.WindowState != WindowState.Maximized)
-            {
-                return;
-            }
-
-            if (window.Bounds.Width <= 0 || window.Bounds.Height <= 0)
+            if (!InitialCanvasFitPolicy.IsLayoutReady(
+                expectedState == WindowState.Maximized,
+                window.WindowState == WindowState.Maximized,
+                window.Bounds.Width,
+                window.Bounds.Height))
             {
                 return;
             }
