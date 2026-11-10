@@ -11,66 +11,18 @@ public sealed partial class FreeformHelperView
 {
     private void OnTopLevelKeyDown(object? sender, KeyEventArgs e)
     {
-        if (DataContext is FreeformHelperViewModel { IsProjectEditingEnabled: false })
-        {
-            return;
-        }
-
-        if (e.Handled)
-        {
-            return;
-        }
-
-        if (MainWindowInputSources.IsTextEntry(e.Source))
-        {
-            return;
-        }
-
-        if (TryHandleGlobalShortcut(e))
+        var viewModel = DataContext as FreeformHelperViewModel;
+        if (MainWindowShortcutExecution.TryHandle(
+            viewModel?.IsProjectEditingEnabled ?? true, e.Handled, e.Key, e.KeyModifiers, e.Source,
+            viewModel?.DeleteSelectedCadPadsCommand, viewModel?.UndoCommand, viewModel?.FitCommand,
+            () => _canvas?.SelectAllPads(),
+            RestoreNotchExportSelectionWindowIfHidden,
+            viewModel is null
+                ? null
+                : () => _uiEvents?.Run("Workspace.SaveShortcut", _ => SaveProjectFromShortcutAsync(viewModel), CancellationToken.None)))
         {
             e.Handled = true;
         }
-    }
-
-    private bool TryHandleGlobalShortcut(KeyEventArgs e)
-    {
-        if (DataContext is not FreeformHelperViewModel viewModel)
-        {
-            return false;
-        }
-
-        var shortcut = MainWindowShortcutRouter.Resolve(e.Key, e.KeyModifiers, MainWindowInputSources.IsCanvas(e.Source));
-        switch (shortcut)
-        {
-            case MainWindowShortcut.RestoreNotchExportSelection:
-                return RestoreNotchExportSelectionWindowIfHidden();
-            case MainWindowShortcut.DeleteSelectedCadPads:
-                return TryExecute(viewModel.DeleteSelectedCadPadsCommand);
-            case MainWindowShortcut.Undo:
-                return TryExecute(viewModel.UndoCommand);
-            case MainWindowShortcut.SaveProject:
-                _uiEvents?.Run("Workspace.SaveShortcut", _ => SaveProjectFromShortcutAsync(viewModel), CancellationToken.None);
-                return true;
-            case MainWindowShortcut.SelectAllPads:
-                _canvas?.SelectAllPads();
-                return true;
-            case MainWindowShortcut.Fit:
-                viewModel.FitCommand.Execute(null);
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private static bool TryExecute(System.Windows.Input.ICommand command)
-    {
-        if (!command.CanExecute(null))
-        {
-            return false;
-        }
-
-        command.Execute(null);
-        return true;
     }
 
     private async Task SaveProjectFromShortcutAsync(FreeformHelperViewModel viewModel)
