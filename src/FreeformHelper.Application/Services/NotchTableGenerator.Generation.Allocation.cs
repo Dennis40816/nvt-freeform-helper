@@ -30,33 +30,15 @@ public sealed partial class NotchTableGenerator
         {
             var cadPad = cadPads[index];
             var allocations = GetOrBuildCadAllocations(cadPad, grid);
-            if (allocations.Count == 0)
-            {
-                profiles.Add(new CadAllocationProfile(
+            var profile = allocations.Count == 0
+                ? new CadAllocationProfile(
                     CadPad: cadPad,
                     Anchor: null,
                     MaxRatio: 0.0,
                     IcIndices: Array.Empty<int>(),
                     HasAllocations: false,
-                    Allocations: Array.Empty<NotchAllocation>()));
-                if (ShouldReportGenerationProgress(index + 1, totalCount))
-                {
-                    ReportGenerationProgress(
-                        progress,
-                        index + 1,
-                        totalCount,
-                        0,
-                        cadPad.Id,
-                        null,
-                        phase,
-                        phaseStep,
-                        phaseStepCount);
-                }
-
-                continue;
-            }
-
-            var profile = BuildCadAllocationProfile(cadPad, allocations);
+                    Allocations: Array.Empty<NotchAllocation>())
+                : BuildCadAllocationProfile(cadPad, allocations);
             profiles.Add(profile);
             if (ShouldReportGenerationProgress(index + 1, totalCount))
             {
