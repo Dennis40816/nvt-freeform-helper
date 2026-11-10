@@ -6,6 +6,7 @@ using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Coordinate;
 using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -106,19 +107,20 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
         string PreferredAaOutlineLayerName);
 
     private readonly CoordinatePlannerWorkspaceSession _session;
+    private readonly CoordinateGeometryOwner _geometry;
+    private readonly CoordinateGuideOwner<CoordinatePlannerGuideBasisKind> _guides;
     private readonly bool _highlightUnmatched;
     private readonly bool _highlightFreeform;
-    private readonly CoordinatePlannerCustomArtifactsModel _customArtifacts = new();
-    private readonly CoordinatePlannerHostCallbacks _hostCallbacks = new();
-    private CoordinatePlannerRenderState _render;
-    private bool _isBatchUpdatingCustomArrayCorners;
+    private readonly CoordinateArrayOwner _array;
+    private readonly CoordinateArtifactOwner _artifacts;
+    private readonly CoordinatePresentationOwner<CoordinatePlannerGuideBasisKind> _presentation;
 
     public event EventHandler? FitCanvasRequested;
     public event Action<CoordinatePlannerWorkspacePreferences>? WorkspacePreferencesChanged;
     public Func<CoordinateArtifactRow, Task>? RequestArtifactDetailAsync
     {
-        get => _hostCallbacks.RequestArtifactDetailAsync;
-        set => _hostCallbacks.RequestArtifactDetailAsync = value;
+        get => _artifacts.RequestArtifactDetailAsync;
+        set => _artifacts.RequestArtifactDetailAsync = value;
     }
 
     public CoordinatePlannerWorkspaceViewModel(
@@ -130,289 +132,382 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
         var snapshot = CoordinatePlannerComputationService.BuildSnapshot(session.Grid, BuildRequestFromDefaults(session));
         var artifactSnapshot = CoordinateArtifactService.BuildSnapshot(
             snapshot, snapshot.ActiveAreaBounds, "AA outline: regular grid bounds", "Guide reference: AA outline");
-        _render = new(snapshot, artifactSnapshot, snapshot.ActiveAreaBounds,
+        var initialRender = new CoordinatePlannerRenderState(snapshot, artifactSnapshot, snapshot.ActiveAreaBounds,
             "AA outline: regular grid bounds", "Guide reference: AA outline", Array.Empty<CadPad>(),
             Array.Empty<CoordinatePlannerPointRow>(), Array.Empty<CoordinatePlannerPointRow>(), Array.Empty<CoordinatePlannerPointRow>(),
             Array.Empty<CoordinatePlannerLineRow>(), Array.Empty<CoordinatePlannerLineRow>(), Array.Empty<CoordinateArtifactRow>());
         _highlightUnmatched = false;
         _highlightFreeform = false;
 
-        LayerOptions = BuildLayerOptions(session.VisibleLayerNames);
-        AaBoundsOptions = BuildAaBoundsOptions(session.VisibleLayerNames);
-        GuideBasisOptions = CoordinatePlannerPresentationCatalog.GuideBasisOptions;
-        GuideGenerationOptions = CoordinatePlannerPresentationCatalog.GuideGenerationOptions;
-        CustomArrayCornerOptions = CoordinatePlannerPresentationCatalog.CustomArrayCornerOptions;
-        _selectedLayerOption = LayerOptions[1];
-        _selectedAaBoundsOption = ResolveInitialAaBoundsOption(
-            AaBoundsOptions,
-            session.VisibleLayerNames,
-            session.PreferredActiveAreaOutlineLayerName);
-        _selectedGuideBasisOption = GuideBasisOptions[0];
-        _selectedHorizontalGuideGenerationOption = GuideGenerationOptions[0];
-        _selectedVerticalGuideGenerationOption = GuideGenerationOptions[0];
-        _selectedCustomArrayCornerOption = CustomArrayCornerOptions[0];
-        _machineOriginX = 0m;
-        _machineOriginY = 0m;
-        _machineWidth = (decimal)session.DefaultMachineWidth;
-        _machineHeight = (decimal)session.DefaultMachineHeight;
-        _pixelWidth = session.DefaultPixelWidth;
-        _pixelHeight = session.DefaultPixelHeight;
-        _showRegular = session.DefaultShowRegular;
-        _copperPillarDiameter = 0m;
-        _horizontalGuideCount = 5;
-        _verticalGuideCount = 5;
-        _horizontalGuidePitch = 10m;
-        _verticalGuidePitch = 10m;
-        _horizontalGuideInset = 0m;
-        _verticalGuideInset = 0m;
-        _showBistRectangle = true;
-        _showCustomArray = false;
-        _customArrayColumnCount = 5;
-        _customArrayRowCount = 5;
-        _customArrayTopLeftMachineX = _machineOriginX;
-        _customArrayTopLeftMachineY = _machineOriginY;
-        _customArrayTopRightMachineX = _machineOriginX + _machineWidth;
-        _customArrayTopRightMachineY = _machineOriginY;
-        _customArrayBottomRightMachineX = _machineOriginX + _machineWidth;
-        _customArrayBottomRightMachineY = _machineOriginY + _machineHeight;
-        _customArrayBottomLeftMachineX = _machineOriginX;
-        _customArrayBottomLeftMachineY = _machineOriginY + _machineHeight;
+        var layerOptions = BuildLayerOptions(session.VisibleLayerNames);
+        var aaBoundsOptions = BuildAaBoundsOptions(session.VisibleLayerNames);
+        var guideBasisOptions = CoordinatePlannerPresentationCatalog.GuideBasisOptions;
+        var guideGenerationOptions = CoordinatePlannerPresentationCatalog.GuideGenerationOptions;
+        var cornerOptions = CoordinatePlannerPresentationCatalog.CustomArrayCornerOptions;
+        var overlayModeOptions = CoordinatePlannerPresentationCatalog.OverlayModeOptions;
+        _geometry = new CoordinateGeometryOwner(
+            new(ResolveInitialAaBoundsOption(aaBoundsOptions, session.VisibleLayerNames, session.PreferredActiveAreaOutlineLayerName),
+                0m, 0m, (decimal)session.DefaultMachineWidth, (decimal)session.DefaultMachineHeight,
+                session.DefaultPixelWidth, session.DefaultPixelHeight, 0m, true),
+            RebuildSnapshot, preferences => WorkspacePreferencesChanged?.Invoke(preferences),
+            UseActiveAreaSafeCorners, value => StatusText = value, aaBoundsOptions, OnPropertyChanging, OnPropertyChanged);
+        _guides = new CoordinateGuideOwner<CoordinatePlannerGuideBasisKind>(
+            new(guideBasisOptions[0], guideGenerationOptions[0], guideGenerationOptions[0],
+                5m, 5m, 10m, 10m, 0m, 0m, string.Empty, string.Empty),
+            RebuildSnapshot, guideBasisOptions, guideGenerationOptions, ToGuideBasisKind, OnPropertyChanging, OnPropertyChanged);
+        _artifacts = new CoordinateArtifactOwner(
+            new(null, "Default", false), () => Render, ReplaceArtifactRows, value => StatusText = value,
+            RunArtifactDetailAsync, OnPropertyChanging, OnPropertyChanged);
+        _presentation = new CoordinatePresentationOwner<CoordinatePlannerGuideBasisKind>(
+            new(layerOptions[1], session.DefaultShowRegular, false, false, overlayModeOptions[1]),
+            initialRender, session.CadPads, BuildRender, _artifacts.SortRows, () => SelectedArtifactRow?.Key,
+            _artifacts.RestoreSelection, value => StatusText = value,
+            () => FitCanvasRequested?.Invoke(this, EventArgs.Empty),
+            layerOptions, overlayModeOptions, OnPropertyChanging, OnPropertyChanged);
+        _array = new CoordinateArrayOwner(
+            new(cornerOptions[0], false, 5m, 5m, MachineOriginX, MachineOriginY,
+                MachineOriginX + MachineWidth, MachineOriginY,
+                MachineOriginX + MachineWidth, MachineOriginY + MachineHeight,
+                MachineOriginX, MachineOriginY + MachineHeight),
+            () => Snapshot, _geometry.CaptureInput, RebuildSnapshot, _artifacts.SelectByKey,
+            value => StatusText = value, cornerOptions, OnPropertyChanging, OnPropertyChanged);
 
-        OverlayModeOptions = CoordinatePlannerPresentationCatalog.OverlayModeOptions;
-        _selectedOverlayModeOption = OverlayModeOptions[1];
-        CustomRecipeRows = _customArtifacts.RecipeRows;
-        CustomEditor = new CoordinatePlannerCustomEditorModel(_machineOriginX, _machineOriginY, _machineWidth, _machineHeight);
-
-        SyncFromWorkspaceCommand = new RelayCommand(SyncFromWorkspace);
-        UseActiveAreaSafeCornersCommand = new RelayCommand(UseActiveAreaSafeCorners);
-        FitCanvasCommand = new RelayCommand(() => FitCanvasRequested?.Invoke(this, EventArgs.Empty));
-        ExportPreviewPngCommand = new AsyncRelayCommand(ExportPreviewPngAsync);
-        CopySelectedArtifactCommand = new AsyncRelayCommand(CopySelectedArtifactAsync);
-        CopyAllArtifactsCommand = new AsyncRelayCommand(CopyAllArtifactsAsync);
-        ExportArtifactsCsvCommand = new AsyncRelayCommand(ExportArtifactsCsvAsync);
-        ExportArtifactsJsonCommand = new AsyncRelayCommand(ExportArtifactsJsonAsync);
-        AddCustomPointCommand = new RelayCommand(AddCustomPoint);
-        AddCustomPathCommand = new RelayCommand(AddCustomPath);
-        ClearCustomArtifactsCommand = new RelayCommand(ClearCustomArtifacts, () => HasCustomArtifacts);
-        SortArtifactRowsCommand = new RelayCommand<string?>(SortArtifactRows);
-        ShowArtifactDetailCommand = new AsyncRelayCommand<CoordinateArtifactRow?>(ShowArtifactDetailAsync);
-
-        UpdateCadPadsForCanvas();
+        _presentation.UpdateCadPadsForCanvas();
         RebuildSnapshot();
     }
 
     public int SourceRevision => _session.SourceRevision;
 
-    public IReadOnlyList<CadPad> CadPadsForCanvas => _render.CadPads;
+    public IReadOnlyList<CadPad> CadPadsForCanvas => _presentation.CadPadsForCanvas;
 
     public IReadOnlyList<RegularPad> RegularPads => _session.Grid.Pads;
     public bool HighlightUnmatched => _highlightUnmatched;
     public bool HighlightFreeform => _highlightFreeform;
 
-    public IReadOnlyList<CoordinatePlannerCadLayerOption> LayerOptions { get; }
+    public IReadOnlyList<CoordinatePlannerCadLayerOption> LayerOptions => _presentation.LayerOptions;
 
-    public IReadOnlyList<CoordinatePlannerBoundsOption> AaBoundsOptions { get; }
+    public IReadOnlyList<CoordinatePlannerBoundsOption> AaBoundsOptions => _geometry.AaBoundsOptions;
 
-    public IReadOnlyList<CoordinatePlannerGuideBasisOption> GuideBasisOptions { get; }
+    public IReadOnlyList<CoordinatePlannerGuideBasisOption> GuideBasisOptions => _guides.GuideBasisOptions;
 
-    public IReadOnlyList<CoordinatePlannerGuideGenerationOption> GuideGenerationOptions { get; }
+    public IReadOnlyList<CoordinatePlannerGuideGenerationOption> GuideGenerationOptions => _guides.GuideGenerationOptions;
 
-    public IReadOnlyList<CoordinatePlannerCustomArrayCornerOption> CustomArrayCornerOptions { get; }
+    public IReadOnlyList<CoordinatePlannerCustomArrayCornerOption> CustomArrayCornerOptions => _array.CustomArrayCornerOptions;
 
-    public IReadOnlyList<CoordinatePlannerOverlayModeOption> OverlayModeOptions { get; }
+    public IReadOnlyList<CoordinatePlannerOverlayModeOption> OverlayModeOptions => _presentation.OverlayModeOptions;
 
-    public IReadOnlyList<CoordinatePlannerPointRow> AaCornerRows => _render.AaCornerRows;
+    public IReadOnlyList<CoordinatePlannerPointRow> AaCornerRows => _presentation.AaCornerRows;
 
-    public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayCornerRows => _render.CustomArrayCornerRows;
+    public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayCornerRows => _presentation.CustomArrayCornerRows;
 
-    public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayPointRows => _render.CustomArrayPointRows;
+    public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayPointRows => _presentation.CustomArrayPointRows;
 
-    public IReadOnlyList<CoordinatePlannerLineRow> HorizontalGuideRows => _render.HorizontalGuideRows;
+    public IReadOnlyList<CoordinatePlannerLineRow> HorizontalGuideRows => _presentation.HorizontalGuideRows;
 
-    public IReadOnlyList<CoordinatePlannerLineRow> VerticalGuideRows => _render.VerticalGuideRows;
+    public IReadOnlyList<CoordinatePlannerLineRow> VerticalGuideRows => _presentation.VerticalGuideRows;
 
-    public IReadOnlyList<CoordinateArtifactRow> ArtifactRows => _render.ArtifactRows;
+    public IReadOnlyList<CoordinateArtifactRow> ArtifactRows => _artifacts.ArtifactRows;
 
-    public ReadOnlyObservableCollection<CoordinatePlannerCustomRecipeRow> CustomRecipeRows { get; }
+    public ReadOnlyObservableCollection<CoordinatePlannerCustomRecipeRow> CustomRecipeRows => _array.CustomRecipeRows;
 
-    public CoordinatePlannerCustomEditorModel CustomEditor { get; }
+    public CoordinatePlannerCustomEditorModel CustomEditor => _array.CustomEditor;
 
-    public CoordinatePlannerSnapshot Snapshot => _render.Snapshot;
+    public CoordinatePlannerSnapshot Snapshot => _presentation.Snapshot;
 
-    public Rect2 PreviewBounds => _render.PreviewBounds;
+    public Rect2 PreviewBounds => _presentation.PreviewBounds;
 
-    public IRelayCommand SyncFromWorkspaceCommand { get; }
+    public IRelayCommand SyncFromWorkspaceCommand => _geometry.SyncFromWorkspaceCommand;
 
-    public IRelayCommand UseActiveAreaSafeCornersCommand { get; }
+    public IRelayCommand UseActiveAreaSafeCornersCommand => _array.UseActiveAreaSafeCornersCommand;
 
-    public IRelayCommand FitCanvasCommand { get; }
+    public IRelayCommand FitCanvasCommand => _presentation.FitCanvasCommand;
 
-    public IAsyncRelayCommand ExportPreviewPngCommand { get; }
+    public IAsyncRelayCommand ExportPreviewPngCommand => _artifacts.ExportPreviewPngCommand;
 
-    public IAsyncRelayCommand CopySelectedArtifactCommand { get; }
+    public IAsyncRelayCommand CopySelectedArtifactCommand => _artifacts.CopySelectedArtifactCommand;
 
-    public IAsyncRelayCommand CopyAllArtifactsCommand { get; }
+    public IAsyncRelayCommand CopyAllArtifactsCommand => _artifacts.CopyAllArtifactsCommand;
 
-    public IAsyncRelayCommand ExportArtifactsCsvCommand { get; }
+    public IAsyncRelayCommand ExportArtifactsCsvCommand => _artifacts.ExportArtifactsCsvCommand;
 
-    public IAsyncRelayCommand ExportArtifactsJsonCommand { get; }
+    public IAsyncRelayCommand ExportArtifactsJsonCommand => _artifacts.ExportArtifactsJsonCommand;
 
-    public IRelayCommand AddCustomPointCommand { get; }
+    public IRelayCommand AddCustomPointCommand => _array.AddCustomPointCommand;
 
-    public IRelayCommand AddCustomPathCommand { get; }
+    public IRelayCommand AddCustomPathCommand => _array.AddCustomPathCommand;
 
-    public IRelayCommand ClearCustomArtifactsCommand { get; }
+    public IRelayCommand ClearCustomArtifactsCommand => _array.ClearCustomArtifactsCommand;
 
-    public IRelayCommand<string?> SortArtifactRowsCommand { get; }
+    public IRelayCommand<string?> SortArtifactRowsCommand => _artifacts.SortArtifactRowsCommand;
 
-    public IAsyncRelayCommand<CoordinateArtifactRow?> ShowArtifactDetailCommand { get; }
+    public IAsyncRelayCommand<CoordinateArtifactRow?> ShowArtifactDetailCommand => _artifacts.ShowArtifactDetailCommand;
 
     public Func<Task<bool>>? RequestExportPreviewPngAsync
     {
-        get => _hostCallbacks.RequestExportPreviewPngAsync;
-        set => _hostCallbacks.RequestExportPreviewPngAsync = value;
+        get => _artifacts.RequestExportPreviewPngAsync;
+        set => _artifacts.RequestExportPreviewPngAsync = value;
     }
 
     public Func<string, Task<bool>>? RequestSetClipboardTextAsync
     {
-        get => _hostCallbacks.RequestSetClipboardTextAsync;
-        set => _hostCallbacks.RequestSetClipboardTextAsync = value;
+        get => _artifacts.RequestSetClipboardTextAsync;
+        set => _artifacts.RequestSetClipboardTextAsync = value;
     }
 
     public Func<CoordinatePlannerTextExportRequest, Task<bool>>? RequestSaveTextFileAsync
     {
-        get => _hostCallbacks.RequestSaveTextFileAsync;
-        set => _hostCallbacks.RequestSaveTextFileAsync = value;
+        get => _artifacts.RequestSaveTextFileAsync;
+        set => _artifacts.RequestSaveTextFileAsync = value;
     }
 
-    [ObservableProperty]
-    private CoordinatePlannerCadLayerOption _selectedLayerOption;
+    public CoordinatePlannerCadLayerOption SelectedLayerOption
+    {
+        get => _presentation.SelectedLayerOption;
+        set => _presentation.SelectedLayerOption = value;
+    }
 
-    [ObservableProperty]
-    private CoordinatePlannerBoundsOption _selectedAaBoundsOption;
+    public CoordinatePlannerBoundsOption SelectedAaBoundsOption
+    {
+        get => _geometry.SelectedAaBoundsOption;
+        set => _geometry.SelectedAaBoundsOption = value;
+    }
 
-    [ObservableProperty]
-    private CoordinatePlannerGuideBasisOption _selectedGuideBasisOption;
+    public CoordinatePlannerGuideBasisOption SelectedGuideBasisOption
+    {
+        get => _guides.SelectedGuideBasisOption;
+        set => _guides.SelectedGuideBasisOption = value;
+    }
 
-    [ObservableProperty]
-    private CoordinatePlannerGuideGenerationOption _selectedHorizontalGuideGenerationOption;
+    public CoordinatePlannerGuideGenerationOption SelectedHorizontalGuideGenerationOption
+    {
+        get => _guides.SelectedHorizontalGuideGenerationOption;
+        set => _guides.SelectedHorizontalGuideGenerationOption = value;
+    }
 
-    [ObservableProperty]
-    private CoordinatePlannerGuideGenerationOption _selectedVerticalGuideGenerationOption;
+    public CoordinatePlannerGuideGenerationOption SelectedVerticalGuideGenerationOption
+    {
+        get => _guides.SelectedVerticalGuideGenerationOption;
+        set => _guides.SelectedVerticalGuideGenerationOption = value;
+    }
 
-    [ObservableProperty]
-    private CoordinatePlannerCustomArrayCornerOption _selectedCustomArrayCornerOption;
+    public CoordinatePlannerCustomArrayCornerOption SelectedCustomArrayCornerOption
+    {
+        get => _array.SelectedCustomArrayCornerOption;
+        set => _array.SelectedCustomArrayCornerOption = value;
+    }
 
-    [ObservableProperty]
-    private decimal _machineOriginX;
+    public decimal MachineOriginX
+    {
+        get => _geometry.MachineOriginX;
+        set => _geometry.MachineOriginX = value;
+    }
 
-    [ObservableProperty]
-    private decimal _machineOriginY;
+    public decimal MachineOriginY
+    {
+        get => _geometry.MachineOriginY;
+        set => _geometry.MachineOriginY = value;
+    }
 
-    [ObservableProperty]
-    private decimal _machineWidth;
+    public decimal MachineWidth
+    {
+        get => _geometry.MachineWidth;
+        set => _geometry.MachineWidth = value;
+    }
 
-    [ObservableProperty]
-    private decimal _machineHeight;
+    public decimal MachineHeight
+    {
+        get => _geometry.MachineHeight;
+        set => _geometry.MachineHeight = value;
+    }
 
-    [ObservableProperty]
-    private decimal _pixelWidth;
+    public decimal PixelWidth
+    {
+        get => _geometry.PixelWidth;
+        set => _geometry.PixelWidth = value;
+    }
 
-    [ObservableProperty]
-    private decimal _pixelHeight;
+    public decimal PixelHeight
+    {
+        get => _geometry.PixelHeight;
+        set => _geometry.PixelHeight = value;
+    }
 
-    [ObservableProperty]
-    private bool _showRegular;
+    public bool ShowRegular
+    {
+        get => _presentation.ShowRegular;
+        set => _presentation.ShowRegular = value;
+    }
 
-    [ObservableProperty]
-    private bool _showRegularAxisLabels;
+    public bool ShowRegularAxisLabels
+    {
+        get => _presentation.ShowRegularAxisLabels;
+        set => _presentation.ShowRegularAxisLabels = value;
+    }
 
-    [ObservableProperty]
-    private bool _showCalibrationDetails;
+    public bool ShowCalibrationDetails
+    {
+        get => _presentation.ShowCalibrationDetails;
+        set => _presentation.ShowCalibrationDetails = value;
+    }
 
-    [ObservableProperty]
-    private CoordinatePlannerOverlayModeOption _selectedOverlayModeOption;
+    public CoordinatePlannerOverlayModeOption SelectedOverlayModeOption
+    {
+        get => _presentation.SelectedOverlayModeOption;
+        set => _presentation.SelectedOverlayModeOption = value;
+    }
 
-    [ObservableProperty]
-    private CoordinateArtifactRow? _selectedArtifactRow;
+    public CoordinateArtifactRow? SelectedArtifactRow
+    {
+        get => _artifacts.SelectedArtifactRow;
+        set => _artifacts.SelectedArtifactRow = value;
+    }
 
-    [ObservableProperty]
-    private string _artifactSortKey = "Default";
+    public string ArtifactSortKey
+    {
+        get => _artifacts.ArtifactSortKey;
+        set => _artifacts.ArtifactSortKey = value;
+    }
 
-    [ObservableProperty]
-    private bool _artifactSortDescending;
+    public bool ArtifactSortDescending
+    {
+        get => _artifacts.ArtifactSortDescending;
+        set => _artifacts.ArtifactSortDescending = value;
+    }
 
-    [ObservableProperty]
-    private decimal _copperPillarDiameter;
+    public decimal CopperPillarDiameter
+    {
+        get => _geometry.CopperPillarDiameter;
+        set => _geometry.CopperPillarDiameter = value;
+    }
 
-    [ObservableProperty]
-    private decimal _horizontalGuideCount;
+    public decimal HorizontalGuideCount
+    {
+        get => _guides.HorizontalGuideCount;
+        set => _guides.HorizontalGuideCount = value;
+    }
 
-    [ObservableProperty]
-    private decimal _verticalGuideCount;
+    public decimal VerticalGuideCount
+    {
+        get => _guides.VerticalGuideCount;
+        set => _guides.VerticalGuideCount = value;
+    }
 
-    [ObservableProperty]
-    private decimal _horizontalGuidePitch;
+    public decimal HorizontalGuidePitch
+    {
+        get => _guides.HorizontalGuidePitch;
+        set => _guides.HorizontalGuidePitch = value;
+    }
 
-    [ObservableProperty]
-    private decimal _verticalGuidePitch;
+    public decimal VerticalGuidePitch
+    {
+        get => _guides.VerticalGuidePitch;
+        set => _guides.VerticalGuidePitch = value;
+    }
 
-    [ObservableProperty]
-    private decimal _horizontalGuideInset;
+    public decimal HorizontalGuideInset
+    {
+        get => _guides.HorizontalGuideInset;
+        set => _guides.HorizontalGuideInset = value;
+    }
 
-    [ObservableProperty]
-    private decimal _verticalGuideInset;
+    public decimal VerticalGuideInset
+    {
+        get => _guides.VerticalGuideInset;
+        set => _guides.VerticalGuideInset = value;
+    }
 
-    [ObservableProperty]
-    private string _horizontalGuidePositionListText = string.Empty;
+    public string HorizontalGuidePositionListText
+    {
+        get => _guides.HorizontalGuidePositionListText;
+        set => _guides.HorizontalGuidePositionListText = value;
+    }
 
-    [ObservableProperty]
-    private string _verticalGuidePositionListText = string.Empty;
+    public string VerticalGuidePositionListText
+    {
+        get => _guides.VerticalGuidePositionListText;
+        set => _guides.VerticalGuidePositionListText = value;
+    }
 
-    [ObservableProperty]
-    private bool _showBistRectangle;
+    public bool ShowBistRectangle
+    {
+        get => _geometry.ShowBistRectangle;
+        set => _geometry.ShowBistRectangle = value;
+    }
 
-    [ObservableProperty]
-    private bool _showCustomArray;
+    public bool ShowCustomArray
+    {
+        get => _array.ShowCustomArray;
+        set => _array.ShowCustomArray = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayColumnCount;
+    public decimal CustomArrayColumnCount
+    {
+        get => _array.CustomArrayColumnCount;
+        set => _array.CustomArrayColumnCount = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayRowCount;
+    public decimal CustomArrayRowCount
+    {
+        get => _array.CustomArrayRowCount;
+        set => _array.CustomArrayRowCount = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayTopLeftMachineX;
+    public decimal CustomArrayTopLeftMachineX
+    {
+        get => _array.CustomArrayTopLeftMachineX;
+        set => _array.CustomArrayTopLeftMachineX = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayTopLeftMachineY;
+    public decimal CustomArrayTopLeftMachineY
+    {
+        get => _array.CustomArrayTopLeftMachineY;
+        set => _array.CustomArrayTopLeftMachineY = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayTopRightMachineX;
+    public decimal CustomArrayTopRightMachineX
+    {
+        get => _array.CustomArrayTopRightMachineX;
+        set => _array.CustomArrayTopRightMachineX = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayTopRightMachineY;
+    public decimal CustomArrayTopRightMachineY
+    {
+        get => _array.CustomArrayTopRightMachineY;
+        set => _array.CustomArrayTopRightMachineY = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayBottomRightMachineX;
+    public decimal CustomArrayBottomRightMachineX
+    {
+        get => _array.CustomArrayBottomRightMachineX;
+        set => _array.CustomArrayBottomRightMachineX = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayBottomRightMachineY;
+    public decimal CustomArrayBottomRightMachineY
+    {
+        get => _array.CustomArrayBottomRightMachineY;
+        set => _array.CustomArrayBottomRightMachineY = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayBottomLeftMachineX;
+    public decimal CustomArrayBottomLeftMachineX
+    {
+        get => _array.CustomArrayBottomLeftMachineX;
+        set => _array.CustomArrayBottomLeftMachineX = value;
+    }
 
-    [ObservableProperty]
-    private decimal _customArrayBottomLeftMachineY;
+    public decimal CustomArrayBottomLeftMachineY
+    {
+        get => _array.CustomArrayBottomLeftMachineY;
+        set => _array.CustomArrayBottomLeftMachineY = value;
+    }
 
     [ObservableProperty]
     private string _statusText = "Coordinate planner ready.";
 
-    public bool ShowCad => _render.CadPads.Length > 0;
+    public bool ShowCad => _presentation.ShowCad;
 
-    public bool HasBistRectangle => _render.Snapshot.Rectangles.Count > 0;
+    public bool HasBistRectangle => _presentation.HasBistRectangle;
 
-    public bool HasCustomArtifacts => _customArtifacts.HasAny;
+    public bool HasCustomArtifacts => _array.HasCustomArtifacts;
 
     public string WorkspaceSummaryText =>
         string.Format(
@@ -423,85 +518,39 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
             _session.DefaultPixelWidth,
             _session.DefaultPixelHeight);
 
-    public string LayerSummaryText => $"Layer: {SelectedLayerOption.Display}";
+    public string LayerSummaryText => _presentation.LayerSummaryText;
 
-    public string ActiveAreaSourceSummaryText => _render.ActiveAreaSourceText;
+    public string ActiveAreaSourceSummaryText => _presentation.ActiveAreaSourceSummaryText;
 
-    public string GuideSourceSummaryText => _render.GuideSourceText;
+    public string GuideSourceSummaryText => _presentation.GuideSourceSummaryText;
 
-    public string MachineSummaryText =>
-        string.Format(
-            CultureInfo.InvariantCulture,
-            "Machine: origin ({0:0.###}, {1:0.###}) · size {2:0.###} x {3:0.###} mm",
-            MachineOriginX,
-            MachineOriginY,
-            MachineWidth,
-            MachineHeight);
+    public string MachineSummaryText => _geometry.MachineSummaryText;
 
-    public string PixelSummaryText => $"Pixels: {ClampPositiveInt(PixelWidth)} x {ClampPositiveInt(PixelHeight)}";
+    public string PixelSummaryText => _geometry.PixelSummaryText;
 
-    public string CopperSummaryText =>
-        string.Format(
-            CultureInfo.InvariantCulture,
-            "Copper pillar: {0:0.###} mm dia",
-            Math.Max(0m, CopperPillarDiameter));
+    public string CopperSummaryText => _geometry.CopperSummaryText;
 
-    public string GuideSummaryText =>
-        $"Guides: H {BuildGuideModeSummaryText(SelectedHorizontalGuideGenerationOption.Mode, ClampNonNegativeInt(HorizontalGuideCount), HorizontalGuidePitch, HorizontalGuideInset, HorizontalGuidePositionListText)} / V {BuildGuideModeSummaryText(SelectedVerticalGuideGenerationOption.Mode, ClampNonNegativeInt(VerticalGuideCount), VerticalGuidePitch, VerticalGuideInset, VerticalGuidePositionListText)}";
+    public string GuideSummaryText => _guides.GuideSummaryText;
 
-    public bool IsHorizontalGuideCountMode => SelectedHorizontalGuideGenerationOption.Mode == CoordinatePlannerGuideGenerationMode.Count;
+    public bool IsHorizontalGuideCountMode => _guides.IsHorizontalGuideCountMode;
 
-    public bool IsHorizontalGuidePitchMode => SelectedHorizontalGuideGenerationOption.Mode == CoordinatePlannerGuideGenerationMode.Pitch;
+    public bool IsHorizontalGuidePitchMode => _guides.IsHorizontalGuidePitchMode;
 
-    public bool IsHorizontalGuideExplicitMode => SelectedHorizontalGuideGenerationOption.Mode == CoordinatePlannerGuideGenerationMode.ExplicitPositions;
+    public bool IsHorizontalGuideExplicitMode => _guides.IsHorizontalGuideExplicitMode;
 
-    public bool IsVerticalGuideCountMode => SelectedVerticalGuideGenerationOption.Mode == CoordinatePlannerGuideGenerationMode.Count;
+    public bool IsVerticalGuideCountMode => _guides.IsVerticalGuideCountMode;
 
-    public bool IsVerticalGuidePitchMode => SelectedVerticalGuideGenerationOption.Mode == CoordinatePlannerGuideGenerationMode.Pitch;
+    public bool IsVerticalGuidePitchMode => _guides.IsVerticalGuidePitchMode;
 
-    public bool IsVerticalGuideExplicitMode => SelectedVerticalGuideGenerationOption.Mode == CoordinatePlannerGuideGenerationMode.ExplicitPositions;
+    public bool IsVerticalGuideExplicitMode => _guides.IsVerticalGuideExplicitMode;
 
-    public string ArtifactSummaryText =>
-        string.Format(
-            CultureInfo.InvariantCulture,
-            "{0} coordinate row(s)",
-            ArtifactRows.Count);
+    public string ArtifactSummaryText => _artifacts.ArtifactSummaryText;
 
-    public string ArtifactSortStatusText =>
-        string.Format(
-            CultureInfo.InvariantCulture,
-            "Sort: {0} {1}",
-            GetArtifactSortDisplay(ArtifactSortKey),
-            ArtifactSortDescending ? "desc" : "asc");
+    public string ArtifactSortStatusText => _artifacts.ArtifactSortStatusText;
 
-    public string SafeCoordinatePolicyText =>
-        CopperPillarDiameter > 0m
-            ? "Safe clamps by copper radius."
-            : "Safe = raw until copper dia is set.";
+    public string SafeCoordinatePolicyText => _geometry.SafeCoordinatePolicyText;
 
-    public string BistRectangleSummaryText
-    {
-        get
-        {
-            if (_render.Snapshot.Rectangles.Count == 0)
-            {
-                return "BIST center blank rect disabled.";
-            }
-            var rect = _render.Snapshot.Rectangles[0];
-
-            return string.Format(
-                CultureInfo.InvariantCulture,
-                "BIST rect px ({0:0.###}, {1:0.###}) -> ({2:0.###}, {3:0.###}) · machine ({4:0.###}, {5:0.###}) -> ({6:0.###}, {7:0.###})",
-                rect.PixelLeft,
-                rect.PixelTop,
-                rect.PixelRight,
-                rect.PixelBottom,
-                rect.MachineLeft,
-                rect.MachineTop,
-                rect.MachineRight,
-                rect.MachineBottom);
-        }
-    }
+    public string BistRectangleSummaryText => _presentation.BistRectangleSummaryText;
 
     public string CustomArraySummaryText
     {
@@ -515,8 +564,8 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
             return string.Format(
                 CultureInfo.InvariantCulture,
                 "4-point array: {0} x {1} dot(s), corners {2}, plotted dots {3}.",
-                Math.Max(0, ClampNonNegativeInt(CustomArrayColumnCount)),
-                Math.Max(0, ClampNonNegativeInt(CustomArrayRowCount)),
+                Math.Max(0, CoordinatePlannerRequestBuilder.NonNegativeInt(CustomArrayColumnCount)),
+                Math.Max(0, CoordinatePlannerRequestBuilder.NonNegativeInt(CustomArrayRowCount)),
                 CustomArrayCornerRows.Count,
                 CustomArrayPointRows.Count);
         }
@@ -524,31 +573,42 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public decimal SelectedCustomArrayCornerMachineX
     {
-        get => GetCustomArrayCornerMachineX(SelectedCustomArrayCornerOption.Key);
-        set => SetSelectedCustomArrayCornerMachineX(value);
+        get => _array.SelectedCustomArrayCornerMachineX;
+        set => _array.SelectedCustomArrayCornerMachineX = value;
     }
 
     public decimal SelectedCustomArrayCornerMachineY
     {
-        get => GetCustomArrayCornerMachineY(SelectedCustomArrayCornerOption.Key);
-        set => SetSelectedCustomArrayCornerMachineY(value);
+        get => _array.SelectedCustomArrayCornerMachineY;
+        set => _array.SelectedCustomArrayCornerMachineY = value;
     }
 
-    public string SelectedCustomArrayCornerSummaryText =>
-        string.Format(
-            CultureInfo.InvariantCulture,
-            "{0} · machine ({1:0.###}, {2:0.###}) mm",
-            string.IsNullOrWhiteSpace(SelectedCustomArrayCornerOption.Display) ? "Corner" : SelectedCustomArrayCornerOption.Display,
-            SelectedCustomArrayCornerMachineX,
-            SelectedCustomArrayCornerMachineY);
+    public string SelectedCustomArrayCornerSummaryText => _array.SelectedCustomArrayCornerSummaryText;
 
-    public string CustomArtifactSummaryText =>
-        HasCustomArtifacts
-            ? string.Format(
-                CultureInfo.InvariantCulture,
-                "Custom artifacts: {0} point(s), {1} path(s).",
-                _customArtifacts.PointCount,
-                _customArtifacts.PathCount)
-            : "Custom artifacts disabled.";
+    public string CustomArtifactSummaryText => _array.CustomArtifactSummaryText;
 
+    private CoordinatePlannerRenderState Render => _presentation.Render;
+
+    public bool HasSelectedArtifact => _artifacts.HasSelectedArtifact;
+
+    public string BistGenerationStatusText => _presentation.BistGenerationStatusText;
+
+    public const string SyncConsequenceText = "Resets calibration and overwrites the four array corners; turns the array on.";
+
+    public const string SafeCornersConsequenceText = "Overwrites the four corners and turns the array on.";
+
+    public const string ClearCustomConsequenceText = "Clears every custom point and path.";
+
+    public const string GuidePositionsHelpText = "Enter millimetres separated by commas, semicolons, spaces or new lines. Invalid entries are skipped; negative values become zero.";
+
+    public bool BeginCustomArrayCornerEdit(string key) => _array.BeginCustomArrayCornerEdit(key);
+
+    public bool CompleteCustomArrayCornerEdit(string key) => _array.CompleteCustomArrayCornerEdit(key);
+
+    public bool MoveCustomArrayCornerToWorldPoint(string key, Point2 worldPoint) => _array.MoveCustomArrayCornerToWorldPoint(key, worldPoint);
+
+    partial void OnStatusTextChanged(string value)
+    {
+        OnPropertyChanged(nameof(BistGenerationStatusText));
+    }
 }
