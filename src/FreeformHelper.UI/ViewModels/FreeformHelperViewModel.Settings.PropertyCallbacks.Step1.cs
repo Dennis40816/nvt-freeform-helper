@@ -1,3 +1,4 @@
+using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.UI.Services;
 
@@ -139,7 +140,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var clamped = Math.Max(1m, Math.Round(value, MidpointRounding.AwayFromZero));
+        var clamped = CoordinatePixelSizePolicy.Normalize(value);
         if (clamped != value)
         {
             using (_undoSuppression.Enter())
@@ -156,7 +157,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var clamped = Math.Max(1m, Math.Round(value, MidpointRounding.AwayFromZero));
+        var clamped = CoordinatePixelSizePolicy.Normalize(value);
         if (clamped != value)
         {
             using (_undoSuppression.Enter())

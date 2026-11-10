@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.UI.Services;
 using Nvt.Core.Threading;
@@ -561,7 +562,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
 
     partial void OnCoordinatePixelWidthChanged(decimal value)
     {
-        var clamped = Math.Max(1m, Math.Round(value, MidpointRounding.AwayFromZero));
+        var clamped = CoordinatePixelSizePolicy.Normalize(value);
         if (clamped != value)
         {
             CoordinatePixelWidth = clamped;
@@ -570,7 +571,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
 
     partial void OnCoordinatePixelHeightChanged(decimal value)
     {
-        var clamped = Math.Max(1m, Math.Round(value, MidpointRounding.AwayFromZero));
+        var clamped = CoordinatePixelSizePolicy.Normalize(value);
         if (clamped != value)
         {
             CoordinatePixelHeight = clamped;
