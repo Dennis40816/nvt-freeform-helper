@@ -36,7 +36,7 @@ public sealed partial class FreeformHelperViewModel
         ArgumentException.ThrowIfNullOrWhiteSpace(operationLabel);
 
         var generationEpoch = _notchExportGenerationCacheService.CaptureGenerationEpoch();
-        var finalProjectionRevision = Volatile.Read(ref _notchFinalProjectionRevision);
+        var finalProjectionRevision = _notchFinalProjection.Read();
         var sourceRevision = SimulationWorkspaceSourceRevision;
         var effectiveProgress = reportStep5Progress
             ? BeginStep5NotchGenerationProgress(operationLabel, progress, finalProjectionRevision, sourceRevision, progressTextReporter)
@@ -103,7 +103,7 @@ public sealed partial class FreeformHelperViewModel
     private IProgress<NotchGenerationProgress> BeginStep5NotchGenerationProgress(
         string operationLabel,
         IProgress<NotchGenerationProgress>? progress,
-        int finalProjectionRevision,
+        long finalProjectionRevision,
         int sourceRevision,
         Action<string>? progressTextReporter)
     {
@@ -383,7 +383,7 @@ public sealed partial class FreeformHelperViewModel
     private bool TryAcceptNotchGeneration(
         string operationLabel,
         long generationEpoch,
-        int finalProjectionRevision,
+        long finalProjectionRevision,
         int sourceRevision,
         NotchGenerationInputs inputs,
         NotchTable table,
@@ -488,9 +488,9 @@ public sealed partial class FreeformHelperViewModel
         _notchOperationState.EndBusyScope(value => IsNotchExporting = value);
     }
 
-    private bool IsNotchFinalProjectionCurrent(int finalProjectionRevision, int sourceRevision)
+    private bool IsNotchFinalProjectionCurrent(long finalProjectionRevision, int sourceRevision)
     {
-        return Volatile.Read(ref _notchFinalProjectionRevision) == finalProjectionRevision &&
+        return _notchFinalProjection.Read() == finalProjectionRevision &&
                SimulationWorkspaceSourceRevision == sourceRevision;
     }
 
