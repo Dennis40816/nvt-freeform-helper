@@ -270,5 +270,19 @@ public sealed partial class FreeformHelperViewModel
             ClearSelectionCommand: CreateEditingCommand(ClearSelection),
             QuickFocusCommand: CreateEditingCommand(ExecuteQuickFocus));
     }
+
+    /// <summary>
+    /// Filters the displayed CAD pads based on the currently selected layers
+    /// and triggers a grid rebuild if <see cref="RecalcBoundsOnLayerFilter"/> is true.
+    /// </summary>
+    private void ClearSelection()
+    {
+        if (!CanProceedWithPendingEdits())
+        {
+            return;
+        }
+
+        _selectionCoordinator.ClearSelection(CanvasHost);
+    }
 }
 

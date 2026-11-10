@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
 
@@ -29,6 +30,8 @@ public sealed partial class FreeformHelperViewModel
 
         ApplyCadLayerUiSnapshot(layerUiSnapshot);
     }
+
+    private const int MaxBoundLayerDropdownLayers = 256;
 
     private CadLayerUiSnapshot BuildCadLayerUiSnapshot(CadPadSet cad, IReadOnlyList<LayerSelectionSnapshot>? layerSelections)
     {
@@ -140,6 +143,149 @@ public sealed partial class FreeformHelperViewModel
     {
         OpenDxf,
         LoadProject,
+    }
+
+    /// <summary>
+    /// Builds the DXF import options based on current UI settings.
+    /// </summary>
+    /// <returns>A <see cref="DxfImportOptions"/> instance.</returns>
+    private DxfImportOptions BuildDxfOptions()
+    {
+        var options = new DxfImportOptions
+        {
+            OnlyClosedPolylines = ImportOnlyClosedPolylines, // Set option from UI property.
+            IncludeBlockPolylines = ImportBlockPolylines
+        };
+
+        return options;
+    }
+
+    private void ClearDxfLayerCatalog()
+    {
+        _layerCatalogStateService.Clear();
+    }
+
+    private Task TryLoadDxfLayerCatalogFromPathAsync(string path)
+    {
+        return Task.Run(() => _layerCatalogStateService.TryLoadFromPath(path));
+    }
+
+    private Task TryLoadDxfLayerCatalogFromEmbeddedAsync(byte[]? data)
+    {
+        return Task.Run(() => _layerCatalogStateService.TryLoadFromEmbedded(data));
+    }
+
+    /// <summary>
+    /// Handles the asynchronous operation of opening a DXF file.
+    /// Prompts the user for a file, imports the CAD pads, updates the UI, and rebuilds the grid.
+    /// </summary>
+    private async Task OpenDxfAsync()
+    {
+        // Ensure the dialog delegate is wired up by the View.
+        if (PickOpenDxfPathAsync is null)
+        {
+            SetStatus("Open DXF: dialog handler not wired.");
+            return;
+        }
+
+        if (!CanProceedWithPendingEdits())
+        {
+            return;
+        }
+
+        var path = await PickOpenDxfPathAsync(); // Prompt user to pick a DXF file.
+        if (string.IsNullOrWhiteSpace(path)) return; // User cancelled.
+
+        CadEditNotificationSnapshot? previous = null;
+        await _cadLoadWorkflowService.OpenDxfAsync(new OpenDxfWorkflowRequest
+        {
+            Path = path,
+            BuildDxfOptions = BuildDxfOptions,
+            SetStatus = SetStatus,
+            LoadLayerCatalogFromPathAsync = selectedPath =>
+            {
+                _layerCatalogStateService.SetFromPath(selectedPath, _dxfImportService.ImportedCatalog);
+                return Task.CompletedTask;
+            },
+            ResetHiddenCadPads = () =>
+            {
+                previous = new CadEditNotificationSnapshot(this);
+                ResetHiddenCadPads(previous);
+            },
+            ApplyCadLoadOutcomeAsync = outcome => ApplyCadLoadOutcomeCoreAsync(outcome, null, previous),
+            SetProjectLastDxfPath = selectedPath => _projectFile.LastDxfPath = selectedPath,
+            ClearLastSavedPath = () => _lastSavedPath = null,
+            MarkUnsaved = MarkUnsaved,
+            BuildStatus = outcome => BuildCadLoadStatus(outcome, CadLoadContext.OpenDxf, null),
+            LogCadLoadOutcome = outcome => LogCadLoadOutcome(outcome, CadLoadContext.OpenDxf),
+            TriggerGridRebuildAsync = () => TriggerGridRebuildAsync(requestFit: true),
+            RunWithCadLoadCanvasOverlayAsync = RunWithCadLoadCanvasOverlayAsync,
+            GetCadPadCountForLog = () => _cad?.Pads.Count ?? 0,
+            RunUiOperationAsync = (operationName, operationAsync, onError) =>
+                RunUiOperationAsync(operationName, operationAsync, onError),
+            OnError = ex =>
+            {
+                SetStatusError("DXF import failed", ex);
+                _logger.Error(ex, "DXF import failed.");
+            },
+        });
+    }
+
+    /// <summary>
+    /// Builds a <see cref="CadPadSet"/> containing only the CAD pads from currently selected layers.
+    /// </summary>
+    /// <returns>A new <see cref="CadPadSet"/> with filtered pads, or null if no CAD is loaded.</returns>
+    private CadPadSet? BuildFilteredCadPadSet()
+    {
+        if (_cad is null)
+        {
+            return null;
+        }
+
+        if (_cachedFilteredCadForBuild is not null)
+        {
+            return _cachedFilteredCadForBuild;
+        }
+
+        var result = LayerFilterUseCase.Filter(_cad, LayerToggles);
+        var visible = result.VisiblePads
+            .Where(p => !IsCadPadEffectivelyHidden(p.Id))
+            .ToList();
+        _cachedFilteredCadForBuild = new CadPadSet(visible);
+        return _cachedFilteredCadForBuild;
+    }
+
+    private CadPadSet? BuildCadPadSetForBounds()
+    {
+        if (_cad is null)
+        {
+            return null;
+        }
+
+        var boundLayer = SelectedBoundLayerOption?.Name;
+        if (!string.IsNullOrWhiteSpace(boundLayer))
+        {
+            var pads = _cad.Pads
+                .Where(p => !IsCadPadEffectivelyHidden(p.Id))
+                .Where(p => string.Equals(p.Layer, boundLayer, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            if (pads.Count > 0)
+            {
+                return new CadPadSet(pads);
+            }
+        }
+
+        if (RecalcBoundsOnLayerFilter)
+        {
+            return BuildFilteredCadPadSet();
+        }
+
+        if (_cadEdit.AutoHiddenDuplicateCadPadIds.Count == 0)
+        {
+            return _cad;
+        }
+
+        return BuildActiveCadPadSet();
     }
 }
 
