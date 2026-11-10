@@ -41,7 +41,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
         }
 
         var (machineX, machineY) = MachinePointFromWorld(
-            _snapshot.ActiveAreaBounds,
+            _render.Snapshot.ActiveAreaBounds,
             MachineOriginX,
             MachineOriginY,
             MachineWidth,

@@ -109,17 +109,17 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
     private readonly bool _highlightUnmatched;
     private readonly bool _highlightFreeform;
     private readonly CoordinatePlannerCustomArtifactsModel _customArtifacts = new();
-    private CadPad[] _cadPadsForCanvas = Array.Empty<CadPad>();
-    private CoordinatePlannerSnapshot _snapshot;
-    private CoordinateArtifactSnapshot _artifactSnapshot;
-    private Rect2 _previewBounds;
-    private string _activeAreaSourceText = "AA outline: regular grid bounds";
-    private string _guideSourceText = "Guide reference: AA outline";
+    private readonly CoordinatePlannerHostCallbacks _hostCallbacks = new();
+    private CoordinatePlannerRenderState _render;
     private bool _isBatchUpdatingCustomArrayCorners;
 
     public event EventHandler? FitCanvasRequested;
     public event Action<CoordinatePlannerWorkspacePreferences>? WorkspacePreferencesChanged;
-    public Func<CoordinateArtifactRow, Task>? RequestArtifactDetailAsync { get; set; }
+    public Func<CoordinateArtifactRow, Task>? RequestArtifactDetailAsync
+    {
+        get => _hostCallbacks.RequestArtifactDetailAsync;
+        set => _hostCallbacks.RequestArtifactDetailAsync = value;
+    }
 
     public CoordinatePlannerWorkspaceViewModel(
         CoordinatePlannerWorkspaceUseCase useCase,
@@ -127,13 +127,13 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
     {
         ArgumentNullException.ThrowIfNull(useCase);
         _session = session ?? throw new ArgumentNullException(nameof(session));
-        _snapshot = CoordinatePlannerComputationService.BuildSnapshot(session.Grid, BuildRequestFromDefaults(session));
-        _artifactSnapshot = CoordinateArtifactService.BuildSnapshot(
-            _snapshot,
-            _snapshot.ActiveAreaBounds,
-            _activeAreaSourceText,
-            _guideSourceText);
-        _previewBounds = _snapshot.ActiveAreaBounds;
+        var snapshot = CoordinatePlannerComputationService.BuildSnapshot(session.Grid, BuildRequestFromDefaults(session));
+        var artifactSnapshot = CoordinateArtifactService.BuildSnapshot(
+            snapshot, snapshot.ActiveAreaBounds, "AA outline: regular grid bounds", "Guide reference: AA outline");
+        _render = new(snapshot, artifactSnapshot, snapshot.ActiveAreaBounds,
+            "AA outline: regular grid bounds", "Guide reference: AA outline", Array.Empty<CadPad>(),
+            Array.Empty<CoordinatePlannerPointRow>(), Array.Empty<CoordinatePlannerPointRow>(), Array.Empty<CoordinatePlannerPointRow>(),
+            Array.Empty<CoordinatePlannerLineRow>(), Array.Empty<CoordinatePlannerLineRow>(), Array.Empty<CoordinateArtifactRow>());
         _highlightUnmatched = false;
         _highlightFreeform = false;
 
@@ -203,7 +203,7 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public int SourceRevision => _session.SourceRevision;
 
-    public IReadOnlyList<CadPad> CadPadsForCanvas => _cadPadsForCanvas;
+    public IReadOnlyList<CadPad> CadPadsForCanvas => _render.CadPads;
 
     public IReadOnlyList<RegularPad> RegularPads => _session.Grid.Pads;
     public bool HighlightUnmatched => _highlightUnmatched;
@@ -221,25 +221,25 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public IReadOnlyList<CoordinatePlannerOverlayModeOption> OverlayModeOptions { get; }
 
-    public IReadOnlyList<CoordinatePlannerPointRow> AaCornerRows { get; private set; } = Array.Empty<CoordinatePlannerPointRow>();
+    public IReadOnlyList<CoordinatePlannerPointRow> AaCornerRows => _render.AaCornerRows;
 
-    public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayCornerRows { get; private set; } = Array.Empty<CoordinatePlannerPointRow>();
+    public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayCornerRows => _render.CustomArrayCornerRows;
 
-    public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayPointRows { get; private set; } = Array.Empty<CoordinatePlannerPointRow>();
+    public IReadOnlyList<CoordinatePlannerPointRow> CustomArrayPointRows => _render.CustomArrayPointRows;
 
-    public IReadOnlyList<CoordinatePlannerLineRow> HorizontalGuideRows { get; private set; } = Array.Empty<CoordinatePlannerLineRow>();
+    public IReadOnlyList<CoordinatePlannerLineRow> HorizontalGuideRows => _render.HorizontalGuideRows;
 
-    public IReadOnlyList<CoordinatePlannerLineRow> VerticalGuideRows { get; private set; } = Array.Empty<CoordinatePlannerLineRow>();
+    public IReadOnlyList<CoordinatePlannerLineRow> VerticalGuideRows => _render.VerticalGuideRows;
 
-    public IReadOnlyList<CoordinateArtifactRow> ArtifactRows { get; private set; } = Array.Empty<CoordinateArtifactRow>();
+    public IReadOnlyList<CoordinateArtifactRow> ArtifactRows => _render.ArtifactRows;
 
     public ReadOnlyObservableCollection<CoordinatePlannerCustomRecipeRow> CustomRecipeRows { get; }
 
     public CoordinatePlannerCustomEditorModel CustomEditor { get; }
 
-    public CoordinatePlannerSnapshot Snapshot => _snapshot;
+    public CoordinatePlannerSnapshot Snapshot => _render.Snapshot;
 
-    public Rect2 PreviewBounds => _previewBounds;
+    public Rect2 PreviewBounds => _render.PreviewBounds;
 
     public IRelayCommand SyncFromWorkspaceCommand { get; }
 
@@ -267,11 +267,23 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public IAsyncRelayCommand<CoordinateArtifactRow?> ShowArtifactDetailCommand { get; }
 
-    public Func<Task<bool>>? RequestExportPreviewPngAsync { get; set; }
+    public Func<Task<bool>>? RequestExportPreviewPngAsync
+    {
+        get => _hostCallbacks.RequestExportPreviewPngAsync;
+        set => _hostCallbacks.RequestExportPreviewPngAsync = value;
+    }
 
-    public Func<string, Task<bool>>? RequestSetClipboardTextAsync { get; set; }
+    public Func<string, Task<bool>>? RequestSetClipboardTextAsync
+    {
+        get => _hostCallbacks.RequestSetClipboardTextAsync;
+        set => _hostCallbacks.RequestSetClipboardTextAsync = value;
+    }
 
-    public Func<CoordinatePlannerTextExportRequest, Task<bool>>? RequestSaveTextFileAsync { get; set; }
+    public Func<CoordinatePlannerTextExportRequest, Task<bool>>? RequestSaveTextFileAsync
+    {
+        get => _hostCallbacks.RequestSaveTextFileAsync;
+        set => _hostCallbacks.RequestSaveTextFileAsync = value;
+    }
 
     [ObservableProperty]
     private CoordinatePlannerCadLayerOption _selectedLayerOption;
@@ -396,9 +408,9 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
     [ObservableProperty]
     private string _statusText = "Coordinate planner ready.";
 
-    public bool ShowCad => _cadPadsForCanvas.Length > 0;
+    public bool ShowCad => _render.CadPads.Length > 0;
 
-    public bool HasBistRectangle => _snapshot.Rectangles.Count > 0;
+    public bool HasBistRectangle => _render.Snapshot.Rectangles.Count > 0;
 
     public bool HasCustomArtifacts => _customArtifacts.HasAny;
 
@@ -413,9 +425,9 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
 
     public string LayerSummaryText => $"Layer: {SelectedLayerOption.Display}";
 
-    public string ActiveAreaSourceSummaryText => _activeAreaSourceText;
+    public string ActiveAreaSourceSummaryText => _render.ActiveAreaSourceText;
 
-    public string GuideSourceSummaryText => _guideSourceText;
+    public string GuideSourceSummaryText => _render.GuideSourceText;
 
     public string MachineSummaryText =>
         string.Format(
@@ -471,11 +483,11 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
     {
         get
         {
-            if (_snapshot.Rectangles.Count == 0)
+            if (_render.Snapshot.Rectangles.Count == 0)
             {
                 return "BIST center blank rect disabled.";
             }
-            var rect = _snapshot.Rectangles[0];
+            var rect = _render.Snapshot.Rectangles[0];
 
             return string.Format(
                 CultureInfo.InvariantCulture,
