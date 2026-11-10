@@ -24,6 +24,21 @@ public sealed partial class FreeformHelperView
     private INotifyPropertyChanged? _padInfoChangeNotifier; // Used to observe changes in the pad info ViewModel.
     private bool _hasPadInfoPendingChanges; // Flag indicating if the active pad info has unsaved changes.
 
+    private PadInfoOverlayRenderer PadInfoRenderer => _padInfoRenderer ??= new(
+        this,
+        () => _padInfoOverlay,
+        () => _padInfoPopover,
+        () => _padInfoLink,
+        () => _padInfoAnchor,
+        () => _canvas,
+        point => _canvas!.WorldToScreen(point),
+        () => _padInfoBoundsWorld,
+        () => _padInfoSelectedBounds);
+
+    private void QueuePadInfoLayoutUpdate() => PadInfoRenderer.QueueLayoutUpdate();
+
+    private void UpdatePadInfoLayout() => PadInfoRenderer.UpdateLayout();
+
     /// <summary>
     /// Wires up event handlers for the <see cref="PadCanvas"/> control.
     /// </summary>
