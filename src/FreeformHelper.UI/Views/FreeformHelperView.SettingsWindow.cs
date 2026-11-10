@@ -80,4 +80,53 @@ public sealed partial class FreeformHelperView
 
         return _mainMenu.Items.OfType<MenuItem>().ToList();
     }
+
+    private Task ShowIndexMappingReportWindowAsync(IndexMappingReportViewModel viewModel)
+    {
+        viewModel.Editing.AttachProject(DataContext as FreeformHelperViewModel);
+        var owner = TopLevel.GetTopLevel(this) as Window;
+        if (_indexMappingReportWindow is not null && _indexMappingReportWindow.IsVisible)
+        {
+            _indexMappingReportWindow.DataContext = viewModel;
+            _indexMappingReportWindow.Activate();
+            return Task.CompletedTask;
+        }
+
+        if (owner is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var window = new IndexMappingReportWindow
+        {
+            DataContext = viewModel
+        };
+        _indexMappingReportWindow = window;
+        window.Closed += (_, _) =>
+        {
+            if (ReferenceEquals(_indexMappingReportWindow, window))
+            {
+                _indexMappingReportWindow = null;
+            }
+        };
+
+        window.Show(owner);
+        return Task.CompletedTask;
+    }
+
+    private Task ShowNotchDetailWindowAsync(NotchDetailViewModel viewModel)
+    {
+        var owner = TopLevel.GetTopLevel(this) as Window;
+        if (owner is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var window = new NotchDetailWindow
+        {
+            DataContext = viewModel
+        };
+        window.Show(owner);
+        return Task.CompletedTask;
+    }
 }

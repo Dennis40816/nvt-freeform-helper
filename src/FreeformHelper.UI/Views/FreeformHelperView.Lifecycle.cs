@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -8,9 +9,14 @@ using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
+using NLog;
 
 namespace FreeformHelper.UI.Views;
 
+/// <summary>
+/// Shell-level console hosting for <see cref="FreeformHelperView"/>: the row height of the console panel.
+/// The console content lives in <see cref="ConsolePanel"/>.
+/// </summary>
 public sealed partial class FreeformHelperView
 {
     /// <summary>
@@ -217,4 +223,68 @@ public sealed partial class FreeformHelperView
             StartupPerfTracker.Mark("workspace.deferred-ui-hooks-attached");
         }, DispatcherPriority.Background);
     }
+
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+    private void OnShellPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not ViewModels.ShellViewModel vm)
+        {
+            return;
+        }
+
+        if (e.PropertyName == nameof(ViewModels.ShellViewModel.IsConsoleExpanded))
+        {
+            SyncConsoleRowHeight(vm.IsConsoleExpanded);
+        }
+    }
+
+    private void EnsureShellViewModel()
+    {
+        if (_shellViewModel is not null)
+        {
+            return;
+        }
+
+        _shellViewModel = _topLevel?.DataContext as ViewModels.ShellViewModel
+            ?? DataContext as ViewModels.ShellViewModel;
+        if (_shellViewModel is not null)
+        {
+            _shellViewModel.PropertyChanged += OnShellPropertyChanged;
+        }
+    }
+
+    private void SyncConsoleRowHeight(bool isExpanded)
+    {
+        WorkspaceLayoutResourcePolicy.ApplyConsoleRowHeight(this, _consoleRow, isExpanded);
+    }
+
+    private readonly GridLength?[] _savedPanelWidths = new GridLength?[5];
+
+    private void SetLeftPanelVisible(bool isVisible)
+    {
+        SetPanelVisible(0, LeftPanel, isVisible, ref _savedPanelWidths[0]);
+        CanvasOverlayControls.ShowLeftPanelButtonVisible = !isVisible;
+    }
+
+    private void SetRightPanelVisible(bool isVisible)
+    {
+        SetPanelVisible(4, RightPanel, isVisible, ref _savedPanelWidths[4]);
+        CanvasOverlayControls.ShowRightPanelButtonVisible = !isVisible;
+    }
+
+    private void SetPanelVisible(int column, Control panel, bool isVisible, ref GridLength? savedWidth)
+    {
+        if (LayoutGrid.ColumnDefinitions.Count <= column) return;
+        var definition = LayoutGrid.ColumnDefinitions[column];
+        if (!isVisible && panel.IsVisible) savedWidth = definition.Width;
+        if (isVisible && savedWidth is { } width) definition.Width = width;
+        if (!isVisible) definition.Width = new GridLength(0);
+        panel.IsVisible = isVisible;
+    }
+
+    private void HideLeftPanel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SetLeftPanelVisible(false);
+    private void ShowLeftPanel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SetLeftPanelVisible(true);
+    private void HideRightPanel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SetRightPanelVisible(false);
+    private void ShowRightPanel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SetRightPanelVisible(true);
 }
