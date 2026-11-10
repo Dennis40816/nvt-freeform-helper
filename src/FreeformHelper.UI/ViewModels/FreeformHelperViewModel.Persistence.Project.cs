@@ -92,8 +92,7 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     private async Task LoadProjectAsync()
     {
-        string? pathToLoadAfterSave = null;
-        string? backupPath = null;
+        ReplaceProjectPlan? plan = null;
         _ = await RunProjectLoadAsync(async () =>
         {
             var status = CreateStatusScope("LoadProject");
@@ -103,51 +102,35 @@ public sealed partial class FreeformHelperViewModel
                 return ProjectLoadCommandResult.Failed("LOAD_FAILED", "Load project: dialog handler not wired.");
             }
 
-            var path = await PickLoadProjectPathAsync();
-            if (string.IsNullOrWhiteSpace(path))
+            plan = await ReplaceProjectWorkflow.PrepareAsync(
+                PickLoadProjectPathAsync,
+                HasUnsavedProjectWork,
+                TryBackUpUnsavedProjectAsync,
+                () => ProjectDialogs.ConfirmSaveBeforeLoadAsync);
+            if (plan.Outcome != ReplaceProjectOutcome.Load)
             {
-                return ProjectLoadCommandResult.Failed("CANCELLED", "Load cancelled.");
-            }
-
-            if (HasUnsavedProjectWork())
-            {
-                // The backup comes first, so a wrong click in the prompt can never lose the unsaved work.
-                backupPath = await TryBackUpUnsavedProjectAsync();
-                if (ProjectDialogs.ConfirmSaveBeforeLoadAsync is not null)
+                if (plan.Outcome == ReplaceProjectOutcome.Cancel && plan.Path is not null)
                 {
-                    var saveFirst = await ProjectDialogs.ConfirmSaveBeforeLoadAsync(backupPath);
-                    if (saveFirst is null)
-                    {
-                        const string keptMessage = "Load cancelled: unsaved changes were kept.";
-                        status.ReportBlocked(keptMessage);
-                        return ProjectLoadCommandResult.Failed("CANCELLED", keptMessage, path);
-                    }
-
-                    if (saveFirst.Value)
-                    {
-                        // Saving needs the editing session, so it runs after this load session ends.
-                        pathToLoadAfterSave = path;
-                        return ProjectLoadCommandResult.Failed("CANCELLED", "Saving before load.", path);
-                    }
+                    status.ReportBlocked(plan.Message);
                 }
+
+                return ProjectLoadCommandResult.Failed("CANCELLED", plan.Message, plan.Path);
             }
 
-            return await LoadProjectFromPathCoreAsync(path);
+            return await LoadProjectFromPathCoreAsync(plan.Path!);
         });
 
-        if (pathToLoadAfterSave is null)
+        if (plan?.Outcome != ReplaceProjectOutcome.SaveThenLoad)
         {
             return;
         }
 
-        if (!await SaveProjectAsync())
+        if (!await ReplaceProjectWorkflow.SaveThenLoadAsync(
+            plan.Path!, plan.BackupPath, SaveProjectAsync, UnsavedProjectBackup.TryDelete,
+            async path => { _ = await LoadProjectFromPathAsync(path); }))
         {
             CreateStatusScope("LoadProject").ReportBlocked("Load cancelled: the project was not saved, so unsaved changes were kept.");
-            return;
         }
-
-        UnsavedProjectBackup.TryDelete(backupPath);
-        _ = await LoadProjectFromPathAsync(pathToLoadAfterSave);
     }
 
     // Writes the current state to the one backup file. A failed backup is reported and never blocks the load prompt.
