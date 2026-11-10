@@ -35,10 +35,9 @@ public sealed partial class FreeformHelperView : UserControl
     private bool _isNotchExportSelectionHidden;
     private Border? _notchExportRestoreHint;
     private bool _isViewAttached;
-    private bool _isCadLoadSpinnerHostVisible;
+    private readonly CadLoadSpinnerVisibilitySession _cadLoadSpinner = new();
     private bool _isPadInfoLayoutUpdateQueued;
     private FreeformHelperViewModel? _observedViewModel;
-    private ICadLoadSpinnerHost? _cadLoadSpinnerHost;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperView"/> class.
