@@ -294,12 +294,10 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
 
     public NotchTable BuildSelectedTable()
     {
-        var selected = _allRows
-            .Where(row => NotchExportSelectionProjectionBuilder.IsSelectedForExport(row, SelectedVersionOption.Value))
-            .OrderBy(row => row.RowIndex)
-            .Select(row => row.Row)
+        var rows = _allRows
+            .Select(row => new NotchExportRowSelectionPolicy.RowChoice(row.RowIndex, row.Row, row.IsSelected))
             .ToList();
-        return new NotchTable(selected);
+        return NotchExportRowSelectionPolicy.Build(rows, SelectedVersionOption.Value);
     }
 
     public void AttachSimulationSafetyAudit(SimulationSafetyAuditResult? audit)
