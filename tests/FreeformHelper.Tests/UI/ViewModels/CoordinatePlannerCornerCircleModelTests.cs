@@ -10,24 +10,20 @@ namespace FreeformHelper.Tests;
 public sealed class CoordinatePlannerCornerCircleModelTests
 {
     [Fact]
-    public void NewModel_IsOffAndHasNoLayoutOrImage()
+    public void NewModelWithoutAPixelSize_HasNoLayoutOrImage()
     {
         var model = new CoordinatePlannerCornerCircleModel();
-        model.SetPixelSize(1920, 1080);
 
         Assert.False(model.HasLayout);
         Assert.Null(model.Layout);
         Assert.Null(model.BuildImage());
-        Assert.Equal("Corner circles are off.", model.StatusText);
     }
 
     [Fact]
-    public void Enable_PlacesTheCirclesAtTheActiveAreaCornersAndBuildsAnImageOfTheSameSize()
+    public void SettingTheSize_PlacesTheCirclesAtTheActiveAreaCornersAndBuildsAnImageOfTheSameSize()
     {
         var model = new CoordinatePlannerCornerCircleModel { Radius = 100m };
         model.SetPixelSize(1920, 1080);
-
-        model.IsEnabled = true;
 
         Assert.True(model.HasLayout);
         Assert.Equal(
@@ -45,8 +41,6 @@ public sealed class CoordinatePlannerCornerCircleModelTests
         var model = new CoordinatePlannerCornerCircleModel { Radius = 600m };
         model.SetPixelSize(1920, 1080);
 
-        model.IsEnabled = true;
-
         Assert.False(model.HasLayout);
         Assert.Equal(CornerCircleLayoutStatus.DoesNotFit, model.Layout!.Status);
         Assert.Equal(model.Layout.Message, model.StatusText);
@@ -56,7 +50,7 @@ public sealed class CoordinatePlannerCornerCircleModelTests
     [Fact]
     public void ChangingRadiusOrSize_RecalculatesAndRaisesLayoutChanged()
     {
-        var model = new CoordinatePlannerCornerCircleModel { IsEnabled = true };
+        var model = new CoordinatePlannerCornerCircleModel();
         model.SetPixelSize(1000, 500);
         var raised = 0;
         model.LayoutChanged += (_, _) => raised++;
@@ -71,7 +65,7 @@ public sealed class CoordinatePlannerCornerCircleModelTests
     [Fact]
     public void SettingTheSameSizeAgain_DoesNotRecalculate()
     {
-        var model = new CoordinatePlannerCornerCircleModel { IsEnabled = true };
+        var model = new CoordinatePlannerCornerCircleModel();
         model.SetPixelSize(1000, 500);
         var raised = 0;
         model.LayoutChanged += (_, _) => raised++;
@@ -84,18 +78,16 @@ public sealed class CoordinatePlannerCornerCircleModelTests
     [Fact]
     public void WithoutAPixelSize_ReportsThatTheActiveAreaHasNone()
     {
-        var model = new CoordinatePlannerCornerCircleModel { IsEnabled = true };
+        var model = new CoordinatePlannerCornerCircleModel();
 
         Assert.False(model.HasLayout);
         Assert.Equal("The active area has no pixel size.", model.StatusText);
     }
 
     [Fact]
-    public void ConstructorPixelSize_IsUsedWhenTheModelIsEnabled()
+    public void ConstructorPixelSize_GivesALayoutAtOnce()
     {
-        var model = new CoordinatePlannerCornerCircleModel(800, 600) { Radius = 50m };
-
-        model.IsEnabled = true;
+        var model = new CoordinatePlannerCornerCircleModel(800, 600);
 
         Assert.True(model.HasLayout);
         Assert.Equal(800, model.BuildImage()!.Width);
@@ -104,7 +96,7 @@ public sealed class CoordinatePlannerCornerCircleModelTests
     [Fact]
     public void AnActiveAreaBeyondTheImageLimit_ReportsItAndBuildsNoImage()
     {
-        var model = new CoordinatePlannerCornerCircleModel(40000, 100) { IsEnabled = true };
+        var model = new CoordinatePlannerCornerCircleModel(40000, 100);
 
         Assert.False(model.HasLayout);
         Assert.Equal("The active area is too large for an image.", model.StatusText);
@@ -114,7 +106,7 @@ public sealed class CoordinatePlannerCornerCircleModelTests
     [Fact]
     public void DrawCenterRectangle_AddsTheRectangleEdgesToTheImage()
     {
-        var model = new CoordinatePlannerCornerCircleModel { Radius = 5m, IsEnabled = true };
+        var model = new CoordinatePlannerCornerCircleModel { Radius = 5m };
         model.SetPixelSize(40, 40);
 
         var plain = model.BuildImage();

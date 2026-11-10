@@ -17,9 +17,6 @@ public sealed partial class CoordinatePlannerCornerCircleModel : ObservableObjec
     private int _pixelHeight;
 
     [ObservableProperty]
-    private bool _isEnabled;
-
-    [ObservableProperty]
     private decimal _radius = 50m;
 
     [ObservableProperty]
@@ -29,16 +26,17 @@ public sealed partial class CoordinatePlannerCornerCircleModel : ObservableObjec
     private CornerCircleLayoutResult? _layout;
 
     [ObservableProperty]
-    private string _statusText = "Corner circles are off.";
+    private string _statusText = string.Empty;
 
     /// <summary>Set by the view. Saves the image and returns true when a file was written.</summary>
     public Func<CornerCircleImage, Task<bool>>? RequestExportAsync { get; set; }
 
-    /// <summary>Starts with the pixel size of the active area. The model is off until the user turns it on.</summary>
+    /// <summary>Starts with the pixel size of the active area. The layout is calculated at once.</summary>
     public CoordinatePlannerCornerCircleModel(int pixelWidth = 0, int pixelHeight = 0)
     {
         _pixelWidth = pixelWidth;
         _pixelHeight = pixelHeight;
+        Recalculate();
     }
 
     /// <summary>Raised after the layout was recalculated, so the view can redraw the preview.</summary>
@@ -68,8 +66,6 @@ public sealed partial class CoordinatePlannerCornerCircleModel : ObservableObjec
             : null;
     }
 
-    partial void OnIsEnabledChanged(bool value) => Recalculate();
-
     partial void OnRadiusChanged(decimal value) => Recalculate();
 
     partial void OnLayoutChanged(CornerCircleLayoutResult? value)
@@ -79,12 +75,7 @@ public sealed partial class CoordinatePlannerCornerCircleModel : ObservableObjec
 
     private void Recalculate()
     {
-        if (!IsEnabled)
-        {
-            Layout = null;
-            StatusText = "Corner circles are off.";
-        }
-        else if (!CornerCircleImageRenderer.IsSupportedSize(_pixelWidth, _pixelHeight))
+        if (!CornerCircleImageRenderer.IsSupportedSize(_pixelWidth, _pixelHeight))
         {
             Layout = null;
             StatusText = _pixelWidth < 1 || _pixelHeight < 1

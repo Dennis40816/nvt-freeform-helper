@@ -45,7 +45,19 @@ public static class CornerCircleImageEncoder
         using var encoded = new MemoryStream();
         Encode(image, encoded, path);
 
-        await AtomicOutput.WriteBytesAsync(path, encoded.ToArray(), cancellationToken).ConfigureAwait(false);
+        // AtomicOutput names its temporary file in a failure. The status text must show the target the user picked.
+        try
+        {
+            await AtomicOutput.WriteBytesAsync(path, encoded.ToArray(), cancellationToken).ConfigureAwait(false);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            throw new UnauthorizedAccessException($"Access to the path '{path}' is denied.", ex);
+        }
+        catch (IOException ex)
+        {
+            throw new IOException($"{ex.Message} (export target '{path}')", ex);
+        }
     }
 
     private static void WritePng(CornerCircleImage image, Stream output)

@@ -12,12 +12,8 @@
   </UserControl.Styles>
   <panels:CollapsiblePanel Title="Corner circles" IsExpanded="False">
     <StackPanel Spacing="{DynamicResource Space12}">
-      <ToggleButton Content="Four corner circles"
-                    Classes="actionGhost actionTextButton"
-                    HorizontalContentAlignment="Left"
-                    IsChecked="{Binding CornerCircles.IsEnabled, Mode=TwoWay}"
-                    ToolTip.Tip="Four equal circles. Their edges touch the active area. The centers form the largest rectangle that fits."/>
-      <StackPanel Classes="panelFormField">
+      <StackPanel Classes="panelFormField"
+                  ToolTip.Tip="Four equal circles. Their edges touch the active area. The centers form the largest rectangle that fits.">
         <TextBlock Text="Radius (pixel)"/>
         <controls:NumberScrubber Minimum="0"
                                  Maximum="{DynamicResource NumericInputMaximum}"

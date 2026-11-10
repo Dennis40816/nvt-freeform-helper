@@ -16,7 +16,6 @@ public sealed class CoordinatePlannerCornerCircleCommandTests
     {
         var viewModel = CreateViewModel(1000, 500);
         viewModel.CornerCircles.Radius = 40m;
-        viewModel.CornerCircles.IsEnabled = true;
         CornerCircleImage? received = null;
         viewModel.CornerCircles.RequestExportAsync = image =>
         {
@@ -36,7 +35,6 @@ public sealed class CoordinatePlannerCornerCircleCommandTests
     public async Task ExportCommand_FollowsAChangeOfThePixelSizeAsync()
     {
         var viewModel = CreateViewModel(1000, 500);
-        viewModel.CornerCircles.IsEnabled = true;
         viewModel.PixelWidth = 640m;
         viewModel.PixelHeight = 480m;
         CornerCircleImage? received = null;
@@ -56,7 +54,6 @@ public sealed class CoordinatePlannerCornerCircleCommandTests
     public async Task ExportCommand_WhenTheUserCancels_ReportsItAsync()
     {
         var viewModel = CreateViewModel(1000, 500);
-        viewModel.CornerCircles.IsEnabled = true;
         viewModel.CornerCircles.RequestExportAsync = _ => Task.FromResult(false);
 
         await viewModel.ExportCornerCircleImageCommand.ExecuteAsync(null);
@@ -68,7 +65,6 @@ public sealed class CoordinatePlannerCornerCircleCommandTests
     public async Task ExportCommand_WithoutAHost_ReportsThatExportIsUnavailableAsync()
     {
         var viewModel = CreateViewModel(1000, 500);
-        viewModel.CornerCircles.IsEnabled = true;
 
         await viewModel.ExportCornerCircleImageCommand.ExecuteAsync(null);
 
@@ -80,7 +76,6 @@ public sealed class CoordinatePlannerCornerCircleCommandTests
     {
         var viewModel = CreateViewModel(1000, 500);
         viewModel.CornerCircles.Radius = 400m;
-        viewModel.CornerCircles.IsEnabled = true;
         var requests = 0;
         viewModel.CornerCircles.RequestExportAsync = _ =>
         {
@@ -92,6 +87,36 @@ public sealed class CoordinatePlannerCornerCircleCommandTests
 
         Assert.Equal(0, requests);
         Assert.Equal(viewModel.CornerCircles.StatusText, viewModel.StatusText);
+    }
+
+    [Fact]
+    public async Task ExportCommand_WhenTheHostThrows_ReportsTheFailureAsync()
+    {
+        var viewModel = CreateViewModel(1000, 500);
+        viewModel.CornerCircles.RequestExportAsync = _ => throw new IOException("The disk is full. (export target 'C:/out/a.png')");
+
+        await viewModel.ExportCornerCircleImageCommand.ExecuteAsync(null);
+
+        Assert.Equal(
+            "Corner circle image export failed: The disk is full. (export target 'C:/out/a.png')",
+            viewModel.StatusText);
+    }
+
+    [Fact]
+    public async Task ExportCommand_AfterAFailure_CanExportAgainAsync()
+    {
+        var viewModel = CreateViewModel(1000, 500);
+        var calls = 0;
+        viewModel.CornerCircles.RequestExportAsync = _ =>
+        {
+            calls++;
+            return calls == 1 ? throw new UnauthorizedAccessException("denied") : Task.FromResult(true);
+        };
+
+        await viewModel.ExportCornerCircleImageCommand.ExecuteAsync(null);
+        await viewModel.ExportCornerCircleImageCommand.ExecuteAsync(null);
+
+        Assert.Equal("Corner circle image exported (1000 x 500 px).", viewModel.StatusText);
     }
 
     private static CoordinatePlannerWorkspaceViewModel CreateViewModel(int pixelWidth, int pixelHeight)

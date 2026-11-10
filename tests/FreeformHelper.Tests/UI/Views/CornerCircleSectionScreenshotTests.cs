@@ -65,7 +65,6 @@ public sealed class CornerCircleSectionScreenshotTests
         global::Avalonia.Application.Current!.RequestedThemeVariant = theme;
         var viewModel = CreateViewModel();
         viewModel.CornerCircles.Radius = 30m;
-        viewModel.CornerCircles.IsEnabled = true;
         var window = new Window
         {
             Width = 420,

@@ -127,6 +127,30 @@ public sealed class CornerCircleImageEncoderTests
         }
     }
 
+    [Fact]
+    public async Task SaveToFileAsync_WhenTheTargetCannotBeWritten_NamesTheTargetInTheErrorAsync()
+    {
+        var directory = TestFiles.CreateTempDirectory();
+        try
+        {
+            // A folder where the file should go: the write must fail.
+            var path = Path.Combine(directory.FullName, "circles.png");
+            Directory.CreateDirectory(path);
+
+            var error = await Record.ExceptionAsync(
+                () => CornerCircleImageEncoder.SaveToFileAsync(BuildImage(40, 30, 6), path, TestContext.Current.CancellationToken));
+
+            Assert.NotNull(error);
+            Assert.True(error is IOException or UnauthorizedAccessException, error.GetType().Name);
+            Assert.Contains(path, error.Message, StringComparison.Ordinal);
+            Assert.True(Directory.Exists(path));
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
     private static CornerCircleImage BuildImage(int width, int height, double radius)
     {
         var area = new Polygon2([new Point2(0, 0), new Point2(width, 0), new Point2(width, height), new Point2(0, height)]);

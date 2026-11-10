@@ -39,10 +39,17 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
             return;
         }
 
-        var exported = await CornerCircles.RequestExportAsync(image);
-        StatusText = exported
-            ? $"Corner circle image exported ({image.Width} x {image.Height} px)."
-            : "Corner circle image export cancelled.";
+        try
+        {
+            var exported = await CornerCircles.RequestExportAsync(image);
+            StatusText = exported
+                ? $"Corner circle image exported ({image.Width} x {image.Height} px)."
+                : "Corner circle image export cancelled.";
+        }
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
+        {
+            StatusText = $"Corner circle image export failed: {ex.Message}";
+        }
     }
 
     private async Task CopySelectedArtifactAsync()
