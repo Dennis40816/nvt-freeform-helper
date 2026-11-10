@@ -31,6 +31,23 @@ public sealed class SimulationWorkspacePresentationStateTests
         Assert.Equal("IC/diff -", vm.DuplicateDiffResolutionSampleText);
         Assert.False(vm.HasCopperPathReplay);
         Assert.Equal("Replay rows: not run.", vm.CopperPathReplayArtifactSummaryText);
+        Assert.Equal("AUTO color scale", vm.ColorLegendTitleText);
+        Assert.Equal("0", vm.ColorLegendStartText);
+        Assert.Equal(string.Empty, vm.ColorLegendCenterText);
+        Assert.Equal("0", vm.ColorLegendEndText);
+        Assert.False(vm.ShowLegendCenterLabel);
+        Assert.True(vm.ShowSequentialLegend);
+
+        vm.SelectedCanvasColorOption = vm.CanvasColorOptions.Single(
+            static option => option.Value == NotchApplySimulationCanvasColorMode.Threshold);
+
+        Assert.Equal("TH color scale", vm.ColorLegendTitleText);
+        Assert.Equal("0", vm.ColorLegendStartText);
+        Assert.Equal(string.Empty, vm.ColorLegendCenterText);
+        Assert.Equal("TH 5", vm.ColorLegendEndText);
+        Assert.False(vm.ShowLegendCenterLabel);
+        Assert.True(vm.ShowSequentialLegend);
+        Assert.Empty(vm.SimulationOverlayItems);
     }
 
     [Fact]
