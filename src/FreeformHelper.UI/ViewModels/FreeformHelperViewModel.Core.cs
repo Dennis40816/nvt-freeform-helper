@@ -207,15 +207,16 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     /// </summary>
     public void EnsureInitialFit()
     {
-        if (CanvasHost is null)
+        var action = InitialCanvasFitPolicy.Decide(CanvasHost is not null, CadPads.Count > 0, RegularPads.Count > 0);
+        if (action == InitialFitAction.None)
         {
             return; // Cannot fit if canvas host is not available.
         }
 
         // If there's data to display, fit it immediately.
-        if (CadPads.Count > 0 || RegularPads.Count > 0)
+        if (action == InitialFitAction.FitNow)
         {
-            CanvasHost.FitToContent();
+            CanvasHost?.FitToContent();
         }
         else
         {
