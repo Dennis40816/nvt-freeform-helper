@@ -222,10 +222,12 @@ public sealed partial class FreeformHelperViewModel
     private const decimal GlobalFontSizePercentMin = 80m;
     private const decimal GlobalFontSizePercentMax = 140m;
 
+    private readonly CanvasStrokeFillState _canvasStrokeFillState;
+
     /// <summary>
     /// Gets or sets the line width for drawing CAD pads on the canvas.
     /// </summary>
-    [ObservableProperty] private decimal _cadLineWidth = 0.2m;
+    public decimal CadLineWidth { get => _canvasStrokeFillState.CadLineWidth; set => _canvasStrokeFillState.CadLineWidth = value; }
     /// <summary>
     /// Gets or sets the line color for drawing CAD pads on the canvas.
     /// </summary>
@@ -233,20 +235,24 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets the opacity multiplier (0-1) for CAD pad lines.
     /// </summary>
-    [ObservableProperty] private decimal _cadLineOpacity = 1.0m;
+    public decimal CadLineOpacity { get => _canvasStrokeFillState.CadLineOpacity; set => _canvasStrokeFillState.CadLineOpacity = value; }
     /// <summary>
     /// Gets or sets the opacity multiplier (0-1) for CAD pad fills.
     /// </summary>
-    [ObservableProperty] private decimal _cadFillOpacity = 1.0m;
+    public decimal CadFillOpacity { get => _canvasStrokeFillState.CadFillOpacity; set => _canvasStrokeFillState.CadFillOpacity = value; }
     /// <summary>
     /// Gets or sets the line width for drawing regular pads on the canvas.
     /// </summary>
-    [ObservableProperty] private decimal _regularLineWidth = 0.2m;
+    public decimal RegularLineWidth { get => _canvasStrokeFillState.RegularLineWidth; set => _canvasStrokeFillState.RegularLineWidth = value; }
     /// <summary>
     /// Gets or sets a line-width adjustment for highlight/selection overlays.
     /// Positive values make highlights thicker; negative values make them thinner.
     /// </summary>
-    [ObservableProperty] private decimal _highlightStrokeWidthAdjust = -1m;
+    public decimal HighlightStrokeWidthAdjust
+    {
+        get => _canvasStrokeFillState.HighlightStrokeWidthAdjust;
+        set => _canvasStrokeFillState.HighlightStrokeWidthAdjust = value;
+    }
     /// <summary>
     /// Gets or sets the line color for drawing regular pads on the canvas.
     /// </summary>
@@ -254,11 +260,11 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets the opacity multiplier (0-1) for regular pad lines.
     /// </summary>
-    [ObservableProperty] private decimal _regularLineOpacity = 1.0m;
+    public decimal RegularLineOpacity { get => _canvasStrokeFillState.RegularLineOpacity; set => _canvasStrokeFillState.RegularLineOpacity = value; }
     /// <summary>
     /// Gets or sets the opacity multiplier (0-1) for regular pad fills.
     /// </summary>
-    [ObservableProperty] private decimal _regularFillOpacity = 1.0m;
+    public decimal RegularFillOpacity { get => _canvasStrokeFillState.RegularFillOpacity; set => _canvasStrokeFillState.RegularFillOpacity = value; }
     /// <summary>
     /// Gets or sets the line/fill color for selected regular pads on the canvas.
     /// </summary>
@@ -266,7 +272,11 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets the fill opacity (0-1) for selected regular pads.
     /// </summary>
-    [ObservableProperty] private decimal _regularSelectedFillOpacity = 0.24m;
+    public decimal RegularSelectedFillOpacity
+    {
+        get => _canvasStrokeFillState.RegularSelectedFillOpacity;
+        set => _canvasStrokeFillState.RegularSelectedFillOpacity = value;
+    }
     /// <summary>
     /// Gets or sets the hexadecimal string representation of the CAD line color.
     /// </summary>
@@ -355,11 +365,7 @@ public sealed partial class FreeformHelperViewModel
     partial void OnColorCadByAreaChanging(bool value) => TrackUndo(ColorCadByArea, value, v => ColorCadByArea = v, "Toggle CAD area colors");
     partial void OnImportOnlyClosedPolylinesChanging(bool value) => TrackUndo(ImportOnlyClosedPolylines, value, v => ImportOnlyClosedPolylines = v, "Import closed polylines");
     partial void OnImportBlockPolylinesChanging(bool value) => TrackUndo(ImportBlockPolylines, value, v => ImportBlockPolylines = v, "Import block polylines");
-    partial void OnCadLineWidthChanging(decimal value) => TrackUndo(CadLineWidth, value, v => CadLineWidth = v, "CAD line width");
-    partial void OnRegularLineWidthChanging(decimal value) => TrackUndo(RegularLineWidth, value, v => RegularLineWidth = v, "Regular line width");
-    partial void OnHighlightStrokeWidthAdjustChanging(decimal value) => TrackUndo(HighlightStrokeWidthAdjust, value, v => HighlightStrokeWidthAdjust = v, "Highlight line width");
     partial void OnCadLineColorHexChanging(string value) => TrackUndo(CadLineColorHex, value, v => CadLineColorHex = v, "CAD line color");
     partial void OnRegularLineColorHexChanging(string value) => TrackUndo(RegularLineColorHex, value, v => RegularLineColorHex = v, "Regular line color");
     partial void OnRegularSelectedColorHexChanging(string value) => TrackUndo(RegularSelectedColorHex, value, v => RegularSelectedColorHex = v, "Regular selection color");
-    partial void OnRegularSelectedFillOpacityChanging(decimal value) => TrackUndo(RegularSelectedFillOpacity, value, v => RegularSelectedFillOpacity = v, "Regular selection fill opacity");
 }

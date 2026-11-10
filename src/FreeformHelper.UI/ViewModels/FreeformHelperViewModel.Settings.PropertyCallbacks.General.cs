@@ -10,30 +10,6 @@ public sealed partial class FreeformHelperViewModel
     partial void OnHighlightFreeformChanged(bool value) => SyncWorkspaceToggle("highlightFreeform", value);
     partial void OnColorCadByAreaChanged(bool value) => SyncWorkspaceToggle("colorByArea", value);
 
-    partial void OnCadLineOpacityChanged(decimal value)
-    {
-        if (_isLoadingSettings) return;
-        CanvasHost?.Invalidate();
-    }
-
-    partial void OnCadFillOpacityChanged(decimal value)
-    {
-        if (_isLoadingSettings) return;
-        CanvasHost?.Invalidate();
-    }
-
-    partial void OnRegularLineOpacityChanged(decimal value)
-    {
-        if (_isLoadingSettings) return;
-        CanvasHost?.Invalidate();
-    }
-
-    partial void OnRegularFillOpacityChanged(decimal value)
-    {
-        if (_isLoadingSettings) return;
-        CanvasHost?.Invalidate();
-    }
-
     partial void OnCadLineColorHexChanged(string value)
     {
         // Attempt to parse hex string to Color and update property.
@@ -81,32 +57,6 @@ public sealed partial class FreeformHelperViewModel
         using (_undoSuppression.Enter())
         {
             RegularSelectedColorHex = ToRgbHex(value);
-        }
-    }
-
-    partial void OnRegularSelectedFillOpacityChanged(decimal value)
-    {
-        if (_isLoadingSettings) return;
-        var clamped = Math.Clamp(value, 0.0m, 1.0m);
-        if (clamped != value)
-        {
-            using (_undoSuppression.Enter())
-            {
-                RegularSelectedFillOpacity = clamped;
-            }
-        }
-    }
-
-    partial void OnHighlightStrokeWidthAdjustChanged(decimal value)
-    {
-        if (_isLoadingSettings) return;
-        var clamped = Math.Clamp(value, -2.0m, 4.0m);
-        if (clamped != value)
-        {
-            using (_undoSuppression.Enter())
-            {
-                HighlightStrokeWidthAdjust = clamped;
-            }
         }
     }
 
