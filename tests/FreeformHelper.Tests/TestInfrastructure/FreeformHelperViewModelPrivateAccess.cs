@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using FreeformHelper.Application.Services;
+using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
@@ -98,4 +99,7 @@ internal static class FreeformHelperViewModelPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BumpNotchExportGridFingerprint")]
     public static extern void BumpNotchExportGridFingerprint(FreeformHelperViewModel viewModel);
+
+    [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "CreateExportSettingsSnapshot")]
+    public static extern ProjectSettings CreateExportSettingsSnapshot(FreeformHelperViewModel? owner, ProjectSettings source);
 }
