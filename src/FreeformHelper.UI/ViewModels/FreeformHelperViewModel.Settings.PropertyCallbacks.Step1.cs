@@ -1,3 +1,5 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.UI.Services;
@@ -199,33 +201,17 @@ public sealed partial class FreeformHelperViewModel
         ApplySettingsOrchestration(nameof(GridPaddingPercent));
     }
 
-    // The grid build options are stored once. The properties below forward to the record and raise
-    // the same notifications and callbacks as the stored properties they replaced.
+    // The shell keeps one holder for the workflow inputs that have not moved to their own owner yet.
+    // The grid and layer settings live in SettingsStateViewModel.
     private readonly WorkflowInputState _workflowInput = new();
-    private GridBuildOptions _gridBuild
-    {
-        get => _workflowInput.GridBuild;
-        set => _workflowInput.GridBuild = value;
-    }
 
     /// <summary>
     /// Gets or sets the preferred AA outline layer name used by Coordinate.
     /// </summary>
     public string CoordinatePreferredAaOutlineLayerName
     {
-        get => _gridBuild.CoordinatePreferredAaOutlineLayerName;
-        set
-        {
-            if (_gridBuild.CoordinatePreferredAaOutlineLayerName == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _gridBuild = _gridBuild with { CoordinatePreferredAaOutlineLayerName = value };
-            OnCoordinatePreferredAaOutlineLayerNameChanged(value);
-            OnPropertyChanged();
-        }
+        get => SettingsState.CoordinatePreferredAaOutlineLayerName;
+        set => SettingsState.CoordinatePreferredAaOutlineLayerName = value;
     }
 
     partial void OnCoordinatePreferredAaOutlineLayerNameChanged(string value);
@@ -235,19 +221,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public decimal MaxAreaBuckets
     {
-        get => _gridBuild.MaxAreaBuckets;
-        set
-        {
-            if (_gridBuild.MaxAreaBuckets == value)
-            {
-                return;
-            }
-
-            OnMaxAreaBucketsChanging(value);
-            OnPropertyChanging();
-            _gridBuild = _gridBuild with { MaxAreaBuckets = value };
-            OnPropertyChanged();
-        }
+        get => SettingsState.MaxAreaBuckets;
+        set => SettingsState.MaxAreaBuckets = value;
     }
 
     partial void OnMaxAreaBucketsChanging(decimal value);
@@ -257,19 +232,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public decimal AreaBucketTolerance
     {
-        get => _gridBuild.AreaBucketTolerance;
-        set
-        {
-            if (_gridBuild.AreaBucketTolerance == value)
-            {
-                return;
-            }
-
-            OnAreaBucketToleranceChanging(value);
-            OnPropertyChanging();
-            _gridBuild = _gridBuild with { AreaBucketTolerance = value };
-            OnPropertyChanged();
-        }
+        get => SettingsState.AreaBucketTolerance;
+        set => SettingsState.AreaBucketTolerance = value;
     }
 
     partial void OnAreaBucketToleranceChanging(decimal value);
@@ -279,19 +243,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool IsHeightColumnLocal
     {
-        get => _gridBuild.IsHeightColumnLocal;
-        set
-        {
-            if (_gridBuild.IsHeightColumnLocal == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _gridBuild = _gridBuild with { IsHeightColumnLocal = value };
-            OnIsHeightColumnLocalChanged(value);
-            OnPropertyChanged();
-        }
+        get => SettingsState.IsHeightColumnLocal;
+        set => SettingsState.IsHeightColumnLocal = value;
     }
 
     partial void OnIsHeightColumnLocalChanged(bool value);
@@ -301,19 +254,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool IsWidthRowLocal
     {
-        get => _gridBuild.IsWidthRowLocal;
-        set
-        {
-            if (_gridBuild.IsWidthRowLocal == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _gridBuild = _gridBuild with { IsWidthRowLocal = value };
-            OnIsWidthRowLocalChanged(value);
-            OnPropertyChanged();
-        }
+        get => SettingsState.IsWidthRowLocal;
+        set => SettingsState.IsWidthRowLocal = value;
     }
 
     partial void OnIsWidthRowLocalChanged(bool value);
@@ -323,19 +265,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool UseLocalSizing
     {
-        get => _gridBuild.UseLocalSizing;
-        set
-        {
-            if (_gridBuild.UseLocalSizing == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _gridBuild = _gridBuild with { UseLocalSizing = value };
-            OnUseLocalSizingChanged(value);
-            OnPropertyChanged();
-        }
+        get => SettingsState.UseLocalSizing;
+        set => SettingsState.UseLocalSizing = value;
     }
 
     partial void OnUseLocalSizingChanged(bool value);
@@ -345,19 +276,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public RegularSourceMode RegularSourceMode
     {
-        get => _gridBuild.RegularSourceMode;
-        set
-        {
-            if (_gridBuild.RegularSourceMode == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _gridBuild = _gridBuild with { RegularSourceMode = value };
-            OnRegularSourceModeChanged(value);
-            OnPropertyChanged();
-        }
+        get => SettingsState.RegularSourceMode;
+        set => SettingsState.RegularSourceMode = value;
     }
 
     partial void OnRegularSourceModeChanged(RegularSourceMode value);
@@ -367,20 +287,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public GridAlignmentMode GridAlignmentMode
     {
-        get => _gridBuild.GridAlignmentMode;
-        set
-        {
-            if (_gridBuild.GridAlignmentMode == value)
-            {
-                return;
-            }
-
-            OnGridAlignmentModeChanging(value);
-            OnPropertyChanging();
-            _gridBuild = _gridBuild with { GridAlignmentMode = value };
-            OnGridAlignmentModeChanged(value);
-            OnPropertyChanged();
-        }
+        get => SettingsState.GridAlignmentMode;
+        set => SettingsState.GridAlignmentMode = value;
     }
 
     partial void OnGridAlignmentModeChanging(GridAlignmentMode value);
@@ -392,51 +300,21 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public ScanOrder SelectedScanOrder
     {
-        get => _gridBuild.SelectedScanOrder;
-        set
-        {
-            if (_gridBuild.SelectedScanOrder == value)
-            {
-                return;
-            }
-
-            OnSelectedScanOrderChanging(value);
-            OnPropertyChanging();
-            _gridBuild = _gridBuild with { SelectedScanOrder = value };
-            OnSelectedScanOrderChanged(value);
-            OnPropertyChanged();
-        }
+        get => SettingsState.SelectedScanOrder;
+        set => SettingsState.SelectedScanOrder = value;
     }
 
     partial void OnSelectedScanOrderChanging(ScanOrder value);
 
     partial void OnSelectedScanOrderChanged(ScanOrder value);
 
-    // The layer source selection is stored once. The properties below forward to the record and raise
-    // the same notifications and callbacks as the stored properties they replaced.
-    private LayerSourceSelection _layerSource
-    {
-        get => _workflowInput.LayerSource;
-        set => _workflowInput.LayerSource = value;
-    }
-
     /// <summary>
     /// Gets or sets helper text for DXF regular-source validation and suggested IC/grid settings.
     /// </summary>
     public string DxfRegularSourceHint
     {
-        get => _layerSource.DxfRegularSourceHint;
-        set
-        {
-            if (_layerSource.DxfRegularSourceHint == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _layerSource = _layerSource with { DxfRegularSourceHint = value };
-            OnPropertyChanged();
-        }
+        get => SettingsState.DxfRegularSourceHint;
+        set => SettingsState.DxfRegularSourceHint = value;
     }
 
     /// <summary>
@@ -444,19 +322,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public RegularSourceLayerOption SelectedRegularSourceLayerOption
     {
-        get => _layerSource.SelectedRegularSourceLayerOption;
-        set
-        {
-            if (_layerSource.SelectedRegularSourceLayerOption == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _layerSource = _layerSource with { SelectedRegularSourceLayerOption = value };
-            OnSelectedRegularSourceLayerOptionChanged(value);
-            OnPropertyChanged();
-        }
+        get => SettingsState.SelectedRegularSourceLayerOption;
+        set => SettingsState.SelectedRegularSourceLayerOption = value;
     }
 
     partial void OnSelectedRegularSourceLayerOptionChanged(RegularSourceLayerOption value);
@@ -467,18 +334,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public string BoundLayerOptionSummary
     {
-        get => _layerSource.BoundLayerOptionSummary;
-        set
-        {
-            if (_layerSource.BoundLayerOptionSummary == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _layerSource = _layerSource with { BoundLayerOptionSummary = value };
-            OnPropertyChanged();
-        }
+        get => SettingsState.BoundLayerOptionSummary;
+        set => SettingsState.BoundLayerOptionSummary = value;
     }
 
     /// <summary>
@@ -486,19 +343,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public BoundLayerOption SelectedBoundLayerOption
     {
-        get => _layerSource.SelectedBoundLayerOption;
-        set
-        {
-            if (_layerSource.SelectedBoundLayerOption == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _layerSource = _layerSource with { SelectedBoundLayerOption = value };
-            OnSelectedBoundLayerOptionChanged(value);
-            OnPropertyChanged();
-        }
+        get => SettingsState.SelectedBoundLayerOption;
+        set => SettingsState.SelectedBoundLayerOption = value;
     }
 
     partial void OnSelectedBoundLayerOptionChanged(BoundLayerOption value);
@@ -509,18 +355,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool HasCadLayers
     {
-        get => _layerSource.HasCadLayers;
-        set
-        {
-            if (_layerSource.HasCadLayers == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _layerSource = _layerSource with { HasCadLayers = value };
-            OnPropertyChanged();
-        }
+        get => SettingsState.HasCadLayers;
+        set => SettingsState.HasCadLayers = value;
     }
 
     /// <summary>

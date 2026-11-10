@@ -112,6 +112,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
+        _settingsState = new SettingsStateViewModel(this);
         _canvasStrokeFillState = new CanvasStrokeFillState(
             () => _isLoadingSettings,
             () => _undoSuppression.IsActive,

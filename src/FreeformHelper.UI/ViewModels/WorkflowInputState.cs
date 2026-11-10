@@ -1,11 +1,7 @@
 namespace FreeformHelper.UI.ViewModels;
 
-/// <summary>Stores the grid, layer source and FW diff inputs for one view model.</summary>
+/// <summary>Stores the FW diff input for one view model. The grid and layer inputs live in SettingsStateViewModel.</summary>
 internal sealed class WorkflowInputState
 {
-    public GridBuildOptions GridBuild { get; set; } = GridBuildOptions.Initial;
-
-    public LayerSourceSelection LayerSource { get; set; } = LayerSourceSelection.Initial;
-
     public FwDiffAssignmentSettings FwDiffAssignment { get; set; } = FwDiffAssignmentSettings.Initial;
 }
