@@ -99,6 +99,12 @@ internal static class PadCanvasPrivateAccess
         bool lowDetailMode,
         double lowDetailZoomThreshold);
 
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "GetLabelFontSize")]
+    public static extern double GetLabelFontSize(PadCanvas canvas, double step, double baseSize, double minSize, double maxSize);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "GetAxisLabelStride")]
+    public static extern int GetAxisLabelStride(PadCanvas canvas, double step, double fontSize, int count, double maxLabelWidth);
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "RecordRenderPerf")]
     public static extern void RecordRenderPerf(
         PadCanvas canvas,
