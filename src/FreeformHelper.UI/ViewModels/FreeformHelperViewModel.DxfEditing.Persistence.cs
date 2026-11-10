@@ -32,9 +32,9 @@ public sealed partial class FreeformHelperViewModel
         file.VisibleDuplicateCadPadIds = GetRestoredDuplicateCadPadIds()
             .Where(validCadIds.Contains)
             .ToHashSet();
-        file.DxfCadLayerOverrides = CapturePersistedCadLayerOverrides();
+        file.DxfCadLayerOverrides = DxfEditStateCapture.CapturePersistedCadLayerOverrides(_cad, _cadEdit.BaselineCad);
         file.DxfCadGeometryOverrides = CapturePersistedCadGeometryOverrides();
-        file.DxfCombinedCadGroups = CapturePersistedCombinedCadGroups();
+        file.DxfCombinedCadGroups = DxfEditStateCapture.CapturePersistedCombinedCadGroups(_cad, _combinedCad, _cadEdit.UnrestoredCombinedGroups);
     }
 
     internal static PersistedDxfEditProjectState CapturePersistedDxfEditProjectState(ProjectFile file)
@@ -67,86 +67,6 @@ public sealed partial class FreeformHelperViewModel
                         .ToList(),
                 })
                 .ToList());
-    }
-
-    private Dictionary<int, string> CapturePersistedCadLayerOverrides()
-    {
-        if (_cad is null || _cadEdit.BaselineCad is null)
-        {
-            return new Dictionary<int, string>();
-        }
-
-        var baselineLayersByCadId = _cadEdit.BaselineCad.Pads
-            .GroupBy(static pad => pad.Id)
-            .ToDictionary(static group => group.Key, static group => group.First().Layer);
-
-        return _cad.Pads
-            .Where(pad =>
-                baselineLayersByCadId.TryGetValue(pad.Id, out var baselineLayer) &&
-                !string.Equals(baselineLayer, pad.Layer, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(static pad => pad.Id, static pad => pad.Layer);
-    }
-
-    private List<ProjectDxfCombinedCadGroup> CapturePersistedCombinedCadGroups()
-    {
-        var groups = new List<ProjectDxfCombinedCadGroup>();
-        if (_cad is not null && _combinedCad.Groups.Count > 0)
-        {
-            AddCurrentCombinedCadGroups(groups, _cad);
-        }
-
-        AppendUnrestoredCombinedCadGroups(groups);
-        return groups;
-    }
-
-    private void AppendUnrestoredCombinedCadGroups(List<ProjectDxfCombinedCadGroup> groups)
-    {
-        var usedGroupIds = groups.Select(static group => group.GroupId).ToHashSet();
-        var nextGroupId = usedGroupIds.Count == 0 ? 1 : usedGroupIds.Max() + 1;
-        foreach (var kept in _cadEdit.UnrestoredCombinedGroups)
-        {
-            var groupId = kept.GroupId;
-            if (groupId > 0 && !usedGroupIds.Add(groupId))
-            {
-                // A group made after a DXF reload may reuse this id. Give the kept group a free one.
-                groupId = nextGroupId;
-                usedGroupIds.Add(groupId);
-            }
-
-            nextGroupId = Math.Max(nextGroupId, groupId + 1);
-            groups.Add(new ProjectDxfCombinedCadGroup
-            {
-                GroupId = groupId,
-                SourceCadIds = kept.SourceCadIds,
-                OutputPads = kept.OutputPads,
-            });
-        }
-    }
-
-    private void AddCurrentCombinedCadGroups(List<ProjectDxfCombinedCadGroup> groups, CadPadSet cad)
-    {
-        var currentPadsById = cad.Pads.ToDictionary(static pad => pad.Id);
-        foreach (var pair in _combinedCad.Groups.OrderBy(static pair => pair.Key))
-        {
-            var outputPads = pair.Value.OutputCadIds
-                .Select(outputCadId => currentPadsById.TryGetValue(outputCadId, out var pad)
-                    ? ProjectCadPadSnapshot.FromCadPad(pad)
-                    : null)
-                .Where(static pad => pad is not null)
-                .Cast<ProjectCadPadSnapshot>()
-                .ToList();
-            if (pair.Value.SourceCadIds.Count == 0 || outputPads.Count == 0)
-            {
-                continue;
-            }
-
-            groups.Add(new ProjectDxfCombinedCadGroup
-            {
-                GroupId = pair.Key,
-                SourceCadIds = pair.Value.SourceCadIds.Distinct().OrderBy(static id => id).ToList(),
-                OutputPads = outputPads,
-            });
-        }
     }
 
     // Drops the runtime edit state of the previous project when the new project has no DXF,
