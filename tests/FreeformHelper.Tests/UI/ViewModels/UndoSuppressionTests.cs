@@ -87,7 +87,8 @@ public sealed class UndoSuppressionTests
     }
 }
 
-public sealed partial class FreeformHelperViewModelTests
+[Collection("HeadlessUiSerial")]
+public sealed class FreeformHelperUndoIntegrationTests
 {
     [Fact]
     public void Undo_InsideOuterSuppression_KeepsRecordingSuppressed()
