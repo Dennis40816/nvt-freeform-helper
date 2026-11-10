@@ -261,21 +261,6 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 67
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.Cascade.cs",
-        "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs"
-      ],
-      "contentHash": "23e72bed74c5927d2935b4aeeafd5f0570bf887cbf0e719f7be4e2a4141b9757",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.SettingsWindowViewModel"
-    },
-    {
-      "kind": "type",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "stateMembers": 46
       },
       "owner": "NFH",
