@@ -90,6 +90,18 @@ internal static class PadCanvasPrivateAccess
     public static extern void EnsureRegularSpatialIndex(PadCanvas canvas);
 
     // Rendering seams.
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_visibleRegularUnselected")]
+    public static extern ref List<RegularPad> VisibleRegularUnselected(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_visibleRegularSelected")]
+    public static extern ref List<RegularPad> VisibleRegularSelected(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_visibleCadUnselected")]
+    public static extern ref List<CadPad> VisibleCadUnselected(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_visibleCadSelected")]
+    public static extern ref List<CadPad> VisibleCadSelected(PadCanvas canvas);
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildVisibleDrawLists")]
     public static extern void BuildVisibleDrawLists(
         PadCanvas canvas,
