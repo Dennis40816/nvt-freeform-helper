@@ -468,28 +468,26 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         NotchTable table,
         IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> exportTypeOptions)
     {
-        var countsByVersion = table.Rows
-            .GroupBy(row => row.Version)
-            .ToDictionary(group => group.Key, group => group.Count());
-        var versions = new SortedSet<NotchAlgorithmVersion>(countsByVersion.Keys);
+        var rowVersions = table.Rows.Select(row => row.Version).ToList();
+        var pinnedVersions = new List<NotchAlgorithmVersion?>();
         foreach (var exportTypeOption in exportTypeOptions)
         {
             if (NotchExportFileTypeMetadata.TryGetPinnedVersion(exportTypeOption, out var pinnedVersion))
             {
-                versions.Add(pinnedVersion);
+                pinnedVersions.Add(pinnedVersion);
             }
         }
 
+        var catalog = NotchExportVersionPolicy.BuildCatalog(rowVersions, pinnedVersions);
         var options = new List<NotchExportVersionOption>
         {
             new NotchExportVersionOption(null, "All versions"),
         };
 
-        foreach (var version in versions)
+        foreach (var versionCount in catalog)
         {
-            countsByVersion.TryGetValue(version, out var count);
-            var display = $"{version.ToDisplayLabel()} ({count})";
-            options.Add(new NotchExportVersionOption(version, display));
+            var display = $"{versionCount.Version.ToDisplayLabel()} ({versionCount.Count})";
+            options.Add(new NotchExportVersionOption(versionCount.Version, display));
         }
 
         return options;
