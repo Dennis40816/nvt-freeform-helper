@@ -1,6 +1,5 @@
 using System.Globalization;
 using FreeformHelper.Application.Services;
-using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 
@@ -11,7 +10,7 @@ public sealed partial class FreeformHelperViewModel
     public bool CanRotateSelectedCadPads =>
         _cad is not null &&
         GetRotationTargetCadIds(_cad).Count > 0 &&
-        Math.Abs(NormalizeDxfRotationDegrees((double)DxfEditRotationDegrees)) > 1e-9;
+        Math.Abs(DxfEditRules.NormalizeRotationDegrees((double)DxfEditRotationDegrees)) > 1e-9;
 
     public string RotatedDxfEditBadgeTooltip =>
         FormattableString.Invariant($"Rotated pads: {RotatedCadPadCount}. Click to open geometry-rotation details.");
@@ -27,7 +26,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var rotationDegrees = NormalizeDxfRotationDegrees((double)DxfEditRotationDegrees);
+        var rotationDegrees = DxfEditRules.NormalizeRotationDegrees((double)DxfEditRotationDegrees);
         if (Math.Abs(rotationDegrees) < 1e-9)
         {
             SetStatus("DXF rotate: input a non-zero angle first.");
@@ -87,41 +86,18 @@ public sealed partial class FreeformHelperViewModel
 
         return SelectedDxfEditRotationScopeOption.Value switch
         {
-            DxfEditRotationScope.TargetLayer => ResolveRotationTargetLayerCadIds(cad, baselineCadIds),
-            _ => ResolveRotationSelectedCadIds(baselineCadIds),
+            DxfEditRotationScope.TargetLayer =>
+                DxfEditRules.ResolveRotationTargetLayerCadIds(cad, baselineCadIds, DxfEditRotationLayerName, IsCadPadEffectivelyHidden),
+            _ =>
+                DxfEditRules.ResolveRotationSelectedCadIds(_selectedCadIds, baselineCadIds, IsCadPadEffectivelyHidden),
         };
-    }
-
-    private HashSet<int> ResolveRotationSelectedCadIds(HashSet<int> baselineCadIds)
-    {
-        return _selectedCadIds
-            .Where(id => !IsCadPadEffectivelyHidden(id))
-            .Where(baselineCadIds.Contains)
-            .Distinct()
-            .ToHashSet();
-    }
-
-    private HashSet<int> ResolveRotationTargetLayerCadIds(CadPadSet cad, HashSet<int> baselineCadIds)
-    {
-        var targetLayerName = NormalizeDxfLayerName(DxfEditRotationLayerName);
-        if (string.IsNullOrWhiteSpace(targetLayerName))
-        {
-            return new HashSet<int>();
-        }
-
-        return cad.Pads
-            .Where(pad => baselineCadIds.Contains(pad.Id))
-            .Where(pad => !IsCadPadEffectivelyHidden(pad.Id))
-            .Where(pad => string.Equals(pad.Layer, targetLayerName, StringComparison.OrdinalIgnoreCase))
-            .Select(static pad => pad.Id)
-            .ToHashSet();
     }
 
     private string BuildRotateUnavailableStatus()
     {
         return SelectedDxfEditRotationScopeOption.Value switch
         {
-            DxfEditRotationScope.TargetLayer when string.IsNullOrWhiteSpace(NormalizeDxfLayerName(DxfEditRotationLayerName))
+            DxfEditRotationScope.TargetLayer when string.IsNullOrWhiteSpace(DxfEditRules.NormalizeLayerName(DxfEditRotationLayerName))
                 => "DXF rotate: select rotation layer first.",
             DxfEditRotationScope.TargetLayer
                 => "DXF rotate: selected layer has no visible baseline CAD pads.",
@@ -152,7 +128,7 @@ public sealed partial class FreeformHelperViewModel
                 continue;
             }
 
-            if (ArePolygonVerticesEquivalent(pad.Polygon, baselinePad.Polygon))
+            if (DxfEditRules.ArePolygonVerticesEquivalent(pad.Polygon, baselinePad.Polygon))
             {
                 updatedPads.Add(pad);
                 continue;
@@ -189,24 +165,6 @@ public sealed partial class FreeformHelperViewModel
         PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), "DXF restore CAD geometry");
     }
 
-    private Dictionary<int, ProjectCadGeometrySnapshot> CapturePersistedCadGeometryOverrides()
-    {
-        if (_cad is null || _cadEdit.BaselineCad is null)
-        {
-            return new Dictionary<int, ProjectCadGeometrySnapshot>();
-        }
-
-        var baselinePadsByCadId = _cadEdit.BaselineCad.Pads
-            .GroupBy(static pad => pad.Id)
-            .ToDictionary(static group => group.Key, static group => group.First());
-
-        return _cad.Pads
-            .Where(pad =>
-                baselinePadsByCadId.TryGetValue(pad.Id, out var baselinePad) &&
-                !ArePolygonVerticesEquivalent(baselinePad.Polygon, pad.Polygon))
-            .ToDictionary(static pad => pad.Id, ProjectCadGeometrySnapshot.FromCadPad);
-    }
-
     private void ApplyPersistedCadGeometryOverrides(Dictionary<int, ProjectCadGeometrySnapshot> geometryOverrides)
     {
         if (_cad is null || geometryOverrides.Count == 0)
@@ -228,42 +186,6 @@ public sealed partial class FreeformHelperViewModel
         }
 
         _cad = new CadPadSet(updatedPads);
-    }
-
-    private static double NormalizeDxfRotationDegrees(double rotationDegrees)
-    {
-        var normalized = rotationDegrees % 360.0;
-        if (normalized <= -180.0)
-        {
-            normalized += 360.0;
-        }
-        else if (normalized > 180.0)
-        {
-            normalized -= 360.0;
-        }
-
-        return Math.Abs(normalized) < 1e-9 ? 0.0 : normalized;
-    }
-
-    private static bool ArePolygonVerticesEquivalent(Polygon2 left, Polygon2 right, double epsilon = 1e-6)
-    {
-        if (left.Vertices.Length != right.Vertices.Length)
-        {
-            return false;
-        }
-
-        for (var index = 0; index < left.Vertices.Length; index++)
-        {
-            var leftVertex = left.Vertices[index];
-            var rightVertex = right.Vertices[index];
-            if (Math.Abs(leftVertex.X - rightVertex.X) > epsilon ||
-                Math.Abs(leftVertex.Y - rightVertex.Y) > epsilon)
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     partial void OnDxfEditRotationDegreesChanged(decimal value)

@@ -22,7 +22,7 @@ public sealed partial class FreeformHelperViewModel
     public bool CanCreateLayerAndMoveSelectedCadPads =>
         _cad is not null &&
         HasSelectedCadPadsForDxfEdit &&
-        !string.IsNullOrWhiteSpace(NormalizeDxfLayerName(DxfEditNewLayerName));
+        !string.IsNullOrWhiteSpace(DxfEditRules.NormalizeLayerName(DxfEditNewLayerName));
 
     public bool IsDxfEditRotationLayerScope => SelectedDxfEditRotationScopeOption.Value == DxfEditRotationScope.TargetLayer;
 
@@ -51,7 +51,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void MoveSelectedCadPadsToLayer()
     {
-        var targetLayerName = NormalizeDxfLayerName(DxfEditTargetLayerName);
+        var targetLayerName = DxfEditRules.NormalizeLayerName(DxfEditTargetLayerName);
         if (string.IsNullOrWhiteSpace(targetLayerName))
         {
             SetStatus("DXF edit: select target layer first.");
@@ -63,7 +63,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void CreateLayerAndMoveSelectedCadPads()
     {
-        var newLayerName = NormalizeDxfLayerName(DxfEditNewLayerName);
+        var newLayerName = DxfEditRules.NormalizeLayerName(DxfEditNewLayerName);
         if (string.IsNullOrWhiteSpace(newLayerName))
         {
             SetStatus("DXF edit: input new layer name first.");
@@ -172,16 +172,6 @@ public sealed partial class FreeformHelperViewModel
         FilterCadPadsByLayer();
 
         NotifyCadLayerAggregateStateChanged();
-    }
-
-    private static string NormalizeDxfLayerName(string? layerName)
-    {
-        if (string.IsNullOrWhiteSpace(layerName))
-        {
-            return string.Empty;
-        }
-
-        return layerName.Trim();
     }
 
     private void RefreshDxfEditLayerOptions(IReadOnlyList<string> layerNames)
