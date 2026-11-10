@@ -154,14 +154,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var baselineLayersByCadId = _cadEdit.BaselineCad.Pads
-            .GroupBy(static pad => pad.Id)
-            .ToDictionary(static group => group.Key, static group => group.First().Layer);
-        var relayeredCount = _cad.Pads.Count(pad =>
-            baselineLayersByCadId.TryGetValue(pad.Id, out var baselineLayer) &&
-            !string.Equals(baselineLayer, pad.Layer, StringComparison.OrdinalIgnoreCase));
-
-        RelayeredCadPadCount = relayeredCount;
+        RelayeredCadPadCount = DxfEditStateCapture.CountRelayeredPads(_cad, _cadEdit.BaselineCad);
         NotifyCadEditProjectionChange(nameof(HasRelayeredCadPads), previous.Relayered > 0, HasRelayeredCadPads);
         previous.Relayered = RelayeredCadPadCount;
         OnPropertyChanged(nameof(MovedDxfEditBadgeTooltip));
@@ -181,14 +174,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var baselinePadsByCadId = _cadEdit.BaselineCad.Pads
-            .GroupBy(static pad => pad.Id)
-            .ToDictionary(static group => group.Key, static group => group.First());
-        var rotatedCount = _cad.Pads.Count(pad =>
-            baselinePadsByCadId.TryGetValue(pad.Id, out var baselinePad) &&
-            !DxfEditRules.ArePolygonVerticesEquivalent(baselinePad.Polygon, pad.Polygon));
-
-        RotatedCadPadCount = rotatedCount;
+        RotatedCadPadCount = DxfEditStateCapture.CountRotatedPads(_cad, _cadEdit.BaselineCad);
         NotifyCadEditProjectionChange(nameof(HasRotatedCadPads), previous.Rotated > 0, HasRotatedCadPads);
         previous.Rotated = RotatedCadPadCount;
         OnPropertyChanged(nameof(RotatedDxfEditBadgeTooltip));
