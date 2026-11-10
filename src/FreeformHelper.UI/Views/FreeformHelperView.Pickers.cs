@@ -102,46 +102,14 @@ public sealed partial class FreeformHelperView
     /// <param name="storage">The <see cref="IStorageProvider"/> for file operations.</param>
     private void ConfigureFilePickers(FreeformHelperViewModel viewModel, IStorageProvider storage)
     {
-        // Delegate for opening a DXF file.
-        viewModel.PickOpenDxfPathAsync = async () =>
-        {
-            var res = await storage.OpenFilePickerAsync(FilePickerOptionFactory.OpenDxf());
-            return StoragePickerPaths.FirstLocalPath(res); // Return local path of selected file.
-        };
+        var pickers = new MainWindowFilePickerService(storage);
 
-        viewModel.PickOpenRegularVisibilityMaskPathAsync = async () =>
-        {
-            var res = await storage.OpenFilePickerAsync(FilePickerOptionFactory.OpenRegularVisibilityMask());
-            return StoragePickerPaths.FirstLocalPath(res);
-        };
-
-        // Delegate for loading a project file.
-        viewModel.PickLoadProjectPathAsync = async () =>
-        {
-            var res = await storage.OpenFilePickerAsync(FilePickerOptionFactory.OpenProject());
-            return StoragePickerPaths.FirstLocalPath(res);
-        };
-
-        // Delegate for saving a project file.
-        viewModel.PickSaveProjectPathAsync = async () =>
-        {
-            var res = await storage.SaveFilePickerAsync(FilePickerOptionFactory.SaveProject());
-            return StoragePickerPaths.LocalPath(res);
-        };
-
-        // Delegate for saving notch table files.
-        viewModel.PickSaveNotchPathAsync = async (baseName, ext) =>
-        {
-            var res = await storage.SaveFilePickerAsync(FilePickerOptionFactory.SaveNotch(baseName, ext));
-            return StoragePickerPaths.LocalPath(res);
-        };
-
-        // Delegate for saving generic export files (DXF, image, etc.).
-        viewModel.PickSaveExportPathAsync = async (baseName, ext) =>
-        {
-            var res = await storage.SaveFilePickerAsync(FilePickerOptionFactory.SaveExport(baseName, ext));
-            return StoragePickerPaths.LocalPath(res);
-        };
+        viewModel.PickOpenDxfPathAsync = pickers.OpenDxfAsync;
+        viewModel.PickOpenRegularVisibilityMaskPathAsync = pickers.OpenRegularVisibilityMaskAsync;
+        viewModel.PickLoadProjectPathAsync = pickers.OpenProjectAsync;
+        viewModel.PickSaveProjectPathAsync = pickers.SaveProjectAsync;
+        viewModel.PickSaveNotchPathAsync = pickers.SaveNotchAsync;
+        viewModel.PickSaveExportPathAsync = pickers.SaveExportAsync;
 
         // Delegates for the project save/load confirmation dialogs.
         viewModel.ConfirmEmbedDxfAsync = () => ProjectDialogPrompts.ConfirmEmbedDxfAsync(TopLevel.GetTopLevel(this) as Window);
