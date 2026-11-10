@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 using System.Collections.Concurrent;
-using System.Text.Json.Nodes;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
+using static FreeformHelper.Tests.ViewModelPropertyTestHarness;
 
 namespace FreeformHelper.Tests;
 
@@ -71,14 +71,7 @@ public sealed class IndexMappingTuningPropertyTests
     [MemberData(nameof(PropertyNames))]
     public void Set_SameValue_RaisesNothing(string name)
     {
-        var vm = new FreeformHelperViewModel();
-        var raised = new ConcurrentQueue<string?>();
-        vm.PropertyChanging += (_, args) => raised.Enqueue(args.PropertyName);
-        vm.PropertyChanged += (_, args) => raised.Enqueue(args.PropertyName);
-
-        Write(vm, name, Read(vm, name));
-
-        Assert.Empty(raised);
+        AssertSameValueRaisesNothing(vm => Write(vm, name, Read(vm, name)));
     }
 
     [Theory]
@@ -96,40 +89,21 @@ public sealed class IndexMappingTuningPropertyTests
     [AvaloniaFact]
     public async Task SaveLoadSave_ChangedValues_WritesTheSameProjectFileExceptTheSaveTime()
     {
-        using var files = new LoadingModeTestScope();
-        await files.SaveAsync(saved =>
-        {
-            saved.MappingWeightIou = 0.41m;
-            saved.MappingWeightCentroidDistance = 0.32m;
-            saved.MappingWeightAreaRatio = 0.27m;
-            saved.MappingLowConfidenceThreshold = 0.55m;
-            saved.MappingAmbiguousMargin = 0.07m;
-            saved.MappingCandidateNumber = 17m;
-        });
-        var first = await ReadWithoutSavedAtAsync(files.PathFor("project.json"));
-        var vm = files.CreateViewModel();
-        var secondPath = files.PathFor("project-second.json");
-        vm.PickSaveProjectPathAsync = () => Task.FromResult<string?>(secondPath);
-
-        var result = await vm.LoadProjectFromPathAsync(files.PathFor("project.json"));
-        Assert.True(result.IsLoaded);
-        Assert.Equal(0.41m, vm.MappingWeightIou);
-        Assert.Equal(17m, vm.MappingCandidateNumber);
-        Assert.False(vm.HasUnsavedChanges);
-        Assert.True(await vm.SaveProjectAsync());
-
-        var second = await ReadWithoutSavedAtAsync(secondPath);
-        Assert.Equal(first, second);
-    }
-
-    // The save time is the only member that differs between two saves of the same state.
-    private static async Task<string> ReadWithoutSavedAtAsync(string projectFilePath)
-    {
-        await using var stream = File.OpenRead(projectFilePath);
-        var root = (await JsonNode.ParseAsync(stream))!.AsObject();
-        var key = root.Select(member => member.Key).Single(name => string.Equals(name, "SavedAt", StringComparison.OrdinalIgnoreCase));
-        root.Remove(key);
-        return root.ToJsonString();
+        await AssertProjectRoundTripAsync(
+            saved =>
+            {
+                saved.MappingWeightIou = 0.41m;
+                saved.MappingWeightCentroidDistance = 0.32m;
+                saved.MappingWeightAreaRatio = 0.27m;
+                saved.MappingLowConfidenceThreshold = 0.55m;
+                saved.MappingAmbiguousMargin = 0.07m;
+                saved.MappingCandidateNumber = 17m;
+            },
+            vm =>
+            {
+                Assert.Equal(0.41m, vm.MappingWeightIou);
+                Assert.Equal(17m, vm.MappingCandidateNumber);
+            });
     }
 
     private static Dictionary<string, decimal> ReadAll(FreeformHelperViewModel vm) =>
