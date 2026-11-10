@@ -1,3 +1,4 @@
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 
@@ -76,7 +77,7 @@ public sealed partial class PadCanvas
         public CadSpatialIndex(IReadOnlyList<CadPad> pads)
         {
             _allPads = pads;
-            _bounds = BuildBounds(pads);
+            _bounds = PadSpatialQueryPolicy.BuildBounds(pads);
 
             if (pads.Count == 0 || _bounds.Width <= EdgeEpsilon || _bounds.Height <= EdgeEpsilon)
             {
@@ -200,22 +201,6 @@ public sealed partial class PadCanvas
             }
         }
 
-        private static Rect2 BuildBounds(IReadOnlyList<CadPad> pads)
-        {
-            if (pads.Count == 0)
-            {
-                return new Rect2(0, 0, 0, 0);
-            }
-
-            var bounds = pads[0].Bounds;
-            for (var i = 1; i < pads.Count; i++)
-            {
-                bounds = Rect2.Union(bounds, pads[i].Bounds);
-            }
-
-            return bounds;
-        }
-
         private void AddBucketPad(int row, int col, CadPad pad)
         {
             var idx = (row * _cols) + col;
@@ -229,47 +214,9 @@ public sealed partial class PadCanvas
             bucket.Add(pad);
         }
 
-        private int GetColumn(double x)
-        {
-            if (_cols <= 1)
-            {
-                return 0;
-            }
+        private int GetColumn(double x) => PadSpatialQueryPolicy.GetColumn(x, _bounds, _cols, _cellWidth);
 
-            if (x <= _bounds.MinX)
-            {
-                return 0;
-            }
-
-            if (x >= _bounds.MaxX)
-            {
-                return _cols - 1;
-            }
-
-            var normalized = (x - _bounds.MinX) / _cellWidth;
-            return Math.Clamp((int)Math.Floor(normalized), 0, _cols - 1);
-        }
-
-        private int GetRow(double y)
-        {
-            if (_rows <= 1)
-            {
-                return 0;
-            }
-
-            if (y <= _bounds.MinY)
-            {
-                return 0;
-            }
-
-            if (y >= _bounds.MaxY)
-            {
-                return _rows - 1;
-            }
-
-            var normalized = (y - _bounds.MinY) / _cellHeight;
-            return Math.Clamp((int)Math.Floor(normalized), 0, _rows - 1);
-        }
+        private int GetRow(double y) => PadSpatialQueryPolicy.GetRow(y, _bounds, _rows, _cellHeight);
     }
 
     /// <summary>
@@ -278,7 +225,6 @@ public sealed partial class PadCanvas
     /// </summary>
     internal sealed class RegularSpatialIndex
     {
-        private const double EdgeEpsilon = 1e-6;
         // Internal 2D array representing the grid of pads.
         private readonly RegularPad?[,] _grid;
         // Arrays storing the X-coordinates of the vertical grid lines (column edges).
@@ -347,7 +293,8 @@ public sealed partial class PadCanvas
                 rowMax[r] = Math.Max(rowMax[r], b.MaxY);
             }
 
-            SupportsExactQueries = ValidateSeparableGrid(pads, minRow, minCol, colMin, colMax, rowMin, rowMax);
+            SupportsExactQueries = PadSpatialQueryPolicy.ValidateSeparableGrid(
+                pads, minRow, minCol, colMin, colMax, rowMin, rowMax);
 
             // Build _xEdges: The left edge of each column (colMin) and the right edge of the last column (colMax).
             _xEdges[0] = colMin[0];
@@ -364,37 +311,6 @@ public sealed partial class PadCanvas
                 _yEdges[r] = rowMin[r];
             }
             _yEdges[Rows] = rowMax[Rows - 1]; // Last edge is the top edge of the last row.
-        }
-
-        private static bool ValidateSeparableGrid(
-            IReadOnlyList<RegularPad> pads,
-            int minRow,
-            int minCol,
-            double[] colMin,
-            double[] colMax,
-            double[] rowMin,
-            double[] rowMax)
-        {
-            foreach (var pad in pads)
-            {
-                var r = pad.Row - minRow;
-                var c = pad.Col - minCol;
-                if ((uint)r >= (uint)rowMin.Length || (uint)c >= (uint)colMin.Length)
-                {
-                    return false;
-                }
-
-                var bounds = pad.Bounds;
-                if (Math.Abs(bounds.MinX - colMin[c]) > EdgeEpsilon ||
-                    Math.Abs(bounds.MaxX - colMax[c]) > EdgeEpsilon ||
-                    Math.Abs(bounds.MinY - rowMin[r]) > EdgeEpsilon ||
-                    Math.Abs(bounds.MaxY - rowMax[r]) > EdgeEpsilon)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -449,55 +365,10 @@ public sealed partial class PadCanvas
             }
         }
 
-        /// <summary>
-        /// Finds the bucket (cell index) within a set of sorted edges that contains a given value.
-        /// </summary>
-        /// <param name="edges">Sorted array of edge coordinates.</param>
-        /// <param name="v">The value to locate.</param>
-        /// <returns>The index of the bucket, or -1 if the value is outside the range of edges.</returns>
-        private static int FindBucket(double[] edges, double v)
-        {
-            // Returns i such that edges[i] <= v <= edges[i+1].
-            if (v < edges[0] || v > edges[^1]) return -1; // Value is outside the total range.
+        private static int FindBucket(double[] edges, double v) => PadSpatialQueryPolicy.FindBucket(edges, v);
 
-            var idx = Array.BinarySearch(edges, v);
-            if (idx >= 0)
-            {
-                // If value is exactly on an edge, prefer the bucket to its left (for discrete indexing).
-                // Handle the case where it's the very last edge specifically.
-                return Math.Clamp(idx == edges.Length - 1 ? idx - 1 : idx, 0, edges.Length - 2);
-            }
+        private static int FindFirstCell(double[] edges, double min) => PadSpatialQueryPolicy.FindFirstCell(edges, min);
 
-            // If not exact match, bitwise complement of 'idx' gives insertion point.
-            // This insertion point is effectively the right edge of the bucket containing 'v'.
-            idx = ~idx;
-            return Math.Clamp(idx - 1, 0, edges.Length - 2);
-        }
-
-        /// <summary>
-        /// Finds the first cell (inclusive) in the grid along an axis that is intersected by a given minimum coordinate.
-        /// </summary>
-        private static int FindFirstCell(double[] edges, double min)
-        {
-            if (min <= edges[0]) return 0; // If min is before or at the first edge, it's the first cell.
-            if (min >= edges[^1]) return edges.Length - 2; // If min is beyond the last edge, it's the last cell.
-
-            var idx = Array.BinarySearch(edges, min);
-            if (idx < 0) idx = ~idx; // If not found, get insertion point.
-            return Math.Clamp(idx - 1, 0, edges.Length - 2); // Return the cell index.
-        }
-
-        /// <summary>
-        /// Finds the last cell (inclusive) in the grid along an axis that is intersected by a given maximum coordinate.
-        /// </summary>
-        private static int FindLastCell(double[] edges, double max)
-        {
-            if (max <= edges[0]) return 0; // If max is before or at the first edge, it's the first cell.
-            if (max >= edges[^1]) return edges.Length - 2; // If max is beyond the last edge, it's the last cell.
-
-            var idx = Array.BinarySearch(edges, max);
-            if (idx < 0) idx = ~idx - 1; // If not found, get insertion point and adjust for 'last' cell.
-            return Math.Clamp(idx, 0, edges.Length - 2); // Return the cell index.
-        }
+        private static int FindLastCell(double[] edges, double max) => PadSpatialQueryPolicy.FindLastCell(edges, max);
     }
 }
