@@ -62,34 +62,6 @@
       "symbol": "FreeformHelper.Infrastructure.Project.UiViewSnapshot"
     },
     {
-      "kind": "file",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "axamlCodeBehindLines": 151
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/App.axaml.cs"
-      ],
-      "contentHash": "6b830d7f1cbbead6407a87126d2370112e02232d75a5f00cfd05947791bf8dd2",
-      "project": "FreeformHelper.UI",
-      "symbol": "file:FreeformHelper.UI.App"
-    },
-    {
-      "kind": "member",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "methodLines": 115
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/App.axaml.cs"
-      ],
-      "contentHash": "cfbe2c30b1c172a551e63b0e559f5d48d966ff801d2d09ebcaba9fceba485e6a",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.App.OnFrameworkInitializationCompleted()"
-    },
-    {
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
