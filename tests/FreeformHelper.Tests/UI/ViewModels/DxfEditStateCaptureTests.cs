@@ -199,6 +199,52 @@ public sealed class DxfEditStateCaptureTests
         }
     }
 
+    [Fact]
+    public void RelayeredCountIgnoresCaseOnlyChangesAndPadsAbsentFromBaseline()
+    {
+        var baseline = new CadPadSet([CreatePad(1), CreatePad(2), CreatePad(3)]);
+        var cad = new CadPadSet([CreatePad(1, "original"), CreatePad(2, "Moved"), CreatePad(4, "Moved")]);
+
+        Assert.Equal(1, DxfEditStateCapture.CountRelayeredPads(cad, baseline));
+    }
+
+    [Fact]
+    public void RelayeredCountMatchesCapturedLayerOverrides()
+    {
+        var baseline = new CadPadSet([CreatePad(1), CreatePad(2), CreatePad(3)]);
+        var cad = new CadPadSet([CreatePad(1, "A"), CreatePad(2), CreatePad(3, "B")]);
+
+        Assert.Equal(
+            DxfEditStateCapture.CapturePersistedCadLayerOverrides(cad, baseline).Count,
+            DxfEditStateCapture.CountRelayeredPads(cad, baseline));
+    }
+
+    [Fact]
+    public void RotatedCountCountsOnlyPadsWithChangedPolygonThatExistInBaseline()
+    {
+        var baseline = new CadPadSet([CreatePad(1), CreatePad(2), CreatePad(3)]);
+        var cad = new CadPadSet([CreatePad(1), CreateRotatedPad(2), CreateRotatedPad(4)]);
+
+        Assert.Equal(1, DxfEditStateCapture.CountRotatedPads(cad, baseline));
+    }
+
+    [Fact]
+    public void RotatedCountMatchesCapturedGeometryOverrides()
+    {
+        var baseline = new CadPadSet([CreatePad(1), CreatePad(2)]);
+        var cad = new CadPadSet([CreateRotatedPad(1), CreateRotatedPad(2)]);
+
+        Assert.Equal(
+            DxfEditStateCapture.CapturePersistedCadGeometryOverrides(cad, baseline).Count,
+            DxfEditStateCapture.CountRotatedPads(cad, baseline));
+    }
+
+    private static CadPad CreateRotatedPad(int id)
+        => new(id, $"Pad {id}", "Original", new Polygon2(
+        [
+            new Point2(0, 0), new Point2(1, 0), new Point2(1, 2), new Point2(0, 2),
+        ]));
+
     private static CadPad CreatePad(int id, string layer = "Original")
         => new(id, $"Pad {id}", layer, new Polygon2(
         [

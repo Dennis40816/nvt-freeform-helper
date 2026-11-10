@@ -14,15 +14,40 @@ internal static class DxfEditStateCapture
             return new Dictionary<int, string>();
         }
 
+        return EnumerateRelayeredPads(cad, baselineCad)
+            .ToDictionary(static pad => pad.Id, static pad => pad.Layer);
+    }
+
+    internal static int CountRelayeredPads(CadPadSet cad, CadPadSet baselineCad)
+    {
+        return EnumerateRelayeredPads(cad, baselineCad).Count();
+    }
+
+    internal static int CountRotatedPads(CadPadSet cad, CadPadSet baselineCad)
+    {
+        return EnumerateRotatedPads(cad, baselineCad).Count();
+    }
+
+    private static IEnumerable<CadPad> EnumerateRelayeredPads(CadPadSet cad, CadPadSet baselineCad)
+    {
         var baselineLayersByCadId = baselineCad.Pads
             .GroupBy(static pad => pad.Id)
             .ToDictionary(static group => group.Key, static group => group.First().Layer);
 
-        return cad.Pads
-            .Where(pad =>
-                baselineLayersByCadId.TryGetValue(pad.Id, out var baselineLayer) &&
-                !string.Equals(baselineLayer, pad.Layer, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(static pad => pad.Id, static pad => pad.Layer);
+        return cad.Pads.Where(pad =>
+            baselineLayersByCadId.TryGetValue(pad.Id, out var baselineLayer) &&
+            !string.Equals(baselineLayer, pad.Layer, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static IEnumerable<CadPad> EnumerateRotatedPads(CadPadSet cad, CadPadSet baselineCad)
+    {
+        var baselinePadsByCadId = baselineCad.Pads
+            .GroupBy(static pad => pad.Id)
+            .ToDictionary(static group => group.Key, static group => group.First());
+
+        return cad.Pads.Where(pad =>
+            baselinePadsByCadId.TryGetValue(pad.Id, out var baselinePad) &&
+            !DxfEditRules.ArePolygonVerticesEquivalent(baselinePad.Polygon, pad.Polygon));
     }
 
     internal static List<ProjectDxfCombinedCadGroup> CapturePersistedCombinedCadGroups(
@@ -98,14 +123,7 @@ internal static class DxfEditStateCapture
             return new Dictionary<int, ProjectCadGeometrySnapshot>();
         }
 
-        var baselinePadsByCadId = baselineCad.Pads
-            .GroupBy(static pad => pad.Id)
-            .ToDictionary(static group => group.Key, static group => group.First());
-
-        return cad.Pads
-            .Where(pad =>
-                baselinePadsByCadId.TryGetValue(pad.Id, out var baselinePad) &&
-                !DxfEditRules.ArePolygonVerticesEquivalent(baselinePad.Polygon, pad.Polygon))
+        return EnumerateRotatedPads(cad, baselineCad)
             .ToDictionary(static pad => pad.Id, ProjectCadGeometrySnapshot.FromCadPad);
     }
 }
