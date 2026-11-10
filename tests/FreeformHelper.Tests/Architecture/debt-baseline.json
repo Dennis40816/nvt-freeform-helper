@@ -10,7 +10,7 @@
     "directClockReads": 0,
     "bareCatch": 0,
     "catchException": 1,
-    "suppressFlagFields": 4,
+    "suppressFlagFields": 2,
     "freeformViewModelStateMembers": 69,
     "shellNavigationBooleans": 0,
     "noWarnIds": 1
@@ -34,7 +34,6 @@
     ],
     "suppressFlagFields": [
       "src/FreeformHelper.UI/ViewModels/NotchExportSelectionViewModel.cs:65",
-      "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:15", "src/FreeformHelper.UI/ViewModels/SettingsWindowViewModel.cs:16",
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:16"
     ],
     "freeformViewModelStateMembers": [
