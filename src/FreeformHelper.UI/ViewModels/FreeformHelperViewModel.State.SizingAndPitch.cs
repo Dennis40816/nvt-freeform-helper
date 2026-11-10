@@ -9,7 +9,12 @@ public sealed partial class FreeformHelperViewModel
 
     // The manual sizing inputs are stored once. The properties below forward to the record and raise
     // the same notifications and callbacks as the stored properties they replaced.
-    private ManualSizingInput _manualSizingInput = ManualSizingInput.Initial;
+    private readonly ManualSizingState _manualSizing = new();
+    private ManualSizingInput _manualSizingInput
+    {
+        get => _manualSizing.Input;
+        set => _manualSizing.Input = value;
+    }
 
     /// <summary>
     /// Gets or sets the pending width value for manual column/pad sizing.
@@ -168,18 +173,16 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
-    private string _manualRangeError = string.Empty;
-
     /// <summary>
     /// Gets or sets an error message for invalid manual range input.
     /// </summary>
     public string ManualRangeError
     {
-        get => _manualRangeError;
+        get => _manualSizing.RangeError;
         set
         {
             var hadError = HasManualRangeError;
-            if (SetProperty(ref _manualRangeError, value) && hadError != HasManualRangeError)
+            if (SetProperty(ref _manualSizing.RangeError, value) && hadError != HasManualRangeError)
             {
                 OnPropertyChanged(nameof(HasManualRangeError));
             }
@@ -190,7 +193,7 @@ public sealed partial class FreeformHelperViewModel
     /// Gets a value indicating whether there is an error in the manual range input.
     /// The value follows <see cref="ManualRangeError"/>.
     /// </summary>
-    public bool HasManualRangeError => !string.IsNullOrEmpty(_manualRangeError);
+    public bool HasManualRangeError => !string.IsNullOrEmpty(_manualSizing.RangeError);
 
     // --- Derived Read-Only Properties ---
 

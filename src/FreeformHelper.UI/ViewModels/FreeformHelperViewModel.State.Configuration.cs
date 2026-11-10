@@ -47,7 +47,12 @@ public sealed partial class FreeformHelperViewModel
     // The grid, coordinate, active area, panel offset and match settings are stored once. The properties
     // below forward to the record and raise the same notifications and callbacks as the stored properties
     // they replaced.
-    private GridAndMatchSettings _gridAndMatch = GridAndMatchSettings.Initial;
+    private readonly CalculationAndPreviewState _calculationAndPreview = new();
+    private GridAndMatchSettings _gridAndMatch
+    {
+        get => _calculationAndPreview.GridAndMatch;
+        set => _calculationAndPreview.GridAndMatch = value;
+    }
 
     /// <summary>
     /// Gets or sets the number of X channels (columns) in the grid.
@@ -511,7 +516,11 @@ public sealed partial class FreeformHelperViewModel
     /// Holds the index mapping numbers. The view model replaces the whole value. The properties
     /// below forward to it and raise their change notification when their own value changed.
     /// </summary>
-    private IndexMappingTuning _indexMappingTuning = IndexMappingTuning.Initial;
+    private IndexMappingTuning _indexMappingTuning
+    {
+        get => _calculationAndPreview.IndexMappingTuning;
+        set => _calculationAndPreview.IndexMappingTuning = value;
+    }
     /// <summary>
     /// Gets or sets the IoU weight used for DXF/Regular mapping scoring.
     /// </summary>
