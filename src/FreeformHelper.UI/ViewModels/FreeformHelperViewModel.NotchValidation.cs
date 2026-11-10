@@ -191,28 +191,13 @@ public sealed partial class FreeformHelperViewModel
         return null;
     }
 
-    private static string FormatPercent(double value)
-    {
-        return value.ToString("0.##", CultureInfo.InvariantCulture);
-    }
-
-    private static string FormatAreaText(double area)
-    {
-        if (double.IsNaN(area) || double.IsInfinity(area))
-        {
-            return "-";
-        }
-
-        return area.ToString("0.###", CultureInfo.InvariantCulture);
-    }
-
     private static NotchValidationDisplayItem ToDisplayItem(NotchValidationTraceRow row)
     {
         var ratioText = row.RatioPercent.HasValue
-            ? $"{FormatPercent(row.RatioPercent.Value)}%"
+            ? $"{NotchValueText.FormatPercent(row.RatioPercent.Value)}%"
             : "-";
         var areaText = row.EffectiveArea.HasValue
-            ? FormatAreaText(row.EffectiveArea.Value)
+            ? NotchValueText.FormatAreaText(row.EffectiveArea.Value)
             : "-";
 
         return new NotchValidationDisplayItem(
