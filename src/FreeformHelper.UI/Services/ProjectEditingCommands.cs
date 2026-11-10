@@ -10,9 +10,19 @@ namespace FreeformHelper.UI.Services;
 public sealed class ProjectEditingCommands : ObservableObject
 {
     private readonly List<IRelayCommand> _commands = [];
+    private readonly Func<bool>? _isProjectEditingEnabled;
     private FreeformHelperViewModel? _project;
 
-    public bool IsProjectEditingEnabled => _project?.IsProjectEditingEnabled ?? true;
+    public ProjectEditingCommands()
+    {
+    }
+
+    internal ProjectEditingCommands(Func<bool> isProjectEditingEnabled)
+    {
+        _isProjectEditingEnabled = isProjectEditingEnabled;
+    }
+
+    public bool IsProjectEditingEnabled => _isProjectEditingEnabled?.Invoke() ?? _project?.IsProjectEditingEnabled ?? true;
 
     internal void AttachProject(FreeformHelperViewModel? project)
     {
@@ -55,12 +65,31 @@ public sealed class ProjectEditingCommands : ObservableObject
         return command;
     }
 
+    internal AsyncRelayCommand CreateAsyncCommand(Func<Task> execute)
+    {
+        var command = new AsyncRelayCommand(
+            () => IsProjectEditingEnabled ? execute() : Task.CompletedTask,
+            () => IsProjectEditingEnabled);
+        _commands.Add(command);
+        return command;
+    }
+
+    internal AsyncRelayCommand CreateAsyncCommand(Func<Task<bool>> execute)
+    {
+        // Preserve the result task so shortcut callers can display the result of this execution.
+        var command = new AsyncRelayCommand(
+            () => IsProjectEditingEnabled ? execute() : Task.FromResult(false),
+            () => IsProjectEditingEnabled);
+        _commands.Add(command);
+        return command;
+    }
+
     private void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(FreeformHelperViewModel.IsProjectEditingEnabled)) NotifyAvailabilityChanged();
     }
 
-    private void NotifyAvailabilityChanged()
+    internal void NotifyAvailabilityChanged()
     {
         OnPropertyChanged(nameof(IsProjectEditingEnabled));
         foreach (var command in _commands) command.NotifyCanExecuteChanged();
