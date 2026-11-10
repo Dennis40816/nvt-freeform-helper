@@ -84,7 +84,7 @@
           </StackPanel>
         </Border>
       </Border>
-      <views:SimulationWorkspaceView IsVisible="{Binding HasUsableWorkspace}"
+      <views:SimulationWorkspaceView IsVisible="{Binding $parent[views:SimulationHostView].DataContext.HasUsableWorkspace}"
           MinHeight="0"
           MinWidth="0"
           DataContext="{Binding CurrentWorkspace}"/>
