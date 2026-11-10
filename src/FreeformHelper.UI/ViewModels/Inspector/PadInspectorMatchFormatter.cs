@@ -60,22 +60,11 @@ internal static class PadInspectorMatchFormatter
     {
         if (regularIds.Count == 0)
         {
-            return "Unmatched";
+            return PadMatchTextFormatter.CadMatchText(regularIds, Array.Empty<int>(), getRegularPadIcDiff);
         }
 
-        var ordered = links
-            .Select(link => link.RegularPadId)
-            .Concat(regularIds)
-            .Distinct()
-            .ToList();
-        var bestRegularId = ordered[0];
-        var bestText = BuildRegularMatchKey(bestRegularId, getRegularPadIcDiff);
-        if (ordered.Count == 1)
-        {
-            return bestText;
-        }
-
-        return $"{bestText} (+{ordered.Count - 1})";
+        return PadMatchTextFormatter.CadMatchText(
+            regularIds, links.Select(link => link.RegularPadId), getRegularPadIcDiff);
     }
 
     internal static string BuildCadMatchDetailsText(
@@ -114,16 +103,6 @@ internal static class PadInspectorMatchFormatter
         return string.Join(Environment.NewLine, lines);
     }
 
-    internal static string BuildRegularMatchKey(
-        int regularPadId,
-        Func<int, (int IcIndex, int DiffIndex)?>? getRegularPadIcDiff)
-    {
-        var match = getRegularPadIcDiff?.Invoke(regularPadId);
-        return match.HasValue
-            ? $"IC{match.Value.IcIndex + 1}/diff{match.Value.DiffIndex}"
-            : $"regId {regularPadId}";
-    }
-
     internal static string BuildRegularMatchDetail(
         int regularPadId,
         Func<int, (int IcIndex, int DiffIndex)?>? getRegularPadIcDiff)
@@ -140,7 +119,7 @@ internal static class PadInspectorMatchFormatter
     {
         if (cadIds.Count == 0)
         {
-            return "Unmatched";
+            return PadMatchTextFormatter.RegularMatchText(cadIds, Array.Empty<int>());
         }
 
         var dxfIndices = matchedCadDetails
@@ -151,14 +130,7 @@ internal static class PadInspectorMatchFormatter
             .OrderBy(index => index)
             .ToList();
 
-        var cadListText = BuildCompactList(cadIds);
-        if (dxfIndices.Count > 0)
-        {
-            var dxfListText = BuildCompactList(dxfIndices);
-            return $"CAD idx {dxfListText} (CAD id {cadListText})";
-        }
-
-        return $"CAD id {cadListText}";
+        return PadMatchTextFormatter.RegularMatchText(cadIds, dxfIndices);
     }
 
     internal static string BuildRegularMatchDetailsText(
@@ -200,20 +172,5 @@ internal static class PadInspectorMatchFormatter
         }
 
         return string.Join(Environment.NewLine, lines);
-    }
-
-    internal static string BuildCompactList(IReadOnlyList<int> values)
-    {
-        if (values.Count == 0)
-        {
-            return "-";
-        }
-
-        if (values.Count <= 3)
-        {
-            return string.Join(", ", values);
-        }
-
-        return $"{values[0]}, {values[1]}, {values[2]} (+{values.Count - 3})";
     }
 }

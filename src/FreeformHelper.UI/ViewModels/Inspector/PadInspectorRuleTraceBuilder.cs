@@ -170,7 +170,7 @@ internal static class PadInspectorRuleTraceBuilder
 
         var ownersText = parsed.OwnerCadPadIds.Count == 0
             ? "-"
-            : PadInspectorMatchFormatter.BuildCompactList(parsed.OwnerCadPadIds);
+            : PadMatchTextFormatter.CompactList(parsed.OwnerCadPadIds);
 
         return $"To Full ratio: {ratioText}{Environment.NewLine}" +
                $"Switch: {switchText}{Environment.NewLine}" +

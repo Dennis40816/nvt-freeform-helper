@@ -52,7 +52,7 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
     {
         if (cadIds.Count == 0)
         {
-            return "Unmatched";
+            return PadMatchTextFormatter.RegularMatchText(cadIds, Array.Empty<int>());
         }
 
         var dxfIndices = cadIds
@@ -63,14 +63,7 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
             .OrderBy(index => index)
             .ToList();
 
-        var cadListText = PadInfoTextFormatter.CompactList(cadIds);
-        if (dxfIndices.Count > 0)
-        {
-            var dxfListText = PadInfoTextFormatter.CompactList(dxfIndices);
-            return $"CAD idx {dxfListText} (CAD id {cadListText})";
-        }
-
-        return $"CAD id {cadListText}";
+        return PadMatchTextFormatter.RegularMatchText(cadIds, dxfIndices);
     }
 
     private static string BuildRegularMatchDetailsText(
