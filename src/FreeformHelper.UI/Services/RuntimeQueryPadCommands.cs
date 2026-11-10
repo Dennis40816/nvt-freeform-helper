@@ -3,11 +3,54 @@ using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 
-internal sealed partial class RuntimeQueryUseCase
+/// <summary>
+/// Runtime query command that returns one pad snapshot, by CAD id or by regular pad id.
+/// </summary>
+internal sealed class RuntimeQueryPadCommands
 {
+    private readonly RuntimeQueryContext _context;
+
+    public RuntimeQueryPadCommands(RuntimeQueryContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    /// <summary>Adds the commands of this group to the registry.</summary>
+    /// <param name="registry">The registry that receives the handlers.</param>
+    public void Register(RuntimeQueryCommandRegistry registry)
+    {
+        registry.AddSync("pad", QueryPad);
+    }
+
+    private RuntimeQueryResponseEnvelope QueryPad(IReadOnlyDictionary<string, string>? args)
+    {
+        var hasCadId = RuntimeQueryArgumentParser.TryGetIntArg(args, "cad-id", 0, int.MaxValue, out var cadPadId, out var cadError);
+        if (cadError is not null)
+        {
+            return cadError;
+        }
+
+        var hasRegularId = RuntimeQueryArgumentParser.TryGetIntArg(args, "regular-id", 0, int.MaxValue, out var regularPadId, out var regularError);
+        if (regularError is not null)
+        {
+            return regularError;
+        }
+
+        if (hasCadId == hasRegularId)
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Use exactly one of --cad-id or --regular-id.");
+        }
+
+        return hasCadId
+            ? QueryCadPad(cadPadId)
+            : QueryRegularPad(regularPadId);
+    }
+
     private RuntimeQueryResponseEnvelope QueryCadPad(int cadPadId)
     {
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         var snapshot = helper.BuildCadPadInspectorSnapshot(cadPadId);
         if (snapshot?.Cad is not CadPadInspectorSnapshot cad)
         {
@@ -164,7 +207,7 @@ internal sealed partial class RuntimeQueryUseCase
 
     private RuntimeQueryResponseEnvelope QueryRegularPad(int regularPadId)
     {
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         var snapshot = helper.BuildRegularPadInspectorSnapshot(regularPadId);
         if (snapshot?.Regular is not RegularPadInspectorSnapshot regular)
         {

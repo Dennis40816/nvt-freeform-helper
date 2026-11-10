@@ -4,26 +4,78 @@ using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 
-internal sealed partial class RuntimeQueryUseCase
+/// <summary>
+/// Runtime query commands that return the Simulation workspace state and export the Step 5 notch table to a file.
+/// </summary>
+internal sealed class RuntimeQueryOutputCommands
 {
-    private RuntimeQueryResponseEnvelope QuerySetToFull(IReadOnlyDictionary<string, string>? args)
+    private readonly RuntimeQueryContext _context;
+
+    public RuntimeQueryOutputCommands(RuntimeQueryContext context)
     {
-        if (!RuntimeQueryArgumentParser.TryGetBoolArg(args, "enable", out var enable, out var error) || error is not null)
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    /// <summary>Adds the commands of this group to the registry.</summary>
+    /// <param name="registry">The registry that receives the handlers.</param>
+    public void Register(RuntimeQueryCommandRegistry registry)
+    {
+        registry.Add("simulation", QuerySimulationAsync);
+        registry.Add("export-notch", QueryExportNotchAsync);
+    }
+
+    private async Task<RuntimeQueryResponseEnvelope> QuerySimulationAsync(IReadOnlyDictionary<string, string>? args)
+    {
+        var hasRegularId = RuntimeQueryArgumentParser.TryGetIntArg(args, "regular-id", 0, int.MaxValue, out var regularPadId, out var regularIdError);
+        if (regularIdError is not null)
         {
-            return error ?? RuntimeQueryResponseEnvelope.Failure(
-                code: "INVALID_ARGUMENTS",
-                message: "Argument '--enable' is required for query set-tofull.");
+            return regularIdError;
         }
 
-        var helper = _shellViewModel.FreeformHelper;
-        helper.EnableToFull = enable;
-        var workflow = helper.GetWorkflowStateSnapshot();
+        var simulation = _context.Shell.Simulation;
+        var workspace = simulation.CurrentWorkspace;
+        if (workspace is null)
+        {
+            var buildFailure = await RuntimeQueryCommandOperation.RunAsync(
+                simulation.EnsureWorkspaceAsync,
+                "BUILD_FAILED",
+                ex => $"Simulation workspace build failed: {ex.Message}");
+            if (buildFailure is not null)
+            {
+                return buildFailure;
+            }
+
+            workspace = simulation.CurrentWorkspace;
+        }
+
+        if (workspace is null)
+        {
+            var detail = string.IsNullOrWhiteSpace(simulation.BuildFailureText)
+                ? "Simulation workspace is not ready for current workflow state."
+                : simulation.BuildFailureText;
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "NOT_READY",
+                message: $"Simulation workspace is not ready. {detail}");
+        }
+
+        object? regular = null;
+        if (hasRegularId)
+        {
+            if (!workspace.TryGetRegularQuerySnapshot(regularPadId, out var snapshot))
+            {
+                return RuntimeQueryResponseEnvelope.Failure(
+                    code: "PAD_NOT_FOUND",
+                    message: $"Regular pad {regularPadId} is unavailable in the current Simulation workspace.");
+            }
+
+            regular = BuildSimulationRegularPayload(snapshot);
+        }
+
         return RuntimeQueryResponseEnvelope.Success(new
         {
-            enableToFull = helper.EnableToFull,
-            statusText = helper.StatusText,
-            workflow = RuntimeQueryResponseBuilder.BuildWorkflowPayload(workflow),
-            notchPreview = RuntimeQueryResponseBuilder.BuildNotchPreviewPayload(helper)
+            kind = "simulation",
+            workspace = BuildSimulationWorkspacePayload(simulation, workspace),
+            regular
         });
     }
 
@@ -49,7 +101,7 @@ internal sealed partial class RuntimeQueryUseCase
             return formatFailure;
         }
 
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         var target = CaptureNotchExportTargetState(outputPath);
 
         var previousOption = helper.SelectedNotchExportFileTypeOption;
@@ -110,7 +162,7 @@ internal sealed partial class RuntimeQueryUseCase
                 message: $"Unsupported export format '{formatText}'. Use csv (CSV review)|c-v21|c-v22.");
         }
 
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         option = helper.NotchExportFileTypeOptions.FirstOrDefault(candidate =>
             candidate.Value == mappedType.Value);
         normalizedFormat = mappedType.Value switch

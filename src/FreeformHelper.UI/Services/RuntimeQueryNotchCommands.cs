@@ -4,12 +4,155 @@ using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 
-internal sealed partial class RuntimeQueryUseCase
+/// <summary>
+/// Runtime query commands for the notch compensation of one CAD pad: notch, notch-stage and notch-validation.
+/// </summary>
+internal sealed class RuntimeQueryNotchCommands
 {
+    private readonly RuntimeQueryContext _context;
+
+    public RuntimeQueryNotchCommands(RuntimeQueryContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    /// <summary>Adds the commands of this group to the registry.</summary>
+    /// <param name="registry">The registry that receives the handlers.</param>
+    public void Register(RuntimeQueryCommandRegistry registry)
+    {
+        registry.AddSync("notch", QueryNotch);
+        registry.AddSync("notch-stage", QueryNotchStage);
+        registry.AddSync("notch-validation", QueryNotchValidation);
+    }
+
+    private RuntimeQueryResponseEnvelope QueryNotch(IReadOnlyDictionary<string, string>? args)
+    {
+        if (!RuntimeQueryArgumentParser.TryGetIntArg(args, "cad-id", 0, int.MaxValue, out var cadPadId, out var cadIdError) || cadIdError is not null)
+        {
+            return cadIdError ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--cad-id' is required for query notch.");
+        }
+
+        var limit = RuntimeQueryLimits.DefaultNotchRegularLimit;
+        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "limit", 1, RuntimeQueryLimits.MaxNotchRegularLimit, out var parsedLimit, out var limitError))
+        {
+            limit = parsedLimit;
+        }
+        else if (limitError is not null)
+        {
+            return limitError;
+        }
+
+        var targetLimit = RuntimeQueryLimits.DefaultNotchTargetLimit;
+        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "target-limit", 1, RuntimeQueryLimits.MaxNotchTargetLimit, out var parsedTargetLimit, out var targetLimitError))
+        {
+            targetLimit = parsedTargetLimit;
+        }
+        else if (targetLimitError is not null)
+        {
+            return targetLimitError;
+        }
+
+        var polygonLimit = RuntimeQueryLimits.DefaultNotchPolygonLimit;
+        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "polygon-limit", 1, RuntimeQueryLimits.MaxNotchPolygonLimit, out var parsedPolygonLimit, out var polygonLimitError))
+        {
+            polygonLimit = parsedPolygonLimit;
+        }
+        else if (polygonLimitError is not null)
+        {
+            return polygonLimitError;
+        }
+
+        return QueryCadNotch(cadPadId, limit, targetLimit, polygonLimit);
+    }
+
+    private RuntimeQueryResponseEnvelope QueryNotchStage(IReadOnlyDictionary<string, string>? args)
+    {
+        if (!RuntimeQueryArgumentParser.TryGetIntArg(args, "cad-id", 0, int.MaxValue, out var cadPadId, out var cadIdError) || cadIdError is not null)
+        {
+            return cadIdError ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--cad-id' is required for query notch-stage.");
+        }
+
+        var polygonLimit = RuntimeQueryLimits.DefaultNotchPolygonLimit;
+        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "polygon-limit", 1, RuntimeQueryLimits.MaxNotchPolygonLimit, out var parsedPolygonLimit, out var polygonLimitError))
+        {
+            polygonLimit = parsedPolygonLimit;
+        }
+        else if (polygonLimitError is not null)
+        {
+            return polygonLimitError;
+        }
+
+        return QueryCadNotchStage(cadPadId, polygonLimit);
+    }
+
+    private RuntimeQueryResponseEnvelope QueryNotchValidation(IReadOnlyDictionary<string, string>? args)
+    {
+        if (!RuntimeQueryArgumentParser.TryGetIntArg(args, "regular-id", 0, int.MaxValue, out var regularPadId, out var regularIdError) || regularIdError is not null)
+        {
+            return regularIdError ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--regular-id' is required for query notch-validation.");
+        }
+
+        var helper = _context.Shell.FreeformHelper;
+        if (!helper.TryGetNotchValidationReportForRegularPad(
+                regularPadId,
+                out var report,
+                out var nullDiffValue,
+                out var failureCode,
+                out var failureMessage))
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: string.IsNullOrWhiteSpace(failureCode) ? "NOT_READY" : failureCode,
+                message: string.IsNullOrWhiteSpace(failureMessage)
+                    ? "Validation data is unavailable."
+                    : failureMessage);
+        }
+
+        var trace = NotchValidationTraceService.BuildTrace(report, helper.RegularPads, nullDiffValue);
+        var traceDirectRows = trace.DirectRows
+            .Select(RuntimeQueryResponseBuilder.BuildValidationTraceRowPayload)
+            .ToList();
+        var traceIncomingRows = trace.IncomingRows
+            .Select(RuntimeQueryResponseBuilder.BuildValidationTraceRowPayload)
+            .ToList();
+        var traceOutgoingRows = trace.OutgoingRows
+            .Select(RuntimeQueryResponseBuilder.BuildValidationTraceRowPayload)
+            .ToList();
+
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            kind = "notch-validation",
+            regularPad = new
+            {
+                report.RegularPadId,
+                report.IcIndex,
+                report.DiffIndex,
+                nullDiffValue
+            },
+            summary = new
+            {
+                directRowCount = traceDirectRows.Count,
+                incomingRowCount = traceIncomingRows.Count,
+                outgoingRowCount = traceOutgoingRows.Count
+            },
+            rows = new
+            {
+                direct = traceDirectRows,
+                incoming = traceIncomingRows,
+                outgoing = traceOutgoingRows
+            }
+        });
+    }
+
     private RuntimeQueryResponseEnvelope QueryCadNotch(int cadPadId, int limit, int targetLimit, int polygonLimit)
     {
-        var helper = _shellViewModel.FreeformHelper;
-        if (!_notchQueryCacheService.TryGetCadNotchCacheEntry(helper, cadPadId, out var cacheEntry, out var error))
+        var helper = _context.Shell.FreeformHelper;
+        if (!_context.NotchCache.TryGetCadNotchCacheEntry(helper, cadPadId, out var cacheEntry, out var error))
         {
             return error ?? RuntimeQueryResponseEnvelope.Failure(
                 code: "NOT_READY",
@@ -20,7 +163,7 @@ internal sealed partial class RuntimeQueryUseCase
         var resolved = cacheEntry.Resolved;
         var compensation = resolved.Compensation;
         var returnedRegulars = BuildCadNotchRegularRows(compensation, limit);
-        var strictOverlapPercent = _shellViewModel.FreeformHelper.GetNotchMultiOwnerStrictOverlapPercent();
+        var strictOverlapPercent = _context.Shell.FreeformHelper.GetNotchMultiOwnerStrictOverlapPercent();
         var allocation = resolved.TargetAllocation;
         var display = NotchDisplayProjector.Build(
             compensation,
@@ -213,5 +356,51 @@ internal sealed partial class RuntimeQueryUseCase
             blockerRegularCount = compensation.RegularDebugInfos.Count(info => info.BlockerCandidateCount > 0),
             compensation.IsToFullEnabled
         };
+    }
+
+    private RuntimeQueryResponseEnvelope QueryCadNotchStage(int cadPadId, int polygonLimit)
+    {
+        var helper = _context.Shell.FreeformHelper;
+        if (!_context.NotchCache.TryGetCadNotchCacheEntry(helper, cadPadId, out var cacheEntry, out var error))
+        {
+            return error ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "NOT_READY",
+                message: "Notch stage overlays are unavailable.");
+        }
+
+        var overlay = helper.GetCadV22StageOverlays(cadPadId);
+        if (!overlay.HasValue)
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "NOT_READY",
+                message: "Notch stage overlays are unavailable. Build grid and ensure CAD is visible.");
+        }
+
+        var stage = overlay.Value;
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            kind = "notch-v22-stage",
+            cache = new
+            {
+                step3Revision = cacheEntry.Revision,
+                cacheKey = $"r{cacheEntry.Revision}:cad{cadPadId}"
+            },
+            cadPad = new
+            {
+                id = cacheEntry.Cad.CadPadId,
+                cacheEntry.Cad.Name,
+                cacheEntry.Cad.Layer,
+                cacheEntry.Cad.IcIndex,
+                diffIndex = cacheEntry.Cad.DxfIndex,
+                diffSource = cacheEntry.Cad.CadOutputFwDiffAssignmentModeText
+            },
+            isToFullEnabled = stage.IsToFullEnabled,
+            stages = new
+            {
+                stage1 = RuntimeQueryResponseBuilder.BuildStagePolygonPayload("seed", stage.Stage1Seed, polygonLimit),
+                stage2 = RuntimeQueryResponseBuilder.BuildStagePolygonPayload("candidate", stage.Stage2Candidate, polygonLimit),
+                stage3 = RuntimeQueryResponseBuilder.BuildStagePolygonPayload("final", stage.Stage3Final, polygonLimit)
+            }
+        });
     }
 }

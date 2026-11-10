@@ -4,15 +4,69 @@ using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 
-internal sealed partial class RuntimeQueryUseCase
+/// <summary>
+/// Runtime query command that returns the regular pads gated by the multi-owner rule.
+/// </summary>
+internal sealed class RuntimeQueryMultiOwnerCommands
 {
+    private readonly RuntimeQueryContext _context;
+
+    public RuntimeQueryMultiOwnerCommands(RuntimeQueryContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    /// <summary>Adds the commands of this group to the registry.</summary>
+    /// <param name="registry">The registry that receives the handlers.</param>
+    public void Register(RuntimeQueryCommandRegistry registry)
+    {
+        registry.AddSync("multi-owner", QueryMultiOwner);
+    }
+
+    private RuntimeQueryResponseEnvelope QueryMultiOwner(IReadOnlyDictionary<string, string>? args)
+    {
+        if (!RuntimeQueryArgumentParser.TryGetIntArg(args, "cad-id", 0, int.MaxValue, out var cadPadId, out var cadIdError) || cadIdError is not null)
+        {
+            return cadIdError ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--cad-id' is required for query multi-owner.");
+        }
+
+        var limit = RuntimeQueryLimits.DefaultNotchRegularLimit;
+        if (RuntimeQueryArgumentParser.TryGetIntArg(args, "limit", 1, RuntimeQueryLimits.MaxNotchRegularLimit, out var parsedLimit, out var limitError))
+        {
+            limit = parsedLimit;
+        }
+        else if (limitError is not null)
+        {
+            return limitError;
+        }
+
+        var hasOverlapPercentOverride = RuntimeQueryArgumentParser.TryGetDoubleArg(
+            args,
+            "overlap-percent",
+            0.0,
+            100.0,
+            out var overlapPercentOverride,
+            out var overlapPercentError);
+        if (overlapPercentError is not null)
+        {
+            return overlapPercentError;
+        }
+
+        var strictOverlapRatioOverride = hasOverlapPercentOverride
+            ? NotchV22CompensationService.NormalizeStrictOverlapRatio(overlapPercentOverride / 100.0)
+            : (double?)null;
+        return QueryCadMultiOwner(cadPadId, limit, strictOverlapRatioOverride, hasOverlapPercentOverride ? overlapPercentOverride : null);
+    }
+
     private RuntimeQueryResponseEnvelope QueryCadMultiOwner(
         int cadPadId,
         int limit,
         double? strictOverlapRatioOverride,
         double? overlapPercentOverride)
     {
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         if (!helper.CadPads.Any(pad => pad.Id == cadPadId))
         {
             return RuntimeQueryResponseEnvelope.Failure(
@@ -138,51 +192,5 @@ internal sealed partial class RuntimeQueryUseCase
             }).ToList(),
             info.IsToFullApplied
         };
-    }
-
-    private RuntimeQueryResponseEnvelope QueryCadNotchStage(int cadPadId, int polygonLimit)
-    {
-        var helper = _shellViewModel.FreeformHelper;
-        if (!_notchQueryCacheService.TryGetCadNotchCacheEntry(helper, cadPadId, out var cacheEntry, out var error))
-        {
-            return error ?? RuntimeQueryResponseEnvelope.Failure(
-                code: "NOT_READY",
-                message: "Notch stage overlays are unavailable.");
-        }
-
-        var overlay = helper.GetCadV22StageOverlays(cadPadId);
-        if (!overlay.HasValue)
-        {
-            return RuntimeQueryResponseEnvelope.Failure(
-                code: "NOT_READY",
-                message: "Notch stage overlays are unavailable. Build grid and ensure CAD is visible.");
-        }
-
-        var stage = overlay.Value;
-        return RuntimeQueryResponseEnvelope.Success(new
-        {
-            kind = "notch-v22-stage",
-            cache = new
-            {
-                step3Revision = cacheEntry.Revision,
-                cacheKey = $"r{cacheEntry.Revision}:cad{cadPadId}"
-            },
-            cadPad = new
-            {
-                id = cacheEntry.Cad.CadPadId,
-                cacheEntry.Cad.Name,
-                cacheEntry.Cad.Layer,
-                cacheEntry.Cad.IcIndex,
-                diffIndex = cacheEntry.Cad.DxfIndex,
-                diffSource = cacheEntry.Cad.CadOutputFwDiffAssignmentModeText
-            },
-            isToFullEnabled = stage.IsToFullEnabled,
-            stages = new
-            {
-                stage1 = RuntimeQueryResponseBuilder.BuildStagePolygonPayload("seed", stage.Stage1Seed, polygonLimit),
-                stage2 = RuntimeQueryResponseBuilder.BuildStagePolygonPayload("candidate", stage.Stage2Candidate, polygonLimit),
-                stage3 = RuntimeQueryResponseBuilder.BuildStagePolygonPayload("final", stage.Stage3Final, polygonLimit)
-            }
-        });
     }
 }

@@ -3,8 +3,31 @@ using Nvt.Core.RuntimeQuery;
 
 namespace FreeformHelper.UI.Services;
 
-internal sealed partial class RuntimeQueryUseCase
+/// <summary>
+/// Runtime query commands that drive the workflow and the selection: load-project, run-step, clear-step, select-cad, select-regular, clear-selection and set-tofull.
+/// </summary>
+internal sealed class RuntimeQueryWorkflowCommands
 {
+    private readonly RuntimeQueryContext _context;
+
+    public RuntimeQueryWorkflowCommands(RuntimeQueryContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    /// <summary>Adds the commands of this group to the registry.</summary>
+    /// <param name="registry">The registry that receives the handlers.</param>
+    public void Register(RuntimeQueryCommandRegistry registry)
+    {
+        registry.Add("load-project", QueryLoadProjectAsync);
+        registry.Add("run-step", QueryRunStepAsync);
+        registry.AddSync("clear-step", QueryClearStep);
+        registry.AddSync("select-cad", QuerySelectCad);
+        registry.AddSync("select-regular", QuerySelectRegular);
+        registry.AddSync("clear-selection", _ => QueryClearSelection());
+        registry.AddSync("set-tofull", QuerySetToFull);
+    }
+
     private async Task<RuntimeQueryResponseEnvelope> QueryLoadProjectAsync(IReadOnlyDictionary<string, string>? args)
     {
         if (!RuntimeQueryArgumentParser.TryGetStringArg(args, "path", out var path, out var error) || error is not null)
@@ -14,7 +37,7 @@ internal sealed partial class RuntimeQueryUseCase
                 message: "Argument '--path' is required for query load-project.");
         }
 
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         var result = await helper.LoadProjectFromPathAsync(path);
         if (!result.IsLoaded)
         {
@@ -66,7 +89,7 @@ internal sealed partial class RuntimeQueryUseCase
                 message: "Argument '--step' is required for query run-step.");
         }
 
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         var stepId = step switch
         {
             1 => WorkflowStepId.Step1Match,
@@ -83,7 +106,7 @@ internal sealed partial class RuntimeQueryUseCase
             result = await helper.RunWorkflowStepAsync(stepId);
         }
 
-        var stepFailure = await RunCommandOperationAsync(
+        var stepFailure = await RuntimeQueryCommandOperation.RunAsync(
             RunStepAsync,
             "STEP_EXECUTION_FAILED",
             ex => ex.Message);
@@ -127,7 +150,7 @@ internal sealed partial class RuntimeQueryUseCase
                 message: "Argument '--step' is required for query clear-step.");
         }
 
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         var stepId = step switch
         {
             1 => WorkflowStepId.Step1Match,
@@ -162,7 +185,7 @@ internal sealed partial class RuntimeQueryUseCase
             return error;
         }
 
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         var visibleCadIds = helper.CadPads.Select(static pad => pad.Id).ToHashSet();
         var effective = selectedIds.Where(visibleCadIds.Contains).Distinct().OrderBy(id => id).ToList();
         var missing = selectedIds.Where(id => !visibleCadIds.Contains(id)).Distinct().OrderBy(id => id).ToList();
@@ -188,7 +211,7 @@ internal sealed partial class RuntimeQueryUseCase
 
     private RuntimeQueryResponseEnvelope QuerySelectRegular(IReadOnlyDictionary<string, string>? args)
     {
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         var regularById = helper.RegularPads.ToDictionary(static pad => pad.RegularPadId, static pad => pad.Index);
         var regularIndices = RuntimeQuerySelectionParser.ParseRegularSelectionArgs(
             args,
@@ -227,12 +250,33 @@ internal sealed partial class RuntimeQueryUseCase
 
     private RuntimeQueryResponseEnvelope QueryClearSelection()
     {
-        var helper = _shellViewModel.FreeformHelper;
+        var helper = _context.Shell.FreeformHelper;
         helper.ClearSelectionCommand.Execute(null);
         return RuntimeQueryResponseEnvelope.Success(new
         {
             selection = RuntimeQueryResponseBuilder.BuildSelectionPayload(helper),
             statusText = helper.StatusText
+        });
+    }
+
+    private RuntimeQueryResponseEnvelope QuerySetToFull(IReadOnlyDictionary<string, string>? args)
+    {
+        if (!RuntimeQueryArgumentParser.TryGetBoolArg(args, "enable", out var enable, out var error) || error is not null)
+        {
+            return error ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--enable' is required for query set-tofull.");
+        }
+
+        var helper = _context.Shell.FreeformHelper;
+        helper.EnableToFull = enable;
+        var workflow = helper.GetWorkflowStateSnapshot();
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            enableToFull = helper.EnableToFull,
+            statusText = helper.StatusText,
+            workflow = RuntimeQueryResponseBuilder.BuildWorkflowPayload(workflow),
+            notchPreview = RuntimeQueryResponseBuilder.BuildNotchPreviewPayload(helper)
         });
     }
 }
