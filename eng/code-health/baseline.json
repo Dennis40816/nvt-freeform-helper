@@ -136,23 +136,6 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 44
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/CoordinatePlannerWorkspaceViewModel.ArrayHandles.cs",
-        "src/FreeformHelper.UI/ViewModels/CoordinatePlannerWorkspaceViewModel.cs",
-        "src/FreeformHelper.UI/ViewModels/CoordinatePlannerWorkspaceViewModel.Operations.cs",
-        "src/FreeformHelper.UI/ViewModels/CoordinatePlannerWorkspaceViewModel.PropertyCallbacks.cs"
-      ],
-      "contentHash": "2cf26cc5f7f4a53a063a231cd506d1214321ba286ea063ac93c311948c6811bb",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.CoordinatePlannerWorkspaceViewModel"
-    },
-    {
-      "kind": "type",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
         "stateMembers": 70,
         "partialFiles": 91
       },
