@@ -225,30 +225,6 @@
     <Setter Property="TextWrapping" Value="Wrap"/>
   </Style>
 
-  <Style Selector="Button.padInfoInfoButton">
-    <Setter Property="Width" Value="{DynamicResource IconSizeLg}"/>
-    <Setter Property="Height" Value="{DynamicResource IconSizeLg}"/>
-    <Setter Property="MinWidth" Value="0"/>
-    <Setter Property="MinHeight" Value="0"/>
-    <Setter Property="Padding" Value="0"/>
-    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
-    <Setter Property="BorderThickness" Value="0"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
-  </Style>
-
-  <Style Selector="Button.padInfoInfoButton:pointerover">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
-  </Style>
-
-  <Style Selector="Button.padInfoInfoButton controls|FontIcon">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
-  </Style>
-
-  <Style Selector="Button.padInfoInfoButton:pointerover controls|FontIcon">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
-  </Style>
-
   <Style Selector="Button.padInfoHeaderActionButton">
     <Setter Property="Width" Value="{DynamicResource IconSizeXl}"/>
     <Setter Property="Height" Value="{DynamicResource IconSizeXl}"/>

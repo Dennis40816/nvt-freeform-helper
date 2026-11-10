@@ -80,7 +80,7 @@
       "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.cs"
     ],
     "controlsViewModels": [
-      "src/FreeformHelper.UI/Controls/NotchApplySimulationAaView.cs", "src/FreeformHelper.UI/Controls/PadCanvas.Properties.cs",
+      "src/FreeformHelper.UI/Controls/PadCanvas.Properties.cs",
       "src/FreeformHelper.UI/Controls/PadCanvas.Rendering.Simulation.cs",
       "src/FreeformHelper.UI/Controls/PadCanvas.State.cs", "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml.cs"
     ],
