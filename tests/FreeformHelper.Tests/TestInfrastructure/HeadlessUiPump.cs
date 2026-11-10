@@ -36,6 +36,33 @@ internal static class HeadlessUiPump
         await YieldAsync(DispatcherPriority.Background);
     }
 
+    /// <summary>Polls observable UI state while pumping queued work, with a bounded failure guard.</summary>
+    public static async Task WaitForConditionAsync(Func<bool> predicate, string failureMessage)
+    {
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        while (!predicate())
+        {
+            if (timeout.IsCancellationRequested)
+            {
+                throw new TimeoutException(failureMessage);
+            }
+
+            await YieldAsync(DispatcherPriority.Background);
+        }
+    }
+
+    /// <summary>Waits for a visible child window, reporting its name if opening fails.</summary>
+    public static async Task<TWindow> WaitForOwnedWindowAsync<TWindow>(Window owner, string windowName) where TWindow : Window
+    {
+        TWindow? result = null;
+        await WaitForConditionAsync(() =>
+        {
+            result = owner.OwnedWindows.OfType<TWindow>().FirstOrDefault(static window => window.IsVisible);
+            return result is not null;
+        }, $"The {windowName} window did not open.");
+        return result!;
+    }
+
     public static void Drain(TopLevel root)
     {
         var dispatcher = root.Dispatcher;

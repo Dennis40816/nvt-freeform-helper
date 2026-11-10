@@ -1,12 +1,16 @@
+using System.Text;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Input;
+using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
 using Xunit;
@@ -105,4 +109,175 @@ public sealed partial class ProjectLoadingSecondaryWindowTests
     {
         new Point2(0, 0), new Point2(10, 0), new Point2(10, 10), new Point2(0, 10)
     }));
+
+    [AvaloniaFact]
+    public async Task ShowArtifactDetailCommand_LoadedProject_OpensAndClosesDetailAsync()
+    {
+        using var session = await LoadedSecondaryWindowSession.CreateAsync();
+        var source = Assert.IsType<CoordinatePlannerWorkspaceSession>(
+            await session.Helper.CreateCoordinatePlannerWorkspaceSessionAsync());
+        var model = new CoordinatePlannerWorkspaceViewModel(new CoordinatePlannerWorkspaceUseCase(), source);
+        session.Owner.Content = new CoordinatePlannerWorkspaceView { DataContext = model };
+        await HeadlessUiPump.FlushQueueAsync();
+        var row = model.ArtifactRows.First();
+
+        var show = model.ShowArtifactDetailCommand.ExecuteAsync(row);
+        var dialog = await HeadlessUiPump.WaitForOwnedWindowAsync<CoordinateArtifactDetailWindow>(
+            session.Owner, nameof(CoordinateArtifactDetailWindow));
+        try
+        {
+            Assert.Same(row, dialog.DataContext);
+            Assert.Same(row, model.SelectedArtifactRow);
+            UiEventProbe.Click(dialog, static button => button.Classes.Contains("actionNeutral"));
+            await HeadlessUiPump.WaitForConditionAsync(() => show.IsCompleted,
+                "Closing the coordinate detail window did not complete its command.");
+            await show;
+            Assert.False(dialog.IsVisible);
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task ExportDxfLayerImageCommand_LoadedProject_OpensAndCancelsWindowAsync()
+    {
+        using var session = await LoadedSecondaryWindowSession.CreateAsync();
+        var picks = 0;
+        session.Helper.PickSaveExportPathAsync = (_, _) =>
+        {
+            picks++;
+            return Task.FromResult<string?>(null);
+        };
+        var dirty = session.Helper.HasUnsavedChanges;
+
+        var export = session.Helper.ExportDxfLayerImageCommand.ExecuteAsync(null);
+        var dialog = await HeadlessUiPump.WaitForOwnedWindowAsync<LayerImageExportWindow>(
+            session.Owner, nameof(LayerImageExportWindow));
+        try
+        {
+            var model = Assert.IsType<LayerImageExportViewModel>(dialog.DataContext);
+            Assert.Equal("L1", Assert.Single(model.VisibleRows).Name);
+            Assert.True(model.VisibleRows[0].IsChecked);
+            model.CancelCommand.Execute(null);
+            await HeadlessUiPump.WaitForConditionAsync(() => export.IsCompleted,
+                "Cancelling the layer image window did not complete the export command.");
+            await export;
+
+            Assert.False(dialog.IsVisible);
+            Assert.Null(model.CompletedRequest);
+            Assert.Equal(0, picks);
+            Assert.Equal(dirty, session.Helper.HasUnsavedChanges);
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+}
+
+internal sealed class LoadedSecondaryWindowSession : IDisposable
+{
+    private readonly DirectoryInfo _directory;
+
+    private LoadedSecondaryWindowSession(DirectoryInfo directory, FreeformHelperViewModel helper)
+    {
+        _directory = directory;
+        Helper = helper;
+        View = new FreeformHelperView { DataContext = helper };
+        Owner = new Window { Content = View, Width = 1200, Height = 800 };
+        Owner.Show();
+    }
+
+    public FreeformHelperViewModel Helper { get; }
+    public FreeformHelperView View { get; }
+    public Window Owner { get; }
+
+    public static async Task<LoadedSecondaryWindowSession> CreateAsync()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var directory = TestFiles.CreateTempDirectory();
+        LoadedSecondaryWindowSession? session = null;
+        try
+        {
+            var path = Path.Combine(directory.FullName, "project.json");
+            await new JsonProjectStore().SaveAsync(path, CreateProject(), TestContext.Current.CancellationToken);
+            var helper = new FreeformHelperViewModel
+            {
+                PickLoadProjectPathAsync = () => Task.FromResult<string?>(path),
+                ApplyAppVisualPreferencesOnProjectLoad = false,
+            };
+            await helper.LoadProjectCommand.ExecuteAsync(null);
+            await helper.WaitForGridRebuildIdleAsync();
+            Assert.NotEmpty(helper.CadPads);
+            Assert.NotEmpty(helper.RegularPads);
+            session = new LoadedSecondaryWindowSession(directory, helper);
+            await HeadlessUiPump.FlushQueueAsync();
+            return session;
+        }
+        catch
+        {
+            if (session is not null) session.Dispose();
+            else directory.Delete(recursive: true);
+            throw;
+        }
+    }
+
+    private static ProjectFile CreateProject() => new()
+    {
+        EmbeddedDxfName = "entry-coverage.dxf",
+        EmbeddedDxf = Encoding.UTF8.GetBytes(SyntheticDxf),
+        Settings = new ProjectSettings { Grid = new GridSettings { XChannels = 2, YChannels = 1 } },
+        UiSnapshot = new ProjectUiSnapshot
+        {
+            Grid = new UiGridSnapshot
+            {
+                CascadeCount = 1, IcX = [2], IcY = [1], TotalX = 2, TotalY = 1,
+                ActiveAreaWidthMm = 20, ActiveAreaHeightMm = 10,
+            },
+        },
+    };
+
+    public void Dispose()
+    {
+        foreach (var child in Owner.OwnedWindows.ToArray()) child.Close();
+        Owner.Close();
+        _directory.Delete(recursive: true);
+    }
+
+    private const string SyntheticDxf = """
+        0
+        SECTION
+        2
+        ENTITIES
+        0
+        LWPOLYLINE
+        8
+        L1
+        70
+        1
+        90
+        4
+        10
+        0
+        20
+        0
+        10
+        20
+        20
+        0
+        10
+        20
+        20
+        10
+        10
+        0
+        20
+        10
+        0
+        ENDSEC
+        0
+        EOF
+        """;
 }

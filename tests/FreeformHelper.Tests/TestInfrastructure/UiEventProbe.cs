@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using FreeformHelper.UI;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Threading;
@@ -18,6 +20,13 @@ internal sealed class UiEventProbe
     public UiEventProbe()
     {
         Runner = new UiEventRunner(Report, (operation, exception) => FallbackReports.Add((operation, exception)));
+    }
+
+    /// <summary>Raises the routed click on an existing button to run its code-behind handler.</summary>
+    public static void Click(Control root, Func<Button, bool> predicate)
+    {
+        var button = root.GetVisualDescendants().OfType<Button>().Single(predicate);
+        button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
     }
 
     private void Report(string operation, Exception exception)
