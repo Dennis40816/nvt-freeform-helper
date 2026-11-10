@@ -137,6 +137,15 @@ internal static class PadCanvasPrivateAccess
     public static extern PadCanvas.HoverDebugSnapshot? BuildHoverDebugSnapshot(PadCanvas canvas);
 
     // Selection and view seams.
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyAxisLabelSelection")]
+    public static extern void ApplyAxisLabelSelection(PadCanvas canvas, PadCanvas.AxisLabelHit hit, bool additive);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyHitSelection")]
+    public static extern void ApplyHitSelection(PadCanvas canvas, PadCanvas.HitResult hit, bool toggle, bool additive);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyExtendSelection")]
+    public static extern void ApplyExtendSelection(PadCanvas canvas, PadCanvas.HitResult anchorHit, PadCanvas.HitResult currentHit);
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "SelectPadsInWorldRect")]
     public static extern void SelectPadsInWorldRect(PadCanvas canvas, Rect2 worldRect, bool additive, bool regularOnly);
 
