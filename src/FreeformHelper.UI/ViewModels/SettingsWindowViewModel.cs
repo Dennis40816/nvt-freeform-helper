@@ -1,9 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FreeformHelper.Application.Services;
-using FreeformHelper.Application.Settings;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Settings;
 using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -12,173 +11,226 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
 {
     private readonly FreeformHelperViewModel _owner;
     internal UiEventRunner UiEvents => _owner.UiEvents;
-    private bool _suppressNotchThresholdSync;
-    private bool _suppressCompensationModelSync;
     private readonly HashSet<string> _editedProperties = new(StringComparer.Ordinal);
+    private readonly SettingsNotchDraftOwner _notch;
+    private readonly SettingsMappingExportDraftOwner _mappingExport;
     private readonly SettingsWindowOptionSet _options;
+    private readonly SettingsGeneralDraftOwner _general;
+    private readonly SettingsGridDraftOwner _grid;
 
     public SettingsWindowViewModel(FreeformHelperViewModel owner)
     {
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         _options = new SettingsWindowOptionSet(owner);
 
-        _selectedScanOrderOption = _options.SelectedScanOrder;
-        _selectedGridAlignmentOption = _options.SelectedGridAlignment;
-        _selectedRegularSourceModeOption = _options.SelectedRegularSourceMode;
-        _selectedRegularSourceLayerOption = _options.SelectedRegularSourceLayer;
-        _selectedLogLevelOption = _options.SelectedLogLevel;
-        _selectedCadOutputFwDiffAutoModeOption = _options.SelectedCadOutputFwDiffAutoMode;
-        _selectedNotchExportFileTypeOption = _options.SelectedNotchExportFileType;
-        _selectedNotchExportProfileOption = _options.SelectedNotchExportProfile;
-        _selectedNotchCompensationModelOption = _options.SelectedNotchCompensationModel;
-
-        _xChannels = owner.XChannels;
-        _yChannels = owner.YChannels;
-        _cascadeNum = owner.CascadeNum;
-        _coordinatePixelWidth = owner.CoordinatePixelWidth;
-        _coordinatePixelHeight = owner.CoordinatePixelHeight;
-        _gridPaddingPercent = owner.GridPaddingPercent;
-        _activeAreaWidth = owner.ActiveAreaWidth;
-        _activeAreaHeight = owner.ActiveAreaHeight;
-        _panelBiasX = owner.PanelBiasX;
-        _panelBiasY = owner.PanelBiasY;
-        _importOnlyClosedPolylines = owner.ImportOnlyClosedPolylines;
-        _importBlockPolylines = owner.ImportBlockPolylines;
-        _recalcBoundsOnLayerFilter = owner.RecalcBoundsOnLayerFilter;
-        _dxfRegularSourceHint = owner.DxfRegularSourceHint;
-        _matchThreshold = owner.MatchThreshold;
-        _freeformAxisThreshold = owner.FreeformAxisThreshold;
-        _enableAutoDetectXy = owner.EnableAutoDetectXy;
-        _enableFreeformEdgeSpecialization = owner.EnableFreeformEdgeSpecialization;
-        _autoReplayStep2AfterProjectLoad = owner.AutoReplayStep2AfterProjectLoad;
-        _applyAppVisualPreferencesOnProjectLoad = owner.ApplyAppVisualPreferencesOnProjectLoad;
-        _enableToRegular = owner.EnableToRegular;
-        _enableToFull = owner.EnableToFull;
-        _enableToFullRuleEngine = owner.EnableToFullRuleEngine;
-        _enableToFullRuleTrace = owner.EnableToFullRuleTrace;
-        _enableBoundaryVirtualAreaCap = owner.EnableBoundaryVirtualAreaCap;
-        _boundaryVirtualAreaCapPercent = owner.BoundaryVirtualAreaCapPercent;
-        _enableTargetCoverageGuard = owner.EnableTargetCoverageGuard;
-        _targetCoverageCapPercent = owner.TargetCoverageCapPercent;
-        _showNotchCanvasPreview = owner.ShowNotchCanvasPreview;
-        _showNotchToRegularLabels = owner.ShowNotchToRegularLabels;
-        _toFullStrictOverlapPercent = owner.ToFullStrictOverlapPercent;
-        _notchPreviewVisualizationStep = owner.NotchPreviewVisualizationStep;
-        _notchPreviewAutoPlayEnabled = owner.NotchPreviewAutoPlayEnabled;
-        _notchPreviewAutoPlayIntervalMs = owner.NotchPreviewAutoPlayIntervalMs;
-        _showDiffIndexOverlay = owner.ShowDiffIndexOverlay;
-        _cadOutputFwDiffIndexStart = owner.CadOutputFwDiffIndexStart;
-        _cadOutputFwDiffIndexAnchorCadId = owner.CadOutputFwDiffIndexAnchorCadId;
-        _enableV21 = owner.EnableV21;
-        _enableV22 = owner.EnableV22;
-        _lenScale = owner.LenScale;
-        _nullValue = owner.NullValue;
-        _mappingWeightIou = owner.MappingWeightIou;
-        _mappingWeightCentroidDistance = owner.MappingWeightCentroidDistance;
-        _mappingWeightAreaRatio = owner.MappingWeightAreaRatio;
-        _mappingLowConfidenceThreshold = owner.MappingLowConfidenceThreshold;
-        _mappingAmbiguousMargin = owner.MappingAmbiguousMargin;
-        _mappingCandidateNumber = owner.MappingCandidateNumber;
-        _useLocalSizing = owner.UseLocalSizing;
-        _globalFontSizePercent = owner.GlobalFontSizePercent;
-        _highlightStrokeWidthAdjust = owner.HighlightStrokeWidthAdjust;
-        _suppressNotchThresholdSync = true;
-        _notchThresholdQ7 = owner.NotchThresholdQ7;
-        _notchThresholdPercent = owner.NotchThresholdPercent;
-        _linkNotchThresholds = owner.LinkNotchThresholds;
-        _suppressNotchThresholdSync = false;
-
-        InitializeCascadeIcSettings(owner);
-        RefreshLayerCategoryRows();
+        _general = CreateGeneralDraftOwner();
+        _notch = CreateNotchDraftOwner();
+        _mappingExport = CreateMappingExportDraftOwner();
+        _grid = CreateGridDraftOwner(new ActiveAreaPixelsDraft());
+        _general.RefreshLayerCategoryRows();
         SaveCommand = new RelayCommand(OnSave, () => _owner.IsProjectEditingEnabled);
         CancelCommand = new RelayCommand(OnCancel);
     }
 
+    private SettingsGeneralDraftOwner CreateGeneralDraftOwner()
+    {
+        var seed = new SettingsGeneralDraftOwner.Seed(
+            ImportOnlyClosedPolylines: _owner.ImportOnlyClosedPolylines,
+            ImportBlockPolylines: _owner.ImportBlockPolylines,
+            RecalcBoundsOnLayerFilter: _owner.RecalcBoundsOnLayerFilter,
+            MatchThreshold: _owner.MatchThreshold,
+            FreeformAxisThreshold: _owner.FreeformAxisThreshold,
+            EnableAutoDetectXy: _owner.EnableAutoDetectXy,
+            EnableFreeformEdgeSpecialization: _owner.EnableFreeformEdgeSpecialization,
+            AutoReplayStep2AfterProjectLoad: _owner.AutoReplayStep2AfterProjectLoad,
+            ApplyAppVisualPreferencesOnProjectLoad: _owner.ApplyAppVisualPreferencesOnProjectLoad,
+            SelectedLogLevelOption: _options.SelectedLogLevel,
+            UseLocalSizing: _owner.UseLocalSizing,
+            GlobalFontSizePercent: _owner.GlobalFontSizePercent,
+            HighlightStrokeWidthAdjust: _owner.HighlightStrokeWidthAdjust,
+            LayerCategoryRows: new());
+        return new SettingsGeneralDraftOwner(
+            seed, () => ActiveAreaPixels.ProjectIdentity,
+            _owner.GetDxfLayerCategoryStates, _owner.ApplyLayerCategorySelection,
+            _options.LogLevel,
+            OnPropertyChanging, OnPropertyChanged);
+    }
+
+    private SettingsGridDraftOwner CreateGridDraftOwner(ActiveAreaPixelsDraft activeAreaPixels)
+    {
+        var seed = new SettingsGridDraftOwner.Seed(
+            XChannels: _owner.XChannels,
+            YChannels: _owner.YChannels,
+            CascadeNum: _owner.CascadeNum,
+            CoordinatePixelWidth: _owner.CoordinatePixelWidth,
+            CoordinatePixelHeight: _owner.CoordinatePixelHeight,
+            GridPaddingPercent: _owner.GridPaddingPercent,
+            ActiveAreaWidth: _owner.ActiveAreaWidth,
+            ActiveAreaHeight: _owner.ActiveAreaHeight,
+            PanelBiasX: _owner.PanelBiasX,
+            PanelBiasY: _owner.PanelBiasY,
+            SelectedScanOrderOption: _options.SelectedScanOrder,
+            SelectedRegularSourceModeOption: _options.SelectedRegularSourceMode,
+            SelectedRegularSourceLayerOption: _options.SelectedRegularSourceLayer,
+            DxfRegularSourceHint: _owner.DxfRegularSourceHint,
+            SelectedGridAlignmentOption: _options.SelectedGridAlignment,
+            CascadeIcSettings: new());
+        return new SettingsGridDraftOwner(
+            seed, () => ActiveAreaPixels.ProjectIdentity,
+            activeAreaPixels,
+            _owner.CascadeIcSettings.Select(static row => Math.Max(1, (int)Math.Round(row.XChannels))),
+            _owner.CascadeIcSettings.Select(static row => Math.Max(1, (int)Math.Round(row.YChannels))),
+            BuildCascadeDraftLayout, propertyName => _editedProperties.Add(propertyName),
+            _options.ScanOrder, _options.GridAlignment, _options.RegularSourceMode, _options.RegularSourceLayer,
+            OnPropertyChanging, OnPropertyChanged);
+    }
+
+    private SettingsNotchDraftOwner CreateNotchDraftOwner()
+    {
+        var seed = new SettingsNotchDraftOwner.Seed(
+            EnableToRegular: _owner.EnableToRegular,
+            EnableToFull: _owner.EnableToFull,
+            EnableToFullRuleEngine: _owner.EnableToFullRuleEngine,
+            EnableToFullRuleTrace: _owner.EnableToFullRuleTrace,
+            EnableBoundaryVirtualAreaCap: _owner.EnableBoundaryVirtualAreaCap,
+            BoundaryVirtualAreaCapPercent: _owner.BoundaryVirtualAreaCapPercent,
+            EnableTargetCoverageGuard: _owner.EnableTargetCoverageGuard,
+            TargetCoverageCapPercent: _owner.TargetCoverageCapPercent,
+            SelectedNotchCompensationModelOption: _options.SelectedNotchCompensationModel,
+            ShowNotchCanvasPreview: _owner.ShowNotchCanvasPreview,
+            ShowNotchToRegularLabels: _owner.ShowNotchToRegularLabels,
+            NotchPreviewVisualizationStep: _owner.NotchPreviewVisualizationStep,
+            ToFullStrictOverlapPercent: _owner.ToFullStrictOverlapPercent,
+            NotchPreviewAutoPlayEnabled: _owner.NotchPreviewAutoPlayEnabled,
+            NotchPreviewAutoPlayIntervalMs: _owner.NotchPreviewAutoPlayIntervalMs,
+            NotchThresholdQ7: _owner.NotchThresholdQ7,
+            NotchThresholdPercent: _owner.NotchThresholdPercent,
+            LinkNotchThresholds: _owner.LinkNotchThresholds);
+        return new SettingsNotchDraftOwner(
+            seed, () => ActiveAreaPixels.ProjectIdentity,
+            _options.NotchCompensationModel,
+            SimulationSafetyTextProjector.BuildNotchTargetCoverageGuardSummary,
+            percent => SimulationSafetyTextProjector.BuildNotchTargetCoverageCapHelpText(
+                percent, SimulationSafetyTextProjector.DefaultEmsAfterCapText),
+            () => SimulationSafetyTextProjector.BuildNotchEmsSafetyPolicySummary(
+                SimulationSafetyTextProjector.DefaultEmsAfterCapText),
+            () => SimulationSafetyTextProjector.BuildNotchEmsSafetyShortText(
+                SimulationSafetyTextProjector.DefaultEmsAfterCapText),
+            OnPropertyChanging, OnPropertyChanged);
+    }
+
+    private SettingsMappingExportDraftOwner CreateMappingExportDraftOwner()
+    {
+        var seed = new SettingsMappingExportDraftOwner.Seed(
+            ShowDiffIndexOverlay: _owner.ShowDiffIndexOverlay,
+            CadOutputFwDiffIndexStart: _owner.CadOutputFwDiffIndexStart,
+            CadOutputFwDiffIndexAnchorCadId: _owner.CadOutputFwDiffIndexAnchorCadId,
+            SelectedCadOutputFwDiffAutoModeOption: _options.SelectedCadOutputFwDiffAutoMode,
+            SelectedNotchExportFileTypeOption: _options.SelectedNotchExportFileType,
+            SelectedNotchExportProfileOption: _options.SelectedNotchExportProfile,
+            MappingWeightIou: _owner.MappingWeightIou,
+            MappingWeightCentroidDistance: _owner.MappingWeightCentroidDistance,
+            MappingWeightAreaRatio: _owner.MappingWeightAreaRatio,
+            MappingLowConfidenceThreshold: _owner.MappingLowConfidenceThreshold,
+            MappingAmbiguousMargin: _owner.MappingAmbiguousMargin,
+            MappingCandidateNumber: _owner.MappingCandidateNumber,
+            EnableV21: _owner.EnableV21,
+            EnableV22: _owner.EnableV22,
+            LenScale: _owner.LenScale,
+            NullValue: _owner.NullValue);
+        return new SettingsMappingExportDraftOwner(
+            seed, () => ActiveAreaPixels.ProjectIdentity,
+            _options.CadOutputFwDiffAutoMode, _options.NotchExportFileType, _options.NotchExportProfile,
+            () => SimulationSafetyTextProjector.BuildNotchExportSafetyPolicySummary(
+                SimulationSafetyTextProjector.DefaultEmsAfterCapText),
+            OnPropertyChanging, OnPropertyChanged);
+    }
+
     public event Action? RequestClose;
 
-    public IReadOnlyList<FreeformHelperViewModel.ScanOrderOption> ScanOrderOptions => _options.ScanOrder;
-    public IReadOnlyList<FreeformHelperViewModel.GridAlignmentOption> GridAlignmentOptions => _options.GridAlignment;
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> RegularSourceModeOptions => _options.RegularSourceMode;
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayerOptions => _options.RegularSourceLayer;
-    public IReadOnlyList<FreeformHelperViewModel.LogLevelOption> LogLevelOptions => _options.LogLevel;
-    public IReadOnlyList<FreeformHelperViewModel.CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions => _options.CadOutputFwDiffAutoMode;
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> NotchExportFileTypeOptions => _options.NotchExportFileType;
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportProfileOption> NotchExportProfileOptions => _options.NotchExportProfile;
-    public IReadOnlyList<FreeformHelperViewModel.NotchCompensationModelOption> NotchCompensationModelOptions => _options.NotchCompensationModel;
+    public IReadOnlyList<FreeformHelperViewModel.ScanOrderOption> ScanOrderOptions => _grid.ScanOrderOptions;
+    public IReadOnlyList<FreeformHelperViewModel.GridAlignmentOption> GridAlignmentOptions => _grid.GridAlignmentOptions;
+    public IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> RegularSourceModeOptions => _grid.RegularSourceModeOptions;
+    public IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayerOptions => _grid.RegularSourceLayerOptions;
+    public IReadOnlyList<FreeformHelperViewModel.LogLevelOption> LogLevelOptions => _general.LogLevelOptions;
+    public IReadOnlyList<FreeformHelperViewModel.CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions => _mappingExport.CadOutputFwDiffAutoModeOptions;
+    public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> NotchExportFileTypeOptions => _mappingExport.NotchExportFileTypeOptions;
+    public IReadOnlyList<FreeformHelperViewModel.NotchExportProfileOption> NotchExportProfileOptions => _mappingExport.NotchExportProfileOptions;
+    public IReadOnlyList<FreeformHelperViewModel.NotchCompensationModelOption> NotchCompensationModelOptions => _notch.NotchCompensationModelOptions;
 
-    public ActiveAreaPixelsDraft ActiveAreaPixels { get; } = new();
+    public ActiveAreaPixelsDraft ActiveAreaPixels => _grid.ActiveAreaPixels;
 
     public IRelayCommand SaveCommand { get; }
     public IRelayCommand CancelCommand { get; }
 
     [ObservableProperty] private SettingsWindowSection _selectedSection = SettingsWindowSection.General;
-    [ObservableProperty] private decimal _xChannels;
-    [ObservableProperty] private decimal _yChannels;
-    [ObservableProperty] private decimal _cascadeNum;
-    [ObservableProperty] private decimal _coordinatePixelWidth;
-    [ObservableProperty] private decimal _coordinatePixelHeight;
-    [ObservableProperty] private decimal _gridPaddingPercent;
-    [ObservableProperty] private decimal _activeAreaWidth;
-    [ObservableProperty] private decimal _activeAreaHeight;
-    [ObservableProperty] private decimal _panelBiasX;
-    [ObservableProperty] private decimal _panelBiasY;
-    [ObservableProperty] private bool _importOnlyClosedPolylines;
-    [ObservableProperty] private bool _importBlockPolylines;
-    [ObservableProperty] private bool _recalcBoundsOnLayerFilter;
-    [ObservableProperty] private FreeformHelperViewModel.ScanOrderOption _selectedScanOrderOption;
-    [ObservableProperty] private decimal _matchThreshold;
-    [ObservableProperty] private decimal _freeformAxisThreshold;
-    [ObservableProperty] private bool _enableAutoDetectXy;
-    [ObservableProperty] private bool _enableFreeformEdgeSpecialization;
-    [ObservableProperty] private bool _autoReplayStep2AfterProjectLoad;
-    [ObservableProperty] private bool _applyAppVisualPreferencesOnProjectLoad;
-    [ObservableProperty] private FreeformHelperViewModel.RegularSourceModeOption _selectedRegularSourceModeOption;
-    [ObservableProperty] private FreeformHelperViewModel.RegularSourceLayerOption _selectedRegularSourceLayerOption;
-    [ObservableProperty] private string _dxfRegularSourceHint = string.Empty;
-    [ObservableProperty] private bool _showDiffIndexOverlay;
-    [ObservableProperty] private decimal _cadOutputFwDiffIndexStart;
-    [ObservableProperty] private decimal _cadOutputFwDiffIndexAnchorCadId;
-    [ObservableProperty] private FreeformHelperViewModel.CadOutputFwDiffAutoModeOption _selectedCadOutputFwDiffAutoModeOption;
-    [ObservableProperty] private bool _enableToRegular;
-    [ObservableProperty] private bool _enableToFull;
-    [ObservableProperty] private bool _enableToFullRuleEngine;
-    [ObservableProperty] private bool _enableToFullRuleTrace;
-    [ObservableProperty] private bool _enableBoundaryVirtualAreaCap;
-    [ObservableProperty] private decimal _boundaryVirtualAreaCapPercent;
-    [ObservableProperty] private bool _enableTargetCoverageGuard;
-    [ObservableProperty] private decimal _targetCoverageCapPercent;
-    [ObservableProperty] private FreeformHelperViewModel.NotchCompensationModelOption _selectedNotchCompensationModelOption;
-    [ObservableProperty] private bool _showNotchCanvasPreview;
-    [ObservableProperty] private bool _showNotchToRegularLabels;
-    [ObservableProperty] private decimal _notchPreviewVisualizationStep;
-    [ObservableProperty] private decimal _toFullStrictOverlapPercent;
-    [ObservableProperty] private bool _notchPreviewAutoPlayEnabled;
-    [ObservableProperty] private decimal _notchPreviewAutoPlayIntervalMs;
-    [ObservableProperty] private FreeformHelperViewModel.GridAlignmentOption _selectedGridAlignmentOption;
-    [ObservableProperty] private FreeformHelperViewModel.LogLevelOption _selectedLogLevelOption;
-    [ObservableProperty] private FreeformHelperViewModel.NotchExportFileTypeOption _selectedNotchExportFileTypeOption;
-    [ObservableProperty] private FreeformHelperViewModel.NotchExportProfileOption _selectedNotchExportProfileOption;
-    [ObservableProperty] private decimal _mappingWeightIou;
-    [ObservableProperty] private decimal _mappingWeightCentroidDistance;
-    [ObservableProperty] private decimal _mappingWeightAreaRatio;
-    [ObservableProperty] private decimal _mappingLowConfidenceThreshold;
-    [ObservableProperty] private decimal _mappingAmbiguousMargin;
-    [ObservableProperty] private decimal _mappingCandidateNumber;
-    [ObservableProperty] private bool _useLocalSizing;
-    [ObservableProperty] private decimal _globalFontSizePercent;
-    [ObservableProperty] private decimal _highlightStrokeWidthAdjust;
-    [ObservableProperty] private bool _enableV21;
-    [ObservableProperty] private bool _enableV22;
-    [ObservableProperty] private decimal _lenScale;
-    [ObservableProperty] private decimal _nullValue;
-    [ObservableProperty] private decimal _notchThresholdQ7;
-    [ObservableProperty] private decimal _notchThresholdPercent;
-    [ObservableProperty] private bool _linkNotchThresholds;
-    [ObservableProperty] private ObservableCollection<LayerCategoryRow> _layerCategoryRows = new();
+    public decimal XChannels { get => _grid.XChannels; set => _grid.XChannels = value; }
+    public decimal YChannels { get => _grid.YChannels; set => _grid.YChannels = value; }
+    public decimal CascadeNum { get => _grid.CascadeNum; set => _grid.CascadeNum = value; }
+    public decimal CoordinatePixelWidth { get => _grid.CoordinatePixelWidth; set => _grid.CoordinatePixelWidth = value; }
+    public decimal CoordinatePixelHeight { get => _grid.CoordinatePixelHeight; set => _grid.CoordinatePixelHeight = value; }
+    public decimal GridPaddingPercent { get => _grid.GridPaddingPercent; set => _grid.GridPaddingPercent = value; }
+    public decimal ActiveAreaWidth { get => _grid.ActiveAreaWidth; set => _grid.ActiveAreaWidth = value; }
+    public decimal ActiveAreaHeight { get => _grid.ActiveAreaHeight; set => _grid.ActiveAreaHeight = value; }
+    public decimal PanelBiasX { get => _grid.PanelBiasX; set => _grid.PanelBiasX = value; }
+    public decimal PanelBiasY { get => _grid.PanelBiasY; set => _grid.PanelBiasY = value; }
+    public bool ImportOnlyClosedPolylines { get => _general.ImportOnlyClosedPolylines; set => _general.ImportOnlyClosedPolylines = value; }
+    public bool ImportBlockPolylines { get => _general.ImportBlockPolylines; set => _general.ImportBlockPolylines = value; }
+    public bool RecalcBoundsOnLayerFilter { get => _general.RecalcBoundsOnLayerFilter; set => _general.RecalcBoundsOnLayerFilter = value; }
+    public FreeformHelperViewModel.ScanOrderOption SelectedScanOrderOption { get => _grid.SelectedScanOrderOption; set => _grid.SelectedScanOrderOption = value; }
+    public decimal MatchThreshold { get => _general.MatchThreshold; set => _general.MatchThreshold = value; }
+    public decimal FreeformAxisThreshold { get => _general.FreeformAxisThreshold; set => _general.FreeformAxisThreshold = value; }
+    public bool EnableAutoDetectXy { get => _general.EnableAutoDetectXy; set => _general.EnableAutoDetectXy = value; }
+    public bool EnableFreeformEdgeSpecialization { get => _general.EnableFreeformEdgeSpecialization; set => _general.EnableFreeformEdgeSpecialization = value; }
+    public bool AutoReplayStep2AfterProjectLoad { get => _general.AutoReplayStep2AfterProjectLoad; set => _general.AutoReplayStep2AfterProjectLoad = value; }
+    public bool ApplyAppVisualPreferencesOnProjectLoad { get => _general.ApplyAppVisualPreferencesOnProjectLoad; set => _general.ApplyAppVisualPreferencesOnProjectLoad = value; }
+    public FreeformHelperViewModel.RegularSourceModeOption SelectedRegularSourceModeOption { get => _grid.SelectedRegularSourceModeOption; set => _grid.SelectedRegularSourceModeOption = value; }
+    public FreeformHelperViewModel.RegularSourceLayerOption SelectedRegularSourceLayerOption { get => _grid.SelectedRegularSourceLayerOption; set => _grid.SelectedRegularSourceLayerOption = value; }
+    public string DxfRegularSourceHint { get => _grid.DxfRegularSourceHint; set => _grid.DxfRegularSourceHint = value; }
+    public bool ShowDiffIndexOverlay { get => _mappingExport.ShowDiffIndexOverlay; set => _mappingExport.ShowDiffIndexOverlay = value; }
+    public decimal CadOutputFwDiffIndexStart { get => _mappingExport.CadOutputFwDiffIndexStart; set => _mappingExport.CadOutputFwDiffIndexStart = value; }
+    public decimal CadOutputFwDiffIndexAnchorCadId { get => _mappingExport.CadOutputFwDiffIndexAnchorCadId; set => _mappingExport.CadOutputFwDiffIndexAnchorCadId = value; }
+    public FreeformHelperViewModel.CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption { get => _mappingExport.SelectedCadOutputFwDiffAutoModeOption; set => _mappingExport.SelectedCadOutputFwDiffAutoModeOption = value; }
+    public bool EnableToRegular { get => _notch.EnableToRegular; set => _notch.EnableToRegular = value; }
+    public bool EnableToFull { get => _notch.EnableToFull; set => _notch.EnableToFull = value; }
+    public bool EnableToFullRuleEngine { get => _notch.EnableToFullRuleEngine; set => _notch.EnableToFullRuleEngine = value; }
+    public bool EnableToFullRuleTrace { get => _notch.EnableToFullRuleTrace; set => _notch.EnableToFullRuleTrace = value; }
+    public bool EnableBoundaryVirtualAreaCap { get => _notch.EnableBoundaryVirtualAreaCap; set => _notch.EnableBoundaryVirtualAreaCap = value; }
+    public decimal BoundaryVirtualAreaCapPercent { get => _notch.BoundaryVirtualAreaCapPercent; set => _notch.BoundaryVirtualAreaCapPercent = value; }
+    public bool EnableTargetCoverageGuard { get => _notch.EnableTargetCoverageGuard; set => _notch.EnableTargetCoverageGuard = value; }
+    public decimal TargetCoverageCapPercent { get => _notch.TargetCoverageCapPercent; set => _notch.TargetCoverageCapPercent = value; }
+    public FreeformHelperViewModel.NotchCompensationModelOption SelectedNotchCompensationModelOption { get => _notch.SelectedNotchCompensationModelOption; set => _notch.SelectedNotchCompensationModelOption = value; }
+    public bool ShowNotchCanvasPreview { get => _notch.ShowNotchCanvasPreview; set => _notch.ShowNotchCanvasPreview = value; }
+    public bool ShowNotchToRegularLabels { get => _notch.ShowNotchToRegularLabels; set => _notch.ShowNotchToRegularLabels = value; }
+    public decimal NotchPreviewVisualizationStep { get => _notch.NotchPreviewVisualizationStep; set => _notch.NotchPreviewVisualizationStep = value; }
+    public decimal ToFullStrictOverlapPercent { get => _notch.ToFullStrictOverlapPercent; set => _notch.ToFullStrictOverlapPercent = value; }
+    public bool NotchPreviewAutoPlayEnabled { get => _notch.NotchPreviewAutoPlayEnabled; set => _notch.NotchPreviewAutoPlayEnabled = value; }
+    public decimal NotchPreviewAutoPlayIntervalMs { get => _notch.NotchPreviewAutoPlayIntervalMs; set => _notch.NotchPreviewAutoPlayIntervalMs = value; }
+    public FreeformHelperViewModel.GridAlignmentOption SelectedGridAlignmentOption { get => _grid.SelectedGridAlignmentOption; set => _grid.SelectedGridAlignmentOption = value; }
+    public FreeformHelperViewModel.LogLevelOption SelectedLogLevelOption { get => _general.SelectedLogLevelOption; set => _general.SelectedLogLevelOption = value; }
+    public FreeformHelperViewModel.NotchExportFileTypeOption SelectedNotchExportFileTypeOption { get => _mappingExport.SelectedNotchExportFileTypeOption; set => _mappingExport.SelectedNotchExportFileTypeOption = value; }
+    public FreeformHelperViewModel.NotchExportProfileOption SelectedNotchExportProfileOption { get => _mappingExport.SelectedNotchExportProfileOption; set => _mappingExport.SelectedNotchExportProfileOption = value; }
+    public decimal MappingWeightIou { get => _mappingExport.MappingWeightIou; set => _mappingExport.MappingWeightIou = value; }
+    public decimal MappingWeightCentroidDistance { get => _mappingExport.MappingWeightCentroidDistance; set => _mappingExport.MappingWeightCentroidDistance = value; }
+    public decimal MappingWeightAreaRatio { get => _mappingExport.MappingWeightAreaRatio; set => _mappingExport.MappingWeightAreaRatio = value; }
+    public decimal MappingLowConfidenceThreshold { get => _mappingExport.MappingLowConfidenceThreshold; set => _mappingExport.MappingLowConfidenceThreshold = value; }
+    public decimal MappingAmbiguousMargin { get => _mappingExport.MappingAmbiguousMargin; set => _mappingExport.MappingAmbiguousMargin = value; }
+    public decimal MappingCandidateNumber { get => _mappingExport.MappingCandidateNumber; set => _mappingExport.MappingCandidateNumber = value; }
+    public bool UseLocalSizing { get => _general.UseLocalSizing; set => _general.UseLocalSizing = value; }
+    public decimal GlobalFontSizePercent { get => _general.GlobalFontSizePercent; set => _general.GlobalFontSizePercent = value; }
+    public decimal HighlightStrokeWidthAdjust { get => _general.HighlightStrokeWidthAdjust; set => _general.HighlightStrokeWidthAdjust = value; }
+    public bool EnableV21 { get => _mappingExport.EnableV21; set => _mappingExport.EnableV21 = value; }
+    public bool EnableV22 { get => _mappingExport.EnableV22; set => _mappingExport.EnableV22 = value; }
+    public decimal LenScale { get => _mappingExport.LenScale; set => _mappingExport.LenScale = value; }
+    public decimal NullValue { get => _mappingExport.NullValue; set => _mappingExport.NullValue = value; }
+    public decimal NotchThresholdQ7 { get => _notch.NotchThresholdQ7; set => _notch.NotchThresholdQ7 = value; }
+    public decimal NotchThresholdPercent { get => _notch.NotchThresholdPercent; set => _notch.NotchThresholdPercent = value; }
+    public bool LinkNotchThresholds { get => _notch.LinkNotchThresholds; set => _notch.LinkNotchThresholds = value; }
+    public ObservableCollection<LayerCategoryRow> LayerCategoryRows { get => _general.LayerCategoryRows; set => _general.LayerCategoryRows = value; }
 
-    public bool HasLayerCategoryRows => LayerCategoryRows.Count > 0;
-    public bool IsPanelAlignment => SelectedGridAlignmentOption.Value == FreeformHelper.Application.Settings.GridAlignmentMode.FromPanelAa;
-    public bool IsDxfLayerRegularSource => SelectedRegularSourceModeOption.Value == FreeformHelper.Application.Settings.RegularSourceMode.FromDxfLayer;
+    public bool HasLayerCategoryRows => _general.HasLayerCategoryRows;
+    public bool IsPanelAlignment => _grid.IsPanelAlignment;
+    public bool IsDxfLayerRegularSource => _grid.IsDxfLayerRegularSource;
     public bool IsGeneralSectionSelected
     {
         get => SelectedSection == SettingsWindowSection.General;
@@ -251,11 +303,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
         }
     }
 
-    public string ToFullRuleEngineSummary => EnableToFullRuleEngine
-        ? (EnableToFullRuleTrace
-            ? "To Full rule engine: ON (trace ON)"
-            : "To Full rule engine: ON (trace OFF)")
-        : "To Full rule engine: OFF (legacy gate path)";
+    public string ToFullRuleEngineSummary => _notch.ToFullRuleEngineSummary;
 
     public string SettingsSelectedSectionTitle => SelectedSection switch
     {
@@ -279,106 +327,37 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
         _ => "Edit project settings.",
     };
 
-    public string NotchCompensationModelSummary => string.IsNullOrWhiteSpace(SelectedNotchCompensationModelOption.Description)
-        ? string.Empty
-        : SelectedNotchCompensationModelOption.Description;
+    public string NotchCompensationModelSummary => _notch.NotchCompensationModelSummary;
 
-    public string NotchEffectiveModelSummary =>
-        $"{SelectedNotchCompensationModelOption.Display} · ToRegular {(EnableToRegular ? "ON" : "OFF")} · ToFull {(EnableToFull ? "ON" : "OFF")}";
+    public string NotchEffectiveModelSummary => _notch.NotchEffectiveModelSummary;
 
-    public string NotchAllocationModelSummary =>
-        SelectedNotchCompensationModelOption.Value switch
-        {
-            NotchCompensationModel.CurrentGain => "Allocation model: Stage3 effective-area gain; ToFull-expanded area splits the combined source signal.",
-            NotchCompensationModel.ConservativeNoGain => "Allocation model: SourceArea-dominant; ToFull is support/cap, not direct full-area weight.",
-            NotchCompensationModel.Disabled => "Allocation model: disabled baseline.",
-            _ => string.Empty,
-        };
+    public string NotchAllocationModelSummary => _notch.NotchAllocationModelSummary;
 
-    public string NotchAllocationModelShortText =>
-        SelectedNotchCompensationModelOption.Value switch
-        {
-            NotchCompensationModel.CurrentGain => "Stage3 gain allocation",
-            NotchCompensationModel.ConservativeNoGain => "Source-area dominant",
-            NotchCompensationModel.Disabled => "Disabled baseline",
-            _ => string.Empty,
-        };
+    public string NotchAllocationModelShortText => _notch.NotchAllocationModelShortText;
 
-    public string NotchToRegularSemanticSummary => EnableToRegular
-        ? "ToRegular: undo NF area flattening and restore area-proportional signal before redistribution."
-        : "ToRegular: disabled for baseline comparison.";
+    public string NotchToRegularSemanticSummary => _notch.NotchToRegularSemanticSummary;
 
-    public string NotchToRegularShortText => EnableToRegular
-        ? "ON - restore area signal"
-        : "OFF - baseline";
+    public string NotchToRegularShortText => _notch.NotchToRegularShortText;
 
-    public string NotchToFullSemanticSummary => EnableToFull
-        ? "ToFull: boundary support/cap/allowance only; target amount remains area-proportional."
-        : "ToFull: disabled for baseline comparison.";
+    public string NotchToFullSemanticSummary => _notch.NotchToFullSemanticSummary;
 
-    public string NotchToFullShortText => EnableToFull
-        ? "ON - support/cap only"
-        : "OFF - no boundary support";
+    public string NotchToFullShortText => _notch.NotchToFullShortText;
 
-    public string NotchBoundaryVirtualAreaCapSummary => EnableBoundaryVirtualAreaCap
-        ? $"Boundary cap: virtual ToFull area <= inside overlap x {BoundaryVirtualAreaCapPercent:0.#}%."
-        : "Boundary cap: OFF; Stage3 uses raw ToFull reachable area.";
+    public string NotchBoundaryVirtualAreaCapSummary => _notch.NotchBoundaryVirtualAreaCapSummary;
 
-    public string NotchBoundaryVirtualAreaCapShortText => EnableBoundaryVirtualAreaCap
-        ? $"Boundary cap {BoundaryVirtualAreaCapPercent:0.#}%"
-        : "Boundary cap OFF";
+    public string NotchBoundaryVirtualAreaCapShortText => _notch.NotchBoundaryVirtualAreaCapShortText;
 
-    public string NotchTargetCoverageGuardSummary =>
-        SimulationSafetyTextProjector.BuildNotchTargetCoverageGuardSummary(
-            EnableTargetCoverageGuard,
-            TargetCoverageCapPercent);
+    public string NotchTargetCoverageGuardSummary => _notch.NotchTargetCoverageGuardSummary;
 
-    public string NotchTargetCoverageGuardShortText => EnableTargetCoverageGuard
-        ? $"Target guard {TargetCoverageCapPercent:0.#}%"
-        : "Target guard OFF";
+    public string NotchTargetCoverageGuardShortText => _notch.NotchTargetCoverageGuardShortText;
 
-    public string NotchTargetCoverageCapHelpText =>
-        SimulationSafetyTextProjector.BuildNotchTargetCoverageCapHelpText(
-            TargetCoverageCapPercent,
-            SimulationSafetyTextProjector.DefaultEmsAfterCapText);
+    public string NotchTargetCoverageCapHelpText => _notch.NotchTargetCoverageCapHelpText;
 
-    public string NotchEmsSafetyPolicySummary =>
-        !string.IsNullOrWhiteSpace(SelectedNotchCompensationModelOption.Display)
-            ? SimulationSafetyTextProjector.BuildNotchEmsSafetyPolicySummary(
-                SimulationSafetyTextProjector.DefaultEmsAfterCapText)
-            : string.Empty;
+    public string NotchEmsSafetyPolicySummary => _notch.NotchEmsSafetyPolicySummary;
 
-    public string NotchEmsSafetyShortText =>
-        !string.IsNullOrWhiteSpace(SelectedNotchCompensationModelOption.Display)
-            ? SimulationSafetyTextProjector.BuildNotchEmsSafetyShortText(
-                SimulationSafetyTextProjector.DefaultEmsAfterCapText)
-            : string.Empty;
+    public string NotchEmsSafetyShortText => _notch.NotchEmsSafetyShortText;
 
-    public string NotchExportSafetyPolicySummary =>
-        !string.IsNullOrWhiteSpace(SelectedNotchExportFileTypeOption.Display)
-            ? SimulationSafetyTextProjector.BuildNotchExportSafetyPolicySummary(
-                SimulationSafetyTextProjector.DefaultEmsAfterCapText)
-            : string.Empty;
-
-    partial void OnActiveAreaWidthChanged(decimal value)
-    {
-        ActiveAreaPixels.WidthMm = value;
-    }
-
-    partial void OnActiveAreaHeightChanged(decimal value)
-    {
-        ActiveAreaPixels.HeightMm = value;
-    }
-
-    partial void OnSelectedGridAlignmentOptionChanged(FreeformHelperViewModel.GridAlignmentOption value)
-    {
-        OnPropertyChanged(nameof(IsPanelAlignment));
-    }
-
-    partial void OnSelectedRegularSourceModeOptionChanged(FreeformHelperViewModel.RegularSourceModeOption value)
-    {
-        OnPropertyChanged(nameof(IsDxfLayerRegularSource));
-    }
+    public string NotchExportSafetyPolicySummary => _mappingExport.NotchExportSafetyPolicySummary;
 
     partial void OnSelectedSectionChanged(SettingsWindowSection value)
     {
@@ -390,200 +369,6 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(IsStep5SectionSelected));
         OnPropertyChanged(nameof(SettingsSelectedSectionTitle));
         OnPropertyChanged(nameof(SettingsSelectedSectionDescription));
-    }
-
-    partial void OnEnableToFullRuleEngineChanged(bool value)
-    {
-        OnPropertyChanged(nameof(ToFullRuleEngineSummary));
-    }
-
-    partial void OnEnableToFullRuleTraceChanged(bool value)
-    {
-        OnPropertyChanged(nameof(ToFullRuleEngineSummary));
-    }
-
-    partial void OnEnableBoundaryVirtualAreaCapChanged(bool value)
-    {
-        NotifyNotchModelSummaryChanged();
-    }
-
-    partial void OnBoundaryVirtualAreaCapPercentChanged(decimal value)
-    {
-        var clamped = Math.Clamp(value, 0m, 1000m);
-        if (clamped != value)
-        {
-            BoundaryVirtualAreaCapPercent = clamped;
-            return;
-        }
-
-        NotifyNotchModelSummaryChanged();
-    }
-
-    partial void OnEnableTargetCoverageGuardChanged(bool value)
-    {
-        NotifyNotchModelSummaryChanged();
-    }
-
-    partial void OnTargetCoverageCapPercentChanged(decimal value)
-    {
-        var clamped = Math.Clamp(value, 0m, 255m);
-        if (clamped != value)
-        {
-            TargetCoverageCapPercent = clamped;
-            return;
-        }
-
-        NotifyNotchModelSummaryChanged();
-    }
-
-    partial void OnEnableToRegularChanged(bool value)
-    {
-        NotifyNotchModelSummaryChanged();
-    }
-
-    partial void OnEnableToFullChanged(bool value)
-    {
-        NotifyNotchModelSummaryChanged();
-    }
-
-    partial void OnSelectedNotchCompensationModelOptionChanged(FreeformHelperViewModel.NotchCompensationModelOption value)
-    {
-        if (_suppressCompensationModelSync)
-        {
-            return;
-        }
-
-        _suppressCompensationModelSync = true;
-        try
-        {
-            var (enableToRegular, enableToFull) = value.Value == NotchCompensationModel.Disabled
-                ? (false, false)
-                : (true, true);
-            EnableToRegular = enableToRegular;
-            EnableToFull = enableToFull;
-        }
-        finally
-        {
-            _suppressCompensationModelSync = false;
-        }
-
-        OnPropertyChanged(nameof(NotchCompensationModelSummary));
-        NotifyNotchModelSummaryChanged();
-    }
-
-    partial void OnSelectedNotchExportFileTypeOptionChanged(FreeformHelperViewModel.NotchExportFileTypeOption value)
-    {
-        OnPropertyChanged(nameof(NotchExportSafetyPolicySummary));
-    }
-
-    private void NotifyNotchModelSummaryChanged()
-    {
-        OnPropertyChanged(nameof(NotchEffectiveModelSummary));
-        OnPropertyChanged(nameof(NotchAllocationModelSummary));
-        OnPropertyChanged(nameof(NotchAllocationModelShortText));
-        OnPropertyChanged(nameof(NotchToRegularSemanticSummary));
-        OnPropertyChanged(nameof(NotchToRegularShortText));
-        OnPropertyChanged(nameof(NotchToFullSemanticSummary));
-        OnPropertyChanged(nameof(NotchToFullShortText));
-        OnPropertyChanged(nameof(NotchBoundaryVirtualAreaCapSummary));
-        OnPropertyChanged(nameof(NotchBoundaryVirtualAreaCapShortText));
-        OnPropertyChanged(nameof(NotchTargetCoverageGuardSummary));
-        OnPropertyChanged(nameof(NotchTargetCoverageGuardShortText));
-        OnPropertyChanged(nameof(NotchTargetCoverageCapHelpText));
-        OnPropertyChanged(nameof(NotchEmsSafetyPolicySummary));
-        OnPropertyChanged(nameof(NotchEmsSafetyShortText));
-    }
-
-    partial void OnCoordinatePixelWidthChanged(decimal value)
-    {
-        var clamped = CoordinatePixelSizePolicy.Normalize(value);
-        if (clamped != value)
-        {
-            CoordinatePixelWidth = clamped;
-        }
-    }
-
-    partial void OnCoordinatePixelHeightChanged(decimal value)
-    {
-        var clamped = CoordinatePixelSizePolicy.Normalize(value);
-        if (clamped != value)
-        {
-            CoordinatePixelHeight = clamped;
-        }
-    }
-
-    partial void OnHighlightStrokeWidthAdjustChanged(decimal value)
-    {
-        var clamped = Math.Clamp(value, -2m, 4m);
-        if (clamped != value)
-        {
-            HighlightStrokeWidthAdjust = clamped;
-        }
-    }
-
-    partial void OnNotchThresholdQ7Changed(decimal value)
-    {
-        var clamped = Math.Clamp(value, 0m, 128m);
-        if (clamped != value)
-        {
-            NotchThresholdQ7 = clamped;
-            return;
-        }
-
-        if (_suppressNotchThresholdSync || !LinkNotchThresholds)
-        {
-            return;
-        }
-
-        _suppressNotchThresholdSync = true;
-        NotchThresholdPercent = Math.Round(clamped * 100m / 128m, 2);
-        _suppressNotchThresholdSync = false;
-    }
-
-    partial void OnNotchThresholdPercentChanged(decimal value)
-    {
-        var clamped = Math.Clamp(value, 0m, 100m);
-        if (clamped != value)
-        {
-            NotchThresholdPercent = clamped;
-            return;
-        }
-
-        if (_suppressNotchThresholdSync || !LinkNotchThresholds)
-        {
-            return;
-        }
-
-        _suppressNotchThresholdSync = true;
-        var q7 = Math.Clamp((int)Math.Round(clamped * 128m / 100m, MidpointRounding.AwayFromZero), 0, 128);
-        NotchThresholdQ7 = q7;
-        _suppressNotchThresholdSync = false;
-    }
-
-    partial void OnLinkNotchThresholdsChanged(bool value)
-    {
-        if (!value || _suppressNotchThresholdSync)
-        {
-            return;
-        }
-
-        _suppressNotchThresholdSync = true;
-        NotchThresholdPercent = Math.Round(NotchThresholdQ7 * 100m / 128m, 2);
-        _suppressNotchThresholdSync = false;
-    }
-
-    private void RefreshLayerCategoryRows()
-    {
-        LayerCategoryRows = new ObservableCollection<LayerCategoryRow>(
-            _owner.GetDxfLayerCategoryStates()
-                .Select(state => new LayerCategoryRow(state, ApplyLayerCategorySelection)));
-        OnPropertyChanged(nameof(HasLayerCategoryRows));
-    }
-
-    private void ApplyLayerCategorySelection(FreeformHelperViewModel.DxfLayerCategory category, bool isSelected)
-    {
-        _owner.ApplyLayerCategorySelection(category, isSelected);
-        RefreshLayerCategoryRows();
     }
 
     /// <summary>
