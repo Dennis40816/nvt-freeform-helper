@@ -106,8 +106,11 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     {
     }
 
+    private readonly ProjectEditingSession _projectEditingSession;
+
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
+        _projectEditingSession = new ProjectEditingSession(PublishProjectEditingAvailabilityChange);
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
         _statusReporter = new UiOperationStatusReporter(message => StatusText = message);
         UiEvents = uiEvents ?? new UiEventRunner(new UiEventFailureReporter(_statusReporter).Report, EmergencyLogSink.Report);

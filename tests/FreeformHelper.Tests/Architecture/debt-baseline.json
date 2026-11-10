@@ -11,7 +11,7 @@
     "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 4,
-    "freeformViewModelStateMembers": 86,
+    "freeformViewModelStateMembers": 84,
     "shellNavigationBooleans": 0,
     "noWarnIds": 1
   },
@@ -47,7 +47,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:63",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.cs:123",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorSummary.cs:8",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:8", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:9", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:100",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:54",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.RegularVisibilityMask.cs:14",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Summary.cs:14",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.cs:19",
