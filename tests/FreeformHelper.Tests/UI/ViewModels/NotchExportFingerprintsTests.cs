@@ -127,4 +127,161 @@ public sealed class NotchExportFingerprintsTests
         nameof(NotchSettings.MultiOwnerStrictOverlapPercent) => settings => settings.MultiOwnerStrictOverlapPercent = 0.2,
         _ => throw new ArgumentOutOfRangeException(nameof(setting)),
     };
+
+    [Fact]
+    public void ActiveRegularHashUsesMinusOneForNullAndEmptySets()
+    {
+        Assert.Equal(-1, NotchExportFingerprints.ComputeActiveRegularHash(null));
+        Assert.Equal(-1, NotchExportFingerprints.ComputeActiveRegularHash(new HashSet<int>()));
+    }
+
+    [Fact]
+    public void ActiveRegularHashIgnoresInsertionOrder()
+    {
+        var first = new HashSet<int> { 10, 20, 30 };
+        var second = new HashSet<int> { 30, 10, 20 };
+
+        Assert.Equal(
+            NotchExportFingerprints.ComputeActiveRegularHash(first),
+            NotchExportFingerprints.ComputeActiveRegularHash(second));
+    }
+
+    [Fact]
+    public void ActiveRegularHashChangesWithTheIds()
+    {
+        var first = new HashSet<int> { 10, 20 };
+        var second = new HashSet<int> { 10, 30 };
+
+        Assert.NotEqual(
+            NotchExportFingerprints.ComputeActiveRegularHash(first),
+            NotchExportFingerprints.ComputeActiveRegularHash(second));
+    }
+
+    [Fact]
+    public void ActiveRegularHashForOneIdIsNotTheEmptySentinel()
+    {
+        Assert.NotEqual(-1, NotchExportFingerprints.ComputeActiveRegularHash(new HashSet<int> { 10 }));
+    }
+
+    [Fact]
+    public void CadPoolFingerprintIsRepeatableForTheSameOrderedIds()
+    {
+        var first = new[]
+        {
+            TestInfrastructure.TestGeometryFactory.CreateCadPad(10, "AA", 0, 0, 10, 10),
+            TestInfrastructure.TestGeometryFactory.CreateCadPad(20, "AA", 10, 0, 20, 10),
+        };
+        var second = new[]
+        {
+            TestInfrastructure.TestGeometryFactory.CreateCadPad(10, "AA", 0, 0, 10, 10),
+            TestInfrastructure.TestGeometryFactory.CreateCadPad(20, "AA", 10, 0, 20, 10),
+        };
+
+        Assert.Equal(
+            NotchExportFingerprints.ComputeCadPoolFingerprint(first),
+            NotchExportFingerprints.ComputeCadPoolFingerprint(second));
+    }
+
+    [Fact]
+    public void CadPoolFingerprintChangesWithTheCount()
+    {
+        var pad = TestInfrastructure.TestGeometryFactory.CreateCadPad(10, "AA", 0, 0, 10, 10);
+
+        Assert.NotEqual(
+            NotchExportFingerprints.ComputeCadPoolFingerprint([pad]),
+            NotchExportFingerprints.ComputeCadPoolFingerprint([pad, pad]));
+    }
+
+    [Fact]
+    public void CadPoolFingerprintChangesWithAnId()
+    {
+        var first = TestInfrastructure.TestGeometryFactory.CreateCadPad(10, "AA", 0, 0, 10, 10);
+        var second = TestInfrastructure.TestGeometryFactory.CreateCadPad(20, "AA", 0, 0, 10, 10);
+
+        Assert.NotEqual(
+            NotchExportFingerprints.ComputeCadPoolFingerprint([first]),
+            NotchExportFingerprints.ComputeCadPoolFingerprint([second]));
+    }
+
+    [Fact]
+    public void CadPoolFingerprintPreservesIdOrder()
+    {
+        var first = TestInfrastructure.TestGeometryFactory.CreateCadPad(10, "AA", 0, 0, 10, 10);
+        var second = TestInfrastructure.TestGeometryFactory.CreateCadPad(20, "AA", 10, 0, 20, 10);
+
+        Assert.NotEqual(
+            NotchExportFingerprints.ComputeCadPoolFingerprint([first, second]),
+            NotchExportFingerprints.ComputeCadPoolFingerprint([second, first]));
+    }
+
+    [Fact]
+    public void EmptyCadPoolFingerprintIsStable()
+    {
+        var first = NotchExportFingerprints.ComputeCadPoolFingerprint([]);
+        var second = NotchExportFingerprints.ComputeCadPoolFingerprint([]);
+
+        Assert.Equal(first, second);
+    }
+
+    [Theory]
+    [InlineData(2, 10, 3)]
+    [InlineData(1, 11, 3)]
+    [InlineData(1, 10, 4)]
+    public void CadFingerprintChangesWithEachInput(int cadRevision, int cadPadCount, int hiddenCadPadCount)
+    {
+        var original = NotchExportFingerprints.BuildCadFingerprint(1, 10, 3);
+        var changed = NotchExportFingerprints.BuildCadFingerprint(cadRevision, cadPadCount, hiddenCadPadCount);
+
+        Assert.NotEqual(original, changed);
+    }
+
+    [Fact]
+    public void CadFingerprintIsRepeatableForEqualInputs()
+    {
+        var first = NotchExportFingerprints.BuildCadFingerprint(1, 10, 3);
+        var second = NotchExportFingerprints.BuildCadFingerprint(1, 10, 3);
+
+        Assert.Equal(first, second);
+    }
+
+    [Theory]
+    [InlineData(2, 10, 3)]
+    [InlineData(1, 11, 3)]
+    [InlineData(1, 10, 4)]
+    public void ExportGridFingerprintChangesWithEachInput(int gridRevision, int gridPadCount, int indexRevision)
+    {
+        var original = NotchExportFingerprints.BuildExportGridFingerprint(1, 10, 3);
+        var changed = NotchExportFingerprints.BuildExportGridFingerprint(gridRevision, gridPadCount, indexRevision);
+
+        Assert.NotEqual(original, changed);
+    }
+
+    [Fact]
+    public void ExportGridFingerprintIsRepeatableForEqualInputs()
+    {
+        var first = NotchExportFingerprints.BuildExportGridFingerprint(1, 10, 3);
+        var second = NotchExportFingerprints.BuildExportGridFingerprint(1, 10, 3);
+
+        Assert.Equal(first, second);
+    }
+
+    [Theory]
+    [InlineData(2, 10)]
+    [InlineData(1, 11)]
+    public void ComputationGridFingerprintChangesWithEachInput(int gridRevision, int gridPadCount)
+    {
+        var original = NotchExportFingerprints.BuildComputationGridFingerprint(1, 10);
+        var changed = NotchExportFingerprints.BuildComputationGridFingerprint(gridRevision, gridPadCount);
+
+        Assert.NotEqual(original, changed);
+    }
+
+    [Fact]
+    public void ComputationGridFingerprintIsRepeatableForEqualInputs()
+    {
+        var first = NotchExportFingerprints.BuildComputationGridFingerprint(1, 10);
+        var second = NotchExportFingerprints.BuildComputationGridFingerprint(1, 10);
+
+        Assert.Equal(first, second);
+    }
 }

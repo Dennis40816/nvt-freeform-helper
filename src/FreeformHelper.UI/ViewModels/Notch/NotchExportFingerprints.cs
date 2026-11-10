@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using FreeformHelper.Application.Settings;
+using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -65,6 +66,75 @@ internal static class NotchExportFingerprints
                 hash = (hash * 31) + pair.Value;
             }
 
+            return hash;
+        }
+    }
+
+    internal static int ComputeActiveRegularHash(IReadOnlySet<int>? activeRegularPadIds)
+    {
+        if (activeRegularPadIds is null || activeRegularPadIds.Count == 0)
+        {
+            return -1;
+        }
+
+        unchecked
+        {
+            var hash = 17;
+            foreach (var id in activeRegularPadIds.OrderBy(static id => id))
+            {
+                hash = (hash * 31) + id;
+            }
+
+            return hash;
+        }
+    }
+
+    internal static ulong ComputeCadPoolFingerprint(IReadOnlyList<CadPad> cadPads)
+    {
+        unchecked
+        {
+            var hash = 1469598103934665603UL;
+            hash = (hash * 1099511628211UL) ^ (uint)cadPads.Count;
+            foreach (var cadPad in cadPads)
+            {
+                hash = (hash * 1099511628211UL) ^ (uint)cadPad.Id;
+            }
+
+            return hash;
+        }
+    }
+
+    internal static ulong BuildCadFingerprint(int cadRevision, int cadPadCount, int hiddenCadPadCount)
+    {
+        unchecked
+        {
+            var hash = 1469598103934665603UL;
+            hash = (hash * 1099511628211UL) ^ (uint)cadRevision;
+            hash = (hash * 1099511628211UL) ^ (uint)cadPadCount;
+            hash = (hash * 1099511628211UL) ^ (uint)(hiddenCadPadCount);
+            return hash;
+        }
+    }
+
+    internal static ulong BuildExportGridFingerprint(int gridRevision, int gridPadCount, int indexRevision)
+    {
+        unchecked
+        {
+            var hash = 1469598103934665603UL;
+            hash = (hash * 1099511628211UL) ^ (uint)gridRevision;
+            hash = (hash * 1099511628211UL) ^ (uint)gridPadCount;
+            hash = (hash * 1099511628211UL) ^ (uint)indexRevision;
+            return hash;
+        }
+    }
+
+    internal static ulong BuildComputationGridFingerprint(int gridRevision, int gridPadCount)
+    {
+        unchecked
+        {
+            var hash = 1469598103934665603UL;
+            hash = (hash * 1099511628211UL) ^ (uint)gridRevision;
+            hash = (hash * 1099511628211UL) ^ (uint)gridPadCount;
             return hash;
         }
     }
