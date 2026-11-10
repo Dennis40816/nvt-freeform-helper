@@ -15,11 +15,7 @@ public sealed partial class SimulationWorkspaceViewModel
 
         _cellsByRegularPadId = projection.CellsByRegularPadId;
         _simulationOverlayItems = projection.OverlayItems;
-        _legendMinimumValue = projection.LegendRange.Minimum;
-        _legendMaximumValue = projection.LegendRange.Maximum;
-        _legendMaximumAbsDelta = projection.LegendRange.MaximumAbsDelta;
-        _legendAutoNegativeClampAbs = projection.LegendRange.AutoNegativeClampAbs;
-        _legendAutoPositiveClamp = projection.LegendRange.AutoPositiveClamp;
+        _legendRange = projection.LegendRange;
 
         EnsureSelectedRegularWithinArea();
         OnPropertyChanged(nameof(SimulationOverlayItems));
@@ -114,12 +110,12 @@ public sealed partial class SimulationWorkspaceViewModel
 
         if (SelectedCanvasColorOption.Value == NotchApplySimulationCanvasColorMode.Auto)
         {
-            return Math.Max(_legendAutoNegativeClampAbs, _legendAutoPositiveClamp);
+            return Math.Max(_legendRange.AutoNegativeClampAbs, _legendRange.AutoPositiveClamp);
         }
 
         return IsSignedCanvasView
-            ? _legendMaximumAbsDelta
-            : Math.Max(Math.Abs(_legendMinimumValue), Math.Abs(_legendMaximumValue));
+            ? _legendRange.MaximumAbsDelta
+            : Math.Max(Math.Abs(_legendRange.Minimum), Math.Abs(_legendRange.Maximum));
     }
 
     private static string FormatLegendValue(double value)

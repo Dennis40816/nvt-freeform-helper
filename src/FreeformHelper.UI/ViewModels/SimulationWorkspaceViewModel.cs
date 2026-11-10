@@ -134,16 +134,12 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     private IReadOnlyDictionary<int, NotchApplySimulationDiffCell> _cellsByRegularPadId = new Dictionary<int, NotchApplySimulationDiffCell>();
     private Dictionary<int, NotchApplySimulationDiffCell> _snapshotCellsByRegularPadId = new();
     private Dictionary<int, IReadOnlyList<NotchApplySimulationImpactItemViewModel>> _impactItemsByRegularPadId = new();
-    private double _legendMinimumValue;
-    private double _legendMaximumValue;
-    private double _legendMaximumAbsDelta;
+    private SimulationLegendRange _legendRange;
     private readonly IReadOnlyList<CadPad> _cadPads;
     private readonly bool _showCad;
     private readonly bool _showRegular;
     private readonly bool _highlightFreeform;
     private readonly bool _highlightUnmatched;
-    private double _legendAutoNegativeClampAbs;
-    private double _legendAutoPositiveClamp;
     private IReadOnlyList<string> _csvSourcePaths = Array.Empty<string>();
     private NotchApplySimulationImportedDataset _csvDataset = NotchApplySimulationImportedDataset.Empty;
     private CopperPillarPathReplayResult _copperPathReplayResult = CopperPillarPathReplayResult.Empty;
@@ -338,7 +334,7 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     public bool CanRandomizeVisibleValues => _session.FwDiffGrid.Pads.Any(IsPadInSelectedAreaAndActiveSurface);
     public bool IsThresholdMode => SelectedCanvasColorOption.Value == NotchApplySimulationCanvasColorMode.Threshold;
     public bool IsSignedCanvasView => SelectedCanvasViewMode is NotchApplySimulationCanvasViewMode.Delta or NotchApplySimulationCanvasViewMode.ChangedOnly;
-    public bool UsesSignedColorScale => IsSignedCanvasView || _legendMinimumValue < -SignificantDeltaEpsilon;
+    public bool UsesSignedColorScale => IsSignedCanvasView || _legendRange.Minimum < -SignificantDeltaEpsilon;
     public bool HasSelectedRegular => SelectedRegularPadId >= 0 && _regularPadById.ContainsKey(SelectedRegularPadId);
     public bool HasManualOverrides => _manualOverridesByRegularPadId.Count > 0;
     public bool HasSelectedOverride => HasSelectedRegular && _manualOverridesByRegularPadId.ContainsKey(SelectedRegularPadId);
@@ -422,7 +418,7 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         ? FormatLegendValue(-GetLegendSignedRange())
         : IsThresholdMode
             ? "0"
-            : FormatLegendValue(_legendMinimumValue);
+            : FormatLegendValue(_legendRange.Minimum);
     public string ColorLegendCenterText => UsesSignedColorScale
         ? "0"
         : string.Empty;
@@ -430,7 +426,7 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         ? FormatSignedLegendValue(GetLegendSignedRange())
         : IsThresholdMode
             ? $"TH {ColorThresholdValue.ToString("0.###", CultureInfo.InvariantCulture)}"
-            : FormatLegendValue(_legendMaximumValue);
+            : FormatLegendValue(_legendRange.Maximum);
     public bool HasDuplicateDiffResolutions => _snapshot?.SimulationResult.DiffIdentityContract.HasDuplicateResolutions ?? false;
     public int DuplicateDiffResolutionCount => _snapshot?.SimulationResult.DiffIdentityContract.DuplicateResolutionCount ?? 0;
     public string DuplicateDiffResolutionStrategyText => FormatDuplicateDiffResolutionStrategy(
