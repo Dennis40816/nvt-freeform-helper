@@ -38,7 +38,7 @@ public sealed partial class FreeformHelperViewModel
     {
         return DxfEditChangeEntryBuilder.Build(
             _cad, _cadEdit, _combinedCad, IsCadPadEffectivelyHidden,
-            static (left, right) => ArePolygonVerticesEquivalent(left, right));
+            static (left, right) => DxfEditRules.ArePolygonVerticesEquivalent(left, right));
     }
 
     private void FocusDxfEditChangeEntry(DxfEditChangeListEntry entry)

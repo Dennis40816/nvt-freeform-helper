@@ -89,4 +89,23 @@ internal static class DxfEditStateCapture
             });
         }
     }
+
+    internal static Dictionary<int, ProjectCadGeometrySnapshot> CapturePersistedCadGeometryOverrides(
+        CadPadSet? cad, CadPadSet? baselineCad)
+    {
+        if (cad is null || baselineCad is null)
+        {
+            return new Dictionary<int, ProjectCadGeometrySnapshot>();
+        }
+
+        var baselinePadsByCadId = baselineCad.Pads
+            .GroupBy(static pad => pad.Id)
+            .ToDictionary(static group => group.Key, static group => group.First());
+
+        return cad.Pads
+            .Where(pad =>
+                baselinePadsByCadId.TryGetValue(pad.Id, out var baselinePad) &&
+                !DxfEditRules.ArePolygonVerticesEquivalent(baselinePad.Polygon, pad.Polygon))
+            .ToDictionary(static pad => pad.Id, ProjectCadGeometrySnapshot.FromCadPad);
+    }
 }

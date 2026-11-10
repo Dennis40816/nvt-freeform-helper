@@ -186,7 +186,7 @@ public sealed partial class FreeformHelperViewModel
             .ToDictionary(static group => group.Key, static group => group.First());
         var rotatedCount = _cad.Pads.Count(pad =>
             baselinePadsByCadId.TryGetValue(pad.Id, out var baselinePad) &&
-            !ArePolygonVerticesEquivalent(baselinePad.Polygon, pad.Polygon));
+            !DxfEditRules.ArePolygonVerticesEquivalent(baselinePad.Polygon, pad.Polygon));
 
         RotatedCadPadCount = rotatedCount;
         NotifyCadEditProjectionChange(nameof(HasRotatedCadPads), previous.Rotated > 0, HasRotatedCadPads);

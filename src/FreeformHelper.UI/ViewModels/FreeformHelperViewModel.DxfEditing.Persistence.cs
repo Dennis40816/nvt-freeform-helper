@@ -33,7 +33,7 @@ public sealed partial class FreeformHelperViewModel
             .Where(validCadIds.Contains)
             .ToHashSet();
         file.DxfCadLayerOverrides = DxfEditStateCapture.CapturePersistedCadLayerOverrides(_cad, _cadEdit.BaselineCad);
-        file.DxfCadGeometryOverrides = CapturePersistedCadGeometryOverrides();
+        file.DxfCadGeometryOverrides = DxfEditStateCapture.CapturePersistedCadGeometryOverrides(_cad, _cadEdit.BaselineCad);
         file.DxfCombinedCadGroups = DxfEditStateCapture.CapturePersistedCombinedCadGroups(_cad, _combinedCad, _cadEdit.UnrestoredCombinedGroups);
     }
 

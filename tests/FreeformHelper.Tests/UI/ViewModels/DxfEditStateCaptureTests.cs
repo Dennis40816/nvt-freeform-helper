@@ -228,4 +228,60 @@ public sealed class DxfEditStateCaptureTests
         Assert.Equal(expectedLayer, actual.Layer);
         Assert.Equal(new[] { new Point2(0, 0), new Point2(2, 0), new Point2(2, 1), new Point2(0, 1) }, actual.Vertices);
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void GeometryOverridesWithMissingCadOrBaselineAreEmpty(bool hasCad)
+    {
+        var pads = new CadPadSet([CreatePad(1)]);
+
+        var overrides = DxfEditStateCapture.CapturePersistedCadGeometryOverrides(
+            hasCad ? pads : null, hasCad ? null : pads);
+
+        Assert.Empty(overrides);
+    }
+
+    [Fact]
+    public void GeometryOverridesIgnoreUnchangedPad()
+    {
+        var cad = new CadPadSet([CreatePad(1)]);
+        var baseline = new CadPadSet([CreatePad(1)]);
+
+        var overrides = DxfEditStateCapture.CapturePersistedCadGeometryOverrides(cad, baseline);
+
+        Assert.Empty(overrides);
+    }
+
+    [Fact]
+    public void GeometryOverridesCaptureCurrentVerticesForRotatedPad()
+    {
+        var rotated = new CadPad(1, "Pad 1", "Original", new Polygon2(
+        [
+            new Point2(1.5, -0.5), new Point2(1.5, 1.5), new Point2(0.5, 1.5), new Point2(0.5, -0.5),
+        ]));
+        var cad = new CadPadSet([rotated]);
+        var baseline = new CadPadSet([CreatePad(1)]);
+
+        var overrides = DxfEditStateCapture.CapturePersistedCadGeometryOverrides(cad, baseline);
+
+        var changed = Assert.Single(overrides);
+        Assert.Equal(1, changed.Key);
+        Assert.Collection(changed.Value.Vertices,
+            static vertex => Assert.Equal(new Point2(1.5, -0.5), vertex),
+            static vertex => Assert.Equal(new Point2(1.5, 1.5), vertex),
+            static vertex => Assert.Equal(new Point2(0.5, 1.5), vertex),
+            static vertex => Assert.Equal(new Point2(0.5, -0.5), vertex));
+    }
+
+    [Fact]
+    public void GeometryOverridesIgnorePadsAbsentFromBaseline()
+    {
+        var cad = new CadPadSet([CreatePad(2)]);
+        var baseline = new CadPadSet([CreatePad(1)]);
+
+        var overrides = DxfEditStateCapture.CapturePersistedCadGeometryOverrides(cad, baseline);
+
+        Assert.Empty(overrides);
+    }
 }
