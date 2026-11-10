@@ -1,14 +1,13 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
-using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Simulation;
 using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -118,19 +117,16 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         new(NotchApplySimulationCanvasColorMode.Threshold, "TH"),
     };
 
+    private readonly SimulationSourceOwner<SimulationScenarioSnapshot, NotchApplySimulationImportedDataset> _source;
+    private readonly SimulationPlaybackOwner _playback;
+    private readonly SimulationCopperOwner _copper;
     private readonly SimulationWorkspaceUseCase _useCase;
     private readonly SimulationWorkspaceSession _session;
-    private DispatcherTimer? _playbackTimer;
-    private readonly Dictionary<int, double> _manualOverridesByRegularPadId = new();
     private readonly Dictionary<int, RegularPad> _regularPadById;
     private readonly Dictionary<int, int> _cadOutputFwDiffByRegularPadId;
     private readonly Dictionary<(int IcIndex, int DiffIndex), int[]> _regularPadIdsByIcDiff;
-    private readonly Dictionary<SimulationSnapshotCacheKey, SimulationScenarioSnapshot> _csvSnapshotCache = new();
-    private readonly ObservableCollection<NotchApplySimulationSourceFileItemViewModel> _csvFiles = new();
-    private readonly ObservableCollection<NotchApplySimulationFrameOption> _frameOptions = new();
     private readonly ObservableCollection<NotchApplySimulationImpactItemViewModel> _selectedImpactItems = new();
     private readonly ObservableCollection<SimulationSafetyRiskDiffViewModel> _simulationHighRiskDiffs = new();
-    private readonly ObservableCollection<CopperPillarPathReplayArtifactRow> _copperPathReplayRows = new();
     private IReadOnlyDictionary<int, NotchApplySimulationDiffCell> _cellsByRegularPadId = new Dictionary<int, NotchApplySimulationDiffCell>();
     private Dictionary<int, NotchApplySimulationDiffCell> _snapshotCellsByRegularPadId = new();
     private Dictionary<int, IReadOnlyList<NotchApplySimulationImpactItemViewModel>> _impactItemsByRegularPadId = new();
@@ -140,15 +136,10 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     private readonly bool _showRegular;
     private readonly bool _highlightFreeform;
     private readonly bool _highlightUnmatched;
-    private IReadOnlyList<string> _csvSourcePaths = Array.Empty<string>();
-    private NotchApplySimulationImportedDataset _csvDataset = NotchApplySimulationImportedDataset.Empty;
-    private CopperPillarPathReplayResult _copperPathReplayResult = CopperPillarPathReplayResult.Empty;
-    private CopperPillarPathReplayArtifactSnapshot _copperPathReplayArtifactSnapshot =
-        CopperPillarPathReplayArtifactSnapshot.Empty;
-    private SimulationScenarioSnapshot? _snapshot;
+    private NotchApplySimulationImportedDataset _csvDataset => _source.Dataset;
+    private IReadOnlyDictionary<int, double> _manualOverridesByRegularPadId => _source.ManualOverrides;
+    private SimulationScenarioSnapshot? _snapshot => _source.Current;
     private IReadOnlyList<NotchApplySimulationAaDisplayCell> _simulationOverlayItems = Array.Empty<NotchApplySimulationAaDisplayCell>();
-    private bool _isSyncingFrameSelection;
-    private bool _isUpdatingCopperCenter;
 
     public SimulationWorkspaceViewModel(
         SimulationWorkspaceUseCase useCase,
@@ -165,70 +156,93 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         _highlightFreeform = _session.DefaultHighlightFreeform;
         _highlightUnmatched = _session.DefaultHighlightUnmatched;
 
-        SourceOptions = _sharedInputSourceOptions;
-        CopperContactModelOptions = _sharedCopperContactModelOptions;
         CanvasViewOptions = _sharedCanvasViewOptions;
         CanvasColorOptions = _sharedCanvasColorOptions;
-        VersionOptions = BuildVersionOptions(_session.Table);
         AreaOptions = BuildAreaOptions(_session.FwDiffGrid.Pads);
-        CsvFiles = new ReadOnlyObservableCollection<NotchApplySimulationSourceFileItemViewModel>(_csvFiles);
-        FrameOptions = new ReadOnlyObservableCollection<NotchApplySimulationFrameOption>(_frameOptions);
         SelectedImpactItems = new ReadOnlyObservableCollection<NotchApplySimulationImpactItemViewModel>(_selectedImpactItems);
         SimulationHighRiskDiffs = new ReadOnlyObservableCollection<SimulationSafetyRiskDiffViewModel>(_simulationHighRiskDiffs);
-        CopperPathReplayRows = new ReadOnlyObservableCollection<CopperPillarPathReplayArtifactRow>(_copperPathReplayRows);
 
-        ImportCsvCommand = new AsyncRelayCommand(ImportCsvAsync, () => CanImportCsv);
-        ClearCsvCommand = new RelayCommand(ClearCsv, () => HasCsvFiles);
-        RandomizeVisibleValuesCommand = new RelayCommand(RandomizeVisibleValues, () => IsManualSource && CanRandomizeVisibleValues);
-        ApplyManualPresetCommand = new RelayCommand<string?>(ApplyManualPreset, _ => IsManualSource);
-        TogglePlaybackCommand = new RelayCommand(TogglePlayback, () => CanPlayFrames);
-        PreviousFrameCommand = new RelayCommand(MoveToPreviousFrame, () => CanStepFrames);
-        NextFrameCommand = new RelayCommand(MoveToNextFrame, () => CanStepFrames);
-        ApplySelectedOverrideCommand = new RelayCommand(ApplySelectedOverride, () => HasSelectedRegular);
-        ClearSelectedOverrideCommand = new RelayCommand(ClearSelectedOverride, () => HasSelectedOverride);
-        ClearAllManualOverridesCommand = new RelayCommand(ClearAllManualOverrides, () => HasManualOverrides);
         FitCanvasCommand = new RelayCommand(() => FitCanvasRequested?.Invoke(this, EventArgs.Empty));
         SelectSimulationRiskDiffCommand = new RelayCommand<SimulationSafetyRiskDiffViewModel?>(SelectSimulationRiskDiff);
-        ReplayCopperPathCommand = new RelayCommand(ReplayConfiguredCopperPath, () => IsCopperSource);
-        UseCurrentCopperAsPathStartCommand = new RelayCommand(
-            () => CaptureCopperPathEndpoint(useStart: true),
-            () => IsCopperSource);
-        UseCurrentCopperAsPathEndCommand = new RelayCommand(
-            () => CaptureCopperPathEndpoint(useStart: false),
-            () => IsCopperSource);
-        SelectCopperPathReplayRowCommand =
-            new RelayCommand<CopperPillarPathReplayArtifactRow?>(SelectCopperPathReplayRow);
-        CopyCopperPathReplayCommand = new AsyncRelayCommand(CopyCopperPathReplayAsync);
-        ExportCopperPathReplayCsvCommand = new AsyncRelayCommand(ExportCopperPathReplayCsvAsync);
-        ExportCopperPathReplayJsonCommand = new AsyncRelayCommand(ExportCopperPathReplayJsonAsync);
+        _source = CreateSourceOwner();
+        _playback = new SimulationPlaybackOwner(
+            new SimulationPlaybackOwner.Seed(0, false, true, DefaultPlaybackFramesPerSecond),
+            () => IsCsvSource, () => FrameOptions, RefreshSnapshot, RefreshCommandState,
+            CreatePlaybackTimer, name => OnPropertyChanging(name), name => OnPropertyChanged(name));
+        _copper = CreateCopperOwner();
+        _playback.EnsureTimer();
 
-        _ = EnsurePlaybackTimer();
-
-        _selectedInputSourceOption = SourceOptions[0];
-        _selectedCopperContactModelOption = CopperContactModelOptions[0];
-        _selectedVersionOption = VersionOptions[0];
         _selectedCanvasViewOption = _sharedCanvasViewOptions[0];
         _selectedCanvasColorOption = _sharedCanvasColorOptions[0];
         _selectedAreaOption = AreaOptions[0];
         _colorThresholdValue = DefaultThresholdValue;
-        _globalValue = DefaultGlobalValue;
-        _copperPeakValue = DefaultCopperPeakValue;
-        _copperBaselineValue = DefaultCopperBaselineValue;
-        _copperDiameter = ResolveDefaultCopperDiameter(_session.FwDiffGrid);
-        _copperCenterX = (_session.FwDiffGrid.Bounds.MinX + _session.FwDiffGrid.Bounds.MaxX) * 0.5d;
-        _copperCenterY = (_session.FwDiffGrid.Bounds.MinY + _session.FwDiffGrid.Bounds.MaxY) * 0.5d;
-        _copperPathStartX = (decimal)_session.FwDiffGrid.Bounds.MinX;
-        _copperPathStartY = (decimal)_copperCenterY;
-        _copperPathEndX = (decimal)_session.FwDiffGrid.Bounds.MaxX;
-        _copperPathEndY = (decimal)_copperCenterY;
-        _copperPathStepCount = 9m;
         _selectedManualValue = DefaultGlobalValue;
-        _playbackFramesPerSecond = DefaultPlaybackFramesPerSecond;
         _statusText = "Simulation ready. Use Manual to set baseline values, or import CSV for frame playback.";
 
-        RefreshFrameOptions();
+        _source.RefreshFrameOptions();
         RefreshSnapshot();
     }
+
+    private SimulationSourceOwner<SimulationScenarioSnapshot, NotchApplySimulationImportedDataset> CreateSourceOwner()
+    {
+        var versions = BuildVersionOptions(_session.Table);
+        return new SimulationSourceOwner<SimulationScenarioSnapshot, NotchApplySimulationImportedDataset>(
+            new SimulationSourceOwner<SimulationScenarioSnapshot, NotchApplySimulationImportedDataset>.Seed(
+                _sharedInputSourceOptions[0], versions[0], DefaultGlobalValue),
+            _sharedInputSourceOptions, versions, _session.FwDiffGrid.Pads,
+            NotchApplySimulationImportedDataset.Empty, dataset => dataset.CompatibleFrameCount > 0,
+            dataset => dataset.Files.Select(file => new NotchApplySimulationSourceFileItemViewModel(
+                file.FileName, file.SummaryText, file.ShapeText)),
+            dataset => dataset.Frames.Where(static frame => frame.Projection.IsCompatible)
+                .Select(static frame => new NotchApplySimulationFrameOption(frame.GlobalIndex, frame.DisplayText)),
+            ImportCsvSources,
+            (version, dataset, frameIndex) => SimulationWorkspaceUseCase.BuildScenarioSnapshot(
+                _session, SimulationWorkspaceUseCase.BuildCsvScenario(
+                    dataset, version, NotchApplySimulationAggregationMode.SingleFrame, frameIndex)),
+            (version, globalValue, overrides) => SimulationWorkspaceUseCase.BuildScenarioSnapshot(
+                _session, SimulationWorkspaceUseCase.BuildManualScenario(_session, version, globalValue, overrides)),
+            version => SimulationWorkspaceUseCase.BuildScenarioSnapshot(
+                _session, SimulationWorkspaceUseCase.BuildCopperScenario(_session, version, _copper.CaptureRequest())),
+            AcceptSnapshot, () => SelectedFrameSliderIndex, StopPlayback, () => _playback.ReconcileFrames(),
+            RefreshCommandState, RefreshSelectionPresentation,
+            () => HasSelectedRegular, () => SelectedRegularPadId,
+            () => SelectedManualValue, value => SelectedManualValue = value,
+            IsPadInSelectedAreaAndActiveSurface, () => SelectedCanvasViewMode,
+            () => SelectedAreaOption.Display, value => StatusText = value,
+            name => OnPropertyChanging(name), name => OnPropertyChanged(name));
+    }
+
+    private (bool Success, NotchApplySimulationImportedDataset Dataset, string Diagnostic) ImportCsvSources(
+        IReadOnlyList<string> paths)
+    {
+        var success = _useCase.TryImportCsvSources(paths, _session.FwDiffGrid, out var dataset, out var diagnostic);
+        return (success, dataset, diagnostic);
+    }
+
+    private SimulationCopperOwner CreateCopperOwner()
+    {
+        var centerX = (_session.FwDiffGrid.Bounds.MinX + _session.FwDiffGrid.Bounds.MaxX) * 0.5d;
+        var centerY = (_session.FwDiffGrid.Bounds.MinY + _session.FwDiffGrid.Bounds.MaxY) * 0.5d;
+        var seed = new SimulationCopperOwner.Seed(
+            _sharedCopperContactModelOptions[0], centerX, centerY,
+            ResolveDefaultCopperDiameter(_session.FwDiffGrid), DefaultCopperPeakValue, DefaultCopperBaselineValue,
+            (decimal)_session.FwDiffGrid.Bounds.MinX, (decimal)centerY,
+            (decimal)_session.FwDiffGrid.Bounds.MaxX, (decimal)centerY, 9m, null);
+        return new SimulationCopperOwner(
+            seed, _sharedCopperContactModelOptions, () => IsCopperSource,
+            () => SelectedInputSourceOption = SourceOptions.First(option => option.Value == SimulationInputSourceMode.Copper),
+            () => SelectedVersionOption.Value,
+            (version, request) => SimulationWorkspaceUseCase.ReplayCopperPath(_session, version, request),
+            BuildCopperPathReplaySummaryText, RefreshSnapshot, value => StatusText = value,
+            name => OnPropertyChanging(name), name => OnPropertyChanged(name));
+    }
+
+    public void MoveCopperToWorldPoint(Point2 worldPoint) => _copper.MoveCopperToWorldPoint(worldPoint);
+
+    public CopperPillarPathReplayResult ReplayCopperPath(Point2 start, Point2 end, int stepCount) =>
+        _copper.ReplayCopperPath(start, end, stepCount);
+
+    private void StopPlayback() => _playback.Stop();
 
     private static Dictionary<int, int> BuildCadOutputFwDiffByRegularPadId(SimulationWorkspaceSession session) =>
         session.CadOutputFwDiffGrid.Pads.ToDictionary(
@@ -242,71 +256,155 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
                 static group => group.Key,
                 static group => group.Select(static pad => pad.RegularPadId).ToArray());
 
-    private readonly record struct SimulationSnapshotCacheKey(
-        NotchAlgorithmVersion Version,
-        int FrameIndex);
-
     public event EventHandler? FitCanvasRequested;
-    public Func<Task<IReadOnlyList<string>>>? PickOpenDiffCsvPathsAsync { get; set; }
-    public Func<string, Task<bool>>? RequestSetClipboardTextAsync { get; set; }
-    public Func<SimulationTextExportRequest, Task<bool>>? RequestSaveTextFileAsync { get; set; }
+    public Func<Task<IReadOnlyList<string>>>? PickOpenDiffCsvPathsAsync
+    {
+        get => _source.PickOpenDiffCsvPathsAsync;
+        set => _source.PickOpenDiffCsvPathsAsync = value;
+    }
+    public Func<string, Task<bool>>? RequestSetClipboardTextAsync
+    {
+        get => _copper.RequestSetClipboardTextAsync;
+        set => _copper.RequestSetClipboardTextAsync = value;
+    }
+    public Func<SimulationTextExportRequest, Task<bool>>? RequestSaveTextFileAsync
+    {
+        get => _copper.RequestSaveTextFileAsync;
+        set => _copper.RequestSaveTextFileAsync = value;
+    }
 
-    public IReadOnlyList<SimulationInputSourceOption> SourceOptions { get; }
-    public IReadOnlyList<SimulationContactModelOption> CopperContactModelOptions { get; }
+    public IReadOnlyList<SimulationInputSourceOption> SourceOptions => _source.SourceOptions;
+    public IReadOnlyList<SimulationContactModelOption> CopperContactModelOptions => _copper.CopperContactModelOptions;
     public IReadOnlyList<NotchApplySimulationCanvasViewOption> CanvasViewOptions { get; }
     public IReadOnlyList<NotchApplySimulationCanvasColorOption> CanvasColorOptions { get; }
-    public IReadOnlyList<NotchApplySimulationVersionOption> VersionOptions { get; }
+    public IReadOnlyList<NotchApplySimulationVersionOption> VersionOptions => _source.VersionOptions;
     public IReadOnlyList<NotchApplySimulationAreaOption> AreaOptions { get; }
-    public ReadOnlyObservableCollection<NotchApplySimulationSourceFileItemViewModel> CsvFiles { get; }
-    public ReadOnlyObservableCollection<NotchApplySimulationFrameOption> FrameOptions { get; }
+    public ReadOnlyObservableCollection<NotchApplySimulationSourceFileItemViewModel> CsvFiles => _source.CsvFiles;
+    public ReadOnlyObservableCollection<NotchApplySimulationFrameOption> FrameOptions => _source.FrameOptions;
     public ReadOnlyObservableCollection<NotchApplySimulationImpactItemViewModel> SelectedImpactItems { get; }
     public ReadOnlyObservableCollection<SimulationSafetyRiskDiffViewModel> SimulationHighRiskDiffs { get; }
-    public ReadOnlyObservableCollection<CopperPillarPathReplayArtifactRow> CopperPathReplayRows { get; }
+    public ReadOnlyObservableCollection<CopperPillarPathReplayArtifactRow> CopperPathReplayRows => _copper.CopperPathReplayRows;
 
-    public IAsyncRelayCommand ImportCsvCommand { get; }
-    public IRelayCommand ClearCsvCommand { get; }
-    public IRelayCommand RandomizeVisibleValuesCommand { get; }
-    public IRelayCommand<string?> ApplyManualPresetCommand { get; }
-    public IRelayCommand TogglePlaybackCommand { get; }
-    public IRelayCommand PreviousFrameCommand { get; }
-    public IRelayCommand NextFrameCommand { get; }
-    public IRelayCommand ApplySelectedOverrideCommand { get; }
-    public IRelayCommand ClearSelectedOverrideCommand { get; }
-    public IRelayCommand ClearAllManualOverridesCommand { get; }
+    public IAsyncRelayCommand ImportCsvCommand => _source.ImportCsvCommand;
+    public IRelayCommand ClearCsvCommand => _source.ClearCsvCommand;
+    public IRelayCommand RandomizeVisibleValuesCommand => _source.RandomizeVisibleValuesCommand;
+    public IRelayCommand<string?> ApplyManualPresetCommand => _source.ApplyManualPresetCommand;
+    public IRelayCommand TogglePlaybackCommand => _playback.TogglePlaybackCommand;
+    public IRelayCommand PreviousFrameCommand => _playback.PreviousFrameCommand;
+    public IRelayCommand NextFrameCommand => _playback.NextFrameCommand;
+    public IRelayCommand ApplySelectedOverrideCommand => _source.ApplySelectedOverrideCommand;
+    public IRelayCommand ClearSelectedOverrideCommand => _source.ClearSelectedOverrideCommand;
+    public IRelayCommand ClearAllManualOverridesCommand => _source.ClearAllManualOverridesCommand;
     public IRelayCommand FitCanvasCommand { get; }
     public IRelayCommand<SimulationSafetyRiskDiffViewModel?> SelectSimulationRiskDiffCommand { get; }
-    public IRelayCommand ReplayCopperPathCommand { get; }
-    public IRelayCommand UseCurrentCopperAsPathStartCommand { get; }
-    public IRelayCommand UseCurrentCopperAsPathEndCommand { get; }
-    public IRelayCommand<CopperPillarPathReplayArtifactRow?> SelectCopperPathReplayRowCommand { get; }
-    public IAsyncRelayCommand CopyCopperPathReplayCommand { get; }
-    public IAsyncRelayCommand ExportCopperPathReplayCsvCommand { get; }
-    public IAsyncRelayCommand ExportCopperPathReplayJsonCommand { get; }
+    public IRelayCommand ReplayCopperPathCommand => _copper.ReplayCopperPathCommand;
+    public IRelayCommand UseCurrentCopperAsPathStartCommand => _copper.UseCurrentCopperAsPathStartCommand;
+    public IRelayCommand UseCurrentCopperAsPathEndCommand => _copper.UseCurrentCopperAsPathEndCommand;
+    public IRelayCommand<CopperPillarPathReplayArtifactRow?> SelectCopperPathReplayRowCommand => _copper.SelectCopperPathReplayRowCommand;
+    public IAsyncRelayCommand CopyCopperPathReplayCommand => _copper.CopyCopperPathReplayCommand;
+    public IAsyncRelayCommand ExportCopperPathReplayCsvCommand => _copper.ExportCopperPathReplayCsvCommand;
+    public IAsyncRelayCommand ExportCopperPathReplayJsonCommand => _copper.ExportCopperPathReplayJsonCommand;
 
-    [ObservableProperty] private SimulationInputSourceOption _selectedInputSourceOption;
-    [ObservableProperty] private SimulationContactModelOption _selectedCopperContactModelOption;
-    [ObservableProperty] private NotchApplySimulationVersionOption _selectedVersionOption;
+    public SimulationInputSourceOption SelectedInputSourceOption
+    {
+        get => _source.SelectedInputSourceOption;
+        set => _source.SelectedInputSourceOption = value;
+    }
+    public SimulationContactModelOption SelectedCopperContactModelOption
+    {
+        get => _copper.SelectedCopperContactModelOption;
+        set => _copper.SelectedCopperContactModelOption = value;
+    }
+    public NotchApplySimulationVersionOption SelectedVersionOption
+    {
+        get => _source.SelectedVersionOption;
+        set => _source.SelectedVersionOption = value;
+    }
     [ObservableProperty] private NotchApplySimulationCanvasViewOption _selectedCanvasViewOption;
     [ObservableProperty] private NotchApplySimulationCanvasColorOption _selectedCanvasColorOption;
     [ObservableProperty] private NotchApplySimulationAreaOption _selectedAreaOption;
     [ObservableProperty] private double _colorThresholdValue;
-    [ObservableProperty] private double _globalValue;
-    [ObservableProperty] private double _copperCenterX;
-    [ObservableProperty] private double _copperCenterY;
-    [ObservableProperty] private double _copperDiameter;
-    [ObservableProperty] private double _copperPeakValue;
-    [ObservableProperty] private double _copperBaselineValue;
-    [ObservableProperty] private decimal _copperPathStartX;
-    [ObservableProperty] private decimal _copperPathStartY;
-    [ObservableProperty] private decimal _copperPathEndX;
-    [ObservableProperty] private decimal _copperPathEndY;
-    [ObservableProperty] private decimal _copperPathStepCount;
-    [ObservableProperty] private CopperPillarPathReplayArtifactRow? _selectedCopperPathReplayRow;
-    [ObservableProperty] private int _selectedFrameSliderIndex;
-    [ObservableProperty] private bool _isPlaybackRunning;
-    [ObservableProperty] private bool _isPlaybackLoopEnabled = true;
+    public double GlobalValue
+    {
+        get => _source.GlobalValue;
+        set => _source.GlobalValue = value;
+    }
+    public double CopperCenterX
+    {
+        get => _copper.CopperCenterX;
+        set => _copper.CopperCenterX = value;
+    }
+    public double CopperCenterY
+    {
+        get => _copper.CopperCenterY;
+        set => _copper.CopperCenterY = value;
+    }
+    public double CopperDiameter
+    {
+        get => _copper.CopperDiameter;
+        set => _copper.CopperDiameter = value;
+    }
+    public double CopperPeakValue
+    {
+        get => _copper.CopperPeakValue;
+        set => _copper.CopperPeakValue = value;
+    }
+    public double CopperBaselineValue
+    {
+        get => _copper.CopperBaselineValue;
+        set => _copper.CopperBaselineValue = value;
+    }
+    public decimal CopperPathStartX
+    {
+        get => _copper.CopperPathStartX;
+        set => _copper.CopperPathStartX = value;
+    }
+    public decimal CopperPathStartY
+    {
+        get => _copper.CopperPathStartY;
+        set => _copper.CopperPathStartY = value;
+    }
+    public decimal CopperPathEndX
+    {
+        get => _copper.CopperPathEndX;
+        set => _copper.CopperPathEndX = value;
+    }
+    public decimal CopperPathEndY
+    {
+        get => _copper.CopperPathEndY;
+        set => _copper.CopperPathEndY = value;
+    }
+    public decimal CopperPathStepCount
+    {
+        get => _copper.CopperPathStepCount;
+        set => _copper.CopperPathStepCount = value;
+    }
+    public CopperPillarPathReplayArtifactRow? SelectedCopperPathReplayRow
+    {
+        get => _copper.SelectedCopperPathReplayRow;
+        set => _copper.SelectedCopperPathReplayRow = value;
+    }
+    public int SelectedFrameSliderIndex
+    {
+        get => _playback.SelectedFrameSliderIndex;
+        set => _playback.SelectedFrameSliderIndex = value;
+    }
+    public bool IsPlaybackRunning
+    {
+        get => _playback.IsPlaybackRunning;
+        set => _playback.IsPlaybackRunning = value;
+    }
+    public bool IsPlaybackLoopEnabled
+    {
+        get => _playback.IsPlaybackLoopEnabled;
+        set => _playback.IsPlaybackLoopEnabled = value;
+    }
     [ObservableProperty] private bool _isSimulationSafetyExpanded;
-    [ObservableProperty] private int _playbackFramesPerSecond;
+    public int PlaybackFramesPerSecond
+    {
+        get => _playback.PlaybackFramesPerSecond;
+        set => _playback.PlaybackFramesPerSecond = value;
+    }
     [ObservableProperty] private int _selectedRegularPadId = -1;
     [ObservableProperty] private double _selectedManualValue;
     [ObservableProperty] private string _statusText;
@@ -320,24 +418,24 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     public bool ShowRegular => _showRegular;
     public bool HighlightFreeform => _highlightFreeform;
     public bool HighlightUnmatched => _highlightUnmatched;
-    public bool CanImportCsv => PickOpenDiffCsvPathsAsync is not null;
-    public bool HasCsvFiles => CsvFiles.Count > 0;
-    public bool HasCsvData => _csvDataset.CompatibleFrameCount > 0;
-    public bool IsCsvSource => SelectedInputSourceOption.Value == SimulationInputSourceMode.Csv;
-    public bool IsCopperSource => SelectedInputSourceOption.Value == SimulationInputSourceMode.Copper;
-    public bool IsManualSource => SelectedInputSourceOption.Value == SimulationInputSourceMode.Manual;
+    public bool CanImportCsv => _source.CanImportCsv;
+    public bool HasCsvFiles => _source.HasCsvFiles;
+    public bool HasCsvData => _source.HasCsvData;
+    public bool IsCsvSource => _source.IsCsvSource;
+    public bool IsCopperSource => _source.IsCopperSource;
+    public bool IsManualSource => _source.IsManualSource;
     public bool ShowSimulationDiagnostics => _snapshot is not null;
     public bool HasUserDerivedState => HasCsvFiles || HasManualOverrides || IsCopperSource;
     public bool CanAutoRefreshFromSourceChange => !HasUserDerivedState;
-    public bool CanPlayFrames => IsCsvSource && FrameOptions.Count > 1;
-    public bool CanStepFrames => IsCsvSource && FrameOptions.Count > 0;
-    public bool CanRandomizeVisibleValues => _session.FwDiffGrid.Pads.Any(IsPadInSelectedAreaAndActiveSurface);
+    public bool CanPlayFrames => _playback.CanPlayFrames;
+    public bool CanStepFrames => _playback.CanStepFrames;
+    public bool CanRandomizeVisibleValues => _source.CanRandomizeVisibleValues;
     public bool IsThresholdMode => SelectedCanvasColorOption.Value == NotchApplySimulationCanvasColorMode.Threshold;
     public bool IsSignedCanvasView => SelectedCanvasViewMode is NotchApplySimulationCanvasViewMode.Delta or NotchApplySimulationCanvasViewMode.ChangedOnly;
     public bool UsesSignedColorScale => IsSignedCanvasView || _legendRange.Minimum < -SignificantDeltaEpsilon;
     public bool HasSelectedRegular => SelectedRegularPadId >= 0 && _regularPadById.ContainsKey(SelectedRegularPadId);
-    public bool HasManualOverrides => _manualOverridesByRegularPadId.Count > 0;
-    public bool HasSelectedOverride => HasSelectedRegular && _manualOverridesByRegularPadId.ContainsKey(SelectedRegularPadId);
+    public bool HasManualOverrides => _source.HasManualOverrides;
+    public bool HasSelectedOverride => _source.HasSelectedOverride;
     public int ActiveSurfaceRegularCount => _session.ActiveRegularPadIds.Count;
     public string SessionSummaryText => $"Grid {_session.RowCount} x {_session.ColumnCount} · REG {_session.PadCount} · Rows {_session.Table.Rows.Count}";
     public int SourceRevision => _session.SourceRevision;
@@ -504,23 +602,15 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         : $"No projected regular pads under {SelectedAreaOption.Display}.";
     public bool HasCanvasHint => !HasSimulationData;
     public bool ShowSelectedOverrideEditor => HasSelectedRegular && IsManualSource;
-    public string CopperPositionText =>
-        $"X {CopperCenterX.ToString("0.###", CultureInfo.InvariantCulture)} · Y {CopperCenterY.ToString("0.###", CultureInfo.InvariantCulture)} · Ø {CopperDiameter.ToString("0.###", CultureInfo.InvariantCulture)}";
-    public string CopperSummaryText =>
-        $"{SelectedCopperContactModelOption.Display} · {CopperPositionText}";
-    public string CopperContactModelSummaryText =>
-        $"{SelectedCopperContactModelOption.Description} Peak {FormatWholeNumberDisplay(CopperPeakValue)}.";
-    public string CopperProjectionModelText =>
-        $"Input path: {SelectedCopperContactModelOption.Display} CAD overlap -> CAD Output FW Diff -> regular/FW Before -> notch After.";
-    public string CopperInstructionText =>
-        IsCopperSource
-            ? "Move the mouse over the AA canvas to update signal in real time. Copper mode runs EMS, net-flow, and geometry audit through the same simulation gate."
-            : "Select Copper to drive Before by movable CAD overlap area.";
-    public bool HasCopperPathReplay => _copperPathReplayResult.HasSteps;
-    public string CopperPathReplaySummaryText => BuildCopperPathReplaySummaryText(_copperPathReplayResult);
-    public string CopperPathReplayArtifactSummaryText => HasCopperPathReplay
-        ? $"Replay rows {_copperPathReplayArtifactSnapshot.StepCount.ToString(CultureInfo.InvariantCulture)} · EMS {_copperPathReplayArtifactSnapshot.TotalEmsViolationCount.ToString(CultureInfo.InvariantCulture)} · net-flow {_copperPathReplayArtifactSnapshot.TotalNetFlowResidualCount.ToString(CultureInfo.InvariantCulture)} · coverage {_copperPathReplayArtifactSnapshot.TotalTargetCoverageRiskCount.ToString(CultureInfo.InvariantCulture)}"
-        : "Replay rows: not run.";
+    public string CopperPositionText => _copper.CopperPositionText;
+    public string CopperSummaryText => _copper.CopperSummaryText;
+    public string CopperContactModelSummaryText => _copper.CopperContactModelSummaryText;
+    public string CopperProjectionModelText => _copper.CopperProjectionModelText;
+    public string CopperInstructionText => _copper.CopperInstructionText;
+    public bool HasCopperPathReplay => _copper.HasCopperPathReplay;
+    public string CopperPathReplaySummaryText => _copper.CopperPathReplaySummaryText;
+    public string CopperPathReplayArtifactSummaryText => _copper.CopperPathReplayArtifactSummaryText;
+
 
     private int GetFwDiffIndex(int regularPadId)
     {
@@ -566,48 +656,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
             Mode: mode,
             ReasonCounts: reasonCounts,
             DecisionSourceCounts: sourceCounts);
-    }
-
-    public void MoveCopperToWorldPoint(Point2 worldPoint)
-    {
-        if (!IsCopperSource)
-        {
-            return;
-        }
-
-        if (Math.Abs(CopperCenterX - worldPoint.X) <= 1e-6 &&
-            Math.Abs(CopperCenterY - worldPoint.Y) <= 1e-6)
-        {
-            return;
-        }
-
-        _isUpdatingCopperCenter = true;
-        CopperCenterX = worldPoint.X;
-        CopperCenterY = worldPoint.Y;
-        _isUpdatingCopperCenter = false;
-        RefreshCopperSnapshotIfActive();
-    }
-
-    public CopperPillarPathReplayResult ReplayCopperPath(Point2 start, Point2 end, int stepCount)
-    {
-        var result = SimulationWorkspaceUseCase.ReplayCopperPath(
-            _session,
-            SelectedVersionOption.Value,
-            new CopperPillarPathReplayRequest(
-                start,
-                end,
-                stepCount,
-                CopperDiameter,
-                CopperPeakValue,
-                CopperBaselineValue));
-        _copperPathReplayResult = result;
-        _copperPathReplayArtifactSnapshot = CopperPillarPathReplayArtifactService.BuildSnapshot(result);
-        RebuildCopperPathReplayRows();
-        StatusText = BuildCopperPathReplaySummaryText(result);
-        OnPropertyChanged(nameof(HasCopperPathReplay));
-        OnPropertyChanged(nameof(CopperPathReplaySummaryText));
-        OnPropertyChanged(nameof(CopperPathReplayArtifactSummaryText));
-        return result;
     }
 
     public void SetCanvasViewMode(NotchApplySimulationCanvasViewMode mode)
