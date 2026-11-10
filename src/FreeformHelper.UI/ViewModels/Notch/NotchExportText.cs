@@ -42,6 +42,12 @@ internal static class NotchExportText
 
     internal static string BuildStep5GenerationProgressText(string operationLabel, NotchGenerationProgress progress)
     {
+        var (displayTotal, displayProcessed, phaseLabel) = GetGenerationDisplayFacts(progress);
+        return $"{operationLabel}: {phaseLabel} {displayProcessed}/{displayTotal}, rows={progress.GeneratedRowCount}";
+    }
+
+    internal static (int DisplayTotal, int DisplayProcessed, string PhaseLabel) GetGenerationDisplayFacts(NotchGenerationProgress progress)
+    {
         var displayTotal = Math.Max(progress.TotalCount, 0);
         var displayProcessed = displayTotal <= 0
             ? 0
@@ -49,7 +55,7 @@ internal static class NotchExportText
         var phaseLabel = string.IsNullOrWhiteSpace(progress.Phase)
             ? "Scan CAD"
             : progress.Phase;
-        return $"{operationLabel}: {phaseLabel} {displayProcessed}/{displayTotal}, rows={progress.GeneratedRowCount}";
+        return (displayTotal, displayProcessed, phaseLabel);
     }
 
     internal static string BuildStage2RowSummary(

@@ -120,28 +120,20 @@ public sealed partial class FreeformHelperViewModel
 
     private Progress<NotchGenerationProgress> CreateNotchGenerationProgressReporter(string exportKind)
     {
-        const int minUpdateIntervalMs = 120;
         var finalProjectionRevision = _notchFinalProjection.Read();
         var sourceRevision = SimulationWorkspaceSourceRevision;
-        var lastTick = 0L;
+        var gate = new NotchProgressGate(
+            TimeProvider.System,
+            () => IsNotchFinalProjectionCurrent(finalProjectionRevision, sourceRevision),
+            120);
 
         return new Progress<NotchGenerationProgress>(progress =>
         {
-            if (!IsNotchFinalProjectionCurrent(finalProjectionRevision, sourceRevision))
+            if (!gate.ShouldPublish(progress))
             {
                 return;
             }
 
-            var total = Math.Max(progress.TotalCount, 1);
-            var processed = Math.Clamp(progress.ProcessedCount, 0, total);
-            var isFinal = processed >= total;
-            var now = TimeProvider.System.GetTimestamp();
-            if (!isFinal && TimeProvider.System.GetElapsedTime(lastTick).TotalMilliseconds < minUpdateIntervalMs)
-            {
-                return;
-            }
-
-            lastTick = now;
             ReportExportGenerationProgress(exportKind, progress);
         });
     }
@@ -154,13 +146,7 @@ public sealed partial class FreeformHelperViewModel
         var stageSpan = 1.0 / NotchExportStageCount;
         NotchExportProgress = stageStart + stageSpan * Math.Clamp(phaseFraction, 0.0, 1.0);
 
-        var displayTotal = Math.Max(progress.TotalCount, 0);
-        var displayProcessed = displayTotal <= 0
-            ? 0
-            : Math.Clamp(progress.ProcessedCount, 0, displayTotal);
-        var phaseLabel = string.IsNullOrWhiteSpace(progress.Phase)
-            ? "Scan CAD"
-            : progress.Phase;
+        var (displayTotal, displayProcessed, phaseLabel) = NotchExportText.GetGenerationDisplayFacts(progress);
         var message = $"{exportKind} export [2/{NotchExportStageCount}]: {phaseLabel} {displayProcessed}/{displayTotal}, built rows={progress.GeneratedRowCount}";
         NotchExportSummary = message;
         status.ReportProgress(message);
@@ -173,26 +159,18 @@ public sealed partial class FreeformHelperViewModel
         int sourceRevision,
         Action<string>? progressTextReporter = null)
     {
-        const int minUpdateIntervalMs = 120;
-        var lastTick = 0L;
+        var gate = new NotchProgressGate(
+            TimeProvider.System,
+            () => IsNotchFinalProjectionCurrent(finalProjectionRevision, sourceRevision),
+            120);
 
         return new Progress<NotchGenerationProgress>(progress =>
         {
-            if (!IsNotchFinalProjectionCurrent(finalProjectionRevision, sourceRevision))
+            if (!gate.ShouldPublish(progress))
             {
                 return;
             }
 
-            var total = Math.Max(progress.TotalCount, 1);
-            var processed = Math.Clamp(progress.ProcessedCount, 0, total);
-            var isFinal = processed >= total;
-            var now = TimeProvider.System.GetTimestamp();
-            if (!isFinal && TimeProvider.System.GetElapsedTime(lastTick).TotalMilliseconds < minUpdateIntervalMs)
-            {
-                return;
-            }
-
-            lastTick = now;
             ReportStep5GenerationProgress(operationLabel, progress, progressTextReporter);
         });
     }
