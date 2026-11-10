@@ -76,7 +76,7 @@ public sealed partial class FreeformHelperViewModel
             (strictOverlapPercentOverride.HasValue
                 ? Math.Clamp(strictOverlapPercentOverride.Value, 0.0, 100.0) / 100.0
                 : GetStrictOverlapRatioForNotchCompensation()));
-        return ComputeOwnerInfosForRegular(regular, visibleCadPads, strictOverlapRatio);
+        return NotchToFullDiagnostics.ComputeOwnerInfosForRegular(regular, visibleCadPads, strictOverlapRatio);
     }
 
     public NotchV22CompensationResult? GetCadV22CompensationResult(int cadPadId, double? strictOverlapRatioOverride = null)
