@@ -1,4 +1,3 @@
-using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
@@ -7,99 +6,12 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class SimulationWorkspaceViewModel
 {
-    public async Task ImportCsvAsync()
+    public Task ImportCsvAsync() => _source.ImportCsvAsync();
+
+    private void RefreshSnapshot() => _source.RefreshSnapshot();
+
+    private void AcceptSnapshot(SimulationScenarioSnapshot snapshot)
     {
-        if (PickOpenDiffCsvPathsAsync is null)
-        {
-            return;
-        }
-
-        var picked = await PickOpenDiffCsvPathsAsync();
-        if (picked.Count == 0)
-        {
-            return;
-        }
-
-        var sourcePaths = _csvSourcePaths
-            .Concat(picked)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        if (!_useCase.TryImportCsvSources(sourcePaths, _session.FwDiffGrid, out var dataset, out var diagnostic))
-        {
-            StatusText = $"CSV import failed: {diagnostic}";
-            return;
-        }
-
-        _csvSourcePaths = sourcePaths;
-        _csvDataset = dataset;
-        _csvSnapshotCache.Clear();
-        RebuildCsvFiles();
-        RefreshFrameOptions();
-        if (SelectedInputSourceOption.Value != SimulationInputSourceMode.Csv)
-        {
-            SelectedInputSourceOption = SourceOptions.First(option => option.Value == SimulationInputSourceMode.Csv);
-        }
-        else
-        {
-            RefreshSnapshot();
-        }
-    }
-
-    private void ClearCsv()
-    {
-        StopPlayback();
-        _csvSourcePaths = Array.Empty<string>();
-        _csvDataset = NotchApplySimulationImportedDataset.Empty;
-        _csvSnapshotCache.Clear();
-        _csvFiles.Clear();
-        RefreshFrameOptions();
-        RefreshSnapshot();
-    }
-
-    private void RefreshSnapshot()
-    {
-        SimulationScenarioSnapshot snapshot;
-        if (IsCsvSource && HasCsvData)
-        {
-            var sliderIndex = Math.Clamp(SelectedFrameSliderIndex, 0, Math.Max(FrameOptions.Count - 1, 0));
-            var frameIndex = FrameOptions.Count > 0 ? FrameOptions[sliderIndex].Value : sliderIndex;
-            var cacheKey = new SimulationSnapshotCacheKey(SelectedVersionOption.Value, frameIndex);
-            if (!_csvSnapshotCache.TryGetValue(cacheKey, out snapshot!))
-            {
-                var scenario = SimulationWorkspaceUseCase.BuildCsvScenario(
-                    _csvDataset,
-                    SelectedVersionOption.Value,
-                    NotchApplySimulationAggregationMode.SingleFrame,
-                    frameIndex);
-                snapshot = SimulationWorkspaceUseCase.BuildScenarioSnapshot(_session, scenario);
-                _csvSnapshotCache[cacheKey] = snapshot;
-            }
-        }
-        else if (IsCopperSource)
-        {
-            var scenario = SimulationWorkspaceUseCase.BuildCopperScenario(
-                _session,
-                SelectedVersionOption.Value,
-                new CopperPillarSimulationRequest(
-                    CopperCenterX,
-                    CopperCenterY,
-                    CopperDiameter,
-                    CopperPeakValue,
-                    CopperBaselineValue));
-            snapshot = SimulationWorkspaceUseCase.BuildScenarioSnapshot(_session, scenario);
-        }
-        else
-        {
-            var scenario = SimulationWorkspaceUseCase.BuildManualScenario(
-                _session,
-                SelectedVersionOption.Value,
-                GlobalValue,
-                _manualOverridesByRegularPadId);
-            snapshot = SimulationWorkspaceUseCase.BuildScenarioSnapshot(_session, scenario);
-        }
-
-        _snapshot = snapshot;
         _snapshotCellsByRegularPadId = snapshot.SimulationResult.Cells.ToDictionary(
             static cell => cell.RegularPadId,
             static cell => cell);
@@ -117,33 +29,6 @@ public sealed partial class SimulationWorkspaceViewModel
     internal SimulationScenarioSnapshot? GetSimulationScenarioSnapshot()
     {
         return _snapshot;
-    }
-
-    private void RebuildCsvFiles()
-    {
-        _csvFiles.Clear();
-        foreach (var file in _csvDataset.Files)
-        {
-            _csvFiles.Add(new NotchApplySimulationSourceFileItemViewModel(
-                file.FileName,
-                file.SummaryText,
-                file.ShapeText));
-        }
-    }
-
-    private void RefreshFrameOptions()
-    {
-        _frameOptions.Clear();
-        foreach (var frame in _csvDataset.Frames.Where(static frame => frame.Projection.IsCompatible))
-        {
-            _frameOptions.Add(new NotchApplySimulationFrameOption(frame.GlobalIndex, frame.DisplayText));
-        }
-
-        _isSyncingFrameSelection = true;
-        SelectedFrameSliderIndex = Math.Clamp(SelectedFrameSliderIndex, 0, Math.Max(FrameOptions.Count - 1, 0));
-        _isSyncingFrameSelection = false;
-        OnPropertyChanged(nameof(SelectedFrameSliderMaximum));
-        OnPropertyChanged(nameof(FrameSummaryText));
     }
 
     private void UpdateStatus(SimulationScenarioSnapshot snapshot)
@@ -190,112 +75,4 @@ public sealed partial class SimulationWorkspaceViewModel
         return options;
     }
 
-    partial void OnSelectedInputSourceOptionChanged(SimulationInputSourceOption value)
-    {
-        if (!IsCsvSource)
-        {
-            StopPlayback();
-        }
-
-        RefreshSnapshot();
-    }
-
-    partial void OnSelectedCopperContactModelOptionChanged(SimulationContactModelOption value)
-    {
-        CopperPeakValue = value.PeakValue;
-        OnPropertyChanged(nameof(CopperContactModelSummaryText));
-        OnPropertyChanged(nameof(CopperSummaryText));
-        OnPropertyChanged(nameof(InputPrimarySummaryText));
-        OnPropertyChanged(nameof(SelectedFrameDisplayText));
-    }
-
-    partial void OnSelectedVersionOptionChanged(NotchApplySimulationVersionOption value)
-    {
-        RefreshSnapshot();
-        OnPropertyChanged(nameof(VersionSummaryText));
-    }
-
-    partial void OnGlobalValueChanged(double value)
-    {
-        if (IsManualSource)
-        {
-            RefreshSnapshot();
-        }
-        else
-        {
-            RefreshCommandState();
-        }
-    }
-
-    partial void OnCopperCenterXChanged(double value)
-    {
-        RefreshCopperSnapshotIfActive();
-    }
-
-    partial void OnCopperCenterYChanged(double value)
-    {
-        RefreshCopperSnapshotIfActive();
-    }
-
-    partial void OnCopperDiameterChanged(double value)
-    {
-        if (value < 0d)
-        {
-            CopperDiameter = 0d;
-            return;
-        }
-
-        RefreshCopperSnapshotIfActive();
-    }
-
-    partial void OnCopperPeakValueChanged(double value)
-    {
-        OnPropertyChanged(nameof(CopperContactModelSummaryText));
-        RefreshCopperSnapshotIfActive();
-    }
-
-    partial void OnCopperBaselineValueChanged(double value)
-    {
-        RefreshCopperSnapshotIfActive();
-    }
-
-    private void RefreshCopperSnapshotIfActive()
-    {
-        OnPropertyChanged(nameof(CopperPositionText));
-        OnPropertyChanged(nameof(CopperSummaryText));
-        OnPropertyChanged(nameof(CopperProjectionModelText));
-        OnPropertyChanged(nameof(CopperContactModelSummaryText));
-        OnPropertyChanged(nameof(InputPrimarySummaryText));
-        OnPropertyChanged(nameof(InputSecondarySummaryText));
-        OnPropertyChanged(nameof(SelectedFrameDisplayText));
-
-        if (!IsCopperSource || _isUpdatingCopperCenter)
-        {
-            return;
-        }
-
-        RefreshSnapshot();
-    }
-
-    partial void OnSelectedFrameSliderIndexChanged(int value)
-    {
-        if (_isSyncingFrameSelection || !CanPlayFrames)
-        {
-            return;
-        }
-
-        var clamped = Math.Clamp(value, 0, Math.Max(FrameOptions.Count - 1, 0));
-        if (clamped != value)
-        {
-            _isSyncingFrameSelection = true;
-            SelectedFrameSliderIndex = clamped;
-            _isSyncingFrameSelection = false;
-            return;
-        }
-
-        RefreshSnapshot();
-        OnPropertyChanged(nameof(FrameSummaryText));
-        OnPropertyChanged(nameof(SelectedFrameDisplayText));
-    }
 }
-

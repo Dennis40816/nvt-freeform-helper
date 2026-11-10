@@ -273,26 +273,6 @@
       "symbol": "FreeformHelper.UI.ViewModels.SettingsWindowViewModel"
     },
     {
-      "kind": "type",
-      "issue": "health-refactor/2026-10-31",
-      "ceilings": {
-        "stateMembers": 46
-      },
-      "owner": "NFH",
-      "locations": [
-        "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.CopperReplay.cs",
-        "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.cs",
-        "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Overlay.cs",
-        "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Playback.cs",
-        "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Selection.cs",
-        "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Source.cs",
-        "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Validation.cs"
-      ],
-      "contentHash": "99c395204568bb71b56eda092a1d8b6a44515987328084f6c3f91f9256b7b009",
-      "project": "FreeformHelper.UI",
-      "symbol": "FreeformHelper.UI.ViewModels.SimulationWorkspaceViewModel"
-    },
-    {
       "kind": "file",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {

@@ -76,8 +76,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorDeferred.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Persistence.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.NotchPreview.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.PropertyCallbacks.General.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Settings.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs",
-      "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Playback.cs",
-      "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.cs"
+      "src/FreeformHelper.UI/ViewModels/SimulationWorkspaceViewModel.Playback.cs"
     ],
     "controlsViewModels": [
       "src/FreeformHelper.UI/Controls/NotchApplySimulationAaView.cs", "src/FreeformHelper.UI/Controls/PadCanvas.Properties.cs",
