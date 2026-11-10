@@ -94,6 +94,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly UndoService _undoService = new();
     private readonly UiOperationStatusReporter _statusReporter;
 
+    /// <summary>Gets the confirmation hooks for project save and load that the View wires.</summary>
+    public ProjectDialogHooks ProjectDialogs { get; } = new();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperViewModel"/> class.
     /// Sets up default values, initializes UI options, and configures commands.

@@ -93,6 +93,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     private async Task LoadProjectAsync()
     {
+        string? pathToLoadAfterSave = null;
+        string? backupPath = null;
         _ = await RunProjectLoadAsync(async () =>
         {
             var status = CreateStatusScope("LoadProject");
@@ -108,8 +110,93 @@ public sealed partial class FreeformHelperViewModel
                 return ProjectLoadCommandResult.Failed("CANCELLED", "Load cancelled.");
             }
 
+            if (HasUnsavedProjectWork())
+            {
+                // The backup comes first, so a wrong click in the prompt can never lose the unsaved work.
+                backupPath = await TryBackUpUnsavedProjectAsync();
+                if (ProjectDialogs.ConfirmSaveBeforeLoadAsync is not null)
+                {
+                    var saveFirst = await ProjectDialogs.ConfirmSaveBeforeLoadAsync(backupPath);
+                    if (saveFirst is null)
+                    {
+                        const string keptMessage = "Load cancelled: unsaved changes were kept.";
+                        status.ReportBlocked(keptMessage);
+                        return ProjectLoadCommandResult.Failed("CANCELLED", keptMessage, path);
+                    }
+
+                    if (saveFirst.Value)
+                    {
+                        // Saving needs the editing session, so it runs after this load session ends.
+                        pathToLoadAfterSave = path;
+                        return ProjectLoadCommandResult.Failed("CANCELLED", "Saving before load.", path);
+                    }
+                }
+            }
+
             return await LoadProjectFromPathCoreAsync(path);
         });
+
+        if (pathToLoadAfterSave is null)
+        {
+            return;
+        }
+
+        if (!await SaveProjectAsync())
+        {
+            CreateStatusScope("LoadProject").ReportBlocked("Load cancelled: the project was not saved, so unsaved changes were kept.");
+            return;
+        }
+
+        UnsavedProjectBackup.TryDelete(backupPath);
+        _ = await LoadProjectFromPathAsync(pathToLoadAfterSave);
+    }
+
+    // Writes the current state to the one backup file. A failed backup is reported and never blocks the load prompt.
+    private async Task<string?> TryBackUpUnsavedProjectAsync()
+    {
+        var backupPath = UnsavedProjectBackup.PathFor(_appGeneralSettingsStore.SettingsPath);
+        try
+        {
+            CaptureDxfEditProjectState(_projectFile);
+            _ = await _projectPersistenceUseCase.SaveAsync(new ProjectSaveRequest(
+                Project: _projectFile,
+                Grid: _grid,
+                CadPadCustomValues: _cadPadCustomValues,
+                PickSaveProjectPathAsync: () => Task.FromResult<string?>(backupPath),
+                ConfirmEmbedDxfAsync: null,
+                BuildUiSnapshot: BuildUiSnapshot,
+                ApplyUiToSettings: ApplyUiToSettings,
+                HasCadLoaded: _cad is not null));
+            _logger.Info(CultureInfo.InvariantCulture, "Unsaved project backed up: {0}", backupPath);
+            return backupPath;
+        }
+        catch (IOException ex)
+        {
+            return ReportBackupFailed(ex);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return ReportBackupFailed(ex);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // The store refuses settings that fail validation, and the backup must not block the prompt.
+            return ReportBackupFailed(ex);
+        }
+    }
+
+    private string? ReportBackupFailed(Exception ex)
+    {
+        _logger.Warn(CultureInfo.InvariantCulture, "Unsaved project backup failed: {0}", ex.Message);
+        CreateStatusScope("LoadProject").ReportWarning($"Could not back up the unsaved project: {ex.Message}");
+        return null;
+    }
+
+    // A fresh session reports unsaved changes after the View applies its settings, so the prompt and the
+    // backup need a project that holds something: a loaded DXF or a project file the session came from.
+    private bool HasUnsavedProjectWork()
+    {
+        return ShouldPromptSaveOnExit() && (_cad is not null || !string.IsNullOrWhiteSpace(_lastSavedPath));
     }
 
     internal Task<ProjectLoadCommandResult> LoadProjectFromPathAsync(string path)
