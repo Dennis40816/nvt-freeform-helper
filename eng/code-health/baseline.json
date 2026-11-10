@@ -347,7 +347,7 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "viewTypeLines": 1510,
+        "viewTypeLines": 1462,
         "partialFiles": 17
       },
       "owner": "NFH",
