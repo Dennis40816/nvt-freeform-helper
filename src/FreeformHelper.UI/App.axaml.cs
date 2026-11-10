@@ -1,6 +1,5 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.Views;
 using NLog;
@@ -48,92 +47,7 @@ public sealed class App : global::Avalonia.Application
                 return;
             }
 
-            // If so, create and assign the main application window.
-            StartupPerfTracker.Mark("app.main-window-create-start");
-            var mainWindow = new MainWindow();
-            StartupPerfTracker.Mark("app.main-window-create-complete");
-            desktop.MainWindow = mainWindow;
-            StartupPerfTracker.Mark("app.main-window-created");
-            StartupPerfTracker.Mark("app.cad-spinner-warmup-start");
-            CadLoadSpinnerHostService.WarmupSharedHost();
-            StartupPerfTracker.Mark("app.cad-spinner-warmup-dispatched");
-            var shellBootstrapped = false;
-            var runtimeIpcStarted = false;
-
-            void BootstrapShellIfNeeded()
-            {
-                if (shellBootstrapped)
-                {
-                    return;
-                }
-
-                shellBootstrapped = true;
-                if (mainWindow.DataContext is not ViewModels.ShellViewModel shellViewModel)
-                {
-                    StartupPerfTracker.Mark("app.shell-vm-create-start");
-                    shellViewModel = new ViewModels.ShellViewModel { IsDevPageAvailable = AppBuildChannel.IsDevelopmentBuild };
-                    StartupPerfTracker.Mark("app.shell-vm-assign-start");
-                    mainWindow.SetShellViewModel(shellViewModel);
-                    StartupPerfTracker.Mark("app.shell-vm-assigned");
-                }
-            }
-
-            void StartRuntimeIpcIfNeeded()
-            {
-                if (runtimeIpcStarted)
-                {
-                    return;
-                }
-
-                if (mainWindow.DataContext is not ViewModels.ShellViewModel shellViewModel)
-                {
-                    return;
-                }
-
-                runtimeIpcStarted = true;
-                RuntimeQueryIpcHost.Start(shellViewModel);
-                StartupPerfTracker.Mark("app.runtime-ipc-started");
-            }
-
-            void ScheduleRuntimeIpcStart()
-            {
-                Dispatcher.Post(() =>
-                {
-                    StartupPerfTracker.Mark("app.runtime-ipc-background-dispatch");
-                    StartRuntimeIpcIfNeeded();
-                }, DispatcherPriority.Background);
-            }
-
-            StartupPerfTracker.Mark("app.shell-vm-immediate-bootstrap");
-            BootstrapShellIfNeeded();
-            StartupPerfTracker.Mark("app.runtime-ipc-deferred", "opened/background");
-
-            mainWindow.Opened += (_, _) =>
-            {
-                StartupPerfTracker.Mark("app.main-window-opened");
-                StartupPerfTracker.Mark("app.shell-vm-opened-bootstrap");
-                BootstrapShellIfNeeded();
-                ScheduleRuntimeIpcStart();
-            };
-
-            Dispatcher.Post(() =>
-            {
-                // Fallback path for edge-cases where Opened may be delayed.
-                StartupPerfTracker.Mark("app.shell-vm-fallback-dispatch");
-                if (!mainWindow.IsVisible)
-                {
-                    return;
-                }
-
-                BootstrapShellIfNeeded();
-                ScheduleRuntimeIpcStart();
-            }, DispatcherPriority.ApplicationIdle);
-
-            desktop.Exit += (_, _) =>
-            {
-                CadLoadSpinnerHostService.ShutdownSharedHost();
-                _ = RuntimeQueryIpcHost.StopAsync();
-            };
+            StartMainWindow(desktop);
         }
 
         StartupPerfTracker.Mark("app.ui-ready");
@@ -147,5 +61,31 @@ public sealed class App : global::Avalonia.Application
         // Call the base class implementation.
         base.OnFrameworkInitializationCompleted();
         StartupPerfTracker.Mark("app.framework-init-complete");
+    }
+
+    private void StartMainWindow(IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        // Create and assign the main application window.
+        StartupPerfTracker.Mark("app.main-window-create-start");
+        var mainWindow = new MainWindow();
+        StartupPerfTracker.Mark("app.main-window-create-complete");
+        desktop.MainWindow = mainWindow;
+        StartupPerfTracker.Mark("app.main-window-created");
+        StartupPerfTracker.Mark("app.cad-spinner-warmup-start");
+        CadLoadSpinnerHostService.WarmupSharedHost();
+        StartupPerfTracker.Mark("app.cad-spinner-warmup-dispatched");
+
+        new MainWindowStartup(
+            mainWindow,
+            Dispatcher,
+            () => new ViewModels.ShellViewModel { IsDevPageAvailable = AppBuildChannel.IsDevelopmentBuild },
+            mainWindow.SetShellViewModel,
+            RuntimeQueryIpcHost.Start).Attach();
+
+        desktop.Exit += (_, _) =>
+        {
+            CadLoadSpinnerHostService.ShutdownSharedHost();
+            _ = RuntimeQueryIpcHost.StopAsync();
+        };
     }
 }
