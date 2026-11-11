@@ -392,9 +392,21 @@ internal sealed class AxamlBindingWalker
         target is "SelectedValueBinding" or "DisplayMemberBinding" or "SelectedItemBinding" or "ValueMemberBinding";
 
     // These bindings run against each item of the control, so the data context of the control is not their source.
-    private BindingValue ItemSource(BindingMarkup binding, BindingFrame frame) => binding.Get("DataType") is { } declared
-        ? new BindingValue(_types.Resolve(frame.Element, declared))
-        : throw BindingWalkException.Uncovered(binding.Path, "Item-level binding without a declared DataType.");
+    private BindingValue ItemSource(BindingMarkup binding, BindingFrame frame)
+    {
+        var declared = binding.Get("DataType") is { } name ? _types.Resolve(frame.Element, name)
+            : throw BindingWalkException.Uncovered(binding.Path, "Item-level binding without a declared DataType.");
+        try
+        {
+            var item = BindingTypeResolver.ItemType(Property(frame, "ItemsSource").Type);
+            return new BindingValue(item == typeof(object) ? declared : item);
+        }
+        catch (BindingWalkException error) when (error.Coverage == BindingCoverage.Uncovered)
+        {
+            // Preserve declaration-based checking when collection provenance cannot establish an item type.
+            return new BindingValue(declared);
+        }
+    }
 
     private void CheckConstraint(BindingFrame frame, bool inheritedContext = false)
     {

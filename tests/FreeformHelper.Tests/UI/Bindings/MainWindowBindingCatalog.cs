@@ -45,22 +45,23 @@ internal static class MainWindowBindingCatalog
         BindingPathVerifier.RequireInitialized(draft, nameof(SettingsWindowViewModel.ActiveAreaPixels));
     }
 
-    public static void CheckCodePaths(BindingTypeResolver types, BindingPathVerifier paths, BindingWalkReport report)
+    public static void CheckCodePaths(BindingTypeResolver types, BindingPathVerifier paths, BindingWalkReport report,
+        IReadOnlyDictionary<string, string>? sources = null)
     {
         var root = TestPaths.FromRepo("src", "FreeformHelper.UI");
-        var registrations = new Dictionary<(string File, string Member), (Type Source, Type Target, string Property)>
+        var registrations = new Dictionary<(string File, string Member), CodeBindingRegistration>
         {
             [("Views/FreeformHelperView.SettingsWindow.cs", "FreeformHelperViewModel.IsProjectEditingEnabled")] =
-                (typeof(FreeformHelperViewModel), typeof(Window), nameof(Window.IsEnabled)),
+                new(typeof(FreeformHelperViewModel), "viewModel", typeof(Window), "_settingsWindow", nameof(Window.IsEnabled)),
             [("Views/SimulationWorkspaceView.Integrated.cs", "ToggleButton.IsChecked")] =
-                (typeof(ToggleButton), typeof(Grid), nameof(Grid.IsVisible)),
+                new(typeof(ToggleButton), "toggle", typeof(Grid), "body", nameof(Grid.IsVisible)),
         };
         var consumed = new HashSet<(string File, string Member)>();
-        foreach (var file in Directory.EnumerateFiles(root, "*.cs", SearchOption.AllDirectories)
-                     .Where(static path => !path.Split(Path.DirectorySeparatorChar).Any(static part => part is "bin" or "obj")))
+        sources ??= Directory.EnumerateFiles(root, "*.cs", SearchOption.AllDirectories)
+            .Where(static path => !path.Split(Path.DirectorySeparatorChar).Any(static part => part is "bin" or "obj"))
+            .ToDictionary(path => Path.GetRelativePath(root, path).Replace('\\', '/'), TestFiles.ReadContent, StringComparer.Ordinal);
+        foreach (var (relative, text) in sources)
         {
-            var relative = Path.GetRelativePath(root, file).Replace('\\', '/');
-            var text = TestFiles.ReadContent(file);
             foreach (Match call in Regex.Matches(text, @"\bnew\s+(?:[\w.]+\.)?(?:Binding|ReflectionBinding|CompiledBinding|MultiBinding)\s*[({]",
                          RegexOptions.CultureInvariant))
             {
@@ -76,17 +77,20 @@ internal static class MainWindowBindingCatalog
                         "New, duplicate or dynamic C# path requires explicit source/target provenance."));
                     continue;
                 }
+                var source = "unknown";
                 try
                 {
                     var path = key.Item2.Split('.')[^1];
+                    var sourceType = CodeSource(text[(call.Index + expression.Length)..], registration);
+                    source = sourceType.FullName ?? sourceType.Name;
                     var mode = types.Mode(registration.Target, registration.Property, null, owner);
-                    paths.Follow(new BindingValue(registration.Source), path, owner,
+                    paths.Follow(new BindingValue(sourceType), path, owner,
                         mode is Avalonia.Data.BindingMode.TwoWay or Avalonia.Data.BindingMode.OneWayToSource);
-                    report.Add(new BindingFinding(site, BindingCoverage.Checked, registration.Source.Name, path, string.Empty, "C# path checked."));
+                    report.Add(new BindingFinding(site, BindingCoverage.Checked, source, path, string.Empty, "C# path checked."));
                 }
                 catch (BindingWalkException error)
                 {
-                    report.Add(new BindingFinding(site, error.Coverage, registration.Source.Name, key.Item2, error.Segment, error.Message));
+                    report.Add(new BindingFinding(site, error.Coverage, source, key.Item2, error.Segment, error.Message));
                 }
             }
             AuditBindingCalls(relative, text, report);
@@ -97,6 +101,22 @@ internal static class MainWindowBindingCatalog
             report.Add(new BindingFinding(new BindingSite(entry.File, owner, owner, "C# path", entry.Member),
                 BindingCoverage.Uncovered, "unknown", entry.Member, "registration", "Registered source site was not found."));
         }
+    }
+
+    private static Type CodeSource(string initializer, CodeBindingRegistration registration)
+    {
+        // Only the registered local or target is proven. Other source expressions require explicit provenance.
+        var assignment = Regex.Match(initializer, @"^\s*\{\s*Source\s*=\s*(?<source>\w+)\s*,?\s*\}", RegexOptions.CultureInvariant);
+        var source = assignment.Groups["source"].Value;
+        if (assignment.Success && source == registration.SourceName)
+        {
+            return registration.Source;
+        }
+        if (assignment.Success && source == registration.TargetName)
+        {
+            return registration.Target;
+        }
+        throw BindingWalkException.Uncovered("C# source", "Actual binding Source is absent, unsupported or not registered.");
     }
 
     private static void AuditBindingCalls(string file, string text, BindingWalkReport report)
@@ -118,4 +138,6 @@ internal static class MainWindowBindingCatalog
 
     private static (string, string) Draft(string window) => Dialog(window, nameof(SettingsWindowViewModel));
     private static (string, string) Dialog(string window, string model) => ($"Views/{window}.axaml", "FreeformHelper.UI.ViewModels." + model);
+
+    private sealed record CodeBindingRegistration(Type Source, string SourceName, Type Target, string TargetName, string Property);
 }
