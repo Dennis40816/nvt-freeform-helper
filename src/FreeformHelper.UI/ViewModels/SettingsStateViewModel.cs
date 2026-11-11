@@ -333,7 +333,7 @@ internal sealed partial class SettingsStateViewModel
 
             _host.NotifyPropertyChanging(nameof(SelectedRegularSourceLayerOption));
             _layerSource = _layerSource with { SelectedRegularSourceLayerOption = value };
-            _host.OnSelectedRegularSourceLayerOptionChanged(value);
+            _host.OnSelectedRegularSourceLayerOptionChanged();
             _host.NotifyPropertyChanged(nameof(SelectedRegularSourceLayerOption));
         }
     }
@@ -373,7 +373,7 @@ internal sealed partial class SettingsStateViewModel
 
             _host.NotifyPropertyChanging(nameof(SelectedBoundLayerOption));
             _layerSource = _layerSource with { SelectedBoundLayerOption = value };
-            _host.OnSelectedBoundLayerOptionChanged(value);
+            _host.OnSelectedBoundLayerOptionChanged();
             _host.NotifyPropertyChanged(nameof(SelectedBoundLayerOption));
         }
     }

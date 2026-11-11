@@ -201,10 +201,6 @@ public sealed partial class FreeformHelperViewModel
         ApplySettingsOrchestration(nameof(GridPaddingPercent));
     }
 
-    // The shell keeps one holder for the workflow inputs that have not moved to their own owner yet.
-    // The grid and layer settings live in SettingsStateViewModel.
-    private readonly WorkflowInputState _workflowInput = new();
-
     /// <summary>
     /// Gets or sets the preferred AA outline layer name used by Coordinate.
     /// </summary>
