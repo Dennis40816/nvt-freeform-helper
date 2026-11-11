@@ -71,18 +71,18 @@ public sealed class ProjectSnapshotMappingCharacterizationTests
     {
         var vm = CreateViewModel();
         vm.CascadeIcSettings.Clear();
-        vm.CascadeIcSettings.Add(new FreeformHelperViewModel.CascadeIcSetting(0, 1, 1)
+        vm.CascadeIcSettings.Add(new CascadeIcSetting(0, 1, 1)
         {
             XChannels = 2.5m,
             YChannels = 0.4m,
         });
-        vm.CascadeIcSettings.Add(new FreeformHelperViewModel.CascadeIcSetting(1, 1, 1)
+        vm.CascadeIcSettings.Add(new CascadeIcSetting(1, 1, 1)
         {
             XChannels = 3.5m,
             YChannels = 6.5m,
         });
-        vm.LayerToggles.Add(new FreeformHelperViewModel.LayerToggle("z", false));
-        vm.LayerToggles.Add(new FreeformHelperViewModel.LayerToggle("A"));
+        vm.LayerToggles.Add(new LayerToggle("z", false));
+        vm.LayerToggles.Add(new LayerToggle("A"));
 
         var snapshot = await CaptureAsync(vm);
         vm.CascadeIcSettings[0].XChannels = 99;

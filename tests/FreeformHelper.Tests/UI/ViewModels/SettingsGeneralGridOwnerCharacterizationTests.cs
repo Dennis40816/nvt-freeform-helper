@@ -128,7 +128,7 @@ public sealed class SettingsGeneralGridOwnerCharacterizationTests
         var oldOption = draft.SelectedScanOrderOption;
         var next = draft.ScanOrderOptions.FirstOrDefault(option => option.Value != oldOption.Value);
         Assert.NotEqual(oldOption.Value, next.Value);
-        var trace = new SettingsDraftTrace<(FreeformHelperViewModel.ScanOrderOption, bool)>(draft,
+        var trace = new SettingsDraftTrace<(ScanOrderOption, bool)>(draft,
             () => (draft.SelectedScanOrderOption, draft.IsEdited(nameof(FreeformHelperViewModel.SelectedScanOrder))));
 
         draft.SelectedScanOrderOption = next;

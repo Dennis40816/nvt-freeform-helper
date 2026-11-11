@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using FreeformHelper.Application.Settings;
-using BoundLayerOption = FreeformHelper.UI.ViewModels.FreeformHelperViewModel.BoundLayerOption;
-using RegularSourceLayerOption = FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RegularSourceLayerOption;
 
 namespace FreeformHelper.UI.ViewModels;
 

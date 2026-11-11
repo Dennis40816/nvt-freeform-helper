@@ -25,7 +25,7 @@ internal sealed class SettingsNotchDraftOwner
     private decimal _boundaryVirtualAreaCapPercent;
     private bool _enableTargetCoverageGuard;
     private decimal _targetCoverageCapPercent;
-    private FreeformHelperViewModel.NotchCompensationModelOption _selectedNotchCompensationModelOption;
+    private NotchCompensationModelOption _selectedNotchCompensationModelOption;
     private bool _showNotchCanvasPreview;
     private bool _showNotchToRegularLabels;
     private decimal _notchPreviewVisualizationStep;
@@ -45,7 +45,7 @@ internal sealed class SettingsNotchDraftOwner
         decimal BoundaryVirtualAreaCapPercent,
         bool EnableTargetCoverageGuard,
         decimal TargetCoverageCapPercent,
-        FreeformHelperViewModel.NotchCompensationModelOption SelectedNotchCompensationModelOption,
+        NotchCompensationModelOption SelectedNotchCompensationModelOption,
         bool ShowNotchCanvasPreview,
         bool ShowNotchToRegularLabels,
         decimal NotchPreviewVisualizationStep,
@@ -59,7 +59,7 @@ internal sealed class SettingsNotchDraftOwner
     public SettingsNotchDraftOwner(
         Seed seed,
         Func<object?> readDraftProjectIdentity,
-        IReadOnlyList<FreeformHelperViewModel.NotchCompensationModelOption> notchCompensationModelOptions,
+        IReadOnlyList<NotchCompensationModelOption> notchCompensationModelOptions,
         Func<bool, decimal, string> buildTargetCoverageGuardSummary,
         Func<decimal, string> buildTargetCoverageCapHelpText,
         Func<string> buildEmsSafetyPolicySummary,
@@ -98,7 +98,7 @@ internal sealed class SettingsNotchDraftOwner
 
     public object? ProjectIdentity => _readDraftProjectIdentity();
 
-    public IReadOnlyList<FreeformHelperViewModel.NotchCompensationModelOption> NotchCompensationModelOptions { get; }
+    public IReadOnlyList<NotchCompensationModelOption> NotchCompensationModelOptions { get; }
 
     public bool EnableToRegular
     {
@@ -148,7 +148,7 @@ internal sealed class SettingsNotchDraftOwner
         set => SetValue(ref _targetCoverageCapPercent, value, nameof(TargetCoverageCapPercent), OnTargetCoverageCapPercentChanged);
     }
 
-    public FreeformHelperViewModel.NotchCompensationModelOption SelectedNotchCompensationModelOption
+    public NotchCompensationModelOption SelectedNotchCompensationModelOption
     {
         get => _selectedNotchCompensationModelOption;
         set => SetValue(ref _selectedNotchCompensationModelOption, value, nameof(SelectedNotchCompensationModelOption), OnSelectedNotchCompensationModelOptionChanged);
@@ -308,7 +308,7 @@ internal sealed class SettingsNotchDraftOwner
         NotifyNotchModelSummaryChanged();
     }
 
-    private void OnSelectedNotchCompensationModelOptionChanged(FreeformHelperViewModel.NotchCompensationModelOption value)
+    private void OnSelectedNotchCompensationModelOptionChanged(NotchCompensationModelOption value)
     {
         if (_compensationModelSync.IsActive)
         {

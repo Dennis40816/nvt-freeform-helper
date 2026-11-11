@@ -8,10 +8,10 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 internal sealed record NotchValidationDisplayState(
     string SummaryText,
-    ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> Items,
-    ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> DirectItems,
-    ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> IncomingItems,
-    ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> OutgoingItems)
+    ObservableCollection<NotchValidationDisplayItem> Items,
+    ObservableCollection<NotchValidationDisplayItem> DirectItems,
+    ObservableCollection<NotchValidationDisplayItem> IncomingItems,
+    ObservableCollection<NotchValidationDisplayItem> OutgoingItems)
 {
     /// <summary>
     /// The summary text before the first analyze or after a clear.
@@ -26,9 +26,9 @@ internal sealed record NotchValidationDisplayState(
     {
         return new NotchValidationDisplayState(
             HintSummaryText,
-            new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>(),
-            new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>(),
-            new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>(),
-            new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>());
+            new ObservableCollection<NotchValidationDisplayItem>(),
+            new ObservableCollection<NotchValidationDisplayItem>(),
+            new ObservableCollection<NotchValidationDisplayItem>(),
+            new ObservableCollection<NotchValidationDisplayItem>());
     }
 }

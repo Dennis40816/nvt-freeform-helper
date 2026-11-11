@@ -58,7 +58,7 @@ public sealed class SettingsWindowSaveBehaviorCoverageTests
         {
             var expected = vm.LogLevelOptions.Single(option => option.Value == "Warn");
             var draft = vm.CreateSettingsWindowViewModel();
-            draft.SelectedLogLevelOption = new FreeformHelperViewModel.LogLevelOption("wArN", "Warnings");
+            draft.SelectedLogLevelOption = new LogLevelOption("wArN", "Warnings");
             Assert.Equal("Info", LoggingBootstrapper.GetCurrentMinimumLevelName());
 
             draft.SaveCommand.Execute(null);

@@ -14,7 +14,7 @@ public sealed class NotchExportSelectionFilterBehaviorTests
     {
         using var culture = TestCulture.UseEnUs();
         var table = BuildMixedTable();
-        FreeformHelperViewModel.NotchExportFileTypeOption[] options =
+        NotchExportFileTypeOption[] options =
         [
             new(FreeformHelperViewModel.NotchExportFileType.Csv, "CSV review (.csv)", "csv"),
             new(FreeformHelperViewModel.NotchExportFileType.Cv21, "C v2.1 (.c)", "c", NotchAlgorithmVersion.V21),

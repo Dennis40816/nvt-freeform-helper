@@ -223,7 +223,7 @@ public sealed class NotchExportVersionOptionsCharacterizationTests
         Assert.Same(table.Rows[1], Assert.Single(viewModel.BuildSelectedTable().Rows));
     }
 
-    private static FreeformHelperViewModel.NotchExportFileTypeOption[] CreateExportTypeOptions()
+    private static NotchExportFileTypeOption[] CreateExportTypeOptions()
     {
         return
         [
