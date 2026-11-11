@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -11,6 +12,35 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel
         BuildCurrentRequest(), _geometry.SelectedAaOutlineLayerName, _guides.BasisKind);
 
     private void UseActiveAreaSafeCorners() => _array.UseActiveAreaSafeCorners();
+
+    [RelayCommand]
+    private async Task ExportCornerCircleImageAsync()
+    {
+        var image = CornerCircles.BuildImage();
+        if (image is null)
+        {
+            StatusText = CornerCircles.StatusText;
+            return;
+        }
+
+        if (CornerCircles.RequestExportAsync is null)
+        {
+            StatusText = "Corner circle image export is unavailable in the current host.";
+            return;
+        }
+
+        try
+        {
+            var exported = await CornerCircles.RequestExportAsync(image);
+            StatusText = exported
+                ? $"Corner circle image exported ({image.Width} x {image.Height} px)."
+                : "Corner circle image export cancelled.";
+        }
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
+        {
+            StatusText = $"Corner circle image export failed: {ex.Message}";
+        }
+    }
 
     private void ReplaceArtifactRows(CoordinateArtifactRow[] rows) => _presentation.ReplaceArtifactRows(rows);
 

@@ -32,6 +32,24 @@ internal static class CoordinatePlannerFilePickerOptions
         };
     }
 
+    public static FilePickerSaveOptions SaveCornerCircleImage(int pixelWidth, int pixelHeight)
+    {
+        return new FilePickerSaveOptions
+        {
+            Title = "Export Corner Circle Image",
+            DefaultExtension = "png",
+            SuggestedFileName = string.Create(
+                System.Globalization.CultureInfo.InvariantCulture,
+                $"corner_circles_{pixelWidth}x{pixelHeight}.png"),
+            FileTypeChoices = new List<FilePickerFileType>
+            {
+                new FilePickerFileType("PNG") { Patterns = _pngFilePatterns },
+                new FilePickerFileType("BMP") { Patterns = _bmpFilePatterns },
+                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
+            }
+        };
+    }
+
     public static FilePickerSaveOptions SavePreviewImage()
     {
         return new FilePickerSaveOptions
