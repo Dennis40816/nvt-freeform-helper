@@ -1,7 +1,9 @@
-namespace FreeformHelper.UI.ViewModels;
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
+namespace FreeformHelper.UI.CadEditing;
 
 /// <summary>
-/// Holds the inputs of the DXF edit panel of the main view model: the target layer name, the rotation scope,
+/// Holds the inputs of the DXF edit panel of the edit child: the target layer name, the rotation scope,
 /// the rotation layer name, the new layer name, the rotation angle and the advanced panel expander state.
 /// The view model replaces the whole value when one of them changes and forwards one property per member
 /// so the bindings keep their names.
@@ -14,7 +16,7 @@ namespace FreeformHelper.UI.ViewModels;
 /// <param name="IsDxfEditAdvancedPanelExpanded">Whether the advanced DXF edit block is expanded.</param>
 public sealed record DxfEditPanelInput(
     string DxfEditTargetLayerName,
-    FreeformHelperViewModel.DxfEditRotationScopeOption SelectedDxfEditRotationScopeOption,
+    DxfEditRotationScopeOption SelectedDxfEditRotationScopeOption,
     string DxfEditRotationLayerName,
     string DxfEditNewLayerName,
     decimal DxfEditRotationDegrees,
@@ -31,3 +33,21 @@ public sealed record DxfEditPanelInput(
         90m,
         false);
 }
+
+/// <summary>
+/// Represents the scope used by DXF geometry rotation.
+/// </summary>
+public enum DxfEditRotationScope
+{
+    SelectedPads,
+    TargetLayer,
+}
+
+/// <summary>
+/// Represents an option for DXF rotation scope selection.
+/// </summary>
+/// <param name="Value">Scope enum value.</param>
+/// <param name="Display">Human-readable label.</param>
+/// <param name="Description">Short behavior note for tooltip/help text.</param>
+public readonly record struct DxfEditRotationScopeOption(DxfEditRotationScope Value, string Display, string Description);
+

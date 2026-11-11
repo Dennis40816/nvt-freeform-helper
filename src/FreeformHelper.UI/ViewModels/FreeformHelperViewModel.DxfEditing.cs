@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Text;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Domain.Pads;
@@ -7,15 +8,12 @@ using FreeformHelper.UI.CadEditing;
 namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
-/// Handles in-app DXF edit operations (hide/restore) and DXF export workflows.
+/// Connects the edit child to existing callers and retains commands for later owner moves.
 /// </summary>
 public sealed partial class FreeformHelperViewModel
 {
     internal static PersistedDxfEditProjectState CapturePersistedDxfEditProjectState(ProjectFile file) =>
         DxfEditStateCapture.CaptureProjectState(file);
-
-    private CadEditNotificationSnapshot CaptureCadEditNotifications() =>
-        new(DeletedCadPadCount, DuplicateCadPadCount, CombinedCadPadCount, RelayeredCadPadCount, RotatedCadPadCount);
 
     private bool CadLayersMatchDocument(CadPadSet cad)
     {
@@ -53,130 +51,59 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets the command to export CAD pads (visible layers only) to DXF.
     /// </summary>
-    public IAsyncRelayCommand ExportDxfVisibleCommand => _dxfEditCommands.ExportDxfVisibleCommand;
+    public IAsyncRelayCommand ExportDxfVisibleCommand => _dxfWorkspaceCommands.ExportDxfVisibleCommand;
 
     /// <summary>
     /// Gets the command to export CAD pads (all non-deleted layers) to DXF.
     /// </summary>
-    public IAsyncRelayCommand ExportDxfAllCommand => _dxfEditCommands.ExportDxfAllCommand;
+    public IAsyncRelayCommand ExportDxfAllCommand => _dxfWorkspaceCommands.ExportDxfAllCommand;
 
     /// <summary>
     /// Gets the command to export one DXF layer to image (PNG/BMP/JPG).
     /// </summary>
-    public IAsyncRelayCommand ExportDxfLayerImageCommand => _dxfEditCommands.ExportDxfLayerImageCommand;
+    public IAsyncRelayCommand ExportDxfLayerImageCommand => _dxfWorkspaceCommands.ExportDxfLayerImageCommand;
 
     /// <summary>
     /// Gets the command to check the quality of the loaded DXF data.
     /// </summary>
-    public IAsyncRelayCommand CheckDxfQualityCommand => _dxfEditCommands.CheckDxfQualityCommand;
+    public IAsyncRelayCommand CheckDxfQualityCommand => _dxfWorkspaceCommands.CheckDxfQualityCommand;
 
     /// <summary>
     /// Gets the command to select CAD pads flagged by DXF overlap checking.
     /// </summary>
-    public IRelayCommand SelectDxfOverlapPadsCommand => _dxfEditCommands.SelectDxfOverlapPadsCommand;
+    public IRelayCommand SelectDxfOverlapPadsCommand => _dxfWorkspaceCommands.SelectDxfOverlapPadsCommand;
 
     /// <summary>
     /// Gets the command to clear overlap highlight and selection state.
     /// </summary>
-    public IRelayCommand ClearDxfOverlapHighlightsCommand => _dxfEditCommands.ClearDxfOverlapHighlightsCommand;
+    public IRelayCommand ClearDxfOverlapHighlightsCommand => _dxfWorkspaceCommands.ClearDxfOverlapHighlightsCommand;
 
     /// <summary>
     /// Gets the command to show overlap details in a dedicated window.
     /// </summary>
-    public IAsyncRelayCommand ShowDxfOverlapDetailsCommand => _dxfEditCommands.ShowDxfOverlapDetailsCommand;
+    public IAsyncRelayCommand ShowDxfOverlapDetailsCommand => _dxfWorkspaceCommands.ShowDxfOverlapDetailsCommand;
 
     /// <summary>
     /// Gets the command to analyze DXF idx ↔ regular mapping.
     /// </summary>
-    public IAsyncRelayCommand AnalyzeIndexMappingCommand => _dxfEditCommands.AnalyzeIndexMappingCommand;
+    public IAsyncRelayCommand AnalyzeIndexMappingCommand => _dxfWorkspaceCommands.AnalyzeIndexMappingCommand;
 
     /// <summary>
     /// Gets the command to shift diff idx for all selected CAD pads by one shared offset.
     /// </summary>
-    public IRelayCommand OffsetSelectedCadOutputFwDiffIndicesCommand => _dxfEditCommands.OffsetSelectedCadOutputFwDiffIndicesCommand;
+    public IRelayCommand OffsetSelectedCadOutputFwDiffIndicesCommand => _dxfWorkspaceCommands.OffsetSelectedCadOutputFwDiffIndicesCommand;
 
     /// <summary>
     /// Gets the command to select and focus one duplicate diff group in Step 4.
     /// </summary>
     public IRelayCommand<Step4DuplicateDiffGroupViewModel?> SelectStep4DuplicateDiffGroupCommand =>
-        _dxfEditCommands.SelectStep4DuplicateDiffGroupCommand;
+        _dxfWorkspaceCommands.SelectStep4DuplicateDiffGroupCommand;
 
-    /// <summary>
-    /// Gets the command to hide selected CAD pads.
-    /// </summary>
-    public IRelayCommand DeleteSelectedCadPadsCommand => _dxfEditCommands.DeleteSelectedCadPadsCommand;
+    private readonly DxfWorkspaceCommands _dxfWorkspaceCommands;
 
-    /// <summary>
-    /// Gets the command to undo the last CAD hide action.
-    /// </summary>
-    public IRelayCommand RestoreLastDeletedCadPadsCommand => _dxfEditCommands.RestoreLastDeletedCadPadsCommand;
-
-    /// <summary>
-    /// Gets the command to restore all manually hidden CAD pads.
-    /// </summary>
-    public IRelayCommand RestoreAllHiddenCadPadsCommand => _dxfEditCommands.RestoreAllHiddenCadPadsCommand;
-
-    /// <summary>
-    /// Gets the command to combine selected CAD pads into one synthetic pad.
-    /// </summary>
-    public IRelayCommand CombineSelectedCadPadsCommand => _dxfEditCommands.CombineSelectedCadPadsCommand;
-
-    /// <summary>
-    /// Gets the command to clear the selected synthetic combined CAD groups.
-    /// </summary>
-    public IRelayCommand ClearCombinedCadPadsCommand => _dxfEditCommands.ClearCombinedCadPadsCommand;
-
-    /// <summary>
-    /// Gets the command to reset all DXF edits, including hidden, combined, and layer-move changes.
-    /// </summary>
-    public IRelayCommand ResetAllDxfEditsCommand => _dxfEditCommands.ResetAllDxfEditsCommand;
-
-    /// <summary>
-    /// Gets the command to open the Hidden DXF edit detail dialog.
-    /// </summary>
-    public IAsyncRelayCommand OpenHiddenDxfEditChangeListCommand => _dxfEditCommands.OpenHiddenDxfEditChangeListCommand;
-
-    /// <summary>
-    /// Gets the command to open the Duplicate DXF edit detail dialog.
-    /// </summary>
-    public IAsyncRelayCommand OpenDuplicateDxfEditChangeListCommand => _dxfEditCommands.OpenDuplicateDxfEditChangeListCommand;
-
-    /// <summary>
-    /// Gets the command to open the Combined DXF edit detail dialog.
-    /// </summary>
-    public IAsyncRelayCommand OpenCombinedDxfEditChangeListCommand => _dxfEditCommands.OpenCombinedDxfEditChangeListCommand;
-
-    /// <summary>
-    /// Gets the command to open the Moved DXF edit detail dialog.
-    /// </summary>
-    public IAsyncRelayCommand OpenMovedDxfEditChangeListCommand => _dxfEditCommands.OpenMovedDxfEditChangeListCommand;
-
-    /// <summary>
-    /// Gets the command to open the Rotated DXF edit detail dialog.
-    /// </summary>
-    public IAsyncRelayCommand OpenRotatedDxfEditChangeListCommand => _dxfEditCommands.OpenRotatedDxfEditChangeListCommand;
-
-    /// <summary>
-    /// Gets the command to move selected CAD pads to an existing DXF layer.
-    /// </summary>
-    public IRelayCommand MoveSelectedCadPadsToLayerCommand => _dxfEditCommands.MoveSelectedCadPadsToLayerCommand;
-
-    /// <summary>
-    /// Gets the command to create a new DXF layer and move selected CAD pads into it.
-    /// </summary>
-    public IRelayCommand CreateLayerAndMoveSelectedCadPadsCommand => _dxfEditCommands.CreateLayerAndMoveSelectedCadPadsCommand;
-
-    /// <summary>
-    /// Gets the command to rotate selected CAD pads around their own centroids.
-    /// </summary>
-    public IRelayCommand RotateSelectedCadPadsCommand => _dxfEditCommands.RotateSelectedCadPadsCommand;
-
-    private readonly DxfEditCommands _dxfEditCommands;
-
-    /// <summary>Creates the DXF edit commands once during construction.</summary>
-    private DxfEditCommands CreateDxfEditCommands()
+    private DxfWorkspaceCommands CreateDxfWorkspaceCommands()
     {
-        return new DxfEditCommands(
+        return new DxfWorkspaceCommands(
             ExportDxfVisibleCommand: CreateEditingAsyncCommand(ExportVisibleDxfAsync),
             ExportDxfAllCommand: CreateEditingAsyncCommand(ExportAllDxfAsync),
             ExportDxfLayerImageCommand: CreateEditingAsyncCommand(ExportLayerImageAsync),
@@ -186,20 +113,66 @@ public sealed partial class FreeformHelperViewModel
             ShowDxfOverlapDetailsCommand: CreateEditingAsyncCommand(ShowDxfOverlapDetailsAsync),
             AnalyzeIndexMappingCommand: CreateEditingAsyncCommand(AnalyzeIndexMappingAsync),
             OffsetSelectedCadOutputFwDiffIndicesCommand: CreateEditingCommand(OffsetSelectedCadOutputFwDiffIndices),
-            SelectStep4DuplicateDiffGroupCommand: CreateEditingCommand<Step4DuplicateDiffGroupViewModel?>(SelectStep4DuplicateDiffGroup),
-            DeleteSelectedCadPadsCommand: CreateEditingCommand(DeleteSelectedCadPads),
-            RestoreLastDeletedCadPadsCommand: CreateEditingCommand(RestoreLastDeletedCadPads),
-            RestoreAllHiddenCadPadsCommand: CreateEditingCommand(RestoreAllHiddenCadPads),
-            CombineSelectedCadPadsCommand: CreateEditingCommand(CombineSelectedCadPads),
-            ClearCombinedCadPadsCommand: CreateEditingCommand(ClearCombinedCadPads),
-            ResetAllDxfEditsCommand: CreateEditingCommand(ResetAllDxfEdits),
-            OpenHiddenDxfEditChangeListCommand: CreateEditingAsyncCommand(OpenHiddenDxfEditChangeListAsync),
-            OpenDuplicateDxfEditChangeListCommand: CreateEditingAsyncCommand(OpenDuplicateDxfEditChangeListAsync),
-            OpenCombinedDxfEditChangeListCommand: CreateEditingAsyncCommand(OpenCombinedDxfEditChangeListAsync),
-            OpenMovedDxfEditChangeListCommand: CreateEditingAsyncCommand(OpenMovedDxfEditChangeListAsync),
-            OpenRotatedDxfEditChangeListCommand: CreateEditingAsyncCommand(OpenRotatedDxfEditChangeListAsync),
-            MoveSelectedCadPadsToLayerCommand: CreateEditingCommand(MoveSelectedCadPadsToLayer),
-            CreateLayerAndMoveSelectedCadPadsCommand: CreateEditingCommand(CreateLayerAndMoveSelectedCadPads),
-            RotateSelectedCadPadsCommand: CreateEditingCommand(RotateSelectedCadPads));
+            SelectStep4DuplicateDiffGroupCommand: CreateEditingCommand<Step4DuplicateDiffGroupViewModel?>(SelectStep4DuplicateDiffGroup));
     }
+
+    // Compatibility surface for callers outside the edit panel. All state and commands belong to the child.
+    public int DeletedCadPadCount => DxfEdit.DeletedCadPadCount;
+    public bool HasDeletedCadPads => DxfEdit.HasDeletedCadPads;
+    public int DuplicateCadPadCount => DxfEdit.DuplicateCadPadCount;
+    public bool HasDuplicateCadPads => DxfEdit.HasDuplicateCadPads;
+    public int CombinedCadPadCount => DxfEdit.CombinedCadPadCount;
+    public bool HasCombinedCadPads => DxfEdit.HasCombinedCadPads;
+    public int RelayeredCadPadCount { get => DxfEdit.RelayeredCadPadCount; set => DxfEdit.RelayeredCadPadCount = value; }
+    public bool HasRelayeredCadPads => DxfEdit.HasRelayeredCadPads;
+    public int RotatedCadPadCount { get => DxfEdit.RotatedCadPadCount; set => DxfEdit.RotatedCadPadCount = value; }
+    public bool HasRotatedCadPads => DxfEdit.HasRotatedCadPads;
+    public bool HasAnyCadEdits => DxfEdit.HasAnyCadEdits;
+    public string DxfEditTargetLayerName { get => DxfEdit.DxfEditTargetLayerName; set => DxfEdit.DxfEditTargetLayerName = value; }
+    public DxfEditRotationScopeOption SelectedDxfEditRotationScopeOption { get => DxfEdit.SelectedDxfEditRotationScopeOption; set => DxfEdit.SelectedDxfEditRotationScopeOption = value; }
+    public string DxfEditRotationLayerName { get => DxfEdit.DxfEditRotationLayerName; set => DxfEdit.DxfEditRotationLayerName = value; }
+    public string DxfEditNewLayerName { get => DxfEdit.DxfEditNewLayerName; set => DxfEdit.DxfEditNewLayerName = value; }
+    public decimal DxfEditRotationDegrees { get => DxfEdit.DxfEditRotationDegrees; set => DxfEdit.DxfEditRotationDegrees = value; }
+    public bool IsDxfEditAdvancedPanelExpanded { get => DxfEdit.IsDxfEditAdvancedPanelExpanded; set => DxfEdit.IsDxfEditAdvancedPanelExpanded = value; }
+    public IReadOnlyList<DxfEditRotationScopeOption> DxfEditRotationScopeOptions => DxfEdit.DxfEditRotationScopeOptions;
+    public bool HasSelectedCadPadsForDxfEdit => DxfEdit.HasSelectedCadPadsForDxfEdit;
+    public bool HasSelectedCombinedCadPadsForDxfEdit => DxfEdit.HasSelectedCombinedCadPadsForDxfEdit;
+    public bool HasManualHiddenCadPads => DxfEdit.HasManualHiddenCadPads;
+    public bool HasDetectedDuplicateCadPads => DxfEdit.HasDetectedDuplicateCadPads;
+    public bool CanMoveSelectedCadPadsToLayer => DxfEdit.CanMoveSelectedCadPadsToLayer;
+    public bool CanCreateLayerAndMoveSelectedCadPads => DxfEdit.CanCreateLayerAndMoveSelectedCadPads;
+    public bool IsDxfEditRotationLayerScope => DxfEdit.IsDxfEditRotationLayerScope;
+    public string DxfEditSelectionSummary => DxfEdit.DxfEditSelectionSummary;
+    public string HiddenDxfEditBadgeTooltip => DxfEdit.HiddenDxfEditBadgeTooltip;
+    public string CombinedDxfEditBadgeTooltip => DxfEdit.CombinedDxfEditBadgeTooltip;
+    public string DuplicateDxfEditBadgeTooltip => DxfEdit.DuplicateDxfEditBadgeTooltip;
+    public string MovedDxfEditBadgeTooltip => DxfEdit.MovedDxfEditBadgeTooltip;
+    public bool CanRotateSelectedCadPads => DxfEdit.CanRotateSelectedCadPads;
+    public string RotatedDxfEditBadgeTooltip => DxfEdit.RotatedDxfEditBadgeTooltip;
+    public IRelayCommand DeleteSelectedCadPadsCommand => DxfEdit.DeleteSelectedCadPadsCommand;
+    public IRelayCommand RestoreLastDeletedCadPadsCommand => DxfEdit.RestoreLastDeletedCadPadsCommand;
+    public IRelayCommand RestoreAllHiddenCadPadsCommand => DxfEdit.RestoreAllHiddenCadPadsCommand;
+    public IRelayCommand CombineSelectedCadPadsCommand => DxfEdit.CombineSelectedCadPadsCommand;
+    public IRelayCommand ClearCombinedCadPadsCommand => DxfEdit.ClearCombinedCadPadsCommand;
+    public IRelayCommand ResetAllDxfEditsCommand => DxfEdit.ResetAllDxfEditsCommand;
+    public IAsyncRelayCommand OpenHiddenDxfEditChangeListCommand => DxfEdit.OpenHiddenDxfEditChangeListCommand;
+    public IAsyncRelayCommand OpenDuplicateDxfEditChangeListCommand => DxfEdit.OpenDuplicateDxfEditChangeListCommand;
+    public IAsyncRelayCommand OpenCombinedDxfEditChangeListCommand => DxfEdit.OpenCombinedDxfEditChangeListCommand;
+    public IAsyncRelayCommand OpenMovedDxfEditChangeListCommand => DxfEdit.OpenMovedDxfEditChangeListCommand;
+    public IAsyncRelayCommand OpenRotatedDxfEditChangeListCommand => DxfEdit.OpenRotatedDxfEditChangeListCommand;
+    public IRelayCommand MoveSelectedCadPadsToLayerCommand => DxfEdit.MoveSelectedCadPadsToLayerCommand;
+    public IRelayCommand CreateLayerAndMoveSelectedCadPadsCommand => DxfEdit.CreateLayerAndMoveSelectedCadPadsCommand;
+    public IRelayCommand RotateSelectedCadPadsCommand => DxfEdit.RotateSelectedCadPadsCommand;
+    public ObservableCollection<string> DxfEditLayerOptions { get => DxfEdit.DxfEditLayerOptions; set => DxfEdit.DxfEditLayerOptions = value; }
+
+    private CadEditState _cadEdit => CadDocument.Edit;
+    private CadEditNotificationSnapshot CaptureCadEditNotifications() => DxfEdit.CaptureCadEditNotifications();
+    private void ResetDxfEditBaseline(CadPadSet? cad) => _cadEditWorkflow.ResetBaseline(cad, CaptureCadEditNotifications());
+    private void SyncHiddenCadIdsToProject(CadEditNotificationSnapshot? previous = null) => DxfEdit.SyncHiddenCadIdsToProject(previous);
+    private void SyncCombinedCadState(CadEditNotificationSnapshot? previous = null) => DxfEdit.SyncCombinedCadState(previous);
+    private void SyncDuplicateCadState(CadEditNotificationSnapshot? previous = null, bool persistToProject = true) => DxfEdit.SyncDuplicateCadState(previous, persistToProject);
+    private void SyncRelayeredCadState(CadEditNotificationSnapshot? previous = null) => DxfEdit.SyncRelayeredCadState(previous);
+    private void SyncRotatedCadState(CadEditNotificationSnapshot? previous = null) => DxfEdit.SyncRotatedCadState(previous);
+    private void RefreshDxfEditLayerOptions(IReadOnlyList<string> layerNames) => DxfEdit.RefreshDxfEditLayerOptions(layerNames);
+    private void NotifyDxfEditPanelActionStateChanged() => DxfEdit.NotifyDxfEditPanelActionStateChanged();
 }

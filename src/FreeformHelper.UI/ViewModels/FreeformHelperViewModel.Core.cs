@@ -27,7 +27,7 @@ namespace FreeformHelper.UI.ViewModels;
 /// coordinating between the UI (via commands and observable properties),
 /// application services, and data models.
 /// </summary>
-public sealed partial class FreeformHelperViewModel : ObservableObject
+public sealed partial class FreeformHelperViewModel : ObservableObject, IProjectEditingAvailability
 {
     internal UiEventRunner UiEvents { get; }
 
@@ -60,7 +60,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     public Func<NotchDetailViewModel, Task>? OpenNotchDetailAsync { get => _viewCallbacks.OpenNotchDetailAsync; set => _viewCallbacks.OpenNotchDetailAsync = value; }
     public Func<NotchExportSelectionViewModel, Task<NotchTable?>>? OpenNotchExportSelectionAsync { get => _viewCallbacks.OpenNotchExportSelectionAsync; set => _viewCallbacks.OpenNotchExportSelectionAsync = value; }
     public Func<SimulationSafetyAuditResult?>? GetCurrentSimulationSafetyAudit { get => _viewCallbacks.GetCurrentSimulationSafetyAudit; set => _viewCallbacks.GetCurrentSimulationSafetyAudit = value; }
-    public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get => _viewCallbacks.OpenDxfEditChangeListAsync; set => _viewCallbacks.OpenDxfEditChangeListAsync = value; }
+    public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get => DxfEdit.OpenDxfEditChangeListAsync; set => DxfEdit.OpenDxfEditChangeListAsync = value; }
     public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get => _viewCallbacks.OpenIndexMappingReportAsync; set => _viewCallbacks.OpenIndexMappingReportAsync = value; }
     public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get => _viewCallbacks.OpenDxfOverlapReportAsync; set => _viewCallbacks.OpenDxfOverlapReportAsync = value; }
     public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get => _viewCallbacks.OpenDxfLayerImageExportAsync; set => _viewCallbacks.OpenDxfLayerImageExportAsync = value; }
@@ -86,6 +86,8 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     public WorkspaceInteractionState InteractionState { get; } = new();
 
     internal CadDocumentSession CadDocument { get; } = new();
+    public DxfEditViewModel DxfEdit { get; }
+
     private readonly CadEditWorkflow _cadEditWorkflow;
     private readonly CadEditReplay _cadEditReplay;
     private CadPadSet? _cad { get => CadDocument.Cad; set => CadDocument.Cad = value; }
@@ -118,7 +120,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     {
     }
 
-    private (CadEditWorkflow Workflow, CadEditReplay Replay) CreateCadEditEngine()
+    private (CadEditWorkflow Workflow, CadEditReplay Replay, IDxfEditActions Actions, DxfEditInteraction Interaction) CreateCadEditEngine()
     {
         var publication = new CadEditPublication(
             CaptureCadEditNotifications, SyncRelayeredCadState, SyncRotatedCadState,
@@ -129,8 +131,39 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         var effects = new CadEditEffects(
             InteractionState.ClosePadInfo, () => _selectionCoordinator.ClearSelection(CanvasHost),
             FilterCadPadsByLayer, RebuildAfterCadEdit, SetStatus, MarkUnsaved, PushUndo);
-        var workflow = new CadEditWorkflow(CadDocument, publication, layers, effects);
-        return (workflow, new CadEditReplay(CadDocument, workflow, publication, layers));
+        var interaction = CreateDxfEditInteraction();
+        var workflow = new CadEditWorkflow(CadDocument, publication, layers, effects, interaction);
+        var actions = new DxfEditWorkflow(CadDocument, workflow, publication, layers, effects, interaction);
+        return (workflow, new CadEditReplay(CadDocument, workflow, publication, layers), actions, interaction);
+    }
+
+    private DxfEditInteraction CreateDxfEditInteraction() => new(
+        () => _selectedCadIds, () => DxfEdit.PanelInput, name => DxfEdit.DxfEditNewLayerName = name,
+        FocusDxfEditCadPad, SetStatus,
+        () => OnPropertyChanged(nameof(CanOffsetSelectedCadOutputFwDiffIndices)),
+        () => OnPropertyChanged(nameof(Step4DiffShiftSelectionSummary)));
+
+    private DxfEditViewModel CreateDxfEditChild(IDxfEditActions actions, DxfEditInteraction interaction)
+    {
+        var child = new DxfEditViewModel(
+            CadDocument, actions, interaction,
+            new CadEditPersistence(ids => _projectFile.HiddenCadPadIds = ids, ids => _projectFile.VisibleDuplicateCadPadIds = ids),
+            () => _projectEditingSession.IsProjectEditingEnabled,
+            execute => CreateEditingCommand(execute), execute => CreateEditingAsyncCommand(execute));
+        child.PropertyChanging += (_, args) => OnPropertyChanging(args);
+        child.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName != nameof(IsProjectEditingEnabled)) OnPropertyChanged(args);
+        };
+        return child;
+    }
+
+    private void FocusDxfEditCadPad(int cadPadId)
+    {
+        TryLocateSelection(
+            new[] { cadPadId }, Array.Empty<int>(), focusSelection: true,
+            notVisibleStatus: $"CAD {cadPadId} is not visible.",
+            successStatusBuilder: (cadCount, _) => $"DXF edit focused: CAD {cadPadId} (CAD output={cadCount}).");
     }
 
     internal DxfCombinedGroupReplayResult? ApplyCapturedDxfEditProjectState(
@@ -140,7 +173,8 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
-        (_cadEditWorkflow, _cadEditReplay) = CreateCadEditEngine();
+        var editEngine = CreateCadEditEngine();
+        (_cadEditWorkflow, _cadEditReplay) = (editEngine.Workflow, editEngine.Replay);
         _settingsState = new SettingsStateViewModel(this);
         _fwAssignmentSettings = new FwAssignmentSettingsViewModel(this);
         _canvasStrokeFillState = new CanvasStrokeFillState(
@@ -158,6 +192,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             load => _projectEditingSession.RunLoadAsync(load), OnPropertyChanging, OnPropertyChanged);
         _manualSizingOwner = new Lazy<ManualSizingOwner>(CreateManualSizingOwner, LazyThreadSafetyMode.None);
         _gridMatchingOwner = new Lazy<GridMatchingOwner>(CreateGridMatchingOwner, LazyThreadSafetyMode.None);
+        DxfEdit = CreateDxfEditChild(editEngine.Actions, editEngine.Interaction);
         _dxfLayerImagePreferenceState = new DxfLayerImagePreferenceState(MarkUnsaved, SchedulePersistAppGeneralSettings);
         _projectUiSnapshotMapper = new ProjectUiSnapshotMapper(CreateProjectSnapshotReaders());
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
@@ -170,7 +205,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         ScanOrderOptions = BuildScanOrderOptions();
         GridAlignmentOptions = BuildGridAlignmentOptions();
         RegularSourceModeOptions = BuildRegularSourceModeOptions();
-        DxfEditRotationScopeOptions = BuildDxfEditRotationScopeOptions();
         LogLevelOptions = BuildLogLevelOptions();
         CadOutputFwDiffAutoModeOptions = BuildCadOutputFwDiffAutoModeOptions();
         NotchExportFileTypeOptions = BuildNotchExportFileTypeOptions();
@@ -181,7 +215,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _selectedNotchCompensationModelOption = NotchCompensationModelOptions[0];
         _selectedLogLevelOption = ResolveInitialLogLevelOption();
         InitializeLayerSelectionOptions();
-        InitializeDxfEditOptionSelection();
         StartupPerfTracker.Mark("workspace.vm-options-initialized");
         // Layered settings precedence: Project > App General > Built-in defaults.
         // At startup without a project file loaded, app general overrides default values.
@@ -203,7 +236,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _projectCommands = new ProjectCommandOwner(
             CreateEditingAsyncCommand, CreateEditingAsyncCommand, SaveProjectAsync, LoadProjectAsync);
         _selectionCommands = CreateSelectionCommands(); // Register selection commands next.
-        _dxfEditCommands = CreateDxfEditCommands(); // Keep DXF edit command registration next.
+        _dxfWorkspaceCommands = CreateDxfWorkspaceCommands();
         _generalCommands = CreateGeneralCommands(); // Finish command registration in the original order.
         StartupPerfTracker.Mark("workspace.vm-commands-initialized");
         // Subscribe to selection changes from the InteractionState.

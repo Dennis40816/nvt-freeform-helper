@@ -2,7 +2,7 @@ using System.ComponentModel;
 using Avalonia.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FreeformHelper.UI.ViewModels;
+using FreeformHelper.UI.CadEditing;
 
 namespace FreeformHelper.UI.Services;
 
@@ -11,7 +11,7 @@ public sealed class ProjectEditingCommands : ObservableObject
 {
     private readonly List<IRelayCommand> _commands = [];
     private readonly Func<bool>? _isProjectEditingEnabled;
-    private FreeformHelperViewModel? _project;
+    private IProjectEditingAvailability? _project;
 
     public ProjectEditingCommands()
     {
@@ -24,7 +24,7 @@ public sealed class ProjectEditingCommands : ObservableObject
 
     public bool IsProjectEditingEnabled => _isProjectEditingEnabled?.Invoke() ?? _project?.IsProjectEditingEnabled ?? true;
 
-    internal void AttachProject(FreeformHelperViewModel? project)
+    internal void AttachProject(IProjectEditingAvailability? project)
     {
         if (ReferenceEquals(_project, project)) return;
         if (_project is not null)
@@ -36,7 +36,7 @@ public sealed class ProjectEditingCommands : ObservableObject
         _project = project;
         if (_project is not null)
         {
-            WeakEventHandlerManager.Subscribe<FreeformHelperViewModel, PropertyChangedEventArgs, ProjectEditingCommands>(
+            WeakEventHandlerManager.Subscribe<INotifyPropertyChanged, PropertyChangedEventArgs, ProjectEditingCommands>(
                 _project, nameof(_project.PropertyChanged), OnProjectPropertyChanged);
         }
 
@@ -86,7 +86,7 @@ public sealed class ProjectEditingCommands : ObservableObject
 
     private void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(FreeformHelperViewModel.IsProjectEditingEnabled)) NotifyAvailabilityChanged();
+        if (e.PropertyName == nameof(IProjectEditingAvailability.IsProjectEditingEnabled)) NotifyAvailabilityChanged();
     }
 
     internal void NotifyAvailabilityChanged()
