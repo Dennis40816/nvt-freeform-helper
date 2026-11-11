@@ -6,124 +6,22 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel
 {
     public int? GetCadOutputFwDiffIndexOverride(int cadPadId)
-    {
-        return _projectFile.CadOutputFwDiffIndexOverrides.TryGetValue(cadPadId, out var index)
-            ? index
-            : null;
-    }
+        => IndexMapping.Assignment.GetCadOutputFwDiffIndexOverride(cadPadId);
 
     public void SetCadOutputFwDiffIndexOverride(int cadPadId, int targetIndex)
-    {
-        var overrides = _projectFile.CadOutputFwDiffIndexOverrides;
-        var result = DxfOverrideService.SetOverride(cadPadId, targetIndex, overrides, _cadIcIndexByCadId);
-        if (!result.Changed)
-        {
-            return;
-        }
-
-        PushUndo(() =>
-        {
-            if (result.HadPrevious)
-            {
-                overrides[cadPadId] = result.PreviousIndex;
-            }
-            else
-            {
-                overrides.Remove(cadPadId);
-            }
-
-            foreach (var pair in result.ReplacedOverrides)
-            {
-                overrides[pair.Key] = pair.Value;
-            }
-
-            UpdateCadOutputFwDiffIndexing(CadPads.ToList());
-        }, "CAD Output FW Diff override");
-
-        UpdateCadOutputFwDiffIndexing(CadPads.ToList());
-        InvalidateDownstreamFromStep4(showStatus: false);
-        NotifySimulationWorkspaceSourceChanged();
-        MarkUnsaved();
-        SetStatus(result.Message);
-    }
+        => IndexMapping.Assignment.SetCadOutputFwDiffIndexOverride(cadPadId, targetIndex);
 
     public void ClearCadOutputFwDiffIndexOverride(int cadPadId)
-    {
-        var overrides = _projectFile.CadOutputFwDiffIndexOverrides;
-        var result = DxfOverrideService.ClearOverride(cadPadId, overrides);
-        if (!result.HadPrevious)
-        {
-            SetStatus($"CAD Output FW Diff override clear: CAD {cadPadId} has no override.");
-            return;
-        }
-
-        PushUndo(() =>
-        {
-            overrides[cadPadId] = result.PreviousIndex;
-            UpdateCadOutputFwDiffIndexing(CadPads.ToList());
-        }, "CAD Output FW Diff override clear");
-
-        UpdateCadOutputFwDiffIndexing(CadPads.ToList());
-        InvalidateDownstreamFromStep4(showStatus: false);
-        NotifySimulationWorkspaceSourceChanged();
-        MarkUnsaved();
-        SetStatus($"CAD Output FW Diff override cleared: CAD {cadPadId}.");
-    }
+        => IndexMapping.Assignment.ClearCadOutputFwDiffIndexOverride(cadPadId);
 
     public bool IsCadOutputFwDiffIndexAnchorCadPad(int cadPadId)
-    {
-        return DxfOverrideService.IsAnchor(cadPadId, _cadIcIndexByCadId, _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc);
-    }
+        => IndexMapping.Assignment.IsCadOutputFwDiffIndexAnchorCadPad(cadPadId);
 
     public void SetCadOutputFwDiffIndexAnchorCadPad(int cadPadId)
-    {
-        if (!_cadIcIndexByCadId.TryGetValue(cadPadId, out var icIndex))
-        {
-            SetStatus($"CAD Output FW Diff anchor ignored: CAD {cadPadId} is not visible.");
-            return;
-        }
-
-        if (_projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.TryGetValue(icIndex, out var currentAnchor) &&
-            currentAnchor == cadPadId)
-        {
-            return;
-        }
-
-        CadOutputFwDiffIndexAnchorCadId = cadPadId;
-    }
+        => IndexMapping.Assignment.SetCadOutputFwDiffIndexAnchorCadPad(cadPadId);
 
     public void ClearCadOutputFwDiffIndexAnchorCadPad(int cadPadId)
-    {
-        if (!_cadIcIndexByCadId.TryGetValue(cadPadId, out var icIndex))
-        {
-            SetStatus($"CAD Output FW Diff anchor clear ignored: CAD {cadPadId} is not visible.");
-            return;
-        }
-
-        if (!_projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.Remove(icIndex))
-        {
-            SetStatus($"CAD Output FW Diff anchor clear: IC {icIndex + 1} has no anchor.");
-            return;
-        }
-
-        // Keep the stored selection in step with the project anchors, so selecting the same CAD again commits it.
-        if (CadOutputFwDiffIndexAnchorCadId == cadPadId)
-        {
-            using (_settingsSuppression.EnterDxfIndexAnchorChange())
-            {
-                using (_undoSuppression.Enter())
-                {
-                    CadOutputFwDiffIndexAnchorCadId = -1;
-                }
-            }
-        }
-
-        UpdateCadOutputFwDiffIndexing(CadPads.ToList());
-        InvalidateDownstreamFromStep4(showStatus: false);
-        NotifySimulationWorkspaceSourceChanged();
-        MarkUnsaved();
-        SetStatus($"CAD Output FW Diff anchor cleared: IC {icIndex + 1} uses scan-order first CAD.");
-    }
+        => IndexMapping.Assignment.ClearCadOutputFwDiffIndexAnchorCadPad(cadPadId);
 
     /// <summary>
     /// Gets a read-only list of <see cref="CadOutputFwDiffAutoModeOption"/> objects for Step 4 auto CAD Output FW Diff mode.
@@ -160,7 +58,7 @@ public sealed partial class FreeformHelperViewModel
     // The four per-CAD-pad index tables are stored once. The members below keep the old names and
     // read through it: members that carry analyzer debt read them, and renaming them would change
     // their ledger fingerprints.
-    private readonly CadIndexMaps _cadIndexMaps = new();
+    private CadIndexMaps _cadIndexMaps => IndexMapping.Assignment.Maps;
 
     internal CadIndexMaps CadIndexMaps => _cadIndexMaps;
 
@@ -180,25 +78,16 @@ public sealed partial class FreeformHelperViewModel
     }
 
     public bool TryGetCadOutputFwDiffIndex(int cadPadId, out int dxfIndex)
-    {
-        return _cadOutputFwDiffIndexByCadId.TryGetValue(cadPadId, out dxfIndex);
-    }
+        => IndexMapping.Assignment.TryGetCadOutputFwDiffIndex(cadPadId, out dxfIndex);
 
     public bool TryGetCadIcIndex(int cadPadId, out int icIndex)
-    {
-        return _cadIcIndexByCadId.TryGetValue(cadPadId, out icIndex);
-    }
+        => IndexMapping.Assignment.TryGetCadIcIndex(cadPadId, out icIndex);
 
     public bool TryGetCadDisplayIndex(int cadPadId, out int displayIndex)
-    {
-        return _cadDisplayIndexByCadId.TryGetValue(cadPadId, out displayIndex);
-    }
+        => IndexMapping.Assignment.TryGetCadDisplayIndex(cadPadId, out displayIndex);
 
     private void SetLatestCadOutputFwDiffAssignmentDecisions(IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> decisions)
-    {
-        _latestCadOutputFwDiffAssignmentDecisionsByCadId = decisions;
-        InvalidateWorkflowDataSnapshot();
-    }
+        => IndexMapping.Assignment.SetLatestCadOutputFwDiffAssignmentDecisions(decisions);
 
     private static List<CadOutputFwDiffAutoModeOption> BuildCadOutputFwDiffAutoModeOptions() =>
         new List<CadOutputFwDiffAutoModeOption>
