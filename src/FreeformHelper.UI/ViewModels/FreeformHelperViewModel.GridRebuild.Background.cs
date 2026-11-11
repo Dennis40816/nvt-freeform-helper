@@ -139,7 +139,7 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(PitchSizeYSummary));
 
         RegularPads = new ObservableCollection<RegularPad>(grid.Pads);
-        RefreshRegularVisibilityMask(grid);
+        RegularMask.Workflow.Refresh(grid);
         ResetFreeformAutoDetectStats("Freeform stats: run Step 2 auto-detect.");
         if (!_isLoadingSettings)
         {
@@ -194,11 +194,7 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(PitchSizeXSummary));
         OnPropertyChanged(nameof(PitchSizeYSummary));
         RegularPads = new ObservableCollection<RegularPad>();
-        ApplyRegularVisibilityMaskResult(
-            string.IsNullOrWhiteSpace(_regularVisibilityMask.SourcePath)
-                ? RegularVisibilityMaskResult.NotFound()
-                : RegularVisibilityMaskResult.NotFound(_regularVisibilityMask.SourcePath),
-            grid: null);
+        RegularMask.Workflow.ResetResult(grid: null);
         CanvasHintText = hint;
         ResetFreeformAutoDetectStats();
         if (!_isLoadingSettings)

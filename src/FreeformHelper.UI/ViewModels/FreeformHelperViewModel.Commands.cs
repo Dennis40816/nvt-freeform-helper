@@ -23,11 +23,11 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets the command to import a Step 1 regular visibility mask CSV.
     /// </summary>
-    public IAsyncRelayCommand ImportRegularVisibilityMaskCommand => _generalCommands.ImportRegularVisibilityMaskCommand;
+    public IAsyncRelayCommand ImportRegularVisibilityMaskCommand => RegularMask.ImportRegularVisibilityMaskCommand;
     /// <summary>
     /// Gets the command to clear the imported Step 1 regular visibility mask CSV.
     /// </summary>
-    public IRelayCommand ClearRegularVisibilityMaskCommand => _generalCommands.ClearRegularVisibilityMaskCommand;
+    public IRelayCommand ClearRegularVisibilityMaskCommand => RegularMask.ClearRegularVisibilityMaskCommand;
     /// <summary>
     /// Gets the command to automatically detect freeform pads.
     /// </summary>
@@ -82,11 +82,12 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>Creates the general commands once during construction.</summary>
     private GeneralCommands CreateGeneralCommands()
     {
+        var openDxf = CreateEditingAsyncCommand(OpenDxfAsync);
+        var match = CreateEditingAsyncCommand(MatchAsync);
+        RegularMask.InitializeCommands(CreateEditingAsyncCommand, execute => CreateEditingCommand(execute));
         return new GeneralCommands(
-            OpenDxfCommand: CreateEditingAsyncCommand(OpenDxfAsync),
-            MatchCommand: CreateEditingAsyncCommand(MatchAsync),
-            ImportRegularVisibilityMaskCommand: CreateEditingAsyncCommand(ImportRegularVisibilityMaskAsync),
-            ClearRegularVisibilityMaskCommand: CreateEditingCommand(ClearRegularVisibilityMask),
+            OpenDxfCommand: openDxf,
+            MatchCommand: match,
             AutoDetectFreeformsCommand: CreateEditingAsyncCommand(AutoDetectFreeformsAsync),
             ClearStep1ResultCommand: CreateEditingCommand(() => ClearWorkflowStep(WorkflowStepId.Step1Match)),
             ClearStep2ResultCommand: CreateEditingCommand(() => ClearWorkflowStep(WorkflowStepId.Step2Freeform)),

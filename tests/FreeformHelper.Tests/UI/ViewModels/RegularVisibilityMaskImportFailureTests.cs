@@ -23,11 +23,11 @@ public sealed class RegularVisibilityMaskImportFailureTests
         Assert.True(await saver.SaveProjectAsync());
         var vm = files.CreateViewModel();
         Assert.True((await vm.LoadProjectFromPathAsync(projectPath)).IsLoaded);
-        vm.RegularVisibilityMaskUi.IsEnabled = false;
-        var previousMask = vm.RegularVisibilityMaskForTests.Mask;
-        var previousPath = vm.RegularVisibilityMaskForTests.SourcePath;
-        var previousEmbedded = vm.RegularVisibilityMaskForTests.EmbeddedMask;
-        var previousName = vm.RegularVisibilityMaskForTests.EmbeddedName;
+        vm.RegularMask.IsEnabled = false;
+        var previousMask = vm.RegularMask.Workflow.Mask;
+        var previousPath = vm.RegularMask.Workflow.SourcePath;
+        var previousEmbedded = vm.RegularMask.Workflow.EmbeddedMask;
+        var previousName = vm.RegularMask.Workflow.EmbeddedName;
         Assert.True(previousMask.HasLoadedMask);
         Assert.NotNull(previousEmbedded);
         var cad = vm.CadPads.ToArray();
@@ -44,12 +44,12 @@ public sealed class RegularVisibilityMaskImportFailureTests
         }
 
         Assert.StartsWith("Regular visibility mask: failed to load locked-mask.csv. Ignored.", vm.StatusText, StringComparison.Ordinal);
-        Assert.Equal(vm.StatusText, vm.RegularVisibilityMaskUi.Summary);
-        Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
-        Assert.Same(previousMask, vm.RegularVisibilityMaskForTests.Mask);
-        Assert.Equal(previousPath, vm.RegularVisibilityMaskForTests.SourcePath);
-        Assert.Same(previousEmbedded, vm.RegularVisibilityMaskForTests.EmbeddedMask);
-        Assert.Equal(previousName, vm.RegularVisibilityMaskForTests.EmbeddedName);
+        Assert.Equal(vm.StatusText, vm.RegularMask.Summary);
+        Assert.False(vm.RegularMask.IsEnabled);
+        Assert.Same(previousMask, vm.RegularMask.Workflow.Mask);
+        Assert.Equal(previousPath, vm.RegularMask.Workflow.SourcePath);
+        Assert.Same(previousEmbedded, vm.RegularMask.Workflow.EmbeddedMask);
+        Assert.Equal(previousName, vm.RegularMask.Workflow.EmbeddedName);
         Assert.Equal(cad, vm.CadPads);
         Assert.Equal(regular, vm.RegularPads);
         Assert.Same(grid, FreeformHelperViewModelPrivateAccess.Grid(vm));
@@ -58,13 +58,13 @@ public sealed class RegularVisibilityMaskImportFailureTests
         Assert.True(await vm.SaveProjectAsync());
         var reloaded = files.CreateViewModel();
         Assert.True((await reloaded.LoadProjectFromPathAsync(projectPath)).IsLoaded);
-        Assert.False(reloaded.RegularVisibilityMaskUi.IsEnabled);
-        Assert.Equal(previousPath, reloaded.RegularVisibilityMaskForTests.SourcePath);
-        Assert.Equal(previousEmbedded, reloaded.RegularVisibilityMaskForTests.EmbeddedMask);
-        Assert.Equal(previousName, reloaded.RegularVisibilityMaskForTests.EmbeddedName);
-        Assert.True(reloaded.RegularVisibilityMaskForTests.Mask.HasLoadedMask);
-        Assert.Equal(0, Assert.Single(reloaded.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
-        Assert.Equal(1, Assert.Single(reloaded.RegularVisibilityMaskForTests.Mask.InactiveRegularPadIds));
+        Assert.False(reloaded.RegularMask.IsEnabled);
+        Assert.Equal(previousPath, reloaded.RegularMask.Workflow.SourcePath);
+        Assert.Equal(previousEmbedded, reloaded.RegularMask.Workflow.EmbeddedMask);
+        Assert.Equal(previousName, reloaded.RegularMask.Workflow.EmbeddedName);
+        Assert.True(reloaded.RegularMask.Workflow.Mask.HasLoadedMask);
+        Assert.Equal(0, Assert.Single(reloaded.RegularMask.Workflow.Mask.ActiveRegularPadIds));
+        Assert.Equal(1, Assert.Single(reloaded.RegularMask.Workflow.Mask.InactiveRegularPadIds));
     }
 
     [AvaloniaFact]
@@ -72,16 +72,16 @@ public sealed class RegularVisibilityMaskImportFailureTests
     {
         using var files = new IoFailureScope();
         var vm = await CreateMaskedViewModelAsync(files);
-        var previousMask = vm.RegularVisibilityMaskForTests.Mask;
-        var previousPath = vm.RegularVisibilityMaskForTests.SourcePath;
+        var previousMask = vm.RegularMask.Workflow.Mask;
+        var previousPath = vm.RegularMask.Workflow.SourcePath;
         vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(files.PathFor("missing-mask.csv"));
 
         await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
         Assert.StartsWith("Regular visibility mask: failed to load missing-mask.csv.", vm.StatusText, StringComparison.Ordinal);
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
-        Assert.Same(previousMask, vm.RegularVisibilityMaskForTests.Mask);
-        Assert.Equal(previousPath, vm.RegularVisibilityMaskForTests.SourcePath);
+        Assert.True(vm.RegularMask.IsEnabled);
+        Assert.Same(previousMask, vm.RegularMask.Workflow.Mask);
+        Assert.Equal(previousPath, vm.RegularMask.Workflow.SourcePath);
     }
 
     private static async Task<FreeformHelperViewModel> CreateMaskedViewModelAsync(IoFailureScope files)
@@ -103,8 +103,8 @@ public sealed class RegularVisibilityMaskImportFailureTests
         TestFiles.WriteText(maskPath, "Xch:\"2\",Ych:\"1\"\ntimestamp(0:0:0),DiffData,1,0\n");
         vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(maskPath);
         await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
-        Assert.Equal(0, Assert.Single(vm.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
+        Assert.True(vm.RegularMask.IsEnabled);
+        Assert.Equal(0, Assert.Single(vm.RegularMask.Workflow.Mask.ActiveRegularPadIds));
         return vm;
     }
 }

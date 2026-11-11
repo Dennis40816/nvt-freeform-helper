@@ -21,9 +21,9 @@ public sealed class RegularVisibilityMaskClearBehaviorTests
         using var files = new IoFailureScope();
         var vm = await LoadEmbeddedOnlyMaskAsync(files, enabled);
         var cad = Assert.Single(vm.CadPads);
-        Assert.Equal(enabled, vm.RegularVisibilityMaskUi.IsEnabled);
-        Assert.True(vm.RegularVisibilityMaskForTests.Mask.HasLoadedMask);
-        Assert.Null(vm.RegularVisibilityMaskForTests.SourcePath);
+        Assert.Equal(enabled, vm.RegularMask.IsEnabled);
+        Assert.True(vm.RegularMask.Workflow.Mask.HasLoadedMask);
+        Assert.Null(vm.RegularMask.Workflow.SourcePath);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(cad.Id, out var beforeClear));
         Assert.Equal(enabled ? 1 : 0, beforeClear);
         vm.NotchExportSummary = "Previous export completed.";
@@ -32,8 +32,8 @@ public sealed class RegularVisibilityMaskClearBehaviorTests
 
         vm.ClearRegularVisibilityMaskCommand.Execute(null);
 
-        Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
-        Assert.Contains("not loaded", vm.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
+        Assert.False(vm.RegularMask.IsEnabled);
+        Assert.Contains("not loaded", vm.RegularMask.Summary, StringComparison.Ordinal);
         Assert.Equal("Regular visibility mask cleared. Step 4 uses pure geometry seed.", vm.StatusText);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(cad.Id, out var afterClear));
         Assert.Equal(0, afterClear);
@@ -59,8 +59,8 @@ public sealed class RegularVisibilityMaskClearBehaviorTests
         await WaitForGridRebuildAsync(reloaded);
 
         Assert.Single(reloaded.CadPads);
-        Assert.False(reloaded.RegularVisibilityMaskUi.IsEnabled);
-        Assert.Contains("not loaded", reloaded.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
+        Assert.False(reloaded.RegularMask.IsEnabled);
+        Assert.Contains("not loaded", reloaded.RegularMask.Summary, StringComparison.Ordinal);
         Assert.True(reloaded.TryGetCadOutputFwDiffIndex(cad.Id, out var reloadedDiff));
         Assert.Equal(0, reloadedDiff);
     }
@@ -73,13 +73,13 @@ public sealed class RegularVisibilityMaskClearBehaviorTests
         var vm = await files.CreateWithoutDxfAsync();
         await WaitForGridRebuildAsync(vm);
         Assert.Empty(vm.CadPads);
-        vm.RegularVisibilityMaskUi.IsEnabled = true;
+        vm.RegularMask.IsEnabled = true;
         var sourceRevision = vm.SimulationWorkspaceSourceRevision;
 
         vm.ClearRegularVisibilityMaskCommand.Execute(null);
 
-        Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
-        Assert.Contains("not loaded", vm.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
+        Assert.False(vm.RegularMask.IsEnabled);
+        Assert.Contains("not loaded", vm.RegularMask.Summary, StringComparison.Ordinal);
         Assert.Equal("Regular visibility mask cleared. Step 4 uses pure geometry seed.", vm.StatusText);
         Assert.True(vm.SimulationWorkspaceSourceRevision > sourceRevision);
         Assert.Empty(vm.CadPads);
@@ -92,19 +92,19 @@ public sealed class RegularVisibilityMaskClearBehaviorTests
         using var files = new OperationProgressLifecycleTestScope();
         var vm = await files.CreateWithoutDxfAsync();
         await WaitForGridRebuildAsync(vm);
-        vm.RegularVisibilityMaskUi.IsEnabled = true;
+        vm.RegularMask.IsEnabled = true;
         vm.ClearRegularVisibilityMaskCommand.Execute(null);
         vm.ClearStep5ResultCommand.Execute(null);
         Assert.Equal("Step 5 result cleared.", vm.StatusText);
         var sourceRevision = vm.SimulationWorkspaceSourceRevision;
-        var summary = vm.RegularVisibilityMaskUi.Summary;
+        var summary = vm.RegularMask.Summary;
 
         vm.ClearRegularVisibilityMaskCommand.Execute(null);
 
         Assert.Equal("Step 5 result cleared.", vm.StatusText);
         Assert.Equal(sourceRevision, vm.SimulationWorkspaceSourceRevision);
-        Assert.Equal(summary, vm.RegularVisibilityMaskUi.Summary);
-        Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.Equal(summary, vm.RegularMask.Summary);
+        Assert.False(vm.RegularMask.IsEnabled);
     }
 
     private static async Task<FreeformHelperViewModel> LoadEmbeddedOnlyMaskAsync(IoFailureScope files, bool enabled)

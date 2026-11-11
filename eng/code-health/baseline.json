@@ -136,8 +136,8 @@
       "kind": "type",
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
-        "stateMembers": 59,
-        "partialFiles": 89
+        "stateMembers": 58,
+        "partialFiles": 88
       },
       "owner": "NFH",
       "locations": [

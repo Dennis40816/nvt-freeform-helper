@@ -8,8 +8,6 @@ namespace FreeformHelper.UI.ViewModels;
 internal sealed record GeneralCommands(
     IAsyncRelayCommand OpenDxfCommand,
     IAsyncRelayCommand MatchCommand,
-    IAsyncRelayCommand ImportRegularVisibilityMaskCommand,
-    IRelayCommand ClearRegularVisibilityMaskCommand,
     IAsyncRelayCommand AutoDetectFreeformsCommand,
     IRelayCommand ClearStep1ResultCommand,
     IRelayCommand ClearStep2ResultCommand,
