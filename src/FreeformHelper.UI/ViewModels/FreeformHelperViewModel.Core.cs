@@ -99,7 +99,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly CadLoadUseCase _cadLoadUseCase;
     private readonly CadLoadWorkflowService _cadLoadWorkflowService;
     private readonly LayerCatalogStateService _layerCatalogStateService;
-    private readonly ProjectPersistenceUseCase _projectPersistenceUseCase;
+    private readonly ProjectPersistenceCoordinator _projectPersistenceCoordinator;
     private readonly UndoService _undoService = new();
     private readonly UiOperationStatusReporter _statusReporter;
 
@@ -213,7 +213,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _cadLoadUseCase = new CadLoadUseCase(_dxfImportService);
         _cadLoadWorkflowService = new CadLoadWorkflowService(_cadLoadUseCase);
         _layerCatalogStateService = new LayerCatalogStateService(_dxfLayerCatalogReader);
-        _projectPersistenceUseCase = new ProjectPersistenceUseCase(_projectStore);
+        _projectPersistenceCoordinator = CreateProjectPersistenceCoordinator();
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
         _logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
         StartupPerfTracker.Mark("workspace.vm-ctor-complete");
