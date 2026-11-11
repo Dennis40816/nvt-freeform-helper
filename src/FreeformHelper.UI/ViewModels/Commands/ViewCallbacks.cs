@@ -9,7 +9,6 @@ namespace FreeformHelper.UI.ViewModels;
 internal sealed class ViewCallbacks
 {
     public Func<Task<string?>>? PickOpenDxfPathAsync { get; set; }
-    public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get; set; }
     public Func<Task<string?>>? PickLoadProjectPathAsync { get; set; }
     public Func<Task<string?>>? PickSaveProjectPathAsync { get; set; }
     public Func<string, string, Task<string?>>? PickSaveNotchPathAsync { get; set; }

@@ -68,7 +68,7 @@ public sealed class NotchComputationSourcesCharacterizationTests
         };
         await vm.WaitForGridRebuildIdleAsync();
         // Enable before installing the synthetic source snapshot so no indexing refresh rewrites it.
-        vm.RegularVisibilityMaskUi.IsEnabled = true;
+        vm.RegularMask.IsEnabled = true;
         var grid = TestGeometryFactory.CreateRegularGrid(3, 3, cellWidth: 10, cellHeight: 10);
         var pads = new List<CadPad>
         {
@@ -89,7 +89,7 @@ public sealed class NotchComputationSourcesCharacterizationTests
         vm.CadPads = new ObservableCollection<CadPad>(cadPads.Pads);
         vm.RegularPads = new ObservableCollection<RegularPad>(grid.Pads);
         vm.WorkflowDataForTests.LatestPadMatch = PadMatcher.Match(cadPads, grid);
-        vm.RegularVisibilityMaskForTests.Mask = new RegularVisibilityMaskResult(
+        vm.RegularMask.Workflow.Mask = new RegularVisibilityMaskResult(
             RegularVisibilityMaskStatus.Loaded, "synthetic.csv", 1,
             _maskIds.ToHashSet(), grid.Pads.Select(static pad => pad.RegularPadId).Except(_maskIds).ToHashSet(), null);
         vm.InvalidateWorkflowDataSnapshot();

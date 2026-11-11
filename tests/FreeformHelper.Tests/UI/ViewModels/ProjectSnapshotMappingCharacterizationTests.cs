@@ -122,7 +122,7 @@ public sealed class ProjectSnapshotMappingCharacterizationTests
 
         var snapshot = await CaptureAsync(vm);
 
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularMask.IsEnabled);
         Assert.Equal(files.MaskPath, snapshot.Import.RegularVisibilityMaskSourcePath);
         Assert.True(snapshot.Import.UseRegularVisibilityMask);
     }

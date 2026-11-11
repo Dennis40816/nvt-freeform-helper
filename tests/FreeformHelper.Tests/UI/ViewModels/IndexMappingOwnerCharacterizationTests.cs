@@ -353,7 +353,7 @@ public sealed class IndexMappingOwnerCharacterizationTests
         {
             vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(maskPath);
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
-            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+            Assert.True(vm.RegularMask.IsEnabled);
         }
         finally
         {

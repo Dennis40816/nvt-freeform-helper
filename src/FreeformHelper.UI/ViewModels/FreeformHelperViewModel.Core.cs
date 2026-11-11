@@ -46,7 +46,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     // These delegates are set by the View (FreeformHelperView) to enable the ViewModel
     // to trigger platform-specific file dialogs or confirmation prompts.
     public Func<Task<string?>>? PickOpenDxfPathAsync { get => _viewCallbacks.PickOpenDxfPathAsync; set => _viewCallbacks.PickOpenDxfPathAsync = value; }
-    public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get => _viewCallbacks.PickOpenRegularVisibilityMaskPathAsync; set => _viewCallbacks.PickOpenRegularVisibilityMaskPathAsync = value; }
+    public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get => RegularMask.PickOpenRegularVisibilityMaskPathAsync; set => RegularMask.PickOpenRegularVisibilityMaskPathAsync = value; }
     public Func<Task<string?>>? PickLoadProjectPathAsync { get => _viewCallbacks.PickLoadProjectPathAsync; set => _viewCallbacks.PickLoadProjectPathAsync = value; }
     public Func<Task<string?>>? PickSaveProjectPathAsync { get => _viewCallbacks.PickSaveProjectPathAsync; set => _viewCallbacks.PickSaveProjectPathAsync = value; }
     public Func<string, string, Task<string?>>? PickSaveNotchPathAsync { get => _viewCallbacks.PickSaveNotchPathAsync; set => _viewCallbacks.PickSaveNotchPathAsync = value; }
@@ -101,6 +101,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     /// <summary>Gets the confirmation hooks for project save and load that the View wires.</summary>
     public ProjectDialogHooks ProjectDialogs { get; } = new();
 
+    /// <summary>Gets the mask child, whose identity survives project replacement.</summary>
+    public RegularMaskViewModel RegularMask { get; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperViewModel"/> class.
     /// Sets up default values, initializes UI options, and configures commands.
@@ -135,6 +138,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _projectUiSnapshotMapper = new ProjectUiSnapshotMapper(CreateProjectSnapshotReaders());
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
         _statusReporter = new UiOperationStatusReporter(message => StatusText = message);
+        RegularMask = CreateRegularMask();
         UiEvents = uiEvents ?? new UiEventRunner(new UiEventFailureReporter(_statusReporter).Report, EmergencyLogSink.Report);
         _appGeneralSettingsStore = appGeneralSettingsStore ?? new AppGeneralSettingsStore();
         _appGeneralPersistenceCoordinator = new AppGeneralPersistenceCoordinator(this, _appGeneralPersistence);
@@ -189,6 +193,30 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
         _logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
         StartupPerfTracker.Mark("workspace.vm-ctor-complete");
+    }
+
+    private RegularMaskViewModel CreateRegularMask()
+    {
+        var stateChange = _settingsSuppression.RegularMaskStateChange;
+        var effects = new RegularMaskEffects(
+            GetGrid: () => _grid,
+            HasCad: () => _cad is not null,
+            GetVisiblePads: () => CadPads.Count > 0 ? CadPads.ToList() : BuildFilteredCadPadSet()?.Pads.ToList(),
+            UpdateMapping: UpdateCadOutputFwDiffIndexing,
+            InvalidateCanvas: () => CanvasHost?.Invalidate(),
+            InvalidateDownstream: () => InvalidateDownstreamFromStep4(showStatus: false),
+            PublishSimulationChange: NotifySimulationWorkspaceSourceChanged,
+            InvalidateSnapshot: InvalidateWorkflowDataSnapshot,
+            RefreshDuplicateGroups: () => RefreshStep4DuplicateDiffGroups(),
+            ClearProjectEmbeddedMask: () =>
+            {
+                _projectFile.EmbeddedRegularVisibilityMask = null;
+                _projectFile.EmbeddedRegularVisibilityMaskName = null;
+            },
+            SetStatus: message => SetStatus(message),
+            EnterStateChange: stateChange.Enter,
+            IsStateChangeActive: stateChange.IsActive);
+        return new RegularMaskViewModel(presentation => new RegularMaskWorkflow(presentation, effects, _logger));
     }
 
     private void RequestFitAfterNextRebuild()
@@ -274,7 +302,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             return cached.Snapshot;
         }
 
-        var activeMask = GetActiveRegularVisibilityMaskPadIds()?.ToFrozenSet();
+        var activeMask = RegularMask.Workflow.ActiveRegularPadIds?.ToFrozenSet();
 
         var cadToRegular = _workflowData.LatestPadMatch.CadToRegular
             .ToDictionary(
