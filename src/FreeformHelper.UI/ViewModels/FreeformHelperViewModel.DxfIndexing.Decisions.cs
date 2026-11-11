@@ -3,15 +3,7 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel
 {
     public CadOutputFwDiffAssignmentDecisionSummarySnapshot GetCadOutputFwDiffAssignmentDecisionSummarySnapshot()
-    {
-        var snapshot = BuildWorkflowDataSnapshot();
-        if (snapshot.CadOutputFwDiffAssignmentDecisionsByCadId.Count == 0)
-        {
-            return CadOutputFwDiffAssignmentDecisionSummarySnapshot.Empty;
-        }
-
-        return DxfAssignmentSummaryBuilder.Build(snapshot.CadOutputFwDiffAssignmentDecisionsByCadId.Values.ToArray());
-    }
+        => IndexMapping.Assignment.GetCadOutputFwDiffAssignmentDecisionSummarySnapshot();
 }
 
 public readonly record struct CadOutputFwDiffAssignmentDecisionSummarySnapshot(
