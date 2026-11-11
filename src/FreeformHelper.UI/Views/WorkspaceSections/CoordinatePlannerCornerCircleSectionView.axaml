@@ -1,0 +1,38 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerCornerCircleSectionView"
+             x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
+             x:CompileBindings="True">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
+  </UserControl.Styles>
+  <panels:CollapsiblePanel Title="Corner circles" IsExpanded="False">
+    <StackPanel Spacing="{DynamicResource Space12}">
+      <StackPanel Classes="panelFormField"
+                  ToolTip.Tip="Four equal circles. Their edges touch the active area. The centers form the largest rectangle that fits.">
+        <TextBlock Text="Radius (pixel)"/>
+        <controls:NumberScrubber Minimum="0"
+                                 Maximum="{DynamicResource NumericInputMaximum}"
+                                 SmallChange="1"
+                                 FormatString="0.###"
+                                 SnapToStep="False"
+                                 Value="{Binding CornerCircles.Radius, Mode=TwoWay}"/>
+      </StackPanel>
+      <ToggleButton Content="Draw center rectangle"
+                    Classes="actionGhost actionTextButton"
+                    HorizontalContentAlignment="Left"
+                    IsChecked="{Binding CornerCircles.DrawCenterRectangle, Mode=TwoWay}"
+                    ToolTip.Tip="Adds a one-pixel rectangle through the four circle centers to the exported image."/>
+      <TextBlock Text="{Binding CornerCircles.StatusText}" TextWrapping="Wrap"/>
+      <Button Content="Export AA-size image…"
+              Classes="actionNeutral actionTextButton"
+              HorizontalAlignment="Right"
+              Command="{Binding ExportCornerCircleImageCommand}"
+              ToolTip.Tip="Saves a black image with four white circles. One image pixel is one active-area pixel."/>
+    </StackPanel>
+  </panels:CollapsiblePanel>
+</UserControl>

@@ -172,11 +172,24 @@ public sealed partial class CoordinatePlannerWorkspaceViewModel : ObservableObje
             () => Snapshot, _geometry.CaptureInput, RebuildSnapshot, _artifacts.SelectByKey,
             value => StatusText = value, cornerOptions, OnPropertyChanging, OnPropertyChanged);
 
+        CornerCircles = new CoordinatePlannerCornerCircleModel(session.DefaultPixelWidth, session.DefaultPixelHeight);
+        PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(PixelWidth) or nameof(PixelHeight))
+            {
+                CornerCircles.SetPixelSize(
+                    CoordinatePlannerRequestBuilder.PositiveInt(PixelWidth),
+                    CoordinatePlannerRequestBuilder.PositiveInt(PixelHeight));
+            }
+        };
+
         _presentation.UpdateCadPadsForCanvas();
         RebuildSnapshot();
     }
 
     public int SourceRevision => _session.SourceRevision;
+
+    public CoordinatePlannerCornerCircleModel CornerCircles { get; }
 
     public IReadOnlyList<CadPad> CadPadsForCanvas => _presentation.CadPadsForCanvas;
 
