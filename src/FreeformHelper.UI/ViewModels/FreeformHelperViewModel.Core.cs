@@ -146,6 +146,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _settingsEffects = new SettingsEffectCoordinator(this);
         _settingsSnapshotMapper = new SettingsSnapshotMapper(this);
         _settingsStepCallbacks = new SettingsStepCallbackAdapter(this);
+        _notchSettingsCallbacks = new NotchSettingsCallbackAdapter(this);
         _canvasStrokeFillState = new CanvasStrokeFillState(
             () => _isLoadingSettings, () => _undoSuppression.IsActive, () => _undoSuppression.Enter(), PushUndo,
             () => CanvasHost?.Invalidate(), OnPropertyChanging, OnPropertyChanged);
