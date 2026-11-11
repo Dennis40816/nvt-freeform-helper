@@ -1,14 +1,19 @@
+using System.Collections.ObjectModel;
+using System.Windows.Input;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
 
 namespace FreeformHelper.UI.ViewModels;
 
-public sealed partial class FreeformHelperViewModel
+public sealed partial class FreeformHelperViewModel : IWorkflowDispatchPort, IWorkspaceNavigationSource
 {
     private const string DiagnosticsNotRunSummary = MappingDiagnosticsResult.NotRunSummary;
     private const string NotchExportNotRunSummary = "Notch export: not run.";
     private readonly AsyncGeneration _notchFinalProjection = new();
+    private readonly WorkflowDispatchCoordinator _workflowDispatch;
+    private readonly WorkspaceNavigationPresentation _workspaceNavigation;
+    private readonly WorkspaceToggleRegistry _workspaceToggleRegistry;
 
     private void MoveToWorkflowStep(WorkspaceWorkStep step) => MoveToWorkflowStep(step switch
     {
@@ -18,111 +23,31 @@ public sealed partial class FreeformHelperViewModel
         _ => WorkflowStepId.Step5Export,
     });
 
-    private void MoveToWorkflowStep(WorkflowStepId step)
-    {
-        var expansion = WorkflowPipelineService.BuildExpansionState(step);
-        _workflowPanelState.ApplyExpansion(
-            expansion.IsStep1Expanded,
-            expansion.IsStep2Expanded,
-            expansion.IsStep3Expanded,
-            expansion.IsStep4Expanded,
-            expansion.IsStep5Expanded,
-            expansion.IsStep6Expanded);
-    }
-
-    private void TryMoveToNextWorkflowStep(WorkflowStepId completedStep)
-    {
-        if (!WorkflowPipelineService.TryGetNextStepOnSuccess(completedStep, out var nextStep))
-        {
-            return;
-        }
-
-        if (TryEnsureWorkflowStep(nextStep, suppressStatus: true))
-        {
-            MoveToWorkflowStep(nextStep);
-        }
-    }
+    private void MoveToWorkflowStep(WorkflowStepId step) => _workflowDispatch.MoveToWorkflowStep(step);
 
     private void OnWorkflowStepChanged(WorkflowStepId changedStep, bool showStatus = false)
-    {
-        InvalidateDownstreamFromStep(changedStep, showStatus);
-    }
+        => _workflowDispatch.OnWorkflowStepChanged(changedStep, showStatus);
 
-    private void OnWorkflowStepCompleted(
-        WorkflowStepId completedStep,
-        bool invalidateDownstream,
-        bool moveToNextStep)
-    {
-        if (invalidateDownstream)
-        {
-            OnWorkflowStepChanged(completedStep, showStatus: false);
-        }
-
-        if (moveToNextStep)
-        {
-            TryMoveToNextWorkflowStep(completedStep);
-        }
-    }
+    private void OnWorkflowStepCompleted(WorkflowStepId completedStep, bool invalidateDownstream, bool moveToNextStep)
+        => _workflowDispatch.OnWorkflowStepCompleted(completedStep, invalidateDownstream, moveToNextStep);
 
     private void ResetWorkflowFromStep(WorkflowStepId changedStep, bool showStatus = false)
-    {
-        OnWorkflowStepChanged(changedStep, showStatus);
-        MoveToWorkflowStep(changedStep);
-    }
+        => _workflowDispatch.ResetWorkflowFromStep(changedStep, showStatus);
 
     private void InvalidateDownstreamFromStep2(bool showStatus)
-    {
-        OnWorkflowStepChanged(WorkflowStepId.Step2Freeform, showStatus);
-    }
+        => OnWorkflowStepChanged(WorkflowStepId.Step2Freeform, showStatus);
 
     private void InvalidateDownstreamFromStep3(bool showStatus)
-    {
-        OnWorkflowStepChanged(WorkflowStepId.Step3NotchPreview, showStatus);
-    }
+        => OnWorkflowStepChanged(WorkflowStepId.Step3NotchPreview, showStatus);
 
     private void InvalidateDownstreamFromStep4(bool showStatus)
-    {
-        OnWorkflowStepChanged(WorkflowStepId.Step4IndexDiagnostics, showStatus);
-    }
+        => OnWorkflowStepChanged(WorkflowStepId.Step4IndexDiagnostics, showStatus);
 
-    private void InvalidateDownstreamFromStep(WorkflowStepId changedStep, bool showStatus)
-    {
-        var steps = WorkflowPipelineService.GetDownstreamStepsToInvalidate(changedStep);
-        foreach (var step in steps)
-        {
-            ClearStepResultCore(step);
-        }
+    internal Task<WorkflowStepExecutionResult> RunWorkflowStepAsync(WorkflowStepId step)
+        => _workflowDispatch.RunWorkflowStepAsync(step);
 
-        if (!showStatus)
-        {
-            return;
-        }
-
-        var message = WorkflowPipelineService.GetInvalidationStatusMessage(changedStep);
-        if (!string.IsNullOrWhiteSpace(message))
-        {
-            SetStatus(message);
-        }
-    }
-
-    private void ClearStepResultCore(WorkflowStepId step)
-    {
-        switch (step)
-        {
-            case WorkflowStepId.Step2Freeform:
-                ClearStep2ResultCore();
-                break;
-            case WorkflowStepId.Step3NotchPreview:
-                ClearStep3ResultCore();
-                break;
-            case WorkflowStepId.Step4IndexDiagnostics:
-                ClearStep4ResultCore();
-                break;
-            case WorkflowStepId.Step5Export:
-                ClearStep5ResultCore();
-                break;
-        }
-    }
+    internal WorkflowStepExecutionResult ClearWorkflowStep(WorkflowStepId step)
+        => _workflowDispatch.ClearWorkflowStep(step);
 
     private void ClearStep2ResultCore()
     {
@@ -172,119 +97,66 @@ public sealed partial class FreeformHelperViewModel
         ClearNotchValidation();
     }
 
-    private void ExecuteStep3PreviewWorkflow()
+    WorkflowStateSnapshot IWorkflowDispatchPort.BuildWorkflowStateSnapshot() => BuildWorkflowStateSnapshot();
+    bool IWorkflowDispatchPort.CanAdvanceTo(WorkflowStepId step) => TryEnsureWorkflowStep(step, suppressStatus: true);
+    void IWorkflowDispatchPort.SetStatus(string message) => SetStatus(message);
+    void IWorkflowDispatchPort.InvalidateCanvas() => CanvasHost?.Invalidate();
+    void IWorkflowDispatchPort.ClearStep1Result()
     {
-        OnWorkflowStepChanged(WorkflowStepId.Step3NotchPreview, showStatus: false);
-        RefreshNotchCanvasPreview(showStatus: true);
+        ClearNotchCanvasPreview();
+        ClearPadMatchResult(clearRegularAssignments: true);
+    }
+    void IWorkflowDispatchPort.ClearStep2Result() => ClearStep2ResultCore();
+    void IWorkflowDispatchPort.ClearStep3Result() => ClearStep3ResultCore();
+    void IWorkflowDispatchPort.ClearStep4Result() => ClearStep4ResultCore();
+    void IWorkflowDispatchPort.ClearStep5Result() => ClearStep5ResultCore();
+    void IWorkflowDispatchPort.RefreshStep3Preview() => RefreshNotchCanvasPreview(showStatus: true);
+    Task IWorkflowDispatchPort.MatchAsync() => MatchAsync();
+    Task IWorkflowDispatchPort.AutoDetectFreeformsAsync() => AutoDetectFreeformsAsync();
+    Task IWorkflowDispatchPort.AnalyzeIndexMappingAsync() => AnalyzeIndexMappingAsync();
+
+    void IWorkflowDispatchPort.ApplyExpansion(WorkflowStepExpansionState expansion)
+        => _workflowPanelState.ApplyExpansion(expansion.IsStep1Expanded, expansion.IsStep2Expanded,
+            expansion.IsStep3Expanded, expansion.IsStep4Expanded, expansion.IsStep5Expanded, expansion.IsStep6Expanded);
+
+    public ObservableCollection<WorkspaceHeaderItem> WorkspaceHeaderItems
+    {
+        get => _workspaceToggleRegistry.WorkspaceHeaderItems;
+        set => _workspaceToggleRegistry.WorkspaceHeaderItems = value;
     }
 
-    private void ExecuteClearWorkflowStep(WorkflowStepId step)
+    public string WorkspacePrimaryActionText => _workspaceNavigation.WorkspacePrimaryActionText;
+    public ICommand WorkspacePrimaryActionCommand => _workspaceNavigation.WorkspacePrimaryActionCommand;
+    public string WorkspaceWorkHint => _workspaceNavigation.WorkspaceWorkHint;
+    public string WorkspaceMatchSummary => _workspaceNavigation.WorkspaceMatchSummary;
+    public string ManualOverrideHint => _workspaceNavigation.ManualOverrideHint;
+    public string ToFullPreviewToggleHint => _workspaceNavigation.ToFullPreviewToggleHint;
+    public string DxfCheckHeaderText => _workspaceNavigation.DxfCheckHeaderText;
+    public string DxfEditsHeaderText => _workspaceNavigation.DxfEditsHeaderText;
+    public string DxfRotationScopeHint => _workspaceNavigation.DxfRotationScopeHint;
+    public string ValidationTraceHint => _workspaceNavigation.ValidationTraceHint;
+
+    private void NotifyWorkspaceLayoutChanged(string? propertyName) => _workspaceNavigation.NotifyWorkspaceLayoutChanged(propertyName);
+    private void SelectWorkspaceWorkStep(WorkspaceWorkStep step) => _workspaceNavigation.SelectWorkspaceWorkStep(step);
+
+    bool IWorkspaceNavigationSource.HasCad => GetWorkflowStateSnapshot().HasCad;
+    bool IWorkspaceNavigationSource.HasStep1Result => GetWorkflowStateSnapshot().HasStep1Result;
+    WorkspaceWorkStep IWorkspaceNavigationSource.WorkStep
     {
-        switch (step)
-        {
-            case WorkflowStepId.Step1Match:
-                ClearNotchCanvasPreview();
-                ClearPadMatchResult(clearRegularAssignments: true);
-                ResetWorkflowFromStep(WorkflowStepId.Step1Match, showStatus: false);
-                CanvasHost?.Invalidate();
-                SetStatus("Step 1 result cleared.");
-                break;
-            case WorkflowStepId.Step2Freeform:
-                ClearStep2ResultCore();
-                ResetWorkflowFromStep(WorkflowStepId.Step2Freeform, showStatus: false);
-                SetStatus("Step 2 result cleared.");
-                break;
-            case WorkflowStepId.Step3NotchPreview:
-                ClearStep3ResultCore();
-                ResetWorkflowFromStep(WorkflowStepId.Step3NotchPreview, showStatus: false);
-                SetStatus("Step 3 result cleared.");
-                break;
-            case WorkflowStepId.Step4IndexDiagnostics:
-                ClearStep4ResultCore();
-                ResetWorkflowFromStep(WorkflowStepId.Step4IndexDiagnostics, showStatus: false);
-                SetStatus("Step 4 result cleared.");
-                break;
-            case WorkflowStepId.Step5Export:
-                ClearStep5ResultCore();
-                MoveToWorkflowStep(WorkflowStepId.Step5Export);
-                SetStatus("Step 5 result cleared.");
-                break;
-        }
+        get => _inspectorPanel.WorkStep;
+        set => _inspectorPanel = _inspectorPanel with { WorkStep = value };
     }
+    ICommand IWorkspaceNavigationSource.OpenDxfCommand => OpenDxfCommand;
+    ICommand IWorkspaceNavigationSource.MatchCommand => MatchCommand;
+    ICommand IWorkspaceNavigationSource.AutoDetectFreeformsCommand => AutoDetectFreeformsCommand;
+    ICommand IWorkspaceNavigationSource.ExportNotchCommand => ExportNotchCommand;
+    int IWorkspaceNavigationSource.SelectedRegularCount => SelectionSummaryResult.RegularCount;
+    bool IWorkspaceNavigationSource.IsDxfOverlapNotRun => DxfOverlapSummary == DxfOverlapResult.NotRunSummary;
 
-    internal async Task<WorkflowStepExecutionResult> RunWorkflowStepAsync(WorkflowStepId step)
+    (bool UsesLayer, bool MatchesSelection, int TargetCount) IWorkspaceNavigationSource.GetRotationScope()
     {
-        switch (step)
-        {
-            case WorkflowStepId.Step1Match:
-                await MatchAsync();
-                break;
-            case WorkflowStepId.Step2Freeform:
-                await AutoDetectFreeformsAsync();
-                break;
-            case WorkflowStepId.Step3NotchPreview:
-                ExecuteStep3PreviewWorkflow();
-                break;
-            case WorkflowStepId.Step4IndexDiagnostics:
-                await AnalyzeIndexMappingAsync();
-                break;
-            default:
-                return WorkflowStepExecutionResult.Unsupported(step, BuildWorkflowStateSnapshot(), StatusText);
-        }
-
-        var snapshot = BuildWorkflowStateSnapshot();
-        var isReady = step switch
-        {
-            WorkflowStepId.Step1Match => snapshot.HasStep1Result,
-            WorkflowStepId.Step2Freeform => snapshot.HasStep2Result,
-            WorkflowStepId.Step3NotchPreview => snapshot.HasStep3Result,
-            WorkflowStepId.Step4IndexDiagnostics => snapshot.HasStep4Result,
-            _ => false
-        };
-
-        return new WorkflowStepExecutionResult(
-            IsSupported: true,
-            IsReady: isReady,
-            Step: step,
-            Snapshot: snapshot,
-            StatusText: StatusText);
-    }
-
-    internal WorkflowStepExecutionResult ClearWorkflowStep(WorkflowStepId step)
-    {
-        if (step is < WorkflowStepId.Step1Match or > WorkflowStepId.Step5Export)
-        {
-            return WorkflowStepExecutionResult.Unsupported(step, BuildWorkflowStateSnapshot(), StatusText);
-        }
-
-        ExecuteClearWorkflowStep(step);
-        var snapshot = BuildWorkflowStateSnapshot();
-        return new WorkflowStepExecutionResult(
-            IsSupported: true,
-            IsReady: true,
-            Step: step,
-            Snapshot: snapshot,
-            StatusText: StatusText);
-    }
-}
-
-internal readonly record struct WorkflowStepExecutionResult(
-    bool IsSupported,
-    bool IsReady,
-    WorkflowStepId Step,
-    WorkflowStateSnapshot Snapshot,
-    string? StatusText)
-{
-    public static WorkflowStepExecutionResult Unsupported(
-        WorkflowStepId step,
-        WorkflowStateSnapshot snapshot,
-        string? statusText)
-    {
-        return new WorkflowStepExecutionResult(
-            IsSupported: false,
-            IsReady: false,
-            Step: step,
-            Snapshot: snapshot,
-            StatusText: statusText);
+        if (!IsDxfEditRotationLayerScope || _cad is null) return (false, false, 0);
+        var targets = GetRotationTargetCadIds(_cad);
+        return (true, targets.SetEquals(_selectedCadIds), targets.Count);
     }
 }

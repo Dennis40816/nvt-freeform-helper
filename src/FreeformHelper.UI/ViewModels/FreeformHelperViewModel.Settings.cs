@@ -2,7 +2,6 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.UI.Services;
@@ -180,14 +179,6 @@ public sealed partial class FreeformHelperViewModel
     }
 
     /// <summary>
-    /// Converts an Avalonia <see cref="Color"/> to its RGB hexadecimal string representation.
-    /// </summary>
-    private static string ToRgbHex(Color c)
-    {
-        return $"#{c.R:X2}{c.G:X2}{c.B:X2}";
-    }
-
-    /// <summary>
     /// Overrides the base <see cref="ObservableObject.OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs)"/> method to
     /// automatically mark the project as dirty (unsaved) if a persisted setting changes.
     /// </summary>
@@ -214,4 +205,19 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
+    partial void OnRecalcBoundsOnLayerFilterChanged(bool value)
+    {
+        if (_isLoadingSettings) return;
+        ApplySettingsOrchestration(nameof(RecalcBoundsOnLayerFilter));
+    }
+
+    partial void OnApplyAppVisualPreferencesOnProjectLoadChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        SchedulePersistAppGeneralSettings();
+    }
 }

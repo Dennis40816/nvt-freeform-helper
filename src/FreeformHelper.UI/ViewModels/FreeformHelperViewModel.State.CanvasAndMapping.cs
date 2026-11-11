@@ -7,180 +7,25 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    // --- Canvas Toggles (Directly bound to UI for visual state) ---
+    private readonly CanvasAppearanceState _canvasAppearance;
+    private readonly CadImportChoices _cadImportChoices;
 
-    // The canvas display switches and the import flags are stored once. The properties below forward to
-    // the record and raise the same notifications and callbacks as the stored properties they replaced.
-    private CanvasDisplayToggles _canvasToggles = CanvasDisplayToggles.Initial;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether CAD pads should be displayed on the canvas.
-    /// </summary>
-    public bool ShowCad
-    {
-        get => _canvasToggles.ShowCad;
-        set
-        {
-            if (_canvasToggles.ShowCad == value)
-            {
-                return;
-            }
-
-            OnShowCadChanging(value);
-            OnPropertyChanging();
-            _canvasToggles = _canvasToggles with { ShowCad = value };
-            OnShowCadChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnShowCadChanging(bool value);
-
-    partial void OnShowCadChanged(bool value);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether regular pads should be displayed on the canvas.
-    /// </summary>
-    public bool ShowRegular
-    {
-        get => _canvasToggles.ShowRegular;
-        set
-        {
-            if (_canvasToggles.ShowRegular == value)
-            {
-                return;
-            }
-
-            OnShowRegularChanging(value);
-            OnPropertyChanging();
-            _canvasToggles = _canvasToggles with { ShowRegular = value };
-            OnShowRegularChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnShowRegularChanging(bool value);
-
-    partial void OnShowRegularChanged(bool value);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether unmatched pads should be highlighted on the canvas.
-    /// </summary>
-    public bool HighlightUnmatched
-    {
-        get => _canvasToggles.HighlightUnmatched;
-        set
-        {
-            if (_canvasToggles.HighlightUnmatched == value)
-            {
-                return;
-            }
-
-            OnHighlightUnmatchedChanging(value);
-            OnPropertyChanging();
-            _canvasToggles = _canvasToggles with { HighlightUnmatched = value };
-            OnHighlightUnmatchedChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnHighlightUnmatchedChanging(bool value);
-
-    partial void OnHighlightUnmatchedChanged(bool value);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether freeform pads should be highlighted on the canvas.
-    /// </summary>
-    public bool HighlightFreeform
-    {
-        get => _canvasToggles.HighlightFreeform;
-        set
-        {
-            if (_canvasToggles.HighlightFreeform == value)
-            {
-                return;
-            }
-
-            OnHighlightFreeformChanging(value);
-            OnPropertyChanging();
-            _canvasToggles = _canvasToggles with { HighlightFreeform = value };
-            OnHighlightFreeformChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnHighlightFreeformChanging(bool value);
-
-    partial void OnHighlightFreeformChanged(bool value);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether CAD pads should be colored by area on the canvas.
-    /// </summary>
-    public bool ColorCadByArea
-    {
-        get => _canvasToggles.ColorCadByArea;
-        set
-        {
-            if (_canvasToggles.ColorCadByArea == value)
-            {
-                return;
-            }
-
-            OnColorCadByAreaChanging(value);
-            OnPropertyChanging();
-            _canvasToggles = _canvasToggles with { ColorCadByArea = value };
-            OnColorCadByAreaChanged(value);
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnColorCadByAreaChanging(bool value);
-
-    partial void OnColorCadByAreaChanged(bool value);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether only closed polylines should be imported from DXF.
-    /// </summary>
+    // Compatibility properties keep the existing binding and snapshot ports.
+    public bool ShowCad { get => _canvasAppearance.ShowCad; set => _canvasAppearance.ShowCad = value; }
+    public bool ShowRegular { get => _canvasAppearance.ShowRegular; set => _canvasAppearance.ShowRegular = value; }
+    public bool HighlightUnmatched { get => _canvasAppearance.HighlightUnmatched; set => _canvasAppearance.HighlightUnmatched = value; }
+    public bool HighlightFreeform { get => _canvasAppearance.HighlightFreeform; set => _canvasAppearance.HighlightFreeform = value; }
+    public bool ColorCadByArea { get => _canvasAppearance.ColorCadByArea; set => _canvasAppearance.ColorCadByArea = value; }
     public bool ImportOnlyClosedPolylines
     {
-        get => _canvasToggles.ImportOnlyClosedPolylines;
-        set
-        {
-            if (_canvasToggles.ImportOnlyClosedPolylines == value)
-            {
-                return;
-            }
-
-            OnImportOnlyClosedPolylinesChanging(value);
-            OnPropertyChanging();
-            _canvasToggles = _canvasToggles with { ImportOnlyClosedPolylines = value };
-            OnPropertyChanged();
-        }
+        get => _cadImportChoices.ImportOnlyClosedPolylines;
+        set => _cadImportChoices.ImportOnlyClosedPolylines = value;
     }
-
-    partial void OnImportOnlyClosedPolylinesChanging(bool value);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether polylines from the DXF BLOCKS section should be imported.
-    /// </summary>
     public bool ImportBlockPolylines
     {
-        get => _canvasToggles.ImportBlockPolylines;
-        set
-        {
-            if (_canvasToggles.ImportBlockPolylines == value)
-            {
-                return;
-            }
-
-            OnImportBlockPolylinesChanging(value);
-            OnPropertyChanging();
-            _canvasToggles = _canvasToggles with { ImportBlockPolylines = value };
-            OnPropertyChanged();
-        }
+        get => _cadImportChoices.ImportBlockPolylines;
+        set => _cadImportChoices.ImportBlockPolylines = value;
     }
-
-    partial void OnImportBlockPolylinesChanging(bool value);
 
     private readonly WorkflowPanelState _workflowPanelState;
 
@@ -224,73 +69,115 @@ public sealed partial class FreeformHelperViewModel
     private const decimal GlobalFontSizePercentMin = 80m;
     private const decimal GlobalFontSizePercentMax = 140m;
 
-    private readonly CanvasStrokeFillState _canvasStrokeFillState;
-
     /// <summary>
     /// Gets or sets the line width for drawing CAD pads on the canvas.
     /// </summary>
-    public decimal CadLineWidth { get => _canvasStrokeFillState.CadLineWidth; set => _canvasStrokeFillState.CadLineWidth = value; }
+    public decimal CadLineWidth
+    {
+        get => _canvasAppearance.StrokeFill.CadLineWidth;
+        set => _canvasAppearance.StrokeFill.CadLineWidth = value;
+    }
     /// <summary>
     /// Gets or sets the line color for drawing CAD pads on the canvas.
     /// </summary>
-    [ObservableProperty] private Color _cadLineColor;
+    public Color CadLineColor
+    {
+        get => Color.FromUInt32(_canvasAppearance.CadLineColor);
+        set => _canvasAppearance.CadLineColor = value.ToUInt32();
+    }
     /// <summary>
     /// Gets or sets the opacity multiplier (0-1) for CAD pad lines.
     /// </summary>
-    public decimal CadLineOpacity { get => _canvasStrokeFillState.CadLineOpacity; set => _canvasStrokeFillState.CadLineOpacity = value; }
+    public decimal CadLineOpacity
+    {
+        get => _canvasAppearance.StrokeFill.CadLineOpacity;
+        set => _canvasAppearance.StrokeFill.CadLineOpacity = value;
+    }
     /// <summary>
     /// Gets or sets the opacity multiplier (0-1) for CAD pad fills.
     /// </summary>
-    public decimal CadFillOpacity { get => _canvasStrokeFillState.CadFillOpacity; set => _canvasStrokeFillState.CadFillOpacity = value; }
+    public decimal CadFillOpacity
+    {
+        get => _canvasAppearance.StrokeFill.CadFillOpacity;
+        set => _canvasAppearance.StrokeFill.CadFillOpacity = value;
+    }
     /// <summary>
     /// Gets or sets the line width for drawing regular pads on the canvas.
     /// </summary>
-    public decimal RegularLineWidth { get => _canvasStrokeFillState.RegularLineWidth; set => _canvasStrokeFillState.RegularLineWidth = value; }
+    public decimal RegularLineWidth
+    {
+        get => _canvasAppearance.StrokeFill.RegularLineWidth;
+        set => _canvasAppearance.StrokeFill.RegularLineWidth = value;
+    }
     /// <summary>
     /// Gets or sets a line-width adjustment for highlight/selection overlays.
     /// Positive values make highlights thicker; negative values make them thinner.
     /// </summary>
     public decimal HighlightStrokeWidthAdjust
     {
-        get => _canvasStrokeFillState.HighlightStrokeWidthAdjust;
-        set => _canvasStrokeFillState.HighlightStrokeWidthAdjust = value;
+        get => _canvasAppearance.StrokeFill.HighlightStrokeWidthAdjust;
+        set => _canvasAppearance.StrokeFill.HighlightStrokeWidthAdjust = value;
     }
     /// <summary>
     /// Gets or sets the line color for drawing regular pads on the canvas.
     /// </summary>
-    [ObservableProperty] private Color _regularLineColor;
+    public Color RegularLineColor
+    {
+        get => Color.FromUInt32(_canvasAppearance.RegularLineColor);
+        set => _canvasAppearance.RegularLineColor = value.ToUInt32();
+    }
     /// <summary>
     /// Gets or sets the opacity multiplier (0-1) for regular pad lines.
     /// </summary>
-    public decimal RegularLineOpacity { get => _canvasStrokeFillState.RegularLineOpacity; set => _canvasStrokeFillState.RegularLineOpacity = value; }
+    public decimal RegularLineOpacity
+    {
+        get => _canvasAppearance.StrokeFill.RegularLineOpacity;
+        set => _canvasAppearance.StrokeFill.RegularLineOpacity = value;
+    }
     /// <summary>
     /// Gets or sets the opacity multiplier (0-1) for regular pad fills.
     /// </summary>
-    public decimal RegularFillOpacity { get => _canvasStrokeFillState.RegularFillOpacity; set => _canvasStrokeFillState.RegularFillOpacity = value; }
+    public decimal RegularFillOpacity
+    {
+        get => _canvasAppearance.StrokeFill.RegularFillOpacity;
+        set => _canvasAppearance.StrokeFill.RegularFillOpacity = value;
+    }
     /// <summary>
     /// Gets or sets the line/fill color for selected regular pads on the canvas.
     /// </summary>
-    [ObservableProperty] private Color _regularSelectedColor;
+    public Color RegularSelectedColor
+    {
+        get => Color.FromUInt32(_canvasAppearance.RegularSelectedColor);
+        set => _canvasAppearance.RegularSelectedColor = value.ToUInt32();
+    }
     /// <summary>
     /// Gets or sets the fill opacity (0-1) for selected regular pads.
     /// </summary>
     public decimal RegularSelectedFillOpacity
     {
-        get => _canvasStrokeFillState.RegularSelectedFillOpacity;
-        set => _canvasStrokeFillState.RegularSelectedFillOpacity = value;
+        get => _canvasAppearance.StrokeFill.RegularSelectedFillOpacity;
+        set => _canvasAppearance.StrokeFill.RegularSelectedFillOpacity = value;
     }
     /// <summary>
     /// Gets or sets the hexadecimal string representation of the CAD line color.
     /// </summary>
-    [ObservableProperty] private string _cadLineColorHex = string.Empty;
+    public string CadLineColorHex { get => _canvasAppearance.CadLineColorHex; set => _canvasAppearance.CadLineColorHex = value; }
     /// <summary>
     /// Gets or sets the hexadecimal string representation of the regular line color.
     /// </summary>
-    [ObservableProperty] private string _regularLineColorHex = string.Empty;
+    public string RegularLineColorHex
+    {
+        get => _canvasAppearance.RegularLineColorHex;
+        set => _canvasAppearance.RegularLineColorHex = value;
+    }
     /// <summary>
     /// Gets or sets the hexadecimal string representation of the selected regular pad color.
     /// </summary>
-    [ObservableProperty] private string _regularSelectedColorHex = string.Empty;
+    public string RegularSelectedColorHex
+    {
+        get => _canvasAppearance.RegularSelectedColorHex;
+        set => _canvasAppearance.RegularSelectedColorHex = value;
+    }
 
     private void ApplyCanvasColorDefaultsFromTokens()
     {
@@ -360,14 +247,27 @@ public sealed partial class FreeformHelperViewModel
         return false;
     }
 
-    partial void OnShowCadChanging(bool value) => TrackUndo(ShowCad, value, v => ShowCad = v, "Toggle CAD layer");
-    partial void OnShowRegularChanging(bool value) => TrackUndo(ShowRegular, value, v => ShowRegular = v, "Toggle regular grid");
-    partial void OnHighlightUnmatchedChanging(bool value) => TrackUndo(HighlightUnmatched, value, v => HighlightUnmatched = v, "Toggle unmatched highlight");
-    partial void OnHighlightFreeformChanging(bool value) => TrackUndo(HighlightFreeform, value, v => HighlightFreeform = v, "Toggle freeform highlight");
-    partial void OnColorCadByAreaChanging(bool value) => TrackUndo(ColorCadByArea, value, v => ColorCadByArea = v, "Toggle CAD area colors");
-    partial void OnImportOnlyClosedPolylinesChanging(bool value) => TrackUndo(ImportOnlyClosedPolylines, value, v => ImportOnlyClosedPolylines = v, "Import closed polylines");
-    partial void OnImportBlockPolylinesChanging(bool value) => TrackUndo(ImportBlockPolylines, value, v => ImportBlockPolylines = v, "Import block polylines");
-    partial void OnCadLineColorHexChanging(string value) => TrackUndo(CadLineColorHex, value, v => CadLineColorHex = v, "CAD line color");
-    partial void OnRegularLineColorHexChanging(string value) => TrackUndo(RegularLineColorHex, value, v => RegularLineColorHex = v, "Regular line color");
-    partial void OnRegularSelectedColorHexChanging(string value) => TrackUndo(RegularSelectedColorHex, value, v => RegularSelectedColorHex = v, "Regular selection color");
+    private CanvasAppearanceState CreateCanvasAppearanceState()
+    {
+        var strokeFill = new CanvasStrokeFillState(
+            () => _isLoadingSettings,
+            () => _undoSuppression.IsActive,
+            () => _undoSuppression.Enter(),
+            PushUndo,
+            () => CanvasHost?.Invalidate(),
+            OnPropertyChanging,
+            OnPropertyChanged);
+        return new CanvasAppearanceState(strokeFill, _workspaceToggleRegistry,
+            ParseCanvasColor, FormatCanvasColor, () => _undoSuppression.Enter(),
+            TrackUndo, TrackUndo, OnPropertyChanging, OnPropertyChanged);
+    }
+
+    private static uint? ParseCanvasColor(string text)
+        => Color.TryParse(text, out var color) ? color.ToUInt32() : null;
+
+    private static string FormatCanvasColor(uint argb)
+    {
+        var color = Color.FromUInt32(argb);
+        return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+    }
 }
