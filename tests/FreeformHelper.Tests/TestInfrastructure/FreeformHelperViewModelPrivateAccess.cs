@@ -5,6 +5,7 @@ using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.CadEditing;
+using FreeformHelper.UI.CadImport;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Lifecycle;

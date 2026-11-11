@@ -15,7 +15,7 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets the command to open a DXF file.
     /// </summary>
-    public IAsyncRelayCommand OpenDxfCommand => _generalCommands.OpenDxfCommand;
+    public IAsyncRelayCommand OpenDxfCommand => CadImport.OpenDxfCommand;
     /// <summary>
     /// Gets the command to perform pad matching.
     /// </summary>
@@ -82,11 +82,10 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>Creates the general commands once during construction.</summary>
     private GeneralCommands CreateGeneralCommands()
     {
-        var openDxf = CreateEditingAsyncCommand(OpenDxfAsync);
+        CadImport.InitializeCommand(CreateEditingAsyncCommand);
         var match = CreateEditingAsyncCommand(MatchAsync);
         RegularMask.InitializeCommands(CreateEditingAsyncCommand, execute => CreateEditingCommand(execute));
         return new GeneralCommands(
-            OpenDxfCommand: openDxf,
             MatchCommand: match,
             AutoDetectFreeformsCommand: CreateEditingAsyncCommand(AutoDetectFreeformsAsync),
             ClearStep1ResultCommand: CreateEditingCommand(() => ClearWorkflowStep(WorkflowStepId.Step1Match)),

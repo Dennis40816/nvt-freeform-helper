@@ -98,7 +98,7 @@ public sealed class SettingsDraftLifecycleCharacterizationTests
         await owner.WaitForGridRebuildIdleAsync();
         var draft = owner.CreateSettingsWindowViewModel();
         var rows = draft.LayerCategoryRows;
-        var category = rows.Single(row => row.Category == FreeformHelperViewModel.DxfLayerCategory.Polyline);
+        var category = rows.Single(row => row.Category == FreeformHelper.Application.CadImport.DxfLayerCategory.Polyline);
         var layer = Assert.Single(owner.LayerToggles, toggle => toggle.Name == "signal");
         Assert.True(layer.IsSelected);
         Assert.Equal(1, category.SelectedCount);

@@ -46,12 +46,12 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("MaxDropDownHeight=\"{StaticResource LayerListMaxHeight}\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("controls:BalancedWrapPanel Classes=\"badgeGroup dxfEditBadgeGroup\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", leftPanel, StringComparison.Ordinal);
-        Assert.Contains("IsChecked=\"{Binding IsCadLayerBulkToggleChecked, Mode=TwoWay}\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("IsChecked=\"{Binding Layers.IsCadLayerBulkToggleChecked, Mode=TwoWay}\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleContent\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", leftPanel, StringComparison.Ordinal);
-        Assert.Contains("IsVisible=\"{Binding AreSomeCadLayersSelected}\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("IsVisible=\"{Binding Layers.AreSomeCadLayersSelected}\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleLabel\"", leftPanel, StringComparison.Ordinal);
-        Assert.Contains("Text=\"{Binding CadLayerBulkToggleText}\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{Binding Layers.CadLayerBulkToggleText}\"", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerBulkToggleIcon", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerBulkToggleSwitch", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dangerTextButton dxfEditMiniAction\"", leftPanel, StringComparison.Ordinal);

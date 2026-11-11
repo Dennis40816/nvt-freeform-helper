@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace FreeformHelper.UI.ViewModels;
+namespace FreeformHelper.UI.CadImport;
 
 /// <summary>
 /// Holds the result of one DXF overlap check: the summary text, the issue messages and the CAD pads

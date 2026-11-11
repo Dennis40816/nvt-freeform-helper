@@ -1,3 +1,4 @@
+using FreeformHelper.Application.CadImport;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Logging;

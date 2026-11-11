@@ -6,7 +6,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>Owns the general command instances for one workspace.</summary>
 internal sealed record GeneralCommands(
-    IAsyncRelayCommand OpenDxfCommand,
     IAsyncRelayCommand MatchCommand,
     IAsyncRelayCommand AutoDetectFreeformsCommand,
     IRelayCommand ClearStep1ResultCommand,

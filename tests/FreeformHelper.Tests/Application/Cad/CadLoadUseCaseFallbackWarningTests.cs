@@ -2,6 +2,7 @@
 using System.Text;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.CadImport;
 using FreeformHelper.UI.Services;
 using Xunit;
 

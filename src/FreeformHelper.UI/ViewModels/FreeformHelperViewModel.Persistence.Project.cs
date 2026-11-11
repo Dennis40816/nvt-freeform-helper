@@ -5,6 +5,7 @@ using System.Globalization;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.CadEditing;
+using FreeformHelper.UI.CadImport;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.UseCases.ProjectLoad;
 using FreeformHelper.UI.ViewModels.Project;
@@ -205,19 +206,10 @@ public sealed partial class FreeformHelperViewModel
         await ApplyCadLoadOutcomeAsync(outcome, file.UiSnapshot.View);
         ApplyImportSnapshot(file.UiSnapshot.Import, file);
         var combinedGroupReplay = _cadEditReplay.Apply(persistedDxfEditState, outcome.FallbackWarning);
-        status.ReportProgress(BuildCadLoadStatus(outcome, CadLoadContext.LoadProject, path));
-        LogCadLoadOutcome(outcome, CadLoadContext.LoadProject);
+        status.ReportProgress(BuildCadLoadStatus(outcome, path));
+        LogCadLoadOutcome(outcome);
         return (dxfElapsedMs, combinedGroupReplay);
     }
 
-    private void DetachAndClearLayerToggles()
-    {
-        foreach (var toggle in LayerToggles)
-        {
-            toggle.PropertyChanging -= OnLayerToggleChanging;
-            toggle.PropertyChanged -= OnLayerToggleChanged;
-        }
-
-        LayerToggles.Clear();
-    }
+    private void DetachAndClearLayerToggles() => Layers.DetachAndClearLayerToggles();
 }

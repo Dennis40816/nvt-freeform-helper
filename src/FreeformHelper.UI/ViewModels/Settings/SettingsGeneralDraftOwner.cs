@@ -10,8 +10,8 @@ internal sealed class SettingsGeneralDraftOwner
     private readonly Func<object?> _readDraftProjectIdentity;
     private readonly Action<string> _propertyChanging;
     private readonly Action<string> _propertyChanged;
-    private readonly Func<IReadOnlyList<FreeformHelperViewModel.DxfLayerCategoryState>> _readCategoryStates;
-    private readonly Action<FreeformHelperViewModel.DxfLayerCategory, bool> _applyCategory;
+    private readonly Func<IReadOnlyList<FreeformHelper.Application.CadImport.DxfLayerCategoryState>> _readCategoryStates;
+    private readonly Action<FreeformHelper.Application.CadImport.DxfLayerCategory, bool> _applyCategory;
 
     private bool _importOnlyClosedPolylines;
     private bool _importBlockPolylines;
@@ -47,8 +47,8 @@ internal sealed class SettingsGeneralDraftOwner
     public SettingsGeneralDraftOwner(
         Seed seed,
         Func<object?> readDraftProjectIdentity,
-        Func<IReadOnlyList<FreeformHelperViewModel.DxfLayerCategoryState>> readCategoryStates,
-        Action<FreeformHelperViewModel.DxfLayerCategory, bool> applyCategory,
+        Func<IReadOnlyList<FreeformHelper.Application.CadImport.DxfLayerCategoryState>> readCategoryStates,
+        Action<FreeformHelper.Application.CadImport.DxfLayerCategory, bool> applyCategory,
         IReadOnlyList<FreeformHelperViewModel.LogLevelOption> logLevelOptions,
         Action<string> propertyChanging,
         Action<string> propertyChanged)
@@ -183,7 +183,7 @@ internal sealed class SettingsGeneralDraftOwner
         _propertyChanged(nameof(HasLayerCategoryRows));
     }
 
-    private void ApplyLayerCategorySelection(FreeformHelperViewModel.DxfLayerCategory category, bool isSelected)
+    private void ApplyLayerCategorySelection(FreeformHelper.Application.CadImport.DxfLayerCategory category, bool isSelected)
     {
         _applyCategory(category, isSelected);
         RefreshLayerCategoryRows();

@@ -121,7 +121,7 @@ public sealed partial class FreeformHelperView
             vm.ClearCadOutputFwDiffIndexAnchorCadPad,
             () => ClosePadInfoViaState(), // Action to close popover.
             vm.ShowNotchDetailCommand, // Notch detail command.
-            canSelectAreaBucket ? () => vm.SelectCadAreaBucketFromPad(pad.Id) : null,
+            canSelectAreaBucket ? () => vm.Layers.SelectCadAreaBucketFromPad(pad.Id) : null,
             vm.GetMatchedRegularPadIds,
             vm.GetMatchedRegularLinks,
             vm.GetRegularPadIcDiff,

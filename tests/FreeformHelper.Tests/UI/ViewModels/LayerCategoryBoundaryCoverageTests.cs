@@ -2,7 +2,6 @@
 
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.ViewModels;
 using Xunit;
 using static FreeformHelper.Tests.FreeformHelperViewModelTests;
 using static FreeformHelper.Tests.SuppressedWorkspaceBehaviorTests;
@@ -77,9 +76,9 @@ public sealed class LayerCategoryBoundaryCoverageTests
         Assert.Equal("edited", vm.CadPads.Single(pad => pad.Id == id).Layer);
         var settings = vm.CreateSettingsWindowViewModel();
         var category = Assert.Single(settings.LayerCategoryRows,
-            static row => row.Category == FreeformHelperViewModel.DxfLayerCategory.Polyline);
+            static row => row.Category == FreeformHelper.Application.CadImport.DxfLayerCategory.Polyline);
         var staleTextCategory = Assert.Single(settings.LayerCategoryRows,
-            static row => row.Category == FreeformHelperViewModel.DxfLayerCategory.Text);
+            static row => row.Category == FreeformHelper.Application.CadImport.DxfLayerCategory.Text);
         Assert.Equal(3, category.TotalCount);
 
         category.DisableCommand.Execute(null);
@@ -96,7 +95,7 @@ public sealed class LayerCategoryBoundaryCoverageTests
         vm.HasUnsavedChanges = false;
         await vm.OpenDxfCommand.ExecuteAsync(null);
         await WaitForGridRebuildAsync(vm);
-        Assert.Equal(FreeformHelperViewModel.DxfLayerCategory.Polyline,
+        Assert.Equal(FreeformHelper.Application.CadImport.DxfLayerCategory.Polyline,
             Assert.Single(vm.CreateSettingsWindowViewModel().LayerCategoryRows).Category);
         var visibility = vm.LayerToggles.Select(static toggle => (toggle.Name, toggle.IsSelected)).ToArray();
         var canUndo = vm.CanUndo;
@@ -106,7 +105,7 @@ public sealed class LayerCategoryBoundaryCoverageTests
 
         Assert.Equal(visibility, vm.LayerToggles.Select(static toggle => (toggle.Name, toggle.IsSelected)));
         Assert.Equal(2, vm.CadPads.Count);
-        Assert.Equal(FreeformHelperViewModel.DxfLayerCategory.Polyline, Assert.Single(settings.LayerCategoryRows).Category);
+        Assert.Equal(FreeformHelper.Application.CadImport.DxfLayerCategory.Polyline, Assert.Single(settings.LayerCategoryRows).Category);
         Assert.False(vm.HasUnsavedChanges);
         Assert.Equal(canUndo, vm.CanUndo);
     }

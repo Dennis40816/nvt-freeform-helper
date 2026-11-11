@@ -41,11 +41,6 @@ public sealed partial class FreeformHelperViewModel : ISettingsHost, IFwAssignme
 
     void ISettingsHost.OnSelectedScanOrderChanged(ScanOrder value) => OnSelectedScanOrderChanged(value);
 
-    void ISettingsHost.OnSelectedRegularSourceLayerOptionChanged() =>
-        OnSelectedRegularSourceLayerOptionChanged(SelectedRegularSourceLayerOption);
-
-    void ISettingsHost.OnSelectedBoundLayerOptionChanged() => OnSelectedBoundLayerOptionChanged(SelectedBoundLayerOption);
-
     bool IFwAssignmentSettingsHost.IsLoadingSettings => _isLoadingSettings;
 
     SettingsSuppressionScopes IFwAssignmentSettingsHost.Suppression => _settingsSuppression;

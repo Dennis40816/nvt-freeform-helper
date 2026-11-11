@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using FreeformHelper.Application.Settings;
-using BoundLayerOption = FreeformHelper.UI.ViewModels.FreeformHelperViewModel.BoundLayerOption;
-using RegularSourceLayerOption = FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RegularSourceLayerOption;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -13,13 +11,11 @@ internal sealed partial class SettingsStateViewModel
 
     // UI thread only after construction. Moved from the shell, with the same record defaults.
     private GridBuildOptions _gridBuild;
-    private LayerSourceSelection _layerSource;
 
     internal SettingsStateViewModel(ISettingsHost host)
     {
         _host = host;
         _gridBuild = GridBuildOptions.Initial;
-        _layerSource = LayerSourceSelection.Initial;
     }
 
     /// <summary>
@@ -299,102 +295,4 @@ internal sealed partial class SettingsStateViewModel
         }
     }
 
-    /// <summary>
-    /// Gets or sets helper text for DXF regular-source validation and suggested IC/grid settings.
-    /// </summary>
-    public string DxfRegularSourceHint
-    {
-        get => _layerSource.DxfRegularSourceHint;
-        set
-        {
-            if (_layerSource.DxfRegularSourceHint == value)
-            {
-                return;
-            }
-
-            _host.NotifyPropertyChanging(nameof(DxfRegularSourceHint));
-            _layerSource = _layerSource with { DxfRegularSourceHint = value };
-            _host.NotifyPropertyChanged(nameof(DxfRegularSourceHint));
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the currently selected layer option for DXF regular source mode.
-    /// </summary>
-    public RegularSourceLayerOption SelectedRegularSourceLayerOption
-    {
-        get => _layerSource.SelectedRegularSourceLayerOption;
-        set
-        {
-            if (_layerSource.SelectedRegularSourceLayerOption == value)
-            {
-                return;
-            }
-
-            _host.NotifyPropertyChanging(nameof(SelectedRegularSourceLayerOption));
-            _layerSource = _layerSource with { SelectedRegularSourceLayerOption = value };
-            _host.OnSelectedRegularSourceLayerOptionChanged();
-            _host.NotifyPropertyChanged(nameof(SelectedRegularSourceLayerOption));
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the helper text shown under bounds layer selector,
-    /// including truncation hint when available layers exceed dropdown cap.
-    /// </summary>
-    public string BoundLayerOptionSummary
-    {
-        get => _layerSource.BoundLayerOptionSummary;
-        set
-        {
-            if (_layerSource.BoundLayerOptionSummary == value)
-            {
-                return;
-            }
-
-            _host.NotifyPropertyChanging(nameof(BoundLayerOptionSummary));
-            _layerSource = _layerSource with { BoundLayerOptionSummary = value };
-            _host.NotifyPropertyChanged(nameof(BoundLayerOptionSummary));
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the currently selected layer option for bounding the grid.
-    /// </summary>
-    public BoundLayerOption SelectedBoundLayerOption
-    {
-        get => _layerSource.SelectedBoundLayerOption;
-        set
-        {
-            if (_layerSource.SelectedBoundLayerOption == value)
-            {
-                return;
-            }
-
-            _host.NotifyPropertyChanging(nameof(SelectedBoundLayerOption));
-            _layerSource = _layerSource with { SelectedBoundLayerOption = value };
-            _host.OnSelectedBoundLayerOptionChanged();
-            _host.NotifyPropertyChanged(nameof(SelectedBoundLayerOption));
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether any CAD layers are available.
-    /// Used to hide the layer section when no DXF is loaded.
-    /// </summary>
-    public bool HasCadLayers
-    {
-        get => _layerSource.HasCadLayers;
-        set
-        {
-            if (_layerSource.HasCadLayers == value)
-            {
-                return;
-            }
-
-            _host.NotifyPropertyChanging(nameof(HasCadLayers));
-            _layerSource = _layerSource with { HasCadLayers = value };
-            _host.NotifyPropertyChanged(nameof(HasCadLayers));
-        }
-    }
 }

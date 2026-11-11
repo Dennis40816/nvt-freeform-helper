@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
+using FreeformHelper.UI.CadImport;
 using FreeformHelper.UI.Services;
 using Xunit;
 

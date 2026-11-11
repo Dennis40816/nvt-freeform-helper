@@ -27,7 +27,7 @@ internal sealed class SettingsWindowOptionSet
         SelectedRegularSourceLayer = RegularSourceLayer.FirstOrDefault(o =>
             string.Equals(o.Name, owner.SelectedRegularSourceLayerOption.Name, StringComparison.Ordinal))
             ?? GetFirstOrDefault(RegularSourceLayer)
-            ?? new FreeformHelperViewModel.RegularSourceLayerOption(null, "Select layer");
+            ?? new FreeformHelper.Application.CadImport.RegularSourceLayerOption(null, "Select layer");
         SelectedLogLevel = PickOption(
             LogLevel,
             o => string.Equals(o.Value, owner.SelectedLogLevelOption.Value, StringComparison.OrdinalIgnoreCase),
@@ -48,7 +48,7 @@ internal sealed class SettingsWindowOptionSet
 
     public IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> RegularSourceMode { get; }
 
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayer { get; }
+    public IReadOnlyList<FreeformHelper.Application.CadImport.RegularSourceLayerOption> RegularSourceLayer { get; }
 
     public IReadOnlyList<FreeformHelperViewModel.LogLevelOption> LogLevel { get; }
 
@@ -66,7 +66,7 @@ internal sealed class SettingsWindowOptionSet
 
     public FreeformHelperViewModel.RegularSourceModeOption SelectedRegularSourceMode { get; }
 
-    public FreeformHelperViewModel.RegularSourceLayerOption SelectedRegularSourceLayer { get; }
+    public FreeformHelper.Application.CadImport.RegularSourceLayerOption SelectedRegularSourceLayer { get; }
 
     public FreeformHelperViewModel.LogLevelOption SelectedLogLevel { get; }
 

@@ -151,7 +151,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     public IReadOnlyList<FreeformHelperViewModel.ScanOrderOption> ScanOrderOptions => _grid.ScanOrderOptions;
     public IReadOnlyList<FreeformHelperViewModel.GridAlignmentOption> GridAlignmentOptions => _grid.GridAlignmentOptions;
     public IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> RegularSourceModeOptions => _grid.RegularSourceModeOptions;
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayerOptions => _grid.RegularSourceLayerOptions;
+    public IReadOnlyList<FreeformHelper.Application.CadImport.RegularSourceLayerOption> RegularSourceLayerOptions => _grid.RegularSourceLayerOptions;
     public IReadOnlyList<FreeformHelperViewModel.LogLevelOption> LogLevelOptions => _general.LogLevelOptions;
     public IReadOnlyList<FreeformHelperViewModel.CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions => _mappingExport.CadOutputFwDiffAutoModeOptions;
     public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> NotchExportFileTypeOptions => _mappingExport.NotchExportFileTypeOptions;
@@ -185,7 +185,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     public bool AutoReplayStep2AfterProjectLoad { get => _general.AutoReplayStep2AfterProjectLoad; set => _general.AutoReplayStep2AfterProjectLoad = value; }
     public bool ApplyAppVisualPreferencesOnProjectLoad { get => _general.ApplyAppVisualPreferencesOnProjectLoad; set => _general.ApplyAppVisualPreferencesOnProjectLoad = value; }
     public FreeformHelperViewModel.RegularSourceModeOption SelectedRegularSourceModeOption { get => _grid.SelectedRegularSourceModeOption; set => _grid.SelectedRegularSourceModeOption = value; }
-    public FreeformHelperViewModel.RegularSourceLayerOption SelectedRegularSourceLayerOption { get => _grid.SelectedRegularSourceLayerOption; set => _grid.SelectedRegularSourceLayerOption = value; }
+    public FreeformHelper.Application.CadImport.RegularSourceLayerOption SelectedRegularSourceLayerOption { get => _grid.SelectedRegularSourceLayerOption; set => _grid.SelectedRegularSourceLayerOption = value; }
     public string DxfRegularSourceHint { get => _grid.DxfRegularSourceHint; set => _grid.DxfRegularSourceHint = value; }
     public bool ShowDiffIndexOverlay { get => _mappingExport.ShowDiffIndexOverlay; set => _mappingExport.ShowDiffIndexOverlay = value; }
     public decimal CadOutputFwDiffIndexStart { get => _mappingExport.CadOutputFwDiffIndexStart; set => _mappingExport.CadOutputFwDiffIndexStart = value; }
@@ -433,11 +433,11 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
 
     public sealed partial class LayerCategoryRow : ObservableObject
     {
-        private readonly Action<FreeformHelperViewModel.DxfLayerCategory, bool> _applySelection;
+        private readonly Action<FreeformHelper.Application.CadImport.DxfLayerCategory, bool> _applySelection;
 
         public LayerCategoryRow(
-            FreeformHelperViewModel.DxfLayerCategoryState state,
-            Action<FreeformHelperViewModel.DxfLayerCategory, bool> applySelection)
+            FreeformHelper.Application.CadImport.DxfLayerCategoryState state,
+            Action<FreeformHelper.Application.CadImport.DxfLayerCategory, bool> applySelection)
         {
             Category = state.Category;
             _display = state.Display;
@@ -449,7 +449,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
             DisableCommand = new RelayCommand(() => _applySelection(Category, false));
         }
 
-        public FreeformHelperViewModel.DxfLayerCategory Category { get; }
+        public FreeformHelper.Application.CadImport.DxfLayerCategory Category { get; }
         public IRelayCommand EnableCommand { get; }
         public IRelayCommand DisableCommand { get; }
 

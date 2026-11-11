@@ -17,13 +17,7 @@ public sealed partial class FreeformHelperViewModel
     private CadEditNotificationSnapshot CaptureCadEditNotifications() =>
         new(DeletedCadPadCount, DuplicateCadPadCount, CombinedCadPadCount, RelayeredCadPadCount, RotatedCadPadCount);
 
-    private bool CadLayersMatchDocument(CadPadSet cad)
-    {
-        var current = LayerToggles.Select(static toggle => toggle.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var expected = BuildCadLayerUiSnapshot(cad, layerSelections: null).ToggleStates
-            .Select(static state => state.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        return current.SetEquals(expected);
-    }
+    private bool CadLayersMatchDocument(CadPadSet cad) => Layers.Workflow.CadLayersMatchDocument(cad);
 
     private void RebuildAfterCadEdit()
     {
@@ -68,22 +62,22 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets the command to check the quality of the loaded DXF data.
     /// </summary>
-    public IAsyncRelayCommand CheckDxfQualityCommand => _dxfEditCommands.CheckDxfQualityCommand;
+    public IAsyncRelayCommand CheckDxfQualityCommand => Quality.CheckDxfQualityCommand;
 
     /// <summary>
     /// Gets the command to select CAD pads flagged by DXF overlap checking.
     /// </summary>
-    public IRelayCommand SelectDxfOverlapPadsCommand => _dxfEditCommands.SelectDxfOverlapPadsCommand;
+    public IRelayCommand SelectDxfOverlapPadsCommand => Quality.SelectDxfOverlapPadsCommand;
 
     /// <summary>
     /// Gets the command to clear overlap highlight and selection state.
     /// </summary>
-    public IRelayCommand ClearDxfOverlapHighlightsCommand => _dxfEditCommands.ClearDxfOverlapHighlightsCommand;
+    public IRelayCommand ClearDxfOverlapHighlightsCommand => Quality.ClearDxfOverlapHighlightsCommand;
 
     /// <summary>
     /// Gets the command to show overlap details in a dedicated window.
     /// </summary>
-    public IAsyncRelayCommand ShowDxfOverlapDetailsCommand => _dxfEditCommands.ShowDxfOverlapDetailsCommand;
+    public IAsyncRelayCommand ShowDxfOverlapDetailsCommand => Quality.ShowDxfOverlapDetailsCommand;
 
     /// <summary>
     /// Gets the command to analyze DXF idx ↔ regular mapping.
@@ -176,14 +170,14 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>Creates the DXF edit commands once during construction.</summary>
     private DxfEditCommands CreateDxfEditCommands()
     {
+        var exportVisible = CreateEditingAsyncCommand(ExportVisibleDxfAsync);
+        var exportAll = CreateEditingAsyncCommand(ExportAllDxfAsync);
+        var exportImage = CreateEditingAsyncCommand(ExportLayerImageAsync);
+        Quality.InitializeCommands(CreateEditingAsyncCommand, execute => CreateEditingCommand(execute));
         return new DxfEditCommands(
-            ExportDxfVisibleCommand: CreateEditingAsyncCommand(ExportVisibleDxfAsync),
-            ExportDxfAllCommand: CreateEditingAsyncCommand(ExportAllDxfAsync),
-            ExportDxfLayerImageCommand: CreateEditingAsyncCommand(ExportLayerImageAsync),
-            CheckDxfQualityCommand: CreateEditingAsyncCommand(CheckDxfQualityAsync),
-            SelectDxfOverlapPadsCommand: CreateEditingCommand(SelectDxfOverlapPads),
-            ClearDxfOverlapHighlightsCommand: CreateEditingCommand(ClearDxfOverlapHighlights),
-            ShowDxfOverlapDetailsCommand: CreateEditingAsyncCommand(ShowDxfOverlapDetailsAsync),
+            ExportDxfVisibleCommand: exportVisible,
+            ExportDxfAllCommand: exportAll,
+            ExportDxfLayerImageCommand: exportImage,
             AnalyzeIndexMappingCommand: CreateEditingAsyncCommand(AnalyzeIndexMappingAsync),
             OffsetSelectedCadOutputFwDiffIndicesCommand: CreateEditingCommand(OffsetSelectedCadOutputFwDiffIndices),
             SelectStep4DuplicateDiffGroupCommand: CreateEditingCommand<Step4DuplicateDiffGroupViewModel?>(SelectStep4DuplicateDiffGroup),
