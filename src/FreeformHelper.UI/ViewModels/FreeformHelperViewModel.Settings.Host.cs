@@ -1,10 +1,14 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
+using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Settings;
+using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.Contracts.Settings;
+using FreeformHelper.UI.ViewModels.Settings;
 
 namespace FreeformHelper.UI.ViewModels;
 
-public sealed partial class FreeformHelperViewModel : ISettingsHost, IFwAssignmentSettingsHost
+public sealed partial class FreeformHelperViewModel : ISettingsHost, IFwAssignmentSettingsHost, ISettingsSnapshotHost, ISettingsWindowDraftHost
 {
     // The child is created once in the shell constructor and never replaced. Its constructor does not call back into the shell.
     private readonly SettingsStateViewModel _settingsState;
@@ -123,4 +127,102 @@ public sealed partial class FreeformHelperViewModel : ISettingsHost, IFwAssignme
     }
 
     partial void OnCadOutputFwDiffIndexStartChanging(decimal value);
+
+    bool ISettingsSnapshotHost.IsLoadingSettings => _isLoadingSettings;
+    int? ISettingsSnapshotHost.LegacyFwDiffAnchor => _projectFile.CadOutputFwDiffIndexAnchorCadPadId;
+    IEnumerable<int> ISettingsSnapshotHost.FwDiffAnchorValues => _projectFile.CadOutputFwDiffIndexAnchorCadPadByIc.Values;
+    string? ISettingsSnapshotHost.PendingBoundLayerName { set => _pendingLayerSelection.BoundLayerName = value; }
+    string? ISettingsSnapshotHost.PendingRegularSourceLayerName { set => _pendingLayerSelection.RegularSourceLayerName = value; }
+    string? ISettingsSnapshotHost.SelectedBoundLayerName => SelectedBoundLayerOption?.Name;
+    string? ISettingsSnapshotHost.SelectedRegularSourceLayerName => SelectedRegularSourceLayerOption?.Name;
+    IEnumerable<decimal> ISettingsSnapshotHost.PerIcXChannels => CascadeIcSettings.Select(static row => row.XChannels);
+    IEnumerable<decimal> ISettingsSnapshotHost.PerIcYChannels => CascadeIcSettings.Select(static row => row.YChannels);
+    NotchCompensationModel ISettingsSnapshotHost.SelectedCompensationModel => SelectedNotchCompensationModelOption.Value;
+    NotchExportProfile ISettingsSnapshotHost.SelectedExportProfile => SelectedNotchExportProfileOption.Value;
+
+    IDisposable ISettingsSnapshotHost.EnterSettingsLoading() => _settingsSuppression.EnterSettingsLoading();
+    IDisposable ISettingsSnapshotHost.EnterScopeSync() => _settingsSuppression.EnterScopeSync();
+    IDisposable ISettingsSnapshotHost.EnterNotchThresholdSync() => _settingsSuppression.EnterNotchThresholdSync();
+    IDisposable ISettingsSnapshotHost.EnterUndoSuppression() => _undoSuppression.Enter();
+    void ISettingsSnapshotHost.NotifyPropertyChanged(string propertyName) => OnPropertyChanged(propertyName);
+    void ISettingsSnapshotHost.RebuildCascadeSettings() => RebuildCascadeSettings();
+    void ISettingsSnapshotHost.MarkUnsaved() => MarkUnsaved();
+    int ISettingsSnapshotHost.ClampToInt(decimal value, int min, int max) => ClampToInt(value, min, max);
+    decimal ISettingsSnapshotHost.NormalizeLineOpacity(double value) => NormalizeLineOpacity(value);
+
+    void ISettingsSnapshotHost.ApplyNotchCompensationModeToLegacySwitches(
+        NotchCompensationModel mode, bool? currentGainEnableToRegular, bool? currentGainEnableToFull) =>
+        ApplyNotchCompensationModeToLegacySwitches(mode, currentGainEnableToRegular, currentGainEnableToFull);
+
+    void ISettingsSnapshotHost.ApplyDxfLayerImageExportSnapshot(UiViewSnapshot snapshot) => ApplyDxfLayerImageExportSnapshot(snapshot);
+
+    void ISettingsSnapshotHost.ApplyRegularVisibilityMaskSnapshot(
+        string? sourcePath, bool isEnabled, bool allowRuntimeRefresh, byte[]? embeddedMask, string? embeddedMaskName) =>
+        RegularMask.Workflow.ApplySnapshot(sourcePath, isEnabled, allowRuntimeRefresh, embeddedMask, embeddedMaskName);
+
+    void ISettingsSnapshotHost.EnsureGridAlignmentOption()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedGridAlignmentOption.Display))
+        {
+            var fallback = GridAlignmentOptions.FirstOrDefault(o => o.Value == GridAlignmentMode.FromCadBounds);
+            if (!string.IsNullOrWhiteSpace(fallback.Display)) GridAlignmentMode = fallback.Value;
+        }
+    }
+
+    void ISettingsSnapshotHost.EnsureRegularSourceModeOption()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedRegularSourceModeOption.Display))
+        {
+            var fallback = RegularSourceModeOptions.FirstOrDefault(o => o.Value == RegularSourceMode.GeneratedGrid);
+            if (!string.IsNullOrWhiteSpace(fallback.Display)) RegularSourceMode = fallback.Value;
+        }
+    }
+
+    void ISettingsSnapshotHost.SelectNotchCompensationModel(NotchCompensationModel value)
+    {
+        var option = NotchCompensationModelOptions.FirstOrDefault(option => option.Value == value);
+        if (string.IsNullOrWhiteSpace(option.Display))
+        {
+            option = NotchCompensationModelOptions.Count > 0 ? NotchCompensationModelOptions[0] : default;
+        }
+        SelectedNotchCompensationModelOption = option;
+    }
+
+    void ISettingsSnapshotHost.SelectNotchExportProfile(NotchExportProfile value)
+    {
+        var option = NotchExportProfileOptions.FirstOrDefault(option => option.Value == value);
+        if (string.IsNullOrWhiteSpace(option.Display))
+        {
+            option = NotchExportProfileOptions.Count > 0 ? NotchExportProfileOptions[0] : default;
+        }
+        SelectedNotchExportProfileOption = option;
+    }
+
+    void ISettingsSnapshotHost.SelectNotchExportFileType(string value)
+    {
+        if (NotchExportFileTypeMetadata.TryParseStoredValue(value, out var fileType))
+        {
+            var option = NotchExportFileTypeOptions.FirstOrDefault(o => o.Value == fileType);
+            if (!string.IsNullOrWhiteSpace(option.Display)) SelectedNotchExportFileTypeOption = option;
+        }
+    }
+
+    void ISettingsSnapshotHost.SelectLogLevel(string value)
+    {
+        var option = LogLevelOptions.FirstOrDefault(option => string.Equals(option.Value, value, StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(option.Display)) SelectedLogLevelOption = option;
+    }
+
+    public SettingsWindowViewModel CreateSettingsWindowViewModel()
+    {
+        var window = new SettingsWindowViewModel(this);
+        window.ActiveAreaPixels.Load(ActiveAreaWidth, ActiveAreaHeight, ActiveAreaPixelsX, ActiveAreaPixelsY, _projectFile);
+        window.MarkOpened();
+        return window;
+    }
+
+    IReadOnlyList<RegularSourceLayerOption> ISettingsWindowDraftHost.RegularSourceLayerOptions => RegularSourceLayerOptions;
+    IDisposable ISettingsWindowDraftHost.EnterSettingsLoading() => _settingsSuppression.EnterSettingsLoading();
+    void ISettingsWindowDraftHost.ReplacePerIcChannels(IReadOnlyList<int> xChannels, IReadOnlyList<int> yChannels) =>
+        _projectFile.Settings.Grid.ReplacePerIcChannels(xChannels, yChannels);
 }
