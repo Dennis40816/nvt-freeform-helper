@@ -4,6 +4,7 @@ using Avalonia.Headless.XUnit;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
@@ -19,8 +20,8 @@ public sealed class ManualFreeformTaggingTests
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_grid")]
     private static extern ref RegularGrid? GridField(FreeformHelperViewModel viewModel);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_projectFile")]
-    private static extern ref ProjectFile ProjectFileOf(FreeformHelperViewModel viewModel);
+    private static ProjectFile ProjectFileOf(FreeformHelperViewModel viewModel)
+        => FreeformHelperViewModelPrivateAccess.ProjectFile(viewModel);
 
     private static RegularPad CreateRectRegular(int row, int col, int index, double minX, double minY, double maxX, double maxY)
     {

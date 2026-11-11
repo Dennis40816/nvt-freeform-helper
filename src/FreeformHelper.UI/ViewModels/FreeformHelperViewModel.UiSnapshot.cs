@@ -1,4 +1,3 @@
-using FreeformHelper.Application.Services;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.ViewModels.Project;
@@ -187,6 +186,6 @@ public sealed partial class FreeformHelperViewModel
     /// <returns>True if a save prompt is needed, false otherwise.</returns>
     public bool ShouldPromptSaveOnExit()
     {
-        return ProjectClosePolicy.ShouldPromptSave(HasUnsavedChanges, _cad is not null, _lastSavedPath);
+        return _projectSession.ShouldPromptSaveOnExit();
     }
 }

@@ -214,7 +214,7 @@ public sealed partial class RuntimeQueryUseCaseTests
         using var shell = BuildShellWithNotchValidationTable(BuildTypedValidationTable());
         var projectFile = new ProjectFile();
         projectFile.Settings.Notch.NullValue = ushort.MaxValue + 1;
-        FreeformHelperViewModelPrivateAccess.ProjectFile(shell.FreeformHelper) = projectFile;
+        FreeformHelperViewModelPrivateAccess.ReplaceProjectFile(shell.FreeformHelper, projectFile);
         var useCase = new RuntimeQueryUseCase(shell);
 
         var error = await Assert.ThrowsAsync<InvalidOperationException>(() => useCase.ExecuteAsync(new RuntimeQueryRequest(

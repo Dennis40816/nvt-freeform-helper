@@ -15,15 +15,7 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel
 {
     internal Task<bool>? TryStartSaveProjectCommandAsync()
-    {
-        if (SaveProjectCommand.IsRunning || !SaveProjectCommand.CanExecute(null))
-        {
-            return null;
-        }
-
-        // The save command preserves the Task<bool> returned by SaveProjectAsync.
-        return (Task<bool>)SaveProjectCommand.ExecuteAsync(null);
-    }
+        => _projectCommands.TryStartSaveAsync();
 
     /// <summary>
     /// Asynchronously saves the current project state to a file.
@@ -74,7 +66,7 @@ public sealed partial class FreeformHelperViewModel
                 }
 
                 HasUnsavedChanges = false;
-                _lastSavedPath = result.Path;
+                _projectSession.LastSavedPath = result.Path;
                 FlushDeferredAppGeneralSettingsIfNeeded();
                 return true;
             },
@@ -174,12 +166,8 @@ public sealed partial class FreeformHelperViewModel
         return null;
     }
 
-    // A fresh session reports unsaved changes after the View applies its settings, so the prompt and the
-    // backup need a project that holds something: a loaded DXF or a project file the session came from.
     private bool HasUnsavedProjectWork()
-    {
-        return ShouldPromptSaveOnExit() && (_cad is not null || !string.IsNullOrWhiteSpace(_lastSavedPath));
-    }
+        => _projectSession.HasUnsavedProjectWork();
 
     internal Task<ProjectLoadCommandResult> LoadProjectFromPathAsync(string path)
     {
@@ -270,7 +258,7 @@ public sealed partial class FreeformHelperViewModel
         _appGeneralPersistence.SuppressPersistence = true;
         _projectFile = file;
         InvalidateWorkflowDataSnapshot();
-        _lastSavedPath = path;
+        _projectSession.LastSavedPath = path;
         try
         {
             using var sourceChangeBatch = BeginSimulationWorkspaceSourceChangeBatch();
@@ -565,4 +553,3 @@ internal sealed record ProjectLoadReplayTiming(
         Step1Replayed: false,
         Step2Replayed: false);
 }
-
