@@ -117,6 +117,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
+        _selectionOwner = new(CreateSelectionOwner, LazyThreadSafetyMode.None);
         _settingsState = new SettingsStateViewModel(this);
         _fwAssignmentSettings = new FwAssignmentSettingsViewModel(this);
         _canvasStrokeFillState = new CanvasStrokeFillState(

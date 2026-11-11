@@ -11,7 +11,7 @@
     "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 2,
-    "freeformViewModelStateMembers": 54,
+    "freeformViewModelStateMembers": 52,
     "shellNavigationBooleans": 0,
     "noWarnIds": 1
   },
@@ -44,8 +44,6 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:63",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.cs:11",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Summary.cs:14",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.cs:19",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:14", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:207", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:236", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:261", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:273", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:285", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:289", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.CanvasAndMapping.cs:293",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:36", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:257", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:490", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:495", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:501", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:595", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Configuration.cs:599",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:395", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:399", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:403", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:408", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:473", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Notch.cs:476",
