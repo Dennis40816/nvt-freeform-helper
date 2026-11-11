@@ -275,4 +275,41 @@ public sealed partial class FreeformHelperViewModel
     }
 
     private readonly PendingLayerSelectionState _pendingLayerSelection = new(); // Holds the layer selection data that waits for the next CAD load or layer toggle.
+
+    private void PreserveDxfDependentLayerSelections()
+    {
+        _pendingLayerSelection.BoundLayerName = SelectedBoundLayerOption?.Name;
+        _pendingLayerSelection.RegularSourceLayerName = SelectedRegularSourceLayerOption?.Name;
+    }
+
+    private void RestoreLayerSelectionAfterCadLayerEdit(
+        Dictionary<string, bool> previousSelection,
+        string ensureVisibleLayerName)
+    {
+        if (LayerToggles.Count == 0)
+        {
+            return;
+        }
+
+        using (_settingsSuppression.EnterLayerToggleChange())
+        {
+            foreach (var toggle in LayerToggles)
+            {
+                var isSelected = previousSelection.TryGetValue(toggle.Name, out var previous)
+                    ? previous
+                    : toggle.IsSelected;
+                if (string.Equals(toggle.Name, ensureVisibleLayerName, StringComparison.OrdinalIgnoreCase))
+                {
+                    isSelected = true;
+                }
+
+                toggle.IsSelected = isSelected;
+            }
+        }
+
+        // The moved pads keep their old layer in the visible pad list until it is filtered again, so filter on every move.
+        FilterCadPadsByLayer();
+
+        NotifyCadLayerAggregateStateChanged();
+    }
 }

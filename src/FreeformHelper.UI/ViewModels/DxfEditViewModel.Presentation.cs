@@ -1,14 +1,18 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
 using System.Collections.ObjectModel;
-using System.Globalization;
+using System.ComponentModel;
 using FreeformHelper.Application.CadEditing;
+using FreeformHelper.UI.CadEditing;
 
 namespace FreeformHelper.UI.ViewModels;
 
-public sealed partial class FreeformHelperViewModel
+public sealed partial class DxfEditViewModel
 {
-    public bool HasSelectedCadPadsForDxfEdit => _selectedCadIds.Count > 0;
+    public bool HasSelectedCadPadsForDxfEdit => _interaction.SelectedCadIds().Count > 0;
 
-    public bool HasSelectedCombinedCadPadsForDxfEdit => _selectedCadIds.Any(id => TryResolveCombinedCadGroupId(id, out _));
+    public bool HasSelectedCombinedCadPadsForDxfEdit =>
+        _interaction.SelectedCadIds().Any(id => CadDocument.TryResolveCombinedGroupId(id, out _));
 
     public bool HasManualHiddenCadPads => _cadEdit.HiddenCadPadIds.Any(id => !_combinedCad.GroupIdBySourceCadId.ContainsKey(id));
 
@@ -28,7 +32,7 @@ public sealed partial class FreeformHelperViewModel
 
     public string DxfEditSelectionSummary =>
         FormattableString.Invariant(
-            $"{_selectedCadIds.Count} CAD pad{(_selectedCadIds.Count == 1 ? string.Empty : "s")} selected");
+            $"{_interaction.SelectedCadIds().Count} CAD pad{(_interaction.SelectedCadIds().Count == 1 ? string.Empty : "s")} selected");
 
     public string HiddenDxfEditBadgeTooltip =>
         FormattableString.Invariant($"Hidden pads: {DeletedCadPadCount}. Click to open hidden CAD edit details.");
@@ -43,91 +47,15 @@ public sealed partial class FreeformHelperViewModel
     public string MovedDxfEditBadgeTooltip =>
         FormattableString.Invariant($"Moved pads: {RelayeredCadPadCount}. Click to open layer-move details.");
 
-    private void PreserveDxfDependentLayerSelections()
-    {
-        _pendingLayerSelection.BoundLayerName = SelectedBoundLayerOption?.Name;
-        _pendingLayerSelection.RegularSourceLayerName = SelectedRegularSourceLayerOption?.Name;
-    }
+    public bool CanRotateSelectedCadPads =>
+        _cad is not null &&
+        _actions.GetRotationTargetCadIds().Count > 0 &&
+        Math.Abs(DxfEditRules.NormalizeRotationDegrees((double)DxfEditRotationDegrees)) > 1e-9;
 
-    private void MoveSelectedCadPadsToLayer()
-    {
-        var targetLayerName = DxfEditRules.NormalizeLayerName(DxfEditTargetLayerName);
-        if (string.IsNullOrWhiteSpace(targetLayerName))
-        {
-            SetStatus("DXF edit: select target layer first.");
-            return;
-        }
+    public string RotatedDxfEditBadgeTooltip =>
+        FormattableString.Invariant($"Rotated pads: {RotatedCadPadCount}. Click to open geometry-rotation details.");
 
-        MoveSelectedCadPadsToLayerCore(targetLayerName, operationName: "move to existing layer");
-    }
-
-    private void CreateLayerAndMoveSelectedCadPads()
-    {
-        var newLayerName = DxfEditRules.NormalizeLayerName(DxfEditNewLayerName);
-        if (string.IsNullOrWhiteSpace(newLayerName))
-        {
-            SetStatus("DXF edit: input new layer name first.");
-            return;
-        }
-
-        MoveSelectedCadPadsToLayerCore(newLayerName, operationName: "create layer and move");
-        DxfEditNewLayerName = string.Empty;
-    }
-
-    private void MoveSelectedCadPadsToLayerCore(string targetLayerName, string operationName)
-    {
-        if (!TryGetLoadedCad(() => _cad, "DXF edit: import DXF first.", out var cad))
-        {
-            _logger.Debug(CultureInfo.InvariantCulture, "DXF layer move skipped: no DXF loaded.");
-            return;
-        }
-
-        var selected = _selectedCadIds
-            .Where(id => !CadDocument.IsEffectivelyHidden(id))
-            .Distinct()
-            .ToList();
-        if (selected.Count == 0)
-        {
-            SetStatus("DXF edit: select CAD pads first.");
-            _logger.Debug(CultureInfo.InvariantCulture, "DXF layer move skipped: no CAD pad selected.");
-            return;
-        }
-
-        _cadEditWorkflow.MoveToLayer(cad, selected.ToHashSet(), targetLayerName, operationName);
-    }
-
-    private void RestoreLayerSelectionAfterCadLayerEdit(
-        Dictionary<string, bool> previousSelection,
-        string ensureVisibleLayerName)
-    {
-        if (LayerToggles.Count == 0)
-        {
-            return;
-        }
-
-        using (_settingsSuppression.EnterLayerToggleChange())
-        {
-            foreach (var toggle in LayerToggles)
-            {
-                var isSelected = previousSelection.TryGetValue(toggle.Name, out var previous)
-                    ? previous
-                    : toggle.IsSelected;
-                if (string.Equals(toggle.Name, ensureVisibleLayerName, StringComparison.OrdinalIgnoreCase))
-                {
-                    isSelected = true;
-                }
-
-                toggle.IsSelected = isSelected;
-            }
-        }
-
-        // The moved pads keep their old layer in the visible pad list until it is filtered again, so filter on every move.
-        FilterCadPadsByLayer();
-
-        NotifyCadLayerAggregateStateChanged();
-    }
-
-    private void RefreshDxfEditLayerOptions(IReadOnlyList<string> layerNames)
+    internal void RefreshDxfEditLayerOptions(IReadOnlyList<string> layerNames)
     {
         var ordered = layerNames
             .Where(name => !string.IsNullOrWhiteSpace(name))
@@ -177,7 +105,7 @@ public sealed partial class FreeformHelperViewModel
         NotifyDxfEditPanelActionStateChanged();
     }
 
-    private void NotifyDxfEditPanelActionStateChanged()
+    internal void NotifyDxfEditPanelActionStateChanged()
     {
         OnPropertyChanged(nameof(HasSelectedCadPadsForDxfEdit));
         OnPropertyChanged(nameof(HasSelectedCombinedCadPadsForDxfEdit));
@@ -185,9 +113,43 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(nameof(CanMoveSelectedCadPadsToLayer));
         OnPropertyChanged(nameof(CanCreateLayerAndMoveSelectedCadPads));
         OnPropertyChanged(nameof(CanRotateSelectedCadPads));
-        OnPropertyChanged(nameof(CanOffsetSelectedCadOutputFwDiffIndices));
+        _interaction.NotifyMappingEligibility();
         OnPropertyChanged(nameof(IsDxfEditRotationLayerScope));
         OnPropertyChanged(nameof(DxfEditSelectionSummary));
-        OnPropertyChanged(nameof(Step4DiffShiftSelectionSummary));
+        _interaction.NotifyMappingSelectionSummary();
+    }
+
+    partial void OnDxfEditRotationDegreesChanged(decimal value)
+    {
+        NotifyDxfEditPanelActionStateChanged();
+    }
+
+    public string DxfEditsHeaderText =>
+        $"Hidden {DeletedCadPadCount} · Merged {CombinedCadPadCount}";
+
+    public string DxfRotationScopeHint
+    {
+        get
+        {
+            if (!IsDxfEditRotationLayerScope || _cad is null) return "Applies to selected CAD pads.";
+            var targets = _actions.GetRotationTargetCadIds();
+            return targets.SetEquals(_interaction.SelectedCadIds())
+                ? "Applies to the chosen layer."
+                : $"Layer scope · {targets.Count} target pads; selection is unchanged.";
+        }
+    }
+
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.PropertyName is nameof(DeletedCadPadCount) or nameof(CombinedCadPadCount))
+        {
+            OnPropertyChanged(nameof(DxfEditsHeaderText));
+        }
+        if (e.PropertyName is nameof(SelectedDxfEditRotationScopeOption) or nameof(DxfEditRotationLayerName)
+            or nameof(CanRotateSelectedCadPads))
+        {
+            OnPropertyChanged(nameof(DxfRotationScopeHint));
+        }
     }
 }
