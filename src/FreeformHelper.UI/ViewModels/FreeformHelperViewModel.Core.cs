@@ -74,7 +74,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     // --- Internal State Management ---
     private readonly Dictionary<int, double> _cadPadCustomValues = new(); // Stores custom user-defined values for CAD pads.
-    private readonly Dictionary<string, WorkspaceHeaderItem> _workspaceHeaderItemMap = new(); // Maps keys to header items.
     // Independent nesting-safe suppression counters; UI-thread-only access.
     private readonly SettingsSuppressionScopes _settingsSuppression = new();
     private ProjectFile _projectFile { get => _projectSession.Document; set => _projectSession.Document = value; }
@@ -144,14 +143,11 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _selectionOwner = new(CreateSelectionOwner, LazyThreadSafetyMode.None);
         _settingsState = new SettingsStateViewModel(this);
         _fwAssignmentSettings = new FwAssignmentSettingsViewModel(this);
-        _canvasStrokeFillState = new CanvasStrokeFillState(
-            () => _isLoadingSettings,
-            () => _undoSuppression.IsActive,
-            () => _undoSuppression.Enter(),
-            PushUndo,
-            () => CanvasHost?.Invalidate(),
-            OnPropertyChanging,
-            OnPropertyChanged);
+        _workspaceToggleRegistry = new WorkspaceToggleRegistry(OnPropertyChanging, OnPropertyChanged);
+        _canvasAppearance = CreateCanvasAppearanceState();
+        _cadImportChoices = new CadImportChoices(TrackUndo, OnPropertyChanging, OnPropertyChanged);
+        _workflowDispatch = new WorkflowDispatchCoordinator(this);
+        _workspaceNavigation = new WorkspaceNavigationPresentation(this, MoveToWorkflowStep, OnPropertyChanged);
         _workflowPanelState = new WorkflowPanelState(SelectWorkspaceWorkStep, OnPropertyChanging, OnPropertyChanged);
         _projectEditingSession = new ProjectEditingSession(PublishProjectEditingAvailabilityChange);
         _projectSession = new ProjectSessionState(
@@ -195,7 +191,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         ApplyImportSnapshot(_projectFile.UiSnapshot.Import);
         _appGeneralPersistence.SuppressPersistence = false;
         StartupPerfTracker.Mark("workspace.vm-settings-loaded");
-        InitializeWorkspaceHeaderItems(); // Set up items for the workspace header menu.
+        _workspaceToggleRegistry.InitializeWorkspaceHeaderItems(_canvasAppearance);
         StartupPerfTracker.Mark("workspace.vm-header-initialized");
         RebuildCascadeSettings(); // Initialize cascade-related settings.
         StartupPerfTracker.Mark("workspace.vm-cascade-initialized");
