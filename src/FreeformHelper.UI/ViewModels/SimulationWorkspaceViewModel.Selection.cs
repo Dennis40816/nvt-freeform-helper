@@ -1,118 +1,23 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
 using System.Globalization;
-using FreeformHelper.Application.Services;
-using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class SimulationWorkspaceViewModel
 {
-    public string? BuildHoverTipText(int regularPadId)
-    {
-        if (!_cellsByRegularPadId.TryGetValue(regularPadId, out var cell) || !_regularPadById.TryGetValue(regularPadId, out var pad))
-        {
-            return null;
-        }
+    public string? BuildHoverTipText(int regularPadId) => _selection.BuildHoverTipText(regularPadId);
 
-        return $"REG {pad.RegularPadId} · IC {pad.IcIndex + 1} · FW Diff Idx {GetFwDiffIndex(pad.RegularPadId)} · CAD Output FW Diff Idx {GetCadOutputFwDiffIndex(pad.RegularPadId)}\n" +
-               $"Before {FormatWholeNumberDisplay(cell.BeforeValue)}\n" +
-               $"After {FormatWholeNumberDisplay(cell.AfterValue)}\n" +
-               $"Delta {cell.DeltaValue.ToString("+0.###;-0.###;0", CultureInfo.InvariantCulture)}\n" +
-               FormatCellEmsStatus(cell);
-    }
+    internal bool TryGetRegularQuerySnapshot(int regularPadId, out SimulationRegularQuerySnapshot snapshot) =>
+        _selection.TryGetRegularQuerySnapshot(regularPadId, out snapshot);
 
-    internal bool TryGetRegularQuerySnapshot(int regularPadId, out SimulationRegularQuerySnapshot snapshot)
-    {
-        if (!_regularPadById.TryGetValue(regularPadId, out var pad) || _snapshot is null)
-        {
-            snapshot = default;
-            return false;
-        }
+    public void SelectRegularPad(int regularPadId) => _selection.SelectRegularPad(regularPadId);
 
-        if (!_snapshotCellsByRegularPadId.TryGetValue(regularPadId, out var cell))
-        {
-            snapshot = default;
-            return false;
-        }
-
-        var impacts = GetImpactItemsForPad(pad);
-        snapshot = new SimulationRegularQuerySnapshot(
-            pad.RegularPadId,
-            pad.Row,
-            pad.Col,
-            pad.IcIndex,
-            GetFwDiffIndex(pad.RegularPadId),
-            GetCadOutputFwDiffIndex(pad.RegularPadId),
-            cell.BeforeValue,
-            cell.AfterValue,
-            cell.DeltaValue,
-            SimulationSafetyAuditService.IsEmsAfterCapViolation(cell.AfterValue, SimulationEmsAfterCap),
-            _session.ActiveRegularPadIds.Contains(regularPadId),
-            _cellsByRegularPadId.ContainsKey(regularPadId),
-            SelectedSourceText,
-            impacts);
-        return true;
-    }
-
-    public void SelectRegularPad(int regularPadId)
-    {
-        if (regularPadId < 0)
-        {
-            SelectedRegularPadId = -1;
-            return;
-        }
-
-        if (!_regularPadById.ContainsKey(regularPadId))
-        {
-            return;
-        }
-
-        SelectedRegularPadId = regularPadId;
-    }
+    private void RefreshSelectionPresentation() => _selection.RefreshSelectionPresentation();
 
     public void RefreshExternalBindings()
     {
         RefreshCommandState();
-    }
-
-    private void RefreshSelectionPresentation()
-    {
-        _selectedImpactItems.Clear();
-        if (!TryGetSelectedRegularPad(out _))
-        {
-            OnSelectionPresentationChanged();
-            return;
-        }
-
-        if (IsManualSource)
-        {
-            SelectedManualValue = _manualOverridesByRegularPadId.TryGetValue(SelectedRegularPadId, out var overrideValue)
-                ? overrideValue
-                : GlobalValue;
-        }
-
-        OnSelectionPresentationChanged();
-        RebuildSelectedImpactItems();
-        OnPropertyChanged(nameof(SelectedImpactSummaryText));
-        OnPropertyChanged(nameof(HasSelectedImpactItems));
-    }
-
-    private void OnSelectionPresentationChanged()
-    {
-        OnPropertyChanged(nameof(SelectedRegularHeaderText));
-        OnPropertyChanged(nameof(SelectedRegularLocationText));
-        OnPropertyChanged(nameof(SelectedBeforeText));
-        OnPropertyChanged(nameof(SelectedAfterText));
-        OnPropertyChanged(nameof(SelectedDeltaText));
-        OnPropertyChanged(nameof(SelectedPercentChangeText));
-        OnPropertyChanged(nameof(SelectedEmsStatusText));
-        OnPropertyChanged(nameof(SelectedNetFlowText));
-        OnPropertyChanged(nameof(SelectedFlowLegSummaryText));
-        OnPropertyChanged(nameof(SelectedFlowLegs));
-        OnPropertyChanged(nameof(HasSelectedFlowLegs));
-        OnPropertyChanged(nameof(SelectedSourceText));
-        OnPropertyChanged(nameof(ShowSelectedOverrideEditor));
-        OnPropertyChanged(nameof(SelectedImpactSummaryText));
-        OnPropertyChanged(nameof(HasSelectedImpactItems));
     }
 
     private void RefreshCommandState()
@@ -187,145 +92,6 @@ public sealed partial class SimulationWorkspaceViewModel
         OnPropertyChanged(nameof(CopperContactModelSummaryText));
         OnPropertyChanged(nameof(CopperInstructionText));
         OnPropertyChanged(nameof(CopperPathReplayArtifactSummaryText));
-    }
-
-    private bool TryGetSelectedRegularPad(out RegularPad pad)
-    {
-        if (_regularPadById.TryGetValue(SelectedRegularPadId, out pad!))
-        {
-            return true;
-        }
-
-        pad = null!;
-        return false;
-    }
-
-    private bool TryGetSelectedCell(out NotchApplySimulationDiffCell cell)
-    {
-        if (_cellsByRegularPadId.TryGetValue(SelectedRegularPadId, out cell!))
-        {
-            return true;
-        }
-
-        cell = null!;
-        return false;
-    }
-
-    partial void OnSelectedRegularPadIdChanged(int value)
-    {
-        RefreshSelectionPresentation();
-        RefreshCommandState();
-    }
-
-    private void RebuildSelectedImpactItems()
-    {
-        _selectedImpactItems.Clear();
-        if (_snapshot is null || !TryGetSelectedRegularPad(out var pad))
-        {
-            return;
-        }
-
-        foreach (var impact in GetImpactItemsForPad(pad))
-        {
-            _selectedImpactItems.Add(impact);
-        }
-    }
-
-    private IReadOnlyList<NotchApplySimulationImpactItemViewModel> GetImpactItemsForPad(RegularPad pad)
-    {
-        return _impactItemsByRegularPadId.TryGetValue(pad.RegularPadId, out var impacts)
-            ? impacts
-            : Array.Empty<NotchApplySimulationImpactItemViewModel>();
-    }
-
-    private void RebuildImpactItemIndex(IReadOnlyList<NotchApplySimulationAction> actions)
-    {
-        var indexed = new Dictionary<int, List<(double SortKey, NotchApplySimulationImpactItemViewModel Item)>>();
-        foreach (var action in actions)
-        {
-            var sourceRowsText = BuildSourceRowsText(action.SourceRowNumbers);
-            var sourceCadText = action.CadPadId.HasValue
-                ? action.CadPadId.Value.ToString(CultureInfo.InvariantCulture)
-                : "-";
-            var sourceDelta = action.SourceAfterValue - action.SourceBeforeValue;
-            if (Math.Abs(sourceDelta) > SignificantDeltaEpsilon)
-            {
-                var sourceImpact = new NotchApplySimulationImpactItemViewModel(
-                    "Anchor retain",
-                    $"FW Diff Idx {action.AnchorDiffIndex} keeps {action.SourceRetainedPercent}%",
-                    $"Combine {action.CombinePercent}% · CAD {sourceCadText}",
-                    sourceDelta.ToString("+0.###;-0.###;0", CultureInfo.InvariantCulture),
-                    sourceRowsText);
-                AppendImpactForDiff(
-                    action.IcIndex,
-                    action.AnchorDiffIndex,
-                    Math.Abs(sourceDelta),
-                    sourceImpact,
-                    indexed);
-            }
-
-            foreach (var leg in action.Legs)
-            {
-                var targetImpact = new NotchApplySimulationImpactItemViewModel(
-                    "Target receive",
-                    $"From FW Diff Idx {action.AnchorDiffIndex} at {leg.RatioPercent}%",
-                    $"CAD {sourceCadText} · anchor REG {action.RegularPadId}",
-                    leg.DeltaValue.ToString("+0.###;-0.###;0", CultureInfo.InvariantCulture),
-                    sourceRowsText);
-                AppendImpactForDiff(
-                    action.IcIndex,
-                    leg.TargetDiffIndex,
-                    Math.Abs(leg.DeltaValue),
-                    targetImpact,
-                    indexed);
-            }
-        }
-
-        var finalized = new Dictionary<int, IReadOnlyList<NotchApplySimulationImpactItemViewModel>>(indexed.Count);
-        foreach (var (regularPadId, impacts) in indexed)
-        {
-            finalized[regularPadId] = impacts
-                .OrderByDescending(static item => item.SortKey)
-                .ThenBy(static item => item.Item.RoleText, StringComparer.Ordinal)
-                .Select(static item => item.Item)
-                .ToArray();
-        }
-
-        _impactItemsByRegularPadId = finalized;
-    }
-
-    private void AppendImpactForDiff(
-        int icIndex,
-        int diffIndex,
-        double sortKey,
-        NotchApplySimulationImpactItemViewModel impact,
-        Dictionary<int, List<(double SortKey, NotchApplySimulationImpactItemViewModel Item)>> indexed)
-    {
-        if (!_regularPadIdsByIcDiff.TryGetValue((icIndex, diffIndex), out var regularPadIds))
-        {
-            return;
-        }
-
-        foreach (var regularPadId in regularPadIds)
-        {
-            if (!indexed.TryGetValue(regularPadId, out var impacts))
-            {
-                impacts = new List<(double SortKey, NotchApplySimulationImpactItemViewModel Item)>();
-                indexed[regularPadId] = impacts;
-            }
-
-            impacts.Add((sortKey, impact));
-        }
-    }
-
-    private static string BuildSourceRowsText(IReadOnlyList<int> sourceRowNumbers)
-    {
-        if (sourceRowNumbers.Count == 0)
-        {
-            return "Rows: -";
-        }
-
-        return "Rows: #" + string.Join(", #", sourceRowNumbers);
     }
 
     internal static string FormatWholeNumberDisplay(double value)

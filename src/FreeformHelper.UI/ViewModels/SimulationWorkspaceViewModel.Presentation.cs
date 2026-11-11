@@ -18,16 +18,11 @@ public sealed partial class SimulationWorkspaceViewModel
         _ => "Type values per pad or for the whole panel.",
     };
 
-    public string ColorScaleCaptionText => SelectedCanvasViewMode switch
-    {
-        NotchApplySimulationCanvasViewMode.Before => "Before",
-        NotchApplySimulationCanvasViewMode.After => "After",
-        _ => "Delta (After - Before)",
-    };
+    public string ColorScaleCaptionText => _canvas.ColorScaleCaptionText;
 
     public string RandomScopeText => $"Random fills {AreaSummaryText} only.";
 
-    public string SelectedImpactCountText => $"{SelectedImpactItems.Count.ToString(CultureInfo.InvariantCulture)} impact(s)";
+    public string SelectedImpactCountText => _selection.SelectedImpactCountText;
 
     public string CsvCompatibilityText => !HasCsvFiles
         ? "Import CSV files to check compatibility."
