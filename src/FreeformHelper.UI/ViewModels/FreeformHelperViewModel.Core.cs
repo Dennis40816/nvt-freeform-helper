@@ -70,10 +70,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     // --- Internal State Management ---
     private readonly Dictionary<int, double> _cadPadCustomValues = new(); // Stores custom user-defined values for CAD pads.
     private readonly Dictionary<string, WorkspaceHeaderItem> _workspaceHeaderItemMap = new(); // Maps keys to header items.
-    private string? _lastSavedPath; // Stores the path where the project was last saved.
     // Independent nesting-safe suppression counters; UI-thread-only access.
     private readonly SettingsSuppressionScopes _settingsSuppression = new();
-    private ProjectFile _projectFile = new(); // The core project data model.
+    private ProjectFile _projectFile { get => _projectSession.Document; set => _projectSession.Document = value; }
 
     /// <summary>
     /// Gets the <see cref="WorkspaceInteractionState"/> instance, which manages global UI interaction states
@@ -125,6 +124,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             OnPropertyChanged);
         _workflowPanelState = new WorkflowPanelState(SelectWorkspaceWorkStep, OnPropertyChanging, OnPropertyChanged);
         _projectEditingSession = new ProjectEditingSession(PublishProjectEditingAvailabilityChange);
+        _projectSession = new ProjectSessionState(
+            new ProjectFile(), () => _cad is not null, () => _projectEditingSession.IsProjectEditingEnabled,
+            load => _projectEditingSession.RunLoadAsync(load), OnPropertyChanging, OnPropertyChanged);
         _dxfLayerImagePreferenceState = new DxfLayerImagePreferenceState(MarkUnsaved, SchedulePersistAppGeneralSettings);
         _projectUiSnapshotMapper = new ProjectUiSnapshotMapper(CreateProjectSnapshotReaders());
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
@@ -165,7 +167,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         RebuildCascadeSettings(); // Initialize cascade-related settings.
         StartupPerfTracker.Mark("workspace.vm-cascade-initialized");
         _notchCommands = CreateNotchCommands(); // Register Notch commands first.
-        _projectCommands = CreateProjectCommands(); // Register project commands next.
+        // Register project commands next, through the existing editing session registry.
+        _projectCommands = new ProjectCommandOwner(
+            CreateEditingAsyncCommand, CreateEditingAsyncCommand, SaveProjectAsync, LoadProjectAsync);
         _selectionCommands = CreateSelectionCommands(); // Register selection commands next.
         _dxfEditCommands = CreateDxfEditCommands(); // Keep DXF edit command registration next.
         _generalCommands = CreateGeneralCommands(); // Finish command registration in the original order.

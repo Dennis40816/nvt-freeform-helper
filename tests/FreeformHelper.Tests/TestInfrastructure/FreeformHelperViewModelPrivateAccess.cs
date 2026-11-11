@@ -28,8 +28,10 @@ internal static class FreeformHelperViewModelPrivateAccess
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_grid")]
     public static extern ref RegularGrid? Grid(FreeformHelperViewModel viewModel);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_projectFile")]
-    public static extern ref ProjectFile ProjectFile(FreeformHelperViewModel viewModel);
+    public static ProjectFile ProjectFile(FreeformHelperViewModel viewModel) => viewModel.ProjectSession.Document;
+
+    public static void ReplaceProjectFile(FreeformHelperViewModel viewModel, ProjectFile document)
+        => viewModel.ProjectSession.Document = document;
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cadEdit")]
     public static extern ref CadEditState CadEdit(FreeformHelperViewModel viewModel);

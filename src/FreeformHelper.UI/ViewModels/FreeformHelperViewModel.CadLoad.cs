@@ -214,7 +214,7 @@ public sealed partial class FreeformHelperViewModel
             },
             ApplyCadLoadOutcomeAsync = outcome => ApplyCadLoadOutcomeCoreAsync(outcome, null, previous),
             SetProjectLastDxfPath = selectedPath => _projectFile.LastDxfPath = selectedPath,
-            ClearLastSavedPath = () => _lastSavedPath = null,
+            ClearLastSavedPath = () => _projectSession.LastSavedPath = null,
             MarkUnsaved = MarkUnsaved,
             BuildStatus = outcome => BuildCadLoadStatus(outcome, CadLoadContext.OpenDxf, null),
             LogCadLoadOutcome = outcome => LogCadLoadOutcome(outcome, CadLoadContext.OpenDxf),

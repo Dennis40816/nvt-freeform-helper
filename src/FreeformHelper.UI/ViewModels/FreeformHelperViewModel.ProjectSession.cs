@@ -1,14 +1,17 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FreeformHelper.UI.ViewModels.Project;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    public ProjectSessionMode SessionMode
-        => IsProjectEditingEnabled ? ProjectSessionMode.Ready : ProjectSessionMode.LoadingProject;
+    private readonly ProjectSessionState _projectSession;
 
-    public bool IsProjectEditingEnabled => _projectEditingSession.IsProjectEditingEnabled;
+    internal ProjectSessionState ProjectSession => _projectSession;
+
+    public ProjectSessionMode SessionMode => _projectSession.SessionMode;
+
+    public bool IsProjectEditingEnabled => _projectSession.IsProjectEditingEnabled;
 
     // True while settings or a project load apply values. Derived from the counter; there is no second copy.
     // The old field name is kept on purpose: members that carry analyzer debt (the RebuildGridAsync async lambda
@@ -16,22 +19,10 @@ public sealed partial class FreeformHelperViewModel
     private bool _isLoadingSettings => _settingsSuppression.IsSettingsLoadingActive;
 
     private void PublishProjectEditingAvailabilityChange(Action changeMode)
-    {
-        OnPropertyChanging(nameof(SessionMode));
-        changeMode();
-        OnPropertyChanged(nameof(SessionMode));
-        OnPropertyChanged(nameof(IsProjectEditingEnabled));
-    }
+        => _projectSession.PublishEditingAvailabilityChange(changeMode);
 
     private Task<ProjectLoadCommandResult> RunProjectLoadAsync(Func<Task<ProjectLoadCommandResult>> load)
-    {
-        if (!IsProjectEditingEnabled)
-        {
-            return Task.FromResult(ProjectLoadCommandResult.Failed("BUSY", "A project is already loading."));
-        }
-
-        return _projectEditingSession.RunLoadAsync(load);
-    }
+        => _projectSession.RunLoadAsync(load);
 
     private RelayCommand CreateEditingCommand(Action execute, Func<bool>? canExecute = null)
         => _projectEditingSession.Create(execute, canExecute);
@@ -50,8 +41,11 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets or sets a value indicating whether the current project has unsaved changes.
     /// </summary>
-    [ObservableProperty]
-    private bool _hasUnsavedChanges;
+    public bool HasUnsavedChanges
+    {
+        get => _projectSession.HasUnsavedChanges;
+        set => _projectSession.HasUnsavedChanges = value;
+    }
 
     /// <summary>
     /// Gets the command to save the current project.
@@ -63,13 +57,5 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public IAsyncRelayCommand LoadProjectCommand => _projectCommands.LoadProjectCommand;
 
-    private readonly ProjectCommands _projectCommands;
-
-    /// <summary>Creates the project commands once during construction.</summary>
-    private ProjectCommands CreateProjectCommands()
-    {
-        return new ProjectCommands(
-            SaveProjectCommand: CreateEditingAsyncCommand(SaveProjectAsync),
-            LoadProjectCommand: CreateEditingAsyncCommand(LoadProjectAsync));
-    }
+    private readonly ProjectCommandOwner _projectCommands;
 }
