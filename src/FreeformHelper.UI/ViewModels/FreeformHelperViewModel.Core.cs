@@ -143,14 +143,12 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         (_cadEditWorkflow, _cadEditReplay) = CreateCadEditEngine();
         _settingsState = new SettingsStateViewModel(this);
         _fwAssignmentSettings = new FwAssignmentSettingsViewModel(this);
+        _settingsEffects = new SettingsEffectCoordinator(this);
+        _settingsSnapshotMapper = new SettingsSnapshotMapper(this);
+        _settingsStepCallbacks = new SettingsStepCallbackAdapter(this);
         _canvasStrokeFillState = new CanvasStrokeFillState(
-            () => _isLoadingSettings,
-            () => _undoSuppression.IsActive,
-            () => _undoSuppression.Enter(),
-            PushUndo,
-            () => CanvasHost?.Invalidate(),
-            OnPropertyChanging,
-            OnPropertyChanged);
+            () => _isLoadingSettings, () => _undoSuppression.IsActive, () => _undoSuppression.Enter(), PushUndo,
+            () => CanvasHost?.Invalidate(), OnPropertyChanging, OnPropertyChanged);
         _workflowPanelState = new WorkflowPanelState(SelectWorkspaceWorkStep, OnPropertyChanging, OnPropertyChanged);
         _projectEditingSession = new ProjectEditingSession(PublishProjectEditingAvailabilityChange);
         _projectSession = new ProjectSessionState(
