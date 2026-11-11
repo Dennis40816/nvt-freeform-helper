@@ -11,12 +11,7 @@ namespace FreeformHelper.Tests.UI.Bindings;
 internal static class BindingKnownIssues
 {
     /// <summary>Paths that the type walker proves to be wrong. The key is the site location from the walker report.</summary>
-    public static readonly IReadOnlyDictionary<string, string> Failures = new Dictionary<string, string>(StringComparer.Ordinal)
-    {
-        ["Views/SimulationHostView.axaml:87 SimulationWorkspaceView.IsVisible"] =
-            "IsVisible binds HasUsableWorkspace, but the same element sets DataContext to CurrentWorkspace, so the path is read on " +
-            "SimulationWorkspaceViewModel and the property is on SimulationHostViewModel. The fix changes behavior: owner decision, separate PR.",
-    };
+    public static readonly IReadOnlyDictionary<string, string> Failures = new Dictionary<string, string>(StringComparer.Ordinal);
 
     /// <summary>
     /// Warnings that Avalonia logs while the main window runs. The key is Target|Expression|Message.
