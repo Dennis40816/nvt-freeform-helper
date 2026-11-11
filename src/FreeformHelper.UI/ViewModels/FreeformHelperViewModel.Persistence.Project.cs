@@ -26,14 +26,15 @@ public sealed partial class FreeformHelperViewModel
     internal Task<ProjectLoadCommandResult> LoadProjectFromPathAsync(string path)
         => _projectPersistenceCoordinator.LoadProjectFromPathAsync(path);
 
-    private ProjectPersistenceCoordinator CreateProjectPersistenceCoordinator()
+    private (ProjectPersistenceCoordinator Project, NotchExportWorkflow NotchExport) CreatePersistenceOwners()
     {
         var operations = CreateProjectOperationPorts();
         var applier = new ProjectLoadApplier(
             CreateProjectApplyPorts(), new ProjectCadPorts(LoadProjectCadAsync), CreateProjectReplayPorts(), operations);
-        return new ProjectPersistenceCoordinator(
+        var project = new ProjectPersistenceCoordinator(
             CreateProjectPersistencePorts(new ProjectPersistenceUseCase(_projectStore)), CreateProjectSessionPorts(),
             operations, applier.ApplyAsync);
+        return (project, CreateNotchExportWorkflow());
     }
 
     private ProjectPersistencePorts CreateProjectPersistencePorts(ProjectPersistenceUseCase useCase) => new(

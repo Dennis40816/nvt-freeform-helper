@@ -1,5 +1,4 @@
 using System.Globalization;
-using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
@@ -10,26 +9,7 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel
 {
     private (string ExportKind, string Extension, Func<NotchTable, CadPadSet, RegularGrid, string> Serialize) ResolveDynamicNotchExportTarget()
-    {
-        var option = SelectedNotchExportFileTypeOption;
-        if (NotchExportFileTypeMetadata.IsCExportType(option.Value))
-        {
-            return (
-                ExportKind: NotchExportFileTypeMetadata.GetExportKindLabel(option),
-                Extension: option.Extension,
-                Serialize: (table, cad, grid) => NotchTableExporter.ExportAsCInitializer(
-                    table,
-                    cad,
-                    grid,
-                    _projectFile.Settings,
-                    _projectFile.Settings.Notch.ExportProfile));
-        }
-
-        return (
-            ExportKind: "CSV review",
-            Extension: option.Extension,
-            Serialize: (table, _, _) => NotchTableExporter.ExportAsCsv(table));
-    }
+        => _notchExportWorkflow.ResolveDynamicNotchExportTarget();
 
     internal static string ResolveSuggestedNotchExportBaseName(string requestedBaseName, string extension, NotchTable table)
         => NotchExportText.ResolveSuggestedNotchExportBaseName(requestedBaseName, extension, table);
@@ -104,53 +84,6 @@ public sealed partial class FreeformHelperViewModel
             successStatusBuilder: (cadCount, regularCount) =>
                 $"Notch row focused: CAD={cadCount}, REG={regularCount}.",
             minZoomOverride: NotchExportPreviewFocusMinZoom);
-    }
-
-    private void ReportExportStage(string exportKind, int stage, string detail)
-    {
-        var status = CreateStatusScope("NotchExport");
-        var clampedStage = Math.Clamp(stage, 0, NotchExportStageCount);
-        NotchExportProgress = clampedStage / (double)NotchExportStageCount;
-        var message = $"{exportKind} export [{clampedStage}/{NotchExportStageCount}]: {detail}";
-        NotchExportSummary = message;
-        NotchExportProgressText = message;
-        status.ReportProgress(message);
-        _logger.Info(message);
-    }
-
-    private Progress<NotchGenerationProgress> CreateNotchGenerationProgressReporter(string exportKind)
-    {
-        var finalProjectionRevision = _notchFinalProjection.Read();
-        var sourceRevision = SimulationWorkspaceSourceRevision;
-        var gate = new NotchProgressGate(
-            TimeProvider.System,
-            () => IsNotchFinalProjectionCurrent(finalProjectionRevision, sourceRevision),
-            120);
-
-        return new Progress<NotchGenerationProgress>(progress =>
-        {
-            if (!gate.ShouldPublish(progress))
-            {
-                return;
-            }
-
-            ReportExportGenerationProgress(exportKind, progress);
-        });
-    }
-
-    private void ReportExportGenerationProgress(string exportKind, NotchGenerationProgress progress)
-    {
-        var status = CreateStatusScope("NotchExport");
-        var phaseFraction = NotchExportText.ComputeGenerationPhaseFraction(progress);
-        var stageStart = 1.0 / NotchExportStageCount;
-        var stageSpan = 1.0 / NotchExportStageCount;
-        NotchExportProgress = stageStart + stageSpan * Math.Clamp(phaseFraction, 0.0, 1.0);
-
-        var (displayTotal, displayProcessed, phaseLabel) = NotchExportText.GetGenerationDisplayFacts(progress);
-        var message = $"{exportKind} export [2/{NotchExportStageCount}]: {phaseLabel} {displayProcessed}/{displayTotal}, built rows={progress.GeneratedRowCount}";
-        NotchExportSummary = message;
-        status.ReportProgress(message);
-        NotchExportProgressText = message;
     }
 
     private Progress<NotchGenerationProgress> CreateStep5GenerationProgressReporter(
