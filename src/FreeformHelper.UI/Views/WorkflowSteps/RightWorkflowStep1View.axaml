@@ -21,10 +21,10 @@
         <SelectableTextBlock Text="{Binding MatchThreshold, StringFormat='Diagnostic threshold: {0:0.####}'}"/>
         <panels:CollapsiblePanel Title="Regular Visibility Mask" IsExpanded="False">
           <panels:CollapsiblePanel.HeaderRight>
-            <SelectableTextBlock Classes="stepNote" Text="{Binding RegularVisibilityMaskUi.Summary}"
+            <SelectableTextBlock Classes="stepNote" Text="{Binding RegularMask.Summary}"
                                  MaxWidth="{DynamicResource WorkspaceCompactStatusMaxWidth}" TextTrimming="CharacterEllipsis"
                                  TextWrapping="NoWrap"
-                                 ToolTip.Tip="{Binding RegularVisibilityMaskUi.Summary}"/>
+                                 ToolTip.Tip="{Binding RegularMask.Summary}"/>
           </panels:CollapsiblePanel.HeaderRight>
           <StackPanel Spacing="{StaticResource Space6}">
         <StackPanel Classes="panelFormField">
@@ -34,7 +34,7 @@
                                  Text="Use Regular Visibility Mask"
                                  VerticalAlignment="Center"/>
             <ToggleSwitch Grid.Column="1"
-                          IsChecked="{Binding RegularVisibilityMaskUi.IsEnabled, Mode=TwoWay}"
+                          IsChecked="{Binding RegularMask.IsEnabled, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
@@ -45,12 +45,12 @@
                 ColumnSpacing="{StaticResource Space10}">
             <Button Grid.Column="0"
                     Content="Import mask"
-                    Command="{Binding ImportRegularVisibilityMaskCommand}"
+                    Command="{Binding RegularMask.ImportRegularVisibilityMaskCommand}"
                     HorizontalAlignment="Stretch"
                     ToolTip.Tip="Import Regular Visibility Mask (SeeRegular.csv) and build the regular active mask used by Step 4 and Simulation."/>
             <Button Grid.Column="1"
                     Content="Clear mask"
-                    Command="{Binding ClearRegularVisibilityMaskCommand}"
+                    Command="{Binding RegularMask.ClearRegularVisibilityMaskCommand}"
                     HorizontalAlignment="Stretch"
                     ToolTip.Tip="Remove the imported regular visibility mask and return to pure geometry seed."/>
           </Grid>

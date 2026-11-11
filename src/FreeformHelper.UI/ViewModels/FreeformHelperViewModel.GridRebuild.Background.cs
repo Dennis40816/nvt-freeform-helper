@@ -1,5 +1,4 @@
 using System.Globalization;
-using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels.Grid;
@@ -58,8 +57,8 @@ public sealed partial class FreeformHelperViewModel
             hint => CanvasHintText = hint,
             hint => DxfRegularSourceHint = hint,
             pads => RegularPads = pads,
-            RefreshRegularVisibilityMask,
-            ClearGridVisibilityMask,
+            grid => RegularMask.Workflow.Refresh(grid),
+            () => RegularMask.Workflow.ResetResult(grid: null),
             UpdateCadOutputFwDiffIndexing,
             RefreshDxfRegularSourceHint,
             ResetFreeformAutoDetectStats,
@@ -91,12 +90,6 @@ public sealed partial class FreeformHelperViewModel
             : GridRebuildOrchestrator.Build(buildRequest);
         return new GridBuildOutcome(result.Success, result.Grid, result.StatusText, result.CanvasHint, result.DxfRegularSourceHint);
     }
-
-    private void ClearGridVisibilityMask() => ApplyRegularVisibilityMaskResult(
-        string.IsNullOrWhiteSpace(_regularVisibilityMask.SourcePath)
-            ? RegularVisibilityMaskResult.NotFound()
-            : RegularVisibilityMaskResult.NotFound(_regularVisibilityMask.SourcePath),
-        grid: null);
 
     private GridRebuildBuildRequest CreateGridRebuildBuildRequestSnapshot()
     {

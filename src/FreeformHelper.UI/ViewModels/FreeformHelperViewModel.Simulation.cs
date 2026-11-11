@@ -1,4 +1,5 @@
 using System.Globalization;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
 
@@ -75,7 +76,7 @@ public sealed partial class FreeformHelperViewModel
                 }
 
                 reporter.Progress("Resolving simulation diff grid...");
-                var activeRegularPadIds = BuildSimulationActiveRegularPadIds(
+                var activeRegularPadIds = RegularVisibilityMaskProjection.BuildActivePadIds(
                     generation.RawGrid,
                     workflowSnapshot.ActiveRegularVisibilityMaskPadIds);
 
@@ -216,24 +217,6 @@ public sealed partial class FreeformHelperViewModel
                 Status?.ReportProgress(message);
             }
         }
-    }
-
-    private static HashSet<int> BuildSimulationActiveRegularPadIds(
-        RegularGrid effectiveGrid,
-        IReadOnlySet<int>? activeRegularVisibilityMaskPadIds)
-    {
-        ArgumentNullException.ThrowIfNull(effectiveGrid);
-
-        var activeRegularPadIds = effectiveGrid.Pads
-            .Select(static pad => pad.RegularPadId)
-            .ToHashSet();
-        if (activeRegularVisibilityMaskPadIds is null)
-        {
-            return activeRegularPadIds;
-        }
-
-        activeRegularPadIds.IntersectWith(activeRegularVisibilityMaskPadIds);
-        return activeRegularPadIds;
     }
 
     internal void NotifySimulationWorkspaceSourceChanged()

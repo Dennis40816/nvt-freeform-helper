@@ -17,7 +17,7 @@ public sealed partial class FreeformHelperViewModel
         var notifications = new IndexMappingNotifications(name => OnPropertyChanging(name), name => OnPropertyChanged(name));
         var inputs = new IndexAssignmentInputs(() => _projectFile, () => _grid, () => CadPads,
             () => RegularPads, () => _workflowData.LatestPadMatch.CadToRegular,
-            GetActiveRegularVisibilityMaskPadIds, () => SelectedScanOrder,
+            () => RegularMask.Workflow.ActiveRegularPadIds, () => SelectedScanOrder,
             () => CadOutputFwDiffAutoMode, () => _selectedCadIds);
         var effects = new IndexMappingEffects(SetStatus, MarkUnsaved,
             () => InvalidateDownstreamFromStep4(showStatus: false), NotifySimulationWorkspaceSourceChanged,

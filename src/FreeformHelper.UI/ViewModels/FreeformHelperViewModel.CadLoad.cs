@@ -16,7 +16,7 @@ public sealed partial class FreeformHelperViewModel
     {
         previous ??= new CadEditNotificationSnapshot(this);
         _cad = outcome.Cad;
-        ResetRegularVisibilityMaskSelection(clearProjectEmbeddedMask: !_isLoadingSettings);
+        RegularMask.Workflow.ResetSelection(clearProjectEmbeddedMask: !_isLoadingSettings);
         ClearAutoHiddenDuplicateCadPadState();
         ClearDxfEditRuntimeState(resetBaseline: false, previous);
         SetAutoHiddenDuplicateCadPads(outcome.DuplicateSanitization);

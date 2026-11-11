@@ -127,9 +127,9 @@ public sealed class MalformedCadAndMaskInputCharacterizationTests
             var validPath = TestFiles.WriteTempCsv("Xch:\"2\",Ych:\"1\"\ntimestamp(0:0:0),DiffData,1,0\n");
             vm.PickOpenRegularVisibilityMaskPathAsync = () => Task.FromResult<string?>(validPath);
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
-            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
-            Assert.Equal(0, Assert.Single(vm.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
-            var previousMask = vm.RegularVisibilityMaskForTests.Mask;
+            Assert.True(vm.RegularMask.IsEnabled);
+            Assert.Equal(0, Assert.Single(vm.RegularMask.Workflow.Mask.ActiveRegularPadIds));
+            var previousMask = vm.RegularMask.Workflow.Mask;
             var cad = vm.CadPads.ToArray();
             var regular = vm.RegularPads.ToArray();
             var grid = FreeformHelperViewModelPrivateAccess.Grid(vm);
@@ -140,13 +140,13 @@ public sealed class MalformedCadAndMaskInputCharacterizationTests
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
             Assert.Equal("Regular visibility mask: failed to load bad-mask.json. Ignored. CSV does not contain any frames.", vm.StatusText);
-            Assert.Equal(vm.StatusText, vm.RegularVisibilityMaskUi.Summary);
-            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
-            var mask = vm.RegularVisibilityMaskForTests.Mask;
+            Assert.Equal(vm.StatusText, vm.RegularMask.Summary);
+            Assert.True(vm.RegularMask.IsEnabled);
+            var mask = vm.RegularMask.Workflow.Mask;
             Assert.Same(previousMask, mask);
             Assert.Equal(RegularVisibilityMaskStatus.Loaded, mask.Status);
             Assert.Equal(validPath, mask.SourcePath);
-            Assert.Equal(validPath, vm.RegularVisibilityMaskForTests.SourcePath);
+            Assert.Equal(validPath, vm.RegularMask.Workflow.SourcePath);
             Assert.Equal(0, Assert.Single(mask.ActiveRegularPadIds));
             Assert.Equal(1, Assert.Single(mask.InactiveRegularPadIds));
             Assert.Equal(cad, vm.CadPads);

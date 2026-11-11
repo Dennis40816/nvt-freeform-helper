@@ -54,8 +54,8 @@ public sealed partial class FreeformHelperViewModel
             coordinatePreferredAaOutlineLayerName: () => CoordinatePreferredAaOutlineLayerName),
         import: new ProjectSnapshotReaders.ImportReaders(
             onlyClosedPolylines: () => ImportOnlyClosedPolylines, includeBlockPolylines: () => ImportBlockPolylines,
-            logLevel: () => SelectedLogLevelOption.Value, maskSourcePath: () => _regularVisibilityMask.SourcePath,
-            useMask: () => RegularVisibilityMaskUi.IsEnabled),
+            logLevel: () => SelectedLogLevelOption.Value, maskSourcePath: () => RegularMask.Workflow.SourcePath,
+            useMask: () => RegularMask.IsEnabled),
         imagePreferences: () => _dxfLayerImageExportPreferences,
         layers: () => LayerToggles.Select(t => (t.Name, t.IsSelected)));
 
@@ -171,7 +171,7 @@ public sealed partial class FreeformHelperViewModel
             }
         }
 
-        ApplyRegularVisibilityMaskSnapshot(
+        RegularMask.Workflow.ApplySnapshot(
             sourcePath: snapshot.RegularVisibilityMaskSourcePath,
             isEnabled: snapshot.UseRegularVisibilityMask,
             allowRuntimeRefresh: allowRuntimeRefresh,
