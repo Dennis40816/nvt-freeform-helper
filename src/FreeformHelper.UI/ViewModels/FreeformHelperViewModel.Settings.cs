@@ -1,3 +1,5 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia.Media;
@@ -205,7 +207,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         // Check if the changed property is one of the persisted settings.
-        if (_dirtySettingNames.Value.Contains(e.PropertyName))
+        if (SettingsStateViewModel.IsDirtySetting(e.PropertyName))
         {
             MarkUnsaved(); // Mark the project as unsaved.
             SchedulePersistAppGeneralSettings();
