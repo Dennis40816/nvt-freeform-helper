@@ -1,5 +1,3 @@
-using System.Globalization;
-using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
 
@@ -7,13 +5,13 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private readonly SimulationSourceChangeBatchState _simulationSourceChangeBatch = new(); // Holds the suspend depth and the pending flag of the simulation workspace source change batch.
+    private readonly SimulationSessionBuilder _simulationSessionBuilder;
 
     public event EventHandler? SimulationWorkspaceSourceChanged;
 
-    public int SimulationWorkspaceSourceRevision { get; private set; }
+    public int SimulationWorkspaceSourceRevision => _simulationSessionBuilder.SourceChanges.Revision;
 
-    public string LastSimulationWorkspaceAttemptMessage { get; private set; } = string.Empty;
+    public string LastSimulationWorkspaceAttemptMessage => _simulationSessionBuilder.LastAttemptMessage;
 
     public async Task<SimulationWorkspaceSession?> CreateSimulationWorkspaceSessionAsync(bool silent)
     {
@@ -23,6 +21,29 @@ public sealed partial class FreeformHelperViewModel
     public async Task<SimulationWorkspaceSession?> CreateSimulationWorkspaceSessionAsync(
         bool silent,
         Action<string>? progressTextReporter)
+    {
+        return await _simulationSessionBuilder.CreateAsync(silent, progressTextReporter);
+    }
+
+    private (UiOperationStatusReporter Status, SimulationSessionBuilder Builder) CreateSimulationServices()
+    {
+        var status = new UiOperationStatusReporter(message => StatusText = message);
+        var ports = new SimulationSessionPorts(
+            ReadSimulationSessionInputs,
+            BuildWorkflowDataSnapshot,
+            GenerateSimulationSessionTableAsync,
+            snapshot => RefreshStep4DuplicateDiffGroups(CadPads.ToList(), snapshot),
+            ReadSimulationDuplicateDiffWarning,
+            () => new SimulationSessionDisplay(ShowRegular, HighlightUnmatched, HighlightFreeform),
+            CreateStatusScope,
+            (name, operationAsync, onError, showSpinner) =>
+                RunUiOperationAsync(name, operationAsync, onError, showModalSpinner: showSpinner),
+            SetStatus);
+        return (status, new SimulationSessionBuilder(
+            ports, _logger, () => SimulationWorkspaceSourceChanged?.Invoke(this, EventArgs.Empty)));
+    }
+
+    private SimulationSessionInputs? ReadSimulationSessionInputs(bool silent)
     {
         CadPadSet? cad;
         RegularGrid? grid;
@@ -44,237 +65,34 @@ public sealed partial class FreeformHelperViewModel
             return null;
         }
 
-        LastSimulationWorkspaceAttemptMessage = string.Empty;
-        SimulationWorkspaceSession? session = null;
-        UiOperationStatusReporter.Scope? status = silent ? null : CreateStatusScope("SimulationWorkspace");
-        var reporter = new SimulationBuildReporter(silent, status, progressTextReporter);
-        await RunUiOperationAsync(
-            operationName: "Build simulation workspace",
-            operationAsync: async () =>
-            {
-                reporter.Progress("Preparing simulation workspace...");
-
-                var workflowSnapshot = BuildWorkflowDataSnapshot();
-                reporter.Progress("Generating simulation notch table...");
-                var generation = await GenerateCurrentNotchTableAsync(
-                    cad,
-                    grid,
-                    "Simulation workspace",
-                    workflowSnapshot: workflowSnapshot,
-                    reportStep5Progress: !silent,
-                    projectToCadOutputFwDiff: true,
-                    progressTextReporter: silent ? null : progressTextReporter);
-                if (generation is null)
-                {
-                    return;
-                }
-
-                if (generation.Table.Rows.Count == 0)
-                {
-                    ReportSimulationNoRowsGenerated(reporter);
-                    return;
-                }
-
-                reporter.Progress("Resolving simulation diff grid...");
-                var activeRegularPadIds = RegularVisibilityMaskProjection.BuildActivePadIds(
-                    generation.RawGrid,
-                    workflowSnapshot.ActiveRegularVisibilityMaskPadIds);
-
-                RefreshStep4DuplicateDiffGroups(CadPads.ToList(), workflowSnapshot);
-                var duplicateWarningMessage = ReportSimulationDuplicateDiffWarning(reporter);
-
-                reporter.Progress("Finalizing simulation workspace...");
-                session = CreateSimulationWorkspaceSession(generation, activeRegularPadIds, workflowSnapshot, cad);
-                ReportSimulationWorkspaceReady(reporter, generation, duplicateWarningMessage);
-            },
-            onError: ex => ReportSimulationBuildFailed(reporter, ex),
-            showModalSpinner: !silent);
-
-        return session;
+        return new SimulationSessionInputs(cad, grid);
     }
 
-    private void ReportSimulationNoRowsGenerated(SimulationBuildReporter reporter)
+    private async Task<SimulationSessionGeneration?> GenerateSimulationSessionTableAsync(
+        SimulationSessionInputs inputs, WorkflowDataSnapshot workflowSnapshot, bool silent, Action<string>? progressTextReporter)
     {
-        var message = "Simulation: no notch rows generated under current settings.";
-        LastSimulationWorkspaceAttemptMessage = message;
-        if (reporter.Silent)
-        {
-            _logger.Info(message);
-        }
-        else
-        {
-            reporter.Status?.ReportBlocked(message);
-            SetStatus(message);
-        }
-
-        reporter.Progress(message, reportToStatus: false);
+        var generation = await GenerateCurrentNotchTableAsync(
+            inputs.Cad,
+            inputs.Grid,
+            "Simulation workspace",
+            workflowSnapshot: workflowSnapshot,
+            reportStep5Progress: !silent,
+            projectToCadOutputFwDiff: true,
+            progressTextReporter: silent ? null : progressTextReporter);
+        return generation is null ? null : new SimulationSessionGeneration(
+            generation.Table, generation.RawGrid, generation.CadOutputFwDiffGrid, generation.ExportSettings, generation.SourceRevision);
     }
 
-    private string? ReportSimulationDuplicateDiffWarning(SimulationBuildReporter reporter)
+    private SimulationDuplicateDiffWarning? ReadSimulationDuplicateDiffWarning()
     {
-        string? duplicateWarningMessage = null;
-        if (HasStep4DuplicateDiffGroups)
+        if (!HasStep4DuplicateDiffGroups)
         {
-            var sample = Step4DuplicateDiffGroups[0];
-            duplicateWarningMessage = string.Format(
-                CultureInfo.InvariantCulture,
-                "Simulation warning: duplicate CAD output FW diff at IC{0}/diff{1}; results may include ambiguous mappings.",
-                sample.IcIndex + 1,
-                sample.DiffIndex);
-            _logger.Warn(
-                CultureInfo.InvariantCulture,
-                "{0} duplicate-groups={1} sample-cads={2}.",
-                duplicateWarningMessage,
-                Step4DuplicateDiffGroups.Count,
-                string.Join(", ", sample.CadPadIds));
-            if (!reporter.Silent)
-            {
-                reporter.Status?.ReportWarning(duplicateWarningMessage);
-            }
-
-            reporter.Progress(duplicateWarningMessage, reportToStatus: false);
+            return null;
         }
 
-        return duplicateWarningMessage;
+        var sample = Step4DuplicateDiffGroups[0];
+        return new SimulationDuplicateDiffWarning(sample.IcIndex, sample.DiffIndex, sample.CadPadIds, Step4DuplicateDiffGroups.Count);
     }
 
-    private SimulationWorkspaceSession CreateSimulationWorkspaceSession(
-        NotchTableGenerationResult generation,
-        HashSet<int> activeRegularPadIds,
-        WorkflowDataSnapshot workflowSnapshot,
-        CadPadSet cad)
-    {
-        return new SimulationWorkspaceSession(
-            generation.RawGrid,
-            generation.Table,
-            generation.ExportSettings.Notch.NullValue,
-            generation.SourceRevision,
-            activeRegularPadIds,
-            ShowRegular,
-            HighlightUnmatched,
-            HighlightFreeform,
-            workflowSnapshot.CadOutputFwDiffAssignmentDecisionsByCadId,
-            generation.CadOutputFwDiffGrid,
-            cad.Pads.ToArray(),
-            workflowSnapshot.CadOutputFwDiffIndexByCadId,
-            workflowSnapshot.CadIcIndexByCadId,
-            generation.ExportSettings.Notch.ComputationMode);
-    }
-
-    private void ReportSimulationWorkspaceReady(
-        SimulationBuildReporter reporter,
-        NotchTableGenerationResult generation,
-        string? duplicateWarningMessage)
-    {
-        var readyMessage = string.Format(
-            CultureInfo.InvariantCulture,
-            "Simulation ready. Rows={0}.",
-            generation.Table.Rows.Count);
-        LastSimulationWorkspaceAttemptMessage = duplicateWarningMessage is null
-            ? readyMessage
-            : string.Concat(readyMessage, " ", duplicateWarningMessage);
-        if (reporter.Silent)
-        {
-            _logger.Info(
-                CultureInfo.InvariantCulture,
-                duplicateWarningMessage is null
-                    ? "Simulation prewarm ready. Rows={0}."
-                    : "Simulation prewarm ready with duplicate-diff warning. Rows={0}.",
-                generation.Table.Rows.Count);
-        }
-        else
-        {
-            reporter.Status?.ReportSuccess(readyMessage);
-        }
-
-        reporter.Progress(readyMessage, reportToStatus: false);
-    }
-
-    private void ReportSimulationBuildFailed(SimulationBuildReporter reporter, Exception ex)
-    {
-        var message = $"Simulation build failed: {ex.Message}";
-        LastSimulationWorkspaceAttemptMessage = message;
-        if (!reporter.Silent)
-        {
-            reporter.Status?.ReportError("Simulation workspace failed", ex);
-            SetStatus(message);
-        }
-
-        _logger.Error(ex, "Simulation workspace failed.");
-        reporter.Progress(message, reportToStatus: false);
-    }
-
-    private readonly record struct SimulationBuildReporter(
-        bool Silent,
-        UiOperationStatusReporter.Scope? Status,
-        Action<string>? ProgressTextReporter)
-    {
-        public void Progress(string message, bool reportToStatus = true)
-        {
-            ProgressTextReporter?.Invoke(message);
-            if (reportToStatus)
-            {
-                Status?.ReportProgress(message);
-            }
-        }
-    }
-
-    internal void NotifySimulationWorkspaceSourceChanged()
-    {
-        if (_simulationSourceChangeBatch.SuspendDepth > 0)
-        {
-            _simulationSourceChangeBatch.Pending = true;
-            return;
-        }
-
-        RaiseSimulationWorkspaceSourceChanged();
-    }
-
-    private SimulationWorkspaceSourceChangeBatchScope BeginSimulationWorkspaceSourceChangeBatch()
-    {
-        _simulationSourceChangeBatch.SuspendDepth++;
-        return new SimulationWorkspaceSourceChangeBatchScope(this);
-    }
-
-    private void EndSimulationWorkspaceSourceChangeBatch()
-    {
-        if (_simulationSourceChangeBatch.SuspendDepth <= 0)
-        {
-            return;
-        }
-
-        _simulationSourceChangeBatch.SuspendDepth--;
-        if (_simulationSourceChangeBatch.SuspendDepth == 0 && _simulationSourceChangeBatch.Pending)
-        {
-            _simulationSourceChangeBatch.Pending = false;
-            RaiseSimulationWorkspaceSourceChanged();
-        }
-    }
-
-    private void RaiseSimulationWorkspaceSourceChanged()
-    {
-        SimulationWorkspaceSourceRevision++;
-        SimulationWorkspaceSourceChanged?.Invoke(this, EventArgs.Empty);
-    }
-
-    private sealed class SimulationWorkspaceSourceChangeBatchScope : IDisposable
-    {
-        private FreeformHelperViewModel? _owner;
-
-        public SimulationWorkspaceSourceChangeBatchScope(FreeformHelperViewModel owner)
-        {
-            _owner = owner;
-        }
-
-        public void Dispose()
-        {
-            if (_owner is null)
-            {
-                return;
-            }
-
-            _owner.EndSimulationWorkspaceSourceChangeBatch();
-            _owner = null;
-        }
-    }
+    internal void NotifySimulationWorkspaceSourceChanged() => _simulationSessionBuilder.SourceChanges.Notify();
 }
