@@ -144,10 +144,11 @@ if ($counts.Total -eq 0 -and $RunDiagnostics.Count -gt 0) {
         $Shard, $diagnostic.Group, $diagnostic.Phase, $exit, $diagnostic.TrxFiles, $directory)
 }
 # Failure text is private by default. Only the tests named here print their exception type and first message line.
-# These two fail intermittently on CI and the job log has no test output (issue #64). Remove a name once its cause is fixed.
+# These three fail intermittently on CI and the job log has no test output (issue #64). Remove a name once its cause is fixed.
 $failureDetailAllowlist = @(
     'FreeformHelper.Tests.LayerImageExportScreenshotTests.CaptureTheRealExportWindowsInBothThemesAsync',
-    'FreeformHelper.Tests.LayerPreviewBitmapConverterTests.RebindingReusesTheBitmapAndNewBytesReplaceItAsync'
+    'FreeformHelper.Tests.LayerPreviewBitmapConverterTests.RebindingReusesTheBitmapAndNewBytesReplaceItAsync',
+    'FreeformHelper.Tests.CornerCircleImageEncoderTests.SaveToFileAsync_WritesAFileOfTheImageSize'
 )
 if (@($counts.FailedTests | Where-Object { $failureDetailAllowlist -ccontains $_ }).Count -gt 0) {
     try {
