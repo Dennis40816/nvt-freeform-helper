@@ -98,20 +98,9 @@ public sealed partial class FreeformHelperViewModel
         : HasDxfOverlapIssues ? $"{DxfOverlapIssueCount} overlaps"
         : DxfOverlapSummary == DxfOverlapResult.NotRunSummary ? "Not checked" : "Checked";
 
-    public string DxfEditsHeaderText =>
-        $"Hidden {DeletedCadPadCount} · Merged {CombinedCadPadCount}";
+    public string DxfEditsHeaderText => DxfEdit.DxfEditsHeaderText;
 
-    public string DxfRotationScopeHint
-    {
-        get
-        {
-            if (!IsDxfEditRotationLayerScope || _cad is null) return "Applies to selected CAD pads.";
-            var targets = GetRotationTargetCadIds(_cad);
-            return targets.SetEquals(_selectedCadIds)
-                ? "Applies to the chosen layer."
-                : $"Layer scope · {targets.Count} target pads; selection is unchanged.";
-        }
-    }
+    public string DxfRotationScopeHint => DxfEdit.DxfRotationScopeHint;
 
     public string ValidationTraceHint => HasNotchValidationItems
         ? "Trace ready; expand a category to inspect its rows."
@@ -145,15 +134,6 @@ public sealed partial class FreeformHelperViewModel
         if (propertyName is nameof(DxfOverlapResult) or nameof(IsCheckingDxfOverlap))
         {
             OnPropertyChanged(nameof(DxfCheckHeaderText));
-        }
-        if (propertyName is nameof(DeletedCadPadCount) or nameof(CombinedCadPadCount))
-        {
-            OnPropertyChanged(nameof(DxfEditsHeaderText));
-        }
-        if (propertyName is nameof(SelectedDxfEditRotationScopeOption) or nameof(DxfEditRotationLayerName)
-            or nameof(CanRotateSelectedCadPads))
-        {
-            OnPropertyChanged(nameof(DxfRotationScopeHint));
         }
     }
 

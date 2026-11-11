@@ -1,142 +1,14 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Application.CadEditing;
-using FreeformHelper.Application.Services;
-using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.CadEditing;
-
-// Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 namespace FreeformHelper.UI.ViewModels;
 
-public sealed partial class FreeformHelperViewModel
+public sealed partial class DxfEditViewModel
 {
-    private static bool HasDxfEditChanges(bool deleted, bool combined, bool relayered, bool rotated) =>
-        deleted || combined || relayered || rotated;
-
-    private void NotifyCadEditProjectionChange<T>(string propertyName, T previous, T current)
-    {
-        if (EqualityComparer<T>.Default.Equals(previous, current))
-        {
-            return;
-        }
-
-        OnPropertyChanging(propertyName);
-        OnPropertyChanged(propertyName);
-    }
-
-    private void ResetDxfEditBaseline(CadPadSet? cad)
-    {
-        _cadEditWorkflow.ResetBaseline(cad, CaptureCadEditNotifications());
-    }
-
-    private void SyncHiddenCadIdsToProject(CadEditNotificationSnapshot? previous = null)
-    {
-        previous ??= CaptureCadEditNotifications();
-        var hadEdits = previous.HasAny;
-        if (_cad is not null)
-        {
-            _projectFile.HiddenCadPadIds = _cadEdit.HiddenCadPadIds.ToHashSet();
-        }
-        NotifyCadEditProjectionChange(nameof(DeletedCadPadCount), previous.Deleted, DeletedCadPadCount);
-        NotifyCadEditProjectionChange(nameof(HasDeletedCadPads), previous.Deleted > 0, HasDeletedCadPads);
-        previous.Deleted = DeletedCadPadCount;
-        OnPropertyChanged(nameof(HiddenDxfEditBadgeTooltip));
-        OnPropertyChanged(nameof(HasManualHiddenCadPads));
-        SyncCadEditAggregateState(hadEdits, previous.HasAny);
-    }
-
-    private void SyncCombinedCadState(CadEditNotificationSnapshot? previous = null)
-    {
-        previous ??= CaptureCadEditNotifications();
-        var hadEdits = previous.HasAny;
-        NotifyCadEditProjectionChange(nameof(CombinedCadPadCount), previous.Combined, CombinedCadPadCount);
-        NotifyCadEditProjectionChange(nameof(HasCombinedCadPads), previous.Combined > 0, HasCombinedCadPads);
-        previous.Combined = CombinedCadPadCount;
-        OnPropertyChanged(nameof(CombinedDxfEditBadgeTooltip));
-        OnPropertyChanged(nameof(HasManualHiddenCadPads));
-        OnPropertyChanged(nameof(HasSelectedCombinedCadPadsForDxfEdit));
-        SyncCadEditAggregateState(hadEdits, previous.HasAny);
-    }
-
-    // Without a CAD, the saved visible duplicate ids stay in the project file (persistToProject: false).
-    private void SyncDuplicateCadState(CadEditNotificationSnapshot? previous = null, bool persistToProject = true)
-    {
-        previous ??= CaptureCadEditNotifications();
-        NotifyCadEditProjectionChange(nameof(DuplicateCadPadCount), previous.Duplicate, DuplicateCadPadCount);
-        NotifyCadEditProjectionChange(nameof(HasDuplicateCadPads), previous.Duplicate > 0, HasDuplicateCadPads);
-        previous.Duplicate = DuplicateCadPadCount;
-        if (persistToProject)
-        {
-            _projectFile.VisibleDuplicateCadPadIds = CadDocument.GetRestoredDuplicateIds();
-        }
-
-        OnPropertyChanged(nameof(HasDetectedDuplicateCadPads));
-        OnPropertyChanged(nameof(DuplicateDxfEditBadgeTooltip));
-    }
-
-    private void SyncRelayeredCadState(CadEditNotificationSnapshot? previous = null)
-    {
-        previous ??= CaptureCadEditNotifications();
-        var hadEdits = previous.HasAny;
-        if (_cadEdit.BaselineCad is null || _cad is null)
-        {
-            RelayeredCadPadCount = 0;
-            NotifyCadEditProjectionChange(nameof(HasRelayeredCadPads), previous.Relayered > 0, HasRelayeredCadPads);
-            previous.Relayered = RelayeredCadPadCount;
-            SyncCadEditAggregateState(hadEdits, previous.HasAny);
-            return;
-        }
-
-        RelayeredCadPadCount = DxfEditStateCapture.CountRelayeredPads(_cad, _cadEdit.BaselineCad);
-        NotifyCadEditProjectionChange(nameof(HasRelayeredCadPads), previous.Relayered > 0, HasRelayeredCadPads);
-        previous.Relayered = RelayeredCadPadCount;
-        OnPropertyChanged(nameof(MovedDxfEditBadgeTooltip));
-        SyncCadEditAggregateState(hadEdits, previous.HasAny);
-    }
-
-    private void SyncRotatedCadState(CadEditNotificationSnapshot? previous = null)
-    {
-        previous ??= CaptureCadEditNotifications();
-        var hadEdits = previous.HasAny;
-        if (_cadEdit.BaselineCad is null || _cad is null)
-        {
-            RotatedCadPadCount = 0;
-            NotifyCadEditProjectionChange(nameof(HasRotatedCadPads), previous.Rotated > 0, HasRotatedCadPads);
-            previous.Rotated = RotatedCadPadCount;
-            SyncCadEditAggregateState(hadEdits, previous.HasAny);
-            return;
-        }
-
-        RotatedCadPadCount = DxfEditStateCapture.CountRotatedPads(_cad, _cadEdit.BaselineCad);
-        NotifyCadEditProjectionChange(nameof(HasRotatedCadPads), previous.Rotated > 0, HasRotatedCadPads);
-        previous.Rotated = RotatedCadPadCount;
-        OnPropertyChanged(nameof(RotatedDxfEditBadgeTooltip));
-        SyncCadEditAggregateState(hadEdits, previous.HasAny);
-    }
-
-    private void SyncCadEditAggregateState(bool previous, bool current)
-    {
-        NotifyCadEditProjectionChange(nameof(HasAnyCadEdits), previous, current);
-    }
-
-    /// <summary>
-    /// Gets or sets the latest CAD?egular overlap links for canvas ratio labels.
-    /// </summary>
-    [ObservableProperty] private IReadOnlyList<PadMatchLink> _matchLinksForCanvas = Array.Empty<PadMatchLink>();
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the AA canvas should show the shared CAD-load overlay.
-    /// This is used by both Open DXF and Load Project while DXF import/reload and grid rebuild are in progress.
-    /// </summary>
-    [ObservableProperty] private bool _isCadLoadCanvasOverlayVisible;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the global modal loading spinner host should be visible.
-    /// Long-running operations use this as a single entry/exit lifecycle rather than re-deriving ad hoc busy UI.
-    /// </summary>
-    [ObservableProperty] private bool _isModalLoadingSpinnerVisible;
-
     /// <summary>Gets the number of hidden CAD pads.</summary>
     public int DeletedCadPadCount => _cadEdit.HiddenCadPadIds.Count;
 

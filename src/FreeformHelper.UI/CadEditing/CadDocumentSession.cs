@@ -41,6 +41,16 @@ internal sealed class CadDocumentSession
     internal bool IsEffectivelyHidden(int cadPadId) =>
         Edit.HiddenCadPadIds.Contains(cadPadId) || Edit.AutoHiddenDuplicateCadPadIds.Contains(cadPadId);
 
+    internal bool TryResolveCombinedGroupId(int cadPadId, out int groupId)
+    {
+        if (Combined.GroupIdByOutputCadId.TryGetValue(cadPadId, out groupId))
+        {
+            return true;
+        }
+
+        return Combined.GroupIdBySourceCadId.TryGetValue(cadPadId, out groupId);
+    }
+
     internal HashSet<int> BuildEffectiveHiddenIds()
     {
         var hidden = Edit.HiddenCadPadIds.ToHashSet();
