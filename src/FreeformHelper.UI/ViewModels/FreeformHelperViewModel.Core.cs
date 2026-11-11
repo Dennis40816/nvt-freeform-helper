@@ -114,6 +114,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
         _settingsState = new SettingsStateViewModel(this);
+        _fwAssignmentSettings = new FwAssignmentSettingsViewModel(this);
         _canvasStrokeFillState = new CanvasStrokeFillState(
             () => _isLoadingSettings,
             () => _undoSuppression.IsActive,
@@ -130,6 +131,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _statusReporter = new UiOperationStatusReporter(message => StatusText = message);
         UiEvents = uiEvents ?? new UiEventRunner(new UiEventFailureReporter(_statusReporter).Report, EmergencyLogSink.Report);
         _appGeneralSettingsStore = appGeneralSettingsStore ?? new AppGeneralSettingsStore();
+        _appGeneralPersistenceCoordinator = new AppGeneralPersistenceCoordinator(this, _appGeneralPersistence);
         InitializeAppGeneralSettingsPersistence();
         ScanOrderOptions = BuildScanOrderOptions();
         GridAlignmentOptions = BuildGridAlignmentOptions();

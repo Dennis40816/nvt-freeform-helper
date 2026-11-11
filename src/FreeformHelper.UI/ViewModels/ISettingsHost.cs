@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using FreeformHelper.Application.Settings;
-using BoundLayerOption = FreeformHelper.UI.ViewModels.FreeformHelperViewModel.BoundLayerOption;
-using RegularSourceLayerOption = FreeformHelper.UI.ViewModels.FreeformHelperViewModel.RegularSourceLayerOption;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -36,9 +34,9 @@ internal interface ISettingsHost
 
     void OnSelectedScanOrderChanged(ScanOrder value);
 
-    // Compatibility leak: the existing layer option type is nested in the shell.
-    void OnSelectedRegularSourceLayerOptionChanged(RegularSourceLayerOption value);
+    // The shell hook reads the selection already stored by the setter.
+    void OnSelectedRegularSourceLayerOptionChanged();
 
-    // Compatibility leak: the existing layer option type is nested in the shell.
-    void OnSelectedBoundLayerOptionChanged(BoundLayerOption value);
+    // The shell hook reads the selection already stored by the setter.
+    void OnSelectedBoundLayerOptionChanged();
 }
