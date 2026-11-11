@@ -11,7 +11,7 @@
     "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 2,
-    "freeformViewModelStateMembers": 60,
+    "freeformViewModelStateMembers": 59,
     "shellNavigationBooleans": 0,
     "noWarnIds": 1
   },
@@ -37,9 +37,8 @@
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:16"
     ],
     "freeformViewModelStateMembers": [
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:70", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:71", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:72", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:75", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:83", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:84", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:86", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:88",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:71", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:72", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:73", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:76", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:84", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:85", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:87", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:89",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:192", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:198", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:204", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:228", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:237", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:248", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:252",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfLayerImageExportSettings.cs:26",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:162", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:167", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:172", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:181",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs:252",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:10",
