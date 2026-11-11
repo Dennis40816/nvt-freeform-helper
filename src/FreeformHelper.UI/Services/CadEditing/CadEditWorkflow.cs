@@ -10,10 +10,11 @@ using NLog;
 namespace FreeformHelper.UI.Services.CadEditing;
 
 // UI-thread orchestration. The ports retain presentation order without owning presentation state.
-internal sealed class CadEditWorkflow(
-    CadDocumentSession document, CadEditPublication publication, CadEditLayers layers, CadEditEffects effects)
+internal sealed partial class CadEditWorkflow(
+    CadDocumentSession document, CadEditPublication publication, CadEditLayers layers, CadEditEffects effects, DxfEditInteraction interaction)
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _editLogger = LogManager.GetLogger("FreeformHelper.UI.ViewModels.FreeformHelperViewModel");
 
     internal void RestoreUndo(CadEditUndoSnapshot snapshot)
     {

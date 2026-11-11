@@ -132,8 +132,8 @@ public sealed partial class FreeformHelperViewModel : IWorkflowDispatchPort, IWo
     public string ManualOverrideHint => _workspaceNavigation.ManualOverrideHint;
     public string ToFullPreviewToggleHint => _workspaceNavigation.ToFullPreviewToggleHint;
     public string DxfCheckHeaderText => _workspaceNavigation.DxfCheckHeaderText;
-    public string DxfEditsHeaderText => _workspaceNavigation.DxfEditsHeaderText;
-    public string DxfRotationScopeHint => _workspaceNavigation.DxfRotationScopeHint;
+    public string DxfEditsHeaderText => DxfEdit.DxfEditsHeaderText;
+    public string DxfRotationScopeHint => DxfEdit.DxfRotationScopeHint;
     public string ValidationTraceHint => _workspaceNavigation.ValidationTraceHint;
 
     private void NotifyWorkspaceLayoutChanged(string? propertyName) => _workspaceNavigation.NotifyWorkspaceLayoutChanged(propertyName);
@@ -152,11 +152,4 @@ public sealed partial class FreeformHelperViewModel : IWorkflowDispatchPort, IWo
     ICommand IWorkspaceNavigationSource.ExportNotchCommand => ExportNotchCommand;
     int IWorkspaceNavigationSource.SelectedRegularCount => SelectionSummaryResult.RegularCount;
     bool IWorkspaceNavigationSource.IsDxfOverlapNotRun => DxfOverlapSummary == DxfOverlapResult.NotRunSummary;
-
-    (bool UsesLayer, bool MatchesSelection, int TargetCount) IWorkspaceNavigationSource.GetRotationScope()
-    {
-        if (!IsDxfEditRotationLayerScope || _cad is null) return (false, false, 0);
-        var targets = GetRotationTargetCadIds(_cad);
-        return (true, targets.SetEquals(_selectedCadIds), targets.Count);
-    }
 }

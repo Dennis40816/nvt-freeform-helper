@@ -2,20 +2,9 @@
 
 using CommunityToolkit.Mvvm.Input;
 
-namespace FreeformHelper.UI.ViewModels;
+namespace FreeformHelper.UI.CadEditing;
 
-/// <summary>Owns the DXF edit command instances for one workspace.</summary>
 internal sealed record DxfEditCommands(
-    IAsyncRelayCommand ExportDxfVisibleCommand,
-    IAsyncRelayCommand ExportDxfAllCommand,
-    IAsyncRelayCommand ExportDxfLayerImageCommand,
-    IAsyncRelayCommand CheckDxfQualityCommand,
-    IRelayCommand SelectDxfOverlapPadsCommand,
-    IRelayCommand ClearDxfOverlapHighlightsCommand,
-    IAsyncRelayCommand ShowDxfOverlapDetailsCommand,
-    IAsyncRelayCommand AnalyzeIndexMappingCommand,
-    IRelayCommand OffsetSelectedCadOutputFwDiffIndicesCommand,
-    IRelayCommand<Step4DuplicateDiffGroupViewModel?> SelectStep4DuplicateDiffGroupCommand,
     IRelayCommand DeleteSelectedCadPadsCommand,
     IRelayCommand RestoreLastDeletedCadPadsCommand,
     IRelayCommand RestoreAllHiddenCadPadsCommand,

@@ -34,7 +34,7 @@ public sealed partial class FreeformHelperView
         viewModel.OpenNotchDetailAsync = ShowNotchDetailWindowAsync;
         viewModel.OpenNotchExportSelectionAsync = ShowNotchExportSelectionWindowAsync;
         viewModel.GetCurrentSimulationSafetyAudit = ResolveCurrentSimulationSafetyAudit;
-        viewModel.OpenDxfEditChangeListAsync = ShowDxfEditChangeListWindowAsync;
+        viewModel.DxfEdit.OpenDxfEditChangeListAsync = ShowDxfEditChangeListWindowAsync;
         viewModel.OpenIndexMappingReportAsync = ShowIndexMappingReportWindowAsync;
         viewModel.OpenDxfOverlapReportAsync = ShowDxfOverlapReportWindowAsync;
         viewModel.OpenDxfLayerImageExportAsync = ShowDxfLayerImageExportWindowAsync;
@@ -78,7 +78,7 @@ public sealed partial class FreeformHelperView
         viewModel.OpenNotchDetailAsync = null;
         viewModel.OpenNotchExportSelectionAsync = null;
         viewModel.GetCurrentSimulationSafetyAudit = null;
-        viewModel.OpenDxfEditChangeListAsync = null;
+        viewModel.DxfEdit.OpenDxfEditChangeListAsync = null;
         viewModel.OpenIndexMappingReportAsync = null;
         viewModel.OpenDxfOverlapReportAsync = null;
         viewModel.OpenDxfLayerImageExportAsync = null;
