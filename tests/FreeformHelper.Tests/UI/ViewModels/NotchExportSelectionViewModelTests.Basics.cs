@@ -185,11 +185,11 @@ public sealed partial class NotchExportSelectionViewModelTests
         var table = BuildSampleTable();
         var options = new[]
         {
-            new FreeformHelperViewModel.NotchExportFileTypeOption(
+            new NotchExportFileTypeOption(
                 FreeformHelperViewModel.NotchExportFileType.Csv,
                 "CSV review (.csv)",
                 "csv"),
-            new FreeformHelperViewModel.NotchExportFileTypeOption(
+            new NotchExportFileTypeOption(
                 FreeformHelperViewModel.NotchExportFileType.Cv22,
                 "C v2.2 (.c)",
                 "c",
@@ -214,16 +214,16 @@ public sealed partial class NotchExportSelectionViewModelTests
         var table = BuildSampleTable();
         var options = new[]
         {
-            new FreeformHelperViewModel.NotchExportFileTypeOption(
+            new NotchExportFileTypeOption(
                 FreeformHelperViewModel.NotchExportFileType.Csv,
                 "CSV review (.csv)",
                 "csv"),
-            new FreeformHelperViewModel.NotchExportFileTypeOption(
+            new NotchExportFileTypeOption(
                 FreeformHelperViewModel.NotchExportFileType.Cv21,
                 "C v2.1 (.c)",
                 "c",
                 NotchAlgorithmVersion.V21),
-            new FreeformHelperViewModel.NotchExportFileTypeOption(
+            new NotchExportFileTypeOption(
                 FreeformHelperViewModel.NotchExportFileType.Cv22,
                 "C v2.2 (.c)",
                 "c",
@@ -256,11 +256,11 @@ public sealed partial class NotchExportSelectionViewModelTests
         });
         var options = new[]
         {
-            new FreeformHelperViewModel.NotchExportFileTypeOption(
+            new NotchExportFileTypeOption(
                 FreeformHelperViewModel.NotchExportFileType.Csv,
                 "CSV review (.csv)",
                 "csv"),
-            new FreeformHelperViewModel.NotchExportFileTypeOption(
+            new NotchExportFileTypeOption(
                 FreeformHelperViewModel.NotchExportFileType.Cv21,
                 "C v2.1 (.c)",
                 "c",

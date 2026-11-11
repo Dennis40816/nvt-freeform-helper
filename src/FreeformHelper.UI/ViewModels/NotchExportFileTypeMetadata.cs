@@ -25,7 +25,7 @@ internal static class NotchExportFileTypeMetadata
             FreeformHelperViewModel.NotchExportFileType.Cv22;
     }
 
-    public static string GetExportKindLabel(FreeformHelperViewModel.NotchExportFileTypeOption option)
+    public static string GetExportKindLabel(NotchExportFileTypeOption option)
     {
         return option.Value switch
         {
@@ -37,7 +37,7 @@ internal static class NotchExportFileTypeMetadata
     }
 
     public static bool TryGetPinnedVersion(
-        FreeformHelperViewModel.NotchExportFileTypeOption option,
+        NotchExportFileTypeOption option,
         out NotchAlgorithmVersion version)
     {
         if (option.PinnedVersion.HasValue)

@@ -533,8 +533,8 @@ public sealed partial class FreeformHelperViewModelTests
             var auxToggle = Assert.Single(vm.LayerToggles, static toggle => string.Equals(toggle.Name, "aux", StringComparison.OrdinalIgnoreCase));
             auxToggle.IsSelected = false;
             vm.RegularSourceMode = FreeformHelper.Application.Settings.RegularSourceMode.FromDxfLayer;
-            vm.SelectedRegularSourceLayerOption = new FreeformHelperViewModel.RegularSourceLayerOption("regular", "regular");
-            vm.SelectedBoundLayerOption = new FreeformHelperViewModel.BoundLayerOption("signal", "signal");
+            vm.SelectedRegularSourceLayerOption = new RegularSourceLayerOption("regular", "regular");
+            vm.SelectedBoundLayerOption = new BoundLayerOption("signal", "signal");
             vm.DxfEditTargetLayerName = "signal";
 
             var projectFile = Assert.IsType<FreeformHelper.Infrastructure.Project.ProjectFile>(FreeformHelperViewModelPrivateAccess.ProjectFile(vm));

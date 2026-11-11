@@ -75,7 +75,7 @@ public sealed class SelectionLocateEffectsBehaviorTests
         var visibleCad = vm.CadPads.Single(static pad => pad.Layer == "signal-b");
         var link = Assert.Single(vm.GetMatchedRegularLinks(hiddenCad.Id));
         var regular = vm.RegularPads.Single(pad => pad.RegularPadId == link.RegularPadId);
-        var item = new FreeformHelperViewModel.NotchValidationDisplayItem(
+        var item = new NotchValidationDisplayItem(
             KindText: "DIRECT",
             RowText: "#1",
             VersionText: "2.2",

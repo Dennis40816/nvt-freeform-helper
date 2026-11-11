@@ -34,7 +34,7 @@
                       IsEnabled="{Binding CanSelectExportType}"
                       SelectedItem="{Binding SelectedExportTypeOption, Mode=TwoWay}">
               <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:FreeformHelperViewModel+NotchExportFileTypeOption">
+                <DataTemplate x:DataType="viewModels:NotchExportFileTypeOption">
                   <TextBlock Text="{Binding Display}"/>
                 </DataTemplate>
               </ComboBox.ItemTemplate>

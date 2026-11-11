@@ -303,10 +303,10 @@ public sealed class SelectionOwnerCharacterizationTests
     public void TimingPublishesOnlyAfterTheSelectionAndKeepsOneAcceptedResult()
     {
         var vm = new FreeformHelperViewModel();
-        Assert.Equal(new FreeformHelperViewModel.SelectionTimingSnapshot(0, 0, 0, 0), vm.GetLastSelectionTimingSnapshot());
+        Assert.Equal(new SelectionTimingSnapshot(0, 0, 0, 0), vm.GetLastSelectionTimingSnapshot());
         vm.ApplyCanvasSelection([1, 2], []);
         var previous = vm.GetLastSelectionTimingSnapshot();
-        var observed = new List<FreeformHelperViewModel.SelectionTimingSnapshot>();
+        var observed = new List<SelectionTimingSnapshot>();
         vm.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(vm.SelectedCadPadIds) || args.PropertyName == nameof(vm.SelectedRegularPadIndices))
@@ -317,7 +317,7 @@ public sealed class SelectionOwnerCharacterizationTests
 
         vm.ApplyCanvasSelection([3, 4], []);
 
-        Assert.Equal<FreeformHelperViewModel.SelectionTimingSnapshot>([previous, previous], observed);
+        Assert.Equal<SelectionTimingSnapshot>([previous, previous], observed);
         var accepted = vm.GetLastSelectionTimingSnapshot();
         Assert.InRange(accepted.SummaryMs, 0, accepted.TotalMs);
         Assert.InRange(accepted.InspectorMs, 0, accepted.TotalMs);

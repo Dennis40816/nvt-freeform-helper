@@ -162,13 +162,13 @@ public sealed partial class FreeformHelperViewModelTests
         vm.CadIndexMaps.IcIndexByCadId[cadPadId] = icIndex;
     }
 
-    private static FreeformHelperViewModel.NotchValidationDisplayItem CreateValidationDisplayItem(
+    private static NotchValidationDisplayItem CreateValidationDisplayItem(
         string kindText,
         bool isDirect = false,
         bool isIncoming = false,
         bool isOutgoing = false)
     {
-        return new FreeformHelperViewModel.NotchValidationDisplayItem(
+        return new NotchValidationDisplayItem(
             KindText: kindText,
             RowText: "#1",
             VersionText: "2.2",

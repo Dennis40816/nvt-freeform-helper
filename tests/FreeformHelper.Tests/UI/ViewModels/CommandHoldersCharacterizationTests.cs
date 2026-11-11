@@ -18,7 +18,7 @@ public sealed class CommandHoldersCharacterizationTests
         ("UseSelectedRegularForNotchValidationCommand", typeof(IRelayCommand)),
         ("AnalyzeNotchValidationCommand", typeof(IRelayCommand)),
         ("ClearNotchValidationCommand", typeof(IRelayCommand)),
-        ("FocusNotchValidationItemCommand", typeof(IRelayCommand<FreeformHelperViewModel.NotchValidationDisplayItem>)),
+        ("FocusNotchValidationItemCommand", typeof(IRelayCommand<NotchValidationDisplayItem>)),
         ("PreviousNotchPreviewStageCommand", typeof(IRelayCommand)),
         ("NextNotchPreviewStageCommand", typeof(IRelayCommand)),
         ("SaveProjectCommand", typeof(IAsyncRelayCommand)),
@@ -197,12 +197,12 @@ public sealed class CommandHoldersCharacterizationTests
         return states;
     }
 
-    private static FreeformHelperViewModel.NotchValidationDisplayItem? GetParameter(IRelayCommand command) =>
-        command is IRelayCommand<FreeformHelperViewModel.NotchValidationDisplayItem> ? CreateValidationItem() : null;
+    private static NotchValidationDisplayItem? GetParameter(IRelayCommand command) =>
+        command is IRelayCommand<NotchValidationDisplayItem> ? CreateValidationItem() : null;
 
-    private static FreeformHelperViewModel.NotchValidationDisplayItem CreateValidationItem()
+    private static NotchValidationDisplayItem CreateValidationItem()
     {
-        return new FreeformHelperViewModel.NotchValidationDisplayItem(
+        return new NotchValidationDisplayItem(
             KindText: "DIRECT",
             RowText: "#1",
             VersionText: "2.2",
