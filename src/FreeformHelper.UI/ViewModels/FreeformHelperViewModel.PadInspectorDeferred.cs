@@ -1,8 +1,8 @@
-using System.Diagnostics;
 using System.Globalization;
 using Avalonia.Threading;
 using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Inspector;
 using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -12,67 +12,78 @@ public sealed partial class FreeformHelperViewModel
     internal const string DeferredCadInspectorRefreshWorkName = "deferred-cad-inspector-refresh";
     internal const string DeferredRegularInspectorRefreshWorkName = "deferred-regular-inspector-refresh";
 
-    private const int PadInspectorDeferredRefreshDelayMs = 200;
-    private const int RegularPadInspectorDeferredRefreshDelayMs = 150;
-
-    private readonly PadInspectorDeferredRefreshSlot _padInspectorDeferredCadSlot = new();
-    private readonly PadInspectorDeferredRefreshSlot _padInspectorDeferredRegularSlot = new();
-
-    public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId)
-    {
-        QueueDeferredCadInspectorSnapshotRefresh(
-            cadPadId,
-            _padInspectorRequests.ReadSelectionRevision());
-    }
-
-    public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId, long selectionRevision)
-    {
-        CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: false);
-        var cts = new CancellationTokenSource();
-        _padInspectorDeferredCadSlot.Install(cts);
-        var requestId = _padInspectorRequests.NextCadRefreshRequestId();
-        UpdatePadInspectorDeferredRefreshPendingState();
-        BackgroundWork.Run(
+    private InspectorRefreshOwner<DeferredCadInspectorContext> CreateInspectorRefreshOwner(PadInspectorRequestState requests, Action<bool> writePending) =>
+        new InspectorRefreshOwner<DeferredCadInspectorContext>(
+            requests,
+            new InspectorRefreshPorts<DeferredCadInspectorContext>(
+                CaptureDeferredCadInspectorContext,
+                ResolveDeferredCadInspectorAsync,
+                TryApplyDeferredCadInspectorSnapshot,
+                CanApplyDeferredRegularInspectorSnapshot,
+                BuildRegularPadInspectorSnapshot,
+                snapshot => PadInspectorUi.Snapshot = snapshot,
+                (name, work) => BackgroundWork.Run(name, work),
+                DispatchInspectorRefreshAsync,
+                (delay, token) => Task.Delay(TimeSpan.FromMilliseconds(delay), TimeProvider.System, token),
+                RunInspectorRefreshSafelyAsync,
+                (context, elapsed, delay) => _logger.Debug(CultureInfo.InvariantCulture,
+                    "Pad inspector deferred refresh applied: CAD={0}, elapsed={1}ms (delay={2}ms).",
+                    context.ResolutionRequest.CadPad.Id, elapsed, delay),
+                (id, elapsed, delay) => _logger.Debug(CultureInfo.InvariantCulture,
+                    "Pad inspector deferred refresh applied: REG={0}, elapsed={1}ms (delay={2}ms).",
+                    id, elapsed, delay),
+                (ex, id) => _logger.Warn(ex, "Pad inspector deferred refresh failed: CAD={0}.", id),
+                (ex, id) => _logger.Warn(ex, "Pad inspector deferred refresh failed: REG={0}.", id)),
+            writePending,
             DeferredCadInspectorRefreshWorkName,
-            () => RunDeferredCadInspectorSnapshotRefreshAsync(requestId, cadPadId, selectionRevision, cts, cts.Token));
-    }
+            DeferredRegularInspectorRefreshWorkName);
 
-    public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId)
+    public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId) =>
+        Inspector.Refresh.QueueDeferredCadInspectorSnapshotRefresh(cadPadId);
+
+    public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId, long selectionRevision) =>
+        Inspector.Refresh.QueueDeferredCadInspectorSnapshotRefresh(cadPadId, selectionRevision);
+
+    public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId) =>
+        Inspector.Refresh.QueueDeferredRegularInspectorSnapshotRefresh(regularPadId);
+
+    public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId, long selectionRevision) =>
+        Inspector.Refresh.QueueDeferredRegularInspectorSnapshotRefresh(regularPadId, selectionRevision);
+
+    private void CancelDeferredCadInspectorSnapshotRefresh(bool clearPendingState) =>
+        Inspector.Refresh.CancelCad(clearPendingState);
+
+    private void CancelDeferredRegularInspectorSnapshotRefresh(bool clearPendingState) =>
+        Inspector.Refresh.CancelRegular(clearPendingState);
+
+    private static async Task<bool> DispatchInspectorRefreshAsync(Action action, CancellationToken cancellationToken)
     {
-        QueueDeferredRegularInspectorSnapshotRefresh(
-            regularPadId,
-            _padInspectorRequests.ReadSelectionRevision());
-    }
-
-    public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId, long selectionRevision)
-    {
-        CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: false);
-        var cts = new CancellationTokenSource();
-        _padInspectorDeferredRegularSlot.Install(cts);
-        var requestId = _padInspectorRequests.NextRegularRefreshRequestId();
-        UpdatePadInspectorDeferredRefreshPendingState();
-        BackgroundWork.Run(
-            DeferredRegularInspectorRefreshWorkName,
-            () => RunDeferredRegularInspectorSnapshotRefreshAsync(requestId, regularPadId, selectionRevision, cts, cts.Token));
-    }
-
-    private void CancelDeferredCadInspectorSnapshotRefresh(bool clearPendingState)
-    {
-        _padInspectorDeferredCadSlot.Cancel();
-
-        if (clearPendingState)
+        if (!UiThread.TryGetRunningDispatcher(out var dispatcher))
         {
-            UpdatePadInspectorDeferredRefreshPendingState();
+            return false;
         }
+
+        await dispatcher!.InvokeAsync(action, DispatcherPriority.Background, cancellationToken);
+        return true;
     }
 
-    private void CancelDeferredRegularInspectorSnapshotRefresh(bool clearPendingState)
+    private static async Task RunInspectorRefreshSafelyAsync(Func<Task> work, Action<Exception> warn, Action complete)
     {
-        _padInspectorDeferredRegularSlot.Cancel();
-
-        if (clearPendingState)
+        try
         {
-            UpdatePadInspectorDeferredRefreshPendingState();
+            await work().ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // Deferred refresh canceled.
+        }
+        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
+        {
+            warn(ex);
+        }
+        finally
+        {
+            complete();
         }
     }
 
@@ -138,78 +149,6 @@ public sealed partial class FreeformHelperViewModel
             WorkflowDataSnapshotRevision: _workflowDataSnapshotRevision,
             CacheRevision: _notchComputationSession.Revision);
         return true;
-    }
-
-    private async Task RunDeferredCadInspectorSnapshotRefreshAsync(
-        long requestId,
-        int cadPadId,
-        long selectionRevision,
-        CancellationTokenSource cts,
-        CancellationToken cancellationToken)
-    {
-        var sw = Stopwatch.StartNew();
-        DeferredCadInspectorContext? context = null;
-        try
-        {
-            await Task.Delay(TimeSpan.FromMilliseconds(PadInspectorDeferredRefreshDelayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
-            if (cancellationToken.IsCancellationRequested || requestId != _padInspectorRequests.ReadCadRefreshRequestId())
-            {
-                return;
-            }
-
-            if (!UiThread.TryGetRunningDispatcher(out var dispatcher))
-            {
-                return;
-            }
-
-            await dispatcher!.InvokeAsync(() =>
-            {
-                context = CaptureDeferredCadInspectorContext(requestId, cadPadId, selectionRevision, cancellationToken);
-            }, DispatcherPriority.Background, cancellationToken);
-
-            if (context is null)
-            {
-                return;
-            }
-
-            var (resolved, diagnostics) = await ResolveDeferredCadInspectorAsync(context, cancellationToken).ConfigureAwait(false);
-
-            if (!UiThread.TryGetRunningDispatcher(out dispatcher))
-            {
-                return;
-            }
-
-            await dispatcher!.InvokeAsync(() =>
-            {
-                if (!TryApplyDeferredCadInspectorSnapshot(context, resolved, diagnostics))
-                {
-                    return;
-                }
-
-                _logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: CAD={0}, elapsed={1}ms (delay={2}ms).",
-                    context.ResolutionRequest.CadPad.Id,
-                    sw.ElapsedMilliseconds,
-                    PadInspectorDeferredRefreshDelayMs);
-            }, DispatcherPriority.Background, cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            // Deferred refresh canceled.
-        }
-        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
-        {
-            _logger.Warn(
-                ex,
-                "Pad inspector deferred refresh failed: CAD={0}.",
-                cadPadId);
-        }
-        finally
-        {
-            if (_padInspectorDeferredCadSlot.TryComplete(cts))
-            {
-                UpdatePadInspectorDeferredRefreshPendingState();
-            }
-        }
     }
 
     private DeferredCadInspectorContext? CaptureDeferredCadInspectorContext(
@@ -279,71 +218,6 @@ public sealed partial class FreeformHelperViewModel
 
         PadInspectorUi.Snapshot = snapshot;
         return true;
-    }
-
-    private async Task RunDeferredRegularInspectorSnapshotRefreshAsync(
-        long requestId,
-        int regularPadId,
-        long selectionRevision,
-        CancellationTokenSource cts,
-        CancellationToken cancellationToken)
-    {
-        var sw = Stopwatch.StartNew();
-        try
-        {
-            await Task.Delay(TimeSpan.FromMilliseconds(RegularPadInspectorDeferredRefreshDelayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
-            if (cancellationToken.IsCancellationRequested ||
-                requestId != _padInspectorRequests.ReadRegularRefreshRequestId())
-            {
-                return;
-            }
-
-            if (!UiThread.TryGetRunningDispatcher(out var dispatcher))
-            {
-                return;
-            }
-
-            await dispatcher!.InvokeAsync(() =>
-            {
-                if (!CanApplyDeferredRegularInspectorSnapshot(requestId, regularPadId, selectionRevision))
-                {
-                    return;
-                }
-
-                var snapshot = BuildRegularPadInspectorSnapshot(
-                    regularPadId,
-                    includeMatchDetails: true,
-                    includeRuleTrace: true);
-                if (snapshot is null)
-                {
-                    return;
-                }
-
-                PadInspectorUi.Snapshot = snapshot;
-                _logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: REG={0}, elapsed={1}ms (delay={2}ms).",
-                    regularPadId,
-                    sw.ElapsedMilliseconds,
-                    RegularPadInspectorDeferredRefreshDelayMs);
-            }, DispatcherPriority.Background, cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            // Deferred refresh canceled.
-        }
-        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
-        {
-            _logger.Warn(
-                ex,
-                "Pad inspector deferred refresh failed: REG={0}.",
-                regularPadId);
-        }
-        finally
-        {
-            if (_padInspectorDeferredRegularSlot.TryComplete(cts))
-            {
-                UpdatePadInspectorDeferredRefreshPendingState();
-            }
-        }
     }
 
     private bool CanApplyDeferredCadInspectorSnapshot(DeferredCadInspectorContext context)
@@ -431,13 +305,6 @@ public sealed partial class FreeformHelperViewModel
         return PadInspectorUi.Snapshot?.Regular?.RegularPadId == regularPadId;
     }
 
-    private void UpdatePadInspectorDeferredRefreshPendingState()
-    {
-        PadInspectorUi.IsDeferredRefreshPending =
-            _padInspectorDeferredCadSlot.IsActive ||
-            _padInspectorDeferredRegularSlot.IsActive;
-    }
-
     private sealed record DeferredCadInspectorContext(
         long RequestId,
         long SelectionRevision,
@@ -449,4 +316,3 @@ public sealed partial class FreeformHelperViewModel
         int WorkflowDataSnapshotRevision,
         int CacheRevision);
 }
-
