@@ -9,7 +9,9 @@ using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Interaction;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Grid;
 using FreeformHelper.UI.ViewModels.Project;
+using FreeformHelper.UI.ViewModels.Sizing;
 using NLog;
 using Nvt.Core.Lifecycle;
 using Nvt.Core.Threading;
@@ -124,6 +126,8 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             OnPropertyChanged);
         _workflowPanelState = new WorkflowPanelState(SelectWorkspaceWorkStep, OnPropertyChanging, OnPropertyChanged);
         _projectEditingSession = new ProjectEditingSession(PublishProjectEditingAvailabilityChange);
+        _manualSizingOwner = new Lazy<ManualSizingOwner>(CreateManualSizingOwner, LazyThreadSafetyMode.None);
+        _gridMatchingOwner = new Lazy<GridMatchingOwner>(CreateGridMatchingOwner, LazyThreadSafetyMode.None);
         _dxfLayerImagePreferenceState = new DxfLayerImagePreferenceState(MarkUnsaved, SchedulePersistAppGeneralSettings);
         _projectUiSnapshotMapper = new ProjectUiSnapshotMapper(CreateProjectSnapshotReaders());
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
