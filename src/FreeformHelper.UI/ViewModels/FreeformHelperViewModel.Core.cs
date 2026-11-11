@@ -158,7 +158,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _dxfLayerImagePreferenceState = new DxfLayerImagePreferenceState(MarkUnsaved, SchedulePersistAppGeneralSettings);
         _projectUiSnapshotMapper = new ProjectUiSnapshotMapper(CreateProjectSnapshotReaders());
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
-        _statusReporter = new UiOperationStatusReporter(message => StatusText = message);
+        (_statusReporter, _simulationSessionBuilder) = CreateSimulationServices();
         RegularMask = CreateRegularMask();
         UiEvents = uiEvents ?? new UiEventRunner(new UiEventFailureReporter(_statusReporter).Report, EmergencyLogSink.Report);
         _appGeneralSettingsStore = appGeneralSettingsStore ?? new AppGeneralSettingsStore();

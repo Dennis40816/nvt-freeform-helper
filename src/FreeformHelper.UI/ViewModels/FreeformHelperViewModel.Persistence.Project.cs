@@ -123,7 +123,7 @@ public sealed partial class FreeformHelperViewModel
         installDocument: file => _projectFile = file,
         invalidateWorkflowSnapshot: InvalidateWorkflowDataSnapshot,
         setPath: path => _projectSession.LastSavedPath = path,
-        beginSourceChangeBatch: () => BeginSimulationWorkspaceSourceChangeBatch(),
+        beginSourceChangeBatch: () => _simulationSessionBuilder.SourceChanges.Begin(),
         replaceCustomPadValues: file =>
         {
             _cadPadCustomValues.Clear();
