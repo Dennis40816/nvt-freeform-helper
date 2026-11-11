@@ -47,8 +47,8 @@ public partial class LeftDxfPanel : UserControl
     private async Task ResetAllDxfEditsAsync()
     {
         if (DataContext is not FreeformHelperViewModel viewModel ||
-            !viewModel.HasAnyCadEdits ||
-            !viewModel.ResetAllDxfEditsCommand.CanExecute(null))
+            !viewModel.DxfEdit.HasAnyCadEdits ||
+            !viewModel.DxfEdit.ResetAllDxfEditsCommand.CanExecute(null))
         {
             return;
         }
@@ -73,6 +73,6 @@ public partial class LeftDxfPanel : UserControl
             return;
         }
 
-        viewModel.ResetAllDxfEditsCommand.Execute(null);
+        viewModel.DxfEdit.ResetAllDxfEditsCommand.Execute(null);
     }
 }

@@ -59,14 +59,17 @@ internal static class FreeformHelperViewModelPrivateAccess
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyCadLoadOutcomeAsync")]
     public static extern Task ApplyCadLoadOutcomeAsync(FreeformHelperViewModel viewModel, CadLoadOutcome outcome, UiViewSnapshot? snapshot);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildDxfEditChangeEntries")]
-    public static extern List<DxfEditChangeListEntry> BuildDxfEditChangeEntries(FreeformHelperViewModel viewModel);
+    public static List<DxfEditChangeListEntry> BuildDxfEditChangeEntries(FreeformHelperViewModel viewModel) =>
+        viewModel.DxfEdit.BuildDxfEditChangeEntries();
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyDxfEditChangeEntry")]
-    public static extern void ApplyDxfEditChangeEntry(FreeformHelperViewModel viewModel, DxfEditChangeListEntry entry);
+    public static void ApplyDxfEditChangeEntry(FreeformHelperViewModel viewModel, DxfEditChangeListEntry entry) =>
+        viewModel.DxfEdit.ApplyDxfEditChangeEntry(entry);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "RestoreHiddenCadPad")]
-    public static extern void RestoreHiddenCadPad(FreeformHelperViewModel viewModel, int cadPadId);
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_actions")]
+    private static extern ref IDxfEditActions DxfEditActions(DxfEditViewModel viewModel);
+
+    public static void RestoreHiddenCadPad(FreeformHelperViewModel viewModel, int cadPadId) =>
+        DxfEditActions(viewModel.DxfEdit).RestoreHiddenEntry(cadPadId);
 
     public static CadPadSet? BuildActiveCadPadSet(FreeformHelperViewModel viewModel) => viewModel.CadDocument.BuildActiveCad();
 

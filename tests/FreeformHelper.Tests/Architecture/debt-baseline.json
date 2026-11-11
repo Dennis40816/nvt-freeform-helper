@@ -11,7 +11,7 @@
     "bareCatch": 0,
     "catchException": 1,
     "suppressFlagFields": 2,
-    "freeformViewModelStateMembers": 39,
+    "freeformViewModelStateMembers": 37,
     "shellNavigationBooleans": 0,
     "noWarnIds": 1
   },
@@ -37,8 +37,7 @@
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:16"
     ],
     "freeformViewModelStateMembers": [
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:76", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:91", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:94",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:126", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:132", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:138", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:210", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:214",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:76", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:93", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:96",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:162", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:167", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:172", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:181",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs:12",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:10",
@@ -50,7 +49,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.NotchPreview.cs:12",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SimulationSafetyOverview.cs:15",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:71",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:20", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:26", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:32", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:47", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:62",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:21", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:27", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:33", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:48", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:63", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:156", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:162", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:168",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Undo.cs:21"
     ],
     "shellNavigationBooleans": [],
@@ -86,7 +85,7 @@
       "src/FreeformHelper.UI/Services/NotchDisplayProjector.cs", "src/FreeformHelper.UI/Services/NotchExportSelectionColumnFilterService.cs",
       "src/FreeformHelper.UI/Services/NotchExportSelectionProjectionBuilder.cs", "src/FreeformHelper.UI/Services/NotchExportSelectionRowSelectionService.cs",
       "src/FreeformHelper.UI/Services/NotchExportSelectionSelectedRowService.cs", "src/FreeformHelper.UI/Services/NotchExportSelectionSummaryProjector.cs",
-      "src/FreeformHelper.UI/Services/NotchExportSelectionWorkspaceLinkService.cs", "src/FreeformHelper.UI/Services/ProjectEditingCommands.cs",
+      "src/FreeformHelper.UI/Services/NotchExportSelectionWorkspaceLinkService.cs",
       "src/FreeformHelper.UI/Services/RuntimeQueryIpcHost.cs", "src/FreeformHelper.UI/Services/RuntimeQueryMultiOwnerCommands.cs",
       "src/FreeformHelper.UI/Services/RuntimeQueryNotchCacheService.cs", "src/FreeformHelper.UI/Services/RuntimeQueryOutputCommands.cs",
       "src/FreeformHelper.UI/Services/RuntimeQueryPadCommands.cs", "src/FreeformHelper.UI/Services/RuntimeQueryResponseBuilder.cs",

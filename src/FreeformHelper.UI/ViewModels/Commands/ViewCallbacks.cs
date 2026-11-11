@@ -19,7 +19,6 @@ internal sealed class ViewCallbacks
     public Func<NotchDetailViewModel, Task>? OpenNotchDetailAsync { get; set; }
     public Func<NotchExportSelectionViewModel, Task<NotchTable?>>? OpenNotchExportSelectionAsync { get; set; }
     public Func<SimulationSafetyAuditResult?>? GetCurrentSimulationSafetyAudit { get; set; }
-    public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get; set; }
     public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get; set; }
     public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get; set; }
     public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get; set; }

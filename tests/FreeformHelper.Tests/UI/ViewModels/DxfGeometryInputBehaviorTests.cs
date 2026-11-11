@@ -73,7 +73,7 @@ public sealed class DxfGeometryInputBehaviorTests
         if (targetLayer)
         {
             vm.SelectedDxfEditRotationScopeOption = vm.DxfEditRotationScopeOptions.Single(
-                static option => option.Value == FreeformHelperViewModel.DxfEditRotationScope.TargetLayer);
+                static option => option.Value == FreeformHelper.UI.CadEditing.DxfEditRotationScope.TargetLayer);
         }
         vm.DxfEditRotationLayerName = layerName;
         vm.DxfEditRotationDegrees = 45m;

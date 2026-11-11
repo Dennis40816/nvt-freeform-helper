@@ -54,21 +54,6 @@ internal sealed class WorkspaceNavigationPresentation(
         : source.HasDxfOverlapIssues ? $"{source.DxfOverlapIssueCount} overlaps"
         : source.IsDxfOverlapNotRun ? "Not checked" : "Checked";
 
-    public string DxfEditsHeaderText =>
-        $"Hidden {source.DeletedCadPadCount} · Merged {source.CombinedCadPadCount}";
-
-    public string DxfRotationScopeHint
-    {
-        get
-        {
-            var scope = source.GetRotationScope();
-            if (!scope.UsesLayer) return "Applies to selected CAD pads.";
-            return scope.MatchesSelection
-                ? "Applies to the chosen layer."
-                : $"Layer scope · {scope.TargetCount} target pads; selection is unchanged.";
-        }
-    }
-
     public string ValidationTraceHint => source.HasNotchValidationItems
         ? "Trace ready; expand a category to inspect its rows."
         : source.NotchValidationSummaryText;
@@ -101,15 +86,6 @@ internal sealed class WorkspaceNavigationPresentation(
         if (propertyName is "DxfOverlapResult" or "IsCheckingDxfOverlap")
         {
             propertyChanged(nameof(DxfCheckHeaderText));
-        }
-        if (propertyName is "DeletedCadPadCount" or "CombinedCadPadCount")
-        {
-            propertyChanged(nameof(DxfEditsHeaderText));
-        }
-        if (propertyName is "SelectedDxfEditRotationScopeOption" or "DxfEditRotationLayerName"
-            or "CanRotateSelectedCadPads")
-        {
-            propertyChanged(nameof(DxfRotationScopeHint));
         }
     }
 

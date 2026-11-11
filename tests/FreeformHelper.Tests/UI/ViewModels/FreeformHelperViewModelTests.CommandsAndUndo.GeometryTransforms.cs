@@ -82,7 +82,7 @@ public sealed partial class FreeformHelperViewModelTests
             CreateCad(3, "aux", 20, 0, 24, 2),
         };
         InitializeDxfEditCadState(vm, source);
-        vm.SelectedDxfEditRotationScopeOption = vm.DxfEditRotationScopeOptions.Single(static option => option.Value == FreeformHelperViewModel.DxfEditRotationScope.TargetLayer);
+        vm.SelectedDxfEditRotationScopeOption = vm.DxfEditRotationScopeOptions.Single(static option => option.Value == FreeformHelper.UI.CadEditing.DxfEditRotationScope.TargetLayer);
         vm.DxfEditRotationLayerName = "signal";
         vm.DxfEditRotationDegrees = 90m;
 

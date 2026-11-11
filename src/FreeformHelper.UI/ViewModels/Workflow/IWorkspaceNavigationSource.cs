@@ -20,9 +20,6 @@ internal interface IWorkspaceNavigationSource
     bool HasDxfOverlapIssues { get; }
     int DxfOverlapIssueCount { get; }
     bool IsDxfOverlapNotRun { get; }
-    int DeletedCadPadCount { get; }
-    int CombinedCadPadCount { get; }
     bool HasNotchValidationItems { get; }
     string NotchValidationSummaryText { get; }
-    (bool UsesLayer, bool MatchesSelection, int TargetCount) GetRotationScope();
 }
