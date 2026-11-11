@@ -22,7 +22,7 @@ public sealed class LayerFilterUseCase
             .ToList();
     }
 
-    public static LayerFilterResult Filter(CadPadSet cad, IReadOnlyCollection<FreeformHelperViewModel.LayerToggle> toggles)
+    public static LayerFilterResult Filter(CadPadSet cad, IReadOnlyCollection<LayerToggle> toggles)
     {
         var allowed = toggles
             .Where(t => t.IsSelected)

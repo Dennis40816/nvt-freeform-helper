@@ -14,7 +14,7 @@ namespace FreeformHelper.UI.ViewModels;
 /// <param name="IsDxfEditAdvancedPanelExpanded">Whether the advanced DXF edit block is expanded.</param>
 public sealed record DxfEditPanelInput(
     string DxfEditTargetLayerName,
-    FreeformHelperViewModel.DxfEditRotationScopeOption SelectedDxfEditRotationScopeOption,
+    DxfEditRotationScopeOption SelectedDxfEditRotationScopeOption,
     string DxfEditRotationLayerName,
     string DxfEditNewLayerName,
     decimal DxfEditRotationDegrees,

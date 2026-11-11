@@ -10,7 +10,6 @@ using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 using static FreeformHelper.Tests.FreeformHelperViewModelTests;
-using static FreeformHelper.UI.ViewModels.FreeformHelperViewModel;
 using Vm = FreeformHelper.UI.ViewModels.FreeformHelperViewModel;
 
 namespace FreeformHelper.Tests;

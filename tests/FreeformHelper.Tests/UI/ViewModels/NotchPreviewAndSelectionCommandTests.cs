@@ -69,7 +69,7 @@ public sealed class NotchPreviewAndSelectionCommandTests
                 new(0, 0, 11, polygon) { DiffIndex = 10 },
                 new(0, 1, 12, polygon) { DiffIndex = 11 },
             },
-            NotchValidationItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+            NotchValidationItems = new ObservableCollection<NotchValidationDisplayItem>
             {
                 CreateValidationItem(),
                 CreateValidationItem() with
@@ -82,9 +82,9 @@ public sealed class NotchPreviewAndSelectionCommandTests
         };
     }
 
-    private static FreeformHelperViewModel.NotchValidationDisplayItem CreateValidationItem()
+    private static NotchValidationDisplayItem CreateValidationItem()
     {
-        return new FreeformHelperViewModel.NotchValidationDisplayItem(
+        return new NotchValidationDisplayItem(
             KindText: "DIRECT",
             RowText: "#1",
             VersionText: "2.2",

@@ -14,9 +14,9 @@ namespace FreeformHelper.UI.ViewModels;
 /// <param name="DxfRegularSourceHint">Helper text for DXF regular-source validation and suggested IC/grid settings.</param>
 public sealed record LayerSourceSelection(
     bool HasCadLayers,
-    FreeformHelperViewModel.BoundLayerOption SelectedBoundLayerOption,
+    BoundLayerOption SelectedBoundLayerOption,
     string BoundLayerOptionSummary,
-    FreeformHelperViewModel.RegularSourceLayerOption SelectedRegularSourceLayerOption,
+    RegularSourceLayerOption SelectedRegularSourceLayerOption,
     string DxfRegularSourceHint)
 {
     /// <summary>
@@ -24,8 +24,8 @@ public sealed record LayerSourceSelection(
     /// </summary>
     public static LayerSourceSelection Initial { get; } = new(
         false,
-        new FreeformHelperViewModel.BoundLayerOption(null, "Auto (visible layers)"),
+        new BoundLayerOption(null, "Auto (visible layers)"),
         "Hidden bounds layer is still valid.",
-        new FreeformHelperViewModel.RegularSourceLayerOption(null, "Select layer"),
+        new RegularSourceLayerOption(null, "Select layer"),
         string.Empty);
 }

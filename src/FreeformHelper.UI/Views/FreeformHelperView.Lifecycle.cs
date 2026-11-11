@@ -179,7 +179,7 @@ public sealed partial class FreeformHelperView
             return;
         }
 
-        if (control.DataContext is not FreeformHelperViewModel.LayerToggle toggle)
+        if (control.DataContext is not LayerToggle toggle)
         {
             return;
         }

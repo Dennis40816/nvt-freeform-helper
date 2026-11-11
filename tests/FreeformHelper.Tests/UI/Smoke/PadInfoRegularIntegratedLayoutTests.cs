@@ -317,7 +317,7 @@ public sealed class PadInfoRegularIntegratedLayoutTests
             setFreeform: static (_, _) => { },
             getCrossIcOwnerShares: static _ => [(201, 75)],
             getNotchRowsByRegularPad: static id =>
-                [new FreeformHelperViewModel.NotchRowPreview(2, NotchAlgorithmVersion.V22, 0, 9, id, 201, "values", "comment")],
+                [new NotchRowPreview(2, NotchAlgorithmVersion.V22, 0, 9, id, 201, "values", "comment")],
             highlightCadOwnerPads: highlight ?? (static _ => { }),
             focusRegularMatches: focus ?? (static _ => { }),
             highlightRegularMatches: null);

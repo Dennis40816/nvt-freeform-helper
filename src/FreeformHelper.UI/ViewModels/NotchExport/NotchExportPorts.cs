@@ -19,7 +19,7 @@ internal sealed class NotchExportPorts(
     NotchExportTryGetInputs tryGetInputs,
     Func<Func<string, string, Task<string?>>?> getSavePicker,
     Func<CadPadSet, RegularGrid, string, bool, Task<NotchTable?>> buildTableAsync,
-    Func<FreeformHelperViewModel.NotchExportFileTypeOption> getExportType,
+    Func<NotchExportFileTypeOption> getExportType,
     Func<ProjectSettings> getSettings,
     Func<(bool IsAllowed, string? Message)> validateWorkflowGate,
     Func<Func<bool>> captureGenerationCurrency,
@@ -28,7 +28,7 @@ internal sealed class NotchExportPorts(
     public NotchExportTryGetInputs TryGetInputs { get; } = tryGetInputs;
     public Func<Func<string, string, Task<string?>>?> GetSavePicker { get; } = getSavePicker;
     public Func<CadPadSet, RegularGrid, string, bool, Task<NotchTable?>> BuildTableAsync { get; } = buildTableAsync;
-    public Func<FreeformHelperViewModel.NotchExportFileTypeOption> GetExportType { get; } = getExportType;
+    public Func<NotchExportFileTypeOption> GetExportType { get; } = getExportType;
     public Func<ProjectSettings> GetSettings { get; } = getSettings;
     public Func<(bool IsAllowed, string? Message)> ValidateWorkflowGate { get; } = validateWorkflowGate;
     public Func<Func<bool>> CaptureGenerationCurrency { get; } = captureGenerationCurrency;

@@ -112,7 +112,7 @@ public static class CadLayerUiSnapshotBuilder
         return string.Equals(layerName, "regular", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static List<FreeformHelperViewModel.BoundLayerOption> BuildBoundLayerOptions(
+    private static List<BoundLayerOption> BuildBoundLayerOptions(
         List<string> layerNames,
         string? pendingBoundLayerName,
         string? selectedBoundLayerName,
@@ -120,7 +120,7 @@ public static class CadLayerUiSnapshotBuilder
         out string? resolvedSelectedBoundLayerName,
         out string boundLayerOptionSummary)
     {
-        var options = new List<FreeformHelperViewModel.BoundLayerOption>
+        var options = new List<BoundLayerOption>
         {
             new(null, "Auto (visible layers)")
         };
@@ -165,7 +165,7 @@ public static class CadLayerUiSnapshotBuilder
                 .ToList();
         }
 
-        options.AddRange(displayNames.Select(name => new FreeformHelperViewModel.BoundLayerOption(name, name)));
+        options.AddRange(displayNames.Select(name => new BoundLayerOption(name, name)));
 
         boundLayerOptionSummary = distinctNames.Count > displayNames.Count
             ? $"Hidden bounds layer is valid. Showing {displayNames.Count}/{distinctNames.Count}."
@@ -177,17 +177,17 @@ public static class CadLayerUiSnapshotBuilder
         return options;
     }
 
-    private static List<FreeformHelperViewModel.RegularSourceLayerOption> BuildRegularSourceLayerOptions(
+    private static List<RegularSourceLayerOption> BuildRegularSourceLayerOptions(
         List<string> layerNames,
         string? pendingRegularSourceLayerName,
         string? selectedRegularSourceLayerName,
         out string? resolvedSelectedRegularSourceLayerName)
     {
-        var options = new List<FreeformHelperViewModel.RegularSourceLayerOption>
+        var options = new List<RegularSourceLayerOption>
         {
             new(null, "Select layer")
         };
-        options.AddRange(layerNames.Select(name => new FreeformHelperViewModel.RegularSourceLayerOption(name, name)));
+        options.AddRange(layerNames.Select(name => new RegularSourceLayerOption(name, name)));
 
         var desired = string.IsNullOrWhiteSpace(pendingRegularSourceLayerName)
             ? selectedRegularSourceLayerName
@@ -228,10 +228,10 @@ public sealed record CadLayerUiSnapshotRequest(
 public sealed record CadLayerUiSnapshot(
     IReadOnlyList<CadLayerToggleState> ToggleStates,
     bool HasCadLayers,
-    IReadOnlyList<FreeformHelperViewModel.BoundLayerOption> BoundLayerOptions,
+    IReadOnlyList<BoundLayerOption> BoundLayerOptions,
     string? SelectedBoundLayerName,
     string BoundLayerOptionSummary,
-    IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayerOptions,
+    IReadOnlyList<RegularSourceLayerOption> RegularSourceLayerOptions,
     string? SelectedRegularSourceLayerName,
     IReadOnlyList<string> DxfEditLayerOptions,
     string SelectedDxfEditTargetLayerName,

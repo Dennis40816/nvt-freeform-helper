@@ -38,12 +38,12 @@ public sealed class NotchExportSelectionCallerBehaviorTests
                 [10, 128, 11, 64, 0, 65535, 0, 0, 0], "legacy"),
             new(0, 11, 101, 201, new NotchV22Node(11, 90, 12, 10, 65535, 0, 0), "transfer"),
         ];
-        FreeformHelperViewModel.NotchExportFileTypeOption[] offered =
+        NotchExportFileTypeOption[] offered =
         [
             new(FreeformHelperViewModel.NotchExportFileType.Cv22, "C v2.2 (.c)", "c", NotchAlgorithmVersion.V22),
             new(FreeformHelperViewModel.NotchExportFileType.Csv, "CSV review (.csv)", "csv"),
         ];
-        var removedPreference = new FreeformHelperViewModel.NotchExportFileTypeOption(
+        var removedPreference = new NotchExportFileTypeOption(
             FreeformHelperViewModel.NotchExportFileType.Cv21, "C v2.1 (.c)", "c", NotchAlgorithmVersion.V21);
 
         var vm = new NotchExportSelectionViewModel(
