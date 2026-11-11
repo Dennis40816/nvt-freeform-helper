@@ -141,6 +141,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
         (_cadEditWorkflow, _cadEditReplay) = CreateCadEditEngine();
+        _selectionOwner = new(CreateSelectionOwner, LazyThreadSafetyMode.None);
         _settingsState = new SettingsStateViewModel(this);
         _fwAssignmentSettings = new FwAssignmentSettingsViewModel(this);
         _canvasStrokeFillState = new CanvasStrokeFillState(
@@ -206,7 +207,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _dxfEditCommands = CreateDxfEditCommands(); // Keep DXF edit command registration next.
         _generalCommands = CreateGeneralCommands(); // Finish command registration in the original order.
         StartupPerfTracker.Mark("workspace.vm-commands-initialized");
-        // Subscribe to selection changes from the InteractionState.
         InteractionState.SelectionChanged += OnInteractionSelectionChanged;
         _gridRebuildUseCase = new GridRebuildUseCase(RequestFitAfterNextRebuild, RebuildGridAsync);
         _selectionCoordinator = new SelectionCoordinator(InteractionState);
