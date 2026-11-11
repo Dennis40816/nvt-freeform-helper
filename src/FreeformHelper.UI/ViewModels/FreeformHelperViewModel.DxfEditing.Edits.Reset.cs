@@ -14,8 +14,8 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var undoSnapshot = CaptureCadEditUndoSnapshot();
-        var previous = new CadEditNotificationSnapshot(this);
+        var undoSnapshot = CadDocument.CaptureUndo();
+        var previous = CaptureCadEditNotifications();
         var restored = _cadEdit.HiddenCadPadIds.Count;
         var removedCombined = _combinedCad.OutputCadIds.Count;
         var restoredLayerMoves = RelayeredCadPadCount;
@@ -32,7 +32,7 @@ public sealed partial class FreeformHelperViewModel
         _cadEdit.HiddenCadPadIds.Clear();
         _cadEdit.HiddenUndoStack.Clear();
         _combinedCad.Clear();
-        _cachedFilteredCadForBuild = null;
+        CadDocument.InvalidateFilteredCad();
         SyncRelayeredCadState(previous);
         SyncRotatedCadState(previous);
         SyncHiddenCadIdsToProject(previous);
@@ -61,7 +61,7 @@ public sealed partial class FreeformHelperViewModel
             restoredLayerMoves,
             restoredRotations);
         MarkUnsaved();
-        PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), "DXF reset all edits");
+        PushUndo(() => _cadEditWorkflow.RestoreUndo(undoSnapshot), "DXF reset all edits");
     }
 
     private int RemoveCombinedPadsFromCadSet()

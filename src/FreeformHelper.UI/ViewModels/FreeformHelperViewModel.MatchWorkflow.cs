@@ -76,7 +76,7 @@ public sealed partial class FreeformHelperViewModel
         TryGetOperationCadAndGrid(BuildFilteredCadPadSet, missingStatus, out cad, out grid);
 
     private bool GetActiveMatchInputs(string missingStatus, out CadPadSet cad, out RegularGrid grid) =>
-        TryGetOperationCadAndGrid(BuildActiveCadPadSet, missingStatus, out cad, out grid);
+        TryGetOperationCadAndGrid(CadDocument.BuildActiveCad, missingStatus, out cad, out grid);
 
     private GridStatusPorts CreateGridStatusPorts(string operationName)
     {

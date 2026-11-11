@@ -3,6 +3,7 @@ using System.Globalization;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadEditing;
 using FreeformHelper.UI.Services;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -10,21 +11,21 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel
 {
     private Task ApplyCadLoadOutcomeAsync(CadLoadOutcome outcome, UiViewSnapshot? snapshot) =>
-        ApplyCadLoadOutcomeCoreAsync(outcome, snapshot, new CadEditNotificationSnapshot(this));
+        ApplyCadLoadOutcomeCoreAsync(outcome, snapshot, CaptureCadEditNotifications());
 
     private async Task ApplyCadLoadOutcomeCoreAsync(CadLoadOutcome outcome, UiViewSnapshot? snapshot, CadEditNotificationSnapshot? previous)
     {
-        previous ??= new CadEditNotificationSnapshot(this);
+        previous ??= CaptureCadEditNotifications();
         _cad = outcome.Cad;
         RegularMask.Workflow.ResetSelection(clearProjectEmbeddedMask: !_isLoadingSettings);
-        ClearAutoHiddenDuplicateCadPadState();
-        ClearDxfEditRuntimeState(resetBaseline: false, previous);
-        SetAutoHiddenDuplicateCadPads(outcome.DuplicateSanitization);
-        ResetDxfEditBaselineCore(outcome.Cad, previous);
+        CadDocument.ClearAutoHiddenDuplicates();
+        _cadEditWorkflow.ClearRuntime(resetBaseline: false, previous);
+        _cadEditWorkflow.SetAutoHiddenDuplicates(outcome.DuplicateSanitization);
+        _cadEditWorkflow.ResetBaseline(outcome.Cad, previous);
         SyncHiddenCadIdsToProject(previous);
         SyncCombinedCadState(previous);
         SyncDuplicateCadState(previous);
-        _cachedFilteredCadForBuild = null;
+        CadDocument.InvalidateFilteredCad();
 
         var layerUiSnapshot = await Task.Run(() => BuildCadLayerUiSnapshot(outcome.Cad, snapshot?.LayerSelections));
 
@@ -209,8 +210,8 @@ public sealed partial class FreeformHelperViewModel
             },
             ResetHiddenCadPads = () =>
             {
-                previous = new CadEditNotificationSnapshot(this);
-                ResetHiddenCadPads(previous);
+                previous = CaptureCadEditNotifications();
+                _cadEditWorkflow.ResetHiddenPads(previous);
             },
             ApplyCadLoadOutcomeAsync = outcome => ApplyCadLoadOutcomeCoreAsync(outcome, null, previous),
             SetProjectLastDxfPath = selectedPath => _projectFile.LastDxfPath = selectedPath,
@@ -242,17 +243,17 @@ public sealed partial class FreeformHelperViewModel
             return null;
         }
 
-        if (_cachedFilteredCadForBuild is not null)
+        if (CadDocument.FilteredCad is not null)
         {
-            return _cachedFilteredCadForBuild;
+            return CadDocument.FilteredCad;
         }
 
         var result = LayerFilterUseCase.Filter(_cad, LayerToggles);
         var visible = result.VisiblePads
-            .Where(p => !IsCadPadEffectivelyHidden(p.Id))
+            .Where(p => !CadDocument.IsEffectivelyHidden(p.Id))
             .ToList();
-        _cachedFilteredCadForBuild = new CadPadSet(visible);
-        return _cachedFilteredCadForBuild;
+        CadDocument.PublishFilteredCad(new CadPadSet(visible));
+        return CadDocument.FilteredCad;
     }
 
     private CadPadSet? BuildCadPadSetForBounds()
@@ -266,7 +267,7 @@ public sealed partial class FreeformHelperViewModel
         if (!string.IsNullOrWhiteSpace(boundLayer))
         {
             var pads = _cad.Pads
-                .Where(p => !IsCadPadEffectivelyHidden(p.Id))
+                .Where(p => !CadDocument.IsEffectivelyHidden(p.Id))
                 .Where(p => string.Equals(p.Layer, boundLayer, StringComparison.OrdinalIgnoreCase))
                 .ToList();
             if (pads.Count > 0)
@@ -285,7 +286,7 @@ public sealed partial class FreeformHelperViewModel
             return _cad;
         }
 
-        return BuildActiveCadPadSet();
+        return CadDocument.BuildActiveCad();
     }
 }
 

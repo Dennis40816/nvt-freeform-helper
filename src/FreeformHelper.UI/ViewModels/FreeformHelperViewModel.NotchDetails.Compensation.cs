@@ -70,7 +70,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var visibleCadPads = CadPads
-            .Where(pad => !IsCadPadEffectivelyHidden(pad.Id))
+            .Where(pad => !CadDocument.IsEffectivelyHidden(pad.Id))
             .ToList();
         var strictOverlapRatio = NotchV22CompensationService.NormalizeStrictOverlapRatio(
             (strictOverlapPercentOverride.HasValue

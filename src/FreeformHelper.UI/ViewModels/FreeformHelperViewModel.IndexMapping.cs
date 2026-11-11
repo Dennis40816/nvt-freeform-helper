@@ -25,7 +25,7 @@ public sealed partial class FreeformHelperViewModel
             (message, arguments) => _logger.Info(CultureInfo.InvariantCulture, message, arguments),
             (message, arguments) => _logger.Warn(CultureInfo.InvariantCulture, message, arguments));
         var assignmentPorts = new IndexAssignmentPorts(ReadIndexMappingSnapshot,
-            pads => CadPads = pads, cad => _cachedFilteredCadForBuild = cad,
+            pads => CadPads = pads, cad => CadDocument.PublishFilteredCad(cad),
             BumpNotchExportCadFingerprint, BumpNotchExportIndexFingerprint, InvalidateWorkflowDataSnapshot,
             ids => CadOutputFwDiffIndexOverrideCadIds = ids,
             ids => CadOutputFwDiffIndexAnchorCadIdsForCanvas = ids,

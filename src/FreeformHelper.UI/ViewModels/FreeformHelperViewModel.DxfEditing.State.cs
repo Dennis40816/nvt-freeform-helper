@@ -1,8 +1,9 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FreeformHelper.Application.CadEditing;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.UI.CadEditing;
 
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
@@ -10,18 +11,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    // UI-thread owned, operation-local notification history; never retained on the ViewModel.
-    // Advance each source only at its Sync point, including multi-source edits and DXF reloads.
-    private sealed class CadEditNotificationSnapshot(FreeformHelperViewModel owner)
-    {
-        public int Deleted { get; set; } = owner.DeletedCadPadCount;
-        public int Duplicate { get; set; } = owner.DuplicateCadPadCount;
-        public int Combined { get; set; } = owner.CombinedCadPadCount;
-        public int Relayered { get; set; } = owner.RelayeredCadPadCount;
-        public int Rotated { get; set; } = owner.RotatedCadPadCount;
-        public bool HasAny => HasDxfEditChanges(Deleted > 0, Combined > 0, Relayered > 0, Rotated > 0);
-    }
-
     private static bool HasDxfEditChanges(bool deleted, bool combined, bool relayered, bool rotated) =>
         deleted || combined || relayered || rotated;
 
@@ -36,69 +25,14 @@ public sealed partial class FreeformHelperViewModel
         OnPropertyChanged(propertyName);
     }
 
-    private void ClearDxfEditRuntimeState(bool resetBaseline, CadEditNotificationSnapshot previous)
-    {
-        _cadEdit.HiddenCadPadIds.Clear();
-        _cadEdit.HiddenUndoStack.Clear();
-        _combinedCad.Clear();
-        if (resetBaseline)
-        {
-            ResetDxfEditBaselineCore(_cad, previous);
-        }
-    }
-
     private void ResetDxfEditBaseline(CadPadSet? cad)
     {
-        ResetDxfEditBaselineCore(cad, new CadEditNotificationSnapshot(this));
-    }
-
-    private void ResetDxfEditBaselineCore(CadPadSet? cad, CadEditNotificationSnapshot previous)
-    {
-        _cadEdit.BaselineCad = cad is null
-            ? null
-            : new CadPadSet(cad.Pads.ToList());
-        SyncRelayeredCadState(previous);
-        SyncRotatedCadState(previous);
-    }
-
-    private void SetHiddenCadPads(IEnumerable<int> hiddenIds, CadEditNotificationSnapshot? previous = null)
-    {
-        previous ??= new CadEditNotificationSnapshot(this);
-        _cadEdit.HiddenCadPadIds.Clear();
-
-        if (_cad is null)
-        {
-            SyncHiddenCadIdsToProject(previous);
-            SyncCombinedCadState(previous);
-            return;
-        }
-
-        var valid = _cad.Pads.Select(p => p.Id).ToHashSet();
-        foreach (var id in hiddenIds)
-        {
-            if (valid.Contains(id))
-            {
-                _cadEdit.HiddenCadPadIds.Add(id);
-            }
-        }
-
-        SyncHiddenCadIdsToProject(previous);
-        SyncCombinedCadState(previous);
-        _logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads set from project. Hidden total={0}.", _cadEdit.HiddenCadPadIds.Count);
-    }
-
-    private void ResetHiddenCadPads(CadEditNotificationSnapshot previous)
-    {
-        ClearDxfEditRuntimeState(resetBaseline: true, previous);
-        ClearAutoHiddenDuplicateCadPadState();
-        SyncHiddenCadIdsToProject(previous);
-        SyncCombinedCadState(previous);
-        _logger.Debug(CultureInfo.InvariantCulture, "DXF hidden pads reset.");
+        _cadEditWorkflow.ResetBaseline(cad, CaptureCadEditNotifications());
     }
 
     private void SyncHiddenCadIdsToProject(CadEditNotificationSnapshot? previous = null)
     {
-        previous ??= new CadEditNotificationSnapshot(this);
+        previous ??= CaptureCadEditNotifications();
         var hadEdits = previous.HasAny;
         if (_cad is not null)
         {
@@ -114,7 +48,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void SyncCombinedCadState(CadEditNotificationSnapshot? previous = null)
     {
-        previous ??= new CadEditNotificationSnapshot(this);
+        previous ??= CaptureCadEditNotifications();
         var hadEdits = previous.HasAny;
         NotifyCadEditProjectionChange(nameof(CombinedCadPadCount), previous.Combined, CombinedCadPadCount);
         NotifyCadEditProjectionChange(nameof(HasCombinedCadPads), previous.Combined > 0, HasCombinedCadPads);
@@ -128,13 +62,13 @@ public sealed partial class FreeformHelperViewModel
     // Without a CAD, the saved visible duplicate ids stay in the project file (persistToProject: false).
     private void SyncDuplicateCadState(CadEditNotificationSnapshot? previous = null, bool persistToProject = true)
     {
-        previous ??= new CadEditNotificationSnapshot(this);
+        previous ??= CaptureCadEditNotifications();
         NotifyCadEditProjectionChange(nameof(DuplicateCadPadCount), previous.Duplicate, DuplicateCadPadCount);
         NotifyCadEditProjectionChange(nameof(HasDuplicateCadPads), previous.Duplicate > 0, HasDuplicateCadPads);
         previous.Duplicate = DuplicateCadPadCount;
         if (persistToProject)
         {
-            _projectFile.VisibleDuplicateCadPadIds = GetRestoredDuplicateCadPadIds();
+            _projectFile.VisibleDuplicateCadPadIds = CadDocument.GetRestoredDuplicateIds();
         }
 
         OnPropertyChanged(nameof(HasDetectedDuplicateCadPads));
@@ -143,7 +77,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void SyncRelayeredCadState(CadEditNotificationSnapshot? previous = null)
     {
-        previous ??= new CadEditNotificationSnapshot(this);
+        previous ??= CaptureCadEditNotifications();
         var hadEdits = previous.HasAny;
         if (_cadEdit.BaselineCad is null || _cad is null)
         {
@@ -163,7 +97,7 @@ public sealed partial class FreeformHelperViewModel
 
     private void SyncRotatedCadState(CadEditNotificationSnapshot? previous = null)
     {
-        previous ??= new CadEditNotificationSnapshot(this);
+        previous ??= CaptureCadEditNotifications();
         var hadEdits = previous.HasAny;
         if (_cadEdit.BaselineCad is null || _cad is null)
         {
@@ -225,7 +159,21 @@ public sealed partial class FreeformHelperViewModel
     /// Gets or sets the count of CAD pads whose layer differs from the current DXF edit baseline.
     /// </summary>
     // UI-thread owned; sync measures the O(n) baseline scan so binding reads stay O(1).
-    [ObservableProperty] private int _relayeredCadPadCount;
+    public int RelayeredCadPadCount
+    {
+        get => CadDocument.EditDelta.Relayered;
+        set
+        {
+            if (value == RelayeredCadPadCount)
+            {
+                return;
+            }
+
+            OnPropertyChanging(nameof(RelayeredCadPadCount));
+            CadDocument.EditDelta = CadDocument.EditDelta with { Relayered = value };
+            OnPropertyChanged(nameof(RelayeredCadPadCount));
+        }
+    }
 
     /// <summary>Gets whether any CAD pad has been moved to a different layer.</summary>
     public bool HasRelayeredCadPads => RelayeredCadPadCount > 0;
@@ -234,7 +182,21 @@ public sealed partial class FreeformHelperViewModel
     /// Gets or sets the count of CAD pads whose polygon differs from the current DXF edit baseline.
     /// </summary>
     // UI-thread owned; sync measures the O(n) baseline scan so binding reads stay O(1).
-    [ObservableProperty] private int _rotatedCadPadCount;
+    public int RotatedCadPadCount
+    {
+        get => CadDocument.EditDelta.Rotated;
+        set
+        {
+            if (value == RotatedCadPadCount)
+            {
+                return;
+            }
+
+            OnPropertyChanging(nameof(RotatedCadPadCount));
+            CadDocument.EditDelta = CadDocument.EditDelta with { Rotated = value };
+            OnPropertyChanged(nameof(RotatedCadPadCount));
+        }
+    }
 
     /// <summary>Gets whether any CAD pad geometry differs from baseline.</summary>
     public bool HasRotatedCadPads => RotatedCadPadCount > 0;
@@ -385,9 +347,9 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public IReadOnlyList<DxfEditRotationScopeOption> DxfEditRotationScopeOptions { get; }
 
-    private readonly CadEditState _cadEdit = new(); // Holds the hidden, duplicate and baseline data of the CAD edits.
+    private CadEditState _cadEdit => CadDocument.Edit;
 
-    private readonly CombinedCadState _combinedCad = new();
+    private CombinedCadState _combinedCad => CadDocument.Combined;
 
     private static List<DxfEditRotationScopeOption> BuildDxfEditRotationScopeOptions() =>
         new List<DxfEditRotationScopeOption>
