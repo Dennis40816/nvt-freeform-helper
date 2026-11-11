@@ -76,8 +76,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         IReadOnlyList<string> Patterns,
         string Content);
 
-    private const double SignificantDeltaEpsilon = 1e-9;
-    private const double DefaultThresholdValue = 5d;
     private const double DefaultGlobalValue = 0d;
     private const double DefaultCopperPeakValue = 400d;
     private const double DefaultFingerPeakValue = 360d;
@@ -120,17 +118,10 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     private readonly SimulationSourceOwner<SimulationScenarioSnapshot, NotchApplySimulationImportedDataset> _source;
     private readonly SimulationPlaybackOwner _playback;
     private readonly SimulationCopperOwner _copper;
+    private readonly SimulationCanvasOwner<SimulationOverlayProjection> _canvas;
+    private readonly SimulationSelectionOwner _selection;
     private readonly SimulationWorkspaceUseCase _useCase;
     private readonly SimulationWorkspaceSession _session;
-    private readonly Dictionary<int, RegularPad> _regularPadById;
-    private readonly Dictionary<int, int> _cadOutputFwDiffByRegularPadId;
-    private readonly Dictionary<(int IcIndex, int DiffIndex), int[]> _regularPadIdsByIcDiff;
-    private readonly ObservableCollection<NotchApplySimulationImpactItemViewModel> _selectedImpactItems = new();
-    private readonly ObservableCollection<SimulationSafetyRiskDiffViewModel> _simulationHighRiskDiffs = new();
-    private IReadOnlyDictionary<int, NotchApplySimulationDiffCell> _cellsByRegularPadId = new Dictionary<int, NotchApplySimulationDiffCell>();
-    private Dictionary<int, NotchApplySimulationDiffCell> _snapshotCellsByRegularPadId = new();
-    private Dictionary<int, IReadOnlyList<NotchApplySimulationImpactItemViewModel>> _impactItemsByRegularPadId = new();
-    private SimulationLegendRange _legendRange;
     private readonly IReadOnlyList<CadPad> _cadPads;
     private readonly bool _showCad;
     private readonly bool _showRegular;
@@ -139,7 +130,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     private NotchApplySimulationImportedDataset _csvDataset => _source.Dataset;
     private IReadOnlyDictionary<int, double> _manualOverridesByRegularPadId => _source.ManualOverrides;
     private SimulationScenarioSnapshot? _snapshot => _source.Current;
-    private IReadOnlyList<NotchApplySimulationAaDisplayCell> _simulationOverlayItems = Array.Empty<NotchApplySimulationAaDisplayCell>();
 
     public SimulationWorkspaceViewModel(
         SimulationWorkspaceUseCase useCase,
@@ -148,22 +138,15 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         _useCase = useCase ?? throw new ArgumentNullException(nameof(useCase));
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _cadPads = _session.CadPads;
-        _regularPadById = _session.FwDiffGrid.Pads.ToDictionary(pad => pad.RegularPadId);
-        _cadOutputFwDiffByRegularPadId = BuildCadOutputFwDiffByRegularPadId(_session);
-        _regularPadIdsByIcDiff = BuildRegularPadIdsByIcDiff(_session);
         _showCad = false;
         _showRegular = _session.DefaultShowRegular;
         _highlightFreeform = _session.DefaultHighlightFreeform;
         _highlightUnmatched = _session.DefaultHighlightUnmatched;
 
-        CanvasViewOptions = _sharedCanvasViewOptions;
-        CanvasColorOptions = _sharedCanvasColorOptions;
-        AreaOptions = BuildAreaOptions(_session.FwDiffGrid.Pads);
-        SelectedImpactItems = new ReadOnlyObservableCollection<NotchApplySimulationImpactItemViewModel>(_selectedImpactItems);
-        SimulationHighRiskDiffs = new ReadOnlyObservableCollection<SimulationSafetyRiskDiffViewModel>(_simulationHighRiskDiffs);
+        _canvas = CreateCanvasOwner();
+        _selection = CreateSelectionOwner();
 
         FitCanvasCommand = new RelayCommand(() => FitCanvasRequested?.Invoke(this, EventArgs.Empty));
-        SelectSimulationRiskDiffCommand = new RelayCommand<SimulationSafetyRiskDiffViewModel?>(SelectSimulationRiskDiff);
         _source = CreateSourceOwner();
         _playback = new SimulationPlaybackOwner(
             new SimulationPlaybackOwner.Seed(0, false, true, DefaultPlaybackFramesPerSecond),
@@ -172,11 +155,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         _copper = CreateCopperOwner();
         _playback.EnsureTimer();
 
-        _selectedCanvasViewOption = _sharedCanvasViewOptions[0];
-        _selectedCanvasColorOption = _sharedCanvasColorOptions[0];
-        _selectedAreaOption = AreaOptions[0];
-        _colorThresholdValue = DefaultThresholdValue;
-        _selectedManualValue = DefaultGlobalValue;
         _statusText = "Simulation ready. Use Manual to set baseline values, or import CSV for frame playback.";
 
         _source.RefreshFrameOptions();
@@ -207,7 +185,7 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
             RefreshCommandState, RefreshSelectionPresentation,
             () => HasSelectedRegular, () => SelectedRegularPadId,
             () => SelectedManualValue, value => SelectedManualValue = value,
-            IsPadInSelectedAreaAndActiveSurface, () => SelectedCanvasViewMode,
+            _selection.IsPadInSelectedAreaAndActiveSurface, () => SelectedCanvasViewMode,
             () => SelectedAreaOption.Display, value => StatusText = value,
             name => OnPropertyChanging(name), name => OnPropertyChanged(name));
     }
@@ -275,14 +253,14 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
 
     public IReadOnlyList<SimulationInputSourceOption> SourceOptions => _source.SourceOptions;
     public IReadOnlyList<SimulationContactModelOption> CopperContactModelOptions => _copper.CopperContactModelOptions;
-    public IReadOnlyList<NotchApplySimulationCanvasViewOption> CanvasViewOptions { get; }
-    public IReadOnlyList<NotchApplySimulationCanvasColorOption> CanvasColorOptions { get; }
+    public IReadOnlyList<NotchApplySimulationCanvasViewOption> CanvasViewOptions => _canvas.CanvasViewOptions;
+    public IReadOnlyList<NotchApplySimulationCanvasColorOption> CanvasColorOptions => _canvas.CanvasColorOptions;
     public IReadOnlyList<NotchApplySimulationVersionOption> VersionOptions => _source.VersionOptions;
-    public IReadOnlyList<NotchApplySimulationAreaOption> AreaOptions { get; }
+    public IReadOnlyList<NotchApplySimulationAreaOption> AreaOptions => _canvas.AreaOptions;
     public ReadOnlyObservableCollection<NotchApplySimulationSourceFileItemViewModel> CsvFiles => _source.CsvFiles;
     public ReadOnlyObservableCollection<NotchApplySimulationFrameOption> FrameOptions => _source.FrameOptions;
-    public ReadOnlyObservableCollection<NotchApplySimulationImpactItemViewModel> SelectedImpactItems { get; }
-    public ReadOnlyObservableCollection<SimulationSafetyRiskDiffViewModel> SimulationHighRiskDiffs { get; }
+    public ReadOnlyObservableCollection<NotchApplySimulationImpactItemViewModel> SelectedImpactItems => _selection.SelectedImpactItems;
+    public ReadOnlyObservableCollection<SimulationSafetyRiskDiffViewModel> SimulationHighRiskDiffs => _selection.SimulationHighRiskDiffs;
     public ReadOnlyObservableCollection<CopperPillarPathReplayArtifactRow> CopperPathReplayRows => _copper.CopperPathReplayRows;
 
     public IAsyncRelayCommand ImportCsvCommand => _source.ImportCsvCommand;
@@ -296,7 +274,7 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     public IRelayCommand ClearSelectedOverrideCommand => _source.ClearSelectedOverrideCommand;
     public IRelayCommand ClearAllManualOverridesCommand => _source.ClearAllManualOverridesCommand;
     public IRelayCommand FitCanvasCommand { get; }
-    public IRelayCommand<SimulationSafetyRiskDiffViewModel?> SelectSimulationRiskDiffCommand { get; }
+    public IRelayCommand<SimulationSafetyRiskDiffViewModel?> SelectSimulationRiskDiffCommand => _selection.SelectSimulationRiskDiffCommand;
     public IRelayCommand ReplayCopperPathCommand => _copper.ReplayCopperPathCommand;
     public IRelayCommand UseCurrentCopperAsPathStartCommand => _copper.UseCurrentCopperAsPathStartCommand;
     public IRelayCommand UseCurrentCopperAsPathEndCommand => _copper.UseCurrentCopperAsPathEndCommand;
@@ -320,10 +298,26 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         get => _source.SelectedVersionOption;
         set => _source.SelectedVersionOption = value;
     }
-    [ObservableProperty] private NotchApplySimulationCanvasViewOption _selectedCanvasViewOption;
-    [ObservableProperty] private NotchApplySimulationCanvasColorOption _selectedCanvasColorOption;
-    [ObservableProperty] private NotchApplySimulationAreaOption _selectedAreaOption;
-    [ObservableProperty] private double _colorThresholdValue;
+    public NotchApplySimulationCanvasViewOption SelectedCanvasViewOption
+    {
+        get => _canvas.SelectedCanvasViewOption;
+        set => _canvas.SelectedCanvasViewOption = value;
+    }
+    public NotchApplySimulationCanvasColorOption SelectedCanvasColorOption
+    {
+        get => _canvas.SelectedCanvasColorOption;
+        set => _canvas.SelectedCanvasColorOption = value;
+    }
+    public NotchApplySimulationAreaOption SelectedAreaOption
+    {
+        get => _canvas.SelectedAreaOption;
+        set => _canvas.SelectedAreaOption = value;
+    }
+    public double ColorThresholdValue
+    {
+        get => _canvas.ColorThresholdValue;
+        set => _canvas.ColorThresholdValue = value;
+    }
     public double GlobalValue
     {
         get => _source.GlobalValue;
@@ -399,21 +393,33 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         get => _playback.IsPlaybackLoopEnabled;
         set => _playback.IsPlaybackLoopEnabled = value;
     }
-    [ObservableProperty] private bool _isSimulationSafetyExpanded;
+    public bool IsSimulationSafetyExpanded
+    {
+        get => _selection.IsSimulationSafetyExpanded;
+        set => _selection.IsSimulationSafetyExpanded = value;
+    }
     public int PlaybackFramesPerSecond
     {
         get => _playback.PlaybackFramesPerSecond;
         set => _playback.PlaybackFramesPerSecond = value;
     }
-    [ObservableProperty] private int _selectedRegularPadId = -1;
-    [ObservableProperty] private double _selectedManualValue;
+    public int SelectedRegularPadId
+    {
+        get => _selection.SelectedRegularPadId;
+        set => _selection.SelectedRegularPadId = value;
+    }
+    public double SelectedManualValue
+    {
+        get => _selection.SelectedManualValue;
+        set => _selection.SelectedManualValue = value;
+    }
     [ObservableProperty] private string _statusText;
 
     public IReadOnlyList<CadPad> CadPads => _cadPads;
     public IReadOnlyList<RegularPad> RegularPads => _session.FwDiffGrid.Pads;
-    public IReadOnlyList<NotchApplySimulationAaDisplayCell> SimulationOverlayItems => _simulationOverlayItems;
-    public NotchApplySimulationCanvasViewMode SelectedCanvasViewMode => SelectedCanvasViewOption.Value;
-    public NotchApplySimulationCanvasColorMode SelectedCanvasColorMode => SelectedCanvasColorOption.Value;
+    public IReadOnlyList<NotchApplySimulationAaDisplayCell> SimulationOverlayItems => _canvas.SimulationOverlayItems;
+    public NotchApplySimulationCanvasViewMode SelectedCanvasViewMode => _canvas.SelectedCanvasViewMode;
+    public NotchApplySimulationCanvasColorMode SelectedCanvasColorMode => _canvas.SelectedCanvasColorMode;
     public bool ShowCad => _showCad;
     public bool ShowRegular => _showRegular;
     public bool HighlightFreeform => _highlightFreeform;
@@ -430,16 +436,16 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     public bool CanPlayFrames => _playback.CanPlayFrames;
     public bool CanStepFrames => _playback.CanStepFrames;
     public bool CanRandomizeVisibleValues => _source.CanRandomizeVisibleValues;
-    public bool IsThresholdMode => SelectedCanvasColorOption.Value == NotchApplySimulationCanvasColorMode.Threshold;
-    public bool IsSignedCanvasView => SelectedCanvasViewMode is NotchApplySimulationCanvasViewMode.Delta or NotchApplySimulationCanvasViewMode.ChangedOnly;
-    public bool UsesSignedColorScale => IsSignedCanvasView || _legendRange.Minimum < -SignificantDeltaEpsilon;
-    public bool HasSelectedRegular => SelectedRegularPadId >= 0 && _regularPadById.ContainsKey(SelectedRegularPadId);
+    public bool IsThresholdMode => _canvas.IsThresholdMode;
+    public bool IsSignedCanvasView => _canvas.IsSignedCanvasView;
+    public bool UsesSignedColorScale => _canvas.UsesSignedColorScale;
+    public bool HasSelectedRegular => _selection.HasSelectedRegular;
     public bool HasManualOverrides => _source.HasManualOverrides;
     public bool HasSelectedOverride => _source.HasSelectedOverride;
     public int ActiveSurfaceRegularCount => _session.ActiveRegularPadIds.Count;
     public string SessionSummaryText => $"Grid {_session.RowCount} x {_session.ColumnCount} · REG {_session.PadCount} · Rows {_session.Table.Rows.Count}";
     public int SourceRevision => _session.SourceRevision;
-    public string AreaSummaryText => SelectedAreaOption.Display;
+    public string AreaSummaryText => _canvas.AreaSummaryText;
     public string SourceModeSummaryText => SelectedInputSourceOption.Value switch
     {
         SimulationInputSourceMode.Csv => "Source: CSV",
@@ -487,44 +493,26 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
             ? "Copper frame"
             : "Manual frame";
     public string VersionSummaryText => $"Version: {SelectedVersionOption.Display}";
-    public string ViewModeSummaryText => $"View: {SelectedCanvasViewOption.Display}";
-    public string ColorModeSummaryText => SelectedCanvasColorOption.Value == NotchApplySimulationCanvasColorMode.Threshold
-        ? $"Color: TH scale ({ColorThresholdValue.ToString("0.###", CultureInfo.InvariantCulture)})"
-        : "Color: AUTO scale";
+    public string ViewModeSummaryText => _canvas.ViewModeSummaryText;
+    public string ColorModeSummaryText => _canvas.ColorModeSummaryText;
     public string CanvasStatusSummaryText => HasSimulationData
         ? StatusText
         : $"Mode ready · {AreaSummaryText}";
     public string PlaybackButtonText => IsPlaybackRunning ? "Pause" : "Play";
     public string PlaybackButtonGlyph => IsPlaybackRunning ? IconGlyphs.Pause : IconGlyphs.PlayArrow;
     public int SelectedFrameSliderMaximum => Math.Max(FrameOptions.Count - 1, 0);
-    public bool HasSimulationData => SimulationOverlayItems.Count > 0;
+    public bool HasSimulationData => _canvas.HasSimulationData;
     public string PlaybackLoopText => IsPlaybackLoopEnabled ? "Loop on" : "Loop off";
     public string SelectedFrameDisplayText => IsCsvSource && FrameOptions.Count > 0 && SelectedFrameSliderIndex >= 0 && SelectedFrameSliderIndex < FrameOptions.Count
         ? FrameOptions[SelectedFrameSliderIndex].Display
         : IsCopperSource
             ? CopperSummaryText
             : "Manual baseline";
-    public string ColorLegendTitleText => IsThresholdMode ? "TH color scale" : "AUTO color scale";
-    public string ColorLegendMeaningText => UsesSignedColorScale
-        ? SelectedCanvasColorOption.Value == NotchApplySimulationCanvasColorMode.Auto
-            ? "AUTO percentile-clamped scale: ordinary values stay green, strongly negative values trend blue, and stronger positive values move through yellow/orange to red based on the visible distribution."
-            : "TH signed scale: negative values trend blue, values near 0 trend green, and positive values move through yellow/orange to red, using TH as the scale reference."
-        : SelectedCanvasColorOption.Value == NotchApplySimulationCanvasColorMode.Auto
-            ? "AUTO percentile-clamped scale: regular values stay green at baseline, then move through yellow/orange to red as they rise within the visible distribution."
-            : "TH mode: lower diff trends blue, near-threshold values trend green/yellow, and higher diff trends orange/red, using TH as the color scale reference.";
-    public string ColorLegendStartText => UsesSignedColorScale
-        ? FormatLegendValue(-GetLegendSignedRange())
-        : IsThresholdMode
-            ? "0"
-            : FormatLegendValue(_legendRange.Minimum);
-    public string ColorLegendCenterText => UsesSignedColorScale
-        ? "0"
-        : string.Empty;
-    public string ColorLegendEndText => UsesSignedColorScale
-        ? FormatSignedLegendValue(GetLegendSignedRange())
-        : IsThresholdMode
-            ? $"TH {ColorThresholdValue.ToString("0.###", CultureInfo.InvariantCulture)}"
-            : FormatLegendValue(_legendRange.Maximum);
+    public string ColorLegendTitleText => _canvas.ColorLegendTitleText;
+    public string ColorLegendMeaningText => _canvas.ColorLegendMeaningText;
+    public string ColorLegendStartText => _canvas.ColorLegendStartText;
+    public string ColorLegendCenterText => _canvas.ColorLegendCenterText;
+    public string ColorLegendEndText => _canvas.ColorLegendEndText;
     public bool HasDuplicateDiffResolutions => _snapshot?.SimulationResult.DiffIdentityContract.HasDuplicateResolutions ?? false;
     public int DuplicateDiffResolutionCount => _snapshot?.SimulationResult.DiffIdentityContract.DuplicateResolutionCount ?? 0;
     public string DuplicateDiffResolutionStrategyText => FormatDuplicateDiffResolutionStrategy(
@@ -553,55 +541,21 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
             return $"IC{sample.IcIndex + 1}/FW Diff Idx {sample.DiffIndex}: merge REG {string.Join(", ", mergedRegularPadIds)}{suffix}";
         }
     }
-    public bool ShowLegendCenterLabel => UsesSignedColorScale;
-    public bool ShowSequentialLegend => !ShowLegendCenterLabel;
-    public bool HasSelectedImpactItems => SelectedImpactItems.Count > 0;
-    public string SelectedImpactSummaryText => !HasSelectedRegular
-        ? "Select a regular pad to inspect notch impact."
-        : HasSelectedImpactItems
-            ? $"{SelectedImpactItems.Count} notch impact(s) affect this regular."
-            : "No notch rows affect this regular under the current simulation version.";
-    public string SelectedRegularHeaderText => TryGetSelectedRegularPad(out var pad)
-        ? $"REG {pad.RegularPadId} · IC {pad.IcIndex + 1} · FW Diff Idx {GetFwDiffIndex(pad.RegularPadId)} · CAD Output FW Diff Idx {GetCadOutputFwDiffIndex(pad.RegularPadId)}"
-        : "No regular selected.";
-    public string SelectedRegularLocationText => TryGetSelectedRegularPad(out var locationPad)
-        ? $"R{locationPad.Row}, C{locationPad.Col}"
-        : "-";
-    public string SelectedBeforeText => TryGetSelectedCell(out var beforeCell)
-        ? FormatWholeNumberDisplay(beforeCell.BeforeValue)
-        : "-";
-    public string SelectedAfterText => TryGetSelectedCell(out var afterCell)
-        ? FormatWholeNumberDisplay(afterCell.AfterValue)
-        : "-";
-    public string SelectedDeltaText => TryGetSelectedCell(out var deltaCell)
-        ? deltaCell.DeltaValue.ToString("+0.###;-0.###;0", CultureInfo.InvariantCulture)
-        : "-";
-    public string SelectedPercentChangeText
-    {
-        get
-        {
-            if (!TryGetSelectedCell(out var cell) || Math.Abs(cell.BeforeValue) <= SignificantDeltaEpsilon)
-            {
-                return "-";
-            }
+    public bool ShowLegendCenterLabel => _canvas.ShowLegendCenterLabel;
+    public bool ShowSequentialLegend => _canvas.ShowSequentialLegend;
+    public bool HasSelectedImpactItems => _selection.HasSelectedImpactItems;
+    public string SelectedImpactSummaryText => _selection.SelectedImpactSummaryText;
+    public string SelectedRegularHeaderText => _selection.SelectedRegularHeaderText;
+    public string SelectedRegularLocationText => _selection.SelectedRegularLocationText;
+    public string SelectedBeforeText => _selection.SelectedBeforeText;
+    public string SelectedAfterText => _selection.SelectedAfterText;
+    public string SelectedDeltaText => _selection.SelectedDeltaText;
+    public string SelectedPercentChangeText => _selection.SelectedPercentChangeText;
 
-            var percent = ((cell.AfterValue - cell.BeforeValue) / cell.BeforeValue) * 100d;
-            return percent.ToString("+0.###;-0.###;0", CultureInfo.InvariantCulture) + "%";
-        }
-    }
-
-    public string SelectedSourceText => SelectedInputSourceOption.Value switch
-    {
-        SimulationInputSourceMode.Manual => HasSelectedOverride ? "Manual override" : "Global baseline",
-        SimulationInputSourceMode.Csv => HasCsvData ? "CSV frame projection" : "CSV not loaded",
-        SimulationInputSourceMode.Copper => "CAD overlap -> CAD Output FW Diff",
-        _ => "-",
-    };
-    public string CanvasHintText => HasSimulationData
-        ? string.Empty
-        : $"No projected regular pads under {SelectedAreaOption.Display}.";
-    public bool HasCanvasHint => !HasSimulationData;
-    public bool ShowSelectedOverrideEditor => HasSelectedRegular && IsManualSource;
+    public string SelectedSourceText => _selection.SelectedSourceText;
+    public string CanvasHintText => _canvas.CanvasHintText;
+    public bool HasCanvasHint => _canvas.HasCanvasHint;
+    public bool ShowSelectedOverrideEditor => _selection.ShowSelectedOverrideEditor;
     public string CopperPositionText => _copper.CopperPositionText;
     public string CopperSummaryText => _copper.CopperSummaryText;
     public string CopperContactModelSummaryText => _copper.CopperContactModelSummaryText;
@@ -610,21 +564,6 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
     public bool HasCopperPathReplay => _copper.HasCopperPathReplay;
     public string CopperPathReplaySummaryText => _copper.CopperPathReplaySummaryText;
     public string CopperPathReplayArtifactSummaryText => _copper.CopperPathReplayArtifactSummaryText;
-
-
-    private int GetFwDiffIndex(int regularPadId)
-    {
-        return _regularPadById.TryGetValue(regularPadId, out var channelPad)
-            ? channelPad.DiffIndex
-            : -1;
-    }
-
-    private int GetCadOutputFwDiffIndex(int regularPadId)
-    {
-        return _cadOutputFwDiffByRegularPadId.TryGetValue(regularPadId, out var cadOutputFwDiffIndex)
-            ? cadOutputFwDiffIndex
-            : GetFwDiffIndex(regularPadId);
-    }
 
     internal SimulationCadOutputFwDiffAssignmentDecisionSummarySnapshot BuildCadOutputFwDiffAssignmentDecisionSummarySnapshot()
     {
@@ -658,21 +597,9 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
             DecisionSourceCounts: sourceCounts);
     }
 
-    public void SetCanvasViewMode(NotchApplySimulationCanvasViewMode mode)
-    {
-        var option = CanvasViewOptions.FirstOrDefault(candidate => candidate.Value == mode);
-        if (!option.Equals(default(NotchApplySimulationCanvasViewOption)))
-        {
-            SelectedCanvasViewOption = option;
-        }
-    }
+    public void SetCanvasViewMode(NotchApplySimulationCanvasViewMode mode) => _canvas.SetCanvasViewMode(mode);
 
-    public void ToggleBeforeAfterCanvasView()
-    {
-        SetCanvasViewMode(SelectedCanvasViewMode == NotchApplySimulationCanvasViewMode.Before
-            ? NotchApplySimulationCanvasViewMode.After
-            : NotchApplySimulationCanvasViewMode.Before);
-    }
+    public void ToggleBeforeAfterCanvasView() => _canvas.ToggleBeforeAfterCanvasView();
 
     private string BuildCsvShapeSummaryText()
     {

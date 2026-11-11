@@ -12,14 +12,11 @@ public sealed partial class SimulationWorkspaceViewModel
 
     private void AcceptSnapshot(SimulationScenarioSnapshot snapshot)
     {
-        _snapshotCellsByRegularPadId = snapshot.SimulationResult.Cells.ToDictionary(
-            static cell => cell.RegularPadId,
-            static cell => cell);
-        RebuildImpactItemIndex(snapshot.SimulationResult.Actions);
+        _selection.IndexResult(snapshot.SimulationResult);
 
-        RebuildOverlayItems(snapshot.SimulationResult.Cells);
-        RefreshDiffViolationState();
-        RefreshSimulationSafetyState();
+        _canvas.Rebuild(snapshot.SimulationResult.Cells);
+        _selection.RefreshDiffViolationState();
+        _selection.RefreshSimulationSafetyState(_snapshot?.SafetyAudit);
 
         UpdateStatus(snapshot);
         RefreshSelectionPresentation();
