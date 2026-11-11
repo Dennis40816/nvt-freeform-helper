@@ -1,8 +1,8 @@
-using System.Globalization;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Grid;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -36,205 +36,74 @@ public sealed partial class FreeformHelperViewModel
         state.SetProgress(value);
         OnPropertyChanged(propertyName);
     }
-    /// <summary>
-    /// Handles the asynchronous operation of matching regular pads to CAD pads.
-    /// </summary>
-    private async Task MatchAsync()
+
+    // UI thread only; construction does not publish state or start work.
+    private readonly Lazy<GridMatchingOwner> _gridMatchingOwner;
+    private GridMatchingOwner GridMatching => _gridMatchingOwner.Value;
+
+    private GridMatchingOwner CreateGridMatchingOwner() => new(
+        new GridMatchingPorts(CreateGridStatePorts(), CreateGridEffectPorts(), CreateGridWorkflowPorts(),
+            new GridMatchPorts(
+                GetFilteredMatchInputs,
+                GetActiveMatchInputs,
+                CreateGridStatusPorts,
+                RunGridMatchOperationAsync,
+                RunFreeformOperationAsync,
+                MatchPadsInBackgroundAsync,
+                () => _projectFile.Settings.Matching,
+                () => AutoReplayStep2AfterProjectLoad,
+                BuildStep2FreeformAssignmentsAsync,
+                FreeformTaggingUseCase.ApplyAutoDetectAssignments,
+                grid => PadOverrideService.ApplyFreeformOverrides(_projectFile, grid),
+                FreeformTaggingUseCase.ApplyManual,
+                SyncManualFreeformOverrides,
+                RebuildVisibleDxfIndexMap,
+                links => MatchLinksForCanvas = links,
+                result => FreeformAutoDetectResult = result,
+                () => FreeformAutoDetectSummary,
+                ex => _logger.Error(ex, "Match failed."))),
+        CreateGridRebuildOwner());
+
+    private Task MatchAsync() => GridMatching.MatchAsync();
+
+    private Task<bool> RestoreStep1MatchAfterProjectLoadAsync() => GridMatching.RestoreStep1MatchAfterProjectLoadAsync();
+
+    private Task<bool> RestoreStep2FreeformAfterProjectLoadAsync() => GridMatching.RestoreStep2FreeformAfterProjectLoadAsync();
+
+    private Task AutoDetectFreeformsAsync() => GridMatching.AutoDetectFreeformsAsync();
+
+    private bool GetFilteredMatchInputs(string missingStatus, out CadPadSet cad, out RegularGrid grid) =>
+        TryGetOperationCadAndGrid(BuildFilteredCadPadSet, missingStatus, out cad, out grid);
+
+    private bool GetActiveMatchInputs(string missingStatus, out CadPadSet cad, out RegularGrid grid) =>
+        TryGetOperationCadAndGrid(BuildActiveCadPadSet, missingStatus, out cad, out grid);
+
+    private GridStatusPorts CreateGridStatusPorts(string operationName)
     {
-        var status = CreateStatusScope("Match");
-        if (!TryGetOperationCadAndGrid(
-                BuildFilteredCadPadSet,
-                "Step 1: import DXF and build grid first.",
-                out var cad,
-                out var grid))
-        {
-            return;
-        }
-        await RunUiProgressOperationAsync(
-            operationName: "Match task",
-            setBusy: busy => IsMatchingPads = busy,
-            setProgress: progress => MatchProgress = progress,
-            onStart: () =>
-            {
-                ApplyUiToSettings(_projectFile.Settings);
-                status.ReportProgress("Matching pads...");
-                _logger.Info(CultureInfo.InvariantCulture, "Matching pads.");
-            },
-            operationAsync: MatchPadsAsync,
-            onError: ex =>
-            {
-                status.ReportError("Match failed", ex);
-                _logger.Error(ex, "Match failed.");
-            });
-        async Task MatchPadsAsync(Action<double> reportProgress)
-        {
-            await ApplyStep1MatchResultAsync(
-                cad,
-                grid,
-                reportProgress,
-                invalidateDownstream: true,
-                moveToStep2: true,
-                completionStatus: "Matching complete.");
-            _logger.Info(CultureInfo.InvariantCulture, "Matching complete.");
-        }
+        var status = CreateStatusScope(operationName);
+        return new GridStatusPorts(status.ReportProgress, status.ReportSuccess, status.ReportError);
     }
 
-    private async Task ApplyStep1MatchResultAsync(
-        CadPadSet cad,
-        RegularGrid grid,
-        Action<double> reportProgress,
-        bool invalidateDownstream,
-        bool moveToStep2,
-        string? completionStatus)
+    private Task RunGridMatchOperationAsync(
+        Action onStart, Func<Action<double>, Task> operationAsync, Action<Exception> onError) =>
+        RunUiProgressOperationAsync("Match task", busy => IsMatchingPads = busy,
+            progress => MatchProgress = progress, operationAsync, onError, onStart);
+
+    private async Task RunFreeformOperationAsync(Func<Task> operationAsync)
     {
-        var result = await Task.Run(() => PadMatchService.Match(
-            cad,
-            grid,
-            reportProgress));
-
-        SetLatestPadMatchResult(result);
-        BumpNotchExportGridFingerprint();
-        RebuildVisibleDxfIndexMap(CadPads.ToList());
-        MatchLinksForCanvas = result.Links;
-        var telemetry = result.Telemetry;
-        _logger.Debug(CultureInfo.InvariantCulture, "PERF PADMATCH: cad={0}, candidateCells={1}, boundsIntersections={2}, polygonIntersections={3}, avgCandidatePerCad={4:0.##}, p95CandidatePerCad={5}.",
-            telemetry.CadPadCount,
-            telemetry.CandidateCellVisits,
-            telemetry.BoundsIntersections,
-            telemetry.PolygonIntersections,
-            telemetry.CandidateCellsPerCadAverage,
-            telemetry.CandidateCellsPerCadP95);
-
-        OnWorkflowStepCompleted(
-            WorkflowStepId.Step1Match,
-            invalidateDownstream,
-            moveToStep2);
-
-        // H4: keep Step3 preview live when Step1 result changes and CAD selection already exists.
-        if (_selectedCadIds.Count > 0)
-        {
-            RefreshNotchCanvasPreview(showStatus: false);
-        }
-
-        if (!string.IsNullOrWhiteSpace(completionStatus))
-        {
-            SetStatus(completionStatus);
-        }
-
-        NotifySimulationWorkspaceSourceChanged();
-        CanvasHost?.Invalidate();
-    }
-
-    private async Task<bool> RestoreStep1MatchAfterProjectLoadAsync()
-    {
-        var status = CreateStatusScope("LoadProject.Step1Replay");
-        if (!TryGetOperationCadAndGrid(
-                BuildFilteredCadPadSet,
-                "Project loaded: no CAD output pads; Step 1 auto replay skipped.",
-                out var cad,
-                out var grid))
-        {
-            return false;
-        }
-
-        ApplyUiToSettings(_projectFile.Settings);
-        status.ReportProgress("Project loaded: replaying Step 1 match...");
-
-        await ApplyStep1MatchResultAsync(
-            cad,
-            grid,
-            _ => { },
-            invalidateDownstream: false,
-            moveToStep2: false,
-            completionStatus: null);
-
-        RefreshFreeformAutoDetectStats("project load");
-        status.ReportSuccess("Project loaded: Step 1 match restored.");
-        return true;
-    }
-
-    private async Task<bool> RestoreStep2FreeformAfterProjectLoadAsync()
-    {
-        var status = CreateStatusScope("LoadProject.Step2Replay");
-        if (!AutoReplayStep2AfterProjectLoad)
-        {
-            return false;
-        }
-
-        if (_workflowData.LatestPadMatch.CadToRegular.Count == 0)
-        {
-            return false;
-        }
-
-        if (!TryGetOperationCadAndGrid(
-                BuildActiveCadPadSet,
-                "Project loaded: Step 2 auto replay skipped (CAD/grid missing).",
-                out var cad,
-                out var grid))
-        {
-            return false;
-        }
-
-        ApplyUiToSettings(_projectFile.Settings);
-        var matchingSettings = CloneMatchingSettings(_projectFile.Settings.Matching);
-        var assignments = await BuildStep2FreeformAssignmentsAsync(
-            cad,
-            grid,
-            matchingSettings);
-        CommitStep2FreeformResult(
-            grid,
-            assignments,
-            source: "project load auto-detect",
-            invalidateDownstream: true,
-            moveToStep3: false,
-            setStatusFromSummary: false,
-            reapplyManualOverrides: true);
-        status.ReportSuccess("Project loaded: Step 2 freeform restored.");
-        return true;
-    }
-
-    /// <summary>
-    /// Handles the asynchronous operation of automatically detecting and tagging freeform pads.
-    /// </summary>
-    private async Task AutoDetectFreeformsAsync()
-    {
-        if (!TryEnsureWorkflowStep(WorkflowStepId.Step2Freeform))
-        {
-            return;
-        }
-
-        if (!TryGetOperationCadAndGrid(
-                BuildActiveCadPadSet,
-                "Step 2: import DXF and run Step 1 first.",
-                out var cad,
-                out var grid))
-        {
-            return;
-        }
-
         try
         {
-            ApplyUiToSettings(_projectFile.Settings); // Apply current UI settings.
-            var matchingSettings = CloneMatchingSettings(_projectFile.Settings.Matching);
-            var assignments = await BuildStep2FreeformAssignmentsAsync(
-                cad,
-                grid,
-                matchingSettings);
-            CommitStep2FreeformResult(
-                grid,
-                assignments,
-                source: "auto-detect",
-                invalidateDownstream: true,
-                moveToStep3: true,
-                setStatusFromSummary: true,
-                reapplyManualOverrides: false);
+            await operationAsync();
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
             SetStatusError("Auto detect failed", ex);
         }
-
     }
+
+    private static Task<PadMatchResult> MatchPadsInBackgroundAsync(
+        CadPadSet cad, RegularGrid grid, Action<double> reportProgress) =>
+        Task.Run(() => PadMatchService.Match(cad, grid, reportProgress));
 
     private async Task<IReadOnlyDictionary<int, FreeformType>> BuildStep2FreeformAssignmentsAsync(
         CadPadSet cad,
@@ -246,60 +115,6 @@ public sealed partial class FreeformHelperViewModel
             grid,
             matchingSettings,
             _workflowData.LatestPadMatch));
-    }
-
-    private void CommitStep2FreeformResult(
-        RegularGrid grid,
-        IReadOnlyDictionary<int, FreeformType> assignments,
-        string source,
-        bool invalidateDownstream,
-        bool moveToStep3,
-        bool setStatusFromSummary,
-        bool reapplyManualOverrides)
-    {
-        if (invalidateDownstream)
-        {
-            OnWorkflowStepChanged(WorkflowStepId.Step2Freeform, showStatus: false);
-        }
-
-        FreeformTaggingUseCase.ApplyAutoDetectAssignments(grid, assignments);
-        if (reapplyManualOverrides)
-        {
-            PadOverrideService.ApplyFreeformOverrides(_projectFile, grid);
-        }
-
-        BumpNotchExportGridFingerprint();
-
-        RefreshFreeformAutoDetectStats(source);
-        if (_selectedCadIds.Count > 0)
-        {
-            RefreshNotchCanvasPreview(showStatus: false);
-        }
-
-        OnWorkflowStepCompleted(
-            WorkflowStepId.Step2Freeform,
-            invalidateDownstream: false,
-            moveToNextStep: moveToStep3);
-
-        if (setStatusFromSummary)
-        {
-            SetStatus(FreeformAutoDetectSummary);
-        }
-
-        NotifySimulationWorkspaceSourceChanged();
-        CanvasHost?.Invalidate();
-    }
-
-    private static MatchingSettings CloneMatchingSettings(MatchingSettings source)
-    {
-        ArgumentNullException.ThrowIfNull(source);
-
-        return new MatchingSettings
-        {
-            FreeformAxisThreshold = source.FreeformAxisThreshold,
-            EnableAutoDetectXy = source.EnableAutoDetectXy,
-            EnableFreeformEdgeSpecialization = source.EnableFreeformEdgeSpecialization,
-        };
     }
 
     /// <summary>
@@ -320,4 +135,3 @@ public sealed partial class FreeformHelperViewModel
         set => SetOperationProgress(_matchState, value, nameof(MatchProgress));
     }
 }
-
