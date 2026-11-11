@@ -1,14 +1,41 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
-using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
-using FreeformHelper.Domain.Pads;
+using FreeformHelper.UI.ViewModels.Inspector;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
+    // UI thread only; lazy composition does not publish notifications or start work.
+    private PadInspectorOwner? _padInspectorOwner;
+
+    private PadInspectorOwner Inspector => _padInspectorOwner ??= new PadInspectorOwner(
+        new InspectorSnapshotPorts(
+            id => CadPads.FirstOrDefault(pad => pad.Id == id),
+            id => RegularPads.FirstOrDefault(pad => pad.RegularPadId == id),
+            CaptureInspectorCadWorkflow,
+            GetCadOutputFwDiffIndexOverride,
+            IsCadOutputFwDiffIndexAnchorCadPad,
+            () => CadOutputFwDiffAutoMode,
+            BuildCadNotchRowEligibility,
+            ToDisplayRow),
+        new InspectorMatchPorts(
+            GetMatchedRegularLinks,
+            GetMatchedRegularPadIds,
+            GetRegularPadIcDiff,
+            GetMatchedCadLinks,
+            GetMatchedCadPadIds,
+            TryGetCadOutputFwDiffIndex,
+            () => _projectFile.FreeformOverrides),
+        new InspectorDisplayPorts(
+            name => OnPropertyChanging(name),
+            name => OnPropertyChanged(name),
+            BuildPadInspectorDisplay,
+            () => SelectedPadCount,
+            value => IsPadInspectorRawTraceExpanded = value),
+        CreateInspectorRefreshOwner);
+
     internal NotchComputationMode CurrentNotchComputationMode => _projectFile.Settings.Notch.ComputationMode;
 
     public PadInspectorSnapshot? BuildCadPadInspectorSnapshot(
@@ -20,53 +47,9 @@ public sealed partial class FreeformHelperViewModel
         NotchV22CompensationResult? precomputedCompensation = null,
         string? precomputedDiagnostics = null)
     {
-        var cadPad = CadPads.FirstOrDefault(pad => pad.Id == cadPadId);
-        if (cadPad is null)
-        {
-            return null;
-        }
-
-        var workflowSnapshot = BuildWorkflowDataSnapshot();
-        var dxfIndex = workflowSnapshot.TryGetCadOutputFwDiffIndex(cadPadId, out var dxfIndexValue) ? dxfIndexValue : (int?)null;
-        var cadOutputFwDiffOverride = GetCadOutputFwDiffIndexOverride(cadPadId);
-        var isDxfIndexAnchor = IsCadOutputFwDiffIndexAnchorCadPad(cadPadId);
-        var dxfIndexDisplayText = dxfIndex?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "-";
-        var cadOutputFwDiffAssignmentModeText = PadInspectorMatchFormatter.BuildCadOutputFwDiffAssignmentModeText(
-            cadOutputFwDiffOverride.HasValue,
-            isDxfIndexAnchor,
-            CadOutputFwDiffAutoMode);
-
-        var icIndex = workflowSnapshot.TryGetCadIcIndex(cadPadId, out var icIndexValue) ? icIndexValue : (int?)null;
-
-        var matchCache = GetOrBuildCadInspectorMatchCache(cadPadId);
-        var (matchedRegularDetails, matchText, matchDetailsText) = PadInspectorSnapshotProjector.BuildCadMatchDisplay(
-            matchCache,
-            includeMatchDetails,
-            includeRuleTrace);
-        var notch = BuildCadInspectorNotch(
-            cadPadId,
-            includeExpensiveNotchDetails,
-            workflowSnapshot,
-            precomputedCompensation,
-            precomputedDiagnostics);
-        var (notchEligibility, notchRowSummary) = BuildCadInspectorNotchRowSummary(cadPad, includeNotchRowEligibilityDetails);
-
-        return PadInspectorSnapshotProjector.BuildCad(
-            cadPad,
-            dxfIndex,
-            cadOutputFwDiffOverride,
-            isDxfIndexAnchor,
-            dxfIndexDisplayText,
-            cadOutputFwDiffAssignmentModeText,
-            icIndex,
-            matchCache,
-            matchedRegularDetails,
-            matchText,
-            matchDetailsText,
-            notch,
-            notchEligibility,
-            notchRowSummary,
-            includeRuleTrace);
+        return Inspector.BuildCadPadInspectorSnapshot(
+            cadPadId, includeExpensiveNotchDetails, includeNotchRowEligibilityDetails,
+            includeMatchDetails, includeRuleTrace, precomputedCompensation, precomputedDiagnostics);
     }
 
     private PadInspectorNotchSnapshot BuildCadInspectorNotchSnapshot(
@@ -82,98 +65,74 @@ public sealed partial class FreeformHelperViewModel
             CurrentNotchComputationMode);
     }
 
-    private (NotchCadRowEligibility Eligibility, string Summary) BuildCadInspectorNotchRowSummary(
-        CadPad cadPad,
-        bool includeNotchRowEligibilityDetails)
-    {
-        if (!includeNotchRowEligibilityDetails)
-        {
-            return (PadInspectorMatchDetailBuilder.BuildDeferredNotchRowEligibilityPlaceholder(cadPad.Id), "Notch rows: computing...");
-        }
-
-        var notchEligibility = BuildCadNotchRowEligibility(cadPad);
-        return (notchEligibility, PadInspectorSnapshotProjector.FormatNotchRowSummary(notchEligibility));
-    }
-
     public PadInspectorSnapshot? BuildRegularPadInspectorSnapshot(
         int regularPadId,
         bool includeMatchDetails = true,
         bool includeRuleTrace = true)
     {
-        var regularPad = RegularPads.FirstOrDefault(pad => pad.RegularPadId == regularPadId);
-        if (regularPad is null)
-        {
-            return null;
-        }
-
-        var matchCache = GetOrBuildRegularInspectorMatchCache(regularPad);
-        return PadInspectorSnapshotProjector.BuildRegular(
-            regularPad,
-            matchCache,
-            includeMatchDetails,
-            includeRuleTrace,
-            ToDisplayRow(regularPad.Row));
+        return Inspector.BuildRegularPadInspectorSnapshot(regularPadId, includeMatchDetails, includeRuleTrace);
     }
 
     /// <summary>
     /// Gets or sets the text and lines that the pad inspector panels show for the current snapshot.
     /// The properties below read from this one value.
     /// </summary>
-    [ObservableProperty]
-    private PadInspectorDisplay _padInspectorDisplay = PadInspectorDisplay.CreateEmpty();
+    public PadInspectorDisplay PadInspectorDisplay
+    {
+        get => Inspector.PadInspectorDisplay;
+        set => Inspector.PadInspectorDisplay = value;
+    }
 
     /// <summary>
     /// Gets whether the top-strip pad inspector summary is visible.
     /// </summary>
-    public bool HasPadInspectorSummary => PadInspectorDisplay.HasSummary;
+    public bool HasPadInspectorSummary => Inspector.HasPadInspectorSummary;
 
-    public bool HasNoPadInspectorSummary => !HasPadInspectorSummary && !HasPadInspectorMultiSelection;
+    public bool HasNoPadInspectorSummary => Inspector.HasNoPadInspectorSummary;
 
-    public bool HasPadInspectorMultiSelection => SelectedPadCount > 1;
+    public bool HasPadInspectorMultiSelection => Inspector.HasPadInspectorMultiSelection;
 
-    public string PadInspectorSelectionSummaryText => HasPadInspectorMultiSelection
-        ? string.Create(CultureInfo.InvariantCulture, $"{SelectedPadCount} pads selected")
-        : string.Empty;
+    public string PadInspectorSelectionSummaryText => Inspector.PadInspectorSelectionSummaryText;
 
     /// <summary>
     /// Gets top-strip primary text for current inspector snapshot.
     /// </summary>
-    public string PadInspectorPrimaryText => PadInspectorDisplay.PrimaryText;
+    public string PadInspectorPrimaryText => Inspector.PadInspectorPrimaryText;
 
     /// <summary>
     /// Gets compact header text (ID + diff idx only) for workspace top strip.
     /// </summary>
-    public string PadInspectorCompactHeaderText => PadInspectorDisplay.CompactHeaderText;
+    public string PadInspectorCompactHeaderText => Inspector.PadInspectorCompactHeaderText;
 
     /// <summary>
     /// Gets top-strip secondary text for current inspector snapshot.
     /// </summary>
-    public string PadInspectorSecondaryText => PadInspectorDisplay.SecondaryText;
+    public string PadInspectorSecondaryText => Inspector.PadInspectorSecondaryText;
 
     /// <summary>
     /// Gets top-strip match summary text for current inspector snapshot.
     /// </summary>
-    public string PadInspectorMatchText => PadInspectorDisplay.MatchText;
+    public string PadInspectorMatchText => Inspector.PadInspectorMatchText;
 
     /// <summary>
     /// Gets segmented notch/freeform summary lines for inspector panel.
     /// </summary>
-    public ObservableCollection<PadInspectorDisplayLine> PadInspectorCompensationLines => PadInspectorDisplay.CompensationLines;
+    public ObservableCollection<PadInspectorDisplayLine> PadInspectorCompensationLines => Inspector.PadInspectorCompensationLines;
 
     /// <summary>
     /// Gets rule trace lines for current inspector snapshot.
     /// </summary>
-    public ObservableCollection<string> PadInspectorRuleTraceLines => PadInspectorDisplay.RuleTraceLines;
+    public ObservableCollection<string> PadInspectorRuleTraceLines => Inspector.PadInspectorRuleTraceLines;
 
     /// <summary>
     /// Gets grouped rule trace sections for current inspector snapshot.
     /// </summary>
-    public ObservableCollection<PadInspectorRuleTraceSection> PadInspectorRuleTraceSections => PadInspectorDisplay.RuleTraceSections;
+    public ObservableCollection<PadInspectorRuleTraceSection> PadInspectorRuleTraceSections => Inspector.PadInspectorRuleTraceSections;
 
     /// <summary>
     /// Gets whether current inspector snapshot has rule trace lines.
     /// </summary>
-    public bool HasPadInspectorRuleTrace => PadInspectorDisplay.HasRuleTrace;
+    public bool HasPadInspectorRuleTrace => Inspector.HasPadInspectorRuleTrace;
 
     /// <summary>
     /// Gets or sets whether Debug raw section in inspector rule trace is expanded.

@@ -1,11 +1,22 @@
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.UI.ViewModels.Inspector;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
+    private InspectorCadWorkflow CaptureInspectorCadWorkflow()
+    {
+        var snapshot = BuildWorkflowDataSnapshot();
+        return new InspectorCadWorkflow(
+            id => snapshot.TryGetCadOutputFwDiffIndex(id, out var index) ? index : (int?)null,
+            id => snapshot.TryGetCadIcIndex(id, out var index) ? index : (int?)null,
+            (id, expensive, compensation, diagnostics) =>
+                BuildCadInspectorNotch(id, expensive, snapshot, compensation, diagnostics));
+    }
+
     private NotchCadRowEligibility BuildCadNotchRowEligibility(CadPad cadPad)
     {
         if (_grid is null)

@@ -43,8 +43,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs:252",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.NotchDetails.AutoPlay.cs:10",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Operations.LayerFiltering.cs:63",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.cs:123",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspectorSummary.cs:8",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.PadInspector.cs:11",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ProjectSession.cs:54",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.RegularVisibilityMask.cs:14",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Selection.Summary.cs:14",
@@ -59,6 +58,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.SizingAndPitch.cs:272",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.Step4Indexing.cs:5",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:20", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:26", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:32", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:47", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.cs:62",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Undo.cs:21",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.WorkspaceHeader.cs:173"
     ],
     "shellNavigationBooleans": [],

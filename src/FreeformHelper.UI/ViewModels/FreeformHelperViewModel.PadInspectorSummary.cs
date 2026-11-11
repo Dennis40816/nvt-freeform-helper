@@ -5,39 +5,11 @@ namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private PadInspectorUiState? _padInspectorUi; // Created on first read so that the snapshot-change callback can point at this instance.
-
     /// <summary>Gets the pad inspector snapshot and refresh flag that the inspector views bind to.</summary>
-    public PadInspectorUiState PadInspectorUi => _padInspectorUi ??= new PadInspectorUiState(OnPadInspectorSnapshotChanged);
+    public PadInspectorUiState PadInspectorUi => Inspector.PadInspectorUi;
 
-    private void OnPadInspectorSnapshotChanged(PadInspectorSnapshot? value)
-    {
-        var display = value is null ? null : PadInspectorDisplayProjector.BuildPadInspectorDisplay(
-            value,
-            TryGetCadDisplayIndex,
-            BuildCadCompensationLines);
-        PadInspectorDisplay = display ?? PadInspectorDisplay.CreateEmpty();
-        IsPadInspectorRawTraceExpanded = false;
-    }
-
-    partial void OnPadInspectorDisplayChanged(PadInspectorDisplay? oldValue, PadInspectorDisplay newValue)
-    {
-        ArgumentNullException.ThrowIfNull(oldValue);
-        if (oldValue.HasSummary != newValue.HasSummary)
-        {
-            OnPropertyChanged(nameof(HasPadInspectorSummary));
-            OnPropertyChanged(nameof(HasNoPadInspectorSummary));
-        }
-
-        RaiseWhenChanged(oldValue.CompactHeaderText, newValue.CompactHeaderText, nameof(PadInspectorCompactHeaderText));
-        RaiseWhenChanged(oldValue.PrimaryText, newValue.PrimaryText, nameof(PadInspectorPrimaryText));
-        RaiseWhenChanged(oldValue.SecondaryText, newValue.SecondaryText, nameof(PadInspectorSecondaryText));
-        RaiseWhenChanged(oldValue.MatchText, newValue.MatchText, nameof(PadInspectorMatchText));
-        RaiseWhenChanged(oldValue.CompensationLines, newValue.CompensationLines, nameof(PadInspectorCompensationLines));
-        RaiseWhenChanged(oldValue.RuleTraceLines, newValue.RuleTraceLines, nameof(PadInspectorRuleTraceLines));
-        RaiseWhenChanged(oldValue.RuleTraceSections, newValue.RuleTraceSections, nameof(PadInspectorRuleTraceSections));
-        RaiseWhenChanged(oldValue.HasRuleTrace, newValue.HasRuleTrace, nameof(HasPadInspectorRuleTrace));
-    }
+    private PadInspectorDisplay? BuildPadInspectorDisplay(PadInspectorSnapshot snapshot) =>
+        PadInspectorDisplayProjector.BuildPadInspectorDisplay(snapshot, TryGetCadDisplayIndex, BuildCadCompensationLines);
 
     private void RaiseWhenChanged<T>(T oldValue, T newValue, string propertyName)
     {
