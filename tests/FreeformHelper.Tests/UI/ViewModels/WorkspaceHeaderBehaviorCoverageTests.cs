@@ -27,10 +27,10 @@ public sealed class WorkspaceHeaderBehaviorCoverageTests
             NotchPreviewAutoPlayEnabled = false,
         };
         vm.SelectedDxfEditRotationScopeOption = vm.DxfEditRotationScopeOptions.Single(
-            static option => option.Value == FreeformHelperViewModel.DxfEditRotationScope.TargetLayer);
+            static option => option.Value == FreeformHelper.UI.CadEditing.DxfEditRotationScope.TargetLayer);
         Assert.Equal("Applies to selected CAD pads.", vm.DxfRotationScopeHint);
         vm.SelectedDxfEditRotationScopeOption = vm.DxfEditRotationScopeOptions.Single(
-            static option => option.Value == FreeformHelperViewModel.DxfEditRotationScope.SelectedPads);
+            static option => option.Value == FreeformHelper.UI.CadEditing.DxfEditRotationScope.SelectedPads);
         await vm.OpenDxfCommand.ExecuteAsync(null);
         await FreeformHelperViewModelTests.WaitForGridRebuildAsync(vm);
         var selected = vm.CadPads.Where(pad => pad.Layer == (selectLayer ? "signal" : "aux"))
@@ -40,7 +40,7 @@ public sealed class WorkspaceHeaderBehaviorCoverageTests
 
         vm.DxfEditRotationLayerName = "signal";
         vm.SelectedDxfEditRotationScopeOption = vm.DxfEditRotationScopeOptions.Single(
-            static option => option.Value == FreeformHelperViewModel.DxfEditRotationScope.TargetLayer);
+            static option => option.Value == FreeformHelper.UI.CadEditing.DxfEditRotationScope.TargetLayer);
 
         Assert.Equal(expectedHint, vm.DxfRotationScopeHint);
         Assert.Equal(selected, vm.SelectedCadPadIds.Order().ToArray());

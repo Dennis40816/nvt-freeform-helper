@@ -19,7 +19,10 @@ public sealed partial class FreeformHelperViewModel
     private bool _isLoadingSettings => _settingsSuppression.IsSettingsLoadingActive;
 
     private void PublishProjectEditingAvailabilityChange(Action changeMode)
-        => _projectSession.PublishEditingAvailabilityChange(changeMode);
+    {
+        _projectSession.PublishEditingAvailabilityChange(changeMode);
+        DxfEdit.NotifyEditingAvailabilityChanged();
+    }
 
     private Task<ProjectLoadCommandResult> RunProjectLoadAsync(Func<Task<ProjectLoadCommandResult>> load)
         => _projectSession.RunLoadAsync(load);

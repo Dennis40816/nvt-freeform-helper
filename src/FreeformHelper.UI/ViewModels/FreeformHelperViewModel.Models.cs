@@ -47,23 +47,6 @@ public sealed partial class FreeformHelperViewModel
     public sealed record RegularSourceLayerOption(string? Name, string Display);
 
     /// <summary>
-    /// Represents the scope used by DXF geometry rotation.
-    /// </summary>
-    public enum DxfEditRotationScope
-    {
-        SelectedPads,
-        TargetLayer,
-    }
-
-    /// <summary>
-    /// Represents an option for DXF rotation scope selection.
-    /// </summary>
-    /// <param name="Value">Scope enum value.</param>
-    /// <param name="Display">Human-readable label.</param>
-    /// <param name="Description">Short behavior note for tooltip/help text.</param>
-    public readonly record struct DxfEditRotationScopeOption(DxfEditRotationScope Value, string Display, string Description);
-
-    /// <summary>
     /// Represents an option for selecting the minimum application log level in the UI.
     /// </summary>
     /// <param name="Value">The NLog level name (for example, "Info").</param>

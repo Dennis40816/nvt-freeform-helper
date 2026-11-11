@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -148,4 +149,21 @@ public sealed partial class FreeformHelperViewModel
     {
         return !IsReadyStatusText(value) && !string.IsNullOrWhiteSpace(value);
     }
+
+    /// <summary>
+    /// Gets or sets the latest CAD-to-regular overlap links for canvas ratio labels.
+    /// </summary>
+    [ObservableProperty] private IReadOnlyList<PadMatchLink> _matchLinksForCanvas = Array.Empty<PadMatchLink>();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the AA canvas should show the shared CAD-load overlay.
+    /// This is used by both Open DXF and Load Project while DXF import/reload and grid rebuild are in progress.
+    /// </summary>
+    [ObservableProperty] private bool _isCadLoadCanvasOverlayVisible;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the global modal loading spinner host should be visible.
+    /// Long-running operations use this as a single entry/exit lifecycle rather than re-deriving ad hoc busy UI.
+    /// </summary>
+    [ObservableProperty] private bool _isModalLoadingSpinnerVisible;
 }

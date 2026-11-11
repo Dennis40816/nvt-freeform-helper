@@ -14,7 +14,7 @@ public sealed partial class FreeformHelperView
         var viewModel = DataContext as FreeformHelperViewModel;
         if (MainWindowShortcutExecution.TryHandle(
             viewModel?.IsProjectEditingEnabled ?? true, e.Handled, e.Key, e.KeyModifiers, e.Source,
-            viewModel?.DeleteSelectedCadPadsCommand, viewModel?.UndoCommand, viewModel?.FitCommand,
+            viewModel?.DxfEdit.DeleteSelectedCadPadsCommand, viewModel?.UndoCommand, viewModel?.FitCommand,
             () => _canvas?.SelectAllPads(),
             RestoreNotchExportSelectionWindowIfHidden,
             viewModel is null
