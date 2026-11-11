@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using FreeformHelper.UI.CadExport;
 
 namespace FreeformHelper.UI.ViewModels;
 

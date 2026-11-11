@@ -45,11 +45,11 @@
                     ToolTip.Tip="Pick Notch rows, then export using the existing file type selection."/>
           <Separator/>
           <MenuItem Header="DXF" IsEnabled="False"/>
-          <MenuItem Header="Export DXF (Visible Layers)" Command="{Binding ExportDxfVisibleCommand}"
+          <MenuItem Header="Export DXF (Visible Layers)" Command="{Binding CadExport.ExportDxfVisibleCommand}"
                     ToolTip.Tip="Export visible canvas layers plus DXF-layer pads using the current export rules."/>
-          <MenuItem Header="Export DXF (All Layers)" Command="{Binding ExportDxfAllCommand}"
+          <MenuItem Header="Export DXF (All Layers)" Command="{Binding CadExport.ExportDxfAllCommand}"
                     ToolTip.Tip="Export all DXF layers, including layers hidden on the canvas."/>
-          <MenuItem Header="Export DXF Layer Image" Command="{Binding ExportDxfLayerImageCommand}"/>
+          <MenuItem Header="Export DXF Layer Image" Command="{Binding CadExport.ExportDxfLayerImageCommand}"/>
         </MenuItem>
         <MenuItem Header="Settings">
           <MenuItem Header="Open Settings"

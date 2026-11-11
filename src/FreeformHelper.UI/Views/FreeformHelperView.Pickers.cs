@@ -37,8 +37,8 @@ public sealed partial class FreeformHelperView
         viewModel.OpenDxfEditChangeListAsync = ShowDxfEditChangeListWindowAsync;
         viewModel.OpenIndexMappingReportAsync = ShowIndexMappingReportWindowAsync;
         viewModel.OpenDxfOverlapReportAsync = ShowDxfOverlapReportWindowAsync;
-        viewModel.OpenDxfLayerImageExportAsync = ShowDxfLayerImageExportWindowAsync;
-        viewModel.ShowWarningAsync = ShowWarningDialogAsync;
+        viewModel.CadExport.Dialogs.OpenDxfLayerImageExportAsync = ShowDxfLayerImageExportWindowAsync;
+        viewModel.CadExport.Dialogs.ShowWarningAsync = ShowWarningDialogAsync;
         AttachCadLoadSpinnerWindow(viewModel);
     }
 
@@ -71,7 +71,7 @@ public sealed partial class FreeformHelperView
         viewModel.PickLoadProjectPathAsync = null;
         viewModel.PickSaveProjectPathAsync = null;
         viewModel.PickSaveNotchPathAsync = null;
-        viewModel.PickSaveExportPathAsync = null;
+        viewModel.CadExport.Dialogs.PickSaveExportPathAsync = null;
         viewModel.ConfirmEmbedDxfAsync = null;
         viewModel.ProjectDialogs.ConfirmSaveBeforeLoadAsync = null;
         viewModel.EnsureNoPendingEdits = null;
@@ -81,8 +81,8 @@ public sealed partial class FreeformHelperView
         viewModel.OpenDxfEditChangeListAsync = null;
         viewModel.OpenIndexMappingReportAsync = null;
         viewModel.OpenDxfOverlapReportAsync = null;
-        viewModel.OpenDxfLayerImageExportAsync = null;
-        viewModel.ShowWarningAsync = null;
+        viewModel.CadExport.Dialogs.OpenDxfLayerImageExportAsync = null;
+        viewModel.CadExport.Dialogs.ShowWarningAsync = null;
         DetachCadLoadSpinnerWindow(viewModel);
     }
 
@@ -109,7 +109,7 @@ public sealed partial class FreeformHelperView
         viewModel.PickLoadProjectPathAsync = pickers.OpenProjectAsync;
         viewModel.PickSaveProjectPathAsync = pickers.SaveProjectAsync;
         viewModel.PickSaveNotchPathAsync = pickers.SaveNotchAsync;
-        viewModel.PickSaveExportPathAsync = pickers.SaveExportAsync;
+        viewModel.CadExport.Dialogs.PickSaveExportPathAsync = pickers.SaveExportAsync;
 
         // Delegates for the project save/load confirmation dialogs.
         viewModel.ConfirmEmbedDxfAsync = () => ProjectDialogPrompts.ConfirmEmbedDxfAsync(TopLevel.GetTopLevel(this) as Window);

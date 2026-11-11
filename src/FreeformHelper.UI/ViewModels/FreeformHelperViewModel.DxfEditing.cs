@@ -1,13 +1,13 @@
-using System.Text;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.CadEditing;
+using FreeformHelper.UI.CadExport;
 
 namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
-/// Handles in-app DXF edit operations (hide/restore) and DXF export workflows.
+/// Handles in-app DXF edit operations (hide/restore).
 /// </summary>
 public sealed partial class FreeformHelperViewModel
 {
@@ -33,37 +33,20 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
-    private static string SanitizeFileNameToken(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-        {
-            return "layer";
-        }
-
-        var invalidChars = Path.GetInvalidFileNameChars().ToHashSet();
-        var builder = new StringBuilder(input.Length);
-        foreach (var ch in input)
-        {
-            builder.Append(invalidChars.Contains(ch) ? '_' : ch);
-        }
-
-        return builder.Length == 0 ? "layer" : builder.ToString();
-    }
-
     /// <summary>
     /// Gets the command to export CAD pads (visible layers only) to DXF.
     /// </summary>
-    public IAsyncRelayCommand ExportDxfVisibleCommand => _dxfEditCommands.ExportDxfVisibleCommand;
+    public IAsyncRelayCommand ExportDxfVisibleCommand => CadExport.ExportDxfVisibleCommand;
 
     /// <summary>
     /// Gets the command to export CAD pads (all non-deleted layers) to DXF.
     /// </summary>
-    public IAsyncRelayCommand ExportDxfAllCommand => _dxfEditCommands.ExportDxfAllCommand;
+    public IAsyncRelayCommand ExportDxfAllCommand => CadExport.ExportDxfAllCommand;
 
     /// <summary>
     /// Gets the command to export one DXF layer to image (PNG/BMP/JPG).
     /// </summary>
-    public IAsyncRelayCommand ExportDxfLayerImageCommand => _dxfEditCommands.ExportDxfLayerImageCommand;
+    public IAsyncRelayCommand ExportDxfLayerImageCommand => CadExport.ExportDxfLayerImageCommand;
 
     /// <summary>
     /// Gets the command to check the quality of the loaded DXF data.
@@ -173,13 +156,11 @@ public sealed partial class FreeformHelperViewModel
 
     private readonly DxfEditCommands _dxfEditCommands;
 
-    /// <summary>Creates the DXF edit commands once during construction.</summary>
-    private DxfEditCommands CreateDxfEditCommands()
+    /// <summary>Creates the CAD export child and the DXF edit commands once during construction. The export commands register first.</summary>
+    private (CadExportViewModel Export, DxfEditCommands Edit) CreateDxfEditCommands()
     {
-        return new DxfEditCommands(
-            ExportDxfVisibleCommand: CreateEditingAsyncCommand(ExportVisibleDxfAsync),
-            ExportDxfAllCommand: CreateEditingAsyncCommand(ExportAllDxfAsync),
-            ExportDxfLayerImageCommand: CreateEditingAsyncCommand(ExportLayerImageAsync),
+        var export = CreateCadExport();
+        var edit = new DxfEditCommands(
             CheckDxfQualityCommand: CreateEditingAsyncCommand(CheckDxfQualityAsync),
             SelectDxfOverlapPadsCommand: CreateEditingCommand(SelectDxfOverlapPads),
             ClearDxfOverlapHighlightsCommand: CreateEditingCommand(ClearDxfOverlapHighlights),
@@ -201,5 +182,6 @@ public sealed partial class FreeformHelperViewModel
             MoveSelectedCadPadsToLayerCommand: CreateEditingCommand(MoveSelectedCadPadsToLayer),
             CreateLayerAndMoveSelectedCadPadsCommand: CreateEditingCommand(CreateLayerAndMoveSelectedCadPads),
             RotateSelectedCadPadsCommand: CreateEditingCommand(RotateSelectedCadPads));
+        return (export, edit);
     }
 }

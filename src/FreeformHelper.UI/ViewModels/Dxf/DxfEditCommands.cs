@@ -6,9 +6,6 @@ namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>Owns the DXF edit command instances for one workspace.</summary>
 internal sealed record DxfEditCommands(
-    IAsyncRelayCommand ExportDxfVisibleCommand,
-    IAsyncRelayCommand ExportDxfAllCommand,
-    IAsyncRelayCommand ExportDxfLayerImageCommand,
     IAsyncRelayCommand CheckDxfQualityCommand,
     IRelayCommand SelectDxfOverlapPadsCommand,
     IRelayCommand ClearDxfOverlapHighlightsCommand,

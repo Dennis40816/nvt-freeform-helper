@@ -37,7 +37,7 @@
       "src/FreeformHelper.UI/ViewModels/WorkspaceHeaderItem.cs:16"
     ],
     "freeformViewModelStateMembers": [
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:76", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:77", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:92", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:95",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:77", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:78", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:96", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs:99",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:126", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:132", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:138", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:210", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.State.cs:214",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:162", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:167", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:172", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfQuality.cs:181",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs:12",
@@ -79,7 +79,7 @@
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.State.NotchPreview.cs"
     ],
     "servicesViewModels": [
-      "src/FreeformHelper.UI/Services/CadLayerUiSnapshotBuilder.cs", "src/FreeformHelper.UI/Services/DxfLayerImageExportService.cs",
+      "src/FreeformHelper.UI/Services/CadLayerUiSnapshotBuilder.cs",
       "src/FreeformHelper.UI/Services/IndexMappingAlgorithmTraceProjector.cs", "src/FreeformHelper.UI/Services/IndexMappingDecisionRowContract.cs",
       "src/FreeformHelper.UI/Services/IndexMappingDecisionRowProjector.cs", "src/FreeformHelper.UI/Services/IndexMappingVerificationWorkspaceFilterService.cs",
       "src/FreeformHelper.UI/Services/IndexMappingVerificationWorkspaceProjector.cs", "src/FreeformHelper.UI/Services/IndexMappingVerificationWorkspaceSnapshot.cs",
@@ -99,7 +99,7 @@
       "src/FreeformHelper.UI/ViewModels/DxfEditChangeListViewModel.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.AppSettings.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CadLoad.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CadLoadOverlay.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Commands.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.CoordinatePlanner.cs",
-      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfEditing.Export.cs",
+      "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.Core.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.DxfIndexing.Duplicates.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.GridRebuild.Background.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.IndexMapping.cs",
       "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.ManualSizing.cs", "src/FreeformHelper.UI/ViewModels/FreeformHelperViewModel.MatchWorkflow.cs",
