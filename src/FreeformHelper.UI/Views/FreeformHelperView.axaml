@@ -35,7 +35,7 @@
       <Menu x:Name="MainMenu"
             HorizontalAlignment="Left">
         <MenuItem Header="File">
-          <MenuItem Header="Open DXF" Command="{Binding OpenDxfCommand}"/>
+          <MenuItem Header="Open DXF" Command="{Binding CadImport.OpenDxfCommand}"/>
           <MenuItem Header="Save Project" Command="{Binding SaveProjectCommand}"/>
           <MenuItem Header="Load Project" Command="{Binding LoadProjectCommand}"/>
         </MenuItem>
@@ -127,7 +127,7 @@
                               CadLineColor="{Binding CadLineColor}"
                               CadFillOpacity="{Binding CadFillOpacity}"
                               CadLineOpacity="{Binding CadLineOpacity}"
-                              HighlightedCadPadIds="{Binding DxfOverlapHighlightedCadIds}"
+                              HighlightedCadPadIds="{Binding Quality.DxfOverlapHighlightedCadIds}"
                               DiffIndexOverrideCadPadIds="{Binding CadOutputFwDiffIndexOverrideCadIds}"
                               DiffIndexAnchorCadPadIds="{Binding CadOutputFwDiffIndexAnchorCadIdsForCanvas}"
                               ShowDiffIndexOverlay="{Binding ShowDiffIndexOverlay}"

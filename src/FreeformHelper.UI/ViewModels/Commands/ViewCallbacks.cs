@@ -8,7 +8,6 @@ namespace FreeformHelper.UI.ViewModels;
 /// <summary>Owns the view callback delegates for one workspace.</summary>
 internal sealed class ViewCallbacks
 {
-    public Func<Task<string?>>? PickOpenDxfPathAsync { get; set; }
     public Func<Task<string?>>? PickLoadProjectPathAsync { get; set; }
     public Func<Task<string?>>? PickSaveProjectPathAsync { get; set; }
     public Func<string, string, Task<string?>>? PickSaveNotchPathAsync { get; set; }
@@ -21,6 +20,5 @@ internal sealed class ViewCallbacks
     public Func<SimulationSafetyAuditResult?>? GetCurrentSimulationSafetyAudit { get; set; }
     public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get; set; }
     public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get; set; }
-    public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get; set; }
     public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get; set; }
 }

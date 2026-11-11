@@ -188,7 +188,7 @@ public sealed class SettingsCategoryAndConsoleCopyEntryTests
     }
 
     private static SettingsWindowViewModel.LayerCategoryRow GetPolylineCategory(SettingsWindowViewModel draft)
-        => Assert.Single(draft.LayerCategoryRows, static row => row.Category == FreeformHelperViewModel.DxfLayerCategory.Polyline);
+        => Assert.Single(draft.LayerCategoryRows, static row => row.Category == FreeformHelper.Application.CadImport.DxfLayerCategory.Polyline);
 
     private static void AssertPolylineSelection(FreeformHelperViewModel vm, SettingsWindowViewModel draft, bool selected)
     {
@@ -204,9 +204,9 @@ public sealed class SettingsCategoryAndConsoleCopyEntryTests
             .OrderBy(static toggle => toggle.Name, StringComparer.Ordinal)
             .Select(static toggle => (toggle.Name, toggle.IsSelected)).ToArray();
 
-    private static (FreeformHelperViewModel.DxfLayerCategory Category, int Total, int Selected)[] CaptureOtherCategories(
+    private static (FreeformHelper.Application.CadImport.DxfLayerCategory Category, int Total, int Selected)[] CaptureOtherCategories(
         SettingsWindowViewModel draft)
-        => draft.LayerCategoryRows.Where(static row => row.Category != FreeformHelperViewModel.DxfLayerCategory.Polyline)
+        => draft.LayerCategoryRows.Where(static row => row.Category != FreeformHelper.Application.CadImport.DxfLayerCategory.Polyline)
             .OrderBy(static row => row.Category)
             .Select(static row => (row.Category, row.TotalCount, row.SelectedCount)).ToArray();
 }

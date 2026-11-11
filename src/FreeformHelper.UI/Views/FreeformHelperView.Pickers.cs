@@ -36,7 +36,7 @@ public sealed partial class FreeformHelperView
         viewModel.GetCurrentSimulationSafetyAudit = ResolveCurrentSimulationSafetyAudit;
         viewModel.OpenDxfEditChangeListAsync = ShowDxfEditChangeListWindowAsync;
         viewModel.OpenIndexMappingReportAsync = ShowIndexMappingReportWindowAsync;
-        viewModel.OpenDxfOverlapReportAsync = ShowDxfOverlapReportWindowAsync;
+        viewModel.Quality.OpenDxfOverlapReportAsync = ShowDxfOverlapReportWindowAsync;
         viewModel.OpenDxfLayerImageExportAsync = ShowDxfLayerImageExportWindowAsync;
         viewModel.ShowWarningAsync = ShowWarningDialogAsync;
         AttachCadLoadSpinnerWindow(viewModel);
@@ -66,7 +66,7 @@ public sealed partial class FreeformHelperView
         viewModel.InteractionState.SelectionChanged -= OnInteractionSelectionChanged;
         viewModel.InteractionState.PadInfoChanged -= OnPadInfoChanged;
         // Clear all delegate references to prevent memory leaks.
-        viewModel.PickOpenDxfPathAsync = null;
+        viewModel.CadImport.PickOpenDxfPathAsync = null;
         viewModel.RegularMask.PickOpenRegularVisibilityMaskPathAsync = null;
         viewModel.PickLoadProjectPathAsync = null;
         viewModel.PickSaveProjectPathAsync = null;
@@ -80,7 +80,7 @@ public sealed partial class FreeformHelperView
         viewModel.GetCurrentSimulationSafetyAudit = null;
         viewModel.OpenDxfEditChangeListAsync = null;
         viewModel.OpenIndexMappingReportAsync = null;
-        viewModel.OpenDxfOverlapReportAsync = null;
+        viewModel.Quality.OpenDxfOverlapReportAsync = null;
         viewModel.OpenDxfLayerImageExportAsync = null;
         viewModel.ShowWarningAsync = null;
         DetachCadLoadSpinnerWindow(viewModel);
@@ -104,7 +104,7 @@ public sealed partial class FreeformHelperView
     {
         var pickers = new MainWindowFilePickerService(storage);
 
-        viewModel.PickOpenDxfPathAsync = pickers.OpenDxfAsync;
+        viewModel.CadImport.PickOpenDxfPathAsync = pickers.OpenDxfAsync;
         viewModel.RegularMask.PickOpenRegularVisibilityMaskPathAsync = pickers.OpenRegularVisibilityMaskAsync;
         viewModel.PickLoadProjectPathAsync = pickers.OpenProjectAsync;
         viewModel.PickSaveProjectPathAsync = pickers.SaveProjectAsync;

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using Avalonia.Headless.XUnit;
-using FreeformHelper.UI.Services;
+using FreeformHelper.UI.Contracts;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 

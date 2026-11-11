@@ -81,8 +81,8 @@ public sealed class ProjectSnapshotMappingCharacterizationTests
             XChannels = 3.5m,
             YChannels = 6.5m,
         });
-        vm.LayerToggles.Add(new FreeformHelperViewModel.LayerToggle("z", false));
-        vm.LayerToggles.Add(new FreeformHelperViewModel.LayerToggle("A"));
+        vm.LayerToggles.Add(new FreeformHelper.UI.CadImport.LayerToggle("z", false));
+        vm.LayerToggles.Add(new FreeformHelper.UI.CadImport.LayerToggle("A"));
 
         var snapshot = await CaptureAsync(vm);
         vm.CascadeIcSettings[0].XChannels = 99;

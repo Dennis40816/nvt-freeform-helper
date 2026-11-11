@@ -1,6 +1,7 @@
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.UI.Contracts;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels.Grid;
 
@@ -9,7 +10,6 @@ namespace FreeformHelper.UI.ViewModels;
 public sealed partial class FreeformHelperViewModel
 {
     // Each operation snapshot is owned and accessed only on the UI thread.
-    private readonly UiOperationProgressState _dxfOverlapState = new();
     private readonly UiOperationProgressState _matchState = new();
     private readonly UiOperationProgressState _indexMappingState = new();
 

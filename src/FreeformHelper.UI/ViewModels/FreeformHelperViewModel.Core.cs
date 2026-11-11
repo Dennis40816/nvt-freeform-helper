@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Application.Services;
@@ -7,10 +8,12 @@ using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.CadEditing;
+using FreeformHelper.UI.CadImport;
 using FreeformHelper.UI.Interaction;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.Services.CadEditing;
+using FreeformHelper.UI.Services.CadImport;
 using FreeformHelper.UI.UseCases.ProjectLoad;
 using FreeformHelper.UI.ViewModels.Grid;
 using FreeformHelper.UI.ViewModels.Project;
@@ -48,7 +51,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     // --- Delegates for UI-specific Dialogs ---
     // These delegates are set by the View (FreeformHelperView) to enable the ViewModel
     // to trigger platform-specific file dialogs or confirmation prompts.
-    public Func<Task<string?>>? PickOpenDxfPathAsync { get => _viewCallbacks.PickOpenDxfPathAsync; set => _viewCallbacks.PickOpenDxfPathAsync = value; }
+    public Func<Task<string?>>? PickOpenDxfPathAsync { get => CadImport.PickOpenDxfPathAsync; set => CadImport.PickOpenDxfPathAsync = value; }
     public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get => RegularMask.PickOpenRegularVisibilityMaskPathAsync; set => RegularMask.PickOpenRegularVisibilityMaskPathAsync = value; }
     public Func<Task<string?>>? PickLoadProjectPathAsync { get => _viewCallbacks.PickLoadProjectPathAsync; set => _viewCallbacks.PickLoadProjectPathAsync = value; }
     public Func<Task<string?>>? PickSaveProjectPathAsync { get => _viewCallbacks.PickSaveProjectPathAsync; set => _viewCallbacks.PickSaveProjectPathAsync = value; }
@@ -62,7 +65,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     public Func<SimulationSafetyAuditResult?>? GetCurrentSimulationSafetyAudit { get => _viewCallbacks.GetCurrentSimulationSafetyAudit; set => _viewCallbacks.GetCurrentSimulationSafetyAudit = value; }
     public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get => _viewCallbacks.OpenDxfEditChangeListAsync; set => _viewCallbacks.OpenDxfEditChangeListAsync = value; }
     public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get => _viewCallbacks.OpenIndexMappingReportAsync; set => _viewCallbacks.OpenIndexMappingReportAsync = value; }
-    public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get => _viewCallbacks.OpenDxfOverlapReportAsync; set => _viewCallbacks.OpenDxfOverlapReportAsync = value; }
+    public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get => Quality.OpenDxfOverlapReportAsync; set => Quality.OpenDxfOverlapReportAsync = value; }
     public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get => _viewCallbacks.OpenDxfLayerImageExportAsync; set => _viewCallbacks.OpenDxfLayerImageExportAsync = value; }
 
     // --- Application Services ---
@@ -97,7 +100,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly GridRebuildUseCase _gridRebuildUseCase;
     private readonly SelectionCoordinator _selectionCoordinator;
     private readonly CadLoadUseCase _cadLoadUseCase;
-    private readonly CadLoadWorkflowService _cadLoadWorkflowService;
     private readonly LayerCatalogStateService _layerCatalogStateService;
     private readonly ProjectPersistenceCoordinator _projectPersistenceCoordinator;
     private readonly UndoService _undoService = new();
@@ -163,6 +165,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         _projectUiSnapshotMapper = new ProjectUiSnapshotMapper(CreateProjectSnapshotReaders());
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
         _statusReporter = new UiOperationStatusReporter(message => StatusText = message);
+        (_cadLoadUseCase, _layerCatalogStateService, Layers, CadImport, Quality) = CreateCadChildren();
         RegularMask = CreateRegularMask();
         UiEvents = uiEvents ?? new UiEventRunner(new UiEventFailureReporter(_statusReporter).Report, EmergencyLogSink.Report);
         _appGeneralSettingsStore = appGeneralSettingsStore ?? new AppGeneralSettingsStore();
@@ -210,14 +213,102 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         InteractionState.SelectionChanged += OnInteractionSelectionChanged;
         _gridRebuildUseCase = new GridRebuildUseCase(RequestFitAfterNextRebuild, RebuildGridAsync);
         _selectionCoordinator = new SelectionCoordinator(InteractionState);
-        _cadLoadUseCase = new CadLoadUseCase(_dxfImportService);
-        _cadLoadWorkflowService = new CadLoadWorkflowService(_cadLoadUseCase);
-        _layerCatalogStateService = new LayerCatalogStateService(_dxfLayerCatalogReader);
         _projectPersistenceCoordinator = CreateProjectPersistenceCoordinator();
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
         _logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
         StartupPerfTracker.Mark("workspace.vm-ctor-complete");
     }
+
+    /// <summary>Gets stable CAD children; project load replaces their values, not their identities.</summary>
+    public LayerSelectionViewModel Layers { get; }
+    public CadImportViewModel CadImport { get; }
+    public DxfQualityViewModel Quality { get; }
+
+    private (CadLoadUseCase Load, LayerCatalogStateService Catalog, LayerSelectionViewModel Layers, CadImportViewModel Import, DxfQualityViewModel Quality)
+        CreateCadChildren()
+    {
+        var load = new CadLoadUseCase(_dxfImportService);
+        var workflow = new CadLoadWorkflowService(load);
+        var catalog = new LayerCatalogStateService(_dxfLayerCatalogReader);
+        var layers = CreateCadLayers();
+        var import = CreateCadImport(workflow, catalog, layers);
+        var quality = CreateDxfQuality();
+        ForwardCadChildNotifications(layers);
+        ForwardCadChildNotifications(import);
+        ForwardCadChildNotifications(quality);
+        return (load, catalog, layers, import, quality);
+    }
+
+    private void ForwardCadChildNotifications(ObservableObject child)
+    {
+        child.PropertyChanging += (_, args) => OnPropertyChanging(args);
+        child.PropertyChanged += (_, args) => OnPropertyChanged(args);
+    }
+
+    private LayerSelectionViewModel CreateCadLayers()
+    {
+        var guards = new CadLayerGuards(CanProceedWithPendingEdits, () => _isLoadingSettings, () => _undoSuppression.IsActive,
+            () => _settingsSuppression.EnterLayerToggleChange(), () => _settingsSuppression.IsLayerToggleChangeActive,
+            () => _settingsSuppression.EnterBoundLayerSelectionChange(), () => _settingsSuppression.IsBoundLayerSelectionChangeActive,
+            () => _settingsSuppression.EnterRegularSourceLayerSelectionChange(), () => _settingsSuppression.IsRegularSourceLayerSelectionChangeActive);
+        var inputs = new CadLayerInputs(() => _layerCatalogStateService.Catalog, () => RegularSourceMode, () => GridAlignmentMode,
+            () => XChannels, () => YChannels, () => CascadeNum, () => DxfEditTargetLayerName, () => DxfEditRotationLayerName,
+            () => ColorCadByArea, () => AreaBucketTolerance, () => CadPads.ToList());
+        return new LayerSelectionViewModel(state => new CadLayerWorkflow(CadDocument, state, guards, inputs, CreateCadLayerEffects(), _logger));
+    }
+
+    private CadLayerEffects CreateCadLayerEffects() => new(
+        MarkUnsaved, PushUndo, ApplySettingsOrchestration, requestFit => TriggerGridRebuildAsync(requestFit), SetStatus, SetStatusError,
+        (options, target, rotation) =>
+        {
+            DxfEditLayerOptions = new ObservableCollection<string>(options);
+            DxfEditTargetLayerName = target;
+            DxfEditRotationLayerName = rotation;
+        },
+        NotifyDxfEditPanelActionStateChanged, ClearCadLayerOutput, UpdateCadOutputFwDiffIndexing,
+        () => SyncHiddenCadIdsToProject(), () => ClearPadMatchResult(clearRegularAssignments: true),
+        () => ResetWorkflowFromStep(WorkflowStepId.Step1Match, showStatus: false),
+        ids => _selectionCoordinator.ApplyProgrammaticSelection(ids, Array.Empty<int>(), CanvasHost));
+
+    private void ClearCadLayerOutput()
+    {
+        CadPads = new ObservableCollection<CadPad>();
+        CadDocument.InvalidateFilteredCad();
+        _cadOutputFwDiffIndexByCadId.Clear();
+        _cadDisplayIndexByCadId.Clear();
+        SetLatestCadOutputFwDiffAssignmentDecisions(new Dictionary<int, CadOutputFwDiffAssignmentDecision>());
+        RefreshDxfEditLayerOptions(Array.Empty<string>());
+    }
+
+    private CadImportViewModel CreateCadImport(CadLoadWorkflowService loadWorkflow, LayerCatalogStateService catalog, LayerSelectionViewModel layers)
+    {
+        var effects = new CadImportEffects(CanProceedWithPendingEdits, () => _isLoadingSettings,
+            clear => RegularMask.Workflow.ResetSelection(clear), CaptureCadEditNotifications,
+            previous => SyncHiddenCadIdsToProject(previous), previous => SyncCombinedCadState(previous),
+            previous => SyncDuplicateCadState(previous), path => _projectFile.LastDxfPath = path,
+            () => _projectSession.LastSavedPath = null, MarkUnsaved, SetStatus, SetStatusError,
+            () => TriggerGridRebuildAsync(requestFit: true), RunWithCadLoadCanvasOverlayAsync,
+            (name, operation, error) => RunUiOperationAsync(name, operation, error));
+        return new CadImportViewModel(options => new CadImportWorkflow(CadDocument, _cadEditWorkflow, layers.Workflow,
+            loadWorkflow, catalog, _dxfImportService, options, effects, _logger),
+            (oldValue, newValue, restore, label) => TrackUndo(oldValue, newValue, restore, label));
+    }
+
+    private DxfQualityViewModel CreateDxfQuality()
+    {
+        var effects = new DxfQualityEffects(() => CadPads.ToList(), SetStatus, SetStatusError,
+            ids => _selectionCoordinator.ApplyProgrammaticSelection(ids, Array.Empty<int>(), CanvasHost),
+            () => _selectionCoordinator.ClearSelection(CanvasHost),
+            (name, busy, progress, operation, error, start) => RunUiProgressOperationAsync(name, busy, progress, operation, error, start));
+        return new DxfQualityViewModel(state => new DxfQualityWorkflow(CadDocument, state, effects, _logger));
+    }
+
+    private void MarkUnsaved()
+    {
+        if (!_isLoadingSettings) HasUnsavedChanges = true;
+    }
+
+    private bool CanProceedWithPendingEdits() => EnsureNoPendingEdits?.Invoke() ?? true;
 
     private RegularMaskViewModel CreateRegularMask()
     {

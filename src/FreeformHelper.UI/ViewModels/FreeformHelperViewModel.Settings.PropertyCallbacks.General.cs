@@ -60,12 +60,6 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
-    partial void OnRecalcBoundsOnLayerFilterChanged(bool value)
-    {
-        if (_isLoadingSettings) return;
-        ApplySettingsOrchestration(nameof(RecalcBoundsOnLayerFilter));
-    }
-
     partial void OnApplyAppVisualPreferencesOnProjectLoadChanged(bool value)
     {
         if (_isLoadingSettings)

@@ -138,49 +138,8 @@ public sealed partial class FreeformHelperViewModel
 
     partial void OnColorCadByAreaChanged(bool value);
 
-    /// <summary>
-    /// Gets or sets a value indicating whether only closed polylines should be imported from DXF.
-    /// </summary>
-    public bool ImportOnlyClosedPolylines
-    {
-        get => _canvasToggles.ImportOnlyClosedPolylines;
-        set
-        {
-            if (_canvasToggles.ImportOnlyClosedPolylines == value)
-            {
-                return;
-            }
-
-            OnImportOnlyClosedPolylinesChanging(value);
-            OnPropertyChanging();
-            _canvasToggles = _canvasToggles with { ImportOnlyClosedPolylines = value };
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnImportOnlyClosedPolylinesChanging(bool value);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether polylines from the DXF BLOCKS section should be imported.
-    /// </summary>
-    public bool ImportBlockPolylines
-    {
-        get => _canvasToggles.ImportBlockPolylines;
-        set
-        {
-            if (_canvasToggles.ImportBlockPolylines == value)
-            {
-                return;
-            }
-
-            OnImportBlockPolylinesChanging(value);
-            OnPropertyChanging();
-            _canvasToggles = _canvasToggles with { ImportBlockPolylines = value };
-            OnPropertyChanged();
-        }
-    }
-
-    partial void OnImportBlockPolylinesChanging(bool value);
+    public bool ImportOnlyClosedPolylines { get => CadImport.ImportOnlyClosedPolylines; set => CadImport.ImportOnlyClosedPolylines = value; }
+    public bool ImportBlockPolylines { get => CadImport.ImportBlockPolylines; set => CadImport.ImportBlockPolylines = value; }
 
     private readonly WorkflowPanelState _workflowPanelState;
 
@@ -365,8 +324,6 @@ public sealed partial class FreeformHelperViewModel
     partial void OnHighlightUnmatchedChanging(bool value) => TrackUndo(HighlightUnmatched, value, v => HighlightUnmatched = v, "Toggle unmatched highlight");
     partial void OnHighlightFreeformChanging(bool value) => TrackUndo(HighlightFreeform, value, v => HighlightFreeform = v, "Toggle freeform highlight");
     partial void OnColorCadByAreaChanging(bool value) => TrackUndo(ColorCadByArea, value, v => ColorCadByArea = v, "Toggle CAD area colors");
-    partial void OnImportOnlyClosedPolylinesChanging(bool value) => TrackUndo(ImportOnlyClosedPolylines, value, v => ImportOnlyClosedPolylines = v, "Import closed polylines");
-    partial void OnImportBlockPolylinesChanging(bool value) => TrackUndo(ImportBlockPolylines, value, v => ImportBlockPolylines = v, "Import block polylines");
     partial void OnCadLineColorHexChanging(string value) => TrackUndo(CadLineColorHex, value, v => CadLineColorHex = v, "CAD line color");
     partial void OnRegularLineColorHexChanging(string value) => TrackUndo(RegularLineColorHex, value, v => RegularLineColorHex = v, "Regular line color");
     partial void OnRegularSelectedColorHexChanging(string value) => TrackUndo(RegularSelectedColorHex, value, v => RegularSelectedColorHex = v, "Regular selection color");

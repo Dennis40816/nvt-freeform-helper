@@ -20,9 +20,9 @@ public sealed class LayerSourceSelectionPropertyTests
     private static readonly Setting[] _settings =
     [
         new(nameof(FreeformHelperViewModel.HasCadLayers), true, false, false),
-        new(nameof(FreeformHelperViewModel.SelectedBoundLayerOption), new FreeformHelperViewModel.BoundLayerOption("LAYER_A", "LAYER_A"), false, true),
+        new(nameof(FreeformHelperViewModel.SelectedBoundLayerOption), new FreeformHelper.Application.CadImport.BoundLayerOption("LAYER_A", "LAYER_A"), false, true),
         new(nameof(FreeformHelperViewModel.BoundLayerOptionSummary), "changed summary", false, false),
-        new(nameof(FreeformHelperViewModel.SelectedRegularSourceLayerOption), new FreeformHelperViewModel.RegularSourceLayerOption("LAYER_B", "LAYER_B"), false, false),
+        new(nameof(FreeformHelperViewModel.SelectedRegularSourceLayerOption), new FreeformHelper.Application.CadImport.RegularSourceLayerOption("LAYER_B", "LAYER_B"), false, false),
         new(nameof(FreeformHelperViewModel.DxfRegularSourceHint), "changed hint", false, false),
     ];
 
@@ -34,9 +34,9 @@ public sealed class LayerSourceSelectionPropertyTests
         var vm = new FreeformHelperViewModel();
 
         Assert.False(vm.HasCadLayers);
-        Assert.Equal(new FreeformHelperViewModel.BoundLayerOption(null, "Auto (visible layers)"), vm.SelectedBoundLayerOption);
+        Assert.Equal(new FreeformHelper.Application.CadImport.BoundLayerOption(null, "Auto (visible layers)"), vm.SelectedBoundLayerOption);
         Assert.Equal("Hidden bounds layer is still valid.", vm.BoundLayerOptionSummary);
-        Assert.Equal(new FreeformHelperViewModel.RegularSourceLayerOption(null, "Select layer"), vm.SelectedRegularSourceLayerOption);
+        Assert.Equal(new FreeformHelper.Application.CadImport.RegularSourceLayerOption(null, "Select layer"), vm.SelectedRegularSourceLayerOption);
         Assert.Equal("", vm.DxfRegularSourceHint);
     }
 
@@ -90,9 +90,9 @@ public sealed class LayerSourceSelectionPropertyTests
         setting.Name switch
         {
             nameof(FreeformHelperViewModel.HasCadLayers) => false,
-            nameof(FreeformHelperViewModel.SelectedBoundLayerOption) => new FreeformHelperViewModel.BoundLayerOption(null, "Auto (visible layers)"),
+            nameof(FreeformHelperViewModel.SelectedBoundLayerOption) => new FreeformHelper.Application.CadImport.BoundLayerOption(null, "Auto (visible layers)"),
             nameof(FreeformHelperViewModel.BoundLayerOptionSummary) => "Hidden bounds layer is still valid.",
-            nameof(FreeformHelperViewModel.SelectedRegularSourceLayerOption) => new FreeformHelperViewModel.RegularSourceLayerOption(null, "Select layer"),
+            nameof(FreeformHelperViewModel.SelectedRegularSourceLayerOption) => new FreeformHelper.Application.CadImport.RegularSourceLayerOption(null, "Select layer"),
             nameof(FreeformHelperViewModel.DxfRegularSourceHint) => "",
             _ => setting.NewValue,
         };

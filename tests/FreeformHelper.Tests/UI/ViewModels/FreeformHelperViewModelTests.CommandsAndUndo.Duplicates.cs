@@ -3,8 +3,8 @@ using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.CadImport;
 using FreeformHelper.UI.Icons;
-using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 

@@ -179,7 +179,7 @@ public sealed partial class FreeformHelperView
             return;
         }
 
-        if (control.DataContext is not FreeformHelperViewModel.LayerToggle toggle)
+        if (control.DataContext is not FreeformHelper.UI.CadImport.LayerToggle toggle)
         {
             return;
         }
@@ -191,7 +191,7 @@ public sealed partial class FreeformHelperView
 
         if (LayerTogglePointerPolicy.IsSoloRequest(e.GetCurrentPoint(this).Properties.IsLeftButtonPressed, e.KeyModifiers))
         {
-            viewModel.ApplyLayerSelection(toggle, soloSelect: true);
+            viewModel.Layers.ApplyLayerSelection(toggle, soloSelect: true);
             e.Handled = true;
         }
     }

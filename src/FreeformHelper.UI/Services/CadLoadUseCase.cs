@@ -1,6 +1,7 @@
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
+using FreeformHelper.UI.CadImport;
 
 namespace FreeformHelper.UI.Services;
 
@@ -107,15 +108,3 @@ public sealed class CadLoadUseCase
     }
 }
 
-public enum CadLoadSource
-{
-    Path,
-    Embedded,
-}
-
-public sealed record CadLoadOutcome(
-    CadPadSet Cad,
-    CadLoadSource Source,
-    string? SourcePath,
-    CadPadExactDuplicateSanitizationResult DuplicateSanitization,
-    string? FallbackWarning = null);

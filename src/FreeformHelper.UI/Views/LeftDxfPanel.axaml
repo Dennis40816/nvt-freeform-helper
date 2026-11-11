@@ -18,15 +18,15 @@
   </UserControl.Resources>
   <StackPanel Spacing="{StaticResource Space10}">
     <panels:CollapsiblePanel Title="Import &amp; DXF check" IsExpanded="False">
-      <panels:CollapsiblePanel.HeaderRight><SelectableTextBlock Classes="stepNote" Text="{Binding DxfCheckHeaderText}" ToolTip.Tip="{Binding DxfOverlapSummary}"
+      <panels:CollapsiblePanel.HeaderRight><SelectableTextBlock Classes="stepNote" Text="{Binding DxfCheckHeaderText}" ToolTip.Tip="{Binding Quality.DxfOverlapSummary}"
             MaxWidth="{DynamicResource WorkspaceCompactStatusMaxWidth}" TextTrimming="CharacterEllipsis"/></panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}">
         <CheckBox Content="Only closed polylines"
-                  IsChecked="{Binding ImportOnlyClosedPolylines, Mode=TwoWay}"
+                  IsChecked="{Binding CadImport.ImportOnlyClosedPolylines, Mode=TwoWay}"
                   ToolTip.Tip="Only import closed polylines from the DXF."/>
         <SelectableTextBlock Classes="stepNote" Text="Reopen the DXF to apply import changes."/>
         <Button Classes="workspaceActionButton"
-                Command="{Binding CheckDxfQualityCommand}"
+                Command="{Binding Quality.CheckDxfQualityCommand}"
                 ToolTip.Tip="Scan the current DXF for duplicates or overlaps.">
           <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
             <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Search}"/>
@@ -36,17 +36,17 @@
         </Button>
         <ProgressBar Minimum="0"
                      Maximum="1"
-                     Value="{Binding DxfOverlapProgress}"
-                     IsVisible="{Binding IsCheckingDxfOverlap}"
+                     Value="{Binding Quality.DxfOverlapProgress}"
+                     IsVisible="{Binding Quality.IsCheckingDxfOverlap}"
                      Height="{StaticResource Space6}"/>
-        <StackPanel Spacing="{StaticResource Space6}" IsVisible="{Binding HasDxfOverlapIssues}">
-          <SelectableTextBlock Classes="stepNote" Text="{Binding DxfOverlapIssueCount, StringFormat='Issues: {0}'}"/>
+        <StackPanel Spacing="{StaticResource Space6}" IsVisible="{Binding Quality.HasDxfOverlapIssues}">
+          <SelectableTextBlock Classes="stepNote" Text="{Binding Quality.DxfOverlapIssueCount, StringFormat='Issues: {0}'}"/>
           <WrapPanel>
-            <Button Classes="actionTextButton actionGhost" Content="Details" Command="{Binding ShowDxfOverlapDetailsCommand}"
+            <Button Classes="actionTextButton actionGhost" Content="Details" Command="{Binding Quality.ShowDxfOverlapDetailsCommand}"
                     ToolTip.Tip="Open overlap details window (copy supported)."/>
-            <Button Classes="actionTextButton actionGhost" Content="Select" Command="{Binding SelectDxfOverlapPadsCommand}"
+            <Button Classes="actionTextButton actionGhost" Content="Select" Command="{Binding Quality.SelectDxfOverlapPadsCommand}"
                     ToolTip.Tip="Restore overlap highlight and select those CAD pads."/>
-            <Button Classes="actionTextButton actionGhost" Content="Clear" Command="{Binding ClearDxfOverlapHighlightsCommand}"
+            <Button Classes="actionTextButton actionGhost" Content="Clear" Command="{Binding Quality.ClearDxfOverlapHighlightsCommand}"
                     ToolTip.Tip="Clear overlap highlight and current selection."/>
           </WrapPanel>
         </StackPanel>
@@ -56,21 +56,21 @@
       <panels:CollapsiblePanel.HeaderRight>
         <ToggleButton
                       Classes="dxfLayerBulkToggleButton"
-                      IsChecked="{Binding IsCadLayerBulkToggleChecked, Mode=TwoWay}"
-                      IsEnabled="{Binding HasCadLayers}"
-                      ToolTip.Tip="{Binding CadLayerBulkToggleToolTip}">
+                      IsChecked="{Binding Layers.IsCadLayerBulkToggleChecked, Mode=TwoWay}"
+                      IsEnabled="{Binding Layers.HasCadLayers}"
+                      ToolTip.Tip="{Binding Layers.CadLayerBulkToggleToolTip}">
           <Grid Classes="dxfLayerBulkToggleContent"
                 ColumnDefinitions="Auto,*">
             <Border Classes="dxfLayerBulkMixedIndicator"
-                    IsVisible="{Binding AreSomeCadLayersSelected}"/>
+                    IsVisible="{Binding Layers.AreSomeCadLayersSelected}"/>
             <SelectableTextBlock Grid.Column="1"
                                  Classes="dxfLayerBulkToggleLabel"
-                                 Text="{Binding CadLayerBulkToggleText}"/>
+                                 Text="{Binding Layers.CadLayerBulkToggleText}"/>
           </Grid>
         </ToggleButton>
       </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}">
-            <ItemsControl ItemsSource="{Binding LayerToggles}">
+            <ItemsControl ItemsSource="{Binding Layers.LayerToggles}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
                   <ToggleButton Classes="layerToggle"
@@ -99,8 +99,8 @@
         <SelectableTextBlock Classes="stepNote"
                              Text="Used when alignment mode is DXF bounds."/>
         <ComboBox Classes="boundLayerSelector"
-                  ItemsSource="{Binding BoundLayerOptions}"
-                  SelectedItem="{Binding SelectedBoundLayerOption, Mode=TwoWay}"
+                  ItemsSource="{Binding Layers.BoundLayerOptions}"
+                  SelectedItem="{Binding Layers.SelectedBoundLayerOption, Mode=TwoWay}"
                   MaxDropDownHeight="{StaticResource LayerListMaxHeight}"
                   ToolTip.Tip="Layer used to determine grid bounds when using DXF alignment.">
           <ComboBox.ItemTemplate>
@@ -109,7 +109,7 @@
             </DataTemplate>
           </ComboBox.ItemTemplate>
         </ComboBox>
-        <SelectableTextBlock Text="{Binding BoundLayerOptionSummary}"
+        <SelectableTextBlock Text="{Binding Layers.BoundLayerOptionSummary}"
                              Foreground="{DynamicResource BrushTextMuted}"
                              TextWrapping="Wrap"/>
       </StackPanel>

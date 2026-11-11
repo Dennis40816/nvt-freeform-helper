@@ -1,7 +1,9 @@
-namespace FreeformHelper.UI.ViewModels;
+using FreeformHelper.Application.CadImport;
+
+namespace FreeformHelper.UI.CadImport;
 
 /// <summary>
-/// Holds the layer source selection of the main view model: the CAD layer flag, the selected bound layer
+/// Holds the staged layer source publication of the layer child: the CAD layer flag, the selected bound layer
 /// option and its summary, and the selected regular source layer option and its hint.
 /// The view model replaces the whole value when one of them changes and forwards one property per member
 /// so the bindings keep their names. The option lists stay on the view model because a record start
@@ -14,9 +16,9 @@ namespace FreeformHelper.UI.ViewModels;
 /// <param name="DxfRegularSourceHint">Helper text for DXF regular-source validation and suggested IC/grid settings.</param>
 public sealed record LayerSourceSelection(
     bool HasCadLayers,
-    FreeformHelperViewModel.BoundLayerOption SelectedBoundLayerOption,
+    BoundLayerOption SelectedBoundLayerOption,
     string BoundLayerOptionSummary,
-    FreeformHelperViewModel.RegularSourceLayerOption SelectedRegularSourceLayerOption,
+    RegularSourceLayerOption SelectedRegularSourceLayerOption,
     string DxfRegularSourceHint)
 {
     /// <summary>
@@ -24,8 +26,8 @@ public sealed record LayerSourceSelection(
     /// </summary>
     public static LayerSourceSelection Initial { get; } = new(
         false,
-        new FreeformHelperViewModel.BoundLayerOption(null, "Auto (visible layers)"),
+        new BoundLayerOption(null, "Auto (visible layers)"),
         "Hidden bounds layer is still valid.",
-        new FreeformHelperViewModel.RegularSourceLayerOption(null, "Select layer"),
+        new RegularSourceLayerOption(null, "Select layer"),
         string.Empty);
 }

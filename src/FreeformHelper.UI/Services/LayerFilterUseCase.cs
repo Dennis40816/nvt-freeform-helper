@@ -1,43 +1,19 @@
+using FreeformHelper.Application.CadImport;
 using FreeformHelper.Domain.Pads;
-using FreeformHelper.UI.ViewModels;
+using FreeformHelper.UI.CadImport;
 
 namespace FreeformHelper.UI.Services;
 
-/// <summary>
-/// Computes layer filter results for CAD pads based on layer toggles.
-/// </summary>
+/// <summary>Adapts observable layer inputs to the shared pure visibility rule.</summary>
 public sealed class LayerFilterUseCase
 {
-    public static IReadOnlyList<string> GetLayerNames(CadPadSet cad)
+    public static IReadOnlyList<string> GetLayerNames(CadPadSet cad) => CadLayerVisibilityRules.GetLayerNames(cad);
+
+    public static LayerFilterResult Filter(CadPadSet cad, IReadOnlyCollection<LayerToggle> toggles)
     {
-        if (cad is null)
-        {
-            return Array.Empty<string>();
-        }
-
-        return cad.Pads
-            .Select(p => p.Layer)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-    }
-
-    public static LayerFilterResult Filter(CadPadSet cad, IReadOnlyCollection<FreeformHelperViewModel.LayerToggle> toggles)
-    {
-        var allowed = toggles
-            .Where(t => t.IsSelected)
-            .Select(t => t.Name)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        var filtered = allowed.Count == 0 && toggles.Count > 0
-            ? Enumerable.Empty<CadPad>()
-            : cad.Pads.Where(p => allowed.Count == 0 || allowed.Contains(p.Layer));
-
-        var list = filtered.ToList();
-        return new LayerFilterResult(list, allowed);
+        var result = CadLayerVisibilityRules.Filter(cad, toggles.Select(toggle => new CadLayerSelection(toggle.Name, toggle.IsSelected)).ToArray());
+        return new LayerFilterResult(result.VisiblePads, result.AllowedLayers);
     }
 }
 
-public sealed record LayerFilterResult(
-    IReadOnlyList<CadPad> VisiblePads,
-    IReadOnlyCollection<string> AllowedLayers);
+public sealed record LayerFilterResult(IReadOnlyList<CadPad> VisiblePads, IReadOnlyCollection<string> AllowedLayers);

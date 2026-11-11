@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
+using FreeformHelper.Application.CadImport;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.UI.Services;
@@ -73,34 +74,6 @@ public sealed partial class FreeformHelperViewModel
 
         if (_isLoadingSettings) return;
         ApplySettingsOrchestration(nameof(GridAlignmentMode));
-    }
-
-    partial void OnSelectedBoundLayerOptionChanged(BoundLayerOption value)
-    {
-        if (_settingsSuppression.IsBoundLayerSelectionChangeActive)
-        {
-            return;
-        }
-
-        if (GridAlignmentMode == GridAlignmentMode.FromCadBounds)
-        {
-            _ = TriggerGridRebuildAsync(requestFit: true);
-        }
-    }
-
-    partial void OnSelectedRegularSourceLayerOptionChanged(RegularSourceLayerOption value)
-    {
-        if (_settingsSuppression.IsRegularSourceLayerSelectionChangeActive)
-        {
-            return;
-        }
-
-        if (_isLoadingSettings)
-        {
-            return;
-        }
-
-        ApplySettingsOrchestration(nameof(SelectedRegularSourceLayerOption));
     }
 
     partial void OnXChannelsChanged(decimal value)
@@ -309,8 +282,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public string DxfRegularSourceHint
     {
-        get => SettingsState.DxfRegularSourceHint;
-        set => SettingsState.DxfRegularSourceHint = value;
+        get => Layers.DxfRegularSourceHint;
+        set => Layers.DxfRegularSourceHint = value;
     }
 
     /// <summary>
@@ -318,11 +291,9 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public RegularSourceLayerOption SelectedRegularSourceLayerOption
     {
-        get => SettingsState.SelectedRegularSourceLayerOption;
-        set => SettingsState.SelectedRegularSourceLayerOption = value;
+        get => Layers.SelectedRegularSourceLayerOption;
+        set => Layers.SelectedRegularSourceLayerOption = value;
     }
-
-    partial void OnSelectedRegularSourceLayerOptionChanged(RegularSourceLayerOption value);
 
     /// <summary>
     /// Gets or sets the helper text shown under bounds layer selector,
@@ -330,8 +301,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public string BoundLayerOptionSummary
     {
-        get => SettingsState.BoundLayerOptionSummary;
-        set => SettingsState.BoundLayerOptionSummary = value;
+        get => Layers.BoundLayerOptionSummary;
+        set => Layers.BoundLayerOptionSummary = value;
     }
 
     /// <summary>
@@ -339,11 +310,9 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public BoundLayerOption SelectedBoundLayerOption
     {
-        get => SettingsState.SelectedBoundLayerOption;
-        set => SettingsState.SelectedBoundLayerOption = value;
+        get => Layers.SelectedBoundLayerOption;
+        set => Layers.SelectedBoundLayerOption = value;
     }
-
-    partial void OnSelectedBoundLayerOptionChanged(BoundLayerOption value);
 
     /// <summary>
     /// Gets or sets a value indicating whether any CAD layers are available.
@@ -351,8 +320,8 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public bool HasCadLayers
     {
-        get => SettingsState.HasCadLayers;
-        set => SettingsState.HasCadLayers = value;
+        get => Layers.HasCadLayers;
+        set => Layers.HasCadLayers = value;
     }
 
     /// <summary>

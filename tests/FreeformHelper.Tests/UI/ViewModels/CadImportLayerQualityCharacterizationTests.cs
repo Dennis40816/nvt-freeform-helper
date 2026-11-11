@@ -7,10 +7,10 @@ using Avalonia.Threading;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.CadImport;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 using static FreeformHelper.Tests.FreeformHelperViewModelTests;
-using static FreeformHelper.UI.ViewModels.FreeformHelperViewModel;
 using Vm = FreeformHelper.UI.ViewModels.FreeformHelperViewModel;
 
 namespace FreeformHelper.Tests;
