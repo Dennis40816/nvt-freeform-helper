@@ -13,7 +13,7 @@ public sealed partial class FreeformHelperViewModel
         if (_cad is null)
         {
             CadPads = new ObservableCollection<CadPad>();
-            _cachedFilteredCadForBuild = null;
+            CadDocument.InvalidateFilteredCad();
             _cadOutputFwDiffIndexByCadId.Clear();
             _cadDisplayIndexByCadId.Clear();
             SetLatestCadOutputFwDiffAssignmentDecisions(new Dictionary<int, CadOutputFwDiffAssignmentDecision>());
@@ -31,7 +31,7 @@ public sealed partial class FreeformHelperViewModel
         {
             var result = LayerFilterUseCase.Filter(_cad, LayerToggles);
             var visible = result.VisiblePads
-                .Where(p => !IsCadPadEffectivelyHidden(p.Id))
+                .Where(p => !CadDocument.IsEffectivelyHidden(p.Id))
                 .ToList();
             UpdateCadOutputFwDiffIndexing(visible);
             SyncHiddenCadIdsToProject();

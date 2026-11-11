@@ -2,11 +2,13 @@
 
 using FreeformHelper.Domain.Pads;
 
-namespace FreeformHelper.UI.ViewModels;
+namespace FreeformHelper.Application.CadEditing;
 
-internal static class DxfCombinedGroupRules
+/// <summary>Pure combined-pad membership and allocation rules.</summary>
+public static class DxfCombinedGroupRules
 {
-    internal static (HashSet<int> OutputIds, HashSet<int> SourceIds) CollectGroupMemberIds(
+    /// <summary>Collects the source and output ids for existing requested groups.</summary>
+    public static (HashSet<int> OutputIds, HashSet<int> SourceIds) CollectGroupMemberIds(
         CombinedCadState combinedCad, List<int> validGroupIds)
     {
         var outputIds = new HashSet<int>();
@@ -32,7 +34,8 @@ internal static class DxfCombinedGroupRules
         return (outputIds, sourceIds);
     }
 
-    internal static int RemoveGroupMembers(
+    /// <summary>Removes group indexes and returns the number of restored hidden sources.</summary>
+    public static int RemoveGroupMembers(
         CombinedCadState combinedCad, HashSet<int> hiddenCadPadIds, HashSet<int> outputIds, HashSet<int> sourceIds)
     {
         foreach (var outputId in outputIds)
@@ -54,7 +57,8 @@ internal static class DxfCombinedGroupRules
         return restoredSources;
     }
 
-    internal static int AllocatePadId(CadPadSet? cad, CombinedCadState combinedCad)
+    /// <summary>Allocates the next unused synthetic pad id, advancing the existing allocator.</summary>
+    public static int AllocatePadId(CadPadSet? cad, CombinedCadState combinedCad)
     {
         if (cad is null)
         {
@@ -70,7 +74,8 @@ internal static class DxfCombinedGroupRules
         return combinedCad.NextPadId++;
     }
 
-    internal static List<CadPad> CreatePads(
+    /// <summary>Creates combined pads and records their output membership.</summary>
+    public static List<CadPad> CreatePads(
         string layer, IReadOnlyList<Domain.Geometry.Polygon2> polygons, int groupId, CadPadSet? cad, CombinedCadState combinedCad)
     {
         var combinedPads = new List<CadPad>(polygons.Count);

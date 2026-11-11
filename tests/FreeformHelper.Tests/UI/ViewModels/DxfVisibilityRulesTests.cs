@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
+using FreeformHelper.Application.CadEditing;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
-using FreeformHelper.UI.ViewModels;
 using Xunit;
 
 namespace FreeformHelper.Tests;

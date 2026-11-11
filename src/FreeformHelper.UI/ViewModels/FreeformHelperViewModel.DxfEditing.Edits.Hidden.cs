@@ -1,4 +1,5 @@
 using System.Globalization;
+using FreeformHelper.Application.CadEditing;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -12,7 +13,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var selected = DxfVisibilityRules.SelectVisibleSelectedCadIds(_selectedCadIds, IsCadPadEffectivelyHidden);
+        var selected = DxfVisibilityRules.SelectVisibleSelectedCadIds(_selectedCadIds, CadDocument.IsEffectivelyHidden);
         if (selected.Count == 0)
         {
             SetStatus("DXF edit: select CAD pads first.");
@@ -20,8 +21,8 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var undoSnapshot = CaptureCadEditUndoSnapshot();
-        var previous = new CadEditNotificationSnapshot(this);
+        var undoSnapshot = CadDocument.CaptureUndo();
+        var previous = CaptureCadEditNotifications();
         foreach (var id in selected)
         {
             _cadEdit.HiddenCadPadIds.Add(id);
@@ -40,7 +41,7 @@ public sealed partial class FreeformHelperViewModel
         SetStatus($"DXF edit: hid {selected.Count} CAD pad(s).");
         _logger.Info(CultureInfo.InvariantCulture, "DXF edit hid {0} pad(s). Hidden total={1}.", selected.Count, _cadEdit.HiddenCadPadIds.Count);
         MarkUnsaved();
-        PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), "DXF hide CAD pads");
+        PushUndo(() => _cadEditWorkflow.RestoreUndo(undoSnapshot), "DXF hide CAD pads");
     }
 
     private void RestoreLastDeletedCadPads()
@@ -125,7 +126,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var undoSnapshot = CaptureCadEditUndoSnapshot();
+        var undoSnapshot = CadDocument.CaptureUndo();
         foreach (var duplicateId in changedIds)
         {
             if (autoHide)
@@ -138,7 +139,7 @@ public sealed partial class FreeformHelperViewModel
             }
         }
 
-        _cachedFilteredCadForBuild = null;
+        CadDocument.InvalidateFilteredCad();
         SyncDuplicateCadState();
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
@@ -156,7 +157,7 @@ public sealed partial class FreeformHelperViewModel
             changedIds.Count,
             _cadEdit.AutoHiddenDuplicateCadPadIds.Count);
         MarkUnsaved();
-        PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), undoLabel);
+        PushUndo(() => _cadEditWorkflow.RestoreUndo(undoSnapshot), undoLabel);
     }
 
     private int RestoreHiddenCadPadsCore(
@@ -178,18 +179,18 @@ public sealed partial class FreeformHelperViewModel
             return 0;
         }
 
-        var undoSnapshot = CaptureCadEditUndoSnapshot();
-        var previous = new CadEditNotificationSnapshot(this);
+        var undoSnapshot = CadDocument.CaptureUndo();
+        var previous = CaptureCadEditNotifications();
         foreach (var id in restorableIds)
         {
             _cadEdit.HiddenCadPadIds.Remove(id);
             if (removeFromUndoBatches)
             {
-                RemoveHiddenCadIdFromUndoBatches(id);
+                CadDocument.RemoveHiddenIdFromUndoBatches(id);
             }
         }
 
-        _cachedFilteredCadForBuild = null;
+        CadDocument.InvalidateFilteredCad();
         SyncHiddenCadIdsToProject(previous);
         InteractionState.ClosePadInfo();
         _selectionCoordinator.ClearSelection(CanvasHost);
@@ -207,7 +208,7 @@ public sealed partial class FreeformHelperViewModel
             restorableIds.Count,
             _cadEdit.HiddenCadPadIds.Count);
         MarkUnsaved();
-        PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), undoLabel);
+        PushUndo(() => _cadEditWorkflow.RestoreUndo(undoSnapshot), undoLabel);
         return restorableIds.Count;
     }
 }

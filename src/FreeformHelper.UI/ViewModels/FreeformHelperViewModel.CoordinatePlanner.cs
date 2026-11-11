@@ -20,14 +20,14 @@ public sealed partial class FreeformHelperViewModel
         if (silent)
         {
             grid = _grid;
-            activeCad = BuildActiveCadPadSet();
+            activeCad = CadDocument.BuildActiveCad();
             if (grid is null || activeCad is null || activeCad.Pads.Count == 0)
             {
                 return Task.FromResult<CoordinatePlannerWorkspaceSession?>(null);
             }
         }
         else if (!TryGetOperationCadAndGrid(
-                     BuildActiveCadPadSet,
+                     CadDocument.BuildActiveCad,
                      "Coordinate: import DXF and build grid first.",
                      out activeCad!,
                      out grid!))

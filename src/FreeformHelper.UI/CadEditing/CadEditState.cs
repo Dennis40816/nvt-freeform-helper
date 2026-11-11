@@ -1,10 +1,12 @@
+// Copyright (c) 2026 Dennis Liu. All rights reserved.
+
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 
-namespace FreeformHelper.UI.ViewModels;
+namespace FreeformHelper.UI.CadEditing;
 
 /// <summary>
-/// Holds the CAD edit data of the main view model: the hidden pad ids, the pad ids that a duplicate check hid,
+/// UI-thread owned edit history within one CAD document session: the hidden pad ids, the pad ids that a duplicate check hid,
 /// the duplicate to canonical pad map, the hidden undo batches and the baseline CAD.
 /// </summary>
 internal sealed class CadEditState

@@ -1,5 +1,4 @@
-using System.Globalization;
-using FreeformHelper.Domain.Pads;
+using FreeformHelper.Application.CadEditing;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -37,7 +36,7 @@ public sealed partial class FreeformHelperViewModel
     private List<DxfEditChangeListEntry> BuildDxfEditChangeEntries()
     {
         return DxfEditChangeEntryBuilder.Build(
-            _cad, _cadEdit, _combinedCad, IsCadPadEffectivelyHidden,
+            _cad, _cadEdit, _combinedCad, CadDocument.IsEffectivelyHidden,
             static (left, right) => DxfEditRules.ArePolygonVerticesEquivalent(left, right));
     }
 
@@ -120,63 +119,7 @@ public sealed partial class FreeformHelperViewModel
             logContext: "DXF combine cleared group");
     }
 
-    private void RestoreMovedCadPadLayer(int cadPadId)
-    {
-        if (_cad is null || _cadEdit.BaselineCad is null)
-        {
-            return;
-        }
-
-        var baselinePad = _cadEdit.BaselineCad.Pads.FirstOrDefault(pad => pad.Id == cadPadId);
-        if (baselinePad is null)
-        {
-            return;
-        }
-
-        var changedCount = 0;
-        var updatedPads = new List<CadPad>(_cad.Pads.Count);
-        foreach (var pad in _cad.Pads)
-        {
-            if (pad.Id != cadPadId)
-            {
-                updatedPads.Add(pad);
-                continue;
-            }
-
-            if (string.Equals(pad.Layer, baselinePad.Layer, StringComparison.OrdinalIgnoreCase))
-            {
-                updatedPads.Add(pad);
-                continue;
-            }
-
-            updatedPads.Add(new CadPad(pad.Id, pad.Name, baselinePad.Layer, pad.Polygon));
-            changedCount++;
-        }
-
-        if (changedCount == 0)
-        {
-            return;
-        }
-
-        var undoSnapshot = CaptureCadEditUndoSnapshot();
-        var layerSelectionSnapshot = CaptureLayerSelectionSnapshot();
-        _cad = new CadPadSet(updatedPads);
-        _cachedFilteredCadForBuild = null;
-        PreserveDxfDependentLayerSelections();
-        UpdateLayerToggles(_cad);
-        RestoreLayerSelectionAfterCadLayerEdit(layerSelectionSnapshot, baselinePad.Layer);
-        SyncRelayeredCadState();
-        InteractionState.ClosePadInfo();
-        _selectionCoordinator.ClearSelection(CanvasHost);
-        SetStatus($"DXF edit: restored CAD {cadPadId} to layer '{baselinePad.Layer}'.");
-        _logger.Info(
-            CultureInfo.InvariantCulture,
-            "DXF layer restore applied. cadId={0}, layer={1}.",
-            cadPadId,
-            baselinePad.Layer);
-        MarkUnsaved();
-        PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), "DXF restore CAD layer");
-    }
+    private void RestoreMovedCadPadLayer(int cadPadId) => _cadEditWorkflow.RestoreLayer(cadPadId);
 
     private bool TryResolveCombinedCadGroupId(int cadPadId, out int groupId)
     {
