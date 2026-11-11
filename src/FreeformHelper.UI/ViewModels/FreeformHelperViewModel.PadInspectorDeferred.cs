@@ -12,14 +12,39 @@ public sealed partial class FreeformHelperViewModel
     internal const string DeferredCadInspectorRefreshWorkName = "deferred-cad-inspector-refresh";
     internal const string DeferredRegularInspectorRefreshWorkName = "deferred-regular-inspector-refresh";
 
-    private InspectorRefreshOwner<DeferredCadInspectorContext> CreateInspectorRefreshOwner(PadInspectorRequestState requests, Action<bool> writePending) =>
-        new InspectorRefreshOwner<DeferredCadInspectorContext>(
+    private InspectorRefreshOwner<DeferredCadInspectorContext> CreateInspectorRefreshOwner(
+        PadInspectorRequestState requests, Action<bool> writePending)
+    {
+        var deferred = new InspectorDeferredRefreshOwner(
+            requests,
+            new InspectorDeferredContextPorts(
+                TryResolveNotchComputationInputs,
+                () => _grid,
+                () => CreateExportSettingsSnapshot(_projectFile.Settings),
+                () => SelectedNotchCompensationModelOption.Value,
+                () => EnableToRegular,
+                () => EnableToFull,
+                () => EnableToFullRuleEngine,
+                () => EnableToFullRuleTrace,
+                GetStrictOverlapRatioForNotchCompensation,
+                CaptureDeferredInspectorWorkflow,
+                BuildNotchComputationGridFingerprint,
+                () => _workflowDataSnapshotRevision,
+                () => _notchComputationSession.Revision),
+            new InspectorDeferredResultPorts(
+                BuildDeferredInspectorResolvedAsync,
+                BuildToFullDiagnosticsText,
+                (id, diagnostics) => BuildCadPadInspectorSnapshot(
+                    id, includeExpensiveNotchDetails: true, precomputedDiagnostics: diagnostics),
+                () => PadInspectorUi.Snapshot,
+                snapshot => PadInspectorUi.Snapshot = snapshot));
+        return new InspectorRefreshOwner<DeferredCadInspectorContext>(
             requests,
             new InspectorRefreshPorts<DeferredCadInspectorContext>(
-                CaptureDeferredCadInspectorContext,
-                ResolveDeferredCadInspectorAsync,
-                TryApplyDeferredCadInspectorSnapshot,
-                CanApplyDeferredRegularInspectorSnapshot,
+                deferred.CaptureDeferredCadInspectorContext,
+                deferred.ResolveDeferredCadInspectorAsync,
+                deferred.TryApplyDeferredCadInspectorSnapshot,
+                deferred.CanApplyDeferredRegularInspectorSnapshot,
                 BuildRegularPadInspectorSnapshot,
                 snapshot => PadInspectorUi.Snapshot = snapshot,
                 (name, work) => BackgroundWork.Run(name, work),
@@ -37,6 +62,29 @@ public sealed partial class FreeformHelperViewModel
             writePending,
             DeferredCadInspectorRefreshWorkName,
             DeferredRegularInspectorRefreshWorkName);
+    }
+
+    private InspectorDeferredCadWorkflow CaptureDeferredInspectorWorkflow()
+    {
+        var snapshot = BuildWorkflowDataSnapshot();
+        return new InspectorDeferredCadWorkflow(
+            id => snapshot.TryGetCadIcIndex(id, out var index) ? index : (int?)null,
+            id => snapshot.TryGetCadOutputFwDiffIndex(id, out var index) ? index : (int?)null,
+            (cad, allCad, activeRegular, strictOverlap, precomputed, buildIfMissing) => GetOrBuildCadV22ResolvedResultCached(
+                cad, allCad, activeRegular, snapshot, strictOverlap,
+                precomputedResolved: precomputed, buildIfMissing: buildIfMissing));
+    }
+
+    private static Task<NotchV22ResolvedResult> BuildDeferredInspectorResolvedAsync(
+        InspectorDeferredCadRequest request, CancellationToken cancellationToken)
+    {
+        var resolutionRequest = new NotchResolvedResultRequest(
+            request.CadPad, request.Grid, request.Settings, request.AllCadPads, request.ActiveRegularPadIds,
+            request.CompensationModel, request.EnableToRegular, request.EnableToFull,
+            request.EnableToFullRuleEngine, request.EnableToFullRuleTrace, request.StrictOverlapRatio,
+            request.AnchorIcIndex, request.AnchorDiffIndex, request.AllocationAreaMode);
+        return Task.Run(() => NotchDetailUseCase.BuildResolvedResult(resolutionRequest), cancellationToken);
+    }
 
     public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId) =>
         Inspector.Refresh.QueueDeferredCadInspectorSnapshotRefresh(cadPadId);
@@ -86,233 +134,4 @@ public sealed partial class FreeformHelperViewModel
             complete();
         }
     }
-
-    private bool TryCreateDeferredCadInspectorContext(
-        long requestId,
-        int cadPadId,
-        long selectionRevision,
-        out DeferredCadInspectorContext context)
-    {
-        context = null!;
-        if (!TryResolveNotchComputationInputs(cadPadId, out var cad, out var allCadPads, out var activeRegularPadIds))
-        {
-            return false;
-        }
-
-        if (_grid is null)
-        {
-            return false;
-        }
-
-        var activeRegularSnapshot = activeRegularPadIds is null
-            ? null
-            : activeRegularPadIds.ToHashSet();
-        var allCadSnapshot = allCadPads.ToList();
-        var strictOverlapRatio = GetStrictOverlapRatioForNotchCompensation();
-        var workflowSnapshot = BuildWorkflowDataSnapshot();
-        var anchorIcIndex = workflowSnapshot.TryGetCadIcIndex(cadPadId, out var icIndex)
-            ? icIndex
-            : (int?)null;
-        var anchorDiffIndex = workflowSnapshot.TryGetCadOutputFwDiffIndex(cadPadId, out var diffIndex)
-            ? diffIndex
-            : (int?)null;
-        var resolutionRequest = new NotchResolvedResultRequest(
-            cad,
-            _grid,
-            CreateExportSettingsSnapshot(_projectFile.Settings),
-            allCadSnapshot,
-            activeRegularSnapshot,
-            SelectedNotchCompensationModelOption.Value,
-            EnableToRegular,
-            EnableToFull,
-            EnableToFullRuleEngine,
-            EnableToFullRuleTrace,
-            strictOverlapRatio,
-            anchorIcIndex,
-            anchorDiffIndex,
-            NotchV22TargetAllocationPolicy.ResolveAreaMode(SelectedNotchCompensationModelOption.Value));
-
-        context = new DeferredCadInspectorContext(
-            RequestId: requestId,
-            SelectionRevision: selectionRevision,
-            ResolutionRequest: resolutionRequest,
-            CadPoolFingerprint: NotchExportFingerprints.ComputeCadPoolFingerprint(allCadSnapshot),
-            ActiveRegularHash: NotchExportFingerprints.ComputeActiveRegularHash(activeRegularSnapshot),
-            GridFingerprint: BuildNotchComputationGridFingerprint(_grid),
-            PrewarmedResolved: GetOrBuildCadV22ResolvedResultCached(
-                cad,
-                allCadSnapshot,
-                activeRegularSnapshot,
-                workflowSnapshot,
-                strictOverlapRatio,
-                buildIfMissing: false),
-            WorkflowDataSnapshotRevision: _workflowDataSnapshotRevision,
-            CacheRevision: _notchComputationSession.Revision);
-        return true;
-    }
-
-    private DeferredCadInspectorContext? CaptureDeferredCadInspectorContext(
-        long requestId,
-        int cadPadId,
-        long selectionRevision,
-        CancellationToken cancellationToken)
-    {
-        if (cancellationToken.IsCancellationRequested || requestId != _padInspectorRequests.ReadCadRefreshRequestId())
-        {
-            return null;
-        }
-
-        if (!TryCreateDeferredCadInspectorContext(requestId, cadPadId, selectionRevision, out var created))
-        {
-            return null;
-        }
-
-        return created;
-    }
-
-    private static async Task<(NotchV22ResolvedResult Resolved, string? Diagnostics)> ResolveDeferredCadInspectorAsync(
-        DeferredCadInspectorContext context,
-        CancellationToken cancellationToken)
-    {
-        var resolved = context.PrewarmedResolved;
-        if (resolved is null)
-        {
-            resolved = await Task.Run(
-                () => NotchDetailUseCase.BuildResolvedResult(context.ResolutionRequest),
-                cancellationToken).ConfigureAwait(false);
-        }
-
-        var diagnostics = BuildToFullDiagnosticsText(resolved.Compensation);
-        return (resolved, diagnostics);
-    }
-
-    private bool TryApplyDeferredCadInspectorSnapshot(
-        DeferredCadInspectorContext context,
-        NotchV22ResolvedResult resolved,
-        string? diagnostics)
-    {
-        if (!CanApplyDeferredCadInspectorSnapshot(context))
-        {
-            return false;
-        }
-
-        var request = context.ResolutionRequest;
-        if (context.PrewarmedResolved is null)
-        {
-            _ = GetOrBuildCadV22ResolvedResultCached(
-                request.CadPad,
-                request.AllCadPads,
-                request.ActiveRegularPadIds,
-                BuildWorkflowDataSnapshot(),
-                request.StrictOverlapRatio,
-                precomputedResolved: resolved);
-        }
-        var snapshot = BuildCadPadInspectorSnapshot(
-            request.CadPad.Id,
-            includeExpensiveNotchDetails: true,
-            precomputedDiagnostics: diagnostics);
-        if (snapshot is null)
-        {
-            return false;
-        }
-
-        PadInspectorUi.Snapshot = snapshot;
-        return true;
-    }
-
-    private bool CanApplyDeferredCadInspectorSnapshot(DeferredCadInspectorContext context)
-    {
-        var request = context.ResolutionRequest;
-        if (context.RequestId != _padInspectorRequests.ReadCadRefreshRequestId())
-        {
-            return false;
-        }
-
-        if (context.SelectionRevision != _padInspectorRequests.ReadSelectionRevision())
-        {
-            return false;
-        }
-
-        if (_notchComputationSession.Revision != context.CacheRevision)
-        {
-            return false;
-        }
-
-        if (_workflowDataSnapshotRevision != context.WorkflowDataSnapshotRevision)
-        {
-            return false;
-        }
-
-        if (_grid is null || BuildNotchComputationGridFingerprint(_grid) != context.GridFingerprint)
-        {
-            return false;
-        }
-
-        if (!TryResolveNotchComputationInputs(
-                request.CadPad.Id,
-                out var currentCadPad,
-                out var currentCadPads,
-                out var currentActiveRegularPadIds) ||
-            NotchExportFingerprints.ComputeCadPoolFingerprint(currentCadPads) != context.CadPoolFingerprint ||
-            NotchExportFingerprints.ComputeActiveRegularHash(currentActiveRegularPadIds) != context.ActiveRegularHash)
-        {
-            return false;
-        }
-
-        if (EnableToRegular != request.EnableToRegular ||
-            EnableToFull != request.EnableToFull ||
-            EnableToFullRuleEngine != request.EnableToFullRuleEngine ||
-            EnableToFullRuleTrace != request.EnableToFullRuleTrace)
-        {
-            return false;
-        }
-
-        var currentStrictOverlapRatio = GetStrictOverlapRatioForNotchCompensation();
-        if (Math.Abs(currentStrictOverlapRatio - request.StrictOverlapRatio) > 1e-12)
-        {
-            return false;
-        }
-
-        if (context.PrewarmedResolved is not null &&
-            !ReferenceEquals(
-                GetOrBuildCadV22ResolvedResultCached(
-                    currentCadPad,
-                    currentCadPads,
-                    currentActiveRegularPadIds,
-                    BuildWorkflowDataSnapshot(),
-                    request.StrictOverlapRatio,
-                    buildIfMissing: false),
-                context.PrewarmedResolved))
-        {
-            return false;
-        }
-
-        return PadInspectorUi.Snapshot?.Cad?.CadPadId == request.CadPad.Id;
-    }
-
-    private bool CanApplyDeferredRegularInspectorSnapshot(long requestId, int regularPadId, long selectionRevision)
-    {
-        if (requestId != _padInspectorRequests.ReadRegularRefreshRequestId())
-        {
-            return false;
-        }
-
-        if (selectionRevision != _padInspectorRequests.ReadSelectionRevision())
-        {
-            return false;
-        }
-
-        return PadInspectorUi.Snapshot?.Regular?.RegularPadId == regularPadId;
-    }
-
-    private sealed record DeferredCadInspectorContext(
-        long RequestId,
-        long SelectionRevision,
-        NotchResolvedResultRequest ResolutionRequest,
-        ulong CadPoolFingerprint,
-        int ActiveRegularHash,
-        ulong GridFingerprint,
-        NotchV22ResolvedResult? PrewarmedResolved,
-        int WorkflowDataSnapshotRevision,
-        int CacheRevision);
 }
