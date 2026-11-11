@@ -53,8 +53,8 @@ public sealed partial class FreeformHelperViewModel
                 OnlyClosedPolylines = ImportOnlyClosedPolylines,
                 IncludeBlockPolylines = ImportBlockPolylines,
                 LogLevel = SelectedLogLevelOption.Value,
-                RegularVisibilityMaskSourcePath = _regularVisibilityMask.SourcePath,
-                UseRegularVisibilityMask = RegularVisibilityMaskUi.IsEnabled
+                RegularVisibilityMaskSourcePath = RegularMask.Workflow.SourcePath,
+                UseRegularVisibilityMask = RegularMask.IsEnabled
             }
         };
 
@@ -236,7 +236,7 @@ public sealed partial class FreeformHelperViewModel
             }
         }
 
-        ApplyRegularVisibilityMaskSnapshot(
+        RegularMask.Workflow.ApplySnapshot(
             sourcePath: snapshot.RegularVisibilityMaskSourcePath,
             isEnabled: snapshot.UseRegularVisibilityMask,
             allowRuntimeRefresh: allowRuntimeRefresh,

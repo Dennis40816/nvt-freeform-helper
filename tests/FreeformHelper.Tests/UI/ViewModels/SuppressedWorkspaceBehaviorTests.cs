@@ -100,16 +100,16 @@ public sealed class SuppressedWorkspaceBehaviorTests
     {
         using var fixture = new WorkspaceFixture();
         var vm = await fixture.OpenAsync();
-        vm.RegularVisibilityMaskUi.IsEnabled = true;
+        vm.RegularMask.IsEnabled = true;
         var statuses = new List<string>();
         vm.PropertyChanged += (_, args) => RecordStatus(vm, args.PropertyName, statuses);
 
         await vm.OpenDxfCommand.ExecuteAsync(null);
         await WaitForGridRebuildAsync(vm);
 
-        Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.False(vm.RegularMask.IsEnabled);
         Assert.DoesNotContain("Regular visibility mask disabled. Step 4 uses pure geometry seed.", statuses);
-        vm.RegularVisibilityMaskUi.IsEnabled = true;
+        vm.RegularMask.IsEnabled = true;
         Assert.Equal("Regular visibility mask enabled.", vm.StatusText);
     }
 

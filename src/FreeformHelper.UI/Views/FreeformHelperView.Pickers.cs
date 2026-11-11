@@ -67,7 +67,7 @@ public sealed partial class FreeformHelperView
         viewModel.InteractionState.PadInfoChanged -= OnPadInfoChanged;
         // Clear all delegate references to prevent memory leaks.
         viewModel.PickOpenDxfPathAsync = null;
-        viewModel.PickOpenRegularVisibilityMaskPathAsync = null;
+        viewModel.RegularMask.PickOpenRegularVisibilityMaskPathAsync = null;
         viewModel.PickLoadProjectPathAsync = null;
         viewModel.PickSaveProjectPathAsync = null;
         viewModel.PickSaveNotchPathAsync = null;
@@ -105,7 +105,7 @@ public sealed partial class FreeformHelperView
         var pickers = new MainWindowFilePickerService(storage);
 
         viewModel.PickOpenDxfPathAsync = pickers.OpenDxfAsync;
-        viewModel.PickOpenRegularVisibilityMaskPathAsync = pickers.OpenRegularVisibilityMaskAsync;
+        viewModel.RegularMask.PickOpenRegularVisibilityMaskPathAsync = pickers.OpenRegularVisibilityMaskAsync;
         viewModel.PickLoadProjectPathAsync = pickers.OpenProjectAsync;
         viewModel.PickSaveProjectPathAsync = pickers.SaveProjectAsync;
         viewModel.PickSaveNotchPathAsync = pickers.SaveNotchAsync;

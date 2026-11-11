@@ -19,7 +19,7 @@ public sealed class RegularMaskCharacterizationTests
         using var files = new IoFailureScope();
         var saved = await CreateWorkspaceAsync(files);
         await ImportMaskAsync(saved, WriteMask(files, "saved.csv", "10,0"));
-        saved.RegularVisibilityMaskUi.IsEnabled = false;
+        saved.RegularMask.IsEnabled = false;
         var projectPath = await SaveEmbeddedProjectAsync(saved, files.PathFor("replacement.json"));
         var vm = await CreateWorkspaceAsync(files);
         var previousRegularPads = vm.RegularPads;
@@ -33,9 +33,9 @@ public sealed class RegularMaskCharacterizationTests
             Assert.True((await vm.LoadProjectFromPathAsync(projectPath)).IsLoaded);
             await WaitForGridRebuildAsync(vm);
             Assert.NotSame(previousRegularPads, vm.RegularPads);
-            Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
-            Assert.NotNull(vm.RegularVisibilityMaskForTests.EmbeddedMask);
-            Assert.Equal(0, Assert.Single(vm.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
+            Assert.False(vm.RegularMask.IsEnabled);
+            Assert.NotNull(vm.RegularMask.Workflow.EmbeddedMask);
+            Assert.Equal(0, Assert.Single(vm.RegularMask.Workflow.Mask.ActiveRegularPadIds));
             var revision = vm.SimulationWorkspaceSourceRevision;
             var publications = ObservePublications(vm);
 
@@ -43,11 +43,11 @@ public sealed class RegularMaskCharacterizationTests
             await pendingImport.WaitAsync(TimeSpan.FromSeconds(30), TestContext.Current.CancellationToken);
 
             // KNOWN DEFECT: A picker opened for the previous project replaces the newly loaded project's mask.
-            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
-            Assert.Equal(latePath, vm.RegularVisibilityMaskForTests.SourcePath);
-            Assert.Null(vm.RegularVisibilityMaskForTests.EmbeddedMask);
-            Assert.Null(vm.RegularVisibilityMaskForTests.EmbeddedName);
-            Assert.Equal(1, Assert.Single(vm.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
+            Assert.True(vm.RegularMask.IsEnabled);
+            Assert.Equal(latePath, vm.RegularMask.Workflow.SourcePath);
+            Assert.Null(vm.RegularMask.Workflow.EmbeddedMask);
+            Assert.Null(vm.RegularMask.Workflow.EmbeddedName);
+            Assert.Equal(1, Assert.Single(vm.RegularMask.Workflow.Mask.ActiveRegularPadIds));
             Assert.Equal(1, ReadDiff(vm));
             Assert.Equal((revision + 1, true, 1), Assert.Single(publications));
             Assert.Equal(revision + 1, vm.SimulationWorkspaceSourceRevision);
@@ -78,7 +78,7 @@ public sealed class RegularMaskCharacterizationTests
             await vm.MatchCommand.ExecuteAsync(null);
             Assert.NotSame(previousRegularPads, vm.RegularPads);
             Assert.Equal(3, vm.RegularPads.Count);
-            Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
+            Assert.False(vm.RegularMask.IsEnabled);
             var revision = vm.SimulationWorkspaceSourceRevision;
             var publications = ObservePublications(vm);
 
@@ -86,11 +86,11 @@ public sealed class RegularMaskCharacterizationTests
             await pendingImport.WaitAsync(TimeSpan.FromSeconds(30), TestContext.Current.CancellationToken);
 
             // KNOWN DEFECT: A picker opened for the old grid is accepted against the replacement grid without an identity check.
-            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
-            Assert.Equal(path, vm.RegularVisibilityMaskForTests.SourcePath);
-            Assert.True(vm.RegularVisibilityMaskForTests.Mask.HasLoadedMask);
-            Assert.Equal(1, Assert.Single(vm.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
-            Assert.Equal(2, vm.RegularVisibilityMaskForTests.Mask.InactiveRegularCount);
+            Assert.True(vm.RegularMask.IsEnabled);
+            Assert.Equal(path, vm.RegularMask.Workflow.SourcePath);
+            Assert.True(vm.RegularMask.Workflow.Mask.HasLoadedMask);
+            Assert.Equal(1, Assert.Single(vm.RegularMask.Workflow.Mask.ActiveRegularPadIds));
+            Assert.Equal(2, vm.RegularMask.Workflow.Mask.InactiveRegularCount);
             Assert.Equal((revision + 1, true, 1), Assert.Single(publications));
             Assert.Equal(revision + 1, vm.SimulationWorkspaceSourceRevision);
         }
@@ -113,12 +113,12 @@ public sealed class RegularMaskCharacterizationTests
         var vm = files.CreateViewModel();
         Assert.True((await vm.LoadProjectFromPathAsync(projectPath)).IsLoaded);
         await WaitForGridRebuildAsync(vm);
-        var accepted = vm.RegularVisibilityMaskForTests.Mask;
-        var embedded = vm.RegularVisibilityMaskForTests.EmbeddedMask;
-        var embeddedName = vm.RegularVisibilityMaskForTests.EmbeddedName;
+        var accepted = vm.RegularMask.Workflow.Mask;
+        var embedded = vm.RegularMask.Workflow.EmbeddedMask;
+        var embeddedName = vm.RegularMask.Workflow.EmbeddedName;
         Assert.NotNull(embedded);
         Assert.True(accepted.HasLoadedMask);
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularMask.IsEnabled);
         Assert.Equal(1, ReadDiff(vm));
         var revision = vm.SimulationWorkspaceSourceRevision;
         var publications = ObservePublications(vm);
@@ -128,12 +128,12 @@ public sealed class RegularMaskCharacterizationTests
         await ImportMaskAsync(vm, rejectedPath);
 
         Assert.StartsWith("Regular visibility mask: failed to load empty.csv.", vm.StatusText, StringComparison.Ordinal);
-        Assert.Equal(vm.StatusText, vm.RegularVisibilityMaskUi.Summary);
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
-        Assert.Same(accepted, vm.RegularVisibilityMaskForTests.Mask);
-        Assert.Equal(acceptedPath, vm.RegularVisibilityMaskForTests.SourcePath);
-        Assert.Same(embedded, vm.RegularVisibilityMaskForTests.EmbeddedMask);
-        Assert.Equal(embeddedName, vm.RegularVisibilityMaskForTests.EmbeddedName);
+        Assert.Equal(vm.StatusText, vm.RegularMask.Summary);
+        Assert.True(vm.RegularMask.IsEnabled);
+        Assert.Same(accepted, vm.RegularMask.Workflow.Mask);
+        Assert.Equal(acceptedPath, vm.RegularMask.Workflow.SourcePath);
+        Assert.Same(embedded, vm.RegularMask.Workflow.EmbeddedMask);
+        Assert.Equal(embeddedName, vm.RegularMask.Workflow.EmbeddedName);
         Assert.Equal(1, ReadDiff(vm));
         Assert.Empty(publications);
         Assert.Equal(revision, vm.SimulationWorkspaceSourceRevision);
@@ -141,10 +141,10 @@ public sealed class RegularMaskCharacterizationTests
         var reloaded = files.CreateViewModel();
         Assert.True((await reloaded.LoadProjectFromPathAsync(resavedPath)).IsLoaded);
         await WaitForGridRebuildAsync(reloaded);
-        Assert.True(reloaded.RegularVisibilityMaskUi.IsEnabled);
-        Assert.Equal(acceptedPath, reloaded.RegularVisibilityMaskForTests.SourcePath);
-        Assert.Equal(embeddedName, reloaded.RegularVisibilityMaskForTests.EmbeddedName);
-        Assert.Equal(1, Assert.Single(reloaded.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
+        Assert.True(reloaded.RegularMask.IsEnabled);
+        Assert.Equal(acceptedPath, reloaded.RegularMask.Workflow.SourcePath);
+        Assert.Equal(embeddedName, reloaded.RegularMask.Workflow.EmbeddedName);
+        Assert.Equal(1, Assert.Single(reloaded.RegularMask.Workflow.Mask.ActiveRegularPadIds));
         Assert.Equal(1, ReadDiff(reloaded));
     }
 
@@ -161,11 +161,11 @@ public sealed class RegularMaskCharacterizationTests
         await ImportMaskAsync(vm, WriteMask(files, "current.csv", "10,0"));
         Assert.Equal(0, ReadDiff(vm));
         var enabledChanges = new List<(bool Enabled, bool Loaded)>();
-        vm.RegularVisibilityMaskUi.PropertyChanged += (_, change) =>
+        vm.RegularMask.PropertyChanged += (_, change) =>
         {
-            if (change.PropertyName == nameof(RegularVisibilityMaskUiState.IsEnabled))
+            if (change.PropertyName == nameof(RegularMaskViewModel.IsEnabled))
             {
-                enabledChanges.Add((vm.RegularVisibilityMaskUi.IsEnabled, vm.RegularVisibilityMaskForTests.Mask.HasLoadedMask));
+                enabledChanges.Add((vm.RegularMask.IsEnabled, vm.RegularMask.Workflow.Mask.HasLoadedMask));
             }
         };
         var revision = vm.SimulationWorkspaceSourceRevision;
@@ -175,11 +175,11 @@ public sealed class RegularMaskCharacterizationTests
         await WaitForGridRebuildAsync(vm);
 
         Assert.Equal(new[] { (false, false), (true, false) }, enabledChanges);
-        Assert.NotNull(vm.RegularVisibilityMaskForTests.EmbeddedMask);
-        Assert.Equal("embedded.csv", vm.RegularVisibilityMaskForTests.EmbeddedName);
-        Assert.Equal(path, vm.RegularVisibilityMaskForTests.SourcePath);
-        Assert.True(vm.RegularVisibilityMaskForTests.Mask.HasLoadedMask);
-        Assert.Equal(1, Assert.Single(vm.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
+        Assert.NotNull(vm.RegularMask.Workflow.EmbeddedMask);
+        Assert.Equal("embedded.csv", vm.RegularMask.Workflow.EmbeddedName);
+        Assert.Equal(path, vm.RegularMask.Workflow.SourcePath);
+        Assert.True(vm.RegularMask.Workflow.Mask.HasLoadedMask);
+        Assert.Equal(1, Assert.Single(vm.RegularMask.Workflow.Mask.ActiveRegularPadIds));
         Assert.Equal(1, ReadDiff(vm));
         Assert.Equal((revision + 1, true, 1), Assert.Single(publications));
         Assert.Equal(revision + 1, vm.SimulationWorkspaceSourceRevision);
@@ -191,7 +191,7 @@ public sealed class RegularMaskCharacterizationTests
         using var files = new IoFailureScope();
         var vm = await CreateWorkspaceAsync(files);
         var path = WriteMask(files, "mask.csv", "0,10");
-        var initialSummary = vm.RegularVisibilityMaskUi.Summary;
+        var initialSummary = vm.RegularMask.Summary;
         var revision = vm.SimulationWorkspaceSourceRevision;
         var notifications = ObserveMaskNotifications(vm);
         var disabledSummary = DisabledSummary("mask.csv");
@@ -222,15 +222,15 @@ public sealed class RegularMaskCharacterizationTests
         using var files = new IoFailureScope();
         var vm = await CreateWorkspaceAsync(files);
         await ImportMaskAsync(vm, WriteMask(files, "mask.csv", "0,10"));
-        vm.RegularVisibilityMaskUi.IsEnabled = !enabled;
-        var previousSummary = vm.RegularVisibilityMaskUi.Summary;
+        vm.RegularMask.IsEnabled = !enabled;
+        var previousSummary = vm.RegularMask.Summary;
         var nextSummary = enabled ? EnabledSummary("mask.csv") : DisabledSummary("mask.csv");
         var revision = vm.SimulationWorkspaceSourceRevision;
         var notifications = ObserveMaskNotifications(vm);
         vm.NotchExportSummary = "Previous export completed.";
         Assert.Equal(previousDiff, ReadDiff(vm));
 
-        vm.RegularVisibilityMaskUi.IsEnabled = enabled;
+        vm.RegularMask.IsEnabled = enabled;
 
         Assert.Equal(new[]
         {
@@ -250,9 +250,9 @@ public sealed class RegularMaskCharacterizationTests
     {
         using var files = new IoFailureScope();
         var vm = await CreateWorkspaceAsync(files);
-        var clearedSummary = vm.RegularVisibilityMaskUi.Summary;
+        var clearedSummary = vm.RegularMask.Summary;
         await ImportMaskAsync(vm, WriteMask(files, "mask.csv", "0,10"));
-        var enabledSummary = vm.RegularVisibilityMaskUi.Summary;
+        var enabledSummary = vm.RegularMask.Summary;
         var revision = vm.SimulationWorkspaceSourceRevision;
         var notifications = ObserveMaskNotifications(vm);
         Assert.Equal(1, ReadDiff(vm));
@@ -268,8 +268,8 @@ public sealed class RegularMaskCharacterizationTests
             new MaskNotification("source", false, clearedSummary, 0, revision + 1),
         }, notifications);
         Assert.Equal(0, ReadDiff(vm));
-        Assert.False(vm.RegularVisibilityMaskForTests.Mask.HasLoadedMask);
-        Assert.Null(vm.RegularVisibilityMaskForTests.SourcePath);
+        Assert.False(vm.RegularMask.Workflow.Mask.HasLoadedMask);
+        Assert.Null(vm.RegularMask.Workflow.SourcePath);
         Assert.Equal(revision + 1, vm.SimulationWorkspaceSourceRevision);
     }
 
@@ -280,8 +280,8 @@ public sealed class RegularMaskCharacterizationTests
         var vm = await CreateWorkspaceAsync(files);
         await ImportMaskAsync(vm, WriteMask(files, "previous.csv", "0,10"));
         Assert.Equal(1, ReadDiff(vm));
-        var previousMask = vm.RegularVisibilityMaskForTests.Mask;
-        var previousSummary = vm.RegularVisibilityMaskUi.Summary;
+        var previousMask = vm.RegularMask.Workflow.Mask;
+        var previousSummary = vm.RegularMask.Summary;
         var revision = vm.SimulationWorkspaceSourceRevision;
         var notifications = ObserveMaskNotifications(vm);
         vm.NotchExportSummary = "Previous export completed.";
@@ -290,10 +290,10 @@ public sealed class RegularMaskCharacterizationTests
         await ImportMaskAsync(vm, path);
 
         // KNOWN DEFECT: Replacing an enabled mask accepts new data but leaves the old mapping, export and simulation revision.
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
-        Assert.NotSame(previousMask, vm.RegularVisibilityMaskForTests.Mask);
-        Assert.Equal(path, vm.RegularVisibilityMaskForTests.SourcePath);
-        Assert.Equal(0, Assert.Single(vm.RegularVisibilityMaskForTests.Mask.ActiveRegularPadIds));
+        Assert.True(vm.RegularMask.IsEnabled);
+        Assert.NotSame(previousMask, vm.RegularMask.Workflow.Mask);
+        Assert.Equal(path, vm.RegularMask.Workflow.SourcePath);
+        Assert.Equal(0, Assert.Single(vm.RegularMask.Workflow.Mask.ActiveRegularPadIds));
         Assert.Equal(1, ReadDiff(vm));
         Assert.Equal("Previous export completed.", vm.NotchExportSummary);
         Assert.Equal(new[]
@@ -313,18 +313,18 @@ public sealed class RegularMaskCharacterizationTests
         using var files = new IoFailureScope();
         var vm = await CreateWorkspaceAsync(files);
         await ImportMaskAsync(vm, WriteMask(files, "mask.csv", "0,10"));
-        vm.RegularVisibilityMaskUi.IsEnabled = enabled;
+        vm.RegularMask.IsEnabled = enabled;
         var status = vm.StatusText;
-        var summary = vm.RegularVisibilityMaskUi.Summary;
+        var summary = vm.RegularMask.Summary;
         var diff = ReadDiff(vm);
         var revision = vm.SimulationWorkspaceSourceRevision;
         var notifications = ObserveMaskNotifications(vm);
 
-        vm.RegularVisibilityMaskUi.IsEnabled = enabled;
+        vm.RegularMask.IsEnabled = enabled;
 
         Assert.Empty(notifications);
         Assert.Equal(status, vm.StatusText);
-        Assert.Equal(summary, vm.RegularVisibilityMaskUi.Summary);
+        Assert.Equal(summary, vm.RegularMask.Summary);
         Assert.Equal(diff, ReadDiff(vm));
         Assert.Equal(revision, vm.SimulationWorkspaceSourceRevision);
     }
@@ -390,7 +390,7 @@ public sealed class RegularMaskCharacterizationTests
     {
         var publications = new List<(int Revision, bool Enabled, int Diff)>();
         vm.SimulationWorkspaceSourceChanged += (_, _) => publications.Add((
-            vm.SimulationWorkspaceSourceRevision, vm.RegularVisibilityMaskUi.IsEnabled, ReadDiff(vm)));
+            vm.SimulationWorkspaceSourceRevision, vm.RegularMask.IsEnabled, ReadDiff(vm)));
         return publications;
     }
 
@@ -398,10 +398,10 @@ public sealed class RegularMaskCharacterizationTests
     {
         var notifications = new List<MaskNotification>();
         void Record(string name) => notifications.Add(new MaskNotification(
-            name, vm.RegularVisibilityMaskUi.IsEnabled, vm.RegularVisibilityMaskUi.Summary,
+            name, vm.RegularMask.IsEnabled, vm.RegularMask.Summary,
             ReadDiff(vm), vm.SimulationWorkspaceSourceRevision));
-        vm.RegularVisibilityMaskUi.PropertyChanging += (_, change) => Record($"changing:{change.PropertyName}");
-        vm.RegularVisibilityMaskUi.PropertyChanged += (_, change) => Record($"changed:{change.PropertyName}");
+        vm.RegularMask.PropertyChanging += (_, change) => Record($"changing:{change.PropertyName}");
+        vm.RegularMask.PropertyChanged += (_, change) => Record($"changed:{change.PropertyName}");
         vm.SimulationWorkspaceSourceChanged += (_, _) => Record("source");
         return notifications;
     }

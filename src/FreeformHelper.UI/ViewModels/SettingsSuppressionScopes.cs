@@ -56,6 +56,10 @@ internal sealed class SettingsSuppressionScopes
     public bool IsManualSizingApplyActive => _manualSizingApply.IsActive;
     public UndoSuppression.Scope EnterManualSizingApply() => _manualSizingApply.Enter();
 
+    // The mask workflow receives only this synchronous scope port; legacy scope readers share the same counter.
+    internal (Func<IDisposable> Enter, Func<bool> IsActive) RegularMaskStateChange =>
+        (() => EnterRegularVisibilityMaskStateChange(), () => IsRegularVisibilityMaskStateChangeActive);
+
     public bool IsRegularVisibilityMaskStateChangeActive => _regularVisibilityMaskStateChange.IsActive;
     public UndoSuppression.Scope EnterRegularVisibilityMaskStateChange() => _regularVisibilityMaskStateChange.Enter();
 

@@ -82,7 +82,7 @@ public sealed class LayerFilteringBehaviorTests
 
         await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularMask.IsEnabled);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(fixedId, out var unchangedFixed));
         Assert.Equal(originalFixed, unchangedFixed);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(repairId, out var repaired));
@@ -108,7 +108,7 @@ public sealed class LayerFilteringBehaviorTests
 
         await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularMask.IsEnabled);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(repairId, out var unchangedRepair));
         Assert.Equal(originalRepair, unchangedRepair);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(occupiedId, out var unchangedOccupied));
@@ -130,7 +130,7 @@ public sealed class LayerFilteringBehaviorTests
 
         await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
 
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularMask.IsEnabled);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(repairId, out var actual));
         Assert.Equal(manualDiff, actual);
         Assert.Equal(manualDiff, vm.GetCadOutputFwDiffIndexOverride(repairId));

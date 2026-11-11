@@ -391,7 +391,7 @@ public sealed partial class FreeformHelperViewModel
             _workflowData.LatestPadMatch.CadToRegular,
             _grid.Pads.ToDictionary(pad => pad.RegularPadId),
             _cadIcIndexByCadId,
-            GetActiveRegularVisibilityMaskPadIds());
+            RegularMask.Workflow.ActiveRegularPadIds);
     }
 
     private Dictionary<int, List<CadPad>> BuildPadsByIc(IReadOnlyList<CadPad> ordered)
@@ -477,7 +477,7 @@ public sealed partial class FreeformHelperViewModel
             _workflowData.LatestPadMatch.CadToRegular,
             regularPadById,
             _cadIcIndexByCadId,
-            GetActiveRegularVisibilityMaskPadIds(),
+            RegularMask.Workflow.ActiveRegularPadIds,
             _cadOutputFwDiffIndexByCadId,
             _projectFile.CadOutputFwDiffIndexOverrides);
         if (allowCsvRepairAutoApply)
@@ -493,7 +493,7 @@ public sealed partial class FreeformHelperViewModel
         IReadOnlyDictionary<int, RegularPad> regularPadById,
         IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> decisions)
     {
-        var activeMaskPadIds = GetActiveRegularVisibilityMaskPadIds();
+        var activeMaskPadIds = RegularMask.Workflow.ActiveRegularPadIds;
         if (activeMaskPadIds is null || activeMaskPadIds.Count == 0)
         {
             return decisions;
