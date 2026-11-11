@@ -95,7 +95,7 @@ public sealed partial class FreeformHelperViewModelTests
 
         vm.CadPads = visiblePads;
         vm.RegularSourceMode = RegularSourceMode.FromDxfLayer;
-        vm.SelectedRegularSourceLayerOption = new FreeformHelperViewModel.RegularSourceLayerOption("regular", "regular");
+        vm.SelectedRegularSourceLayerOption = new FreeformHelper.Application.CadImport.RegularSourceLayerOption("regular", "regular");
 
         var outputPath = TestFiles.NewTempFilePath("freeformhelper-visible-", ".dxf");
         vm.PickSaveExportPathAsync = (_, _) => Task.FromResult<string?>(outputPath);

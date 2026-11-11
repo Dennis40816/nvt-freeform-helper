@@ -33,20 +33,6 @@ public sealed partial class FreeformHelperViewModel
     public readonly record struct RegularSourceModeOption(RegularSourceMode Value, string Display);
 
     /// <summary>
-    /// Represents an option for selecting a DXF layer to use as grid bounds.
-    /// </summary>
-    /// <param name="Name">The layer name (null means auto/visible layers).</param>
-    /// <param name="Display">The human-readable string for display in the UI.</param>
-    public sealed record BoundLayerOption(string? Name, string Display);
-
-    /// <summary>
-    /// Represents an option for selecting a DXF layer as regular source.
-    /// </summary>
-    /// <param name="Name">The layer name (null means no layer selected).</param>
-    /// <param name="Display">The human-readable string for display in the UI.</param>
-    public sealed record RegularSourceLayerOption(string? Name, string Display);
-
-    /// <summary>
     /// Represents the scope used by DXF geometry rotation.
     /// </summary>
     public enum DxfEditRotationScope
@@ -165,57 +151,6 @@ public sealed partial class FreeformHelperViewModel
         bool IsDirect,
         bool IsIncoming,
         bool IsOutgoing);
-
-    /// <summary>
-    /// Represents a coarse DXF layer category used for batch layer toggles.
-    /// </summary>
-    public enum DxfLayerCategory
-    {
-        Polyline,
-        Block,
-        Text,
-    }
-
-    /// <summary>
-    /// Represents one DXF layer category state summary in current layer toggles.
-    /// </summary>
-    /// <param name="Category">Category enum.</param>
-    /// <param name="Display">Display label.</param>
-    /// <param name="Description">Short category note.</param>
-    /// <param name="TotalCount">Total layer count in this category.</param>
-    /// <param name="SelectedCount">Selected layer count in this category.</param>
-    public readonly record struct DxfLayerCategoryState(
-        DxfLayerCategory Category,
-        string Display,
-        string Description,
-        int TotalCount,
-        int SelectedCount);
-
-    /// <summary>
-    /// Represents a toggleable layer item in the UI, typically for controlling layer visibility.
-    /// </summary>
-    public sealed partial class LayerToggle : ObservableObject
-    {
-        /// <summary>
-        /// Gets or sets the name of the layer.
-        /// </summary>
-        [ObservableProperty] private string _name;
-        /// <summary>
-        /// Gets or sets a value indicating whether the layer is selected (e.g., visible).
-        /// </summary>
-        [ObservableProperty] private bool _isSelected;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LayerToggle"/> class.
-        /// </summary>
-        /// <param name="name">The name of the layer.</param>
-        /// <param name="isSelected">The initial selection state of the layer.</param>
-        public LayerToggle(string name, bool isSelected = true)
-        {
-            _name = name;
-            _isSelected = isSelected;
-        }
-    }
 
     /// <summary>
     /// Represents settings for a single cascaded IC, specifically its X and Y channel counts.

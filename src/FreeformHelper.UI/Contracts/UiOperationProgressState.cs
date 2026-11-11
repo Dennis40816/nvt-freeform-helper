@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
-namespace FreeformHelper.UI.Services;
+namespace FreeformHelper.UI.Contracts;
 
 /// <summary>Owns one operation's immutable progress snapshot; accessed only on the UI thread.</summary>
 internal sealed class UiOperationProgressState

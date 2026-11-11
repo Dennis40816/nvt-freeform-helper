@@ -33,10 +33,4 @@ internal interface ISettingsHost
     void OnSelectedScanOrderChanging(ScanOrder value);
 
     void OnSelectedScanOrderChanged(ScanOrder value);
-
-    // The shell hook reads the selection already stored by the setter.
-    void OnSelectedRegularSourceLayerOptionChanged();
-
-    // The shell hook reads the selection already stored by the setter.
-    void OnSelectedBoundLayerOptionChanged();
 }

@@ -171,7 +171,7 @@ public sealed class HeadlessUiSmokeTests
         HeadlessAppBootstrap.EnsureInitialized();
         var vm = new FreeformHelperViewModel();
         vm.LayerToggles.Clear();
-        vm.LayerToggles.Add(new FreeformHelperViewModel.LayerToggle("L1", isSelected: true));
+        vm.LayerToggles.Add(new FreeformHelper.UI.CadImport.LayerToggle("L1", isSelected: true));
 
         var view = new FreeformHelperView
         {

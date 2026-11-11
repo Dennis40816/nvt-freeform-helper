@@ -176,7 +176,7 @@ public sealed partial class FreeformHelperViewModelTests
         FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
         FreeformHelperViewModelPrivateAccess.Grid(vm) = grid;
         vm.LayerToggles.Clear();
-        vm.LayerToggles.Add(new FreeformHelperViewModel.LayerToggle("L1", isSelected: false));
+        vm.LayerToggles.Add(new FreeformHelper.UI.CadImport.LayerToggle("L1", isSelected: false));
 
         await vm.AnalyzeIndexMappingCommand.ExecuteAsync(null);
 

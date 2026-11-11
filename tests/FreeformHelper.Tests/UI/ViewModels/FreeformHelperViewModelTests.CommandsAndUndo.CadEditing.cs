@@ -279,8 +279,8 @@ public sealed partial class FreeformHelperViewModelTests
         FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
         FreeformHelperViewModelPrivateAccess.ResetDxfEditBaseline(vm, cad);
         FreeformHelperViewModelPrivateAccess.UpdateLayerToggles(vm, cad);
-        vm.SelectedRegularSourceLayerOption = new FreeformHelperViewModel.RegularSourceLayerOption("regular", "regular");
-        vm.SelectedBoundLayerOption = new FreeformHelperViewModel.BoundLayerOption("signal", "signal");
+        vm.SelectedRegularSourceLayerOption = new FreeformHelper.Application.CadImport.RegularSourceLayerOption("regular", "regular");
+        vm.SelectedBoundLayerOption = new FreeformHelper.Application.CadImport.BoundLayerOption("signal", "signal");
 
         await SelectCadPadsAsync(vm, _singleCadSelection);
         vm.DeleteSelectedCadPadsCommand.Execute(null);

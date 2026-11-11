@@ -96,7 +96,7 @@ public sealed partial class FreeformHelperViewModel
 
     public string DxfCheckHeaderText => IsCheckingDxfOverlap ? "Checking…"
         : HasDxfOverlapIssues ? $"{DxfOverlapIssueCount} overlaps"
-        : DxfOverlapSummary == DxfOverlapResult.NotRunSummary ? "Not checked" : "Checked";
+        : DxfOverlapSummary == FreeformHelper.UI.CadImport.DxfOverlapResult.NotRunSummary ? "Not checked" : "Checked";
 
     public string DxfEditsHeaderText =>
         $"Hidden {DeletedCadPadCount} · Merged {CombinedCadPadCount}";

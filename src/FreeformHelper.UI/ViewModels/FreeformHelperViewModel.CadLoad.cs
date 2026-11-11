@@ -1,292 +1,48 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
+using FreeformHelper.Application.CadImport;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
-using FreeformHelper.UI.CadEditing;
-using FreeformHelper.UI.Services;
+using FreeformHelper.UI.CadImport;
+using FreeformHelper.UI.Services.CadImport;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    private Task ApplyCadLoadOutcomeAsync(CadLoadOutcome outcome, UiViewSnapshot? snapshot) =>
-        ApplyCadLoadOutcomeCoreAsync(outcome, snapshot, CaptureCadEditNotifications());
+    // Compatibility surface for project, editing, IPC and existing callers. All state belongs to the children.
+    private Task ApplyCadLoadOutcomeAsync(CadLoadOutcome outcome, UiViewSnapshot? snapshot) => CadImport.Workflow.ApplyOutcomeAsync(outcome, snapshot);
+    private DxfImportOptions BuildDxfOptions() => CadImport.BuildDxfOptions();
+    private void ClearDxfLayerCatalog() => CadImport.Workflow.ClearLayerCatalog();
+    private Task TryLoadDxfLayerCatalogFromPathAsync(string path) => CadImport.Workflow.LoadCatalogFromPathAsync(path);
+    private Task TryLoadDxfLayerCatalogFromEmbeddedAsync(byte[]? data) => CadImport.Workflow.LoadCatalogFromEmbeddedAsync(data);
+    private static string BuildCadLoadStatus(CadLoadOutcome outcome, string? projectPath) => CadImportWorkflow.BuildCadLoadStatus(outcome, false, projectPath);
+    private void LogCadLoadOutcome(CadLoadOutcome outcome) => ((CadImportWorkflow)CadImport.Workflow).LogCadLoadOutcome(outcome, false);
+    private CadPadSet? BuildFilteredCadPadSet() => Layers.Workflow.BuildFilteredCadPadSet();
+    private CadPadSet? BuildCadPadSetForBounds() => Layers.Workflow.BuildCadPadSetForBounds();
+    internal void FilterCadPadsByLayer() => Layers.Workflow.FilterCadPadsByLayer();
+    private void UpdateLayerToggles(CadPadSet cad) => Layers.Workflow.UpdateLayerToggles(cad);
+    private void InitializeLayerSelectionOptions() => Layers.Workflow.InitializeLayerSelectionOptions();
+    private void NotifyCadLayerAggregateStateChanged() => Layers.NotifyCadLayerAggregateStateChanged();
+    private void RefreshDxfRegularSourceHint() => Layers.Workflow.RefreshDxfRegularSourceHint();
+    private bool ApplyRegularSourceLayerAutoHidePolicy(bool filterCadPads = true) => Layers.Workflow.ApplyRegularSourceLayerAutoHidePolicy(filterCadPads);
+    private Dictionary<string, bool> CaptureLayerSelectionSnapshot() => Layers.Workflow.CaptureLayerSelectionSnapshot();
+    private PendingLayerSelectionState _pendingLayerSelection => Layers.Pending;
+    public void SelectAllLayers() => Layers.SelectAllLayers();
+    public void DeselectAllLayers() => Layers.DeselectAllLayers();
+    public void ApplyLayerSelection(LayerToggle toggle, bool soloSelect) => Layers.ApplyLayerSelection(toggle, soloSelect);
+    public void SelectCadAreaBucketFromPad(int anchorCadPadId) => Layers.SelectCadAreaBucketFromPad(anchorCadPadId);
+    internal IReadOnlyList<DxfLayerCategoryState> GetDxfLayerCategoryStates() => Layers.GetDxfLayerCategoryStates();
+    internal void ApplyLayerCategorySelection(DxfLayerCategory category, bool isSelected) => Layers.ApplyLayerCategorySelection(category, isSelected);
 
-    private async Task ApplyCadLoadOutcomeCoreAsync(CadLoadOutcome outcome, UiViewSnapshot? snapshot, CadEditNotificationSnapshot? previous)
-    {
-        previous ??= CaptureCadEditNotifications();
-        _cad = outcome.Cad;
-        RegularMask.Workflow.ResetSelection(clearProjectEmbeddedMask: !_isLoadingSettings);
-        CadDocument.ClearAutoHiddenDuplicates();
-        _cadEditWorkflow.ClearRuntime(resetBaseline: false, previous);
-        _cadEditWorkflow.SetAutoHiddenDuplicates(outcome.DuplicateSanitization);
-        _cadEditWorkflow.ResetBaseline(outcome.Cad, previous);
-        SyncHiddenCadIdsToProject(previous);
-        SyncCombinedCadState(previous);
-        SyncDuplicateCadState(previous);
-        CadDocument.InvalidateFilteredCad();
-
-        var layerUiSnapshot = await Task.Run(() => BuildCadLayerUiSnapshot(outcome.Cad, snapshot?.LayerSelections));
-
-        ApplyCadLayerUiSnapshot(layerUiSnapshot);
-    }
-
-    private const int MaxBoundLayerDropdownLayers = 256;
-
-    private CadLayerUiSnapshot BuildCadLayerUiSnapshot(CadPadSet cad, IReadOnlyList<LayerSelectionSnapshot>? layerSelections)
-    {
-        return CadLayerUiSnapshotBuilder.Build(new CadLayerUiSnapshotRequest(
-            Cad: cad,
-            Catalog: _layerCatalogStateService.Catalog,
-            LayerSelections: layerSelections,
-            PendingBoundLayerName: _pendingLayerSelection.BoundLayerName,
-            SelectedBoundLayerName: SelectedBoundLayerOption?.Name,
-            PendingRegularSourceLayerName: _pendingLayerSelection.RegularSourceLayerName,
-            SelectedRegularSourceLayerName: SelectedRegularSourceLayerOption?.Name,
-            SelectedDxfEditTargetLayerName: DxfEditTargetLayerName,
-            SelectedDxfEditRotationLayerName: DxfEditRotationLayerName,
-            MaxBoundLayerDropdownLayers: MaxBoundLayerDropdownLayers));
-    }
-
-    private void ApplyCadLayerUiSnapshot(CadLayerUiSnapshot snapshot)
-    {
-        foreach (var toggle in LayerToggles)
-        {
-            toggle.PropertyChanging -= OnLayerToggleChanging;
-            toggle.PropertyChanged -= OnLayerToggleChanged;
-        }
-
-        var toggles = new ObservableCollection<LayerToggle>();
-        foreach (var state in snapshot.ToggleStates)
-        {
-            var toggle = new LayerToggle(state.Name, state.IsSelected);
-            toggle.PropertyChanging += OnLayerToggleChanging;
-            toggle.PropertyChanged += OnLayerToggleChanged;
-            toggles.Add(toggle);
-        }
-
-        LayerToggles = toggles;
-        HasCadLayers = snapshot.HasCadLayers;
-
-        using (_settingsSuppression.EnterBoundLayerSelectionChange())
-        {
-            BoundLayerOptions = new ObservableCollection<BoundLayerOption>(snapshot.BoundLayerOptions);
-            SelectedBoundLayerOption = BoundLayerOptions.FirstOrDefault(option =>
-                string.Equals(option.Name, snapshot.SelectedBoundLayerName, StringComparison.OrdinalIgnoreCase))
-                ?? BoundLayerOptions.First();
-            BoundLayerOptionSummary = snapshot.BoundLayerOptionSummary;
-        }
-
-        using (_settingsSuppression.EnterRegularSourceLayerSelectionChange())
-        {
-            RegularSourceLayerOptions = new ObservableCollection<RegularSourceLayerOption>(snapshot.RegularSourceLayerOptions);
-            SelectedRegularSourceLayerOption = RegularSourceLayerOptions.FirstOrDefault(option =>
-                string.Equals(option.Name, snapshot.SelectedRegularSourceLayerName, StringComparison.OrdinalIgnoreCase))
-                ?? RegularSourceLayerOptions.First();
-        }
-
-        DxfEditLayerOptions = new ObservableCollection<string>(snapshot.DxfEditLayerOptions);
-        DxfEditTargetLayerName = snapshot.SelectedDxfEditTargetLayerName;
-        DxfEditRotationLayerName = snapshot.SelectedDxfEditRotationLayerName;
-        _pendingLayerSelection.BoundLayerName = null;
-        _pendingLayerSelection.RegularSourceLayerName = null;
-        NotifyDxfEditPanelActionStateChanged();
-        ApplyRegularSourceLayerAutoHidePolicy(filterCadPads: false);
-        RefreshDxfRegularSourceHint();
-        NotifyCadLayerAggregateStateChanged();
-        FilterCadPadsByLayer();
-    }
-
-    private static string BuildCadLoadStatus(CadLoadOutcome outcome, CadLoadContext context, string? projectPath)
-    {
-        var sourceLabel = outcome.Source == CadLoadSource.Path ? "path" : "embedded";
-        var padCount = outcome.Cad.Pads.Count;
-        var activePadCount = padCount - outcome.DuplicateSanitization.ExcludedPadIds.Count;
-        var duplicateNote = outcome.DuplicateSanitization.HasExcludedDuplicates
-            ? $" Auto-hidden same-layer duplicates: {outcome.DuplicateSanitization.ExcludedPadIds.Count}."
-            : string.Empty;
-        if (context == CadLoadContext.OpenDxf)
-        {
-            return $"DXF imported ({sourceLabel}). CAD pads: {activePadCount}/{padCount}.{duplicateNote}";
-        }
-
-        if (string.IsNullOrWhiteSpace(projectPath))
-        {
-            return $"Project loaded. DXF ({sourceLabel}), CAD pads: {activePadCount}/{padCount}.{duplicateNote}";
-        }
-
-        return $"Project loaded: {projectPath}. DXF ({sourceLabel}), CAD pads: {activePadCount}/{padCount}.{duplicateNote}";
-    }
-
-    private static void LogCadLoadOutcome(CadLoadOutcome outcome, CadLoadContext context)
-    {
-        if (outcome.DuplicateSanitization.HasExcludedDuplicates)
-        {
-            _logger.Warn(
-                CultureInfo.InvariantCulture,
-                "CAD load auto-hidden same-layer exact duplicate pads. groups={0}, duplicateIds={1}.",
-                outcome.DuplicateSanitization.DuplicateSameLayerGroupCount,
-                string.Join(", ", outcome.DuplicateSanitization.ExcludedPadIds));
-        }
-
-        if (outcome.Source == CadLoadSource.Path)
-        {
-            var label = context == CadLoadContext.OpenDxf ? "DXF imported" : "DXF reloaded";
-            _logger.Info(CultureInfo.InvariantCulture, "{0}: {1} (pads={2})", label, outcome.SourcePath, outcome.Cad.Pads.Count);
-            return;
-        }
-
-        _logger.Info(CultureInfo.InvariantCulture, "DXF loaded from embedded data (pads={0})", outcome.Cad.Pads.Count);
-    }
-
-    private enum CadLoadContext
-    {
-        OpenDxf,
-        LoadProject,
-    }
-
-    /// <summary>
-    /// Builds the DXF import options based on current UI settings.
-    /// </summary>
-    /// <returns>A <see cref="DxfImportOptions"/> instance.</returns>
-    private DxfImportOptions BuildDxfOptions()
-    {
-        var options = new DxfImportOptions
-        {
-            OnlyClosedPolylines = ImportOnlyClosedPolylines, // Set option from UI property.
-            IncludeBlockPolylines = ImportBlockPolylines
-        };
-
-        return options;
-    }
-
-    private void ClearDxfLayerCatalog()
-    {
-        _layerCatalogStateService.Clear();
-    }
-
-    private Task TryLoadDxfLayerCatalogFromPathAsync(string path)
-    {
-        return Task.Run(() => _layerCatalogStateService.TryLoadFromPath(path));
-    }
-
-    private Task TryLoadDxfLayerCatalogFromEmbeddedAsync(byte[]? data)
-    {
-        return Task.Run(() => _layerCatalogStateService.TryLoadFromEmbedded(data));
-    }
-
-    /// <summary>
-    /// Handles the asynchronous operation of opening a DXF file.
-    /// Prompts the user for a file, imports the CAD pads, updates the UI, and rebuilds the grid.
-    /// </summary>
-    private async Task OpenDxfAsync()
-    {
-        // Ensure the dialog delegate is wired up by the View.
-        if (PickOpenDxfPathAsync is null)
-        {
-            SetStatus("Open DXF: dialog handler not wired.");
-            return;
-        }
-
-        if (!CanProceedWithPendingEdits())
-        {
-            return;
-        }
-
-        var path = await PickOpenDxfPathAsync(); // Prompt user to pick a DXF file.
-        if (string.IsNullOrWhiteSpace(path)) return; // User cancelled.
-
-        CadEditNotificationSnapshot? previous = null;
-        await _cadLoadWorkflowService.OpenDxfAsync(new OpenDxfWorkflowRequest
-        {
-            Path = path,
-            BuildDxfOptions = BuildDxfOptions,
-            SetStatus = SetStatus,
-            LoadLayerCatalogFromPathAsync = selectedPath =>
-            {
-                _layerCatalogStateService.SetFromPath(selectedPath, _dxfImportService.ImportedCatalog);
-                return Task.CompletedTask;
-            },
-            ResetHiddenCadPads = () =>
-            {
-                previous = CaptureCadEditNotifications();
-                _cadEditWorkflow.ResetHiddenPads(previous);
-            },
-            ApplyCadLoadOutcomeAsync = outcome => ApplyCadLoadOutcomeCoreAsync(outcome, null, previous),
-            SetProjectLastDxfPath = selectedPath => _projectFile.LastDxfPath = selectedPath,
-            ClearLastSavedPath = () => _projectSession.LastSavedPath = null,
-            MarkUnsaved = MarkUnsaved,
-            BuildStatus = outcome => BuildCadLoadStatus(outcome, CadLoadContext.OpenDxf, null),
-            LogCadLoadOutcome = outcome => LogCadLoadOutcome(outcome, CadLoadContext.OpenDxf),
-            TriggerGridRebuildAsync = () => TriggerGridRebuildAsync(requestFit: true),
-            RunWithCadLoadCanvasOverlayAsync = RunWithCadLoadCanvasOverlayAsync,
-            GetCadPadCountForLog = () => _cad?.Pads.Count ?? 0,
-            RunUiOperationAsync = (operationName, operationAsync, onError) =>
-                RunUiOperationAsync(operationName, operationAsync, onError),
-            OnError = ex =>
-            {
-                SetStatusError("DXF import failed", ex);
-                _logger.Error(ex, "DXF import failed.");
-            },
-        });
-    }
-
-    /// <summary>
-    /// Builds a <see cref="CadPadSet"/> containing only the CAD pads from currently selected layers.
-    /// </summary>
-    /// <returns>A new <see cref="CadPadSet"/> with filtered pads, or null if no CAD is loaded.</returns>
-    private CadPadSet? BuildFilteredCadPadSet()
-    {
-        if (_cad is null)
-        {
-            return null;
-        }
-
-        if (CadDocument.FilteredCad is not null)
-        {
-            return CadDocument.FilteredCad;
-        }
-
-        var result = LayerFilterUseCase.Filter(_cad, LayerToggles);
-        var visible = result.VisiblePads
-            .Where(p => !CadDocument.IsEffectivelyHidden(p.Id))
-            .ToList();
-        CadDocument.PublishFilteredCad(new CadPadSet(visible));
-        return CadDocument.FilteredCad;
-    }
-
-    private CadPadSet? BuildCadPadSetForBounds()
-    {
-        if (_cad is null)
-        {
-            return null;
-        }
-
-        var boundLayer = SelectedBoundLayerOption?.Name;
-        if (!string.IsNullOrWhiteSpace(boundLayer))
-        {
-            var pads = _cad.Pads
-                .Where(p => !CadDocument.IsEffectivelyHidden(p.Id))
-                .Where(p => string.Equals(p.Layer, boundLayer, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-            if (pads.Count > 0)
-            {
-                return new CadPadSet(pads);
-            }
-        }
-
-        if (RecalcBoundsOnLayerFilter)
-        {
-            return BuildFilteredCadPadSet();
-        }
-
-        if (_cadEdit.AutoHiddenDuplicateCadPadIds.Count == 0)
-        {
-            return _cad;
-        }
-
-        return CadDocument.BuildActiveCad();
-    }
+    public ObservableCollection<LayerToggle> LayerToggles { get => Layers.LayerToggles; set => Layers.LayerToggles = value; }
+    public ObservableCollection<BoundLayerOption> BoundLayerOptions { get => Layers.BoundLayerOptions; set => Layers.BoundLayerOptions = value; }
+    public ObservableCollection<RegularSourceLayerOption> RegularSourceLayerOptions { get => Layers.RegularSourceLayerOptions; set => Layers.RegularSourceLayerOptions = value; }
+    public bool RecalcBoundsOnLayerFilter { get => Layers.RecalcBoundsOnLayerFilter; set => Layers.RecalcBoundsOnLayerFilter = value; }
+    public bool AreAllCadLayersSelected => Layers.AreAllCadLayersSelected;
+    public bool AreNoCadLayersSelected => Layers.AreNoCadLayersSelected;
+    public bool AreSomeCadLayersSelected => Layers.AreSomeCadLayersSelected;
+    public bool IsCadLayerBulkToggleChecked { get => Layers.IsCadLayerBulkToggleChecked; set => Layers.IsCadLayerBulkToggleChecked = value; }
+    public string CadLayerBulkToggleText => Layers.CadLayerBulkToggleText;
+    public string CadLayerBulkToggleToolTip => Layers.CadLayerBulkToggleToolTip;
 }
-

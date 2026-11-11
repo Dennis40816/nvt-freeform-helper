@@ -12,14 +12,14 @@ public sealed partial class FreeformHelperViewModelTests
         "0\nSECTION\n2\nBLOCKS\n0\nLINE\n8\nblocks\n10\n0\n20\n0\n11\n1\n21\n1\n0\nENDSEC\n0\nEOF\n";
 
     [Theory]
-    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Polyline, "poly", true, 2)]
-    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Polyline, "poly", false, 2)]
-    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Block, "blocks", true, 1)]
-    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Block, "blocks", false, 1)]
-    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Text, "labels", true, 1)]
-    [InlineData(FreeformHelperViewModel.DxfLayerCategory.Text, "labels", false, 1)]
+    [InlineData(FreeformHelper.Application.CadImport.DxfLayerCategory.Polyline, "poly", true, 2)]
+    [InlineData(FreeformHelper.Application.CadImport.DxfLayerCategory.Polyline, "poly", false, 2)]
+    [InlineData(FreeformHelper.Application.CadImport.DxfLayerCategory.Block, "blocks", true, 1)]
+    [InlineData(FreeformHelper.Application.CadImport.DxfLayerCategory.Block, "blocks", false, 1)]
+    [InlineData(FreeformHelper.Application.CadImport.DxfLayerCategory.Text, "labels", true, 1)]
+    [InlineData(FreeformHelper.Application.CadImport.DxfLayerCategory.Text, "labels", false, 1)]
     public async Task SettingsCategoryCommand_ChangesOnlyTargetLayersAsync(
-        FreeformHelperViewModel.DxfLayerCategory category, string layerPrefix, bool enable, int layerCount)
+        FreeformHelper.Application.CadImport.DxfLayerCategory category, string layerPrefix, bool enable, int layerCount)
     {
         var path = CreateTempDxfFile(("poly-a", 0, 0, 10, 10), ("poly-b", 20, 0, 30, 10));
         try

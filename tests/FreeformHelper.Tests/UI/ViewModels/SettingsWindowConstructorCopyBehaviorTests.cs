@@ -88,7 +88,7 @@ public sealed class SettingsWindowConstructorCopyBehaviorTests
     public void Constructor_WithAnOwnerSelectionThatIsNotInTheList_FallsBackToTheFirstOption()
     {
         var owner = new FreeformHelperViewModel();
-        var unknown = new FreeformHelperViewModel.RegularSourceLayerOption("layer-that-does-not-exist", "Missing");
+        var unknown = new FreeformHelper.Application.CadImport.RegularSourceLayerOption("layer-that-does-not-exist", "Missing");
         owner.SelectedRegularSourceLayerOption = unknown;
 
         var draft = owner.CreateSettingsWindowViewModel();

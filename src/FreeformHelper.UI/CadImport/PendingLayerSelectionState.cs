@@ -1,4 +1,4 @@
-namespace FreeformHelper.UI.ViewModels;
+namespace FreeformHelper.UI.CadImport;
 
 /// <summary>
 /// Holds the layer selection data that waits for the next CAD load or layer toggle: the undo snapshot and the layer names of the bounds and the regular source.
