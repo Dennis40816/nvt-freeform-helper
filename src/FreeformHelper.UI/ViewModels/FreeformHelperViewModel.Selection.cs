@@ -1,130 +1,61 @@
-using System.Diagnostics;
 using System.Globalization;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.UI.Interaction;
+using FreeformHelper.UI.ViewModels.Selection;
 
 namespace FreeformHelper.UI.ViewModels;
 
-/// <summary>
-/// This partial class of <see cref="FreeformHelperViewModel"/> manages the selection state
-/// of pads (both CAD and regular) on the canvas, updates UI summaries, and synchronizes
-/// with manual sizing inputs.
-/// </summary>
+/// <summary>Keeps the root selection API and command identities while the owner coordinates selection.</summary>
 public sealed partial class FreeformHelperViewModel
 {
-    private const double LocateFocusMinZoom = 2.0;
     private const double NotchExportPreviewFocusMinZoom = 2.4;
 
-    // HashSets for efficient storage and lookup of selected pad IDs/indices.
-    private readonly HashSet<int> _selectedCadIds = new();
-    private readonly SelectionState _selection = new();
-    private readonly LatestRequestGate _selectionNotchPreviewGate = new();
-    private readonly SelectionTimingRecorder _selectionTimings = new();
+    // Other workflow partials read the same owner-held membership and rebuild flag.
+    private IReadOnlySet<int> _selectedCadIds => Selection.SelectedCadPadIds;
+    private SelectionState _selection => Selection.RegularSelection;
+    private int SelectedPadCount => Selection.SelectedPadCount;
 
-    /// <summary>
-    /// Gets a read-only collection of selected CAD pad IDs.
-    /// </summary>
-    public IReadOnlyCollection<int> SelectedCadPadIds => _selectedCadIds;
+    /// <summary>Gets the selected CAD pad IDs.</summary>
+    public IReadOnlyCollection<int> SelectedCadPadIds => Selection.SelectedCadPadIds;
 
-    /// <summary>
-    /// Gets a read-only collection of selected regular pad indices.
-    /// </summary>
-    public IReadOnlyCollection<int> SelectedRegularPadIndices => _selection.RegularIndices;
+    /// <summary>Gets the selected Regular pad indices.</summary>
+    public IReadOnlyCollection<int> SelectedRegularPadIndices => Selection.SelectedRegularPadIndices;
 
     public SelectionTimingSnapshot GetLastSelectionTimingSnapshot()
     {
-        var last = _selectionTimings.Last;
-        return new SelectionTimingSnapshot(
-            SummaryMs: last.SummaryMs,
-            InspectorMs: last.InspectorMs,
-            NotchPreviewMs: last.NotchPreviewMs,
-            TotalMs: last.TotalMs);
+        var last = Selection.GetLastSelectionTimings();
+        return new SelectionTimingSnapshot(last.SummaryMs, last.InspectorMs, last.NotchPreviewMs, last.TotalMs);
     }
 
-    /// <summary>
-    /// Applies a selection received from the canvas to the ViewModel selection coordinator.
-    /// </summary>
-    public void ApplyCanvasSelection(IReadOnlyList<int> cadPadIds, IReadOnlyList<int> regularPadIndices)
+    /// <summary>Applies the canvas selection through the existing selection coordinator.</summary>
+    public void ApplyCanvasSelection(IReadOnlyList<int> cadPadIds, IReadOnlyList<int> regularPadIndices) =>
+        Selection.ApplyCanvasSelection(cadPadIds, regularPadIndices);
+
+    private void OnInteractionSelectionChanged(object? sender, SelectionChangedEventArgs e) =>
+        Selection.ApplySelection(e.CadIds, e.RegularIndices);
+
+    /// <summary>Rebuilds Inspector content from the current selection after edits.</summary>
+    public void RefreshInspectorFromSelection() => Selection.RefreshInspectorFromSelection();
+
+    /// <summary>Gets or sets the unified CAD, Regular, or FW diff quick-focus query.</summary>
+    public string QuickFocusQueryText
     {
-        _selectionCoordinator.ApplyCanvasSelection(cadPadIds, regularPadIndices);
+        get => Selection.QuickFocusQueryText;
+        set => Selection.QuickFocusQueryText = value;
     }
 
-    /// <summary>
-    /// Handles selection updates from workspace interaction state.
-    /// </summary>
-    private void OnInteractionSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private void LogSelectionTimings(SelectionTimings timings)
     {
-        ApplySelection(e.CadIds, e.RegularIndices);
-    }
-
-    /// <summary>
-    /// Updates internal selection state and synchronizes dependent UI state.
-    /// </summary>
-    private void ApplySelection(IReadOnlyList<int> cadPadIds, IReadOnlyList<int> regularPadIndices)
-    {
-        var selectionRevision = _padInspectorRequests.NextSelectionRevision();
-        var selectionSw = Stopwatch.StartNew();
-        _selectedCadIds.Clear();
-        foreach (var id in cadPadIds)
-        {
-            _selectedCadIds.Add(id);
-        }
-
-        _selection.RegularIndices.Clear();
-        foreach (var idx in regularPadIndices)
-        {
-            _selection.RegularIndices.Add(idx);
-        }
-
-        var summaryStartMs = selectionSw.ElapsedMilliseconds;
-        UpdateSelectedRangeSummary();
-        var summaryDurationMs = selectionSw.ElapsedMilliseconds - summaryStartMs;
-
-        OnPropertyChanged(nameof(SelectedCadPadIds));
-        OnPropertyChanged(nameof(SelectedRegularPadIndices));
-        OnPropertyChanged(nameof(HasPadInspectorMultiSelection));
-        OnPropertyChanged(nameof(PadInspectorSelectionSummaryText));
-        OnPropertyChanged(nameof(HasNoPadInspectorSummary));
-        NotifyDxfEditPanelActionStateChanged();
-        var inspectorStartMs = selectionSw.ElapsedMilliseconds;
-        UpdateInspectorSnapshotFromSelection(selectionRevision);
-        var inspectorDurationMs = selectionSw.ElapsedMilliseconds - inspectorStartMs;
-
-        long notchPreviewDurationMs = 0;
-        if (_grid is not null && _selectedCadIds.Count > 0)
-        {
-            var previewStartMs = selectionSw.ElapsedMilliseconds;
-            if (_selectedCadIds.Count == 1)
-            {
-                CancelDeferredSelectionNotchPreviewRefresh();
-                RefreshNotchCanvasPreview(showStatus: false);
-            }
-            else
-            {
-                QueueDeferredSelectionNotchPreviewRefresh();
-            }
-
-            notchPreviewDurationMs = selectionSw.ElapsedMilliseconds - previewStartMs;
-        }
-        else
-        {
-            CancelDeferredSelectionNotchPreviewRefresh();
-            ClearNotchCanvasPreview();
-        }
-
-        var totalDurationMs = selectionSw.ElapsedMilliseconds;
-        _selectionTimings.Record(summaryDurationMs, inspectorDurationMs, notchPreviewDurationMs, totalDurationMs);
         var canvasPerfText = BuildCanvasPerfText();
-
         _logger.Debug(
             CultureInfo.InvariantCulture,
             "Selection updated: CAD={0}, Regular={1}, summary={2}ms, inspector={3}ms, notchPreview={4}ms, total={5}ms. {6} | {7}",
             _selectedCadIds.Count,
             _selection.RegularIndices.Count,
-            summaryDurationMs,
-            inspectorDurationMs,
-            notchPreviewDurationMs,
-            totalDurationMs,
+            timings.SummaryMs,
+            timings.InspectorMs,
+            timings.NotchPreviewMs,
+            timings.TotalMs,
             SelectionDetailText,
             canvasPerfText);
     }
@@ -162,96 +93,6 @@ public sealed partial class FreeformHelperViewModel
     }
 
     /// <summary>
-    /// Rebuilds the Inspector content from the current selection, for example after Pad Info closes with edited values.
-    /// </summary>
-    public void RefreshInspectorFromSelection()
-    {
-        var selectionRevision = _padInspectorRequests.NextSelectionRevision();
-        UpdateInspectorSnapshotFromSelection(selectionRevision);
-    }
-
-    private void UpdateInspectorSnapshotFromSelection(long selectionRevision)
-    {
-        if (HasPadInspectorMultiSelection)
-        {
-            // Keep multi-selection updates lightweight during box drag.
-            CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: true);
-            CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
-            PadInspectorUi.Snapshot = null;
-            return;
-        }
-
-        if (_selectedCadIds.Count == 1)
-        {
-            CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
-            var cadId = _selectedCadIds.First();
-            PadInspectorUi.Snapshot = BuildCadPadInspectorSnapshot(
-                cadId,
-                includeExpensiveNotchDetails: false,
-                includeNotchRowEligibilityDetails: false,
-                includeMatchDetails: false,
-                includeRuleTrace: false);
-            QueueDeferredCadInspectorSnapshotRefresh(cadId, selectionRevision);
-            return;
-        }
-
-        CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: true);
-        if (_selection.RegularIndices.Count == 1)
-        {
-            var selectedRegularIndex = _selection.RegularIndices.First();
-            var primaryRegular = RegularPads.FirstOrDefault(pad => pad.Index == selectedRegularIndex);
-            if (primaryRegular is not null)
-            {
-                PadInspectorUi.Snapshot = BuildRegularPadInspectorSnapshot(
-                    primaryRegular.RegularPadId,
-                    includeMatchDetails: false,
-                    includeRuleTrace: false);
-                QueueDeferredRegularInspectorSnapshotRefresh(primaryRegular.RegularPadId, selectionRevision);
-                return;
-            }
-        }
-        CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: true);
-        PadInspectorUi.Snapshot = null;
-    }
-
-    /// <summary>
-    /// Holds the selected regular pad indices and the flag that keeps the selection through the next grid rebuild, for the main view model.
-    /// </summary>
-    internal sealed class SelectionState
-    {
-        /// <summary>Gets the selected regular pad indices.</summary>
-        internal HashSet<int> RegularIndices { get; } = new();
-
-        /// <summary>
-        /// Gets or sets a value that, when true, suppresses clearing the current selection
-        /// during a grid rebuild operation. Used for undo/redo.
-        /// </summary>
-        internal bool SuppressClearOnRebuild { get; set; }
-    }
-
-    /// <summary>
-    /// Gets or sets the unified quick-focus query used by the Inspector panel.
-    /// Examples: CAD 4809, REG 4616, DIFF 72, IC1 DIFF72.
-    /// </summary>
-    public string QuickFocusQueryText
-    {
-        get => _inspectorPanel.QuickFocusQueryText;
-        set
-        {
-            if (_inspectorPanel.QuickFocusQueryText == value)
-            {
-                return;
-            }
-
-            OnPropertyChanging();
-            _inspectorPanel = _inspectorPanel with { QuickFocusQueryText = value };
-            OnPropertyChanged();
-        }
-    }
-
-    private int SelectedPadCount => _selectedCadIds.Count + _selection.RegularIndices.Count;
-
-    /// <summary>
     /// Gets the command to clear the current selection on the canvas.
     /// </summary>
     public IRelayCommand ClearSelectionCommand => _selectionCommands.ClearSelectionCommand;
@@ -271,18 +112,5 @@ public sealed partial class FreeformHelperViewModel
             QuickFocusCommand: CreateEditingCommand(ExecuteQuickFocus));
     }
 
-    /// <summary>
-    /// Filters the displayed CAD pads based on the currently selected layers
-    /// and triggers a grid rebuild if <see cref="RecalcBoundsOnLayerFilter"/> is true.
-    /// </summary>
-    private void ClearSelection()
-    {
-        if (!CanProceedWithPendingEdits())
-        {
-            return;
-        }
-
-        _selectionCoordinator.ClearSelection(CanvasHost);
-    }
+    private void ClearSelection() => Selection.ClearSelection();
 }
-

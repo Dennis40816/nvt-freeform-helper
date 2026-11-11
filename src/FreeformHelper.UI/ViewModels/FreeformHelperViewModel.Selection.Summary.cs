@@ -1,94 +1,65 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Selection;
 using SelectionSummaryModel = FreeformHelper.UI.Services.SelectionSummary;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
-    /// <summary>
-    /// Gets or sets the result of the last selection summary computation.
-    /// The text properties below read from this one result.
-    /// </summary>
-    [ObservableProperty]
-    private SelectionSummaryModel _selectionSummaryResult = SelectionSummaryModel.Initial;
+    private readonly Lazy<SelectionOwner<SelectionSummaryModel>> _selectionOwner;
+    private SelectionOwner<SelectionSummaryModel> Selection => _selectionOwner.Value;
 
-    /// <summary>
-    /// Gets a string indicating the count of selected CAD pads.
-    /// </summary>
-    public string CadSelectionText => SelectionSummaryResult.CadSelectionText;
-
-    /// <summary>
-    /// Gets a string indicating the count of selected regular pads.
-    /// </summary>
-    public string RegularSelectionText => SelectionSummaryResult.RegularSelectionText;
-
-    /// <summary>
-    /// Gets a detailed text description of the current selection, including row/col ranges.
-    /// </summary>
-    public string SelectionDetailText => SelectionSummaryResult.SelectionDetailText;
-
-    private void UpdateSelectedRangeSummary()
+    private SelectionOwner<SelectionSummaryModel> CreateSelectionOwner()
     {
-        var summary = SelectionSummaryUseCase.Compute(_grid, _selectedCadIds, _selection.RegularIndices);
-
-        SelectionSummaryResult = summary;
-        SetManualRangeInputs(summary.ManualRowsRange, summary.ManualColsRange);
-        ManualRangeError = summary.ManualRangeError;
-        SetManualSizeInputs(summary.PendingWidth, summary.PendingHeight);
-        IsPendingColumnWidthMixed = summary.WidthMixed;
-        IsPendingRowHeightMixed = summary.HeightMixed;
+        return new SelectionOwner<SelectionSummaryModel>(
+            new SelectionSummaryPorts<SelectionSummaryModel>(
+                SelectionSummaryModel.Initial, SelectionSummaryUseCase.Compute, ProjectSelectionSummary,
+                OnPropertyChanging, OnPropertyChanged),
+            new SelectionInteractionPorts(
+                () => _grid, () => RegularPads,
+                (cad, regular) => _selectionCoordinator.ApplyCanvasSelection(cad, regular),
+                CanProceedWithPendingEdits, () => _selectionCoordinator.ClearSelection(CanvasHost),
+                () => _inspectorPanel.QuickFocusQueryText,
+                value => _inspectorPanel = _inspectorPanel with { QuickFocusQueryText = value },
+                NotifyDxfEditPanelActionStateChanged, () => RefreshNotchCanvasPreview(showStatus: false),
+                ClearNotchCanvasPreview, LogSelectionTimings),
+            new SelectionManualPorts(
+                () => (ManualRowsRange, ManualColsRange),
+                value => ManualRowsRange = value, value => ManualColsRange = value,
+                () => (PendingColumnWidth, PendingRowHeight),
+                value => PendingColumnWidth = value, value => PendingRowHeight = value,
+                value => ManualRangeError = value,
+                value => IsPendingColumnWidthMixed = value, value => IsPendingRowHeightMixed = value,
+                () => _settingsSuppression.EnterManualSizingApply(), () => _undoSuppression.Enter(),
+                UpdateManualRangeStatus),
+            new SelectionInspectorPorts(
+                () => _padInspectorRequests.NextSelectionRevision(), () => HasPadInspectorMultiSelection,
+                CancelDeferredCadInspectorSnapshotRefresh, CancelDeferredRegularInspectorSnapshotRefresh,
+                cadId => BuildCadPadInspectorSnapshot(cadId, includeExpensiveNotchDetails: false,
+                    includeNotchRowEligibilityDetails: false, includeMatchDetails: false, includeRuleTrace: false),
+                regularId => BuildRegularPadInspectorSnapshot(regularId, includeMatchDetails: false, includeRuleTrace: false),
+                QueueDeferredCadInspectorSnapshotRefresh, QueueDeferredRegularInspectorSnapshotRefresh,
+                snapshot => PadInspectorUi.Snapshot = snapshot),
+            CreateSelectionLocator(), CreateSelectionPreviewRefreshOwner());
     }
 
-    partial void OnSelectionSummaryResultChanged(SelectionSummaryModel? oldValue, SelectionSummaryModel newValue)
+    private static SelectionSummaryFields ProjectSelectionSummary(SelectionSummaryModel summary) => new(
+        summary.CadSelectionText, summary.RegularSelectionText, summary.SelectionDetailText,
+        summary.ManualRowsRange, summary.ManualColsRange, summary.ManualRangeError,
+        summary.PendingWidth, summary.PendingHeight, summary.WidthMixed, summary.HeightMixed);
+
+    /// <summary>Gets or sets the single accepted selection summary.</summary>
+    public SelectionSummaryModel SelectionSummaryResult
     {
-        ArgumentNullException.ThrowIfNull(oldValue);
-        RaiseWhenChanged(oldValue.CadSelectionText, newValue.CadSelectionText, nameof(CadSelectionText));
-        RaiseWhenChanged(oldValue.RegularSelectionText, newValue.RegularSelectionText, nameof(RegularSelectionText));
-        RaiseWhenChanged(oldValue.SelectionDetailText, newValue.SelectionDetailText, nameof(SelectionDetailText));
+        get => Selection.SummaryResult;
+        set => Selection.SummaryResult = value;
     }
 
-    private void SetManualRangeInputs(string rows, string cols)
-    {
-        if (ManualRowsRange == rows && ManualColsRange == cols)
-        {
-            return;
-        }
+    public string CadSelectionText => Selection.CadSelectionText;
+    public string RegularSelectionText => Selection.RegularSelectionText;
+    public string SelectionDetailText => Selection.SelectionDetailText;
 
-        using (_settingsSuppression.EnterManualSizingApply())
-        {
-            using (_undoSuppression.Enter())
-            {
-                ManualRowsRange = rows;
-                ManualColsRange = cols;
-            }
-        }
-        UpdateManualRangeStatus();
-    }
-
-    private void SetManualSizeInputs(decimal width, decimal height)
-    {
-        if (PendingColumnWidth == width && PendingRowHeight == height)
-        {
-            return;
-        }
-
-        using (_settingsSuppression.EnterManualSizingApply())
-        {
-            using (_undoSuppression.Enter())
-            {
-                PendingColumnWidth = width;
-                PendingRowHeight = height;
-            }
-        }
-        ClearPendingMixedFlags();
-    }
-
-    private void ClearPendingMixedFlags()
-    {
-        IsPendingColumnWidthMixed = false;
-        IsPendingRowHeightMixed = false;
-    }
+    private void UpdateSelectedRangeSummary() => Selection.UpdateSelectedRangeSummary();
 
     private static string FormatIndexRanges(IEnumerable<int> indices)
     {
