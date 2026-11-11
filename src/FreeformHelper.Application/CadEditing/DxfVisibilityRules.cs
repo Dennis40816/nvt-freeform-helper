@@ -7,6 +7,10 @@ namespace FreeformHelper.Application.CadEditing;
 /// <summary>Pure visibility selection rules for CAD editing and export.</summary>
 public static class DxfVisibilityRules
 {
+    /// <summary>Selects all export pads, excluding effective hides regardless of layer selection.</summary>
+    public static List<CadPad> SelectAllExportPads(CadPadSet cad, Func<int, bool> isEffectivelyHidden) =>
+        cad.Pads.Where(pad => !isEffectivelyHidden(pad.Id)).ToList();
+
     /// <summary>Selects ids that are not effectively hidden.</summary>
     public static List<int> SelectVisibleSelectedCadIds(IEnumerable<int> selectedCadIds, Func<int, bool> isEffectivelyHidden)
     {

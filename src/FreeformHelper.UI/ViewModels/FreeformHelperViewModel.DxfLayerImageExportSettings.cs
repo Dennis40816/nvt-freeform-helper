@@ -1,4 +1,6 @@
+using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.ViewModels.Project;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -11,6 +13,10 @@ public sealed partial class FreeformHelperViewModel
 
     internal void RememberDxfLayerImageExportRequest(DxfLayerImageExportRequest request) =>
         _dxfLayerImagePreferenceState.Remember(request);
+
+    internal LayerImageExportContext BuildLayerImageExportContext(
+        IReadOnlyList<CadPad> pads, Func<string, string, Task<string?>> pickSavePathAsync) =>
+        CadExport.BuildLayerImageExportContext(pads, pickSavePathAsync);
 
     private void ApplyDxfLayerImageExportSnapshot(UiViewSnapshot snapshot) =>
         _dxfLayerImagePreferenceState.Apply(snapshot);

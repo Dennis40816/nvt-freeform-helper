@@ -7,6 +7,7 @@ using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.CadEditing;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.Interaction;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
@@ -53,9 +54,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject, IProject
     public Func<Task<string?>>? PickLoadProjectPathAsync { get => _viewCallbacks.PickLoadProjectPathAsync; set => _viewCallbacks.PickLoadProjectPathAsync = value; }
     public Func<Task<string?>>? PickSaveProjectPathAsync { get => _viewCallbacks.PickSaveProjectPathAsync; set => _viewCallbacks.PickSaveProjectPathAsync = value; }
     public Func<string, string, Task<string?>>? PickSaveNotchPathAsync { get => _viewCallbacks.PickSaveNotchPathAsync; set => _viewCallbacks.PickSaveNotchPathAsync = value; }
-    public Func<string, string, Task<string?>>? PickSaveExportPathAsync { get => _viewCallbacks.PickSaveExportPathAsync; set => _viewCallbacks.PickSaveExportPathAsync = value; }
+    public Func<string, string, Task<string?>>? PickSaveExportPathAsync { get => CadExport.Dialogs.PickSaveExportPathAsync; set => CadExport.Dialogs.PickSaveExportPathAsync = value; }
     public Func<Task<bool>>? ConfirmEmbedDxfAsync { get => _viewCallbacks.ConfirmEmbedDxfAsync; set => _viewCallbacks.ConfirmEmbedDxfAsync = value; }
-    public Func<string, string, Task>? ShowWarningAsync { get => _viewCallbacks.ShowWarningAsync; set => _viewCallbacks.ShowWarningAsync = value; }
+    public Func<string, string, Task>? ShowWarningAsync { get => CadExport.Dialogs.ShowWarningAsync; set => CadExport.Dialogs.ShowWarningAsync = value; }
     public Func<bool>? EnsureNoPendingEdits { get => _viewCallbacks.EnsureNoPendingEdits; set => _viewCallbacks.EnsureNoPendingEdits = value; }
     public Func<NotchDetailViewModel, Task>? OpenNotchDetailAsync { get => _viewCallbacks.OpenNotchDetailAsync; set => _viewCallbacks.OpenNotchDetailAsync = value; }
     public Func<NotchExportSelectionViewModel, Task<NotchTable?>>? OpenNotchExportSelectionAsync { get => _viewCallbacks.OpenNotchExportSelectionAsync; set => _viewCallbacks.OpenNotchExportSelectionAsync = value; }
@@ -63,7 +64,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject, IProject
     public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get => DxfEdit.OpenDxfEditChangeListAsync; set => DxfEdit.OpenDxfEditChangeListAsync = value; }
     public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get => _viewCallbacks.OpenIndexMappingReportAsync; set => _viewCallbacks.OpenIndexMappingReportAsync = value; }
     public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get => _viewCallbacks.OpenDxfOverlapReportAsync; set => _viewCallbacks.OpenDxfOverlapReportAsync = value; }
-    public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get => _viewCallbacks.OpenDxfLayerImageExportAsync; set => _viewCallbacks.OpenDxfLayerImageExportAsync = value; }
+    public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get => CadExport.Dialogs.OpenDxfLayerImageExportAsync; set => CadExport.Dialogs.OpenDxfLayerImageExportAsync = value; }
 
     // --- Application Services ---
     // Instances of various services responsible for business logic and data manipulation.
@@ -83,6 +84,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject, IProject
     /// such as current selection and active info popovers.
     /// </summary>
     public WorkspaceInteractionState InteractionState { get; } = new();
+
+    /// <summary>Gets the stable CAD export child for this workspace.</summary>
+    public CadExportViewModel CadExport { get; }
 
     internal CadDocumentSession CadDocument { get; } = new();
     public DxfEditViewModel DxfEdit { get; }
@@ -164,6 +168,17 @@ public sealed partial class FreeformHelperViewModel : ObservableObject, IProject
             successStatusBuilder: (cadCount, _) => $"DXF edit focused: CAD {cadPadId} (CAD output={cadCount}).");
     }
 
+    private CadExportViewModel CreateCadExport()
+    {
+        var inputs = new CadExportInputs(
+            () => CadPads, () => RegularSourceMode, () => SelectedRegularSourceLayerOption?.Name,
+            () => (_projectFile.Settings.ActiveAreaPixels.X, _projectFile.Settings.ActiveAreaPixels.Y),
+            () => _dxfLayerImagePreferenceState.Value);
+        var effects = new CadExportEffects(SetStatus, SetStatusError, _dxfLayerImagePreferenceState.Remember);
+        return new CadExportViewModel(
+            dialogs => new CadExportWorkflow(CadDocument, dialogs, inputs, effects, _logger), CreateEditingAsyncCommand);
+    }
+
     internal DxfCombinedGroupReplayResult? ApplyCapturedDxfEditProjectState(
         PersistedDxfEditProjectState state, string? cadFallbackWarning = null) => _cadEditReplay.Apply(state, cadFallbackWarning);
 
@@ -232,6 +247,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject, IProject
         _projectCommands = new ProjectCommandOwner(
             CreateEditingAsyncCommand, CreateEditingAsyncCommand, SaveProjectAsync, LoadProjectAsync);
         _selectionCommands = CreateSelectionCommands(); // Register selection commands next.
+        CadExport = CreateCadExport(); // Export commands register before the other DXF commands.
         _dxfWorkspaceCommands = CreateDxfWorkspaceCommands();
         _generalCommands = CreateGeneralCommands(); // Finish command registration in the original order.
         StartupPerfTracker.Mark("workspace.vm-commands-initialized");

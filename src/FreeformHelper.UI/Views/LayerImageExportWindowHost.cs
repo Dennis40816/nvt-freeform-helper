@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using Avalonia.Controls;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;

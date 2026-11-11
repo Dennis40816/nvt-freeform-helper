@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Text;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
@@ -31,37 +30,20 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
-    private static string SanitizeFileNameToken(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-        {
-            return "layer";
-        }
-
-        var invalidChars = Path.GetInvalidFileNameChars().ToHashSet();
-        var builder = new StringBuilder(input.Length);
-        foreach (var ch in input)
-        {
-            builder.Append(invalidChars.Contains(ch) ? '_' : ch);
-        }
-
-        return builder.Length == 0 ? "layer" : builder.ToString();
-    }
-
     /// <summary>
     /// Gets the command to export CAD pads (visible layers only) to DXF.
     /// </summary>
-    public IAsyncRelayCommand ExportDxfVisibleCommand => _dxfWorkspaceCommands.ExportDxfVisibleCommand;
+    public IAsyncRelayCommand ExportDxfVisibleCommand => CadExport.ExportDxfVisibleCommand;
 
     /// <summary>
     /// Gets the command to export CAD pads (all non-deleted layers) to DXF.
     /// </summary>
-    public IAsyncRelayCommand ExportDxfAllCommand => _dxfWorkspaceCommands.ExportDxfAllCommand;
+    public IAsyncRelayCommand ExportDxfAllCommand => CadExport.ExportDxfAllCommand;
 
     /// <summary>
     /// Gets the command to export one DXF layer to image (PNG/BMP/JPG).
     /// </summary>
-    public IAsyncRelayCommand ExportDxfLayerImageCommand => _dxfWorkspaceCommands.ExportDxfLayerImageCommand;
+    public IAsyncRelayCommand ExportDxfLayerImageCommand => CadExport.ExportDxfLayerImageCommand;
 
     /// <summary>
     /// Gets the command to check the quality of the loaded DXF data.
@@ -104,9 +86,6 @@ public sealed partial class FreeformHelperViewModel
     private DxfWorkspaceCommands CreateDxfWorkspaceCommands()
     {
         var workspaceCommands = new DxfWorkspaceCommands(
-            ExportDxfVisibleCommand: CreateEditingAsyncCommand(ExportVisibleDxfAsync),
-            ExportDxfAllCommand: CreateEditingAsyncCommand(ExportAllDxfAsync),
-            ExportDxfLayerImageCommand: CreateEditingAsyncCommand(ExportLayerImageAsync),
             CheckDxfQualityCommand: CreateEditingAsyncCommand(CheckDxfQualityAsync),
             SelectDxfOverlapPadsCommand: CreateEditingCommand(SelectDxfOverlapPads),
             ClearDxfOverlapHighlightsCommand: CreateEditingCommand(ClearDxfOverlapHighlights),

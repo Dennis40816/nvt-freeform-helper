@@ -64,51 +64,6 @@ public sealed partial class FreeformHelperViewModel
         return TryGetOperationCadAndGrid(cadFactory, missingStatus, onCadUnavailable: null, out cad, out grid);
     }
 
-    /// <summary>
-    /// Validates that CAD data is available for an operation.
-    /// </summary>
-    /// <param name="cadFactory">Factory that returns the CAD set for the operation context.</param>
-    /// <param name="missingStatus">Status text to show when CAD is unavailable.</param>
-    /// <param name="onCadUnavailable">Optional custom side effect when CAD is unavailable.</param>
-    /// <param name="cad">Resolved CAD set when available.</param>
-    /// <returns><c>true</c> when CAD is ready; otherwise <c>false</c>.</returns>
-    private bool TryGetLoadedCad(
-        Func<CadPadSet?> cadFactory,
-        string missingStatus,
-        Action? onCadUnavailable,
-        out CadPadSet cad)
-    {
-        ArgumentNullException.ThrowIfNull(cadFactory);
-        ArgumentException.ThrowIfNullOrWhiteSpace(missingStatus);
-
-        cad = null!;
-        var resolvedCad = cadFactory();
-        if (resolvedCad is null)
-        {
-            if (onCadUnavailable is not null)
-            {
-                onCadUnavailable();
-            }
-            else
-            {
-                SetStatus(missingStatus);
-            }
-
-            return false;
-        }
-
-        cad = resolvedCad;
-        return true;
-    }
-
-    private bool TryGetLoadedCad(
-        Func<CadPadSet?> cadFactory,
-        string missingStatus,
-        out CadPadSet cad)
-    {
-        return TryGetLoadedCad(cadFactory, missingStatus, onCadUnavailable: null, out cad);
-    }
-
     private bool TryEnsureWorkflowStep(WorkflowStepId step, string? overrideStatus = null, bool suppressStatus = false)
     {
         var gate = WorkflowStepGateService.Validate(step, BuildWorkflowStateSnapshot());

@@ -5,6 +5,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Application.Services;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.Logging;
 
 namespace FreeformHelper.UI.ViewModels;

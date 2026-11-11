@@ -3,7 +3,7 @@
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 
-namespace FreeformHelper.UI.ViewModels;
+namespace FreeformHelper.UI.CadExport;
 
 /// <summary>Admitted dialog inputs and host operations, independent of any window.</summary>
 public sealed record LayerImageExportContext(
