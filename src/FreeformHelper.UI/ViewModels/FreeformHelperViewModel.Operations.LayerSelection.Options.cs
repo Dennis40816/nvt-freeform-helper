@@ -78,7 +78,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var layerPads = _cad.Pads
-            .Where(p => !IsCadPadEffectivelyHidden(p.Id))
+            .Where(p => !CadDocument.IsEffectivelyHidden(p.Id))
             .Where(p => string.Equals(p.Layer, layerName, StringComparison.OrdinalIgnoreCase))
             .ToList();
         if (layerPads.Count == 0)

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadEditing;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.UseCases.ProjectLoad;
 
@@ -47,7 +48,7 @@ public sealed partial class FreeformHelperViewModel
             onStart: () => _logger.Info(CultureInfo.InvariantCulture, "Saving project."),
             operationAsync: async () =>
             {
-                CaptureDxfEditProjectState(_projectFile);
+                DxfEditStateCapture.Capture(CadDocument, _projectFile);
                 var result = await _projectPersistenceUseCase.SaveAsync(new ProjectSaveRequest(
                     Project: _projectFile,
                     Grid: _grid,
@@ -139,7 +140,7 @@ public sealed partial class FreeformHelperViewModel
         var backupPath = UnsavedProjectBackup.PathFor(_appGeneralSettingsStore.SettingsPath);
         try
         {
-            CaptureDxfEditProjectState(_projectFile);
+            DxfEditStateCapture.Capture(CadDocument, _projectFile);
             _ = await _projectPersistenceUseCase.SaveAsync(new ProjectSaveRequest(
                 Project: _projectFile,
                 Grid: _grid,
@@ -330,7 +331,7 @@ public sealed partial class FreeformHelperViewModel
         {
             _cad = null;
             ResetDxfEditBaseline(null);
-            _cachedFilteredCadForBuild = null;
+            CadDocument.InvalidateFilteredCad();
             ClearDxfLayerCatalog();
             CadPads = new ObservableCollection<CadPad>();
             DetachAndClearLayerToggles();
@@ -363,10 +364,10 @@ public sealed partial class FreeformHelperViewModel
         var dxfElapsedMs = dxfLoadSw.ElapsedMilliseconds;
         if (outcome is null)
         {
-            return (dxfElapsedMs, KeepDxfEditsWithoutCad(file));
+            return (dxfElapsedMs, _cadEditReplay.KeepWithoutCad(file));
         }
 
-        var persistedDxfEditState = CapturePersistedDxfEditProjectState(file);
+        var persistedDxfEditState = DxfEditStateCapture.CaptureProjectState(file);
         if (outcome.Source == CadLoadSource.Path && !string.IsNullOrWhiteSpace(outcome.SourcePath))
         {
             await TryLoadDxfLayerCatalogFromPathAsync(outcome.SourcePath);
@@ -378,7 +379,7 @@ public sealed partial class FreeformHelperViewModel
 
         await ApplyCadLoadOutcomeAsync(outcome, file.UiSnapshot.View);
         ApplyImportSnapshot(file.UiSnapshot.Import, file);
-        var combinedGroupReplay = ApplyCapturedDxfEditProjectState(persistedDxfEditState, outcome.FallbackWarning);
+        var combinedGroupReplay = _cadEditReplay.Apply(persistedDxfEditState, outcome.FallbackWarning);
         status.ReportProgress(BuildCadLoadStatus(outcome, CadLoadContext.LoadProject, path));
         LogCadLoadOutcome(outcome, CadLoadContext.LoadProject);
         return (dxfElapsedMs, combinedGroupReplay);

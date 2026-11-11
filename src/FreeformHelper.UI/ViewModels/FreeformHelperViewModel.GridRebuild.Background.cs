@@ -25,7 +25,7 @@ public sealed partial class FreeformHelperViewModel
             GridAlignmentMode = GridAlignmentMode,
             Cad = fullCadSnapshot,
             RegularSourceLayerName = SelectedRegularSourceLayerOption?.Name,
-            HiddenCadPadIds = BuildEffectiveHiddenCadPadIds(),
+            HiddenCadPadIds = CadDocument.BuildEffectiveHiddenIds(),
             BuildCadPadSetForBounds = () => boundsCadSnapshot,
         };
     }

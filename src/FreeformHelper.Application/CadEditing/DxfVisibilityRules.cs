@@ -2,18 +2,21 @@
 
 using FreeformHelper.Domain.Pads;
 
-namespace FreeformHelper.UI.ViewModels;
+namespace FreeformHelper.Application.CadEditing;
 
-internal static class DxfVisibilityRules
+/// <summary>Pure visibility selection rules for CAD editing and export.</summary>
+public static class DxfVisibilityRules
 {
-    internal static List<int> SelectVisibleSelectedCadIds(IEnumerable<int> selectedCadIds, Func<int, bool> isEffectivelyHidden)
+    /// <summary>Selects ids that are not effectively hidden.</summary>
+    public static List<int> SelectVisibleSelectedCadIds(IEnumerable<int> selectedCadIds, Func<int, bool> isEffectivelyHidden)
     {
         return selectedCadIds
             .Where(id => !isEffectivelyHidden(id))
             .ToList();
     }
 
-    internal static List<int> SelectManualHiddenCadPadIds(IEnumerable<int> hiddenCadPadIds, CombinedCadState combinedCad)
+    /// <summary>Selects manually hidden ids without combined source pads.</summary>
+    public static List<int> SelectManualHiddenCadPadIds(IEnumerable<int> hiddenCadPadIds, CombinedCadState combinedCad)
     {
         return hiddenCadPadIds
             .Where(id => !combinedCad.GroupIdBySourceCadId.ContainsKey(id))
@@ -22,7 +25,8 @@ internal static class DxfVisibilityRules
             .ToList();
     }
 
-    internal static List<int> SelectRestorableHiddenCadPadIds(
+    /// <summary>Selects requested hidden ids that can be restored independently.</summary>
+    public static List<int> SelectRestorableHiddenCadPadIds(
         IEnumerable<int> cadPadIds, HashSet<int> hiddenCadPadIds, CombinedCadState combinedCad)
     {
         return cadPadIds
@@ -32,7 +36,8 @@ internal static class DxfVisibilityRules
             .ToList();
     }
 
-    internal static List<int> SelectChangedDuplicateCadPadIds(
+    /// <summary>Selects duplicates whose requested automatic-hide state differs.</summary>
+    public static List<int> SelectChangedDuplicateCadPadIds(
         IEnumerable<int> cadPadIds, IReadOnlyDictionary<int, int> duplicateCadPadIdToCanonicalId,
         HashSet<int> autoHiddenDuplicateCadPadIds, bool autoHide)
     {
@@ -61,7 +66,8 @@ internal static class DxfVisibilityRules
         return changedIds;
     }
 
-    internal static List<CadPad> SelectRegularSourceLayerPadsToAppend(
+    /// <summary>Selects visible regular-source pads missing from an export projection.</summary>
+    public static List<CadPad> SelectRegularSourceLayerPadsToAppend(
         IReadOnlyList<CadPad> visiblePads, CadPadSet cad, string regularLayerName, Func<int, bool> isEffectivelyHidden)
     {
         var visibleIds = visiblePads.Select(pad => pad.Id).ToHashSet();

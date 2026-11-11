@@ -287,7 +287,7 @@ public sealed partial class FreeformHelperViewModel
     {
         var ordered = DxfIndexAssigner.OrderPads(visiblePads, _grid, SelectedScanOrder);
         CadPads = new ObservableCollection<CadPad>(ordered);
-        _cachedFilteredCadForBuild = new CadPadSet(ordered);
+        CadDocument.PublishFilteredCad(new CadPadSet(ordered));
         RebuildVisibleDxfIndexMap(ordered);
         BumpNotchExportCadFingerprint();
     }

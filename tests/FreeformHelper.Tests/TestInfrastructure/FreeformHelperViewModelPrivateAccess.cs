@@ -4,6 +4,7 @@ using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadEditing;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Lifecycle;
@@ -16,8 +17,7 @@ internal static class FreeformHelperViewModelPrivateAccess
 {
     private const string NotchTableGenerationTaskType = "System.Threading.Tasks.Task`1[[FreeformHelper.UI.ViewModels.FreeformHelperViewModel+NotchTableGenerationResult, FreeformHelper.UI]]";
 
-    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cad")]
-    public static extern ref CadPadSet? Cad(FreeformHelperViewModel viewModel);
+    public static ref CadPadSet? Cad(FreeformHelperViewModel viewModel) => ref viewModel.CadDocument.Cad;
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_undoSuppression")]
     public static extern ref UndoSuppression UndoSuppression(FreeformHelperViewModel viewModel);
@@ -31,8 +31,7 @@ internal static class FreeformHelperViewModelPrivateAccess
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_projectFile")]
     public static extern ref ProjectFile ProjectFile(FreeformHelperViewModel viewModel);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cadEdit")]
-    public static extern ref CadEditState CadEdit(FreeformHelperViewModel viewModel);
+    public static CadEditState CadEdit(FreeformHelperViewModel viewModel) => viewModel.CadDocument.Edit;
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_dxfImportService")]
     public static extern ref DxfImportService DxfImportService(FreeformHelperViewModel viewModel);
@@ -67,8 +66,7 @@ internal static class FreeformHelperViewModelPrivateAccess
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "RestoreHiddenCadPad")]
     public static extern void RestoreHiddenCadPad(FreeformHelperViewModel viewModel, int cadPadId);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildActiveCadPadSet")]
-    public static extern CadPadSet? BuildActiveCadPadSet(FreeformHelperViewModel viewModel);
+    public static CadPadSet? BuildActiveCadPadSet(FreeformHelperViewModel viewModel) => viewModel.CadDocument.BuildActiveCad();
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildFilteredCadPadSet")]
     public static extern CadPadSet? BuildFilteredCadPadSet(FreeformHelperViewModel viewModel);

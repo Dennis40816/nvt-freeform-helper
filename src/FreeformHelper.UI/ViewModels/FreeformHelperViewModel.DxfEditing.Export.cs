@@ -1,4 +1,5 @@
 using System.Globalization;
+using FreeformHelper.Application.CadEditing;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 
@@ -31,7 +32,7 @@ public sealed partial class FreeformHelperViewModel
 
         var pads = visibleOnly
             ? BuildVisibleDxfExportPads(cad)
-            : cad.Pads.Where(p => !IsCadPadEffectivelyHidden(p.Id)).ToList();
+            : cad.Pads.Where(p => !CadDocument.IsEffectivelyHidden(p.Id)).ToList();
 
         if (pads.Count == 0)
         {
@@ -82,7 +83,7 @@ public sealed partial class FreeformHelperViewModel
             return pads;
         }
 
-        var toAppend = DxfVisibilityRules.SelectRegularSourceLayerPadsToAppend(pads, cad, regularLayerName, IsCadPadEffectivelyHidden);
+        var toAppend = DxfVisibilityRules.SelectRegularSourceLayerPadsToAppend(pads, cad, regularLayerName, CadDocument.IsEffectivelyHidden);
         pads.AddRange(toAppend);
         var appended = toAppend.Count;
 
@@ -119,7 +120,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var pads = BuildActiveCadPadSet()?.Pads;
+        var pads = CadDocument.BuildActiveCad()?.Pads;
         if (pads is null || pads.Count == 0)
         {
             SetStatus("Export DXF image: no CAD pads available.");

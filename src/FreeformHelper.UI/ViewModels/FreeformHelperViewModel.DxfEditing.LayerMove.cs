@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
-using FreeformHelper.Domain.Pads;
+using FreeformHelper.Application.CadEditing;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -38,7 +38,7 @@ public sealed partial class FreeformHelperViewModel
 
     public string DuplicateDxfEditBadgeTooltip =>
         FormattableString.Invariant(
-            $"Duplicate groups: {DuplicateCadPadCount}. Auto-hidden exact duplicates: {_cadEdit.AutoHiddenDuplicateCadPadIds.Count}, restored: {GetRestoredDuplicateCadPadIds().Count}. Click to open duplicate details.");
+            $"Duplicate groups: {DuplicateCadPadCount}. Auto-hidden exact duplicates: {_cadEdit.AutoHiddenDuplicateCadPadIds.Count}, restored: {CadDocument.GetRestoredDuplicateIds().Count}. Click to open duplicate details.");
 
     public string MovedDxfEditBadgeTooltip =>
         FormattableString.Invariant($"Moved pads: {RelayeredCadPadCount}. Click to open layer-move details.");
@@ -83,7 +83,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         var selected = _selectedCadIds
-            .Where(id => !IsCadPadEffectivelyHidden(id))
+            .Where(id => !CadDocument.IsEffectivelyHidden(id))
             .Distinct()
             .ToList();
         if (selected.Count == 0)
@@ -93,54 +93,7 @@ public sealed partial class FreeformHelperViewModel
             return;
         }
 
-        var selectedSet = selected.ToHashSet();
-        var changedCount = 0;
-        var updatedPads = new List<CadPad>(cad.Pads.Count);
-        foreach (var pad in cad.Pads)
-        {
-            if (!selectedSet.Contains(pad.Id))
-            {
-                updatedPads.Add(pad);
-                continue;
-            }
-
-            if (string.Equals(pad.Layer, targetLayerName, StringComparison.OrdinalIgnoreCase))
-            {
-                updatedPads.Add(pad);
-                continue;
-            }
-
-            updatedPads.Add(new CadPad(pad.Id, pad.Name, targetLayerName, pad.Polygon));
-            changedCount++;
-        }
-
-        if (changedCount == 0)
-        {
-            SetStatus($"DXF edit: selected pads are already in layer '{targetLayerName}'.");
-            return;
-        }
-
-        var undoSnapshot = CaptureCadEditUndoSnapshot();
-        var layerSelectionSnapshot = CaptureLayerSelectionSnapshot();
-        _cad = new CadPadSet(updatedPads);
-        _cachedFilteredCadForBuild = null;
-        PreserveDxfDependentLayerSelections();
-        UpdateLayerToggles(_cad);
-        RestoreLayerSelectionAfterCadLayerEdit(layerSelectionSnapshot, targetLayerName);
-        DxfEditTargetLayerName = targetLayerName;
-
-        SyncRelayeredCadState();
-        InteractionState.ClosePadInfo();
-        _selectionCoordinator.ClearSelection(CanvasHost);
-        SetStatus($"DXF edit: moved {changedCount} CAD pad(s) to layer '{targetLayerName}'.");
-        _logger.Info(
-            CultureInfo.InvariantCulture,
-            "DXF layer move applied. op={0}, targetLayer={1}, changedPads={2}.",
-            operationName,
-            targetLayerName,
-            changedCount);
-        MarkUnsaved();
-        PushUndo(() => RestoreCadEditUndoSnapshot(undoSnapshot), "DXF move CAD pads to layer");
+        _cadEditWorkflow.MoveToLayer(cad, selected.ToHashSet(), targetLayerName, operationName);
     }
 
     private void RestoreLayerSelectionAfterCadLayerEdit(

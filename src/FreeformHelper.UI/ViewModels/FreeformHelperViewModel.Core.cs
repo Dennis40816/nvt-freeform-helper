@@ -6,9 +6,12 @@ using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadEditing;
 using FreeformHelper.UI.Interaction;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.Services.CadEditing;
+using FreeformHelper.UI.UseCases.ProjectLoad;
 using NLog;
 using Nvt.Core.Lifecycle;
 using Nvt.Core.Threading;
@@ -80,10 +83,12 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     /// </summary>
     public WorkspaceInteractionState InteractionState { get; } = new();
 
-    private CadPadSet? _cad; // The loaded CAD pad data.
+    internal CadDocumentSession CadDocument { get; } = new();
+    private readonly CadEditWorkflow _cadEditWorkflow;
+    private readonly CadEditReplay _cadEditReplay;
+    private CadPadSet? _cad { get => CadDocument.Cad; set => CadDocument.Cad = value; }
     private RegularGrid? _grid; // The generated regular grid data.
     private readonly WorkflowDataState _workflowData = new(); // Holds the latest pad match result and the cached workflow data snapshot built from it.
-    private CadPadSet? _cachedFilteredCadForBuild; // Cache for layer-filtered CAD pads.
 
     private int _workflowDataSnapshotRevision = 1;
     private readonly GridStartupState _gridStartup = new(); // Holds the one-time startup flags and the fit request of the grid build.
@@ -108,10 +113,29 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     {
     }
 
+    private (CadEditWorkflow Workflow, CadEditReplay Replay) CreateCadEditEngine()
+    {
+        var publication = new CadEditPublication(
+            CaptureCadEditNotifications, SyncRelayeredCadState, SyncRotatedCadState,
+            SyncHiddenCadIdsToProject, SyncCombinedCadState, SyncDuplicateCadState);
+        var layers = new CadEditLayers(
+            CaptureLayerSelectionSnapshot, PreserveDxfDependentLayerSelections, UpdateLayerToggles,
+            RestoreLayerSelectionAfterCadLayerEdit, CadLayersMatchDocument, name => DxfEditTargetLayerName = name);
+        var effects = new CadEditEffects(
+            InteractionState.ClosePadInfo, () => _selectionCoordinator.ClearSelection(CanvasHost),
+            FilterCadPadsByLayer, RebuildAfterCadEdit, SetStatus, MarkUnsaved, PushUndo);
+        var workflow = new CadEditWorkflow(CadDocument, publication, layers, effects);
+        return (workflow, new CadEditReplay(CadDocument, workflow, publication, layers));
+    }
+
+    internal DxfCombinedGroupReplayResult? ApplyCapturedDxfEditProjectState(
+        PersistedDxfEditProjectState state, string? cadFallbackWarning = null) => _cadEditReplay.Apply(state, cadFallbackWarning);
+
     private readonly ProjectEditingSession _projectEditingSession;
 
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
+        (_cadEditWorkflow, _cadEditReplay) = CreateCadEditEngine();
         _settingsState = new SettingsStateViewModel(this);
         _canvasStrokeFillState = new CanvasStrokeFillState(
             () => _isLoadingSettings,

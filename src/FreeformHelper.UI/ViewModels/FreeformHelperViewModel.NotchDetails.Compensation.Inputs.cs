@@ -12,7 +12,7 @@ public sealed partial class FreeformHelperViewModel
     private List<CadPad> GetCadPadsForNotchComputation(int? targetCadPadId = null)
     {
         return NotchComputationInputs.SelectCadPadsForComputation(
-            ResolveCadPadsForComputationSource(), IsCadPadEffectivelyHidden, _grid, targetCadPadId, TryGetCadIcIndex);
+            ResolveCadPadsForComputationSource(), CadDocument.IsEffectivelyHidden, _grid, targetCadPadId, TryGetCadIcIndex);
     }
 
     private HashSet<int>? GetActiveRegularPadIdsForNotchComputation()

@@ -167,7 +167,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         if (!TryGetOperationCadAndGrid(
-                BuildActiveCadPadSet,
+                CadDocument.BuildActiveCad,
                 "Project loaded: Step 2 auto replay skipped (CAD/grid missing).",
                 out var cad,
                 out var grid))
@@ -204,7 +204,7 @@ public sealed partial class FreeformHelperViewModel
         }
 
         if (!TryGetOperationCadAndGrid(
-                BuildActiveCadPadSet,
+                CadDocument.BuildActiveCad,
                 "Step 2: import DXF and run Step 1 first.",
                 out var cad,
                 out var grid))
