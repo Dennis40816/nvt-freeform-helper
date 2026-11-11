@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using FreeformHelper.Application.Services;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 

@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadExport;
 
 namespace FreeformHelper.UI.ViewModels.Project;
 

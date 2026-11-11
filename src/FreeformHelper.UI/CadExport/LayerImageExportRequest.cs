@@ -2,7 +2,7 @@
 
 using FreeformHelper.Application.Services;
 
-namespace FreeformHelper.UI.ViewModels;
+namespace FreeformHelper.UI.CadExport;
 
 /// <summary>A snapshot of the drawing and file choices; Save fills the chosen path.</summary>
 public sealed record LayerImageExportRequest(

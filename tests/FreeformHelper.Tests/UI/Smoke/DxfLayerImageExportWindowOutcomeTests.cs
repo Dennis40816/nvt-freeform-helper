@@ -8,6 +8,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;

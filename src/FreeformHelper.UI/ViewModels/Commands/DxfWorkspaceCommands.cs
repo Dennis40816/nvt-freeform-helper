@@ -4,11 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace FreeformHelper.UI.ViewModels;
 
-// Commands owned by the later quality, export and mapping slices.
+// Commands owned by the later quality and mapping slices.
 internal sealed record DxfWorkspaceCommands(
-    IAsyncRelayCommand ExportDxfVisibleCommand,
-    IAsyncRelayCommand ExportDxfAllCommand,
-    IAsyncRelayCommand ExportDxfLayerImageCommand,
     IAsyncRelayCommand CheckDxfQualityCommand,
     IRelayCommand SelectDxfOverlapPadsCommand,
     IRelayCommand ClearDxfOverlapHighlightsCommand,

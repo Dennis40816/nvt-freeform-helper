@@ -3,7 +3,7 @@
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Pads;
 
-namespace FreeformHelper.UI.ViewModels;
+namespace FreeformHelper.UI.CadExport;
 
 /// <summary>Admitted output jobs and drawing choices passed to the host's image writer.</summary>
 public sealed record LayerImageWriteRequest(

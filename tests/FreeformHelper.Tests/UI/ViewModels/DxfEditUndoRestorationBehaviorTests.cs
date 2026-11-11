@@ -2,7 +2,7 @@
 
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.ViewModels;
+using FreeformHelper.UI.CadExport;
 using Xunit;
 using static FreeformHelper.Tests.FreeformHelperViewModelTests;
 using static FreeformHelper.Tests.SuppressedWorkspaceBehaviorTests;

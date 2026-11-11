@@ -4,6 +4,7 @@ using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 
