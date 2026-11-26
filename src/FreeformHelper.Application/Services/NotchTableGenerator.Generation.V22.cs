@@ -47,13 +47,15 @@ public sealed partial class NotchTableGenerator
                 continue;
             }
 
+            var mainCombinePercent = selected.CombinePercent -
+                                     orderedLegs.Skip(2).Sum(static leg => leg.RatioPercent);
             for (var i = 0; i < orderedLegs.Count; i += 2)
             {
                 var isContinuation = i > 0;
                 var leg1 = orderedLegs[i];
                 var hasLeg2 = i + 1 < orderedLegs.Count;
                 var leg2 = hasLeg2 ? orderedLegs[i + 1] : null;
-                var combinePercent = isContinuation ? 100 : selected.CombinePercent;
+                var combinePercent = isContinuation ? 100 : mainCombinePercent;
                 var flags = isContinuation ? V22ContinuationFlag : 0;
                 var commentTag = isContinuation ? "CONT" : "MAIN";
                 var node = new NotchV22Node(
@@ -181,14 +183,24 @@ public sealed partial class NotchTableGenerator
             return Array.Empty<NotchTableRow>();
         }
 
+        var continuationLegSums = canonicalV22Rows
+            .Select(static row => (row.IcIndex, row.DiffIndex, Node: row.V22Node ?? NotchV22Node.FromValues(row.Values)))
+            .Where(static row => (row.Node.Flags & V22ContinuationFlag) != 0)
+            .GroupBy(static row => (row.IcIndex, row.DiffIndex))
+            .ToDictionary(static group => group.Key,
+                static group => group.Sum(static row => row.Node.TargetRatioPercent1 + row.Node.TargetRatioPercent2));
         var projected = new List<NotchTableRow>(canonicalV22Rows.Count);
         foreach (var row in canonicalV22Rows)
         {
             var node = row.V22Node ?? NotchV22Node.FromValues(row.Values);
+            // V21 also subtracts continuation legs from the source, so preserve its full MAIN combine.
+            var combinePercent = node.CombinePercent + ((node.Flags & V22ContinuationFlag) == 0
+                ? continuationLegSums.GetValueOrDefault((row.IcIndex, row.DiffIndex))
+                : 0);
             var values = new int[9];
             values[0] = node.AnchorDiffIndex;
-            values[1] = Math.Clamp(node.CombinePercent, 0, 255);
-            values[2] = Math.Clamp(node.CombinePercent, 0, 255);
+            values[1] = Math.Clamp(combinePercent, 0, 255);
+            values[2] = Math.Clamp(combinePercent, 0, 255);
             FillLegacyLeg(
                 targetDiffIndex: node.TargetDiffIndex1,
                 ratioPercent: node.TargetRatioPercent1,

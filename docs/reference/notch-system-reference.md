@@ -210,7 +210,7 @@ Key rules:
   - `Boundary virtual-area cap`: Before the ToFull virtual extension area enters Stage3 gain/allocation, limit it to `inside overlap × cap ratio`.
   - `Target coverage guard`: After canonical rows are selected, sum retained/incoming coverage for each target FW diff; if it exceeds the cap (default `120%`), proportionally reduce that target's retained/leg percentages to prevent uniform 400 from exceeding EMS 480.
 - More than two target legs are split into continuation rows
-- The first row retains the actual `CombinePercent`
+- The first (MAIN) row uses `CombinePercent = original CombinePercent - sum(CONT leg percentages)`; subtracting MAIN's two legs then leaves the anchor coverage. The diagnostic `C=...%` comment still records the full source allocation across MAIN and CONT before the target coverage guard; `TG=...%`, when present, is the total after the guard.
 - Continuation rows fix `CombinePercent = 100`
 - `NotchV22FirmwareProjector` is the sole normalization entry point from typed/legacy V22 table rows to final Firmware nodes: typed `V22Node` takes priority, `Values.Length >= 7` retains raw compatibility decode, and `< 7` preserves the existing legacy combine fallback and exact overflow exception.
 - The projection provides both `SourceRows`, which preserves the original row/action ordinal, and `NodesByIc`, which preserves the existing C per-IC ordering; the two views share the same projected row. The exporter only formats projected nodes; simulation executes the same batch of nodes before aggregating Actions/diagnostics.
@@ -271,7 +271,7 @@ The C file currently produced by `NotchTableExporter.ExportAsCInitializer(...)` 
 
 - `R=...%` represents the To Regular diagnostic multiplier: `Σ(overlapArea / targetRegularArea)`. It is no longer multiplied into all target shares as a source-wide gain.
 - `F=...%` represents the To Full diagnostic multiplier; in `Conservative (No Gain)`, To Full mainly serves as boundary support/cap/allowance, so `F=100%` is common without boundary expansion. In `Current (Gain)`, the Stage3 effective area after To Full affects only the coverage of the corresponding target.
-- `C=...%` represents the node's actual coverage sum, namely the total self retained + target legs of this source row.
+- `C=...%` represents the full source allocation before the target coverage guard, namely self retained + all target legs across MAIN and CONT; `TG=...%`, when present, is the total after the guard. MAIN's payload `CombinePercent` excludes the CONT legs.
 - `NODE KEEP=...% MOVE=...%` is the actual node flow additionally derived by C export; for example, `C=100%` with a target leg of `44` means the source retains `56%` and moves `44%`.
 
 The current model rules for `C` are:
@@ -390,6 +390,7 @@ sourceDelta     = retainedPercent - 100
 
 4. Source and target scaling both use `(INT16)((source * percent) / 100)`; integer division truncates toward zero, and accumulation retains firmware modular narrowing.
 5. Continuation rows add only their own target legs, without adjusting source retained again.
+   The generator therefore subtracts the sum of CONT leg percentages from the original Combine when encoding MAIN; V21 projection restores that full Combine to preserve its existing continuation subtraction behavior.
 6. Aggregate Actions by `SourceRows` only after physics completes; action grouping must not affect firmware calculations in reverse.
 
 Test contracts:
@@ -415,6 +416,8 @@ After R13.103c-2, the executable Firmware domain of `NullValue` is fixed at `0..
 The input domain for V21/V22 simulation is FW INT16: finite fractional values truncate toward zero, values beyond the INT16 range saturate, and NaN/Infinity quantize to 0. `Cells.BeforeValue`, Actions, and safety audit all use this quantized baseline to avoid misrepresenting input quantization as notch compensation. V21 CadAllocation additionally provides source-oriented Actions; V21 LegacyRegularAnchor rows are destination-oriented, so they provide only exact Cells/EMS, without producing source-flow Actions in the wrong direction.
 
 If a parity gap is found in 1.0.x, only simulation/decoder/compatibility adapter adjustments that do not change C bytes are allowed; a correctness change requiring encoder, row ordering, or C emission changes must be filed as a separate post-g7 product issue.
+
+Exception: on 2026-11-26 23:07 (UTC+8) the owner decided that the V22 continuation-row correction ships in 1.0.0: the MAIN combine excludes the continuation legs. The exception covers this correction only, including the output changes it causes against the 1.0.x output-equality rules.
 
 ### 7.4.3 C export generation metadata
 
