@@ -10,6 +10,9 @@
       <SolidColorBrush x:Key="NfcAccentBorderBrush" Color="#53A6FF"/>
       <SolidColorBrush x:Key="NfcAccentBorderStrongBrush" Color="#86C0FF"/>
       <SolidColorBrush x:Key="NfcAccentBorderLightBrush" Color="#53A6FF"/>
+      <!-- Checked text toggle: white text stays readable, also on the dimmed canvas toolbar. -->
+      <SolidColorBrush x:Key="BrushToggleCheckedBackground" Color="#2967A9"/>
+      <SolidColorBrush x:Key="BrushToggleCheckedForeground" Color="#FFFFFF"/>
       <!-- NFH accent and tool data colors. Core owns neutral and semantic brushes. -->
       <Color x:Key="ColorScrollTrack">#DDDDE0</Color>
       <Color x:Key="ColorScrollThumb">#6F737A</Color>
@@ -115,6 +118,9 @@
       <SolidColorBrush x:Key="NfcAccentBorderBrush" Color="#2967A9"/>
       <SolidColorBrush x:Key="NfcAccentBorderStrongBrush" Color="#225489"/>
       <SolidColorBrush x:Key="NfcAccentBorderLightBrush" Color="#2967A9"/>
+      <!-- Checked text toggle: white text stays readable, also on the dimmed canvas toolbar. -->
+      <SolidColorBrush x:Key="BrushToggleCheckedBackground" Color="#2967A9"/>
+      <SolidColorBrush x:Key="BrushToggleCheckedForeground" Color="#FFFFFF"/>
       <!-- NFH accent and tool data colors. Core owns neutral and semantic brushes. -->
       <Color x:Key="ColorScrollTrack">#D7D7DA</Color>
       <Color x:Key="ColorScrollThumb">#7A7D84</Color>

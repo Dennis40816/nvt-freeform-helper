@@ -204,11 +204,11 @@
   </Style>
 
   <!-- These toggles have no border or check mark, so the fill alone must show on versus off.
-       The accent fill stays distinct from the unchecked surface on the dimmed canvas toolbar. -->
+       The solid fill stays distinct from the unchecked surface and keeps its label readable. -->
   <Style Selector="ToggleButton.actionTextButton.actionNeutral:checked, ToggleButton.actionTextButton.actionNeutral:checked:pointerover, ToggleButton.actionTextButton.actionNeutral:checked:pressed">
-    <Setter Property="Background" Value="{DynamicResource NfcAccentBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushToggleCheckedBackground}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource NfcAccentBorderBrush}"/>
-    <Setter Property="Foreground" Value="{DynamicResource NfcSurfaceBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource BrushToggleCheckedForeground}"/>
   </Style>
 
   <!-- Primary action role. -->

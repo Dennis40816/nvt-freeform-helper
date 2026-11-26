@@ -111,15 +111,24 @@ public sealed class ThemeBrushResolutionTests
             // The canvas toolbar has no border or check mark: the fill is the only on/off signal.
             var onFill = Assert.IsAssignableFrom<ISolidColorBrush>(on.Background).Color;
             var offFill = Assert.IsAssignableFrom<ISolidColorBrush>(off.Background).Color;
-            var contrast = (Math.Max(Luminance(onFill), Luminance(offFill)) + 0.05) /
-                           (Math.Min(Luminance(onFill), Luminance(offFill)) + 0.05);
-            Assert.True(contrast >= 3.0, $"{theme}: checked/unchecked fill contrast {contrast:F2} is below 3:1.");
+            var onText = Assert.IsAssignableFrom<ISolidColorBrush>(on.Foreground).Color;
+            var fillContrast = Contrast(onFill, offFill);
+            var textContrast = Contrast(onText, onFill);
+            Assert.True(fillContrast >= 3.0, $"{theme}: checked/unchecked fill contrast {fillContrast:F2} is below 3:1.");
+            Assert.True(textContrast >= 4.5, $"{theme}: checked label contrast {textContrast:F2} is below 4.5:1.");
         }
         finally
         {
             window.Close();
             app.RequestedThemeVariant = previousTheme;
         }
+    }
+
+    private static double Contrast(Color first, Color second)
+    {
+        var a = Luminance(first);
+        var b = Luminance(second);
+        return (Math.Max(a, b) + 0.05) / (Math.Min(a, b) + 0.05);
     }
 
     private static double Luminance(Color color)
