@@ -44,7 +44,7 @@ public sealed partial class UiLayoutGuardTests
         var leftPanel = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "LeftDxfPanel.axaml"));
         Assert.Contains("Classes=\"boundLayerSelector\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("MaxDropDownHeight=\"{StaticResource LayerListMaxHeight}\"", leftPanel, StringComparison.Ordinal);
-        Assert.Contains("controls:BalancedWrapPanel Classes=\"badgeGroup dxfEditBadgeGroup\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("primitives:BalancedWrapPanel Classes=\"badgeGroup dxfEditBadgeGroup\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("IsChecked=\"{Binding IsCadLayerBulkToggleChecked, Mode=TwoWay}\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleContent\"", leftPanel, StringComparison.Ordinal);
@@ -264,6 +264,7 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("Text=\"Split selected\"", dxfCombineSection, StringComparison.Ordinal);
         Assert.DoesNotContain("DeleteSelectedCadPadsCommand", dxfCombineSection, StringComparison.Ordinal);
         Assert.DoesNotContain("controls:BalancedWrapPanel Classes=\"dxfEditToolbar\"", leftPanel, StringComparison.Ordinal);
+        Assert.DoesNotContain("primitives:BalancedWrapPanel Classes=\"dxfEditToolbar\"", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfEditToolbarAction", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfEditToolbarSurface", leftPanel, StringComparison.Ordinal);
     }
@@ -274,7 +275,7 @@ public sealed partial class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
 
         var coreStyles = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Core.axaml"));
-        Assert.Contains("controls|BalancedWrapPanel.badgeGroup", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("primitives|BalancedWrapPanel.badgeGroup", coreStyles, StringComparison.Ordinal);
         Assert.Contains("BalanceLastRow", coreStyles, StringComparison.Ordinal);
         Assert.Contains("DxfEditSummaryBadgeMinWidth", coreStyles, StringComparison.Ordinal);
         Assert.Contains("Button.workspaceActionButton", coreStyles, StringComparison.Ordinal);
@@ -294,6 +295,7 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("Border.dxfEditFieldActionSpacer", coreStyles, StringComparison.Ordinal);
         Assert.Contains("AncestorType=Button", coreStyles, StringComparison.Ordinal);
         Assert.DoesNotContain("controls|BalancedWrapPanel.dxfEditToolbar", coreStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("primitives|BalancedWrapPanel.dxfEditToolbar", coreStyles, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerSegmentRail", coreStyles, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerSegmentAction", coreStyles, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfEditAccordionHeader", coreStyles, StringComparison.Ordinal);

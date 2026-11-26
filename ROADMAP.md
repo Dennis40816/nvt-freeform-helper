@@ -289,12 +289,17 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
     - `933b47f`: records the rendered snapshot tests, but not the lint run or the baseline test.
     - `f5d08d2`: no verification result, and the `Refs #64` text is inline instead of a separate line.
 - [ ] **R13.307-ICON Material Symbols becomes the shared Core icon system** · Target: g4 · Status: In progress: Core font file adoption done; shared names moved to `NvtIcons`; `dark_mode`, `light_mode`, `link`, `link_off` wait for Core constants · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
+  - Known issue: since PR #707 the icon `Text` is a private-use code point instead of a word, so a screen reader may read it differently (not verified).
 - [x] **R13.307-FONT Adopt the Core font set** · Target: g4 · Status: Done · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
 - [x] **R13.307-LIC Ship the Core license as `licenses/Nvt.Core/LICENSE` and the font licenses (including the Inter OFL text) under `licenses/`** · Target: first NFH release with Core · Status: Done · PR: - (pending; [#43](https://github.com/Dennis40816/nvt-freeform-helper/issues/43))
   - The pinned Fonts 0.1.0 package supplies the Core license, three font license files and Material Symbols NOTICE. It omits a standalone Inter OFL license; the Core packaging follow-up must supply it before customer distribution. NFH already ships its own copy as `licenses/Inter/LICENSE` (`src/FreeformHelper.UI/licenses/Inter/LICENSE`, included by `FreeformHelper.UI.csproj`).
 - [x] **C-LSC Use LoadingScopeCoordinator from the Core non-UI library** · Target: g4 · Status: Done; Core side in [Core #44](https://github.com/Dennis40816/nvt_fw_core/pull/44) · PR: [#61](https://github.com/Dennis40816/nvt-freeform-helper/pull/61)
 - [x] **C-NONUI Move CoalescedRefresh and UndoService to the Core non-UI library** · Target: g4 · Status: Done · PR: [#60](https://github.com/Dennis40816/nvt-freeform-helper/pull/60)
-- [ ] **C-CTRL Move cards, dialogs and input controls to Core** · Target: g4 · Status: Not started · PR: -
+- [ ] **C-CTRL Move cards, dialogs and input controls to Core** · Target: g4 · Status: In progress · PR: -
+  - This pull request switches BalancedWrapPanel to Core and removes the unused ReviewWorkspaceShell.
+  - InfoLabel, SectionFrame and CollapsiblePanel follow after C-THEME2, with before-and-after PNG images in Light and Dark approved by the owner.
+  - Dialogs, NumberScrubber and cards keep the NFH versions in 1.0.0; deleting them moves after 1.0.0 (decided 2026-11-26).
+  - Core gaps: ConfirmDialog has no consequence text, next-start note or dismiss result; WarningDialog has no scrolling and no Enter or Esc handling; NumberScrubber does not forward the accessible name; there is no card style.
 - [ ] **R13.307-GUARD Should Core ship test helpers such as the headless session guard?** · Target: - · Status: Waiting for owner · PR: -
 - [ ] **R13.307-HL Test whether an exception in test setup stops the headless loop on Avalonia 12.1.1** · Target: - · Status: Not started · PR: -
   - Record the result in the Core Testing module docs.
