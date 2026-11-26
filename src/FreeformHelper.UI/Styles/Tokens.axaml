@@ -862,7 +862,6 @@
   <GridLength x:Key="NotchExportTableColMatchWidth">66</GridLength>
   <GridLength x:Key="NotchExportTableColStatusWidth">126</GridLength>
   <GridLength x:Key="NotchExportMainLeftColumnWidth">2.2*</GridLength>
-  <GridLength x:Key="NotchExportMainRightColumnWidth">*</GridLength>
   <x:Double x:Key="InspectorTierDotSize">8</x:Double>
   <x:Double x:Key="VerificationStepRailNodeSize">10</x:Double>
   <x:Double x:Key="VerificationStepRailLineWidth">2</x:Double>

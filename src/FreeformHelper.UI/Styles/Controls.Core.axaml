@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
         xmlns:icons="using:Nvt.Core.Avalonia.Icons"
-        xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
+        xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia">
   <!-- Slightly denser typography -->
   <Style Selector="TextBlock, SelectableTextBlock">
     <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}"/>
@@ -824,7 +824,7 @@
     <Setter Property="HorizontalAlignment" Value="Stretch"/>
   </Style>
 
-  <Style Selector="controls|BalancedWrapPanel.badgeGroup">
+  <Style Selector="primitives|BalancedWrapPanel.badgeGroup">
     <Setter Property="ItemSpacing" Value="{StaticResource Space6}"/>
     <Setter Property="LineSpacing" Value="{StaticResource Space6}"/>
     <Setter Property="BalanceLastRow" Value="True"/>

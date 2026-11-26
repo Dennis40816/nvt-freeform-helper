@@ -49,67 +49,6 @@
     </Setter>
   </Style>
 
-  <Style Selector="controls|ReviewWorkspaceShell">
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="controls:ReviewWorkspaceShell">
-          <Border Padding="{StaticResource Inset14}">
-            <Grid RowDefinitions="Auto,Auto,Auto,*,Auto"
-                  RowSpacing="{StaticResource Space14}">
-              <Grid Grid.Row="0"
-                    ColumnDefinitions="*,Auto"
-                    ColumnSpacing="{StaticResource Space16}">
-                <StackPanel Spacing="{StaticResource Space2}">
-                  <SelectableTextBlock Classes="workspaceMainTitle"
-                                       Text="{TemplateBinding Title}"/>
-                  <SelectableTextBlock Text="{TemplateBinding Subtitle}"
-                                       Foreground="{DynamicResource BrushTextMuted}"
-                                       TextWrapping="Wrap"/>
-                </StackPanel>
-
-                <ContentPresenter Grid.Column="1"
-                                  Content="{TemplateBinding HeaderRight}"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Top"/>
-              </Grid>
-
-              <Border Grid.Row="1"
-                      Classes="workspaceTopLayerBox">
-                <ContentPresenter Content="{TemplateBinding SummaryContent}"/>
-              </Border>
-
-              <Border Grid.Row="2"
-                      Classes="workspaceTopLayerBox">
-                <ContentPresenter Content="{TemplateBinding ToolbarContent}"/>
-              </Border>
-
-              <Border Grid.Row="3"
-                      Background="{DynamicResource BrushBgPanel}"
-                      BorderBrush="{DynamicResource BrushBorder}"
-                      BorderThickness="{StaticResource BorderThin}"
-                      CornerRadius="{StaticResource RadiusSm}"
-                      Padding="{StaticResource Inset8}">
-                <Grid ColumnSpacing="{StaticResource Space12}">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{StaticResource NotchExportMainLeftColumnWidth}"/>
-                    <ColumnDefinition Width="{StaticResource NotchExportMainRightColumnWidth}"/>
-                  </Grid.ColumnDefinitions>
-
-                  <ContentPresenter Content="{TemplateBinding LeftContent}"/>
-                  <ContentPresenter Grid.Column="1"
-                                    Content="{TemplateBinding RightContent}"/>
-                </Grid>
-              </Border>
-
-              <ContentPresenter Grid.Row="4"
-                                Content="{TemplateBinding FooterContent}"/>
-            </Grid>
-          </Border>
-        </ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>
-
   <Style Selector="Border.panelBlockRoot">
     <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>

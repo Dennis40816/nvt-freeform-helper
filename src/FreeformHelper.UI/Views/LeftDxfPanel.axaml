@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
              xmlns:icons="using:Nvt.Core.Avalonia.Icons"
@@ -119,7 +120,7 @@
       <panels:CollapsiblePanel.HeaderRight><SelectableTextBlock Classes="stepNote" Text="{Binding DxfEdit.DxfEditsHeaderText}" MaxWidth="{DynamicResource ManualSizingInputWidth}"
             TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding DxfEdit.DxfEditsHeaderText}"/></panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}">
-          <controls:BalancedWrapPanel Classes="badgeGroup dxfEditBadgeGroup"
+          <primitives:BalancedWrapPanel Classes="badgeGroup dxfEditBadgeGroup"
                                       HorizontalAlignment="Stretch">
             <Button Classes="actionChip chipAction dxfEditSummaryChip hidden"
                     Command="{Binding DxfEdit.OpenHiddenDxfEditChangeListCommand}"
@@ -177,7 +178,7 @@
                                      Text="{Binding DxfEdit.RotatedCadPadCount, StringFormat='Rotated {0}'}"/>
               </StackPanel>
             </Button>
-          </controls:BalancedWrapPanel>
+          </primitives:BalancedWrapPanel>
         <StackPanel Spacing="{StaticResource Space6}">
           <SelectableTextBlock Classes="dxfEditSectionLabel"
                                Text="Quick actions"/>
