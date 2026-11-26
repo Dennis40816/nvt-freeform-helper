@@ -31,25 +31,29 @@ Each work milestone still runs the UI build as required by `AGENTS.md`. Run `./s
 
 `example/` is a private git submodule. A new clone or worktree must run `git submodule update --init example` before any gate. Without it, example-data tests may be skipped, and `run-refactor-gate.ps1` will fail. Do not bring its contents into this repo, a PR, an issue, or a log. To switch to a branch from before the submodule was set up, first run `git submodule deinit -f example`.
 
-## Merge Boundaries (Owner Decision, 2026-10-02)
+## Merge Boundaries (Owner Decision, 2026-11-26)
 
-Every pull request has a tier. A machine check of the changed paths decides the tier. The author's own claim does not count.
+The owner said on 2026-11-26: 「只有畫面修改和重要演算法改再叫我 approve」 ("Ask me to approve only for screen changes and important algorithm changes.")
 
-Tier A needs approval from the owner. A pull request is tier A when it changes any of these:
+Every pull request has a tier. The independent review of the final head decides the tier. The author's own claim does not count. The review answers two questions:
 
-- `.github/**`, and `scripts/**` that define a gate
-- `.editorconfig`, `Directory.Build.props`, `Directory.Packages.props`, `global.json`
-- release files and agent permission settings
-- tests that define a check (for example the architecture, guard, baseline, ratchet or contract tests)
-- new documents
-- `src/**`, unless the change only deletes code (see tier B)
-- golden or snapshot files, and `.axaml` view files
+- Can the user see a change on the screen, including a layout, an appearance or a text?
+- Can the change alter a DXF parsing, Match or Notch computation result?
 
-Tier B needs no approval from the owner. A pull request is tier B when it only changes docs and tests, debt baselines that only go down, or `src/**` `.cs` files by deleting code only (no added line, at most 200 deleted lines in all, tests only shrink, no new test file). The bot merges a tier B pull request after an independent review concludes `accept` on the final head, with no P0 or P1 finding, required checks green and no open thread.
+Tier A needs approval from the owner. A pull request is tier A when the answer to either question is yes, or when it changes any of these:
 
-A tier that the machine cannot prove is tier A.
+- the approval mechanism, or agent permission settings
+- a guard, so that it checks less: a loosened test that defines a check (for example the architecture, guard, baseline, ratchet or contract tests), a debt baseline that goes up, or a loosened gate script or workflow
+- the version, or release files
+- license files
 
-The bot is the repository's existing GitHub App, inherited from the template project. Changes to `AGENTS.md` or `CONTRIBUTING.md` require owner confirmation in chat before editing. The owner said on 2026-10-04: 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). A GitHub review is not required for this confirmation. The GitHub owner-approval rules for `src/**`, `scripts/**`, `.github/**`, and the other high-risk paths above continue to apply.
+Tier B needs no approval from the owner. Every other pull request is tier B, including documents, moves, renames, refactors with no visible difference, tests and CI. The bot merges a tier B pull request after an independent review concludes `accept` on the final head, with no P0 or P1 finding, required checks green and no open thread.
+
+If an answer or a condition is not clear, the pull request is tier A.
+
+A path check such as `pr-tier` is only a hint. It does not decide the tier.
+
+The bot is the repository's existing GitHub App, inherited from the template project. Changes to `AGENTS.md` or `CONTRIBUTING.md` require owner confirmation in chat before editing. The owner said on 2026-10-04: 「讓我在聊天中確認即可」 ("Confirming in the chat is enough"). A GitHub review is not required for this confirmation. A later change to the merge rules in this section is a change to the approval mechanism and is tier A.
 
 Before merging, reconfirm the PR's current head, the applicable independent review and owner approval, and the required checks. Use `gh pr merge <n> --merge --match-head-commit <head>`, treating the head confirmed at that moment as the merge boundary.
 

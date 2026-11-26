@@ -308,7 +308,7 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
 
 Decisions about one item are recorded with that item. These apply across the roadmap.
 
-- **Merge approval (2026-10-02)**: only high-risk changes need owner approval on GitHub: `src/**`, `.github/**`, `scripts/**`, `.editorconfig`, `Directory.Build.props`, `Directory.Packages.props` and `global.json`. After approval, a commit that only merges trunk cleanly needs no new approval if tests pass. Manual conflict resolution needs approval again (2026-10-05). Integration batches awaiting review have no limit.
+- **Merge approval (2026-11-26)**: the owner said 「只有畫面修改和重要演算法改再叫我 approve」 ("Ask me to approve only for screen changes and important algorithm changes.") Owner approval on GitHub is needed for a change the user can see on the screen and for a change that can alter DXF parsing, Match or Notch results. It is still needed, as before, for the approval mechanism, a loosened guard, the version, release files and license files. Every other change merges after the independent review and green checks. `CONTRIBUTING.md` holds the full rule. After approval, a commit that only merges trunk cleanly needs no new approval if tests pass. Manual conflict resolution needs approval again (2026-10-05). Integration batches awaiting review have no limit.
 - **AGENTS.md and CONTRIBUTING.md (2026-10-04)**: changes need the owner's prior confirmation in chat, not a GitHub review.
 - **Review**: an agent this project dispatches (a fresh Claude or Codex) does the independent review.
 - **License**: all rights reserved; copyright holder Dennis Liu. Core code, including code moved from NFH, ships under the Core proprietary license.
