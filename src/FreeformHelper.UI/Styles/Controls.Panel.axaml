@@ -19,7 +19,7 @@
                 <Grid ColumnDefinitions="*,Auto,Auto">
                   <TextBlock Text="{TemplateBinding Title}"
                              FontWeight="SemiBold"
-                             Foreground="{DynamicResource BrushTextPrimary}"
+                             Foreground="{DynamicResource NfcTextBrush}"
                              VerticalAlignment="Center"/>
 
                   <ContentPresenter Grid.Column="1"
@@ -50,8 +50,8 @@
   </Style>
 
   <Style Selector="Border.panelBlockRoot">
-    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
     <Setter Property="Padding" Value="0"/>
@@ -60,8 +60,8 @@
 
   <Style Selector="Border.workspaceSidePane">
     <Setter Property="Padding" Value="{StaticResource Inset12}"/>
-    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
     <Setter Property="MinHeight" Value="0"/>
     <Setter Property="ClipToBounds" Value="True"/>
   </Style>
@@ -78,7 +78,7 @@
 
   <Style Selector="ToggleButton.panelBlockHeader">
     <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderBottomThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusTopMd}"/>
     <Setter Property="Padding" Value="{StaticResource Inset12_10}"/>
@@ -87,44 +87,44 @@
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader TextBlock, ToggleButton.panelBlockHeader SelectableTextBlock">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextSecondaryBrush}"/>
     <Setter Property="TextWrapping" Value="NoWrap"/>
     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader controls|FontIcon.panelBlockChevron">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextSecondaryBrush}"/>
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader:pointerover">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSelectionSurfaceBrush}"/>
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader:pressed">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSecondaryActionPressedBrush}"/>
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader:checked">
     <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderBottomThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusTopMd}"/>
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader:checked TextBlock, ToggleButton.panelBlockHeader:checked SelectableTextBlock">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader:checked controls|FontIcon.panelBlockChevron">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader:checked:pointerover">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSelectionSurfaceBrush}"/>
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader:checked:pressed">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSecondaryActionPressedBrush}"/>
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader:disabled">
@@ -156,8 +156,8 @@
   </Style>
 
   <Style Selector="Border.workflowOverviewSection">
-    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
     <Setter Property="Padding" Value="{StaticResource Inset10_10}"/>
@@ -165,35 +165,35 @@
   </Style>
 
   <Style Selector="Border.workflowOverviewSection.last">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderBrush}"/>
   </Style>
 
   <Style Selector="Border.workflowOverviewSection.warning">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushWarning}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcWarningTextBrush}"/>
   </Style>
 
   <Style Selector="Border.workflowOverviewSection.danger">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcDangerTextBrush}"/>
   </Style>
 
   <Style Selector="Border.workflowStepSubsection">
     <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderTopThin}"/>
     <Setter Property="Padding" Value="{StaticResource Inset10_8}"/>
   </Style>
 
   <Style Selector="Border.workflowStepInsetPanel">
-    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
     <Setter Property="Padding" Value="{StaticResource Inset8_6}"/>
   </Style>
 
   <Style Selector="Border.workflowStepStatusStrip">
-    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
     <Setter Property="Padding" Value="{StaticResource Inset8_6}"/>
@@ -201,20 +201,20 @@
 
   <Style Selector="Border.workflowStepMetricTile">
     <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderBottomThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusNone}"/>
     <Setter Property="Padding" Value="{StaticResource Inset6_4}"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowStepMetricLabel, TextBlock.workflowStepMetricLabel">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="TextWrapping" Value="Wrap"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowStepMetricText, TextBlock.workflowStepMetricText">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
     <Setter Property="TextWrapping" Value="Wrap"/>
     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     <Setter Property="MaxLines" Value="3"/>
@@ -225,14 +225,14 @@
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowLegendTitle, TextBlock.workflowLegendTitle">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="TextWrapping" Value="NoWrap"/>
     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowLegendMeta, TextBlock.workflowLegendMeta">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
     <Setter Property="TextWrapping" Value="NoWrap"/>
     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     <Setter Property="MaxLines" Value="1"/>
@@ -257,22 +257,22 @@
   </Style>
 
   <Style Selector="Button.icon.ghost.workflowOverviewAction:pointerover, Button.icon.ghost.workflowStepAction:pointerover">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSelectionSurfaceBrush}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>
   </Style>
 
   <Style Selector="Button.icon.ghost.workflowOverviewAction controls|FontIcon, Button.icon.ghost.workflowStepAction controls|FontIcon">
     <Setter Property="FontSize" Value="{DynamicResource IconSizeLg}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
   </Style>
 
   <Style Selector="Button.icon.ghost.workflowOverviewAction:pointerover controls|FontIcon, Button.icon.ghost.workflowStepAction:pointerover controls|FontIcon">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
   </Style>
 
   <Style Selector="Border.workflowOverviewBadge">
-    <Setter Property="Background" Value="{DynamicResource BrushBgElevated}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorderStrong}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
     <Setter Property="Padding" Value="{StaticResource Inset10_4}"/>
@@ -282,72 +282,72 @@
   </Style>
 
   <Style Selector="Border.workflowOverviewBadge.warning">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushWarning}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcWarningTextBrush}"/>
   </Style>
 
   <Style Selector="Border.workflowOverviewBadge.warning SelectableTextBlock.workflowOverviewBadgeText, Border.workflowOverviewBadge.warning TextBlock.workflowOverviewBadgeText">
-    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcWarningTextBrush}"/>
   </Style>
 
   <Style Selector="Border.workflowOverviewBadge.danger">
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcDangerTextBrush}"/>
   </Style>
 
   <Style Selector="Border.workflowOverviewBadge.danger SelectableTextBlock.workflowOverviewBadgeText, Border.workflowOverviewBadge.danger TextBlock.workflowOverviewBadgeText">
-    <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcDangerTextBrush}"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewBadgeText, TextBlock.workflowOverviewBadgeText">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="TextWrapping" Value="NoWrap"/>
     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewTitle, TextBlock.workflowOverviewTitle">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="TextWrapping" Value="NoWrap"/>
     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewStatus, TextBlock.workflowOverviewStatus">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextSecondaryBrush}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="TextWrapping" Value="NoWrap"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewStatus.warning, TextBlock.workflowOverviewStatus.warning">
-    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcWarningTextBrush}"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewStatus.danger, TextBlock.workflowOverviewStatus.danger">
-    <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcDangerTextBrush}"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewLabel, TextBlock.workflowOverviewLabel">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
     <Setter Property="TextWrapping" Value="NoWrap"/>
     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewValue, TextBlock.workflowOverviewValue">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextSubtle}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextSecondaryBrush}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="TextWrapping" Value="NoWrap"/>
     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewValue.warning, TextBlock.workflowOverviewValue.warning">
-    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcWarningTextBrush}"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewValue.danger, TextBlock.workflowOverviewValue.danger">
-    <Setter Property="Foreground" Value="{DynamicResource BrushDanger}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcDangerTextBrush}"/>
   </Style>
 
   <Style Selector="SelectableTextBlock.workflowOverviewMeta, TextBlock.workflowOverviewMeta">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
     <Setter Property="TextWrapping" Value="Wrap"/>
     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     <Setter Property="MaxLines" Value="2"/>
@@ -367,18 +367,18 @@
   </Style>
 
   <Style Selector="Border.canvasQuickToolbar.coordinateOverlayToolbar">
-    <Setter Property="Background" Value="{DynamicResource BrushBgSurface}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceBrush}"/>
     <Setter Property="Opacity" Value="1"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
   </Style>
 
   <Style Selector="TextBlock.canvasQuickHint, SelectableTextBlock.canvasQuickHint">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
   </Style>
 
   <Style Selector="TextBlock.stepNote, SelectableTextBlock.stepNote">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
     <Setter Property="TextWrapping" Value="Wrap"/>
   </Style>
 

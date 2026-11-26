@@ -28,7 +28,7 @@
         <SelectableTextBlock Classes="padInfoSubtle" Text="{Binding Subtitle, ElementName=Root}"/>
       </StackPanel>
     </Grid>
-    <Border BorderBrush="{DynamicResource BrushBorder}"
+    <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}"
             BorderThickness="{DynamicResource BorderHorizontal}"
             Padding="{DynamicResource Inset4}">
       <ContentControl Content="{Binding Actions, ElementName=Root}"/>

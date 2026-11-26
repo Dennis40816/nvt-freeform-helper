@@ -112,7 +112,7 @@
                 HorizontalAlignment="Right"
                 Command="{Binding AddCustomPathCommand}"/>
       </StackPanel>
-      <Border BorderBrush="{DynamicResource BrushBorder}"
+      <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}"
               BorderThickness="{DynamicResource BorderTopThin}"
               Padding="{DynamicResource InsetTop8}">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">

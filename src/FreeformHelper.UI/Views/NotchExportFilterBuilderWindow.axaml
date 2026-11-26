@@ -8,8 +8,8 @@
         MinWidth="{StaticResource NotchExportFilterHelperMinWidth}"
         MinHeight="{StaticResource NotchExportFilterHelperMinHeight}"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="Filter helper">
   <Window.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/ExportNotchRows.axaml"/>

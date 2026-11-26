@@ -15,7 +15,7 @@
     <Grid RowDefinitions="Auto,*,Auto" RowSpacing="{DynamicResource Space12}">
       <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
         <controls:FontIcon Classes="symbols iconLg" Glyph="{DynamicResource Nvt.Icon.Warning}"
-                           Foreground="{DynamicResource BrushWarning}" VerticalAlignment="Top"/>
+                           Foreground="{DynamicResource NfcWarningTextBrush}" VerticalAlignment="Top"/>
         <SelectableTextBlock x:Name="TitleText" Grid.Column="1" Classes="dialogTitle" Text="{Binding Title}"/>
       </Grid>
       <ScrollViewer x:Name="MessageScroll" Grid.Row="1" Classes="dialogBody">

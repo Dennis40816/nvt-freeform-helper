@@ -12,8 +12,8 @@
         WindowStartupLocation="CenterOwner"
         IsEnabled="{Binding Editing.IsProjectEditingEnabled}"
         ShowInTaskbar="False"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="DXF Edit Details">
   <Window.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/DxfEditDetails.axaml"/>
@@ -83,7 +83,7 @@
         </Border>
         <Grid Grid.Row="2">
           <TextBlock x:Name="EmptyRowsHint" Text="No DXF edit rows in this scope."
-                     IsVisible="{Binding HasNoRows}" Foreground="{DynamicResource BrushTextMuted}"
+                     IsVisible="{Binding HasNoRows}" Foreground="{DynamicResource NfcTextMutedBrush}"
                      Margin="{DynamicResource Inset8}" TextWrapping="Wrap"/>
           <ListBox x:Name="RowsListBox" ItemsSource="{Binding Rows}" Classes="scrollV2 workspaceDataList"
                    SelectedItem="{Binding SelectedEntry, Mode=TwoWay}" IsVisible="{Binding HasRows}"

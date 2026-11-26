@@ -7,8 +7,8 @@
         MinWidth="{StaticResource CascadeIcSettingsDialogMinWidth}"
         MinHeight="{StaticResource CascadeIcSettingsDialogMinHeight}"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource BrushSettingsWindowBackground}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcAppBackgroundBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="Cascade IC details">
   <Border Classes="settingsWindowChrome">
     <Grid RowDefinitions="Auto,Auto,*,Auto"

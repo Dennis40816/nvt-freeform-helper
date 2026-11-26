@@ -6,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using FreeformHelper.Application.Services;
@@ -316,6 +317,8 @@ public sealed class CoordinatePlannerIntegratedLayoutTests
             static control => control.Name == "PART_ContentPresenter");
         Assert.Null(presenter.Background);
         Assert.Null(presenter.BorderBrush);
-        Assert.Equal(section.FindResource("BrushActionGhostForeground"), presenter.Foreground);
+        var expectedForeground = Assert.IsAssignableFrom<ISolidColorBrush>(
+            section.FindResource(section.ActualThemeVariant, "NfcTextSecondaryBrush"));
+        Assert.Equal(expectedForeground, presenter.Foreground);
     }
 }

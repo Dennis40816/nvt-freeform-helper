@@ -1,14 +1,24 @@
 using System.Text.RegularExpressions;
+using Avalonia.Media;
+using Avalonia.Styling;
 using Xunit;
 
 namespace FreeformHelper.Tests;
 
 public sealed partial class UiLayoutGuardTests
 {
+    [Theory]
+    [InlineData("White", "#FFFFFF")]
+    [InlineData("Black", "#FF000000")]
+    [InlineData("#FF1E293B", "#1E293B")]
+    public void ContrastLuminanceMeasuresNamedAndArgbColors(string value, string rgb)
+    {
+        Assert.Equal(RelativeLuminance(rgb), RelativeLuminance(value));
+    }
+
     private static void AssertInteractiveActionStateContrast(string actionStyles, string tokens, double minimumRatio)
     {
-        var colorsByTheme = ReadThemeColors(tokens);
-        var colorKeysByBrush = ReadBrushColorKeys(tokens);
+        var localColorKeys = ReadBrushColorKeys(tokens);
         var offenders = new List<string>();
 
         foreach (var style in ExtractStyleBlocks(actionStyles))
@@ -25,17 +35,10 @@ public sealed partial class UiLayoutGuardTests
                 continue;
             }
 
-            if (!colorKeysByBrush.TryGetValue(backgroundBrush, out var backgroundKey) ||
-                !colorKeysByBrush.TryGetValue(foregroundBrush, out var foregroundKey))
-            {
-                continue;
-            }
-
             foreach (var theme in new[] { "Dark", "Light" })
             {
-                Assert.True(colorsByTheme.TryGetValue(theme, out var colors), $"Theme not found: {theme}");
-                Assert.True(colors.TryGetValue(backgroundKey, out var background), $"{theme} token missing: {backgroundKey}");
-                Assert.True(colors.TryGetValue(foregroundKey, out var foreground), $"{theme} token missing: {foregroundKey}");
+                var background = ReadThemeColor(localColorKeys.GetValueOrDefault(backgroundBrush, backgroundBrush), theme);
+                var foreground = ReadThemeColor(localColorKeys.GetValueOrDefault(foregroundBrush, foregroundBrush), theme);
 
                 var ratio = ContrastRatio(background, foreground);
                 if (ratio < minimumRatio)
@@ -76,7 +79,7 @@ public sealed partial class UiLayoutGuardTests
                 }
 
                 var foreground = GetSetterValue(style.Body, "Foreground");
-                if (!string.Equals(foreground, "{DynamicResource BrushButtonDisabledForeground}", StringComparison.Ordinal))
+                if (!string.Equals(foreground, "{DynamicResource NfcTextDisabledBrush}", StringComparison.Ordinal))
                 {
                     offenders.Add($"{selector} -> Foreground={foreground ?? "<missing>"}");
                 }
@@ -148,14 +151,12 @@ public sealed partial class UiLayoutGuardTests
         return match.Success ? match.Groups["key"].Value : null;
     }
 
-    private static void AssertMinimumContrast(string tokens, string backgroundKey, string foregroundKey, double minimumRatio)
+    private static void AssertMinimumContrast(string backgroundKey, string foregroundKey, double minimumRatio)
     {
-        var colorsByTheme = ReadThemeColors(tokens);
         foreach (var theme in new[] { "Dark", "Light" })
         {
-            Assert.True(colorsByTheme.TryGetValue(theme, out var colors), $"Theme not found: {theme}");
-            Assert.True(colors.TryGetValue(backgroundKey, out var background), $"{theme} token missing: {backgroundKey}");
-            Assert.True(colors.TryGetValue(foregroundKey, out var foreground), $"{theme} token missing: {foregroundKey}");
+            var background = ReadThemeColor(backgroundKey, theme);
+            var foreground = ReadThemeColor(foregroundKey, theme);
 
             var ratio = ContrastRatio(background, foreground);
             Assert.True(
@@ -164,28 +165,17 @@ public sealed partial class UiLayoutGuardTests
         }
     }
 
-    private static Dictionary<string, Dictionary<string, string>> ReadThemeColors(string tokens)
+    private static string ReadThemeColor(string key, string theme)
     {
-        var themePattern = new Regex(
-            @"<ResourceDictionary\s+x:Key=""(?<theme>Dark|Light)"">(?<body>[\s\S]*?)</ResourceDictionary>",
-            RegexOptions.Compiled);
-        var colorPattern = new Regex(
-            @"<Color\s+x:Key=""(?<key>[^""]+)"">(?<value>#[0-9A-Fa-f]{6,8})</Color>",
-            RegexOptions.Compiled);
-        var result = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
-
-        foreach (Match themeMatch in themePattern.Matches(tokens))
+        var app = global::Avalonia.Application.Current!;
+        var variant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+        Assert.True(app.TryGetResource(key, variant, out var resource), $"{theme} token missing: {key}");
+        return resource switch
         {
-            var colors = colorPattern.Matches(themeMatch.Groups["body"].Value)
-                .Cast<Match>()
-                .ToDictionary(
-                    static match => match.Groups["key"].Value,
-                    static match => match.Groups["value"].Value,
-                    StringComparer.Ordinal);
-            result[themeMatch.Groups["theme"].Value] = colors;
-        }
-
-        return result;
+            Color color => color.ToString(),
+            ISolidColorBrush brush => brush.Color.ToString(),
+            _ => throw new InvalidOperationException($"{theme} token is not a solid color or brush: {key}"),
+        };
     }
 
     private static Dictionary<string, string> ReadBrushColorKeys(string tokens)
@@ -210,19 +200,13 @@ public sealed partial class UiLayoutGuardTests
         return (lighter + 0.05) / (darker + 0.05);
     }
 
-    private static double RelativeLuminance(string hex)
+    private static double RelativeLuminance(string value)
     {
-        var rgb = NormalizeRgbHex(hex);
-        var red = SrgbToLinear(Convert.ToInt32(rgb[..2], 16) / 255d);
-        var green = SrgbToLinear(Convert.ToInt32(rgb[2..4], 16) / 255d);
-        var blue = SrgbToLinear(Convert.ToInt32(rgb[4..6], 16) / 255d);
+        var color = Color.Parse(value);
+        var red = SrgbToLinear(color.R / 255d);
+        var green = SrgbToLinear(color.G / 255d);
+        var blue = SrgbToLinear(color.B / 255d);
         return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-    }
-
-    private static string NormalizeRgbHex(string hex)
-    {
-        var value = hex.TrimStart('#');
-        return value.Length == 8 ? value[2..] : value;
     }
 
     private static double SrgbToLinear(double channel)

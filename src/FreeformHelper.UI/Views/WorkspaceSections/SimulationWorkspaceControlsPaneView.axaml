@@ -17,7 +17,7 @@
           <StackPanel Spacing="{StaticResource Space6}">
             <SelectableTextBlock Text="Input" FontWeight="SemiBold"/>
             <SelectableTextBlock Text="{Binding InputPurposeText}"
-                Foreground="{DynamicResource BrushTextMuted}"
+                Foreground="{DynamicResource NfcTextMutedBrush}"
                 TextWrapping="Wrap"/>
           </StackPanel>
           <StackPanel Spacing="{DynamicResource Space8}">
@@ -101,7 +101,7 @@
                 <Button Grid.Column="1" Classes="actionGhost actionTextButton simulationActionButton" Content="Random"
                     Command="{Binding RandomizeVisibleValuesCommand}" IsEnabled="{Binding CanRandomizeVisibleValues}"/>
               </Grid>
-              <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
+              <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
                   <TextBlock Text="Clears overrides in every region." Classes="workspaceSectionMeta" VerticalAlignment="Center" TextWrapping="Wrap"/>
                   <Button Grid.Column="1" Classes="actionGhost actionTextButton simulationActionButton" Content="Clear all"
@@ -136,7 +136,7 @@
                   <SelectableTextBlock Text="{Binding CsvInspectorShapeSummaryText}" IsVisible="{Binding HasCsvInspectorData}" TextWrapping="Wrap"/>
                 </StackPanel>
               </controls:HidePanelBlock>
-              <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
+              <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
                   <TextBlock Text="Stops playback and removes every file." Classes="workspaceSectionMeta" TextWrapping="Wrap" VerticalAlignment="Center"/>
                   <Button Grid.Column="1" Classes="actionGhost actionTextButton simulationActionButton" Content="Clear CSV"

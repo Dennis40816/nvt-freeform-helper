@@ -137,7 +137,7 @@
             </StackPanel>
           </StackPanel>
         </primitives:SectionFrame>
-        <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}"
+        <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}"
                 Padding="{DynamicResource InsetTop8}">
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}" HorizontalAlignment="Left">
             <SelectableTextBlock Classes="padInfoKeyLabel" Text="Freeform" VerticalAlignment="Center"
@@ -154,7 +154,7 @@
                     Command="{Binding SetFreeformXYCommand}" ToolTip.Tip="Mark selection as XY-way."/>
           </StackPanel>
         </Border>
-        <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}"
+        <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}"
                 Padding="{DynamicResource InsetTop8}">
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Classes="actionTextButton actionGhost" Content="Reset size" Command="{Binding ResetPadSizeCommand}"/>

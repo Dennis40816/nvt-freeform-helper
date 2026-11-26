@@ -12,8 +12,8 @@
         MinWidth="{DynamicResource LayerImageExportIntegratedMinWidth}"
         MinHeight="{DynamicResource LayerImageExportIntegratedMinHeight}"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         FontFamily="{DynamicResource FontFamilyUi}"
         FontSize="{DynamicResource FontSizeMd}"
         Title="Export layer image">
@@ -39,7 +39,7 @@
         <ColumnDefinition Width="{DynamicResource LayerImageExportIntegratedListColumn}"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
-      <Border BorderBrush="{DynamicResource BrushBorderMuted}" BorderThickness="{DynamicResource BorderLeftThin}"
+      <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderLeftThin}"
               Padding="{DynamicResource Inset12}">
         <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="{DynamicResource Space8}">
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
@@ -99,7 +99,7 @@
             <controls:FontIcon Classes="symbols" Glyph="{Binding PreviewSettings.UseDarkTheme, Converter={StaticResource ThemeGlyph}}"/>
           </Button>
         </Grid>
-        <Border Grid.Row="1" Background="{DynamicResource BrushBgSurfaceInset}" CornerRadius="{DynamicResource NfcSurfaceCornerRadius}"
+        <Border Grid.Row="1" Background="{DynamicResource NfcSurfaceSubtleBrush}" CornerRadius="{DynamicResource NfcSurfaceCornerRadius}"
                 MinWidth="{DynamicResource LayerImageExportPreviewMinWidth}"
                 MinHeight="{DynamicResource LayerImageExportPreviewMinHeight}" ClipToBounds="True">
           <Grid>
@@ -180,7 +180,7 @@
         </Grid>
       </Grid>
     </Grid>
-    <Border Grid.Row="1" BorderBrush="{DynamicResource BrushBorderMuted}" BorderThickness="{DynamicResource BorderTopThin}"
+    <Border Grid.Row="1" BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}"
             Padding="{DynamicResource Inset12_10}">
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock x:Name="ExportSummary" Text="{Binding FooterText}" Classes="exportMuted" TextTrimming="CharacterEllipsis"/>

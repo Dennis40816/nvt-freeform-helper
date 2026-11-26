@@ -24,7 +24,7 @@
     <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
   </Style>
   <Style Selector="Border.mappingInspector">
-    <Setter Property="Background" Value="{DynamicResource BrushBgPanel}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
     <Setter Property="BorderThickness" Value="{DynamicResource BorderLeftThin}"/>
     <Setter Property="CornerRadius" Value="{DynamicResource RadiusNone}"/>
     <Setter Property="Padding" Value="{DynamicResource Inset12}"/>

@@ -179,10 +179,10 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("Button.viewportOverlayAction:pointerover", actionStyles, StringComparison.Ordinal);
         Assert.Contains("BrushActionInverseBackground", actionStyles, StringComparison.Ordinal);
         Assert.Contains("Button.dangerTextButton", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("BrushActionDangerOnNeutralForeground", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("BrushActionDangerForeground", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("NfcDangerTextBrush", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("NfcDangerTextBrush", actionStyles, StringComparison.Ordinal);
         Assert.Contains("Button.dxfEditMiniAction:pointerover", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("BrushActionTextHoverBackground", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("NfcSelectionSurfaceBrush", actionStyles, StringComparison.Ordinal);
         Assert.Contains("Button.dxfEditMiniAction", actionStyles, StringComparison.Ordinal);
         Assert.Contains("CornerRadius\" Value=\"{StaticResource RadiusSm}\"", actionStyles, StringComparison.Ordinal);
         Assert.Contains("HorizontalAlignment\" Value=\"Stretch\"", actionStyles, StringComparison.Ordinal);
@@ -199,22 +199,22 @@ public sealed partial class UiLayoutGuardTests
         Assert.DoesNotContain("Button.actionGhost.dxfEditMiniAction", actionStyles, StringComparison.Ordinal);
         var dxfMiniHoverStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.dxfEditMiniAction:pointerover");
-        Assert.Equal("{DynamicResource BrushActionTextHoverForeground}", GetSetterValue(dxfMiniHoverStyle.Body, "Foreground"));
-        Assert.DoesNotContain("BrushButtonNeutralForeground", dxfMiniHoverStyle.Body, StringComparison.Ordinal);
-        Assert.DoesNotContain("BrushTextMuted", dxfMiniHoverStyle.Body, StringComparison.Ordinal);
+        Assert.Equal("{DynamicResource NfcTextStrongBrush}", GetSetterValue(dxfMiniHoverStyle.Body, "Foreground"));
+        Assert.DoesNotContain("NfcTextBrush", dxfMiniHoverStyle.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("NfcTextMutedBrush", dxfMiniHoverStyle.Body, StringComparison.Ordinal);
         var dxfMiniPressedStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.dxfEditMiniAction:pressed");
-        Assert.Equal("{DynamicResource BrushActionTextHoverForeground}", GetSetterValue(dxfMiniPressedStyle.Body, "Foreground"));
+        Assert.Equal("{DynamicResource NfcTextStrongBrush}", GetSetterValue(dxfMiniPressedStyle.Body, "Foreground"));
         var dxfDangerMiniHoverStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.dangerTextButton.dxfEditMiniAction:pointerover");
-        Assert.Equal("{DynamicResource BrushActionDangerForeground}", GetSetterValue(dxfDangerMiniHoverStyle.Body, "Foreground"));
+        Assert.Equal("{DynamicResource NfcDangerTextBrush}", GetSetterValue(dxfDangerMiniHoverStyle.Body, "Foreground"));
         var dxfMiniDisabledStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.dxfEditMiniAction:disabled");
-        Assert.Equal("{DynamicResource BrushButtonDisabledForeground}", GetSetterValue(dxfMiniDisabledStyle.Body, "Foreground"));
+        Assert.Equal("{DynamicResource NfcTextDisabledBrush}", GetSetterValue(dxfMiniDisabledStyle.Body, "Foreground"));
         var dxfMiniDisabledHoverStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.dxfEditMiniAction:disabled:pointerover, Button.dxfEditMiniAction:disabled:pressed");
-        Assert.Equal("{DynamicResource BrushButtonDisabledForeground}", GetSetterValue(dxfMiniDisabledHoverStyle.Body, "Foreground"));
-        Assert.DoesNotContain("BrushButtonNeutralForeground", dxfMiniDisabledHoverStyle.Body, StringComparison.Ordinal);
+        Assert.Equal("{DynamicResource NfcTextDisabledBrush}", GetSetterValue(dxfMiniDisabledHoverStyle.Body, "Foreground"));
+        Assert.DoesNotContain("NfcTextBrush", dxfMiniDisabledHoverStyle.Body, StringComparison.Ordinal);
     }
 
     [Fact]

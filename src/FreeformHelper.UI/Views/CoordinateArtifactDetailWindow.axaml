@@ -11,8 +11,8 @@
         MinHeight="{DynamicResource CoordinateArtifactDetailMinHeight}"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="Coordinate detail">
   <Window.Styles>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
@@ -21,7 +21,7 @@
     <Grid RowDefinitions="Auto,*,Auto" RowSpacing="{DynamicResource Space12}">
       <StackPanel Grid.Row="0" Spacing="{DynamicResource Space4}">
         <SelectableTextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"/>
-        <SelectableTextBlock Text="{Binding KindRecipeText}" Foreground="{DynamicResource BrushTextMuted}"/>
+        <SelectableTextBlock Text="{Binding KindRecipeText}" Foreground="{DynamicResource NfcTextMutedBrush}"/>
       </StackPanel>
       <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Spacing="{DynamicResource Space10}">
@@ -69,7 +69,7 @@
       </ScrollViewer>
       <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
         <SelectableTextBlock Text="Close keeps the row selected and marked on the canvas."
-                             Foreground="{DynamicResource BrushTextMuted}"
+                             Foreground="{DynamicResource NfcTextMutedBrush}"
                              TextWrapping="Wrap"
                              VerticalAlignment="Center"/>
         <StackPanel Grid.Column="1"

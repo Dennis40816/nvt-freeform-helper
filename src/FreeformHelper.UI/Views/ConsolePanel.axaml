@@ -19,8 +19,8 @@
                                       TrueGlyph="{x:Static icons:NvtIcons.ExpandMore}"/>
   </UserControl.Resources>
   <Border x:Name="ConsoleBorder"
-          Background="{DynamicResource BrushBgSurface}"
-          BorderBrush="{DynamicResource BrushBorder}"
+          Background="{DynamicResource NfcSurfaceBrush}"
+          BorderBrush="{DynamicResource NfcBorderMutedBrush}"
           BorderThickness="{StaticResource BorderTopThin}"
           Padding="{StaticResource ConsolePanelPadding}">
     <Grid RowDefinitions="Auto,*">
@@ -53,8 +53,8 @@
                                    List="{Binding #ConsoleList}"
                                    CopyVisibleCommand="{Binding ConsoleSession.CopyVisibleCommand}"/>
         <Border Grid.Row="1"
-                Background="{DynamicResource BrushBgApp}"
-                BorderBrush="{DynamicResource BrushBorder}"
+                Background="{DynamicResource NfcAppBackgroundBrush}"
+                BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                 BorderThickness="{StaticResource BorderThin}"
                 CornerRadius="{StaticResource RadiusXs}"
                 Margin="{StaticResource InsetTop2}">

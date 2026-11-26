@@ -8,8 +8,8 @@
     mc:Ignorable="d"
     xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
     x:Class="FreeformHelper.UI.Views.SimulationWorkspaceView"
-    Background="{DynamicResource BrushBgApp}"
-    Foreground="{DynamicResource BrushTextPrimary}">
+    Background="{DynamicResource NfcAppBackgroundBrush}"
+    Foreground="{DynamicResource NfcTextBrush}">
   <UserControl.Styles>
     <Style Selector="views|ConsolePanel.expanded">
       <Setter Property="Height" Value="{DynamicResource SimulationConsoleHeight}"/>
@@ -31,7 +31,7 @@
       <sections:SimulationWorkspaceControlsPaneView Grid.Column="0"/>
       <GridSplitter Grid.Column="1"
           Width="{StaticResource SplitterThickness}"
-          Background="{DynamicResource BrushBorder}"
+          Background="{DynamicResource NfcBorderMutedBrush}"
           HorizontalAlignment="Stretch"
           ShowsPreview="True"/>
       <Border Grid.Column="2"
@@ -77,7 +77,7 @@
                 RegularPadActivated="SimulationPadCanvas_RegularPadActivated"
                 Focusable="True"/>
             <Canvas x:Name="SimulationRiskOverlay" IsHitTestVisible="False" ClipToBounds="True">
-              <Border x:Name="SimulationRiskMarker" IsVisible="False" BorderBrush="{DynamicResource BrushWarning}"
+              <Border x:Name="SimulationRiskMarker" IsVisible="False" BorderBrush="{DynamicResource NfcWarningTextBrush}"
                   BorderThickness="{DynamicResource BorderInput}" CornerRadius="{DynamicResource RadiusXs}"/>
             </Canvas>
             <TextBlock x:Name="SimulationSelectionCount" Classes="workspaceSectionMeta" VerticalAlignment="Bottom" Margin="{DynamicResource Inset8}" IsHitTestVisible="False"/>
@@ -132,7 +132,7 @@
             </StackPanel>
             <SelectableTextBlock Text="{Binding CanvasHintText}"
                 IsVisible="{Binding HasCanvasHint}"
-                Foreground="{DynamicResource BrushTextMuted}"
+                Foreground="{DynamicResource NfcTextMutedBrush}"
                 TextWrapping="Wrap"
                 TextAlignment="Center"
                 HorizontalAlignment="Center"
@@ -143,7 +143,7 @@
           </Grid>
           <GridSplitter Grid.Row="2"
               HorizontalAlignment="Stretch"
-              Background="{DynamicResource BrushBorder}"
+              Background="{DynamicResource NfcBorderMutedBrush}"
               ResizeDirection="Rows"
               ShowsPreview="True"/>
           <StackPanel Grid.Row="3" MinHeight="{DynamicResource Space0}">
@@ -155,7 +155,7 @@
       </Border>
       <GridSplitter Grid.Column="3"
           Width="{StaticResource SplitterThickness}"
-          Background="{DynamicResource BrushBorder}"
+          Background="{DynamicResource NfcBorderMutedBrush}"
           HorizontalAlignment="Stretch"
           ShowsPreview="True"/>
       <sections:SimulationWorkspaceDetailsPaneView Grid.Column="4"/>

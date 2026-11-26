@@ -127,7 +127,7 @@
         </ListBox>
       </Grid>
       <Border Grid.Row="2"
-              BorderBrush="{DynamicResource BrushBorder}"
+              BorderBrush="{DynamicResource NfcBorderMutedBrush}"
               BorderThickness="{DynamicResource BorderTopThin}"
               Padding="{DynamicResource InsetTop8}">
         <StackPanel x:Name="CoordinateFooterActions"

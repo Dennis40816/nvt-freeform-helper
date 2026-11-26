@@ -8,8 +8,8 @@
         MinWidth="{DynamicResource IndexMappingReportMinWidth}"
         MinHeight="{DynamicResource IndexMappingReportMinHeight}"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="DXF overlaps report">
   <Window.Styles>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
@@ -19,12 +19,12 @@
     <Grid x:Name="ReportLayout" RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space12}">
       <StackPanel x:Name="ReportSummary" Spacing="{DynamicResource Space12}">
         <SelectableTextBlock Text="{Binding Summary}" TextWrapping="Wrap"
-                             Foreground="{DynamicResource BrushTextMuted}"/>
+                             Foreground="{DynamicResource NfcTextMutedBrush}"/>
         <SelectableTextBlock Text="{Binding IssueTitle}" Classes="bodyStrong"/>
       </StackPanel>
       <Grid Grid.Row="1" RowDefinitions="*,Auto" RowSpacing="{DynamicResource Space12}">
-        <Border Background="{DynamicResource BrushBgPanel}"
-                BorderBrush="{DynamicResource BrushBorder}"
+        <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
+                BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                 BorderThickness="{DynamicResource BorderThin}"
                 CornerRadius="{DynamicResource RadiusSm}"
                 Padding="{DynamicResource Inset8}">
@@ -37,11 +37,11 @@
                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                    Text="{Binding ReportText, Mode=OneWay}"/>
         </Border>
-        <Border Grid.Row="1" BorderBrush="{DynamicResource BrushBorder}"
+        <Border Grid.Row="1" BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                 BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop10}">
           <Grid x:Name="ReportFooter" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
             <TextBlock x:Name="CopyResult" Text="{Binding CopyResultText}" IsVisible="{Binding HasCopyResult}"
-                       Foreground="{DynamicResource BrushSuccess}" VerticalAlignment="Center"
+                       Foreground="{DynamicResource NfcSuccessTextBrush}" VerticalAlignment="Center"
                        TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
             <Button Grid.Column="1" Classes="actionPrimary" Content="Copy all"
                     HorizontalAlignment="Right" Click="CopyAll_Click" ToolTip.Tip="Copy overlap report text."/>

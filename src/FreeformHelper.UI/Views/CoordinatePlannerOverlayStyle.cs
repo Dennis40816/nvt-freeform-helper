@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using FreeformHelper.UI.Services;
 using Nvt.Core.Avalonia.Theme;
 
 namespace FreeformHelper.UI.Views;
@@ -36,7 +37,7 @@ internal sealed record CoordinatePlannerOverlayStyle(
         var cornerBrush = GetBrush(owner, "BrushCoordinatePlannerPoint", Brushes.Gold);
         var bistBrush = GetBrush(owner, "BrushCoordinatePlannerBist", Brushes.Orange);
         var arrayBrush = GetBrush(owner, "BrushCoordinatePlannerArray", guideBrush);
-        var mutedBrush = GetBrush(owner, "BrushTextMuted", Brushes.Gray);
+        var mutedBrush = GetBrush(owner, "NfcTextMutedBrush", Brushes.Gray);
         var labelBackground = GetBrush(owner, "BrushCoordinatePlannerLabelBackground", Brushes.Black);
         var labelForeground = GetBrush(owner, "BrushCoordinatePlannerLabelForeground", Brushes.White);
         var guideThickness = UiResourceResolver.GetDouble(owner, "CoordinatePlannerGuideStrokeThickness", 2d);
@@ -76,6 +77,6 @@ internal sealed record CoordinatePlannerOverlayStyle(
 
     private static IBrush GetBrush(Control owner, string resourceKey, IBrush fallback)
     {
-        return UiResourceResolver.GetBrush(owner, resourceKey, fallback, static color => new SolidColorBrush(color));
+        return ThemeBrushResolver.GetBrush(owner, resourceKey, fallback, static color => new SolidColorBrush(color));
     }
 }

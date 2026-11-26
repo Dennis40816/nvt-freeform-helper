@@ -14,8 +14,8 @@
         WindowStartupLocation="CenterOwner"
         IsEnabled="{Binding Editing.IsProjectEditingEnabled}"
         Opacity="{StaticResource NotchExportSelectionOpacity}"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="Export Notch Rows">
   <Window.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/ExportNotchRows.axaml"/>
@@ -174,7 +174,7 @@
             </panels:CollapsiblePanel>
           </StackPanel>
           <TextBlock IsVisible="{Binding HasNoSelectedRow}" Text="Select a row on the left to inspect it."
-                     Foreground="{DynamicResource BrushTextMuted}" TextWrapping="Wrap"/>
+                     Foreground="{DynamicResource NfcTextMutedBrush}" TextWrapping="Wrap"/>
           <primitives:SectionFrame x:Name="ExportChecksSection" Title="Export checks">
             <StackPanel Spacing="{StaticResource Space6}">
               <panels:CollapsiblePanel Title="{Binding SimulationSafetyExportBadgeText}"
@@ -261,7 +261,7 @@
                              Text="{Binding ExportSummaryText}" TextWrapping="Wrap"/>
         <StackPanel x:Name="FooterActions" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
                     Spacing="{StaticResource Space8}">
-          <SelectableTextBlock VerticalAlignment="Center" Foreground="{DynamicResource BrushWarning}" TextWrapping="Wrap"
+          <SelectableTextBlock VerticalAlignment="Center" Foreground="{DynamicResource NfcWarningTextBrush}" TextWrapping="Wrap"
                                Text="{Binding HiddenSelectedRowsHintText}" IsVisible="{Binding HasHiddenSelectedRows}"/>
           <Button Classes="actionNeutral" Content="Cancel" Click="CancelButton_Click"/>
           <Button Classes="actionPrimary" Content="Export" IsEnabled="{Binding HasSelection}"

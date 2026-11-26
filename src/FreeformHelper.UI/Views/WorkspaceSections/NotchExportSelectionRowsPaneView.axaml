@@ -75,12 +75,12 @@
             <ContentControl Content="{Binding VisibleGroup}" IsVisible="{Binding HasVisibleGroup}">
               <ContentControl.ContentTemplate>
                 <DataTemplate x:DataType="viewModels:NotchExportIcGroupViewModel">
-                  <Border Background="{DynamicResource BrushBgPanel}" Padding="{StaticResource Inset4}">
+                  <Border Background="{DynamicResource NfcSurfaceSubtleBrush}" Padding="{StaticResource Inset4}">
                     <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{StaticResource Space6}">
                       <TextBlock Text="{Binding HeaderText}" FontWeight="SemiBold" VerticalAlignment="Center"
-                                 Foreground="{DynamicResource BrushTextPrimary}"/>
+                                 Foreground="{DynamicResource NfcTextBrush}"/>
                       <TextBlock Grid.Column="1" Text="{Binding SummaryText}" VerticalAlignment="Center"
-                                 Foreground="{DynamicResource BrushTextMuted}"/>
+                                 Foreground="{DynamicResource NfcTextMutedBrush}"/>
                       <Button Grid.Column="2" Classes="actionGhost" Content="All shown"
                               Command="{Binding SelectAllGroupCommand}" ToolTip.Tip="Check visible rows in this IC only"/>
                       <Button Grid.Column="3" Classes="actionGhost" Content="None shown"
@@ -115,7 +115,7 @@
       </ListBox.ItemTemplate>
     </ListBox>
     <Border Grid.Row="2" IsVisible="{Binding HasNoRows}" VerticalAlignment="Top"
-            Background="{DynamicResource BrushBgPanel}" Padding="{StaticResource Inset12}">
+            Background="{DynamicResource NfcSurfaceSubtleBrush}" Padding="{StaticResource Inset12}">
       <StackPanel Spacing="{StaticResource Space4}">
         <TextBlock Text="No rows match the view filters."/>
         <TextBlock Classes="stepNote" Text="Use Reset filters above to show every row."/>

@@ -11,8 +11,8 @@
              x:Class="FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView"
              x:Name="WorkspaceRoot"
              x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
-             Background="{DynamicResource BrushBgApp}"
-             Foreground="{DynamicResource BrushTextPrimary}">
+             Background="{DynamicResource NfcAppBackgroundBrush}"
+             Foreground="{DynamicResource NfcTextBrush}">
   <UserControl.Styles>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/MenuStyles.axaml"/>
   </UserControl.Styles>
@@ -27,7 +27,7 @@
     <sections:CoordinatePlannerWorkspaceControlsPaneView Grid.Column="0"/>
     <GridSplitter Grid.Column="1"
                   Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource BrushBorder}"
+                  Background="{DynamicResource NfcBorderMutedBrush}"
                   HorizontalAlignment="Stretch"
                   ShowsPreview="True"/>
     <Border Grid.Column="2" Background="{DynamicResource BrushCanvasBackground}" ClipToBounds="True">
@@ -85,8 +85,8 @@
                    IsLightDismissEnabled="True"
                    Topmost="False"
                    PlacementConstraintAdjustment="FlipX,FlipY,SlideX,SlideY">
-              <Border Background="{DynamicResource BrushBgPanel}"
-                      BorderBrush="{DynamicResource BrushBorder}"
+              <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
+                      BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                       BorderThickness="{DynamicResource BorderThin}"
                       CornerRadius="{DynamicResource RadiusMd}"
                       Padding="{DynamicResource Inset12}"
@@ -130,7 +130,7 @@
     </Border>
     <GridSplitter Grid.Column="3"
                   Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource BrushBorder}"
+                  Background="{DynamicResource NfcBorderMutedBrush}"
                   HorizontalAlignment="Stretch"
                   ShowsPreview="True"/>
     <sections:CoordinatePlannerWorkspaceDetailsPaneView Grid.Column="4"/>

@@ -273,7 +273,7 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
   - Same-user pipe access with network logons denied, bounded in-flight shutdown, and pipe-creation failure diagnostic timing are owner-approved behavior changes (owner decision, 2026-10-07: 「接受 Core 的行為 (Recommended)」); every other behavior is unchanged.
 - [x] **R13.307-M2 Use the Core UiResourceResolver and delete NFH's copy** · Target: g4 · Status: Done · PR: [#58](https://github.com/Dennis40816/nvt-freeform-helper/pull/58)
   - All NFH callers must share one dispatcher registration. See the Core Theme module notes.
-- [ ] **C-THEME2 Theme step 2: one look PR with the Core tokens, button roles and scroll styles** · Target: g4 · Status: Not started; waits for the NFC and NFU look PRs and for the Console button roles · PR: -
+- [ ] **C-THEME2 Theme step 2: one look PR with the Core tokens, button roles and scroll styles** · Target: g4 · Status: In progress · PR: -
   - Set only the seven `NfcAccent*` keys for the NFH accent. Delete the local button, scroll and neutral token styles.
   - Map tool-specific button classes to the nearest Core role. Open a Core issue when none fits.
   - This replaces the former steps M3 (scroll styles) and M4 (button roles). It also removes the scroll selectors that match nothing on Avalonia 12 and fixes the neutral text button focus.
@@ -296,7 +296,7 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
 - [x] **C-LSC Use LoadingScopeCoordinator from the Core non-UI library** · Target: g4 · Status: Done; Core side in [Core #44](https://github.com/Dennis40816/nvt_fw_core/pull/44) · PR: [#61](https://github.com/Dennis40816/nvt-freeform-helper/pull/61)
 - [x] **C-NONUI Move CoalescedRefresh and UndoService to the Core non-UI library** · Target: g4 · Status: Done · PR: [#60](https://github.com/Dennis40816/nvt-freeform-helper/pull/60)
 - [ ] **C-CTRL Move cards, dialogs and input controls to Core** · Target: g4 · Status: In progress · PR: -
-  - This pull request switches BalancedWrapPanel to Core and removes the unused ReviewWorkspaceShell.
+  - #709 switches BalancedWrapPanel to Core and removes the unused ReviewWorkspaceShell.
   - InfoLabel, SectionFrame and CollapsiblePanel follow after C-THEME2, with before-and-after PNG images in Light and Dark approved by the owner.
   - Dialogs, NumberScrubber and cards keep the NFH versions in 1.0.0; deleting them moves after 1.0.0 (decided 2026-11-26).
   - Core gaps: ConfirmDialog has no consequence text, next-start note or dismiss result; WarningDialog has no scrolling and no Enter or Esc handling; NumberScrubber does not forward the accessible name; there is no card style.

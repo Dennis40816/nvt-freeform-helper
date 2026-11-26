@@ -111,7 +111,7 @@
           </ComboBox.ItemTemplate>
         </ComboBox>
         <SelectableTextBlock Text="{Binding BoundLayerOptionSummary}"
-                             Foreground="{DynamicResource BrushTextMuted}"
+                             Foreground="{DynamicResource NfcTextMutedBrush}"
                              TextWrapping="Wrap"/>
       </StackPanel>
       </StackPanel>

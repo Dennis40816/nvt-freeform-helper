@@ -22,7 +22,7 @@
     </Border>
     <Grid Grid.Row="1">
       <SelectableTextBlock Text="No CAD/REG entity rows under current filter."
-                           Foreground="{DynamicResource BrushTextMuted}" IsVisible="{Binding HasNoDecisionRows}"/>
+                           Foreground="{DynamicResource NfcTextMutedBrush}" IsVisible="{Binding HasNoDecisionRows}"/>
       <ListBox x:Name="DecisionList" Classes="scrollV2 workspaceDataList mappingDecisions"
                ItemsSource="{Binding DecisionRows}" SelectedItem="{Binding SelectedDecision, Mode=TwoWay}"
                IsVisible="{Binding HasDecisionRows}" Background="{DynamicResource BrushTransparent}"

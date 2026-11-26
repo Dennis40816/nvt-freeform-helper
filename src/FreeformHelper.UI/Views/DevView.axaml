@@ -8,8 +8,8 @@
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.DevView"
-             Background="{DynamicResource BrushBgApp}"
-             Foreground="{DynamicResource BrushTextPrimary}">
+             Background="{DynamicResource NfcAppBackgroundBrush}"
+             Foreground="{DynamicResource NfcTextBrush}">
   <Design.DataContext>
     <vm:DevViewModel/>
   </Design.DataContext>
@@ -28,9 +28,9 @@
                              FontWeight="SemiBold"/>
         <SelectableTextBlock Text="Prototype sections have been trimmed. This page now keeps only lightweight runtime/theme probes."
                              TextWrapping="Wrap"
-                             Foreground="{DynamicResource BrushTextMuted}"/>
-        <Border Background="{DynamicResource BrushBgPanel}"
-                BorderBrush="{DynamicResource BrushBorderStrong}"
+                             Foreground="{DynamicResource NfcTextMutedBrush}"/>
+        <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
+                BorderBrush="{DynamicResource NfcBorderBrush}"
                 BorderThickness="{StaticResource BorderThin}"
                 CornerRadius="{DynamicResource RadiusMd}"
                 Padding="{DynamicResource Inset16}">
@@ -40,30 +40,30 @@
                                  FontWeight="SemiBold"/>
             <SelectableTextBlock Text="Same LoadingSpinner control used by the CAD load host window."
                                  TextWrapping="Wrap"
-                                 Foreground="{DynamicResource BrushTextMuted}"/>
+                                 Foreground="{DynamicResource NfcTextMutedBrush}"/>
             <Button x:Name="DevTriggerSpinnerButton"
                     HorizontalAlignment="Left"
                     Content="Show loading spinner (1.5s)"
                     Click="OnDevTriggerSpinnerClick"/>
-            <Border Background="{DynamicResource BrushBgElevated}"
-                    BorderBrush="{DynamicResource BrushBorderMuted}"
+            <Border Background="{DynamicResource NfcSurfaceBrush}"
+                    BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                     BorderThickness="{StaticResource BorderThin}"
                     CornerRadius="{DynamicResource RadiusMd}"
                     Height="{StaticResource DevScrollPreviewHeight}">
               <Grid>
-                <Border Background="{DynamicResource BrushBgSurfaceInset}"
+                <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
                         CornerRadius="{DynamicResource RadiusSm}"
                         Margin="{DynamicResource Inset12}">
                   <Grid>
                     <SelectableTextBlock HorizontalAlignment="Center"
                                          VerticalAlignment="Center"
-                                         Foreground="{DynamicResource BrushTextMuted}"
+                                         Foreground="{DynamicResource NfcTextMutedBrush}"
                                          Text="Preview area"/>
                   </Grid>
                 </Border>
                 <Border x:Name="DevLoadingPreviewOverlay"
                         IsVisible="False"
-                        Background="{DynamicResource BrushOverlayScrim}"
+                        Background="{DynamicResource NfcModalScrimBrush}"
                         CornerRadius="{DynamicResource RadiusMd}">
                   <controls:LoadingSpinner HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
@@ -566,8 +566,8 @@
                 <controls:FontIcon Classes="symbols"
                                    Glyph="{x:Static icons:NvtIcons.ChevronLeft}"/>
               </Button>
-              <Border Background="{DynamicResource BrushBgSurface}"
-                      BorderBrush="{DynamicResource BrushBorder}"
+              <Border Background="{DynamicResource NfcSurfaceBrush}"
+                      BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                       BorderThickness="{StaticResource BorderThin}"
                       CornerRadius="{DynamicResource RadiusPill}"
                       Padding="{DynamicResource Inset8_4}"
@@ -793,8 +793,8 @@
             <StackPanel Spacing="{DynamicResource Space6}">
               <SelectableTextBlock Text="Console matrix"
                                    FontWeight="SemiBold"/>
-              <Border Background="{DynamicResource BrushBgSurface}"
-                      BorderBrush="{DynamicResource BrushBorder}"
+              <Border Background="{DynamicResource NfcSurfaceBrush}"
+                      BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                       BorderThickness="{StaticResource BorderThin}"
                       CornerRadius="{DynamicResource RadiusPill}"
                       Padding="{DynamicResource Inset8_4}">
