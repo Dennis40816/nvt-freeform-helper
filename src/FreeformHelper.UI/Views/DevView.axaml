@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              mc:Ignorable="d"
@@ -98,7 +98,7 @@
                           ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
                                          Classes="symbols"
-                                         Glyph="{x:Static icons:IconGlyphs.ExpandMore}"/>
+                                         Glyph="{x:Static icons:NvtIcons.ExpandMore}"/>
                       <SelectableTextBlock Grid.Column="1"
                                            Classes="workspaceSectionTitle"
                                            Text="EMS safety"/>
@@ -115,7 +115,7 @@
                     <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
                       <controls:FontIcon Grid.Column="0"
                                          Classes="symbols iconTextButtonLeadingIcon"
-                                         Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                                         Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                       <SelectableTextBlock Grid.Column="1"
                                            Classes="iconTextButtonLabel"
                                            Text="Import"/>
@@ -127,7 +127,7 @@
                     <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
                       <controls:FontIcon Grid.Column="0"
                                          Classes="symbols iconTextButtonLeadingIcon"
-                                         Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                                         Glyph="{x:Static icons:NvtIcons.Remove}"/>
                       <SelectableTextBlock Grid.Column="1"
                                            Classes="iconTextButtonLabel"
                                            Text="Clear"/>
@@ -141,7 +141,7 @@
                           ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
                                          Classes="symbols workspaceFileRowIcon"
-                                         Glyph="{x:Static icons:IconGlyphs.DataObject}"/>
+                                         Glyph="{x:Static icons:NvtIcons.DataObject}"/>
                       <StackPanel Grid.Column="1" Spacing="{DynamicResource Space2}">
                         <SelectableTextBlock Classes="workspaceFileRowTitle"
                                              Text="regular_frame_001.csv"/>
@@ -157,7 +157,7 @@
                           ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
                                          Classes="symbols workspaceFileRowIcon"
-                                         Glyph="{x:Static icons:IconGlyphs.DataObject}"/>
+                                         Glyph="{x:Static icons:NvtIcons.DataObject}"/>
                       <StackPanel Grid.Column="1" Spacing="{DynamicResource Space2}">
                         <SelectableTextBlock Classes="workspaceFileRowTitle"
                                              Text="regular_frame_delta_review_long_filename.csv"/>
@@ -187,7 +187,7 @@
                           Classes="actionDanger actionIconButton dxfEditHeaderAction"
                           ToolTip.Tip="Reset all DXF edits.">
                     <controls:FontIcon Classes="symbols iconSm"
-                                       Glyph="{x:Static icons:IconGlyphs.RestartAlt}"/>
+                                       Glyph="{x:Static icons:NvtIcons.RestartAlt}"/>
                   </Button>
                 </Grid>
                 <StackPanel Spacing="{DynamicResource Space6}">
@@ -203,7 +203,7 @@
                                     Orientation="Horizontal"
                                     Spacing="{DynamicResource Space4}">
                           <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                             Glyph="{x:Static icons:IconGlyphs.VisibilityOff}"/>
+                                             Glyph="{x:Static icons:NvtIcons.VisibilityOff}"/>
                           <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                                Text="Hide selected"/>
                         </StackPanel>
@@ -217,7 +217,7 @@
                                       Orientation="Horizontal"
                                       Spacing="{DynamicResource Space4}">
                             <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                               Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+                                               Glyph="{x:Static icons:NvtIcons.Undo}"/>
                             <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                                  Text="Undo hide"/>
                           </StackPanel>
@@ -229,7 +229,7 @@
                                       Orientation="Horizontal"
                                       Spacing="{DynamicResource Space4}">
                             <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                               Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                                               Glyph="{x:Static icons:NvtIcons.Visibility}"/>
                             <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                                  Text="Show all"/>
                           </StackPanel>
@@ -248,7 +248,7 @@
                                     Orientation="Horizontal"
                                     Spacing="{DynamicResource Space4}">
                           <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                             Glyph="{x:Static icons:IconGlyphs.Merge}"/>
+                                             Glyph="{x:Static icons:NvtIcons.Merge}"/>
                           <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                                Text="Combine"/>
                         </StackPanel>
@@ -260,7 +260,7 @@
                                     Orientation="Horizontal"
                                     Spacing="{DynamicResource Space4}">
                           <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                             Glyph="{x:Static icons:IconGlyphs.CallSplit}"/>
+                                             Glyph="{x:Static icons:NvtIcons.CallSplit}"/>
                           <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                                Text="Split selected"/>
                         </StackPanel>
@@ -319,13 +319,13 @@
                           ColumnDefinitions="Auto,*,Auto">
                       <controls:FontIcon Grid.Column="0"
                                          Classes="symbols iconSm"
-                                         Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+                                         Glyph="{x:Static icons:NvtIcons.Settings}"/>
                       <SelectableTextBlock Grid.Column="1"
                                            Text="Advanced edit"
                                            FontWeight="SemiBold"/>
                       <controls:FontIcon Grid.Column="2"
                                          Classes="symbols iconSm"
-                                         Glyph="{x:Static icons:IconGlyphs.ExpandLess}"/>
+                                         Glyph="{x:Static icons:NvtIcons.ExpandLess}"/>
                     </Grid>
                   </ToggleButton>
                 </StackPanel>
@@ -340,19 +340,19 @@
                             Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                             ToolTip.Tip="Rotate selected CAD pads.">
                       <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
-                                         Glyph="{x:Static icons:IconGlyphs.RotateRight}"/>
+                                         Glyph="{x:Static icons:NvtIcons.RotateRight}"/>
                     </Button>
                     <Button Grid.Column="2"
                             Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                             ToolTip.Tip="Move selected CAD pads to layer.">
                       <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
-                                         Glyph="{x:Static icons:IconGlyphs.DriveFileMove}"/>
+                                         Glyph="{x:Static icons:NvtIcons.DriveFileMove}"/>
                     </Button>
                     <Button Grid.Column="3"
                             Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
                             ToolTip.Tip="Create layer and move selected CAD pads.">
                       <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
-                                         Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                                         Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                     </Button>
                   </Grid>
                 </Border>
@@ -417,14 +417,14 @@
                       Margin="{DynamicResource InsetRight8Bottom6}"
                       ToolTip.Tip="Icon button">
                 <controls:FontIcon Classes="symbols"
-                                   Glyph="{x:Static icons:IconGlyphs.Search}"/>
+                                   Glyph="{x:Static icons:NvtIcons.Search}"/>
               </Button>
               <ToggleButton Classes="actionIconButton viewportOverlayAction"
                             Margin="{DynamicResource InsetRight8Bottom6}"
                             IsChecked="True"
                             ToolTip.Tip="Selected icon button">
                 <controls:FontIcon Classes="symbols"
-                                   Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                                   Glyph="{x:Static icons:NvtIcons.Visibility}"/>
               </ToggleButton>
               <Button Classes="workspaceActionButton"
                       Width="{StaticResource NotchExportPrimaryButtonMinWidth}"
@@ -433,7 +433,7 @@
                 <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
                   <controls:FontIcon Grid.Column="0"
                                      Classes="symbols iconTextButtonLeadingIcon"
-                                     Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                                     Glyph="{x:Static icons:NvtIcons.ContentCopy}"/>
                   <SelectableTextBlock Grid.Column="1"
                                        Classes="iconTextButtonLabel"
                                        Text="Copy result"/>
@@ -447,7 +447,7 @@
                 <Grid Classes="workspacePresetButtonContent" ColumnDefinitions="Auto,*">
                   <controls:FontIcon Grid.Column="0"
                                      Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                                     Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                   <SelectableTextBlock Grid.Column="1"
                                        Classes="workspacePresetButtonLabel"
                                        Text="Uniform 400"/>
@@ -458,7 +458,7 @@
                 <Grid Classes="workspacePresetButtonContent" ColumnDefinitions="Auto,*">
                   <controls:FontIcon Grid.Column="0"
                                      Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                                     Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                   <SelectableTextBlock Grid.Column="1"
                                        Classes="workspacePresetButtonLabel"
                                        Text="Zero"/>
@@ -516,7 +516,7 @@
                       ColumnSpacing="{DynamicResource Space6}">
                   <controls:FontIcon Grid.Column="0"
                                      Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.PlayArrow}"/>
+                                     Glyph="{x:Static icons:NvtIcons.PlayArrow}"/>
                   <SelectableTextBlock Grid.Column="1"
                                        Text="Primary"/>
                 </Grid>
@@ -527,7 +527,7 @@
                       ColumnSpacing="{DynamicResource Space6}">
                   <controls:FontIcon Grid.Column="0"
                                      Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                                     Glyph="{x:Static icons:NvtIcons.Remove}"/>
                   <SelectableTextBlock Grid.Column="1"
                                        Text="Danger"/>
                 </Grid>
@@ -536,14 +536,14 @@
                       Margin="{DynamicResource InsetRight8Bottom6}"
                       ToolTip.Tip="Ghost icon action">
                 <controls:FontIcon Classes="symbols"
-                                   Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                                   Glyph="{x:Static icons:NvtIcons.Edit}"/>
               </Button>
               <ToggleButton Classes="actionIconButton actionGhost"
                             IsChecked="True"
                             Margin="{DynamicResource InsetRight8Bottom6}"
                             ToolTip.Tip="Checked ghost icon action">
                 <controls:FontIcon Classes="symbols"
-                                   Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                                   Glyph="{x:Static icons:NvtIcons.Visibility}"/>
               </ToggleButton>
             </WrapPanel>
             <WrapPanel Orientation="Horizontal">
@@ -551,20 +551,20 @@
                       Margin="{DynamicResource InsetRight8Bottom6}"
                       ToolTip.Tip="Viewport search action">
                 <controls:FontIcon Classes="symbols"
-                                   Glyph="{x:Static icons:IconGlyphs.Search}"/>
+                                   Glyph="{x:Static icons:NvtIcons.Search}"/>
               </Button>
               <ToggleButton Classes="actionIconButton viewportOverlayAction"
                             IsChecked="True"
                             Margin="{DynamicResource InsetRight8Bottom6}"
                             ToolTip.Tip="Checked viewport visibility action">
                 <controls:FontIcon Classes="symbols"
-                                   Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                                   Glyph="{x:Static icons:NvtIcons.Visibility}"/>
               </ToggleButton>
               <Button Classes="actionIconButton panelChromeToggle"
                       Margin="{DynamicResource InsetRight8Bottom6}"
                       ToolTip.Tip="Panel chrome toggle action">
                 <controls:FontIcon Classes="symbols"
-                                   Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+                                   Glyph="{x:Static icons:NvtIcons.ChevronLeft}"/>
               </Button>
               <Border Background="{DynamicResource BrushBgSurface}"
                       BorderBrush="{DynamicResource BrushBorder}"
@@ -577,13 +577,13 @@
                           Margin="{DynamicResource InsetRight6}"
                           ToolTip.Tip="Console copy action">
                     <controls:FontIcon Classes="symbols"
-                                       Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                                       Glyph="{x:Static icons:NvtIcons.ContentCopy}"/>
                   </Button>
                   <ToggleButton Classes="actionIconButton consoleHeaderAction"
                                 IsChecked="True"
                                 ToolTip.Tip="Checked console toggle action">
                     <controls:FontIcon Classes="symbols"
-                                       Glyph="{x:Static icons:IconGlyphs.ContentPasteOff}"/>
+                                       Glyph="{x:Static icons:NvtIcons.ContentPasteOff}"/>
                   </ToggleButton>
                 </StackPanel>
               </Border>
@@ -633,7 +633,7 @@
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Neutral icon action">
                   <controls:FontIcon Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                                     Glyph="{x:Static icons:NvtIcons.ContentCopy}"/>
                 </Button>
                 <Button Classes="actionTextButton actionNeutral"
                         Margin="{DynamicResource InsetRight8Bottom6}">
@@ -641,7 +641,7 @@
                         ColumnSpacing="{DynamicResource Space6}">
                     <controls:FontIcon Grid.Column="0"
                                        Classes="symbols"
-                                       Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                                       Glyph="{x:Static icons:NvtIcons.Edit}"/>
                     <SelectableTextBlock Grid.Column="1"
                                          Text="Icon + text"/>
                   </Grid>
@@ -670,7 +670,7 @@
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Primary icon action">
                   <controls:FontIcon Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.PlayArrow}"/>
+                                     Glyph="{x:Static icons:NvtIcons.PlayArrow}"/>
                 </Button>
                 <Button Classes="actionTextButton actionPrimary"
                         Margin="{DynamicResource InsetRight8Bottom6}">
@@ -678,7 +678,7 @@
                         ColumnSpacing="{DynamicResource Space6}">
                     <controls:FontIcon Grid.Column="0"
                                        Classes="symbols"
-                                       Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                                       Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                     <SelectableTextBlock Grid.Column="1"
                                          Text="Icon + text"/>
                   </Grid>
@@ -707,7 +707,7 @@
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Danger icon action">
                   <controls:FontIcon Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                                     Glyph="{x:Static icons:NvtIcons.Remove}"/>
                 </Button>
                 <Button Classes="actionTextButton actionDanger"
                         Margin="{DynamicResource InsetRight8Bottom6}">
@@ -715,7 +715,7 @@
                         ColumnSpacing="{DynamicResource Space6}">
                     <controls:FontIcon Grid.Column="0"
                                        Classes="symbols"
-                                       Glyph="{x:Static icons:IconGlyphs.Remove}"/>
+                                       Glyph="{x:Static icons:NvtIcons.Remove}"/>
                     <SelectableTextBlock Grid.Column="1"
                                          Text="Icon + text"/>
                   </Grid>
@@ -744,7 +744,7 @@
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Ghost icon action">
                   <controls:FontIcon Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                                     Glyph="{x:Static icons:NvtIcons.Edit}"/>
                 </Button>
                 <Button Classes="actionTextButton actionGhost"
                         Margin="{DynamicResource InsetRight8Bottom6}">
@@ -752,7 +752,7 @@
                         ColumnSpacing="{DynamicResource Space6}">
                     <controls:FontIcon Grid.Column="0"
                                        Classes="symbols"
-                                       Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                                       Glyph="{x:Static icons:NvtIcons.ContentCopy}"/>
                     <SelectableTextBlock Grid.Column="1"
                                          Text="Icon + text"/>
                   </Grid>
@@ -772,21 +772,21 @@
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Fit viewport">
                   <controls:FontIcon Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                                     Glyph="{x:Static icons:NvtIcons.FitScreen}"/>
                 </Button>
                 <ToggleButton Classes="actionIconButton viewportOverlayAction"
                               IsChecked="True"
                               Margin="{DynamicResource InsetRight8Bottom6}"
                               ToolTip.Tip="Toggle viewport visibility">
                   <controls:FontIcon Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                                     Glyph="{x:Static icons:NvtIcons.Visibility}"/>
                 </ToggleButton>
                 <Button Classes="actionIconButton viewportOverlayAction"
                         IsEnabled="False"
                         Margin="{DynamicResource InsetRight8Bottom6}"
                         ToolTip.Tip="Disabled viewport search">
                   <controls:FontIcon Classes="symbols"
-                                     Glyph="{x:Static icons:IconGlyphs.Search}"/>
+                                     Glyph="{x:Static icons:NvtIcons.Search}"/>
                 </Button>
               </WrapPanel>
             </StackPanel>
@@ -803,21 +803,21 @@
                           Margin="{DynamicResource InsetRight6Bottom6}"
                           ToolTip.Tip="Copy console text">
                     <controls:FontIcon Classes="symbols"
-                                       Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                                       Glyph="{x:Static icons:NvtIcons.ContentCopy}"/>
                   </Button>
                   <ToggleButton Classes="actionIconButton consoleHeaderAction"
                                 IsChecked="True"
                                 Margin="{DynamicResource InsetRight6Bottom6}"
                                 ToolTip.Tip="Toggle console filter">
                     <controls:FontIcon Classes="symbols"
-                                       Glyph="{x:Static icons:IconGlyphs.ContentPasteOff}"/>
+                                       Glyph="{x:Static icons:NvtIcons.ContentPasteOff}"/>
                   </ToggleButton>
                   <Button Classes="actionIconButton consoleHeaderAction"
                           IsEnabled="False"
                           Margin="{DynamicResource InsetRight6Bottom6}"
                           ToolTip.Tip="Disabled console delete">
                     <controls:FontIcon Classes="symbols"
-                                       Glyph="{x:Static icons:IconGlyphs.Delete}"/>
+                                       Glyph="{x:Static icons:NvtIcons.Delete}"/>
                   </Button>
                 </WrapPanel>
               </Border>

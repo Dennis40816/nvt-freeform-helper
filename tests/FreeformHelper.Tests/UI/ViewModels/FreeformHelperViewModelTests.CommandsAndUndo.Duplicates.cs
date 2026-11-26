@@ -3,9 +3,9 @@ using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -254,14 +254,14 @@ public sealed partial class FreeformHelperViewModelTests
             var clearGroupHint = "Clear this combine group and restore its source pads.";
             Assert.Equal(
                 [
-                    $"Hidden|4|4|PAD_5|Hidden by combine|Layer signal|Group 1|Combine group 1 hides this source pad. Source pads: 2.|{IconGlyphs.Remove}|Clear group|{clearGroupHint}|False|True",
-                    $"Hidden|5|5|PAD_6|Hidden by combine|Layer signal|Group 1|Combine group 1 hides this source pad. Source pads: 2.|{IconGlyphs.Remove}|Clear group|{clearGroupHint}|False|True",
-                    $"Hidden|6|6|PAD_7|Hidden|Layer signal|Manual hide|Hidden manually from the current DXF edit session.|{IconGlyphs.Undo}|Restore|Restore this hidden CAD pad.|False|True",
-                    $"Duplicate|1|0|PAD_2|Auto-hidden duplicate|Layer signal · Canonical CAD 0|Canonical CAD 0|Exact same-layer duplicate of CAD 0 (PAD_1).|{IconGlyphs.Undo}|Restore|Restore this duplicate CAD pad into the active working set.|True|True",
-                    $"Combined|1500000000|1500000000|COMB_1500000000|Synthetic|Layer signal|Group 1 · 2 src|Combine group 1 output. Source pads: 2.|{IconGlyphs.Remove}|Clear group|{clearGroupHint}|True|True",
-                    $"Combined|1500000001|1500000001|COMB_1500000001|Synthetic|Layer signal|Group 1 · 2 src|Combine group 1 output. Source pads: 2.|{IconGlyphs.Remove}|Clear group|{clearGroupHint}|True|True",
-                    $"Moved|2|2|PAD_3|Moved|Layer moved|signal -> moved|Original layer: signal -> Current layer: moved.|{IconGlyphs.Undo}|Restore layer|Move this CAD pad back to layer 'signal'.|True|True",
-                    $"Rotated|3|3|PAD_4|Rotated|Layer signal|Geometry differs from DXF baseline|Polygon vertices were rotated relative to the imported DXF baseline. Restore resets this pad geometry only.|{IconGlyphs.Undo}|Restore geometry|Restore this CAD pad geometry back to DXF baseline.|True|True",
+                    $"Hidden|4|4|PAD_5|Hidden by combine|Layer signal|Group 1|Combine group 1 hides this source pad. Source pads: 2.|{NvtIcons.Remove}|Clear group|{clearGroupHint}|False|True",
+                    $"Hidden|5|5|PAD_6|Hidden by combine|Layer signal|Group 1|Combine group 1 hides this source pad. Source pads: 2.|{NvtIcons.Remove}|Clear group|{clearGroupHint}|False|True",
+                    $"Hidden|6|6|PAD_7|Hidden|Layer signal|Manual hide|Hidden manually from the current DXF edit session.|{NvtIcons.Undo}|Restore|Restore this hidden CAD pad.|False|True",
+                    $"Duplicate|1|0|PAD_2|Auto-hidden duplicate|Layer signal · Canonical CAD 0|Canonical CAD 0|Exact same-layer duplicate of CAD 0 (PAD_1).|{NvtIcons.Undo}|Restore|Restore this duplicate CAD pad into the active working set.|True|True",
+                    $"Combined|1500000000|1500000000|COMB_1500000000|Synthetic|Layer signal|Group 1 · 2 src|Combine group 1 output. Source pads: 2.|{NvtIcons.Remove}|Clear group|{clearGroupHint}|True|True",
+                    $"Combined|1500000001|1500000001|COMB_1500000001|Synthetic|Layer signal|Group 1 · 2 src|Combine group 1 output. Source pads: 2.|{NvtIcons.Remove}|Clear group|{clearGroupHint}|True|True",
+                    $"Moved|2|2|PAD_3|Moved|Layer moved|signal -> moved|Original layer: signal -> Current layer: moved.|{NvtIcons.Undo}|Restore layer|Move this CAD pad back to layer 'signal'.|True|True",
+                    $"Rotated|3|3|PAD_4|Rotated|Layer signal|Geometry differs from DXF baseline|Polygon vertices were rotated relative to the imported DXF baseline. Restore resets this pad geometry only.|{NvtIcons.Undo}|Restore geometry|Restore this CAD pad geometry back to DXF baseline.|True|True",
                 ],
                 lines);
         }

@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep2View">
     <panels:CollapsiblePanel x:Name="Step2Block" Title="Step 2 · Freeform tagging"
@@ -10,7 +10,7 @@
         <Button Tag="Step2FreeformTagging"
                 Classes="actionIconButton actionGhost workflowStepAction" Click="OpenSettingsButton_Click"
                 ToolTip.Tip="Open Settings at Step 2 section.">
-          <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+          <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.Settings}"/>
         </Button>
       </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">

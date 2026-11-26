@@ -5,9 +5,9 @@ using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels.Simulation;
+using Nvt.Core.Avalonia.Icons;
 using Nvt.Core.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -499,7 +499,7 @@ public sealed partial class SimulationWorkspaceViewModel : ObservableObject
         ? StatusText
         : $"Mode ready · {AreaSummaryText}";
     public string PlaybackButtonText => IsPlaybackRunning ? "Pause" : "Play";
-    public string PlaybackButtonGlyph => IsPlaybackRunning ? IconGlyphs.Pause : IconGlyphs.PlayArrow;
+    public string PlaybackButtonGlyph => IsPlaybackRunning ? NvtIcons.Pause : NvtIcons.PlayArrow;
     public int SelectedFrameSliderMaximum => Math.Max(FrameOptions.Count - 1, 0);
     public bool HasSimulationData => _canvas.HasSimulationData;
     public string PlaybackLoopText => IsPlaybackLoopEnabled ? "Loop on" : "Loop off";

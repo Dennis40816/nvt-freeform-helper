@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:stepViews="clr-namespace:FreeformHelper.UI.Views.WorkflowSteps"
              x:Class="FreeformHelper.UI.Views.RightWorkflowSections.RightWorkflowSettingsTabView">
     <StackPanel Spacing="{StaticResource Space10}"
@@ -21,7 +21,7 @@
                       Click="OpenSettingsButton_Click"
                       ToolTip.Tip="Open Settings > General.">
                 <controls:FontIcon Classes="symbols iconSm"
-                                   Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+                                   Glyph="{x:Static icons:NvtIcons.Settings}"/>
               </Button>
         </StackPanel>
       </panels:CollapsiblePanel.HeaderRight>

@@ -1,7 +1,7 @@
 <Styles x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:icons="using:Nvt.Core.Avalonia.Icons"
         xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
   <!-- Panel block (settings card with collapsible header) -->
@@ -32,7 +32,7 @@
                           Margin="{StaticResource InsetLeft10}"
                           IsVisible="{TemplateBinding IsCollapsible}">
                     <controls:FontIcon Classes="panelBlockChevron symbols iconSm"
-                                       Glyph="{x:Static icons:IconGlyphs.ExpandMore}"/>
+                                       Glyph="{x:Static icons:NvtIcons.ExpandMore}"/>
                   </Border>
                 </Grid>
               </ToggleButton>
@@ -203,7 +203,7 @@
   </Style>
 
   <Style Selector="ToggleButton.panelBlockHeader:checked controls|FontIcon.panelBlockChevron">
-    <Setter Property="Glyph" Value="{x:Static icons:IconGlyphs.ExpandLess}"/>
+    <Setter Property="Glyph" Value="{x:Static icons:NvtIcons.ExpandLess}"/>
   </Style>
 
   <Style Selector="Border.panelBlockContent">

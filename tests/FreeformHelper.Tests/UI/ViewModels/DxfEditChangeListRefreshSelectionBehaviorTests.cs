@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -95,6 +95,6 @@ public sealed class DxfEditChangeListRefreshSelectionBehaviorTests
         var action = kind == DxfEditChangeKind.Moved ? "Restore layer" : "Restore";
         return new DxfEditChangeListEntry(
             kind, id, id, "SENSOR", kind.ToString(), "Layer signal", "Changed pad", "Changed pad detail",
-            IconGlyphs.Undo, action, action, canFocus: kind == DxfEditChangeKind.Moved, canApply: true);
+            NvtIcons.Undo, action, action, canFocus: kind == DxfEditChangeKind.Moved, canApply: true);
     }
 }

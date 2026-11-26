@@ -5,16 +5,16 @@
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.LeftDxfPanel">
   <UserControl.Resources>
     <converters:BooleanGlyphConverter x:Key="LayerVisibilityGlyph"
-                                      FalseGlyph="{x:Static icons:IconGlyphs.VisibilityOff}"
-                                      TrueGlyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                                      FalseGlyph="{x:Static icons:NvtIcons.VisibilityOff}"
+                                      TrueGlyph="{x:Static icons:NvtIcons.Visibility}"/>
     <converters:BooleanGlyphConverter x:Key="AccordionExpandGlyph"
-                                      FalseGlyph="{x:Static icons:IconGlyphs.ExpandMore}"
-                                      TrueGlyph="{x:Static icons:IconGlyphs.ExpandLess}"/>
+                                      FalseGlyph="{x:Static icons:NvtIcons.ExpandMore}"
+                                      TrueGlyph="{x:Static icons:NvtIcons.ExpandLess}"/>
   </UserControl.Resources>
   <StackPanel Spacing="{StaticResource Space10}">
     <panels:CollapsiblePanel Title="Import &amp; DXF check" IsExpanded="False">
@@ -29,7 +29,7 @@
                 Command="{Binding CheckDxfQualityCommand}"
                 ToolTip.Tip="Scan the current DXF for duplicates or overlaps.">
           <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
-            <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Search}"/>
+            <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:NvtIcons.Search}"/>
             <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Overlap check"/>
             <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
           </Grid>
@@ -93,7 +93,7 @@
         <StackPanel Orientation="Horizontal"
                     Spacing="{StaticResource Space8}">
           <controls:FontIcon Classes="symbols iconSm"
-                             Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                             Glyph="{x:Static icons:NvtIcons.FitScreen}"/>
           <SelectableTextBlock Text="Bounds source layer" FontWeight="SemiBold"/>
         </StackPanel>
         <SelectableTextBlock Classes="stepNote"
@@ -127,7 +127,7 @@
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.VisibilityOff}"/>
+                                   Glyph="{x:Static icons:NvtIcons.VisibilityOff}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
                                      Text="{Binding DxfEdit.DeletedCadPadCount, StringFormat='Hidden {0}'}"/>
               </StackPanel>
@@ -139,7 +139,7 @@
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                                   Glyph="{x:Static icons:NvtIcons.ContentCopy}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
                                      Text="{Binding DxfEdit.DuplicateCadPadCount, StringFormat='Duplicates {0}'}"/>
               </StackPanel>
@@ -150,7 +150,7 @@
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.Merge}"/>
+                                   Glyph="{x:Static icons:NvtIcons.Merge}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
                                      Text="{Binding DxfEdit.CombinedCadPadCount, StringFormat='Merged {0}'}"/>
               </StackPanel>
@@ -161,7 +161,7 @@
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.DriveFileMove}"/>
+                                   Glyph="{x:Static icons:NvtIcons.DriveFileMove}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
                                      Text="{Binding DxfEdit.RelayeredCadPadCount, StringFormat='Moved {0}'}"/>
               </StackPanel>
@@ -172,7 +172,7 @@
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.RotateRight}"/>
+                                   Glyph="{x:Static icons:NvtIcons.RotateRight}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
                                      Text="{Binding DxfEdit.RotatedCadPadCount, StringFormat='Rotated {0}'}"/>
               </StackPanel>
@@ -192,7 +192,7 @@
                             Orientation="Horizontal"
                             Spacing="{StaticResource Space4}">
                   <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                     Glyph="{x:Static icons:IconGlyphs.VisibilityOff}"/>
+                                     Glyph="{x:Static icons:NvtIcons.VisibilityOff}"/>
                   <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                        Text="Hide selected"/>
                 </StackPanel>
@@ -207,7 +207,7 @@
                               Orientation="Horizontal"
                               Spacing="{StaticResource Space4}">
                     <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                       Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+                                       Glyph="{x:Static icons:NvtIcons.Undo}"/>
                     <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                          Text="Undo hide"/>
                   </StackPanel>
@@ -221,7 +221,7 @@
                               Orientation="Horizontal"
                               Spacing="{StaticResource Space4}">
                     <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                       Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                                       Glyph="{x:Static icons:NvtIcons.Visibility}"/>
                     <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                          Text="Show all"/>
                   </StackPanel>
@@ -240,7 +240,7 @@
                             Orientation="Horizontal"
                             Spacing="{StaticResource Space4}">
                   <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                     Glyph="{x:Static icons:IconGlyphs.Merge}"/>
+                                     Glyph="{x:Static icons:NvtIcons.Merge}"/>
                   <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                        Text="Combine"/>
                 </StackPanel>
@@ -253,7 +253,7 @@
                             Orientation="Horizontal"
                             Spacing="{StaticResource Space4}">
                   <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                     Glyph="{x:Static icons:IconGlyphs.CallSplit}"/>
+                                     Glyph="{x:Static icons:NvtIcons.CallSplit}"/>
                   <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                        Text="Split selected"/>
                 </StackPanel>

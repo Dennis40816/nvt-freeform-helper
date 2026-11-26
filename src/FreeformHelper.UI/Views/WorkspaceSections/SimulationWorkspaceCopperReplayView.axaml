@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="True" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:icons="using:Nvt.Core.Avalonia.Icons"
     xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
     xmlns:services="clr-namespace:FreeformHelper.Application.Services;assembly=FreeformHelper.Application"
     x:DataType="viewModels:SimulationWorkspaceViewModel"
@@ -41,7 +41,7 @@
           <Button Classes="actionGhost actionTextButton" Content="End" Command="{Binding UseCurrentCopperAsPathEndCommand}" ToolTip.Tip="Use the current copper position as the path end."/>
           <Button Classes="actionPrimary actionTextButton simulationActionButton" Command="{Binding ReplayCopperPathCommand}">
             <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}">
-              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.PlayArrow}"/>
+              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.PlayArrow}"/>
               <TextBlock Text="Run"/>
             </StackPanel>
           </Button>
