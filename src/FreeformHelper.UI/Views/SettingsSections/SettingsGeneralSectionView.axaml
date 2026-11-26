@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsGeneralSectionView">
   <StackPanel Classes="settingsPage">
     <Border Classes="settingsSectionBlock">
@@ -38,7 +38,7 @@
                           Click="EditCascadeDetailsButton_Click"
                           ToolTip.Tip="Edit per-IC X/Y channels.">
                     <controls:FontIcon Classes="symbols iconSm"
-                                       Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                                       Glyph="{x:Static icons:NvtIcons.Edit}"/>
                   </Button>
                 </Grid>
               </StackPanel>

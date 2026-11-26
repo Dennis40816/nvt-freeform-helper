@@ -3,13 +3,13 @@
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              x:Class="FreeformHelper.UI.Views.RightWorkflowSections.RightWorkflowInspectorView">
     <UserControl.Resources>
       <converters:BooleanGlyphConverter x:Key="AccordionExpandGlyph"
-                                        FalseGlyph="{x:Static icons:IconGlyphs.ExpandMore}"
-                                        TrueGlyph="{x:Static icons:IconGlyphs.ExpandLess}"/>
+                                        FalseGlyph="{x:Static icons:NvtIcons.ExpandMore}"
+                                        TrueGlyph="{x:Static icons:NvtIcons.ExpandLess}"/>
     </UserControl.Resources>
     <controls:HidePanelBlock Title="Inspector snapshot"
                              IsVisible="{Binding IsRightPanelInspectorTab}"

@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:padInfo="clr-namespace:FreeformHelper.UI.Views.PadInfoSections"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
@@ -142,7 +142,7 @@
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}" HorizontalAlignment="Left">
             <SelectableTextBlock Classes="padInfoKeyLabel" Text="Freeform" VerticalAlignment="Center"
                                  ToolTip.Tip="{Binding FreeformActionHint}"/>
-            <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.Info}"
+            <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.Info}"
                                VerticalAlignment="Center" ToolTip.Tip="{Binding FreeformActionHint}"/>
             <Button Classes="actionNeutral actionTextButton padInfoActionButton" Content="None"
                     Command="{Binding SetFreeformNoneCommand}" ToolTip.Tip="Mark selection as none."/>

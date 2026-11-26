@@ -10,9 +10,9 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -315,6 +315,6 @@ public sealed class DxfEditDetailsIntegratedLayoutTests
     {
         return new DxfEditChangeListEntry(
             kind, cadPadId, cadPadId, $"PAD_{cadPadId}", kind.ToString(), "Layer 0", "detail", "Complete change detail.",
-            IconGlyphs.Undo, actionLabel, "Apply this row's scoped action.", canFocus: true, canApply: true);
+            NvtIcons.Undo, actionLabel, "Apply this row's scoped action.", canFocus: true, canApply: true);
     }
 }

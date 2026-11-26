@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -75,7 +75,7 @@ public sealed class DxfEditChangeListBulkApplyAvailabilityTests
             "Layer 0",
             "detail",
             "detail",
-            IconGlyphs.Undo,
+            NvtIcons.Undo,
             "Clear",
             "Clear",
             canFocus: true,

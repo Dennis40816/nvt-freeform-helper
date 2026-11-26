@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              x:Class="FreeformHelper.UI.Controls.NumberScrubber">
   <Border x:Name="RootBorder" Classes="numberScrubber">
     <Grid ColumnDefinitions="*,Auto">

@@ -5,8 +5,8 @@ using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.CadEditing;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -47,7 +47,7 @@ public sealed class DxfEditChangeEntryBuilderTests
         Assert.Equal("Layer A", entry.CurrentLayerText);
         Assert.Equal("Manual hide", entry.ListDetailText);
         Assert.Equal("Hidden manually from the current DXF edit session.", entry.DetailText);
-        Assert.Equal(IconGlyphs.Undo, entry.ActionGlyph);
+        Assert.Equal(NvtIcons.Undo, entry.ActionGlyph);
         Assert.Equal("Restore", entry.ActionLabel);
         Assert.Equal("Restore this hidden CAD pad.", entry.ActionHint);
         Assert.False(entry.CanFocus);
@@ -82,7 +82,7 @@ public sealed class DxfEditChangeEntryBuilderTests
         Assert.Equal("Layer A", entry.CurrentLayerText);
         Assert.Equal("Group 7", entry.ListDetailText);
         Assert.Equal(expectedDetail, entry.DetailText);
-        Assert.Equal(IconGlyphs.Remove, entry.ActionGlyph);
+        Assert.Equal(NvtIcons.Remove, entry.ActionGlyph);
         Assert.Equal("Clear group", entry.ActionLabel);
         Assert.Equal("Clear this combine group and restore its source pads.", entry.ActionHint);
         Assert.False(entry.CanFocus);
@@ -138,7 +138,7 @@ public sealed class DxfEditChangeEntryBuilderTests
         Assert.Equal("Layer A · Canonical CAD 1", entry.CurrentLayerText);
         Assert.Equal("Canonical CAD 1", entry.ListDetailText);
         Assert.Equal("Exact same-layer duplicate of CAD 1 (Pad 1).", entry.DetailText);
-        Assert.Equal(autoHidden ? IconGlyphs.Undo : IconGlyphs.VisibilityOff, entry.ActionGlyph);
+        Assert.Equal(autoHidden ? NvtIcons.Undo : NvtIcons.VisibilityOff, entry.ActionGlyph);
         Assert.Equal(expectedAction, entry.ActionLabel);
         Assert.Equal(expectedHint, entry.ActionHint);
         Assert.True(entry.CanFocus);
@@ -197,7 +197,7 @@ public sealed class DxfEditChangeEntryBuilderTests
         Assert.Equal("Layer A", entry.CurrentLayerText);
         Assert.Equal(expectedListDetail, entry.ListDetailText);
         Assert.Equal(expectedDetail, entry.DetailText);
-        Assert.Equal(IconGlyphs.Remove, entry.ActionGlyph);
+        Assert.Equal(NvtIcons.Remove, entry.ActionGlyph);
         Assert.Equal("Clear group", entry.ActionLabel);
         Assert.Equal("Clear this combine group and restore its source pads.", entry.ActionHint);
         Assert.True(entry.CanFocus);
@@ -225,7 +225,7 @@ public sealed class DxfEditChangeEntryBuilderTests
         Assert.Equal("Layer B", entry.CurrentLayerText);
         Assert.Equal("A -> B", entry.ListDetailText);
         Assert.Equal("Original layer: A -> Current layer: B.", entry.DetailText);
-        Assert.Equal(IconGlyphs.Undo, entry.ActionGlyph);
+        Assert.Equal(NvtIcons.Undo, entry.ActionGlyph);
         Assert.Equal("Restore layer", entry.ActionLabel);
         Assert.Equal("Move this CAD pad back to layer 'A'.", entry.ActionHint);
         Assert.Equal(!hidden, entry.CanFocus);
@@ -255,7 +255,7 @@ public sealed class DxfEditChangeEntryBuilderTests
         Assert.Equal(
             "Polygon vertices were rotated relative to the imported DXF baseline. Restore resets this pad geometry only.",
             entry.DetailText);
-        Assert.Equal(IconGlyphs.Undo, entry.ActionGlyph);
+        Assert.Equal(NvtIcons.Undo, entry.ActionGlyph);
         Assert.Equal("Restore geometry", entry.ActionLabel);
         Assert.Equal("Restore this CAD pad geometry back to DXF baseline.", entry.ActionHint);
         Assert.Equal(!hidden, entry.CanFocus);

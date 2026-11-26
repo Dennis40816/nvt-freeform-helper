@@ -1,7 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-        xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+        xmlns:icons="using:Nvt.Core.Avalonia.Icons"
         xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
   <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Core.axaml"/>
   <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Overlay.axaml"/>

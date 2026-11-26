@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
              xmlns:logConsole="clr-namespace:Nvt.Core.Avalonia.LogConsole;assembly=Nvt.Core.Avalonia"
              mc:Ignorable="d"
@@ -15,8 +15,8 @@
   </UserControl.Styles>
   <UserControl.Resources>
     <converters:BooleanGlyphConverter x:Key="ConsoleToggleGlyph"
-                                      FalseGlyph="{x:Static icons:IconGlyphs.ExpandLess}"
-                                      TrueGlyph="{x:Static icons:IconGlyphs.ExpandMore}"/>
+                                      FalseGlyph="{x:Static icons:NvtIcons.ExpandLess}"
+                                      TrueGlyph="{x:Static icons:NvtIcons.ExpandMore}"/>
   </UserControl.Resources>
   <Border x:Name="ConsoleBorder"
           Background="{DynamicResource BrushBgSurface}"

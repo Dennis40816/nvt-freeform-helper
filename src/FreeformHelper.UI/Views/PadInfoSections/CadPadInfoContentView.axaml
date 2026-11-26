@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:padInfo="clr-namespace:FreeformHelper.UI.Views.PadInfoSections"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
@@ -87,7 +87,7 @@
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space4}" IsVisible="{Binding HasToFullReason}">
               <SelectableTextBlock Classes="padInfoMetaText" Text="{Binding ToFullReasonLineText}" TextWrapping="Wrap"/>
               <Button Grid.Column="1" Classes="actionIconButton actionGhost" ToolTip.Tip="{Binding ToFullReasonToolTip}">
-                <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.Info}"/>
+                <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.Info}"/>
               </Button>
             </Grid>
           </StackPanel>

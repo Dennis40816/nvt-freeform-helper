@@ -228,8 +228,8 @@ public sealed partial class UiLayoutGuardTests
         var dxfRestoreLastButton = FindXamlElementTagContaining(leftPanel, "Button", "RestoreLastDeletedCadPadsCommand");
         var dxfRestoreAllButton = FindXamlElementTagContaining(leftPanel, "Button", "RestoreAllHiddenCadPadsCommand");
         Assert.Contains("actionDanger", dxfResetButton, StringComparison.Ordinal);
-        Assert.Contains("IconGlyphs.Undo", dxfRestoreLastButton, StringComparison.Ordinal);
-        Assert.Contains("IconGlyphs.Visibility", dxfRestoreAllButton, StringComparison.Ordinal);
+        Assert.Contains("NvtIcons.Undo", dxfRestoreLastButton, StringComparison.Ordinal);
+        Assert.Contains("NvtIcons.Visibility", dxfRestoreAllButton, StringComparison.Ordinal);
 
         var dxfHideSectionStart = leftPanel.IndexOf("Text=\"Hide / restore\"", StringComparison.Ordinal);
         var dxfCombineSectionStart = leftPanel.IndexOf("Text=\"Combine / split\"", StringComparison.Ordinal);
@@ -259,7 +259,7 @@ public sealed partial class UiLayoutGuardTests
         Assert.DoesNotContain("ColumnDefinitions=\"*,*\"", dxfCombineSection, StringComparison.Ordinal);
         Assert.Contains("CombineSelectedCadPadsCommand", dxfCombineSection, StringComparison.Ordinal);
         Assert.Contains("ClearCombinedCadPadsCommand", dxfCombineSection, StringComparison.Ordinal);
-        Assert.Contains("IconGlyphs.CallSplit", dxfCombineSection, StringComparison.Ordinal);
+        Assert.Contains("NvtIcons.CallSplit", dxfCombineSection, StringComparison.Ordinal);
         Assert.Contains("Text=\"Combine\"", dxfCombineSection, StringComparison.Ordinal);
         Assert.Contains("Text=\"Split selected\"", dxfCombineSection, StringComparison.Ordinal);
         Assert.DoesNotContain("DeleteSelectedCadPadsCommand", dxfCombineSection, StringComparison.Ordinal);
@@ -323,7 +323,7 @@ public sealed partial class UiLayoutGuardTests
         var simulationControlsPane = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkspaceSections", "SimulationWorkspaceControlsPaneView.axaml"));
         Assert.Contains("Classes=\"workspaceFileRow\"", simulationControlsPane, StringComparison.Ordinal);
         Assert.Contains("Classes=\"workspaceFileRowTitle\"", simulationControlsPane, StringComparison.Ordinal);
-        Assert.Contains("Glyph=\"{x:Static icons:IconGlyphs.DataObject}\"", simulationControlsPane, StringComparison.Ordinal);
+        Assert.Contains("Glyph=\"{x:Static icons:NvtIcons.DataObject}\"", simulationControlsPane, StringComparison.Ordinal);
 
         var simulationWorkspace = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "SimulationWorkspaceView.axaml"));
         Assert.Matches(@"GridSplitter\s+Grid\.Row=""2""[\s\S]*ResizeDirection=""Rows""[\s\S]*ShowsPreview=""True""", simulationWorkspace);

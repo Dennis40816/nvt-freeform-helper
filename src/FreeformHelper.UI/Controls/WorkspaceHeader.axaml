@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              x:Class="FreeformHelper.UI.Controls.WorkspaceHeader"
              x:Name="Root">
   <UserControl.Styles>
@@ -207,7 +207,7 @@
                     VerticalAlignment="Stretch">
         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}">
           <controls:FontIcon Classes="symbols"
-                             Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                             Glyph="{x:Static icons:NvtIcons.Visibility}"/>
           <SelectableTextBlock Text="Display" VerticalAlignment="Center"/>
         </StackPanel>
       </ToggleButton>

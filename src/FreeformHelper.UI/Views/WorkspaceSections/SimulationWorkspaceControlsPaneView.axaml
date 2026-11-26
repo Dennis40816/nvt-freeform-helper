@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:icons="using:Nvt.Core.Avalonia.Icons"
     xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
     x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspaceControlsPaneView">
   <Border Grid.Column="0"
@@ -60,7 +60,7 @@
                         ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
                           Classes="symbols"
-                          Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                          Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                       <SelectableTextBlock Grid.Column="1"
                           Classes="workspacePresetButtonLabel"
                           Text="Uniform 400"/>
@@ -74,7 +74,7 @@
                         ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
                           Classes="symbols"
-                          Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                          Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                       <SelectableTextBlock Grid.Column="1"
                           Classes="workspacePresetButtonLabel"
                           Text="Uniform 360"/>
@@ -88,7 +88,7 @@
                         ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
                           Classes="symbols"
-                          Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                          Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                       <SelectableTextBlock Grid.Column="1"
                           Classes="workspacePresetButtonLabel"
                           Text="Zero"/>
@@ -119,7 +119,7 @@
                       <Grid Classes="workspaceFileRowContent" ColumnDefinitions="Auto,*">
                         <controls:FontIcon Grid.Column="0"
                             Classes="symbols workspaceFileRowIcon"
-                            Glyph="{x:Static icons:IconGlyphs.DataObject}"/>
+                            Glyph="{x:Static icons:NvtIcons.DataObject}"/>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
                           <SelectableTextBlock Classes="workspaceFileRowTitle" Text="{Binding FileName}"/>
                           <SelectableTextBlock Classes="workspaceFileRowMeta" Text="{Binding SummaryText}"/>

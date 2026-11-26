@@ -5,7 +5,7 @@
     xmlns:views="clr-namespace:FreeformHelper.UI.Views"
     xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
     xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:icons="using:Nvt.Core.Avalonia.Icons"
     mc:Ignorable="d"
     x:Class="FreeformHelper.UI.Views.SimulationHostView"
     Background="{DynamicResource BrushBgApp}"
@@ -73,7 +73,7 @@
                   ColumnDefinitions="Auto,*,Auto">
                 <controls:FontIcon Grid.Column="0"
                     Classes="symbols iconTextButtonLeadingIcon"
-                    Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                    Glyph="{x:Static icons:NvtIcons.FitScreen}"/>
                 <SelectableTextBlock Grid.Column="1"
                     Classes="iconTextButtonLabel"
                     Text="{Binding BuildActionText}"/>
@@ -112,7 +112,7 @@
                 ColumnDefinitions="Auto,*,Auto">
               <controls:FontIcon Grid.Column="0"
                   Classes="symbols iconTextButtonLeadingIcon"
-                  Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+                  Glyph="{x:Static icons:NvtIcons.Undo}"/>
               <SelectableTextBlock Grid.Column="1"
                   Classes="iconTextButtonLabel"
                   Text="Retry build"/>

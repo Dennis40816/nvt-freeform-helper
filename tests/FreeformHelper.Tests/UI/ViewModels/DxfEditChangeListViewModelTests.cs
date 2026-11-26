@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -98,7 +98,7 @@ public sealed class DxfEditChangeListViewModelTests
 
         Assert.True(vm.IsRotatedKindSelected);
         Assert.Equal("Restore selected geometry", vm.BulkActionText);
-        Assert.Equal(IconGlyphs.Undo, vm.BulkActionGlyph);
+        Assert.Equal(NvtIcons.Undo, vm.BulkActionGlyph);
     }
 
     [Fact]
@@ -254,7 +254,7 @@ public sealed class DxfEditChangeListViewModelTests
             "Layer 0",
             "detail",
             "detail",
-            actionLabel == "Hide again" ? IconGlyphs.VisibilityOff : IconGlyphs.Undo,
+            actionLabel == "Hide again" ? NvtIcons.VisibilityOff : NvtIcons.Undo,
             actionLabel,
             actionLabel,
             canFocus: true,

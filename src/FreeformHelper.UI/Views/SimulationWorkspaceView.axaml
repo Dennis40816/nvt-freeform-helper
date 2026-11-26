@@ -3,7 +3,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:icons="using:Nvt.Core.Avalonia.Icons"
     xmlns:views="clr-namespace:FreeformHelper.UI.Views"
     mc:Ignorable="d"
     xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
@@ -94,7 +94,7 @@
                   <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space6}">
                     <SelectableTextBlock Classes="padInfoTitle" Text="{Binding SelectedRegularHeaderText}"/>
                     <Button Grid.Column="1" Classes="actionGhost actionIconButton" ToolTip.Tip="Close manual editor" Click="InlineClose_Click">
-                      <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.Close}"/>
+                      <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.Close}"/>
                     </Button>
                   </Grid>
                   <controls:NumberScrubber x:Name="SimulationInlineEditorValueInput"
@@ -114,10 +114,10 @@
             </Canvas>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="{DynamicResource InsetTop12Right16}" Spacing="{DynamicResource Space4}">
               <Button Classes="actionIconButton viewportOverlayAction" Command="{Binding FitCanvasCommand}" ToolTip.Tip="Fit AA canvas (F)">
-                <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.FitScreen}"/>
               </Button>
               <ToggleButton x:Name="CanvasHelpToggle" Classes="actionGhost actionIconButton" ToolTip.Tip="Canvas help">
-                <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.Info}"/>
+                <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.Info}"/>
               </ToggleButton>
               <Popup PlacementTarget="{Binding #CanvasHelpToggle}" IsOpen="{Binding #CanvasHelpToggle.IsChecked, Mode=TwoWay}" IsLightDismissEnabled="True">
                 <Border Classes="workspaceSectionCard" MaxWidth="{DynamicResource ViewMenuPopupMaxWidth}">
