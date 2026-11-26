@@ -13,9 +13,9 @@ internal sealed class SettingsMappingExportDraftOwner
     private bool _showDiffIndexOverlay;
     private decimal _cadOutputFwDiffIndexStart;
     private decimal _cadOutputFwDiffIndexAnchorCadId;
-    private FreeformHelperViewModel.CadOutputFwDiffAutoModeOption _selectedCadOutputFwDiffAutoModeOption;
-    private FreeformHelperViewModel.NotchExportFileTypeOption _selectedNotchExportFileTypeOption;
-    private FreeformHelperViewModel.NotchExportProfileOption _selectedNotchExportProfileOption;
+    private CadOutputFwDiffAutoModeOption _selectedCadOutputFwDiffAutoModeOption;
+    private NotchExportFileTypeOption _selectedNotchExportFileTypeOption;
+    private NotchExportProfileOption _selectedNotchExportProfileOption;
     private decimal _mappingWeightIou;
     private decimal _mappingWeightCentroidDistance;
     private decimal _mappingWeightAreaRatio;
@@ -31,9 +31,9 @@ internal sealed class SettingsMappingExportDraftOwner
         bool ShowDiffIndexOverlay,
         decimal CadOutputFwDiffIndexStart,
         decimal CadOutputFwDiffIndexAnchorCadId,
-        FreeformHelperViewModel.CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption,
-        FreeformHelperViewModel.NotchExportFileTypeOption SelectedNotchExportFileTypeOption,
-        FreeformHelperViewModel.NotchExportProfileOption SelectedNotchExportProfileOption,
+        CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption,
+        NotchExportFileTypeOption SelectedNotchExportFileTypeOption,
+        NotchExportProfileOption SelectedNotchExportProfileOption,
         decimal MappingWeightIou,
         decimal MappingWeightCentroidDistance,
         decimal MappingWeightAreaRatio,
@@ -48,9 +48,9 @@ internal sealed class SettingsMappingExportDraftOwner
     public SettingsMappingExportDraftOwner(
         Seed seed,
         Func<object?> readDraftProjectIdentity,
-        IReadOnlyList<FreeformHelperViewModel.CadOutputFwDiffAutoModeOption> cadOutputFwDiffAutoModeOptions,
-        IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> notchExportFileTypeOptions,
-        IReadOnlyList<FreeformHelperViewModel.NotchExportProfileOption> notchExportProfileOptions,
+        IReadOnlyList<CadOutputFwDiffAutoModeOption> cadOutputFwDiffAutoModeOptions,
+        IReadOnlyList<NotchExportFileTypeOption> notchExportFileTypeOptions,
+        IReadOnlyList<NotchExportProfileOption> notchExportProfileOptions,
         Func<string> buildExportSafetySummary,
         Action<string> propertyChanging,
         Action<string> propertyChanged)
@@ -83,9 +83,9 @@ internal sealed class SettingsMappingExportDraftOwner
 
     public object? ProjectIdentity => _readDraftProjectIdentity();
 
-    public IReadOnlyList<FreeformHelperViewModel.CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> NotchExportFileTypeOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportProfileOption> NotchExportProfileOptions { get; }
+    public IReadOnlyList<CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions { get; }
+    public IReadOnlyList<NotchExportFileTypeOption> NotchExportFileTypeOptions { get; }
+    public IReadOnlyList<NotchExportProfileOption> NotchExportProfileOptions { get; }
 
     public bool ShowDiffIndexOverlay
     {
@@ -105,19 +105,19 @@ internal sealed class SettingsMappingExportDraftOwner
         set => SetValue(ref _cadOutputFwDiffIndexAnchorCadId, value, nameof(CadOutputFwDiffIndexAnchorCadId));
     }
 
-    public FreeformHelperViewModel.CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption
+    public CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption
     {
         get => _selectedCadOutputFwDiffAutoModeOption;
         set => SetValue(ref _selectedCadOutputFwDiffAutoModeOption, value, nameof(SelectedCadOutputFwDiffAutoModeOption));
     }
 
-    public FreeformHelperViewModel.NotchExportFileTypeOption SelectedNotchExportFileTypeOption
+    public NotchExportFileTypeOption SelectedNotchExportFileTypeOption
     {
         get => _selectedNotchExportFileTypeOption;
         set => SetValue(ref _selectedNotchExportFileTypeOption, value, nameof(SelectedNotchExportFileTypeOption), _ => _propertyChanged(nameof(NotchExportSafetyPolicySummary)));
     }
 
-    public FreeformHelperViewModel.NotchExportProfileOption SelectedNotchExportProfileOption
+    public NotchExportProfileOption SelectedNotchExportProfileOption
     {
         get => _selectedNotchExportProfileOption;
         set => SetValue(ref _selectedNotchExportProfileOption, value, nameof(SelectedNotchExportProfileOption));

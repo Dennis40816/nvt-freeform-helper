@@ -36,9 +36,9 @@ public sealed class SettingsDraftExportPersistenceCharacterizationTests
     {
         using var scope = new SettingsDraftTestScope();
         var owner = scope.Owner;
-        var unknownType = new FreeformHelperViewModel.NotchExportFileTypeOption(
+        var unknownType = new NotchExportFileTypeOption(
             (FreeformHelperViewModel.NotchExportFileType)99, "Unknown file", "unknown");
-        var unknownProfile = new FreeformHelperViewModel.NotchExportProfileOption((NotchExportProfile)99, "Unknown profile");
+        var unknownProfile = new NotchExportProfileOption((NotchExportProfile)99, "Unknown profile");
         owner.SelectedNotchExportFileTypeOption = unknownType;
         owner.SelectedNotchExportProfileOption = unknownProfile;
 
@@ -60,7 +60,7 @@ public sealed class SettingsDraftExportPersistenceCharacterizationTests
         var owner = scope.Owner;
         var draft = owner.CreateSettingsWindowViewModel();
         draft.SelectedNotchExportFileTypeOption = new(FreeformHelperViewModel.NotchExportFileType.Cv22, "Draft label", "temporary");
-        var profile = new FreeformHelperViewModel.NotchExportProfileOption(NotchExportProfile.Debug, "Draft profile");
+        var profile = new NotchExportProfileOption(NotchExportProfile.Debug, "Draft profile");
         draft.SelectedNotchExportProfileOption = profile;
         owner.SelectedNotchExportFileTypeOption = owner.NotchExportFileTypeOptions.Single(
             option => option.Value == FreeformHelperViewModel.NotchExportFileType.Cv21);
@@ -96,7 +96,7 @@ public sealed class SettingsDraftExportPersistenceCharacterizationTests
         var draft = scope.Owner.CreateSettingsWindowViewModel();
         var original = draft.SelectedNotchExportFileTypeOption;
         var next = draft.NotchExportFileTypeOptions.Single(option => option.Value == FreeformHelperViewModel.NotchExportFileType.Cv22);
-        var trace = new SettingsDraftTrace<FreeformHelperViewModel.NotchExportFileTypeOption>(draft,
+        var trace = new SettingsDraftTrace<NotchExportFileTypeOption>(draft,
             () => draft.SelectedNotchExportFileTypeOption);
 
         draft.SelectedNotchExportFileTypeOption = next;

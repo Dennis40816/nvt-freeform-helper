@@ -97,7 +97,7 @@ public sealed partial class FreeformHelperViewModelTests
                 CreateRectRegular(1, 0, 3, 0, 5, 5, 10),
                 CreateRectRegular(1, 1, 4, 5, 5, 10, 10),
             },
-            NotchValidationItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+            NotchValidationItems = new ObservableCollection<NotchValidationDisplayItem>
             {
                 CreateValidationDisplayItem("DIRECT", isDirect: true),
                 CreateValidationDisplayItem("OUT", isOutgoing: true) with
@@ -176,7 +176,7 @@ public sealed partial class FreeformHelperViewModelTests
         FreeformHelperViewModelPrivateAccess.Cad(vm) = cad;
         FreeformHelperViewModelPrivateAccess.Grid(vm) = grid;
         vm.LayerToggles.Clear();
-        vm.LayerToggles.Add(new FreeformHelperViewModel.LayerToggle("L1", isSelected: false));
+        vm.LayerToggles.Add(new LayerToggle("L1", isSelected: false));
 
         await vm.AnalyzeIndexMappingCommand.ExecuteAsync(null);
 

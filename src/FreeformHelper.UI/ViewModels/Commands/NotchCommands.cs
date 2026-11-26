@@ -11,6 +11,6 @@ internal sealed record NotchCommands(
     IRelayCommand UseSelectedRegularForNotchValidationCommand,
     IRelayCommand AnalyzeNotchValidationCommand,
     IRelayCommand ClearNotchValidationCommand,
-    IRelayCommand<FreeformHelperViewModel.NotchValidationDisplayItem> FocusNotchValidationItemCommand,
+    IRelayCommand<NotchValidationDisplayItem> FocusNotchValidationItemCommand,
     IRelayCommand PreviousNotchPreviewStageCommand,
     IRelayCommand NextNotchPreviewStageCommand);

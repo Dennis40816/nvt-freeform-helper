@@ -63,7 +63,7 @@ internal sealed class MainWindowBindingActivation(MainWindow window, AvaloniaBin
         var activated = await ExpandPanelsAsync(view);
         Assert.Contains(activated.OfType<CollapsiblePanel>(), static panel => panel.Title.StartsWith("Step ", StringComparison.Ordinal));
         Assert.Contains(view.GetVisualDescendants().OfType<Control>(), static control =>
-            control.DataContext is FreeformHelperViewModel.LayerToggle);
+            control.DataContext is LayerToggle);
         RequireNoValidationErrors(view);
         _realized.Add("Workflow panels and populated layer template");
 

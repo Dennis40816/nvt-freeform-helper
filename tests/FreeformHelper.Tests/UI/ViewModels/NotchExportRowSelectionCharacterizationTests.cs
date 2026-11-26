@@ -145,9 +145,9 @@ public sealed class NotchExportRowSelectionCharacterizationTests
         });
         var options = new[]
         {
-            new FreeformHelperViewModel.NotchExportFileTypeOption(
+            new NotchExportFileTypeOption(
                 FreeformHelperViewModel.NotchExportFileType.Csv, "CSV review (.csv)", "csv"),
-            new FreeformHelperViewModel.NotchExportFileTypeOption(
+            new NotchExportFileTypeOption(
                 FreeformHelperViewModel.NotchExportFileType.Cv22, "C v2.2 (.c)", "c", NotchAlgorithmVersion.V22),
         };
         var viewModel = new NotchExportSelectionViewModel(table, exportTypeOptions: options, selectedExportTypeOption: options[0]);

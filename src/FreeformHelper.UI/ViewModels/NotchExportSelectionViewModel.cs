@@ -75,13 +75,13 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public NotchExportSelectionViewModel(
         NotchTable table,
         Action<NotchTableRow>? previewRowChanged = null,
-        IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption>? exportTypeOptions = null,
-        FreeformHelperViewModel.NotchExportFileTypeOption? selectedExportTypeOption = null)
+        IReadOnlyList<NotchExportFileTypeOption>? exportTypeOptions = null,
+        NotchExportFileTypeOption? selectedExportTypeOption = null)
     {
         ArgumentNullException.ThrowIfNull(table);
         _previewRowChanged = previewRowChanged;
         ExportTypeOptions = exportTypeOptions is null
-            ? Array.Empty<FreeformHelperViewModel.NotchExportFileTypeOption>()
+            ? Array.Empty<NotchExportFileTypeOption>()
             : exportTypeOptions.ToList();
         VersionOptions = BuildVersionOptions(table, ExportTypeOptions);
         _selectedVersionOption = VersionOptions[0];
@@ -161,7 +161,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public IRelayCommand EnableWorkspaceLinkedRowsCommand { get; }
     public IRelayCommand DisableWorkspaceLinkedRowsCommand { get; }
     public IRelayCommand HidePanelForInspectCommand { get; }
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> ExportTypeOptions { get; }
+    public IReadOnlyList<NotchExportFileTypeOption> ExportTypeOptions { get; }
     public IReadOnlyList<NotchExportVersionOption> VersionOptions { get; }
     public IReadOnlyList<NotchExportRowDisplayModeOption> RowDisplayModeOptions { get; }
     public IReadOnlyList<NotchExportSortModeOption> SortModeOptions { get; }
@@ -169,7 +169,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     [ObservableProperty] private int _selectedCount;
     [ObservableProperty] private NotchExportRowItemViewModel? _selectedRow;
     [ObservableProperty] private bool _showSelectedRowDetailSection;
-    [ObservableProperty] private FreeformHelperViewModel.NotchExportFileTypeOption _selectedExportTypeOption;
+    [ObservableProperty] private NotchExportFileTypeOption _selectedExportTypeOption;
     [ObservableProperty] private NotchExportVersionOption _selectedVersionOption;
     [ObservableProperty] private NotchExportRowDisplayModeOption _selectedRowDisplayModeOption;
     [ObservableProperty] private NotchExportSortModeOption _selectedSortModeOption;
@@ -417,7 +417,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
                 $"IC {gap.IcIndex + 1} / FW Diff {gap.SourceDiffIndex} -> FW Diff {gap.TargetDiffIndex} | CAD {string.Join("/", gap.CadPadIds)}"));
     }
 
-    partial void OnSelectedExportTypeOptionChanged(FreeformHelperViewModel.NotchExportFileTypeOption value)
+    partial void OnSelectedExportTypeOptionChanged(NotchExportFileTypeOption value)
     {
         SyncVersionSelectionToExportType();
         OnPropertyChanged(nameof(IsVersionSelectionPinnedByExportType));
@@ -466,7 +466,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
 
     private static List<NotchExportVersionOption> BuildVersionOptions(
         NotchTable table,
-        IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> exportTypeOptions)
+        IReadOnlyList<NotchExportFileTypeOption> exportTypeOptions)
     {
         var rowVersions = table.Rows.Select(row => row.Version).ToList();
         var pinnedVersions = new List<NotchAlgorithmVersion?>();
@@ -507,7 +507,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         }
     }
 
-    private NotchExportVersionOption ResolvePinnedVersionOption(FreeformHelperViewModel.NotchExportFileTypeOption exportTypeOption)
+    private NotchExportVersionOption ResolvePinnedVersionOption(NotchExportFileTypeOption exportTypeOption)
     {
         if (!NotchExportFileTypeMetadata.TryGetPinnedVersion(exportTypeOption, out var pinnedVersion))
         {

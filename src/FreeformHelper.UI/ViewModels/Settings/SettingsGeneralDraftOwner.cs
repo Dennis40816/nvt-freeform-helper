@@ -10,7 +10,7 @@ internal sealed class SettingsGeneralDraftOwner
     private readonly Func<object?> _readDraftProjectIdentity;
     private readonly Action<string> _propertyChanging;
     private readonly Action<string> _propertyChanged;
-    private readonly Func<IReadOnlyList<FreeformHelperViewModel.DxfLayerCategoryState>> _readCategoryStates;
+    private readonly Func<IReadOnlyList<DxfLayerCategoryState>> _readCategoryStates;
     private readonly Action<FreeformHelperViewModel.DxfLayerCategory, bool> _applyCategory;
 
     private bool _importOnlyClosedPolylines;
@@ -22,7 +22,7 @@ internal sealed class SettingsGeneralDraftOwner
     private bool _enableFreeformEdgeSpecialization;
     private bool _autoReplayStep2AfterProjectLoad;
     private bool _applyAppVisualPreferencesOnProjectLoad;
-    private FreeformHelperViewModel.LogLevelOption _selectedLogLevelOption;
+    private LogLevelOption _selectedLogLevelOption;
     private bool _useLocalSizing;
     private decimal _globalFontSizePercent;
     private decimal _highlightStrokeWidthAdjust;
@@ -38,7 +38,7 @@ internal sealed class SettingsGeneralDraftOwner
         bool EnableFreeformEdgeSpecialization,
         bool AutoReplayStep2AfterProjectLoad,
         bool ApplyAppVisualPreferencesOnProjectLoad,
-        FreeformHelperViewModel.LogLevelOption SelectedLogLevelOption,
+        LogLevelOption SelectedLogLevelOption,
         bool UseLocalSizing,
         decimal GlobalFontSizePercent,
         decimal HighlightStrokeWidthAdjust,
@@ -47,9 +47,9 @@ internal sealed class SettingsGeneralDraftOwner
     public SettingsGeneralDraftOwner(
         Seed seed,
         Func<object?> readDraftProjectIdentity,
-        Func<IReadOnlyList<FreeformHelperViewModel.DxfLayerCategoryState>> readCategoryStates,
+        Func<IReadOnlyList<DxfLayerCategoryState>> readCategoryStates,
         Action<FreeformHelperViewModel.DxfLayerCategory, bool> applyCategory,
-        IReadOnlyList<FreeformHelperViewModel.LogLevelOption> logLevelOptions,
+        IReadOnlyList<LogLevelOption> logLevelOptions,
         Action<string> propertyChanging,
         Action<string> propertyChanged)
     {
@@ -78,7 +78,7 @@ internal sealed class SettingsGeneralDraftOwner
 
     public object? ProjectIdentity => _readDraftProjectIdentity();
 
-    public IReadOnlyList<FreeformHelperViewModel.LogLevelOption> LogLevelOptions { get; }
+    public IReadOnlyList<LogLevelOption> LogLevelOptions { get; }
 
     public bool ImportOnlyClosedPolylines
     {
@@ -134,7 +134,7 @@ internal sealed class SettingsGeneralDraftOwner
         set => SetValue(ref _applyAppVisualPreferencesOnProjectLoad, value, nameof(ApplyAppVisualPreferencesOnProjectLoad));
     }
 
-    public FreeformHelperViewModel.LogLevelOption SelectedLogLevelOption
+    public LogLevelOption SelectedLogLevelOption
     {
         get => _selectedLogLevelOption;
         set => SetValue(ref _selectedLogLevelOption, value, nameof(SelectedLogLevelOption));

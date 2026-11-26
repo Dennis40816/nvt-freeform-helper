@@ -98,7 +98,7 @@ internal sealed class MainWindowGlobalInputFixture : IAsyncDisposable
     {
         var toggle = Assert.Single(Window.GetVisualDescendants().OfType<ToggleButton>(),
             button => button.Classes.Contains("layerToggle") &&
-                button.DataContext is FreeformHelperViewModel.LayerToggle layer && layer.Name == name);
+                button.DataContext is LayerToggle layer && layer.Name == name);
         Assert.True(toggle.IsEffectivelyVisible);
         Assert.True(toggle.IsEffectivelyEnabled);
         var point = toggle.TranslatePoint(new Rect(toggle.Bounds.Size).Center, Window);
