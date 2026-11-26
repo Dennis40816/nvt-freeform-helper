@@ -148,15 +148,15 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
 
     public event Action? RequestClose;
 
-    public IReadOnlyList<FreeformHelperViewModel.ScanOrderOption> ScanOrderOptions => _grid.ScanOrderOptions;
-    public IReadOnlyList<FreeformHelperViewModel.GridAlignmentOption> GridAlignmentOptions => _grid.GridAlignmentOptions;
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> RegularSourceModeOptions => _grid.RegularSourceModeOptions;
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayerOptions => _grid.RegularSourceLayerOptions;
-    public IReadOnlyList<FreeformHelperViewModel.LogLevelOption> LogLevelOptions => _general.LogLevelOptions;
-    public IReadOnlyList<FreeformHelperViewModel.CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions => _mappingExport.CadOutputFwDiffAutoModeOptions;
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> NotchExportFileTypeOptions => _mappingExport.NotchExportFileTypeOptions;
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportProfileOption> NotchExportProfileOptions => _mappingExport.NotchExportProfileOptions;
-    public IReadOnlyList<FreeformHelperViewModel.NotchCompensationModelOption> NotchCompensationModelOptions => _notch.NotchCompensationModelOptions;
+    public IReadOnlyList<ScanOrderOption> ScanOrderOptions => _grid.ScanOrderOptions;
+    public IReadOnlyList<GridAlignmentOption> GridAlignmentOptions => _grid.GridAlignmentOptions;
+    public IReadOnlyList<RegularSourceModeOption> RegularSourceModeOptions => _grid.RegularSourceModeOptions;
+    public IReadOnlyList<RegularSourceLayerOption> RegularSourceLayerOptions => _grid.RegularSourceLayerOptions;
+    public IReadOnlyList<LogLevelOption> LogLevelOptions => _general.LogLevelOptions;
+    public IReadOnlyList<CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoModeOptions => _mappingExport.CadOutputFwDiffAutoModeOptions;
+    public IReadOnlyList<NotchExportFileTypeOption> NotchExportFileTypeOptions => _mappingExport.NotchExportFileTypeOptions;
+    public IReadOnlyList<NotchExportProfileOption> NotchExportProfileOptions => _mappingExport.NotchExportProfileOptions;
+    public IReadOnlyList<NotchCompensationModelOption> NotchCompensationModelOptions => _notch.NotchCompensationModelOptions;
 
     public ActiveAreaPixelsDraft ActiveAreaPixels => _grid.ActiveAreaPixels;
 
@@ -177,20 +177,20 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     public bool ImportOnlyClosedPolylines { get => _general.ImportOnlyClosedPolylines; set => _general.ImportOnlyClosedPolylines = value; }
     public bool ImportBlockPolylines { get => _general.ImportBlockPolylines; set => _general.ImportBlockPolylines = value; }
     public bool RecalcBoundsOnLayerFilter { get => _general.RecalcBoundsOnLayerFilter; set => _general.RecalcBoundsOnLayerFilter = value; }
-    public FreeformHelperViewModel.ScanOrderOption SelectedScanOrderOption { get => _grid.SelectedScanOrderOption; set => _grid.SelectedScanOrderOption = value; }
+    public ScanOrderOption SelectedScanOrderOption { get => _grid.SelectedScanOrderOption; set => _grid.SelectedScanOrderOption = value; }
     public decimal MatchThreshold { get => _general.MatchThreshold; set => _general.MatchThreshold = value; }
     public decimal FreeformAxisThreshold { get => _general.FreeformAxisThreshold; set => _general.FreeformAxisThreshold = value; }
     public bool EnableAutoDetectXy { get => _general.EnableAutoDetectXy; set => _general.EnableAutoDetectXy = value; }
     public bool EnableFreeformEdgeSpecialization { get => _general.EnableFreeformEdgeSpecialization; set => _general.EnableFreeformEdgeSpecialization = value; }
     public bool AutoReplayStep2AfterProjectLoad { get => _general.AutoReplayStep2AfterProjectLoad; set => _general.AutoReplayStep2AfterProjectLoad = value; }
     public bool ApplyAppVisualPreferencesOnProjectLoad { get => _general.ApplyAppVisualPreferencesOnProjectLoad; set => _general.ApplyAppVisualPreferencesOnProjectLoad = value; }
-    public FreeformHelperViewModel.RegularSourceModeOption SelectedRegularSourceModeOption { get => _grid.SelectedRegularSourceModeOption; set => _grid.SelectedRegularSourceModeOption = value; }
-    public FreeformHelperViewModel.RegularSourceLayerOption SelectedRegularSourceLayerOption { get => _grid.SelectedRegularSourceLayerOption; set => _grid.SelectedRegularSourceLayerOption = value; }
+    public RegularSourceModeOption SelectedRegularSourceModeOption { get => _grid.SelectedRegularSourceModeOption; set => _grid.SelectedRegularSourceModeOption = value; }
+    public RegularSourceLayerOption SelectedRegularSourceLayerOption { get => _grid.SelectedRegularSourceLayerOption; set => _grid.SelectedRegularSourceLayerOption = value; }
     public string DxfRegularSourceHint { get => _grid.DxfRegularSourceHint; set => _grid.DxfRegularSourceHint = value; }
     public bool ShowDiffIndexOverlay { get => _mappingExport.ShowDiffIndexOverlay; set => _mappingExport.ShowDiffIndexOverlay = value; }
     public decimal CadOutputFwDiffIndexStart { get => _mappingExport.CadOutputFwDiffIndexStart; set => _mappingExport.CadOutputFwDiffIndexStart = value; }
     public decimal CadOutputFwDiffIndexAnchorCadId { get => _mappingExport.CadOutputFwDiffIndexAnchorCadId; set => _mappingExport.CadOutputFwDiffIndexAnchorCadId = value; }
-    public FreeformHelperViewModel.CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption { get => _mappingExport.SelectedCadOutputFwDiffAutoModeOption; set => _mappingExport.SelectedCadOutputFwDiffAutoModeOption = value; }
+    public CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoModeOption { get => _mappingExport.SelectedCadOutputFwDiffAutoModeOption; set => _mappingExport.SelectedCadOutputFwDiffAutoModeOption = value; }
     public bool EnableToRegular { get => _notch.EnableToRegular; set => _notch.EnableToRegular = value; }
     public bool EnableToFull { get => _notch.EnableToFull; set => _notch.EnableToFull = value; }
     public bool EnableToFullRuleEngine { get => _notch.EnableToFullRuleEngine; set => _notch.EnableToFullRuleEngine = value; }
@@ -199,17 +199,17 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
     public decimal BoundaryVirtualAreaCapPercent { get => _notch.BoundaryVirtualAreaCapPercent; set => _notch.BoundaryVirtualAreaCapPercent = value; }
     public bool EnableTargetCoverageGuard { get => _notch.EnableTargetCoverageGuard; set => _notch.EnableTargetCoverageGuard = value; }
     public decimal TargetCoverageCapPercent { get => _notch.TargetCoverageCapPercent; set => _notch.TargetCoverageCapPercent = value; }
-    public FreeformHelperViewModel.NotchCompensationModelOption SelectedNotchCompensationModelOption { get => _notch.SelectedNotchCompensationModelOption; set => _notch.SelectedNotchCompensationModelOption = value; }
+    public NotchCompensationModelOption SelectedNotchCompensationModelOption { get => _notch.SelectedNotchCompensationModelOption; set => _notch.SelectedNotchCompensationModelOption = value; }
     public bool ShowNotchCanvasPreview { get => _notch.ShowNotchCanvasPreview; set => _notch.ShowNotchCanvasPreview = value; }
     public bool ShowNotchToRegularLabels { get => _notch.ShowNotchToRegularLabels; set => _notch.ShowNotchToRegularLabels = value; }
     public decimal NotchPreviewVisualizationStep { get => _notch.NotchPreviewVisualizationStep; set => _notch.NotchPreviewVisualizationStep = value; }
     public decimal ToFullStrictOverlapPercent { get => _notch.ToFullStrictOverlapPercent; set => _notch.ToFullStrictOverlapPercent = value; }
     public bool NotchPreviewAutoPlayEnabled { get => _notch.NotchPreviewAutoPlayEnabled; set => _notch.NotchPreviewAutoPlayEnabled = value; }
     public decimal NotchPreviewAutoPlayIntervalMs { get => _notch.NotchPreviewAutoPlayIntervalMs; set => _notch.NotchPreviewAutoPlayIntervalMs = value; }
-    public FreeformHelperViewModel.GridAlignmentOption SelectedGridAlignmentOption { get => _grid.SelectedGridAlignmentOption; set => _grid.SelectedGridAlignmentOption = value; }
-    public FreeformHelperViewModel.LogLevelOption SelectedLogLevelOption { get => _general.SelectedLogLevelOption; set => _general.SelectedLogLevelOption = value; }
-    public FreeformHelperViewModel.NotchExportFileTypeOption SelectedNotchExportFileTypeOption { get => _mappingExport.SelectedNotchExportFileTypeOption; set => _mappingExport.SelectedNotchExportFileTypeOption = value; }
-    public FreeformHelperViewModel.NotchExportProfileOption SelectedNotchExportProfileOption { get => _mappingExport.SelectedNotchExportProfileOption; set => _mappingExport.SelectedNotchExportProfileOption = value; }
+    public GridAlignmentOption SelectedGridAlignmentOption { get => _grid.SelectedGridAlignmentOption; set => _grid.SelectedGridAlignmentOption = value; }
+    public LogLevelOption SelectedLogLevelOption { get => _general.SelectedLogLevelOption; set => _general.SelectedLogLevelOption = value; }
+    public NotchExportFileTypeOption SelectedNotchExportFileTypeOption { get => _mappingExport.SelectedNotchExportFileTypeOption; set => _mappingExport.SelectedNotchExportFileTypeOption = value; }
+    public NotchExportProfileOption SelectedNotchExportProfileOption { get => _mappingExport.SelectedNotchExportProfileOption; set => _mappingExport.SelectedNotchExportProfileOption = value; }
     public decimal MappingWeightIou { get => _mappingExport.MappingWeightIou; set => _mappingExport.MappingWeightIou = value; }
     public decimal MappingWeightCentroidDistance { get => _mappingExport.MappingWeightCentroidDistance; set => _mappingExport.MappingWeightCentroidDistance = value; }
     public decimal MappingWeightAreaRatio { get => _mappingExport.MappingWeightAreaRatio; set => _mappingExport.MappingWeightAreaRatio = value; }
@@ -436,7 +436,7 @@ public sealed partial class SettingsWindowViewModel : ObservableObject
         private readonly Action<FreeformHelperViewModel.DxfLayerCategory, bool> _applySelection;
 
         public LayerCategoryRow(
-            FreeformHelperViewModel.DxfLayerCategoryState state,
+            DxfLayerCategoryState state,
             Action<FreeformHelperViewModel.DxfLayerCategory, bool> applySelection)
         {
             Category = state.Category;

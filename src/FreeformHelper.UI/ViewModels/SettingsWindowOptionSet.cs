@@ -27,7 +27,7 @@ internal sealed class SettingsWindowOptionSet
         SelectedRegularSourceLayer = RegularSourceLayer.FirstOrDefault(o =>
             string.Equals(o.Name, owner.SelectedRegularSourceLayerOption.Name, StringComparison.Ordinal))
             ?? GetFirstOrDefault(RegularSourceLayer)
-            ?? new FreeformHelperViewModel.RegularSourceLayerOption(null, "Select layer");
+            ?? new RegularSourceLayerOption(null, "Select layer");
         SelectedLogLevel = PickOption(
             LogLevel,
             o => string.Equals(o.Value, owner.SelectedLogLevelOption.Value, StringComparison.OrdinalIgnoreCase),
@@ -42,41 +42,41 @@ internal sealed class SettingsWindowOptionSet
             NotchCompensationModel, o => o.Value == owner.SelectedNotchCompensationModelOption.Value, static o => o.Display);
     }
 
-    public IReadOnlyList<FreeformHelperViewModel.ScanOrderOption> ScanOrder { get; }
+    public IReadOnlyList<ScanOrderOption> ScanOrder { get; }
 
-    public IReadOnlyList<FreeformHelperViewModel.GridAlignmentOption> GridAlignment { get; }
+    public IReadOnlyList<GridAlignmentOption> GridAlignment { get; }
 
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> RegularSourceMode { get; }
+    public IReadOnlyList<RegularSourceModeOption> RegularSourceMode { get; }
 
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayer { get; }
+    public IReadOnlyList<RegularSourceLayerOption> RegularSourceLayer { get; }
 
-    public IReadOnlyList<FreeformHelperViewModel.LogLevelOption> LogLevel { get; }
+    public IReadOnlyList<LogLevelOption> LogLevel { get; }
 
-    public IReadOnlyList<FreeformHelperViewModel.CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoMode { get; }
+    public IReadOnlyList<CadOutputFwDiffAutoModeOption> CadOutputFwDiffAutoMode { get; }
 
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> NotchExportFileType { get; }
+    public IReadOnlyList<NotchExportFileTypeOption> NotchExportFileType { get; }
 
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportProfileOption> NotchExportProfile { get; }
+    public IReadOnlyList<NotchExportProfileOption> NotchExportProfile { get; }
 
-    public IReadOnlyList<FreeformHelperViewModel.NotchCompensationModelOption> NotchCompensationModel { get; }
+    public IReadOnlyList<NotchCompensationModelOption> NotchCompensationModel { get; }
 
-    public FreeformHelperViewModel.ScanOrderOption SelectedScanOrder { get; }
+    public ScanOrderOption SelectedScanOrder { get; }
 
-    public FreeformHelperViewModel.GridAlignmentOption SelectedGridAlignment { get; }
+    public GridAlignmentOption SelectedGridAlignment { get; }
 
-    public FreeformHelperViewModel.RegularSourceModeOption SelectedRegularSourceMode { get; }
+    public RegularSourceModeOption SelectedRegularSourceMode { get; }
 
-    public FreeformHelperViewModel.RegularSourceLayerOption SelectedRegularSourceLayer { get; }
+    public RegularSourceLayerOption SelectedRegularSourceLayer { get; }
 
-    public FreeformHelperViewModel.LogLevelOption SelectedLogLevel { get; }
+    public LogLevelOption SelectedLogLevel { get; }
 
-    public FreeformHelperViewModel.CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoMode { get; }
+    public CadOutputFwDiffAutoModeOption SelectedCadOutputFwDiffAutoMode { get; }
 
-    public FreeformHelperViewModel.NotchExportFileTypeOption SelectedNotchExportFileType { get; }
+    public NotchExportFileTypeOption SelectedNotchExportFileType { get; }
 
-    public FreeformHelperViewModel.NotchExportProfileOption SelectedNotchExportProfile { get; }
+    public NotchExportProfileOption SelectedNotchExportProfile { get; }
 
-    public FreeformHelperViewModel.NotchCompensationModelOption SelectedNotchCompensationModel { get; }
+    public NotchCompensationModelOption SelectedNotchCompensationModel { get; }
 
     private static T PickOption<T>(IReadOnlyList<T> options, Func<T, bool> isMatch, Func<T, string?> display)
     {

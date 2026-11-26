@@ -142,7 +142,7 @@ internal sealed class RuntimeQueryOutputCommands
 
     private RuntimeQueryResponseEnvelope? TryResolveNotchExportFormat(
         string formatText,
-        out FreeformHelperViewModel.NotchExportFileTypeOption option,
+        out NotchExportFileTypeOption option,
         out string normalizedFormat)
     {
         var requestedFormat = formatText.Trim().ToLowerInvariant();
@@ -205,7 +205,7 @@ internal sealed class RuntimeQueryOutputCommands
 
     private static RuntimeQueryResponseEnvelope BuildNotchExportResult(
         FreeformHelperViewModel helper,
-        FreeformHelperViewModel.NotchExportFileTypeOption option,
+        NotchExportFileTypeOption option,
         string normalizedFormat,
         NotchExportTargetState target,
         long elapsedMs)

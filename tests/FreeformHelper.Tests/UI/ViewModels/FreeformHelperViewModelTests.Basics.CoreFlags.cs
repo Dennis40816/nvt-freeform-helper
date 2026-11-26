@@ -120,10 +120,10 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.True(vm.IsNotchValidationIncomingEmpty);
         Assert.True(vm.IsNotchValidationOutgoingEmpty);
 
-        vm.NotchValidationItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { directItem };
-        vm.NotchValidationDirectItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { directItem };
-        vm.NotchValidationIncomingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { incomingItem };
-        vm.NotchValidationOutgoingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { outgoingItem };
+        vm.NotchValidationItems = new ObservableCollection<NotchValidationDisplayItem> { directItem };
+        vm.NotchValidationDirectItems = new ObservableCollection<NotchValidationDisplayItem> { directItem };
+        vm.NotchValidationIncomingItems = new ObservableCollection<NotchValidationDisplayItem> { incomingItem };
+        vm.NotchValidationOutgoingItems = new ObservableCollection<NotchValidationDisplayItem> { outgoingItem };
 
         Assert.True(vm.HasNotchValidationItems);
         Assert.False(vm.IsNotchValidationItemsEmpty);
@@ -131,10 +131,10 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.True(vm.HasNotchValidationIncomingItems);
         Assert.True(vm.HasNotchValidationOutgoingItems);
 
-        vm.NotchValidationItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>();
-        vm.NotchValidationDirectItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>();
-        vm.NotchValidationIncomingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>();
-        vm.NotchValidationOutgoingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>();
+        vm.NotchValidationItems = new ObservableCollection<NotchValidationDisplayItem>();
+        vm.NotchValidationDirectItems = new ObservableCollection<NotchValidationDisplayItem>();
+        vm.NotchValidationIncomingItems = new ObservableCollection<NotchValidationDisplayItem>();
+        vm.NotchValidationOutgoingItems = new ObservableCollection<NotchValidationDisplayItem>();
 
         Assert.False(vm.HasNotchValidationItems);
         Assert.True(vm.IsNotchValidationItemsEmpty);

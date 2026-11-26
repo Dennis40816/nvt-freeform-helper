@@ -160,7 +160,7 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
         Action<IReadOnlyList<int>, IReadOnlyList<int>>? resetPadSize,
         Action<IReadOnlyCollection<int>, FreeformType>? setFreeform,
         Func<int, IReadOnlyList<(int CadId, double RatioPercent)>>? getCrossIcOwnerShares,
-        Func<int, IReadOnlyList<FreeformHelperViewModel.NotchRowPreview>>? getNotchRowsByRegularPad,
+        Func<int, IReadOnlyList<NotchRowPreview>>? getNotchRowsByRegularPad,
         Action<IReadOnlyCollection<int>>? highlightCadOwnerPads,
         Action<int>? focusRegularMatches,
         Action<int>? highlightRegularMatches,
@@ -240,7 +240,7 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
         Func<int, IReadOnlyList<int>>? getMatchedCadPadIds,
         Func<int, IReadOnlyList<PadMatchLink>>? getMatchedCadLinks,
         Func<int, IReadOnlyList<(int CadId, double RatioPercent)>>? getCrossIcOwnerShares,
-        Func<int, IReadOnlyList<FreeformHelperViewModel.NotchRowPreview>>? getNotchRowsByRegularPad,
+        Func<int, IReadOnlyList<NotchRowPreview>>? getNotchRowsByRegularPad,
         Action<IReadOnlyCollection<int>>? highlightCadOwnerPads,
         PadInspectorSnapshot? inspectorSnapshot)
     {
@@ -466,13 +466,13 @@ public sealed partial class RegularPadInfoViewModel : ObservableObject, IPadInfo
     private static DisplayValues BuildNotchRowDisplay(
         int regularPadId,
         DisplayValues display,
-        Func<int, IReadOnlyList<FreeformHelperViewModel.NotchRowPreview>>? getNotchRowsByRegularPad,
+        Func<int, IReadOnlyList<NotchRowPreview>>? getNotchRowsByRegularPad,
         Action<IReadOnlyCollection<int>>? highlightCadOwnerPads)
     {
         var relatedRows = getNotchRowsByRegularPad?.Invoke(regularPadId)
             ?.OrderBy(row => row.RowNumber)
             .ToList()
-            ?? new List<FreeformHelperViewModel.NotchRowPreview>();
+            ?? new List<NotchRowPreview>();
         var notchRowSummaryText = $"Notch rows: {relatedRows.Count} (REG {regularPadId})";
         var notchRowFlowCards = new List<PadInfoRelationCardViewModel>();
         foreach (var row in relatedRows.Take(8))

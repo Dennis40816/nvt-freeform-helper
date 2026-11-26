@@ -25,11 +25,11 @@ internal sealed class SettingsGridDraftOwner
     private decimal _activeAreaHeight;
     private decimal _panelBiasX;
     private decimal _panelBiasY;
-    private FreeformHelperViewModel.ScanOrderOption _selectedScanOrderOption;
-    private FreeformHelperViewModel.RegularSourceModeOption _selectedRegularSourceModeOption;
-    private FreeformHelperViewModel.RegularSourceLayerOption _selectedRegularSourceLayerOption;
+    private ScanOrderOption _selectedScanOrderOption;
+    private RegularSourceModeOption _selectedRegularSourceModeOption;
+    private RegularSourceLayerOption _selectedRegularSourceLayerOption;
     private string _dxfRegularSourceHint;
-    private FreeformHelperViewModel.GridAlignmentOption _selectedGridAlignmentOption;
+    private GridAlignmentOption _selectedGridAlignmentOption;
     private ObservableCollection<SettingsWindowViewModel.CascadeIcDraftRow> _cascadeIcSettings;
 
     internal readonly record struct Seed(
@@ -43,11 +43,11 @@ internal sealed class SettingsGridDraftOwner
         decimal ActiveAreaHeight,
         decimal PanelBiasX,
         decimal PanelBiasY,
-        FreeformHelperViewModel.ScanOrderOption SelectedScanOrderOption,
-        FreeformHelperViewModel.RegularSourceModeOption SelectedRegularSourceModeOption,
-        FreeformHelperViewModel.RegularSourceLayerOption SelectedRegularSourceLayerOption,
+        ScanOrderOption SelectedScanOrderOption,
+        RegularSourceModeOption SelectedRegularSourceModeOption,
+        RegularSourceLayerOption SelectedRegularSourceLayerOption,
         string DxfRegularSourceHint,
-        FreeformHelperViewModel.GridAlignmentOption SelectedGridAlignmentOption,
+        GridAlignmentOption SelectedGridAlignmentOption,
         ObservableCollection<SettingsWindowViewModel.CascadeIcDraftRow> CascadeIcSettings);
 
     public SettingsGridDraftOwner(
@@ -58,10 +58,10 @@ internal sealed class SettingsGridDraftOwner
         IEnumerable<int> perIcYChannels,
         Func<int, int, int, IEnumerable<int>, IEnumerable<int>, CascadeDraftLayout> buildCascadeLayout,
         Action<string> markEdited,
-        IReadOnlyList<FreeformHelperViewModel.ScanOrderOption> scanOrderOptions,
-        IReadOnlyList<FreeformHelperViewModel.GridAlignmentOption> gridAlignmentOptions,
-        IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> regularSourceModeOptions,
-        IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> regularSourceLayerOptions,
+        IReadOnlyList<ScanOrderOption> scanOrderOptions,
+        IReadOnlyList<GridAlignmentOption> gridAlignmentOptions,
+        IReadOnlyList<RegularSourceModeOption> regularSourceModeOptions,
+        IReadOnlyList<RegularSourceLayerOption> regularSourceLayerOptions,
         Action<string> propertyChanging,
         Action<string> propertyChanged)
     {
@@ -98,10 +98,10 @@ internal sealed class SettingsGridDraftOwner
 
     public object? ProjectIdentity => _readDraftProjectIdentity();
 
-    public IReadOnlyList<FreeformHelperViewModel.ScanOrderOption> ScanOrderOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.GridAlignmentOption> GridAlignmentOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceModeOption> RegularSourceModeOptions { get; }
-    public IReadOnlyList<FreeformHelperViewModel.RegularSourceLayerOption> RegularSourceLayerOptions { get; }
+    public IReadOnlyList<ScanOrderOption> ScanOrderOptions { get; }
+    public IReadOnlyList<GridAlignmentOption> GridAlignmentOptions { get; }
+    public IReadOnlyList<RegularSourceModeOption> RegularSourceModeOptions { get; }
+    public IReadOnlyList<RegularSourceLayerOption> RegularSourceLayerOptions { get; }
 
     public decimal XChannels
     {
@@ -163,19 +163,19 @@ internal sealed class SettingsGridDraftOwner
         set => SetValue(ref _panelBiasY, value, nameof(PanelBiasY));
     }
 
-    public FreeformHelperViewModel.ScanOrderOption SelectedScanOrderOption
+    public ScanOrderOption SelectedScanOrderOption
     {
         get => _selectedScanOrderOption;
         set => SetValue(ref _selectedScanOrderOption, value, nameof(SelectedScanOrderOption));
     }
 
-    public FreeformHelperViewModel.RegularSourceModeOption SelectedRegularSourceModeOption
+    public RegularSourceModeOption SelectedRegularSourceModeOption
     {
         get => _selectedRegularSourceModeOption;
         set => SetValue(ref _selectedRegularSourceModeOption, value, nameof(SelectedRegularSourceModeOption), _ => _propertyChanged(nameof(IsDxfLayerRegularSource)));
     }
 
-    public FreeformHelperViewModel.RegularSourceLayerOption SelectedRegularSourceLayerOption
+    public RegularSourceLayerOption SelectedRegularSourceLayerOption
     {
         get => _selectedRegularSourceLayerOption;
         set => SetValue(ref _selectedRegularSourceLayerOption, value, nameof(SelectedRegularSourceLayerOption));
@@ -187,7 +187,7 @@ internal sealed class SettingsGridDraftOwner
         set => SetValue(ref _dxfRegularSourceHint, value, nameof(DxfRegularSourceHint));
     }
 
-    public FreeformHelperViewModel.GridAlignmentOption SelectedGridAlignmentOption
+    public GridAlignmentOption SelectedGridAlignmentOption
     {
         get => _selectedGridAlignmentOption;
         set => SetValue(ref _selectedGridAlignmentOption, value, nameof(SelectedGridAlignmentOption), _ => _propertyChanged(nameof(IsPanelAlignment)));
