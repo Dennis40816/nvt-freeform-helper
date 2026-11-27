@@ -9,13 +9,9 @@ using Xunit;
 namespace FreeformHelper.Tests;
 
 /// <summary>
-/// Pins the gap between what the target coverage guard budgets and what the v2.2 firmware node
-/// pair keeps on the anchor (issue #64, inventory finding NOTCH_OUT-D01). The guard runs for the
-/// CurrentGain model. It treats the retained coverage of the anchor as the combine percent minus
-/// the sum of all legs. The firmware subtracts only the two legs of the MAIN row from the anchor, so
-/// the legs of CONT rows add to their targets without taking anything from the anchor. This test
-/// describes the current result, not the wanted one. A fix that changes the guard budget or the
-/// node format changes the expected values and must say so in its pull request.
+/// Checks that the CurrentGain target coverage guard and the final v2.2 MAIN/CONT nodes retain
+/// the same anchor coverage (issue #64, inventory finding NOTCH_OUT-D01). MAIN excludes the
+/// continuation legs from its combine; continuation rows add only to their targets.
 /// </summary>
 public sealed class NotchGuardVersusFinalNodeCharacterizationTests
 {
@@ -26,12 +22,12 @@ public sealed class NotchGuardVersusFinalNodeCharacterizationTests
     private const double CadSize = 12d;
 
     private static readonly double[] _beforeValues = [100d, 0d, 0d, 0d];
-    private static readonly int[] _expectedMainValues = [0, 188, 1, 40, 2, 40, 0];
+    private static readonly int[] _expectedMainValues = [0, 180, 1, 40, 2, 40, 0];
     private static readonly int[] _expectedContValues = [0, 100, 3, 8, 65535, 0, 1];
-    private static readonly double[] _expectedAfterValues = [108d, 40d, 40d, 8d];
+    private static readonly double[] _expectedAfterValues = [100d, 40d, 40d, 8d];
 
     [Fact]
-    public void Generate_CurrentGainWithGuardCapAboveGuardBudget_KeepsMoreOnTheAnchorThanTheGuardBudgets()
+    public void Generate_CurrentGainWithGuardCapAboveGuardBudget_RetainsTheGuardBudgetOnTheAnchor()
     {
         // The guard budgets the anchor at 188 - (40 + 40 + 8) = 100, which is below the cap of 104.
         var (grid, table) = Generate(targetCoverageCapPercent: 104);
@@ -44,17 +40,18 @@ public sealed class NotchGuardVersusFinalNodeCharacterizationTests
         Assert.Equal(_expectedContValues, cont.Values);
         Assert.All(table.Rows, static row => Assert.DoesNotContain("TG=", row.Comment, StringComparison.Ordinal));
 
-        // The guard budget: combine percent minus every leg of the source.
+        // Restore the source-wide combine used by the guard before subtracting every leg.
+        var fullCombine = main.Values[1] + cont.Values[3];
         var legSum = main.Values[3] + main.Values[5] + cont.Values[3];
-        var guardRetained = main.Values[1] - legSum;
+        var guardRetained = fullCombine - legSum;
         Assert.Equal(100, guardRetained);
 
-        // The firmware result: the CONT leg is not taken from the anchor.
+        // Firmware subtracts MAIN legs only; MAIN has already excluded the CONT leg.
         var simulated = Simulate(grid, table);
         Assert.Equal(_expectedAfterValues, simulated);
-        Assert.True(simulated[0] > guardRetained);
-        Assert.True(simulated[0] > 104d);
-        Assert.Equal(196d, simulated.Sum());
+        Assert.Equal((double)guardRetained, simulated[0]);
+        Assert.InRange(simulated[0], 0d, 104d);
+        Assert.Equal(188d, simulated.Sum());
     }
 
     [Fact]
@@ -65,7 +62,7 @@ public sealed class NotchGuardVersusFinalNodeCharacterizationTests
 
         Assert.Equal(2, table.Rows.Count);
         Assert.All(table.Rows, static row => Assert.Contains("TG=", row.Comment, StringComparison.Ordinal));
-        Assert.Equal(178, table.Rows[0].Values[1]);
+        Assert.Equal(170, table.Rows[0].Values[1]);
     }
 
     private static (RegularGrid Grid, NotchTable Table) Generate(int targetCoverageCapPercent)

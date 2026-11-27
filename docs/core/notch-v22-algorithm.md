@@ -120,7 +120,7 @@ Main output payload:
 ### 6.1 continuation row
 
 If an anchor has more than two target legs:
-- The first row retains the actual `CombinePercent`
+- The first (MAIN) row uses `CombinePercent = original CombinePercent - sum(CONT leg percentages)`, so firmware retains only the anchor coverage after subtracting MAIN's two legs.
 - Continuation rows use a fixed `CombinePercent = 100`
 - Set the continuation bit in `Flags`
 

@@ -44,7 +44,7 @@ public sealed class NotchV22GroupedTargetGenerationBehaviorTests
 
         Assert.Collection(
             table.Rows,
-            main => Assert.Equal(new NotchV22Node(10, 240, 20, 100, 30, 60, 0), main.V22Node),
+            main => Assert.Equal(new NotchV22Node(10, 220, 20, 100, 30, 60, 0), main.V22Node),
             continuation => Assert.Equal(new NotchV22Node(10, 100, 20, 20, 65535, 0, 1), continuation.V22Node));
         Assert.All(table.Rows, row =>
         {
