@@ -15,7 +15,7 @@
                 MaxHeight="{DynamicResource PadInfoContentMaxHeight}"
                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                 HorizontalContentAlignment="Stretch" Padding="{DynamicResource InsetNone}">
-    <Border Classes="viewportBoundContent" Padding="{DynamicResource InsetRight12Bottom12}">
+    <Border Padding="{DynamicResource InsetRight12Bottom12}">
       <StackPanel Spacing="{DynamicResource Space12}">
         <controls:PadHeader x:Name="RegularHeader" Title="{Binding Title}" Subtitle="{Binding Subtitle}">
           <controls:PadHeader.KindMark>
