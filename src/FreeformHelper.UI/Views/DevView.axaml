@@ -6,6 +6,7 @@
              xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             xmlns:views="clr-namespace:FreeformHelper.UI.Views"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.DevView"
              Background="{DynamicResource NfcAppBackgroundBrush}"
@@ -22,6 +23,8 @@
             Classes="viewportBoundContent"
             Padding="{DynamicResource Inset24}">
       <StackPanel Spacing="{DynamicResource Space16}">
+        <views:NotchDetailContent x:Name="DevNotchDetailPreview" DataContext="{Binding NotchDetailPreview}"
+                                  Width="{DynamicResource NotchDetailWidth}" HorizontalAlignment="Left"/>
         <SelectableTextBlock x:Name="DevLoadedText"
                              Text="Dev page (minimal mode)."
                              FontSize="{DynamicResource FontSizeXl}"

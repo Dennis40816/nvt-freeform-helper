@@ -4,4 +4,103 @@
         xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
         x:DataType="viewModels:NotchDetailViewModel">
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
+  <Style Selector="TextBlock.explainHeading, SelectableTextBlock.explainHeading">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeMd}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+  <Style Selector="TextBlock.explainNote, SelectableTextBlock.explainNote">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
+  </Style>
+  <Style Selector=".explainTableHeader TextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
+    <Setter Property="HorizontalAlignment" Value="Right"/>
+    <Setter Property="TextAlignment" Value="Right"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+  <Style Selector=".explainOutputRow TextBlock, .explainOutputRow SelectableTextBlock">
+    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyCode}"/>
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeMd}"/>
+  </Style>
+  <Style Selector="SelectableTextBlock.explainOutputValue">
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
+    <Setter Property="HorizontalAlignment" Value="Right"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+  <Style Selector="SelectableTextBlock.explainOutputValue.muted">
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
+  </Style>
+  <Style Selector=".explainCellRow TextBlock, .explainCellRow SelectableTextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
+    <Setter Property="LineHeight" Value="{DynamicResource Space20}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+  <Style Selector="Grid.explainCoverageHeader">
+    <Setter Property="HorizontalAlignment" Value="Right"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="ColumnSpacing" Value="{DynamicResource Space4}"/>
+  </Style>
+  <Style Selector="Rectangle.explainCoverageSwatch">
+    <Setter Property="Width" Value="{DynamicResource NotchExplanationHeaderSwatchSize}"/>
+    <Setter Property="Height" Value="{DynamicResource NotchExplanationHeaderSwatchSize}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+  <Style Selector="SelectableTextBlock.explainNumber">
+    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyCode}"/>
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
+    <Setter Property="HorizontalAlignment" Value="Right"/>
+    <Setter Property="TextAlignment" Value="Right"/>
+  </Style>
+  <Style Selector="SelectableTextBlock.explainFormula">
+    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyCode}"/>
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
+    <Setter Property="LineHeight" Value="{DynamicResource Space20}"/>
+  </Style>
+  <Style Selector="Border.explainCard">
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMd}"/>
+    <Setter Property="Padding" Value="{DynamicResource Inset8}"/>
+  </Style>
+  <Style Selector="Border.explainDifference">
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Background" Value="{DynamicResource NfcWarningSurfaceBrush}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{DynamicResource NotchExplanationChipInset}"/>
+  </Style>
+  <Style Selector="StackPanel.explainLegendRow">
+    <Setter Property="Orientation" Value="Horizontal"/>
+    <Setter Property="Spacing" Value="{DynamicResource Space8}"/>
+  </Style>
+  <Style Selector=".explainLegendRow TextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
+  </Style>
+  <Style Selector="Border.explainLegendSwatch, Rectangle.explainLegendSwatch">
+    <Setter Property="Width" Value="{DynamicResource NotchExplanationSwatchWidth}"/>
+    <Setter Property="Height" Value="{DynamicResource NotchExplanationBarHeight}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+  <Style Selector="Border.explainLegendSwatch">
+    <Setter Property="BorderThickness" Value="{DynamicResource BorderThin}"/>
+  </Style>
+  <Style Selector="Border.explainLegendSwatch.cad">
+    <Setter Property="Background" Value="{DynamicResource BrushNotchCadFill}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushNotchCadStroke}"/>
+  </Style>
+  <Style Selector="Rectangle.explainLegendSwatch.toFull">
+    <Setter Property="Fill" Value="{DynamicResource BrushNotchExplanationReachFill}"/>
+    <Setter Property="Stroke" Value="{DynamicResource BrushNotchExplanationReachOutline}"/>
+    <Setter Property="StrokeThickness" Value="{DynamicResource NotchPreviewToFullStrokeWidth}"/>
+    <Setter Property="StrokeDashArray" Value="{DynamicResource NotchExplanationDashes}"/>
+  </Style>
+  <Style Selector="Border.explainLegendSwatch.neighbor">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushNotchExplanationNeighbor}"/>
+  </Style>
+  <Style Selector="Border.explainLegendSwatch.regular">
+    <Setter Property="BorderBrush" Value="{DynamicResource BrushNotchExplanationRegular}"/>
+  </Style>
 </Styles>

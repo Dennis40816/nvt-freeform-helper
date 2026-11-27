@@ -123,6 +123,15 @@ Diagnostics and edit review use a review workspace similar to export:
 2. Whether regular / diff numbering is reasonable
 3. Whether the Step3 Notch overlay matches expectations
 
+### 6.3 Notch Detail
+
+Open `Notch detail` from a selected CAD pad's info header. The preview labels output
+shares; `Output rows` shows the V2.2 MAIN/CONT integers, followed by exact cell values,
+rounding or drop differences, and formulas. CAD pads with multiple winning sources
+have an IC/source selector. Losing or ineligible pads show a reason. `Allocations (Q7)`
+is collapsed initially and retains the threshold warning and original allocation values.
+Row explanations require CadAllocation with V2.2 enabled; V2.1 output is not explained.
+
 ## 7. Right panel: main workflow
 
 ## 7.1 General settings
