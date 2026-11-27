@@ -11,10 +11,8 @@
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>
-  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml"/>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
-  <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
   <Style Selector="panels|WorkspaceShell.dxfEditDetails /template/ SelectableTextBlock.workspaceMainTitle">
     <Setter Property="IsVisible" Value="False"/>
   </Style>
@@ -23,7 +21,5 @@
     <Setter Property="BorderThickness" Value="{DynamicResource BorderNone}"/>
     <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
   </Style>
-  <Style Selector="Button.actionGhost controls|FontIcon">
-    <Setter Property="Foreground" Value="{Binding $parent[Button].Foreground}"/>
-  </Style>
+
 </Styles>

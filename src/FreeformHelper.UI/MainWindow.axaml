@@ -9,8 +9,8 @@
         Title="FreeformHelper Modern"
         Icon="/Assets/AppIcon/freeform-helper.ico"
         WindowState="Maximized"
-        Background="{DynamicResource BrushBgApp}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcAppBackgroundBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         FontSize="{Binding FreeformHelper.GlobalFontBaseSize, FallbackValue=12}"
         WindowStartupLocation="CenterScreen">
   <Window.DataTemplates>
@@ -36,8 +36,8 @@
           RowDefinitions="Auto,*">
       <!-- Shell header -->
       <Border Grid.Row="0"
-              Background="{DynamicResource BrushBgSurface}"
-              BorderBrush="{DynamicResource BrushBorder}"
+              Background="{DynamicResource NfcSurfaceBrush}"
+              BorderBrush="{DynamicResource NfcBorderMutedBrush}"
               BorderThickness="{StaticResource BorderBottomThin}"
               Padding="{StaticResource Inset10_6}">
         <Border Classes="shellTabStrip"

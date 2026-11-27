@@ -23,7 +23,7 @@
                    VerticalAlignment="Center"/>
         <Button Grid.Column="2"
                 Content="Columns / sort"
-                Classes="actionGhost actionTextButton"
+                Classes="actionGhost"
                 ToolTip.Tip="{Binding ArtifactSortStatusText}">
           <Button.Flyout>
             <MenuFlyout>
@@ -85,10 +85,9 @@
                  x:Name="CoordinateArtifactList"
                  ItemsSource="{Binding ArtifactRows}"
                  SelectedItem="{Binding SelectedArtifactRow, Mode=TwoWay}"
-                 Classes="scrollV2 workspaceDataList coordinateArtifactList"
+                 Classes="workspaceDataList coordinateArtifactList"
                  Background="{DynamicResource BrushTransparent}"
                  BorderThickness="{DynamicResource BorderNone}"
-                 ScrollViewer.AllowAutoHide="False"
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
           <ListBox.ItemsPanel>
@@ -127,7 +126,7 @@
         </ListBox>
       </Grid>
       <Border Grid.Row="2"
-              BorderBrush="{DynamicResource BrushBorder}"
+              BorderBrush="{DynamicResource NfcBorderMutedBrush}"
               BorderThickness="{DynamicResource BorderTopThin}"
               Padding="{DynamicResource InsetTop8}">
         <StackPanel x:Name="CoordinateFooterActions"
@@ -135,21 +134,21 @@
                     HorizontalAlignment="Right"
                     Spacing="{DynamicResource Space6}">
           <Button Content="Details"
-                  Classes="actionGhost actionTextButton"
+                  Classes="actionGhost"
                   IsEnabled="{Binding HasSelectedArtifact}"
                   Command="{Binding ShowArtifactDetailCommand}"
                   CommandParameter="{Binding SelectedArtifactRow}"/>
           <Button Content="Copy selected"
-                  Classes="actionGhost actionTextButton"
+                  Classes="actionGhost"
                   IsEnabled="{Binding HasSelectedArtifact}"
                   Command="{Binding CopySelectedArtifactCommand}"
                   ToolTip.Tip="Copy the selected coordinate row."/>
           <Button Content="Copy all"
-                  Classes="actionGhost actionTextButton"
+                  Classes="actionGhost"
                   Command="{Binding CopyAllArtifactsCommand}"
                   ToolTip.Tip="Copy all coordinate rows in table order."/>
           <Button Content="Export…"
-                  Classes="actionPrimary actionTextButton"
+                  Classes="actionPrimary"
                   ToolTip.Tip="Export CSV or JSON in table order.">
             <Button.Flyout>
               <MenuFlyout>

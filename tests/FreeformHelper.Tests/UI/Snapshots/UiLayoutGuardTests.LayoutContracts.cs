@@ -12,11 +12,12 @@ public sealed partial class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
 
         var controlsStyles = ReadAllStylesText(repoRoot);
-        Assert.Contains("Style Selector=\"ScrollViewer.viewportBoundScroll\"", controlsStyles, StringComparison.Ordinal);
-        Assert.Contains("HorizontalContentAlignment\" Value=\"Stretch", controlsStyles, StringComparison.Ordinal);
-        Assert.Contains("Padding\" Value=\"0", controlsStyles, StringComparison.Ordinal);
-        Assert.Contains("Style Selector=\"Border.viewportBoundContent\"", controlsStyles, StringComparison.Ordinal);
-        Assert.Contains("$parent[ScrollViewer].Viewport.Width", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("avares://Nvt.Core.Avalonia/Theme/ScrollStyles.axaml", controlsStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain(ExtractStyleBlocks(controlsStyles),
+            static style => Regex.IsMatch(style.Selector, @"\bScrollBar\b"));
+        Assert.DoesNotContain("AllowAutoHide", controlsStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("Style Selector=\"ScrollViewer.viewportBoundScroll\"", controlsStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("Style Selector=\"Border.viewportBoundContent\"", controlsStyles, StringComparison.Ordinal);
         Assert.Contains("Style Selector=\"ToggleButton.rightPanelTab\"", controlsStyles, StringComparison.Ordinal);
 
         var mainWindow = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml"));
@@ -26,7 +27,7 @@ public sealed partial class UiLayoutGuardTests
         var freeformView = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.axaml"));
         Assert.Contains("x:Name=\"RightSettingsScroll\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("x:Name=\"LeftSettingsScroll\"", freeformView, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"scrollDevCandidate viewportBoundScroll\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"viewportBoundScroll\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"viewportBoundContent\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("Padding=\"{StaticResource InsetRight12Bottom20}\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("ShowNotchToRegularLabels=\"{Binding IsNotchToRegularPreviewVisible}\"", freeformView, StringComparison.Ordinal);
@@ -54,16 +55,16 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("Text=\"{Binding CadLayerBulkToggleText}\"", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerBulkToggleIcon", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerBulkToggleSwitch", leftPanel, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"dangerTextButton dxfEditMiniAction\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfEditMiniAction actionDanger\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Content=\"Rotate\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Content=\"Move\"", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("actionDanger actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("actionGhost actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("actionNeutral actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
         var dxfOverlapCheckButton = FindXamlElementTagContaining(leftPanel, "Button", "CheckDxfQualityCommand");
-        Assert.Contains("Classes=\"workspaceActionButton\"", dxfOverlapCheckButton, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"workspaceActionButton actionNeutral\"", dxfOverlapCheckButton, StringComparison.Ordinal);
         Assert.DoesNotContain("actionTextButton", dxfOverlapCheckButton, StringComparison.Ordinal);
-        Assert.DoesNotContain("actionNeutral", dxfOverlapCheckButton, StringComparison.Ordinal);
+        Assert.Contains("actionNeutral", dxfOverlapCheckButton, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerSegmentRail", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerSegmentAction", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("Margin=\"{StaticResource InsetRight12Bottom12}\"", leftPanel, StringComparison.Ordinal);
@@ -107,7 +108,7 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("IsVisible=\"{Binding IsStep4SectionSelected}\"", settingsWindow, StringComparison.Ordinal);
         Assert.Contains("x:Name=\"Step5Section\"", settingsWindow, StringComparison.Ordinal);
         Assert.Contains("IsVisible=\"{Binding IsStep5SectionSelected}\"", settingsWindow, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"dangerTextButton\"", settingsWindow, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"actionDanger\"", settingsWindow, StringComparison.Ordinal);
         Assert.Contains("Content=\"Cancel\"", settingsWindow, StringComparison.Ordinal);
         Assert.Contains("Content=\"Save Settings\"", settingsWindow, StringComparison.Ordinal);
         Assert.DoesNotContain("actionDanger actionTextButton", settingsWindow, StringComparison.Ordinal);
@@ -177,44 +178,18 @@ public sealed partial class UiLayoutGuardTests
 
         var actionStyles = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Action.axaml"));
         Assert.Contains("Button.viewportOverlayAction:pointerover", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("BrushActionInverseBackground", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("Button.dangerTextButton", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("BrushActionDangerOnNeutralForeground", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("BrushActionDangerForeground", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("Button.dxfEditMiniAction:pointerover", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("BrushActionTextHoverBackground", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("Button.dxfEditMiniAction", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("CornerRadius\" Value=\"{StaticResource RadiusSm}\"", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("HorizontalAlignment\" Value=\"Stretch\"", actionStyles, StringComparison.Ordinal);
-        var actionChipBaseStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "Button.actionChip, ToggleButton.actionChip");
-        var chipStatusBaseStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "Border.chipStatus");
-        Assert.Equal("{StaticResource BorderControl}", GetSetterValue(actionChipBaseStyle.Body, "BorderThickness"));
-        Assert.Equal("{StaticResource BorderControl}", GetSetterValue(chipStatusBaseStyle.Body, "BorderThickness"));
-        Assert.Contains("Button.dangerTextButton.dxfEditMiniAction:pointerover", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("ToggleButton.canvasQuickToggle:checked", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushToggleCheckedBackground", actionStyles, StringComparison.Ordinal);
+        Assert.Contains("BrushToggleCheckedForeground", actionStyles, StringComparison.Ordinal);
+        var chipStyle = ExtractStyleBlocks(actionStyles)
+            .Single(static style => style.Selector == "Button.productChipAction, ToggleButton.productChipAction" &&
+                GetSetterValue(style.Body, "BorderThickness") is not null);
+        Assert.Equal("{StaticResource BorderControl}", GetSetterValue(chipStyle.Body, "BorderThickness"));
+        AssertCoreRoleAppearanceIsOwnedByCore(repoRoot);
         Assert.DoesNotContain("ToggleButton.dxfLayerBulkToggle", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("ToggleButton.actionTextButton.actionNeutral:checked", actionStyles, StringComparison.Ordinal);
-        Assert.DoesNotContain("Button.actionNeutral.dxfEditMiniAction", actionStyles, StringComparison.Ordinal);
-        Assert.DoesNotContain("Button.actionGhost.dxfEditMiniAction", actionStyles, StringComparison.Ordinal);
-        var dxfMiniHoverStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "Button.dxfEditMiniAction:pointerover");
-        Assert.Equal("{DynamicResource BrushActionTextHoverForeground}", GetSetterValue(dxfMiniHoverStyle.Body, "Foreground"));
-        Assert.DoesNotContain("BrushButtonNeutralForeground", dxfMiniHoverStyle.Body, StringComparison.Ordinal);
-        Assert.DoesNotContain("BrushTextMuted", dxfMiniHoverStyle.Body, StringComparison.Ordinal);
-        var dxfMiniPressedStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "Button.dxfEditMiniAction:pressed");
-        Assert.Equal("{DynamicResource BrushActionTextHoverForeground}", GetSetterValue(dxfMiniPressedStyle.Body, "Foreground"));
-        var dxfDangerMiniHoverStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "Button.dangerTextButton.dxfEditMiniAction:pointerover");
-        Assert.Equal("{DynamicResource BrushActionDangerForeground}", GetSetterValue(dxfDangerMiniHoverStyle.Body, "Foreground"));
-        var dxfMiniDisabledStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "Button.dxfEditMiniAction:disabled");
-        Assert.Equal("{DynamicResource BrushButtonDisabledForeground}", GetSetterValue(dxfMiniDisabledStyle.Body, "Foreground"));
-        var dxfMiniDisabledHoverStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "Button.dxfEditMiniAction:disabled:pointerover, Button.dxfEditMiniAction:disabled:pressed");
-        Assert.Equal("{DynamicResource BrushButtonDisabledForeground}", GetSetterValue(dxfMiniDisabledHoverStyle.Body, "Foreground"));
-        Assert.DoesNotContain("BrushButtonNeutralForeground", dxfMiniDisabledHoverStyle.Body, StringComparison.Ordinal);
+        var miniLayout = ExtractStyleBlocks(actionStyles)
+            .Single(static style => style.Selector == "Button.dxfEditMiniAction");
+        Assert.Equal("Stretch", GetSetterValue(miniLayout.Body, "HorizontalAlignment"));
     }
 
     [Fact]
@@ -307,10 +282,10 @@ public sealed partial class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
 
         var devView = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DevView.axaml"));
-        Assert.Contains("Classes=\"dangerTextButton dxfEditMiniAction\"", devView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfEditMiniAction actionDanger\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", devView, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"workspaceActionButton\"", devView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"workspaceActionButton actionNeutral\"", devView, StringComparison.Ordinal);
         Assert.DoesNotContain("actionDanger actionTextButton dxfEditMiniAction", devView, StringComparison.Ordinal);
         Assert.DoesNotContain("actionGhost actionTextButton dxfEditMiniAction", devView, StringComparison.Ordinal);
         Assert.DoesNotContain("actionNeutral actionTextButton dxfEditMiniAction", devView, StringComparison.Ordinal);

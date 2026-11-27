@@ -46,7 +46,7 @@ public sealed partial class PadCanvas
 
         var valueFontMin = GetResourceDouble("NotchApplySimulationAaValueFontMin", 8d);
         var valueFontMax = GetResourceDouble("NotchApplySimulationAaValueFontMax", 15d);
-        var textBrush = GetResourceBrush("BrushTextPrimary", Brushes.White);
+        var textBrush = GetResourceBrush("NfcTextBrush", Brushes.White);
         var visiblePads = _visibleRegularUnselected.Concat(_visibleRegularSelected);
 
         foreach (var pad in visiblePads)

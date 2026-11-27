@@ -7,8 +7,8 @@
              x:Class="FreeformHelper.UI.Views.CoordinatePlannerHostView"
              x:DataType="vm:CoordinatePlannerHostViewModel"
              x:CompileBindings="True"
-             Background="{DynamicResource BrushBgApp}"
-             Foreground="{DynamicResource BrushTextPrimary}">
+             Background="{DynamicResource NfcAppBackgroundBrush}"
+             Foreground="{DynamicResource NfcTextBrush}">
   <Grid RowDefinitions="Auto,*">
     <Border Classes="workspaceFirstPeekBar">
       <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}">
@@ -33,7 +33,7 @@
         <Button Grid.Column="3"
                 x:Name="RefreshPlanButton"
                 Content="Refresh"
-                Classes="actionNeutral actionTextButton"
+                Classes="actionNeutral"
                 IsVisible="{Binding IsWorkspaceStale}"
                 ToolTip.Tip="{Binding StaleWorkspaceBannerText}"
                 Command="{Binding OpenCoordinatePlannerCommand}"/>
@@ -46,12 +46,12 @@
                   MaxWidth="{DynamicResource IndexMappingReportMinWidth}">
         <TextBlock Text="{Binding PlaceholderTitle}" FontSize="{DynamicResource FontSizeXl}" FontWeight="SemiBold"/>
         <TextBlock Text="{Binding PlaceholderSubtitle}"
-                   Foreground="{DynamicResource BrushTextMuted}"
+                   Foreground="{DynamicResource NfcTextMutedBrush}"
                    TextWrapping="Wrap"/>
         <Button x:Name="BuildPlanButton"
                 Content="Build from current workspace"
                 HorizontalAlignment="Right"
-                Classes="actionPrimary actionTextButton"
+                Classes="actionPrimary"
                 Command="{Binding OpenCoordinatePlannerCommand}"
                 IsEnabled="{Binding CanOpenCoordinatePlanner}"/>
       </StackPanel>

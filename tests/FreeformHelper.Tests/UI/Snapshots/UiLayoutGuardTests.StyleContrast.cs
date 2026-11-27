@@ -1,14 +1,108 @@
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using Avalonia.Media;
+using Avalonia.Styling;
+using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
 namespace FreeformHelper.Tests;
 
 public sealed partial class UiLayoutGuardTests
 {
+    private static readonly string[] _themeVariantKeys = ["Dark", "Light"];
+
+    private static readonly string[] _accentOverrideKeys =
+    [
+        "NfcAccentBorderBrush", "NfcAccentBorderLightBrush", "NfcAccentBorderStrongBrush", "NfcAccentBrush",
+        "NfcAccentStrongBrush", "NfcAccentSurfaceBrush", "NfcAccentSurfaceSubtleBrush",
+    ];
+
+    [Theory]
+    [InlineData("White", "#FFFFFF")]
+    [InlineData("Black", "#FF000000")]
+    [InlineData("#FF1E293B", "#1E293B")]
+    public void ContrastLuminanceMeasuresNamedAndArgbColors(string value, string rgb)
+    {
+        Assert.Equal(RelativeLuminance(rgb), RelativeLuminance(value));
+    }
+
+    [Fact]
+    public void CoreButtonRolesHaveOneApplicationIncludeAndSevenAccentOverrides()
+    {
+        var uiRoot = Path.Combine(TestPaths.RepoRoot, "src", "FreeformHelper.UI");
+        var app = XDocument.Parse(TestFiles.ReadContent(Path.Combine(uiRoot, "App.axaml")));
+        var styles = app.Descendants().Single(static element => element.Name.LocalName == "Application.Styles").Elements().ToArray();
+        Assert.Equal("FluentTheme", styles[0].Name.LocalName);
+        Assert.Equal("avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml", (string?)styles[1].Attribute("Source"));
+        var includes = Directory.EnumerateFiles(uiRoot, "*.axaml", SearchOption.AllDirectories)
+            .SelectMany(static path => XDocument.Parse(TestFiles.ReadContent(path)).Descendants())
+            .Where(static element => element.Name.LocalName == "StyleInclude" &&
+                (string?)element.Attribute("Source") == "avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml");
+        Assert.Single(includes);
+        var tokens = XDocument.Parse(TestFiles.ReadContent(Path.Combine(uiRoot, "Styles", "Tokens.axaml")));
+        XNamespace xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
+        var themes = tokens.Descendants().Where(element => (string?)element.Attribute(xaml + "Key") is "Dark" or "Light").ToArray();
+        Assert.Equal(_themeVariantKeys, themes.Select(element => (string?)element.Attribute(xaml + "Key")).Order(StringComparer.Ordinal));
+        foreach (var theme in themes)
+        {
+            var accents = theme.Elements().Select(element => (string?)element.Attribute(xaml + "Key"))
+                .Where(static key => key?.StartsWith("NfcAccent", StringComparison.Ordinal) == true).ToArray();
+            Assert.Equal(_accentOverrideKeys, accents.Order(StringComparer.Ordinal));
+        }
+    }
+
+    private static void AssertCoreRoleAppearanceIsOwnedByCore(string repoRoot)
+    {
+        var uiRoot = Path.Combine(repoRoot, "src", "FreeformHelper.UI");
+        var appearance = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "Theme", "Background", "BorderBrush", "BorderThickness", "Foreground", "Template", "CornerRadius", "Width", "Height",
+            "MinHeight", "Padding", "FontFamily", "FontSize", "FontWeight", "Opacity", "FocusAdorner", "Transitions", "ClipToBounds",
+            "HorizontalContentAlignment", "VerticalContentAlignment",
+        };
+        var role = new Regex(@"(?:Button|ToggleButton)\.(?:actionPrimary|actionNeutral|actionDanger|actionGhost|actionIconButton|chipAction|consoleHeaderAction|panelChromeToggle|simulationActionButton|workspaceActionButton|workspaceGroupActionButton|workspaceHeaderAction|workspaceInfoButton|workspaceSearchClearButton|workspaceSubtleAction|workspaceTextAction|padInfoActionButton|padInfoHeaderActionButton|padInfoInfoButton|padInfoOverrideIconButton|dxfEditMiniAction|dxfEditCompactIconAction|viewMenuButton|iconTextButton|dangerTextButton|confirmDialogActionButton|confirmDialogDangerButton)\b|Border\.chipStatus\b");
+        foreach (var path in Directory.EnumerateFiles(uiRoot, "*.axaml", SearchOption.AllDirectories))
+        {
+            var document = XDocument.Parse(TestFiles.ReadContent(path));
+            foreach (var style in document.Descendants().Where(static element => element.Name.LocalName == "Style"))
+            {
+                var originalSelector = (string?)style.Attribute("Selector") ?? string.Empty;
+                var selector = Regex.Replace(originalSelector, @":not\([^)]*\)", string.Empty);
+                Assert.DoesNotMatch(@"\.(actionTextButton|actionChip|actionButton)\b", selector);
+                var publicRoles = new[] { "actionPrimary", "actionNeutral", "actionDanger", "actionGhost", "actionIconButton", "chipAction" };
+                var broadRoleStyle = originalSelector.Split(',').Any(part =>
+                    Regex.IsMatch(Regex.Replace(part, @":not\([^)]*\)", string.Empty), @"(?:^|[ >])(Button|ToggleButton)(?=:|$)") &&
+                    publicRoles.Any(name => !part.Contains($":not(.{name})", StringComparison.Ordinal)));
+                // A glyph inside a role button is its own control; Core sets no icon size.
+                var controlSelector = string.Join(',', selector.Split(',')
+                    .Where(static part => !Regex.IsMatch(part, @"controls\|FontIcon[.\w]*\s*$")));
+                if (!role.IsMatch(controlSelector) && !broadRoleStyle) continue;
+                Assert.DoesNotContain(style.Elements().Where(static element => element.Name.LocalName == "Setter"),
+                    setter => appearance.Contains((string?)setter.Attribute("Property") ?? string.Empty));
+            }
+            foreach (var element in document.Descendants())
+            {
+                var classes = ((string?)element.Attribute("Classes") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                Assert.DoesNotContain(classes, static token => token is "actionTextButton" or "actionChip" or "actionButton");
+                Assert.DoesNotContain(element.Attributes(), static attribute =>
+                    attribute.Name.LocalName is "Classes.actionTextButton" or "Classes.actionChip" or "Classes.actionButton");
+                if (classes.Any(static token => token is "viewportOverlayAction" or "canvasQuickToggle" or "canvasToolbarIcon" or
+                    "productChipAction" or "productFilterChip" or "shellTab" or "rightPanelTab" or "rightPanelBrowserTab" or
+                    "settingsNavItem" or "panelBlockHeader" or "workspaceFoldHeader" or "workspaceTableHeaderButton"))
+                {
+                    Assert.DoesNotContain(classes, static token => token is "actionPrimary" or "actionNeutral" or "actionDanger" or
+                        "actionGhost" or "actionIconButton" or "chipAction");
+                }
+                var key = element.Attributes().SingleOrDefault(static attribute => attribute.Name.LocalName == "Key")?.Value;
+                Assert.False(key?.StartsWith("Nvt.Button.", StringComparison.Ordinal) == true ||
+                    key?.StartsWith("Nvt.Focus.", StringComparison.Ordinal) == true, $"Core resource override in {path}: {key}");
+            }
+        }
+    }
+
     private static void AssertInteractiveActionStateContrast(string actionStyles, string tokens, double minimumRatio)
     {
-        var colorsByTheme = ReadThemeColors(tokens);
-        var colorKeysByBrush = ReadBrushColorKeys(tokens);
+        var localColorKeys = ReadBrushColorKeys(tokens);
         var offenders = new List<string>();
 
         foreach (var style in ExtractStyleBlocks(actionStyles))
@@ -25,17 +119,10 @@ public sealed partial class UiLayoutGuardTests
                 continue;
             }
 
-            if (!colorKeysByBrush.TryGetValue(backgroundBrush, out var backgroundKey) ||
-                !colorKeysByBrush.TryGetValue(foregroundBrush, out var foregroundKey))
-            {
-                continue;
-            }
-
             foreach (var theme in new[] { "Dark", "Light" })
             {
-                Assert.True(colorsByTheme.TryGetValue(theme, out var colors), $"Theme not found: {theme}");
-                Assert.True(colors.TryGetValue(backgroundKey, out var background), $"{theme} token missing: {backgroundKey}");
-                Assert.True(colors.TryGetValue(foregroundKey, out var foreground), $"{theme} token missing: {foregroundKey}");
+                var background = ReadThemeColor(localColorKeys.GetValueOrDefault(backgroundBrush, backgroundBrush), theme);
+                var foreground = ReadThemeColor(localColorKeys.GetValueOrDefault(foregroundBrush, foregroundBrush), theme);
 
                 var ratio = ContrastRatio(background, foreground);
                 if (ratio < minimumRatio)
@@ -76,7 +163,7 @@ public sealed partial class UiLayoutGuardTests
                 }
 
                 var foreground = GetSetterValue(style.Body, "Foreground");
-                if (!string.Equals(foreground, "{DynamicResource BrushButtonDisabledForeground}", StringComparison.Ordinal))
+                if (!string.Equals(foreground, "{DynamicResource NfcTextDisabledBrush}", StringComparison.Ordinal))
                 {
                     offenders.Add($"{selector} -> Foreground={foreground ?? "<missing>"}");
                 }
@@ -148,14 +235,12 @@ public sealed partial class UiLayoutGuardTests
         return match.Success ? match.Groups["key"].Value : null;
     }
 
-    private static void AssertMinimumContrast(string tokens, string backgroundKey, string foregroundKey, double minimumRatio)
+    private static void AssertMinimumContrast(string backgroundKey, string foregroundKey, double minimumRatio)
     {
-        var colorsByTheme = ReadThemeColors(tokens);
         foreach (var theme in new[] { "Dark", "Light" })
         {
-            Assert.True(colorsByTheme.TryGetValue(theme, out var colors), $"Theme not found: {theme}");
-            Assert.True(colors.TryGetValue(backgroundKey, out var background), $"{theme} token missing: {backgroundKey}");
-            Assert.True(colors.TryGetValue(foregroundKey, out var foreground), $"{theme} token missing: {foregroundKey}");
+            var background = ReadThemeColor(backgroundKey, theme);
+            var foreground = ReadThemeColor(foregroundKey, theme);
 
             var ratio = ContrastRatio(background, foreground);
             Assert.True(
@@ -164,28 +249,17 @@ public sealed partial class UiLayoutGuardTests
         }
     }
 
-    private static Dictionary<string, Dictionary<string, string>> ReadThemeColors(string tokens)
+    private static string ReadThemeColor(string key, string theme)
     {
-        var themePattern = new Regex(
-            @"<ResourceDictionary\s+x:Key=""(?<theme>Dark|Light)"">(?<body>[\s\S]*?)</ResourceDictionary>",
-            RegexOptions.Compiled);
-        var colorPattern = new Regex(
-            @"<Color\s+x:Key=""(?<key>[^""]+)"">(?<value>#[0-9A-Fa-f]{6,8})</Color>",
-            RegexOptions.Compiled);
-        var result = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
-
-        foreach (Match themeMatch in themePattern.Matches(tokens))
+        var app = global::Avalonia.Application.Current!;
+        var variant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+        Assert.True(app.TryGetResource(key, variant, out var resource), $"{theme} token missing: {key}");
+        return resource switch
         {
-            var colors = colorPattern.Matches(themeMatch.Groups["body"].Value)
-                .Cast<Match>()
-                .ToDictionary(
-                    static match => match.Groups["key"].Value,
-                    static match => match.Groups["value"].Value,
-                    StringComparer.Ordinal);
-            result[themeMatch.Groups["theme"].Value] = colors;
-        }
-
-        return result;
+            Color color => color.ToString(),
+            ISolidColorBrush brush => brush.Color.ToString(),
+            _ => throw new InvalidOperationException($"{theme} token is not a solid color or brush: {key}"),
+        };
     }
 
     private static Dictionary<string, string> ReadBrushColorKeys(string tokens)
@@ -210,19 +284,13 @@ public sealed partial class UiLayoutGuardTests
         return (lighter + 0.05) / (darker + 0.05);
     }
 
-    private static double RelativeLuminance(string hex)
+    private static double RelativeLuminance(string value)
     {
-        var rgb = NormalizeRgbHex(hex);
-        var red = SrgbToLinear(Convert.ToInt32(rgb[..2], 16) / 255d);
-        var green = SrgbToLinear(Convert.ToInt32(rgb[2..4], 16) / 255d);
-        var blue = SrgbToLinear(Convert.ToInt32(rgb[4..6], 16) / 255d);
+        var color = Color.Parse(value);
+        var red = SrgbToLinear(color.R / 255d);
+        var green = SrgbToLinear(color.G / 255d);
+        var blue = SrgbToLinear(color.B / 255d);
         return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-    }
-
-    private static string NormalizeRgbHex(string hex)
-    {
-        var value = hex.TrimStart('#');
-        return value.Length == 8 ? value[2..] : value;
     }
 
     private static double SrgbToLinear(double channel)

@@ -9,14 +9,13 @@
              x:Class="FreeformHelper.UI.Views.PadInfoSections.RegularPadInfoContentView"
              x:DataType="vm:RegularPadInfoViewModel">
   <UserControl.Styles>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Primitives/PrimitivesStyles.axaml"/>
   </UserControl.Styles>
-  <ScrollViewer x:Name="RegularPadInfoScroll" Classes="scrollV2"
+  <ScrollViewer Classes="viewportBoundScroll" x:Name="RegularPadInfoScroll"
                 MaxHeight="{DynamicResource PadInfoContentMaxHeight}"
                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                 HorizontalContentAlignment="Stretch" Padding="{DynamicResource InsetNone}">
-    <Border Padding="{DynamicResource InsetRight12Bottom12}">
+    <Border Classes="viewportBoundContent" Padding="{DynamicResource InsetRight12Bottom12}">
       <StackPanel Spacing="{DynamicResource Space12}">
         <controls:PadHeader x:Name="RegularHeader" Title="{Binding Title}" Subtitle="{Binding Subtitle}">
           <controls:PadHeader.KindMark>
@@ -27,7 +26,6 @@
             <Grid ColumnDefinitions="Auto">
               <Border ToolTip.Tip="{Binding LocateMatchToolTip}">
                 <Button Classes="actionGhost"
-                        Classes.actionTextButton="{Binding ShowActionLabels, ElementName=RegularHeader}"
                         Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=RegularHeader}"
                         AutomationProperties.Name="Locate match" Command="{Binding LocateMatchCommand}"
                         IsEnabled="{Binding HasLocateMatchAction}" ToolTip.Tip="{Binding LocateMatchToolTip}">
@@ -130,34 +128,34 @@
             <SelectableTextBlock Classes="padInfoMetaText" Text="Unsaved changes"
                                  IsVisible="{Binding HasPendingChanges}" HorizontalAlignment="Left"/>
             <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}" HorizontalAlignment="Right">
-              <Button Classes="actionTextButton actionGhost" Content="Discard" Command="{Binding DiscardChangesCommand}"/>
-              <Button Classes="actionTextButton actionPrimary" Content="Apply changes"
+              <Button Classes="actionGhost" Content="Discard" Command="{Binding DiscardChangesCommand}"/>
+              <Button Classes="actionPrimary" Content="Apply changes"
                       IsEnabled="{Binding HasPendingChanges}" Command="{Binding ApplyChangesCommand}"
                       ToolTip.Tip="Apply changes and close."/>
             </StackPanel>
           </StackPanel>
         </primitives:SectionFrame>
-        <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}"
+        <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}"
                 Padding="{DynamicResource InsetTop8}">
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}" HorizontalAlignment="Left">
             <SelectableTextBlock Classes="padInfoKeyLabel" Text="Freeform" VerticalAlignment="Center"
                                  ToolTip.Tip="{Binding FreeformActionHint}"/>
             <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.Info}"
                                VerticalAlignment="Center" ToolTip.Tip="{Binding FreeformActionHint}"/>
-            <Button Classes="actionNeutral actionTextButton padInfoActionButton" Content="None"
+            <Button Classes="actionNeutral padInfoActionButton" Content="None"
                     Command="{Binding SetFreeformNoneCommand}" ToolTip.Tip="Mark selection as none."/>
-            <Button Classes="actionNeutral actionTextButton padInfoActionButton" Content="X"
+            <Button Classes="actionNeutral padInfoActionButton" Content="X"
                     Command="{Binding SetFreeformXCommand}" ToolTip.Tip="Mark selection as X-way."/>
-            <Button Classes="actionNeutral actionTextButton padInfoActionButton" Content="Y"
+            <Button Classes="actionNeutral padInfoActionButton" Content="Y"
                     Command="{Binding SetFreeformYCommand}" ToolTip.Tip="Mark selection as Y-way."/>
-            <Button Classes="actionNeutral actionTextButton padInfoActionButton" Content="XY"
+            <Button Classes="actionNeutral padInfoActionButton" Content="XY"
                     Command="{Binding SetFreeformXYCommand}" ToolTip.Tip="Mark selection as XY-way."/>
           </StackPanel>
         </Border>
-        <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}"
+        <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}"
                 Padding="{DynamicResource InsetTop8}">
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Classes="actionTextButton actionGhost" Content="Reset size" Command="{Binding ResetPadSizeCommand}"/>
+            <Button Classes="actionGhost" Content="Reset size" Command="{Binding ResetPadSizeCommand}"/>
           </StackPanel>
         </Border>
         <panels:CollapsiblePanel x:Name="GeometryDebugSection" Title="Geometry / Debug"

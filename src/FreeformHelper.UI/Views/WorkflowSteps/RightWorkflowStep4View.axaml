@@ -39,7 +39,7 @@
 
           </StackPanel>
         </Border>
-        <Button Content="Analyze mapping"
+        <Button Classes="actionNeutral" Content="Analyze mapping"
                 Command="{Binding AnalyzeIndexMappingCommand}"
                 HorizontalAlignment="Stretch"
                 ToolTip.Tip="Step 4: analyze CAD↔Regular index mapping and open report window."/>
@@ -66,7 +66,7 @@
                                              Text="{Binding SuggestionText}"
                                              TextWrapping="Wrap"/>
                       </StackPanel>
-                      <Button Grid.Column="1"
+                      <Button Classes="actionNeutral" Grid.Column="1"
                               Content="Select"
                               Command="{Binding DataContext.SelectStep4DuplicateDiffGroupCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                               CommandParameter="{Binding}"/>
@@ -93,7 +93,7 @@
                                        FormatString="0"
                                        Value="{Binding Step4Index.ShiftDelta, Mode=TwoWay}"
                                        ToolTip.Tip="Apply one shared diff offset to all selected CAD output pads."/>
-              <Button Grid.Column="1"
+              <Button Classes="actionNeutral" Grid.Column="1"
                       Command="{Binding OffsetSelectedCadOutputFwDiffIndicesCommand}"
                       IsEnabled="{Binding CanOffsetSelectedCadOutputFwDiffIndices}"
                       Content="Shift"
@@ -114,7 +114,7 @@
                              Text="Detailed issues open in a separate report window (copy supported)."/>
         <Separator/>
         <SelectableTextBlock Classes="stepNote" Text="Clears mapping diagnostics and invalidates export and validation." TextWrapping="Wrap"/>
-        <Button Classes="actionTextButton actionDanger" Content="Clear result"
+        <Button Classes="actionDanger" Content="Clear result"
                 HorizontalAlignment="Right" Command="{Binding ClearStep4ResultCommand}"
                 ToolTip.Tip="Clears mapping diagnostics and invalidates export and validation."/>
       </StackPanel>

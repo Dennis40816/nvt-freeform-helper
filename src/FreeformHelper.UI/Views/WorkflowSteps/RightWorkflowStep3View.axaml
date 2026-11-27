@@ -126,7 +126,7 @@
         </panels:CollapsiblePanel>
         <Separator/>
         <SelectableTextBlock Classes="stepNote" Text="Clears preview and invalidates export and validation results." TextWrapping="Wrap"/>
-        <Button Classes="actionTextButton actionDanger" Content="Clear preview"
+        <Button Classes="actionDanger" Content="Clear preview"
                 HorizontalAlignment="Right" Command="{Binding ClearStep3ResultCommand}"
                 ToolTip.Tip="Clears preview and invalidates export and validation results."/>
       </StackPanel>

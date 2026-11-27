@@ -10,8 +10,8 @@
              x:Class="FreeformHelper.UI.Views.FreeformHelperView"
              IsEnabled="{Binding IsProjectEditingEnabled}"
              PointerPressed="OnRootPointerPressed"
-             Background="{DynamicResource BrushBgApp}"
-             Foreground="{DynamicResource BrushTextPrimary}">
+             Background="{DynamicResource NfcAppBackgroundBrush}"
+             Foreground="{DynamicResource NfcTextBrush}">
   <Design.DataContext>
     <vm:FreeformHelperViewModel/>
   </Design.DataContext>
@@ -29,9 +29,9 @@
     <Border Grid.Row="0"
             Grid.ColumnSpan="5"
             Padding="{StaticResource Inset8_6}"
-            Background="{DynamicResource BrushBgSurface}"
+            Background="{DynamicResource NfcSurfaceBrush}"
             BorderThickness="{StaticResource BorderBottomThin}"
-            BorderBrush="{DynamicResource BrushBorder}">
+            BorderBrush="{DynamicResource NfcBorderMutedBrush}">
       <Menu x:Name="MainMenu"
             HorizontalAlignment="Left">
         <MenuItem Header="File">
@@ -74,7 +74,7 @@
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="{StaticResource InsetBottom12}">
           <SelectableTextBlock Text="DXF" FontWeight="SemiBold"/>
           <Button Grid.Column="1"
-                  Classes="actionIconButton panelChromeToggle"
+                  Classes="actionIconButton panelChromeToggle actionGhost"
                   ToolTip.Tip="Hide Layers &amp; DXF panel"
                   Click="HideLeftPanel_Click">
             <controls:FontIcon Classes="symbols"
@@ -83,7 +83,7 @@
         </Grid>
         <ScrollViewer x:Name="LeftSettingsScroll"
                       Grid.Row="1"
-                      Classes="scrollDevCandidate viewportBoundScroll"
+                      Classes="viewportBoundScroll"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
           <Border Classes="viewportBoundContent"
@@ -97,7 +97,7 @@
     <GridSplitter Grid.Row="2"
                   Grid.Column="1"
                   Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource BrushBorder}"
+                  Background="{DynamicResource NfcBorderMutedBrush}"
                   HorizontalAlignment="Stretch"
                   ShowsPreview="True"/>
 
@@ -149,7 +149,7 @@
                               Focusable="True"/>
           <SelectableTextBlock Text="{Binding CanvasHintText}"
                                IsVisible="{Binding HasCanvasHint}"
-                               Foreground="{DynamicResource BrushTextMuted}"
+                               Foreground="{DynamicResource NfcTextMutedBrush}"
                                TextWrapping="Wrap"
                                TextAlignment="Center"
                                HorizontalAlignment="Center"
@@ -164,7 +164,7 @@
 
         <GridSplitter Grid.Row="1"
                       HorizontalAlignment="Stretch"
-                      Background="{DynamicResource BrushBorder}"
+                      Background="{DynamicResource NfcBorderMutedBrush}"
                       ResizeDirection="Rows"
                       ShowsPreview="True"/>
 
@@ -178,7 +178,7 @@
     <GridSplitter Grid.Row="2"
                   Grid.Column="3"
                   Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource BrushBorder}"
+                  Background="{DynamicResource NfcBorderMutedBrush}"
                   HorizontalAlignment="Stretch"
                   ShowsPreview="True"/>
 
@@ -220,7 +220,7 @@
           </Border>
           <Button Grid.Column="1"
                   VerticalAlignment="Center"
-                  Classes="actionIconButton panelChromeToggle"
+                  Classes="actionIconButton panelChromeToggle actionGhost"
                   ToolTip.Tip="Hide Settings &amp; Inspector panel"
                   Click="HideRightPanel_Click">
             <controls:FontIcon Classes="symbols"
@@ -230,7 +230,7 @@
 
         <ScrollViewer x:Name="RightSettingsScroll"
                       Grid.Row="1"
-                      Classes="scrollDevCandidate viewportBoundScroll"
+                      Classes="viewportBoundScroll"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
           <Border Classes="viewportBoundContent"
@@ -253,13 +253,13 @@
             IsHitTestVisible="True">
       <views:PadInfoPopover x:Name="PadInfoPopover"/>
       <Path x:Name="PadInfoLink"
-            Stroke="{DynamicResource BrushTextPrimary}"
+            Stroke="{DynamicResource NfcTextBrush}"
             StrokeThickness="{StaticResource Space1}"
             IsHitTestVisible="False"/>
       <Ellipse x:Name="PadInfoAnchor"
                Width="{StaticResource PadInfoAnchorSize}"
                Height="{StaticResource PadInfoAnchorSize}"
-               Fill="{DynamicResource BrushTextPrimary}"
+               Fill="{DynamicResource NfcTextBrush}"
                IsHitTestVisible="False"/>
     </Canvas>
 

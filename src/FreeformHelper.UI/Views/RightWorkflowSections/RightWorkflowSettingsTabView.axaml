@@ -109,13 +109,13 @@
                              IsExpanded="{Binding IsStep6Expanded, Mode=TwoWay}">
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
         <SelectableTextBlock Classes="stepNote" Text="{Binding ValidationTraceHint}" TextWrapping="Wrap"/>
-        <Button Content="Use Selected REG" Command="{Binding UseSelectedRegularForNotchValidationCommand}"
+        <Button Classes="actionNeutral" Content="Use Selected REG" Command="{Binding UseSelectedRegularForNotchValidationCommand}"
                 ToolTip.Tip="Copy currently selected REG id and run validation."/>
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space6}">
           <controls:NumberScrubber Minimum="0" Maximum="2000000000" SmallChange="1" FormatString="0"
                                    Value="{Binding NotchValidationRegularPadId, Mode=TwoWay}"
                                    ToolTip.Tip="Target REG id to inspect row/flow trace."/>
-          <Button Grid.Column="1" Content="Analyze" Command="{Binding AnalyzeNotchValidationCommand}"
+          <Button Classes="actionNeutral" Grid.Column="1" Content="Analyze" Command="{Binding AnalyzeNotchValidationCommand}"
                   ToolTip.Tip="Analyze direct rows and incoming/outgoing allocations for this REG."/>
         </Grid>
 
@@ -137,13 +137,15 @@
               <SelectableTextBlock Classes="stepNote"
                                    IsVisible="{Binding IsNotchValidationDirectEmpty}"
                                    Text="No DIRECT rows for current REG."/>
-              <ScrollViewer Classes="scrollV2"
+              <ScrollViewer Classes="viewportBoundScroll"
                             VerticalScrollBarVisibility="Auto"
                             HorizontalScrollBarVisibility="Disabled"
                             MaxHeight="{StaticResource NotchDetailListMaxHeight}"
                             IsVisible="{Binding HasNotchValidationDirectItems}">
-                <ItemsControl ItemsSource="{Binding NotchValidationDirectItems}"
-                              ItemTemplate="{StaticResource NotchValidationRowTemplate}"/>
+                <Border Classes="viewportBoundContent">
+                  <ItemsControl ItemsSource="{Binding NotchValidationDirectItems}"
+                                ItemTemplate="{StaticResource NotchValidationRowTemplate}"/>
+                </Border>
               </ScrollViewer>
             </StackPanel>
           </panels:CollapsiblePanel>
@@ -160,13 +162,15 @@
               <SelectableTextBlock Classes="stepNote"
                                    IsVisible="{Binding IsNotchValidationIncomingEmpty}"
                                    Text="No IN rows for current REG."/>
-              <ScrollViewer Classes="scrollV2"
+              <ScrollViewer Classes="viewportBoundScroll"
                             VerticalScrollBarVisibility="Auto"
                             HorizontalScrollBarVisibility="Disabled"
                             MaxHeight="{StaticResource NotchDetailListMaxHeight}"
                             IsVisible="{Binding HasNotchValidationIncomingItems}">
-                <ItemsControl ItemsSource="{Binding NotchValidationIncomingItems}"
-                              ItemTemplate="{StaticResource NotchValidationRowTemplate}"/>
+                <Border Classes="viewportBoundContent">
+                  <ItemsControl ItemsSource="{Binding NotchValidationIncomingItems}"
+                                ItemTemplate="{StaticResource NotchValidationRowTemplate}"/>
+                </Border>
               </ScrollViewer>
             </StackPanel>
           </panels:CollapsiblePanel>
@@ -183,13 +187,15 @@
               <SelectableTextBlock Classes="stepNote"
                                    IsVisible="{Binding IsNotchValidationOutgoingEmpty}"
                                    Text="No OUT rows for current REG."/>
-              <ScrollViewer Classes="scrollV2"
+              <ScrollViewer Classes="viewportBoundScroll"
                             VerticalScrollBarVisibility="Auto"
                             HorizontalScrollBarVisibility="Disabled"
                             MaxHeight="{StaticResource NotchDetailListMaxHeight}"
                             IsVisible="{Binding HasNotchValidationOutgoingItems}">
-                <ItemsControl ItemsSource="{Binding NotchValidationOutgoingItems}"
-                              ItemTemplate="{StaticResource NotchValidationRowTemplate}"/>
+                <Border Classes="viewportBoundContent">
+                  <ItemsControl ItemsSource="{Binding NotchValidationOutgoingItems}"
+                                ItemTemplate="{StaticResource NotchValidationRowTemplate}"/>
+                </Border>
               </ScrollViewer>
             </StackPanel>
           </panels:CollapsiblePanel>
@@ -198,7 +204,7 @@
                              IsVisible="{Binding IsNotchValidationItemsEmpty}"
                              Text="No rows yet. Run Analyze for current REG."/>
         <Separator/>
-        <Button Classes="actionTextButton actionDanger" Content="Clear trace" HorizontalAlignment="Right"
+        <Button Classes="actionDanger" Content="Clear trace" HorizontalAlignment="Right"
                 Command="{Binding ClearNotchValidationCommand}" ToolTip.Tip="Clear validation trace."/>
       </StackPanel>
     </panels:CollapsiblePanel>

@@ -28,7 +28,7 @@
                              Text="{Binding NotchExportProgressText}"/>
         <Separator/>
         <SelectableTextBlock Classes="stepNote" Text="Clears the export result and Validation Quick Trace." TextWrapping="Wrap"/>
-        <Button Classes="actionTextButton actionDanger" Content="Clear result"
+        <Button Classes="actionDanger" Content="Clear result"
                 HorizontalAlignment="Right" Command="{Binding ClearStep5ResultCommand}"
                 ToolTip.Tip="Clears the export result and Validation Quick Trace."/>
       </StackPanel>

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.UI.Services;
 using Nvt.Core.Avalonia.Theme;
 
 namespace FreeformHelper.UI.Controls;
@@ -51,7 +52,7 @@ public sealed class NotchPreviewCanvas : Control
     {
         base.Render(context);
 
-        var background = GetResourceBrush("BrushBgSurface", Brushes.Transparent);
+        var background = GetResourceBrush("NfcSurfaceBrush", Brushes.Transparent);
         context.FillRectangle(background, new Rect(Bounds.Size));
 
         if (CadPad is null && RegularPads.Count == 0 && ToFullPolygons.Count == 0)
@@ -223,7 +224,7 @@ public sealed class NotchPreviewCanvas : Control
 
     private IBrush GetResourceBrush(string key, IBrush fallback)
     {
-        return UiResourceResolver.GetBrush(this, key, fallback, GetBrush);
+        return ThemeBrushResolver.GetBrush(this, key, fallback, GetBrush);
     }
 
     private Color GetResourceColor(string key, Color fallback)

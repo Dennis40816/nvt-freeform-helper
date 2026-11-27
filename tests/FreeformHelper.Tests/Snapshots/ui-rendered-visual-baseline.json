@@ -4,19 +4,19 @@
     "MainWindow.ConsoleExpanded": {
       "width": 1280,
       "height": 900,
-      "hash": "f000e0007c00e000835ce208e009e00fc00fc00c000fbfffdfe10ffe0fff0003",
+      "hash": "fc0040007fff7fffec5fee0fe00fe00fe00fe00fe00ffffff49fe01fe01fe00f",
       "maxDistance": 36
     },
     "SettingsWindow.Default": {
       "width": 960,
       "height": 760,
-      "hash": "4000ff020000fffc078004cc000046c8040c06fc07f006ce000e04c00000003f",
+      "hash": "4000c0020000fe00e300e5fee000e7de66ee67fe67f067fe659e67e000000012",
       "maxDistance": 24
     },
     "HowToUseView.Default": {
       "width": 1000,
       "height": 700,
-      "hash": "c0007800fffffffec0004000f000fffef800e0006000f000fffe000000000000",
+      "hash": "c0000000fffffffe7ffe7ffefffefffefffe7ffe7ffefffefffe000000000000",
       "maxDistance": 24
     }
   }

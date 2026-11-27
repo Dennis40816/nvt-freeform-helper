@@ -7,9 +7,6 @@
              x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerGuidesSectionView"
              x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
              x:CompileBindings="True">
-  <UserControl.Styles>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
-  </UserControl.Styles>
   <panels:CollapsiblePanel Title="Guides" IsExpanded="True">
     <StackPanel Spacing="{DynamicResource Space8}">
       <StackPanel Classes="panelFormField">

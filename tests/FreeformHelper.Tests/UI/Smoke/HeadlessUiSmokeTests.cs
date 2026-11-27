@@ -7,6 +7,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Platform;
+using Avalonia.Styling;
 using Avalonia.VisualTree;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
@@ -219,30 +220,38 @@ public sealed class HeadlessUiSmokeTests
         }
     }
 
-    [AvaloniaFact]
-    public async Task SharedTooltipStyle_StringTooltipUsesTooltipForegroundTextBlock_Headless()
+    [AvaloniaTheory]
+    [InlineData("Dark")]
+    [InlineData("Light")]
+    public async Task SharedTooltipStyle_StringTooltipUsesTooltipForegroundTextBlock_HeadlessAsync(string theme)
     {
         HeadlessAppBootstrap.EnsureInitialized();
+        var app = Avalonia.Application.Current!;
+        var previousTheme = app.RequestedThemeVariant;
         var target = new Button
         {
             Content = "Tooltip target",
         };
-        ToolTip.SetTip(target, "Tooltip text");
-
-        var normalizedTip = Assert.IsType<TextBlock>(ToolTip.GetTip(target));
-        Assert.Equal("Tooltip text", normalizedTip.Text);
-        var normalizedForeground = Assert.IsAssignableFrom<ISolidColorBrush>(normalizedTip.Foreground);
-        Assert.Equal(Colors.Black, normalizedForeground.Color);
-
         var window = new Window
         {
             Width = 240,
             Height = 120,
-            Content = target,
         };
 
         try
         {
+            app.RequestedThemeVariant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+            ToolTip.SetTip(target, "Tooltip text");
+
+            var normalizedTip = Assert.IsType<TextBlock>(ToolTip.GetTip(target));
+            Assert.Equal("Tooltip text", normalizedTip.Text);
+            // A detached tip has no theme variant yet, so it holds the fallback until it is attached.
+            var detachedForeground = Assert.IsAssignableFrom<ISolidColorBrush>(normalizedTip.Foreground);
+            Assert.Equal(Colors.Black, detachedForeground.Color);
+            Assert.True(app.TryGetResource("NfcTextStrongBrush", app.RequestedThemeVariant, out var resource));
+            var expectedForeground = Assert.IsAssignableFrom<ISolidColorBrush>(resource);
+
+            window.Content = target;
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
 
@@ -250,11 +259,14 @@ public sealed class HeadlessUiSmokeTests
             await HeadlessUiPump.FlushQueueAsync();
 
             Assert.True(ToolTip.GetIsOpen(target));
+            Assert.Same(expectedForeground, normalizedTip.Foreground);
+            Assert.Equal(expectedForeground.Color, Assert.IsAssignableFrom<ISolidColorBrush>(normalizedTip.Foreground).Color);
         }
         finally
         {
             ToolTip.SetIsOpen(target, false);
             window.Close();
+            app.RequestedThemeVariant = previousTheme;
         }
     }
 
