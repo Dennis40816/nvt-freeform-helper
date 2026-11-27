@@ -212,11 +212,7 @@ public sealed partial class UiLayoutGuardTests
         AssertMinimumContrast("NfcSurfaceBrush", "NfcTextDisabledBrush", 4.5);
         AssertMinimumContrast("NfcSurfaceBrush", "NfcTextStrongBrush", 4.5);
         AssertInteractiveActionStateContrast(actionStyles, tokens, 4.5);
-        var quickToggleStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "ToggleButton.canvasQuickToggle" &&
-                GetSetterValue(style.Body, "Foreground") is not null);
-        Assert.Equal("{DynamicResource NfcTextBrush}", GetSetterValue(quickToggleStyle.Body, "Foreground"));
-        Assert.Contains("ToggleButton.canvasQuickToggle:disabled", actionStyles, StringComparison.Ordinal);
+        // Core's marked role states are exercised by P1SelectionAppearanceTests.
 
         var appCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "App.axaml.cs"));
         var tooltipServiceCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Services", "SharedToolTipStyleService.cs"));
@@ -247,9 +243,12 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("<Thickness x:Key=\"BorderInput\">2</Thickness>", tokens, StringComparison.Ordinal);
         Assert.Contains("<Thickness x:Key=\"BorderControl\">1.5</Thickness>", tokens, StringComparison.Ordinal);
         Assert.Contains("BorderThickness\" Value=\"{StaticResource BorderInput}\"", formStyles, StringComparison.Ordinal);
-        Assert.Contains("Style Selector=\"ToggleSwitch\"", formStyles, StringComparison.Ordinal);
-        Assert.Contains("Style Selector=\"ToggleSwitch:checked\"", formStyles, StringComparison.Ordinal);
-        Assert.Contains("BorderBrush\" Value=\"{DynamicResource NfcBorderBrush}\"", formStyles, StringComparison.Ordinal);
+        var switchLayout = ExtractStyleBlocks(formStyles).Single(static style => style.Selector == "ToggleSwitch");
+        Assert.Equal(2, Regex.Count(switchLayout.Body, "<Setter "));
+        Assert.Equal("{DynamicResource FormControlHeight}", GetSetterValue(switchLayout.Body, "Height"));
+        Assert.Equal("{DynamicResource FormControlHeight}", GetSetterValue(switchLayout.Body, "MinHeight"));
+        Assert.DoesNotContain("Style Selector=\"ToggleSwitch:checked\"", formStyles, StringComparison.Ordinal);
+        Assert.Contains("BorderBrush\" Value=\"{DynamicResource NfcBorderMutedBrush}\"", formStyles, StringComparison.Ordinal);
         Assert.DoesNotContain("BorderInput", actionStyles, StringComparison.Ordinal);
 
         var tooltipOffenders = FindIconActionButtonsWithoutToolTips(repoRoot);

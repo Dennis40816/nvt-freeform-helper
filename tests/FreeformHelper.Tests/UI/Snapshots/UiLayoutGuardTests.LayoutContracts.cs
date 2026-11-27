@@ -18,7 +18,7 @@ public sealed partial class UiLayoutGuardTests
         Assert.DoesNotContain("AllowAutoHide", controlsStyles, StringComparison.Ordinal);
         Assert.DoesNotContain("Style Selector=\"ScrollViewer.viewportBoundScroll\"", controlsStyles, StringComparison.Ordinal);
         Assert.DoesNotContain("Style Selector=\"Border.viewportBoundContent\"", controlsStyles, StringComparison.Ordinal);
-        Assert.Contains("Style Selector=\"ToggleButton.rightPanelTab\"", controlsStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("ToggleButton.rightPanelTab", controlsStyles, StringComparison.Ordinal);
 
         var mainWindow = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml"));
         Assert.Contains("WindowState=\"Maximized\"", mainWindow, StringComparison.Ordinal);
@@ -46,7 +46,7 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("Classes=\"boundLayerSelector\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("MaxDropDownHeight=\"{StaticResource LayerListMaxHeight}\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("primitives:BalancedWrapPanel Classes=\"badgeGroup dxfEditBadgeGroup\"", leftPanel, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfLayerBulkToggleButton chipAction\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("IsChecked=\"{Binding IsCadLayerBulkToggleChecked, Mode=TwoWay}\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleContent\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", leftPanel, StringComparison.Ordinal);
@@ -177,10 +177,8 @@ public sealed partial class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
 
         var actionStyles = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Action.axaml"));
-        Assert.Contains("Button.viewportOverlayAction:pointerover", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("ToggleButton.canvasQuickToggle:checked", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("BrushToggleCheckedBackground", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("BrushToggleCheckedForeground", actionStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("Button.viewportOverlayAction:pointerover", actionStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("ToggleButton.canvasQuickToggle:checked", actionStyles, StringComparison.Ordinal);
         var chipStyle = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.productChipAction, ToggleButton.productChipAction" &&
                 GetSetterValue(style.Body, "BorderThickness") is not null);
@@ -254,14 +252,14 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("BalanceLastRow", coreStyles, StringComparison.Ordinal);
         Assert.Contains("DxfEditSummaryBadgeMinWidth", coreStyles, StringComparison.Ordinal);
         Assert.Contains("Button.workspaceActionButton", coreStyles, StringComparison.Ordinal);
-        Assert.Contains("ToggleButton.workspaceFoldHeader:checked", coreStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("ToggleButton.workspaceFoldHeader:checked", coreStyles, StringComparison.Ordinal);
         Assert.Contains("Border.workspaceFileRow", coreStyles, StringComparison.Ordinal);
         Assert.Contains("SelectableTextBlock.workspaceFileRowTitle", coreStyles, StringComparison.Ordinal);
         Assert.Contains("Border.dxfEditAdvancedContent", coreStyles, StringComparison.Ordinal);
         Assert.Contains("Border.dxfEditActionGroup", coreStyles, StringComparison.Ordinal);
         Assert.Contains("Grid.dxfEditActionGroupRow", coreStyles, StringComparison.Ordinal);
         Assert.Contains("ToggleButton.dxfLayerBulkToggleButton", coreStyles, StringComparison.Ordinal);
-        Assert.Contains("ToggleButton.dxfLayerBulkToggleButton:checked", coreStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("ToggleButton.dxfLayerBulkToggleButton:checked", coreStyles, StringComparison.Ordinal);
         Assert.Contains("Border.dxfLayerBulkMixedIndicator", coreStyles, StringComparison.Ordinal);
         Assert.Contains("SelectableTextBlock.dxfLayerBulkToggleLabel", coreStyles, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerBulkToggleIcon", coreStyles, StringComparison.Ordinal);
@@ -283,7 +281,7 @@ public sealed partial class UiLayoutGuardTests
 
         var devView = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DevView.axaml"));
         Assert.Contains("Classes=\"dxfEditMiniAction actionDanger\"", devView, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", devView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfLayerBulkToggleButton chipAction\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"workspaceActionButton actionNeutral\"", devView, StringComparison.Ordinal);
         Assert.DoesNotContain("actionDanger actionTextButton dxfEditMiniAction", devView, StringComparison.Ordinal);

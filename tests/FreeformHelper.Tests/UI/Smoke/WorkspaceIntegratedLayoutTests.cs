@@ -171,7 +171,7 @@ public sealed class WorkspaceIntegratedLayoutTests
     public void ProductCollapsibleTemplateKeepsTheCoreVisualPartsExceptTheHeaderRole()
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        var core = new CollapsiblePanel { Title = "Core header", IsExpanded = true };
+        var core = new CollapsiblePanel { Title = "Core header", IsExpanded = true, UseGhostHeader = true };
         var product = new CollapsiblePanel { Title = "Product header", IsExpanded = true };
         var coreHost = new Border { Child = core };
         coreHost.Styles.Add(new StyleInclude(new Uri("avares://Nvt.Core.Avalonia/"))
@@ -187,6 +187,7 @@ public sealed class WorkspaceIntegratedLayoutTests
                 static control => control.Classes.Contains("panelBlockHeader"));
             Assert.Contains("actionGhost", coreHeader.Classes);
             Assert.DoesNotContain("actionGhost", productHeader.Classes);
+            Assert.False(product.UseGhostHeader);
             var coreParts = PanelTemplateParts(core);
             Assert.NotEmpty(coreParts);
             Assert.Equal(coreParts, PanelTemplateParts(product));

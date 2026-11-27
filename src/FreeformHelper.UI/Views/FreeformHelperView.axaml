@@ -196,7 +196,7 @@
                   VerticalAlignment="Center">
             <StackPanel Orientation="Horizontal"
                         Spacing="{StaticResource Space4}">
-              <ToggleButton Classes="rightPanelBrowserTab"
+              <ToggleButton Classes="actionGhost flat marked" MinWidth="{DynamicResource ButtonMinWidthSm}"
                             IsChecked="{Binding IsRightPanelSettingsTab, Mode=TwoWay}">
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource Space6}">
@@ -206,7 +206,7 @@
                              Text="Settings"/>
                 </StackPanel>
               </ToggleButton>
-              <ToggleButton Classes="rightPanelBrowserTab"
+              <ToggleButton Classes="actionGhost flat marked" MinWidth="{DynamicResource ButtonMinWidthSm}"
                             IsChecked="{Binding IsRightPanelInspectorTab, Mode=TwoWay}">
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource Space6}">

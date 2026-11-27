@@ -3,6 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
         x:DataType="panels:WorkspaceShell">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <!-- This view keeps the soft choice-row fill; the application default is None. -->
+      <x:String x:Key="Nvt.Controls.RestFillMode">Soft</x:String>
+    </ResourceDictionary>
+  </Styles.Resources>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml"/>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
 

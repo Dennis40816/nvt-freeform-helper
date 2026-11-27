@@ -34,6 +34,10 @@ public sealed partial class UiLayoutGuardTests
         var styles = app.Descendants().Single(static element => element.Name.LocalName == "Application.Styles").Elements().ToArray();
         Assert.Equal("FluentTheme", styles[0].Name.LocalName);
         Assert.Equal("avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml", (string?)styles[1].Attribute("Source"));
+        Assert.Equal("avares://Nvt.Core.Avalonia/Theme/TabStyles.axaml", (string?)styles[2].Attribute("Source"));
+        Assert.Equal("avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml", (string?)styles[3].Attribute("Source"));
+        Assert.Equal("avares://Nvt.Core.Avalonia/Theme/ToggleStyles.axaml", (string?)styles[4].Attribute("Source"));
+        Assert.Equal("avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml", (string?)styles[5].Attribute("Source"));
         var includes = Directory.EnumerateFiles(uiRoot, "*.axaml", SearchOption.AllDirectories)
             .SelectMany(static path => XDocument.Parse(TestFiles.ReadContent(path)).Descendants())
             .Where(static element => element.Name.LocalName == "StyleInclude" &&
@@ -60,7 +64,7 @@ public sealed partial class UiLayoutGuardTests
             "MinHeight", "Padding", "FontFamily", "FontSize", "FontWeight", "Opacity", "FocusAdorner", "Transitions", "ClipToBounds",
             "HorizontalContentAlignment", "VerticalContentAlignment",
         };
-        var role = new Regex(@"(?:Button|ToggleButton)\.(?:actionPrimary|actionNeutral|actionDanger|actionGhost|actionIconButton|chipAction|consoleHeaderAction|panelChromeToggle|simulationActionButton|workspaceActionButton|workspaceGroupActionButton|workspaceHeaderAction|workspaceInfoButton|workspaceSearchClearButton|workspaceSubtleAction|workspaceTextAction|padInfoActionButton|padInfoHeaderActionButton|padInfoInfoButton|padInfoOverrideIconButton|dxfEditMiniAction|dxfEditCompactIconAction|viewMenuButton|iconTextButton|dangerTextButton|confirmDialogActionButton|confirmDialogDangerButton)\b|Border\.chipStatus\b");
+        var role = new Regex(@"(?:Button|ToggleButton)\.(?:actionPrimary|actionNeutral|actionDanger|actionGhost|actionIconButton|chipAction|consoleHeaderAction|panelChromeToggle|simulationActionButton|workspaceActionButton|workspaceGroupActionButton|workspaceHeaderAction|workspaceInfoButton|workspaceSearchClearButton|workspaceSubtleAction|workspaceTextAction|padInfoActionButton|padInfoHeaderActionButton|padInfoInfoButton|padInfoOverrideIconButton|dxfEditMiniAction|dxfEditCompactIconAction|viewMenuButton|iconTextButton|dangerTextButton|confirmDialogActionButton|confirmDialogDangerButton|canvasQuickToggle|viewportOverlayAction|rightPanelBrowserTab|settingsNavItem)\b|Border\.chipStatus\b");
         foreach (var path in Directory.EnumerateFiles(uiRoot, "*.axaml", SearchOption.AllDirectories))
         {
             var document = XDocument.Parse(TestFiles.ReadContent(path));
@@ -86,9 +90,25 @@ public sealed partial class UiLayoutGuardTests
                 Assert.DoesNotContain(classes, static token => token is "actionTextButton" or "actionChip" or "actionButton");
                 Assert.DoesNotContain(element.Attributes(), static attribute =>
                     attribute.Name.LocalName is "Classes.actionTextButton" or "Classes.actionChip" or "Classes.actionButton");
+                var adoptedRoles = new Dictionary<string, string[]>(StringComparer.Ordinal)
+                {
+                    ["shellTab"] = ["actionGhost", "flat", "marked"],
+                    ["layerToggle"] = ["actionGhost", "flat"],
+                    ["inspectorTraceToggle"] = ["actionGhost", "flat", "marked"],
+                    ["workspaceFoldHeader"] = ["actionGhost", "flat"],
+                    ["panelBlockHeader"] = [],
+                    ["dxfLayerBulkToggleButton"] = ["chipAction"],
+                };
+                if (classes.Contains("layerToggle")) Assert.DoesNotContain("marked", classes);
+                foreach (var required in adoptedRoles.Where(pair => classes.Contains(pair.Key)).Select(static pair => pair.Value))
+                {
+                    Assert.All(required, name => Assert.Contains(name, classes));
+                    var coreRoles = new[] { "actionPrimary", "actionNeutral", "actionDanger", "actionGhost", "actionIconButton", "chipAction" };
+                    Assert.Equal(required.Where(name => coreRoles.Contains(name)), classes.Where(name => coreRoles.Contains(name)));
+                }
                 if (classes.Any(static token => token is "viewportOverlayAction" or "canvasQuickToggle" or "canvasToolbarIcon" or
-                    "productChipAction" or "productFilterChip" or "shellTab" or "rightPanelTab" or "rightPanelBrowserTab" or
-                    "settingsNavItem" or "panelBlockHeader" or "workspaceFoldHeader" or "workspaceTableHeaderButton"))
+                    "productChipAction" or "productFilterChip" or "rightPanelTab" or "rightPanelBrowserTab" or
+                    "settingsNavItem" or "workspaceTableHeaderButton"))
                 {
                     Assert.DoesNotContain(classes, static token => token is "actionPrimary" or "actionNeutral" or "actionDanger" or
                         "actionGhost" or "actionIconButton" or "chipAction");

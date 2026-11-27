@@ -51,27 +51,33 @@
               <SelectableTextBlock Classes="settingsSectionMeta"
                                    Text="Navigation"/>
               <ToggleButton x:Name="GeneralNavButton"
-                            Classes="settingsNavItem"
+                            Classes="actionGhost flat marked"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="General"
                             IsChecked="{Binding IsGeneralSectionSelected, Mode=TwoWay}"/>
               <ToggleButton x:Name="Step1NavButton"
-                            Classes="settingsNavItem"
+                            Classes="actionGhost flat marked"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 1 · Geometry"
                             IsChecked="{Binding IsStep1SectionSelected, Mode=TwoWay}"/>
               <ToggleButton x:Name="Step2NavButton"
-                            Classes="settingsNavItem"
+                            Classes="actionGhost flat marked"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 2 · Freeform"
                             IsChecked="{Binding IsStep2SectionSelected, Mode=TwoWay}"/>
               <ToggleButton x:Name="Step3NavButton"
-                            Classes="settingsNavItem"
+                            Classes="actionGhost flat marked"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 3 · Notch"
                             IsChecked="{Binding IsStep3SectionSelected, Mode=TwoWay}"/>
               <ToggleButton x:Name="Step4NavButton"
-                            Classes="settingsNavItem"
+                            Classes="actionGhost flat marked"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 4 · Index"
                             IsChecked="{Binding IsStep4SectionSelected, Mode=TwoWay}"/>
               <ToggleButton x:Name="Step5NavButton"
-                            Classes="settingsNavItem"
+                            Classes="actionGhost flat marked"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 5 · Export"
                             IsChecked="{Binding IsStep5SectionSelected, Mode=TwoWay}"/>
             </StackPanel>

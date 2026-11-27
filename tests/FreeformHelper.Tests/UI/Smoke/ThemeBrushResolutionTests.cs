@@ -94,33 +94,33 @@ public sealed class ThemeBrushResolutionTests
     [AvaloniaTheory]
     [InlineData("Dark")]
     [InlineData("Light")]
-    public async Task TextToggleFillDistinguishesCheckedFromUncheckedAsync(string theme)
+    public async Task TextToggleMarkDistinguishesCheckedFromUncheckedAsync(string theme)
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var app = global::Avalonia.Application.Current!;
         var previousTheme = app.RequestedThemeVariant;
-        var on = new ToggleButton { Content = "On", IsChecked = true };
-        var off = new ToggleButton { Content = "Off" };
-        foreach (var toggle in new[] { on, off })
-        {
-            toggle.Classes.Add("canvasQuickToggle");
-        }
+        var on = new ToggleButton { Content = "On", IsChecked = true, Classes = { "actionGhost", "flat", "marked" } };
+        var off = new ToggleButton { Content = "Off", Classes = { "actionGhost", "flat", "marked" } };
 
         var window = new Window { Width = 240, Height = 120, Content = new StackPanel { Children = { on, off } } };
+        window.Classes.Add("reducedMotion");
         try
         {
             app.RequestedThemeVariant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
 
-            // The canvas toolbar has no border or check mark: the fill is the only on/off signal.
+            var canvas = CanvasColor(window);
             var onFill = Assert.IsAssignableFrom<ISolidColorBrush>(on.Background).Color;
             var offFill = Assert.IsAssignableFrom<ISolidColorBrush>(off.Background).Color;
+            var mark = Assert.IsAssignableFrom<ISolidColorBrush>(on.BorderBrush).Color;
             var onText = Assert.IsAssignableFrom<ISolidColorBrush>(on.Foreground).Color;
-            var fillContrast = Contrast(onFill, offFill);
-            var textContrast = Contrast(onText, onFill);
-            Assert.True(fillContrast >= 3.0, $"{theme}: checked/unchecked fill contrast {fillContrast:F2} is below 3:1.");
-            Assert.True(textContrast >= 4.5, $"{theme}: checked label contrast {textContrast:F2} is below 4.5:1.");
+            Assert.Equal(0, onFill.A);
+            Assert.Equal(0, offFill.A);
+            Assert.Equal(0, Assert.IsAssignableFrom<ISolidColorBrush>(off.BorderBrush).Color.A);
+            Assert.True(on.BorderThickness.Left > 0);
+            Assert.True(Contrast(mark, canvas) >= 3.0, $"{theme}: checked mark contrast is below 3:1.");
+            Assert.True(Contrast(onText, canvas) >= 4.5, $"{theme}: checked label contrast is below 4.5:1.");
         }
         finally
         {
@@ -139,18 +139,19 @@ public sealed class ThemeBrushResolutionTests
         var toggle = new ToggleButton
         {
             Content = new FontIcon { Glyph = NvtIcons.FitScreen, Classes = { "symbols" } },
-            Classes = { "viewportOverlayAction" },
+            Classes = { "actionIconButton", "actionGhost" },
         };
         var plain = new Button
         {
             Content = new FontIcon { Glyph = NvtIcons.FitScreen, Classes = { "symbols" } },
-            Classes = { "viewportOverlayAction" },
+            Classes = { "actionIconButton", "actionGhost" },
         };
         var window = new Window
         {
             RequestedThemeVariant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light,
             Content = new StackPanel { Children = { overlay, plain, toggle } },
         };
+        window.Classes.Add("reducedMotion");
         try
         {
             window.Show();
@@ -160,7 +161,7 @@ public sealed class ThemeBrushResolutionTests
             // The fit button is the unnamed floating button; the two named ones show or hide side panels.
             // Without a view model it stays disabled, so the plain button covers the other states.
             var fit = Assert.Single(overlay.GetVisualDescendants().OfType<Button>(),
-                static button => button.Classes.Contains("viewportOverlayAction") && button.Name is null);
+                static button => button.Classes.Contains("actionIconButton") && button.Content is FontIcon { Glyph: NvtIcons.FitScreen } && button.Name is null);
             foreach (var button in new Button[] { fit, plain, toggle })
             {
                 foreach (var state in _viewportStates)
@@ -189,14 +190,21 @@ public sealed class ThemeBrushResolutionTests
         }
     }
 
-    // Dark keeps the 30% resting toolbar from before the Core look; only Light needed a stronger value.
-    // Avalonia applies the toolbar opacity to every shape, so the label blends with the already faded fill.
-    [AvaloniaFact]
-    public async Task LightCanvasToolbarAtRestKeepsTheCheckedToggleVisibleAsync()
+    [AvaloniaTheory]
+    [InlineData("Dark")]
+    [InlineData("Light")]
+    public async Task CanvasToolbarAtRestKeepsTheCheckedMarkVisibleAsync(string theme)
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var overlay = new CanvasOverlayControls();
-        var window = new Window { Width = 900, Height = 200, RequestedThemeVariant = ThemeVariant.Light, Content = overlay };
+        var window = new Window
+        {
+            Width = 900,
+            Height = 200,
+            RequestedThemeVariant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light,
+            Content = overlay,
+        };
+        window.Classes.Add("reducedMotion");
         try
         {
             window.Show();
@@ -208,10 +216,14 @@ public sealed class ThemeBrushResolutionTests
             await HeadlessUiPump.FlushQueueAsync();
 
             var canvas = CanvasColor(window);
-            var fill = CompositeOver(Assert.IsAssignableFrom<ISolidColorBrush>(toggle.Background).Color, toolbar.Opacity, canvas);
-            var text = CompositeOver(Assert.IsAssignableFrom<ISolidColorBrush>(toggle.Foreground).Color, toolbar.Opacity, fill);
-            Assert.True(Contrast(fill, canvas) >= 3d, $"checked fill on the canvas is {Contrast(fill, canvas):F2}:1.");
-            Assert.True(Contrast(text, fill) >= 3d, $"checked label on its fill is {Contrast(text, fill):F2}:1.");
+            var fill = Assert.IsAssignableFrom<ISolidColorBrush>(toggle.Background).Color;
+            var mark = CompositeOver(Assert.IsAssignableFrom<ISolidColorBrush>(toggle.BorderBrush).Color, toolbar.Opacity, canvas);
+            var text = CompositeOver(Assert.IsAssignableFrom<ISolidColorBrush>(toggle.Foreground).Color, toolbar.Opacity, canvas);
+            Assert.Equal(1, toolbar.Opacity);
+            Assert.Equal(0, fill.A);
+            Assert.True(toggle.BorderThickness.Left > 0);
+            Assert.True(Contrast(mark, canvas) >= 3d, $"{theme}: checked mark on the canvas is {Contrast(mark, canvas):F2}:1.");
+            Assert.True(Contrast(text, canvas) >= 4.5d, $"{theme}: checked label on the canvas is {Contrast(text, canvas):F2}:1.");
         }
         finally
         {
