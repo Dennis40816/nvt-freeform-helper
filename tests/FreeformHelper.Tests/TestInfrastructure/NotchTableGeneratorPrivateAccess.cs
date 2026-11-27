@@ -73,7 +73,8 @@ internal static class NotchTableGeneratorPrivateAccess
         [UnsafeAccessorType(CandidatesByDiffType)] object candidatesByDiff,
         int nullValue,
         bool applyTargetCoverageGuard,
-        int targetCoverageCapPercent);
+        int targetCoverageCapPercent,
+        NotchV22ExplanationCollector? explanationCollector = null);
 
     [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "BuildV22DiffLegs")]
     [return: UnsafeAccessorType(DiffLegListType)]
