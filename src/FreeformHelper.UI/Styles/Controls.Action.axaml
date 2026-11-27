@@ -59,7 +59,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource NfcTextSecondaryBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderNone}"/>
     <Setter Property="Foreground" Value="{DynamicResource NfcSurfaceBrush}"/>
-    <Setter Property="Opacity" Value="{StaticResource OpacityMuted}"/>
+    <Setter Property="Opacity" Value="{DynamicResource OpacityViewportActionIdle}"/>
   </Style>
 
   <Style Selector="Button.viewportOverlayAction:pointerover, ToggleButton.viewportOverlayAction:pointerover">
@@ -91,7 +91,7 @@
     <Setter Property="Background" Value="{DynamicResource NfcTextSecondaryBrush}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource NfcTextSecondaryBrush}"/>
     <Setter Property="Foreground" Value="{DynamicResource NfcSurfaceBrush}"/>
-    <Setter Property="Opacity" Value="{StaticResource OpacityMuted}"/>
+    <Setter Property="Opacity" Value="{DynamicResource OpacityViewportActionIdle}"/>
   </Style>
 
   <Style Selector="ToggleButton.viewportOverlayAction:checked, ToggleButton.viewportOverlayAction:checked:pointerover, ToggleButton.viewportOverlayAction:checked:pressed">

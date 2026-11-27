@@ -18,6 +18,8 @@ namespace FreeformHelper.Tests;
 public sealed class ThemeBrushResolutionTests
 {
     private static readonly string[] _viewportStates = ["", ":pointerover", ":pressed", ":checked", ":disabled", ":focus-visible"];
+    private static readonly string[] _textButtonRoles = ["actionPrimary", "actionNeutral", "actionDanger", "actionGhost", "chipAction"];
+    private static readonly string[] _textButtonStates = ["", ":pointerover", ":pressed", ":focus-visible"];
 
     [AvaloniaTheory]
     [InlineData("Dark")]
@@ -139,22 +141,27 @@ public sealed class ThemeBrushResolutionTests
             Content = new FontIcon { Glyph = NvtIcons.FitScreen, Classes = { "symbols" } },
             Classes = { "viewportOverlayAction" },
         };
+        var plain = new Button
+        {
+            Content = new FontIcon { Glyph = NvtIcons.FitScreen, Classes = { "symbols" } },
+            Classes = { "viewportOverlayAction" },
+        };
         var window = new Window
         {
             RequestedThemeVariant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light,
-            Content = new StackPanel { Children = { overlay, toggle } },
+            Content = new StackPanel { Children = { overlay, plain, toggle } },
         };
         try
         {
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
-            var backdrop = Assert.IsAssignableFrom<ISolidColorBrush>(
-                window.FindResource(window.ActualThemeVariant, "BrushCanvasBackground"));
-            window.Background = backdrop;
+            var backdrop = CanvasColor(window);
+            window.Background = new SolidColorBrush(backdrop);
             // The fit button is the unnamed floating button; the two named ones show or hide side panels.
+            // Without a view model it stays disabled, so the plain button covers the other states.
             var fit = Assert.Single(overlay.GetVisualDescendants().OfType<Button>(),
                 static button => button.Classes.Contains("viewportOverlayAction") && button.Name is null);
-            foreach (var button in new Button[] { fit, toggle })
+            foreach (var button in new Button[] { fit, plain, toggle })
             {
                 foreach (var state in _viewportStates)
                 {
@@ -169,9 +176,9 @@ public sealed class ThemeBrushResolutionTests
                     var glyph = Assert.IsType<FontIcon>(button.Content);
                     var foreground = Assert.IsAssignableFrom<ISolidColorBrush>(glyph.Foreground).Color;
                     var fill = Assert.IsAssignableFrom<ISolidColorBrush>(button.Background).Color;
-                    var glyphOnFill = CompositeOver(foreground, glyph.Opacity, fill);
-                    var ratio = Contrast(CompositeOver(glyphOnFill, button.Opacity, backdrop.Color),
-                        CompositeOver(fill, button.Opacity, backdrop.Color));
+                    // Avalonia applies the control opacity to every shape, not to the button as one layer.
+                    var shownFill = CompositeOver(fill, button.Opacity, backdrop);
+                    var ratio = Contrast(CompositeOver(foreground, glyph.Opacity * button.Opacity, shownFill), shownFill);
                     Assert.True(ratio >= 3d, $"{theme} {button.GetType().Name} {state}: glyph contrast {ratio:F2} is below 3:1.");
                 }
             }
@@ -181,6 +188,92 @@ public sealed class ThemeBrushResolutionTests
             window.Close();
         }
     }
+
+    // Dark keeps the 30% resting toolbar from before the Core look; only Light needed a stronger value.
+    // Avalonia applies the toolbar opacity to every shape, so the label blends with the already faded fill.
+    [AvaloniaFact]
+    public async Task LightCanvasToolbarAtRestKeepsTheCheckedToggleVisibleAsync()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var overlay = new CanvasOverlayControls();
+        var window = new Window { Width = 900, Height = 200, RequestedThemeVariant = ThemeVariant.Light, Content = overlay };
+        try
+        {
+            window.Show();
+            await HeadlessUiPump.FlushQueueAsync();
+            var toolbar = Assert.Single(overlay.GetVisualDescendants().OfType<Border>(),
+                static border => border.Classes.Contains("canvasQuickToolbar"));
+            var toggle = overlay.GetVisualDescendants().OfType<ToggleButton>().First();
+            toggle.IsChecked = true;
+            await HeadlessUiPump.FlushQueueAsync();
+
+            var canvas = CanvasColor(window);
+            var fill = CompositeOver(Assert.IsAssignableFrom<ISolidColorBrush>(toggle.Background).Color, toolbar.Opacity, canvas);
+            var text = CompositeOver(Assert.IsAssignableFrom<ISolidColorBrush>(toggle.Foreground).Color, toolbar.Opacity, fill);
+            Assert.True(Contrast(fill, canvas) >= 3d, $"checked fill on the canvas is {Contrast(fill, canvas):F2}:1.");
+            Assert.True(Contrast(text, fill) >= 3d, $"checked label on its fill is {Contrast(text, fill):F2}:1.");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    // NFH replaces the Core accent, so the role buttons with text are measured here with the NFH colours.
+    [AvaloniaTheory]
+    [InlineData("Dark")]
+    [InlineData("Light")]
+    public async Task RoleButtonTextKeepsContrastWithTheProductAccentAsync(string theme)
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var buttons = _textButtonRoles.Select(static role => new Button { Content = role, Classes = { role } }).ToArray();
+        var panel = new StackPanel();
+        panel.Children.AddRange(buttons);
+        var window = new Window
+        {
+            Width = 320,
+            Height = 320,
+            RequestedThemeVariant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light,
+            Content = panel,
+        };
+        try
+        {
+            window.Show();
+            await HeadlessUiPump.FlushQueueAsync();
+            var surface = Assert.IsAssignableFrom<ISolidColorBrush>(
+                window.FindResource(window.ActualThemeVariant, "NfcSurfaceBrush"));
+            window.Background = surface;
+            var offenders = new List<string>();
+            foreach (var button in buttons)
+            {
+                button.Transitions = null;
+                foreach (var state in _textButtonStates)
+                {
+                    var pseudoClasses = (IPseudoClasses)button.Classes;
+                    pseudoClasses.Set(":pointerover", state == ":pointerover");
+                    pseudoClasses.Set(":pressed", state == ":pressed");
+                    pseudoClasses.Set(":focus-visible", state == ":focus-visible");
+                    await HeadlessUiPump.FlushQueueAsync();
+                    var fill = button.Background is ISolidColorBrush brush
+                        ? CompositeOver(brush.Color, brush.Opacity, surface.Color)
+                        : surface.Color;
+                    var text = CompositeOver(Assert.IsAssignableFrom<ISolidColorBrush>(button.Foreground).Color, 1d, fill);
+                    var ratio = Contrast(text, fill);
+                    if (ratio < 4.5d) offenders.Add($"{button.Content}{state}={ratio:F2}");
+                }
+            }
+
+            Assert.True(offenders.Count == 0, $"{theme} text below 4.5:1: {string.Join(", ", offenders)}");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    // BrushCanvasBackground follows the application theme, so read the colour of the window theme.
+    private static Color CanvasColor(Window window) =>
+        Assert.IsType<Color>(window.FindResource(window.ActualThemeVariant, "ColorCanvasBackground"));
 
     private static Color CompositeOver(Color color, double opacity, Color backdrop)
     {
