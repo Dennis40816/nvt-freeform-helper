@@ -312,6 +312,7 @@ public sealed class CoordinatePlannerIntegratedLayoutTests
     {
         var header = Assert.Single(section.GetVisualDescendants().OfType<ToggleButton>(),
             static button => button.Classes.Contains("panelBlockHeader"));
+        Assert.DoesNotContain("actionGhost", header.Classes);
         Assert.True(header.IsChecked);
         var presenter = Assert.Single(header.GetVisualDescendants().OfType<ContentPresenter>(),
             static control => control.Name == "PART_ContentPresenter");

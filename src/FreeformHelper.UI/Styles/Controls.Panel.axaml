@@ -1,9 +1,46 @@
 <Styles x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
         xmlns:icons="using:Nvt.Core.Avalonia.Icons"
         xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls">
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
+  <!-- Keep the product fold-header geometry; Core owns ordinary action buttons. -->
+  <Style Selector="panels|CollapsiblePanel">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="panels:CollapsiblePanel">
+        <Border Classes="panelBlockRoot" HorizontalAlignment="Stretch">
+          <StackPanel>
+            <ToggleButton Classes="panelBlockHeader"
+                          IsEnabled="{TemplateBinding IsCollapsible}"
+                          IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                          HorizontalAlignment="Stretch">
+              <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Text="{TemplateBinding Title}"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center" />
+                <ContentPresenter Grid.Column="1"
+                                  Content="{TemplateBinding HeaderRight}"
+                                  VerticalAlignment="Center"
+                                  Margin="{StaticResource InsetLeft10}" />
+                <Border Grid.Column="2"
+                        Classes="panelBlockChevronHost"
+                        Margin="{StaticResource InsetLeft10}"
+                        IsVisible="{TemplateBinding IsCollapsible}">
+                  <Path Classes="panelBlockChevron" />
+                </Border>
+              </Grid>
+            </ToggleButton>
+            <Border Classes="panelBlockContent"
+                    IsVisible="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}">
+              <ContentPresenter Content="{TemplateBinding Content}"
+                                HorizontalAlignment="Stretch" />
+            </Border>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
   <!-- Panel block (settings card with collapsible header) -->
   <Style Selector="controls|HidePanelBlock">
     <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -382,4 +419,9 @@
     <Setter Property="TextWrapping" Value="Wrap"/>
   </Style>
 
+  <Style Selector="panels|CollapsiblePanel /template/ ToggleButton.panelBlockHeader:checked /template/ ContentPresenter#PART_ContentPresenter, panels|CollapsiblePanel /template/ ToggleButton.panelBlockHeader:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter, panels|CollapsiblePanel /template/ ToggleButton.panelBlockHeader:checked:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{x:Null}"/>
+    <Setter Property="BorderBrush" Value="{x:Null}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextSecondaryBrush}"/>
+  </Style>
 </Styles>

@@ -130,6 +130,19 @@ public sealed class ThemeLookScreenshotTests
         await SaveFrameAsync(window, output, "how-to-use.png");
         shell.ShowDevCommand.Execute(null);
         await SaveFrameAsync(window, output, "dev.png");
+        await CaptureDevButtonsAsync(window, output);
+    }
+
+    private static async Task CaptureDevButtonsAsync(MainWindow window, string output)
+    {
+        var dev = Assert.Single(window.GetVisualDescendants().OfType<DevView>());
+        foreach (var name in new[] { "Primary", "Neutral", "Danger", "Ghost", "Flatghost", "Chip", "Icon", "Product" })
+        {
+            var samples = dev.FindControl<Control>($"{name}ButtonSamples");
+            Assert.NotNull(samples);
+            samples.BringIntoView();
+            await SaveFrameAsync(window, output, $"dev-buttons-{name.ToLowerInvariant()}.png");
+        }
     }
 
     private static async Task CaptureSectionsAsync(MainWindow window, string output, string prefix)

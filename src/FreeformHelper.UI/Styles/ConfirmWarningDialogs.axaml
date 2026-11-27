@@ -9,7 +9,6 @@
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>
-  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Focus/ToolTipStyles.axaml"/>
   <Style Selector=":is(Window).sharedMessageDialog">
     <Setter Property="Width" Value="{DynamicResource SharedMessageDialogWidth}"/>

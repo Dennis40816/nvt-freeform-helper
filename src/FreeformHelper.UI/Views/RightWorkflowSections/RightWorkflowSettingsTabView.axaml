@@ -109,13 +109,13 @@
                              IsExpanded="{Binding IsStep6Expanded, Mode=TwoWay}">
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
         <SelectableTextBlock Classes="stepNote" Text="{Binding ValidationTraceHint}" TextWrapping="Wrap"/>
-        <Button Content="Use Selected REG" Command="{Binding UseSelectedRegularForNotchValidationCommand}"
+        <Button Classes="actionNeutral" Content="Use Selected REG" Command="{Binding UseSelectedRegularForNotchValidationCommand}"
                 ToolTip.Tip="Copy currently selected REG id and run validation."/>
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space6}">
           <controls:NumberScrubber Minimum="0" Maximum="2000000000" SmallChange="1" FormatString="0"
                                    Value="{Binding NotchValidationRegularPadId, Mode=TwoWay}"
                                    ToolTip.Tip="Target REG id to inspect row/flow trace."/>
-          <Button Grid.Column="1" Content="Analyze" Command="{Binding AnalyzeNotchValidationCommand}"
+          <Button Classes="actionNeutral" Grid.Column="1" Content="Analyze" Command="{Binding AnalyzeNotchValidationCommand}"
                   ToolTip.Tip="Analyze direct rows and incoming/outgoing allocations for this REG."/>
         </Grid>
 
@@ -198,7 +198,7 @@
                              IsVisible="{Binding IsNotchValidationItemsEmpty}"
                              Text="No rows yet. Run Analyze for current REG."/>
         <Separator/>
-        <Button Classes="actionTextButton actionDanger" Content="Clear trace" HorizontalAlignment="Right"
+        <Button Classes="actionDanger" Content="Clear trace" HorizontalAlignment="Right"
                 Command="{Binding ClearNotchValidationCommand}" ToolTip.Tip="Clear validation trace."/>
       </StackPanel>
     </panels:CollapsiblePanel>

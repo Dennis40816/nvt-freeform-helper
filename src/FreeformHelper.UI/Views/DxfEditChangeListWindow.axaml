@@ -29,19 +29,19 @@
     </panels:WorkspaceShell.HeaderRight>
     <panels:WorkspaceShell.SummaryContent>
       <WrapPanel x:Name="CategorySwitches" Orientation="Horizontal">
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsHiddenKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsHiddenKindSelected}"
                       IsChecked="{Binding IsHiddenKindSelected, Mode=OneWay}"
                       Content="{Binding HiddenCategoryText}" Command="{Binding SetHiddenKindCommand}"/>
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsDuplicateKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsDuplicateKindSelected}"
                       IsChecked="{Binding IsDuplicateKindSelected, Mode=OneWay}"
                       Content="{Binding DuplicateCategoryText}" Command="{Binding SetDuplicateKindCommand}"/>
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsCombinedKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsCombinedKindSelected}"
                       IsChecked="{Binding IsCombinedKindSelected, Mode=OneWay}"
                       Content="{Binding CombinedCategoryText}" Command="{Binding SetCombinedKindCommand}"/>
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsMovedKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsMovedKindSelected}"
                       IsChecked="{Binding IsMovedKindSelected, Mode=OneWay}"
                       Content="{Binding MovedCategoryText}" Command="{Binding SetMovedKindCommand}"/>
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsRotatedKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsRotatedKindSelected}"
                       IsChecked="{Binding IsRotatedKindSelected, Mode=OneWay}"
                       Content="{Binding RotatedCategoryText}" Command="{Binding SetRotatedKindCommand}"/>
       </WrapPanel>

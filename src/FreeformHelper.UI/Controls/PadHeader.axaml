@@ -11,15 +11,6 @@
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </UserControl.Resources>
-  <UserControl.Styles>
-    <Style Selector="controls|PadHeader Button.actionTextButton">
-      <Setter Property="Padding" Value="{DynamicResource Inset6_4}"/>
-      <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
-    </Style>
-    <Style Selector="controls|PadHeader Button.actionIconButton">
-      <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
-    </Style>
-  </UserControl.Styles>
   <StackPanel Spacing="{DynamicResource Space8}">
     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
       <ContentControl Content="{Binding KindMark, ElementName=Root}" VerticalAlignment="Center"/>

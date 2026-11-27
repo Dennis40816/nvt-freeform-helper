@@ -22,7 +22,7 @@
         <SelectableTextBlock x:Name="MessageText" Classes="dialogBodyText" Text="{Binding Message}"/>
       </ScrollViewer>
       <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-        <Button x:Name="OkButton" Classes="actionTextButton actionPrimary"
+        <Button x:Name="OkButton" Classes="actionPrimary"
                 IsDefault="True" IsCancel="True" Click="OkButton_Click" Content="OK"/>
       </StackPanel>
     </Grid>

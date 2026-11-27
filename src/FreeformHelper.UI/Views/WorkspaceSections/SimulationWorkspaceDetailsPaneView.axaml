@@ -105,7 +105,7 @@
                 <ItemsControl ItemsSource="{Binding SimulationHighRiskDiffs}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                      <Button Classes="actionChip chipAction"
+                      <Button Classes="chipAction"
                           Margin="{StaticResource InsetBottom6}"
                           Command="{Binding DataContext.SelectSimulationRiskDiffCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                           CommandParameter="{Binding}"

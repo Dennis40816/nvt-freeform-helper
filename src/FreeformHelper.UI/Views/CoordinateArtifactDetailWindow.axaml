@@ -14,9 +14,6 @@
         Background="{DynamicResource NfcSurfaceBrush}"
         Foreground="{DynamicResource NfcTextBrush}"
         Title="Coordinate detail">
-  <Window.Styles>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
-  </Window.Styles>
   <Border Padding="{DynamicResource Inset14}">
     <Grid RowDefinitions="Auto,*,Auto" RowSpacing="{DynamicResource Space12}">
       <StackPanel Grid.Row="0" Spacing="{DynamicResource Space4}">
@@ -76,7 +73,7 @@
                     x:Name="DetailFooterActions"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right">
-          <Button Content="Close" Classes="actionNeutral actionTextButton" Click="CloseButton_Click"/>
+          <Button Content="Close" Classes="actionNeutral" Click="CloseButton_Click"/>
         </StackPanel>
       </Grid>
     </Grid>

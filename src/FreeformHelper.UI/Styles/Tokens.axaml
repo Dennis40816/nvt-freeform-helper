@@ -36,19 +36,6 @@
       <Color x:Key="ColorCoordinatePlannerArray">#8B7BFF</Color>
       <Color x:Key="ColorCoordinatePlannerLabelBackground">#CC0F131A</Color>
       <Color x:Key="ColorCoordinatePlannerLabelForeground">#E8EDF4</Color>
-      <Color x:Key="ColorActionGhostBackground">#00000000</Color>
-      <Color x:Key="ColorActionGhostBorder">#00000000</Color>
-      <Color x:Key="ColorActionViewportBackground">#F4F7FC</Color>
-      <Color x:Key="ColorActionViewportHover">#FFFFFF</Color>
-      <Color x:Key="ColorActionViewportPressed">#E8EDF5</Color>
-      <Color x:Key="ColorActionViewportBorder">#D0D8E5</Color>
-      <Color x:Key="ColorActionViewportForeground">#4A5568</Color>
-      <Color x:Key="ColorActionViewportCheckedBackground">#006EDB</Color>
-      <Color x:Key="ColorActionViewportCheckedForeground">#FFFFFF</Color>
-      <Color x:Key="ColorActionConsoleBackground">#00000000</Color>
-      <Color x:Key="ColorActionInverseBackground">#FFFFFF</Color>
-      <Color x:Key="ColorActionInversePressedBackground">#E8EDF5</Color>
-      <Color x:Key="ColorActionInverseForeground">#000000</Color>
 
       <!-- Pad info popover -->
       <Color x:Key="ColorPadInfoPanelBackground">#B20F131A</Color>
@@ -144,19 +131,6 @@
       <Color x:Key="ColorCoordinatePlannerArray">#6A5AE0</Color>
       <Color x:Key="ColorCoordinatePlannerLabelBackground">#EFFFFFFF</Color>
       <Color x:Key="ColorCoordinatePlannerLabelForeground">#1E2430</Color>
-      <Color x:Key="ColorActionGhostBackground">#00000000</Color>
-      <Color x:Key="ColorActionGhostBorder">#00000000</Color>
-      <Color x:Key="ColorActionViewportBackground">#F4F7FC</Color>
-      <Color x:Key="ColorActionViewportHover">#FFFFFF</Color>
-      <Color x:Key="ColorActionViewportPressed">#E8EDF5</Color>
-      <Color x:Key="ColorActionViewportBorder">#D0D8E5</Color>
-      <Color x:Key="ColorActionViewportForeground">#4A5568</Color>
-      <Color x:Key="ColorActionViewportCheckedBackground">#006EDB</Color>
-      <Color x:Key="ColorActionViewportCheckedForeground">#FFFFFF</Color>
-      <Color x:Key="ColorActionConsoleBackground">#00000000</Color>
-      <Color x:Key="ColorActionInverseBackground">#1E2430</Color>
-      <Color x:Key="ColorActionInversePressedBackground">#2F3A4A</Color>
-      <Color x:Key="ColorActionInverseForeground">#FFFFFF</Color>
 
       <!-- Pad info popover -->
       <Color x:Key="ColorPadInfoPanelBackground">#E6FFFFFF</Color>
@@ -268,19 +242,6 @@
     <GradientStop Offset="1"
                   Color="{DynamicResource ColorSimulationScaleHigh}"/>
   </LinearGradientBrush>
-  <SolidColorBrush x:Key="BrushActionGhostBackground" Color="{DynamicResource ColorActionGhostBackground}"/>
-  <SolidColorBrush x:Key="BrushActionGhostBorder" Color="{DynamicResource ColorActionGhostBorder}"/>
-  <SolidColorBrush x:Key="BrushActionViewportBackground" Color="{DynamicResource ColorActionViewportBackground}"/>
-  <SolidColorBrush x:Key="BrushActionViewportHover" Color="{DynamicResource ColorActionViewportHover}"/>
-  <SolidColorBrush x:Key="BrushActionViewportPressed" Color="{DynamicResource ColorActionViewportPressed}"/>
-  <SolidColorBrush x:Key="BrushActionViewportBorder" Color="{DynamicResource ColorActionViewportBorder}"/>
-  <SolidColorBrush x:Key="BrushActionViewportForeground" Color="{DynamicResource ColorActionViewportForeground}"/>
-  <SolidColorBrush x:Key="BrushActionViewportCheckedBackground" Color="{DynamicResource ColorActionViewportCheckedBackground}"/>
-  <SolidColorBrush x:Key="BrushActionViewportCheckedForeground" Color="{DynamicResource ColorActionViewportCheckedForeground}"/>
-  <SolidColorBrush x:Key="BrushActionConsoleBackground" Color="{DynamicResource ColorActionConsoleBackground}"/>
-  <SolidColorBrush x:Key="BrushActionInverseBackground" Color="{DynamicResource ColorActionInverseBackground}"/>
-  <SolidColorBrush x:Key="BrushActionInversePressedBackground" Color="{DynamicResource ColorActionInversePressedBackground}"/>
-  <SolidColorBrush x:Key="BrushActionInverseForeground" Color="{DynamicResource ColorActionInverseForeground}"/>
   <SolidColorBrush x:Key="BrushTransparent" Color="Transparent"/>
 
   <SolidColorBrush x:Key="BrushPadInfoPanelBackground" Color="{DynamicResource ColorPadInfoPanelBackground}"/>
@@ -454,10 +415,10 @@
   <x:Double x:Key="PanelRightMinWidth">220</x:Double>
   <x:Double x:Key="SplitterThickness">5</x:Double>
   <x:Double x:Key="SplitterRowThickness">6</x:Double>
-  <x:Double x:Key="ConsoleActionWidth">28</x:Double>
-  <x:Double x:Key="ConsoleActionHeight">24</x:Double>
   <x:Double x:Key="PanelToggleHeight">26</x:Double>
-  <x:Double x:Key="FormControlHeight">30</x:Double>
+  <x:Double x:Key="FormControlHeight">32</x:Double>
+  <x:Double x:Key="ProductControlMinHeight">30</x:Double>
+  <Thickness x:Key="Inset14_0">14,0</Thickness>
   <x:Double x:Key="FormControlCompactHeight">24</x:Double>
   <x:Double x:Key="PanelFormFieldSpacing">4</x:Double>
   <x:Double x:Key="SpinButtonWidth">6</x:Double>
@@ -473,6 +434,7 @@
   <Thickness x:Key="ScrollBarDevCandidateThumbMargin">0</Thickness>
   <x:Double x:Key="ScrollBarDevCandidateThumbMinLength">36</x:Double>
   <x:Double x:Key="IconButtonSize">30</x:Double>
+  <x:Double x:Key="DxfEditMiniActionMinWidth">120</x:Double>
   <x:Double x:Key="DxfEditSummaryBadgeMinWidth">54</x:Double>
   <x:Double x:Key="WorkspaceFoldCornerBadgeSize">24</x:Double>
   <x:Double x:Key="PanelBlockChevronHostSize">20</x:Double>
@@ -663,7 +625,6 @@
   <x:Double x:Key="ViewMenuPopupMaxWidth">320</x:Double>
   <x:Double x:Key="ViewMenuValueWidth">44</x:Double>
   <x:Double x:Key="ViewMenuSwitchMinWidth">44</x:Double>
-  <x:Double x:Key="ViewMenuButtonMinHeight">30</x:Double>
   <x:Double x:Key="WorkspaceHeaderActionMinHeight">24</x:Double>
   <x:Double x:Key="WorkspaceHeaderStatusMaxWidth">820</x:Double>
   <x:Double x:Key="WorkspaceHeaderInspectorChipRowMaxWidth">980</x:Double>

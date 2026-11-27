@@ -23,7 +23,7 @@
   </Style>
 
   <Style Selector="ToggleButton.settingsNavItem">
-    <Setter Property="MinHeight" Value="{StaticResource FormControlHeight}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ProductControlMinHeight}"/>
     <Setter Property="Padding" Value="{StaticResource Inset12_8}"/>
     <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BrushTransparent}"/>

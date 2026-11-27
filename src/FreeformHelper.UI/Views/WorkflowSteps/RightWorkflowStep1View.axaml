@@ -43,12 +43,12 @@
           </Grid>
           <Grid ColumnDefinitions="*,*"
                 ColumnSpacing="{StaticResource Space10}">
-            <Button Grid.Column="0"
+            <Button Classes="actionNeutral" Grid.Column="0"
                     Content="Import mask"
                     Command="{Binding RegularMask.ImportRegularVisibilityMaskCommand}"
                     HorizontalAlignment="Stretch"
                     ToolTip.Tip="Import Regular Visibility Mask (SeeRegular.csv) and build the regular active mask used by Step 4 and Simulation."/>
-            <Button Grid.Column="1"
+            <Button Classes="actionNeutral" Grid.Column="1"
                     Content="Clear mask"
                     Command="{Binding RegularMask.ClearRegularVisibilityMaskCommand}"
                     HorizontalAlignment="Stretch"
@@ -59,7 +59,7 @@
         </panels:CollapsiblePanel>
         <Separator/>
         <SelectableTextBlock Classes="stepNote" Text="Clears matching and invalidates Steps 2 to 5 and validation." TextWrapping="Wrap"/>
-        <Button Classes="actionTextButton actionDanger" Content="Clear result"
+        <Button Classes="actionDanger" Content="Clear result"
                 HorizontalAlignment="Right" Command="{Binding ClearStep1ResultCommand}"
                 ToolTip.Tip="Clears matching and invalidates Steps 2 to 5 and validation."/>
       </StackPanel>

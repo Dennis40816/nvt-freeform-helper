@@ -30,7 +30,7 @@
         </StackPanel>
       </ScrollViewer>
       <Grid x:Name="FooterActions" Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
-        <Button x:Name="CancelButton" Classes="actionTextButton dialogCancel"
+        <Button x:Name="CancelButton" Classes="dialogCancel"
                 Classes.actionNeutral="{Binding !EmphasizeCancel}" Classes.actionDanger="{Binding EmphasizeCancel}"
                 Classes.separated="{Binding HasDismissAction}"
                 Click="CancelButton_Click" ToolTip.Tip="{Binding CancelTip}">
@@ -41,10 +41,10 @@
           </StackPanel>
         </Button>
         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{DynamicResource Space8}">
-          <Button x:Name="DismissButton" Classes="actionTextButton actionNeutral"
+          <Button x:Name="DismissButton" Classes="actionNeutral"
                   Content="{Binding DismissText}" ToolTip.Tip="{Binding DismissTip}"
                   IsVisible="{Binding HasDismissAction}" IsCancel="{Binding HasDismissAction}" Click="DismissButton_Click"/>
-          <Button x:Name="ConfirmButton" Classes="actionTextButton actionPrimary"
+          <Button x:Name="ConfirmButton" Classes="actionPrimary"
                   Click="ConfirmButton_Click" ToolTip.Tip="{Binding ConfirmTip}">
             <SelectableTextBlock x:Name="ConfirmButtonText" Text="{Binding ConfirmText}"/>
           </Button>

@@ -33,7 +33,7 @@
         </WrapPanel>
         <StackPanel Grid.Column="1" IsVisible="{Binding IsWorkspaceStale}" Orientation="Horizontal" Spacing="{DynamicResource Space8}" HorizontalAlignment="Right">
           <TextBlock Text="{Binding StaleWorkspaceBannerText}" MaxWidth="{DynamicResource ViewMenuPopupMaxWidth}" TextWrapping="Wrap" VerticalAlignment="Center"/>
-          <Button Classes="actionNeutral actionTextButton" Content="Refresh" Command="{Binding OpenSimulationCommand}" IsEnabled="{Binding CanOpenSimulation}"/>
+          <Button Classes="actionNeutral" Content="Refresh" Command="{Binding OpenSimulationCommand}" IsEnabled="{Binding CanOpenSimulation}"/>
         </StackPanel>
       </Grid>
     </Border>
@@ -65,7 +65,7 @@
                   Foreground="{DynamicResource NfcWarningTextBrush}"
                   TextWrapping="Wrap"/>
             </Border>
-            <Button Classes="actionPrimary actionTextButton"
+            <Button Classes="actionPrimary"
                 HorizontalAlignment="Right"
                 Command="{Binding OpenSimulationCommand}"
                 IsEnabled="{Binding CanOpenSimulation}">
@@ -104,7 +104,7 @@
           <SelectableTextBlock Text="{Binding BuildFailureText}"
               Foreground="{DynamicResource NfcWarningTextBrush}"
               TextWrapping="Wrap"/>
-          <Button Classes="actionPrimary actionTextButton"
+          <Button Classes="actionNeutral"
               HorizontalAlignment="Right"
               Command="{Binding OpenSimulationCommand}"
               IsEnabled="{Binding CanOpenSimulation}">

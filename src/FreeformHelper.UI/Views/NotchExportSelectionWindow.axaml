@@ -62,26 +62,26 @@
     <panels:WorkspaceShell.SummaryContent>
       <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}"
                   ToolTip.Tip="Counts: rows in the current version scope matching each category.">
-        <ToggleButton Classes="actionGhost flat" Content="Selected only"
+        <ToggleButton Classes="productFilterChip" Content="Selected only"
                       IsChecked="{Binding IsSelectedOnlyActive, Mode=OneWay}"
                       Command="{Binding ToggleSelectedOnlyCommand}"/>
-        <ToggleButton Classes="actionGhost flat" Content="{Binding LinkedFilterText}"
+        <ToggleButton Classes="productFilterChip" Content="{Binding LinkedFilterText}"
                       IsChecked="{Binding IsFilterLinkedOnly, Mode=OneWay}"
                       Command="{Binding SetViewFilterModeCommand}"
                       CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.LinkedOnly}"/>
-        <ToggleButton Classes="actionGhost flat" Content="{Binding TransferFilterText}"
+        <ToggleButton Classes="productFilterChip" Content="{Binding TransferFilterText}"
                       IsChecked="{Binding IsFilterTransferOnly, Mode=OneWay}"
                       Command="{Binding SetViewFilterModeCommand}"
                       CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.TransferOnly}"/>
-        <ToggleButton Classes="actionGhost flat" Content="{Binding NoOpFilterText}"
+        <ToggleButton Classes="productFilterChip" Content="{Binding NoOpFilterText}"
                       IsChecked="{Binding IsFilterWarningOnly, Mode=OneWay}"
                       Command="{Binding SetViewFilterModeCommand}"
                       CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.WarningOnly}"/>
-        <ToggleButton Classes="actionGhost flat" Content="{Binding LegacyFilterText}"
+        <ToggleButton Classes="productFilterChip" Content="{Binding LegacyFilterText}"
                       IsChecked="{Binding IsFilterLegacyOnly, Mode=OneWay}"
                       Command="{Binding SetViewFilterModeCommand}"
                       CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.LegacyOnly}"/>
-        <ToggleButton Classes="actionGhost flat" Content="{Binding NoCadFilterText}"
+        <ToggleButton Classes="productFilterChip" Content="{Binding NoCadFilterText}"
                       IsChecked="{Binding IsFilterNoCadOnly, Mode=OneWay}"
                       Command="{Binding SetViewFilterModeCommand}"
                       CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.NoCadOnly}"/>
@@ -90,7 +90,7 @@
     <panels:WorkspaceShell.ToolbarContent>
       <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,*,Auto"
             ColumnSpacing="{StaticResource Space8}" RowSpacing="{StaticResource Space4}">
-        <TextBox Width="{StaticResource NotchExportSearchWidth}"
+        <TextBox Classes="singleLineActionInput" Width="{StaticResource NotchExportSearchWidth}"
                  PlaceholderText="{Binding SearchWatermarkText}"
                  Text="{Binding SearchKeyword, Mode=TwoWay}"/>
         <Button Grid.Column="1" Classes="actionGhost actionIconButton"

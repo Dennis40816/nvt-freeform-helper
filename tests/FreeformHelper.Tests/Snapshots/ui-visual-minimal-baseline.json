@@ -1,14 +1,14 @@
 {
   "version": "1.0",
   "files": {
-    "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml": "2af3f740452ab3fb35c3f834919f519f0aa60d298776bf2e81d083d04dbbf77a",
+    "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml": "d2a13936131b227305fb9bd7be1fd94575ad1683a29b75123cf3941adf8d6ea4",
     "src/FreeformHelper.UI/Styles/Controls.axaml": "15e463ff51fe465a99c7f1f6348154230bccb6cbdb22869b89cdf0b83721a684",
-    "src/FreeformHelper.UI/Views/CanvasOverlayControls.axaml": "e628bab7ffee6975979c1b97da9bd556b07210fd2962d51e6eb5e8ebaadb3d6b",
-    "src/FreeformHelper.UI/Views/ConsolePanel.axaml": "2604c4de9612358126dd10fa91437a1b7e72e7915c3ac66770c10124e8e4bd92",
-    "src/FreeformHelper.UI/Views/FreeformHelperView.axaml": "55da7f3f2546ef0578fba1e1237a9b76b54bd13125ecd7b2f22c6dcfa9dc6974",
-    "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml": "754c8cb7b3592e3e6f5f097c379b7fc89adde3029dd4bcc9e6d0223a7ccae852",
-    "src/FreeformHelper.UI/Views/PadInfoPopover.axaml": "84cbd7d8b21eba1a48f75ded62ce921f4d1cda38f12c7b330da30bef9611caf8",
+    "src/FreeformHelper.UI/Views/CanvasOverlayControls.axaml": "e33427c20be62b6e127449f7f176505c230445a1781b8d8da42efae5b1aa0d07",
+    "src/FreeformHelper.UI/Views/ConsolePanel.axaml": "e268e149a6a445b432a2d23538f26a133b0d37ac8dca3576779fc1834cd3da21",
+    "src/FreeformHelper.UI/Views/FreeformHelperView.axaml": "390274a736ca429181314717f495dcf5d23571c0c5ca5086f0c7e416e73f267e",
+    "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml": "832bfa5d8780579abeb384c7e36d51025dd3626c4bdbbb7396034c5fe8c89ab9",
+    "src/FreeformHelper.UI/Views/PadInfoPopover.axaml": "1f272a7d12010e6aa1c926f56f523af2df3a724dcc307ae24cfc9340e4808f0d",
     "src/FreeformHelper.UI/Views/RightWorkflowPanel.axaml": "175848c8861a9461f17b1475f7ce623939619b99f0715b1ce37e2d6dd513d3fe",
-    "src/FreeformHelper.UI/Views/SettingsWindow.axaml": "bd827083dad8bbf0a99526343b4e5264738d842e51ceff55c0f46e2e7ab39d76"
+    "src/FreeformHelper.UI/Views/SettingsWindow.axaml": "058162d2ddaf5337ba816b10d64f76a0b19d6fa8224cad910d0035a70cf314b1"
   }
 }

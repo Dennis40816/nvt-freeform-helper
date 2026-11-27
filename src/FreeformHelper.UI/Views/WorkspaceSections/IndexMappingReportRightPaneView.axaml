@@ -19,7 +19,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="viewModels:IndexMappingVerificationStepNodeViewModel">
-                <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsActive}"
+                <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsActive}"
                               Padding="{DynamicResource Inset6_2}"
                               IsChecked="{Binding IsActive, Mode=OneWay}" Content="{Binding Title}"
                               Command="{Binding $parent[UserControl].((viewModels:IndexMappingReportViewModel)DataContext).SelectVerificationStepCommand}"

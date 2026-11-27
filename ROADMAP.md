@@ -300,6 +300,7 @@ Theme adoption follows two steps (owner decision, 2026-10-07): step 1 pins the C
   - InfoLabel, SectionFrame and CollapsiblePanel follow after C-THEME2, with before-and-after PNG images in Light and Dark approved by the owner.
   - Dialogs, NumberScrubber and cards keep the NFH versions in 1.0.0; deleting them moves after 1.0.0 (decided 2026-11-26).
   - Core gaps: ConfirmDialog has no consequence text, next-start note or dismiss result; WarningDialog has no scrolling and no Enter or Esc handling; NumberScrubber does not forward the accessible name; there is no card style.
+  - Core gap (C-THEME2; target: g4; waiting for Core; PR/issue: -): `CollapsiblePanel` needs a way to keep the product header without the `actionGhost` role.
 - [ ] **R13.307-GUARD Should Core ship test helpers such as the headless session guard?** · Target: - · Status: Waiting for owner · PR: -
 - [ ] **R13.307-HL Test whether an exception in test setup stops the headless loop on Avalonia 12.1.1** · Target: - · Status: Not started · PR: -
   - Record the result in the Core Testing module docs.

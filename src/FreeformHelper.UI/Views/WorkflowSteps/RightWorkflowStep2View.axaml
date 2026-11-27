@@ -55,26 +55,26 @@
         <Grid Classes="panelActionRow"
               ColumnDefinitions="*,*,*,*"
               ColumnSpacing="{StaticResource Space6}">
-          <Button Grid.Column="0"
+          <Button Classes="actionNeutral" Grid.Column="0"
                   Content="None"
                   Command="{Binding SetFreeformNoneCommand}"
                   ToolTip.Tip="Mark selection as none."/>
-          <Button Grid.Column="1"
+          <Button Classes="actionNeutral" Grid.Column="1"
                   Content="X"
                   Command="{Binding SetFreeformXCommand}"
                   ToolTip.Tip="Mark selection as X-way."/>
-          <Button Grid.Column="2"
+          <Button Classes="actionNeutral" Grid.Column="2"
                   Content="Y"
                   Command="{Binding SetFreeformYCommand}"
                   ToolTip.Tip="Mark selection as Y-way."/>
-          <Button Grid.Column="3"
+          <Button Classes="actionNeutral" Grid.Column="3"
                   Content="XY"
                   Command="{Binding SetFreeformXYCommand}"
                   ToolTip.Tip="Mark selection as XY-way."/>
         </Grid>
         <Separator/>
         <SelectableTextBlock Classes="stepNote" Text="Clears tagging and invalidates Steps 3 to 5 and validation." TextWrapping="Wrap"/>
-        <Button Classes="actionTextButton actionDanger" Content="Clear result"
+        <Button Classes="actionDanger" Content="Clear result"
                 HorizontalAlignment="Right" Command="{Binding ClearStep2ResultCommand}"
                 ToolTip.Tip="Clears tagging and invalidates Steps 3 to 5 and validation."/>
       </StackPanel>

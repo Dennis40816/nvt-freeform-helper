@@ -151,7 +151,7 @@ public sealed partial class UiLayoutGuardTests
         {
             var button = FindXamlElementTagContaining(TestFiles.ReadContent(file), "Button", commandName);
             Assert.DoesNotContain("actionTextButton", button, StringComparison.Ordinal);
-            Assert.DoesNotContain("actionNeutral", button, StringComparison.Ordinal);
+            Assert.Contains("actionNeutral", button, StringComparison.Ordinal);
             Assert.DoesNotContain("actionPrimary", button, StringComparison.Ordinal);
         }
 
@@ -206,31 +206,17 @@ public sealed partial class UiLayoutGuardTests
         var allStyles = ReadAllStylesText(repoRoot);
         AssertNoStyleSetterCollisions(stylesRoot);
 
-        var inverseForegroundOffenders = FindInverseBackgroundForegroundOffenders(actionStyles);
-        Assert.True(
-            inverseForegroundOffenders.Count == 0,
-            "Interactive hover/focus/pressed styles using inverse backgrounds must use BrushActionInverseForeground. Offenders: "
-            + string.Join(", ", inverseForegroundOffenders));
-
-        AssertMinimumContrast("ColorActionInverseBackground", "ColorActionInverseForeground", 4.5);
+        AssertCoreRoleAppearanceIsOwnedByCore(repoRoot);
         AssertMinimumContrast("NfcSurfaceSubtleBrush", "NfcTextBrush", 4.5);
         AssertMinimumContrast("NfcSelectionSurfaceBrush", "NfcTextBrush", 4.5);
         AssertMinimumContrast("NfcSurfaceBrush", "NfcTextDisabledBrush", 4.5);
         AssertMinimumContrast("NfcSurfaceBrush", "NfcTextStrongBrush", 4.5);
         AssertInteractiveActionStateContrast(actionStyles, tokens, 4.5);
-
-        Assert.Contains("Button.actionTextButton.actionNeutral, ToggleButton.actionTextButton.actionNeutral", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("NfcSurfaceBrush", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("NfcSelectionSurfaceBrush", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("NfcSecondaryActionPressedBrush", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("NfcTextBrush", actionStyles, StringComparison.Ordinal);
-        Assert.Contains("NfcTextDisabledBrush", actionStyles, StringComparison.Ordinal);
-        var neutralStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "Button.actionTextButton.actionNeutral, ToggleButton.actionTextButton.actionNeutral");
-        Assert.Equal("{DynamicResource NfcTextBrush}", GetSetterValue(neutralStyle.Body, "Foreground"));
-        var disabledStyle = ExtractStyleBlocks(actionStyles)
-            .Single(static style => style.Selector == "Button.dxfEditMiniAction:disabled");
-        Assert.Equal("{DynamicResource NfcTextDisabledBrush}", GetSetterValue(disabledStyle.Body, "Foreground"));
+        var quickToggleStyle = ExtractStyleBlocks(actionStyles)
+            .Single(static style => style.Selector == "ToggleButton.canvasQuickToggle" &&
+                GetSetterValue(style.Body, "Foreground") is not null);
+        Assert.Equal("{DynamicResource NfcTextBrush}", GetSetterValue(quickToggleStyle.Body, "Foreground"));
+        Assert.Contains("ToggleButton.canvasQuickToggle:disabled", actionStyles, StringComparison.Ordinal);
 
         var appCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "App.axaml.cs"));
         var tooltipServiceCode = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Services", "SharedToolTipStyleService.cs"));
@@ -250,14 +236,13 @@ public sealed partial class UiLayoutGuardTests
         Assert.Equal("{DynamicResource NfcTextStrongBrush}", GetSetterValue(tooltipBaseStyle.Body, "Foreground"));
         Assert.DoesNotContain("TextBlock.Foreground", tooltipBaseStyle.Body, StringComparison.Ordinal);
         Assert.DoesNotContain("AncestorType=ToolTip", allStyles, StringComparison.Ordinal);
-        Assert.Contains("Button:pointerover", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Button:not(.actionPrimary):not(.actionNeutral)", coreStyles, StringComparison.Ordinal);
         Assert.Contains("NfcTextBrush", coreStyles, StringComparison.Ordinal);
-        Assert.Equal(2, Regex.Count(coreStyles, "ToolTip.ShowOnDisabled"));
+        Assert.Contains("Style Selector=\"Button, ToggleButton\"", coreStyles, StringComparison.Ordinal);
         Assert.Contains("Property=\"ToolTip.ShowOnDisabled\" Value=\"True\"", coreStyles, StringComparison.Ordinal);
-        Assert.Contains("Button:disabled:pointerover, Button:disabled:pressed", coreStyles, StringComparison.Ordinal);
-        Assert.Contains("ToggleButton:disabled:pointerover, ToggleButton:disabled:pressed", coreStyles, StringComparison.Ordinal);
-        Assert.Contains("Button.dangerTextButton:disabled:pointerover, Button.dangerTextButton:disabled:pressed", actionStyles, StringComparison.Ordinal);
-        AssertDisabledInteractiveStatesKeepMutedForeground(coreStyles, actionStyles);
+        Assert.Contains(":disabled:pointerover", coreStyles, StringComparison.Ordinal);
+        Assert.Contains(":disabled:pressed", coreStyles, StringComparison.Ordinal);
+        AssertDisabledInteractiveStatesKeepMutedForeground(coreStyles);
 
         Assert.Contains("<Thickness x:Key=\"BorderInput\">2</Thickness>", tokens, StringComparison.Ordinal);
         Assert.Contains("<Thickness x:Key=\"BorderControl\">1.5</Thickness>", tokens, StringComparison.Ordinal);
@@ -572,45 +557,7 @@ public sealed partial class UiLayoutGuardTests
         return offenders;
     }
 
-    private static List<string> FindInverseBackgroundForegroundOffenders(string stylesText)
-    {
-        var offenders = new List<string>();
-        foreach (var style in ExtractStyleBlocks(stylesText))
-        {
-            var selector = style.Selector;
-            var body = style.Body;
 
-            var usesInverseBackground =
-                body.Contains("BrushActionInverseBackground", StringComparison.Ordinal) ||
-                body.Contains("BrushActionInversePressedBackground", StringComparison.Ordinal);
-            if (!usesInverseBackground)
-            {
-                continue;
-            }
-
-            var isInteractiveControlState =
-                (selector.Contains("Button", StringComparison.Ordinal) || selector.Contains("ToggleButton", StringComparison.Ordinal)) &&
-                (selector.Contains(":pointerover", StringComparison.Ordinal) ||
-                 selector.Contains(":focus-visible", StringComparison.Ordinal) ||
-                 selector.Contains(":pressed", StringComparison.Ordinal)) &&
-                !selector.Contains(" Border.", StringComparison.Ordinal) &&
-                !selector.Contains(" controls|", StringComparison.Ordinal) &&
-                !selector.Contains(" TextBlock", StringComparison.Ordinal) &&
-                !selector.Contains(" SelectableTextBlock", StringComparison.Ordinal);
-            if (!isInteractiveControlState)
-            {
-                continue;
-            }
-
-            var controlForeground = GetSetterValue(body, "Foreground");
-            if (!string.Equals(controlForeground, "{DynamicResource BrushActionInverseForeground}", StringComparison.Ordinal))
-            {
-                offenders.Add($"{selector} -> Foreground={controlForeground ?? "<missing>"}");
-            }
-        }
-
-        return offenders;
-    }
 
     private static void AssertNoStyleSetterCollisions(string stylesRoot)
     {

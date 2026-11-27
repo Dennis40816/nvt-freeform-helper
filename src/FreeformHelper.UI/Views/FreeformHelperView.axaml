@@ -74,7 +74,7 @@
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="{StaticResource InsetBottom12}">
           <SelectableTextBlock Text="DXF" FontWeight="SemiBold"/>
           <Button Grid.Column="1"
-                  Classes="actionIconButton panelChromeToggle"
+                  Classes="actionIconButton panelChromeToggle actionGhost"
                   ToolTip.Tip="Hide Layers &amp; DXF panel"
                   Click="HideLeftPanel_Click">
             <controls:FontIcon Classes="symbols"
@@ -220,7 +220,7 @@
           </Border>
           <Button Grid.Column="1"
                   VerticalAlignment="Center"
-                  Classes="actionIconButton panelChromeToggle"
+                  Classes="actionIconButton panelChromeToggle actionGhost"
                   ToolTip.Tip="Hide Settings &amp; Inspector panel"
                   Click="HideRightPanel_Click">
             <controls:FontIcon Classes="symbols"

@@ -5,9 +5,11 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
+using Avalonia.VisualTree;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Views;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -15,6 +17,8 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class ThemeBrushResolutionTests
 {
+    private static readonly string[] _viewportStates = ["", ":pointerover", ":pressed", ":checked", ":disabled", ":focus-visible"];
+
     [AvaloniaTheory]
     [InlineData("Dark")]
     [InlineData("Light")]
@@ -97,8 +101,7 @@ public sealed class ThemeBrushResolutionTests
         var off = new ToggleButton { Content = "Off" };
         foreach (var toggle in new[] { on, off })
         {
-            toggle.Classes.Add("actionTextButton");
-            toggle.Classes.Add("actionNeutral");
+            toggle.Classes.Add("canvasQuickToggle");
         }
 
         var window = new Window { Width = 240, Height = 120, Content = new StackPanel { Children = { on, off } } };
@@ -122,6 +125,76 @@ public sealed class ThemeBrushResolutionTests
             window.Close();
             app.RequestedThemeVariant = previousTheme;
         }
+    }
+
+    [AvaloniaTheory]
+    [InlineData("Dark")]
+    [InlineData("Light")]
+    public async Task ViewportOverlayGlyphContrastIncludesControlOpacityAsync(string theme)
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var overlay = new CanvasOverlayControls();
+        var toggle = new ToggleButton
+        {
+            Content = new FontIcon { Glyph = NvtIcons.FitScreen, Classes = { "symbols" } },
+            Classes = { "viewportOverlayAction" },
+        };
+        var window = new Window
+        {
+            RequestedThemeVariant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light,
+            Content = new StackPanel { Children = { overlay, toggle } },
+        };
+        try
+        {
+            window.Show();
+            await HeadlessUiPump.FlushQueueAsync();
+            var backdrop = Assert.IsAssignableFrom<ISolidColorBrush>(
+                window.FindResource(window.ActualThemeVariant, "BrushCanvasBackground"));
+            window.Background = backdrop;
+            // The fit button is the unnamed floating button; the two named ones show or hide side panels.
+            var fit = Assert.Single(overlay.GetVisualDescendants().OfType<Button>(),
+                static button => button.Classes.Contains("viewportOverlayAction") && button.Name is null);
+            foreach (var button in new Button[] { fit, toggle })
+            {
+                foreach (var state in _viewportStates)
+                {
+                    if (state == ":checked" && button is not ToggleButton) continue;
+                    button.IsEnabled = state != ":disabled";
+                    if (button is ToggleButton stateToggle) stateToggle.IsChecked = state == ":checked";
+                    var pseudoClasses = (IPseudoClasses)button.Classes;
+                    pseudoClasses.Set(":pointerover", state == ":pointerover");
+                    pseudoClasses.Set(":pressed", state == ":pressed");
+                    pseudoClasses.Set(":focus-visible", state == ":focus-visible");
+                    await HeadlessUiPump.FlushQueueAsync();
+                    var glyph = Assert.IsType<FontIcon>(button.Content);
+                    var foreground = Assert.IsAssignableFrom<ISolidColorBrush>(glyph.Foreground).Color;
+                    var fill = Assert.IsAssignableFrom<ISolidColorBrush>(button.Background).Color;
+                    var glyphOnFill = CompositeOver(foreground, glyph.Opacity, fill);
+                    var ratio = Contrast(CompositeOver(glyphOnFill, button.Opacity, backdrop.Color),
+                        CompositeOver(fill, button.Opacity, backdrop.Color));
+                    Assert.True(ratio >= 3d, $"{theme} {button.GetType().Name} {state}: glyph contrast {ratio:F2} is below 3:1.");
+                }
+            }
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    private static Color CompositeOver(Color color, double opacity, Color backdrop)
+    {
+        var foregroundAlpha = color.A / 255d * opacity;
+        var backgroundAlpha = backdrop.A / 255d * (1d - foregroundAlpha);
+        var alpha = foregroundAlpha + backgroundAlpha;
+        if (alpha == 0d) return Colors.Transparent;
+        static byte Channel(byte value, byte background, double sourceWeight, double backgroundWeight, double totalWeight) =>
+            (byte)Math.Round((value * sourceWeight + background * backgroundWeight) / totalWeight, MidpointRounding.AwayFromZero);
+
+        return Color.FromArgb((byte)Math.Round(alpha * 255d, MidpointRounding.AwayFromZero),
+            Channel(color.R, backdrop.R, foregroundAlpha, backgroundAlpha, alpha),
+            Channel(color.G, backdrop.G, foregroundAlpha, backgroundAlpha, alpha),
+            Channel(color.B, backdrop.B, foregroundAlpha, backgroundAlpha, alpha));
     }
 
     private static double Contrast(Color first, Color second)

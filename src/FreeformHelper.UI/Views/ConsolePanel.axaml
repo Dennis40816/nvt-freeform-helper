@@ -8,7 +8,7 @@
              xmlns:logConsole="clr-namespace:Nvt.Core.Avalonia.LogConsole;assembly=Nvt.Core.Avalonia"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.ConsolePanel">
-  <!-- Core's console styles load here, not in App.axaml: its button and scroll styles share class names with the NFH styles. -->
+  <!-- Console resources and list styles stay scoped here; shared button roles come from App.axaml. -->
   <UserControl.Styles>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/LogConsole/LogConsoleStyles.axaml"/>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/LogConsole/ConsoleListStyles.axaml"/>
@@ -26,7 +26,7 @@
     <Grid RowDefinitions="Auto,*">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
         <ToggleButton x:Name="ConsoleToggleButton"
-                      Classes="actionIconButton panelChromeToggle"
+                      Classes="actionIconButton panelChromeToggle actionGhost flat"
                       IsChecked="{Binding IsConsoleExpanded, Mode=TwoWay}"
                       ToolTip.Tip="Toggle console panel"
                       VerticalAlignment="Center"

@@ -12,7 +12,6 @@
         Foreground="{DynamicResource NfcTextBrush}"
         Title="DXF overlaps report">
   <Window.Styles>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/TextStyles.axaml"/>
   </Window.Styles>
   <Border Padding="{DynamicResource Inset14}">

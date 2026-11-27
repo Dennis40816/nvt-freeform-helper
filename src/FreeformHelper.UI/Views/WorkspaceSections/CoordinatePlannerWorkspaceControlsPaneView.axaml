@@ -8,9 +8,6 @@
              x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerWorkspaceControlsPaneView"
              x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
              x:CompileBindings="True">
-  <UserControl.Styles>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
-  </UserControl.Styles>
   <Border Classes="workspaceSidePane left">
     <ScrollViewer Classes="scrollDevCandidate viewportBoundScroll"
                   VerticalScrollBarVisibility="Auto"
@@ -51,7 +48,7 @@
           <sections:CoordinatePlannerGuidesSectionView/>
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
             <ToggleButton Content="BIST center rect"
-                          Classes="actionGhost actionTextButton"
+                          Classes="actionGhost"
                           HorizontalContentAlignment="Left"
                           IsChecked="{Binding ShowBistRectangle, Mode=TwoWay}"/>
             <Border Grid.Column="1" Classes="chipStatus" VerticalAlignment="Center">

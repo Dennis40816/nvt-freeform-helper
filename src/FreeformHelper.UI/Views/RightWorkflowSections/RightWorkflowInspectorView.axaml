@@ -119,11 +119,11 @@
 
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space8}">
-              <TextBox Text="{Binding QuickFocusQueryText, Mode=TwoWay}"
+              <TextBox Classes="singleLineActionInput" Text="{Binding QuickFocusQueryText, Mode=TwoWay}"
                        PlaceholderText="diff 72 / cad 4809 / reg 4616"
                        ToolTip.Tip="Focus by typed target. Examples: diff 72, ic1 diff72, cad 4809, reg 4616. Plain number auto-resolves CAD, REG, then diff."/>
               <Button Grid.Column="1"
-                      Classes="actionNeutral actionTextButton"
+                      Classes="actionNeutral"
                       Content="Focus"
                       Command="{Binding QuickFocusCommand}"
                       ToolTip.Tip="Select and zoom the matching CAD output pad, regular pad, or FW diff."/>
@@ -247,7 +247,7 @@
                                 ColumnSpacing="{StaticResource Space6}">
                             <SelectableTextBlock Text="{Binding Title}"
                                                  FontWeight="SemiBold"/>
-                            <ToggleButton Grid.Column="1"
+                            <ToggleButton Classes="inspectorTraceToggle" Grid.Column="1"
                                           IsChecked="{Binding DataContext.IsPadInspectorRawTraceExpanded, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
                               <SelectableTextBlock Text="{Binding Lines.Count, StringFormat='Raw x{0}'}"/>
                             </ToggleButton>

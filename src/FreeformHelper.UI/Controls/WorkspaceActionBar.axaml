@@ -12,11 +12,11 @@
       <primitives:BalancedWrapPanel HorizontalAlignment="Right" BalanceLastRow="False"
                                   ItemSpacing="{DynamicResource Space6}" LineSpacing="{DynamicResource Space6}">
         <Border x:Name="RestoreHint" IsVisible="False">
-          <Button Classes="actionTextButton actionGhost" Content="Restore Export Notch Rows"
+          <Button Classes="actionGhost" Content="Restore Export Notch Rows"
                   Click="RestoreButton_Click"
                   ToolTip.Tip="Restore the hidden Export Notch Rows window (Ctrl+Shift+E)."/>
         </Border>
-        <Button Classes="actionTextButton actionPrimary" Content="{Binding WorkspacePrimaryActionText}"
+        <Button Classes="actionPrimary" Content="{Binding WorkspacePrimaryActionText}"
                 Command="{Binding WorkspacePrimaryActionCommand}"/>
       </primitives:BalancedWrapPanel>
     </StackPanel>

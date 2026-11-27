@@ -104,7 +104,7 @@
                              Classes="settingsSectionMeta"
                              VerticalAlignment="Center"
                              Text="Draft changes apply with Save Settings."/>
-        <Button Grid.Column="1"
+        <Button Classes="actionNeutral" Grid.Column="1"
                 Content="Done"
                 Click="DoneButton_Click"/>
       </Grid>

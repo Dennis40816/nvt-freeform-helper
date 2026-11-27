@@ -1,12 +1,22 @@
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Avalonia.Media;
 using Avalonia.Styling;
+using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
 namespace FreeformHelper.Tests;
 
 public sealed partial class UiLayoutGuardTests
 {
+    private static readonly string[] ThemeVariantKeys = ["Dark", "Light"];
+
+    private static readonly string[] AccentOverrideKeys =
+    [
+        "NfcAccentBorderBrush", "NfcAccentBorderLightBrush", "NfcAccentBorderStrongBrush", "NfcAccentBrush",
+        "NfcAccentStrongBrush", "NfcAccentSurfaceBrush", "NfcAccentSurfaceSubtleBrush",
+    ];
+
     [Theory]
     [InlineData("White", "#FFFFFF")]
     [InlineData("Black", "#FF000000")]
@@ -14,6 +24,80 @@ public sealed partial class UiLayoutGuardTests
     public void ContrastLuminanceMeasuresNamedAndArgbColors(string value, string rgb)
     {
         Assert.Equal(RelativeLuminance(rgb), RelativeLuminance(value));
+    }
+
+    [Fact]
+    public void CoreButtonRolesHaveOneApplicationIncludeAndSevenAccentOverrides()
+    {
+        var uiRoot = Path.Combine(TestPaths.RepoRoot, "src", "FreeformHelper.UI");
+        var app = XDocument.Parse(TestFiles.ReadContent(Path.Combine(uiRoot, "App.axaml")));
+        var styles = app.Descendants().Single(static element => element.Name.LocalName == "Application.Styles").Elements().ToArray();
+        Assert.Equal("FluentTheme", styles[0].Name.LocalName);
+        Assert.Equal("avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml", (string?)styles[1].Attribute("Source"));
+        var includes = Directory.EnumerateFiles(uiRoot, "*.axaml", SearchOption.AllDirectories)
+            .SelectMany(static path => XDocument.Parse(TestFiles.ReadContent(path)).Descendants())
+            .Where(static element => element.Name.LocalName == "StyleInclude" &&
+                (string?)element.Attribute("Source") == "avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml");
+        Assert.Single(includes);
+        var tokens = XDocument.Parse(TestFiles.ReadContent(Path.Combine(uiRoot, "Styles", "Tokens.axaml")));
+        XNamespace xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
+        var themes = tokens.Descendants().Where(element => (string?)element.Attribute(xaml + "Key") is "Dark" or "Light").ToArray();
+        Assert.Equal(ThemeVariantKeys, themes.Select(element => (string?)element.Attribute(xaml + "Key")).Order(StringComparer.Ordinal));
+        foreach (var theme in themes)
+        {
+            var accents = theme.Elements().Select(element => (string?)element.Attribute(xaml + "Key"))
+                .Where(static key => key?.StartsWith("NfcAccent", StringComparison.Ordinal) == true).ToArray();
+            Assert.Equal(AccentOverrideKeys, accents.Order(StringComparer.Ordinal));
+        }
+    }
+
+    private static void AssertCoreRoleAppearanceIsOwnedByCore(string repoRoot)
+    {
+        var uiRoot = Path.Combine(repoRoot, "src", "FreeformHelper.UI");
+        var appearance = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "Theme", "Background", "BorderBrush", "BorderThickness", "Foreground", "Template", "CornerRadius", "Width", "Height",
+            "MinHeight", "Padding", "FontFamily", "FontSize", "FontWeight", "Opacity", "FocusAdorner", "Transitions", "ClipToBounds",
+            "HorizontalContentAlignment", "VerticalContentAlignment",
+        };
+        var role = new Regex(@"(?:Button|ToggleButton)\.(?:actionPrimary|actionNeutral|actionDanger|actionGhost|actionIconButton|chipAction|consoleHeaderAction|panelChromeToggle|simulationActionButton|workspaceActionButton|workspaceGroupActionButton|workspaceHeaderAction|workspaceInfoButton|workspaceSearchClearButton|workspaceSubtleAction|workspaceTextAction|padInfoActionButton|padInfoHeaderActionButton|padInfoInfoButton|padInfoOverrideIconButton|dxfEditMiniAction|dxfEditCompactIconAction|viewMenuButton|iconTextButton|dangerTextButton|confirmDialogActionButton|confirmDialogDangerButton)\b|Border\.chipStatus\b");
+        foreach (var path in Directory.EnumerateFiles(uiRoot, "*.axaml", SearchOption.AllDirectories))
+        {
+            var document = XDocument.Parse(TestFiles.ReadContent(path));
+            foreach (var style in document.Descendants().Where(static element => element.Name.LocalName == "Style"))
+            {
+                var originalSelector = (string?)style.Attribute("Selector") ?? string.Empty;
+                var selector = Regex.Replace(originalSelector, @":not\([^)]*\)", string.Empty);
+                Assert.DoesNotMatch(@"\.(actionTextButton|actionChip|actionButton)\b", selector);
+                var publicRoles = new[] { "actionPrimary", "actionNeutral", "actionDanger", "actionGhost", "actionIconButton", "chipAction" };
+                var broadRoleStyle = originalSelector.Split(',').Any(part =>
+                    Regex.IsMatch(Regex.Replace(part, @":not\([^)]*\)", string.Empty), @"(?:^|[ >])(Button|ToggleButton)(?=:|$)") &&
+                    publicRoles.Any(name => !part.Contains($":not(.{name})", StringComparison.Ordinal)));
+                // A glyph inside a role button is its own control; Core sets no icon size.
+                var controlSelector = string.Join(',', selector.Split(',')
+                    .Where(static part => !Regex.IsMatch(part, @"controls\|FontIcon[.\w]*\s*$")));
+                if (!role.IsMatch(controlSelector) && !broadRoleStyle) continue;
+                Assert.DoesNotContain(style.Elements().Where(static element => element.Name.LocalName == "Setter"),
+                    setter => appearance.Contains((string?)setter.Attribute("Property") ?? string.Empty));
+            }
+            foreach (var element in document.Descendants())
+            {
+                var classes = ((string?)element.Attribute("Classes") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                Assert.DoesNotContain(classes, static token => token is "actionTextButton" or "actionChip" or "actionButton");
+                Assert.DoesNotContain(element.Attributes(), static attribute =>
+                    attribute.Name.LocalName is "Classes.actionTextButton" or "Classes.actionChip" or "Classes.actionButton");
+                if (classes.Any(static token => token is "viewportOverlayAction" or "canvasQuickToggle" or "canvasToolbarIcon" or
+                    "productChipAction" or "productFilterChip" or "shellTab" or "rightPanelTab" or "rightPanelBrowserTab" or
+                    "settingsNavItem" or "panelBlockHeader" or "workspaceFoldHeader" or "workspaceTableHeaderButton"))
+                {
+                    Assert.DoesNotContain(classes, static token => token is "actionPrimary" or "actionNeutral" or "actionDanger" or
+                        "actionGhost" or "actionIconButton" or "chipAction");
+                }
+                var key = element.Attributes().SingleOrDefault(static attribute => attribute.Name.LocalName == "Key")?.Value;
+                Assert.False(key?.StartsWith("Nvt.Button.", StringComparison.Ordinal) == true ||
+                    key?.StartsWith("Nvt.Focus.", StringComparison.Ordinal) == true, $"Core resource override in {path}: {key}");
+            }
+        }
     }
 
     private static void AssertInteractiveActionStateContrast(string actionStyles, string tokens, double minimumRatio)

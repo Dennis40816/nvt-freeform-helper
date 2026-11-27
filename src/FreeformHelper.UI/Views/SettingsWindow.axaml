@@ -123,12 +123,12 @@
                       Orientation="Horizontal"
                       HorizontalAlignment="Right"
                       Spacing="{StaticResource Space8}">
-            <Button Classes="dangerTextButton"
+            <Button Classes="actionDanger"
                     Content="Reset all settings"
                     Click="ResetAllSettingsButton_Click"/>
-            <Button Content="Cancel"
+            <Button Classes="actionNeutral" Content="Cancel"
                     Command="{Binding CancelCommand}"/>
-            <Button Content="Save Settings"
+            <Button Classes="actionPrimary" Content="Save Settings"
                     Command="{Binding SaveCommand}"/>
           </StackPanel>
         </Grid>

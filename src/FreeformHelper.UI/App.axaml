@@ -13,6 +13,7 @@
   </Application.Resources>
   <Application.Styles>
     <FluentTheme />
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/Icons.axaml"/>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.axaml"/>
   </Application.Styles>

@@ -37,9 +37,9 @@
           </StackPanel>
         </Grid>
         <StackPanel x:Name="ReplayRunActions" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{DynamicResource Space6}">
-          <Button Classes="actionGhost actionTextButton" Content="Start" Command="{Binding UseCurrentCopperAsPathStartCommand}" ToolTip.Tip="Use the current copper position as the path start."/>
-          <Button Classes="actionGhost actionTextButton" Content="End" Command="{Binding UseCurrentCopperAsPathEndCommand}" ToolTip.Tip="Use the current copper position as the path end."/>
-          <Button Classes="actionPrimary actionTextButton simulationActionButton" Command="{Binding ReplayCopperPathCommand}">
+          <Button Classes="actionGhost" Content="Start" Command="{Binding UseCurrentCopperAsPathStartCommand}" ToolTip.Tip="Use the current copper position as the path start."/>
+          <Button Classes="actionGhost" Content="End" Command="{Binding UseCurrentCopperAsPathEndCommand}" ToolTip.Tip="Use the current copper position as the path end."/>
+          <Button Classes="simulationActionButton actionPrimary" Command="{Binding ReplayCopperPathCommand}">
             <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}">
               <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.PlayArrow}"/>
               <TextBlock Text="Run"/>
@@ -102,9 +102,9 @@
           </ListBox.ItemTemplate>
         </ListBox>
         <StackPanel x:Name="ReplayExportActions" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{DynamicResource Space6}">
-          <Button Classes="actionGhost actionTextButton" Content="Copy" Command="{Binding CopyCopperPathReplayCommand}" IsEnabled="{Binding HasCopperPathReplay}"/>
-          <Button Classes="actionGhost actionTextButton" Content="Export CSV" Command="{Binding ExportCopperPathReplayCsvCommand}" IsEnabled="{Binding HasCopperPathReplay}"/>
-          <Button Classes="actionGhost actionTextButton" Content="Export JSON" Command="{Binding ExportCopperPathReplayJsonCommand}" IsEnabled="{Binding HasCopperPathReplay}"/>
+          <Button Classes="actionGhost" Content="Copy" Command="{Binding CopyCopperPathReplayCommand}" IsEnabled="{Binding HasCopperPathReplay}"/>
+          <Button Classes="actionGhost" Content="Export CSV" Command="{Binding ExportCopperPathReplayCsvCommand}" IsEnabled="{Binding HasCopperPathReplay}"/>
+          <Button Classes="actionGhost" Content="Export JSON" Command="{Binding ExportCopperPathReplayJsonCommand}" IsEnabled="{Binding HasCopperPathReplay}"/>
         </StackPanel>
       </StackPanel>
     </ScrollViewer>

@@ -52,7 +52,7 @@
                 <SelectableTextBlock Text="Uniform presets" FontWeight="SemiBold"/>
                 <TextBlock Text="Sets every pad and clears all overrides." Classes="workspaceSectionMeta" TextWrapping="Wrap"/>
                 <WrapPanel Orientation="Horizontal">
-                  <Button Classes="actionChip chipAction"
+                  <Button Classes="chipAction"
                       Margin="{StaticResource InsetRight6Bottom6}"
                       Command="{Binding ApplyManualPresetCommand}"
                       CommandParameter="400">
@@ -66,7 +66,7 @@
                           Text="Uniform 400"/>
                     </Grid>
                   </Button>
-                  <Button Classes="actionChip chipAction"
+                  <Button Classes="chipAction"
                       Margin="{StaticResource InsetRight6Bottom6}"
                       Command="{Binding ApplyManualPresetCommand}"
                       CommandParameter="360">
@@ -80,7 +80,7 @@
                           Text="Uniform 360"/>
                     </Grid>
                   </Button>
-                  <Button Classes="actionChip chipAction"
+                  <Button Classes="chipAction"
                       Margin="{StaticResource InsetRight6Bottom6}"
                       Command="{Binding ApplyManualPresetCommand}"
                       CommandParameter="0">
@@ -98,19 +98,19 @@
               </StackPanel>
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
                 <TextBlock Text="{Binding RandomScopeText}" Classes="workspaceSectionMeta" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                <Button Grid.Column="1" Classes="actionGhost actionTextButton simulationActionButton" Content="Random"
+                <Button Grid.Column="1" Classes="simulationActionButton actionNeutral" Content="Random"
                     Command="{Binding RandomizeVisibleValuesCommand}" IsEnabled="{Binding CanRandomizeVisibleValues}"/>
               </Grid>
               <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
                   <TextBlock Text="Clears overrides in every region." Classes="workspaceSectionMeta" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                  <Button Grid.Column="1" Classes="actionGhost actionTextButton simulationActionButton" Content="Clear all"
+                  <Button Grid.Column="1" Classes="simulationActionButton actionNeutral" Content="Clear all"
                       Command="{Binding ClearAllManualOverridesCommand}" IsEnabled="{Binding HasManualOverrides}"/>
                 </Grid>
               </Border>
             </StackPanel>
             <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding IsCsvSource}">
-              <Button HorizontalAlignment="Right" Classes="actionTextButton simulationActionButton" Classes.actionPrimary="{Binding !CanPlayFrames}" Classes.actionNeutral="{Binding CanPlayFrames}"
+              <Button HorizontalAlignment="Right" Classes="simulationActionButton" Classes.actionPrimary="{Binding !CanPlayFrames}" Classes.actionNeutral="{Binding CanPlayFrames}"
                   Content="Import CSV" Command="{Binding ImportCsvCommand}" IsEnabled="{Binding CanImportCsv}"/>
               <ItemsControl ItemsSource="{Binding CsvFiles}">
                 <ItemsControl.ItemTemplate>
@@ -139,7 +139,7 @@
               <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
                   <TextBlock Text="Stops playback and removes every file." Classes="workspaceSectionMeta" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                  <Button Grid.Column="1" Classes="actionGhost actionTextButton simulationActionButton" Content="Clear CSV"
+                  <Button Grid.Column="1" Classes="simulationActionButton actionNeutral" Content="Clear CSV"
                       Command="{Binding ClearCsvCommand}" IsEnabled="{Binding HasCsvFiles}"/>
                 </Grid>
               </Border>

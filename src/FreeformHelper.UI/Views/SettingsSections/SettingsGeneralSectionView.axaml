@@ -468,12 +468,12 @@
                                          Classes="stepNote"
                                          TextWrapping="Wrap"/>
                   </StackPanel>
-                  <Button Grid.Row="0"
+                  <Button Classes="actionNeutral" Grid.Row="0"
                           Grid.Column="1"
                           Margin="{StaticResource InsetRight8}"
                           Content="On"
                           Command="{Binding EnableCommand}"/>
-                  <Button Grid.Row="0"
+                  <Button Classes="actionNeutral" Grid.Row="0"
                           Grid.Column="2"
                           Content="Off"
                           Command="{Binding DisableCommand}"/>
