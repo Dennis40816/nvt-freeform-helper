@@ -3,6 +3,7 @@
 using System.Globalization;
 using System.Text;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -50,12 +51,15 @@ public sealed class DetailWindowEntryTests
             Assert.Equal("Notch detail", window.Title);
             Assert.Same(cad, detail.CadPad);
             Assert.Equal(FreeformType.XWay, detail.FreeformType);
+            var content = Assert.Single(window.GetVisualDescendants().OfType<NotchDetailContent>());
+            content.FindControl<ToggleButton>("AllocationsToggle")!.IsChecked = true;
+            await HeadlessUiPump.FlushQueueAsync();
             var text = window.GetVisualDescendants().OfType<SelectableTextBlock>().Select(static block => block.Text).ToArray();
             Assert.Contains(detail.CadTitle, text);
             Assert.Contains(detail.CadLayer, text);
             Assert.Contains(detail.FreeformLabel, text);
             var allocation = Assert.Single(detail.Allocations);
-            var table = Assert.Single(window.GetVisualDescendants().OfType<ItemsControl>());
+            var table = Assert.IsType<ListBox>(content.FindControl<ListBox>("AllocationList"));
             Assert.Equal(detail.Allocations.Count, table.ItemCount);
             Assert.Same(allocation, Assert.Single(table.Items));
             Assert.Contains(allocation.Q7Text, text);

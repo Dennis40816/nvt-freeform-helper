@@ -1,104 +1,13 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-        xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
-        x:Class="FreeformHelper.UI.Views.NotchDetailWindow"
-        x:DataType="viewModels:NotchDetailViewModel"
-        x:CompileBindings="True"
-        Width="{StaticResource NotchDetailWidth}"
-        Height="{StaticResource NotchDetailHeight}"
-        MinWidth="{StaticResource NotchDetailMinWidth}"
-        MinHeight="{StaticResource NotchDetailMinHeight}"
-        WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource NfcSurfaceBrush}"
-        Foreground="{DynamicResource NfcTextBrush}"
-        Title="Notch detail">
-  <Window.Styles>
-    <StyleInclude Source="avares://FreeformHelper.UI/Styles/NotchDetail.axaml"/>
-  </Window.Styles>
-  <Border Padding="{StaticResource Inset14}">
-    <Grid x:Name="DetailLayout" RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="{StaticResource Space12}">
-      <StackPanel Spacing="{StaticResource Space4}">
-        <SelectableTextBlock Text="{Binding CadTitle}"
-                   FontWeight="SemiBold"/>
-        <SelectableTextBlock Text="{Binding CadLayer}"
-                   Foreground="{DynamicResource NfcTextMutedBrush}"/>
-      </StackPanel>
-      <StackPanel Grid.Row="1" Spacing="{StaticResource Space4}">
-        <SelectableTextBlock Text="{Binding FreeformLabel}"/>
-        <SelectableTextBlock Text="{Binding ToRegularRatioText}"
-                   Foreground="{DynamicResource NfcTextMutedBrush}"/>
-        <SelectableTextBlock Text="{Binding ToFullRatioText}"
-                   Foreground="{DynamicResource NfcTextMutedBrush}"/>
-        <SelectableTextBlock Text="{Binding CombinedRatioText}"
-                   Foreground="{DynamicResource NfcTextMutedBrush}"/>
-        <SelectableTextBlock Text="{Binding ThresholdSummary}"
-                   Foreground="{DynamicResource NfcTextMutedBrush}"/>
-        <SelectableTextBlock Text="Below TH (skip notch output)"
-                   Foreground="{DynamicResource NfcWarningTextBrush}"
-                   IsVisible="{Binding IsBelowThreshold}"/>
-      </StackPanel>
-
-      <Border Grid.Row="2" Background="{DynamicResource NfcSurfaceSubtleBrush}"
-              BorderBrush="{DynamicResource NfcBorderMutedBrush}"
-              BorderThickness="{StaticResource BorderThin}"
-              CornerRadius="{StaticResource RadiusSm}"
-              Padding="{StaticResource Inset8}">
-        <controls:NotchPreviewCanvas CadPad="{Binding CadPad}"
-                                     RegularPads="{Binding PreviewRegularPads}"
-                                     ToFullPolygons="{Binding ToFullPolygons}"
-                                     FreeformType="{Binding FreeformType}"
-                                     Height="{StaticResource NotchPreviewHeight}"/>
-      </Border>
-
-      <SelectableTextBlock Grid.Row="3" Text="Allocations (Q7)"
-                 FontWeight="SemiBold"/>
-
-      <Grid x:Name="AllocationSection" Grid.Row="4" RowDefinitions="Auto,*"
-            RowSpacing="{StaticResource Space6}" Grid.IsSharedSizeScope="True">
-        <Border x:Name="AllocationHeader" Classes="workspaceTableHeader">
-          <Grid ColumnSpacing="{StaticResource Space6}">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" SharedSizeGroup="RegularId"/>
-              <ColumnDefinition Width="Auto" SharedSizeGroup="Coordinates"/>
-              <ColumnDefinition Width="Auto" SharedSizeGroup="Q7"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <SelectableTextBlock Classes="workspaceTableHeaderText" Text="Regular id"/>
-            <SelectableTextBlock Grid.Column="1" Classes="workspaceTableHeaderText" Text="Coord"/>
-            <SelectableTextBlock Grid.Column="2" Classes="workspaceTableHeaderText" Text="Q7"/>
-            <SelectableTextBlock Grid.Column="3" Classes="workspaceTableHeaderText" Text="Ratio"/>
-          </Grid>
-        </Border>
-        <ListBox x:Name="AllocationList" Grid.Row="1" Classes="workspaceDataList"
-                 ItemsSource="{Binding Allocations}"
-                 Background="{DynamicResource NfcSurfaceSubtleBrush}"
-                 BorderBrush="{DynamicResource NfcBorderMutedBrush}"
-                 BorderThickness="{StaticResource BorderThin}"
-                 Padding="{StaticResource InsetNone}"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-          <ListBox.ItemTemplate>
-            <DataTemplate x:DataType="viewModels:NotchDetailAllocation">
-              <Border Padding="{StaticResource Inset8_6}">
-                <Grid ColumnSpacing="{StaticResource Space6}">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="RegularId"/>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="Coordinates"/>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="Q7"/>
-                    <ColumnDefinition Width="*"/>
-                  </Grid.ColumnDefinitions>
-                  <SelectableTextBlock Text="{Binding RegularLabel}"/>
-                  <SelectableTextBlock Grid.Column="1" Text="{Binding GridLabel}"/>
-                  <SelectableTextBlock Grid.Column="2" Text="{Binding Q7Text}"/>
-                  <SelectableTextBlock Grid.Column="3" Text="{Binding RatioText}"
-                                       Foreground="{DynamicResource NfcTextMutedBrush}"/>
-                </Grid>
-              </Border>
-            </DataTemplate>
-          </ListBox.ItemTemplate>
-        </ListBox>
-      </Grid>
-    </Grid>
-  </Border>
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:FreeformHelper.UI.Views" xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+        x:Class="FreeformHelper.UI.Views.NotchDetailWindow" x:DataType="vm:NotchDetailViewModel" x:CompileBindings="True"
+        Width="{DynamicResource NotchDetailWidth}" Height="{DynamicResource NotchDetailHeight}"
+        MinWidth="{DynamicResource NotchDetailMinWidth}" MinHeight="{DynamicResource NotchDetailMinHeight}"
+        WindowStartupLocation="CenterOwner" Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}" Title="Notch detail">
+  <ScrollViewer x:Name="DetailScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <Border Padding="{DynamicResource NotchExplanationWindowInset}">
+      <views:NotchDetailContent x:Name="DetailContent"/>
+    </Border>
+  </ScrollViewer>
 </Window>

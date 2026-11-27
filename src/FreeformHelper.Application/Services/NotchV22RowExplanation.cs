@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using System.Collections.Immutable;
+using FreeformHelper.Domain.Geometry;
 
 namespace FreeformHelper.Application.Services;
 
@@ -16,7 +17,10 @@ public sealed record NotchV22RowExplanation(
     ImmutableArray<NotchV22TargetExplanation> Targets,
     NotchV22CombineExplanation Combine,
     ImmutableArray<NotchV22GuardExplanation> Guard,
-    ImmutableArray<NotchV22ExplainedRow> Rows);
+    ImmutableArray<NotchV22ExplainedRow> Rows)
+{
+    public ImmutableArray<Polygon2> PreviewPolygons { get; init; } = [];
+}
 
 /// <summary>Selection order: first five keys descending, then CAD ID ascending; ties retain input order.</summary>
 public sealed record NotchV22CandidateExplanation(

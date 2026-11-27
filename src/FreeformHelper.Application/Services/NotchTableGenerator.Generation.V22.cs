@@ -268,14 +268,10 @@ public sealed partial class NotchTableGenerator
 
     private static V22CadCandidate SelectPrimaryV22Candidate(IReadOnlyList<V22CadCandidate> candidates)
     {
-        return candidates
-            .OrderByDescending(candidate => candidate.HasToFullInfluence)
-            .ThenByDescending(candidate => candidate.Legs.Count > 0)
-            .ThenByDescending(candidate => candidate.IsAnchorMatchedCad)
-            .ThenByDescending(candidate => candidate.SourceAreaScore)
-            .ThenByDescending(candidate => candidate.CombinePercent)
-            .ThenBy(candidate => candidate.CadPadId)
-            .First();
+        return NotchV22CandidateSelection.Select(candidates, static candidate => new NotchV22CandidateSelection.Rank(
+            candidate.HasToFullInfluence,
+            candidate.Legs.Count > 0, candidate.IsAnchorMatchedCad, candidate.SourceAreaScore,
+            candidate.CombinePercent, candidate.CadPadId));
     }
 
     private static V22CadCandidate BuildV22CadCandidate(

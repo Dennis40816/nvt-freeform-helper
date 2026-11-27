@@ -300,7 +300,7 @@ public sealed class NotchPreviewStateCharacterizationTests
         Assert.Equal(cad.Id, detail.CadPad.Id);
         Assert.NotEmpty(detail.Allocations);
         Assert.Equal(resolved.Compensation.CombinedRatio, detail.CombinedRatio);
-        Assert.Equal(resolved.Stage2CandidatePolygons, detail.ToFullPolygons);
+        Assert.Equal(resolved.Compensation.ToFullPolygons, detail.ToFullPolygons);
         Assert.Equal(status, vm.StatusText);
         Assert.False(vm.HasUnsavedChanges);
         Assert.False(vm.CanUndo);

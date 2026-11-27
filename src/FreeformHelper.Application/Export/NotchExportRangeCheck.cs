@@ -76,20 +76,7 @@ internal static class NotchExportRangeCheck
         int nullValue,
         NotchExportProfile profile)
     {
-        var projection = NotchV22FirmwareProjector.Project(rows, nullValue, icCount);
-        return profile == NotchExportProfile.Release
-            ? NotchV22FirmwareProjector.OrderNodesByIc(
-                projection.SourceRows.Where(static node => !IsNoOpNode(node)).ToList(), icCount)
-            : projection.NodesByIc;
-    }
-
-    private static bool IsNoOpNode(NotchV22FirmwareRow node)
-    {
-        return node.CombinePercent == 100 &&
-               node.FirstTargetDiffIndex is null &&
-               node.FirstRatioPercent == 0 &&
-               node.SecondTargetDiffIndex is null &&
-               node.SecondRatioPercent == 0;
+        return NotchV22ExportRows.ProjectNodes(rows, icCount, nullValue, profile);
     }
 
     private static void ValidateV21Rows(IReadOnlyList<NotchTableRow> rows)

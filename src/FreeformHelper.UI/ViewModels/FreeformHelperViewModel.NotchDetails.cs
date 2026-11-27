@@ -201,7 +201,39 @@ public sealed partial class FreeformHelperViewModel
             cad.Id,
             dxfIndex?.ToString(CultureInfo.InvariantCulture) ?? "-",
             detail.Allocations.Count);
+        var explanation = BeginNotchRowExplanationAsync(cad, workflowSnapshot, detail);
         await OpenNotchDetailAsync(detail);
+        await explanation;
+    }
+
+    /// <summary>
+    /// Takes the export inputs on the UI thread, then fills the open detail window. The generation reads copies,
+    /// so the window keeps showing the project as it was when it opened.
+    /// </summary>
+    private Task BeginNotchRowExplanationAsync(
+        FreeformHelper.Domain.Pads.CadPad selectedCad,
+        WorkflowDataSnapshot workflowSnapshot,
+        NotchDetailViewModel detail)
+    {
+        var cad = new FreeformHelper.Domain.Pads.CadPadSet(BuildFilteredCadPadSet()!.Pads.ToArray());
+        var grid = NotchDetailUseCase.SnapshotGrid(_grid!);
+        // The same effective values export uses, applied to a copy so opening a detail never marks the project dirty.
+        var settings = CreateExportSettingsSnapshot(_projectFile.Settings);
+        ApplyUiToSettings(settings, markUnsaved: false);
+        var firmwareOutput = NotchExportFileTypeMetadata.IsCExportType(SelectedNotchExportFileTypeOption.Value);
+        var activeIds = GetActiveRegularPadIdsForNotchComputation()?.ToHashSet();
+        var diffMap = workflowSnapshot.CadOutputFwDiffIndexByCadId.ToDictionary();
+        return RunUiOperationAsync(
+            "Notch detail rows",
+            async () => detail.ShowExplanation(await Task.Run(() => NotchDetailUseCase.BuildExplanation(
+                selectedCad, cad, grid, settings, activeIds, diffMap, firmwareOutput))),
+            ex =>
+            {
+                detail.ShowExplanation(FreeformHelper.UI.Presentation.NotchDetailExplanation.WithoutRows(
+                    $"Could not work out the rows: {ex.Message}"));
+                _logger.Error(ex, "Notch detail row explanation failed.");
+            },
+            showModalSpinner: false);
     }
 
     /// <summary>

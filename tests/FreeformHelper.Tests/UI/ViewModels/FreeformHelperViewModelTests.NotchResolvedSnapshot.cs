@@ -639,7 +639,7 @@ public sealed partial class FreeformHelperViewModelTests
         Assert.Equal(display.ToRegularRatioText, detail.ToRegularRatioText);
         Assert.Equal(display.ToFullRatioText, detail.ToFullRatioText);
         Assert.Equal(display.CombinedRatioText, detail.CombinedRatioText);
-        Assert.Same(resolved.Stage2CandidatePolygons, detail.ToFullPolygons);
+        Assert.Same(resolved.Compensation.ToFullPolygons, detail.ToFullPolygons);
     }
 
     private static void AssertInspectorProjectsResolved(

@@ -2,12 +2,13 @@
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Notch;
 
 namespace FreeformHelper.Application.Services;
 
-/// <summary>Use a fresh collector for each Generate call. No geometry or input paths are retained.</summary>
-public sealed class NotchV22ExplanationCollector
+/// <summary>Use a fresh collector for each Generate call. Only the requested preview retains geometry; no input paths are retained.</summary>
+public sealed class NotchV22ExplanationCollector(int? previewCadPadId = null)
 {
     private const double AreaNoiseRatio = 1e-9;
 
@@ -32,7 +33,8 @@ public sealed class NotchV22ExplanationCollector
                 target.IcIndex, target.DiffIndex, target.Ratio, target.RatioPercentRounded,
                 target.PassesStrictThreshold, target.ToFullAppliedRegularCount,
                 DescribeDisposition(target, emitted))).ToImmutableArray(),
-            combineRuleCode, toRegularPercent, toFullPercent, legs.ToImmutableArray());
+            combineRuleCode, toRegularPercent, toFullPercent, legs.ToImmutableArray(),
+            selection.CadPadId == previewCadPadId ? compensation.ToFullPolygons.ToImmutableArray() : []);
         if (!_candidates.TryAdd(new CandidateKey(ic, diff, selection.CadPadId), evidence))
         {
             throw new InvalidOperationException("A collector must be used for only one generation run.");
@@ -41,6 +43,11 @@ public sealed class NotchV22ExplanationCollector
 
     internal void CaptureGuard(int ic, int diff, IEnumerable<NotchV22GuardExplanation> scaling) =>
         _guard.Add((ic, diff), scaling.ToImmutableArray());
+
+    public ImmutableArray<Polygon2> GetPreviewPolygons(int cadPadId) =>
+        _candidates.Where(pair => pair.Key.CadId == cadPadId)
+            .OrderBy(static pair => pair.Key.Ic).ThenBy(static pair => pair.Key.Diff)
+            .SelectMany(static pair => pair.Value.PreviewPolygons).ToImmutableArray();
 
     internal void CaptureRows(int ic, int diff, int cadId, IEnumerable<int> candidateIds,
         int finalCombine, int continuationSubtraction, int nullValue, IEnumerable<NotchTableRow> rows)
@@ -59,7 +66,10 @@ public sealed class NotchV22ExplanationCollector
         _explanations.Add(new NotchV22RowExplanation(ic, diff, cadId, evidence.Selection.RegularPadId, nullValue,
             candidateIds.Select(id => _candidates[new CandidateKey(ic, diff, id)].Selection).ToImmutableArray(),
             evidence.Regulars, targets, combine,
-            _guard.GetValueOrDefault((ic, diff), ImmutableArray<NotchV22GuardExplanation>.Empty), explainedRows));
+            _guard.GetValueOrDefault((ic, diff), ImmutableArray<NotchV22GuardExplanation>.Empty), explainedRows)
+        {
+            PreviewPolygons = evidence.PreviewPolygons,
+        });
     }
 
     private static NotchV22RegularExplanation ExplainRegular(NotchV22RegularDebugInfo info) =>
@@ -124,5 +134,6 @@ public sealed class NotchV22ExplanationCollector
 
     private sealed record CandidateEvidence(NotchV22CandidateExplanation Selection,
         ImmutableArray<NotchV22RegularExplanation> Regulars, ImmutableArray<NotchV22TargetExplanation> Targets,
-        string CombineRuleCode, int ToRegularPercent, int ToFullPercent, ImmutableArray<NotchV22ExplanationLeg> Legs);
+        string CombineRuleCode, int ToRegularPercent, int ToFullPercent, ImmutableArray<NotchV22ExplanationLeg> Legs,
+        ImmutableArray<Polygon2> PreviewPolygons);
 }
