@@ -37,7 +37,7 @@ public sealed class ThemeLookScreenshotTests
         var previousUiCulture = CultureInfo.CurrentUICulture;
         try
         {
-            app.RequestedThemeVariant = ThemeVariant.Dark;
+            app.RequestedThemeVariant = TestEnvironment.Get("FH_THEME_VARIANT") == "Light" ? ThemeVariant.Light : ThemeVariant.Dark;
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
             CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             await CaptureMainWindowAsync(output);
