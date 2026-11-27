@@ -21,7 +21,7 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class ThemeLookScreenshotTests
 {
-    private static readonly string[] CoordinateLayers = ["alpha", "beta"];
+    private static readonly string[] _coordinateLayers = ["alpha", "beta"];
 
     [AvaloniaFact]
     public async Task CaptureMainScreensWhenRequestedAsync()
@@ -119,7 +119,7 @@ public sealed class ThemeLookScreenshotTests
         var coordinate = new CoordinatePlannerWorkspaceViewModel(
             new FreeformHelper.UI.Services.CoordinatePlannerWorkspaceUseCase(),
             new FreeformHelper.UI.Services.CoordinatePlannerWorkspaceSession(grid,
-                shell.FreeformHelper.CadPads.ToArray(), CoordinateLayers,
+                shell.FreeformHelper.CadPads.ToArray(), _coordinateLayers,
                 shell.FreeformHelper.WorkspaceDerivedSourceRevision, 100d, 50d, 1000, 500));
         await shell.ShowCoordinateAsync(coordinate);
         await SaveFrameAsync(window, output, "coordinate.png");

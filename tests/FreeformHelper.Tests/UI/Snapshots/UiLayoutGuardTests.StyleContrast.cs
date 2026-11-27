@@ -9,9 +9,9 @@ namespace FreeformHelper.Tests;
 
 public sealed partial class UiLayoutGuardTests
 {
-    private static readonly string[] ThemeVariantKeys = ["Dark", "Light"];
+    private static readonly string[] _themeVariantKeys = ["Dark", "Light"];
 
-    private static readonly string[] AccentOverrideKeys =
+    private static readonly string[] _accentOverrideKeys =
     [
         "NfcAccentBorderBrush", "NfcAccentBorderLightBrush", "NfcAccentBorderStrongBrush", "NfcAccentBrush",
         "NfcAccentStrongBrush", "NfcAccentSurfaceBrush", "NfcAccentSurfaceSubtleBrush",
@@ -42,12 +42,12 @@ public sealed partial class UiLayoutGuardTests
         var tokens = XDocument.Parse(TestFiles.ReadContent(Path.Combine(uiRoot, "Styles", "Tokens.axaml")));
         XNamespace xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
         var themes = tokens.Descendants().Where(element => (string?)element.Attribute(xaml + "Key") is "Dark" or "Light").ToArray();
-        Assert.Equal(ThemeVariantKeys, themes.Select(element => (string?)element.Attribute(xaml + "Key")).Order(StringComparer.Ordinal));
+        Assert.Equal(_themeVariantKeys, themes.Select(element => (string?)element.Attribute(xaml + "Key")).Order(StringComparer.Ordinal));
         foreach (var theme in themes)
         {
             var accents = theme.Elements().Select(element => (string?)element.Attribute(xaml + "Key"))
                 .Where(static key => key?.StartsWith("NfcAccent", StringComparison.Ordinal) == true).ToArray();
-            Assert.Equal(AccentOverrideKeys, accents.Order(StringComparer.Ordinal));
+            Assert.Equal(_accentOverrideKeys, accents.Order(StringComparer.Ordinal));
         }
     }
 
