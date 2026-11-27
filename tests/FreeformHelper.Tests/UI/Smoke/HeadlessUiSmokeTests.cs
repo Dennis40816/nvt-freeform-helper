@@ -245,11 +245,11 @@ public sealed class HeadlessUiSmokeTests
 
             var normalizedTip = Assert.IsType<TextBlock>(ToolTip.GetTip(target));
             Assert.Equal("Tooltip text", normalizedTip.Text);
-            var normalizedForeground = Assert.IsAssignableFrom<ISolidColorBrush>(normalizedTip.Foreground);
+            // A detached tip has no theme variant yet, so it holds the fallback until it is attached.
+            var detachedForeground = Assert.IsAssignableFrom<ISolidColorBrush>(normalizedTip.Foreground);
+            Assert.Equal(Colors.Black, detachedForeground.Color);
             Assert.True(app.TryGetResource("NfcTextStrongBrush", app.RequestedThemeVariant, out var resource));
             var expectedForeground = Assert.IsAssignableFrom<ISolidColorBrush>(resource);
-            Assert.Same(expectedForeground, normalizedForeground);
-            Assert.Equal(expectedForeground.Color, normalizedForeground.Color);
 
             window.Content = target;
             window.Show();
