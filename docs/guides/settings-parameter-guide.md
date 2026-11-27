@@ -85,18 +85,18 @@ Tuning recommendations: first enter the actual number of cascaded ICs in `Cascad
 | --- | --- | --- |
 | `Compensation model` | Step 3 compensation model; controls To Regular / To Full semantics through a single source. | Follow the current product line specification; recheck Step 3 summary and Simulation after switching. |
 | `To Regular EN (derived)` | Derived from the compensation model; indicates whether to restore the area-proportional signal first. | Read-only state; change `Compensation model` to change behavior. |
-| `To Full EN (derived)` | Derived from the compensation model; indicates whether boundary target support / cap is enabled. | Read-only state; change `Compensation model` to change behavior. |
-| `Multi-owner strict overlap (%)` | Required regular-area overlap ratio before CAD can own or block a boundary target. | Increase to reject ambiguous boundary targets earlier; decrease to retain more boundary candidates, but check with Simulation. |
+| `To Full EN (derived)` | Derived from the compensation model; indicates whether To Full expansion is enabled. | Read-only state; change `Compensation model` to change behavior. |
+| `Multi-owner strict overlap (%)` | To Full ignores overlaps and free areas below this ratio. A smaller target share is ignored unless To Full applies to it. Blocking does not use this value. | Increase to ignore smaller overlaps; decrease to retain more candidates, but check with Simulation. |
 | `Use boundary area cap` | Limits To Full virtual expansion area to prevent uncontrolled boundary EMS. | Keep enabled as recommended; disable only for diagnostic comparisons. |
 | `Virtual cap (%)` | Maximum ratio of virtual To Full area to original overlap area. | 100% means the outer virtual area does not exceed the inner overlap. Check EMS margin before relaxing the limit. |
 | `Use target coverage guard` | Limits total coverage for each target FW diff after CurrentGain rows are selected. | Keep enabled as recommended; this is the main guard against uniform-field EMS overflow. |
 | `Target cap (%)` | Target-side coverage limit; 120% corresponds to uniform 400 reaching the EMS 480 cap. | Usually keep at 120; increasing it raises EMS risk, while decreasing it may cause undercompensation. |
-| `Use To Full rule engine` | Uses the centralized To Full boundary gate engine; when disabled, uses the legacy inline gate path. | Keep enabled as recommended unless comparing with the legacy path. |
+| `Use To Full rule engine` | Uses the centralized To Full gate engine; when disabled, uses the legacy inline gate path. | Keep enabled as recommended unless comparing with the legacy path. |
 | `Keep To Full trace` | Stores the To Full rule decision for each regular pad for diagnostics / runtime query. | Enable when inspecting rule decisions; normally disable to reduce diagnostic data volume. |
 | `Stage auto play` | Automatically cycles Step 3 preview layers on the AA canvas. | Display only; does not affect notch rows. |
 | `Interval (ms)` | Interval between auto play layers. | Adjusts only viewing speed; does not affect calculations. |
 | `Show To Regular labels` | Displays To Regular ratio labels on the Step 3 preview canvas. | Display only; enable when checking individual ratios. |
-| `Show To Full overlay` | Displays To Full support stages on the Step 3 preview canvas. | Display only; enable when checking boundary support. |
+| `Show To Full overlay` | Displays To Full support stages on the Step 3 preview canvas. | Display only; enable when checking To Full support. |
 | `To Full layer stage` | Selects the To Full preview layer: 1 seed, 2 candidate, 3 final. | Locates the layer where a rule gate excludes a candidate; does not change calculation results. |
 
 ## Step 4

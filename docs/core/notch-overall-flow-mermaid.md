@@ -27,7 +27,7 @@ flowchart LR
     J --> K["Reuse in Export / Simulation / Inspector"]
 
     N1["Regular Visibility Mask (SeeRegular.csv) only constrains Step4 geometry seed and Simulation active surface"]:::note
-    N2["ToFull boundary currently uses match-scope active regular set, not Regular Visibility Mask (SeeRegular.csv)"]:::note
+    N2["Boundary diagnostics currently use the match-scope active regular set, not Regular Visibility Mask (SeeRegular.csv)"]:::note
     D -.-> N1
     G -.-> N2
 
@@ -105,7 +105,7 @@ Key points:
 - `ToRegular`
   - Its purpose is to partly flatten the area difference caused by Undo NF, so the sensed quantity first returns to a state closer to proportional to area.
 - `ToFull`
-  - Its purpose is to support boundary / edge push. It should not automatically mean that the expanded full area becomes the main allocation weight directly.
+  - Its purpose is to support boundary / edge push (design intent only: it is not limited to boundary regulars). It should not automatically mean that the expanded full area becomes the main allocation weight directly.
 - `Boundary virtual-area cap`
   - Its purpose is to limit the virtual area that ToFull extends, so that a very small boundary overlap does not get an excessively large expansion weight.
 - `Target coverage guard`

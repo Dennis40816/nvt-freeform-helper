@@ -38,7 +38,7 @@ public sealed class NotchPreviewSummaryBehaviorTests
         Assert.Equal($"ToRegular {state}", vm.NotchToRegularStateText);
         Assert.Equal($"ToFull {state}", vm.NotchToFullStateText);
         Assert.Equal(enabled ? "ON - restore area signal" : "OFF - baseline", vm.NotchToRegularShortText);
-        Assert.Equal(enabled ? "ON - support/cap only" : "OFF - no boundary support", vm.NotchToFullShortText);
+        Assert.Equal(enabled ? "ON - expand free area" : "OFF - no expansion", vm.NotchToFullShortText);
         Assert.Equal(
             enabled
                 ? "ToRegular: undo NF area flattening and restore area-proportional signal before redistribution."
@@ -46,7 +46,7 @@ public sealed class NotchPreviewSummaryBehaviorTests
             vm.NotchToRegularSemanticSummary);
         Assert.Equal(
             enabled
-                ? "ToFull: boundary support/cap/allowance only; target amount remains area-proportional."
+                ? "ToFull: expands pads into reachable free area."
                 : "ToFull: disabled for baseline comparison.",
             vm.NotchToFullSemanticSummary);
     }

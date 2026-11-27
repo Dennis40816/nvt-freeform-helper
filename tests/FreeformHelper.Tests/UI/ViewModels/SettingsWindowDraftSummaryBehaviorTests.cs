@@ -16,7 +16,7 @@ public sealed class SettingsWindowDraftSummaryBehaviorTests
         "Allocation model: Stage3 effective-area gain; ToFull-expanded area splits the combined source signal.",
         "Stage3 gain allocation")]
     [InlineData(NotchCompensationModel.ConservativeNoGain, true, "Conservative (No Gain)",
-        "Apply ToRegular source combine; ToFull only gates boundary support.",
+        "Apply ToRegular source combine; ToFull adds no gain.",
         "Allocation model: SourceArea-dominant; ToFull is support/cap, not direct full-area weight.",
         "Source-area dominant")]
     [InlineData(NotchCompensationModel.Disabled, false, "Disabled",
@@ -43,12 +43,12 @@ public sealed class SettingsWindowDraftSummaryBehaviorTests
         var state = enabled ? "ON" : "OFF";
         Assert.Equal($"{display} · ToRegular {state} · ToFull {state}", draft.NotchEffectiveModelSummary);
         Assert.Equal(enabled ? "ON - restore area signal" : "OFF - baseline", draft.NotchToRegularShortText);
-        Assert.Equal(enabled ? "ON - support/cap only" : "OFF - no boundary support", draft.NotchToFullShortText);
+        Assert.Equal(enabled ? "ON - expand free area" : "OFF - no expansion", draft.NotchToFullShortText);
         Assert.Equal(enabled
             ? "ToRegular: undo NF area flattening and restore area-proportional signal before redistribution."
             : "ToRegular: disabled for baseline comparison.", draft.NotchToRegularSemanticSummary);
         Assert.Equal(enabled
-            ? "ToFull: boundary support/cap/allowance only; target amount remains area-proportional."
+            ? "ToFull: expands pads into reachable free area."
             : "ToFull: disabled for baseline comparison.", draft.NotchToFullSemanticSummary);
         Assert.Contains(nameof(draft.NotchCompensationModelSummary), changes);
         Assert.Contains(nameof(draft.NotchAllocationModelSummary), changes);

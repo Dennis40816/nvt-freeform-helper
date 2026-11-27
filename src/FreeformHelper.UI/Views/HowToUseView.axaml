@@ -129,8 +129,8 @@
                 <SelectableTextBlock Text="- BBoxArea: CAD pad bounding-box area, formula = width × height (used by V2.1 REGU_TO_FULL field)."/>
                 <SelectableTextBlock Text="- Freeform TH (Matching &gt; Freeform axis threshold): decides XWay/YWay/None classification during auto-detect."/>
                 <SelectableTextBlock Text="- Notch TH (Notch threshold Q7): after allocation, if max allocation &lt; TH, that CAD is skipped from notch export."/>
-                <SelectableTextBlock Text="- Effective boundary: To Full can only start from CAD-overlapped regulars that are connected to boundary seeds (outer edge or inactive-neighbor seed)."/>
-                <SelectableTextBlock Text="- Multi-owner gate: if one regular is owned by more than one CAD (strict overlap over TH), that regular cannot be a To Full target."/>
+                <SelectableTextBlock Text="- To Full scope: every CAD-overlapped regular with reachable free area can expand, not only boundary regulars."/>
+                <SelectableTextBlock Text="- Multi-owner gate: a shared regular is blocked only when it has no reachable free area."/>
                 <SelectableTextBlock Text="- Active regular visibility mask: boundary inactive-neighbor check uses current active regular set (match result scope), not all grid cells."/>
                 <SelectableTextBlock Text="- Allocation cutoff: reserved for future FW-oriented row minimization (not enabled in current build)."/>
                 <SelectableTextBlock Text="- Export notch now opens a row picker, so each generated notch row can be included/excluded manually before file output."/>

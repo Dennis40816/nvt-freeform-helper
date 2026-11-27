@@ -183,7 +183,7 @@ Main purpose:
 
 Key points:
 - `ToRegular`: area relationship between CAD and regular
-- `ToFull`: whether safe expansion is possible under boundary / owner / gate rules
+- `ToFull`: whether safe expansion is possible under owner / gate rules
 - `Combined`: combined ratio
 
 Common places to inspect:

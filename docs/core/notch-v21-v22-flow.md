@@ -217,7 +217,7 @@ flowchart LR
     - `Current (Gain)`: `Σ(stage3EffectiveAreaOnTarget / targetRegularArea)`.
     - `Conservative (No Gain)`: `Σ(overlapAreaOnTarget / targetRegularArea)`.
   - This avoids multiplying each target share by the whole CAD's `R` as a source-wide gain.
-  - `Boundary virtual-area cap` is part of the middle Step3 compensation stage: it limits the effective virtual area extended by the ToFull boundary without changing Step1/Step4 mapping.
+  - `Boundary virtual-area cap` is part of the middle Step3 compensation stage: it limits the effective virtual area that ToFull adds, without changing Step1/Step4 mapping.
   - Source diff prioritizes `CAD Output FW Diff Idx`; target legs are built only from geometric aggregation of regular `(IC,Diff)`.
   - Build target legs; coverage above `100%` is split into multiple <=100% chunks to fit the v2.2 `INT8` ratio payload.
 - `BuildV22DiffCentricRows`
@@ -232,7 +232,7 @@ flowchart LR
    - Means "regulars to which CAD has already been allocated"
 2. `Regular Visibility Mask (SeeRegular.csv)`
    - A separate set of additional restrictions
-   - Currently not used directly as the source of `ToFull boundary`
+   - Currently not used directly as the source of the boundary diagnostics
    - It is an upstream geometry/visibility input, not a Step3 compensation item; therefore it should not carry EMS cap or target coverage behavior.
 3. `boundary seed`
    - Currently defined as `grid outer edge OR inactive neighbor in match-scope active set`
@@ -262,7 +262,7 @@ flowchart LR
    - That is, first restore the sensing value to a state closer to area proportionality, rather than simply applying gain.
 2. `ToFull`
    - In domain terms, this should mean "Boundary / edge-extension support".
-   - Its primary purpose is to give boundary regulars enough allocatable support to assist edge reporting.
+   - Its primary purpose is to give boundary regulars enough allocatable support to assist edge reporting. (Design intent only: `ToFull` is not limited to boundary regulars.)
 3. beta0.7 baseline
    - `NotchV22TargetAllocationService.Build(...)` uses `ReachableArea` as `EffectiveArea` in target allocation for regulars with `IsToFullApplied`.
    - This means full-area expansion directly affects the target ratio.

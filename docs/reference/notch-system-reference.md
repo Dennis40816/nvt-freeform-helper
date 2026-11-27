@@ -1,6 +1,6 @@
 # Notch System Reference
 
-> Last updated: 2026-10-03
+> Last updated: 2026-11-27
 > Status: The sole canonical reference for the current Notch pipeline / Simulation / Export
 
 This document does not aim to replace all historical documents. It brings together "how the system currently works" in one place. Any future changes to the flow, naming, or C export contract should update this file first, then adjust the deep-dive or legacy example.
@@ -84,8 +84,8 @@ A CAD pad is not itself a FW memory node, but several diff identities are derive
   - Source: `_workflowData.LatestPadMatch.RegularToCad.Keys`
   - Meaning: Regular pads already assigned to a CAD pad in the current Step1 / matching result
   - Current uses:
-    - v2.2 `ToFull` boundary seed
-    - Active/inactive neighbor decisions for notch compensation
+    - v2.2 boundary-regular diagnostics (not a `ToFull` gate, see section 4.2)
+    - Active/inactive neighbor decisions behind those diagnostics
 
 - `Regular Visibility Mask (SeeRegular.csv)`
   - Source: `SeeRegular.csv` loads successfully, and `UseRegularVisibilityMask` / `RegularVisibilityMaskUi.IsEnabled` is enabled
@@ -111,7 +111,12 @@ Under the `CadAllocation` path:
 - It falls back to the raw anchor regular diff only when the output mapping is currently missing
 - v2.2 target legs come only from geometric aggregation of regular `(IC, FW Diff Idx)`
 - Targets should no longer be rewritten by visible / CAD projection
-- The `ToFull` boundary seed is currently defined as:
+- `ToFull` is not limited to boundary regulars:
+  - Step3 evaluates every overlapped regular and applies `ToFull` where the pad has reachable free area (connected safe fill).
+  - `ToFull` also decides row emission. A CAD emits no row for an IC when its anchor regular pad in that IC is not tagged freeform and no target has `ToFull` applied.
+  - The boundary-only gate was removed on purpose in 2026-03 (S11.44 in `docs/archive/TODO-history-2026-03-24.md`).
+  - A proposal to limit `ToFull` to boundary regulars again was dropped (owner decision, 2026-11-27). It removed whole rows, including the area allocation to neighbors. On a staggered synthetic panel with the virtual area cap and the target coverage guard off, a uniform input stays uniform today and no longer did with that proposal. Both settings are on by default, and with them on a uniform input is not preserved on that panel either way.
+- A boundary regular is still computed, for diagnostics only. It is:
   - A regular on the outer edge of the grid, or
   - A regular with any up/down/left/right neighbor missing or outside the `match-scope active regular set`
 - The boundary regular index set is precomputed once within the same generation pass, then filtered and reused in each candidate; this is a performance optimization that does not change results
@@ -270,7 +275,7 @@ The C file currently produced by `NotchTableExporter.ExportAsCInitializer(...)` 
 ### 7.4 v2.2 Node Comment Semantics
 
 - `R=...%` represents the To Regular diagnostic multiplier: `Σ(overlapArea / targetRegularArea)`. It is no longer multiplied into all target shares as a source-wide gain.
-- `F=...%` represents the To Full diagnostic multiplier; in `Conservative (No Gain)`, To Full mainly serves as boundary support/cap/allowance, so `F=100%` is common without boundary expansion. In `Current (Gain)`, the Stage3 effective area after To Full affects only the coverage of the corresponding target.
+- `F=...%` represents the To Full diagnostic multiplier; in `Conservative (No Gain)`, To Full mainly serves as support/cap/allowance, so `F=100%` is common without expansion. In `Current (Gain)`, the Stage3 effective area after To Full affects only the coverage of the corresponding target.
 - `C=...%` represents the full source allocation before the target coverage guard, namely self retained + all target legs across MAIN and CONT; `TG=...%`, when present, is the total after the guard. MAIN's payload `CombinePercent` excludes the CONT legs.
 - `NODE KEEP=...% MOVE=...%` is the actual node flow additionally derived by C export; for example, `C=100%` with a target leg of `44` means the source retains `56%` and moves `44%`.
 
@@ -313,7 +318,7 @@ CombinePercent = self retained coverage + Σ(target leg coverage)
 ```
 
 - `ToRegular` remains enabled to restore area differences flattened by NF.
-- `ToFull` still runs the rule engine, but determines only support / cap / boundary allowance.
+- `ToFull` still runs the rule engine, but determines only support / cap / allowance.
 - Actual target legs use only the original overlap coverage.
 - No Gain therefore means "no ToFull amount gain", not no compensation at all.
 
@@ -519,7 +524,9 @@ This section records the domain golden rules that current Freeform / Notch desig
 - In other words, `ToRegular` should be viewed as "bringing sensing amounts back closer to proportionality with area" to offset NF's partial compensation for area differences.
 - If this assumption holds, `ToRegular` is physically meaningful and closer to the actual sensor area distribution than simply retaining the post-NF values.
 
-### 9.6 Physical Meaning of To Full
+### 9.6 Physical Meaning of To Full (recommendation, not adopted)
+
+> Status: not adopted. This section records a design recommendation. It does not describe current behavior: `ToFull` is not limited to boundary or edge regulars (section 4.2).
 
 - `ToFull` is intended to support boundary edge extrapolation, rather than arbitrarily amplify sensing amounts.
 - The reason is that the Boundary algorithm estimates positions from a line of sensing amounts outside the edge; if the freeform region has no valid sensing output before notch correction, the edge cannot be extrapolated outward correctly.
@@ -527,7 +534,9 @@ This section records the domain golden rules that current Freeform / Notch desig
   - Allowing edge regulars to obtain usable boundary sensing support
   - Helping edge touch reporting, rather than rewriting the main allocation rules across the interior
 
-### 9.7 Canonical Recommendations for To Full
+### 9.7 Recommendations for To Full (not adopted)
+
+> Status: not adopted, except the last bullet about `Current (Gain)`, which describes current behavior.
 
 - Whether `ToFull` should directly use the expanded full regular area as the target allocation weight should not currently be considered settled.
 - The recommendation currently more consistent with physical intuition is:
@@ -604,6 +613,7 @@ Given the current practical sensor / FW / NF scenarios, `ToRegular` and `ToFull`
   - Conclusion: Reasonable, but expanded/full area should not directly determine the target ratio.
   - Reason: The actual purpose of `ToFull` is to provide sufficient edge support for boundary / edge extrapolation algorithms, rather than let tiny overlap become the main allocation leg through full expansion.
   - Recommended meaning: `ToFull` determines reachability, support eligibility, caps, or boundary allowance; the actual allocation ratio should still primarily be determined by `exact/source overlap`.
+  - Status: not adopted (see section 9.6).
 - `with gain`
   - Conclusion: Unsuitable as the default main path.
   - Reason: It has been corrected to per-target Stage3 coverage, but gain may still amplify local net-flow imbalance until measurements establish uniform-field stability for target allocation.
@@ -685,7 +695,7 @@ The future state that best matches your description should therefore be:
 - `v2.2 canonical`
 - `without gain` as the default
 - Retain `ToRegular`
-- Change `ToFull` to `support / cap / boundary allowance`
+- Change `ToFull` to `support / cap / boundary allowance` (not adopted, see section 9.6)
 - Add `area-preserving + EMS-guarded` safety correction and audit to target allocation; beta0.9's `Boundary virtual-area cap` / `Target coverage guard` is the current first implementation
 
 ## 11. Related Deep-Dives / Examples
