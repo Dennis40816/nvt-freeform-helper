@@ -15,7 +15,7 @@
   </Design.DataContext>
 
   <ScrollViewer x:Name="DevRootScroll"
-                Classes="scrollV2 viewportBoundScroll"
+                Classes="viewportBoundScroll"
                 VerticalScrollBarVisibility="Auto"
                 HorizontalScrollBarVisibility="Disabled">
     <Border x:Name="DebugRoot"
@@ -29,6 +29,23 @@
         <SelectableTextBlock Text="Prototype sections have been trimmed. This page now keeps only lightweight runtime/theme probes."
                              TextWrapping="Wrap"
                              Foreground="{DynamicResource NfcTextMutedBrush}"/>
+        <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
+                BorderBrush="{DynamicResource NfcBorderBrush}"
+                BorderThickness="{StaticResource BorderThin}"
+                CornerRadius="{DynamicResource RadiusMd}"
+                Padding="{DynamicResource Inset16}">
+          <StackPanel Spacing="{DynamicResource Space12}">
+            <SelectableTextBlock Text="Scroll bars" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"/>
+            <ScrollViewer x:Name="DevScrollPreview" Classes="viewportBoundScroll"
+                          Height="{StaticResource DevScrollPreviewHeight}"
+                          VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+              <Border Classes="viewportBoundContent" Padding="{DynamicResource Inset12}">
+                <SelectableTextBlock TextWrapping="Wrap"
+                                     Text="Scroll preview&#10;Project settings&#10;Geometry&#10;Freeform&#10;Notch&#10;Index mapping&#10;Export review&#10;CAD pad details&#10;Regular pad details&#10;Simulation&#10;Copper replay&#10;Coordinate planner&#10;Layer selection&#10;Visibility&#10;Display options&#10;Diagnostics&#10;Verification&#10;Console entries&#10;Selection details&#10;Source bounds&#10;Advanced settings&#10;End of preview"/>
+              </Border>
+            </ScrollViewer>
+          </StackPanel>
+        </Border>
         <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
                 BorderBrush="{DynamicResource NfcBorderBrush}"
                 BorderThickness="{StaticResource BorderThin}"

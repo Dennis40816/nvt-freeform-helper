@@ -12,11 +12,12 @@ public sealed partial class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
 
         var controlsStyles = ReadAllStylesText(repoRoot);
-        Assert.Contains("Style Selector=\"ScrollViewer.viewportBoundScroll\"", controlsStyles, StringComparison.Ordinal);
-        Assert.Contains("HorizontalContentAlignment\" Value=\"Stretch", controlsStyles, StringComparison.Ordinal);
-        Assert.Contains("Padding\" Value=\"0", controlsStyles, StringComparison.Ordinal);
-        Assert.Contains("Style Selector=\"Border.viewportBoundContent\"", controlsStyles, StringComparison.Ordinal);
-        Assert.Contains("$parent[ScrollViewer].Viewport.Width", controlsStyles, StringComparison.Ordinal);
+        Assert.Contains("avares://Nvt.Core.Avalonia/Theme/ScrollStyles.axaml", controlsStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain(ExtractStyleBlocks(controlsStyles),
+            static style => Regex.IsMatch(style.Selector, @"\bScrollBar\b"));
+        Assert.DoesNotContain("AllowAutoHide", controlsStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("Style Selector=\"ScrollViewer.viewportBoundScroll\"", controlsStyles, StringComparison.Ordinal);
+        Assert.DoesNotContain("Style Selector=\"Border.viewportBoundContent\"", controlsStyles, StringComparison.Ordinal);
         Assert.Contains("Style Selector=\"ToggleButton.rightPanelTab\"", controlsStyles, StringComparison.Ordinal);
 
         var mainWindow = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "MainWindow.axaml"));
@@ -26,7 +27,7 @@ public sealed partial class UiLayoutGuardTests
         var freeformView = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "FreeformHelperView.axaml"));
         Assert.Contains("x:Name=\"RightSettingsScroll\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("x:Name=\"LeftSettingsScroll\"", freeformView, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"scrollDevCandidate viewportBoundScroll\"", freeformView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"viewportBoundScroll\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"viewportBoundContent\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("Padding=\"{StaticResource InsetRight12Bottom20}\"", freeformView, StringComparison.Ordinal);
         Assert.Contains("ShowNotchToRegularLabels=\"{Binding IsNotchToRegularPreviewVisible}\"", freeformView, StringComparison.Ordinal);

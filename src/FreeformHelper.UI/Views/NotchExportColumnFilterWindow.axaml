@@ -69,13 +69,12 @@
       </Border>
 
       <ListBox Grid.Row="3"
-               Classes="scrollV2 workspaceFilterOptions"
+               Classes="workspaceFilterOptions"
                BorderThickness="{StaticResource BorderThin}"
                BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                Background="{DynamicResource NfcSurfaceSubtleBrush}"
                ItemsSource="{Binding Options}"
                IsVisible="{Binding CanShowValueList}"
-               ScrollViewer.AllowAutoHide="False"
                ScrollViewer.VerticalScrollBarVisibility="Auto"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled">
         <ListBox.ItemsPanel>

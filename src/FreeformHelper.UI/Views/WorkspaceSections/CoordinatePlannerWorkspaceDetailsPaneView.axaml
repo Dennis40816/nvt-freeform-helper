@@ -85,10 +85,9 @@
                  x:Name="CoordinateArtifactList"
                  ItemsSource="{Binding ArtifactRows}"
                  SelectedItem="{Binding SelectedArtifactRow, Mode=TwoWay}"
-                 Classes="scrollV2 workspaceDataList coordinateArtifactList"
+                 Classes="workspaceDataList coordinateArtifactList"
                  Background="{DynamicResource BrushTransparent}"
                  BorderThickness="{DynamicResource BorderNone}"
-                 ScrollViewer.AllowAutoHide="False"
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
           <ListBox.ItemsPanel>

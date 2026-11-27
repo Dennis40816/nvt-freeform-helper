@@ -151,31 +151,33 @@
               <controls:FontIcon Classes="symbols" Glyph="{DynamicResource Nvt.Icon.RestartAlt}"/>
             </Button>
           </Grid>
-          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <controls:HidePanelBlock x:Name="AdvancedOptions" Classes="exportAdvanced" Title="Advanced" DefaultExpanded="False">
-              <StackPanel Spacing="{DynamicResource Space8}">
-                <Grid ColumnDefinitions="Auto,Auto">
-                  <StackPanel Classes="panelFormField left">
-                    <TextBlock Classes="exportLabel" Text="Padding"/>
-                    <controls:NumberScrubber Classes="exportNumber" Minimum="0" Maximum="100000" SmallChange="1" FormatString="0"
-                                             Value="{Binding PreviewSettings.PaddingX, Mode=TwoWay}" AutomationProperties.Name="Padding X"/>
-                  </StackPanel>
-                  <StackPanel Grid.Column="1" Classes="panelFormField right" VerticalAlignment="Bottom">
-                    <controls:NumberScrubber Classes="exportNumber" Minimum="0" Maximum="100000" SmallChange="1" FormatString="0"
-                                             Value="{Binding PreviewSettings.PaddingY, Mode=TwoWay}" AutomationProperties.Name="Padding Y"/>
-                  </StackPanel>
-                </Grid>
-                <StackPanel Classes="panelFormField">
-                  <TextBlock Classes="exportLabel" Text="Line width"/>
-                  <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                    <controls:NumberScrubber Classes="exportNumber" Minimum="0.1" Maximum="100" SmallChange="0.1"
-                                             FormatString="0.##" SnapToStep="False"
-                                             Value="{Binding PreviewSettings.LineWidthPixels, Mode=TwoWay}" AutomationProperties.Name="Line width in pixels"/>
-                    <TextBlock Text="px" Classes="exportMuted"/>
+          <ScrollViewer Classes="viewportBoundScroll" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <Border Classes="viewportBoundContent">
+              <controls:HidePanelBlock x:Name="AdvancedOptions" Classes="exportAdvanced" Title="Advanced" DefaultExpanded="False">
+                <StackPanel Spacing="{DynamicResource Space8}">
+                  <Grid ColumnDefinitions="Auto,Auto">
+                    <StackPanel Classes="panelFormField left">
+                      <TextBlock Classes="exportLabel" Text="Padding"/>
+                      <controls:NumberScrubber Classes="exportNumber" Minimum="0" Maximum="100000" SmallChange="1" FormatString="0"
+                                               Value="{Binding PreviewSettings.PaddingX, Mode=TwoWay}" AutomationProperties.Name="Padding X"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Classes="panelFormField right" VerticalAlignment="Bottom">
+                      <controls:NumberScrubber Classes="exportNumber" Minimum="0" Maximum="100000" SmallChange="1" FormatString="0"
+                                               Value="{Binding PreviewSettings.PaddingY, Mode=TwoWay}" AutomationProperties.Name="Padding Y"/>
+                    </StackPanel>
+                  </Grid>
+                  <StackPanel Classes="panelFormField">
+                    <TextBlock Classes="exportLabel" Text="Line width"/>
+                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                      <controls:NumberScrubber Classes="exportNumber" Minimum="0.1" Maximum="100" SmallChange="0.1"
+                                               FormatString="0.##" SnapToStep="False"
+                                               Value="{Binding PreviewSettings.LineWidthPixels, Mode=TwoWay}" AutomationProperties.Name="Line width in pixels"/>
+                      <TextBlock Text="px" Classes="exportMuted"/>
+                    </StackPanel>
                   </StackPanel>
                 </StackPanel>
-              </StackPanel>
-            </controls:HidePanelBlock>
+              </controls:HidePanelBlock>
+            </Border>
           </ScrollViewer>
         </Grid>
       </Grid>

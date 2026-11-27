@@ -6,7 +6,7 @@
     x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspaceControlsPaneView">
   <Border Grid.Column="0"
       Classes="workspaceSidePane left">
-    <ScrollViewer Classes="scrollDevCandidate viewportBoundScroll"
+    <ScrollViewer Classes="viewportBoundScroll"
         MinHeight="0"
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Disabled">

@@ -8,7 +8,7 @@
   <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Tab.axaml"/>
   <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Form.axaml"/>
   <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Panel.axaml"/>
-  <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Scroll.axaml"/>
+  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ScrollStyles.axaml"/>
   <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Settings.axaml"/>
   <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.PadInfo.axaml"/>
   <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.Action.axaml"/>

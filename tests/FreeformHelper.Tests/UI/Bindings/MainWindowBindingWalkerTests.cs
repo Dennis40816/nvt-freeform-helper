@@ -11,7 +11,7 @@ public sealed class MainWindowBindingWalkerTests(ITestOutputHelper output)
 {
     // Sites that the walker cannot follow yet (secondary windows, key bindings, style setters that need a runtime ancestor).
     // The number only goes down: lower it in the same change that covers more sites. It must equal the measured count.
-    private const int UncoveredCeiling = 18;
+    private const int UncoveredCeiling = 17;
 
     [AvaloniaFact]
     public void MainWindowCompositionHasReadableAndWritableBindingPaths()

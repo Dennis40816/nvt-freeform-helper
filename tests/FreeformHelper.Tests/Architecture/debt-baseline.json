@@ -135,7 +135,6 @@
     "src/FreeformHelper.UI/Styles/Controls.Core.axaml",
     "src/FreeformHelper.UI/Styles/Controls.Form.axaml",
     "src/FreeformHelper.UI/Styles/Controls.Panel.axaml",
-    "src/FreeformHelper.UI/Styles/Controls.Scroll.axaml",
     "src/FreeformHelper.UI/Views/CanvasOverlayControls.axaml",
     "src/FreeformHelper.UI/Views/CascadeIcSettingsWindow.axaml",
     "src/FreeformHelper.UI/Views/ConsolePanel.axaml",

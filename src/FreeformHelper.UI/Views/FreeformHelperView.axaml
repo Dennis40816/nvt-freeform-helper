@@ -83,7 +83,7 @@
         </Grid>
         <ScrollViewer x:Name="LeftSettingsScroll"
                       Grid.Row="1"
-                      Classes="scrollDevCandidate viewportBoundScroll"
+                      Classes="viewportBoundScroll"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
           <Border Classes="viewportBoundContent"
@@ -230,7 +230,7 @@
 
         <ScrollViewer x:Name="RightSettingsScroll"
                       Grid.Row="1"
-                      Classes="scrollDevCandidate viewportBoundScroll"
+                      Classes="viewportBoundScroll"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
           <Border Classes="viewportBoundContent"

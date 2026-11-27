@@ -62,9 +62,8 @@
         </Button>
       </Grid>
     </Border>
-    <ListBox Grid.Row="2" Classes="scrollV2 notchExportRows"
-             ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
-             ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto"
+    <ListBox Grid.Row="2" Classes="notchExportRows"
+             ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}" ScrollViewer.VerticalScrollBarVisibility="Auto"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
       <ListBox.ItemsPanel>
         <ItemsPanelTemplate><VirtualizingStackPanel/></ItemsPanelTemplate>

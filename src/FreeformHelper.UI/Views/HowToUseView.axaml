@@ -11,8 +11,8 @@
   <UserControl.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/HowToUse.axaml"/>
   </UserControl.Styles>
-  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-    <Border Padding="{DynamicResource Inset20}">
+  <ScrollViewer Classes="viewportBoundScroll" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <Border Classes="viewportBoundContent" Padding="{DynamicResource Inset20}">
       <StackPanel x:Name="HelpSections" Spacing="{DynamicResource Space12}">
         <StackPanel Spacing="{DynamicResource Space4}">
           <SelectableTextBlock Text="How To Use" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"/>

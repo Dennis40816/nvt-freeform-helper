@@ -70,7 +70,7 @@
             <SelectableTextBlock Grid.Column="3" Classes="workspaceTableHeaderText" Text="Ratio"/>
           </Grid>
         </Border>
-        <ListBox x:Name="AllocationList" Grid.Row="1" Classes="scrollV2 workspaceDataList"
+        <ListBox x:Name="AllocationList" Grid.Row="1" Classes="workspaceDataList"
                  ItemsSource="{Binding Allocations}"
                  Background="{DynamicResource NfcSurfaceSubtleBrush}"
                  BorderBrush="{DynamicResource NfcBorderMutedBrush}"

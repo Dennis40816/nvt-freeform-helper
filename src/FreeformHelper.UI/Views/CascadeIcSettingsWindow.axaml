@@ -60,39 +60,40 @@
                                  Text="Y channels"/>
           </Grid>
 
-          <ScrollViewer Grid.Row="1"
-                        Classes="scrollV2"
+          <ScrollViewer Classes="viewportBoundScroll" Grid.Row="1"
                         VerticalScrollBarVisibility="Auto"
                         HorizontalScrollBarVisibility="Disabled">
-            <StackPanel Classes="settingsPage">
-              <ItemsControl ItemsSource="{Binding CascadeIcSettings}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <Border Classes="settingsFieldTile"
-                            Margin="{StaticResource InsetBottom6}">
-                      <Grid ColumnDefinitions="Auto,*,*"
-                            ColumnSpacing="{StaticResource Space10}">
-                        <SelectableTextBlock VerticalAlignment="Center"
-                                             Classes="settingsPassiveValue"
-                                             Text="{Binding IcLabel}"/>
-                        <controls:NumberScrubber Grid.Column="1"
-                                                 Minimum="1"
-                                                 Maximum="{StaticResource NumericInputMaximum}"
-                                                 SmallChange="1"
-                                                 FormatString="0"
-                                                 Value="{Binding XChannels, Mode=TwoWay}"/>
-                        <controls:NumberScrubber Grid.Column="2"
-                                                 Minimum="1"
-                                                 Maximum="{StaticResource NumericInputMaximum}"
-                                                 SmallChange="1"
-                                                 FormatString="0"
-                                                 Value="{Binding YChannels, Mode=TwoWay}"/>
-                      </Grid>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
+            <Border Classes="viewportBoundContent">
+              <StackPanel Classes="settingsPage">
+                <ItemsControl ItemsSource="{Binding CascadeIcSettings}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Border Classes="settingsFieldTile"
+                              Margin="{StaticResource InsetBottom6}">
+                        <Grid ColumnDefinitions="Auto,*,*"
+                              ColumnSpacing="{StaticResource Space10}">
+                          <SelectableTextBlock VerticalAlignment="Center"
+                                               Classes="settingsPassiveValue"
+                                               Text="{Binding IcLabel}"/>
+                          <controls:NumberScrubber Grid.Column="1"
+                                                   Minimum="1"
+                                                   Maximum="{StaticResource NumericInputMaximum}"
+                                                   SmallChange="1"
+                                                   FormatString="0"
+                                                   Value="{Binding XChannels, Mode=TwoWay}"/>
+                          <controls:NumberScrubber Grid.Column="2"
+                                                   Minimum="1"
+                                                   Maximum="{StaticResource NumericInputMaximum}"
+                                                   SmallChange="1"
+                                                   FormatString="0"
+                                                   Value="{Binding YChannels, Mode=TwoWay}"/>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
           </ScrollViewer>
         </Grid>
       </Border>

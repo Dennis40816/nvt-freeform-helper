@@ -12,7 +12,7 @@ using Xunit;
 namespace FreeformHelper.Tests;
 
 /// <summary>
-/// Guards shared button roles across application and console scopes, while NFH keeps its own scroll styles.
+/// Guards shared button roles and scroll styles across application and console scopes.
 /// </summary>
 [Collection("HeadlessUiSerial")]
 public sealed class ConsoleStyleScopeTests
@@ -169,28 +169,87 @@ public sealed class ConsoleStyleScopeTests
         }
     }
 
-    [AvaloniaFact]
-    public void ScrollBarInsideAnNfhScrollViewerOutsideTheConsole_KeepsTheNfhThickness()
+    [AvaloniaTheory]
+    [InlineData("Dark", Orientation.Vertical)]
+    [InlineData("Dark", Orientation.Horizontal)]
+    [InlineData("Light", Orientation.Vertical)]
+    [InlineData("Light", Orientation.Horizontal)]
+    public void ScrollBarsInsideAndOutsideTheConsoleUseTheCoreLook(string theme, Orientation orientation)
     {
         HeadlessAppBootstrap.EnsureInitialized();
-        var scrollViewer = new ScrollViewer
+        var outside = CreateScrollProbe();
+        var inside = CreateScrollProbe();
+        var console = new ConsolePanel();
+        var consoleRoot = Assert.IsType<Grid>(Assert.IsType<Border>(console.Content).Child);
+        consoleRoot.Children.Add(inside);
+        var window = new Window
         {
-            Height = 100,
-            Width = 200,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
-            Content = new Border { Height = 600, Width = 150 },
+            Width = 480,
+            Height = 320,
+            RequestedThemeVariant = theme == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light,
+            Content = new StackPanel { Children = { outside, console } },
         };
-
-        var window = ShowInWindow(scrollViewer);
+        window.Show();
         try
         {
-            scrollViewer.ApplyTemplate();
             window.Dispatcher.RunJobs();
+            AssertCoreScrollLook(outside, orientation);
+            AssertCoreScrollLook(inside, orientation);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
 
-            var scrollBar = Assert.Single(
-                scrollViewer.GetVisualDescendants().OfType<ScrollBar>(),
-                static bar => bar.Orientation == Orientation.Vertical);
-            Assert.Equal(ResourceDouble("ScrollBarThickness"), scrollBar.Width);
+    private static ScrollViewer CreateScrollProbe() => new()
+    {
+        Height = 100,
+        Width = 200,
+        VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+        HorizontalScrollBarVisibility = ScrollBarVisibility.Visible,
+        Content = new Border { Height = 600, Width = 600 },
+    };
+
+    private static void AssertCoreScrollLook(ScrollViewer scroll, Orientation orientation)
+    {
+        var bar = Assert.Single(scroll.GetVisualDescendants().OfType<ScrollBar>(), bar => bar.Orientation == orientation);
+        var thumb = Assert.Single(bar.GetVisualDescendants().OfType<Thumb>());
+        Assert.Equal(14d, orientation == Orientation.Vertical ? bar.Bounds.Width : bar.Bounds.Height);
+        Assert.Equal(6d, orientation == Orientation.Vertical ? thumb.Bounds.Width : thumb.Bounds.Height);
+        Assert.False(scroll.AllowAutoHide);
+        Assert.False(bar.AllowAutoHide);
+        Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(bar.Background).Color);
+        Assert.True(bar.TryFindResource("NfcTextDisabledBrush", bar.ActualThemeVariant, out var expectedThumb));
+        Assert.Equal(Assert.IsAssignableFrom<ISolidColorBrush>(expectedThumb).Color,
+            Assert.IsAssignableFrom<ISolidColorBrush>(thumb.Background).Color);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(20d)]
+    [InlineData(600d)]
+    public void ViewportBoundContentFitsWithAndWithoutVerticalOverflow(double contentHeight)
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var content = new Border { Height = contentHeight };
+        content.Classes.Add("viewportBoundContent");
+        var scroll = new ScrollViewer
+        {
+            Width = 200,
+            Height = 100,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = content,
+        };
+        scroll.Classes.Add("viewportBoundScroll");
+        var window = ShowInWindow(scroll);
+        try
+        {
+            Assert.Equal(HorizontalAlignment.Stretch, scroll.HorizontalContentAlignment);
+            Assert.Equal(default(global::Avalonia.Thickness), scroll.Padding);
+            Assert.True(content.Bounds.Width > 0);
+            Assert.Equal(scroll.Viewport.Width, content.Bounds.Width, precision: 3);
+            Assert.True(content.Bounds.Width <= scroll.Bounds.Width);
         }
         finally
         {

@@ -85,10 +85,9 @@
           <TextBlock x:Name="EmptyRowsHint" Text="No DXF edit rows in this scope."
                      IsVisible="{Binding HasNoRows}" Foreground="{DynamicResource NfcTextMutedBrush}"
                      Margin="{DynamicResource Inset8}" TextWrapping="Wrap"/>
-          <ListBox x:Name="RowsListBox" ItemsSource="{Binding Rows}" Classes="scrollV2 workspaceDataList"
+          <ListBox x:Name="RowsListBox" ItemsSource="{Binding Rows}" Classes="workspaceDataList"
                    SelectedItem="{Binding SelectedEntry, Mode=TwoWay}" IsVisible="{Binding HasRows}"
-                   Background="{DynamicResource BrushTransparent}" BorderThickness="{DynamicResource BorderNone}"
-                   ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                   Background="{DynamicResource BrushTransparent}" BorderThickness="{DynamicResource BorderNone}" ScrollViewer.VerticalScrollBarVisibility="Auto"
                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemsPanel>
               <ItemsPanelTemplate>
@@ -134,9 +133,11 @@
           <Border Grid.Row="3" Classes="workspaceInspectorSection" IsVisible="{Binding HasSelectedEntry}">
             <Grid RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space4}">
               <TextBlock Classes="workspaceInspectorSectionTitle" Text="Detail"/>
-              <ScrollViewer Grid.Row="1" x:Name="InspectorDetailScroll"
+              <ScrollViewer Classes="viewportBoundScroll" Grid.Row="1" x:Name="InspectorDetailScroll"
                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding SelectedRowDetailText}" TextWrapping="Wrap"/>
+                <Border Classes="viewportBoundContent">
+                  <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding SelectedRowDetailText}" TextWrapping="Wrap"/>
+                </Border>
               </ScrollViewer>
             </Grid>
           </Border>

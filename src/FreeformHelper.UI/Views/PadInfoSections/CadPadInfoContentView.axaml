@@ -9,11 +9,11 @@
   <UserControl.Styles>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Primitives/PrimitivesStyles.axaml"/>
   </UserControl.Styles>
-  <ScrollViewer x:Name="CadPadInfoScroll" Classes="scrollV2"
+  <ScrollViewer Classes="viewportBoundScroll" x:Name="CadPadInfoScroll"
                 MaxHeight="{DynamicResource PadInfoContentMaxHeight}"
                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                 HorizontalContentAlignment="Stretch" Padding="{DynamicResource InsetNone}">
-    <Border Padding="{DynamicResource InsetRight12Bottom12}">
+    <Border Classes="viewportBoundContent" Padding="{DynamicResource InsetRight12Bottom12}">
       <StackPanel Spacing="{DynamicResource Space12}">
         <controls:PadHeader x:Name="CadHeader" Title="{Binding Title}" Subtitle="{Binding Subtitle}">
           <controls:PadHeader.KindMark>

@@ -9,7 +9,7 @@
              x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
              x:CompileBindings="True">
   <Border Classes="workspaceSidePane left">
-    <ScrollViewer Classes="scrollDevCandidate viewportBoundScroll"
+    <ScrollViewer Classes="viewportBoundScroll"
                   VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled">
       <Border Classes="viewportBoundContent" Padding="{DynamicResource InsetRight12Bottom20}">

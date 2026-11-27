@@ -97,7 +97,9 @@ public sealed class DxfEditDetailsIntegratedLayoutTests
                 var scroll = Assert.IsType<ScrollViewer>(window.FindControl<ScrollViewer>("InspectorDetailScroll"));
                 Assert.Equal(ScrollBarVisibility.Auto, scroll.VerticalScrollBarVisibility);
                 Assert.Equal(ScrollBarVisibility.Disabled, scroll.HorizontalScrollBarVisibility);
-                var detail = Assert.IsType<SelectableTextBlock>(scroll.Content);
+                var content = Assert.IsType<Border>(scroll.Content);
+                Assert.Equal(scroll.Viewport.Width, content.Bounds.Width, precision: 3);
+                var detail = Assert.IsType<SelectableTextBlock>(content.Child);
                 Assert.Equal(TextWrapping.Wrap, detail.TextWrapping);
                 Assert.Equal(vm.SelectedRowDetailText, detail.Text);
             }
