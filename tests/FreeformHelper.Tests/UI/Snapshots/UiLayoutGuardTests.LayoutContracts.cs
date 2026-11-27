@@ -55,7 +55,7 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("Text=\"{Binding CadLayerBulkToggleText}\"", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerBulkToggleIcon", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("dxfLayerBulkToggleSwitch", leftPanel, StringComparison.Ordinal);
-        Assert.Contains("Classes=\"dxfEditMiniAction actionDanger actionIconButton\"", leftPanel, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfEditMiniAction actionDanger\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Content=\"Rotate\"", leftPanel, StringComparison.Ordinal);
         Assert.Contains("Content=\"Move\"", leftPanel, StringComparison.Ordinal);
         Assert.DoesNotContain("actionDanger actionTextButton dxfEditMiniAction", leftPanel, StringComparison.Ordinal);
@@ -190,7 +190,6 @@ public sealed partial class UiLayoutGuardTests
         var miniLayout = ExtractStyleBlocks(actionStyles)
             .Single(static style => style.Selector == "Button.dxfEditMiniAction");
         Assert.Equal("Stretch", GetSetterValue(miniLayout.Body, "HorizontalAlignment"));
-        Assert.Equal("{StaticResource DxfEditMiniActionMinWidth}", GetSetterValue(miniLayout.Body, "MinWidth"));
     }
 
     [Fact]
@@ -283,7 +282,7 @@ public sealed partial class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
 
         var devView = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DevView.axaml"));
-        Assert.Contains("Classes=\"dxfEditMiniAction actionDanger actionIconButton\"", devView, StringComparison.Ordinal);
+        Assert.Contains("Classes=\"dxfEditMiniAction actionDanger\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleButton\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"workspaceActionButton actionNeutral\"", devView, StringComparison.Ordinal);

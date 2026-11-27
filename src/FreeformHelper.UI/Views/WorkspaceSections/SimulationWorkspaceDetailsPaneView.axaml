@@ -105,7 +105,7 @@
                 <ItemsControl ItemsSource="{Binding SimulationHighRiskDiffs}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                      <Button Classes="chipAction"
+                      <Button Classes="productChipAction"
                           Margin="{StaticResource InsetBottom6}"
                           Command="{Binding DataContext.SelectSimulationRiskDiffCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                           CommandParameter="{Binding}"
@@ -123,7 +123,8 @@
                               Spacing="{StaticResource Space2}">
                             <SelectableTextBlock Text="{Binding LocationText}"
                                 FontWeight="SemiBold"
-                                TextWrapping="Wrap"/>
+                                TextWrapping="Wrap"
+                                MaxLines="2"/>
                             <SelectableTextBlock Classes="workspaceSectionMeta"
                                 Text="{Binding StatusText}"
                                 TextWrapping="Wrap"/>

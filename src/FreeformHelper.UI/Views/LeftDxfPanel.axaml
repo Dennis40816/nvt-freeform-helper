@@ -186,7 +186,7 @@
             <StackPanel Spacing="{StaticResource Space6}">
               <SelectableTextBlock Classes="dxfEditActionGroupLabel"
                                    Text="Hide / restore"/>
-              <Button Classes="dxfEditMiniAction actionDanger actionIconButton"
+              <Button Classes="dxfEditMiniAction actionDanger"
                       Command="{Binding DxfEdit.DeleteSelectedCadPadsCommand}"
                       ToolTip.Tip="Hide selected CAD pads from current workflow (shortcut: Delete).">
                 <StackPanel Classes="dxfEditMiniActionContent"
@@ -199,9 +199,9 @@
                 </StackPanel>
               </Button>
               <Grid Classes="dxfEditActionGroupRow"
-                    ColumnDefinitions="*,*">
-                <Button Grid.Column="0"
-                        Classes="dxfEditMiniAction actionIconButton"
+                    RowDefinitions="Auto,Auto">
+                <Button Grid.Row="0"
+                        Classes="dxfEditMiniAction actionNeutral"
                         Command="{Binding DxfEdit.RestoreLastDeletedCadPadsCommand}"
                         ToolTip.Tip="Restore last hidden CAD batch.">
                   <StackPanel Classes="dxfEditMiniActionContent"
@@ -213,8 +213,8 @@
                                          Text="Undo hide"/>
                   </StackPanel>
                 </Button>
-                <Button Grid.Column="1"
-                        Classes="dxfEditMiniAction actionIconButton"
+                <Button Grid.Row="1"
+                        Classes="dxfEditMiniAction actionNeutral"
                         Command="{Binding DxfEdit.RestoreAllHiddenCadPadsCommand}"
                         IsEnabled="{Binding DxfEdit.HasManualHiddenCadPads}"
                         ToolTip.Tip="Restore all manually hidden CAD pads. Combined groups and layer moves stay unchanged.">
@@ -234,7 +234,7 @@
             <StackPanel Spacing="{StaticResource Space6}">
               <SelectableTextBlock Classes="dxfEditActionGroupLabel"
                                    Text="Combine / split"/>
-              <Button Classes="dxfEditMiniAction actionIconButton"
+              <Button Classes="dxfEditMiniAction actionNeutral"
                       Command="{Binding DxfEdit.CombineSelectedCadPadsCommand}"
                       ToolTip.Tip="Combine selected CAD pads using geometry union (preserves shape).">
                 <StackPanel Classes="dxfEditMiniActionContent"
@@ -246,7 +246,7 @@
                                        Text="Combine"/>
                 </StackPanel>
               </Button>
-              <Button Classes="dxfEditMiniAction actionIconButton"
+              <Button Classes="dxfEditMiniAction actionNeutral"
                       Command="{Binding DxfEdit.ClearCombinedCadPadsCommand}"
                       IsEnabled="{Binding DxfEdit.HasSelectedCombinedCadPadsForDxfEdit}"
                       ToolTip.Tip="Split selected combined CAD groups back into their source pads.">

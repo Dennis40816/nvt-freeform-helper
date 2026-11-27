@@ -242,7 +242,7 @@ public sealed partial class UiLayoutGuardTests
         Assert.Contains("Property=\"ToolTip.ShowOnDisabled\" Value=\"True\"", coreStyles, StringComparison.Ordinal);
         Assert.Contains(":disabled:pointerover", coreStyles, StringComparison.Ordinal);
         Assert.Contains(":disabled:pressed", coreStyles, StringComparison.Ordinal);
-        AssertDisabledInteractiveStatesKeepMutedForeground(coreStyles);
+        AssertDisabledInteractiveStatesKeepMutedForeground(coreStyles, actionStyles);
 
         Assert.Contains("<Thickness x:Key=\"BorderInput\">2</Thickness>", tokens, StringComparison.Ordinal);
         Assert.Contains("<Thickness x:Key=\"BorderControl\">1.5</Thickness>", tokens, StringComparison.Ordinal);

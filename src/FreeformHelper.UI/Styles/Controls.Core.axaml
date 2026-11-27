@@ -779,7 +779,7 @@
   </Style>
 
   <Style Selector="Grid.dxfEditActionGroupRow">
-    <Setter Property="ColumnSpacing" Value="{StaticResource Space6}"/>
+    <Setter Property="RowSpacing" Value="{StaticResource Space6}"/>
   </Style>
 
   <Style Selector="ToggleButton.dxfLayerBulkToggleButton">

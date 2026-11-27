@@ -6,7 +6,7 @@
              x:Class="FreeformHelper.UI.Views.WorkspaceSections.IndexMappingReportLeftPaneView"
              x:DataType="viewModels:IndexMappingReportViewModel">
   <Grid RowDefinitions="Auto,*,Auto" RowSpacing="{DynamicResource Space6}">
-    <Border Classes="workspaceTableHeader">
+    <Border Classes="workspaceTableHeader mappingDecisionHeader">
       <Grid Classes="mappingDecisionColumns" ColumnSpacing="{DynamicResource Space8}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="{DynamicResource IndexMappingReportCadColumnWidth}"/>

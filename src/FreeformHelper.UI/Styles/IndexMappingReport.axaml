@@ -30,5 +30,8 @@
   <Style Selector="ListBox.mappingDecisions ListBoxItem">
     <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
   </Style>
-
+  <!-- The decision rows are Core ghost buttons; keep the header text above the row text. -->
+  <Style Selector="Border.workspaceTableHeader.mappingDecisionHeader">
+    <Setter Property="Padding" Value="{DynamicResource Inset14_6}"/>
+  </Style>
 </Styles>

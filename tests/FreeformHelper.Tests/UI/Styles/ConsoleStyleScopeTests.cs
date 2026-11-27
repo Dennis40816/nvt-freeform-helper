@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -282,6 +283,36 @@ public sealed class ConsoleStyleScopeTests
         {
             window.Close();
         }
+    }
+
+    [AvaloniaFact]
+    public void CanvasQuickToggleShowsDisabledAndKeyboardFocusStates()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var disabled = new ToggleButton { Content = "To Full Preview", IsEnabled = false };
+        disabled.Classes.Add("canvasQuickToggle");
+        var focused = new ToggleButton { Content = "CAD layer" };
+        focused.Classes.Add("canvasQuickToggle");
+        var window = ShowInWindow(new StackPanel { Children = { disabled, focused } });
+        try
+        {
+            focused.Focus(NavigationMethod.Tab);
+            window.Dispatcher.RunJobs();
+            Assert.Equal(ThemeColor(disabled, "NfcTextMutedBrush"),
+                Assert.IsAssignableFrom<ISolidColorBrush>(disabled.Foreground).Color);
+            Assert.Equal(ThemeColor(focused, "NfcSelectionSurfaceBrush"),
+                Assert.IsAssignableFrom<ISolidColorBrush>(focused.Background).Color);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    private static Color ThemeColor(Control control, string key)
+    {
+        Assert.True(control.TryFindResource(key, control.ActualThemeVariant, out var brush));
+        return Assert.IsAssignableFrom<ISolidColorBrush>(brush).Color;
     }
 
     [AvaloniaFact]

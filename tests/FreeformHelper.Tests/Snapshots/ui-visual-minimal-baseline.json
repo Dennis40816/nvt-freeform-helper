@@ -6,7 +6,7 @@
     "src/FreeformHelper.UI/Views/CanvasOverlayControls.axaml": "e33427c20be62b6e127449f7f176505c230445a1781b8d8da42efae5b1aa0d07",
     "src/FreeformHelper.UI/Views/ConsolePanel.axaml": "e268e149a6a445b432a2d23538f26a133b0d37ac8dca3576779fc1834cd3da21",
     "src/FreeformHelper.UI/Views/FreeformHelperView.axaml": "f7b536d040f38f81d72f48c72fbf0628b3aaaf93d4cdd17a205420b49eecb8a0",
-    "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml": "832bfa5d8780579abeb384c7e36d51025dd3626c4bdbbb7396034c5fe8c89ab9",
+    "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml": "bbca69eefa4be61ce155ed4a3cdfb278132cb0a9c72ad55f450222f9469adca1",
     "src/FreeformHelper.UI/Views/PadInfoPopover.axaml": "1f272a7d12010e6aa1c926f56f523af2df3a724dcc307ae24cfc9340e4808f0d",
     "src/FreeformHelper.UI/Views/RightWorkflowPanel.axaml": "175848c8861a9461f17b1475f7ce623939619b99f0715b1ce37e2d6dd513d3fe",
     "src/FreeformHelper.UI/Views/SettingsWindow.axaml": "058162d2ddaf5337ba816b10d64f76a0b19d6fa8224cad910d0035a70cf314b1"
