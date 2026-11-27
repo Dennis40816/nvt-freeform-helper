@@ -121,6 +121,50 @@ Under the `CadAllocation` path:
   - A regular with any up/down/left/right neighbor missing or outside the `match-scope active regular set`
 - The boundary regular index set is precomputed once within the same generation pass, then filtered and reused in each candidate; this is a performance optimization that does not change results
 
+### 4.2.1 Opt-in V22 row explanations and A/B reports
+
+`NotchTableGenerator.Generate(..., explanationCollector: collector)` accepts a fresh
+Application-owned `NotchV22ExplanationCollector` for CadAllocation with V22 enabled.
+Its immutable explanations are keyed by `(IC, source diff)` and cover MAIN and every
+CONT row. They capture the admitted candidates' actual selection keys (ToFull influence,
+has legs, anchor match, source area and combine descending, then CAD ID ascending;
+exact ties retain candidate input order), the winner's regular areas/rules, target
+ratios and rounding/disposition, combine composition, guard scales/flooring, and final
+seven-integer rows with their leg membership and MAIN continuation subtraction.
+Targets admitted before the guard but floored away by it have `GuardRoundedToZero`
+disposition; their original rounded percent and guard before/after values remain available.
+Compensation, allocation, selection, rounding and the guard execute only in the existing
+generation path. Without a collector, no explanation objects or collections are created.
+`AdditionLimit` derives once from produced effective/reachable areas: a reduction below
+reachable area means `VirtualAreaCap`; an applied expansion reaching less than the regular
+area means `ReachableFreeArea`; otherwise it is `None`. Boundary remains diagnostic only.
+
+`NotchV22ExplanationComparer` compares payloads by `(IC, source diff, row ordinal)`;
+ordinal 0 is MAIN and later ordinals are CONT. It reports changed/added/removed rows,
+before/after integers and rule codes, and the first differing step: candidate selection,
+overlap, ToFull rule/area, ratio before rounding, rounding, then guard/continuation split.
+An absent source belongs to selection/admission; a changed continuation count within an
+otherwise identical source belongs to the final split. Unchanged payloads are omitted.
+Differing payloads with identical recorded steps fail comparison as incomplete evidence.
+
+After building the test project, use the isolated opt-in test host through:
+
+```powershell
+pwsh -NoProfile -File scripts/tools/notch-ab-report.ps1 -Action snapshot -ProjectPath $project -CompensationModel ConservativeNoGain -BoundaryVirtualAreaCap On -OutputPath build/notch-ab/a.json
+pwsh -NoProfile -File scripts/tools/notch-ab-report.ps1 -Action snapshot -ProjectPath $project -CompensationModel CurrentGain -BoundaryVirtualAreaCap On -OutputPath build/notch-ab/b.json
+pwsh -NoProfile -File scripts/tools/notch-ab-report.ps1 -Action compare -BeforePath build/notch-ab/a.json -AfterPath build/notch-ab/b.json -OutputPath build/notch-ab/ab.md
+```
+
+Both overrides are optional; unspecified values come from the loaded project. The host
+uses the existing project loader, selected-layer CAD, match-scope active regulars, output
+diff mapping and official CadAllocation generator. It uses test settings isolation and
+suspends project-load logging. Normal tests perform no host IO unless explicitly opted
+in. JSON and Markdown outputs are restricted to this worktree's `build/`; they contain
+scalar explanation evidence, not input files, pad names, polygons or project paths, and
+remain local artifacts. For code A/B, snapshot each built worktree with identical inputs
+and settings, then compare the two absolute JSON paths from either worktree. Both builds
+must support snapshot schema 1; compare never loads a project or regenerates rows.
+
 ### 4.3 Simulation
 
 The correct role of Simulation is:

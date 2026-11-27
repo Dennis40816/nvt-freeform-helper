@@ -256,7 +256,8 @@ public sealed partial class NotchTableGenerator
         ProjectSettings settings,
         IProgress<NotchGenerationProgress>? progress,
         IReadOnlySet<int>? activeRegularPadIds,
-        IReadOnlyDictionary<int, int>? cadOutputFwDiffIndexByCadId)
+        IReadOnlyDictionary<int, int>? cadOutputFwDiffIndexByCadId,
+        NotchV22ExplanationCollector? explanationCollector = null)
     {
         var resolution = ResolveCadAllocationBatchCore(
             cad,
@@ -266,14 +267,16 @@ public sealed partial class NotchTableGenerator
             activeRegularPadIds,
             cadOutputFwDiffIndexByCadId,
             selectedSparseResultRequest: null,
-            captureProjectionRequest: true);
+            captureProjectionRequest: true,
+            explanationCollector);
         return (
             resolution.Batch,
             ProjectCadAllocationResolvedBatchCore(
                 resolution.Batch,
                 resolution.ProjectionRequest!.Value,
                 progress,
-                includeResolutionTimings: true));
+                includeResolutionTimings: true,
+                explanationCollector));
     }
 
     private (ResolvedCadAllocationBatch Batch, CadAllocationProjectionRequest? ProjectionRequest)
@@ -285,7 +288,8 @@ public sealed partial class NotchTableGenerator
             IReadOnlySet<int>? activeRegularPadIds,
             IReadOnlyDictionary<int, int>? cadOutputFwDiffIndexByCadId,
             CadAllocationSparseResultRequest? selectedSparseResultRequest,
-            bool captureProjectionRequest)
+            bool captureProjectionRequest,
+            NotchV22ExplanationCollector? explanationCollector = null)
     {
         var cadPads = cad.Pads;
         var buildProfilesStopwatch = Stopwatch.StartNew();
@@ -328,7 +332,8 @@ public sealed partial class NotchTableGenerator
             cadOutputFwDiffIndexSnapshot,
             resolutionSettings,
             NotchV22TargetAllocationPolicy.ResolveAreaMode(resolutionSettings.CompensationModel),
-            selectedSparseResultRequest);
+            selectedSparseResultRequest,
+            explanationCollector);
         CadAllocationProjectionRequest? projectionRequest = captureProjectionRequest
             ? CaptureCadAllocationProjectionRequest(settings.Notch, resolutionSettings.CompensationModel)
             : null;
@@ -349,7 +354,8 @@ public sealed partial class NotchTableGenerator
         ResolvedCadAllocationBatch batch,
         CadAllocationProjectionRequest projectionRequest,
         IProgress<NotchGenerationProgress>? progress,
-        bool includeResolutionTimings)
+        bool includeResolutionTimings,
+        NotchV22ExplanationCollector? explanationCollector = null)
     {
         var canonicalCandidateBuild = batch.CanonicalCandidateBuild;
         var rows = new List<NotchTableRow>();
@@ -371,7 +377,8 @@ public sealed partial class NotchTableGenerator
                 admittedCandidatesByDiff,
                 projectionRequest.NullValue,
                 projectionRequest.ApplyTargetCoverageGuard,
-                projectionRequest.TargetCoverageCapPercent)
+                projectionRequest.TargetCoverageCapPercent,
+                explanationCollector)
             .ToList();
         var toFullCoverageAudit = BuildToFullCoverageAudit(
             admittedCandidatesByDiff,

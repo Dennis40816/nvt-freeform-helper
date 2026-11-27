@@ -24,7 +24,8 @@ public sealed partial class NotchTableGenerator
         IReadOnlyDictionary<int, int>? cadOutputFwDiffIndexByCadId,
         CadAllocationResolutionSettings resolutionSettings,
         NotchV22TargetAllocationAreaMode targetAllocationAreaMode,
-        CadAllocationSparseResultRequest? selectedSparseResultRequest)
+        CadAllocationSparseResultRequest? selectedSparseResultRequest,
+        NotchV22ExplanationCollector? explanationCollector)
     {
         public readonly IReadOnlyList<CadPad> CadPads = cadPads;
         public readonly RegularGrid Grid = grid;
@@ -38,6 +39,7 @@ public sealed partial class NotchTableGenerator
         public readonly CadAllocationResolutionSettings ResolutionSettings = resolutionSettings;
         public readonly NotchV22TargetAllocationAreaMode TargetAllocationAreaMode = targetAllocationAreaMode;
         public readonly CadAllocationSparseResultRequest? SelectedSparseResultRequest = selectedSparseResultRequest;
+        public readonly NotchV22ExplanationCollector? ExplanationCollector = explanationCollector;
     }
 
     private sealed record CanonicalCandidateBuildResult(
