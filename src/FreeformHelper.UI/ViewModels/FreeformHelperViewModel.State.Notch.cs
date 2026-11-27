@@ -657,7 +657,7 @@ public sealed partial class FreeformHelperViewModel
             new(
                 NotchCompensationModel.ConservativeNoGain,
                 "Conservative (No Gain)",
-                "Apply ToRegular source combine; ToFull only gates boundary support."),
+                "Apply ToRegular source combine; ToFull adds no gain."),
             new(
                 NotchCompensationModel.Disabled,
                 "Disabled",

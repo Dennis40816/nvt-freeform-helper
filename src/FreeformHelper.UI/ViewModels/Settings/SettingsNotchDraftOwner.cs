@@ -248,12 +248,12 @@ internal sealed class SettingsNotchDraftOwner
         : "OFF - baseline";
 
     public string NotchToFullSemanticSummary => EnableToFull
-        ? "ToFull: boundary support/cap/allowance only; target amount remains area-proportional."
+        ? "ToFull: expands pads into reachable free area."
         : "ToFull: disabled for baseline comparison.";
 
     public string NotchToFullShortText => EnableToFull
-        ? "ON - support/cap only"
-        : "OFF - no boundary support";
+        ? "ON - expand free area"
+        : "OFF - no expansion";
 
     public string NotchBoundaryVirtualAreaCapSummary => EnableBoundaryVirtualAreaCap
         ? $"Boundary cap: virtual ToFull area <= inside overlap x {BoundaryVirtualAreaCapPercent:0.#}%."
