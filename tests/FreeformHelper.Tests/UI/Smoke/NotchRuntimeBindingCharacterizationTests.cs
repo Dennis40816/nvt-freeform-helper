@@ -59,16 +59,16 @@ public sealed class NotchRuntimeBindingCharacterizationTests
             Assert.Equal(101, Assert.Single(canvas.NotchCanvasPreviewItems!).CadPadId);
             Assert.True(previous.IsEffectivelyEnabled);
             Assert.True(next.IsEffectivelyEnabled);
-            AssertStage(step3, canvas, 1, "Current layer: Stage 1 (Seed)");
+            AssertStage(step3, canvas, 1, "Stage 1 (Seed)");
             next.Command!.Execute(next.CommandParameter);
             await HeadlessUiPump.FlushQueueAsync();
             Assert.Equal(2m, vm.NotchPreviewVisualizationStep);
-            AssertStage(step3, canvas, 2, "Current layer: Stage 2 (Candidate)");
+            AssertStage(step3, canvas, 2, "Stage 2 (Candidate)");
             previous.Command!.Execute(previous.CommandParameter);
             previous.Command!.Execute(previous.CommandParameter);
             await HeadlessUiPump.FlushQueueAsync();
             Assert.Equal(3m, vm.NotchPreviewVisualizationStep);
-            AssertStage(step3, canvas, 3, "Current layer: Stage 3 (Final)");
+            AssertStage(step3, canvas, 3, "Stage 3 (Final)");
 
             vm.NotchCanvasPreviewItems = [];
             await HeadlessUiPump.FlushQueueAsync();

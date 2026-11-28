@@ -19,7 +19,7 @@ internal sealed class WorkspaceNavigationPresentation(
         null => "Open DXF",
         WorkspaceWorkStep.Step1Match => "Match overlaps",
         WorkspaceWorkStep.Step2Freeform => "Detect freeform",
-        _ => "Export",
+        _ => "Export notch…",
     };
 
     public ICommand WorkspacePrimaryActionCommand => WorkspaceActionStep switch
@@ -35,7 +35,7 @@ internal sealed class WorkspaceNavigationPresentation(
         null => "Open DXF or use File > Load Project to begin.",
         WorkspaceWorkStep.Step1Match => "Step 1 · Geometry match",
         WorkspaceWorkStep.Step2Freeform => "Step 2 · Freeform tagging",
-        _ => "Step 3 preview → Step 5 · Notch export",
+        _ => string.Empty,
     };
 
     public string WorkspaceMatchSummary => source.HasStep1Result
