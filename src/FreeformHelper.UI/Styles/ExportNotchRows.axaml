@@ -79,6 +79,13 @@
   <Style Selector="ListBox.notchExportRows ContentControl.exportIcGroup">
     <Setter Property="Margin" Value="{DynamicResource Nvt.List.RowPadding}"/>
   </Style>
+  <!-- Core sets the state colors on the item. The data row and its mark read them from there. -->
+  <Style Selector="ListBox.notchExportRows ListBoxItem Border.exportRowFill">
+    <Setter Property="Background" Value="{Binding $parent[ListBoxItem].Background}"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows ListBoxItem Border.exportRowMark">
+    <Setter Property="Background" Value="{Binding $parent[ListBoxItem].Foreground}"/>
+  </Style>
   <Style Selector="ListBox.notchExportRows Border.exportRowFill">
     <Setter Property="MinHeight" Value="{DynamicResource NfcControlHeight}"/>
     <Setter Property="Padding" Value="{DynamicResource Nvt.List.RowPadding}"/>

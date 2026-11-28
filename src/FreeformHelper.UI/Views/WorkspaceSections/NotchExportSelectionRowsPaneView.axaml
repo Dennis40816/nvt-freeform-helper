@@ -89,7 +89,7 @@
               </ContentControl.ContentTemplate>
             </ContentControl>
             <Panel>
-              <Border Classes="exportRowFill" Background="{Binding $parent[ListBoxItem].Background}">
+              <Border Classes="exportRowFill">
                 <Grid ColumnSpacing="{StaticResource Space6}" VerticalAlignment="Center"
                       PointerPressed="InspectRow_PointerPressed">
                   <Grid.ColumnDefinitions>
@@ -112,7 +112,7 @@
                   <TextBlock Grid.Column="6" Text="{Binding StatusText}" VerticalAlignment="Center"/>
                 </Grid>
               </Border>
-              <Border Classes="exportRowMark" Background="{Binding $parent[ListBoxItem].Foreground}"/>
+              <Border Classes="exportRowMark"/>
               <Border Classes="exportRowFocus"/>
             </Panel>
           </StackPanel>
