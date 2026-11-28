@@ -4,13 +4,13 @@
              xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
              x:Class="FreeformHelper.UI.Views.WorkspaceSections.IndexMappingReportFooterView"
              x:DataType="viewModels:IndexMappingReportViewModel">
-  <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}"
+  <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}"
           Padding="{DynamicResource InsetTop10}">
     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
       <StackPanel VerticalAlignment="Center" Spacing="{DynamicResource Space2}">
-        <SelectableTextBlock x:Name="LastActionStatus" Foreground="{DynamicResource BrushTextMuted}"
+        <SelectableTextBlock x:Name="LastActionStatus" Foreground="{DynamicResource NfcTextMutedBrush}"
                              Text="{Binding ActionStatus}" TextWrapping="WrapWithOverflow"/>
-        <SelectableTextBlock Foreground="{DynamicResource BrushTextMuted}"
+        <SelectableTextBlock Foreground="{DynamicResource NfcTextMutedBrush}"
                              Text="Simulation uses exported notch table payload."
                              IsVisible="{Binding ShowSimulationActionButtons}" TextWrapping="WrapWithOverflow"/>
       </StackPanel>

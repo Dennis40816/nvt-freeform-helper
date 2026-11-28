@@ -1,6 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
@@ -8,11 +8,8 @@
              x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerWorkspaceControlsPaneView"
              x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
              x:CompileBindings="True">
-  <UserControl.Styles>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
-  </UserControl.Styles>
   <Border Classes="workspaceSidePane left">
-    <ScrollViewer Classes="scrollDevCandidate viewportBoundScroll"
+    <ScrollViewer Classes="viewportBoundScroll"
                   VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled">
       <Border Classes="viewportBoundContent" Padding="{DynamicResource InsetRight12Bottom20}">
@@ -51,13 +48,13 @@
           <sections:CoordinatePlannerGuidesSectionView/>
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
             <ToggleButton Content="BIST center rect"
-                          Classes="actionGhost actionTextButton"
+                          Classes="actionGhost"
                           HorizontalContentAlignment="Left"
                           IsChecked="{Binding ShowBistRectangle, Mode=TwoWay}"/>
             <Border Grid.Column="1" Classes="chipStatus" VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space6}">
-                <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.Visibility}" IsVisible="{Binding HasBistRectangle}"/>
-                <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.VisibilityOff}" IsVisible="{Binding !HasBistRectangle}"/>
+                <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.Visibility}" IsVisible="{Binding HasBistRectangle}"/>
+                <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.VisibilityOff}" IsVisible="{Binding !HasBistRectangle}"/>
                 <TextBlock Text="{Binding BistGenerationStatusText}"/>
               </StackPanel>
             </Border>
@@ -65,6 +62,7 @@
           <sections:CoordinatePlannerArraySectionView/>
           <sections:CoordinatePlannerCalibrationSectionView/>
           <sections:CoordinatePlannerCustomSectionView/>
+          <sections:CoordinatePlannerCornerCircleSectionView/>
         </StackPanel>
       </Border>
     </ScrollViewer>

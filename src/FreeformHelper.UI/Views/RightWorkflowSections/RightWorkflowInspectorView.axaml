@@ -3,13 +3,13 @@
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              x:Class="FreeformHelper.UI.Views.RightWorkflowSections.RightWorkflowInspectorView">
     <UserControl.Resources>
       <converters:BooleanGlyphConverter x:Key="AccordionExpandGlyph"
-                                        FalseGlyph="{x:Static icons:IconGlyphs.ExpandMore}"
-                                        TrueGlyph="{x:Static icons:IconGlyphs.ExpandLess}"/>
+                                        FalseGlyph="{x:Static icons:NvtIcons.ExpandMore}"
+                                        TrueGlyph="{x:Static icons:NvtIcons.ExpandLess}"/>
     </UserControl.Resources>
     <controls:HidePanelBlock Title="Inspector snapshot"
                              IsVisible="{Binding IsRightPanelInspectorTab}"
@@ -44,7 +44,7 @@
               <Border Classes="infoTierDot detail"/>
               <SelectableTextBlock Grid.Column="1"
                                    Text="{Binding PadInspectorSecondaryText}"
-                                   Foreground="{DynamicResource BrushTextMuted}"
+                                   Foreground="{DynamicResource NfcTextMutedBrush}"
                                    ToolTip.Tip="{Binding PadInspectorSecondaryText}"
                                    TextWrapping="Wrap"/>
             </Grid>
@@ -53,7 +53,7 @@
               <Border Classes="infoTierDot detail"/>
               <SelectableTextBlock Grid.Column="1"
                                    Text="{Binding PadInspectorMatchText}"
-                                   Foreground="{DynamicResource BrushTextMuted}"
+                                   Foreground="{DynamicResource NfcTextMutedBrush}"
                                    ToolTip.Tip="{Binding PadInspectorMatchText}"
                                    TextWrapping="Wrap"/>
             </Grid>
@@ -119,11 +119,11 @@
 
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space8}">
-              <TextBox Text="{Binding QuickFocusQueryText, Mode=TwoWay}"
+              <TextBox Classes="singleLineActionInput" Text="{Binding QuickFocusQueryText, Mode=TwoWay}"
                        PlaceholderText="diff 72 / cad 4809 / reg 4616"
                        ToolTip.Tip="Focus by typed target. Examples: diff 72, ic1 diff72, cad 4809, reg 4616. Plain number auto-resolves CAD, REG, then diff."/>
               <Button Grid.Column="1"
-                      Classes="actionNeutral actionTextButton"
+                      Classes="actionNeutral"
                       Content="Focus"
                       Command="{Binding QuickFocusCommand}"
                       ToolTip.Tip="Select and zoom the matching CAD output pad, regular pad, or FW diff."/>
@@ -131,7 +131,7 @@
           </StackPanel>
         </panels:CollapsiblePanel>
         <Border Height="{StaticResource Space1}"
-                Background="{DynamicResource BrushBorder}"
+                Background="{DynamicResource NfcBorderMutedBrush}"
                 IsVisible="{Binding HasPadInspectorSummary}"/>
 
 
@@ -139,8 +139,8 @@
         <panels:CollapsiblePanel Title="Debug details" IsExpanded="{Binding PadInspectorUi.IsDebugDetailsExpanded, Mode=TwoWay}"
                                  IsVisible="{Binding HasPadInspectorSummary}">
           <StackPanel Spacing="{StaticResource Space8}">
-          <Border Background="{DynamicResource BrushBgSurfaceInset}"
-                  BorderBrush="{DynamicResource BrushBorder}"
+          <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
+                  BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                   BorderThickness="{StaticResource BorderThin}"
                   CornerRadius="{StaticResource RadiusSm}"
                   Padding="{StaticResource Inset8}"
@@ -173,11 +173,11 @@
           </Border>
 
           <Border Height="{StaticResource Space1}"
-                  Background="{DynamicResource BrushBorder}"
+                  Background="{DynamicResource NfcBorderMutedBrush}"
                   IsVisible="{Binding HasPadInspectorRuleTrace}"/>
 
-          <Border Background="{DynamicResource BrushBgSurfaceInset}"
-                  BorderBrush="{DynamicResource BrushBorder}"
+          <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
+                  BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                   BorderThickness="{StaticResource BorderThin}"
                   CornerRadius="{StaticResource RadiusSm}"
                   Padding="{StaticResource Inset8}"
@@ -194,8 +194,8 @@
               <ItemsControl ItemsSource="{Binding PadInspectorRuleTraceSections}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>
-                    <Border Background="{DynamicResource BrushBgPanel}"
-                            BorderBrush="{DynamicResource BrushBorder}"
+                    <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
+                            BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                             BorderThickness="{StaticResource BorderThin}"
                             CornerRadius="{StaticResource RadiusXs}"
                             Margin="{StaticResource InsetBottom6}"
@@ -247,7 +247,7 @@
                                 ColumnSpacing="{StaticResource Space6}">
                             <SelectableTextBlock Text="{Binding Title}"
                                                  FontWeight="SemiBold"/>
-                            <ToggleButton Grid.Column="1"
+                            <ToggleButton Classes="inspectorTraceToggle actionGhost flat marked" Grid.Column="1"
                                           IsChecked="{Binding DataContext.IsPadInspectorRawTraceExpanded, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
                               <SelectableTextBlock Text="{Binding Lines.Count, StringFormat='Raw x{0}'}"/>
                             </ToggleButton>

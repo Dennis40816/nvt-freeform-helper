@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep3View">
     <panels:CollapsiblePanel x:Name="Step3Block" Title="Step 3 · Notch compensation"
@@ -10,7 +10,7 @@
         <Button Tag="Step3NotchCompensation"
                 Classes="actionIconButton actionGhost workflowStepAction" Click="OpenSettingsButton_Click"
                 ToolTip.Tip="Open Settings at Step 3 section.">
-          <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+          <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.Settings}"/>
         </Button>
       </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
@@ -82,13 +82,13 @@
         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource Space8}">
           <Button Classes="actionIconButton actionGhost" Command="{Binding PreviousNotchPreviewStageCommand}"
                   IsEnabled="{Binding CanControlNotchPreviewStage}" ToolTip.Tip="Previous stage">
-            <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+            <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.ChevronLeft}"/>
           </Button>
           <SelectableTextBlock Grid.Column="1" Text="{Binding NotchPreviewStageSummary}"
                                TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center"/>
           <Button Grid.Column="2" Classes="actionIconButton actionGhost" Command="{Binding NextNotchPreviewStageCommand}"
                   IsEnabled="{Binding CanControlNotchPreviewStage}" ToolTip.Tip="Next stage">
-            <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.ChevronRight}"/>
+            <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.ChevronRight}"/>
           </Button>
         </Grid>
         <CheckBox Content="Auto play" IsEnabled="{Binding CanControlNotchPreviewStage}"
@@ -126,7 +126,7 @@
         </panels:CollapsiblePanel>
         <Separator/>
         <SelectableTextBlock Classes="stepNote" Text="Clears preview and invalidates export and validation results." TextWrapping="Wrap"/>
-        <Button Classes="actionTextButton actionDanger" Content="Clear preview"
+        <Button Classes="actionDanger" Content="Clear preview"
                 HorizontalAlignment="Right" Command="{Binding ClearStep3ResultCommand}"
                 ToolTip.Tip="Clears preview and invalidates export and validation results."/>
       </StackPanel>

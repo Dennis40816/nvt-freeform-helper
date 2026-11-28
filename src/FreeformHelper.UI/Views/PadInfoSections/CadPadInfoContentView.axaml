@@ -1,16 +1,15 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:padInfo="clr-namespace:FreeformHelper.UI.Views.PadInfoSections"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
              x:Class="FreeformHelper.UI.Views.PadInfoSections.CadPadInfoContentView">
   <UserControl.Styles>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Primitives/PrimitivesStyles.axaml"/>
   </UserControl.Styles>
-  <ScrollViewer x:Name="CadPadInfoScroll" Classes="scrollV2"
+  <ScrollViewer Classes="viewportBoundScroll" x:Name="CadPadInfoScroll"
                 MaxHeight="{DynamicResource PadInfoContentMaxHeight}"
                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                 HorizontalContentAlignment="Stretch" Padding="{DynamicResource InsetNone}">
@@ -25,7 +24,6 @@
             <Grid x:Name="CadCommonActions" ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="{DynamicResource Space2}">
               <Border Grid.Column="0" ToolTip.Tip="{Binding LocateMatchToolTip}">
                 <Button Classes="actionGhost"
-                        Classes.actionTextButton="{Binding ShowActionLabels, ElementName=CadHeader}"
                         Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=CadHeader}"
                         AutomationProperties.Name="Locate match" Command="{Binding LocateMatchCommand}"
                         IsEnabled="{Binding HasLocateMatchAction}" ToolTip.Tip="{Binding LocateMatchToolTip}">
@@ -37,7 +35,6 @@
               </Border>
               <Border Grid.Column="1" ToolTip.Tip="{Binding NotchDetailToolTip}">
                 <Button Classes="actionGhost"
-                        Classes.actionTextButton="{Binding ShowActionLabels, ElementName=CadHeader}"
                         Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=CadHeader}"
                         AutomationProperties.Name="Notch detail" Command="{Binding NotchDetailCommand}"
                         IsEnabled="{Binding HasNotchDetailAction}" ToolTip.Tip="{Binding NotchDetailToolTip}">
@@ -49,7 +46,6 @@
               </Border>
               <Border Grid.Column="2" ToolTip.Tip="{Binding SelectAreaBucketToolTip}">
                 <Button Classes="actionGhost"
-                        Classes.actionTextButton="{Binding ShowActionLabels, ElementName=CadHeader}"
                         Classes.actionIconButton="{Binding !ShowActionLabels, ElementName=CadHeader}"
                         AutomationProperties.Name="Select area bucket" Command="{Binding SelectAreaBucketCommand}"
                         IsEnabled="{Binding CanSelectAreaBucket}" ToolTip.Tip="{Binding SelectAreaBucketToolTip}">
@@ -87,7 +83,7 @@
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space4}" IsVisible="{Binding HasToFullReason}">
               <SelectableTextBlock Classes="padInfoMetaText" Text="{Binding ToFullReasonLineText}" TextWrapping="Wrap"/>
               <Button Grid.Column="1" Classes="actionIconButton actionGhost" ToolTip.Tip="{Binding ToFullReasonToolTip}">
-                <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.Info}"/>
+                <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.Info}"/>
               </Button>
             </Grid>
           </StackPanel>
@@ -128,20 +124,20 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}" HorizontalAlignment="Right"
                         IsVisible="{Binding HasCadOutputFwDiffOverrideEditor}">
-              <Button Classes="actionTextButton actionGhost" Content="Clear override"
+              <Button Classes="actionGhost" Content="Clear override"
                       IsEnabled="{Binding CanClearCadOutputFwDiffOverride}" Command="{Binding ClearCadOutputFwDiffOverrideCommand}"
                       ToolTip.Tip="Clear the FW output override."/>
-              <Button Classes="actionTextButton actionNeutral" Content="Apply override"
+              <Button Classes="actionNeutral" Content="Apply override"
                       Command="{Binding ApplyCadOutputFwDiffOverrideCommand}" ToolTip.Tip="Apply this FW output override."/>
             </StackPanel>
             <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding HasDxfIndexAnchorEditor}">
               <SelectableTextBlock Classes="padInfoKeyLabel" Text="Anchors, one per IC"/>
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
                 <SelectableTextBlock Classes="padInfoBodyText" Text="{Binding AnchorIcText}" VerticalAlignment="Center"/>
-                <Button Grid.Column="1" Classes="actionTextButton actionGhost" Content="Set anchor"
+                <Button Grid.Column="1" Classes="actionGhost" Content="Set anchor"
                         IsVisible="{Binding !IsDxfIndexAnchor}" Command="{Binding SetDxfIndexAnchorCommand}"
                         ToolTip.Tip="Use this CAD pad as the start anchor for its IC only."/>
-                <Button Grid.Column="1" Classes="actionTextButton actionGhost" Content="Clear anchor"
+                <Button Grid.Column="1" Classes="actionGhost" Content="Clear anchor"
                         IsVisible="{Binding IsDxfIndexAnchor}" IsEnabled="{Binding CanClearDxfIndexAnchor}"
                         Command="{Binding ClearDxfIndexAnchorCommand}" ToolTip.Tip="Clear the start anchor for this IC only."/>
               </Grid>

@@ -11,7 +11,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.Icons;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -67,33 +67,26 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
         Assert.NotEmpty(icons);
         foreach (var icon in icons)
         {
-            if (icon.EnumerateRunes().All(static rune => rune.Value is >= 0xE000 and <= 0xF8FF))
+            var text = new TextBlock
             {
-                foreach (var rune in icon.EnumerateRunes())
+                Text = icon,
+                FontFamily = family,
+                FontSize = Resource<double>("IconSizeMd"),
+                FontFeatures = new FontFeatureCollection
                 {
-                    Assert.True(typeface.CharacterToGlyphMap.TryGetGlyph(rune.Value, out var glyph),
-                        $"Missing icon code point U+{rune.Value:X4}");
-                    Assert.NotEqual((ushort)0, glyph);
-                }
-            }
-            else
-            {
-                // Shape the actual NFH spelling, including uppercase ligature constants.
-                var text = new TextBlock
-                {
-                    Text = icon,
-                    FontFamily = family,
-                    FontSize = Resource<double>("IconSizeMd"),
-                };
-                text.Measure(Size.Infinity);
-                var run = Assert.Single(Assert.Single(text.TextLayout.TextLines).TextRuns.OfType<ShapedTextRun>());
-                Assert.Equal("Material Symbols Outlined", run.GlyphRun.GlyphTypeface.FamilyName);
-                var glyph = Assert.Single(run.GlyphRun.GlyphInfos);
-                Assert.True(glyph.GlyphIndex != 0, $"Missing icon ligature: {icon}");
-            }
+                    FontFeature.Parse("liga"),
+                    FontFeature.Parse("clig"),
+                },
+            };
+            text.Measure(Size.Infinity);
+            var run = Assert.Single(Assert.Single(text.TextLayout.TextLines).TextRuns.OfType<ShapedTextRun>());
+            Assert.Equal("Material Symbols Outlined", run.GlyphRun.GlyphTypeface.FamilyName);
+            var glyph = Assert.Single(run.GlyphRun.GlyphInfos);
+            Assert.True(glyph.GlyphIndex != 0, $"Missing icon: {(icon.Length == 1 ? $"U+{(int)icon[0]:X4}" : icon)}");
         }
 
-        output.WriteLine($"Checked {icons.Count} distinct NFH icon names/code points: {string.Join(", ", icons)}");
+        output.WriteLine($"Checked {icons.Count} distinct NFH icon names/code points: {string.Join(", ", icons.Select(static icon =>
+            icon.Length == 1 ? $"U+{(int)icon[0]:X4}" : icon))}");
     }
 
     [Fact]
@@ -150,7 +143,7 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
     private static SortedSet<string> ReadNfhIcons()
     {
         var icons = new SortedSet<string>(StringComparer.Ordinal);
-        var constants = typeof(IconGlyphs).GetFields(BindingFlags.Public | BindingFlags.Static)
+        var constants = typeof(NvtIcons).GetFields(BindingFlags.Public | BindingFlags.Static)
             .Where(static field => field.IsLiteral && field.FieldType == typeof(string))
             .ToDictionary(static field => field.Name, static field => (string)field.GetRawConstantValue()!, StringComparer.Ordinal);
         icons.UnionWith(constants.Values);
@@ -158,13 +151,13 @@ public sealed class FontAdoptionTests(ITestOutputHelper output)
         foreach (var file in Directory.EnumerateFiles(uiRoot, "*.axaml", SearchOption.AllDirectories))
         {
             var document = XDocument.Load(file);
-            foreach (var attribute in document.Descendants().Where(static element => element.Name.LocalName == "FontIcon")
+            foreach (var attribute in document.Descendants().Where(static element => element.Name.LocalName is "FontIcon" or "BooleanGlyphConverter")
                          .SelectMany(static element => element.Attributes())
-                         .Where(static attribute => attribute.Name.LocalName is "Glyph" or "Text"))
+                         .Where(static attribute => attribute.Name.LocalName is "Glyph" or "Text" or "TrueGlyph" or "FalseGlyph"))
             {
-                if (attribute.Value.StartsWith("{x:Static icons:IconGlyphs.", StringComparison.Ordinal))
+                if (attribute.Value.StartsWith("{x:Static icons:NvtIcons.", StringComparison.Ordinal))
                 {
-                    var name = attribute.Value["{x:Static icons:IconGlyphs.".Length..].TrimEnd('}');
+                    var name = attribute.Value["{x:Static icons:NvtIcons.".Length..].TrimEnd('}');
                     icons.Add(constants[name]);
                 }
                 else if (!attribute.Value.StartsWith('{') && !string.IsNullOrWhiteSpace(attribute.Value))

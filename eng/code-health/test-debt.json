@@ -9,16 +9,6 @@
       "rule": "childProcessInTests",
       "member": "FreeformHelper.Tests.NotchTableExporterTests.AssertCCompilesWithGcc(string)",
       "owner": "NFH",
-      "symbol": "new Process",
-      "syntaxHash": "d4e21f6ab0143cbc2d8c386f0b4968f44e1c911c2aa4e086201f773f6dab3341",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "rule": "childProcessInTests",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.AssertCCompilesWithGcc(string)",
-      "owner": "NFH",
       "symbol": "new ProcessStartInfo",
       "syntaxHash": "4688763bd993801b3871d9664a49173b957c0795ee82f84e7edbb0b77ee1fbe2",
       "count": 1
@@ -29,28 +19,8 @@
       "rule": "childProcessInTests",
       "member": "FreeformHelper.Tests.NotchTableExporterTests.IsGccAvailable()",
       "owner": "NFH",
-      "symbol": "new Process",
-      "syntaxHash": "d4e21f6ab0143cbc2d8c386f0b4968f44e1c911c2aa4e086201f773f6dab3341",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "rule": "childProcessInTests",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.IsGccAvailable()",
-      "owner": "NFH",
       "symbol": "new ProcessStartInfo",
       "syntaxHash": "4688763bd993801b3871d9664a49173b957c0795ee82f84e7edbb0b77ee1fbe2",
-      "count": 1
-    },
-    {
-      "project": "FreeformHelper.Tests",
-      "path": "tests/FreeformHelper.Tests/Application/Notch/NotchTableExporterTests.cs",
-      "rule": "childProcessInTests",
-      "member": "FreeformHelper.Tests.NotchTableExporterTests.RunProcess(string,IEnumerable<string>,string)",
-      "owner": "NFH",
-      "symbol": "new Process",
-      "syntaxHash": "04bc79c34110a0e9955703b780725365db806eada34f0f4a2fd55896d7b03ecd",
       "count": 1
     },
     {

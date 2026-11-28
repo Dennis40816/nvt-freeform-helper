@@ -298,6 +298,8 @@ public sealed partial class FreeformHelperViewModel
         notch.ThresholdPercentV22 = Math.Clamp((double)NotchThresholdPercent, 0.0, 100.0);
         notch.LinkVersionThresholds = LinkNotchThresholds;
         notch.CompensationModel = SelectedNotchCompensationModelOption.Value;
+        notch.EnableToRegular = EnableToRegular;
+        notch.EnableToFull = EnableToFull;
         var (enableToRegular, enableToFull) = notch.ResolveStep3Switches();
         notch.EnableToRegular = enableToRegular;
         notch.EnableToFull = enableToFull;

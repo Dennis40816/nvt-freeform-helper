@@ -56,7 +56,6 @@ Example: in 3635, `CAD4818` covers `REG384/FW1472` by approximately `98.6%` and 
 ## 3. `ToFull` Gates
 
 Each overlapped regular is evaluated for:
-- boundary candidate？
 - Sufficient source area?
 - multi-owner？
 - blocker？
@@ -64,11 +63,14 @@ Each overlapped regular is evaluated for:
 
 Common gate codes:
 - `GATE_TOFULL_DISABLED`
-- `GATE_NOT_BOUNDARY`
+- `GATE_NOT_BOUNDARY` (the name and its text remain; the engine does not emit it)
 - `GATE_SOURCE_EMPTY`
 - `GATE_MULTI_OWNER`
 - `NO_EXPANSION_NEEDED`
 - `EXPAND_CLEAR_PATH`
+- `EXPAND_SHARED_REACHABLE`
+
+Being a boundary regular is not a gate.
 
 Rule engine:
 - `src/FreeformHelper.Application/Services/NotchToFullRuleEngine.cs`
@@ -120,7 +122,7 @@ Main output payload:
 ### 6.1 continuation row
 
 If an anchor has more than two target legs:
-- The first row retains the actual `CombinePercent`
+- The first (MAIN) row uses `CombinePercent = original CombinePercent - sum(CONT leg percentages)`, so firmware retains only the anchor coverage after subtracting MAIN's two legs.
 - Continuation rows use a fixed `CombinePercent = 100`
 - Set the continuation bit in `Flags`
 

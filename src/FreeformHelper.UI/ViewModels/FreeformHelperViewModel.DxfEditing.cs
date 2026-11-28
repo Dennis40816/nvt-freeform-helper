@@ -1,156 +1,160 @@
-using System.Text;
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadEditing;
 
 namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
-/// Handles in-app DXF edit operations (hide/restore) and DXF export workflows.
+/// Connects the edit child to existing callers and retains commands for later owner moves.
 /// </summary>
 public sealed partial class FreeformHelperViewModel
 {
-    private sealed record CadEditUndoSnapshot(
-        CadPadSet? Cad,
-        List<int> HiddenCadIds,
-        List<int> AutoHiddenDuplicateCadIds,
-        List<List<int>> HiddenUndoBatchesTopToBottom,
-        Dictionary<int, int> DuplicateCadPadIdToCanonicalId,
-        CombinedCadState Combined);
+    internal static PersistedDxfEditProjectState CapturePersistedDxfEditProjectState(ProjectFile file) =>
+        DxfEditStateCapture.CaptureProjectState(file);
 
-    private CadEditUndoSnapshot CaptureCadEditUndoSnapshot()
+    private bool CadLayersMatchDocument(CadPadSet cad)
     {
-        return new CadEditUndoSnapshot(
-            _cad,
-            _cadEdit.HiddenCadPadIds.ToList(),
-            _cadEdit.AutoHiddenDuplicateCadPadIds.ToList(),
-            _cadEdit.HiddenUndoStack.Select(batch => batch.ToList()).ToList(),
-            _cadEdit.DuplicateCadPadIdToCanonicalId.ToDictionary(static pair => pair.Key, static pair => pair.Value),
-            _combinedCad.Clone());
+        var current = LayerToggles.Select(static toggle => toggle.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var expected = BuildCadLayerUiSnapshot(cad, layerSelections: null).ToggleStates
+            .Select(static state => state.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return current.SetEquals(expected);
     }
 
-    private void RestoreCadEditUndoSnapshot(CadEditUndoSnapshot snapshot)
+    private void RebuildAfterCadEdit()
     {
-        var previous = new CadEditNotificationSnapshot(this);
-        _cad = snapshot.Cad;
-        _cadEdit.HiddenCadPadIds.Clear();
-        foreach (var id in snapshot.HiddenCadIds)
-        {
-            _cadEdit.HiddenCadPadIds.Add(id);
-        }
-
-        _cadEdit.AutoHiddenDuplicateCadPadIds.Clear();
-        foreach (var id in snapshot.AutoHiddenDuplicateCadIds)
-        {
-            _cadEdit.AutoHiddenDuplicateCadPadIds.Add(id);
-        }
-
-        _cadEdit.HiddenUndoStack.Clear();
-        for (var index = snapshot.HiddenUndoBatchesTopToBottom.Count - 1; index >= 0; index--)
-        {
-            _cadEdit.HiddenUndoStack.Push(snapshot.HiddenUndoBatchesTopToBottom[index].ToList());
-        }
-
-        _cadEdit.DuplicateCadPadIdToCanonicalId.Clear();
-        foreach (var pair in snapshot.DuplicateCadPadIdToCanonicalId)
-        {
-            _cadEdit.DuplicateCadPadIdToCanonicalId[pair.Key] = pair.Value;
-        }
-
-        _combinedCad.CopyFrom(snapshot.Combined);
-        _cachedFilteredCadForBuild = null;
-        SyncRelayeredCadState(previous);
-        SyncRotatedCadState(previous);
-        InteractionState.ClosePadInfo();
-        _selectionCoordinator.ClearSelection(CanvasHost);
-        SyncCombinedCadState(previous);
-        SyncHiddenCadIdsToProject(previous);
-        SyncDuplicateCadState(previous);
-        if (_cad is not null)
-        {
-            var currentLayers = LayerToggles
-                .Select(toggle => toggle.Name)
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            var expectedLayers = BuildCadLayerUiSnapshot(_cad, layerSelections: null).ToggleStates
-                .Select(static state => state.Name)
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            if (!currentLayers.SetEquals(expectedLayers))
-            {
-                var layerSelectionSnapshot = CaptureLayerSelectionSnapshot();
-                PreserveDxfDependentLayerSelections();
-                UpdateLayerToggles(_cad);
-                RestoreLayerSelectionAfterCadLayerEdit(layerSelectionSnapshot, ensureVisibleLayerName: string.Empty);
-            }
-            else
-            {
-                FilterCadPadsByLayer();
-            }
-        }
-        else
-        {
-            FilterCadPadsByLayer();
-        }
         if (!RecalcBoundsOnLayerFilter)
         {
             _ = TriggerGridRebuildAsync(requestFit: false);
         }
-
-        MarkUnsaved();
     }
 
-    private CadPadSet? BuildActiveCadPadSet()
+    /// <summary>
+    /// Gets the command to export CAD pads (visible layers only) to DXF.
+    /// </summary>
+    public IAsyncRelayCommand ExportDxfVisibleCommand => CadExport.ExportDxfVisibleCommand;
+
+    /// <summary>
+    /// Gets the command to export CAD pads (all non-deleted layers) to DXF.
+    /// </summary>
+    public IAsyncRelayCommand ExportDxfAllCommand => CadExport.ExportDxfAllCommand;
+
+    /// <summary>
+    /// Gets the command to export one DXF layer to image (PNG/BMP/JPG).
+    /// </summary>
+    public IAsyncRelayCommand ExportDxfLayerImageCommand => CadExport.ExportDxfLayerImageCommand;
+
+    /// <summary>
+    /// Gets the command to check the quality of the loaded DXF data.
+    /// </summary>
+    public IAsyncRelayCommand CheckDxfQualityCommand => _dxfWorkspaceCommands.CheckDxfQualityCommand;
+
+    /// <summary>
+    /// Gets the command to select CAD pads flagged by DXF overlap checking.
+    /// </summary>
+    public IRelayCommand SelectDxfOverlapPadsCommand => _dxfWorkspaceCommands.SelectDxfOverlapPadsCommand;
+
+    /// <summary>
+    /// Gets the command to clear overlap highlight and selection state.
+    /// </summary>
+    public IRelayCommand ClearDxfOverlapHighlightsCommand => _dxfWorkspaceCommands.ClearDxfOverlapHighlightsCommand;
+
+    /// <summary>
+    /// Gets the command to show overlap details in a dedicated window.
+    /// </summary>
+    public IAsyncRelayCommand ShowDxfOverlapDetailsCommand => _dxfWorkspaceCommands.ShowDxfOverlapDetailsCommand;
+
+    /// <summary>
+    /// Gets the command to analyze DXF idx ↔ regular mapping.
+    /// </summary>
+    public IAsyncRelayCommand AnalyzeIndexMappingCommand => _dxfWorkspaceCommands.AnalyzeIndexMappingCommand;
+
+    /// <summary>
+    /// Gets the command to shift diff idx for all selected CAD pads by one shared offset.
+    /// </summary>
+    public IRelayCommand OffsetSelectedCadOutputFwDiffIndicesCommand => _dxfWorkspaceCommands.OffsetSelectedCadOutputFwDiffIndicesCommand;
+
+    /// <summary>
+    /// Gets the command to select and focus one duplicate diff group in Step 4.
+    /// </summary>
+    public IRelayCommand<Step4DuplicateDiffGroupViewModel?> SelectStep4DuplicateDiffGroupCommand =>
+        _dxfWorkspaceCommands.SelectStep4DuplicateDiffGroupCommand;
+
+    private readonly DxfWorkspaceCommands _dxfWorkspaceCommands;
+
+    private DxfWorkspaceCommands CreateDxfWorkspaceCommands()
     {
-        if (_cad is null)
-        {
-            return null;
-        }
-
-        if (_cadEdit.HiddenCadPadIds.Count == 0 && _cadEdit.AutoHiddenDuplicateCadPadIds.Count == 0)
-        {
-            return _cad;
-        }
-
-        var visible = _cad.Pads
-            .Where(p => !IsCadPadEffectivelyHidden(p.Id))
-            .ToList();
-        return new CadPadSet(visible);
+        var workspaceCommands = new DxfWorkspaceCommands(
+            CheckDxfQualityCommand: CreateEditingAsyncCommand(CheckDxfQualityAsync),
+            SelectDxfOverlapPadsCommand: CreateEditingCommand(SelectDxfOverlapPads),
+            ClearDxfOverlapHighlightsCommand: CreateEditingCommand(ClearDxfOverlapHighlights),
+            ShowDxfOverlapDetailsCommand: CreateEditingAsyncCommand(ShowDxfOverlapDetailsAsync),
+            AnalyzeIndexMappingCommand: CreateEditingAsyncCommand(AnalyzeIndexMappingAsync),
+            OffsetSelectedCadOutputFwDiffIndicesCommand: CreateEditingCommand(OffsetSelectedCadOutputFwDiffIndices),
+            SelectStep4DuplicateDiffGroupCommand: CreateEditingCommand<Step4DuplicateDiffGroupViewModel?>(SelectStep4DuplicateDiffGroup));
+        // The edit commands register right after the workspace commands, as before the move.
+        DxfEdit.InitializeCommands(execute => CreateEditingCommand(execute), execute => CreateEditingAsyncCommand(execute));
+        return workspaceCommands;
     }
 
-    private static string SanitizeFileNameToken(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-        {
-            return "layer";
-        }
+    // Compatibility surface for callers outside the edit panel. All state and commands belong to the child.
+    public int DeletedCadPadCount => DxfEdit.DeletedCadPadCount;
+    public bool HasDeletedCadPads => DxfEdit.HasDeletedCadPads;
+    public int DuplicateCadPadCount => DxfEdit.DuplicateCadPadCount;
+    public bool HasDuplicateCadPads => DxfEdit.HasDuplicateCadPads;
+    public int CombinedCadPadCount => DxfEdit.CombinedCadPadCount;
+    public bool HasCombinedCadPads => DxfEdit.HasCombinedCadPads;
+    public int RelayeredCadPadCount { get => DxfEdit.RelayeredCadPadCount; set => DxfEdit.RelayeredCadPadCount = value; }
+    public bool HasRelayeredCadPads => DxfEdit.HasRelayeredCadPads;
+    public int RotatedCadPadCount { get => DxfEdit.RotatedCadPadCount; set => DxfEdit.RotatedCadPadCount = value; }
+    public bool HasRotatedCadPads => DxfEdit.HasRotatedCadPads;
+    public bool HasAnyCadEdits => DxfEdit.HasAnyCadEdits;
+    public string DxfEditTargetLayerName { get => DxfEdit.DxfEditTargetLayerName; set => DxfEdit.DxfEditTargetLayerName = value; }
+    public DxfEditRotationScopeOption SelectedDxfEditRotationScopeOption { get => DxfEdit.SelectedDxfEditRotationScopeOption; set => DxfEdit.SelectedDxfEditRotationScopeOption = value; }
+    public string DxfEditRotationLayerName { get => DxfEdit.DxfEditRotationLayerName; set => DxfEdit.DxfEditRotationLayerName = value; }
+    public string DxfEditNewLayerName { get => DxfEdit.DxfEditNewLayerName; set => DxfEdit.DxfEditNewLayerName = value; }
+    public decimal DxfEditRotationDegrees { get => DxfEdit.DxfEditRotationDegrees; set => DxfEdit.DxfEditRotationDegrees = value; }
+    public bool IsDxfEditAdvancedPanelExpanded { get => DxfEdit.IsDxfEditAdvancedPanelExpanded; set => DxfEdit.IsDxfEditAdvancedPanelExpanded = value; }
+    public IReadOnlyList<DxfEditRotationScopeOption> DxfEditRotationScopeOptions => DxfEdit.DxfEditRotationScopeOptions;
+    public bool HasSelectedCadPadsForDxfEdit => DxfEdit.HasSelectedCadPadsForDxfEdit;
+    public bool HasSelectedCombinedCadPadsForDxfEdit => DxfEdit.HasSelectedCombinedCadPadsForDxfEdit;
+    public bool HasManualHiddenCadPads => DxfEdit.HasManualHiddenCadPads;
+    public bool HasDetectedDuplicateCadPads => DxfEdit.HasDetectedDuplicateCadPads;
+    public bool CanMoveSelectedCadPadsToLayer => DxfEdit.CanMoveSelectedCadPadsToLayer;
+    public bool CanCreateLayerAndMoveSelectedCadPads => DxfEdit.CanCreateLayerAndMoveSelectedCadPads;
+    public bool IsDxfEditRotationLayerScope => DxfEdit.IsDxfEditRotationLayerScope;
+    public string DxfEditSelectionSummary => DxfEdit.DxfEditSelectionSummary;
+    public string HiddenDxfEditBadgeTooltip => DxfEdit.HiddenDxfEditBadgeTooltip;
+    public string CombinedDxfEditBadgeTooltip => DxfEdit.CombinedDxfEditBadgeTooltip;
+    public string DuplicateDxfEditBadgeTooltip => DxfEdit.DuplicateDxfEditBadgeTooltip;
+    public string MovedDxfEditBadgeTooltip => DxfEdit.MovedDxfEditBadgeTooltip;
+    public bool CanRotateSelectedCadPads => DxfEdit.CanRotateSelectedCadPads;
+    public string RotatedDxfEditBadgeTooltip => DxfEdit.RotatedDxfEditBadgeTooltip;
+    public IRelayCommand DeleteSelectedCadPadsCommand => DxfEdit.DeleteSelectedCadPadsCommand;
+    public IRelayCommand RestoreLastDeletedCadPadsCommand => DxfEdit.RestoreLastDeletedCadPadsCommand;
+    public IRelayCommand RestoreAllHiddenCadPadsCommand => DxfEdit.RestoreAllHiddenCadPadsCommand;
+    public IRelayCommand CombineSelectedCadPadsCommand => DxfEdit.CombineSelectedCadPadsCommand;
+    public IRelayCommand ClearCombinedCadPadsCommand => DxfEdit.ClearCombinedCadPadsCommand;
+    public IRelayCommand ResetAllDxfEditsCommand => DxfEdit.ResetAllDxfEditsCommand;
+    public IAsyncRelayCommand OpenHiddenDxfEditChangeListCommand => DxfEdit.OpenHiddenDxfEditChangeListCommand;
+    public IAsyncRelayCommand OpenDuplicateDxfEditChangeListCommand => DxfEdit.OpenDuplicateDxfEditChangeListCommand;
+    public IAsyncRelayCommand OpenCombinedDxfEditChangeListCommand => DxfEdit.OpenCombinedDxfEditChangeListCommand;
+    public IAsyncRelayCommand OpenMovedDxfEditChangeListCommand => DxfEdit.OpenMovedDxfEditChangeListCommand;
+    public IAsyncRelayCommand OpenRotatedDxfEditChangeListCommand => DxfEdit.OpenRotatedDxfEditChangeListCommand;
+    public IRelayCommand MoveSelectedCadPadsToLayerCommand => DxfEdit.MoveSelectedCadPadsToLayerCommand;
+    public IRelayCommand CreateLayerAndMoveSelectedCadPadsCommand => DxfEdit.CreateLayerAndMoveSelectedCadPadsCommand;
+    public IRelayCommand RotateSelectedCadPadsCommand => DxfEdit.RotateSelectedCadPadsCommand;
+    public ObservableCollection<string> DxfEditLayerOptions { get => DxfEdit.DxfEditLayerOptions; set => DxfEdit.DxfEditLayerOptions = value; }
 
-        var invalidChars = Path.GetInvalidFileNameChars().ToHashSet();
-        var builder = new StringBuilder(input.Length);
-        foreach (var ch in input)
-        {
-            builder.Append(invalidChars.Contains(ch) ? '_' : ch);
-        }
-
-        return builder.Length == 0 ? "layer" : builder.ToString();
-    }
-
-    private void RemoveHiddenCadIdFromUndoBatches(int cadPadId)
-    {
-        if (_cadEdit.HiddenUndoStack.Count == 0)
-        {
-            return;
-        }
-
-        var batchesTopToBottom = _cadEdit.HiddenUndoStack
-            .Select(static batch => batch.ToList())
-            .ToList();
-        _cadEdit.HiddenUndoStack.Clear();
-
-        for (var index = batchesTopToBottom.Count - 1; index >= 0; index--)
-        {
-            var batch = batchesTopToBottom[index];
-            batch.RemoveAll(id => id == cadPadId);
-            if (batch.Count > 0)
-            {
-                _cadEdit.HiddenUndoStack.Push(batch);
-            }
-        }
-    }
+    private CadEditState _cadEdit => CadDocument.Edit;
+    private CadEditNotificationSnapshot CaptureCadEditNotifications() => DxfEdit.CaptureCadEditNotifications();
+    private void ResetDxfEditBaseline(CadPadSet? cad) => _cadEditWorkflow.ResetBaseline(cad, CaptureCadEditNotifications());
+    private void SyncHiddenCadIdsToProject(CadEditNotificationSnapshot? previous = null) => DxfEdit.SyncHiddenCadIdsToProject(previous);
+    private void SyncCombinedCadState(CadEditNotificationSnapshot? previous = null) => DxfEdit.SyncCombinedCadState(previous);
+    private void SyncDuplicateCadState(CadEditNotificationSnapshot? previous = null, bool persistToProject = true) => DxfEdit.SyncDuplicateCadState(previous, persistToProject);
+    private void SyncRelayeredCadState(CadEditNotificationSnapshot? previous = null) => DxfEdit.SyncRelayeredCadState(previous);
+    private void SyncRotatedCadState(CadEditNotificationSnapshot? previous = null) => DxfEdit.SyncRotatedCadState(previous);
+    private void RefreshDxfEditLayerOptions(IReadOnlyList<string> layerNames) => DxfEdit.RefreshDxfEditLayerOptions(layerNames);
+    private void NotifyDxfEditPanelActionStateChanged() => DxfEdit.NotifyDxfEditPanelActionStateChanged();
 }

@@ -1,6 +1,6 @@
 # Notch System Reference
 
-> Last updated: 2026-10-03
+> Last updated: 2026-11-27
 > Status: The sole canonical reference for the current Notch pipeline / Simulation / Export
 
 This document does not aim to replace all historical documents. It brings together "how the system currently works" in one place. Any future changes to the flow, naming, or C export contract should update this file first, then adjust the deep-dive or legacy example.
@@ -84,8 +84,8 @@ A CAD pad is not itself a FW memory node, but several diff identities are derive
   - Source: `_workflowData.LatestPadMatch.RegularToCad.Keys`
   - Meaning: Regular pads already assigned to a CAD pad in the current Step1 / matching result
   - Current uses:
-    - v2.2 `ToFull` boundary seed
-    - Active/inactive neighbor decisions for notch compensation
+    - v2.2 boundary-regular diagnostics (not a `ToFull` gate, see section 4.2)
+    - Active/inactive neighbor decisions behind those diagnostics
 
 - `Regular Visibility Mask (SeeRegular.csv)`
   - Source: `SeeRegular.csv` loads successfully, and `UseRegularVisibilityMask` / `RegularVisibilityMaskUi.IsEnabled` is enabled
@@ -111,10 +111,70 @@ Under the `CadAllocation` path:
 - It falls back to the raw anchor regular diff only when the output mapping is currently missing
 - v2.2 target legs come only from geometric aggregation of regular `(IC, FW Diff Idx)`
 - Targets should no longer be rewritten by visible / CAD projection
-- The `ToFull` boundary seed is currently defined as:
+- `ToFull` is not limited to boundary regulars:
+  - Step3 evaluates every overlapped regular and applies `ToFull` where the pad has reachable free area (connected safe fill).
+  - `ToFull` also decides row emission. A CAD emits no row for an IC when its anchor regular pad in that IC is not tagged freeform and no target has `ToFull` applied.
+  - The boundary-only gate was removed on purpose in 2026-03 (S11.44 in `docs/archive/TODO-history-2026-03-24.md`).
+  - A proposal to limit `ToFull` to boundary regulars again was dropped (owner decision, 2026-11-27). It removed whole rows, including the area allocation to neighbors. On a staggered synthetic panel with the virtual area cap and the target coverage guard off, a uniform input stays uniform today and no longer did with that proposal. Both settings are on by default, and with them on a uniform input is not preserved on that panel either way.
+- A boundary regular is still computed, for diagnostics only. It is:
   - A regular on the outer edge of the grid, or
   - A regular with any up/down/left/right neighbor missing or outside the `match-scope active regular set`
 - The boundary regular index set is precomputed once within the same generation pass, then filtered and reused in each candidate; this is a performance optimization that does not change results
+
+### 4.2.1 Opt-in V22 row explanations and A/B reports
+
+Notch Detail runs an uncached generation off the UI thread using the export input snapshot,
+active regular IDs and CAD output FW diff map. Its immutable presentation reads collector
+evidence and the projected V22 table through the shared row-selection and firmware/profile
+policy (CSV keeps all selected rows). It shows MAIN/CONT rows, exact versus emitted cell
+shares, To Full limits, drops, guard scaling and continuation formulas. A source selector
+covers CAD pads winning on multiple ICs; losing or ineligible CAD pads retain the preview
+and collapsed Q7 allocations. Legacy mode or disabled V22 shows a prerequisite message.
+The preview outline is the area To Full can reach in that run, not the whole candidate
+cells. Reachable polygons are retained only for the requested CAD. Changed projects discard
+pending detail results. Generated rows, export and simulation calculations are unchanged.
+
+`NotchTableGenerator.Generate(..., explanationCollector: collector)` accepts a fresh
+Application-owned `NotchV22ExplanationCollector` for CadAllocation with V22 enabled.
+Its immutable explanations are keyed by `(IC, source diff)` and cover MAIN and every
+CONT row. They capture the admitted candidates' actual selection keys (ToFull influence,
+has legs, anchor match, source area and combine descending, then CAD ID ascending;
+exact ties retain candidate input order), the winner's regular areas/rules, target
+ratios and rounding/disposition, combine composition, guard scales/flooring, and final
+seven-integer rows with their leg membership and MAIN continuation subtraction.
+Targets admitted before the guard but floored away by it have `GuardRoundedToZero`
+disposition; their original rounded percent and guard before/after values remain available.
+Compensation, allocation, selection, rounding and the guard execute only in the existing
+generation path. Without a collector, no explanation objects or collections are created.
+`AdditionLimit` derives once from produced effective/reachable areas: a reduction below
+reachable area means `VirtualAreaCap`; an applied expansion reaching less than the regular
+area means `ReachableFreeArea`; otherwise it is `None`. Boundary remains diagnostic only.
+
+`NotchV22ExplanationComparer` compares payloads by `(IC, source diff, row ordinal)`;
+ordinal 0 is MAIN and later ordinals are CONT. It reports changed/added/removed rows,
+before/after integers and rule codes, and the first differing step: candidate selection,
+overlap, ToFull rule/area, ratio before rounding, rounding, then guard/continuation split.
+An absent source belongs to selection/admission; a changed continuation count within an
+otherwise identical source belongs to the final split. Unchanged payloads are omitted.
+Differing payloads with identical recorded steps fail comparison as incomplete evidence.
+
+After building the test project, use the isolated opt-in test host through:
+
+```powershell
+pwsh -NoProfile -File scripts/tools/notch-ab-report.ps1 -Action snapshot -ProjectPath $project -CompensationModel ConservativeNoGain -BoundaryVirtualAreaCap On -OutputPath build/notch-ab/a.json
+pwsh -NoProfile -File scripts/tools/notch-ab-report.ps1 -Action snapshot -ProjectPath $project -CompensationModel CurrentGain -BoundaryVirtualAreaCap On -OutputPath build/notch-ab/b.json
+pwsh -NoProfile -File scripts/tools/notch-ab-report.ps1 -Action compare -BeforePath build/notch-ab/a.json -AfterPath build/notch-ab/b.json -OutputPath build/notch-ab/ab.md
+```
+
+Both overrides are optional; unspecified values come from the loaded project. The host
+uses the existing project loader, selected-layer CAD, match-scope active regulars, output
+diff mapping and official CadAllocation generator. It uses test settings isolation and
+suspends project-load logging. Normal tests perform no host IO unless explicitly opted
+in. JSON and Markdown outputs are restricted to this worktree's `build/`; they contain
+scalar explanation evidence, not input files, pad names, polygons or project paths, and
+remain local artifacts. For code A/B, snapshot each built worktree with identical inputs
+and settings, then compare the two absolute JSON paths from either worktree. Both builds
+must support snapshot schema 1; compare never loads a project or regenerates rows.
 
 ### 4.3 Simulation
 
@@ -155,7 +215,7 @@ project/filter
 After `R13.102a-2a` / `R13.102a-2b-2` / `R13.102b-2`, the current state still has three explicit boundaries:
 
 1. Normal `CadAllocation` has separated phases 1～3 output-neutral resolution from phase 4 final projection; the Step5 export cache holds an Application-owned opaque batch that remains reusable even when projection yields zero rows. Concurrent Export/Simulation with the same CAD/grid/Step3/computation identity and generation epoch create only one resolution task; joiners do not replay phases 1～3 progress, and each caller executes phase 4 using the enabled versions, V21/V22 threshold, `NullValue`, and target coverage guard/cap frozen at its own entry point. The resolved-batch settings fingerprint excludes final-only fields, but the completed cache and in-flight join still perform full computation-settings equality to guard against 32-bit collisions. A faulted task is removed for the next retry; final-only invalidation retains the task/batch and rejects publication of the old projection, while full invalidation advances the epoch, detaches the old task, and rejects its store/publish. Each generation request also freezes the Step5 final-projection revision and Simulation source revision; projected row count, last table, progress/flow, and caller continuation may be committed only while all three remain current. Warm projection executes/reports only phase 4. This is narrow progress for the full-table consumer task owner, not a repository-wide canonical result.
-2. Step 3 preview, the 200 ms deferred CAD Inspector, Notch Detail, and Runtime Query `query multi-owner` for the same single-CAD selection/revision all project a revisioned sparse `NotchV22ResolvedResult`; the VM no longer holds a parallel compensation dictionary. R13.102a-2b-2 connects the request for the currently selected single CAD to the existing full batch session: a matching warm result is consumed by the candidate as the exact same instance, while a cold batch carries at most one resolved result identified by CAD ID + anchor IC/diff, which is promoted back to the same per-CAD owner only after completion passes the currentness check. Reuse identity locks the exact CAD, immutable grid/CAD-pool signatures, active mask, all computation settings, and anchor; a change to the same mutable grid reference must not cause an old result to be reused incorrectly. The full batch still deliberately stores only compact candidate evidence, without retaining polygons/debug results for all CAD pads; this is therefore a bounded sparse/full bridge and does not claim that all readers use one giant batch shape.
+2. Step 3 preview, the 200 ms deferred CAD Inspector, and Runtime Query `query multi-owner` for the same single-CAD selection/revision all project a revisioned sparse `NotchV22ResolvedResult`; the VM no longer holds a parallel compensation dictionary. R13.102a-2b-2 connects the request for the currently selected single CAD to the existing full batch session: a matching warm result is consumed by the candidate as the exact same instance, while a cold batch carries at most one resolved result identified by CAD ID + anchor IC/diff, which is promoted back to the same per-CAD owner only after completion passes the currentness check. Reuse identity locks the exact CAD, immutable grid/CAD-pool signatures, active mask, all computation settings, and anchor; a change to the same mutable grid reference must not cause an old result to be reused incorrectly. The full batch still deliberately stores only compact candidate evidence, without retaining polygons/debug results for all CAD pads; this is therefore a bounded sparse/full bridge and does not claim that all readers use one giant batch shape.
 3. `LegacyRegularAnchor` still performs fixed V21/V22 compatibility dispatch according to the enabled version/threshold and retains a request-specific `NotchTable` cache. Top-level dispatch creates an owned `LegacyNotchGenerationRequest` before the first synchronous progress callback, fixing the ordered enabled versions, effective V22/V21 thresholds, `NullValue`, and `LenScale` at once; threshold admission, eligibility, and both versions of row builders read only this request and the same explicit version switch. Callbacks still synchronously mutate caller settings, but affect only the next generation. R13.103d-2 removed the strategy interface/dictionary/injection seam with no consumers; the V22 builder no longer retains the CadAllocation hybrid compensation branch or all-CAD input either.
 
 Owner: R13.101e has converged normal generator/UI compensation on a single compute path through the complete, output-version-neutral `NotchV22CompensationContext`; the old multi-parameter API serves only as a compatibility adapter, and explicitly empty allocation evidence no longer falls back to recomputation. R13.101 still continues through R13.101c-2 to complete the repository-wide shared-result/final-output cache split; R13.102a-2b-2 has enabled concurrent full-table consumers to share a revisioned resolution task and completed the bounded selected sparse bridge. R13.102/R13.102a/R13.102a-2 still require audits of all consumers and Legacy convergence against their respective complete exit criteria; R13.103 completes typed final projectors/formatters and the legacy boundary. All of these parents remain open. R13.102b-2 completes only a single Runtime Query reader; R13.103d-1 freezes the Legacy request and removes the hybrid branch, and R13.103d-2 further deletes the registry/injection seam, but neither merges the request-specific table cache nor the entire Legacy boundary. R13.104a-1 to a-10 sequentially converge the EMS predicate, resolved display decisions, audit/replay/export status, active Notch cap guidance, and target-cap help. `LegacyRegularAnchor` convergence, other hard-coded caps, and the remaining Simulation/replay/display text are still unfinished; `LegacyRegularAnchor` serves only as an explicit compatibility path and does not enter the normal operator flow.
@@ -210,7 +270,7 @@ Key rules:
   - `Boundary virtual-area cap`: Before the ToFull virtual extension area enters Stage3 gain/allocation, limit it to `inside overlap × cap ratio`.
   - `Target coverage guard`: After canonical rows are selected, sum retained/incoming coverage for each target FW diff; if it exceeds the cap (default `120%`), proportionally reduce that target's retained/leg percentages to prevent uniform 400 from exceeding EMS 480.
 - More than two target legs are split into continuation rows
-- The first row retains the actual `CombinePercent`
+- The first (MAIN) row uses `CombinePercent = original CombinePercent - sum(CONT leg percentages)`; subtracting MAIN's two legs then leaves the anchor coverage. The diagnostic `C=...%` comment still records the full source allocation across MAIN and CONT before the target coverage guard; `TG=...%`, when present, is the total after the guard.
 - Continuation rows fix `CombinePercent = 100`
 - `NotchV22FirmwareProjector` is the sole normalization entry point from typed/legacy V22 table rows to final Firmware nodes: typed `V22Node` takes priority, `Values.Length >= 7` retains raw compatibility decode, and `< 7` preserves the existing legacy combine fallback and exact overflow exception.
 - The projection provides both `SourceRows`, which preserves the original row/action ordinal, and `NodesByIc`, which preserves the existing C per-IC ordering; the two views share the same projected row. The exporter only formats projected nodes; simulation executes the same batch of nodes before aggregating Actions/diagnostics.
@@ -270,8 +330,8 @@ The C file currently produced by `NotchTableExporter.ExportAsCInitializer(...)` 
 ### 7.4 v2.2 Node Comment Semantics
 
 - `R=...%` represents the To Regular diagnostic multiplier: `Σ(overlapArea / targetRegularArea)`. It is no longer multiplied into all target shares as a source-wide gain.
-- `F=...%` represents the To Full diagnostic multiplier; in `Conservative (No Gain)`, To Full mainly serves as boundary support/cap/allowance, so `F=100%` is common without boundary expansion. In `Current (Gain)`, the Stage3 effective area after To Full affects only the coverage of the corresponding target.
-- `C=...%` represents the node's actual coverage sum, namely the total self retained + target legs of this source row.
+- `F=...%` represents the To Full diagnostic multiplier; in `Conservative (No Gain)`, To Full mainly serves as support/cap/allowance, so `F=100%` is common without expansion. In `Current (Gain)`, the Stage3 effective area after To Full affects only the coverage of the corresponding target.
+- `C=...%` represents the full source allocation before the target coverage guard, namely self retained + all target legs across MAIN and CONT; `TG=...%`, when present, is the total after the guard. MAIN's payload `CombinePercent` excludes the CONT legs.
 - `NODE KEEP=...% MOVE=...%` is the actual node flow additionally derived by C export; for example, `C=100%` with a target leg of `44` means the source retains `56%` and moves `44%`.
 
 The current model rules for `C` are:
@@ -313,7 +373,7 @@ CombinePercent = self retained coverage + Σ(target leg coverage)
 ```
 
 - `ToRegular` remains enabled to restore area differences flattened by NF.
-- `ToFull` still runs the rule engine, but determines only support / cap / boundary allowance.
+- `ToFull` still runs the rule engine, but determines only support / cap / allowance.
 - Actual target legs use only the original overlap coverage.
 - No Gain therefore means "no ToFull amount gain", not no compensation at all.
 
@@ -390,6 +450,7 @@ sourceDelta     = retainedPercent - 100
 
 4. Source and target scaling both use `(INT16)((source * percent) / 100)`; integer division truncates toward zero, and accumulation retains firmware modular narrowing.
 5. Continuation rows add only their own target legs, without adjusting source retained again.
+   The generator therefore subtracts the sum of CONT leg percentages from the original Combine when encoding MAIN; V21 projection restores that full Combine to preserve its existing continuation subtraction behavior.
 6. Aggregate Actions by `SourceRows` only after physics completes; action grouping must not affect firmware calculations in reverse.
 
 Test contracts:
@@ -415,6 +476,8 @@ After R13.103c-2, the executable Firmware domain of `NullValue` is fixed at `0..
 The input domain for V21/V22 simulation is FW INT16: finite fractional values truncate toward zero, values beyond the INT16 range saturate, and NaN/Infinity quantize to 0. `Cells.BeforeValue`, Actions, and safety audit all use this quantized baseline to avoid misrepresenting input quantization as notch compensation. V21 CadAllocation additionally provides source-oriented Actions; V21 LegacyRegularAnchor rows are destination-oriented, so they provide only exact Cells/EMS, without producing source-flow Actions in the wrong direction.
 
 If a parity gap is found in 1.0.x, only simulation/decoder/compatibility adapter adjustments that do not change C bytes are allowed; a correctness change requiring encoder, row ordering, or C emission changes must be filed as a separate post-g7 product issue.
+
+Exception: on 2026-11-26 23:07 (UTC+8) the owner decided that the V22 continuation-row correction ships in 1.0.0: the MAIN combine excludes the continuation legs. The exception covers this correction only, including the output changes it causes against the 1.0.x output-equality rules.
 
 ### 7.4.3 C export generation metadata
 
@@ -516,7 +579,9 @@ This section records the domain golden rules that current Freeform / Notch desig
 - In other words, `ToRegular` should be viewed as "bringing sensing amounts back closer to proportionality with area" to offset NF's partial compensation for area differences.
 - If this assumption holds, `ToRegular` is physically meaningful and closer to the actual sensor area distribution than simply retaining the post-NF values.
 
-### 9.6 Physical Meaning of To Full
+### 9.6 Physical Meaning of To Full (recommendation, not adopted)
+
+> Status: not adopted. This section records a design recommendation. It does not describe current behavior: `ToFull` is not limited to boundary or edge regulars (section 4.2).
 
 - `ToFull` is intended to support boundary edge extrapolation, rather than arbitrarily amplify sensing amounts.
 - The reason is that the Boundary algorithm estimates positions from a line of sensing amounts outside the edge; if the freeform region has no valid sensing output before notch correction, the edge cannot be extrapolated outward correctly.
@@ -524,7 +589,9 @@ This section records the domain golden rules that current Freeform / Notch desig
   - Allowing edge regulars to obtain usable boundary sensing support
   - Helping edge touch reporting, rather than rewriting the main allocation rules across the interior
 
-### 9.7 Canonical Recommendations for To Full
+### 9.7 Recommendations for To Full (not adopted)
+
+> Status: not adopted, except the last bullet about `Current (Gain)`, which describes current behavior.
 
 - Whether `ToFull` should directly use the expanded full regular area as the target allocation weight should not currently be considered settled.
 - The recommendation currently more consistent with physical intuition is:
@@ -601,6 +668,7 @@ Given the current practical sensor / FW / NF scenarios, `ToRegular` and `ToFull`
   - Conclusion: Reasonable, but expanded/full area should not directly determine the target ratio.
   - Reason: The actual purpose of `ToFull` is to provide sufficient edge support for boundary / edge extrapolation algorithms, rather than let tiny overlap become the main allocation leg through full expansion.
   - Recommended meaning: `ToFull` determines reachability, support eligibility, caps, or boundary allowance; the actual allocation ratio should still primarily be determined by `exact/source overlap`.
+  - Status: not adopted (see section 9.6).
 - `with gain`
   - Conclusion: Unsuitable as the default main path.
   - Reason: It has been corrected to per-target Stage3 coverage, but gain may still amplify local net-flow imbalance until measurements establish uniform-field stability for target allocation.
@@ -682,7 +750,7 @@ The future state that best matches your description should therefore be:
 - `v2.2 canonical`
 - `without gain` as the default
 - Retain `ToRegular`
-- Change `ToFull` to `support / cap / boundary allowance`
+- Change `ToFull` to `support / cap / boundary allowance` (not adopted, see section 9.6)
 - Add `area-preserving + EMS-guarded` safety correction and audit to target allocation; beta0.9's `Boundary virtual-area cap` / `Target coverage guard` is the current first implementation
 
 ## 11. Related Deep-Dives / Examples

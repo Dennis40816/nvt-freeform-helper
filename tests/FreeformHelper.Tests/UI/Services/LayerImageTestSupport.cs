@@ -3,8 +3,8 @@
 using System.Globalization;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.Services;
-using FreeformHelper.UI.ViewModels;
 
 namespace FreeformHelper.Tests;
 

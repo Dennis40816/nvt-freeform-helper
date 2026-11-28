@@ -1,0 +1,98 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             xmlns:views="clr-namespace:FreeformHelper.UI.Views"
+             xmlns:p="clr-namespace:FreeformHelper.UI.Presentation"
+             x:Class="FreeformHelper.UI.Views.NotchDetailContent"
+             x:DataType="vm:NotchDetailViewModel" x:CompileBindings="True">
+  <UserControl.Styles><StyleInclude Source="avares://FreeformHelper.UI/Styles/NotchDetail.axaml"/></UserControl.Styles>
+  <StackPanel x:Name="DetailLayout" Spacing="{DynamicResource Space12}">
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+      <SelectableTextBlock Text="{Binding CadTitle}" FontWeight="SemiBold"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+        <SelectableTextBlock Classes="explainNote" Text="{Binding CadLayer}"/>
+        <SelectableTextBlock Classes="explainNote" Text="{Binding FreeformLabel}"/>
+      </StackPanel>
+    </Grid>
+    <ComboBox x:Name="SourceDiffSelector" IsVisible="{Binding HasSourceSelector}" ItemsSource="{Binding Sources}"
+              SelectedItem="{Binding SelectedSource, Mode=TwoWay}">
+      <ComboBox.ItemTemplate><DataTemplate x:DataType="p:NotchSourcePresentation"><TextBlock Text="{Binding SelectorText}"/></DataTemplate></ComboBox.ItemTemplate>
+    </ComboBox>
+    <SelectableTextBlock Classes="explainNote" Text="{Binding SelectedSource.CompetitionText}"
+                         IsVisible="{Binding HasCompetition}" TextWrapping="Wrap"/>
+    <SelectableTextBlock Text="Below TH (skip notch output)" Foreground="{DynamicResource NfcWarningTextBrush}"
+                         IsVisible="{Binding IsBelowThreshold}"/>
+    <Border Classes="explainCard">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <controls:NotchPreviewCanvas x:Name="DetailPreview" CadPad="{Binding CadPad}" RegularPads="{Binding PreviewRegularPads}"
+                                     ToFullPolygons="{Binding ToFullPolygons}" FreeformType="{Binding FreeformType}"
+                                     NeighborCadPads="{Binding NeighborCadPads}" Explanation="{Binding SelectedSource}"
+                                     ClipToBounds="True" Height="{DynamicResource NotchExplanationPreviewHeight}"/>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="{DynamicResource Space8}">
+          <StackPanel Classes="explainLegendRow"><Border Classes="explainLegendSwatch cad"/><TextBlock Text="CAD covers"/></StackPanel>
+          <StackPanel Classes="explainLegendRow"><Rectangle Classes="explainLegendSwatch toFull"/><TextBlock Text="To Full can reach"/></StackPanel>
+          <StackPanel Classes="explainLegendRow"><Border Classes="explainLegendSwatch neighbor"/><TextBlock Text="neighbor CAD"/></StackPanel>
+          <StackPanel Classes="explainLegendRow"><Border Classes="explainLegendSwatch regular"/><TextBlock Text="regular cell"/></StackPanel>
+          <StackPanel Classes="explainLegendRow" IsVisible="{Binding HasSources}">
+            <TextBlock Text="→" Width="{DynamicResource NotchExplanationSwatchWidth}"/>
+            <TextBlock Text="{Binding SelectedSource.ShareLegend}"/>
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+    </Border>
+    <SelectableTextBlock Text="{Binding ExplanationMessage}" TextWrapping="Wrap" IsVisible="{Binding HasNoSources}"/>
+    <Panel IsVisible="{Binding HasSources}">
+      <views:NotchExplanationView x:Name="Explanation" DataContext="{Binding SelectedSource}"/>
+    </Panel>
+    <StackPanel Spacing="{DynamicResource Space8}">
+      <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource NotchExplanationAccordionBorder}">
+        <Grid ColumnDefinitions="*,Auto">
+          <ToggleButton x:Name="AllocationsToggle" Classes="actionGhost flat" IsChecked="False" HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left" Padding="{DynamicResource Inset8}">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <TextBlock Text="▸" IsVisible="{Binding !IsChecked, ElementName=AllocationsToggle}"/>
+              <TextBlock Text="▾" IsVisible="{Binding IsChecked, ElementName=AllocationsToggle}"/>
+              <TextBlock Text="Allocations (Q7)"/>
+            </StackPanel>
+          </ToggleButton>
+          <SelectableTextBlock Grid.Column="1" Classes="explainNote" Text="{Binding ThresholdSummary}" VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
+      <Grid x:Name="AllocationSection" IsVisible="{Binding IsChecked, ElementName=AllocationsToggle}"
+            RowDefinitions="Auto,Auto" RowSpacing="{DynamicResource Space4}" Grid.IsSharedSizeScope="True">
+        <Border x:Name="AllocationHeader" Classes="workspaceTableHeader">
+          <Grid ColumnSpacing="{DynamicResource Space8}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" SharedSizeGroup="RegularId"/><ColumnDefinition Width="Auto" SharedSizeGroup="Coordinates"/>
+              <ColumnDefinition Width="Auto" SharedSizeGroup="Q7"/><ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <SelectableTextBlock Classes="workspaceTableHeaderText" Text="Regular id"/>
+            <SelectableTextBlock Grid.Column="1" Classes="workspaceTableHeaderText" Text="Coord"/>
+            <SelectableTextBlock Grid.Column="2" Classes="workspaceTableHeaderText" Text="Q7"/>
+            <SelectableTextBlock Grid.Column="3" Classes="workspaceTableHeaderText" Text="Ratio"/>
+          </Grid>
+        </Border>
+        <ListBox x:Name="AllocationList" Grid.Row="1" Classes="workspaceDataList" ItemsSource="{Binding Allocations}"
+                 MaxHeight="{DynamicResource NotchDetailListMaxHeight}" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:NotchDetailAllocation">
+              <Border Padding="{DynamicResource Inset8}">
+                <Grid ColumnSpacing="{DynamicResource Space8}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="RegularId"/><ColumnDefinition Width="Auto" SharedSizeGroup="Coordinates"/>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Q7"/><ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <SelectableTextBlock Text="{Binding RegularLabel}"/><SelectableTextBlock Grid.Column="1" Text="{Binding GridLabel}"/>
+                  <SelectableTextBlock Grid.Column="2" Text="{Binding Q7Text}"/>
+                  <SelectableTextBlock Grid.Column="3" Text="{Binding RatioText}" Foreground="{DynamicResource NfcTextMutedBrush}"/>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

@@ -1,4 +1,6 @@
 using System.Globalization;
+using CommunityToolkit.Mvvm.Input;
+using FreeformHelper.Domain.Notch;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 
@@ -199,6 +201,124 @@ public sealed partial class FreeformHelperViewModel
             cad.Id,
             dxfIndex?.ToString(CultureInfo.InvariantCulture) ?? "-",
             detail.Allocations.Count);
+        var explanation = BeginNotchRowExplanationAsync(cad, workflowSnapshot, detail);
         await OpenNotchDetailAsync(detail);
+        await explanation;
+    }
+
+    /// <summary>
+    /// Takes the export inputs on the UI thread, then fills the open detail window. The generation reads copies,
+    /// so the window keeps showing the project as it was when it opened.
+    /// </summary>
+    private Task BeginNotchRowExplanationAsync(
+        FreeformHelper.Domain.Pads.CadPad selectedCad,
+        WorkflowDataSnapshot workflowSnapshot,
+        NotchDetailViewModel detail)
+    {
+        var cad = new FreeformHelper.Domain.Pads.CadPadSet(BuildFilteredCadPadSet()!.Pads.ToArray());
+        var grid = NotchDetailUseCase.SnapshotGrid(_grid!);
+        // The same effective values export uses, applied to a copy so opening a detail never marks the project dirty.
+        var settings = CreateExportSettingsSnapshot(_projectFile.Settings);
+        ApplyUiToSettings(settings, markUnsaved: false);
+        var firmwareOutput = NotchExportFileTypeMetadata.IsCExportType(SelectedNotchExportFileTypeOption.Value);
+        var activeIds = GetActiveRegularPadIdsForNotchComputation()?.ToHashSet();
+        var diffMap = workflowSnapshot.CadOutputFwDiffIndexByCadId.ToDictionary();
+        return RunUiOperationAsync(
+            "Notch detail rows",
+            async () => detail.ShowExplanation(await Task.Run(() => NotchDetailUseCase.BuildExplanation(
+                selectedCad, cad, grid, settings, activeIds, diffMap, firmwareOutput))),
+            ex =>
+            {
+                detail.ShowExplanation(FreeformHelper.UI.Presentation.NotchDetailExplanation.WithoutRows(
+                    $"Could not work out the rows: {ex.Message}"));
+                _logger.Error(ex, "Notch detail row explanation failed.");
+            },
+            showModalSpinner: false);
+    }
+
+    /// <summary>
+    /// Gets the command to export the notch table in the currently selected format.
+    /// </summary>
+    public IAsyncRelayCommand ExportNotchCommand => _notchCommands.ExportNotchCommand;
+
+    /// <summary>
+    /// Gets the command to open the notch detail view for the selected CAD pad.
+    /// </summary>
+    public IAsyncRelayCommand ShowNotchDetailCommand => _notchCommands.ShowNotchDetailCommand;
+
+    /// <summary>
+    /// Gets the command to set notch validation target REG from current selection.
+    /// </summary>
+    public IRelayCommand UseSelectedRegularForNotchValidationCommand => _notchCommands.UseSelectedRegularForNotchValidationCommand;
+
+    /// <summary>
+    /// Gets the command to analyze notch rows/flow for current validation REG.
+    /// </summary>
+    public IRelayCommand AnalyzeNotchValidationCommand => _notchCommands.AnalyzeNotchValidationCommand;
+
+    /// <summary>
+    /// Gets the command to clear notch validation result.
+    /// </summary>
+    public IRelayCommand ClearNotchValidationCommand => _notchCommands.ClearNotchValidationCommand;
+
+    /// <summary>
+    /// Gets the command to focus canvas selection based on one validation row.
+    /// </summary>
+    public IRelayCommand<NotchValidationDisplayItem> FocusNotchValidationItemCommand => _notchCommands.FocusNotchValidationItemCommand;
+
+    /// <summary>
+    /// Gets the command to move Notch Stage preview to previous stage.
+    /// </summary>
+    public IRelayCommand PreviousNotchPreviewStageCommand => _notchCommands.PreviousNotchPreviewStageCommand;
+
+    /// <summary>
+    /// Gets the command to move Notch Stage preview to next stage.
+    /// </summary>
+    public IRelayCommand NextNotchPreviewStageCommand => _notchCommands.NextNotchPreviewStageCommand;
+
+    private readonly NotchCommands _notchCommands;
+
+    /// <summary>Creates the notch commands once during construction.</summary>
+    private NotchCommands CreateNotchCommands()
+    {
+        return new NotchCommands(
+            ExportNotchCommand: CreateEditingAsyncCommand(ExportNotchAsync),
+            ShowNotchDetailCommand: CreateEditingAsyncCommand(ShowNotchDetailAsync),
+            UseSelectedRegularForNotchValidationCommand: CreateEditingCommand(UseSelectedRegularForNotchValidation),
+            AnalyzeNotchValidationCommand: CreateEditingCommand(AnalyzeNotchValidation),
+            ClearNotchValidationCommand: CreateEditingCommand(ClearNotchValidation),
+            FocusNotchValidationItemCommand: CreateEditingCommand<NotchValidationDisplayItem>(FocusNotchValidationItem),
+            PreviousNotchPreviewStageCommand: CreateEditingCommand(() => ShiftNotchPreviewStage(-1)),
+            NextNotchPreviewStageCommand: CreateEditingCommand(() => ShiftNotchPreviewStage(1)));
+    }
+
+    private readonly NotchExportGenerationCacheService _notchExportGenerationCacheService = new();
+
+    private readonly NotchComputationSession _notchComputationSession = new();
+
+    private readonly NotchValidationSession _notchValidationSession = new();
+
+    private readonly NotchPreviewTiming _notchPreviewTiming = new();
+
+    private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
+
+    private readonly NotchResultCacheState _notchCache = new(); // Holds the notch validation cache, last generated table and playback visibility.
+
+    /// <summary>Gets the notch result cache holder for tests.</summary>
+    internal NotchResultCacheState NotchCacheForTests => _notchCache;
+
+    /// <summary>Gets the notch preview timing for tests.</summary>
+    internal NotchPreviewTiming NotchPreviewTimingForTests => _notchPreviewTiming;
+
+    /// <summary>
+    /// Holds the last generated notch table and the last preview visibility seen by playback, for the main view model.
+    /// </summary>
+    internal sealed class NotchResultCacheState
+    {
+        /// <summary>Gets or sets the table of the last notch generation.</summary>
+        internal NotchTable? LastGeneratedTable { get; set; }
+
+        /// <summary>Gets or sets the preview visibility that the last playback sync saw.</summary>
+        internal bool LastPreviewVisibleForPlayback { get; set; }
     }
 }

@@ -5,13 +5,13 @@
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              xmlns:views="clr-namespace:FreeformHelper.UI.Views"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.FreeformHelperView"
              IsEnabled="{Binding IsProjectEditingEnabled}"
              PointerPressed="OnRootPointerPressed"
-             Background="{DynamicResource BrushBgApp}"
-             Foreground="{DynamicResource BrushTextPrimary}">
+             Background="{DynamicResource NfcAppBackgroundBrush}"
+             Foreground="{DynamicResource NfcTextBrush}">
   <Design.DataContext>
     <vm:FreeformHelperViewModel/>
   </Design.DataContext>
@@ -29,9 +29,9 @@
     <Border Grid.Row="0"
             Grid.ColumnSpan="5"
             Padding="{StaticResource Inset8_6}"
-            Background="{DynamicResource BrushBgSurface}"
+            Background="{DynamicResource NfcSurfaceBrush}"
             BorderThickness="{StaticResource BorderBottomThin}"
-            BorderBrush="{DynamicResource BrushBorder}">
+            BorderBrush="{DynamicResource NfcBorderMutedBrush}">
       <Menu x:Name="MainMenu"
             HorizontalAlignment="Left">
         <MenuItem Header="File">
@@ -45,11 +45,11 @@
                     ToolTip.Tip="Pick Notch rows, then export using the existing file type selection."/>
           <Separator/>
           <MenuItem Header="DXF" IsEnabled="False"/>
-          <MenuItem Header="Export DXF (Visible Layers)" Command="{Binding ExportDxfVisibleCommand}"
+          <MenuItem Header="Export DXF (Visible Layers)" Command="{Binding CadExport.ExportDxfVisibleCommand}"
                     ToolTip.Tip="Export visible canvas layers plus DXF-layer pads using the current export rules."/>
-          <MenuItem Header="Export DXF (All Layers)" Command="{Binding ExportDxfAllCommand}"
+          <MenuItem Header="Export DXF (All Layers)" Command="{Binding CadExport.ExportDxfAllCommand}"
                     ToolTip.Tip="Export all DXF layers, including layers hidden on the canvas."/>
-          <MenuItem Header="Export DXF Layer Image" Command="{Binding ExportDxfLayerImageCommand}"/>
+          <MenuItem Header="Export DXF Layer Image" Command="{Binding CadExport.ExportDxfLayerImageCommand}"/>
         </MenuItem>
         <MenuItem Header="Settings">
           <MenuItem Header="Open Settings"
@@ -74,16 +74,16 @@
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="{StaticResource InsetBottom12}">
           <SelectableTextBlock Text="DXF" FontWeight="SemiBold"/>
           <Button Grid.Column="1"
-                  Classes="actionIconButton panelChromeToggle"
+                  Classes="actionIconButton panelChromeToggle actionGhost"
                   ToolTip.Tip="Hide Layers &amp; DXF panel"
                   Click="HideLeftPanel_Click">
             <controls:FontIcon Classes="symbols"
-                               Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+                               Glyph="{x:Static icons:NvtIcons.ChevronLeft}"/>
           </Button>
         </Grid>
         <ScrollViewer x:Name="LeftSettingsScroll"
                       Grid.Row="1"
-                      Classes="scrollDevCandidate viewportBoundScroll"
+                      Classes="viewportBoundScroll"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
           <Border Classes="viewportBoundContent"
@@ -97,7 +97,7 @@
     <GridSplitter Grid.Row="2"
                   Grid.Column="1"
                   Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource BrushBorder}"
+                  Background="{DynamicResource NfcBorderMutedBrush}"
                   HorizontalAlignment="Stretch"
                   ShowsPreview="True"/>
 
@@ -149,7 +149,7 @@
                               Focusable="True"/>
           <SelectableTextBlock Text="{Binding CanvasHintText}"
                                IsVisible="{Binding HasCanvasHint}"
-                               Foreground="{DynamicResource BrushTextMuted}"
+                               Foreground="{DynamicResource NfcTextMutedBrush}"
                                TextWrapping="Wrap"
                                TextAlignment="Center"
                                HorizontalAlignment="Center"
@@ -164,7 +164,7 @@
 
         <GridSplitter Grid.Row="1"
                       HorizontalAlignment="Stretch"
-                      Background="{DynamicResource BrushBorder}"
+                      Background="{DynamicResource NfcBorderMutedBrush}"
                       ResizeDirection="Rows"
                       ShowsPreview="True"/>
 
@@ -178,7 +178,7 @@
     <GridSplitter Grid.Row="2"
                   Grid.Column="3"
                   Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource BrushBorder}"
+                  Background="{DynamicResource NfcBorderMutedBrush}"
                   HorizontalAlignment="Stretch"
                   ShowsPreview="True"/>
 
@@ -196,22 +196,22 @@
                   VerticalAlignment="Center">
             <StackPanel Orientation="Horizontal"
                         Spacing="{StaticResource Space4}">
-              <ToggleButton Classes="rightPanelBrowserTab"
+              <ToggleButton Classes="actionGhost flat marked" MinWidth="{DynamicResource ButtonMinWidthSm}"
                             IsChecked="{Binding IsRightPanelSettingsTab, Mode=TwoWay}">
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource Space6}">
                   <controls:FontIcon Classes="symbols iconSm rightPanelBrowserTabIcon"
-                                     Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+                                     Glyph="{x:Static icons:NvtIcons.Settings}"/>
                   <TextBlock Classes="rightPanelBrowserTabTitle"
                              Text="Settings"/>
                 </StackPanel>
               </ToggleButton>
-              <ToggleButton Classes="rightPanelBrowserTab"
+              <ToggleButton Classes="actionGhost flat marked" MinWidth="{DynamicResource ButtonMinWidthSm}"
                             IsChecked="{Binding IsRightPanelInspectorTab, Mode=TwoWay}">
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource Space6}">
                   <controls:FontIcon Classes="symbols iconSm rightPanelBrowserTabIcon"
-                                     Glyph="{x:Static icons:IconGlyphs.Search}"/>
+                                     Glyph="{x:Static icons:NvtIcons.Search}"/>
                   <TextBlock Classes="rightPanelBrowserTabTitle"
                              Text="Inspector"/>
                 </StackPanel>
@@ -220,17 +220,17 @@
           </Border>
           <Button Grid.Column="1"
                   VerticalAlignment="Center"
-                  Classes="actionIconButton panelChromeToggle"
+                  Classes="actionIconButton panelChromeToggle actionGhost"
                   ToolTip.Tip="Hide Settings &amp; Inspector panel"
                   Click="HideRightPanel_Click">
             <controls:FontIcon Classes="symbols"
-                               Glyph="{x:Static icons:IconGlyphs.ChevronRight}"/>
+                               Glyph="{x:Static icons:NvtIcons.ChevronRight}"/>
           </Button>
         </Grid>
 
         <ScrollViewer x:Name="RightSettingsScroll"
                       Grid.Row="1"
-                      Classes="scrollDevCandidate viewportBoundScroll"
+                      Classes="viewportBoundScroll"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
           <Border Classes="viewportBoundContent"
@@ -253,13 +253,13 @@
             IsHitTestVisible="True">
       <views:PadInfoPopover x:Name="PadInfoPopover"/>
       <Path x:Name="PadInfoLink"
-            Stroke="{DynamicResource BrushTextPrimary}"
+            Stroke="{DynamicResource NfcTextBrush}"
             StrokeThickness="{StaticResource Space1}"
             IsHitTestVisible="False"/>
       <Ellipse x:Name="PadInfoAnchor"
                Width="{StaticResource PadInfoAnchorSize}"
                Height="{StaticResource PadInfoAnchorSize}"
-               Fill="{DynamicResource BrushTextPrimary}"
+               Fill="{DynamicResource NfcTextBrush}"
                IsHitTestVisible="False"/>
     </Canvas>
 

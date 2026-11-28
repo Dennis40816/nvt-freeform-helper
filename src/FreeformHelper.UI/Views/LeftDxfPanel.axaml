@@ -3,18 +3,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              mc:Ignorable="d"
              x:Class="FreeformHelper.UI.Views.LeftDxfPanel">
   <UserControl.Resources>
     <converters:BooleanGlyphConverter x:Key="LayerVisibilityGlyph"
-                                      FalseGlyph="{x:Static icons:IconGlyphs.VisibilityOff}"
-                                      TrueGlyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                                      FalseGlyph="{x:Static icons:NvtIcons.VisibilityOff}"
+                                      TrueGlyph="{x:Static icons:NvtIcons.Visibility}"/>
     <converters:BooleanGlyphConverter x:Key="AccordionExpandGlyph"
-                                      FalseGlyph="{x:Static icons:IconGlyphs.ExpandMore}"
-                                      TrueGlyph="{x:Static icons:IconGlyphs.ExpandLess}"/>
+                                      FalseGlyph="{x:Static icons:NvtIcons.ExpandMore}"
+                                      TrueGlyph="{x:Static icons:NvtIcons.ExpandLess}"/>
   </UserControl.Resources>
   <StackPanel Spacing="{StaticResource Space10}">
     <panels:CollapsiblePanel Title="Import &amp; DXF check" IsExpanded="False">
@@ -25,11 +26,11 @@
                   IsChecked="{Binding ImportOnlyClosedPolylines, Mode=TwoWay}"
                   ToolTip.Tip="Only import closed polylines from the DXF."/>
         <SelectableTextBlock Classes="stepNote" Text="Reopen the DXF to apply import changes."/>
-        <Button Classes="workspaceActionButton"
+        <Button Classes="workspaceActionButton actionNeutral"
                 Command="{Binding CheckDxfQualityCommand}"
                 ToolTip.Tip="Scan the current DXF for duplicates or overlaps.">
           <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
-            <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:IconGlyphs.Search}"/>
+            <controls:FontIcon Grid.Column="0" Classes="symbols iconTextButtonLeadingIcon" Glyph="{x:Static icons:NvtIcons.Search}"/>
             <SelectableTextBlock Grid.Column="1" Classes="iconTextButtonLabel" Text="Overlap check"/>
             <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
           </Grid>
@@ -42,11 +43,11 @@
         <StackPanel Spacing="{StaticResource Space6}" IsVisible="{Binding HasDxfOverlapIssues}">
           <SelectableTextBlock Classes="stepNote" Text="{Binding DxfOverlapIssueCount, StringFormat='Issues: {0}'}"/>
           <WrapPanel>
-            <Button Classes="actionTextButton actionGhost" Content="Details" Command="{Binding ShowDxfOverlapDetailsCommand}"
+            <Button Classes="actionGhost" Content="Details" Command="{Binding ShowDxfOverlapDetailsCommand}"
                     ToolTip.Tip="Open overlap details window (copy supported)."/>
-            <Button Classes="actionTextButton actionGhost" Content="Select" Command="{Binding SelectDxfOverlapPadsCommand}"
+            <Button Classes="actionGhost" Content="Select" Command="{Binding SelectDxfOverlapPadsCommand}"
                     ToolTip.Tip="Restore overlap highlight and select those CAD pads."/>
-            <Button Classes="actionTextButton actionGhost" Content="Clear" Command="{Binding ClearDxfOverlapHighlightsCommand}"
+            <Button Classes="actionGhost" Content="Clear" Command="{Binding ClearDxfOverlapHighlightsCommand}"
                     ToolTip.Tip="Clear overlap highlight and current selection."/>
           </WrapPanel>
         </StackPanel>
@@ -55,7 +56,7 @@
     <panels:CollapsiblePanel Title="Layers" IsExpanded="True">
       <panels:CollapsiblePanel.HeaderRight>
         <ToggleButton
-                      Classes="dxfLayerBulkToggleButton"
+                      Classes="dxfLayerBulkToggleButton chipAction"
                       IsChecked="{Binding IsCadLayerBulkToggleChecked, Mode=TwoWay}"
                       IsEnabled="{Binding HasCadLayers}"
                       ToolTip.Tip="{Binding CadLayerBulkToggleToolTip}">
@@ -73,9 +74,8 @@
             <ItemsControl ItemsSource="{Binding LayerToggles}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <ToggleButton Classes="layerToggle"
+                  <ToggleButton Classes="layerToggle actionGhost flat"
                                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                PointerPressed="OnLayerTogglePointerPressedInternal"
                                 HorizontalAlignment="Stretch"
                                 HorizontalContentAlignment="Left"
                                 Padding="{StaticResource Inset4}"
@@ -94,7 +94,7 @@
         <StackPanel Orientation="Horizontal"
                     Spacing="{StaticResource Space8}">
           <controls:FontIcon Classes="symbols iconSm"
-                             Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+                             Glyph="{x:Static icons:NvtIcons.FitScreen}"/>
           <SelectableTextBlock Text="Bounds source layer" FontWeight="SemiBold"/>
         </StackPanel>
         <SelectableTextBlock Classes="stepNote"
@@ -111,74 +111,74 @@
           </ComboBox.ItemTemplate>
         </ComboBox>
         <SelectableTextBlock Text="{Binding BoundLayerOptionSummary}"
-                             Foreground="{DynamicResource BrushTextMuted}"
+                             Foreground="{DynamicResource NfcTextMutedBrush}"
                              TextWrapping="Wrap"/>
       </StackPanel>
       </StackPanel>
     </panels:CollapsiblePanel>
     <panels:CollapsiblePanel Title="DXF edits" IsExpanded="False">
-      <panels:CollapsiblePanel.HeaderRight><SelectableTextBlock Classes="stepNote" Text="{Binding DxfEditsHeaderText}" MaxWidth="{DynamicResource ManualSizingInputWidth}"
-            TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding DxfEditsHeaderText}"/></panels:CollapsiblePanel.HeaderRight>
+      <panels:CollapsiblePanel.HeaderRight><SelectableTextBlock Classes="stepNote" Text="{Binding DxfEdit.DxfEditsHeaderText}" MaxWidth="{DynamicResource ManualSizingInputWidth}"
+            TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding DxfEdit.DxfEditsHeaderText}"/></panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}">
-          <controls:BalancedWrapPanel Classes="badgeGroup dxfEditBadgeGroup"
+          <primitives:BalancedWrapPanel Classes="badgeGroup dxfEditBadgeGroup"
                                       HorizontalAlignment="Stretch">
-            <Button Classes="actionChip chipAction dxfEditSummaryChip hidden"
-                    Command="{Binding OpenHiddenDxfEditChangeListCommand}"
-                    ToolTip.Tip="{Binding HiddenDxfEditBadgeTooltip}">
+            <Button Classes="productChipAction dxfEditSummaryChip hidden"
+                    Command="{Binding DxfEdit.OpenHiddenDxfEditChangeListCommand}"
+                    ToolTip.Tip="{Binding DxfEdit.HiddenDxfEditBadgeTooltip}">
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.VisibilityOff}"/>
+                                   Glyph="{x:Static icons:NvtIcons.VisibilityOff}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
-                                     Text="{Binding DeletedCadPadCount, StringFormat='Hidden {0}'}"/>
+                                     Text="{Binding DxfEdit.DeletedCadPadCount, StringFormat='Hidden {0}'}"/>
               </StackPanel>
             </Button>
-            <Button Classes="actionChip chipAction dxfEditSummaryChip duplicate"
-                    Command="{Binding OpenDuplicateDxfEditChangeListCommand}"
-                    IsVisible="{Binding HasDetectedDuplicateCadPads}"
-                    ToolTip.Tip="{Binding DuplicateDxfEditBadgeTooltip}">
+            <Button Classes="productChipAction dxfEditSummaryChip duplicate"
+                    Command="{Binding DxfEdit.OpenDuplicateDxfEditChangeListCommand}"
+                    IsVisible="{Binding DxfEdit.HasDetectedDuplicateCadPads}"
+                    ToolTip.Tip="{Binding DxfEdit.DuplicateDxfEditBadgeTooltip}">
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.ContentCopy}"/>
+                                   Glyph="{x:Static icons:NvtIcons.ContentCopy}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
-                                     Text="{Binding DuplicateCadPadCount, StringFormat='Duplicates {0}'}"/>
+                                     Text="{Binding DxfEdit.DuplicateCadPadCount, StringFormat='Duplicates {0}'}"/>
               </StackPanel>
             </Button>
-            <Button Classes="actionChip chipAction dxfEditSummaryChip combined"
-                    Command="{Binding OpenCombinedDxfEditChangeListCommand}"
-                    ToolTip.Tip="{Binding CombinedDxfEditBadgeTooltip}">
+            <Button Classes="productChipAction dxfEditSummaryChip combined"
+                    Command="{Binding DxfEdit.OpenCombinedDxfEditChangeListCommand}"
+                    ToolTip.Tip="{Binding DxfEdit.CombinedDxfEditBadgeTooltip}">
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.Merge}"/>
+                                   Glyph="{x:Static icons:NvtIcons.Merge}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
-                                     Text="{Binding CombinedCadPadCount, StringFormat='Merged {0}'}"/>
+                                     Text="{Binding DxfEdit.CombinedCadPadCount, StringFormat='Merged {0}'}"/>
               </StackPanel>
             </Button>
-            <Button Classes="actionChip chipAction dxfEditSummaryChip layer"
-                    Command="{Binding OpenMovedDxfEditChangeListCommand}"
-                    ToolTip.Tip="{Binding MovedDxfEditBadgeTooltip}">
+            <Button Classes="productChipAction dxfEditSummaryChip layer"
+                    Command="{Binding DxfEdit.OpenMovedDxfEditChangeListCommand}"
+                    ToolTip.Tip="{Binding DxfEdit.MovedDxfEditBadgeTooltip}">
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.DriveFileMove}"/>
+                                   Glyph="{x:Static icons:NvtIcons.DriveFileMove}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
-                                     Text="{Binding RelayeredCadPadCount, StringFormat='Moved {0}'}"/>
+                                     Text="{Binding DxfEdit.RelayeredCadPadCount, StringFormat='Moved {0}'}"/>
               </StackPanel>
             </Button>
-            <Button Classes="actionChip chipAction dxfEditSummaryChip geometry"
-                    Command="{Binding OpenRotatedDxfEditChangeListCommand}"
-                    ToolTip.Tip="{Binding RotatedDxfEditBadgeTooltip}">
+            <Button Classes="productChipAction dxfEditSummaryChip geometry"
+                    Command="{Binding DxfEdit.OpenRotatedDxfEditChangeListCommand}"
+                    ToolTip.Tip="{Binding DxfEdit.RotatedDxfEditBadgeTooltip}">
               <StackPanel Orientation="Horizontal"
                           Spacing="{StaticResource Space6}">
                 <controls:FontIcon Classes="symbols iconSm dxfEditBadgeIcon"
-                                   Glyph="{x:Static icons:IconGlyphs.RotateRight}"/>
+                                   Glyph="{x:Static icons:NvtIcons.RotateRight}"/>
                 <SelectableTextBlock Classes="dxfEditSummaryBadgeText"
-                                     Text="{Binding RotatedCadPadCount, StringFormat='Rotated {0}'}"/>
+                                     Text="{Binding DxfEdit.RotatedCadPadCount, StringFormat='Rotated {0}'}"/>
               </StackPanel>
             </Button>
-          </controls:BalancedWrapPanel>
+          </primitives:BalancedWrapPanel>
         <StackPanel Spacing="{StaticResource Space6}">
           <SelectableTextBlock Classes="dxfEditSectionLabel"
                                Text="Quick actions"/>
@@ -186,43 +186,43 @@
             <StackPanel Spacing="{StaticResource Space6}">
               <SelectableTextBlock Classes="dxfEditActionGroupLabel"
                                    Text="Hide / restore"/>
-              <Button Classes="dangerTextButton dxfEditMiniAction"
-                      Command="{Binding DeleteSelectedCadPadsCommand}"
+              <Button Classes="dxfEditMiniAction actionDanger"
+                      Command="{Binding DxfEdit.DeleteSelectedCadPadsCommand}"
                       ToolTip.Tip="Hide selected CAD pads from current workflow (shortcut: Delete).">
                 <StackPanel Classes="dxfEditMiniActionContent"
                             Orientation="Horizontal"
                             Spacing="{StaticResource Space4}">
                   <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                     Glyph="{x:Static icons:IconGlyphs.VisibilityOff}"/>
+                                     Glyph="{x:Static icons:NvtIcons.VisibilityOff}"/>
                   <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                        Text="Hide selected"/>
                 </StackPanel>
               </Button>
               <Grid Classes="dxfEditActionGroupRow"
-                    ColumnDefinitions="*,*">
-                <Button Grid.Column="0"
-                        Classes="dxfEditMiniAction"
-                        Command="{Binding RestoreLastDeletedCadPadsCommand}"
+                    RowDefinitions="Auto,Auto">
+                <Button Grid.Row="0"
+                        Classes="dxfEditMiniAction actionNeutral"
+                        Command="{Binding DxfEdit.RestoreLastDeletedCadPadsCommand}"
                         ToolTip.Tip="Restore last hidden CAD batch.">
                   <StackPanel Classes="dxfEditMiniActionContent"
                               Orientation="Horizontal"
                               Spacing="{StaticResource Space4}">
                     <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                       Glyph="{x:Static icons:IconGlyphs.Undo}"/>
+                                       Glyph="{x:Static icons:NvtIcons.Undo}"/>
                     <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                          Text="Undo hide"/>
                   </StackPanel>
                 </Button>
-                <Button Grid.Column="1"
-                        Classes="dxfEditMiniAction"
-                        Command="{Binding RestoreAllHiddenCadPadsCommand}"
-                        IsEnabled="{Binding HasManualHiddenCadPads}"
+                <Button Grid.Row="1"
+                        Classes="dxfEditMiniAction actionNeutral"
+                        Command="{Binding DxfEdit.RestoreAllHiddenCadPadsCommand}"
+                        IsEnabled="{Binding DxfEdit.HasManualHiddenCadPads}"
                         ToolTip.Tip="Restore all manually hidden CAD pads. Combined groups and layer moves stay unchanged.">
                   <StackPanel Classes="dxfEditMiniActionContent"
                               Orientation="Horizontal"
                               Spacing="{StaticResource Space4}">
                     <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                       Glyph="{x:Static icons:IconGlyphs.Visibility}"/>
+                                       Glyph="{x:Static icons:NvtIcons.Visibility}"/>
                     <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                          Text="Show all"/>
                   </StackPanel>
@@ -234,27 +234,27 @@
             <StackPanel Spacing="{StaticResource Space6}">
               <SelectableTextBlock Classes="dxfEditActionGroupLabel"
                                    Text="Combine / split"/>
-              <Button Classes="dxfEditMiniAction"
-                      Command="{Binding CombineSelectedCadPadsCommand}"
+              <Button Classes="dxfEditMiniAction actionNeutral"
+                      Command="{Binding DxfEdit.CombineSelectedCadPadsCommand}"
                       ToolTip.Tip="Combine selected CAD pads using geometry union (preserves shape).">
                 <StackPanel Classes="dxfEditMiniActionContent"
                             Orientation="Horizontal"
                             Spacing="{StaticResource Space4}">
                   <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                     Glyph="{x:Static icons:IconGlyphs.Merge}"/>
+                                     Glyph="{x:Static icons:NvtIcons.Merge}"/>
                   <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                        Text="Combine"/>
                 </StackPanel>
               </Button>
-              <Button Classes="dxfEditMiniAction"
-                      Command="{Binding ClearCombinedCadPadsCommand}"
-                      IsEnabled="{Binding HasSelectedCombinedCadPadsForDxfEdit}"
+              <Button Classes="dxfEditMiniAction actionNeutral"
+                      Command="{Binding DxfEdit.ClearCombinedCadPadsCommand}"
+                      IsEnabled="{Binding DxfEdit.HasSelectedCombinedCadPadsForDxfEdit}"
                       ToolTip.Tip="Split selected combined CAD groups back into their source pads.">
                 <StackPanel Classes="dxfEditMiniActionContent"
                             Orientation="Horizontal"
                             Spacing="{StaticResource Space4}">
                   <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
-                                     Glyph="{x:Static icons:IconGlyphs.CallSplit}"/>
+                                     Glyph="{x:Static icons:NvtIcons.CallSplit}"/>
                   <SelectableTextBlock Classes="dxfEditMiniActionLabel"
                                        Text="Split selected"/>
                 </StackPanel>
@@ -264,26 +264,26 @@
         </StackPanel>
         <Separator/>
         <Button HorizontalAlignment="Right"
-                Classes="actionTextButton actionDanger" Content="Reset all DXF edits"
+                Classes="actionDanger" Content="Reset all DXF edits"
                 Click="ResetAllDxfEditsButton_Click"
-                IsEnabled="{Binding HasAnyCadEdits}"
+                IsEnabled="{Binding DxfEdit.HasAnyCadEdits}"
                 VerticalAlignment="Center"
                 ToolTip.Tip="Reset all DXF edits, including hidden, combined, and layer-move changes.">
         </Button>
       </StackPanel>
     </panels:CollapsiblePanel>
-    <panels:CollapsiblePanel Title="Advanced edit" IsExpanded="{Binding IsDxfEditAdvancedPanelExpanded, Mode=TwoWay}" >
+    <panels:CollapsiblePanel Title="Advanced edit" IsExpanded="{Binding DxfEdit.IsDxfEditAdvancedPanelExpanded, Mode=TwoWay}" >
       <StackPanel Spacing="{StaticResource Space8}">
             <StackPanel Classes="panelForm"
                         Spacing="{StaticResource Space10}">
               <StackPanel Classes="panelFormField">
                 <SelectableTextBlock Classes="dxfEditFieldLabel"
                                      Text="Rotate"/>
-                <SelectableTextBlock Classes="stepNote" Text="{Binding DxfRotationScopeHint}" TextWrapping="Wrap"/>
+                <SelectableTextBlock Classes="stepNote" Text="{Binding DxfEdit.DxfRotationScopeHint}" TextWrapping="Wrap"/>
                   <ComboBox
-                            ItemsSource="{Binding DxfEditRotationScopeOptions}"
-                            SelectedItem="{Binding SelectedDxfEditRotationScopeOption, Mode=TwoWay}"
-                            ToolTip.Tip="{Binding SelectedDxfEditRotationScopeOption.Description}">
+                            ItemsSource="{Binding DxfEdit.DxfEditRotationScopeOptions}"
+                            SelectedItem="{Binding DxfEdit.SelectedDxfEditRotationScopeOption, Mode=TwoWay}"
+                            ToolTip.Tip="{Binding DxfEdit.SelectedDxfEditRotationScopeOption.Description}">
                     <ComboBox.ItemTemplate>
                       <DataTemplate>
                         <SelectableTextBlock Text="{Binding Display}"/>
@@ -291,9 +291,9 @@
                     </ComboBox.ItemTemplate>
                   </ComboBox>
                   <ComboBox
-                      IsVisible="{Binding IsDxfEditRotationLayerScope}"
-                            ItemsSource="{Binding DxfEditLayerOptions}"
-                            SelectedItem="{Binding DxfEditRotationLayerName, Mode=TwoWay}"
+                      IsVisible="{Binding DxfEdit.IsDxfEditRotationLayerScope}"
+                            ItemsSource="{Binding DxfEdit.DxfEditLayerOptions}"
+                            SelectedItem="{Binding DxfEdit.DxfEditRotationLayerName, Mode=TwoWay}"
                             ToolTip.Tip="Rotate all visible baseline CAD pads in the selected layer as one group."/>
                 <Grid ColumnDefinitions="*,Auto"
                       ColumnSpacing="{StaticResource Space6}">
@@ -303,11 +303,11 @@
                                            SmallChange="90"
                                            LargeChange="180"
                                            FormatString="0"
-                                           Value="{Binding DxfEditRotationDegrees, Mode=TwoWay}"/>
+                                           Value="{Binding DxfEdit.DxfEditRotationDegrees, Mode=TwoWay}"/>
                   <Button Grid.Column="1"
-                          Classes="actionNeutral actionTextButton" Content="Rotate"
-                          Command="{Binding RotateSelectedCadPadsCommand}"
-                          IsEnabled="{Binding CanRotateSelectedCadPads}"
+                          Classes="actionNeutral" Content="Rotate"
+                          Command="{Binding DxfEdit.RotateSelectedCadPadsCommand}"
+                          IsEnabled="{Binding DxfEdit.CanRotateSelectedCadPads}"
                           ToolTip.Tip="Rotate the current DXF edit scope as one group around its shared center. 90° units are recommended.">
                   </Button>
                 </Grid>
@@ -319,13 +319,13 @@
                 <Grid ColumnDefinitions="*,Auto"
                       ColumnSpacing="{StaticResource Space6}">
                   <ComboBox Grid.Column="0"
-                            ItemsSource="{Binding DxfEditLayerOptions}"
-                            SelectedItem="{Binding DxfEditTargetLayerName, Mode=TwoWay}"
+                            ItemsSource="{Binding DxfEdit.DxfEditLayerOptions}"
+                            SelectedItem="{Binding DxfEdit.DxfEditTargetLayerName, Mode=TwoWay}"
                             ToolTip.Tip="Target layer for selected CAD pads."/>
                   <Button Grid.Column="1"
-                          Classes="actionNeutral actionTextButton" Content="Move"
-                          Command="{Binding MoveSelectedCadPadsToLayerCommand}"
-                          IsEnabled="{Binding CanMoveSelectedCadPadsToLayer}"
+                          Classes="actionNeutral" Content="Move"
+                          Command="{Binding DxfEdit.MoveSelectedCadPadsToLayerCommand}"
+                          IsEnabled="{Binding DxfEdit.CanMoveSelectedCadPadsToLayer}"
                           ToolTip.Tip="Move selected CAD pads to target layer.">
                   </Button>
                 </Grid>
@@ -337,12 +337,12 @@
                 <Grid ColumnDefinitions="*,Auto"
                       ColumnSpacing="{StaticResource Space6}">
                   <TextBox Grid.Column="0"
-                           Text="{Binding DxfEditNewLayerName, Mode=TwoWay}"
+                           Text="{Binding DxfEdit.DxfEditNewLayerName, Mode=TwoWay}"
                            PlaceholderText="New DXF layer"/>
                   <Button Grid.Column="1"
-                          Classes="actionNeutral actionTextButton" Content="Move"
-                          Command="{Binding CreateLayerAndMoveSelectedCadPadsCommand}"
-                          IsEnabled="{Binding CanCreateLayerAndMoveSelectedCadPads}"
+                          Classes="actionNeutral" Content="Move"
+                          Command="{Binding DxfEdit.CreateLayerAndMoveSelectedCadPadsCommand}"
+                          IsEnabled="{Binding DxfEdit.CanCreateLayerAndMoveSelectedCadPads}"
                           ToolTip.Tip="Create new layer and move selected CAD pads.">
                   </Button>
                 </Grid>

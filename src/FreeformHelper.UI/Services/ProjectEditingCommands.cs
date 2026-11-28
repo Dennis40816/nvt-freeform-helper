@@ -2,7 +2,7 @@ using System.ComponentModel;
 using Avalonia.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FreeformHelper.UI.ViewModels;
+using FreeformHelper.UI.CadEditing;
 
 namespace FreeformHelper.UI.Services;
 
@@ -10,11 +10,21 @@ namespace FreeformHelper.UI.Services;
 public sealed class ProjectEditingCommands : ObservableObject
 {
     private readonly List<IRelayCommand> _commands = [];
-    private FreeformHelperViewModel? _project;
+    private readonly Func<bool>? _isProjectEditingEnabled;
+    private IProjectEditingAvailability? _project;
 
-    public bool IsProjectEditingEnabled => _project?.IsProjectEditingEnabled ?? true;
+    public ProjectEditingCommands()
+    {
+    }
 
-    internal void AttachProject(FreeformHelperViewModel? project)
+    internal ProjectEditingCommands(Func<bool> isProjectEditingEnabled)
+    {
+        _isProjectEditingEnabled = isProjectEditingEnabled;
+    }
+
+    public bool IsProjectEditingEnabled => _isProjectEditingEnabled?.Invoke() ?? _project?.IsProjectEditingEnabled ?? true;
+
+    internal void AttachProject(IProjectEditingAvailability? project)
     {
         if (ReferenceEquals(_project, project)) return;
         if (_project is not null)
@@ -26,7 +36,7 @@ public sealed class ProjectEditingCommands : ObservableObject
         _project = project;
         if (_project is not null)
         {
-            WeakEventHandlerManager.Subscribe<FreeformHelperViewModel, PropertyChangedEventArgs, ProjectEditingCommands>(
+            WeakEventHandlerManager.Subscribe<INotifyPropertyChanged, PropertyChangedEventArgs, ProjectEditingCommands>(
                 _project, nameof(_project.PropertyChanged), OnProjectPropertyChanged);
         }
 
@@ -55,12 +65,31 @@ public sealed class ProjectEditingCommands : ObservableObject
         return command;
     }
 
-    private void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    internal AsyncRelayCommand CreateAsyncCommand(Func<Task> execute)
     {
-        if (e.PropertyName == nameof(FreeformHelperViewModel.IsProjectEditingEnabled)) NotifyAvailabilityChanged();
+        var command = new AsyncRelayCommand(
+            () => IsProjectEditingEnabled ? execute() : Task.CompletedTask,
+            () => IsProjectEditingEnabled);
+        _commands.Add(command);
+        return command;
     }
 
-    private void NotifyAvailabilityChanged()
+    internal AsyncRelayCommand CreateAsyncCommand(Func<Task<bool>> execute)
+    {
+        // Preserve the result task so shortcut callers can display the result of this execution.
+        var command = new AsyncRelayCommand(
+            () => IsProjectEditingEnabled ? execute() : Task.FromResult(false),
+            () => IsProjectEditingEnabled);
+        _commands.Add(command);
+        return command;
+    }
+
+    private void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(IProjectEditingAvailability.IsProjectEditingEnabled)) NotifyAvailabilityChanged();
+    }
+
+    internal void NotifyAvailabilityChanged()
     {
         OnPropertyChanged(nameof(IsProjectEditingEnabled));
         foreach (var command in _commands) command.NotifyCanExecuteChanged();

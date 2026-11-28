@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep1View">
     <panels:CollapsiblePanel x:Name="Step1Block" Title="Step 1 · Geometry match"
@@ -10,7 +10,7 @@
         <Button Tag="Step1GeometryMatch"
                 Classes="actionIconButton actionGhost workflowStepAction" Click="OpenSettingsButton_Click"
                 ToolTip.Tip="Open Settings at Step 1 section.">
-          <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:IconGlyphs.Settings}"/>
+          <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.Settings}"/>
         </Button>
       </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
@@ -21,10 +21,10 @@
         <SelectableTextBlock Text="{Binding MatchThreshold, StringFormat='Diagnostic threshold: {0:0.####}'}"/>
         <panels:CollapsiblePanel Title="Regular Visibility Mask" IsExpanded="False">
           <panels:CollapsiblePanel.HeaderRight>
-            <SelectableTextBlock Classes="stepNote" Text="{Binding RegularVisibilityMaskUi.Summary}"
+            <SelectableTextBlock Classes="stepNote" Text="{Binding RegularMask.Summary}"
                                  MaxWidth="{DynamicResource WorkspaceCompactStatusMaxWidth}" TextTrimming="CharacterEllipsis"
                                  TextWrapping="NoWrap"
-                                 ToolTip.Tip="{Binding RegularVisibilityMaskUi.Summary}"/>
+                                 ToolTip.Tip="{Binding RegularMask.Summary}"/>
           </panels:CollapsiblePanel.HeaderRight>
           <StackPanel Spacing="{StaticResource Space6}">
         <StackPanel Classes="panelFormField">
@@ -34,7 +34,7 @@
                                  Text="Use Regular Visibility Mask"
                                  VerticalAlignment="Center"/>
             <ToggleSwitch Grid.Column="1"
-                          IsChecked="{Binding RegularVisibilityMaskUi.IsEnabled, Mode=TwoWay}"
+                          IsChecked="{Binding RegularMask.IsEnabled, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
@@ -43,14 +43,14 @@
           </Grid>
           <Grid ColumnDefinitions="*,*"
                 ColumnSpacing="{StaticResource Space10}">
-            <Button Grid.Column="0"
+            <Button Classes="actionNeutral" Grid.Column="0"
                     Content="Import mask"
-                    Command="{Binding ImportRegularVisibilityMaskCommand}"
+                    Command="{Binding RegularMask.ImportRegularVisibilityMaskCommand}"
                     HorizontalAlignment="Stretch"
                     ToolTip.Tip="Import Regular Visibility Mask (SeeRegular.csv) and build the regular active mask used by Step 4 and Simulation."/>
-            <Button Grid.Column="1"
+            <Button Classes="actionNeutral" Grid.Column="1"
                     Content="Clear mask"
-                    Command="{Binding ClearRegularVisibilityMaskCommand}"
+                    Command="{Binding RegularMask.ClearRegularVisibilityMaskCommand}"
                     HorizontalAlignment="Stretch"
                     ToolTip.Tip="Remove the imported regular visibility mask and return to pure geometry seed."/>
           </Grid>
@@ -59,7 +59,7 @@
         </panels:CollapsiblePanel>
         <Separator/>
         <SelectableTextBlock Classes="stepNote" Text="Clears matching and invalidates Steps 2 to 5 and validation." TextWrapping="Wrap"/>
-        <Button Classes="actionTextButton actionDanger" Content="Clear result"
+        <Button Classes="actionDanger" Content="Clear result"
                 HorizontalAlignment="Right" Command="{Binding ClearStep1ResultCommand}"
                 ToolTip.Tip="Clears matching and invalidates Steps 2 to 5 and validation."/>
       </StackPanel>

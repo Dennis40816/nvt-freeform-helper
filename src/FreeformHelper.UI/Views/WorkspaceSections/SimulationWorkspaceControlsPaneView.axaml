@@ -1,12 +1,12 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:icons="using:Nvt.Core.Avalonia.Icons"
     xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
     x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspaceControlsPaneView">
   <Border Grid.Column="0"
       Classes="workspaceSidePane left">
-    <ScrollViewer Classes="scrollDevCandidate viewportBoundScroll"
+    <ScrollViewer Classes="viewportBoundScroll"
         MinHeight="0"
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Disabled">
@@ -17,7 +17,7 @@
           <StackPanel Spacing="{StaticResource Space6}">
             <SelectableTextBlock Text="Input" FontWeight="SemiBold"/>
             <SelectableTextBlock Text="{Binding InputPurposeText}"
-                Foreground="{DynamicResource BrushTextMuted}"
+                Foreground="{DynamicResource NfcTextMutedBrush}"
                 TextWrapping="Wrap"/>
           </StackPanel>
           <StackPanel Spacing="{DynamicResource Space8}">
@@ -52,7 +52,7 @@
                 <SelectableTextBlock Text="Uniform presets" FontWeight="SemiBold"/>
                 <TextBlock Text="Sets every pad and clears all overrides." Classes="workspaceSectionMeta" TextWrapping="Wrap"/>
                 <WrapPanel Orientation="Horizontal">
-                  <Button Classes="actionChip chipAction"
+                  <Button Classes="chipAction"
                       Margin="{StaticResource InsetRight6Bottom6}"
                       Command="{Binding ApplyManualPresetCommand}"
                       CommandParameter="400">
@@ -60,13 +60,13 @@
                         ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
                           Classes="symbols"
-                          Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                          Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                       <SelectableTextBlock Grid.Column="1"
                           Classes="workspacePresetButtonLabel"
                           Text="Uniform 400"/>
                     </Grid>
                   </Button>
-                  <Button Classes="actionChip chipAction"
+                  <Button Classes="chipAction"
                       Margin="{StaticResource InsetRight6Bottom6}"
                       Command="{Binding ApplyManualPresetCommand}"
                       CommandParameter="360">
@@ -74,13 +74,13 @@
                         ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
                           Classes="symbols"
-                          Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                          Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                       <SelectableTextBlock Grid.Column="1"
                           Classes="workspacePresetButtonLabel"
                           Text="Uniform 360"/>
                     </Grid>
                   </Button>
-                  <Button Classes="actionChip chipAction"
+                  <Button Classes="chipAction"
                       Margin="{StaticResource InsetRight6Bottom6}"
                       Command="{Binding ApplyManualPresetCommand}"
                       CommandParameter="0">
@@ -88,7 +88,7 @@
                         ColumnDefinitions="Auto,*">
                       <controls:FontIcon Grid.Column="0"
                           Classes="symbols"
-                          Glyph="{x:Static icons:IconGlyphs.AddCircle}"/>
+                          Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
                       <SelectableTextBlock Grid.Column="1"
                           Classes="workspacePresetButtonLabel"
                           Text="Zero"/>
@@ -98,19 +98,19 @@
               </StackPanel>
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
                 <TextBlock Text="{Binding RandomScopeText}" Classes="workspaceSectionMeta" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                <Button Grid.Column="1" Classes="actionGhost actionTextButton simulationActionButton" Content="Random"
+                <Button Grid.Column="1" Classes="simulationActionButton actionNeutral" Content="Random"
                     Command="{Binding RandomizeVisibleValuesCommand}" IsEnabled="{Binding CanRandomizeVisibleValues}"/>
               </Grid>
-              <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
+              <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
                   <TextBlock Text="Clears overrides in every region." Classes="workspaceSectionMeta" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                  <Button Grid.Column="1" Classes="actionGhost actionTextButton simulationActionButton" Content="Clear all"
+                  <Button Grid.Column="1" Classes="simulationActionButton actionNeutral" Content="Clear all"
                       Command="{Binding ClearAllManualOverridesCommand}" IsEnabled="{Binding HasManualOverrides}"/>
                 </Grid>
               </Border>
             </StackPanel>
             <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding IsCsvSource}">
-              <Button HorizontalAlignment="Right" Classes="actionTextButton simulationActionButton" Classes.actionPrimary="{Binding !CanPlayFrames}" Classes.actionNeutral="{Binding CanPlayFrames}"
+              <Button HorizontalAlignment="Right" Classes="simulationActionButton" Classes.actionPrimary="{Binding !CanPlayFrames}" Classes.actionNeutral="{Binding CanPlayFrames}"
                   Content="Import CSV" Command="{Binding ImportCsvCommand}" IsEnabled="{Binding CanImportCsv}"/>
               <ItemsControl ItemsSource="{Binding CsvFiles}">
                 <ItemsControl.ItemTemplate>
@@ -119,7 +119,7 @@
                       <Grid Classes="workspaceFileRowContent" ColumnDefinitions="Auto,*">
                         <controls:FontIcon Grid.Column="0"
                             Classes="symbols workspaceFileRowIcon"
-                            Glyph="{x:Static icons:IconGlyphs.DataObject}"/>
+                            Glyph="{x:Static icons:NvtIcons.DataObject}"/>
                         <StackPanel Grid.Column="1" Spacing="{StaticResource Space2}">
                           <SelectableTextBlock Classes="workspaceFileRowTitle" Text="{Binding FileName}"/>
                           <SelectableTextBlock Classes="workspaceFileRowMeta" Text="{Binding SummaryText}"/>
@@ -136,10 +136,10 @@
                   <SelectableTextBlock Text="{Binding CsvInspectorShapeSummaryText}" IsVisible="{Binding HasCsvInspectorData}" TextWrapping="Wrap"/>
                 </StackPanel>
               </controls:HidePanelBlock>
-              <Border BorderBrush="{DynamicResource BrushBorder}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
+              <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}" Padding="{DynamicResource InsetTop8}">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
                   <TextBlock Text="Stops playback and removes every file." Classes="workspaceSectionMeta" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                  <Button Grid.Column="1" Classes="actionGhost actionTextButton simulationActionButton" Content="Clear CSV"
+                  <Button Grid.Column="1" Classes="simulationActionButton actionNeutral" Content="Clear CSV"
                       Command="{Binding ClearCsvCommand}" IsEnabled="{Binding HasCsvFiles}"/>
                 </Grid>
               </Border>

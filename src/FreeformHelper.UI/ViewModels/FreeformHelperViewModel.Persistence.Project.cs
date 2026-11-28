@@ -2,326 +2,186 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Security;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadEditing;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.UseCases.ProjectLoad;
+using FreeformHelper.UI.ViewModels.Project;
 
 namespace FreeformHelper.UI.ViewModels;
 
-/// <summary>
-/// This partial class of <see cref="FreeformHelperViewModel"/> manages project save/load operations.
-/// </summary>
+/// <summary>Compatibility entries and service adapters for project persistence; CAD leaf behavior stays here until stage 2.</summary>
 public sealed partial class FreeformHelperViewModel
 {
     internal Task<bool>? TryStartSaveProjectCommandAsync()
-    {
-        if (SaveProjectCommand.IsRunning || !SaveProjectCommand.CanExecute(null))
-        {
-            return null;
-        }
+        => _projectCommands.TryStartSaveAsync();
 
-        // The save command preserves the Task<bool> returned by SaveProjectAsync.
-        return (Task<bool>)SaveProjectCommand.ExecuteAsync(null);
-    }
-
-    /// <summary>
-    /// Asynchronously saves the current project state to a file.
-    /// This includes current settings, pad overrides, UI snapshot, and optionally embeds DXF data.
-    /// </summary>
+    /// <summary>Saves settings, overrides, the UI snapshot, and optionally embedded DXF data.</summary>
     /// <returns>True if the project was saved successfully, false otherwise.</returns>
-    public async Task<bool> SaveProjectAsync()
-    {
-        if (!IsProjectEditingEnabled) return false;
+    public Task<bool> SaveProjectAsync() => _projectPersistenceCoordinator.SaveProjectAsync();
 
-        var status = CreateStatusScope("SaveProject");
-        if (PickSaveProjectPathAsync is null)
-        {
-            status.ReportBlocked("Save project: dialog handler not wired.");
-            return false;
-        }
-
-        return await RunUiOperationAsync(
-            operationName: "Save project",
-            showModalSpinner: false,
-            onStart: () => _logger.Info(CultureInfo.InvariantCulture, "Saving project."),
-            operationAsync: async () =>
-            {
-                CaptureDxfEditProjectState(_projectFile);
-                var result = await _projectPersistenceUseCase.SaveAsync(new ProjectSaveRequest(
-                    Project: _projectFile,
-                    Grid: _grid,
-                    CadPadCustomValues: _cadPadCustomValues,
-                    PickSaveProjectPathAsync: PickSaveProjectPathAsync,
-                    ConfirmEmbedDxfAsync: ConfirmEmbedDxfAsync,
-                    BuildUiSnapshot: BuildUiSnapshot,
-                    ApplyUiToSettings: ApplyUiToSettings,
-                    HasCadLoaded: _cad is not null));
-
-                if (result.IsCancelled)
-                {
-                    return false;
-                }
-
-                var successMessage = result.EmbedWarning is null
-                    ? $"Project saved: {result.Path}"
-                    : $"Project saved: {result.Path}. {result.EmbedWarning}";
-                status.ReportSuccess(successMessage);
-                _logger.Info(CultureInfo.InvariantCulture, "Project saved: {0}", result.Path);
-                if (!string.IsNullOrWhiteSpace(result.EmbedWarning))
-                {
-                    _logger.Warn(result.EmbedWarning);
-                }
-
-                HasUnsavedChanges = false;
-                _lastSavedPath = result.Path;
-                FlushDeferredAppGeneralSettingsIfNeeded();
-                return true;
-            },
-            onError: ex =>
-            {
-                status.ReportError("Save project failed", ex);
-                _logger.Error(ex, "Save project failed.");
-                return false;
-            });
-    }
-
-    /// <summary>
-    /// Asynchronously loads a project from a file.
-    /// This restores settings, pad overrides, UI snapshot, and optionally reloads DXF data.
-    /// </summary>
-    private async Task LoadProjectAsync()
-    {
-        _ = await RunProjectLoadAsync(async () =>
-        {
-            var status = CreateStatusScope("LoadProject");
-            if (PickLoadProjectPathAsync is null)
-            {
-                status.ReportBlocked("Load project: dialog handler not wired.");
-                return ProjectLoadCommandResult.Failed("LOAD_FAILED", "Load project: dialog handler not wired.");
-            }
-
-            var path = await PickLoadProjectPathAsync();
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                return ProjectLoadCommandResult.Failed("CANCELLED", "Load cancelled.");
-            }
-
-            return await LoadProjectFromPathCoreAsync(path);
-        });
-    }
+    private Task LoadProjectAsync() => _projectPersistenceCoordinator.LoadProjectAsync();
 
     internal Task<ProjectLoadCommandResult> LoadProjectFromPathAsync(string path)
+        => _projectPersistenceCoordinator.LoadProjectFromPathAsync(path);
+
+    private (ProjectPersistenceCoordinator Project, NotchExportWorkflow NotchExport) CreatePersistenceOwners()
     {
-        return RunProjectLoadAsync(() => LoadProjectFromPathCoreAsync(path));
+        var operations = CreateProjectOperationPorts();
+        var applier = new ProjectLoadApplier(
+            CreateProjectApplyPorts(), new ProjectCadPorts(LoadProjectCadAsync), CreateProjectReplayPorts(), operations);
+        var project = new ProjectPersistenceCoordinator(
+            CreateProjectPersistencePorts(new ProjectPersistenceUseCase(_projectStore)), CreateProjectSessionPorts(),
+            operations, applier.ApplyAsync);
+        return (project, CreateNotchExportWorkflow());
     }
 
-    // Path.GetFullPath documents exactly these four exception types; anything else is not an input problem.
-    private static string? TryGetFullProjectPath(string path, out Exception? error)
-    {
-        error = null;
-        try
+    private ProjectPersistencePorts CreateProjectPersistencePorts(ProjectPersistenceUseCase useCase) => new(
+        getSavePicker: () => PickSaveProjectPathAsync,
+        getLoadPicker: () => PickLoadProjectPathAsync,
+        getEmbedConfirmation: () => ConfirmEmbedDxfAsync,
+        saveAsync: (pickPathAsync, confirmEmbedAsync) => SaveCurrentProjectStateAsync(useCase, pickPathAsync, confirmEmbedAsync),
+        loadAsync: LoadPersistedProjectAsync,
+        resolvePath: path =>
         {
-            return Path.GetFullPath(path.Trim());
-        }
-        catch (ArgumentException ex)
-        {
-            error = ex;
-        }
-        catch (NotSupportedException ex)
-        {
-            error = ex;
-        }
-        catch (PathTooLongException ex)
-        {
-            error = ex;
-        }
-        catch (SecurityException ex)
-        {
-            error = ex;
-        }
+            var result = ProjectPathResolver.Resolve(path, File.Exists);
+            return (result.NormalizedPath, result.Code, result.Message);
+        },
+        prepareReplacementAsync: PrepareProjectReplacementAsync,
+        saveThenLoadAsync: ReplaceProjectWorkflow.SaveThenLoadAsync,
+        getBackupPath: () => UnsavedProjectBackup.PathFor(_appGeneralSettingsStore.SettingsPath),
+        deleteBackup: UnsavedProjectBackup.TryDelete);
 
-        return null;
+    private ProjectSessionPorts CreateProjectSessionPorts() => new(
+        isEditingEnabled: () => IsProjectEditingEnabled,
+        runLoadAsync: RunProjectLoadAsync,
+        hasUnsavedWork: _projectSession.HasUnsavedProjectWork,
+        captureCadEdits: () => DxfEditStateCapture.Capture(CadDocument, _projectFile),
+        setDirty: value => HasUnsavedChanges = value,
+        setLastSavedPath: path => _projectSession.LastSavedPath = path,
+        flushDeferredAppSettings: FlushDeferredAppGeneralSettingsIfNeeded);
+
+    private async Task<(bool IsCancelled, string? Path, string? EmbedWarning)> SaveCurrentProjectStateAsync(
+        ProjectPersistenceUseCase useCase, Func<Task<string?>> pickPathAsync, Func<Task<bool>>? confirmEmbedAsync)
+    {
+        var result = await useCase.SaveAsync(new ProjectSaveRequest(
+            Project: _projectFile,
+            Grid: _grid,
+            CadPadCustomValues: _cadPadCustomValues,
+            PickSaveProjectPathAsync: pickPathAsync,
+            ConfirmEmbedDxfAsync: confirmEmbedAsync,
+            BuildUiSnapshot: BuildUiSnapshot,
+            ApplyUiToSettings: ApplyUiToSettings,
+            HasCadLoaded: _cad is not null));
+        return (result.IsCancelled, result.Path, result.EmbedWarning);
     }
 
-    // A rejected path must reach the status bar for every caller, so the user never sees a silent failed load.
-    private ProjectLoadCommandResult ReportLoadRejected(string code, string message, string? path)
+    private async Task<(bool IsCancelled, ProjectFile? Project, string? Path)> LoadPersistedProjectAsync(string path)
     {
-        CreateStatusScope("LoadProject").ReportBlocked(message);
-        return ProjectLoadCommandResult.Failed(code, message, path);
+        var result = await ProjectPersistenceUseCase.LoadAsync(new ProjectLoadRequest(
+            PickLoadProjectPathAsync: () => Task.FromResult<string?>(path),
+            CanProceedWithPendingEdits));
+        return (result.IsCancelled, result.Project, result.Path);
     }
 
-    private async Task<ProjectLoadCommandResult> LoadProjectFromPathCoreAsync(string path)
+    private async Task<ProjectReplacementPlan> PrepareProjectReplacementAsync(
+        Func<Task<string?>> pickPathAsync, Func<bool> hasUnsavedWork, Func<Task<string?>> backUpAsync)
     {
-        var status = CreateStatusScope("LoadProject");
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return ReportLoadRejected("INVALID_ARGUMENTS", "Argument '--path' is required.", null);
-        }
-
-        var normalizedPath = TryGetFullProjectPath(path, out var pathError);
-        if (normalizedPath is null)
-        {
-            return ReportLoadRejected("INVALID_ARGUMENTS", $"Invalid project path '{path}': {pathError!.Message}", null);
-        }
-
-        if (!File.Exists(normalizedPath))
-        {
-            return ReportLoadRejected("PATH_NOT_FOUND", $"Project file not found: {normalizedPath}", normalizedPath);
-        }
-
-        var commandResult = ProjectLoadCommandResult.Failed(
-            code: "LOAD_FAILED",
-            message: $"Load project failed: {normalizedPath}",
-            path: normalizedPath);
-
-        await RunUiOperationAsync(
-            operationName: "Load project",
-            showModalSpinner: true,
-            onStart: () =>
+        var plan = await ReplaceProjectWorkflow.PrepareAsync(
+            pickPathAsync, hasUnsavedWork, backUpAsync, () => ProjectDialogs.ConfirmSaveBeforeLoadAsync);
+        return new ProjectReplacementPlan(
+            plan.Outcome switch
             {
-                _logger.Info(CultureInfo.InvariantCulture, "Loading project from path: {0}", normalizedPath);
-                _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT: stage=start path={0}.", normalizedPath);
+                ReplaceProjectOutcome.Cancel => ProjectReplacementOutcome.Cancel,
+                ReplaceProjectOutcome.Load => ProjectReplacementOutcome.Load,
+                ReplaceProjectOutcome.SaveThenLoad => ProjectReplacementOutcome.SaveThenLoad,
+                _ => ProjectReplacementOutcome.Other
             },
-            operationAsync: async () =>
-            {
-                var loadSw = Stopwatch.StartNew();
-                var result = await ProjectPersistenceUseCase.LoadAsync(new ProjectLoadRequest(
-                    PickLoadProjectPathAsync: () => Task.FromResult<string?>(normalizedPath),
-                    CanProceedWithPendingEdits));
-                loadSw.Stop();
-
-                if (result.IsCancelled || result.Project is null || string.IsNullOrWhiteSpace(result.Path))
-                {
-                    _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT: stage=cancelled path={0}.", normalizedPath);
-                    commandResult = ProjectLoadCommandResult.Failed(
-                        code: "CANCELLED",
-                        message: "Load cancelled (pending edits were not committed).",
-                        path: normalizedPath);
-                    return;
-                }
-
-                var timings = await ApplyLoadedProjectStateAsync(result.Project, result.Path, loadSw.ElapsedMilliseconds);
-                commandResult = ProjectLoadCommandResult.Loaded(
-                    path: result.Path,
-                    totalElapsedMs: timings.TotalElapsedMs,
-                    persistenceElapsedMs: loadSw.ElapsedMilliseconds,
-                    applyStateElapsedMs: timings.ApplyStateElapsedMs,
-                    dxfElapsedMs: timings.DxfElapsedMs,
-                    rebuildElapsedMs: timings.RebuildElapsedMs,
-                    step1ReplayElapsedMs: timings.Step1ReplayElapsedMs,
-                    step2ReplayElapsedMs: timings.Step2ReplayElapsedMs,
-                    step1Replayed: timings.Step1Replayed,
-                    step2Replayed: timings.Step2Replayed);
-            },
-            onError: ex =>
-            {
-                status.ReportError("Load project failed", ex);
-                _logger.Error(ex, "Load project failed.");
-                commandResult = ProjectLoadCommandResult.Failed(
-                    code: "LOAD_FAILED",
-                    message: ex.Message,
-                    path: normalizedPath);
-            });
-
-        return commandResult;
+            plan.Path, plan.BackupPath, plan.Message);
     }
 
-    private async Task<ProjectLoadApplyTiming> ApplyLoadedProjectStateAsync(ProjectFile file, string path, long persistenceElapsedMs)
-    {
-        var status = CreateStatusScope("LoadProject");
-        var totalSw = Stopwatch.StartNew();
-        _logger.Info(CultureInfo.InvariantCulture, "Loading project: {0}", path);
-        var originalSuppressAppGeneralPersistence = _appGeneralPersistence.SuppressPersistence;
-        _appGeneralPersistence.SuppressPersistence = true;
-        _projectFile = file;
-        InvalidateWorkflowDataSnapshot();
-        _lastSavedPath = path;
-        try
+    private ProjectOperationPorts CreateProjectOperationPorts() => new(
+        createStatus: operation =>
         {
-            using var sourceChangeBatch = BeginSimulationWorkspaceSourceChangeBatch();
-            var applyStateSw = Stopwatch.StartNew();
-            ApplyLoadedProjectSettings(file, path, status);
-            applyStateSw.Stop();
+            var status = CreateStatusScope(operation);
+            return new ProjectOperationStatus(
+                status.ReportSuccess, status.ReportProgress, status.ReportWarning, status.ReportBlocked, status.ReportError);
+        },
+        runAsync: RunUiOperationAsync,
+        runBooleanAsync: RunUiOperationAsync,
+        info: (message, arguments) => _logger.Info(CultureInfo.InvariantCulture, message, arguments),
+        debug: (message, arguments) => _logger.Debug(CultureInfo.InvariantCulture, message, arguments),
+        warnFormat: (message, arguments) => _logger.Warn(CultureInfo.InvariantCulture, message, arguments),
+        infoMessage: message => _logger.Info(message),
+        warn: message => _logger.Warn(message),
+        error: (exception, message) => _logger.Error(exception, message));
 
-            var cadReload = await ReloadCadAfterProjectLoadAsync(file, path, status);
-
-            cadReload.CombinedGroupReplay?.ReportWarnings(status.ReportWarning, message => _logger.Warn(CultureInfo.InvariantCulture, "{0}", message));
-            totalSw.Stop();
-            LogProjectLoadTiming(path, persistenceElapsedMs, totalSw.ElapsedMilliseconds, applyStateSw.ElapsedMilliseconds, cadReload);
-
-            return new ProjectLoadApplyTiming(
-                TotalElapsedMs: totalSw.ElapsedMilliseconds,
-                ApplyStateElapsedMs: applyStateSw.ElapsedMilliseconds,
-                DxfElapsedMs: cadReload.DxfElapsedMs,
-                RebuildElapsedMs: cadReload.RebuildElapsedMs,
-                Step1ReplayElapsedMs: cadReload.ReplayTiming.Step1ReplayElapsedMs,
-                Step2ReplayElapsedMs: cadReload.ReplayTiming.Step2ReplayElapsedMs,
-                Step1Replayed: cadReload.ReplayTiming.Step1Replayed,
-                Step2Replayed: cadReload.ReplayTiming.Step2Replayed);
-        }
-        finally
+    private ProjectApplyPorts CreateProjectApplyPorts() => new(
+        getSuppressPersistence: () => _appGeneralPersistence.SuppressPersistence,
+        setSuppressPersistence: value => _appGeneralPersistence.SuppressPersistence = value,
+        installDocument: file => _projectFile = file,
+        invalidateWorkflowSnapshot: InvalidateWorkflowDataSnapshot,
+        setPath: path => _projectSession.LastSavedPath = path,
+        beginSourceChangeBatch: () => _simulationSessionBuilder.SourceChanges.Begin(),
+        replaceCustomPadValues: file =>
         {
-            _appGeneralPersistence.SuppressPersistence = originalSuppressAppGeneralPersistence;
-        }
-    }
-
-    private void ApplyLoadedProjectSettings(ProjectFile file, string path, UiOperationStatusReporter.Scope status)
-    {
-        _cadPadCustomValues.Clear();
-        foreach (var kv in file.CadPadCustomValues)
-        {
-            _cadPadCustomValues[kv.Key] = kv.Value;
-        }
-
-        LoadSettingsToUi(file.Settings);
-        ApplyViewSnapshot(file.UiSnapshot.View);
-        ApplyImportSnapshot(file.UiSnapshot.Import, file);
-        TryApplyAppGeneralVisualPreferencesAfterProjectLoad();
-        ClearStep5ResultCore();
-        status.ReportSuccess($"Project loaded: {path}");
-        _logger.Info(CultureInfo.InvariantCulture, "Project loaded: {0}", path);
-        HasUnsavedChanges = false;
-        MarkProjectLoadedForAppGeneralPersistence();
-    }
-
-    private async Task<ProjectLoadCadReload> ReloadCadAfterProjectLoadAsync(ProjectFile file, string path, UiOperationStatusReporter.Scope status)
-    {
-        var dxfElapsedMs = 0L;
-        var rebuildElapsedMs = 0L;
-        var replayTiming = ProjectLoadReplayTiming.Empty;
-        DxfCombinedGroupReplayResult? combinedGroupReplay = null;
-
-        using (_settingsSuppression.EnterSettingsLoading())
-        {
-            _cad = null;
-            ResetDxfEditBaseline(null);
-            _cachedFilteredCadForBuild = null;
-            ClearDxfLayerCatalog();
-            CadPads = new ObservableCollection<CadPad>();
-            DetachAndClearLayerToggles();
-
-            await RunWithCadLoadCanvasOverlayAsync(async () =>
+            _cadPadCustomValues.Clear();
+            foreach (var kv in file.CadPadCustomValues)
             {
-                (dxfElapsedMs, combinedGroupReplay) = await LoadProjectCadAsync(file, path, status);
+                _cadPadCustomValues[kv.Key] = kv.Value;
+            }
+        },
+        loadSettings: LoadSettingsToUi,
+        applyView: ApplyViewSnapshot,
+        applyImport: (snapshot, file) => ApplyImportSnapshot(snapshot, file),
+        applyAppVisualPreferences: TryApplyAppGeneralVisualPreferencesAfterProjectLoad,
+        clearStep5: ClearStep5ResultCore,
+        setDirty: value => HasUnsavedChanges = value,
+        deferAppPersistence: MarkProjectLoadedForAppGeneralPersistence,
+        enterSettingsLoading: () => _settingsSuppression.EnterSettingsLoading(),
+        resetCad: () => _cad = null,
+        resetCadEditBaseline: () => ResetDxfEditBaseline(null),
+        clearCadBuildCache: () => CadDocument.InvalidateFilteredCad(),
+        clearCadCatalog: ClearDxfLayerCatalog,
+        publishEmptyCadPads: () => CadPads = new ObservableCollection<CadPad>(),
+        detachLayerToggles: DetachAndClearLayerToggles,
+        runCadOverlayAsync: RunWithCadLoadCanvasOverlayAsync,
+        rebuildGridAsync: () => TriggerGridRebuildAsync(requestFit: true));
 
-                var rebuildSw = Stopwatch.StartNew();
-                await TriggerGridRebuildAsync(requestFit: true);
-                rebuildSw.Stop();
-                rebuildElapsedMs = rebuildSw.ElapsedMilliseconds;
+    private ProjectReplayPorts CreateProjectReplayPorts() => new(
+        isStep2Enabled: () => AutoReplayStep2AfterProjectLoad,
+        getDisabledMessage: () => WorkflowPipelineService.GetProjectLoadReplaySkippedMessage(
+            WorkflowStepId.Step2Freeform, "disabled by setting"),
+        buildPlan: () => WorkflowPipelineService.BuildProjectLoadReplayPlan(AutoReplayStep2AfterProjectLoad)
+            .Select(CreateProjectReplayAction).ToArray());
 
-                replayTiming = await ReplayWorkflowStepsAfterProjectLoadAsync();
-            });
-        }
-
-        return new ProjectLoadCadReload(dxfElapsedMs, rebuildElapsedMs, replayTiming, combinedGroupReplay);
+    private ProjectReplayAction CreateProjectReplayAction(WorkflowStepId step)
+    {
+        var identity = step switch
+        {
+            WorkflowStepId.Step1Match => ProjectReplayStep.Step1Match,
+            WorkflowStepId.Step2Freeform => ProjectReplayStep.Step2Freeform,
+            _ => ProjectReplayStep.Other
+        };
+        Func<Task<bool>> executeAsync = step switch
+        {
+            WorkflowStepId.Step1Match => RestoreStep1MatchAfterProjectLoadAsync,
+            WorkflowStepId.Step2Freeform => RestoreStep2FreeformAfterProjectLoadAsync,
+            _ => () => Task.FromResult(false)
+        };
+        return new ProjectReplayAction(
+            identity,
+            () => WorkflowPipelineService.GetProjectLoadReplayStartedMessage(step),
+            () => WorkflowPipelineService.GetProjectLoadReplayCompletedMessage(step),
+            () => WorkflowPipelineService.GetProjectLoadReplaySkippedMessage(step, "preconditions not met"),
+            executeAsync);
     }
 
     private async Task<(long DxfElapsedMs, DxfCombinedGroupReplayResult? CombinedGroupReplay)> LoadProjectCadAsync(
         ProjectFile file,
         string path,
-        UiOperationStatusReporter.Scope status)
+        ProjectOperationStatus status)
     {
         var dxfOptions = BuildDxfOptions();
         var dxfLoadSw = Stopwatch.StartNew();
@@ -330,10 +190,10 @@ public sealed partial class FreeformHelperViewModel
         var dxfElapsedMs = dxfLoadSw.ElapsedMilliseconds;
         if (outcome is null)
         {
-            return (dxfElapsedMs, KeepDxfEditsWithoutCad(file));
+            return (dxfElapsedMs, _cadEditReplay.KeepWithoutCad(file));
         }
 
-        var persistedDxfEditState = CapturePersistedDxfEditProjectState(file);
+        var persistedDxfEditState = DxfEditStateCapture.CaptureProjectState(file);
         if (outcome.Source == CadLoadSource.Path && !string.IsNullOrWhiteSpace(outcome.SourcePath))
         {
             await TryLoadDxfLayerCatalogFromPathAsync(outcome.SourcePath);
@@ -345,34 +205,10 @@ public sealed partial class FreeformHelperViewModel
 
         await ApplyCadLoadOutcomeAsync(outcome, file.UiSnapshot.View);
         ApplyImportSnapshot(file.UiSnapshot.Import, file);
-        var combinedGroupReplay = ApplyCapturedDxfEditProjectState(persistedDxfEditState, outcome.FallbackWarning);
+        var combinedGroupReplay = _cadEditReplay.Apply(persistedDxfEditState, outcome.FallbackWarning);
         status.ReportProgress(BuildCadLoadStatus(outcome, CadLoadContext.LoadProject, path));
         LogCadLoadOutcome(outcome, CadLoadContext.LoadProject);
         return (dxfElapsedMs, combinedGroupReplay);
-    }
-
-    private static void LogProjectLoadTiming(string path, long persistenceElapsedMs, long totalElapsedMs, long applyStateElapsedMs, ProjectLoadCadReload cadReload)
-    {
-        var replayTiming = cadReload.ReplayTiming;
-        _logger.Info(CultureInfo.InvariantCulture, "Load project timing: total={0} ms, persistence={1} ms, apply-state={2} ms, dxf={3} ms, rebuild={4} ms.",
-            totalElapsedMs,
-            persistenceElapsedMs,
-            applyStateElapsedMs,
-            cadReload.DxfElapsedMs,
-            cadReload.RebuildElapsedMs);
-        _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step1-auto-replay={0} ms (replayed={1}).", replayTiming.Step1ReplayElapsedMs, replayTiming.Step1Replayed);
-        _logger.Info(CultureInfo.InvariantCulture, "Load project timing detail: step2-auto-replay={0} ms (replayed={1}).", replayTiming.Step2ReplayElapsedMs, replayTiming.Step2Replayed);
-        _logger.Debug(CultureInfo.InvariantCulture, "PERF LOAD_PROJECT SUMMARY: total={0}ms persistence={1}ms applyState={2}ms dxf={3}ms rebuild={4}ms step1={5}ms step2={6}ms step1Replayed={7} step2Replayed={8} path={9}",
-            totalElapsedMs,
-            persistenceElapsedMs,
-            applyStateElapsedMs,
-            cadReload.DxfElapsedMs,
-            cadReload.RebuildElapsedMs,
-            replayTiming.Step1ReplayElapsedMs,
-            replayTiming.Step2ReplayElapsedMs,
-            replayTiming.Step1Replayed ? "Y" : "N",
-            replayTiming.Step2Replayed ? "Y" : "N",
-            path);
     }
 
     private void DetachAndClearLayerToggles()
@@ -385,151 +221,4 @@ public sealed partial class FreeformHelperViewModel
 
         LayerToggles.Clear();
     }
-
-    private async Task<ProjectLoadReplayTiming> ReplayWorkflowStepsAfterProjectLoadAsync()
-    {
-        if (!AutoReplayStep2AfterProjectLoad)
-        {
-            _logger.Info(WorkflowPipelineService.GetProjectLoadReplaySkippedMessage(
-                WorkflowStepId.Step2Freeform,
-                "disabled by setting"));
-        }
-
-        var step1ElapsedMs = 0L;
-        var step2ElapsedMs = 0L;
-        var step1Replayed = false;
-        var step2Replayed = false;
-        var replayPlan = WorkflowPipelineService.BuildProjectLoadReplayPlan(AutoReplayStep2AfterProjectLoad);
-
-        foreach (var step in replayPlan)
-        {
-            _logger.Info(WorkflowPipelineService.GetProjectLoadReplayStartedMessage(step));
-            var stepSw = Stopwatch.StartNew();
-            var replayed = step switch
-            {
-                WorkflowStepId.Step1Match => await RestoreStep1MatchAfterProjectLoadAsync(),
-                WorkflowStepId.Step2Freeform => await RestoreStep2FreeformAfterProjectLoadAsync(),
-                _ => false
-            };
-            stepSw.Stop();
-
-            if (step == WorkflowStepId.Step1Match)
-            {
-                step1ElapsedMs = stepSw.ElapsedMilliseconds;
-                step1Replayed = replayed;
-            }
-            else if (step == WorkflowStepId.Step2Freeform)
-            {
-                step2ElapsedMs = stepSw.ElapsedMilliseconds;
-                step2Replayed = replayed;
-            }
-
-            if (replayed)
-            {
-                _logger.Info(WorkflowPipelineService.GetProjectLoadReplayCompletedMessage(step));
-            }
-            else
-            {
-                _logger.Info(WorkflowPipelineService.GetProjectLoadReplaySkippedMessage(step, "preconditions not met"));
-            }
-        }
-
-        return new ProjectLoadReplayTiming(
-            Step1ReplayElapsedMs: step1ElapsedMs,
-            Step2ReplayElapsedMs: step2ElapsedMs,
-            Step1Replayed: step1Replayed,
-            Step2Replayed: step2Replayed);
-    }
 }
-
-internal sealed record ProjectLoadCommandResult(
-    bool IsLoaded,
-    string Code,
-    string Message,
-    string? Path,
-    long TotalElapsedMs,
-    long PersistenceElapsedMs,
-    long ApplyStateElapsedMs,
-    long DxfElapsedMs,
-    long RebuildElapsedMs,
-    long Step1ReplayElapsedMs,
-    long Step2ReplayElapsedMs,
-    bool Step1Replayed,
-    bool Step2Replayed)
-{
-    public static ProjectLoadCommandResult Loaded(
-        string path,
-        long totalElapsedMs,
-        long persistenceElapsedMs,
-        long applyStateElapsedMs,
-        long dxfElapsedMs,
-        long rebuildElapsedMs,
-        long step1ReplayElapsedMs,
-        long step2ReplayElapsedMs,
-        bool step1Replayed,
-        bool step2Replayed)
-    {
-        return new ProjectLoadCommandResult(
-            IsLoaded: true,
-            Code: "OK",
-            Message: $"Project loaded: {path}",
-            Path: path,
-            TotalElapsedMs: totalElapsedMs,
-            PersistenceElapsedMs: persistenceElapsedMs,
-            ApplyStateElapsedMs: applyStateElapsedMs,
-            DxfElapsedMs: dxfElapsedMs,
-            RebuildElapsedMs: rebuildElapsedMs,
-            Step1ReplayElapsedMs: step1ReplayElapsedMs,
-            Step2ReplayElapsedMs: step2ReplayElapsedMs,
-            Step1Replayed: step1Replayed,
-            Step2Replayed: step2Replayed);
-    }
-
-    public static ProjectLoadCommandResult Failed(string code, string message, string? path = null)
-    {
-        return new ProjectLoadCommandResult(
-            IsLoaded: false,
-            Code: code,
-            Message: message,
-            Path: path,
-            TotalElapsedMs: 0,
-            PersistenceElapsedMs: 0,
-            ApplyStateElapsedMs: 0,
-            DxfElapsedMs: 0,
-            RebuildElapsedMs: 0,
-            Step1ReplayElapsedMs: 0,
-            Step2ReplayElapsedMs: 0,
-            Step1Replayed: false,
-            Step2Replayed: false);
-    }
-}
-
-internal sealed record ProjectLoadApplyTiming(
-    long TotalElapsedMs,
-    long ApplyStateElapsedMs,
-    long DxfElapsedMs,
-    long RebuildElapsedMs,
-    long Step1ReplayElapsedMs,
-    long Step2ReplayElapsedMs,
-    bool Step1Replayed,
-    bool Step2Replayed);
-
-internal sealed record ProjectLoadCadReload(
-    long DxfElapsedMs,
-    long RebuildElapsedMs,
-    ProjectLoadReplayTiming ReplayTiming,
-    DxfCombinedGroupReplayResult? CombinedGroupReplay);
-
-internal sealed record ProjectLoadReplayTiming(
-    long Step1ReplayElapsedMs,
-    long Step2ReplayElapsedMs,
-    bool Step1Replayed,
-    bool Step2Replayed)
-{
-    public static ProjectLoadReplayTiming Empty => new(
-        Step1ReplayElapsedMs: 0,
-        Step2ReplayElapsedMs: 0,
-        Step1Replayed: false,
-        Step2Replayed: false);
-}
-

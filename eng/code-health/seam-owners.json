@@ -18,6 +18,24 @@
       "reason": "The tests read and set a process environment variable here and nowhere else. The test project has no other way to switch the benchmark, baseline-update and example-data modes, or to point the app settings store at a test file.",
       "kind": "permanent-seam",
       "review": "Added with the change that routes all test environment access through TestEnvironment. Tier A: the owner approves the permanent seam in that pull request."
+    },
+    {
+      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardAttribute.cs",
+      "member": "*",
+      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread",
+      "owner": "NFH",
+      "reason": "The headless test host guard checks the global Avalonia UI dispatcher slot between and after headless tests: leftover queued work, an unhandled exception, or a dispatcher that another thread created first. The slot is what it must observe, so the Core UiThread wrapper cannot replace it: the wrapper keeps its dispatcher outside the Avalonia slot, and TryGetRunningDispatcher returns false when Application.Current is null, which is the state between tests.",
+      "kind": "permanent-seam",
+      "review": "Tier A: the owner approves the permanent seam in this pull request. Scope: this file only. No product code and no other test file uses the global slot."
+    },
+    {
+      "path": "tests/FreeformHelper.Tests/UI/TestHost/HeadlessSessionGuardTests.cs",
+      "member": "*",
+      "symbol": "P:Avalonia.Threading.Dispatcher.UIThread",
+      "owner": "NFH",
+      "reason": "The headless test host guard checks the global Avalonia UI dispatcher slot between and after headless tests: leftover queued work, an unhandled exception, or a dispatcher that another thread created first. The slot is what it must observe, so the Core UiThread wrapper cannot replace it: the wrapper keeps its dispatcher outside the Avalonia slot, and TryGetRunningDispatcher returns false when Application.Current is null, which is the state between tests.",
+      "kind": "permanent-seam",
+      "review": "Tier A: the owner approves the permanent seam in this pull request. Scope: this file only. No product code and no other test file uses the global slot."
     }
   ]
 }

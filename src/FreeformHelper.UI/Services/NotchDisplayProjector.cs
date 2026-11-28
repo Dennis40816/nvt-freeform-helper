@@ -357,7 +357,7 @@ internal static partial class NotchDisplayProjector
     {
         var ownersText = parsed.OwnerCadPadIds.Count == 0
             ? "-"
-            : BuildCompactList(parsed.OwnerCadPadIds);
+            : PadMatchTextFormatter.CompactList(parsed.OwnerCadPadIds);
 
         builder.Append("IC")
             .Append(parsed.IcIndex)
@@ -398,37 +398,9 @@ internal static partial class NotchDisplayProjector
                 parsed.IsBoundary));
     }
 
-    private static string BuildCompactList(IReadOnlyList<int> values)
-    {
-        if (values.Count == 0)
-        {
-            return "-";
-        }
-
-        if (values.Count <= 3)
-        {
-            return string.Join(", ", values);
-        }
-
-        return $"{values[0]}, {values[1]}, {values[2]} (+{values.Count - 3})";
-    }
-
     private static bool TryParseDiagnosticLine(string line, out NotchToFullDiagnosticEntry parsed)
     {
-        const string pattern =
-            @"IC(?<ic>\d+)\/diff(?<diff>-?\d+)\s+reg(?<reg>\d+)\s*:\s*" +
-            @"ov=(?<ov>[-\d.]+),\s*" +
-            @"src=(?<src>[-\d.]+),\s*" +
-            @"blk=(?<blk>[-\d.]+),\s*" +
-            @"reach=(?<reach>[-\d.]+),\s*" +
-            @"blocker=(?<blocker>\d+)," +
-            @"(?:\s*owners=(?<owners>[^,]+),)?" +
-            @"(?:\s*ownerShare=(?<ownershare>[^,]+),)?" +
-            @"\s*boundary=(?<boundary>[YN])," +
-            @"(?:\s*candidate=(?<candidate>[YN]),)?" +
-            @"\s*tofull=(?<tofull>[YN])" +
-            @"(?:\s*\((?<rule>[A-Z_]+)\))?";
-        var match = Regex.Match(line, pattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+        var match = Regex.Match(line, NotchToFullDiagnosticLine.Pattern, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
         if (!match.Success)
         {
             parsed = default;

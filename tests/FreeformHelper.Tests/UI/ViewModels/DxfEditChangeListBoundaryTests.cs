@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.ViewModels;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -28,10 +28,10 @@ public sealed class DxfEditChangeListBoundaryTests
         Assert.Equal(
             kind switch
             {
-                DxfEditChangeKind.Hidden => IconGlyphs.Undo,
-                DxfEditChangeKind.Combined => IconGlyphs.CallSplit,
-                DxfEditChangeKind.Moved => IconGlyphs.DriveFileMove,
-                _ => IconGlyphs.Edit,
+                DxfEditChangeKind.Hidden => NvtIcons.Undo,
+                DxfEditChangeKind.Combined => NvtIcons.CallSplit,
+                DxfEditChangeKind.Moved => NvtIcons.DriveFileMove,
+                _ => NvtIcons.Edit,
             },
             vm.BulkActionGlyph);
     }
@@ -67,7 +67,7 @@ public sealed class DxfEditChangeListBoundaryTests
             currentLayerText: "Layer edited",
             listDetailText: "signal -> edited",
             detailText: "Original layer: signal -> Current layer: edited.",
-            actionGlyph: IconGlyphs.Undo,
+            actionGlyph: NvtIcons.Undo,
             actionLabel: kind switch
             {
                 DxfEditChangeKind.Combined => "Clear group",

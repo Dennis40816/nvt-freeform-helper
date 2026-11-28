@@ -1,20 +1,20 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Style Selector="ToolTip">
-    <Setter Property="Background" Value="{DynamicResource BrushTooltipBackground}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushTooltipBorder}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTooltipForeground}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextStrongBrush}"/>
     <Setter Property="Padding" Value="{StaticResource Inset8_4}"/>
   </Style>
 
   <Style Selector="ToolTip TextBlock, ToolTip SelectableTextBlock">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTooltipForeground}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextStrongBrush}"/>
   </Style>
 
   <Style Selector="ToolTip /template/ ContentPresenter">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTooltipForeground}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextStrongBrush}"/>
   </Style>
 
 </Styles>

@@ -13,7 +13,8 @@ public sealed partial class NotchTableGenerator
         IReadOnlyDictionary<(int IcIndex, int DiffIndex), List<V22CadCandidate>> candidatesByDiff,
         int nullValue,
         bool applyTargetCoverageGuard,
-        int targetCoverageCapPercent)
+        int targetCoverageCapPercent,
+        NotchV22ExplanationCollector? explanationCollector = null)
     {
         if (candidatesByDiff.Count == 0)
         {
@@ -30,56 +31,71 @@ public sealed partial class NotchTableGenerator
         {
             selectedCandidates = ApplyTargetCoverageGuard(
                 selectedCandidates,
-                targetCoverageCapPercent);
+                targetCoverageCapPercent,
+                explanationCollector);
         }
 
         var rows = new List<NotchTableRow>();
         foreach (var selected in selectedCandidates)
         {
-            var orderedLegs = selected.Legs
-                .OrderByDescending(leg => Math.Abs(leg.RatioPercent))
-                .ThenBy(leg => leg.TargetDiffIndex)
-                .ToList();
-
-            if (orderedLegs.Count == 0)
-            {
-                rows.Add(BuildV22NoTargetRow(selected, nullValue));
-                continue;
-            }
-
-            for (var i = 0; i < orderedLegs.Count; i += 2)
-            {
-                var isContinuation = i > 0;
-                var leg1 = orderedLegs[i];
-                var hasLeg2 = i + 1 < orderedLegs.Count;
-                var leg2 = hasLeg2 ? orderedLegs[i + 1] : null;
-                var combinePercent = isContinuation ? 100 : selected.CombinePercent;
-                var flags = isContinuation ? V22ContinuationFlag : 0;
-                var commentTag = isContinuation ? "CONT" : "MAIN";
-                var node = new NotchV22Node(
-                    AnchorDiffIndex: selected.DiffIndex,
-                    CombinePercent: combinePercent,
-                    TargetDiffIndex1: leg1.TargetDiffIndex,
-                    TargetRatioPercent1: Math.Clamp(leg1.RatioPercent, -100, 100),
-                    TargetDiffIndex2: hasLeg2 ? leg2!.TargetDiffIndex : nullValue,
-                    TargetRatioPercent2: hasLeg2 ? Math.Clamp(leg2!.RatioPercent, -100, 100) : 0,
-                    Flags: Math.Max(0, flags));
-                rows.Add(new NotchTableRow(
-                    selected.IcIndex,
-                    selected.DiffIndex,
-                    selected.RegularPadId,
-                    selected.CadPadId,
-                    node,
-                    $"{selected.CommentPrefix} {commentTag} L={orderedLegs.Count}"));
-            }
+            var firstRowIndex = rows.Count;
+            var continuationSubtraction = AppendV22CandidateRows(selected, nullValue, rows);
+            explanationCollector?.CaptureRows(selected.IcIndex, selected.DiffIndex, selected.CadPadId,
+                candidatesByDiff[(selected.IcIndex, selected.DiffIndex)].Select(static candidate => candidate.CadPadId),
+                selected.CombinePercent, continuationSubtraction, nullValue, rows.Skip(firstRowIndex));
         }
 
         return rows;
     }
 
+    private static int AppendV22CandidateRows(V22CadCandidate selected, int nullValue, List<NotchTableRow> rows)
+    {
+        var orderedLegs = selected.Legs
+            .OrderByDescending(leg => Math.Abs(leg.RatioPercent))
+            .ThenBy(leg => leg.TargetDiffIndex)
+            .ToList();
+
+        if (orderedLegs.Count == 0)
+        {
+            rows.Add(BuildV22NoTargetRow(selected, nullValue));
+            return 0;
+        }
+
+        var continuationSubtraction = orderedLegs.Skip(2).Sum(static leg => leg.RatioPercent);
+        var mainCombinePercent = selected.CombinePercent - continuationSubtraction;
+        for (var i = 0; i < orderedLegs.Count; i += 2)
+        {
+            var isContinuation = i > 0;
+            var leg1 = orderedLegs[i];
+            var hasLeg2 = i + 1 < orderedLegs.Count;
+            var leg2 = hasLeg2 ? orderedLegs[i + 1] : null;
+            var combinePercent = isContinuation ? 100 : mainCombinePercent;
+            var flags = isContinuation ? V22ContinuationFlag : 0;
+            var commentTag = isContinuation ? "CONT" : "MAIN";
+            var node = new NotchV22Node(
+                AnchorDiffIndex: selected.DiffIndex,
+                CombinePercent: combinePercent,
+                TargetDiffIndex1: leg1.TargetDiffIndex,
+                TargetRatioPercent1: Math.Clamp(leg1.RatioPercent, -100, 100),
+                TargetDiffIndex2: hasLeg2 ? leg2!.TargetDiffIndex : nullValue,
+                TargetRatioPercent2: hasLeg2 ? Math.Clamp(leg2!.RatioPercent, -100, 100) : 0,
+                Flags: Math.Max(0, flags));
+            rows.Add(new NotchTableRow(
+                selected.IcIndex,
+                selected.DiffIndex,
+                selected.RegularPadId,
+                selected.CadPadId,
+                node,
+                $"{selected.CommentPrefix} {commentTag} L={orderedLegs.Count}"));
+        }
+
+        return continuationSubtraction;
+    }
+
     private static List<V22CadCandidate> ApplyTargetCoverageGuard(
         IReadOnlyList<V22CadCandidate> candidates,
-        int targetCoverageCapPercent)
+        int targetCoverageCapPercent,
+        NotchV22ExplanationCollector? explanationCollector)
     {
         var capPercent = Math.Clamp(targetCoverageCapPercent, 0, 255);
         if (capPercent <= 0 || candidates.Count == 0)
@@ -110,7 +126,7 @@ public sealed partial class NotchTableGenerator
         }
 
         return candidates
-            .Select(candidate => ApplyTargetCoverageScale(candidate, scaleByTarget))
+            .Select(candidate => ApplyTargetCoverageScale(candidate, scaleByTarget, explanationCollector))
             .ToList();
 
         void AddCoverage((int IcIndex, int DiffIndex) key, int percent)
@@ -126,12 +142,17 @@ public sealed partial class NotchTableGenerator
 
     private static V22CadCandidate ApplyTargetCoverageScale(
         V22CadCandidate candidate,
-        IReadOnlyDictionary<(int IcIndex, int DiffIndex), double> scaleByTarget)
+        IReadOnlyDictionary<(int IcIndex, int DiffIndex), double> scaleByTarget,
+        NotchV22ExplanationCollector? explanationCollector)
     {
         var legSum = candidate.Legs.Sum(static leg => Math.Max(0, leg.RatioPercent));
         var retainedPercent = Math.Max(0, candidate.CombinePercent - legSum);
         var anchorScale = scaleByTarget.GetValueOrDefault((candidate.IcIndex, candidate.DiffIndex), 1.0);
         var scaledRetainedPercent = ScaleCoveragePercent(retainedPercent, anchorScale);
+        var scaling = explanationCollector is null ? null : new List<NotchV22GuardExplanation>
+        {
+            new(candidate.DiffIndex, true, retainedPercent, anchorScale, scaledRetainedPercent),
+        };
         var scaledLegs = candidate.Legs
             .GroupBy(static leg => leg.TargetDiffIndex)
             .SelectMany(group =>
@@ -139,6 +160,7 @@ public sealed partial class NotchTableGenerator
                 var rawPercent = group.Sum(static leg => leg.RatioPercent);
                 var targetScale = scaleByTarget.GetValueOrDefault((candidate.IcIndex, group.Key), 1.0);
                 var scaledPercent = ScaleCoveragePercent(rawPercent, targetScale);
+                scaling?.Add(new NotchV22GuardExplanation(group.Key, false, rawPercent, targetScale, scaledPercent));
                 var hasToFullCoverage = group.Any(static leg => leg.HasToFullCoverage);
                 return SplitRatioPercent(scaledPercent)
                     .Select(chunk => new V22DiffLeg(group.Key, chunk, hasToFullCoverage));
@@ -147,6 +169,7 @@ public sealed partial class NotchTableGenerator
             .ToList();
         var scaledLegSum = scaledLegs.Sum(static leg => Math.Max(0, leg.RatioPercent));
         var scaledCombinePercent = Math.Clamp(scaledRetainedPercent + scaledLegSum, 0, 255);
+        explanationCollector?.CaptureGuard(candidate.IcIndex, candidate.DiffIndex, scaling!);
         return candidate with
         {
             CombinePercent = scaledCombinePercent,
@@ -181,14 +204,24 @@ public sealed partial class NotchTableGenerator
             return Array.Empty<NotchTableRow>();
         }
 
+        var continuationLegSums = canonicalV22Rows
+            .Select(static row => (row.IcIndex, row.DiffIndex, Node: row.V22Node ?? NotchV22Node.FromValues(row.Values)))
+            .Where(static row => (row.Node.Flags & V22ContinuationFlag) != 0)
+            .GroupBy(static row => (row.IcIndex, row.DiffIndex))
+            .ToDictionary(static group => group.Key,
+                static group => group.Sum(static row => row.Node.TargetRatioPercent1 + row.Node.TargetRatioPercent2));
         var projected = new List<NotchTableRow>(canonicalV22Rows.Count);
         foreach (var row in canonicalV22Rows)
         {
             var node = row.V22Node ?? NotchV22Node.FromValues(row.Values);
+            // V21 also subtracts continuation legs from the source, so preserve its full MAIN combine.
+            var combinePercent = node.CombinePercent + ((node.Flags & V22ContinuationFlag) == 0
+                ? continuationLegSums.GetValueOrDefault((row.IcIndex, row.DiffIndex))
+                : 0);
             var values = new int[9];
             values[0] = node.AnchorDiffIndex;
-            values[1] = Math.Clamp(node.CombinePercent, 0, 255);
-            values[2] = Math.Clamp(node.CombinePercent, 0, 255);
+            values[1] = Math.Clamp(combinePercent, 0, 255);
+            values[2] = Math.Clamp(combinePercent, 0, 255);
             FillLegacyLeg(
                 targetDiffIndex: node.TargetDiffIndex1,
                 ratioPercent: node.TargetRatioPercent1,
@@ -235,14 +268,10 @@ public sealed partial class NotchTableGenerator
 
     private static V22CadCandidate SelectPrimaryV22Candidate(IReadOnlyList<V22CadCandidate> candidates)
     {
-        return candidates
-            .OrderByDescending(candidate => candidate.HasToFullInfluence)
-            .ThenByDescending(candidate => candidate.Legs.Count > 0)
-            .ThenByDescending(candidate => candidate.IsAnchorMatchedCad)
-            .ThenByDescending(candidate => candidate.SourceAreaScore)
-            .ThenByDescending(candidate => candidate.CombinePercent)
-            .ThenBy(candidate => candidate.CadPadId)
-            .First();
+        return NotchV22CandidateSelection.Select(candidates, static candidate => new NotchV22CandidateSelection.Rank(
+            candidate.HasToFullInfluence,
+            candidate.Legs.Count > 0, candidate.IsAnchorMatchedCad, candidate.SourceAreaScore,
+            candidate.CombinePercent, candidate.CadPadId));
     }
 
     private static V22CadCandidate BuildV22CadCandidate(
@@ -330,32 +359,17 @@ public sealed partial class NotchTableGenerator
             : BuildSourceAreaDominantLegs(targets);
 
     private static List<V22DiffLeg> BuildSourceAreaDominantLegs(
-        IReadOnlyList<NotchV22TargetAllocation> targets)
+        IReadOnlyList<NotchV22TargetAllocation> targets) =>
+        BuildV22Legs(targets, static ratioPercent => new[] { Math.Clamp(ratioPercent, -100, 100) });
+
+    private static List<V22DiffLeg> BuildV22Legs(
+        IReadOnlyList<NotchV22TargetAllocation> targets,
+        Func<int, IEnumerable<int>> projectRatio)
     {
         var legs = new List<V22DiffLeg>();
         foreach (var target in targets)
         {
-            if (target.RatioPercentRounded == 0)
-            {
-                continue;
-            }
-
-            legs.Add(new V22DiffLeg(
-                TargetDiffIndex: target.DiffIndex,
-                RatioPercent: Math.Clamp(target.RatioPercentRounded, -100, 100),
-                HasToFullCoverage: target.ToFullAppliedRegularCount > 0));
-        }
-
-        return legs;
-    }
-
-    private static List<V22DiffLeg> BuildTargetCoverageLegs(
-        IReadOnlyList<NotchV22TargetAllocation> targets)
-    {
-        var legs = new List<V22DiffLeg>();
-        foreach (var target in targets)
-        {
-            foreach (var chunk in SplitRatioPercent(target.RatioPercentRounded))
+            foreach (var chunk in projectRatio(target.RatioPercentRounded))
             {
                 if (chunk == 0)
                 {
@@ -371,6 +385,10 @@ public sealed partial class NotchTableGenerator
 
         return legs;
     }
+
+    private static List<V22DiffLeg> BuildTargetCoverageLegs(
+        IReadOnlyList<NotchV22TargetAllocation> targets) =>
+        BuildV22Legs(targets, SplitRatioPercent);
 
     private static IEnumerable<int> SplitRatioPercent(int ratioPercent)
     {
@@ -543,6 +561,12 @@ public sealed partial class NotchTableGenerator
             isAnchorMatchedCad,
             hasToFullInfluenceOnAnchorIc,
             legs);
+        context.ExplanationCollector?.CaptureCandidate(anchor.IcIndex, sourceDiffIndex,
+            new NotchV22CandidateExplanation(cadPad.Id, anchor.RegularPadId, hasToFullInfluenceOnAnchorIc,
+                legs.Count > 0, isAnchorMatchedCad, anchorSourceArea, combinedPercent, profile.MaxRatio),
+            compensation, allocation, context.ResolutionSettings.CompensationModel.ToString(),
+            toRegularPercent, toFullPercent,
+            legs.Select(static leg => new NotchV22ExplanationLeg(leg.TargetDiffIndex, leg.RatioPercent)));
         return candidate;
     }
 
@@ -658,34 +682,22 @@ public sealed partial class NotchTableGenerator
         for (var index = 0; index < candidatesByProfile.Length; index++)
         {
             var candidates = candidatesByProfile[index];
-            if (candidates is null || candidates.Count == 0)
+            // Empty profiles report zero even when earlier profiles created buckets.
+            var generatedRows = 0;
+            if (candidates is not null && candidates.Count > 0)
             {
-                if (ShouldReportGenerationProgress(index + 1, candidatesByProfile.Length))
+                foreach (var candidate in candidates)
                 {
-                    ReportGenerationProgress(
-                        progress,
-                        index + 1,
-                        candidatesByProfile.Length,
-                        0,
-                        cadProfiles[index].CadPad.Id,
-                        null,
-                        GenerationPhaseMergeCanonicalCandidates,
-                        phaseStep: mergePhaseStep,
-                        phaseStepCount: phaseStepCount);
+                    if (!candidatesByDiff.TryGetValue(candidate.Key, out var sameDiffCandidates))
+                    {
+                        sameDiffCandidates = new List<V22CadCandidate>();
+                        candidatesByDiff[candidate.Key] = sameDiffCandidates;
+                    }
+
+                    sameDiffCandidates.Add(candidate.Value);
                 }
 
-                continue;
-            }
-
-            foreach (var candidate in candidates)
-            {
-                if (!candidatesByDiff.TryGetValue(candidate.Key, out var sameDiffCandidates))
-                {
-                    sameDiffCandidates = new List<V22CadCandidate>();
-                    candidatesByDiff[candidate.Key] = sameDiffCandidates;
-                }
-
-                sameDiffCandidates.Add(candidate.Value);
+                generatedRows = candidatesByDiff.Count;
             }
 
             if (ShouldReportGenerationProgress(index + 1, candidatesByProfile.Length))
@@ -694,7 +706,7 @@ public sealed partial class NotchTableGenerator
                     progress,
                     index + 1,
                     candidatesByProfile.Length,
-                    candidatesByDiff.Count,
+                    generatedRows,
                     cadProfiles[index].CadPad.Id,
                     null,
                     GenerationPhaseMergeCanonicalCandidates,

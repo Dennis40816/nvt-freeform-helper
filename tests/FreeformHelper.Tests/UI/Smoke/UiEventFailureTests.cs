@@ -101,7 +101,7 @@ public sealed class UiEventFailureTests
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
             var reset = Assert.Single(window.GetVisualDescendants().OfType<Button>(),
-                static button => button.Classes.Contains("dangerTextButton"));
+                static button => button.Classes.Contains("actionDanger"));
 
             var cancelled = await ClickResetAndWaitForConfirmAsync(window, reset);
             UiEventProbe.Click(Assert.IsType<Button>(cancelled.FindControl<Button>("CancelButton")));

@@ -13,8 +13,8 @@
         MinHeight="{DynamicResource IndexMappingReportMinHeight}"
         WindowStartupLocation="CenterOwner"
         IsEnabled="{Binding Editing.IsProjectEditingEnabled}"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="Verification Workspace">
   <Window.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/IndexMappingReport.axaml"/>
@@ -35,11 +35,11 @@
         </Border>
         <SelectableTextBlock Grid.Column="2" VerticalAlignment="Center" Text="{Binding OpenIssueSummaryText}"/>
         <SelectableTextBlock Grid.Column="3" VerticalAlignment="Center"
-                             Foreground="{DynamicResource BrushTextMuted}"
+                             Foreground="{DynamicResource NfcTextMutedBrush}"
                              Text="{Binding MaskAuditSummary}" TextTrimming="CharacterEllipsis"
                              ToolTip.Tip="{Binding MaskAuditSummary}"/>
         <SelectableTextBlock Grid.Column="4" VerticalAlignment="Center"
-                             Foreground="{DynamicResource BrushTextMuted}" Text="{Binding TableRevisionText}"/>
+                             Foreground="{DynamicResource NfcTextMutedBrush}" Text="{Binding TableRevisionText}"/>
       </Grid>
     </panels:WorkspaceShell.SummaryContent>
     <panels:WorkspaceShell.ToolbarContent>

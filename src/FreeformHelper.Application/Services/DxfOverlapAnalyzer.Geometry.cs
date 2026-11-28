@@ -31,14 +31,89 @@ public sealed partial class DxfOverlapAnalyzer
             }
         }
 
-        // Check centroids as an additional test for containment.
-        if (IsPointStrictlyInside(b, a.Centroid()) || IsPointStrictlyInside(a, b.Centroid()))
+        // A centroid of a concave pad can lie outside the pad, so it only counts when it is inside both pads.
+        if (IsCentroidInsideBoth(a, b) || IsCentroidInsideBoth(b, a))
         {
             return true;
         }
 
         // Check for proper edge intersections (edges cross each other, not just touch at a point).
-        return EdgesProperlyIntersect(a, b);
+        if (EdgesProperlyIntersect(a, b))
+        {
+            return true;
+        }
+
+        // Pads with collinear edges and vertices only on the other pad's edges (for example staggered
+        // rectangles of the same height) are caught by sampling the cells between the vertex coordinates.
+        return HasInteriorSampleInsideBoth(a, b);
+    }
+
+    private static bool IsCentroidInsideBoth(Polygon2 owner, Polygon2 other)
+    {
+        var centroid = owner.Centroid();
+        return IsPointStrictlyInside(owner, centroid) && IsPointStrictlyInside(other, centroid);
+    }
+
+    /// <summary>
+    /// Samples the center of every grid cell formed by the vertex coordinates inside the shared bounds.
+    /// A sample strictly inside both polygons proves that the overlap has a positive area.
+    /// </summary>
+    private static bool HasInteriorSampleInsideBoth(Polygon2 a, Polygon2 b)
+    {
+        var xCuts = CollectCuts(a, b, a.Bounds.MinX, a.Bounds.MaxX, b.Bounds.MinX, b.Bounds.MaxX, useX: true);
+        var yCuts = CollectCuts(a, b, a.Bounds.MinY, a.Bounds.MaxY, b.Bounds.MinY, b.Bounds.MaxY, useX: false);
+        if (xCuts.Count > MaxInteriorSampleCuts || yCuts.Count > MaxInteriorSampleCuts)
+        {
+            return false;
+        }
+
+        for (var i = 0; i + 1 < xCuts.Count; i++)
+        {
+            for (var j = 0; j + 1 < yCuts.Count; j++)
+            {
+                var center = new Point2((xCuts[i] + xCuts[i + 1]) / 2.0, (yCuts[j] + yCuts[j + 1]) / 2.0);
+                if (IsPointStrictlyInside(a, center) && IsPointStrictlyInside(b, center))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static List<double> CollectCuts(
+        Polygon2 a, Polygon2 b, double aMin, double aMax, double bMin, double bMax, bool useX)
+    {
+        var min = Math.Max(aMin, bMin);
+        var max = Math.Min(aMax, bMax);
+        var values = new List<double> { min, max };
+        AddCutsInside(values, a, min, max, useX);
+        AddCutsInside(values, b, min, max, useX);
+        values.Sort();
+
+        var cuts = new List<double>(values.Count);
+        foreach (var value in values)
+        {
+            if (cuts.Count == 0 || value - cuts[^1] > Epsilon)
+            {
+                cuts.Add(value);
+            }
+        }
+
+        return cuts;
+    }
+
+    private static void AddCutsInside(List<double> values, Polygon2 polygon, double min, double max, bool useX)
+    {
+        foreach (var vertex in polygon.Vertices)
+        {
+            var value = useX ? vertex.X : vertex.Y;
+            if (value > min && value < max)
+            {
+                values.Add(value);
+            }
+        }
     }
 
     private static bool IsPointStrictlyInside(Polygon2 poly, Point2 point)

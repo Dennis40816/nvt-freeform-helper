@@ -36,7 +36,7 @@ public sealed partial class FreeformHelperViewModel
         ArgumentException.ThrowIfNullOrWhiteSpace(operationLabel);
 
         var generationEpoch = _notchExportGenerationCacheService.CaptureGenerationEpoch();
-        var finalProjectionRevision = Volatile.Read(ref _notchFinalProjectionRevision);
+        var finalProjectionRevision = _notchFinalProjection.Read();
         var sourceRevision = SimulationWorkspaceSourceRevision;
         var effectiveProgress = reportStep5Progress
             ? BeginStep5NotchGenerationProgress(operationLabel, progress, finalProjectionRevision, sourceRevision, progressTextReporter)
@@ -77,7 +77,7 @@ public sealed partial class FreeformHelperViewModel
             var effectiveGrid = projectToCadOutputFwDiff ? projection.Grid : grid;
 
             var stage2ElapsedMs = (long)TimeProvider.System.GetElapsedTime(stage2StartedAt).TotalMilliseconds;
-            var crossIcMismatch = BuildCrossIcMismatchSnapshot(grid);
+            var crossIcMismatch = NotchCrossIcMismatch.BuildCrossIcMismatchSnapshot(grid);
             LogNotchGenerationMetrics(operationLabel, stage2ElapsedMs, cacheLookup, crossIcMismatch, projection, projectToCadOutputFwDiff, effectiveTable);
 
             if (!TryAcceptNotchGeneration(operationLabel, generationEpoch, finalProjectionRevision, sourceRevision, inputs, table, resolvedBatch, legacyTableToStore))
@@ -103,7 +103,7 @@ public sealed partial class FreeformHelperViewModel
     private IProgress<NotchGenerationProgress> BeginStep5NotchGenerationProgress(
         string operationLabel,
         IProgress<NotchGenerationProgress>? progress,
-        int finalProjectionRevision,
+        long finalProjectionRevision,
         int sourceRevision,
         Action<string>? progressTextReporter)
     {
@@ -134,8 +134,8 @@ public sealed partial class FreeformHelperViewModel
         workflowSnapshot ??= BuildWorkflowDataSnapshot();
         var exportSettings = CreateExportSettingsSnapshot(_projectFile.Settings);
         var activeRegularPadIds = GetActiveRegularPadIdsForNotchComputation();
-        var activeRegularHash = ComputeActiveRegularHash(activeRegularPadIds);
-        var cadOutputFwDiffHash = ComputeCadOutputFwDiffHash(workflowSnapshot.CadOutputFwDiffIndexByCadId);
+        var activeRegularHash = NotchExportFingerprints.ComputeActiveRegularHash(activeRegularPadIds);
+        var cadOutputFwDiffHash = NotchExportFingerprints.ComputeCadOutputFwDiffHash(workflowSnapshot.CadOutputFwDiffIndexByCadId);
         var step3Revision = GetNotchStep3Revision();
         var selectedSparseResultRequest = exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation
             ? NotchSparseResultUseCase.CreateRequest(
@@ -153,8 +153,8 @@ public sealed partial class FreeformHelperViewModel
             : null;
         var generationSettingsFingerprint = exportSettings.Notch.ComputationMode == NotchComputationMode.CadAllocation
             ? NotchTableGenerator.ComputeCadAllocationResolvedBatchSettingsFingerprint(exportSettings)
-            : ComputeNotchExportSettingsFingerprint(exportSettings);
-        var settingsFingerprint = CombineNotchExportSettingsFingerprint(
+            : NotchExportFingerprints.ComputeNotchExportSettingsFingerprint(exportSettings);
+        var settingsFingerprint = NotchExportFingerprints.CombineNotchExportSettingsFingerprint(
             generationSettingsFingerprint,
             activeRegularHash,
             cadOutputFwDiffHash);
@@ -320,7 +320,7 @@ public sealed partial class FreeformHelperViewModel
             projectToCadOutputFwDiff ? "visible" : "raw");
         if (effectiveTable.GenerationPhaseTimings.HasData)
         {
-            LogNotchGenerationPhaseTimings(operationLabel, effectiveTable.GenerationPhaseTimings);
+            NotchGenerationLog.LogPhaseTimings(_logger, operationLabel, effectiveTable.GenerationPhaseTimings);
         }
 
         if (crossIcMismatch.CadCount > 0)
@@ -335,55 +335,10 @@ public sealed partial class FreeformHelperViewModel
         }
     }
 
-    private static void LogNotchGenerationPhaseTimings(string operationLabel, NotchGenerationPhaseTimings phaseTimings)
-    {
-        _logger.Info(
-            CultureInfo.InvariantCulture,
-            "{0} phase timings: profiles={1} ms, candidates={2} ms, merge={3} ms, legacy={4} ms, finalize={5} ms, total={6} ms.",
-            operationLabel,
-            phaseTimings.BuildProfilesElapsedMs,
-            phaseTimings.BuildCanonicalCandidatesElapsedMs,
-            phaseTimings.MergeCanonicalCandidatesElapsedMs,
-            phaseTimings.BuildLegacyRowsElapsedMs,
-            phaseTimings.FinalizeCanonicalExportsElapsedMs,
-            phaseTimings.TotalElapsedMs);
-        if (phaseTimings.CandidateBreakdown?.HasData == true)
-        {
-            var candidateBreakdown = phaseTimings.CandidateBreakdown;
-            var compensationStages = candidateBreakdown.CompensationStageTimings;
-            var stageCBreakdown = compensationStages.StageCBreakdown;
-            _logger.Info(
-                CultureInfo.InvariantCulture,
-                "{0} candidate breakdown: count={1}, buildCadCandidate={2} ms, compensation={3} ms, postCompute={4} ms, stageA={5} ms, stageB={6} ms, stageC={7} ms, stageD={8} ms.",
-                operationLabel,
-                candidateBreakdown.CandidateCount,
-                candidateBreakdown.BuildV22CadCandidateElapsedMs,
-                candidateBreakdown.CompensationComputeElapsedMs,
-                candidateBreakdown.CandidatePostComputeElapsedMs,
-                compensationStages.StageAElapsedMs,
-                compensationStages.StageBElapsedMs,
-                compensationStages.StageCElapsedMs,
-                compensationStages.StageDElapsedMs);
-            if (stageCBreakdown?.HasData == true)
-            {
-                _logger.Info(
-                    CultureInfo.InvariantCulture,
-                    "{0} stageC breakdown: ownerLookup={1} ms, occupiedArea={2} ms, sourceCoverage={3} ms, reachability={4} ms, ruleDecision={5} ms, previewDebug={6} ms.",
-                    operationLabel,
-                    stageCBreakdown.OwnerAndBlockerLookupElapsedMs,
-                    stageCBreakdown.ExactOccupiedAreaElapsedMs,
-                    stageCBreakdown.SourceCoverageElapsedMs,
-                    stageCBreakdown.ReachabilityElapsedMs,
-                    stageCBreakdown.RuleDecisionElapsedMs,
-                    stageCBreakdown.PreviewAndDebugElapsedMs);
-            }
-        }
-    }
-
     private bool TryAcceptNotchGeneration(
         string operationLabel,
         long generationEpoch,
-        int finalProjectionRevision,
+        long finalProjectionRevision,
         int sourceRevision,
         NotchGenerationInputs inputs,
         NotchTable table,
@@ -488,9 +443,9 @@ public sealed partial class FreeformHelperViewModel
         _notchOperationState.EndBusyScope(value => IsNotchExporting = value);
     }
 
-    private bool IsNotchFinalProjectionCurrent(int finalProjectionRevision, int sourceRevision)
+    private bool IsNotchFinalProjectionCurrent(long finalProjectionRevision, int sourceRevision)
     {
-        return Volatile.Read(ref _notchFinalProjectionRevision) == finalProjectionRevision &&
+        return _notchFinalProjection.Read() == finalProjectionRevision &&
                SimulationWorkspaceSourceRevision == sourceRevision;
     }
 

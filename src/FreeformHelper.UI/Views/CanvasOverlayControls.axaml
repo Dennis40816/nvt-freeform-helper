@@ -1,44 +1,45 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              x:Class="FreeformHelper.UI.Views.CanvasOverlayControls">
   <Grid>
     <Grid x:Name="CanvasToolbar" ColumnDefinitions="*,Auto" VerticalAlignment="Top"
           Margin="{StaticResource Inset8}" ColumnSpacing="{StaticResource Space8}" Panel.ZIndex="5">
       <Grid x:Name="CanvasLeftOverlay" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource Space6}">
-        <Button x:Name="ShowLeftPanelButton" Classes="actionIconButton viewportOverlayAction"
+        <Button x:Name="ShowLeftPanelButton" Classes="actionIconButton actionGhost"
                 ToolTip.Tip="Show Layers &amp; DXF panel" Click="ShowLeftPanelButton_Click"
                 IsVisible="False" VerticalAlignment="Top">
-          <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.ChevronRight}"/>
+          <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.ChevronRight}"/>
         </Button>
         <Border Grid.Column="1" Classes="canvasQuickToolbar">
-          <controls:BalancedWrapPanel ItemSpacing="{DynamicResource Space4}" LineSpacing="{DynamicResource Space4}"
+          <primitives:BalancedWrapPanel ItemSpacing="{DynamicResource Space4}" LineSpacing="{DynamicResource Space4}"
                                       BalanceLastRow="False">
-          <ToggleButton Classes="actionTextButton actionNeutral" Content="CAD layer"
+          <ToggleButton Classes="actionGhost flat marked" Content="CAD layer"
                         IsChecked="{Binding ShowCad, Mode=TwoWay}"
                         ToolTip.Tip="Show or hide CAD pads on canvas."/>
-          <ToggleButton Classes="actionTextButton actionNeutral" Content="Regular grid"
+          <ToggleButton Classes="actionGhost flat marked" Content="Regular grid"
                         IsChecked="{Binding ShowRegular, Mode=TwoWay}"
                         ToolTip.Tip="Show or hide the regular grid on canvas."/>
-          <ToggleButton Classes="actionTextButton actionNeutral" Content="Color by area"
+          <ToggleButton Classes="actionGhost flat marked" Content="Color by area"
                         IsChecked="{Binding ColorCadByArea, Mode=TwoWay}"
                         ToolTip.Tip="Color CAD pads by area buckets."/>
-          <ToggleButton Classes="actionTextButton actionNeutral" Content="To Regular Preview"
+          <ToggleButton Classes="actionGhost flat marked" Content="To Regular Preview"
                         IsChecked="{Binding ShowNotchToRegularLabels, Mode=TwoWay}"
                         ToolTip.Tip="Display only; show or hide To Regular ratio labels."/>
-          <ToggleButton Classes="actionTextButton actionNeutral" Content="To Full Preview"
+          <ToggleButton Classes="actionGhost flat marked" Content="To Full Preview"
                         IsChecked="{Binding ShowNotchCanvasPreview, Mode=TwoWay}" IsEnabled="{Binding CanShowToFullPreviewToggle}"
                         ToolTip.Tip="{Binding ToFullPreviewToggleHint}"/>
-          </controls:BalancedWrapPanel>
+          </primitives:BalancedWrapPanel>
         </Border>
       </Grid>
       <StackPanel x:Name="CanvasTopButtons" Grid.Column="1" Orientation="Horizontal"
                   Spacing="{StaticResource Space6}" VerticalAlignment="Top">
-        <Button Classes="actionIconButton viewportOverlayAction" ToolTip.Tip="Fit to screen (F)" Command="{Binding FitCommand}">
-          <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+        <Button Classes="actionIconButton actionGhost" ToolTip.Tip="Fit to screen (F)" Command="{Binding FitCommand}">
+          <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.FitScreen}"/>
         </Button>
-        <Button Classes="actionTextButton actionGhost" Content="Canvas help" ToolTip.Tip="Canvas gestures, shortcuts and Pad Info">
+        <Button Classes="actionGhost" Content="Canvas help" ToolTip.Tip="Canvas gestures, shortcuts and Pad Info">
           <Button.Flyout>
             <Flyout>
               <StackPanel Spacing="{StaticResource Space6}" MaxWidth="{StaticResource ViewMenuPopupWidth}">
@@ -49,15 +50,15 @@
                 <SelectableTextBlock Text="Ctrl+A: select all · Ctrl+Z: undo · Space+left drag: pan" TextWrapping="Wrap"/>
                 <SelectableTextBlock Text="Shift+arrows: fine pan" TextWrapping="Wrap"/>
                 <SelectableTextBlock Text="Right-click or double-click a pad: open Pad Info" TextWrapping="Wrap"/>
-                <Button Classes="actionTextButton actionGhost" Content="Clear selection"
+                <Button Classes="actionGhost" Content="Clear selection"
                         HorizontalAlignment="Right" Command="{Binding ClearSelectionCommand}"/>
               </StackPanel>
             </Flyout>
           </Button.Flyout>
         </Button>
-        <Button x:Name="ShowRightPanelButton" Classes="actionIconButton viewportOverlayAction"
+        <Button x:Name="ShowRightPanelButton" Classes="actionIconButton actionGhost"
                 ToolTip.Tip="Show Settings &amp; Inspector panel" Click="ShowRightPanelButton_Click" IsVisible="False">
-          <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.ChevronLeft}"/>
+          <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.ChevronLeft}"/>
         </Button>
       </StackPanel>
     </Grid>

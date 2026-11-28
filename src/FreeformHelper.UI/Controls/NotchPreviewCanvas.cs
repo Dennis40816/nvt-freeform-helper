@@ -3,12 +3,35 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.UI.Presentation;
+using FreeformHelper.UI.Services;
 using Nvt.Core.Avalonia.Theme;
 
 namespace FreeformHelper.UI.Controls;
 
 public sealed class NotchPreviewCanvas : Control
 {
+    public static readonly StyledProperty<NotchSourcePresentation?> ExplanationProperty =
+        AvaloniaProperty.Register<NotchPreviewCanvas, NotchSourcePresentation?>(nameof(Explanation));
+    public static readonly StyledProperty<IReadOnlyList<CadPad>> NeighborCadPadsProperty =
+        AvaloniaProperty.Register<NotchPreviewCanvas, IReadOnlyList<CadPad>>(nameof(NeighborCadPads), Array.Empty<CadPad>());
+
+    static NotchPreviewCanvas() => AffectsRender<NotchPreviewCanvas>(ExplanationProperty, NeighborCadPadsProperty,
+        CadPadProperty, RegularPadsProperty, ToFullPolygonsProperty, FreeformTypeProperty);
+
+    public NotchPreviewCanvas() => ActualThemeVariantChanged += (_, _) => InvalidateVisual();
+
+    public NotchSourcePresentation? Explanation
+    {
+        get => GetValue(ExplanationProperty);
+        set => SetValue(ExplanationProperty, value);
+    }
+
+    public IReadOnlyList<CadPad> NeighborCadPads
+    {
+        get => GetValue(NeighborCadPadsProperty);
+        set => SetValue(NeighborCadPadsProperty, value);
+    }
     public static readonly StyledProperty<CadPad?> CadPadProperty =
         AvaloniaProperty.Register<NotchPreviewCanvas, CadPad?>(nameof(CadPad));
 
@@ -47,11 +70,14 @@ public sealed class NotchPreviewCanvas : Control
         set => SetValue(FreeformTypeProperty, value);
     }
 
+    private IReadOnlyList<Polygon2> EffectiveToFullPolygons => Explanation is { } explanation
+        ? explanation.PreviewPolygons : ToFullPolygons;
+
     public override void Render(DrawingContext context)
     {
         base.Render(context);
 
-        var background = GetResourceBrush("BrushBgSurface", Brushes.Transparent);
+        var background = GetResourceBrush("NfcSurfaceBrush", Brushes.Transparent);
         context.FillRectangle(background, new Rect(Bounds.Size));
 
         if (CadPad is null && RegularPads.Count == 0 && ToFullPolygons.Count == 0)
@@ -59,7 +85,7 @@ public sealed class NotchPreviewCanvas : Control
             return;
         }
 
-        var bounds = BuildWorldBounds(CadPad, RegularPads, ToFullPolygons);
+        var bounds = BuildWorldBounds(CadPad, RegularPads, EffectiveToFullPolygons);
         if (bounds.Width <= 0 || bounds.Height <= 0)
         {
             return;
@@ -92,12 +118,17 @@ public sealed class NotchPreviewCanvas : Control
         var hatchWidth = GetResourceDouble("NotchPreviewHatchWidth", strokeWidth);
 
         var cadFill = GetResourceBrush("BrushNotchCadFill", Brushes.Transparent);
-        var cadPen = new Pen(GetBrush(cadStrokeColor), strokeWidth);
-        var regPen = new Pen(GetBrush(regStrokeColor), strokeWidth);
-        var toFullPen = new Pen(GetBrush(toFullStrokeColor), toFullStrokeWidth);
+        var strokeScale = Explanation is null ? 1 : scale;
+        var cadPen = new Pen(GetBrush(cadStrokeColor), strokeWidth / strokeScale);
+        var regPen = new Pen(Explanation is null ? GetBrush(regStrokeColor) :
+            GetResourceBrush("BrushNotchExplanationRegular", Brushes.Transparent), strokeWidth / strokeScale);
+        var dash = Explanation is not null && this.TryFindResource("NotchExplanationDash", ActualThemeVariant, out var value)
+            ? value as IDashStyle : null;
+        var toFullPen = new Pen(GetBrush(toFullStrokeColor), toFullStrokeWidth / strokeScale, dashStyle: dash);
         var hatchPen = new Pen(GetBrush(hatchColor), hatchWidth);
 
         DrawWorldShapes(context, worldToScreen, hatchSpacing / scale, cadFill, cadPen, regPen, toFullPen, hatchPen);
+        NotchPreviewAnnotations.Draw(this, context, worldToScreen);
     }
 
     private void DrawWorldShapes(
@@ -112,6 +143,28 @@ public sealed class NotchPreviewCanvas : Control
     {
         using (context.PushTransform(worldToScreen))
         {
+            if (Explanation is not null &&
+                this.TryFindResource("BrushNotchExplanationReachFill", ActualThemeVariant, out var resource) &&
+                resource is IBrush toFullFill)
+            {
+                foreach (var polygon in EffectiveToFullPolygons)
+                {
+                    if (BuildGeometry(polygon) is { } geometry)
+                    {
+                        context.DrawGeometry(toFullFill, null, geometry);
+                    }
+                }
+            }
+            var neighborPen = new Pen(GetResourceBrush("BrushNotchExplanationNeighbor", Brushes.Transparent),
+                cadPen.Thickness);
+            foreach (var neighbor in NeighborCadPads)
+            {
+                var geometry = BuildGeometry(neighbor.Polygon);
+                if (geometry is not null)
+                {
+                    context.DrawGeometry(null, neighborPen, geometry);
+                }
+            }
             if (CadPad is not null)
             {
                 var cadGeometry = BuildGeometry(CadPad.Polygon);
@@ -128,13 +181,16 @@ public sealed class NotchPreviewCanvas : Control
                     var b = pad.Bounds;
                     var rect = new Rect(b.MinX, b.MinY, b.Width, b.Height);
                     context.DrawRectangle(Brushes.Transparent, regPen, rect);
-                    DrawHatch(context, rect, hatchPen, spacingWorld);
+                    if (Explanation is null)
+                    {
+                        DrawHatch(context, rect, hatchPen, spacingWorld);
+                    }
                 }
             }
 
-            if (ToFullPolygons.Count > 0)
+            if (EffectiveToFullPolygons.Count > 0)
             {
-                foreach (var polygon in ToFullPolygons)
+                foreach (var polygon in EffectiveToFullPolygons)
                 {
                     var geometry = BuildGeometry(polygon);
                     if (geometry is null)
@@ -223,7 +279,7 @@ public sealed class NotchPreviewCanvas : Control
 
     private IBrush GetResourceBrush(string key, IBrush fallback)
     {
-        return UiResourceResolver.GetBrush(this, key, fallback, GetBrush);
+        return ThemeBrushResolver.GetBrush(this, key, fallback, GetBrush);
     }
 
     private Color GetResourceColor(string key, Color fallback)

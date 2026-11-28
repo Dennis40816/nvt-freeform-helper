@@ -7,12 +7,9 @@
              x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerArraySectionView"
              x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
              x:CompileBindings="True">
-  <UserControl.Styles>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
-  </UserControl.Styles>
   <StackPanel Spacing="{DynamicResource Space6}">
     <ToggleButton Content="4-point array"
-                  Classes="actionGhost actionTextButton"
+                  Classes="actionGhost"
                   HorizontalContentAlignment="Left"
                   IsChecked="{Binding ShowCustomArray, Mode=TwoWay}"
                   ToolTip.Tip="Enable array generation. Expanding settings does not change this switch."/>
@@ -38,7 +35,7 @@
         </Grid>
         <TextBlock Text="{x:Static vm:CoordinatePlannerWorkspaceViewModel.SafeCornersConsequenceText}" TextWrapping="Wrap" HorizontalAlignment="Left"/>
         <Button Content="Use safe AA corners"
-                Classes="actionNeutral actionTextButton"
+                Classes="actionNeutral"
                 HorizontalAlignment="Right"
                 Command="{Binding UseActiveAreaSafeCornersCommand}"
                 ToolTip.Tip="{x:Static vm:CoordinatePlannerWorkspaceViewModel.SafeCornersConsequenceText}"/>

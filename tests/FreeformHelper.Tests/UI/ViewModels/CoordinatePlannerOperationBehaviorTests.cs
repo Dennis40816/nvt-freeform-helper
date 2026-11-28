@@ -21,12 +21,12 @@ public sealed class CoordinatePlannerOperationBehaviorTests
         AddPoint(viewModel, "Alpha", 100m, -20m);
         AddPoint(viewModel, "Beta", 10m, 30m);
         AddPoint(viewModel, "Gamma", 10m, 20m);
-        viewModel.CustomPathLabelText = "Sweep";
-        viewModel.CustomPathStartMachineX = 20m;
-        viewModel.CustomPathStartMachineY = 10m;
-        viewModel.CustomPathEndMachineX = 80m;
-        viewModel.CustomPathEndMachineY = 40m;
-        viewModel.CustomPathStepCount = 2m;
+        viewModel.CustomEditor.CustomPathLabelText = "Sweep";
+        viewModel.CustomEditor.CustomPathStartMachineX = 20m;
+        viewModel.CustomEditor.CustomPathStartMachineY = 10m;
+        viewModel.CustomEditor.CustomPathEndMachineX = 80m;
+        viewModel.CustomEditor.CustomPathEndMachineY = 40m;
+        viewModel.CustomEditor.CustomPathStepCount = 2m;
         viewModel.AddCustomPathCommand.Execute(null);
         var sourceOrder = viewModel.ArtifactRows.Select(static row => row.Key).ToArray();
         string[] numericOrder =
@@ -105,9 +105,9 @@ public sealed class CoordinatePlannerOperationBehaviorTests
 
     private static void AddPoint(CoordinatePlannerWorkspaceViewModel viewModel, string label, decimal x, decimal y)
     {
-        viewModel.CustomPointLabelText = label;
-        viewModel.CustomPointMachineX = x;
-        viewModel.CustomPointMachineY = y;
+        viewModel.CustomEditor.CustomPointLabelText = label;
+        viewModel.CustomEditor.CustomPointMachineX = x;
+        viewModel.CustomEditor.CustomPointMachineY = y;
         viewModel.AddCustomPointCommand.Execute(null);
     }
 

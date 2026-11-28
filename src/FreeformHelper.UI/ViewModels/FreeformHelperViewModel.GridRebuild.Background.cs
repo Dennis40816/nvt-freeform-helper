@@ -1,12 +1,96 @@
+using System.Globalization;
 using FreeformHelper.Application.Settings;
-using FreeformHelper.Domain.Pads;
-using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Grid;
 
 namespace FreeformHelper.UI.ViewModels;
 
 public sealed partial class FreeformHelperViewModel
 {
+    private async Task TriggerGridRebuildAsync(bool requestFit = false) =>
+        await _gridRebuildUseCase.RequestAsync(requestFit);
+
+    private Task RebuildGridAsync() => GridMatching.Rebuild.RebuildGridAsync();
+
+    private void ClearPadMatchResult(bool clearRegularAssignments) =>
+        GridMatching.Rebuild.ClearPadMatchResult(clearRegularAssignments);
+
+    private GridStatePorts CreateGridStatePorts() => new(
+        () => _grid,
+        grid => _grid = grid,
+        () => _cad is not null,
+        () => RegularPads.Count,
+        () => CadPads,
+        () => _isLoadingSettings,
+        () => _selectedCadIds.Count > 0,
+        () => _selection.RegularIndices,
+        () => _workflowData.LatestPadMatch,
+        SetLatestPadMatchResult);
+
+    private GridEffectPorts CreateGridEffectPorts() => new(
+        () => ApplyUiToSettings(_projectFile.Settings),
+        BumpNotchExportGridFingerprint,
+        BumpNotchExportIndexFingerprint,
+        InvalidateNotchCompensationCache,
+        () => RefreshNotchCanvasPreview(showStatus: false),
+        NotifySimulationWorkspaceSourceChanged,
+        () => CanvasHost?.Invalidate(),
+        () => CanvasHost?.FitToContent(),
+        MarkUnsaved,
+        SetStatus,
+        OnPropertyChanged,
+        (message, args) => _logger.Info(CultureInfo.InvariantCulture, message, args),
+        (message, args) => _logger.Debug(CultureInfo.InvariantCulture, message, args));
+
+    private GridWorkflowPorts CreateGridWorkflowPorts() => new(
+        () => TryEnsureWorkflowStep(WorkflowStepId.Step2Freeform),
+        (invalidate, move) => OnWorkflowStepCompleted(WorkflowStepId.Step1Match, invalidate, move),
+        () => OnWorkflowStepChanged(WorkflowStepId.Step2Freeform, showStatus: false),
+        move => OnWorkflowStepCompleted(WorkflowStepId.Step2Freeform, invalidateDownstream: false, moveToNextStep: move),
+        () => ResetWorkflowFromStep(WorkflowStepId.Step1Match, showStatus: false));
+
+    private GridRebuildOwner CreateGridRebuildOwner() => new(new GridRebuildPorts(
+        CreateGridStatePorts(), CreateGridEffectPorts(), CreateGridWorkflowPorts(),
+        new GridBuildPorts(
+            RunGridRebuildOperationAsync,
+            BuildGridSnapshotAsync,
+            hint => CanvasHintText = hint,
+            hint => DxfRegularSourceHint = hint,
+            pads => RegularPads = pads,
+            grid => RegularMask.Workflow.Refresh(grid),
+            () => RegularMask.Workflow.ResetResult(grid: null),
+            UpdateCadOutputFwDiffIndexing,
+            RefreshDxfRegularSourceHint,
+            ResetFreeformAutoDetectStats,
+            links => MatchLinksForCanvas = links),
+        new GridSelectionPorts(
+            () => _selection.SuppressClearOnRebuild,
+            () => _selection.SuppressClearOnRebuild = false,
+            () => _selectionCoordinator.ClearSelection(CanvasHost),
+            UpdateSelectedRangeSummary),
+        new GridStartupPorts(
+            () => _gridStartup.InitialGridBuiltMarked,
+            () => _gridStartup.InitialGridBuiltMarked = true,
+            StartupPerfTracker.Mark,
+            () => _gridStartup.FitAfterNextBuild,
+            () => _gridStartup.FitAfterNextBuild = false)));
+
+    private Task RunGridRebuildOperationAsync(Func<Task> operationAsync) =>
+        RunUiOperationAsync("Grid rebuild", operationAsync, ex =>
+        {
+            SetStatusError("Rebuild grid failed", ex);
+            _logger.Error(ex, "Rebuild grid failed.");
+        });
+
+    private async Task<GridBuildOutcome> BuildGridSnapshotAsync()
+    {
+        var buildRequest = CreateGridRebuildBuildRequestSnapshot();
+        var result = IsCadLoadCanvasOverlayVisible
+            ? await Task.Run(() => GridRebuildOrchestrator.Build(buildRequest))
+            : GridRebuildOrchestrator.Build(buildRequest);
+        return new GridBuildOutcome(result.Success, result.Grid, result.StatusText, result.CanvasHint, result.DxfRegularSourceHint);
+    }
+
     private GridRebuildBuildRequest CreateGridRebuildBuildRequestSnapshot()
     {
         var fullCadSnapshot = _cad;
@@ -16,58 +100,14 @@ public sealed partial class FreeformHelperViewModel
 
         return new GridRebuildBuildRequest
         {
-            ProjectFile = CreateGridRebuildProjectSnapshot(),
-            Settings = CloneGridSettings(_projectFile.Settings.Grid),
+            ProjectFile = GridRebuildOwner.CreateProjectSnapshot(_projectFile),
+            Settings = GridRebuildOwner.CloneGridSettings(_projectFile.Settings.Grid),
             RegularSourceMode = RegularSourceMode,
             GridAlignmentMode = GridAlignmentMode,
             Cad = fullCadSnapshot,
             RegularSourceLayerName = SelectedRegularSourceLayerOption?.Name,
-            HiddenCadPadIds = BuildEffectiveHiddenCadPadIds(),
+            HiddenCadPadIds = CadDocument.BuildEffectiveHiddenIds(),
             BuildCadPadSetForBounds = () => boundsCadSnapshot,
-        };
-    }
-
-    private ProjectFile CreateGridRebuildProjectSnapshot()
-    {
-        return new ProjectFile
-        {
-            FreeformOverrides = new Dictionary<int, FreeformType>(_projectFile.FreeformOverrides),
-        };
-    }
-
-    private static GridSettings CloneGridSettings(GridSettings source)
-    {
-        return new GridSettings
-        {
-            XChannels = source.XChannels,
-            YChannels = source.YChannels,
-            WidthScope = source.WidthScope,
-            HeightScope = source.HeightScope,
-            CascadeNum = source.CascadeNum,
-            PerIcXChannels = new List<int>(source.PerIcXChannels),
-            PerIcYChannels = new List<int>(source.PerIcYChannels),
-            AlignmentMode = source.AlignmentMode,
-            ScanOrder = source.ScanOrder,
-            AfeOverlap = source.AfeOverlap,
-            RegularSourceMode = source.RegularSourceMode,
-            RegularSourceLayerName = source.RegularSourceLayerName,
-            ColumnWidths = new List<double>(source.ColumnWidths),
-            ColumnOverrides = new List<bool>(source.ColumnOverrides),
-            RowHeights = new List<double>(source.RowHeights),
-            RowOverrides = new List<bool>(source.RowOverrides),
-            RowWidthOverrides = source.RowWidthOverrides.Select(static row => new List<double>(row)).ToList(),
-            RowWidthOverrideFlags = source.RowWidthOverrideFlags.Select(static row => new List<bool>(row)).ToList(),
-            ColumnHeightOverrides = source.ColumnHeightOverrides.Select(static column => new List<double>(column)).ToList(),
-            ColumnHeightOverrideFlags = source.ColumnHeightOverrideFlags.Select(static column => new List<bool>(column)).ToList(),
-            BoundsPaddingRatio = source.BoundsPaddingRatio,
-            MaxChannelsX = source.MaxChannelsX,
-            MaxChannelsY = source.MaxChannelsY,
-            ActiveAreaWidth = source.ActiveAreaWidth,
-            ActiveAreaHeight = source.ActiveAreaHeight,
-            PanelBiasX = source.PanelBiasX,
-            PanelBiasY = source.PanelBiasY,
-            BoundLayerName = source.BoundLayerName,
-            RecalcBoundsOnLayerFilter = source.RecalcBoundsOnLayerFilter,
         };
     }
 }

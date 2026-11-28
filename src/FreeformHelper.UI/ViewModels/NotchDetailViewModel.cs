@@ -1,9 +1,12 @@
+using System.Collections.Immutable;
+using CommunityToolkit.Mvvm.ComponentModel;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.UI.Presentation;
 
 namespace FreeformHelper.UI.ViewModels;
 
-public sealed class NotchDetailViewModel
+public sealed class NotchDetailViewModel : ObservableObject
 {
     public NotchDetailViewModel(
         CadPad cadPad,
@@ -24,6 +27,7 @@ public sealed class NotchDetailViewModel
         DxfIndex = dxfIndex;
         FreeformType = freeformType;
         Allocations = allocations;
+        _basePreviewRegularPads = previewRegularPads;
         PreviewRegularPads = previewRegularPads;
         ThresholdQ7 = thresholdQ7;
         MaxAllocationQ7 = maxAllocationQ7;
@@ -39,7 +43,7 @@ public sealed class NotchDetailViewModel
     public int? DxfIndex { get; }
     public FreeformType FreeformType { get; }
     public IReadOnlyList<NotchDetailAllocation> Allocations { get; }
-    public IReadOnlyList<RegularPad> PreviewRegularPads { get; }
+    public IReadOnlyList<RegularPad> PreviewRegularPads { get; private set; }
     public int ThresholdQ7 { get; }
     public int MaxAllocationQ7 { get; }
     public string ThresholdSummary { get; }
@@ -48,6 +52,48 @@ public sealed class NotchDetailViewModel
     public string ToFullRatioText { get; }
     public string CombinedRatioText { get; }
     public IReadOnlyList<Polygon2> ToFullPolygons { get; }
+    // UI thread only; set once by ShowExplanation, then read by the view.
+    private readonly IReadOnlyList<RegularPad> _basePreviewRegularPads;
+    private NotchDetailExplanation _explanation = NotchDetailExplanation.WithoutRows("Working out rows...");
+
+    public ImmutableArray<NotchSourcePresentation> Sources => _explanation.Sources;
+    public ImmutableArray<CadPad> NeighborCadPads => _explanation.NeighborCadPads;
+    public string ExplanationMessage => _explanation.Message;
+    public bool HasSources => Sources.Length > 0;
+    public bool HasNoSources => !HasSources;
+    public bool HasSourceSelector => Sources.Length > 1;
+    public bool HasCompetition => SelectedSource?.HasCompetition == true;
+
+    public void ShowExplanation(NotchDetailExplanation explanation)
+    {
+        _explanation = explanation;
+        // The preview also needs every cell the rows send a share to.
+        PreviewRegularPads = _basePreviewRegularPads
+            .Concat(explanation.CellPads.Where(cell => _basePreviewRegularPads.All(pad => pad.RegularPadId != cell.RegularPadId)))
+            .ToImmutableArray();
+        OnPropertyChanged(nameof(PreviewRegularPads));
+        OnPropertyChanged(nameof(Sources));
+        OnPropertyChanged(nameof(NeighborCadPads));
+        OnPropertyChanged(nameof(ExplanationMessage));
+        OnPropertyChanged(nameof(HasSources));
+        OnPropertyChanged(nameof(HasNoSources));
+        OnPropertyChanged(nameof(HasSourceSelector));
+        SelectedSource = Sources.Length > 0 ? Sources[0] : null;
+    }
+
+    // UI thread only; this is the sole state changed by the source selector.
+    private NotchSourcePresentation? _selectedSource;
+    public NotchSourcePresentation? SelectedSource
+    {
+        get => _selectedSource;
+        set
+        {
+            if (SetProperty(ref _selectedSource, value))
+            {
+                OnPropertyChanged(nameof(HasCompetition));
+            }
+        }
+    }
 
     public string CadTitle => DxfIndex.HasValue ? $"CAD idx {DxfIndex.Value} (CAD id {CadPad.Id})" : $"CAD id {CadPad.Id}";
     public string CadLayer => string.IsNullOrWhiteSpace(CadPad.Layer) ? "Layer: -" : $"Layer: {CadPad.Layer}";

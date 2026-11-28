@@ -1,9 +1,8 @@
 namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
-/// Holds the canvas display switches and the DXF import flags of the main view model. The view model
-/// replaces the whole value when one of them changes and forwards one property per member so the bindings
-/// keep their names.
+/// Supplies the existing default values for canvas display switches and DXF import choices.
+/// Live values belong to the separate appearance and import owners; the root properties keep their binding names.
 /// </summary>
 /// <param name="ShowCad">Whether CAD pads should be displayed on the canvas.</param>
 /// <param name="ShowRegular">Whether regular pads should be displayed on the canvas.</param>

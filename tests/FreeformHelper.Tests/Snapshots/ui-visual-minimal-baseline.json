@@ -1,14 +1,14 @@
 {
   "version": "1.0",
   "files": {
-    "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml": "0fe327fc436aa72887e0d16556790f82f696561c066f79125abafebd28d8c7bb",
-    "src/FreeformHelper.UI/Styles/Controls.axaml": "c7d20df744546434fb507fee93427aae58f06ca52e2cd7c8fb54d1f14a6c92dd",
-    "src/FreeformHelper.UI/Views/CanvasOverlayControls.axaml": "111054b07d2f6e594cbe487931c84ea15783108a0947fa222dfe16698c59c576",
-    "src/FreeformHelper.UI/Views/ConsolePanel.axaml": "d6d63e9cf864b8d40f47d920364635c80d736e49729f8e88b5e9fd732b59f0d6",
-    "src/FreeformHelper.UI/Views/FreeformHelperView.axaml": "211363bce23b30c0dd2346c8f7156d47e29e0fe2dfeba271330ad41ce5baecd5",
-    "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml": "d11be2b6c661bc641bdf2374103de7596576c0a111fe00d85e58f11c21182c8b",
-    "src/FreeformHelper.UI/Views/PadInfoPopover.axaml": "84cbd7d8b21eba1a48f75ded62ce921f4d1cda38f12c7b330da30bef9611caf8",
-    "src/FreeformHelper.UI/Views/RightWorkflowPanel.axaml": "27f8c70950caea38341088a08a7cf43a3239ca4db0508f4990de12f614032eaa",
-    "src/FreeformHelper.UI/Views/SettingsWindow.axaml": "903e9217179bf31640fc35165b51b48aae7887e4006f09288ac2092bbccd10e3"
+    "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml": "d2a13936131b227305fb9bd7be1fd94575ad1683a29b75123cf3941adf8d6ea4",
+    "src/FreeformHelper.UI/Styles/Controls.axaml": "7afb605c58aa84716b9144be8ac7446cf899b6bbdae4f229f448cfb59f7cb16f",
+    "src/FreeformHelper.UI/Views/CanvasOverlayControls.axaml": "254d0170f59a1ca7ca6f83381dce55b120fecb9182bf2a53842fed834ea1930d",
+    "src/FreeformHelper.UI/Views/ConsolePanel.axaml": "e268e149a6a445b432a2d23538f26a133b0d37ac8dca3576779fc1834cd3da21",
+    "src/FreeformHelper.UI/Views/FreeformHelperView.axaml": "eff5ef5921794d4e9650b1976896e40677b04554a8661df3d62029fcbef2bd05",
+    "src/FreeformHelper.UI/Views/LeftDxfPanel.axaml": "513e5d93742367048c8fe0602406949c120d8da96f6dee3f64c42c0c47f36350",
+    "src/FreeformHelper.UI/Views/PadInfoPopover.axaml": "1f272a7d12010e6aa1c926f56f523af2df3a724dcc307ae24cfc9340e4808f0d",
+    "src/FreeformHelper.UI/Views/RightWorkflowPanel.axaml": "175848c8861a9461f17b1475f7ce623939619b99f0715b1ce37e2d6dd513d3fe",
+    "src/FreeformHelper.UI/Views/SettingsWindow.axaml": "0c2dd9e908aa1b103124b4b6313cc3e77063fba9391781f091f49c7dd6394433"
   }
 }

@@ -3,12 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls">
   <!-- Scope shared roles to these dialogs, keeping the rest of the app unchanged. -->
-  <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
+  <Styles.Resources>
+    <ResourceDictionary>
+      <!-- This view keeps the soft choice-row fill; the application default is None. -->
+      <x:String x:Key="Nvt.Controls.RestFillMode">Soft</x:String>
+    </ResourceDictionary>
+  </Styles.Resources>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml"/>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
 
   <Style Selector="TextBlock.exportMuted, TextBlock.exportLabel">
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextMuted}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
     <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
     <Setter Property="VerticalAlignment" Value="Center"/>
   </Style>
@@ -49,8 +54,8 @@
     <Setter Property="VerticalContentAlignment" Value="Center"/>
   </Style>
   <Style Selector="TextBox.exportSearch">
-    <Setter Property="Background" Value="{DynamicResource BrushBgSurfaceInset}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource BrushFieldBorder}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderBrush}"/>
     <Setter Property="BorderThickness" Value="{DynamicResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{DynamicResource NfcSurfaceCornerRadius}"/>
     <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -63,13 +68,13 @@
   <!-- Checked rows own the mark. ListBox selection only tracks keyboard navigation. -->
   <Style Selector="ListBox.exportLayers ListBoxItem:selected">
     <Setter Property="Background" Value="{DynamicResource Nvt.List.TransparentBrush}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
   </Style>
   <Style Selector="ListBox.exportLayers ListBoxItem:pointerover, ListBox.exportLayers ListBoxItem:selected:pointerover">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractiveHover}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSelectionSurfaceBrush}"/>
   </Style>
   <Style Selector="ListBox.exportLayers ListBoxItem:pressed">
-    <Setter Property="Background" Value="{DynamicResource BrushBgInteractivePressed}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcSecondaryActionPressedBrush}"/>
   </Style>
   <Style Selector="ListBox.exportLayers ListBoxItem:selected /template/ Border#ListSelectionIndicator">
     <Setter Property="IsVisible" Value="False"/>

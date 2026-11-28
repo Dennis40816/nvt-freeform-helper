@@ -2,6 +2,7 @@ using System.Text.Json;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Infrastructure.Project;
 using NLog;
+using Nvt.Core.Hosting;
 
 namespace FreeformHelper.UI.Services;
 
@@ -143,13 +144,13 @@ public sealed class AppGeneralSettingsStore
 
     private static string BuildDefaultSettingsPath()
     {
-        var overridePath = Environment.GetEnvironmentVariable(SettingsPathOverrideEnvironmentVariable);
+        var overridePath = HostEnvironment.GetVariable(SettingsPathOverrideEnvironmentVariable);
         if (!string.IsNullOrWhiteSpace(overridePath))
         {
             return ExpandOverridePathTemplate(overridePath.Trim());
         }
 
-        var appDataRoot = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var appDataRoot = KnownFolders.GetLocalApplicationData();
         var appDir = Path.Combine(appDataRoot, "FreeformHelper");
         return Path.Combine(appDir, "app-general-settings.json");
     }

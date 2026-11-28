@@ -106,13 +106,13 @@ public sealed class SuppressionRecoveryBehaviorTests
     {
         using var fixture = new WorkspaceFixture();
         var vm = await fixture.OpenAsync();
-        vm.RegularVisibilityMaskUi.IsEnabled = true;
-        OnNextChange(vm.RegularVisibilityMaskUi, nameof(RegularVisibilityMaskUiState.IsEnabled), ThrowNotification);
+        vm.RegularMask.IsEnabled = true;
+        OnNextChange(vm.RegularMask, nameof(RegularMaskViewModel.IsEnabled), ThrowNotification);
 
         await vm.OpenDxfCommand.ExecuteAsync(null);
 
-        Assert.False(vm.RegularVisibilityMaskUi.IsEnabled);
-        vm.RegularVisibilityMaskUi.IsEnabled = true;
+        Assert.False(vm.RegularMask.IsEnabled);
+        vm.RegularMask.IsEnabled = true;
         Assert.Equal("Regular visibility mask enabled.", vm.StatusText);
         await WaitForGridRebuildAsync(vm);
     }

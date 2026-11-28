@@ -1,3 +1,5 @@
+using FreeformHelper.UI.ViewModels.Undo;
+
 namespace FreeformHelper.UI.ViewModels;
 
 /// <summary>
@@ -13,7 +15,23 @@ public sealed partial class FreeformHelperViewModel
     /// <summary>
     /// Gets a value indicating whether there are any actions currently available to be undone.
     /// </summary>
-    public bool CanUndo => _undoService.CanUndo;
+    public bool CanUndo => UndoCoordinator.CanUndo;
+
+    // UI thread only. The shared suppression and history instances remain in the host.
+    private UndoOwner? _undoOwner;
+
+    private UndoOwner UndoCoordinator => _undoOwner ??= new UndoOwner(
+        () => _isLoadingSettings,
+        () => _undoSuppression.IsActive,
+        () => _undoSuppression.Enter(),
+        (undo, description) => _undoService.Push(undo, description),
+        () => _undoService.TryPop(out var entry)
+            ? (true, entry.Undo, entry.Description)
+            : (false, null, null),
+        () => _undoService.CanUndo,
+        () => UndoCommand?.NotifyCanExecuteChanged(),
+        status => SetStatus(status),
+        name => OnPropertyChanged(name));
 
     /// <summary>
     /// Pushes a new undoable action onto the undo stack.
@@ -22,15 +40,7 @@ public sealed partial class FreeformHelperViewModel
     /// <param name="description">A description of the change, used for UI feedback.</param>
     private void PushUndo(Action undo, string description)
     {
-        // Suppress undo recording during programmatic changes or settings loading.
-        if (_undoSuppression.IsActive || _isLoadingSettings)
-        {
-            return;
-        }
-
-        _undoService.Push(undo, description);
-        UndoCommand?.NotifyCanExecuteChanged(); // Notify UI that undo command's CanExecute state might have changed.
-        OnPropertyChanged(nameof(CanUndo)); // Notify UI that CanUndo property has changed.
+        UndoCoordinator.PushUndo(undo, description);
     }
 
     /// <summary>
@@ -44,19 +54,7 @@ public sealed partial class FreeformHelperViewModel
     /// <param name="description">A description of the change.</param>
     private void TrackUndo<T>(T oldValue, T newValue, Action<T> assign, string description)
     {
-        // Suppress undo recording during programmatic changes or settings loading.
-        if (_undoSuppression.IsActive || _isLoadingSettings)
-        {
-            return;
-        }
-
-        // Only push an undo entry if the value has actually changed.
-        if (EqualityComparer<T>.Default.Equals(oldValue, newValue))
-        {
-            return;
-        }
-
-        PushUndo(() => assign(oldValue), description); // Push an action to restore the old value.
+        UndoCoordinator.TrackUndo(oldValue, newValue, assign, description);
     }
 
     /// <summary>
@@ -64,17 +62,6 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public void Undo()
     {
-        if (!_undoService.TryPop(out var entry))
-        {
-            return; // Nothing to undo.
-        }
-        using (_undoSuppression.Enter())
-        {
-            entry.Undo(); // Execute the undo action.
-        }
-
-        SetStatus($"Undo: {entry.Description}"); // Update status text with undo information.
-        UndoCommand?.NotifyCanExecuteChanged(); // Notify UI that undo command's CanExecute state might have changed.
-        OnPropertyChanged(nameof(CanUndo)); // Notify UI that CanUndo property has changed.
+        UndoCoordinator.Undo();
     }
 }

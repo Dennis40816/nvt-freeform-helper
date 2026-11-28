@@ -1,8 +1,8 @@
-using System.Diagnostics;
 using System.Globalization;
 using Avalonia.Threading;
 using FreeformHelper.Application.Services;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Inspector;
 using Nvt.Core.Avalonia.Threading;
 
 namespace FreeformHelper.UI.ViewModels;
@@ -12,209 +12,114 @@ public sealed partial class FreeformHelperViewModel
     internal const string DeferredCadInspectorRefreshWorkName = "deferred-cad-inspector-refresh";
     internal const string DeferredRegularInspectorRefreshWorkName = "deferred-regular-inspector-refresh";
 
-    private const int PadInspectorDeferredRefreshDelayMs = 200;
-    private const int RegularPadInspectorDeferredRefreshDelayMs = 150;
-
-    private CancellationTokenSource? _padInspectorDeferredRefreshCts;
-    private long _padInspectorDeferredRefreshRequestId;
-    private CancellationTokenSource? _regularPadInspectorDeferredRefreshCts;
-    private long _regularPadInspectorDeferredRefreshRequestId;
-
-    public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId)
+    private InspectorRefreshOwner<DeferredCadInspectorContext> CreateInspectorRefreshOwner(
+        PadInspectorRequestState requests, Action<bool> writePending)
     {
-        QueueDeferredCadInspectorSnapshotRefresh(
-            cadPadId,
-            Interlocked.Read(ref _padInspectorSelectionRevision));
-    }
-
-    public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId, long selectionRevision)
-    {
-        CancelDeferredCadInspectorSnapshotRefresh(clearPendingState: false);
-        var cts = new CancellationTokenSource();
-        _padInspectorDeferredRefreshCts = cts;
-        var requestId = Interlocked.Increment(ref _padInspectorDeferredRefreshRequestId);
-        UpdatePadInspectorDeferredRefreshPendingState();
-        BackgroundWork.Run(
+        var deferred = new InspectorDeferredRefreshOwner(
+            requests,
+            new InspectorDeferredContextPorts(
+                TryResolveNotchComputationInputs,
+                () => _grid,
+                () => CreateExportSettingsSnapshot(_projectFile.Settings),
+                () => SelectedNotchCompensationModelOption.Value,
+                () => EnableToRegular,
+                () => EnableToFull,
+                () => EnableToFullRuleEngine,
+                () => EnableToFullRuleTrace,
+                GetStrictOverlapRatioForNotchCompensation,
+                CaptureDeferredInspectorWorkflow,
+                BuildNotchComputationGridFingerprint,
+                () => _workflowDataSnapshotRevision,
+                () => _notchComputationSession.Revision),
+            new InspectorDeferredResultPorts(
+                BuildDeferredInspectorResolvedAsync,
+                BuildToFullDiagnosticsText,
+                (id, diagnostics) => BuildCadPadInspectorSnapshot(
+                    id, includeExpensiveNotchDetails: true, precomputedDiagnostics: diagnostics),
+                () => PadInspectorUi.Snapshot,
+                snapshot => PadInspectorUi.Snapshot = snapshot));
+        return new InspectorRefreshOwner<DeferredCadInspectorContext>(
+            requests,
+            new InspectorRefreshPorts<DeferredCadInspectorContext>(
+                deferred.CaptureDeferredCadInspectorContext,
+                deferred.ResolveDeferredCadInspectorAsync,
+                deferred.TryApplyDeferredCadInspectorSnapshot,
+                deferred.CanApplyDeferredRegularInspectorSnapshot,
+                BuildRegularPadInspectorSnapshot,
+                snapshot => PadInspectorUi.Snapshot = snapshot,
+                (name, work) => BackgroundWork.Run(name, work),
+                DispatchInspectorRefreshAsync,
+                (delay, token) => Task.Delay(TimeSpan.FromMilliseconds(delay), TimeProvider.System, token),
+                RunInspectorRefreshSafelyAsync,
+                (context, elapsed, delay) => _logger.Debug(CultureInfo.InvariantCulture,
+                    "Pad inspector deferred refresh applied: CAD={0}, elapsed={1}ms (delay={2}ms).",
+                    context.ResolutionRequest.CadPad.Id, elapsed, delay),
+                (id, elapsed, delay) => _logger.Debug(CultureInfo.InvariantCulture,
+                    "Pad inspector deferred refresh applied: REG={0}, elapsed={1}ms (delay={2}ms).",
+                    id, elapsed, delay),
+                (ex, id) => _logger.Warn(ex, "Pad inspector deferred refresh failed: CAD={0}.", id),
+                (ex, id) => _logger.Warn(ex, "Pad inspector deferred refresh failed: REG={0}.", id)),
+            writePending,
             DeferredCadInspectorRefreshWorkName,
-            () => RunDeferredCadInspectorSnapshotRefreshAsync(requestId, cadPadId, selectionRevision, cts, cts.Token));
+            DeferredRegularInspectorRefreshWorkName);
     }
 
-    public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId)
+    private InspectorDeferredCadWorkflow CaptureDeferredInspectorWorkflow()
     {
-        QueueDeferredRegularInspectorSnapshotRefresh(
-            regularPadId,
-            Interlocked.Read(ref _padInspectorSelectionRevision));
+        var snapshot = BuildWorkflowDataSnapshot();
+        return new InspectorDeferredCadWorkflow(
+            id => snapshot.TryGetCadIcIndex(id, out var index) ? index : (int?)null,
+            id => snapshot.TryGetCadOutputFwDiffIndex(id, out var index) ? index : (int?)null,
+            (cad, allCad, activeRegular, strictOverlap, precomputed, buildIfMissing) => GetOrBuildCadV22ResolvedResultCached(
+                cad, allCad, activeRegular, snapshot, strictOverlap,
+                precomputedResolved: precomputed, buildIfMissing: buildIfMissing));
     }
 
-    public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId, long selectionRevision)
+    private static Task<NotchV22ResolvedResult> BuildDeferredInspectorResolvedAsync(
+        InspectorDeferredCadRequest request, CancellationToken cancellationToken)
     {
-        CancelDeferredRegularInspectorSnapshotRefresh(clearPendingState: false);
-        var cts = new CancellationTokenSource();
-        _regularPadInspectorDeferredRefreshCts = cts;
-        var requestId = Interlocked.Increment(ref _regularPadInspectorDeferredRefreshRequestId);
-        UpdatePadInspectorDeferredRefreshPendingState();
-        BackgroundWork.Run(
-            DeferredRegularInspectorRefreshWorkName,
-            () => RunDeferredRegularInspectorSnapshotRefreshAsync(requestId, regularPadId, selectionRevision, cts, cts.Token));
-    }
-
-    private void CancelDeferredCadInspectorSnapshotRefresh(bool clearPendingState)
-    {
-        var cts = Interlocked.Exchange(ref _padInspectorDeferredRefreshCts, null);
-        if (cts is not null)
-        {
-            try
-            {
-                cts.Cancel();
-            }
-            finally
-            {
-                cts.Dispose();
-            }
-        }
-
-        if (clearPendingState)
-        {
-            UpdatePadInspectorDeferredRefreshPendingState();
-        }
-    }
-
-    private void CancelDeferredRegularInspectorSnapshotRefresh(bool clearPendingState)
-    {
-        var cts = Interlocked.Exchange(ref _regularPadInspectorDeferredRefreshCts, null);
-        if (cts is not null)
-        {
-            try
-            {
-                cts.Cancel();
-            }
-            finally
-            {
-                cts.Dispose();
-            }
-        }
-
-        if (clearPendingState)
-        {
-            UpdatePadInspectorDeferredRefreshPendingState();
-        }
-    }
-
-    private bool TryCreateDeferredCadInspectorContext(
-        long requestId,
-        int cadPadId,
-        long selectionRevision,
-        out DeferredCadInspectorContext context)
-    {
-        context = null!;
-        if (!TryResolveNotchComputationInputs(cadPadId, out var cad, out var allCadPads, out var activeRegularPadIds))
-        {
-            return false;
-        }
-
-        if (_grid is null)
-        {
-            return false;
-        }
-
-        var activeRegularSnapshot = activeRegularPadIds is null
-            ? null
-            : activeRegularPadIds.ToHashSet();
-        var allCadSnapshot = allCadPads.ToList();
-        var strictOverlapRatio = GetStrictOverlapRatioForNotchCompensation();
-        var workflowSnapshot = BuildWorkflowDataSnapshot();
-        var anchorIcIndex = workflowSnapshot.TryGetCadIcIndex(cadPadId, out var icIndex)
-            ? icIndex
-            : (int?)null;
-        var anchorDiffIndex = workflowSnapshot.TryGetCadOutputFwDiffIndex(cadPadId, out var diffIndex)
-            ? diffIndex
-            : (int?)null;
         var resolutionRequest = new NotchResolvedResultRequest(
-            cad,
-            _grid,
-            CreateExportSettingsSnapshot(_projectFile.Settings),
-            allCadSnapshot,
-            activeRegularSnapshot,
-            SelectedNotchCompensationModelOption.Value,
-            EnableToRegular,
-            EnableToFull,
-            EnableToFullRuleEngine,
-            EnableToFullRuleTrace,
-            strictOverlapRatio,
-            anchorIcIndex,
-            anchorDiffIndex,
-            NotchV22TargetAllocationPolicy.ResolveAreaMode(SelectedNotchCompensationModelOption.Value));
+            request.CadPad, request.Grid, request.Settings, request.AllCadPads, request.ActiveRegularPadIds,
+            request.CompensationModel, request.EnableToRegular, request.EnableToFull,
+            request.EnableToFullRuleEngine, request.EnableToFullRuleTrace, request.StrictOverlapRatio,
+            request.AnchorIcIndex, request.AnchorDiffIndex, request.AllocationAreaMode);
+        return Task.Run(() => NotchDetailUseCase.BuildResolvedResult(resolutionRequest), cancellationToken);
+    }
 
-        context = new DeferredCadInspectorContext(
-            RequestId: requestId,
-            SelectionRevision: selectionRevision,
-            ResolutionRequest: resolutionRequest,
-            CadPoolFingerprint: ComputeCadPoolFingerprint(allCadSnapshot),
-            ActiveRegularHash: ComputeActiveRegularHash(activeRegularSnapshot),
-            GridFingerprint: BuildNotchComputationGridFingerprint(_grid),
-            PrewarmedResolved: GetOrBuildCadV22ResolvedResultCached(
-                cad,
-                allCadSnapshot,
-                activeRegularSnapshot,
-                workflowSnapshot,
-                strictOverlapRatio,
-                buildIfMissing: false),
-            WorkflowDataSnapshotRevision: _workflowDataSnapshotRevision,
-            CacheRevision: _notchCompensationCacheRevision);
+    public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId) =>
+        Inspector.Refresh.QueueDeferredCadInspectorSnapshotRefresh(cadPadId);
+
+    public void QueueDeferredCadInspectorSnapshotRefresh(int cadPadId, long selectionRevision) =>
+        Inspector.Refresh.QueueDeferredCadInspectorSnapshotRefresh(cadPadId, selectionRevision);
+
+    public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId) =>
+        Inspector.Refresh.QueueDeferredRegularInspectorSnapshotRefresh(regularPadId);
+
+    public void QueueDeferredRegularInspectorSnapshotRefresh(int regularPadId, long selectionRevision) =>
+        Inspector.Refresh.QueueDeferredRegularInspectorSnapshotRefresh(regularPadId, selectionRevision);
+
+    private void CancelDeferredCadInspectorSnapshotRefresh(bool clearPendingState) =>
+        Inspector.Refresh.CancelCad(clearPendingState);
+
+    private void CancelDeferredRegularInspectorSnapshotRefresh(bool clearPendingState) =>
+        Inspector.Refresh.CancelRegular(clearPendingState);
+
+    private static async Task<bool> DispatchInspectorRefreshAsync(Action action, CancellationToken cancellationToken)
+    {
+        if (!UiThread.TryGetRunningDispatcher(out var dispatcher))
+        {
+            return false;
+        }
+
+        await dispatcher!.InvokeAsync(action, DispatcherPriority.Background, cancellationToken);
         return true;
     }
 
-    private async Task RunDeferredCadInspectorSnapshotRefreshAsync(
-        long requestId,
-        int cadPadId,
-        long selectionRevision,
-        CancellationTokenSource cts,
-        CancellationToken cancellationToken)
+    private static async Task RunInspectorRefreshSafelyAsync(Func<Task> work, Action<Exception> warn, Action complete)
     {
-        var sw = Stopwatch.StartNew();
-        DeferredCadInspectorContext? context = null;
         try
         {
-            await Task.Delay(TimeSpan.FromMilliseconds(PadInspectorDeferredRefreshDelayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
-            if (cancellationToken.IsCancellationRequested || requestId != Interlocked.Read(ref _padInspectorDeferredRefreshRequestId))
-            {
-                return;
-            }
-
-            if (!UiThread.TryGetRunningDispatcher(out var dispatcher))
-            {
-                return;
-            }
-
-            await dispatcher!.InvokeAsync(() =>
-            {
-                context = CaptureDeferredCadInspectorContext(requestId, cadPadId, selectionRevision, cancellationToken);
-            }, DispatcherPriority.Background, cancellationToken);
-
-            if (context is null)
-            {
-                return;
-            }
-
-            var (resolved, diagnostics) = await ResolveDeferredCadInspectorAsync(context, cancellationToken).ConfigureAwait(false);
-
-            if (!UiThread.TryGetRunningDispatcher(out dispatcher))
-            {
-                return;
-            }
-
-            await dispatcher!.InvokeAsync(() =>
-            {
-                if (!TryApplyDeferredCadInspectorSnapshot(context, resolved, diagnostics))
-                {
-                    return;
-                }
-
-                _logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: CAD={0}, elapsed={1}ms (delay={2}ms).",
-                    context.ResolutionRequest.CadPad.Id,
-                    sw.ElapsedMilliseconds,
-                    PadInspectorDeferredRefreshDelayMs);
-            }, DispatcherPriority.Background, cancellationToken);
+            await work().ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -222,257 +127,11 @@ public sealed partial class FreeformHelperViewModel
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {
-            _logger.Warn(
-                ex,
-                "Pad inspector deferred refresh failed: CAD={0}.",
-                cadPadId);
+            warn(ex);
         }
         finally
         {
-            if (ReferenceEquals(Interlocked.CompareExchange(ref _padInspectorDeferredRefreshCts, null, cts), cts))
-            {
-                cts.Dispose();
-                UpdatePadInspectorDeferredRefreshPendingState();
-            }
+            complete();
         }
     }
-
-    private DeferredCadInspectorContext? CaptureDeferredCadInspectorContext(
-        long requestId,
-        int cadPadId,
-        long selectionRevision,
-        CancellationToken cancellationToken)
-    {
-        if (cancellationToken.IsCancellationRequested || requestId != Interlocked.Read(ref _padInspectorDeferredRefreshRequestId))
-        {
-            return null;
-        }
-
-        if (!TryCreateDeferredCadInspectorContext(requestId, cadPadId, selectionRevision, out var created))
-        {
-            return null;
-        }
-
-        return created;
-    }
-
-    private static async Task<(NotchV22ResolvedResult Resolved, string? Diagnostics)> ResolveDeferredCadInspectorAsync(
-        DeferredCadInspectorContext context,
-        CancellationToken cancellationToken)
-    {
-        var resolved = context.PrewarmedResolved;
-        if (resolved is null)
-        {
-            resolved = await Task.Run(
-                () => NotchDetailUseCase.BuildResolvedResult(context.ResolutionRequest),
-                cancellationToken).ConfigureAwait(false);
-        }
-
-        var diagnostics = BuildToFullDiagnosticsText(resolved.Compensation);
-        return (resolved, diagnostics);
-    }
-
-    private bool TryApplyDeferredCadInspectorSnapshot(
-        DeferredCadInspectorContext context,
-        NotchV22ResolvedResult resolved,
-        string? diagnostics)
-    {
-        if (!CanApplyDeferredCadInspectorSnapshot(context))
-        {
-            return false;
-        }
-
-        var request = context.ResolutionRequest;
-        if (context.PrewarmedResolved is null)
-        {
-            _ = GetOrBuildCadV22ResolvedResultCached(
-                request.CadPad,
-                request.AllCadPads,
-                request.ActiveRegularPadIds,
-                BuildWorkflowDataSnapshot(),
-                request.StrictOverlapRatio,
-                precomputedResolved: resolved);
-        }
-        var snapshot = BuildCadPadInspectorSnapshot(
-            request.CadPad.Id,
-            includeExpensiveNotchDetails: true,
-            precomputedDiagnostics: diagnostics);
-        if (snapshot is null)
-        {
-            return false;
-        }
-
-        PadInspectorUi.Snapshot = snapshot;
-        return true;
-    }
-
-    private async Task RunDeferredRegularInspectorSnapshotRefreshAsync(
-        long requestId,
-        int regularPadId,
-        long selectionRevision,
-        CancellationTokenSource cts,
-        CancellationToken cancellationToken)
-    {
-        var sw = Stopwatch.StartNew();
-        try
-        {
-            await Task.Delay(TimeSpan.FromMilliseconds(RegularPadInspectorDeferredRefreshDelayMs), TimeProvider.System, cancellationToken).ConfigureAwait(false);
-            if (cancellationToken.IsCancellationRequested ||
-                requestId != Interlocked.Read(ref _regularPadInspectorDeferredRefreshRequestId))
-            {
-                return;
-            }
-
-            if (!UiThread.TryGetRunningDispatcher(out var dispatcher))
-            {
-                return;
-            }
-
-            await dispatcher!.InvokeAsync(() =>
-            {
-                if (!CanApplyDeferredRegularInspectorSnapshot(requestId, regularPadId, selectionRevision))
-                {
-                    return;
-                }
-
-                var snapshot = BuildRegularPadInspectorSnapshot(
-                    regularPadId,
-                    includeMatchDetails: true,
-                    includeRuleTrace: true);
-                if (snapshot is null)
-                {
-                    return;
-                }
-
-                PadInspectorUi.Snapshot = snapshot;
-                _logger.Debug(CultureInfo.InvariantCulture, "Pad inspector deferred refresh applied: REG={0}, elapsed={1}ms (delay={2}ms).",
-                    regularPadId,
-                    sw.ElapsedMilliseconds,
-                    RegularPadInspectorDeferredRefreshDelayMs);
-            }, DispatcherPriority.Background, cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            // Deferred refresh canceled.
-        }
-        catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
-        {
-            _logger.Warn(
-                ex,
-                "Pad inspector deferred refresh failed: REG={0}.",
-                regularPadId);
-        }
-        finally
-        {
-            if (ReferenceEquals(Interlocked.CompareExchange(ref _regularPadInspectorDeferredRefreshCts, null, cts), cts))
-            {
-                cts.Dispose();
-                UpdatePadInspectorDeferredRefreshPendingState();
-            }
-        }
-    }
-
-    private bool CanApplyDeferredCadInspectorSnapshot(DeferredCadInspectorContext context)
-    {
-        var request = context.ResolutionRequest;
-        if (context.RequestId != Interlocked.Read(ref _padInspectorDeferredRefreshRequestId))
-        {
-            return false;
-        }
-
-        if (context.SelectionRevision != Interlocked.Read(ref _padInspectorSelectionRevision))
-        {
-            return false;
-        }
-
-        if (_notchCompensationCacheRevision != context.CacheRevision)
-        {
-            return false;
-        }
-
-        if (_workflowDataSnapshotRevision != context.WorkflowDataSnapshotRevision)
-        {
-            return false;
-        }
-
-        if (_grid is null || BuildNotchComputationGridFingerprint(_grid) != context.GridFingerprint)
-        {
-            return false;
-        }
-
-        if (!TryResolveNotchComputationInputs(
-                request.CadPad.Id,
-                out var currentCadPad,
-                out var currentCadPads,
-                out var currentActiveRegularPadIds) ||
-            ComputeCadPoolFingerprint(currentCadPads) != context.CadPoolFingerprint ||
-            ComputeActiveRegularHash(currentActiveRegularPadIds) != context.ActiveRegularHash)
-        {
-            return false;
-        }
-
-        if (EnableToRegular != request.EnableToRegular ||
-            EnableToFull != request.EnableToFull ||
-            EnableToFullRuleEngine != request.EnableToFullRuleEngine ||
-            EnableToFullRuleTrace != request.EnableToFullRuleTrace)
-        {
-            return false;
-        }
-
-        var currentStrictOverlapRatio = GetStrictOverlapRatioForNotchCompensation();
-        if (Math.Abs(currentStrictOverlapRatio - request.StrictOverlapRatio) > 1e-12)
-        {
-            return false;
-        }
-
-        if (context.PrewarmedResolved is not null &&
-            !ReferenceEquals(
-                GetOrBuildCadV22ResolvedResultCached(
-                    currentCadPad,
-                    currentCadPads,
-                    currentActiveRegularPadIds,
-                    BuildWorkflowDataSnapshot(),
-                    request.StrictOverlapRatio,
-                    buildIfMissing: false),
-                context.PrewarmedResolved))
-        {
-            return false;
-        }
-
-        return PadInspectorUi.Snapshot?.Cad?.CadPadId == request.CadPad.Id;
-    }
-
-    private bool CanApplyDeferredRegularInspectorSnapshot(long requestId, int regularPadId, long selectionRevision)
-    {
-        if (requestId != Interlocked.Read(ref _regularPadInspectorDeferredRefreshRequestId))
-        {
-            return false;
-        }
-
-        if (selectionRevision != Interlocked.Read(ref _padInspectorSelectionRevision))
-        {
-            return false;
-        }
-
-        return PadInspectorUi.Snapshot?.Regular?.RegularPadId == regularPadId;
-    }
-
-    private void UpdatePadInspectorDeferredRefreshPendingState()
-    {
-        PadInspectorUi.IsDeferredRefreshPending =
-            _padInspectorDeferredRefreshCts is not null ||
-            _regularPadInspectorDeferredRefreshCts is not null;
-    }
-
-    private sealed record DeferredCadInspectorContext(
-        long RequestId,
-        long SelectionRevision,
-        NotchResolvedResultRequest ResolutionRequest,
-        ulong CadPoolFingerprint,
-        int ActiveRegularHash,
-        ulong GridFingerprint,
-        NotchV22ResolvedResult? PrewarmedResolved,
-        int WorkflowDataSnapshotRevision,
-        int CacheRevision);
 }
-

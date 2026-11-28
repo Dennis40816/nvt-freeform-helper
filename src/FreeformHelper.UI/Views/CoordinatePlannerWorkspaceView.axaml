@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
              x:CompileBindings="True"
@@ -11,8 +11,8 @@
              x:Class="FreeformHelper.UI.Views.CoordinatePlannerWorkspaceView"
              x:Name="WorkspaceRoot"
              x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
-             Background="{DynamicResource BrushBgApp}"
-             Foreground="{DynamicResource BrushTextPrimary}">
+             Background="{DynamicResource NfcAppBackgroundBrush}"
+             Foreground="{DynamicResource NfcTextBrush}">
   <UserControl.Styles>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/MenuStyles.axaml"/>
   </UserControl.Styles>
@@ -27,29 +27,29 @@
     <sections:CoordinatePlannerWorkspaceControlsPaneView Grid.Column="0"/>
     <GridSplitter Grid.Column="1"
                   Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource BrushBorder}"
+                  Background="{DynamicResource NfcBorderMutedBrush}"
                   HorizontalAlignment="Stretch"
                   ShowsPreview="True"/>
     <Border Grid.Column="2" Background="{DynamicResource BrushCanvasBackground}" ClipToBounds="True">
       <Grid x:Name="CoordinatePreviewHost" RowDefinitions="Auto,*" ClipToBounds="True">
         <Border Grid.Row="0" Classes="workspaceSecondPeekBar">
           <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="{DynamicResource Space6}">
-            <Button Classes="actionGhost actionIconButton"
+            <Button Classes="canvasToolbarIcon"
                     ToolTip.Tip="Fit AA canvas (F)"
                     Command="{Binding FitCanvasCommand}">
-              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.FitScreen}"/>
+              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.FitScreen}"/>
             </Button>
             <ToggleButton Grid.Column="1"
-                          Classes="actionGhost actionIconButton"
+                          Classes="canvasToolbarIcon"
                           ToolTip.Tip="Toggle regular grid"
                           IsChecked="{Binding ShowRegular, Mode=TwoWay}">
-              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.Layers}"/>
+              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.Layers}"/>
             </ToggleButton>
             <ToggleButton Grid.Column="2"
-                          Classes="actionGhost actionIconButton"
+                          Classes="canvasToolbarIcon"
                           ToolTip.Tip="Toggle regular row and column labels"
                           IsChecked="{Binding ShowRegularAxisLabels, Mode=TwoWay}">
-              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.Straighten}"/>
+              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.Straighten}"/>
             </ToggleButton>
             <ComboBox Grid.Column="3"
                       Width="{DynamicResource CoordinateOverlayModeComboWidth}"
@@ -62,8 +62,8 @@
                 </DataTemplate>
               </ComboBox.ItemTemplate>
             </ComboBox>
-            <Button Grid.Column="5" Classes="actionGhost actionIconButton" ToolTip.Tip="Export preview image…">
-              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.ArrowDownward}"/>
+            <Button Grid.Column="5" Classes="canvasToolbarIcon" ToolTip.Tip="Export preview image…">
+              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.ArrowDownward}"/>
               <Button.Flyout>
                 <MenuFlyout Opened="PreviewImageMenu_Opened">
                   <MenuItem x:Name="PreviewImageDescription" Header="PNG / BMP" IsEnabled="False"/>
@@ -75,9 +75,9 @@
             </Button>
             <ToggleButton Grid.Column="6"
                           x:Name="CanvasHelpButton"
-                          Classes="actionGhost actionIconButton"
+                          Classes="canvasToolbarIcon"
                           ToolTip.Tip="Canvas help">
-              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:IconGlyphs.Info}"/>
+              <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.Info}"/>
             </ToggleButton>
             <Popup PlacementTarget="{Binding #CanvasHelpButton}"
                    Placement="BottomEdgeAlignedRight"
@@ -85,8 +85,8 @@
                    IsLightDismissEnabled="True"
                    Topmost="False"
                    PlacementConstraintAdjustment="FlipX,FlipY,SlideX,SlideY">
-              <Border Background="{DynamicResource BrushBgPanel}"
-                      BorderBrush="{DynamicResource BrushBorder}"
+              <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
+                      BorderBrush="{DynamicResource NfcBorderMutedBrush}"
                       BorderThickness="{DynamicResource BorderThin}"
                       CornerRadius="{DynamicResource RadiusMd}"
                       Padding="{DynamicResource Inset12}"
@@ -130,7 +130,7 @@
     </Border>
     <GridSplitter Grid.Column="3"
                   Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource BrushBorder}"
+                  Background="{DynamicResource NfcBorderMutedBrush}"
                   HorizontalAlignment="Stretch"
                   ShowsPreview="True"/>
     <sections:CoordinatePlannerWorkspaceDetailsPaneView Grid.Column="4"/>

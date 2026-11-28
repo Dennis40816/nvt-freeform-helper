@@ -217,6 +217,36 @@ public sealed class SimulationIntegratedLayoutTests
     }
 
     [AvaloniaFact]
+    public async Task WorkspaceViewIsVisibleOnlyWhileTheHostHasAUsableWorkspaceAsync()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var host = new SimulationHostViewModel { RequestBuildWorkspaceAsync = () => Task.CompletedTask };
+        var view = new SimulationHostView { DataContext = host };
+        var window = CreateWindow(view);
+        try
+        {
+            window.Show();
+            await HeadlessUiPump.FlushQueueAsync();
+            var workspaceView = view.GetVisualDescendants().OfType<SimulationWorkspaceView>().Single();
+
+            Assert.False(workspaceView.IsVisible, "No workspace: the workspace view stays hidden.");
+            host.CurrentWorkspace = CreateWorkspace();
+            await HeadlessUiPump.FlushQueueAsync();
+            Assert.True(workspaceView.IsVisible, "A workspace without a build failure is shown.");
+            host.SetBuildFailure("No Regular grid in the current workspace.");
+            await HeadlessUiPump.FlushQueueAsync();
+            Assert.False(workspaceView.IsVisible, "A workspace with a build failure is hidden behind the failure overlay.");
+            host.SetBuildFailure(null);
+            await HeadlessUiPump.FlushQueueAsync();
+            Assert.True(workspaceView.IsVisible, "Clearing the failure shows the workspace again.");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public async Task ConsoleStartsCollapsedAndFollowsTheShellStateAsync()
     {
         HeadlessAppBootstrap.EnsureInitialized();

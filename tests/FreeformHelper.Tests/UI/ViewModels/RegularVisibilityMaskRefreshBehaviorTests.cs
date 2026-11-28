@@ -39,12 +39,12 @@ public sealed class RegularVisibilityMaskRefreshBehaviorTests
         await WaitForGridRebuildAsync(vm);
 
         Assert.True(result.IsLoaded);
-        Assert.Equal(enabled, vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.Equal(enabled, vm.RegularMask.IsEnabled);
         var expectedSummary = enabled
             ? $"Regular visibility mask enabled: {expectedLabel} loaded, active=1, inactive=1, frames=1. " +
               "Step 4 geometry seed only uses active regulars."
             : $"Regular visibility mask loaded but disabled: {expectedLabel}. Step 4 uses pure geometry seed.";
-        Assert.Equal(expectedSummary, vm.RegularVisibilityMaskUi.Summary);
+        Assert.Equal(expectedSummary, vm.RegularMask.Summary);
     }
 
     [AvaloniaFact]
@@ -57,16 +57,16 @@ public sealed class RegularVisibilityMaskRefreshBehaviorTests
         cascade.XChannels = 3;
         await WaitForGridRebuildAsync(vm);
 
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularMask.IsEnabled);
         Assert.Equal(3, vm.RegularPads.Count);
         Assert.StartsWith(
             $"Regular visibility mask: {Path.GetFileName(maskPath)} incompatible with current grid 1x3. Ignored.",
-            vm.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
+            vm.RegularMask.Summary, StringComparison.Ordinal);
 
         cascade.XChannels = 2;
         await WaitForGridRebuildAsync(vm);
 
-        Assert.Contains("active=1, inactive=1, frames=1", vm.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
+        Assert.Contains("active=1, inactive=1, frames=1", vm.RegularMask.Summary, StringComparison.Ordinal);
     }
 
     [AvaloniaFact]
@@ -79,16 +79,16 @@ public sealed class RegularVisibilityMaskRefreshBehaviorTests
         vm.ActiveAreaWidth = 22;
         await WaitForGridRebuildAsync(vm);
 
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularMask.IsEnabled);
         Assert.StartsWith(
             $"Regular visibility mask: failed to load {Path.GetFileName(maskPath)}. Ignored.",
-            vm.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
+            vm.RegularMask.Summary, StringComparison.Ordinal);
 
         WriteMask(maskPath);
         vm.ActiveAreaWidth = 20;
         await WaitForGridRebuildAsync(vm);
 
-        Assert.Contains("active=1, inactive=1, frames=1", vm.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
+        Assert.Contains("active=1, inactive=1, frames=1", vm.RegularMask.Summary, StringComparison.Ordinal);
     }
 
     [AvaloniaFact]
@@ -106,10 +106,10 @@ public sealed class RegularVisibilityMaskRefreshBehaviorTests
         vm.NotchExportProgressText = "Previous export completed.";
         var revision = vm.SimulationWorkspaceSourceRevision;
 
-        vm.RegularVisibilityMaskUi.IsEnabled = false;
+        vm.RegularMask.IsEnabled = false;
 
         Assert.Equal("Regular visibility mask disabled. Step 4 uses pure geometry seed.", vm.StatusText);
-        Assert.Contains("loaded but disabled", vm.RegularVisibilityMaskUi.Summary, StringComparison.Ordinal);
+        Assert.Contains("loaded but disabled", vm.RegularMask.Summary, StringComparison.Ordinal);
         Assert.Empty(vm.CadPads);
         Assert.All(cadIds, id => Assert.False(vm.TryGetCadOutputFwDiffIndex(id, out _)));
         Assert.Equal("Notch export: not run.", vm.NotchExportSummary);
@@ -149,7 +149,7 @@ public sealed class RegularVisibilityMaskRefreshBehaviorTests
         await vm.OpenDxfCommand.ExecuteAsync(null);
         await WaitForGridRebuildAsync(vm);
         await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularMask.IsEnabled);
         Assert.Equal(2, vm.RegularPads.Count);
         return (vm, maskPath);
     }

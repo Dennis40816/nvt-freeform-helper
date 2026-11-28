@@ -3,6 +3,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
 using Xunit;

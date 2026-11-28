@@ -29,7 +29,7 @@ public sealed class DxfGeometrySelectionBoundaryTests
         var combined = Assert.Single(vm.CadPads, pad => originals.All(original => original.Id != pad.Id));
         Assert.Equal("signal", combined.Layer);
         vm.SelectedDxfEditRotationScopeOption = vm.DxfEditRotationScopeOptions.Single(
-            option => option.Value == FreeformHelperViewModel.DxfEditRotationScope.TargetLayer);
+            option => option.Value == FreeformHelper.UI.CadEditing.DxfEditRotationScope.TargetLayer);
         vm.DxfEditRotationLayerName = " SIGNAL ";
         vm.DxfEditRotationDegrees = -270m;
         Assert.True(vm.CanRotateSelectedCadPads);

@@ -1,201 +1,68 @@
 using System.Globalization;
+using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.ViewModels.Sizing;
 
 namespace FreeformHelper.UI.ViewModels;
 
-/// <summary>
-/// This partial class of <see cref="FreeformHelperViewModel"/> manages the functionality
-/// related to manual sizing adjustments of the regular grid. It handles user input for
-/// specifying ranges of rows/columns and applying desired widths/heights.
-/// </summary>
 public sealed partial class FreeformHelperViewModel
 {
-    // Flag to suppress manual sizing application during initial settings loading or other controlled updates.
+    // UI thread only; construction is inert and identity lasts for the root lifetime.
+    private readonly Lazy<ManualSizingOwner> _manualSizingOwner;
+    private ManualSizingOwner ManualSizing => _manualSizingOwner.Value;
 
-    /// <summary>
-    /// Partial method invoked when the <see cref="ManualRowsRange"/> property changes.
-    /// Triggers an update of the manual range status and attempts to apply manual sizing.
-    /// </summary>
-    /// <param name="value">The new value of <see cref="ManualRowsRange"/>.</param>
-    partial void OnManualRowsRangeChanged(string value)
+    private ManualSizingOwner CreateManualSizingOwner() => new(new ManualSizingPorts(
+        () => _grid,
+        () => XChannels,
+        () => YChannels,
+        () => ActiveAreaWidth,
+        () => ActiveAreaHeight,
+        new ManualInputPorts(
+            OnPropertyChanging,
+            OnPropertyChanged,
+            () => _isLoadingSettings,
+            () => _settingsSuppression.IsManualSizingApplyActive,
+            TrackUndo,
+            TrackUndo),
+        new ManualRangePorts(
+            TryParseRowRange,
+            TryParseColRange,
+            FormatIndexRanges,
+            actualRow => ManualSizingService.ToDisplayRow(actualRow, _grid?.Rows ?? 0),
+            EvaluateManualRange,
+            () => _selectionCoordinator.ClearSelection(CanvasHost),
+            SyncSelectionFromManualRange),
+        new SizingEditPorts(
+            () => ApplyUiToSettings(_projectFile.Settings, markUnsaved: false),
+            ApplySizingMutation,
+            ResetSizingMutation,
+            () => _cadPadCustomValues,
+            PushUndo,
+            TriggerGridRebuildAsync,
+            () => _selection.SuppressClearOnRebuild = true,
+            MarkUnsaved,
+            SetStatus,
+            (message, args) => _logger.Debug(CultureInfo.InvariantCulture, message, args),
+            (message, args) => _logger.Info(CultureInfo.InvariantCulture, message, args),
+            (message, args) => _logger.Warn(CultureInfo.InvariantCulture, message, args))));
+
+    private void UpdateManualRangeStatus() => ManualSizing.UpdateManualRangeStatus();
+
+    private static ManualRangePlan EvaluateManualRange(
+        RegularGrid grid, string rows, string cols, decimal width, decimal height)
     {
-        // Suppress updates if settings are loading or manual sizing is temporarily suppressed.
-        if (_isLoadingSettings || _settingsSuppression.IsManualSizingApplyActive)
-        {
-            return;
-        }
-        UpdateManualRangeStatus(); // Update status text for the manual range input.
-        _ = TryApplyManualSizingAsync(); // Attempt to apply sizing asynchronously.
+        var plan = ManualSizingUseCase.Evaluate(grid, rows, cols, width, height);
+        return new ManualRangePlan(plan.HasError, plan.ErrorMessage,
+            plan.Action == ManualSizingAction.SyncSelection, plan.Action == ManualSizingAction.ApplySizing,
+            plan.Rows, plan.Cols, plan.Width, plan.Height);
     }
 
-    /// <summary>
-    /// Partial method invoked when the <see cref="ManualColsRange"/> property changes.
-    /// Triggers an update of the manual range status and attempts to apply manual sizing.
-    /// </summary>
-    /// <param name="value">The new value of <see cref="ManualColsRange"/>.</param>
-    partial void OnManualColsRangeChanged(string value)
-    {
-        // Suppress updates if settings are loading or manual sizing is temporarily suppressed.
-        if (_isLoadingSettings || _settingsSuppression.IsManualSizingApplyActive)
-        {
-            return;
-        }
-        UpdateManualRangeStatus(); // Update status text for the manual range input.
-        _ = TryApplyManualSizingAsync(); // Attempt to apply sizing asynchronously.
-    }
+    private bool TryParseRowRange(string input, out List<int> rows, out string error) =>
+        ManualSizingService.TryParseRowRange(input, _grid?.Rows ?? 0, out rows, out error);
 
-    /// <summary>
-    /// Partial method invoked when the <see cref="PendingColumnWidth"/> property changes.
-    /// Resets the mixed state for column width and attempts to apply manual sizing.
-    /// </summary>
-    /// <param name="value">The new value of <see cref="PendingColumnWidth"/>.</param>
-    partial void OnPendingColumnWidthChanged(decimal value)
-    {
-        // Suppress updates if settings are loading or manual sizing is temporarily suppressed.
-        if (_isLoadingSettings || _settingsSuppression.IsManualSizingApplyActive)
-        {
-            return;
-        }
-        IsPendingColumnWidthMixed = false; // Clear mixed state as a specific value is being set.
-        _ = TryApplyManualSizingAsync(); // Attempt to apply sizing asynchronously.
-    }
+    private bool TryParseColRange(string input, out List<int> cols, out string error) =>
+        ManualSizingService.TryParseColRange(input, _grid?.Cols ?? 0, out cols, out error);
 
-    /// <summary>
-    /// Partial method invoked when the <see cref="PendingRowHeight"/> property changes.
-    /// Resets the mixed state for row height and attempts to apply manual sizing.
-    /// </summary>
-    /// <param name="value">The new value of <see cref="PendingRowHeight"/>.</param>
-    partial void OnPendingRowHeightChanged(decimal value)
-    {
-        // Suppress updates if settings are loading or manual sizing is temporarily suppressed.
-        if (_isLoadingSettings || _settingsSuppression.IsManualSizingApplyActive)
-        {
-            return;
-        }
-        IsPendingRowHeightMixed = false; // Clear mixed state as a specific value is being set.
-        _ = TryApplyManualSizingAsync(); // Attempt to apply sizing asynchronously.
-    }
-
-    /// <summary>
-    /// Updates the UI status message related to the manual sizing range input.
-    /// Displays parsing errors or a summary of the selected range.
-    /// </summary>
-    private void UpdateManualRangeStatus()
-    {
-        ManualRangeError = string.Empty; // Clear previous errors.
-
-        // If no grid is built, indicate that.
-        if (_grid is null)
-        {
-            ManualRangeStatus = "Grid not built.";
-            return;
-        }
-
-        // Attempt to parse row and column ranges.
-        var rowsOk = TryParseRowRange(ManualRowsRange, out var rows, out _);
-        var colsOk = TryParseColRange(ManualColsRange, out var cols, out _);
-
-        // Update status based on parsing results.
-        if (!rowsOk && !colsOk)
-        {
-            ManualRangeStatus = "No manual range.";
-            return;
-        }
-        if (!rowsOk)
-        {
-            ManualRangeStatus = "Rows: invalid.";
-            return;
-        }
-        if (!colsOk)
-        {
-            ManualRangeStatus = "Cols: invalid.";
-            return;
-        }
-
-        // Format and display the selected ranges.
-        var rowLabel = FormatIndexRanges(rows.Select(ToDisplayRow)); // Convert to display rows for UI.
-        var colLabel = FormatIndexRanges(cols);
-        ManualRangeStatus = $"Manual range: Rows {rowLabel}, Cols {colLabel}.";
-    }
-
-    /// <summary>
-    /// Attempts to apply manual sizing based on the current <see cref="ManualRowsRange"/>,
-    /// <see cref="ManualColsRange"/>, <see cref="PendingColumnWidth"/>, and <see cref="PendingRowHeight"/>.
-    /// Displays errors if input is invalid.
-    /// </summary>
-    private async Task TryApplyManualSizingAsync()
-    {
-        if (_grid is null)
-        {
-            return; // Cannot apply sizing if no grid is built.
-        }
-
-        var rowsEmpty = string.IsNullOrWhiteSpace(ManualRowsRange);
-        var colsEmpty = string.IsNullOrWhiteSpace(ManualColsRange);
-
-        // If both ranges are empty, clear any errors and selection.
-        if (rowsEmpty && colsEmpty)
-        {
-            ManualRangeError = string.Empty;
-            _selectionCoordinator.ClearSelection(CanvasHost);
-            return;
-        }
-
-        // If one range is empty but the other is not, it's an incomplete input, so do nothing.
-        if (rowsEmpty || colsEmpty)
-        {
-            return;
-        }
-
-        var plan = ManualSizingUseCase.Evaluate(_grid, ManualRowsRange, ManualColsRange, PendingColumnWidth, PendingRowHeight);
-        if (plan.HasError)
-        {
-            ManualRangeError = plan.ErrorMessage;
-            return;
-        }
-
-        ManualRangeError = string.Empty; // Clear errors if parsing successful.
-
-        if (plan.Action == ManualSizingAction.SyncSelection)
-        {
-            SyncSelectionFromManualRange(plan.Rows, plan.Cols);
-            return;
-        }
-
-        if (plan.Action == ManualSizingAction.ApplySizing)
-        {
-            ApplySizingToCells(plan.Rows, plan.Cols, plan.Width, plan.Height);
-            var rowLabel = FormatIndexRanges(plan.Rows.Select(ToDisplayRow));
-            var colLabel = FormatIndexRanges(plan.Cols);
-            _logger.Debug(CultureInfo.InvariantCulture, "Manual sizing applied. Rows={0}, Cols={1}, Width={2}, Height={3}.", rowLabel, colLabel, PendingColumnWidth, PendingRowHeight);
-            SyncSelectionFromManualRange(plan.Rows, plan.Cols); // Update canvas selection.
-        }
-        await Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Wrapper around <see cref="ManualSizingService.TryParseRowRange"/> that uses the ViewModel's current grid.
-    /// </summary>
-    private bool TryParseRowRange(string input, out List<int> rows, out string error)
-    {
-        var totalRows = _grid?.Rows ?? 0;
-        return ManualSizingService.TryParseRowRange(input, totalRows, out rows, out error);
-    }
-
-    /// <summary>
-    /// Wrapper around <see cref="ManualSizingService.TryParseColRange"/> that uses the ViewModel's current grid.
-    /// </summary>
-    private bool TryParseColRange(string input, out List<int> cols, out string error)
-    {
-        var totalCols = _grid?.Cols ?? 0;
-        return ManualSizingService.TryParseColRange(input, totalCols, out cols, out error);
-    }
-
-    /// <summary>
-    /// Synchronizes the canvas selection to highlight the pads within the specified manual sizing range.
-    /// </summary>
-    /// <param name="rows">The list of actual row indices in the manual sizing range.</param>
-    /// <param name="cols">The list of column indices in the manual sizing range.</param>
     private void SyncSelectionFromManualRange(IReadOnlyList<int> rows, IReadOnlyList<int> cols)
     {
         if (_grid is null)
@@ -206,4 +73,3 @@ public sealed partial class FreeformHelperViewModel
         _selectionCoordinator.SelectRegularRange(_grid, rows, cols, CanvasHost);
     }
 }
-

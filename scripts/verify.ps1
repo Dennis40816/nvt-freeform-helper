@@ -238,15 +238,50 @@ function Invoke-TestShard {
                 $runFailed = $true
                 $directoryExceptionType = $_.Exception.GetType().FullName
             }
+            # Build the test project once for the whole shard. Each group then runs with -NoBuild, so the first
+            # group no longer builds inside its own 'dotnet test'. Only the exit code, the seconds and the error
+            # codes of the build are printed.
+            $buildPassed = $true
+            $buildStatus = @{ ExitCode = $null; ElapsedSeconds = $null; BuildErrorCodes = @() }
+            $buildExceptionType = ''
+            if ([string]::IsNullOrEmpty($directoryExceptionType)) {
+                try {
+                    & $runTestsScript -BuildOnly -Configuration $Configuration -UseNoAppHost `
+                        -AllowMissingExampleData:($AllowMissingExampleData -or $Unverified) `
+                        -RunStatus $buildStatus *> $null
+                } catch {
+                    $buildPassed = $false
+                    $runFailed = $true
+                    $buildExceptionType = $_.Exception.GetType().FullName
+                }
+                Write-Host ('[verify] build-step shard={0} exit={1} elapsed-seconds={2}' -f
+                    $Name, $buildStatus.ExitCode, $buildStatus.ElapsedSeconds)
+                if (@($buildStatus.BuildErrorCodes).Count -gt 0) {
+                    Write-Host ('[verify] build-step-errors shard={0} codes={1}' -f
+                        $Name, (@($buildStatus.BuildErrorCodes) -join ','))
+                }
+            }
             foreach ($group in $shardGroups[$Name]) {
+                if (-not $buildPassed) {
+                    # The groups are not run after a failed build. Each one is recorded with the build phase.
+                    $runDiagnostics.Add([pscustomobject]@{
+                        Group = $group
+                        Phase = 'build'
+                        ExitCode = $buildStatus.ExitCode
+                        ExceptionType = $buildExceptionType
+                        TrxFiles = 0
+                        DirectoryPresent = $false
+                    })
+                    continue
+                }
                 $groupDirectory = Join-Path $resultsDirectory $group
-                $runStatus = @{ ExitCode = $null; HostErrors = @() }
+                $runStatus = @{ ExitCode = $null; HostErrors = @(); RetryCount = 0; RedactedOutput = @() }
                 $phase = 'results-directory'
                 $exceptionType = $directoryExceptionType
                 if ([string]::IsNullOrEmpty($directoryExceptionType)) {
                     try {
                         $phase = 'run-tests'
-                        & $runTestsScript -Group $group -Configuration $Configuration -UseNoAppHost `
+                        & $runTestsScript -Group $group -Configuration $Configuration -UseNoAppHost -NoBuild `
                             -AllowMissingExampleData:($AllowMissingExampleData -or $Unverified) `
                             -ResultsDirectory $groupDirectory -RunStatus $runStatus *> $null
                         $phase = 'read-results'
@@ -255,6 +290,17 @@ function Invoke-TestShard {
                         $runFailed = $true
                         $exceptionType = $_.Exception.GetType().FullName
                     }
+                }
+                # A group that was run again after an empty start: numbers only, so the line cannot carry a test name.
+                if ([int]$runStatus.RetryCount -gt 0) {
+                    Write-Host ('[verify] retry-diagnostic group={0} retries={1} listed-tests={2} executed-tests={3}' -f
+                        $group, $runStatus.RetryCount, $runStatus.RetryListedTests, $runStatus.ExecutedTests)
+                }
+                # The redacted shape of each start that found no test, also when the start was run again and passed.
+                # run-tests.ps1 builds it from known message shapes only, so a test name, a path or a message text is
+                # already replaced.
+                foreach ($redactedRow in @($runStatus.RedactedOutput)) {
+                    Write-Host $redactedRow
                 }
                 # Only fixed labels from run-tests.ps1 are printed. The output they came from is never printed.
                 if (@($runStatus.HostErrors).Count -gt 0) {

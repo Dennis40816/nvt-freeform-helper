@@ -16,24 +16,14 @@ public sealed partial class NotchTableGenerator
         var allocations = GetOrBuildCadAllocations(cadPad, grid);
         if (allocations.Count == 0)
         {
-            return new NotchCadRowEligibility(
-                CadPadId: cadPad.Id,
-                EligibleVersions: Array.Empty<NotchAlgorithmVersion>(),
-                EstimatedRowCount: 0,
-                AnchorRegularPadId: null,
-                Reason: "No regular overlap.");
+            return CreateEmptyCadRowEligibility(cadPad.Id, "No regular overlap.");
         }
 
         var anchor = SelectCadAllocationAnchor(cadPad.Id, allocations);
         var maxRatio = allocations[0].Ratio;
         if (anchor is null)
         {
-            return new NotchCadRowEligibility(
-                CadPadId: cadPad.Id,
-                EligibleVersions: Array.Empty<NotchAlgorithmVersion>(),
-                EstimatedRowCount: 0,
-                AnchorRegularPadId: null,
-                Reason: "No Step2 freeform anchor.");
+            return CreateEmptyCadRowEligibility(cadPad.Id, "No Step2 freeform anchor.");
         }
 
         var eligible = new List<NotchAlgorithmVersion>();
@@ -69,6 +59,14 @@ public sealed partial class NotchTableGenerator
             Reason: reason);
     }
 
+    private static NotchCadRowEligibility CreateEmptyCadRowEligibility(int cadPadId, string reason) =>
+        new(
+            CadPadId: cadPadId,
+            EligibleVersions: Array.Empty<NotchAlgorithmVersion>(),
+            EstimatedRowCount: 0,
+            AnchorRegularPadId: null,
+            Reason: reason);
+
     private static NotchCadRowEligibility EvaluateLegacyEligibility(
         CadPad cadPad,
         RegularGrid grid,
@@ -80,12 +78,7 @@ public sealed partial class NotchTableGenerator
             .ToList();
         if (candidates.Count == 0)
         {
-            return new NotchCadRowEligibility(
-                CadPadId: cadPad.Id,
-                EligibleVersions: Array.Empty<NotchAlgorithmVersion>(),
-                EstimatedRowCount: 0,
-                AnchorRegularPadId: null,
-                Reason: "No matched freeform regular.");
+            return CreateEmptyCadRowEligibility(cadPad.Id, "No matched freeform regular.");
         }
 
         var cadArea = Math.Max(cadPad.Area, 1e-12);

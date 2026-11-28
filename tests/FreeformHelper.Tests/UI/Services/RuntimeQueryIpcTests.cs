@@ -103,7 +103,7 @@ public sealed class RuntimeQueryIpcTests
         using var shell = new ShellViewModel { IsDevPageAvailable = true };
         var projectFile = new ProjectFile();
         projectFile.Settings.Notch.NullValue = ushort.MaxValue + 1;
-        FreeformHelperViewModelPrivateAccess.ProjectFile(shell.FreeformHelper) = projectFile;
+        FreeformHelperViewModelPrivateAccess.ReplaceProjectFile(shell.FreeformHelper, projectFile);
 
         try
         {

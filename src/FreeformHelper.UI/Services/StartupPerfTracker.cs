@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using NLog;
+using Nvt.Core.Hosting;
 
 namespace FreeformHelper.UI.Services;
 
@@ -14,7 +15,7 @@ internal static class StartupPerfTracker
     private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
     private static long _lastElapsedMs;
     private static int _markerIndex;
-    private static readonly bool EmitAsInfo = IsTruthy(Environment.GetEnvironmentVariable("FREEFORM_PERF_MARKERS_INFO"));
+    private static readonly bool _emitAsInfo = IsTruthy(HostEnvironment.GetVariable("FREEFORM_PERF_MARKERS_INFO"));
 
     public static void Mark(string stage, string? detail = null)
     {
@@ -56,7 +57,7 @@ internal static class StartupPerfTracker
         if (string.IsNullOrWhiteSpace(detail))
         {
             const string message = "PERF STARTUP #{0}: stage={1}; elapsed={2}ms; delta={3}ms.";
-            if (EmitAsInfo)
+            if (_emitAsInfo)
             {
                 _logger.Info(CultureInfo.InvariantCulture, message, index, stage, elapsedMs, deltaMs);
             }
@@ -69,7 +70,7 @@ internal static class StartupPerfTracker
         }
 
         const string detailMessage = "PERF STARTUP #{0}: stage={1}; elapsed={2}ms; delta={3}ms; detail={4}.";
-        if (EmitAsInfo)
+        if (_emitAsInfo)
         {
             _logger.Info(CultureInfo.InvariantCulture, detailMessage, index, stage, elapsedMs, deltaMs, detail);
         }

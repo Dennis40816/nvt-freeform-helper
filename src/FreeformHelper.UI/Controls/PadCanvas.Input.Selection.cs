@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Threading;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 
@@ -147,35 +148,16 @@ public sealed partial class PadCanvas
                     return;
                 }
 
-                switch (hit.Kind)
+                var axis = hit.Kind switch
                 {
-                    case AxisLabelKind.Row:
-                        foreach (var pad in RegularPads)
-                        {
-                            if (pad.Row == hit.Index)
-                            {
-                                selectedRegIdx.Add(pad.Index);
-                            }
-                        }
-                        break;
-                    case AxisLabelKind.Column:
-                        foreach (var pad in RegularPads)
-                        {
-                            if (pad.Col == hit.Index)
-                            {
-                                selectedRegIdx.Add(pad.Index);
-                            }
-                        }
-                        break;
-                    case AxisLabelKind.Ic:
-                        foreach (var pad in RegularPads)
-                        {
-                            if (pad.IcIndex == hit.Index)
-                            {
-                                selectedRegIdx.Add(pad.Index);
-                            }
-                        }
-                        break;
+                    AxisLabelKind.Row => PadSelectionPolicy.Axis.Row,
+                    AxisLabelKind.Column => PadSelectionPolicy.Axis.Column,
+                    AxisLabelKind.Ic => PadSelectionPolicy.Axis.Ic,
+                    _ => (PadSelectionPolicy.Axis)(-1),
+                };
+                foreach (var index in PadSelectionPolicy.ResolveAxis(RegularPads, axis, hit.Index))
+                {
+                    selectedRegIdx.Add(index);
                 }
             },
             clearExisting: !additive,
@@ -257,14 +239,8 @@ public sealed partial class PadCanvas
         Point anchorCenter = GetPadCenter(anchorHit);
         Point currentCenter = GetPadCenter(currentHit);
 
-        var worldRect = new Rect2(
-            Math.Min(anchorCenter.X, currentCenter.X),
-            Math.Min(anchorCenter.Y, currentCenter.Y),
-            Math.Max(anchorCenter.X, currentCenter.X),
-            Math.Max(anchorCenter.Y, currentCenter.Y)
-        );
-        // Inflate slightly to ensure pads whose centers are exactly on the edge are included
-        worldRect = new Rect2(worldRect.MinX - 1.0, worldRect.MinY - 1.0, worldRect.MaxX + 1.0, worldRect.MaxY + 1.0);
+        var worldRect = PadSelectionPolicy.ExtendBounds(
+            new Point2(anchorCenter.X, anchorCenter.Y), new Point2(currentCenter.X, currentCenter.Y));
 
         SelectPadsInWorldRect(worldRect, additive: false);
 

@@ -44,7 +44,7 @@
           <SelectableTextBlock Classes="settingsSectionTitle"
                                Text="Signal semantics"/>
           <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Area ratio stays primary; To Full only gates boundary support."/>
+                               Text="To Full expands pads into reachable free area."/>
         </StackPanel>
         <WrapPanel>
           <Border Classes="chipStatus">
@@ -73,7 +73,7 @@
                       Classes="panelFormField right">
             <SelectableTextBlock Text="To Full meaning"/>
             <SelectableTextBlock Classes="stepNote"
-                                 Text="Allow boundary targets; cap impossible expansion."
+                                 Text="Expand into free area; cap impossible expansion."
                                  TextWrapping="Wrap"/>
           </StackPanel>
         </Grid>
@@ -113,7 +113,7 @@
                 ColumnSpacing="{StaticResource Space10}">
             <StackPanel Grid.Column="0"
                         Classes="panelFormField right">
-              <controls:SettingsInfoLabel Text="To Full EN (derived)" Tip="Derived from the selected compensation model; enables boundary support/cap logic."/>
+              <controls:SettingsInfoLabel Text="To Full EN (derived)" Tip="Derived from the selected compensation model; enables To Full expansion."/>
               <SelectableTextBlock Classes="stepNote"
                                    Text="From selected model."
                                    TextWrapping="Wrap"/>
@@ -128,7 +128,7 @@
           </Grid>
         </Grid>
         <StackPanel Classes="panelFormField">
-          <controls:SettingsInfoLabel Text="Multi-owner strict overlap (%)" Tip="Minimum regular-area overlap ratio required before a CAD can own or block a boundary target."/>
+          <controls:SettingsInfoLabel Text="Multi-owner strict overlap (%)" Tip="To Full ignores overlaps and free areas below this ratio. A smaller target share is ignored unless To Full applies to it. Blocking does not use this value."/>
           <controls:NumberScrubber Minimum="0"
                                    Maximum="100"
                                    SmallChange="0.1"
@@ -136,7 +136,7 @@
                                    SnapToStep="False"
                                    Value="{Binding ToFullStrictOverlapPercent, Mode=TwoWay}"/>
           <SelectableTextBlock Classes="stepNote"
-                               Text="Higher rejects ambiguous boundary targets sooner."
+                               Text="Higher ignores smaller overlaps."
                                TextWrapping="Wrap"/>
         </StackPanel>
         <Grid ColumnDefinitions="1*,1*"
@@ -146,9 +146,9 @@
                 ColumnSpacing="{StaticResource Space10}">
             <StackPanel Grid.Column="0"
                         Classes="panelFormField left">
-              <controls:SettingsInfoLabel Text="Use To Full rule engine" Tip="ON uses the newer centralized To Full boundary gate engine; OFF falls back to the legacy inline gate path."/>
+              <controls:SettingsInfoLabel Text="Use To Full rule engine" Tip="ON uses the newer centralized To Full gate engine; OFF falls back to the legacy inline gate path."/>
               <SelectableTextBlock Classes="stepNote"
-                                   Text="Controls the To Full boundary-gate implementation path."
+                                   Text="Controls the To Full gate implementation path."
                                    TextWrapping="Wrap"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"

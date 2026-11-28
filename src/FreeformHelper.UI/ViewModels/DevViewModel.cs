@@ -8,6 +8,8 @@ namespace FreeformHelper.UI.ViewModels;
 /// </summary>
 public sealed partial class DevViewModel : ObservableObject
 {
+    public NotchDetailViewModel NotchDetailPreview { get; } = NotchDetailPreviewSample.Build();
+
     internal UiEventRunner? UiEvents { get; init; }
 
     [ObservableProperty]

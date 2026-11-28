@@ -1,0 +1,281 @@
+using Nvt.Core.RuntimeQuery;
+
+namespace FreeformHelper.UI.Services;
+
+/// <summary>
+/// Runtime query commands that drive the workflow and the selection: load-project, run-step, clear-step, select-cad, select-regular, clear-selection and set-tofull.
+/// </summary>
+internal sealed class RuntimeQueryWorkflowCommands
+{
+    private readonly RuntimeQueryContext _context;
+
+    public RuntimeQueryWorkflowCommands(RuntimeQueryContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    /// <summary>Adds the commands of this group to the registry.</summary>
+    /// <param name="registry">The registry that receives the handlers.</param>
+    public void Register(RuntimeQueryCommandRegistry registry)
+    {
+        registry.Add("load-project", QueryLoadProjectAsync);
+        registry.Add("run-step", QueryRunStepAsync);
+        registry.AddSync("clear-step", QueryClearStep);
+        registry.AddSync("select-cad", QuerySelectCad);
+        registry.AddSync("select-regular", QuerySelectRegular);
+        registry.AddSync("clear-selection", _ => QueryClearSelection());
+        registry.AddSync("set-tofull", QuerySetToFull);
+    }
+
+    private async Task<RuntimeQueryResponseEnvelope> QueryLoadProjectAsync(IReadOnlyDictionary<string, string>? args)
+    {
+        if (!RuntimeQueryArgumentParser.TryGetStringArg(args, "path", out var path, out var error) || error is not null)
+        {
+            return error ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--path' is required for query load-project.");
+        }
+
+        var helper = _context.Shell.FreeformHelper;
+        var result = await helper.LoadProjectFromPathAsync(path);
+        if (!result.IsLoaded)
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: result.Code,
+                message: result.Message);
+        }
+
+        var workflow = helper.GetWorkflowStateSnapshot();
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            path = result.Path,
+            statusText = helper.StatusText,
+            cadCount = helper.CadPads.Count,
+            regularCount = helper.RegularPads.Count,
+            workflow = new
+            {
+                hasCad = workflow.HasCad,
+                hasGrid = workflow.HasGrid,
+                hasStep1Result = workflow.HasStep1Result,
+                hasStep2Result = workflow.HasStep2Result,
+                hasStep3Result = workflow.HasStep3Result,
+                hasStep4Result = workflow.HasStep4Result
+            },
+            timings = new
+            {
+                result.TotalElapsedMs,
+                result.PersistenceElapsedMs,
+                result.ApplyStateElapsedMs,
+                result.DxfElapsedMs,
+                result.RebuildElapsedMs,
+                stepReplay = new
+                {
+                    result.Step1ReplayElapsedMs,
+                    result.Step2ReplayElapsedMs,
+                    result.Step1Replayed,
+                    result.Step2Replayed
+                }
+            }
+        });
+    }
+
+    private async Task<RuntimeQueryResponseEnvelope> QueryRunStepAsync(IReadOnlyDictionary<string, string>? args)
+    {
+        if (!RuntimeQueryArgumentParser.TryGetIntArg(args, "step", 1, 4, out var step, out var stepError) || stepError is not null)
+        {
+            return stepError ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--step' is required for query run-step.");
+        }
+
+        var helper = _context.Shell.FreeformHelper;
+        var stepId = step switch
+        {
+            1 => WorkflowStepId.Step1Match,
+            2 => WorkflowStepId.Step2Freeform,
+            3 => WorkflowStepId.Step3NotchPreview,
+            4 => WorkflowStepId.Step4IndexDiagnostics,
+            _ => WorkflowStepId.Step1Match
+        };
+
+        WorkflowStepExecutionResult result = default!;
+
+        async Task RunStepAsync()
+        {
+            result = await helper.RunWorkflowStepAsync(stepId);
+        }
+
+        var stepFailure = await RuntimeQueryCommandOperation.RunAsync(
+            RunStepAsync,
+            "STEP_EXECUTION_FAILED",
+            ex => ex.Message);
+        if (stepFailure is not null)
+        {
+            return stepFailure;
+        }
+
+        if (!result.IsSupported)
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: $"Unsupported step '{step}'.");
+        }
+
+        if (!result.IsReady)
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "STEP_NOT_READY",
+                message: string.IsNullOrWhiteSpace(result.StatusText)
+                    ? $"Step {step} did not produce a ready result."
+                    : result.StatusText);
+        }
+
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            step,
+            statusText = result.StatusText,
+            workflow = RuntimeQueryResponseBuilder.BuildWorkflowPayload(result.Snapshot),
+            selection = RuntimeQueryResponseBuilder.BuildSelectionPayload(helper),
+            notchPreview = RuntimeQueryResponseBuilder.BuildNotchPreviewPayload(helper)
+        });
+    }
+
+    private RuntimeQueryResponseEnvelope QueryClearStep(IReadOnlyDictionary<string, string>? args)
+    {
+        if (!RuntimeQueryArgumentParser.TryGetIntArg(args, "step", 1, 5, out var step, out var stepError) || stepError is not null)
+        {
+            return stepError ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--step' is required for query clear-step.");
+        }
+
+        var helper = _context.Shell.FreeformHelper;
+        var stepId = step switch
+        {
+            1 => WorkflowStepId.Step1Match,
+            2 => WorkflowStepId.Step2Freeform,
+            3 => WorkflowStepId.Step3NotchPreview,
+            4 => WorkflowStepId.Step4IndexDiagnostics,
+            5 => WorkflowStepId.Step5Export,
+            _ => WorkflowStepId.Step1Match
+        };
+        var result = helper.ClearWorkflowStep(stepId);
+        if (!result.IsSupported)
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: $"Unsupported step '{step}'.");
+        }
+
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            step,
+            statusText = result.StatusText,
+            workflow = RuntimeQueryResponseBuilder.BuildWorkflowPayload(result.Snapshot),
+            notchPreview = RuntimeQueryResponseBuilder.BuildNotchPreviewPayload(helper)
+        });
+    }
+
+    private RuntimeQueryResponseEnvelope QuerySelectCad(IReadOnlyDictionary<string, string>? args)
+    {
+        var selectedIds = RuntimeQuerySelectionParser.ParseCadSelectionArgs(args, out var error);
+        if (error is not null)
+        {
+            return error;
+        }
+
+        var helper = _context.Shell.FreeformHelper;
+        var visibleCadIds = helper.CadPads.Select(static pad => pad.Id).ToHashSet();
+        var effective = selectedIds.Where(visibleCadIds.Contains).Distinct().OrderBy(id => id).ToList();
+        var missing = selectedIds.Where(id => !visibleCadIds.Contains(id)).Distinct().OrderBy(id => id).ToList();
+
+        if (effective.Count == 0)
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "PAD_NOT_FOUND",
+                message: missing.Count > 0
+                    ? $"CAD pads not visible: {string.Join(", ", missing)}"
+                    : "No CAD output pads selected.");
+        }
+
+        helper.ApplyCanvasSelection(effective, Array.Empty<int>());
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            selectedCadIds = effective,
+            missingCadIds = missing,
+            selection = RuntimeQueryResponseBuilder.BuildSelectionPayload(helper),
+            statusText = helper.StatusText
+        });
+    }
+
+    private RuntimeQueryResponseEnvelope QuerySelectRegular(IReadOnlyDictionary<string, string>? args)
+    {
+        var helper = _context.Shell.FreeformHelper;
+        var regularById = helper.RegularPads.ToDictionary(static pad => pad.RegularPadId, static pad => pad.Index);
+        var regularIndices = RuntimeQuerySelectionParser.ParseRegularSelectionArgs(
+            args,
+            regularById,
+            out var error,
+            out var missingRegularIds,
+            out var missingRegularIndices);
+        if (error is not null)
+        {
+            return error;
+        }
+
+        if (regularIndices.Count == 0)
+        {
+            return RuntimeQueryResponseEnvelope.Failure(
+                code: "PAD_NOT_FOUND",
+                message: "No visible regular pads selected.");
+        }
+
+        helper.ApplyCanvasSelection(Array.Empty<int>(), regularIndices);
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            selectedRegularIndices = regularIndices,
+            selectedRegularPadIds = helper.RegularPads
+                .Where(pad => regularIndices.Contains(pad.Index))
+                .Select(pad => pad.RegularPadId)
+                .Distinct()
+                .OrderBy(id => id)
+                .ToList(),
+            missingRegularPadIds = missingRegularIds,
+            missingRegularIndices,
+            selection = RuntimeQueryResponseBuilder.BuildSelectionPayload(helper),
+            statusText = helper.StatusText
+        });
+    }
+
+    private RuntimeQueryResponseEnvelope QueryClearSelection()
+    {
+        var helper = _context.Shell.FreeformHelper;
+        helper.ClearSelectionCommand.Execute(null);
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            selection = RuntimeQueryResponseBuilder.BuildSelectionPayload(helper),
+            statusText = helper.StatusText
+        });
+    }
+
+    private RuntimeQueryResponseEnvelope QuerySetToFull(IReadOnlyDictionary<string, string>? args)
+    {
+        if (!RuntimeQueryArgumentParser.TryGetBoolArg(args, "enable", out var enable, out var error) || error is not null)
+        {
+            return error ?? RuntimeQueryResponseEnvelope.Failure(
+                code: "INVALID_ARGUMENTS",
+                message: "Argument '--enable' is required for query set-tofull.");
+        }
+
+        var helper = _context.Shell.FreeformHelper;
+        helper.EnableToFull = enable;
+        var workflow = helper.GetWorkflowStateSnapshot();
+        return RuntimeQueryResponseEnvelope.Success(new
+        {
+            enableToFull = helper.EnableToFull,
+            statusText = helper.StatusText,
+            workflow = RuntimeQueryResponseBuilder.BuildWorkflowPayload(workflow),
+            notchPreview = RuntimeQueryResponseBuilder.BuildNotchPreviewPayload(helper)
+        });
+    }
+}
