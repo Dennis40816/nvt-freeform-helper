@@ -78,8 +78,6 @@ public sealed partial class PadCanvas
     private Dictionary<int, ISolidColorBrush>? _cadAreaBrushCache; // Cache for Avalonia brushes for area-colored CAD pads.
     private CadSpatialIndex? _cadIndex; // Spatial index for efficient querying of CAD pads.
     private RegularSpatialIndex? _regularIndex; // Spatial index for efficient querying of regular pads.
-    private readonly PadCanvasSelectionEngine _selectionEngine;
-    private readonly PadCanvasVisibleDrawListBuilder _visibleDrawListBuilder;
 
     /// <summary>
     /// Caches <see cref="ISolidColorBrush"/> instances to avoid creating new brush objects repeatedly.
@@ -87,6 +85,9 @@ public sealed partial class PadCanvas
     /// </summary>
     private readonly Dictionary<uint, ISolidColorBrush> _brushCache = new(); // General brush cache.
     private readonly Dictionary<string, TextLayout> _labelLayoutCache = new(); // Cache for rendered text layouts (labels).
+
+    private PadCanvasQueryState CreateQueryState(bool showCad, bool showRegular) =>
+        new(CadPads, RegularPads, _cadIndex, _regularIndex, showCad, showRegular);
 
     internal enum AxisLabelKind
     {
@@ -97,3 +98,30 @@ public sealed partial class PadCanvas
 
     internal readonly record struct AxisLabelHit(AxisLabelKind Kind, int Index, Rect Bounds);
 }
+
+internal readonly record struct PadCanvasQueryState(
+    IReadOnlyList<CadPad>? CadPads,
+    IReadOnlyList<RegularPad>? RegularPads,
+    PadCanvas.CadSpatialIndex? CadIndex,
+    PadCanvas.RegularSpatialIndex? RegularIndex,
+    bool ShowCad,
+    bool ShowRegular);
+
+internal readonly record struct PadCanvasVisibleDrawState(
+    bool ShowRegular,
+    bool ShowCad,
+    bool LowDetailMode,
+    double Zoom,
+    double LowDetailZoomThreshold,
+    double MaxRegularStep,
+    double MaxCadUnselected,
+    double MinCadScreenSize,
+    IReadOnlySet<int> SelectedRegularIndices,
+    IReadOnlySet<int> SelectedCadIds,
+    IReadOnlySet<int> HighlightedCadIds);
+
+internal readonly record struct PadCanvasVisibleDrawBuffers(
+    List<RegularPad> RegularUnselected,
+    List<RegularPad> RegularSelected,
+    List<CadPad> CadUnselected,
+    List<CadPad> CadSelected);

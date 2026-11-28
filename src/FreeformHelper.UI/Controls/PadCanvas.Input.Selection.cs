@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Threading;
 using FreeformHelper.Application.Services;
@@ -180,12 +181,34 @@ public sealed partial class PadCanvas
     /// <returns>A <see cref="HitResult"/> indicating the hit item.</returns>
     private HitResult HitTest(Point screenPoint, bool regularOnly = false)
     {
-        return _selectionEngine.HitTest(screenPoint, regularOnly);
+        var world = ScreenToWorld(screenPoint);
+        EnsureSelectionIndexes(regularOnly: false, showRegular: ShowRegular);
+        return PadCanvasSelectionEngine.HitTest(world, CreateQueryState(ShowCad, ShowRegular), regularOnly);
+    }
+
+    private void EnsureSelectionIndexes(bool regularOnly, bool showRegular)
+    {
+        if (!regularOnly && ShowCad && CadPads is { Count: > 0 })
+        {
+            EnsureCadSpatialIndex();
+        }
+
+        if (showRegular && RegularPads is { Count: > 0 })
+        {
+            EnsureRegularSpatialIndex();
+        }
     }
 
     private HitResult HitTestForHoverDebug(Point screenPoint, bool regularOnly = false)
     {
-        return _selectionEngine.HitTestForHoverDebug(screenPoint, regularOnly);
+        var world = ScreenToWorld(screenPoint);
+        if (regularOnly)
+        {
+            EnsureSelectionIndexes(regularOnly: true, showRegular: true);
+            return PadCanvasSelectionEngine.HitTest(world, CreateQueryState(showCad: false, showRegular: true), regularOnly: true);
+        }
+
+        return HitTest(screenPoint, regularOnly: false);
     }
 
     /// <summary>
@@ -250,7 +273,36 @@ public sealed partial class PadCanvas
     // Helper method to get the center of a pad.
     private Point GetPadCenter(HitResult hit)
     {
-        return _selectionEngine.GetPadCenter(hit);
+        if (hit.kind == HitKind.Cad && CadPads is { Count: > 0 })
+        {
+            foreach (var cad in CadPads)
+            {
+                if (cad.Id != hit.idOrIndex)
+                {
+                    continue;
+                }
+
+                return new Point(
+                    (cad.Bounds.MinX + cad.Bounds.MaxX) / 2,
+                    (cad.Bounds.MinY + cad.Bounds.MaxY) / 2);
+            }
+        }
+        else if (hit.kind == HitKind.Regular && RegularPads is { Count: > 0 })
+        {
+            foreach (var pad in RegularPads)
+            {
+                if (pad.Index != hit.idOrIndex)
+                {
+                    continue;
+                }
+
+                return new Point(
+                    (pad.Bounds.MinX + pad.Bounds.MaxX) / 2,
+                    (pad.Bounds.MinY + pad.Bounds.MaxY) / 2);
+            }
+        }
+
+        return new Point(0, 0);
     }
 
     /// <summary>
@@ -401,7 +453,20 @@ public sealed partial class PadCanvas
     /// <param name="regularOnly">If true, only regular pads are selected inside the rectangle.</param>
     private void SelectPadsInWorldRect(Rect2 wRect, bool additive, bool regularOnly = false)
     {
-        _selectionEngine.SelectPadsInWorldRect(wRect, additive, regularOnly);
+        var stopwatch = Stopwatch.StartNew();
+        EnsureSelectionIndexes(regularOnly, ShowRegular);
+        var result = PadCanvasSelectionEngine.SelectPadsInWorldRect(wRect, CreateQueryState(ShowCad, ShowRegular), regularOnly);
+        stopwatch.Stop();
+        ApplyRectangleSelectionResult(
+            result.CadIds,
+            result.RegularIndices,
+            additive,
+            regularOnly,
+            stopwatch.ElapsedMilliseconds,
+            result.CadCandidates,
+            result.RegularCandidates,
+            result.UsedCadIndex,
+            result.UsedRegularIndex);
     }
 
     /// <summary>
