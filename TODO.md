@@ -31,4 +31,4 @@
 # Shell tabs (inventory item F8, owner question Q147)
 
 - [x] Dev tab: release builds hide it, development builds show it. A development build has a pre-release suffix in its version (`X.Y.Z-g.N`, see the version rules in `ROADMAP.md`), and an unknown version counts as development. This is the default of owner question Q147 (inventory F8, PC chat Q40) until the owner decides. `ShellViewModel.IsDevPageAvailable` is a required property: the app start passes `AppBuildChannel.IsDevelopmentBuild` and every test says which value it wants
-- [ ] The How To Use text (`HowToUseView.axaml`, "Top tabs: Freeform Helper, How To Use, Dev.") still lists the Dev tab, so a release build describes a tab the user cannot see. Fix it in a separate PR together with the other stale texts
+- [x] The How To Use text (`HowToUseView.axaml`, "Top tabs: Freeform Helper, How To Use, Dev.") still lists the Dev tab, so a release build describes a tab the user cannot see. Fix it in a separate PR together with the other stale texts

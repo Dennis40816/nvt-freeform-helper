@@ -4,7 +4,9 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FreeformHelper.Domain.Geometry;
+using FreeformHelper.UI.Views;
 using Point = Avalonia.Point;
 using Rect = Avalonia.Rect;
 using ShapePath = Avalonia.Controls.Shapes.Path;
@@ -25,6 +27,7 @@ internal sealed class PadInfoOverlayRenderer
     private readonly Func<Rect2?> _getBoundsWorld;
     private readonly Func<IReadOnlyList<Rect2>> _getSelectedBounds;
     private bool _isLayoutUpdateQueued; // UI thread only.
+    private bool _isPopoverObserved; // UI thread only.
 
     public PadInfoOverlayRenderer(
         Control resourceOwner,
@@ -46,6 +49,10 @@ internal sealed class PadInfoOverlayRenderer
         _worldToScreen = worldToScreen;
         _getBoundsWorld = getBoundsWorld;
         _getSelectedBounds = getSelectedBounds;
+        if (getCanvas() is { } canvas)
+        {
+            canvas.SizeChanged += (_, _) => QueueLayoutUpdate();
+        }
     }
 
     /// <summary>Posts one Background update that reads the current controls and bounds.</summary>
@@ -73,14 +80,31 @@ internal sealed class PadInfoOverlayRenderer
             return;
         }
 
+        if (!_isPopoverObserved && popover is PadInfoPopover padInfoPopover)
+        {
+            _isPopoverObserved = true;
+            Avalonia.AvaloniaObjectExtensions.GetObservable(padInfoPopover, PadInfoPopover.IsCloseConfirmVisibleProperty)
+                .Subscribe(_ => QueueLayoutUpdate());
+        }
+
         if (!overlay.IsVisible || _getBoundsWorld() is not { } bounds)
         {
             return;
         }
 
-        var panelSize = MeasurePopover(popover, overlay.Bounds.Size);
         var canvasOrigin = Avalonia.VisualExtensions.TranslatePoint(canvas, new Point(0, 0), overlay) ?? new Point(0, 0);
         var canvasRect = new Rect(canvasOrigin, canvas.Bounds.Size);
+        var gap = WorkspaceLayoutResourcePolicy.GetResourceDouble(_resourceOwner, "PadInfoGap", 20.0);
+        popover.MaxHeight = double.PositiveInfinity;
+        var naturalSize = MeasurePopover(popover, new Size(canvasRect.Width, double.PositiveInfinity));
+        var scroll = popover.GetVisualDescendants().OfType<ScrollViewer>()
+            .FirstOrDefault(static control => control.Classes.Contains("viewportBoundScroll"));
+        // Keep the fixed chrome and confirmation bar, plus one visible control row in the scroll area.
+        var contentHeight = scroll?.DesiredSize.Height ?? 0;
+        var visibleContentHeight = WorkspaceLayoutResourcePolicy.GetResourceDouble(_resourceOwner, "FormControlHeight", 32.0);
+        var minimumHeight = naturalSize.Height - contentHeight + Math.Min(contentHeight, visibleContentHeight);
+        popover.MaxHeight = Math.Max(minimumHeight, canvasRect.Height - (2 * gap));
+        var panelSize = MeasurePopover(popover, new Size(canvasRect.Width, popover.MaxHeight));
         var selectionRect = BuildSelectionScreenRect(canvas, overlay, bounds);
         var selectionVisible = PadInfoLayoutCalculator.RectsOverlap(selectionRect, canvasRect);
         var anchorWorld = PadInfoLayoutCalculator.ChooseAnchor(bounds, _getSelectedBounds());
@@ -91,7 +115,6 @@ internal sealed class PadInfoOverlayRenderer
             : 0.0;
         anchorScreen = PadInfoLayoutCalculator.ClampPointToRect(anchorScreen, canvasRect, anchorClampMargin);
 
-        var gap = WorkspaceLayoutResourcePolicy.GetResourceDouble(_resourceOwner, "PadInfoGap", 20.0);
         var minLine = WorkspaceLayoutResourcePolicy.GetResourceDouble(_resourceOwner, "PadInfoMinLineLength", 20.0);
         var lineInset = WorkspaceLayoutResourcePolicy.GetResourceDouble(_resourceOwner, "PadInfoLineInset", 12.0);
 
