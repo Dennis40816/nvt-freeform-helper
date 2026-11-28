@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using FreeformHelper.Tests.TestInfrastructure;
 using Xunit;
 
@@ -279,7 +280,20 @@ public sealed partial class UiLayoutGuardTests
     {
         var repoRoot = TestPaths.RepoRoot;
 
-        var devView = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "DevView.axaml"));
+        var viewsPath = Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views");
+        var devView = TestFiles.ReadContent(Path.Combine(viewsPath, "DevView.axaml"));
+        XNamespace sectionNamespace = "clr-namespace:FreeformHelper.UI.Views.DevSections";
+        var sections = XDocument.Parse(devView).Descendants()
+            .Where(element => element.Name.Namespace == sectionNamespace).ToArray();
+        Assert.Collection(sections,
+            static section => Assert.Equal("DevSidebarPreviewView", section.Name.LocalName),
+            static section => Assert.Equal("DevActionRolePreviewView", section.Name.LocalName),
+            static section => Assert.Equal("DevPadHeaderPreviewView", section.Name.LocalName));
+        foreach (var section in sections)
+        {
+            devView += TestFiles.ReadContent(Path.Combine(viewsPath, "DevSections", $"{section.Name.LocalName}.axaml"));
+        }
+
         Assert.Contains("Classes=\"dxfEditMiniAction actionDanger\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkToggleButton chipAction\"", devView, StringComparison.Ordinal);
         Assert.Contains("Classes=\"dxfLayerBulkMixedIndicator\"", devView, StringComparison.Ordinal);

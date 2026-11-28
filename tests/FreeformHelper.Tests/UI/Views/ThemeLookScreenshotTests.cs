@@ -13,6 +13,7 @@ using FreeformHelper.UI;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
+using FreeformHelper.UI.Views.DevSections;
 using Nvt.Core.Avalonia.Panels;
 using Xunit;
 
@@ -136,9 +137,10 @@ public sealed class ThemeLookScreenshotTests
     private static async Task CaptureDevButtonsAsync(MainWindow window, string output)
     {
         var dev = Assert.Single(window.GetVisualDescendants().OfType<DevView>());
+        var actionRoles = Assert.Single(dev.GetVisualDescendants().OfType<DevActionRolePreviewView>());
         foreach (var name in new[] { "Primary", "Neutral", "Danger", "Ghost", "Flatghost", "Chip", "Icon", "Product" })
         {
-            var samples = dev.FindControl<Control>($"{name}ButtonSamples");
+            var samples = actionRoles.FindControl<Control>($"{name}ButtonSamples");
             Assert.NotNull(samples);
             samples.BringIntoView();
             await SaveFrameAsync(window, output, $"dev-buttons-{name.ToLowerInvariant()}.png");
