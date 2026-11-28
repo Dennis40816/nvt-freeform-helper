@@ -121,12 +121,13 @@ public sealed class CadLoadSpinnerProcessHostRestartTests
     }
 
     [AvaloniaFact]
-    public void Show_WhenTheProcessIsRunning_SendsShowWithoutStartingAProcess()
+    public async Task Show_WhenTheProcessIsRunning_SendsShowWithoutStartingAProcess()
     {
         var process = new FakeProcess(exited: false);
         using var host = new CadLoadSpinnerProcessHost(process.Send, process.StartAsync, () => process.HasExited);
 
         host.Show(new Window());
+        await AwaitStateSyncAsync(host.LatestStateSyncTask);
 
         Assert.Equal(0, process.Starts);
         Assert.Contains(CadLoadSpinnerIpcProtocol.ShowCommand, process.Commands);

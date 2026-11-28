@@ -63,10 +63,11 @@ public sealed class CadLoadSpinnerProcessHostTests
     }
 
     [AvaloniaFact]
-    public void Dispose_ResetsRequestedAndEffectiveVisibilityToHidden()
+    public async Task Dispose_ResetsRequestedAndEffectiveVisibilityToHidden()
     {
         using var host = new CadLoadSpinnerProcessHost(_ => true);
         host.Show(new Window());
+        await host.LatestStateSyncTask.WaitAsync(SafetyNetTimeout, TestContext.Current.CancellationToken);
         var shown = host.GetVisibilityStateSnapshot();
         Assert.Equal("Visible", shown.Requested);
         Assert.Equal("Visible", shown.Effective);
@@ -108,6 +109,7 @@ public sealed class CadLoadSpinnerProcessHostTests
         var owner = new Window();
 
         host.Show(owner);
+        await host.LatestStateSyncTask.WaitAsync(SafetyNetTimeout, TestContext.Current.CancellationToken);
         Assert.Equal("Visible", host.GetVisibilityStateSnapshot().Effective);
 
         host.Hide();

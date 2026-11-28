@@ -25,7 +25,7 @@
     "suppressUndoAssignments": [],
     "fileWriteAllText": [],
     "processStart": [
-      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:451"
+      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:441"
     ],
     "directClockReads": [],
     "bareCatch": [],
