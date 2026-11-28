@@ -111,7 +111,7 @@ public sealed partial class NumberScrubber
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == AutomationProperties.NameProperty && _inputBox is not null)
+        if (change.Property == AutomationProperties.NameProperty)
         {
             AutomationProperties.SetName(_inputBox, change.GetNewValue<string?>());
             return;

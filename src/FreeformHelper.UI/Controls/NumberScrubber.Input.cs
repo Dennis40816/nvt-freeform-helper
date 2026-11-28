@@ -9,15 +9,6 @@ public sealed partial class NumberScrubber
 {
     private void AttachControls()
     {
-        _rootBorder = this.FindControl<Border>("RootBorder");
-        _scrubArea = this.FindControl<Border>("ScrubArea");
-        _inputBox = this.FindControl<TextBox>("InputBox");
-
-        if (_inputBox is null || _scrubArea is null)
-        {
-            return;
-        }
-
         _inputBox.GotFocus += OnInputFocus;
         _inputBox.LostFocus += OnInputLostFocus;
         _inputBox.KeyDown += OnInputKeyDown;
@@ -34,22 +25,14 @@ public sealed partial class NumberScrubber
 
     private void UpdateReadOnlyState()
     {
-        if (_inputBox is null)
-        {
-            return;
-        }
-
         _inputBox.IsReadOnly = IsReadOnly;
-        if (_scrubArea is not null)
-        {
-            _scrubArea.IsHitTestVisible = !IsReadOnly;
-        }
+        _scrubArea.IsHitTestVisible = !IsReadOnly;
     }
 
     private void OnInputFocus(object? sender, FocusChangedEventArgs e)
     {
         _isEditing = true;
-        if (IsMixed && _inputBox is not null)
+        if (IsMixed)
         {
             _inputBox.Text = string.Empty;
         }
@@ -83,7 +66,7 @@ public sealed partial class NumberScrubber
 
     private void OnInputTextChanged(object? sender, TextChangedEventArgs e)
     {
-        if (!_isEditing || _inputBox is null)
+        if (!_isEditing)
         {
             return;
         }
