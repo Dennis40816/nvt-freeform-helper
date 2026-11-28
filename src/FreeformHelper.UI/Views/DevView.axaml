@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
              xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
@@ -33,6 +34,19 @@
         <SelectableTextBlock Text="Prototype sections have been trimmed. This page now keeps only lightweight runtime/theme probes."
                              TextWrapping="Wrap"
                              Foreground="{DynamicResource NfcTextMutedBrush}"/>
+        <Border Classes="workspaceSectionCard">
+          <Border.Styles>
+            <StyleInclude Source="avares://FreeformHelper.UI/Styles/HowToUse.axaml"/>
+          </Border.Styles>
+          <corePrimitives:SectionFrame x:Name="DevCoreSectionFrame"
+                                       Title="{Binding Text, ElementName=DevLoadedText}">
+            <StackPanel Classes="panelFormField settingsFieldTile">
+              <corePrimitives:InfoLabel x:Name="DevCoreInfoLabel"
+                                        Text="Field label"
+                                        Tip="Field help shown by the label and its field tile."/>
+            </StackPanel>
+          </corePrimitives:SectionFrame>
+        </Border>
         <Border Background="{DynamicResource NfcSurfaceSubtleBrush}"
                 BorderBrush="{DynamicResource NfcBorderBrush}"
                 BorderThickness="{StaticResource BorderThin}"

@@ -128,7 +128,6 @@
     ]
   },
   "compiledBindingExceptions": [
-    "src/FreeformHelper.UI/Controls/SettingsInfoLabel.axaml",
     "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml",
     "src/FreeformHelper.UI/MainWindow.axaml",
     "src/FreeformHelper.UI/Styles/Controls.Action.axaml",
