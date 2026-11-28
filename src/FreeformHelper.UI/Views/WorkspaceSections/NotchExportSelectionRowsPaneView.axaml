@@ -119,12 +119,9 @@
         <TextBlock Classes="stepNote" Text="Use Reset filters above to show every row."/>
       </StackPanel>
     </Border>
-    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space8}">
-      <TextBlock Text="{Binding VisibleRowsSummaryText}" VerticalAlignment="Center"/>
-      <Button Grid.Column="1" Classes="actionNeutral" Content="Select only shown rows"
-              IsVisible="{Binding HasRows}"
-              HorizontalAlignment="Right" Command="{Binding UseShownOnlyCommand}"
-              ToolTip.Tip="Clears other selections."/>
-    </Grid>
+    <Button Grid.Row="2" Classes="actionNeutral" Content="Select only shown rows"
+            IsVisible="{Binding HasRows}"
+            HorizontalAlignment="Right" Command="{Binding UseShownOnlyCommand}"
+            ToolTip.Tip="Clears other selections."/>
   </Grid>
 </UserControl>

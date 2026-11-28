@@ -32,7 +32,7 @@ public sealed class NotchExportSelectionProjectionSearchTests
         Assert.Equal(snapshot.VisibleRows, snapshot.IcGroups[0].Rows);
         Assert.Equal("Search: \"\"", snapshot.FilterViewState.SearchFilterChipText);
         Assert.True(snapshot.FilterViewState.HasSearchFilterChip);
-        Assert.Equal("Showing 2 rows", snapshot.FilterViewState.VisibleRowsSummaryText);
+        Assert.Equal(2, snapshot.VisibleRows.Count);
         Assert.False(rows[1].IsSelected);
     }
 

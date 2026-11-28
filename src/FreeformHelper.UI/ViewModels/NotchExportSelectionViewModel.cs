@@ -41,8 +41,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         HasNoActiveFilterChips: false,
         HasResettableViewFilters: true,
         ActiveColumnFilterSummaryText: "None",
-        CurrentSearchScopeText: "Active filter: text=* | mode=Transfer-only | selected=all | header=None | shown=0.",
-        VisibleRowsSummaryText: "Showing 0 rows");
+        CurrentSearchScopeText: "Active filter: text=* | mode=Transfer-only | selected=all | header=None | shown=0.");
     private NotchExportSelectionSummarySnapshot _summarySnapshot = new(
         AllRowCount: 0,
         VisibleCount: 0,
@@ -213,7 +212,6 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public bool HasNoActiveFilterChips => _filterViewState.HasNoActiveFilterChips;
     public bool HasResettableViewFilters => _filterViewState.HasResettableViewFilters;
     public string SearchWatermarkText { get; } = DefaultSearchWatermark;
-    public string VisibleRowsSummaryText => _filterViewState.VisibleRowsSummaryText;
     public int HiddenSelectedRowCount => _summarySnapshot.HiddenSelectedRowCount;
     public bool HasHiddenSelectedRows => _summarySnapshot.HasHiddenSelectedRows;
     public string HiddenSelectedRowsHintText => _summarySnapshot.HiddenSelectedRowsHintText;

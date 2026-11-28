@@ -58,7 +58,8 @@ public sealed class ExportNotchRowsIntegratedLayoutTests
                 static text => Assert.Equal(0, text.MaxLines));
             passed.Flyout.Hide();
             Assert.Single(VisibleText(window), text => text == viewModel.FooterStatusText);
-            Assert.Single(VisibleText(window), static text => text == "Showing 1 rows");
+            Assert.Equal("2 selected · 1 shown · 1 hidden row is exported too", viewModel.FooterStatusText);
+            Assert.DoesNotContain(VisibleText(window), static text => text!.StartsWith("Showing", StringComparison.Ordinal));
             Assert.DoesNotContain(window.GetVisualDescendants().OfType<TextBlock>(),
                 text => text.Text == window.Title);
             Assert.DoesNotContain(window.GetVisualDescendants().OfType<SelectableTextBlock>(),
