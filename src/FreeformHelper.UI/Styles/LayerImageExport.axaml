@@ -53,13 +53,6 @@
     <Setter Property="VerticalAlignment" Value="Center"/>
     <Setter Property="VerticalContentAlignment" Value="Center"/>
   </Style>
-  <Style Selector="TextBox.exportSearch">
-    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderBrush}"/>
-    <Setter Property="BorderThickness" Value="{DynamicResource BorderThin}"/>
-    <Setter Property="CornerRadius" Value="{DynamicResource NfcSurfaceCornerRadius}"/>
-    <Setter Property="VerticalContentAlignment" Value="Center"/>
-  </Style>
   <Style Selector="ListBox.exportLayers ListBoxItem">
     <Setter Property="MinHeight" Value="{DynamicResource LayerImageExportRowHeight}"/>
     <Setter Property="Height" Value="{DynamicResource LayerImageExportRowHeight}"/>

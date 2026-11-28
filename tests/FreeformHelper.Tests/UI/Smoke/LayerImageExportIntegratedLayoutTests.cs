@@ -22,7 +22,7 @@ public sealed class LayerImageExportIntegratedLayoutTests
     {
         using var session = new LayerImageExportViewTestSession();
         await session.ShowAsync();
-        var search = session.Window.FindControl<TextBox>("SearchBox")!;
+        var search = session.SearchBox;
         Assert.Same(session.Window.FindControl<ListBox>("LayerList"), session.Window.FocusManager!.GetFocusedElement());
         session.Window.FindControl<Button>("ExportButton")!.Focus();
 
@@ -47,9 +47,8 @@ public sealed class LayerImageExportIntegratedLayoutTests
         using var session = new LayerImageExportViewTestSession();
         await session.ShowAsync();
         var all = session.Window.FindControl<CheckBox>("AllLayersCheckBox")!;
-        var clear = session.Window.FindControl<Button>("ClearSearchButton")!;
+        var clear = session.ClearSearchButton;
         Assert.Equal("All layers", all.Content);
-        Assert.Same(session.Model.ClearSearchCommand, clear.Command);
         Assert.Equal("Clear search (Esc)", TipText(clear));
 
         session.Model.SearchText = "ref";

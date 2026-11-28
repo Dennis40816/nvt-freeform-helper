@@ -1,10 +1,12 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using System.Globalization;
+using Avalonia.Controls;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.CadExport;
+using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
@@ -33,6 +35,9 @@ internal sealed class LayerImageExportViewTestSession : IDisposable
     public LayerImageExportContext Context { get; }
     public LayerImageExportViewModel Model { get; }
     public LayerImageExportWindow Window { get; }
+    public TextBox SearchBox => Search.FindControl<TextBox>("SearchBox")!;
+    public Button ClearSearchButton => Search.FindControl<Button>("ClearSearchButton")!;
+    private LayerSearchBox Search => Window.FindControl<LayerSearchBox>("LayerSearch")!;
 
     public async Task ShowAsync()
     {

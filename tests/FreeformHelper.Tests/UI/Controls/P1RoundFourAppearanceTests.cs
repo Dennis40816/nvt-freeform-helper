@@ -220,8 +220,8 @@ public sealed class P1RoundFourAppearanceTests(ITestOutputHelper output)
         var visible = rows.Single(static button => button.DataContext is LayerToggle { Name: "beta" });
         AssertLayerRow(hidden, NvtIcons.VisibilityOff, "NfcTextMutedBrush");
         AssertLayerRow(visible, NvtIcons.Visibility, "NfcTextBrush");
-        var hiddenText = hidden.GetVisualDescendants().OfType<SelectableTextBlock>().Single();
-        var visibleText = visible.GetVisualDescendants().OfType<SelectableTextBlock>().Single();
+        var hiddenText = LayerName(hidden);
+        var visibleText = LayerName(visible);
         Assert.NotEqual(ColorOf(visibleText.Foreground), ColorOf(hiddenText.Foreground));
 
         var point = Avalonia.VisualExtensions.TranslatePoint(hidden,
@@ -244,11 +244,15 @@ public sealed class P1RoundFourAppearanceTests(ITestOutputHelper output)
         Assert.Equal("Ctrl+click: show only this layer.", Assert.IsType<TextBlock>(ToolTip.GetTip(hidden)).Text);
     }
 
+    // The name is drawn by the search highlight control, which holds one text block.
+    private static TextBlock LayerName(ToggleButton row) => Assert.Single(
+        Assert.Single(row.GetVisualDescendants().OfType<HighlightedTextBlock>())
+            .GetVisualDescendants().OfType<TextBlock>());
+
     private void AssertLayerRow(ToggleButton row, string glyph, string textBrush)
     {
         Assert.Equal(glyph, Assert.Single(row.GetVisualDescendants().OfType<FontIcon>()).Glyph);
-        var label = Assert.Single(row.GetVisualDescendants().OfType<SelectableTextBlock>());
-        var text = ColorOf(label.Foreground);
+        var text = ColorOf(LayerName(row).Foreground);
         Assert.Equal(ResourceColor(row, textBrush), text);
         Assert.Equal(0, ColorOf(row.Background).A);
         Assert.Equal(default, row.BorderThickness);
