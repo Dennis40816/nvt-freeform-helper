@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Media;
-using FreeformHelper.Domain.Geometry;
 
 namespace FreeformHelper.UI.Controls;
 
@@ -243,11 +242,6 @@ public sealed partial class PadCanvas
 
         labelElapsedMs += ElapsedMilliseconds(labelTailStarted);
         return (overlayElapsedMs, labelElapsedMs);
-    }
-
-    private void BuildVisibleDrawLists(Rect2 worldViewport, bool showRegular, bool showCad, bool lowDetailMode, double lowDetailZoomThreshold)
-    {
-        _visibleDrawListBuilder.Build(worldViewport, showRegular, showCad, lowDetailMode, lowDetailZoomThreshold);
     }
 
     private bool ShouldEnsureCadGeometryCache(bool lowDetailMode)

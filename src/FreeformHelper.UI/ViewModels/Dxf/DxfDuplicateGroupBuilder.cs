@@ -114,9 +114,8 @@ internal static class DxfDuplicateGroupBuilder
         }
 
         var impactedCadCount = groups.Sum(static group => group.CadPadIds.Count);
-        var sample = groups[0];
         return FormattableString.Invariant(
-            $"Duplicate CAD Output FW Diff: {groups.Length} group(s), {impactedCadCount} CAD pad(s). Sample: IC{sample.IcIndex + 1}/diff{sample.DiffIndex} -> CAD {string.Join(", ", sample.CadPadIds)}.");
+            $"Duplicate Output FW Diff · {impactedCadCount} CAD in {groups.Length} {(groups.Length == 1 ? "group" : "groups")}");
     }
 }
 

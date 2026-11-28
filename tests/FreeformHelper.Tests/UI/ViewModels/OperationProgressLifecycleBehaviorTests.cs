@@ -267,6 +267,8 @@ public sealed class OperationProgressLifecycleBehaviorTests
         using var report = new SavePathGate();
         vm.OpenIndexMappingReportAsync = _ => report.PickAsync("report", "");
         var analysis = await report.StartAndWaitForEntryAsync(() => vm.AnalyzeIndexMappingCommand.ExecuteAsync(null));
+        // Ensure resetting changes progress even if queued reports have not run.
+        vm.IndexMappingProgress = 0.5;
         using var changes = new ProgressOperation(vm, "Mapping").Observe();
 
         vm.ClearStep4ResultCommand.Execute(null);

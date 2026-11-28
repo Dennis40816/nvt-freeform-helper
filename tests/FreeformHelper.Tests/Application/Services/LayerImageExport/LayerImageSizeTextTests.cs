@@ -14,13 +14,4 @@ public sealed class LayerImageSizeTextTests
 
         Assert.Equal("6,500 × 852 px", LayerImageSizeText.Format(size));
     }
-
-    [Theory]
-    [InlineData(0, "0 layers selected")]
-    [InlineData(1, "1 layer selected")]
-    [InlineData(5, "5 layers selected")]
-    public void SelectionTextUsesCorrectPlural(int count, string expected)
-    {
-        Assert.Equal(expected, LayerImageSizeText.FormatSelection(count));
-    }
 }

@@ -108,7 +108,7 @@ internal sealed class CoordinateArtifactOwner
     public string ArtifactSummaryText =>
         string.Format(
             CultureInfo.InvariantCulture,
-            "{0} coordinate row(s)",
+            "{0} row(s)",
             ArtifactRows.Count);
 
     public string ArtifactSortStatusText =>

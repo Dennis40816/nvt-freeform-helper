@@ -279,6 +279,7 @@ internal sealed class IndexAssignmentOwner
         _ports.SetOverrideHints(new ObservableCollection<int>());
         _ports.SetAnchorHints(new ObservableCollection<int>());
         _ports.SetAssignmentSummary("CAD Output FW Diff assignment: no CAD output pads.");
+        Step4Index.AssignmentCountText = "CAD Output FW Diff: no CAD output pads.";
         SetLatestCadOutputFwDiffAssignmentDecisions(new Dictionary<int, CadOutputFwDiffAssignmentDecision>());
         RefreshStep4DuplicateDiffGroups(Array.Empty<CadPad>());
         _ports.BumpIndexFingerprint();
@@ -366,6 +367,9 @@ internal sealed class IndexAssignmentOwner
         _ports.SetOverrideHints(new ObservableCollection<int>(hints.OverrideCadIds));
         _ports.SetAnchorHints(new ObservableCollection<int>(hints.AnchorCadIdsForCanvas));
         _ports.SetAssignmentSummary(hints.Summary);
+        // Count from the current map: CSV repair can assign pads after the assignment result was built.
+        var unassigned = ordered.Count(pad => !_cadOutputFwDiffIndexByCadId.ContainsKey(pad.Id));
+        Step4Index.AssignmentCountText = hints.AssignmentCountText + (unassigned > 0 ? $" · {unassigned} unresolved" : string.Empty);
     }
 
     private void RefreshLatestCadOutputFwDiffAssignmentDecisions(

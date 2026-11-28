@@ -129,6 +129,7 @@ public sealed partial class IndexMappingDecisionRowViewModel : ObservableObject
     public string SuggestedDisplay { get; }
     public string StatusDisplay { get; }
     public string ReasonText { get; }
+    public bool HasDistinctReasonText => !string.Equals(ReasonText, StatusDisplay, StringComparison.Ordinal);
     public string ActionHint { get; }
     public string RawDetailText { get; }
     public string MaskedDetailText { get; }

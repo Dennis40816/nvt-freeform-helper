@@ -5,40 +5,51 @@
              xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
              x:Class="FreeformHelper.UI.Views.WorkspaceSections.IndexMappingReportFilterBarView"
              x:DataType="viewModels:IndexMappingReportViewModel">
-  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
-    <primitives:BalancedWrapPanel ItemSpacing="{DynamicResource Space2}" LineSpacing="{DynamicResource Space4}">
-      <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsFilterAllActive}"
+  <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto"
+        ColumnSpacing="{DynamicResource Space12}" RowSpacing="{DynamicResource Space8}">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}" VerticalAlignment="Center">
+      <SelectableTextBlock Classes="workspaceGroupTitle" Text="{Binding ActiveVerificationStepText}"/>
+      <SelectableTextBlock FontWeight="SemiBold" Text="{Binding OverallStatusSummaryText}"/>
+      <SelectableTextBlock Text="{Binding OpenIssueSummaryText}"/>
+      <SelectableTextBlock Foreground="{DynamicResource NfcTextMutedBrush}" Text="{Binding TableRevisionText}"/>
+    </StackPanel>
+    <SelectableTextBlock Grid.Row="1" Grid.ColumnSpan="2" IsVisible="{Binding !HasMaskAudit}"
+                         Foreground="{DynamicResource NfcTextMutedBrush}" Text="{Binding MaskAuditSummary}"
+                         TextWrapping="Wrap"/>
+    <primitives:BalancedWrapPanel Grid.Row="2" Grid.ColumnSpan="2"
+                                 ItemSpacing="{DynamicResource Space2}" LineSpacing="{DynamicResource Space4}">
+      <ToggleButton Classes="productFilterChip" Classes.empty="{Binding IsAllFilterEmpty}" Classes.active="{Binding IsFilterAllActive}"
                     IsChecked="{Binding IsFilterAllActive, Mode=OneWay}" Content="{Binding AllFilterText}"
                     Command="{Binding SetDecisionFilterModeCommand}"
                     CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.All}"/>
-      <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsFilterChangedByMaskActive}"
-                    IsChecked="{Binding IsFilterChangedByMaskActive, Mode=OneWay}" Content="{Binding ChangedFilterText}"
-                    Command="{Binding SetDecisionFilterModeCommand}"
-                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.ChangedByMask}"/>
-      <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsFilterRemovedByMaskActive}"
-                    IsChecked="{Binding IsFilterRemovedByMaskActive, Mode=OneWay}" Content="{Binding RemovedFilterText}"
-                    Command="{Binding SetDecisionFilterModeCommand}"
-                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.RemovedByMask}"/>
-      <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsFilterAmbiguousActive}"
-                    IsChecked="{Binding IsFilterAmbiguousActive, Mode=OneWay}" Content="{Binding AmbiguousFilterText}"
-                    Command="{Binding SetDecisionFilterModeCommand}"
-                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.Ambiguous}"/>
-      <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsFilterDuplicateDiffActive}"
-                    IsChecked="{Binding IsFilterDuplicateDiffActive, Mode=OneWay}" Content="{Binding DuplicateFilterText}"
-                    Command="{Binding SetDecisionFilterModeCommand}"
-                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.DuplicateDiff}"/>
-      <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsFilterLowConfidenceActive}"
-                    IsChecked="{Binding IsFilterLowConfidenceActive, Mode=OneWay}" Content="{Binding LowConfidenceFilterText}"
-                    Command="{Binding SetDecisionFilterModeCommand}"
-                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.LowConfidence}"/>
-      <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsFilterUnmappedActive}"
+      <ToggleButton Classes="productFilterChip" Classes.empty="{Binding IsUnmappedFilterEmpty}" Classes.active="{Binding IsFilterUnmappedActive}"
                     IsChecked="{Binding IsFilterUnmappedActive, Mode=OneWay}" Content="{Binding UnmappedFilterText}"
                     Command="{Binding SetDecisionFilterModeCommand}"
                     CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.Unmapped}"/>
-      <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsFilterCountMismatchActive}"
+      <ToggleButton Classes="productFilterChip" Classes.empty="{Binding IsLowConfidenceFilterEmpty}" Classes.active="{Binding IsFilterLowConfidenceActive}"
+                    IsChecked="{Binding IsFilterLowConfidenceActive, Mode=OneWay}" Content="{Binding LowConfidenceFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.LowConfidence}"/>
+      <ToggleButton Classes="productFilterChip" Classes.empty="{Binding IsAmbiguousFilterEmpty}" Classes.active="{Binding IsFilterAmbiguousActive}"
+                    IsChecked="{Binding IsFilterAmbiguousActive, Mode=OneWay}" Content="{Binding AmbiguousFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.Ambiguous}"/>
+      <ToggleButton Classes="productFilterChip" Classes.empty="{Binding IsMismatchFilterEmpty}" Classes.active="{Binding IsFilterCountMismatchActive}"
                     IsChecked="{Binding IsFilterCountMismatchActive, Mode=OneWay}" Content="{Binding MismatchFilterText}"
                     Command="{Binding SetDecisionFilterModeCommand}"
                     CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.CountMismatch}"/>
+      <ToggleButton Classes="productFilterChip" Classes.empty="{Binding IsChangedFilterEmpty}" Classes.active="{Binding IsFilterChangedByMaskActive}"
+                    IsChecked="{Binding IsFilterChangedByMaskActive, Mode=OneWay}" Content="{Binding ChangedFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.ChangedByMask}"/>
+      <ToggleButton Classes="productFilterChip" Classes.empty="{Binding IsRemovedFilterEmpty}" Classes.active="{Binding IsFilterRemovedByMaskActive}"
+                    IsChecked="{Binding IsFilterRemovedByMaskActive, Mode=OneWay}" Content="{Binding RemovedFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.RemovedByMask}"/>
+      <ToggleButton Classes="productFilterChip" Classes.empty="{Binding IsDuplicateFilterEmpty}" Classes.active="{Binding IsFilterDuplicateDiffActive}"
+                    IsChecked="{Binding IsFilterDuplicateDiffActive, Mode=OneWay}" Content="{Binding DuplicateFilterText}"
+                    Command="{Binding SetDecisionFilterModeCommand}"
+                    CommandParameter="{x:Static viewModels:IndexMappingDecisionFilterMode.DuplicateDiff}"/>
     </primitives:BalancedWrapPanel>
     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space6}" VerticalAlignment="Top">
       <TextBox Classes="singleLineActionInput" x:Name="SearchBox" Width="{DynamicResource IndexMappingReportSearchWidth}"

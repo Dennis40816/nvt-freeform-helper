@@ -517,7 +517,8 @@
   <x:Double x:Key="NotchExportSelectionWorkspaceListMaxHeight">150</x:Double>
   <x:Double x:Key="NotchExportSelectionPreviewMinWidth">320</x:Double>
   <GridLength x:Key="NotchExportIntegratedInspectorWidth">320</GridLength>
-  <x:Double x:Key="NotchExportIntegratedVersionWidth">110</x:Double>
+  <x:Double x:Key="NotchExportCheckListMaxHeight">72</x:Double>
+  <x:Double x:Key="NotchExportPassedChecksMaxWidth">420</x:Double>
   <GridLength x:Key="NotchExportIntegratedCheckWidth">28</GridLength>
   <GridLength x:Key="NotchExportIntegratedRowWidth">42</GridLength>
   <GridLength x:Key="NotchExportIntegratedIcWidth">44</GridLength>
@@ -587,6 +588,7 @@
   <x:Double x:Key="CoordinateOverlayModeComboWidth">132</x:Double>
   <x:Double x:Key="CoordinateCalibrationSummaryMaxWidth">112</x:Double>
   <x:Double x:Key="CoordinateTableOptionalColumnWidth">96</x:Double>
+  <x:Double x:Key="CoordinateNarrowViewportWidth">1600</x:Double>
   <x:Double x:Key="NotchExportSearchWidth">300</x:Double>
   <x:Double x:Key="NotchExportSortDropdownWidth">160</x:Double>
   <x:Double x:Key="NotchExportMiniPreviewMinHeight">84</x:Double>
@@ -668,6 +670,7 @@
   <GridLength x:Key="PanelLeftWidthGrid">280</GridLength>
   <GridLength x:Key="PanelRightWidthGrid">360</GridLength>
   <GridLength x:Key="CoordinatePanelRightWidthGrid">460</GridLength>
+  <GridLength x:Key="CoordinatePanelRightNarrowWidthGrid">360</GridLength>
   <GridLength x:Key="CoordinateArtifactLabelColumnGrid">1.15*</GridLength>
   <GridLength x:Key="CoordinateArtifactPixelColumnGrid">1.25*</GridLength>
   <GridLength x:Key="CoordinateArtifactMachineColumnGrid">1.4*</GridLength>

@@ -7,236 +7,256 @@ namespace FreeformHelper.UI.Controls;
 
 public sealed partial class PadCanvas
 {
-    private sealed class PadCanvasVisibleDrawListBuilder
+    private void BuildVisibleDrawLists(
+        Rect2 worldViewport,
+        bool showRegular,
+        bool showCad,
+        bool lowDetailMode,
+        double lowDetailZoomThreshold)
     {
-        private readonly PadCanvas _owner;
-
-        public PadCanvasVisibleDrawListBuilder(PadCanvas owner)
+        var stopwatch = Stopwatch.StartNew();
+        var queryCacheKey = CreateVisibleDrawQueryCacheKey(worldViewport, showRegular, showCad);
+        var queryCacheHit = TryUseVisibleDrawQueryCache(queryCacheKey, out var queryEntry);
+        if (!queryCacheHit)
         {
-            _owner = owner;
+            var candidates = PadCanvasVisibleDrawListBuilder.Query(worldViewport, CreateQueryState(showCad, showRegular));
+            queryEntry = StoreVisibleDrawQueryCache(queryCacheKey, candidates.Regular, candidates.Cad);
         }
 
-        public void Build(
-            Rect2 worldViewport,
-            bool showRegular,
-            bool showCad,
-            bool lowDetailMode,
-            double lowDetailZoomThreshold)
+        var drawListCacheKey = CreateVisibleDrawListCacheKey(queryEntry, lowDetailMode, lowDetailZoomThreshold);
+        if (TryUseVisibleDrawListCache(drawListCacheKey, out var cachedMetrics))
         {
-            var stopwatch = Stopwatch.StartNew();
-            var queryCacheKey = _owner.CreateVisibleDrawQueryCacheKey(worldViewport, showRegular, showCad);
-            var queryCacheHit = _owner.TryUseVisibleDrawQueryCache(queryCacheKey, out var queryEntry);
-            if (!queryCacheHit)
-            {
-                queryEntry = _owner.StoreVisibleDrawQueryCache(
-                    queryCacheKey,
-                    BuildRegularCandidates(worldViewport, showRegular),
-                    BuildCadCandidates(worldViewport, showCad));
-            }
-
-            var drawListCacheKey = _owner.CreateVisibleDrawListCacheKey(queryEntry, lowDetailMode, lowDetailZoomThreshold);
-            if (_owner.TryUseVisibleDrawListCache(drawListCacheKey, out var cachedMetrics))
-            {
-                stopwatch.Stop();
-                _owner.RecordVisibleDrawPerf(
-                    elapsedMs: stopwatch.ElapsedMilliseconds,
-                    regularCandidates: cachedMetrics.RegularCandidates,
-                    cadCandidates: cachedMetrics.CadCandidates,
-                    visibleRegularSelected: cachedMetrics.VisibleRegularSelected,
-                    visibleRegularUnselected: cachedMetrics.VisibleRegularUnselected,
-                    visibleCadSelected: cachedMetrics.VisibleCadSelected,
-                    visibleCadUnselected: cachedMetrics.VisibleCadUnselected,
-                    regularDecimationStep: cachedMetrics.RegularDecimationStep,
-                    cadDecimationStep: cachedMetrics.CadDecimationStep,
-                    regularDecimatedCount: cachedMetrics.RegularDecimatedCount,
-                    cadDecimatedCount: cachedMetrics.CadDecimatedCount,
-                    lowDetailMode: lowDetailMode,
-                    queryCacheHit: queryCacheHit,
-                    drawListCacheHit: true);
-                return;
-            }
-
-            _owner._visibleRegularUnselected.Clear();
-            _owner._visibleRegularSelected.Clear();
-            _owner._visibleCadUnselected.Clear();
-            _owner._visibleCadSelected.Clear();
-
-            var regularDecimationStep = ComputeRegularDecimationStep(showRegular, lowDetailMode, lowDetailZoomThreshold);
-            var regularDecimatedCount = BuildVisibleRegularDrawLists(queryEntry.RegularCandidates, regularDecimationStep);
-
-            var cadBuildPlan = CreateCadBuildPlan(showCad, lowDetailMode, queryEntry.CadCandidates);
-            var cadDecimatedCount = BuildVisibleCadDrawLists(queryEntry.CadCandidates, cadBuildPlan);
-
             stopwatch.Stop();
-            var metrics = new PadCanvasVisibleDrawListMetrics(
-                RegularCandidates: queryEntry.RegularCandidates.Length,
-                CadCandidates: queryEntry.CadCandidates.Length,
-                VisibleRegularSelected: _owner._visibleRegularSelected.Count,
-                VisibleRegularUnselected: _owner._visibleRegularUnselected.Count,
-                VisibleCadSelected: _owner._visibleCadSelected.Count,
-                VisibleCadUnselected: _owner._visibleCadUnselected.Count,
-                RegularDecimationStep: regularDecimationStep,
-                CadDecimationStep: cadBuildPlan.DecimationStep,
-                RegularDecimatedCount: regularDecimatedCount,
-                CadDecimatedCount: cadDecimatedCount);
-            _owner.StoreVisibleDrawListCache(drawListCacheKey, metrics);
-            _owner.RecordVisibleDrawPerf(
+            RecordVisibleDrawPerf(
                 elapsedMs: stopwatch.ElapsedMilliseconds,
-                regularCandidates: metrics.RegularCandidates,
-                cadCandidates: metrics.CadCandidates,
-                visibleRegularSelected: metrics.VisibleRegularSelected,
-                visibleRegularUnselected: metrics.VisibleRegularUnselected,
-                visibleCadSelected: metrics.VisibleCadSelected,
-                visibleCadUnselected: metrics.VisibleCadUnselected,
-                regularDecimationStep: metrics.RegularDecimationStep,
-                cadDecimationStep: metrics.CadDecimationStep,
-                regularDecimatedCount: metrics.RegularDecimatedCount,
-                cadDecimatedCount: metrics.CadDecimatedCount,
+                regularCandidates: cachedMetrics.RegularCandidates,
+                cadCandidates: cachedMetrics.CadCandidates,
+                visibleRegularSelected: cachedMetrics.VisibleRegularSelected,
+                visibleRegularUnselected: cachedMetrics.VisibleRegularUnselected,
+                visibleCadSelected: cachedMetrics.VisibleCadSelected,
+                visibleCadUnselected: cachedMetrics.VisibleCadUnselected,
+                regularDecimationStep: cachedMetrics.RegularDecimationStep,
+                cadDecimationStep: cachedMetrics.CadDecimationStep,
+                regularDecimatedCount: cachedMetrics.RegularDecimatedCount,
+                cadDecimatedCount: cachedMetrics.CadDecimatedCount,
                 lowDetailMode: lowDetailMode,
                 queryCacheHit: queryCacheHit,
-                drawListCacheHit: false);
+                drawListCacheHit: true);
+            return;
         }
 
-        private RegularPad[] BuildRegularCandidates(Rect2 worldViewport, bool showRegular)
+        var state = CreateVisibleDrawState(showRegular, showCad, lowDetailMode, lowDetailZoomThreshold, queryEntry.CadCandidates.Length);
+        var metrics = PadCanvasVisibleDrawListBuilder.Build(
+            queryEntry.RegularCandidates, queryEntry.CadCandidates, state, VisibleDrawBuffers);
+        stopwatch.Stop();
+        StoreVisibleDrawListCache(drawListCacheKey, metrics);
+        RecordVisibleDrawPerf(
+            elapsedMs: stopwatch.ElapsedMilliseconds,
+            regularCandidates: metrics.RegularCandidates,
+            cadCandidates: metrics.CadCandidates,
+            visibleRegularSelected: metrics.VisibleRegularSelected,
+            visibleRegularUnselected: metrics.VisibleRegularUnselected,
+            visibleCadSelected: metrics.VisibleCadSelected,
+            visibleCadUnselected: metrics.VisibleCadUnselected,
+            regularDecimationStep: metrics.RegularDecimationStep,
+            cadDecimationStep: metrics.CadDecimationStep,
+            regularDecimatedCount: metrics.RegularDecimatedCount,
+            cadDecimatedCount: metrics.CadDecimatedCount,
+            lowDetailMode: lowDetailMode,
+            queryCacheHit: queryCacheHit,
+            drawListCacheHit: false);
+    }
+
+    internal PadCanvasVisibleDrawBuffers VisibleDrawBuffers =>
+        new(_visibleRegularUnselected, _visibleRegularSelected, _visibleCadUnselected, _visibleCadSelected);
+
+    private PadCanvasVisibleDrawState CreateVisibleDrawState(
+        bool showRegular, bool showCad, bool lowDetailMode, double lowDetailZoomThreshold, int cadCandidateCount)
+    {
+        var maxRegularStep = showRegular && lowDetailMode
+            ? GetResourceDouble("CanvasLowDetailRegularDecimationMaxStep", 4.0) : 4.0;
+        var decimateCad = showCad && lowDetailMode && cadCandidateCount > 0;
+        var maxCadUnselected = decimateCad ? GetResourceDouble("CanvasLowDetailCadMaxVisibleUnselected", 2500) : 2500;
+        var minCadScreenSize = decimateCad ? GetResourceDouble("CanvasLowDetailCadMinScreenSize", 0.9) : 0.0;
+        return new PadCanvasVisibleDrawState(
+            showRegular, showCad, lowDetailMode, _zoom, lowDetailZoomThreshold,
+            maxRegularStep, maxCadUnselected, minCadScreenSize, _selectedRegIdx, _selectedCadIds, _highlightedCadIds);
+    }
+}
+
+internal static class PadCanvasVisibleDrawListBuilder
+{
+    public static (RegularPad[] Regular, CadPad[] Cad) Query(Rect2 worldViewport, in PadCanvasQueryState state) =>
+        (BuildRegularCandidates(worldViewport, state), BuildCadCandidates(worldViewport, state));
+
+    public static PadCanvas.PadCanvasVisibleDrawListMetrics Build(
+        RegularPad[] regular, CadPad[] cad, in PadCanvasVisibleDrawState state, in PadCanvasVisibleDrawBuffers buffers)
+    {
+        buffers.RegularUnselected.Clear();
+        buffers.RegularSelected.Clear();
+        buffers.CadUnselected.Clear();
+        buffers.CadSelected.Clear();
+
+        var regularDecimationStep = ComputeRegularDecimationStep(state);
+        var regularDecimatedCount = BuildVisibleRegularDrawLists(regular, regularDecimationStep, state, buffers);
+        var cadBuildPlan = CreateCadBuildPlan(cad, state);
+        var cadDecimatedCount = BuildVisibleCadDrawLists(cad, cadBuildPlan, state, buffers);
+
+        return new PadCanvas.PadCanvasVisibleDrawListMetrics(
+            RegularCandidates: regular.Length,
+            CadCandidates: cad.Length,
+            VisibleRegularSelected: buffers.RegularSelected.Count,
+            VisibleRegularUnselected: buffers.RegularUnselected.Count,
+            VisibleCadSelected: buffers.CadSelected.Count,
+            VisibleCadUnselected: buffers.CadUnselected.Count,
+            RegularDecimationStep: regularDecimationStep,
+            CadDecimationStep: cadBuildPlan.DecimationStep,
+            RegularDecimatedCount: regularDecimatedCount,
+            CadDecimatedCount: cadDecimatedCount);
+    }
+
+    private static RegularPad[] BuildRegularCandidates(Rect2 worldViewport, in PadCanvasQueryState state)
+    {
+        if (!state.ShowRegular || state.RegularPads is not { Count: > 0 })
         {
-            if (!showRegular || _owner.RegularPads is not { Count: > 0 })
-            {
-                return Array.Empty<RegularPad>();
-            }
-
-            if (_owner._regularIndex is not null)
-            {
-                return _owner._regularIndex.Query(worldViewport).ToArray();
-            }
-
-            return _owner.RegularPads
-                .Where(pad => pad.Bounds.Intersects(worldViewport))
-                .ToArray();
+            return Array.Empty<RegularPad>();
         }
 
-        private CadPad[] BuildCadCandidates(Rect2 worldViewport, bool showCad)
+        if (state.RegularIndex is not null)
         {
-            if (!showCad || _owner.CadPads is not { Count: > 0 })
-            {
-                return Array.Empty<CadPad>();
-            }
-
-            if (_owner._cadIndex is not null)
-            {
-                return _owner._cadIndex.Query(worldViewport).ToArray();
-            }
-
-            return _owner.CadPads
-                .Where(pad => pad.Bounds.Intersects(worldViewport))
-                .ToArray();
+            return state.RegularIndex.Query(worldViewport).ToArray();
         }
 
-        private int ComputeRegularDecimationStep(bool showRegular, bool lowDetailMode, double lowDetailZoomThreshold)
-        {
-            if (!showRegular || !lowDetailMode)
-            {
-                return 1;
-            }
+        return state.RegularPads
+            .Where(pad => pad.Bounds.Intersects(worldViewport))
+            .ToArray();
+    }
 
-            var maxStepResource = _owner.GetResourceDouble("CanvasLowDetailRegularDecimationMaxStep", 4.0);
-            return PadDrawDensityPolicy.RegularStep(showRegular, lowDetailMode, lowDetailZoomThreshold, _owner._zoom, maxStepResource);
+    private static CadPad[] BuildCadCandidates(Rect2 worldViewport, in PadCanvasQueryState state)
+    {
+        var _cadIndex = state.CadIndex;
+        if (!state.ShowCad || state.CadPads is not { Count: > 0 })
+        {
+            return Array.Empty<CadPad>();
         }
 
-        private int BuildVisibleRegularDrawLists(RegularPad[] regularCandidates, int regularDecimationStep)
+        if (_cadIndex is not null)
         {
-            var decimatedCount = 0;
-            foreach (var pad in regularCandidates)
-            {
-                var isSelected = _owner._selectedRegIdx.Contains(pad.Index);
-                if (PadDrawDensityPolicy.IsRegularDecimated(isSelected, pad.Row, pad.Col, regularDecimationStep))
-                {
-                    decimatedCount++;
-                    continue;
-                }
-
-                if (isSelected)
-                {
-                    _owner._visibleRegularSelected.Add(pad);
-                }
-                else
-                {
-                    _owner._visibleRegularUnselected.Add(pad);
-                }
-            }
-
-            return decimatedCount;
+            return _cadIndex.Query(worldViewport).ToArray();
         }
 
-        private CadVisibleBuildPlan CreateCadBuildPlan(bool showCad, bool lowDetailMode, CadPad[] cadCandidates)
+        return state.CadPads
+            .Where(pad => pad.Bounds.Intersects(worldViewport))
+            .ToArray();
+    }
+
+    private static int ComputeRegularDecimationStep(in PadCanvasVisibleDrawState state)
+    {
+        if (!state.ShowRegular || !state.LowDetailMode)
         {
-            if (!showCad || !lowDetailMode || cadCandidates.Length == 0)
-            {
-                return new CadVisibleBuildPlan(DecimationStep: 1, MinScreenSize: 0.0);
-            }
-
-            var maxVisibleUnselectedResource = _owner.GetResourceDouble("CanvasLowDetailCadMaxVisibleUnselected", 2500);
-            var visibleUnselectedCandidates = 0;
-            foreach (var pad in cadCandidates)
-            {
-                if (_owner._selectedCadIds.Contains(pad.Id) || _owner._highlightedCadIds.Contains(pad.Id))
-                {
-                    continue;
-                }
-
-                visibleUnselectedCandidates++;
-            }
-
-            var decimationStep = PadDrawDensityPolicy.CadStep(visibleUnselectedCandidates, maxVisibleUnselectedResource);
-            var minScreenSize = _owner.GetResourceDouble("CanvasLowDetailCadMinScreenSize", 0.9);
-            return new CadVisibleBuildPlan(decimationStep, minScreenSize);
+            return 1;
         }
 
-        private int BuildVisibleCadDrawLists(CadPad[] cadCandidates, CadVisibleBuildPlan plan)
+        return PadDrawDensityPolicy.RegularStep(
+            state.ShowRegular, state.LowDetailMode, state.LowDetailZoomThreshold, state.Zoom, state.MaxRegularStep);
+    }
+
+    private static int BuildVisibleRegularDrawLists(
+        RegularPad[] regularCandidates, int regularDecimationStep,
+        in PadCanvasVisibleDrawState state, in PadCanvasVisibleDrawBuffers buffers)
+    {
+        var decimatedCount = 0;
+        foreach (var pad in regularCandidates)
         {
-            var decimatedCount = 0;
-            var cadUnselectedCounter = 0;
-            foreach (var pad in cadCandidates)
+            var isSelected = state.SelectedRegularIndices.Contains(pad.Index);
+            if (PadDrawDensityPolicy.IsRegularDecimated(isSelected, pad.Row, pad.Col, regularDecimationStep))
             {
-                var isSelected = _owner._selectedCadIds.Contains(pad.Id);
-                var isHighlighted = _owner._highlightedCadIds.Contains(pad.Id);
+                decimatedCount++;
+                continue;
+            }
 
-                if (!isSelected && plan.DecimationStep > 1)
-                {
-                    if (!isHighlighted)
-                    {
-                        cadUnselectedCounter++;
-                        if (((cadUnselectedCounter - 1) % plan.DecimationStep) != 0)
-                        {
-                            decimatedCount++;
-                            continue;
-                        }
-                    }
-                }
+            if (isSelected)
+            {
+                buffers.RegularSelected.Add(pad);
+            }
+            else
+            {
+                buffers.RegularUnselected.Add(pad);
+            }
+        }
 
-                if (!isSelected && plan.MinScreenSize > 0.0 && !isHighlighted)
+        return decimatedCount;
+    }
+
+    private static CadVisibleBuildPlan CreateCadBuildPlan(CadPad[] cadCandidates, in PadCanvasVisibleDrawState state)
+    {
+        if (!state.ShowCad || !state.LowDetailMode || cadCandidates.Length == 0)
+        {
+            return new CadVisibleBuildPlan(DecimationStep: 1, MinScreenSize: 0.0);
+        }
+
+        var visibleUnselectedCandidates = 0;
+        foreach (var pad in cadCandidates)
+        {
+            if (state.SelectedCadIds.Contains(pad.Id) || state.HighlightedCadIds.Contains(pad.Id))
+            {
+                continue;
+            }
+
+            visibleUnselectedCandidates++;
+        }
+
+        var decimationStep = PadDrawDensityPolicy.CadStep(visibleUnselectedCandidates, state.MaxCadUnselected);
+        return new CadVisibleBuildPlan(decimationStep, state.MinCadScreenSize);
+    }
+
+    private static int BuildVisibleCadDrawLists(
+        CadPad[] cadCandidates, CadVisibleBuildPlan plan,
+        in PadCanvasVisibleDrawState state, in PadCanvasVisibleDrawBuffers buffers)
+    {
+        var decimatedCount = 0;
+        var cadUnselectedCounter = 0;
+        foreach (var pad in cadCandidates)
+        {
+            var isSelected = state.SelectedCadIds.Contains(pad.Id);
+            var isHighlighted = state.HighlightedCadIds.Contains(pad.Id);
+
+            if (!isSelected && plan.DecimationStep > 1)
+            {
+                if (!isHighlighted)
                 {
-                    var widthOnScreen = pad.Bounds.Width * _owner._zoom;
-                    var heightOnScreen = pad.Bounds.Height * _owner._zoom;
-                    if (widthOnScreen < plan.MinScreenSize && heightOnScreen < plan.MinScreenSize)
+                    cadUnselectedCounter++;
+                    if (((cadUnselectedCounter - 1) % plan.DecimationStep) != 0)
                     {
                         decimatedCount++;
                         continue;
                     }
                 }
+            }
 
-                if (isSelected)
+            if (!isSelected && plan.MinScreenSize > 0.0 && !isHighlighted)
+            {
+                var widthOnScreen = pad.Bounds.Width * state.Zoom;
+                var heightOnScreen = pad.Bounds.Height * state.Zoom;
+                if (widthOnScreen < plan.MinScreenSize && heightOnScreen < plan.MinScreenSize)
                 {
-                    _owner._visibleCadSelected.Add(pad);
-                }
-                else
-                {
-                    _owner._visibleCadUnselected.Add(pad);
+                    decimatedCount++;
+                    continue;
                 }
             }
 
-            return decimatedCount;
+            if (isSelected)
+            {
+                buffers.CadSelected.Add(pad);
+            }
+            else
+            {
+                buffers.CadUnselected.Add(pad);
+            }
         }
 
-        private readonly record struct CadVisibleBuildPlan(int DecimationStep, double MinScreenSize);
+        return decimatedCount;
     }
+
+    private readonly record struct CadVisibleBuildPlan(int DecimationStep, double MinScreenSize);
 }

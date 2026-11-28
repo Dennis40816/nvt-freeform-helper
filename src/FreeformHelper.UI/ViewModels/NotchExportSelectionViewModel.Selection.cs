@@ -161,7 +161,6 @@ public sealed partial class NotchExportSelectionViewModel
         OnPropertyChanged(nameof(HeaderFilterChipText));
         OnPropertyChanged(nameof(HasNoActiveFilterChips));
         OnPropertyChanged(nameof(HasResettableViewFilters));
-        OnPropertyChanged(nameof(VisibleRowsSummaryText));
     }
 
     private void ApplyVisibleRows(IReadOnlyList<NotchExportRowItemViewModel> visibleRows)

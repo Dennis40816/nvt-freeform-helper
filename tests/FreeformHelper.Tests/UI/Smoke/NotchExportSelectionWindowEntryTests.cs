@@ -70,7 +70,7 @@ public sealed class NotchExportSelectionWindowEntryTests
             await HeadlessUiPump.FlushQueueAsync();
             Assert.False(viewModel.TryGetExportBlockMessage(out _, out _));
 
-            await ClickAsync(FindContentButton(window, "Export"));
+            await ClickAsync(window.FindControl<Button>("ExportButton")!);
 
             Assert.True(Assert.Single(completions));
             Assert.False(window.IsVisible);
@@ -104,7 +104,7 @@ public sealed class NotchExportSelectionWindowEntryTests
             await HeadlessUiPump.FlushQueueAsync();
             Assert.True(viewModel.TryGetExportBlockMessage(out var title, out var message));
 
-            await ClickAsync(FindContentButton(window, "Export"));
+            await ClickAsync(window.FindControl<Button>("ExportButton")!);
 
             var dialog = Assert.Single(window.OwnedWindows.OfType<WarningDialog>());
             Assert.Same(window, dialog.Owner);
@@ -152,7 +152,7 @@ public sealed class NotchExportSelectionWindowEntryTests
             {
                 await clipboard.SetTextAsync("Before copying payload");
 
-                await ClickAsync(FindTooltipButton(window, "Copy payload"));
+                await ClickAsync(window.FindControl<Button>("CopyPayloadButton")!);
 
                 Assert.Equal(expected, await clipboard.TryGetTextAsync());
                 Assert.True(window.IsVisible);

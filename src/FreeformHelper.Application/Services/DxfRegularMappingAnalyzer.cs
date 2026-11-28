@@ -15,12 +15,13 @@ public sealed partial class DxfRegularMappingAnalyzer
         IndexMappingSettings settings,
         IReadOnlyDictionary<int, int>? manualOverrides = null,
         IReadOnlyDictionary<int, int>? expectedDiffIndexByCadId = null,
-        Action<double>? reportProgress = null)
+        Action<double>? reportProgress = null,
+        IReadOnlyDictionary<int, int>? cadIcIndexByCadId = null)
     {
         // Defer conversion until overrides are applied, after candidate progress callbacks.
         return AnalyzeCore(cad, grid, settings,
             manualOverrides is null ? null : new LegacyManualOverrides(manualOverrides),
-            expectedDiffIndexByCadId, reportProgress);
+            new CurrentCadAssignments(expectedDiffIndexByCadId, cadIcIndexByCadId), reportProgress);
     }
 
     /// <summary>
@@ -32,9 +33,11 @@ public sealed partial class DxfRegularMappingAnalyzer
         IndexMappingSettings settings,
         IReadOnlyDictionary<CadPadId, RegularPadId>? manualOverrides,
         IReadOnlyDictionary<int, int>? expectedDiffIndexByCadId = null,
-        Action<double>? reportProgress = null)
+        Action<double>? reportProgress = null,
+        IReadOnlyDictionary<int, int>? cadIcIndexByCadId = null)
     {
-        return AnalyzeCore(cad, grid, settings, manualOverrides, expectedDiffIndexByCadId, reportProgress);
+        return AnalyzeCore(cad, grid, settings, manualOverrides,
+            new CurrentCadAssignments(expectedDiffIndexByCadId, cadIcIndexByCadId), reportProgress);
     }
 
     private static DxfRegularMappingResult AnalyzeCore(
@@ -42,9 +45,10 @@ public sealed partial class DxfRegularMappingAnalyzer
         RegularGrid grid,
         IndexMappingSettings settings,
         IReadOnlyCollection<KeyValuePair<CadPadId, RegularPadId>>? manualOverrides,
-        IReadOnlyDictionary<int, int>? expectedDiffIndexByCadId,
+        CurrentCadAssignments current,
         Action<double>? reportProgress)
     {
+        var expectedDiffIndexByCadId = current.DiffIndexByCadId;
         ReportProgress(reportProgress, 0.0);
         settings ??= new IndexMappingSettings();
         settings.ValidateOrThrow();
@@ -62,7 +66,7 @@ public sealed partial class DxfRegularMappingAnalyzer
         var mappedPairs = BuildMappedPairs(cadPads, regPads, assignment, expectedDiffIndexByCadId);
 
         // --- Build report ---
-        var inputs = new ReportInputs(cadPads, regPads, settings, scan, assignment, expectedDiffIndexByCadId, reportProgress);
+        var inputs = new ReportInputs(cadPads, regPads, settings, scan, assignment, current, reportProgress);
         var tally = CollectIssues(inputs);
         var report = BuildReport(inputs, mappedPairs.Count, tally);
 
@@ -381,47 +385,53 @@ public sealed partial class DxfRegularMappingAnalyzer
         }
     }
 
+    // The Step 4 panel lists the same groups, so every visible CAD pad counts, paired or not.
     private static void AddDuplicateDiffIssues(ReportInputs inputs, IssueTally tally)
     {
-        var cadPads = inputs.CadPads;
-        var regPads = inputs.RegPads;
-        var scan = inputs.Scan;
-        var assignment = inputs.Assignment;
-        var duplicateDiffGroups = Enumerable.Range(0, cadPads.Count)
-            .Where(c => assignment.CadToReg[c] >= 0)
-            .Select(c => new
-            {
-                CadIndex = c,
-                CadPadId = cadPads[c].Id,
-                DxfIndex = ResolveCadSequenceIndex(cadPads, inputs.ExpectedDiffIndexByCadId, c),
-                Regular = regPads[assignment.CadToReg[c]],
-                Score = assignment.CadAssignedScore[c],
-            })
-            .GroupBy(static entry => (entry.Regular.IcIndex, entry.DxfIndex))
-            .Where(static group => group.Count() > 1)
-            .ToList();
-        tally.DuplicateDiffCount = duplicateDiffGroups.Sum(group => group.Count());
-        foreach (var duplicateGroup in duplicateDiffGroups)
+        var current = inputs.Current;
+        if (current.DiffIndexByCadId is null || current.IcIndexByCadId is null)
         {
-            var cadIdsText = string.Join(", ", duplicateGroup.Select(static entry => entry.CadPadId).OrderBy(static id => id));
-            var message = $"Current diff idx {duplicateGroup.Key.DxfIndex} in IC{duplicateGroup.Key.IcIndex + 1} is shared by CAD {cadIdsText}.";
-            foreach (var duplicateEntry in duplicateGroup)
+            return;
+        }
+
+        var duplicateGroups = CadOutputFwDiffIndexDuplicateReviewService.BuildGroups(
+            inputs.CadPads, current.DiffIndexByCadId, current.IcIndexByCadId);
+        tally.DuplicateDiffCount = duplicateGroups.Sum(static group => group.Entries.Count);
+        var cadIndexById = Enumerable.Range(0, inputs.CadPads.Count)
+            .ToLookup(c => inputs.CadPads[c].Id);
+        foreach (var group in duplicateGroups)
+        {
+            var cadIdsText = string.Join(", ", group.Entries.Select(static entry => entry.CadPadId));
+            var message = $"Current diff idx {group.DiffIndex} in IC{group.IcIndex + 1} is shared by CAD {cadIdsText}.";
+            foreach (var entry in group.Entries)
             {
-                tally.Issues.Add(new DxfRegularMappingIssue(
-                    DxfRegularMappingIssueKind.DuplicateDiff,
-                    message,
-                    DxfIndex: duplicateEntry.DxfIndex,
-                    CadPadId: duplicateEntry.CadPadId,
-                    RegularPadIndex: duplicateEntry.Regular.RegularPadId,
-                    IcIndex: duplicateEntry.Regular.IcIndex,
-                    DiffIndex: duplicateEntry.Regular.DiffIndex,
-                    Score: duplicateEntry.Score,
-                    BestScore: scan.Best[duplicateEntry.CadIndex],
-                    SecondScore: scan.Second[duplicateEntry.CadIndex],
-                    Margin: scan.Best[duplicateEntry.CadIndex] - scan.Second[duplicateEntry.CadIndex],
-                    TopCandidates: scan.TopCandidates[duplicateEntry.CadIndex]));
+                tally.Issues.Add(BuildDuplicateDiffIssue(inputs, cadIndexById[entry.CadPadId].First(), entry, message));
             }
         }
+    }
+
+    private static DxfRegularMappingIssue BuildDuplicateDiffIssue(
+        ReportInputs inputs,
+        int c,
+        CadOutputFwDiffIndexDuplicateReviewEntry entry,
+        string message)
+    {
+        var scan = inputs.Scan;
+        var regIndex = inputs.Assignment.CadToReg[c];
+        var reg = regIndex < 0 ? null : inputs.RegPads[regIndex];
+        return new DxfRegularMappingIssue(
+            DxfRegularMappingIssueKind.DuplicateDiff,
+            message,
+            DxfIndex: entry.CurrentDiffIndex,
+            CadPadId: entry.CadPadId,
+            RegularPadIndex: reg?.RegularPadId,
+            IcIndex: entry.IcIndex,
+            DiffIndex: reg?.DiffIndex,
+            Score: reg is null ? null : inputs.Assignment.CadAssignedScore[c],
+            BestScore: scan.Best[c],
+            SecondScore: scan.Second[c],
+            Margin: scan.Best[c] - scan.Second[c],
+            TopCandidates: scan.TopCandidates[c]);
     }
 
     private static void AddUnmappedRegularIssues(ReportInputs inputs, IssueTally tally)
@@ -469,7 +479,7 @@ public sealed partial class DxfRegularMappingAnalyzer
         var issuesTruncated = issues.Count > settings.MaxReportIssues;
         if (issuesTruncated)
         {
-            issues = issues.Take(settings.MaxReportIssues).ToList();
+            issues = TruncateKeepingDuplicates(issues, settings.MaxReportIssues);
         }
 
         var sampleIssues = issues.Take(Math.Min(settings.MaxSampleIssues, issues.Count)).ToList();
@@ -493,6 +503,31 @@ public sealed partial class DxfRegularMappingAnalyzer
             Issues: issues,
             sampleIssues,
             DuplicateDiffCount: tally.DuplicateDiffCount);
+    }
+
+    // The report counts its rows, so duplicate rows take their slots first. Otherwise a truncated report reads
+    // "no duplicate" while the Step 4 panel lists groups. The order of the kept rows does not change.
+    private static List<DxfRegularMappingIssue> TruncateKeepingDuplicates(List<DxfRegularMappingIssue> issues, int maxCount)
+    {
+        var duplicateSlots = Math.Min(maxCount, issues.Count(static issue => issue.Kind == DxfRegularMappingIssueKind.DuplicateDiff));
+        var otherSlots = maxCount - duplicateSlots;
+        var kept = new List<DxfRegularMappingIssue>(maxCount);
+        foreach (var issue in issues)
+        {
+            if (issue.Kind == DxfRegularMappingIssueKind.DuplicateDiff)
+            {
+                if (duplicateSlots-- > 0)
+                {
+                    kept.Add(issue);
+                }
+            }
+            else if (otherSlots-- > 0)
+            {
+                kept.Add(issue);
+            }
+        }
+
+        return kept;
     }
 
     private static void ReportProgress(Action<double>? reportProgress, double value)
@@ -541,8 +576,15 @@ public sealed partial class DxfRegularMappingAnalyzer
         IndexMappingSettings Settings,
         CandidateScan Scan,
         PadAssignment Assignment,
-        IReadOnlyDictionary<int, int>? ExpectedDiffIndexByCadId,
-        Action<double>? ReportProgress);
+        CurrentCadAssignments Current,
+        Action<double>? ReportProgress)
+    {
+        public IReadOnlyDictionary<int, int>? ExpectedDiffIndexByCadId => Current.DiffIndexByCadId;
+    }
+
+    private readonly record struct CurrentCadAssignments(
+        IReadOnlyDictionary<int, int>? DiffIndexByCadId,
+        IReadOnlyDictionary<int, int>? IcIndexByCadId);
 
     private sealed class IssueTally(int capacity)
     {

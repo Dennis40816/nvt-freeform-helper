@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 using Avalonia.Headless.XUnit;
+using FreeformHelper.Infrastructure.Project;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
@@ -52,6 +53,34 @@ public sealed class ProjectLoadStateApplyCharacterizationTests
         Assert.False(result.Step2Replayed);
         Assert.Empty(vm.CadPads);
         Assert.Contains(NoCadReplayStatus, vm.StatusText, StringComparison.Ordinal);
+    }
+
+    [AvaloniaFact]
+    public async Task LoadFromPath_ProjectWithoutCad_RefreshesTheAssignmentSummaryAndKeepsTheSavedOverrides()
+    {
+        const string noPads = "CAD Output FW Diff assignment: no CAD output pads.";
+        var scope = new LoadScope();
+        var path = await scope.SaveProjectAsync(static _ => { });
+        var saved = JsonProjectStore.Load(path);
+        saved.CadOutputFwDiffIndexOverrides[3] = 7;
+        saved.CadOutputFwDiffIndexAnchorCadPadByIc[0] = 3;
+        await new JsonProjectStore().SaveAsync(path, saved, TestContext.Current.CancellationToken);
+        var vm = scope.CreateViewModel();
+        await vm.OpenDxfCommand.ExecuteAsync(null);
+        Assert.NotEqual(noPads, vm.CadOutputFwDiffAssignmentSummary);
+        var changed = new List<string?>();
+        vm.PropertyChanged += (_, args) => changed.Add(args.PropertyName);
+
+        var result = await vm.LoadProjectFromPathAsync(path);
+
+        Assert.True(result.IsLoaded);
+        Assert.Empty(vm.CadPads);
+        Assert.Equal(noPads, vm.CadOutputFwDiffAssignmentSummary);
+        Assert.Contains(nameof(vm.CadOutputFwDiffAssignmentSummary), changed);
+        Assert.True(await vm.SaveProjectAsync());
+        var again = JsonProjectStore.Load(path);
+        Assert.Equal(7, Assert.Single(again.CadOutputFwDiffIndexOverrides, static pair => pair.Key == 3).Value);
+        Assert.Equal(3, Assert.Single(again.CadOutputFwDiffIndexAnchorCadPadByIc, static pair => pair.Key == 0).Value);
     }
 
     [AvaloniaFact]

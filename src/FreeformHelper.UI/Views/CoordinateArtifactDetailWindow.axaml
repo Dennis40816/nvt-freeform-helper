@@ -47,21 +47,10 @@
               <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Source"/>
               <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding SourceText}" TextWrapping="Wrap"/>
             </StackPanel>
-            <panels:CollapsiblePanel x:Name="SourceDetailSection" Title="Source bounds and detail" IsExpanded="False">
-              <StackPanel Spacing="{DynamicResource Space8}">
-                <StackPanel Spacing="{DynamicResource Space2}">
-                  <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Source bounds"/>
-                  <SelectableTextBlock Classes="workspaceInspectorValue"
-                                       Text="{Binding SourceBoundsText}"
-                                       TextWrapping="Wrap"/>
-                </StackPanel>
-                <StackPanel Spacing="{DynamicResource Space2}">
-                  <SelectableTextBlock Classes="workspaceInspectorSectionTitle" Text="Detail"/>
-                  <SelectableTextBlock Classes="workspaceInspectorValue"
-                                       Text="{Binding DetailText}"
-                                       TextWrapping="Wrap"/>
-                </StackPanel>
-              </StackPanel>
+            <panels:CollapsiblePanel x:Name="SourceDetailSection" Title="Source bounds" IsExpanded="False">
+              <SelectableTextBlock Classes="workspaceInspectorValue"
+                                   Text="{Binding SourceBoundsText}"
+                                   TextWrapping="Wrap"/>
             </panels:CollapsiblePanel>
           </StackPanel>
         </Border>

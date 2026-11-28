@@ -66,8 +66,8 @@
       "issue": "health-refactor/2026-10-31",
       "ceilings": {
         "stateMembers": 65,
-        "partialFiles": 28,
-        "viewTypeLines": 5474
+        "partialFiles": 27,
+        "viewTypeLines": 5104
       },
       "owner": "NFH",
       "locations": [

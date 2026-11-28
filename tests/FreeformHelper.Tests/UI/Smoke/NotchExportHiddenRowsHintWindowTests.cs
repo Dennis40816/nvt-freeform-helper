@@ -2,7 +2,6 @@
 
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Avalonia.VisualTree;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
@@ -29,27 +28,25 @@ public sealed class NotchExportHiddenRowsHintWindowTests
         {
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
-            var hint = Assert.Single(window.GetVisualDescendants().OfType<SelectableTextBlock>(),
-                text => text.Text == "1 row hidden but still exported");
+            var status = Assert.IsType<SelectableTextBlock>(window.FindControl<SelectableTextBlock>("FooterStatus"));
 
-            Assert.True(hint.IsVisible);
-            Assert.True(hint.IsEffectivelyVisible);
+            Assert.Equal("2 selected · 1 shown · 1 hidden row is exported too", status.Text);
+            Assert.Contains("warning", status.Classes);
 
             viewModel.SelectedRowDisplayModeOption = viewModel.RowDisplayModeOptions
                 .Single(option => option.Value == NotchExportRowDisplayMode.AllRows);
             await HeadlessUiPump.FlushQueueAsync();
 
             Assert.Equal(0, viewModel.HiddenSelectedRowCount);
-            Assert.False(hint.IsVisible);
-            Assert.False(hint.IsEffectivelyVisible);
+            Assert.Equal("2 selected · 2 shown", status.Text);
+            Assert.DoesNotContain("warning", status.Classes);
 
             viewModel.SelectedRowDisplayModeOption = viewModel.RowDisplayModeOptions
                 .Single(option => option.Value == NotchExportRowDisplayMode.TransferOnly);
             await HeadlessUiPump.FlushQueueAsync();
 
-            Assert.Equal("1 row hidden but still exported", hint.Text);
-            Assert.True(hint.IsVisible);
-            Assert.True(hint.IsEffectivelyVisible);
+            Assert.Equal("2 selected · 1 shown · 1 hidden row is exported too", status.Text);
+            Assert.Contains("warning", status.Classes);
         }
         finally
         {

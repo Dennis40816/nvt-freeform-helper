@@ -115,23 +115,22 @@ public sealed class LayerImageExportIntegratedLayoutTests
         var footer = session.Window.FindControl<TextBlock>("ExportSummary")!;
         Assert.True(left.IsEffectivelyVisible);
         Assert.True(footer.IsEffectivelyVisible);
-        Assert.Equal("5 of 9 shown selected · 5 / 9 layers selected", left.Text);
-        Assert.Contains("5 layers selected", footer.Text!, StringComparison.Ordinal);
-        Assert.Contains(session.Model.PreviewSettings.OutputText, footer.Text!, StringComparison.Ordinal);
+        Assert.Equal("5 / 9 layers selected", left.Text);
+        Assert.Equal(session.Model.PreviewSettings.OutputText, footer.Text);
 
         session.Model.SearchText = "ref";
         await HeadlessUiPump.FlushQueueAsync();
-        Assert.Equal("2 of 2 shown selected · 5 / 9 layers selected", left.Text);
-        Assert.Contains("5 layers selected", footer.Text!, StringComparison.Ordinal);
+        Assert.Equal("2 of 2 shown selected · 5 / 9 in total", left.Text);
+        Assert.Equal(session.Model.PreviewSettings.OutputText, footer.Text);
         session.Model.ToggleAllLayersCommand.Execute(null);
         await HeadlessUiPump.FlushQueueAsync();
-        Assert.Equal("0 of 2 shown selected · 3 / 9 layers selected", left.Text);
-        Assert.Contains("3 layers selected", footer.Text!, StringComparison.Ordinal);
+        Assert.Equal("0 of 2 shown selected · 3 / 9 in total", left.Text);
+        Assert.Equal(session.Model.PreviewSettings.OutputText, footer.Text);
 
         session.Model.SearchText = "missing-layer";
         await HeadlessUiPump.FlushQueueAsync();
-        Assert.Equal("0 of 0 shown selected · 3 / 9 layers selected", left.Text);
-        Assert.Contains("3 layers selected", footer.Text!, StringComparison.Ordinal);
+        Assert.Equal("0 of 0 shown selected · 3 / 9 in total", left.Text);
+        Assert.Equal(session.Model.PreviewSettings.OutputText, footer.Text);
         Assert.True(session.Window.FindControl<Button>("ExportButton")!.IsEffectivelyEnabled);
     }
 
@@ -146,7 +145,7 @@ public sealed class LayerImageExportIntegratedLayoutTests
         Assert.Equal("Export…", export.Content);
         Assert.Same(session.Model.ConfirmCommand, export.Command);
         Assert.False(export.IsEffectivelyEnabled);
-        Assert.Contains("0 layers selected", footer.Text!, StringComparison.Ordinal);
+        Assert.Equal(session.Model.PreviewSettings.OutputText, footer.Text);
 
         session.Model.VisibleRows[0].IsChecked = true;
         session.Model.PreviewSettings.KeepRatio = false;
@@ -155,8 +154,7 @@ public sealed class LayerImageExportIntegratedLayoutTests
         await HeadlessUiPump.FlushQueueAsync();
 
         Assert.True(export.IsEffectivelyEnabled);
-        Assert.Contains("1 layer selected", footer.Text!, StringComparison.Ordinal);
-        Assert.Contains("720 × 480 px", footer.Text!, StringComparison.Ordinal);
+        Assert.Equal("720 × 480 px", footer.Text);
         Assert.Equal(720m, session.Model.PreviewSettings.PixelsX);
         Assert.Equal(480m, session.Model.PreviewSettings.PixelsY);
     }

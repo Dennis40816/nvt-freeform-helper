@@ -43,7 +43,7 @@ public sealed class NotchExportSelectionExportButtonTests
         await HeadlessUiPump.FlushQueueAsync();
         Assert.Equal(_sortedDiffs, fixture.Selection.Rows.Select(row => row.Row.DiffIndex));
 
-        await ClickAsync(FindButton(window, "Export"));
+        await ClickAsync(FindExportButton(window));
 
         var selected = Assert.IsType<NotchTable>(await result.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
         AssertRows(selected, fixture.Table.Rows[0], fixture.Table.Rows[4]);
@@ -76,7 +76,7 @@ public sealed class NotchExportSelectionExportButtonTests
         Assert.False(fixture.Selection.ShowSelectedOnly);
         AssertGroup(fixture.Selection, 0, 3, 3);
         AssertGroup(fixture.Selection, 1, 1, 3);
-        await ClickAsync(FindButton(fixture.Window, "Export"));
+        await ClickAsync(FindExportButton(fixture.Window));
 
         var selected = Assert.IsType<NotchTable>(await result.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
         AssertRows(selected, fixture.Table.Rows[0], fixture.Table.Rows[1], fixture.Table.Rows[2], fixture.Table.Rows[4]);
@@ -111,7 +111,7 @@ public sealed class NotchExportSelectionExportButtonTests
         Assert.True(fixture.Selection.Rows[0].IsSelected);
         Assert.False(fixture.Selection.Rows[1].IsSelected);
         Assert.Equal(1, fixture.Selection.HiddenSelectedRowCount);
-        await ClickAsync(FindButton(fixture.Window, "Export"));
+        await ClickAsync(FindExportButton(fixture.Window));
         var selected = Assert.IsType<NotchTable>(await result.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
         AssertRows(selected, fixture.Table.Rows[0], fixture.Table.Rows[4]);
     }
@@ -138,7 +138,7 @@ public sealed class NotchExportSelectionExportButtonTests
         Assert.Equal("ic=2", fixture.Selection.SearchKeyword);
         Assert.Equal(_builderFilterDiffs, fixture.Selection.Rows.Select(row => row.Row.DiffIndex));
         Assert.Equal(1, fixture.Selection.HiddenSelectedRowCount);
-        await ClickAsync(FindButton(fixture.Window, "Export"));
+        await ClickAsync(FindExportButton(fixture.Window));
         var selected = Assert.IsType<NotchTable>(await result.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
         AssertRows(selected, fixture.Table.Rows[1], fixture.Table.Rows[3]);
     }
@@ -162,7 +162,7 @@ public sealed class NotchExportSelectionExportButtonTests
         {
             await clipboard.SetTextAsync("before copy");
 
-            await ClickAsync(FindTooltipButton(fixture.Window, "Copy payload"));
+            await ClickAsync(fixture.Window.FindControl<Button>("CopyPayloadButton")!);
 
             Assert.Equal("{ 40, 95, 41, 5, 65535, 0, 0 }", await clipboard.TryGetTextAsync());
             Assert.True(fixture.Window.IsVisible);
@@ -184,7 +184,7 @@ public sealed class NotchExportSelectionExportButtonTests
         await HeadlessUiPump.WaitUntilAsync(() => fixture.Owner.OwnedWindows.Count > 0, "Selection window did not open.");
         await HeadlessUiPump.FlushQueueAsync();
         var window = fixture.Window;
-        var export = FindButton(window, "Export");
+        var export = FindExportButton(window);
         await fixture.ClearSelectionAsync();
 
         Assert.False(export.IsEffectivelyEnabled);
@@ -221,7 +221,7 @@ public sealed class NotchExportSelectionExportButtonTests
         var expected = rows[^1].Row;
         await ClickAsync(fixture.FindRowCheckBox(expected.DiffIndex));
 
-        await ClickAsync(FindButton(window, "Export"));
+        await ClickAsync(FindExportButton(window));
         await export.WaitAsync(TimeSpan.FromSeconds(30), TestContext.Current.CancellationToken);
 
         var data = Assert.Single(TestFiles.ReadContentLines(files.ExportPath).Skip(1)).Split(',');

@@ -162,7 +162,7 @@ public sealed partial class PadCanvas
         long HighlightRevision,
         long ResourceRevision);
 
-    private readonly record struct PadCanvasVisibleDrawListMetrics(
+    internal readonly record struct PadCanvasVisibleDrawListMetrics(
         int RegularCandidates,
         int CadCandidates,
         int VisibleRegularSelected,

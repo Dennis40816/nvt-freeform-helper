@@ -24,7 +24,6 @@ public sealed class HowToUseIntegratedLayoutTests
         "Manual sizing and right-pane settings",
         "Notch reference",
         "Numeric input and Console",
-        "Advanced reference",
     ];
 
     private static readonly (string Gesture, string Action)[] _gestureRows =
@@ -54,54 +53,51 @@ public sealed class HowToUseIntegratedLayoutTests
         ("Interface tour",
         [
             "Navigation",
-            "- Top tabs: Freeform Helper, How To Use, Dev.",
+            "- Top tabs: Freeform Helper, Simulation, Coordinate, How To Use.",
             "- Fit icon: top-right of the canvas.",
             "Menu Bar",
             "- File: Open DXF, Save Project, Load Project.",
-            "- Match: Run pad matching.",
-            "- Export: Notch CSV review or C v2.1/v2.2.",
+            "- Export: Notch rows, DXF, or DXF layer images.",
         ]),
         ("Display and DXF settings",
         [
             "Workspace Header (Display)",
-            "- Display menu: CAD layer, Regular grid, Highlight unmatched/freeform, Color by area.",
+            "- Display menu: highlight unmatched/freeform. Layer and preview toggles are on the canvas.",
             "- CAD display: line width and line color.",
             "- Area buckets: CAD-only area grouping colors.",
             "- Status and selection summaries update automatically.",
             "DXF Settings (Left Panel)",
             "- Only closed polylines: import closed shapes only.",
             "- Layer toggles: hide/show CAD pads by layer after import.",
-            "- Check DXF overlaps: scan duplicates and overlaps on demand.",
+            "- Overlap check: scan duplicates and overlaps on demand.",
         ]),
         ("Manual sizing and right-pane settings",
         [
-            "Manual Sizing (Header Bar)",
+            "Range selection / Pad Info",
             "- Rows/Cols: enter ranges like 5, 5-7, 5,7.",
-            "- Width/Height: set target size for selected regular pads.",
-            "- Use Selection: fill Rows/Cols from current selection.",
-            "- '*' means mixed values in the current selection.",
-            "Right Panel: General Settings",
+            "- Pad Info: edit Width/Height for selected regular pads.",
+            "- Mixed values: enter a size to override the selection.",
+            "Settings: General",
             "- IC layout: Cascade count and per-IC X/Y channels.",
             "- Grid settings: Padding percent, scan order, and sizing scope (Local/Global).",
             "- Panel AA size (mm): Physical panel size used to compute pitch.",
             "- Alignment mode: Choose AA vs DXF bounds.",
-            "Right Panel: Analysis",
+            "Right Panel: Settings",
             "- Matching: overlap-based CAD↔Regular relation; one CAD can map to multiple regular pads.",
             "- Unmatched threshold: Display-only overlap / regular area diagnostic; changing it does not change links.",
-            "- Freeform tagging: Assign X/Y/XY/None to selected pads.",
-            "- Notch export: Enable versions and legacy values.",
+            "- Freeform tagging: assign X/Y/XY/None to selected Regular pads.",
+            "- Step 5 settings: choose versions, export type, and C profile.",
         ]),
         ("Notch reference",
         [
             "Notch Terms & Thresholds",
             "- BBoxArea: CAD pad bounding-box area, formula = width × height (used by V2.1 REGU_TO_FULL field).",
-            "- Freeform TH (Matching > Freeform axis threshold): decides XWay/YWay/None classification during auto-detect.",
-            "- Notch TH (Notch threshold Q7): after allocation, if max allocation < TH, that CAD is skipped from notch export.",
+            "- Freeform TH (Settings > Step 2; ratio 0–1): decides XWay/YWay/XYWay/None classification during auto-detect.",
+            "- Notch gate TH (Settings > Step 5; v2.1 Q7/128, v2.2 percent): after allocation, max allocation below the active TH skips that CAD from notch export.",
             "- To Full scope: every CAD-overlapped regular with reachable free area can expand, not only boundary regulars.",
             "- Multi-owner gate: a shared regular is blocked only when it has no reachable free area.",
             "- Active regular visibility mask: boundary inactive-neighbor check uses current active regular set (match result scope), not all grid cells.",
-            "- Allocation cutoff: reserved for future FW-oriented row minimization (not enabled in current build).",
-            "- Export notch now opens a row picker, so each generated notch row can be included/excluded manually before file output.",
+            "- Export Notch Rows opens a row picker to manually include/exclude each generated notch row before file output.",
         ]),
         ("Numeric input and Console",
         [
@@ -115,11 +111,6 @@ public sealed class HowToUseIntegratedLayoutTests
             "- Clear removes entries.",
             "- Ctrl + Z undoes settings and pad edits (global when not editing text).",
             "- Delete hides selected CAD pads (global when not editing text).",
-        ]),
-        ("Advanced reference",
-        [
-            "Build & Tests",
-            "- Run scripts/build.ps1 to build and execute unit tests.",
         ]),
     ];
 
@@ -135,7 +126,7 @@ public sealed class HowToUseIntegratedLayoutTests
             groups[0].IsExpanded = false;
             Assert.True(groups[0].IsExpanded);
             Assert.All(groups.Skip(1), static group => Assert.False(group.IsExpanded));
-            Assert.Equal("Advanced reference", groups[^1].Title);
+            Assert.Equal("Numeric input and Console", groups[^1].Title);
             return Task.CompletedTask;
         });
     }

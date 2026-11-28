@@ -12,8 +12,6 @@ public sealed partial class PadCanvas
     public PadCanvas()
     {
         ClipToBounds = true; // Ensure content outside the control's bounds is clipped.
-        _selectionEngine = new PadCanvasSelectionEngine(this);
-        _visibleDrawListBuilder = new PadCanvasVisibleDrawListBuilder(this);
 
         AttachedToVisualTree += OnAttachedToVisualTree;
         ResourcesChanged += OnResourcesChanged;

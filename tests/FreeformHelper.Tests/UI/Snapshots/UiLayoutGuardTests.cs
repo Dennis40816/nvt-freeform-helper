@@ -299,11 +299,10 @@ public sealed partial class UiLayoutGuardTests
             },
             [Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "NotchExportSelectionWindow.axaml")] = new[]
             {
-                "ExportSummaryText",
-                "HiddenSelectedRowsHintText",
+                "FooterStatusText",
                 "InspectorHeaderText",
                 "SelectedRowCodePreviewText",
-                "SelectedRowAnalysisText",
+                "SelectedRowAnalysisRatioSumText",
                 "SelectedRowPadRelationText",
                 "SelectedRowPayloadAnchorText",
                 "SelectedRowPayloadCombineText",
