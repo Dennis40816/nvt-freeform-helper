@@ -19,27 +19,23 @@ namespace FreeformHelper.Tests;
 public sealed class ConsoleStyleScopeTests
 {
     [AvaloniaFact]
-    public void CanvasOverlayButtonOutsideTheConsole_KeepsTheNfhSizeAndTemplate()
+    public void CanvasOverlayButtonOutsideTheConsoleUsesTheCoreGhostIconRole()
     {
         HeadlessAppBootstrap.EnsureInitialized();
 
         // The same role classes as the fit button of CanvasOverlayControls.
         var button = new Button { Content = "x" };
-        button.Classes.Add("viewportOverlayAction");
+        button.Classes.AddRange(["actionIconButton", "actionGhost"]);
 
         var window = ShowInWindow(button);
         try
         {
             button.ApplyTemplate();
 
-            Assert.Equal(ResourceDouble("IconButtonSize"), button.Width);
-            Assert.Equal(ResourceDouble("IconButtonSize"), button.MinHeight);
-
-            // The Core role template has a Grid with the borders RoleBorder and PrimaryPressedBorder.
-            // The NFH template is one Border around the content.
-            var borders = button.GetVisualDescendants().OfType<Border>().ToList();
-            Assert.Single(borders);
-            Assert.DoesNotContain(borders, static border => border.Name is "RoleBorder" or "PrimaryPressedBorder");
+            Assert.Equal(ResourceDouble("NfcControlHeight"), button.Width);
+            Assert.Equal(ResourceDouble("NfcControlHeight"), button.MinHeight);
+            var body = Assert.Single(button.GetVisualDescendants().OfType<Border>(), static border => border.Name == "RoleBorder");
+            Assert.Equal(0, Assert.IsAssignableFrom<ISolidColorBrush>(body.Background).Color.A);
         }
         finally
         {
@@ -130,7 +126,7 @@ public sealed class ConsoleStyleScopeTests
     [InlineData(":pressed", true)]
     [InlineData(":focus-visible", true)]
     [InlineData(":disabled", true)]
-    public void CoreButtonIs32WhileTheRealCanvasToggleKeepsItsShape(string state, bool isChecked)
+    public void CanvasToggleUsesTheCoreFlatMarkedGeometryInEveryState(string state, bool isChecked)
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var action = new Button { Content = "General action" };
@@ -139,18 +135,17 @@ public sealed class ConsoleStyleScopeTests
         var window = ShowInWindow(new StackPanel { Children = { action, overlay } });
         try
         {
-            var toggle = overlay.GetVisualDescendants().OfType<ToggleButton>()
-                .Where(static control => control.Classes.Contains("canvasQuickToggle")).ToArray()[0];
+            var toggle = overlay.GetVisualDescendants().OfType<ToggleButton>().ToArray()[0];
             var radius = toggle.CornerRadius;
             toggle.IsChecked = isChecked;
             SetState(toggle, state);
             window.Dispatcher.RunJobs();
             Assert.Equal(32d, action.Height);
             Assert.Equal(32d, action.Bounds.Height);
-            Assert.Equal(ResourceDouble("ProductControlMinHeight"), toggle.MinHeight);
-            Assert.Equal(ResourceDouble("ProductControlMinHeight"), toggle.Bounds.Height);
-            Assert.Equal(new global::Avalonia.Thickness(10, 6), toggle.Padding);
-            Assert.Equal(default(global::Avalonia.Thickness), toggle.BorderThickness);
+            Assert.Equal(action.MinHeight, toggle.MinHeight);
+            Assert.Equal(action.Bounds.Height, toggle.Bounds.Height);
+            Assert.Equal(action.Padding, toggle.Padding);
+            Assert.Equal(new global::Avalonia.Thickness(2), toggle.BorderThickness);
             Assert.Equal(radius, toggle.CornerRadius);
             Assert.True(toggle.CornerRadius.TopLeft < toggle.MinHeight / 2);
             Assert.DoesNotContain("actionNeutral", toggle.Classes);
@@ -290,18 +285,20 @@ public sealed class ConsoleStyleScopeTests
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var disabled = new ToggleButton { Content = "To Full Preview", IsEnabled = false };
-        disabled.Classes.Add("canvasQuickToggle");
+        disabled.Classes.AddRange(["actionGhost", "flat", "marked"]);
         var focused = new ToggleButton { Content = "CAD layer" };
-        focused.Classes.Add("canvasQuickToggle");
+        focused.Classes.AddRange(["actionGhost", "flat", "marked"]);
         var window = ShowInWindow(new StackPanel { Children = { disabled, focused } });
         try
         {
             focused.Focus(NavigationMethod.Tab);
             window.Dispatcher.RunJobs();
-            Assert.Equal(ThemeColor(disabled, "NfcTextMutedBrush"),
+            Assert.Equal(ThemeColor(disabled, "NfcTextDisabledBrush"),
                 Assert.IsAssignableFrom<ISolidColorBrush>(disabled.Foreground).Color);
-            Assert.Equal(ThemeColor(focused, "NfcSelectionSurfaceBrush"),
-                Assert.IsAssignableFrom<ISolidColorBrush>(focused.Background).Color);
+            Assert.Equal(1, disabled.Opacity);
+            Assert.Equal(0, Assert.IsAssignableFrom<ISolidColorBrush>(focused.Background).Color.A);
+            Assert.True(focused.IsFocused);
+            Assert.NotNull(focused.FocusAdorner);
         }
         finally
         {

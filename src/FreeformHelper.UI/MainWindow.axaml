@@ -43,27 +43,27 @@
         <Border Classes="shellTabStrip"
                 HorizontalAlignment="Left">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space4}">
-            <ToggleButton Classes="shellTab"
+            <ToggleButton Classes="shellTab actionGhost flat marked"
                           Content="Freeform Helper"
                           Tag="{x:Static vm:ShellPage.Workspace}"
                           IsChecked="{Binding IsWorkspaceActive, Mode=OneWay}"
                           Command="{Binding ShowWorkspaceCommand}"/>
-            <ToggleButton Classes="shellTab"
+            <ToggleButton Classes="shellTab actionGhost flat marked"
                           Content="Simulation"
                           Tag="{x:Static vm:ShellPage.Simulation}"
                           IsChecked="{Binding IsSimulationActive, Mode=OneWay}"
                           Command="{Binding ShowSimulationCommand}"/>
-            <ToggleButton Classes="shellTab"
+            <ToggleButton Classes="shellTab actionGhost flat marked"
                           Content="Coordinate"
                           Tag="{x:Static vm:ShellPage.Coordinate}"
                           IsChecked="{Binding IsCoordinateActive, Mode=OneWay}"
                           Command="{Binding ShowCoordinateCommand}"/>
-            <ToggleButton Classes="shellTab"
+            <ToggleButton Classes="shellTab actionGhost flat marked"
                           Content="How To Use"
                           Tag="{x:Static vm:ShellPage.HowToUse}"
                           IsChecked="{Binding IsHowToUseActive, Mode=OneWay}"
                           Command="{Binding ShowHowToUseCommand}"/>
-            <ToggleButton Classes="shellTab"
+            <ToggleButton Classes="shellTab actionGhost flat marked"
                           Content="Dev"
                           Tag="{x:Static vm:ShellPage.Dev}"
                           IsVisible="{Binding IsDevPageAvailable}"

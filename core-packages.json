@@ -3,14 +3,14 @@
   "repository": "Dennis40816/nvt_fw_core",
   "packages": [
     {
-      "release": "core-v0.9.6",
-      "asset": "Nvt.Core.0.9.6.nupkg",
-      "sha256": "1ae58bb324a49d0b83c4480cc6c454019f4412fea7555c40387f281ea09ba7d2"
+      "release": "core-v0.9.7",
+      "asset": "Nvt.Core.0.9.7.nupkg",
+      "sha256": "6f88a964ef1fe63b6253685964d3233a11877ac44eb5d10eea056ebca1269553"
     },
     {
-      "release": "core-v0.9.6",
-      "asset": "Nvt.Core.Avalonia.0.9.6.nupkg",
-      "sha256": "67eab7e3de6c102aa70fffb2638bd898e4174720e51a50ef715b05d708d15d86"
+      "release": "core-v0.9.7",
+      "asset": "Nvt.Core.Avalonia.0.9.7.nupkg",
+      "sha256": "5056c21f903c2d8145ce7c36a91ed44416a28e58b8474ce248fa5871aa26f35b"
     },
     {
       "release": "core-fonts-v0.1.0",

@@ -56,7 +56,7 @@
     <panels:CollapsiblePanel Title="Layers" IsExpanded="True">
       <panels:CollapsiblePanel.HeaderRight>
         <ToggleButton
-                      Classes="dxfLayerBulkToggleButton"
+                      Classes="dxfLayerBulkToggleButton chipAction"
                       IsChecked="{Binding IsCadLayerBulkToggleChecked, Mode=TwoWay}"
                       IsEnabled="{Binding HasCadLayers}"
                       ToolTip.Tip="{Binding CadLayerBulkToggleToolTip}">
@@ -74,7 +74,7 @@
             <ItemsControl ItemsSource="{Binding LayerToggles}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <ToggleButton Classes="layerToggle"
+                  <ToggleButton Classes="layerToggle actionGhost flat"
                                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                 HorizontalAlignment="Stretch"
                                 HorizontalContentAlignment="Left"

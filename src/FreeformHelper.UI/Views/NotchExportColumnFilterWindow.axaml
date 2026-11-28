@@ -84,7 +84,7 @@
         </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="viewModels:NotchExportColumnFilterOptionViewModel">
-            <CheckBox Classes="workspaceFilterOptionCheck"
+            <CheckBox Classes="compact workspaceFilterOptionCheck"
                       IsChecked="{Binding IsSelected, Mode=TwoWay}">
               <SelectableTextBlock Text="{Binding Display}"
                                    TextWrapping="NoWrap"

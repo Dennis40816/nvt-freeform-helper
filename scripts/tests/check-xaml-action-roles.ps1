@@ -223,7 +223,27 @@ try {
           Add-Issue -File $relativePath -Line $line -Rule "XAR001" -Message "Removed role class binding is not allowed." -Classes $classes
         }
       }
-      $productRoles = @("viewportOverlayAction", "canvasQuickToggle", "canvasToolbarIcon", "productChipAction", "productFilterChip", "shellTab", "rightPanelTab", "rightPanelBrowserTab", "settingsNavItem", "panelBlockHeader", "workspaceFoldHeader", "workspaceTableHeaderButton")
+      $adoptedRoles = @{
+        shellTab = @("actionGhost", "flat", "marked")
+        layerToggle = @("actionGhost", "flat")
+        inspectorTraceToggle = @("actionGhost", "flat", "marked")
+        workspaceFoldHeader = @("actionGhost", "flat")
+        panelBlockHeader = @()
+        dxfLayerBulkToggleButton = @("chipAction")
+      }
+      if ($tokenSet.Contains("layerToggle") -and $tokenSet.Contains("marked")) {
+        Add-Issue -File $relativePath -Line $line -Rule "XAR017" -Message "Layer visibility uses its eye glyph and muted text; marked frames are not allowed." -Classes $classes
+      }
+      foreach ($productClass in $adoptedRoles.Keys) {
+        if (-not $tokenSet.Contains($productClass)) { continue }
+        $required = $adoptedRoles[$productClass]
+        $missing = @($required | Where-Object { -not $tokenSet.Contains($_) })
+        $unexpected = @($tokens | Where-Object { $_ -in $publicRoles -and $_ -notin $required })
+        if ($missing.Count -gt 0 -or $unexpected.Count -gt 0) {
+          Add-Issue -File $relativePath -Line $line -Rule "XAR017" -Message "$productClass requires exactly the Core role and modifiers: $($required -join ' ')." -Classes $classes
+        }
+      }
+      $productRoles = @("viewportOverlayAction", "canvasQuickToggle", "canvasToolbarIcon", "productChipAction", "productFilterChip", "rightPanelTab", "rightPanelBrowserTab", "settingsNavItem", "workspaceTableHeaderButton")
       if (@($tokens | Where-Object { $_ -in $productRoles }).Count -gt 0 -and
           @($tokens | Where-Object { $_ -in $publicRoles }).Count -gt 0) {
         Add-Issue -File $relativePath -Line $line -Rule "XAR014" -Message "Kept product controls must not carry a Core role that can change their geometry or states." -Classes $classes
@@ -301,8 +321,11 @@ try {
           Add-Issue -File $relativePath -Line $line -Rule "XAR012" -Message "chipAction is a complete Core role; the actionChip primitive is removed." -Classes $classes
         }
 
-        if (-not $isDevPreview -and -not (Test-HasAnyAttribute -Element $element -Names $interactiveAttributeNames)) {
-          Add-Issue -File $relativePath -Line $line -Rule "XAR013" -Message "chipAction must bind Command or an explicit click/tap handler outside Dev preview samples." -Classes $classes
+        $checkedBinding = $element.Attribute("IsChecked")
+        $hasTwoWayState = $elementName -eq "ToggleButton" -and $null -ne $checkedBinding -and
+          $checkedBinding.Value -match '^\{Binding\s+.+\bMode\s*=\s*TwoWay\s*\}$'
+        if (-not $isDevPreview -and -not $hasTwoWayState -and -not (Test-HasAnyAttribute -Element $element -Names $interactiveAttributeNames)) {
+          Add-Issue -File $relativePath -Line $line -Rule "XAR013" -Message "chipAction must bind Command, a two-way toggle state, or an explicit click/tap handler outside Dev preview samples." -Classes $classes
         }
       }
     }

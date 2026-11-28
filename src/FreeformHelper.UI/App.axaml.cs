@@ -3,6 +3,7 @@ using Avalonia.Markup.Xaml;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.Views;
 using NLog;
+using Nvt.Core.Avalonia.Theme;
 
 namespace FreeformHelper.UI;
 
@@ -24,6 +25,7 @@ public sealed class App : global::Avalonia.Application
         StartupPerfTracker.Mark("app.initialize-start");
         // Loads the XAML UI definitions from App.axaml and associated files.
         AvaloniaXamlLoader.Load(this);
+        ThemeRestFills.SetRestFill(Resources, ThemeRestFill.None);
         SharedToolTipStyleService.Register();
         StartupPerfTracker.Mark("app.initialize-complete");
     }

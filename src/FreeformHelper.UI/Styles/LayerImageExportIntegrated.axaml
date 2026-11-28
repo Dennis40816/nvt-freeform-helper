@@ -9,6 +9,8 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://Nvt.Core.Avalonia/Icons/IconResources.axaml"/>
       </ResourceDictionary.MergedDictionaries>
+      <!-- This view keeps the soft choice-row fill; the application default is None. -->
+      <x:String x:Key="Nvt.Controls.RestFillMode">Soft</x:String>
     </ResourceDictionary>
   </Styles.Resources>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml"/>

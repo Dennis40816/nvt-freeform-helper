@@ -421,11 +421,21 @@
                   Classes="settingsFieldTile">
             <Grid ColumnDefinitions="Auto,*"
                   ColumnSpacing="{StaticResource Space12}">
-              <ToggleSwitch Grid.Column="0"
-                            IsChecked="{Binding UseLocalSizing, Mode=TwoWay}"
-                            OnContent="Local"
-                            OffContent="Global"
-                            VerticalAlignment="Center"/>
+              <StackPanel Grid.Column="0"
+                          Orientation="Horizontal"
+                          Spacing="{StaticResource Space8}"
+                          VerticalAlignment="Center">
+                <ToggleSwitch x:Name="SizingScopeSwitch"
+                              IsChecked="{Binding UseLocalSizing, Mode=TwoWay}"
+                              AutomationProperties.Name="Sizing scope"
+                              VerticalAlignment="Center"/>
+                <TextBlock PointerReleased="SizingScopeText_PointerReleased" Text="Local"
+                           IsVisible="{Binding UseLocalSizing}"
+                           VerticalAlignment="Center"/>
+                <TextBlock PointerReleased="SizingScopeText_PointerReleased" Text="Global"
+                           IsVisible="{Binding !UseLocalSizing}"
+                           VerticalAlignment="Center"/>
+              </StackPanel>
               <StackPanel Grid.Column="1"
                           Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="Sizing scope" Tip="Local adjusts selected rows or columns; Global redistributes the whole generated grid."/>

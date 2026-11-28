@@ -12,8 +12,17 @@
     </ResourceDictionary>
   </Application.Resources>
   <Application.Styles>
-    <FluentTheme />
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Dark" Accent="{StaticResource ColorAccentDark}"/>
+        <ColorPaletteResources x:Key="Light" Accent="{StaticResource ColorAccentLight}"/>
+      </FluentTheme.Palettes>
+    </FluentTheme>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"/>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/TabStyles.axaml"/>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ToggleStyles.axaml"/>
+    <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml"/>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/Icons.axaml"/>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.axaml"/>
   </Application.Styles>

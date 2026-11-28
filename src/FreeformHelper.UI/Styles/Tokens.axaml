@@ -2,9 +2,13 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Base"
                     xmlns:collections="clr-namespace:Avalonia.Collections;assembly=Avalonia.Base">
+  <!-- Shared by the Core accent brush and Fluent's per-variant palette. -->
+  <Color x:Key="ColorAccentDark">#53A6FF</Color>
+  <Color x:Key="ColorAccentLight">#2967A9</Color>
   <ResourceDictionary.ThemeDictionaries>
     <ResourceDictionary x:Key="Dark">
-      <SolidColorBrush x:Key="NfcAccentBrush" Color="#53A6FF"/>
+      <SolidColorBrush x:Key="NfcAccentBrush" Color="{StaticResource ColorAccentDark}"/>
+      <SolidColorBrush x:Key="NotificationCardInformationBackgroundBrush" Color="{StaticResource ColorAccentDark}"/>
       <SolidColorBrush x:Key="NfcAccentStrongBrush" Color="#86C0FF"/>
       <SolidColorBrush x:Key="NfcAccentSurfaceBrush" Color="#192941"/>
       <SolidColorBrush x:Key="NfcAccentSurfaceSubtleBrush" Color="#152134"/>
@@ -110,7 +114,8 @@
     </ResourceDictionary>
 
     <ResourceDictionary x:Key="Light">
-      <SolidColorBrush x:Key="NfcAccentBrush" Color="#2967A9"/>
+      <SolidColorBrush x:Key="NfcAccentBrush" Color="{StaticResource ColorAccentLight}"/>
+      <SolidColorBrush x:Key="NotificationCardInformationBackgroundBrush" Color="{StaticResource ColorAccentLight}"/>
       <SolidColorBrush x:Key="NfcAccentStrongBrush" Color="#225489"/>
       <SolidColorBrush x:Key="NfcAccentSurfaceBrush" Color="#F0F4F9"/>
       <SolidColorBrush x:Key="NfcAccentSurfaceSubtleBrush" Color="#F8FAFC"/>

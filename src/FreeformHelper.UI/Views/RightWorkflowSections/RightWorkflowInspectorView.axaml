@@ -247,7 +247,7 @@
                                 ColumnSpacing="{StaticResource Space6}">
                             <SelectableTextBlock Text="{Binding Title}"
                                                  FontWeight="SemiBold"/>
-                            <ToggleButton Classes="inspectorTraceToggle" Grid.Column="1"
+                            <ToggleButton Classes="inspectorTraceToggle actionGhost flat marked" Grid.Column="1"
                                           IsChecked="{Binding DataContext.IsPadInspectorRawTraceExpanded, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
                               <SelectableTextBlock Text="{Binding Lines.Count, StringFormat='Raw x{0}'}"/>
                             </ToggleButton>
