@@ -21,12 +21,9 @@
 
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space12}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Classes="settingsSectionTitle"
-                               Text="Export target"/>
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Notch versions, output type, and C profile."/>
-        </StackPanel>
+        <SelectableTextBlock Classes="settingsSectionTitle"
+                             Text="Export target"
+                             ToolTip.Tip="Notch versions, output type, and C profile."/>
         <Grid ColumnDefinitions="1*,1*"
               RowDefinitions="Auto,Auto"
               ColumnSpacing="{StaticResource Space12}"
@@ -107,12 +104,9 @@
 
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space12}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Classes="settingsSectionTitle"
-                               Text="Gate thresholds"/>
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Gate thresholds for v2.1 and v2.2 export."/>
-        </StackPanel>
+        <SelectableTextBlock Classes="settingsSectionTitle"
+                             Text="Gate thresholds"
+                             ToolTip.Tip="Gate thresholds for v2.1 and v2.2 export."/>
         <Grid ColumnDefinitions="1*,1*"
               RowDefinitions="Auto,Auto"
               ColumnSpacing="{StaticResource Space12}"
@@ -151,11 +145,9 @@
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space10}">
               <StackPanel Grid.Column="0"
-                          Classes="panelFormField">
+                          Classes="panelFormField"
+                          VerticalAlignment="Center">
                 <controls:SettingsInfoLabel Text="Link TH (v2.1 Q7 &lt;-&gt; v2.2 %)" Tip="Keep v2.1 Q7 and v2.2 percent thresholds synchronized while editing."/>
-                <SelectableTextBlock Classes="stepNote"
-                                     Text="Keep v2.1 and v2.2 thresholds synchronized."
-                                     TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding LinkNotchThresholds, Mode=TwoWay}"

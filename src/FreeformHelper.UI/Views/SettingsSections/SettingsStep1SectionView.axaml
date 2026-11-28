@@ -5,12 +5,6 @@
   <StackPanel Classes="settingsPage">
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space12}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Classes="settingsSectionTitle"
-                               Text="Geometry match"/>
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Diagnostics threshold only; overlap links stay unchanged."/>
-        </StackPanel>
         <Border Classes="settingsFieldTile">
           <StackPanel Classes="panelFormField">
             <controls:SettingsInfoLabel Text="Unmatched TH (overlap / regular area)"
