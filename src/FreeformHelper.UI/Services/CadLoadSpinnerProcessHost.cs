@@ -683,8 +683,27 @@ internal sealed class CadLoadSpinnerProcessHost : ICadLoadSpinnerHost
             }
             return await TrySendRequestAsync(request, ConnectTimeoutMs).ConfigureAwait(false);
         }
-        catch (Exception ex) when (ex is IOException or TimeoutException or InvalidOperationException or
-            UnauthorizedAccessException or NotSupportedException or ArgumentException)
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (TimeoutException)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
         {
             return false;
         }
