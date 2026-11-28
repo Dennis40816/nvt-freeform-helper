@@ -130,7 +130,8 @@ public sealed class DxfRegularMappingAnalyzerOrderingCharacterizationTests
             cad,
             grid,
             settings,
-            expectedDiffIndexByCadId: new Dictionary<int, int> { [21] = 7, [22] = 7 });
+            expectedDiffIndexByCadId: new Dictionary<int, int> { [21] = 7, [22] = 7 },
+            cadIcIndexByCadId: new Dictionary<int, int> { [21] = 0, [22] = 0 });
 
         var issues = result.Report.Issues;
         var expectedOrder = new (DxfRegularMappingIssueKind Kind, int? CadPadId)[]
@@ -165,7 +166,7 @@ public sealed class DxfRegularMappingAnalyzerOrderingCharacterizationTests
     }
 
     [Fact]
-    public void Analyze_MixedIssues_TruncationKeepsFirstIssuesAndPreCountedTotals()
+    public void Analyze_MixedIssues_TruncationKeepsDuplicateRowsFirstAndPreCountedTotals()
     {
         var grid = BuildRowGrid(4);
         var cad = new CadPadSet(new[]
@@ -188,13 +189,15 @@ public sealed class DxfRegularMappingAnalyzerOrderingCharacterizationTests
             cad,
             grid,
             settings,
-            expectedDiffIndexByCadId: new Dictionary<int, int> { [21] = 7, [22] = 7 }).Report;
+            expectedDiffIndexByCadId: new Dictionary<int, int> { [21] = 7, [22] = 7 },
+            cadIcIndexByCadId: new Dictionary<int, int> { [21] = 0, [22] = 0 }).Report;
 
         Assert.True(report.IssuesTruncated);
         Assert.Equal(7, report.TotalIssueCount);
         Assert.Equal(
-            new[] { DxfRegularMappingIssueKind.LowConfidence, DxfRegularMappingIssueKind.LowConfidence, DxfRegularMappingIssueKind.Ambiguous },
+            new[] { DxfRegularMappingIssueKind.LowConfidence, DxfRegularMappingIssueKind.DuplicateDiff, DxfRegularMappingIssueKind.DuplicateDiff },
             report.Issues.Select(static issue => issue.Kind).ToArray());
+        Assert.Equal(new int?[] { 22, 21, 22 }, report.Issues.Select(static issue => issue.CadPadId).ToArray());
         Assert.Equal(2, report.SampleIssues.Count);
         Assert.Same(report.Issues[0], report.SampleIssues[0]);
         Assert.Same(report.Issues[1], report.SampleIssues[1]);
@@ -202,6 +205,15 @@ public sealed class DxfRegularMappingAnalyzerOrderingCharacterizationTests
         Assert.Equal(1, report.AmbiguousCount);
         Assert.Equal(2, report.DuplicateDiffCount);
         Assert.True(report.HasIssues);
+
+        settings = new IndexMappingSettings { CandidatePaddingCells = 0, LowConfidenceThreshold = 0.8, AmbiguousMargin = 0.2, MaxReportIssues = 1 };
+        var single = DxfRegularMappingAnalyzer.Analyze(
+            cad,
+            grid,
+            settings,
+            expectedDiffIndexByCadId: new Dictionary<int, int> { [21] = 7, [22] = 7 },
+            cadIcIndexByCadId: new Dictionary<int, int> { [21] = 0, [22] = 0 }).Report;
+        Assert.Equal(DxfRegularMappingIssueKind.DuplicateDiff, Assert.Single(single.Issues).Kind);
     }
 
     [Fact]

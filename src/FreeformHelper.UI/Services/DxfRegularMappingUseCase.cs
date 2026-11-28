@@ -24,7 +24,8 @@ public sealed class DxfRegularMappingUseCase
             settings.IndexMapping,
             manualOverrides,
             expectedDiffIndexByCadId,
-            reportProgress);
+            reportProgress,
+            cadIcIndexByCadId);
 
         if (cadToRegular is null || cadIcIndexByCadId is null)
         {

@@ -338,7 +338,8 @@ public sealed class DxfRegularMappingAnalyzerTests
             {
                 [61] = 324,
                 [62] = 324,
-            });
+            },
+            cadIcIndexByCadId: new Dictionary<int, int> { [61] = 0, [62] = 0 });
 
         Assert.Equal(2, res.Report.DuplicateDiffCount);
         var duplicateIssues = res.Report.Issues.Where(i => i.Kind == DxfRegularMappingIssueKind.DuplicateDiff).ToList();
@@ -346,6 +347,53 @@ public sealed class DxfRegularMappingAnalyzerTests
         Assert.All(duplicateIssues, issue => Assert.Equal(324, issue.DxfIndex));
         Assert.Contains("IC1", duplicateIssues[0].Message, StringComparison.Ordinal);
         Assert.Contains("shared by CAD 61, 62", duplicateIssues[0].Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Analyze_CountsUnpairedCadInDuplicateDiffGroup_LikeTheStep4Panel()
+    {
+        var gridSettings = new GridSettings
+        {
+            XChannels = 2,
+            YChannels = 1,
+            ActiveAreaWidth = 2,
+            ActiveAreaHeight = 1,
+            BoundsPaddingRatio = 0,
+        };
+
+        var grid = RegularGridBuilder.BuildFromSettings(gridSettings);
+        DiffIndexMapper.ApplyMapping(grid, gridSettings);
+        // Two CAD pads on one Regular pad, so only one of them can be paired.
+        var left = grid.GetPad(0, 0).Bounds;
+        var cad = new CadPadSet(new[]
+        {
+            BuildCad(61, left),
+            BuildCad(62, left),
+        });
+        var diffs = new Dictionary<int, int> { [61] = 324, [62] = 324 };
+        var ics = new Dictionary<int, int> { [61] = 0, [62] = 0 };
+
+        var res = DxfRegularMappingAnalyzer.Analyze(
+            cad,
+            grid,
+            new IndexMappingSettings
+            {
+                CandidatePaddingCells = 0,
+            },
+            expectedDiffIndexByCadId: diffs,
+            cadIcIndexByCadId: ics);
+
+        var panelGroups = CadOutputFwDiffIndexDuplicateReviewService.BuildGroups(cad.Pads, diffs, ics);
+        Assert.Equal(panelGroups.Sum(group => group.Entries.Count), res.Report.DuplicateDiffCount);
+        Assert.Equal(2, res.Report.DuplicateDiffCount);
+        var issues = res.Report.Issues.Where(i => i.Kind == DxfRegularMappingIssueKind.DuplicateDiff).ToList();
+        Assert.Equal(new int?[] { 61, 62 }, issues.Select(issue => issue.CadPadId).ToArray());
+        var unpaired = Assert.Single(issues, issue => issue.RegularPadIndex is null);
+        Assert.Null(unpaired.DiffIndex);
+        Assert.Null(unpaired.Score);
+        Assert.Equal(0, unpaired.IcIndex);
+        Assert.Equal(324, unpaired.DxfIndex);
+        Assert.Contains("duplicateDiff=2", res.Report.Summary, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -376,7 +424,8 @@ public sealed class DxfRegularMappingAnalyzerTests
             {
                 [71] = 324,
                 [72] = 324,
-            });
+            },
+            cadIcIndexByCadId: new Dictionary<int, int> { [71] = 0, [72] = 1 });
 
         Assert.Equal(0, res.Report.DuplicateDiffCount);
         Assert.DoesNotContain(res.Report.Issues, issue => issue.Kind == DxfRegularMappingIssueKind.DuplicateDiff);
