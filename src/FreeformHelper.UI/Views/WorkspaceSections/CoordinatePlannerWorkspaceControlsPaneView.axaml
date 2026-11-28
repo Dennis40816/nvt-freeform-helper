@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
@@ -17,7 +18,7 @@
           <panels:CollapsiblePanel Title="Reference" IsExpanded="True">
             <StackPanel Spacing="{DynamicResource Space8}">
               <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Preview layer"
+                <corePrimitives:InfoLabel Text="Preview layer"
                                             Tip="Controls only which CAD layer is displayed; AA outline selects the planning boundary."/>
                 <ComboBox ItemsSource="{Binding LayerOptions}"
                           SelectedItem="{Binding SelectedLayerOption, Mode=TwoWay}">
@@ -29,7 +30,7 @@
                 </ComboBox>
               </StackPanel>
               <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="AA outline"
+                <corePrimitives:InfoLabel Text="AA outline"
                                             Tip="Selects the source bounds used to plan coordinates."/>
                 <ComboBox ItemsSource="{Binding AaBoundsOptions}"
                           SelectedItem="{Binding SelectedAaBoundsOption, Mode=TwoWay}">

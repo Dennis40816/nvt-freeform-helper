@@ -2,6 +2,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
              xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
              x:Class="FreeformHelper.UI.Views.HowToUseView"
              x:DataType="vm:HowToUseViewModel">
@@ -26,37 +27,37 @@
         </controls:HidePanelBlock>
         <controls:HidePanelBlock Title="Interface tour" IsExpanded="False" DefaultExpanded="False">
           <StackPanel Spacing="{DynamicResource Space12}">
-            <controls:PadInfoSectionFrame Title="Navigation">
+            <corePrimitives:SectionFrame Title="Navigation">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- Top tabs: Freeform Helper, Simulation, Coordinate, How To Use."/>
                 <SelectableTextBlock Text="- Fit icon: top-right of the canvas."/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
-            <controls:PadInfoSectionFrame Title="Menu Bar">
+            </corePrimitives:SectionFrame>
+            <corePrimitives:SectionFrame Title="Menu Bar">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- File: Open DXF, Save Project, Load Project."/>
                 <SelectableTextBlock Text="- Export: Notch rows, DXF, or DXF layer images."/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
+            </corePrimitives:SectionFrame>
           </StackPanel>
         </controls:HidePanelBlock>
         <controls:HidePanelBlock Title="Display and DXF settings" IsExpanded="False" DefaultExpanded="False">
           <StackPanel Spacing="{DynamicResource Space12}">
-            <controls:PadInfoSectionFrame Title="Workspace Header (Display)">
+            <corePrimitives:SectionFrame Title="Workspace Header (Display)">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- Display menu: highlight unmatched/freeform. Layer and preview toggles are on the canvas."/>
                 <SelectableTextBlock Text="- CAD display: line width and line color."/>
                 <SelectableTextBlock Text="- Area buckets: CAD-only area grouping colors."/>
                 <SelectableTextBlock Text="- Status and selection summaries update automatically."/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
-            <controls:PadInfoSectionFrame Title="DXF Settings (Left Panel)">
+            </corePrimitives:SectionFrame>
+            <corePrimitives:SectionFrame Title="DXF Settings (Left Panel)">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- Only closed polylines: import closed shapes only."/>
                 <SelectableTextBlock Text="- Layer toggles: hide/show CAD pads by layer after import."/>
                 <SelectableTextBlock Text="- Overlap check: scan duplicates and overlaps on demand."/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
+            </corePrimitives:SectionFrame>
           </StackPanel>
         </controls:HidePanelBlock>
         <controls:HidePanelBlock Title="Canvas navigation and selection" IsExpanded="False" DefaultExpanded="False">
@@ -95,34 +96,34 @@
         </controls:HidePanelBlock>
         <controls:HidePanelBlock Title="Manual sizing and right-pane settings" IsExpanded="False" DefaultExpanded="False">
           <StackPanel Spacing="{DynamicResource Space12}">
-            <controls:PadInfoSectionFrame Title="Range selection / Pad Info">
+            <corePrimitives:SectionFrame Title="Range selection / Pad Info">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- Rows/Cols: enter ranges like 5, 5-7, 5,7."/>
                 <SelectableTextBlock Text="- Pad Info: edit Width/Height for selected regular pads."/>
                 <SelectableTextBlock Text="- Mixed values: enter a size to override the selection."/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
-            <controls:PadInfoSectionFrame Title="Settings: General">
+            </corePrimitives:SectionFrame>
+            <corePrimitives:SectionFrame Title="Settings: General">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- IC layout: Cascade count and per-IC X/Y channels."/>
                 <SelectableTextBlock Text="- Grid settings: Padding percent, scan order, and sizing scope (Local/Global)."/>
                 <SelectableTextBlock Text="- Panel AA size (mm): Physical panel size used to compute pitch."/>
                 <SelectableTextBlock Text="- Alignment mode: Choose AA vs DXF bounds."/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
-            <controls:PadInfoSectionFrame Title="Right Panel: Settings">
+            </corePrimitives:SectionFrame>
+            <corePrimitives:SectionFrame Title="Right Panel: Settings">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- Matching: overlap-based CAD↔Regular relation; one CAD can map to multiple regular pads."/>
                 <SelectableTextBlock Text="- Unmatched threshold: Display-only overlap / regular area diagnostic; changing it does not change links."/>
                 <SelectableTextBlock Text="- Freeform tagging: assign X/Y/XY/None to selected Regular pads."/>
                 <SelectableTextBlock Text="- Step 5 settings: choose versions, export type, and C profile."/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
+            </corePrimitives:SectionFrame>
           </StackPanel>
         </controls:HidePanelBlock>
         <controls:HidePanelBlock Title="Notch reference" IsExpanded="False" DefaultExpanded="False">
           <StackPanel Spacing="{DynamicResource Space12}">
-            <controls:PadInfoSectionFrame Title="Notch Terms &amp; Thresholds">
+            <corePrimitives:SectionFrame Title="Notch Terms &amp; Thresholds">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- BBoxArea: CAD pad bounding-box area, formula = width × height (used by V2.1 REGU_TO_FULL field)."/>
                 <SelectableTextBlock Text="- Freeform TH (Settings &gt; Step 2; ratio 0–1): decides XWay/YWay/XYWay/None classification during auto-detect."/>
@@ -138,27 +139,27 @@
                 <Image Source="avares://FreeformHelper.UI/Assets/HowTo/bbox-area.png" Height="{DynamicResource HowToFigureHeight}"
                        Stretch="Uniform" HorizontalAlignment="Left"/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
+            </corePrimitives:SectionFrame>
           </StackPanel>
         </controls:HidePanelBlock>
         <controls:HidePanelBlock Title="Numeric input and Console" IsExpanded="False" DefaultExpanded="False">
           <StackPanel Spacing="{DynamicResource Space12}">
-            <controls:PadInfoSectionFrame Title="Number Inputs">
+            <corePrimitives:SectionFrame Title="Number Inputs">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- Type a value and press Enter or click away to commit."/>
                 <SelectableTextBlock Text="- Up/Down buttons step by the configured increment."/>
                 <SelectableTextBlock Text="- Drag the right scrub area to adjust quickly."/>
                 <SelectableTextBlock Text="- Alt + mouse wheel changes the value."/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
-            <controls:PadInfoSectionFrame Title="Console &amp; Undo">
+            </corePrimitives:SectionFrame>
+            <corePrimitives:SectionFrame Title="Console &amp; Undo">
               <StackPanel Spacing="{DynamicResource Space6}">
                 <SelectableTextBlock Text="- Bottom console streams logs and auto-scrolls to the latest entry."/>
                 <SelectableTextBlock Text="- Clear removes entries."/>
                 <SelectableTextBlock Text="- Ctrl + Z undoes settings and pad edits (global when not editing text)."/>
                 <SelectableTextBlock Text="- Delete hides selected CAD pads (global when not editing text)."/>
               </StackPanel>
-            </controls:PadInfoSectionFrame>
+            </corePrimitives:SectionFrame>
           </StackPanel>
         </controls:HidePanelBlock>
       </StackPanel>

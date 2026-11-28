@@ -1,6 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
              x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsStep2SectionView">
   <StackPanel Classes="settingsPage">
     <Border Classes="settingsSectionBlock">
@@ -13,7 +14,7 @@
                   Grid.Column="0"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="Freeform TH (dominant axis ratio)" Tip="Dominant-axis ratio threshold used when Step 2 tags XWay, YWay, or XYWay."/>
+              <corePrimitives:InfoLabel Text="Freeform TH (dominant axis ratio)" Tip="Dominant-axis ratio threshold used when Step 2 tags XWay, YWay, or XYWay."/>
               <controls:NumberScrubber Minimum="0"
                                        Maximum="1"
                                        SmallChange="0.01"
@@ -30,7 +31,7 @@
               <StackPanel Grid.Column="0"
                           Classes="panelFormField"
                           VerticalAlignment="Center">
-                <controls:SettingsInfoLabel Text="XY WAY EN" Tip="Allow Step 2 to detect X/Y freeform direction automatically."/>
+                <corePrimitives:InfoLabel Text="XY WAY EN" Tip="Allow Step 2 to detect X/Y freeform direction automatically."/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding EnableAutoDetectXy, Mode=TwoWay}"
@@ -48,7 +49,7 @@
               <StackPanel Grid.Column="0"
                           Classes="panelFormField"
                           VerticalAlignment="Center">
-                <controls:SettingsInfoLabel Text="Edge spill EN" Tip="Enable edge-specific freeform rules for boundary spill cases."/>
+                <corePrimitives:InfoLabel Text="Edge spill EN" Tip="Enable edge-specific freeform rules for boundary spill cases."/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding EnableFreeformEdgeSpecialization, Mode=TwoWay}"
@@ -66,7 +67,7 @@
               <StackPanel Grid.Column="0"
                           Classes="panelFormField"
                           VerticalAlignment="Center">
-                <controls:SettingsInfoLabel Text="Load auto-run Step 2" Tip="Replay Step 2 tagging automatically after a project is loaded."/>
+                <corePrimitives:InfoLabel Text="Load auto-run Step 2" Tip="Replay Step 2 tagging automatically after a project is loaded."/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding AutoReplayStep2AfterProjectLoad, Mode=TwoWay}"

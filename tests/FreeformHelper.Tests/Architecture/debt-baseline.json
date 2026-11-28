@@ -25,7 +25,7 @@
     "suppressUndoAssignments": [],
     "fileWriteAllText": [],
     "processStart": [
-      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:451"
+      "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs:441"
     ],
     "directClockReads": [],
     "bareCatch": [],
@@ -128,11 +128,9 @@
     ]
   },
   "compiledBindingExceptions": [
-    "src/FreeformHelper.UI/Controls/SettingsInfoLabel.axaml",
     "src/FreeformHelper.UI/Controls/WorkspaceHeader.axaml",
     "src/FreeformHelper.UI/MainWindow.axaml",
     "src/FreeformHelper.UI/Styles/Controls.Action.axaml",
-    "src/FreeformHelper.UI/Styles/Controls.Core.axaml",
     "src/FreeformHelper.UI/Styles/Controls.Form.axaml",
     "src/FreeformHelper.UI/Styles/Controls.Panel.axaml",
     "src/FreeformHelper.UI/Views/CanvasOverlayControls.axaml",

@@ -52,7 +52,7 @@ Use for the right workflow panel and pad info popovers.
 
 - Action role source of truth: `docs/guides/ui-action-role-system.md`.
 - Action controls: choose one base primitive and one semantic role from the Action Role System before adding or changing XAML classes.
-- Settings common fields: `settingsFieldTile`, `panelFormField`, `SettingsInfoLabel`.
+- Settings common fields: `settingsFieldTile`, `panelFormField`, `InfoLabel` (NVT Core).
 - Workflow status cards: `workflowStepStatusStrip`, `workflowStepMetricTile`, `workflowStepMetricLabel`, `workflowStepMetricText`.
 - Workflow sections: `workflowStepSubsection`, `workflowStepInsetPanel`.
 - Summary badges: passive badges use `chipStatus`; interactive badges use `actionChip chipAction`.

@@ -2,14 +2,19 @@ using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.UI.Services;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 using Xunit;
 
 namespace FreeformHelper.Tests;
 
 /// <summary>
 /// Pins what the spinner host does when sending a request fails: a failure that sending can end in is ignored,
-/// the visible state stays as it was, and any other failure, out-of-memory included, reaches the caller.
+/// the visible state stays as it was. Other recoverable visibility failures are logged by the state sync,
+/// and out-of-memory faults its task. Idle shutdown failures still reach the Dispose caller.
 /// </summary>
+[Collection("HeadlessUiSerial")]
 public sealed class CadLoadSpinnerProcessHostFailureTests
 {
     // Long on purpose: it only turns a real hang into a failure.
@@ -47,34 +52,65 @@ public sealed class CadLoadSpinnerProcessHostFailureTests
     [InlineData("unauthorized")]
     [InlineData("not-supported")]
     [InlineData("argument")]
-    public void Show_WhenTheShowSendFailsWithAnExpectedException_StaysHidden(string kind)
+    public async Task Show_WhenTheShowSendFailsWithAnExpectedException_StaysHidden(string kind)
     {
+        var attempted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         using var host = new CadLoadSpinnerProcessHost(request =>
-            request.Command == CadLoadSpinnerIpcProtocol.ShowCommand ? throw SendFailure(kind) : true);
+        {
+            if (request.Command == CadLoadSpinnerIpcProtocol.ShowCommand)
+            {
+                attempted.TrySetResult();
+                throw SendFailure(kind);
+            }
+            return true;
+        });
 
         host.Show(new Window());
+        await attempted.Task.WaitAsync(SafetyNetTimeout, TestContext.Current.CancellationToken);
 
         var snapshot = host.GetVisibilityStateSnapshot();
         Assert.Equal("Visible", snapshot.Requested);
         Assert.Equal("Hidden", snapshot.Effective);
+        host.Hide();
+        await AwaitStateSyncAsync(host.LatestStateSyncTask);
     }
 
     [AvaloniaFact]
-    public void Show_WhenTheShowSendRunsOutOfMemory_Propagates()
+    public async Task Show_WhenTheShowSendRunsOutOfMemory_FaultsTheStateSync()
     {
         using var host = new CadLoadSpinnerProcessHost(request =>
             request.Command == CadLoadSpinnerIpcProtocol.ShowCommand ? throw CreateOutOfMemory() : true);
 
-        Assert.Throws<OutOfMemoryException>(() => host.Show(new Window()));
+        host.Show(new Window());
+        await Assert.ThrowsAsync<OutOfMemoryException>(async () =>
+            await host.LatestStateSyncTask.WaitAsync(SafetyNetTimeout, TestContext.Current.CancellationToken));
     }
 
     [AvaloniaFact]
-    public void Show_WhenTheShowSendFailsWithAnUndocumentedException_Propagates()
+    public async Task Show_WhenTheShowSendFailsWithAnUndocumentedException_LogsTheFailure()
     {
-        using var host = new CadLoadSpinnerProcessHost(request =>
-            request.Command == CadLoadSpinnerIpcProtocol.ShowCommand ? throw new FormatException("unexpected") : true);
+        var previousConfiguration = LogManager.Configuration;
+        using var target = new MemoryTarget { Layout = "${level}|${message}|${exception:format=Type,Message}" };
+        var configuration = new LoggingConfiguration();
+        configuration.AddRule(LogLevel.Warn, LogLevel.Warn, target, typeof(CadLoadSpinnerProcessHost).FullName!);
+        try
+        {
+            LogManager.Configuration = configuration;
+            using var host = new CadLoadSpinnerProcessHost(request =>
+                request.Command == CadLoadSpinnerIpcProtocol.ShowCommand ? throw new FormatException("unexpected") : true);
 
-        Assert.Throws<FormatException>(() => host.Show(new Window()));
+            host.Show(new Window());
+            await AwaitStateSyncAsync(host.LatestStateSyncTask);
+
+            var message = Assert.Single(target.Logs);
+            Assert.Contains("Failed to sync CAD load spinner visibility state.", message, StringComparison.Ordinal);
+            Assert.Contains("FormatException", message, StringComparison.Ordinal);
+            Assert.Contains("unexpected", message, StringComparison.Ordinal);
+        }
+        finally
+        {
+            LogManager.Configuration = previousConfiguration;
+        }
     }
 
     [AvaloniaTheory]
@@ -90,6 +126,7 @@ public sealed class CadLoadSpinnerProcessHostFailureTests
         using var host = new CadLoadSpinnerProcessHost(request =>
             request.Command == CadLoadSpinnerIpcProtocol.HideCommand ? throw SendFailure(kind) : true);
         host.Show(new Window());
+        await AwaitStateSyncAsync(host.LatestStateSyncTask);
         Assert.Equal("Visible", host.GetVisibilityStateSnapshot().Effective);
 
         host.Hide();

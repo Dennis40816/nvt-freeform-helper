@@ -2,6 +2,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+        xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
         x:DataType="vm:HowToUseViewModel">
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
   <Style Selector="SelectableTextBlock">
@@ -12,5 +13,12 @@
   </Style>
   <Style Selector="ListBox.workspaceDataList ListBoxItem">
     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+  </Style>
+  <Style Selector="corePrimitives|SectionFrame /template/ Border.sectionDividerLine">
+    <Setter Property="Background" Value="{DynamicResource BrushWhite}"/>
+  </Style>
+  <Style Selector="corePrimitives|SectionFrame /template/ SelectableTextBlock.sectionDividerText">
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushPadInfoPanelBackground}"/>
   </Style>
 </Styles>

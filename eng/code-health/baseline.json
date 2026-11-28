@@ -464,26 +464,6 @@
       "symbol": "GetResult"
     },
     {
-      "syntaxHash": "6d41945ada8098a316106cdf1b903aadd78886851b85a7b3e470548fad860f6e",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SendShowRequestCoreLocked(CadLoadSpinnerRequest)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "GetResult"
-    },
-    {
-      "syntaxHash": "a5a4d95679b7d1f771e3b87bf360d33290fd2b84e0b69c0bf30fd18cb8d2e40e",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.TrySendRequest(CadLoadSpinnerRequest,int)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "blockingWait",
-      "symbol": "GetResult"
-    },
-    {
       "syntaxHash": "bd24d4d9589213bcb79c8983b5d8611e6a606194753163df413ea5461b5c6eb5",
       "member": "FreeformHelper.UI.Services.NotchExportGenerationCacheService.fields:_generationEpoch",
       "owner": "NFH",
@@ -726,26 +706,6 @@
     {
       "syntaxHash": "e412e895bc654bb67e4f019d457b2283ff5bd04dac2d0f3cb916e45cb4761803",
       "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SendRequest(CadLoadSpinnerRequest,int,bool)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "VSTHRD002",
-      "symbol": "VSTHRD002"
-    },
-    {
-      "syntaxHash": "f155d840415aefd35d07558803e6838b3eb9d7f3ab44ff64e5afffaba78a2305",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.SendShowRequestCoreLocked(CadLoadSpinnerRequest)",
-      "owner": "NFH",
-      "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
-      "project": "FreeformHelper.UI",
-      "count": 1,
-      "rule": "VSTHRD002",
-      "symbol": "VSTHRD002"
-    },
-    {
-      "syntaxHash": "77a848783aef1348e299d412d2104ec5e02f7ce4f351127e6f365effc46e980b",
-      "member": "FreeformHelper.UI.Services.CadLoadSpinnerProcessHost.TrySendRequest(CadLoadSpinnerRequest,int)",
       "owner": "NFH",
       "path": "src/FreeformHelper.UI/Services/CadLoadSpinnerProcessHost.cs",
       "project": "FreeformHelper.UI",

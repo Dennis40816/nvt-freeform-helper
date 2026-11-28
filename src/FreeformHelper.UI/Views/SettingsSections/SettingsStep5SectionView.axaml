@@ -1,6 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
              x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsStep5SectionView">
   <StackPanel Classes="settingsPage">
     <Border Classes="settingsSectionBlock">
@@ -32,7 +33,7 @@
                   Grid.Column="0"
                   Classes="settingsFieldTile">
             <StackPanel Spacing="{StaticResource Space10}">
-              <controls:SettingsInfoLabel Text="Export versions"
+              <corePrimitives:InfoLabel Text="Export versions"
                                           Tip="Choose which notch table versions are emitted during export."/>
               <Grid ColumnDefinitions="1*,Auto"
                     ColumnSpacing="{StaticResource Space10}">
@@ -60,7 +61,7 @@
                   Grid.Column="1"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="Export type" Tip="Choose the generated file type, such as C source or CSV diagnostics."/>
+              <corePrimitives:InfoLabel Text="Export type" Tip="Choose the generated file type, such as C source or CSV diagnostics."/>
               <ComboBox ItemsSource="{Binding NotchExportFileTypeOptions}"
                         SelectedItem="{Binding SelectedNotchExportFileTypeOption, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
@@ -75,7 +76,7 @@
                   Grid.Column="0"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="C export profile" Tip="Select the C output profile expected by the downstream FW integration."/>
+              <corePrimitives:InfoLabel Text="C export profile" Tip="Select the C output profile expected by the downstream FW integration."/>
               <ComboBox ItemsSource="{Binding NotchExportProfileOptions}"
                         SelectedItem="{Binding SelectedNotchExportProfileOption, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
@@ -90,7 +91,7 @@
                   Grid.Column="1"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="Null value" Tip="Placeholder value used for empty entries in exported notch payloads."/>
+              <corePrimitives:InfoLabel Text="Null value" Tip="Placeholder value used for empty entries in exported notch payloads."/>
               <controls:NumberScrubber Minimum="0"
                                        Maximum="65535"
                                        SmallChange="1"
@@ -115,7 +116,7 @@
                   Grid.Column="0"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="Notch gate TH v2.1 (Q7/128)" Tip="v2.1 gate threshold stored in Q7 units where 128 means 100 percent."/>
+              <corePrimitives:InfoLabel Text="Notch gate TH v2.1 (Q7/128)" Tip="v2.1 gate threshold stored in Q7 units where 128 means 100 percent."/>
               <controls:NumberScrubber Minimum="0"
                                        Maximum="128"
                                        SmallChange="1"
@@ -128,7 +129,7 @@
                   Grid.Column="1"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="Notch gate TH v2.2 (%)" Tip="v2.2 gate threshold expressed directly as percent."/>
+              <corePrimitives:InfoLabel Text="Notch gate TH v2.2 (%)" Tip="v2.2 gate threshold expressed directly as percent."/>
               <controls:NumberScrubber Minimum="0"
                                        Maximum="100"
                                        SmallChange="0.1"
@@ -147,7 +148,7 @@
               <StackPanel Grid.Column="0"
                           Classes="panelFormField"
                           VerticalAlignment="Center">
-                <controls:SettingsInfoLabel Text="Link TH (v2.1 Q7 &lt;-&gt; v2.2 %)" Tip="Keep v2.1 Q7 and v2.2 percent thresholds synchronized while editing."/>
+                <corePrimitives:InfoLabel Text="Link TH (v2.1 Q7 &lt;-&gt; v2.2 %)" Tip="Keep v2.1 Q7 and v2.2 percent thresholds synchronized while editing."/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding LinkNotchThresholds, Mode=TwoWay}"

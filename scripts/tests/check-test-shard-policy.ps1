@@ -168,7 +168,7 @@ try {
         Assert-Policy ($actual.Summary.checks.skippedNotZero -eq ($case.Skipped -gt 0))
     }
     Assert-Policy (@($actual.Summary.failedTests).Count -eq 0)
-    # Only the allowlisted failed tests print their exception type and first message line. All other output stays as before.
+    # All failed tests print their method name; only allowlisted tests print exception details.
     $allowedFailing = 'FreeformHelper.Tests.LayerImageExportScreenshotTests.CaptureTheRealExportWindowsInBothThemesAsync'
     $detailMessage = "System.TimeoutException : The export preview did not finish within 60 s in round 2 of 5 (updating=True, error='') at C:\private\example\file.dxf`nSECOND_LINE_SENTINEL"
     $detailTests = @($samples[0], $samples[1], @{ Name = $allowedFailing; Outcome = 'Failed'; Message = [System.Security.SecurityElement]::Escape($detailMessage) })
@@ -179,13 +179,36 @@ try {
     Assert-Policy ($detailLines.Count -eq 1)
     Assert-Policy ([string]$detailLines[0] -ceq ("[check-test-shard] failure-detail test=$allowedFailing type=System.TimeoutException " +
         "message=The export preview did not finish within 60 s in round 2 of 5 (updating=True, error='') at <path>"))
+    Assert-Policy ($detailOutput.Count -eq 3 -and [string]$detailOutput[1] -ceq "[check-test-shard] failed test=$allowedFailing")
     Assert-Policy (($detailOutput -join "`n") -notmatch 'SECOND_LINE_SENTINEL|private|StackTrace|CONFIDENTIAL_SENTINEL')
-    # A failed test that is not on the allowlist prints nothing, even when the allowlisted test passes.
+    # A failed test outside the allowlist prints its name without its private message or other failure details.
     $otherTests = @($samples[0], $samples[1], @{ Name = 'Tests.Sample.Three'; Outcome = 'Failed'; Message = 'OTHER_SENTINEL' })
     Write-FixtureTrx -Directory $resultsPath -Tests $otherTests -RunOutcome Failed
     $otherOutput = @(try { & $checkScript -Shard core -ResultsDirectory $resultsPath -BaselinePath $baselinePath `
         -ExampleDataPresent $false -SummaryPath (Join-Path $testRoot "summary.json") -Commit ("a" * 40) 6>&1 } catch { })
-    Assert-Policy (($otherOutput -join "`n") -ceq '[check-test-shard] total 3 passed 2 failed 1 skipped 0 notExecuted 0')
+    $expectedOtherOutput = @(
+        '[check-test-shard] total 3 passed 2 failed 1 skipped 0 notExecuted 0'
+        '[check-test-shard] failed test=Tests.Sample.Three'
+    )
+    Assert-Policy (($otherOutput -join "`n") -ceq ($expectedOtherOutput -join "`n"))
+    Assert-Policy (($otherOutput -join "`n") -notmatch 'OTHER_SENTINEL|CONFIDENTIAL_SENTINEL|StackTrace')
+    # The limit counts method names, not failed theory rows, and the summary keeps every name.
+    foreach ($failedCount in @(20, 21)) {
+        $failedTests = @(1..$failedCount | ForEach-Object {
+            @{ Name = ('Tests.Sample.Failure{0:d2}' -f $_); Outcome = 'Failed'; Message = 'PRIVATE-MARKER-DO-NOT-PRINT' }
+        })
+        Write-FixtureTrx -Directory $resultsPath -Tests @($failedTests + $failedTests[0]) -RunOutcome Failed
+        $actual = Invoke-FixtureCheck
+        $expectedOutput = @(
+            ('[check-test-shard] total {0} passed 0 failed {0} skipped 0 notExecuted 0' -f ($failedCount + 1))
+            foreach ($test in $failedTests[0..19]) { '[check-test-shard] failed test={0}' -f $test.Name }
+        )
+        if ($failedCount -gt 20) { $expectedOutput += '[check-test-shard] failed tests omitted=1' }
+        Assert-Policy (($actual.Output -join "`n") -ceq ($expectedOutput -join "`n"))
+        Assert-Policy ($actual.Summary.outcome -ceq 'failed' -and $actual.Message -ceq 'Shard validation failed.' -and
+            @($actual.Summary.failedTests).Count -eq $failedCount)
+        Assert-Policy (($actual.Output -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
+    }
     # The line is cut to 200 characters.
     $longTests = @($samples[0], $samples[1], @{ Name = $allowedFailing; Outcome = 'Failed'; Message = ('x' * 500) })
     Write-FixtureTrx -Directory $resultsPath -Tests $longTests -RunOutcome Failed
