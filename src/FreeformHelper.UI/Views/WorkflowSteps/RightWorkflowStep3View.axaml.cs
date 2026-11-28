@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using FreeformHelper.UI.ViewModels;
 
@@ -11,6 +12,17 @@ public partial class RightWorkflowStep3View : UserControl
     public RightWorkflowStep3View()
     {
         InitializeComponent();
+    }
+
+    private void AutoPlayLabel_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (AutoPlaySwitch.IsEffectivelyEnabled && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            // Move focus too, so the next Space acts on this switch and not on a guard switch focused before.
+            AutoPlaySwitch.Focus(NavigationMethod.Pointer);
+            AutoPlaySwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, AutoPlaySwitch.IsChecked != true);
+            e.Handled = true;
+        }
     }
 
     private void OpenSettingsButton_Click(object? sender, RoutedEventArgs e)

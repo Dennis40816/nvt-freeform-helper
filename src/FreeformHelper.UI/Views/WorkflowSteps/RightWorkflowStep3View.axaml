@@ -3,6 +3,7 @@
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
+             xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
              x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep3View">
     <panels:CollapsiblePanel x:Name="Step3Block" Title="Step 3 · Notch compensation"
                              IsExpanded="{Binding IsStep3Expanded, Mode=TwoWay}">
@@ -15,70 +16,45 @@
       </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
         <SelectableTextBlock Classes="stepNote" Text="{Binding NotchEffectiveModelSummary}" TextWrapping="Wrap"/>
-        <SelectableTextBlock Text="Export-critical guards" FontWeight="SemiBold"/>
-        <SelectableTextBlock Classes="stepNote" Text="{Binding NotchTargetCoverageGuardSummary}" TextWrapping="Wrap"/>
-        <SelectableTextBlock Classes="stepNote" Text="{Binding NotchBoundaryVirtualAreaCapSummary}" TextWrapping="Wrap"/>
-        <panels:CollapsiblePanel Title="Edit guards" IsExpanded="False">
-          <StackPanel Spacing="{StaticResource Space8}">
-            <SelectableTextBlock Classes="stepNote" Text="Changes apply immediately; generate a new export after editing." TextWrapping="Wrap"/>
-
-            <Grid ColumnDefinitions="*,Auto"
-                  ColumnSpacing="{StaticResource Space8}">
-              <StackPanel Grid.Column="0"
-                          Classes="panelFormField">
-                <SelectableTextBlock Text="Target coverage guard"/>
-                <SelectableTextBlock Classes="stepNote"
-                                     Text="{Binding NotchTargetCoverageGuardSummary}"
-                                     TextWrapping="Wrap"/>
-              </StackPanel>
-              <ToggleSwitch Grid.Column="1"
-                            IsChecked="{Binding EnableTargetCoverageGuard, Mode=TwoWay}"
-                            OnContent=""
-                            OffContent=""
-                            MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                            VerticalAlignment="Center"/>
-            </Grid>
-            <StackPanel Classes="panelFormField">
-              <SelectableTextBlock Text="Target cap (%)"/>
-              <controls:NumberScrubber Minimum="0"
-                                       Maximum="255"
-                                       SmallChange="1"
-                                       FormatString="0"
-                                       IsEnabled="{Binding EnableTargetCoverageGuard}"
-                                       Value="{Binding TargetCoverageCapPercent, Mode=TwoWay}"
-                                       ToolTip.Tip="{Binding NotchTargetCoverageCapHelpText}"/>
-            </StackPanel>
-            <Separator Margin="{StaticResource InsetTop2Bottom8}"/>
-            <Grid ColumnDefinitions="*,Auto"
-                  ColumnSpacing="{StaticResource Space8}">
-              <StackPanel Grid.Column="0"
-                          Classes="panelFormField">
-                <SelectableTextBlock Text="Boundary virtual-area cap"/>
-                <SelectableTextBlock Classes="stepNote"
-                                     Text="{Binding NotchBoundaryVirtualAreaCapSummary}"
-                                     TextWrapping="Wrap"/>
-              </StackPanel>
-              <ToggleSwitch Grid.Column="1"
-                            IsChecked="{Binding EnableBoundaryVirtualAreaCap, Mode=TwoWay}"
-                            OnContent=""
-                            OffContent=""
-                            MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                            VerticalAlignment="Center"/>
-            </Grid>
-            <StackPanel Classes="panelFormField">
-              <SelectableTextBlock Text="Virtual cap (%)"/>
-              <controls:NumberScrubber Minimum="0"
-                                       Maximum="1000"
-                                       SmallChange="10"
-                                       FormatString="0.#"
-                                       IsEnabled="{Binding EnableBoundaryVirtualAreaCap}"
-                                       Value="{Binding BoundaryVirtualAreaCapPercent, Mode=TwoWay}"
-                                       ToolTip.Tip="Maximum virtual To Full area relative to original overlap area."/>
-            </StackPanel>
-          </StackPanel>
-        </panels:CollapsiblePanel>
+        <SelectableTextBlock Text="Export guards" FontWeight="SemiBold"
+                             ToolTip.Tip="Changes apply immediately; generate a new export after editing."/>
+        <WrapPanel ItemSpacing="{StaticResource Space2}" LineSpacing="{StaticResource Space4}"
+                   ToolTip.Tip="{Binding NotchTargetCoverageGuardSummary}">
+          <ToggleSwitch AutomationProperties.Name="Target coverage cap" IsChecked="{Binding EnableTargetCoverageGuard, Mode=TwoWay}"
+                        OnContent="" OffContent="" MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                        Width="{DynamicResource Nvt.Toggle.SwitchTrackWidth}"
+                        VerticalAlignment="Center"/>
+          <SelectableTextBlock Text="Target coverage cap" TextWrapping="Wrap" VerticalAlignment="Center"
+                               Width="{DynamicResource WorkflowGuardLabelWidth}"/>
+          <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="{StaticResource Space2}" VerticalAlignment="Center">
+            <controls:NumberScrubber Minimum="0" Maximum="255" SmallChange="1" FormatString="0"
+                                     Width="{StaticResource ButtonMinWidthSm}"
+                                     IsEnabled="{Binding EnableTargetCoverageGuard}"
+                                     Value="{Binding TargetCoverageCapPercent, Mode=TwoWay}"
+                                     ToolTip.Tip="{Binding NotchTargetCoverageCapHelpText}"/>
+            <SelectableTextBlock Grid.Column="1" Classes="stepNote" Text="%" VerticalAlignment="Center"/>
+          </Grid>
+        </WrapPanel>
+        <WrapPanel ItemSpacing="{StaticResource Space2}" LineSpacing="{StaticResource Space4}"
+                   ToolTip.Tip="{Binding NotchBoundaryVirtualAreaCapSummary}">
+          <ToggleSwitch AutomationProperties.Name="ToFull area cap" IsChecked="{Binding EnableBoundaryVirtualAreaCap, Mode=TwoWay}"
+                        OnContent="" OffContent="" MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                        Width="{DynamicResource Nvt.Toggle.SwitchTrackWidth}"
+                        VerticalAlignment="Center"/>
+          <SelectableTextBlock Text="ToFull area cap" TextWrapping="Wrap" VerticalAlignment="Center"
+                               Width="{DynamicResource WorkflowGuardLabelWidth}"/>
+          <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="{StaticResource Space2}" VerticalAlignment="Center">
+            <controls:NumberScrubber Minimum="0" Maximum="1000" SmallChange="10" FormatString="0.#"
+                                     Width="{StaticResource ButtonMinWidthSm}"
+                                     IsEnabled="{Binding EnableBoundaryVirtualAreaCap}"
+                                     Value="{Binding BoundaryVirtualAreaCapPercent, Mode=TwoWay}"
+                                     ToolTip.Tip="Maximum virtual To Full area relative to original overlap area."/>
+            <SelectableTextBlock Grid.Column="1" Classes="stepNote" Text="% overlap" VerticalAlignment="Center"/>
+          </Grid>
+        </WrapPanel>
         <Separator/>
-        <SelectableTextBlock Text="Preview" FontWeight="SemiBold"/>
+        <SelectableTextBlock Text="Preview" FontWeight="SemiBold"
+                             ToolTip.Tip="Display only; stage and playback do not change export."/>
         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource Space8}">
           <Button Classes="actionIconButton actionGhost" Command="{Binding PreviousNotchPreviewStageCommand}"
                   IsEnabled="{Binding CanControlNotchPreviewStage}" ToolTip.Tip="Previous stage">
@@ -91,22 +67,28 @@
             <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.ChevronRight}"/>
           </Button>
         </Grid>
-        <CheckBox Content="Auto play" IsEnabled="{Binding CanControlNotchPreviewStage}"
-                  IsChecked="{Binding NotchPreviewAutoPlayEnabled, Mode=TwoWay}"/>
-        <SelectableTextBlock Classes="stepNote" Text="Display only; stage and playback do not change export."/>
-        <panels:CollapsiblePanel Title="Play interval" IsExpanded="False">
-          <StackPanel Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Interval (ms)" Tip="Auto play interval; applies to canvas stage playback only."/>
+        <primitives:BalancedWrapPanel ItemSpacing="{StaticResource Space8}" LineSpacing="{StaticResource Space4}"
+                                      BalanceLastRow="False">
+          <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="{StaticResource Space4}">
+            <ToggleSwitch x:Name="AutoPlaySwitch" AutomationProperties.Name="Auto play" OnContent="" OffContent=""
+                          IsEnabled="{Binding CanControlNotchPreviewStage}"
+                          IsChecked="{Binding NotchPreviewAutoPlayEnabled, Mode=TwoWay}"/>
+            <TextBlock Grid.Column="1" Text="Auto play" VerticalAlignment="Center"
+                       IsEnabled="{Binding CanControlNotchPreviewStage}" PointerPressed="AutoPlayLabel_PointerPressed"/>
+          </Grid>
+          <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="{StaticResource Space8}"
+                ToolTip.Tip="Auto play interval; applies to canvas stage playback only.">
+            <SelectableTextBlock Text="every" Classes="stepNote" VerticalAlignment="Center"/>
             <controls:NumberScrubber Minimum="200" Maximum="5000" SmallChange="100" FormatString="0"
+                                     Grid.Column="1" Width="{StaticResource ButtonMinWidthSm}"
                                      IsEnabled="{Binding CanControlNotchPreviewStage}"
                                      Value="{Binding NotchPreviewAutoPlayIntervalMs, Mode=TwoWay}"/>
-          </StackPanel>
-        </panels:CollapsiblePanel>
-        <panels:CollapsiblePanel Title="ToFull / allocation details"
+            <SelectableTextBlock Grid.Column="2" Text="ms" Classes="stepNote" VerticalAlignment="Center"/>
+          </Grid>
+        </primitives:BalancedWrapPanel>
+        <panels:CollapsiblePanel Title="Allocation details"
                                  IsExpanded="{Binding IsStep3ToFullDetailsExpanded, Mode=TwoWay}">
           <StackPanel Spacing="{StaticResource Space4}">
-            <SelectableTextBlock Text="ToFull / allocation details"
-                                 FontWeight="SemiBold"/>
             <SelectableTextBlock Classes="stepNote"
                                  Text="{Binding NotchAllocationModelSummary}"
                                  TextWrapping="Wrap"/>
@@ -125,7 +107,6 @@
           </StackPanel>
         </panels:CollapsiblePanel>
         <Separator/>
-        <SelectableTextBlock Classes="stepNote" Text="Clears preview and invalidates export and validation results." TextWrapping="Wrap"/>
         <Button Classes="actionDanger" Content="Clear preview"
                 HorizontalAlignment="Right" Command="{Binding ClearStep3ResultCommand}"
                 ToolTip.Tip="Clears preview and invalidates export and validation results."/>

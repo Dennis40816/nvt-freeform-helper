@@ -160,9 +160,9 @@ public sealed partial class FreeformHelperViewModel
     /// </summary>
     public string NotchPreviewStageSummary => NotchPreviewStageIndex switch
     {
-        1 => "Current layer: Stage 1 (Seed)",
-        2 => "Current layer: Stage 2 (Candidate)",
-        _ => "Current layer: Stage 3 (Final)",
+        1 => "Stage 1 (Seed)",
+        2 => "Stage 2 (Candidate)",
+        _ => "Stage 3 (Final)",
     };
 
     /// <summary>

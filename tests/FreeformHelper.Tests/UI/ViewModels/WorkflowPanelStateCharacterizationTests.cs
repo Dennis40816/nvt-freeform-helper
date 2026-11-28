@@ -32,13 +32,13 @@ public sealed class WorkflowPanelStateCharacterizationTests
 
     [Avalonia.Headless.XUnit.AvaloniaTheory]
     [InlineData(nameof(FreeformHelperViewModel.IsStep1Expanded), "1000010", "1100010", "1100000",
-        "Export", "Match overlaps", nameof(FreeformHelperViewModel.IsStep5Expanded))]
+        "Export notch…", "Match overlaps", nameof(FreeformHelperViewModel.IsStep5Expanded))]
     [InlineData(nameof(FreeformHelperViewModel.IsStep2Expanded), "1100000", "1110000", "1010000",
         "Match overlaps", "Detect freeform", nameof(FreeformHelperViewModel.IsStep1Expanded))]
     [InlineData(nameof(FreeformHelperViewModel.IsStep3Expanded), "1100000", "1101000", "1001000",
-        "Match overlaps", "Export", nameof(FreeformHelperViewModel.IsStep1Expanded))]
+        "Match overlaps", "Export notch…", nameof(FreeformHelperViewModel.IsStep1Expanded))]
     [InlineData(nameof(FreeformHelperViewModel.IsStep5Expanded), "1100000", "1100010", "1000010",
-        "Match overlaps", "Export", nameof(FreeformHelperViewModel.IsStep1Expanded))]
+        "Match overlaps", "Export notch…", nameof(FreeformHelperViewModel.IsStep1Expanded))]
     public async Task ExpansionSelectsWorkBeforeReentrantCollapseAndRootPublicationAsync(
         string propertyName, string before, string intermediate, string after,
         string oldAction, string newAction, string collapsedProperty)
@@ -69,7 +69,7 @@ public sealed class WorkflowPanelStateCharacterizationTests
 
         var expected = new List<Notification>
         {
-            new("changing", nameof(vm.IsStep2Expanded), State(vm, "1000111", "Export")),
+            new("changing", nameof(vm.IsStep2Expanded), State(vm, "1000111", "Export notch…")),
             new("changing", nameof(vm.IsStep4Expanded), State(vm, "1010111", "Detect freeform")),
             new("changed", nameof(vm.IsStep4Expanded), State(vm, "1010011", "Detect freeform")),
             new("changing", nameof(vm.IsStep5Expanded), State(vm, "1010011", "Detect freeform")),
@@ -110,8 +110,8 @@ public sealed class WorkflowPanelStateCharacterizationTests
     [Avalonia.Headless.XUnit.AvaloniaTheory]
     [InlineData(nameof(FreeformHelperViewModel.IsStep1Expanded), "1100000", "1000000", "Match overlaps")]
     [InlineData(nameof(FreeformHelperViewModel.IsStep2Expanded), "1010000", "1000000", "Detect freeform")]
-    [InlineData(nameof(FreeformHelperViewModel.IsStep3Expanded), "1001000", "1000000", "Export")]
-    [InlineData(nameof(FreeformHelperViewModel.IsStep5Expanded), "1000010", "1000000", "Export")]
+    [InlineData(nameof(FreeformHelperViewModel.IsStep3Expanded), "1001000", "1000000", "Export notch…")]
+    [InlineData(nameof(FreeformHelperViewModel.IsStep5Expanded), "1000010", "1000000", "Export notch…")]
     public async Task CollapsingWorkKeepsItsPrimaryActionAsync(string propertyName, string before, string after, string action)
     {
         using var scope = new ViewModelScope();
@@ -224,7 +224,7 @@ public sealed class WorkflowPanelStateCharacterizationTests
     {
         "Match overlaps" => new(flags, action, vm.MatchCommand, "Step 1 · Geometry match"),
         "Detect freeform" => new(flags, action, vm.AutoDetectFreeformsCommand, "Step 2 · Freeform tagging"),
-        "Export" => new(flags, action, vm.ExportNotchCommand, "Step 3 preview → Step 5 · Notch export"),
+        "Export notch…" => new(flags, action, vm.ExportNotchCommand, string.Empty),
         _ => throw new ArgumentOutOfRangeException(nameof(action)),
     };
 
