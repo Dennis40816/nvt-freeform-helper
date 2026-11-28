@@ -26,8 +26,9 @@ public sealed class MainWindowCloseTests
         }
         finally
         {
-            prompt.TrySetResult(null);
-            await HeadlessUiPump.YieldAsync();
+            prompt.TrySetResult(false);
+            await HeadlessUiPump.WaitUntilAsync(
+                () => fixture.ClosedCount == 1, "The window did not close after the prompt was answered.");
         }
     }
 
