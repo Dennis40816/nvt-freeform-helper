@@ -6,7 +6,7 @@ public sealed partial class NumberScrubber
 {
     private void OnScrubAreaPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (IsReadOnly || _scrubArea is null)
+        if (IsReadOnly)
         {
             return;
         }
@@ -20,7 +20,7 @@ public sealed partial class NumberScrubber
         _scrubStartValue = Value;
         _isScrubbing = true;
         e.Pointer.Capture(_scrubArea);
-        _inputBox?.Focus();
+        _inputBox.Focus();
         SetFocused(true);
         e.Handled = true;
     }
@@ -42,19 +42,19 @@ public sealed partial class NumberScrubber
 
     private void OnScrubAreaPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (_scrubArea is not null && e.Pointer.Captured == _scrubArea)
+        if (e.Pointer.Captured == _scrubArea)
         {
             e.Pointer.Capture(null);
         }
 
         _isScrubbing = false;
-        SetFocused(_inputBox?.IsFocused ?? false);
+        SetFocused(_inputBox.IsFocused);
     }
 
     private void OnScrubAreaPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
     {
         _isScrubbing = false;
-        SetFocused(_inputBox?.IsFocused ?? false);
+        SetFocused(_inputBox.IsFocused);
     }
 
     private void StepBy(decimal steps)

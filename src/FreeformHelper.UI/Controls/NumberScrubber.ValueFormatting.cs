@@ -7,11 +7,6 @@ public sealed partial class NumberScrubber
 {
     private void CommitText()
     {
-        if (_inputBox is null)
-        {
-            return;
-        }
-
         var text = _inputBox.Text?.Trim();
         if (string.IsNullOrWhiteSpace(text))
         {
@@ -32,11 +27,6 @@ public sealed partial class NumberScrubber
 
     private void UpdateTextFromValue(bool force)
     {
-        if (_inputBox is null)
-        {
-            return;
-        }
-
         if (_isEditing && !force)
         {
             return;
@@ -97,7 +87,7 @@ public sealed partial class NumberScrubber
 
     private void SetFocused(bool focused)
     {
-        _rootBorder?.Classes.Set("focused", focused);
+        _rootBorder.Classes.Set("focused", focused);
     }
 
     private void InitializeComponent()
