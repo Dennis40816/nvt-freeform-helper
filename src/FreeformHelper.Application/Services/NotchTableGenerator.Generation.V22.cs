@@ -14,7 +14,8 @@ public sealed partial class NotchTableGenerator
         int nullValue,
         bool applyTargetCoverageGuard,
         int targetCoverageCapPercent,
-        NotchV22ExplanationCollector? explanationCollector = null)
+        NotchV22ExplanationCollector? explanationCollector = null,
+        IReadOnlySet<(int IcIndex, int DiffIndex)>? electrodeTargets = null)
     {
         if (candidatesByDiff.Count == 0)
         {
@@ -32,7 +33,8 @@ public sealed partial class NotchTableGenerator
             selectedCandidates = ApplyTargetCoverageGuard(
                 selectedCandidates,
                 targetCoverageCapPercent,
-                explanationCollector);
+                explanationCollector,
+                electrodeTargets?.Where(target => target.DiffIndex != nullValue).ToHashSet());
         }
 
         var rows = new List<NotchTableRow>();
@@ -95,7 +97,8 @@ public sealed partial class NotchTableGenerator
     private static List<V22CadCandidate> ApplyTargetCoverageGuard(
         IReadOnlyList<V22CadCandidate> candidates,
         int targetCoverageCapPercent,
-        NotchV22ExplanationCollector? explanationCollector)
+        NotchV22ExplanationCollector? explanationCollector,
+        IReadOnlySet<(int IcIndex, int DiffIndex)>? electrodeTargets)
     {
         var capPercent = Math.Clamp(targetCoverageCapPercent, 0, 255);
         if (capPercent <= 0 || candidates.Count == 0)
@@ -103,7 +106,11 @@ public sealed partial class NotchTableGenerator
             return candidates.ToList();
         }
 
-        var coverageByTarget = new Dictionary<(int IcIndex, int DiffIndex), int>();
+        // Row-less electrodes retain their original 100%; only incoming shares can be scaled.
+        // Use the same source assignments as export, including CADs omitted from the row set.
+        var implicitTargets = electrodeTargets?.Except(
+            candidates.Select(static candidate => (candidate.IcIndex, candidate.DiffIndex))).ToHashSet() ?? [];
+        var coverageByTarget = implicitTargets.ToDictionary(static key => key, static _ => 100);
         foreach (var candidate in candidates)
         {
             var legSum = candidate.Legs.Sum(static leg => Math.Max(0, leg.RatioPercent));
@@ -116,10 +123,13 @@ public sealed partial class NotchTableGenerator
         }
 
         var scaleByTarget = coverageByTarget
-            .Where(item => item.Value > capPercent)
+            .Where(item => item.Value > capPercent &&
+                           (!implicitTargets.Contains(item.Key) || item.Value > 100))
             .ToDictionary(
                 static item => item.Key,
-                item => capPercent / Math.Max(1.0, item.Value));
+                item => implicitTargets.Contains(item.Key)
+                    ? Math.Max(0, capPercent - 100) / Math.Max(1.0, item.Value - 100)
+                    : capPercent / Math.Max(1.0, item.Value));
         if (scaleByTarget.Count == 0)
         {
             return candidates.ToList();

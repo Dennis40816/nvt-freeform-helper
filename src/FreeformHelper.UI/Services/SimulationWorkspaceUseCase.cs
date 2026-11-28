@@ -262,7 +262,9 @@ public sealed partial class SimulationWorkspaceUseCase
         return new SimulationScenarioSnapshot(
             scenario,
             reviewSnapshot,
-            SimulationSafetyAuditService.Analyze(reviewSnapshot.SimulationResult));
+            SimulationSafetyAuditService.Analyze(
+                reviewSnapshot.SimulationResult,
+                targetCoveragePercentCap: session.TargetCoverageCapPercent));
     }
 
     public static CopperPillarPathReplayResult ReplayCopperPath(

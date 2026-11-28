@@ -1,5 +1,4 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
-using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
@@ -262,6 +261,6 @@ public sealed class NotchExportRangeCheckTests
         {
             Notch = new NotchSettings { NullValue = NullDiff, ComputationMode = mode },
         };
-        return NotchTableExporter.ExportAsCInitializer(new NotchTable(rows), cad, grid, settings);
+        return FirmwareExportTestSupport.ExportSparseFirmwareSample(new NotchTable(rows), cad, grid, settings);
     }
 }

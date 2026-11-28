@@ -129,10 +129,16 @@ int main(void)
     public static string ExportC(
         NotchTable table,
         NotchExportProfile profile = NotchExportProfile.Debug,
-        ProjectSettings? settings = null)
+        ProjectSettings? settings = null,
+        int columnsPerIc = 1)
     {
         var cad = new CadPadSet([TestGeometryFactory.CreateCadPad(1, "L", 0, 0, 10, 10)]);
-        var grid = TestGeometryFactory.CreateLinearRegularGrid([0]);
+        var icCount = Math.Max(1, table.Rows.Select(static row => row.IcIndex).DefaultIfEmpty(0).Max() + 1);
+        var grid = TestGeometryFactory.CreateRegularGrid(
+            rows: 1,
+            cols: icCount * columnsPerIc,
+            diffIndexSelector: (_, col) => col % columnsPerIc,
+            icIndexSelector: (_, col) => col / columnsPerIc);
         return NotchTableExporter.ExportAsCInitializer(table, cad, grid, settings ?? CreateSettings(), profile);
     }
 

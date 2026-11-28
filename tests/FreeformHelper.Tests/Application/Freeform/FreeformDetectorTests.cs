@@ -16,9 +16,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 1001, minX: 0.0, minY: 0.0, maxX: 3.0, maxY: 1.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetectorTestSupport.AutoTag(
-            cad,
-            grid,
+        FreeformDetectorTestSupport.AutoTag(grid,
             new MatchingSettings { FreeformAxisThreshold = 0.5 },
             matchResult);
 
@@ -32,9 +30,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 2001, minX: 0.0, minY: 0.0, maxX: 1.0, maxY: 3.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetectorTestSupport.AutoTag(
-            cad,
-            grid,
+        FreeformDetectorTestSupport.AutoTag(grid,
             new MatchingSettings { FreeformAxisThreshold = 0.5 },
             matchResult);
 
@@ -48,9 +44,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 3001, minX: 0.0, minY: 0.0, maxX: 1.1, maxY: 1.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetectorTestSupport.AutoTag(
-            cad,
-            grid,
+        FreeformDetectorTestSupport.AutoTag(grid,
             new MatchingSettings { FreeformAxisThreshold = 0.2 },
             matchResult);
 
@@ -64,9 +58,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 4001, minX: 0.0, minY: 0.0, maxX: 2.0, maxY: 2.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetectorTestSupport.AutoTag(
-            cad,
-            grid,
+        FreeformDetectorTestSupport.AutoTag(grid,
             new MatchingSettings
             {
                 FreeformAxisThreshold = 0.4,
@@ -89,7 +81,7 @@ public sealed class FreeformDetectorTests
         };
         var matchResult = PadMatcher.Match(cad, grid);
 
-        var assignments = FreeformDetector.DetectAssignments(cad, grid, settings, matchResult);
+        var assignments = FreeformDetector.DetectAssignments(grid, settings, matchResult);
 
         Assert.Equal(grid.Pads.Count, assignments.Count);
         Assert.All(grid.Pads, pad => Assert.Equal(FreeformType.None, pad.Freeform));
@@ -106,9 +98,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 5001, minX: 0.9, minY: 0.0, maxX: 1.3, maxY: 1.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetectorTestSupport.AutoTag(
-            cad,
-            grid,
+        FreeformDetectorTestSupport.AutoTag(grid,
             new MatchingSettings
             {
                 FreeformAxisThreshold = 0.3,
@@ -126,9 +116,7 @@ public sealed class FreeformDetectorTests
         var cad = BuildCadPadSet(id: 5002, minX: 0.9, minY: 0.0, maxX: 1.3, maxY: 1.0);
         var matchResult = PadMatcher.Match(cad, grid);
 
-        FreeformDetectorTestSupport.AutoTag(
-            cad,
-            grid,
+        FreeformDetectorTestSupport.AutoTag(grid,
             new MatchingSettings
             {
                 FreeformAxisThreshold = 0.3,
@@ -151,7 +139,6 @@ public sealed class FreeformDetectorTests
     public void AutoTagFreeforms_IgnoresNumericalNoiseSecondaryOverlap_WhenEdgeSpecializationEnabled()
     {
         var grid = BuildGrid(rows: 1, cols: 2, width: 2, height: 1);
-        var cad = BuildCadPadSet(id: 5003, minX: 0.0, minY: 0.0, maxX: 1.0, maxY: 1.0);
         var orderedPads = grid.Pads
             .OrderBy(pad => pad.Col)
             .ToList();
@@ -182,9 +169,7 @@ public sealed class FreeformDetectorTests
                 [noisePad.RegularPadId] = new[] { noiseLink },
             });
 
-        FreeformDetectorTestSupport.AutoTag(
-            cad,
-            grid,
+        FreeformDetectorTestSupport.AutoTag(grid,
             new MatchingSettings
             {
                 FreeformAxisThreshold = 0.3,
@@ -199,7 +184,6 @@ public sealed class FreeformDetectorTests
     public void DetectAssignments_AssignsFreeformOnlyToMajorLinks_WhenMinorTailFallsBelowThreshold()
     {
         var grid = BuildGrid(rows: 1, cols: 3, width: 3, height: 1);
-        var cad = BuildCadPadSet(id: 6001, minX: 0.0, minY: 0.0, maxX: 3.0, maxY: 1.0);
         var orderedPads = grid.Pads
             .OrderBy(pad => pad.Col)
             .ToList();
@@ -242,9 +226,7 @@ public sealed class FreeformDetectorTests
                 [tail.RegularPadId] = new[] { links[2] },
             });
 
-        var assignments = FreeformDetector.DetectAssignments(
-            cad,
-            grid,
+        var assignments = FreeformDetector.DetectAssignments(grid,
             new MatchingSettings
             {
                 FreeformAxisThreshold = 0.01,

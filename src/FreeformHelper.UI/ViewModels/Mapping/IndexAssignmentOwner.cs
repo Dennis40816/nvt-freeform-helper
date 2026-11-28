@@ -226,8 +226,7 @@ internal sealed class IndexAssignmentOwner
             _inputs.Project().Settings.Grid,
             autoMode,
             strictMatchDiffByCadId,
-            _inputs.Project().CadOutputFwDiffIndexOverrides,
-            _inputs.Project().CadOutputFwDiffIndexAnchorCadPadByIc);
+            _inputs.Project().CadOutputFwDiffIndexOverrides);
 
         foreach (var pair in assignment.CadIcIndexByCadId)
         {

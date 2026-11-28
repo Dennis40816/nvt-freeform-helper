@@ -51,7 +51,9 @@ public sealed class ProjectSaveLoadUserWorkRoundTripTests
     {
         using var files = new LoadingModeTestScope();
         var original = await OpenAsync(files, ("signal", 7, 3.5, 13, 6.5));
-        await ApplyManualRegularWorkAsync(original);
+        // The export refuses a diff outside the 2x2 panel, so this round trip uses one inside it.
+        const int panelDiff = 2;
+        await ApplyManualRegularWorkAsync(original, panelDiff);
         var expectedGrid = CaptureRegularWork(original);
         var cadId = Assert.Single(original.CadPads).Id;
         var expected = await ExportNotchProfileAsync(original, NotchExportProfile.Release, files.PathFor("before.c"));
@@ -62,9 +64,9 @@ public sealed class ProjectSaveLoadUserWorkRoundTripTests
         var actual = await ExportNotchProfileAsync(loaded, NotchExportProfile.Release, files.PathFor("after.c"));
 
         Assert.Equal(expectedGrid, CaptureRegularWork(loaded));
-        Assert.Equal(37, loaded.GetCadOutputFwDiffIndexOverride(cadId));
+        Assert.Equal(panelDiff, loaded.GetCadOutputFwDiffIndexOverride(cadId));
         Assert.True(loaded.TryGetCadOutputFwDiffIndex(cadId, out var diff));
-        Assert.Equal(37, diff);
+        Assert.Equal(panelDiff, diff);
         Assert.Equal(expected, actual);
     }
 
@@ -249,7 +251,7 @@ public sealed class ProjectSaveLoadUserWorkRoundTripTests
         await WaitForGridRebuildAsync(vm);
     }
 
-    private static async Task ApplyManualRegularWorkAsync(FreeformHelperViewModel vm)
+    private static async Task ApplyManualRegularWorkAsync(FreeformHelperViewModel vm, int fwDiff = 37)
     {
         vm.ApplySizingToCells([0], [0], 6m, 7m);
         await WaitForGridRebuildAsync(vm);
@@ -258,9 +260,10 @@ public sealed class ProjectSaveLoadUserWorkRoundTripTests
         Assert.Equal(7, resized.Bounds.Height, 6);
         await vm.MatchCommand.ExecuteAsync(null);
         ApplyManualTags(vm);
-        vm.SetCadOutputFwDiffIndexOverride(vm.CadPads[0].Id, 37);
+        Assert.False(vm.TryGetCadOutputFwDiffIndex(vm.CadPads[0].Id, out var automatic) && automatic == fwDiff);
+        vm.SetCadOutputFwDiffIndexOverride(vm.CadPads[0].Id, fwDiff);
         Assert.True(vm.TryGetCadOutputFwDiffIndex(vm.CadPads[0].Id, out var diff));
-        Assert.Equal(37, diff);
+        Assert.Equal(fwDiff, diff);
     }
 
     private static void ApplyManualTags(FreeformHelperViewModel vm)

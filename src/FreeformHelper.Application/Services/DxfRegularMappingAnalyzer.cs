@@ -193,7 +193,13 @@ public sealed partial class DxfRegularMappingAnalyzer
             assignment.CadAssignedScore);
 
         var pairs = scan.Pairs;
-        pairs.Sort(static (a, b) => b.Score.CompareTo(a.Score));
+        pairs.Sort((a, b) =>
+        {
+            var score = b.Score.CompareTo(a.Score);
+            if (score != 0) return score;
+            var cadId = cadPads[a.CadIndex].Id.CompareTo(cadPads[b.CadIndex].Id);
+            return cadId != 0 ? cadId : regPads[a.RegularPadIndex].RegularPadId.CompareTo(regPads[b.RegularPadIndex].RegularPadId);
+        });
         var pairCount = pairs.Count;
         for (var i = 0; i < pairCount; i++)
         {

@@ -65,8 +65,8 @@ public sealed class DxfIndexAssigner
 
     private static (int row, int col) ResolveGridCell(RegularGrid grid, Point2 centroid, int rows, int cols)
     {
-        var coarseRow = FindCellIndex(grid.YEdges, centroid.Y, rows);
-        var coarseCol = FindCellIndex(grid.XEdges, centroid.X, cols);
+        var coarseRow = GridCellLookup.FindCellIndex(grid.YEdges, centroid.Y, rows);
+        var coarseCol = GridCellLookup.FindCellIndex(grid.XEdges, centroid.X, cols);
         coarseRow = Math.Clamp(coarseRow, 0, rows - 1);
         coarseCol = Math.Clamp(coarseCol, 0, cols - 1);
 
@@ -210,31 +210,5 @@ public sealed class DxfIndexAssigner
         return items.Select(t => t.pad).ToList();
     }
 
-    private static int FindCellIndex(IReadOnlyList<double> edges, double coord, int cellCount)
-    {
-        if (cellCount <= 1 || edges.Count < 2)
-        {
-            return 0;
-        }
 
-        if (coord <= edges[0]) return 0;
-        if (coord >= edges[^1]) return cellCount - 1;
-
-        var lo = 0;
-        var hi = edges.Count - 1;
-        while (lo + 1 < hi)
-        {
-            var mid = (lo + hi) / 2;
-            if (coord < edges[mid])
-            {
-                hi = mid;
-            }
-            else
-            {
-                lo = mid;
-            }
-        }
-
-        return Math.Clamp(lo, 0, cellCount - 1);
-    }
 }

@@ -74,7 +74,8 @@ internal static class NotchTableGeneratorPrivateAccess
         int nullValue,
         bool applyTargetCoverageGuard,
         int targetCoverageCapPercent,
-        NotchV22ExplanationCollector? explanationCollector = null);
+        NotchV22ExplanationCollector? explanationCollector = null,
+        IReadOnlySet<(int IcIndex, int DiffIndex)>? electrodeTargets = null);
 
     [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "BuildV22DiffLegs")]
     [return: UnsafeAccessorType(DiffLegListType)]

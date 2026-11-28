@@ -46,7 +46,8 @@ public static class NotchApplySimulationService
                 request.Table.Rows,
                 request.NullDiffValue,
                 ResolveIcCount(request),
-                request.ComputationMode);
+                request.ComputationMode,
+                diagnostics);
             var firmwareEvaluation = NotchV21FirmwareEvaluator.Apply(
                 firmwareProjection,
                 beforeByDiff,

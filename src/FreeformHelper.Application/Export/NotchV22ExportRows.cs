@@ -22,9 +22,15 @@ public static class NotchV22ExportRows
     }
 
     internal static IReadOnlyList<IReadOnlyList<NotchV22FirmwareRow>> ProjectNodes(
-        IReadOnlyList<NotchTableRow> rows, int icCount, int nullValue, NotchExportProfile profile)
+        IReadOnlyList<NotchTableRow> rows, int icCount, int nullValue, NotchExportProfile profile) =>
+        ProjectNodes(rows, icCount, nullValue, profile, out _);
+
+    internal static IReadOnlyList<IReadOnlyList<NotchV22FirmwareRow>> ProjectNodes(
+        IReadOnlyList<NotchTableRow> rows, int icCount, int nullValue, NotchExportProfile profile,
+        out IReadOnlyList<NotchV22FirmwareRow> sourceRows)
     {
         var projection = NotchV22FirmwareProjector.Project(rows, nullValue, icCount);
+        sourceRows = projection.SourceRows;
         return profile == NotchExportProfile.Release
             ? NotchV22FirmwareProjector.OrderNodesByIc(
                 projection.SourceRows.Where(static node => !IsNoOp(node)).ToList(), icCount)

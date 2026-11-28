@@ -20,11 +20,6 @@ public sealed class FreeformDetectorBehaviorCoverageTests
         int rows, int cols, double threshold, bool enableXy, bool useEmptyEvidence, FreeformType expected)
     {
         var grid = TestGeometryFactory.CreateRegularGrid(rows + 1, cols + 2);
-        var cad = new CadPadSet(
-        [
-            TestGeometryFactory.CreateCadPad(100, "PAD", 0, 0, cols, rows),
-            TestGeometryFactory.CreateCadPad(200, "PAD", cols, 0, cols + 1, 1),
-        ]);
         foreach (var pad in grid.Pads)
         {
             pad.Freeform = FreeformType.XYWay;
@@ -41,8 +36,7 @@ public sealed class FreeformDetectorBehaviorCoverageTests
         zeroScore.MatchScore = 0;
         var settings = new MatchingSettings { FreeformAxisThreshold = threshold, EnableAutoDetectXy = enableXy };
 
-        var assignments = FreeformDetector.DetectAssignments(
-            cad, grid, settings, useEmptyEvidence ? PadMatchResult.Empty : null);
+        var assignments = FreeformDetector.DetectAssignments(grid, settings, useEmptyEvidence ? PadMatchResult.Empty : null);
         FreeformDetector.ApplyAssignments(grid, assignments);
 
         Assert.Equal(expected == FreeformType.None ? 0 : rows * cols, assignments.Count);
@@ -62,9 +56,9 @@ public sealed class FreeformDetectorBehaviorCoverageTests
         var matches = PadMatcher.Match(cad, grid);
         var settings = new MatchingSettings { FreeformAxisThreshold = 0.3 };
 
-        Assert.Empty(FreeformDetector.DetectAssignments(cad, grid, settings, matches));
+        Assert.Empty(FreeformDetector.DetectAssignments(grid, settings, matches));
         settings.EnableFreeformEdgeSpecialization = true;
-        var assignments = FreeformDetector.DetectAssignments(cad, grid, settings, matches);
+        var assignments = FreeformDetector.DetectAssignments(grid, settings, matches);
         FreeformDetector.ApplyAssignments(grid, assignments);
 
         Assert.Equal(2, assignments.Count);
@@ -90,7 +84,7 @@ public sealed class FreeformDetectorBehaviorCoverageTests
             EnableAutoDetectXy = enableXy,
         };
 
-        var assignments = FreeformDetector.DetectAssignments(cad, grid, settings, matches);
+        var assignments = FreeformDetector.DetectAssignments(grid, settings, matches);
         FreeformDetector.ApplyAssignments(grid, assignments);
 
         Assert.Equal(enableXy ? 4 : 0, assignments.Count);
@@ -116,7 +110,7 @@ public sealed class FreeformDetectorBehaviorCoverageTests
             EnableAutoDetectXy = true,
         };
 
-        var assignments = FreeformDetector.DetectAssignments(cad, grid, settings, matches);
+        var assignments = FreeformDetector.DetectAssignments(grid, settings, matches);
 
         Assert.Equal(grid.Pads.Count, matches.RegularToCad.Count);
         Assert.True(matches.CadToRegular[spill.Id].Count >= 2);

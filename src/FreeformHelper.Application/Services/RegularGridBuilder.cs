@@ -188,14 +188,11 @@ public sealed class RegularGridBuilder
         if (settings.RowWidthOverrides.Count > row)
         {
             var overrides = Resize(settings.RowWidthOverrides[row], cols, 0.0);
-            var flags = settings.RowWidthOverrideFlags.Count > row
-                ? Resize(settings.RowWidthOverrideFlags[row], cols, false)
-                : Enumerable.Repeat(false, cols).ToList();
 
             for (var c = 0; c < cols; c++)
             {
-                // An override is applied if its flag is set or if it's a positive value.
-                if ((flags[c] || overrides[c] > 0) && overrides[c] > 0)
+                // Positive values override the base size.
+                if (overrides[c] > 0)
                 {
                     baseWidths[c] = overrides[c];
                 }
@@ -214,14 +211,11 @@ public sealed class RegularGridBuilder
         if (settings.ColumnHeightOverrides.Count > col)
         {
             var overrides = Resize(settings.ColumnHeightOverrides[col], rows, 0.0);
-            var flags = settings.ColumnHeightOverrideFlags.Count > col
-                ? Resize(settings.ColumnHeightOverrideFlags[col], rows, false)
-                : Enumerable.Repeat(false, rows).ToList();
 
             for (var r = 0; r < rows; r++)
             {
-                // An override is applied if its flag is set or if it's a positive value.
-                if ((flags[r] || overrides[r] > 0) && overrides[r] > 0)
+                // Positive values override the base size.
+                if (overrides[r] > 0)
                 {
                     baseHeights[r] = overrides[r];
                 }

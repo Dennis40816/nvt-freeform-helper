@@ -1,3 +1,4 @@
+using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 
 namespace FreeformHelper.Application.Services;
@@ -42,5 +43,26 @@ public sealed partial class CadOutputFwDiffIndexAssignmentService
     }
 
     private sealed record RowGroup(int RowIndex, int FirstOrder, List<CadPad> Pads);
+
+    internal static IReadOnlySet<(int IcIndex, int DiffIndex)> BuildAssignedElectrodeTargets(
+        IReadOnlyList<CadPad> cadPads,
+        RegularGrid grid,
+        GridSettings settings,
+        IReadOnlyDictionary<int, int>? assignedDiffByCadId)
+    {
+        if (assignedDiffByCadId is null || assignedDiffByCadId.Count == 0)
+        {
+            return new HashSet<(int IcIndex, int DiffIndex)>();
+        }
+
+        var assignedPads = cadPads.Where(pad => assignedDiffByCadId.ContainsKey(pad.Id)).ToArray();
+        var icByCadId = new Dictionary<int, int>();
+        BuildRowGroups(assignedPads, grid,
+            GridIcChannelAllocationService.ResolvePerIcColumns(settings, grid.Cols), icByCadId);
+        return assignedPads
+            .Select(pad => (icByCadId[pad.Id], assignedDiffByCadId[pad.Id]))
+            .Where(static target => target.Item2 >= 0)
+            .ToHashSet();
+    }
 
 }

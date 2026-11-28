@@ -1,6 +1,6 @@
 # Notch System Reference
 
-> Last updated: 2026-11-27
+> Last updated: 2026-11-28
 > Status: The sole canonical reference for the current Notch pipeline / Simulation / Export
 
 This document does not aim to replace all historical documents. It brings together "how the system currently works" in one place. Any future changes to the flow, naming, or C export contract should update this file first, then adjust the deep-dive or legacy example.
@@ -435,6 +435,8 @@ old diff1473 total ≈ 83% + 41% = 124%
 
 This is the root cause of the previous abnormal values around 500 at both side edges. The new algorithm lets `CAD4818` retain only approximately `59%` on `diff1473`; approximately `41%` incoming from the adjacent pad brings it back close to `100%`.
 
+The CurrentGain target coverage guard adds an original 100% for a target without its own row only when a CAD outputs to that (IC, diff). Electrode presence comes from the same Step 4 CAD output assignment used to generate the export, before row eligibility and threshold filtering. A row-less target without an electrode starts near zero, so it receives no original 100%. The guard reserves this original coverage and scales incoming shares to the remaining cap budget. Targets with their own rows keep the existing retained-coverage calculation; V21 and V22 share this guard before Debug or Release projection, including rows that Release later removes. NoGain and legacy guard eligibility are unchanged.
+
 ### 7.4.2 Consistency Between C Runtime and FreeformHelper Simulation
 
 `NotchFirmwareCExporter` and `NotchApplySimulationService` both consume final nodes produced by `NotchV22FirmwareProjector`; simulation no longer decodes raw rows itself or merges continuation legs before recomputing physics.
@@ -493,6 +495,17 @@ C export outputs a comment-only metadata region without adding C structures or a
 - `TargetCoverageGuard / TargetCoverageCapPercent`
 - export profile
 - Whether v2.1 / v2.2 actually has rows
+
+### 7.4.4 C export IC address diagnostics
+
+An out-of-panel source or target diff is rejected before formatting, for example:
+`First target diff index must be below IC rows × columns (16) at IC index 0: 37. Held by CAD 73.`
+The CAD identity uses the Pad Info / override console wording `CAD {id}` (the stable `CAD id`, not the pad name or display order).
+The exporter looks up the reported value among the same IC's firmware source diffs, including Release no-op sources;
+a target can belong to another CAD pad, so the reporting row's CAD is not assumed to be the owner.
+Repeated rows count once per CAD. Up to three owners are listed in ID order, followed by `(+N more)` when needed.
+When no source CAD holds the value, the message ends with `No CAD pad holds this output FW diff.`
+The IC capacity rule, other range diagnostics, and generated C remain unchanged.
 
 ### 7.5 FW simulation base mask (removed)
 

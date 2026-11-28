@@ -25,7 +25,7 @@ public sealed class NotchV22LegacyFirmwareProjectionBehaviorTests
         var grid = TestGeometryFactory.CreateLinearRegularGrid([10]);
         var projection = new DiffFrameGridProjectionResult(true, null, [new DiffFrameGridCellValue(0, 0, 0, 0, 0, 100)]);
 
-        var text = NotchEdgeCaseHarness.ExportC(table);
+        var text = NotchEdgeCaseHarness.ExportC(table, columnsPerIc: 11);
         var result = NotchApplySimulationService.Simulate(new NotchApplySimulationRequest(
             grid, grid.Pads.Select(pad => pad.RegularPadId).ToHashSet(), [projection], table,
             NotchAlgorithmVersion.V22, 65535));

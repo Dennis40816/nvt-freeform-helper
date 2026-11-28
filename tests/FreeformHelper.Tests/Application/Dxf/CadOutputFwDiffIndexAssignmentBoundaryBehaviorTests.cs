@@ -17,8 +17,7 @@ public sealed class CadOutputFwDiffIndexAssignmentBoundaryBehaviorTests
             new GridSettings(),
             CadOutputFwDiffAutoMode.StrictUnique,
             new Dictionary<int, int?> { [42] = 8 },
-            new Dictionary<int, int> { [42] = -1 },
-            new Dictionary<int, int> { [0] = 42 });
+            new Dictionary<int, int> { [42] = -1 });
 
         Assert.Empty(result.AssignedIndexByCadId);
         Assert.Empty(result.CadIcIndexByCadId);

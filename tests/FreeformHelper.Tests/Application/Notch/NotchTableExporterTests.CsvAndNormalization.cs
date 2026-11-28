@@ -106,12 +106,12 @@ public sealed partial class NotchTableExporterTests
         var grid = TestGeometryFactory.CreateLinearRegularGrid([21, 45]);
         var typedTable = new NotchTable([typedRow]);
         var untypedTable = new NotchTable([untypedRow]);
-        var typedText = NotchTableExporter.ExportAsCInitializer(
+        var typedText = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             typedTable,
             CreateCadSet(),
             grid,
             CreateProjectSettings());
-        var untypedText = NotchTableExporter.ExportAsCInitializer(
+        var untypedText = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             untypedTable,
             CreateCadSet(),
             grid,
@@ -151,7 +151,7 @@ public sealed partial class NotchTableExporterTests
         var settings = CreateProjectSettings();
         settings.Notch.NullValue = invalidNullDiff;
         var exportException = Record.Exception(() =>
-            NotchTableExporter.ExportAsCInitializer(
+            FirmwareExportTestSupport.ExportSparseFirmwareSample(
                 table,
                 CreateCadSet(),
                 grid,
@@ -198,7 +198,7 @@ public sealed partial class NotchTableExporterTests
             computationMode,
             beforeValues: [beforeSource, beforeUint16Max],
             nullDiffValue: nullDiff);
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
+        var generatedSource = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             grid,
@@ -242,7 +242,7 @@ public sealed partial class NotchTableExporterTests
             grid.Pads.Select(static pad => pad.RegularPadId),
             () => settings.Notch.NullValue = ushort.MaxValue);
 
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
+        var generatedSource = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             grid,
@@ -265,7 +265,7 @@ public sealed partial class NotchTableExporterTests
         var settings = CreateProjectSettings();
         settings.Notch.NullValue = ushort.MaxValue + 1;
 
-        var text = NotchTableExporter.ExportAsCInitializer(
+        var text = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             new NotchTable([]),
             CreateCadSet(),
             CreateGrid(),
@@ -290,7 +290,7 @@ public sealed partial class NotchTableExporterTests
                 comment: string.Empty)
         ]);
 
-        var text = NotchTableExporter.ExportAsCInitializer(
+        var text = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             grid,
@@ -321,7 +321,7 @@ public sealed partial class NotchTableExporterTests
         ]);
 
         var exportException = Assert.Throws<InvalidOperationException>(() =>
-            NotchTableExporter.ExportAsCInitializer(
+            FirmwareExportTestSupport.ExportSparseFirmwareSample(
                 table,
                 CreateCadSet(),
                 grid,
@@ -349,13 +349,13 @@ public sealed partial class NotchTableExporterTests
                 comment: "profile-no-op")
         ]);
 
-        var debugText = NotchTableExporter.ExportAsCInitializer(
+        var debugText = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             grid,
             CreateProjectSettings(),
             NotchExportProfile.Debug);
-        var releaseText = NotchTableExporter.ExportAsCInitializer(
+        var releaseText = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             grid,
@@ -388,7 +388,7 @@ public sealed partial class NotchTableExporterTests
                 comment: index == 0 ? "drop-no-op" : $"keep-{index:D2}"))
             .ToArray();
 
-        var text = NotchTableExporter.ExportAsCInitializer(
+        var text = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             new NotchTable(rows),
             CreateCadSet(),
             CreateGrid(),

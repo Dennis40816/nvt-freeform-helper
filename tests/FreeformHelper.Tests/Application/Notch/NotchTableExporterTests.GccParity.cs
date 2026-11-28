@@ -39,13 +39,13 @@ public sealed partial class NotchTableExporterTests
                 comment: "v21-only"),
         });
 
-        AssertCCompilesWithGcc(NotchTableExporter.ExportAsCInitializer(
+        AssertCCompilesWithGcc(FirmwareExportTestSupport.ExportSparseFirmwareSample(
             v22OnlyTable,
             CreateCadSet(),
             CreateGrid(),
             CreateProjectSettings(),
             NotchExportProfile.Debug));
-        AssertCCompilesWithGcc(NotchTableExporter.ExportAsCInitializer(
+        AssertCCompilesWithGcc(FirmwareExportTestSupport.ExportSparseFirmwareSample(
             v21OnlyTable,
             CreateCadSet(),
             CreateGrid(),
@@ -64,7 +64,7 @@ public sealed partial class NotchTableExporterTests
         var grid = CreateRuntimeParityGrid();
         var table = CreateRuntimeParityV22Table();
         var expected = SimulateWithCSharp(grid, table, NotchAlgorithmVersion.V22);
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
+        var generatedSource = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSetWithIcCount(2),
             grid,
@@ -109,7 +109,7 @@ public sealed partial class NotchTableExporterTests
             table,
             NotchAlgorithmVersion.V22,
             beforeValues: beforeValues);
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
+        var generatedSource = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             grid,
@@ -168,7 +168,7 @@ public sealed partial class NotchTableExporterTests
             NotchAlgorithmVersion.V22,
             65535));
         var simulated = simulation.Cells.Select(static cell => cell.AfterValue).ToArray();
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
+        var generatedSource = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             grid,
@@ -207,7 +207,7 @@ public sealed partial class NotchTableExporterTests
         var grid = CreateRuntimeParityGrid();
         var table = CreateRuntimeParityV21Table();
         var expected = SimulateWithCSharp(grid, table, NotchAlgorithmVersion.V21);
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
+        var generatedSource = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSetWithIcCount(2),
             grid,
@@ -235,7 +235,7 @@ public sealed partial class NotchTableExporterTests
             table,
             NotchAlgorithmVersion.V21,
             NotchComputationMode.LegacyRegularAnchor);
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
+        var generatedSource = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSetWithIcCount(2),
             grid,
@@ -271,7 +271,7 @@ public sealed partial class NotchTableExporterTests
             .ThenBy(static cell => cell.RegularCol)
             .Select(static cell => cell.AfterValue)
             .ToArray();
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
+        var generatedSource = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSetWithIcCount(1),
             grid,
@@ -281,7 +281,7 @@ public sealed partial class NotchTableExporterTests
         var firmwareValues = RunCProgramWithGcc(CreateV21Q7BoundaryRuntimeHarnessSource(generatedSource));
 
         Assert.True(simulation.IsSupported);
-        Assert.Empty(simulation.Diagnostics);
+        Assert.All(simulation.Diagnostics, diagnostic => Assert.Contains("clamped to 0", diagnostic, StringComparison.Ordinal));
         Assert.Equal(_expectedV21Q7BoundaryRuntimeValues, firmwareValues);
         Assert.Equal(_expectedV21Q7BoundaryRuntimeValues, simulatedValues);
         Assert.Equal(_expectedV21Q7BoundarySignedPercents, simulation.Actions.SelectMany(static action => action.Legs).Select(static leg => leg.RatioPercent));
@@ -303,7 +303,7 @@ public sealed partial class NotchTableExporterTests
                 values: [sourceDiff, 100, 200, 20, 1, 128, 65535, 0, 0],
                 comment: $"src{sourceDiff}"))
             .ToArray());
-        var generatedSource = NotchTableExporter.ExportAsCInitializer(
+        var generatedSource = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSetWithIcCount(1),
             grid,

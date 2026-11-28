@@ -45,7 +45,7 @@ public sealed class NotchV21FirmwareProjectionBehaviorTests
             new NotchTableRow(NotchAlgorithmVersion.V21, 0, 10, 0, 101,
                 [10, 100, 100, 20, 1, 32, 20, 1, 32], "split"),
         ]);
-        var text = NotchEdgeCaseHarness.ExportC(table);
+        var text = NotchEdgeCaseHarness.ExportC(table, columnsPerIc: 21);
 
         var result = Simulate(table, NotchComputationMode.CadAllocation, targetBefore: 0);
 

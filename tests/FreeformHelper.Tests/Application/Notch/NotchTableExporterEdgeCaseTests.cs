@@ -152,7 +152,7 @@ public sealed class NotchTableExporterEdgeCaseTests
     {
         var table = new NotchTable([V22Row(0, 10, 120, 20, 30, NullDiff, 0, 0, "only")]);
 
-        var text = ExportC(table, profile);
+        var text = ExportC(table, profile, columnsPerIc: 21);
 
         Assert.Contains("#define USER_NHC_IC_NUM          (1u)", text, StringComparison.Ordinal);
         Assert.Contains("#define USER_NHC_NODE_NUM        (1u)", text, StringComparison.Ordinal);
@@ -175,7 +175,7 @@ public sealed class NotchTableExporterEdgeCaseTests
     {
         var table = new NotchTable([V21Row(0, 10, [10, 100, 120, 20, 1, 38, NullDiff, 0, 0], "only")]);
 
-        var text = ExportC(table, settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor));
+        var text = ExportC(table, settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor), columnsPerIc: 21);
 
         Assert.Contains("#define USER_NHC_NODE_NUM        (1u)", text, StringComparison.Ordinal);
         Assert.Equal(
@@ -193,7 +193,7 @@ public sealed class NotchTableExporterEdgeCaseTests
         // 120% combine with one +38/128 leg: the leg is 30%, so the source keeps 90% (SUB 13/128).
         var table = new NotchTable([V21Row(0, 10, [10, 100, 120, 20, 1, 38, NullDiff, 0, 0], "only")]);
 
-        var text = ExportC(table);
+        var text = ExportC(table, columnsPerIc: 21);
 
         Assert.Contains("#define USER_NHC_NODE_NUM        (2u)", text, StringComparison.Ordinal);
         Assert.Equal(
@@ -222,7 +222,7 @@ public sealed class NotchTableExporterEdgeCaseTests
             V22Row(254, 7, 50, NullDiff, 0, NullDiff, 0, 0, "last-ic"),
         ]);
 
-        var text = ExportC(table);
+        var text = ExportC(table, columnsPerIc: 8);
 
         Assert.Contains("#define USER_NHC_IC_NUM          (255u)", text, StringComparison.Ordinal);
         Assert.Equal(
@@ -243,7 +243,7 @@ public sealed class NotchTableExporterEdgeCaseTests
             V22Row(255, 7, 50, NullDiff, 0, NullDiff, 0, 0, "last-ic"),
         ]);
 
-        var text = ExportC(table);
+        var text = ExportC(table, columnsPerIc: 8);
         var emptyDispatchEntries = Lines(text).Count(static line => line.StartsWith("    { NULL,", StringComparison.Ordinal));
 
         Assert.Contains("#define USER_NHC_IC_NUM          (256u)", text, StringComparison.Ordinal);
@@ -270,7 +270,7 @@ public sealed class NotchTableExporterEdgeCaseTests
             .Select(static index => V22Row(0, index, 100, NullDiff, 0, NullDiff, 0, 0, "n"))
             .ToArray();
 
-        var text = ExportC(new NotchTable(rows));
+        var text = ExportC(new NotchTable(rows), columnsPerIc: ushort.MaxValue);
         var dump = DumpV22Table(text);
 
         Assert.Contains("#define USER_NHC_NODE_NUM_IC1 (65535u)", text, StringComparison.Ordinal);
@@ -285,7 +285,7 @@ public sealed class NotchTableExporterEdgeCaseTests
     {
         var table = new NotchTable([V22Row(0, 65534, 100, 0, 50, 65533, 25, 0, "max-diff")]);
 
-        var text = ExportC(table);
+        var text = ExportC(table, columnsPerIc: ushort.MaxValue);
 
         Assert.Equal(
             "    { 65534, 100,             0,   50,         65533,   25, NHC_FLAG_NONE }, // max-diff; NODE KEEP=25% MOVE=75%",
@@ -316,7 +316,7 @@ public sealed class NotchTableExporterEdgeCaseTests
             }
         }
 
-        var text = ExportC(new NotchTable(rows));
+        var text = ExportC(new NotchTable(rows), columnsPerIc: 201);
 
         Assert.Equal(expected, DumpV22Table(text));
     }
@@ -326,7 +326,7 @@ public sealed class NotchTableExporterEdgeCaseTests
     {
         var table = new NotchTable([V22Row(0, 10, int.MaxValue, 20, int.MaxValue, 30, int.MinValue, 0, "ext")]);
 
-        var line = TableLine(ExportC(table), "// ext;");
+        var line = TableLine(ExportC(table, columnsPerIc: 31), "// ext;");
 
         Assert.Equal(
             "    {    10, 255,            20,  100,            30, -100, NHC_FLAG_NONE }, // ext; NODE KEEP=255% MOVE=0%",
@@ -353,7 +353,7 @@ public sealed class NotchTableExporterEdgeCaseTests
         var table = new NotchTable([V22Row(0, 10, combine, 11, ratio, NullDiff, 0, 0, "clamp")]);
 
         var simulated = Simulate(table, NotchAlgorithmVersion.V22, diffs, [100d, 0d]);
-        var firmware = RunCompensation(ExportC(table), 0, diffs, [100, 0]);
+        var firmware = RunCompensation(ExportC(table, columnsPerIc: 12), 0, diffs, [100, 0]);
 
         Assert.Equal([expectedSource, expectedTarget], firmware);
         Assert.Equal([(double)expectedSource, expectedTarget], simulated);
@@ -364,7 +364,7 @@ public sealed class NotchTableExporterEdgeCaseTests
     {
         var table = new NotchTable([V22Row(0, 10, 100, NullDiff, 0, NullDiff, 0, 0, "no-op")]);
 
-        var text = ExportC(table, NotchExportProfile.Release);
+        var text = ExportC(table, NotchExportProfile.Release, columnsPerIc: 11);
 
         Assert.Contains("#define USER_NHC_NODE_NUM        (0u)", text, StringComparison.Ordinal);
         Assert.DoesNotContain("no-op", text, StringComparison.Ordinal);
@@ -381,7 +381,7 @@ public sealed class NotchTableExporterEdgeCaseTests
             .Select(static flags => V22Row(0, flags, 100, NullDiff, 0, NullDiff, 0, flags, $"flag-{flags:D3}"))
             .ToArray();
 
-        var text = ExportC(new NotchTable(rows));
+        var text = ExportC(new NotchTable(rows), columnsPerIc: 256);
 
         for (var flags = 0; flags < 256; flags++)
         {
@@ -410,7 +410,7 @@ public sealed class NotchTableExporterEdgeCaseTests
         var realTarget = nullValue == 7 ? 8 : 7;
         var table = new NotchTable([V22Row(0, 3, 100, nullValue, 0, realTarget, 40, 0, "null-edge")]);
 
-        var text = ExportC(table, settings: CreateSettings(nullValue));
+        var text = ExportC(table, settings: CreateSettings(nullValue), columnsPerIc: 8);
 
         Assert.Contains(
             $"#define NHC_DIFF_NONE            (0x{nullValue:X4}u)",
@@ -446,7 +446,7 @@ public sealed class NotchTableExporterEdgeCaseTests
 
         var text = ExportC(
             new NotchTable(rows),
-            settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor));
+            settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor), columnsPerIc: 80);
 
         Assert.Equal(expected, DumpV21Table(text));
     }
@@ -462,7 +462,7 @@ public sealed class NotchTableExporterEdgeCaseTests
 
         var dump = DumpV21Table(ExportC(
             new NotchTable(rows),
-            settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor)));
+            settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor), columnsPerIc: 61));
 
         var normalized = types.Select(static type => type is 1 or 2 ? type : 0).ToArray();
         Assert.Equal(
@@ -485,7 +485,7 @@ public sealed class NotchTableExporterEdgeCaseTests
 
         var text = ExportC(
             new NotchTable(rows),
-            settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor));
+            settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor), columnsPerIc: 61);
 
         string[] names = ["NHC_TYPE_NONE", "NHC_TYPE_ADD", "NHC_TYPE_SUB"];
         for (var index = 0; index < rows.Count; index++)
@@ -588,7 +588,7 @@ public sealed class NotchTableExporterEdgeCaseTests
             ? V22Row(0, 10, 120, 20, 30, NullDiff, 0, 0, "enum")
             : V21Row(0, 10, [10, 100, 120, 20, 1, 38, NullDiff, 0, 0], "enum");
 
-        var text = ExportC(new NotchTable([row]), profile, CreateSettings(computationMode: mode, compensationModel: model));
+        var text = ExportC(new NotchTable([row]), profile, CreateSettings(computationMode: mode, compensationModel: model), columnsPerIc: 21);
 
         Assert.Contains($"//   ExportProfile: {profile}", text, StringComparison.Ordinal);
         Assert.Contains($"//   ComputationMode: {mode}", text, StringComparison.Ordinal);
@@ -613,8 +613,8 @@ public sealed class NotchTableExporterEdgeCaseTests
         var v21 = new NotchTable([V21Row(0, 10, [10, 100, 120, 20, 1, 38, NullDiff, 0, 0], comment)]);
 
         var csvRow = Lines(NotchTableExporter.ExportAsCsv(v22))[1];
-        var v22Text = ExportC(v22);
-        var v21Text = ExportC(v21, settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor));
+        var v22Text = ExportC(v22, columnsPerIc: 21);
+        var v21Text = ExportC(v21, settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor), columnsPerIc: 21);
 
         Assert.EndsWith($",\"{comment}\"", csvRow, StringComparison.Ordinal);
         Assert.EndsWith($" }}, // {comment}; NODE KEEP=90% MOVE=30%", TableLine(v22Text, "// xxx"), StringComparison.Ordinal);
@@ -635,11 +635,11 @@ public sealed class NotchTableExporterEdgeCaseTests
         var v22 = new NotchTable([V22Row(0, 10, 120, 20, 30, NullDiff, 0, 0, comment)]);
         var v21 = new NotchTable([V21Row(0, 10, [10, 100, 120, 20, 1, 38, NullDiff, 0, 0], comment)]);
 
-        Assert.EndsWith(" }, // -; NODE KEEP=90% MOVE=30%", TableLine(ExportC(v22), "NODE KEEP"), StringComparison.Ordinal);
+        Assert.EndsWith(" }, // -; NODE KEEP=90% MOVE=30%", TableLine(ExportC(v22, columnsPerIc: 21), "NODE KEEP"), StringComparison.Ordinal);
         Assert.EndsWith(
             " }, // -",
             TableLine(
-                ExportC(v21, settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor)),
+                ExportC(v21, settings: CreateSettings(computationMode: NotchComputationMode.LegacyRegularAnchor), columnsPerIc: 21),
                 "NHC_TYPE_ADD,   38"),
             StringComparison.Ordinal);
     }
@@ -682,7 +682,7 @@ public sealed class NotchTableExporterEdgeCaseTests
     private static int[][] DumpCad(int[] values)
     {
         var table = new NotchTable([V21Row(0, values[0], values, "cad")]);
-        return DumpV21Table(ExportC(table));
+        return DumpV21Table(ExportC(table, columnsPerIc: 21));
     }
 
     private static string ExpectedFlagLiteral(int flags)

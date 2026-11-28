@@ -38,6 +38,7 @@ public sealed partial class FreeformHelperViewModelTests
             {
                 Settings = new ProjectSettings
                 {
+                    Grid = new GridSettings { AlignmentMode = GridAlignmentMode.FromPanelAa },
                     Notch = new NotchSettings
                     {
                         ComputationMode = NotchComputationMode.LegacyRegularAnchor,
@@ -50,6 +51,12 @@ public sealed partial class FreeformHelperViewModelTests
             }, CancellationToken.None);
 
             var vm = await CreateNotchExportCacheViewModelAsync(dxfPath, projectPath);
+            // Legacy V22 compatibility exports 200 as a diff; retain the two covered cells and provide that address.
+            vm.ActiveAreaWidth = 2010;
+            Assert.Single(vm.CascadeIcSettings).XChannels = 201;
+            await WaitForGridRebuildAsync(vm);
+            await vm.MatchCommand.ExecuteAsync(null);
+            await vm.AutoDetectFreeformsCommand.ExecuteAsync(null);
             var metrics = new List<NotchExportGenerationCacheMetricsSnapshot>();
 
             var initialPayload = await ExportNotchProfileAsync(vm, NotchExportProfile.Release, outputPath);

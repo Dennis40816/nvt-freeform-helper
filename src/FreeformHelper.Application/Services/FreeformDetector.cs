@@ -12,12 +12,10 @@ public sealed class FreeformDetector
     private const double CoverageNoiseFloor = 1e-6;
 
     public static IReadOnlyDictionary<int, FreeformType> DetectAssignments(
-        CadPadSet cad,
         RegularGrid grid,
         MatchingSettings matchSettings,
         PadMatchResult? matchResult = null)
     {
-        _ = cad;
         matchSettings ??= new MatchingSettings();
         var threshold = Math.Clamp(matchSettings.FreeformAxisThreshold, 0.0, 1.0);
         var enableXy = matchSettings.EnableAutoDetectXy;

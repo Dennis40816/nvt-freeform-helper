@@ -21,7 +21,7 @@ public sealed class FreeformOverlapOwnershipBehaviorTests
         var matches = PadMatcher.Match(cad, grid);
         var settings = new MatchingSettings { FreeformAxisThreshold = 0.3 };
 
-        var assignments = FreeformDetector.DetectAssignments(cad, grid, settings, matches);
+        var assignments = FreeformDetector.DetectAssignments(grid, settings, matches);
         FreeformDetector.ApplyAssignments(grid, assignments);
 
         Assert.Equal(3, assignments.Count);
@@ -39,7 +39,7 @@ public sealed class FreeformOverlapOwnershipBehaviorTests
         var matches = PadMatcher.Match(cad, grid);
         var settings = new MatchingSettings { FreeformAxisThreshold = 0.3 };
 
-        var assignments = FreeformDetector.DetectAssignments(cad, grid, settings, matches);
+        var assignments = FreeformDetector.DetectAssignments(grid, settings, matches);
 
         Assert.Equal(3, matches.Links.Count);
         Assert.All(matches.Links, link =>

@@ -47,7 +47,7 @@ public static class CadBestMatchSeedService
             .ToDictionary(static pair => pair.Key, static pair => pair.Value.BestMatchFwDiffIndex);
     }
 
-    private static CadBestMatchSeed ResolveBestMatchSeed(
+    internal static CadBestMatchSeed ResolveBestMatchSeed(
         CadPad cadPad,
         IReadOnlyDictionary<int, IReadOnlyList<PadMatchLink>> cadToRegular,
         IReadOnlyDictionary<int, RegularPad> regularPadById,
