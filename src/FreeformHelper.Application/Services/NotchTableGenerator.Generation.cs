@@ -334,6 +334,11 @@ public sealed partial class NotchTableGenerator
             NotchV22TargetAllocationPolicy.ResolveAreaMode(resolutionSettings.CompensationModel),
             selectedSparseResultRequest,
             explanationCollector);
+        foreach (var target in CadOutputFwDiffIndexAssignmentService.BuildAssignedElectrodeTargets(
+                     cadPads, grid, settings.Grid, cadOutputFwDiffIndexSnapshot))
+        {
+            generationContext.ElectrodeTargets.TryAdd(target, 0);
+        }
         CadAllocationProjectionRequest? projectionRequest = captureProjectionRequest
             ? CaptureCadAllocationProjectionRequest(settings.Notch, resolutionSettings.CompensationModel)
             : null;
@@ -378,7 +383,8 @@ public sealed partial class NotchTableGenerator
                 projectionRequest.NullValue,
                 projectionRequest.ApplyTargetCoverageGuard,
                 projectionRequest.TargetCoverageCapPercent,
-                explanationCollector)
+                explanationCollector,
+                canonicalCandidateBuild.ElectrodeTargets)
             .ToList();
         var toFullCoverageAudit = BuildToFullCoverageAudit(
             admittedCandidatesByDiff,
@@ -641,7 +647,10 @@ public sealed partial class NotchTableGenerator
             candidateStopwatch.ElapsedMilliseconds,
             mergeStopwatch.ElapsedMilliseconds,
             candidateTimingAccumulator.Build(),
-            selectedSparseResult);
+            selectedSparseResult)
+        {
+            ElectrodeTargets = context.ElectrodeTargets.Keys.ToHashSet(),
+        };
     }
 
     private static List<KeyValuePair<(int IcIndex, int DiffIndex), V22CadCandidate>> BuildCanonicalCandidatesForProfile(
@@ -672,6 +681,11 @@ public sealed partial class NotchTableGenerator
                                   context.CadOutputFwDiffIndexByCadId.TryGetValue(cadPad.Id, out var cadOutputFwDiffIndex)
                 ? cadOutputFwDiffIndex
                 : anchorForIc.DiffIndex;
+            if (context.CadOutputFwDiffIndexByCadId is null ||
+                context.CadOutputFwDiffIndexByCadId.ContainsKey(cadPad.Id))
+            {
+                context.ElectrodeTargets.TryAdd((anchorForIc.IcIndex, sourceDiffIndex), 0);
+            }
             var candidate = BuildV22CadCandidate(
                 anchorForIc,
                 sourceDiffIndex,

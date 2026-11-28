@@ -435,6 +435,8 @@ old diff1473 total ≈ 83% + 41% = 124%
 
 This is the root cause of the previous abnormal values around 500 at both side edges. The new algorithm lets `CAD4818` retain only approximately `59%` on `diff1473`; approximately `41%` incoming from the adjacent pad brings it back close to `100%`.
 
+The CurrentGain target coverage guard adds an original 100% for a target without its own row only when a CAD outputs to that (IC, diff). Electrode presence comes from the same Step 4 CAD output assignment used to generate the export, before row eligibility and threshold filtering. A row-less target without an electrode starts near zero, so it receives no original 100%. The guard reserves this original coverage and scales incoming shares to the remaining cap budget. Targets with their own rows keep the existing retained-coverage calculation; V21 and V22 share this guard before Debug or Release projection, including rows that Release later removes. NoGain and legacy guard eligibility are unchanged.
+
 ### 7.4.2 Consistency Between C Runtime and FreeformHelper Simulation
 
 `NotchFirmwareCExporter` and `NotchApplySimulationService` both consume final nodes produced by `NotchV22FirmwareProjector`; simulation no longer decodes raw rows itself or merges continuation legs before recomputing physics.

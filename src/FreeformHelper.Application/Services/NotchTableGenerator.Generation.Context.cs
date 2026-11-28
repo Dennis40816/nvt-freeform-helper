@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
@@ -40,6 +41,7 @@ public sealed partial class NotchTableGenerator
         public readonly NotchV22TargetAllocationAreaMode TargetAllocationAreaMode = targetAllocationAreaMode;
         public readonly CadAllocationSparseResultRequest? SelectedSparseResultRequest = selectedSparseResultRequest;
         public readonly NotchV22ExplanationCollector? ExplanationCollector = explanationCollector;
+        public readonly ConcurrentDictionary<(int IcIndex, int DiffIndex), byte> ElectrodeTargets = new();
     }
 
     private sealed record CanonicalCandidateBuildResult(
@@ -49,6 +51,9 @@ public sealed partial class NotchTableGenerator
         NotchCandidatePhaseTimings CandidateBreakdown,
         CadAllocationSparseResult? SelectedSparseResult)
     {
+        public IReadOnlySet<(int IcIndex, int DiffIndex)> ElectrodeTargets { get; init; } =
+            new HashSet<(int IcIndex, int DiffIndex)>();
+
         public static CanonicalCandidateBuildResult Empty { get; } =
             new(
                 new Dictionary<(int IcIndex, int DiffIndex), List<V22CadCandidate>>(),
