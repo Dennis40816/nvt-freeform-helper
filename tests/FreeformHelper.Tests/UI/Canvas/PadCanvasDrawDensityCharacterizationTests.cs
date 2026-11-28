@@ -4,14 +4,18 @@ using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using Xunit;
+using DrawInputs = (
+    FreeformHelper.UI.Controls.PadCanvasQueryState Query,
+    FreeformHelper.UI.Controls.PadCanvasVisibleDrawState State,
+    FreeformHelper.UI.Controls.PadCanvasVisibleDrawBuffers Buffers);
 
 namespace FreeformHelper.Tests;
 
-/// <summary>Pins visible pad membership through the canvas, including before the policy extraction.</summary>
+/// <summary>Pins visible pad membership using supplied state and buffers, with control cache integration coverage.</summary>
 [Collection("HeadlessUiSerial")]
 public sealed class PadCanvasDrawDensityCharacterizationTests
 {
-    [Avalonia.Headless.XUnit.AvaloniaTheory]
+    [Theory]
     [InlineData(0.300001, 1, new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 })]
     [InlineData(0.3, 1, new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 })]
     [InlineData(0.299999, 2, new int[] { 1, 2, 4, 5, 8, 9, 10, 13 })]
@@ -28,73 +32,73 @@ public sealed class PadCanvasDrawDensityCharacterizationTests
     [InlineData(0.0, 4, new int[] { 1, 2, 8, 9, 13 })]
     public void RegularModuloRetainsExactIdsAcrossZoomBoundaries(double zoom, int expectedStep, int[] expectedIds)
     {
-        var canvas = CreateCanvas(regularPads: CreateRegularPads(), zoom: zoom);
+        var inputs = CreateInputs(regularPads: CreateRegularPads(), zoom: zoom);
 
-        Build(canvas);
+        var metrics = Build(inputs);
 
-        AssertRegularIds(canvas, unselected: expectedIds, selected: []);
-        Assert.Equal(expectedStep, canvas.GetVisibleDrawPerfSnapshot().RegularDecimationStep);
+        AssertRegularIds(inputs.Buffers, unselected: expectedIds, selected: []);
+        Assert.Equal(expectedStep, metrics.RegularDecimationStep);
     }
 
-    [Avalonia.Headless.XUnit.AvaloniaTheory]
+    [Theory]
     [InlineData(0.299999, new int[] { 1, 2, 4, 5, 8, 9, 10, 13 })]
     [InlineData(0.149999, new int[] { 1, 2, 6, 7, 11 })]
     [InlineData(0.099999, new int[] { 1, 2, 8, 9, 13 })]
     public void SelectedRegularPadsSurviveEveryDecimationStep(double zoom, int[] expectedUnselectedIds)
     {
-        var canvas = CreateCanvas(regularPads: CreateRegularPads(), zoom: zoom);
-        canvas.SetSelection([], [3, 12]);
+        var inputs = CreateInputs(regularPads: CreateRegularPads(), zoom: zoom);
+        inputs.State = inputs.State with { SelectedRegularIndices = new HashSet<int> { 3, 12 } };
 
-        Build(canvas);
+        Build(inputs);
 
-        AssertRegularIds(canvas, unselected: expectedUnselectedIds, selected: [3, 12]);
+        AssertRegularIds(inputs.Buffers, unselected: expectedUnselectedIds, selected: [3, 12]);
     }
 
-    [Avalonia.Headless.XUnit.AvaloniaTheory]
+    [Theory]
     [InlineData(100, 1, 100)]
     [InlineData(101, 2, 51)]
     [InlineData(401, 5, 81)]
     public void CadBudgetRetainsExactSourceOrdinals(int candidateCount, int expectedStep, int expectedRetainedCount)
     {
-        var canvas = CreateCanvas(cadPads: CreateCadPads(candidateCount));
+        var inputs = CreateInputs(cadPads: CreateCadPads(candidateCount));
         var expectedIds = Enumerable.Range(0, expectedRetainedCount)
             .Select(ordinal => 1000 - (ordinal * expectedStep)).ToArray();
 
-        Build(canvas);
+        var metrics = Build(inputs);
 
-        AssertCadIds(canvas, unselected: expectedIds, selected: []);
-        Assert.Equal(expectedStep, canvas.GetVisibleDrawPerfSnapshot().CadDecimationStep);
+        AssertCadIds(inputs.Buffers, unselected: expectedIds, selected: []);
+        Assert.Equal(expectedStep, metrics.CadDecimationStep);
     }
 
-    [Avalonia.Headless.XUnit.AvaloniaFact]
+    [Fact]
     public void SelectedAndHighlightedCadPadsDoNotConsumeTheBudget()
     {
-        var canvas = CreateCanvas(cadPads: CreateCadPads(102));
-        canvas.SetSelection([999], []);
-        canvas.HighlightedCadPadIds = [997];
+        var inputs = CreateInputs(cadPads: CreateCadPads(102));
+        inputs.State = inputs.State with { SelectedCadIds = new HashSet<int> { 999 } };
+        inputs.State = inputs.State with { HighlightedCadIds = new HashSet<int> { 997 } };
         var expectedIds = Enumerable.Range(0, 102).Select(ordinal => 1000 - ordinal).Where(id => id != 999).ToArray();
 
-        Build(canvas);
+        var metrics = Build(inputs);
 
-        AssertCadIds(canvas, unselected: expectedIds, selected: [999]);
-        Assert.Equal(1, canvas.GetVisibleDrawPerfSnapshot().CadDecimationStep);
+        AssertCadIds(inputs.Buffers, unselected: expectedIds, selected: [999]);
+        Assert.Equal(1, metrics.CadDecimationStep);
     }
 
-    [Avalonia.Headless.XUnit.AvaloniaFact]
+    [Fact]
     public void SelectedAndHighlightedCadPadsDoNotAdvanceTheSamplingOrdinal()
     {
-        var canvas = CreateCanvas(cadPads: CreateCadPads(103));
-        canvas.SetSelection([999], []);
-        canvas.HighlightedCadPadIds = [997];
+        var inputs = CreateInputs(cadPads: CreateCadPads(103));
+        inputs.State = inputs.State with { SelectedCadIds = new HashSet<int> { 999 } };
+        inputs.State = inputs.State with { HighlightedCadIds = new HashSet<int> { 997 } };
         int[] expectedIds = [1000, 997, .. Enumerable.Range(0, 50).Select(ordinal => 996 - (ordinal * 2))];
 
-        Build(canvas);
+        var metrics = Build(inputs);
 
-        AssertCadIds(canvas, unselected: expectedIds, selected: [999]);
-        Assert.Equal(2, canvas.GetVisibleDrawPerfSnapshot().CadDecimationStep);
+        AssertCadIds(inputs.Buffers, unselected: expectedIds, selected: [999]);
+        Assert.Equal(2, metrics.CadDecimationStep);
     }
 
-    [Avalonia.Headless.XUnit.AvaloniaFact]
+    [Fact]
     public void CadMinimumScreenSizeKeepsEqualityAndExemptsSelectedAndHighlightedPads()
     {
         CadPad[] pads =
@@ -105,75 +109,90 @@ public sealed class PadCanvasDrawDensityCharacterizationTests
             new CadPad(44, "Selected", "L1", CreateRectangle(1, 1)),
             new CadPad(45, "Highlighted", "L1", CreateRectangle(1, 1)),
         ];
-        var canvas = CreateCanvas(cadPads: pads);
-        canvas.SetSelection([44], []);
-        canvas.HighlightedCadPadIds = [45];
+        var inputs = CreateInputs(cadPads: pads);
+        inputs.State = inputs.State with { SelectedCadIds = new HashSet<int> { 44 } };
+        inputs.State = inputs.State with { HighlightedCadIds = new HashSet<int> { 45 } };
 
-        Build(canvas);
+        var metrics = Build(inputs);
 
-        AssertCadIds(canvas, unselected: [42, 43, 45], selected: [44]);
-        Assert.Equal(1, canvas.GetVisibleDrawPerfSnapshot().CadDecimatedCount);
+        AssertCadIds(inputs.Buffers, unselected: [42, 43, 45], selected: [44]);
+        Assert.Equal(1, metrics.CadDecimatedCount);
     }
 
-    [Avalonia.Headless.XUnit.AvaloniaFact]
+    [Fact]
     public void ZeroCandidatesRetainsEmptyListsAndUnitSteps()
     {
-        var canvas = CreateCanvas(zoom: 0.3);
+        var inputs = CreateInputs(zoom: 0.3);
 
-        Build(canvas);
+        var metrics = Build(inputs);
 
-        AssertRegularIds(canvas, unselected: [], selected: []);
-        AssertCadIds(canvas, unselected: [], selected: []);
-        Assert.Equal(1, canvas.GetVisibleDrawPerfSnapshot().RegularDecimationStep);
-        Assert.Equal(1, canvas.GetVisibleDrawPerfSnapshot().CadDecimationStep);
+        AssertRegularIds(inputs.Buffers, unselected: [], selected: []);
+        AssertCadIds(inputs.Buffers, unselected: [], selected: []);
+        Assert.Equal(1, metrics.RegularDecimationStep);
+        Assert.Equal(1, metrics.CadDecimationStep);
     }
 
-    [Avalonia.Headless.XUnit.AvaloniaFact]
+    [Fact]
     public void LowDetailOffRetainsEveryPadEvenBelowTheScreenSizeThreshold()
     {
-        var canvas = CreateCanvas(CreateRegularPads(), CreateCadPads(101), zoom: 0.01);
+        var inputs = CreateInputs(CreateRegularPads(), CreateCadPads(101), zoom: 0.01);
 
-        Build(canvas, lowDetailMode: false);
+        var metrics = Build(inputs, lowDetailMode: false);
 
-        AssertRegularIds(canvas, unselected: Enumerable.Range(1, 13).ToArray(), selected: []);
-        AssertCadIds(canvas, unselected: Enumerable.Range(0, 101).Select(ordinal => 1000 - ordinal).ToArray(), selected: []);
-        Assert.Equal(1, canvas.GetVisibleDrawPerfSnapshot().RegularDecimationStep);
-        Assert.Equal(1, canvas.GetVisibleDrawPerfSnapshot().CadDecimationStep);
+        AssertRegularIds(inputs.Buffers, unselected: Enumerable.Range(1, 13).ToArray(), selected: []);
+        AssertCadIds(inputs.Buffers, unselected: Enumerable.Range(0, 101).Select(ordinal => 1000 - ordinal).ToArray(), selected: []);
+        Assert.Equal(1, metrics.RegularDecimationStep);
+        Assert.Equal(1, metrics.CadDecimationStep);
     }
 
-    [Avalonia.Headless.XUnit.AvaloniaFact]
+    [Fact]
     public void HiddenLayersRetainEmptyListsAndUnitSteps()
     {
-        var canvas = CreateCanvas(CreateRegularPads(), CreateCadPads(101), zoom: 0.01);
+        var inputs = CreateInputs(CreateRegularPads(), CreateCadPads(101), zoom: 0.01);
 
-        PadCanvasPrivateAccess.BuildVisibleDrawLists(canvas, new Rect2(-5, -5, 100, 100), false, false, true, 0.3);
+        var metrics = Build(inputs, showRegular: false, showCad: false);
 
-        AssertRegularIds(canvas, unselected: [], selected: []);
-        AssertCadIds(canvas, unselected: [], selected: []);
-        Assert.Equal(1, canvas.GetVisibleDrawPerfSnapshot().RegularDecimationStep);
-        Assert.Equal(1, canvas.GetVisibleDrawPerfSnapshot().CadDecimationStep);
+        AssertRegularIds(inputs.Buffers, unselected: [], selected: []);
+        AssertCadIds(inputs.Buffers, unselected: [], selected: []);
+        Assert.Equal(1, metrics.RegularDecimationStep);
+        Assert.Equal(1, metrics.CadDecimationStep);
     }
 
     [Avalonia.Headless.XUnit.AvaloniaFact]
     public void ReusingTheDrawCachePreservesExactRetainedIds()
     {
-        var canvas = CreateCanvas(CreateRegularPads(), CreateCadPads(101), zoom: 0.1);
+        var canvas = CreateCachedCanvas(CreateRegularPads(), CreateCadPads(101), zoom: 0.1);
         canvas.SetSelection([999], [3]);
         canvas.HighlightedCadPadIds = [997];
         Build(canvas);
-        AssertRegularIds(canvas, unselected: [1, 2, 6, 7, 11], selected: [3]);
+        AssertRegularIds(canvas.VisibleDrawBuffers, unselected: [1, 2, 6, 7, 11], selected: [3]);
         var expectedCadIds = Enumerable.Range(0, 101).Select(ordinal => 1000 - ordinal).Where(id => id != 999).ToArray();
-        AssertCadIds(canvas, unselected: expectedCadIds, selected: [999]);
+        AssertCadIds(canvas.VisibleDrawBuffers, unselected: expectedCadIds, selected: [999]);
+        var buffers = canvas.VisibleDrawBuffers;
+        using var regularUnselected = buffers.RegularUnselected.GetEnumerator();
+        using var regularSelected = buffers.RegularSelected.GetEnumerator();
+        using var cadUnselected = buffers.CadUnselected.GetEnumerator();
+        using var cadSelected = buffers.CadSelected.GetEnumerator();
+        var firstRevision = canvas.GetVisibleDrawPerfSnapshot().Revision;
 
         Build(canvas);
 
-        AssertRegularIds(canvas, unselected: [1, 2, 6, 7, 11], selected: [3]);
-        AssertCadIds(canvas, unselected: expectedCadIds, selected: [999]);
+        AssertRegularIds(canvas.VisibleDrawBuffers, unselected: [1, 2, 6, 7, 11], selected: [3]);
+        AssertCadIds(canvas.VisibleDrawBuffers, unselected: expectedCadIds, selected: [999]);
         Assert.True(canvas.GetVisibleDrawPerfSnapshot().QueryCacheHit);
         Assert.True(canvas.GetVisibleDrawPerfSnapshot().DrawListCacheHit);
+        Assert.Same(buffers.RegularUnselected, canvas.VisibleDrawBuffers.RegularUnselected);
+        Assert.Same(buffers.RegularSelected, canvas.VisibleDrawBuffers.RegularSelected);
+        Assert.Same(buffers.CadUnselected, canvas.VisibleDrawBuffers.CadUnselected);
+        Assert.Same(buffers.CadSelected, canvas.VisibleDrawBuffers.CadSelected);
+        Assert.True(regularUnselected.MoveNext());
+        Assert.True(regularSelected.MoveNext());
+        Assert.True(cadUnselected.MoveNext());
+        Assert.True(cadSelected.MoveNext());
+        Assert.Equal(firstRevision + 1, canvas.GetVisibleDrawPerfSnapshot().Revision);
     }
 
-    private static PadCanvas CreateCanvas(
+    private static PadCanvas CreateCachedCanvas(
         IReadOnlyList<RegularPad>? regularPads = null,
         IReadOnlyList<CadPad>? cadPads = null,
         double zoom = 0.1)
@@ -196,16 +215,34 @@ public sealed class PadCanvasDrawDensityCharacterizationTests
             canvas, new Rect2(-5, -5, 100, 100), showRegular: true, showCad: true, lowDetailMode, lowDetailZoomThreshold: 0.3);
     }
 
-    private static void AssertRegularIds(PadCanvas canvas, int[] unselected, int[] selected)
+    private static DrawInputs CreateInputs(
+        IReadOnlyList<RegularPad>? regularPads = null,
+        IReadOnlyList<CadPad>? cadPads = null,
+        double zoom = 0.1) =>
+        (new PadCanvasQueryState(cadPads ?? [], regularPads ?? [], null, null, true, true),
+         new PadCanvasVisibleDrawState(true, true, true, zoom, 0.3, 4.0, 100.0, 0.9,
+             new HashSet<int>(), new HashSet<int>(), new HashSet<int>()),
+         new PadCanvasVisibleDrawBuffers([], [], [], []));
+
+    private static PadCanvas.PadCanvasVisibleDrawListMetrics Build(
+        DrawInputs inputs, bool lowDetailMode = true, bool showRegular = true, bool showCad = true)
     {
-        Assert.Equal(unselected, PadCanvasPrivateAccess.VisibleRegularUnselected(canvas).Select(pad => pad.Index).ToArray());
-        Assert.Equal(selected, PadCanvasPrivateAccess.VisibleRegularSelected(canvas).Select(pad => pad.Index).ToArray());
+        var query = inputs.Query with { ShowRegular = showRegular, ShowCad = showCad };
+        var candidates = PadCanvasVisibleDrawListBuilder.Query(new Rect2(-5, -5, 100, 100), query);
+        var state = inputs.State with { ShowRegular = showRegular, ShowCad = showCad, LowDetailMode = lowDetailMode };
+        return PadCanvasVisibleDrawListBuilder.Build(candidates.Regular, candidates.Cad, state, inputs.Buffers);
     }
 
-    private static void AssertCadIds(PadCanvas canvas, int[] unselected, int[] selected)
+    private static void AssertRegularIds(PadCanvasVisibleDrawBuffers buffers, int[] unselected, int[] selected)
     {
-        Assert.Equal(unselected, PadCanvasPrivateAccess.VisibleCadUnselected(canvas).Select(pad => pad.Id).ToArray());
-        Assert.Equal(selected, PadCanvasPrivateAccess.VisibleCadSelected(canvas).Select(pad => pad.Id).ToArray());
+        Assert.Equal(unselected, buffers.RegularUnselected.Select(pad => pad.Index).ToArray());
+        Assert.Equal(selected, buffers.RegularSelected.Select(pad => pad.Index).ToArray());
+    }
+
+    private static void AssertCadIds(PadCanvasVisibleDrawBuffers buffers, int[] unselected, int[] selected)
+    {
+        Assert.Equal(unselected, buffers.CadUnselected.Select(pad => pad.Id).ToArray());
+        Assert.Equal(selected, buffers.CadSelected.Select(pad => pad.Id).ToArray());
     }
 
     private static RegularPad[] CreateRegularPads()
