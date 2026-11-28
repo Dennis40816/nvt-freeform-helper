@@ -8,7 +8,7 @@ namespace FreeformHelper.UI.Views;
 
 public sealed partial class FreeformHelperView
 {
-    private void OpenSettingsWindow_Click(object? sender, RoutedEventArgs e)
+    internal void OpenSettingsWindow_Click(object? sender, RoutedEventArgs e)
     {
         OpenSettingsWindowCore(section: null, source: "toolbar");
     }
@@ -72,7 +72,7 @@ public sealed partial class FreeformHelperView
 
     private IReadOnlyList<MenuItem> GetRootMenuItems()
     {
-        _mainMenu ??= this.FindControl<Menu>("MainMenu");
+        _mainMenu ??= (TopLevel.GetTopLevel(this) as MainWindow)?.FindControl<Menu>("MainMenu");
         if (_mainMenu?.Items is null)
         {
             return Array.Empty<MenuItem>();

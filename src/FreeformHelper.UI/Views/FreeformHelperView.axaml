@@ -16,7 +16,7 @@
     <vm:FreeformHelperViewModel/>
   </Design.DataContext>
 
-  <Grid x:Name="LayoutGrid" RowDefinitions="Auto,Auto,*">
+  <Grid x:Name="LayoutGrid" RowDefinitions="Auto,*">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="{StaticResource PanelLeftWidthGrid}"/>
       <ColumnDefinition Width="{StaticResource SplitterThicknessGrid}"/>
@@ -25,41 +25,8 @@
       <ColumnDefinition Width="{StaticResource PanelRightWidthGrid}"/>
     </Grid.ColumnDefinitions>
 
-    <!-- Menu bar -->
-    <Border Grid.Row="0"
-            Grid.ColumnSpan="5"
-            Padding="{StaticResource Inset8_6}"
-            Background="{DynamicResource NfcSurfaceBrush}"
-            BorderThickness="{StaticResource BorderBottomThin}"
-            BorderBrush="{DynamicResource NfcBorderMutedBrush}">
-      <Menu x:Name="MainMenu"
-            HorizontalAlignment="Left">
-        <MenuItem Header="File">
-          <MenuItem Header="Open DXF" Command="{Binding OpenDxfCommand}"/>
-          <MenuItem Header="Save Project" Command="{Binding SaveProjectCommand}"/>
-          <MenuItem Header="Load Project" Command="{Binding LoadProjectCommand}"/>
-        </MenuItem>
-        <MenuItem Header="Export">
-          <MenuItem Header="Notch" IsEnabled="False"/>
-          <MenuItem Header="Export Notch Rows…" Command="{Binding ExportNotchCommand}"
-                    ToolTip.Tip="Pick Notch rows, then export using the existing file type selection."/>
-          <Separator/>
-          <MenuItem Header="DXF" IsEnabled="False"/>
-          <MenuItem Header="Export DXF (Visible Layers)" Command="{Binding CadExport.ExportDxfVisibleCommand}"
-                    ToolTip.Tip="Export visible canvas layers plus DXF-layer pads using the current export rules."/>
-          <MenuItem Header="Export DXF (All Layers)" Command="{Binding CadExport.ExportDxfAllCommand}"
-                    ToolTip.Tip="Export all DXF layers, including layers hidden on the canvas."/>
-          <MenuItem Header="Export DXF Layer Image" Command="{Binding CadExport.ExportDxfLayerImageCommand}"/>
-        </MenuItem>
-        <MenuItem Header="Settings">
-          <MenuItem Header="Open Settings"
-                    Click="OpenSettingsWindow_Click"/>
-        </MenuItem>
-      </Menu>
-    </Border>
-
     <!-- Workspace header -->
-    <controls:WorkspaceHeader Grid.Row="1"
+    <controls:WorkspaceHeader Grid.Row="0"
                               Grid.ColumnSpan="5"
                               Items="{Binding WorkspaceHeaderItems}"
                               StatusText="{Binding StatusText}"
@@ -67,7 +34,7 @@
 
     <!-- Left: DXF controls -->
     <Border x:Name="LeftPanel"
-            Grid.Row="2"
+            Grid.Row="1"
             Grid.Column="0"
             Classes="workspaceSidePane left">
       <Grid RowDefinitions="Auto,*">
@@ -94,7 +61,7 @@
       </Grid>
     </Border>
 
-    <GridSplitter Grid.Row="2"
+    <GridSplitter Grid.Row="1"
                   Grid.Column="1"
                   Width="{StaticResource SplitterThickness}"
                   Background="{DynamicResource NfcBorderMutedBrush}"
@@ -102,7 +69,7 @@
                   ShowsPreview="True"/>
 
     <!-- Center: canvas -->
-    <Border Grid.Row="2" Grid.Column="2" Background="{DynamicResource BrushCanvasBackground}">
+    <Border Grid.Row="1" Grid.Column="2" Background="{DynamicResource BrushCanvasBackground}">
       <Grid x:Name="CanvasGrid">
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
@@ -175,7 +142,7 @@
       </Grid>
     </Border>
 
-    <GridSplitter Grid.Row="2"
+    <GridSplitter Grid.Row="1"
                   Grid.Column="3"
                   Width="{StaticResource SplitterThickness}"
                   Background="{DynamicResource NfcBorderMutedBrush}"
@@ -184,7 +151,7 @@
 
     <!-- Right: settings/inspector -->
     <Border x:Name="RightPanel"
-            Grid.Row="2"
+            Grid.Row="1"
             Grid.Column="4"
             Classes="workspaceSidePane right">
       <Grid RowDefinitions="Auto,*,Auto">
@@ -246,7 +213,7 @@
 
     <!-- Global Overlays (Ensure they are not obscured by side panels) -->
     <Canvas x:Name="PadInfoOverlay"
-            Grid.Row="0" Grid.RowSpan="3"
+            Grid.Row="0" Grid.RowSpan="2"
             Grid.Column="0" Grid.ColumnSpan="5"
             Panel.ZIndex="100"
             IsVisible="False"

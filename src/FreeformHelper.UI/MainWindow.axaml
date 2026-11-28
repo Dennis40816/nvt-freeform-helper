@@ -40,8 +40,7 @@
               BorderBrush="{DynamicResource NfcBorderMutedBrush}"
               BorderThickness="{StaticResource BorderBottomThin}"
               Padding="{StaticResource Inset10_6}">
-        <Border Classes="shellTabStrip"
-                HorizontalAlignment="Left">
+        <Grid x:Name="ShellHeaderRow" ColumnDefinitions="*,Auto">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space4}">
             <ToggleButton Classes="shellTab actionGhost flat marked"
                           Content="Freeform Helper"
@@ -70,7 +69,32 @@
                           IsChecked="{Binding IsDevActive, Mode=OneWay}"
                           Command="{Binding ShowDevCommand}"/>
           </StackPanel>
-        </Border>
+          <Menu x:Name="MainMenu" Grid.Column="1" VerticalAlignment="Center"
+                KeyboardNavigation.TabNavigation="Once"
+                IsVisible="{Binding DataContext.IsWorkspaceActive, RelativeSource={RelativeSource AncestorType=Window}}"
+                DataContext="{Binding FreeformHelper}" IsEnabled="{Binding IsProjectEditingEnabled}">
+            <MenuItem Header="File">
+              <MenuItem Header="Open DXF" Command="{Binding OpenDxfCommand}"/>
+              <MenuItem Header="Save Project" Command="{Binding SaveProjectCommand}"/>
+              <MenuItem Header="Load Project" Command="{Binding LoadProjectCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Export">
+              <MenuItem Header="Notch" IsEnabled="False"/>
+              <MenuItem Header="Export Notch Rows…" Command="{Binding ExportNotchCommand}"
+                        ToolTip.Tip="Pick Notch rows, then export using the existing file type selection."/>
+              <Separator/>
+              <MenuItem Header="DXF" IsEnabled="False"/>
+              <MenuItem Header="Export DXF (Visible Layers)" Command="{Binding CadExport.ExportDxfVisibleCommand}"
+                        ToolTip.Tip="Export visible canvas layers plus DXF-layer pads using the current export rules."/>
+              <MenuItem Header="Export DXF (All Layers)" Command="{Binding CadExport.ExportDxfAllCommand}"
+                        ToolTip.Tip="Export all DXF layers, including layers hidden on the canvas."/>
+              <MenuItem Header="Export DXF Layer Image" Command="{Binding CadExport.ExportDxfLayerImageCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Settings">
+              <MenuItem Header="Open Settings" Click="OpenSettingsWindow_Click"/>
+            </MenuItem>
+          </Menu>
+        </Grid>
       </Border>
 
       <!-- Current view -->
