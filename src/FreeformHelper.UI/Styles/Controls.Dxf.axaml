@@ -1,0 +1,130 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="using:Nvt.Core.Avalonia.Icons"
+        xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
+        x:DataType="Control">
+  <Style Selector="Button.dxfEditSummaryChip">
+    <Setter Property="MinWidth" Value="{StaticResource DxfEditSummaryBadgeMinWidth}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="controls|FontIcon.dxfEditBadgeIcon">
+    <Setter Property="FontSize" Value="{DynamicResource IconSizeMd}"/>
+    <Setter Property="FontWeight" Value="Black"/>
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditSummaryBadgeText, TextBlock.dxfEditSummaryBadgeText">
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditSectionLabel, TextBlock.dxfEditSectionLabel">
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditSelectionSummary, TextBlock.dxfEditSelectionSummary">
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="Border.dxfEditActionGroup">
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderMutedBrush}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset8}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditActionGroupLabel, TextBlock.dxfEditActionGroupLabel">
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextSecondaryBrush}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Grid.dxfEditActionGroupRow">
+    <Setter Property="RowSpacing" Value="{StaticResource Space6}"/>
+  </Style>
+
+  <!-- Layer visibility is conveyed by the eye glyph and text, without a selected row surface. -->
+  <Style Selector="ToggleButton.layerToggle:checked:not(:pointerover):not(:pressed)">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.layerToggle:checked:not(:disabled)">
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.layerToggle:not(:checked):not(:disabled)">
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextMutedBrush}"/>
+  </Style>
+
+  <Style Selector="ToggleButton.dxfLayerBulkToggleButton">
+    <Setter Property="Height" Value="{StaticResource ProductControlMinHeight}"/>
+    <Setter Property="MinHeight" Value="{StaticResource ProductControlMinHeight}"/>
+    <Setter Property="Padding" Value="{StaticResource Inset10_4}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderInput}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="HorizontalAlignment" Value="Right"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+  </Style>
+
+  <Style Selector="Grid.dxfLayerBulkToggleContent">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space6}"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Border.dxfLayerBulkMixedIndicator">
+    <Setter Property="Width" Value="{StaticResource Space12}"/>
+    <Setter Property="Height" Value="{StaticResource Space2}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Background" Value="{DynamicResource NfcAccentBrush}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfLayerBulkToggleLabel, TextBlock.dxfLayerBulkToggleLabel">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Grid.dxfEditAlignedFieldRow">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space6}"/>
+  </Style>
+
+  <Style Selector="Border.dxfEditFieldActionSpacer">
+    <Setter Property="Width" Value="{StaticResource IconButtonSize}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+  </Style>
+
+  <Style Selector="StackPanel.dxfEditMiniActionContent">
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="controls|FontIcon.dxfEditMiniActionIcon">
+    <Setter Property="FontSize" Value="{StaticResource IconSizeSm}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.dxfEditMiniActionLabel, TextBlock.dxfEditMiniActionLabel">
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+  </Style>
+</Styles>

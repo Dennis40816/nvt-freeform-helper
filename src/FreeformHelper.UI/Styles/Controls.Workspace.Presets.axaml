@@ -1,0 +1,25 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:icons="using:Nvt.Core.Avalonia.Icons"
+        xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
+        x:DataType="Control">
+  <Style Selector="Border.validationRowKindTag.workspaceContextBadge">
+    <Setter Property="BorderThickness" Value="{StaticResource BorderNotchExportBadge}"/>
+  </Style>
+
+  <Style Selector="Grid.workspacePresetButtonContent">
+    <Setter Property="ColumnSpacing" Value="{StaticResource Space6}"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock.workspacePresetButtonLabel, TextBlock.workspacePresetButtonLabel">
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    <Setter Property="MaxLines" Value="1"/>
+  </Style>
+</Styles>
