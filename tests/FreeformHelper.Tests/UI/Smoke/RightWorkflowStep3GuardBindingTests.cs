@@ -6,7 +6,6 @@ using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views.WorkflowSteps;
-using Nvt.Core.Avalonia.Panels;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -82,9 +81,8 @@ public sealed class RightWorkflowStep3GuardBindingTests
         var window = new Window { Width = 480, Height = 900, Content = view };
         window.Show();
         await HeadlessUiPump.FlushQueueAsync();
-        Assert.Single(view.GetVisualDescendants().OfType<CollapsiblePanel>(),
-            static panel => panel.Title == "Edit guards").IsExpanded = true;
-        await HeadlessUiPump.FlushQueueAsync();
+        Assert.All(view.GetVisualDescendants().OfType<NumberScrubber>(),
+            static input => Assert.True(input.IsEffectivelyVisible));
         return (viewModel, view, window);
     }
 
@@ -92,7 +90,7 @@ public sealed class RightWorkflowStep3GuardBindingTests
         FindGuardControls(RightWorkflowStep3View view)
     {
         var switches = view.GetVisualDescendants().OfType<ToggleSwitch>().ToList();
-        Assert.Equal(2, switches.Count);
+        Assert.Equal(3, switches.Count);
         var targetCap = Assert.Single(
             view.GetVisualDescendants().OfType<NumberScrubber>(),
             static scrubber => scrubber.Maximum == TargetCapMaximum);

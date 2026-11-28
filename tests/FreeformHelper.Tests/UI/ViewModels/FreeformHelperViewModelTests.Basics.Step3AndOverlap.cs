@@ -221,19 +221,19 @@ public sealed partial class FreeformHelperViewModelTests
     {
         var vm = CreateViewModelWithStep3PreviewReady();
         Assert.True(vm.CanControlNotchPreviewStage);
-        Assert.Equal("Current layer: Stage 3 (Final)", vm.NotchPreviewStageSummary);
+        Assert.Equal("Stage 3 (Final)", vm.NotchPreviewStageSummary);
         Assert.Equal("Hidden", vm.NotchPreviewSeedLayerStateText);
         Assert.Equal("Hidden", vm.NotchPreviewCandidateLayerStateText);
         Assert.Equal("Active", vm.NotchPreviewFinalLayerStateText);
 
         vm.NotchPreviewVisualizationStep = 2;
-        Assert.Equal("Current layer: Stage 2 (Candidate)", vm.NotchPreviewStageSummary);
+        Assert.Equal("Stage 2 (Candidate)", vm.NotchPreviewStageSummary);
         Assert.Equal("Hidden", vm.NotchPreviewSeedLayerStateText);
         Assert.Equal("Active", vm.NotchPreviewCandidateLayerStateText);
         Assert.Equal("Hidden", vm.NotchPreviewFinalLayerStateText);
 
         vm.NotchPreviewVisualizationStep = 1;
-        Assert.Equal("Current layer: Stage 1 (Seed)", vm.NotchPreviewStageSummary);
+        Assert.Equal("Stage 1 (Seed)", vm.NotchPreviewStageSummary);
         Assert.Equal("Active", vm.NotchPreviewSeedLayerStateText);
         Assert.Equal("Hidden", vm.NotchPreviewCandidateLayerStateText);
         Assert.Equal("Hidden", vm.NotchPreviewFinalLayerStateText);

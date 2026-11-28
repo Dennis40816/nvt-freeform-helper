@@ -42,10 +42,10 @@ public sealed class WorkspaceIntegratedLayoutTests
         vm.IsStep2Expanded = false;
         AssertPrimary(window, "Detect freeform", vm.AutoDetectFreeformsCommand);
         vm.IsStep3Expanded = true;
-        AssertPrimary(window, "Export", vm.ExportNotchCommand);
+        AssertPrimary(window, "Export notch…", vm.ExportNotchCommand);
         vm.IsStep5Expanded = true;
         vm.IsStep4Expanded = true;
-        AssertPrimary(window, "Export", vm.ExportNotchCommand);
+        AssertPrimary(window, "Export notch…", vm.ExportNotchCommand);
 
         vm.IsRightPanelInspectorTab = true;
         HeadlessUiPump.Drain(window);
@@ -108,8 +108,9 @@ public sealed class WorkspaceIntegratedLayoutTests
         window.Content = new RightWorkflowSettingsTabView { DataContext = vm };
         vm.IsStep3Expanded = true;
         HeadlessUiPump.Drain(window);
-        Assert.False(FindPanel(window, "Edit guards").IsExpanded);
-        Assert.False(FindPanel(window, "Play interval").IsExpanded);
+        Assert.DoesNotContain(window.GetVisualDescendants().OfType<CollapsiblePanel>(),
+            static panel => panel.Title is "Edit guards" or "Play interval");
+        Assert.False(FindPanel(window, "Allocation details").IsExpanded);
         Assert.False(vm.IsStep3ToFullDetailsExpanded);
         Assert.False(vm.IsStep4Expanded);
         Assert.False(vm.IsStep6Expanded);

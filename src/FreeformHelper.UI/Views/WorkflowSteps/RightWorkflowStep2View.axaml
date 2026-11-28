@@ -73,7 +73,6 @@
                   ToolTip.Tip="Mark selection as XY-way."/>
         </Grid>
         <Separator/>
-        <SelectableTextBlock Classes="stepNote" Text="Clears tagging and invalidates Steps 3 to 5 and validation." TextWrapping="Wrap"/>
         <Button Classes="actionDanger" Content="Clear result"
                 HorizontalAlignment="Right" Command="{Binding ClearStep2ResultCommand}"
                 ToolTip.Tip="Clears tagging and invalidates Steps 3 to 5 and validation."/>

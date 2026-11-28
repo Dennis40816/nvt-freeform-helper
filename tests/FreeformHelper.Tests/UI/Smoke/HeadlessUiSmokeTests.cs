@@ -299,12 +299,10 @@ public sealed class HeadlessUiSmokeTests
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
 
-            Assert.Single(view.GetVisualDescendants().OfType<Nvt.Core.Avalonia.Panels.CollapsiblePanel>(),
-                static panel => panel.Title == "Edit guards").IsExpanded = true;
-            await HeadlessUiPump.FlushQueueAsync();
             var target = Assert.Single(
                 view.GetVisualDescendants().OfType<NumberScrubber>(),
                 static scrubber => scrubber is { Value: 128m, Maximum: 255m });
+            Assert.True(target.IsEffectivelyVisible);
             var tip = Assert.IsType<TextBlock>(ToolTip.GetTip(target));
             Assert.Equal(
                 "At uniform 400, target cap 128% maps to After 512; compare with EMS cap 512.",
