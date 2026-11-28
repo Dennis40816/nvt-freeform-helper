@@ -63,7 +63,6 @@ public sealed class NotchExportSelectionProjectionBehaviorTests : IDisposable
             Assert.Equal(linked, snapshot.WorkspaceLinkedRows.Select(static row => row.RowIndex));
             Assert.Equal(icGroups, snapshot.IcGroups.Select(static group => group.IcIndex));
             Assert.True(snapshot.FilterViewState.HasModeFilterChip);
-            Assert.Equal($"Showing {visible.Length} rows", snapshot.FilterViewState.VisibleRowsSummaryText);
 
             var regularSnapshot = NotchExportSelectionProjectionBuilder.Build(rows, filter, [], [100, 102, 103]);
 

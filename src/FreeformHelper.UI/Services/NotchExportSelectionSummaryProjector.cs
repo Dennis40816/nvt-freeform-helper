@@ -26,8 +26,8 @@ public readonly record struct NotchExportSelectionSummarySnapshot(
     public string HiddenSelectedRowsHintText => HiddenSelectedRowCount switch
     {
         0 => string.Empty,
-        1 => "1 row hidden but still exported",
-        _ => $"{HiddenSelectedRowCount.ToString(CultureInfo.InvariantCulture)} rows hidden but still exported",
+        1 => "1 hidden row is exported too",
+        _ => $"{HiddenSelectedRowCount.ToString(CultureInfo.InvariantCulture)} hidden rows are exported too",
     };
 }
 

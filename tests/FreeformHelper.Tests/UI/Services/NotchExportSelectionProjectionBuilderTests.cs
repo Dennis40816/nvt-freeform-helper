@@ -46,7 +46,7 @@ public sealed class NotchExportSelectionProjectionBuilderTests
         Assert.Equal(_cadOutputFwDiffIndices, snapshot.WorkspaceLinkedRows.Select(row => row.Row.DiffIndex).ToArray());
         Assert.True(snapshot.FilterViewState.HasSelectionFilterChip);
         Assert.True(snapshot.FilterViewState.HasHeaderFilterChip);
-        Assert.Equal("Showing 2 rows", snapshot.FilterViewState.VisibleRowsSummaryText);
+        Assert.Equal(2, snapshot.VisibleRows.Count);
     }
 
     [Fact]

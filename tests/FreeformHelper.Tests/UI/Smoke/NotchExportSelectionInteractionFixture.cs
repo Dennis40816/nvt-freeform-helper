@@ -62,6 +62,9 @@ internal sealed class NotchExportSelectionInteractionFixture : IAsyncDisposable
         Assert.Single(Window.GetVisualDescendants().OfType<CheckBox>(), checkBox =>
             checkBox.DataContext is NotchExportRowItemViewModel row && row.Row.DiffIndex == diffIndex);
 
+    public static Button FindExportButton(Window window) =>
+        Assert.IsType<Button>(window.FindControl<Button>("ExportButton"));
+
     public static Button FindButton(Control root, string content) =>
         Assert.Single(root.GetVisualDescendants().OfType<Button>(), button => button.Content as string == content);
 

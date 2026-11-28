@@ -35,7 +35,7 @@ public sealed class NotchExportSelectionProjectionRecoveryTests
         Assert.Empty(snapshot.WorkspaceLinkedRows);
         Assert.Equal("IC(1), Status(0)", snapshot.FilterViewState.ActiveColumnFilterSummaryText);
         Assert.True(snapshot.FilterViewState.HasResettableViewFilters);
-        Assert.Equal("Showing 0 rows", snapshot.FilterViewState.VisibleRowsSummaryText);
+        Assert.Empty(snapshot.VisibleRows);
         Assert.Equal(["Legacy", "Linked"], statusOptions);
         Assert.Empty(icOptions);
         Assert.All(rows, static row => Assert.True(row.IsSelected));

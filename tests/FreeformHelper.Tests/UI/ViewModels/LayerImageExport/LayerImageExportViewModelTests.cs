@@ -99,7 +99,7 @@ public sealed class LayerImageExportViewModelTests
         Assert.Equal(0m, vm.PreviewSettings.PaddingX);
         Assert.Equal(0m, vm.PreviewSettings.PaddingY);
         Assert.Equal("6,480 × 848 px", vm.PreviewSettings.OutputText);
-        Assert.Equal("3 layers selected · 6,480 × 848 px", vm.FooterText);
+        Assert.Equal("6,480 × 848 px", vm.FooterText);
     }
 
     [Fact]

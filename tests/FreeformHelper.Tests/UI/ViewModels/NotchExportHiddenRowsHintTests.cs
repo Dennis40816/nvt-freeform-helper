@@ -13,8 +13,8 @@ public sealed class NotchExportHiddenRowsHintTests
     private static readonly string[] _allDiffKeys = ["8", "9", "10"];
 
     [Theory]
-    [InlineData(1, "1 row hidden but still exported")]
-    [InlineData(2, "2 rows hidden but still exported")]
+    [InlineData(1, "1 hidden row is exported too")]
+    [InlineData(2, "2 hidden rows are exported too")]
     public void DefaultTransferOnlyReportsSelectedNoOpRows(int noOpCount, string expectedText)
     {
         var viewModel = new NotchExportSelectionViewModel(BuildTable(noOpCount));
@@ -59,7 +59,7 @@ public sealed class NotchExportHiddenRowsHintTests
 
         Assert.Equal(1, viewModel.HiddenSelectedRowCount);
         Assert.True(viewModel.HasHiddenSelectedRows);
-        Assert.Equal("1 row hidden but still exported", viewModel.HiddenSelectedRowsHintText);
+        Assert.Equal("1 hidden row is exported too", viewModel.HiddenSelectedRowsHintText);
 
         noOpRows[1].IsSelected = false;
 
@@ -107,7 +107,7 @@ public sealed class NotchExportHiddenRowsHintTests
 
         Assert.Equal(2, viewModel.HiddenSelectedRowCount);
         Assert.True(viewModel.HasHiddenSelectedRows);
-        Assert.Equal("2 rows hidden but still exported", viewModel.HiddenSelectedRowsHintText);
+        Assert.Equal("2 hidden rows are exported too", viewModel.HiddenSelectedRowsHintText);
         Assert.Equal(3, viewModel.BuildSelectedTable().Rows.Count);
     }
 
@@ -121,7 +121,7 @@ public sealed class NotchExportHiddenRowsHintTests
 
         Assert.Single(viewModel.Rows);
         Assert.Equal(2, viewModel.HiddenSelectedRowCount);
-        Assert.Equal("2 rows hidden but still exported", viewModel.HiddenSelectedRowsHintText);
+        Assert.Equal("2 hidden rows are exported too", viewModel.HiddenSelectedRowsHintText);
 
         viewModel.SearchKeyword = string.Empty;
 
@@ -139,7 +139,7 @@ public sealed class NotchExportHiddenRowsHintTests
 
         Assert.Single(viewModel.Rows);
         Assert.Equal(2, viewModel.HiddenSelectedRowCount);
-        Assert.Equal("2 rows hidden but still exported", viewModel.HiddenSelectedRowsHintText);
+        Assert.Equal("2 hidden rows are exported too", viewModel.HiddenSelectedRowsHintText);
 
         viewModel.ApplyColumnFilterSelection(NotchExportColumnFilterField.Diff, _allDiffKeys, _allDiffKeys);
 

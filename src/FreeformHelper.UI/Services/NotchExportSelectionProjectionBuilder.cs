@@ -135,8 +135,7 @@ internal static class NotchExportSelectionProjectionBuilder
                 $"mode={filterState.RowDisplayModeLabel} | " +
                 $"selected={selectedScopeText} | " +
                 $"header={headerScopeText} | " +
-                $"shown={visibleCount}.",
-            VisibleRowsSummaryText: $"Showing {visibleCount} rows");
+                $"shown={visibleCount}.");
     }
 
     public static bool IsSelectedForExport(
@@ -501,5 +500,4 @@ internal sealed record NotchExportSelectionFilterViewState(
     bool HasNoActiveFilterChips,
     bool HasResettableViewFilters,
     string ActiveColumnFilterSummaryText,
-    string CurrentSearchScopeText,
-    string VisibleRowsSummaryText);
+    string CurrentSearchScopeText);
