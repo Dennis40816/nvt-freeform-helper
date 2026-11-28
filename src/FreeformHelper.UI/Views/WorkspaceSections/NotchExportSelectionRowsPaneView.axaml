@@ -69,8 +69,8 @@
       </ListBox.ItemsPanel>
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="viewModels:NotchExportRowItemViewModel">
-          <StackPanel Spacing="{StaticResource Space4}" ToolTip.Tip="Click to inspect · checkbox includes in export">
-            <ContentControl Content="{Binding VisibleGroup}" IsVisible="{Binding HasVisibleGroup}">
+          <StackPanel ToolTip.Tip="Click to inspect · checkbox includes in export">
+            <ContentControl Classes="exportIcGroup" Content="{Binding VisibleGroup}" IsVisible="{Binding HasVisibleGroup}">
               <ContentControl.ContentTemplate>
                 <DataTemplate x:DataType="viewModels:NotchExportIcGroupViewModel">
                   <Border Background="{DynamicResource NfcSurfaceSubtleBrush}" Padding="{StaticResource Inset4}">
@@ -88,26 +88,33 @@
                 </DataTemplate>
               </ContentControl.ContentTemplate>
             </ContentControl>
-            <Grid ColumnSpacing="{StaticResource Space6}" PointerPressed="InspectRow_PointerPressed">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="{StaticResource NotchExportIntegratedCheckWidth}"/>
-                <ColumnDefinition Width="{StaticResource NotchExportIntegratedRowWidth}"/>
-                <ColumnDefinition Width="{StaticResource NotchExportIntegratedIcWidth}"/>
-                <ColumnDefinition Width="{StaticResource NotchExportIntegratedDiffWidth}"/>
-                <ColumnDefinition Width="{StaticResource NotchExportIntegratedMatchWidth}"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="{StaticResource NotchExportIntegratedStatusWidth}"/>
-              </Grid.ColumnDefinitions>
-              <CheckBox Classes="exportRowCheck" IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                        HorizontalAlignment="Center" ToolTip.Tip="Include in export"/>
-              <TextBlock Grid.Column="1" Text="{Binding RowNumberText}" VerticalAlignment="Center" FontWeight="SemiBold"/>
-              <TextBlock Grid.Column="2" Text="{Binding IcText}" VerticalAlignment="Center"/>
-              <TextBlock Grid.Column="3" Text="{Binding DiffText}" VerticalAlignment="Center"/>
-              <TextBlock Grid.Column="4" Text="{Binding MatchSummaryText}" VerticalAlignment="Center"/>
-              <TextBlock Grid.Column="5" Text="{Binding MappingText}" VerticalAlignment="Center"
-                         TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding MappingText}"/>
-              <TextBlock Grid.Column="6" Text="{Binding StatusText}" VerticalAlignment="Center"/>
-            </Grid>
+            <Panel>
+              <Border Classes="exportRowFill">
+                <Grid ColumnSpacing="{StaticResource Space6}" VerticalAlignment="Center"
+                      PointerPressed="InspectRow_PointerPressed">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource NotchExportIntegratedCheckWidth}"/>
+                    <ColumnDefinition Width="{StaticResource NotchExportIntegratedRowWidth}"/>
+                    <ColumnDefinition Width="{StaticResource NotchExportIntegratedIcWidth}"/>
+                    <ColumnDefinition Width="{StaticResource NotchExportIntegratedDiffWidth}"/>
+                    <ColumnDefinition Width="{StaticResource NotchExportIntegratedMatchWidth}"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="{StaticResource NotchExportIntegratedStatusWidth}"/>
+                  </Grid.ColumnDefinitions>
+                  <CheckBox Classes="exportRowCheck" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                            HorizontalAlignment="Center" ToolTip.Tip="Include in export"/>
+                  <TextBlock Grid.Column="1" Text="{Binding RowNumberText}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                  <TextBlock Grid.Column="2" Text="{Binding IcText}" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="3" Text="{Binding DiffText}" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="4" Text="{Binding MatchSummaryText}" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="5" Text="{Binding MappingText}" VerticalAlignment="Center"
+                             TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding MappingText}"/>
+                  <TextBlock Grid.Column="6" Text="{Binding StatusText}" VerticalAlignment="Center"/>
+                </Grid>
+              </Border>
+              <Border Classes="exportRowMark"/>
+              <Border Classes="exportRowFocus"/>
+            </Panel>
           </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
