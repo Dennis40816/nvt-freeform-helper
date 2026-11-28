@@ -337,7 +337,7 @@ public sealed partial class NotchTableGeneratorTests
         };
 
         var matchResult = PadMatcher.Match(cad, grid);
-        TestInfrastructure.FreeformDetectorTestSupport.AutoTag(cad, grid, matchSettings, matchResult);
+        TestInfrastructure.FreeformDetectorTestSupport.AutoTag(grid, matchSettings, matchResult);
 
         var settings = new ProjectSettings
         {

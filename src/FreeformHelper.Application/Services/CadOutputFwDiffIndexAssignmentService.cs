@@ -11,13 +11,11 @@ public sealed partial class CadOutputFwDiffIndexAssignmentService
         GridSettings gridSettings,
         CadOutputFwDiffAutoMode autoMode,
         IReadOnlyDictionary<int, int?> strictDiffByCadId,
-        IReadOnlyDictionary<int, int>? manualOverrides = null,
-        IReadOnlyDictionary<int, int>? anchorCadIdByIc = null)
+        IReadOnlyDictionary<int, int>? manualOverrides = null)
     {
         ArgumentNullException.ThrowIfNull(orderedPads);
         ArgumentNullException.ThrowIfNull(gridSettings);
         ArgumentNullException.ThrowIfNull(strictDiffByCadId);
-        _ = anchorCadIdByIc;
 
         var assignedByCadId = new Dictionary<int, int>(orderedPads.Count);
         var cadIcIndexByCadId = new Dictionary<int, int>(orderedPads.Count);

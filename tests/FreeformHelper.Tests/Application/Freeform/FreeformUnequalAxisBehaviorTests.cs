@@ -28,7 +28,7 @@ public sealed class FreeformUnequalAxisBehaviorTests
             EnableFreeformEdgeSpecialization = false,
         };
 
-        var assignments = FreeformDetector.DetectAssignments(cad, grid, settings, matches);
+        var assignments = FreeformDetector.DetectAssignments(grid, settings, matches);
         FreeformDetector.ApplyAssignments(grid, assignments);
 
         Assert.Equal(4, matches.Links.Count);

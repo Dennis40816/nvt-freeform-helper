@@ -47,8 +47,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             gridSettings,
             CadOutputFwDiffAutoMode.BestMatchDirect,
             seeds,
-            manualOverrides: null,
-            anchorCadIdByIc: null);
+            manualOverrides: null);
 
         Assert.Equal(firstRowDiffs[0], result.AssignedIndexByCadId[firstRow.Cads[0].Id]);
         Assert.Equal(firstRowDiffs[1], result.AssignedIndexByCadId[firstRow.Cads[1].Id]);
@@ -100,8 +99,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             gridSettings,
             CadOutputFwDiffAutoMode.StrictUnique,
             seeds,
-            manualOverrides: null,
-            anchorCadIdByIc: null);
+            manualOverrides: null);
 
         Assert.Equal(rowDiffs[0], result.AssignedIndexByCadId[row.Cads[0].Id]);
         Assert.Equal(rowDiffs[1], result.AssignedIndexByCadId[row.Cads[1].Id]);
@@ -266,8 +264,7 @@ public sealed class CadOutputFwDiffIndexAssignmentServiceTests
             gridSettings,
             autoMode,
             seeds,
-            manualOverrides: null,
-            anchorCadIdByIc: new Dictionary<int, int> { [0] = rows[1].Cads[0].Id });
+            manualOverrides: null);
 
         Assert.Equal(35, result.AssignedIndexByCadId[rows[0].Cads[0].Id]);
         Assert.Equal(36, result.AssignedIndexByCadId[rows[0].Cads[1].Id]);

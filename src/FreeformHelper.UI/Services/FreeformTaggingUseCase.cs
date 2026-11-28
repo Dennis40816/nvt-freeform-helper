@@ -38,7 +38,7 @@ public sealed class FreeformTaggingUseCase
         MatchingSettings settings,
         PadMatchResult? matchResult = null)
     {
-        return FreeformDetector.DetectAssignments(cad, grid, settings, matchResult);
+        return FreeformDetector.DetectAssignments(grid, settings, matchResult);
     }
 
     public static void ApplyAutoDetectAssignments(RegularGrid grid, IReadOnlyDictionary<int, FreeformType> assignments)
