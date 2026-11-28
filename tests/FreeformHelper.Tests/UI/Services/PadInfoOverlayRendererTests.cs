@@ -165,6 +165,23 @@ public sealed class PadInfoOverlayRendererTests
         Assert.Same(geometry, layout.Link.Data);
     }
 
+    [AvaloniaFact]
+    public async Task PanelThatGrowsNearTheBottomIsPlacedInsideTheCanvasAgainAsync()
+    {
+        using var layout = new RendererFixture();
+        layout.Pan = new Point(100, 390);
+        layout.Renderer.UpdateLayout();
+        await HeadlessUiPump.FlushQueueAsync();
+
+        // A section was expanded: the panel grows without a viewport or selection change.
+        layout.Popover.Height = 300;
+        await HeadlessUiPump.FlushQueueAsync();
+
+        // The canvas spans y 30 to 430 in overlay coordinates.
+        var top = Avalonia.Controls.Canvas.GetTop(layout.Popover);
+        Assert.True(top >= 30 && top + 300 <= 430, $"Panel spans {top} to {top + 300}.");
+    }
+
     private sealed class RendererFixture : IDisposable
     {
         private readonly Window _window;

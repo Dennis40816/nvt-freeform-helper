@@ -311,11 +311,11 @@ public sealed partial class UiLayoutGuardTests
 
         var rightWorkflowSettings = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "RightWorkflowSections", "RightWorkflowSettingsTabView.axaml"));
         Assert.Contains("Title=\"Overview\"", rightWorkflowSettings, StringComparison.Ordinal);
-        Assert.Contains("Text=\"Project / grid\"", rightWorkflowSettings, StringComparison.Ordinal);
-        Assert.Contains("Text=\"Simulation safety\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Matches(@"<Grid Classes=""workflowOverviewInfoGrid""[^>]*>\s*<ToolTip\.Tip>\s*<TextBlock Text=""Project / grid""/>", rightWorkflowSettings);
+        Assert.Matches(@"<Border Classes=""chipStatus warning""[^>]*>\s*<ToolTip\.Tip>[\s\S]*?Text=""Simulation safety""", rightWorkflowSettings);
         Assert.Contains("ToolTip.Tip=\"Loaded CAD pad count after DXF import and current DXF edits.\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.Contains("ToolTip.Tip=\"Generated regular-grid pad count.\"", rightWorkflowSettings, StringComparison.Ordinal);
-        Assert.Contains("ToolTip.Tip=\"{Binding SimulationSafetyOverviewSummaryText}\"", rightWorkflowSettings, StringComparison.Ordinal);
+        Assert.Matches(@"<Border Classes=""chipStatus warning""[^>]*>\s*<ToolTip\.Tip>[\s\S]*?Text=""\{Binding SimulationSafetyOverviewSummaryText\}""", rightWorkflowSettings);
         Assert.Contains("Tag=\"General\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.DoesNotContain("Value=\"{Binding CascadeNum, Mode=TwoWay}\"", rightWorkflowSettings, StringComparison.Ordinal);
         Assert.DoesNotContain("ComboBox Classes=\"regularLayerSelector\"", rightWorkflowSettings, StringComparison.Ordinal);
@@ -349,7 +349,7 @@ public sealed partial class UiLayoutGuardTests
         Assert.DoesNotContain("120% maps uniform 400 to EMS cap 480", settingsStep3Section, StringComparison.Ordinal);
 
         var step5View = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep5View.axaml"));
-        Assert.Contains("Text=\"Handoff checklist\"", step5View, StringComparison.Ordinal);
+        Assert.Matches(@"<ToolTip\.Tip>[\s\S]*?Text=""Handoff checklist""[\s\S]*?Text=""\{Binding NotchExportHandoffChecklistText\}""", step5View);
         Assert.Contains("Text=\"{Binding NotchExportHandoffFileText}\"", step5View, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding NotchExportHandoffVersionText}\"", step5View, StringComparison.Ordinal);
         Assert.Contains("Text=\"{Binding NotchExportHandoffProfileText}\"", step5View, StringComparison.Ordinal);

@@ -4,7 +4,7 @@
              xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep5View">
-    <panels:CollapsiblePanel x:Name="Step5Block" Title="Step 5 · Notch export"
+    <panels:CollapsiblePanel x:Name="Step5Block" Classes="workflowCompactCard" Title="Step 5 · Notch export"
                              IsExpanded="{Binding IsStep5Expanded, Mode=TwoWay}">
       <panels:CollapsiblePanel.HeaderRight>
         <Button Tag="Step5NotchExport"
@@ -15,19 +15,29 @@
       </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
         <SelectableTextBlock Classes="stepNote" Text="{Binding NotchExportSummary}" TextWrapping="Wrap"/>
-        <SelectableTextBlock Text="Handoff checklist" FontWeight="SemiBold" ToolTip.Tip="{Binding NotchExportHandoffChecklistText}"/>
-        <SelectableTextBlock Text="{Binding NotchExportHandoffFileText}" ToolTip.Tip="{Binding NotchExportHandoffChecklistText}"/>
-        <SelectableTextBlock Classes="stepNote" Text="{Binding NotchExportHandoffVersionText}"/>
-        <SelectableTextBlock Classes="stepNote" Text="{Binding NotchExportHandoffProfileText}"/>
-        <SelectableTextBlock Classes="stepNote" Text="Review export safety" ToolTip.Tip="{Binding NotchExportSafetyPolicySummary}"/>
-        <SelectableTextBlock Classes="stepNote" Text="{Binding NotchEmsSafetyShortText}" ToolTip.Tip="{Binding NotchEmsSafetyPolicySummary}"/>
-        <SelectableTextBlock Classes="stepNote" Text="Guard changes require a new export."/>
+        <SelectableTextBlock Text="{Binding NotchExportHandoffFileText}" TextWrapping="Wrap" ToolTip.Tip="{Binding NotchExportHandoffChecklistText}"/>
+        <SelectableTextBlock Classes="stepNote" Text="{Binding NotchExportHandoffVersionText}" TextWrapping="Wrap">
+          <ToolTip.Tip>
+            <StackPanel Spacing="{StaticResource Space6}">
+              <TextBlock Text="Handoff checklist"/>
+              <TextBlock Text="{Binding NotchExportHandoffChecklistText}" TextWrapping="Wrap"/>
+            </StackPanel>
+          </ToolTip.Tip>
+        </SelectableTextBlock>
+        <SelectableTextBlock Classes="stepNote" Text="{Binding NotchExportHandoffProfileText}" TextWrapping="Wrap">
+          <ToolTip.Tip>
+            <StackPanel Spacing="{StaticResource Space6}">
+              <TextBlock Text="Review export safety"/>
+              <TextBlock Text="{Binding NotchExportSafetyPolicySummary}" TextWrapping="Wrap"/>
+              <TextBlock Text="Guard changes require a new export." TextWrapping="Wrap"/>
+            </StackPanel>
+          </ToolTip.Tip>
+        </SelectableTextBlock>
+        <SelectableTextBlock Classes="stepNote" Text="{Binding NotchEmsSafetyShortText}" TextWrapping="Wrap" ToolTip.Tip="{Binding NotchEmsSafetyPolicySummary}"/>
         <ProgressBar Minimum="0" Maximum="1" Value="{Binding NotchExportProgress}"
                      IsVisible="{Binding ShouldShowNotchExportProgress}" Height="{StaticResource Space6}"/>
         <SelectableTextBlock Classes="stepNote" IsVisible="{Binding ShouldShowNotchExportProgress}"
-                             Text="{Binding NotchExportProgressText}"/>
-        <Separator/>
-        <SelectableTextBlock Classes="stepNote" Text="Clears the export result and Validation Quick Trace." TextWrapping="Wrap"/>
+                             Text="{Binding NotchExportProgressText}" TextWrapping="Wrap"/>
         <Button Classes="actionDanger" Content="Clear result"
                 HorizontalAlignment="Right" Command="{Binding ClearStep5ResultCommand}"
                 ToolTip.Tip="Clears the export result and Validation Quick Trace."/>

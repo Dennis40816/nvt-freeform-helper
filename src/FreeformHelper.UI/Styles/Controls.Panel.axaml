@@ -386,4 +386,8 @@
     <Setter Property="BorderBrush" Value="{x:Null}"/>
     <Setter Property="Foreground" Value="{DynamicResource NfcTextSecondaryBrush}"/>
   </Style>
+  <Style Selector="panels|CollapsiblePanel.workflowCompactCard /template/ ToggleButton.panelBlockHeader TextBlock">
+    <Setter Property="TextWrapping" Value="Wrap"/>
+    <Setter Property="TextTrimming" Value="None"/>
+  </Style>
 </Styles>

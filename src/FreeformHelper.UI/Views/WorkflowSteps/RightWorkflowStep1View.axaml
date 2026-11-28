@@ -4,7 +4,7 @@
              xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
              x:Class="FreeformHelper.UI.Views.WorkflowSteps.RightWorkflowStep1View">
-    <panels:CollapsiblePanel x:Name="Step1Block" Title="Step 1 · Geometry match"
+    <panels:CollapsiblePanel x:Name="Step1Block" Classes="workflowCompactCard" Title="Step 1 · Geometry match"
                              IsExpanded="{Binding IsStep1Expanded, Mode=TwoWay}">
       <panels:CollapsiblePanel.HeaderRight>
         <Button Tag="Step1GeometryMatch"
@@ -14,51 +14,50 @@
         </Button>
       </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
-        <SelectableTextBlock Classes="stepNote" Text="{Binding WorkspaceMatchSummary}" TextWrapping="Wrap"/>
-        <SelectableTextBlock Classes="stepNote" Text="The threshold changes diagnostic visibility only."/>
         <ProgressBar Minimum="0" Maximum="1" Value="{Binding MatchProgress}"
                      IsVisible="{Binding IsMatchingPads}" Height="{StaticResource Space6}"/>
-        <SelectableTextBlock Text="{Binding MatchThreshold, StringFormat='Diagnostic threshold: {0:0.####}'}"/>
-        <panels:CollapsiblePanel Title="Regular Visibility Mask" IsExpanded="False">
-          <panels:CollapsiblePanel.HeaderRight>
-            <SelectableTextBlock Classes="stepNote" Text="{Binding RegularMask.Summary}"
-                                 MaxWidth="{DynamicResource WorkspaceCompactStatusMaxWidth}" TextTrimming="CharacterEllipsis"
-                                 TextWrapping="NoWrap"
-                                 ToolTip.Tip="{Binding RegularMask.Summary}"/>
-          </panels:CollapsiblePanel.HeaderRight>
-          <StackPanel Spacing="{StaticResource Space6}">
-        <StackPanel Classes="panelFormField">
-          <Grid ColumnDefinitions="*,Auto"
-                ColumnSpacing="{StaticResource Space10}">
-            <SelectableTextBlock Grid.Column="0"
-                                 Text="Use Regular Visibility Mask"
-                                 VerticalAlignment="Center"/>
-            <ToggleSwitch Grid.Column="1"
-                          IsChecked="{Binding RegularMask.IsEnabled, Mode=TwoWay}"
-                          OnContent=""
-                          OffContent=""
-                          MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                          VerticalAlignment="Center"
-                          ToolTip.Tip="Constrain Step 4 geometry seed and Simulation to active regular pads from imported SeeRegular.csv."/>
-          </Grid>
-          <Grid ColumnDefinitions="*,*"
-                ColumnSpacing="{StaticResource Space10}">
-            <Button Classes="actionNeutral" Grid.Column="0"
-                    Content="Import mask"
-                    Command="{Binding RegularMask.ImportRegularVisibilityMaskCommand}"
-                    HorizontalAlignment="Stretch"
-                    ToolTip.Tip="Import Regular Visibility Mask (SeeRegular.csv) and build the regular active mask used by Step 4 and Simulation."/>
-            <Button Classes="actionNeutral" Grid.Column="1"
-                    Content="Clear mask"
-                    Command="{Binding RegularMask.ClearRegularVisibilityMaskCommand}"
-                    HorizontalAlignment="Stretch"
-                    ToolTip.Tip="Remove the imported regular visibility mask and return to pure geometry seed."/>
-          </Grid>
-        </StackPanel>
+        <SelectableTextBlock Text="{Binding MatchThreshold, StringFormat='Diagnostic threshold: {0:0.####}'}"
+                             TextWrapping="Wrap">
+          <ToolTip.Tip>
+            <StackPanel Spacing="{StaticResource Space6}">
+              <TextBlock Text="{Binding WorkspaceMatchSummary}" TextWrapping="Wrap"/>
+              <TextBlock Text="The threshold changes diagnostic visibility only." TextWrapping="Wrap"/>
+            </StackPanel>
+          </ToolTip.Tip>
+        </SelectableTextBlock>
+        <panels:CollapsiblePanel Classes="workflowCompactCard" Title="Regular Visibility Mask" IsExpanded="False"
+                                 ToolTip.Tip="{Binding RegularMask.Summary}">
+          <StackPanel Classes="panelFormField">
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space10}">
+              <SelectableTextBlock Grid.Column="0"
+                                   Text="Use Regular Visibility Mask"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"/>
+              <ToggleSwitch Grid.Column="1"
+                            IsChecked="{Binding RegularMask.IsEnabled, Mode=TwoWay}"
+                            OnContent=""
+                            OffContent=""
+                            MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
+                            VerticalAlignment="Center"
+                            ToolTip.Tip="Constrain Step 4 geometry seed and Simulation to active regular pads from imported SeeRegular.csv."/>
+            </Grid>
+            <StackPanel Classes="panelFormField">
+              <Button Classes="actionNeutral"
+                      Content="Import mask"
+                      Command="{Binding RegularMask.ImportRegularVisibilityMaskCommand}"
+                      HorizontalAlignment="Stretch"
+                      ToolTip.Tip="Import Regular Visibility Mask (SeeRegular.csv) and build the regular active mask used by Step 4 and Simulation."/>
+              <Button Classes="actionNeutral"
+                      Content="Clear mask"
+                      Command="{Binding RegularMask.ClearRegularVisibilityMaskCommand}"
+                      HorizontalAlignment="Stretch"
+                      ToolTip.Tip="Remove the imported regular visibility mask and return to pure geometry seed."/>
+            </StackPanel>
           </StackPanel>
         </panels:CollapsiblePanel>
-        <Separator/>
-        <SelectableTextBlock Classes="stepNote" Text="Clears matching and invalidates Steps 2 to 5 and validation." TextWrapping="Wrap"/>
+        <SelectableTextBlock Classes="stepNote" Text="{Binding RegularMask.Summary}" TextWrapping="Wrap"
+                             IsVisible="{Binding RegularMask.HasLoadProblem}"/>
         <Button Classes="actionDanger" Content="Clear result"
                 HorizontalAlignment="Right" Command="{Binding ClearStep1ResultCommand}"
                 ToolTip.Tip="Clears matching and invalidates Steps 2 to 5 and validation."/>

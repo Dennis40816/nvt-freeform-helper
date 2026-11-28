@@ -10,7 +10,6 @@
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Primitives/PrimitivesStyles.axaml"/>
   </UserControl.Styles>
   <ScrollViewer Classes="viewportBoundScroll" x:Name="CadPadInfoScroll"
-                MaxHeight="{DynamicResource PadInfoContentMaxHeight}"
                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                 HorizontalContentAlignment="Stretch" Padding="{DynamicResource InsetNone}">
     <Border Padding="{DynamicResource InsetRight12Bottom12}">
