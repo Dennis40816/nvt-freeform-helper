@@ -20,9 +20,8 @@
                              ToolTip.Tip="Changes apply immediately; generate a new export after editing."/>
         <WrapPanel ItemSpacing="{StaticResource Space2}" LineSpacing="{StaticResource Space4}"
                    ToolTip.Tip="{Binding NotchTargetCoverageGuardSummary}">
-          <ToggleSwitch AutomationProperties.Name="Target coverage cap" IsChecked="{Binding EnableTargetCoverageGuard, Mode=TwoWay}"
-                        OnContent="" OffContent="" MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                        Width="{DynamicResource Nvt.Toggle.SwitchTrackWidth}"
+          <ToggleSwitch Classes="compact" AutomationProperties.Name="Target coverage cap"
+                        IsChecked="{Binding EnableTargetCoverageGuard, Mode=TwoWay}" OnContent="" OffContent=""
                         VerticalAlignment="Center"/>
           <SelectableTextBlock Text="Target coverage cap" TextWrapping="Wrap" VerticalAlignment="Center"
                                Width="{DynamicResource WorkflowGuardLabelWidth}"/>
@@ -37,9 +36,8 @@
         </WrapPanel>
         <WrapPanel ItemSpacing="{StaticResource Space2}" LineSpacing="{StaticResource Space4}"
                    ToolTip.Tip="{Binding NotchBoundaryVirtualAreaCapSummary}">
-          <ToggleSwitch AutomationProperties.Name="ToFull area cap" IsChecked="{Binding EnableBoundaryVirtualAreaCap, Mode=TwoWay}"
-                        OnContent="" OffContent="" MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                        Width="{DynamicResource Nvt.Toggle.SwitchTrackWidth}"
+          <ToggleSwitch Classes="compact" AutomationProperties.Name="ToFull area cap"
+                        IsChecked="{Binding EnableBoundaryVirtualAreaCap, Mode=TwoWay}" OnContent="" OffContent=""
                         VerticalAlignment="Center"/>
           <SelectableTextBlock Text="ToFull area cap" TextWrapping="Wrap" VerticalAlignment="Center"
                                Width="{DynamicResource WorkflowGuardLabelWidth}"/>

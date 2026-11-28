@@ -194,6 +194,44 @@ public sealed class ShortWorkflowPanelTests
         }
     }
 
+    [AvaloniaTheory]
+    [InlineData("Light")]
+    [InlineData("Dark")]
+    public void GuardSwitchesStayCompactWithAtMostTwoLabelLinesAtMinimumPanelWidth(string theme)
+    {
+        var vm = new FreeformHelperViewModel { IsStep3Expanded = true, NotchPreviewAutoPlayEnabled = false };
+        var view = new FreeformHelperView { DataContext = vm };
+        var window = Show(view, 1920, 1080);
+        window.RequestedThemeVariant = theme == "Light"
+            ? global::Avalonia.Styling.ThemeVariant.Light : global::Avalonia.Styling.ThemeVariant.Dark;
+        view.FindControl<Grid>("LayoutGrid")!.ColumnDefinitions[4].Width = new global::Avalonia.Controls.GridLength(220);
+        HeadlessUiPump.Drain(window);
+        AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+        vm.IsStep3Expanded = true;
+        HeadlessUiPump.Drain(window);
+        Assert.Equal(220, view.FindControl<Border>("RightPanel")!.Bounds.Width, 2);
+        var step = Assert.Single(view.GetVisualDescendants().OfType<RightWorkflowStep3View>());
+        foreach (var labelText in new[] { "Target coverage cap", "ToFull area cap" })
+        {
+            var toggle = Assert.Single(step.GetVisualDescendants().OfType<ToggleSwitch>(),
+                control => AutomationProperties.GetName(control) == labelText);
+            var label = Assert.Single(step.GetVisualDescendants().OfType<SelectableTextBlock>(), text => text.Text == labelText);
+            Assert.Contains("compact", toggle.Classes);
+            Assert.True(toggle.IsEffectivelyVisible);
+            Assert.Equal(Convert.ToDouble(toggle.FindResource("Nvt.Toggle.CompactSwitchWidth"),
+                System.Globalization.CultureInfo.InvariantCulture), toggle.Bounds.Width, 2);
+            Assert.Equal(Convert.ToDouble(toggle.FindResource("NfcControlHeight"),
+                System.Globalization.CultureInfo.InvariantCulture), toggle.Bounds.Height, 2);
+            Assert.InRange(label.TextLayout.TextLines.Count, 1, 2);
+            Assert.All(label.TextLayout.TextLines, static line => Assert.False(line.HasCollapsed));
+            AssertTextFits(label);
+            AssertWithin(toggle, step, horizontalOnly: true);
+            AssertWithin(label, step, horizontalOnly: true);
+            Assert.True(BoundsIn(toggle, step).Right < BoundsIn(label, step).Left);
+            Assert.InRange(Math.Abs(BoundsIn(toggle, step).Center.Y - BoundsIn(label, step).Center.Y), 0, 1);
+        }
+    }
+
     [AvaloniaFact]
     public async Task DetectionKeepsStatisticsInThePanelAndConsoleWithAShortBannerAsync()
     {

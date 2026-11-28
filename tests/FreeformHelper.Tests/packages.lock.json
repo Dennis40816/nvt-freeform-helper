@@ -415,7 +415,7 @@
         "dependencies": {
           "FreeformHelper.Application": "[1.0.0-g.4, )",
           "FreeformHelper.Domain": "[1.0.0-g.4, )",
-          "Nvt.Core": "[0.9.7, 0.9.7]"
+          "Nvt.Core": "[0.9.8, 0.9.8]"
         }
       },
       "freeformhelper.ui": {
@@ -431,7 +431,7 @@
           "FreeformHelper.Infrastructure": "[1.0.0-g.4, )",
           "NLog": "[5.3.4, )",
           "NLog.Extensions.Logging": "[5.3.4, )",
-          "Nvt.Core.Avalonia": "[0.9.7, 0.9.7]",
+          "Nvt.Core.Avalonia": "[0.9.8, 0.9.8]",
           "Nvt.Core.Fonts": "[0.1.0, 0.1.0]",
           "System.Reactive": "[6.0.0, )"
         }
@@ -510,19 +510,19 @@
       },
       "Nvt.Core": {
         "type": "CentralTransitive",
-        "requested": "[0.9.7, 0.9.7]",
-        "resolved": "0.9.7",
-        "contentHash": "rcy73nzLheGnnEMIdbrYb2CpkP38voV/EU+J6Fyyan21GN1HYmSV/WE23UEN292zXD0GnbU4Q4kunf7OniGMtw=="
+        "requested": "[0.9.8, 0.9.8]",
+        "resolved": "0.9.8",
+        "contentHash": "kV1E4farVR/T31qdf9bF/ftELeAJa6OwQjN23z2D2lI4H4i0jqpnnqMN/xSBj34LlLY9cSgHRQUV0cuxOCr0yw=="
       },
       "Nvt.Core.Avalonia": {
         "type": "CentralTransitive",
-        "requested": "[0.9.7, 0.9.7]",
-        "resolved": "0.9.7",
-        "contentHash": "RA1N7ymLAlYiRUs3dvZSKrlcAPo4YXVLjKEGCEXolISDnIhB8SBvHNUSmKLCm11Ymq01sK3nxFcVt+AWrBIvHw==",
+        "requested": "[0.9.8, 0.9.8]",
+        "resolved": "0.9.8",
+        "contentHash": "OpsKC2EDkiNQaShSg9UViBm8onGYKHckHk0aQkAg6o5t9eP5PLkja+MZT+8DnrczYD76bLrD4zGWKkA0NAt00Q==",
         "dependencies": {
           "Avalonia": "12.1.1",
           "CommunityToolkit.Mvvm": "8.4.2",
-          "Nvt.Core": "0.9.7"
+          "Nvt.Core": "0.9.8"
         }
       },
       "Nvt.Core.Fonts": {
