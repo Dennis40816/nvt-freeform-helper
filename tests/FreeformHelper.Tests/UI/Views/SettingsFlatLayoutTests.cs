@@ -195,6 +195,27 @@ public sealed class SettingsFlatLayoutTests
         });
     }
 
+    [AvaloniaFact]
+    public async Task Step3ModelSummaryChipShowsTheWholeLineAsync()
+    {
+        await WithWindowAsync(async (window, draft) =>
+        {
+            window.Width = window.MinWidth;
+            window.Height = window.MinHeight;
+            var view = await ShowSectionAsync(window, SettingsWindowSection.Step3NotchCompensation);
+            foreach (var model in draft.NotchCompensationModelOptions)
+            {
+                draft.SelectedNotchCompensationModelOption = model;
+                await HeadlessUiPump.FlushQueueAsync();
+                var text = Assert.Single(view.GetVisualDescendants().OfType<SelectableTextBlock>(),
+                    item => item.Text == draft.NotchEffectiveModelSummary);
+                Assert.False(text.TextLayout.TextLines.Any(static line => line.HasCollapsed),
+                    $"'{text.Text}' is cut in {text.Bounds.Width}.");
+                AssertFits(text, view);
+            }
+        });
+    }
+
     [AvaloniaTheory]
     [InlineData(SettingsWindowSection.General)]
     [InlineData(SettingsWindowSection.Step1GeometryMatch)]
