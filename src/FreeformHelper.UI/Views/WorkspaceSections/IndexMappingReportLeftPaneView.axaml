@@ -12,12 +12,10 @@
           <ColumnDefinition Width="{DynamicResource IndexMappingReportCadColumnWidth}"/>
           <ColumnDefinition Width="{DynamicResource IndexMappingReportRegColumnWidth}"/>
           <ColumnDefinition Width="{DynamicResource IndexMappingReportResultColumnWidth}"/>
-          <ColumnDefinition Width="{DynamicResource IndexMappingReportReasonColumnWidth}"/>
         </Grid.ColumnDefinitions>
         <TextBlock Classes="workspaceTableHeaderText" Text="CAD"/>
         <TextBlock Grid.Column="1" Classes="workspaceTableHeaderText" Text="REG"/>
         <TextBlock Grid.Column="2" Classes="workspaceTableHeaderText" Text="Result"/>
-        <TextBlock Grid.Column="3" Classes="workspaceTableHeaderText" Text="Reason"/>
       </Grid>
     </Border>
     <Grid Grid.Row="1">
@@ -43,15 +41,12 @@
                   <ColumnDefinition Width="{DynamicResource IndexMappingReportCadColumnWidth}"/>
                   <ColumnDefinition Width="{DynamicResource IndexMappingReportRegColumnWidth}"/>
                   <ColumnDefinition Width="{DynamicResource IndexMappingReportResultColumnWidth}"/>
-                  <ColumnDefinition Width="{DynamicResource IndexMappingReportReasonColumnWidth}"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock FontWeight="SemiBold" Text="{Binding CadDisplayText}" ToolTip.Tip="{Binding Title}"
                            TextTrimming="CharacterEllipsis"/>
                 <TextBlock Grid.Column="1" Text="{Binding RegularDisplayText}" ToolTip.Tip="{Binding RegularDisplayText}"
                            TextTrimming="CharacterEllipsis"/>
                 <TextBlock Grid.Column="2" Text="{Binding StatusDisplay}" ToolTip.Tip="{Binding StatusDisplay}"
-                           TextTrimming="CharacterEllipsis"/>
-                <TextBlock Grid.Column="3" Text="{Binding DecisionReasonCodeText}" ToolTip.Tip="{Binding ReasonText}"
                            TextTrimming="CharacterEllipsis"/>
               </Grid>
             </Button>

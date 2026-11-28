@@ -55,11 +55,13 @@ internal static class DxfIndexHintsBuilder
 
         var summary =
             $"CAD Output FW Diff assignment: override={assignment.OverrideAssignedCount}, auto={assignment.AutoAssignedCount}, unresolved={unresolvedCount}, {icText}, {anchorText}, {scanOrderText}. Mode: {modeText}. Priority: {priorityText}{qualityText}.";
-        return new DxfIndexHints(visibleOverrideCadIds, anchorCadIds, summary);
+        return new DxfIndexHints(visibleOverrideCadIds, anchorCadIds, summary,
+            $"CAD Output FW Diff: {assignment.AutoAssignedCount} auto · {assignment.OverrideAssignedCount} override");
     }
 }
 
 internal sealed record DxfIndexHints(
     IReadOnlyList<int> OverrideCadIds,
     IReadOnlyList<int> AnchorCadIdsForCanvas,
-    string Summary);
+    string Summary,
+    string AssignmentCountText);

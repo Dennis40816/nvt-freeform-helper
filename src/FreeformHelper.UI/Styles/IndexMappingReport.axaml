@@ -28,16 +28,23 @@
     <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
   </Style>
   <Style Selector="Border.mappingInspector">
-    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
     <Setter Property="BorderThickness" Value="{DynamicResource BorderLeftThin}"/>
     <Setter Property="CornerRadius" Value="{DynamicResource RadiusNone}"/>
     <Setter Property="Padding" Value="{DynamicResource Inset12}"/>
   </Style>
+  <Style Selector="ToggleButton.productFilterChip.empty">
+    <Setter Property="Opacity" Value="{DynamicResource OpacityMuted}"/>
+  </Style>
   <Style Selector="ListBox.mappingDecisions ListBoxItem">
     <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
   </Style>
-  <!-- The decision rows are Core ghost buttons; keep the header text above the row text. -->
+  <Style Selector="Grid.mappingDecisionColumns">
+    <Setter Property="UseLayoutRounding" Value="False"/>
+  </Style>
+  <!-- Header and flat rows share the same border-free column geometry. -->
   <Style Selector="Border.workspaceTableHeader.mappingDecisionHeader">
     <Setter Property="Padding" Value="{DynamicResource Inset14_6}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource BorderNone}"/>
   </Style>
 </Styles>
