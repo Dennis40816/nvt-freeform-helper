@@ -11,6 +11,7 @@
     Background="{DynamicResource NfcAppBackgroundBrush}"
     Foreground="{DynamicResource NfcTextBrush}">
   <UserControl.Styles>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.WorkbenchShell.axaml"/>
     <Style Selector="views|ConsolePanel.expanded">
       <Setter Property="Height" Value="{DynamicResource SimulationConsoleHeight}"/>
     </Style>
@@ -30,10 +31,7 @@
       </Grid.ColumnDefinitions>
       <sections:SimulationWorkspaceControlsPaneView Grid.Column="0"/>
       <GridSplitter Grid.Column="1"
-          Width="{StaticResource SplitterThickness}"
-          Background="{DynamicResource NfcBorderMutedBrush}"
-          HorizontalAlignment="Stretch"
-          ShowsPreview="True"/>
+          Background="{DynamicResource NfcBorderMutedBrush}"/>
       <Border Grid.Column="2"
           Background="{DynamicResource BrushCanvasBackground}"
           MinHeight="0"
@@ -154,10 +152,7 @@
         </Grid>
       </Border>
       <GridSplitter Grid.Column="3"
-          Width="{StaticResource SplitterThickness}"
-          Background="{DynamicResource NfcBorderMutedBrush}"
-          HorizontalAlignment="Stretch"
-          ShowsPreview="True"/>
+          Background="{DynamicResource NfcBorderMutedBrush}"/>
       <sections:SimulationWorkspaceDetailsPaneView Grid.Column="4"/>
     </Grid>
   </Grid>

@@ -1,6 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
              xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsGeneralSectionView">
   <StackPanel Classes="settingsPage">
@@ -19,7 +20,7 @@
                       Grid.Column="1"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Cascade" Tip="Number of IC cascade blocks used to build the full regular grid."/>
+            <corePrimitives:InfoLabel Text="Cascade" Tip="Number of IC cascade blocks used to build the full regular grid."/>
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space8}">
               <controls:NumberScrubber Grid.Column="0"
@@ -41,7 +42,7 @@
                       Grid.Column="2"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Total X channels" Tip="Computed from per-IC X channels in Cascade details."/>
+            <corePrimitives:InfoLabel Text="Total X channels" Tip="Computed from per-IC X channels in Cascade details."/>
             <Border Height="{StaticResource FormControlHeight}">
               <SelectableTextBlock Classes="settingsPassiveValue"
                                    VerticalAlignment="Center"
@@ -52,7 +53,7 @@
                       Grid.Column="3"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Total Y channels" Tip="Computed as the max Y channel count across Cascade details."/>
+            <corePrimitives:InfoLabel Text="Total Y channels" Tip="Computed as the max Y channel count across Cascade details."/>
             <Border Height="{StaticResource FormControlHeight}">
               <SelectableTextBlock Classes="settingsPassiveValue"
                                    VerticalAlignment="Center"
@@ -68,7 +69,7 @@
                       Grid.Column="1"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="AA size X (mm)" Tip="Active-area width in millimeters for generated regular grid placement."/>
+            <corePrimitives:InfoLabel Text="AA size X (mm)" Tip="Active-area width in millimeters for generated regular grid placement."/>
             <controls:NumberScrubber Minimum="0.1"
                                      Maximum="{StaticResource NumericInputMaximum}"
                                      SmallChange="0.0001"
@@ -80,7 +81,7 @@
                       Grid.Column="2"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="AA size Y (mm)" Tip="Active-area height in millimeters for generated regular grid placement."/>
+            <corePrimitives:InfoLabel Text="AA size Y (mm)" Tip="Active-area height in millimeters for generated regular grid placement."/>
             <controls:NumberScrubber Minimum="0.1"
                                      Maximum="{StaticResource NumericInputMaximum}"
                                      SmallChange="0.0001"
@@ -92,7 +93,7 @@
                       Grid.Column="1"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="AA pixels X" Tip="Optional. Panel pixel count across the AA width, for example 6480. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
+            <corePrimitives:InfoLabel Text="AA pixels X" Tip="Optional. Panel pixel count across the AA width, for example 6480. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
             <controls:NumberScrubber Minimum="0"
                                      Maximum="100000"
                                      SmallChange="1"
@@ -104,7 +105,7 @@
                       Grid.Column="2"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="AA pixels Y" Tip="Optional. Panel pixel count across the AA height, for example 848. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
+            <corePrimitives:InfoLabel Text="AA pixels Y" Tip="Optional. Panel pixel count across the AA height, for example 848. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
             <controls:NumberScrubber Minimum="0"
                                      Maximum="100000"
                                      SmallChange="1"
@@ -128,7 +129,7 @@
                       Grid.Column="1"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Scan order" Tip="Diff-index numbering direction for the generated regular grid."/>
+            <corePrimitives:InfoLabel Text="Scan order" Tip="Diff-index numbering direction for the generated regular grid."/>
             <ComboBox ItemsSource="{Binding ScanOrderOptions}"
                       SelectedItem="{Binding SelectedScanOrderOption, Mode=TwoWay}">
               <ComboBox.ItemTemplate>
@@ -143,7 +144,7 @@
                       Grid.ColumnSpan="2"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Regular source" Tip="Choose generated regular grid or a DXF layer as the regular-pad source."/>
+            <corePrimitives:InfoLabel Text="Regular source" Tip="Choose generated regular grid or a DXF layer as the regular-pad source."/>
             <ComboBox ItemsSource="{Binding RegularSourceModeOptions}"
                       SelectedItem="{Binding SelectedRegularSourceModeOption, Mode=TwoWay}">
               <ComboBox.ItemTemplate>
@@ -158,7 +159,7 @@
                       Grid.ColumnSpan="2"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Regular layer" Tip="DXF layer used as regular geometry when Regular source is DXF layer."/>
+            <corePrimitives:InfoLabel Text="Regular layer" Tip="DXF layer used as regular geometry when Regular source is DXF layer."/>
             <ComboBox Classes="regularLayerSelector"
                       IsEnabled="{Binding IsDxfLayerRegularSource}"
                       ItemsSource="{Binding RegularSourceLayerOptions}"
@@ -176,7 +177,7 @@
                       Grid.Column="1"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Grid padding (%)" Tip="Padding percentage applied when generating the regular grid inside the AA size."/>
+            <corePrimitives:InfoLabel Text="Grid padding (%)" Tip="Padding percentage applied when generating the regular grid inside the AA size."/>
             <controls:NumberScrubber Minimum="0"
                                      Maximum="50"
                                      SmallChange="1"
@@ -192,7 +193,7 @@
                       Grid.Column="1"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Coordinate pixel X" Tip="FW reported X-coordinate width used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
+            <corePrimitives:InfoLabel Text="Coordinate pixel X" Tip="FW reported X-coordinate width used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
             <controls:NumberScrubber Minimum="1"
                                      Maximum="{StaticResource NumericInputMaximum}"
                                      SmallChange="1"
@@ -203,7 +204,7 @@
                       Grid.Column="2"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Coordinate pixel Y" Tip="FW reported Y-coordinate height used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
+            <corePrimitives:InfoLabel Text="Coordinate pixel Y" Tip="FW reported Y-coordinate height used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
             <controls:NumberScrubber Minimum="1"
                                      Maximum="{StaticResource NumericInputMaximum}"
                                      SmallChange="1"
@@ -214,7 +215,7 @@
                       Grid.Column="1"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Panel bias X" Tip="Horizontal panel alignment offset used only in panel alignment mode."/>
+            <corePrimitives:InfoLabel Text="Panel bias X" Tip="Horizontal panel alignment offset used only in panel alignment mode."/>
             <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
                                      Maximum="{StaticResource NumericInputMaximum}"
                                      SmallChange="0.0001"
@@ -227,7 +228,7 @@
                       Grid.Column="2"
                       Classes="panelFormField settingsFieldTile"
                       VerticalAlignment="Bottom">
-            <controls:SettingsInfoLabel Text="Panel bias Y" Tip="Vertical panel alignment offset used only in panel alignment mode."/>
+            <corePrimitives:InfoLabel Text="Panel bias Y" Tip="Vertical panel alignment offset used only in panel alignment mode."/>
             <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
                                      Maximum="{StaticResource NumericInputMaximum}"
                                      SmallChange="0.0001"
@@ -260,7 +261,7 @@
               <StackPanel Grid.Column="0"
                           Classes="panelFormField"
                           VerticalAlignment="Center">
-                <controls:SettingsInfoLabel Text="Only closed polylines" Tip="Import only closed DXF polylines as CAD pads; open lines are ignored."/>
+                <corePrimitives:InfoLabel Text="Only closed polylines" Tip="Import only closed DXF polylines as CAD pads; open lines are ignored."/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding ImportOnlyClosedPolylines, Mode=TwoWay}"
@@ -278,7 +279,7 @@
               <StackPanel Grid.Column="0"
                           Classes="panelFormField"
                           VerticalAlignment="Center">
-                <controls:SettingsInfoLabel Text="Import block polylines" Tip="Also scan polylines nested inside DXF BLOCK definitions."/>
+                <corePrimitives:InfoLabel Text="Import block polylines" Tip="Also scan polylines nested inside DXF BLOCK definitions."/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding ImportBlockPolylines, Mode=TwoWay}"
@@ -296,7 +297,7 @@
               <StackPanel Grid.Column="0"
                           Classes="panelFormField"
                           VerticalAlignment="Center">
-                <controls:SettingsInfoLabel Text="Auto bounds from visible layers" Tip="Recompute DXF bounds from currently visible layers after layer filters change."/>
+                <corePrimitives:InfoLabel Text="Auto bounds from visible layers" Tip="Recompute DXF bounds from currently visible layers after layer filters change."/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding RecalcBoundsOnLayerFilter, Mode=TwoWay}"
@@ -314,7 +315,7 @@
               <StackPanel Grid.Column="0"
                           Classes="panelFormField"
                           VerticalAlignment="Center">
-                <controls:SettingsInfoLabel Text="Apply visual preferences on load" Tip="After project load, keep project geometry but reapply app-level display preferences."/>
+                <corePrimitives:InfoLabel Text="Apply visual preferences on load" Tip="After project load, keep project geometry but reapply app-level display preferences."/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding ApplyAppVisualPreferencesOnProjectLoad, Mode=TwoWay}"
@@ -341,7 +342,7 @@
                   Grid.Column="0"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="Grid alignment mode" Tip="Controls how the generated regular grid is aligned to panel AA or CAD geometry."/>
+              <corePrimitives:InfoLabel Text="Grid alignment mode" Tip="Controls how the generated regular grid is aligned to panel AA or CAD geometry."/>
               <ComboBox ItemsSource="{Binding GridAlignmentOptions}"
                         SelectedItem="{Binding SelectedGridAlignmentOption, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
@@ -356,7 +357,7 @@
                   Grid.Column="1"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="Log level" Tip="Minimum log verbosity written to the app console and log file."/>
+              <corePrimitives:InfoLabel Text="Log level" Tip="Minimum log verbosity written to the app console and log file."/>
               <ComboBox ItemsSource="{Binding LogLevelOptions}"
                         SelectedItem="{Binding SelectedLogLevelOption, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
@@ -371,7 +372,7 @@
                   Grid.Column="0"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="Global font size (%)" Tip="Scales UI text across the app; project geometry is unchanged."/>
+              <corePrimitives:InfoLabel Text="Global font size (%)" Tip="Scales UI text across the app; project geometry is unchanged."/>
               <controls:NumberScrubber Minimum="80"
                                        Maximum="140"
                                        SmallChange="1"
@@ -383,7 +384,7 @@
                   Grid.Column="1"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="Highlight line width adjust" Tip="Extra stroke width for selected or highlighted pads on canvas."/>
+              <corePrimitives:InfoLabel Text="Highlight line width adjust" Tip="Extra stroke width for selected or highlighted pads on canvas."/>
               <controls:NumberScrubber Minimum="-2"
                                        Maximum="4"
                                        SmallChange="0.1"
@@ -415,7 +416,7 @@
               <StackPanel Grid.Column="1"
                           Classes="panelFormField"
                           VerticalAlignment="Center">
-                <controls:SettingsInfoLabel Text="Sizing scope" Tip="Local adjusts selected rows or columns; Global redistributes the whole generated grid."/>
+                <corePrimitives:InfoLabel Text="Sizing scope" Tip="Local adjusts selected rows or columns; Global redistributes the whole generated grid."/>
               </StackPanel>
             </Grid>
           </Border>

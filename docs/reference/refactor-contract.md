@@ -429,6 +429,12 @@ Exit criteria: the root VM is noticeably thinner. UI, IPC, keyboard shortcuts, a
 
 - Split the workspace, DXF, and validation responsibilities of `Controls.Core.axaml`.
 - Keep include and selector precedence. Do not change hover, disabled, or checked behavior because of file moves.
+- The split-only layout keeps base defaults and button state overrides in `Controls.Core.axaml`, with includes at each original block position:
+  - `Controls.Validation.axaml`: validation counts, trace rows, and row-kind tags.
+  - `Controls.Workspace.Presets.axaml`: the workspace context badge and preset button content.
+  - `Controls.Workspace.axaml`: workspace surfaces, typography, data rows, verification rails, and code/link content.
+  - `Controls.Dxf.axaml`: DXF summary badges, action groups, layer visibility, and field actions.
+  - `Controls.Dxf.Advanced.axaml`: advanced content, compact icon alignment, and field labels, after the shared action/icon-text styles.
 - Introduce `BasedOn` only for action roles with identical semantics. Merge duplicate `ControlTemplate`s only after structural comparison confirms equivalence one by one. Do not create cross-role inheritance chains.
 - Verify using DevView and UI guards.
 

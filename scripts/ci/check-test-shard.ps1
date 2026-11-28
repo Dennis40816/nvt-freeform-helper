@@ -112,6 +112,12 @@ try {
 }
 Write-Host ("[check-test-shard] total {0} passed {1} failed {2} skipped {3} notExecuted {4}" -f
     $counts.Total, $counts.Passed, $counts.Failed, $counts.Skipped, $counts.NotExecuted)
+foreach ($testName in @($counts.FailedTests | Select-Object -First 20)) {
+    Write-Host ('[check-test-shard] failed test={0}' -f $testName)
+}
+if ($counts.FailedTests.Count -gt 20) {
+    Write-Host ('[check-test-shard] failed tests omitted={0}' -f ($counts.FailedTests.Count - 20))
+}
 if ($counts.Total -eq 0 -and $RunDiagnostics.Count -gt 0) {
     # The existing parse path identifies the failed group; never print an unrecognized directory name.
     $diagnostic = $RunDiagnostics | Where-Object { $_.Group -ceq $readDiagnostics.FailedGroup } | Select-Object -First 1

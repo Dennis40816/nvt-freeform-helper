@@ -1,6 +1,7 @@
 <Window x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
         x:Class="FreeformHelper.UI.Views.CascadeIcSettingsWindow"
         Width="{StaticResource CascadeIcSettingsDialogWidth}"
         Height="{StaticResource CascadeIcSettingsDialogHeight}"
@@ -32,7 +33,7 @@
                                TextWrapping="Wrap"/>
           <StackPanel Grid.Column="1"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Cascade"
+            <corePrimitives:InfoLabel Text="Cascade"
                                         Tip="Adjust IC count. The per-IC rows below update immediately."/>
             <controls:NumberScrubber Minimum="1"
                                      Maximum="{StaticResource NumericInputMaximum}"

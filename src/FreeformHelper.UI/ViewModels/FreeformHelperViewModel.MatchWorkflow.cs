@@ -94,6 +94,7 @@ public sealed partial class FreeformHelperViewModel
         try
         {
             await operationAsync();
+            _logger.Info(System.Globalization.CultureInfo.InvariantCulture, "{0}", FreeformAutoDetectSummary);
         }
         catch (Exception ex) when (ExceptionPolicy.IsRecoverable(ex))
         {

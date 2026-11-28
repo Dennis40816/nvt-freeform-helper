@@ -2,12 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
              xmlns:sys="using:System"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
              x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsStep3SectionView">
   <StackPanel Classes="panelForm settingsPage">
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space8}">
         <StackPanel Classes="panelFormField">
-          <controls:SettingsInfoLabel Text="Compensation model" Tip="Select the Step 3 compensation model that drives To Regular and To Full behavior. Single source of truth for Step 3 behavior."/>
+          <corePrimitives:InfoLabel Text="Compensation model" Tip="Select the Step 3 compensation model that drives To Regular and To Full behavior. Single source of truth for Step 3 behavior."/>
           <ComboBox ItemsSource="{Binding NotchCompensationModelOptions}"
                     SelectedItem="{Binding SelectedNotchCompensationModelOption, Mode=TwoWay}"
                     ToolTip.Tip="{Binding NotchCompensationModelSummary}">
@@ -69,7 +70,7 @@
           <StackPanel Grid.Row="0"
                       Grid.Column="0"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="To Regular EN (derived)" Tip="Derived from the selected compensation model; restores area-proportional signal before redistribution."/>
+            <corePrimitives:InfoLabel Text="To Regular EN (derived)" Tip="Derived from the selected compensation model; restores area-proportional signal before redistribution."/>
             <ToggleSwitch Classes="settingsColumnSwitch"
                           IsEnabled="False"
                           IsChecked="{Binding EnableToRegular, Mode=TwoWay}"
@@ -82,7 +83,7 @@
           <StackPanel Grid.Row="0"
                       Grid.Column="1"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="To Full EN (derived)" Tip="Derived from the selected compensation model; enables To Full expansion."/>
+            <corePrimitives:InfoLabel Text="To Full EN (derived)" Tip="Derived from the selected compensation model; enables To Full expansion."/>
             <ToggleSwitch Classes="settingsColumnSwitch"
                           IsEnabled="False"
                           IsChecked="{Binding EnableToFull, Mode=TwoWay}"
@@ -95,7 +96,7 @@
           <StackPanel Grid.Row="1"
                       Grid.Column="0"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Multi-owner strict overlap (%)" Tip="To Full ignores overlaps and free areas below this ratio. A smaller target share is ignored unless To Full applies to it. Blocking does not use this value. Higher ignores smaller overlaps."/>
+            <corePrimitives:InfoLabel Text="Multi-owner strict overlap (%)" Tip="To Full ignores overlaps and free areas below this ratio. A smaller target share is ignored unless To Full applies to it. Blocking does not use this value. Higher ignores smaller overlaps."/>
             <controls:NumberScrubber Minimum="0"
                                      Maximum="100"
                                      SmallChange="0.1"
@@ -106,7 +107,7 @@
           <StackPanel Grid.Row="2"
                       Grid.Column="0"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Use To Full rule engine" Tip="ON uses the newer centralized To Full gate engine; OFF falls back to the legacy inline gate path."/>
+            <corePrimitives:InfoLabel Text="Use To Full rule engine" Tip="ON uses the newer centralized To Full gate engine; OFF falls back to the legacy inline gate path."/>
             <ToggleSwitch Classes="settingsColumnSwitch"
                           IsChecked="{Binding EnableToFullRuleEngine, Mode=TwoWay}"
                           OnContent=""
@@ -118,7 +119,7 @@
           <StackPanel Grid.Row="2"
                       Grid.Column="1"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Keep To Full trace" Tip="Store per-regular To Full rule decisions for diagnostics and runtime query payloads. Adds diagnostics only; notch output is unchanged."/>
+            <corePrimitives:InfoLabel Text="Keep To Full trace" Tip="Store per-regular To Full rule decisions for diagnostics and runtime query payloads. Adds diagnostics only; notch output is unchanged."/>
             <ToggleSwitch Classes="settingsColumnSwitch"
                           IsEnabled="{Binding EnableToFullRuleEngine}"
                           IsChecked="{Binding EnableToFullRuleTrace, Mode=TwoWay}"
@@ -146,7 +147,7 @@
           <StackPanel Grid.Row="0"
                       Grid.Column="0"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Stage auto play" Tip="Loop the Step 3 preview layers automatically in the AA canvas."/>
+            <corePrimitives:InfoLabel Text="Stage auto play" Tip="Loop the Step 3 preview layers automatically in the AA canvas."/>
             <ToggleSwitch Classes="settingsColumnSwitch"
                           IsChecked="{Binding NotchPreviewAutoPlayEnabled, Mode=TwoWay}"
                           OnContent=""
@@ -158,7 +159,7 @@
           <StackPanel Grid.Row="0"
                       Grid.Column="1"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Interval (ms)" Tip="Delay between Step 3 preview layers during auto play."/>
+            <corePrimitives:InfoLabel Text="Interval (ms)" Tip="Delay between Step 3 preview layers during auto play."/>
             <controls:NumberScrubber Minimum="200"
                                      Maximum="5000"
                                      SmallChange="100"
@@ -168,7 +169,7 @@
           <StackPanel Grid.Row="1"
                       Grid.Column="0"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Show To Regular labels" Tip="Display To Regular ratio labels on the Step 3 preview canvas only."/>
+            <corePrimitives:InfoLabel Text="Show To Regular labels" Tip="Display To Regular ratio labels on the Step 3 preview canvas only."/>
             <ToggleSwitch Classes="settingsColumnSwitch"
                           IsChecked="{Binding ShowNotchToRegularLabels, Mode=TwoWay}"
                           OnContent=""
@@ -180,7 +181,7 @@
           <StackPanel Grid.Row="1"
                       Grid.Column="1"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Show To Full overlay" Tip="Display To Full support stages on the Step 3 preview canvas only."/>
+            <corePrimitives:InfoLabel Text="Show To Full overlay" Tip="Display To Full support stages on the Step 3 preview canvas only."/>
             <ToggleSwitch Classes="settingsColumnSwitch"
                           IsChecked="{Binding ShowNotchCanvasPreview, Mode=TwoWay}"
                           OnContent=""
@@ -192,7 +193,7 @@
           <StackPanel Grid.Row="2"
                       Grid.Column="0"
                       Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="To Full layer stage" Tip="Choose the To Full preview layer: seed, candidate, or final support result."/>
+            <corePrimitives:InfoLabel Text="To Full layer stage" Tip="Choose the To Full preview layer: seed, candidate, or final support result."/>
             <controls:NumberScrubber Minimum="1"
                                      Maximum="3"
                                      SmallChange="1"

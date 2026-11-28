@@ -15,6 +15,7 @@
              Foreground="{DynamicResource NfcTextBrush}">
   <UserControl.Styles>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/MenuStyles.axaml"/>
+    <StyleInclude Source="avares://FreeformHelper.UI/Styles/Controls.WorkbenchShell.axaml"/>
   </UserControl.Styles>
   <controls:SidePanelGrid x:Name="CoordinateWorkspaceGrid"
                           NarrowBelowWidth="{StaticResource CoordinateNarrowViewportWidth}"
@@ -36,10 +37,7 @@
     </Grid.ColumnDefinitions>
     <sections:CoordinatePlannerWorkspaceControlsPaneView Grid.Column="0"/>
     <GridSplitter Grid.Column="1"
-                  Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource NfcBorderMutedBrush}"
-                  HorizontalAlignment="Stretch"
-                  ShowsPreview="True"/>
+                  Background="{DynamicResource NfcBorderMutedBrush}"/>
     <Border Grid.Column="2" Background="{DynamicResource BrushCanvasBackground}" ClipToBounds="True">
       <Grid x:Name="CoordinatePreviewHost" RowDefinitions="Auto,*" ClipToBounds="True">
         <Border Grid.Row="0" Classes="workspaceSecondPeekBar">
@@ -139,10 +137,7 @@
       </Grid>
     </Border>
     <GridSplitter Grid.Column="3"
-                  Width="{StaticResource SplitterThickness}"
-                  Background="{DynamicResource NfcBorderMutedBrush}"
-                  HorizontalAlignment="Stretch"
-                  ShowsPreview="True"/>
+                  Background="{DynamicResource NfcBorderMutedBrush}"/>
     <sections:CoordinatePlannerWorkspaceDetailsPaneView x:Name="CoordinateTable" Grid.Column="4"/>
   </controls:SidePanelGrid>
 </UserControl>
