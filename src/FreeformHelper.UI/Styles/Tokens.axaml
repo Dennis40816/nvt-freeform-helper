@@ -371,6 +371,7 @@
   <Thickness x:Key="InsetLeft18">18,0,0,0</Thickness>
   <Thickness x:Key="InsetFormColumnLeft">0,0,6,0</Thickness>
   <Thickness x:Key="InsetFormColumnRight">6,0,0,0</Thickness>
+  <Thickness x:Key="InsetSettingsSwitchTrack">-3,0,0,0</Thickness>
   <Thickness x:Key="InsetTop12Right16">0,12,16,0</Thickness>
   <Thickness x:Key="InsetLeft10Top16">10,16,0,0</Thickness>
   <Thickness x:Key="InsetWorkspaceFoldCornerBadgeOffset">0,-12,-12,0</Thickness>

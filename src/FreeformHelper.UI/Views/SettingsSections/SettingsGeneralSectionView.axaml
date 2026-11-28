@@ -6,247 +6,237 @@
   <StackPanel Classes="settingsPage">
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space12}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Classes="settingsSectionTitle"
-                               Text="Grid and mapping"/>
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Set the IC layout, AA size, scan direction, and secondary coordinate/alignment options."/>
-        </StackPanel>
-
-        <StackPanel Spacing="{StaticResource Space8}">
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Core setup · most projects start here."/>
-          <Grid ColumnDefinitions="1*,1*,1*"
-                RowDefinitions="Auto,Auto,Auto"
-                ColumnSpacing="{StaticResource Space12}"
-                RowSpacing="{StaticResource Space12}">
-            <Border Grid.Row="0"
-                    Grid.Column="0"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Cascade" Tip="Number of IC cascade blocks used to build the full regular grid."/>
-                <Grid ColumnDefinitions="*,Auto"
-                      ColumnSpacing="{StaticResource Space8}">
-                  <controls:NumberScrubber Grid.Column="0"
-                                           Minimum="1"
-                                           Maximum="{StaticResource NumericInputMaximum}"
-                                           SmallChange="1"
-                                           FormatString="0"
-                                           Value="{Binding CascadeNum, Mode=TwoWay}"/>
-                  <Button Grid.Column="1"
-                          Classes="actionIconButton actionGhost"
-                          Click="EditCascadeDetailsButton_Click"
-                          ToolTip.Tip="Edit per-IC X/Y channels.">
-                    <controls:FontIcon Classes="symbols iconSm"
-                                       Glyph="{x:Static icons:NvtIcons.Edit}"/>
-                  </Button>
-                </Grid>
-              </StackPanel>
+        <Grid ColumnDefinitions="Auto,*,*,*"
+              RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+              ColumnSpacing="{StaticResource Space12}"
+              RowSpacing="{StaticResource Space12}">
+          <SelectableTextBlock Grid.Row="0"
+                               Grid.Column="0"
+                               Classes="settingsSectionTitle"
+                               Text="IC"
+                               ToolTip.Tip="Core setup · most projects start here."/>
+          <StackPanel Grid.Row="0"
+                      Grid.Column="1"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Cascade" Tip="Number of IC cascade blocks used to build the full regular grid."/>
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{StaticResource Space8}">
+              <controls:NumberScrubber Grid.Column="0"
+                                       Minimum="1"
+                                       Maximum="{StaticResource NumericInputMaximum}"
+                                       SmallChange="1"
+                                       FormatString="0"
+                                       Value="{Binding CascadeNum, Mode=TwoWay}"/>
+              <Button Grid.Column="1"
+                      Classes="actionIconButton actionGhost"
+                      Click="EditCascadeDetailsButton_Click"
+                      ToolTip.Tip="Edit per-IC X/Y channels.">
+                <controls:FontIcon Classes="symbols iconSm"
+                                   Glyph="{x:Static icons:NvtIcons.Edit}"/>
+              </Button>
+            </Grid>
+          </StackPanel>
+          <StackPanel Grid.Row="0"
+                      Grid.Column="2"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Total X channels" Tip="Computed from per-IC X channels in Cascade details."/>
+            <Border Height="{StaticResource FormControlHeight}">
+              <SelectableTextBlock Classes="settingsPassiveValue"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding XChannels, StringFormat='{}{0:0}'}"/>
             </Border>
-            <Border Grid.Row="0"
-                    Grid.Column="1"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Total X channels" Tip="Computed from per-IC X channels in Cascade details."/>
-                <SelectableTextBlock Classes="settingsPassiveValue"
-                                     Text="{Binding XChannels, StringFormat='{}{0:0}'}"/>
-              </StackPanel>
+          </StackPanel>
+          <StackPanel Grid.Row="0"
+                      Grid.Column="3"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Total Y channels" Tip="Computed as the max Y channel count across Cascade details."/>
+            <Border Height="{StaticResource FormControlHeight}">
+              <SelectableTextBlock Classes="settingsPassiveValue"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding YChannels, StringFormat='{}{0:0}'}"/>
             </Border>
-            <Border Grid.Row="0"
-                    Grid.Column="2"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Total Y channels" Tip="Computed as the max Y channel count across Cascade details."/>
-                <SelectableTextBlock Classes="settingsPassiveValue"
-                                     Text="{Binding YChannels, StringFormat='{}{0:0}'}"/>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="1"
-                    Grid.Column="0"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="AA size X (mm)" Tip="Active-area width in millimeters for generated regular grid placement."/>
-                <controls:NumberScrubber Minimum="0.1"
-                                         Maximum="{StaticResource NumericInputMaximum}"
-                                         SmallChange="0.0001"
-                                         FormatString="0.####"
-                                         SnapToStep="False"
-                                         Value="{Binding ActiveAreaWidth, Mode=TwoWay}"/>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="1"
-                    Grid.Column="1"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="AA size Y (mm)" Tip="Active-area height in millimeters for generated regular grid placement."/>
-                <controls:NumberScrubber Minimum="0.1"
-                                         Maximum="{StaticResource NumericInputMaximum}"
-                                         SmallChange="0.0001"
-                                         FormatString="0.####"
-                                         SnapToStep="False"
-                                         Value="{Binding ActiveAreaHeight, Mode=TwoWay}"/>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="1"
-                    Grid.Column="2"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Scan order" Tip="Diff-index numbering direction for the generated regular grid."/>
-                <ComboBox ItemsSource="{Binding ScanOrderOptions}"
-                          SelectedItem="{Binding SelectedScanOrderOption, Mode=TwoWay}">
-                  <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                      <SelectableTextBlock Text="{Binding Display}"/>
-                    </DataTemplate>
-                  </ComboBox.ItemTemplate>
-                </ComboBox>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="2"
-                    Grid.Column="0"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Regular source" Tip="Choose generated regular grid or a DXF layer as the regular-pad source."/>
-                <ComboBox ItemsSource="{Binding RegularSourceModeOptions}"
-                          SelectedItem="{Binding SelectedRegularSourceModeOption, Mode=TwoWay}">
-                  <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                      <SelectableTextBlock Text="{Binding Display}"/>
-                    </DataTemplate>
-                  </ComboBox.ItemTemplate>
-                </ComboBox>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="2"
-                    Grid.Column="1"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Regular layer" Tip="DXF layer used as regular geometry when Regular source is DXF layer."/>
-                <ComboBox Classes="regularLayerSelector"
-                          IsEnabled="{Binding IsDxfLayerRegularSource}"
-                          ItemsSource="{Binding RegularSourceLayerOptions}"
-                          SelectedItem="{Binding SelectedRegularSourceLayerOption, Mode=TwoWay}">
-                  <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                      <SelectableTextBlock Text="{Binding Display}"
-                                           TextWrapping="NoWrap"
-                                           TextTrimming="CharacterEllipsis"/>
-                    </DataTemplate>
-                  </ComboBox.ItemTemplate>
-                </ComboBox>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="2"
-                    Grid.Column="2"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Grid padding (%)" Tip="Padding percentage applied when generating the regular grid inside the AA size."/>
-                <controls:NumberScrubber Minimum="0"
-                                         Maximum="50"
-                                         SmallChange="1"
-                                         FormatString="0"
-                                         Value="{Binding GridPaddingPercent, Mode=TwoWay}"/>
-              </StackPanel>
-            </Border>
-          </Grid>
-        </StackPanel>
-
-        <StackPanel Spacing="{StaticResource Space8}">
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Advanced mapping · adjust only for coordinate output or panel alignment."/>
-          <Grid ColumnDefinitions="1*,1*,1*"
-                RowDefinitions="Auto,Auto"
-                ColumnSpacing="{StaticResource Space12}"
-                RowSpacing="{StaticResource Space12}">
-            <Border Grid.Row="0"
-                    Grid.Column="0"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Coordinate pixel X" Tip="FW reported X-coordinate width used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
-                <controls:NumberScrubber Minimum="1"
-                                         Maximum="{StaticResource NumericInputMaximum}"
-                                         SmallChange="1"
-                                         FormatString="0"
-                                         Value="{Binding CoordinatePixelWidth, Mode=TwoWay}"/>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="0"
-                    Grid.Column="1"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="Coordinate pixel Y" Tip="FW reported Y-coordinate height used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
-                <controls:NumberScrubber Minimum="1"
-                                         Maximum="{StaticResource NumericInputMaximum}"
-                                         SmallChange="1"
-                                         FormatString="0"
-                                         Value="{Binding CoordinatePixelHeight, Mode=TwoWay}"/>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="0"
-                    Grid.Column="2"
-                    Classes="settingsFieldTile">
-              <Grid ColumnDefinitions="1*,1*"
-                    ColumnSpacing="{StaticResource Space10}">
-                <StackPanel Grid.Column="0"
-                            Classes="panelFormField left">
-                  <controls:SettingsInfoLabel Text="Panel bias X" Tip="Horizontal panel alignment offset used only in panel alignment mode."/>
-                  <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
-                                           Maximum="{StaticResource NumericInputMaximum}"
-                                           SmallChange="0.0001"
-                                           FormatString="0.####"
-                                           SnapToStep="False"
-                                           IsEnabled="{Binding IsPanelAlignment}"
-                                           Value="{Binding PanelBiasX, Mode=TwoWay}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1"
-                            Classes="panelFormField right">
-                  <controls:SettingsInfoLabel Text="Panel bias Y" Tip="Vertical panel alignment offset used only in panel alignment mode."/>
-                  <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
-                                           Maximum="{StaticResource NumericInputMaximum}"
-                                           SmallChange="0.0001"
-                                           FormatString="0.####"
-                                           SnapToStep="False"
-                                           IsEnabled="{Binding IsPanelAlignment}"
-                                           Value="{Binding PanelBiasY, Mode=TwoWay}"/>
-                </StackPanel>
-              </Grid>
-            </Border>
-            <Border Grid.Row="1"
-                    Grid.Column="0"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="AA pixels X" Tip="Optional. Panel pixel count across the AA width, for example 6480. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
-                <controls:NumberScrubber Minimum="0"
-                                         Maximum="100000"
-                                         SmallChange="1"
-                                         FormatString="0"
-                                         AutomationProperties.Name="AA pixels X"
-                                         Value="{Binding ActiveAreaPixels.PixelsX, Mode=TwoWay}"/>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="1"
-                    Grid.Column="1"
-                    Classes="settingsFieldTile">
-              <StackPanel Classes="panelFormField">
-                <controls:SettingsInfoLabel Text="AA pixels Y" Tip="Optional. Panel pixel count across the AA height, for example 848. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
-                <controls:NumberScrubber Minimum="0"
-                                         Maximum="100000"
-                                         SmallChange="1"
-                                         FormatString="0"
-                                         AutomationProperties.Name="AA pixels Y"
-                                         Value="{Binding ActiveAreaPixels.PixelsY, Mode=TwoWay}"/>
-              </StackPanel>
-            </Border>
-            <Border Grid.Row="1"
-                    Grid.Column="2"
-                    Classes="settingsFieldTile"
-                    IsVisible="{Binding ActiveAreaPixels.HasStatus}">
-              <SelectableTextBlock Classes="stepNote"
-                                   Text="{Binding ActiveAreaPixels.StatusText}"
-                                   TextWrapping="Wrap"/>
-            </Border>
-          </Grid>
-        </StackPanel>
+          </StackPanel>
+          <SelectableTextBlock Grid.Row="1"
+                               Grid.Column="0"
+                               Classes="settingsSectionTitle"
+                               Text="Active area"
+                               ToolTip.Tip="Core setup · most projects start here."/>
+          <StackPanel Grid.Row="1"
+                      Grid.Column="1"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="AA size X (mm)" Tip="Active-area width in millimeters for generated regular grid placement."/>
+            <controls:NumberScrubber Minimum="0.1"
+                                     Maximum="{StaticResource NumericInputMaximum}"
+                                     SmallChange="0.0001"
+                                     FormatString="0.####"
+                                     SnapToStep="False"
+                                     Value="{Binding ActiveAreaWidth, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Row="1"
+                      Grid.Column="2"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="AA size Y (mm)" Tip="Active-area height in millimeters for generated regular grid placement."/>
+            <controls:NumberScrubber Minimum="0.1"
+                                     Maximum="{StaticResource NumericInputMaximum}"
+                                     SmallChange="0.0001"
+                                     FormatString="0.####"
+                                     SnapToStep="False"
+                                     Value="{Binding ActiveAreaHeight, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Row="2"
+                      Grid.Column="1"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="AA pixels X" Tip="Optional. Panel pixel count across the AA width, for example 6480. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="100000"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     AutomationProperties.Name="AA pixels X"
+                                     Value="{Binding ActiveAreaPixels.PixelsX, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Row="2"
+                      Grid.Column="2"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="AA pixels Y" Tip="Optional. Panel pixel count across the AA height, for example 848. Stored with the project. Nothing reads it yet. Leave 0 when unknown."/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="100000"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     AutomationProperties.Name="AA pixels Y"
+                                     Value="{Binding ActiveAreaPixels.PixelsY, Mode=TwoWay}"/>
+          </StackPanel>
+          <SelectableTextBlock Grid.Row="2"
+                               Grid.Column="3"
+                               Classes="stepNote"
+                               VerticalAlignment="Bottom"
+                               IsVisible="{Binding ActiveAreaPixels.HasStatus}"
+                               Text="{Binding ActiveAreaPixels.StatusText}"
+                               TextWrapping="Wrap"/>
+          <SelectableTextBlock Grid.Row="3"
+                               Grid.Column="0"
+                               Classes="settingsSectionTitle"
+                               Text="Grid"
+                               ToolTip.Tip="Core setup · most projects start here."/>
+          <StackPanel Grid.Row="3"
+                      Grid.Column="1"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Scan order" Tip="Diff-index numbering direction for the generated regular grid."/>
+            <ComboBox ItemsSource="{Binding ScanOrderOptions}"
+                      SelectedItem="{Binding SelectedScanOrderOption, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <SelectableTextBlock Text="{Binding Display}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+          <StackPanel Grid.Row="3"
+                      Grid.Column="2"
+                      Grid.ColumnSpan="2"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Regular source" Tip="Choose generated regular grid or a DXF layer as the regular-pad source."/>
+            <ComboBox ItemsSource="{Binding RegularSourceModeOptions}"
+                      SelectedItem="{Binding SelectedRegularSourceModeOption, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <SelectableTextBlock Text="{Binding Display}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+          <StackPanel Grid.Row="4"
+                      Grid.Column="2"
+                      Grid.ColumnSpan="2"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Regular layer" Tip="DXF layer used as regular geometry when Regular source is DXF layer."/>
+            <ComboBox Classes="regularLayerSelector"
+                      IsEnabled="{Binding IsDxfLayerRegularSource}"
+                      ItemsSource="{Binding RegularSourceLayerOptions}"
+                      SelectedItem="{Binding SelectedRegularSourceLayerOption, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <SelectableTextBlock Text="{Binding Display}"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+          <StackPanel Grid.Row="4"
+                      Grid.Column="1"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Grid padding (%)" Tip="Padding percentage applied when generating the regular grid inside the AA size."/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="50"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     Value="{Binding GridPaddingPercent, Mode=TwoWay}"/>
+          </StackPanel>
+          <SelectableTextBlock Grid.Row="5"
+                               Grid.Column="0"
+                               Classes="settingsSectionTitle"
+                               Text="Advanced"
+                               ToolTip.Tip="Advanced mapping · adjust only for coordinate output or panel alignment."/>
+          <StackPanel Grid.Row="5"
+                      Grid.Column="1"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Coordinate pixel X" Tip="FW reported X-coordinate width used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
+            <controls:NumberScrubber Minimum="1"
+                                     Maximum="{StaticResource NumericInputMaximum}"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     Value="{Binding CoordinatePixelWidth, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Row="5"
+                      Grid.Column="2"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Coordinate pixel Y" Tip="FW reported Y-coordinate height used by Coordinate planning and export diagnostics; it does not change regular grid geometry or notch allocation."/>
+            <controls:NumberScrubber Minimum="1"
+                                     Maximum="{StaticResource NumericInputMaximum}"
+                                     SmallChange="1"
+                                     FormatString="0"
+                                     Value="{Binding CoordinatePixelHeight, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Row="6"
+                      Grid.Column="1"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Panel bias X" Tip="Horizontal panel alignment offset used only in panel alignment mode."/>
+            <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                     Maximum="{StaticResource NumericInputMaximum}"
+                                     SmallChange="0.0001"
+                                     FormatString="0.####"
+                                     SnapToStep="False"
+                                     IsEnabled="{Binding IsPanelAlignment}"
+                                     Value="{Binding PanelBiasX, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Row="6"
+                      Grid.Column="2"
+                      Classes="panelFormField settingsFieldTile"
+                      VerticalAlignment="Bottom">
+            <controls:SettingsInfoLabel Text="Panel bias Y" Tip="Vertical panel alignment offset used only in panel alignment mode."/>
+            <controls:NumberScrubber Minimum="{StaticResource NumericInputMinimum}"
+                                     Maximum="{StaticResource NumericInputMaximum}"
+                                     SmallChange="0.0001"
+                                     FormatString="0.####"
+                                     SnapToStep="False"
+                                     IsEnabled="{Binding IsPanelAlignment}"
+                                     Value="{Binding PanelBiasY, Mode=TwoWay}"/>
+          </StackPanel>
+        </Grid>
         <SelectableTextBlock Classes="stepNote"
                              IsVisible="{Binding IsDxfLayerRegularSource}"
                              Text="{Binding DxfRegularSourceHint}"
@@ -255,12 +245,9 @@
     </Border>
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space12}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Classes="settingsSectionTitle"
-                               Text="Import and project behavior"/>
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="DXF import scope and project-load behavior."/>
-        </StackPanel>
+        <SelectableTextBlock Classes="settingsSectionTitle"
+                             Text="Import and project behavior"
+                             ToolTip.Tip="DXF import scope and project-load behavior."/>
         <Grid ColumnDefinitions="1*,1*"
               RowDefinitions="Auto,Auto"
               ColumnSpacing="{StaticResource Space12}"
@@ -271,11 +258,9 @@
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space10}">
               <StackPanel Grid.Column="0"
-                          Classes="panelFormField">
+                          Classes="panelFormField"
+                          VerticalAlignment="Center">
                 <controls:SettingsInfoLabel Text="Only closed polylines" Tip="Import only closed DXF polylines as CAD pads; open lines are ignored."/>
-                <SelectableTextBlock Classes="stepNote"
-                                     Text="Closed DXF shapes only."
-                                     TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding ImportOnlyClosedPolylines, Mode=TwoWay}"
@@ -291,11 +276,9 @@
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space10}">
               <StackPanel Grid.Column="0"
-                          Classes="panelFormField">
+                          Classes="panelFormField"
+                          VerticalAlignment="Center">
                 <controls:SettingsInfoLabel Text="Import block polylines" Tip="Also scan polylines nested inside DXF BLOCK definitions."/>
-                <SelectableTextBlock Classes="stepNote"
-                                     Text="Include polylines inside BLOCKS."
-                                     TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding ImportBlockPolylines, Mode=TwoWay}"
@@ -311,11 +294,9 @@
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space10}">
               <StackPanel Grid.Column="0"
-                          Classes="panelFormField">
+                          Classes="panelFormField"
+                          VerticalAlignment="Center">
                 <controls:SettingsInfoLabel Text="Auto bounds from visible layers" Tip="Recompute DXF bounds from currently visible layers after layer filters change."/>
-                <SelectableTextBlock Classes="stepNote"
-                                     Text="Recompute bounds after layer filters change."
-                                     TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding RecalcBoundsOnLayerFilter, Mode=TwoWay}"
@@ -331,11 +312,9 @@
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space10}">
               <StackPanel Grid.Column="0"
-                          Classes="panelFormField">
+                          Classes="panelFormField"
+                          VerticalAlignment="Center">
                 <controls:SettingsInfoLabel Text="Apply visual preferences on load" Tip="After project load, keep project geometry but reapply app-level display preferences."/>
-                <SelectableTextBlock Classes="stepNote"
-                                     Text="Use app display preferences after load."
-                                     TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding ApplyAppVisualPreferencesOnProjectLoad, Mode=TwoWay}"
@@ -351,12 +330,9 @@
 
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space12}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Classes="settingsSectionTitle"
-                               Text="Application appearance"/>
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Workspace display scale and generated grid alignment."/>
-        </StackPanel>
+        <SelectableTextBlock Classes="settingsSectionTitle"
+                             Text="Application appearance"
+                             ToolTip.Tip="Workspace display scale and generated grid alignment."/>
         <Grid ColumnDefinitions="1*,1*"
               RowDefinitions="Auto,Auto,Auto"
               ColumnSpacing="{StaticResource Space12}"
@@ -437,11 +413,9 @@
                            VerticalAlignment="Center"/>
               </StackPanel>
               <StackPanel Grid.Column="1"
-                          Classes="panelFormField">
+                          Classes="panelFormField"
+                          VerticalAlignment="Center">
                 <controls:SettingsInfoLabel Text="Sizing scope" Tip="Local adjusts selected rows or columns; Global redistributes the whole generated grid."/>
-                <SelectableTextBlock Classes="stepNote"
-                                     Text="Local adjusts row/column sizing; Global redistributes the whole grid."
-                                     TextWrapping="Wrap"/>
               </StackPanel>
             </Grid>
           </Border>
@@ -452,12 +426,9 @@
     <Border Classes="settingsSectionBlock"
             IsVisible="{Binding HasLayerCategoryRows}">
       <StackPanel Spacing="{StaticResource Space12}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Classes="settingsSectionTitle"
-                               Text="Layer categories"/>
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Batch toggle DXF layers by parsed content category."/>
-        </StackPanel>
+        <SelectableTextBlock Classes="settingsSectionTitle"
+                             Text="Layer categories"
+                             ToolTip.Tip="Batch toggle DXF layers by parsed content category."/>
         <ItemsControl ItemsSource="{Binding LayerCategoryRows}">
           <ItemsControl.ItemTemplate>
             <DataTemplate>

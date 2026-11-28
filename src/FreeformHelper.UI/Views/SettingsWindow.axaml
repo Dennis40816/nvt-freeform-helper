@@ -11,33 +11,8 @@
         Foreground="{DynamicResource NfcTextBrush}"
         Title="Settings">
   <Border Classes="settingsWindowChrome">
-    <Grid RowDefinitions="Auto,*,Auto">
-      <Border Grid.Row="0"
-              Classes="settingsHero"
-              Margin="{StaticResource InsetBottom12}">
-        <Grid ColumnDefinitions="*,Auto"
-              ColumnSpacing="{StaticResource Space16}">
-          <StackPanel Grid.Column="0"
-                      Spacing="{StaticResource Space4}">
-            <SelectableTextBlock Classes="settingsEyebrow"
-                                 Text="Freeform Helper"/>
-            <SelectableTextBlock Text="{Binding SettingsSelectedSectionTitle}"
-                                 Classes="workspaceMainTitle"/>
-            <SelectableTextBlock Text="{Binding SettingsSelectedSectionDescription}"
-                                 Classes="settingsSectionMeta"/>
-          </StackPanel>
-          <WrapPanel Grid.Column="1"
-                     HorizontalAlignment="Right"
-                     VerticalAlignment="Top">
-            <Border Classes="chipStatus">
-              <SelectableTextBlock Classes="chipStatusText"
-                                   Text="{Binding SettingsSelectedSectionTitle}"/>
-            </Border>
-          </WrapPanel>
-        </Grid>
-      </Border>
-
-      <Grid Grid.Row="1"
+    <Grid RowDefinitions="*,Auto">
+      <Grid Grid.Row="0"
             ColumnSpacing="{StaticResource Space14}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="{StaticResource SettingsNavRailWidthGrid}"/>
@@ -48,38 +23,42 @@
           <ScrollViewer VerticalScrollBarVisibility="Auto"
                         HorizontalScrollBarVisibility="Disabled">
             <StackPanel Spacing="{StaticResource Space6}">
-              <SelectableTextBlock Classes="settingsSectionMeta"
-                                   Text="Navigation"/>
               <ToggleButton x:Name="GeneralNavButton"
                             Classes="actionGhost flat marked"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="General"
-                            IsChecked="{Binding IsGeneralSectionSelected, Mode=TwoWay}"/>
+                            IsChecked="{Binding IsGeneralSectionSelected, Mode=TwoWay}"
+                            ToolTip.Tip="Project layout, DXF import, display, and generated regular grid settings."/>
               <ToggleButton x:Name="Step1NavButton"
                             Classes="actionGhost flat marked"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 1 · Geometry"
-                            IsChecked="{Binding IsStep1SectionSelected, Mode=TwoWay}"/>
+                            IsChecked="{Binding IsStep1SectionSelected, Mode=TwoWay}"
+                            ToolTip.Tip="Geometry match. Overlap diagnostics and unmatched highlighting."/>
               <ToggleButton x:Name="Step2NavButton"
                             Classes="actionGhost flat marked"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 2 · Freeform"
-                            IsChecked="{Binding IsStep2SectionSelected, Mode=TwoWay}"/>
+                            IsChecked="{Binding IsStep2SectionSelected, Mode=TwoWay}"
+                            ToolTip.Tip="Freeform tagging. Freeform classification and project-load replay behavior."/>
               <ToggleButton x:Name="Step3NavButton"
                             Classes="actionGhost flat marked"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 3 · Notch"
-                            IsChecked="{Binding IsStep3SectionSelected, Mode=TwoWay}"/>
+                            IsChecked="{Binding IsStep3SectionSelected, Mode=TwoWay}"
+                            ToolTip.Tip="Notch compensation. Compensation model, allocation semantics, and preview diagnostics."/>
               <ToggleButton x:Name="Step4NavButton"
                             Classes="actionGhost flat marked"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 4 · Index"
-                            IsChecked="{Binding IsStep4SectionSelected, Mode=TwoWay}"/>
+                            IsChecked="{Binding IsStep4SectionSelected, Mode=TwoWay}"
+                            ToolTip.Tip="Index diagnostics. FW output diff visibility and mapping confidence thresholds."/>
               <ToggleButton x:Name="Step5NavButton"
                             Classes="actionGhost flat marked"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Content="Step 5 · Export"
-                            IsChecked="{Binding IsStep5SectionSelected, Mode=TwoWay}"/>
+                            IsChecked="{Binding IsStep5SectionSelected, Mode=TwoWay}"
+                            ToolTip.Tip="Notch export. Export versions, file type, gate thresholds, and handoff safety."/>
             </StackPanel>
           </ScrollViewer>
         </Border>
@@ -117,7 +96,7 @@
         </Border>
       </Grid>
 
-      <Border Grid.Row="2"
+      <Border Grid.Row="1"
               Classes="settingsFooter">
         <Grid ColumnDefinitions="*,Auto"
               ColumnSpacing="{StaticResource Space12}">

@@ -5,12 +5,9 @@
   <StackPanel Classes="settingsPage">
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space12}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Classes="settingsSectionTitle"
-                               Text="Mapping score weights"/>
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="Geometry score weights for mapping diagnostics."/>
-        </StackPanel>
+        <SelectableTextBlock Classes="settingsSectionTitle"
+                             Text="Mapping score weights"
+                             ToolTip.Tip="Geometry score weights for mapping diagnostics."/>
         <Grid ColumnDefinitions="1*,1*"
               RowDefinitions="Auto,Auto,Auto"
               ColumnSpacing="{StaticResource Space12}"
@@ -98,12 +95,9 @@
 
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space12}">
-        <StackPanel Spacing="{StaticResource Space4}">
-          <SelectableTextBlock Classes="settingsSectionTitle"
-                               Text="CAD Output FW Diff diagnostics"/>
-          <SelectableTextBlock Classes="settingsSectionMeta"
-                               Text="CAD output FW diff numbering and visibility."/>
-        </StackPanel>
+        <SelectableTextBlock Classes="settingsSectionTitle"
+                             Text="CAD Output FW Diff diagnostics"
+                             ToolTip.Tip="CAD output FW diff numbering and visibility."/>
         <Grid ColumnDefinitions="1*,1*"
               RowDefinitions="Auto,Auto"
               ColumnSpacing="{StaticResource Space12}"
@@ -112,9 +106,10 @@
                   Grid.Column="0"
                   Classes="settingsFieldTile">
             <StackPanel Classes="panelFormField">
-              <controls:SettingsInfoLabel Text="CAD Output FW Diff strategy" Tip="Strategy used to assign CAD Output FW Diff indices from geometry seed and overrides."/>
+              <controls:SettingsInfoLabel Text="CAD Output FW Diff strategy" Tip="Strategy used to assign CAD Output FW Diff indices from geometry seed and overrides. Future validation path: reserved for CSV-confirmed geometry seed."/>
               <ComboBox ItemsSource="{Binding CadOutputFwDiffAutoModeOptions}"
-                        SelectedItem="{Binding SelectedCadOutputFwDiffAutoModeOption, Mode=TwoWay}">
+                        SelectedItem="{Binding SelectedCadOutputFwDiffAutoModeOption, Mode=TwoWay}"
+                        ToolTip.Tip="{Binding SelectedCadOutputFwDiffAutoModeOption.Description}">
                 <ComboBox.ItemTemplate>
                   <DataTemplate>
                     <SelectableTextBlock Text="{Binding Display}"
@@ -122,9 +117,6 @@
                   </DataTemplate>
                 </ComboBox.ItemTemplate>
               </ComboBox>
-              <SelectableTextBlock Classes="stepNote"
-                                   Text="{Binding SelectedCadOutputFwDiffAutoModeOption.Description}"
-                                   TextWrapping="Wrap"/>
             </StackPanel>
           </Border>
           <Border Grid.Row="0"
@@ -142,24 +134,12 @@
           <Border Grid.Row="1"
                   Grid.Column="0"
                   Classes="settingsFieldTile">
-            <StackPanel Classes="panelFormField">
-              <SelectableTextBlock Text="Future validation path"/>
-              <SelectableTextBlock Classes="stepNote"
-                                   Text="Reserved for CSV-confirmed geometry seed."
-                                   TextWrapping="Wrap"/>
-            </StackPanel>
-          </Border>
-          <Border Grid.Row="1"
-                  Grid.Column="1"
-                  Classes="settingsFieldTile">
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space10}">
               <StackPanel Grid.Column="0"
-                          Classes="panelFormField">
+                          Classes="panelFormField"
+                          VerticalAlignment="Center">
                 <controls:SettingsInfoLabel Text="Show CAD Output FW Diff markers" Tip="Display CAD output diff markers on canvas; mapping data is unchanged."/>
-                <SelectableTextBlock Classes="stepNote"
-                                     Text="Display only; mapping result unchanged."
-                                     TextWrapping="Wrap"/>
               </StackPanel>
               <ToggleSwitch Grid.Column="1"
                             IsChecked="{Binding ShowDiffIndexOverlay, Mode=TwoWay}"
