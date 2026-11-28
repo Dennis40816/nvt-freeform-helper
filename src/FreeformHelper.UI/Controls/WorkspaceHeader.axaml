@@ -179,72 +179,97 @@
   <Border Background="{DynamicResource NfcSurfaceBrush}"
           BorderBrush="{DynamicResource NfcBorderMutedBrush}"
           BorderThickness="{StaticResource BorderBottomThin}"
-          Padding="{StaticResource Inset14_8}">
-    <Grid ColumnDefinitions="Auto,*"
+          Padding="{StaticResource Inset10_4}">
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto"
           RowDefinitions="Auto">
+      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left"
+            VerticalAlignment="Center" Margin="{StaticResource InsetRight12}">
+        <SelectableTextBlock x:Name="StatusMessage" Classes="workspaceHeaderStatus"
+                             MaxLines="1"
+                             Text="{Binding StatusDisplayText}" IsVisible="{Binding HasStatusDisplay}"
+                             ToolTip.Tip="{Binding StatusDisplayText}"
+                             VerticalAlignment="Center" Margin="{StaticResource InsetRight8}"/>
+        <SelectableTextBlock x:Name="SelectionCounts" Grid.Column="1" Classes="workspaceHeaderSelection"
+                             MaxLines="1"
+                             VerticalAlignment="Center">
+          <SelectableTextBlock.Text>
+            <MultiBinding StringFormat="Selected: CAD {0} · Regular {1}">
+              <Binding Path="SelectionSummaryResult.CadCount"/>
+              <Binding Path="SelectionSummaryResult.RegularCount"/>
+            </MultiBinding>
+          </SelectableTextBlock.Text>
+        </SelectableTextBlock>
+      </Grid>
+      <SelectableTextBlock x:Name="RangeWarning" Grid.Column="1"
+                           Text="{Binding ManualRangeError}" Foreground="{DynamicResource NfcDangerTextBrush}"
+                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxLines="1"
+                           MaxWidth="{StaticResource ViewMenuPopupWidth}"
+                           Margin="{StaticResource InsetRight8}" VerticalAlignment="Center"
+                           ToolTip.Tip="{Binding ManualRangeError}" IsVisible="{Binding HasManualRangeError}"/>
+      <ToggleButton x:Name="RangeMenuButton" Grid.Column="2"
+                    Classes="actionGhost flat" Classes.active="{Binding IsOpen, ElementName=RangeMenuPopup}"
+                    KeyDown="HeaderMenuButton_KeyDown">
+        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}">
+          <SelectableTextBlock Text="Range selection" VerticalAlignment="Center"/>
+          <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.ExpandMore}"/>
+        </StackPanel>
+      </ToggleButton>
       <ToggleButton x:Name="ViewMenuButton"
-                    Classes="viewMenuButton actionNeutral"
+                    Grid.Column="3"
+                    Classes="viewMenuButton actionGhost flat" Classes.active="{Binding IsOpen, ElementName=ViewMenuPopup}"
                     ToolTip.Tip="Display options"
                     PointerPressed="ViewMenuButton_PointerPressed"
                     PointerEntered="ViewMenuButton_PointerEntered"
                     PointerExited="ViewMenuButton_PointerExited"
                     IsCheckedChanged="ViewMenuButton_IsCheckedChanged"
-                    Margin="{StaticResource InsetRight12}"
+                    KeyDown="HeaderMenuButton_KeyDown"
                     VerticalAlignment="Stretch">
         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}">
           <controls:FontIcon Classes="symbols"
                              Glyph="{x:Static icons:NvtIcons.Visibility}"/>
           <SelectableTextBlock Text="Display" VerticalAlignment="Center"/>
+          <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.ExpandMore}"/>
         </StackPanel>
       </ToggleButton>
 
-      <Border Grid.Column="1"
-              Background="{DynamicResource NfcSurfaceSubtleBrush}"
-              BorderBrush="{DynamicResource NfcBorderMutedBrush}"
-              BorderThickness="{StaticResource BorderThin}"
-              CornerRadius="{StaticResource RadiusMd}"
-              Padding="{StaticResource Inset12_10}"
-              VerticalAlignment="Stretch">
+      <Popup x:Name="RangeMenuPopup"
+             PlacementTarget="{Binding ElementName=RangeMenuButton}"
+             Placement="BottomEdgeAlignedRight" Topmost="False"
+             IsOpen="{Binding IsChecked, ElementName=RangeMenuButton, Mode=TwoWay}"
+             IsLightDismissEnabled="True" Opened="HeaderMenuPopup_Opened"
+             DataContext="{Binding DataContext, ElementName=Root}">
+        <Border Classes="viewMenuPopup" KeyDown="HeaderMenuPopup_KeyDown"
+                KeyboardNavigation.TabNavigation="Cycle">
         <StackPanel Spacing="{StaticResource Space6}">
-          <SelectableTextBlock Classes="workspaceHeaderStatus"
-                               Text="{Binding StatusDisplayText}" IsVisible="{Binding HasStatusDisplay}"
-                               ToolTip.Tip="{Binding StatusDisplayText}"/>
-          <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space8}">
-            <Border Classes="chipStatus"><SelectableTextBlock Text="{Binding CadSelectionText}"/></Border>
-            <Border Classes="chipStatus"><SelectableTextBlock Text="{Binding RegularSelectionText}"/></Border>
-          </StackPanel>
-          <SelectableTextBlock Text="{Binding ManualRangeError}" Foreground="{DynamicResource NfcDangerTextBrush}"
-                               TextWrapping="Wrap" IsVisible="{Binding HasManualRangeError}"/>
-          <controls:HidePanelBlock Title="Range selection" IsExpanded="False">
-            <StackPanel Spacing="{StaticResource Space6}">
               <Grid ColumnDefinitions="*,*">
                 <StackPanel Classes="panelFormField left">
                   <SelectableTextBlock Text="Rows"/>
-                  <TextBox Classes="workspaceHeaderInput" PlaceholderText="e.g. 0-3,6"
+                  <TextBox x:Name="ManualRowsInput" Classes="workspaceHeaderInput" PlaceholderText="e.g. 0-3,6"
                            Text="{Binding ManualRowsRange, Mode=TwoWay}"
                            ToolTip.Tip="Rows range (0 = top). Accepts 5 / 5-7 / 5,7."/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Classes="panelFormField right">
                   <SelectableTextBlock Text="Cols"/>
-                  <TextBox Classes="workspaceHeaderInput" PlaceholderText="e.g. 2-6"
+                  <TextBox x:Name="ManualColsInput" Classes="workspaceHeaderInput" PlaceholderText="e.g. 2-6"
                            Text="{Binding ManualColsRange, Mode=TwoWay}"
                            ToolTip.Tip="Column range. Accepts 5 / 5-7 / 5,7."/>
                 </StackPanel>
               </Grid>
-              <SelectableTextBlock Classes="stepNote" Text="0-based; applies immediately"/>
-            </StackPanel>
-          </controls:HidePanelBlock>
         </StackPanel>
-      </Border>
+        </Border>
+      </Popup>
 
       <Popup x:Name="ViewMenuPopup"
              PlacementTarget="{Binding ElementName=ViewMenuButton}"
              Placement="BottomEdgeAlignedLeft"
              Topmost="False"
+             Opened="HeaderMenuPopup_Opened"
              PlacementConstraintAdjustment="FlipX,FlipY,SlideX,SlideY"
              DataContext="{Binding DataContext, ElementName=Root}">
         <Border x:Name="ViewMenuPopupRoot"
                 Classes="viewMenuPopup"
+                KeyDown="HeaderMenuPopup_KeyDown"
+                KeyboardNavigation.TabNavigation="Cycle"
                 PointerEntered="ViewMenuPopup_PointerEntered"
                 PointerExited="ViewMenuPopup_PointerExited">
            <ScrollViewer x:Name="ViewMenuScroll"

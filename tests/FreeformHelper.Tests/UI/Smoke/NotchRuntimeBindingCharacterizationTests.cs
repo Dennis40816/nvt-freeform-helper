@@ -7,6 +7,7 @@ using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI;
 using FreeformHelper.UI.Controls;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
@@ -140,15 +141,16 @@ public sealed class NotchRuntimeBindingCharacterizationTests
         using var culture = TestCulture.UseEnUs();
         using var files = new NotchDataEditExportTestScope();
         var vm = await files.CreateAsync();
-        var view = new FreeformHelperView { DataContext = vm };
-        var window = new Window { Content = view, Width = 1200, Height = 900 };
+        using var shell = new ShellViewModel(vm) { IsDevPageAvailable = false };
+        var window = new MainWindow { Width = 1200, Height = 900, WindowState = WindowState.Normal };
+        window.SetShellViewModel(shell);
         using var dialog = new SavePathGate();
         Task export = Task.CompletedTask;
         try
         {
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
-            var menu = Assert.IsType<Menu>(view.FindControl<Menu>("MainMenu"));
+            var menu = Assert.IsType<Menu>(window.FindControl<Menu>("MainMenu"));
             var exportMenu = Assert.Single(menu.Items.OfType<MenuItem>(), static candidate => candidate.Header as string == "Export");
             exportMenu.IsSubMenuOpen = true;
             await HeadlessUiPump.FlushQueueAsync();
@@ -180,6 +182,7 @@ public sealed class NotchRuntimeBindingCharacterizationTests
         {
             dialog.Release();
             await export.WaitAsync(TestContext.Current.CancellationToken);
+            vm.HasUnsavedChanges = false;
             window.Close();
         }
     }

@@ -123,8 +123,8 @@ public sealed class WorkspaceIntegratedLayoutTests
         var view = new FreeformHelperView { DataContext = vm };
         var window = Show(view);
 
-        Assert.False(Assert.Single(view.GetVisualDescendants().OfType<HidePanelBlock>(),
-            static panel => panel.Title == "Range selection").IsExpanded);
+        Assert.False(Assert.Single(view.GetVisualDescendants().OfType<WorkspaceHeader>())
+            .FindControl<Avalonia.Controls.Primitives.Popup>("RangeMenuPopup")!.IsOpen);
         Assert.False(FindPanel(window, "Regular Visibility Mask").IsExpanded);
         vm.IsStep2Expanded = true;
         HeadlessUiPump.Drain(window);
@@ -245,8 +245,9 @@ public sealed class WorkspaceIntegratedLayoutTests
     private static void AssertSelectionCounts(Window window, FreeformHelperViewModel vm)
     {
         HeadlessUiPump.Drain(window);
-        Assert.Single(VisibleTexts(window), text => text == vm.CadSelectionText);
-        Assert.Single(VisibleTexts(window), text => text == vm.RegularSelectionText);
+        Assert.Single(VisibleTexts(window), text => text ==
+            $"Selected: CAD {vm.SelectionSummaryResult.CadCount} · Regular {vm.SelectionSummaryResult.RegularCount}");
+        Assert.DoesNotContain(VisibleTexts(window), text => text == vm.CadSelectionText || text == vm.RegularSelectionText);
     }
 
     private static CollapsiblePanel FindPanel(Window window, string title) =>

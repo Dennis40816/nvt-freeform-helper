@@ -20,7 +20,7 @@ internal sealed class MainWindowGlobalInputFixture : IAsyncDisposable
     private readonly DxfEditingBehaviorTestScope _files = new();
     private readonly ShellViewModel _shell;
 
-    private MainWindowGlobalInputFixture()
+    private MainWindowGlobalInputFixture(bool devPageAvailable)
     {
         HeadlessAppBootstrap.EnsureInitialized();
         Helper = _files.CreateViewModel();
@@ -33,7 +33,7 @@ internal sealed class MainWindowGlobalInputFixture : IAsyncDisposable
         var cascade = Assert.Single(Helper.CascadeIcSettings);
         cascade.XChannels = 3;
         cascade.YChannels = 1;
-        _shell = new ShellViewModel(Helper) { IsConsoleExpanded = false, IsDevPageAvailable = false };
+        _shell = new ShellViewModel(Helper) { IsConsoleExpanded = false, IsDevPageAvailable = devPageAvailable };
         _shell.Simulation.RequestPrewarmWorkspaceAsync = null;
         _shell.CoordinatePlanner.RequestPrewarmWorkspaceAsync = null;
         Window = new MainWindow { Width = 1280, Height = 900, WindowState = WindowState.Normal };
@@ -45,9 +45,9 @@ internal sealed class MainWindowGlobalInputFixture : IAsyncDisposable
     public FreeformHelperViewModel Helper { get; }
     public MainWindow Window { get; }
 
-    public static async Task<MainWindowGlobalInputFixture> CreateAsync()
+    public static async Task<MainWindowGlobalInputFixture> CreateAsync(bool devPageAvailable = false)
     {
-        var fixture = new MainWindowGlobalInputFixture();
+        var fixture = new MainWindowGlobalInputFixture(devPageAvailable);
         try
         {
             await HeadlessUiPump.FlushQueueAsync();
